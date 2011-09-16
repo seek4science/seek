@@ -216,6 +216,8 @@ class PersonTest < ActiveSupport::TestCase
     p=people(:quentin_person)
     newP=Person.new(:first_name=>"Fred",:email=>p.email)
     assert !newP.valid?,"Should not be valid as email is not unique"
+    newP.email = p.email.capitalize
+    assert !newP.valid?,"Should not be valid as email is not case sensitive"
     newP.email="zxczxc@zxczxczxc.com"
     assert newP.valid?
   end
