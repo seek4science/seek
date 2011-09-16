@@ -1,12 +1,8 @@
 module SearchHelper
   
   def search_type_options
-    search_type_options = ["People","Institutions","Projects","SOPs","Studies","Assays", "Investigations","Models","Data files", "Publications","Presentations"]
-    if Seek::Config.is_virtualliver
-       search_type_options |= ["Samples","Specimens"]
-    end
-    search_type_options.sort!
-    search_type_options.insert(0, 'All')
+    search_type_options = ["All", "Institutions", "People", "Projects"]
+    search_type_options |= Seek::Util.user_creatable_types.collect{|c| [(c.name.underscore.humanize == "Sop" ? "SOP" : c.name.underscore.humanize),c.name.underscore] }
     return search_type_options
   end
     
