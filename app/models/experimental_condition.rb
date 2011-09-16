@@ -10,6 +10,7 @@ class ExperimentalCondition < ActiveRecord::Base
   validates_presence_of :experimental_condition_links, :if => Proc.new{|ec| ec.measured_item.title == 'concentration'}
   acts_as_solr(:field => [], :include => [{:measured_item => {:fields => [:title]}}]) if Seek::Config.solr_enabled
 
+  acts_as_annotatable :name_field=>:item
 
   def range_text
     #TODO: write test

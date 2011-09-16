@@ -201,6 +201,5 @@ module Seek
      mapping = mappings.blank? ? Mapping.new(:sabiork_id => sabiork_id, :chebi_id => chebi_id, :kegg_id => kegg_id) :  mappings.first
      mapping
   end
-  end
 
 end

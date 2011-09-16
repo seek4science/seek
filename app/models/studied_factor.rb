@@ -9,6 +9,8 @@ class StudiedFactor < ActiveRecord::Base
   validates_presence_of :unit,:measured_item,:start_value,:data_file
   validates_presence_of :studied_factor_links, :if => Proc.new{|fs| fs.measured_item.title == 'concentration'}, :message => "can't be a nil"
 
+  acts_as_annotatable :name_field=>:item
+
   def range_text
     #TODO: write test
     return start_value unless (end_value && end_value!=0)
