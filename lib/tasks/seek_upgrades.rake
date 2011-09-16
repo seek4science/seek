@@ -39,10 +39,8 @@ namespace :seek do
           end
         end
       end
-      puts "Finished successfully"
     end
-
-
+    puts "Finished successfully"
   end
 
 end
