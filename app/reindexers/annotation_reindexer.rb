@@ -5,7 +5,7 @@ class AnnotationReindexer < ReindexerObserver
     c=[]
     c = c | annotation.annotatable if annotation.annotatable.respond_to?(:reindexing_consequences)
     c << annotation.annotatable if annotation.annotatable.respond_to?(:solr_save)
-    c
+    c.uniq
   end
   
 end
