@@ -73,11 +73,9 @@ class DataFile < ActiveRecord::Base
 
   belongs_to :content_blob #don't add a dependent=>:destroy, as the content_blob needs to remain to detect future duplicates
 
-  acts_as_solr(:fields=>[:description,:title,:original_filename,:tag_counts,:annotations,:fs_search_fields]) if Seek::Config.solr_enabled
+  acts_as_solr(:fields=>[:description,:title,:original_filename,:searchable_tags,:spreadsheet_annotation_search_fields,:fs_search_fields]) if Seek::Config.solr_enabled
 
   has_many :studied_factors, :conditions =>  'studied_factors.data_file_version = #{self.version}'
-
-  acts_as_uniquely_identifiable
 
   explicit_versioning(:version_column => "version") do
 
@@ -133,11 +131,13 @@ class DataFile < ActiveRecord::Base
   end
 
   #the annotation string values to be included in search indexing
-  def annotations
+  def spreadsheet_annotation_search_fields
     annotations = []
-    content_blob.worksheets.each do |ws|
-      ws.cell_ranges.each do |cell_range|
-        annotations = annotations | cell_range.annotations.collect{|a| a.value.text}
+    unless content_blob.nil?
+      content_blob.worksheets.each do |ws|
+        ws.cell_ranges.each do |cell_range|
+          annotations = annotations | cell_range.annotations.collect{|a| a.value.text}
+        end
       end
     end
     annotations

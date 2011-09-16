@@ -38,7 +38,7 @@
     <%= f.text_area :comments, :style => "width: 85%;", :rows => 5 -%>
   </p>
 
-  <%= render :partial => 'projects/project_selector', :locals => {:resource => @sample}%>
+  <%= render :partial => 'projects/project_selector', :locals => {:resource => @sample,:allow_nil=>true}%>
 
   <br style="clear:both"/>
   <p>
@@ -48,7 +48,7 @@
   <%= fancy_multiselect @sample, :sops, :name => 'sample_sop_ids', :association_class=>Sop,:selected => (params[:sample_sop_ids] || []).map(&:to_i) | @sample.sop_masters.map(&:sop_id) %>
 </div>
 
-
+<%= f.hidden_field :from_new_link %>
 
 <p style="margin-top: 2em; text-align: center;">
   <%= f.submit(action==:edit ? "Update" : "Create", :disable_with=>(action==:edit ? "Updating..." : "Creating...")) -%>

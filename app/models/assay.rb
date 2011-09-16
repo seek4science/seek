@@ -17,8 +17,9 @@ class Assay < ActiveRecord::Base
     User.current_user.try :person
   end
 
+  acts_as_annotatable :name_field=>:tag
+  include Seek::Taggable
 
-  acts_as_taggable
   belongs_to :institution
   has_and_belongs_to_many :samples
   belongs_to :assay_type
@@ -59,13 +60,13 @@ class Assay < ActiveRecord::Base
   validates_presence_of :study, :message=>" must be selected"
   validates_presence_of :owner
   validates_presence_of :assay_class
-  validates_presence_of :samples,:unless => :is_modelling?
+  validates_presence_of :samples,:if => Proc.new { |assay| assay.is_experimental? && Seek::Config.is_virtualliver}
   has_many :relationships, 
     :class_name => 'Relationship',
     :as => :subject,
     :dependent => :destroy
           
-  acts_as_solr(:fields=>[:description,:title,:tag_counts],:include=>[:assay_type,:technology_type,:organisms,:strains]) if Seek::Config.solr_enabled
+  acts_as_solr(:fields=>[:description,:title],:include=>[:assay_type,:technology_type,:organisms,:strains]) if Seek::Config.solr_enabled
   
   def short_description
     type=assay_type.nil? ? "No type" : assay_type.title

@@ -25,9 +25,7 @@ class DataFilesControllerTest < ActionController::TestCase
   test "get XML when not logged in" do
     logout
     df = Factory(:data_file,:policy=>Factory(:public_policy, :access_type=>Policy::VISIBLE))
-    puts df.versions
     get :show,:id=>df,:format=>"xml"
-    puts @response.body
     perform_api_checks
 
   end
@@ -701,47 +699,62 @@ class DataFilesControllerTest < ActionController::TestCase
   end
 
   test "update with ajax only applied when viewable" do
-    login_as(:aaron)
-    user=users(:aaron)
-    df=data_files(:downloadable_data_file)
-    assert df.tag_counts.empty?,"This should have no tags for this test to work"
-    golf_tags=tags(:golf)
+    p=Factory :person
+    p2=Factory :person
+    viewable_df=Factory :data_file,:contributor=>p2,:policy=>Factory(:publicly_viewable_policy)
+    dummy_df=Factory :data_file
 
-    assert_difference("ActsAsTaggableOn::Tagging.count") do
-      xml_http_request :post, :update_tags_ajax,{:id=>df.id,:tag_autocompleter_unrecognized_items=>[],:tag_autocompleter_selected_ids=>[golf_tags.id]}
-    end
+    login_as p.user
 
-    df.reload
+    assert viewable_df.can_view?(p.user)
+    assert !viewable_df.can_edit?(p.user)
 
-    assert_equal ["golf"],df.tag_counts.collect(&:name)
+    golf=Factory :tag,:annotatable=>dummy_df,:source=>p2,:value=>"golf"
 
-    df=data_files(:private_data_file)
-    assert df.tag_counts.empty?,"This should have no tags for this test to work"
+    xml_http_request :post, :update_annotations_ajax,{:id=>viewable_df,:tag_autocompleter_unrecognized_items=>[],:tag_autocompleter_selected_ids=>[golf.value.id]}
 
-    assert !df.can_view?(user),"Aaron should not be able to view this item for this test to be valid"
+    viewable_df.reload
 
-    assert_no_difference("ActsAsTaggableOn::Tagging.count") do
-      xml_http_request :post, :update_tags_ajax,{:id=>df.id,:tag_autocompleter_unrecognized_items=>[],:tag_autocompleter_selected_ids=>[golf_tags.id]}
-    end
+    assert_equal ["golf"],viewable_df.annotations.collect{|a| a.value.text}
 
-    df.reload
+    private_df=Factory :data_file,:contributor=>p2,:policy=>Factory(:private_policy)
 
-    assert df.tag_counts.empty?,"This should still have no tags"
+    assert !private_df.can_view?(p.user)
+    assert !private_df.can_edit?(p.user)
+
+    xml_http_request :post, :update_annotations_ajax,{:id=>private_df,:tag_autocompleter_unrecognized_items=>[],:tag_autocompleter_selected_ids=>[golf.value.id]}
+
+    private_df.reload
+    assert private_df.annotations.empty?
 
   end
 
   test "update tags with ajax" do
-    df=data_files(:picture)
-    golf_tags=tags(:golf)
+    p = Factory :person
 
-    assert df.tag_counts.empty?, "This sop should have no tags for the test"
+    login_as p.user
 
-    assert_difference("ActsAsTaggableOn::Tag.count") do
-      xml_http_request :post, :update_tags_ajax,{:id=>df.id,:tag_autocompleter_unrecognized_items=>["soup"],:tag_autocompleter_selected_ids=>golf_tags.id}
-    end
+    p2 = Factory :person
+    df = Factory :data_file,:contributor=>p.user
+
+    assert df.annotations.empty?,"this data file should have no tags for the test"
+
+    golf = Factory :tag,:annotatable=>df,:source=>p2.user,:value=>"golf"
+    Factory :tag,:annotatable=>df,:source=>p2.user,:value=>"sparrow"
 
     df.reload
-    assert_equal ["golf","soup"],df.tag_counts.collect(&:name).sort
+
+    assert_equal ["golf","sparrow"],df.annotations.collect{|a| a.value.text}.sort
+    assert_equal [],df.annotations.select{|a| a.source==p.user}.collect{|a| a.value.text}.sort
+    assert_equal ["golf","sparrow"],df.annotations.select{|a|a.source==p2.user}.collect{|a| a.value.text}.sort
+
+    xml_http_request :post, :update_annotations_ajax,{:id=>df,:tag_autocompleter_unrecognized_items=>["soup"],:tag_autocompleter_selected_ids=>[golf.value.id]}
+
+    df.reload
+
+    assert_equal ["golf","soup","sparrow"],df.annotations.collect{|a| a.value.text}.uniq.sort
+    assert_equal ["golf","soup"],df.annotations.select{|a| a.source==p.user}.collect{|a| a.value.text}.sort
+    assert_equal ["golf","sparrow"],df.annotations.select{|a|a.source==p2.user}.collect{|a| a.value.text}.sort
 
   end
 
@@ -859,6 +872,23 @@ class DataFilesControllerTest < ActionController::TestCase
 
     assert_redirected_to df
     assert flash[:error].match(/Unable to find a copy of the file for download/)
+  end
+
+  test "explore latest version" do
+    get :explore,:id=>data_files(:downloadable_spreadsheet_data_file)
+    assert_response :success
+  end
+
+  test "explore earlier version" do
+    get :explore,:id=>data_files(:downloadable_spreadsheet_data_file),:version=>1
+    assert_response :success
+  end
+
+  test "gracefully handles explore with no spreadsheet" do
+    df=data_files(:picture)
+    get :explore,:id=>df,:version=>1
+    assert_redirected_to data_file_path(df,:version=>1)
+    assert_not_nil flash[:error]
   end
 
   private

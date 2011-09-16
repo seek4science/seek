@@ -161,7 +161,7 @@ downloadable_spreadsheet_data_file:
   content_blob: unique_spreadsheet_blob
   content_type: application/vnd.excel
   last_used_at: 2009-04-03 11:09:18
-  version: 1
+  version: 2
   projects: [other_project] # not linked to any project for now
   policy: download_for_all_sysmo_users_policy
 

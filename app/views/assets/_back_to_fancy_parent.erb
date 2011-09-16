@@ -1,0 +1,23 @@
+<script type="text/javascript">
+  /* submit and close Popup window for creating new object after clicking new link in fancy_multiselect_box.
+  */
+    var text,value,child_list_id,hidden_child_list;
+    text = "<%= child.title %>";
+    value = "<%= child.id %>";
+    child_type = "<%= child.class.name.downcase%>";
+    parent_type ="<%= parent%>";
+    if (!window.opener) {
+        alert("New "+ child_type +" was created but its parent window was closed.");
+        window.close();
+    }
+
+    hidden_child_list =  window.opener.document.getElementById(parent_type +"_" +child_type +"_ids");
+    hidden_child_list.appendChild(new Option(text, value));
+
+    child_list_id = window.opener.document.getElementById("possible_"+ parent_type +"_" +child_type +"_ids");
+    child_list_id.appendChild(new Option(text, value));
+    child_list_id.selectedIndex = child_list_id.options.length - 1;
+    child_list_id.onchange();
+    alert("New "+ child_type +" was created! You can add it now.");
+    window.close();
+</script>

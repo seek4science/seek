@@ -70,16 +70,14 @@
       </p>
       <% end -%>
 
-     <%# if Seek::Config.is_virtualliver or !@assay.assay_organisms.blank? && @assay.samples.blank?%>
-     <%  if !@assay.assay_organisms.blank? && @assay.samples.blank?%>
+
       <p id="organism">
           <b>Organisms: </b>
           <%= show_assay_organisms_list @assay.assay_organisms %>
       </p>
-    <% end %>
 
-     <%# if Seek::Config.is_virtualliver and @assay.assay_organisms.blank? and !@assay.samples.blank?%>
-     <%  if @assay.assay_organisms.blank? && !@assay.samples.blank? %>
+
+
      <p id="specimens">
        <b>Specimens: </b>
        <% specimens = [] %>
@@ -99,10 +97,10 @@
      <p id="Samples">
        <b>Samples: </b>
        <%= samples_link_list @assay.samples%>
-         </p>
-     <% end -%>
+     </p>
 
 
+     <%# FIXME: should be in a css file rather than in the middle of a page -%>
       <style type="text/css">
           div.data_model_relationship {
               border: 1px dotted black;

@@ -16,6 +16,7 @@ require 'acts_as_favouritable'
 require 'acts_as_asset'
 require 'send_subscriptions_when_activity_logged'
 require 'modporter_extensions'
+require 'seek/taggable'
 
 
 GLOBAL_PASSPHRASE="ohx0ipuk2baiXah" unless defined? GLOBAL_PASSPHRASE
@@ -25,4 +26,6 @@ ASSET_ORDER                = ['Person', 'Project', 'Institution', 'Investigation
 PORTER_SECRET = "" unless defined? PORTER_SECRET
 
 Seek::Config.propagate_all
+
+Annotations::Config.attribute_names_to_allow_duplicates.concat(["tag"])
 

@@ -86,6 +86,11 @@
     f.access_type Policy::VISIBLE
   end
 
+  Factory.define(:publicly_viewable_policy, :parent=>:policy) do |f|
+    f.sharing_scope Policy::EVERYONE
+    f.access_type Policy::VISIBLE
+  end
+
 #Permission
   Factory.define(:permission, :class => Permission) do |f|
     f.association :contributor, :factory => :person
@@ -228,6 +233,17 @@ end
     f.association :institution
   end
 
+  Factory.define(:favourite_group) do |f|
+    f.association :user
+    f.name 'A Favourite Group'
+  end
+
+  Factory.define(:favourite_group_membership) do |f|
+    f.association :person
+    f.association :favourite_group
+    f.access_type 1
+  end
+
   Factory.define(:organism) do |f|
     f.title "An Organism"
   end
@@ -321,7 +337,7 @@ end
   end
 
   Factory.define :synonym do |f|
-    f.name "toffee"
+    f.name "coffee"
     f.association :substance, :factory=>:compound
   end
 
@@ -334,4 +350,34 @@ end
     f.chebi_id "12345"
     f.kegg_id "6789"
     f.sabiork_id "4"
+  end
+
+  Factory.define :site_announcement do |f|
+    f.sequence(:title) {|n| "Announcement #{n}"}
+    f.sequence(:body) {|n| "This is the body for announcement #{n}"}
+    f.association :announcer,:factory=>:admin
+    f.is_headline false
+    f.expires_at 5.days.since
+    f.email_notification false
+  end
+
+  Factory.define :headline_announcement,:parent=>:site_announcement do |f|
+    f.is_headline true
+  end
+
+  Factory.define :annotation do |f|
+    f.sequence(:value) {|n| "anno #{n}"}
+    f.association :source, :factory=>:person
+  end
+
+  Factory.define :tag,:parent=>:annotation do |f|
+    f.attribute_name "tag"
+  end
+
+  Factory.define :expertise,:parent=>:annotation do |f|
+    f.attribute_name "expertise"
+  end
+
+  Factory.define :tool,:parent=>:annotation do |f|
+    f.attribute_name "tool"
   end

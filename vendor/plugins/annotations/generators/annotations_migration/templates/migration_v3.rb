@@ -4,7 +4,7 @@ class AnnotationsMigrationV3 < ActiveRecord::Migration
     change_table :annotations do |t|
       t.rename :value, :old_value
       t.remove :value_type
-      t.string :value_type, :limit => 50, :null => false, :default => "FIXME"
+      t.string :value_type, :limit => 50, :null => false, :default => "TextValue"
       t.integer :value_id, :null => false, :default => 0
     end
     change_column :annotations, :old_value, :string, :null => true
@@ -13,7 +13,7 @@ class AnnotationsMigrationV3 < ActiveRecord::Migration
     change_table :annotation_versions do |t|
       t.rename :value, :old_value
       t.remove :value_type
-      t.string :value_type, :limit => 50, :null => false, :default => "FIXME"
+      t.string :value_type, :limit => 50, :null => false, :default => "TextValue"
       t.integer :value_id, :null => false, :default => 0
     end
     change_column :annotation_versions, :old_value, :string, :null => true
@@ -55,6 +55,8 @@ class AnnotationsMigrationV3 < ActiveRecord::Migration
     # TODO: IMPORTANT: please check the comments and logic in
     # this util method to see if it is what you want.
     # If you need to change the behaviour, redefine it in your app.
+    Annotation::reset_column_information
+    Annotation::reload_versioned_columns_info
     Annotations::Util::migrate_annotations_to_v3
     
     change_table :annotation_value_seeds do |t|

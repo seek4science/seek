@@ -8,6 +8,8 @@ class Person < ActiveRecord::Base
   before_save :first_person_admin
 
   acts_as_notifiee
+  acts_as_annotatable :name_field=>:expertise
+  include Seek::Taggable
 
   #grouped_pagination :pages=>("A".."Z").to_a #shouldn't need "Other" tab for people
   #load the configuration for the pagination
@@ -31,8 +33,6 @@ class Person < ActiveRecord::Base
   has_many :work_groups, :through=>:group_memberships, :before_add => proc {|person, wg| person.project_subscriptions.build :project => wg.project unless person.project_subscriptions.detect {|ps| ps.project == wg.project}}
   has_many :studies, :foreign_key => :person_responsible_id
   has_many :assays,:foreign_key => :owner_id
-
-  acts_as_taggable_on :tools, :expertise
 
   has_one :user, :dependent=>:destroy
 
@@ -215,11 +215,40 @@ class Person < ActiveRecord::Base
   requires_can_manage :is_admin, :can_edit_projects, :can_edit_institutions
 
   def can_manage? user = User.current_user
-    user.nil? ? false : (user.is_admin?)
+    try_block{user.is_admin?}
   end
 
   def can_destroy? user = User.current_user
     can_manage? user
+  end
+
+  def title_is_public?
+    true
+  end
+
+  def expertise= tags
+    if tags.kind_of? Hash
+      tag_with_params tags,"expertise"
+    else
+      tag_with tags,"expertise"
+    end
+  end
+
+  def tools= tags
+    if tags.kind_of? Hash
+      tag_with_params tags,"tool"
+    else
+      tag_with tags,"tool"
+    end
+
+  end
+
+  def expertise
+    annotations_with_attribute("expertise").collect{|a| a.value}
+  end
+
+  def tools
+    annotations_with_attribute("tool").collect{|a| a.value}
   end
 
   private

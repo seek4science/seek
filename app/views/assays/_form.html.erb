@@ -82,17 +82,22 @@
     <% end -%>
   </tr>
 </table>
-<%# if Seek::Config.is_virtualliver -%>
 
 <br style="clear:both"/>
- <% if @assay.is_modelling?  -%>
-    <div id="add_organism_form">
-        <%= render :partial=>"assays/select_organisms" if !Seek::Config.is_virtualliver || @assay.is_modelling?-%>
-    </div>
- <% else -%>
-     <%= f.fancy_multiselect :samples, :object_type_text => @assay_text, :required=>true -%>
- <% end -%>
 
+<% if Seek::Config.is_virtualliver %>
+    <% if @assay.is_modelling?  -%>
+        <div id="add_organism_form">
+            <%= render :partial=>"assays/select_organisms" if !Seek::Config.is_virtualliver || @assay.is_modelling?-%>
+        </div>
+     <% else -%>
+         <%= f.fancy_multiselect :samples, :object_type_text => @assay_text, :required=>true -%>
+     <% end -%>
+<% else %>
+  <div id="add_organism_form">
+     <%= render :partial=>"assays/select_organisms" -%>
+  </div>
+<% end %>
 
 <br style="clear:both"/>
 
@@ -125,12 +130,11 @@
      is_new_file=action==:edit ? false : true
   %>
   <%= preview_permission_popup_link('assay', url_for(:controller => 'policies', :action => 'preview_permissions'), is_new_file)-%>
-  <%= f.submit button_text, :id => "assay_submit_btn", :onclick => "javascript: clickLink($('preview_permission'));;return(false);" -%>
+  <%= f.submit button_text, :id => "assay_submit_btn", :onclick => "javascript: clickLink($('preview_permission'));return(false);" -%>
   or <%= link_to 'Cancel', (@assay.id ? assay_path(@assay.id) : assays_path) -%>
 </p>
 
 <script type="text/javascript">
-
 
   function hide_organism_form(){
       Effect.Fade('add_organism_form');

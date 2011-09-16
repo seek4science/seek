@@ -7,7 +7,6 @@ require 'title_trimmer'
 class Model < ActiveRecord::Base
 
   title_trimmer
-  
   acts_as_asset
   acts_as_trashable  
   
@@ -23,9 +22,7 @@ class Model < ActiveRecord::Base
   belongs_to :model_type
   belongs_to :model_format
   
-  acts_as_solr(:fields=>[:description,:title,:original_filename,:organism_name,:tag_counts]) if Seek::Config.solr_enabled
-
-  acts_as_uniquely_identifiable
+  acts_as_solr(:fields=>[:description,:title,:original_filename,:organism_name,:searchable_tags]) if Seek::Config.solr_enabled
   
   explicit_versioning(:version_column => "version") do
     acts_as_versioned_resource

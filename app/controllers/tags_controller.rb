@@ -1,18 +1,18 @@
 class TagsController < ApplicationController
   
   def show
-    @tag = ActsAsTaggableOn::Tag.find(params[:id])
-    taggings = @tag.taggings.select{|tg| !tg.taggable.nil?}
-    @tagged_objects = select_authorised taggings.collect{|tagging| tagging.taggable}.uniq
-    
+    @tag = TextValue.find(params[:id])
+        
+    @tagged_objects = select_authorised @tag.annotations.collect{|a| a.annotatable}.uniq
+
     if @tagged_objects.empty?
-      flash.now[:notice]="No objects (or none that you are authorized to view) are tagged with '<b>#{@tag.name}</b>'."
+      flash.now[:notice]="No objects (or none that you are authorized to view) are tagged with '<b>#{@tag.text}</b>'."
     else
-      flash.now[:notice]="#{@tagged_objects.size} #{@tagged_objects.size==1 ? 'item' : 'items'} tagged with '<b>#{@tag.name}</b>'."
+      flash.now[:notice]="#{@tagged_objects.size} #{@tagged_objects.size==1 ? 'item' : 'items'} tagged with '<b>#{@tag.text}</b>'."
     end
     respond_to do |format|
       format.html # show.html.erb
-    end    
+    end
   end
 
   def index

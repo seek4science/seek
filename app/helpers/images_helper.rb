@@ -272,7 +272,7 @@ module ImagesHelper
       when 'subscribe'
         "famfamfam_silk/email_add.png"
       when 'presentation_avatar','presentation','presentations'
-        "file_icons/ppt.png"
+        "1315482798_presentation-slides.png"
     else
       return nil
     end
