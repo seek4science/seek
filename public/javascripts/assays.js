@@ -430,10 +430,10 @@ function updateOrganisms() {
         culture_growth=organism[3];
         titleText = '<span title="' + title + '">' + title.truncate(100);
         if (strain.length>0) {
-            titleText += ":"+ "<span class='assay_strain_info'> " + strain+ "</span>";
+            titleText += ":"+ "<span> " + strain+ "</span>";
         }
         if (culture_growth.length>0 && culture_growth!='Not specified') {
-            titleText += " <span class='assay_item_sup_info'>("+culture_growth+")</span>";
+            titleText += " <span>("+culture_growth+")</span>";
         }
         titleText +=  '</span>';
         organism_text += '<li>' + titleText +
