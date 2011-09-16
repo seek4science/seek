@@ -1,10 +1,13 @@
-class ModelsController < ApplicationController    
+ require 'zip/zip'
+ require 'zip/zipfilesystem'
+
+class ModelsController < ApplicationController
   
   include WhiteListHelper
   include IndexPager
   include DotGenerator
   include Seek::AssetsCommon
-  
+
   before_filter :pal_or_admin_required,:only=> [:create_model_metadata,:update_model_metadata,:delete_model_metadata ]
   
   before_filter :find_assets, :only => [ :index ]
@@ -439,7 +442,7 @@ class ModelsController < ApplicationController
     @model.last_used_at = Time.now
     @model.save_without_timestamping    
     
-    handle_download @display_model
+    handle_download_zip @model
   end
   
   # PUT /models/1
@@ -591,5 +594,29 @@ class ModelsController < ApplicationController
     end
 
     @model.save!
-	end
+  end
+
+
+  def handle_download_zip asset
+    t = Tempfile.new("#{Time.now.year}#{Time.now.month}#{Time.now.day}_#{asset.class.name.downcase}_#{asset.title}_#{asset.id}","#{RAILS_ROOT}/tmp")
+  # Give the path of the temp file to the zip outputstream, it won't try to open it as an archive.
+    Zip::ZipOutputStream.open(t.path) do |zos|
+      asset.attachments.each do |attach|
+        file_path =  "#{RAILS_ROOT}/public" + attach.public_filename
+        if File.exists? file_path
+          # Create a new entry with attachment's filename'
+          zos.put_next_entry(attach.filename)
+          # Add the contents of the file, don't read the stuff linewise if its binary, instead use direct IO
+          zos.print IO.read(file_path)
+        else
+          flash.now[:error] = "#{attach.public_filename} does not exist!"
+        end
+
+      end
+    end
+    send_file t.path, :type => 'application/zip', :disposition => 'attachment', :filename => "#{asset.class.name.downcase}_#{asset.title}.zip"
+  # The temp file will be deleted some time...
+    t.close
+
+  end
 end
