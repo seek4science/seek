@@ -31,7 +31,7 @@ module Seek
 
     #List of activerecord model classes that are directly creatable by a standard user (e.g. uploading a new DataFile, creating a new Assay, but NOT creating a new Project)
     #returns a list of all types that respond_to and return true for user_creatable?
-    def self.user_creatable_classes
+    def self.user_creatable_types
       @@creatable_model_classes ||= begin
         classes=persistent_classes.select do |c|
           c.respond_to?("user_creatable?") && c.user_creatable?

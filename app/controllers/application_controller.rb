@@ -343,8 +343,6 @@ class ApplicationController < ActionController::Base
     end
   end
 
-  helper_method :user_creatable_classes
-
   def permitted_filters
     #placed this in a seperate method so that other controllers could override it if necessary
     Seek::Util.persistent_classes.select {|c| c.respond_to? :find_by_id}.map {|c| c.name.underscore}

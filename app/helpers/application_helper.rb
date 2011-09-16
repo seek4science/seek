@@ -85,10 +85,10 @@ module ApplicationHelper
     script="<script type='text/javascript'>\n"
     script << "function newAsset() {\n"
     script << "selected_model=$('new_resource_type').value;\n"
-    user_creatable_classes.each do |c|
+    Seek::Util.user_creatable_types.each do |c|
       name=c.name.underscore
       path = eval "new_#{name}_path"
-      if c==user_creatable_classes.first
+      if c==Seek::Util.user_creatable_types.first
         script << "if "
       else
         script << "else if "
@@ -102,7 +102,7 @@ module ApplicationHelper
 
   #selection of assets for new asset gadget
   def new_creatable_selection
-    select_tag :new_resource_type, options_for_select(user_creatable_classes.collect{|c| [(c.name.underscore.humanize == "Sop" ? "SOP" : c.name.underscore.humanize),c.name.underscore] })
+    select_tag :new_resource_type, options_for_select(Seek::Util.user_creatable_types.collect{|c| [(c.name.underscore.humanize == "Sop" ? "SOP" : c.name.underscore.humanize),c.name.underscore] })
   end
   
   def is_nil_or_empty? thing
