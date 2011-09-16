@@ -18,7 +18,7 @@
         <% substance = ''
            link_table_name = "#{object.class.name.underscore}_links"
            object.send(link_table_name).each do |ltn|
-             substance.concat(ltn.substance.name + '/')
+             substance.concat(try_block{ltn.substance.name}.to_s + '/')
            end
            substance.chop!
         %>
