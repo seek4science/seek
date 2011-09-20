@@ -20,15 +20,17 @@
 
 
   <div class="conditions_or_factors" >
-  <h4> Edit this entry </h4>
-  <table >
+  <h4 style="border-bottom: 1px solid #DDD; width: 20em;"> Edit this entry </h4>
+  <table class='conditions_or_factor_table'>
     <tr>
       <th>Item</th>
       <th>Unit</th>
-      <th>Start value</th>
-      <th>End value</th>
       <% if entity == "studied_factor" %>
-        <th>SD</th>
+         <th>Start value</th>
+         <th>End value</th>
+         <th>SD</th>
+      <% elsif entity == 'experimental_condition' %>
+        <th>Value</th>
       <% end %>
     </tr>
     <tr>
@@ -48,13 +50,6 @@
           <td><%= f.text_field :standard_deviation,:size=>4 %></td>
       <% end %>
 
-      <td><%= f.submit "Update", :id => "update_#{object.id}" %> or <%= link_to_function "Cancel" do |page|
-          page.visual_effect :fade, "edit_condition_or_factor_#{object.id}_form"
-          page["edit_on_#{object.id}"].toggle
-          page["edit_off_#{object.id}"].toggle
-        end
-      -%>
-
       <%= hidden_field_tag "version", display_asset.version -%>
     </tr>
   </table>
@@ -68,8 +63,19 @@
   <div id="<%= object.id -%>substance_condition_factor" class="substance_condition_factor" style="display: none">
     <%= render :partial=>"layouts/substances_autocomplete", :locals => {:name => "#{object.id}_substance", :resource => object}%>
   </div>
+
+  <div class='border_top'>
+    <%= f.submit "Update", :id => "update_#{object.id}" %> or <%= link_to_function "Cancel" do |page|
+          page.visual_effect :fade, "edit_condition_or_factor_#{object.id}_form"
+          page["edit_on_#{object.id}"].toggle
+          page["edit_off_#{object.id}"].toggle
+     end
+    -%>
+  </div>
+
   </div>
   <%= javascript_tag "additionalFieldForItem('edit_condition_or_factor_#{object.id}_form', #{object.id} )"-%>
+
 <% end -%>
 
 
