@@ -1,5 +1,6 @@
 class StudiedFactorsController < ApplicationController
   include Seek::FactorStudied
+  include Seek::AnnotationCommon
 
   before_filter :login_required
   before_filter :find_data_file_auth
@@ -20,21 +21,23 @@ class StudiedFactorsController < ApplicationController
     new_substances = params[:substance_autocompleter_unrecognized_items] || []
     known_substance_ids_and_types = params[:substance_autocompleter_selected_ids] || []
     substances = find_or_new_substances new_substances,known_substance_ids_and_types
-    #substances = update_substances ['Acetate']
+
     substances.each do |substance|
       @studied_factor.studied_factor_links.build(:substance => substance )
     end
 
+    update_annotations(@studied_factor, 'description', false) unless params[:annotation][:value].blank?
+
     render :update do |page|
       if @studied_factor.save
-        page.insert_html :bottom,"condition_or_factor_rows",:partial=>"condition_or_factor_row",:object=>@studied_factor,:locals=>{:asset => 'data_file', :show_delete=>true}
-        page.visual_effect :highlight,"condition_or_factor_rows"
-        # clear the _add_factor form
-        page.call "autocompleters['substance_autocompleter'].deleteAllTokens"
-        page[:add_condition_or_factor_form].reset
-        page[:substance_autocomplete_input].disabled = true
+          page.insert_html :bottom,"condition_or_factor_rows",:partial=>"condition_or_factor_row",:object=>@studied_factor,:locals=>{:asset => 'data_file', :show_delete=>true}
+          page.visual_effect :highlight,"condition_or_factor_rows"
+          # clear the _add_factor form
+          page.call "autocompleters['substance_autocompleter'].deleteAllTokens"
+          page[:add_condition_or_factor_form].reset
+          page[:substance_autocomplete_input].disabled = true
       else
-        page.alert(@studied_factor.errors.full_messages)
+          page.alert(@studied_factor.errors.full_messages)
       end
     end
   end
@@ -43,6 +46,7 @@ class StudiedFactorsController < ApplicationController
     studied_factor_ids = []
     new_studied_factors = []
     #retrieve the selected FSes
+
     params.each do |key, value|
        if key.match('checkbox_')
          studied_factor_ids.push value.to_i
@@ -58,9 +62,13 @@ class StudiedFactorsController < ApplicationController
       studied_factor.studied_factor_links.each do |sfl|
          new_studied_factor.studied_factor_links.build(:substance => sfl.substance)
       end
+      params[:annotation] = {}
+      params[:annotation][:value] = try_block{Annotation.for_annotatable(studied_factor.class.name, studied_factor.id).with_attribute_name('description').first.value.text}
+      update_annotations(new_studied_factor, 'description', false) unless params[:annotation][:value].blank?
+
       new_studied_factors.push new_studied_factor
     end
-    #
+
     render :update do |page|
       new_studied_factors.each do  |sf|
         if sf.save
@@ -103,6 +111,8 @@ class StudiedFactorsController < ApplicationController
       studied_factor_links.push StudiedFactorLink.new(:substance => substance)
     end
     @studied_factor.studied_factor_links = studied_factor_links
+
+    update_annotations (@studied_factor, 'description', false) unless params[:annotation][:value].blank?
 
     render :update do |page|
       if  @studied_factor.update_attributes(params[:studied_factor])

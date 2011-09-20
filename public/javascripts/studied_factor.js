@@ -1,6 +1,6 @@
 var autocompleters = new Array();
 
-function showOrHideSubstanceTextField(form_id){
+function additionalFieldForItem(form_id, fs_or_ec_id){
     var elements =  $(form_id).getElements();
     var item;
     var substance_autocomplete;
@@ -19,16 +19,15 @@ function showOrHideSubstanceTextField(form_id){
 
     if (option_select.text == 'concentration'){
         substance_autocomplete.disabled = false;
-
-    }else{
-        //clear all the substances when disable
-        var autocompleter_id = substance_autocomplete.id.replace('autocomplete_input', '');
-        autocompleter_id = autocompleter_id.concat('autocompleter');
-        autocompleters[autocompleter_id].deleteAllTokens();
-        substance_autocomplete.disabled = true;
+        Effect.Fade(fs_or_ec_id + 'growth_medium_or_buffer_description', { duration: 1 });
+        Effect.Appear(fs_or_ec_id + 'substance_condition_factor', { duration: 4 });
     }
-}
-
-function getCompoundName(){
-    $F('compound_title')
+    else if (option_select.text == 'growth medium' || option_select.text == 'buffer'){
+        Effect.Fade(fs_or_ec_id + 'substance_condition_factor', { duration: 1 });
+        Effect.Appear(fs_or_ec_id + 'growth_medium_or_buffer_description', { duration: 4 });
+    }
+    else{
+        Effect.Fade(fs_or_ec_id + 'substance_condition_factor', { duration: 1 });
+        Effect.Fade(fs_or_ec_id + 'growth_medium_or_buffer_description', { duration: 1 });
+    }
 }

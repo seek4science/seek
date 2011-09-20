@@ -202,5 +202,28 @@ module Seek
      mapping
   end
 
+=begin
+  def create_annotation entity, owner=User.current_user
+    unless owner.blank?
+      annotation = Annotation.new(:attribute_name => params[:annotation][:attribute_name],
+                        :value => params[:annotation][:value],
+                        :source => owner,
+                        :annotatable => entity)
+      annotation.save!
+    end
+  end
+
+  def create_or_update_annotation entity, owner=User.current_user
+    unless owner.blank?
+      current = entity.annotations_with_attribute(params[:annotation][:attribute_name])
+      unless annotation.blank?
+        annotation.update_attributes!({:attribute_name => params[:annotation][:attribute_name], :value => params[:annotation][:value]})
+      else
+        create_annotation owner
+      end
+    end
+  end
+=end
+
   end
 end

@@ -23,6 +23,10 @@
            substance.chop!
         %>
         <%= h substance + ' ' + object.measured_item.title  %>
+      <%elsif (object.measured_item.title == 'growth medium' || object.measured_item.title == 'buffer')
+         description = try_block{Annotation.for_annotatable(object.class.name, object.id).with_attribute_name('description').first.value.text}
+      %>
+        <%= h object.measured_item.title + (description.blank? ? '' : " (#{description})")  %>
       <%else%>
         <%= h object.measured_item.title %>
       <%end%>

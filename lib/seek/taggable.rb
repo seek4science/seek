@@ -1,27 +1,31 @@
 module Seek
   module Taggable
 
-    def tag_as_user_with_params params,attr="tag",owner=User.current_user
-      tags = resolve_tags_from_params params,attr
+    def tag_as_user_with_params params,attr="tag",use_autocomplete = true,owner=User.current_user
+      tags = resolve_tags_from_params params,attr, use_autocomplete
       tag_as_user_with tags,attr,owner
     end
 
-    def tag_with_params params,attr="tag",owner=User.current_user
-      tags = resolve_tags_from_params params,attr
+    def tag_with_params params,attr="tag",use_autocomplete=true,owner=User.current_user
+      tags = resolve_tags_from_params params,attr, use_autocomplete
       tag_with tags,attr,owner
     end
 
-    def resolve_tags_from_params params,attr
-      selected_key = "#{attr}_autocompleter_selected_ids".to_sym
-      unrecognized_key = "#{attr}_autocompleter_unrecognized_items".to_sym
+    def resolve_tags_from_params params,attr,use_autocomplete=true
       tags=[]
-      params[selected_key].each do |selected_id|
+      if use_autocomplete
+        selected_key = "#{attr}_autocompleter_selected_ids".to_sym
+        unrecognized_key = "#{attr}_autocompleter_unrecognized_items".to_sym
+        params[selected_key].each do |selected_id|
         tag=TextValue.find(selected_id)
         tags << tag.text
-      end unless params[selected_key].nil?
-      params[unrecognized_key].each do |item|
-        tags << item
-      end unless params[unrecognized_key].nil?
+        end unless params[selected_key].nil?
+        params[unrecognized_key].each do |item|
+          tags << item
+        end unless params[unrecognized_key].nil?
+      else
+        tags << params[:annotation][:value]
+      end
       tags
     end
 
