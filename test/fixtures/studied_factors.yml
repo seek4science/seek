@@ -12,3 +12,7 @@ studied_factor_time:
   start_value: 1
   end_value: 8
   data_file: editable_data_file
+
+studied_factor_growth_medium:
+  measured_item: growth_medium
+  data_file: editable_data_file

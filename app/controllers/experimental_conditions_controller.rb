@@ -25,7 +25,7 @@ class ExperimentalConditionsController < ApplicationController
       @experimental_condition.experimental_condition_links.build(:substance => substance )
     end
 
-    update_annotations(@experimental_condition, 'description', false) unless params[:annotation][:value].blank?
+    update_annotations(@experimental_condition, 'description', false) if try_block{!params[:annotation][:value].blank?}
 
     render :update do |page|
       if @experimental_condition.save
@@ -61,7 +61,7 @@ class ExperimentalConditionsController < ApplicationController
       end
       params[:annotation] = {}
       params[:annotation][:value] = try_block{Annotation.for_annotatable(experimental_condition.class.name, experimental_condition.id).with_attribute_name('description').first.value.text}
-      update_annotations(new_experimental_condition, 'description', false) unless params[:annotation][:value].blank?
+      update_annotations(new_experimental_condition, 'description', false) if try_block{!params[:annotation][:value].blank?}
 
       new_experimental_conditions.push new_experimental_condition
     end
@@ -109,7 +109,7 @@ class ExperimentalConditionsController < ApplicationController
       end
       @experimental_condition.experimental_condition_links = experimental_condition_links
 
-      update_annotations (@experimental_condition, 'description', false) unless params[:annotation][:value].blank?
+      update_annotations(@experimental_condition, 'description', false) if try_block{!params[:annotation][:value].blank?}
 
       render :update do |page|
         if  @experimental_condition.update_attributes(params[:experimental_condition])

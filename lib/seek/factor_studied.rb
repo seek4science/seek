@@ -68,9 +68,9 @@ module Seek
   def no_comma_for_decimal
     check_string = ''
     if self.controller_name.downcase == 'studied_factors'
-      check_string.concat(params[:studied_factor][:start_value].to_s + params[:studied_factor][:end_value].to_s + params[:studied_factor][:standard_deviation].to_s)
+      check_string.concat(try_block{params[:studied_factor][:start_value]}.to_s + try_block{params[:studied_factor][:end_value]}.to_s + try_block{params[:studied_factor][:standard_deviation]}.to_s)
     elsif self.controller_name.downcase == 'experimental_conditions'
-      check_string.concat(params[:experimental_condition][:start_value].to_s + params[:experimental_condition][:end_value].to_s)
+      check_string.concat(try_block{params[:experimental_condition][:start_value]}.to_s)
     end
 
     if check_string.match(',')

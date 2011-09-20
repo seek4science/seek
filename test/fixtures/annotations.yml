@@ -18,3 +18,17 @@ annotation_3:
   attribute: annotation
   value: annotation_3_content (TextValue)
   version: 1
+
+annotation_for_studied_factor_growth_medium:
+  source: datafile_owner (User)
+  annotatable: studied_factor_growth_medium (StudiedFactor)
+  attribute: description
+  value: annotation_for_studied_factor_growth_medium (TextValue)
+  version: 1
+
+annotation_experimental_condition_growth_medium:
+  source: sop_owner (User)
+  annotatable: experimental_condition_growth_medium (ExperimentalCondition)
+  attribute: description
+  value: annotation_for_experimental_condition_growth_medium (TextValue)
+  version: 1

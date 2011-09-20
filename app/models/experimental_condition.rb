@@ -6,9 +6,9 @@ class ExperimentalCondition < ActiveRecord::Base
   belongs_to :unit
   has_many :experimental_condition_links, :before_add => proc {|ec,ecl| ecl.experimental_condition = ec}, :dependent => :destroy
 
-  validates_presence_of :unit,:measured_item,:sop
+  validates_presence_of :measured_item,:sop
   validates_presence_of :experimental_condition_links, :if => Proc.new{|ec| ec.measured_item.title == 'concentration'}
-  validates_presence_of :start_value, :unless => Proc.new{|ec| ec.measured_item.title == 'growth medium' || ec.measured_item.title == 'buffer'}, :message => "can't be a empty"
+  validates_presence_of :start_value, :unit, :unless => Proc.new{|ec| ec.measured_item.title == 'growth medium' || ec.measured_item.title == 'buffer'}, :message => "can't be a empty"
 
   acts_as_annotatable :name_field => :tag
   include Seek::Taggable
