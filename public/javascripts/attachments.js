@@ -6,7 +6,8 @@
 function MultiSelector(list_target, max,object_name,method) {
     this.list_target = list_target;
     this.count = 0;
-    this.id = 0;
+    this.id_file = 0;
+    this.id_url = 0;
     this.object_name = object_name;
     this.method = method;
     if (max) {
@@ -17,9 +18,8 @@ function MultiSelector(list_target, max,object_name,method) {
     ;
     this.addElement = function(element) {
         if (element.tagName == 'INPUT' && element.type == 'file') {
-            element.name = 'attachment[file_' + (this.id++) + ']';
+            element.name = 'attachment[file_' + (this.id_file++) + ']';
             element.multi_selector = this;
-
             element.onchange = function() {
                 var new_element = document.createElement('input');
                 new_element.type = 'file';
@@ -29,14 +29,32 @@ function MultiSelector(list_target, max,object_name,method) {
                 this.style.position = 'absolute';
                 this.style.left = '-1000px';
             };
-            if (this.max != -1 && this.count >= this.max) {
+            if (this.max != -1 && this.count > this.max) {
                 element.disabled = true;
+                document.getElementsByName('attachment[url_' + (this.id_url-1) + ']')[0].disabled = true;
             }
             ;
             this.count++;
-            this.current_element = element;
-        } else {
-            alert('Error: not a file input element');
+            this.current_file_element = element;
+            this.current_element  = element;
+        } else{
+            if (element.tagName == 'INPUT' && element.type == 'text') {
+                element.name = 'attachment[url_' + (this.id_url++) + ']';
+                element.multi_selector = this;
+
+                if (this.max != -1 && this.count > this.max) {
+                    element.disabled = true;
+                    document.getElementsByName('attachment[file_' + (this.id_file-1) + ']')[0].disabled = true;
+                }
+                ;
+                this.count++;
+                this.current_url_element = element;
+                this.current_element  = element;
+            }else{
+                alert('Error: neither a file input element nor a text field for file url');
+            }
+
+
         }
         ;
     };
@@ -83,13 +101,14 @@ function MultiSelector(list_target, max,object_name,method) {
             this.parentNode.parentNode.element.parentNode.removeChild(this.parentNode.parentNode.element);
             this.parentNode.parentNode.parentNode.removeChild(this.parentNode.parentNode);
             this.parentNode.parentNode.element.multi_selector.count--;
-            this.parentNode.parentNode.element.multi_selector.current_element.disabled = false;
+            this.parentNode.parentNode.element.multi_selector.current_file_element.disabled = false;
+            this.parentNode.parentNode.element.multi_selector.current_url_element.disabled = false;
             return false;
         };
         new_col4.appendChild(new_row_button);
 
 
-        new_col2.innerHTML = '<img src="/images/famfamfam_silk/page.png">';
+        new_col2.innerHTML = '<img src="/images/file_icons/small/genericGray.png">';
         new_col3.innerHTML =  element.value.split('/')[element.value.split('/').length - 1];
 
         new_col3.style.textAlign = "left";

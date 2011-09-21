@@ -16,5 +16,21 @@ class Attachment < ActiveRecord::Base
     self.content_type.index('image')== 0
   end
 
+  def source_uri=(uri)
+    url = open(URI.parse(uri))
+    (class << url; self; end;).class_eval do
+      define_method(:original_filename) { base_uri.path.split('/').last }
+    end
+
+    self.uploaded_data = url
+  end
+
+  def file_exists?
+    File.exist?(filepath)
+  end
+
+  def filepath
+      "#{RAILS_ROOT}/public/#{public_filename}"
+  end
 
 end

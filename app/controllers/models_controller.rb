@@ -24,21 +24,23 @@ class ModelsController < ApplicationController
   # GET /models.xml
   
   def new_version
-    if (handle_data nil)
+    #if (handle_data nil)
       
       comments = params[:revision_comment]
-      @model.content_blob = ContentBlob.new(:tmp_io_object => @tmp_io_object, :url=>@data_url)
+      #@model.content_blob = ContentBlob.new(:tmp_io_object => @tmp_io_object, :url=>@data_url)
       @model.content_type = params[:model][:content_type]
       @model.original_filename = params[:model][:original_filename]
-      
+      @model.attachments.destroy_all
+
       respond_to do |format|
-        create_new_version comments
+        create_new_version  comments
+        process_file_uploads
         format.html {redirect_to @model }
       end
-    else
-      flash[:error]=flash.now[:error]
-      redirect_to @model
-    end
+    #else
+    #  flash[:error]=flash.now[:error]
+    #  redirect_to @model
+    #end
   end    
   
   def delete_model_metadata
@@ -395,10 +397,11 @@ class ModelsController < ApplicationController
   
   # POST /models
   # POST /models.xml
-  def create    
-    if handle_data
+  def create
+    params[:model].delete 'local_copy'
+   # if handle_data
       @model = Model.new(params[:model])
-      @model.content_blob = ContentBlob.new(:tmp_io_object => @tmp_io_object,:url=>@data_url)
+      #@model.content_blob = ContentBlob.new(:tmp_io_object => @tmp_io_object,:url=>@data_url)
 
       @model.policy.set_attributes_with_sharing params[:sharing], @model.projects
 
@@ -431,7 +434,7 @@ class ModelsController < ApplicationController
           }
         end
       end
-    end
+    #end
     
   end
   
@@ -450,7 +453,7 @@ class ModelsController < ApplicationController
   def update
     # remove protected columns (including a "link" to content blob - actual data cannot be updated!)
     if params[:model]
-      [:contributor_id, :contributor_type, :original_filename, :content_type, :content_blob_id, :created_at, :updated_at, :last_used_at].each do |column_name|
+      [:contributor_id, :contributor_type, :original_filename, :content_type, :content_blob_id, :created_at, :updated_at, :last_used_at,:local_copy].each do |column_name|
         params[:model].delete(column_name)
       end
       
@@ -582,10 +585,20 @@ class ModelsController < ApplicationController
 
 	def process_file_uploads
 		i = 0
-		while !params[:attachment].nil? && params[:attachment]['file_'+i.to_s] != "" && !params[:attachment]['file_'+i.to_s].nil?
-      @attachment = Attachment.new(Hash["uploaded_data" => params[:attachment]['file_'+i.to_s]])
-      @model.attachments << @attachment
-      @model.id_image = @attachment.id if @attachment.is_image? and !@model.id_image.nil? and !@model.attachments.map(&:id).include? @model.id_image.to_i
+		while !params[:attachment].nil? && ( (params[:attachment]['file_'+i.to_s] != "" && !params[:attachment]['file_'+i.to_s].nil?) or (params[:attachment]['url_'+i.to_s] != "" && !params[:attachment]['url_'+i.to_s].nil?))
+      if params[:attachment]['file_'+i.to_s] != "" && !params[:attachment]['file_'+i.to_s].nil?
+         @attachment = Attachment.new(Hash["uploaded_data" => params[:attachment]['file_'+i.to_s]])
+         @model.attachments << @attachment
+
+         @model.id_image = @attachment.id if @attachment.is_image? and !@model.id_image.nil? and !@model.attachments.map(&:id).include? @model.id_image.to_i
+      end
+      if params[:attachment]['url_'+i.to_s] != "" && !params[:attachment]['url_'+i.to_s].nil?
+         url = params[:attachment]['url_'+i.to_s]
+         @attachment = Attachment.new(:source_uri=>url,:data_url=>url)
+         @model.attachments << @attachment
+
+         @model.id_image = @attachment.id if @attachment.is_image? and !@model.id_image.nil? and !@model.attachments.map(&:id).include? @model.id_image.to_i
+      end
       i += 1
     end
 
@@ -605,7 +618,7 @@ class ModelsController < ApplicationController
         file_path =  "#{RAILS_ROOT}/public" + attach.public_filename
         if File.exists? file_path
           # Create a new entry with attachment's filename'
-          zos.put_next_entry(attach.filename)
+          zos.put_next_entry(attach.original_filename)
           # Add the contents of the file, don't read the stuff linewise if its binary, instead use direct IO
           zos.print IO.read(file_path)
         else

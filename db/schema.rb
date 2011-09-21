@@ -9,7 +9,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20110906133647) do
+ActiveRecord::Schema.define(:version => 20110920130259) do
 
   create_table "activity_logs", :force => true do |t|
     t.string   "action"
@@ -130,6 +130,8 @@ ActiveRecord::Schema.define(:version => 20110906133647) do
     t.string   "attachable_type"
     t.datetime "created_at"
     t.datetime "updated_at"
+    t.string   "data_url"
+    t.string   "original_filename"
   end
 
   add_index "attachments", ["attachable_id", "attachable_type"], :name => "index_attachments_on_attachable_id_and_attachable_type"

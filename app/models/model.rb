@@ -19,7 +19,7 @@ class Model < ActiveRecord::Base
   # allow same titles, but only if these belong to different users
   # validates_uniqueness_of :title, :scope => [ :contributor_id, :contributor_type ], :message => "error - you already have a Model with such title."
 
-  belongs_to :content_blob #don't add a dependent=>:destroy, as the content_blob needs to remain to detect future duplicates    
+  #belongs_to :content_blob #don't add a dependent=>:destroy, as the content_blob needs to remain to detect future duplicates
 
   belongs_to :organism
   belongs_to :recommended_environment,:class_name=>"RecommendedModelEnvironment"
@@ -33,13 +33,21 @@ class Model < ActiveRecord::Base
   explicit_versioning(:version_column => "version") do
     acts_as_versioned_resource
     
-    belongs_to :content_blob             
+    #belongs_to :content_blob
     belongs_to :organism
     belongs_to :recommended_environment,:class_name=>"RecommendedModelEnvironment"
     belongs_to :model_type
     belongs_to :model_format
+
+     def content_blob
+     parent.content_blob
+     end
+
   end
 
+  def content_blob
+     attachments.first
+  end
   def studies
     assays.collect{|a| a.study}.uniq
   end  
