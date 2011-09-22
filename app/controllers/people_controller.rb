@@ -223,6 +223,39 @@ class PeopleController < ApplicationController
   # DELETE /people/1
   # DELETE /people/1.xml
   def destroy
+    #remove the permissions which are set on this person
+    remove_permissions_on @person
+
+    #retrieve the items that this person is contributor (owner for assay)
+    related_items = related_items_of @person
+
+    #check if anyone has manage right
+    #if not, assign the manage right to pis||pals
+    related_items.each do |item|
+      policy_with_manage_access_type = try_block{item.policy.access_type}.to_i == Policy::MANAGING ? item.policy : nil
+      permissions_with_manage_access_type = try_block{item.policy.permissions.select{|p| p.contributor_type == 'Person' && p.access_type == Policy::MANAGING}}
+      if policy_with_manage_access_type.blank? && permissions_with_manage_access_type.blank?
+        #find the projects which this person and item belong to
+        projects_in_common = @person.projects & item.projects
+        pis = projects_in_common.collect{|p| p.pis}.flatten.uniq
+        pis.reject!{|pi| pi.id == @person.id}
+        policy = item.policy.blank? ? (create_private_policy_for item) : item.policy
+        unless pis.blank?
+          pis.each do |pi|
+            policy.permissions.build(:contributor => pi, :access_type => Policy::MANAGING)
+            policy.save
+          end
+        else
+          pals = projects_in_common.collect{|p| p.pals}.flatten.uniq
+          pals.reject!{|pal| pal.id == @person.id}
+          pals.each do |pal|
+            policy.permissions.build(:contributor => pal, :access_type => Policy::MANAGING)
+            policy.save
+          end
+        end
+      end
+    end
+
     @person.destroy
 
     respond_to do |format|
@@ -320,4 +353,33 @@ class PeopleController < ApplicationController
     end
   end
 
+  #remove the permissions which are set on this person
+  def remove_permissions_on person
+    permissions = Permission.find(:all, :conditions => ["contributor_type =? and contributor_id=?", 'Person', person.try(:id)])
+    permissions.each do |p|
+      p.destroy
+    end
+  end
+
+  #retrieve the items that this person is contributor (owner for assay)
+  def related_items_of person
+     user = try_block{person.user}
+     related_items = []
+     related_items |= try_block{person.assays}.to_a
+     unless user.blank?
+       related_items |= user.assets
+       related_items |= user.presentations
+       related_items |= user.events
+       related_items |= user.investigations
+       related_items |= user.studies
+     end
+     related_items
+  end
+
+  def create_private_policy_for item
+    policy = Policy.private_policy
+    policy.save
+    item.policy_id = policy.id
+    policy
+  end
 end

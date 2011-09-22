@@ -25,7 +25,7 @@ class Person < ActiveRecord::Base
 
   has_and_belongs_to_many :disciplines
 
-  has_many :group_memberships
+  has_many :group_memberships, :dependent => :destroy
 
   has_many :favourite_group_memberships, :dependent => :destroy
   has_many :favourite_groups, :through => :favourite_group_memberships
