@@ -77,7 +77,7 @@
     </div>
     <div style="clear:both;">
         <br/>
-        <%= render :partial=>"people/contact_details" unless hide_contact_details? %>
+        <%= render :partial=>"people/contact_details" unless hide_contact_details? or !logged_in_and_registered? %>
         <%= render :partial=>"people/roles",:locals=>{:editable=>false} %>
         <%# get, classify and authorize all assets for this person's user (assets belong to users, not people!) -%>
         <%= render :partial=>"layouts/items_related_to",:object => @person %>
