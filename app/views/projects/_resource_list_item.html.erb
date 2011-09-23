@@ -3,7 +3,7 @@
 <div class="list_item_left_column">
   <%= list_item_optional_attribute "Public web page", h(resource.web_page), h(resource.web_page) %>
 
-  <% unless hide_contact_details? or !logged_in_and_registered?%>
+  <% unless hide_contact_details? %>
       <%= list_item_optional_attribute "Internal web page", h(resource.wiki_page), h(resource.wiki_page) %>
   <% end %>
 </div>

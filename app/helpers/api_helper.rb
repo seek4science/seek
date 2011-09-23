@@ -146,7 +146,7 @@ module ApiHelper
       api_partial_collection builder,(object.creators || [])
     end if object.respond_to?("creators")
             
-    unless Seek::Config.hide_details_enabled or !logged_in_and_registered?
+    unless hide_contact_details?
       builder.tag! "email",object.email if object.respond_to?("email")
       builder.tag! "webpage",object.webpage if object.respond_to?("webpage")
       builder.tag! "internal_webpage",object.internal_webpage if object.respond_to?("internal_webpage")
