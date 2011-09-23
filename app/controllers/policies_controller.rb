@@ -93,6 +93,8 @@ class PoliciesController < ApplicationController
           project_ids = params["project_ids"].blank? ? [] : params["project_ids"].split(',')
         end
 
+        creators = (params[:creators].blank? ? [] : ActiveSupport::JSON.decode(params[:creators])).uniq
+
         contributor_types = params["contributor_types"].blank? ? [] : ActiveSupport::JSON.decode(params["contributor_types"])
         new_permission_data = params["contributor_values"].blank? ? {} : ActiveSupport::JSON.decode(params["contributor_values"])
 
@@ -194,6 +196,10 @@ class PoliciesController < ApplicationController
         filtered_people = add_people_in_whitelist(filtered_people, people_in_group['WhiteList'])
         #remove people in blacklist
         filtered_people = remove_people_in_blacklist(filtered_people, people_in_group['BlackList'])
+
+        #add creators and assign them the Policy::EDITING right
+        creators.collect!{|c| [c[1] ,c[0], Policy::EDITING]}
+        filtered_people = add_people_in_whitelist(filtered_people, creators)
 
         #remove current_user
         filtered_people = filtered_people.reject{|person| person[0] == current_user.id}

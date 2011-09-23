@@ -940,4 +940,3 @@ function getProjectIds(resource_name){
 
 
 
-
