@@ -381,3 +381,9 @@ end
   Factory.define :tool,:parent=>:annotation do |f|
     f.attribute_name "tool"
   end
+
+  Factory.define :assets_creator do |f|
+    f.association :asset, :factory => :data_file
+    f.association :creator, :factory => :person_in_project
+  end
+

@@ -43,6 +43,9 @@ module Authorization
         return true #contributor is always authorized 
         # have to do this because of inconsistancies with access_type that mess up later on
         # (4 = can manage, 0 = can manage... if contributor) ???
+      elsif thing.is_downloadable? and thing.creators.include?(user.person) and access_type_allows_action?(action, Policy::EDITING)
+        scope = Policy::PRIVATE
+        return true
       else
         if user.person && user.person.projects.empty?
           scope = Policy::EVERYONE
