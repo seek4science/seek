@@ -72,7 +72,7 @@ class PoliciesController < ApplicationController
     end
 
     #return the hash: key is access_type, value is the array of people
-    def request_permission_summary
+    def request_permission_summary (params=params, contributor=(current_user.try :person))
         #get params
         sharing_scope = params["sharing_scope"].to_i
         access_type = params["access_type"].to_i
@@ -80,12 +80,12 @@ class PoliciesController < ApplicationController
         your_proj_access_type = params["project_access_type"].blank? ? nil : params["project_access_type"].to_i
         #when resource is study, id of the investigation is sent, so get the project_ids from the investigation
         project_ids = []
-        if (params[:resource_name] == 'study') and (!params["project_ids"].blank?)
+        if (params["resource_name"] == 'study') and (!params["project_ids"].blank?)
           investigation = Investigation.find_by_id(try_block{params["project_ids"].to_i})
           project_ids = try_block{investigation.projects.collect{|p| p.id}}
 
         #when resource is assay, id of the study is sent, so get the project_ids from the study
-        elsif (params[:resource_name] == 'assay') and (!params["project_ids"].blank?)
+        elsif (params["resource_name"] == 'assay') and (!params["project_ids"].blank?)
           study = Study.find_by_id(try_block{params["project_ids"].to_i})
           project_ids = try_block{study.projects.collect{|p| p.id}}
         #normal case, the project_ids is sent
@@ -93,13 +93,13 @@ class PoliciesController < ApplicationController
           project_ids = params["project_ids"].blank? ? [] : params["project_ids"].split(',')
         end
 
-        creators = (params[:creators].blank? ? [] : ActiveSupport::JSON.decode(params[:creators])).uniq
+        creators = (params["creators"].blank? ? [] : ActiveSupport::JSON.decode(params["creators"])).uniq
 
         contributor_types = params["contributor_types"].blank? ? [] : ActiveSupport::JSON.decode(params["contributor_types"])
         new_permission_data = params["contributor_values"].blank? ? {} : ActiveSupport::JSON.decode(params["contributor_values"])
 
         #build the hash containing contributor_type as key and the people in these groups as value
-        people_in_group = {'Person' => [], 'FavouriteGroup' => [], 'WorkGroup' => [], 'Project' => [], 'WhiteList' => [], 'BlackList' => [],'Network' => []}
+        people_in_group = {'Person' => [], 'FavouriteGroup' => [], 'WorkGroup' => [], 'Project' => [], 'Institution' => [], 'WhiteList' => [], 'BlackList' => [],'Network' => []}
         #the result return: a hash contain the access_type as key, and array of people as value
         grouped_people_by_access_type = {}
 
@@ -162,6 +162,13 @@ class PoliciesController < ApplicationController
                     people_in_group['Project'] |= people_in_project
                   end
                end
+             when 'Institution'
+               new_permission_data['Institution'].each do |key, value|
+                  people_in_institution = get_people_in_institution key, value.values.first
+                  unless people_in_institution.blank?
+                    people_in_group['Institution'] |= people_in_institution
+                  end
+               end
            end
         end
 
@@ -184,9 +191,11 @@ class PoliciesController < ApplicationController
         people_in_group['FavouriteGroup']  = remove_duplicate(people_in_group['FavouriteGroup'])
         people_in_group['WorkGroup']  = remove_duplicate(people_in_group['WorkGroup'])
         people_in_group['Project']  = remove_duplicate(people_in_group['Project'])
+        people_in_group['Institution']  = remove_duplicate(people_in_group['Institution'])
 
         #Now process precedence with the order [network, project, wg, fg, person]
         filtered_people = people_in_group['Network']
+        filtered_people = precedence(filtered_people, people_in_group['Institution'])
         filtered_people = precedence(filtered_people, people_in_group['Project'])
         filtered_people = precedence(filtered_people, people_in_group['WorkGroup'])
         filtered_people = precedence(filtered_people, people_in_group['FavouriteGroup'])
@@ -201,8 +210,8 @@ class PoliciesController < ApplicationController
         creators.collect!{|c| [c[1] ,c[0], Policy::EDITING]}
         filtered_people = add_people_in_whitelist(filtered_people, creators)
 
-        #remove current_user
-        filtered_people = filtered_people.reject{|person| person[0] == current_user.id}
+        #add current_user
+        filtered_people = add_people_in_whitelist(filtered_people, [[contributor.id, "#{contributor.first_name} #{contributor.last_name}", Policy::MANAGING]]) unless contributor.blank?
 
         #sort people by name
         filtered_people = filtered_people.sort{|a,b| a[1] <=> b[1]}
@@ -247,11 +256,11 @@ class PoliciesController < ApplicationController
     #review people in black list, white list and normal workgroup
     def get_people_in_FG fg_id=nil, is_white_list=nil, is_black_list=nil
       if is_white_list
-        f_group = FavouriteGroup.find(:all, :conditions => ["name = ? AND user_id = ?", "__whitelist__", current_user.id ]).first
+        f_group = FavouriteGroup.find(:all, :conditions => ["name = ? AND user_id = ?", "__whitelist__", User.current_user.id ]).first
       elsif is_black_list
-        f_group = FavouriteGroup.find(:all, :conditions => ["name = ? AND user_id = ?", "__blacklist__", current_user.id ]).first
+        f_group = FavouriteGroup.find(:all, :conditions => ["name = ? AND user_id = ?", "__blacklist__", User.current_user.id ]).first
       else
-        f_group = FavouriteGroup.find(fg_id, :conditions => { :user_id => current_user.id } )
+        f_group = FavouriteGroup.find(fg_id, :conditions => { :user_id => User.current_user.id } )
       end
 
       if f_group
@@ -273,6 +282,18 @@ class PoliciesController < ApplicationController
           people_in_project.push [person.id, "#{person.first_name} #{person.last_name}", access_type]
         end
         return people_in_project
+      end
+    end
+
+    #review people in institution
+    def get_people_in_institution institution_id, access_type
+        institution = Institution.find(institution_id)
+      if institution
+        people_in_institution = [] #id, name, access_type
+        institution.people.each do |person|
+          people_in_institution.push [person.id, "#{person.first_name} #{person.last_name}", access_type]
+        end
+        return people_in_institution
       end
     end
 

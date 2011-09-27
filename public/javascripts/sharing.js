@@ -933,7 +933,14 @@ function getProjectIds(resource_name){
     return project_ids
 }
 
+function getCreators(){
+    var creators = []
+    var element = $('creators')
+    if (element != null)
+      creators = $F('creators')
 
+    return creators
+}
 
 
 

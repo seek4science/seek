@@ -39,13 +39,15 @@
             <%= display_people_list value-%>
         <%when Policy::MANAGING %>
             <h2>People can manage:</h2>
-            <%= display_people_list value-%>
+            <%if (grouped_people_by_access_type.count == 1) && (value.count == 1 and value.first[0] == try_block{current_user.person.id})%>
+               <p class='private'>You keep this item private (only visible to you)</p>
+            <%else%>
+               <%= display_people_list value-%>
+            <%end%>
         <%when Policy::PUBLISHING %>
             <p class='public'>All visitors (including anonymous visitors with no login) can <span style="color: #475f30;"><%= Policy.get_access_type_wording(value, nil).downcase -%> </span>  </p>
        <%end%>
       <%end%>
-    <%else%>
-        <p class='private'>You keep this item private (only visible to you)</p>
     <%end%>
 
     <div align="center" style="margin-top: 1em">

@@ -251,10 +251,34 @@ class Person < ActiveRecord::Base
     annotations_with_attribute("tool").collect{|a| a.value}
   end
 
+    #retrieve the items that this person is contributor (owner for assay)
+  def related_items
+     related_items = []
+     related_items |= assays
+     unless user.blank?
+       related_items |= user.assets
+       related_items |= user.presentations
+       related_items |= user.events
+       related_items |= user.investigations
+       related_items |= user.studies
+     end
+     related_items
+  end
+
+  #remove the permissions which are set on this person
+  def remove_permissions
+    permissions = Permission.find(:all, :conditions => ["contributor_type =? and contributor_id=?", 'Person', id])
+    permissions.each do |p|
+      p.destroy
+    end
+  end
+
   private
 
   #a before_save trigger, that checks if the person is the first one created, and if so defines it as admin
   def first_person_admin
     self.is_admin=true if Person.count==0
   end
+
+
 end

@@ -5,7 +5,7 @@ class PeopleController < ApplicationController
   before_filter :current_user_exists,:only=>[:select,:userless_project_selected_ajax,:create,:new]
   before_filter :profile_belongs_to_current_or_is_admin, :only=>[:edit, :update]
   before_filter :profile_is_not_another_admin_except_me, :only=>[:edit,:update]
-  before_filter :is_user_admin_auth, :only=>[:destroy]
+  before_filter :is_user_admin_auth,:clean_up_and_assign_permissions, :only=>[:destroy]
   before_filter :is_user_admin_or_personless, :only=>[:new]
   before_filter :auth_params,:only=>[:update,:create]
 
@@ -223,39 +223,6 @@ class PeopleController < ApplicationController
   # DELETE /people/1
   # DELETE /people/1.xml
   def destroy
-    #remove the permissions which are set on this person
-    remove_permissions_on @person
-
-    #retrieve the items that this person is contributor (owner for assay)
-    related_items = related_items_of @person
-
-    #check if anyone has manage right
-    #if not, assign the manage right to pis||pals
-    related_items.each do |item|
-      policy_with_manage_access_type = try_block{item.policy.access_type}.to_i == Policy::MANAGING ? item.policy : nil
-      permissions_with_manage_access_type = try_block{item.policy.permissions.select{|p| p.contributor_type == 'Person' && p.access_type == Policy::MANAGING}}
-      if policy_with_manage_access_type.blank? && permissions_with_manage_access_type.blank?
-        #find the projects which this person and item belong to
-        projects_in_common = @person.projects & item.projects
-        pis = projects_in_common.collect{|p| p.pis}.flatten.uniq
-        pis.reject!{|pi| pi.id == @person.id}
-        policy = item.policy.blank? ? (create_private_policy_for item) : item.policy
-        unless pis.blank?
-          pis.each do |pi|
-            policy.permissions.build(:contributor => pi, :access_type => Policy::MANAGING)
-            policy.save
-          end
-        else
-          pals = projects_in_common.collect{|p| p.pals}.flatten.uniq
-          pals.reject!{|pal| pal.id == @person.id}
-          pals.each do |pal|
-            policy.permissions.build(:contributor => pal, :access_type => Policy::MANAGING)
-            policy.save
-          end
-        end
-      end
-    end
-
     @person.destroy
 
     respond_to do |format|
@@ -295,6 +262,71 @@ class PeopleController < ApplicationController
         render :json => {:status => 200, :people_list => people_list }
       }
     end
+  end
+
+  def clean_up_and_assign_permissions
+    #remove the permissions which are set on this person
+    @person.remove_permissions
+
+    #retrieve the items that this person is contributor (owner for assay)
+    related_items = @person.related_items
+
+    #check if anyone has manage right on the related_items
+    #if not or if only the contributor then assign the manage right to pis||pals
+    related_items.each do |item|
+      people_can_manage_item = people_can_manage(item, @person)
+      if people_can_manage_item.blank? || (people_can_manage_item == [[@person.id, "#{@person.first_name} #{@person.last_name}", Policy::MANAGING]])
+        #find the projects which this person and item belong to
+        projects_in_common = @person.projects & item.projects
+        pis = projects_in_common.collect{|p| p.pis}.flatten.uniq
+        pis.reject!{|pi| pi.id == @person.id}
+        policy = item.policy.blank? ? (create_private_policy_for item) : item.policy
+        unless pis.blank?
+          pis.each do |pi|
+            policy.permissions.build(:contributor => pi, :access_type => Policy::MANAGING)
+            policy.save
+          end
+        else
+          pals = projects_in_common.collect{|p| p.pals}.flatten.uniq
+          pals.reject!{|pal| pal.id == @person.id}
+          pals.each do |pal|
+            policy.permissions.build(:contributor => pal, :access_type => Policy::MANAGING)
+            policy.save
+          end
+        end
+      end
+    end
+  end
+
+  def create_private_policy_for item
+    policy = Policy.private_policy
+    policy.save
+    item.policy_id = policy.id
+    policy
+  end
+
+  #setup sharing params to send to request_permission_summary to check the people who have manage right
+  def people_can_manage item, contributor
+    policy_params = {}
+    policy = item.policy
+    policy_params["sharing_scope"] = policy.sharing_scope
+    policy_params["access_type"] = policy.access_type
+    policy_params["contributor_types"] = policy.permissions.collect{|p| p.contributor_type}
+    policy_params["contributor_values"] = {}
+    policy_params["contributor_types"].each do |contributor_type|
+      permissions = policy.permissions.select{|p| p.contributor_type == contributor_type}
+      permission_hash = {}
+      permissions.each do  |p|
+        permission_hash[p.contributor_id] = {'access_type' => p.access_type}
+      end
+      policy_params["contributor_values"][contributor_type] =  permission_hash
+    end
+    policy_params["contributor_types"] = policy_params["contributor_types"].to_json
+    policy_params["contributor_values"] = policy_params["contributor_values"].to_json
+    policy_params['use_whitelist'] = policy.use_whitelist.to_s
+    policy_params['use_backlist'] = policy.use_blacklist.to_s
+    grouped_people_by_access_type = PoliciesController.new().request_permission_summary policy_params, contributor
+    grouped_people_by_access_type[Policy::MANAGING]
   end
 
   private
@@ -351,35 +383,5 @@ class PeopleController < ApplicationController
     restricted_params.each do |param, allowed|
       params[:person].delete(param) if params[:person] and not allowed
     end
-  end
-
-  #remove the permissions which are set on this person
-  def remove_permissions_on person
-    permissions = Permission.find(:all, :conditions => ["contributor_type =? and contributor_id=?", 'Person', person.try(:id)])
-    permissions.each do |p|
-      p.destroy
-    end
-  end
-
-  #retrieve the items that this person is contributor (owner for assay)
-  def related_items_of person
-     user = try_block{person.user}
-     related_items = []
-     related_items |= try_block{person.assays}.to_a
-     unless user.blank?
-       related_items |= user.assets
-       related_items |= user.presentations
-       related_items |= user.events
-       related_items |= user.investigations
-       related_items |= user.studies
-     end
-     related_items
-  end
-
-  def create_private_policy_for item
-    policy = Policy.private_policy
-    policy.save
-    item.policy_id = policy.id
-    policy
   end
 end
