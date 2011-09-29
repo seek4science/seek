@@ -43,9 +43,9 @@ function validateSopFields(is_new_file) {
 function validateModelFields(is_new_file) {
     // only make this test if that's a new Model
     if(is_new_file) {
-        if($('model_data').value.length == 0 && $('model_data_url').value.length == 0) {
-            alert("Please specify the file to upload, or provide a URL.");
-            $('model_data').focus();
+        if($('content_blob_data').value.length == 0 && $('content_blob_data_url').value.length == 0) {
+            alert("Please specify files to upload, or provide URLs.");
+            $('content_blob_data').focus();
             return(false);
         }
     }

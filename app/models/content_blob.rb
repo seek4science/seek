@@ -4,7 +4,10 @@ require 'open-uri'
 require 'tmpdir'
 
 class ContentBlob < ActiveRecord::Base
-  
+
+
+  belongs_to :asset, :polymorphic => true
+
   DATA_STORAGE_PATH = "filestore/content_blobs/"
   
   #the actual data value stored in memory. If this could be large, then using :tmp_io_object is preferred
@@ -22,7 +25,12 @@ class ContentBlob < ActiveRecord::Base
   before_save :dump_data_to_file
   
   before_save :calculate_md5
-  
+
+  #include all image types
+  def is_image?
+    self.content_type.index('image')== 0
+  end
+
   def md5sum
     if super.nil?
       other_changes=self.changed?

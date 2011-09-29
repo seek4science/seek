@@ -69,7 +69,7 @@ class DataFile < ActiveRecord::Base
   # allow same titles, but only if these belong to different users
   # validates_uniqueness_of :title, :scope => [ :contributor_id, :contributor_type ], :message => "error - you already have a Data file with such title."
 
-  belongs_to :content_blob #don't add a dependent=>:destroy, as the content_blob needs to remain to detect future duplicates
+  has_one :content_blob, :as => :asset, :foreign_key => :asset_id ,:conditions => 'asset_version= #{self.version}'
 
   acts_as_solr(:fields=>[:description,:title,:original_filename,:tag_counts]) if Seek::Config.solr_enabled
 
@@ -80,8 +80,6 @@ class DataFile < ActiveRecord::Base
 
   explicit_versioning(:version_column => "version") do
     acts_as_versioned_resource
-    
-    belongs_to :content_blob
     
     has_many :studied_factors, :primary_key => "data_file_id", :foreign_key => "data_file_id", :conditions =>  'studied_factors.data_file_version = #{self.version}'
     

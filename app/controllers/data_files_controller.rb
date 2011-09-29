@@ -8,6 +8,7 @@ class DataFilesController < ApplicationController
   include MimeTypesHelper  
   include DotGenerator  
   include Seek::AssetsCommon
+  include AssetsCommonExtension
 
   #before_filter :login_required
   
@@ -93,12 +94,11 @@ class DataFilesController < ApplicationController
   def new_version
     if (handle_data nil)          
       comments=params[:revision_comment]
-      @data_file.content_blob = ContentBlob.new(:tmp_io_object => @tmp_io_object, :url=>@data_url)      
-      @data_file.content_type = params[:data_file][:content_type]
-      @data_file.original_filename=params[:data_file][:original_filename]
+
       factors = @data_file.studied_factors
       respond_to do |format|
         if @data_file.save_as_new_version(comments)
+          create_content_blobs
           #Duplicate studied factors
           factors.each do |f|
             new_f = f.clone
@@ -147,12 +147,12 @@ class DataFilesController < ApplicationController
       params[:data_file][:project_ids] = [params[:data_file].delete(:project_id)] if params[:data_file][:project_id]
       @data_file = DataFile.new params[:data_file]
 
-      @data_file.content_blob = ContentBlob.new :tmp_io_object => @tmp_io_object, :url=>@data_url
+      #@data_file.content_blob = ContentBlob.new :tmp_io_object => @tmp_io_object, :url=>@data_url
       Policy.new_for_upload_tool(@data_file, params[:recipient_id])
 
       if @data_file.save
         @data_file.creators = [current_user.person]
-
+        create_content_blobs
         #send email to the file uploader and receiver
         Mailer.deliver_file_uploaded(current_user,Person.find(params[:recipient_id]),@data_file,base_host)
 
@@ -169,7 +169,7 @@ class DataFilesController < ApplicationController
     if handle_data
       
       @data_file = DataFile.new params[:data_file]
-      @data_file.content_blob = ContentBlob.new :tmp_io_object => @tmp_io_object, :url=>@data_url
+      #@data_file.content_blob = ContentBlob.new :tmp_io_object => @tmp_io_object, :url=>@data_url
 
       update_tags @data_file
 
@@ -178,6 +178,9 @@ class DataFilesController < ApplicationController
       assay_ids = params[:assay_ids] || []
       respond_to do |format|
         if @data_file.save
+
+          create_content_blobs
+
           # update attributions
           Relationship.create_or_update_attributions(@data_file, params[:attributions])
           

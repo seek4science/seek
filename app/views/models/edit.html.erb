@@ -11,7 +11,7 @@
     <% form_for(@model ,:html => {:multipart => true, :method => :put}) do |f| %>
     <div class="asset_form">
         <%= f.error_messages %>
-      <%= render :partial=>"assets/batch_upload_box",:locals=>{:action=>:edit,:resource=>@model} -%>
+      <%= render :partial=>"assets/upload_box",:locals=>{:action=>:edit,:resource=>@model} -%>
         <p>
             <b>Title:</b>
             <br/>

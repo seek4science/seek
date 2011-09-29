@@ -1,12 +1,12 @@
  require 'zip/zip'
  require 'zip/zipfilesystem'
-
 class ModelsController < ApplicationController
   
   include WhiteListHelper
   include IndexPager
   include DotGenerator
   include Seek::AssetsCommon
+  include AssetsCommonExtension
 
   before_filter :pal_or_admin_required,:only=> [:create_model_metadata,:update_model_metadata,:delete_model_metadata ]
   
@@ -19,28 +19,41 @@ class ModelsController < ApplicationController
   include Seek::Publishing
   
   @@model_builder = Seek::JWS::OneStop.new
-  
+
+  def send_image
+    @model = Model.find params[:id]
+    @display_model = @model.find_version params[:version]
+    content_blob = ContentBlob.find_by_id @display_model.id_image
+
+    if File.file? content_blob.filepath
+      send_file content_blob.filepath,:type=>content_blob.content_type, :disposition => 'inline'
+    else
+      show_via_url @display_model,content_blob
+    end
+
+  end
+
   # GET /models
   # GET /models.xml
   
   def new_version
-    #if (handle_data nil)
+    if (handle_batch_data nil)
       
       comments = params[:revision_comment]
-      #@model.content_blob = ContentBlob.new(:tmp_io_object => @tmp_io_object, :url=>@data_url)
-      @model.content_type = params[:model][:content_type]
-      @model.original_filename = params[:model][:original_filename]
-      @model.attachments.destroy_all
 
       respond_to do |format|
         create_new_version  comments
-        process_file_uploads
+
+        @model.id_image = nil
+        create_content_blobs
+        set_or_update_image :new_version
+
         format.html {redirect_to @model }
       end
-    #else
-    #  flash[:error]=flash.now[:error]
-    #  redirect_to @model
-    #end
+    else
+      flash[:error]=flash.now[:error]
+      redirect_to @model
+    end
   end    
   
   def delete_model_metadata
@@ -377,7 +390,7 @@ class ModelsController < ApplicationController
   # GET /models/new.xml
   def new    
     @model=Model.new
-    @attachment = Attachment.new
+    @content_blob= ContentBlob.new
     respond_to do |format|
       if current_user.person.member?
         format.html # new.html.erb
@@ -390,18 +403,14 @@ class ModelsController < ApplicationController
   
   # GET /models/1/edit
   def edit
-    @newfile = Attachment.new
-		@allowed = Seek::Config.max_attachments_num - @model.attachments.count
 
   end
   
   # POST /models
   # POST /models.xml
   def create
-    params[:model].delete 'local_copy'
-   # if handle_data
+    if handle_batch_data
       @model = Model.new(params[:model])
-      #@model.content_blob = ContentBlob.new(:tmp_io_object => @tmp_io_object,:url=>@data_url)
 
       @model.policy.set_attributes_with_sharing params[:sharing], @model.projects
 
@@ -410,7 +419,9 @@ class ModelsController < ApplicationController
       respond_to do |format|
         if @model.save
 
-           process_file_uploads
+          create_content_blobs
+
+          set_or_update_image :new
 
           # update attributions
           Relationship.create_or_update_attributions(@model, params[:attributions])
@@ -434,10 +445,10 @@ class ModelsController < ApplicationController
           }
         end
       end
-    #end
+    end
     
   end
-  
+
   # GET /models/1/download
   def download
     # update timestamp in the current Model record
@@ -452,61 +463,61 @@ class ModelsController < ApplicationController
   # PUT /models/1.xml
   def update
     # remove protected columns (including a "link" to content blob - actual data cannot be updated!)
-    if params[:model]
-      [:contributor_id, :contributor_type, :original_filename, :content_type, :content_blob_id, :created_at, :updated_at, :last_used_at,:local_copy].each do |column_name|
-        params[:model].delete(column_name)
-      end
-      
-      # update 'last_used_at' timestamp on the Model
-      params[:model][:last_used_at] = Time.now
-    end
-
-    publication_params    = params[:related_publication_ids].nil?? [] : params[:related_publication_ids].collect { |i| ["Publication", i.split(",").first]}
-    update_tags @model
-
-    @model.attributes = params[:model]
-
-    if params[:sharing]
-      @model.policy_or_default
-      @model.policy.set_attributes_with_sharing params[:sharing], @model.projects
-    end
-
-    assay_ids = params[:assay_ids] || []
-    respond_to do |format|
-      if @model.save
-
-        process_file_uploads
-
-        # update attributions
-        Relationship.create_or_update_attributions(@model, params[:attributions])
-        
-        # update related publications
-        Relationship.create_or_update_attributions(@model,publication_params, Relationship::RELATED_TO_PUBLICATION)
-        
-        #update creators
-        AssetsCreator.add_or_update_creator_list(@model, params[:creators])
-        
-        flash[:notice] = 'Model metadata was successfully updated.'
-        format.html { redirect_to model_path(@model) }
-        # Update new assay_asset
-        Assay.find(assay_ids).each do |assay|
-          if assay.can_edit?
-            assay.relate(@model)
-          end
+      if params[:model]
+        [:contributor_id, :contributor_type, :original_filename, :content_type, :content_blob_id, :created_at, :updated_at, :last_used_at].each do |column_name|
+          params[:model].delete(column_name)
         end
-        #Destroy AssayAssets that aren't needed
-        assay_assets = @model.assay_assets
-        assay_assets.each do |assay_asset|
-          if assay_asset.assay.can_edit? and !assay_ids.include?(assay_asset.assay_id.to_s)
-            AssayAsset.destroy(assay_asset.id)
-          end
-        end
-      else
-        format.html {
-          render :action => "edit"
-        }
+
+        # update 'last_used_at' timestamp on the Model
+        params[:model][:last_used_at] = Time.now
       end
-    end
+
+      publication_params    = params[:related_publication_ids].nil?? [] : params[:related_publication_ids].collect { |i| ["Publication", i.split(",").first]}
+      update_tags @model
+
+      @model.attributes = params[:model]
+
+      if params[:sharing]
+        @model.policy_or_default
+        @model.policy.set_attributes_with_sharing params[:sharing], @model.projects
+      end
+
+      assay_ids = params[:assay_ids] || []
+      respond_to do |format|
+        if @model.save
+
+          set_or_update_image  :edit
+
+          # update attributions
+          Relationship.create_or_update_attributions(@model, params[:attributions])
+
+          # update related publications
+          Relationship.create_or_update_attributions(@model,publication_params, Relationship::RELATED_TO_PUBLICATION)
+
+          #update creators
+          AssetsCreator.add_or_update_creator_list(@model, params[:creators])
+
+          flash[:notice] = 'Model metadata was successfully updated.'
+          format.html { redirect_to model_path(@model) }
+          # Update new assay_asset
+          Assay.find(assay_ids).each do |assay|
+            if assay.can_edit?
+              assay.relate(@model)
+            end
+          end
+          #Destroy AssayAssets that aren't needed
+          assay_assets = @model.assay_assets
+          assay_assets.each do |assay_asset|
+            if assay_asset.assay.can_edit? and !assay_ids.include?(assay_asset.assay_id.to_s)
+              AssayAsset.destroy(assay_asset.id)
+            end
+          end
+        else
+          format.html {
+            render :action => "edit"
+          }
+        end
+      end
   end
   
   # DELETE /models/1
@@ -519,7 +530,7 @@ class ModelsController < ApplicationController
       format.xml  { head :ok }
     end
   end
-  
+
   def preview
     
     element = params[:element]
@@ -581,55 +592,19 @@ class ModelsController < ApplicationController
     end
   end
 
-  protected
-
-	def process_file_uploads
-		i = 0
-		while !params[:attachment].nil? && ( (params[:attachment]['file_'+i.to_s] != "" && !params[:attachment]['file_'+i.to_s].nil?) or (params[:attachment]['url_'+i.to_s] != "" && !params[:attachment]['url_'+i.to_s].nil?))
-      if params[:attachment]['file_'+i.to_s] != "" && !params[:attachment]['file_'+i.to_s].nil?
-         @attachment = Attachment.new(Hash["uploaded_data" => params[:attachment]['file_'+i.to_s]])
-         @model.attachments << @attachment
-
-         @model.id_image = @attachment.id if @attachment.is_image? and !@model.id_image.nil? and !@model.attachments.map(&:id).include? @model.id_image.to_i
-      end
-      if params[:attachment]['url_'+i.to_s] != "" && !params[:attachment]['url_'+i.to_s].nil?
-         url = params[:attachment]['url_'+i.to_s]
-         @attachment = Attachment.new(:source_uri=>url,:data_url=>url)
-         @model.attachments << @attachment
-
-         @model.id_image = @attachment.id if @attachment.is_image? and !@model.id_image.nil? and !@model.attachments.map(&:id).include? @model.id_image.to_i
-      end
-      i += 1
+  def set_or_update_image  action
+    #if two image files have the same name,no matter which one is selected,the first file will be selected
+    # when new /new version, params[:model][:id_image] = content_blob.original_filename, when edit,params[:model][:id_image] = content_blob.id
+    case action
+      when :new,:new_version
+         @model.id_image = @model.content_blobs.detect{|cb|cb.original_filename==params[:model][:id_image]}.try(:id)
+      when :edit
+        @model.id_image = params[:model][:id_image].to_i
     end
 
-    if @model.id_image.nil? || @model.id_image==0
-       @model.id_image = @model.attachments.detect { |a| a.is_image? == true }.try(:id)
-    end
-
+     if @model.id_image.nil? or @model.id_image==0
+         @model.id_image = @model.content_blobs.detect(&:is_image?).id
+     end
     @model.save!
-  end
-
-
-  def handle_download_zip asset
-    t = Tempfile.new("#{Time.now.year}#{Time.now.month}#{Time.now.day}_#{asset.class.name.downcase}_#{asset.title}_#{asset.id}","#{RAILS_ROOT}/tmp")
-  # Give the path of the temp file to the zip outputstream, it won't try to open it as an archive.
-    Zip::ZipOutputStream.open(t.path) do |zos|
-      asset.attachments.each do |attach|
-        file_path =  "#{RAILS_ROOT}/public" + attach.public_filename
-        if File.exists? file_path
-          # Create a new entry with attachment's filename'
-          zos.put_next_entry(attach.original_filename)
-          # Add the contents of the file, don't read the stuff linewise if its binary, instead use direct IO
-          zos.print IO.read(file_path)
-        else
-          flash.now[:error] = "#{attach.public_filename} does not exist!"
-        end
-
-      end
-    end
-    send_file t.path, :type => 'application/zip', :disposition => 'attachment', :filename => "#{asset.class.name.downcase}_#{asset.title}.zip"
-  # The temp file will be deleted some time...
-    t.close
-
   end
 end

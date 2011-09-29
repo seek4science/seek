@@ -2,7 +2,8 @@ class SopsController < ApplicationController
   
   include IndexPager
   include DotGenerator
-  include Seek::AssetsCommon  
+  include Seek::AssetsCommon
+  include AssetsCommonExtension
   
   #before_filter :login_required
   before_filter :find_assets, :only => [ :index ]
@@ -14,14 +15,13 @@ class SopsController < ApplicationController
   def new_version
     if (handle_data nil)      
       comments=params[:revision_comment]
-      
-      @sop.content_blob = ContentBlob.new(:tmp_io_object => @tmp_io_object, :url=>@data_url)
-      @sop.content_type = params[:sop][:content_type]
-      @sop.original_filename = params[:sop][:original_filename]
-      
+
       conditions = @sop.experimental_conditions
       respond_to do |format|
         if @sop.save_as_new_version(comments)
+
+          create_content_blobs
+
           #Duplicate experimental conditions
           conditions.each do |con|
             new_con = con.clone
@@ -95,14 +95,15 @@ class SopsController < ApplicationController
 
     if handle_data            
       @sop = Sop.new(params[:sop])
-      @sop.content_blob = ContentBlob.new(:tmp_io_object => @tmp_io_object,:url=>@data_url)
-
       @sop.policy.set_attributes_with_sharing params[:sharing], @sop.projects
 
       update_tags @sop
       assay_ids = params[:assay_ids] || []
       respond_to do |format|
         if @sop.save
+
+          create_content_blobs
+
           # update attributions
           Relationship.create_or_update_attributions(@sop, params[:attributions])
           

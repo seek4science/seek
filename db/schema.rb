@@ -9,7 +9,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20110920130259) do
+ActiveRecord::Schema.define(:version => 20110921135820) do
 
   create_table "activity_logs", :force => true do |t|
     t.string   "action"
@@ -161,10 +161,15 @@ ActiveRecord::Schema.define(:version => 20110920130259) do
   end
 
   create_table "content_blobs", :force => true do |t|
-    t.binary "data_old", :limit => 2147483647
-    t.string "md5sum"
-    t.string "url"
-    t.string "uuid"
+    t.binary  "data_old",          :limit => 2147483647
+    t.string  "md5sum"
+    t.string  "url"
+    t.string  "uuid"
+    t.string  "original_filename"
+    t.string  "content_type"
+    t.integer "asset_id"
+    t.string  "asset_type"
+    t.integer "asset_version"
   end
 
   create_table "culture_growth_types", :force => true do |t|
@@ -191,9 +196,6 @@ ActiveRecord::Schema.define(:version => 20110920130259) do
     t.integer  "contributor_id"
     t.string   "title"
     t.text     "description"
-    t.string   "original_filename"
-    t.string   "content_type"
-    t.integer  "content_blob_id"
     t.integer  "template_id"
     t.datetime "last_used_at"
     t.datetime "created_at"
@@ -217,15 +219,12 @@ ActiveRecord::Schema.define(:version => 20110920130259) do
     t.integer  "contributor_id"
     t.string   "title"
     t.text     "description"
-    t.string   "original_filename"
-    t.string   "content_type"
-    t.integer  "content_blob_id"
     t.integer  "template_id"
     t.datetime "last_used_at"
     t.datetime "created_at"
     t.datetime "updated_at"
-    t.integer  "version",                        :default => 1
-    t.string   "first_letter",      :limit => 1
+    t.integer  "version",                       :default => 1
+    t.string   "first_letter",     :limit => 1
     t.text     "other_creators"
     t.string   "uuid"
     t.integer  "policy_id"
@@ -454,9 +453,6 @@ ActiveRecord::Schema.define(:version => 20110920130259) do
     t.integer  "contributor_id"
     t.string   "title"
     t.text     "description"
-    t.string   "original_filename"
-    t.integer  "content_blob_id"
-    t.string   "content_type"
     t.integer  "recommended_environment_id"
     t.text     "result_graph"
     t.datetime "last_used_at"
@@ -485,9 +481,6 @@ ActiveRecord::Schema.define(:version => 20110920130259) do
     t.integer  "contributor_id"
     t.string   "title"
     t.text     "description"
-    t.string   "original_filename"
-    t.integer  "content_blob_id"
-    t.string   "content_type"
     t.integer  "recommended_environment_id"
     t.text     "result_graph"
     t.datetime "last_used_at"
@@ -611,9 +604,6 @@ ActiveRecord::Schema.define(:version => 20110920130259) do
     t.integer  "contributor_id"
     t.string   "title"
     t.text     "description"
-    t.string   "original_filename"
-    t.string   "content_type"
-    t.integer  "content_blob_id"
     t.datetime "created_at"
     t.datetime "updated_at"
     t.datetime "last_used_at"
@@ -633,14 +623,11 @@ ActiveRecord::Schema.define(:version => 20110920130259) do
     t.integer  "contributor_id"
     t.string   "title"
     t.text     "description"
-    t.string   "original_filename"
-    t.string   "content_type"
-    t.integer  "content_blob_id"
     t.datetime "created_at"
     t.datetime "updated_at"
     t.datetime "last_used_at"
-    t.integer  "version",                        :default => 1
-    t.string   "first_letter",      :limit => 1
+    t.integer  "version",                       :default => 1
+    t.string   "first_letter",     :limit => 1
     t.text     "other_creators"
     t.string   "uuid"
     t.integer  "policy_id"
@@ -857,9 +844,6 @@ ActiveRecord::Schema.define(:version => 20110920130259) do
     t.integer  "contributor_id"
     t.string   "title"
     t.text     "description"
-    t.string   "original_filename"
-    t.string   "content_type"
-    t.integer  "content_blob_id"
     t.datetime "created_at"
     t.datetime "updated_at"
     t.datetime "last_used_at"
@@ -877,14 +861,11 @@ ActiveRecord::Schema.define(:version => 20110920130259) do
     t.integer  "contributor_id"
     t.string   "title"
     t.text     "description"
-    t.string   "original_filename"
-    t.string   "content_type"
-    t.integer  "content_blob_id"
     t.datetime "created_at"
     t.datetime "updated_at"
     t.datetime "last_used_at"
-    t.integer  "version",                        :default => 1
-    t.string   "first_letter",      :limit => 1
+    t.integer  "version",                       :default => 1
+    t.string   "first_letter",     :limit => 1
     t.text     "other_creators"
     t.string   "uuid"
     t.integer  "policy_id"

@@ -32,6 +32,7 @@ module Acts #:nodoc:
         acts_as_favouritable
         default_scope :order => "#{self.table_name}.updated_at DESC"
 
+        attr_writer :original_filename,:content_type
 
 
         validates_presence_of :title
@@ -84,6 +85,22 @@ module Acts #:nodoc:
     end
 
     module InstanceMethods
+      # adapt for moving original_filename,content_type to content_blob
+
+      def original_filename
+           self.content_blob.try :original_filename
+      end
+
+      def content_type
+        self.content_blob.try :content_type
+      end
+
+      if self.respond_to? :content_blobs
+        def content_blob
+          self.content_blobs.first
+        end
+      end
+
       # this method will take attributions' association and return a collection of resources,
       # to which the current resource is attributed
       def attributions
