@@ -55,8 +55,7 @@
                     <input id="content_blob_data" type="file"
                     <% if action==:edit -%>
                              disabled
-                    <% end -%>
-                    >
+                    <% end -%> >
                 <% end %>
           </p>
 
@@ -67,19 +66,19 @@
             <span class="required">*</span>
 
 
-                <input id="content_blob_data_url" type="text" size="55"
-                 <% if action==:edit-%>
-                             disabled
-                 <% end -%>  >
+            <input id="content_blob_data_url" type="text" size="55"
+                   <% if action==:edit -%>
+                   disabled
+                   <% end -%>  >
 
             <% if action==:new %>
 
                 <%= link_to_function (image("new") + "Add"), "addToList()" %>
-                <%= link_to_remote image("test",:title=>"Test",:alt=>"Test")+" Test",
-                    :url=>{:action=>:test_asset_url, :symb=>"content_blob"},
-                    :method=>:post,
-                    :with=>"multi_selector.current_url_element.serialize()",
-                    :before=>"$('test_url_msg').innerHTML='';show_ajax_loader('test_url_result_icon');" -%>
+                <%= link_to_remote image("test", :title=>"Test", :alt=>"Test")+" Test",
+                                   :url=>{:action=>:test_asset_url, :symb=>"content_blob"},
+                                   :method=>:post,
+                                   :with=>"multi_selector.current_url_element.serialize()",
+                                   :before=>"$('test_url_msg').innerHTML='';show_ajax_loader('test_url_result_icon');" -%>
 
                 <br/>
 
@@ -88,18 +87,19 @@
 
                   <%# fields_for upload_field,:local_copy do |local_copies| %>
 
-                       <%#= local_copies.check_box upload_field, :local_copy, :id=>"local_copy" -%>
+                  <%#= local_copies.check_box upload_field, :local_copy, :id=>"local_copy" -%>
                   <%# end %>
-                 <%= check_box upload_field, :local_copy, :id=>"local_copy" -%>
-                </p>
-                </p>
-                <p>
-                  <span id="test_url_result_icon"></span>
-                  <span id="test_url_msg" style="display:none;"></span>
+                  <%= check_box upload_field, :local_copy, :id=>"local_copy" -%>
                 </p>
             <% end -%>
+            </p>
+            <p>
+              <span id="test_url_result_icon"></span>
+              <span id="test_url_msg" style="display:none;"></span>
+            </p>
 
-        </div>
+
+            </div>
 
       </li>
     </ul>
@@ -134,7 +134,6 @@
                                    :with=>"url_element.multi_selector.current_url_element.serialize()",
                                    :before=>"$('test_url_msg').innerHTML='';show_ajax_loader('test_url_result_icon');" )
                                    -%>
-        ;
         var url = parseUri(multi_selector.current_url_element.value).file;
 
         if (url != "" && url != null) {
