@@ -382,6 +382,10 @@ end
     f.attribute_name "tool"
   end
 
+  Factory.define :text_value do |f|
+    f.sequence(:text) {|n| "value #{n}"}
+  end
+
   Factory.define :assets_creator do |f|
     f.association :asset, :factory => :data_file
     f.association :creator, :factory => :person_in_project

@@ -10,7 +10,7 @@ class DataFilesControllerTest < ActionController::TestCase
   include AuthenticatedTestHelper
   include RestTestCases
   include SharingFormTestHelper
-  
+
   def setup
     login_as(:datafile_owner)
     @object=data_files(:picture)
