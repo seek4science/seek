@@ -113,7 +113,7 @@
 
 
 
-<%= render :partial=>"assays/associate_sop",:locals=>{:f=>f} -%>
+<%= render :partial=>"assays/associate_sop",:locals=>{:f=>f, :resource => @assay} -%>
 
 <%  if @assay.is_modelling? -%>
   <%= render :partial=>"assays/associate_model",:locals=>{:f=>f, :resource => @assay} -%>

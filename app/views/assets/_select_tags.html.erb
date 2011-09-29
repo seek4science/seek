@@ -19,7 +19,7 @@
     <%= help_icon("Here you can provide some tags to help describe, and other people find, your #{type_name}.") -%>
     Tags
   </div>
-  <div class="foldContent" style="display:none;">
+  <div class="foldContent" style="display:<%= item_tags.blank? ? 'none' : 'block' -%>">
     <p class="box_infotext" style="margin-bottom: 0.5em;">
       <% if object.id.nil? -%>
           Here you can provide some initial tags to help describe this <%= type_name -%>. You can change these tags

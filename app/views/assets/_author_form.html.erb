@@ -21,7 +21,7 @@
     Creators
   </div>
 
-  <div id="creator_fold_content" class="foldContent" style="display: none;">
+  <div id="creator_fold_content" class="foldContent" style="display:<%= existing_creators.blank? ? 'none' : 'block' -%>">
 
     <p>
       If this <%= resource_type %> was created by, or together with, other <%= Seek::Config.project_name %> members, please list their names below. <br/>

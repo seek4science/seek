@@ -9,7 +9,7 @@
     Associate Publications
   </div>
 
-  <div id="associate_publication_fold_content" class="foldContent" style="display: block;">
+  <div id="associate_publication_fold_content" class="foldContent" style="display:<%= resource.publications.blank? ? 'none' : 'block' -%>">
     <div class="yui-u first" style="width:66%; float:left">
       
       <%
