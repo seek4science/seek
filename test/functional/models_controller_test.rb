@@ -114,7 +114,7 @@ class ModelsControllerTest < ActionController::TestCase
     login_as(:model_owner)
     assay = assays(:modelling_assay)
     assert_difference('Model.count') do
-      post :create, :model => valid_model, :sharing=>valid_sharing, :assay_ids => [assay.id.to_s]
+      post :create, :model => valid_model,:content_blob=>{:file_0=>fixture_file_upload('files/little_file.txt',Mime::TEXT)}, :sharing=>valid_sharing, :assay_ids => [assay.id.to_s]
     end
     
     assert_redirected_to model_path(assigns(:model))
@@ -125,7 +125,7 @@ class ModelsControllerTest < ActionController::TestCase
   def test_missing_sharing_should_default_to_private
     assert_difference('Model.count') do
       assert_difference('ContentBlob.count') do
-        post :create, :model => valid_model
+        post :create, :model => valid_model,:content_blob=>{:file_0=>fixture_file_upload('files/little_file.txt',Mime::TEXT)}
       end
     end
     assert_redirected_to model_path(assigns(:model))
@@ -146,9 +146,11 @@ class ModelsControllerTest < ActionController::TestCase
   end
   
   test "should create model with url" do
+    WebMock.allow_net_connect!
+
     assert_difference('Model.count') do
       assert_difference('ContentBlob.count') do
-        post :create, :model => valid_model_with_url, :sharing=>valid_sharing
+        post :create, :model => valid_model_with_url,:content_blob=>{:url_0=>"http://www.sysmo-db.org/images/sysmo-db-logo-grad2.png"}, :sharing=>valid_sharing
       end
     end
     assert_redirected_to model_path(assigns(:model))
@@ -161,11 +163,13 @@ class ModelsControllerTest < ActionController::TestCase
   end
   
   test "should create sop and store with url and store flag" do
+    WebMock.allow_net_connect!
+
     model_details=valid_model_with_url
     model_details[:local_copy]="1"
     assert_difference('Model.count') do
       assert_difference('ContentBlob.count') do
-        post :create, :model => model_details, :sharing=>valid_sharing
+        post :create, :model => model_details,:content_blob=>{:url_0=>"http://www.sysmo-db.org/images/sysmo-db-logo-grad2.png"}, :sharing=>valid_sharing
       end
     end
     assert_redirected_to model_path(assigns(:model))
@@ -181,7 +185,7 @@ class ModelsControllerTest < ActionController::TestCase
     assert_difference('Model.count') do
       model=valid_model
       model[:recommended_environment_id]=recommended_model_environments(:jws).id
-      post :create, :model => model, :sharing=>valid_sharing
+      post :create, :model => model,:content_blob=>{:file_0=>fixture_file_upload('files/little_file.txt',Mime::TEXT)} ,:sharing=>valid_sharing
     end
     
     m=assigns(:model)
@@ -407,12 +411,13 @@ class ModelsControllerTest < ActionController::TestCase
   def test_should_show_version
     m = models(:model_with_format_and_type)
     m.save! #to force creation of initial version (fixtures don't include it)
-    old_desc=m.description
-    old_desc_regexp=Regexp.new(old_desc)
-    
+    # new version will not change description
+    #old_desc=m.description
+    #old_desc_regexp=Regexp.new(old_desc)
+
     #create new version
-    m.description="This is now version 2"
-    assert m.save_as_new_version
+    post :new_version, :id=>m, :model=>{},:content_blob=>{:file_0=>fixture_file_upload('files/little_file.txt',Mime::TEXT)}
+    assert_redirected_to model_path(assigns(:m))
     m = Model.find(m.id)
     assert_equal 2, m.versions.size
     assert_equal 2, m.version
@@ -420,24 +425,23 @@ class ModelsControllerTest < ActionController::TestCase
     assert_equal 2, m.versions[1].version
     
     get :show, :id=>models(:model_with_format_and_type)
-    assert_select "p", :text=>/This is now version 2/, :count=>1
-    assert_select "p", :text=>old_desc_regexp, :count=>0
+    assert_select "p", :text=>/little_file.txt/, :count=>1
+    assert_select "p", :text=>/Teusink.xml/, :count=>0
     
     get :show, :id=>models(:model_with_format_and_type), :version=>"2"
-    assert_select "p", :text=>/This is now version 2/, :count=>1
-    assert_select "p", :text=>old_desc_regexp, :count=>0
+    assert_select "p", :text=>/little_file.txt/, :count=>1
+    assert_select "p", :text=>/Teusink.xml/, :count=>0
     
     get :show, :id=>models(:model_with_format_and_type), :version=>"1"
-    assert_select "p", :text=>/This is now version 2/, :count=>0
-    assert_select "p", :text=>old_desc_regexp, :count=>1
+    assert_select "p", :text=>/little_file.txt/, :count=>0
+    assert_select "p", :text=>/Teusink.xml/, :count=>1
     
   end
   
   def test_should_create_new_version
-    m=models(:model_with_format_and_type)    
-    
+    m=models(:model_with_format_and_type)
     assert_difference("Model::Version.count", 1) do
-      post :new_version, :id=>m, :model=>{:data=>fixture_file_upload('files/file_picture.png')}, :revision_comment=>"This is a new revision"
+      post :new_version, :id=>m, :model=>{},:content_blob=>{:file_0=>fixture_file_upload('files/little_file.txt',Mime::TEXT)}, :revision_comment=>"This is a new revision"
     end
     
     assert_redirected_to model_path(m)
@@ -449,8 +453,8 @@ class ModelsControllerTest < ActionController::TestCase
     m=Model.find(m.id)
     assert_equal 2,m.versions.size
     assert_equal 2,m.version
-    assert_equal "file_picture.png",m.original_filename
-    assert_equal "file_picture.png",m.versions[1].original_filename
+    assert_equal "little_file.txt",m.original_filename
+    assert_equal "little_file.txt",m.versions[1].original_filename
     assert_equal "Teusink.xml",m.versions[0].original_filename
     assert_equal "This is a new revision",m.versions[1].revision_comments
     
@@ -542,7 +546,7 @@ class ModelsControllerTest < ActionController::TestCase
 
   test "owner should be able to choose policy 'share with everyone' when creating a model" do
     model=valid_model
-    post :create, :model => model, :sharing=>{:use_whitelist=>"0", :user_blacklist=>"0", :sharing_scope =>Policy::EVERYONE, "access_type_#{Policy::EVERYONE}"=>Policy::VISIBLE}
+    post :create, :model => model,:content_blob=>{:file_0=>fixture_file_upload('files/little_file.txt',Mime::TEXT)}, :sharing=>{:use_whitelist=>"0", :user_blacklist=>"0", :sharing_scope =>Policy::EVERYONE, "access_type_#{Policy::EVERYONE}"=>Policy::VISIBLE}
     assert_redirected_to model_path(assigns(:model))
     assert_equal users(:model_owner),assigns(:model).contributor
     assert assigns(:model)
@@ -669,11 +673,11 @@ class ModelsControllerTest < ActionController::TestCase
   end
 
   def valid_model
-    { :title=>"Test",:data=>fixture_file_upload('files/little_file.txt'),:projects=>[projects(:sysmo_project)]}
+    { :title=>"Test",:projects=>[projects(:sysmo_project)]}
   end
 
   def valid_model_with_url
-    { :title=>"Test",:data_url=>"http://www.sysmo-db.org/images/sysmo-db-logo-grad2.png",:projects=>[projects(:sysmo_project)]}
+    { :title=>"Test",:projects=>[projects(:sysmo_project)]}
   end
   
 end

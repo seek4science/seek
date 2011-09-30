@@ -5,10 +5,14 @@ class DataFileTest < ActiveSupport::TestCase
   fixtures :all
 
   test "associations" do
-    datafile=data_files(:picture)
-    assert_equal users(:datafile_owner),datafile.contributor    
+    datafile_owner = Factory :user
+    datafile=Factory :data_file,:policy => Factory(:all_sysmo_viewable_policy),:contributor=> datafile_owner
+    assert_equal datafile_owner,datafile.contributor
+    unless datafile.content_blob.nil?
+      datafile.content_blob = nil
+    end
 
-    blob=content_blobs(:picture_blob)
+    blob=Factory.create(:content_blob,:original_filename=>"df.ppt", :content_type=>"application/ppt",:asset => datafile,:asset_version=>datafile.version)#content_blobs(:picture_blob)
     assert_equal blob,datafile.content_blob
   end
 
@@ -25,7 +29,7 @@ class DataFileTest < ActiveSupport::TestCase
 
   test "assay association" do
     User.with_current_user Factory(:user) do
-      datafile = data_files(:picture)
+      datafile = Factory :data_file,:policy => Factory(:all_sysmo_viewable_policy)
       assay = assays(:modelling_assay_with_data_and_relationship)
       relationship = relationship_types(:validation_data)
       assay_asset = assay_assets(:metabolomics_assay_asset1)
@@ -63,6 +67,7 @@ class DataFileTest < ActiveSupport::TestCase
   end
 
   def test_avatar_key
+
     assert_nil data_files(:picture).avatar_key
     assert data_files(:picture).use_mime_type_for_avatar?
 
@@ -106,9 +111,9 @@ class DataFileTest < ActiveSupport::TestCase
   end
 
   test "managers" do
-    df=data_files(:picture)
+    df= data_files(:picture)
     assert_not_nil df.managers
-    contributor=people(:person_for_datafile_owner)
+    contributor= people(:person_for_datafile_owner)
     manager=people(:person_for_owner_of_my_first_sop)
     assert df.managers.include?(contributor)
     assert df.managers.include?(manager)
@@ -116,7 +121,7 @@ class DataFileTest < ActiveSupport::TestCase
   end
 
   test "make sure content blob is preserved after deletion" do
-    df = data_files(:picture)
+    df = Factory :data_file #data_files(:picture)
     User.current_user = df.contributor
     assert_not_nil df.content_blob,"Must have an associated content blob for this test to work"
     cb=df.content_blob
@@ -129,7 +134,7 @@ class DataFileTest < ActiveSupport::TestCase
   end
 
   test "is restorable after destroy" do
-    df = data_files(:picture)
+    df = Factory :data_file,:policy => Factory(:all_sysmo_viewable_policy)
     User.current_user = df.contributor
     assert_difference("DataFile.count",-1) do
       df.destroy
@@ -159,14 +164,14 @@ class DataFileTest < ActiveSupport::TestCase
   end
   
   test "title_trimmed" do
-    df=data_files(:picture)
+    df= Factory :data_file ,:policy=>Factory(:policy,:sharing_scope=>Policy::ALL_SYSMO_USERS,:access_type=>Policy::EDITING) #data_files(:picture)
     df.title=" should be trimmed"
     df.save!
     assert_equal "should be trimmed",df.title
   end
 
   test "uuid doesn't change" do
-    x = data_files(:picture)
+    x = Factory :data_file,:policy => Factory(:all_sysmo_viewable_policy)#data_files(:picture)
     x.save
     uuid = x.attributes["uuid"]
     x.save
@@ -206,7 +211,7 @@ class DataFileTest < ActiveSupport::TestCase
       data_file_converted = data_file.convert_to_presentation
 
       assert_equal "Presentation", data_file_converted.class.name
-      assert_equal presentation.attributes.keys, data_file_converted.attributes.keys
+      assert_equal presentation.attributes.keys.sort!, data_file_converted.attributes.keys.sort!
       data_file_converted.valid?
       assert data_file_converted.valid?
 

@@ -300,13 +300,15 @@ class SopsControllerTest < ActionController::TestCase
   end
 
   def test_should_show_version
-    s              =sops(:editable_sop)
-    old_desc       =s.description
-    old_desc_regexp=Regexp.new(old_desc)
+    s = sops(:editable_sop)
+
+    #!!!description cannot be changed in new version but revision comments and file name,etc
+
 
     #create new version
-    s.description  ="This is now version 2"
-    assert s.save_as_new_version
+    post :new_version, :id=>s, :sop=>{:data=>fixture_file_upload('files/little_file_v2.txt',Mime::TEXT)}
+    assert_redirected_to sop_path(assigns(:s))
+
     s=Sop.find(s.id)
     assert_equal 2, s.versions.size
     assert_equal 2, s.version
@@ -314,16 +316,16 @@ class SopsControllerTest < ActionController::TestCase
     assert_equal 2, s.versions[1].version
 
     get :show, :id=>sops(:editable_sop)
-    assert_select "p", :text=>/This is now version 2/, :count=>1
-    assert_select "p", :text=>old_desc_regexp, :count=>0
+    assert_select "p", :text=>/little_file_v2.txt/, :count=>1
+    assert_select "p", :text=>/little_file.txt/, :count=>0
 
     get :show, :id=>sops(:editable_sop), :version=>"2"
-    assert_select "p", :text=>/This is now version 2/, :count=>1
-    assert_select "p", :text=>old_desc_regexp, :count=>0
+    assert_select "p", :text=>/little_file_v2.txt/, :count=>1
+    assert_select "p", :text=>/little_file.txt/, :count=>0
 
     get :show, :id=>sops(:editable_sop), :version=>"1"
-    assert_select "p", :text=>/This is now version 2/, :count=>0
-    assert_select "p", :text=>old_desc_regexp, :count=>1
+    assert_select "p", :text=>/little_file_v2.txt/, :count=>0
+    assert_select "p", :text=>/little_file.txt/, :count=>1
 
   end
 

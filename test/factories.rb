@@ -62,7 +62,11 @@
     f.title "This Sop"
     f.projects {[Factory.build(:project)]}
     f.association :contributor, :factory => :user
-  end
+
+    f.after_create do |sop|
+      sop.content_blob = Factory.create(:content_blob, :content_type=>"application/pdf", :asset => sop, :asset_version=>sop.version)
+    end
+end
 
 #Policy
   Factory.define(:policy, :class => Policy) do |f|
@@ -84,6 +88,16 @@
   Factory.define(:all_sysmo_viewable_policy,:parent=>:policy) do |f|
     f.sharing_scope Policy::ALL_SYSMO_USERS
     f.access_type Policy::VISIBLE
+  end
+
+  Factory.define(:all_sysmo_downloadable_policy,:parent=>:policy) do |f|
+    f.sharing_scope Policy::ALL_SYSMO_USERS
+    f.access_type Policy::ACCESSIBLE
+  end
+
+  Factory.define(:public_download_and_no_custom_sharing,:parent=>:policy) do |f|
+    f.sharing_scope Policy::ALL_SYSMO_USERS
+    f.access_type Policy::ACCESSIBLE
   end
 
 #Permission
@@ -187,7 +201,10 @@ end
     f.sequence(:title) {|n| "A Data File_#{n}"}
     f.projects {[Factory.build(:project)]}
     f.association :contributor, :factory => :user
-    f.association :content_blob, :factory => :content_blob
+    f.after_create do |data_file|
+       data_file.content_blob = Factory.create(:content_blob,  :original_filename=>"test.pdf", :content_type=>"application/pdf", :asset => data_file, :asset_version=>data_file.version)
+
+    end
   end
 
 #Model
@@ -195,7 +212,9 @@ end
     f.title "A Model"
     f.projects {[Factory.build(:project)]}
     f.association :contributor, :factory => :user
-    f.association :content_blob, :factory => :content_blob
+    f.after_create do |model|
+       model.content_blobs = [Factory.create(:content_blob, :original_filename=>"test.pdf", :content_type=>"application/pdf",:asset => model,:asset_version=>model.version)] if model.content_blobs.blank?
+    end
   end
 
 #Publication
@@ -211,7 +230,30 @@ Factory.define(:presentation) do |f|
   f.projects {[Factory.build :project]}
  # f.data_url "http://www.virtual-liver.de/images/logo.png"
   f.association :contributor,:factory=>:user
-  f.association :content_blob, :factory => :content_blob
+  f.after_create do |presentation|
+    presentation.content_blob = Factory.create(:content_blob,:original_filename=>"test.pdf", :content_type=>"application/pdf", :asset => presentation, :asset_version=>presentation.version)
+  end
+end
+
+#Model Version
+Factory.define(:model_version) do |f|
+  f.association :model
+
+end
+
+#SOP Version
+Factory.define(:sop_version) do |f|
+  f.association :sop
+end
+
+#DataFile Version
+Factory.define(:data_file_version) do |f|
+  f.association :data_file
+end
+
+#Presentation Version
+Factory.define(:presentation_version) do |f|
+  f.association :presentation
 end
 
 #Misc
