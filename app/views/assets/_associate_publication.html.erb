@@ -91,7 +91,7 @@
   <% if publication.can_view? -%>
       publication_id = '<%= publication.id -%>';
       publication_title = '<%= escape_javascript(publication.title) -%>';
-      publications_array.push([publication_title,publication_id]);
+      publication_array.push([publication_title,publication_id]);
   <% end -%>
 <% end -%>
 
@@ -101,7 +101,7 @@
     <% if publication.can_view? -%>
         publication_id = '<%= publication.id -%>';
         publication_title = '<%= escape_javascript(publication.title) -%>';
-        publications_array.push([publication_title, publication_id]);
+        publication_array.push([publication_title, publication_id]);
     <% end -%>
   <% end -%>
 <% end -%>
