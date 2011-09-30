@@ -65,127 +65,24 @@ class PoliciesController < ApplicationController
 
     def preview_permissions
       set_no_layout
-      grouped_people_by_access_type = request_permission_summary
+      creators = (params["creators"].blank? ? [] : ActiveSupport::JSON.decode(params["creators"])).uniq
+      policy = sharing_params_to_policy
+      grouped_people_by_access_type = request_permission_summary policy, creators
       respond_to do |format|
         format.html { render :template=>"layouts/preview_permissions", :locals => {:grouped_people_by_access_type => grouped_people_by_access_type}}
       end
     end
 
     #return the hash: key is access_type, value is the array of people
-    def request_permission_summary (params=params, contributor=(current_user.try :person))
-        #get params
-        sharing_scope = params["sharing_scope"].to_i
-        access_type = params["access_type"].to_i
-
-        your_proj_access_type = params["project_access_type"].blank? ? nil : params["project_access_type"].to_i
-        #when resource is study, id of the investigation is sent, so get the project_ids from the investigation
-        project_ids = []
-        if (params["resource_name"] == 'study') and (!params["project_ids"].blank?)
-          investigation = Investigation.find_by_id(try_block{params["project_ids"].to_i})
-          project_ids = try_block{investigation.projects.collect{|p| p.id}}
-
-        #when resource is assay, id of the study is sent, so get the project_ids from the study
-        elsif (params["resource_name"] == 'assay') and (!params["project_ids"].blank?)
-          study = Study.find_by_id(try_block{params["project_ids"].to_i})
-          project_ids = try_block{study.projects.collect{|p| p.id}}
-        #normal case, the project_ids is sent
-        else
-          project_ids = params["project_ids"].blank? ? [] : params["project_ids"].split(',')
-        end
-
-        creators = (params["creators"].blank? ? [] : ActiveSupport::JSON.decode(params["creators"])).uniq
-
-        contributor_types = params["contributor_types"].blank? ? [] : ActiveSupport::JSON.decode(params["contributor_types"])
-        new_permission_data = params["contributor_values"].blank? ? {} : ActiveSupport::JSON.decode(params["contributor_values"])
-
-        #build the hash containing contributor_type as key and the people in these groups as value
-        people_in_group = {'Person' => [], 'FavouriteGroup' => [], 'WorkGroup' => [], 'Project' => [], 'Institution' => [], 'WhiteList' => [], 'BlackList' => [],'Network' => []}
+    def request_permission_summary policy, creators=[current_user.person], contributor=current_user.person
+        #build the hash containing contributor_type as key and the people in these groups as value,exception:'Public' holds the access_type as the value
+        people_in_group = {'Person' => [], 'FavouriteGroup' => [], 'WorkGroup' => [], 'Project' => [], 'Institution' => [], 'WhiteList' => [], 'BlackList' => [],'Network' => [], 'Public' => 0}
         #the result return: a hash contain the access_type as key, and array of people as value
         grouped_people_by_access_type = {}
 
-        #Process policy
-        #if the item is shared to all sysmo members
-        if (sharing_scope == Policy::ALL_SYSMO_USERS)
-           people_in_network = get_people_in_network access_type
-             unless people_in_network.blank?
-               people_in_group['Network'] |= people_in_network
-             end
-        end
-        #if public scope is chosen
-        if (sharing_scope == Policy::EVERYONE)
-          grouped_people_by_access_type[Policy::PUBLISHING] = access_type
-        end
+        policy_to_people_group policy, people_in_group
 
-        #Process permissions
-        #if share with your project and with all_sysmo_user is chosen
-        if (sharing_scope == Policy::ALL_SYSMO_USERS) and !project_ids.blank?
-          project_ids.each do |project_id|
-            project_id = project_id.to_i
-            #add Project to contributor_type
-            contributor_types << "Project" if !contributor_types.include? "Project"
-            #add one hash {project.id => {"access_type" => sharing[:your_proj_access_type].to_i}} to new_permission_data
-            if !new_permission_data.has_key?('Project')
-              new_permission_data["Project"] = {project_id => {"access_type" => your_proj_access_type}}
-            else
-              new_permission_data["Project"][project_id] = {"access_type" => your_proj_access_type}
-            end
-          end
-        end
-
-        contributor_types.each do |contributor_type|
-           case contributor_type
-             when 'Person'
-               new_permission_data['Person'].each do |key, value|
-                 person = get_person key, value.values.first
-                 unless person.blank?
-                   people_in_group['Person'] << person
-                 end
-               end
-             when 'FavouriteGroup'
-               new_permission_data['FavouriteGroup'].each_key do |key|
-                 people_in_FG = get_people_in_FG key
-                 unless people_in_FG.blank?
-                   people_in_group['FavouriteGroup'] |= people_in_FG
-                 end
-               end
-             when 'WorkGroup'
-               new_permission_data['WorkGroup'].each do |key, value|
-                 people_in_WG = get_people_in_WG key, value.values.first
-                 unless people_in_WG.blank?
-                   people_in_group['WorkGroup'] |= people_in_WG
-                 end
-               end
-             when 'Project'
-               new_permission_data['Project'].each do |key, value|
-                  people_in_project = get_people_in_project key, value.values.first
-                  unless people_in_project.blank?
-                    people_in_group['Project'] |= people_in_project
-                  end
-               end
-             when 'Institution'
-               new_permission_data['Institution'].each do |key, value|
-                  people_in_institution = get_people_in_institution key, value.values.first
-                  unless people_in_institution.blank?
-                    people_in_group['Institution'] |= people_in_institution
-                  end
-               end
-           end
-        end
-
-        #if blacklist/whitelist is used
-        if (params["use_whitelist"] == 'true')
-          people_in_whitelist = get_people_in_FG(nil, true, nil)
-          unless people_in_whitelist.blank?
-            people_in_group['WhiteList'] |= people_in_whitelist
-          end
-        end
-        #if blacklist/whitelist is used
-        if (params["use_blacklist"] == 'true')
-          people_in_blacklist = get_people_in_FG(nil, nil, true)
-          unless people_in_blacklist.blank?
-            people_in_group['BlackList'] |= people_in_blacklist
-          end
-        end
+        permissions_to_people_group policy.permissions, people_in_group
 
         #Now make the people in group unique by choosing the highest access_type
         people_in_group['FavouriteGroup']  = remove_duplicate(people_in_group['FavouriteGroup'])
@@ -193,7 +90,7 @@ class PoliciesController < ApplicationController
         people_in_group['Project']  = remove_duplicate(people_in_group['Project'])
         people_in_group['Institution']  = remove_duplicate(people_in_group['Institution'])
 
-        #Now process precedence with the order [network, project, wg, fg, person]
+        #Now process precedence with the order [network, institution, project, wg, fg, person]
         filtered_people = people_in_group['Network']
         filtered_people = precedence(filtered_people, people_in_group['Institution'])
         filtered_people = precedence(filtered_people, people_in_group['Project'])
@@ -210,7 +107,7 @@ class PoliciesController < ApplicationController
         creators.collect!{|c| [c[1] ,c[0], Policy::EDITING]}
         filtered_people = add_people_in_whitelist(filtered_people, creators)
 
-        #add current_user
+        #add contributor
         filtered_people = add_people_in_whitelist(filtered_people, [[contributor.id, "#{contributor.first_name} #{contributor.last_name}", Policy::MANAGING]]) unless contributor.blank?
 
         #sort people by name
@@ -218,6 +115,9 @@ class PoliciesController < ApplicationController
 
         #group people by access_type
         grouped_people_by_access_type.merge!(filtered_people.group_by{|person| person[2]})
+
+        #add publishing if access_type for public > 0
+        grouped_people_by_access_type[Policy::PUBLISHING] = people_in_group['Public'] if people_in_group['Public'] > 0
 
         #only store (people in backlist) + (people in people_in_group['Person'] with no access) to the group of access_type=Policy::NO_ACCESS
         people_with_no_access = []
@@ -378,6 +278,104 @@ class PoliciesController < ApplicationController
        result |= whitelist
        return remove_duplicate(result)
     end
+
+  def sharing_params_to_policy params=params
+      policy =Policy.new()
+      policy.sharing_scope = params["sharing_scope"].to_i
+      policy.access_type = params["access_type"].to_i
+      policy.use_whitelist = params["use_whitelist"] == 'true' ? true : false
+      policy.use_blacklist = params["use_blacklist"] == 'true' ? true : false
+
+      #now process the params for permissions
+      contributor_types = params["contributor_types"].blank? ? [] : ActiveSupport::JSON.decode(params["contributor_types"])
+      new_permission_data = params["contributor_values"].blank? ? {} : ActiveSupport::JSON.decode(params["contributor_values"])
+
+      #if share with your project and with all_sysmo_user is chosen
+      if (policy.sharing_scope == Policy::ALL_SYSMO_USERS)
+          your_proj_access_type = params["project_access_type"].blank? ? nil : params["project_access_type"].to_i
+          project_ids = []
+          #when resource is study, id of the investigation is sent, so get the project_ids from the investigation
+          if (params["resource_name"] == 'study') and (!params["project_ids"].blank?)
+            investigation = Investigation.find_by_id(try_block{params["project_ids"].to_i})
+            project_ids = try_block{investigation.projects.collect{|p| p.id}}
+
+          #when resource is assay, id of the study is sent, so get the project_ids from the study
+          elsif (params["resource_name"] == 'assay') and (!params["project_ids"].blank?)
+            study = Study.find_by_id(try_block{params["project_ids"].to_i})
+            project_ids = try_block{study.projects.collect{|p| p.id}}
+          #normal case, the project_ids is sent
+          else
+            project_ids = params["project_ids"].blank? ? [] : params["project_ids"].split(',')
+          end
+          project_ids.each do |project_id|
+            project_id = project_id.to_i
+            #add Project to contributor_type
+            contributor_types << "Project" if !contributor_types.include? "Project"
+            #add one hash {project.id => {"access_type" => sharing[:your_proj_access_type].to_i}} to new_permission_data
+            if !new_permission_data.has_key?('Project')
+              new_permission_data["Project"] = {project_id => {"access_type" => your_proj_access_type}}
+            else
+              new_permission_data["Project"][project_id] = {"access_type" => your_proj_access_type}
+            end
+          end
+      end
+
+      #build permissions
+      contributor_types.each do |contributor_type|
+         new_permission_data[contributor_type].each do |key, value|
+           policy.permissions.build(:contributor_type => contributor_type, :contributor_id => key, :access_type => value.values.first)
+         end
+      end
+    policy
+  end
+
+  protected
+
+  def policy_to_people_group policy, people_in_group
+      if policy.sharing_scope == Policy::ALL_SYSMO_USERS
+         people_in_network = get_people_in_network policy.access_type
+         people_in_group['Network'] |= people_in_network unless people_in_network.blank?
+      elsif policy.sharing_scope == Policy::EVERYONE
+        people_in_group['Public'] = policy.access_type
+      end
+      #if blacklist/whitelist is used
+      if policy.use_whitelist
+        people_in_whitelist = get_people_in_FG(nil, true, nil)
+        people_in_group['WhiteList'] |= people_in_whitelist unless people_in_whitelist.blank?
+      end
+      #if blacklist/whitelist is used
+      if policy.use_blacklist
+        people_in_blacklist = get_people_in_FG(nil, nil, true)
+        people_in_group['BlackList'] |= people_in_blacklist unless people_in_blacklist.blank?
+      end
+      people_in_group
+  end
+
+  def permissions_to_people_group permissions, people_in_group
+      permissions.each do |permission|
+        contributor_id = permission.contributor_id
+        access_type = permission.access_type
+        case permission.contributor_type
+           when 'Person'
+               person = get_person contributor_id, access_type
+               people_in_group['Person'] << person unless person.blank?
+           when 'FavouriteGroup'
+               people_in_FG = get_people_in_FG contributor_id
+               people_in_group['FavouriteGroup'] |= people_in_FG unless people_in_FG.blank?
+           when 'WorkGroup'
+               people_in_WG = get_people_in_WG contributor_id, access_type
+               people_in_group['WorkGroup'] |= people_in_WG unless people_in_WG.blank?
+           when 'Project'
+               people_in_project = get_people_in_project contributor_id, access_type
+               people_in_group['Project'] |= people_in_project unless people_in_project.blank?
+           when 'Institution'
+               people_in_institution = get_people_in_institution contributor_id, access_type
+               people_in_group['Institution'] |= people_in_institution unless people_in_institution.blank?
+
+         end
+      end
+      people_in_group
+  end
 end
 
 

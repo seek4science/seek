@@ -274,7 +274,7 @@ class PeopleController < ApplicationController
     #check if anyone has manage right on the related_items
     #if not or if only the contributor then assign the manage right to pis||pals
     related_items.each do |item|
-      people_can_manage_item = people_can_manage(item, @person)
+      people_can_manage_item = people_can_manage item, @person
       if people_can_manage_item.blank? || (people_can_manage_item == [[@person.id, "#{@person.first_name} #{@person.last_name}", Policy::MANAGING]])
         #find the projects which this person and item belong to
         projects_in_common = @person.projects & item.projects
@@ -307,25 +307,9 @@ class PeopleController < ApplicationController
 
   #setup sharing params to send to request_permission_summary to check the people who have manage right
   def people_can_manage item, contributor
-    policy_params = {}
-    policy = item.policy
-    policy_params["sharing_scope"] = policy.sharing_scope
-    policy_params["access_type"] = policy.access_type
-    policy_params["contributor_types"] = policy.permissions.collect{|p| p.contributor_type}
-    policy_params["contributor_values"] = {}
-    policy_params["contributor_types"].each do |contributor_type|
-      permissions = policy.permissions.select{|p| p.contributor_type == contributor_type}
-      permission_hash = {}
-      permissions.each do  |p|
-        permission_hash[p.contributor_id] = {'access_type' => p.access_type}
-      end
-      policy_params["contributor_values"][contributor_type] =  permission_hash
-    end
-    policy_params["contributor_types"] = policy_params["contributor_types"].to_json
-    policy_params["contributor_values"] = policy_params["contributor_values"].to_json
-    policy_params['use_whitelist'] = policy.use_whitelist.to_s
-    policy_params['use_backlist'] = policy.use_blacklist.to_s
-    grouped_people_by_access_type = PoliciesController.new().request_permission_summary policy_params, contributor
+    return [[contributor.id, "#{contributor.first_name} #{contributor.last_name}", Policy::MANAGING]] if item.policy.blank?
+    creators = item.is_downloadable? ? item.creators : []
+    grouped_people_by_access_type = PoliciesController.new().request_permission_summary item.policy, creators, contributor
     grouped_people_by_access_type[Policy::MANAGING]
   end
 
