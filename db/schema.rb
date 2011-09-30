@@ -220,14 +220,11 @@ ActiveRecord::Schema.define(:version => 20110921135820) do
     t.integer  "contributor_id"
     t.string   "title"
     t.text     "description"
-    t.string   "original_filename"
-    t.string   "content_type"
-    t.integer  "content_blob_id"
     t.integer  "template_id"
     t.datetime "last_used_at"
     t.datetime "created_at"
     t.datetime "updated_at"
-    t.integer  "version",                       :default => 1
+    t.integer  "version"
     t.string   "first_letter",     :limit => 1
     t.text     "other_creators"
     t.string   "uuid"
@@ -870,13 +867,10 @@ ActiveRecord::Schema.define(:version => 20110921135820) do
     t.integer  "contributor_id"
     t.string   "title"
     t.text     "description"
-    t.string   "original_filename"
-    t.string   "content_type"
-    t.integer  "content_blob_id"
     t.datetime "created_at"
     t.datetime "updated_at"
     t.datetime "last_used_at"
-    t.integer  "version",                       :default => 1
+    t.integer  "version"
     t.string   "first_letter",     :limit => 1
     t.text     "other_creators"
     t.string   "uuid"
