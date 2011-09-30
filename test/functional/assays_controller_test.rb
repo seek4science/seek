@@ -9,7 +9,8 @@ class AssaysControllerTest < ActionController::TestCase
 
   def setup
     login_as(:quentin)
-    @object=Factory(:experimental_assay, :policy => Factory(:public_policy))    
+    @object=Factory(:experimental_assay, :policy => Factory(:public_policy))
+    Seek::Config.is_virtualliver=true
   end
 
 
@@ -239,7 +240,6 @@ class AssaysControllerTest < ActionController::TestCase
     assert_equal s, assigns(:assay).study
   end
 
-=begin
 test "should not create experimental assay without sample" do
     assert_no_difference('ActivityLog.count') do
       assert_no_difference("Assay.count") do
@@ -267,10 +267,10 @@ test "should not create experimental assay without sample" do
     a=assigns(:assay)
     assert_redirected_to assay_path(a)
     #assert_equal organisms(:yeast),a.organism
-  end
-=end
+end
 
-  test "should create modelling assay without organisms" do
+
+  test "should create experimental assay with/without organisms" do
 
     assert_difference("Assay.count") do
       post :create, :assay=>{:title=>"test",
@@ -278,7 +278,8 @@ test "should not create experimental assay without sample" do
                              :assay_type_id=>assay_types(:metabolomics).id,
                              :study_id=>studies(:metabolomics_study).id,
                              :assay_class=>assay_classes(:experimental_assay_class),
-                             :owner => Factory(:person)}
+                             :owner => Factory(:person),
+                             :samples => [Factory(:sample)]}
     end
 
     assert_difference("Assay.count") do
@@ -287,18 +288,18 @@ test "should not create experimental assay without sample" do
                              :assay_type_id=>assay_types(:metabolomics).id,
                              :study_id=>studies(:metabolomics_study).id,
                              :assay_class=>assay_classes(:experimental_assay_class),
-                             :owner => Factory(:person)},
+                             :owner => Factory(:person),
+                             :samples => [Factory(:sample)]},
            :assay_organism_ids => [Factory(:organism).id, Factory(:strain).title, Factory(:culture_growth_type).title].to_s
     end
     a=assigns(:assay)
     assert_redirected_to assay_path(a)
   end
 
-  test "should create experimental assay without organisms" do
+  test "should create modelling assay with/without organisms" do
 
     assert_difference("Assay.count") do
       post :create, :assay=>{:title=>"test",
-                             :technology_type_id=>technology_types(:gas_chromatography).id,
                              :assay_type_id=>assay_types(:metabolomics).id,
                              :study_id=>studies(:metabolomics_study).id,
                              :assay_class=>assay_classes(:modelling_assay_class),
@@ -307,7 +308,6 @@ test "should not create experimental assay without sample" do
 
     assert_difference("Assay.count") do
       post :create, :assay=>{:title=>"test",
-                             :technology_type_id=>technology_types(:gas_chromatography).id,
                              :assay_type_id=>assay_types(:metabolomics).id,
                              :study_id=>studies(:metabolomics_study).id,
                              :assay_class=>assay_classes(:modelling_assay_class),
@@ -320,7 +320,7 @@ test "should not create experimental assay without sample" do
 
   test "should not create modelling assay with sample" do
     #FIXME: its allows at the moment due to time constraints before pals meeting, and fixtures and factories need updating. JIRA: SYSMO-734
-    assert_difference("Assay.count") do
+    assert_no_difference("Assay.count") do
       post :create, :assay=>{:title=>"test",
                              :technology_type_id=>technology_types(:gas_chromatography).id,
                              :assay_type_id=>assay_types(:metabolomics).id,
