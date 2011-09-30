@@ -40,10 +40,10 @@ module Acts #:nodoc:
 
 
       def content_blob
-        if self.respond_to? :content_blob
+        if !self.respond_to?(:content_blobs) && self.respond_to?(:content_blob)
           ContentBlob.find(:first, :conditions => ["asset_id =? and asset_type =? and asset_version =?", self.parent.id, self.parent.class.name, self.version])
         elsif self.respond_to? :content_blobs
-          self.content_blobs.last(:order=>"id asc")
+          self.content_blobs.last
         end
       end
 
