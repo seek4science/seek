@@ -26,9 +26,17 @@ class ContentBlob < ActiveRecord::Base
   
   before_save :calculate_md5
 
+  before_save :check_version
+
+  def check_version
+    if asset_version.nil? && !asset.nil?
+      self.asset_version = asset.version
+    end
+  end
+
   #include all image types
   def is_image?
-    self.content_type.index('image')== 0
+    self.content_type.nil?? false : self.content_type.index('image')== 0
   end
 
   def md5sum

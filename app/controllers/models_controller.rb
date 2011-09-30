@@ -103,6 +103,7 @@ class ModelsController < ApplicationController
   def submit_to_jws
     following_action=params.delete("following_action")    
     error=nil
+    content_blob = @model.content_blob
     begin
       if following_action == "annotate"
         @params_hash,@attribution_annotations,@species_annotations,@reaction_annotations,@search_results,@cached_annotations,@saved_file,@error_keys = @@model_builder.annotate params
@@ -134,10 +135,10 @@ class ModelsController < ApplicationController
           downloader=Seek::RemoteDownloader.new
           data_hash = downloader.get_remote_data url
           File.open(data_hash[:data_tmp_path],"r") do |f|
-            @model.content_blob=ContentBlob.new(:data=>f.read)
+            content_blob = @model.content_blobs.build(:data=>f.read)
           end
-          @model.content_type=model_format=="sbml" ? "text/xml" : "text/plain"
-          @model.original_filename=new_version_filename
+          content_blob.content_type=model_format=="sbml" ? "text/xml" : "text/plain"
+          content_blob.original_filename=new_version_filename
         end
       end
     end
@@ -153,6 +154,8 @@ class ModelsController < ApplicationController
         format.html {render :action=>"annotator"}
       elsif @error_keys.empty? && following_action == "save_new_version"
         create_new_version(new_version_comments)
+        content_blob.asset_version = @model.version
+        content_blob.save!
         format.html {redirect_to  model_path(@model,:version=>@model.version) }
       else
         format.html { render :action=>"builder" }
@@ -603,7 +606,7 @@ class ModelsController < ApplicationController
     end
 
      if @model.id_image.nil? or @model.id_image==0
-         @model.id_image = @model.content_blobs.detect(&:is_image?).id
+         @model.id_image = @model.content_blobs.detect(&:is_image?).try(:id)
      end
     @model.save!
   end

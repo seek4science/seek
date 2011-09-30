@@ -95,11 +95,6 @@ module Acts #:nodoc:
         self.content_blob.try :content_type
       end
 
-      if self.respond_to? :content_blobs
-        def content_blob
-          self.content_blobs.first
-        end
-      end
 
       # this method will take attributions' association and return a collection of resources,
       # to which the current resource is attributed
@@ -125,10 +120,14 @@ module Acts #:nodoc:
             downloader            =Jerm::DownloaderFactory.create p.name
             resource_type         = self.class.name.split("::")[0] #need to handle versions, e.g. Sop::Version
             data_hash             = downloader.get_remote_data self.content_blob.url, p.site_username, p.site_password, resource_type
-            self.content_blob.tmp_io_object = File.open data_hash[:data_tmp_path],"r"
-            self.content_type     = data_hash[:content_type]
-            self.content_blob.save
-            self.save
+            cb = self.content_blob
+            cb.tmp_io_object = File.open data_hash[:data_tmp_path],"r"
+            cb.content_type     = data_hash[:content_type]
+            cb.original_filename = data_hash[:filename]
+            cb.save!
+            self.save!
+
+
           rescue Exception=>e
             puts "Error caching remote data for url=#{self.content_blob.url} #{e.message[0..50]} ..."
           end

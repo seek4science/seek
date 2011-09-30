@@ -175,7 +175,7 @@ module AssetsCommonExtension
       @tmp_io_objects_localfile.each do |tmp_io_object|
         asset.content_blobs.create(:tmp_io_object => tmp_io_object,
                                    :original_filename=>@original_filenames[0],
-                                   :content_type=>@content_types[0],
+                                   :content_type=>@content_types[0].to_s,
                                    :asset_version=>version)
         @original_filenames.delete_at(0)
         @content_types.delete_at(0)

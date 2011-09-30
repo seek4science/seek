@@ -38,11 +38,6 @@ module Acts #:nodoc:
 
     module InstanceMethods
 
-      if self.respond_to? :content_blobs
-        def content_blobs
-          ContentBlob.find(:all, :conditions => ["asset_id =? and asset_type =? and asset_version =?", self.parent.id, self.parent.class.name, self.version])
-        end
-      end
 
       def content_blob
         if self.respond_to? :content_blob
