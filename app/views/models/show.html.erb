@@ -76,11 +76,9 @@
           <b>Model visualization</b>(<span style="font-style:italic;">click it to zoom</span>)<br/>
           <div id="thumbnail">
 
-            <% attach = @model.attachments.find_by_id(@model.id_image) %>
-
-            <% unless attach.nil? %>
-            <a href='<%= attach.public_filename %>' rel="lightbox">
-              <img src="<%= application_root %><%= attach.public_filename(:thumb)%>" alt='' align="center" title="click it to zoom" style=" vertical-align:middle;border: 0;"/>
+            <% unless  @display_model.id_image.nil? or @display_model.id_image==0 %>
+            <a href='<%= url_for(:controller=>"models",:action=>"send_image",:id=>@model,:version=>@display_model.version) %>' rel="lightbox">
+               <img src="<%= url_for(:controller=>"models",:action=>"send_image",:id=>@model,:version=>@display_model.version) %>" width="50" height="50"/>
             </a>
             <% else %>
             <span class="none_text">None</span>

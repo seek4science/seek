@@ -4,7 +4,7 @@
     <% form_tag({:action => :create}, :multipart => true) do -%>
     <div class="asset_form">
         <%= error_messages_for :model -%>
-        <%= render :partial=>"assets/upload_box" -%>
+        <%= render :partial=>"assets/upload_box",:locals=>{:action=>:new,:resource=>@model} -%>
         <p style="margin-top: 1.5em;">
             <b>Title</b>
             <span class="required">*</span>
@@ -39,7 +39,7 @@
         <%= render :partial => "assays/associate_assays", :locals=>{:resource => @model, :show_relationships => false} -%>
 
 
-         <%= render :partial => "models/new_batch_upload" ,:locals => {:resource=>@model}%>
+         <%#= render :partial => "models/new_batch_upload" ,:locals => {:resource=>@model}%>
 
         <p>
             <%= submit_tag "Upload and Save", :id => "model_submit_btn", :onclick => "javascript: validateModelFields(true); return(false);" -%>&nbsp;or <%= link_to 'Cancel', models_path -%>

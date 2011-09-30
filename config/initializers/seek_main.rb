@@ -18,6 +18,7 @@ require 'send_subscriptions_when_activity_logged'
 require 'modporter_extensions'
 require "acts_as_scalable"
 require "attachment_fu_extension"
+require 'assets_common_extension'
 
 
 GLOBAL_PASSPHRASE="ohx0ipuk2baiXah" unless defined? GLOBAL_PASSPHRASE

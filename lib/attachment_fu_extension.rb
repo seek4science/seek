@@ -8,11 +8,15 @@ Technoweenie::AttachmentFu::InstanceMethods.module_eval do
     self.class.image?(content_type) || @@image_mime_types.values.include?(content_type)
   end
 
-  def uploaded_data_with_tiff_convert=(file_data)
-    upload_results = self.uploaded_data_without_tiff_convert=file_data
+  def uploaded_data_with_extension=(file_data)
+    upload_results = self.uploaded_data_without_extension=file_data
+    self.original_filename = file_data.original_filename
+
+    uuid_to_use="#{UUIDTools::UUID.random_create.to_s}"
+    self.filename= "#{uuid_to_use}.dat"
 
     if upload_results && file_data.content_type=="image/tiff"
-      self.filename =self.filename + ".jpg"
+      #self.filename =self.filename + ".jpg"
       self.content_type = "image/jpeg"
 
       @uploaded_image = Magick::Image.read(file_data.path).first
@@ -20,9 +24,10 @@ Technoweenie::AttachmentFu::InstanceMethods.module_eval do
 
       self.temp_paths.unshift write_to_temp_file(@uploaded_image.to_blob { self.format = 'JPEG' })
     end
+
     return upload_results
   end
 
-  alias_method_chain :uploaded_data=, :tiff_convert
+  alias_method_chain :uploaded_data=, :extension
 
 end

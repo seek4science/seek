@@ -18,6 +18,7 @@ gem 'rest-client',">=1.6.1"
 gem 'calendar_date_select'
 gem 'factory_girl'
 gem 'ratom'
+gem 'rubyzip'
 
 
 

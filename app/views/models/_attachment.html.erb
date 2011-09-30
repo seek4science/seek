@@ -11,7 +11,7 @@
 <% end %>
 </td>
 <td> <%= image_tag file_type_icon_url(attachment)%></td>
-<td style="text-align:left"><%= link_to attachment.filename,attach_path,{:style=>"color:#0000CC;"} %></td>
+<td style="text-align:left"><%= link_to attachment.original_filename,attach_path,{:style=>"color:#0000CC;"} %></td>
 <td>
 <%= link_to_remote "Remove", :url  => attachment_path(:id => attachment), :method => :delete, :html => { :title  => "Remove this attachment"} %>
 </td>
