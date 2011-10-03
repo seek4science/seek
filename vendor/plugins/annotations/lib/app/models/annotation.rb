@@ -100,6 +100,14 @@ class Annotation < ActiveRecord::Base
       :order => "created_at DESC" }
   }
 
+  # Finder to get all annotations with one of the given attribute_names.
+  named_scope :with_attribute_names, lambda { |attrib_names|
+    conditions = [attrib_names.collect{"annotation_attributes.name = ?"}.join(" or ")] | attrib_names
+    { :conditions => conditions,
+      :joins => :attribute,
+      :order => "created_at DESC" }
+  }
+
   # Finder to get all annotations for a given value_type.
   named_scope :with_value_type, lambda { |value_type|
     { :conditions => { :value_type =>  value_type },

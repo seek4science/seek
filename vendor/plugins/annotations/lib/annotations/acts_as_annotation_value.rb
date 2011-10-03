@@ -77,13 +77,10 @@ module Annotations
 
         #A set of all values that have been used, or seeded, with one of the provided attribute names
         def with_attribute_names attributes
-          #TODO: this would probably be better as a named_scope
           attributes = Array(attributes)
-          attributes.reduce([]) { |values,attr|
-            annotations = Annotation.with_attribute_name(attr).with_value_type(self.name).include_values.collect{|ann| ann.value}
-            seeds = AnnotationValueSeed.with_attribute_name(attr).with_value_type(self.name).include_values.collect{|ann| ann.value}
-              values | annotations | seeds
-          }.uniq
+          annotations = Annotation.with_attribute_names(attributes).with_value_type(self.name).include_values.collect{|ann| ann.value}
+          seeds = AnnotationValueSeed.with_attribute_names(attributes).with_value_type(self.name).include_values.collect{|ann| ann.value}
+          (annotations | seeds).uniq
         end
       end
       
@@ -98,9 +95,7 @@ module Annotations
         #The total number of annotations that match one or more attribute names.
         def annotation_count attributes
           attributes = Array(attributes)
-          attributes.reduce(0) do |sum,attr|
-            sum + annotations.with_attribute_name(attr).count
-          end
+          annotations.with_attribute_names(attributes).count
         end
         
         # The actual content of the annotation value

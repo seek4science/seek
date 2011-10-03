@@ -16,9 +16,17 @@ class AnnotationValueSeed < ActiveRecord::Base
     { :include => [ :value ] }
   }
 
-  # Finder to get all annotations with a given attribute_name.
+  # Finder to get all annotation value seeds with a given attrib_name.
   named_scope :with_attribute_name, lambda { |attrib_name|
     { :conditions => { :annotation_attributes => { :name => attrib_name } },
+      :joins => :attribute,
+      :order => "created_at DESC" }
+  }
+
+  # Finder to get all annotation value seeds with one of the given attrib_names.
+  named_scope :with_attribute_names, lambda { |attrib_names|
+    conditions = [attrib_names.collect{"annotation_attributes.name = ?"}.join(" or ")] | attrib_names
+    { :conditions => conditions,
       :joins => :attribute,
       :order => "created_at DESC" }
   }
