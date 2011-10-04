@@ -26,6 +26,16 @@ class DataFilesController < ApplicationController
 
     class << @presentation
 
+      def clone_versioned_content_blobs
+        data_file = DataFile.find(self.orig_data_file_id)
+        versioned_content_blobs = ContentBlob.find(:all, :conditions => ["asset_id =? and asset_type =?", data_file.id, data_file.class.name])
+        versioned_content_blobs.each do |content_blob|
+          attrs = content_blob.attributes.delete_if { |k, v| k=="id" || k=="uuid"}
+          attrs["asset_id"]= self.id
+          attrs["asset_type"] = self.class.name
+          ContentBlob.create attrs
+        end
+      end
       def clone_versioned_data_file_model versioned_presentation, versioned_data_file
           versioned_presentation.attributes.keys.each do |key|
             versioned_presentation.send("#{key}=", eval("versioned_data_file.#{key}")) if versioned_data_file.respond_to? key.to_sym  and key!="id"
@@ -48,6 +58,7 @@ class DataFilesController < ApplicationController
               update_timestamps(rev, self)
             end
          end
+         clone_versioned_content_blobs
       end
     end
 
