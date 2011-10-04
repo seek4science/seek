@@ -11,7 +11,7 @@ module Seek
         eval("@#{controller_name.singularize} = entity")
         render :update do |page|
           page.replace_html 'tags_box', :partial=>'assets/tags_box'
-          page.replace_html 'sidebar_tag_cloud', :partial=>'gadgets/merged_tag_cloud_gadget'
+          page.replace_html 'sidebar_tag_cloud', :partial=>'gadgets/tag_cloud_gadget'
           page.visual_effect :highlight, 'tags_box'
           page.visual_effect :highlight, 'sidebar_tag_cloud'
         end
