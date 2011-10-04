@@ -60,8 +60,7 @@ class PublicationsController < ApplicationController
     assay_ids = params[:assay_ids] || []
     respond_to do |format|
       if @publication.save
-        authors = !result.authors.blank? ? result.authors : (@publication.pubmed_id ? (get_pubmed_authors_from_xml result.xml) : (get_doi_authors_from_xml result.xml))
-        authors.each do |author|
+        result.authors.each do |author|
           pa = PublicationAuthor.new()
           pa.publication = @publication
           pa.first_name = author.first_name
@@ -220,8 +219,7 @@ class PublicationsController < ApplicationController
       end
     else
       respond_to do |format|
-        authors = !result.authors.blank? ? result.authors : (protocol == "pubmed" ? (get_pubmed_authors_from_xml result.xml) : (get_doi_authors_from_xml result.xml))
-        format.html { render :partial => "publications/publication_preview", :locals => { :publication => @publication, :authors => authors} }
+        format.html { render :partial => "publications/publication_preview", :locals => { :publication => @publication, :authors => result.authors} }
       end
     end
     
@@ -293,8 +291,7 @@ class PublicationsController < ApplicationController
       result = query.fetch(doi)
     end      
     unless result.nil?
-      authors = !result.authors.blank? ? result.authors : (@publication.pubmed_id ? (get_pubmed_authors_from_xml result.xml) : (get_doi_authors_from_xml result.xml))
-      authors.each do |author|
+      result.authors.each do |author|
         pa = PublicationAuthor.new()
         pa.publication = @publication
         pa.first_name = author.first_name
@@ -353,50 +350,5 @@ class PublicationsController < ApplicationController
       end  
     end
   end
-  
-  #some PUBMED/DOI fields cant be retrieved from direct calls on the fetching of query result (because the mistakes of parsing xml), but these fields are also store in xml field
-  def get_pubmed_authors_from_xml xml_node
-    authors = []
-    unless xml_node.blank?
-      xml_node.find("//PubmedArticle/MedlineCitation/Article/AuthorList/Author").collect do |author|
-        last_name = ''
-        fore_name = ''
-        initials = ''
-        unless author["ValidYN"] == "N"
-          author.children.each do |child|
-            if child.name == 'LastName'
-              last_name = child.content
-            elsif child.name == 'ForeName'
-              fore_name = child.content
-            elsif child.name == 'Initials'
-              initials = child.content
-            end
-          end
-        end
-        authors.push PubmedAuthor.new(fore_name, last_name, initials)
-      end
-    end
-    return authors
-  end
 
-  def get_doi_authors_from_xml xml_node
-    authors = []
-    unless xml_node.blank?
-      xml_node.find("//journal/journal_article/contributors/person_name").collect do |author|
-        last_name = ''
-        fore_name = ''
-        if author.attributes['contributor_role'] == 'author'
-          author.children.each do |child|
-            if child.name == 'surname'
-              last_name = child.content
-            elsif child.name == 'given_name'
-              fore_name = child.content
-            end
-          end
-          authors.push DoiAuthor.new(fore_name, last_name)
-        end
-      end
-    end
-    return authors
-  end
 end
