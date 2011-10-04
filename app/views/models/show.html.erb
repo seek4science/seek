@@ -45,12 +45,12 @@
                 <span class="title"><%=h @display_model.title -%></span>
             </p>
             <p>
-                <b>File name:</b>
-                <%=h @display_model.original_filename -%>
-            </p>
-            <p>
-                <b>Format:</b>
-                <%=h mime_nice_name(@display_model.content_type) -%>
+              <% files = @display_model.content_blobs %>
+                <b>Files</b> (<span style="font-style: italic;"><%= files.count %> in total</span>):<br/>
+              <% files.each do |content_blob|%>
+               <%= h(content_blob.original_filename) -%> (<%=h mime_nice_name(content_blob.content_type) -%>)
+               <br/>
+              <% end %>
             </p>
             <p>
                 <b>Organism:</b>
