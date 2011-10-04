@@ -88,11 +88,11 @@ module Acts #:nodoc:
       # adapt for moving original_filename,content_type to content_blob
 
       def original_filename
-           self.content_blob.try :original_filename
+           self.content_blob.try :original_filename if self.respond_to? :content_blob
       end
 
       def content_type
-        self.content_blob.try :content_type
+        self.content_blob.try :content_type if self.respond_to? :content_blob
       end
 
 
