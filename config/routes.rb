@@ -7,7 +7,7 @@ ActionController::Routing::Routes.draw do |map|
 #  end
 
 
-  map.resources :presentations,:member => { :download => :get, :new_version=>:post, :preview_publish=>:get,:publish=>:post,:request_resource=>:post, :update_tags_ajax=>:post }
+  map.resources :presentations,:member => { :download => :get, :new_version=>:post, :preview_publish=>:get,:publish=>:post,:request_resource=>:post, :update_annotations_ajax=>:post }
   map.resources :subscriptions
   map.resources :specimens
   map.resources :samples
