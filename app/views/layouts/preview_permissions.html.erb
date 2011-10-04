@@ -45,7 +45,7 @@
                <%= display_people_list value-%>
             <%end%>
         <%when Policy::PUBLISHING %>
-            <p class='public'>All visitors (including anonymous visitors with no login) can <span style="color: #475f30;"><%= Policy.get_access_type_wording(value, nil).downcase -%> </span>  </p>
+            <p class='public'>All visitors (including anonymous visitors with no login) can <span style="color: #475f30;"><%= Policy.get_access_type_wording(value, try_block{resource_name.camelize.constantize.new()}).downcase -%> </span>  </p>
        <%end%>
       <%end%>
     <%end%>

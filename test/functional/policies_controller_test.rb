@@ -11,10 +11,10 @@ class PoliciesControllerTest < ActionController::TestCase
   end
 
   test 'should show the preview permission when choosing public scope' do
-    post :preview_permissions, :sharing_scope => 4, :access_type => 1
+    post :preview_permissions, :sharing_scope => 4, :access_type => 2, :resource_name => 'data_file'
 
     assert_response :success
-    assert_select "p",:text=>"All visitors (including anonymous visitors with no login) can #{Policy.get_access_type_wording(1, nil).downcase}",:count=>1
+    assert_select "p",:text=>"All visitors (including anonymous visitors with no login) can view summary and get contents",:count=>1
   end
 
   test 'should show the preview permission when choosing private scope' do
