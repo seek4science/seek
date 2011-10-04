@@ -6,6 +6,7 @@ class Person < ActiveRecord::Base
   default_scope :order => "last_name, first_name"
 
   before_save :first_person_admin
+  before_destroy :clean_up_and_assign_permissions
 
   acts_as_notifiee
   acts_as_annotatable :name_field=>:name
@@ -270,6 +271,41 @@ class Person < ActiveRecord::Base
     permissions = Permission.find(:all, :conditions => ["contributor_type =? and contributor_id=?", 'Person', id])
     permissions.each do |p|
       p.destroy
+    end
+  end
+
+  def clean_up_and_assign_permissions
+    #remove the permissions which are set on this person
+    remove_permissions
+
+    #retrieve the items that this person is contributor (owner for assay)
+    person_related_items = related_items
+
+    #check if anyone has manage right on the related_items
+    #if not or if only the contributor then assign the manage right to pis||pals
+    person_related_items.each do |item|
+      people_can_manage_item = people_can_manage
+      if people_can_manage_item.blank? || (people_can_manage_item == [[@person.id, "#{@person.first_name} #{@person.last_name}", Policy::MANAGING]])
+        #find the projects which this person and item belong to
+        projects_in_common = @person.projects & item.projects
+        pis = projects_in_common.collect{|p| p.pis}.flatten.uniq
+        pis.reject!{|pi| pi.id == @person.id}
+        policy_or_default
+        policy = item.policy
+        unless pis.blank?
+          pis.each do |pi|
+            policy.permissions.build(:contributor => pi, :access_type => Policy::MANAGING)
+            policy.save
+          end
+        else
+          pals = projects_in_common.collect{|p| p.pals}.flatten.uniq
+          pals.reject!{|pal| pal.id == @person.id}
+          pals.each do |pal|
+            policy.permissions.build(:contributor => pal, :access_type => Policy::MANAGING)
+            policy.save
+          end
+        end
+      end
     end
   end
 

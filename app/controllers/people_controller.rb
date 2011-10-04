@@ -5,7 +5,7 @@ class PeopleController < ApplicationController
   before_filter :current_user_exists,:only=>[:select,:userless_project_selected_ajax,:create,:new]
   before_filter :profile_belongs_to_current_or_is_admin, :only=>[:edit, :update]
   before_filter :profile_is_not_another_admin_except_me, :only=>[:edit,:update]
-  before_filter :is_user_admin_auth,:clean_up_and_assign_permissions, :only=>[:destroy]
+  before_filter :is_user_admin_auth,:only=>[:destroy]
   before_filter :is_user_admin_or_personless, :only=>[:new]
   before_filter :auth_params,:only=>[:update,:create]
 
@@ -262,55 +262,6 @@ class PeopleController < ApplicationController
         render :json => {:status => 200, :people_list => people_list }
       }
     end
-  end
-
-  def clean_up_and_assign_permissions
-    #remove the permissions which are set on this person
-    @person.remove_permissions
-
-    #retrieve the items that this person is contributor (owner for assay)
-    related_items = @person.related_items
-
-    #check if anyone has manage right on the related_items
-    #if not or if only the contributor then assign the manage right to pis||pals
-    related_items.each do |item|
-      people_can_manage_item = people_can_manage item, @person
-      if people_can_manage_item.blank? || (people_can_manage_item == [[@person.id, "#{@person.first_name} #{@person.last_name}", Policy::MANAGING]])
-        #find the projects which this person and item belong to
-        projects_in_common = @person.projects & item.projects
-        pis = projects_in_common.collect{|p| p.pis}.flatten.uniq
-        pis.reject!{|pi| pi.id == @person.id}
-        policy = item.policy.blank? ? (create_private_policy_for item) : item.policy
-        unless pis.blank?
-          pis.each do |pi|
-            policy.permissions.build(:contributor => pi, :access_type => Policy::MANAGING)
-            policy.save
-          end
-        else
-          pals = projects_in_common.collect{|p| p.pals}.flatten.uniq
-          pals.reject!{|pal| pal.id == @person.id}
-          pals.each do |pal|
-            policy.permissions.build(:contributor => pal, :access_type => Policy::MANAGING)
-            policy.save
-          end
-        end
-      end
-    end
-  end
-
-  def create_private_policy_for item
-    policy = Policy.private_policy
-    policy.save
-    item.policy_id = policy.id
-    policy
-  end
-
-  #setup sharing params to send to request_permission_summary to check the people who have manage right
-  def people_can_manage item, contributor
-    return [[contributor.id, "#{contributor.first_name} #{contributor.last_name}", Policy::MANAGING]] if item.policy.blank?
-    creators = item.is_downloadable? ? item.creators : []
-    grouped_people_by_access_type = PoliciesController.new().request_permission_summary item.policy, creators, contributor
-    grouped_people_by_access_type[Policy::MANAGING]
   end
 
   private
