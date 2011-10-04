@@ -207,10 +207,9 @@ module AssetsCommonExtension
            downloader=Seek::RemoteDownloader.new
            data_hash = downloader.get_remote_data content_blob.url,nil,nil,nil,true
 
-           tmp_io_object=File.open data_hash[:data_tmp_path],"r"
           zos.put_next_entry(content_blob.original_filename)
 
-          zos.print tmp_io_object
+          zos.print IO.read(data_hash[:data_tmp_path])
         else
           flash.now[:error] = "#{content_blob.original_filename} does not exist!"
         end
