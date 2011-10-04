@@ -19,10 +19,12 @@ class UsersControllerTest < ActionController::TestCase
 
 
   test "creatable classes order" do
-    oldval = Seek::Config.is_virtualliver
-    Seek::Config.is_virtualliver = true
-    assert_equal [DataFile,Model,Presentation,Publication,Sop,Assay,Investigation,Study,Event,Sample,Specimen],@controller.send(:user_creatable_classes)
-    Seek::Config.is_virtualliver = oldval
+    user_creatable_classes =  [DataFile,Model,Presentation,Publication,Sop,Assay,Investigation,Study,Event,Sample,Specimen]
+    unless Seek::Config.is_virtualliver
+      user_creatable_classes.delete(Specimen)
+      user_creatable_classes.delete(Sample)
+    end
+    assert_equal user_creatable_classes,@controller.send(:user_creatable_classes)
   end
   
   def test_title
