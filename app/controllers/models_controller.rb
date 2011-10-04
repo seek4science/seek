@@ -458,8 +458,13 @@ class ModelsController < ApplicationController
     # (this will also trigger timestamp update in the corresponding Asset)
     @model.last_used_at = Time.now
     @model.save_without_timestamping    
-    
-    handle_download_zip @model
+
+    if @model.content_blobs.count==1
+       handle_download @model
+    elsif @model.content_blobs.count > 1
+      handle_download_zip @model
+    end
+
   end
 
   def download_one_file
