@@ -284,13 +284,13 @@ class Person < ActiveRecord::Base
     #check if anyone has manage right on the related_items
     #if not or if only the contributor then assign the manage right to pis||pals
     person_related_items.each do |item|
-      people_can_manage_item = people_can_manage
-      if people_can_manage_item.blank? || (people_can_manage_item == [[@person.id, "#{@person.first_name} #{@person.last_name}", Policy::MANAGING]])
+      people_can_manage_item = item.people_can_manage
+      if people_can_manage_item.blank? || (people_can_manage_item == [[id, "#{first_name} #{last_name}", Policy::MANAGING]])
         #find the projects which this person and item belong to
-        projects_in_common = @person.projects & item.projects
+        projects_in_common = projects & item.projects
         pis = projects_in_common.collect{|p| p.pis}.flatten.uniq
-        pis.reject!{|pi| pi.id == @person.id}
-        policy_or_default
+        pis.reject!{|pi| pi.id == id}
+        item.policy_or_default
         policy = item.policy
         unless pis.blank?
           pis.each do |pi|
@@ -299,7 +299,7 @@ class Person < ActiveRecord::Base
           end
         else
           pals = projects_in_common.collect{|p| p.pals}.flatten.uniq
-          pals.reject!{|pal| pal.id == @person.id}
+          pals.reject!{|pal| pal.id == id}
           pals.each do |pal|
             policy.permissions.build(:contributor => pal, :access_type => Policy::MANAGING)
             policy.save

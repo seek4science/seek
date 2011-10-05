@@ -218,9 +218,9 @@ class Policy < ActiveRecord::Base
         #the result return: a hash contain the access_type as key, and array of people as value
         grouped_people_by_access_type = {}
 
-        policy_to_people_group people_in_group
+        policy_to_people_group people_in_group, contributor
 
-        permissions_to_people_group permissions, people_in_group
+        permissions_to_people_group permissions, people_in_group, contributor
 
         #Now make the people in group unique by choosing the highest access_type
         people_in_group['FavouriteGroup']  = remove_duplicate(people_in_group['FavouriteGroup'])
@@ -272,7 +272,7 @@ class Policy < ActiveRecord::Base
         return grouped_people_by_access_type
   end
 
-  def policy_to_people_group people_in_group
+  def policy_to_people_group people_in_group, contributor=User.current_user.person
       if sharing_scope == Policy::ALL_SYSMO_USERS
          people_in_network = get_people_in_network access_type
          people_in_group['Network'] |= people_in_network unless people_in_network.blank?
@@ -281,18 +281,18 @@ class Policy < ActiveRecord::Base
       end
       #if blacklist/whitelist is used
       if use_whitelist
-        people_in_whitelist = get_people_in_FG(nil, true, nil)
+        people_in_whitelist = get_people_in_FG(contributor, nil, true, nil)
         people_in_group['WhiteList'] |= people_in_whitelist unless people_in_whitelist.blank?
       end
       #if blacklist/whitelist is used
       if use_blacklist
-        people_in_blacklist = get_people_in_FG(nil, nil, true)
+        people_in_blacklist = get_people_in_FG(contributor, nil, nil, true)
         people_in_group['BlackList'] |= people_in_blacklist unless people_in_blacklist.blank?
       end
       people_in_group
   end
 
-  def permissions_to_people_group permissions, people_in_group
+  def permissions_to_people_group permissions, people_in_group, contributor=User.current_user.person
       permissions.each do |permission|
         contributor_id = permission.contributor_id
         access_type = permission.access_type
@@ -301,7 +301,7 @@ class Policy < ActiveRecord::Base
                person = get_person contributor_id, access_type
                people_in_group['Person'] << person unless person.blank?
            when 'FavouriteGroup'
-               people_in_FG = get_people_in_FG contributor_id
+               people_in_FG = get_people_in_FG contributor, contributor_id
                people_in_group['FavouriteGroup'] |= people_in_FG unless people_in_FG.blank?
            when 'WorkGroup'
                people_in_WG = get_people_in_WG contributor_id, access_type
@@ -338,13 +338,13 @@ class Policy < ActiveRecord::Base
   end
 
   #review people in black list, white list and normal workgroup
-  def get_people_in_FG fg_id=nil, is_white_list=nil, is_black_list=nil
+  def get_people_in_FG contributor, fg_id=nil, is_white_list=nil, is_black_list=nil
     if is_white_list
-      f_group = FavouriteGroup.find(:all, :conditions => ["name = ? AND user_id = ?", "__whitelist__", User.current_user.id ]).first
+      f_group = FavouriteGroup.find(:all, :conditions => ["name = ? AND user_id = ?", "__whitelist__", contributor.user.id]).first
     elsif is_black_list
-      f_group = FavouriteGroup.find(:all, :conditions => ["name = ? AND user_id = ?", "__blacklist__", User.current_user.id ]).first
+      f_group = FavouriteGroup.find(:all, :conditions => ["name = ? AND user_id = ?", "__blacklist__", contributor.user.id]).first
     else
-      f_group = FavouriteGroup.find(fg_id, :conditions => { :user_id => User.current_user.id } )
+      f_group = FavouriteGroup.find_by_id(fg_id)
     end
 
     if f_group
