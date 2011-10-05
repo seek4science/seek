@@ -384,24 +384,4 @@ class PeopleControllerTest < ActionController::TestCase
     assert_equal pal.id, permissions.first.contributor_id
     assert_equal Policy::MANAGING, permissions.first.access_type
   end
-
-  test 'should retrieve the list of people who have the manage right on the item' do
-    login_as(:quentin)
-    user = Factory(:user)
-    person = user.person
-    data_file = Factory(:data_file, :contributor => user)
-    people_can_manage = PeopleController.new().people_can_manage data_file, person
-    assert_equal 1, people_can_manage.count
-    assert_equal person.id, people_can_manage.first[0]
-
-    new_person = Factory(:person_in_project)
-    policy = data_file.policy
-    policy.permissions.build(:contributor => new_person, :access_type => Policy::MANAGING)
-    policy.save
-    people_can_manage = PeopleController.new().people_can_manage data_file, person
-    assert_equal 2, people_can_manage.count
-    people_ids = people_can_manage.collect{|p| p[0]}
-    assert people_ids.include? person.id
-    assert people_ids.include? new_person.id
-  end
 end

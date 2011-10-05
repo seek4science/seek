@@ -446,5 +446,23 @@ class PersonTest < ActiveSupport::TestCase
     work_group_projects = person.work_groups.map(&:project).uniq.sort_by(&:title)
     assert_equal (group_membership_projects | work_group_projects), person.projects.sort_by(&:title)
   end
-  
+
+  test 'should retrieve the list of people who have the manage right on the item' do
+    user = Factory(:user)
+    person = user.person
+    data_file = Factory(:data_file, :contributor => user)
+    people_can_manage = data_file.people_can_manage
+    assert_equal 1, people_can_manage.count
+    assert_equal person.id, people_can_manage.first[0]
+
+    new_person = Factory(:person_in_project)
+    policy = data_file.policy
+    policy.permissions.build(:contributor => new_person, :access_type => Policy::MANAGING)
+    policy.save
+    people_can_manage = data_file.people_can_manage
+    assert_equal 2, people_can_manage.count
+    people_ids = people_can_manage.collect{|p| p[0]}
+    assert people_ids.include? person.id
+    assert people_ids.include? new_person.id
+  end
 end
