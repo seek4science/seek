@@ -9,7 +9,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20110921135820) do
+ActiveRecord::Schema.define(:version => 20110920130259) do
 
   create_table "activity_logs", :force => true do |t|
     t.string   "action"
@@ -162,15 +162,10 @@ ActiveRecord::Schema.define(:version => 20110921135820) do
   end
 
   create_table "content_blobs", :force => true do |t|
-    t.binary  "data_old",          :limit => 2147483647
-    t.string  "md5sum"
-    t.string  "url"
-    t.string  "uuid"
-    t.string  "original_filename"
-    t.string  "content_type"
-    t.integer "asset_id"
-    t.string  "asset_type"
-    t.integer "asset_version"
+    t.binary "data_old", :limit => 2147483647
+    t.string "md5sum"
+    t.string "url"
+    t.string "uuid"
   end
 
   create_table "culture_growth_types", :force => true do |t|
@@ -205,6 +200,9 @@ ActiveRecord::Schema.define(:version => 20110921135820) do
     t.text     "other_creators"
     t.string   "uuid"
     t.integer  "policy_id"
+    t.string   "original_filename"
+    t.string   "content_type"
+    t.integer  "content_blob_id"
   end
 
   add_index "data_file_versions", ["contributor_id", "contributor_type"], :name => "index_data_file_versions_on_contributor_id_and_contributor_type"
@@ -225,10 +223,13 @@ ActiveRecord::Schema.define(:version => 20110921135820) do
     t.datetime "created_at"
     t.datetime "updated_at"
     t.integer  "version"
-    t.string   "first_letter",     :limit => 1
+    t.string   "first_letter",      :limit => 1
     t.text     "other_creators"
     t.string   "uuid"
     t.integer  "policy_id"
+    t.string   "original_filename"
+    t.string   "content_type"
+    t.integer  "content_blob_id"
   end
 
   add_index "data_files", ["contributor_id", "contributor_type"], :name => "index_data_files_on_contributor_id_and_contributor_type"
@@ -467,6 +468,9 @@ ActiveRecord::Schema.define(:version => 20110921135820) do
     t.string   "uuid"
     t.integer  "policy_id"
     t.integer  "id_image"
+    t.string   "original_filename"
+    t.string   "content_type"
+    t.integer  "content_blob_id"
   end
 
   add_index "model_versions", ["contributor_id", "contributor_type"], :name => "index_model_versions_on_contributor_id_and_contributor_type"
@@ -496,6 +500,9 @@ ActiveRecord::Schema.define(:version => 20110921135820) do
     t.string   "uuid"
     t.integer  "policy_id"
     t.integer  "id_image"
+    t.string   "original_filename"
+    t.string   "content_type"
+    t.integer  "content_blob_id"
   end
 
   add_index "models", ["contributor_id", "contributor_type"], :name => "index_models_on_contributor_id_and_contributor_type"
@@ -612,6 +619,9 @@ ActiveRecord::Schema.define(:version => 20110921135820) do
     t.text     "other_creators"
     t.string   "uuid"
     t.integer  "policy_id"
+    t.string   "original_filename"
+    t.string   "content_type"
+    t.integer  "content_blob_id"
   end
 
   create_table "presentation_versions_projects", :id => false, :force => true do |t|
@@ -627,11 +637,14 @@ ActiveRecord::Schema.define(:version => 20110921135820) do
     t.datetime "created_at"
     t.datetime "updated_at"
     t.datetime "last_used_at"
-    t.integer  "version",                       :default => 1
-    t.string   "first_letter",     :limit => 1
+    t.integer  "version",                        :default => 1
+    t.string   "first_letter",      :limit => 1
     t.text     "other_creators"
     t.string   "uuid"
     t.integer  "policy_id"
+    t.string   "original_filename"
+    t.string   "content_type"
+    t.integer  "content_blob_id"
   end
 
   create_table "presentations_projects", :id => false, :force => true do |t|
@@ -857,6 +870,9 @@ ActiveRecord::Schema.define(:version => 20110921135820) do
     t.text     "other_creators"
     t.string   "uuid"
     t.integer  "policy_id"
+    t.string   "original_filename"
+    t.string   "content_type"
+    t.integer  "content_blob_id"
   end
 
   add_index "sop_versions", ["contributor_id", "contributor_type"], :name => "index_sop_versions_on_contributor_id_and_contributor_type"
@@ -871,10 +887,13 @@ ActiveRecord::Schema.define(:version => 20110921135820) do
     t.datetime "updated_at"
     t.datetime "last_used_at"
     t.integer  "version"
-    t.string   "first_letter",     :limit => 1
+    t.string   "first_letter",      :limit => 1
     t.text     "other_creators"
     t.string   "uuid"
     t.integer  "policy_id"
+    t.string   "original_filename"
+    t.string   "content_type"
+    t.integer  "content_blob_id"
   end
 
   add_index "sops", ["contributor_id", "contributor_type"], :name => "index_sops_on_contributor_id_and_contributor_type"
