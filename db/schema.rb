@@ -873,6 +873,15 @@ ActiveRecord::Schema.define(:version => 20111005074321) do
 
   add_index "sops", ["contributor_id", "contributor_type"], :name => "index_sops_on_contributor_id_and_contributor_type"
 
+  create_table "special_auth_codes", :force => true do |t|
+    t.string   "code"
+    t.date     "expiration_date"
+    t.string   "asset_type"
+    t.integer  "asset_id"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
   create_table "specimens", :force => true do |t|
     t.string   "donor_number"
     t.integer  "age"
