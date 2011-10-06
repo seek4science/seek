@@ -19,6 +19,7 @@ gem 'calendar_date_select'
 gem 'factory_girl'
 gem 'ratom'
 gem 'rubyzip'
+gem 'bio'
 
 
 

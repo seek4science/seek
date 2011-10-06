@@ -32,6 +32,7 @@ class PublicationsController < ApplicationController
       format.svg { render :text=>to_svg(@publication,params[:deep]=='false',@publication)}
       format.dot { render :text=>to_dot(@publication,params[:deep]=='false',@publication)}
       format.png { render :text=>to_png(@publication,params[:deep]=='false',@publication)}
+      format.enw { send_data @publication.endnote, :type => "application/x-endnote-refer", :filename => "#{@publication.title}.enw" }
     end
   end
 
