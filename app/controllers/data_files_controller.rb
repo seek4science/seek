@@ -374,7 +374,11 @@ end
   
   def find_display_data_file
     if @data_file
-      @display_data_file = params[:version] ? @data_file.find_version(params[:version]) : @data_file.latest_version
+      if logged_in? and current_user.person.member? and params[:version]
+        @display_data_file = @data_file.find_version(params[:version]) ? @data_file.find_version(params[:version]) : @data_file.latest_version
+      else
+        @display_data_file = @data_file.latest_version
+      end
     end
   end
 

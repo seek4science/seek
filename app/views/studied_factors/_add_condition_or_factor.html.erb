@@ -92,7 +92,7 @@
                 fses_or_ecs = fses_or_ecs.sort{|a,b| (try_block{a.send(link_table_name).first.substance.name.downcase}.to_s + a.measured_item.title) <=> (try_block{b.send(link_table_name).first.substance.name.downcase}.to_s + b.measured_item.title)} %>
                 <ul class="measured_items">
                   <li>
-                     <input type=checkbox id='checkbox_<%= measured_item-%>' onclick="Effect.toggle('conditions_or_factors_of_item_<%= measured_item-%>', 'appear')">
+                     <input type=checkbox id='checkbox_<%= measured_item-%>' onclick="Effect.toggle('conditions_or_factors_of_item_<%= measured_item-%>', 'appear', { duration: 0.5 })">
                   </li>
                   <li><%= measured_item -%></li>
                 </ul>

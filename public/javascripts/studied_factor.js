@@ -19,15 +19,15 @@ function additionalFieldForItem(form_id, fs_or_ec_id){
 
     if (option_select.text == 'concentration'){
         substance_autocomplete.disabled = false;
-        Effect.Fade(fs_or_ec_id + 'growth_medium_or_buffer_description', { duration: 1 });
+        Effect.Fade(fs_or_ec_id + 'growth_medium_or_buffer_description', { duration: 0.5 });
         Effect.Appear(fs_or_ec_id + 'substance_condition_factor', { duration: 4 });
     }
     else if (option_select.text == 'growth medium' || option_select.text == 'buffer'){
-        Effect.Fade(fs_or_ec_id + 'substance_condition_factor', { duration: 1 });
+        Effect.Fade(fs_or_ec_id + 'substance_condition_factor', { duration: 0.5 });
         Effect.Appear(fs_or_ec_id + 'growth_medium_or_buffer_description', { duration: 4 });
     }
     else{
         Effect.Fade(fs_or_ec_id + 'substance_condition_factor', { duration: 1 });
-        Effect.Fade(fs_or_ec_id + 'growth_medium_or_buffer_description', { duration: 1 });
+        Effect.Fade(fs_or_ec_id + 'growth_medium_or_buffer_description', { duration: 0.5 });
     }
 }

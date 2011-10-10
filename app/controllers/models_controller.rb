@@ -546,7 +546,11 @@ class ModelsController < ApplicationController
   
   def find_display_model
     if @model
-      @display_model = params[:version] ? @model.find_version(params[:version]) : @model.latest_version
+      if logged_in? and current_user.person.member? and params[:version]
+        @display_model = @model.find_version(params[:version]) ? @model.find_version(params[:version]) : @model.latest_version
+      else
+        @display_model = @model.latest_version
+      end
     end
   end
 

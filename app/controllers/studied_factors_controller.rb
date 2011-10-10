@@ -132,7 +132,11 @@ class StudiedFactorsController < ApplicationController
       data_file = DataFile.find(params[:data_file_id])
       if data_file.can_edit? current_user
         @data_file = data_file
-        @display_data_file = params[:version] ? @data_file.find_version(params[:version]) : @data_file.latest_version
+        if logged_in? and current_user.person.member? and params[:version]
+          @display_data_file = @data_file.find_version(params[:version]) ? @data_file.find_version(params[:version]) : @data_file.latest_version
+        else
+          @display_data_file = @data_file.latest_version
+        end
       else
         respond_to do |format|
           flash[:error] = "You are not authorized to perform this action"

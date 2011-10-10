@@ -109,10 +109,6 @@
   <%= render :partial=>"assets/select_tags" -%>
 </p>
 
-
-
-
-
 <%= render :partial=>"assays/associate_sop",:locals=>{:f=>f, :resource => @assay} -%>
 
 <%  if @assay.is_modelling? -%>
@@ -123,7 +119,7 @@
 
 <%= render :partial => "assets/publication_relation_form", :locals => { :resource_type => "Assay",
                                                                         :related_publications => @assay.related_publications} -%>
-                                                                        
+
 <p style="margin-top: 2em; text-align: center;" >
   <%
      button_text=action==:edit ? "Update" : "Create"

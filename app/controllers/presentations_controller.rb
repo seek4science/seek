@@ -245,7 +245,11 @@ class PresentationsController < ApplicationController
   protected
   def find_display_presentation
     if @presentation
-      @display_presentation = params[:version] ? @presentation.find_version(params[:version]) : @presentation.latest_version
+      if logged_in? and current_user.person.member? and params[:version]
+        @display_presentation = @presentation.find_version(params[:version]) ? @presentation.find_version(params[:version]) : @presentation.latest_version
+      else
+        @display_presentation = @presentation.latest_version
+      end
     end
   end
 end
