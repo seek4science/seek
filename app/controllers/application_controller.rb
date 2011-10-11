@@ -31,6 +31,14 @@ class ApplicationController < ActionController::Base
     end
   end
 
+  around_filter :with_auth_code
+  def with_auth_code
+    session[:code] = params[:code] if params[:code]
+    SpecialAuthCode.with_auth_code(session[:code]) do
+      yield
+    end
+  end
+
   before_filter :project_membership_required,:only=>[:create,:new]
 
   helper :all

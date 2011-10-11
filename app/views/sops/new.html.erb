@@ -22,7 +22,9 @@
         <p>
         <%= fancy_multiselect @sop,:scales, {:possibilities=>sort_scales(Scale.all)} -%>
        </p>
-		<%= render :partial=>"assets/asset_form_bottom", :locals=> {:resource_type => "Sop",:show_publications=>false} -%>
+
+       <%= fields_for(@sop) { |f| render :partial=>"assets/asset_form_bottom", :locals=> {:show_publications=>false, :f => f} }-%>
+       
 		<%= render :partial => "assays/associate_assays", :locals=>{:resource => @sop, :show_relationships => false} -%>
       <p>
             <%= submit_tag "Upload and Save", :id => "sop_submit_btn", :onclick => "javascript: validateSopFields(true); return(false);" -%> or <%= link_to 'Cancel', sops_path -%>

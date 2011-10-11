@@ -261,6 +261,8 @@ module ImagesHelper
         "famfamfam_silk/email_add.png"
       when 'presentation_avatar','presentation','presentations'
         "1315482798_presentation-slides.png"
+      when 'endnote'
+        "famfamfam_silk/script_go.png"
     else
       return nil
     end

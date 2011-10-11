@@ -373,5 +373,6 @@ end
 
   Factory.define(:attribution, :parent => :relationship) {}
 
-
-
+  Factory.define(:special_auth_code) do |f|
+    f.association :asset, :factory => :data_file
+  end

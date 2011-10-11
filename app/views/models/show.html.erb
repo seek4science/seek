@@ -46,7 +46,7 @@
             </p>
             <p>
               <% files = @display_model.content_blobs %>
-                <b>Files</b> (<span style="font-style: italic;"><%= files.count %> in total</span>):<br/>
+                <b>All Files</b> (<span style="font-style: italic;"><%= files.count %> in total</span>):<br/>
               <% files.each do |content_blob|%>
                <%= h(content_blob.original_filename) -%> (<%=h mime_nice_name(content_blob.content_type) -%>)
                <br/>

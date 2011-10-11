@@ -112,6 +112,10 @@ module Seek
       #for now do nothing.
     end
 
+    def pubmed_api_email_propagate
+      Bio::NCBI.default_email = "(#{self.pubmed_api_email})"
+    end
+
     def propagate_all
       prop_methods=self.methods.select{|m| m.end_with?("_propagate")}
       prop_methods.each do |m|

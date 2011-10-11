@@ -50,6 +50,8 @@
       <%= render :partial => "assets/sharing_form" if @sample.can_manage?-%>
   </p>
 
+  <%= render :partial => 'assets/special_auth_code_form', :locals => {:f => f}%>
+
   <%= fancy_multiselect @sample, :sops, :name => 'sample_sop_ids', :association_class=>Sop,:selected => (params[:sample_sop_ids] || []).map(&:to_i) | @sample.sop_masters.map(&:sop_id) %>
 </div>
 
