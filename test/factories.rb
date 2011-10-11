@@ -262,6 +262,7 @@ end
   Factory.define(:activity_log) do |f|
     f.action "create"
     f.association :activity_loggable, :factory => :data_file
+    f.controller_name "data_files"
     f.association :culprit, :factory => :user
   end
 
