@@ -5,44 +5,28 @@ module ApplicationHelper
   include FancyMultiselectHelper
 
 
-  def authorized_list items, attribute, sort=true, max_length=75, count_hidden_items=false
-    items = Authorization.authorize_collection("view", items, current_user, count_hidden_items)
+  def authorized_list all_items, attribute, sort=true, max_length=75, count_hidden_items=false
+    items = all_items.select &:can_view?
+    title_only_items = (all_items - items).select &:title_is_public?
     html  = "<b>#{(items.size > 1 ? attribute.pluralize : attribute)}:</b> "
-    if items.empty?
+    if items.empty? and title_only_items.empty?
       html << "<span class='none_text'>No #{attribute}</span>"
     else
-      original_size     = items.size
-      items             = items.compact
-      hidden_item_count = original_size - items.size
-      items = items.sort { |a, b| get_object_title(a)<=>get_object_title(b) } if sort
-      items.each do |i|
-        html << (link_to h(truncate(i.title, :length=>max_length)), show_resource_path(i), :title=>get_object_title(i))
-        html << ", " unless items.last==i
-      end
+      original_size     = all_items.size
+      hidden_item_count = original_size - (items.size + title_only_items.size)
+
+      items = items.sort_by { |i| get_object_title(i) } if sort
+      title_only_items = title_only_items.sort_by{|i| get_object_title(i)} if sort
+
+      list = items.collect {|i| link_to h(truncate(i.title, :length=>max_length)), show_resource_path(i), :title=>get_object_title(i)}
+      list = list + title_only_items.collect {|i| h(truncate(i.title, :length => max_length))}
+      html << list.join(', ')
+
       if count_hidden_items && hidden_item_count>0
         html << "<span class=\"none_text\">#{items.size > 0 ? " and " : ""}#{hidden_item_count} hidden #{hidden_item_count > 1 ? "items" :"item"}</span>"
       end
     end
-    return html
-  end
-
-
-  #List of activerecord model classes that are directly creatable by a standard user (e.g. uploading a new DataFile, creating a new Assay, but NOT creating a new Project)
-  #returns a list of all types that respond_to and return true for user_creatable?
-  def user_creatable_classes
-    @@creatable_model_classes ||= begin
-      classes=Seek::Util.persistent_classes.select do |c|
-        c.respond_to?("user_creatable?") && c.user_creatable?
-      end.sort_by{|a| [a.is_asset? ? -1 : 1, a.is_isa? ? -1 : 1,a.name]}
-      classes.delete(Event) unless Seek::Config.events_enabled
-      
-#      unless Seek::Config.is_virtualliver
-#        classes.delete(Sample)
-#        classes.delete(Specimen)
-#      end
-
-      classes
-    end    
+    html
   end
 
   def tabbar
@@ -101,10 +85,10 @@ module ApplicationHelper
     script="<script type='text/javascript'>\n"
     script << "function newAsset() {\n"
     script << "selected_model=$('new_resource_type').value;\n"
-    user_creatable_classes.each do |c|
+    Seek::Util.user_creatable_types.each do |c|
       name=c.name.underscore
       path = eval "new_#{name}_path"
-      if c==user_creatable_classes.first
+      if c==Seek::Util.user_creatable_types.first
         script << "if "
       else
         script << "else if "
@@ -118,7 +102,7 @@ module ApplicationHelper
 
   #selection of assets for new asset gadget
   def new_creatable_selection
-    select_tag :new_resource_type, options_for_select(user_creatable_classes.collect{|c| [(c.name.underscore.humanize == "Sop" ? "SOP" : c.name.underscore.humanize),c.name.underscore] })
+    select_tag :new_resource_type, options_for_select(Seek::Util.user_creatable_types.collect{|c| [(c.name.underscore.humanize == "Sop" ? "SOP" : c.name.underscore.humanize),c.name.underscore] })
   end
   
   def is_nil_or_empty? thing
@@ -354,9 +338,9 @@ module ApplicationHelper
         :failure => "alert('Sorry, an error has occurred.'); RedBox.close();",
         :with => "'sharing_scope=' + selectedSharingScope() + '&access_type=' + selectedAccessType(selectedSharingScope())
         + '&use_whitelist=' + $('cb_use_whitelist').checked + '&use_blacklist=' + $('cb_use_blacklist').checked
-        + '&project_ids=' + escape($F('#{resource_name}' + '_project_ids')) + '&project_access_type=' + $F('sharing_your_proj_access_type')
+        + '&project_ids=' + getProjectIds('#{resource_name}') + '&project_access_type=' + $F('sharing_your_proj_access_type')
         + '&contributor_types=' + $F('sharing_permissions_contributor_types') + '&contributor_values=' + $F('sharing_permissions_values')
-        + '&resource_name=' + '#{resource_name}' + '&is_new_file=' + '#{is_new_file}'"},
+        + '&creators=' + getCreators() + '&resource_name=' + '#{resource_name}' + '&is_new_file=' + '#{is_new_file}'"},
       { :id => 'preview_permission',
         :style => 'display:none'
       } #,

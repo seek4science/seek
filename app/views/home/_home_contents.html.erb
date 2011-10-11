@@ -1,0 +1,20 @@
+<%= stylesheet_link_tag "homepage" -%>
+
+<h1><%= Seek::Config.application_name -%></h1>
+<div class="top_home_panel">
+  <%= simple_format(auto_link(Seek::Config.home_description)) -%>
+</div>
+
+<% if SiteAnnouncement.headline_announcement -%>
+    <p class="box_standout headline_announcement">
+      <%= site_annoucements_headline %>
+    </p>
+<% end -%>
+
+<%= render :partial=>"home_news_feeds" -%>
+
+<br/>
+
+<%= render :partial=>"home_activity_notifications" -%>
+
+

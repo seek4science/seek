@@ -32,6 +32,10 @@ module Acts #:nodoc:
         false
       end
 
+      def title_is_public?
+        false
+      end
+
       def publish!
         if can_manage?
           policy.access_type=Policy::ACCESSIBLE
@@ -43,7 +47,6 @@ module Acts #:nodoc:
       end
 
       def is_published?
-        #FIXME: a temporary work-around for the lack of ability to use can_download? as a non logged in user (passing nil defaults to User.current_user)
         can_download? nil
       end
 

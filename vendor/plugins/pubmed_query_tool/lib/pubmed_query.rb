@@ -144,6 +144,7 @@ class PubmedQuery
       params[:pubmed_pub_date] = find_publication_date article
       
       journal = article.find_first('.//Journal/ISOAbbreviation')
+      journal = article.find_first('.//Journal/Title') unless try_block{journal.content}
       params[:journal] = journal.nil? ? nil : journal.content
       
       params[:pmid] = article.find_first('.//PMID').content

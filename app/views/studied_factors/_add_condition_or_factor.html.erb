@@ -26,7 +26,7 @@
 
   <div class="conditions_or_factors" >
   <h4 style="border-bottom: 1px solid #DDD; width: 20em;"> Add new entry manually </h4>
-  <table >
+  <table class='conditions_or_factor_table' >
     <tr>
       <th>Item</th>
       <th>Unit</th>
@@ -41,10 +41,10 @@
 
     <tr>
       <% if entity == "studied_factor" %>
-        <td><%=  f.collection_select :measured_item_id, MeasuredItem.factors_studied_items.sort{|a,b| a.title <=> b.title},:id,:title, {}, {:onchange => "showOrHideSubstanceTextField('add_condition_or_factor_form')"} %></td>
+        <td><%=  f.collection_select :measured_item_id, MeasuredItem.factors_studied_items.sort{|a,b| a.title <=> b.title},:id,:title, {}, {:onchange => "additionalFieldForItem('add_condition_or_factor_form', '')"} %></td>
         <td><%=  f.collection_select :unit_id, Unit.factors_studied_units.sort{|a,b| a.order <=> b.order},:id,:symbol %></td>
       <% elsif entity == 'experimental_condition' %>
-        <td><%= f.collection_select :measured_item_id, MeasuredItem.find(:all).sort{|a,b| a.title <=> b.title},:id,:title, {}, {:onchange => "showOrHideSubstanceTextField('add_condition_or_factor_form')"} %></td>
+        <td><%= f.collection_select :measured_item_id, MeasuredItem.find(:all).sort{|a,b| a.title <=> b.title},:id,:title, {}, {:onchange => "additionalFieldForItem('add_condition_or_factor_form', '')"} %></td>
         <td><%=  f.collection_select :unit_id, Unit.find(:all).sort{|a,b| a.order <=> b.order},:id,:symbol %></td>
       <% end %>
 
@@ -59,8 +59,13 @@
     </tr>
   </table>
 
-  <div class="substance_condition_factor">
+  <div id='substance_condition_factor' class="substance_condition_factor" style="display: none">
      <%= render :partial=>"layouts/substances_autocomplete", :locals => {:name => "substance"}-%>
+  </div>
+  <div id='growth_medium_or_buffer_description' class="growth_medium_or_buffer_description" style="display: none">
+      <%= hidden_field_tag "annotation[attribute_name]", "description" -%>
+      Please enter the description:<br/>
+      <%= text_area_tag "annotation[value]", nil, :cols => 45 -%>
   </div>
 
   <div class='border_top'>
@@ -87,7 +92,7 @@
                 fses_or_ecs = fses_or_ecs.sort{|a,b| (try_block{a.send(link_table_name).first.substance.name.downcase}.to_s + a.measured_item.title) <=> (try_block{b.send(link_table_name).first.substance.name.downcase}.to_s + b.measured_item.title)} %>
                 <ul class="measured_items">
                   <li>
-                     <input type=checkbox id='checkbox_<%= measured_item-%>' onclick="Effect.toggle('conditions_or_factors_of_item_<%= measured_item-%>', 'appear')">
+                     <input type=checkbox id='checkbox_<%= measured_item-%>' onclick="Effect.toggle('conditions_or_factors_of_item_<%= measured_item-%>', 'appear', { duration: 0.5 })">
                   </li>
                   <li><%= measured_item -%></li>
                 </ul>
@@ -98,6 +103,7 @@
             <% end -%>
             <%= hidden_field_tag "#{asset}_id", asset_object.id -%>
             <%= hidden_field_tag "version", display_asset.version  -%>
+
             <div class='border_top' style="float:right;margin-right: 13em; clear: both">
                <%= submit_tag "Add", :style => "width:50px;font-weight:bold", :id => 'add_from_existing' %>
             </div>

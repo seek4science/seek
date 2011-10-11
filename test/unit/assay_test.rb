@@ -38,9 +38,10 @@ class AssayTest < ActiveSupport::TestCase
 
   test "is_modelling" do
     assay=assays(:metabolomics_assay)
-    User.current_user = assay.contributor
+    User.current_user = assay.contributor.user
     assert !assay.is_modelling?
     assay.assay_class=assay_classes(:modelling_assay_class)
+    assay.samples = []
     assay.save!
     assert assay.is_modelling?
   end
@@ -57,9 +58,10 @@ class AssayTest < ActiveSupport::TestCase
 
   test "is_experimental" do
     assay=assays(:metabolomics_assay)
-    User.current_user = assay.contributor
+    User.current_user = assay.contributor.user
     assert assay.is_experimental?
     assay.assay_class=assay_classes(:modelling_assay_class)
+    assay.samples = []
     assay.save!
     assert !assay.is_experimental?
   end
@@ -116,10 +118,10 @@ class AssayTest < ActiveSupport::TestCase
 
     assay.owner=people(:person_for_model_owner)
 
-      #an modelling assay can be valid without a technology type,but require sample or organism
+      #an modelling assay can be valid without a technology type, sample or organism
     assay.assay_class=assay_classes(:modelling_assay_class)
     assay.technology_type=nil
-      assay.samples = [Factory(:sample)]
+      assay.samples = []
     assert assay.valid?
     
     #an experimental assay can be invalid without a sample

@@ -10,3 +10,7 @@ experimental_condition_time:
   unit: second
   start_value: 1
   sop: editable_sop
+
+experimental_condition_growth_medium:
+  measured_item: growth_medium
+  sop: editable_sop

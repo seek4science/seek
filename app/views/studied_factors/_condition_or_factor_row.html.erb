@@ -18,11 +18,15 @@
         <% substance = ''
            link_table_name = "#{object.class.name.underscore}_links"
            object.send(link_table_name).each do |ltn|
-             substance.concat(ltn.substance.name + '/')
+             substance.concat(try_block{ltn.substance.name}.to_s + '/')
            end
            substance.chop!
         %>
         <%= h substance + ' ' + object.measured_item.title  %>
+      <%elsif (object.measured_item.title == 'growth medium' || object.measured_item.title == 'buffer')
+         description = try_block{Annotation.for_annotatable(object.class.name, object.id).with_attribute_name('description').first.value.text}
+      %>
+        <%= h object.measured_item.title + (description.blank? ? '' : " (#{description})")  %>
       <%else%>
         <%= h object.measured_item.title %>
       <%end%>
@@ -30,8 +34,7 @@
 
     <li id="values">
       <!--don't show dimensionless unit-->
-      <%= object.unit.symbol == 'dimensionless' ? "#{h object.range_text}" : "#{h object.range_text} #{object.unit.symbol}" %>
-
+      <%= object.range_text.blank? ? '': (h "#{object.range_text}" + (object.unit.symbol == 'dimensionless' ? '' : "#{object.unit.symbol}"))  %>
     </li>       
     <% if asset == 'data_file' %>
       <li id="standard_deviation">

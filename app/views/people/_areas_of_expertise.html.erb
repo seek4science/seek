@@ -3,24 +3,24 @@
 
 <div id="expertise">
   
-    <p>
+    <p id="expertise">
       <label>Expertise:</label>
 
       <%  if expertise_list.blank? -%>
         <span class='none_text'>Not known</span>
       <% else %>
 
-        <%= list_item_tags_list person.expertise,:type=>:expertise %>
+        <%= list_item_tags_list expertise_list,:type=>:expertise %>
       <% end %>
     </p>
 
-    <p>
+    <p id="tools">
       <label>Tools:</label>
 
       <%  if tools_list.blank? -%>
         <span class='none_text'>Not known</span>
       <% else %>
-        <%= list_item_tags_list person.tools,:type=>:tools %>
+        <%= list_item_tags_list tools_list,:type=>:tools %>
       <% end %>
     </p>
     

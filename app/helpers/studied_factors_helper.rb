@@ -31,10 +31,12 @@ module StudiedFactorsHelper
       if !resource.nil?
         (resource.send link_table_name).each do |ltn|
           substance = ltn.substance
-          s = Substance.new
-          s.id = substance.id.to_s + ",#{substance.class.name}"
-          s.name = substance.name
-          tagged_substances.push s
+          unless substance.blank?
+            s = Substance.new
+            s.id = substance.id.to_s + ",#{substance.class.name}"
+            s.name = substance.name
+            tagged_substances.push s
+          end
         end
       end
       tagged_substances
@@ -80,6 +82,7 @@ module StudiedFactorsHelper
     end
     neighboring_assets.select(&:can_view?).collect {|a| a.send(fs_or_ec)}.flatten
   end
+
 
 end
 

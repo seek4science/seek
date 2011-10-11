@@ -84,12 +84,131 @@ class PersonTest < ActiveSupport::TestCase
   end
   
   def test_expertise
-    p=people(:pal)
+    p=Factory :person
+    Factory :expertise,:value=>"golf",:annotatable=>p
+    Factory :expertise,:value=>"fishing",:annotatable=>p
+    Factory :tool,:value=>"sbml",:annotatable=>p
+
     assert_equal 2, p.expertise.size
     
-    p=people(:modeller_person)
+    p=Factory :person
+    Factory :expertise,:value=>"golf",:annotatable=>p
+    Factory :tool,:value=>"sbml",:annotatable=>p
     assert_equal 1, p.expertise.size
-    assert_equal "golf",p.expertise[0].name
+    assert_equal "golf",p.expertise[0].text
+  end
+
+  def test_tools
+    p=Factory :person
+    Factory :tool,:value=>"sbml",:annotatable=>p
+    Factory :tool,:value=>"java",:annotatable=>p
+    Factory :expertise,:value=>"sbml",:annotatable=>p
+
+    assert_equal 2, p.tools.size
+
+    p=Factory :person
+    Factory :tool,:value=>"sbml",:annotatable=>p
+    Factory :expertise,:value=>"fishing",:annotatable=>p
+    assert_equal 1, p.tools.size
+    assert_equal "sbml",p.tools[0].text
+  end
+
+  def test_assign_expertise
+    p=Factory :person
+    User.current_user = p.user
+    assert_equal 0,p.expertise.size
+    assert_difference("Annotation.count",2) do
+      assert_difference("TextValue.count",2) do
+        p.expertise = ["golf","fishing"]
+      end
+    end
+
+    assert_equal 2,p.expertise.size
+    assert p.expertise.collect{|e| e.text}.include?("golf")
+    assert p.expertise.collect{|e| e.text}.include?("fishing")
+
+    assert_difference("Annotation.count",-1) do
+      assert_no_difference("TextValue.count") do
+        p.expertise = ["golf"]
+      end
+    end
+
+    assert_equal 1,p.expertise.size
+    assert_equal "golf",p.expertise[0].text
+
+    p2=Factory :person
+    assert_difference("Annotation.count") do
+      assert_no_difference("TextValue.count") do
+        p2.expertise = ["golf"]
+      end
+    end
+
+
+  end
+
+  def test_assigns_tools
+    p=Factory :person
+    User.current_user = p.user
+    assert_equal 0,p.tools.size
+    assert_difference("Annotation.count",2) do
+      assert_difference("TextValue.count",2) do
+        p.tools = ["golf","fishing"]
+      end
+    end
+
+    assert_equal 2,p.tools.size
+    assert p.tools.collect{|e| e.text}.include?("golf")
+    assert p.tools.collect{|e| e.text}.include?("fishing")
+
+    assert_difference("Annotation.count",-1) do
+      assert_no_difference("TextValue.count") do
+        p.tools = ["golf"]
+      end
+    end
+
+    assert_equal 1,p.tools.size
+    assert_equal "golf",p.tools[0].text
+
+    p2=Factory :person
+    assert_difference("Annotation.count") do
+      assert_no_difference("TextValue.count") do
+        p2.tools = ["golf"]
+      end
+    end
+  end
+
+  def test_removes_previously_assigned
+    p=Factory :person
+    User.current_user = p.user
+    p.tools = ["one","two"]
+    assert_equal 2,p.tools.size
+    p.tools = ["three"]
+    assert_equal 1,p.tools.size
+    assert_equal "three",p.tools[0].text
+    
+    p=Factory :person
+    p.expertise = ["aaa","bbb"]
+    assert_equal 2,p.expertise.size
+    p.expertise = ["ccc"]
+    assert_equal 1,p.expertise.size
+    assert_equal "ccc",p.expertise[0].text
+  end
+
+  def test_expertise_and_tools_with_same_name
+    p=Factory :person
+    User.current_user = p.user
+
+    assert_difference("Annotation.count",2) do
+      assert_difference("TextValue.count",2) do
+        p.tools = ["golf","fishing"]
+      end
+    end
+
+    assert_difference("Annotation.count",2) do
+      assert_no_difference("TextValue.count") do
+        p.expertise = ["golf","fishing"]
+      end
+    end
   end
   
   def test_institutions
@@ -216,6 +335,8 @@ class PersonTest < ActiveSupport::TestCase
     p=people(:quentin_person)
     newP=Person.new(:first_name=>"Fred",:email=>p.email)
     assert !newP.valid?,"Should not be valid as email is not unique"
+    newP.email = p.email.capitalize
+    assert !newP.valid?,"Should not be valid as email is not case sensitive"
     newP.email="zxczxc@zxczxczxc.com"
     assert newP.valid?
   end
@@ -325,5 +446,23 @@ class PersonTest < ActiveSupport::TestCase
     work_group_projects = person.work_groups.map(&:project).uniq.sort_by(&:title)
     assert_equal (group_membership_projects | work_group_projects), person.projects.sort_by(&:title)
   end
-  
+
+  test 'should retrieve the list of people who have the manage right on the item' do
+    user = Factory(:user)
+    person = user.person
+    data_file = Factory(:data_file, :contributor => user)
+    people_can_manage = data_file.people_can_manage
+    assert_equal 1, people_can_manage.count
+    assert_equal person.id, people_can_manage.first[0]
+
+    new_person = Factory(:person_in_project)
+    policy = data_file.policy
+    policy.permissions.build(:contributor => new_person, :access_type => Policy::MANAGING)
+    policy.save
+    people_can_manage = data_file.people_can_manage
+    assert_equal 2, people_can_manage.count
+    people_ids = people_can_manage.collect{|p| p[0]}
+    assert people_ids.include? person.id
+    assert people_ids.include? new_person.id
+  end
 end

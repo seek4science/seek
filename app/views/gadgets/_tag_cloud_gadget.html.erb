@@ -1,0 +1,61 @@
+<div class="sysmo_gadget">
+
+  <div class="header">
+    Tags
+    <%= link_to "[show all]", all_anns_path -%>
+  </div>
+
+  <div class="contents">
+    <% unless Rails.env == "development" -%>
+        <div class="tags_smaller">
+          <div class="hTagcloud">
+
+            <div class="popularity">
+              <%
+                 tag_cloud = TextValue.all_tags
+                 all_tags= tag_cloud.select { |tag| tag.tag_count>=Seek::Config.tag_threshold }
+                 show_tags= tag_cloud.sort { |a, b| b.tag_count<=>a.tag_count }[0...Seek::Config.max_visible_tags]
+                 hidden_tags=all_tags.size != show_tags.size
+                 hidden_class="merged_tag_hidden"
+              %>
+              <% unless all_tags.blank? -%>
+                  <% ann_cloud all_tags, %w(popular v-popular vv-popular vvv-popular vvvv-popular) do |tag, css_class| -%>
+                      <%
+                         hide_tag=!show_tags.include?(tag)
+                         tag_class="#{css_class}"
+                         tag_class << " #{hidden_class}" if hide_tag
+                         style= hide_tag ? "display:none;" : ""  #has to be set as a style rather than in CSS for javascript to work
+                      %>
+                      <%= link_for_ann tag, :truncate_length=>40, :class => tag_class, :style=>"#{style}" -%>
+                  <% end -%>
+              <% end -%>
+
+              <% if hidden_tags -%>
+                  <div class="expand_collapse_tags_button">
+                    <%
+                       button_images=image("expand", :id=>"toggle_merged_button_down") +
+                               image("collapse", :id=>"toggle_merged_button_up", :style=>"display:none;")
+                    %>
+                    <%= link_to_function(button_images) do |page|
+                        page.select(".#{hidden_class}").each do |el|
+                            el.toggle
+                        end
+
+                        page.toggle "toggle_merged_button_down"
+                        page.toggle "toggle_merged_button_up"
+                    end
+                    %>
+                  </div>
+
+              <% end -%>
+            </div>
+
+          </div>
+        </div>
+    <% else -%>
+        <p class="none_text">Tag cloud is disabled in development mode</p>
+    <% end -%>
+  </div>
+</div>
+
+

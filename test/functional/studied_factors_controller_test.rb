@@ -244,6 +244,31 @@ class StudiedFactorsControllerTest < ActionController::TestCase
     end
 
   end
+
+  test "should create factor studied with growth medium item" do
+    data_file=data_files(:editable_data_file)
+    mi = measured_items(:growth_medium)
+    fs = {:measured_item_id => mi.id}
+    post :create, :studied_factor => fs, :data_file_id => data_file.id, :version => data_file.version, :annotation =>{:attribute => 'description', :value => 'test value'}
+    fs = assigns(:studied_factor)
+    assert_not_nil fs
+    assert fs.valid?
+    assert_equal fs.measured_item, mi
+    assert_equal 'test value', fs.annotations_with_attribute('description').first.value.text
+  end
+
+  test "should update factor studied with another description of growth medium item" do
+    fs = studied_factors(:studied_factor_growth_medium)
+    assert_equal measured_items(:growth_medium), fs.measured_item
+    assert_equal 'one value', fs.annotations_with_attribute('description').first.value.text
+
+    put :update, :id => fs.id, :data_file_id => fs.data_file.id, :annotation =>{:attribute => 'description', :value => 'update value'}
+    fs = assigns(:studied_factor)
+    assert_not_nil fs
+    assert fs.valid?
+    assert_equal measured_items(:growth_medium), fs.measured_item
+    assert_equal 'update value', fs.annotations_with_attribute('description').first.value.text
+  end
 end
 
 

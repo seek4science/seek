@@ -25,7 +25,8 @@ module Seek
 
          #if new_substance is a new synonym of an existing compound,need to save that compound and return that synonym to the result
          if !c.new_record? and c.save
-            result.push Synonym.find(:all, :conditions => ['name = ? AND substance_type = ? AND substance_id = ?', new_substance,c.class.name, c.id]).first
+            s = c.synonyms.select{|s| s.title == new_substance}
+            result.push s.first unless s.first.blank?
          else
            result.push c
          end
@@ -38,10 +39,8 @@ module Seek
     result
   end
 
-  def update_substances(substances)
-    result = []
-    unless substances.blank?
-      substances.each do |substance|
+  def update_substance(substance)
+    unless substance.blank?
          #call the webservice to retrieve the substance annotation from sabiork
          #the annotation is stored in a hash, which keys: recommended_name, synonyms, sabiork_id, chebi_ids, kegg_ids
          compound_annotation = Seek::SabiorkWebservices.new().get_compound_annotation(substance)
@@ -57,23 +56,21 @@ module Seek
            #create new or update synonyms
            c = new_or_update_synonyms c, compound_annotation
 
-           result.push c
+           return c
          else
            #if the webservice doesn't return any value: find the compound or create compound with the name substance
            c = Compound.find_by_name(substance) ? Compound.find_by_name(substance) : Compound.new(:name => substance)
-           result.push c
+           return c
          end
-      end
     end
-    result
   end
 
   def no_comma_for_decimal
     check_string = ''
     if self.controller_name.downcase == 'studied_factors'
-      check_string.concat(params[:studied_factor][:start_value].to_s + params[:studied_factor][:end_value].to_s + params[:studied_factor][:standard_deviation].to_s)
+      check_string.concat(try_block{params[:studied_factor][:start_value]}.to_s + try_block{params[:studied_factor][:end_value]}.to_s + try_block{params[:studied_factor][:standard_deviation]}.to_s)
     elsif self.controller_name.downcase == 'experimental_conditions'
-      check_string.concat(params[:experimental_condition][:start_value].to_s + params[:experimental_condition][:end_value].to_s)
+      check_string.concat(try_block{params[:experimental_condition][:start_value]}.to_s)
     end
 
     if check_string.match(',')
@@ -86,7 +83,6 @@ module Seek
     end
   end
 
-    protected
   #double checks and resolves if any new compounds are actually known. This can occur when the compound has been typed completely rather than
   #relying on autocomplete. If not fixed, this could have an impact on preserving compound ownership.
   def check_if_new_substances_are_known new_substances, known_substances
@@ -125,33 +121,60 @@ module Seek
        end
      end
      mapping_links = []
-     #sabiork always has, but not for kegg_ids and chebi_ids
-     if kegg_ids.blank?
-       if chebi_ids.blank?
-          mapping = new_or_update_mapping sabiork_id
-          mapping_links.push MappingLink.new(:substance => compound, :mapping => mapping)
+     #not always every ids are provided, proceed 8 possibilities of the 3 ids combination
+     if sabiork_id.blank?
+       if kegg_ids.blank?
+         unless chebi_ids.blank?
+           chebi_ids.each do |chebi_id|
+             mapping = new_or_update_mapping sabiork_id, chebi_id
+             mapping_links.push MappingLink.new(:substance => compound, :mapping => mapping)
+           end
+         end
        else
-         chebi_ids.each do |chebi_id|
-           mapping = new_or_update_mapping sabiork_id, chebi_id
-           mapping_links.push MappingLink.new(:substance => compound, :mapping => mapping)
+         if chebi_ids.blank?
+           kegg_ids.each do |kegg_id|
+             mapping = new_or_update_mapping sabiork_id, nil, kegg_id
+             mapping_links.push MappingLink.new(:substance => compound, :mapping => mapping)
+           end
+         else
+           kegg_ids.each do |kegg_id|
+           #only create new mapping when it doesn't exist
+             chebi_ids.each do |chebi_id|
+               mapping = new_or_update_mapping sabiork_id, chebi_id, kegg_id
+               mapping_links.push MappingLink.new(:substance => compound, :mapping => mapping)
+             end
+           end
          end
        end
      else
-       if chebi_ids.blank?
-         kegg_ids.each do |kegg_id|
-           mapping = new_or_update_mapping sabiork_id, nil, kegg_id
-           mapping_links.push MappingLink.new(:substance => compound, :mapping => mapping)
+        if kegg_ids.blank?
+         if chebi_ids.blank?
+            mapping = new_or_update_mapping sabiork_id
+            mapping_links.push MappingLink.new(:substance => compound, :mapping => mapping)
+         else
+           chebi_ids.each do |chebi_id|
+             mapping = new_or_update_mapping sabiork_id, chebi_id
+             mapping_links.push MappingLink.new(:substance => compound, :mapping => mapping)
+           end
          end
        else
-         kegg_ids.each do |kegg_id|
-         #only create new mapping when it doesn't exist
-           chebi_ids.each do |chebi_id|
-             mapping = new_or_update_mapping sabiork_id, chebi_id, kegg_id
+         if chebi_ids.blank?
+           kegg_ids.each do |kegg_id|
+             mapping = new_or_update_mapping sabiork_id, nil, kegg_id
              mapping_links.push MappingLink.new(:substance => compound, :mapping => mapping)
+           end
+         else
+           kegg_ids.each do |kegg_id|
+           #only create new mapping when it doesn't exist
+             chebi_ids.each do |chebi_id|
+               mapping = new_or_update_mapping sabiork_id, chebi_id, kegg_id
+               mapping_links.push MappingLink.new(:substance => compound, :mapping => mapping)
+             end
            end
          end
        end
      end
+
      compound.mapping_links = mapping_links
      compound
   end
@@ -178,6 +201,29 @@ module Seek
      mapping = mappings.blank? ? Mapping.new(:sabiork_id => sabiork_id, :chebi_id => chebi_id, :kegg_id => kegg_id) :  mappings.first
      mapping
   end
+
+=begin
+  def create_annotation entity, owner=User.current_user
+    unless owner.blank?
+      annotation = Annotation.new(:attribute_name => params[:annotation][:attribute_name],
+                        :value => params[:annotation][:value],
+                        :source => owner,
+                        :annotatable => entity)
+      annotation.save!
+    end
   end
 
+  def create_or_update_annotation entity, owner=User.current_user
+    unless owner.blank?
+      current = entity.annotations_with_attribute(params[:annotation][:attribute_name])
+      unless annotation.blank?
+        annotation.update_attributes!({:attribute_name => params[:annotation][:attribute_name], :value => params[:annotation][:value]})
+      else
+        create_annotation owner
+      end
+    end
+  end
+=end
+
+  end
 end

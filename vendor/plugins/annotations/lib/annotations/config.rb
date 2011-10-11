@@ -16,7 +16,7 @@ module Annotations
     #
     # e.g: { "tag" => [ '"', ','] } or { "tag" => '"' }
     # 
-    # NOTE: The attribute name(s) specified MUST all be in lowercase.  
+    # NOTE: The attribute name(s) specified MUST all be in lowercase. 
     @@strip_text_rules = { }
     
     # This allows you to specify a different model name for users in the system (if different from the default: "User").
@@ -70,6 +70,30 @@ module Annotations
     # AnnotationAttribute#identifier value. See AnnotationAttribute#before_validation for more info.
     @@attribute_name_transform_for_identifier = Proc.new { |name| name.to_s }
     
+    # This stores the factory Procs that are used to generate the value objects
+    # for annotations, based on the attribute name.
+    #
+    # - Keys should be attribute names (as Strings, in lowercase).
+    # - Values should either be a Proc that takes in one argument - the raw value object, that is then used 
+    # to output the actual value to be stored. IMPORTANT: the Procs must be exhibit consistent data behaviour. 
+    # I.e. should be able to run them over and over again without causing data inconsistencies or harmful side effects.
+    #
+    # NOTE (1): this is run BEFORE the default value generation logic in the +Annotation+ model.
+    # The default value generation logic will still run after the Proc.
+    # NOTE (2): The attribute name(s) specified MUST all be in lowercase.
+    @@value_factories_for_attributes = { }
+    
+    # This determines the valid value types that are allowed for certain attribute names.
+    #
+    # - Keys should be attribute names (as Strings, in lowercase).
+    # - Values should be an Array of Strings, or single String, of valid class names for the value object type.
+    #
+    # NOTE (1): It is possible to use the above +value_factories_for_attributes+ option to achieve
+    # similar behaviour. However, this config option allows you to state explicitly what types are
+    # allowed as value objects.
+    # NOTE (2): The attribute name(s) specified MUST all be in lowercase.
+    @@valid_value_types = { }
+    
     def self.reset
       @@attribute_names_for_values_to_be_downcased = [ ]
       @@attribute_names_for_values_to_be_upcased = [ ]
@@ -80,6 +104,8 @@ module Annotations
       @@content_restrictions = { }
       @@default_attribute_identifier_template = "http://www.example.org/attribute#%s"
       @@attribute_name_transform_for_identifier = Proc.new { |name| name.to_s }
+      @@value_factories = { }
+      @@valid_value_types = { }
     end
     
     reset
@@ -94,7 +120,9 @@ module Annotations
       :attribute_names_to_allow_duplicates,
       :content_restrictions,
       :default_attribute_identifier_template,
-      :attribute_name_transform_for_identifier ].each do |sym|
+      :attribute_name_transform_for_identifier,
+      :value_factories,
+      :valid_value_types ].each do |sym|
       class_eval <<-EOS, __FILE__, __LINE__
         def self.#{sym}
           if defined?(#{sym.to_s.upcase})

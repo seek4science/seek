@@ -52,7 +52,7 @@ module ResourceListItemHelper
   end
 
   def list_item_tag_list resource
-    list_item_simple_list(resource.tag_counts, "Tags") {|i| link_for_tag(i)}
+    list_item_simple_list(resource.annotations.collect{|a| a.value}, "Tags") {|i| link_for_ann(i)}
   end
 
   def list_item_simple_list items, attribute
@@ -85,7 +85,8 @@ module ResourceListItemHelper
 
   def list_item_authorized_attribute attribute, object, url='undefined', method = :title
     url = object if url == 'undefined'
-    list_item_optional_attribute attribute, object.try(:can_view?) ? object.send(method) : nil, url, "Not available"
+    not_authorized_text = object.try(:title_is_public?) ? object.title : "Not available"
+    list_item_optional_attribute attribute, object.try(:can_view?) ? object.send(method) : nil, url, not_authorized_text
   end
 
   def list_item_optional_attribute attribute, value, url=nil, missing_value_text="Not specified"

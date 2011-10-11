@@ -9,3 +9,6 @@ time:
 
 pressure:
   title: pressure
+
+growth_medium:
+  title: growth medium

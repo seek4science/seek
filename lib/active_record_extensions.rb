@@ -38,9 +38,15 @@ module ActiveRecordExtensions
         end
       end
 
+      def self.is_taggable?
+        self.ancestors.include?(Seek::Taggable)
+      end
+
       class_alias_method_chain :accepts_nested_attributes_for, :allow_destroy_bugfix
 
     end
+
+
   end
 
   def defines_own_avatar?
@@ -70,7 +76,7 @@ module ActiveRecordExtensions
     #currently based upon the naive assumption that downloadable items are publishable, which is currently the case but may change.
     is_downloadable?
   end
-  
+
 end
 
 ActiveRecord::Base.class_eval do

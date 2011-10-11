@@ -4,13 +4,6 @@ class AssetTest < ActiveSupport::TestCase
   fixtures :all
   include ApplicationHelper
 
-  test "creatable classes order" do
-    oldval = Seek::Config.is_virtualliver
-    Seek::Config.is_virtualliver = true
-    assert_equal [DataFile,Model,Presentation,Publication,Sop,Assay,Investigation,Study,Event,Sample,Specimen],user_creatable_classes
-    Seek::Config.is_virtualliver = oldval
-  end
-
   test "default contributor or nil" do
     User.current_user = users(:owner_of_my_first_sop)
     model = Model.new(Factory.attributes_for(:model).tap{|h|h[:contributor] = nil})
@@ -115,6 +108,21 @@ class AssetTest < ActiveSupport::TestCase
     policy.permissions << Factory(:permission, :contributor => p1, :access_type => Policy::MANAGING, :policy => policy)
     model=Factory(:model,:policy=>policy,:contributor=>p2)
     assert model.managers.empty?
+  end
+
+  test "tags as text array" do
+    model = Factory :model
+    u = Factory :user
+    Factory :tag,:annotatable=>model,:source=>u,:value=>"aaa"
+    Factory :tag,:annotatable=>model,:source=>u,:value=>"bbb"
+    Factory :tag,:annotatable=>model,:source=>u,:value=>"ddd"
+    Factory :tag,:annotatable=>model,:source=>u,:value=>"ccc"
+    assert_equal ["aaa","bbb","ccc","ddd"],model.tags_as_text_array.sort
+
+    p = Factory :person
+    Factory :expertise,:annotatable=>p,:source=>u,:value=>"java"
+    Factory :tool,:annotatable=>p,:source=>u,:value=>"trowel"
+    assert_equal ["java","trowel"],p.tags_as_text_array.sort
   end
 
 

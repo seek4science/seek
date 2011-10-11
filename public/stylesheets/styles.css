@@ -813,7 +813,7 @@ a.asset img.avatar {
     min-height: 3em;
 }
 
-div.list_item {
+div.list_item, div.private_list_item, div.public_list_item {
     width: 95%;
     background-color: #F0F0F0;
     margin-top: 6px;
@@ -1456,49 +1456,7 @@ a.advanced_sharing_link{
 /*Factors studied, experimental condition, substances*/
 div.substance_condition_factor{
     margin-bottom: 1em;
-    margin-bottom: 1em;
     width: 25em;
-}
-
-div.substance_experimental_condition{
-    position:relative;
-    margin-left: -16em;
-    margin-bottom: 1em;
-    width: 25em;
-}
-
-table.substance_info {
-	border-width: 1px;
-	border-spacing: 2px;
-	border-style: outset;
-	border-color: #DDD;
-	border-collapse: separate;
-	background-color: white;
-    margin-top: 0.5em;
-
-
-}
-table.substance_info th {
-	border-width: 1px;
-	padding: 1px;
-	border-style: inset;
-	border-color: #DDD;
-	background-color: white;
-}
-table.substance_info td {
-	border-width: 1px;
-	padding: 1px;
-	border-style: inset;
-	border-color: #DDD;
-	background-color: white;
-}
-input.search_substance_info {
-    font-weight:bold;
-}
-div.add_substance_concentration {
-   border-top: 1px dashed #DDD;
-   margin-top: 0.5em;
-   margin-bottom: 1em;
 }
 
 ul.conditions_or_factors li {
@@ -1592,3 +1550,72 @@ ul.existing_conditions_or_factors li {
 .space_for_alignment {
   width: 1em;
 }
+
+div.growth_medium_or_buffer_description {
+    margin-bottom: 1em;
+}
+table.conditions_or_factor_table {
+   margin-bottom: 1em;
+}
+
+/*Compound*/
+ul.compounds li {
+    list-style-type:none;
+}
+
+ul.compounds {
+    float: left;
+    margin-top: 2em;
+}
+
+ul.compound_row {
+    clear:both;
+    border-bottom: dotted #d3d3d3 1px;
+}
+
+ul.compound_row li {
+    float:left;
+    padding: 0 0.6em 0.25em 0.25em;
+    text-align:left;
+    min-height: 2em;
+}
+
+ul.compound_row li#compound_name {
+    width:13em;
+}
+
+ul.compound_row li#synonyms {
+    width:13em;
+}
+
+ul.compound_row li#sabiork_id {
+    width:6em;
+}
+
+ul.compound_row li#chebi_ids {
+    width:5em;
+}
+
+ul.compound_row li#kegg_ids {
+    width:5em;
+}
+
+ul.compound_row li#delete {
+    width:1em;
+}
+
+div.compounds {
+    border: 1px solid #DDD;
+    float: left;
+    margin-left: 4em;
+    margin-top: 2em;
+    margin-bottom: 1em;
+    width: 48em;
+    padding: 0 1em 0.5em 1em;
+}
+
+
+
+
+
+

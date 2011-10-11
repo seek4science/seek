@@ -8,7 +8,15 @@ module Annotations
       end
 
       module ClassMethods
-        def acts_as_annotatable
+        def acts_as_annotatable(options)
+          cattr_accessor :annotatable_name_field, :is_annotatable
+          
+          if options[:name_field].blank?
+            raise ArgumentError.new("Must specify the :name_field option that will be used as the field for the name")
+          end
+          
+          self.annotatable_name_field = options[:name_field] 
+          
           has_many :annotations, 
                    :as => :annotatable, 
                    :dependent => :destroy, 
@@ -16,6 +24,8 @@ module Annotations
                    
           __send__ :extend, SingletonMethods
           __send__ :include, InstanceMethods
+          
+          self.is_annotatable = true
         end
       end
       
@@ -24,101 +34,127 @@ module Annotations
         # Helper finder to get all annotations for an object of the mixin annotatable type with the ID provided.
         # This is the same as object.annotations with the added benefit that the object doesnt have to be loaded.
         # E.g: Book.find_annotations_for(34) will give all annotations for the Book with ID 34.
-        def find_annotations_for(id)
+        def find_annotations_for(id, include_values=false)
           obj_type = ActiveRecord::Base.send(:class_name_of_active_record_descendant, self).to_s
           
-          Annotation.find(:all,
-                          :conditions => { :annotatable_type =>  obj_type, 
-                                           :annotatable_id => id },
-                          :order => "updated_at DESC")
+          options = { 
+            :conditions => { :annotatable_type =>  obj_type, 
+                             :annotatable_id => id },
+            :order => "updated_at DESC"
+          }
+          
+          options[:include] = [ :value ] if include_values
+          
+          Annotation.find(:all, options)
         end
         
         # Helper finder to get all annotations for all objects of the mixin annotatable type, by the source specified.
         # E.g: Book.find_annotations_by('User', 10) will give all annotations for all Books by User with ID 10. 
-        def find_annotations_by(source_type, source_id)
+        def find_annotations_by(source_type, source_id, include_values=false)
           obj_type = ActiveRecord::Base.send(:class_name_of_active_record_descendant, self).to_s
           
-          Annotation.find(:all,
-                          :conditions => { :annotatable_type =>  obj_type, 
-                                           :source_type => source_type,
-                                           :source_id => source_id },
-                          :order => "updated_at DESC")
+          options = {
+            :conditions => { :annotatable_type =>  obj_type, 
+                             :source_type => source_type,
+                             :source_id => source_id },
+            :order => "updated_at DESC"
+          }
+          
+          options[:include] = [ :value ] if include_values
+          
+          Annotation.find(:all, options)
         end
       end
       
       # This module contains instance methods
       module InstanceMethods
         
-        # Provides a default implementation to get the display name for 
-        # an annotatable object, that can be overrided.
+        # Gets the name of the annotatable object
         def annotatable_name
-          %w{ preferred_name display_name title name }.each do |w|
-            return eval("self.#{w}") if self.respond_to?(w)
-          end
-          return "#{self.class.name}_#{self.id}"
+          self.send(self.class.annotatable_name_field)
         end
         
         # Helper method to get latest annotations
-        def latest_annotations(limit=nil)
+        def latest_annotations(limit=nil, include_values=false)
           obj_type = ActiveRecord::Base.send(:class_name_of_active_record_descendant, self.class).to_s
           
-          Annotation.find(:all,
-                          :conditions => { :annotatable_type =>  obj_type, 
-                                           :annotatable_id => self.id },
-                          :order => "updated_at DESC",
-                          :limit => limit)
+          options = {
+            :conditions => { :annotatable_type =>  obj_type, 
+                             :annotatable_id => self.id },
+            :order => "updated_at DESC",
+            :limit => limit
+          }
+          
+          options[:include] = [ :value ] if include_values
+          
+          Annotation.find(:all, options)
         end
         
         # Finder to get annotations with a specific attribute.
         # The input parameter is the attribute name 
         # (MUST be a String representing the attribute's name).
-        def annotations_with_attribute(attrib)
+        def annotations_with_attribute(attrib, include_values=false)
           return [] if attrib.blank?
           
           obj_type = ActiveRecord::Base.send(:class_name_of_active_record_descendant, self.class).to_s
           
-          Annotation.find(:all,
-                          :joins => :attribute,
-                          :conditions => { :annotatable_type => obj_type,
-                                           :annotatable_id => self.id,
-                                           :annotation_attributes =>  { :name => attrib.strip.downcase } },
-                          :order => "updated_at DESC")
+          options = {
+            :joins => :attribute,
+            :conditions => { :annotatable_type => obj_type,
+            :annotatable_id => self.id,
+            :annotation_attributes =>  { :name => attrib.strip.downcase } },
+            :order => "updated_at DESC"
+          }
+          
+          options[:include] = [ :value ] if include_values
+          
+          Annotation.find(:all, options)
         end
         
         # Same as the {obj}.annotations_with_attribute method (above) but 
         # takes in an array for attribute names to look for.
         #
         # NOTE (1): the argument to this method MUST be an Array of Strings.
-        def annotations_with_attributes(attribs)
+        def annotations_with_attributes(attribs, include_values=false)
           return [] if attribs.blank?
           
           obj_type = ActiveRecord::Base.send(:class_name_of_active_record_descendant, self.class).to_s
           
-          Annotation.find(:all,
-                          :joins => :attribute,
-                          :conditions => { :annotatable_type => obj_type,
-                                           :annotatable_id => self.id,
-                                           :annotation_attributes =>  { :name => attribs } },
-                          :order => "updated_at DESC")
+          options = {
+            :joins => :attribute,
+            :conditions => { :annotatable_type => obj_type,
+                             :annotatable_id => self.id,
+                             :annotation_attributes =>  { :name => attribs } },
+            :order => "updated_at DESC"
+          }
+          
+          options[:include] = [ :value ] if include_values
+          
+          Annotation.find(:all, options)
         end
         
         # Finder to get annotations with a specific attribute by a specific source.
         #
         # The first input parameter is the attribute name (MUST be a String representing the attribute's name).
         # The second input is the source object.
-        def annotations_with_attribute_and_by_source(attrib, source)
+        def annotations_with_attribute_and_by_source(attrib, source, include_values=false)
           return [] if attrib.blank? or source.nil?
           
           obj_type = ActiveRecord::Base.send(:class_name_of_active_record_descendant, self.class).to_s
           
-          Annotation.find(:all,
-                          :joins => :attribute,
-                          :conditions => { :annotatable_type => obj_type,
-                                           :annotatable_id => self.id,
-                                           :source_type => source.class.name,
-                                           :source_id => source.id,
-                                           :annotation_attributes =>  { :name => attrib.strip.downcase } },
-                          :order => "updated_at DESC")
+          options = {
+            :joins => :attribute,
+            :conditions => { :annotatable_type => obj_type,
+                             :annotatable_id => self.id,
+                             :source_type => source.class.name,
+                             :source_id => source.id,
+                             :annotation_attributes =>  { :name => attrib.strip.downcase } },
+            :order => "updated_at DESC"
+          }
+          
+          options[:include] = [ :value ] if include_values
+          
+          Annotation.find(:all, options)
         end
         
         # Finder to get all annotations on this object excluding those that
@@ -126,18 +162,23 @@ module Annotations
         #
         # NOTE (1): the argument to this method MUST be an Array of Strings.
         # NOTE (2): the returned records will be Read Only.
-        def all_annotations_excluding_attributes(attribs)
+        def all_annotations_excluding_attributes(attribs, include_values=false)
           return [] if attribs.blank?
           
           obj_type = ActiveRecord::Base.send(:class_name_of_active_record_descendant, self.class).to_s
           
-          Annotation.find(:all,
-                          :joins => :attribute,
-                          :conditions => [ "`annotations`.`annotatable_type` = ? AND `annotations`.`annotatable_id` = ? AND `annotation_attributes`.`name` NOT IN (?)",
-                                           obj_type,
-                                           self.id,
-                                           attribs ],
-                          :order => "`annotations`.`updated_at` DESC")
+          options = {
+            :joins => :attribute,
+            :conditions => [ "`annotations`.`annotatable_type` = ? AND `annotations`.`annotatable_id` = ? AND `annotation_attributes`.`name` NOT IN (?)",
+                             obj_type,
+                             self.id,
+                             attribs ],
+            :order => "`annotations`.`updated_at` DESC"
+          }
+          
+          options[:include] = [ :value ] if include_values
+          
+          Annotation.find(:all, options)
         end
         
         # Returns the number of annotations on this annotatable object by the source type specified.

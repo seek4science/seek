@@ -5,7 +5,7 @@ class PeopleController < ApplicationController
   before_filter :current_user_exists,:only=>[:select,:userless_project_selected_ajax,:create,:new]
   before_filter :profile_belongs_to_current_or_is_admin, :only=>[:edit, :update]
   before_filter :profile_is_not_another_admin_except_me, :only=>[:edit,:update]
-  before_filter :is_user_admin_auth, :only=>[:destroy]
+  before_filter :is_user_admin_auth,:only=>[:destroy]
   before_filter :is_user_admin_or_personless, :only=>[:new]
   before_filter :auth_params,:only=>[:update,:create]
 
@@ -265,36 +265,18 @@ class PeopleController < ApplicationController
   end
 
   private
-
+  
   def set_tools_and_expertise person,params
 
-      tags=""
-      params[:tools_autocompleter_selected_ids].each do |selected_id|        
-        tag=ActsAsTaggableOn::Tag.find(selected_id)        
-        tags << tag.name << ","
-      end unless params[:tools_autocompleter_selected_ids].nil?
-      params[:tools_autocompleter_unrecognized_items].each do |item|
-        tags << item << ","
-      end unless params[:tools_autocompleter_unrecognized_items].nil?
-
-      person.tool_list=tags
-    
-      tags=""
-      params[:expertise_autocompleter_selected_ids].each do |selected_id|
-        tag=ActsAsTaggableOn::Tag.find(selected_id)
-        tags << tag.name << ","
-      end unless params[:expertise_autocompleter_selected_ids].nil?
-      params[:expertise_autocompleter_unrecognized_items].each do |item|
-        tags << item << ","
-      end unless params[:expertise_autocompleter_unrecognized_items].nil?
-      person.expertise_list=tags
+      person.expertise =  params
+      person.tools = params
 
       #FIXME: don't like this, but is a temp solution for handling lack of observer callback when removing a tag. Also should only expire when they have changed.
       expire_fragment("sidebar_tag_cloud")
       expire_fragment("super_tag_cloud")
 
   end
-  
+
   def profile_belongs_to_current_or_is_admin
     @person=Person.find(params[:id])
     unless @person == current_user.person || User.admin_logged_in? || current_user.person.is_project_manager?
@@ -337,5 +319,4 @@ class PeopleController < ApplicationController
       params[:person].delete(param) if params[:person] and not allowed
     end
   end
-
 end

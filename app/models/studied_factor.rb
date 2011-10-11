@@ -6,8 +6,12 @@ class StudiedFactor < ActiveRecord::Base
   belongs_to :data_file
   has_many :studied_factor_links, :before_add => proc {|sf,sfl| sfl.studied_factor = sf}, :dependent => :destroy
 
-  validates_presence_of :unit,:measured_item,:start_value,:data_file
-  validates_presence_of :studied_factor_links, :if => Proc.new{|fs| fs.measured_item.title == 'concentration'}, :message => "can't be a nil"
+  validates_presence_of :measured_item,:data_file
+  validates_presence_of :studied_factor_links, :if => Proc.new{|fs| fs.measured_item.title == 'concentration'}, :message => "can't be a empty"
+  validates_presence_of :start_value, :unit, :unless => Proc.new{|fs| fs.measured_item.title == 'growth medium' || fs.measured_item.title == 'buffer'}, :message => "can't be a empty"
+
+  acts_as_annotatable :name_field => :tag
+  include Seek::Taggable
 
   def range_text
     #TODO: write test

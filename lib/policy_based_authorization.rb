@@ -24,6 +24,14 @@ module Acts
         true
       end
 
+      def private?
+        policy.private?
+      end
+
+      def public?
+        policy.public?
+      end
+
       def default_policy
         Policy.default
       end
@@ -48,6 +56,15 @@ module Acts
         if self.new_record? && contributor.nil?
           self.contributor = default_contributor
         end
+      end
+
+      #use request_permission_summary to retrieve who can manage the item
+      def people_can_manage
+        contributor = self.class.name=='Assay' ? self.contributor : try_block{self.contributor.person}
+        return [[contributor.id, "#{contributor.first_name} #{contributor.last_name}", Policy::MANAGING]] if policy.blank?
+        creators = is_downloadable? ? self.creators : []
+        grouped_people_by_access_type = policy.summarize_permissions creators, contributor
+        grouped_people_by_access_type[Policy::MANAGING]
       end
 
       AUTHORIZATION_ACTIONS.each do |action|

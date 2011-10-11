@@ -2,7 +2,10 @@ class AnnotationReindexer < ReindexerObserver
   observe :annotation
 
   def consequences annotation
-    annotation.annotatable.reindexing_consequences
+    c=[]
+    c = c | annotation.annotatable.reindexing_consequences if annotation.annotatable.respond_to?(:reindexing_consequences)
+    c << annotation.annotatable if annotation.annotatable.respond_to?(:solr_save)
+    c.uniq
   end
   
 end

@@ -13,6 +13,12 @@ class User < ActiveRecord::Base
   has_many :data_files, :as=>:contributor
   has_many :models,:as=>:contributor
   has_many :presentations,:as=>:contributor
+  has_many :events, :as => :contributor
+  has_many :publications, :as => :contributor
+
+  has_many :investigations,:as=>:contributor
+  has_many :studies,:as=>:contributor
+
   #restful_authentication plugin generated code ...
   # Virtual attribute for the unencrypted password
   attr_accessor :password

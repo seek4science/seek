@@ -43,9 +43,7 @@ class Publication < ActiveRecord::Base
 
   alias :seek_authors :creators
   
-  acts_as_solr(:fields=>[:title,:abstract,:journal,:tag_counts]) if Seek::Config.solr_enabled
-  
-  acts_as_uniquely_identifiable
+  acts_as_solr(:fields=>[:title,:abstract,:journal,:searchable_tags]) if Seek::Config.solr_enabled
 
   #TODO: refactor to something like 'sorted_by :start_date', which should create the default scope and the sort method. Maybe rename the sort method.
   default_scope :order => "#{self.table_name}.published_date DESC"
@@ -61,7 +59,7 @@ class Publication < ActiveRecord::Base
     self.title = pubmed_record.title.chop #remove full stop
     self.abstract = pubmed_record.abstract
     self.published_date = pubmed_record.date_published
-    self.journal = pubmed_record.journal || (get_journal_from_xml pubmed_record.xml)
+    self.journal = pubmed_record.journal
     self.pubmed_id = pubmed_record.pmid
   end
   
@@ -103,13 +101,6 @@ class Publication < ActiveRecord::Base
   #defines that this is a user_creatable object type, and appears in the "New Object" gadget
   def self.user_creatable?
     true
-  end
-  #some PUBMED/DOI fields cant be retrieved from direct calls on the fetching of query result, but these fields are also store in xml field
-  def get_journal_from_xml xml_node
-    unless xml_node.blank?
-      namespace = "//PubmedArticle/MedlineCitation/Article/Journal/Title"
-      return try_block{xml_node.find_first(namespace).content}
-    end
   end
 end
 

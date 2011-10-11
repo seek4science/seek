@@ -70,39 +70,37 @@
       </p>
       <% end -%>
 
-     <%# if Seek::Config.is_virtualliver or !@assay.assay_organisms.blank? && @assay.samples.blank?%>
-     <%  if !@assay.assay_organisms.blank? && @assay.samples.blank?%>
+
       <p id="organism">
           <b>Organisms: </b>
           <%= show_assay_organisms_list @assay.assay_organisms %>
       </p>
-    <% end %>
 
-     <%# if Seek::Config.is_virtualliver and @assay.assay_organisms.blank? and !@assay.samples.blank?%>
-     <%  if @assay.assay_organisms.blank? && !@assay.samples.blank? %>
-     <p id="specimens">
-       <b>Specimens: </b>
-       <% specimens = [] %>
-       <%if !@assay.samples.blank?
-            @assay.samples.each do |sample|
-                found = specimens.select{|s|s==sample.specimen}
-                if found.blank?
-                    specimens << sample.specimen
-                end
-             end %>
-        <%= specimens_link_list specimens %>
-       <% else %>
-          <span class='none_text'>Not Specified</span>
-       <% end %>
+      <% if Seek::Config.is_virtualliver %>
+         <p id="specimens">
+           <b>Specimens: </b>
+           <% specimens = [] %>
+           <%if !@assay.samples.blank?
+                @assay.samples.each do |sample|
+                    found = specimens.select{|s|s==sample.specimen}
+                    if found.blank?
+                        specimens << sample.specimen
+                    end
+                 end %>
+            <%= specimens_link_list specimens %>
+           <% else %>
+              <span class='none_text'>Not Specified</span>
+           <% end %>
+             </p>
+
+         <p id="Samples">
+           <b>Samples: </b>
+           <%= samples_link_list @assay.samples%>
          </p>
-
-     <p id="Samples">
-       <b>Samples: </b>
-       <%= samples_link_list @assay.samples%>
-         </p>
-     <% end -%>
+      <% end %>
 
 
+     <%# FIXME: should be in a css file rather than in the middle of a page -%>
       <style type="text/css">
           div.data_model_relationship {
               border: 1px dotted black;

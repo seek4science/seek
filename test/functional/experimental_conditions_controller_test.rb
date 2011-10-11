@@ -243,4 +243,29 @@ class ExperimentalConditionsControllerTest < ActionController::TestCase
       assert_nil ExperimentalConditionLink.find_by_id(ecl.id)
     end
   end
+
+  test "should create experimental condition with growth medium item" do
+    sop = sops(:editable_sop)
+    mi = measured_items(:growth_medium)
+    ec = {:measured_item_id => mi.id}
+    post :create, :experimental_condition => ec, :sop_id => sop.id, :version => sop.version, :annotation =>{:attribute => 'description', :value => 'test value'}
+    ec = assigns(:experimental_condition)
+    assert_not_nil ec
+    assert ec.valid?
+    assert_equal ec.measured_item, mi
+    assert_equal 'test value', ec.annotations_with_attribute('description').first.value.text
+  end
+
+  test "should update experimental condition with another description of growth medium item" do
+    ec = experimental_conditions(:experimental_condition_growth_medium)
+    assert_equal measured_items(:growth_medium), ec.measured_item
+    assert_equal 'one value', ec.annotations_with_attribute('description').first.value.text
+
+    put :update, :id => ec.id, :sop_id => ec.sop.id, :annotation =>{:attribute => 'description', :value => 'update value'}
+    ec = assigns(:experimental_condition)
+    assert_not_nil ec
+    assert ec.valid?
+    assert_equal measured_items(:growth_medium), ec.measured_item
+    assert_equal 'update value', ec.annotations_with_attribute('description').first.value.text
+  end
 end

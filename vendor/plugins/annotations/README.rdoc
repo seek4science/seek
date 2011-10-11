@@ -2,15 +2,29 @@
 
 
 Original Author::   	Jiten Bhagat (mailto:mail@jits.co.uk)
-Copyright::         	(c) 2008-2010, the University of Manchester and the European Bioinformatics Institute (EMBL-EBI)
+Copyright::         	(c) 2008-2011, the University of Manchester and the European Bioinformatics Institute (EMBL-EBI)
 License::           	BSD
-Version::           	0.1.1
+Version::           	0.4.1
+
+== IMPORTANT NOTE
+
+In v0.2.0+ this plugin has been modified substantially to support polymorphic annotation values rather than just strings.
 
 == Overview
 
-This plugin allows arbitrary metadata to be stored and retrieved for any model object in your Ruby on Rails (v2.2+) application. This metadata is in the form of attribute/value data pairs that, together with provenance information, make up 'annotations'. These annotations are "attached" to a model object in your application. 
+This plugin allows arbitrary metadata and relationships to be stored and retrieved, in the form of *Annotations* for any model objects in your Ruby on Rails (v2.2+) application. 
 
-The idea is to abstract out and decouple annotations from your application's core data model and allow layering in of metadata easily.
+Annotations are in the form:
+
+  Annotation = Annotatable (what thing are you talking about?) 
+             + Attribute (what is the kind/class of annotation? [tag? description?]) 
+             + Value (what is the data or other thing you want to associate with the annotatable)) 
+             + Source (who/what made this annotation?)
+             + Version Info (how many versions of this annotation are there?) 
+             + Timestamps (when was this annotation created/updated?)
+
+
+The idea is to provide a consistent and systematic way to abstract out and decouple annotations from your application's core data model and allow layering in of metadata/relationships easily.
 
 Examples of things you can use the annotations plugin for:
 * Tags
@@ -20,17 +34,36 @@ Examples of things you can use the annotations plugin for:
 * Notes
 * Comments
 
+A concrete example of a 'tag' Annotation:
+
+  Ann1 = <car SF8 JK0>      (Annotatable)
+       + <tag>              (Attribute)
+       + <dirty>            (Value)
+       + <Autobot 3000>     (Source)
+       + <v1>               (Version Info)
+       + <2011-07-06 10:00> (Timestamps)
+
+A concrete example of another kind of Annotation:
+
+  Ann1 = <dog jack>         (Annotatable)
+       + <isBreed>          (Attribute)
+       + <chihuahua>        (Value)
+       + <Dave Elias>       (Source)
+       + <v2>               (Version Info)
+       + <2011-07-06 11:00> (Timestamps)
+
 The main benefit is that annotations are stored and retrieved in a uniform manner with a common API. Parts of the plugin can also be extended and overridden in your application (see the Usage section for more info).
 
 The annotations plugin is currently being used successfully in the BioCatalogue {codebase}[http://rubyforge.org/projects/biocatalogue] to allow easy annotation of web services and their deployments/versions/operations/inputs/outputs/etc. Check out http://www.biocatalogue.org.
 
 === Features:
 
-* A complete set of ActiveRecord models for annotations, annotation attributes and annotation value seeds.
-* acts_as_annotatable and acts_as_annotation source mixin modules for your models, complete with a number of advanced finders.
+* A complete set of ActiveRecord models for annotations, annotation attributes and annotation values and annotation value seeds.
+* acts_as_annotatable, acts_as_annotation_source and acts_as_annotation_value mixin modules for your models, complete with a number of advanced finders.
 * A basic CRUD controller that can be used out of the box to list, create, view, edit and delete annotations.
 * Versioning of annotations - all updates to annotations cause a new version of that annotation to be created.
 * Annotation Value Seeds can be used to set up some default/preliminary seed data for attributes without having to create annotations.
+* Lots of configuration options!
 
 == Full Documentation
 
@@ -53,27 +86,26 @@ The generated documentation will be in the _doc_ folder of the annotations plugi
 == Conceptual Data Model
 
 At a conceptual level, an *Annotation* consists of:
-* a link to the thing being annotated - the <b>Annotatable</b>
+* a link to the thing being annotated - the *Annotatable*
+* a link to the attribute which specifies what kind of annotation this is - the *Attribute*
+* a link to the value of the annotation - the *Value*
 * a link to the source of the annotation - the *Source*
-* a link to the attribute which specifies what kind of annotation this is - the <b>Attribute</b>
-* the value of the annotation (currently only free text and stored as a string) - the <b>Value</b>
-* the data type of the value (defaults to "String") - the <b>Value Type</b>
-* version information - <b>Version Info</b>
-* timestamps for event time info - <b>Timestamps</b>
+* version information - *Version Info*
+* timestamps for event time info - *Timestamps*
 
 This can be represented as:
 
-  Annotation = Annotatable + Source + Attribute + Value + Value Type + Version Info + Timestamps
+  Annotation = Annotatable + Attribute + Value + Source + Version Info + Timestamps
 
 The database model for an Annotation is made up of the following fields:
 
-  | id | annotatable_type | annotatable_id | source_type | source_id | attribute_id | value | value_type | version | version_creator_id | created_at | updated_at |
+  | id | annotatable_type | annotatable_id | source_type | source_id | attribute_id | value_type | value_id | version | version_creator_id | created_at | updated_at |
 
-This makes use of ActiveRecord polymorphic relationships to allow any ActiveRecord model to be an Annotatable or Source.
+This makes use of ActiveRecord polymorphic relationships to allow any ActiveRecord model to be an Annotatable, Source and Value.
 
 *Note:* The _version_creator_id_ field is only relevant when there are more than one version of an Annotation. I.e.: for the first version of the annotation the _version_creator_id_ will be nil.
 
-Annotation Attributes currently only consist of a name. This is the _attribute_ or _property_ you are describing for an Annotatable. Examples: 'tag', 'description', etc.
+Annotation Attributes currently consist of a name and a unique identifier (in the form of a URI). This is the _attribute_ or _property_ you are describing for an Annotatable. Examples: 'tag', 'description', etc.
 
 == Versioning of Annotations
 

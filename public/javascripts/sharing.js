@@ -917,8 +917,30 @@ function selectedAccessType(sharing_scope){
     return escape(access_type)
 }
 
+function getProjectIds(resource_name){
+    var project_ids
+    //in case of study, return the id of investigation, then from the server side, the project_ids are retrieved
+    if (resource_name == 'study'){
+       project_ids = $F('study_investigation_id')
+    }
+    //in case of assay, return the id of study, then from the server side, the project_ids are retrieved
+    else if (resource_name == 'assay'){
+       project_ids = $F('assay_study_id')
+    }
+    else{
+      project_ids = $F(resource_name + '_project_ids')
+    }
+    return project_ids
+}
 
+function getCreators(){
+    var creators = []
+    var element = $('creators')
+    if (element != null)
+      creators = $F('creators')
 
+    return creators
+}
 
 
 

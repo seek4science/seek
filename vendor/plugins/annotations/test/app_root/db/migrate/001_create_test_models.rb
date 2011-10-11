@@ -22,6 +22,11 @@ class CreateTestModels < ActiveRecord::Migration
     create_table :groups, :force => true do |t|
       t.string :name
     end
+    
+    create_table :tags, :force => true do |t|
+      t.string :name, :null => false
+    end
+    add_index :tags, [ :name ], :unique => true
   end
 
   def self.down
