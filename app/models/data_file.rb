@@ -13,7 +13,7 @@ class DataFile < ActiveRecord::Base
 
    def included_to_be_copied? symbol
      case symbol.to_s
-       when "activity_logs","versions","attributions","relationships"
+       when "activity_logs","versions","attributions","relationships","inverse_relationships"
          return false
        else
          return true
