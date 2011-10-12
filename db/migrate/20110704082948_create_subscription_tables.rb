@@ -59,6 +59,8 @@ class CreateSubscriptionTables < ActiveRecord::Migration
       t.string :frequency
     end
 
+    [Project, WorkGroup, GroupMembership, ProjectSubscription, Subscription, Person].each {|e| e.reset_column_information}
+
     Person.all.each { |p| p.set_default_subscriptions }
   end
 
