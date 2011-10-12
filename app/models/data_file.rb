@@ -33,6 +33,9 @@ class DataFile < ActiveRecord::Base
            if !association.blank?
              association.each do |item|
                attrs = item.attributes.delete_if{|k,v|k=="id" || k =="#{a.options[:as]}_id" || k =="#{a.options[:as]}_type"}
+               if !attrs["person_id"].nil? and !Person.find(:first,:conditions => ["id =?",attrs["person_id"].to_i]).nil?
+                 attrs["person_id"] = self.contributor.person.id
+               end
               presentation.send("#{a.name}".to_sym).send :build,attrs
              end
            end
