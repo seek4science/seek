@@ -218,4 +218,8 @@ class ConfigTest < ActiveSupport::TestCase
   test "sabiork_ws_base_url" do
     assert_equal "http://sabiork.h-its.org/sabioRestWebServices/",Seek::Config.sabiork_ws_base_url
   end
+
+  test "publish_button_enabled" do
+    assert_equal true,Seek::Config.publish_button_enabled
+  end
 end

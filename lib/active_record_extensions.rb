@@ -74,7 +74,7 @@ module ActiveRecordExtensions
 
   def is_publishable?
     #currently based upon the naive assumption that downloadable items are publishable, which is currently the case but may change.
-    is_downloadable?
+    is_downloadable? && Seek::Config.publish_button_enabled
   end
 
 end

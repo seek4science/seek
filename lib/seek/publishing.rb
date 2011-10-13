@@ -3,6 +3,7 @@ module Seek
 
     def self.included(base)
       base.before_filter :set_asset, :only=>[:preview_publish,:publish]
+      base.before_filter :publish_auth
     end
 
     def preview_publish
@@ -36,6 +37,13 @@ module Seek
     def set_asset
       c = self.controller_name.downcase
       @asset = eval("@"+c.singularize)
+    end
+
+    def publish_auth
+      unless Seek::Config.publish_button_enabled
+        error("This feature is is not yet currently available","invalid route")
+        return false
+      end
     end
 
     private
