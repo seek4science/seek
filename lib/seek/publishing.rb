@@ -3,7 +3,7 @@ module Seek
 
     def self.included(base)
       base.before_filter :set_asset, :only=>[:preview_publish,:publish]
-      base.before_filter :publish_auth
+      base.before_filter :publish_auth, :only=>[:preview_publish,:publish]
     end
 
     def preview_publish
