@@ -68,7 +68,13 @@ class PoliciesController < ApplicationController
       creators = (params["creators"].blank? ? [] : ActiveSupport::JSON.decode(params["creators"])).uniq
       creators.collect!{|c| Person.find(c[1])}
       policy = sharing_params_to_policy
-      grouped_people_by_access_type = policy.summarize_permissions creators
+      if params['is_new_file'] == 'false'
+        contributor = try_block{User.find_by_id(params['contributor_id'].to_i).person}
+        grouped_people_by_access_type = policy.summarize_permissions creators, contributor
+      else
+        grouped_people_by_access_type = policy.summarize_permissions creators
+      end
+
       respond_to do |format|
         format.html { render :template=>"layouts/preview_permissions", :locals => {:grouped_people_by_access_type => grouped_people_by_access_type}}
       end

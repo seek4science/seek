@@ -888,7 +888,81 @@ class DataFilesControllerTest < ActionController::TestCase
     df=data_files(:picture)
     get :explore,:id=>df,:version=>1
     assert_redirected_to data_file_path(df,:version=>1)
+    assert_nil flash[:error]
+  end
+
+  test "uploader can publish the item" do
+    uploader = Factory(:user)
+    data_file = Factory(:data_file, :contributor => uploader)
+    assert_not_equal Policy::EVERYONE, data_file.policy.sharing_scope
+    login_as(uploader)
+    put :update, :id => data_file, :sharing => {:sharing_scope =>Policy::EVERYONE, "access_type_#{Policy::EVERYONE}".to_sym => Policy::VISIBLE}
+
+    assert_nil flash[:error]
+  end
+
+  test "the person who has the manage right to the item, but not the uploader, CAN NOT publish the item, if the item WAS NOT published" do
+    person = Factory(:person)
+    policy = Factory(:policy)
+    Factory(:permission, :policy => policy, :contributor => person, :access_type => Policy::MANAGING)
+    data_file = Factory(:data_file, :policy => policy)
+    assert_not_equal Policy::EVERYONE, data_file.policy.sharing_scope
+    login_as(person.user)
+    assert data_file.can_manage?
+    put :update, :id => data_file, :sharing => {:sharing_scope =>Policy::EVERYONE, "access_type_#{Policy::EVERYONE}".to_sym => Policy::VISIBLE}
+
     assert_not_nil flash[:error]
+  end
+
+  test "the person who has the manage right to the item, but not the uploader, CAN publish the item, if the item WAS published" do
+      person = Factory(:person)
+      policy = Factory(:policy, :sharing_scope => Policy::EVERYONE)
+      Factory(:permission, :policy => policy, :contributor => person, :access_type => Policy::MANAGING)
+      data_file = Factory(:data_file, :policy => policy)
+      assert_equal Policy::EVERYONE, data_file.policy.sharing_scope
+      login_as(person.user)
+      assert data_file.can_manage?
+      put :update, :id => data_file, :sharing => {:sharing_scope =>Policy::EVERYONE, "access_type_#{Policy::EVERYONE}".to_sym => Policy::VISIBLE}
+
+      assert_nil flash[:error]
+    end
+
+  test "should enable the policy scope 'all visitor...' when uploader edit the item" do
+      uploader = Factory(:user)
+      data_file = Factory(:data_file, :contributor => uploader)
+      assert_not_equal Policy::EVERYONE, data_file.policy.sharing_scope
+      login_as(uploader)
+      get :edit, :id => data_file
+
+      assert_select "input[type=radio][id='sharing_scope_4'][value='4'][disabled='true']", :count => 0
+  end
+
+  test "should disable the policy scope 'all visitor...' for the manager if the item was not published" do
+    person = Factory(:person)
+    policy = Factory(:policy)
+    Factory(:permission, :policy => policy, :contributor => person, :access_type => Policy::MANAGING)
+    data_file = Factory(:data_file, :policy => policy)
+    assert_not_equal Policy::EVERYONE, data_file.policy.sharing_scope
+    login_as(person.user)
+    assert data_file.can_manage?
+
+    get :edit, :id => data_file
+
+      assert_select "input[type=radio][id='sharing_scope_4'][value='4'][disabled='true']"
+  end
+
+  test "should enable the policy scope 'all visitor...' for the manager if the item was published" do
+    person = Factory(:person)
+    policy = Factory(:policy, :sharing_scope => Policy::EVERYONE)
+    Factory(:permission, :policy => policy, :contributor => person, :access_type => Policy::MANAGING)
+    data_file = Factory(:data_file, :policy => policy)
+    assert_equal Policy::EVERYONE, data_file.policy.sharing_scope
+    login_as(person.user)
+    assert data_file.can_manage?
+
+    get :edit, :id => data_file
+
+    assert_select "input[type=radio][id='sharing_scope_4'][value='4'][disabled='true']", :count => 0
   end
 
   private
