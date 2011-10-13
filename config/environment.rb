@@ -37,7 +37,7 @@ Rails::Initializer.run do |config|
   # (by default production uses :info, the others :debug)
   # config.log_level = :info
   begin
-    RAILS_DEFAULT_LOGGER = Logger.new("#{RAILS_ROOT}/log/#{RAILS_ENV}.log")
+    RAILS_DEFAULT_LOGGER = Logger.new("#{Rails.root}/log/#{RAILS_ENV}.log")
   rescue StandardError
     RAILS_DEFAULT_LOGGER = Logger.new(STDERR)
     RAILS_DEFAULT_LOGGER.level = Logger::WARN
