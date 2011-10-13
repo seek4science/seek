@@ -26,7 +26,9 @@
         <ul style="padding-left:1em;">
           <li>Keep the <%= @resource_type -%> private, and only visible to yourself.</li>
           <li>Share within the selected projects and with all other users that are a member of a <%= Seek::Config.project_name %> project.</li>
-          <li>Share with the all visitors (including anonymous visitors with no login)</li>
+          <% if try_block{@resource.can_publish?} %>
+            <li>Share with the all visitors (including anonymous visitors with no login)</li>
+          <% end %>
           <li>Define more fine-grained sharing in the <em>Advanced sharing</em>: you can share within your Project/Institution only,<br/> with specific individuals, or set up custom favourite groups for people you regularly need to share with.</li>
         </ul>
       </div>
@@ -64,13 +66,14 @@
         <p>
           <label for="sharing_scope_<%= Policy::EVERYONE -%>">
             <input type="radio" <%= 'checked="checked"' if @sharing_mode == Policy::EVERYONE -%> id="sharing_scope_<%= Policy::EVERYONE -%>" name="sharing[sharing_scope]"
-                   value="<%= Policy::EVERYONE -%>" />
+                   value="<%= Policy::EVERYONE -%>" <%= 'disabled="true"' if @resource.respond_to? :can_publish? and !@resource.can_publish? -%>/>
             - All visitors (including anonymous visitors with no login):
           </label>
           <%= render :partial => "assets/sharing_form_access_type_dropdown", :locals => { :access_type_selector_for_scope => Policy::EVERYONE,
             :sharing_scope => @sharing_mode, :access_type => @access_mode } -%>
           <br/>
         </p>
+
     </div>
 
     <br/>
