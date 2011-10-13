@@ -7,7 +7,7 @@ ActionController::Routing::Routes.draw do |map|
 #  end
 
   map.resources :attachments
-  map.resources :presentations,:member => { :download => :get, :new_version=>:post, :preview_publish=>:get,:publish=>:post,:request_resource=>:post, :update_tags_ajax=>:post }
+  map.resources :presentations,:member => { :download => :get, :new_version=>:post, :preview_publish=>:get,:publish=>:post,:request_resource=>:post, :update_annotations_ajax=>:post }
   map.resources :subscriptions
   map.resources :specimens
   map.resources :samples
@@ -16,7 +16,7 @@ ActionController::Routing::Routes.draw do |map|
 
   map.resources :strains
 
-  map.resources :publications,:collection=>{:fetch_preview=>:post},:member=>{:disassociate_authors=>:post,:update_tags_ajax=>:post}
+  map.resources :publications,:collection=>{:fetch_preview=>:post},:member=>{:disassociate_authors=>:post,:update_annotations_ajax=>:post}
 
   map.resources :assay_types, :collection=>{:manage=>:get}
 
@@ -30,13 +30,15 @@ ActionController::Routing::Routes.draw do |map|
 
   map.resources :studies
 
-  map.resources :assays,:member=>{:update_tags_ajax=>:post}
+  map.resources :assays,:member=>{:update_annotations_ajax=>:post}
 
   map.resources :saved_searches
 
-  map.resources :data_files, :collection=>{:test_asset_url=>:post},:member => {:download => :get,:plot=>:get, :data => :get,:preview_publish=>:get,:publish=>:post, :request_resource=>:post, :update_tags_ajax=>:post},:new=>{:upload_for_tool => :post}  do |data_file|
+  map.resources :data_files, :collection=>{:test_asset_url=>:post},:member => {:download => :get,:plot=>:get, :data => :get,:preview_publish=>:get,:publish=>:post, :request_resource=>:post, :update_annotations_ajax=>:post, :explore=>:get},:new=>{:upload_for_tool => :post}  do |data_file|
     data_file.resources :studied_factors, :collection =>{:create_from_existing=>:post}
   end
+  
+  map.resources :spreadsheet_annotations, :only => [:create, :destroy, :update]
   
   map.resources :uuids
 
@@ -47,7 +49,7 @@ ActionController::Routing::Routes.draw do |map|
   end
 
   map.resources :models, 
-    :member => { :download => :get, :execute=>:post, :request_resource=>:post,:preview_publish=>:get,:publish=>:post, :builder=>:get, :submit_to_jws=>:post, :simulate=>:post, :update_tags_ajax=>:post },
+    :member => { :download => :get, :execute=>:post, :request_resource=>:post,:preview_publish=>:get,:publish=>:post, :builder=>:get, :submit_to_jws=>:post, :simulate=>:post, :update_annotations_ajax=>:post },
     :collection=>{:build=>:get}
 
   map.resources :people, :collection=>{:select=>:get,:get_work_group =>:get} do |person|
@@ -61,7 +63,7 @@ ActionController::Routing::Routes.draw do |map|
     project.resources :avatars, :member => { :select => :post }, :collection => { :new => :post }
   end
 
-  map.resources :sops, :member => { :download => :get, :new_version=>:post, :preview_publish=>:get,:publish=>:post,:request_resource=>:post, :update_tags_ajax=>:post } do |sop|
+  map.resources :sops, :member => { :download => :get, :new_version=>:post, :preview_publish=>:get,:publish=>:post,:request_resource=>:post, :update_annotations_ajax=>:post } do |sop|
     sop.resources :experimental_conditions, :collection =>{:create_from_existing=>:post}
   end
 
@@ -80,6 +82,8 @@ ActionController::Routing::Routes.draw do |map|
   
   #forum attachments
   map.resources :forum_attachments, :member => {:download => :get}, :only => [:create, :destroy]
+
+  map.resources :compounds
   
   # search and saved searches
   map.search '/search/',:controller=>'search',:action=>'index'
@@ -92,7 +96,12 @@ ActionController::Routing::Routes.draw do |map|
   #tags
   map.all_tags '/tags',:controller=>'tags',:action=>'index'
   map.show_tag '/tags/:id',:controller=>'tags',:action=>'show'
-  
+
+  #annotations
+  map.all_anns '/tags',:controller=>'tags',:action=>'index'
+  map.show_ann '/tags/:id',:controller=>'tags',:action=>'show'
+
+
   map.jerm '/jerm/',:controller=>'jerm',:action=>'index'
   
   # browsing by countries
@@ -129,7 +138,7 @@ ActionController::Routing::Routes.draw do |map|
   #create new specimen based existing one
   #map.new_specimen_based_on_existing_one '/specimens/new_specimen_based_on_existing_one/:id',:controller=>'specimens',:action=>'new_specimen_based_on_existing_one', :conditions => { :method => :post }
   map.new_object_based_on_existing_one ':controller_name/new_object_based_on_existing_one/:id',:controller=>'#{controller_name}',:action=>'new_object_based_on_existing_one', :conditions => { :method => :post }
-
+  #map.preview_permissions ':controller_name/preview_permissions', :controller=>'controller_name', :action=>'preview_permissions', :conditions => { :method => :post }
 
   # The priority is based upon order of creation: first created -> highest priority.
 

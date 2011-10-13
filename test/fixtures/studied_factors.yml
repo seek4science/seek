@@ -5,12 +5,14 @@ studied_factor_concentration_glucose:
   start_value: 1
   end_value: 8
   data_file: editable_data_file
-  substance: compound_glucose
-  substance_type: Compound
 
 studied_factor_time:
   measured_item: time
   unit: second
   start_value: 1
   end_value: 8
+  data_file: editable_data_file
+
+studied_factor_growth_medium:
+  measured_item: growth_medium
   data_file: editable_data_file

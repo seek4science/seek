@@ -1,0 +1,495 @@
+= Annotations Plugin (for Ruby on Rails applications)
+
+
+Original Author::   	Jiten Bhagat (mailto:mail@jits.co.uk)
+Copyright::         	(c) 2008-2011, the University of Manchester and the European Bioinformatics Institute (EMBL-EBI)
+License::           	BSD
+Version::           	0.4.1
+
+== IMPORTANT NOTE
+
+In v0.2.0+ this plugin has been modified substantially to support polymorphic annotation values rather than just strings.
+
+== Overview
+
+This plugin allows arbitrary metadata and relationships to be stored and retrieved, in the form of *Annotations* for any model objects in your Ruby on Rails (v2.2+) application. 
+
+Annotations are in the form:
+
+  Annotation = Annotatable (what thing are you talking about?) 
+             + Attribute (what is the kind/class of annotation? [tag? description?]) 
+             + Value (what is the data or other thing you want to associate with the annotatable)) 
+             + Source (who/what made this annotation?)
+             + Version Info (how many versions of this annotation are there?) 
+             + Timestamps (when was this annotation created/updated?)
+
+
+The idea is to provide a consistent and systematic way to abstract out and decouple annotations from your application's core data model and allow layering in of metadata/relationships easily.
+
+Examples of things you can use the annotations plugin for:
+* Tags
+* Categories
+* Descriptions
+* Examples
+* Notes
+* Comments
+
+A concrete example of a 'tag' Annotation:
+
+  Ann1 = <car SF8 JK0>      (Annotatable)
+       + <tag>              (Attribute)
+       + <dirty>            (Value)
+       + <Autobot 3000>     (Source)
+       + <v1>               (Version Info)
+       + <2011-07-06 10:00> (Timestamps)
+
+A concrete example of another kind of Annotation:
+
+  Ann1 = <dog jack>         (Annotatable)
+       + <isBreed>          (Attribute)
+       + <chihuahua>        (Value)
+       + <Dave Elias>       (Source)
+       + <v2>               (Version Info)
+       + <2011-07-06 11:00> (Timestamps)
+
+The main benefit is that annotations are stored and retrieved in a uniform manner with a common API. Parts of the plugin can also be extended and overridden in your application (see the Usage section for more info).
+
+The annotations plugin is currently being used successfully in the BioCatalogue {codebase}[http://rubyforge.org/projects/biocatalogue] to allow easy annotation of web services and their deployments/versions/operations/inputs/outputs/etc. Check out http://www.biocatalogue.org.
+
+=== Features:
+
+* A complete set of ActiveRecord models for annotations, annotation attributes and annotation values and annotation value seeds.
+* acts_as_annotatable, acts_as_annotation_source and acts_as_annotation_value mixin modules for your models, complete with a number of advanced finders.
+* A basic CRUD controller that can be used out of the box to list, create, view, edit and delete annotations.
+* Versioning of annotations - all updates to annotations cause a new version of that annotation to be created.
+* Annotation Value Seeds can be used to set up some default/preliminary seed data for attributes without having to create annotations.
+* Lots of configuration options!
+
+== Full Documentation
+
+To generate full documentation (including this readme and full API docs) do the following:
+
+Install RDoc (v2.3.0 or above):
+
+  % [sudo] gem install rdoc
+
+Install the darkfish-rdoc gem:
+
+  % [sudo] gem install darkfish-rdoc
+
+Run the following command in the plugin's root directory (_vendor/plugins/annotations_):
+
+  % rdoc -SHNU -w 2 --title='Annotations Plugin' -m 'INDEX.rdoc' -x '(/doc|/tasks|/script|/test)'
+
+The generated documentation will be in the _doc_ folder of the annotations plugin.
+
+== Conceptual Data Model
+
+At a conceptual level, an *Annotation* consists of:
+* a link to the thing being annotated - the *Annotatable*
+* a link to the attribute which specifies what kind of annotation this is - the *Attribute*
+* a link to the value of the annotation - the *Value*
+* a link to the source of the annotation - the *Source*
+* version information - *Version Info*
+* timestamps for event time info - *Timestamps*
+
+This can be represented as:
+
+  Annotation = Annotatable + Attribute + Value + Source + Version Info + Timestamps
+
+The database model for an Annotation is made up of the following fields:
+
+  | id | annotatable_type | annotatable_id | source_type | source_id | attribute_id | value_type | value_id | version | version_creator_id | created_at | updated_at |
+
+This makes use of ActiveRecord polymorphic relationships to allow any ActiveRecord model to be an Annotatable, Source and Value.
+
+*Note:* The _version_creator_id_ field is only relevant when there are more than one version of an Annotation. I.e.: for the first version of the annotation the _version_creator_id_ will be nil.
+
+Annotation Attributes currently consist of a name and a unique identifier (in the form of a URI). This is the _attribute_ or _property_ you are describing for an Annotatable. Examples: 'tag', 'description', etc.
+
+== Versioning of Annotations
+
+Whenever an Annotation is updated, a new AnnotationVersion entry is created in the db (corresponding model name = Annotation::Version).
+
+This uses a library from the {version_fu plugin}[http://github.com/jmckible/version_fu/tree/master]. A customised version of this is embedded within the Annotations plugin (which won't conflict if version_fu is installed in the main codebase).
+
+== Installation and Setup
+
+=== Important Requirements
+
+* Only works for Ruby on Rails v2.2 and above.
+* Your Application Controller MUST define (or have access to) the following methods:
+  * _login_required_ - a method that checks if the user is logged in and if not redirects to the login page.
+  * _logged_in?_ - a method to check if the user is logged_in.
+  * _current_user_ - a method to retrieve the currently logged in user. This MUST return nil if no user is currently logged in.
+
+=== Installation
+
+To install the plugin as a git cloned repo (this allows you to easily update the plugin in the future):
+
+  ruby script/plugin install git://github.com/myGrid/annotations.git
+
+*Note:* this requires git to be installed.
+
+To install the plugin the regular way:
+
+  ruby script/plugin install http://github.com/myGrid/annotations.git/
+
+=== Setup
+
+* Generate the migration(s):
+
+    ruby script/generate annotations_migration all
+
+* Create a config file - _config/initializers/annotations.rb_ - for the plugin specific configuration (see Usage section for the available config options)
+
+* Modify your application to work with the plugin:
+
+  * Add the following line to the top of your _app/controllers/application_controller.rb_ file (or _application.rb_ in older versions of Rails):
+
+      require_dependency File.join(Rails.root, 'vendor', 'plugins', 'annotations', 'lib', 'app', 'controllers', 'application_controller')
+
+  * Add the following line to the top of your _app/helpers/application_helper.rb_ file:
+
+      require_dependency File.join(Rails.root, 'vendor', 'plugins', 'annotations', 'lib', 'app', 'helpers', 'application_helper')
+
+  *Note:* the _require_dependency_ line is crucial in making your app work with the files in the plugin and allows for easy extension and overriding of the plugin parts. *However, this does mean that any file with the _require_dependency_ line will not be automagically loaded by Rails in development mode when changes have been made - a server restart is required whenever any changes are made to these files.*
+
+* Create the following files in your application:
+
+  * \Annotation model:
+
+      # app/models/annotation.rb
+      #
+      # This extends the Annotation model defined in the Annotations plugin.
+
+      require_dependency File.join(Rails.root, 'vendor', 'plugins', 'annotations', 'lib', 'app', 'models', 'annotation')
+
+      class Annotation < ActiveRecord::Base
+      end
+
+  * \AnnotationAttribute model:
+
+      # app/models/annotation_attribute.rb
+      #
+      # This extends the AnnotationAttribute model defined in the Annotations plugin.
+
+      require_dependency File.join(Rails.root, 'vendor', 'plugins', 'annotations', 'lib', 'app', 'models', 'annotation_attribute')
+
+      class AnnotationAttribute < ActiveRecord::Base
+      end
+
+  * \AnnotationsController controller:
+
+      # app/controllers/annotations_controller.rb
+      #
+      # This extends the AnnotationsController controller defined in the Annotations plugin.
+
+      require_dependency File.join(Rails.root, 'vendor', 'plugins', 'annotations', 'lib', 'app', 'controllers', 'annotations_controller')
+
+      class AnnotationsController < ApplicationController
+      end
+
+  These are used to extend/override the models and controller from the plugin with extra actions, filters, validations, processing and so on (see Usage section for more details and examples).
+
+* Specify which models in your codebase can be *annotated* by adding _acts_as_annotatable_ in the model's definition. For example:
+
+    class Service < ActiveRecord::Base
+      ...
+      acts_as_annotatable
+      ...
+    end
+
+* Specify which models in your codebase can be the *source* of annotations by adding _acts_as_annotation_source_ in the model's definition. For example:
+
+    class User < ActiveRecord::Base
+      ...
+      acts_as_annotation_source
+      ...
+    end
+
+The Annotations plugin has now been installed and is ready for use. See the Usage section for further details.
+
+
+== Usage
+
+=== Quick Use
+
+* To add a bunch of Annotations to a model instance:
+
+    book = Book.find(1)
+    data = {
+      :description => "My bookie wookie",
+      :rating => 5,
+      :tag => [ "horror", "romance", "indiluted", "true story" ] }
+    new_annotations = book.create_annotations(data, current_user)
+
+* Create an Annotation directly:
+
+    book = Book.find(10)
+    ann1 = Annotation.new(:attribute_name => "tag", 
+                          :value => "hot", 
+                          :source_type => "User", 
+                          :source_id => 100,
+                          :annotatable_type => book.class.name,
+                          :annotatable_id => book.id)
+
+* Building a simple form for adding a single Annotation, like 'description', to a specified model object:
+
+    <% form_tag annotations_url do %>
+      <%= hidden_field_tag "annotation[annotatable_type]", "Book" -%>
+      <%= hidden_field_tag "annotation[annotatable_id]", 100 -%>
+      <%= hidden_field_tag "annotation[attribute_name]", "description" -%>
+      <%= text_area_tag "annotation[value]" -%>			
+      <%= submit_tag "Submit", :disable_with => "Submitting..." -%>
+    <% end %>
+
+* Building a simple form for adding multiple Annotations from one field, like 'tags', to a specified model object:
+
+    <% form_tag create_multiple_annotations_url do %>
+      <%= hidden_field_tag "separator", "," -%>
+      <%= hidden_field_tag "annotation[annotatable_type]", "Book" -%>
+    	<%= hidden_field_tag "annotation[annotatable_id]", 100 -%>
+      <%= hidden_field_tag "annotation[attribute_name]", "description" -%>
+      <%= text_area_tag "annotation[value]" -%>			
+      <%= submit_tag "Submit", :disable_with => "Submitting..." -%>
+    <% end %>
+
+* Find all Annotations for a model instance (that has _acts_annotatable_ specified in the model's class):
+
+    book = Book.find(6806)
+    annotations = book.annotations
+
+* Find all 'tag' Annotations for a model instance (that has _acts_annotatable_ specified in the model's class):
+
+    book = Book.find(23)
+    tag_annotations = book.annotations_with_attribute("tag")
+
+* Find all Annotations for a model instance that have a number of different attribute names (that has _acts_annotatable_ specified in the model's class):
+
+    book = Book.find(22124)
+    rating_annotations = book.annotations_with_attributes([ "rating-performance", "rating-usefulness", "rating-documentation" ])
+
+See _More Examples_ below.
+
+=== Important Usage Notes
+
+* When using the built in Annotations Controller to create annotations (as in the forms examples above), the default is to use the _current_user_ as the Source. However, you can explicitly specify the source by adding fields for "annotations[source_type]" and "annotations[source_id]".
+* Attributes are NOT case-sensitive. So 'description' and 'Description' will be the same AnnotationAttribute entity and therefore all annotations with that attribute will be the exact same type/class/kind of annotation).
+* When displaying the values of annotations, ALWAYS clean the data using methods like _h_ (html escape), _sanitize_ and _white_list_.
+* By default, duplicate annotations cannot be created (by "duplicate" we mean: same value for the same attribute, on an annotatable object, regardless of source). For example: a user cannot add a description to a service that matches an existing description for that service. You can override this behaviour for annotations with certain attributes, using the configuration option: _attribute_names_to_allow_duplicates_. NOTE: this is different to the _limits_per_source_ config_ option, which isn't about duplicate annotations, but rather limiting the quantity of annotations of a specific attribute on a specific annotatable object by a specific source.
+
+=== Config Options
+
+All the config options can be found in _lib/annotations/config.rb_, listed below:
+
+* *attribute_names_for_values_to_be_downcased*
+* *attribute_names_for_values_to_be_upcase*
+* *strip_text_rules*
+* *user_model_name*
+* *limits_per_source*
+* *attribute_names_to_allow_duplicates*
+* *value_restrictions*
+
+TODO: explain and document these.
+
+=== More Examples
+
+* Create multiple 'tag' Annotations from a single string value:
+
+    params = { :annotatable_type => "Book",
+               :annotatable_id => 78,
+               :attribute_name => "tag",
+               :value => "workflow, taverna, brilliant",
+               :source_type => "Group",
+               :source_id => 4 }
+    Annotation.create_multiple(params, ',')
+
+* Find all 'comment' Annotations, by a specified Source, for a model instance (that has _acts_annotatable_ specified in the model's class):
+  
+    book = Book.find(67)
+    user = User.find_by_name("jane")
+    annotations = book.annotations_with_attribute_and_by_source("comment", user)
+
+* Find all Annotations, that don't have the specified attributes, for a model instance (that has _acts_annotatable_ specified in the model's class):
+
+    book = Book.find(56)
+    annotations = book.all_annotations_excluding_attributes([ "tag", "note", "example" ])
+
+* Find Annotatable objects that have a specific attribute name AND value:
+  
+  * Gets all annotatables regardless of type:
+
+      Annotation.find_annotatables_with_attribute_name_and_value("complexity", "O(x^2)")
+  
+  * Gets only annotatables that are Books:
+  
+      Book.with_annotations_with_attribute_name_and_value("Tag", "Amusing rhetoric")
+
+* Find Annotatable objects that have a combination of attribute names AND values:
+
+    Annotation.find_annotatables_with_attribute_names_and_values([ "tag" ], [ "fiction", "sci-fi", "fantasy" ])
+
+    Annotation.find_annotatables_with_attribute_names_and_values([ "tag", "keyword", "category" ], [ "fiction", "fantasy" ])
+
+* Count the number of Annotations, by any Source, for a model instance (that has _acts_annotatable_ specified in the model's class):
+    
+    book = Book.find(90)
+    count = book.count_annotations_by("all")
+
+* Count the number of Annotations, by Users, for a model instance (that has _acts_annotatable_ specified in the model's class):
+    
+    book = Book.find(90)
+    count = book.count_annotations_by("User")
+
+TODO: add more advanced examples!
+
+=== Extending the Plugin
+
+Most of the aspects of this plugin can be extended/overridden in your codebase.
+
+Examples:
+
+* To restrict the values for certain annotations, you can either use the Annotations::Config::value_restrictions setting and/or extend the Annotation model in your own codebase and use the ActiveRecord validates_inclusion_of validation. For the latter, an example is below:
+
+    require_dependency RAILS_ROOT + '/vendor/plugins/annotations/lib/app/models/annotation'
+    
+    class Annotation < ActiveRecord::Base
+      ...
+      
+      validates_inclusion_of :value, 
+      	                     :in => [ "fruit", "nut", "fibre" ], 
+      	                     :message => "Please select a valid category.",
+      	                     :if => Proc.new { |ann| ann.attribute_name.downcase == "category" }
+      
+      ...
+    end
+
+TODO: add more!
+
+==== See Also
+
+The BioCatalogue {codebase}[http://rubyforge.org/projects/biocatalogue] contains many examples of using the Annotations plugin successfully. Some pointers:
+
+* {Configuring the plugin}[http://biocatalogue.rubyforge.org/svn/trunk/config/initializers/biocat_main.rb] (scroll down to the "Configure the Annotations plugin" section)
+* {A module to add extra logic on top of the Annotations plugin}[http://biocatalogue.rubyforge.org/svn/trunk/lib/bio_catalogue/annotations.rb]
+* {The extended \Annotation model}[http://biocatalogue.rubyforge.org/svn/trunk/app/models/annotation.rb]
+* {The extended \AnnotationAttribute model}[http://biocatalogue.rubyforge.org/svn/trunk/app/models/annotation_attribute.rb]
+* {The extended \AnnotationsController controller}[http://biocatalogue.rubyforge.org/svn/trunk/app/controllers/annotations_controller.rb]
+* The \AnnotationsHelper helper (to be added)
+* {Views and partials for annotations}[http://biocatalogue.rubyforge.org/svn/trunk/app/views/annotations/]
+* Tags (all of these build a layer on top of the annotations plugin, specifically for tagging of objects):
+  * {Module}[http://biocatalogue.rubyforge.org/svn/trunk/lib/bio_catalogue/tags.rb]
+  * {Controller}[http://biocatalogue.rubyforge.org/svn/trunk/app/controllers/tags_controller.rb] (adds new and alternative actions for tagging that builds on annotations).
+  * {Views Helper}[http://biocatalogue.rubyforge.org/svn/trunk/app/helpers/tags_helper.rb]
+  * Views:
+    * {Tags box}[http://biocatalogue.rubyforge.org/svn/trunk/app/views/annotations/_tags_box.html.erb]
+    * {Tags flat}[http://biocatalogue.rubyforge.org/svn/trunk/app/views/annotations/_tags_flat.html.erb]
+* Ratings (all of these build a layer on top of the annotations plugin, specifically for rating of objects):
+  * {Controller}[http://biocatalogue.rubyforge.org/svn/trunk/app/controllers/ratings_controller.rb] (adds new and alternative actions for rating that builds on annotations).
+  * {Views Helper}[http://biocatalogue.rubyforge.org/svn/trunk/app/helpers/ratings_helper.rb]
+  * Views:
+    * {Ratings box}[http://biocatalogue.rubyforge.org/svn/trunk/app/views/annotations/_ratings_box.html.erb]
+
+The prototype {Shims Library}[http://code.google.com/p/mygrid-shims-library/] also makes use of the Annotations plugin successfully and may provide some useful examples. 
+
+== Updating the Plugin
+
+Update the plugin code using the appropriate mechanism. Then:
+
+  ruby script/generate annotations_migration vX
+
+... where X is the version of the migration you want to generate
+
+== Main Plugin Contents
+
+TODO: list files and what the purpose of each is.
+
+== Known Issues
+
+* May not work with sqlite and sqlite3 databases.
+* Not tested with Postgres DB.
+* Doesn't work consistently well with Single Table Inheritance (STI).
+
+== Troubleshooting
+
+* Whilst running in development mode, if you get an error such as: 
+
+    A copy of ApplicationController has been removed from the module tree but is still active!
+
+  ... then restart your server. This is due to the way Rails autoloads files in development mode, which affects the plugin and any extensions in the main app.
+
+== Future Plans
+
+In no particular order:
+
+* Allow curation assertions such as "Agree", "Useful", "Incomplete" to be made on annotations.
+* Allow values to be any model rather than free text and provide a basic set of annotation value models, such as AnnotationValueFreeText, AnnotationValueNumber, AnnotationValueUri, etc
+* Extend the AnnotationAttribute model to contain controlled vocabulary / ontology term information.
+* Update the versioning to a better version of _version_fu_. See: http://github.com/jmckible/version_fu/network
+
+== Appendix A: Data Model
+
+=== Annotations
+
+Table name: annotations
+
+Fields:
+
+* id
+* source_type
+* source_id
+* annotatable_type
+* annotatable_id
+* attribute_id
+* value
+* value_type
+* created_at
+* updated_at
+* version
+* version_creator_id
+
+=== \Annotation Versions
+
+Table name: annotation_versions
+
+Fields:
+
+* id
+* annotation_id
+* version
+* version_creator_id
+* source_type
+* source_id
+* annotatable_type
+* annotatable_id
+* attribute_id
+* value
+* value_type
+* created_at
+* updated_at
+
+=== \Annotation Attributes
+
+Table name: annotation_attributes
+
+Fields:
+
+* id
+* name
+* created_at
+* updated_at
+
+=== \Annotation Value Seeds
+
+Table name: annotation_value_seeds
+
+Fields:
+
+* id
+* attribute_id
+* value
+* created_at
+* updated_at
+
+

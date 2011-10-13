@@ -6,11 +6,9 @@ class PublicationsControllerTest < ActionController::TestCase
 
   include AuthenticatedTestHelper
   include RestTestCases
-
-  CROSSREF_API_EMAIL="sowen@cs.man.ac.uk"
-  PUBMED_API_EMAIL=""
   
   def setup
+    WebMock.allow_net_connect!
     login_as(:quentin)
     @object=publications(:taverna_paper_pubmed)
   end

@@ -1,0 +1,28 @@
+= Running Tests
+
+To run the tests for this plugin:
+
+* you have to install this into a dummy Rails v2.3.2 app and meet the requirements (see the README file).
+
+* ensure the following gems are installed:
+  
+  gem install plugin_test_helper -v 0.3.0
+  gem install mysql
+
+* ensure database 'annotations_plugin_test' exists on a local MySQL server installation (with default ports) and username 'annotations' with password 'annotations_plugin'. Commands for MySQL:
+
+  create database annotations_plugin_test character set utf8;
+  create user 'annotations'@'localhost' identified  by 'annotations_plugin';
+  grant all privileges on annotations_plugin_test.* to 'annotations'@'localhost';
+
+* In the root of the dummy Rails app, run:
+
+  rake test:plugins PLUGIN=annotations
+
+* For more detailed back traces, run:
+
+  rake test:plugins PLUGIN=annotations BACKTRACE=blegga
+  
+* To run a specific test file, run e.g.:
+
+  rake test:plugins PLUGIN=annotations BACKTRACE=blegga TEST=vendor/plugins/annotations/test/config_test.rb

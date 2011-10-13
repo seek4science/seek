@@ -9,7 +9,7 @@
     Associate Publications
   </div>
 
-  <div id="associate_publication_fold_content" class="foldContent" style="display: block;">
+  <div id="associate_publication_fold_content" class="foldContent" style="display:<%= resource.publications.blank? ? 'none' : 'block' -%>">
     <div class="yui-u first" style="width:66%; float:left">
       
       <%
@@ -91,7 +91,7 @@
   <% if publication.can_view? -%>
       publication_id = '<%= publication.id -%>';
       publication_title = '<%= escape_javascript(publication.title) -%>';
-      publications_array.push([publication_title,publication_id]);
+      publication_array.push([publication_title,publication_id]);
   <% end -%>
 <% end -%>
 
@@ -101,7 +101,7 @@
     <% if publication.can_view? -%>
         publication_id = '<%= publication.id -%>';
         publication_title = '<%= escape_javascript(publication.title) -%>';
-        publications_array.push([publication_title, publication_id]);
+        publication_array.push([publication_title, publication_id]);
     <% end -%>
   <% end -%>
 <% end -%>

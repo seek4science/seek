@@ -40,7 +40,8 @@
          <%#= render :partial => "models/new_batch_upload" ,:locals => {:resource=>@model}%>
 
         <p>
-            <%= submit_tag "Upload and Save", :id => "model_submit_btn", :onclick => "javascript: validateModelFields(true); return(false);" -%>&nbsp;or <%= link_to 'Cancel', models_path -%>
+          <%= preview_permission_popup_link('model', url_for(:controller => 'policies', :action => 'preview_permissions'), true)-%>
+          <%= submit_tag "Upload and Save", :id => "model_submit_btn", :onclick => "javascript: validateResourceFields(true, 'model'); return(false);" -%>&nbsp;or <%= link_to 'Cancel', models_path -%>
         </p>
 		</div>
         <% end -%>    

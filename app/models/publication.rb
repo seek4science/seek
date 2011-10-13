@@ -1,6 +1,7 @@
 require 'acts_as_asset'
 require 'grouped_pagination'
 require 'title_trimmer'
+require 'libxml'
 
 class Publication < ActiveRecord::Base
   
@@ -42,9 +43,7 @@ class Publication < ActiveRecord::Base
 
   alias :seek_authors :creators
   
-  acts_as_solr(:fields=>[:title,:abstract,:journal,:tag_counts]) if Seek::Config.solr_enabled
-  
-  acts_as_uniquely_identifiable
+  acts_as_solr(:fields=>[:title,:abstract,:journal,:searchable_tags]) if Seek::Config.solr_enabled
 
   #TODO: refactor to something like 'sorted_by :start_date', which should create the default scope and the sort method. Maybe rename the sort method.
   default_scope :order => "#{self.table_name}.published_date DESC"
@@ -61,8 +60,8 @@ class Publication < ActiveRecord::Base
     self.abstract = pubmed_record.abstract
     self.published_date = pubmed_record.date_published
     self.journal = pubmed_record.journal
-    self.pubmed_id = pubmed_record.pmid    
-  end 
+    self.pubmed_id = pubmed_record.pmid
+  end
   
   def extract_doi_metadata(doi_record)
     self.title = doi_record.title
@@ -119,3 +118,4 @@ class Publication < ActiveRecord::Base
     true
   end
 end
+

@@ -45,10 +45,9 @@ module IndexPager
   
   def find_assets    
     controller = self.controller_name.downcase
-    model_name=controller.classify
-    model_class=eval(model_name)
+    model_class=controller.classify.constantize
     found = model_class.find(:all)
-    found = apply_filters(found)        
+    found = apply_filters(found)
     
     eval("@" + controller + " = found")
   end

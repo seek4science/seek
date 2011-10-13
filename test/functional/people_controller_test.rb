@@ -27,15 +27,6 @@ class PeopleControllerTest < ActionController::TestCase
     get :new
     assert_response :success
   end
-
-  test "personal tags are shown" do
-    person=people(:pal)
-    assert person.user.owned_tags.collect(&:name).include?("cricket"), "This person must own the tag fishing for this test to work."
-    tag=tags(:cricket)
-    get :show,:id=>person
-    assert :success
-    assert_select "div#personal_tags a[href=?]",show_tag_path(tag),:text=>tag.name,:count=>1
-  end
   
   def test_first_registered_person_is_admin
     Person.destroy_all
@@ -268,29 +259,6 @@ class PeopleControllerTest < ActionController::TestCase
     assert_equal "quentin@email.com",quentin.email
   end
   
-  def test_tags_updated_correctly
-    p=people(:aaron_person)
-    p.expertise_list="one,two,three"
-    p.tool_list="four"
-    assert p.save
-    assert_equal ["one","two","three"],p.expertise_list
-    assert_equal ["four"],p.tool_list
-    
-    p=Person.find(p.id)
-    assert_equal ["one","two","three"],p.expertise_list
-    assert_equal ["four"],p.tool_list
-    
-    one=ActsAsTaggableOn::Tag.find(:first,:conditions=>{:name=>"one"})
-    two=ActsAsTaggableOn::Tag.find(:first,:conditions=>{:name=>"two"})
-    four=ActsAsTaggableOn::Tag.find(:first,:conditions=>{:name=>"four"})
-    post :update, :id=>p.id, :person=>{}, :expertise_autocompleter_selected_ids=>[one.id,two.id],:tools_autocompleter_selected_ids=>[four.id],:tools_autocompleter_unrecognized_items=>"three"
-    
-    p=Person.find(p.id)
-    
-    assert_equal ["one","two"],p.expertise_list
-    assert_equal ["four","three"],p.tool_list
-  end
-  
   def test_should_destroy_person
     assert_difference('Person.count', -1) do
       delete :destroy, :id => people(:quentin_person)
@@ -319,5 +287,101 @@ class PeopleControllerTest < ActionController::TestCase
     assert assigns(:people)
     assert assigns(:people).include?(people(:person_for_model_owner))
   end
-  
+
+  test "admin can manage person" do
+    login_as(:quentin)
+    person = people(:aaron_person)
+    assert person.can_manage?
+  end
+
+  test "non-admin users + anonymous users can not manage person " do
+    login_as(:aaron)
+    person =  people(:quentin_person)
+    assert !person.can_manage?
+
+    logout
+    assert !person.can_manage?
+  end
+
+  test 'should remove every permissions set on the person before deleting him' do
+    login_as(:quentin)
+    person = Factory(:person)
+    #create bunch of permissions on this person
+    i = 0
+    while i < 10
+      Factory(:permission, :contributor => person, :access_type => rand(5))
+      i += 1
+    end
+    permissions = Permission.find(:all, :conditions => ["contributor_type =? and contributor_id=?", 'Person', person.try(:id)])
+    assert_equal 10, permissions.count
+
+    assert_difference('Person.count', -1) do
+      delete :destroy, :id => person
+    end
+
+    permissions = Permission.find(:all, :conditions => ["contributor_type =? and contributor_id=?", 'Person', person.try(:id)])
+    assert_equal 0, permissions.count
+  end
+
+  test 'should set the manage right on pi before deleting the person' do
+    login_as(:quentin)
+
+    project = Factory(:project)
+    work_group = Factory(:work_group, :project => project)
+    person = Factory(:person_in_project, :group_memberships => [Factory(:group_membership, :work_group => work_group)])
+    user = Factory(:user, :person => person)
+    #create a datafile that this person is the contributor
+    data_file = Factory(:data_file, :contributor => user, :projects => [project])
+    #create pi
+    role = Role.find_by_name('PI')
+    pi =  Factory(:person_in_project, :group_memberships => [Factory(:group_membership, :work_group => work_group)])
+    pi.group_memberships.first.roles << role
+    pi.save
+    assert_equal pi, project.pis.first
+
+    assert_difference('Person.count', -1) do
+      delete :destroy, :id => person
+    end
+
+    permissions_on_person = Permission.find(:all, :conditions => ["contributor_type =? and contributor_id=?", 'Person', person.try(:id)])
+    assert_equal 0, permissions_on_person.count
+
+    permissions = data_file.policy.permissions
+
+    assert_equal 1, permissions.count
+    assert_equal pi.id, permissions.first.contributor_id
+    assert_equal Policy::MANAGING, permissions.first.access_type
+  end
+
+  test 'should set the manage right on pal (if no pi) before deleting the person' do
+    login_as(:quentin)
+
+    project = Factory(:project)
+    work_group = Factory(:work_group, :project => project)
+    person = Factory(:person_in_project, :group_memberships => [Factory(:group_membership, :work_group => work_group)])
+    user = Factory(:user, :person => person)
+    #create a datafile that this person is the contributor and with the same project
+    data_file = Factory(:data_file, :contributor => user, :projects => [project])
+    #create pal
+    role = Role.find_by_name('Sysmo-DB Pal')
+    pal =  Factory(:person_in_project, :group_memberships => [Factory(:group_membership, :work_group => work_group)])
+    pal.group_memberships.first.roles << role
+    pal.is_pal = true
+    pal.save
+    assert_equal pal, project.pals.first
+    assert_equal 0, project.pis.count
+
+    assert_difference('Person.count', -1) do
+      delete :destroy, :id => person
+    end
+
+    permissions_on_person = Permission.find(:all, :conditions => ["contributor_type =? and contributor_id=?", 'Person', person.try(:id)])
+    assert_equal 0, permissions_on_person.count
+
+    permissions = data_file.policy.permissions
+
+    assert_equal 1, permissions.count
+    assert_equal pal.id, permissions.first.contributor_id
+    assert_equal Policy::MANAGING, permissions.first.access_type
+  end
 end

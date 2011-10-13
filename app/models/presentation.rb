@@ -11,7 +11,7 @@ class Presentation < ActiveRecord::Base
 
    has_one :content_blob, :as => :asset, :foreign_key => :asset_id ,:conditions => 'asset_version= #{self.version}'
 
-   acts_as_solr(:fields=>[:description,:title,:original_filename,:tag_counts]) if Seek::Config.solr_enabled
+   acts_as_solr(:fields=>[:description,:title,:original_filename,:searchable_tags]) if Seek::Config.solr_enabled
 
 
    explicit_versioning(:version_column => "version") do

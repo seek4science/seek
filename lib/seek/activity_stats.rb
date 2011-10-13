@@ -2,7 +2,7 @@ module Seek
   class ActivityStats   
     
     #the time periods to be tested
-    PERIODS={"daily"=>1.day.ago,"weekly"=>1.week.ago,"monthly"=>1.month.ago,"yearly"=>1.year.ago}
+    PERIODS={"daily"=>1.day.ago,"weekly"=>1.week.ago,"monthly"=>1.month.ago,"six_monthly"=>6.month.ago,"yearly"=>1.year.ago}
     
     #the item types to include
     INCLUDED_TYPES=["Sop","Model","Publication","DataFile","Assay","Study","Investigation"] 
@@ -29,6 +29,10 @@ module Seek
         end
         
       end    
+    end
+
+    def six_monthly_users
+      distinct_culprits_since 6.month.ago
     end
     
     def monthly_users

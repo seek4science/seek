@@ -1,0 +1,29 @@
+<%
+   compound_annotation = sabiork_search_result
+   compound_name = compound_annotation['recommended_name']
+   synonyms = compound_annotation['synonyms'].inject{|result, s| result.concat(s + "; ")}
+   synonyms.chomp!('; ')
+   sabiork_id = compound_annotation['sabiork_id']
+   chebi_ids = compound_annotation['chebi_ids'].inject{|result, id| result.concat(id + "; ")}
+   chebi_ids.chomp!('; ')
+   kegg_ids = compound_annotation['kegg_ids'].inject{|result, id| result.concat(id + "; ")}
+   kegg_ids.chomp!('; ')
+%>
+<div id='sabiork_search_result'>
+    <table class="compound_info">
+        <tr>
+          <th>Compound Name</th>
+          <th>Synonyms</th>
+          <th>Sabiork ID</th>
+          <th>ChEBI IDs</th>
+          <th>KEGG IDs</th>
+        </tr>
+        <tr>
+          <td><%= compound_name %></td>
+          <td><%= synonyms %></td>
+          <td><%= sabiork_id %></td>
+          <td><%= chebi_ids %></td>
+          <td><%= kegg_ids %></td>
+        </tr>
+    </table>
+</div>
