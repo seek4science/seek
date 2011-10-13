@@ -89,7 +89,12 @@ module AuthenticatedSystem
   end
 
   def redirect_back
-    redirect_to(:back)
+    if request.env['HTTP_REFERER']
+      redirect_to(:back)
+    else
+      redirect_to "/"
+    end
+    
     session[:return_to] = nil
   end
   
