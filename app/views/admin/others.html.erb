@@ -40,6 +40,13 @@
             :name=>"Maximum visible tags",
             :field=>text_field_tag(:max_visible_tags, Seek::Config.max_visible_tags, :title => 'maximum number of tags appeared in the tag cloud', :onkeypress => "javascript: return onlyNumbers(event);")
     } -%>
+
+    <%= render :partial=>'setting_li',:locals=>{
+            :description=>"This base URL for sabiork webservices REST API",
+            :name=>"SabioRK WS base URL",
+            :field=>text_field_tag(:sabiork_ws_base_url, Seek::Config.sabiork_ws_base_url, :title => 'this is needed for getting compound annotation from SabioRK')
+    } -%>
+
     <li>
         <%= submit_tag "Update",:disable_with=>"Updating..." -%>
     </li>

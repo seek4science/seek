@@ -51,7 +51,7 @@ GEM
     ruby-openid (2.1.8)
     ruby-prof (0.9.2)
     rubyzip (0.9.4)
-    simple-spreadsheet-extractor (0.6.3)
+    simple-spreadsheet-extractor (0.6.4)
       POpen4 (= 0.1.4)
       open4 (= 1.0.1)
     sqlite3-ruby (1.2.5)
@@ -82,7 +82,7 @@ DEPENDENCIES
   ruby-openid
   ruby-prof
   rubyzip
-  simple-spreadsheet-extractor (= 0.6.3)
+  simple-spreadsheet-extractor (= 0.6.4)
   sqlite3-ruby (= 1.2.5)
   timocratic-test_benchmark
   uuidtools (= 2.1.1)

@@ -47,7 +47,7 @@ class DoiQuery
 
       params[:authors] = []
       author_elements = article.find('//content_item/contributors/person_name')
-      author_elements ||= article.find('//contributors/person_name')
+      author_elements = article.find('//contributors/person_name') if author_elements.collect.blank?
       author_elements.each do |author|
         author_last_name = author.find_first(".//surname").content
         author_first_name = author.find_first(".//given_name").content
@@ -99,3 +99,6 @@ class DoiQuery
     end
   end
 end
+
+
+

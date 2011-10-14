@@ -31,6 +31,29 @@ class ModelsControllerTest < ActionController::TestCase
     end
     assert_not_nil flash[:error]    
   end
+
+  test 'creators show in list item' do
+    p1=Factory :person
+    p2=Factory :person
+    model=Factory(:model,:title=>"ZZZZZ",:creators=>[p2],:contributor=>p1.user,:policy=>Factory(:public_policy, :access_type=>Policy::VISIBLE))
+
+    get :index,:page=>"Z"
+
+    #check the test is behaving as expected:
+    assert_equal p1.user,model.contributor
+    assert model.creators.include?(p2)
+    assert_select ".list_item_title a[href=?]",model_path(model),"ZZZZZ","the data file for this test should appear as a list item"
+
+    #check for avatars
+    assert_select ".list_item_avatar" do
+      assert_select "a[href=?]",person_path(p2) do
+        assert_select "img"
+      end
+      assert_select "a[href=?]",person_path(p1) do
+        assert_select "img"
+      end
+    end
+  end
   
   test "shouldn't show hidden items in index" do
     login_as(:aaron)
@@ -576,48 +599,63 @@ class ModelsControllerTest < ActionController::TestCase
   end
 
   test "update with ajax only applied when viewable" do
-    login_as(:aaron)
-    user=users(:aaron)
-    model=models(:jws_model)
-    assert model.tag_counts.empty?,"This should have no tags for this test to work"
-    golf_tags=tags(:golf)
+    p=Factory :person
+    p2=Factory :person
+    viewable_model=Factory :model,:contributor=>p2,:policy=>Factory(:publicly_viewable_policy)
+    dummy_model=Factory :model
 
-    assert_difference("ActsAsTaggableOn::Tagging.count") do
-      xml_http_request :post, :update_tags_ajax,{:id=>model.id,:tag_autocompleter_unrecognized_items=>[],:tag_autocompleter_selected_ids=>[golf_tags.id]}
-    end
+    login_as p.user
 
-    model.reload
+    assert viewable_model.can_view?(p.user)
+    assert !viewable_model.can_edit?(p.user)
 
-    assert_equal ["golf"],model.tag_counts.collect(&:name)
+    golf=Factory :tag,:annotatable=>dummy_model,:source=>p2,:value=>"golf"
 
-    model=models(:private_model)
-    
-    assert model.tag_counts.empty?,"This should have no tags for this test to work"
+    xml_http_request :post, :update_annotations_ajax,{:id=>viewable_model,:tag_autocompleter_unrecognized_items=>[],:tag_autocompleter_selected_ids=>[golf.value.id]}
 
-    assert !model.can_view?(user),"Aaron should not be able to view this item for this test to be valid"
+    viewable_model.reload
 
-    assert_no_difference("ActsAsTaggableOn::Tagging.count") do
-      xml_http_request :post, :update_tags_ajax,{:id=>model.id,:tag_autocompleter_unrecognized_items=>[],:tag_autocompleter_selected_ids=>[golf_tags.id]}
-    end
+    assert_equal ["golf"],viewable_model.annotations.collect{|a| a.value.text}
 
-    model.reload
+    private_model=Factory :model,:contributor=>p2,:policy=>Factory(:private_policy)
 
-    assert model.tag_counts.empty?,"This should still have no tags"
+    assert !private_model.can_view?(p.user)
+    assert !private_model.can_edit?(p.user)
+
+    xml_http_request :post, :update_annotations_ajax,{:id=>private_model,:tag_autocompleter_unrecognized_items=>[],:tag_autocompleter_selected_ids=>[golf.value.id]}
+
+    private_model.reload
+    assert private_model.annotations.empty?
 
   end
 
   test "update tags with ajax" do
-    model=models(:teusink)
-    golf_tags=tags(:golf)
+    p = Factory :person
 
-    assert model.tag_counts.empty?, "This sop should have no tags for the test"
+    login_as p.user
 
-    assert_difference("ActsAsTaggableOn::Tag.count") do
-      xml_http_request :post, :update_tags_ajax,{:id=>model.id,:tag_autocompleter_unrecognized_items=>["soup"],:tag_autocompleter_selected_ids=>golf_tags.id}
-    end
+    p2 = Factory :person
+    model = Factory :model,:contributor=>p.user
+
+
+    assert model.annotations.empty?,"this model should have no tags for the test"
+
+    golf = Factory :tag,:annotatable=>model,:source=>p2.user,:value=>"golf"
+    Factory :tag,:annotatable=>model,:source=>p2.user,:value=>"sparrow"
 
     model.reload
-    assert_equal ["golf","soup"],model.tag_counts.collect(&:name).sort
+
+    assert_equal ["golf","sparrow"],model.annotations.collect{|a| a.value.text}.sort
+    assert_equal [],model.annotations.select{|a| a.source==p.user}.collect{|a| a.value.text}.sort
+    assert_equal ["golf","sparrow"],model.annotations.select{|a|a.source==p2.user}.collect{|a| a.value.text}.sort
+
+    xml_http_request :post, :update_annotations_ajax,{:id=>model,:tag_autocompleter_unrecognized_items=>["soup"],:tag_autocompleter_selected_ids=>[golf.value.id]}
+
+    model.reload
+
+    assert_equal ["golf","soup","sparrow"],model.annotations.collect{|a| a.value.text}.uniq.sort
+    assert_equal ["golf","soup"],model.annotations.select{|a| a.source==p.user}.collect{|a| a.value.text}.sort
+    assert_equal ["golf","sparrow"],model.annotations.select{|a|a.source==p2.user}.collect{|a| a.value.text}.sort
 
   end
 

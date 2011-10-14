@@ -256,6 +256,13 @@ spreadsheet_blob_view:
   original_filename: spreadsheet.xls
   content_type: application/vnd.excel
 
+private_spreadsheet_blob:
+  uuid: <%= init_blob('small-test-spreadsheet.xls') %>
+  original_filename: spreadsheet.xls
+  content_type: application/vnd.excel
+  asset: non_downloadable_data_file (DataFile)
+  asset_version: 1
+
 url_content_blob:
   url: http://mockedlocation.com/a-piccy.png
   uuid: <%= UUIDTools::UUID.random_create.to_s %>
@@ -294,12 +301,27 @@ invalid_sbml_xml_blob:
   content_type: text/xml
 
 non_jws_dat_blob:  
-  uuid: <%= init_blob('non_jws_dat.dat') %>    
+  uuid: <%= init_blob('non_jws_dat.dat') %>
   asset: non_jws_dat   (Model)
   asset_version: 1
   original_filename: non_jws_dat.xml
   content_type: text/xml
 
+unique_spreadsheet_blob:
+  uuid: <%= init_blob('small-test-spreadsheet.xls') %>
+  original_filename: spreadsheet.xls
+  content_type: application/vnd.excel
+  asset_version: 1
+  asset: downloadable_spreadsheet_data_file (DataFile)
+
+not_so_unique_spreadsheet_blob:
+  uuid: <%= init_blob('small-test-spreadsheet.xls') %>
+  original_filename: spreadsheet.xls
+  content_type: application/vnd.excel
+  asset_version: 2
+  asset: downloadable_spreadsheet_data_file (DataFile)
+
+  
 model_with_format_and_type_blob:
   uuid: <%= init_blob('Teusink.xml') %>
   asset: model_with_format_and_type (Model)

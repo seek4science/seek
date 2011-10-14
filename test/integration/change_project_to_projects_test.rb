@@ -7,18 +7,20 @@ class ChangeProjectToProjectsTest < ActionController::IntegrationTest
   def setup
     User.current_user = Factory(:user, :login => 'test')
     post '/sessions/create', :login => 'test', :password => 'blah'
+    @is_vl=Seek::Config.is_virtualliver
     Seek::Config.is_virtualliver = true
+  end
+
+  def teardown
+    Seek::Config.is_virtualliver=@is_vl
   end
 
   test 'form allows setting project_ids' do
     #TODO: update publications edit/new
     ASSETS_WITH_MULTIPLE_PROJECTS.each do |type_name|
-      p type_name
-      p 'new'
       get "/#{type_name}/new"
       assert_select "form select[name=?]", "#{type_name.singularize}[project_ids][]"
 
-      p 'edit'
       get "/#{type_name}/#{Factory(type_name.singularize.to_sym, :policy => Factory(:public_policy)).id}/edit"
         assert_select "form select[name=?]", "#{type_name.singularize}[project_ids][]"
     end
@@ -27,7 +29,6 @@ class ChangeProjectToProjectsTest < ActionController::IntegrationTest
   test 'choosing my project in the sharing form adds permissions for each project' do
     #publications are skipped, because they don't have a sharing form
     ASSETS_WITH_MULTIPLE_PROJECTS.reject { |t| t=='publications' }.each do |type_name|
-      p type_name
       item = Factory(type_name.singularize.to_sym, :contributor => User.current_user)
       item.projects = [Factory(:project), Factory(:project)]
 

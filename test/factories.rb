@@ -94,6 +94,11 @@ end
     f.sharing_scope Policy::ALL_SYSMO_USERS
     f.access_type Policy::ACCESSIBLE
   end
+    
+  Factory.define(:publicly_viewable_policy, :parent=>:policy) do |f|
+    f.sharing_scope Policy::EVERYONE
+    f.access_type Policy::VISIBLE
+  end
 
   Factory.define(:public_download_and_no_custom_sharing,:parent=>:policy) do |f|
     f.sharing_scope Policy::ALL_SYSMO_USERS
@@ -138,8 +143,6 @@ end
 
 Factory.define(:modelling_assay, :parent => :assay_base) do |f|
   f.association :assay_class, :factory => :modelling_assay_class
-  f.samples {[Factory.build :sample]}
-
 end
 
 Factory.define(:modelling_assay_with_organism, :parent => :modelling_assay) do |f|
@@ -276,6 +279,17 @@ end
     f.association :institution
   end
 
+  Factory.define(:favourite_group) do |f|
+    f.association :user
+    f.name 'A Favourite Group'
+  end
+
+  Factory.define(:favourite_group_membership) do |f|
+    f.association :person
+    f.association :favourite_group
+    f.access_type 1
+  end
+
   Factory.define(:organism) do |f|
     f.title "An Organism"
   end
@@ -296,6 +310,7 @@ end
   Factory.define(:activity_log) do |f|
     f.action "create"
     f.association :activity_loggable, :factory => :data_file
+    f.controller_name "data_files"
     f.association :culprit, :factory => :user
   end
 
@@ -307,7 +322,7 @@ end
     f.data_file_version 1
     f.association :measured_item, :factory => :measured_item
     f.association :unit, :factory => :unit
-    f.association :substance, :factory => :compound
+    f.studied_factor_links {[StudiedFactorLink.new(:substance => Factory(:compound))]}
     f.association :data_file, :factory => :data_file
   end
 
@@ -340,15 +355,19 @@ end
     f.sequence(:name) {|n| "glucose #{n}"}
   end
 
- #Experimental condition
+  Factory.define(:studied_factor_link) do |f|
+    f.association :substance, :factory => :compound
+    f.association :studied_factor
+  end
+
+  #Experimental condition
   Factory.define(:experimental_condition) do |f|
     f.start_value 1
-    f.end_value 10
     f.sop_version 1
     f.association :measured_item, :factory => :measured_item
     f.association :unit, :factory => :unit
-    f.association :substance, :factory => :compound
     f.association :sop, :factory => :sop
+    f.experimental_condition_links {[ExperimentalConditionLink.new(:substance => Factory(:compound))]}
   end
 
 Factory.define(:scalable,:parent=>:data_file){}
@@ -376,3 +395,64 @@ end
   Factory.define(:special_auth_code) do |f|
     f.association :asset, :factory => :data_file
   end
+  
+  Factory.define(:experimental_condition_link) do |f|
+    f.association :substance, :factory => :compound
+    f.association :experimental_condition
+  end
+
+  Factory.define :synonym do |f|
+    f.name "coffee"
+    f.association :substance, :factory=>:compound
+  end
+
+  Factory.define :mapping_link do |f|
+    f.association :substance, :factory=>:compound
+    f.association :mapping,:factory=>:mapping
+  end
+
+  Factory.define :mapping do |f|
+    f.chebi_id "12345"
+    f.kegg_id "6789"
+    f.sabiork_id "4"
+  end
+
+  Factory.define :site_announcement do |f|
+    f.sequence(:title) {|n| "Announcement #{n}"}
+    f.sequence(:body) {|n| "This is the body for announcement #{n}"}
+    f.association :announcer,:factory=>:admin
+    f.is_headline false
+    f.expires_at 5.days.since
+    f.email_notification false
+  end
+
+  Factory.define :headline_announcement,:parent=>:site_announcement do |f|
+    f.is_headline true
+  end
+
+  Factory.define :annotation do |f|
+    f.sequence(:value) {|n| "anno #{n}"}
+    f.association :source, :factory=>:person
+  end
+
+  Factory.define :tag,:parent=>:annotation do |f|
+    f.attribute_name "tag"
+  end
+
+  Factory.define :expertise,:parent=>:annotation do |f|
+    f.attribute_name "expertise"
+  end
+
+  Factory.define :tool,:parent=>:annotation do |f|
+    f.attribute_name "tool"
+  end
+
+  Factory.define :text_value do |f|
+    f.sequence(:text) {|n| "value #{n}"}
+  end
+
+  Factory.define :assets_creator do |f|
+    f.association :asset, :factory => :data_file
+    f.association :creator, :factory => :person_in_project
+  end
+

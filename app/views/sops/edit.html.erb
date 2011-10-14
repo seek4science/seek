@@ -37,7 +37,8 @@
 	<%= render :partial => "assays/associate_assays", :locals=>{:resource => @sop, :show_relationships => false} -%>
       <% end -%>           
         <p>
-            <%= f.submit "Update", :id => "sop_submit_btn", :onclick => "javascript: validateSopFields(false); return(false);" -%> or <%= link_to "Cancel", sop_path(@sop) -%>
+          <%= preview_permission_popup_link('sop', url_for(:controller => 'policies', :action => 'preview_permissions'), false, try_block{@sop.contributor.id})-%>
+          <%= f.submit "Update", :id => "sop_submit_btn", :onclick => "javascript: validateResourceFields(false, 'sop', #{current_user_authorized_to_manage}); return(false);" -%> or <%= link_to "Cancel", sop_path(@sop) -%>
         </p>
 		</div>
         <% end %>    

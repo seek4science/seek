@@ -1,0 +1,33 @@
+<div class="yui-g home_panel_pair">
+  <div class="yui-u first home_panel" style="display:<%= Seek::Config.project_news_enabled ? 'block' : 'none' -%>">
+     <div class="heading"><%= Seek::Config.project_name%> News</div>
+     <div id="project_news" class="homepanel_list">
+        <ul>
+         <%
+           entries = Seek::FeedReader.fetch_entries_for :project_news
+         %>
+         <% unless entries.blank? %>
+             <% entries.each do |entry|   %>
+                <%= display_single_entry(entry) -%>
+             <% end %>
+         <% end %>
+         </ul>
+     </div>
+  </div>
+
+  <div class="yui-u home_panel" style="display:<%= Seek::Config.community_news_enabled ? 'block' : 'none' -%>">
+     <div class="heading">Community News</div>
+     <div id="community_news" class="homepanel_list">
+         <ul>
+         <%
+            entries = Seek::FeedReader.fetch_entries_for :community_news
+         %>
+         <% unless entries.blank? %>
+             <% entries.each do |entry|   %>
+                <%= display_single_entry(entry) -%>
+             <% end %>
+         <% end %>
+         </ul>
+     </div>
+  </div>
+</div>

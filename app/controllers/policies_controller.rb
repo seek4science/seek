@@ -62,4 +62,75 @@ class PoliciesController < ApplicationController
       }
     end
   end
+
+  def preview_permissions
+      set_no_layout
+      creators = (params["creators"].blank? ? [] : ActiveSupport::JSON.decode(params["creators"])).uniq
+      creators.collect!{|c| Person.find(c[1])}
+      policy = sharing_params_to_policy
+      if params['is_new_file'] == 'false'
+        contributor = try_block{User.find_by_id(params['contributor_id'].to_i).person}
+        grouped_people_by_access_type = policy.summarize_permissions creators, contributor
+      else
+        grouped_people_by_access_type = policy.summarize_permissions creators
+      end
+
+      respond_to do |format|
+        format.html { render :template=>"layouts/preview_permissions", :locals => {:grouped_people_by_access_type => grouped_people_by_access_type}}
+      end
+  end
+
+  protected
+  def sharing_params_to_policy params=params
+      policy =Policy.new()
+      policy.sharing_scope = params["sharing_scope"].to_i
+      policy.access_type = params["access_type"].to_i
+      policy.use_whitelist = params["use_whitelist"] == 'true' ? true : false
+      policy.use_blacklist = params["use_blacklist"] == 'true' ? true : false
+
+      #now process the params for permissions
+      contributor_types = params["contributor_types"].blank? ? [] : ActiveSupport::JSON.decode(params["contributor_types"])
+      new_permission_data = params["contributor_values"].blank? ? {} : ActiveSupport::JSON.decode(params["contributor_values"])
+
+      #if share with your project and with all_sysmo_user is chosen
+      if (policy.sharing_scope == Policy::ALL_SYSMO_USERS)
+          your_proj_access_type = params["project_access_type"].blank? ? nil : params["project_access_type"].to_i
+          project_ids = []
+          #when resource is study, id of the investigation is sent, so get the project_ids from the investigation
+          if (params["resource_name"] == 'study') and (!params["project_ids"].blank?)
+            investigation = Investigation.find_by_id(try_block{params["project_ids"].to_i})
+            project_ids = try_block{investigation.projects.collect{|p| p.id}}
+
+          #when resource is assay, id of the study is sent, so get the project_ids from the study
+          elsif (params["resource_name"] == 'assay') and (!params["project_ids"].blank?)
+            study = Study.find_by_id(try_block{params["project_ids"].to_i})
+            project_ids = try_block{study.projects.collect{|p| p.id}}
+          #normal case, the project_ids is sent
+          else
+            project_ids = params["project_ids"].blank? ? [] : params["project_ids"].split(',')
+          end
+          project_ids.each do |project_id|
+            project_id = project_id.to_i
+            #add Project to contributor_type
+            contributor_types << "Project" if !contributor_types.include? "Project"
+            #add one hash {project.id => {"access_type" => sharing[:your_proj_access_type].to_i}} to new_permission_data
+            if !new_permission_data.has_key?('Project')
+              new_permission_data["Project"] = {project_id => {"access_type" => your_proj_access_type}}
+            else
+              new_permission_data["Project"][project_id] = {"access_type" => your_proj_access_type}
+            end
+          end
+      end
+
+      #build permissions
+      contributor_types.each do |contributor_type|
+         new_permission_data[contributor_type].each do |key, value|
+           policy.permissions.build(:contributor_type => contributor_type, :contributor_id => key, :access_type => value.values.first)
+         end
+      end
+    policy
+  end
+
 end
+
+

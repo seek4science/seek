@@ -20,3 +20,6 @@ datafile_and_publication:
     subject: picture (DataFile)
     object: pubmed_2 (Publication)
     predicate: Relationship::RELATED_TO_PUBLICATION
+
+
+

@@ -9,19 +9,20 @@ module ImagesHelper
       :style => "vertical-align:middle;")
   end
   
-  def image_tag_for_key(key, url=nil, alt=nil, url_options={}, label=key.humanize, remote=false)
+  def image_tag_for_key(key, url=nil, alt=nil, url_options={}, label=key.humanize, remote=false, size=nil)
 
     if (label == 'Destroy')
       label = 'Delete';
     end
     
     return nil unless (filename = icon_filename_for_key(key.downcase))
-    
+
     image_options = alt ? { :alt => alt } : { :alt => key.humanize }
+    image_options[:size] = "#{size}x#{size}" unless size.blank?
     img_tag = image_tag(filename, image_options)
-    
+
     inner = img_tag;
-    inner = "#{img_tag} #{label}" unless label == nil
+    inner = "#{img_tag} #{label}" unless label.blank?
     
     if (url)
       if (remote==:function)
@@ -255,6 +256,18 @@ module ImagesHelper
         "misc_icons/green_virus-64x64.png"
       when "publish"
        "crystal_project/22x22/actions/up.png"
+      when "spreadsheet"
+      "famfamfam_silk/table.png"
+      when "spreadsheet_annotation"
+      "famfamfam_silk/tag_blue.png"
+      when "spreadsheet_annotation_edit"
+      "famfamfam_silk/tag_blue_edit.png"
+      when "spreadsheet_annotation_add"
+      "famfamfam_silk/tag_blue_add.png"
+      when "spreadsheet_annotation_destroy"
+      "famfamfam_silk/tag_blue_delete.png"
+      when "spreadsheet_export"
+      "famfamfam_silk/table_go.png"
       when 'unsubscribe'
         "famfamfam_silk/email_delete.png"
       when 'subscribe'

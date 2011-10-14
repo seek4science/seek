@@ -16,16 +16,6 @@ class UsersControllerTest < ActionController::TestCase
     @request    = ActionController::TestRequest.new
     @response   = ActionController::TestResponse.new
   end
-
-
-  test "creatable classes order" do
-    user_creatable_classes =  [DataFile,Model,Presentation,Publication,Sop,Assay,Investigation,Study,Event,Sample,Specimen]
-    unless Seek::Config.is_virtualliver
-      user_creatable_classes.delete(Specimen)
-      user_creatable_classes.delete(Sample)
-    end
-    assert_equal user_creatable_classes,@controller.send(:user_creatable_classes)
-  end
   
   def test_title
     get :new

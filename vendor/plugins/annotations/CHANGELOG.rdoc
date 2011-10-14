@@ -1,0 +1,64 @@
+= Changelog
+
+== 0.4.1
+* Add +Annotation::include_values+ as a named scope that can be used to potentially improve performance.
+* Added +include_values+ optional argument (default: false) to as many finder methods. This allows you to specify whether value records must be included in the query results or not, and *may* be used to improve performance.
+
+== 0.4.0
+* New config option: +Annotations::Config.value_factories+ - support for value object generation factories per attribute name.
+Example:    
+    Annotations::Config.value_factories["tag"] = Proc.new { |v|
+      case v
+        when String, Symbol
+          Tag.find_or_create_by_name(v.to_s)
+        else
+          v
+      end
+    }
+IMPORTANT: don't use explicit +return+s in your Proc otherwise it will cause the returning method to exit too!
+* The process of generating/setting the annotation's actual value object has been changed to "lazy generate" the actual +value+ object of the annotation. This is now done before validation. NOTE: this still allows +Annotation#value+ (which has been overridden) to be set at any time, but the actual setting of the value association at the ActiveRecord level now happens later.
+* The +process_value_adjustments+ code in the +Annotation+ model now happens BEFORE setting the value association. This prevents the value object from being modified after it's been set. NOTE: this does also mean that it will only run when provided with a String or Symbol.
+* New config option: +Annotations::Config.valid_value_types+ - support for validation checks based on the class of the value object.
+Example:
+    Annotations::Config::valid_value_types["tag"] = "Tag"
+
+== 0.3.1
+* Minor bugfixes
+* +annotations_version_fu+ nows allows reloading of the versioned columns (needed if doing something during a migration).
+
+== 0.3.0
+* +acts_as_annotatable+ now requires you to specify an option - +:name_field+ - on the model that is becoming an annotatable.
+* +acts_as_annotatable+ now exposes an +is_annotatable+ attribute to allow you to check if a model can act as an annotatable. 
+
+== 0.2.1
+* Updated the routes to allow +requirements+ to be passed in.
+
+== 0.2.0
+*Main change*: 
+Annotation values are now polymorphic rather than just plain strings. 
+Some basic +act_as_annotation_value+ models have been introduced for this. 
+Note: this has affected all methods that take in or work with annotation values. 
+See below for further details.
+
+* New mixin module: +acts_as_annotation_value+.
+* New basic annotation value models: +TextValue+ and +NumberValue+ (but note that you can use any model as a value by specifying +acts_as_annotation_value+ on it).
+* Removed +Annotation::find_annotatables_with_attribute_name_and_value+.
+* Removed +Annotation::find_annotatables_with_attribute_names_and_values+.
+* Removed +with_annotations_with_attribute_name_and_value+ in the +acts_as_annotatable+ module.
+* +Annotations::Config::value_restrictions+ has been renamed to +Annotations::Config::content_restrictions+
+* Latest migration version = v3
+* NOTE: the new migration script will keep the old +value+ column data in a new +old_value+ column for EXISTING annotations only. This can be used for verification/text purposes.
+
+== 0.1.1
+* Added +identifier+ to +AnnotationAttribute+. This can be used to specify what ontology term / URI the attribute can be
+  uniquely identified using. See +AnnotationAttribute#before_validation+ for more information on how this identifier
+  will be generated if not specified manually.
+* Changed the +annotations+ association in +act_as_annotation_source+ to +annotations_by+, to fix cases when a model has both
+  +acts_as_annotatable+ AND +acts_as_annotation_source+.
+* Latest migration version = v2
+
+== 0.1.0 (July 23rd 2009)
+* Initial import from the BioCatalogue codebase.
+* Improved documentation. See README.rdoc for more info on features and usage.
+* Latest migration version = v1
+              

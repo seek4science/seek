@@ -1,7 +1,18 @@
 <%
    tags=[]
+
    if !person.user.nil?
-       tags=person.user.owned_tags
+       tags = person.user.annotations_by.with_attribute_name("tag")
+
+       tag_values = []
+       annotations = []
+       tags.each do |tag|
+         if !(tag_values.include?(tag.value.id))
+           annotations << tag
+           tag_values << tag.value.id
+         end
+       end
+       tags = annotations.collect{|a| a.value}
    end
 -%>
 
