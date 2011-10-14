@@ -30,8 +30,9 @@ class ProjectsControllerTest < ActionController::TestCase
 	end
 
 	def test_should_create_project
+    parent_id = Factory(:project,:title=>"Test Parent").id
 		assert_difference('Project.count') do
-			post :create, :project => {:name=>"test"}
+			post :create, :project => {:name=>"test",:parent_id=>parent_id}
 		end
 
 		assert_redirected_to project_path(assigns(:project))
@@ -48,7 +49,8 @@ class ProjectsControllerTest < ActionController::TestCase
 	end
 
 	def test_should_update_project
-		put :update, :id => projects(:four), :project => valid_project
+    parent_id = Factory(:project,:title=>"Test Parent").id
+		put :update, :id => projects(:four), :project => {:parent_id=>parent_id}
 		assert_redirected_to project_path(assigns(:project))
 	end
 
@@ -58,15 +60,26 @@ class ProjectsControllerTest < ActionController::TestCase
 		end
 
 		assert_redirected_to projects_path
-	end
+  end
+
+  def test_admin_can_manage
+    get :manage, :id=> Factory(:project)
+    assert_response :success
+  end
 
 	def test_non_admin_should_not_destroy_project
-		login_as(:aaron)
+		login_as Factory(:user,:person=>Factory(:person))
 		assert_no_difference('Project.count') do
-			delete :destroy, :id => projects(:four)
+			delete :destroy, :id => Factory(:project)
 		end
 
 	end
+
+  def test_non_admin_should_not_manage_projects
+		login_as(:aaron)
+		get :manage,:id=> Factory(:project)
+    assert_not_nil flash[:error]
+  end
 
 	test 'should get index for non-project member, non-login user' do
 		login_as(:registered_user_with_no_projects)
@@ -214,7 +227,8 @@ class ProjectsControllerTest < ActionController::TestCase
 
 
 	test "non admin cannot administer project" do
-		login_as(:pal_user)
+		#login_as(:pal_user)
+    login_as Factory(:user,:person=>Factory(:person))
 		get :admin,:id=>projects(:sysmo_project)
 		assert_response :redirect
 		assert_not_nil flash[:error]
