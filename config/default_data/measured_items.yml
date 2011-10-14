@@ -45,3 +45,11 @@ dry biomass concentration:
 optical density 600 nm:
   title: optical density 600 nm
   factors_studied: false
+
+growth medium:
+  title: growth medium
+  factors_studied: true
+
+buffer:
+  title: buffer
+  factors_studied: true

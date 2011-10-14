@@ -57,20 +57,75 @@
     </tr>
   </table>
   <br/>
-  <%= hidden_field_tag :sysmo_member, true -%>  
-  
-  <br/>
-  <div id="sysmo_member_details_div" >
-    <p class="box_infotext" style="text-align:center">
-      Please provide some additional details about the projects your are a member of,<br/> and the institution at which you are based.<br/>
-    </p>
+  <%= hidden_field_tag :sysmo_member, true -%>
+
+
     <br/>
-    <center>
-      <%=
-      text_area_tag :sysmo_member_details,nil,:size=>"60x5"
-      -%>
-    </center>
-  </div>
-  <br/>
+    <h2>Projects & Institutions</h2>
+        <div class="yui-g box_simple">
+        <center>
+          <div class="yui-u first" style="width: 42%; margin-left: 2em; margin-top: 1em; margin-bottom: 1em;">
+            <span style="font-weight:bold;float: left">Projects:</span> <br/>
+            <%= select_tag "projects",
+              options_for_select(Project.all.collect {|p| [p.name, "#{p.name},#{p.id}"]}|[['Others','Others,0']]),
+              {:onchange => "Javascript:others('projects')", :multiple => true, :style => "width: 100%" }
+            -%>
+            <div id='other_projects' style='display: none'>
+              <br/>
+              <span style="font-weight:bold;float: left">Other projects:</span> <br/> <%= text_field_tag :other_projects, nil, {:style => "width: 100%"} %>
+            </div>
+          </div>
+        </center>
+
+        <center>
+          <div class="yui-u" style="width: 42%;margin-right: 2em; margin-top: 1em; margin-bottom: 1em;">
+              <span style="font-weight:bold;float: left">Institutions:</span> <br/>
+              <%= select_tag "institutions",
+                options_for_select(Institution.all.collect {|i| [i.name, "#{i.name},#{i.id}"]}|[['Others', 'Others,0']]),
+                {:onchange => "Javascript:others('institutions')", :multiple => true, :style => "width: 100%;" }
+              -%>
+              <div id='other_institutions' style='display: none'>
+                <br/>
+                <span style="font-weight:bold;float: left">Other institutions:</span> <br/> <%= text_field_tag :other_institutions, nil, {:style => "width: 100%"} %>
+              </div>
+          </div>
+        </center>
+        </div>
+
+    <br/>
+
   <%=  f.submit("Create",:disable_with=>"Creating...") %>
 <% end -%>
+
+<script type="text/javascript">
+  function others(element_id){
+     //check if the selected item is 'Other'
+     var selected_texts = selectedEntryTexts(element_id)
+     var check_flag = false;
+     for (var i=0; i<selected_texts.length; i++){
+        if (selected_texts[i] == 'Others'){
+            check_flag = true;
+            break;
+         }
+     }
+     if (check_flag == true){
+        Effect.Appear('other_' + element_id, { duration: 1 });
+     }else{
+        Effect.Fade('other_' + element_id, { duration: 0.25 });
+     }
+  }
+
+  function selectedEntryTexts(element_id){
+      var selectedArray = new Array();
+      var selObj = document.getElementById(element_id);
+      var i;
+      var count = 0;
+      for (i=0; i<selObj.options.length; i++) {
+        if (selObj.options[i].selected) {
+          selectedArray[count] = selObj.options[i].text;
+          count++;
+        }
+      }
+      return selectedArray;
+  }
+</script>

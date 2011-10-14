@@ -24,7 +24,9 @@
       <p>
         <%= fancy_multiselect @data_file,:scales, {:possibilities=>sort_scales(Scale.all)} -%>
       </p>
-        <%= render :partial=>"assets/asset_form_bottom", :locals=> {:resource_type => "DataFile"} -%>
+
+      <%= fields_for(@data_file) {|f|render :partial=>"assets/asset_form_bottom", :locals=> {:f => f}} -%>
+      
         <p>
             <% if Seek::Config.events_enabled -%>
                 <%= render :partial => "assets/associate_event", :locals=>{:resource => @data_file} -%>
@@ -34,7 +36,8 @@
             <%= render :partial => "assays/associate_assays", :locals=>{:resource => @data_file, :show_relationships=>true} -%>
         </p>
         <p>
-            <%= submit_tag "Upload and Save", :id => "data_file_submit_btn", :onclick => "javascript: validateDataFileFields(true); return(false);" -%> or <%= link_to 'Cancel', data_files_path -%>
+          <%= preview_permission_popup_link('data_file', url_for(:controller => 'policies', :action => 'preview_permissions'), true)-%>
+          <%= submit_tag "Upload and Save", :id => "data_file_submit_btn", :onclick => "javascript: validateResourceFields(true,'data_file'); return(false);" -%> or <%= link_to 'Cancel', data_files_path -%>
         </p>
     </div>
     <% end -%>

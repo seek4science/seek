@@ -42,6 +42,29 @@ class SopsControllerTest < ActionController::TestCase
 
   end
 
+  test 'creators show in list item' do
+    p1=Factory :person
+    p2=Factory :person
+    sop=Factory(:sop,:title=>"ZZZZZ",:creators=>[p2],:contributor=>p1.user,:policy=>Factory(:public_policy, :access_type=>Policy::VISIBLE))
+
+    get :index,:page=>"Z"
+
+    #check the test is behaving as expected:
+    assert_equal p1.user,sop.contributor
+    assert sop.creators.include?(p2)
+    assert_select ".list_item_title a[href=?]",sop_path(sop),"ZZZZZ","the data file for this test should appear as a list item"
+
+    #check for avatars
+    assert_select ".list_item_avatar" do
+      assert_select "a[href=?]",person_path(p2) do
+        assert_select "img"
+      end
+      assert_select "a[href=?]",person_path(p1) do
+        assert_select "img"
+      end
+    end
+  end
+
   test "request file button visibility when logged in and out" do
 
     sop = Factory :sop,:policy => Factory(:policy, :sharing_scope => Policy::EVERYONE, :access_type => Policy::VISIBLE)
@@ -370,9 +393,9 @@ class SopsControllerTest < ActionController::TestCase
   end
 
   def test_should_duplicate_conditions_for_new_version
-    s          =sops(:editable_sop)
+    s=sops(:editable_sop)
     condition1 = ExperimentalCondition.create(:unit        => units(:gram), :measured_item => measured_items(:weight),
-                                              :start_value => 1, :end_value => 2, :sop_id => s.id, :sop_version => s.version)
+                                              :start_value => 1, :sop_id => s.id, :sop_version => s.version)
     assert_difference("Sop::Version.count", 1) do
       post :new_version, :id=>s, :sop=>{:data=>fixture_file_upload('files/file_picture.png')}, :revision_comment=>"This is a new revision" #v2
     end
@@ -383,9 +406,9 @@ class SopsControllerTest < ActionController::TestCase
   end
 
   def test_adding_new_conditions_to_different_versions
-    s          =sops(:editable_sop)
-    condition1 = ExperimentalCondition.create(:unit        => units(:gram), :measured_item => measured_items(:weight),
-                                              :start_value => 1, :end_value => 2, :sop_id => s.id, :sop_version => s.version)
+    s =sops(:editable_sop)
+    condition1 = ExperimentalCondition.create(:unit => units(:gram), :measured_item => measured_items(:weight),
+                                              :start_value => 1, :sop_id => s.id, :sop_version => s.version)
     assert_difference("Sop::Version.count", 1) do
       post :new_version, :id=>s, :sop=>{:data=>fixture_file_upload('files/file_picture.png')}, :revision_comment=>"This is a new revision" #v2
     end
@@ -394,8 +417,8 @@ class SopsControllerTest < ActionController::TestCase
     assert_equal condition1, s.find_version(1).experimental_conditions.first
     assert_equal 0, s.find_version(2).experimental_conditions.count
 
-    condition2 = ExperimentalCondition.create(:unit        => units(:gram), :measured_item => measured_items(:weight),
-                                              :start_value => 2, :end_value => 3, :sop_id => s.id, :sop_version => 2)
+    condition2 = ExperimentalCondition.create(:unit => units(:gram), :measured_item => measured_items(:weight),
+                                              :start_value => 2, :sop_id => s.id, :sop_version => 2)
 
     assert_not_equal 0, s.find_version(2).experimental_conditions.count
     assert_equal condition2, s.find_version(2).experimental_conditions.first
@@ -499,166 +522,6 @@ class SopsControllerTest < ActionController::TestCase
 
     assert_equal "new title", sop.title
     assert_equal Policy::NO_ACCESS, sop.policy.access_type, "policy should have been updated"
-  end
-
-  test "update with ajax only applied when viewable" do
-    login_as(:aaron)
-    user=users(:aaron)
-    sop=sops(:sop_with_fully_public_policy)
-    assert sop.tag_counts.empty?,"This should have no tags for this test to work"
-    golf_tags=tags(:golf)
-    
-    assert_difference("ActsAsTaggableOn::Tagging.count") do
-      xml_http_request :post, :update_tags_ajax,{:id=>sop.id,:tag_autocompleter_unrecognized_items=>[],:tag_autocompleter_selected_ids=>[golf_tags.id]}
-    end
-
-    sop.reload
-
-    assert_equal ["golf"],sop.tag_counts.collect(&:name)
-
-    sop=sops(:private_sop)
-    assert sop.tag_counts.empty?,"This should have no tags for this test to work"
-    
-    assert !sop.can_view?(user),"Aaron should not be able to view this item for this test to be valid"
-
-    assert_no_difference("ActsAsTaggableOn::Tagging.count") do
-      xml_http_request :post, :update_tags_ajax,{:id=>sop.id,:tag_autocompleter_unrecognized_items=>[],:tag_autocompleter_selected_ids=>[golf_tags.id]}
-    end
-
-    sop.reload
-
-    assert sop.tag_counts.empty?,"This should still have no tags"
-
-  end
-
-  test "update tags with ajax" do
-    sop=sops(:downloadable_sop)
-    golf_tags=tags(:golf)
-    user=users(:quentin)
-
-    assert sop.tag_counts.empty?, "This sop should have no tags for the test"
-
-    #another owners tags. that should be preserved
-    user2 = users(:aaron)
-    user2.tag sop,:with=>"golf, sparrow",:on=>:tags
-
-    assert_difference("ActsAsTaggableOn::Tag.count") do
-      xml_http_request :post, :update_tags_ajax,{:id=>sop.id,:tag_autocompleter_unrecognized_items=>["soup"],:tag_autocompleter_selected_ids=>[golf_tags.id]}
-    end
-
-    sop.reload
-    assert_equal ["golf","soup","sparrow"],sop.tag_counts.collect(&:name).sort
-    assert_equal ["golf","soup"],sop.owner_tags_on(user,:tags).collect(&:name).sort
-    assert_equal ["golf","sparrow"],sop.owner_tags_on(user2,:tags).collect(&:name).sort
-
-  end
-
-  test "should update sop tags" do
-    login_as(:owner_of_my_first_sop)
-    user = users(:owner_of_my_first_sop)
-    sop=sops(:my_first_sop)
-
-    assert sop.tag_counts.empty?, "This sop should have no tags"
-
-    golf_tags=tags(:golf)
-
-    #give it somme existing tags that should be removed
-    user.tag sop,:with=>"fish, apple",:on=>:tags
-
-    sop.save!
-
-    put :update, :id => sop, :tag_autocompleter_unrecognized_items=>["soup"],:tag_autocompleter_selected_ids=>golf_tags.id,:sop=>{}, :sharing=>valid_sharing
-    sop.reload
-
-    assert_equal ["golf","soup"],sop.owner_tags_on(user,:tags).collect(&:name).sort
-    assert_equal ["golf","soup"],sop.tag_counts.collect(&:name).sort
-  end
-
-  test "should update sop tags with correct ownership" do
-    login_as(:owner_of_my_first_sop)
-    sop=sops(:my_first_sop)
-    user_owner = users(:owner_of_my_first_sop)
-    user2 = users(:aaron)
-    user3 = users(:datafile_owner)
-
-    assert sop.tag_counts.empty?, "This sop should have no tags"
-
-    user_owner.tag sop,:with=>"fish",:on=>:tags
-    user2.tag sop,:with=>"fish, golf",:on=>:tags
-    user3.tag sop, :with=>"apple",:on=>:tags
-
-    sop.reload
-
-    assert_equal ["fish"],sop.owner_tags_on(user_owner,:tags).collect(&:name).sort
-    assert_equal ["fish","golf"],sop.owner_tags_on(user2,:tags).collect(&:name).sort
-    assert_equal ["apple"],sop.owner_tags_on(user3,:tags).collect(&:name).sort
-    assert_equal ["apple","fish","golf"],sop.tag_counts.collect(&:name).sort
-
-    golf_tags=tags(:golf)
-
-    put :update, :id => sop, :tag_autocompleter_unrecognized_items=>["soup"],:tag_autocompleter_selected_ids=>golf_tags.id,:sop=>{}, :sharing=>valid_sharing
-    sop.reload
-
-    assert_equal ["soup"],sop.owner_tags_on(user_owner,:tags).collect(&:name).sort
-    assert_equal ["golf"],sop.owner_tags_on(user2,:tags).collect(&:name).sort
-    assert_equal [],sop.owner_tags_on(user3,:tags).collect(&:name).sort
-    assert_equal ["golf","soup"],sop.tag_counts.collect(&:name).sort
-
-  end
-
-  test "should update sop tags with correct ownership2" do
-    #a specific case where a tag to keep was added by both the owner and another user.
-    #Test checks that the correct tag ownership is preserved.
-    login_as(:owner_of_my_first_sop)
-    sop=sops(:my_first_sop)
-    user_owner = users(:owner_of_my_first_sop)
-    user2 = users(:aaron)
-
-    assert sop.tag_counts.empty?, "This sop should have no tags"
-
-    user_owner.tag sop,:with=>"fish,golf",:on=>:tags
-    user2.tag sop,:with=>"apple, golf",:on=>:tags
-
-    sop.reload
-
-    assert_equal ["fish","golf"],sop.owner_tags_on(user_owner,:tags).collect(&:name).sort
-    assert_equal ["apple","golf"],sop.owner_tags_on(user2,:tags).collect(&:name).sort
-    assert_equal ["apple","fish","golf"],sop.tag_counts.collect(&:name).sort
-
-    golf_tags=tags(:golf)
-
-    put :update, :id => sop, :tag_autocompleter_unrecognized_items=>[],:tag_autocompleter_selected_ids=>golf_tags.id,:sop=>{}, :sharing=>valid_sharing
-    sop.reload
-
-    assert_equal ["golf"],sop.owner_tags_on(user_owner,:tags).collect(&:name).sort
-    assert_equal ["golf"],sop.owner_tags_on(user2,:tags).collect(&:name).sort
-    assert_equal ["golf"],sop.tag_counts.collect(&:name).sort
-
-  end
-
-  test "update tags with known tags passed as unrecognised" do
-    #checks that when a known tag is incorrectly passed as a new tag, it is correctly handled
-    #this can happen when a tag is typed in full, rather than relying on autocomplete, and can affect the correct preservation of ownership
-    login_as(:owner_of_my_first_sop)
-    sop=sops(:my_first_sop)
-    user = users(:owner_of_my_first_sop)
-    user2 = users(:aaron)
-
-    assert sop.tag_counts.empty?, "This sop should have no tags"
-
-    golf_tags=tags(:golf)
-
-    user.tag sop, :with=>"fish, golf", :on=>:tags
-    user2.tag sop, :with=>"fish, soup", :on=>:tags
-
-    put :update, :id => sop, :tag_autocompleter_unrecognized_items=>["fish"],:tag_autocompleter_selected_ids=>golf_tags.id,:sop=>{}, :sharing=>valid_sharing
-
-    sop.reload
-
-    assert_equal ["fish","golf"],sop.owner_tags_on(user,:tags).collect(&:name).sort
-    assert_equal ["fish"],sop.owner_tags_on(user2,:tags).collect(&:name).sort
-    assert_equal ["fish","golf"],sop.tag_counts.collect(&:name).sort
-
   end
 
   test "do publish" do

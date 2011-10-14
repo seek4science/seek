@@ -1,7 +1,7 @@
 
 
 <h1>
-  Editing tag: '<strong><%= @tag.name -%></strong>'
+  Editing tag: '<strong><%= @tag.text -%></strong>'
 </h1>
 
 <h2>New tags</h2>
@@ -15,7 +15,7 @@
         <span class="tab_stop"><input type="text" id="tags_hidden_input" tabindex="-1"></span>
 
         <div id="tags_autocomplete_display" class="tokenizer_input">
-          <input type="text" size="1" tabindex="" id="tags_autocomplete_input"/>
+          <input type="text" size="1" tabindex="" id="tags_autocomplete_input" onBlur="addLastTag('tags_autocompleter');"/>
         </div>
       </div>
       <div id="tags_autocomplete_populate" class="clearfix autocomplete typeahead_list" style="width: 600px; height: auto; overflow-y: hidden;display:none">
@@ -45,17 +45,13 @@
   autocompleters[tags_autocompleter_id] = tags_autocompleter;
 </script>
 
-<h2>Tagged items (<%= @tag.taggings.select{|t| !t.taggable.nil?}.size -%>)</h2>
+<h2>Tagged items (<%= @tag.annotations.size -%>)</h2>
 <ul>
-  <% for tagging in @tag.taggings do -%>
-      <% unless tagging.taggable.nil? -%>
-          <li>
-            <%= link_to "#{tagging.taggable.title} ( #{tagging.taggable_type} )", tagging.taggable -%>
-            context = <%= tagging.context -%>
-
-
-          </li>
-      <% end -%>
+  <% @tag.annotations.each do |a| -%>
+      <li>
+        <%= link_to "#{try_block{a.annotatable.title}} ( #{a.annotatable_type} )", a.annotatable -%>
+        context = <%= a.attribute.name -%>
+      </li>
   <% end -%>
 </ul>
 

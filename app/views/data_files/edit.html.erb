@@ -30,28 +30,27 @@
       <p>
         <%= fancy_multiselect @data_file, :scales, {:possibilities=>sort_scales(Scale.all)} -%>
       </p>
-	<%= render :partial=>"assets/asset_form_bottom", :locals=> {
-					:resource_type => "DataFile",
-					:existing_attributions=>Authorization.authorize_collection("view", @data_file.attributions_objects, current_user),
-					:existing_creators=>@data_file.creators,
-					:other_creators=>@data_file.other_creators,
-					:related_publications=>@data_file.related_publications
-				} 
-    -%>
 
-    <p>
-        <% if Seek::Config.events_enabled -%>
-            <%= render :partial => "assets/associate_event", :locals=>{:resource => @data_file, :show_relationships=>false} -%>
+      <%= render :partial=>"assets/asset_form_bottom", :locals=> { :f => f } -%>
+      
+        <p>
+            <% if Seek::Config.events_enabled -%>
+                <%= render :partial => "assets/associate_event", :locals=>{:resource => @data_file, :show_relationships=>false} -%>
+            <% end -%>
+        </p>
+        <p>
+            <%= render :partial => "assays/associate_assays", :locals=>{:resource => @data_file, :show_relationships=>true} -%>
+        </p>
+
         <% end -%>
-    </p>
-    <p>
-        <%= render :partial => "assays/associate_assays", :locals=>{:resource => @data_file, :show_relationships=>true} -%>
-    </p>
-    <% end -%>
-    <p>
-        <%= f.submit "Update", :id => "data_file_submit_btn", :onclick => "javascript: validateDataFileFields(false); return(false);" -%> or <%= link_to "Cancel", data_file_path(@data_file) -%>
-    </p>
-	</div>
+        <%= preview_permission_popup_link('data_file', url_for(:controller => 'policies', :action => 'preview_permissions'), false, try_block{@data_file.contributor.id})-%>
+        <p>
+            <%= f.submit "Update", :id => "data_file_submit_btn", :onclick => "javascript: validateResourceFields(false, 'data_file', #{current_user_authorized_to_manage}); return(false);" -%> or <%= link_to "Cancel", data_file_path(@data_file) -%>
+        </p>
+        </div>
     <% end %>
     
 </div>
+
+
+

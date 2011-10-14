@@ -18,6 +18,8 @@ class Assay < ActiveRecord::Base
     User.current_user.try :person
   end
 
+  acts_as_annotatable :name_field=>:tag
+  include Seek::Taggable
 
   belongs_to :institution
   has_and_belongs_to_many :samples
@@ -59,12 +61,13 @@ class Assay < ActiveRecord::Base
   validates_presence_of :study, :message=>" must be selected"
   validates_presence_of :owner
   validates_presence_of :assay_class
-  has_many :relationships,
+  validates_presence_of :samples,:if => Proc.new { |assay| assay.is_experimental? && Seek::Config.is_virtualliver}
+  has_many :relationships, 
     :class_name => 'Relationship',
     :as => :subject,
     :dependent => :destroy
           
-  acts_as_solr(:fields=>[:description,:title,:tag_counts],:include=>[:assay_type,:technology_type,:organisms,:strains]) if Seek::Config.solr_enabled
+  acts_as_solr(:fields=>[:description,:title,:searchable_tags],:include=>[:assay_type,:technology_type,:organisms,:strains]) if Seek::Config.solr_enabled
   
   def short_description
     type=assay_type.nil? ? "No type" : assay_type.title
@@ -170,23 +173,6 @@ class Assay < ActiveRecord::Base
     "assay_#{type}_avatar"
   end
 
-  def samples_are_missing?
-    return samples.blank?
-  end
-
-  def organisms_are_missing?
-    return assay_organisms.blank?
-  end
-
-
-  def validate
-
-    errors.add_to_base "Please specify either samples or organisms for assay!" if samples_are_missing? and organisms_are_missing?
-
-  end
-
-
-
   def clone_with_associations
     new_object= self.clone
     new_object.policy = self.policy.deep_copy
@@ -197,5 +183,10 @@ class Assay < ActiveRecord::Base
     new_object.assay_organisms = self.try(:assay_organisms)
     new_object.scale_ids = self.scale_ids
     return new_object
+  end
+
+  def validate
+    #FIXME: allows at the moment until fixtures and factories are updated: JIRA: SYSMO-734
+    errors.add_to_base "You cannot associate a modelling analysis with a sample" if is_modelling? && !samples.empty?
   end
 end

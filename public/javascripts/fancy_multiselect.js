@@ -18,7 +18,7 @@
         remove_link += "'" + $(multiselect).id + "','";
         remove_link += option.value + "'";
         remove_link += '); return(false);">remove</a>';
-        displaylist.insert('<li>&nbsp;&nbsp;&nbsp;'+ title_span +'<small style="vertical-align: middle;">[' + remove_link + ']</small></li>');
+        displaylist.insert('<li>' + title_span +'&nbsp;&nbsp;<small style="vertical-align: middle;">[' + remove_link + ']</small></li>');
     }
 
     function updateFancyMultiselect(multiselect) {

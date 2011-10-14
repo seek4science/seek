@@ -1,4 +1,4 @@
- <%= javascript_include_tag "sharing.js" %>
+ <%= javascript_include_tag "sharing.js", 'resource.js' %>
 
 <%= error_messages_for :study %>
 
@@ -64,6 +64,16 @@
 
 
 <p style="margin-top: 2em; text-align: center;">
-  <%= f.submit(action==:edit ? "Update" : "Create", :disable_with=>(action==:edit ? "Updating..." : "Creating...")) -%>
+  <%
+     button_text=action==:edit ? "Update" : "Create"
+     disabled_text=action==:edit ? "Updating..." : "Creating..."
+     is_new_file=action==:edit ? false : true
+  %>
+  <% if @study.can_manage? %>
+      <%= preview_permission_popup_link('study', url_for(:controller => 'policies', :action => 'preview_permissions'), is_new_file, try_block{@study.contributor.id})-%>
+      <%= f.submit button_text, :id => "study_submit_btn", :onclick => "javascript: clickLink($('preview_permission'));return(false);" -%>
+  <% else %>
+      <%= f.submit button_text, :disable_with=>disabled_text, :id => "study_submit_btn", :onclick => "javascript: $('study_submit_btn').form.submit();return(false);" -%>
+  <% end %>
   or <%= link_to 'Cancel', (@study.id ? study_path(@study.id) : studies_path) -%>
 </p>

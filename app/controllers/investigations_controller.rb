@@ -104,16 +104,5 @@ class InvestigationsController < ApplicationController
   end
 
   private
-
-  def make_investigation_and_auth
-    @investigation=Investigation.new(params[:investigation])
-    unless current_user.person.member_of? @investigation.projects
-      respond_to do |format|
-        flash[:error] = "You cannot create a investigation for a project you are not a member of."
-        format.html { redirect_to investigations_path }
-      end
-      return false
-    end
-  end
   
 end

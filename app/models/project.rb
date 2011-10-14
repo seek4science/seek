@@ -82,6 +82,11 @@ class Project < ActiveRecord::Base
     end
   end
 
+  def pis
+    pi_role = Role.find_by_name('PI')
+    people.select{|p| p.roles.include?(pi_role)}
+    end
+
   def locations
     # infer all project's locations from the institutions where the person is member of
     locations = self.institutions.collect { |i| i.country unless i.country.blank? }

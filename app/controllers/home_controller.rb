@@ -70,7 +70,7 @@ class HomeController < ApplicationController
   RECENT_SIZE=3
 
   def everything
-    user_creatable_classes.inject([]) do |items, klass|
+    Seek::Util.user_creatable_types.inject([]) do |items, klass|
       items + klass.all
     end
   end

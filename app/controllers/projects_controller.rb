@@ -205,7 +205,4 @@ class ProjectsController < ApplicationController
       return false
     end
   end
-
-
-
 end
