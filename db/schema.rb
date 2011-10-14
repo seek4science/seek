@@ -9,7 +9,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20111005074321) do
+ActiveRecord::Schema.define(:version => 20111010121606) do
 
   create_table "activity_logs", :force => true do |t|
     t.string   "action"
@@ -639,6 +639,11 @@ ActiveRecord::Schema.define(:version => 20111005074321) do
     t.integer "presentation_id"
   end
 
+  create_table "project_descendants", :id => false, :force => true do |t|
+    t.integer "ancestor_id"
+    t.integer "descendant_id"
+  end
+
   create_table "project_subscriptions", :force => true do |t|
     t.integer "person_id"
     t.integer "project_id"
@@ -660,6 +665,7 @@ ActiveRecord::Schema.define(:version => 20111005074321) do
     t.string   "site_root_uri"
     t.datetime "last_jerm_run"
     t.string   "uuid"
+    t.integer  "parent_id"
   end
 
   create_table "projects_publications", :id => false, :force => true do |t|

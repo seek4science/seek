@@ -18,11 +18,16 @@
 		  <%= f.label "Internal Web page" -%><br />
 		  <%= f.text_field :wiki_page, :style => "width: 350px;" -%>
 		</p>
-		
+
 		<p>
 		  <%= f.label :description -%><br/>
 		  <%= f.text_area :description, :style => "width: 85%;", :rows => 5 -%>
 		</p>
+
+      <p>
+        <%= f.label "Parent" -%><br/>
+        <%= tree_single_select_tag Project, "id", @project ? @project.parent : nil, [@project] + @project.descendants, "parent_id" %>
+      </p>
 	</div>
 </div>
 

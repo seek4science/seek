@@ -56,7 +56,7 @@ ActionController::Routing::Routes.draw do |map|
   end
 
   map.resources :projects,
-    :collection => { :request_institutions => :get },:member=>{:admin=>:get} do |project|
+    :collection => { :request_institutions => :get,:manage=>:get },:member=>{:admin=>:get} do |project|
     # avatars / pictures 'owned by' project
     project.resources :avatars, :member => { :select => :post }, :collection => { :new => :post }
   end

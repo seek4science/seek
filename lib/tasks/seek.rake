@@ -450,6 +450,82 @@ namespace :seek do
     end
   end
 
+
+  desc "projects hierarchies only for existing Virtual Liver SEEK projects "
+  task :projects_hierarchies =>:environment do
+    root = Project.find_by_name "Virtual Liver"
+    ctu = Project.find_by_name "CTUs"
+    show_case = Project.find_by_name "Show cases"
+    project_mt = Project.find_by_name "Project Management"
+    interleukin = Project.find_by_name "Interleukin-6 signalling"
+    pals = Project.find_by_name "PALs Team"
+    hepatosys = Project.find_by_name "HepatoSys"
+    irreg_projects = [ctu, show_case, project_mt, interleukin, pals, hepatosys].compact
+    #root as parent
+    reg_projects = Project.find(:all, :conditions=>["name REGEXP?", "^[A-Z][:]"])
+    (irreg_projects + reg_projects).each do |proj|
+      if proj and root
+        proj.parent = root
+        puts "#{proj.name} |has parent|  #{root.name}"
+        proj.save!
+      end
+    end
+    #ctus
+    sub_ctus = Project.find(:all, :conditions=>["name REGEXP?", "^CTU[^s]"])
+    sub_ctus.each do |proj|
+      if proj
+        proj.parent = ctu
+        puts "#{proj.name} |has parent|  #{ctu.name}"
+        proj.save!
+      end
+    end
+    #show cases
+    ["HGF and Regeneration", "LPS and Inflammation", "Steatosis"].each do |name|
+      proj = Project.find_by_name name
+      if proj
+        proj.parent = show_case
+        puts "#{proj.name} |has parent| #{show_case.name}"
+        proj.save!
+      end
+    end
+    #project management
+    ["Admin:Administration",
+     "PtJ",
+     "Virtual Liver Management Team",
+     "Virtual Liver Scientific Advisory Board"].each do |name|
+      proj = Project.find_by_name name
+      if proj
+        proj.parent = project_mt
+        puts "#{proj.name} |has parent| #{project_mt.name}"
+        proj.save!
+      end
+    end
+    #set parents for children of A-G,e.g.A,A1,A1.1
+    reg_projects.each do |proj|
+      init_char = proj.name[0].chr
+      Project.find(:all, :conditions=>["name REGEXP?", "^#{init_char}[0-9][^.]"]).each do |sub_proj|
+        if sub_proj
+          sub_proj.parent = proj
+          puts "#{sub_proj.name} |parent is| #{proj.name}"
+          sub_proj.save!
+          num = sub_proj.name[1].chr # get the second char of the name
+          Project.find(:all, :conditions=>["name REGEXP?", "^#{init_char}[#{num}][.]"]).each { |sub_sub_proj|
+            if sub_sub_proj
+              sub_sub_proj.parent = sub_proj
+              puts "#{sub_sub_proj.name} |parent is| #{sub_proj.name}"
+              sub_sub_proj.save!
+            end
+          }
+        end
+      end
+    end
+    ######################### cache projects descendants ############################
+    puts "cache projects descendants..."
+    Project.all.each do |proj|
+      proj.saved_ancestors= proj.ancestors
+      proj.save!
+    end
+  end
   
   private
   
@@ -504,4 +580,13 @@ namespace :seek do
     end
   end
 
+  def set_projects_parent array,parent
+      array.each do |proj|
+        unless proj.nil?
+           proj.parent = parent
+           proj.save!
+        end
+
+      end
+  end
 end

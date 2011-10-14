@@ -56,6 +56,10 @@ class ProjectSubscription < ActiveRecord::Base
 
   private
   def all_in_project
-    subscribable_types.map(&:constantize).collect {|klass| if klass.reflect_on_association(:projects) then klass.scoped(:include => :projects) else klass.all end}.flatten.select {|item| item.projects.include? project}
+    subscribable_types.map(&:constantize).collect {|klass|
+      if klass.reflect_on_association(:projects)
+        then klass.scoped(:include => [:projects, {:projects => :saved_ancestors}])
+      else klass.all
+      end}.flatten.select {|item| (item.projects + item.projects.map(&:ancestors).flatten).include? project}
   end
 end
