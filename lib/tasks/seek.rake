@@ -506,7 +506,7 @@ namespace :seek do
     #ctus
     sub_ctus = Project.find(:all, :conditions=>["name REGEXP?", "^CTU[^s]"])
     sub_ctus.each do |proj|
-      if proj
+      if proj and ctu
         proj.parent = ctu
         puts "#{proj.name} |has parent|  #{ctu.name}"
         proj.save!
@@ -515,7 +515,7 @@ namespace :seek do
     #show cases
     ["HGF and Regeneration", "LPS and Inflammation", "Steatosis"].each do |name|
       proj = Project.find_by_name name
-      if proj
+      if proj and show_case
         proj.parent = show_case
         puts "#{proj.name} |has parent| #{show_case.name}"
         proj.save!
@@ -527,7 +527,7 @@ namespace :seek do
      "Virtual Liver Management Team",
      "Virtual Liver Scientific Advisory Board"].each do |name|
       proj = Project.find_by_name name
-      if proj
+      if proj and project_mt
         proj.parent = project_mt
         puts "#{proj.name} |has parent| #{project_mt.name}"
         proj.save!
