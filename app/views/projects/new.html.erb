@@ -4,7 +4,4 @@
   <% form_for(@project) do |f| %>
     <%= render :partial => "form", :locals => { :f => f, :project => nil } -%>
   <% end %>
-  <div>
-    <ul><%= tree_editor_display Project, false, false, @project.id%></ul>
-  </div>
 </div>
