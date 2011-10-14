@@ -539,13 +539,13 @@ namespace :seek do
       Project.find(:all, :conditions=>["name REGEXP?", "^#{init_char}[0-9][^.]"]).each do |sub_proj|
         if sub_proj
           sub_proj.parent = proj
-          puts "#{sub_proj.name} |parent is| #{proj.name}"
+          puts "#{sub_proj.name} |has parent| #{proj.name}"
           sub_proj.save!
           num = sub_proj.name[1].chr # get the second char of the name
           Project.find(:all, :conditions=>["name REGEXP?", "^#{init_char}[#{num}][.]"]).each { |sub_sub_proj|
             if sub_sub_proj
               sub_sub_proj.parent = sub_proj
-              puts "#{sub_sub_proj.name} |parent is| #{sub_proj.name}"
+              puts "#{sub_sub_proj.name} |has parent| #{sub_proj.name}"
               sub_sub_proj.save!
             end
           }
