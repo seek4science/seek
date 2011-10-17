@@ -18,7 +18,7 @@ class RegistrationStateTest < ActionController::IntegrationTest
     get "/session/new"
     assert_response :success
 
-    xml_http_request :get,'people/userless_project_selected_ajax',{:project_id=>Factory(:project).id}
+    xml_http_request :post,'people/userless_project_selected_ajax',{:project_id=>Factory(:project).id}
     assert_response :success
 
     get people_path
