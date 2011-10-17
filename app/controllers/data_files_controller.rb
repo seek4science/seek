@@ -15,7 +15,7 @@ class DataFilesController < ApplicationController
   
   before_filter :find_assets, :only => [ :index ]
   before_filter :find_and_auth, :except => [ :index, :new, :upload_for_tool, :create, :request_resource, :preview, :test_asset_url, :update_annotations_ajax]
-  before_filter :find_display_data_file, :only=>[:show,:download,:explore]
+  before_filter :find_display_asset, :only=>[:show,:download,:explore]
 
   #has to come after the other filters
   include Seek::Publishing
@@ -370,17 +370,7 @@ end
     end
   end 
   
-  protected    
-  
-  def find_display_data_file
-    if @data_file
-      if logged_in? and current_user.person.member? and params[:version]
-        @display_data_file = @data_file.find_version(params[:version]) ? @data_file.find_version(params[:version]) : @data_file.latest_version
-      else
-        @display_data_file = @data_file.latest_version
-      end
-    end
-  end
+  protected
 
   def translate_action action
     action="download" if action=="data"

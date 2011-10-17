@@ -77,6 +77,10 @@ module ActiveRecordExtensions
     is_downloadable? && Seek::Config.publish_button_enabled
   end
 
+  def is_versioned?
+    respond_to? :versions
+  end
+
 end
 
 ActiveRecord::Base.class_eval do

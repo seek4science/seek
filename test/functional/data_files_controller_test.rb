@@ -965,6 +965,65 @@ class DataFilesControllerTest < ActionController::TestCase
     assert_select "input[type=radio][id='sharing_scope_4'][value='4'][disabled='true']", :count => 0
   end
 
+  test "should show the latest version if the params[:version] is not specified" do
+    data_file=data_files(:editable_data_file)
+    get :show, :id => data_file
+    assert_response :success
+    assert_nil flash[:error]
+
+    logout
+    published_data_file = Factory(:data_file, :policy => Factory(:public_policy))
+    get :show, :id => published_data_file
+    assert_response :success
+    assert_nil flash[:error]
+  end
+
+  test "should show the correct version" do
+    data_file=data_files(:downloadable_spreadsheet_data_file)
+    get :show, :id => data_file, :version => 1
+    assert_response :success
+    assert_nil flash[:error]
+
+    get :show, :id => data_file, :version => 2
+    assert_response :success
+    assert_nil flash[:error]
+  end
+
+  test "should show error for the incorrect version" do
+    data_file=data_files(:editable_data_file)
+    get :show, :id => data_file, :version => 2
+    assert_redirected_to root_path
+    assert_not_nil flash[:error]
+  end
+
+  test "should show error for the user who doesn't login or is not the project member, when the user specify the version and this version is not the latest version" do
+    published_data_file = Factory(:data_file, :policy => Factory(:public_policy))
+    published_data_file.content_blob = Factory(:content_blob)
+
+    published_data_file.save_as_new_version
+    published_data_file.reload
+
+    logout
+    get :show, :id => published_data_file, :version => 1
+    assert_redirected_to root_path
+    assert_not_nil flash[:error]
+
+    flash[:error] = nil
+    get :show, :id => published_data_file, :version => 2
+    assert_response :success
+    assert_nil flash[:error]
+
+    login_as(Factory(:user_not_in_project))
+    get :show, :id => published_data_file, :version => 1
+    assert_redirected_to root_path
+    assert_not_nil flash[:error]
+
+    flash[:error] = nil
+    get :show, :id => published_data_file, :version => 2
+    assert_response :success
+    assert_nil flash[:error]
+  end
+
   private
 
   def mock_http
