@@ -116,6 +116,6 @@
 </p>
 <% end -%>
 <p style="text-align: center; margin-top: 1.5em;">
-    <%= f.submit((person ? "Update" : "Create"), :disable_with=>(person ? "Updating..." : "Creating..."), :onclick => "javascript: $form_state['redirect'] = FALSE;") -%>
+    <%= f.submit((person ? "Update" : "Create"), :disable_with=>(person ? "Updating..." : "Creating...")) -%>
     or <%= link_to 'Cancel', (person ? person_path(person.id) : people_path) -%>
 </p>
