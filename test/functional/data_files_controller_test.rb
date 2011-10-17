@@ -888,7 +888,7 @@ class DataFilesControllerTest < ActionController::TestCase
     df=data_files(:picture)
     get :explore,:id=>df,:version=>1
     assert_redirected_to data_file_path(df,:version=>1)
-    assert_nil flash[:error]
+    assert flash[:error]
   end
 
   test "uploader can publish the item" do
