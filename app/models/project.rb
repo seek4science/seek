@@ -4,9 +4,10 @@ require 'title_trimmer'
 
 class Project < ActiveRecord::Base
 
-  acts_as_yellow_pages 
+  acts_as_yellow_pages
 
   include SimpleCrypt
+  include ActsAsCachedTree::CacheTree
 
   title_trimmer
   
@@ -61,7 +62,7 @@ class Project < ActiveRecord::Base
   attr_accessor :site_username,:site_password
 
   before_save :set_credentials
-  
+
   def institutions=(new_institutions)
     new_institutions.each_index do |i|
       new_institutions[i]=Institution.find(new_institutions[i]) unless new_institutions.is_a?(Institution)
@@ -100,7 +101,12 @@ class Project < ActiveRecord::Base
   def people
     #TODO: look into doing this with a named_scope or direct query
     res = work_groups.scoped(:include => :people).collect(&:people).flatten.uniq.compact
+    descendants.each do |descendant|
+      res = res | descendant.work_groups.scoped(:include => :people).collect(&:people).flatten.uniq.compact
+    end
+
     #TODO: write a test to check they are ordered
+    res = res.flatten.uniq.compact
     res.sort_by{|a| (a.last_name.blank? ? a.name : a.last_name)}
   end
 

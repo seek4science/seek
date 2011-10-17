@@ -48,6 +48,15 @@
   <div class="main_content_right_box_wider">
     <%= render :partial => "layouts/contribution_section_box_avatar", :locals => { :object => @project, :drag_id => drag_id } -%>
   </div>
+
+  <div>
+    <b>Show project hierarchies:</b>
+    (<%= link_to_function "expand", visual_effect(:toggle_appear, "project_hierarchy")+"$('project_hierarchy').style.display=='none'? this.innerHTML='collapse' : this.innerHTML='expand';" %>)<br/>
+    <div id="project_hierarchy" style="display: none;">
+      <ul><%= tree_editor_display Project, false, false, @project.id, "Person", false %></ul>
+    </div>
+  </div>
+
   <div style="clear:both;">
     <p style="margin-top: 1em;">
       <b>About the project:</b>

@@ -21,6 +21,7 @@ require "attachment_fu_extension"
 require 'seek/taggable'
 require "bio"
 require 'assets_common_extension'
+require 'acts_as_cached_tree'
 
 
 GLOBAL_PASSPHRASE="ohx0ipuk2baiXah" unless defined? GLOBAL_PASSPHRASE

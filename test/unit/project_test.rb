@@ -229,4 +229,17 @@ class ProjectTest < ActiveSupport::TestCase
     x.save
     assert_equal x.uuid, uuid
   end
+
+  test "set parent" do
+    parent_proj =  Factory(:project,:title=>"test parent")
+    proj = Factory(:project,:parent_id=>parent_proj.id)
+    assert_equal proj.parent,parent_proj
+    assert true, parent_proj.descendants.include?(proj)
+    parent_proj_changed = Factory(:project,:title=>"changed test parent")
+    proj.parent = parent_proj_changed
+    proj.save!
+
+    assert_equal "changed test parent",proj.parent.name
+
+  end
 end

@@ -90,7 +90,7 @@ class DataFilesController < ApplicationController
       else
         flash.now[:error] = "Data File failed to convert to Presentation!!"
         format.html {
-          redirect_to data_data_file_path @data_file
+          redirect_to data_file_path @data_file
         }
       end
     end

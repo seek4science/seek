@@ -53,10 +53,10 @@ class Person < ActiveRecord::Base
 
   alias_attribute :webpage,:web_page
 
-  has_many :project_subscriptions, :before_add => proc {|person, ps| ps.person = person}
+  has_many :project_subscriptions, :before_add => proc {|person, ps| ps.person = person},:dependent => :destroy
   accepts_nested_attributes_for :project_subscriptions, :allow_destroy => true
 
-  has_many :subscriptions
+  has_many :subscriptions,:dependent => :destroy
   before_create :set_default_subscriptions
 
   def set_default_subscriptions
@@ -143,7 +143,7 @@ class Person < ActiveRecord::Base
 
   def member_of?(item_or_array)
     array = [item_or_array].flatten
-    array.detect {|item| projects.include?(item)}
+    array.detect {|item| projects.include?(item) || item.people.include?(self)}
   end
 
   def locations
