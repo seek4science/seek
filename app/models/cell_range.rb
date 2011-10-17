@@ -6,8 +6,7 @@ require_dependency File.join(Rails.root, 'vendor', 'plugins', 'finns-spreadsheet
 class CellRange < ActiveRecord::Base
 
   def reindexing_consequences
-    blob_id = worksheet.content_blob
-    DataFile.find(:all,:conditions=>["content_blob_id = ?",blob_id])
+    [worksheet.content_blob.asset]
   end
   
 end

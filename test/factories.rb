@@ -211,8 +211,7 @@ end
     f.projects {[Factory.build(:project)]}
     f.association :contributor, :factory => :user
     f.after_create do |data_file|
-       data_file.content_blob = Factory.create(:content_blob,  :original_filename=>"test.pdf", :content_type=>"application/pdf", :asset => data_file, :asset_version=>data_file.version)
-
+       data_file.content_blob = Factory.create(:pdf, :asset => data_file, :asset_version=>data_file.version) if data_file.content_blob.blank?
     end
   end
 
@@ -222,7 +221,7 @@ end
     f.projects {[Factory.build(:project)]}
     f.association :contributor, :factory => :user
     f.after_create do |model|
-       model.content_blobs = [Factory.create(:content_blob, :original_filename=>"test.pdf", :content_type=>"application/pdf",:asset => model,:asset_version=>model.version)] if model.content_blobs.blank?
+       model.content_blobs = [Factory.create(:pdf, :asset => model,:asset_version=>model.version)] if model.content_blobs.blank?
     end
   end
 
@@ -233,6 +232,7 @@ end
     f.projects {[Factory.build(:project)]}
     f.association :contributor, :factory => :user
   end
+
 #Presentation
 Factory.define(:presentation) do |f|
   f.title "A Presentation"
@@ -305,6 +305,15 @@ end
   Factory.define(:content_blob) do |f|
     f.uuid UUIDTools::UUID.random_create.to_s
     f.sequence(:data) {|n| "data [#{n}]" }
+  end
+
+  Factory.define(:pdf, :parent => :content_blob) do |f|
+    f.original_filename "test.pdf"
+    f.content_type "application/pdf"
+  end
+
+  Factory.define(:spreadsheet, :parent => :content_blob) do |f|
+    f.original_filename "test.xls"
   end
 
   Factory.define(:activity_log) do |f|
@@ -454,5 +463,16 @@ end
   Factory.define :assets_creator do |f|
     f.association :asset, :factory => :data_file
     f.association :creator, :factory => :person_in_project
+  end
+
+  Factory.define :worksheet do |f|
+    f.content_blob { Factory.build(:spreadsheet, :asset => Factory(:data_file))}
+    f.last_row 10
+    f.last_column 10
+  end
+
+  Factory.define :cell_range do |f|
+    f.cell_range "A1:B3"
+    f.association :worksheet
   end
 
