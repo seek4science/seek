@@ -10,6 +10,7 @@ class PeopleController < ApplicationController
   before_filter :auth_params,:only=>[:update,:create]
 
   skip_before_filter :project_membership_required
+  skip_before_filter :profile_for_login_required,:only=>[:select,:userless_project_selected_ajax,:create]
 
   cache_sweeper :people_sweeper,:only=>[:update,:create,:destroy]
   

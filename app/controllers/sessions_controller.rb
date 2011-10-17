@@ -3,6 +3,7 @@ class SessionsController < ApplicationController
 
   before_filter :signup_admin_if_not_users,:only=>:new
   skip_before_filter :project_membership_required
+  skip_before_filter :profile_for_login_required,:only=>[:new,:destroy]
   
   # render new.rhtml
   def new

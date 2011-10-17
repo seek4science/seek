@@ -32,6 +32,7 @@ class ApplicationController < ActionController::Base
     end
   end
 
+  before_filter :profile_for_login_required
   before_filter :project_membership_required,:only=>[:create,:new]
 
   helper :all
@@ -190,6 +191,15 @@ class ApplicationController < ActionController::Base
 
   def email_enabled?
     Seek::Config.email_enabled
+  end
+
+  def profile_for_login_required
+    if User.current_user
+      if User.current_user.person.nil?
+        flash[:notice]="You have successfully registered your account, but now must select a profile, or create your own."
+        redirect_to select_people_path
+      end
+    end
   end
 
   def translate_action action_name

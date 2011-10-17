@@ -9,7 +9,6 @@ class SopsControllerTest < ActionController::TestCase
   include SharingFormTestHelper
 
   def setup
-    WebMock.allow_net_connect!
     login_as(:quentin)
     @object=sops(:downloadable_sop)
   end
@@ -560,6 +559,7 @@ class SopsControllerTest < ActionController::TestCase
   private
 
   def valid_sop_with_url
+    mock_remote_file "#{Rails.root}/test/fixtures/files/file_picture.png","http://www.sysmo-db.org/images/sysmo-db-logo-grad2.png"
     {:title=>"Test", :data_url=>"http://www.sysmo-db.org/images/sysmo-db-logo-grad2.png",:projects=>[projects(:sysmo_project)]}
   end
 

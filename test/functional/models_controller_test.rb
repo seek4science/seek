@@ -183,7 +183,7 @@ class ModelsControllerTest < ActionController::TestCase
     assert_equal "image/png", assigns(:model).content_type
   end
   
-  test "should create sop and store with url and store flag" do
+  test "should create model and store with url and store flag" do
     model_details=valid_model_with_url
     model_details[:local_copy]="1"
     assert_difference('Model.count') do
@@ -711,6 +711,7 @@ class ModelsControllerTest < ActionController::TestCase
   end
 
   def valid_model_with_url
+    mock_remote_file "#{Rails.root}/test/fixtures/files/file_picture.png","http://www.sysmo-db.org/images/sysmo-db-logo-grad2.png"
     { :title=>"Test",:data_url=>"http://www.sysmo-db.org/images/sysmo-db-logo-grad2.png",:projects=>[projects(:sysmo_project)]}
   end
   

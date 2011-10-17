@@ -89,4 +89,10 @@ class ActiveSupport::TestCase
   def run_secondary_tests?
     @@run_secondary ||= File.exists? "#{Rails.root}/tmp/run_secondary_tests"
   end
+
+  def mock_remote_file path,route
+    stub_request(:get, route).to_return(:body => File.new(path), :status => 200, :headers=>{'Content-Type' => 'image/png'})
+    stub_request(:head, route)
+  end
+  
 end
