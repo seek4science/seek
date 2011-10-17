@@ -177,6 +177,7 @@ module AssetsHelper
         related["Model"][:items] = resource.models
         related["Sop"][:items] = resource.sops
         related["Publication"][:items] = resource.publications
+        related["Presentation"][:items]= resource.presentations
       when "Publication"
         related["Person"][:items] = resource.creators
         related["Project"][:items] = resource.projects
