@@ -9,8 +9,14 @@ class Object
   #so instead of a.respond_to? :b? and a.b? try_block { a.b? }
   def try_block
     yield
-  rescue NoMethodError, NameError
-    nil
+    rescue NoMethodError, NameError
+      nil
+    rescue RuntimeError => e
+     if e.message.to_s == "Called id for nil, which would mistakenly be 4 -- if you really wanted the id of nil, use object_id"
+        nil
+     else
+        raise
+     end
   end
 
 end
