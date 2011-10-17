@@ -1,6 +1,7 @@
 class ExperimentalConditionsController < ApplicationController
   include Seek::FactorStudied
   include Seek::AnnotationCommon
+  include Seek::AssetsCommon
 
   before_filter :login_required
   before_filter :find_and_auth_sop  
@@ -130,11 +131,7 @@ class ExperimentalConditionsController < ApplicationController
       sop = Sop.find(params[:sop_id])
       if sop.can_edit? current_user
         @sop = sop
-        if logged_in? and current_user.person.member? and params[:version]
-          @display_sop = @sop.find_version(params[:version]) ? @sop.find_version(params[:version]) : @sop.latest_version
-        else
-          @display_sop = @sop.latest_version
-        end
+        find_display_asset @sop
       else
         respond_to do |format|
           flash[:error] = "You are not authorized to perform this action"
