@@ -113,12 +113,14 @@ module AssetsHelper
 
     case name
       when "DataFile"
+        related["Person"][:items] = resource.creators
         related["Project"][:items] = resource.projects
         related["Study"][:items] = resource.studies
         related["Assay"][:items] = resource.assays
         related["Publication"][:items] = resource.related_publications
         related["Event"][:items] = resource.events
       when "Sop", "Model"
+        related["Person"][:items] = resource.creators
         related["Project"][:items] = resource.projects
         related["Study"][:items] = resource.studies
         related["Assay"][:items] = resource.assays
@@ -179,6 +181,7 @@ module AssetsHelper
         related["Model"][:items] = resource.models
         related["Sop"][:items] = resource.sops
         related["Publication"][:items] = resource.publications
+        related["Presentation"][:items]= resource.presentations
       when "Publication"
         related["Person"][:items] = resource.creators
         related["Project"][:items] = resource.projects
