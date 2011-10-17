@@ -73,9 +73,7 @@ class ModelTest < ActiveSupport::TestCase
   end
 
   test "cache_remote_content" do
-    file="#{Rails.root}/test/fixtures/files/Teusink.xml"
-    stub_request(:get, "http://mockedlocation.com/teusink.xml").to_return(:body => File.new(file), :status => 200, :headers=>{'Content-Type' => 'image/png'})
-    stub_request(:head, "http://mockedlocation.com/teusink.xml")
+    mock_remote_file "#{Rails.root}/test/fixtures/files/Teusink.xml","http://mockedlocation.com/teusink.xml"
 
     model = Factory :model,
         :content_blob => ContentBlob.new(:url=>"http://mockedlocation.com/teusink.xml"),
