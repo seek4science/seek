@@ -33,7 +33,7 @@ function additionalFieldForItem(form_id, fs_or_ec_id){
 }
 
 function appear(element_id){
-   Effect.Appear(element_id, { duration: 4 });
+   Effect.Appear(element_id, { duration: 0.5 });
 }
 
 function fade(element_id){
