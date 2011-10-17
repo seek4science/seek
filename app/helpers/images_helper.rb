@@ -250,7 +250,7 @@ module ImagesHelper
       when "specimen_avatar"
         "misc_icons/green_virus-64x64.png"
       when "sample_avatar"
-        "misc_icons/jws_builder32x32.png"
+        "misc_icons/sampleBGXblue.png"
       when "specimen", "specimens"
         "misc_icons/green_virus-64x64.png"
       when "publish"
