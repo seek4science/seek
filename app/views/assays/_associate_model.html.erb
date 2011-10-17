@@ -1,19 +1,16 @@
-<div class="fold">
-
+<%
+    all_models=authorised_models.sort{|a, b| a.title<=>b.title}
+    project_models=all_models.select{|s| current_user.person.member_of?(s.projects)}
+    select_truncate_length=120
+    associated_models = resource.is_a?(Publication) ? resource.related_models : resource.models
+-%>
   <div class="foldTitle">
     <%= help_icon("Here you associate models in SEEK to this assay.") -%>
     Associate Models
   </div>
 
-  <div id="associate_model_fold_content" class="foldContent" style="display: block;">
+  <div id="associate_model_fold_content" class="foldContent" style="display:<%= associated_models.blank? ? 'none' : 'block' -%>">
     <div class="yui-u first" style="width:66%; float:left">
-    
-      <%
-        all_models=authorised_models.sort{|a, b| a.title<=>b.title}
-        project_models=all_models.select{|s| current_user.person.member_of?(s.projects)}
-        select_truncate_length=120
-      -%>
-
       <p style="color: #666666;">
         The following model is involved in this <%= @assay_text -%>:
       </p>
@@ -31,11 +28,11 @@
               :before=>"show_ajax_loader('model_preview')"
             )+";check_show_add_model();return(false);"
           } -%>
-    
+
           <%= select_tag :assay_model_ids, options_from_collection_for_select([], :id, :title), {:multiple=>true, :style=>"display:none;"} -%>
-  
+
           <br/>
-          
+
           <%= check_box_tag :include_other_project_models, nil, false, {:onchange=>"toggle_model_list();",:style=>"margin-top:0.5em;"} -%> Include Models from other projects?
         </div>
 		<br/>
@@ -43,8 +40,8 @@
       </div>
     </div>
     <%= render :partial => 'assets/preview_box', :locals => {:preview_name => 'model'} %>
-    </div>
   </div>
+
 
 <script type="text/javascript">
   function toggle_model_list() {

@@ -17,6 +17,8 @@ require 'acts_as_asset'
 require 'send_subscriptions_when_activity_logged'
 require 'modporter_extensions'
 require "attachment_fu_extension"
+require 'seek/taggable'
+require "bio"
 require 'assets_common_extension'
 
 
@@ -27,4 +29,6 @@ ASSET_ORDER                = ['Person', 'Project', 'Institution', 'Investigation
 PORTER_SECRET = "" unless defined? PORTER_SECRET
 
 Seek::Config.propagate_all
+
+Annotations::Config.attribute_names_to_allow_duplicates.concat(["tag"])
 

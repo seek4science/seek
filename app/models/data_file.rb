@@ -6,6 +6,8 @@ require 'title_trimmer'
 
 class DataFile < ActiveRecord::Base
 
+  include SpreadsheetUtil
+
   acts_as_asset
   acts_as_trashable
 
@@ -74,14 +76,13 @@ class DataFile < ActiveRecord::Base
 
   has_one :content_blob, :as => :asset, :foreign_key => :asset_id ,:conditions => 'asset_version= #{self.version}'
 
-  acts_as_solr(:fields=>[:description,:title,:original_filename,:tag_counts]) if Seek::Config.solr_enabled
+  acts_as_solr(:fields=>[:description,:title,:original_filename,:searchable_tags,:spreadsheet_annotation_search_fields,:fs_search_fields]) if Seek::Config.solr_enabled
 
   has_many :studied_factors, :conditions =>  'studied_factors.data_file_version = #{self.version}'
 
-  acts_as_uniquely_identifiable
-
-
   explicit_versioning(:version_column => "version") do
+
+    include SpreadsheetUtil
     acts_as_versioned_resource
     
     has_many :studied_factors, :primary_key => "data_file_id", :foreign_key => "data_file_id", :conditions =>  'studied_factors.data_file_version = #{self.version}'
@@ -116,11 +117,6 @@ class DataFile < ActiveRecord::Base
     return datafiles_with_contributors.to_json
   end
 
-  def self.spreadsheets
-    
-  end
-  
-
   def relationship_type(assay)
     #FIXME: don't like this hardwiring to assay within data file, needs abstracting
     assay_assets.find_by_assay_id(assay.id).relationship_type  
@@ -134,5 +130,33 @@ class DataFile < ActiveRecord::Base
   def self.user_creatable?
     true
   end
-  
+
+  #the annotation string values to be included in search indexing
+  def spreadsheet_annotation_search_fields
+    annotations = []
+    unless content_blob.nil?
+      content_blob.worksheets.each do |ws|
+        ws.cell_ranges.each do |cell_range|
+          annotations = annotations | cell_range.annotations.collect{|a| a.value.text}
+        end
+      end
+    end
+    annotations
+  end
+
+    #factors studied, and related compound text that should be included in search
+  def fs_search_fields
+    flds = studied_factors.collect do |fs|
+      [fs.measured_item.title,
+       fs.substances.collect do |sub|
+         #FIXME: this makes the assumption that the synonym.substance appears like a Compound
+         sub = sub.substance if sub.is_a?(Synonym)
+         [sub.title] |
+             (sub.respond_to?(:synonyms) ? sub.synonyms.collect { |syn| syn.title } : []) |
+             (sub.respond_to?(:mappings) ? sub.mappings.collect { |mapping| ["CHEBI:#{mapping.chebi_id}", mapping.chebi_id, mapping.sabiork_id.to_s, mapping.kegg_id] } : [])
+       end
+      ]
+    end
+    flds.flatten.uniq
+  end
 end

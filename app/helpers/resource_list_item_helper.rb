@@ -52,7 +52,7 @@ module ResourceListItemHelper
   end
 
   def list_item_tag_list resource
-    list_item_simple_list(resource.tag_counts, "Tags") {|i| link_for_tag(i)}
+    list_item_simple_list(resource.annotations.collect{|a| a.value}, "Tags") {|i| link_for_ann(i)}
   end
 
   def list_item_simple_list items, attribute

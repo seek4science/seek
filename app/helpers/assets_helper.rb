@@ -153,11 +153,13 @@ module AssetsHelper
         related["Project"][:items] = resource.projects
         related["Institution"][:items] = resource.institutions
         related["Study"][:items] = resource.studies
-        if resource.user
-          related["DataFile"][:items] = resource.user.data_files
-          related["Model"][:items] = resource.user.models
-          related["Sop"][:items] = resource.user.sops
-          related["Presentation"][:items] = resource.user.presentations
+        user = resource.user
+        if user
+          related["DataFile"][:items] = user.data_files
+          related["Model"][:items] = user.models
+          related["Sop"][:items] = user.sops
+          related["Presentation"][:items] = user.presentations
+          related["Event"][:items] = user.events
         end
         related["DataFile"][:items] = related["DataFile"][:items] | resource.created_data_files
         related["Model"][:items] = related["Model"][:items] | resource.created_models

@@ -1,4 +1,5 @@
 class ActivityLog < ActiveRecord::Base
+  
   belongs_to :activity_loggable, :polymorphic => true
   belongs_to :referenced, :polymorphic => true
   belongs_to :culprit, :polymorphic => true

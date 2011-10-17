@@ -118,7 +118,6 @@
 				updateGroupMembers();
 				
 			</script>
-	
 			<%= submit_tag ((action_create ? "Create" : "Update") + " this group"), :style => "width: 150px;", :onclick => "javascript: postFavouriteGroupData(#{action_create}); return(false);" -%>
 			<input type="button" value="Cancel" style="width: 150px;" onclick="javascript: RedBox.close(); return(false);" />
 		</div>

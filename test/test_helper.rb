@@ -22,6 +22,15 @@ Factory.class_eval do
   class_alias_method_chain :build, :privileged_mode
 end
 
+Kernel.class_eval do
+  def as_virtualliver
+    vl = Seek::Config.is_virtualliver
+    Seek::Config.is_virtualliver=true
+    yield
+    Seek::Config.is_virtualliver=vl
+  end
+end
+
 class ActiveSupport::TestCase
   # Transactional fixtures accelerate your tests by wrapping each test method
   # in a transaction that's rolled back on completion.  This ensures that the
@@ -57,8 +66,6 @@ class ActiveSupport::TestCase
   set_fixture_class :sop_versions=>Sop::Version
   set_fixture_class :model_versions=>Model::Version
   set_fixture_class :data_file_versions=>DataFile::Version
-  set_fixture_class :taggings=>ActsAsTaggableOn::Tagging
-  set_fixture_class :tags=>ActsAsTaggableOn::Tag
 
   # Add more helper methods to be used by all tests here...
 
@@ -71,12 +78,15 @@ class ActiveSupport::TestCase
   def stop_profiling prefix="profile"
     results = RubyProf.stop
 
-    File.open "#{RAILS_ROOT}/tmp/#{prefix}-graph.html", 'w' do |file|
+    File.open "#{Rails.root}/tmp/#{prefix}-graph.html", 'w' do |file|
       RubyProf::GraphHtmlPrinter.new(results).print(file)
+    end
+    File.open "#{Rails.root}/tmp/#{prefix}-flat.txt", 'w' do |file|
+      RubyProf::FlatPrinter.new(results).print(file)
     end
   end
 
   def run_secondary_tests?
-    @@run_secondary ||= File.exists? "#{RAILS_ROOT}/tmp/run_secondary_tests"
+    @@run_secondary ||= File.exists? "#{Rails.root}/tmp/run_secondary_tests"
   end
 end

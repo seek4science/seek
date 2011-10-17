@@ -1,3 +1,4 @@
+<% if logged_in? and current_user.person.member?%>
 <div class="contribution_version_box">
   <div class="contribution_version_selector_box">
     <table>
@@ -42,3 +43,4 @@
     </div>
   </div>
 </div>
+<% end %>

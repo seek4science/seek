@@ -1,0 +1,13 @@
+h:
+  id: 1
+  title: Harry Pooter and the Exploding Gentlemen's Lavatory
+  author_name: Rich Woman
+  pub_year: 2056
+  summary: Wonderfully delightful!
+  
+r:
+  id: 2
+  title: Learning Ruby in 2 Seconds
+  author_name: Too Much Time
+  pub_year: 1854
+  isbn: 1688HH979BLAH

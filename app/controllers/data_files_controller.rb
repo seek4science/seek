@@ -5,16 +5,18 @@ class DataFilesController < ApplicationController
   
   include IndexPager
   include SysMODB::SpreadsheetExtractor
+  include SpreadsheetUtil
   include MimeTypesHelper  
   include DotGenerator  
   include Seek::AssetsCommon
   include AssetsCommonExtension
+  include Seek::AnnotationCommon
 
   #before_filter :login_required
   
   before_filter :find_assets, :only => [ :index ]
-  before_filter :find_and_auth, :except => [ :index, :new, :upload_for_tool, :create, :request_resource, :preview, :test_asset_url, :update_tags_ajax,:convert_to_presentation]
-  before_filter :find_display_data_file, :only=>[:show,:download]
+  before_filter :find_and_auth, :except => [ :index, :new, :upload_for_tool, :create, :request_resource, :preview, :test_asset_url, :update_annotations_ajax]
+  before_filter :find_display_data_file, :only=>[:show,:download,:explore]
 
   #has to come after the other filters
   include Seek::Publishing
@@ -182,7 +184,7 @@ class DataFilesController < ApplicationController
       @data_file = DataFile.new params[:data_file]
       #@data_file.content_blob = ContentBlob.new :tmp_io_object => @tmp_io_object, :url=>@data_url
 
-      update_tags @data_file
+     update_annotations @data_file
 
       @data_file.policy.set_attributes_with_sharing params[:sharing], @data_file.projects
 
@@ -229,7 +231,7 @@ class DataFilesController < ApplicationController
     # (this will also trigger timestamp update in the corresponding Asset)
     @data_file.last_used_at = Time.now
     @data_file.save_without_timestamping
-
+    
     respond_to do |format|
       format.html # show.html.erb
       format.xml
@@ -256,7 +258,8 @@ class DataFilesController < ApplicationController
 
     publication_params    = params[:related_publication_ids].nil?? [] : params[:related_publication_ids].collect { |i| ["Publication", i.split(",").first]}
 
-    update_tags @data_file
+    update_annotations @data_file
+
     assay_ids = params[:assay_ids] || []
     respond_to do |format|
       @data_file.attributes = params[:data_file]
@@ -363,11 +366,33 @@ end
     end
   end  
   
+  def explore
+    if @display_data_file.is_spreadsheet?
+      #Generate Ruby spreadsheet model from XML
+      @spreadsheet = @display_data_file.spreadsheet
+
+      #FIXME: Annotations need to be specific to version
+      @spreadsheet.annotations = @display_data_file.spreadsheet_annotations
+      respond_to do |format|
+        format.html { render :layout=>"minimal" }
+      end
+    else
+     respond_to do |format|
+        flash[:error] = "Unable to view contents of this data file"
+        format.html { redirect_to data_file_path(@data_file,:version=>@display_data_file.version) }
+      end
+    end
+  end 
+  
   protected    
   
   def find_display_data_file
     if @data_file
-      @display_data_file = params[:version] ? @data_file.find_version(params[:version]) : @data_file.latest_version
+      if logged_in? and current_user.person.member? and params[:version]
+        @display_data_file = @data_file.find_version(params[:version]) ? @data_file.find_version(params[:version]) : @data_file.latest_version
+      else
+        @display_data_file = @data_file.latest_version
+      end
     end
   end
 

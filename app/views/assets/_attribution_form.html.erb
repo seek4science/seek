@@ -30,7 +30,7 @@
     Attributions
   </div>
 
-  <div id="attributions_fold_content" class="foldContent" style="display: none;">
+  <div id="attributions_fold_content" class="foldContent" style="display:<%= existing_attributions.blank? ? 'none' : 'block' -%>">
     
     <p>
       If this <%= resource_type %> is based on any existing <%= resource_type_attributed_to_types -%>, please list them below

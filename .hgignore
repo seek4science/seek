@@ -37,6 +37,7 @@ vendor/bundle/
 vendor/cache/
 tmp/restart.txt
 tmp/*-graph.html
+vendor/plugins/annotations/.git
 
 
 syntax: regexp

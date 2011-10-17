@@ -30,10 +30,5 @@ class SampleTest < ActiveSupport::TestCase
     #s.reload
     #s.strains=[]
     #assert !s.valid?
-
-
-
   end
-
-
 end

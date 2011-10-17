@@ -4,7 +4,6 @@ class InvestigationsController < ApplicationController
   include IndexPager
 
   before_filter :find_assets, :only=>[:index]
-  before_filter :make_investigation_and_auth,:only=>[:create]
   before_filter :find_and_auth,:only=>[:edit, :update, :destroy]
 
   def new_object_based_on_existing_one
@@ -36,6 +35,7 @@ class InvestigationsController < ApplicationController
   end
 
   def create
+    @investigation=Investigation.new(params[:investigation])
     @investigation.policy.set_attributes_with_sharing params[:sharing], @investigation.projects
 
     if @investigation.save
@@ -104,16 +104,5 @@ class InvestigationsController < ApplicationController
   end
 
   private
-
-  def make_investigation_and_auth
-    @investigation=Investigation.new(params[:investigation])
-    unless current_user.person.member_of? @investigation.projects
-      respond_to do |format|
-        flash[:error] = "You cannot create a investigation for a project you are not a member of."
-        format.html { redirect_to investigations_path }
-      end
-      return false
-    end
-  end
   
 end

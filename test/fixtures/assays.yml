@@ -142,7 +142,6 @@ modelling_assay_with_data_and_relationship:
   study: study_with_modelling_assay
   assay_class: modelling_assay_class
   policy: policy_for_viewable_data_file
-  samples: [test_sample]
 
 assay_with_a_model:
   title: Assay with model
@@ -172,7 +171,6 @@ modelling_assay:
   study: study_with_modelling_assay
   assay_class: modelling_assay_class
   policy: policy_for_viewable_data_file
-  samples: [test_sample]
 
 assay_can_edit_by_datafile_owner:
   title: Modelling Assay
@@ -182,7 +180,6 @@ assay_can_edit_by_datafile_owner:
   study: study_with_modelling_assay
   assay_class: modelling_assay_class
   policy: policy_for_viewable_data_file
-  samples: [test_sample]
 
 assay_can_edit_by_my_first_sop_owner1:
   title: Modelling Assay
@@ -192,7 +189,6 @@ assay_can_edit_by_my_first_sop_owner1:
   study: study_with_modelling_assay
   assay_class: modelling_assay_class
   policy: policy_for_viewable_data_file
-  samples: [test_sample]
 
 assay_can_edit_by_my_first_sop_owner2:
   title: Modelling Assay
@@ -202,4 +198,4 @@ assay_can_edit_by_my_first_sop_owner2:
   study: study_with_modelling_assay
   assay_class: modelling_assay_class
   policy: policy_for_viewable_data_file
-  samples: [test_sample]
+
