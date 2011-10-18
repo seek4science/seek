@@ -38,10 +38,10 @@
             <h2>People can view and edit summary and contents:</h2>
             <%= display_people_list value-%>
         <%when Policy::MANAGING %>
-            <h2>People can manage:</h2>
             <%if (grouped_people_by_access_type.count == 1) && (value.count == 1 and value.first[0] == try_block{current_user.person.id})%>
                <p class='private'>You keep this item private (only visible to you)</p>
             <%else%>
+               <h2>People can manage:</h2>
                <%= display_people_list value-%>
             <%end%>
         <%when Policy::PUBLISHING %>
