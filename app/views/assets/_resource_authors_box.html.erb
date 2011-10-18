@@ -9,7 +9,7 @@ if resource.respond_to?(:contributor) and resource.contributor_credited? and !cr
     creators = (resource.try(:creators) || []) | [resource.contributor.nil? ? nil : resource.contributor.person]
     title ||= "Uploader and creators"
 else
-    creators ||= resource.creators
+    creators ||= resource.creators.dup
     title ||= "Creators"
 end
 %>
