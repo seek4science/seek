@@ -15,7 +15,7 @@ class DataFile < ActiveRecord::Base
 
    def included_to_be_copied? symbol
      case symbol.to_s
-       when "activity_logs","versions","attributions","relationships"
+       when "activity_logs","versions","attributions","relationships","inverse_relationships"
          return false
        else
          return true
@@ -35,6 +35,9 @@ class DataFile < ActiveRecord::Base
            if !association.blank?
              association.each do |item|
                attrs = item.attributes.delete_if{|k,v|k=="id" || k =="#{a.options[:as]}_id" || k =="#{a.options[:as]}_type"}
+               if !attrs["person_id"].nil? and Person.find(:first,:conditions => ["id =?",attrs["person_id"].to_i]).nil?
+                 attrs["person_id"] = self.contributor.person.id
+               end
               presentation.send("#{a.name}".to_sym).send :build,attrs
              end
            end
