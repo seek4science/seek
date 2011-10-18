@@ -129,9 +129,7 @@ class PolicyTest < ActiveSupport::TestCase
     end
     whitelist =  Policy.new().remove_duplicate(whitelist)
     whitelist_added= whitelist.select{|person| person[0]>9}
-    puts whitelist_added.inspect
     filtered_people = Policy.new().add_people_in_whitelist(people_with_access_type, whitelist)
-    puts filtered_people
     assert_equal (people_with_access_type.count + whitelist_added.count), filtered_people.count
   end
 end
