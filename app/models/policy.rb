@@ -312,7 +312,7 @@ class Policy < ActiveRecord::Base
   def get_person person_id, access_type
       person = Person.find(person_id)
       if person
-        return [person.id, "#{person.first_name} #{person.last_name}", access_type]
+        return [person.id, "#{person.name}", access_type]
       end
   end
 
@@ -321,8 +321,8 @@ class Policy < ActiveRecord::Base
       w_group = WorkGroup.find(wg_id)
     if w_group
       people_in_wg = [] #id, name, access_type
-      w_group.group_memberships.each do |gm|
-        people_in_wg.push [gm.person.id, "#{gm.person.first_name} #{gm.person.last_name}", access_type ] unless gm.blank?
+      w_group.people.each do |person|
+        people_in_wg.push [person.id, "#{person.name}", access_type ] unless person.blank?
       end
     end
     return people_in_wg
@@ -341,7 +341,7 @@ class Policy < ActiveRecord::Base
     if f_group
       people_in_FG = [] #id, name, access_type
       f_group.favourite_group_memberships.each do |fgm|
-        people_in_FG.push [fgm.person.id, "#{fgm.person.first_name} #{fgm.person.last_name}", fgm.access_type] unless fgm.blank?
+        people_in_FG.push [fgm.person.id, "#{fgm.person.name}", fgm.access_type] if !fgm.blank? and !fgm.person.blank?
       end
       return people_in_FG
     end
@@ -354,7 +354,7 @@ class Policy < ActiveRecord::Base
     if project
       people_in_project = [] #id, name, access_type
       project.people.each do |person|
-        people_in_project.push [person.id, "#{person.first_name} #{person.last_name}", access_type] unless person.blank?
+        people_in_project.push [person.id, "#{person.name}", access_type] unless person.blank?
       end
       return people_in_project
     end
@@ -366,7 +366,7 @@ class Policy < ActiveRecord::Base
     if institution
       people_in_institution = [] #id, name, access_type
       institution.people.each do |person|
-        people_in_institution.push [person.id, "#{person.first_name} #{person.last_name}", access_type] unless person.blank?
+        people_in_institution.push [person.id, "#{person.name}", access_type] unless person.blank?
       end
       return people_in_institution
     end
@@ -379,7 +379,7 @@ class Policy < ActiveRecord::Base
     projects.each do |project|
       project.people.each do |person|
         unless person.blank?
-          person_identification = [person.id, "#{person.first_name} #{person.last_name}"]
+          person_identification = [person.id, "#{person.name}"]
           people_in_network.push person_identification if (!people_in_network.include? person_identification)
         end
       end
