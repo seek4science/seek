@@ -168,4 +168,17 @@ class PresentationsControllerTest < ActionController::TestCase
     presentation.reload
     assert_equal 'marry queen', presentation.other_creators
   end
+
+  test 'should show the other creators on the presentation index' do
+    Factory(:presentation, :policy => Factory(:public_policy), :other_creators => 'another creator')
+    get :index
+    assert_select 'p.list_item_attribute', :text => /: another creator/, :count => 1
+  end
+
+  test 'should show the other creators in -uploader and creators- box' do
+    presentation=Factory(:presentation, :policy => Factory(:public_policy), :other_creators => 'another creator')
+    get :show, :id => presentation
+    assert_select 'div', :text => /another creator/, :count => 1
+  end
+
 end

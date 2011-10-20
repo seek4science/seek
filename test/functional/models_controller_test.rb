@@ -714,6 +714,24 @@ class ModelsControllerTest < ActionController::TestCase
     assert_equal 'marry queen', model.other_creators
   end
 
+  test 'should show the other creators on the model index' do
+    model=models(:teusink)
+    model.other_creators = 'another creator'
+    model.save
+    get :index
+
+    assert_select 'p.list_item_attribute', :text => /: another creator/, :count => 1
+  end
+
+  test 'should show the other creators in -uploader and creators- box' do
+    model=models(:teusink)
+    model.other_creators = 'another creator'
+    model.save
+    get :show, :id => model
+
+    assert_select 'div', :text => /another creator/, :count => 1
+  end
+
   def valid_model
     { :title=>"Test",:data=>fixture_file_upload('files/little_file.txt'),:projects=>[projects(:sysmo_project)]}
   end

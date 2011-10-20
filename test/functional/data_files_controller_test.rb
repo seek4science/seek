@@ -1032,6 +1032,24 @@ class DataFilesControllerTest < ActionController::TestCase
     assert_equal 'marry queen', data_file.other_creators
   end
 
+  test 'should show the other creators on the data file index' do
+    data_file=data_files(:picture)
+    data_file.other_creators = 'another creator'
+    data_file.save
+    get :index
+
+    assert_select 'p.list_item_attribute', :text => /: another creator/, :count => 1
+  end
+
+  test 'should show the other creators in -uploader and creators- box' do
+    data_file=data_files(:picture)
+    data_file.other_creators = 'another creator'
+    data_file.save
+    get :show, :id => data_file
+
+    assert_select 'div', :text => /another creator/, :count => 1
+  end
+
   private
 
   def mock_http
