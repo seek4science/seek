@@ -25,9 +25,6 @@ class DataFilesController < ApplicationController
     @data_file = DataFile.find params[:id]
     @presentation = @data_file.convert_to_presentation
 
-
-    class << @presentation
-
       def clone_versioned_content_blobs
         data_file = DataFile.find(self.orig_data_file_id)
         versioned_content_blobs = ContentBlob.find(:all, :conditions => ["asset_id =? and asset_type =?", data_file.id, data_file.class.name])
@@ -38,43 +35,10 @@ class DataFilesController < ApplicationController
           ContentBlob.create attrs
         end
       end
-      def clone_versioned_data_file_model versioned_presentation, versioned_data_file
-          versioned_presentation.attributes.keys.each do |key|
-            versioned_presentation.send("#{key}=", eval("versioned_data_file.#{key}")) if versioned_data_file.respond_to? key.to_sym  and key!="id"
-          end
-      end
-
-      def set_new_version
-         self.version = DataFile.find(self.orig_data_file_id).version
-      end
-      def save_version_on_create
-         df_versions = DataFile::Version.find(:all,:conditions=>["data_file_id =?",self.orig_data_file_id])
-         df_versions.each do |df_version|
-            rev = Presentation::Version.new
-            self.clone_versioned_data_file_model(rev,df_version)
-            rev.presentation_id = self.id
-            saved = rev.save
-            if saved
-              # Now update timestamp columns on main model.
-              # Note: main model doesnt get saved yet.
-              update_timestamps(rev, self)
-            end
-         end
          clone_versioned_content_blobs
-      end
-    end
-
-
-   saved = nil
-    if current_user.admin? or @data_file.can_delete?
-      disable_authorization_checks {
-        saved = @presentation.save
-      }
-    end
-
     respond_to do |format|
 
-      if saved
+      if !@presentation.new_record?
         disable_authorization_checks do
           # update attributions
           Relationship.create_or_update_attributions(@presentation, @data_file.attributions_objects.collect { |a| [a.class.name, a.id] })
@@ -88,7 +52,7 @@ class DataFilesController < ApplicationController
           format.html { redirect_to presentation_path(@presentation) }
         end
       else
-        flash.now[:error] = "Data File failed to convert to Presentation!!"
+        flash[:error] = "Data File failed to convert to Presentation!!"
         format.html {
           redirect_to data_file_path @data_file
         }
