@@ -122,7 +122,6 @@ ActiveRecord::Schema.define(:version => 20111005074321) do
     t.integer  "genotype_id"
     t.datetime "created_at"
     t.datetime "updated_at"
-    t.integer  "tissue_and_cell_type_id"
   end
 
   add_index "assay_organisms", ["assay_id"], :name => "index_assay_organisms_on_assay_id"
@@ -770,6 +769,7 @@ ActiveRecord::Schema.define(:version => 20111005074321) do
     t.string   "site_root_uri"
     t.datetime "last_jerm_run"
     t.string   "uuid"
+    t.integer  "parent_id"
   end
 
   create_table "projects_publications", :id => false, :force => true do |t|
@@ -874,11 +874,6 @@ ActiveRecord::Schema.define(:version => 20111005074321) do
     t.integer  "contributor_id"
     t.string   "contributor_type"
     t.integer  "institution_id"
-  end
-
-  create_table "samples_tissue_and_cell_types", :id => false, :force => true do |t|
-    t.integer "sample_id"
-    t.integer "tissue_and_cell_type_id"
   end
 
   create_table "saved_searches", :force => true do |t|
@@ -1123,10 +1118,10 @@ ActiveRecord::Schema.define(:version => 20111005074321) do
   end
 
   create_table "text_value_versions", :force => true do |t|
-    t.integer  "text_value_id",                          :null => false
-    t.integer  "version",                                :null => false
+    t.integer  "text_value_id",                            :null => false
+    t.integer  "version",                                  :null => false
     t.integer  "version_creator_id"
-    t.text     "text",               :limit => 16777215, :null => false
+    t.text     "text",               :limit => 2147483647, :null => false
     t.datetime "created_at"
     t.datetime "updated_at"
   end
@@ -1134,20 +1129,12 @@ ActiveRecord::Schema.define(:version => 20111005074321) do
   add_index "text_value_versions", ["text_value_id"], :name => "index_text_value_versions_on_text_value_id"
 
   create_table "text_values", :force => true do |t|
-    t.integer  "version",                                :null => false
+    t.integer  "version",                                  :null => false
     t.integer  "version_creator_id"
-    t.text     "text",               :limit => 16777215, :null => false
+    t.text     "text",               :limit => 2147483647, :null => false
     t.datetime "created_at"
     t.datetime "updated_at"
   end
-
-  create_table "tissue_and_cell_types", :force => true do |t|
-    t.string   "title"
-    t.datetime "created_at"
-    t.datetime "updated_at"
-  end
-
-  add_index "tissue_and_cell_types", ["title"], :name => "title", :unique => true
 
   create_table "topics", :force => true do |t|
     t.integer  "forum_id"
