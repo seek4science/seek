@@ -706,6 +706,14 @@ class ModelsControllerTest < ActionController::TestCase
     assert flash[:error]
   end
 
+  test "should set the other creators " do
+    model=models(:teusink)
+    assert model.can_manage?,"The sop must be manageable for this test to succeed"
+    put :update, :id => model, :model => {:other_creators => 'marry queen'}
+    model.reload
+    assert_equal 'marry queen', model.other_creators
+  end
+
   def valid_model
     { :title=>"Test",:data=>fixture_file_upload('files/little_file.txt'),:projects=>[projects(:sysmo_project)]}
   end

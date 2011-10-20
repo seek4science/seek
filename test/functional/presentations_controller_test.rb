@@ -159,4 +159,13 @@ class PresentationsControllerTest < ActionController::TestCase
 
   end
 
+  test "should set the other creators " do
+    user = Factory(:user)
+    presentation = Factory(:presentation, :contributor => user)
+    login_as(user)
+    assert presentation.can_manage?,"The presentation must be manageable for this test to succeed"
+    put :update, :id => presentation, :presentation => {:other_creators => 'marry queen'}
+    presentation.reload
+    assert_equal 'marry queen', presentation.other_creators
+  end
 end

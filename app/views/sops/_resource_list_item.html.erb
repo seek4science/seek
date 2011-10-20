@@ -3,6 +3,8 @@
 <div class="list_item_left_column">
 <%= list_item_authorized_list resource.creators, "Creator" -%>
 
+<%= list_item_attribute "Other creator", resource.other_creators -%>
+
 <%= list_item_contributor resource -%>
 
 </div>
@@ -13,10 +15,10 @@
 
 <%= render :partial => 'projects/show_project_relationship', :locals => {:resource => resource, :list_item => true}%>
 
-</div>
-<div class="list_item_whole_width">
 <%= list_item_tag_list resource %>
 
+</div>
+<div class="list_item_whole_width">
 <%= list_item_description resource.description %>
 
 <%= list_item_timestamp resource %>  

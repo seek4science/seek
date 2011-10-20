@@ -1024,6 +1024,14 @@ class DataFilesControllerTest < ActionController::TestCase
     assert_nil flash[:error]
   end
 
+  test "should set the other creators " do
+    data_file=data_files(:picture)
+    assert data_file.can_manage?,"The data file must be manageable for this test to succeed"
+    put :update, :id => data_file, :data_file => {:other_creators => 'marry queen'}
+    data_file.reload
+    assert_equal 'marry queen', data_file.other_creators
+  end
+
   private
 
   def mock_http
