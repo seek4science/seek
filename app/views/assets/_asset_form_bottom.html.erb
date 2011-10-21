@@ -3,7 +3,7 @@
 <%
    if f ||= nil
      resource_type ||= f.object.class.name
-     existing_attributions ||= try_block{f.object.attributions_objects.select &:can_view}
+     existing_attributions ||= try_block{f.object.attributions_objects.select &:can_view?}
 	 existing_creators ||= f.object.try :creators
 	 other_creators ||= f.object.try :other_creators
 	 related_publications ||= try_block { f.object.related_publications }
