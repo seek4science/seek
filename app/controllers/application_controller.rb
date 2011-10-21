@@ -12,10 +12,10 @@ class ApplicationController < ActionController::Base
   self.silent_exceptions = []
   self.rails_error_classes = {
   ActiveRecord::RecordNotFound => "404",
-  ::ActionController::UnknownController => "406",
-  ::ActionController::UnknownAction => "406",
+  ::ActionController::UnknownController => "404",
+  ::ActionController::UnknownAction => "404",
   ::ActionController::RoutingError => "404",  
-  ::ActionView::MissingTemplate => "406",
+  ::ActionView::MissingTemplate => "404",
   ::ActionView::TemplateError => "500"
   }
   local_addresses.clear
