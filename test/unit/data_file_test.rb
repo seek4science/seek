@@ -206,18 +206,14 @@ class DataFileTest < ActiveSupport::TestCase
   test "convert to presentation" do
     user = Factory :user
     User.with_current_user(user) {
-      data_file = Factory :data_file,:contributor=>user
+      data_file = Factory :data_file,:contributor=>user,:version=>2
       presentation = Factory.build :presentation,:contributor=>user
       data_file_converted = data_file.convert_to_presentation
 
       assert_equal "Presentation", data_file_converted.class.name
-      assert_equal presentation.attributes.keys.sort!, data_file_converted.attributes.keys.sort!
-      data_file_converted.valid?
-      assert data_file_converted.valid?
+      assert_equal presentation.attributes.keys.sort!, data_file_converted.attributes.keys.reject{|k|k=='id'}.sort!
 
-      data_file_converted.save!
-      data_file_converted.reload
-
+      assert_equal data_file.version, data_file_converted.version
       assert_equal data_file.policy.sharing_scope, data_file_converted.policy.sharing_scope
       assert_equal data_file.policy.access_type, data_file_converted.policy.access_type
       assert_equal data_file.policy.use_whitelist, data_file_converted.policy.use_whitelist
@@ -227,6 +223,7 @@ class DataFileTest < ActiveSupport::TestCase
       assert_equal data_file.subscriptions.map(&:person_id), data_file_converted.subscriptions(&:person_id)
       assert_equal data_file.event_ids, data_file_converted.event_ids
       assert_equal data_file.creators, data_file_converted.creators
+      assert_equal data_file.projects,data_file_converted.projects
     }
   end
 

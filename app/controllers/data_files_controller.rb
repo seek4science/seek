@@ -25,23 +25,12 @@ class DataFilesController < ApplicationController
     @data_file = DataFile.find params[:id]
     @presentation = @data_file.convert_to_presentation
 
-      def clone_versioned_content_blobs
-        data_file = DataFile.find(self.orig_data_file_id)
-        versioned_content_blobs = ContentBlob.find(:all, :conditions => ["asset_id =? and asset_type =?", data_file.id, data_file.class.name])
-        versioned_content_blobs.each do |content_blob|
-          attrs = content_blob.attributes.delete_if { |k, v| k=="id" || k=="uuid"}
-          attrs["asset_id"]= self.id
-          attrs["asset_type"] = self.class.name
-          ContentBlob.create attrs
-        end
-      end
-         clone_versioned_content_blobs
     respond_to do |format|
 
       if !@presentation.new_record?
         disable_authorization_checks do
           # update attributions
-          Relationship.create_or_update_attributions(@presentation, @data_file.attributions_objects.collect { |a| [a.class.name, a.id] })
+          #Relationship.create_or_update_attributions(@presentation, @data_file.attributions_objects.collect { |a| [a.class.name, a.id] })
 
           # update related publications
           Relationship.create_or_update_attributions(@presentation, @data_file.related_publications.collect { |p| ["Publication", p.id.to_json] }, Relationship::RELATED_TO_PUBLICATION) unless @data_file.related_publications.blank?
@@ -107,6 +96,7 @@ class DataFilesController < ApplicationController
   end
   
   def new
+    #DataFile.find(13).destroy
     @data_file = DataFile.new
     respond_to do |format|
       if current_user.person.member?
