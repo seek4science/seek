@@ -9,7 +9,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20110810093644) do
+ActiveRecord::Schema.define(:version => 20111024104147) do
 
   create_table "activity_logs", :force => true do |t|
     t.string   "action"
@@ -24,7 +24,7 @@ ActiveRecord::Schema.define(:version => 20110810093644) do
     t.datetime "updated_at"
     t.string   "http_referer"
     t.string   "user_agent"
-    t.text     "data",                   :limit => 2147483647
+    t.text     "data",                   :limit => 16777215
     t.string   "controller_name"
   end
 
@@ -79,7 +79,7 @@ ActiveRecord::Schema.define(:version => 20110810093644) do
     t.integer  "annotatable_id",                                        :null => false
     t.integer  "attribute_id",                                          :null => false
     t.string   "old_value",                        :default => ""
-    t.integer  "version",                                               :null => false
+    t.integer  "version"
     t.integer  "version_creator_id"
     t.datetime "created_at"
     t.datetime "updated_at"
@@ -273,7 +273,7 @@ ActiveRecord::Schema.define(:version => 20110810093644) do
     t.datetime "last_used_at"
     t.datetime "created_at"
     t.datetime "updated_at"
-    t.integer  "version",                        :default => 1
+    t.integer  "version"
     t.string   "first_letter",      :limit => 1
     t.text     "other_creators"
     t.string   "uuid"
@@ -566,7 +566,7 @@ ActiveRecord::Schema.define(:version => 20110810093644) do
     t.integer  "organism_id"
     t.integer  "model_type_id"
     t.integer  "model_format_id"
-    t.integer  "version",                                 :default => 1
+    t.integer  "version"
     t.string   "first_letter",               :limit => 1
     t.text     "other_creators"
     t.string   "uuid"
@@ -614,7 +614,7 @@ ActiveRecord::Schema.define(:version => 20110810093644) do
   add_index "number_value_versions", ["number_value_id"], :name => "index_number_value_versions_on_number_value_id"
 
   create_table "number_values", :force => true do |t|
-    t.integer  "version",            :null => false
+    t.integer  "version"
     t.integer  "version_creator_id"
     t.integer  "number",             :null => false
     t.datetime "created_at"
@@ -956,7 +956,7 @@ ActiveRecord::Schema.define(:version => 20110810093644) do
     t.datetime "created_at"
     t.datetime "updated_at"
     t.datetime "last_used_at"
-    t.integer  "version",                        :default => 1
+    t.integer  "version"
     t.string   "first_letter",      :limit => 1
     t.text     "other_creators"
     t.string   "uuid"
@@ -1101,7 +1101,7 @@ ActiveRecord::Schema.define(:version => 20110810093644) do
   add_index "text_value_versions", ["text_value_id"], :name => "index_text_value_versions_on_text_value_id"
 
   create_table "text_values", :force => true do |t|
-    t.integer  "version",                                  :null => false
+    t.integer  "version"
     t.integer  "version_creator_id"
     t.text     "text",               :limit => 2147483647, :null => false
     t.datetime "created_at"

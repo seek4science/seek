@@ -28,4 +28,5 @@ PORTER_SECRET = "" unless defined? PORTER_SECRET
 Seek::Config.propagate_all
 
 Annotations::Config.attribute_names_to_allow_duplicates.concat(["tag"])
+Annotations::Config.versioning_enabled = false
 

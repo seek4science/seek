@@ -93,6 +93,12 @@ module Annotations
     # allowed as value objects.
     # NOTE (2): The attribute name(s) specified MUST all be in lowercase.
     @@valid_value_types = { }
+
+    # This determines whether versioning is enabled.
+    # The default behaviour is true, in which case when a new annotation is created or updated, a copy of the new version
+    # is stored in Annotation::Version and linked to the annotation. Likewise versions of the annotation values are created.
+    # By setting to false, no versions are recorded.
+    @@versioning_enabled = true
     
     def self.reset
       @@attribute_names_for_values_to_be_downcased = [ ]
@@ -122,7 +128,8 @@ module Annotations
       :default_attribute_identifier_template,
       :attribute_name_transform_for_identifier,
       :value_factories,
-      :valid_value_types ].each do |sym|
+      :valid_value_types,
+      :versioning_enabled].each do |sym|
       class_eval <<-EOS, __FILE__, __LINE__
         def self.#{sym}
           if defined?(#{sym.to_s.upcase})
