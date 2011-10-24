@@ -232,9 +232,8 @@ class DataFileTest < ActiveSupport::TestCase
         Factory :tag,:annotatable=>data_file,:source=>user,:value=>"fish"
 
         assert_equal 1, data_file.annotations.count
-        assert_equal 1, data_file.annotations.first.versions.count
+        assert_equal 0, data_file.annotations.first.versions.count
         assert 'fish', data_file.annotations.first.value.text
-        assert 'fish', data_file.annotations.first.versions.first.value.text
 
         data_file_converted = data_file.convert_to_presentation
         data_file_converted.save!
@@ -244,9 +243,8 @@ class DataFileTest < ActiveSupport::TestCase
         assert [], data_file.annotations
         assert [], Annotation::Version.find(:all, :conditions => ['annotatable_type=? and annotatable_id=?', 'DataFile', data_file.id])
         assert_equal 1, data_file_converted.annotations.count
-        assert_equal 1, data_file_converted.annotations.first.versions.count
+        assert_equal 0, data_file_converted.annotations.first.versions.count
         assert 'fish', data_file_converted.annotations.first.value.text
-        assert 'fish', data_file_converted.annotations.first.versions.first.value.text
       }
   end
 

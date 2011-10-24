@@ -83,6 +83,8 @@ class DataFile < ActiveRecord::Base
              a.annotatable = self
              #need to call update without callbacks, otherwise a new version is created
              a.send(:update_without_callbacks)
+
+             #versions for annotations are no longer enabled in SEEK - but this code is left here incase they are re-enabled in the future.
              a.versions.each do |av|
                av.annotatable =self
                av.save
