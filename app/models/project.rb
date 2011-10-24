@@ -69,17 +69,20 @@ class Project < ActiveRecord::Base
       new_institutions[i]=Institution.find(new_institutions[i]) unless new_institutions.is_a?(Institution)
     end
     work_groups.each do |wg|
-      wg.destroy unless new_institutions.include?(wg.institution)
+        wg.destroy unless new_institutions.include?(wg.institution)
     end
     for institution in new_institutions
       institutions << institution unless institutions.include?(institution)
+      self.ancestors.each do |ancestor|
+        ancestor.institutions << institution unless ancestor.work_groups.scoped(:include=>:institution).collect(&:institution).include? institution
+      end
     end
   end
 
   def pals
     pal_role=Role.pal_role
     people.select{|p| p.is_pal?}.select do |possible_pal|
-      possible_pal.project_roles(self).include?(pal_role)
+      possible_pal.project_roles(self).include?(pal_role) || self.descendants.detect{|descendant|possible_pal.project_roles(descendant).include?(pal_role)}
     end
   end
 
