@@ -128,13 +128,13 @@ module HomeHelper
       html=''
       unless entry.blank?
           #get the link of the entry
-          entry_links = try_block{entry.links}
-          entry_link = try_block{entry_links.alternate.href}
-          entry_title, feed_title = (try_block{entry.title} || '').split('***')
+          entry_link = try_block{entry.links.alternate.href}
+          entry_title = entry.title || "Unknown title"
+          feed_title = entry.feed_title || "Unknown publisher"
           entry_date = try_block{entry.updated} || try_block{entry.published} || try_block{entry.last_modified}
           entry_summary = truncate(strip_tags(entry.summary || entry.content),:length=>500)
           tooltip=tooltip_title_attrib("<p>#{entry_summary}</p><p class='feedinfo none_text'>#{entry_date.strftime('%c') unless entry_date.nil?}</p>")
-          unless entry_title.blank? or entry_link.blank?
+          unless entry_title.blank? || entry_link.blank?
             html << "<li class='homepanel_item'>"
             html << link_to("#{entry_title}", "#{entry_link}", :title => tooltip, :target=>"_blank")
             html << "<div class='feedinfo none_text'>"
