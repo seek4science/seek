@@ -15,7 +15,7 @@ class ApplicationController < ActionController::Base
   ::ActionController::UnknownController => "404",
   ::ActionController::UnknownAction => "404",
   ::ActionController::RoutingError => "404",  
-  ::ActionView::MissingTemplate => "404",
+  ::ActionView::MissingTemplate => "406",
   ::ActionView::TemplateError => "500"
   }
   local_addresses.clear
