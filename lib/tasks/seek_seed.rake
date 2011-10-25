@@ -3,8 +3,16 @@ require 'rake'
 require 'active_record/fixtures'
 require 'lib/seek/factor_studied.rb'
 
-namespace :seek do
+namespace :db do
+  desc 'seeds the database using seek:seed rather than db/seed.rb'
+  task(:seed=>:environment) do
+    Rake::Task["seek:seed"].execute
+  end
+end
 
+namespace :seek do
+  include Seek::FactorStudied
+  
   desc 'seeds the database with the controlled vocabularies'
   task(:seed=>:environment) do
     tasks=["seed_testing", "compounds", "load_help_docs"]

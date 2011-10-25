@@ -1,10 +1,11 @@
 require 'rubygems'
 require 'rake'
 require 'active_record/fixtures'
-require 'lib/seek/factor_studied.rb'
+
+
 
 namespace :seek do
-  include Seek::FactorStudied
+
   desc 'an alternative to the doc:seek task'
   task(:docs=>["doc:seek"]) do
 
