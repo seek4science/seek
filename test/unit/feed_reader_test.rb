@@ -54,6 +54,14 @@ class FeedReaderTest < ActiveSupport::TestCase
     assert !File.exists?(dir)
   end
 
+  test "handles error and ignores bad feed" do
+    stub_request(:get,"http://dodgy.atom.feed").to_return(:status=>200,:body=>"<badly><formed></xml>")
+    Seek::Config.project_news_feed_urls="http://dodgy.atom.feed"
+    Seek::Config.project_news_number_of_entries = 5
+    entries = Seek::FeedReader.fetch_entries_for :project_news
+    assert entries.empty?
+  end
+
 
 
   def stub_guardian
