@@ -41,5 +41,44 @@ namespace :seek_dev do
       p.save!
     end
   end
+  
+  desc "Lists all publicly available assets"
+  task :list_public_assets => :environment do
+    [Investigation, Study, Assay, DataFile, Model, Sop, Publication].each do |assets|
+      #  :logout
+      assets.all.each do |asset|
+        if asset.can_view?
+          puts "#{asset.title} - #{asset.id}"
+        end
+      end
+    end
+  end
+
+  desc "Generate an XMI db/schema.xml file describing the current DB as seen by AR. Produces XMI 1.1 for UML 1.3 Rose Extended, viewable e.g. by StarUML"
+  task :xmi => :environment do
+    require 'lib/uml_dumper.rb'
+    File.open("doc/data_models/schema.xmi", "w") do |file|
+      ActiveRecord::UmlDumper.dump(ActiveRecord::Base.connection, file)
+    end
+    puts "Done. Schema XMI created as doc/data_models/schema.xmi."
+  end
+
+  desc 'removes any data this is not authorized to viewed by the first User'
+  task(:remove_private_data=>:environment) do
+    sops        =Sop.find(:all)
+    private_sops=sops.select { |s| !s.can_view? User.first }
+    puts "#{private_sops.size} private Sops being removed"
+    private_sops.each { |s| s.destroy }
+
+    models        =Model.find(:all)
+    private_models=models.select { |m| ! m.can_view? User.first }
+    puts "#{private_models.size} private Models being removed"
+    private_models.each { |m| m.destroy }
+
+    data        =DataFile.find(:all)
+    private_data=data.select { |d| !d.can_view? User.first }
+    puts "#{private_data.size} private Data files being removed"
+    private_data.each { |d| d.destroy }
+  end
 
 end
