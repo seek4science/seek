@@ -10,7 +10,7 @@ class StudiedFactor < ActiveRecord::Base
   validates_presence_of :studied_factor_links, :if => Proc.new{|fs| fs.measured_item.title == 'concentration'}, :message => "can't be a empty"
   validates_presence_of :start_value, :unit, :unless => Proc.new{|fs| fs.measured_item.title == 'growth medium' || fs.measured_item.title == 'buffer'}, :message => "can't be a empty"
 
-  acts_as_annotatable :name_field => :tag
+  acts_as_annotatable :name_field => :title
   include Seek::Taggable
 
   def range_text

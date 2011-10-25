@@ -154,16 +154,24 @@ class HomeControllerTest < ActionController::TestCase
     end
   end
 
+  test "should handle index.html" do
+    assert_routing("/",{:controller=>"home",:action=>"index"})
+    assert_recognizes({:controller=>"home",:action=>"index"},"/index.html")
+    assert_recognizes({:controller=>"home",:action=>"index"},"/index")
+  end
+
   test "should show the content of project news and community news with the configurable number of entries" do
-    WebMock.allow_net_connect!
+    sbml = mock_response_contents "http://sbml.atom.feed","sbml_atom.xml"
+    bbc = mock_response_contents "http://bbc.atom.feed","bbc_atom.xml"
+    guardian = mock_response_contents "http://guardian.atom.feed","guardian_atom.xml"
     #project news
     Seek::Config.project_news_enabled=true
-    Seek::Config.project_news_feed_urls = "http://www.google.com/reader/public/atom/user%2F02837181562898136579%2Fbundle%2Fsystembiology, http://www.google.com/reader/public/atom/user%2F03588343170344705149%2Fbundle%2FSBML"
+    Seek::Config.project_news_feed_urls = "#{bbc}, #{sbml}"
     Seek::Config.project_news_number_of_entries = "5"
 
     #community news
     Seek::Config.community_news_enabled=true
-    Seek::Config.community_news_feed_urls = "http://www.google.com/reader/public/atom/user%2F03588343170344705149%2Fbundle%2FSBML"
+    Seek::Config.community_news_feed_urls = "#{guardian}"
     Seek::Config.community_news_number_of_entries = "7"
 
     login_as(:aaron)
