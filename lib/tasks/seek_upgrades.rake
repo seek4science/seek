@@ -43,9 +43,11 @@ namespace :seek do
             end
           end
         end
+        tagging.destroy
       end
+      tag.destroy
     end
-    puts "Finished successfully"
+    puts "Finished updating tags successfully"
   end
 
   desc "removes the older duplicate create activity logs that were added for a short period due to a bug (this only affects versions between stable releases)"
