@@ -52,6 +52,7 @@ module Seek
           feed = Atom::Feed.load_feed(src)
           cache_feed(feed_url,feed.to_xml) unless src.is_a?(File)
         rescue
+          raise
           feed = nil
         end
         feed

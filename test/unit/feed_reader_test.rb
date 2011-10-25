@@ -2,12 +2,7 @@ require 'test_helper'
 
 class FeedReaderTest < ActiveSupport::TestCase
 
-  ATOM_FEED = "http://feeds.feedburner.com/co/luEY"
-  ATOM_FEED2 = "http://www.google.com/reader/public/atom/user%2F02837181562898136579%2Fbundle%2Fsbml.org%20news"
-  ATOM_FEED3 = "http://feeds.feedburner.com/co/aVFK"
-
   def setup
-    WebMock.allow_net_connect!
     @old_project_news = Seek::Config.project_news_feed_urls
     @old_project_num_entries = Seek::Config.project_news_number_of_entries
   end
@@ -18,7 +13,8 @@ class FeedReaderTest < ActiveSupport::TestCase
   end
   
   test "fetch atom entries" do
-    Seek::Config.project_news_feed_urls="#{ATOM_FEED}, #{ATOM_FEED2}"
+
+    Seek::Config.project_news_feed_urls="#{stub_bbc}, #{stub_sbml}"
     Seek::Config.project_news_number_of_entries = 5
     entries = Seek::FeedReader.fetch_entries_for :project_news
 
@@ -26,7 +22,8 @@ class FeedReaderTest < ActiveSupport::TestCase
   end
 
   test "check caching" do
-    feed_to_use = ATOM_FEED3
+
+    feed_to_use = stub_guardian
     path = Seek::FeedReader.cache_path(feed_to_use)
     assert_equal File.join(Dir.tmpdir,"seek-cache","atom-feeds",CGI::escape(feed_to_use)),path
     FileUtils.rm path if File.exists?(path)
@@ -56,4 +53,19 @@ class FeedReaderTest < ActiveSupport::TestCase
     Seek::FeedReader.clear_cache
     assert !File.exists?(dir)
   end
+
+
+
+  def stub_guardian
+    mock_response_contents "http://guardian.atom.feed","guardian_atom.xml"
+  end
+
+  def stub_sbml
+    mock_response_contents "http://sbml.atom.feed","sbml_atom.xml"
+  end
+  
+  def stub_bbc
+    mock_response_contents "http://bbc.atom.feed","bbc_atom.xml"
+  end
+
 end
