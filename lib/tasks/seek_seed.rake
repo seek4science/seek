@@ -4,6 +4,31 @@ require 'active_record/fixtures'
 require 'lib/seek/factor_studied.rb'
 
 namespace :seek do
+
+  desc 'seeds the database with the controlled vocabularies'
+  task(:seed=>:environment) do
+    tasks=["seed_testing", "compounds", "load_help_docs"]
+    tasks.each do |task|
+      Rake::Task["seek:#{task}"].execute
+    end
+  end
+
+  desc 'seeds the database without the loading of help document, which is currently not working for SQLITE3 (SYSMO-678). Also skips adding compounds from sabio-rk'
+  task(:seed_testing=>:environment) do
+    tasks=["refresh_controlled_vocabs", "tags", "graft_new_assay_types"]
+    tasks.each do |task|
+      Rake::Task["seek:#{task}"].execute
+    end
+  end
+
+  desc 'refreshes, or creates, the standard initial controlled vocublaries'
+  task(:refresh_controlled_vocabs=>:environment) do
+    other_tasks=["culture_growth_types", "model_types", "model_formats", "assay_types", "disciplines", "organisms", "technology_types", "recommended_model_environments", "measured_items", "units", "roles", "assay_classes", "relationship_types", "strains"]
+    other_tasks.each do |task|
+      Rake::Task["seek:#{task}"].execute
+    end
+  end
+
   desc "adds the default tags"
   task(:tags=>:environment) do
 
@@ -61,22 +86,6 @@ namespace :seek do
     end
   end
 
-  desc 'seeds the database with the controlled vocabularies'
-  task(:seed=>:environment) do
-    tasks=["seed_testing", "compounds", "load_help_docs"]
-    tasks.each do |task|
-      Rake::Task["seek:#{task}"].execute
-    end
-  end
-
-  desc 'seeds the database without the loading of help document, which is currently not working for SQLITE3 (SYSMO-678). Also skips adding compounds from sabio-rk'
-  task(:seed_testing=>:environment) do
-    tasks=["refresh_controlled_vocabs", "tags", "graft_new_assay_types"]
-    tasks.each do |task|
-      Rake::Task["seek:#{task}"].execute
-    end
-  end
-
   desc 'adds the new modelling assay types and creates a new root'
   task(:graft_new_assay_types=>:environment) do
     experimental =AssayType.find(628957644)
@@ -104,14 +113,6 @@ namespace :seek do
     end
     modelling_assay_type.save!
 
-  end
-
-  desc 'refreshes, or creates, the standard initial controlled vocublaries'
-  task(:refresh_controlled_vocabs=>:environment) do
-    other_tasks=["culture_growth_types", "model_types", "model_formats", "assay_types", "disciplines", "organisms", "technology_types", "recommended_model_environments", "measured_items", "units", "roles", "assay_classes", "relationship_types", "strains"]
-    other_tasks.each do |task|
-      Rake::Task["seek:#{task}"].execute
-    end
   end
 
   task(:strains=>:environment) do
