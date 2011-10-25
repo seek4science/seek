@@ -336,7 +336,6 @@ module ApplicationHelper
       { :url => url ,
         :failure => "alert('Sorry, an error has occurred.'); RedBox.close();",
         :with => "'sharing_scope=' + selectedSharingScope() + '&access_type=' + selectedAccessType(selectedSharingScope())
-        + '&use_whitelist=' + $('cb_use_whitelist').checked + '&use_blacklist=' + $('cb_use_blacklist').checked
         + '&project_ids=' + getProjectIds('#{resource_name}') + '&project_access_type=' + $F('sharing_your_proj_access_type')
         + '&contributor_types=' + $F('sharing_permissions_contributor_types') + '&contributor_values=' + $F('sharing_permissions_values')
         + '&creators=' + getCreators() + '&contributor_id=' + '#{contributor_id}' + '&resource_name=' + '#{resource_name}' + '&is_new_file=' + '#{is_new_file}'"},
