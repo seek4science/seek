@@ -154,6 +154,12 @@ class HomeControllerTest < ActionController::TestCase
     end
   end
 
+  test "should handle index.html" do
+    assert_routing("/",{:controller=>"home",:action=>"index"})
+    assert_recognizes({:controller=>"home",:action=>"index"},"/index.html")
+    assert_recognizes({:controller=>"home",:action=>"index"},"/index")
+  end
+
   test "should show the content of project news and community news with the configurable number of entries" do
     sbml = mock_response_contents "http://sbml.atom.feed","sbml_atom.xml"
     bbc = mock_response_contents "http://bbc.atom.feed","bbc_atom.xml"
