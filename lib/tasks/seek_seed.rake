@@ -5,37 +5,20 @@ require 'lib/seek/factor_studied.rb'
 
 namespace :db do
   desc 'seeds the database using seek:seed rather than db/seed.rb'
-  task(:seed=>:environment) do
-    Rake::Task["seek:seed"].execute
-  end
+  task :seed=>[:environment,"seek:seed"]
 end
 
 namespace :seek do
   include Seek::FactorStudied
   
   desc 'seeds the database with the controlled vocabularies'
-  task(:seed=>:environment) do
-    tasks=["seed_testing", "compounds", "load_help_docs"]
-    tasks.each do |task|
-      Rake::Task["seek:#{task}"].execute
-    end
-  end
+  task :seed=>[:environment,:seed_testing,:compounds,:load_help_docs]
 
   desc 'seeds the database without the loading of help document, which is currently not working for SQLITE3 (SYSMO-678). Also skips adding compounds from sabio-rk'
-  task(:seed_testing=>:environment) do
-    tasks=["refresh_controlled_vocabs", "tags", "graft_new_assay_types"]
-    tasks.each do |task|
-      Rake::Task["seek:#{task}"].execute
-    end
-  end
+  task :seed_testing=>[:environment,:refresh_controlled_vocabs,:tags,:graft_new_assay_types]
 
   desc 'refreshes, or creates, the standard initial controlled vocublaries'
-  task(:refresh_controlled_vocabs=>:environment) do
-    other_tasks=["culture_growth_types", "model_types", "model_formats", "assay_types", "disciplines", "organisms", "technology_types", "recommended_model_environments", "measured_items", "units", "roles", "assay_classes", "relationship_types", "strains"]
-    other_tasks.each do |task|
-      Rake::Task["seek:#{task}"].execute
-    end
-  end
+  task :refresh_controlled_vocabs=>[:environment,:culture_growth_types, :model_types, :model_formats, :assay_types, :disciplines, :organisms, :technology_types, :recommended_model_environments, :measured_items, :units, :roles, :assay_classes, :relationship_types, :strains]
 
   desc "adds the default tags"
   task(:tags=>:environment) do
