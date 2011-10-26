@@ -1,7 +1,7 @@
 class WorkGroup < ActiveRecord::Base
   belongs_to :institution
   belongs_to :project
-  has_many :group_memberships
+  has_many :group_memberships,:dependent => :destroy
   has_many :people, :through=>:group_memberships
   
   

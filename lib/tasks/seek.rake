@@ -525,9 +525,9 @@ namespace :seek do
     end
     #project management
     ["Admin:Administration",
-     "PtJ",
-     "Virtual Liver Management Team",
-     "Virtual Liver Scientific Advisory Board"].each do |name|
+    "PtJ",
+    "Virtual Liver Management Team",
+    "Virtual Liver Scientific Advisory Board"].each do |name|
       proj = Project.find_by_name name
       if proj and project_mt
         proj.parent = project_mt
@@ -554,6 +554,16 @@ namespace :seek do
         end
       end
     end
+
+    ######update work groups##############
+    puts "update work groups,it may take some time..."
+    disable_authorization_checks do
+      Project.all.each do |proj|
+        proj.institutions = proj.institutions
+        proj.save!
+      end
+    end
+
   end
   
   private
