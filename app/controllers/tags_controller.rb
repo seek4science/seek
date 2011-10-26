@@ -1,8 +1,9 @@
 class TagsController < ApplicationController
+
+  before_filter :find_tag,:only=>[:show]
   
   def show
-    @tag = TextValue.find(params[:id])
-        
+
     @tagged_objects = select_authorised @tag.annotations.collect{|a| a.annotatable}.uniq
 
     if @tagged_objects.empty?
@@ -21,7 +22,19 @@ class TagsController < ApplicationController
     end
   end
   
-  private  
+  private
+
+  def find_tag
+    @tag = TextValue.find_by_id(params[:id])
+    if @tag.nil?
+      flash[:error]="The Tag does not exist"
+      respond_to do |format|
+        format.html { redirect_to all_anns_path }
+        format.xml { head :status => 404 }
+      end
+
+    end
+  end
 
   #Removes all results from the search results collection passed in that are not Authorised to show for the current_user
   def select_authorised collection
