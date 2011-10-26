@@ -559,8 +559,9 @@ namespace :seek do
     puts "update work groups,it may take some time..."
     disable_authorization_checks do
       Project.all.each do |proj|
-        proj.institutions = proj.institutions
-        proj.save!
+        proj.institutions.each do |i|
+          proj.parent.institutions << i unless proj.parent.institutions.include?(i)
+        end
       end
     end
 

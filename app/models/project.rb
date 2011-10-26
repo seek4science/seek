@@ -74,8 +74,16 @@ class Project < ActiveRecord::Base
   end
 
   has_many :work_groups, :dependent=>:destroy
-  has_many :institutions, :through=>:work_groups
-  
+  has_many :institutions, :through=>:work_groups, :after_add => :create_ancestor_workgroups, :before_remove => :check_workgroup_is_empty
+
+  def create_ancestor_workgroups institution
+    parent.institutions << institution unless parent.nil? || parent.institutions.include?(institution)
+  end
+
+  def check_workgroup_is_empty institution
+    raise unless work_groups.find_by_institution(institution).people.empty?
+  end
+
   alias_attribute :webpage, :web_page
   alias_attribute :internal_webpage, :wiki_page
 
@@ -86,21 +94,6 @@ class Project < ActiveRecord::Base
   attr_accessor :site_username,:site_password
 
   before_save :set_credentials
-
-  def institutions=(new_institutions)
-    new_institutions.map do |i|
-      Institution.find(i) unless i.is_a?(Institution)
-    end
-    work_groups.each do |wg|
-        wg.destroy unless new_institutions.include?(wg.institution)
-    end
-    for institution in new_institutions
-      institutions << institution unless institutions.include?(institution)
-      self.ancestors.each do |ancestor|
-        ancestor.institutions << institution unless ancestor.work_groups.scoped(:include=>:institution).collect(&:institution).include? institution
-      end
-    end
-  end
 
   def pals
     pal_role=Role.pal_role
