@@ -9,14 +9,14 @@ namespace :seek do
   task :upgrade_version_tasks=>[:environment,:compounds, :measured_items, :units, :upgrade_tags, :remove_duplicate_activity_creates, :update_sharing_scope]
 
   desc("upgrades SEEK from the last released version to the latest released version")
-  task(:upgrade=>:environment) do
+  task(:upgrade=>[:environment,"db:migrate"]) do
     
     solr=Seek::Config.solr_enabled
-    
+
     Seek::Config.solr_enabled=false
 
     Rake::Task["seek:upgrade_version_tasks"].invoke
-    
+
     Seek::Config.solr_enabled = solr
 
     Rake::Task["solr:reindex"].invoke if solr
