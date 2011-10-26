@@ -7,7 +7,30 @@ class Project < ActiveRecord::Base
   acts_as_yellow_pages
 
   include SimpleCrypt
-  include ActsAsCachedTree::CacheTree
+  include ActsAsCachedTree
+
+  #when I have a new ancestor, subscribe to items in that project
+  write_inheritable_array :before_add_for_ancestors, [:add_indirect_subscriptions]
+
+  has_many :project_subscriptions
+
+  def add_indirect_subscriptions ancestor
+    subscribers = project_subscriptions.scoped(:include => :person).map(&:person)
+    possibly_new_items = ancestor.subscribable_items #might already have subscriptions to these some other way
+    subscribers.each do |p|
+      possibly_new_items.each {|i| i.subscribe(p); disable_authorization_checks{i.save(false)} if i.changed_for_autosave?}
+    end
+  end
+
+  def subscribable_items
+    #TODO: Possibly refactor this. Probably the Project#subscribable_items should only return the subscribable items directly in _this_ project, not including its ancestors
+    ProjectSubscription.subscribable_types.collect {|klass|
+      if klass.reflect_on_association(:projects)
+        then klass.scoped(:include => :projects)
+      else
+        klass.all
+      end}.flatten.select {|item| !(([self] + ancestors) & item.projects).empty?}
+  end
 
   title_trimmer
   
@@ -101,10 +124,8 @@ class Project < ActiveRecord::Base
 
   def people
     #TODO: look into doing this with a named_scope or direct query
-    res = work_groups.scoped(:include => :people).collect(&:people).flatten.uniq.compact
-    descendants.each do |descendant|
-      res = res | descendant.work_groups.scoped(:include => :people).collect(&:people).flatten.uniq.compact
-    end
+    res = work_groups.scoped(:include => :people).collect(&:people)
+    res = res + descendants.scoped(:include => [:work_groups, {:work_groups => :people}]).collect(&:people)
 
     #TODO: write a test to check they are ordered
     res = res.flatten.uniq.compact

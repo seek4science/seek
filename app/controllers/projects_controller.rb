@@ -101,7 +101,6 @@ class ProjectsController < ApplicationController
   # POST /projects.xml
   def create
     @project = Project.new(params[:project])
-    @project.old_parent_id = nil
     @project.default_policy.set_attributes_with_sharing params[:sharing], [@project]
 
 
@@ -121,7 +120,6 @@ class ProjectsController < ApplicationController
   # PUT /projects/1.xml
   def update
     @project = Project.find(params[:id])
-    @project.old_parent_id = @project.parent_id
     #@project.work_groups.each{|wg| wg.destroy} if params[:project][:institutions].nil?
     
     # extra check required to see if any avatar was actually selected (or it remains to be the default one)

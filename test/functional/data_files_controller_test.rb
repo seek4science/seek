@@ -65,9 +65,6 @@ class DataFilesControllerTest < ActionController::TestCase
       assert_select "a[href=?]",person_path(p2) do
         assert_select "img"
       end
-      assert_select "a[href=?]",person_path(p1) do
-        assert_select "img"
-      end
     end
   end
 

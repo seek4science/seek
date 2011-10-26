@@ -1,42 +1,37 @@
 module ActsAsCachedTree
-  module CacheTree
+  def self.included klass
+    klass.class_eval do
+      acts_as_tree
 
-    def self.included klass
-      klass.class_eval do
-        acts_as_tree
+      alias_method :calculate_ancestors, :ancestors
+      has_and_belongs_to_many :descendants, :class_name=>self.name, :join_table=>"#{self.name.underscore}_descendants", :foreign_key=>"ancestor_id", :association_foreign_key=>"descendant_id"
+      has_and_belongs_to_many :ancestors, :class_name=>self.name, :join_table=>"#{self.name.underscore}_descendants", :foreign_key=>"descendant_id", :association_foreign_key=>"ancestor_id"
 
-        has_and_belongs_to_many :descendants, :class_name=>self.name, :join_table=>"#{self.name.underscore}_descendants", :foreign_key=>"ancestor_id", :association_foreign_key=>"descendant_id"
-        has_and_belongs_to_many :saved_ancestors, :class_name=>self.name, :join_table=>"#{self.name.underscore}_descendants", :foreign_key=>"descendant_id", :association_foreign_key=>"ancestor_id"
+      before_save :update_descendants_cache
 
-        #validates_presence_of :parent_id ,:message=>"project is required to be selected" if self.root
+      include InstanceMethods
 
-        attr_accessor :old_parent_id
-        before_save { |record| record.update_descendants(record.old_parent_id, record.parent_id) }
-
-        include InstanceMethods
-      end
     end
-
-    def update_descendants old_parent_id, new_parent_id
-
-      if new_record?
-        if root and new_parent_id
-          self.saved_ancestors = self.ancestors
-        end
-      else
-        unless new_parent_id == old_parent_id
-          ([self] + self.descendants).each {|obj|obj.saved_ancestors = obj.ancestors}
-        end
-      end
-    end
-
-
-    module InstanceMethods
-      def has_children?
-        return !children.empty?
-      end
-    end
-
   end
 
+  def update_descendants_cache
+    disable_authorization_checks do
+      if new_record?
+        if parent_id
+          self.ancestors = self.calculate_ancestors
+        end
+      else
+        if parent_id_changed?
+          ([self] + self.descendants).each {|obj| obj.ancestors = obj.calculate_ancestors}
+        end
+      end
+    end
+  end
+
+
+  module InstanceMethods
+    def has_children?
+      return !children.empty?
+    end
+  end
 end

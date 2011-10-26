@@ -102,20 +102,6 @@ class InvestigationsControllerTest < ActionController::TestCase
 
   end
 
-  test "should fall back to form when no projects validation fails" do
-    login_as(Factory :user)
-
-    assert_no_difference("Investigation.count") do
-      put :create, :investigation=> {:title=>"investigation with no projects"}
-    end
-    assert_template :new
-
-    assert assigns(:investigation)
-    assert !assigns(:investigation).valid?
-    assert !assigns(:investigation).errors.empty?
-
-  end
-
   test "no edit button in show for unauthorized user" do
     login_as(Factory(:user))
     get :show, :id=>Factory(:investigation, :policy => Factory(:private_policy))
