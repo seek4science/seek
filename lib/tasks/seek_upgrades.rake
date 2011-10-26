@@ -15,7 +15,7 @@ namespace :seek do
     
     Seek::Config.solr_enabled=false
 
-    Rake::Task["seek:upgrade_tasks"].invoke
+    Rake::Task["seek:upgrade_version_tasks"].invoke
     
     Seek::Config.solr_enabled = solr
 
