@@ -29,7 +29,9 @@ module Seek
     def update_annotations entity, attr='tag', use_autocomplete = true, owner=User.current_user
       unless owner.nil?
         entity.tag_with_params params, attr, use_autocomplete
+        expire_annotation_fragments
       end
+      
     end
 
     #Updates tags for a given owner using the params passed through the tagging web interface. This just updates the tags for a given owner, which defaults
@@ -37,6 +39,7 @@ module Seek
     def update_owned_annotations entity, attr='tag', use_autocomplete = true, owner=User.current_user
       unless owner.nil?
         entity.tag_as_user_with_params params, attr, use_autocomplete
+        expire_annotation_fragments
       end
     end
   end

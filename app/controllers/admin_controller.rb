@@ -194,8 +194,7 @@ class AdminController < ApplicationController
 
       @tag.destroy if @tag.annotations.blank?
 
-      #FIXME: don't like this, but is a temp solution for handling lack of observer callback when removing a tag
-      expire_fragment("sidebar_tag_cloud")
+      expire_annotation_fragments
 
       redirect_to :action=>:tags
     else
@@ -221,8 +220,7 @@ class AdminController < ApplicationController
       flash.now[:error]="Must be a post"
     end
 
-    #FIXME: don't like this, but is a temp solution for handling lack of observer callback when removing a tag
-    expire_fragment("sidebar_tag_cloud")
+    expire_annotation_fragments
 
     redirect_to :action=>:tags
   end
