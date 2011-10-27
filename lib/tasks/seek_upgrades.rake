@@ -13,11 +13,11 @@ namespace :seek do
     
     solr=Seek::Config.solr_enabled
 
-#    Seek::Config.solr_enabled=false
-#
-#    Rake::Task["seek:upgrade_version_tasks"].invoke
-#
-#    Seek::Config.solr_enabled = solr
+    Seek::Config.solr_enabled=false
+
+    Rake::Task["seek:upgrade_version_tasks"].invoke
+
+    Seek::Config.solr_enabled = solr
 
     begin
       Rake::Task["solr:reindex"].invoke if solr
