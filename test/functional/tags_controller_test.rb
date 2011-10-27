@@ -4,6 +4,8 @@ class TagsControllerTest < ActionController::TestCase
   
   include AuthenticatedTestHelper
 
+  fixtures :all
+
   def setup
     login_as Factory(:user,:person => Factory(:person))
   end
@@ -15,6 +17,28 @@ class TagsControllerTest < ActionController::TestCase
     assert_not_nil flash[:error]
     assert_redirected_to all_anns_path
     
+  end
+
+  test "doesnt try and show cellranges and descriptions" do
+    p=Factory :person
+    df=Factory :data_file,:policy=>Factory(:public_policy)
+    exp = Factory :expertise,:value=>"exp",:source=>p.user,:annotatable=>p
+    Factory :tool,:value=>exp.value,:source=>p.user,:annotatable=>p
+    Factory :tag,:value=>exp.value,:source=>p.user,:annotatable=>df
+    cell_range = cell_ranges(:cell_range_1)
+    Factory :annotation,:value=>exp.value,:source=>p.user,:annotatable=>cell_range
+    sf=Factory :studied_factor
+    Factory :annotation, :attribute_name=>"description",:value=>exp.value,:source=>p.user,:annotatable=>sf
+
+    get :show,:id=>exp.value
+
+    assert_response :success
+
+    assert_select "div.list_items_container" do
+      assert_select "a",:text=>p.name,:count=>1
+      assert_select "a",:text=>df.title,:count=>1
+    end
+
   end
 
   test "show for expertise tag" do

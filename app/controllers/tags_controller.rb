@@ -1,10 +1,14 @@
 class TagsController < ApplicationController
 
+
+
   before_filter :find_tag,:only=>[:show]
   
   def show
 
-    @tagged_objects = select_authorised @tag.annotations.collect{|a| a.annotatable}.uniq
+    acceptable_attributes = ["expertise","tool","tag"]
+
+    @tagged_objects = select_authorised @tag.annotations.with_attribute_name(acceptable_attributes).collect{|a| a.annotatable}.uniq
 
     if @tagged_objects.empty?
       flash.now[:notice]="No objects (or none that you are authorized to view) are tagged with '<b>#{@tag.text}</b>'."
