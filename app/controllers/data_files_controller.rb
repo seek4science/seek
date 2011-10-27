@@ -15,7 +15,7 @@ class DataFilesController < ApplicationController
   
   before_filter :find_assets, :only => [ :index ]
   before_filter :find_and_auth, :except => [ :index, :new, :upload_for_tool, :create, :request_resource, :preview, :test_asset_url, :update_annotations_ajax]
-  before_filter :find_display_data_file, :only=>[:show,:download,:explore]
+  before_filter :find_display_asset, :only=>[:show,:download,:explore]
 
   #has to come after the other filters
   include Seek::Publishing
@@ -23,35 +23,6 @@ class DataFilesController < ApplicationController
   def convert_to_presentation
     @data_file = DataFile.find params[:id]
     @presentation = @data_file.convert_to_presentation
-
-
-    class << @presentation
-
-      def clone_versioned_data_file_model versioned_presentation, versioned_data_file
-          versioned_presentation.attributes.keys.each do |key|
-            versioned_presentation.send("#{key}=", eval("versioned_data_file.#{key}")) if versioned_data_file.respond_to? key.to_sym  and key!="id"
-          end
-      end
-
-      def set_new_version
-         self.version = DataFile.find(self.orig_data_file_id).version
-      end
-      def save_version_on_create
-         df_versions = DataFile::Version.find(:all,:conditions=>["data_file_id =?",self.orig_data_file_id])
-         df_versions.each do |df_version|
-            rev = Presentation::Version.new
-            self.clone_versioned_data_file_model(rev,df_version)
-            rev.presentation_id = self.id
-            saved = rev.save
-            if saved
-              # Now update timestamp columns on main model.
-              # Note: main model doesnt get saved yet.
-              update_timestamps(rev, self)
-            end
-         end
-      end
-    end
-
 
    saved = nil
     if current_user.admin? or @data_file.can_delete?
@@ -76,9 +47,9 @@ class DataFilesController < ApplicationController
           format.html { redirect_to presentation_path(@presentation) }
         end
       else
-        flash.now[:error] = "Data File failed to convert to Presentation!!"
+        flash[:error] = "Data File failed to convert to Presentation!!"
         format.html {
-          redirect_to data_data_file_path @data_file
+          redirect_to data_file_path @data_file
         }
       end
     end
@@ -370,17 +341,7 @@ end
     end
   end 
   
-  protected    
-  
-  def find_display_data_file
-    if @data_file
-      if logged_in? and current_user.person.member? and params[:version]
-        @display_data_file = @data_file.find_version(params[:version]) ? @data_file.find_version(params[:version]) : @data_file.latest_version
-      else
-        @display_data_file = @data_file.latest_version
-      end
-    end
-  end
+  protected
 
   def translate_action action
     action="download" if action=="data"

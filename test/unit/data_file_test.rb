@@ -207,7 +207,6 @@ class DataFileTest < ActiveSupport::TestCase
 
       assert_equal "Presentation", data_file_converted.class.name
       assert_equal presentation.attributes.keys, data_file_converted.attributes.keys
-      data_file_converted.valid?
       assert data_file_converted.valid?
 
       data_file_converted.save!
@@ -222,7 +221,31 @@ class DataFileTest < ActiveSupport::TestCase
       assert_equal data_file.subscriptions.map(&:person_id), data_file_converted.subscriptions(&:person_id)
       assert_equal data_file.event_ids, data_file_converted.event_ids
       assert_equal data_file.creators, data_file_converted.creators
+      assert_equal data_file.other_creators, data_file_converted.other_creators
     }
+  end
+
+  test 'should convert tag from datafile to presentation' do
+      user = Factory :user
+      User.with_current_user(user) {
+        data_file = Factory :data_file,:contributor=>user
+        Factory :tag,:annotatable=>data_file,:source=>user,:value=>"fish"
+
+        assert_equal 1, data_file.annotations.count
+        assert_equal 0, data_file.annotations.first.versions.count
+        assert 'fish', data_file.annotations.first.value.text
+
+        data_file_converted = data_file.convert_to_presentation
+        data_file_converted.save!
+        data_file_converted.reload
+        data_file.reload
+
+        assert [], data_file.annotations
+        assert [], Annotation::Version.find(:all, :conditions => ['annotatable_type=? and annotatable_id=?', 'DataFile', data_file.id])
+        assert_equal 1, data_file_converted.annotations.count
+        assert_equal 0, data_file_converted.annotations.first.versions.count
+        assert 'fish', data_file_converted.annotations.first.value.text
+      }
   end
 
   test "fs_search_fields" do
@@ -273,5 +296,5 @@ class DataFileTest < ActiveSupport::TestCase
       assert_equal 8,df.fs_search_fields.count
     end
   end
-  
+
 end

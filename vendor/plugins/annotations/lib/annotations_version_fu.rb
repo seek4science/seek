@@ -31,7 +31,7 @@ module AnnotationsVersionFu
           end                    
         end
 
-        before_save :check_for_new_version
+        before_save :check_for_new_version if Annotations::Config.versioning_enabled
       end
       
       # Versioned Model

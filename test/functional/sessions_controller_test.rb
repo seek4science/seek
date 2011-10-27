@@ -113,20 +113,13 @@ class SessionsControllerTest < ActionController::TestCase
     assert flash[:error].include?("You still need to activate your account.")
   end
 
-  def test_partly_registed_user_should_redirect_to_select
+  def test_partly_registed_user_should_redirect_to_select_person
     post :create, :login => 'part_registered', :password => 'test'
     assert session[:user_id]
     assert_equal users(:part_registered).id,session[:user_id]
     assert_not_nil flash.now[:notice]
     assert_redirected_to select_people_path
   end
-  
-  def test_invalid_user_should_not_login
-    post :create, :login => 'fred', :password => 'blogs'
-    assert !session[:user_id]
-    assert_redirected_to "/"
-  end
-
 
   protected
     def auth_token(token)

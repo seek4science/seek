@@ -9,7 +9,7 @@ class ModelsController < ApplicationController
   
   before_filter :find_assets, :only => [ :index ]
   before_filter :find_and_auth, :except => [ :build,:index, :new, :create,:create_model_metadata,:update_model_metadata,:delete_model_metadata,:request_resource,:preview,:test_asset_url, :update_annotations_ajax]
-  before_filter :find_display_model, :only=>[:show,:download,:execute,:builder,:simulate,:submit_to_jws]
+  before_filter :find_display_asset, :only=>[:show,:download,:execute,:builder,:simulate,:submit_to_jws]
     
   before_filter :jws_enabled,:only=>[:builder,:simulate,:submit_to_jws]
 
@@ -542,16 +542,6 @@ class ModelsController < ApplicationController
   
   def default_items_per_page
     return 2
-  end
-  
-  def find_display_model
-    if @model
-      if logged_in? and current_user.person.member? and params[:version]
-        @display_model = @model.find_version(params[:version]) ? @model.find_version(params[:version]) : @model.latest_version
-      else
-        @display_model = @model.latest_version
-      end
-    end
   end
 
   def translate_action action

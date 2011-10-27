@@ -73,11 +73,11 @@ class ModelTest < ActiveSupport::TestCase
   end
 
   test "cache_remote_content" do
-    WebMock.allow_net_connect!
+    mock_remote_file "#{Rails.root}/test/fixtures/files/Teusink.xml","http://mockedlocation.com/teusink.xml"
 
     model = Factory :model,
-        :content_blob => ContentBlob.new(:url=>"http://www.sysmo-db.org/images/sysmo-db-logo-grad2.png"),
-        :original_filename => "sysmo-logo.png"
+        :content_blob => ContentBlob.new(:url=>"http://mockedlocation.com/teusink.xml"),
+        :original_filename => "teusink.xml"
 
     assert !model.content_blob.file_exists?
 

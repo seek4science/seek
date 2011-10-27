@@ -32,6 +32,7 @@ Seek::Config.default :community_news_enabled,false
 Seek::Config.default :community_news_feed_urls,''
 Seek::Config.default :community_news_number_of_entries,10
 Seek::Config.default :home_description, 'Some (configurable) information about the project and what we do goes here.'
+Seek::Config.default :publish_button_enabled,false
 
 Seek::Config.default :presentations_enabled,true
 

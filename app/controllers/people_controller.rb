@@ -10,6 +10,7 @@ class PeopleController < ApplicationController
   before_filter :auth_params,:only=>[:update,:create]
 
   skip_before_filter :project_membership_required
+  skip_before_filter :profile_for_login_required,:only=>[:select,:userless_project_selected_ajax,:create]
 
   cache_sweeper :people_sweeper,:only=>[:update,:create,:destroy]
   
@@ -145,7 +146,9 @@ class PeopleController < ApplicationController
       is_sysmo_member=params[:sysmo_member]
 
       if (is_sysmo_member)
-        member_details=params[:sysmo_member_details]               
+        member_details = ''
+        member_details.concat(project_or_institution_details 'projects')
+        member_details.concat(project_or_institution_details 'institutions')
       end
 
       redirect_action="select"
@@ -318,5 +321,19 @@ class PeopleController < ApplicationController
     restricted_params.each do |param, allowed|
       params[:person].delete(param) if params[:person] and not allowed
     end
+  end
+  def project_or_institution_details projects_or_institutions
+    details = ''
+    unless params[projects_or_institutions].blank?
+        params[projects_or_institutions].each do |project_or_institution|
+          project_or_institution_details= project_or_institution.split(',')
+          if project_or_institution_details[0] == 'Others'
+             details.concat("Other #{projects_or_institutions}: #{params["other_#{projects_or_institutions}"]}; ")
+          else
+             details.concat("#{projects_or_institutions.singularize.capitalize}: #{project_or_institution_details[0]}, Id: #{project_or_institution_details[1]}; ")
+          end
+        end
+    end
+    details
   end
 end

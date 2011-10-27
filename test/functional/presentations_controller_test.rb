@@ -159,4 +159,26 @@ class PresentationsControllerTest < ActionController::TestCase
 
   end
 
+  test "should set the other creators " do
+    user = Factory(:user)
+    presentation = Factory(:presentation, :contributor => user)
+    login_as(user)
+    assert presentation.can_manage?,"The presentation must be manageable for this test to succeed"
+    put :update, :id => presentation, :presentation => {:other_creators => 'marry queen'}
+    presentation.reload
+    assert_equal 'marry queen', presentation.other_creators
+  end
+
+  test 'should show the other creators on the presentation index' do
+    Factory(:presentation, :policy => Factory(:public_policy), :other_creators => 'another creator')
+    get :index
+    assert_select 'p.list_item_attribute', :text => /: another creator/, :count => 1
+  end
+
+  test 'should show the other creators in -uploader and creators- box' do
+    presentation=Factory(:presentation, :policy => Factory(:public_policy), :other_creators => 'another creator')
+    get :show, :id => presentation
+    assert_select 'div', :text => /another creator/, :count => 1
+  end
+
 end

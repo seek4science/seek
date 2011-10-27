@@ -5,7 +5,7 @@
 module CommonSweepers
 
   def expire_all_fragments
-    expire_tag_fragments
+    expire_annotation_fragments
     expire_all_favourite_fragments
     expire_organism_gadget
     expire_header_and_footer
@@ -21,12 +21,6 @@ module CommonSweepers
     expire_fragment "header_main"
     expire_fragment "footer"
   end
-
-  def expire_tag_fragments
-    expire_fragment "sidebar_tag_cloud"
-    expire_fragment "super_tag_cloud"
-  end
-
 
   def expire_annotation_fragments
     expire_fragment "sidebar_tag_cloud"

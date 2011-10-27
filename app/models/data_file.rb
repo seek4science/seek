@@ -15,7 +15,7 @@ class DataFile < ActiveRecord::Base
 
    def included_to_be_copied? symbol
      case symbol.to_s
-       when "activity_logs","versions","attributions","relationships"
+       when "activity_logs","versions","attributions","relationships","inverse_relationships", "annotations"
          return false
        else
          return true
@@ -23,7 +23,6 @@ class DataFile < ActiveRecord::Base
    end
 
   def convert_to_presentation
-
      presentation_attrs = self.attributes.delete_if{|k,v|k=="template_id" || k =="id"}
      presentation = Presentation.new presentation_attrs
 
@@ -35,6 +34,9 @@ class DataFile < ActiveRecord::Base
            if !association.blank?
              association.each do |item|
                attrs = item.attributes.delete_if{|k,v|k=="id" || k =="#{a.options[:as]}_id" || k =="#{a.options[:as]}_type"}
+               if !attrs["person_id"].nil? and Person.find(:first,:conditions => ["id =?",attrs["person_id"].to_i]).nil?
+                 attrs["person_id"] = self.contributor.person.id
+               end
               presentation.send("#{a.name}".to_sym).send :build,attrs
              end
            end
@@ -46,7 +48,54 @@ class DataFile < ActiveRecord::Base
 
       presentation.policy = self.policy.deep_copy
       presentation.orig_data_file_id= self.id
-      presentation
+
+    class << presentation
+      def clone_versioned_data_file_model versioned_presentation, versioned_data_file
+          versioned_presentation.attributes.keys.each do |key|
+            versioned_presentation.send("#{key}=", eval("versioned_data_file.#{key}")) if versioned_data_file.respond_to? key.to_sym  and key!="id"
+          end
+      end
+
+      def set_new_version
+         self.version = DataFile.find(self.orig_data_file_id).version
+      end
+
+      def save_version_on_create
+         df_versions = DataFile::Version.find(:all,:conditions=>["data_file_id =?",self.orig_data_file_id])
+         df_versions.each do |df_version|
+            rev = Presentation::Version.new
+            self.clone_versioned_data_file_model(rev,df_version)
+            rev.presentation_id = self.id
+            saved = rev.save
+            if saved
+              # Now update timestamp columns on main model.
+              # Note: main model doesnt get saved yet.
+              update_timestamps(rev, self)
+            end
+         end
+      end
+
+      #Need to copy the annotations from the data_file to the presentation after the presentation got saved
+      def after_save
+        df = DataFile.find_by_id(self.orig_data_file_id)
+        unless df.blank?
+           df.annotations.each do |a|
+             a.annotatable = self
+             #need to call update without callbacks, otherwise a new version is created
+             a.send(:update_without_callbacks)
+
+             #versions for annotations are no longer enabled in SEEK - but this code is left here incase they are re-enabled in the future.
+             a.versions.each do |av|
+               av.annotatable =self
+               av.save
+             end
+           end
+        end
+        super
+      end
+    end
+
+    presentation
   end
 
 

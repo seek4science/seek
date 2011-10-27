@@ -146,15 +146,14 @@ module ApplicationHelper
       
   # text in "caption" will be used to display the item next to the image_tag_for_key;
   # if "caption" is nil, item.name will be used by default
-  def list_item_with_icon(icon_type, item, caption, truncate_to, custom_tooltip=nil)
+  def list_item_with_icon(icon_type, item, caption, truncate_to, custom_tooltip=nil, size=nil)
     list_item = "<li>"
-    
     if icon_type.downcase == "flag"
       list_item += flag_icon(item.country)
     elsif icon_type == "data_file" || icon_type == "sop"
       list_item += file_type_icon(item)
     else
-      list_item += image_tag_for_key(icon_type.downcase, nil, icon_type.camelize, nil, "")
+      list_item += image_tag_for_key(icon_type.downcase, nil, icon_type.camelize, nil, "", false, size)
     end
     item_caption = " " + h(caption.blank? ? item.name : caption)
     list_item += link_to truncate(item_caption, :length=>truncate_to), url_for(item), :title => tooltip_title_attrib(custom_tooltip.blank? ? item_caption : custom_tooltip)
@@ -332,15 +331,14 @@ module ApplicationHelper
     )
   end
 
-  def preview_permission_popup_link resource_name, url, is_new_file
+  def preview_permission_popup_link resource_name, url, is_new_file, contributor_id=nil
      return link_to_remote_redbox("preview permission",
       { :url => url ,
         :failure => "alert('Sorry, an error has occurred.'); RedBox.close();",
         :with => "'sharing_scope=' + selectedSharingScope() + '&access_type=' + selectedAccessType(selectedSharingScope())
-        + '&use_whitelist=' + $('cb_use_whitelist').checked + '&use_blacklist=' + $('cb_use_blacklist').checked
         + '&project_ids=' + getProjectIds('#{resource_name}') + '&project_access_type=' + $F('sharing_your_proj_access_type')
         + '&contributor_types=' + $F('sharing_permissions_contributor_types') + '&contributor_values=' + $F('sharing_permissions_values')
-        + '&creators=' + getCreators() + '&resource_name=' + '#{resource_name}' + '&is_new_file=' + '#{is_new_file}'"},
+        + '&creators=' + getCreators() + '&contributor_id=' + '#{contributor_id}' + '&resource_name=' + '#{resource_name}' + '&is_new_file=' + '#{is_new_file}'"},
       { :id => 'preview_permission',
         :style => 'display:none'
       } #,

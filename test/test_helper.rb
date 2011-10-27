@@ -89,4 +89,22 @@ class ActiveSupport::TestCase
   def run_secondary_tests?
     @@run_secondary ||= File.exists? "#{Rails.root}/tmp/run_secondary_tests"
   end
+
+  ## stuff for mocking
+
+  def mock_remote_file path,route
+    stub_request(:get, route).to_return(:body => File.new(path), :status => 200, :headers=>{'Content-Type' => 'image/png'})
+    stub_request(:head, route)
+  end
+
+  #mocks the contents of a http response with contents stored in a file
+  # path - the http path to be mocked
+  # mock_file - the name of the file that resides in test/fixtures/files/mocking and contains the contents of the response
+  def mock_response_contents path,mock_file
+    contents_path = File.join(Rails.root,"test","fixtures","files","mocking",mock_file)
+    xml=File.open(contents_path,"r").read
+    stub_request(:get,path).to_return(:status=>200,:body=>xml)
+    path
+  end
+  
 end

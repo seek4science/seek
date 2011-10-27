@@ -9,7 +9,15 @@ module Seek
       urls = Seek::Config.send("#{category.to_s}_feed_urls")
       n = Seek::Config.send("#{category.to_s}_number_of_entries")
 
-      feeds = urls.split(",").select{|url| !url.blank?}.collect{|url| get_feed(url)}
+      feeds = urls.split(",").select{|url| !url.blank?}.collect do |url|
+        begin
+          get_feed(url)
+        rescue => e
+          Rails.logger.warn("Problem with feed: #{url} - #{e.message}")
+          nil
+        end
+      end
+      feeds.delete(nil)
 
       filter_feeds_entries_with_chronological_order(feeds, n)
       
@@ -47,13 +55,11 @@ module Seek
       unless feed_url.blank?
         #trim the url element
         feed_url.strip!
-        begin
-          src = select_feed_source feed_url
-          feed = Atom::Feed.load_feed(src)
-          cache_feed(feed_url,feed.to_xml) unless src.is_a?(File)
-        rescue
-          feed = nil
-        end
+
+        src = select_feed_source feed_url
+        feed = Atom::Feed.load_feed(src)
+        cache_feed(feed_url,feed.to_xml) unless src.is_a?(File)
+
         feed
       end
     end
@@ -89,15 +95,21 @@ module Seek
       filtered_entries = []
       unless feeds.blank?
         feeds.each do |feed|
-           entries = try_block{feed.entries}
+           entries = feed.entries || []
            #concat the source of the entry in the entry title, used later on to display
-           unless entries.blank?
-             entries.each{|entry| entry.title<< "***#{feed.title}" if entry.title}
+
+           entries.each do |entry|
+             class << entry
+               attr_accessor :feed_title
+             end
+             entry.feed_title = feed.title || feed.subtitle
            end
+
            filtered_entries |= entries.take(number_of_entries) if entries
-        end
+          end
       end
       filtered_entries.sort {|a,b| (try_block{b.updated} || try_block{b.published} || try_block{b.last_modified} || 10.year.ago) <=> (try_block{a.updated} || try_block{a.published} || try_block{a.last_modified} || 10.year.ago)}.take(number_of_entries)
+
     end
 
   end

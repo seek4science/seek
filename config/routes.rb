@@ -191,6 +191,8 @@ ActionController::Routing::Routes.draw do |map|
   map.request_policy_settings '/policies/request_settings', :controller => 'policies', :action => 'send_policy_data'
 
   map.root :controller=>"home"
+  map.match "index.html",:controller=>"home"
+  map.match "index",:controller=>"home"
 
   # See how all your routes lay out with "rake routes"
 

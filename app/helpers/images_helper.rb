@@ -9,19 +9,20 @@ module ImagesHelper
       :style => "vertical-align:middle;")
   end
   
-  def image_tag_for_key(key, url=nil, alt=nil, url_options={}, label=key.humanize, remote=false)
+  def image_tag_for_key(key, url=nil, alt=nil, url_options={}, label=key.humanize, remote=false, size=nil)
 
     if (label == 'Destroy')
       label = 'Delete';
     end
     
     return nil unless (filename = icon_filename_for_key(key.downcase))
-    
+
     image_options = alt ? { :alt => alt } : { :alt => key.humanize }
+    image_options[:size] = "#{size}x#{size}" unless size.blank?
     img_tag = image_tag(filename, image_options)
-    
+
     inner = img_tag;
-    inner = "#{img_tag} #{label}" unless label == nil
+    inner = "#{img_tag} #{label}" unless label.blank?
     
     if (url)
       if (remote==:function)

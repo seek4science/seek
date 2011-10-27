@@ -17,7 +17,7 @@ class Assay < ActiveRecord::Base
     User.current_user.try :person
   end
 
-  acts_as_annotatable :name_field=>:tag
+  acts_as_annotatable :name_field=>:title
   include Seek::Taggable
 
   belongs_to :institution

@@ -8,6 +8,15 @@ class TagsControllerTest < ActionController::TestCase
     login_as Factory(:user,:person => Factory(:person))
   end
 
+  test "handles invalid tag id" do
+    id = 9999
+    get :show,:id=>id
+
+    assert_not_nil flash[:error]
+    assert_redirected_to all_anns_path
+    
+  end
+
   test "show for expertise tag" do
     p=Factory :person
     exp=Factory :expertise,:value=>"golf",:source=>p.user,:annotatable=>p

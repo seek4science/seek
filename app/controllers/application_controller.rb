@@ -12,8 +12,8 @@ class ApplicationController < ActionController::Base
   self.silent_exceptions = []
   self.rails_error_classes = {
   ActiveRecord::RecordNotFound => "404",
-  ::ActionController::UnknownController => "406",
-  ::ActionController::UnknownAction => "406",
+  ::ActionController::UnknownController => "404",
+  ::ActionController::UnknownAction => "404",
   ::ActionController::RoutingError => "404",  
   ::ActionView::MissingTemplate => "406",
   ::ActionView::TemplateError => "500"
@@ -32,6 +32,7 @@ class ApplicationController < ActionController::Base
     end
   end
 
+  before_filter :profile_for_login_required
   before_filter :project_membership_required,:only=>[:create,:new]
 
   helper :all
@@ -192,6 +193,15 @@ class ApplicationController < ActionController::Base
     Seek::Config.email_enabled
   end
 
+  def profile_for_login_required
+    if User.current_user
+      if User.current_user.person.nil?
+        flash[:notice]="You have successfully registered your account, but now must select a profile, or create your own."
+        redirect_to select_people_path
+      end
+    end
+  end
+
   def translate_action action_name
     case action_name
       when 'show', 'index', 'view', 'search', 'favourite', 'favourite_delete',
@@ -210,8 +220,11 @@ class ApplicationController < ActionController::Base
       when 'destroy', 'destroy_item'
         'delete'
 
-      when 'manage','preview_publish','publish'
+      when 'manage'
         'manage'
+
+      when 'preview_publish', 'publish'
+        'publish'
 
       else
         nil
@@ -227,6 +240,8 @@ class ApplicationController < ActionController::Base
 
       object = name.camelize.constantize.find(params[:id])
 
+      action = 'publish' if ['update', 'edit'].include?action and object.authorization_supported? and try_block{params[:sharing][:sharing_scope].to_i} == Policy::EVERYONE
+
       if object.can_perform? action
         eval "@#{name} = object"
         params.delete :sharing unless object.can_manage?(current_user)
@@ -236,11 +251,12 @@ class ApplicationController < ActionController::Base
           if User.current_user.nil?
             flash[:error] = "You may not #{action} #{name}:#{params[:id]} , please log in first"
           else
-            flash[:error] = "You are not authorized to view this  #{name.humanize}"
+            flash[:error] = "You are not authorized to #{action} this  #{name.humanize}"
           end
 
           format.html do
             case action
+              when 'publish'   then redirect_to object
               when 'manage'   then redirect_to object
               when 'edit'     then redirect_to object
               when 'download' then redirect_to object

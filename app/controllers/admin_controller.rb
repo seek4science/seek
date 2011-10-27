@@ -194,8 +194,7 @@ class AdminController < ApplicationController
 
       @tag.destroy if @tag.annotations.blank?
 
-      #FIXME: don't like this, but is a temp solution for handling lack of observer callback when removing a tag
-      expire_fragment("sidebar_tag_cloud")
+      expire_annotation_fragments
 
       redirect_to :action=>:tags
     else
@@ -221,8 +220,7 @@ class AdminController < ApplicationController
       flash.now[:error]="Must be a post"
     end
 
-    #FIXME: don't like this, but is a temp solution for handling lack of observer callback when removing a tag
-    expire_fragment("sidebar_tag_cloud")
+    expire_annotation_fragments
 
     redirect_to :action=>:tags
   end
@@ -261,7 +259,8 @@ class AdminController < ApplicationController
         type = "activity_stats"
       when "search"
         type = "search_stats"
-      else
+      when "none"
+        type = "none"
     end
     respond_to do |format|
       case type
@@ -275,6 +274,8 @@ class AdminController < ApplicationController
           format.html { render :partial => "admin/activity_stats", :locals => {:stats => Seek::ActivityStats.new} }
         when "search_stats"
           format.html { render :partial => "admin/search_stats", :locals => {:stats => Seek::SearchStats.new} }
+        when "none"
+          format.html { render :text=>"" }
       end
     end
   end
