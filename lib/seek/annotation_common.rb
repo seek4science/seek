@@ -26,9 +26,9 @@ module Seek
 
     #Updates all annotations as the owner of the entity, using the parameters passed through the web interface Any tags that do not match those passed in are removed as a tagging for this item.
     #New tags are assigned to the owner, which defaults to the current user.
-    def update_annotations entity, attr='tag', use_autocomplete = true, owner=User.current_user
+    def update_annotations entity, attr='tag', owner=User.current_user
       unless owner.nil?
-        entity.tag_with_params params, attr, use_autocomplete
+        entity.tag_with_params params, attr
         expire_annotation_fragments
       end
       
@@ -36,9 +36,9 @@ module Seek
 
     #Updates tags for a given owner using the params passed through the tagging web interface. This just updates the tags for a given owner, which defaults
     #to the current user - it doesn't affect other peoples tags for that item.
-    def update_owned_annotations entity, attr='tag', use_autocomplete = true, owner=User.current_user
+    def update_owned_annotations entity, attr='tag', owner=User.current_user
       unless owner.nil?
-        entity.tag_as_user_with_params params, attr, use_autocomplete
+        entity.tag_as_user_with_params params, attr
         expire_annotation_fragments
       end
     end
