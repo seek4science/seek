@@ -9,7 +9,7 @@ namespace :seek do
   task :upgrade_version_tasks=>[:environment,:compounds, :measured_items, :units, :upgrade_tags, :remove_duplicate_activity_creates, :update_sharing_scope]
 
   desc("upgrades SEEK from the last released version to the latest released version")
-  task(:upgrade=>[:environment,"db:migrate"]) do
+  task(:upgrade=>[:environment,"db:migrate","tmp:clear","tmp:assets:clear"]) do
     
     solr=Seek::Config.solr_enabled
 
