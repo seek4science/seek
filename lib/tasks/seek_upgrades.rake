@@ -13,13 +13,18 @@ namespace :seek do
     
     solr=Seek::Config.solr_enabled
 
-    Seek::Config.solr_enabled=false
+#    Seek::Config.solr_enabled=false
+#
+#    Rake::Task["seek:upgrade_version_tasks"].invoke
+#
+#    Seek::Config.solr_enabled = solr
 
-    Rake::Task["seek:upgrade_version_tasks"].invoke
-
-    Seek::Config.solr_enabled = solr
-
-    Rake::Task["solr:reindex"].invoke if solr
+    begin
+      Rake::Task["solr:reindex"].invoke if solr
+    rescue 
+      puts "Reindexing failed - maybe solr isn't running?' - Error: #{$!}."
+      puts "If not You should start solr and run rake solr:reindex manually"
+    end
 
     puts "Upgrade completed successfully"
   end
