@@ -15,7 +15,7 @@ class ReindexerObserver < ActiveRecord::Observer
   end
 
   def reindex item
-    puts "*** REINDEX CALLED FOR OBSERVER #{self.class.name}, ObjID:#{self.object_id}"
+    Rails.logger.info("REINDEX CALLED FOR OBSERVER #{self.class.name}, ObjID:#{self.object_id}")
     consequences(item).each do |consequence|
       consequence.solr_save
     end

@@ -27,7 +27,7 @@ class StudiedFactorsController < ApplicationController
       @studied_factor.studied_factor_links.build(:substance => substance )
     end
 
-    update_annotations(@studied_factor, 'description', false) if try_block{!params[:annotation][:value].blank?}
+    update_annotations(@studied_factor, 'description') if try_block{!params[:annotation][:value].blank?}
 
     render :update do |page|
       if @studied_factor.save
@@ -114,7 +114,7 @@ class StudiedFactorsController < ApplicationController
     end
     @studied_factor.studied_factor_links = studied_factor_links
 
-    update_annotations(@studied_factor, 'description', false) if try_block{!params[:annotation][:value].blank?}
+    update_annotations(@studied_factor, 'description') if try_block{!params[:annotation][:value].blank?}
 
     render :update do |page|
       if  @studied_factor.update_attributes(params[:studied_factor])

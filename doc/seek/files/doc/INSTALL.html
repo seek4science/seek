@@ -56,7 +56,7 @@
     </tr>
     <tr class="top-aligned-row">
       <td><strong>Last Update:</strong></td>
-      <td>Wed Aug 17 16:48:11 +0100 2011</td>
+      <td>Tue Oct 25 16:53:14 +0100 2011</td>
     </tr>
     </table>
   </div>
@@ -186,10 +186,10 @@ as the version control system.
 </p>
 <p>
 For a stable version, you should check out according to a stable tag. Our
-current tag is v0.11.3, so to retrieve this version you should use:
+current tag is v0.12.2, so to retrieve this version you should use:
 </p>
 <pre>
-  hg clone https://sysmo-db.googlecode.com/hg/ -r v0.11.3 seek
+  hg clone https://sysmo-db.googlecode.com/hg/ -r v0.12.2 seek
 </pre>
 <p>
 <a href="http://gembundler.com/">Bundler</a> is used to manage gems, so to
@@ -267,13 +267,11 @@ server exposed to the internet).
     mysql&gt; GRANT ALL PRIVILEGES ON *.* TO 'mysqluser'@'localhost' WITH GRANT OPTION;
 </pre>
 <p>
-Run the rake tasks (the final task installs some default controlled
-vocubulary data)
+Run the rake database setup task, this creates the database, loads the
+schema and seeds the database with any default data
 </p>
 <pre>
-  rake db:create:all
-  rake db:schema:load
-  rake seek:seed
+  rake db:setup
 </pre>
 <h2>A quick test</h2>
 <p>
