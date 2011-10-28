@@ -1,11 +1,11 @@
-<% resource_text ||= resource.class.name.downcase
+<% resource_text ||= text_for_resource(resource)
    associated_data_files = resource.is_a?(Publication) ? resource.related_data_files : resource.data_files
 %>
 <div class="fold">
 
   <div class="foldTitle">
-    <%= help_icon("Here you associate data in SEEK to this #{resource_text}.") -%>
-    Associate Data
+    <%= help_icon("Here you associate Data file in SEEK to this #{resource_text}.") -%>
+    Data files
   </div>
 
   <div id="associate_data_fold_content" class="foldContent" style="display:<%= associated_data_files.blank? ? 'none' : 'block' -%>">
@@ -18,7 +18,7 @@
       -%>
       
       <p style="color: #666666;">
-        The following Data Files are involved in this <%= resource_text -%>:
+        The following Data files are involved in this <%= resource_text -%>:
       </p>
       <div id="data_file_to_list" class="box_editing_inner" style="line-height: 1.5">
         <span class="none_text" id="data_files">Loading...</span>
@@ -43,10 +43,10 @@
         
         <br/>
         
-        <%= check_box_tag :include_other_project_data_files, nil, false, {:onchange=>"toggle_data_file_list();",:style=>"margin-top:0.5em;"} -%> Include Data files from other projects?        
+        <%= check_box_tag :include_other_project_data_files, nil, false, {:onchange=>"toggle_data_file_list();",:style=>"margin-top:0.5em;"} -%> Associate Data files from other projects?
       </div>
 	  <br/>
-      <%= link_to_function (image("new") + " Include in the #{resource_text}"), "addSelectedDataFile(); return(false);", :id=>"add_data_file_link", :class=>"block_link", :style => "width: 11em" %>
+      <%= link_to_function (image("new") + " Associate with this #{resource_text}"), "addSelectedDataFile(); return(false);", :id=>"add_data_file_link", :class=>"block_link", :style => "width: 11em" %>
     </div>
   
     <%= render :partial => 'assets/preview_box', :locals => {:preview_name => 'data_file'} %>
