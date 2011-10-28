@@ -3,7 +3,7 @@
 <% fancy_multiselect resource, :events,{:hidden=> resource.events.blank? ? true : false} do %>
     <br/>
 
-    <%= check_box_tag :include_other_project_events, nil, false, {:onchange=>"swapSelectListContents('possible_event_ids','alternative_event_ids');",:style=>"margin-top:0.5em;"} -%> Include Events from other projects?
+    <%= check_box_tag :include_other_project_events, nil, false, {:onchange=>"swapSelectListContents('possible_event_ids','alternative_event_ids');",:style=>"margin-top:0.5em;"} -%> Associate Events from other projects?
     <%= select_tag :alternative_event_ids, options_for_select([["Select events ...",0]]|project_events.collect{|o| [truncate(h(o.title), :length=>120), o.id]}), {:style => 'display:none;'} %>
 <% end %>
 

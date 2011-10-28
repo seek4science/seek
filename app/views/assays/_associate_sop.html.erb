@@ -1,4 +1,5 @@
 <%
+    resource_text ||= text_for_resource(resource)
     all_sops=authorised_sops.sort{|a, b| a.title<=>b.title}
     project_sops=all_sops.select{|s| current_user.person.member_of?(s.projects)}
     select_truncate_length=120
@@ -7,14 +8,14 @@
 <div class="fold">
 
   <div class="foldTitle">
-    <%= help_icon("Here you associate SOPs in SEEK to this assay.") -%>
-    Associate SOPs
+    <%= help_icon("Here you associate SOPs in SEEK to this #{resource_text}.") -%>
+    SOPs
   </div>
 
   <div id="associate_model_fold_content" class="foldContent" style="display:<%= associated_sops.blank? ? 'none' : 'block' -%>">
     <div class="yui-u first" style="width:66%; float:left">
       <p style="color: #666666;">
-        The following SOPs are involved in this <%= @assay_text -%>:
+        The following SOPs are involved in this <%= resource_text -%>:
       </p>
   
       <div id="sop_to_list" class="box_editing_inner" style="line-height: 1.5;">
@@ -35,10 +36,10 @@
         
         <br/>
       
-        <%= check_box_tag :include_other_project_sops, nil, false, {:onchange=>"toggle_sop_list();",:style=>"margin-top:0.5em;"} -%> Include SOPs from other projects?
+        <%= check_box_tag :include_other_project_sops, nil, false, {:onchange=>"toggle_sop_list();",:style=>"margin-top:0.5em;"} -%> Associate SOPs from other projects?
       </div>
 	  <br/>
-      <%= link_to_function (image("new") + " Include in the assay"), "addSelectedSop(); return(false);", :id=>"add_sop_link", :class=>"block_link", :style => "width: 11em" %>      
+      <%= link_to_function (image("new") + " Associate with this #{resource_text}"), "addSelectedSop(); return(false);", :id=>"add_sop_link", :class=>"block_link", :style => "width: 11em" %>
     </div>
     <%= render :partial => 'assets/preview_box', :locals => {:preview_name => 'sop'} %>
   

@@ -32,7 +32,7 @@
                 insertFancyListItem(multiselect, list, opt);
             });
         } else {
-            display_area.innerHTML = '<span class="none_text">No Items</span>';
+            display_area.innerHTML = '<span class="none_text">None</span>';
         }
         multiselect.fire('fancySelect:update');
     }

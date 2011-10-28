@@ -14,8 +14,8 @@
 <div class="fold">
 
   <div class="foldTitle">
-    <%= help_icon("Here you can associate assays in SEEK to this #{resource_text}. You can only associate assays you are authorized to edit.") -%>
-    Associate Assays
+    <%= help_icon("Here you can associate Assays in SEEK to this #{resource_text}. You can only associate Assays you are authorized to edit.") -%>
+    Assays
   </div>
 
   <div id="associate_assay_fold_content" class="foldContent" style="display:<%= associated_assays.blank? ? 'none' : 'block' -%>">
@@ -29,7 +29,7 @@
       </div>
       <div class="association_step">
         <p style="color: #666666;">
-             You may select an existing assay Or create <%= link_to h("New Assay Here"), new_assay_path(:create_from_asset=>:true),:popup => true%>  for the <%= resource_text -%>.
+             You may select an existing Assay or create <%= link_to h("new Assay here"), new_assay_path(:create_from_asset=>:true),:popup => true%>  for the <%= resource_text -%>.
         </p>
         <% if show_relationships -%>
             <%= select_tag :possible_assays,
@@ -63,7 +63,7 @@
       </div>
 
 	  <br/>
-      <%= link_to_function (image("new") + " Include in the #{resource_text}"), "addSelectedAssay(); return(false);", :id=>"add_assay_link", :class=>"block_link", :style => "width: 11em" %>
+      <%= link_to_function (image("new") + " Associate with this #{resource_text}"), "addSelectedAssay(); return(false);", :id=>"add_assay_link", :class=>"block_link", :style => "width: 11em" %>
     </div>
   
     <%= render :partial => 'assets/preview_box', :locals => {:preview_name => 'assay'}%>

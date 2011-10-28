@@ -54,7 +54,7 @@ function updatePublications() {
 
     // update the page
     if(publication_array.length == 0) {
-        $('publication_to_list').innerHTML = '<span class="none_text">No data files</span>';
+        $('publication_to_list').innerHTML = '<span class="none_text">None</span>';
     }
     else {
         $('publication_to_list').innerHTML = publication_text;
