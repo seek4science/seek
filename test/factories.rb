@@ -367,6 +367,7 @@ end
   Factory.define :annotation do |f|
     f.sequence(:value) {|n| "anno #{n}"}
     f.association :source, :factory=>:person
+    f.attribute_name "annotation"
   end
 
   Factory.define :tag,:parent=>:annotation do |f|
