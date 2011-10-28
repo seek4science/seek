@@ -41,7 +41,7 @@ class ApplicationController < ActionController::Base
 
   # See ActionController::RequestForgeryProtection for details
   # Uncomment the :secret if you're not using the cookie session store
-  protect_from_forgery # :secret => 'cfb59feef722633aaee5ee0fd816b5fb'
+  protect_from_forgery :secret => '4ujARdxGS4uAz29RwFaq37g88cPoA54z'
 
   def set_no_layout
     self.class.layout nil
