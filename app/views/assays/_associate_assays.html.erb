@@ -29,7 +29,7 @@
       </div>
       <div class="association_step">
         <p style="color: #666666;">
-             You may select an existing Assay or create <%= link_to h("new Assay here"), new_assay_path(:create_from_asset=>:true),:popup => true%>  for the <%= resource_text -%>.
+             You may select an existing Assay or <%= link_to h("create a new Assay here"), new_assay_path(:create_from_asset=>:true),:popup => true%>  for the <%= resource_text -%>.
         </p>
         <% if show_relationships -%>
             <%= select_tag :possible_assays,
