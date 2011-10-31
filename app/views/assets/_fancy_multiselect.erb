@@ -3,7 +3,7 @@
  selected ||= nil
  intro ||= ""
  default_choice_text ||= "Select Item ..."
- button_text ||= "Include"
+ button_text ||= "Associate"
  value_method ||= :id
  text_method ||= :title
  html_options ||= ''
@@ -31,7 +31,7 @@
       <div class="association_step">
         <% if with_new_link  %>
          <p style="color: #666666;">
-             You may select an existing  <%= association.to_s.singularize %> Or create <%= link_to h("New #{association.to_s.singularize.capitalize} Here"), new_association_path,:popup => true%>  for the <%= object_type_text -%>.
+             You may select an existing  <%= association.to_s.singularize %> or create <%= link_to h("new #{association.to_s.singularize.capitalize} here"), new_association_path,:popup => true%>  for the <%= object_type_text -%>.
         </p>
         <% end  %>
          <%= select_tag possibilities_collection_id,
