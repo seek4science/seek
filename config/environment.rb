@@ -5,7 +5,7 @@
 # ENV['RAILS_ENV'] ||= 'production'
 
 # Specifies gem version of Rails to use when vendor/rails is not present
-RAILS_GEM_VERSION = '2.3.12' unless defined? RAILS_GEM_VERSION
+RAILS_GEM_VERSION = '2.3.14' unless defined? RAILS_GEM_VERSION
 
 # Bootstrap the Rails environment, frameworks, and default configuration
 require File.join(File.dirname(__FILE__), 'boot')
@@ -31,7 +31,7 @@ Rails::Initializer.run do |config|
   # Add additional load paths for your own custom dirs
   # config.load_paths += %W( #{RAILS_ROOT}/extras )
 
-  config.load_paths += %W(#{Rails.root}/app/sweepers #{Rails.root}/app/reindexers)
+  config.autoload_paths += %W(#{Rails.root}/app/sweepers #{Rails.root}/app/reindexers)
 
   # Force all environments to use the same logger level
   # (by default production uses :info, the others :debug)
