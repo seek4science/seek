@@ -48,7 +48,7 @@ namespace :seek do
           if taggable.nil?
             #seed
             annotation_attribute = AnnotationValueSeed.new :value=>text_value, :attribute=>AnnotationAttribute.find_or_create_by_name(attribute)
-            annotation_attribute.save!
+            disable_authorization_checks { annotation_attribute.save }
           else
             tagger = taggable if tagger.nil? && attribute!="tag"
             unless tagger.nil?
@@ -56,7 +56,7 @@ namespace :seek do
               matches = matches.select { |m| m.value == text_value }
               if matches.empty?
                 annotation = Annotation.new :source=>tagger, :annotatable=>taggable, :value=>text_value, :attribute_name=>attribute
-                disable_authorization_checks { annotation.save! }
+                disable_authorization_checks { annotation.save }
               end
 
             end
