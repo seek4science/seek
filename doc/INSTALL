@@ -63,6 +63,9 @@ The following commands should install rubygems for you on a Ubuntu/Debian system
 
 == Getting the source code
 
+On a production server we would recommend installing into the directory <i>/srv/rails/</i> and installing as the user www-data. There is also more information later
+on how to setup Apache and {Passenger Phusion (modrails)}[http://www.modrails.com/].
+
 Our source code is stored within the {Sysmo-DB Google Code Repository}[http://code.google.com/p/sysmo-db/], using Mercurial[http://mercurial.selenic.com/] as the version control system. 
 
 For a stable version, you should check out according to a stable tag. Our current stable tag is v1.0, so to retrieve this version you should use:
@@ -157,6 +160,40 @@ Once logged in as an administrator, you will notice a link on the right-hand sid
 admin facilities for creating new projects, institutions and profiles.
 
 Here you can also define additional administrator users.
+
+== Setting up Passenger Phusion and Apache for production servers.
+
+This section is only relevant if setting up a production deployment, and assumes that seek has been deployed to /srv/rails/seek as the user www-data, and that you have used RAILS_ENV=production whilst setting up.
+Most of these steps are already very well documented at {Passenger Phusion Install Guide}[http://www.modrails.com/install.html] and the installation is a guided process.
+
+If you have not done so already, then beforehand install some additional libaries using:
+
+  sudo apt-get install apache2-mpm-prefork apache2-prefork-dev libapr1-dev libaprutil1-dev libcurl4-openssl-dev
+
+Next install the passenger gem
+
+  sudo gem install passenger
+
+Next run the following command to compile and install the modrails Apache modules, and follow the instructions it provides
+
+  sudo passenger-install-apache2-module
+
+If you've followed the instructions, you will have added something like the following (the version numbers may differ) to your <i>/etc/apache/http.conf</i>
+
+  LoadModule passenger_module /usr/lib/ruby/gems/1.8/gems/passenger-3.0.7/ext/apache2/mod_passenger.so
+  PassengerRoot /usr/lib/ruby/gems/1.8/gems/passenger-3.0.7
+  PassengerRuby /usr/bin/ruby1.8
+
+and configured a virtual host that looks something like:
+
+  <VirtualHost *:80>
+     ServerName www.yourhost.com
+     DocumentRoot /srv/rails/seek/public
+        <Directory /srv/rails/seek/public>
+         AllowOverride all
+         Options -MultiViews            
+      </Directory>
+   </VirtualHost>
 
 == Contacting us and other developers 
 
