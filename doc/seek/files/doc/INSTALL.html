@@ -56,7 +56,7 @@
     </tr>
     <tr class="top-aligned-row">
       <td><strong>Last Update:</strong></td>
-      <td>Tue Nov 01 11:46:59 +0000 2011</td>
+      <td>Wed Nov 02 16:10:21 +0000 2011</td>
     </tr>
     </table>
   </div>
@@ -132,10 +132,11 @@ href="https://help.ubuntu.com/community/Repositories/Ubuntu#Adding+Canonical+Par
 </p>
 <p>
 If you needed to add partner repositories, and its a good idea anyway, you
-should do an apt-get update
+should now do an apt-get update and an apt-get upgrade to make sure things
+are up to date:
 </p>
 <pre>
-  sudo apt-get update
+  sudo apt-get update &amp;&amp; sudo apt-get -y upgrade
 </pre>
 <p>
 If using Ubuntu or Debian, the following commands should install most the
@@ -198,6 +199,9 @@ current stable tag is v1.0, so to retrieve this version you should use:
   hg clone https://sysmo-db.googlecode.com/hg/ -r v1.0 seek
 </pre>
 <p>
+This will create a <em>seek</em> directory that contains the application.
+</p>
+<p>
 <a href="http://gembundler.com/">Bundler</a> is used to manage gems, so to
 install the required gems you first need to install the bundler gem:
 </p>
@@ -205,7 +209,7 @@ install the required gems you first need to install the bundler gem:
   gem install -d bundler rake
 </pre>
 <p>
-Then from within the sysmo-seek directory run
+Then from within the seek directory run
 </p>
 <pre>
   bundle install
@@ -224,27 +228,6 @@ development, you should set the RAILS_ENV variable before proceeding
 </p>
 <pre>
   export RAILS_ENV=production
-</pre>
-<h2>Rebranding SysMO SEEK for other projects</h2>
-<p>
-If you are running SEEK for a project other than SysMO, copy
-config/initializers/seek_local.rb.pre to config/initializers/seek_local.rb.
-This file contains several constants that you should set, to reflect the
-name of your project/application.
-</p>
-<p>
-To insert your application/project name into the help documents for SEEK,
-and to remove the logos/links to SEEK&#8216;s &#8216;related projects and
-friends&#8217; use
-</p>
-<pre>
-  rake seek:rebrand
-</pre>
-<p>
-If you only want to change the help documents, you can instead use
-</p>
-<pre>
-  rake seek:rebrand_help_docs
 </pre>
 <h2>Configuring the database</h2>
 <p>
@@ -277,16 +260,7 @@ Run the rake database setup task, this creates the database, loads the
 schema and seeds the database with any default data
 </p>
 <pre>
-  rake db:setup
-</pre>
-<h2>A quick test</h2>
-<p>
-You can quickly check that everything is in order by running the system
-tests as follows
-</p>
-<pre>
-  rake db:test:prepare
-  rake test
+  bundle exec rake db:setup
 </pre>
 <h2>Starting the server</h2>
 <p>
@@ -325,6 +299,43 @@ institutions and profiles.
 <p>
 Here you can also define additional administrator users.
 </p>
+<h2>Enabling search and starting the SOLR server</h2>
+<p>
+Search can be enabled in the admin setting under Admin settings, Site
+configuration, Enable/disable features - under &quot;Search enabled&quot;.
+You will need to restart the server after changing this setting.
+</p>
+<p>
+To start the search server you need to run:
+</p>
+<pre>
+  bundle exec solr:start
+</pre>
+<p>
+and to reindex any existing data that created before search was enabled:
+</p>
+<pre>
+  bundle exec solr:reindex
+</pre>
+<h2>Rebranding SysMO SEEK for other projects</h2>
+<p>
+If you are running SEEK for a project other than SysMO you can change
+various text elements under Admin, Site branding.
+</p>
+<p>
+To insert your application/project name into the help documents for SEEK,
+and to remove the logos/links to SEEK&#8216;s &#8216;related projects and
+friends&#8217; use
+</p>
+<pre>
+  bundle exec rake seek:rebrand
+</pre>
+<p>
+If you only want to change the help documents, you can instead use
+</p>
+<pre>
+  bundle exec rake seek:rebrand_help_docs
+</pre>
 <h2>Setting up Passenger Phusion and Apache for production servers.</h2>
 <p>
 This section is only relevant if setting up a production deployment, and
@@ -365,7 +376,8 @@ like the following (the version numbers may differ) to your
   PassengerRuby /usr/bin/ruby1.8
 </pre>
 <p>
-and configured a virtual host that looks something like:
+and configured a virtual host (probably in
+<em>/etc/apache2/sites-enabled/default</em>) that looks something like:
 </p>
 <pre>
   &lt;VirtualHost *:80&gt;
