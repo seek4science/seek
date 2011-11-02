@@ -56,7 +56,7 @@
     </tr>
     <tr class="top-aligned-row">
       <td><strong>Last Update:</strong></td>
-      <td>Tue Nov 01 11:46:59 +0000 2011</td>
+      <td>Wed Nov 02 10:20:14 +0000 2011</td>
     </tr>
     </table>
   </div>
@@ -132,10 +132,11 @@ href="https://help.ubuntu.com/community/Repositories/Ubuntu#Adding+Canonical+Par
 </p>
 <p>
 If you needed to add partner repositories, and its a good idea anyway, you
-should do an apt-get update
+should now do an apt-get update and an apt-get upgrade to make sure things
+are up to date:
 </p>
 <pre>
-  sudo apt-get update
+  sudo apt-get update &amp;&amp; apt-get -y upgrade
 </pre>
 <p>
 If using Ubuntu or Debian, the following commands should install most the
