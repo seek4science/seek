@@ -56,7 +56,7 @@
     </tr>
     <tr class="top-aligned-row">
       <td><strong>Last Update:</strong></td>
-      <td>Wed Nov 02 16:10:21 +0000 2011</td>
+      <td>Wed Nov 02 16:35:10 +0000 2011</td>
     </tr>
     </table>
   </div>
@@ -206,7 +206,7 @@ This will create a <em>seek</em> directory that contains the application.
 install the required gems you first need to install the bundler gem:
 </p>
 <pre>
-  gem install -d bundler rake
+  gem install -d bundler
 </pre>
 <p>
 Then from within the seek directory run
@@ -260,7 +260,7 @@ Run the rake database setup task, this creates the database, loads the
 schema and seeds the database with any default data
 </p>
 <pre>
-  bundle exec rake db:setup
+  rake db:setup
 </pre>
 <h2>Starting the server</h2>
 <p>
@@ -309,13 +309,13 @@ You will need to restart the server after changing this setting.
 To start the search server you need to run:
 </p>
 <pre>
-  bundle exec solr:start
+  rake solr:start
 </pre>
 <p>
 and to reindex any existing data that created before search was enabled:
 </p>
 <pre>
-  bundle exec solr:reindex
+  solr:reindex
 </pre>
 <h2>Rebranding SysMO SEEK for other projects</h2>
 <p>
@@ -328,13 +328,13 @@ and to remove the logos/links to SEEK&#8216;s &#8216;related projects and
 friends&#8217; use
 </p>
 <pre>
-  bundle exec rake seek:rebrand
+  rake seek:rebrand
 </pre>
 <p>
 If you only want to change the help documents, you can instead use
 </p>
 <pre>
-  bundle exec rake seek:rebrand_help_docs
+  rake seek:rebrand_help_docs
 </pre>
 <h2>Setting up Passenger Phusion and Apache for production servers.</h2>
 <p>
