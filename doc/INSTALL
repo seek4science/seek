@@ -71,12 +71,14 @@ Our source code is stored within the {Sysmo-DB Google Code Repository}[http://co
 For a stable version, you should check out according to a stable tag. Our current stable tag is v1.0, so to retrieve this version you should use:
 
   hg clone https://sysmo-db.googlecode.com/hg/ -r v1.0 seek
+
+This will create a <i>seek</i> directory that contains the application.
   
 Bundler[http://gembundler.com/] is used to manage gems, so to install the required gems you first need to install the bundler gem:
 
   gem install -d bundler rake
   
-Then from within the sysmo-seek directory run
+Then from within the seek directory run
 
   bundle install  
   
@@ -91,18 +93,6 @@ If you are requested for a root or sudo password, but you do not have this level
 If you are setting up SEEK as a production environment, rather than for development, you should set the RAILS_ENV variable before proceeding
 
   export RAILS_ENV=production
-
-== Rebranding SysMO SEEK for other projects
-
-If you are running SEEK for a project other than SysMO, copy config/initializers/seek_local.rb.pre to config/initializers/seek_local.rb. This file contains several constants that you should set, to reflect the name of your project/application.
-
-To insert your application/project name into the help documents for SEEK, and to remove the logos/links to SEEK's 'related projects and friends' use
-
-  rake seek:rebrand
-
-If you only want to change the help documents, you can instead use
-
-  rake seek:rebrand_help_docs
 
 == Configuring the database
 
@@ -126,14 +116,7 @@ To add users to the MySQL database, first login to the database as an administra
 
 Run the rake database setup task, this creates the database, loads the schema and seeds the database with any default data
 
-  rake db:setup
-
-== A quick test
-
-You can quickly check that everything is in order by running the system tests as follows
-
-  rake db:test:prepare
-  rake test
+  bundle exec rake db:setup
 
 == Starting the server
 
@@ -161,6 +144,31 @@ admin facilities for creating new projects, institutions and profiles.
 
 Here you can also define additional administrator users.
 
+== Enabling search and starting the SOLR server
+
+Search can be enabled in the admin setting under Admin settings, Site configuration, Enable/disable features - under "Search enabled". You will need
+to restart the server after changing this setting.
+
+To start the search server you need to run:
+
+  bundle exec solr:start
+
+and to reindex any existing data that created before search was enabled:
+
+  bundle exec solr:reindex
+
+== Rebranding SysMO SEEK for other projects
+
+If you are running SEEK for a project other than SysMO you can change various text elements under Admin, Site branding.
+
+To insert your application/project name into the help documents for SEEK, and to remove the logos/links to SEEK's 'related projects and friends' use
+
+  bundle exec rake seek:rebrand
+
+If you only want to change the help documents, you can instead use
+
+  bundle exec rake seek:rebrand_help_docs
+
 == Setting up Passenger Phusion and Apache for production servers.
 
 This section is only relevant if setting up a production deployment, and assumes that seek has been deployed to /srv/rails/seek as the user www-data, and that you have used RAILS_ENV=production whilst setting up.
@@ -184,7 +192,7 @@ If you've followed the instructions, you will have added something like the foll
   PassengerRoot /usr/lib/ruby/gems/1.8/gems/passenger-3.0.7
   PassengerRuby /usr/bin/ruby1.8
 
-and configured a virtual host that looks something like:
+and configured a virtual host (probably in <i>/etc/apache2/sites-enabled/default</i>) that looks something like:
 
   <VirtualHost *:80>
      ServerName www.yourhost.com
