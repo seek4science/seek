@@ -205,28 +205,50 @@ class DataFileTest < ActiveSupport::TestCase
 
   test "convert to presentation" do
     user = Factory :user
+    attribution_df = Factory :data_file
     User.with_current_user(user) {
-      data_file = Factory :data_file,:contributor=>user
+      data_file = Factory :data_file,:contributor=>user,:version=>2,
+                          :assay_ids=>[Factory(:modelling_assay).id,Factory(:experimental_assay).id]
+      Factory :content_blob,:asset=>data_file
+      Factory :attribution,:subject=>data_file,:object=>attribution_df
+      Factory :relationship,:subject=>data_file,:object=>Factory(:publication),:predicate=>Relationship::RELATED_TO_PUBLICATION
+      data_file.creators = [Factory(:person),Factory(:person)]
+      Factory :annotation,:annotatable=> data_file,:attribute => AnnotationAttribute.create(:name=>"test attribute")
+      data_file.events = [Factory(:event)]
+      data_file.save!
+
+      data_file.reload
+      #those will be changed after converting are duplicated here for comparison, e.g. polymorphic association
+      data_file.attributions.dup
+      data_file.related_publications.dup
+      data_file.annotations.dup
+      data_file.creators.dup
+      data_file.content_blob.dup
+
       presentation = Factory.build :presentation,:contributor=>user
       data_file_converted = data_file.convert_to_presentation
 
       assert_equal "Presentation", data_file_converted.class.name
-      assert_equal presentation.attributes.keys.sort!, data_file_converted.attributes.keys.sort!
-      data_file_converted.valid?
-      assert data_file_converted.valid?
+      assert_equal presentation.attributes.keys.sort!, data_file_converted.attributes.keys.reject{|k|k=='id'}.sort!
 
-      data_file_converted.save!
-      data_file_converted.reload
-
+      assert_equal data_file.version, data_file_converted.version
       assert_equal data_file.policy.sharing_scope, data_file_converted.policy.sharing_scope
       assert_equal data_file.policy.access_type, data_file_converted.policy.access_type
       assert_equal data_file.policy.use_whitelist, data_file_converted.policy.use_whitelist
       assert_equal data_file.policy.use_blacklist, data_file_converted.policy.use_blacklist
       assert_equal data_file.policy.permissions, data_file_converted.policy.permissions
+      assert_equal data_file.content_blob, data_file_converted.content_blob
 
       assert_equal data_file.subscriptions.map(&:person_id), data_file_converted.subscriptions(&:person_id)
-      assert_equal data_file.event_ids, data_file_converted.event_ids
+      assert_equal data_file.projects,data_file_converted.projects
+      assert_equal data_file.attributions , data_file_converted.attributions
+      assert_equal data_file.related_publications, data_file_converted.related_publications
       assert_equal data_file.creators, data_file_converted.creators
+      assert_equal data_file.annotations, data_file_converted.annotations
+      assert_equal data_file.assays,data_file_converted.assays
+      assert_equal data_file.event_ids, data_file_converted.event_ids
+
+
     }
   end
 
