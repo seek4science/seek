@@ -76,7 +76,7 @@ This will create a <i>seek</i> directory that contains the application.
   
 Bundler[http://gembundler.com/] is used to manage gems, so to install the required gems you first need to install the bundler gem:
 
-  gem install -d bundler rake
+  gem install -d bundler
   
 Then from within the seek directory run
 
@@ -85,8 +85,6 @@ Then from within the seek directory run
 If you are requested for a root or sudo password, but you do not have this level of access then you should use
 
   bundle install --deployment
-  
-
 
 == The RAILS_ENV environment variable
 
@@ -116,7 +114,7 @@ To add users to the MySQL database, first login to the database as an administra
 
 Run the rake database setup task, this creates the database, loads the schema and seeds the database with any default data
 
-  bundle exec rake db:setup
+  rake db:setup
 
 == Starting the server
 
@@ -151,11 +149,11 @@ to restart the server after changing this setting.
 
 To start the search server you need to run:
 
-  bundle exec solr:start
+  rake solr:start
 
 and to reindex any existing data that created before search was enabled:
 
-  bundle exec solr:reindex
+  solr:reindex
 
 == Rebranding SysMO SEEK for other projects
 
@@ -163,11 +161,11 @@ If you are running SEEK for a project other than SysMO you can change various te
 
 To insert your application/project name into the help documents for SEEK, and to remove the logos/links to SEEK's 'related projects and friends' use
 
-  bundle exec rake seek:rebrand
+  rake seek:rebrand
 
 If you only want to change the help documents, you can instead use
 
-  bundle exec rake seek:rebrand_help_docs
+  rake seek:rebrand_help_docs
 
 == Setting up Passenger Phusion and Apache for production servers.
 
