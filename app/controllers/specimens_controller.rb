@@ -3,7 +3,6 @@ class SpecimensController < ApplicationController
 
   before_filter :find_assets, :only => [:index]
   before_filter :find_and_auth, :only => [:show, :update, :edit, :destroy]
-  before_filter :virtualliver_only
 
   include IndexPager
 

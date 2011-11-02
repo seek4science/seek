@@ -10,7 +10,6 @@ class AssaysControllerTest < ActionController::TestCase
   def setup
     login_as(:quentin)
     @object=Factory(:experimental_assay, :policy => Factory(:public_policy))
-    Seek::Config.is_virtualliver=true
   end
 
 

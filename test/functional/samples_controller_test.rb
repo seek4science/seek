@@ -7,7 +7,6 @@ fixtures :all
   # Called before every test method runs. Can be used
   # to set up fixture information.
   def setup
-    Seek::Config.is_virtualliver = true
     login_as Factory(:user,:person => Factory(:person,:is_admin=> false))
     @object = Factory(:sample,:contributor => User.current_user,
             :title=> "test1",
