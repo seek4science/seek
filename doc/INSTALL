@@ -32,7 +32,7 @@ as follows:
 
 If you needed to add partner repositories, and its a good idea anyway, you should now do an apt-get update and an apt-get upgrade to make sure things are up to date:
 
-  sudo apt-get update && apt-get -y upgrade
+  sudo apt-get update && sudo apt-get -y upgrade
 
 If using Ubuntu or Debian, the following commands should install most the packages you need:
  
