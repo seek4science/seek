@@ -6,7 +6,7 @@ require 'uuidtools'
 namespace :seek do
   
   #these are the tasks required for this version upgrade
-  task :upgrade_version_tasks=>[:environment,:compounds, :measured_items, :units, :upgrade_tags, :remove_duplicate_activity_creates, :update_sharing_scope, :create_default_subscriptions]
+  task :upgrade_version_tasks=>[:environment,:compounds, :measured_items, :units, :upgrade_tags, :refresh_organism_concepts, :remove_duplicate_activity_creates, :update_sharing_scope]
 
   desc("upgrades SEEK from the last released version to the latest released version")
   task(:upgrade=>[:environment,"db:migrate","tmp:clear","tmp:assets:clear"]) do
@@ -48,7 +48,7 @@ namespace :seek do
           if taggable.nil?
             #seed
             annotation_attribute = AnnotationValueSeed.new :value=>text_value, :attribute=>AnnotationAttribute.find_or_create_by_name(attribute)
-            annotation_attribute.save!
+            disable_authorization_checks { annotation_attribute.save }
           else
             tagger = taggable if tagger.nil? && attribute!="tag"
             unless tagger.nil?
@@ -56,7 +56,7 @@ namespace :seek do
               matches = matches.select { |m| m.value == text_value }
               if matches.empty?
                 annotation = Annotation.new :source=>tagger, :annotatable=>taggable, :value=>text_value, :attribute_name=>attribute
-                disable_authorization_checks { annotation.save! }
+                disable_authorization_checks { annotation.save }
               end
 
             end

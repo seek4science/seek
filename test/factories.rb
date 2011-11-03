@@ -390,4 +390,3 @@ end
     f.association :asset, :factory => :data_file
     f.association :creator, :factory => :person_in_project
   end
-
