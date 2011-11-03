@@ -69,24 +69,6 @@ namespace :seek do
 
   private
 
-  #reverts to use pre-2.3.4 id generation to keep generated ID's consistent
-  def revert_fixtures_identify
-    def Fixtures.identify(label)
-      label.to_s.hash.abs
-    end
-  end
-
-  desc "Subscribes users to the items they would normally be subscribed to by default"
-  #Run this after the subscriptions, and all subscribable classes have had their tables created by migrations
-  #You can also run it any time you want to force everyone to subscribe to something they would be subscribed to by default
-  task :create_default_subscriptions => :environment do
-    People.each do |p|
-      p.set_default_subscriptions
-      disable_authorization_checks {p.save(false)}
-    end
-  end
-
-
   desc "Send mail daily to users"
   task :send_daily_subscription => :environment do
     send_subscription_mails ActivityLog.scoped(:include => :activity_loggable, :conditions => ['created_at=?', Date.yesterday]), 'daily'
