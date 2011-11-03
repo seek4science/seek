@@ -6,7 +6,7 @@ require 'uuidtools'
 namespace :seek do
   
   #these are the tasks required for this version upgrade
-  task :upgrade_version_tasks=>[:environment,:compounds, :measured_items, :units, :upgrade_tags, :refresh_organism_concepts, :remove_duplicate_activity_creates, :update_sharing_scope]
+  task :upgrade_version_tasks=>[:environment,:compounds, :measured_items, :units, :upgrade_tags, :refresh_organism_concepts, :remove_duplicate_activity_creates, :update_sharing_scope,:create_default_subscriptions]
 
   desc("upgrades SEEK from the last released version to the latest released version")
   task(:upgrade=>[:environment,"db:migrate","tmp:clear","tmp:assets:clear"]) do
@@ -73,7 +73,7 @@ namespace :seek do
   #Run this after the subscriptions, and all subscribable classes have had their tables created by migrations
   #You can also run it any time you want to force everyone to subscribe to something they would be subscribed to by default
   task :create_default_subscriptions => :environment do
-    People.each do |p|
+    Person.all.each do |p|
       p.set_default_subscriptions
       disable_authorization_checks {p.save(false)}
     end
