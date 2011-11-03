@@ -122,6 +122,7 @@ ActiveRecord::Schema.define(:version => 20111014093022) do
     t.integer  "genotype_id"
     t.datetime "created_at"
     t.datetime "updated_at"
+    t.integer  "tissue_and_cell_type_id"
   end
 
   add_index "assay_organisms", ["assay_id"], :name => "index_assay_organisms_on_assay_id"
@@ -881,6 +882,11 @@ ActiveRecord::Schema.define(:version => 20111014093022) do
     t.integer  "institution_id"
   end
 
+  create_table "samples_tissue_and_cell_types", :id => false, :force => true do |t|
+    t.integer "sample_id"
+    t.integer "tissue_and_cell_type_id"
+  end
+
   create_table "saved_searches", :force => true do |t|
     t.integer  "user_id"
     t.text     "search_query"
@@ -1137,6 +1143,20 @@ ActiveRecord::Schema.define(:version => 20111014093022) do
     t.integer  "version",                                  :null => false
     t.integer  "version_creator_id"
     t.text     "text",               :limit => 2147483647, :null => false
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
+  create_table "tissue_and_cell_types", :force => true do |t|
+    t.string   "title"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
+  add_index "tissue_and_cell_types", ["title"], :name => "title", :unique => true
+
+  create_table "tissue_and_cell_types_old", :force => true do |t|
+    t.string   "title"
     t.datetime "created_at"
     t.datetime "updated_at"
   end
