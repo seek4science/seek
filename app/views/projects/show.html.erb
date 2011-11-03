@@ -40,7 +40,10 @@
           <label><%= Seek::Config.dm_project_name %> Pals:</label>
           <%= pals_link_list @project -%>
         </p>
-
+        <p class="project_coordinators">
+          <label>Project Coordinators:</label>
+          <%= project_coordinators_link_list @project -%>
+        </p>
 
 
     </div>
@@ -49,11 +52,10 @@
     <%= render :partial => "layouts/contribution_section_box_avatar", :locals => { :object => @project, :drag_id => drag_id } -%>
   </div>
 
-  <div>
-    <b>Show project hierarchies:</b>
-    (<%= link_to_function "expand", visual_effect(:toggle_appear, "project_hierarchy")+"$('project_hierarchy').style.display=='none'? this.innerHTML='collapse' : this.innerHTML='expand';" %>)<br/>
-    <div id="project_hierarchy" style="display: none;">
-      <ul><%= tree_editor_display Project, false, false, @project.id, "Person", false %></ul>
+  <div style="clear:both;">
+    <b>project hierarchies (<%= link_to_function "hide", visual_effect(:toggle_appear, "project_hierarchy")+"$('project_hierarchy').style.display=='none'? this.innerHTML='hide' : this.innerHTML='show';" %>):</b><br/><br/>
+    <div id="project_hierarchy" style="display: block;">
+      <ul><%= tree_editor_display Project, false, false, @project.id, "Person",true, true %></ul>
     </div>
   </div>
 

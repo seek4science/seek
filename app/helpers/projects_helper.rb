@@ -26,33 +26,63 @@ module ProjectsHelper
     end
   end
 
-  def tree_editor_display type, show_edit=true, show_delete=true, selected_id=nil, related_resource_type="Person", foldable=true
+  def project_coordinators_link_list project
+    if project.project_coordinators.empty?
+      "<span class='none_text'>No project coordinators for this project</span>";
+    else
+      project.project_coordinators.select(&:can_view?).collect { |p| link_to(h(p.name), p) }.join(", ")
+    end
+  end
+
+  def tree_editor_display type, show_edit=true, show_delete=true, selected_id=nil, related_resource_type="Person",selective_display=false, foldable=false
+
+    selected_display_items = nil
+
+    if selected_id && selective_display
+      selected = type.find selected_id
+      selected_display_items = [selected] + selected.ancestors
+    end
+
+
     roots = type.roots.sort { |a, b| a.title.downcase <=> b.title.downcase }
     list = []
     roots.each do |root|
       related_resource = eval "root.#{related_resource_type.downcase.pluralize}"
-      depth = 0
+      depth = 1
+      display_style = (foldable == true) ? "display:none" : "display:block"
+      display_style = "display:block" if (foldable == true) && (!selected_display_items.nil?) && selected_display_items.include?(root)
 
-      folder_tag = link_to_function image("collapse"), visual_effect(:toggle_appear, "#{root.id}"), :title=>"click it to toggle its children display"
-      if foldable
-        folder = root.has_children? ? folder_tag : "└ "
-      else
-        folder = depth>0 ? "└ " : " "
+      #two images for toggle
+      expand_link = link_to_function expand_plus_image, :style => "float:left;" + "display:" + (display_style=='display:none' ? 'block;' : 'none;'), :id =>"projects_hierarchies_expand_#{root.id}" do |page|
+        page.visual_effect :toggle_blind, "#{root.id}", :duration => 0.5
+        page["projects_hierarchies_expand_#{root.id}"].toggle
+        page["projects_hierarchies_collapse_#{root.id}"].toggle
+
       end
-      list << "<li style=\"margin-left:#{12*depth}px;#{root.id == selected_id ? "background-color: lightblue;" : ""}\">"+ folder + (link_to root.title, root) + " " +
+      collapse_link = link_to_function collapse_minus_image,:style => "float:left;"+ "display:" + (display_style=='display:none' ? 'none;' : 'block;'), :id =>"projects_hierarchies_collapse_#{root.id}" do |page|
+        page.visual_effect :toggle_blind, "#{root.id}", :duration => 0.5
+        page["projects_hierarchies_expand_#{root.id}"].toggle
+        page["projects_hierarchies_collapse_#{root.id}"].toggle
+      end
+
+      folder_tag =  expand_link + collapse_link
+      if foldable
+        folder = root.has_children? ? folder_tag : " "
+        margin_left = root.has_children? ? "" : "margin-left:18px"
+        
+      else
+        folder = " "
+        margin_left  = ""
+      end
+      list << "<li style=\"#{margin_left} ; #{root.id == selected_id ? "background-color: lightblue;" : "#{(selected_display_items && selected_display_items.include?(root))? "font-weight: bold;" : ""}"}\">"+ folder + (link_to root.title, root) + " " +
           (show_edit ? link_to(image("edit"), edit_polymorphic_path(root), {:style=>"vertical-align:middle"}) : "") + " " +
           (show_delete ? link_to(image("destroy"), root, :confirm =>
               "Are you sure you want to remove this #{root.class.name}?  This cannot be undone.",
                                                                :method => :delete, :style=>"vertical-align:middle") : "")  + "<span style=\"color: #666666;\">(#{related_resource.size} #{related_resource_type.downcase.pluralize})</span>" +
           "</li>"
 
-      depth = depth + 1
-
-
-      display_style = (foldable==true) ? "display:none" : "display:block"
-
       list << "<div id= '#{root.id}' style='#{display_style}'>"
-      list = list + indented_tree_child_options(root, depth, show_edit, show_delete, selected_id, related_resource_type, foldable)
+      list = list + indented_tree_child_options(root, depth, show_edit, show_delete, selected_id, related_resource_type, selected_display_items,foldable)
       list << "</div>"
 
     end
@@ -64,30 +94,42 @@ module ProjectsHelper
 
   #Displays the tree node with appropriate indentation, as well as optional
   #edit and remove icons, and the number of people associated with the node.
-  def indented_tree_child_options parent, depth=0, show_edit=true, show_delete=true, selected_id=nil, related_resource_type="Person", foldable=true
+  def indented_tree_child_options parent, depth=0, show_edit=true, show_delete=true, selected_id=nil, related_resource_type="Person",selected_display_items=nil, foldable=true
     result = []
-
     unless parent.children.empty?
       parent.children.sort { |a, b| a.title.downcase <=> b.title.downcase }.each do |child|
-        folder_tag = link_to_function image("collapse"), visual_effect(:toggle_appear, "#{parent.id}_#{child.id}"), :title=>"click it to toggle its children display"
+        display_style = (foldable==true) ? "display:none" : "display:block"
+        display_style = "display:block" if (foldable == true) && (!selected_display_items.nil?) && selected_display_items.include?(child)
+        expand_link = link_to_function expand_plus_image, :style => "float:left;" + "display:" + (display_style=='display:none' ? 'block;' : 'none;'), :id =>"projects_hierarchies_expand_#{parent.id}_#{child.id}" do |page|
+          page.visual_effect :toggle_blind, "#{parent.id}_#{child.id}", :duration => 0.5
+          page["projects_hierarchies_expand_#{parent.id}_#{child.id}"].toggle
+          page["projects_hierarchies_collapse_#{parent.id}_#{child.id}"].toggle
+        end
+        collapse_link = link_to_function collapse_minus_image,:style => "float:left;" + "display:" + (display_style=='display:none' ? 'none;' : 'block;'), :id =>"projects_hierarchies_collapse_#{parent.id}_#{child.id}" do |page|
+          page.visual_effect :toggle_blind, "#{parent.id}_#{child.id}", :duration => 0.5
+          page["projects_hierarchies_expand_#{parent.id}_#{child.id}"].toggle
+          page["projects_hierarchies_collapse_#{parent.id}_#{child.id}"].toggle
+        end
+
+        folder_tag =  expand_link + collapse_link
         if foldable
-          folder = child.has_children? ? folder_tag : "└ "
+          folder = child.has_children? ? folder_tag : " └ "
         else
-          folder = depth>0 ? "└ " : " "
+          folder = depth>0 ? " └ " : " "
         end
 
         related_resource = eval "child.#{related_resource_type.downcase.pluralize}"
-        result << "<li style=\"margin-left:#{12*depth}px;#{child.id == selected_id ? "background-color: lightblue;" : ""}\">"+ folder + (link_to child.title, child) + " " +
+        result << "<li style=\"margin-left:#{12*depth}px;#{child.id == selected_id ? "background-color: lightblue;" : "#{(selected_display_items && selected_display_items.include?(child))? "font-weight: bold;" : ""}"};\">"+ folder + (link_to child.title, child) + " " +
             (show_edit ? link_to(image("edit"), edit_polymorphic_path(child), {:style=>"vertical-align:middle"}) : "") + " " +
             (show_delete ? link_to(image("destroy"), child, :confirm =>
                 "Are you sure you want to remove this #{child.class.name}?  This cannot be undone.",
-                                                                 :method => :delete, :style=>"vertical-align:middle") : "")+ "<span style=\"color: #666666;\">(#{related_resource.size} #{related_resource_type.downcase.pluralize})</span>"  +
+                                   :method => :delete, :style=>"vertical-align:middle") : "")+ "<span style=\"color: #666666;\">(#{related_resource.size} #{related_resource_type.downcase.pluralize})</span>" +
 
             "</li>"
-        display_style = (foldable==true) ? "display:none" : "display:block"
+
         if child.has_children?
           result << "<div id= '#{parent.id}_#{child.id}' style='#{display_style}'>"
-          result = result + indented_tree_child_options(child, depth+1, show_edit, show_delete, selected_id, related_resource_type, foldable)
+          result = result + indented_tree_child_options(child, depth+1, show_edit, show_delete, selected_id, related_resource_type, selected_display_items, foldable)
           result<< "</div>"
         end
       end
@@ -125,3 +167,4 @@ module ProjectsHelper
   end
 
 end
+

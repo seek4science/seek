@@ -411,6 +411,11 @@ module ApplicationHelper
     "Effect.toggle('#{block_id}','slide',{duration:0.5})"
   end
 
+  def toggle_appear_with_image_javascript block_id
+      toggle_appear_javascript block_id
+      ""
+  end
+
   def count_actions(object, actions=nil)
     count = 0
     if actions.nil?
