@@ -228,8 +228,9 @@ class DataFileTest < ActiveSupport::TestCase
       presentation = Factory.build :presentation,:contributor=>user
       data_file_converted = data_file.convert_to_presentation
 
-      assert_equal "Presentation", data_file_converted.class.name
+      assert_equal "Presentation", data_file_converted.class.name 
       assert_equal presentation.attributes.keys.sort!, data_file_converted.attributes.keys.reject{|k|k=='id'}.sort!
+      
 
       assert_equal data_file.version, data_file_converted.version
       assert_equal data_file.policy.sharing_scope, data_file_converted.policy.sharing_scope
@@ -245,6 +246,7 @@ class DataFileTest < ActiveSupport::TestCase
       assert_equal data_file.related_publications, data_file_converted.related_publications
       assert_equal data_file.creators, data_file_converted.creators
       assert_equal data_file.annotations, data_file_converted.annotations
+      assert_equal data_file.project_ids,data_file_converted.project_ids
       assert_equal data_file.assays,data_file_converted.assays
       assert_equal data_file.event_ids, data_file_converted.event_ids
 
