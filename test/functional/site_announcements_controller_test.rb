@@ -49,7 +49,7 @@ class SiteAnnouncementsControllerTest < ActionController::TestCase
   end
 
   test "should email registered users" do
-    assert_emails(Person.registered.select {|p| p.notifiee_info.receive_notifications?}.count) do
+    assert_emails(Person.registered.select {|p| p.notifiee_info.try :receive_notifications?}.count) do
       post :create,:site_announcement=>{:title=>"fred", :email_notification => true}
     end
   end
