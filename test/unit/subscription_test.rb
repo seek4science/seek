@@ -91,9 +91,10 @@ class SubscriptionTest < ActiveSupport::TestCase
   test 'subscribers who are not registered dont receive emails' do
     person = Factory(:person_in_project)
     proj = Factory(:project)
+    s = Factory(:subscribable, :projects => [proj], :policy => Factory(:public_policy))    
+
     disable_authorization_checks do
       person.project_subscriptions.create :project => proj, :frequency => 'immediately'
-      s = Factory(:subscribable, :projects => [proj], :policy => Factory(:public_policy))
       s.subscribe; s.save!
     end
 
