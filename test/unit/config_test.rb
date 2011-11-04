@@ -3,7 +3,7 @@ require 'test_helper'
 class ConfigTest < ActiveSupport::TestCase
 #Features enabled
   test "public seek enabled" do
-    assert_equal false ,Seek::Config.public_seek_enabled
+    assert_equal true ,Seek::Config.public_seek_enabled
   end
 
   test "events enabled" do
