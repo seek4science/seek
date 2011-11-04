@@ -95,6 +95,10 @@ class Project < ActiveRecord::Base
 
   before_save :set_credentials
 
+  def project_coordinators
+    coordinator_role = Role.find_by_name('Project Coordinator')
+    people.select{|p| p.project_roles(self).include?(coordinator_role) || descendants.detect{|descendant|p.project_roles(descendant).include?(coordinator_role)}}
+  end
   def pals
     pal_role=Role.pal_role
     people.select{|p| p.is_pal?}.select do |possible_pal|
@@ -104,8 +108,8 @@ class Project < ActiveRecord::Base
 
   def pis
     pi_role = Role.find_by_name('PI')
-    people.select{|p| p.roles.include?(pi_role)}
-    end
+    people.select{|p| p.project_roles(self).include?(pi_role) || descendants.detect{|descendant|p.project_roles(descendant).include?(pi_role)}}
+  end
 
   def locations
     # infer all project's locations from the institutions where the person is member of
