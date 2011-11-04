@@ -57,7 +57,12 @@ class Project < ActiveRecord::Base
 
   has_and_belongs_to_many :organisms  
   
-  acts_as_solr(:fields => [ :name , :description, :locations],:include=>[:organisms]) if Seek::Config.solr_enabled
+  searchable do
+    text :name , :description, :locations
+    string :sort_field do
+      name.downcase.gsub(/^(an?|the)/, '')
+    end
+  end if Seek::Config.solr_enabled
 
   attr_accessor :site_username,:site_password
 

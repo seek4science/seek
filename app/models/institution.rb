@@ -16,8 +16,13 @@ class Institution < ActiveRecord::Base
   has_many :work_groups, :dependent => :destroy
   has_many :projects, :through=>:work_groups
 
-  acts_as_solr(:fields => [ :name,:country,:city ]) if Seek::Config.solr_enabled
-  
+  searchable do
+    text :name,:country,:city
+    string :sort_field do
+      name.downcase.gsub(/^(an?|the)/, '')
+    end
+  end if Seek::Config.solr_enabled
+
   def people
     res=[]
     work_groups.each do |wg|

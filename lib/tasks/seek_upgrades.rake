@@ -20,10 +20,10 @@ namespace :seek do
     Seek::Config.solr_enabled = solr
 
     begin
-      Rake::Task["solr:reindex"].invoke if solr
+      Rake::Task["sunspot:reindex"].invoke if solr
     rescue 
       puts "Reindexing failed - maybe solr isn't running?' - Error: #{$!}."
-      puts "If not You should start solr and run rake solr:reindex manually"
+      puts "If not You should start solr and run rake sunspot:reindex manually"
     end
 
     puts "Upgrade completed successfully"

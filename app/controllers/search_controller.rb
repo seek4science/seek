@@ -47,39 +47,20 @@ class SearchController < ApplicationController
 
     @results=[]
     if (Seek::Config.solr_enabled and !downcase_query.blank?)
-      case (type)
-        when ("people")
-          @results = Person.multi_solr_search(downcase_query, :limit=>100, :models=>[Person]).results
-        when ("institutions")
-          @results = Institution.multi_solr_search(downcase_query, :limit=>100, :models=>[Institution]).results
-        when ("projects")
-          @results = Project.multi_solr_search(downcase_query, :limit=>100, :models=>[Project]).results
-        when ("sops")
-          @results = Sop.multi_solr_search(downcase_query, :limit=>100, :models=>[Sop]).results
-        when ("studies")
-          @results = Study.multi_solr_search(downcase_query, :limit=>100, :models=>[Study]).results
-        when ("models")
-          @results = Model.multi_solr_search(downcase_query, :limit=>100, :models=>[Model]).results
-        when ("data files")
-          @results = DataFile.multi_solr_search(downcase_query, :limit=>100, :models=>[DataFile]).results
-        when ("investigations")
-          @results = Investigation.multi_solr_search(downcase_query, :limit=>100, :models=>[Investigation]).results
-        when ("assays")
-          @results = Assay.multi_solr_search(downcase_query, :limit=>100, :models=>[Assay]).results
-        when ("publications")
-          @results = Publication.multi_solr_search(downcase_query, :limit=>100, :models=>[Publication]).results
-        when ("presentations")
-          @results = Presentation.multi_solr_search(downcase_query, :limit=>100, :models=>[Presentation]).results
-        when ("events")
-          @results = Event.multi_solr_search(downcase_query, :limit=>100, :models=>[Event]).results
-        when ("specimens")
-          @results = Specimen.multi_solr_search(downcase_query, :limit=>100, :models=>[Specimen]).results
-        when ("samples")
-          @results = Sample.multi_solr_search(downcase_query, :limit=>100, :models=>[Sample]).results
-        else
-          sources = [Person, Project, Institution, Sop, Model, Study, DataFile, Assay, Investigation, Publication, Presentation, Event]
-          sources |= [Sample, Specimen]
-          @results = Person.multi_solr_search(downcase_query, :limit=>100, :models=>sources).results
+      if type == "all"
+          sources = [Person, Project, Institution, Sop, Model, Study, DataFile, Assay, Investigation, Publication, Presentation, Event, Sample, Specimen]
+          sources.each do |source|
+            @results |=  source.search do
+             keywords downcase_query
+             order_by :sort_field
+            end.results
+          end
+      else
+           object = type=='data files' ? DataFile : type.singularize.capitalize.constantize
+           @results =  object.search do
+           keywords downcase_query
+           order_by :sort_field
+          end.results
       end
     end
   end

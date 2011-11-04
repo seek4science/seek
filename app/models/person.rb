@@ -44,7 +44,15 @@ class Person < ActiveRecord::Base
   has_many :created_publications, :through => :assets_creators, :source => :asset, :source_type => "Publication"
   has_many :created_presentations,:through => :assets_creators,:source=>:asset,:source_type => "Presentation"
 
-  acts_as_solr(:fields => [ :first_name, :last_name,:searchable_tags,:locations, :roles ],:include=>[:disciplines]) if Seek::Config.solr_enabled
+  searchable do
+    text :first_name, :last_name,:searchable_tags,:locations, :roles
+    string :sort_field do
+      first_name.downcase.gsub(/^(an?|the)/, '')
+    end
+    text :disciplines do
+      disciplines.map{|d| d.title}
+    end
+  end if Seek::Config.solr_enabled
 
   named_scope :without_group, :include=>:group_memberships, :conditions=>"group_memberships.person_id IS NULL"
   named_scope :registered,:include=>:user,:conditions=>"users.person_id != 0"

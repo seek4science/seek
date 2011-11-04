@@ -25,7 +25,12 @@ class Study < ActiveRecord::Base
 
   validates_uniqueness_of :title
 
-  acts_as_solr(:fields=>[:description,:title]) if Seek::Config.solr_enabled
+  searchable do
+    text :description,:title
+    string :sort_field do
+      title.downcase.gsub(/^(an?|the)/, '')
+    end
+  end if Seek::Config.solr_enabled
 
   def data_files
     assays.collect{|a| a.data_files}.flatten.uniq

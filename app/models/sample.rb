@@ -35,10 +35,23 @@ class Sample < ActiveRecord::Base
   has_many :sop_masters,:class_name => "SampleSop"
   grouped_pagination :pages=>("A".."Z").to_a, :default_page => Seek::Config.default_page(self.name.underscore.pluralize)
 
-  acts_as_solr(:fields=>[:description,:title,:lab_internal_number],:include=>[:institution,:specimen,:assays]) if Seek::Config.solr_enabled
+  searchable do
+    text :description,:title,:lab_internal_number
+    string :sort_field do
+      title.downcase.gsub(/^(an?|the)/, '')
+    end
+    text :assays do
+      assays.map{|a| a.title}
+    end
+    text :institution do
+      institution.try :name
+    end
+    text :specimen do
+      specimen.try :donor_number
+    end
+  end if Seek::Config.solr_enabled
 
   acts_as_authorized
-
 
   def can_delete? *args
     assays.empty? && super

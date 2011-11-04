@@ -1,4 +1,5 @@
 require 'acts_as_authorized'
+
 class Assay < ActiveRecord::Base
   acts_as_isa
 
@@ -66,8 +67,25 @@ class Assay < ActiveRecord::Base
     :as => :subject,
     :dependent => :destroy
           
-  acts_as_solr(:fields=>[:description,:title,:searchable_tags],:include=>[:assay_type,:technology_type,:organisms,:strains]) if Seek::Config.solr_enabled
-  
+  searchable do
+    text :description, :title, :searchable_tags
+    string :sort_field do
+      title.downcase.gsub(/^(an?|the)/, '')
+    end
+    text :assay_type do
+        assay_type.try :title
+    end
+    text :technology_type do
+        technology_type.try :title
+    end
+    text :organisms do
+        organisms.map{|o| o.title}
+    end
+    text :strains do
+        strains.map{|s| s.title}
+    end
+  end if Seek::Config.solr_enabled
+
   def short_description
     type=assay_type.nil? ? "No type" : assay_type.title
    
