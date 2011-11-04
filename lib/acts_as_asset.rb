@@ -90,7 +90,7 @@ module Acts #:nodoc:
       # adapt for moving original_filename,content_type to content_blob
 
       def original_filename
-        try_block {content_blob.content_type}
+        try_block {content_blob.original_filename}
       end
 
       def content_type
