@@ -205,8 +205,9 @@ class DataFileTest < ActiveSupport::TestCase
       presentation = Factory.build :presentation,:contributor=>user
       data_file_converted = data_file.convert_to_presentation
 
-      assert_equal "Presentation", data_file_converted.class.name
-      assert_equal presentation.attributes.keys, data_file_converted.attributes.keys
+      assert_equal "Presentation", data_file_converted.class.name 
+      assert_equal presentation.attributes.keys.sort!, data_file_converted.attributes.keys.reject{|k|k=='id'}.sort!
+      
       data_file_converted.valid?
       assert data_file_converted.valid?
 
@@ -222,6 +223,7 @@ class DataFileTest < ActiveSupport::TestCase
       assert_equal data_file.subscriptions.map(&:person_id), data_file_converted.subscriptions(&:person_id)
       assert_equal data_file.event_ids, data_file_converted.event_ids
       assert_equal data_file.creators, data_file_converted.creators
+      assert_equal data_file.project_ids,data_file_converted.project_ids
     }
   end
 end
