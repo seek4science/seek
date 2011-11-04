@@ -242,4 +242,18 @@ class ProjectTest < ActiveSupport::TestCase
     assert_equal "changed test parent",proj.parent.name
 
   end
+
+  test "parent project have institutions of children" do
+      institutions =  [ Factory(:institution), Factory(:institution)]
+      parent_proj = Factory :project,:name=>"parent proj"
+      project = Factory :project,:parent => parent_proj
+      project.institutions = institutions
+      project.save!
+
+      institutions.each do |ins|
+        assert true, parent_proj.institutions.include?(ins)
+      end
+
+
+  end
 end
