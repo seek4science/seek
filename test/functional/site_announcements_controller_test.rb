@@ -47,6 +47,12 @@ class SiteAnnouncementsControllerTest < ActionController::TestCase
       delete :destroy,:id=>site_announcements(:feed)
     end    
   end
+
+  test "should email registered users" do
+    assert_emails(Person.registered.select {|p| p.notifiee_info.receive_notifications?}.count) do
+      post :create,:site_announcement=>{:title=>"fred", :email_notification => true}
+    end
+  end
   
   test "should not destroy" do
     login_as(:aaron)
