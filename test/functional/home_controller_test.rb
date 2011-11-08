@@ -101,7 +101,7 @@ class HomeControllerTest < ActionController::TestCase
     login_as(:quentin)
     get :index
     assert_response :success
-    assert_select 'a',:text=>/Forum/,:count=>0
+    assert_select 'a',:text=>/Forum/,:count=>1
   end
 
 unless  Seek::Config.is_virtualliver

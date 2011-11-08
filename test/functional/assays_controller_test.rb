@@ -283,7 +283,7 @@ end
                              :study_id=>studies(:metabolomics_study).id,
                              :assay_class=>assay_classes(:experimental_assay_class),
                              :owner => Factory(:person),
-                             :samples => [Factory(:sample)]},:assay_organism_ids =>[Factory(:organism).id,Factory(:strain).title,Factory(:culture_growth_type).title,tissue_and_cell_type.id,tissue_and_cell_type.title].to_s
+                             :samples => [Factory(:sample)]}, :assay_organism_ids =>[Factory(:organism).id,Factory(:strain).title,Factory(:culture_growth_type).title,tissue_and_cell_type.id,tissue_and_cell_type.title].to_s
     end
 
     assert_difference("Assay.count") do
