@@ -65,6 +65,14 @@ class Person < ActiveRecord::Base
     end
   end
 
+  RELATED_RESOURCE_TYPES = [:data_files,:models,:sops,:presentations,:events,:publications]
+  RELATED_RESOURCE_TYPES.each do |type|
+    define_method "related_#{type}" do
+      user_items = user.try(:send,type) || []
+      user_items | self.send("created_#{type}".to_sym) if self.respond_to? "created_#{type}".to_sym
+      user_items
+    end
+  end
   #FIXME: change userless_people to use this scope - unit tests
   named_scope :not_registered,:include=>:user,:conditions=>"users.person_id IS NULL"
 
