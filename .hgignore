@@ -6,9 +6,7 @@ db/*.sqlite3
 config/database.yml
 config/initializers/seek_local.rb
 *.DS_Store
-log/*.log
-log/*.log
-log/*.log.lck
+log/*
 nbproject/*
 solr/data/
 filestore*/
