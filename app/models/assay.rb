@@ -3,6 +3,9 @@ class Assay < ActiveRecord::Base
   acts_as_isa
   acts_as_taggable
 
+  def related_models
+     is_modelling?? models : []
+  end
   def projects
     try_block {study.investigation.projects} || []
   end

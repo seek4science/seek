@@ -149,7 +149,7 @@ class DataFile < ActiveRecord::Base
           if (a.macro == :has_many) or (a.macro == :has_and_belongs_to_many) or (a.macro == :has_one)
 
             association = data_file.send a.name
-            if !association.blank? and self.send(a.name).blank?
+            if self.respond_to?(a.name.to_sym) and !association.blank? and self.send(a.name).blank?
               self.send "#{a.name}=".to_sym, data_file.send("#{a.name}".to_sym)
               self.save!
             end

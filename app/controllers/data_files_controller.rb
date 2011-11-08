@@ -29,14 +29,7 @@ class DataFilesController < ApplicationController
 
       if !@presentation.new_record?
         disable_authorization_checks do
-          # update attributions
-          #Relationship.create_or_update_attributions(@presentation, @data_file.attributions_objects.collect { |a| [a.class.name, a.id] })
-
-          # update related publications
-          Relationship.create_or_update_attributions(@presentation, @data_file.related_publications.collect { |p| ["Publication", p.id.to_json] }, Relationship::RELATED_TO_PUBLICATION) unless @data_file.related_publications.blank?
-
           @data_file.destroy
-
           flash[:notice]="Data File '#{@presentation.title}' is successfully converted to Presentation"
           format.html { redirect_to presentation_path(@presentation) }
         end
