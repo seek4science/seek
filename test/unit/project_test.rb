@@ -253,7 +253,19 @@ class ProjectTest < ActiveSupport::TestCase
       institutions.each do |ins|
         assert true, parent_proj.institutions.include?(ins)
       end
-
-
   end
+
+  test "related resource to parent project" do
+    parent_proj = Factory :project
+    proj = Factory :project,:parent=>parent_proj
+
+    Project::RELATED_RESOURCE_TYPES.each do |type|
+      proj.send "#{type.underscore.pluralize}=".to_sym,[Factory type.underscore.to_sym] unless ["Study","Assay"].include?(type)
+
+      proj.send("#{type.underscore.pluralize}".to_sym).each do |resource|
+        assert true, parent_proj.send("related_#{type.underscore.pluralize}".to_sym).include?(resource)
+      end
+    end
+  end
+
 end

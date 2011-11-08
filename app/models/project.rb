@@ -29,6 +29,19 @@ class Project < ActiveRecord::Base
   has_and_belongs_to_many :events
   has_and_belongs_to_many :presentations
 
+  RELATED_RESOURCE_TYPES = ["Investigation","Study","Assay","DataFile","Model","Sop","Publication","Event","Presentation","Organism"]
+
+  RELATED_RESOURCE_TYPES.each do |type|
+     define_method "related_#{type.underscore.pluralize}" do
+         res = send "#{type.underscore.pluralize}"
+         descendants.each do |descendant|
+           res = res | descendant.send("#{type.underscore.pluralize}")
+         end
+          res.compact
+     end
+  end
+
+
   def studies
     investigations.collect(&:studies).flatten.uniq
   end
