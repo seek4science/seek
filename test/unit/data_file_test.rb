@@ -218,19 +218,12 @@ class DataFileTest < ActiveSupport::TestCase
       data_file.save!
 
       data_file.reload
-      #those will be changed after converting are duplicated here for comparison, e.g. polymorphic association
-      data_file.attributions.dup
-      data_file.related_publications.dup
-      data_file.annotations.dup
-      data_file.creators.dup
-      data_file.content_blob.dup
 
       presentation = Factory.build :presentation,:contributor=>user
-      data_file_converted = data_file.convert_to_presentation
+      data_file_converted = data_file.to_presentation!
 
-      assert_equal "Presentation", data_file_converted.class.name 
-      assert_equal presentation.attributes.keys.sort!, data_file_converted.attributes.keys.reject{|k|k=='id'}.sort!
-      
+      assert_equal presentation.class.name, data_file_converted.class.name
+      assert_equal presentation.attributes.keys.sort!, data_file_converted.attributes.keys.reject{|k|k=='id'}.sort! #???
 
       assert_equal data_file.version, data_file_converted.version
       assert_equal data_file.policy.sharing_scope, data_file_converted.policy.sharing_scope
@@ -238,6 +231,7 @@ class DataFileTest < ActiveSupport::TestCase
       assert_equal data_file.policy.use_whitelist, data_file_converted.policy.use_whitelist
       assert_equal data_file.policy.use_blacklist, data_file_converted.policy.use_blacklist
       assert_equal data_file.policy.permissions, data_file_converted.policy.permissions
+      assert data_file.policy.id != data_file_converted.policy.id
       assert_equal data_file.content_blob, data_file_converted.content_blob
 
       assert_equal data_file.subscriptions.map(&:person_id), data_file_converted.subscriptions(&:person_id)
@@ -250,7 +244,7 @@ class DataFileTest < ActiveSupport::TestCase
       assert_equal data_file.assays,data_file_converted.assays
       assert_equal data_file.event_ids, data_file_converted.event_ids
 
-
+      assert_equal data_file.versions.map(&:updated_at).sort, data_file_converted.versions.map(&:updated_at).sort
     }
   end
 

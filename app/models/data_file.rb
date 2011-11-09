@@ -52,7 +52,6 @@ class DataFile < ActiveRecord::Base
   has_many :studied_factors, :conditions =>  'studied_factors.data_file_version = #{self.version}'
 
   explicit_versioning(:version_column => "version") do
-
     include SpreadsheetUtil
     acts_as_versioned_resource
     
@@ -60,6 +59,19 @@ class DataFile < ActiveRecord::Base
     
     def relationship_type(assay)
       parent.relationship_type(assay)
+    end
+
+    def to_presentation_version
+      returning Presentation::Version.new do |presentation_version|
+        presentation_version.attributes.keys.each do |attr|
+          presentation_version.send("#{attr}=", send("#{attr}")) if respond_to? attr and attr!="id"
+          DataFile.reflect_on_all_associations.select { |a| [:has_many, :has_and_belongs_to_many, :has_one].include?(a.macro) }.each do |a|
+            disable_authorization_checks do
+              presentation_version.send("#{a.name}=", send(a.name)) if presentation_version.respond_to?("#{a.name}=")
+            end
+          end
+        end
+      end
     end
   end
 
@@ -132,65 +144,47 @@ class DataFile < ActiveRecord::Base
     flds.flatten.uniq
   end
 
-  def convert_to_presentation
-
-    presentation_attrs = self.attributes.delete_if { |k, v| k=="template_id" || k =="id" }
-    presentation = Presentation.new presentation_attrs
-
-    #clone required attributes/associations
-    presentation.project_ids = self.projects.map(&:id)
-    presentation.policy = self.policy.deep_copy
-    presentation.orig_data_file_id= self.id
-    class << presentation
-      def clone_associations
-        data_file = DataFile.find(self.orig_data_file_id)
-        DataFile.reflect_on_all_associations.each do |a|
-          if (a.macro == :has_many) or (a.macro == :has_and_belongs_to_many) or (a.macro == :has_one)
-
-            association = data_file.send a.name
-            if self.respond_to?(a.name.to_sym) and !association.blank? and self.send(a.name).blank?
-              self.send "#{a.name}=".to_sym, data_file.send("#{a.name}".to_sym)
-              self.save!
-            end
-          end
-
+  def to_presentation!
+    returning self.to_presentation do |presentation|
+      class << presentation
+        #disabling versioning, since I have manually copied the versions of the data file over
+        def save_version_on_create
         end
       end
 
-      def clone_versioned_data_file_model versioned_presentation, versioned_data_file
-        versioned_presentation.attributes.keys.each do |key|
-          versioned_presentation.send("#{key}=", eval("versioned_data_file.#{key}")) if versioned_data_file.respond_to? key.to_sym and key!="id"
-        end
+      #TODO: should we throw an exception if the user isn't authorized to make these changes?
+      if User.current_user.admin? or self.can_delete?
+        disable_authorization_checks {
+          presentation.save!
+          #TODO: perhaps the deletion of the data file should also be here? We are already throwing an exception if save fails for some reason
+        }
       end
 
-      def set_new_version
-        self.version = DataFile.find(self.orig_data_file_id).version
-      end
-
-      def save_version_on_create
-        df_versions = DataFile::Version.find(:all, :conditions=>["data_file_id =?", self.orig_data_file_id])
-        df_versions.each do |df_version|
-          rev = Presentation::Version.new
-          self.clone_versioned_data_file_model(rev, df_version)
-          rev.presentation_id = self.id
-          saved = rev.save
-          if saved
-            # Now update timestamp columns on main model.
-            # Note: main model doesnt get saved yet.
-            update_timestamps(rev, self)
-          end
-        end
-        clone_associations
+      #copying annotations has to be done after saving the presentation due to limitations of the annotation plugin
+      disable_authorization_checks do #disabling because annotations should be copied over even if the user would normally lack permission to do so
+        presentation.annotations = self.annotations
       end
     end
-
-    if User.current_user.admin? or self.can_delete?
-      disable_authorization_checks {
-        presentation.save!
-      }
-    end
-
-    presentation
   end
 
+  def to_presentation
+    presentation_attrs = attributes.delete_if { |k, v| k=="template_id" || k =="id" }
+
+    returning Presentation.new(presentation_attrs) do |presentation|
+      DataFile.reflect_on_all_associations.select { |a| [:has_many, :has_and_belongs_to_many, :has_one].include?(a.macro) }.each do |a|
+        #disabled, because even if the user doing the conversion would not normally
+        #be able to associate an item with his data_file/presentation, the pre-existing
+        #association created by someone who was allowed, should carry over to the presentation
+        #based on the data file.
+        disable_authorization_checks do
+          #annotations and versions have to be handled specially
+          presentation.send("#{a.name}=", send(a.name)) if presentation.respond_to?("#{a.name}=") and a.name != :annotations and a.name != :versions
+        end
+      end
+
+      disable_authorization_checks { presentation.versions = versions.map(&:to_presentation_version) }
+      presentation.policy = policy.deep_copy
+      presentation.orig_data_file_id = id
+    end
+  end
 end
