@@ -23,16 +23,16 @@ class DataFilesController < ApplicationController
 
   def convert_to_presentation
     @data_file = DataFile.find params[:id]
-    @presentation = @data_file.convert_to_presentation
+    @presentation = @data_file.to_presentation!
 
     respond_to do |format|
 
       if !@presentation.new_record?
         disable_authorization_checks do
           @data_file.destroy
-          flash[:notice]="Data File '#{@presentation.title}' is successfully converted to Presentation"
-          format.html { redirect_to presentation_path(@presentation) }
         end
+        flash[:notice]="Data File '#{@presentation.title}' is successfully converted to Presentation"
+        format.html { redirect_to presentation_path(@presentation) }
       else
         flash[:error] = "Data File failed to convert to Presentation!!"
         format.html {
@@ -64,9 +64,9 @@ class DataFilesController < ApplicationController
             new_f.data_file_version = @data_file.version
             new_f.save
           end
-          flash[:notice]="New version uploaded - now on version #{@data_file.version}"
+          flash[:notice] = "New version uploaded - now on version #{@data_file.version}"
         else
-          flash[:error]="Unable to save new version"          
+          flash[:error] = "Unable to save new version"
         end
         format.html {redirect_to @data_file }
       end
