@@ -33,4 +33,11 @@ fixtures :all
     assert_equal "#{specimen.age} (weeks)",specimen.age_in_weeks
   end
 
+  test "related people" do
+    specimen = Factory :specimen
+    specimen.creators = [Factory(:person),Factory(:person)]
+
+    assert_equal specimen.creators, specimen.related_people
+  end
+
 end

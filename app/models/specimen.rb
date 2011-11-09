@@ -46,7 +46,9 @@ class Specimen < ActiveRecord::Base
 
   acts_as_authorized
 
-
+  def related_people
+    creators
+  end
 
   def age_in_weeks
     if !age.nil?

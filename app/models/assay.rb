@@ -2,6 +2,9 @@ require 'acts_as_authorized'
 class Assay < ActiveRecord::Base
   acts_as_isa
 
+  def related_models
+     is_modelling?? models : []
+  end
   def projects
     try_block {study.investigation.projects} || []
   end

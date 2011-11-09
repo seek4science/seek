@@ -465,4 +465,21 @@ class PersonTest < ActiveSupport::TestCase
     assert people_ids.include? person.id
     assert people_ids.include? new_person.id
   end
+
+  test "related resource" do
+    user = Factory :user
+    person = user.person
+    Factory :data_file,:contributor=>user
+    Factory :model,:contributor=>user
+    Factory :sop,:contributor=>user
+    Factory :event,:contributor=>user
+    AssetsCreator.create :asset=>Factory(:presentation),:creator=> person
+    AssetsCreator.create :asset=>Factory(:publication),:creator=>person
+    assert_equal user.data_files, person.related_data_files
+    assert_equal user.models, person.related_models
+    assert_equal user.sops,  person.related_sops
+    assert_equal user.events, person.related_events
+    assert_equal person.created_presentations, person.related_presentations
+    assert_equal person.created_publications, person.related_publications
+  end
 end
