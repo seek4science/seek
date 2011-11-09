@@ -371,6 +371,17 @@ end
     assert_redirected_to assays_path
   end
 
+  test "should show edit when not logged in" do
+    logout
+    a = Factory :experimental_assay,:contributor=>Factory(:person),:policy=>Factory(:editing_public_policy)
+    get :edit,:id=>a
+    assert_response :success
+
+    a = Factory :modelling_assay,:contributor=>Factory(:person),:policy=>Factory(:editing_public_policy)
+    get :edit,:id=>a
+    assert_response :success
+  end
+
   test "should not edit assay when not project pal" do
     a = assays(:assay_with_just_a_study)
     login_as(:datafile_owner)
