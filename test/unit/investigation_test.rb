@@ -32,7 +32,6 @@ class InvestigationTest < ActiveSupport::TestCase
   end
   
   test "validations" do
-    
     inv=Investigation.new(:title=>"Test",:projects=>[projects(:sysmo_project)])
     assert inv.valid?
     inv.title=""
@@ -46,11 +45,6 @@ class InvestigationTest < ActiveSupport::TestCase
 
     inv.projects=[projects(:sysmo_project)]
     assert inv.valid?
-
-    #duplicate title not valid
-    inv.title="Metabolomics Investigation"
-    assert !inv.valid?
-
   end
 
   test "unauthorized users can't delete" do
