@@ -353,7 +353,8 @@ class ApplicationController < ActionController::Base
           :activity_loggable_id=>object.id,
           :controller_name=>controllername,
           :action=>"create"})
-      raise Exception.new "Duplicate create activity log about to be created for #{object.class.name}:#{object.id}" unless a.nil?
+      
+      logger.error("ERROR: Duplicate create activity log about to be created for #{object.class.name}:#{object.id}") unless a.nil?
     end
   end
 
