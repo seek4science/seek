@@ -6,7 +6,18 @@ require 'uuidtools'
 namespace :seek do
   
   #these are the tasks required for this version upgrade
-  task :upgrade_version_tasks=>[:environment,:compounds, :measured_items, :units, :upgrade_tags, :refresh_organism_concepts, :remove_duplicate_activity_creates, :update_sharing_scope,:create_default_subscriptions]
+  task :upgrade_version_tasks=>[
+      :environment,
+      :compounds,
+      :measured_items,
+      :units,
+      :upgrade_tags,
+      :refresh_organism_concepts,
+      :remove_duplicate_activity_creates,
+      :update_sharing_scope,
+      #:create_default_subscriptions,
+      :update_study_and_inv_contributors_and_permissions
+  ]
 
   desc("upgrades SEEK from the last released version to the latest released version")
   task(:upgrade=>[:environment,"db:migrate","tmp:clear","tmp:assets:clear"]) do
@@ -29,10 +40,53 @@ namespace :seek do
     puts "Upgrade completed successfully"
   end
 
-  desc 'required to upgrade to 0.12.2 - converts all tags from acts_as_taggable to use acts_as_annotatable'
+  desc('updates the permissions to editable by project, and sets a suitable contributor')
+  task(:update_study_and_inv_contributors_and_permissions=>:environment) do
+    puts "Updating study and investigation contributors and default permissions"
+    ActiveRecord::Base.record_timestamps = false
+
+    Study.all.each do |study|
+      if study.policy.permissions.count!=1
+        puts "Study ID:#{study.id} has had its permissions changed and cannot be updated"
+      else
+        perm=study.policy.permissions.first
+        perm.access_type = Policy::EDITING if perm.access_type==Policy::MANAGING
+        disable_authorization_checks {perm.save}
+        #add pals as managers
+        study.projects.collect{|proj| proj.pals}.flatten.uniq.each do |pal|
+          perm=Permission.new(:contributor=>pal,:policy=>study.policy,:access_type=>Policy::MANAGING)
+          disable_authorization_checks {perm.save}
+        end
+      end
+      study.contributor = determine_study_contributor(study) if study.contributor.nil?
+      disable_authorization_checks {study.save}
+    end
+
+    Investigation.all.each do |investigation|
+      if investigation.policy.permissions.count!=1
+        puts "Investigation ID:#{investigation.id} has had its permissions changed and cannot be updated"
+      else
+        perm=investigation.policy.permissions.first
+        perm.access_type = Policy::EDITING if perm.access_type==Policy::MANAGING
+        disable_authorization_checks {perm.save}
+        #add pals as managers
+        investigation.projects.collect{|proj| proj.pals}.flatten.uniq.each do |pal|
+          perm=Permission.new(:contributor=>pal,:policy=>investigation.policy,:access_type=>Policy::MANAGING)
+          disable_authorization_checks {perm.save}
+        end
+      end
+      investigation.contributor = determine_investigation_contributor(investigation) if investigation.contributor.nil?
+      disable_authorization_checks {investigation.save}
+    end
+    
+    ActiveRecord::Base.record_timestamps = true
+  end
+
+  desc 'required to upgrade to 1.0 - converts all tags from acts_as_taggable to use acts_as_annotatable'
   task(:upgrade_tags=>:environment) do
     include ActsAsTaggableOn
 
+    puts "Upgrading tags"
     Tag.find(:all).each do |tag|
 
       text=tag.name
@@ -73,10 +127,14 @@ namespace :seek do
   #Run this after the subscriptions, and all subscribable classes have had their tables created by migrations
   #You can also run it any time you want to force everyone to subscribe to something they would be subscribed to by default
   task :create_default_subscriptions => :environment do
+    puts "Creating default subscriptions. This can take some time, please be patient"
+    ActiveRecord::Base.record_timestamps = false
     Person.all.each do |p|
+      puts "Updating subscriptions for Person #{p.id}"
       p.set_default_subscriptions
       disable_authorization_checks {p.save(false)}
     end
+    ActiveRecord::Base.record_timestamps = true 
   end
 
   desc "removes the older duplicate create activity logs that were added for a short period due to a bug (this only affects versions between stable releases)"
@@ -86,6 +144,7 @@ namespace :seek do
 
     #Update the sharing_scope in the policies table, because of removing CUSTOM_PERMISSIONS_ONLY and ALL_REGISTERED_USERS scopes
   task(:update_sharing_scope=>:environment) do
+    puts "Updating general sharing scopes"
     # sharing_scope
     private_scope = 0
     custom_permissions_only_scope = 1
@@ -134,6 +193,42 @@ namespace :seek do
     else
       puts "Couldn't find any policies with CUSTOM_PERMISSIONS_ONLY scope"
     end
+  end
+
+  private
+
+  def determine_study_contributor study
+    contributor = study.person_responsible
+    unless contributor
+      puts "No person responsible for Study #{study.id}, determining contributor from assays"
+      if study.assays.blank?
+        puts "No assays for this study. Using the first defined pal from project"
+        contributor = study.projects.collect{|proj| proj.pals}.flatten.first
+        puts "No pals found for Study #{study.id} - leaving contributor as unset (it will appear as JERM created)." if contributor.nil?
+      else
+        study.assays.sort_by(&:id).each do |assay|
+          contributor = assay.contributor
+          break unless contributor.nil?
+        end
+      end
+    end
+    puts "Determined contributor as #{contributor.try(:name) || 'nil'} for Study #{study.id}"
+    contributor
+  end
+
+  def determine_investigation_contributor investigation
+    contributor=nil
+    investigation.studies.sort_by(&:id).each do |study|
+      contributor=study.contributor
+      break unless contributor.nil?
+    end
+    if contributor.nil?
+      puts "Unable to determine contributor from study for Investigation #{investigation.id}, using a pal"
+      contributor = investigation.projects.collect{|proj| proj.pals}.flatten.first
+      puts "No pals found for Investigation - leaving contributor as unset (it will appear as JERM created)." if contributor.nil?
+    end
+    puts "Determined contributor as #{contributor.try(:name) || 'nil'} for Investigation #{investigation.id}"
+    contributor
   end
 
 end

@@ -23,8 +23,6 @@ class Study < ActiveRecord::Base
 
   validates_presence_of :investigation
 
-  validates_uniqueness_of :title
-
   searchable do
     text :description,:title
     string :sort_field do
