@@ -5,14 +5,18 @@ class StrainsController < ApplicationController
   def show_existing_strains
     element=params[:element]    
     render :update do |page|
-      page.replace_html element,:partial=>"strains/existing_strains",:object=>@strains,:locals=>{:organism=>@organism}
+      if @strains && @organism
+        page.replace_html element,:partial=>"strains/existing_strains",:object=>@strains,:locals=>{:organism=>@organism}
+      else
+        page.replace_html element,:text=>""
+      end
     end
   end
 
   def get_strains
     if params[:organism_id]
       @organism=Organism.find_by_id(params[:organism_id])
-      @strains=@organism.strains
+      @strains=@organism.try(:strains)
     end
   end
   

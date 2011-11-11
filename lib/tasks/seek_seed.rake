@@ -251,6 +251,13 @@ namespace :seek do
 
   private
 
+  #reverts to use pre-2.3.4 id generation to keep generated ID's consistent
+  def revert_fixtures_identify
+    def Fixtures.identify(label)
+      label.to_s.hash.abs
+    end
+  end
+
   def create_tag text, attribute
     text_value = TextValue.find_or_create_by_text(text)
     unless text_value.has_attribute_name?(attribute)

@@ -69,13 +69,6 @@ namespace :seek do
 
   private
 
-  #reverts to use pre-2.3.4 id generation to keep generated ID's consistent
-  def revert_fixtures_identify
-    def Fixtures.identify(label)
-      label.to_s.hash.abs
-    end
-  end
-
   desc "Send mail daily to users"
   task :send_daily_subscription => :environment do
     send_subscription_mails ActivityLog.scoped(:include => :activity_loggable, :conditions => ['created_at=?', Date.yesterday]), 'daily'

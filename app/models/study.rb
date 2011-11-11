@@ -23,8 +23,6 @@ class Study < ActiveRecord::Base
 
   validates_presence_of :investigation
 
-  validates_uniqueness_of :title
-
   acts_as_solr(:fields=>[:description,:title]) if Seek::Config.solr_enabled
 
   def data_files
