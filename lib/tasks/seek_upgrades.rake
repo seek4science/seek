@@ -15,7 +15,7 @@ namespace :seek do
       :refresh_organism_concepts,
       :remove_duplicate_activity_creates,
       :update_sharing_scope,
-      #:create_default_subscriptions,
+      :create_default_subscriptions,
       :update_study_and_inv_contributors_and_permissions
   ]
 
