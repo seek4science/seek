@@ -6,7 +6,7 @@ db/*.sqlite3
 config/database.yml
 config/initializers/seek_local.rb
 *.DS_Store
-log/*.log
+log/*.log*
 vendor/plugins/acts_as_solr/solr/tmp/*_pid
 vendor/plugins/acts_as_solr/solr/solr/data/*
 vendor/plugins/acts_as_solr/solr/logs/*
