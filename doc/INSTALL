@@ -153,7 +153,7 @@ To start the search server you need to run:
 
 and to reindex any existing data that created before search was enabled:
 
-  solr:reindex
+  rake solr:reindex
 
 == Rebranding SysMO SEEK for other projects
 
