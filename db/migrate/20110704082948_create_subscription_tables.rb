@@ -14,8 +14,7 @@ class CreateSubscriptionTables < ActiveRecord::Migration
       t.string :unsubscribed_types
       t.string :frequency
     end
-    #refactor to use sql, or at least not depend on app code
-    Person.all.each {|p| User.with_current_user(p.user) {p.set_default_subscriptions; p.save!}}
+    
   end
 
   def self.down

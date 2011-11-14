@@ -485,7 +485,7 @@ module ApplicationHelper
   end
 
   def display_people_list people
-    html = '<ul>'
+    html = "<ul class='people_list'>"
     people.each do |person|
        html<< "<li><a href='#{person_path(person[0])}' target='_blank'>#{person[1]}</a></li>"
     end

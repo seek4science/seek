@@ -39,9 +39,7 @@ class ApplicationController < ActionController::Base
 
   layout "main"
 
-  # See ActionController::RequestForgeryProtection for details
-  # Uncomment the :secret if you're not using the cookie session store
-  protect_from_forgery :secret => '4ujARdxGS4uAz29RwFaq37g88cPoA54z'
+  protect_from_forgery
 
   def set_no_layout
     self.class.layout nil
@@ -355,7 +353,8 @@ class ApplicationController < ActionController::Base
           :activity_loggable_id=>object.id,
           :controller_name=>controllername,
           :action=>"create"})
-      raise Exception.new "Duplicate create activity log about to be created for #{object.class.name}:#{object.id}" unless a.nil?
+      
+      logger.error("ERROR: Duplicate create activity log about to be created for #{object.class.name}:#{object.id}") unless a.nil?
     end
   end
 

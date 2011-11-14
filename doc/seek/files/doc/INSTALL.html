@@ -56,7 +56,7 @@
     </tr>
     <tr class="top-aligned-row">
       <td><strong>Last Update:</strong></td>
-      <td>Wed Nov 02 16:35:10 +0000 2011</td>
+      <td>Fri Nov 11 13:22:53 +0000 2011</td>
     </tr>
     </table>
   </div>
@@ -193,10 +193,11 @@ as the version control system.
 </p>
 <p>
 For a stable version, you should check out according to a stable tag. Our
-current stable tag is v1.0, so to retrieve this version you should use:
+current stable tag is <em>v1.0-pre</em>, so to retrieve this version you
+should use:
 </p>
 <pre>
-  hg clone https://sysmo-db.googlecode.com/hg/ -r v1.0 seek
+  hg clone https://sysmo-db.googlecode.com/hg/ -r v1.0-pre seek
 </pre>
 <p>
 This will create a <em>seek</em> directory that contains the application.
@@ -315,7 +316,7 @@ To start the search server you need to run:
 and to reindex any existing data that created before search was enabled:
 </p>
 <pre>
-  solr:reindex
+  rake solr:reindex
 </pre>
 <h2>Rebranding SysMO SEEK for other projects</h2>
 <p>

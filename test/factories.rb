@@ -91,6 +91,11 @@
     f.access_type Policy::VISIBLE
   end
 
+  Factory.define(:editing_public_policy,:parent=>:policy) do |f|
+    f.sharing_scope Policy::EVERYONE
+    f.access_type Policy::EDITING
+  end
+
 #Permission
   Factory.define(:permission, :class => Permission) do |f|
     f.association :contributor, :factory => :person

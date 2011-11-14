@@ -4,22 +4,26 @@
    resource_name = params[:resource_name]
 %>
 <style>
-  ul.people_list li.name {
+  #preview_permissions ul.people_list {
+      max-height: 10em;
+      overflow-y: auto;
+  }
+  #preview_permissions ul.people_list li.name {
       color: #ff8c00;
   }
-  p.private {
+  #preview_permissions p.private {
       color: red;
       font-size: medium;
       font-weight: bold;
       margin-left: 3em;
   }
-  p.public{
+  #preview_permissions p.public{
       color: #0000ff;
       font-weight: bold;
   }
 </style>
 
-<div class="redbox_contents" style="width:500px;">
+<div class="redbox_contents" id="preview_permissions" style="width:500px;">
     <div class="body">
     <h1>You will share this item with:</h1>
     <%unless grouped_people_by_access_type.blank?
