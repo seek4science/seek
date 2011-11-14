@@ -59,9 +59,6 @@ class Project < ActiveRecord::Base
   
   searchable do
     text :name , :description, :locations
-    string :sort_field do
-      name.downcase.gsub(/^(an?|the)/, '')
-    end
   end if Seek::Config.solr_enabled
 
   attr_accessor :site_username,:site_password

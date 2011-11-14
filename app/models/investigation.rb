@@ -16,9 +16,6 @@ class Investigation < ActiveRecord::Base
 
   searchable do
     text :description,:title
-    string :sort_field do
-      title.downcase.gsub(/^(an?|the)/, '')
-    end
   end if Seek::Config.solr_enabled
 
   def can_delete? *args

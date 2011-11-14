@@ -24,9 +24,6 @@ class Model < ActiveRecord::Base
   
   searchable do
     text :description,:title,:original_filename,:organism_name,:searchable_tags
-    string :sort_field do
-      title.downcase.gsub(/^(an?|the)/, '')
-    end
   end if Seek::Config.solr_enabled
 
   explicit_versioning(:version_column => "version") do

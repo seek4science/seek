@@ -14,9 +14,6 @@ class Event < ActiveRecord::Base
 
   searchable do
     text :address,:city,:country,:url,:description,:title
-    string :sort_field do
-      title.downcase.gsub(/^(an?|the)/, '')
-    end
   end if Seek::Config.solr_enabled
 
   def self.sort events

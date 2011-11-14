@@ -37,9 +37,6 @@ class Sample < ActiveRecord::Base
 
   searchable do
     text :description,:title,:lab_internal_number
-    string :sort_field do
-      title.downcase.gsub(/^(an?|the)/, '')
-    end
     text :assays do
       assays.map{|a| a.title}
     end

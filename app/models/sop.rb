@@ -18,9 +18,6 @@ class Sop < ActiveRecord::Base
 
   searchable do
     text :description, :title, :original_filename,:searchable_tags,:exp_conditions_search_fields
-    string :sort_field do
-      title.downcase.gsub(/^(an?|the)/, '')
-    end
   end if Seek::Config.solr_enabled
 
   belongs_to :content_blob #don't add a dependent=>:destroy, as the content_blob needs to remain to detect future duplicates
