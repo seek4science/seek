@@ -51,15 +51,13 @@ class SearchController < ApplicationController
           sources = [Person, Project, Institution, Sop, Model, Study, DataFile, Assay, Investigation, Publication, Presentation, Event, Sample, Specimen]
           sources.each do |source|
             @results |=  source.search do
-             keywords downcase_query
-             order_by :sort_field
+               keywords downcase_query
             end.results
           end
       else
-           object = type=='data files' ? DataFile : type.singularize.capitalize.constantize
+           object = type=='data_files' ? DataFile : type.singularize.capitalize.constantize
            @results =  object.search do
-           keywords downcase_query
-           order_by :sort_field
+              keywords downcase_query
           end.results
       end
     end
