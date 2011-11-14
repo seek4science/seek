@@ -1614,6 +1614,15 @@ div.compounds {
     padding: 0 1em 0.5em 1em;
 }
 
+div.strain {
+    border: 1px solid #DDD;
+    float: left;
+    margin-left: 4em;
+    margin-top: 2em;
+    margin-bottom: 1em;
+    width: 48em;
+    padding: 0 1em 0.5em 1em;
+}
 
 
 

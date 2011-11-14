@@ -32,8 +32,6 @@ class SpecimensController < ApplicationController
   def create
     @specimen = Specimen.new(params[:specimen])
 
-
-
     sop_ids = (params[:specimen_sop_ids].nil?? [] : params[:specimen_sop_ids].reject(&:blank?))||[]
     @specimen.sop_ids = sop_ids
 
@@ -98,10 +96,6 @@ class SpecimensController < ApplicationController
       end
     end
   end
-
-
-
-
 
 end
 

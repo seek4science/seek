@@ -9,7 +9,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20111024104147) do
+ActiveRecord::Schema.define(:version => 20111109124841) do
 
   create_table "activity_logs", :force => true do |t|
     t.string   "action"
@@ -273,7 +273,7 @@ ActiveRecord::Schema.define(:version => 20111024104147) do
     t.datetime "last_used_at"
     t.datetime "created_at"
     t.datetime "updated_at"
-    t.integer  "version",                        :default => 1
+    t.integer  "version"
     t.string   "first_letter",      :limit => 1
     t.text     "other_creators"
     t.string   "uuid"
@@ -404,6 +404,23 @@ ActiveRecord::Schema.define(:version => 20111024104147) do
     t.integer "posts_count",      :default => 0
     t.integer "position"
     t.text    "description_html"
+  end
+
+  create_table "genes", :force => true do |t|
+    t.string   "title"
+    t.string   "symbol"
+    t.text     "description"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
+  create_table "genotypes", :force => true do |t|
+    t.integer  "gene_id"
+    t.integer  "modification_id"
+    t.integer  "strain_id"
+    t.text     "comment"
+    t.datetime "created_at"
+    t.datetime "updated_at"
   end
 
   create_table "group_memberships", :force => true do |t|
@@ -566,7 +583,7 @@ ActiveRecord::Schema.define(:version => 20111024104147) do
     t.integer  "organism_id"
     t.integer  "model_type_id"
     t.integer  "model_format_id"
-    t.integer  "version",                                 :default => 1
+    t.integer  "version"
     t.string   "first_letter",               :limit => 1
     t.text     "other_creators"
     t.string   "uuid"
@@ -586,6 +603,15 @@ ActiveRecord::Schema.define(:version => 20111024104147) do
   end
 
   add_index "moderatorships", ["forum_id"], :name => "index_moderatorships_on_forum_id"
+
+  create_table "modifications", :force => true do |t|
+    t.string   "title"
+    t.string   "symbol"
+    t.text     "description"
+    t.string   "position"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
 
   create_table "monitorships", :force => true do |t|
     t.integer "topic_id"
@@ -623,9 +649,7 @@ ActiveRecord::Schema.define(:version => 20111024104147) do
 
   create_table "organisms", :force => true do |t|
     t.string   "title"
-    t.integer  "ncbi_id"
-    t.string   "genotype"
-    t.string   "phenotype"
+    t.string   "ncbi_id"
     t.datetime "created_at"
     t.datetime "updated_at"
   end
@@ -666,6 +690,14 @@ ActiveRecord::Schema.define(:version => 20111024104147) do
   end
 
   add_index "permissions", ["policy_id"], :name => "index_permissions_on_policy_id"
+
+  create_table "phenotypes", :force => true do |t|
+    t.text     "description"
+    t.text     "comment"
+    t.integer  "strain_id"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
 
   create_table "policies", :force => true do |t|
     t.string   "name"
@@ -956,7 +988,7 @@ ActiveRecord::Schema.define(:version => 20111024104147) do
     t.datetime "created_at"
     t.datetime "updated_at"
     t.datetime "last_used_at"
-    t.integer  "version",                        :default => 1
+    t.integer  "version"
     t.string   "first_letter",      :limit => 1
     t.text     "other_creators"
     t.string   "uuid"
@@ -995,11 +1027,21 @@ ActiveRecord::Schema.define(:version => 20111024104147) do
     t.datetime "born"
   end
 
+  create_table "strain_descendants", :id => false, :force => true do |t|
+    t.integer "ancestor_id"
+    t.integer "descendant_id"
+  end
+
   create_table "strains", :force => true do |t|
     t.string   "title"
     t.integer  "organism_id"
     t.datetime "created_at"
     t.datetime "updated_at"
+    t.integer  "parent_id"
+    t.string   "synonym"
+    t.text     "comment"
+    t.integer  "provider_id"
+    t.string   "provider_name"
   end
 
   create_table "studied_factor_links", :force => true do |t|

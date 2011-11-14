@@ -16,12 +16,14 @@ class Specimen < ActiveRecord::Base
   belongs_to :organism
   belongs_to :culture_growth_type
   belongs_to :strain
+  has_many :genotypes
+  has_many :phenotypes
 
   alias_attribute :description, :comments
   alias_attribute :title, :donor_number
   alias_attribute :specimen_number, :donor_number
 
-  HUMANIZED_COLUMNS = {:donor_number => "Specimen number"}
+  HUMANIZED_COLUMNS = {:donor_number=> "Specimen number"}
 
   validates_numericality_of :age, :only_integer => true, :greater_than=> 0, :allow_nil=> true, :message => "is not a positive integer"
   validates_presence_of :donor_number
