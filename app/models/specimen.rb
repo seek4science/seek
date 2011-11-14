@@ -43,9 +43,6 @@ class Specimen < ActiveRecord::Base
 
   searchable do
     text :description,:donor_number,:lab_internal_number
-    string :sort_field do
-       donor_number.downcase.gsub(/^(an?|the)/, '')
-    end
     text :culture_growth_type do
       culture_growth_type.try :title
     end

@@ -18,9 +18,6 @@ class Institution < ActiveRecord::Base
 
   searchable do
     text :name,:country,:city
-    string :sort_field do
-      name.downcase.gsub(/^(an?|the)/, '')
-    end
   end if Seek::Config.solr_enabled
 
   def people

@@ -54,9 +54,6 @@ class Person < ActiveRecord::Base
 
   searchable do
     text :first_name, :last_name,:searchable_tags,:locations, :roles
-    string :sort_field do
-      first_name.downcase.gsub(/^(an?|the)/, '')
-    end
     text :disciplines do
       disciplines.map{|d| d.title}
     end

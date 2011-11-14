@@ -14,10 +14,7 @@ class Presentation < ActiveRecord::Base
 
    searchable do
     text :description,:title,:original_filename,:searchable_tags
-    string :sort_field do
-      title.downcase.gsub(/^(an?|the)/, '')
-    end
-  end if Seek::Config.solr_enabled
+   end if Seek::Config.solr_enabled
 
    explicit_versioning(:version_column => "version") do
     acts_as_versioned_resource

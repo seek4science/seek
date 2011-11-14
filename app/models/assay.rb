@@ -69,9 +69,6 @@ class Assay < ActiveRecord::Base
           
   searchable do
     text :description, :title, :searchable_tags
-    string :sort_field do
-      title.downcase.gsub(/^(an?|the)/, '')
-    end
     text :assay_type do
         assay_type.try :title
     end

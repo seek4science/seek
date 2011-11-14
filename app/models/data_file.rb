@@ -124,9 +124,6 @@ class DataFile < ActiveRecord::Base
 
   searchable do
     text :description, :title, :original_filename, :searchable_tags, :spreadsheet_annotation_search_fields,:fs_search_fields
-    string :sort_field do
-      title.downcase.gsub(/^(an?|the)/, '')
-    end
   end if Seek::Config.solr_enabled
 
   has_many :studied_factors, :conditions =>  'studied_factors.data_file_version = #{self.version}'
