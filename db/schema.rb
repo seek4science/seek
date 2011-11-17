@@ -9,7 +9,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20111109124841) do
+ActiveRecord::Schema.define(:version => 20111117103829) do
 
   create_table "activity_logs", :force => true do |t|
     t.string   "action"
@@ -24,7 +24,7 @@ ActiveRecord::Schema.define(:version => 20111109124841) do
     t.datetime "updated_at"
     t.string   "http_referer"
     t.string   "user_agent"
-    t.text     "data",                   :limit => 2147483647
+    t.text     "data",                   :limit => 16777215
     t.string   "controller_name"
   end
 
@@ -777,6 +777,8 @@ ActiveRecord::Schema.define(:version => 20111109124841) do
     t.string  "unsubscribed_types"
     t.string  "frequency"
   end
+
+  add_index "project_subscriptions", ["person_id", "project_id"], :name => "index_project_subscriptions_on_person_id_and_project_id"
 
   create_table "projects", :force => true do |t|
     t.string   "name"
