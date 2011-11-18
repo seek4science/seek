@@ -16,7 +16,8 @@ class StrainsController < ApplicationController
 
   def show_existing_strain
     render :update do |page|
-      page.replace_html "existing_strain",:partial=>"strains/existing_strain",:object=>@strain
+      page.remove 'strain_form'
+      page.insert_html :bottom, "existing_strains",:partial=>"strains/form",:locals=>{:strain => @strain}
     end
   end
 

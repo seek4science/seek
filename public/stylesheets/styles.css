@@ -1617,14 +1617,54 @@ div.compounds {
 div.strain {
     border: 1px solid #DDD;
     float: left;
-    margin-left: 4em;
-    margin-top: 2em;
+    margin-left: 2em;
+    margin-top: 1em;
     margin-bottom: 1em;
-    width: 48em;
+    width: 50em;
     padding: 0 1em 0.5em 1em;
 }
 
+ul.genes li {
+    list-style-type:none;
+}
 
+ul.genes {
+    float: left;
+    margin-top: 2em;
+}
+
+ul.gene_row {
+    clear:both;
+    border-bottom: dotted #d3d3d3 1px;
+}
+
+ul.gene_row li {
+    float:left;
+    padding: 0 0.6em 0.25em 0.25em;
+    text-align:left;
+    min-height: 2em;
+}
+
+ul.modifications li {
+    list-style-type:none;
+}
+
+ul.modifications {
+    float: left;
+    margin-top: 2em;
+}
+
+ul.modification_row {
+    clear:both;
+    border-bottom: dotted #d3d3d3 1px;
+}
+
+ul.modification_row li {
+    float:left;
+    padding: 0 0.6em 0.25em 0.25em;
+    text-align:left;
+    min-height: 2em;
+}
 
 
 

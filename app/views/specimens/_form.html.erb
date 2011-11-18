@@ -1,8 +1,6 @@
-<%= javascript_include_tag "sharing.js" -%>
+<%= javascript_include_tag "sharing.js", 'strain.js' -%>
 
 <%= f.error_messages %>
-
-
 
 <h2>Specimen Details</h2>
 
@@ -51,9 +49,6 @@
 
 
   </div>
-
-
-
 
 <p style="margin-top: 2em; text-align: center;">
   <%= f.submit(action==:edit ? "Update" : "Create", :disable_with=>(action==:edit ? "Updating..." : "Creating...")) -%>
