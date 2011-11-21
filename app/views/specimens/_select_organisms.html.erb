@@ -21,7 +21,8 @@
         <b>Step 1</b> - Choose an organism<br/><br/>
         <%= select_tag "specimen[organism_id]",
         options_for_select([["Select Organism ...", 0]]|all_organisms.collect{|o| [truncate(h(o.title), :length=>select_truncate_length), o.id]},@specimen.organism_id),
-         {:style=>"width:90%",
+         {:style=>"width:90%", :onchange=>"check_show_add_organism();return(false);"
+
           } -%>
 
 
@@ -92,23 +93,24 @@
 
         </div>
         <div class="association_step">
-          <b>Step 3</b> - Create a strain (optional)<br/>
-          <%= radio_button_tag(:create_strain, 1, false,
-                            :onchange=>remote_function(:url=>{:action=>"show_existing_strains", :controller=>"strains", :element=>"existing_strains"},
-                                                       :with=>"'organism_id='+ $F('specimen_organism_id')",
-                                                       :before=>"show_ajax_loader('existing_strains')")+
-                                    ";check_show_add_organism();return(false);") %>
-
-          Create based on existing strain
+          <b>Step 3</b> - Create a strain (optional)<br/> <br/>
+          <div id="create_based_on_existing_strain">
+            <%= radio_button_tag(:create_strain, 1, false,
+                                 :onchange=>remote_function(:url=>{:action=>"show_existing_strains", :controller=>"strains"},
+                                                            :with=>"'organism_id='+ $F('specimen_organism_id')",
+                                                            :before=>"show_ajax_loader('existing_strains')")+
+                                         ";return(false);") %>
+            <label>Create based on existing strain</label>
+          </div>
           <br/>
-
+          <div id='create_new_strain'>
+            <%= radio_button_tag(:create_strain, 1, false,
+                                 :onchange=>remote_function(:url=>{:action=>"new_strain", :controller=>"strains"})) %>
+            <label>Create a new strain</label>
+          </div>
           <div id='existing_strains'></div>
           <div id='strain_form'></div>
-          <%= radio_button_tag(:create_strain, 1, false,
-                            :onchange=>"removeStrainForm();" +(render :partial => "strains/form", :locals=>{:strain => Strain.new}) + ';return(false);')
-          %>
-          Create a new strain
-          <br/>
+          <label style="color: #EEE;">---</label>
         </div>
       </div>
     </div>
@@ -117,12 +119,6 @@
 
 <script type="text/javascript">
  var organism = new Array();
-  function setStrainTextField(strain){
-      $('specimen_strain_title').value = strain;
-      new Effect.Highlight('specimen_strain_title');
-  }
-
-
     function check_show_add_organism() {
 
       selected_id = $F('specimen_organism_id') ;
@@ -130,6 +126,11 @@
         Effect.Fade('extra_organism_details');
       }
       else {
+        var radio_buttons = document.getElementsByName('create_strain');
+        radio_buttons[0].checked=false
+        radio_buttons[1].checked=false
+        Effect.Fade('existing_strains', { duration: 0.25});
+        Effect.Fade('strain_form', { duration: 0.25});
         Effect.Appear('extra_organism_details');
       }
     }
@@ -153,9 +154,6 @@
         else if(title=="in vivo"){
             div2.style.display = 'block';
             div1.style.display='none';
-
-
-
 
         }else{
            div1.style.display = 'none';

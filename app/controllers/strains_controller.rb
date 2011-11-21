@@ -4,12 +4,13 @@ class StrainsController < ApplicationController
   before_filter :get_strain, :only =>:show_existing_strain
 
   def show_existing_strains
-    element=params[:element]    
     render :update do |page|
       if @strains && @organism
-        page.replace_html element,:partial=>"strains/existing_strains",:object=>@strains,:locals=>{:organism=>@organism}
+        page.visual_effect :fade, 'strain_form', :duration => 0.25
+        page.remove 'existing_strains'
+        page.insert_html :bottom, 'create_based_on_existing_strain', :partial=>"strains/existing_strains",:object=>@strains,:locals=>{:organism=>@organism}
       else
-        page.replace_html element,:text=>""
+        page.insert_html :bottom, 'create_based_on_existing_strain',:text=>""
       end
     end
   end
@@ -17,7 +18,16 @@ class StrainsController < ApplicationController
   def show_existing_strain
     render :update do |page|
       page.remove 'strain_form'
-      page.insert_html :bottom, "existing_strains",:partial=>"strains/form",:locals=>{:strain => @strain}
+      page.insert_html :bottom, "create_based_on_existing_strain",:partial=>"strains/form",:locals=>{:strain => @strain}
+    end
+  end
+
+  def new_strain
+    @strain = Strain.new
+    render :update do |page|
+      page.visual_effect :fade, 'existing_strains', :duration => 0.25
+      page.remove 'strain_form'
+      page.insert_html :bottom, "create_new_strain",:partial=>"strains/form",:locals=>{:strain => @strain}
     end
   end
 
