@@ -6,6 +6,8 @@ class SubscriptionTest < ActiveSupport::TestCase
     User.current_user = Factory(:user)
   end
 
+  
+
   test 'subscribing and unsubscribing toggle subscribed?' do
     s = Factory(:subscribable)
 
@@ -37,7 +39,7 @@ class SubscriptionTest < ActiveSupport::TestCase
     current_person.project_subscriptions.create :project => proj, :frequency => 'immediately'
     s = Factory(:subscribable, :projects => [Factory(:project), proj], :policy => Factory(:public_policy))
     s.subscribe; s.save!
-
+    
     assert_emails(1) do
       Factory(:activity_log, :activity_loggable => s, :action => 'update')
     end
