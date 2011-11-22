@@ -9,7 +9,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20111117103829) do
+ActiveRecord::Schema.define(:version => 20111122092911) do
 
   create_table "activity_logs", :force => true do |t|
     t.string   "action"
@@ -1027,6 +1027,7 @@ ActiveRecord::Schema.define(:version => 20111117103829) do
     t.string   "purity"
     t.boolean  "sex"
     t.datetime "born"
+    t.string   "ploidy"
   end
 
   create_table "strain_descendants", :id => false, :force => true do |t|

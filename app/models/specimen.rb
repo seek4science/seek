@@ -16,8 +16,6 @@ class Specimen < ActiveRecord::Base
   belongs_to :organism
   belongs_to :culture_growth_type
   belongs_to :strain
-  has_many :genotypes
-  has_many :phenotypes
 
   alias_attribute :description, :comments
   alias_attribute :title, :donor_number

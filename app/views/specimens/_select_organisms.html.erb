@@ -89,13 +89,37 @@
           </table>
          </div>
 
+          <div id="fields_for_batch_and_chemostat" style="display:none;">
+           <table id="table3" border="1" cellpadding="10" >
+               <tr>
+                <td> <%= f.label :medium -%></td>
+                <td> <%= f.text_field :medium  %></td>
+               </tr>
+                 <td><%= f.label :temperature -%></td>
+                 <td><%= f.text_field :temperature  %> </td>
+               </tr>
+               <tr>
+                 <td><%= f.label :ph,"pH" -%></td>
+                 <td><%= f.text_field :ph  %></td>
+               </tr>
+               <tr>
+                 <td><%= f.label :ploidy -%></td>
+                 <td><%= f.text_field :ploidy  %> </td>
+               </tr>
+               <tr>
+                 <td><%= f.label :sex -%></td>
+                 <td style="text-align:left;"><%= f.select :sex,options_for_select({"female"=>true,"male"=>false},@specimen.sex),:include_blank=>"Not Specified"%> </td>
+               </tr>
+         </table>
+         </div>
+
           <br/>
 
         </div>
         <div class="association_step">
           <b>Step 3</b> - Create a strain (optional)<br/> <br/>
           <div id="create_based_on_existing_strain">
-            <%= radio_button_tag(:create_strain, 1, false,
+            <%= radio_button_tag(:create_strain, 1 , @specimen.strain.try(:parent_id) ? true : false,
                                  :onchange=>remote_function(:url=>{:action=>"show_existing_strains", :controller=>"strains"},
                                                             :with=>"'organism_id='+ $F('specimen_organism_id')",
                                                             :before=>"show_ajax_loader('existing_strains')")+
@@ -104,7 +128,7 @@
           </div>
           <br/>
           <div id='create_new_strain'>
-            <%= radio_button_tag(:create_strain, 1, false,
+            <%= radio_button_tag(:create_strain, 2, (@specimen.strain and !@specimen.strain.parent_id ) ? true : false,
                                  :onchange=>remote_function(:url=>{:action=>"new_strain", :controller=>"strains"})) %>
             <label>Create a new strain</label>
           </div>
@@ -144,21 +168,27 @@
 
         var div1 = document.getElementById('fields_for_cultured_cell_line_and_primary_cell_culture');
         var div2 = document.getElementById('fields_for_vivo');
+        var div3 = document.getElementById('fields_for_batch_and_chemostat');
 
         if (title=="cultured cell line" || title=="primary cell culture"){
             div1.style.display = 'block';
             div2.style.display='none';
-
-
+            div3.style.display='none';
         }
         else if(title=="in vivo"){
             div2.style.display = 'block';
             div1.style.display='none';
+            div3.style.display='none';
 
-        }else{
+        }else if (title=="batch" || title=="chemostat"){
            div1.style.display = 'none';
            div2.style.display='none';
-
+           div3.style.display='block';
+        }
+        else{
+           div1.style.display = 'none';
+           div2.style.display='none';
+           div3.style.display='none';
         }
        }
     }
