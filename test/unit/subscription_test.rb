@@ -78,7 +78,12 @@ class SubscriptionTest < ActiveSupport::TestCase
   end
 
   test 'subscribers who do not receive notifications dont receive emails' do
-    User.current_user = Factory(:person, :notifiee_info => Factory(:notifiee_info, :receive_notifications => false)).user
+
+    current_person.notifiee_info.receive_notifications = false
+    current_person.notifiee_info.save!
+
+    assert !current_person.receive_notifications?
+    
     proj = Factory(:project)
     current_person.project_subscriptions.create :project => proj, :frequency => 'immediately'
     s = Factory(:subscribable, :projects => [proj], :policy => Factory(:public_policy))
