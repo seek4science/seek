@@ -3,7 +3,7 @@ ActivityLog.class_eval do
 
   def send_notification
     if Seek::Config.email_enabled
-      try_block{activity_loggable.send_immediate_subscriptions(self)}
+      activity_loggable.send_immediate_subscriptions(self) if activity_loggable.respond_to :send_immediate_subscriptions
     end
   end
 end
