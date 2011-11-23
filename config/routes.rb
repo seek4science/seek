@@ -181,7 +181,7 @@ ActionController::Routing::Routes.draw do |map|
   map.organism_list_autocomplete '/organism_list_autocomplete',:controller=>'projects',:action=>'auto_complete_for_organism_name'
   
   map.signup  '/signup', :controller => 'users',   :action => 'new' 
-  map.login  '/login',  :controller => 'sessions', :action => 'new'
+  map.login  '/login',  :controller => 'home'
   map.logout '/logout', :controller => 'sessions', :action => 'destroy'  
   
   map.activate '/activate/:activation_code', :controller => 'users', :action => 'activate', :activation_code => nil
