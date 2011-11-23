@@ -248,7 +248,7 @@ module AssetsHelper
     eval("#{resource_type.underscore.pluralize}_path" + filter_text)
   end
 
-  #provides a list of assets, according to the class, that are authorized to 'show'
+  #provides a list of assets, according to the class, that are authorized acording the 'action' which defaults to view
   def authorised_assets asset_class, action="view"
     assets=asset_class.find(:all,:include=>[:policy,{:policy=>:permissions}])
     Authorization.authorize_collection(action, assets, current_user)
