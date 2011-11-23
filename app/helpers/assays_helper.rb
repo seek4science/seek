@@ -100,7 +100,7 @@ module AssaysHelper
   end
 
   def authorised_assays
-    Assay.all.select{|assay| assay.can_edit?(current_user)}
+    authorised_assets(Assay)
   end
 
   def list_assay_samples_and_organisms attribute,assay_samples,assay_organisms, none_text="Not Specified"
