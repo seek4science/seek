@@ -250,7 +250,7 @@ module AssetsHelper
 
   #provides a list of assets, according to the class, that are authorized to 'show'
   def authorised_assets asset_class
-    assets=asset_class.find(:all)
+    assets=asset_class.find(:all,:include=>[:policy,{:policy=>:permissions}])
     Authorization.authorize_collection("view", assets, current_user)
   end
 
