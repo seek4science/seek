@@ -48,11 +48,7 @@ module Seek
         people.select{|p| !p.user.nil?}
       end
       
-      private 
-      
-      def authorised_assets assets,action
-        assets.select{|asset| asset.can_perform? action, @user}
-      end
+      private             
       
       def assets_size assets
         size=0
