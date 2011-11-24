@@ -1,0 +1,259 @@
+bh_summary_1_av1:
+  annotation: bh_summary_1
+  annotatable_type: Book
+  annotatable_id: 1
+  attribute_id: 2
+  value_type: TextValue
+  value_id: 16
+  source_type: User
+  source_id: 1
+  version: 1
+  created_at: <%= 1.minute.ago.to_s(:db) %>
+  updated_at: <%= 1.minute.ago.to_s(:db) %>
+
+bh_length_1_av1:
+  annotation: bh_length_1
+  annotatable_type: Book
+  annotatable_id: 1
+  attribute_id: 3
+  value_type: NumberValue
+  value_id: 1
+  source_type: Group
+  source_id: 2
+  version: 1
+  created_at: <%= 1.minute.ago.to_s(:db) %>
+  updated_at: <%= 1.minute.ago.to_s(:db) %>
+  
+bh_title_1_av1:
+  annotation: bh_title_1
+  annotatable_type: Book
+  annotatable_id: 1
+  attribute_id: 4
+  value_type: TextValue
+  value_id: 17
+  source_type: User
+  source_id: 1
+  version: 1
+  created_at: <%= 1.minute.ago.to_s(:db) %>
+  updated_at: <%= 1.minute.ago.to_s(:db) %>
+
+bh_rating_1_av1:
+  annotation: bh_rating_1
+  annotatable_type: Rating
+  annotatable_id: 1
+  attribute_id: 9
+  value_type: TextValue
+  value_id: 18
+  source_type: User
+  source_id: 2
+  version: 1
+  created_at: <%= 1.minute.ago.to_s(:db) %>
+  updated_at: <%= 1.minute.ago.to_s(:db) %>
+
+bh_tag_1_av1:
+  annotation: bh_tag_1
+  annotatable_type: Book
+  annotatable_id: 1
+  attribute_id: 1
+  value_type: TextValue
+  value_id: 19
+  source_type: Group
+  source_id: 2
+  version: 1
+  created_at: <%= 1.minute.ago.to_s(:db) %>
+  updated_at: <%= 1.minute.ago.to_s(:db) %>
+
+bh_tag_2_av1:
+  annotation: bh_tag_2
+  annotatable_type: Book
+  annotatable_id: 1
+  attribute_id: 1
+  value_type: TextValue
+  value_id: 20
+  source_type: User
+  source_id: 2
+  version: 1
+  created_at: <%= 1.minute.ago.to_s(:db) %>
+  updated_at: <%= 1.minute.ago.to_s(:db) %>
+
+br_summary_1_av1:
+  annotation: br_summary_1
+  annotatable_type: Book
+  annotatable_id: 2
+  attribute_id: 2
+  value_type: TextValue
+  value_id: 21
+  source_type: User
+  source_id: 1
+  version: 1
+  created_at: <%= 1.minute.ago.to_s(:db) %>
+  updated_at: <%= 1.minute.ago.to_s(:db) %>
+  
+br_summary_2_av1:
+  annotation: br_summary_2
+  annotatable_type: Book
+  annotatable_id: 2
+  attribute_id: 2
+  value_type: TextValue
+  value_id: 22
+  source_type: Group
+  source_id: 1
+  version: 1
+  created_at: <%= 1.minute.ago.to_s(:db) %>
+  updated_at: <%= 1.minute.ago.to_s(:db) %>
+  
+br_author_1_av1:
+  annotation: br_author_1
+  annotatable_type: Book
+  annotatable_id: 2
+  attribute_id: 8
+  value_type: TextValue
+  value_id: 23
+  source_type: User
+  source_id: 1
+  version: 1
+  created_at: <%= 1.minute.ago.to_s(:db) %>
+  updated_at: <%= 1.minute.ago.to_s(:db) %>
+  
+br_tag_1_av1:
+  annotation: br_tag_1
+  annotatable_type: Book
+  annotatable_id: 2
+  attribute_id: 1
+  value_type: TextValue
+  value_id: 24
+  source_type: User
+  source_id: 2
+  version: 1
+  created_at: <%= 1.minute.ago.to_s(:db) %>
+  updated_at: <%= 1.minute.ago.to_s(:db) %>
+  
+br_note_1_av1:
+  annotation: br_note_1
+  annotatable_type: Book
+  annotatable_id: 2
+  attribute_id: 7
+  value_type: TextValue
+  value_id: 25
+  source_type: User
+  source_id: 2
+  version: 1
+  created_at: <%= 1.minute.ago.to_s(:db) %>
+  updated_at: <%= 1.minute.ago.to_s(:db) %>
+
+bh_c10_endingtype_1_av1:
+  annotation: bh_c10_endingtype_1
+  annotatable_type: Chapter
+  annotatable_id: 2
+  attribute_id: 6
+  value_type: TextValue
+  value_id: 26
+  source_type: Group
+  source_id: 1
+  version: 1
+  created_at: <%= 1.minute.ago.to_s(:db) %>
+  updated_at: <%= 1.minute.ago.to_s(:db) %>
+  
+bh_c10_title_1_av1:
+  annotation: bh_c10_title_1
+  annotatable_type: Chapter
+  annotatable_id: 2
+  attribute_id: 4
+  value_type: TextValue
+  value_id: 27
+  source_type: User
+  source_id: 2
+  version: 1
+  created_at: <%= 1.minute.ago.to_s(:db) %>
+  updated_at: <%= 1.minute.ago.to_s(:db) %>
+  
+br_c2_title_1_av1:
+  annotation: br_c2_title_1
+  annotatable_type: Chapter
+  annotatable_id: 3
+  attribute_id: 4
+  value_type: TextValue
+  value_id: 28
+  source_type: User
+  source_id: 1
+  version: 1
+  created_at: <%= 1.minute.ago.to_s(:db) %>
+  updated_at: <%= 1.minute.ago.to_s(:db) %>
+  
+br_c2_tag_1_av1:
+  annotation: br_c2_tag_1
+  annotatable_type: Chapter
+  annotatable_id: 3
+  attribute_id: 1
+  value_type: TextValue
+  value_id: 29
+  source_type: Group
+  source_id: 2
+  version: 1
+  created_at: <%= 1.minute.ago.to_s(:db) %>
+  updated_at: <%= 1.minute.ago.to_s(:db) %>
+  
+br_c2_tag_2_av1:
+  annotation: br_c2_tag_2
+  annotatable_type: Chapter
+  annotatable_id: 3
+  attribute_id: 1
+  value_type: TextValue
+  value_id: 30
+  source_type: User
+  source_id: 1
+  version: 1
+  created_at: <%= 1.minute.ago.to_s(:db) %>
+  updated_at: <%= 1.minute.ago.to_s(:db) %>
+  
+br_c2_title_2_av1:
+  annotation: br_c2_title_2
+  annotatable_type: Chapter
+  annotatable_id: 3
+  attribute_id: 4
+  value_type: TextValue
+  value_id: 31
+  source_type: User
+  source_id: 2
+  version: 1
+  created_at: <%= 1.minute.ago.to_s(:db) %>
+  updated_at: <%= 1.minute.ago.to_s(:db) %>
+  
+br_c202_complexity_1_av1:
+  annotation: br_c202_complexity_1
+  annotatable_type: Chapter
+  annotatable_id: 4
+  attribute_id: 5
+  value_type: TextValue
+  value_id: 32
+  source_type: Group
+  source_id: 1
+  version: 1
+  created_at: <%= 1.minute.ago.to_s(:db) %>
+  updated_at: <%= 1.minute.ago.to_s(:db) %>
+
+br_c202_title_1_av1:
+  annotation: br_c202_title_1
+  annotatable_type: Chapter
+  annotatable_id: 4
+  attribute_id: 4
+  value_type: TextValue
+  value_id: 33
+  source_type: User
+  source_id: 1
+  version: 1
+  created_at: <%= 1.minute.ago.to_s(:db) %>
+  updated_at: <%= 1.minute.ago.to_s(:db) %>
+  
+br_c202_tag_1_av1:
+  annotation: br_c202_tag_1
+  annotatable_type: Chapter
+  annotatable_id: 4
+  attribute_id: 1
+  value_type: TextValue
+  value_id: 34
+  source_type: Group
+  source_id: 2
+  version: 1
+  created_at: <%= 1.minute.ago.to_s(:db) %>
+  updated_at: <%= 1.minute.ago.to_s(:db) %>

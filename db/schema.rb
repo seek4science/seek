@@ -9,7 +9,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20110810093644) do
+ActiveRecord::Schema.define(:version => 20111005074321) do
 
   create_table "activity_logs", :force => true do |t|
     t.string   "action"
@@ -33,6 +33,64 @@ ActiveRecord::Schema.define(:version => 20110810093644) do
   add_index "activity_logs", ["culprit_type", "culprit_id"], :name => "act_logs_culprit_index"
   add_index "activity_logs", ["format"], :name => "act_logs_format_index"
   add_index "activity_logs", ["referenced_type", "referenced_id"], :name => "act_logs_referenced_index"
+
+  create_table "annotation_attributes", :force => true do |t|
+    t.string   "name",       :null => false
+    t.datetime "created_at"
+    t.datetime "updated_at"
+    t.string   "identifier", :null => false
+  end
+
+  add_index "annotation_attributes", ["name"], :name => "index_annotation_attributes_on_name"
+
+  create_table "annotation_value_seeds", :force => true do |t|
+    t.integer  "attribute_id",                                    :null => false
+    t.string   "old_value"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+    t.string   "value_type",   :limit => 50, :default => "FIXME", :null => false
+    t.integer  "value_id",                   :default => 0,       :null => false
+  end
+
+  add_index "annotation_value_seeds", ["attribute_id"], :name => "index_annotation_value_seeds_on_attribute_id"
+
+  create_table "annotation_versions", :force => true do |t|
+    t.integer  "annotation_id",                                         :null => false
+    t.integer  "version",                                               :null => false
+    t.integer  "version_creator_id"
+    t.string   "source_type",                                           :null => false
+    t.integer  "source_id",                                             :null => false
+    t.string   "annotatable_type",   :limit => 50,                      :null => false
+    t.integer  "annotatable_id",                                        :null => false
+    t.integer  "attribute_id",                                          :null => false
+    t.string   "old_value",                        :default => ""
+    t.datetime "created_at"
+    t.datetime "updated_at"
+    t.string   "value_type",         :limit => 50, :default => "FIXME", :null => false
+    t.integer  "value_id",                         :default => 0,       :null => false
+  end
+
+  add_index "annotation_versions", ["annotation_id"], :name => "index_annotation_versions_on_annotation_id"
+
+  create_table "annotations", :force => true do |t|
+    t.string   "source_type",                                           :null => false
+    t.integer  "source_id",                                             :null => false
+    t.string   "annotatable_type",   :limit => 50,                      :null => false
+    t.integer  "annotatable_id",                                        :null => false
+    t.integer  "attribute_id",                                          :null => false
+    t.string   "old_value",                        :default => ""
+    t.integer  "version",                                               :null => false
+    t.integer  "version_creator_id"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+    t.string   "value_type",         :limit => 50, :default => "FIXME", :null => false
+    t.integer  "value_id",                         :default => 0,       :null => false
+  end
+
+  add_index "annotations", ["annotatable_type", "annotatable_id"], :name => "index_annotations_on_annotatable_type_and_annotatable_id"
+  add_index "annotations", ["attribute_id"], :name => "index_annotations_on_attribute_id"
+  add_index "annotations", ["source_type", "source_id"], :name => "index_annotations_on_source_type_and_source_id"
+  add_index "annotations", ["value_type", "value_id"], :name => "index_annotations_on_value_type_and_value_id"
 
   create_table "assay_assets", :force => true do |t|
     t.integer  "assay_id"
@@ -117,6 +175,26 @@ ActiveRecord::Schema.define(:version => 20110810093644) do
     t.string  "asset_type"
   end
 
+  create_table "attachments", :force => true do |t|
+    t.integer  "size"
+    t.integer  "height"
+    t.integer  "width"
+    t.integer  "parent_id"
+    t.integer  "attachable_id"
+    t.integer  "position"
+    t.string   "content_type"
+    t.string   "filename"
+    t.string   "thumbnail"
+    t.string   "attachable_type"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+    t.string   "data_url"
+    t.string   "original_filename"
+  end
+
+  add_index "attachments", ["attachable_id", "attachable_type"], :name => "index_attachments_on_attachable_id_and_attachable_type"
+  add_index "attachments", ["parent_id"], :name => "index_attachments_on_parent_id"
+
   create_table "avatars", :force => true do |t|
     t.string   "owner_type"
     t.integer  "owner_id"
@@ -134,6 +212,17 @@ ActiveRecord::Schema.define(:version => 20110810093644) do
     t.string  "conceptable_type"
   end
 
+  create_table "cell_ranges", :force => true do |t|
+    t.integer  "cell_range_id"
+    t.integer  "worksheet_id"
+    t.integer  "start_row"
+    t.integer  "start_column"
+    t.integer  "end_row"
+    t.integer  "end_column"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
   create_table "compounds", :force => true do |t|
     t.string   "name"
     t.datetime "created_at"
@@ -141,10 +230,15 @@ ActiveRecord::Schema.define(:version => 20110810093644) do
   end
 
   create_table "content_blobs", :force => true do |t|
-    t.binary "data_old", :limit => 2147483647
-    t.string "md5sum"
-    t.string "url"
-    t.string "uuid"
+    t.binary  "data_old",          :limit => 2147483647
+    t.string  "md5sum"
+    t.string  "url"
+    t.string  "uuid"
+    t.string  "original_filename"
+    t.string  "content_type"
+    t.integer "asset_id"
+    t.string  "asset_type"
+    t.integer "asset_version"
   end
 
   create_table "culture_growth_types", :force => true do |t|
@@ -171,9 +265,6 @@ ActiveRecord::Schema.define(:version => 20110810093644) do
     t.integer  "contributor_id"
     t.string   "title"
     t.text     "description"
-    t.string   "original_filename"
-    t.string   "content_type"
-    t.integer  "content_blob_id"
     t.integer  "template_id"
     t.datetime "last_used_at"
     t.datetime "created_at"
@@ -197,15 +288,12 @@ ActiveRecord::Schema.define(:version => 20110810093644) do
     t.integer  "contributor_id"
     t.string   "title"
     t.text     "description"
-    t.string   "original_filename"
-    t.string   "content_type"
-    t.integer  "content_blob_id"
     t.integer  "template_id"
     t.datetime "last_used_at"
     t.datetime "created_at"
     t.datetime "updated_at"
-    t.integer  "version",                        :default => 1
-    t.string   "first_letter",      :limit => 1
+    t.integer  "version",                       :default => 1
+    t.string   "first_letter",     :limit => 1
     t.text     "other_creators"
     t.string   "uuid"
     t.integer  "policy_id"
@@ -273,6 +361,14 @@ ActiveRecord::Schema.define(:version => 20110810093644) do
     t.integer "event_id"
   end
 
+  create_table "experimental_condition_links", :force => true do |t|
+    t.string   "substance_type"
+    t.integer  "substance_id"
+    t.integer  "experimental_condition_id"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
   create_table "experimental_conditions", :force => true do |t|
     t.integer  "measured_item_id"
     t.float    "start_value"
@@ -282,8 +378,6 @@ ActiveRecord::Schema.define(:version => 20110810093644) do
     t.datetime "created_at"
     t.datetime "updated_at"
     t.integer  "sop_version"
-    t.integer  "substance_id"
-    t.string   "substance_type"
   end
 
   add_index "experimental_conditions", ["sop_id"], :name => "index_experimental_conditions_on_sop_id"
@@ -407,6 +501,22 @@ ActiveRecord::Schema.define(:version => 20110810093644) do
     t.integer "investigation_id"
   end
 
+  create_table "mapping_links", :force => true do |t|
+    t.string   "substance_type"
+    t.integer  "substance_id"
+    t.integer  "mapping_id"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
+  create_table "mappings", :force => true do |t|
+    t.integer  "sabiork_id"
+    t.string   "chebi_id"
+    t.string   "kegg_id"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
   create_table "measured_items", :force => true do |t|
     t.string   "title"
     t.datetime "created_at"
@@ -434,9 +544,6 @@ ActiveRecord::Schema.define(:version => 20110810093644) do
     t.integer  "contributor_id"
     t.string   "title"
     t.text     "description"
-    t.string   "original_filename"
-    t.integer  "content_blob_id"
-    t.string   "content_type"
     t.integer  "recommended_environment_id"
     t.text     "result_graph"
     t.datetime "last_used_at"
@@ -449,6 +556,7 @@ ActiveRecord::Schema.define(:version => 20110810093644) do
     t.text     "other_creators"
     t.string   "uuid"
     t.integer  "policy_id"
+    t.integer  "id_image"
   end
 
   add_index "model_versions", ["contributor_id", "contributor_type"], :name => "index_model_versions_on_contributor_id_and_contributor_type"
@@ -464,9 +572,6 @@ ActiveRecord::Schema.define(:version => 20110810093644) do
     t.integer  "contributor_id"
     t.string   "title"
     t.text     "description"
-    t.string   "original_filename"
-    t.integer  "content_blob_id"
-    t.string   "content_type"
     t.integer  "recommended_environment_id"
     t.text     "result_graph"
     t.datetime "last_used_at"
@@ -480,6 +585,7 @@ ActiveRecord::Schema.define(:version => 20110810093644) do
     t.text     "other_creators"
     t.string   "uuid"
     t.integer  "policy_id"
+    t.integer  "id_image"
   end
 
   add_index "models", ["contributor_id", "contributor_type"], :name => "index_models_on_contributor_id_and_contributor_type"
@@ -507,6 +613,25 @@ ActiveRecord::Schema.define(:version => 20110810093644) do
     t.string   "notifiee_type"
     t.string   "unique_key"
     t.boolean  "receive_notifications", :default => true
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
+  create_table "number_value_versions", :force => true do |t|
+    t.integer  "number_value_id",    :null => false
+    t.integer  "version",            :null => false
+    t.integer  "version_creator_id"
+    t.integer  "number",             :null => false
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
+  add_index "number_value_versions", ["number_value_id"], :name => "index_number_value_versions_on_number_value_id"
+
+  create_table "number_values", :force => true do |t|
+    t.integer  "version",            :null => false
+    t.integer  "version_creator_id"
+    t.integer  "number",             :null => false
     t.datetime "created_at"
     t.datetime "updated_at"
   end
@@ -589,9 +714,6 @@ ActiveRecord::Schema.define(:version => 20110810093644) do
     t.integer  "contributor_id"
     t.string   "title"
     t.text     "description"
-    t.string   "original_filename"
-    t.string   "content_type"
-    t.integer  "content_blob_id"
     t.datetime "created_at"
     t.datetime "updated_at"
     t.datetime "last_used_at"
@@ -611,14 +733,11 @@ ActiveRecord::Schema.define(:version => 20110810093644) do
     t.integer  "contributor_id"
     t.string   "title"
     t.text     "description"
-    t.string   "original_filename"
-    t.string   "content_type"
-    t.integer  "content_blob_id"
     t.datetime "created_at"
     t.datetime "updated_at"
     t.datetime "last_used_at"
-    t.integer  "version",                        :default => 1
-    t.string   "first_letter",      :limit => 1
+    t.integer  "version",                       :default => 1
+    t.string   "first_letter",     :limit => 1
     t.text     "other_creators"
     t.string   "uuid"
     t.integer  "policy_id"
@@ -650,6 +769,7 @@ ActiveRecord::Schema.define(:version => 20110810093644) do
     t.string   "site_root_uri"
     t.datetime "last_jerm_run"
     t.string   "uuid"
+    t.integer  "parent_id"
   end
 
   create_table "projects_publications", :id => false, :force => true do |t|
@@ -835,9 +955,6 @@ ActiveRecord::Schema.define(:version => 20110810093644) do
     t.integer  "contributor_id"
     t.string   "title"
     t.text     "description"
-    t.string   "original_filename"
-    t.string   "content_type"
-    t.integer  "content_blob_id"
     t.datetime "created_at"
     t.datetime "updated_at"
     t.datetime "last_used_at"
@@ -855,20 +972,26 @@ ActiveRecord::Schema.define(:version => 20110810093644) do
     t.integer  "contributor_id"
     t.string   "title"
     t.text     "description"
-    t.string   "original_filename"
-    t.string   "content_type"
-    t.integer  "content_blob_id"
     t.datetime "created_at"
     t.datetime "updated_at"
     t.datetime "last_used_at"
-    t.integer  "version",                        :default => 1
-    t.string   "first_letter",      :limit => 1
+    t.integer  "version",                       :default => 1
+    t.string   "first_letter",     :limit => 1
     t.text     "other_creators"
     t.string   "uuid"
     t.integer  "policy_id"
   end
 
   add_index "sops", ["contributor_id", "contributor_type"], :name => "index_sops_on_contributor_id_and_contributor_type"
+
+  create_table "special_auth_codes", :force => true do |t|
+    t.string   "code"
+    t.date     "expiration_date"
+    t.string   "asset_type"
+    t.integer  "asset_id"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
 
   create_table "specimens", :force => true do |t|
     t.string   "donor_number"
@@ -907,6 +1030,14 @@ ActiveRecord::Schema.define(:version => 20110810093644) do
     t.datetime "updated_at"
   end
 
+  create_table "studied_factor_links", :force => true do |t|
+    t.string   "substance_type"
+    t.integer  "substance_id"
+    t.integer  "studied_factor_id"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
   create_table "studied_factors", :force => true do |t|
     t.integer  "measured_item_id"
     t.float    "start_value"
@@ -918,8 +1049,6 @@ ActiveRecord::Schema.define(:version => 20110810093644) do
     t.datetime "updated_at"
     t.float    "standard_deviation"
     t.integer  "data_file_version"
-    t.integer  "substance_id"
-    t.string   "substance_type"
   end
 
   add_index "studied_factors", ["data_file_id"], :name => "index_studied_factors_on_data_file_id"
@@ -986,6 +1115,25 @@ ActiveRecord::Schema.define(:version => 20110810093644) do
   create_table "technology_types_edges", :id => false, :force => true do |t|
     t.integer "parent_id"
     t.integer "child_id"
+  end
+
+  create_table "text_value_versions", :force => true do |t|
+    t.integer  "text_value_id",                            :null => false
+    t.integer  "version",                                  :null => false
+    t.integer  "version_creator_id"
+    t.text     "text",               :limit => 2147483647, :null => false
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
+  add_index "text_value_versions", ["text_value_id"], :name => "index_text_value_versions_on_text_value_id"
+
+  create_table "text_values", :force => true do |t|
+    t.integer  "version",                                  :null => false
+    t.integer  "version_creator_id"
+    t.text     "text",               :limit => 2147483647, :null => false
+    t.datetime "created_at"
+    t.datetime "updated_at"
   end
 
   create_table "topics", :force => true do |t|
@@ -1056,5 +1204,12 @@ ActiveRecord::Schema.define(:version => 20110810093644) do
   end
 
   add_index "work_groups", ["project_id"], :name => "index_work_groups_on_project_id"
+
+  create_table "worksheets", :force => true do |t|
+    t.integer "content_blob_id"
+    t.integer "last_row"
+    t.integer "last_column"
+    t.integer "sheet_number"
+  end
 
 end

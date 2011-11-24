@@ -5,38 +5,34 @@ class DataFilesController < ApplicationController
   
   include IndexPager
   include SysMODB::SpreadsheetExtractor
+  include SpreadsheetUtil
   include MimeTypesHelper  
   include DotGenerator  
   include Seek::AssetsCommon
+  include AssetsCommonExtension
+  include Seek::AnnotationCommon
 
   #before_filter :login_required
   
   before_filter :find_assets, :only => [ :index ]
-  before_filter :find_and_auth, :except => [ :index, :new, :upload_for_tool, :create, :request_resource, :preview, :test_asset_url, :update_tags_ajax,:convert_to_presentation]
-  before_filter :find_display_data_file, :only=>[:show,:download]
+  before_filter :find_and_auth, :except => [ :index, :new, :upload_for_tool, :create, :request_resource, :preview, :test_asset_url, :update_annotations_ajax]
+  before_filter :find_display_data_file, :only=>[:show,:download,:explore]
 
   #has to come after the other filters
   include Seek::Publishing
 
   def convert_to_presentation
     @data_file = DataFile.find params[:id]
-    @presentation = @data_file.convert_to_presentation
+    @presentation = @data_file.to_presentation!
 
     respond_to do |format|
 
       if !@presentation.new_record?
         disable_authorization_checks do
-          # update attributions
-          Relationship.create_or_update_attributions(@presentation, @data_file.attributions_objects.collect { |a| [a.class.name, a.id] })
-
-          # update related publications
-          Relationship.create_or_update_attributions(@presentation, @data_file.related_publications.collect { |p| ["Publication", p.id.to_json] }, Relationship::RELATED_TO_PUBLICATION) unless @data_file.related_publications.blank?
-
           @data_file.destroy
-
-          flash[:notice]="Data File '#{@presentation.title}' is successfully converted to Presentation"
-          format.html { redirect_to presentation_path(@presentation) }
         end
+        flash[:notice]="Data File '#{@presentation.title}' is successfully converted to Presentation"
+        format.html { redirect_to presentation_path(@presentation) }
       else
         flash[:error] = "Data File failed to convert to Presentation!!"
         format.html {
@@ -57,21 +53,20 @@ class DataFilesController < ApplicationController
   def new_version
     if (handle_data nil)          
       comments=params[:revision_comment]
-      @data_file.content_blob = ContentBlob.new(:tmp_io_object => @tmp_io_object, :url=>@data_url)      
-      @data_file.content_type = params[:data_file][:content_type]
-      @data_file.original_filename=params[:data_file][:original_filename]
+
       factors = @data_file.studied_factors
       respond_to do |format|
         if @data_file.save_as_new_version(comments)
+          create_content_blobs
           #Duplicate studied factors
           factors.each do |f|
             new_f = f.clone
             new_f.data_file_version = @data_file.version
             new_f.save
           end
-          flash[:notice]="New version uploaded - now on version #{@data_file.version}"
+          flash[:notice] = "New version uploaded - now on version #{@data_file.version}"
         else
-          flash[:error]="Unable to save new version"          
+          flash[:error] = "Unable to save new version"
         end
         format.html {redirect_to @data_file }
       end
@@ -94,6 +89,7 @@ class DataFilesController < ApplicationController
   end
   
   def new
+    #DataFile.find(13).destroy
     @data_file = DataFile.new
     respond_to do |format|
       if current_user.person.member?
@@ -111,12 +107,12 @@ class DataFilesController < ApplicationController
       params[:data_file][:project_ids] = [params[:data_file].delete(:project_id)] if params[:data_file][:project_id]
       @data_file = DataFile.new params[:data_file]
 
-      @data_file.content_blob = ContentBlob.new :tmp_io_object => @tmp_io_object, :url=>@data_url
+      #@data_file.content_blob = ContentBlob.new :tmp_io_object => @tmp_io_object, :url=>@data_url
       Policy.new_for_upload_tool(@data_file, params[:recipient_id])
 
       if @data_file.save
         @data_file.creators = [current_user.person]
-
+        create_content_blobs
         #send email to the file uploader and receiver
         Mailer.deliver_file_uploaded(current_user,Person.find(params[:recipient_id]),@data_file,base_host)
 
@@ -133,15 +129,18 @@ class DataFilesController < ApplicationController
     if handle_data
       
       @data_file = DataFile.new params[:data_file]
-      @data_file.content_blob = ContentBlob.new :tmp_io_object => @tmp_io_object, :url=>@data_url
+      #@data_file.content_blob = ContentBlob.new :tmp_io_object => @tmp_io_object, :url=>@data_url
 
-      update_tags @data_file
+     update_annotations @data_file
 
       @data_file.policy.set_attributes_with_sharing params[:sharing], @data_file.projects
 
       assay_ids = params[:assay_ids] || []
       respond_to do |format|
         if @data_file.save
+
+          create_content_blobs
+
           # update attributions
           Relationship.create_or_update_attributions(@data_file, params[:attributions])
           
@@ -179,7 +178,7 @@ class DataFilesController < ApplicationController
     # (this will also trigger timestamp update in the corresponding Asset)
     @data_file.last_used_at = Time.now
     @data_file.save_without_timestamping
-
+    
     respond_to do |format|
       format.html # show.html.erb
       format.xml
@@ -206,7 +205,8 @@ class DataFilesController < ApplicationController
 
     publication_params    = params[:related_publication_ids].nil?? [] : params[:related_publication_ids].collect { |i| ["Publication", i.split(",").first]}
 
-    update_tags @data_file
+    update_annotations @data_file
+
     assay_ids = params[:assay_ids] || []
     respond_to do |format|
       @data_file.attributes = params[:data_file]
@@ -313,11 +313,33 @@ end
     end
   end  
   
+  def explore
+    if @display_data_file.is_spreadsheet?
+      #Generate Ruby spreadsheet model from XML
+      @spreadsheet = @display_data_file.spreadsheet
+
+      #FIXME: Annotations need to be specific to version
+      @spreadsheet.annotations = @display_data_file.spreadsheet_annotations
+      respond_to do |format|
+        format.html { render :layout=>"minimal" }
+      end
+    else
+     respond_to do |format|
+        flash[:error] = "Unable to view contents of this data file"
+        format.html { redirect_to data_file_path(@data_file,:version=>@display_data_file.version) }
+      end
+    end
+  end 
+  
   protected    
   
   def find_display_data_file
     if @data_file
-      @display_data_file = params[:version] ? @data_file.find_version(params[:version]) : @data_file.latest_version
+      if logged_in? and current_user.person.member? and params[:version]
+        @display_data_file = @data_file.find_version(params[:version]) ? @data_file.find_version(params[:version]) : @data_file.latest_version
+      else
+        @display_data_file = @data_file.latest_version
+      end
     end
   end
 

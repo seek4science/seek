@@ -1,7 +1,7 @@
 require "test_helper"
 
 class SpecimenTest < ActiveSupport::TestCase
-  fixtures :all
+fixtures :all
 
   test "validation" do
     specimen = Factory :specimen, :donor_number => "DonorNumber"
@@ -31,6 +31,13 @@ class SpecimenTest < ActiveSupport::TestCase
   test "age in weeks" do
     specimen = Factory :specimen,:age => 12
     assert_equal "#{specimen.age} (weeks)",specimen.age_in_weeks
+  end
+
+  test "related people" do
+    specimen = Factory :specimen
+    specimen.creators = [Factory(:person),Factory(:person)]
+
+    assert_equal specimen.creators, specimen.related_people
   end
 
 end

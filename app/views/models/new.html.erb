@@ -4,7 +4,7 @@
     <% form_tag({:action => :create}, :multipart => true) do -%>
     <div class="asset_form">
         <%= error_messages_for :model -%>
-        <%= render :partial=>"assets/upload_box" -%>
+        <%= render :partial=>"assets/upload_box",:locals=>{:action=>:new,:resource=>@model} -%>
         <p style="margin-top: 1.5em;">
             <b>Title</b>
             <span class="required">*</span>
@@ -29,12 +29,19 @@
                 </div>
             </div>
         </p>
+
+
         <%= render :partial => "organisms/select_organism",:locals=>{:model_class=>Model} -%>
 
-        <%= render :partial=>"assets/asset_form_bottom", :locals=> {:resource_type => "Model"} -%>
+        <%= fields_for(@model) {|f| render :partial=>"assets/asset_form_bottom", :locals=> {:f => f}} -%>
         <%= render :partial => "assays/associate_assays", :locals=>{:resource => @model, :show_relationships => false} -%>
+
+
+         <%#= render :partial => "models/new_batch_upload" ,:locals => {:resource=>@model}%>
+
         <p>
-            <%= submit_tag "Upload and Save", :id => "model_submit_btn", :onclick => "javascript: validateModelFields(true); return(false);" -%>&nbsp;or <%= link_to 'Cancel', models_path -%>
+          <%= preview_permission_popup_link('model', url_for(:controller => 'policies', :action => 'preview_permissions'), true)-%>
+          <%= submit_tag "Upload and Save", :id => "model_submit_btn", :onclick => "javascript: validateResourceFields(true, 'model'); return(false);" -%>&nbsp;or <%= link_to 'Cancel', models_path -%>
         </p>
 		</div>
         <% end -%>    

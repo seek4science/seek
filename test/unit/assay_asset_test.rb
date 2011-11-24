@@ -1,7 +1,7 @@
 require 'test_helper'
 
 class AssayAssetTest < ActiveSupport::TestCase
-  fixtures :all
+  #fixtures :all
 
   def setup
     User.current_user = Factory :user

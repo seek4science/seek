@@ -307,5 +307,6 @@ class PublishingTest < ActionController::TestCase
     assert !other_persons_data_file.can_manage?
     df
   end
-  
+
 end
+

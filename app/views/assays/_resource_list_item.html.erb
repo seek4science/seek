@@ -25,7 +25,11 @@
 
   <%= render :partial => 'projects/show_project_relationship', :locals => {:resource => resource, :list_item => true}%>
 
-  <%= list_assay_samples_and_organisms "Samples",resource.samples,resource.assay_organisms %>
+  <% if Seek::Config.is_virtualliver %>
+    <%= list_assay_samples_and_organisms "Samples",resource.samples,resource.assay_organisms %>
+  <% else %>
+    <%= list_item_simple_list(resource.assay_organisms, "Organism"){|ao| assay_organism_list_item(ao)} %>
+  <% end %>
 
   <%= list_item_authorized_list resource.sops, "SOPs", true, 50, true %>
 

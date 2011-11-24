@@ -1,0 +1,23 @@
+<% @attachment ||= Attachment.new %>
+<div class="fold">
+  <div class="foldTitle">
+    <%= help_icon("Here you upload multiple files for the #{resource.class.name}.") -%>
+    Attachments
+  </div>
+  <div class="foldContent">
+
+     <p>If you don't choose any file as the image. By default, the first uploaded image file will be selected as the image for the <%= resource.class.name %>.</p>
+	<% fields_for @attachment do |attachment| -%>
+	<p>
+		<label for="attachment_data">Attach Files:</label>
+		<%= attachment.file_field :data %>(<span style="color: red;font-style: italic;">MAX. <%= Seek::Config.max_attachments_num %> files</span>)
+	</p>
+	<% end -%>
+	<table id="pending_files"></table>
+
+  </div>
+</div>
+	<script type="text/javascript">
+		var multi_selector = new MultiSelector($('pending_files'),<%= Seek::Config.max_attachments_num %>,'<%=resource.class.name.downcase%>','id_image');
+		multi_selector.addElement($('attachment_data'));
+	</script>

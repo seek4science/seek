@@ -16,7 +16,7 @@ class UsersControllerTest < ActionController::TestCase
     @request    = ActionController::TestRequest.new
     @response   = ActionController::TestResponse.new
   end
-
+  
   def test_title
     get :new
     assert_select "title",:text=>/The Sysmo SEEK.*/, :count=>1

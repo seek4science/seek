@@ -1,0 +1,14 @@
+
+<tr id="content_blob_<%= content_blob.id %>" >
+
+<td>
+<% if resource.respond_to? :id_image and content_blob.is_image? %>
+  <%= radio_button resource.class.name.downcase,:id_image,content_blob.id,{:title=>'selected as image'}%>
+<% end %>
+</td>
+<td> <%= image_tag file_type_icon_url(content_blob)%></td>
+<td style="text-align:left"><%= link_to content_blob.original_filename,url_for(:controller=>"#{resource.class.name.downcase}s",:action=>"download_one_file" ,:id=> content_blob),{:style=>"color:#0000CC;"} %></td>
+<td>
+<%#= link_to_remote "Remove",  :url=>{:controller=>"#{resource.class.name.downcase}s",:action=>"delete_one_file" ,:id=> content_blob}, :html =>{ :title  => "Remove this file"} %>
+</td>
+</tr>

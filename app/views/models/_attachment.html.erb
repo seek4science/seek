@@ -1,0 +1,18 @@
+<%
+   attach_path = "#{application_root}#{attachment.public_filename}"
+%>
+
+
+<tr id="attachment_<%= attachment.id %>" ><%#= attachment.filename %>
+
+<td>
+<% if resource.respond_to? :id_image and attachment.is_image? %>
+  <%= radio_button resource.class.name.downcase,:id_image,attachment.id,{:title=>'selected as image'}%>
+<% end %>
+</td>
+<td> <%= image_tag file_type_icon_url(attachment)%></td>
+<td style="text-align:left"><%= link_to attachment.original_filename,attach_path,{:style=>"color:#0000CC;"} %></td>
+<td>
+<%= link_to_remote "Remove", :url  => attachment_path(:id => attachment), :method => :delete, :html => { :title  => "Remove this attachment"} %>
+</td>
+</tr>

@@ -1,0 +1,10 @@
+<%= javascript_include_tag 'sharing.js', 'studied_factor.js'-%>
+<div id="add_compound">
+    <%= render :partial=>"add_compound" %>
+</div>
+<ul id='compounds' class='compounds'>
+    <%= render :partial=>"compound_row_headings" %>
+    <div id="compound_rows">
+        <%= render :partial=>"compound_row",  :collection=>@compounds %>
+    </div>
+</ul>

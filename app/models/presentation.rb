@@ -8,16 +8,14 @@ class Presentation < ActiveRecord::Base
    attr_accessor :orig_data_file_id
 
    acts_as_asset
-   belongs_to :content_blob
 
-   validates_presence_of :content_blob
+   has_one :content_blob, :as => :asset, :foreign_key => :asset_id ,:conditions => 'asset_version= #{self.version}'
 
-   acts_as_solr(:fields=>[:description,:title,:original_filename,:tag_counts]) if Seek::Config.solr_enabled
+   acts_as_solr(:fields=>[:description,:title,:original_filename,:searchable_tags]) if Seek::Config.solr_enabled
 
 
    explicit_versioning(:version_column => "version") do
     acts_as_versioned_resource
-    belongs_to :content_blob
   end
 
    if Seek::Config.events_enabled

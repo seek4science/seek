@@ -142,9 +142,8 @@ help_documents:
       \r\n\
       *Title* \xE2\x80\x93 as described above. All assets should have a title\r\n\
       *Description* - free text to describe what the SOP is used for\r\n\
-      *Experimental conditions* - what were the measurements in this experiment (e.g. concentration, pH or gene expression). If you are uploading directly through SEEK, you can chose from a drop-down list\r\n\
-      *Measured Item* \xE2\x80\x93 what was measured in this data, e.g. concentration of glucose. Measured items should be named using controlled vocabulary terms wherever possible, for example, glucose has chEBI name glucose and chEBI ID CHEBI:17234\r\n\
-      *Units*  \xE2\x80\x93  how the measurements were taken e.g. concentration in mmol, or mass in grams.\r\n\
+      *Experimental conditions* - what was standardised and fixed in this experiment (e.g. concentration of nutrients, pH, temperature). If you are uploading directly through SEEK, you can chose from a drop-down list\r\n\
+      *Units*  \xE2\x80\x93  how the measurements were taken e.g. concentration in mmol or mass in grams.\r\n\
       \r\n\
       \r\n\
       h3. Publications\r\n\
@@ -155,7 +154,7 @@ help_documents:
       \r\n\
       *Attribution* \xE2\x80\x93 Some assets are based on others, for example, a model may use data from an experimental assay, or a SOP may be a modified version of another. The attribution section allows you to specify when this is the case\r\n"
     - 2010-05-20 08:37:01
-    - 2010-05-20 08:37:01
+    - 2011-07-26 09:21:21
   - - "9"
     - transcriptomics-guidelines
     - Transcriptomics Guidelines
@@ -334,7 +333,7 @@ help_documents:
       SysMO-DB, the SysMO-PALs and other members of the SysMO consortium have been developing a collection of JERM templates to facilitate standard formats for sharing the same kinds of data through the consortium. This page lists the current templates available. 
 
     - 2010-05-28 09:14:54
-    - 2010-05-28 13:40:08
+    - 2011-01-20 12:32:01
   - - "14"
     - isa-best-practice
     - ISA Best Practice

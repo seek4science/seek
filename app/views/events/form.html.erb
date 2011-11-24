@@ -2,7 +2,7 @@
 <%= javascript_include_tag 'assays.js' %>
 <%= javascript_include_tag 'calendar_date_select/calendar_date_select' %>
 <%= stylesheet_link_tag 'calendar_date_select/default' %>
-<%= javascript_include_tag "sharing.js" %>
+<%= javascript_include_tag "sharing.js", 'resource.js' %>
 
 <h1><%= @new ? 'New Event' : ('Editing Event: ' + link_to(h(@event.title), event_path(@event))) -%></h1>
 <div class="show_basic">
@@ -67,10 +67,23 @@
             <p>
               <%= render :partial => "assets/sharing_form" -%>
             </p>
+            <p>
+              <%= render :partial => "assets/special_auth_code_form", :locals => {:f => f} %>
+            </p>
         <% end %>
       </div>
       <p>
-        <%= f.submit(@new ? "Create" : "Update", :disable_with=>(@new ? "Creating..." :"Updating...")) %>
+        <%
+             button_text=@new ? "Create" : "Update"
+             disabled_text=@new ? "Creating..." : "Updating..."
+             is_new_file=@new ? true : false
+        %>
+        <% if @event.can_manage? %>
+            <%= preview_permission_popup_link('event', url_for(:controller => 'policies', :action => 'preview_permissions'), is_new_file, try_block{@event.contributor.id})-%>
+            <%= f.submit button_text, :id => "event_submit_btn", :onclick => "javascript: clickLink($('preview_permission'));;return(false);" -%>
+        <% else %>
+            <%= f.submit button_text, :disable_with=>disabled_text, :id => "event_submit_btn", :onclick => "javascript: $('event_submit_btn').form.submit();return(false);" -%>
+        <% end %>
       </p>
   <% end %>
 </div>

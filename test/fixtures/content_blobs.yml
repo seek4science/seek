@@ -29,39 +29,339 @@ content_blob_with_little_file:
   
 content_blob_with_little_file2:  
   uuid: <%= init_blob('little_file_v2.txt') %>  
+  asset: my_first_sop (Sop)
+  original_filename: "little_file.txt"
+  content_type: "text/plain"
+  asset_version: 1
+
+editable_sop_blob:
+  uuid: <%=  init_blob('little_file.txt') %>
+  asset: editable_sop (Sop)
+  original_filename: "little_file.txt"
+  content_type: "text/plain"
+  asset_version: 1
+
+sop_with_fully_public_policy_blob:
+  uuid: <%=  init_blob('little_file.txt') %>
+  asset: sop_with_fully_public_policy (Sop)
+  original_filename: "little_file.txt"
+  content_type: "text/plain"
+  asset_version: 1
+
+private_sop_blob:
+  uuid: <%=  init_blob('little_file.txt') %>
+  asset: private_sop (Sop)
+  original_filename: "little_file.txt"
+  content_type: "text/plain"
+  asset_version: 1
+
+sop_with_download_for_all_sysmo_users_policy:
+  uuid: <%=  init_blob('little_file.txt') %>
+  asset: sop_with_download_for_all_sysmo_users_policy (Sop)
+  original_filename: "little_file.txt"
+  content_type: "text/plain"
+  asset_version: 1
+
+sop_with_all_sysmo_users_policy_blob:
+  uuid: <%=  init_blob('little_file.txt') %>
+  asset: sop_with_all_sysmo_users_policy (Sop)
+  original_filename: "little_file.txt"
+  content_type: "text/plain"
+  asset_version: 1
+
+sop_with_custom_permissions_policy_blob:
+  uuid: <%=  init_blob('little_file.txt') %>
+  asset: sop_with_custom_permissions_policy (Sop)
+  original_filename: "little_file.txt"
+  content_type: "text/plain"
+  asset_version: 1
+
+sop_with_complex_permissions_blob:
+  uuid: <%=  init_blob('little_file.txt') %>
+  asset: sop_with_complex_permissions (Sop)
+  original_filename: "little_file.txt"
+  content_type: "text/plain"
+  asset_version: 1
+
+sop_with_private_policy_and_custom_sharing_blob:
+  uuid: <%=  init_blob('little_file.txt') %>
+  asset: sop_with_private_policy_and_custom_sharing (Sop)
+  original_filename: "little_file.txt"
+  content_type: "text/plain"
+  asset_version: 1
+
+sop_with_public_download_and_no_custom_sharing_blob:
+  uuid: <%=  init_blob('little_file.txt') %>
+  asset: sop_with_public_download_and_no_custom_sharing (Sop)
+  original_filename: "little_file.txt"
+  content_type: "text/plain"
+  asset_version: 1
+
+sop_that_uses_whitelist_blacklist_and_custom_sharing_blob:
+  uuid: <%=  init_blob('little_file.txt') %>
+  asset: sop_that_uses_whitelist_blacklist_and_custom_sharing (Sop)
+  original_filename: "little_file.txt"
+  content_type: "text/plain"
+  asset_version: 1
+
+sop_for_test_with_workgroups_blob:
+  uuid: <%=  init_blob('little_file.txt') %>
+  asset: sop_for_test_with_workgroups (Sop)
+  original_filename: "little_file.txt"
+  content_type: "text/plain"
+  asset_version: 1
+
+sop_for_test_with_workgroups_no_custom_sharing_blob:
+  uuid: <%=  init_blob('little_file.txt') %>
+  asset: sop_for_test_with_workgroups_no_custom_sharing (Sop)
+  original_filename: "little_file.txt"
+  content_type: "text/plain"
+  asset_version: 1
+
+sop_for_test_with_projects_institutions_blob:
+  uuid: <%=  init_blob('little_file.txt') %>
+  asset: sop_for_test_with_projects_institutions (Sop)
+  original_filename: "little_file.txt"
+  content_type: "text/plain"
+  asset_version: 1
+
+downloadable_sop_blob2:
+  uuid: <%=  init_blob('little_file_v2.txt') %>
+  asset: downloadable_sop (Sop)
+  original_filename: "little_file.txt"
+  content_type: "text/plain"
+  asset_version: 2
+
+downloadable_sop_blob1:
+  uuid: <%=  init_blob('little_file.txt') %>
+  asset: downloadable_sop (Sop)
+  original_filename: "little_file.txt"
+  content_type: "text/plain"
+  asset_version: 1
+
+sop_with_links_in_description_blob:
+  uuid: <%=  init_blob('little_file.txt') %>
+  asset: sop_with_links_in_description (Sop)
+  original_filename: "little_file.txt"
+  content_type: "text/plain"
+  asset_version: 1
+
+
+sop_with_no_contributor_blob:
+  uuid: <%=  init_blob('little_file.txt') %>
+  asset: sop_with_no_contributor (Sop)
+  original_filename: "little_file.txt"
+  content_type: "text/plain"
+  asset_version: 1
 
 teusink_blob:  
   uuid: <%= init_blob('Teusink.xml') %>
+  asset: teusink (Model)
+  asset_version: 2
+  original_filename: Teusink.xml
+  content_type: text/xml
+
+teusink_with_space_blob:
+  uuid: <%= init_blob('Teusink.xml') %>
+  asset: teusink_with_space (Model)
+  asset_version: 1
+  original_filename: Teusink (1).xml
+  content_type: text/xml
 
 jws_model_blob:  
   uuid: <%= init_blob('Teusink2010921171725.dat') %>
-  
+  asset: jws_model (Model)
+  asset_version: 1
+  original_filename: JWS Model.dat
+  content_type: text/xml
+
 francos_model_blob:  
   uuid: <%= init_blob('BIOMD0000000064.xml') %>  
+  asset: francos_model (Model)
+  asset_version: 1
+  original_filename: BIOMD0000000064.xml
+  content_type: text/xml
 
 picture_blob:  
   uuid: <%= init_blob('file_picture.png') %>
-  
-spreadsheet_blob:  
+  asset: picture (DataFile)
+  asset_version: 1
+  original_filename: file_pictuer.png
+  content_type: text/png
+
+private_data_file_blob:
+  uuid: <%= init_blob('file_picture.png') %>
+  asset: private_data_file (DataFile)
+  asset_version: 1
+  original_filename: file_pictuer.png
+  content_type: text/png
+
+url_based_data_file_blob:
+  url: http://mockedlocation.com/a-piccy.png
+  uuid: <%= UUIDTools::UUID.random_create.to_s %>
+  asset: url_based_data_file (DataFile)
+  asset_version: 1
+  original_filename: sysmologo.png
+  content_type: images/png
+
+
+editable_data_file_blob:
+  uuid: <%= init_blob('file_picture.png') %>
+  asset: editable_data_file (DataFile)
+  asset_version: 1
+  original_filename: file_pictuer.png
+  content_type: text/png
+
+sysmo_data_file_blob:
+    uuid: <%= init_blob('file_picture.png') %>
+    asset: sysmo_data_file (DataFile)
+    asset_version: 1
+    original_filename: file_pictuer.png
+    content_type: text/png
+
+myexperiment_data_file_blob:
+    uuid: <%= init_blob('file_picture.png') %>
+    asset: myexperiment_data_file (DataFile)
+    asset_version: 1
+    original_filename: file_pictuer.png
+    content_type: text/png
+
+data_file_with_links_in_description_blob:
+    uuid: <%= init_blob('file_picture.png') %>
+    asset: data_file_with_links_in_description (DataFile)
+    asset_version: 1
+    original_filename: file_pictuer.png
+    content_type: text/png
+
+data_file_with_no_contributor_blob:
+    uuid: <%= init_blob('file_picture.png') %>
+    asset: data_file_with_no_contributor (DataFile)
+    asset_version: 1
+    original_filename: file_pictuer.png
+    content_type: text/png
+
+
+
+spreadsheet_blob_download:
   uuid: <%= init_blob('small-test-spreadsheet.xls') %>
-  
+  asset: downloadable_data_file (DataFile)
+  asset_version: 1
+  original_filename: spreadsheet.xls
+  content_type: application/vnd.excel
+
+spreadsheet_blob_view:
+  uuid: <%= init_blob('small-test-spreadsheet.xls') %>
+  asset: viewable_data_file (DataFile)
+  asset_version: 1
+  original_filename: spreadsheet.xls
+  content_type: application/vnd.excel
+
+private_spreadsheet_blob:
+  uuid: <%= init_blob('small-test-spreadsheet.xls') %>
+  original_filename: spreadsheet.xls
+  content_type: application/vnd.excel
+  asset: non_downloadable_data_file (DataFile)
+  asset_version: 1
+
 url_content_blob:
   url: http://mockedlocation.com/a-piccy.png
   uuid: <%= UUIDTools::UUID.random_create.to_s %>
-  
+  asset: url_content_blob (DataFile)
+  asset_version: 1
+  original_filename: sysmologo.png
+  content_type: images/png
+
 url_no_host_content_blob:
   url: http://sdkfhsdfkhskfj.com/pic.png 
   uuid: <%= UUIDTools::UUID.random_create.to_s %>
-  
+  asset: url_no_host_data_file (DataFile)
+  asset_version: 1
+  original_filename: sysmologo.png
+  content_type: images/png
+
 url_not_found_content_blob:
   url: http://mocked404.com
   uuid: <%= UUIDTools::UUID.random_create.to_s %>  
-  
+  asset: url_not_found_data_file (DataFile)
+  asset_version: 1
+  original_filename: sysmologo.png
+  content_type: images/png
+
 non_sbml_xml_blob:  
   uuid: <%= init_blob('non_sbml_xml.xml') %>
-  
+  asset: non_sbml_xml  (Model)
+  asset_version: 1
+  original_filename: non_sbml_xml.xml
+  content_type: text/xml
 invalid_sbml_xml_blob:  
   uuid: <%= init_blob('invalid_sbml_xml.xml') %>    
-  
+  asset: invalid_sbml_xml  (Model)
+  asset_version: 1
+  original_filename: invalid_sbml_xml.xml
+  content_type: text/xml
+
 non_jws_dat_blob:  
-  uuid: <%= init_blob('non_jws_dat.dat') %>    
+  uuid: <%= init_blob('non_jws_dat.dat') %>
+  asset: non_jws_dat   (Model)
+  asset_version: 1
+  original_filename: non_jws_dat.xml
+  content_type: text/xml
+
+unique_spreadsheet_blob:
+  uuid: <%= init_blob('small-test-spreadsheet.xls') %>
+  original_filename: spreadsheet.xls
+  content_type: application/vnd.excel
+  asset_version: 1
+  asset: downloadable_spreadsheet_data_file (DataFile)
+
+not_so_unique_spreadsheet_blob:
+  uuid: <%= init_blob('small-test-spreadsheet.xls') %>
+  original_filename: spreadsheet.xls
+  content_type: application/vnd.excel
+  asset_version: 2
+  asset: downloadable_spreadsheet_data_file (DataFile)
+
+  
+model_with_format_and_type_blob:
+  uuid: <%= init_blob('Teusink.xml') %>
+  asset: model_with_format_and_type (Model)
+  asset_version: 1
+  original_filename: Teusink.xml
+  content_type: text/xml
+
+model_with_links_in_description_blob:
+  uuid: <%= init_blob('Teusink.xml') %>
+  asset: model_with_links_in_description (Model)
+  asset_version: 1
+  original_filename: Teusink.xml
+  content_type: text/xml
+
+model_with_different_owner_blob:
+  uuid: <%= init_blob('Teusink.xml') %>
+  asset: model_with_different_owner (Model)
+  asset_version: 1
+  original_filename: Teusink.xml
+  content_type: text/xml
+
+model_with_no_contributor_blob:
+  uuid: <%= init_blob('Teusink.xml') %>
+  asset: model_with_no_contributor (Model)
+  asset_version: 1
+  original_filename: Teusink.xml
+  content_type: text/xml
+
+
+model_jws_incompatible_blob:
+  uuid: <%= init_blob('file_picture.png') %>
+  asset: model_jws_incompatible (Model)
+  asset_version: 1
+  original_filename: file_picture.png
+  content_type: text/png
+
+
+private_model_blob:
+  uuid: <%= init_blob('file_picture.png') %>
+  asset: private_model (Model)
+  asset_version: 1
+  original_filename: file_picture.png
+  content_type: text/png

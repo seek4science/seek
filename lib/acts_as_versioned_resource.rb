@@ -37,6 +37,22 @@ module Acts #:nodoc:
     end
 
     module InstanceMethods
+
+
+      def content_blob
+        if !self.respond_to?(:content_blobs) && self.respond_to?(:content_blob)
+          ContentBlob.find(:first, :conditions => ["asset_id =? and asset_type =? and asset_version =?", self.parent.id, self.parent.class.name, self.version])
+        elsif self.respond_to? :content_blobs
+          self.content_blobs.last
+        end
+      end
+
+      def content_type
+          self.content_blob.content_type
+      end
+      def original_filename
+          self.content_blob.original_filename
+      end
       # this method will take attributions' association and return a collection of resources,
       # to which the current resource is attributed
       def attributions_objects
@@ -109,6 +125,10 @@ module Acts #:nodoc:
 
       def show_contributor_avatars?
         parent.show_contributor_avatars?
+      end
+
+      def annotations
+        parent.annotations if parent.respond_to? :annotations
       end
     end
   end

@@ -1,0 +1,17 @@
+= Annotations Plugin (for Ruby on Rails applications)
+
+Original Author::   	Jiten Bhagat (mailto:mail@jits.co.uk)
+Copyright::         	(c) 2008-2011, the University of Manchester and the European Bioinformatics Institute (EMBL-EBI)
+License::           	BSD
+Version::           	0.4.1
+
+For information on the plugin and to get started, see README.rdoc
+
+For credits and origins, see AUTHORS.rdoc
+
+For license, see LICENSE
+
+For the latest updates, see CHANGELOG.rdoc
+
+To run the tests in the plugin, see RUNNING_TESTS.rdoc
+

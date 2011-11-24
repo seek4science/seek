@@ -1,0 +1,22 @@
+<%# cache "super_tag_cloud" do -%>
+<div class="contribution_title">
+  <h1>All tags</h1>
+</div>
+<div class="show_basic">
+   <%
+
+     tags = Annotation.all.collect{|a| a.value}
+     tag_values = []
+     annotations = []
+     tags.each do |tag|
+       if !(tag_values.include?(tag.id))
+         annotations << tag
+         tag_values << tag.id
+       end
+     end
+     tags = annotations
+      %>
+   <%= render :partial=>"layouts/tag_cloud",:locals=>{:tags=>tags,:show_overall_count=>true,:id=>"super_tag_cloud",:tags_smaller=>false} %>
+
+</div>
+<%# end -%>

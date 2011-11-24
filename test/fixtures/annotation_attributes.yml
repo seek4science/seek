@@ -1,0 +1,7 @@
+annotation:
+  name: annotation
+  identifier: "http://www.example.org/attribute#annotation"
+
+description:
+  name: description
+  identifier: "http://www.example.org/attribute#description"

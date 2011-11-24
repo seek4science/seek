@@ -34,7 +34,7 @@ class AdminController < ApplicationController
   end
   
   def tags
-    @tags=ActsAsTaggableOn::Tag.find(:all,:order=>:name)
+    @tags=TextValue.all_tags.sort_by{|t| t.text}
   end
 
   def update_features_enabled
@@ -145,6 +145,7 @@ class AdminController < ApplicationController
     Seek::Config.bioportal_api_key = params[:bioportal_api_key]
     Seek::Config.tag_threshold = params[:tag_threshold] if only_integer params[:tag_threshold], "tag threshold"
     Seek::Config.max_visible_tags = params[:max_visible_tags] if only_positive_integer params[:max_visible_tags], "maximum visible tags"
+    Seek::Config.sabiork_ws_base_url = params[:sabiork_ws_base_url] unless params[:sabiork_ws_base_url].nil?
     update_flag = (params[:pubmed_api_email] == '' ||(check_valid_email params[:pubmed_api_email], "pubmed api email")) && (params[:crossref_api_email] == '' || (check_valid_email params[:crossref_api_email], "crossref api email")) && (only_integer params[:tag_threshold], "tag threshold") && (only_positive_integer params[:max_visible_tags], "maximum visible tags")
     update_redirect_to update_flag,'others'
   end
@@ -164,43 +165,42 @@ class AdminController < ApplicationController
 
   def edit_tag
     if request.post?
-      @tag=ActsAsTaggableOn::Tag.find(params[:id])
+      @tag=TextValue.find(params[:id])
       replacement_tags = []
 
       params[:tags_autocompleter_selected_ids].each do |selected_id|
-          replacement_tags << ActsAsTaggableOn::Tag.find(selected_id)
+          replacement_tags << TextValue.find(selected_id)
       end unless params[:tags_autocompleter_selected_ids].nil?
       params[:tags_autocompleter_unrecognized_items].select{|t| !t.blank?}.each do |item|
-          tag = ActsAsTaggableOn::Tag.find_by_name(item)
-          tag = ActsAsTaggableOn::Tag.create :name=>item if tag.nil?
+          tag = TextValue.find_by_text(item)
+          tag = TextValue.create :text=>item if tag.nil?
           replacement_tags << tag
       end unless params[:tags_autocompleter_unrecognized_items].nil?
       
-      @tag.taggings.select{|t| !t.taggable.nil?}.each do |tagging|
-        context=tagging.context
-        taggable=tagging.taggable
-        tagger=tagging.tagger
-        tagging.destroy unless replacement_tags.include?(@tag)
+      @tag.annotations.each do |a|
+        annotatable = a.annotatable
+        source = a.source
+        attribute_name = a.attribute.name
+        a.destroy unless replacement_tags.include?(@tag)
         replacement_tags.each do |tag|
-          if ActsAsTaggableOn::Tagging.find(:all,:conditions=>{:context=>context,:tag_id=>tag.id}).select{|t| t.tagger==tagger && t.taggable==taggable}.empty?
-            new_tagging = ActsAsTaggableOn::Tagging.new :taggable=>taggable,:tagger=>tagger, :tag_id=>tag.id, :context=>context
-            new_tagging.save!
-          end          
+          if annotatable.annotations_with_attribute_and_by_source(attribute_name, source).select{|a| a.value == tag}.blank?
+            new_annotation = Annotation.new :attribute_name=>attribute_name, :value=>tag, :annotatable => annotatable, :source => source
+            new_annotation.save!
+          end
         end
-
       end
 
-      @tag=ActsAsTaggableOn::Tag.find(params[:id])
+      @tag=TextValue.find(params[:id])
 
-      @tag.destroy if @tag.taggings.select{|t| !t.taggable.nil?}.empty?
+      @tag.destroy if @tag.annotations.blank?
 
       #FIXME: don't like this, but is a temp solution for handling lack of observer callback when removing a tag
       expire_fragment("sidebar_tag_cloud")
 
       redirect_to :action=>:tags
     else
-      @tag=ActsAsTaggableOn::Tag.find(params[:id])
-      @all_tags_as_json=ActsAsTaggableOn::Tag.find(:all).collect{|t| {'id'=>t.id, 'name'=>t.name}}.to_json
+      @tag=TextValue.find(params[:id])
+      @all_tags_as_json=TextValue.find(:all).collect{|t| {'id'=>t.id, 'name'=>t.text}}.to_json
       respond_to do |format|
         format.html
       end
@@ -209,10 +209,13 @@ class AdminController < ApplicationController
   end
 
   def delete_tag
-    tag=ActsAsTaggableOn::Tag.find(params[:id])
+    tag=TextValue.find(params[:id])
     if request.post?
+      tag.annotations.each do |a|
+        a.delete
+      end
       tag.delete
-      flash.now[:notice]="Tag #{tag.name} deleted"
+      flash.now[:notice]="Tag #{tag.text} deleted"
 
     else
       flash.now[:error]="Must be a post"

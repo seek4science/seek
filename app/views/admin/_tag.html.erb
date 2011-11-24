@@ -1,12 +1,12 @@
 <% name_class=dubious_tag?(tag) ? "dubious_tag" : ""
-   name_class="unlinked_tag" if name_class.empty? and tag.taggings.select{|t| !t.taggable.nil?}.size==0
-   associated_count=tag.taggings.select{|t| !t.taggable.nil?}.size
+   name_class="unlinked_tag" if name_class.empty? and tag.annotations.blank?
+   associated_count=tag.annotations.count
 
 -%>
-<% contexts=tag.taggings.collect{|t| t.context}.uniq -%>      
+<% contexts=tag.annotations.collect{|a| a.attribute.name}.uniq -%>
 <tr>
   <td><%= tag.id -%></td>
-  <td class="<%= name_class -%>"><%= h(tag.name) -%></td>
+  <td class="<%= name_class -%>"><%= h(tag.text) -%></td>
   <td><%= associated_count -%></td>
   <td><%= contexts.join(", ") -%></td>
   <td>

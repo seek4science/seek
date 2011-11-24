@@ -5,7 +5,8 @@ class AssayTest < ActiveSupport::TestCase
 
 
   test "shouldnt edit the assay" do
-    user = users(:aaron)
+    non_admin = Factory :user,:person=> Factory(:person,:is_admin=>false)
+    user = non_admin #users(:aaron)
     assay = assays(:modelling_assay_with_data_and_relationship)
     assert_equal false, assay.can_edit?(user)
   end
@@ -38,9 +39,10 @@ class AssayTest < ActiveSupport::TestCase
 
   test "is_modelling" do
     assay=assays(:metabolomics_assay)
-    User.current_user = assay.contributor
+    User.current_user = assay.contributor.user
     assert !assay.is_modelling?
     assay.assay_class=assay_classes(:modelling_assay_class)
+    assay.samples = []
     assay.save!
     assert assay.is_modelling?
   end
@@ -57,9 +59,10 @@ class AssayTest < ActiveSupport::TestCase
 
   test "is_experimental" do
     assay=assays(:metabolomics_assay)
-    User.current_user = assay.contributor
+    User.current_user = assay.contributor.user
     assert assay.is_experimental?
     assay.assay_class=assay_classes(:modelling_assay_class)
+    assay.samples = []
     assay.save!
     assert !assay.is_experimental?
   end
@@ -116,10 +119,10 @@ class AssayTest < ActiveSupport::TestCase
 
     assay.owner=people(:person_for_model_owner)
 
-      #an modelling assay can be valid without a technology type,but require sample or organism
+      #an modelling assay can be valid without a technology type, sample or organism
     assay.assay_class=assay_classes(:modelling_assay_class)
     assay.technology_type=nil
-      assay.samples = [Factory(:sample)]
+      assay.samples = []
     assert assay.valid?
     
     #an experimental assay can be invalid without a sample
@@ -318,6 +321,13 @@ class AssayTest < ActiveSupport::TestCase
       :assay_class => assay_classes(:experimental_assay_class),
       :samples => [Factory :sample]
     )
+  end
 
+  test "related models" do
+    model_assay = Factory :modelling_assay,:model_master_ids => [Factory(:model).id]
+    exp_assay = Factory :experimental_assay,:model_master_ids => [Factory(:model).id]
+    assert_equal model_assay.models, model_assay.related_models
+    assert_not_equal exp_assay.models,exp_assay.related_models
+    assert_equal [], exp_assay.related_models
   end
 end

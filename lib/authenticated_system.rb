@@ -87,6 +87,11 @@ module AuthenticatedSystem
     redirect_to(session[:return_to] || default)
     session[:return_to] = nil
   end
+
+  def redirect_back
+    redirect_to(:back)
+    session[:return_to] = nil
+  end
   
   # Inclusion hook to make #current_user and #logged_in?
   # available as ActionView helper methods.
