@@ -22,7 +22,9 @@
                                :narrow_view => true,
                                :authorization_already_done => false, :limit => 20} -%>
     </div>
-    <% Scale.all.map(&:title).reject{|s| s == 'cell'}.each do |s|%>
+    <% scale_titles = Scale.all.map(&:title)
+       scale_titles = ['all'] + scale_titles
+       scale_titles.reject{|s| s == 'cell'}.each do |s|%>
     <div id="<%= s %>_results" class="scaled_items" style="display: none;"></div>
     <% end %>
 </div>
