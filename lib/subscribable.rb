@@ -46,7 +46,7 @@ module Subscribable
   end
 
   def set_default_subscriptions
-    Person.all.each do |person|
+    Person.scoped(:include => [:project_subscriptions, {:project_subscriptions => [:project, {:project => :ancestors}]}]).each do |person|
       if project_subscription = person.project_subscriptions.detect {|s| !(([s.project] + s.project.ancestors) & self.projects).empty?}
         subscriptions.build :person => person unless project_subscription.unsubscribed_types.include? self.class.name
       end
