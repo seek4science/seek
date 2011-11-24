@@ -18,7 +18,7 @@ jQuery(document).ready(function($) {
         imgarray.reverse();
 
         //Variablen festlegen, sichtabres Bild ist immer zuerst Bild-0
-        var curImage = imgarray[(imgarray.length - 1)];
+        var curImage = imgarray[current_scale];
         var previousValue;
         var val;
 

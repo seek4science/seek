@@ -42,7 +42,8 @@ class ScalesController < ApplicationController
 
 
     render :update do |page|
-      page.replace_html "#{@scale.title || 'all'}_results", :partial=>"assets/resource_listing_tabbed_by_class", :locals =>{:resource_hash=>resource_hash, :narrow_view => true, :authorization_already_done => true, :limit => 20, :tabs_id => "#{@scale.title}_resource_listing_tabbed_by_class"}
+      scale_title = @scale.try(:title) || 'all'
+      page.replace_html "#{scale_title}_results", :partial=>"assets/resource_listing_tabbed_by_class", :locals =>{:resource_hash=>resource_hash, :narrow_view => true, :authorization_already_done => true, :limit => 20, :tabs_id => "#{scale_title}_resource_listing_tabbed_by_class"}
       page.replace_html "js_for_tabber", :partial => "assets/force_loading_tabber"
     end
 
