@@ -1,6 +1,6 @@
 <script type="text/javascript">
   var loaded_scales = new Array();
-  loaded_scales['all'] = true;
+  loaded_scales['cell'] = true;
 </script>
 <%= render :partial => 'scales/scale_slider', :locals => {:scale_slider_function => (remote_function(
         :url=>{:action=>'scale_search', :controller=>'scales'},
@@ -15,14 +15,14 @@
 <div id="js_for_tabber"></div>
 
 <div id="scaled_items">
-    <div id="all_results" class="scaled_items">
+    <div id="cell_results" class="scaled_items">
       <% resource_hash = classify_for_tabs @scaled_objects -%>
       <%= render :partial => "assets/resource_listing_tabbed_by_class",
                    :locals => {:resource_hash => resource_hash,
                                :narrow_view => true,
                                :authorization_already_done => false, :limit => 20} -%>
     </div>
-    <% Scale.all.map(&:title).reject{|s| s == 'all'}.each do |s|%>
+    <% Scale.all.map(&:title).reject{|s| s == 'cell'}.each do |s|%>
     <div id="<%= s %>_results" class="scaled_items" style="display: none;"></div>
     <% end %>
 </div>
