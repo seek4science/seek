@@ -48,19 +48,17 @@ class SearchController < ApplicationController
     @results=[]
     if (Seek::Config.solr_enabled and !downcase_query.blank?)
       if type == "all"
-        sources = [Person, Project, Institution, Sop, Model, Study, DataFile, Assay, Investigation, Publication, Presentation, Event, Sample, Specimen]
-        sources.each do |source|
-          @results |= source.search do
-            keywords downcase_query
-            order_by :sort_field
-          end.results
-        end
+          sources = [Person, Project, Institution, Sop, Model, Study, DataFile, Assay, Investigation, Publication, Presentation, Event, Sample, Specimen]
+          sources.each do |source|
+            @results |=  source.search do
+               keywords downcase_query
+            end.results
+          end
       else
-        object = type=='data files' ? DataFile : type.singularize.capitalize.constantize
-        @results = object.search do
-          keywords downcase_query
-          order_by :sort_field
-        end.results
+           object = type=='data_files' ? DataFile : type.singularize.capitalize.constantize
+           @results =  object.search do
+              keywords downcase_query
+          end.results
       end
     end
   end
