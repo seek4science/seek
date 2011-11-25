@@ -13,11 +13,15 @@ class DataFileTest < ActiveSupport::TestCase
 #  end
 #
   test "spreadsheet contents for search" do
-    df = data_files(:downloadable_spreadsheet_data_file)
+    df = Factory :rightfield_datafile
+    
     data = df.spreadsheet_contents_for_search
-    assert !data.empty?
-    assert data.include?("fish")
-    assert data.include?("bottle")
+    assert !data.empty?,"Content should not be empty"
+    assert data.include?("Design Type")
+    assert data.include?("MethodologicalDesign")
+    assert data.include?("absolute")
+    assert !data.include?("ontology"),"Shouldn't include content from hidden sheets"
+    assert !data.include?("relative"),"Shouldn't include content from hidden sheets"
 
     df = data_files(:picture)
     assert_equal [],df.spreadsheet_contents_for_search
