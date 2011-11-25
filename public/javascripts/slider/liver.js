@@ -12,15 +12,16 @@ jQuery(document).ready(function($) {
         $("#zoom img").each(function () {
             var img = '#' + $(this).attr('id');
             imgarray.push(img);
+
         });
 
         // same order as scales_arr
         imgarray.reverse();
 
-        //Variablen festlegen, sichtabres Bild ist immer zuerst Bild-0
+
         var curImage = imgarray[current_scale];
         var previousValue;
-        var val;
+        var val=current_scale;
 
         // slider value<=>scale string
         var scales_arr = ["cell","intercellular","liverLobule","liver","organism","all"];//["organism","liver","liverLobe","liverLobule","intercellular","cell"];
@@ -39,7 +40,8 @@ jQuery(document).ready(function($) {
             slide: function (event, ui) {
                 previousValue = val;
                 val = ui.value;
-                //valCheck();
+                $('#scale').val(scales_arr[val]) ; // change scale filter for searching
+                valCheck();
                 scale_id = "#" + scales_arr[val];
                 $(scale_id).click();
             },
@@ -50,12 +52,14 @@ jQuery(document).ready(function($) {
         //then we change the current image to the new image.
         function valCheck() {
             if (val > previousValue) {
+                 //alert("val =" + val + "|| previousValue=" + previousValue);
                 imageSwap3(curImage, imgarray[val]);
                 curImage = imgarray[val];
 
             }
 
             else {
+                //alert("val =" + val + " &&  previousValue=" + previousValue);
                 imageSwap(curImage, imgarray[val]);
                 curImage = imgarray[val];
 
@@ -177,12 +181,14 @@ jQuery(document).ready(function($) {
 
         //We�re just setting val to be the same as num and then running valCheck when the user clicks one of the links, otherwise, the images would only swap when the user slides the handle back and forth. Now the image swap will work if the user either clicks the links or moves the slider.
         function moveSlider(e, num) {
+
             e.preventDefault();
             $('#slider').slider(
                     'value',
                     [num]
                     );
             val = num;
+
             valCheck();
         }
 
