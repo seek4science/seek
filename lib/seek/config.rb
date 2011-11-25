@@ -51,11 +51,9 @@ module Seek
 
     def smtp_propagate
       smtp_hash = self.smtp
-      #when using to retrieve smtp_hash, this hash becomes frozen, so need to make the copy of it in order to update the password
-      smtp_hash_copy = smtp_hash.dup
       password =  self.smtp_settings 'password'
-      smtp_hash_copy.merge! :password => password
-      ActionMailer::Base.smtp_settings = smtp_hash_copy
+      smtp_hash.merge! :password => password
+      ActionMailer::Base.smtp_settings = smtp_hash
     end
 
     def google_analytics_enabled_propagate
@@ -167,11 +165,7 @@ module Seek
 
     if Settings.table_exists?
       def get_value getter,conversion=nil
-        val = Rails.cache.read("settings:#{getter}")
-        if val.nil?
-          val = Settings.send getter
-          Rails.cache.write("settings:#{getter}", val)
-        end
+        val = Settings.send getter
         val = val.send(conversion) if conversion && val
         val
       end
