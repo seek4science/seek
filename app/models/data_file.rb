@@ -152,7 +152,7 @@ class DataFile < ActiveRecord::Base
   # Parameters:
   # - user - user that performs the action; this is required for authorization
   def self.get_all_as_json(user)
-    all_datafiles = DataFile.find(:all, :order => "ID asc")
+    all_datafiles = DataFile.find(:all, :order => "ID asc",:include=>[:policy,{:policy=>:permissions}])
     datafiles_with_contributors = all_datafiles.collect{ |d|
         d.can_view?(user) ?
         (contributor = d.contributor;
@@ -209,4 +209,9 @@ class DataFile < ActiveRecord::Base
     end
     flds.flatten.uniq
   end
+
+  def spreadsheet_contents_for_search
+    Seek::SpreadsheetHandler.new.contents_for_search self
+  end
+  
 end

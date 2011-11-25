@@ -107,7 +107,7 @@ module Authorization
     
     # not authorized items have been turned into NILs - remove these
     unless keep_nil_records
-      authorized_items = authorized_items.compact
+      authorized_items.compact!
     end
     
     return authorized_items
