@@ -131,18 +131,24 @@ class Policy < ActiveRecord::Base
   end
   
   def self.private_policy
-    policy = Policy.new(:name => "default private",                        
-                        :sharing_scope => PRIVATE,
-                        :access_type => NO_ACCESS,
-                        :use_whitelist => false,
-                        :use_blacklist => false)
+    Policy.new(:name => "default private",
+               :sharing_scope => PRIVATE,
+               :access_type => NO_ACCESS,
+               :use_whitelist => false,
+               :use_blacklist => false)
+  end
 
-    return policy
+  def self.registered_users_accessible_policy
+    Policy.new(:name => "default accessible",
+               :sharing_scope => ALL_SYSMO_USERS,
+               :access_type => ACCESSIBLE,
+               :use_whitelist => false,
+               :use_blacklist => false)
   end
 
   #The default policy to use when creating authorized items if no other policy is specified
   def self.default
-    private_policy
+    registered_users_accessible_policy
   end
    
   # translates access type codes into human-readable form
