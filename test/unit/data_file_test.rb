@@ -17,11 +17,21 @@ class DataFileTest < ActiveSupport::TestCase
     
     data = df.spreadsheet_contents_for_search
     assert !data.empty?,"Content should not be empty"
-    assert data.include?("Design Type")
-    assert data.include?("MethodologicalDesign")
+    assert data.include?("design type")
+    assert data.include?("methodological design"), "content should be humanized"
     assert data.include?("absolute")
     assert !data.include?("ontology"),"Shouldn't include content from hidden sheets"
     assert !data.include?("relative"),"Shouldn't include content from hidden sheets"
+
+    assert !data.include?("44.0"),"Should not include numbers"
+    assert !data.include?("1.0"),"Should not include numbers"
+    assert !data.include?("1.7"),"Should not include numbers"
+
+    assert !data.include?(44),"Should not include numbers"
+    assert !data.include?(1),"Should not include numbers"
+    assert !data.include?(1.7),"Should not include numbers"
+
+    assert !data.include?("seek id"),"Should not include blacklisted text"
 
     df = data_files(:picture)
     assert_equal [],df.spreadsheet_contents_for_search
@@ -299,8 +309,6 @@ class DataFileTest < ActiveSupport::TestCase
 
       sf1 = Factory :studied_factor_link,:substance=>suger
       sf2 = Factory :studied_factor_link, :substance=>metal
-
-
 
       Factory :studied_factor,:studied_factor_links=>[sf1,sf2],:data_file=>df
       assert df.fs_search_fields.include?("sugar")
