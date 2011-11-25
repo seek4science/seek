@@ -81,9 +81,6 @@ Rails::Initializer.run do |config|
       :compound_reindexer,
       :synonym_reindexer
 
-  config.gem 'sunspot', :lib => 'sunspot'
-  config.gem 'sunspot_rails', :lib => 'sunspot/rails'
-
 end
 
 
