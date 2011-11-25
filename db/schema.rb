@@ -9,7 +9,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20111125164619) do
+ActiveRecord::Schema.define(:version => 20111125173727) do
 
   create_table "activity_logs", :force => true do |t|
     t.string   "action"
@@ -832,6 +832,13 @@ ActiveRecord::Schema.define(:version => 20111125164619) do
 
   create_table "recommended_model_environments", :force => true do |t|
     t.string   "title"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
+  create_table "reindexing_queues", :force => true do |t|
+    t.string   "item_type"
+    t.integer  "item_id"
     t.datetime "created_at"
     t.datetime "updated_at"
   end
