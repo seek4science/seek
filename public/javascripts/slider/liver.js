@@ -42,6 +42,8 @@ jQuery(document).ready(function($) {
                 val = ui.value;
                 $('#scale').val(scales_arr[val]) ; // change scale filter for searching
                 valCheck();
+                scale_id = "#" + scales_arr[val];
+                $(scale_id).click();
             },
         });
 
