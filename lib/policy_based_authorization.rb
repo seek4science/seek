@@ -70,7 +70,9 @@ module Acts
       AUTHORIZATION_ACTIONS.each do |action|
         eval <<-END_EVAL
           def can_#{action}? user = User.current_user
-            new_record? or Authorization.is_authorized? "#{action}", nil, self, user
+            logger.debug Rails.cache.class.name
+            person_key = (user.try :person).try :cache_key
+            Rails.cache.fetch(:purpose => :authorization, :policy => policy.cache_key, :person => person_key, :action => :#{action}) {(new_record? or Authorization.is_authorized? "#{action}", nil, self, user) ? :true : :false} == :true
           end
         END_EVAL
       end
