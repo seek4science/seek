@@ -9,7 +9,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20111024104147) do
+ActiveRecord::Schema.define(:version => 20111125164619) do
 
   create_table "activity_logs", :force => true do |t|
     t.string   "action"
@@ -295,6 +295,21 @@ ActiveRecord::Schema.define(:version => 20111024104147) do
   create_table "db_files", :force => true do |t|
     t.binary "data", :limit => 2147483647
   end
+
+  create_table "delayed_jobs", :force => true do |t|
+    t.integer  "priority",   :default => 0
+    t.integer  "attempts",   :default => 0
+    t.text     "handler"
+    t.text     "last_error"
+    t.datetime "run_at"
+    t.datetime "locked_at"
+    t.datetime "failed_at"
+    t.string   "locked_by"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
+  add_index "delayed_jobs", ["priority", "run_at"], :name => "delayed_jobs_priority"
 
   create_table "disciplines", :force => true do |t|
     t.string   "title"
