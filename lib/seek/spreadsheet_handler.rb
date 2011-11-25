@@ -13,7 +13,9 @@ module Seek
         xml=data_file.spreadsheet_xml
         if !xml.nil?
           content = extract_content(xml)
+          content = process_content(content)
           content = filter_content(content)
+
         end
       rescue Exception=>e
         Rails.logger.error("Error processing spreadsheet for content_blob #{data_file.content_blob_id} #{e}")
@@ -34,9 +36,16 @@ module Seek
       content
     end
 
+    #does some manipulation of the content, e.g. converting camelcase and converting underscores
+    def process_content content
+      content.collect do |val|
+        val.underscore.humanize.downcase
+      end
+    end
+
     #filters out numbers and text declared in a black list
     def filter_content content
-      blacklist = ["SEEK ID"] #not yet defined
+      blacklist = ["seek id"] #not yet defined
       content = content - blacklist
       content.reject do |val|
         val.to_s.match(/\A[+-]?\d+?(\.\d+)?\Z/) != nil

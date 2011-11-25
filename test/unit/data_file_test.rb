@@ -17,8 +17,8 @@ class DataFileTest < ActiveSupport::TestCase
     
     data = df.spreadsheet_contents_for_search
     assert !data.empty?,"Content should not be empty"
-    assert data.include?("Design Type")
-    assert data.include?("MethodologicalDesign")
+    assert data.include?("design type")
+    assert data.include?("methodological design"), "content should be humanized"
     assert data.include?("absolute")
     assert !data.include?("ontology"),"Shouldn't include content from hidden sheets"
     assert !data.include?("relative"),"Shouldn't include content from hidden sheets"
@@ -31,7 +31,7 @@ class DataFileTest < ActiveSupport::TestCase
     assert !data.include?(1),"Should not include numbers"
     assert !data.include?(1.7),"Should not include numbers"
 
-    assert !data.include?("SEEK ID"),"Should not include blacklisted text"
+    assert !data.include?("seek id"),"Should not include blacklisted text"
 
     df = data_files(:picture)
     assert_equal [],df.spreadsheet_contents_for_search
