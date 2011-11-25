@@ -2,7 +2,7 @@ module Subscribable
   def self.included klass
     klass.class_eval do
       has_many :subscriptions, :required_access_to_owner => false, :as => :subscribable, :dependent => :destroy, :autosave => true, :before_add => proc {|item, sub| sub.subscribable = item}
-      #before_create :set_default_subscriptions
+      before_create :set_default_subscriptions
       extend ClassMethods
     end
   end
