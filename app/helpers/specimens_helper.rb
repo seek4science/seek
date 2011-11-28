@@ -23,7 +23,7 @@ module SpecimensHelper
     if organism
       result = link_to h(organism.title),organism,{:class => "assay_organism_info"}
 
-      if strain
+      if strain and strain.title != 'default'
         result += " : "
         result += link_to h(strain.title),strain,{:class => "assay_strain_info"}
       end

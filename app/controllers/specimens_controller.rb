@@ -31,11 +31,9 @@ class SpecimensController < ApplicationController
 
   def create
     @specimen = Specimen.new(params[:specimen])
-
-
-
     sop_ids = (params[:specimen_sop_ids].nil?? [] : params[:specimen_sop_ids].reject(&:blank?))||[]
     @specimen.policy.set_attributes_with_sharing params[:sharing], @specimen.projects
+
     #Add creators
     AssetsCreator.add_or_update_creator_list(@specimen, params[:creators])
     respond_to do |format|
@@ -44,6 +42,15 @@ class SpecimensController < ApplicationController
           sop= Sop.find sop_id
           SopSpecimen.create!(:sop_id => sop_id,:sop_version=> sop.version,:specimen_id=>@specimen.id)
         end
+
+        #strain
+        if params[:create_strain] == '1' || params[:create_strain] == '2'
+          strain = create_or_update_strain
+        else
+          strain = default_strain_for params[:specimen][:organism_id]
+        end
+        @specimen.strain = strain
+
         flash[:notice] = 'Specimen was successfully created.'
         format.html { redirect_to(@specimen) }
         format.xml  { head :ok }
@@ -71,9 +78,16 @@ class SpecimensController < ApplicationController
             if existing.blank?
                SopSpecimen.create!(:sop_id => sop_id,:sop_version=> sop.version,:specimen_id=>@specimen.id)
             end
-
           end
 
+          #strain
+          if params[:create_strain] == '1' || params[:create_strain] == '2'
+            strain = create_or_update_strain
+            @specimen.strain = strain
+          elsif params[:create_strain] == '0'
+             strain = default_strain_for params[:specimen][:organism_id]
+            @specimen.strain = strain
+          end
           flash[:notice] = 'Specimen was successfully updated.'
           format.html { redirect_to(@specimen) }
           format.xml  { head :ok }
@@ -97,5 +111,55 @@ class SpecimensController < ApplicationController
     end
   end
 
+  def create_or_update_strain
+    strain = @specimen.strain || Strain.new()
+        strain.attributes = params[:strain]
+
+        phenotype = strain.phenotype || Phenotype.new()
+        phenotype.attributes = params["phenotype"]
+        if phenotype['description'].blank?
+          strain.phenotype = nil
+          phenotype.destroy
+        else
+          strain.phenotype = phenotype
+        end
+
+        genotypes_params = params["genotypes"]
+        #destroy first the genotypes of strain
+        strain.genotypes.each do |genotype|
+          genotype.destroy
+        end
+        unless genotypes_params.blank?
+          genotypes_params.each_value do |value|
+
+            genotype = Genotype.new()
+            gene = Gene.find_by_title(value['gene']['title']) || (Gene.create(:title => value['gene']['title']) unless value['gene']['title'].blank?)
+            modification = Modification.find_by_title(value['modification']['title']) || (Modification.create(:title => value['modification']['title']) unless value['modification']['title'].blank?)
+            genotype.gene = gene
+            genotype.modification = modification
+            strain.genotypes << genotype unless gene.blank?
+          end
+        end
+        if strain.save
+          strain
+        else
+          flash[:error] = "Unable to create/update strain '#{strain.title}', '#{strain.errors}'"
+        end
+
+  end
+
+  def default_strain_for organism_id
+    strain = Strain.find(:all, :conditions => ['organism_id=? and title=?', organism_id, 'default']).first
+    unless strain
+      strain = Strain.new(:title => 'default', :organism_id => organism_id)
+      gene = Gene.find_by_title('wild-type') || Gene.create(:title => 'wild-type')
+      genotype = Genotype.new(:gene => gene)
+      phenotype = Phenotype.new(:description => 'wild-type')
+      strain.genotypes = [genotype]
+      strain.phenotype = phenotype
+      strain.save
+    end
+    strain
+  end
 end
 

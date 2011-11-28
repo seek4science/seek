@@ -18,23 +18,23 @@ class StrainsController < ApplicationController
   def show_existing_strain
     render :update do |page|
       page.remove 'strain_form'
-      page.insert_html :bottom, "create_based_on_existing_strain",:partial=>"strains/form",:locals=>{:strain => @strain}
+      page.insert_html :bottom, "create_based_on_existing_strain",:partial=>"strains/form",:locals=>{:strain => @strain, :action => params[:status], :organism_id => params[:organism_id]}
     end
   end
 
   def new_strain
-    @strain = Strain.new
+    @strain = Strain.find_by_id(params[:id]) || Strain.new
     render :update do |page|
       page.visual_effect :fade, 'existing_strains', :duration => 0.25
       page.remove 'strain_form'
-      page.insert_html :bottom, "create_new_strain",:partial=>"strains/form",:locals=>{:strain => @strain}
+      page.insert_html :bottom, "create_new_strain",:partial=>"strains/form",:locals=>{:strain => @strain, :action => params[:status], :organism_id => params[:organism_id]}
     end
   end
 
   def get_strains
     if params[:organism_id]
       @organism=Organism.find_by_id(params[:organism_id])
-      @strains=@organism.try(:strains)
+      @strains=@organism.try(:strains).reject{|s| s.title == 'default' || s.id == params[:strain_id].to_i}
     end
   end
 

@@ -1,6 +1,14 @@
 <%= stylesheet_link_tag 'styles.css' -%>
-
+<% action ||= nil%>
 <div class="strain" id="strain_form">
+  <% if action == 'update'
+        parent_strain = Strain.find_by_id(strain.parent_id).try(:title)
+     else
+        parent_strain = strain.title
+     end   %>
+  <p class="none_text" style="margin-left: 15em;">
+    <%= parent_strain.blank? ? '' : "This strain is created based on #{parent_strain}"%>
+  </p>
   <div class="yui-g">
     <center>
       <div class="yui-u first" style="width: 42%; margin-left: 2em; margin-top: 1em; margin-bottom: 1em;">
@@ -52,15 +60,16 @@
           <% i=1
              strain.genotypes.each do |genotype| %>
               <tr id='genotype_row_<%=i%>'>
-                <td> <%= text_field_tag "strain[genotypes][#{i}][gene][title]", genotype.gene.try(:title), :size => 10 %>
+                <td> <%= text_field_tag "genotypes[#{i}][gene][title]", genotype.gene.try(:title), :size => 10 %>
                 </td>
-                <td><%= text_field_tag "strain[genotypes][#{i}][modification][title]", genotype.modification.try(:title), :size => 10 %>
+                <td><%= text_field_tag "genotypes[#{i}][modification][title]", genotype.modification.try(:title), :size => 10 %>
                 </td>
                 <td> <%= link_to_function image("destroy", :alt=>"Delete", :title=>"Delete this entry", :id=> "delete_#{i}"), "fadeRow('#{i}')"-%>
                 </td>
               </tr>
               <% i += 1 %>
-          <% end %>
+             <% end %>
+
         </table>
         <img src='/images/famfamfam_silk/add.png' alt="Add more" title="Add more gene and mutation" onclick="addRow('genotype_table')"/>
       </div>
@@ -69,11 +78,16 @@
     <center>
       <div class="yui-u  box_simple" style="width: 42%;margin-right: 2em; margin-top: 1em; margin-bottom: 1em;">
       <label style="font-weight: bold"> Phenotype:</label>  <br/>
-          <%= text_area_tag "strain[phenotype][description]", strain.phenotype.try(:description), :cols => 28 %>
-      </div>
+          <%= text_area_tag "phenotype[description]", strain.phenotype.try(:description), :cols => 28 %>
+            </div>
     </center>
   </div>
-  <%= hidden_field_tag 'strain[id]', strain.try(:id) %>
+    <%= hidden_field_tag 'strain[organism_id]', organism_id %>
+  <%if action == 'update' %>
+    <%= hidden_field_tag 'strain[parent_id]', strain.parent_id %>
+  <%else%>
+    <%= hidden_field_tag 'strain[parent_id]', strain.id %>
+  <%end%>
 </div>
 
 

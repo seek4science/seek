@@ -3,13 +3,12 @@
 <%= f.error_messages %>
 
  <div style="width: 95%;">
-   <% if Seek::Config.is_virtualliver %>
        <h2>Specimen Details</h2>
        <p>
          <%= f.label :specimen_number -%><span class="required">*</span><br/>
          <%= f.text_field :donor_number, :style => "width: 350px;" -%>
        </p>
-
+   <% if Seek::Config.is_virtualliver %>
        <p>
          <%= f.label :treatment -%><br/>
          <%= f.text_field :treatment, :style => "width: 350px;" -%>
@@ -34,7 +33,7 @@
   </p>
   <br/>
   <p>
-    <%= render :partial=>"specimens/select_organisms" ,:locals=>{:f=>f}-%>
+    <%= render :partial=>"specimens/select_organisms" ,:locals=>{:f=>f, :action => action}-%>
   </p>
 
     <%= render :partial=>"assets/asset_form_bottom", :locals=> {
@@ -50,6 +49,6 @@
   </div>
 
 <p style="margin-top: 2em; text-align: center;">
-  <%= f.submit(action==:edit ? "Update" : "Create", :disable_with=>(action==:edit ? "Updating..." : "Creating...")) -%>
+  <%= f.submit(action==:update ? "Update" : "Create", :disable_with=>(action==:update ? "Updating..." : "Creating...")) -%>
   or <%= link_to 'Cancel', (@specimen.id ? specimen_path(@specimen.id) : specimens_path) -%>
 </p>

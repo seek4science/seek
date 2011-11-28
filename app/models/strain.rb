@@ -5,5 +5,7 @@ class Strain < ActiveRecord::Base
 
   named_scope :by_title
 
+  validates_presence_of :title
+
   include ActsAsCachedTree
 end

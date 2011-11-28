@@ -117,28 +117,50 @@
 
         </div>
         <div class="association_step">
-          <b>Step 3</b> - Create a strain (optional)<br/> <br/>
-          <div id="create_based_on_existing_strain">
-            <%= radio_button_tag(:create_strain, 1 , @specimen.strain.try(:parent_id) ? true : false,
-                                 :onchange=>remote_function(:url=>{:action=>"show_existing_strains", :controller=>"strains"},
-                                                            :with=>"'organism_id='+ $F('specimen_organism_id')",
-                                                            :before=>"show_ajax_loader('existing_strains')")+
-                                         ";return(false);") %>
-            <label>Create based on existing strain</label>
+          <b>Step 3</b> - Create a strain (optional)<br/>  <br/>
+          <% strain = @specimen.strain %>
+          <% if (action == :update) && (strain and strain.parent_id)%>
+              <%= link_to_remote(h(strain.title), {:url =>{:controller => 'strains', :action => 'show_existing_strain', :id => "#{strain.id}"},
+                  :with => "'status='+'update' + '&organism_id='+ $F('specimen_organism_id')", :before => remote_function(:url=>{:action=>"show_existing_strains", :controller=>"strains"},
+                                   :with=>"'strain_id='+'#{strain.id}' + '&organism_id='+ $F('specimen_organism_id')") + ";$('create_strain_2').checked = true;"}) %>
+              <br/><br/>
+          <% elsif (action == :update) && (strain and !strain.parent_id and strain.title != 'default')%>
+              <%= link_to_remote(h(strain.title), {:url =>{:controller => 'strains', :action => 'new_strain', :id => "#{strain.id}"},
+                                                   :with => "'status='+'update' + '&organism_id='+ $F('specimen_organism_id')", :before => "$('create_strain_1').checked = true"}) %>
+              <br/><br/>
+          <% end %>
+
+
+                <div id="create_based_on_existing_strain">
+                <%= radio_button_tag(:create_strain, 2 , false,
+                                     :onchange=>remote_function(:url=>{:action=>"show_existing_strains", :controller=>"strains"},
+                                   :with=>"'strain_id='+'#{strain.try:id}' + '&organism_id='+ $F('specimen_organism_id')",
+                                                                :before=>"show_ajax_loader('strain_form')")+";return(false);") %>
+              <label>Create based on existing strain</label>
+
+              </div>
+              <br/>
+              <div id='create_new_strain'>
+                <%= radio_button_tag(:create_strain, 1, false,
+                                     :onchange=>remote_function(:url=>{:action=>"new_strain", :controller=>"strains"},
+                                             :with=>"'organism_id='+ $F('specimen_organism_id')",
+                                                                :before=>"show_ajax_loader('strain_form')") + ";return(false);") %>
+              <label>Create without basing on existing strain</label>
+
+              </div>
+              <br/>
+              <div id='no_strain'>
+                <%= radio_button_tag(:create_strain, 0, false,
+                    :onchange=>"fadeCreateStrain();return(false);") %>
+              <label>No strain</label>
+                <div id='existing_strains'></div>
+                         <div id='strain_form'></div>
+
           </div>
-          <br/>
-          <div id='create_new_strain'>
-            <%= radio_button_tag(:create_strain, 2, (@specimen.strain and !@specimen.strain.parent_id ) ? true : false,
-                                 :onchange=>remote_function(:url=>{:action=>"new_strain", :controller=>"strains"})) %>
-            <label>Create a new strain</label>
           </div>
-          <div id='existing_strains'></div>
-          <div id='strain_form'></div>
-          <label style="color: #EEE;">---</label>
-        </div>
-      </div>
     </div>
   </div>
+</div>
 </div>
 
 <script type="text/javascript">
@@ -151,8 +173,9 @@
       }
       else {
         var radio_buttons = document.getElementsByName('create_strain');
-        radio_buttons[0].checked=false
-        radio_buttons[1].checked=false
+        for (var i=0; i< radio_buttons.length;i++){
+           radio_buttons[i].checked=false
+        }
         Effect.Fade('existing_strains', { duration: 0.25});
         Effect.Fade('strain_form', { duration: 0.25});
         Effect.Appear('extra_organism_details');
@@ -192,6 +215,19 @@
         }
        }
     }
+     var radio_buttons = document.getElementsByName('create_strain');
+     var selected_radio_button
+     for (var i = 0; i < radio_buttons.length; i++) {
+         if (radio_buttons[i].checked == 'checked') {
+             if (radio_buttons[i].value =='2'){
+
+             }else if(radio_buttons[i].value =='1'){
+
+             }
+
+             break;
+         }
+     }
 
     check_show_add_organism();
     check_show_which_fields();
