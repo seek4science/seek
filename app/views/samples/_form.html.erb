@@ -43,11 +43,14 @@
   <%= render :partial => 'projects/project_selector', :locals => {:resource => @sample,:allow_nil=>true}%>
 
   <br style="clear:both"/>
-  <p>
-      <%= render :partial => "assets/sharing_form" -%>
-  </p>
 
-  <%= fancy_multiselect @sample, :sops, :name => 'sample_sop_ids', :association_class=>Sop,:selected => (params[:sample_sop_ids] || []).map(&:to_i) | @sample.sop_masters.map(&:sop_id) %>
+  <% if @sample.can_manage?%>
+      <p>
+          <%= render :partial => "assets/sharing_form" -%>
+      </p>
+
+      <%= fancy_multiselect @sample, :sops, :name => 'sample_sop_ids', :association_class=>Sop,:selected => (params[:sample_sop_ids] || []).map(&:to_i) | @sample.sop_masters.map(&:sop_id) %>
+  <% end %>
 </div>
 
 <%= f.hidden_field :from_new_link %>

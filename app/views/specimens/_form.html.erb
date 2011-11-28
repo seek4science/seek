@@ -36,6 +36,7 @@
     <%= render :partial=>"specimens/select_organisms" ,:locals=>{:f=>f, :action => action}-%>
   </p>
 
+  <% if @specimen.can_manage? %>
     <%= render :partial=>"assets/asset_form_bottom", :locals=> {
             :resource_type => "Specimen",
             :attribution_enable => false,
@@ -45,7 +46,7 @@
     } -%>
 
     <%= fancy_multiselect @specimen, :sops, :name => 'specimen_sop_ids',:association_class=>Sop, :selected => (params[:specimen_sop_ids] || []).map(&:to_i) | @specimen.sop_masters.map(&:sop_id)%>
-
+  <% end %>
   </div>
 
 <p style="margin-top: 2em; text-align: center;">
