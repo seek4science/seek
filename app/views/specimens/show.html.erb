@@ -95,10 +95,12 @@
         <%= text_or_not_specified(@specimen.treatment) %>
       </p>
 
-      <p>
-        <label>Lab internal No.:</label>
-        <%= text_or_not_specified(@specimen.lab_internal_number) %>
-      </p>
+      <%if Seek::Config.is_virtualliver%>
+          <p>
+            <label>Lab internal No.:</label>
+            <%= text_or_not_specified(@specimen.lab_internal_number) %>
+          </p>
+      <%end%>
       <p>
         <label>Institution:</label>
         <%= text_or_not_specified(@specimen.institution.name) %>

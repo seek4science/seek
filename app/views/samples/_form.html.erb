@@ -19,25 +19,27 @@
     <%= collection_select(:sample, :specimen_id, Specimen.all.select{|s|s.can_view?} , :id, :title,{:include_blank =>"Please Select..."},{:style=>"width:90%"}) %>
   </p>
 
-  <p>
-    <%= f.label "Explantation time" -%><br/>
-    <%= f.text_field :explantation, :style => "width: 350px;" -%>
-  </p>
+  <% if Seek::Config.is_virtualliver %>
+      <p>
+        <%= f.label "Explantation time" -%><br/>
+        <%= f.text_field :explantation, :style => "width: 350px;" -%>
+      </p>
 
-  <p>
-    <%= f.label :lab_internal_number -%><span class="required">*</span><br/>
-    <%= f.text_field :lab_internal_number, :style => "width: 350px;" -%>
-  </p>
-  <p>
-    <%= f.label :donation_date -%><span class="required">*</span><br/>
-    <%= f.calendar_date_select :donation_date, :time => "mixed" -%>
-  </p>
-
+      <p>
+        <%= f.label :lab_internal_number -%><span class="required">*</span><br/>
+        <%= f.text_field :lab_internal_number, :style => "width: 350px;" -%>
+      </p>
+      <p>
+        <%= f.label :donation_date -%><span class="required">*</span><br/>
+        <%= f.calendar_date_select :donation_date, :time => "mixed" -%>
+      </p>
+  <% end %>
   <p>
     <%= f.label :description -%><br/>
-    <%= f.text_area :comments, :style => "width: 85%;", :rows => 5 -%>
+    <%= f.text_area :comments, :style => "width: 99%;", :rows => 5 -%>
   </p>
 
+  <br/>
   <%= render :partial => 'projects/project_selector', :locals => {:resource => @sample,:allow_nil=>true}%>
 
   <br style="clear:both"/>

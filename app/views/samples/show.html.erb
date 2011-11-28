@@ -26,34 +26,32 @@
         <%= text_or_not_specified(@sample.specimen.title) %>
       </p>
 
-      <p>
-        <label>Explantation time:</label>
-        <%= text_or_not_specified(@sample.explantation) %>
-      </p>
+      <% if Seek::Config.is_virtualliver %>
+          <p>
+            <label>Explantation time:</label>
+            <%= text_or_not_specified(@sample.explantation) %>
+          </p>
 
-      <p>
-        <label>Lab internal No.:</label>
-        <%= text_or_not_specified(@sample.lab_internal_number) %>
-      </p>
+          <p>
+            <label>Lab internal No.:</label>
+            <%= text_or_not_specified(@sample.lab_internal_number) %>
+          </p>
 
-
-      <p>
-        <label>Date of donation:</label>
-
-
-        <% if @sample.donation_date.nil? %>
-            <%= text_or_not_specified nil %>
-        <% else %>
-
-            <% if @sample.donation_date.hour == 0 and @sample.donation_date.min == 0 and @sample.donation_date.sec == 0 then %>
-                <%= h @sample.donation_date.strftime('%d/%m/%Y') %>
+          <p>
+            <label>Date of donation:</label>
+            <% if @sample.donation_date.nil? %>
+                <%= text_or_not_specified nil %>
             <% else %>
-                <%= h @sample.donation_date.strftime('%d/%m/%Y @ %H:%M:%S') %>
+
+                <% if @sample.donation_date.hour == 0 and @sample.donation_date.min == 0 and @sample.donation_date.sec == 0 then %>
+                    <%= h @sample.donation_date.strftime('%d/%m/%Y') %>
+                <% else %>
+                    <%= h @sample.donation_date.strftime('%d/%m/%Y @ %H:%M:%S') %>
+                <% end %>
+
             <% end %>
-
-        <% end %>
-      </p>
-
+          </p>
+      <% end %>
     </div>
   </div>
   <div style="clear:both;">
