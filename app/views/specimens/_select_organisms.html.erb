@@ -119,14 +119,14 @@
         <div class="association_step">
           <b>Step 3</b> - Create a strain (optional)<br/>  <br/>
           <% strain = @specimen.strain %>
-          <% if (action == :update) && (strain and strain.parent_id)%>
+          <% if (action == :edit) && (strain and strain.parent_id)%>
               <%= link_to_remote(h(strain.title), {:url =>{:controller => 'strains', :action => 'show_existing_strain', :id => "#{strain.id}"},
-                  :with => "'status='+'update' + '&organism_id='+ $F('specimen_organism_id')", :before => remote_function(:url=>{:action=>"show_existing_strains", :controller=>"strains"},
+                  :with => "'status='+'edit' + '&organism_id='+ $F('specimen_organism_id')", :before => remote_function(:url=>{:action=>"show_existing_strains", :controller=>"strains"},
                                    :with=>"'strain_id='+'#{strain.id}' + '&organism_id='+ $F('specimen_organism_id')") + ";$('create_strain_2').checked = true;"}) %>
               <br/><br/>
-          <% elsif (action == :update) && (strain and !strain.parent_id and strain.title != 'default')%>
+          <% elsif (action == :edit) && (strain and !strain.parent_id and strain.title != 'default')%>
               <%= link_to_remote(h(strain.title), {:url =>{:controller => 'strains', :action => 'new_strain', :id => "#{strain.id}"},
-                                                   :with => "'status='+'update' + '&organism_id='+ $F('specimen_organism_id')", :before => "$('create_strain_1').checked = true"}) %>
+                                                   :with => "'status='+'edit' + '&organism_id='+ $F('specimen_organism_id')", :before => "$('create_strain_1').checked = true"}) %>
               <br/><br/>
           <% end %>
 

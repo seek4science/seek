@@ -1,6 +1,7 @@
 <%= javascript_include_tag 'calendar_date_select/calendar_date_select' %>
 <%= stylesheet_link_tag 'calendar_date_select/default' %>
 <%= javascript_include_tag "sharing.js" -%>
+<%= javascript_include_tag "resource.js"%>
 
 <%= f.error_messages %>
 
@@ -56,6 +57,16 @@
 <%= f.hidden_field :from_new_link %>
 
 <p style="margin-top: 2em; text-align: center;">
-  <%= f.submit(action==:edit ? "Update" : "Create", :disable_with=>(action==:edit ? "Updating..." : "Creating...")) -%>
+  <%
+     button_text=action==:edit ? "Update" : "Create"
+     disabled_text=action==:edit ? "Updating..." : "Creating..."
+     is_new_file=action==:edit ? false : true
+  %>
+  <% if @sample.can_manage? %>
+      <%= preview_permission_popup_link('sample', url_for(:controller => 'policies', :action => 'preview_permissions'), is_new_file, try_block{@sample.contributor.user.id})-%>
+      <%= f.submit button_text, :onclick => "javascript: clickLink($('preview_permission'));return(false);" -%>
+  <% else %>
+      <%= f.submit button_text, :disable_with=>disabled_text-%>
+  <% end %>
   or <%= link_to 'Cancel', (@sample.id ? sample_path(@sample.id) : samples_path) -%>
 </p>

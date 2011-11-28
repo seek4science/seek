@@ -1,4 +1,5 @@
 <%= javascript_include_tag "sharing.js", 'strain.js' -%>
+<%= javascript_include_tag "resource.js"%>
 
 <%= f.error_messages %>
 
@@ -50,6 +51,16 @@
   </div>
 
 <p style="margin-top: 2em; text-align: center;">
-  <%= f.submit(action==:update ? "Update" : "Create", :disable_with=>(action==:update ? "Updating..." : "Creating...")) -%>
+  <%
+     button_text=action==:edit ? "Update" : "Create"
+     disabled_text=action==:edit ? "Updating..." : "Creating..."
+     is_new_file=action==:edit ? false : true
+  %>
+  <% if @specimen.can_manage? %>
+      <%= preview_permission_popup_link('specimen', url_for(:controller => 'policies', :action => 'preview_permissions'), is_new_file, try_block{@specimen.contributor.user.id})-%>
+      <%= f.submit button_text, :onclick => "javascript: clickLink($('preview_permission'));return(false);" -%>
+  <% else %>
+      <%= f.submit button_text, :disable_with=>disabled_text-%>
+  <% end %>
   or <%= link_to 'Cancel', (@specimen.id ? specimen_path(@specimen.id) : specimens_path) -%>
 </p>
