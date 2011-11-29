@@ -1,0 +1,15 @@
+<% strain_links=[] %>
+<div id="existing_strains_for_assay_organism">
+  <% if existing_strains_for_assay_organism.empty? -%>
+      <p class="none_text">No strains have yet been defined for <%= h(organism.title) -%>.</p>
+  <% else -%>
+      <p class="none_text">Here are the strains for <%= h(organism.title) -%>. Please choose one.</p>
+          <% existing_strains_for_assay_organism.each do |strain| -%>
+              <% strain_links << link_to_function(h(strain.title), "setStrainTextField('#{strain.title}');") %>
+          <% end -%>
+      <%= strain_links.join(", ") -%>
+  <% end -%>
+</div>
+
+
+

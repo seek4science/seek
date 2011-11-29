@@ -27,17 +27,29 @@
       </p>
 
       <p>
-        <%= f.label :lab_internal_number -%><span class="required">*</span><br/>
-        <%= f.text_field :lab_internal_number, :style => "width: 350px;" -%>
-      </p>
-      <p>
         <%= f.label :donation_date -%><span class="required">*</span><br/>
         <%= f.calendar_date_select :donation_date, :time => "mixed" -%>
       </p>
   <% end %>
+
+  <p>
+    <%= f.label :lab_internal_number -%><span class="required">*</span><br/>
+    <%= f.text_field :lab_internal_number, :style => "width: 350px;" -%>
+  </p>
+
   <p>
     <%= f.label :description -%><br/>
     <%= f.text_area :comments, :style => "width: 99%;", :rows => 5 -%>
+  </p>
+
+  <p>
+    <%= f.label :sampling_date -%><br/>
+    <%= f.calendar_date_select :sampling_date, :time => "mixed" -%>
+  </p>
+
+  <p>
+    <%= f.label :organism_part -%><br/>
+    <%= select_tag :organism_part,options_for_select(['Not specified', 'Whole cell', 'membrane fraction']) -%>
   </p>
 
   <br/>
@@ -64,9 +76,9 @@
   %>
   <% if @sample.can_manage? %>
       <%= preview_permission_popup_link('sample', url_for(:controller => 'policies', :action => 'preview_permissions'), is_new_file, try_block{@sample.contributor.user.id})-%>
-      <%= f.submit button_text, :onclick => "javascript: clickLink($('preview_permission'));return(false);" -%>
+      <%= f.submit button_text, :id => "sample_submit_btn", :onclick => "javascript: clickLink($('preview_permission'));return(false);" -%>
   <% else %>
-      <%= f.submit button_text, :disable_with=>disabled_text-%>
+      <%= f.submit button_text, :id => "sample_submit_btn", :disable_with=>disabled_text-%>
   <% end %>
   or <%= link_to 'Cancel', (@sample.id ? sample_path(@sample.id) : samples_path) -%>
 </p>

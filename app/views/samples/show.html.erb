@@ -28,15 +28,14 @@
         <%= text_or_not_specified(@sample.specimen.title) %>
       </p>
 
+      <p>
+        <label>Lab internal No.:</label>
+        <%= text_or_not_specified(@sample.lab_internal_number) %>
+      </p>
       <% if Seek::Config.is_virtualliver %>
           <p>
             <label>Explantation time:</label>
             <%= text_or_not_specified(@sample.explantation) %>
-          </p>
-
-          <p>
-            <label>Lab internal No.:</label>
-            <%= text_or_not_specified(@sample.lab_internal_number) %>
           </p>
 
           <p>
