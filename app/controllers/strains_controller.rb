@@ -1,7 +1,7 @@
 class StrainsController < ApplicationController
   before_filter :login_required
-  before_filter :get_strains,:only=>[:show_existing_strains, :existing_strains_for_select]
-  before_filter :get_strain, :only =>[:show_existing_strain, :strain_detail]
+  before_filter :get_strains,:only=>[:show_existing_strains, :existing_strains_for_assay_organism]
+  before_filter :get_strain, :only =>:show_existing_strain
 
   def show_existing_strains
     render :update do |page|
@@ -31,20 +31,12 @@ class StrainsController < ApplicationController
     end
   end
 
-  def strain_detail
-    render :update do |page|
-      page.replace_html "strain_detail",:partial=>"strains/strain_detail",:locals=>{:strain => @strain}
-      page.visual_effect :appear, 'strain_detail'
-    end
-  end
-
-  def existing_strains_for_select
+  def existing_strains_for_assay_organism
     render :update do |page|
       if @strains && @organism
-        page.replace_html 'existing_strains_for_select', :partial=>"strains/existing_strains_for_select",:object=>@strains,:locals=>{:organism=>@organism}
-        page.visual_effect :appear, 'existing_strains_for_select'
+        page.replace_html 'existing_strains_for_assay_organism', :partial=>"strains/existing_strains_for_assay_organism",:object=>@strains,:locals=>{:organism=>@organism}
       else
-        page.insert_html :bottom, 'existing_strains_for_select',:text=>""
+        page.insert_html :bottom, 'existing_strains_for_assay_organism',:text=>""
       end
     end
   end
