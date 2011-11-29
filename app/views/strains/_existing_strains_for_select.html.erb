@@ -1,0 +1,15 @@
+<% strain_links=[] %>
+<div id="existing_strains_for_select">
+  <% if existing_strains_for_select.empty? -%>
+      <p class="none_text">No strains have yet been defined for <%= h(organism.title) -%>.</p>
+  <% else -%>
+      <p class="none_text">Here are the strains for <%= h(organism.title) -%>. Please choose one.</p>
+          <% existing_strains_for_select.each do |strain| -%>
+              <% strain_links << link_to_remote(h(strain.title), {:url =>{:controller => 'strains', :action => 'strain_detail', :id => "#{strain.id}"}}) %>
+          <% end -%>
+      <%= strain_links.join(", ") -%>
+  <% end -%>
+</div>
+
+
+

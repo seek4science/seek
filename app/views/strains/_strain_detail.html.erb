@@ -1,0 +1,64 @@
+<div id='strain_detail'>
+<div class="yui-g">
+    <center>
+      <div class="yui-u first" style="width: 42%; margin-left: 2em; margin-top: 1em; margin-bottom: 1em;">
+        <p style="margin-bottom: 1.5em">
+          <label style="float: left;"> Name: <%= strain.title%></label>
+        </p>
+
+        <p style="margin-bottom: 1.5em">
+          <label style="float: left;"> Provider ID: <%= strain.provider_id.blank? ? 'Not specified' : strain.provider_id%></label>
+        </p>
+
+        <p style="margin-bottom: 1.5em">
+          <label style="float: left;"> Provider Name:<%= strain.provider_name.blank? ? 'Not specified' : strain.provider_name%></label>
+        </p>
+
+      </div>
+    </center>
+
+    <center>
+      <div class="yui-u" style="width: 42%;margin-right: 2em; margin-top: 1em; margin-bottom: 1em;">
+        <p style="margin-bottom: 1.5em">
+          <label style="float: left;"> Synonym:<%= strain.synonym.blank? ? 'Not specified' : strain.synonym%></label>
+        </p>
+
+        <p style="margin-bottom: 1.5em">
+          <label style="float: left;"> Comment:<%= strain.comment.blank? ? 'Not specified' : strain.comment%></label>
+        </p>
+      </div>
+    </center>
+  </div>
+
+  <div class="yui-g">
+    <center>
+      <div class="yui-u first  box_simple" style="width: 42%; margin-left: 2em; margin-top: 1em; margin-bottom: 1em;">
+        <label style="font-weight: bold; border-bottom: 1px solid #DDD"> Genotypes:</label>
+        <table id='genotype_table'>
+          <tr>
+            <th>Gene affected</th>
+            <th>Kind of mutation</th>
+          </tr>
+
+          <% i=1
+             strain.genotypes.each do |genotype| %>
+              <tr id='genotype_row_<%=i%>'>
+                <td> <%= genotype.gene.try(:title) %>
+                </td>
+                <td><%= genotype.modification.try(:title) %>
+                </td>
+              </tr>
+              <% i += 1 %>
+             <% end %>
+        </table>
+      </div>
+    </center>
+
+    <center>
+      <div class="yui-u  box_simple" style="width: 42%;margin-right: 2em; margin-top: 1em; margin-bottom: 1em;">
+        <label style="font-weight: bold"> Phenotype: <%= strain.phenotype.blank? ? 'Not specified' : strain.phenotype.description%></label>  <br/>
+      </div>
+    </center>
+  </div>
+</div>
+

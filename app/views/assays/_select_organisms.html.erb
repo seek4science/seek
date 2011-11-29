@@ -23,12 +23,10 @@
         <%= select_tag :possible_organisms,
         options_for_select([["Select Organism ...", 0]]|all_organisms.collect{|o| [truncate(h(o.title), :length=>select_truncate_length), o.id]}),
          {:style=>"width:90%",
-          :onchange=>remote_function(:url=>{:action=>"show_existing_strains", :controller=>"strains",:element=>"existing_strains"},
-          :with=>"'organism_id='+this.value",
-          :before=>"show_ajax_loader('existing_strains')")+
-          ";check_show_add_organism();$('strain').clear();return(false);"} -%>
+          :onchange=>"check_show_add_organism();return(false);"} -%>
         <%= select_tag :assay_organism_ids, options_from_collection_for_select([], :id, :title), {:multiple=>true, :style=>"display:none;"} -%>
       </div>
+
       <div id="extra_organism_details" style="display:none;">
         <div class="association_step">
           <b>Step 2</b> - Select method of culture growth (optional)<br/><br/>
@@ -36,11 +34,53 @@
           <br/>
         </div>
         <div class="association_step">
-          <b>Step 3</b> - Specify a strain (optional)<br/>
-          <div id="existing_strains"></div>
-          <%= text_field_tag :strain %>
+          <b>Step 3</b>
           <br/>
+
+          <%= radio_button_tag(:select_or_create_strain, 0, false,
+                               :onchange=>remote_function(:url=>{:action=>"existing_strains_for_select", :controller=>"strains"},
+                                                                    :with=>"'organism_id='+ $F('possible_organisms')")+";Effect.Fade('create_strain', {duration: 0.25});return(false);") %>
+          <label>- Select a strain (optional)</label>
+              <div id='existing_strains_for_select'></div>
+              <div id='strain_detail'></div>
+          <br/>
+
+
+          <%= radio_button_tag(:select_or_create_strain, 1, false,
+                               :onchange=> "Effect.Appear('create_strain', {duration: 0.25});Effect.Fade('existing_strains_for_select', {duration: 0.25});Effect.Fade('strain_detail', {duration: 0.25});return(false);") %>
+          <label>- Or create a strain (optional)</label>
+
+          <div id='create_strain' style="display: none;margin-left: 2em">
+            <div id="create_based_on_existing_strain">
+              <%= radio_button_tag(:create_strain, 2, false,
+                                   :onchange=>remote_function(:url=>{:action=>"show_existing_strains", :controller=>"strains"},
+                                                              :with=>"'organism_id='+ $F('possible_organisms')",
+                                                              :before=>"show_ajax_loader('strain_form')")+";return(false);") %>
+              <label>Create based on existing strain</label>
+              <div id='existing_strains'></div>
+
+            </div>
+            <br/>
+
+            <div id='create_new_strain'>
+              <%= radio_button_tag(:create_strain, 1, false,
+                                   :onchange=>remote_function(:url=>{:action=>"new_strain", :controller=>"strains"},
+                                                              :with=>"'organism_id='+ $F('possible_organisms')",
+                                                              :before=>"show_ajax_loader('strain_form')") + ";return(false);") %>
+              <label>Create without basing on existing strain</label>
+
+            </div>
+            <br/>
+
+            <div id='no_strain'>
+              <%= radio_button_tag(:create_strain, 0, false,
+                                   :onchange=>"fadeCreateStrain();return(false);") %>
+              <label>No strain</label>
+            </div>
+            <div id='strain_form'></div>
+          </div>
         </div>
+
 		<br/>
         <%= link_to_function (image("new") + " Include in the #{@assay_text}"), "addSelectedOrganism(); return(false);", :id=>"add_organism_link", :class=>"block_link", :style => "width: 12em" %>
       </div>
@@ -49,12 +89,7 @@
 </div>
 
 <script type="text/javascript">
-  
-  function setStrainTextField(strain){
-      $('strain').value = strain;
-      new Effect.Highlight('strain');
-  }
-            
+
   <% @assay.assay_organisms.each do |o| -%>
       organism_id = '<%= o.organism.id -%>';
       organism_title = '<%= escape_javascript(o.organism.title) -%>';
@@ -62,9 +97,7 @@
       culture_growth = '<%= o.culture_growth_type.nil? ? "" : o.culture_growth_type.title -%>';
       addOrganism(organism_title, organism_id, strain, culture_growth);
   <% end -%>
-  
 
-  
     updateOrganisms();
   
     function check_show_add_organism() {
@@ -74,6 +107,18 @@
         Effect.Fade('extra_organism_details');
       }
       else {
+        var select_or_create_radio_buttons = document.getElementsByName('select_or_create_strain');
+        for (var i=0; i< select_or_create_radio_buttons.length;i++){
+           select_or_create_radio_buttons[i].checked=false
+        }
+        var create_radio_buttons = document.getElementsByName('create_strain');
+        for (var i=0; i< create_radio_buttons.length;i++){
+           create_radio_buttons[i].checked=false
+        }
+        Effect.Fade('existing_strains_for_select', { duration: 0.25});
+        Effect.Fade('strain_detail', { duration: 0.25});
+        Effect.Fade('existing_strains', { duration: 0.25});
+        Effect.Fade('strain_form', { duration: 0.25});
         Effect.Appear('extra_organism_details');
       }
     }
