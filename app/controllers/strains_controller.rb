@@ -44,7 +44,8 @@ class StrainsController < ApplicationController
   def get_strains
     if params[:organism_id]
       @organism=Organism.find_by_id(params[:organism_id])
-      @strains=@organism.try(:strains).reject{|s| s.title == 'default' || s.id == params[:strain_id].to_i}
+      strains=@organism.try(:strains)
+      @strains = strains ? strains.reject{|s| s.title == 'default' || s.id == params[:strain_id].to_i} : strains
     end
   end
 
