@@ -154,7 +154,7 @@ class HomeControllerTest < ActionController::TestCase
     end
   end
 
-  test "should handle index.html" do
+  test "should handle index html" do
     assert_routing("/",{:controller=>"home",:action=>"index"})
     assert_recognizes({:controller=>"home",:action=>"index"},"/index.html")
     assert_recognizes({:controller=>"home",:action=>"index"},"/index")

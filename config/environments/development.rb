@@ -21,3 +21,5 @@ config.action_mailer.raise_delivery_errors = false
 
 config.middleware.use "Rack::Bug",
   :secret_key => "CaeTyLU8Spfo1PiXNZ4cANaWeO4Y3ptYFjVRLbPo34gbAkV4wNLTDH2hHT8YAKV"
+
+config.cache_store = :memory_store

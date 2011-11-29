@@ -46,7 +46,7 @@ class Model < ActiveRecord::Base
   # Parameters:
   # - user - user that performs the action; this is required for authorization
   def self.get_all_as_json(user)
-    all_models = Model.find(:all, :order => "ID asc")
+    all_models = Model.find(:all, :order => "ID asc",:include=>[:policy,{:policy=>:permissions}])
 
     models_with_contributors = all_models.collect{ |m|
       m.can_view?(user) ?

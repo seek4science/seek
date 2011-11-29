@@ -35,7 +35,7 @@ metabolite_profiling:
   children: catabolic_response,glucose_pulse, flux_balance_analysis
 
 flux_balance_analysis:
-  title: flux balanace analysis
+  title: flux balance analysis
 
 catabolic_response:
   title: catabolic response

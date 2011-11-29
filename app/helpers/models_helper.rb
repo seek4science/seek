@@ -49,8 +49,7 @@ module ModelsHelper
   end
   
   def authorised_models
-    models=Model.find(:all)
-    Authorization.authorize_collection("view",models,current_user)
+    authorised_assets(Model)
   end  
   
   def jws_supported? model

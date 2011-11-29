@@ -44,7 +44,7 @@ class Sop < ActiveRecord::Base
   # Parameters:
   # - user - user that performs the action; this is required for authorization
   def self.get_all_as_json(user)
-    all_sops = Sop.find(:all, :order => "ID asc")
+    all_sops = Sop.find(:all, :order => "ID asc",:include=>[:policy,{:policy=>:permissions}])
     sops_with_contributors = all_sops.collect{ |s|
       s.can_view?(user) ?
         (contributor = s.contributor;
