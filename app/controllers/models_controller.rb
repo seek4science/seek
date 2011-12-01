@@ -144,29 +144,47 @@ class ModelsController < ApplicationController
   end
   
   def simulate
+#    return simulate2
     error=nil
     begin
       supported = @@model_builder.is_supported?(@display_model)
       if supported
-        @data_script_hash,attribution_annotations,saved_file,@objects_hash = @@model_builder.builder_content @display_model    
+        @data_script_hash,attribution_annotations,saved_file,@objects_hash = @@model_builder.builder_content @display_model
         @applet=@@model_builder.simulate saved_file
       end
     rescue Exception=>e
       error=e
     end
-    
+
     respond_to do |format|
       if error
         flash.now[:error]="JWS Online encountered a problem processing this model."
-        format.html { redirect_to(@model,:version=>@display_model.version)}                      
+        format.html { redirect_to(@model,:version=>@display_model.version)}
       elsif !supported
         flash[:error]="This model is of neither SBML or JWS Online (Dat) format so cannot be used with JWS Online"
-        format.html { redirect_to(@model,:version=>@display_model.version)}        
+        format.html { redirect_to(@model,:version=>@display_model.version)}
       else
         format.html {render :layout=>"no_sidebar"}
       end
     end
     
+  end
+
+  #new simulate that uses updated version of the simulator without the applet
+  def simulate2
+    error = false
+    supported = true
+    respond_to do |format|
+      if error
+        flash.now[:error]="JWS Online encountered a problem processing this model."
+        format.html { redirect_to(@model, :version=>@display_model.version) }
+      elsif !supported
+        flash[:error]="This model is of neither SBML or JWS Online (Dat) format so cannot be used with JWS Online"
+        format.html { redirect_to(@model, :version=>@display_model.version) }
+      else
+        format.html { render :simulate2,:layout=>"jws_simulate" }
+      end
+    end
   end
   
   def update_model_metadata
