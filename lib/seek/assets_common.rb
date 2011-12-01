@@ -99,7 +99,7 @@ module Seek
     end
     
     def download_jerm_asset asset
-      project=asset.project
+      project=asset.projects.first
       project.decrypt_credentials
       downloader=Jerm::DownloaderFactory.create project.name
       resource_type = asset.class.name.split("::")[0] #need to handle versions, e.g. Sop::Version
