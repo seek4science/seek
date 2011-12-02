@@ -28,9 +28,6 @@ module ModelsHelper
     model.recommended_environment ? h(model.recommended_environment.title) : "<span class='none_text'>Unknown</span>" 
   end
 
-  def model_jws_online_compatible? model
-    !model.recommended_environment.nil? && model.recommended_environment.title.downcase=="jws online"
-  end
 
   def execute_model_label
     icon_filename=icon_filename_for_key("execute")
@@ -50,12 +47,7 @@ module ModelsHelper
   
   def authorised_models
     authorised_assets(Model)
-  end  
-  
-  def jws_supported? model
-    builder = Seek::JWS::OneStop.new
-    builder.is_supported? model
-  end
+  end    
 
   def jws_annotator_hidden_fields params_hash
     required_params=["assignmentRules", "annotationsReactions", "annotationsSpecies", "modelname", "parameterset", "kinetics", "functions", "initVal", "reaction", "events", "steadystateanalysis", "plotGraphPanel", "plotKineticsPanel"]

@@ -8,7 +8,9 @@ class Model < ActiveRecord::Base
 
   title_trimmer
   acts_as_asset
-  acts_as_trashable  
+  acts_as_trashable
+
+  include Seek::ModelProcessing
   
   validates_presence_of :title
   
@@ -27,6 +29,7 @@ class Model < ActiveRecord::Base
   end if Seek::Config.solr_enabled
 
   explicit_versioning(:version_column => "version") do
+    include Seek::ModelProcessing
     acts_as_versioned_resource
     
     belongs_to :content_blob             
@@ -69,6 +72,22 @@ class Model < ActiveRecord::Base
   #defines that this is a user_creatable object, and appears in the "New Object" gadget
   def self.user_creatable?
     true
+  end
+
+  def matching_data_files
+    files = []
+
+    if Seek::Config.solr_enabled && is_sbml?
+      params_and_values = extract_model_parameters_and_values self
+      #FIXME: would like to do this with one query that matches any word
+      params_and_values.keys.each do |key|
+        files |= DataFile.search do |query|
+          query.keywords key, :fields=>[:fs_search_fields, :spreadsheet_contents_for_search,:title,:description]
+        end.results
+      end
+    end
+
+    files
   end
   
 end

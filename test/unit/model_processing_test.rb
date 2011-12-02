@@ -15,4 +15,35 @@ class ModelProcessingTest < ActiveSupport::TestCase
     assert_equal "1306.45",params["VmPGK"]
   end
 
+  def test_is_sbml
+    model = models(:teusink)
+    assert is_sbml?(model)
+    assert is_sbml?(model.latest_version)
+    assert !is_dat?(model)
+    assert is_sbml?(model.content_blob)
+    assert !is_dat?(model.content_blob)
+  end
+
+  def test_is_dat
+    model = models(:jws_model)
+    assert !is_sbml?(model)
+    assert is_dat?(model)
+    assert is_dat?(model.latest_version)
+    assert !is_sbml?(model.content_blob)
+    assert is_dat?(model.content_blob)
+  end
+
+  def test_is_jws_supported
+    model = models(:jws_model)
+    assert is_jws_supported?(model)
+    assert is_jws_supported?(model.latest_version)
+    assert is_jws_supported?(model.content_blob)
+
+    model = models(:teusink)
+    assert is_jws_supported?(model)
+    assert is_jws_supported?(model.content_blob)
+  end
+
+
+
 end

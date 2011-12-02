@@ -9,7 +9,7 @@ class ModelsController < ApplicationController
   
   before_filter :find_assets, :only => [ :index ]
   before_filter :find_and_auth, :except => [ :build,:index, :new, :create,:create_model_metadata,:update_model_metadata,:delete_model_metadata,:request_resource,:preview,:test_asset_url, :update_annotations_ajax]
-  before_filter :find_display_asset, :only=>[:show,:download,:execute,:builder,:simulate,:submit_to_jws]
+  before_filter :find_display_asset, :only=>[:show,:download,:execute,:builder,:simulate,:submit_to_jws,:matching_data_files]
     
   before_filter :jws_enabled,:only=>[:builder,:simulate,:submit_to_jws]
 
@@ -571,7 +571,23 @@ class ModelsController < ApplicationController
     render :update do |page|
       page[:requesting_resource_status].replace_html "An email has been sent on your behalf to <b>#{resource.managers.collect{|m| m.name}.join(", ")}</b> requesting the file <b>#{h(resource.title)}</b>."
     end
-  end  
+  end
+
+  def matching_data_files
+    #FIXME: should use the correct version
+    matching_files = @model.matching_data_files
+    
+    matching_files = Authorization.authorize_collection("view",df,User.current_user)
+    render :update do |page|
+      page.visual_effect :fade,"matching_data_files"
+      page.visual_effect :appear,'matching_results'
+      if matching_files.empty?
+        page.replace_html "matching_results","<span class='none_text'>No matches found</span>"
+      else
+        page.replace_html "matching_results",:partial=>"assets/resource_list", :locals=> { :collection => matching_files, :authorization_for_showing_already_done=>true}
+      end
+    end
+  end
   
   protected
   
@@ -590,6 +606,7 @@ class ModelsController < ApplicationController
   def translate_action action
     action="download" if action == "simulate"
     action="edit" if ["submit_to_jws","builder"].include?(action)
+    action="view" if ["matching_data_files"].include?(action)
     super action
   end
   
