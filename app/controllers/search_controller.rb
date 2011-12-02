@@ -43,21 +43,20 @@ class SearchController < ApplicationController
 
     downcase_query = @search_query.downcase
     downcase_query.gsub!(":","")
-    downcase_query.gsub!(":","")
 
     @results=[]
     if (Seek::Config.solr_enabled and !downcase_query.blank?)
       if type == "all"
           sources = [Person, Project, Institution, Sop, Model, Study, DataFile, Assay, Investigation, Publication, Presentation, Event, Sample, Specimen]
           sources.each do |source|
-            @results |=  source.search do
-               keywords downcase_query
+            @results |=  source.search do |query|
+               query.keywords downcase_query
             end.results
           end
       else
            object = type=='data_files' ? DataFile : type.singularize.capitalize.constantize
-           @results =  object.search do
-              keywords downcase_query
+           @results =  object.search do |query|
+              query.keywords downcase_query
           end.results
       end
     end
