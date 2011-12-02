@@ -74,16 +74,19 @@ class Model < ActiveRecord::Base
     true
   end
 
+  #return a hash where the data file id is the key, and the matching terms/values are the values
   def matching_data_files
-    files = []
+    files = {}
 
     if Seek::Config.solr_enabled && is_sbml?
       params_and_values = extract_model_parameters_and_values self
-      #FIXME: would like to do this with one query that matches any word
       params_and_values.keys.each do |key|
-        files |= DataFile.search do |query|
+        DataFile.search do |query|
           query.keywords key, :fields=>[:fs_search_fields, :spreadsheet_contents_for_search,:title,:description]
-        end.results
+        end.hits.each do |result|
+          files[result.primary_key]||=[]
+          files[result.primary_key] << key
+        end
       end
     end
 

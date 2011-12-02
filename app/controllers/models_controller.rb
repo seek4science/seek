@@ -527,16 +527,22 @@ class ModelsController < ApplicationController
   def matching_data_files
     #FIXME: should use the correct version
     matching_files = @model.matching_data_files
-    
-    matching_files = Authorization.authorize_collection("view",matching_files,User.current_user)
+
     render :update do |page|
       page.visual_effect :fade,"matching_data_files"
       page.visual_effect :appear,'matching_results'
-      if matching_files.empty?
-        page.replace_html "matching_results","<span class='none_text'>No matches found</span>"
-      else
-        page.replace_html "matching_results",:partial=>"assets/resource_list", :locals=> { :collection => matching_files, :authorization_for_showing_already_done=>true}
+      html = ""
+      matching_files.keys.each do |data_file_id|
+        data_file = DataFile.find(data_file_id)
+        if (data_file.can_view?)
+          html << "<div>"
+          html << "Matched by #{matching_files[data_file_id].join(', ')}"
+          html << "<br/>"
+          html << render(:partial=>"layouts/resource_list_item", :object=>data_file)
+          html << "</div>"
+        end
       end
+      page.replace_html "matching_results",:text=>html
     end
   end
   
