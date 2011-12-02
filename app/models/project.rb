@@ -9,6 +9,16 @@ class Project < ActiveRecord::Base
   include SimpleCrypt
   include ActsAsCachedTree
 
+  after_update :touch_for_hierarchy_updates
+
+  def touch_for_hierarchy_updates
+    if changed_attributes.include? :parent_id
+      Permission.find_by_contributor_type("Project", :conditions => {:contributor_id => ([id] + ancestors.map(&:id) + descendants.map(&:id))}).each &:touch
+      ancestors.each &:touch
+      descendants.each &:touch
+    end
+  end
+
   #when I have a new ancestor, subscribe to items in that project
   write_inheritable_array :before_add_for_ancestors, [:add_indirect_subscriptions]
 

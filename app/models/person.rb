@@ -39,7 +39,7 @@ class Person < ActiveRecord::Base
   has_many :favourite_group_memberships, :dependent => :destroy
   has_many :favourite_groups, :through => :favourite_group_memberships
 
-  has_many :work_groups, :through=>:group_memberships, :before_add => proc {|person, wg| person.project_subscriptions.build :project => wg.project unless person.project_subscriptions.detect {|ps| ps.project == wg.project}}
+  has_many :work_groups, :through=>:group_memberships, :before_add => proc {|person, wg| person.project_subscriptions.build :project => wg.project unless person.project_subscriptions.detect {|ps| ps.project == wg.project}}, :touch => true
   has_many :studies, :foreign_key => :person_responsible_id
   has_many :assays,:foreign_key => :owner_id
 
@@ -160,7 +160,7 @@ class Person < ActiveRecord::Base
 
   def member_of?(item_or_array)
     array = [item_or_array].flatten
-    array.detect {|item| projects.include?(item) || item.people.include?(self)}
+    Rails.cache.fetch(array + [self, :member_of?]){array.detect {|item| (item.is_a?(Project) && projects.include?(item)) || item.people.include?(self)}}
   end
 
   def locations

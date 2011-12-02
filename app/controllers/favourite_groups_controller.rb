@@ -10,6 +10,8 @@ class FavouriteGroupsController < ApplicationController
   protect_from_forgery :except => [:create, :update, :destroy]
 
   skip_before_filter :project_membership_required
+
+  cache_sweeper :favourite_groups_sweeper, :only => [:update]
   
   def new
     @f_group = FavouriteGroup.new
