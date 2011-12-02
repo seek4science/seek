@@ -6,8 +6,7 @@ module Seek
   module JWS
 
     BASE_URL = "#{Seek::Config.jws_online_root}/webMathematica/Examples/"
-    SIMULATE_URL = "#{Seek::Config.jws_online_root}/webMathematica/upload/uploadNEW.jsp"
-    SIMULATE2_URL = "#{Seek::Config.jws_online_root}/webMathematica/UItester.jsp?uploadModel=true"
+    SIMULATE_URL = "#{Seek::Config.jws_online_root}/webMathematica/model_upload_SEEK_xml.jsp"
     MOCKED = false
 
     class OneStop
@@ -44,19 +43,26 @@ module Seek
         process_response_body(response.body)
       end
 
-      def simulate2 model
-#        filepath=model.content_blob.filepath
-#        #this is necessary to get the correct filename and especially extension, which JWS relies on
-#          tmpfile = Tempfile.new(model.original_filename)
-#          FileUtils.cp(filepath, tmpfile.path)
-#        response = RestClient.post(upload_sbml_url2, :upfile=>tmpfile, :filename=>model.original_filename, :multipart=>true) { |response, request, result, &block |
-#            if [301, 302, 307].include? response.code
-#              response.follow_redirection(request, result, &block)
-#            else
-#              response.return!(request, result, &block)
-#            end
-#            }
-#        response
+      def simulate model
+        filepath=model.content_blob.filepath
+          #this is necessary to get the correct filename and especially extension, which JWS relies on
+        tmpfile = Tempfile.new(model.original_filename)
+        FileUtils.cp(filepath, tmpfile.path)
+        response = RestClient.post(upload_sbml_url, :upfile=>tmpfile, :uploadModel=>true,:filename=>model.original_filename, :multipart=>true) { |response, request, result, &block |
+        if [301, 302, 307].include? response.code
+          response.follow_redirection(request, result, &block)
+        else
+          response.return!(request, result, &block)
+        end
+        }
+        extract_modelname_from_response(response.strip)
+      end
+
+      def extract_modelname_from_response response
+        parser = LibXML::XML::Parser.string(response, :encoding => LibXML::XML::Encoding::UTF_8)
+        doc = parser.parse
+        name = doc.find_first("//uploader/modelname").content
+        name.strip
       end
 
       def builder_content model
@@ -102,19 +108,6 @@ module Seek
           process_response_body(response.body)
       end
 
-      def simulate saved_file
-        url=Seek::JWS::SIMULATE_URL
-        response = RestClient.post(url, :savedfile=>saved_file, :multipart=>true) { |response, request, result, &block |
-        if [301, 302, 307].include? response.code
-          response.follow_redirection(request, result, &block)
-        else
-          response.return!(request, result, &block)
-        end
-        }
-
-        extract_applet(response.body)
-      end
-
       def sbml_download_url savedfile
         modelname=savedfile.gsub("\.dat", "")
         url=""
@@ -148,11 +141,7 @@ module Seek
       end
 
       def upload_sbml_url
-        "#{Seek::JWS::SIMULATE_URL}?SBMLFilePostedToIFC=true&xmlOutput=true"
-      end
-
-      def upload_sbml_url2
-        return Seek::JWS::SIMULATE2_URL
+        return Seek::JWS::SIMULATE_URL
       end
 
       def saved_file_builder_content saved_file
