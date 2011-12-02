@@ -7,6 +7,7 @@ module Seek
 
     BASE_URL = "#{Seek::Config.jws_online_root}/webMathematica/Examples/"
     SIMULATE_URL = "#{Seek::Config.jws_online_root}/webMathematica/upload/uploadNEW.jsp"
+    SIMULATE2_URL = "#{Seek::Config.jws_online_root}/webMathematica/UItester.jsp?uploadModel=true"
     MOCKED = false
 
     class OneStop
@@ -41,6 +42,21 @@ module Seek
         end
 
         process_response_body(response.body)
+      end
+
+      def simulate2 model
+#        filepath=model.content_blob.filepath
+#        #this is necessary to get the correct filename and especially extension, which JWS relies on
+#          tmpfile = Tempfile.new(model.original_filename)
+#          FileUtils.cp(filepath, tmpfile.path)
+#        response = RestClient.post(upload_sbml_url2, :upfile=>tmpfile, :filename=>model.original_filename, :multipart=>true) { |response, request, result, &block |
+#            if [301, 302, 307].include? response.code
+#              response.follow_redirection(request, result, &block)
+#            else
+#              response.return!(request, result, &block)
+#            end
+#            }
+#        response
       end
 
       def builder_content model
@@ -133,6 +149,10 @@ module Seek
 
       def upload_sbml_url
         "#{Seek::JWS::SIMULATE_URL}?SBMLFilePostedToIFC=true&xmlOutput=true"
+      end
+
+      def upload_sbml_url2
+        return Seek::JWS::SIMULATE2_URL
       end
 
       def saved_file_builder_content saved_file

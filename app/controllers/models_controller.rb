@@ -142,9 +142,34 @@ class ModelsController < ApplicationController
     end
     
   end
-  
+
+#  def simulate
+#    error=nil
+#    begin
+#      supported = @@model_builder.is_supported?(@display_model)
+#      if supported
+#        @response = @@model_builder.simulate2(@display_model)
+#      end
+#    rescue Exception=>e
+#      error=e
+#    end
+##
+#    respond_to do |format|
+#      if error
+#        flash.now[:error]="JWS Online encountered a problem processing this model."
+#        format.html { redirect_to(@model, :version=>@display_model.version) }
+#      elsif !supported
+#        flash[:error]="This model is of neither SBML or JWS Online (Dat) format so cannot be used with JWS Online"
+#        format.html { redirect_to(@model, :version=>@display_model.version) }
+#      else
+#         format.html { render :simulate2,:layout=>"jws_simulate", :response=>@response }
+#      end
+#    end
+#
+#
+#  end
+
   def simulate
-#    return simulate2
     error=nil
     begin
       supported = @@model_builder.is_supported?(@display_model)
@@ -167,7 +192,7 @@ class ModelsController < ApplicationController
         format.html {render :layout=>"no_sidebar"}
       end
     end
-    
+
   end
 
   #new simulate that uses updated version of the simulator without the applet
