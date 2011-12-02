@@ -1654,6 +1654,10 @@ ul.modifications {
     float: left;
     margin-top: 2em;
 }
+#search_box input[type="text"] {
+    width: 28em;
+}
+
 
 ul.modification_row {
     clear:both;
