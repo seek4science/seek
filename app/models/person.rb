@@ -160,7 +160,7 @@ class Person < ActiveRecord::Base
 
   def member_of?(item_or_array)
     array = [item_or_array].flatten
-    Rails.cache.fetch(array + [self, :member_of?]){array.detect {|item| (item.is_a?(Project) && projects.include?(item)) || item.people.include?(self)}}
+    array.detect {|item|Rails.cache.fetch([:member_of?, self.cache_key, item.cache_key]) { (item.is_a?(Project) && projects.include?(item)) || item.people.include?(self)}}
   end
 
   def locations
