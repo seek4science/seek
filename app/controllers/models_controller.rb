@@ -577,7 +577,7 @@ class ModelsController < ApplicationController
     #FIXME: should use the correct version
     matching_files = @model.matching_data_files
     
-    matching_files = Authorization.authorize_collection("view",df,User.current_user)
+    matching_files = Authorization.authorize_collection("view",matching_files,User.current_user)
     render :update do |page|
       page.visual_effect :fade,"matching_data_files"
       page.visual_effect :appear,'matching_results'
