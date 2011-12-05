@@ -2,7 +2,14 @@
 <%= javascript_include_tag "resource.js"%>
 
 <%= f.error_messages %>
-
+<%
+   existing_creators = []
+   if action == :new
+     existing_creators = [current_user.person]
+   elsif action == :edit
+     existing_creators = @specimen.creators
+   end
+%>
  <div style="width: 95%;">
        <h2>Specimen Details</h2>
        <p>
@@ -44,7 +51,7 @@
             :resource_type => "Specimen",
             :attribution_enable => false,
             :show_publications => false,
-            :existing_creators=>@specimen.creators,
+            :existing_creators=>existing_creators,
             :other_creators=>@specimen.other_creators,
     } -%>
 
