@@ -24,7 +24,7 @@ ActiveRecord::Schema.define(:version => 20111129174935) do
     t.datetime "updated_at"
     t.string   "http_referer"
     t.string   "user_agent"
-    t.text     "data",                   :limit => 2147483647
+    t.text     "data",                   :limit => 16777215
     t.string   "controller_name"
   end
 
@@ -295,6 +295,21 @@ ActiveRecord::Schema.define(:version => 20111129174935) do
   create_table "db_files", :force => true do |t|
     t.binary "data", :limit => 2147483647
   end
+
+  create_table "delayed_jobs", :force => true do |t|
+    t.integer  "priority",   :default => 0
+    t.integer  "attempts",   :default => 0
+    t.text     "handler"
+    t.text     "last_error"
+    t.datetime "run_at"
+    t.datetime "locked_at"
+    t.datetime "failed_at"
+    t.string   "locked_by"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
+  add_index "delayed_jobs", ["priority", "run_at"], :name => "delayed_jobs_priority"
 
   create_table "disciplines", :force => true do |t|
     t.string   "title"
@@ -851,6 +866,13 @@ ActiveRecord::Schema.define(:version => 20111129174935) do
 
   create_table "recommended_model_environments", :force => true do |t|
     t.string   "title"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
+  create_table "reindexing_queues", :force => true do |t|
+    t.string   "item_type"
+    t.integer  "item_id"
     t.datetime "created_at"
     t.datetime "updated_at"
   end

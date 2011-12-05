@@ -11,8 +11,9 @@
 <%= render :partial => "layouts/item_title",:locals=>{:item=>@display_model,:title_postfix=>" - JWS Model Simulation"} %>
 
 <br/>
-<center>
-	<div style="border: #999 1px solid;">	
-    	<%= @applet -%>
-	</div>
-</center>
+
+
+<div style="height: 100%;width: 100%;">
+    <iframe src="http://jjj.mib.ac.uk/webMathematica/UItester.jsp?fileName=<%=@modelname-%>&noHeader=true" id="jws_simulator" width="100%" height="100%" frameborder=0>You need a Frames Capable browser to view this content.</iframe>
+</div>
+

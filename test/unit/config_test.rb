@@ -222,15 +222,4 @@ class ConfigTest < ActiveSupport::TestCase
   test "publish_button_enabled" do
     assert_equal true,Seek::Config.publish_button_enabled
   end
-
-  test "should read the configuration parameters from cache when the server doesnt restart" do
-    default_smtp = {:address => '', :port => '25', :domain => '', :authentication => :plain, :user_name => '', :password => ''}
-    assert_equal default_smtp[:user_name], Seek::Config.smtp[:user_name]
-
-    Seek::Config.set_smtp_settings 'user_name', 'Arron'
-    assert_equal default_smtp[:user_name], Seek::Config.smtp[:user_name]
-
-    saved_smtp = Settings.find_by_var('smtp')
-    assert_equal 'Arron', saved_smtp.value[:user_name]
-  end
 end

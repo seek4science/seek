@@ -43,7 +43,7 @@ class Presentation < ActiveRecord::Base
   # Parameters:
   # - user - user that performs the action; this is required for authorization
   def self.get_all_as_json(user)
-    all_presentations = Presentation.find(:all, :order => "ID asc")
+    all_presentations = Presentation.find(:all, :order => "ID asc",:include=>[:policy,{:policy=>:permissions}])
     presentations_with_contributors = all_presentations.collect{ |p|
       p.can_view?(user) ?
         (contributor = p.contributor

@@ -1,5 +1,5 @@
 body {
-	background: #8e8e8e url('/images/body-bg.png') repeat-y center;
+    background: #8e8e8e url('/images/body-bg.png') repeat-y center;
 	font-family: arial;
 	line-height: 1.0;	
 }
@@ -1654,6 +1654,10 @@ ul.modifications {
     float: left;
     margin-top: 2em;
 }
+#search_box input[type="text"] {
+    width: 28em;
+}
+
 
 ul.modification_row {
     clear:both;

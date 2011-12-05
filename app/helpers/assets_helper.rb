@@ -248,15 +248,16 @@ module AssetsHelper
     eval("#{resource_type.underscore.pluralize}_path" + filter_text)
   end
 
-  #provides a list of assets, according to the class, that are authorized to 'show'
-  def authorised_assets asset_class
-    assets=asset_class.find(:all)
-    Authorization.authorize_collection("view", assets, current_user)
+  #provides a list of assets, according to the class, that are authorized acording the 'action' which defaults to view
+  def authorised_assets asset_class, action="view"
+    assets=asset_class.find(:all,:include=>[:policy,{:policy=>:permissions}])
+    Authorization.authorize_collection(action, assets, current_user)
   end
 
   def asset_buttons asset,version=nil,delete_confirm_message=nil
      human_name = text_for_resource asset
      delete_confirm_message ||= "This deletes the #{human_name} and all metadata. Are you sure?"
+
      render :partial=>"assets/asset_buttons",:locals=>{:asset=>asset,:version=>version,:human_name=>human_name,:delete_confirm_message=>delete_confirm_message}
   end
 

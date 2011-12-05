@@ -8,7 +8,9 @@ class Model < ActiveRecord::Base
 
   title_trimmer
   acts_as_asset
-  acts_as_trashable  
+  acts_as_trashable
+
+  include Seek::ModelProcessing
   
   validates_presence_of :title
   
@@ -27,6 +29,7 @@ class Model < ActiveRecord::Base
   end if Seek::Config.solr_enabled
 
   explicit_versioning(:version_column => "version") do
+    include Seek::ModelProcessing
     acts_as_versioned_resource
     
     belongs_to :content_blob             
@@ -46,7 +49,7 @@ class Model < ActiveRecord::Base
   # Parameters:
   # - user - user that performs the action; this is required for authorization
   def self.get_all_as_json(user)
-    all_models = Model.find(:all, :order => "ID asc")
+    all_models = Model.find(:all, :order => "ID asc",:include=>[:policy,{:policy=>:permissions}])
 
     models_with_contributors = all_models.collect{ |m|
       m.can_view?(user) ?
@@ -69,6 +72,32 @@ class Model < ActiveRecord::Base
   #defines that this is a user_creatable object, and appears in the "New Object" gadget
   def self.user_creatable?
     true
+  end
+
+  #a simple container for handling the matching results returned from #matching_data_files
+  class ModelMatchResult < Struct.new(:search_terms,:score,:primary_key)
+
+  end
+
+  #return a an array of ModelMatchResult where the data file id is the key, and the matching terms/values are the values
+  def matching_data_files
+    
+    results = {}
+
+    if Seek::Config.solr_enabled && is_sbml?
+      params_and_values = extract_model_parameters_and_values self
+      params_and_values.keys.each do |key|
+        DataFile.search do |query|
+          query.keywords key, :fields=>[:fs_search_fields, :spreadsheet_contents_for_search,:title,:description]
+        end.hits.each do |hit|
+          results[hit.primary_key]||=ModelMatchResult.new([],0,hit.primary_key)
+          results[hit.primary_key].search_terms << key
+          results[hit.primary_key].score += hit.score
+        end
+      end
+    end
+
+    results.values.sort_by{|a| -a.score}
   end
   
 end
