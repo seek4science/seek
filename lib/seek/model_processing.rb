@@ -27,7 +27,7 @@ module Seek
         species << node.attributes["name"]
         species << node.attributes["id"]
       end
-      species.uniq
+      species.select{|s| !s.blank?}.uniq
     end
   end
 end
