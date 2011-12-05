@@ -94,7 +94,7 @@ class Model < ActiveRecord::Base
         end.hits.each do |hit|
           results[hit.primary_key]||=ModelMatchResult.new([],0,hit.primary_key)
           results[hit.primary_key].search_terms << key
-          results[hit.primary_key].score += hit.score
+          results[hit.primary_key].score += hit.score unless hit.score.nil?
         end
       end
     end
