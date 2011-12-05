@@ -532,12 +532,11 @@ class ModelsController < ApplicationController
       page.visual_effect :fade,"matching_data_files"
       page.visual_effect :appear,'matching_results'
       html = ""
-      matching_files.keys.each do |data_file_id|
-        data_file = DataFile.find(data_file_id)
+      matching_files.each do |match|
+        data_file = DataFile.find(match.primary_key)
         if (data_file.can_view?)
           html << "<div>"
-          html << "Matched by #{matching_files[data_file_id].join(', ')}"
-          html << "<br/>"
+          html << "<div style='padding-top:0.5em;padding-bottom:0.2em;'>Matched with #{match.search_terms.join(', ')}</div>"
           html << render(:partial=>"layouts/resource_list_item", :object=>data_file)
           html << "</div>"
         end

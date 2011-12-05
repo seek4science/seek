@@ -74,23 +74,30 @@ class Model < ActiveRecord::Base
     true
   end
 
-  #return a hash where the data file id is the key, and the matching terms/values are the values
+  #a simple container for handling the matching results returned from #matching_data_files
+  class ModelMatchResult < Struct.new(:search_terms,:score,:primary_key)
+
+  end
+
+  #return a an array of ModelMatchResult where the data file id is the key, and the matching terms/values are the values
   def matching_data_files
-    files = {}
+    
+    results = {}
 
     if Seek::Config.solr_enabled && is_sbml?
       params_and_values = extract_model_parameters_and_values self
       params_and_values.keys.each do |key|
         DataFile.search do |query|
           query.keywords key, :fields=>[:fs_search_fields, :spreadsheet_contents_for_search,:title,:description]
-        end.hits.each do |result|
-          files[result.primary_key]||=[]
-          files[result.primary_key] << key
+        end.hits.each do |hit|
+          results[hit.primary_key]||=ModelMatchResult.new([],0,hit.primary_key)
+          results[hit.primary_key].search_terms << key
+          results[hit.primary_key].score += hit.score
         end
       end
     end
 
-    files
+    results.values.sort_by{|a| -a.score}
   end
   
 end
