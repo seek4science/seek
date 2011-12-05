@@ -34,7 +34,7 @@ class JwsFunctionalTest < ActionController::TestCase
       assert_select "script", :text=>/VmGLT = 97.264/, :count=>1 #check that one of the parameter sets has been recognized from the uploaded file
     end
 
-    test "show builder with sbml format" do
+    def test_show_builder_with_sbml_format
       m=models(:teusink)
       m.content_blob.dump_data_to_file #required for the form post to work, as it uses the stored file
       get :builder, :id=>m
@@ -118,12 +118,12 @@ class JwsFunctionalTest < ActionController::TestCase
       assert_select "object[type='image/svg+xml']",:count=>1
     end
 
-    test "simulate model" do
+    def test_simulate_model
       m=models(:teusink)
       m.content_blob.dump_data_to_file
       post :simulate, :id=>m, :version=>m.version
       assert_response :success
-      assert_select "object[type='application/x-java-applet']", :count=>1
+      assert_select "iframe",:count=>1
     end
 
     test "changing model with jws builder" do
@@ -146,7 +146,7 @@ class JwsFunctionalTest < ActionController::TestCase
 
       post :submit_to_jws,params
       assert_response :success
-      assert_select "object[type='application/x-java-applet']", :count=>1
+      assert_select "iframe",:count=>1
     end
 
     test "annotate" do
