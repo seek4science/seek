@@ -19,6 +19,7 @@ class DataFileTest < ActiveSupport::TestCase
     assert !data.empty?,"Content should not be empty"
     assert data.include?("design type")
     assert data.include?("methodological design"), "content should be humanized"
+    assert data.include?("MethodologicalDesign"),"should also preserve original form before humanizing"
     assert data.include?("absolute")
     assert !data.include?("ontology"),"Shouldn't include content from hidden sheets"
     assert !data.include?("relative"),"Shouldn't include content from hidden sheets"

@@ -12,7 +12,7 @@ module Seek
           xml=data_file.spreadsheet_xml
           if !xml.nil?
             content = extract_content(xml)
-            content = process_content(content)
+            content = humanize_content(content)
             content = filter_content(content)
             content
           else
@@ -38,11 +38,12 @@ module Seek
       content
     end
 
-    #does some manipulation of the content, e.g. converting camelcase and converting underscores
-    def process_content content
+    #does some manipulation of the content, e.g. converting camelcase and converting underscores, whilst preserving the original
+    #form
+    def humanize_content content
       content.collect do |val|
-        val.underscore.humanize.downcase
-      end
+        [content,val.underscore.humanize.downcase]
+      end.flatten.uniq
     end
 
     #filters out numbers and text declared in a black list
