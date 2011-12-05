@@ -93,4 +93,10 @@ class AdminControllerTest < ActionController::TestCase
     
   end
 
+  test "get project content stats" do
+    login_as(:quentin)
+    xml_http_request :get, :get_stats,{:id=>"contents"}
+    assert_response :success
+  end
+
 end
