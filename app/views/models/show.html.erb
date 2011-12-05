@@ -42,7 +42,7 @@
 <div id="matching_data_files" style="display:none;">
   
 </div>
-<div id="matching_results" style="display:none;height:55em">
+<div id="matching_results" style="display:none;height:55em;overflow-y: scroll;">
   
 </div>
 
@@ -107,6 +107,6 @@
     </div>
     <%= render :partial=>"assets/resource_main_content_right",:locals => { :resource => @model } %>
     <div style="clear:both;padding-top:1em;">
-        <%#= render :partial=>"layouts/items_related_to",:object => @model %>
+        <%= render :partial=>"layouts/items_related_to",:object => @model %>
     </div>
 </div>

@@ -85,10 +85,12 @@ class Model < ActiveRecord::Base
     results = {}
 
     if Seek::Config.solr_enabled && is_sbml?
-      params_and_values = extract_model_parameters_and_values self
-      params_and_values.keys.each do |key|
+      params_and_values = extract_model_parameters_and_values(self)
+      species  = extract_model_species(self)
+      search_terms = species | params_and_values.keys
+      search_terms.each do |key|
         DataFile.search do |query|
-          query.keywords key, :fields=>[:fs_search_fields, :spreadsheet_contents_for_search,:title,:description]
+          query.keywords key, :fields=>[:fs_search_fields, :spreadsheet_contents_for_search,:spreadsheet_annotation_search_fields]
         end.hits.each do |hit|
           results[hit.primary_key]||=ModelMatchResult.new([],0,hit.primary_key)
           results[hit.primary_key].search_terms << key
