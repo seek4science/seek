@@ -304,7 +304,15 @@ function bindAnnotations(annotation_sources) {
 //Small annotation summary that jumps to said annotation when clicked
 function createAnnotationStub(ann)
 {
+    var type_class;
+    if (ann.type=="plot_data") {
+        type_class="plot_data_type"
+    }
+    else {
+        type_class="text_annotation_type"
+    }
   var stub = $j("<tr></tr>").addClass("annotation_stub")
+      .append($j("<td>&nbsp;</td>").addClass(type_class))
       .append($j("<td>Sheet"+(ann.sheetNumber+1)+"."+ann.cellRange+"</td>"))
       .append($j("<td>"+ann.content.substring(0,40)+"</td>"))
       .append($j("<td>"+ann.dateCreated+"</td>"))
@@ -317,6 +325,7 @@ function createAnnotationStub(ann)
 
 function bindAnnotation(ann) {
   $j("table.sheet:eq("+ann.sheetNumber+") tr").slice(ann.startRow-1,ann.endRow).each(function() {
+            
     $j(this).children("td.cell").slice(ann.startCol-1,ann.endCol).addClass("annotated_cell")
           .click(function () {show_annotation(ann.id,
               $j(this).position().left + $j(this).outerWidth(),
@@ -435,7 +444,7 @@ function select_cells(startCol, startRow, endCol, endRow) {
   $j('#selection_data').val(selection);
 
   //Update cell coverage in annotation form
-  $j('input#annotation_cell_coverage').attr("value",selection);
+  $j('input.annotation_cell_coverage_class').attr("value",selection);
 
   //Show selection-dependent controls
   $j('.requires_selection').show();
@@ -527,7 +536,7 @@ function plot_cells()
       }
       text += "\n";
     }
-
+    $j("textarea.annotation_content_class").val(text);
       var chart;
       function drawChart() {
         var data = new google.visualization.DataTable();
@@ -568,10 +577,6 @@ function plot_cells()
             vAxis: {title:'',minValue:0,baseline:0},
             hAxis: {title:'time(min)'}
         });
-//        google.visualization.events.addListener(chart, 'select', itemSelected);
-//        function itemSelected(e) {
-//          alert("something was selected");
-//        }
       }
       drawChart();
 

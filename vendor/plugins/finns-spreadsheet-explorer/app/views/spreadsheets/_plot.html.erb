@@ -9,7 +9,36 @@
     <br style="clear:both"/>
   </div>
   
+
   <div id="plot_data">
 
   </div>
+
+  <% form_remote_tag(:url=>{:controller=>"spreadsheet_annotations", :action=>"create"},
+                   :update => { :success => "annotations", :failure => "spreadsheet_errors"},
+                   :success => "$j('#spreadsheet_errors').hide();",
+                   :failure => "$j('#spreadsheet_errors').show();",
+                   :loading => "Element.show('spinner_plot');",
+                   :complete => "Element.hide('spinner_plot');Element.hide('plot_panel');", :html => {:id => "plot_panel"}) do %>
+
+    <%= hidden_field_tag :annotation_content_blob_id, @display_data_file.content_blob_id %>
+    <%= hidden_field_tag :annotation_sheet_id, "0" %>
+
+    <p>
+      Cell Range:<br/>
+      <%= text_field_tag :annotation_cell_coverage, nil,:class=>"annotation_cell_coverage_class" %>
+    </p>
+
+    <%#The stuff here can potentially be abstracted out into a partial when dealing with different annotation types%>
+    <p>
+      Content:<br/>
+      <%= text_area_tag :annotation_content,nil,:class=>"annotation_content_class" %>
+      <%= hidden_field_tag :annotation_attribute_name, "plot_data" %>
+    </p>
+    <%# --- %>
+
+    <%= submit_tag 'Store as annotation',:id=>"fetch_button" %>
+  <% end %>
+  <%= image_tag "ajax-loader.gif", :id => 'spinner_plot', :style => 'display:none;' -%>
+
 </div>

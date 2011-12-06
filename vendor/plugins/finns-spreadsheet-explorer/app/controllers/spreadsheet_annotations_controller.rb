@@ -10,10 +10,11 @@ class SpreadsheetAnnotationsController < ApplicationController
 
     cell = CellRange.new(:worksheet => worksheet,
                        :cell_range => params[:annotation_cell_coverage])
+    attribute_name = params[:annotation_attribute_name] || "annotation"
     if cell.save
       @annotation = Annotation.new(:source => current_user,
                                    :annotatable => cell,
-                                   :attribute_name => "annotation",
+                                   :attribute_name => attribute_name,
                                    :value => params[:annotation_content])
 
       if(@annotation.save)
