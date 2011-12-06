@@ -1,6 +1,6 @@
 <%
 creators = []
-creators + resource.creators if resource.respond_to? :creators
+creators = creators + resource.creators if resource.respond_to? :creators
 contributor = resource.contributor
 contributor = contributor.person if contributor.respond_to? :person
 creators << contributor if resource.contributor_credited? and contributor
@@ -9,7 +9,7 @@ creators = creators.select &:can_view?
 %>
 
 <div style="text-align: center">
-  
+
   <% unless creators.empty? -%>
     <% if creators.size <= 2 %>
       <% creators.each do |a|  -%>

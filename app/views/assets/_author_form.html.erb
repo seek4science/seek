@@ -21,10 +21,11 @@
     Creators
   </div>
 
-  <div id="creator_fold_content" class="foldContent" style="display: none;">
+  <div id="creator_fold_content" class="foldContent" style="display:<%= existing_creators.blank? ? 'none' : 'block' -%>">
 
     <p>
-      If this <%= resource_type %> was created by, or together with, other <%= Seek::Config.project_name %> members, please list their names below
+      If this <%= resource_type %> was created by, or together with, other <%= Seek::Config.project_name %> members, please list their names below. <br/>
+      The creators you specify will have the right to 'view and edit summary and contents' of this <%= resource_type %>.
     </p>
 
     <div class="box_editing">
@@ -68,7 +69,7 @@
           frequency: 0.1,
           updateElement: addAction,
           search_field: "name",
-          <%= "hint_field: \"email\"," unless hide_contact_details?-%>
+          <%= "hint_field: \"email\"," unless hide_contact_details? -%>
           id_field: "id",
           validation_type: "only_suggested"
         });

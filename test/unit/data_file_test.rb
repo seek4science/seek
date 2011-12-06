@@ -5,10 +5,14 @@ class DataFileTest < ActiveSupport::TestCase
   fixtures :all
 
   test "associations" do
-    datafile=data_files(:picture)
-    assert_equal users(:datafile_owner),datafile.contributor    
+    datafile_owner = Factory :user
+    datafile=Factory :data_file,:policy => Factory(:all_sysmo_viewable_policy),:contributor=> datafile_owner
+    assert_equal datafile_owner,datafile.contributor
+    unless datafile.content_blob.nil?
+      datafile.content_blob = nil
+    end
 
-    blob=content_blobs(:picture_blob)
+    blob=Factory.create(:content_blob,:original_filename=>"df.ppt", :content_type=>"application/ppt",:asset => datafile,:asset_version=>datafile.version)#content_blobs(:picture_blob)
     assert_equal blob,datafile.content_blob
   end
 
@@ -25,7 +29,7 @@ class DataFileTest < ActiveSupport::TestCase
 
   test "assay association" do
     User.with_current_user Factory(:user) do
-      datafile = data_files(:picture)
+      datafile = Factory :data_file,:policy => Factory(:all_sysmo_viewable_policy)
       assay = assays(:modelling_assay_with_data_and_relationship)
       relationship = relationship_types(:validation_data)
       assay_asset = assay_assets(:metabolomics_assay_asset1)
@@ -63,6 +67,7 @@ class DataFileTest < ActiveSupport::TestCase
   end
 
   def test_avatar_key
+
     assert_nil data_files(:picture).avatar_key
     assert data_files(:picture).use_mime_type_for_avatar?
 
@@ -106,9 +111,9 @@ class DataFileTest < ActiveSupport::TestCase
   end
 
   test "managers" do
-    df=data_files(:picture)
+    df= data_files(:picture)
     assert_not_nil df.managers
-    contributor=people(:person_for_datafile_owner)
+    contributor= people(:person_for_datafile_owner)
     manager=people(:person_for_owner_of_my_first_sop)
     assert df.managers.include?(contributor)
     assert df.managers.include?(manager)
@@ -116,7 +121,7 @@ class DataFileTest < ActiveSupport::TestCase
   end
 
   test "make sure content blob is preserved after deletion" do
-    df = data_files(:picture)
+    df = Factory :data_file #data_files(:picture)
     User.current_user = df.contributor
     assert_not_nil df.content_blob,"Must have an associated content blob for this test to work"
     cb=df.content_blob
@@ -129,7 +134,7 @@ class DataFileTest < ActiveSupport::TestCase
   end
 
   test "is restorable after destroy" do
-    df = data_files(:picture)
+    df = Factory :data_file,:policy => Factory(:all_sysmo_viewable_policy)
     User.current_user = df.contributor
     assert_difference("DataFile.count",-1) do
       df.destroy
@@ -159,14 +164,14 @@ class DataFileTest < ActiveSupport::TestCase
   end
   
   test "title_trimmed" do
-    df=data_files(:picture)
+    df= Factory :data_file ,:policy=>Factory(:policy,:sharing_scope=>Policy::ALL_SYSMO_USERS,:access_type=>Policy::EDITING) #data_files(:picture)
     df.title=" should be trimmed"
     df.save!
     assert_equal "should be trimmed",df.title
   end
 
   test "uuid doesn't change" do
-    x = data_files(:picture)
+    x = Factory :data_file,:policy => Factory(:all_sysmo_viewable_policy)#data_files(:picture)
     x.save
     uuid = x.attributes["uuid"]
     x.save
@@ -200,30 +205,96 @@ class DataFileTest < ActiveSupport::TestCase
 
   test "convert to presentation" do
     user = Factory :user
+    attribution_df = Factory :data_file
     User.with_current_user(user) {
-      data_file = Factory :data_file,:contributor=>user
+      data_file = Factory :data_file,:contributor=>user,:version=>2,
+                          :assay_ids=>[Factory(:modelling_assay).id,Factory(:experimental_assay).id]
+      Factory :content_blob,:asset=>data_file
+      Factory :attribution,:subject=>data_file,:object=>attribution_df
+      Factory :relationship,:subject=>data_file,:object=>Factory(:publication),:predicate=>Relationship::RELATED_TO_PUBLICATION
+      data_file.creators = [Factory(:person),Factory(:person)]
+      Factory :annotation,:attribute_name=>"tags",:annotatable=> data_file,:attribute_id => AnnotationAttribute.create(:name=>"tags").id
+      data_file.events = [Factory(:event)]
+      data_file.save!
+
+      data_file.reload
+
       presentation = Factory.build :presentation,:contributor=>user
-      data_file_converted = data_file.convert_to_presentation
+      data_file_converted = data_file.to_presentation!
 
-      assert_equal "Presentation", data_file_converted.class.name 
-      assert_equal presentation.attributes.keys.sort!, data_file_converted.attributes.keys.reject{|k|k=='id'}.sort!
-      
-      data_file_converted.valid?
-      assert data_file_converted.valid?
+      assert_equal presentation.class.name, data_file_converted.class.name
+      assert_equal presentation.attributes.keys.sort!, data_file_converted.attributes.keys.reject{|k|k=='id'}.sort! #???
 
-      data_file_converted.save!
-      data_file_converted.reload
-
+      assert_equal data_file.version, data_file_converted.version
       assert_equal data_file.policy.sharing_scope, data_file_converted.policy.sharing_scope
       assert_equal data_file.policy.access_type, data_file_converted.policy.access_type
       assert_equal data_file.policy.use_whitelist, data_file_converted.policy.use_whitelist
       assert_equal data_file.policy.use_blacklist, data_file_converted.policy.use_blacklist
       assert_equal data_file.policy.permissions, data_file_converted.policy.permissions
+      assert data_file.policy.id != data_file_converted.policy.id
+      assert_equal data_file.content_blob, data_file_converted.content_blob
 
       assert_equal data_file.subscriptions.map(&:person_id), data_file_converted.subscriptions(&:person_id)
-      assert_equal data_file.event_ids, data_file_converted.event_ids
+      assert_equal data_file.projects,data_file_converted.projects
+      assert_equal data_file.attributions , data_file_converted.attributions
+      assert_equal data_file.related_publications, data_file_converted.related_publications
       assert_equal data_file.creators, data_file_converted.creators
+      assert_equal data_file.annotations, data_file_converted.annotations
       assert_equal data_file.project_ids,data_file_converted.project_ids
+      assert_equal data_file.assays,data_file_converted.assays
+      assert_equal data_file.event_ids, data_file_converted.event_ids
+
+      assert_equal data_file.versions.map(&:updated_at).sort, data_file_converted.versions.map(&:updated_at).sort
     }
   end
+
+  test "fs_search_fields" do
+    user = Factory :user
+    User.with_current_user user do
+      df = Factory :data_file,:contributor=>user
+      sf1 = Factory :studied_factor_link,:substance=>Factory(:compound,:name=>"sugar")
+      sf2 = Factory :studied_factor_link,:substance=>Factory(:compound,:name=>"iron")
+      comp=sf2.substance
+      Factory :synonym,:name=>"metal",:substance=>comp
+      Factory :mapping_link,:substance=>comp,:mapping=>Factory(:mapping,:chebi_id=>"12345",:kegg_id=>"789",:sabiork_id=>111)
+      studied_factor = Factory :studied_factor,:studied_factor_links=>[sf1,sf2],:data_file=>df
+      assert df.fs_search_fields.include?("sugar")
+      assert df.fs_search_fields.include?("metal")
+      assert df.fs_search_fields.include?("iron")
+      assert df.fs_search_fields.include?("concentration")
+      assert df.fs_search_fields.include?("CHEBI:12345")
+      assert df.fs_search_fields.include?("12345")
+      assert df.fs_search_fields.include?("111")
+      assert df.fs_search_fields.include?("789")
+      assert_equal 8,df.fs_search_fields.count
+    end
+  end
+
+  test "fs_search_fields_with_synonym_substance" do
+    user = Factory :user
+    User.with_current_user user do
+      df = Factory :data_file,:contributor=>user
+      suger = Factory(:compound,:name=>"sugar")
+      iron = Factory(:compound,:name=>"iron")
+      metal = Factory :synonym,:name=>"metal",:substance=>iron
+      Factory :mapping_link,:substance=>iron,:mapping=>Factory(:mapping,:chebi_id=>"12345",:kegg_id=>"789",:sabiork_id=>111)
+      
+      sf1 = Factory :studied_factor_link,:substance=>suger
+      sf2 = Factory :studied_factor_link, :substance=>metal
+
+
+
+      Factory :studied_factor,:studied_factor_links=>[sf1,sf2],:data_file=>df
+      assert df.fs_search_fields.include?("sugar")
+      assert df.fs_search_fields.include?("metal")
+      assert df.fs_search_fields.include?("iron")
+      assert df.fs_search_fields.include?("concentration")
+      assert df.fs_search_fields.include?("CHEBI:12345")
+      assert df.fs_search_fields.include?("12345")
+      assert df.fs_search_fields.include?("111")
+      assert df.fs_search_fields.include?("789")
+      assert_equal 8,df.fs_search_fields.count
+    end
+  end
+  
 end

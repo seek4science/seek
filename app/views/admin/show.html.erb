@@ -6,8 +6,7 @@
   <%= render :partial => 'layouts/collapsable_div', :locals => {:title => "Site configuration",:partial => 'admin/site_configuration'} -%>
   <%= render :partial => 'layouts/collapsable_div', :locals => {:title => "Statistics", :partial => 'admin/stats'} -%>
   <%= render :partial => 'layouts/collapsable_div', :locals => {:title => "Manage Administrators", :partial => 'admin/admin_selection'} -%>
-  <%= render :partial => 'layouts/collapsable_div', :locals => {:title => "Act as another User", :partial => 'admin/impersonate'} -%>
-
+  <%= render :partial => 'layouts/collapsable_div', :locals => {:title => "Act as another User", :partial => 'admin/impersonate'} if Seek::Config.admin_impersonation_enabled-%>
   <br/>
   <div class='box_infotext'>
       If you are running in an production environment deployed in conjunction with <%= link_to "Passenger Phusion (modrails)","http://www.modrails.com/",:target=>"_blank" -%>

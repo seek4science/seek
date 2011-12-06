@@ -791,6 +791,20 @@ class AuthorizationTest < ActiveSupport::TestCase
   end
 
 
+  test 'creator should edit the asset, but can not manage' do
+    item = Factory :sop, :policy => Factory(:private_policy)
+    person = Factory :person
+    Factory :assets_creator, :asset => item, :creator => person
+
+    User.current_user = person.user
+
+    assert item.can_edit?
+    assert item.can_view?
+    assert item.can_download?
+    assert !item.can_delete?
+    assert !item.can_manage?
+  end
+
   private 
 
   def actions
@@ -814,6 +828,9 @@ class AuthorizationTest < ActiveSupport::TestCase
         return true #contributor is always authorized 
         # have to do this because of inconsistancies with access_type that mess up later on
         # (4 = can manage, 0 = can manage... if contributor) ???
+      elsif thing.is_downloadable? and thing.creators.include?(user.person) and access_type_allows_action?(action, Policy::EDITING)
+        scope = Policy::PRIVATE
+        return true
       else
         if user.person && user.person.projects.empty?
           scope = Policy::EVERYONE
@@ -841,4 +858,5 @@ class AuthorizationTest < ActiveSupport::TestCase
     #Use favourite_group_membership in place of permission. It has access_type so duck typing will save us.
     person.favourite_group_memberships.select {|x| favourite_group_ids.include?(x.favourite_group_id)}
   end
+
 end

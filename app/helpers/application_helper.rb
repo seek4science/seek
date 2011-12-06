@@ -1,5 +1,6 @@
 # Methods added to this helper will be available to all templates in the application.
-module ApplicationHelper
+require_dependency File.join(Rails.root, 'vendor', 'plugins', 'annotations', 'lib', 'app', 'helpers', 'application_helper')
+module ApplicationHelper  
   include SavageBeast::ApplicationHelper
   include FancyMultiselectHelper
 
@@ -84,10 +85,10 @@ module ApplicationHelper
     script="<script type='text/javascript'>\n"
     script << "function newAsset() {\n"
     script << "selected_model=$('new_resource_type').value;\n"
-    user_creatable_classes.each do |c|
+    Seek::Util.user_creatable_types.each do |c|
       name=c.name.underscore
       path = eval "new_#{name}_path"
-      if c==user_creatable_classes.first
+      if c==Seek::Util.user_creatable_types.first
         script << "if "
       else
         script << "else if "
@@ -101,7 +102,7 @@ module ApplicationHelper
 
   #selection of assets for new asset gadget
   def new_creatable_selection
-    select_tag :new_resource_type, options_for_select(user_creatable_classes.collect{|c| [(c.name.underscore.humanize == "Sop" ? "SOP" : c.name.underscore.humanize),c.name.underscore] })
+    select_tag :new_resource_type, options_for_select(Seek::Util.user_creatable_types.collect{|c| [(c.name.underscore.humanize == "Sop" ? "SOP" : c.name.underscore.humanize),c.name.underscore] })
   end
   
   def is_nil_or_empty? thing
@@ -145,15 +146,14 @@ module ApplicationHelper
       
   # text in "caption" will be used to display the item next to the image_tag_for_key;
   # if "caption" is nil, item.name will be used by default
-  def list_item_with_icon(icon_type, item, caption, truncate_to, custom_tooltip=nil)
+  def list_item_with_icon(icon_type, item, caption, truncate_to, custom_tooltip=nil, size=nil)
     list_item = "<li>"
-    
     if icon_type.downcase == "flag"
       list_item += flag_icon(item.country)
     elsif icon_type == "data_file" || icon_type == "sop"
       list_item += file_type_icon(item)
     else
-      list_item += image_tag_for_key(icon_type.downcase, nil, icon_type.camelize, nil, "")
+      list_item += image_tag_for_key(icon_type.downcase, nil, icon_type.camelize, nil, "", false, size)
     end
     item_caption = " " + h(caption.blank? ? item.name : caption)
     list_item += link_to truncate(item_caption, :length=>truncate_to), url_for(item), :title => tooltip_title_attrib(custom_tooltip.blank? ? item_caption : custom_tooltip)
@@ -330,7 +330,23 @@ module ApplicationHelper
       #:title => tooltip_title_attrib("Opens a popup window, where you can create a new favourite<br/>group, add people to it and set individual access rights.") }  #options[:tooltip_text]
     )
   end
-  
+
+  def preview_permission_popup_link resource_name, url, is_new_file, contributor_id=nil
+     return link_to_remote_redbox("preview permission",
+      { :url => url ,
+        :failure => "alert('Sorry, an error has occurred.'); RedBox.close();",
+        :with => "'sharing_scope=' + selectedSharingScope() + '&access_type=' + selectedAccessType(selectedSharingScope())
+        + '&use_whitelist=' + $('cb_use_whitelist').checked + '&use_blacklist=' + $('cb_use_blacklist').checked
+        + '&project_ids=' + getProjectIds('#{resource_name}') + '&project_access_type=' + $F('sharing_your_proj_access_type')
+        + '&contributor_types=' + $F('sharing_permissions_contributor_types') + '&contributor_values=' + $F('sharing_permissions_values')
+        + '&creators=' + getCreators() + '&contributor_id=' + '#{contributor_id}' + '&resource_name=' + '#{resource_name}' + '&is_new_file=' + '#{is_new_file}'"},
+      { :id => 'preview_permission',
+        :style => 'display:none'
+      } #,
+      #:alt => "Click to create a new favourite group (opens popup window)",#options[:tooltip_text],
+      #:title => tooltip_title_attrib("Opens a popup window, where you can create a new favourite<br/>group, add people to it and set individual access rights.") }  #options[:tooltip_text]
+    )
+  end
   #Return whether or not to hide contact details from this user
   #Current decided by Seek::Config.hide_details_enabled in config.rb
   #Defaults to false
@@ -469,6 +485,13 @@ module ApplicationHelper
     end
   end
 
+  def display_people_list people
+    html = '<ul>'
+    people.each do |person|
+       html<< "<li><a href='#{person_path(person[0])}' target='_blank'>#{person[1]}</a></li>"
+    end
+    html << '</ul>'
+  end
 
 
   private  
@@ -478,6 +501,10 @@ end
 class ApplicationFormBuilder< ActionView::Helpers::FormBuilder
   def fancy_multiselect association, options = {}
     @template.fancy_multiselect object, association, options
+  end
+
+  def subform_delete_link(link_text='remove', link_options = {}, hidden_field_options = {})
+    hidden_field(:_destroy, hidden_field_options) + @template.link_to_function(link_text, "$(this).previous().value = '1';$(this).up().hide();", link_options)
   end
 end
 

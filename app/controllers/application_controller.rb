@@ -1,7 +1,8 @@
-	# Filters added to this controller apply to all controllers in the application.
+# Filters added to this controller apply to all controllers in the application.
 # Likewise, all the methods added will be available for all controllers.
-
 class ApplicationController < ActionController::Base
+  require_dependency File.join(Rails.root, 'vendor', 'plugins', 'annotations', 'lib', 'app', 'controllers', 'application_controller')
+
   skip_after_filter :add_piwik_analytics_tracking if Seek::Config.piwik_analytics_enabled == false
 
   self.mod_porter_secret = PORTER_SECRET
@@ -31,6 +32,14 @@ class ApplicationController < ActionController::Base
     end
   end
 
+  around_filter :with_auth_code
+  def with_auth_code
+    session[:code] = params[:code] if params[:code]
+    SpecialAuthCode.with_auth_code(session[:code]) do
+      yield
+    end
+  end
+
   before_filter :project_membership_required,:only=>[:create,:new]
 
   helper :all
@@ -49,6 +58,10 @@ class ApplicationController < ActionController::Base
     request.host_with_port
   end
 
+  def application_root
+    return  "http://#{base_host}"
+  end
+  helper_method :application_root
 
   def self.fast_auto_complete_for(object, method, options = {})
     define_method("auto_complete_for_#{object}_#{method}") do
@@ -108,53 +121,6 @@ class ApplicationController < ActionController::Base
     reset_session
   end
 
-  def find_or_create_substance(new_substances, known_substance_ids_and_types)
-    known_substances = []
-    known_substance_ids_and_types.each do |text|
-      id, type = text.split(',')
-      id = id.strip
-      type = type.strip.capitalize.constantize
-      known_substances.push(type.find(id)) if type.find(id)
-    end
-    new_substances, known_substances = check_if_new_substances_are_known new_substances, known_substances
-    #no substance
-    if (new_substances.size + known_substances.size) == 0
-      nil
-    #one substance
-    elsif (new_substances.size + known_substances.size) == 1
-      if !known_substances.empty?
-        known_substances.first
-      else
-        c = Compound.new(:name => new_substances.first)
-          if  c.save
-            c
-          else
-            nil
-          end
-      end
-    #FIXME: update code when mixture table is created
-    else
-      nil
-    end
-  end
-
-  def no_comma_for_decimal
-    check_string = ''
-    if self.controller_name.downcase == 'studied_factors'
-      check_string.concat(params[:studied_factor][:start_value].to_s + params[:studied_factor][:end_value].to_s + params[:studied_factor][:standard_deviation].to_s)
-    elsif self.controller_name.downcase == 'experimental_conditions'
-      check_string.concat(params[:experimental_condition][:start_value].to_s + params[:experimental_condition][:end_value].to_s)
-    end
-
-    if check_string.match(',')
-         render :update do |page|
-           page.alert('Please use point instead of comma for decimal number')
-         end
-      return false
-    else
-      return true
-    end
-  end
   private
 
   def project_membership_required
@@ -245,7 +211,7 @@ class ApplicationController < ActionController::Base
           'tag', 'items', 'statistics', 'tag_suggestions', 'preview'
         'view'
 
-      when 'download', 'named_download', 'launch', 'submit_job', 'data', 'execute','plot'
+      when 'download', 'named_download', 'launch', 'submit_job', 'data', 'execute','plot', 'explore'
         'download'
 
       when 'edit', 'new', 'create', 'update', 'new_version', 'create_version',
@@ -338,6 +304,7 @@ class ApplicationController < ActionController::Base
         end
         when "investigations","studies","assays","specimens","samples"
         if ["show","create","update","destroy"].include?(a)
+          check_log_exists(a,c,object)
           ActivityLog.create(:action => a,
                      :culprit => current_user,
                      :referenced => object.projects.first,
@@ -350,6 +317,7 @@ class ApplicationController < ActionController::Base
           a = "create" if a == "upload_for_tool"
           a = "update" if a == "new_version"
         if ["show","create","update","destroy","download"].include?(a)
+          check_log_exists(a,c,object)
           ActivityLog.create(:action => a,
                      :culprit => current_user,
                      :referenced => object.projects.first,
@@ -376,25 +344,16 @@ class ApplicationController < ActionController::Base
     end
   end
 
-  #List of activerecord model classes that are directly creatable by a standard user (e.g. uploading a new DataFile, creating a new Assay, but NOT creating a new Project)
-  #returns a list of all types that respond_to and return true for user_creatable?
-  def user_creatable_classes
-    @@creatable_model_classes ||= begin
-      classes=Seek::Util.persistent_classes.select do |c|
-        c.respond_to?("user_creatable?") && c.user_creatable?
-      end.sort_by{|a| [a.is_asset? ? -1 : 1, a.is_isa? ? -1 : 1,a.name]}
-      classes.delete(Event) unless Seek::Config.events_enabled
-
-      unless Seek::Config.is_virtualliver
-        classes.delete(Sample)
-        classes.delete(Specimen)
-      end
-
-      classes
+  def check_log_exists action,controllername,object
+    if action=="create"
+      a=ActivityLog.find(:first,:conditions=>{
+          :activity_loggable_type=>object.class.name,
+          :activity_loggable_id=>object.id,
+          :controller_name=>controllername,
+          :action=>"create"})
+      raise Exception.new "Duplicate create activity log about to be created for #{object.class.name}:#{object.id}" unless a.nil?
     end
   end
-
-  helper_method :user_creatable_classes
 
   def permitted_filters
     #placed this in a seperate method so that other controllers could override it if necessary
@@ -434,18 +393,7 @@ class ApplicationController < ActionController::Base
     }
   end
 
-  #double checks and resolves if any new compounds are actually known. This can occur when the compound has been typed completely rather than
-  #relying on autocomplete. If not fixed, this could have an impact on preserving compound ownership.
-  def check_if_new_substances_are_known new_substances, known_substances
-    fixed_new_substances = []
-    new_substances.each do |new_substance|
-      substance=Compound.find_by_name(new_substance.strip) || Synonym.find_by_name(new_substance.strip)
-      if substance.nil?
-        fixed_new_substances << new_substance
-      else
-        known_substances << substance unless known_substances.include?(substance)
-      end
-    end
-    return fixed_new_substances, known_substances
-  end
 end
+
+
+

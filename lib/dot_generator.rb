@@ -9,7 +9,9 @@ module DotGenerator
                   'Study'=>"#91c98b",
                   'Assay'=>"#64b466",
                   'Publication'=>"#84B5FD",
-                  'Presentation' => "cadetblue2"}
+                  'Presentation' => "cadetblue2",
+                  'Sample' => "orange",
+                  'Specimen' => "red"}
   FILL_COLOURS.default = "cadetblue"
 
   def dot_header title
@@ -45,6 +47,10 @@ module DotGenerator
     def initialize first, second, attributes={}
       super "#{first.entry_identifier} -- #{second.entry_identifier}", attributes
     end
+
+    def == other
+      to_s == other.to_s
+    end
   end
 
   class NodeEntry < Entry
@@ -71,7 +77,7 @@ module DotGenerator
   end
 
   class Node < NodeEntry
-    cattr_accessor :current, :deep
+    cattr_accessor :current, :deep, :edges
     cattr_accessor :controller
     attr_accessor :item
 
@@ -82,6 +88,17 @@ module DotGenerator
 
     def as_dot
       to_s
+    end
+
+    def edge *args
+      #keep track of which edges already exist, and don't duplicate them
+      edge = super(*args)
+      unless edges.include? edge
+        edges << edge
+        edge
+      else
+        ""
+      end
     end
 
     def item_type
@@ -186,6 +203,7 @@ module DotGenerator
     Node.current = current_item
     Node.deep = deep
     Node.controller = self
+    Node.edges = []
 
     dot += node_for(root_item).as_dot
     dot << "}"
@@ -381,7 +399,7 @@ class AssayNode < SeekNode
   end
 
   def children
-    deep ? item.assay_assets + item.related_publications : []
+    deep ? item.assay_assets + item.related_publications + item.samples : []
   end
 end
 
@@ -415,6 +433,12 @@ class AssayAssetNode < VersionedAssetNode
     else
       super
     end
+  end
+end
+
+class SampleNode < SeekNode
+  def children
+    [item.specimen]
   end
 end
 

@@ -111,114 +111,21 @@ module AssetsHelper
       related[key][:extra_count] = 0
     end
 
-    case name
-      when "DataFile"
-        related["Person"][:items] = resource.creators
-        related["Project"][:items] = resource.projects
-        related["Study"][:items] = resource.studies
-        related["Assay"][:items] = resource.assays
-        related["Publication"][:items] = resource.related_publications
-        related["Event"][:items] = resource.events
-      when "Sop", "Model"
-        related["Person"][:items] = resource.creators
-        related["Project"][:items] = resource.projects
-        related["Study"][:items] = resource.studies
-        related["Assay"][:items] = resource.assays
-        related["Publication"][:items] = resource.related_publications
-      when "Assay"
-        related["Project"][:items] = resource.projects
-        related["Investigation"][:items] = [resource.investigation]
-        related["Study"][:items] = [resource.study]
-        related["DataFile"][:items] = resource.data_files
-        related["Model"][:items] = resource.models if resource.is_modelling? #MODELLING ASSAY
-        related["Sop"][:items] = resource.sops
-        related["Publication"][:items] = resource.related_publications
-      when "Investigation"
-        related["Project"][:items] = resource.projects
-        related["Study"][:items] = resource.studies
-        related["Assay"][:items] = resource.assays
-        related["DataFile"][:items] = resource.data_files
-        related["Sop"][:items] = resource.sops
-      when "Study"
-        related["Project"][:items] = resource.projects
-        related["Investigation"][:items] = [resource.investigation]
-        related["Assay"][:items] = resource.assays
-        related["DataFile"][:items] = resource.data_files
-        related["Sop"][:items] = resource.sops
-      when "Organism"
-        related["Project"][:items] = resource.projects
-        related["Assay"][:items] = resource.assays
-        related["Model"][:items] = resource.models
-      when "Person"
-        related["Project"][:items] = resource.projects
-        related["Institution"][:items] = resource.institutions
-        related["Study"][:items] = resource.studies
-        if resource.user
-          related["DataFile"][:items] = resource.user.data_files
-          related["Model"][:items] = resource.user.models
-          related["Sop"][:items] = resource.user.sops
-          related["Presentation"][:items] = resource.user.presentations
-        end
-        related["DataFile"][:items] = related["DataFile"][:items] | resource.created_data_files
-        related["Model"][:items] = related["Model"][:items] | resource.created_models
-        related["Sop"][:items] = related["Sop"][:items] | resource.created_sops
-        related["Publication"][:items] = related["Publication"][:items] | resource.created_publications
-        related["Presentation"][:items] = related["Presentation"][:items] | resource.created_presentations
-        related["Assay"][:items] = resource.assays
-      when "Institution"
-        related["Project"][:items] = resource.projects
-        related["Person"][:items] = resource.people
-      when "Project"
-        related["Event"][:items] = resource.events
-        related["Person"][:items] = resource.people
-        related["Institution"][:items] = resource.institutions
-        related["Investigation"][:items] = resource.investigations
-        related["Study"][:items] = resource.studies
-        related["Assay"][:items] = resource.assays
-        related["DataFile"][:items] = resource.data_files
-        related["Model"][:items] = resource.models
-        related["Sop"][:items] = resource.sops
-        related["Publication"][:items] = resource.publications
-        related["Presentation"][:items]= resource.presentations
-      when "Publication"
-        related["Person"][:items] = resource.creators
-        related["Project"][:items] = resource.projects
-        related["DataFile"][:items] = resource.related_data_files
-        related["Model"][:items] = resource.related_models
-        related["Assay"][:items] = resource.related_assays
-        related["Event"][:items] = resource.events
-      when "Presentation"
-        related["Person"][:items] = resource.creators
-        related["Project"][:items] = resource.projects
-        related["Publication"][:items] = resource.related_publications
-        related["Event"][:items] = resource.events
-
-      when "Event"
-        {#"Person" => [resource.contributor.try :person], #assumes contributor is a person. Currently that should always be the case, but that could change.
-         "Project" => resource.projects,
-         "DataFile" => resource.data_files,
-         "Publication" => resource.publications,
-        "Presentation"=> resource.presentations }.each do |k, v|
-          related[k][:items] = v unless v.nil?
-        end
-      when "Specimen"
-
-        related["Institution"][:items] = [resource.institution]
-        related["Person"][:items] = resource.creators
-        related["Project"][:items] = resource.projects
-        related["Sample"][:items] = resource.samples
-        related["Sop"][:items] = resource.sops
-
-      when "Sample"
-        related["Specimen"][:items] = [resource.specimen]
-        related["Institution"][:items] = [resource.institution]
-        related["Project"][:items] = resource.projects
-        related["Assay"][:items] = resource.assays
-        related["Sop"][:items] = resource.sops
-
-      else
+    # polymorphic 'related_resource' with ResourceClass#related_resource_type(s),e.g. Person#related_presentations
+    related_types = related.keys - [resource.class.name]
+    related_types.each do |type|
+      method_name = type.underscore.pluralize
+      if resource.respond_to? "related_#{method_name}"
+        related[type][:items] = resource.send "related_#{method_name}"
+      elsif resource.respond_to? method_name
+        related[type][:items] = resource.send method_name
+      elsif resource.respond_to? "related_#{method_name.singularize}"
+         related[type][:items] = [resource.send "related_#{method_name.singularize}"]
+      elsif resource.respond_to? method_name.singularize
+        related[type][:items] = [resource.send method_name.singularize]
+      end
     end
-    
+
     #Authorize
     related.each_value do |resource_hash|
       resource_hash[:items].compact!

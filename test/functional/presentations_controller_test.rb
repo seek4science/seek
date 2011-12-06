@@ -111,7 +111,7 @@ class PresentationsControllerTest < ActionController::TestCase
 
   test "can destroy" do
     presentation = Factory :presentation,:contributor=>User.current_user
-    content_blob_id = presentation.content_blob_id
+    content_blob_id = presentation.content_blob.id
      assert_difference("Presentation.count",-1) do
        delete :destroy,:id => presentation
      end
@@ -129,5 +129,34 @@ class PresentationsControllerTest < ActionController::TestCase
      end
   end
 
+  test "update tags with ajax" do
+    p = Factory :person
+
+    login_as p.user
+
+    p2 = Factory :person
+    presentation = Factory :presentation,:contributor=>p.user
+
+
+    assert presentation.annotations.empty?,"this presentation should have no tags for the test"
+
+    golf = Factory :tag,:annotatable=>presentation,:source=>p2.user,:value=>"golf"
+    Factory :tag,:annotatable=>presentation,:source=>p2.user,:value=>"sparrow"
+
+    presentation.reload
+
+    assert_equal ["golf","sparrow"],presentation.annotations.collect{|a| a.value.text}.sort
+    assert_equal [],presentation.annotations.select{|a| a.source==p.user}.collect{|a| a.value.text}.sort
+    assert_equal ["golf","sparrow"],presentation.annotations.select{|a|a.source==p2.user}.collect{|a| a.value.text}.sort
+
+    xml_http_request :post, :update_annotations_ajax,{:id=>presentation,:tag_autocompleter_unrecognized_items=>["soup"],:tag_autocompleter_selected_ids=>[golf.value.id]}
+
+    presentation.reload
+
+    assert_equal ["golf","soup","sparrow"],presentation.annotations.collect{|a| a.value.text}.uniq.sort
+    assert_equal ["golf","soup"],presentation.annotations.select{|a| a.source==p.user}.collect{|a| a.value.text}.sort
+    assert_equal ["golf","sparrow"],presentation.annotations.select{|a|a.source==p2.user}.collect{|a| a.value.text}.sort
+
+  end
 
 end

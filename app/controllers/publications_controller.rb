@@ -2,7 +2,7 @@ class PublicationsController < ApplicationController
   
   include IndexPager
   include DotGenerator
-  include Seek::TaggingCommon
+  include Seek::AssetsCommon
   
   require 'pubmed_query_tool'
   
@@ -32,6 +32,7 @@ class PublicationsController < ApplicationController
       format.svg { render :text=>to_svg(@publication,params[:deep]=='false',@publication)}
       format.dot { render :text=>to_dot(@publication,params[:deep]=='false',@publication)}
       format.png { render :text=>to_png(@publication,params[:deep]=='false',@publication)}
+      format.enw { send_data @publication.endnote, :type => "application/x-endnote-refer", :filename => "#{@publication.title}.enw" }
     end
   end
 
@@ -121,7 +122,7 @@ class PublicationsController < ApplicationController
       valid = false
     end
 
-    update_tags @publication
+    update_annotations @publication
 
     assay_ids = params[:assay_ids] || []
 
@@ -285,7 +286,7 @@ class PublicationsController < ApplicationController
     doi = @publication.doi
     if pubmed_id
       query = PubmedQuery.new("seek",Seek::Config.pubmed_api_email)
-      result = query.fetch(pubmed_id)      
+      result = query.fetch(pubmed_id)
     elsif doi
       query = DoiQuery.new(Seek::Config.crossref_api_email)
       result = query.fetch(doi)
@@ -350,4 +351,5 @@ class PublicationsController < ApplicationController
       end  
     end
   end
+
 end

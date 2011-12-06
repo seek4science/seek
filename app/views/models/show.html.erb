@@ -1,4 +1,6 @@
-<%= javascript_include_tag "resource" -%>
+
+<%= javascript_include_tag "resource" ,"zoom/lightbox"-%>
+<%= stylesheet_link_tag "lightbox" %>
 
 <%= asset_buttons @model,@display_model.version -%>
 
@@ -43,12 +45,12 @@
                 <span class="title"><%=h @display_model.title -%></span>
             </p>
             <p>
-                <b>File name:</b>
-                <%=h @display_model.original_filename -%>
-            </p>
-            <p>
-                <b>Format:</b>
-                <%=h mime_nice_name(@display_model.content_type) -%>
+              <% files = @display_model.content_blobs %>
+                <b>All Files</b> (<span style="font-style: italic;"><%= files.count %> in total</span>):<br/>
+              <% files.each do |content_blob|%>
+               <%= h(content_blob.original_filename) -%> (<%=h mime_nice_name(content_blob.content_type) -%>)
+               <br/>
+              <% end %>
             </p>
             <p>
                 <b>Organism:</b>
@@ -70,6 +72,21 @@
                 <b>Execution or visualisation environment:</b>
                 <%= model_environment_text @display_model %>
             </p>
+          <p>
+          <b>Model visualization</b>(<span style="font-style:italic;">click it to zoom</span>)<br/>
+          <div id="thumbnail">
+
+            <% unless  @display_model.id_image.nil? or @display_model.id_image==0 %>
+            <a href='<%= url_for(:controller=>"models",:action=>"send_image",:id=>@model,:version=>@display_model.version) %>' rel="lightbox">
+               <img src="<%= url_for(:controller=>"models",:action=>"send_image",:id=>@model,:version=>@display_model.version) %>" width="50" height="50"/>
+            </a>
+            <% else %>
+            <span class="none_text">None</span>
+            <% end %>
+
+
+           </div>
+         </p>
             <br/>
             <p>
                 <b>Description:</b>
@@ -83,6 +100,7 @@
                 </p>
                 <% end -%>
             </p>
+
             <p>
                 <%= embedded_isa_svg(@model, true, @model) -%>
             </p>
@@ -93,3 +111,6 @@
         <%= render :partial=>"layouts/items_related_to",:object => @model %>
     </div>
 </div>
+
+<script type="text/javascript" src="/javascripts/zoom/scriptaculous.js?load=builder"></script>
+

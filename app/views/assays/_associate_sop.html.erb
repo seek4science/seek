@@ -1,3 +1,9 @@
+<%
+    all_sops=authorised_sops.sort{|a, b| a.title<=>b.title}
+    project_sops=all_sops.select{|s| current_user.person.member_of?(s.projects)}
+    select_truncate_length=120
+    associated_sops = resource.is_a?(Publication) ? resource.related_sops : resource.sops
+-%>
 <div class="fold">
 
   <div class="foldTitle">
@@ -5,14 +11,8 @@
     Associate SOPs
   </div>
 
-  <div id="associate_model_fold_content" class="foldContent" style="display: block;">
+  <div id="associate_model_fold_content" class="foldContent" style="display:<%= associated_sops.blank? ? 'none' : 'block' -%>">
     <div class="yui-u first" style="width:66%; float:left">
-      <%
-        all_sops=authorised_sops.sort{|a, b| a.title<=>b.title}   
-        project_sops=all_sops.select{|s| current_user.person.member_of?(s.projects)}
-        select_truncate_length=120
-      -%>
-
       <p style="color: #666666;">
         The following SOPs are involved in this <%= @assay_text -%>:
       </p>

@@ -4,7 +4,7 @@
 @assay_type_text=@assay.is_modelling? ? "biological problem addressed" : "assay type"
 %>
 <%= javascript_include_tag "assays.js"  %>
-<%= javascript_include_tag "sharing.js" %>
+<%= javascript_include_tag "sharing.js", "resource.js"%>
 
 <%= f.error_messages -%>
 <%= f.hidden_field :create_from_asset %>
@@ -85,11 +85,19 @@
 
 <br style="clear:both"/>
 
- <%= f.fancy_multiselect :samples, :object_type_text => @assay_text,:with_new_link=>true -%>
-
-<div id="add_organism_form">
-<%= render :partial=>"assays/select_organisms"-%>
-</div>
+<% if Seek::Config.is_virtualliver %>
+    <% if @assay.is_modelling?  -%>
+        <div id="add_organism_form">
+            <%= render :partial=>"assays/select_organisms" if !Seek::Config.is_virtualliver || @assay.is_modelling?-%>
+        </div>
+     <% else -%>
+         <%= f.fancy_multiselect :samples, :object_type_text => @assay_text, :required=>true -%>
+     <% end -%>
+<% else %>
+  <div id="add_organism_form">
+     <%= render :partial=>"assays/select_organisms" -%>
+  </div>
+<% end %>
 
 <br style="clear:both"/>
 
@@ -101,11 +109,7 @@
   <%= render :partial=>"assets/select_tags" -%>
 </p>
 
-
-
-
-
-<%= render :partial=>"assays/associate_sop",:locals=>{:f=>f} -%>
+<%= render :partial=>"assays/associate_sop",:locals=>{:f=>f, :resource => @assay} -%>
 
 <%  if @assay.is_modelling? -%>
   <%= render :partial=>"assays/associate_model",:locals=>{:f=>f, :resource => @assay} -%>
@@ -115,18 +119,23 @@
 
 <%= render :partial => "assets/publication_relation_form", :locals => { :resource_type => "Assay",
                                                                         :related_publications => @assay.related_publications} -%>
-                                                                        
+
 <p style="margin-top: 2em; text-align: center;" >
   <%
      button_text=action==:edit ? "Update" : "Create"
      disabled_text=action==:edit ? "Updating..." : "Creating..."
+     is_new_file=action==:edit ? false : true
   %>
-  <%= f.submit button_text,:disable_with=>disabled_text, :id => "assay_submit_btn", :onclick => "javascript: $('assay_submit_btn').form.submit();return(false);" -%>
+  <% if @assay.can_manage? %>
+      <%= preview_permission_popup_link('assay', url_for(:controller => 'policies', :action => 'preview_permissions'), is_new_file, try_block{@assay.contributor.user.id})-%>
+      <%= f.submit button_text, :id => "assay_submit_btn", :onclick => "javascript: clickLink($('preview_permission'));return(false);" -%>
+  <% else %>
+      <%= f.submit button_text, :disable_with=>disabled_text, :id => "assay_submit_btn", :onclick => "javascript: $('assay_submit_btn').form.submit();return(false);" -%>
+  <% end %>
   or <%= link_to 'Cancel', (@assay.id ? assay_path(@assay.id) : assays_path) -%>
 </p>
 
 <script type="text/javascript">
-
 
   function hide_organism_form(){
       Effect.Fade('add_organism_form');
@@ -199,20 +208,21 @@
       }
   }
 
-
+  <%if @assay.is_modelling?%>
       Event.observe(window, 'load', function() {
-          Event.observe('assay_sample_ids', 'fancySelect:update', function(){
-            check_show_organism_form();
-          });
-
-          var update_organisms_without_check_sample_form = this['updateOrganisms'];
-          this['updateOrganisms'] = function() {
-              update_organisms_without_check_sample_form();
-              check_show_sample_form();
-          };
+//          Event.observe('assay_sample_ids', 'fancySelect:update', function(){
+//            check_show_organism_form();
+//          });
+//
+//          var update_organisms_without_check_sample_form = this['updateOrganisms'];
+//          this['updateOrganisms'] = function() {
+//              update_organisms_without_check_sample_form();
+//              check_show_sample_form();
+//          };
 
           $('assay_sample_ids').fire('fancySelect:update');
           updateOrganisms();
       });
+  <% end %>
 
 </script>

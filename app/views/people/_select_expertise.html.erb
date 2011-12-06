@@ -3,4 +3,8 @@
   <%= help_icon("A comma seperated list of keywords that describe your expertise.<br/>Please let the suggestions guide you, but feel free to add your own if necessary.") -%>
 </label>
 
-<%= render :partial=>"layouts/select_tags",:locals=>{:all_tags=>tags_for_context(:expertise), :item_tags=>@person.expertise, :name=>"expertise", :no_tags_message=>"Type the areas you have expertise in" } -%>
+<%
+    all_tags,item_tags = fetch_tags_for_item @person,"expertise"
+%>
+
+<%= render :partial=>"layouts/select_tags",:locals=>{:all_tags=>all_tags, :item_tags=>item_tags, :name=>"expertise", :no_tags_message=>"Type the areas you have expertise in" } -%>

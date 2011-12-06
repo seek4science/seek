@@ -2,11 +2,12 @@ class SopsController < ApplicationController
   
   include IndexPager
   include DotGenerator
-  include Seek::AssetsCommon  
+  include Seek::AssetsCommon
+  include AssetsCommonExtension
   
   #before_filter :login_required
   before_filter :find_assets, :only => [ :index ]
-  before_filter :find_and_auth, :except => [ :index, :new, :create, :request_resource,:preview, :test_asset_url, :update_tags_ajax]
+  before_filter :find_and_auth, :except => [ :index, :new, :create, :request_resource,:preview, :test_asset_url, :update_annotations_ajax]
   before_filter :find_display_sop, :only=>[:show,:download]
 
   include Seek::Publishing
@@ -14,14 +15,13 @@ class SopsController < ApplicationController
   def new_version
     if (handle_data nil)      
       comments=params[:revision_comment]
-      
-      @sop.content_blob = ContentBlob.new(:tmp_io_object => @tmp_io_object, :url=>@data_url)
-      @sop.content_type = params[:sop][:content_type]
-      @sop.original_filename = params[:sop][:original_filename]
-      
+
       conditions = @sop.experimental_conditions
       respond_to do |format|
         if @sop.save_as_new_version(comments)
+
+          create_content_blobs
+
           #Duplicate experimental conditions
           conditions.each do |con|
             new_con = con.clone
@@ -95,14 +95,15 @@ class SopsController < ApplicationController
 
     if handle_data            
       @sop = Sop.new(params[:sop])
-      @sop.content_blob = ContentBlob.new(:tmp_io_object => @tmp_io_object,:url=>@data_url)
-
       @sop.policy.set_attributes_with_sharing params[:sharing], @sop.projects
 
-      update_tags @sop
+      update_annotations @sop
       assay_ids = params[:assay_ids] || []
       respond_to do |format|
         if @sop.save
+
+          create_content_blobs
+
           # update attributions
           Relationship.create_or_update_attributions(@sop, params[:attributions])
           
@@ -138,7 +139,7 @@ class SopsController < ApplicationController
       params[:sop][:last_used_at] = Time.now
     end
 
-    update_tags @sop
+    update_annotations @sop
     assay_ids = params[:assay_ids] || []
 
     @sop.attributes = params[:sop]
@@ -219,7 +220,11 @@ class SopsController < ApplicationController
   
   def find_display_sop
     if @sop
-      @display_sop = params[:version] ? @sop.find_version(params[:version]) : @sop.latest_version
+        if logged_in? and current_user.person.member? and params[:version]
+          @display_sop = @sop.find_version(params[:version]) ? @sop.find_version(params[:version]) : @sop.latest_version
+        else
+          @display_sop = @sop.latest_version
+        end
     end
   end
   

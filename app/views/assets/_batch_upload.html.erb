@@ -1,0 +1,163 @@
+<%= javascript_include_tag 'attachments' %>
+
+<%
+   # determine the asset type from the controller
+   upload_field = controller_name.downcase.singularize.underscore
+   # inject the attributes data_url and local_copy in the asset type, e.g. @model. This keeps the form clean.
+   resource=eval("@"+upload_field)
+   class << resource
+       attr_accessor :data_url, :local_copy
+   end unless resource.nil?
+   resource.local_copy=1 unless resource.nil?
+   asset_name = text_for_resource upload_field
+   @content_blob ||= ContentBlob.new
+-%>
+
+<div class="box_infotext">
+  <p>
+    You can register a <%= asset_name -%> by either directly uploading a file, or registering a URL. Please test the URL
+    before
+    submitting. <%= link_to_function "More info " + expand_image, visual_effect(:toggle_blind, "more_upload_info", :duration => 0.3) -%>
+  </p>
+    <span id="more_upload_info" style="display:none;">
+        <p>
+          When registering a URL you can specify that a copy of the data should be stored
+          within SEEK. This is recommended and is equivalent to uploading a file. It also means that should the data
+          behind the URL the data is still available from SEEK.
+        </p>
+        <p>
+          If the URL results in a redirection or unauthorized response, then SEEK has no option but to store only the
+          URL. In this case, when another user selects to download the <%= asset_name -%>
+          then they will simply directed to the URL (for example, so that they can login to access the file).
+        </p>
+    </span>
+</div>
+
+<div>
+  <div id="upload_type_selection">
+    <ul id="switch_upload_buttons">
+      <li>
+        <%= link_to_function image("file_large"), "from_file_selected(); return (false);", :class=>"block_link_active", :id=>"upload_from_file_button", :title=>tooltip_title_attrib('Add from a local file') -%>
+      </li>
+      <li>
+        <%= link_to_function image("internet_large"), "from_url_selected(); return (false);", :class=>"block_link", :id=>"upload_from_url_button", :title=>tooltip_title_attrib('Add from a remote URL') -%>
+      </li>
+      <li id="upload_options">
+        <div id="upload_from_file">
+          <p>
+            <b>File to upload:</b>
+            <span class="required">*</span>
+            <br/>
+            <%#= file_field upload_field, :data -%>
+
+
+                <% fields_for @content_blob do |content_blob| -%>
+                    <input id="content_blob_data" type="file"
+                    <% if action==:edit -%>
+                             disabled
+                    <% end -%> >
+                <% end %>
+          </p>
+
+        </div>
+        <div id="upload_from_url" style="display:none;">
+          <p>
+            <b>URL:</b>
+            <span class="required">*</span>
+
+
+            <input id="content_blob_data_url" type="text" size="55"
+                   <% if action==:edit -%>
+                   disabled
+                   <% end -%>  >
+
+            <% if action==:new %>
+
+                <%= link_to_function (image("new") + "Add"), "addToList()" %>
+                <%= link_to_remote image("test", :title=>"Test", :alt=>"Test")+" Test",
+                                   :url=>{:action=>:test_asset_url, :symb=>"content_blob"},
+                                   :method=>:post,
+                                   :with=>"multi_selector.current_url_element.serialize()",
+                                   :before=>"$('test_url_msg').innerHTML='';show_ajax_loader('test_url_result_icon');" -%>
+
+                <br/>
+
+                <p style="clear:both;">
+                  <b>Make a copy?</b>
+
+                  <%# fields_for upload_field,:local_copy do |local_copies| %>
+
+                  <%#= local_copies.check_box upload_field, :local_copy, :id=>"local_copy" -%>
+                  <%# end %>
+                  <%= check_box upload_field, :local_copy, :id=>"local_copy" -%>
+                </p>
+            <% end -%>
+            </p>
+            <p>
+              <span id="test_url_result_icon"></span>
+              <span id="test_url_msg" style="display:none;"></span>
+            </p>
+
+
+            </div>
+
+      </li>
+    </ul>
+
+  </div>
+
+
+  <table id="pending_files">
+    <% if action==:edit -%>
+        <%= render :partial => "assets/content_blob", :collection => resource.content_blobs, :locals => {:resource=>resource} %>
+    <% end -%>
+  </table>
+</div>
+
+<script type="text/javascript">
+    from_file_selected();
+
+
+     var multi_selector = new MultiSelector($('pending_files'), '<%=resource.class.name.downcase%>', 'id_image');
+//    if ('<%#= action.to_s%>'=="edit"){
+//       page.assign 'multi_selector.max',<%#= Seek::Config.max_attachments_num %>;
+//    }
+
+     multi_selector.addElement($('content_blob_data'));
+     multi_selector.addElement($('content_blob_data_url'));
+
+
+    function addToList() {
+         var url_element = $('content_blob_data_url');
+         <%#= remote_function(:url=>{:action=>:test_asset_url, :symb=>"content_blob"},
+                                   :method=>:post,
+                                   :with=>"url_element.multi_selector.current_url_element.serialize()",
+                                   :before=>"$('test_url_msg').innerHTML='';show_ajax_loader('test_url_result_icon');" )
+                                   -%>
+        var url = parseUri(multi_selector.current_url_element.value).file;
+
+        if (url != "" && url != null) {
+            var new_element = document.createElement('input');
+            new_element.type = 'text';
+            new_element.size = '55';
+            var old_element = document.getElementsByName('content_blob[url_' + (multi_selector.id_url - 1) + ']')[0];
+            if (old_element.value != "") {
+                old_element.parentNode.insertBefore(new_element, old_element);
+                old_element.multi_selector.addElement(new_element);
+                old_element.multi_selector.addListRow(old_element, old_element.multi_selector.object_name, old_element.multi_selector.method);
+                //old_element.style.position = 'absolute';
+                //old_element.style.left = '-1000px';
+                old_element.type = 'hidden';
+            } else {
+                old_element.focus();
+            }
+
+        }else{
+            alert("The URL cannot be parsed!");
+        }
+
+
+    }
+
+
+</script>

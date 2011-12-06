@@ -62,7 +62,11 @@
     f.title "This Sop"
     f.projects {[Factory.build(:project)]}
     f.association :contributor, :factory => :user
-  end
+
+    f.after_create do |sop|
+      sop.content_blob = Factory.create(:content_blob, :content_type=>"application/pdf", :asset => sop, :asset_version=>sop.version)
+    end
+end
 
 #Policy
   Factory.define(:policy, :class => Policy) do |f|
@@ -84,6 +88,21 @@
   Factory.define(:all_sysmo_viewable_policy,:parent=>:policy) do |f|
     f.sharing_scope Policy::ALL_SYSMO_USERS
     f.access_type Policy::VISIBLE
+  end
+
+  Factory.define(:all_sysmo_downloadable_policy,:parent=>:policy) do |f|
+    f.sharing_scope Policy::ALL_SYSMO_USERS
+    f.access_type Policy::ACCESSIBLE
+  end
+    
+  Factory.define(:publicly_viewable_policy, :parent=>:policy) do |f|
+    f.sharing_scope Policy::EVERYONE
+    f.access_type Policy::VISIBLE
+  end
+
+  Factory.define(:public_download_and_no_custom_sharing,:parent=>:policy) do |f|
+    f.sharing_scope Policy::ALL_SYSMO_USERS
+    f.access_type Policy::ACCESSIBLE
   end
 
 #Permission
@@ -124,8 +143,6 @@ end
 
 Factory.define(:modelling_assay, :parent => :assay_base) do |f|
   f.association :assay_class, :factory => :modelling_assay_class
-  f.samples {[Factory.build :sample]}
-
 end
 
 Factory.define(:modelling_assay_with_organism, :parent => :modelling_assay) do |f|
@@ -187,7 +204,9 @@ end
     f.sequence(:title) {|n| "A Data File_#{n}"}
     f.projects {[Factory.build(:project)]}
     f.association :contributor, :factory => :user
-    f.association :content_blob, :factory => :content_blob
+    f.after_create do |data_file|
+       data_file.content_blob = Factory.create(:pdf, :asset => data_file, :asset_version=>data_file.version) if data_file.content_blob.blank?
+    end
   end
 
 #Model
@@ -195,7 +214,9 @@ end
     f.title "A Model"
     f.projects {[Factory.build(:project)]}
     f.association :contributor, :factory => :user
-    f.association :content_blob, :factory => :content_blob
+    f.after_create do |model|
+       model.content_blobs = [Factory.create(:pdf, :asset => model,:asset_version=>model.version)] if model.content_blobs.blank?
+    end
   end
 
 #Publication
@@ -205,13 +226,37 @@ end
     f.projects {[Factory.build(:project)]}
     f.association :contributor, :factory => :user
   end
+
 #Presentation
 Factory.define(:presentation) do |f|
   f.title "A Presentation"
   f.projects {[Factory.build :project]}
  # f.data_url "http://www.virtual-liver.de/images/logo.png"
   f.association :contributor,:factory=>:user
-  f.association :content_blob, :factory => :content_blob
+  f.after_create do |presentation|
+    presentation.content_blob = Factory.create(:content_blob,:original_filename=>"test.pdf", :content_type=>"application/pdf", :asset => presentation, :asset_version=>presentation.version)
+  end
+end
+
+#Model Version
+Factory.define(:model_version) do |f|
+  f.association :model
+
+end
+
+#SOP Version
+Factory.define(:sop_version) do |f|
+  f.association :sop
+end
+
+#DataFile Version
+Factory.define(:data_file_version) do |f|
+  f.association :data_file
+end
+
+#Presentation Version
+Factory.define(:presentation_version) do |f|
+  f.association :presentation
 end
 
 #Misc
@@ -226,6 +271,17 @@ end
   Factory.define(:work_group) do |f|
     f.association :project
     f.association :institution
+  end
+
+  Factory.define(:favourite_group) do |f|
+    f.association :user
+    f.name 'A Favourite Group'
+  end
+
+  Factory.define(:favourite_group_membership) do |f|
+    f.association :person
+    f.association :favourite_group
+    f.access_type 1
   end
 
   Factory.define(:organism) do |f|
@@ -245,9 +301,19 @@ end
     f.sequence(:data) {|n| "data [#{n}]" }
   end
 
+  Factory.define(:pdf, :parent => :content_blob) do |f|
+    f.original_filename "test.pdf"
+    f.content_type "application/pdf"
+  end
+
+  Factory.define(:spreadsheet, :parent => :content_blob) do |f|
+    f.original_filename "test.xls"
+  end
+
   Factory.define(:activity_log) do |f|
     f.action "create"
     f.association :activity_loggable, :factory => :data_file
+    f.controller_name "data_files"
     f.association :culprit, :factory => :user
   end
 
@@ -259,7 +325,7 @@ end
     f.data_file_version 1
     f.association :measured_item, :factory => :measured_item
     f.association :unit, :factory => :unit
-    f.association :substance, :factory => :compound
+    f.studied_factor_links {[StudiedFactorLink.new(:substance => Factory(:compound))]}
     f.association :data_file, :factory => :data_file
   end
 
@@ -292,15 +358,19 @@ end
     f.sequence(:name) {|n| "glucose #{n}"}
   end
 
- #Experimental condition
+  Factory.define(:studied_factor_link) do |f|
+    f.association :substance, :factory => :compound
+    f.association :studied_factor
+  end
+
+  #Experimental condition
   Factory.define(:experimental_condition) do |f|
     f.start_value 1
-    f.end_value 10
     f.sop_version 1
     f.association :measured_item, :factory => :measured_item
     f.association :unit, :factory => :unit
-    f.association :substance, :factory => :compound
     f.association :sop, :factory => :sop
+    f.experimental_condition_links {[ExperimentalConditionLink.new(:substance => Factory(:compound))]}
   end
 
   Factory.define(:relationship) do |f|
@@ -310,3 +380,79 @@ end
   end
 
   Factory.define(:attribution, :parent => :relationship) {}
+
+  Factory.define(:special_auth_code) do |f|
+    f.association :asset, :factory => :data_file
+  end
+  
+  Factory.define(:experimental_condition_link) do |f|
+    f.association :substance, :factory => :compound
+    f.association :experimental_condition
+  end
+
+  Factory.define :synonym do |f|
+    f.name "coffee"
+    f.association :substance, :factory=>:compound
+  end
+
+  Factory.define :mapping_link do |f|
+    f.association :substance, :factory=>:compound
+    f.association :mapping,:factory=>:mapping
+  end
+
+  Factory.define :mapping do |f|
+    f.chebi_id "12345"
+    f.kegg_id "6789"
+    f.sabiork_id "4"
+  end
+
+  Factory.define :site_announcement do |f|
+    f.sequence(:title) {|n| "Announcement #{n}"}
+    f.sequence(:body) {|n| "This is the body for announcement #{n}"}
+    f.association :announcer,:factory=>:admin
+    f.is_headline false
+    f.expires_at 5.days.since
+    f.email_notification false
+  end
+
+  Factory.define :headline_announcement,:parent=>:site_announcement do |f|
+    f.is_headline true
+  end
+
+  Factory.define :annotation do |f|
+    f.sequence(:value) {|n| "anno #{n}"}
+    f.association :source, :factory=>:person
+  end
+
+  Factory.define :tag,:parent=>:annotation do |f|
+    f.attribute_name "tag"
+  end
+
+  Factory.define :expertise,:parent=>:annotation do |f|
+    f.attribute_name "expertise"
+  end
+
+  Factory.define :tool,:parent=>:annotation do |f|
+    f.attribute_name "tool"
+  end
+
+  Factory.define :text_value do |f|
+    f.sequence(:text) {|n| "value #{n}"}
+  end
+
+  Factory.define :assets_creator do |f|
+    f.association :asset, :factory => :data_file
+    f.association :creator, :factory => :person_in_project
+  end
+
+  Factory.define :worksheet do |f|
+    f.content_blob { Factory.build(:spreadsheet, :asset => Factory(:data_file))}
+    f.last_row 10
+    f.last_column 10
+  end
+
+  Factory.define :cell_range do |f|
+    f.cell_range "A1:B3"
+    f.association :worksheet
+  end
+

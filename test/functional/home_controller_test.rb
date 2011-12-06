@@ -94,11 +94,14 @@ class HomeControllerTest < ActionController::TestCase
     get :index
     assert_response :success
     assert_select 'a',:text=>/Forum/,:count=>0
+  end
 
+  test "should hide forum tab for logged in user" do
+    #this test may break if we re-enable forums - which is currently under question. If it does and we have re-enabled just change :count=>1
     login_as(:quentin)
     get :index
     assert_response :success
-    assert_select 'a',:text=>/Forum/,:count=>1
+    assert_select 'a',:text=>/Forum/,:count=>0
   end
 
   test "should display home description" do
@@ -134,26 +137,6 @@ class HomeControllerTest < ActionController::TestCase
 
     assert_select "div[class='yui-u first home_panel'][style='display:none']", :count => 1
     assert_select "div[class='yui-u home_panel'][style='display:none']", :count => 1
-  end
-
-  test "should display the link 'Recent changes in your project and across SysMo' only for SysMO project members" do
-    login_as(:aaron)
-    get :index
-    assert_response :success
-
-    assert_select "h2",:text => "Recent changes in your project and across #{Seek::Config.project_name}", :count => 1
-
-    logout
-    get :index
-    assert_response :success
-
-    assert_select "h2", :text => "Recent changes in your project and across #{Seek::Config.project_name}", :count => 0
-
-    login_as(:registered_user_with_no_projects)
-    get :index
-    assert_response :success
-
-    assert_select "h2", :text => "Recent changes in your project and across #{Seek::Config.project_name}", :count => 0
   end
 
   test "should show the content of project news and community news with the configurable number of entries" do
@@ -218,6 +201,24 @@ class HomeControllerTest < ActionController::TestCase
 
     assert_select 'div#recently_added ul>li', recently_added_item_logs.count
     assert_select 'div#recently_downloaded ul>li', recently_downloaded_item_logs.count
+  end
+
+  test "should show headline announcement" do
+    login_as :aaron
+    ann=Factory :headline_announcement
+
+    get :index
+    assert_response :success
+    assert_select "p.headline_announcement" do
+
+    end
+
+    #now expire it
+    ann.expires_at=1.day.ago
+    ann.save!
+    get :index
+    assert_response :success
+    assert_select "p.headline_announcement",:count=>0
   end
   
 end

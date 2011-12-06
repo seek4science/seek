@@ -1,0 +1,119 @@
+<%
+   compound = compound_row
+   synonym_names = ''
+   sabiork_id = ''
+   chebi_ids = ''
+   kegg_ids = ''
+   synonyms = compound.synonyms
+   unless synonyms.blank?
+      synonyms.each do |s|
+         synonym_names.concat(s.title + "; ")
+      end
+      synonym_names.chomp!('; ')
+   end
+   mappings = compound.mapping_links.collect{|ml| ml.mapping}
+   unless mappings.blank?
+      sabiork_id = mappings.first.sabiork_id.to_s
+      mappings.each do |m|
+        chebi_ids.concat(m.chebi_id + '; ') if (try_block{m.chebi_id} and !chebi_ids.match(m.chebi_id + '; '))
+        kegg_ids.concat(m.kegg_id + '; ') if (try_block{m.kegg_id} and !kegg_ids.match(m.kegg_id + '; '))
+      end
+      chebi_ids.chomp!('; ')
+      kegg_ids.chomp!('; ')
+   end
+
+%>
+<li id="compound_row_<%= compound.id -%>" >
+  <ul class="compound_row">
+    <li id="compound_name">
+        <%= h compound.title %>
+    </li>
+
+    <li id="synonyms">
+      <%= h synonym_names %>
+    </li>
+
+    <li id="sabiork_id">
+       <%= h sabiork_id %>
+    </li>
+
+    <li id="chebi_ids">
+      <%= h chebi_ids %>
+    </li>
+
+    <li id="kegg_ids">
+      <%= h kegg_ids %>
+    </li>
+
+    <li id="delete_<%= compound.id -%>" class="destroy_compound">
+       <%
+          studied_factors = ''
+          experimental_conditions = ''
+          compound.studied_factors.each do |sf|
+            studied_factors.concat("(item: #{compound.title} #{sf.measured_item.title}, values: #{sf.start_value}-#{sf.end_value}#{sf.unit.title}, SD: #{sf.standard_deviation}); ")
+          end
+          compound.experimental_conditions.each do |ec|
+            experimental_conditions.concat("(item: #{compound.title} #{ec.measured_item.title}, value: #{ec.start_value}}#{ec.unit.title}); ")
+          end
+          confirm_string = ''
+          unless studied_factors.blank?
+            confirm_string.concat("This compound are linked to factors studied: #{studied_factors}")
+          end
+          unless experimental_conditions.blank?
+            confirm_string.concat("This compound are linked to experimental conditions: #{experimental_conditions}")
+          end
+
+          synonyms = compound.synonyms
+          studied_factors = ''
+          experimental_conditions = ''
+          synonyms.each do |s|
+            s.studied_factors.each do |sf|
+                studied_factors.concat("(item: #{compound.title} #{sf.measured_item.title}, values: #{sf.start_value}-#{sf.end_value}#{sf.unit.title}, SD: #{sf.standard_deviation}); ")
+            end
+            s.experimental_conditions.each do |ec|
+                experimental_conditions.concat("(item: #{compound.title} #{ec.measured_item.title}, value: #{ec.start_value}}#{ec.unit.title}); ")
+            end
+          end
+
+          confirm_string_synonyms = ''
+          unless studied_factors.blank?
+            confirm_string_synonyms.concat("The synonyms are linked to factors studied: #{studied_factors}")
+          end
+          unless experimental_conditions.blank?
+            confirm_string_synonyms.concat("The synonyms are linked to experimental conditions: #{experimental_conditions}")
+          end
+          confirm_string.concat(confirm_string_synonyms)
+          confirm_string.concat("Are you sure you want to remove this compound#{synonyms.blank? ? ', ' : ', synonyms'}#{(confirm_string.blank? and confirm_string_synonyms.blank?) ? '' : ', links'}.This cannot be undone.")
+       %>
+       <%= link_to_remote image("destroy",:alt=>"Delete",:title=>"Delete this compound"),
+         :url => { :action => "destroy", :id => compound.id},
+         :confirm => "#{confirm_string}",:method=>:delete
+       -%>
+    </li>
+
+    <li id="edit_on_<%= compound.id -%>" >
+      <%= link_to_function image(("edit"),:title=>"Start editing",:alt=>"Start editing") do |page|
+         page.visual_effect :appear, "edit_compound_#{compound.id}"
+         page["edit_on_#{compound.id}"].toggle
+         page["edit_off_#{compound.id}"].toggle
+
+        end
+      -%>
+    </li>
+
+    <li id="edit_off_<%= compound.id -%>" style="display:none">
+      <%= link_to_function image(("edit-off"),:title=>"Stop editing",:alt=>"Stop editing") do |page|
+         page.visual_effect :fade, "edit_compound_#{compound.id}"
+         page["edit_on_#{compound.id}"].toggle
+         page["edit_off_#{compound.id}"].toggle
+        end
+      -%>
+    </li>
+  </ul>
+</li>
+
+<%= render :partial => "edit_compound", :locals => { :compound => compound}-%>
+
+
+
+

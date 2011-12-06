@@ -17,7 +17,7 @@ function updateAttributionSettings() {
 
         attributed_to += '<b>' + attr_type + '</b>: ' + attr_title
         + "&nbsp;&nbsp;<span style='color: #5F5F5F;'>(" + attr_contributor + ")</span>"
-        + '&nbsp;&nbsp;&nbsp;<small style="vertical-align: middle;">'
+        + '&nbsp;&nbsp;<small style="vertical-align: middle;">'
         + '[<a href="" onclick="javascript:deleteAttribution(\''+ attr_type +'\', '+ attr_id +'); return(false);">remove</a>]</small><br/>';
 
         attributed_to_arr.push([attr_type, attr_id]);

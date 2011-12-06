@@ -97,7 +97,7 @@ class SopTest < ActiveSupport::TestCase
     sop_version=sop_versions(:my_first_sop_v1)
     assert_equal 1,sop_version.version
     assert_equal users(:owner_of_my_first_sop),sop_version.contributor
-    assert_equal content_blobs(:content_blob_with_little_file),sop_version.content_blob
+    assert_equal content_blobs(:content_blob_with_little_file2),sop_version.content_blob
 
     sop=sops(:my_first_sop)
     assert_equal sop.id,sop_version.sop_id

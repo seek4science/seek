@@ -1,0 +1,18 @@
+<script type="text/javascript">
+    function initialize_<%= name -%>() {
+        var list = <%= all_annotations.sort{|a,b| a.id<=>b.id}.collect{|t| {'id'=>t.id,'name'=>t.text}}.to_json -%>;
+        var prepopulate_with = <%= item_annotations.sort{|a,b| a.id<=>b.id}.collect{|t| t.id}.to_json -%>;
+        var autocompleter_id = '<%= name -%>_autocompleter';
+        var autocompleter = new Autocompleter.LocalAdvanced(
+                autocompleter_id, '<%= name -%>_autocomplete_input', '<%= name -%>_autocomplete_display', '<%= name -%>_autocomplete_populate', list, prepopulate_with, {
+            frequency: 0.1,
+            updateElement: addAction,
+            search_field: "name",
+            id_field: "id",
+            validation_type: "any"
+        });
+        var hidden_input = new HiddenInput('<%= name -%>_hidden_input', autocompleter);
+        autocompleters[autocompleter_id] = autocompleter;
+    }
+    initialize_<%= name -%>();
+</script>

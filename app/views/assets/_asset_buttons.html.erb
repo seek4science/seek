@@ -27,9 +27,14 @@
           <%= render :partial=>"assets/request_resource",:locals=>{:resource=>asset} %>
         </li>
       <% end -%>
+      <% if asset.can_download? && asset.class.name == "DataFile" && asset.is_spreadsheet? %>
+        <li>
+          <%= image_tag_for_key('spreadsheet', polymorphic_path(asset,:version=>version,:action=>:explore), "Explore #{human_name}", nil, "Explore #{human_name}") -%>
+        </li>
+      <% end -%>
   <% end -%>
 
-  <% if (asset.can_delete? or current_user.try(:admin?)) and asset.respond_to? :convert_to_presentation %>
+  <% if (asset.can_delete? or current_user.try(:admin?)) and asset.respond_to? :to_presentation %>
      <li>
        <%= image_tag_for_key "arrow_right", {:controller=>"data_files",:action => "convert_to_presentation",:id=>asset.id}, nil, {:title => "click it to convert this data file to presentations",:confirm => "Convert to presentation? It is irreversible!"}, 'Convert to presentation'%>
     </li>

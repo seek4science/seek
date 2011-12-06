@@ -20,7 +20,7 @@
         </p>
         <%= render :partial => "projects/project_selector", :locals => { :resource => @presentation} -%>
 
-		<%= render :partial=>"assets/asset_form_bottom", :locals=> {:resource_type => "Presentation"} -%>
+		<%= fields_for(@presentation) {|f| render :partial=>"assets/asset_form_bottom", :locals=> {:f => f}} -%>
         <p>
             <% if Seek::Config.events_enabled -%>
                 <%= render :partial => "assets/associate_event", :locals=>{:resource => @presentation} -%>
@@ -29,7 +29,8 @@
 
 
         <p>
-            <%= submit_tag "Upload and Save", :id => "presentation_submit_btn", :onclick => "javascript: validatePresentationFields(true); return(false);" -%> or <%= link_to 'Cancel', presentations_path -%>
+          <%= preview_permission_popup_link('presentation', url_for(:controller => 'policies', :action => 'preview_permissions'), true)-%>
+          <%= submit_tag "Upload and Save", :id => "presentation_submit_btn", :onclick => "javascript: validateResourceFields(true,'presentation'); return(false);" -%> or <%= link_to 'Cancel', presentations_path -%>
         </p>
 		</div>
      <% end -%>

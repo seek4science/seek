@@ -11,6 +11,12 @@ class Object
     yield
   rescue NoMethodError, NameError
     nil
+  rescue RuntimeError => e
+    if e.message.to_s == "Called id for nil, which would mistakenly be 4 -- if you really wanted the id of nil, use object_id"
+      nil
+    else
+      raise
+    end
   end
 
 end

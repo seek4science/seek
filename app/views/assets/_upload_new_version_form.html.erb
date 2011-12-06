@@ -1,11 +1,12 @@
 <%
 upload_field = controller_name.downcase.singularize.underscore
+upload_field = 'content_blob'  if resource.respond_to?(:content_blobs)
 %>
 <script>
     function validateUploadFormFields(form){
         if ($('<%= "#{upload_field}_data" -%>').value.length == 0 && $('<%= "#{upload_field}_data_url" -%>').value.length == 0) {
             alert("Please specify the name of the file to upload or provide a URL	");
-            $('data').focus();
+            $('<%= "#{upload_field}_data" -%>').focus();
             return (false);
         }
         $('new_version_submit_btn').disabled = true;
@@ -18,7 +19,9 @@ upload_field = controller_name.downcase.singularize.underscore
     <% form_tag({:action=>"new_version", :id=>resource}, :multipart => true) do -%>
     <center>
         <div style="width:95%;margin-top:0.75em;">
-			<%= render :partial=>"assets/upload_box" -%>
+           <% locals = resource.respond_to?(:content_blobs) ? {:action=>:new,:resource=>resource} : {}  %>
+           <%= render :partial=>"assets/upload_box" ,:locals=>locals-%>
+
             <p>
                 <b>Revision comments (optional)</b>
                 <br/>

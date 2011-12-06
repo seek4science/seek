@@ -1,4 +1,6 @@
-<% resource_text ||= resource.class.name.downcase %>
+<% resource_text ||= resource.class.name.downcase
+   associated_data_files = resource.is_a?(Publication) ? resource.related_data_files : resource.data_files
+%>
 <div class="fold">
 
   <div class="foldTitle">
@@ -6,7 +8,7 @@
     Associate Data
   </div>
 
-  <div id="associate_data_fold_content" class="foldContent" style="display: block;">
+  <div id="associate_data_fold_content" class="foldContent" style="display:<%= associated_data_files.blank? ? 'none' : 'block' -%>">
     <div class="yui-u first" style="width:66%; float:left">
       
       <%

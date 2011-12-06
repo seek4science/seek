@@ -31,6 +31,29 @@ class ModelsControllerTest < ActionController::TestCase
     end
     assert_not_nil flash[:error]    
   end
+
+  test 'creators show in list item' do
+    p1=Factory :person
+    p2=Factory :person
+    model=Factory(:model,:title=>"ZZZZZ",:creators=>[p2],:contributor=>p1.user,:policy=>Factory(:public_policy, :access_type=>Policy::VISIBLE))
+
+    get :index,:page=>"Z"
+
+    #check the test is behaving as expected:
+    assert_equal p1.user,model.contributor
+    assert model.creators.include?(p2)
+    assert_select ".list_item_title a[href=?]",model_path(model),"ZZZZZ","the data file for this test should appear as a list item"
+
+    #check for avatars
+    assert_select ".list_item_avatar" do
+      assert_select "a[href=?]",person_path(p2) do
+        assert_select "img"
+      end
+      assert_select "a[href=?]",person_path(p1) do
+        assert_select "img"
+      end
+    end
+  end
   
   test "shouldn't show hidden items in index" do
     login_as(:aaron)
@@ -114,7 +137,7 @@ class ModelsControllerTest < ActionController::TestCase
     login_as(:model_owner)
     assay = assays(:modelling_assay)
     assert_difference('Model.count') do
-      post :create, :model => valid_model, :sharing=>valid_sharing, :assay_ids => [assay.id.to_s]
+      post :create, :model => valid_model,:content_blob=>{:file_0=>fixture_file_upload('files/little_file.txt',Mime::TEXT)}, :sharing=>valid_sharing, :assay_ids => [assay.id.to_s]
     end
     
     assert_redirected_to model_path(assigns(:model))
@@ -125,7 +148,7 @@ class ModelsControllerTest < ActionController::TestCase
   def test_missing_sharing_should_default_to_private
     assert_difference('Model.count') do
       assert_difference('ContentBlob.count') do
-        post :create, :model => valid_model
+        post :create, :model => valid_model,:content_blob=>{:file_0=>fixture_file_upload('files/little_file.txt',Mime::TEXT)}
       end
     end
     assert_redirected_to model_path(assigns(:model))
@@ -146,9 +169,11 @@ class ModelsControllerTest < ActionController::TestCase
   end
   
   test "should create model with url" do
+    WebMock.allow_net_connect!
+
     assert_difference('Model.count') do
       assert_difference('ContentBlob.count') do
-        post :create, :model => valid_model_with_url, :sharing=>valid_sharing
+        post :create, :model => valid_model_with_url,:content_blob=>{:url_0=>"http://www.sysmo-db.org/images/sysmo-db-logo-grad2.png"}, :sharing=>valid_sharing
       end
     end
     assert_redirected_to model_path(assigns(:model))
@@ -161,11 +186,13 @@ class ModelsControllerTest < ActionController::TestCase
   end
   
   test "should create sop and store with url and store flag" do
+    WebMock.allow_net_connect!
+
     model_details=valid_model_with_url
     model_details[:local_copy]="1"
     assert_difference('Model.count') do
       assert_difference('ContentBlob.count') do
-        post :create, :model => model_details, :sharing=>valid_sharing
+        post :create, :model => model_details,:content_blob=>{:url_0=>"http://www.sysmo-db.org/images/sysmo-db-logo-grad2.png"}, :sharing=>valid_sharing
       end
     end
     assert_redirected_to model_path(assigns(:model))
@@ -181,7 +208,7 @@ class ModelsControllerTest < ActionController::TestCase
     assert_difference('Model.count') do
       model=valid_model
       model[:recommended_environment_id]=recommended_model_environments(:jws).id
-      post :create, :model => model, :sharing=>valid_sharing
+      post :create, :model => model,:content_blob=>{:file_0=>fixture_file_upload('files/little_file.txt',Mime::TEXT)} ,:sharing=>valid_sharing
     end
     
     m=assigns(:model)
@@ -407,12 +434,13 @@ class ModelsControllerTest < ActionController::TestCase
   def test_should_show_version
     m = models(:model_with_format_and_type)
     m.save! #to force creation of initial version (fixtures don't include it)
-    old_desc=m.description
-    old_desc_regexp=Regexp.new(old_desc)
-    
+    # new version will not change description
+    #old_desc=m.description
+    #old_desc_regexp=Regexp.new(old_desc)
+
     #create new version
-    m.description="This is now version 2"
-    assert m.save_as_new_version
+    post :new_version, :id=>m, :model=>{},:content_blob=>{:file_0=>fixture_file_upload('files/little_file.txt',Mime::TEXT)}
+    assert_redirected_to model_path(assigns(:m))
     m = Model.find(m.id)
     assert_equal 2, m.versions.size
     assert_equal 2, m.version
@@ -420,24 +448,23 @@ class ModelsControllerTest < ActionController::TestCase
     assert_equal 2, m.versions[1].version
     
     get :show, :id=>models(:model_with_format_and_type)
-    assert_select "p", :text=>/This is now version 2/, :count=>1
-    assert_select "p", :text=>old_desc_regexp, :count=>0
+    assert_select "p", :text=>/little_file.txt/, :count=>1
+    assert_select "p", :text=>/Teusink.xml/, :count=>0
     
     get :show, :id=>models(:model_with_format_and_type), :version=>"2"
-    assert_select "p", :text=>/This is now version 2/, :count=>1
-    assert_select "p", :text=>old_desc_regexp, :count=>0
+    assert_select "p", :text=>/little_file.txt/, :count=>1
+    assert_select "p", :text=>/Teusink.xml/, :count=>0
     
     get :show, :id=>models(:model_with_format_and_type), :version=>"1"
-    assert_select "p", :text=>/This is now version 2/, :count=>0
-    assert_select "p", :text=>old_desc_regexp, :count=>1
+    assert_select "p", :text=>/little_file.txt/, :count=>0
+    assert_select "p", :text=>/Teusink.xml/, :count=>1
     
   end
   
   def test_should_create_new_version
-    m=models(:model_with_format_and_type)    
-    
+    m=models(:model_with_format_and_type)
     assert_difference("Model::Version.count", 1) do
-      post :new_version, :id=>m, :model=>{:data=>fixture_file_upload('files/file_picture.png')}, :revision_comment=>"This is a new revision"
+      post :new_version, :id=>m, :model=>{},:content_blob=>{:file_0=>fixture_file_upload('files/little_file.txt',Mime::TEXT)}, :revision_comment=>"This is a new revision"
     end
     
     assert_redirected_to model_path(m)
@@ -449,8 +476,8 @@ class ModelsControllerTest < ActionController::TestCase
     m=Model.find(m.id)
     assert_equal 2,m.versions.size
     assert_equal 2,m.version
-    assert_equal "file_picture.png",m.original_filename
-    assert_equal "file_picture.png",m.versions[1].original_filename
+    assert_equal "little_file.txt",m.original_filename
+    assert_equal "little_file.txt",m.versions[1].original_filename
     assert_equal "Teusink.xml",m.versions[0].original_filename
     assert_equal "This is a new revision",m.versions[1].revision_comments
     
@@ -542,7 +569,7 @@ class ModelsControllerTest < ActionController::TestCase
 
   test "owner should be able to choose policy 'share with everyone' when creating a model" do
     model=valid_model
-    post :create, :model => model, :sharing=>{:use_whitelist=>"0", :user_blacklist=>"0", :sharing_scope =>Policy::EVERYONE, "access_type_#{Policy::EVERYONE}"=>Policy::VISIBLE}
+    post :create, :model => model,:content_blob=>{:file_0=>fixture_file_upload('files/little_file.txt',Mime::TEXT)}, :sharing=>{:use_whitelist=>"0", :user_blacklist=>"0", :sharing_scope =>Policy::EVERYONE, "access_type_#{Policy::EVERYONE}"=>Policy::VISIBLE}
     assert_redirected_to model_path(assigns(:model))
     assert_equal users(:model_owner),assigns(:model).contributor
     assert assigns(:model)
@@ -572,48 +599,63 @@ class ModelsControllerTest < ActionController::TestCase
   end
 
   test "update with ajax only applied when viewable" do
-    login_as(:aaron)
-    user=users(:aaron)
-    model=models(:jws_model)
-    assert model.tag_counts.empty?,"This should have no tags for this test to work"
-    golf_tags=tags(:golf)
+    p=Factory :person
+    p2=Factory :person
+    viewable_model=Factory :model,:contributor=>p2,:policy=>Factory(:publicly_viewable_policy)
+    dummy_model=Factory :model
 
-    assert_difference("ActsAsTaggableOn::Tagging.count") do
-      xml_http_request :post, :update_tags_ajax,{:id=>model.id,:tag_autocompleter_unrecognized_items=>[],:tag_autocompleter_selected_ids=>[golf_tags.id]}
-    end
+    login_as p.user
 
-    model.reload
+    assert viewable_model.can_view?(p.user)
+    assert !viewable_model.can_edit?(p.user)
 
-    assert_equal ["golf"],model.tag_counts.collect(&:name)
+    golf=Factory :tag,:annotatable=>dummy_model,:source=>p2,:value=>"golf"
 
-    model=models(:private_model)
-    
-    assert model.tag_counts.empty?,"This should have no tags for this test to work"
+    xml_http_request :post, :update_annotations_ajax,{:id=>viewable_model,:tag_autocompleter_unrecognized_items=>[],:tag_autocompleter_selected_ids=>[golf.value.id]}
 
-    assert !model.can_view?(user),"Aaron should not be able to view this item for this test to be valid"
+    viewable_model.reload
 
-    assert_no_difference("ActsAsTaggableOn::Tagging.count") do
-      xml_http_request :post, :update_tags_ajax,{:id=>model.id,:tag_autocompleter_unrecognized_items=>[],:tag_autocompleter_selected_ids=>[golf_tags.id]}
-    end
+    assert_equal ["golf"],viewable_model.annotations.collect{|a| a.value.text}
 
-    model.reload
+    private_model=Factory :model,:contributor=>p2,:policy=>Factory(:private_policy)
 
-    assert model.tag_counts.empty?,"This should still have no tags"
+    assert !private_model.can_view?(p.user)
+    assert !private_model.can_edit?(p.user)
+
+    xml_http_request :post, :update_annotations_ajax,{:id=>private_model,:tag_autocompleter_unrecognized_items=>[],:tag_autocompleter_selected_ids=>[golf.value.id]}
+
+    private_model.reload
+    assert private_model.annotations.empty?
 
   end
 
   test "update tags with ajax" do
-    model=models(:teusink)
-    golf_tags=tags(:golf)
+    p = Factory :person
 
-    assert model.tag_counts.empty?, "This sop should have no tags for the test"
+    login_as p.user
 
-    assert_difference("ActsAsTaggableOn::Tag.count") do
-      xml_http_request :post, :update_tags_ajax,{:id=>model.id,:tag_autocompleter_unrecognized_items=>["soup"],:tag_autocompleter_selected_ids=>golf_tags.id}
-    end
+    p2 = Factory :person
+    model = Factory :model,:contributor=>p.user
+
+
+    assert model.annotations.empty?,"this model should have no tags for the test"
+
+    golf = Factory :tag,:annotatable=>model,:source=>p2.user,:value=>"golf"
+    Factory :tag,:annotatable=>model,:source=>p2.user,:value=>"sparrow"
 
     model.reload
-    assert_equal ["golf","soup"],model.tag_counts.collect(&:name).sort
+
+    assert_equal ["golf","sparrow"],model.annotations.collect{|a| a.value.text}.sort
+    assert_equal [],model.annotations.select{|a| a.source==p.user}.collect{|a| a.value.text}.sort
+    assert_equal ["golf","sparrow"],model.annotations.select{|a|a.source==p2.user}.collect{|a| a.value.text}.sort
+
+    xml_http_request :post, :update_annotations_ajax,{:id=>model,:tag_autocompleter_unrecognized_items=>["soup"],:tag_autocompleter_selected_ids=>[golf.value.id]}
+
+    model.reload
+
+    assert_equal ["golf","soup","sparrow"],model.annotations.collect{|a| a.value.text}.uniq.sort
+    assert_equal ["golf","soup"],model.annotations.select{|a| a.source==p.user}.collect{|a| a.value.text}.sort
+    assert_equal ["golf","sparrow"],model.annotations.select{|a|a.source==p2.user}.collect{|a| a.value.text}.sort
 
   end
 
@@ -669,11 +711,11 @@ class ModelsControllerTest < ActionController::TestCase
   end
 
   def valid_model
-    { :title=>"Test",:data=>fixture_file_upload('files/little_file.txt'),:projects=>[projects(:sysmo_project)]}
+    { :title=>"Test",:projects=>[projects(:sysmo_project)]}
   end
 
   def valid_model_with_url
-    { :title=>"Test",:data_url=>"http://www.sysmo-db.org/images/sysmo-db-logo-grad2.png",:projects=>[projects(:sysmo_project)]}
+    { :title=>"Test",:projects=>[projects(:sysmo_project)]}
   end
   
 end
