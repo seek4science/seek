@@ -273,7 +273,7 @@ module ImagesHelper
       when 'subscribe'
         "famfamfam_silk/email_add.png"
       when 'presentation_avatar','presentation','presentations'
-        "1315482798_presentation-slides.png"
+        "misc_icons/1315482798_presentation-slides.png"
       when "graph"
         "famfamfam_silk/chart_line.png"
     else
