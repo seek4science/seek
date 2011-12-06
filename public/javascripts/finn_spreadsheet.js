@@ -512,3 +512,70 @@ function copy_cells()
   $j("div.spreadsheet_popup").hide();
   $j("div#export_form").show();
 }
+
+function plot_cells()
+{
+    var cells = $j('td.selected_cell');
+    var columns = $j('.col_heading.selected_heading').size();
+    var text = "";
+
+    for(var i = 0; i < cells.size(); i += columns)
+    {
+      for(var j = 0; j < columns; j += 1)
+      {
+        text += (cells.eq(i + j).html() + "\t");
+      }
+      text += "\n";
+    }
+
+      var chart;
+      function drawChart() {
+        var data = new google.visualization.DataTable();
+        chart = new google.visualization.LineChart(document.getElementById('plot_data'));
+        for(var i = 0; i < cells.size(); i += columns)
+        {
+            var array = new Array();
+            for(var j = 0; j < columns; j += 1)
+            {
+                var value = cells.eq(i + j).html();
+                if (i==0) {
+                    var type;
+                    if (j==0) {
+                        type="string"
+                    }
+                    else {
+                        type="number"
+                    }
+                    data.addColumn(type,value);
+                }
+                else {
+                    if (j==0) {
+                        array.push(value);
+                    }
+                    else {
+                        array.push(parseInt(value));
+                    }
+                }
+            }
+            if (i!=0) {
+                data.addRow(array);
+            }
+        }
+        chart.draw(data, {curveType:'function',
+            width: "600",
+            height: "400",
+            title: '',
+            vAxis: {title:'',minValue:0,baseline:0},
+            hAxis: {title:'time(min)'}
+        });
+//        google.visualization.events.addListener(chart, 'select', itemSelected);
+//        function itemSelected(e) {
+//          alert("something was selected");
+//        }
+      }
+      drawChart();
+
+
+    $j("div.spreadsheet_popup").hide();
+    $j("div#plot_panel").show();
+}
