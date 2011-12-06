@@ -15,6 +15,17 @@ class Policy < ActiveRecord::Base
   validates_numericality_of :sharing_scope, :access_type
   
   alias_attribute :title, :name
+
+  before_save :update_timestamp_if_permissions_change
+
+  def update_timestamp_if_permissions_change
+    if permissions.changed_for_autosave?
+      current_time = current_time_from_proper_timezone
+
+      write_attribute('updated_at', current_time) if respond_to?(:updated_at)
+      write_attribute('updated_on', current_time) if respond_to?(:updated_on)
+    end
+  end
   
   
   # *****************************************************************************
