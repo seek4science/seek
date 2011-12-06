@@ -19,7 +19,7 @@ class Policy < ActiveRecord::Base
   before_save :update_timestamp_if_permissions_change
 
   def update_timestamp_if_permissions_change
-    if permissions.changed_for_autosave?
+    if changed_for_autosave?
       current_time = current_time_from_proper_timezone
 
       write_attribute('updated_at', current_time) if respond_to?(:updated_at)
