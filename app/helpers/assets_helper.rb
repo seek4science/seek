@@ -154,9 +154,9 @@ module AssetsHelper
   end
 
   #provides a list of assets, according to the class, that are authorized to 'show'
-  def authorised_assets asset_class
+  def authorised_assets asset_class, action="view"
     assets=asset_class.find(:all,:include=>[:policy,{:policy=>:permissions}])
-    Authorization.authorize_collection("view", assets, current_user)
+    Authorization.authorize_collection(action, assets, current_user)
   end
 
   def asset_buttons asset,version=nil,delete_confirm_message=nil

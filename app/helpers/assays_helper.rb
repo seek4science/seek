@@ -100,7 +100,7 @@ module AssaysHelper
   end
 
   def authorised_assays
-    authorised_assets(Assay)
+    authorised_assets(Assay, "edit")
   end
 
   def list_assay_samples_and_organisms attribute,assay_samples,assay_organisms, none_text="Not Specified"
