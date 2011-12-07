@@ -11,18 +11,22 @@
    end
 %>
  <div style="width: 95%;">
+       <% unless Seek::Config.is_virtualliver %>
+            <p class="none_text" style="margin-left: 10em">Specimen is the portion of the bacterial cells growing together in a chemostat or in a batch</p>
+       <% end %>
+
        <h2>Specimen Details</h2>
        <p>
-         <%= f.label :specimen_number -%><span class="required">*</span><br/>
+         <%= f.label :specimen_title -%><span class="required">*</span><br/>
          <%= f.text_field :donor_number, :style => "width: 350px;" -%>
        </p>
-   <% if Seek::Config.is_virtualliver %>
-       <p>
-         <%= f.label :treatment -%><br/>
-         <%= f.text_field :treatment, :style => "width: 350px;" -%>
-       </p>
+       <% if Seek::Config.is_virtualliver %>
+           <p>
+             <%= f.label :treatment -%><br/>
+             <%= f.text_field :treatment, :style => "width: 350px;" -%>
+           </p>
 
-   <% end %>
+       <% end %>
 
 
    <p>
