@@ -26,7 +26,7 @@ class ConfigTest < ActiveSupport::TestCase
   test "creatable classes order" do
     oldval = Seek::Config.is_virtualliver
     Seek::Config.is_virtualliver = true
-    assert_equal [DataFile,Model,Presentation,Publication,Sop,Assay,Investigation,Study,Event,Sample,Specimen],ApplicationController.new.send(:user_creatable_classes)
+    assert_equal [DataFile,Model,Presentation,Publication,Sop,Assay,Investigation,Study,Event,Sample,Specimen], Seek::Util.user_creatable_types
     Seek::Config.is_virtualliver = oldval
   end
   test "presentations enabled" do
