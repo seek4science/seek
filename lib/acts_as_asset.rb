@@ -37,7 +37,7 @@ module Acts #:nodoc:
         attr_writer :original_filename,:content_type
         does_not_require_can_edit :last_used_at
 
-        default_scope :order => "#{self.table_name}.updated_at DESC", :include => :policy
+        default_scope :order => "#{self.table_name}.updated_at DESC"
 
         validates_presence_of :title
 
