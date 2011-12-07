@@ -44,6 +44,14 @@ class ModelProcessingTest < ActiveSupport::TestCase
     assert is_jws_supported?(model.content_blob)
   end
 
-
+  def test_extract_sbml_species
+    model = models(:teusink)
+    assert is_sbml?(model)
+    species = extract_model_species model
+    assert species.include?("Glyc")
+    assert !species.include?("KmPYKPEP")
+    puts species
+    assert_equal 22,species.count
+  end
 
 end
