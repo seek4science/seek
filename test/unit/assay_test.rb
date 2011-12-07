@@ -230,7 +230,7 @@ class AssayTest < ActiveSupport::TestCase
 
   test "associate organism" do
     assay=assays(:metabolomics_assay)
-    User.current_user = assay.contributor
+    User.current_user = assay.contributor.user
     organism=organisms(:yeast)
     #test with numeric ID
     assert_difference("AssayOrganism.count") do
