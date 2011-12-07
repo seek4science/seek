@@ -97,6 +97,15 @@
 
     } -%>
 
+     <%= render :partial=>'setting_li',:locals=>{
+            :name=>"Presentations",
+            :field=>(radio_button_tag(:presentations, "latest", Seek::Config.default_page("presentations") == "latest") +
+                    label_tag(:presentations_latest, "latest") +
+                    radio_button_tag(:presentations, "all",Seek::Config.default_page("presentations") == "all") +
+                    label_tag(:presentations_all, "all"))
+
+    } -%>
+
     <%= render :partial=>'setting_li',:locals=>{            
             :name=>"Events",
             :field=>(radio_button_tag(:events, "latest", Seek::Config.default_page("events") == "latest") +
