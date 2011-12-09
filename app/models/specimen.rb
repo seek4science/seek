@@ -19,9 +19,9 @@ class Specimen < ActiveRecord::Base
 
   alias_attribute :description, :comments
   alias_attribute :title, :donor_number
-  alias_attribute :specimen_number, :donor_number
+  alias_attribute :specimen_title, :donor_number
 
-  HUMANIZED_COLUMNS = {:donor_number=> "Specimen number"}
+  HUMANIZED_COLUMNS = {:donor_number=> "Specimen title"}
 
   validates_numericality_of :age, :only_integer => true, :greater_than=> 0, :allow_nil=> true, :message => "is not a positive integer"
   validates_presence_of :donor_number

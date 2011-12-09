@@ -1,14 +1,13 @@
 <%= stylesheet_link_tag 'styles.css' -%>
 <% action ||= nil%>
 <div class="strain" id="strain_form">
-  <% if action == 'edit'
-        parent_strain = Strain.find_by_id(strain.parent_id).try(:title)
-     else
-        parent_strain = strain.title
-     end   %>
-  <p class="none_text" style="margin-left: 15em;">
-    <%= parent_strain.blank? ? '' : "This strain is created based on #{parent_strain}"%>
-  </p>
+  <% if action == 'edit' %>
+       <% parent_strain = Strain.find_by_id(strain.parent_id).try(:title) %>
+       <p class="none_text" style="margin-left: 15em;">
+       <%= parent_strain.blank? ? '' : "This strain is created based on #{parent_strain}"%>
+       </p>
+  <% end %>
+
   <div class="yui-g">
     <center>
       <div class="yui-u first" style="width: 42%; margin-left: 2em; margin-top: 1em; margin-bottom: 1em;">
@@ -18,7 +17,7 @@
         </p>
 
         <p style="margin-bottom: 1.5em">
-          <label style="float: left;"> Provider ID:</label>
+          <label style="float: left;">Strain ID:</label>
           <%= text_field_tag "strain[provider_id]", strain.provider_id, :style => 'float:right' %>
         </p>
 
@@ -83,11 +82,8 @@
     </center>
   </div>
     <%= hidden_field_tag 'strain[organism_id]', organism_id %>
-  <%if action == 'edit' %>
-    <%= hidden_field_tag 'strain[parent_id]', strain.parent_id %>
-  <%else%>
+    <%= hidden_field_tag 'strain[id]', strain.id %>
     <%= hidden_field_tag 'strain[parent_id]', strain.id %>
-  <%end%>
 </div>
 
 

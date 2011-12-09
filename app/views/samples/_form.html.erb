@@ -33,7 +33,7 @@
   <% end %>
 
   <p>
-    <%= f.label :lab_internal_number -%><span class="required">*</span><br/>
+    <%= f.label :lab_internal_identifier -%><span class="required">*</span><br/>
     <%= f.text_field :lab_internal_number, :style => "width: 350px;" -%>
   </p>
 
@@ -49,7 +49,7 @@
 
   <p>
     <%= f.label :organism_part -%><br/>
-    <%= select_tag :organism_part,options_for_select(['Not specified', 'Whole cell', 'membrane fraction']) -%>
+    <%= select_tag :organism_part,options_for_select(['Not specified', 'Whole cell', 'Membrane fraction']) -%>
   </p>
 
   <br/>
