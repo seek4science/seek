@@ -19,14 +19,13 @@ jQuery(document).ready(function($) {
         imgarray.reverse();
 
 
-        var curImage = imgarray[current_scale];
+        var curImage = imgarray[0];
         var previousValue;
-        var val=current_scale;
+        var val=0;
 
         // slider value<=>scale string
         var scales_arr = ["cell","intercellular","liverLobule","liver","organism","all"];//["organism","liver","liverLobe","liverLobule","intercellular","cell"];
         var scale_id;
-
 
         //slider mit 5 stufen, regler ist standardm��ig ganz oben
         //the jQuery slider has a build in event that fires every time the handle is moved on the slider called slide.
@@ -38,14 +37,16 @@ jQuery(document).ready(function($) {
             value: current_scale,
             animate:true,
             slide: function (event, ui) {
+                //alert("#slider.slide"+ ui.value) ;
                 previousValue = val;
                 val = ui.value;
-                $('#scale').val(scales_arr[val]) ; // change scale filter for searching
-                valCheck();
+                //$('#scale').val(scales_arr[val]) ; // change scale filter for searching
+                //valCheck();
                 scale_id = "#" + scales_arr[val];
                 $(scale_id).click();
             },
         });
+
 
 
         //valCheck() just checks the variable val and then runs a function called imageSwap, passing in the current image and the image we want to display,
@@ -59,7 +60,7 @@ jQuery(document).ready(function($) {
             }
 
             else {
-                //alert("val =" + val + " &&  previousValue=" + previousValue);
+               // alert("val =" + val + " &&  previousValue=" + previousValue);
                 imageSwap(curImage, imgarray[val]);
                 curImage = imgarray[val];
 
@@ -181,7 +182,6 @@ jQuery(document).ready(function($) {
 
         //We�re just setting val to be the same as num and then running valCheck when the user clicks one of the links, otherwise, the images would only swap when the user slides the handle back and forth. Now the image swap will work if the user either clicks the links or moves the slider.
         function moveSlider(e, num) {
-
             e.preventDefault();
             $('#slider').slider(
                     'value',
@@ -189,6 +189,8 @@ jQuery(document).ready(function($) {
                     );
             val = num;
 
+           // scale_id = "#" + scales_arr[val];
+           // $(scale_id).click();
             valCheck();
         }
 
@@ -211,7 +213,18 @@ jQuery(document).ready(function($) {
             moveSlider(e, 5);
         });
 
+       //initial status
+        previousValue = $('#slider').slider(
+            'value'
+        );
+        val = current_scale;
+        scale_id = "#" + scales_arr[val];
+        $(scale_id).click();
+
     });
+
+
+
 
 
     /* Source Code: http://atomicrobotdesign.com/blog/web-development/controlling-html-using-the-jquery-ui-slider-and-links/ */
