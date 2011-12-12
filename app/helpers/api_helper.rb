@@ -166,7 +166,7 @@ module ApiHelper
       end
     end if object.respond_to?("bioportal_concept") || object.respond_to?("bioportal_concepts")
     
-    builder.tag! "content_type",object.content_type if object.respond_to?("content_type")
+    builder.tag! "content_type",object.content_type if object.respond_to?("content_type") && !object.is_a?(Publication)
     builder.tag! "version",object.version if object.respond_to?("version")
     builder.tag! "revision_comments",object.revision_comments if object.respond_to?("revision_comments")
     builder.tag! "latest_version",core_xlink(object.latest_version) if object.respond_to?("latest_version")           
