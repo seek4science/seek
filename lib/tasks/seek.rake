@@ -649,32 +649,43 @@ namespace :seek do
   end
 
   desc "dump policy authorization caching"
-  task :dump_policy_authorization_caching => :environment do
-    FasterCSV.open("#{RAILS_ROOT}/cache_dump_new", "w") do |csv|
-      users = User.all.select { |u| u.person }
-      users << nil
-      users.each do |user|
-        Policy.all.each do |policy|
-          Acts::Authorized::AUTHORIZATION_ACTIONS.each do |action|
-            person_key = user ? user.person.cache_key : nil
-            cache_key = {:purpose => :authorization, :policy => policy.cache_key, :person => person_key, :action => action}
-            val = Rails.cache.read cache_key
-            csv << [person_key, policy.cache_key, action, val]
+  task :dump_policy_authorization_caching, :filename, :needs => :environment do |t, args|
+    if args[:filename]
+      FasterCSV.open("#{args[:filename]}", "w") do |csv|
+        users = User.all.select { |u| u.person }
+        users << nil
+        users.each do |user|
+          Policy.all.each do |policy|
+            Acts::Authorized::AUTHORIZATION_ACTIONS.each do |action|
+              person_key = user ? user.person.cache_key : nil
+              cache_key = {:purpose => :authorization, :policy => policy.cache_key, :person => person_key, :action => action}
+              val = Rails.cache.read cache_key
+              csv << [person_key, policy.cache_key, action, val]
+            end
           end
         end
       end
+    else
+      puts "please specify the dump file name... e.g. rake seek:dump_policy_authorization_caching[filename]"
+      raise
     end
+
   end
 
 
   desc "load policy authorization caching"
-  task :load_policy_authorization_caching => :environment do
-    FasterCSV.foreach("#{RAILS_ROOT}/cache_dump_new") do |row|
-      person_key = row[0]
-      policy_key = row[1]
-      action = row[2]
-      val = row[3]
-      Rails.cache.write "can_#{action}?#{policy_key}#{person_key}", val
+  task :load_policy_authorization_caching,:filename,:needs => :environment do |t,args|
+    if args[:filename]
+      FasterCSV.foreach("#{args[:filename]}") do |row|
+        person_key = row[0]
+        policy_key = row[1]
+        action = row[2]
+        val = row[3]
+        Rails.cache.write "can_#{action}?#{policy_key}#{person_key}", val
+        end
+    else
+        puts "please specify the load file name... e.g. rake seek:load_policy_authorization_caching[filename]"
+        raise
     end
   end
 
