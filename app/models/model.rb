@@ -85,8 +85,6 @@ class Model < ActiveRecord::Base
     results = {}
 
     if Seek::Config.solr_enabled && is_sbml?
-      params_and_values = extract_model_parameters_and_values(self)
-      species  = extract_model_species(self)
       search_terms = species | params_and_values.keys
       search_terms.each do |key|
         DataFile.search do |query|

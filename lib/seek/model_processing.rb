@@ -5,7 +5,8 @@ module Seek
     include ModelTypeDetection
 
     #return a hash of parameters names as a key, along with their values, extracted from SBML
-    def extract_model_parameters_and_values model
+    def parameters_and_values model=self
+      return [] if !model.is_sbml?
       parser = LibXML::XML::Parser.file(model.content_blob.filepath)
       doc = parser.parse
       doc.root.namespaces.default_prefix="sbml"
@@ -18,7 +19,8 @@ module Seek
     end
 
     #returns an array of species ID and NAME extracted from SBML
-    def extract_model_species model
+    def species model=self
+      return [] if !model.is_sbml?
       parser = LibXML::XML::Parser.file(model.content_blob.filepath)
       doc = parser.parse
       doc.root.namespaces.default_prefix="sbml"
