@@ -81,6 +81,7 @@
                 child.onclick = function() {
                     $('select_project_subscription').value = project_id;
                     show_project_subscription();
+                    $('select_project_subscription').value = 0;
                     return false;
                 } ;
                 var child_link = document.createElement('a');
