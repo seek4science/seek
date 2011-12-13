@@ -12,7 +12,7 @@
      <ul id="project_subscription_list">
       <%   @person.project_subscriptions.each do |ps|  %>
        <li id="<%= ps.project_id %>_li">
-         <%= link_to_function ps.project.title,"$('select_project_subscription').value = #{ps.project.id};show_project_subscription();return false;"%>
+         <%= link_to_function ps.project.title,"$('select_project_subscription').value = #{ps.project.id};show_project_subscription();$('select_project_subscription').value =0;return false;"%>
        </li>
        <% end %>
      </ul>
