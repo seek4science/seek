@@ -41,8 +41,18 @@ class Specimen < ActiveRecord::Base
   has_many :sop_masters,:class_name => "SopSpecimen"
   grouped_pagination :pages=>("A".."Z").to_a, :default_page => Seek::Config.default_page(self.name.underscore.pluralize)
 
-  acts_as_solr(:fields=>[:description,:donor_number,:lab_internal_number],:include=>[:culture_growth_type,:organism,:strain]) if Seek::Config.solr_enabled
-
+  searchable do
+    text :description,:donor_number,:lab_internal_number
+    text :culture_growth_type do
+      culture_growth_type.try :title
+    end
+    text :organism do
+      organism.try :title
+    end
+    text :strain do
+      strain.try :title
+    end
+  end if Seek::Config.solr_enabled
 
   acts_as_authorized
 

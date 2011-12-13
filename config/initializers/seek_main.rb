@@ -17,7 +17,7 @@ require 'acts_as_asset'
 require 'send_subscriptions_when_activity_logged'
 require 'modporter_extensions'
 require 'seek/taggable'
-
+require 'sunspot_rails'
 
 GLOBAL_PASSPHRASE="ohx0ipuk2baiXah" unless defined? GLOBAL_PASSPHRASE
 

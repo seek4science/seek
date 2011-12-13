@@ -198,6 +198,11 @@ end
     f.association :content_blob, :factory => :content_blob
   end
 
+  Factory.define(:rightfield_datafile,:parent=>:data_file) do |f|
+    f.content_type "application/excel"
+    f.association :content_blob,:factory=>:rightfield_content_blob
+  end
+
 #Model
   Factory.define(:model) do |f|
     f.title "A Model"
@@ -214,13 +219,13 @@ end
     f.association :contributor, :factory => :user
   end
 #Presentation
-Factory.define(:presentation) do |f|
-  f.title "A Presentation"
-  f.projects {[Factory.build :project]}
- # f.data_url "http://www.virtual-liver.de/images/logo.png"
-  f.association :contributor,:factory=>:user
-  f.association :content_blob, :factory => :content_blob
-end
+  Factory.define(:presentation) do |f|
+    f.title "A Presentation"
+    f.projects {[Factory.build :project]}
+   # f.data_url "http://www.virtual-liver.de/images/logo.png"
+    f.association :contributor,:factory=>:user
+    f.association :content_blob, :factory => :content_blob
+  end
 
 #Misc
   Factory.define(:group_membership) do |f|
@@ -262,6 +267,10 @@ end
   Factory.define(:content_blob) do |f|
     f.uuid UUIDTools::UUID.random_create.to_s
     f.sequence(:data) {|n| "data [#{n}]" }
+  end
+
+  Factory.define(:rightfield_content_blob,:parent=>:content_blob) do |f|
+    f.data  File.new("#{Rails.root}/test/fixtures/files/rightfield-test.xls","rb").read
   end
 
   Factory.define(:activity_log) do |f|

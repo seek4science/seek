@@ -6,11 +6,37 @@ class DataFileTest < ActiveSupport::TestCase
 
   test "associations" do
     datafile=data_files(:picture)
-    assert_equal users(:datafile_owner),datafile.contributor    
+    assert_equal users(:datafile_owner),datafile.contributor
 
     blob=content_blobs(:picture_blob)
     assert_equal blob,datafile.content_blob
   end
+
+  test "spreadsheet contents for search" do
+    df = Factory :rightfield_datafile
+    
+    data = df.spreadsheet_contents_for_search
+    assert !data.empty?,"Content should not be empty"
+    assert data.include?("design type")
+    assert data.include?("methodological design"), "content should be humanized"
+    assert data.include?("absolute")
+    assert !data.include?("ontology"),"Shouldn't include content from hidden sheets"
+    assert !data.include?("relative"),"Shouldn't include content from hidden sheets"
+
+    assert !data.include?("44.0"),"Should not include numbers"
+    assert !data.include?("1.0"),"Should not include numbers"
+    assert !data.include?("1.7"),"Should not include numbers"
+
+    assert !data.include?(44),"Should not include numbers"
+    assert !data.include?(1),"Should not include numbers"
+    assert !data.include?(1.7),"Should not include numbers"
+
+    assert !data.include?("seek id"),"Should not include blacklisted text"
+
+    df = data_files(:picture)
+    assert_equal [],df.spreadsheet_contents_for_search
+  end
+
 
   test "event association" do
     User.with_current_user Factory(:user) do
@@ -76,7 +102,7 @@ class DataFileTest < ActiveSupport::TestCase
     assert_equal [p],df.projects
     assert_equal [p],df.latest_version.projects
   end
-  
+
   def test_defaults_to_private_policy
     df_hash = Factory.attributes_for(:data_file)
     df_hash[:policy] = nil
@@ -150,14 +176,14 @@ class DataFileTest < ActiveSupport::TestCase
       assert_nil DataFile.restore_trash(df.id)
     end
   end
-  
+
   test "test uuid generated" do
     x = data_files(:picture)
     assert_nil x.attributes["uuid"]
     x.save
     assert_not_nil x.attributes["uuid"]
   end
-  
+
   test "title_trimmed" do
     df=data_files(:picture)
     df.title=" should be trimmed"
@@ -172,7 +198,7 @@ class DataFileTest < ActiveSupport::TestCase
     x.save
     assert_equal x.uuid, uuid
   end
-  
+
   test "can get relationship type" do
     df = data_file_versions(:picture_v1)
     assay = assays(:modelling_assay_with_data_and_relationship)
@@ -205,9 +231,9 @@ class DataFileTest < ActiveSupport::TestCase
       presentation = Factory.build :presentation,:contributor=>user
       data_file_converted = data_file.convert_to_presentation
 
-      assert_equal "Presentation", data_file_converted.class.name 
+      assert_equal "Presentation", data_file_converted.class.name
       assert_equal presentation.attributes.keys.sort!, data_file_converted.attributes.keys.reject{|k|k=='id'}.sort!
-      
+
       data_file_converted.valid?
       assert data_file_converted.valid?
 
@@ -280,11 +306,9 @@ class DataFileTest < ActiveSupport::TestCase
       iron = Factory(:compound,:name=>"iron")
       metal = Factory :synonym,:name=>"metal",:substance=>iron
       Factory :mapping_link,:substance=>iron,:mapping=>Factory(:mapping,:chebi_id=>"12345",:kegg_id=>"789",:sabiork_id=>111)
-      
+
       sf1 = Factory :studied_factor_link,:substance=>suger
       sf2 = Factory :studied_factor_link, :substance=>metal
-
-
 
       Factory :studied_factor,:studied_factor_links=>[sf1,sf2],:data_file=>df
       assert df.fs_search_fields.include?("sugar")

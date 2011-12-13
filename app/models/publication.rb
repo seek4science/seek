@@ -41,7 +41,9 @@ class Publication < ActiveRecord::Base
 
   alias :seek_authors :creators
   
-  acts_as_solr(:fields=>[:title,:abstract,:journal,:searchable_tags]) if Seek::Config.solr_enabled
+  searchable do
+    text :title,:abstract,:journal,:searchable_tags, :pubmed_id, :doi
+  end if Seek::Config.solr_enabled
 
   #TODO: refactor to something like 'sorted_by :start_date', which should create the default scope and the sort method. Maybe rename the sort method.
   default_scope :order => "#{self.table_name}.published_date DESC"

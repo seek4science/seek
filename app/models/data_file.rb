@@ -13,7 +13,59 @@ class DataFile < ActiveRecord::Base
 
   title_trimmer
 
-   def included_to_be_copied? symbol
+  validates_presence_of :title
+
+  # allow same titles, but only if these belong to different users
+  # validates_uniqueness_of :title, :scope => [ :contributor_id, :contributor_type ], :message => "error - you already have a Data file with such title."
+
+  belongs_to :content_blob #don't add a dependent=>:destroy, as the content_blob needs to remain to detect future duplicates
+
+  searchable do
+    text :description, :title, :original_filename, :searchable_tags, :spreadsheet_annotation_search_fields,:fs_search_fields, :spreadsheet_contents_for_search
+  end if Seek::Config.solr_enabled
+
+  has_many :studied_factors, :conditions =>  'studied_factors.data_file_version = #{self.version}'
+
+  explicit_versioning(:version_column => "version") do
+
+    include SpreadsheetUtil
+    acts_as_versioned_resource
+    
+    belongs_to :content_blob
+    
+    has_many :studied_factors, :primary_key => "data_file_id", :foreign_key => "data_file_id", :conditions =>  'studied_factors.data_file_version = #{self.version}'
+    
+    def relationship_type(assay)
+      parent.relationship_type(assay)
+    end
+  end
+
+  def studies
+    assays.collect{|a| a.study}.uniq
+  end
+
+  # get a list of DataFiles with their original uploaders - for autocomplete fields
+  # (authorization is done immediately to save from iterating through the collection again afterwards)
+  #
+  # Parameters:
+  # - user - user that performs the action; this is required for authorization
+  def self.get_all_as_json(user)
+    all_datafiles = DataFile.find(:all, :order => "ID asc",:include=>[:policy,{:policy=>:permissions}])
+    datafiles_with_contributors = all_datafiles.collect{ |d|
+        d.can_view?(user) ?
+        (contributor = d.contributor;
+        { "id" => d.id,
+          "title" => d.title,
+          "contributor" => contributor.nil? ? "" : "by " + contributor.person.name,
+          "type" => self.name } ) :
+        nil }
+
+    datafiles_with_contributors.delete(nil)
+
+    return datafiles_with_contributors.to_json
+  end
+
+  def included_to_be_copied? symbol
      case symbol.to_s
        when "activity_logs","versions","attributions","relationships","inverse_relationships", "annotations"
          return false
@@ -111,58 +163,8 @@ class DataFile < ActiveRecord::Base
     end
 
     def event_ids= events_ids
-      
+
     end
-  end
-
-  validates_presence_of :title
-
-  # allow same titles, but only if these belong to different users
-  # validates_uniqueness_of :title, :scope => [ :contributor_id, :contributor_type ], :message => "error - you already have a Data file with such title."
-
-  belongs_to :content_blob #don't add a dependent=>:destroy, as the content_blob needs to remain to detect future duplicates
-
-  acts_as_solr(:fields=>[:description,:title,:original_filename,:searchable_tags,:spreadsheet_annotation_search_fields,:fs_search_fields]) if Seek::Config.solr_enabled
-
-  has_many :studied_factors, :conditions =>  'studied_factors.data_file_version = #{self.version}'
-
-  explicit_versioning(:version_column => "version") do
-
-    include SpreadsheetUtil
-    acts_as_versioned_resource
-    
-    belongs_to :content_blob
-    
-    has_many :studied_factors, :primary_key => "data_file_id", :foreign_key => "data_file_id", :conditions =>  'studied_factors.data_file_version = #{self.version}'
-    
-    def relationship_type(assay)
-      parent.relationship_type(assay)
-    end
-  end
-
-  def studies
-    assays.collect{|a| a.study}.uniq
-  end
-
-  # get a list of DataFiles with their original uploaders - for autocomplete fields
-  # (authorization is done immediately to save from iterating through the collection again afterwards)
-  #
-  # Parameters:
-  # - user - user that performs the action; this is required for authorization
-  def self.get_all_as_json(user)
-    all_datafiles = DataFile.find(:all, :order => "ID asc",:include=>[:policy,{:policy=>:permissions}])
-    datafiles_with_contributors = all_datafiles.collect{ |d|
-        d.can_view?(user) ?
-        (contributor = d.contributor;
-        { "id" => d.id,
-          "title" => d.title,
-          "contributor" => contributor.nil? ? "" : "by " + contributor.person.name,
-          "type" => self.name } ) :
-        nil }
-
-    datafiles_with_contributors.delete(nil)
-
-    return datafiles_with_contributors.to_json
   end
 
   def relationship_type(assay)
@@ -207,4 +209,9 @@ class DataFile < ActiveRecord::Base
     end
     flds.flatten.uniq
   end
+
+  def spreadsheet_contents_for_search
+    Seek::SpreadsheetHandler.new.contents_for_search self
+  end
+  
 end

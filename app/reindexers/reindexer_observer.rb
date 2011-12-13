@@ -15,10 +15,10 @@ class ReindexerObserver < ActiveRecord::Observer
   end
 
   def reindex item
-    Rails.logger.info("REINDEX CALLED FOR OBSERVER #{self.class.name}, ObjID:#{self.object_id}")
     consequences(item).each do |consequence|
-      consequence.solr_save
+      ReindexingQueue.create :item=>consequence
     end
+    Delayed::Job.enqueue(ReindexingJob.new,0,5.seconds.from_now) unless ReindexingJob.exists?
   end
 
 end
