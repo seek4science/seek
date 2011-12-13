@@ -19,4 +19,21 @@ module PolicyHelper
       return access_types.first if access_types.all?{|acc| acc == access_types.first}
     end
   end
+
+  #returns a message that there are additional advanced permissions for the resource outside of the provided scope, and if the policy matches the scope.
+  def additional_advanced_permissions_included resource,scope
+    if resource.policy && resource.policy.sharing_scope == scope
+      additional = false
+
+      if resource.policy.permissions.count>0
+        if scope!=Policy::ALL_SYSMO_USERS
+          additional=true
+        else
+          additional=true unless (resource.policy.permissions.collect{|p| p.contributor} - resource.projects).empty?
+        end
+      end
+
+      "<span class='additional_permissions'>there are also additional Advanced Permissions defined below</span>" if additional
+    end
+  end
 end

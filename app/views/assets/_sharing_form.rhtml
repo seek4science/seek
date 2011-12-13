@@ -35,15 +35,24 @@
     </div>
 
     <br/>
+    <style>
+      span.additional_permissions {
+        display:block;
+        margin-left: 4em;
+        font-weight: bold;
+        color: red;
+      }
+    </style>
 
     <div id='simple sharing' class="sharing_box_form">
         <!-- private -->
         <p><label for="sharing_scope_<%= Policy::PRIVATE -%>">
             <input type="hidden" id='access_type_select_<%= Policy::PRIVATE -%>' name="sharing[access_type_<%= Policy::PRIVATE -%>]" value="<%= Policy::NO_ACCESS -%>">
-        <input <%= 'checked="checked"' if @sharing_mode == Policy::PRIVATE %> id="sharing_scope_<%= Policy::PRIVATE -%>" name="sharing[sharing_scope]"
+            <input <%= 'checked="checked"' if @sharing_mode == Policy::PRIVATE %> id="sharing_scope_<%= Policy::PRIVATE -%>" name="sharing[sharing_scope]"
                                                                                   value="<%= Policy::PRIVATE -%>" type="radio" />
             - Keep this <%= @resource_type -%> private (only visible to you)
           </label>
+          <%= additional_advanced_permissions_included @resource, Policy::PRIVATE -%>
         </p>
 
         <p style="font-weight: bold; margin-top: 0.5em;">Or share it with..</p>
@@ -52,16 +61,18 @@
         <p>
           <label>
             <input type="radio" <%= 'checked="checked"' if @sharing_mode == Policy::ALL_SYSMO_USERS -%> id="sharing_scope_<%= Policy::ALL_SYSMO_USERS -%>" name="sharing[sharing_scope]" value="<%= Policy::ALL_SYSMO_USERS -%>" />
-            - Your project(s):
+            - Members of projects associated with this <%= @resource_type -%>:
           </label>
              <select name="sharing[your_proj_access_type]" id="sharing_your_proj_access_type">
                  <%= policy_selection_options([Policy::VISIBLE,Policy::ACCESSIBLE,Policy::EDITING,Policy::MANAGING], @resource, your_project_access_type(@policy, @resource)) -%>
              </select>
-             and other registered users.
+             <br/>
+            <span style="margin-left:10em;">... and all other project members:</span>
              <%= render :partial => "assets/sharing_form_access_type_dropdown", :locals => { :access_type_selector_for_scope => Policy::ALL_SYSMO_USERS,
                :sharing_scope => Policy::ALL_SYSMO_USERS, :access_type => @access_mode, :access_type_options=>[Policy::NO_ACCESS,Policy::VISIBLE,Policy::ACCESSIBLE,Policy::EDITING] } -%>
-             <br/>
+             <%= additional_advanced_permissions_included @resource, Policy::ALL_SYSMO_USERS -%>
         </p>
+
         <!-- public -->
         <p>
           <label for="sharing_scope_<%= Policy::EVERYONE -%>">
@@ -71,7 +82,7 @@
           </label>
               <%= render :partial => "assets/sharing_form_access_type_dropdown", :locals => { :access_type_selector_for_scope => Policy::EVERYONE,
             :sharing_scope => @sharing_mode, :access_type => @access_mode } -%>
-          <br/>
+           <%= additional_advanced_permissions_included @resource, Policy::EVERYONE -%>
         </p>
 
     </div>
@@ -88,7 +99,7 @@
         </script>
     <% end -%>
 
-    <br/>
+
     <%= link_to_function "Advanced permissions " + expand_image, :class => 'advanced_sharing_link', :style => "display:" + (@policy.permissions.empty? ? 'block;' : 'none;'), :id =>'advanced_sharing_expand_image' do |page|
         page.visual_effect :toggle_blind, "advanced sharing", :duration => 0.5
         page["advanced_sharing_expand_image"].toggle
@@ -102,10 +113,9 @@
         end
     -%>
     <br/>
-    <br/>
 
     <div id="advanced sharing" class='sharing_box_form' style="display:<%= @policy.permissions.empty? ? 'none;' : 'block;'-%>">
-        <p style="font-weight: bold;">Define more fine-grained sharing</p>
+        <p style="font-weight: bold;">Additional fine-grained sharing permissions</p>
 
         <div id="specific_sharing" style="display:block; margin-top: 1em;">
           <div class="box_editing" style="padding-left: 1em; font-size: 93%;">
