@@ -52,12 +52,12 @@
         <p>
           <label>
             <input type="radio" <%= 'checked="checked"' if @sharing_mode == Policy::ALL_SYSMO_USERS -%> id="sharing_scope_<%= Policy::ALL_SYSMO_USERS -%>" name="sharing[sharing_scope]" value="<%= Policy::ALL_SYSMO_USERS -%>" />
-            - Selected projects:
+            - Your project(s):
           </label>
              <select name="sharing[your_proj_access_type]" id="sharing_your_proj_access_type">
                  <%= policy_selection_options([Policy::VISIBLE,Policy::ACCESSIBLE,Policy::EDITING,Policy::MANAGING], @resource, your_project_access_type(@policy, @resource)) -%>
              </select>
-             and all <%= Seek::Config.project_name %> users:
+             and other registered users.
              <%= render :partial => "assets/sharing_form_access_type_dropdown", :locals => { :access_type_selector_for_scope => Policy::ALL_SYSMO_USERS,
                :sharing_scope => Policy::ALL_SYSMO_USERS, :access_type => @access_mode, :access_type_options=>[Policy::NO_ACCESS,Policy::VISIBLE,Policy::ACCESSIBLE,Policy::EDITING] } -%>
              <br/>
@@ -76,14 +76,26 @@
 
     </div>
 
+    <!-- some javascript to set the default permissions for new records -->
+    <% if @resource.new_record? && @resource.errors.empty? -%>
+        <script type="text/javascript">
+          $("sharing_scope_<%= Policy::ALL_SYSMO_USERS-%>").checked=true;
+          $("access_type_select_<%= Policy::ALL_SYSMO_USERS-%>").value = "<%= Policy::VISIBLE -%>";
+          <%
+            default_for_selected_projects = @resource.is_isa? ? Policy::EDITING : Policy::ACCESSIBLE
+          -%>
+          $("sharing_your_proj_access_type").value = "<%=default_for_selected_projects-%>"
+        </script>
+    <% end -%>
+
     <br/>
-    <%= link_to_function "Advanced sharing " + expand_image, :class => 'advanced_sharing_link', :style => "display:" + (@policy.permissions.empty? ? 'block;' : 'none;'), :id =>'advanced_sharing_expand_image' do |page|
+    <%= link_to_function "Advanced permissions " + expand_image, :class => 'advanced_sharing_link', :style => "display:" + (@policy.permissions.empty? ? 'block;' : 'none;'), :id =>'advanced_sharing_expand_image' do |page|
         page.visual_effect :toggle_blind, "advanced sharing", :duration => 0.5
         page["advanced_sharing_expand_image"].toggle
         page["advanced_sharing_collapse_image"].toggle
         end
     -%>
-    <%= link_to_function "Advanced sharing " + collapse_image, :class => 'advanced_sharing_link', :style => "display:" + (@policy.permissions.empty? ? 'none;' : 'block;'), :id =>'advanced_sharing_collapse_image'do |page|
+    <%= link_to_function "Advanced permissions " + collapse_image, :class => 'advanced_sharing_link', :style => "display:" + (@policy.permissions.empty? ? 'none;' : 'block;'), :id =>'advanced_sharing_collapse_image'do |page|
         page.visual_effect :toggle_blind, "advanced sharing", :duration => 0.5
         page["advanced_sharing_expand_image"].toggle
         page["advanced_sharing_collapse_image"].toggle
