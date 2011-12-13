@@ -17,7 +17,7 @@
        <% end %>
      </ul>
     <br/>
-    <label><b>Projects:</b></label> <br/>
+     <span class="none_text"> You can subscribe other projects: </span> <br/>
     <%= select_tag :select_project_subscription,
                    options_for_select([["Select Project ...", 0]]|projects.collect { |p| [truncate(h(p.title), :length=>select_truncate_length), p.id] }),
                    {:style=>"width:90%",
