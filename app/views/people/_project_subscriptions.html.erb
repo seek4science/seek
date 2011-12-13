@@ -1,0 +1,20 @@
+<div class="fold">
+  <div class="foldTitle">
+    Subscriptions
+  </div>
+  <div class="foldContent">
+    <table>
+      <tr>
+        <th> Project</th>
+        <th>Email Frequency</th>
+      </tr>
+      <% person.project_subscriptions.uniq.each do |project_subscription| %>
+          <tr>
+            <td style="text-align: left"> <%= link_to project_subscription.project.name, project_subscription.project %> </td>
+            <td> <%= project_subscription.frequency %> </td>
+          </tr>
+      <% end %>
+     </table>
+  </div>
+
+</div>
