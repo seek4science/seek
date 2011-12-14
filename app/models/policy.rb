@@ -141,7 +141,7 @@ class Policy < ActiveRecord::Base
   end
 
   #The default policy to use when creating authorized items if no other policy is specified
-  def self.default
+  def self.default resource=nil
     private_policy
   end
    
