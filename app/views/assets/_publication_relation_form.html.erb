@@ -35,7 +35,7 @@
                 <%= check_box_tag :include_other_project_publications, nil, false, {:onchange=>"toggle_publication_list();",:style=>"margin-top:0.5em;"} -%> Associate Publications from other projects?
             </div>
 			<br/>
-            <%= link_to_function (image("new") + " Associate with this #{resource_type}"), "addSelectedPublication(); return(false);", :id=>"add_publication_link", :class=>"block_link", :style => "width: 10em" %>
+            <%= link_to_function (image("new") + " Associate with this #{resource_type}"), "addSelectedPublication(); return(false);", :id=>"add_publication_link", :class=>"block_link" %>
         </div>
       <%= render :partial => 'assets/preview_box', :locals => {:preview_name => 'publication'} %>
     </div>

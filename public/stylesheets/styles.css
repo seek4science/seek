@@ -1363,6 +1363,7 @@ a.block_link {
   margin-top: 0.3em;
   text-align: left;
   vertical-align: middle;
+  width: 15em;
 }
 
 a.block_link_active {
