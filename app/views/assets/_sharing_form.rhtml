@@ -1,6 +1,8 @@
 <%
    set_parameters_for_sharing_form
    show_advanced_permissions = !@resource.respond_to?(:has_advanced_permissions?) || @resource.has_advanced_permissions?
+   default_projects_access_type = @resource.is_isa? ? Policy::EDITING : Policy::ACCESSIBLE
+   default_consortium_access_type = Policy::VISIBLE
 %>
 <%# initialization: required to keep javascript independent of the access type codes, to allow the use the constants instead -%>
 <%= render :partial=>"assets/sharing_constants" %>
@@ -67,12 +69,12 @@
             - Members of projects associated with this <%= @resource_type -%>:
           </label>
              <select name="sharing[your_proj_access_type]" id="sharing_your_proj_access_type">
-                 <%= policy_selection_options([Policy::VISIBLE,Policy::ACCESSIBLE,Policy::EDITING,Policy::MANAGING], @resource, your_project_access_type(@policy, @resource)) -%>
+                 <%= policy_selection_options([Policy::VISIBLE,Policy::ACCESSIBLE,Policy::EDITING,Policy::MANAGING], @resource, your_project_access_type(@policy, @resource) || default_projects_access_type) -%>
              </select>
              <br/>
             <span style="margin-left:10em;">... and all other project members:</span>
              <%= render :partial => "assets/sharing_form_access_type_dropdown", :locals => { :access_type_selector_for_scope => Policy::ALL_SYSMO_USERS,
-               :sharing_scope => Policy::ALL_SYSMO_USERS, :access_type => @access_mode, :access_type_options=>[Policy::NO_ACCESS,Policy::VISIBLE,Policy::ACCESSIBLE,Policy::EDITING] } -%>
+               :sharing_scope => Policy::ALL_SYSMO_USERS, :access_type => (@resource.policy.sharing_scope==Policy::ALL_SYSMO_USERS ? @access_mode : default_consortium_access_type), :access_type_options=>[Policy::NO_ACCESS,Policy::VISIBLE,Policy::ACCESSIBLE,Policy::EDITING] } -%>
              <%= additional_advanced_permissions_included @resource, Policy::ALL_SYSMO_USERS -%>
         </p>
 
@@ -94,11 +96,7 @@
     <% if @resource.new_record? && @resource.errors.empty? -%>
         <script type="text/javascript">
           $("sharing_scope_<%= Policy::ALL_SYSMO_USERS-%>").checked=true;
-          $("access_type_select_<%= Policy::ALL_SYSMO_USERS-%>").value = "<%= Policy::VISIBLE -%>";
-          <%
-            default_for_selected_projects = @resource.is_isa? ? Policy::EDITING : Policy::ACCESSIBLE
-          -%>
-          $("sharing_your_proj_access_type").value = "<%=default_for_selected_projects-%>"
+
         </script>
     <% end -%>
 
