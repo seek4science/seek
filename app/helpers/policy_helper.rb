@@ -20,20 +20,25 @@ module PolicyHelper
     end
   end
 
-  #returns a message that there are additional advanced permissions for the resource outside of the provided scope, and if the policy matches the scope.
-  def additional_advanced_permissions_included resource,scope
-    if resource.policy && resource.policy.sharing_scope == scope
-      additional = false
-
+  #determines whether there are additional advanced permissions for the resource outside of the provided scope, and if the policy matches the scope.
+  #if a resource has has Policy::ALL_SYSMO_USERS then it is concidered to have advanced permissions if it has permissions that includes contributors other than the associated projects
+  def includes_advanced_permissions? resource,scope
+    advanced = false
+    if resource.respond_to?(:policy) && resource.policy && resource.policy.sharing_scope == scope
       if resource.policy.permissions.count>0
         if scope!=Policy::ALL_SYSMO_USERS
-          additional=true
+          advanced=true
         else
-          additional=true unless (resource.policy.permissions.collect{|p| p.contributor} - resource.projects).empty?
+          advanced=true unless (resource.policy.permissions.collect{|p| p.contributor} - resource.projects).empty?
         end
       end
-
-      "<span class='additional_permissions'>there are also additional Advanced Permissions defined below</span>" if additional
     end
+    advanced
+  end
+
+  #returns a message that there are additional advanced permissions for the resource outside of the provided scope, and if the policy matches the scope.
+  #if a resource has has Policy::ALL_SYSMO_USERS then it is concidered to have advanced permissions if it has permissions that includes contributors other than the associated projects
+  def additional_advanced_permissions_included resource,scope
+    "<span class='additional_permissions'>there are also additional Advanced Permissions defined below</span>" if includes_advanced_permissions? resource,scope
   end
 end

@@ -100,13 +100,13 @@
     <% end -%>
 
 
-    <%= link_to_function "Advanced permissions " + expand_image, :class => 'advanced_sharing_link', :style => "display:" + (@policy.permissions.empty? ? 'block;' : 'none;'), :id =>'advanced_sharing_expand_image' do |page|
+    <%= link_to_function "Advanced permissions " + expand_image, :class => 'advanced_sharing_link', :style => "display:" + (@resource.respond_to?(:policy) && includes_advanced_permissions?(@resource,@resource.policy.sharing_scope) ? 'block;' : 'none;'), :id =>'advanced_sharing_expand_image' do |page|
         page.visual_effect :toggle_blind, "advanced sharing", :duration => 0.5
         page["advanced_sharing_expand_image"].toggle
         page["advanced_sharing_collapse_image"].toggle
         end
     -%>
-    <%= link_to_function "Advanced permissions " + collapse_image, :class => 'advanced_sharing_link', :style => "display:" + (@policy.permissions.empty? ? 'none;' : 'block;'), :id =>'advanced_sharing_collapse_image'do |page|
+    <%= link_to_function "Advanced permissions " + collapse_image, :class => 'advanced_sharing_link', :style => "display:" + (@resource.respond_to?(:policy) && includes_advanced_permissions?(@resource,@resource.policy.sharing_scope) ? 'none;' : 'block;'), :id =>'advanced_sharing_collapse_image'do |page|
         page.visual_effect :toggle_blind, "advanced sharing", :duration => 0.5
         page["advanced_sharing_expand_image"].toggle
         page["advanced_sharing_collapse_image"].toggle
