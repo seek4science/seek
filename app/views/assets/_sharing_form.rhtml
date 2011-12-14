@@ -1,4 +1,8 @@
-<% set_parameters_for_sharing_form %>
+<%
+   set_parameters_for_sharing_form
+   advanced_permissions = !@resource.respond_to?(:has_advanced_permissions?) || @resource.has_advanced_permissions?
+
+%>
 <%# initialization: required to keep javascript independent of the access type codes, to allow the use the constants instead -%>
 <%= render :partial=>"assets/sharing_constants" %>
 
@@ -100,13 +104,13 @@
     <% end -%>
 
 
-    <%= link_to_function "Advanced permissions " + expand_image, :class => 'advanced_sharing_link', :style => "display:" + (@resource.respond_to?(:policy) && includes_advanced_permissions?(@resource,@resource.policy.sharing_scope) ? 'block;' : 'none;'), :id =>'advanced_sharing_expand_image' do |page|
+    <%= link_to_function "Advanced permissions " + expand_image, :class => 'advanced_sharing_link', :style => "display:" + (advanced_permissions ? 'none;' : 'block;'), :id =>'advanced_sharing_expand_image' do |page|
         page.visual_effect :toggle_blind, "advanced sharing", :duration => 0.5
         page["advanced_sharing_expand_image"].toggle
         page["advanced_sharing_collapse_image"].toggle
         end
     -%>
-    <%= link_to_function "Advanced permissions " + collapse_image, :class => 'advanced_sharing_link', :style => "display:" + (@resource.respond_to?(:policy) && includes_advanced_permissions?(@resource,@resource.policy.sharing_scope) ? 'none;' : 'block;'), :id =>'advanced_sharing_collapse_image'do |page|
+    <%= link_to_function "Advanced permissions " + collapse_image, :class => 'advanced_sharing_link', :style => "display:" + (advanced_permissions ? 'block;' : 'none;'), :id =>'advanced_sharing_collapse_image'do |page|
         page.visual_effect :toggle_blind, "advanced sharing", :duration => 0.5
         page["advanced_sharing_expand_image"].toggle
         page["advanced_sharing_collapse_image"].toggle
@@ -114,7 +118,7 @@
     -%>
     <br/>
 
-    <div id="advanced sharing" class='sharing_box_form' style="display:<%= @policy.permissions.empty? ? 'none;' : 'block;'-%>">
+    <div id="advanced sharing" class='sharing_box_form' style="display:<%= advanced_permissions ? 'block;' : 'none;'-%>">
         <p style="font-weight: bold;">Additional fine-grained sharing permissions</p>
 
         <div id="specific_sharing" style="display:block; margin-top: 1em;">
@@ -321,37 +325,38 @@
   REVIEW_WORK_GROUP_LINK = '<%= review_work_group_path("type", "id", "access_type") -%>';
 
 
-<% @policy.permissions.each do |p| -%>
-  <% unless p.marked_for_destruction? %>
-      <% case p.contributor_type; when "FavouriteGroup", "Person", "Project", "Institution", "WorkGroup" -%>
-        <% unless p.contributor_type == "FavouriteGroup" && [FavouriteGroup::WHITELIST_NAME, FavouriteGroup::BLACKLIST_NAME].include?(p.contributor.name) -%>
-            if('<%= p.contributor_type -%>' in permissions_for_set)
-            permissions_for_set['<%= p.contributor_type -%>']++;
-            else {
-              permissions_for_set['<%= p.contributor_type -%>'] = 0;
-              permission_settings['<%= p.contributor_type -%>'] = new Array();
-            }
-          <% allow_removal=true -%>
-          <% if p.contributor_type == "Person" -%>
-            <%
-            contributor_name = (p.contributor.first_name + " " + p.contributor.last_name)
-            allow_removal = !prevent_manager_removal(@resource,p) if p.access_type==Policy::MANAGING
-            -%>
-          <% elsif p.contributor_type == "WorkGroup" -%>
-            <% contributor_name = p.contributor.project.name + " @ " + p.contributor.institution.name -%>
-          <% else -%>
-            <% contributor_name = p.contributor.name -%>
+<% if advanced_permissions -%>
+    <% @policy.permissions.each do |p| -%>
+      <% unless p.marked_for_destruction? %>
+          <% case p.contributor_type; when "FavouriteGroup", "Person", "Project", "Institution", "WorkGroup" -%>
+            <% unless p.contributor_type == "FavouriteGroup" && [FavouriteGroup::WHITELIST_NAME, FavouriteGroup::BLACKLIST_NAME].include?(p.contributor.name) -%>
+                if('<%= p.contributor_type -%>' in permissions_for_set)
+                permissions_for_set['<%= p.contributor_type -%>']++;
+                else {
+                  permissions_for_set['<%= p.contributor_type -%>'] = 0;
+                  permission_settings['<%= p.contributor_type -%>'] = new Array();
+                }
+              <% allow_removal=true -%>
+              <% if p.contributor_type == "Person" -%>
+                <%
+                contributor_name = (p.contributor.first_name + " " + p.contributor.last_name)
+                allow_removal = !prevent_manager_removal(@resource,p) if p.access_type==Policy::MANAGING
+                -%>
+              <% elsif p.contributor_type == "WorkGroup" -%>
+                <% contributor_name = p.contributor.project.name + " @ " + p.contributor.institution.name -%>
+              <% else -%>
+                <% contributor_name = p.contributor.name -%>
+              <% end -%>
+                // add current values into the associative array of permissions:
+                // first index is the category of contributor type of the permission, the second - consecutive
+                // number of occurrences of permissions for such type of contributor
+                permission_settings['<%= p.contributor_type -%>'][permissions_for_set['<%= p.contributor_type -%>']] =
+                  ['<%= contributor_name -%>', <%= p.contributor_id -%>, <%= p.access_type -%>, <%= allow_removal -%> ];
+            <% end -%>
           <% end -%>
-            // add current values into the associative array of permissions:
-            // first index is the category of contributor type of the permission, the second - consecutive
-            // number of occurrences of permissions for such type of contributor
-            permission_settings['<%= p.contributor_type -%>'][permissions_for_set['<%= p.contributor_type -%>']] =
-              ['<%= contributor_name -%>', <%= p.contributor_id -%>, <%= p.access_type -%>, <%= allow_removal -%> ];
-        <% end -%>
       <% end -%>
-  <% end -%>
+    <% end -%>
 <% end -%>
+    updateCustomSharingSettings();
 
-  // build custom permissions list and set relevant other options
-  updateCustomSharingSettings();
 </script>
