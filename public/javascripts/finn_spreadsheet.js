@@ -445,7 +445,7 @@ function activateSheet(sheet, sheetTab) {
   if(sheetTab == null)
     sheetTab = $j("a.sheet_tab:eq(" + sheet +")");
 
-  var sheetName = sheetTab.html().replace(" ","_");
+  var sheetIndex = sheetTab.attr("index")
 
   //Clean up
   //Hide annotations
@@ -465,9 +465,9 @@ function activateSheet(sheet, sheetTab) {
   sheetTab.addClass('selected_tab');
 
   //Show the sheet
-  $j("div.sheet_container#spreadsheet_" + sheetName).show();
+  $j("div.sheet_container#spreadsheet_" + sheetIndex).show();
 
-  var activeSheet = $j("div.sheet#spreadsheet_" + sheetName);
+  var activeSheet = $j("div.sheet#spreadsheet_" + sheetIndex);
 
   //Show the div + set sheet active
   activeSheet.addClass('active_sheet');
@@ -481,7 +481,7 @@ function activateSheet(sheet, sheetTab) {
   deselect_cells();
 
   //Record current sheet in annotation form
-  $j('input#annotation_sheet_id').attr("value",sheetTab.attr("index"));
+  $j('input#annotation_sheet_id').attr("value",sheetIndex);
 
   //Reset variables
   isMouseDown = false,
