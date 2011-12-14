@@ -52,6 +52,17 @@ module Acts
         User.current_user
       end
 
+      #when having a sharing_scope policy of Policy::ALL_SYSMO_USERS it is concidered to have advanced permissions if any of the permissions do not relate to the projects associated with the resource (ISA or Asset))
+      #this is a temporary work-around for the loss of the custom_permissions flag when defining a pre-canned permission of shared with sysmo, but editable/downloadable within mhy project
+      #other policy sharing scopes are simpler, and are concidered to have advanced permissions if there are more than zero permissions defined
+      def has_advanced_permissions?
+        if policy.sharing_scope==Policy::ALL_SYSMO_USERS
+          !(policy.permissions.collect{|p| p.contributor} - projects).empty?
+        else
+          policy.permissions.count > 0
+        end
+      end
+
       def contributor_or_default_if_new
         if self.new_record? && contributor.nil?
           self.contributor = default_contributor
