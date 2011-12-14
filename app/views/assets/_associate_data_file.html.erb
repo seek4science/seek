@@ -46,7 +46,7 @@
         <%= check_box_tag :include_other_project_data_files, nil, false, {:onchange=>"toggle_data_file_list();",:style=>"margin-top:0.5em;"} -%> Associate Data files from other projects?
       </div>
 	  <br/>
-      <%= link_to_function (image("new") + " Associate with this #{resource_text}"), "addSelectedDataFile(); return(false);", :id=>"add_data_file_link", :class=>"block_link", :style => "width: 11em" %>
+      <%= link_to_function (image("new") + " Associate with this #{resource_text}"), "addSelectedDataFile(); return(false);", :id=>"add_data_file_link", :class=>"block_link" %>
     </div>
   
     <%= render :partial => 'assets/preview_box', :locals => {:preview_name => 'data_file'} %>
