@@ -88,11 +88,10 @@ module SpreadsheetUtil
        end
        #Pad columns (so it's at least 10 cols wide)
        if col_index < min_cols
-         for i in (col_index..min_cols)
+         for i in ((col_index+1)..min_cols)
            col = Column.new(i, 2964.to_s)
            sheet.columns << col
          end
-         min_cols = 10
        else
          min_cols = col_index
        end
