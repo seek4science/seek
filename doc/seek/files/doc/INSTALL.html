@@ -56,7 +56,7 @@
     </tr>
     <tr class="top-aligned-row">
       <td><strong>Last Update:</strong></td>
-      <td>Mon Dec 12 15:24:11 +0000 2011</td>
+      <td>Thu Dec 15 11:51:27 +0000 2011</td>
     </tr>
     </table>
   </div>
@@ -276,6 +276,17 @@ If running in production mode, you should start the server with
 <pre>
   ./script/server -e production
 </pre>
+<h2>Starting Delayed-Job (Background processing)</h2>
+<p>
+Some background processing is handled using a tool called <em>Delayed
+Job</em>
+</p>
+<p>
+To start delayed job run the script
+</p>
+<pre>
+  ./script/delayed_job start
+</pre>
 <h2>Creating the Admin user</h2>
 <p>
 Once the server is running you should visit the page <a
@@ -300,7 +311,7 @@ institutions and profiles.
 <p>
 Here you can also define additional administrator users.
 </p>
-<h2>Enabling search and starting the SOLR server</h2>
+<h2>Enabling search and starting the Sunspot SOLR server</h2>
 <p>
 Search can be enabled in the admin setting under Admin settings, Site
 configuration, Enable/disable features - under &quot;Search enabled&quot;.
@@ -310,13 +321,13 @@ You will need to restart the server after changing this setting.
 To start the search server you need to run:
 </p>
 <pre>
-  rake solr:start
+  rake sunspot:solr:start
 </pre>
 <p>
 and to reindex any existing data that created before search was enabled:
 </p>
 <pre>
-  rake solr:reindex
+  rake sunspot:solr:reindex
 </pre>
 <h2>Rebranding SysMO SEEK for other projects</h2>
 <p>
