@@ -44,7 +44,6 @@ module SpreadsheetUtil
        if File.exists?(cached_spreadsheet_path)
          return File.open(cached_spreadsheet_path, "r") {|f| f.read}
        else
-         content_blob.worksheets.clear #Expire all worksheets
          return cache_spreadsheet
        end
     else
