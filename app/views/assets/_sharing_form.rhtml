@@ -1,7 +1,7 @@
 <%
    set_parameters_for_sharing_form
    show_advanced_permissions = !@resource.respond_to?(:has_advanced_permissions?) || @resource.has_advanced_permissions?
-   default_projects_access_type = @resource.is_isa? ? Policy::EDITING : Policy::ACCESSIBLE
+   default_projects_access_type = @resource.is_asset? ? Policy::ACCESSIBLE : Policy::EDITING
    default_consortium_access_type = Policy::VISIBLE
 %>
 <%# initialization: required to keep javascript independent of the access type codes, to allow the use the constants instead -%>
@@ -38,7 +38,6 @@
         </ul>
       </div>
     </div>
-
     <br/>
     <style>
       span.additional_permissions {
