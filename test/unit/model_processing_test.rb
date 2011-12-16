@@ -24,6 +24,22 @@ class ModelProcessingTest < ActiveSupport::TestCase
     assert is_dat?(model.content_blob)
   end
 
+  test "is supported no longer relies on extension" do
+    model=models(:teusink)
+    model.original_filename = "teusink.txt"
+    model.content_blob.dump_data_to_file
+    assert model.is_sbml?
+    assert !model.is_dat?
+    assert model.is_jws_supported?
+
+    model=models(:jws_model)
+    model.original_filename = "jws.txt"
+    model.content_blob.dump_data_to_file
+    assert !model.is_sbml?
+    assert model.is_dat?
+    assert model.is_jws_supported?
+  end
+
   def test_is_jws_supported
     model = models(:jws_model)
     assert is_jws_supported?(model)
