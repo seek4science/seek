@@ -28,8 +28,9 @@ class PresentationsControllerTest < ActionController::TestCase
     presentation_attrs = Factory.attributes_for(:presentation,:contributor=>User.current_user, :data => fixture_file_upload('files/file_picture.png'))
 
     assert_difference "Presentation.count" do
-      post :create,:presentation => presentation_attrs
-      puts assigns(:presentation).errors.full_messages
+      assert_difference "ActivityLog.count" do
+        post :create,:presentation => presentation_attrs
+      end
     end
   end
 
