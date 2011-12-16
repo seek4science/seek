@@ -41,13 +41,11 @@ module SpreadsheetUtil
   #If it doesn't exist yet, it gets created
   def spreadsheet_xml
     if is_spreadsheet?
-       if File.exists?(cached_spreadsheet_path)
-         return File.open(cached_spreadsheet_path, "r") {|f| f.read}
-       else
-         return cache_spreadsheet
-       end
+      Rails.cache.fetch("#{content_blob.cache_key}-ss-xml") do
+        spreadsheet_to_xml(open(content_blob.filepath))
+      end
     else
-      return nil
+      nil
     end
   end
   
@@ -55,12 +53,11 @@ module SpreadsheetUtil
   # a Workbook object
   def parse_spreadsheet_xml(spreadsheet_xml)
     workbook = Workbook.new
-
-    spreadsheet_xml = spreadsheet_xml.gsub(/xmlns=\"([^\"]*)\"/,"") #Strip NS
     
     doc = LibXML::XML::Parser.string(spreadsheet_xml).parse
+    doc.root.namespaces.default_prefix="ss"
     
-    doc.find("//style").each do |s|
+    doc.find("//ss:style").each do |s|
       style = Style.new(s["id"])
       s.children.each do |a|
         style.attributes[a.name] = a.content unless (a.name == "text")
@@ -69,7 +66,7 @@ module SpreadsheetUtil
     end
 
 
-   doc.find("//sheet").each do |s|
+   doc.find("//ss:sheet").each do |s|
      unless s["hidden"] == "true" || s["very_hidden"] == "true"
        sheet = Sheet.new(s["name"])
        workbook.sheets << sheet
@@ -77,7 +74,7 @@ module SpreadsheetUtil
        min_rows = 10
        min_cols = 10
          #Grab columns
-       columns = s.find("./columns/column")
+       columns = s.find("./ss:columns/ss:column")
        col_index = 0
        #Add columns
        columns.each do |c|
@@ -95,7 +92,7 @@ module SpreadsheetUtil
          min_cols = col_index
        end
          #Grab rows
-       rows = s.find("./rows/row")
+       rows = s.find("./ss:rows/ss:row")
        row_index = 0
        #Add rows
        rows.each do |r|
@@ -103,7 +100,7 @@ module SpreadsheetUtil
          row = Row.new(row_index, r["height"])
          sheet.rows[row_index] = row
          #Add cells
-         r.find("./cell").each do |c|
+         r.find("./ss:cell").each do |c|
            col_index = c["column"].to_i
            content = c.content
            content = content.to_f if c["type"] == "numeric"
@@ -149,31 +146,6 @@ module SpreadsheetUtil
       result += (c.ord - 64) * (26 ** (col.length - (i+1)))
     end
     result
-  end
-
-  #the cache file for a given feed url
-  def cached_spreadsheet_path
-    File.join(cached_spreadsheet_dir,"spreadsheet_blob_#{Rails.env}_#{content_blob_id.to_s}.xml")
-  end
-
-  private
-
-  #the directory used to contain the cached spreadsheets
-  def cached_spreadsheet_dir
-    if Rails.env=="test"
-      dir = File.join(Dir.tmpdir,"seek-cache","spreadsheet-xml")
-    else
-      dir = File.join(Rails.root,"tmp","cache","spreadsheet-xml")
-    end
-    FileUtils.mkdir_p dir if !File.exists?(dir)
-    dir
-  end
-
-  #Cache the data file's spreadsheet XML, and returns it
-  def cache_spreadsheet
-    xml = spreadsheet_to_xml(open(content_blob.filepath))
-    File.open(cached_spreadsheet_path, "w") {|f| f.write(xml)}
-    return xml
   end
   
 end
