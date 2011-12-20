@@ -10,11 +10,11 @@ ActionController::Routing::Routes.draw do |map|
   map.resources :presentations,:member => { :download => :get, :new_version=>:post, :preview_publish=>:get,:publish=>:post,:request_resource=>:post, :update_annotations_ajax=>:post }
   map.resources :subscriptions
   map.resources :specimens
-  map.resources :samples
+  map.resources :samples,:collection => {:navigation => :get}
 
   map.resources :events
 
-  map.resources :strains
+  map.resources :strains, :collection=>{:existing_strains=>:get, :existing_strains_for_create=>:get}
 
   map.resources :publications,:collection=>{:fetch_preview=>:post},:member=>{:disassociate_authors=>:post,:update_annotations_ajax=>:post}
 

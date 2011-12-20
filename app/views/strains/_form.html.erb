@@ -1,12 +1,9 @@
 <%= stylesheet_link_tag 'styles.css' -%>
-<% action ||= nil%>
-<div class="strain" id="strain_form">
-  <% if action == 'edit' %>
-       <% parent_strain = Strain.find_by_id(strain.parent_id).try(:title) %>
+<div class="strain" id="strain_form" style="display: <%= display ? 'block' : 'none' -%>">
+       <% parent_strain = strain.title %>
        <p class="none_text" style="margin-left: 15em;">
        <%= parent_strain.blank? ? '' : "This strain is created based on #{parent_strain}"%>
        </p>
-  <% end %>
 
   <div class="yui-g">
     <center>

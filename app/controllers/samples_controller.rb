@@ -108,5 +108,9 @@ class SamplesController < ApplicationController
     end
   end
 
-
+  def navigation
+    respond_to do |format|
+      format.html{render :template => 'samples/navigation'}
+    end
+  end
 end

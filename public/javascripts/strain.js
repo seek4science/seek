@@ -1,3 +1,5 @@
+EXISTING_STRAINS_LINK = null;
+
 function fadeRow(id) {
     try {
         var genotype_row_id = 'genotype_row_'.concat(id.toString())
@@ -50,3 +52,39 @@ function fadeCreateStrain(){
     Effect.Fade('existing_strains', { duration: 0.25 });
 }
 
+
+function check_show_create_new_strain(element_id) {
+    selected_id = $F('strain_organism_id') ;
+    if (selected_id == '0') {
+        Effect.Fade(element_id, { duration: 0.25 });
+    }else{
+        Effect.Appear(element_id, { duration: 0.25 });
+    }
+}
+
+function check_show_existing_strains(organism_element_id, existing_strains_element_id, url) {
+      selected_id = $F(organism_element_id) ;
+      if (selected_id == '0') {
+        Effect.Fade(existing_strains_element_id, { duration: 0.25 });
+      }
+      else {
+          if (url != ''){
+              request = new Ajax.Request(url,
+              {
+                method: 'get',
+                parameters: {
+                    organism_id: selected_id
+                },
+                onSuccess: function(transport){
+                     Effect.Appear(existing_strains_element_id, { duration: 0.25 });
+                },
+                onFailure: function(transport){
+                    alert('Something went wrong, please try again...');
+                }
+              });
+          }
+          else{
+            Effect.Appear(existing_strains_element_id, { duration: 0.25 });
+          }
+      }
+}

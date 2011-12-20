@@ -1,13 +1,14 @@
 <% strain_links=[] %>
 <div id="existing_strains">
+  <h2>Strain</h2>
   <% if existing_strains.empty? -%>
-      <p class="none_text">No strains have yet been defined for <%= h(organism.title) -%>.</p>
+      <p class="none_text">No strains have yet been defined for <span style="font-weight: bold;"> <%= h(organism.title) -%></span>.</p>
   <% else -%>
       <p class="none_text">Here are the strains for <%= h(organism.title) -%>. Please choose one.</p>
-      <% existing_strains.each do |strain| -%>
-          <% strain_links << link_to_remote(h(strain.title), {:url =>{:controller => 'strains', :action => 'show_existing_strain', :id => "#{strain.id}"},
-          :with=>"'organism_id='+ '#{organism.id}'"}) %>
-      <% end -%>
+          <% existing_strains.sort{|a,b| a.title <=> b.title}.each do |strain| -%>
+          <% tooltip=tooltip_title_attrib("#{render :partial => 'strain_detail', :locals => {:strain => strain}}")%>
+              <% strain_links << link_to_remote(h(strain.title),:url => {:controller => 'specimens' , :action => 'existing_specimens'}, :title => tooltip ) %>
+          <% end -%>
       <%= strain_links.join(", ") -%>
   <% end -%>
 </div>
