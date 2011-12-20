@@ -4,6 +4,7 @@
     select_truncate_length=120
     associated_models = resource.is_a?(Publication) ? resource.related_models : resource.models
 -%>
+<div  class="fold">
   <div class="foldTitle">
     <%= help_icon("Here you associate models in SEEK to this assay.") -%>
     Associate Models
@@ -41,7 +42,7 @@
     </div>
     <%= render :partial => 'assets/preview_box', :locals => {:preview_name => 'model'} %>
   </div>
-
+</div>
 
 <script type="text/javascript">
   function toggle_model_list() {
