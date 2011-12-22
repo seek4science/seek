@@ -11,6 +11,7 @@
         <h4 style="margin-left: 7em;margin-top:1em;margin-bottom:1em;font-style:italic;color:gray;">Here you can navigate Organism-Strain-Sample. You also can create new strain or new sample</h4>
           <ul class="sectionIcons">
             <li><%= create_strain_popup_link-%></li>
+            <li><%= create_sample_popup_link-%></li>
           </ul>
         <br/>
         <h2>Organism</h2>
@@ -21,9 +22,9 @@
           :before=>"show_ajax_loader('existing_strains')")+ ";check_show_existing_strains('strain_organism_id', 'existing_strains', ''); return(false);" } -%>
         <br/>
         <div id="existing_strains"></div>
-        <div id="extra_organism_details" style="display:none;">
+        <div id="existing_specimens"></div>
+        <div id="existing_samples"></div>
 
-    </div>
 
 
 <script type="text/javascript">
@@ -62,6 +63,6 @@
         }
        }
     }
-    check_show_existing_strains('strain_organism_id', 'existing_strains', '<%=existing_strains_strains_path-%>');
+    check_show_existing_strains('strain_organism_id', 'existing_strains', '<%=url_for(:controller => 'strains', :action => 'existing_strains')-%>');
     check_show_which_fields();
 </script>

@@ -113,4 +113,24 @@ class SamplesController < ApplicationController
       format.html{render :template => 'samples/navigation'}
     end
   end
+
+  def existing_samples
+    specimen = Specimen.find_by_id(params[:specimen_id])
+    samples=specimen.try(:samples)
+
+    render :update do |page|
+      if samples
+        page.replace_html 'existing_samples', :partial=>"samples/existing_samples",:object=>samples,:locals=>{:specimen=>specimen}
+      else
+        page.insert_html :bottom, 'existing_samples',:text=>""
+      end
+    end
+  end
+
+  def create_sample_popup
+    respond_to do  |format|
+      format.html{render :partial => 'samples/create_sample_popup'}
+    end
+  end
+
 end

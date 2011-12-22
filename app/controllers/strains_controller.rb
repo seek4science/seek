@@ -43,9 +43,9 @@ class StrainsController < ApplicationController
     end
   end
 
-  def create_new_strain
+  def create_strain_popup
     respond_to do  |format|
-      format.html{render :partial => 'strains/create_new_strain'}
+      format.html{render :partial => 'strains/create_strain_popup'}
     end
   end
 
@@ -84,6 +84,7 @@ class StrainsController < ApplicationController
       @strain=Strain.find_by_id(params[:id])
     end
   end
+
   def show
     @strain=Strain.find(params[:id])
     respond_to do |format|

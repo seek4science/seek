@@ -1,0 +1,16 @@
+<% sample_links=[] %>
+<div id="existing_samples">
+  <h2>Sample</h2>
+  <% if existing_samples.empty? -%>
+      <p class="none_text">No samples have yet been defined for <span style="font-weight: bold;"> <%= h(specimen.title) -%></span>.</p>
+  <% else -%>
+      <p class="none_text">Here are the samples for <span style="font-weight: bold;"><%= h(specimen.title) -%></span>. Please choose one.</p>
+          <% existing_samples.each do |sample| -%>
+              <% sample_links << link_to_remote(h(sample.title),:url => {:controller => 'samples' , :action => 'existing_samples', :id => "#{specimen.id}"}) %>
+          <% end -%>
+      <%= sample_links.join(", ") -%>
+  <% end -%>
+</div>
+
+
+

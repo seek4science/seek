@@ -93,5 +93,19 @@ class SpecimensController < ApplicationController
       end
     end
   end
+
+  def existing_specimens
+    strain = Strain.find_by_id(params[:strain_id])
+    specimens=strain.try(:specimens)
+
+    render :update do |page|
+      if specimens
+        page.replace_html 'existing_specimens', :partial=>"specimens/existing_specimens",:object=>specimens,:locals=>{:strain=>strain}
+      else
+        page.insert_html :bottom, 'existing_specimens',:text=>""
+      end
+    end
+  end
+
 end
 

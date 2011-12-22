@@ -1,0 +1,16 @@
+<% specimen_links=[] %>
+<div id="existing_specimens">
+  <h2>Cell culture</h2>
+  <% if existing_specimens.empty? -%>
+      <p class="none_text">No specimens have yet been defined for <span style="font-weight: bold;"> <%= h(strain.title) -%></span>.</p>
+  <% else -%>
+      <p class="none_text">Here are the specimens for <span style="font-weight: bold;"><%= h(strain.title) -%></span>. Please choose one.</p>
+          <% existing_specimens.sort{|a,b| a.donor_number <=> b.donor_number}.each do |specimen| -%>
+              <% specimen_links << link_to_remote(h(specimen.donor_number),{:url => {:controller => 'samples' , :action => 'existing_samples'}, :with => "'specimen_id=' + #{specimen.id}"}) %>
+          <% end -%>
+      <%= specimen_links.join(", ") -%>
+  <% end -%>
+</div>
+
+
+
