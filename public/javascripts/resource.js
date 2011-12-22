@@ -24,9 +24,7 @@ function validateResourceFields(is_new_file, resource_name, is_managed) {
         return(false);
     }
     if (is_managed){
-        if (!checkProjectExists(resource_name)) {
-            return (false);
-        }
+
 
         // check if no tokens remain in the attributions autocompleter
         // (only do this if the fold with attributions is expanded)
