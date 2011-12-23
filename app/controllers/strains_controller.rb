@@ -44,8 +44,9 @@ class StrainsController < ApplicationController
   end
 
   def create_strain_popup
+    strain = Strain.find_by_id(params[:strain_id])
     respond_to do  |format|
-      format.html{render :partial => 'strains/create_strain_popup'}
+      format.html{render :partial => 'strains/create_strain_popup', :locals => {:strain => strain}}
     end
   end
 
@@ -59,6 +60,21 @@ class StrainsController < ApplicationController
         format.html {redirect_to :back}
       end
     end
+  end
+
+  def existing_genotypes_phenotypes
+     strains = Strain.find(:all, :conditions => ["title=?", params[:strain_title]])
+     strains_detail = []
+     strains.each do |strain|
+       genotype_detail = ''
+       strain.genotypes.each do |genotype|
+          genotype_detail << genotype.modification.try(:title) + ' ' + genotype.gene.try(:title) + '; '
+        end
+        strains_detail<< {:id => strain.id, :title => strain.title, :genotype => genotype_detail, :phenotype => strain.phenotype.try(:description)}
+     end
+     render :update do |page|
+        page.replace_html 'existing_genotypes_phenotypes', :partial=>"strains/existing_genotypes_phenotypes", :locals=>{:strains_detail => strains_detail}
+     end
   end
 
   def existing_strains_for_assay_organism

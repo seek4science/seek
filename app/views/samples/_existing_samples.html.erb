@@ -1,16 +1,43 @@
-<% sample_links=[] %>
 <div id="existing_samples">
   <h2>Sample</h2>
   <% if existing_samples.empty? -%>
-      <p class="none_text">No samples have yet been defined for <span style="font-weight: bold;"> <%= h(specimen.title) -%></span>.</p>
+      <p class="none_text">No samples have yet been defined for
+        <span style="font-weight: bold;"> <%= h(specimen.title) -%></span>.</p>
   <% else -%>
-      <p class="none_text">Here are the samples for <span style="font-weight: bold;"><%= h(specimen.title) -%></span>. Please choose one.</p>
-          <% existing_samples.each do |sample| -%>
-              <% sample_links << link_to_remote(h(sample.title),:url => {:controller => 'samples' , :action => 'existing_samples', :id => "#{specimen.id}"}) %>
-          <% end -%>
-      <%= sample_links.join(", ") -%>
+      <p class="none_text">Here are the samples for <span style="font-weight: bold;"><%= h(specimen.title) -%></span>
+      </p>
+      <table border="1">
+        <tr>
+           <th></th>
+          <th>Lab internal identifier</th>
+          <th>Sampling date</th>
+          <th>Provider name</th>
+        </tr>
+        <% existing_samples.sort { |a.b| a.lab_internal_number <=> b.lab.internal_number }.each do |sample| -%>
+            <% if sample.sampling_date.nil? %>
+                <% sampling_date = '' %>
+            <% else %>
+                <% if sample.try(:sampling_date).hour == 0 and sample.try(:sampling_date).min == 0 and sample.try(:sampling_date).sec == 0 then %>
+                    <% sampling_date = sample.try(:sampling_date).strftime('%d/%m/%Y') %>
+                <% else %>
+                    <% sampling_date = sample.try(:sampling_date).strftime('%d/%m/%Y @ %H:%M:%S') %>
+                <% end %>
+
+            <% end %>
+            <%
+               provider_name = sample.try_block{provider_name}
+               provider_name = provider_name.blank? ? try_block { sample.contributor.person.name } : provider_name
+            %>
+            <tr>
+              <td><%= radio_button_tag("selected_sample", sample.id, false, {:onchange => remote_function (:url => {:controller => 'samples', :action => 'existing_samples'}, :with => "'sample_id=' + #{sample.id}")}) %> </td>
+              <td><%= sample.lab_internal_number %> </td>
+              <td><%= sampling_date %> </td>
+              <td><%= provider_name %></td>
+            </tr>
+        <% end -%>
+      </table>
   <% end -%>
+  <ul class="sectionIcons">
+  <li><%= create_sample_popup_link -%></li>
+</ul>
 </div>
-
-
-

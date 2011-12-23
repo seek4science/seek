@@ -1,5 +1,3 @@
-EXISTING_STRAINS_LINK = null;
-
 function fadeRow(id) {
     try {
         var genotype_row_id = 'genotype_row_'.concat(id.toString())
@@ -44,47 +42,96 @@ function addRow(tableID) {
     element3.id = "delete_".concat(rowCount.toString())
     element3.title = "Delete this entry"
     cell3.appendChild(element3);
-    cell3.children[0].onclick = function(){ fadeRow(rowCount)}
+    cell3.children[0].onclick = function() {
+        fadeRow(rowCount)
+    }
 }
 
-function fadeCreateStrain(){
+function fadeCreateStrain() {
     Effect.Fade('strain_form', { duration: 0.25 });
     Effect.Fade('existing_strains', { duration: 0.25 });
 }
 
 
 function check_show_create_new_strain(element_id) {
-    selected_id = $F('strain_organism_id') ;
+    selected_id = $F('strain_organism_id');
     if (selected_id == '0') {
         Effect.Fade(element_id, { duration: 0.25 });
-    }else{
+    } else {
         Effect.Appear(element_id, { duration: 0.25 });
     }
 }
 
 function check_show_existing_strains(organism_element_id, existing_strains_element_id, url) {
-      selected_id = $F(organism_element_id) ;
-      if (selected_id == '0') {
+    selected_id = $F(organism_element_id);
+    if (selected_id == '0') {
         Effect.Fade(existing_strains_element_id, { duration: 0.25 });
-      }
-      else {
-          if (url != ''){
-              request = new Ajax.Request(url,
-              {
+    }
+    else {
+        if (url != '') {
+            request = new Ajax.Request(url,
+                {
+                    method: 'get',
+                    parameters: {
+                        organism_id: selected_id
+                    },
+                    onSuccess: function(transport) {
+                        Effect.Appear(existing_strains_element_id, { duration: 0.25 });
+                    },
+                    onFailure: function(transport) {
+                        alert('Something went wrong, please try again...');
+                    }
+                });
+        }
+        else {
+            Effect.Appear(existing_strains_element_id, { duration: 0.25 });
+        }
+    }
+}
+
+function check_show_existing_strain(strain_id, organism_id, url) {
+    if (strain_id != '' && url != '') {
+        request = new Ajax.Request(url,
+            {
                 method: 'get',
                 parameters: {
-                    organism_id: selected_id
+                    id: strain_id,
+                    organism_id:organism_id
                 },
-                onSuccess: function(transport){
-                     Effect.Appear(existing_strains_element_id, { duration: 0.25 });
+                onSuccess: function(transport) {
                 },
-                onFailure: function(transport){
+                onFailure: function(transport) {
                     alert('Something went wrong, please try again...');
                 }
-              });
-          }
-          else{
-            Effect.Appear(existing_strains_element_id, { duration: 0.25 });
-          }
-      }
+            });
+    }
+}
+
+function getSelectedStrain() {
+    var elArray = [];
+    var tmp = document.getElementsByTagName("input");
+    var name = 'selected_strain'
+    var regex = new RegExp("(^|\\s)" + name);
+    for (var i = 0; i < tmp.length; i++) {
+
+        if (regex.test(tmp[i].name)) {
+            if (tmp[i].checked == true) {
+                elArray.push(tmp[i]);
+            }
+        }
+    }
+    if (elArray.length > 0)
+        return elArray[elArray.length - 1].value;
+}
+
+function getSelectedSample() {
+    var elArray = document.getElementsByName('selected_sample');
+    var selectedElement;
+    for (var i = 0; i < elArray.length; i++) {
+        if (elArray[i].checked == true) {
+            selectedElement = elArray[i];
+        }
+    }
+    if (selectedElement != null)
+        return selectedElement.value
 }

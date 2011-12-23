@@ -128,8 +128,9 @@ class SamplesController < ApplicationController
   end
 
   def create_sample_popup
+    sample = Sample.find_by_id(params[:sample_id])
     respond_to do  |format|
-      format.html{render :partial => 'samples/create_sample_popup'}
+      format.html{render :partial => 'samples/create_sample_popup', :locals => {:sample => sample}}
     end
   end
 
