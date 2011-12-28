@@ -222,8 +222,15 @@ class DataFileTest < ActiveSupport::TestCase
 
       data_file.reload
 
+      #I want to compare data_file.scales to data_file_converted.scales later. If I don't load data_file.scales now,
+      #then it will try to load them when I do the comparison. Since that will be after I've updated the database from converting, it would return [].
+      #to avoid this, I will preload them now.
+      through_associations_to_test_later = [:scales, :creators, :assays]
+      through_associations_to_test_later.each {|a| data_file.send(a).send(:load_target)}
+
       presentation = Factory.build :presentation,:contributor=>user
       data_file_converted = data_file.to_presentation!
+      data_file_converted = data_file_converted.reload
 
       assert_equal presentation.class.name, data_file_converted.class.name
       assert_equal presentation.attributes.keys.sort!, data_file_converted.attributes.keys.reject{|k|k=='id'}.sort! #???
@@ -247,6 +254,7 @@ class DataFileTest < ActiveSupport::TestCase
       assert_equal data_file.assays,data_file_converted.assays
       assert_equal data_file.event_ids, data_file_converted.event_ids
       assert_equal data_file.scalings,data_file_converted.scalings
+      assert_equal data_file.scales,data_file_converted.scales
       assert_equal data_file.versions.map(&:updated_at).sort, data_file_converted.versions.map(&:updated_at).sort
     }
   end
