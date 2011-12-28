@@ -224,7 +224,7 @@ class DataFileTest < ActiveSupport::TestCase
 
       #I want to compare data_file.scales to data_file_converted.scales later. If I don't load data_file.scales now,
       #then it will try to load them when I do the comparison. Since that will be after I've updated the database from converting, it would return [].
-      #to avoid this, I will preload them now.
+      #to avoid this, I will preload scales and similar through_associations now.
       through_associations_to_test_later = [:scales, :creators, :assays]
       through_associations_to_test_later.each {|a| data_file.send(a).send(:load_target)}
 
