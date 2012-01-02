@@ -97,6 +97,7 @@ class SpecimensController < ApplicationController
   def existing_specimens
     strain = Strain.find_by_id(params[:strain_id])
     specimens=strain.try(:specimens)
+    specimens = specimens.select{|specimen| specimen.can_view?}
 
     render :update do |page|
       if specimens

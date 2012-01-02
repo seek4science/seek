@@ -116,11 +116,12 @@ class SamplesController < ApplicationController
 
   def existing_samples
     specimen = Specimen.find_by_id(params[:specimen_id])
-    samples=specimen.try(:samples)
+    samples = specimen.try(:samples)
+    samples = samples.select{|sample| sample.can_view?}
 
     render :update do |page|
       if samples
-        page.replace_html 'existing_samples', :partial=>"samples/existing_samples",:object=>samples,:locals=>{:specimen=>specimen}
+        page.replace_html 'existing_samples', :partial=>"samples/existing_samples",:object=>samples,:locals=>{:specimen=>specimen.can_view? ? specimen : nil}
       else
         page.insert_html :bottom, 'existing_samples',:text=>""
       end
@@ -129,9 +130,17 @@ class SamplesController < ApplicationController
 
   def create_sample_popup
     sample = Sample.find_by_id(params[:sample_id])
-    respond_to do  |format|
-      format.html{render :partial => 'samples/create_sample_popup', :locals => {:sample => sample}}
+    unless sample
+      specimen = Specimen.find_by_id(params[:specimen_id])
+    else
+      specimen = sample.specimen
     end
+    respond_to do  |format|
+      format.html{render :partial => 'samples/create_sample_popup', :locals => {:sample => sample, :specimen => specimen}}
+    end
+  end
+
+  def create_specimen_sample
   end
 
 end
