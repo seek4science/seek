@@ -14,8 +14,8 @@ class ModelsController < ApplicationController
   before_filter :jws_enabled,:only=>[:builder,:simulate,:submit_to_jws]
 
   include Seek::Publishing
-  
-  @@model_builder = Seek::JWS::OneStop.new
+
+  @@model_builder = Seek::JWS::Builder.new
   
   # GET /models
   # GET /models.xml
@@ -55,12 +55,13 @@ class ModelsController < ApplicationController
         supported=true
         @params_hash,@attribution_annotations,@saved_file,@objects_hash,@error_keys = @@model_builder.saved_file_builder_content saved_file
       else
-        supported = @@model_builder.is_supported?(@display_model)
+        supported = @display_model.is_jws_supported?
         @params_hash,@attribution_annotations,@saved_file,@objects_hash,@error_keys = @@model_builder.builder_content @display_model if supported
       end
     rescue Exception=>e
       error=e
       logger.error "Error submitting to JWS Online OneStop - #{e.message}"
+      raise e unless Rails.env=="production"
     end
     
     respond_to do |format|
@@ -76,23 +77,18 @@ class ModelsController < ApplicationController
     end
   end    
 
-#  def annotator
-#    respond_to do |format|
-#      format.html
-#    end
-#  end
-
   def submit_to_jws
     following_action=params.delete("following_action")    
     error=nil
     begin
       if following_action == "annotate"
-        @params_hash,@attribution_annotations,@species_annotations,@reaction_annotations,@search_results,@cached_annotations,@saved_file,@error_keys = @@model_builder.annotate params
+        @params_hash,@attribution_annotations,@species_annotations,@reaction_annotations,@search_results,@cached_annotations,@saved_file,@error_keys = Seek::JWS::Annotator.new.annotate params
       else
         @params_hash,@attribution_annotations,@saved_file,@objects_hash,@error_keys = @@model_builder.construct params
       end
     rescue Exception => e
       error=e
+      raise e unless Rails.env == "production"
     end
 
     if (!error && @error_keys.empty?)
@@ -142,10 +138,11 @@ class ModelsController < ApplicationController
     error=nil
     begin
       if @display_model.is_jws_supported?
-        @modelname = @@model_builder.simulate(@display_model)
+        @modelname = Seek::JWS::Simulator.new.simulate(@display_model)
       end
     rescue Exception=>e
       Rails.logger.error("Problem simulating model on JWS Online #{e}")
+      raise e unless Rails.env=="production"
       error=e
     end
 

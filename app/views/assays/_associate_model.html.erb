@@ -39,7 +39,7 @@
           <%= check_box_tag :include_other_project_models, nil, false, {:onchange=>"toggle_model_list();",:style=>"margin-top:0.5em;"} -%> Associate Models from other projects?
         </div>
 		<br/>
-        <%= link_to_function (image("new") + " Associate with this #{resource_text}"), "addSelectedModel(); return(false);", :id=>"add_model_link", :class=>"block_link", :style => "width: 11em" %>
+        <%= link_to_function (image("new") + " Associate with this #{resource_text}"), "addSelectedModel(); return(false);", :id=>"add_model_link", :class=>"block_link" %>
       </div>
     </div>
     <%= render :partial => 'assets/preview_box', :locals => {:preview_name => 'model'} %>

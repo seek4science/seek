@@ -34,7 +34,7 @@ class JwsFunctionalTest < ActionController::TestCase
       assert_select "script", :text=>/VmGLT = 97.264/, :count=>1 #check that one of the parameter sets has been recognized from the uploaded file
     end
 
-    def test_show_builder_with_sbml_format
+    test "show builder with sbml format" do
       m=models(:teusink)
       m.content_blob.dump_data_to_file #required for the form post to work, as it uses the stored file
       get :builder, :id=>m

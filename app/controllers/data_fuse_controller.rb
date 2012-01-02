@@ -12,7 +12,7 @@ class DataFuseController < ApplicationController
   before_filter :login_required
   before_filter :is_user_admin_auth
 
-  @@model_builder = Seek::JWS::OneStop.new
+  @@model_builder = Seek::JWS::Builder.new
 
   def data_file_csv
 
@@ -106,7 +106,7 @@ class DataFuseController < ApplicationController
     element=params[:element]
     model=Model.find_by_id(params[:id])
 
-    ps=extract_model_parameters_and_values(model).keys
+    ps=model.parameters_and_values.keys
 
     render :update do |page|
       if model.try :can_download?

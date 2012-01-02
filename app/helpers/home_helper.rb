@@ -79,7 +79,7 @@ module HomeHelper
   end
 
   def recently_added_item_logs time=1.month.ago, number_of_item=10
-    item_types = ['DataFile', 'Model', 'Sop', 'Publication', 'Investigation', 'Study', 'Assay']
+    item_types = Seek::Util.user_creatable_types.collect{|type| type.name}
     activity_logs = ActivityLog.find(:all, :include => "activity_loggable", :order => "created_at DESC", :conditions => ["action = ? AND created_at > ? AND activity_loggable_type in (?)", 'create', time, item_types])
     selected_activity_logs = []
     count = 0
@@ -161,7 +161,7 @@ module HomeHelper
           html << "#{icon} "
           html << link_to("#{item.title}", path, :title => tooltip)
           html << "<div class='feedinfo none_text'>"
-          html << "<span>#{text_for_resource(item)} - #{action} #{time_ago_in_words(at_time)} ago<span>"
+          html << "<span>#{text_for_resource(item)} - #{action} #{time_ago_in_words(at_time)} ago</span>"
           html << "</div>"
           html << "</li>"
       end

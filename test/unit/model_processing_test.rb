@@ -6,15 +6,6 @@ class ModelProcessingTest < ActiveSupport::TestCase
   
   include Seek::ModelProcessing
 
-  def test_sbml_parameter_extraction
-    model = models(:teusink)
-    assert is_sbml?(model)
-    params = extract_model_parameters_and_values model
-    assert !params.empty?
-    assert params.keys.include?("KmPYKPEP")
-    assert_equal "1306.45",params["VmPGK"]
-  end
-
   def test_is_sbml
     model = models(:teusink)
     assert is_sbml?(model)
@@ -33,6 +24,22 @@ class ModelProcessingTest < ActiveSupport::TestCase
     assert is_dat?(model.content_blob)
   end
 
+  test "is supported no longer relies on extension" do
+    model=models(:teusink)
+    model.original_filename = "teusink.txt"
+    model.content_blob.dump_data_to_file
+    assert model.is_sbml?
+    assert !model.is_dat?
+    assert model.is_jws_supported?
+
+    model=models(:jws_model)
+    model.original_filename = "jws.txt"
+    model.content_blob.dump_data_to_file
+    assert !model.is_sbml?
+    assert model.is_dat?
+    assert model.is_jws_supported?
+  end
+
   def test_is_jws_supported
     model = models(:jws_model)
     assert is_jws_supported?(model)
@@ -47,11 +54,27 @@ class ModelProcessingTest < ActiveSupport::TestCase
   def test_extract_sbml_species
     model = models(:teusink)
     assert is_sbml?(model)
-    species = extract_model_species model
+    species = model.species
     assert species.include?("Glyc")
     assert !species.include?("KmPYKPEP")
-    puts species
     assert_equal 22,species.count
+
+    #should be able to gracefully handle non sbml
+    model = models(:non_sbml_xml)
+    assert_equal [],model.species
+  end
+
+  def test_sbml_parameter_extraction
+    model = models(:teusink)
+    assert is_sbml?(model)
+    params = model.parameters_and_values
+    assert !params.empty?
+    assert params.keys.include?("KmPYKPEP")
+    assert_equal "1306.45",params["VmPGK"]
+
+    #should be able to gracefully handle non sbml
+    model = models(:non_sbml_xml)
+    assert_equal [],model.parameters_and_values
   end
 
 end

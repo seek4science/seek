@@ -6,11 +6,11 @@ module Seek
     include Seek::MimeTypes
     include SysMODB::SpreadsheetExtractor
     
-    def contents_for_search data_file
-      content = Rails.cache.fetch("#{data_file.content_blob.cache_key}-SS-XML") {
+    def contents_for_search obj=self
+      content = Rails.cache.fetch("#{obj.content_blob.cache_key}-ss-content-for-search") do
         begin
-          xml=data_file.spreadsheet_xml
-          if !xml.nil?
+          xml=obj.spreadsheet_xml
+          unless xml.nil?
             content = extract_content(xml)
             content = humanize_content(content)
             content = filter_content(content)
@@ -19,9 +19,11 @@ module Seek
             []
           end
         rescue Exception=>e
-          Rails.logger.error("Error processing spreadsheet for content_blob #{data_file.content_blob_id} #{e}")
+          Rails.logger.error("Error processing spreadsheet for content_blob #{obj.content_blob_id} #{e}")
+          raise e unless Rails.env=="production"
+          nil
         end
-      }
+      end
 
       content || []
     end
@@ -34,7 +36,6 @@ module Seek
       content = doc.find("//ss:sheet[@hidden='false' and @very_hidden='false']/ss:rows/ss:row/ss:cell").collect do |cell|
         cell.content
       end
-      
       content
     end
 
@@ -48,8 +49,10 @@ module Seek
 
     #filters out numbers and text declared in a black list
     def filter_content content
-      blacklist = ["seek id"] #not yet defined
+      blacklist = ["seek id"] #not yet defined, and should probably be regular expressions
       content = content - blacklist
+
+      #filter out numbers
       content.reject do |val|
         val.to_s.match(/\A[+-]?\d+?(\.\d+)?\Z/) != nil
       end

@@ -6,12 +6,12 @@ module Seek
     
     def is_dat? model_or_blob=self
       content_blob = model_or_blob.is_a?(ContentBlob) ?  model_or_blob : model_or_blob.content_blob
-      check_content content_blob.filepath,"begin name",25000
+      content_blob.file_exists? && check_content(content_blob.filepath,"begin name",25000)
     end                      
     
     def is_sbml? model_or_blob=self
       content_blob = model_or_blob.is_a?(ContentBlob) ?  model_or_blob : model_or_blob.content_blob
-      check_content content_blob.filepath,"<sbml"
+      content_blob.file_exists? && (check_content content_blob.filepath,"<sbml")
     end
 
     def is_jws_supported? model_or_blob=self
