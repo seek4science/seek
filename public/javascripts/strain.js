@@ -52,7 +52,6 @@ function fadeCreateStrain() {
     Effect.Fade('existing_strains', { duration: 0.25 });
 }
 
-
 function check_show_create_new_strain(element_id) {
     var selected_id = $F('strain_organism_id');
     if (selected_id == '0') {
@@ -89,31 +88,18 @@ function check_show_existing_strains(organism_element_id, existing_strains_eleme
     }
 }
 
-function check_show_existing_specimens() {
-    var selected_ids = $F(organism_element_id).join();
-    if (selected_ids == '0') {
-        Effect.Fade(existing_strains_element_id, { duration: 0.25 });
-    }
-    else {
-        if (url != '') {
-            request = new Ajax.Request(url,
-                {
-                    method: 'get',
-                    parameters: {
-                        organism_ids: selected_ids
-                    },
-                    onSuccess: function(transport) {
-                        Effect.Appear(existing_strains_element_id, { duration: 0.25 });
-                    },
-                    onFailure: function(transport) {
-                        alert('Something went wrong, please try again...');
-                    }
-                });
-        }
-        else {
-            Effect.Appear(existing_strains_element_id, { duration: 0.25 });
-        }
-    }
+function show_existing_specimens() {
+    Effect.Appear('existing_specimens', { duration: 0.25 })
+}
+function hide_existing_specimens() {
+    Effect.Fade('existing_specimens', { duration: 0.25 })
+}
+
+function show_existing_samples() {
+    Effect.Appear('existing_samples', { duration: 0.25 })
+}
+function hide_existing_samples() {
+    Effect.Fade('existing_samples', { duration: 0.25 })
 }
 
 function check_show_existing_strain(strain_id, organism_id, url) {
@@ -133,23 +119,6 @@ function check_show_existing_strain(strain_id, organism_id, url) {
             });
     }
 }
-
-/*function getSelectedStrain() {
-    var elArray = [];
-    var tmp = document.getElementsByTagName("input");
-    var name = 'selected_strain'
-    var regex = new RegExp("(^|\\s)" + name);
-    for (var i = 0; i < tmp.length; i++) {
-
-        if (regex.test(tmp[i].name)) {
-            if (tmp[i].checked == true) {
-                elArray.push(tmp[i]);
-            }
-        }
-    }
-    if (elArray.length > 0)
-        return elArray[elArray.length - 1].value;
-}*/
 
 function getSelectedStrain() {
     var elArray = document.getElementsByName('selected_strain');
@@ -174,24 +143,6 @@ function getSelectedSample() {
     if (selectedElement != null)
         return selectedElement.value
 }
-
-/*
-function getSelectedSpecimen() {
-    var elArray = [];
-    var tmp = document.getElementsByTagName("input");
-    var name = 'selected_specimen'
-    var regex = new RegExp("(^|\\s)" + name);
-    for (var i = 0; i < tmp.length; i++) {
-
-        if (regex.test(tmp[i].name)) {
-            if (tmp[i].checked == true) {
-                elArray.push(tmp[i]);
-            }
-        }
-    }
-    if (elArray.length > 0)
-        return elArray[elArray.length - 1].value;
-}*/
 
 function getSelectedSpecimen() {
     var elArray = document.getElementsByName('selected_specimen');

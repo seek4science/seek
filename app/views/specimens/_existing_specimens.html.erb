@@ -27,7 +27,7 @@
 
             <% end %>
             <tr>
-              <td><%= radio_button_tag("selected_specimen", specimen.id, false, {:onchange => remote_function(:url => {'controller' => 'samples', :action => 'existing_samples'}, :with => "'specimen_id='+ #{specimen.id}")}) -%></td>
+              <td><%= radio_button_tag("selected_specimen", specimen.id, false, {:onchange => remote_function(:url => {'controller' => 'samples', :action => 'existing_samples'}, :with => "'specimen_id='+ #{specimen.id}") + ";show_existing_samples();return false;"}) -%></td>
               <td><%= specimen.donor_number -%></td>
               <td><%= born -%></td>
               <td><%= specimen.culture_growth_type.try(:title) -%></td>

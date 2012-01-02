@@ -29,7 +29,7 @@
                phenotype_detail = strain.phenotype.try(:description).blank? ? 'wild-type' : strain.phenotype.try(:description)
             %>
             <tr>
-              <td><%= radio_button_tag("selected_strain", strain.id, false, {:onchange => remote_function(:url => {:controller => 'specimens', :action => 'existing_specimens'}, :with => "'strain_id=' + #{strain.id}")}) -%></td>
+              <td><%= radio_button_tag("selected_strain", strain.id, false, {:onchange => remote_function(:url => {:controller => 'specimens', :action => 'existing_specimens'}, :with => "'strain_id=' + #{strain.id}") + ";show_existing_specimens();hide_existing_samples();return false;"}) -%></td>
               <td><%= strain.title %> </td>
               <td><%= genotype_detail %> </td>
               <td><%= phenotype_detail %></td>
