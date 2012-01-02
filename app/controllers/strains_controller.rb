@@ -1,15 +1,21 @@
 class StrainsController < ApplicationController
-  before_filter :login_required
   before_filter :get_strains,:only=>[:existing_strains_for_assay_organism, :existing_strains, :existing_strains_for_create]
   before_filter :get_strain, :only =>:show_existing_strain
 
   def existing_strains
-    render :update do |page|
-      if @strains && @organism
-        page.replace_html 'existing_strains', :partial=>"strains/existing_strains",:object=>@strains,:locals=>{:organism=>@organism}
-      else
-        page.insert_html :bottom, 'existing_strains',:text=>""
+    strains_of_organisms = []
+    organisms = []
+    if params[:organism_ids]
+      organism_ids = params[:organism_ids].split(',')
+      organism_ids.each do |organism_id|
+        organism=Organism.find_by_id(organism_id)
+        organisms << organism if organism
+        strains=organism.try(:strains)
+        strains_of_organisms |= strains ? strains.reject { |s| s.title == 'default' } : strains
       end
+    end
+    render :update do |page|
+        page.replace_html 'existing_strains', :partial=>"strains/existing_strains", :object=>strains_of_organisms, :locals=>{:organisms=>organisms}
     end
   end
 
@@ -209,5 +215,4 @@ class StrainsController < ApplicationController
     end
     strain
   end
-
 end

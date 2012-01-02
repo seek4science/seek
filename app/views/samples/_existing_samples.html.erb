@@ -29,7 +29,7 @@
                provider_name = provider_name.blank? ? try_block { sample.contributor.person.name } : provider_name
             %>
             <tr>
-              <td><%= radio_button_tag("selected_sample", sample.id, false, {:onchange => remote_function (:url => {:controller => 'samples', :action => 'existing_samples'}, :with => "'sample_id=' + #{sample.id}")}) %> </td>
+              <td><%= radio_button_tag("selected_sample", sample.id, false) %> </td>
               <td><%= sample.lab_internal_number %> </td>
               <td><%= sampling_date %> </td>
               <td><%= provider_name %></td>

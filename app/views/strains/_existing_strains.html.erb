@@ -1,10 +1,14 @@
 <div id="existing_strains">
   <h2>Strain</h2>
+  <%
+     organisms_title = organisms.collect{|organism| organism.title}
+     organisms_title = organisms_title.blank? ? '' : organisms_title.join(', ')
+  %>
   <% if existing_strains.empty? -%>
       <p class="none_text">No strains have yet been defined for
-        <span style="font-weight: bold;"> <%= h(organism.title) -%></span>.</p>
+        <span style="font-weight: bold;"> <%= h(organisms_title) -%></span>.</p>
   <% else -%>
-      <p class="none_text">Here are the strains for <span style="font-weight: bold;"><%= h(organism.title) -%></span>.
+      <p class="none_text">Here are the strains for <span style="font-weight: bold;"><%= h(organisms_title) -%></span>.
       </p>
       <table border="1">
         <tr>
@@ -12,6 +16,7 @@
           <th>Title</th>
           <th>Genotypes</th>
           <th>Phenotypes</th>
+          <th>Organism</th>
         </tr>
         <% i = 0
            existing_strains.sort { |a, b| a.title <=> b.title }.each do |strain| -%>
@@ -24,10 +29,11 @@
                phenotype_detail = strain.phenotype.try(:description).blank? ? 'wild-type' : strain.phenotype.try(:description)
             %>
             <tr>
-              <td><%= check_box_tag("selected_strain_#{i}", strain.id, false, {:onchange => remote_function(:url => {:controller => 'specimens', :action => 'existing_specimens'}, :with => "'strain_id=' + #{strain.id}")}) -%></td>
+              <td><%= radio_button_tag("selected_strain", strain.id, false, {:onchange => remote_function(:url => {:controller => 'specimens', :action => 'existing_specimens'}, :with => "'strain_id=' + #{strain.id}")}) -%></td>
               <td><%= strain.title %> </td>
               <td><%= genotype_detail %> </td>
               <td><%= phenotype_detail %></td>
+              <td><%= strain.organism.title %></td>
             </tr>
         <% i+=1
            end -%>

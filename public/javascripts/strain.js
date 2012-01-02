@@ -54,7 +54,7 @@ function fadeCreateStrain() {
 
 
 function check_show_create_new_strain(element_id) {
-    selected_id = $F('strain_organism_id');
+    var selected_id = $F('strain_organism_id');
     if (selected_id == '0') {
         Effect.Fade(element_id, { duration: 0.25 });
     } else {
@@ -63,8 +63,8 @@ function check_show_create_new_strain(element_id) {
 }
 
 function check_show_existing_strains(organism_element_id, existing_strains_element_id, url) {
-    selected_id = $F(organism_element_id);
-    if (selected_id == '0') {
+    var selected_ids = $F(organism_element_id).join();
+    if (selected_ids == '0') {
         Effect.Fade(existing_strains_element_id, { duration: 0.25 });
     }
     else {
@@ -73,7 +73,34 @@ function check_show_existing_strains(organism_element_id, existing_strains_eleme
                 {
                     method: 'get',
                     parameters: {
-                        organism_id: selected_id
+                        organism_ids: selected_ids
+                    },
+                    onSuccess: function(transport) {
+                        Effect.Appear(existing_strains_element_id, { duration: 0.25 });
+                    },
+                    onFailure: function(transport) {
+                        alert('Something went wrong, please try again...');
+                    }
+                });
+        }
+        else {
+            Effect.Appear(existing_strains_element_id, { duration: 0.25 });
+        }
+    }
+}
+
+function check_show_existing_specimens() {
+    var selected_ids = $F(organism_element_id).join();
+    if (selected_ids == '0') {
+        Effect.Fade(existing_strains_element_id, { duration: 0.25 });
+    }
+    else {
+        if (url != '') {
+            request = new Ajax.Request(url,
+                {
+                    method: 'get',
+                    parameters: {
+                        organism_ids: selected_ids
                     },
                     onSuccess: function(transport) {
                         Effect.Appear(existing_strains_element_id, { duration: 0.25 });
@@ -107,7 +134,7 @@ function check_show_existing_strain(strain_id, organism_id, url) {
     }
 }
 
-function getSelectedStrain() {
+/*function getSelectedStrain() {
     var elArray = [];
     var tmp = document.getElementsByTagName("input");
     var name = 'selected_strain'
@@ -122,10 +149,52 @@ function getSelectedStrain() {
     }
     if (elArray.length > 0)
         return elArray[elArray.length - 1].value;
+}*/
+
+function getSelectedStrain() {
+    var elArray = document.getElementsByName('selected_strain');
+    var selectedElement;
+    for (var i = 0; i < elArray.length; i++) {
+        if (elArray[i].checked == true) {
+            selectedElement = elArray[i];
+        }
+    }
+    if (selectedElement != null)
+        return selectedElement.value
 }
 
 function getSelectedSample() {
     var elArray = document.getElementsByName('selected_sample');
+    var selectedElement;
+    for (var i = 0; i < elArray.length; i++) {
+        if (elArray[i].checked == true) {
+            selectedElement = elArray[i];
+        }
+    }
+    if (selectedElement != null)
+        return selectedElement.value
+}
+
+/*
+function getSelectedSpecimen() {
+    var elArray = [];
+    var tmp = document.getElementsByTagName("input");
+    var name = 'selected_specimen'
+    var regex = new RegExp("(^|\\s)" + name);
+    for (var i = 0; i < tmp.length; i++) {
+
+        if (regex.test(tmp[i].name)) {
+            if (tmp[i].checked == true) {
+                elArray.push(tmp[i]);
+            }
+        }
+    }
+    if (elArray.length > 0)
+        return elArray[elArray.length - 1].value;
+}*/
+
+function getSelectedSpecimen() {
+    var elArray = document.getElementsByName('selected_specimen');
     var selectedElement;
     for (var i = 0; i < elArray.length; i++) {
         if (elArray[i].checked == true) {
