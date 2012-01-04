@@ -4,7 +4,7 @@
 
 <%= asset_buttons @model,@display_model.version -%>
 
-<% if Seek::Config.jws_enabled && jws_supported?(@display_model) -%>
+<% if Seek::Config.jws_enabled && @display_model.content_blob && jws_supported?(@display_model) -%>
 	<ul class="sectionIcons">
 		<% if @model.can_edit? -%>
 		    <li>
@@ -76,7 +76,7 @@
           <b>Model visualization</b>(<span style="font-style:italic;">click it to zoom</span>)<br/>
           <div id="thumbnail">
 
-            <% unless  @display_model.id_image.nil? or @display_model.id_image==0 %>
+            <% if  @display_model.model_image %>
             <a href='<%= url_for(:controller=>"models",:action=>"send_image",:id=>@model,:version=>@display_model.version) %>' rel="lightbox">
                <img src="<%= url_for(:controller=>"models",:action=>"send_image",:id=>@model,:version=>@display_model.version) %>" width="50" height="50"/>
             </a>

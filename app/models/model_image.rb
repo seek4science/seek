@@ -16,24 +16,7 @@ class ModelImage < ActiveRecord::Base
 
   validates_presence_of :model
 
-  def image_storage_mime_type
-    mine_type = case ModelImage.image_storage_format
-                  when "jpg"
-                    "image/jpeg"
-                  when "png"
-                    "image/png"
-                  when "bmp"
-                    "image/bmp"
-                  when "tif","tiff"
-                    "image/tiff"
-                  when "png"
-                    "image/png"
-                  when "png"
-                    "image/png"
-                  when "gif"
-                    "image/gif"
-                end
-  end
+
   def original_image_format
     original_content_type.split("/").last
   end

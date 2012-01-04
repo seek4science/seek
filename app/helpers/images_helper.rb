@@ -371,7 +371,18 @@ module ImagesHelper
     
     return basic_url
   end
-  
+
+    def model_image_url(model_instance, model_image_id, size=nil)
+    basic_url = eval("model_model_image_path(#{model_instance.id}, #{model_image_id})")
+
+    if size
+      basic_url += "?size=#{size}"
+      basic_url += "x#{size}" if size.kind_of?(Numeric)
+    end
+
+    return basic_url
+    end
+
   def default_avatar(object_class_name, size=200, alt="Anonymous", onclick_options="")
     avatar_filename=icon_filename_for_key("#{object_class_name.downcase}_avatar")
     

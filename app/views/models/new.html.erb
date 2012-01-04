@@ -33,11 +33,26 @@
 
         <%= render :partial => "organisms/select_organism",:locals=>{:model_class=>Model} -%>
 
+      <% if @model && (mine?(@model) || @model.can_edit?) -%>
+          <div class="fold">
+            <div class="foldTitle">
+              <%= help_icon("Here you can also upload image for this model") -%>
+              Model image (optional)
+            </div>
+            <div class="foldContent">
+
+              <%= hidden_field_tag(:model_id, @model.id) -%>
+              <p>
+                <b>Image file: </b>
+                <%= file_field :model_image, :image_file %>
+              </p>
+            </div>
+          </div>
+      <% end -%>
+
         <%= fields_for(@model) {|f| render :partial=>"assets/asset_form_bottom", :locals=> {:f => f}} -%>
         <%= render :partial => "assays/associate_assays", :locals=>{:resource => @model, :show_relationships => false} -%>
 
-
-         <%#= render :partial => "models/new_batch_upload" ,:locals => {:resource=>@model}%>
 
         <p>
           <%= preview_permission_popup_link('model', url_for(:controller => 'policies', :action => 'preview_permissions'), true)-%>
