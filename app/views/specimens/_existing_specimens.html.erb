@@ -1,21 +1,53 @@
+<script type="text/javascript" charset="utf-8">
+    $j(document).ready(function() {
+        specimen_table = $j('#specimen_table').dataTable({
+            "bPaginate": false,
+            "bLengthChange": false,
+            "bFilter": false,
+            "bSort": true,
+            "bInfo": false,
+            "bAutoWidth": true,
+            "bRetrieve": true,
+            "aaSorting": [
+                [ 1, "asc" ]],
+            "sScrollY": "500px",
+            "sDom": "frtiS",
+            "bDeferRender": true
+        }).rowGrouping({"sGrupingClass": 'row_group_color'});
+
+        /* Click event handler */
+        $j('#specimen_table tbody tr').click(function() {
+            if ($j(this).hasClass('row_selected'))
+                $j(this).removeClass('row_selected');
+            else
+                $j(this).addClass('row_selected');
+            existing_samples('<%=url_for(:controller => 'samples', :action => 'existing_samples')-%>');
+        });
+    });
+
+</script>
+
 <div id="existing_specimens">
+  <% unless strains.blank?  %>
   <h2>Cell culture</h2>
   <% if existing_specimens.empty? -%>
-      <p class="none_text">No cell cultures have yet been defined for
-        <span style="font-weight: bold;"> <%= h(strain.title) -%></span>.</p>
+      <p class="none_text">No cell cultures have yet been defined for selected strains.</p>
   <% else -%>
-      <p class="none_text">Here are the cell cultures for
-        <span style="font-weight: bold;"><%= h(strain.title) -%></span></p>
-      <table border="1">
+      <p class="none_text">Please select the cell cultures to see their samples.</p>
+      <table cellpadding="0" cellspacing="0" border="0" class="display" id="specimen_table">
+        <thead>
         <tr>
-          <th></th>
+          <th>Strain</th>
           <th>Title</th>
           <th>Culture start date</th>
           <th>Culture growth</th>
           <th>Contributor</th>
+          <th style="display: none;">Specimen ID</th>
         </tr>
-        <% i=0
-           existing_specimens.sort { |a, b| a.donor_number <=> b.donor_number }.each do |specimen| -%>
+        </thead>
+        <tbody>
+        <%
+           existing_specimens.each do |specimen| -%>
             <% if specimen.born.nil? %>
                 <% born = '' %>
             <% else %>
@@ -24,19 +56,31 @@
                 <% else %>
                     <% born = specimen.try(:born).strftime('%d/%m/%Y @ %H:%M:%S') %>
                 <% end %>
-
             <% end %>
+            <%
+               strain = specimen.strain
+               genotype_detail = ''
+               strain.genotypes.each do |genotype|
+                   genotype_detail << genotype.modification.try(:title) + ' ' + genotype.gene.try(:title) + '; ' if genotype.gene
+               end
+               genotype_detail = genotype_detail.blank? ? 'wild-type' : genotype_detail
+               phenotype_detail = strain.phenotype.try(:description).blank? ? 'wild-type' : strain.phenotype.try(:description)
+               strain_info = strain.title + "(" + genotype_detail + '/' + phenotype_detail + ')'
+            %>
+
             <tr>
-              <td><%= radio_button_tag("selected_specimen", specimen.id, false, {:onchange => remote_function(:url => {'controller' => 'samples', :action => 'existing_samples'}, :with => "'specimen_id='+ #{specimen.id}") + ";show_existing_samples();return false;"}) -%></td>
+              <td><%= strain_info -%></td>
               <td><%= specimen.donor_number -%></td>
               <td><%= born -%></td>
               <td><%= specimen.culture_growth_type.try(:title) -%></td>
               <td><%= try_block { specimen.contributor.person.name } -%></td>
+              <td style="display: none"><%= specimen.id %></td>
             </tr>
-        <% i+=1
-           end -%>
+        <% end -%>
+        </tbody>
       </table>
   <% end -%>
+      <% end -%>
 </div>
 
 

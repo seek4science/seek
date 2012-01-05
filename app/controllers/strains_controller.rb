@@ -9,9 +9,11 @@ class StrainsController < ApplicationController
       organism_ids = params[:organism_ids].split(',')
       organism_ids.each do |organism_id|
         organism=Organism.find_by_id(organism_id)
-        organisms << organism if organism
-        strains=organism.try(:strains)
-        strains_of_organisms |= strains ? strains.reject { |s| s.title == 'default' } : strains
+        if organism
+          organisms << organism
+          strains=organism.try(:strains)
+          strains_of_organisms |= strains ? strains.reject { |s| s.title == 'default' } : strains
+        end
       end
     end
     render :update do |page|

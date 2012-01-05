@@ -115,16 +115,21 @@ class SamplesController < ApplicationController
   end
 
   def existing_samples
-    specimen = Specimen.find_by_id(params[:specimen_id])
-    samples = specimen.try(:samples)
-    samples = samples.select{|sample| sample.can_view?}
-
-    render :update do |page|
-      if samples
-        page.replace_html 'existing_samples', :partial=>"samples/existing_samples",:object=>samples,:locals=>{:specimen=>specimen.can_view? ? specimen : nil}
-      else
-        page.insert_html :bottom, 'existing_samples',:text=>""
+    samples_of_specimens = []
+    specimens = []
+    if params[:specimen_ids]
+      specimen_ids = params[:specimen_ids].split(',')
+      specimen_ids.each do |specimen_id|
+        specimen=Specimen.find_by_id(specimen_id)
+        if specimen and specimen.can_view?
+        specimens << specimen
+        samples=specimen.try(:samples)
+        samples_of_specimens |= samples.select(&:can_view?)
+          end
       end
+    end
+    render :update do |page|
+        page.replace_html 'existing_samples', :partial=>"samples/existing_samples",:object=>samples_of_specimens,:locals=>{:specimens=>specimens}
     end
   end
 

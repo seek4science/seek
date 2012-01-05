@@ -1,6 +1,6 @@
 <%= javascript_include_tag 'calendar_date_select/calendar_date_select' %>
 <%= javascript_include_tag 'strain.js' %>
-<%= stylesheet_link_tag 'calendar_date_select/default' %>
+<%= stylesheet_link_tag 'calendar_date_select/default', "styles" %>
 
 <%
    select_truncate_length=120
@@ -8,8 +8,8 @@
    default_selected_organisms =  try_block{current_user.person.projects.first.organism_ids}.blank? ? [0] : try_block{current_user.person.projects.first.organism_ids}
 -%>
 
-<h4 style="margin-left: 7em;margin-top:1em;margin-bottom: -1.5em;font-style:italic;color:gray;">Here you can navigate
-  Organism-Strain-Sample. You also can create new strain or new sample</h4>
+<h4 style="margin-left: 4em;margin-top:1em;margin-bottom: -1.5em;font-style:italic;color:gray;">Here you can navigate
+  Organism-Strain-Cell culture-Sample. You also can create new strain or new sample</h4>
 <br/>
 <div class='yui-g'>
   <div class='yui-u first' style="width: 48%;margin-left: 0.5em;margin-top: 1em">
@@ -29,7 +29,6 @@
   <div class="yui-u first" id="existing_specimens" style="width: 48%;margin-left: 0.5em"></div>
   <div class="yui-u" id="existing_samples" style="width: 48%;margin-right: 0.5em"></div>
 </div>
-
 
 <script type="text/javascript">
     var organism = new Array();

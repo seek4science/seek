@@ -1,43 +1,89 @@
-<div id="existing_samples">
-  <h2>Sample</h2>
-  <% if existing_samples.empty? -%>
-      <p class="none_text">No samples have yet been defined for
-        <span style="font-weight: bold;"> <%= h(specimen.title) -%></span>.</p>
-  <% else -%>
-      <p class="none_text">Here are the samples for <span style="font-weight: bold;"><%= h(specimen.title) -%></span>
-      </p>
-      <table border="1">
-        <tr>
-           <th></th>
-          <th>Lab internal identifier</th>
-          <th>Sampling date</th>
-          <th>Provider name</th>
-        </tr>
-        <% existing_samples.sort { |a.b| a.lab_internal_number <=> b.lab.internal_number }.each do |sample| -%>
-            <% if sample.sampling_date.nil? %>
-                <% sampling_date = '' %>
-            <% else %>
-                <% if sample.try(:sampling_date).hour == 0 and sample.try(:sampling_date).min == 0 and sample.try(:sampling_date).sec == 0 then %>
-                    <% sampling_date = sample.try(:sampling_date).strftime('%d/%m/%Y') %>
-                <% else %>
-                    <% sampling_date = sample.try(:sampling_date).strftime('%d/%m/%Y @ %H:%M:%S') %>
-                <% end %>
+<script type="text/javascript" charset="utf-8">
+    $j(document).ready(function() {
+        sample_table = $j('#sample_table').dataTable({
+            "bPaginate": false,
+            "bLengthChange": false,
+            "bFilter": false,
+            "bSort": true,
+            "bInfo": false,
+            "bAutoWidth": true,
+            "bRetrieve": true,
+            "aaSorting": [
+                [ 1, "asc" ]
+            ],
+            "sScrollY": "500px",
+            "sDom": "frtiS",
+            "bDeferRender": true
+        }).rowGrouping({"sGrupingClass": 'row_group_color'});
 
-            <% end %>
-            <%
-               provider_name = sample.try_block{provider_name}
-               provider_name = provider_name.blank? ? try_block { sample.contributor.person.name } : provider_name
-            %>
+        /* Click event handler */
+        $j('#sample_table tbody tr').click(function() {
+            if ($j(this).hasClass('row_selected'))
+                $j(this).removeClass('row_selected');
+            else
+                $j(this).addClass('row_selected');
+        });
+    });
+</script>
+<div id="existing_samples">
+  <% unless specimens.blank? %>
+      <h2>Sample</h2>
+      <ul class="sectionIcons">
+        <li><%= create_sample_popup_link -%></li>
+      </ul>
+      <% if existing_samples.empty? -%>
+          <p class="none_text">No samples have yet been defined for selected cell cultures
+          </p>
+      <% else -%>
+          <table cellpadding="0" cellspacing="0" border="0" class="display" id="sample_table">
+            <thead>
             <tr>
-              <td><%= radio_button_tag("selected_sample", sample.id, false) %> </td>
-              <td><%= sample.lab_internal_number %> </td>
-              <td><%= sampling_date %> </td>
-              <td><%= provider_name %></td>
+              <th>Specimen</th>
+              <th>Lab internal identifier</th>
+              <th>Sampling date</th>
+              <th>Provider name</th>
             </tr>
-        <% end -%>
-      </table>
+            </thead>
+            <tbody>
+            <% existing_samples.each do |sample| -%>
+                <% if sample.sampling_date.nil? %>
+                    <% sampling_date = '' %>
+                <% else %>
+                    <% if sample.try(:sampling_date).hour == 0 and sample.try(:sampling_date).min == 0 and sample.try(:sampling_date).sec == 0 then %>
+                        <% sampling_date = sample.try(:sampling_date).strftime('%d/%m/%Y') %>
+                    <% else %>
+                        <% sampling_date = sample.try(:sampling_date).strftime('%d/%m/%Y @ %H:%M:%S') %>
+                    <% end %>
+
+                <% end %>
+                <%
+                   provider_name = sample.try_block { provider_name }
+                   provider_name = provider_name.blank? ? try_block { sample.contributor.person.name } : provider_name
+                %>
+                <%
+                   specimen = sample.specimen
+                   if specimen.born.nil?
+                       born = ''
+                   else
+                       if specimen.try(:born).hour == 0 and specimen.try(:born).min == 0 and specimen.try(:born).sec == 0 then
+                           born = specimen.try(:born).strftime('%d/%m/%Y')
+                       else
+                           born = specimen.try(:born).strftime('%d/%m/%Y @ %H:%M:%S')
+                       end
+                   end
+                   specimen_info = specimen.title
+                %>
+
+                <tr class="gradeX">
+                  <td><%= specimen_info %> </td>
+                  <td><%= sample.lab_internal_number %> </td>
+                  <td><%= sampling_date %> </td>
+                  <td><%= provider_name %></td>
+                </tr>
+            <% end -%>
+            </tbody>
+          </table>
+      <% end -%>
+
   <% end -%>
-  <ul class="sectionIcons">
-  <li><%= create_sample_popup_link -%></li>
-</ul>
 </div>

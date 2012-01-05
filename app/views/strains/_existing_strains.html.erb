@@ -1,25 +1,58 @@
+<script type="text/javascript" charset="utf-8">
+    $j(document).ready(function() {
+        strain_table = $j('#strain_table').dataTable({
+            "bPaginate": false,
+            "bLengthChange": false,
+            "bFilter": false,
+            "bSort": true,
+            "bInfo": false,
+            "bAutoWidth": true,
+            "bRetrieve": true,
+            "aaSorting": [
+                [ 1, "asc" ]
+            ],
+            "sScrollY": "300px",
+            "sDom": "frtiS",
+            "bDeferRender": true
+        }).rowGrouping({"sGrupingClass": 'row_group_color'});
+        /* Click event handler */
+        $j('#strain_table tbody tr').click(function() {
+            if ($j(this).hasClass('row_selected'))
+                $j(this).removeClass('row_selected');
+            else
+                $j(this).addClass('row_selected');
+
+            existing_specimens('<%=url_for(:controller => 'specimens', :action => 'existing_specimens')-%>');
+        });
+    });
+</script>
+
 <div id="existing_strains">
   <h2>Strain</h2>
   <%
-     organisms_title = organisms.collect{|organism| organism.title}
+     organisms_title = organisms.collect { |organism| organism.title }
      organisms_title = organisms_title.blank? ? '' : organisms_title.join(', ')
   %>
   <% if existing_strains.empty? -%>
       <p class="none_text">No strains have yet been defined for
         <span style="font-weight: bold;"> <%= h(organisms_title) -%></span>.</p>
   <% else -%>
-      <p class="none_text">Here are the strains for <span style="font-weight: bold;"><%= h(organisms_title) -%></span>.
+      <p class="none_text">Please select the strains to see their cell cultures.
       </p>
-      <table border="1">
+      <div class="box_simple">
+      <table cellpadding="0" cellspacing="0" class="display" id="strain_table">
+        <thead>
         <tr>
-          <th></th>
+          <th>Organism</th>
           <th>Title</th>
           <th>Genotypes</th>
           <th>Phenotypes</th>
-          <th>Organism</th>
+          <th style="display: none;">Strain ID</th>
         </tr>
-        <% i = 0
-           existing_strains.sort { |a, b| a.title <=> b.title }.each do |strain| -%>
+        </thead>
+        <tbody>
+        <%
+           existing_strains.each do |strain| -%>
             <%
                genotype_detail = ''
                strain.genotypes.each do |genotype|
@@ -28,19 +61,19 @@
                genotype_detail = genotype_detail.blank? ? 'wild-type' : genotype_detail
                phenotype_detail = strain.phenotype.try(:description).blank? ? 'wild-type' : strain.phenotype.try(:description)
             %>
-            <tr>
-              <td><%= radio_button_tag("selected_strain", strain.id, false, {:onchange => remote_function(:url => {:controller => 'specimens', :action => 'existing_specimens'}, :with => "'strain_id=' + #{strain.id}") + ";show_existing_specimens();hide_existing_samples();return false;"}) -%></td>
+            <tr class="gradeA">
+              <td><%= strain.organism.title %></td>
               <td><%= strain.title %> </td>
               <td><%= genotype_detail %> </td>
               <td><%= phenotype_detail %></td>
-              <td><%= strain.organism.title %></td>
+              <td style="display: none"><%= strain.id %></td>
             </tr>
-        <% i+=1
-           end -%>
+        <% end -%>
+        </tbody>
       </table>
+      </div>
   <% end -%>
-<ul class="sectionIcons">
+  <ul class="sectionIcons">
     <li><%= create_strain_popup_link() -%></li>
-</ul>
-
+  </ul>
 </div>

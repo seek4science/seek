@@ -18,11 +18,15 @@
       stylesheets << {:cache => 'css_cached'}
       stylesheet_link_tag *stylesheets %>
 
-  
+  <%= javascript_include_tag 'DataTables-1.8.2/jquery.js', 'DataTables-1.8.2/jquery.dataTables.js', 'jquery.dataTables.rowGrouping.js', 'Scroller.js' %>
+  <%= stylesheet_link_tag  'data_tables.css' %>
+
   <script type="text/javascript">
       function show_ajax_loader(element) {
           $(element).innerHTML =<%= "'"+image_tag("ajax-loader.gif")+"'" -%>;
       }
+    jQuery.noConflict();
+    var $j = jQuery;
   </script>
 
 </head>
