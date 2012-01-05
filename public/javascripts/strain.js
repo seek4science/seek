@@ -182,6 +182,7 @@ function existing_specimens(url) {
                 },
                 onSuccess: function(transport) {
                     show_existing_specimens();
+                    hide_existing_samples();
                 },
                 onFailure: function(transport) {
                     alert('Something went wrong, please try again...');

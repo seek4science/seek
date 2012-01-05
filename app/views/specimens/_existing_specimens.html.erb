@@ -6,7 +6,7 @@
             "bFilter": false,
             "bSort": true,
             "bInfo": false,
-            "bAutoWidth": true,
+            "bAutoWidth": false,
             "bRetrieve": true,
             "aaSorting": [
                 [ 1, "asc" ]],
@@ -29,7 +29,7 @@
 
 <div id="existing_specimens">
   <% unless strains.blank?  %>
-  <h2>Cell culture</h2>
+  <h2>Cell culture(chemostat or batch)</h2>
   <% if existing_specimens.empty? -%>
       <p class="none_text">No cell cultures have yet been defined for selected strains.</p>
   <% else -%>
@@ -40,7 +40,7 @@
           <th>Strain</th>
           <th>Title</th>
           <th>Culture start date</th>
-          <th>Culture growth</th>
+          <th>Culture type</th>
           <th>Contributor</th>
           <th style="display: none;">Specimen ID</th>
         </tr>
