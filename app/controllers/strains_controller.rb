@@ -35,21 +35,16 @@ class StrainsController < ApplicationController
   def show_existing_strain
     render :update do |page|
       page.remove 'strain_form'
-      page.insert_html :bottom, "create_based_on_existing_strain",:partial=>"strains/form",:locals=>{:strain => @strain, :action => params[:status], :organism_id => params[:organism_id], :display => true}
+      page.insert_html :bottom, "create_based_on_existing_strain",:partial=>"strains/form",:locals=>{:strain => @strain, :action => params[:status], :organism_id => params[:organism_id]}
     end
   end
 
   def new_strain_form
     @strain = Strain.find_by_id(params[:id]) || Strain.new
     render :update do |page|
-      page.remove 'strain_form'
-      if params['checkbox_checked'] == '1'
-        page.insert_html :bottom, "create_new_strain",:partial=>"strains/form",:locals=>{:strain => @strain, :organism_id => params[:organism_id], :display => true}
-      else
-        page.insert_html :bottom, "create_new_strain",:partial=>"strains/form",:locals=>{:strain => @strain, :organism_id => params[:organism_id], :display => false}
-      end
+      page.replace_html 'strain_form', :partial=>"strains/form",:locals=>{:strain => @strain, :organism_id => params[:organism_id]}
     end
-  end
+    end
 
   def create_strain_popup
     strain = Strain.find_by_id(params[:strain_id])

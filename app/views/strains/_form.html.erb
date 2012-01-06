@@ -1,5 +1,5 @@
 <%= stylesheet_link_tag 'styles.css' -%>
-<div class="strain" id="strain_form" style="display: <%= display ? 'block' : 'none' -%>">
+<div class="strain" id="strain_form">
        <% parent_strain = strain.title %>
        <p class="none_text" style="margin-left: 15em;">
        <%= parent_strain.blank? ? '' : "You will create this new strain based on #{parent_strain}"%>
@@ -78,7 +78,6 @@
             </div>
     </center>
   </div>
-    <%= hidden_field_tag 'strain[organism_id]', organism_id %>
     <%= hidden_field_tag 'strain[id]', strain.id %>
     <%= hidden_field_tag 'strain[parent_id]', strain.id %>
 </div>

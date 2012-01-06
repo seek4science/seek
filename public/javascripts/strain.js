@@ -106,8 +106,8 @@ function hide_existing_samples() {
     Effect.Fade('existing_samples', { duration: 0.25 })
 }
 
-function check_show_existing_strain(strain_id, organism_id, url) {
-    if (strain_id != '' && url != '') {
+function new_strain_form(strain_id, organism_id, url) {
+    if (url != '') {
         request = new Ajax.Request(url,
             {
                 method: 'get',
@@ -124,16 +124,13 @@ function check_show_existing_strain(strain_id, organism_id, url) {
     }
 }
 
-function getSelectedStrain() {
-    var elArray = document.getElementsByName('selected_strain');
-    var selectedElement;
-    for (var i = 0; i < elArray.length; i++) {
-        if (elArray[i].checked == true) {
-            selectedElement = elArray[i];
-        }
+function getSelectedStrains() {
+    var selected_strain_rows = fnGetSelected(strain_table);
+    var strain_ids  = new Array();
+    for (var i=0; i< selected_strain_rows.length; i++){
+        strain_ids.push(strain_table.fnGetData(selected_strain_rows[i])[4]);
     }
-    if (selectedElement != null)
-        return selectedElement.value
+    return strain_ids;
 }
 
 function getSelectedSample() {
@@ -167,12 +164,7 @@ function check_selected_strain(strain_id){
 }
 
 function existing_specimens(url) {
-    var selected_strain_rows = fnGetSelected(strain_table);
-    var strain_ids  = new Array();
-    for (var i=0; i< selected_strain_rows.length; i++){
-        strain_ids.push(strain_table.fnGetData(selected_strain_rows[i])[4]);
-    }
-    strain_ids = strain_ids.join();
+    var strain_ids = getSelectedStrains().join();
     if (url != '') {
         request = new Ajax.Request(url,
             {
@@ -228,4 +220,12 @@ function fnGetSelected( oTableLocal )
 		}
 	}
 	return aReturn;
+}
+
+function checkSelectOneStrain(){
+   if (getSelectedStrains().length > 1){
+       alert('Please select only ONE strain!');
+       return false;
+   }else
+        return true;
 }
