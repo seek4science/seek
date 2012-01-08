@@ -1,0 +1,45 @@
+<%
+  all_organisms = Organism.find(:all,:order=>:title)
+-%>
+<% form_tag :controller => 'strains', :action=>"create" do -%>
+<div id="redbox_contents_div" class="redbox_contents" style="width:760px;">
+	<div class="head">
+		<%= link_to_close_redbox image_tag("close.gif"), :style => "float:right; margin-left:0.5em; vertical-align:middle;" -%>
+		<span style="vertical-align:middle;">
+			Create new strain
+		</span>
+	</div>
+
+    <div class="body">
+      <span style="font-weight: bold;">Organism</span>
+
+      <%= select_tag "strain[organism_id]",
+    options_for_select([["Select Organism ...", 0]]|all_organisms.collect{|o| [truncate(h(o.title)), o.id]},try_block{strain.organism_id} || try_block{current_user.person.projects.first.organism_ids.first})
+    -%>
+
+       <br/>  <br/>
+       <%= radio_button_tag(:create_strain, 2 , strain.nil? ? false : true,
+                                     :onchange=>remote_function(:url=>{:action=>"new_strain_form", :controller=>"strains"},
+                                   :with=>"'id='+'#{strain.try:id}' + '&organism_id='+ $F('strain_organism_id')",
+                                                                :before=>"show_ajax_loader('strain_form')")) %>
+        <span style="font-weight: bold;">Create based on selected strain</span>
+
+       <span style="margin-left: 3em;">
+      <%= radio_button_tag(:create_strain, 1, strain.nil? ? true : false, :onchange=>remote_function(:url=>{:action=>"new_strain_form", :controller=>"strains"},
+                                             :with=>"'organism_id='+ $F('strain_organism_id')",
+                                                                :before=>"show_ajax_loader('strain_form')") + ";return(false);")%>    </span>
+      <span style="font-weight: bold;">  Create new strain </span>
+
+      <div id='strain_form'></div>
+
+      <div align="center" style="margin-top: 1em">
+        <%= submit_tag('Create', :disable_with=> "Creating ...", :style => "font-weight: bold;")%> Or
+        <input type=button value='Cancel' onclick="RedBox.close()">
+      </div>
+    </div>
+</div>
+<% end %>
+<script type="text/javascript">
+ new_strain_form("<%=strain.try(:id)-%>", "<%=strain.try(:organism_id)-%>", '<%=url_for(:controller => 'strains', :action => 'new_strain_form')-%>');
+
+</script>

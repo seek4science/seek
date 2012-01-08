@@ -9,7 +9,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20111129174935) do
+ActiveRecord::Schema.define(:version => 20120106153535) do
 
   create_table "activity_logs", :force => true do |t|
     t.string   "action"
@@ -24,7 +24,7 @@ ActiveRecord::Schema.define(:version => 20111129174935) do
     t.datetime "updated_at"
     t.string   "http_referer"
     t.string   "user_agent"
-    t.text     "data",                   :limit => 2147483647
+    t.text     "data",                   :limit => 16777215
     t.string   "controller_name"
   end
 
@@ -922,6 +922,8 @@ ActiveRecord::Schema.define(:version => 20111129174935) do
     t.integer  "institution_id"
     t.datetime "sampling_date"
     t.string   "organism_part"
+    t.string   "provider_id"
+    t.string   "provider_name"
   end
 
   create_table "saved_searches", :force => true do |t|
@@ -1052,6 +1054,8 @@ ActiveRecord::Schema.define(:version => 20111129174935) do
     t.boolean  "sex"
     t.datetime "born"
     t.string   "ploidy"
+    t.string   "provider_id"
+    t.string   "provider_name"
   end
 
   create_table "strain_descendants", :id => false, :force => true do |t|
