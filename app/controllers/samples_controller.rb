@@ -141,7 +141,11 @@ class SamplesController < ApplicationController
       specimen = sample.specimen
     end
     respond_to do  |format|
-      format.html{render :partial => 'samples/create_sample_popup', :locals => {:sample => sample, :specimen => specimen}}
+      if current_user.person.member?
+        format.html{render :partial => 'samples/create_sample_popup', :locals => {:sample => sample, :specimen => specimen}}
+      else
+        flash[:error] = "You are not authorized to create new sample. Only members of known projects, institutions or work groups are allowed to create new content."
+      end
     end
   end
 

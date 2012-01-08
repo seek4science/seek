@@ -49,7 +49,11 @@ class StrainsController < ApplicationController
   def create_strain_popup
     strain = Strain.find_by_id(params[:strain_id])
     respond_to do  |format|
-      format.html{render :partial => 'strains/create_strain_popup', :locals => {:strain => strain}}
+      if current_user.person.member?
+        format.html{render :partial => 'strains/create_strain_popup', :locals => {:strain => strain}}
+      else
+        flash[:error] = "You are not authorized to create new strain. Only members of known projects, institutions or work groups are allowed to create new content."
+      end
     end
   end
 

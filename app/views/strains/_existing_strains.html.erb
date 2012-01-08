@@ -73,8 +73,10 @@
       </table>
       </div>
   <% end -%>
+<% if logged_in? and current_user.person.member?%>
   <ul class="sectionIcons">
     <li><%= create_strain_popup_link() -%></li>
     (create new strain or based on <span style="font-weight: bold;"> ONE </span>selected strain)
   </ul>
+  <% end %>
 </div>
