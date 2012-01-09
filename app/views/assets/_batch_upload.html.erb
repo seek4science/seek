@@ -52,10 +52,7 @@
 
 
                 <% fields_for @content_blob do |content_blob| -%>
-                    <input id="content_blob_data" type="file"
-                    <% if action==:edit -%>
-                             disabled
-                    <% end -%> >
+                    <input id="content_blob_data" type="file">
                 <% end %>
           </p>
 
@@ -66,13 +63,7 @@
             <span class="required">*</span>
 
 
-            <input id="content_blob_data_url" type="text" size="55"
-                   <% if action==:edit -%>
-                   disabled
-                   <% end -%>  >
-
-            <% if action==:new %>
-
+            <input id="content_blob_data_url" type="text" size="55">
                 <%= link_to_function (image("new") + "Add"), "addToList()" %>
                 <%= link_to_remote image("test", :title=>"Test", :alt=>"Test")+" Test",
                                    :url=>{:action=>:test_asset_url, :symb=>"content_blob"},
@@ -81,17 +72,10 @@
                                    :before=>"$('test_url_msg').innerHTML='';show_ajax_loader('test_url_result_icon');" -%>
 
                 <br/>
-
                 <p style="clear:both;">
                   <b>Make a copy?</b>
-
-                  <%# fields_for upload_field,:local_copy do |local_copies| %>
-
-                  <%#= local_copies.check_box upload_field, :local_copy, :id=>"local_copy" -%>
-                  <%# end %>
                   <%= check_box upload_field, :local_copy, :id=>"local_copy" -%>
                 </p>
-            <% end -%>
             </p>
             <p>
               <span id="test_url_result_icon"></span>
@@ -105,12 +89,7 @@
     </ul>
 
   </div>
-
-
   <table id="pending_files">
-    <% if action==:edit -%>
-        <%= render :partial => "assets/content_blob", :collection => resource.content_blobs, :locals => {:resource=>resource} %>
-    <% end -%>
   </table>
 </div>
 
@@ -118,10 +97,7 @@
     from_file_selected();
 
 
-     var multi_selector = new MultiSelector($('pending_files'), '<%=resource.class.name.downcase%>', 'id_image');
-//    if ('<%#= action.to_s%>'=="edit"){
-//       page.assign 'multi_selector.max',<%#= Seek::Config.max_attachments_num %>;
-//    }
+     var multi_selector = new MultiSelector($('pending_files'));
 
      multi_selector.addElement($('content_blob_data'));
      multi_selector.addElement($('content_blob_data_url'));
@@ -129,11 +105,6 @@
 
     function addToList() {
          var url_element = $('content_blob_data_url');
-         <%#= remote_function(:url=>{:action=>:test_asset_url, :symb=>"content_blob"},
-                                   :method=>:post,
-                                   :with=>"url_element.multi_selector.current_url_element.serialize()",
-                                   :before=>"$('test_url_msg').innerHTML='';show_ajax_loader('test_url_result_icon');" )
-                                   -%>
         var url = parseUri(multi_selector.current_url_element.value).file;
 
         if (url != "" && url != null) {
@@ -145,8 +116,6 @@
                 old_element.parentNode.insertBefore(new_element, old_element);
                 old_element.multi_selector.addElement(new_element);
                 old_element.multi_selector.addListRow(old_element, old_element.multi_selector.object_name, old_element.multi_selector.method);
-                //old_element.style.position = 'absolute';
-                //old_element.style.left = '-1000px';
                 old_element.type = 'hidden';
             } else {
                 old_element.focus();

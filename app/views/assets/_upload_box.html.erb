@@ -24,7 +24,7 @@
     </div>
     <div class="foldContent" style="display: block;">
       <% if !resource.nil? && resource.respond_to?(:content_blobs) %>
-          <%= render :partial=>"assets/batch_upload", :locals=>{:action=>action} -%>
+          <%= render :partial=>"assets/batch_upload"-%>
       <% else %>
           <%= render :partial=>"assets/upload" -%>
       <% end %>
