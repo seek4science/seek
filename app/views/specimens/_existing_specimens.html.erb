@@ -70,7 +70,7 @@
 
             <tr>
               <td><%= strain_info -%></td>
-              <td><%= specimen.donor_number -%></td>
+              <td><%= specimen.lab_internal_number -%></td>
               <td><%= born -%></td>
               <td><%= specimen.culture_growth_type.try(:title) -%></td>
               <td><%= try_block { specimen.contributor.person.name } -%></td>

@@ -145,16 +145,13 @@ function getSelectedSample() {
         return selectedElement.value
 }
 
-function getSelectedSpecimen() {
-    var elArray = document.getElementsByName('selected_specimen');
-    var selectedElement;
-    for (var i = 0; i < elArray.length; i++) {
-        if (elArray[i].checked == true) {
-            selectedElement = elArray[i];
-        }
+function getSelectedSpecimens() {
+    var selected_specimen_rows = fnGetSelected(specimen_table);
+    var specimen_ids  = new Array();
+    for (var i=0; i< selected_specimen_rows.length; i++){
+        specimen_ids.push(specimen_table.fnGetData(selected_specimen_rows[i])[5]);
     }
-    if (selectedElement != null)
-        return selectedElement.value
+    return specimen_ids;
 }
 
 function check_selected_strain(strain_id){
@@ -224,7 +221,15 @@ function fnGetSelected( oTableLocal )
 
 function checkSelectOneStrain(){
    if (getSelectedStrains().length > 1){
-       alert('Please select only ONE strain!');
+       alert('Please select only ONE strain for this new strain to base on.');
+       return false;
+   }else
+        return true;
+}
+
+function checkSelectOneSpecimen(){
+   if (getSelectedSpecimens().length > 1){
+       alert('Please select only ONE specimen for this sample to base on, or select NO specimen');
        return false;
    }else
         return true;

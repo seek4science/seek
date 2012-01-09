@@ -31,7 +31,9 @@
       <% if logged_in? and current_user.person.member?%>
           <ul class="sectionIcons">
             <li><%= create_sample_popup_link -%></li>
+            (from new cell culture or based on <span style="font-weight: bold;"> ONE </span> selected)
           </ul>
+          <br/>
       <% end %>
       <% if existing_samples.empty? -%>
           <p class="none_text">No samples have yet been defined for selected cell cultures
