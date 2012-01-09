@@ -20,7 +20,7 @@ namespace :seek do
   #but now model_image(acts like avatar) is used instead.
   #what should be done is: create model_image according to the corresponding content_blob, and then copy the file to ModelImage.IMAGE_STORAGE_PATH(/filestore/model_images)
   task(:update_id_image_to_model_image=>:environment) do
-    if Model::Version.respond_to? :id_image
+    if Model::Version.first.respond_to? :id_image
       Model::Version.all.select(&:id_image).each do |mv|
         content_blob = ContentBlob.find mv.id_image
         model = Model.find mv.model_id
