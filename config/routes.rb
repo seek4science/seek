@@ -1,11 +1,4 @@
 ActionController::Routing::Routes.draw do |map|
-#   map.namespace(:admin) do |admin|
-#    admin.resources :slide_shows do |slide_show|
-#      slide_show.resources :slides, :member => { :move_up => :get, :move_down => :get }
-#    end
-#    admin.resources :slides, :member => { :move_up => :get, :move_down => :get }
-#  end
-
   map.resources :attachments
   map.resources :presentations,:member => { :download => :get, :new_version=>:post, :preview_publish=>:get,:publish=>:post,:request_resource=>:post, :update_annotations_ajax=>:post }
   map.resources :subscriptions
@@ -50,7 +43,9 @@ ActionController::Routing::Routes.draw do |map|
 
   map.resources :models, 
     :member => { :download => :get, :execute=>:post, :request_resource=>:post,:preview_publish=>:get,:publish=>:post, :builder=>:get, :submit_to_jws=>:post, :simulate=>:post, :update_annotations_ajax=>:post },
-    :collection=>{:build=>:get}
+    :collection=>{:build=>:get} do |model|
+    model.resources :model_images,:member=>{ :select=>:post },:collection => {:new => :post}
+  end
 
   map.resources :people, :collection=>{:select=>:get,:get_work_group =>:get} do |person|
     # avatars / pictures 'owned by' person

@@ -9,7 +9,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20111014093022) do
+ActiveRecord::Schema.define(:version => 20120102135414) do
 
   create_table "activity_logs", :force => true do |t|
     t.string   "action"
@@ -531,6 +531,15 @@ ActiveRecord::Schema.define(:version => 20111014093022) do
     t.datetime "updated_at"
   end
 
+  create_table "model_images", :force => true do |t|
+    t.integer  "model_id"
+    t.integer  "model_version"
+    t.string   "original_filename"
+    t.string   "original_content_type"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
   create_table "model_types", :force => true do |t|
     t.string   "title"
     t.datetime "created_at"
@@ -557,7 +566,7 @@ ActiveRecord::Schema.define(:version => 20111014093022) do
     t.text     "other_creators"
     t.string   "uuid"
     t.integer  "policy_id"
-    t.integer  "id_image"
+    t.integer  "model_image_id"
   end
 
   add_index "model_versions", ["contributor_id", "contributor_type"], :name => "index_model_versions_on_contributor_id_and_contributor_type"
@@ -586,7 +595,7 @@ ActiveRecord::Schema.define(:version => 20111014093022) do
     t.text     "other_creators"
     t.string   "uuid"
     t.integer  "policy_id"
-    t.integer  "id_image"
+    t.integer  "model_image_id"
   end
 
   add_index "models", ["contributor_id", "contributor_type"], :name => "index_models_on_contributor_id_and_contributor_type"
@@ -1129,10 +1138,10 @@ ActiveRecord::Schema.define(:version => 20111014093022) do
   end
 
   create_table "text_value_versions", :force => true do |t|
-    t.integer  "text_value_id",                            :null => false
-    t.integer  "version",                                  :null => false
+    t.integer  "text_value_id",                          :null => false
+    t.integer  "version",                                :null => false
     t.integer  "version_creator_id"
-    t.text     "text",               :limit => 2147483647, :null => false
+    t.text     "text",               :limit => 16777215, :null => false
     t.datetime "created_at"
     t.datetime "updated_at"
   end
@@ -1140,9 +1149,9 @@ ActiveRecord::Schema.define(:version => 20111014093022) do
   add_index "text_value_versions", ["text_value_id"], :name => "index_text_value_versions_on_text_value_id"
 
   create_table "text_values", :force => true do |t|
-    t.integer  "version",                                  :null => false
+    t.integer  "version",                                :null => false
     t.integer  "version_creator_id"
-    t.text     "text",               :limit => 2147483647, :null => false
+    t.text     "text",               :limit => 16777215, :null => false
     t.datetime "created_at"
     t.datetime "updated_at"
   end
