@@ -62,7 +62,7 @@
                phenotype_detail = strain.phenotype.try(:description).blank? ? 'wild-type' : strain.phenotype.try(:description)
             %>
             <tr class="gradeA">
-              <td><%= strain.organism.title %></td>
+              <td><%= link_to strain.organism.title, organism_path(strain.organism.id), {:target => '_blank'} %></td>
               <td><%= strain.title %> </td>
               <td><%= genotype_detail %> </td>
               <td><%= phenotype_detail %></td>
