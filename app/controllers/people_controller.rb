@@ -27,11 +27,7 @@ class PeopleController < ApplicationController
   # GET /people
   # GET /people.xml
   def index
-    if @expertise=params[:expertise]
-      @people=Person.tagged_with(@expertise, :on=>:expertise)      
-    elsif @tools=params[:tools]
-      @people=Person.tagged_with(@tools, :on=>:tools)
-    elsif (params[:discipline_id])
+    if (params[:discipline_id])
       @discipline=Discipline.find(params[:discipline_id])
       #FIXME: strips out the disciplines that don't match
       @people=Person.find(:all,:include=>:disciplines,:conditions=>["disciplines.id=?",@discipline.id])
