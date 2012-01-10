@@ -68,16 +68,7 @@
                 %>
                 <%
                    specimen = sample.specimen
-                   if specimen.born.nil?
-                       born = ''
-                   else
-                       if specimen.try(:born).hour == 0 and specimen.try(:born).min == 0 and specimen.try(:born).sec == 0 then
-                           born = specimen.try(:born).strftime('%d/%m/%Y')
-                       else
-                           born = specimen.try(:born).strftime('%d/%m/%Y @ %H:%M:%S')
-                       end
-                   end
-                   specimen_info = specimen.title
+                   specimen_info = 'Cell culture ' + specimen.title
                 %>
 
                 <tr class="gradeX">

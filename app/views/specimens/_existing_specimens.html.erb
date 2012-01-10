@@ -33,7 +33,7 @@
   <% if existing_specimens.empty? -%>
       <p class="none_text">No cell cultures have yet been defined for selected strains.</p>
   <% else -%>
-      <p class="none_text">Please select the cell cultures to see their samples.</p>
+      <p class="none_text">Please select the cell cultures to see samples.</p>
       <table cellpadding="0" cellspacing="0" border="0" class="display" id="specimen_table">
         <thead>
         <tr>
@@ -65,7 +65,7 @@
                end
                genotype_detail = genotype_detail.blank? ? 'wild-type' : genotype_detail
                phenotype_detail = strain.phenotype.try(:description).blank? ? 'wild-type' : strain.phenotype.try(:description)
-               strain_info = strain.title + "(" + genotype_detail + '/' + phenotype_detail + ')'
+               strain_info = 'Strain ' + strain.title + "(" + genotype_detail + '/' + phenotype_detail + ')'
             %>
 
             <tr>

@@ -8,8 +8,7 @@
    default_selected_organisms =  try_block{current_user.person.projects.first.organism_ids}.blank? ? [0] : try_block{current_user.person.projects.first.organism_ids}
 -%>
 
-<h4 style="margin-left: 4em;margin-top:1em;margin-bottom: -1.5em;font-style:italic;color:gray;">Here you can navigate
-  Organism-Strain-Cell culture-Sample. You also can create new strain or new sample</h4>
+<h4 style="margin-left: 10em;margin-top:1em;margin-bottom: -1.5em;font-style:italic;color:gray;">From Organism to Sample: browsing available and creation new entries</h4>
 <br/>
 <div class='yui-g'>
   <div class='yui-u first' style="width: 48%;margin-left: 0.5em;margin-top: 1em">

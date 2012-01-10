@@ -26,7 +26,7 @@
         </p>
 
         <p style="margin-bottom: 1.5em">
-          <label style="float: left;">Culture start date:</label>
+          <label style="float: left;">Culture starting date:</label>
           <%= calendar_date_select_tag "specimen[born]", @specimen.try(:born), :time => "mixed", :style => 'float:right;margin-right:30em', :disabled =>  current_user_authorized_to_edit ? false : true %>
         </p>
 

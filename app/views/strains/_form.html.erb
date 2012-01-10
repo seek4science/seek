@@ -1,5 +1,5 @@
 <%= stylesheet_link_tag 'styles.css' -%>
-<div class="strain" id="strain_form">
+<div  id="strain_form">
        <% parent_strain = strain.title %>
        <p class="none_text" style="margin-left: 15em;">
        <%= parent_strain.blank? ? '' : "You will create this new strain based on #{parent_strain}"%>
@@ -14,7 +14,7 @@
         </p>
 
         <p style="margin-bottom: 1.5em">
-          <label style="float: left;">Strain ID:</label>
+          <label style="float: left;">Provider strain ID:</label>
           <%= text_field_tag "strain[provider_id]", strain.provider_id, :style => 'float:right' %>
         </p>
 
