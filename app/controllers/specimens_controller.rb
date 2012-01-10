@@ -101,9 +101,11 @@ class SpecimensController < ApplicationController
       strain_ids = params[:strain_ids].split(',')
       strain_ids.each do |strain_id|
         strain=Strain.find_by_id(strain_id)
-        strains << strain if strain
-        specimens=strain.try(:specimens)
-        specimens_of_strains |= specimens.select(&:can_view?)
+        if strain
+          strains << strain
+          specimens=strain.specimens
+          specimens_of_strains |= specimens.select(&:can_view?)
+        end
       end
     end
 

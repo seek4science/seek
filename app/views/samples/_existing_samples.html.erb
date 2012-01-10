@@ -47,6 +47,7 @@
               <th>Lab internal identifier</th>
               <th>Sampling date</th>
               <th>Provider name</th>
+              <th>ID</th>
             </tr>
             </thead>
             <tbody>
@@ -84,6 +85,7 @@
                   <td><%= sample.lab_internal_number %> </td>
                   <td><%= sampling_date %> </td>
                   <td><%= provider_name %></td>
+                  <td><%= sample.id %></td>
                 </tr>
             <% end -%>
             </tbody>

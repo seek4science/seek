@@ -42,7 +42,7 @@
           <th>Culture start date</th>
           <th>Culture type</th>
           <th>Contributor</th>
-          <th style="display: none;">Specimen ID</th>
+          <th>ID</th>
         </tr>
         </thead>
         <tbody>
@@ -74,7 +74,7 @@
               <td><%= born -%></td>
               <td><%= specimen.culture_growth_type.try(:title) -%></td>
               <td><%= try_block { specimen.contributor.person.name } -%></td>
-              <td style="display: none"><%= specimen.id %></td>
+              <td><%= specimen.id %></td>
             </tr>
         <% end -%>
         </tbody>
