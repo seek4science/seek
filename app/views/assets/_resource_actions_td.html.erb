@@ -10,11 +10,6 @@
 <% if (resource.can_delete? or current_user.try(:admin?)) and resource.respond_to? :to_presentation %>
      <%= image_tag_for_key "arrow_right", {:controller=>"data_files",:action => "convert_to_presentation",:id=>resource.id}, nil, {:title => "click it to convert this data file to presentations",:confirm => "Convert to presentation? It is irreversible!"}, 'Convert'%>
 <% end %>
-
-<% if resource.can_delete? %>
-    <%= image_tag_for_key('destroy', polymorphic_path(resource), nil, { :confirm => "yes?", :method => :delete }, "Delete") -%>
-<% end %>
-
 <!---
 <%= link_to_remote image_tag_for_key("favourite"), :url=>{:controller => "favourites", :action => "add", :id => model_to_drag_id(resource)},
     :before => "Element.show('fav_ajax-loader');Element.show('fav_ajax-loader#{model_to_drag_id(resource)}')",

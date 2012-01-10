@@ -4,7 +4,7 @@
 
 <%= asset_buttons @model,@display_model.version -%>
 
-<% if Seek::Config.jws_enabled && @display_model.content_blob && jws_supported?(@display_model) -%>
+<% if Seek::Config.jws_enabled && jws_supported?(@display_model) -%>
 	<ul class="sectionIcons">
 		<% if @model.can_edit? -%>
 		    <li>
@@ -19,7 +19,7 @@
 	</ul>
 <% end -%>
 
-<% if Seek::Config.sycamore_enabled and @display_model.content_blob.file_exists? && Class.new.extend(Seek::ModelTypeDetection).is_sbml?(@display_model) %>
+<% if Seek::Config.sycamore_enabled && Class.new.extend(Seek::ModelTypeDetection).is_sbml?(@display_model) %>
   <ul class="sectionIcons">
     <li>
       <span class="icon">
