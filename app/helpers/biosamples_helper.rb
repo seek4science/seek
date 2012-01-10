@@ -1,2 +1,2 @@
-module BioSamplesHelper
+module BiosamplesHelper
 end
