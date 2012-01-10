@@ -43,7 +43,8 @@ class Model < ActiveRecord::Base
   end
 
   def content_blob
-      self.content_blobs.last(:order=>"id asc")
+    # return the first content blob which is jws supported (is_dat? or is_sbml?)
+      Class.new.extend(Seek::ModelTypeDetection).is_jws_supported? self
   end
 
   def studies
