@@ -30,6 +30,14 @@
 <div id="existing_specimens">
   <% unless strains.blank?  %>
   <h2>Cell culture(chemostat or batch)</h2>
+      <% if logged_in? and current_user.person.member?%>
+                <ul class="sectionIcons">
+                  <li><%= create_sample_popup_link -%></li>
+                  (from new cell culture or based on selected one)
+                </ul>
+                <br/>
+            <% end %>
+
   <% if existing_specimens.empty? -%>
       <p class="none_text">No cell cultures have yet been defined for selected strains.</p>
   <% else -%>

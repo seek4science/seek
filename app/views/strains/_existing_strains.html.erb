@@ -45,8 +45,8 @@
         <tr>
           <th>Organism</th>
           <th>Name</th>
-          <th>Genotypes</th>                                                     N
-          <th>Phenotypes</th>                                                                      N
+          <th>Genotypes</th>
+          <th>Phenotypes</th>
           <th>ID</th>
         </tr>
         </thead>
@@ -76,7 +76,9 @@
 <% if logged_in? and current_user.person.member?%>
   <ul class="sectionIcons">
     <li><%= create_strain_popup_link() -%></li>
-    (create new strain or based on <span style="font-weight: bold;"> ONE </span>selected strain)
+    <br/>
+    <br/>
+    (create new strain or based on selected one)
   </ul>
   <% end %>
 </div>
