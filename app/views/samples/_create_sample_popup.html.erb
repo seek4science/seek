@@ -19,7 +19,6 @@
 	</div>
 
     <div class="body">
-
         <h2>Cell culture</h2>
         <p style="margin-bottom: 1.5em">
           <label style="float: left;"> Title:</label>
@@ -46,14 +45,14 @@
           <%= text_field_tag "specimen[provider_name]", @specimen.try(:provider_name), :style => 'float:right;margin-right:30em', :disabled =>  current_user_authorized_to_edit ? false : true %>
         </p>
 
-        <%if current_user_authorized_to_manage %>
+        <% if current_user_authorized_to_manage %>
             <%= render :partial=>"assets/asset_form_bottom", :locals=> {
                     :resource_type => "Specimen",
                     :attribution_enable => false,
                     :show_publications => false,
                     :sharing_enable => false,
                     :existing_creators=>existing_creators,
-                    :other_creators=>@specimen.other_creators,
+                    :other_creators=>'@specimen.other_creators',
             } -%>
           <% else
                  creator_names = existing_creators.collect(&:name).join(', ')

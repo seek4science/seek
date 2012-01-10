@@ -1,0 +1,2 @@
+class BiosamplesController < ApplicationController
+end
