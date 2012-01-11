@@ -1,0 +1,63 @@
+<div id="strain_detail" style="width: 470px">
+     <div class="yui-g">
+         <center>
+           <div class="yui-u first" style="width: 42%; margin-left: 2em; margin-top: 1em; margin-bottom: 1em;">
+             <p>
+               <label style="float: left;font-weight: bold;"> Name: </label> <%= strain.title%>
+            </p>
+    
+            <p>
+              <label style="float: left;font-weight: bold;"> Provider ID:</label> <%= strain.provider_id.blank? ? 'Not specified' : strain.provider_id%>
+            </p>
+    
+            <p>
+              <label style="float: left;font-weight: bold;"> Provider Name:</label> <%= strain.provider_name.blank? ? 'Not specified' : strain.provider_name%>
+            </p>
+    
+          </div>
+        </center>
+    
+        <center>
+          <div class="yui-u" style="width: 42%;margin-right: 2em; margin-top: 1em; margin-bottom: 1em;">
+            <p>
+              <label style="float: left;font-weight: bold;"> Synonym:</label><%= strain.synonym.blank? ? 'Not specified' : strain.synonym%>
+            </p>
+    
+            <p>
+              <label style="float: left;font-weight: bold;"> Comment:</label><%= strain.comment.blank? ? 'Not specified' : strain.comment%>
+            </p>
+          </div>
+        </center>
+      </div>
+    
+      <div class="yui-g">
+        <center>
+          <div class="yui-u first" style="width: 42%; margin-left: 2em; margin-top: 1em; margin-bottom: 1em;">
+            <label style="font-weight: bold; border-bottom: 1px solid #DDD"> Genotypes:</label>
+            <table id='genotype_table'>
+              <tr>
+                <th>Gene affected</th>
+                <th>Kind of mutation</th>
+              </tr>
+    
+              <% i=1
+                 strain.genotypes.each do |genotype| %>
+                  <tr id='genotype_row_<%=i%>'>
+                    <td> <%= genotype.gene.try(:title) %>
+                    </td>
+                    <td><%= genotype.modification.try(:title) %>
+                    </td>
+                  </tr>
+                  <% i += 1 %>
+                 <% end %>
+            </table>
+          </div>
+        </center>
+    
+        <center>
+          <div class="yui-u" style="width: 42%;margin-right: 2em; margin-top: 1em; margin-bottom: 1em;">
+            <label style="font-weight: bold;border-bottom: 1px solid #DDD"> Phenotype:</label> <br/> <%= strain.phenotype.blank? ? 'Not specified' : strain.phenotype.description%>
+          </div>
+        </center>
+      </div>
+    </div>

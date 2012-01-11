@@ -94,25 +94,6 @@ class SpecimensController < ApplicationController
     end
   end
 
-  def existing_specimens
-    specimens_of_strains = []
-    strains = []
-    if params[:strain_ids]
-      strain_ids = params[:strain_ids].split(',')
-      strain_ids.each do |strain_id|
-        strain=Strain.find_by_id(strain_id)
-        if strain
-          strains << strain
-          specimens=strain.specimens
-          specimens_of_strains |= specimens.select(&:can_view?)
-        end
-      end
-    end
-
-    render :update do |page|
-        page.replace_html 'existing_specimens', :partial=>"specimens/existing_specimens",:object=>specimens_of_strains, :locals=>{:strains=>strains}
-    end
-  end
 end
 
 

@@ -2,25 +2,6 @@ class StrainsController < ApplicationController
   before_filter :get_strains,:only=>[:existing_strains_for_assay_organism, :existing_strains, :existing_strains_for_create]
   before_filter :get_strain, :only =>:show_existing_strain
 
-  def existing_strains
-    strains_of_organisms = []
-    organisms = []
-    if params[:organism_ids]
-      organism_ids = params[:organism_ids].split(',')
-      organism_ids.each do |organism_id|
-        organism=Organism.find_by_id(organism_id)
-        if organism
-          organisms << organism
-          strains=organism.try(:strains)
-          strains_of_organisms |= strains ? strains.reject { |s| s.title == 'default' } : strains
-        end
-      end
-    end
-    render :update do |page|
-        page.replace_html 'existing_strains', :partial=>"strains/existing_strains", :object=>strains_of_organisms, :locals=>{:organisms=>organisms}
-    end
-  end
-
   def existing_strains_for_create
     partial = "existing_strains_for_create"
     render :update do |page|
@@ -44,17 +25,6 @@ class StrainsController < ApplicationController
     render :update do |page|
       page.replace_html 'strain_form', :partial=>"strains/form",:locals=>{:strain => @strain, :organism_id => params[:organism_id]}
     end
-    end
-
-  def create_strain_popup
-    strain = Strain.find_by_id(params[:strain_id])
-    respond_to do  |format|
-      if current_user.person.member?
-        format.html{render :partial => 'strains/create_strain_popup', :locals => {:strain => strain}}
-      else
-        flash[:error] = "You are not authorized to create new strain. Only members of known projects, institutions or work groups are allowed to create new content."
-      end
-    end
   end
 
   def create
@@ -67,21 +37,6 @@ class StrainsController < ApplicationController
         format.html {redirect_to :back}
       end
     end
-  end
-
-  def existing_genotypes_phenotypes
-     strains = Strain.find(:all, :conditions => ["title=?", params[:strain_title]])
-     strains_detail = []
-     strains.each do |strain|
-       genotype_detail = ''
-       strain.genotypes.each do |genotype|
-          genotype_detail << genotype.modification.try(:title) + ' ' + genotype.gene.try(:title) + '; '
-        end
-        strains_detail<< {:id => strain.id, :title => strain.title, :genotype => genotype_detail, :phenotype => strain.phenotype.try(:description)}
-     end
-     render :update do |page|
-        page.replace_html 'existing_genotypes_phenotypes', :partial=>"strains/existing_genotypes_phenotypes", :locals=>{:strains_detail => strains_detail}
-     end
   end
 
   def existing_strains_for_assay_organism

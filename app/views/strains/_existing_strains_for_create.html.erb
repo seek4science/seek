@@ -1,0 +1,18 @@
+<% strain_links=[] %>
+<div id="existing_strains_for_create">
+  <% if existing_strains_for_create.empty? -%>
+      <p class="none_text">No strains have yet been defined for <%= h(organism.title) -%>.</p>
+  <% else -%>
+      <p class="none_text">Here are the strains for <span style="font-weight: bold;"><%= h(organism.title) -%></span>. </p>
+      <span style="font-weight: bold">Select one strain</span> to create new strain based on this.
+      <br/>
+      <% existing_strains_for_create.sort{|a,b| a.title <=> b.title}.each do |strain| -%>
+          <% strain_links << link_to_remote(h(strain.title), {:url =>{:controller => 'strains', :action => 'show_existing_strain', :id => "#{strain.id}"},
+          :with=>"'organism_id='+ '#{organism.id}'", :before=>"$('new_strain').checked=false"}) %>
+      <% end -%>
+      <%= strain_links.join(", ") -%>
+  <% end -%>
+</div>
+
+
+

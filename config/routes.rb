@@ -9,8 +9,8 @@ ActionController::Routing::Routes.draw do |map|
 
   map.resources :presentations,:member => { :download => :get, :new_version=>:post, :preview_publish=>:get,:publish=>:post,:request_resource=>:post, :update_annotations_ajax=>:post }
   map.resources :subscriptions
-  map.resources :specimens,:collection=>{:existing_specimens=>:get}
-  map.resources :samples,:collection => {:navigation => :get, :existing_samples=>:get}
+  map.resources :specimens
+  map.resources :samples
 
   map.resources :events
 
@@ -34,7 +34,7 @@ ActionController::Routing::Routes.draw do |map|
 
   map.resources :saved_searches
 
-  map.resources :biosamples
+  map.resources :biosamples, :collection=>{:existing_strains=>:get, :existing_specimens=>:get, :existing_samples=>:get}
 
   map.resources :data_files, :collection=>{:test_asset_url=>:post},:member => {:download => :get,:plot=>:get, :data => :get,:preview_publish=>:get,:publish=>:post, :request_resource=>:post, :update_annotations_ajax=>:post, :explore=>:get},:new=>{:upload_for_tool => :post}  do |data_file|
     data_file.resources :studied_factors, :collection =>{:create_from_existing=>:post}
