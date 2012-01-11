@@ -2,14 +2,6 @@ var strain_table = null;
 var specimen_table = null;
 var sample_table = null;
 
-function check_show_create_new_strain(element_id) {
-    var selected_id = $F('strain_organism_id');
-    if (selected_id == '0') {
-        Effect.Fade(element_id, { duration: 0.25 });
-    } else {
-        Effect.Appear(element_id, { duration: 0.25 });
-    }
-}
 
 function check_show_existing_strains(organism_element_id, existing_strains_element_id, url) {
     var selected_ids = $F(organism_element_id).join();
@@ -81,18 +73,6 @@ function getSelectedStrains() {
     return strain_ids;
 }
 
-function getSelectedSample() {
-    var elArray = document.getElementsByName('selected_sample');
-    var selectedElement;
-    for (var i = 0; i < elArray.length; i++) {
-        if (elArray[i].checked == true) {
-            selectedElement = elArray[i];
-        }
-    }
-    if (selectedElement != null)
-        return selectedElement.value
-}
-
 function getSelectedSpecimens() {
     var specimen_ids  = new Array();
     if (specimen_table.length != 0){
@@ -102,12 +82,6 @@ function getSelectedSpecimens() {
         }
     }
     return specimen_ids;
-}
-
-function check_selected_strain(strain_id){
-  if (strain_id == null){
-      alert('No strain has been selected')
-  }
 }
 
 function existing_specimens(url) {
