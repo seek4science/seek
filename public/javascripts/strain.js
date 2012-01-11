@@ -125,10 +125,12 @@ function new_strain_form(strain_id, organism_id, url) {
 }
 
 function getSelectedStrains() {
-    var selected_strain_rows = fnGetSelected(strain_table);
     var strain_ids  = new Array();
-    for (var i=0; i< selected_strain_rows.length; i++){
-        strain_ids.push(strain_table.fnGetData(selected_strain_rows[i])[4]);
+    if (strain_table.length != 0){
+        var selected_strain_rows = fnGetSelected(strain_table);
+        for (var i=0; i< selected_strain_rows.length; i++){
+            strain_ids.push(strain_table.fnGetData(selected_strain_rows[i])[4]);
+        }
     }
     return strain_ids;
 }
@@ -146,10 +148,12 @@ function getSelectedSample() {
 }
 
 function getSelectedSpecimens() {
-    var selected_specimen_rows = fnGetSelected(specimen_table);
     var specimen_ids  = new Array();
-    for (var i=0; i< selected_specimen_rows.length; i++){
-        specimen_ids.push(specimen_table.fnGetData(selected_specimen_rows[i])[5]);
+    if (specimen_table.length != 0){
+        var selected_specimen_rows = fnGetSelected(specimen_table);
+        for (var i=0; i< selected_specimen_rows.length; i++){
+            specimen_ids.push(specimen_table.fnGetData(selected_specimen_rows[i])[5]);
+        }
     }
     return specimen_ids;
 }
