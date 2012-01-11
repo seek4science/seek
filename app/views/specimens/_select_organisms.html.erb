@@ -115,7 +115,7 @@
               <br/><br/>
           <% elsif (action == :edit) && (strain and !strain.parent_id and strain.title != 'default')%>
               <p class='none_text'>This strain is selected: </p>
-              <%= link_to_remote(h(strain.title), {:url =>{:controller => 'strains', :action => 'new_strain', :id => "#{strain.id}"},
+              <%= link_to_remote(h(strain.title), {:url =>{:controller => 'strains', :action => 'new_strain_form', :id => "#{strain.id}"},
                                                    :with => "'status='+'edit' + '&organism_id='+ $F('specimen_organism_id')", :before => "$('create_strain_1').checked = true"}) %>
               <br/><br/>
           <% elsif (action == :edit) && ((strain and strain.title == 'default') || !strain) %>
@@ -133,7 +133,7 @@
               <br/>
               <div id='create_new_strain'>
                 <%= radio_button_tag(:create_strain, 1, false,
-                                     :onchange=>remote_function(:url=>{:action=>"new_strain", :controller=>"strains"},
+                                     :onchange=>remote_function(:url=>{:action=>"new_strain_form", :controller=>"strains"},
                                              :with=>"'organism_id='+ $F('specimen_organism_id')",
                                                                 :before=>"show_ajax_loader('strain_form')") + ";return(false);") %>
               <label>Create without basing on existing strain</label>

@@ -1,91 +1,13 @@
-<script type="text/javascript" charset="utf-8">
-    $j(document).ready(function() {
-        strain_table = $j('#strain_table').dataTable({
-            "bPaginate": false,
-            "bLengthChange": false,
-            "bFilter": false,
-            "bSort": true,
-            "bInfo": false,
-            "bAutoWidth": false,
-            "bRetrieve": true,
-            "aaSorting": [
-                [ 1, "asc" ]
-            ],
-            "aoColumns": [
-            null,
-            { "sWidth": "25%" },
-            { "sWidth": "30%" },
-            { "sWidth": "30%" },
-            { "sWidth": "15%" }
-            ],
-            "sScrollY": "250px",
-            "sDom": "frtiS",
-            "bDeferRender": true
-        }).rowGrouping({"sGrupingClass": 'row_group_color'});
-        /* Click event handler */
-        $j('#strain_table tbody tr').click(function() {
-            if ($j(this).hasClass('row_selected'))
-                $j(this).removeClass('row_selected');
-            else
-                $j(this).addClass('row_selected');
-
-            existing_specimens('<%=url_for(:controller => 'specimens', :action => 'existing_specimens')-%>');
-        });
-    });
-</script>
-
+<% strain_links=[] %>
 <div id="existing_strains">
-  <h2>Strain</h2>
-  <%
-     organisms_title = organisms.collect { |organism| organism.title }
-     organisms_title = organisms_title.blank? ? '' : organisms_title.join(', ')
-  %>
   <% if existing_strains.empty? -%>
-      <p class="none_text">No strains have yet been defined for
-        <span style="font-weight: bold;"> <%= h(organisms_title) -%></span>.</p>
+      <p class="none_text">No strains have yet been defined for <%= h(organism.title) -%>.</p>
   <% else -%>
-      <p class="none_text">Please click on the strain rows below to see cell cultures.
-      </p>
-      <div class="box_simple">
-      <table cellpadding="0" cellspacing="0" class="display" id="strain_table">
-        <thead>
-        <tr>
-          <th>Organism</th>
-          <th>Name</th>
-          <th>Genotypes</th>
-          <th>Phenotypes</th>
-          <th>ID</th>
-        </tr>
-        </thead>
-        <tbody>
-        <%
-           existing_strains.each do |strain| -%>
-            <%
-               genotype_detail = ''
-               strain.genotypes.each do |genotype|
-                   genotype_detail << genotype.modification.try(:title) + ' ' + genotype.gene.try(:title) + '; ' if genotype.gene
-               end
-               genotype_detail = genotype_detail.blank? ? 'wild-type' : genotype_detail
-               phenotype_detail = strain.phenotype.try(:description).blank? ? 'wild-type' : strain.phenotype.try(:description)
-            %>
-            <tr class="gradeA">
-              <td><%= link_to strain.organism.title, organism_path(strain.organism.id), {:target => '_blank'} %></td>
-              <td><%= strain.title %> </td>
-              <td><%= genotype_detail %> </td>
-              <td><%= phenotype_detail %></td>
-              <td><%= strain.id %></td>
-            </tr>
-        <% end -%>
-        </tbody>
-      </table>
-      </div>
+      <p class="none_text">Here are the strains for <%= h(organism.title) -%>. Please choose one.</p>
+      <% existing_strains.each do |strain| -%>
+          <% strain_links << link_to_remote(h(strain.title), {:url =>{:controller => 'strains', :action => 'show_existing_strain', :id => "#{strain.id}"},
+          :with=>"'organism_id='+ '#{organism.id}'"}) %>
+      <% end -%>
+      <%= strain_links.join(", ") -%>
   <% end -%>
-<% if logged_in? and current_user.person.member? %>
-  <ul class="sectionIcons">
-    <li><%= create_strain_popup_link() -%></li>
-    <br/>
-    <br/>
-    (create new strain or based on selected one)
-  </ul>
-  <% end %>
 </div>
