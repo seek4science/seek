@@ -196,8 +196,12 @@ module AssetsCommonExtension
     t = Tempfile.new("#{Time.now.year}#{Time.now.month}#{Time.now.day}_#{asset.class.name.downcase}_#{asset.title}_#{asset.id}","#{RAILS_ROOT}/tmp")
   # Give the path of the temp file to the zip outputstream, it won't try to open it as an archive.
     Zip::ZipOutputStream.open(t.path) do |zos|
+      if asset.respond_to?(:model_image) && asset.model_image
+         model_image = asset.model_image
+        zos.put_next_entry(model_image.original_filename)
+        zos.print IO.read("#{model_image.original_path}/#{model_image.id}.#{model_image.original_image_format}")
+      end
       asset.content_blobs.each do |content_blob|
-
         if File.exists? content_blob.filepath
           # Create a new entry with content_blob's original_filename'
           zos.put_next_entry(content_blob.original_filename)
@@ -213,7 +217,6 @@ module AssetsCommonExtension
         else
           flash.now[:error] = "#{content_blob.original_filename} does not exist!"
         end
-
       end
     end
     send_file t.path, :type => 'application/zip', :disposition => 'attachment', :filename => "#{asset.title}.zip"

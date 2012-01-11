@@ -19,7 +19,7 @@
 	</ul>
 <% end -%>
 
-<% if Seek::Config.sycamore_enabled and @display_model.content_blob.file_exists? && Class.new.extend(Seek::ModelTypeDetection).is_sbml?(@display_model) %>
+<% if Seek::Config.sycamore_enabled && Class.new.extend(Seek::ModelTypeDetection).is_sbml?(@display_model) %>
   <ul class="sectionIcons">
     <li>
       <span class="icon">
@@ -76,7 +76,7 @@
           <b>Model visualization</b>(<span style="font-style:italic;">click it to zoom</span>)<br/>
           <div id="thumbnail">
 
-            <% unless  @display_model.id_image.nil? or @display_model.id_image==0 %>
+            <% if  @display_model.model_image %>
             <a href='<%= url_for(:controller=>"models",:action=>"send_image",:id=>@model,:version=>@display_model.version) %>' rel="lightbox">
                <img src="<%= url_for(:controller=>"models",:action=>"send_image",:id=>@model,:version=>@display_model.version) %>" width="50" height="50"/>
             </a>

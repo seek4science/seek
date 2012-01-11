@@ -16,7 +16,7 @@ module Seek
       include MockedResponses if MOCKED
 
       def is_supported? model
-        model.content_blob.file_exists? && is_jws_supported?(model)
+        model.content_blob && model.content_blob.file_exists?
       end
 
       def saved_dat_download_url savedfile

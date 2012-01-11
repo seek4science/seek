@@ -16,6 +16,8 @@ class Model < ActiveRecord::Base
 
   # allow same titles, but only if these belong to different users
   # validates_uniqueness_of :title, :scope => [ :contributor_id, :contributor_type ], :message => "error - you already have a Model with such title."
+  has_many :model_images
+  belongs_to :model_image
 
   has_many :content_blobs, :as => :asset, :foreign_key => :asset_id,:conditions => 'asset_version= #{self.version}'
 
@@ -28,7 +30,8 @@ class Model < ActiveRecord::Base
   
   explicit_versioning(:version_column => "version") do
     acts_as_versioned_resource
-    
+
+    belongs_to :model_image
     belongs_to :organism
     belongs_to :recommended_environment,:class_name=>"RecommendedModelEnvironment"
     belongs_to :model_type
@@ -40,7 +43,8 @@ class Model < ActiveRecord::Base
   end
 
   def content_blob
-      self.content_blobs.last(:order=>"id asc")
+    # return the first content blob which is jws supported (is_dat? or is_sbml?)
+      Class.new.extend(Seek::ModelTypeDetection).is_jws_supported? self
   end
 
   def studies

@@ -11,7 +11,6 @@
     <% form_for(@model ,:html => {:multipart => true, :method => :put}) do |f| %>
     <div class="asset_form">
         <%= f.error_messages %>
-      <%= render :partial=>"assets/upload_box",:locals=>{:action=>:edit,:resource=>@model} -%>
         <p>
             <b>Title:</b>
             <br/>
@@ -42,16 +41,24 @@
         <p>
         <%= fancy_multiselect @model,:scales, {:possibilities=>sort_scales(Scale.all)} -%>
        </p>
-        <%# only the owner should be able to change sharing permissions -%>
+
+
+       <% if @model && (mine?(@model) || @model.can_edit?) -%>
+          <div class="fold">
+            <div class="foldTitle">
+              Model image
+            </div>
+            <div class="foldContent">
+              <%= render :partial => "model_images/image_selector", :locals => {:image_for_instance => @model, :form_instance => f} -%>
+            </div>
+          </div>
+      <% end -%>
+
+
         <% if current_user_authorized_to_manage -%>
 		
 		<%= render :partial=>"assets/asset_form_bottom", :locals=> { :f => f } -%>
 		<%= render :partial => "assays/associate_assays", :locals=>{:resource => @model, :show_relationships => false} -%>
-
-
-        <%#= render :partial => "models/edit_batch_upload", :locals => {:resource=>@model} %>
-
-
 
 
         <% end -%>

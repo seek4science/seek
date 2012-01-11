@@ -1,7 +1,7 @@
  require 'zip/zip'
  require 'zip/zipfilesystem'
 class ModelsController < ApplicationController
-  
+
   include WhiteListHelper
   include IndexPager
   include DotGenerator
@@ -23,13 +23,8 @@ class ModelsController < ApplicationController
   def send_image
     @model = Model.find params[:id]
     @display_model = @model.find_version params[:version]
-    content_blob = ContentBlob.find_by_id @display_model.id_image
-
-    if File.file? content_blob.filepath
-      send_file content_blob.filepath,:type=>content_blob.content_type, :disposition => 'inline'
-    else
-      show_via_url @display_model,content_blob
-    end
+    image = @display_model.model_image
+      send_file "#{image.file_path  }", :type=>"JPEG", :disposition=>'inline'
 
   end
 
@@ -43,11 +38,7 @@ class ModelsController < ApplicationController
 
       respond_to do |format|
         create_new_version  comments
-
-        @model.id_image = nil
         create_content_blobs
-        set_or_update_image :new_version
-
         format.html {redirect_to @model }
       end
     else
@@ -418,14 +409,12 @@ class ModelsController < ApplicationController
       @model.policy.set_attributes_with_sharing params[:sharing], @model.projects
 
       update_annotations @model
+      build_model_image @model,params[:model_image]
       assay_ids = params[:assay_ids] || []
       respond_to do |format|
         if @model.save
 
           create_content_blobs
-
-          set_or_update_image :new
-
           # update attributions
           Relationship.create_or_update_attributions(@model, params[:attributions])
           
@@ -459,9 +448,9 @@ class ModelsController < ApplicationController
     @model.last_used_at = Time.now
     @model.save_without_timestamping    
 
-    if @model.content_blobs.count==1
+    if @model.content_blobs.count==1 and @model.model_image.nil?
        handle_download @model
-    elsif @model.content_blobs.count > 1
+    elsif @model.model_image
       handle_download_zip @model
     end
 
@@ -501,8 +490,6 @@ class ModelsController < ApplicationController
       assay_ids = params[:assay_ids] || []
       respond_to do |format|
         if @model.save
-
-          set_or_update_image  :edit
 
           # update attributions
           Relationship.create_or_update_attributions(@model, params[:attributions])
@@ -612,19 +599,18 @@ class ModelsController < ApplicationController
     end
   end
 
-  def set_or_update_image  action
-    #if two image files have the same name,no matter which one is selected,the first file will be selected
-    # when new /new version, params[:model][:id_image] = content_blob.original_filename, when edit,params[:model][:id_image] = content_blob.id
-    case action
-      when :new,:new_version
-         @model.id_image = @model.content_blobs.detect{|cb|cb.original_filename==params[:model][:id_image]}.try(:id)
-      when :edit
-        @model.id_image = params[:model][:id_image].to_i
+   def build_model_image model_object, params_model_image
+      unless params_model_image.blank? || params_model_image[:image_file].blank?
+
+      # the creation of the new Avatar instance needs to have only one parameter - therefore, the rest should be set separately
+      @model_image = ModelImage.new(params_model_image)
+      @model_image.model_id = model_object.id
+      @model_image.model_version = model_object.version
+      @model_image.original_content_type = params_model_image[:image_file].content_type
+      @model_image.original_filename = params_model_image[:image_file].original_filename
+      model_object.model_image = @model_image
     end
 
-     if @model.id_image.nil? or @model.id_image==0
-         @model.id_image = @model.content_blobs.detect(&:is_image?).try(:id)
-     end
-    @model.save!
-  end
+   end
+
 end

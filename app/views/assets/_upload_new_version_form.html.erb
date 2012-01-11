@@ -19,7 +19,7 @@ upload_field = 'content_blob'  if resource.respond_to?(:content_blobs)
     <% form_tag({:action=>"new_version", :id=>resource}, :multipart => true) do -%>
     <center>
         <div style="width:95%;margin-top:0.75em;">
-           <% locals = resource.respond_to?(:content_blobs) ? {:action=>:new,:resource=>resource} : {}  %>
+           <% locals = resource.respond_to?(:content_blobs) ? {:resource=>resource} : {}  %>
            <%= render :partial=>"assets/upload_box" ,:locals=>locals-%>
 
             <p>

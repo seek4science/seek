@@ -2,11 +2,11 @@ module Seek
   module ModelTypeDetection
     
     def is_dat? model
-      check_content model.content_blob.filepath,"begin name",25000
+      model.content_blobs.detect{|content_blob| check_content content_blob.filepath,"begin name",25000}
     end                      
     
     def is_sbml? model                        
-      check_content model.content_blob.filepath,"<sbml"
+       model.content_blobs.detect{|content_blob| check_content content_blob.filepath,"<sbml" }
     end
 
     def is_jws_supported? model
