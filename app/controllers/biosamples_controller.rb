@@ -29,6 +29,12 @@ class BiosamplesController < ApplicationController
     end
   end
 
+  def new_strain_form
+    strain = Strain.find_by_id(params[:id]) || Strain.new
+    render :update do |page|
+      page.replace_html 'strain_form', :partial=>"biosamples/strain_form",:locals=>{:strain => strain, :organism_id => params[:organism_id]}
+    end
+  end
 
   def existing_specimens
     specimens_of_strains = []
