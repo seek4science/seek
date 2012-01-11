@@ -43,7 +43,8 @@ module Acts #:nodoc:
         if !self.respond_to?(:content_blobs) && self.respond_to?(:content_blob)
           ContentBlob.find(:first, :conditions => ["asset_id =? and asset_type =? and asset_version =?", self.parent.id, self.parent.class.name, self.version])
         elsif self.respond_to? :content_blobs
-          Class.new.extend(Seek::ModelTypeDetection).is_jws_supported? self
+           result = Class.new.extend(Seek::ModelTypeDetection).is_jws_supported? self
+           result.nil?? self.content_blobs.first : result
         end
       end
 
