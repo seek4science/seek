@@ -11,6 +11,13 @@
             "aaSorting": [
                 [ 1, "asc" ]
             ],
+            "aoColumns": [
+            null,
+            { "sWidth": "25%" },
+            { "sWidth": "30%" },
+            { "sWidth": "30%" },
+            { "sWidth": "15%" }
+            ],
             "sScrollY": "250px",
             "sDom": "frtiS",
             "bDeferRender": true
@@ -73,7 +80,7 @@
       </table>
       </div>
   <% end -%>
-<% if logged_in? and current_user.person.member?%>
+<% if logged_in? and current_user.person.member? %>
   <ul class="sectionIcons">
     <li><%= create_strain_popup_link() -%></li>
     <br/>
