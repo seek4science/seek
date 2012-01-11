@@ -44,7 +44,8 @@ class Model < ActiveRecord::Base
 
   def content_blob
     # return the first content blob which is jws supported (is_dat? or is_sbml?)
-      Class.new.extend(Seek::ModelTypeDetection).is_jws_supported? self
+      result = Class.new.extend(Seek::ModelTypeDetection).is_jws_supported? self
+      result.nil?? content_blobs.first : result
   end
 
   def studies
