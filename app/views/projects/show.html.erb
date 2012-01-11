@@ -55,7 +55,7 @@
   <div style="clear:both;">
     <b>project hierarchies (<%= link_to_function "hide", visual_effect(:toggle_appear, "project_hierarchy")+"$('project_hierarchy').style.display=='none'? this.innerHTML='hide' : this.innerHTML='show';" %>):</b><br/><br/>
     <div id="project_hierarchy" style="display: block;">
-      <ul><%= tree_editor_display Project, false, false, @project.id, "Person",true, true %></ul>
+      <ul><%= Rails.cache.fetch([:project_tree_editor, @project.cache_key]) {tree_editor_display Project, false, false, @project.id, "Person",true, true} %></ul>
     </div>
   </div>
 
