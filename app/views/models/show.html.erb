@@ -21,6 +21,7 @@
 
 <% if Seek::Config.sycamore_enabled and @display_model.content_blob.file_exists? && Class.new.extend(Seek::ModelTypeDetection).is_sbml?(@display_model) %>
   <ul class="sectionIcons">
+    <% if @model.can_download? -%>
     <li>
       <span class="icon">
         <% form_tag("http://sycamore.eml.org/sycamore/submission.jsp", :id=>'sycamore-form', :target => '_blank') do -%>
@@ -30,6 +31,7 @@
         <% end -%>
       </span>
     </li>
+    <% end -%>
   </ul>
 <% end %>
 
