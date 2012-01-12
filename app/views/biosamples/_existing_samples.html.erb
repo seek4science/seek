@@ -11,10 +11,22 @@
             "aaSorting": [
                 [ 1, "asc" ]
             ],
+            "aoColumns": [
+            null,
+            { "sWidth": "30%" },
+            { "sWidth": "25%" },
+            { "sWidth": "30%" },
+            { "sWidth": "15%" }
+            ],
             "sScrollY": "500px",
             "sDom": "frtiS",
-            "bDeferRender": true
+            "bDeferRender": true,
+            "fnInitComplete": function () {
+            this.fnAdjustColumnSizing(true);
+            this.fnDraw();}
         }).rowGrouping({"sGrupingClass": 'row_group_color'});
+
+        $j('.dataTables_scrollHeadInner, .dataTables_scrollHeadInner table').attr('style', 'width:100%');
 
         /* Click event handler */
         $j('#sample_table tbody tr').click(function() {
@@ -61,9 +73,8 @@
                 %>
                 <%
                    specimen = sample.specimen
-                   specimen_info = 'Cell culture ' + specimen.title
+                   specimen_info = 'Cell culture ' + specimen.lab_internal_number
                 %>
-
                 <tr class="gradeX">
                   <td><%= specimen_info %> </td>
                   <td><%= sample.lab_internal_number %> </td>
@@ -75,6 +86,5 @@
             </tbody>
           </table>
       <% end -%>
-
   <% end -%>
 </div>

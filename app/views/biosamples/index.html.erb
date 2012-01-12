@@ -1,5 +1,5 @@
 <%= javascript_include_tag 'calendar_date_select/calendar_date_select' %>
-<%= javascript_include_tag 'strain.js' %>
+<%= javascript_include_tag 'strain.js', 'biosample.js' %>
 <%= stylesheet_link_tag 'calendar_date_select/default', "styles" %>
 
 <%
@@ -15,7 +15,7 @@
   <h2>Organism</h2>
   <%= select_tag "strain[organism_ids]",
                  options_for_select([["Select Organisms ...", 0]]|all_organisms.collect { |o| [truncate(h(o.title), :length=>select_truncate_length), o.id] }, :selected => default_selected_organisms),
-                 {:onchange=>remote_function(:url=>{:action=>"existing_strains", :controller=>"strains"},
+                 {:onchange=>remote_function(:url=>{:action=>"existing_strains", :controller=>"biosamples"},
                                              :with=>"'organism_ids='+$F('strain_organism_ids')",
                                              :before=>"show_ajax_loader('existing_strains')")+ ";check_show_existing_strains('strain_organism_ids', 'existing_strains', '');hide_existing_specimens();
                                              hide_existing_samples();return(false);",
@@ -31,5 +31,5 @@
 
 <script type="text/javascript">
     var organism = new Array();
-    check_show_existing_strains('strain_organism_ids', 'existing_strains', '<%=url_for(:controller => 'strains', :action => 'existing_strains')-%>');
+    check_show_existing_strains('strain_organism_ids', 'existing_strains', '<%=url_for(:controller => 'biosamples', :action => 'existing_strains')-%>');
 </script>

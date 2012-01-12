@@ -108,48 +108,4 @@ class SamplesController < ApplicationController
     end
   end
 
-  def navigation
-    respond_to do |format|
-      format.html{render :template => 'samples/navigation'}
-    end
-  end
-
-  def existing_samples
-    samples_of_specimens = []
-    specimens = []
-    if params[:specimen_ids]
-      specimen_ids = params[:specimen_ids].split(',')
-      specimen_ids.each do |specimen_id|
-        specimen=Specimen.find_by_id(specimen_id)
-        if specimen and specimen.can_view?
-        specimens << specimen
-        samples=specimen.try(:samples)
-        samples_of_specimens |= samples.select(&:can_view?)
-          end
-      end
-    end
-    render :update do |page|
-        page.replace_html 'existing_samples', :partial=>"samples/existing_samples",:object=>samples_of_specimens,:locals=>{:specimens=>specimens}
-    end
-  end
-
-  def create_sample_popup
-    sample = Sample.find_by_id(params[:sample_id])
-    unless sample
-      specimen = Specimen.find_by_id(params[:specimen_id])
-    else
-      specimen = sample.specimen
-    end
-    respond_to do  |format|
-      if current_user.person.member?
-        format.html{render :partial => 'samples/create_sample_popup', :locals => {:sample => sample, :specimen => specimen}}
-      else
-        flash[:error] = "You are not authorized to create new sample. Only members of known projects, institutions or work groups are allowed to create new content."
-      end
-    end
-  end
-
-  def create_specimen_sample
-  end
-
 end

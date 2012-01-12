@@ -1,33 +1,15 @@
 class StrainsController < ApplicationController
-  before_filter :get_strains,:only=>[:existing_strains_for_assay_organism, :existing_strains, :existing_strains_for_create]
+  before_filter :get_strains,:only=>[:show_existing_strains, :existing_strains_for_assay_organism]
   before_filter :get_strain, :only =>:show_existing_strain
 
-  def existing_strains
-    strains_of_organisms = []
-    organisms = []
-    if params[:organism_ids]
-      organism_ids = params[:organism_ids].split(',')
-      organism_ids.each do |organism_id|
-        organism=Organism.find_by_id(organism_id)
-        if organism
-          organisms << organism
-          strains=organism.try(:strains)
-          strains_of_organisms |= strains ? strains.reject { |s| s.title == 'default' } : strains
-        end
-      end
-    end
-    render :update do |page|
-        page.replace_html 'existing_strains', :partial=>"strains/existing_strains", :object=>strains_of_organisms, :locals=>{:organisms=>organisms}
-    end
-  end
-
-  def existing_strains_for_create
-    partial = "existing_strains_for_create"
+  def show_existing_strains
     render :update do |page|
       if @strains && @organism
-        page.replace_html partial, :partial=>"strains/#{partial}",:object=>@strains,:locals=>{:organism=>@organism}
+        page.visual_effect :fade, 'strain_form', :duration => 0.25
+        page.remove 'existing_strains'
+        page.insert_html :bottom, 'create_based_on_existing_strain', :partial=>"strains/existing_strains",:object=>@strains,:locals=>{:organism=>@organism}
       else
-        page.insert_html :bottom, partial,:text=>""
+        page.insert_html :bottom, 'create_based_on_existing_strain',:text=>""
       end
     end
   end
@@ -42,46 +24,10 @@ class StrainsController < ApplicationController
   def new_strain_form
     @strain = Strain.find_by_id(params[:id]) || Strain.new
     render :update do |page|
-      page.replace_html 'strain_form', :partial=>"strains/form",:locals=>{:strain => @strain, :organism_id => params[:organism_id]}
+      page.visual_effect :fade, 'existing_strains', :duration => 0.25
+      page.remove 'strain_form'
+      page.insert_html :bottom, "create_new_strain",:partial=>"strains/form",:locals=>{:strain => @strain, :action => params[:status], :organism_id => params[:organism_id]}
     end
-    end
-
-  def create_strain_popup
-    strain = Strain.find_by_id(params[:strain_id])
-    respond_to do  |format|
-      if current_user.person.member?
-        format.html{render :partial => 'strains/create_strain_popup', :locals => {:strain => strain}}
-      else
-        flash[:error] = "You are not authorized to create new strain. Only members of known projects, institutions or work groups are allowed to create new content."
-      end
-    end
-  end
-
-  def create
-    strain = select_or_new_strain
-    respond_to do |format|
-      if strain.save
-        format.html {redirect_to :back}
-      else
-        flash[:error] = "Fail to create new strain. #{strain.errors.full_messages}"
-        format.html {redirect_to :back}
-      end
-    end
-  end
-
-  def existing_genotypes_phenotypes
-     strains = Strain.find(:all, :conditions => ["title=?", params[:strain_title]])
-     strains_detail = []
-     strains.each do |strain|
-       genotype_detail = ''
-       strain.genotypes.each do |genotype|
-          genotype_detail << genotype.modification.try(:title) + ' ' + genotype.gene.try(:title) + '; '
-        end
-        strains_detail<< {:id => strain.id, :title => strain.title, :genotype => genotype_detail, :phenotype => strain.phenotype.try(:description)}
-     end
-     render :update do |page|
-        page.replace_html 'existing_genotypes_phenotypes', :partial=>"strains/existing_genotypes_phenotypes", :locals=>{:strains_detail => strains_detail}
-     end
   end
 
   def existing_strains_for_assay_organism
@@ -107,14 +53,13 @@ class StrainsController < ApplicationController
       @strain=Strain.find_by_id(params[:id])
     end
   end
-
   def show
     @strain=Strain.find(params[:id])
     respond_to do |format|
       format.xml
     end
   end
-  
+
   def index
     @strains=Strain.all
     respond_to do |format|
@@ -122,7 +67,20 @@ class StrainsController < ApplicationController
     end
   end
 
-    #if the strain doesnt get changed from UI, just select that strain
+
+  def create
+    strain = select_or_new_strain
+    respond_to do |format|
+      if strain.save
+        format.html {redirect_to :back}
+      else
+        flash[:error] = "Fail to create new strain. #{strain.errors.full_messages}"
+        format.html {redirect_to :back}
+      end
+    end
+  end
+
+  #if the strain doesnt get changed from UI, just select that strain
   #otherwise create the new one
   def select_or_new_strain
     if params['strain']['id'].blank?
