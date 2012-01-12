@@ -9,22 +9,29 @@
             "bAutoWidth": false,
             "bRetrieve": true,
             "aaSorting": [
-                [ 1, "asc" ]
+                [ 2, "asc" ]
             ],
             "aoColumns": [
             null,
-            { "sWidth": "25%" },
-            { "sWidth": "30%" },
-            { "sWidth": "30%" },
-            { "sWidth": "15%" }
+            { "sWidth": "5%", "bSortable": false },
+            { "sWidth": "20%" },
+            { "sWidth": "20%" },
+            { "sWidth": "20%" },
+            { "sWidth": "5%" },
+            { "sWidth": "20%" },
+            { "sWidth": "20%" }
             ]
         }).rowGrouping({"sGrupingClass": 'row_group_color'});
         /* Click event handler */
         $j('#strain_table tbody tr').click(function() {
-            if ($j(this).hasClass('row_selected'))
+            if ($j(this).hasClass('row_selected')){
                 $j(this).removeClass('row_selected');
-            else
+                this.cells[0].firstChild.checked = false;
+            }
+            else{
                 $j(this).addClass('row_selected');
+                this.cells[0].firstChild.checked = true;
+            }
 
             existing_specimens('<%=url_for(:controller => 'biosamples', :action => 'existing_specimens')-%>');
         });
@@ -48,10 +55,13 @@
         <thead>
         <tr>
           <th>Organism</th>
+          <th></th>
           <th>Name</th>
           <th>Genotypes</th>
           <th>Phenotypes</th>
           <th>ID</th>
+          <th>Synonym</th>
+          <th>Comment</th>
         </tr>
         </thead>
         <tbody>
@@ -67,10 +77,13 @@
             %>
             <tr class="gradeA">
               <td><%= link_to strain.organism.title, organism_path(strain.organism.id), {:target => '_blank'} %></td>
+              <td><%= check_box_tag "selected_strain_#{strain.id}" %></td>
               <td><%= strain.title %> </td>
               <td><%= genotype_detail %> </td>
               <td><%= phenotype_detail %></td>
               <td><%= strain.id %></td>
+              <td><%= strain.synonym %> </td>
+              <td><%= strain.comment %></td>
             </tr>
         <% end -%>
         </tbody>

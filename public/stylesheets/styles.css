@@ -1683,8 +1683,8 @@ ul.modification_row li {
 
 div.scroll_box
 {
-height:250px;
-width: 400px;
-overflow:scroll;
+    height:250px;
+    width: 400px;
+    overflow:scroll;
 }
 

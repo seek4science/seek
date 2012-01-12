@@ -67,7 +67,7 @@ function getSelectedStrains() {
     if (strain_table.length != 0){
         var selected_strain_rows = fnGetSelected(strain_table);
         for (var i=0; i< selected_strain_rows.length; i++){
-            strain_ids.push(strain_table.fnGetData(selected_strain_rows[i])[4]);
+            strain_ids.push(strain_table.fnGetData(selected_strain_rows[i])[5]);
         }
     }
     return strain_ids;
