@@ -17,10 +17,7 @@
             { "sWidth": "30%" },
             { "sWidth": "30%" },
             { "sWidth": "15%" }
-            ],
-            "sScrollY": "250px",
-            "sDom": "frtiS",
-            "bDeferRender": true
+            ]
         }).rowGrouping({"sGrupingClass": 'row_group_color'});
         /* Click event handler */
         $j('#strain_table tbody tr').click(function() {
@@ -46,7 +43,7 @@
   <% else -%>
       <p class="none_text">Please click on the strain rows below to see cell cultures.
       </p>
-      <div class="box_simple">
+      <div class="scroll_box">
       <table cellpadding="0" cellspacing="0" class="display" id="strain_table">
         <thead>
         <tr>

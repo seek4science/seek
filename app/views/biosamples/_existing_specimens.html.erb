@@ -13,21 +13,19 @@
                 [ 1, "asc" ]
             ],
             "aoColumns": [
-            null,
-            { "sWidth": "25%" },
-            { "sWidth": "20%" },
-            { "sWidth": "20%" },
-            { "sWidth": "20%" },
-            { "sWidth": "15%" }
+                null,
+                { "sWidth": "25%" },
+                { "sWidth": "20%" },
+                { "sWidth": "20%" },
+                { "sWidth": "20%" },
+                { "sWidth": "15%" }
             ],
-            "sScrollY": "400px",
-            "sDom": "frtiS",
-            "bDeferRender": true,
             "fnInitComplete": function () {
-            this.fnDraw();}
+                this.fnAdjustColumnSizing(true);
+            }
         }).rowGrouping({"sGrupingClass": 'row_group_color'});
 
-         $j('.dataTables_scrollHeadInner, .dataTables_scrollHeadInner table').attr('style', 'width:100%');
+        $j('.dataTables_scrollHeadInner, .dataTables_scrollHeadInner table').attr('style', 'width:100%');
 
         /* Click event handler */
         $j('#specimen_table tbody tr').click(function() {
@@ -42,67 +40,72 @@
 </script>
 
 <div id="existing_specimens">
-  <% unless strains.blank?  %>
-  <h2>Cell culture(chemostat or batch)</h2>
-      <% if logged_in? and current_user.person.member?%>
-                <ul class="sectionIcons">
-                  <li><%= create_sample_popup_link -%></li>
-                  (from new cell culture or based on selected one)
-                </ul>
-                <br/>
-            <% end %>
+  <% unless strains.blank? %>
+      <h2>Cell culture(chemostat or batch)</h2>
 
-  <% if existing_specimens.empty? -%>
-      <p class="none_text">No cell cultures have yet been defined for selected strains.</p>
-  <% else -%>
-      <p class="none_text">Please select the cell cultures to see samples.</p>
-      <table cellpadding="0" cellspacing="0" border="0" class="display" id="specimen_table" style="width: 100%">
-        <thead>
-        <tr>
-          <th>Strain</th>
-          <th>Title</th>
-          <th>Culture starting date</th>
-          <th>Culture type</th>
-          <th>Contributor</th>
-          <th>ID</th>
-        </tr>
-        </thead>
-        <tbody>
-        <%
-           existing_specimens.each do |specimen| -%>
-            <% if specimen.born.nil? %>
-                <% born = '' %>
-            <% else %>
-                <% if specimen.try(:born).hour == 0 and specimen.try(:born).min == 0 and specimen.try(:born).sec == 0 then %>
-                    <% born = specimen.try(:born).strftime('%d/%m/%Y') %>
-                <% else %>
-                    <% born = specimen.try(:born).strftime('%d/%m/%Y @ %H:%M:%S') %>
-                <% end %>
-            <% end %>
-            <%
-               strain = specimen.strain
-               genotype_detail = ''
-               strain.genotypes.each do |genotype|
-                   genotype_detail << genotype.modification.try(:title) + ' ' + genotype.gene.try(:title) + '; ' if genotype.gene
-               end
-               genotype_detail = genotype_detail.blank? ? 'wild-type' : genotype_detail
-               phenotype_detail = strain.phenotype.try(:description).blank? ? 'wild-type' : strain.phenotype.try(:description)
-               strain_info = 'Strain ' + strain.title + "(" + genotype_detail + '/' + phenotype_detail + ')'
-            %>
+      <% if existing_specimens.empty? -%>
+          <p class="none_text">No cell cultures have yet been defined for selected strains.</p>
+      <% else -%>
+          <p class="none_text">Please select the cell cultures to see samples.</p>
 
-            <tr>
-              <td><%= strain_info -%></td>
-              <td><%= specimen.lab_internal_number -%></td>
-              <td><%= born -%></td>
-              <td><%= specimen.culture_growth_type.try(:title) -%></td>
-              <td><%= try_block { specimen.contributor.person.name } -%></td>
-              <td><%= specimen.id %></td>
-            </tr>
-        <% end -%>
-        </tbody>
-      </table>
-  <% end -%>
+          <div class="scroll_box">
+            <table cellpadding="0" cellspacing="0" border="0" class="display" id="specimen_table" style="width: 100%">
+              <thead>
+              <tr>
+                <th>Strain</th>
+                <th>Title</th>
+                <th>Culture starting date</th>
+                <th>Culture type</th>
+                <th>Contributor</th>
+                <th>ID</th>
+              </tr>
+              </thead>
+              <tbody>
+              <%
+                 existing_specimens.each do |specimen| -%>
+                  <% if specimen.born.nil? %>
+                      <% born = '' %>
+                  <% else %>
+                      <% if specimen.try(:born).hour == 0 and specimen.try(:born).min == 0 and specimen.try(:born).sec == 0 then %>
+                          <% born = specimen.try(:born).strftime('%d/%m/%Y') %>
+                      <% else %>
+                          <% born = specimen.try(:born).strftime('%d/%m/%Y @ %H:%M:%S') %>
+                      <% end %>
+                  <% end %>
+                  <%
+                     strain = specimen.strain
+                     genotype_detail = ''
+                     strain.genotypes.each do |genotype|
+                         genotype_detail << genotype.modification.try(:title) + ' ' + genotype.gene.try(:title) + '; ' if genotype.gene
+                     end
+                     genotype_detail = genotype_detail.blank? ? 'wild-type' : genotype_detail
+                     phenotype_detail = strain.phenotype.try(:description).blank? ? 'wild-type' : strain.phenotype.try(:description)
+                     strain_info = 'Strain ' + strain.title + "(" + genotype_detail + '/' + phenotype_detail + ')'
+                  %>
+
+                  <tr>
+                    <td><%= strain_info -%></td>
+                    <td><%= specimen.lab_internal_number -%></td>
+                    <td><%= born -%></td>
+                    <td><%= specimen.culture_growth_type.try(:title) -%></td>
+                    <td><%= try_block { specimen.contributor.person.name } -%></td>
+                    <td><%= specimen.id %></td>
+                  </tr>
+              <% end -%>
+              </tbody>
+            </table>
+          </div>
       <% end -%>
+      <% if logged_in? and current_user.person.member? %>
+          <ul class="sectionIcons">
+            <li><%= create_sample_popup_link -%></li>
+            <br/>
+            <br/>
+            (from new cell culture or based on selected one)
+          </ul>
+          <br/>
+      <% end %>
+  <% end -%>
 </div>
 
 

@@ -1681,4 +1681,10 @@ ul.modification_row li {
     background-color: #dcdcdc;
 }
 
+div.scroll_box
+{
+height:250px;
+width: 400px;
+overflow:scroll;
+}
 
