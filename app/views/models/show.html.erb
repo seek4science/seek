@@ -76,17 +76,18 @@
             </p>
           <p>
           <b>Model visualization</b>(<span style="font-style:italic;">click it to zoom</span>)<br/>
-          <div id="thumbnail">
-
-            <% if  @display_model.model_image %>
+          <!--  Rescale the image according to the proportion.
+               Max.width is the width of its container(div#main_content_left_box_narrower?)-->
+          <div id="thumbnail" >
+            <% if  @display_model.model_image
+             image_width = @display_model.model_image.image_width.nil??  "100px" : @display_model.model_image.image_width
+            %>
             <a href='<%= url_for(:controller=>"models",:action=>"send_image",:id=>@model,:version=>@display_model.version) %>' rel="lightbox">
-               <img src="<%= url_for(:controller=>"models",:action=>"send_image",:id=>@model,:version=>@display_model.version) %>" width="50" height="50"/>
+               <img src="<%= url_for(:controller=>"models",:action=>"send_image",:id=>@model,:version=>@display_model.version) %>" width="<%= image_width %>"  style="max-width: 100%;"/>
             </a>
             <% else %>
             <span class="none_text">None</span>
             <% end %>
-
-
            </div>
          </p>
             <br/>

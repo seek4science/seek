@@ -9,7 +9,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20120102135414) do
+ActiveRecord::Schema.define(:version => 20120111132446) do
 
   create_table "activity_logs", :force => true do |t|
     t.string   "action"
@@ -537,6 +537,8 @@ ActiveRecord::Schema.define(:version => 20120102135414) do
     t.string   "original_content_type"
     t.datetime "created_at"
     t.datetime "updated_at"
+    t.integer  "image_width"
+    t.integer  "image_height"
   end
 
   create_table "model_types", :force => true do |t|
