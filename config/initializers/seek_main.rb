@@ -30,3 +30,5 @@ Seek::Config.propagate_all
 Annotations::Config.attribute_names_to_allow_duplicates.concat(["tag"])
 Annotations::Config.versioning_enabled = false
 
+CELL_CULTURE_OR_SPECIMEN = Seek::Config.is_virtualliver ? 'specimen' : 'cell culture'
+

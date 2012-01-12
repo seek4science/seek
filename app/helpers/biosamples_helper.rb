@@ -17,7 +17,7 @@ module BiosamplesHelper
       { :url => url_for(:controller => 'biosamples', :action => 'create_sample_popup') ,
         :failure => "alert('Sorry, an error has occurred.'); RedBox.close();",
         :with => "'specimen_id=' + getSelectedSpecimens()",
-        :condition => "checkSelectOneSpecimen()"
+        :condition => "checkSelectOneSpecimen('#{CELL_CULTURE_OR_SPECIMEN}')"
       }
       #,
       #:alt => "Click to create a new favourite group (opens popup window)",#options[:tooltip_text],

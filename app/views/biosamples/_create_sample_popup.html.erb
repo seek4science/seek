@@ -19,7 +19,7 @@
 	</div>
 
     <div class="body">
-        <h2>Cell culture</h2>
+        <h2><%= CELL_CULTURE_OR_SPECIMEN.capitalize%></h2>
         <p style="margin-bottom: 1.5em">
           <label style="float: left;"> Title:</label>
           <%= text_field_tag "specimen[title]", @specimen.try(:lab_internal_number), :style => 'float:right;margin-right:30em', :disabled =>  current_user_authorized_to_edit ? false : true %>

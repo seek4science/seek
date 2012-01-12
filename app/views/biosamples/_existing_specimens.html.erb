@@ -32,12 +32,15 @@
 
 <div id="existing_specimens">
   <% unless strains.blank? %>
-      <h2>Cell culture(chemostat or batch)</h2>
-
+      <% if Seek::Config.is_virtualliver %>
+           <h2>Specimen</h2>
+      <% else %>
+           <h2>Cell culture (chemostat or batch)</h2>
+      <% end %>
       <% if existing_specimens.empty? -%>
-          <p class="none_text">No cell cultures have yet been defined for selected strains.</p>
+          <p class="none_text">No <%= CELL_CULTURE_OR_SPECIMEN%>s have yet been defined for selected strains.</p>
       <% else -%>
-          <p class="none_text">Please select the cell cultures to see samples.</p>
+          <p class="none_text">Please select the <%= CELL_CULTURE_OR_SPECIMEN.capitalize%>s to see samples.</p>
 
           <div class="scroll_box">
             <table cellpadding="0" cellspacing="0" border="0" class="display" id="specimen_table" style="width: 100%">
@@ -100,7 +103,7 @@
             <li><%= create_sample_popup_link -%></li>
             <br/>
             <br/>
-            (from new cell culture or based on selected one)
+            (from new <%= CELL_CULTURE_OR_SPECIMEN %> or based on selected one)
           </ul>
           <br/>
       <% end %>

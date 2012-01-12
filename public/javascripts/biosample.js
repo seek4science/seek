@@ -84,49 +84,6 @@ function getSelectedSpecimens() {
     return specimen_ids;
 }
 
-function existing_specimens(url) {
-    var strain_ids = getSelectedStrains().join();
-    if (url != '') {
-        request = new Ajax.Request(url,
-            {
-                method: 'get',
-                parameters: {
-                    strain_ids: strain_ids
-                },
-                onSuccess: function(transport) {
-                    show_existing_specimens();
-                    hide_existing_samples();
-                },
-                onFailure: function(transport) {
-                    alert('Something went wrong, please try again...');
-                }
-            });
-    }
-}
-
-function existing_samples(url){
-    var selected_specimen_rows = fnGetSelected(specimen_table);
-    var specimen_ids  = new Array();
-    for (var i=0; i< selected_specimen_rows.length; i++){
-        specimen_ids.push(specimen_table.fnGetData(selected_specimen_rows[i])[5]);
-    }
-    specimen_ids = specimen_ids.join();
-    if (url != '') {
-        request = new Ajax.Request(url,
-            {
-                method: 'get',
-                parameters: {
-                    specimen_ids: specimen_ids
-                },
-                onSuccess: function(transport) {
-                    show_existing_samples();
-                },
-                onFailure: function(transport) {
-                    alert('Something went wrong, please try again...');
-                }
-            });
-    }
-}
 /* Get the rows which are currently selected */
 function fnGetSelected( oTableLocal )
 {
@@ -151,9 +108,9 @@ function checkSelectOneStrain(){
         return true;
 }
 
-function checkSelectOneSpecimen(){
-   if (getSelectedSpecimens().length > 1){
-       alert('Please select only ONE specimen for this sample to base on, or select NO specimen');
+function checkSelectOneSpecimen(term){
+    if (getSelectedSpecimens().length > 1){
+       alert("Please select only ONE " + term + " for this sample to base on, or select NO " + term);
        return false;
    }else
         return true;
