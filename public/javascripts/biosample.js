@@ -78,7 +78,7 @@ function getSelectedSpecimens() {
     if (specimen_table.length != 0){
         var selected_specimen_rows = fnGetSelected(specimen_table);
         for (var i=0; i< selected_specimen_rows.length; i++){
-            specimen_ids.push(specimen_table.fnGetData(selected_specimen_rows[i])[5]);
+            specimen_ids.push(specimen_table.fnGetData(selected_specimen_rows[i])[6]);
         }
     }
     return specimen_ids;

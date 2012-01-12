@@ -35,7 +35,7 @@
       <p class="none_text">No strains have yet been defined for
         <span style="font-weight: bold;"> <%= h(organisms_title) -%></span>.</p>
   <% else -%>
-      <p class="none_text">Please click on the strain rows below to see cell cultures.
+      <p class="none_text">Please select the strains to see cell cultures.
       </p>
       <div class="scroll_box">
       <table cellpadding="0" cellspacing="0" class="display" id="strain_table">
@@ -64,7 +64,9 @@
             %>
             <tr class="gradeA">
               <td><%= link_to strain.organism.title, organism_path(strain.organism.id), {:target => '_blank'} %></td>
-              <td><%= check_box_tag "selected_strain_#{strain.id}", strain.id, false, {:onchange => remote_function(:url => {:controller => 'biosamples', :action => 'existing_specimens'}, :with => "'strain_ids=' + getSelectedStrains()") } %></td>
+              <td><%= check_box_tag "selected_strain_#{strain.id}", strain.id, false, :onchange => remote_function(:url => {:controller => 'biosamples', :action => 'existing_specimens'}, :with => "'strain_ids=' + getSelectedStrains()") +
+                      ";show_existing_specimens();hide_existing_samples();" %>
+              </td>
               <td><%= strain.title %> </td>
               <td><%= genotype_detail %> </td>
               <td><%= phenotype_detail %></td>

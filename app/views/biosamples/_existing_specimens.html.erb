@@ -10,31 +10,22 @@
             "bAutoWidth": false,
             "bRetrieve": true,
             "aaSorting": [
-                [ 1, "asc" ]
+                [ 2, "asc" ]
             ],
             "aoColumns": [
                 null,
-                { "sWidth": "25%" },
+                { "sWidth": "5%", 'bSortable':false },
                 { "sWidth": "20%" },
-                { "sWidth": "20%" },
-                { "sWidth": "20%" },
-                { "sWidth": "15%" }
+                { "sWidth": "15%" },
+                { "sWidth": "15%" },
+                { "sWidth": "15%" },
+                { "sWidth": "5%" },
+                { "sWidth": "25%" }
             ],
             "fnInitComplete": function () {
                 this.fnAdjustColumnSizing(true);
             }
         }).rowGrouping({"sGrupingClass": 'row_group_color'});
-
-        $j('.dataTables_scrollHeadInner, .dataTables_scrollHeadInner table').attr('style', 'width:100%');
-
-        /* Click event handler */
-        $j('#specimen_table tbody tr').click(function() {
-            if ($j(this).hasClass('row_selected'))
-                $j(this).removeClass('row_selected');
-            else
-                $j(this).addClass('row_selected');
-            existing_samples('<%=url_for(:controller => 'biosamples', :action => 'existing_samples')-%>');
-        });
     });
 
 </script>
@@ -53,11 +44,13 @@
               <thead>
               <tr>
                 <th>Strain</th>
+                <th></th>
                 <th>Title</th>
                 <th>Culture starting date</th>
                 <th>Culture type</th>
                 <th>Contributor</th>
                 <th>ID</th>
+                <th>Related SOPs</th>
               </tr>
               </thead>
               <tbody>
@@ -81,15 +74,21 @@
                      genotype_detail = genotype_detail.blank? ? 'wild-type' : genotype_detail
                      phenotype_detail = strain.phenotype.try(:description).blank? ? 'wild-type' : strain.phenotype.try(:description)
                      strain_info = 'Strain ' + strain.title + "(" + genotype_detail + '/' + phenotype_detail + ')'
+                     sop_links = []
+                     specimen.sops.select(&:can_view?).each do |sop|
+                        sop_links << link_to(sop.title, sop_path(sop.sop_id) + "?version=#{sop.version}", {:target => '_blank'})
+                     end
                   %>
 
                   <tr>
                     <td><%= strain_info -%></td>
+                    <td><%= check_box_tag "selected_specimen_#{specimen.id}", specimen.id, false, {:onchange => remote_function(:url => {:controller => 'biosamples', :action => 'existing_samples'}, :with => "'specimen_ids=' + getSelectedSpecimens()") + ";show_existing_samples();" } %></td>
                     <td><%= specimen.lab_internal_number -%></td>
                     <td><%= born -%></td>
                     <td><%= specimen.culture_growth_type.try(:title) -%></td>
-                    <td><%= try_block { specimen.contributor.person.name } -%></td>
+                    <td><%= try_block{specimen.contributor.person.name}-%></td>
                     <td><%= specimen.id %></td>
+                    <td><%= sop_links.join(", ") -%></td>
                   </tr>
               <% end -%>
               </tbody>
