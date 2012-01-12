@@ -22,19 +22,6 @@
             { "sWidth": "20%" }
             ]
         }).rowGrouping({"sGrupingClass": 'row_group_color'});
-        /* Click event handler */
-        $j('#strain_table tbody tr').click(function() {
-            if ($j(this).hasClass('row_selected')){
-                $j(this).removeClass('row_selected');
-                this.cells[0].firstChild.checked = false;
-            }
-            else{
-                $j(this).addClass('row_selected');
-                this.cells[0].firstChild.checked = true;
-            }
-
-            existing_specimens('<%=url_for(:controller => 'biosamples', :action => 'existing_specimens')-%>');
-        });
     });
 </script>
 
@@ -77,7 +64,7 @@
             %>
             <tr class="gradeA">
               <td><%= link_to strain.organism.title, organism_path(strain.organism.id), {:target => '_blank'} %></td>
-              <td><%= check_box_tag "selected_strain_#{strain.id}" %></td>
+              <td><%= check_box_tag "selected_strain_#{strain.id}", strain.id, false, {:onchange => remote_function(:url => {:controller => 'biosamples', :action => 'existing_specimens'}, :with => "'strain_ids=' + getSelectedStrains()") } %></td>
               <td><%= strain.title %> </td>
               <td><%= genotype_detail %> </td>
               <td><%= phenotype_detail %></td>

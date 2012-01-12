@@ -135,7 +135,7 @@ function fnGetSelected( oTableLocal )
 
 	for ( var i=0 ; i<aTrs.length ; i++ )
 	{
-		if ( $j(aTrs[i]).hasClass('row_selected') )
+		if (aTrs[i].cells[0].firstChild.checked == true)
 		{
 			aReturn.push( aTrs[i] );
 		}
