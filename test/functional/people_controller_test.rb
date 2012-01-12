@@ -244,6 +244,31 @@ class PeopleControllerTest < ActionController::TestCase
     get :show, :id=> people(:aaron_person)
     assert_select ".box_about_actor p", :text=>/Seek ID :/, :count=>0
   end
+
+  def test_current_user_shows_login_name
+    current_user = Factory(:person).user
+    login_as(current_user)
+    get :show, :id=> current_user.person
+    assert_select ".box_about_actor p", :text=>/Login/m
+    assert_select ".box_about_actor p", :text=>/Login.*#{current_user.login}/m
+  end
+
+  def test_not_current_user_doesnt_show_login_name
+    current_user = Factory(:person).user
+    other_person = Factory(:person)
+    login_as(current_user)
+    get :show, :id=> other_person
+    assert_select ".box_about_actor p", :text=>/Login/m,:count=>0
+  end
+
+  def test_admin_sees_non_current_user_login_name
+    current_user = Factory(:admin).user
+    other_person = Factory(:person)
+    login_as(current_user)
+    get :show, :id=> other_person
+    assert_select ".box_about_actor p", :text=>/Login/m
+    assert_select ".box_about_actor p", :text=>/Login.*#{other_person.user.login}/m
+  end
   
   def test_should_update_person
     put :update, :id => people(:quentin_person), :person => { }
