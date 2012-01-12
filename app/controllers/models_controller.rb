@@ -459,10 +459,10 @@ class ModelsController < ApplicationController
     @model.last_used_at = Time.now
     @model.save_without_timestamping    
 
-    if @model.content_blobs.count==1
-       handle_download @model
-    elsif @model.content_blobs.count > 1
-      handle_download_zip @model
+    if @display_model.content_blobs.count==1
+       handle_download @display_model
+    elsif @display_model.content_blobs.count > 1
+      handle_download_zip @display_model
     end
 
   end
