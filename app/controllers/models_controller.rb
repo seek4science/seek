@@ -448,7 +448,7 @@ class ModelsController < ApplicationController
     @model.last_used_at = Time.now
     @model.save_without_timestamping    
 
-    if @model.content_blobs.count==1 and @model.model_image.nil?
+    if @display_model.content_blobs.count==1 and @display_model.model_image.nil?
        handle_download @display_model
     else
       handle_download_zip @display_model
