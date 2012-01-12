@@ -449,9 +449,9 @@ class ModelsController < ApplicationController
     @model.save_without_timestamping    
 
     if @model.content_blobs.count==1 and @model.model_image.nil?
-       handle_download @model
-    elsif
-      handle_download_zip @model
+       handle_download @display_model
+    else
+      handle_download_zip @display_model
     end
 
   end
