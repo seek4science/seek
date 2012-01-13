@@ -33,4 +33,9 @@ fixtures :all
     assert_equal "#{specimen.age} (weeks)",specimen.age_in_weeks
   end
 
+  test "get organism" do
+    specimen = Factory :specimen
+    assert_not_nil specimen.organism
+  end
+
 end

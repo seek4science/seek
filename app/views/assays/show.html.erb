@@ -73,24 +73,8 @@
 
       <p id="organism">
           <b>Organisms: </b>
-          <%= show_assay_organisms_list @assay.assay_organisms %>
+          <%= show_assay_organisms_list @assay.assay_organisms -%>
       </p>
-
-         <p id="specimens">
-           <b>Specimens: </b>
-           <% specimens = [] %>
-           <%if !@assay.samples.blank?
-                @assay.samples.each do |sample|
-                    found = specimens.select{|s|s==sample.specimen}
-                    if found.blank?
-                        specimens << sample.specimen
-                    end
-                 end %>
-            <%= specimens_link_list specimens %>
-           <% else %>
-              <span class='none_text'>Not Specified</span>
-           <% end %>
-             </p>
 
          <p id="Samples">
            <b>Samples: </b>

@@ -164,6 +164,7 @@ end
 #Strain
 Factory.define(:strain) do |f|
   f.sequence(:title) { |n| "Strain#{n}" }
+  f.association :organism
 end
 
 #Culture growth type
@@ -178,7 +179,7 @@ Factory.define(:specimen) do |f|
   f.association :contributor, :factory => :user
   f.projects {[Factory.build(:project)]}
   f.association :institution
-  f.association :organism
+  f.association :strain
 end
 
 #Sample

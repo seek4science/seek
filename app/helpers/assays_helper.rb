@@ -35,20 +35,16 @@ module AssaysHelper
 
         organism = ao.organism
         strain = ao.strain
-        culture_growth_type = ao.culture_growth_type
 
         if organism
-        result += link_to h(organism.title),organism,{:class => "assay_organism_info"}
+        result += link_to h(organism.title),organism
         end
 
         if strain
           result += " : "
-          result += link_to h(strain.title),strain,{:class => "assay_strain_info"}
+          result += h(strain.title)
         end
 
-        if culture_growth_type
-          result += " (#{culture_growth_type.title})"
-        end
         result += ",<br/>" unless ao == assay_organisms.last
 
       end
@@ -58,26 +54,22 @@ module AssaysHelper
   def show_specimen_organisms_list specimens,none_text="Not specified"
     result=""
     result="<span class='none_text'>#{none_text}</span>" if specimens.empty?
-    organisms = specimens.collect{|s|[s.organism,s.strain,s.culture_growth_type]}.uniq
+    organisms = specimens.collect{|s|[s.organism,s.strain]}.uniq
 
     organisms.each do |ao|
 
       organism = ao.first
       strain = ao.second
-      culture_growth_type = ao.third
 
       if organism
-      result += link_to h(organism.title),organism,{:class => "assay_organism_info"}
+      result += link_to h(organism.title),organism
       end
 
       if strain
         result += " : "
-        result += link_to h(strain.title),strain,{:class => "assay_strain_info"}
+        result += h(strain.title)
       end
 
-      if culture_growth_type
-        result += " (#{culture_growth_type.title})"
-      end
       result += ",<br/>" unless ao == organisms.last
 
     end
