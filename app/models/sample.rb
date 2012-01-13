@@ -54,7 +54,6 @@ class Sample < ActiveRecord::Base
     true
   end
 
-  
   def associate_sop sop
     sample_sop = sop_masters.detect{|ss|ss.sop==sop}
 
