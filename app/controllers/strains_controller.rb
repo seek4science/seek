@@ -97,7 +97,6 @@ class StrainsController < ApplicationController
         flag =  flag && (compare_attribute attributes['comment'], strain_params['comment'])
         flag =  flag && (compare_attribute attributes['provider_id'].to_s, strain_params['provider_id'])
         flag =  flag && (compare_attribute attributes['provider_name'], strain_params['provider_name'])
-        flag =  flag && (compare_attribute strain.phenotype.try(:description), params['phenotype']['description'])
         genotype_array = []
         unless params[:genotypes].blank?
           params[:genotypes].each_value do |value|
@@ -105,6 +104,13 @@ class StrainsController < ApplicationController
           end
         end
         flag =  flag && (compare_genotypes strain.genotypes.collect{|genotype| [genotype.gene.try(:title), genotype.modification.try(:title)]}, genotype_array)
+        phenotype_description = []
+        unless params[:phenotypes].blank?
+          params[:phenotypes].each_value do |value|
+            phenotype_description << value['description'] unless value["description"].blank?
+          end
+        end
+        flag =  flag && (compare_attribute strain.phenotype.try(:description), phenotype_description.join('$$$'))
         if flag
           strain
         else
@@ -139,14 +145,20 @@ class StrainsController < ApplicationController
   def new_strain
       strain = Strain.new()
       strain.attributes = params[:strain]
-      phenotype = Phenotype.new()
-      phenotype.attributes = params["phenotype"]
-      if phenotype['description'].blank?
-        strain.phenotype = nil
-      else
-        strain.phenotype = phenotype
+
+      #phenotypes
+      phenotypes_params = params["phenotypes"]
+      phenotype_description = []
+      unless phenotypes_params.blank?
+        phenotypes_params.each_value do |value|
+          phenotype_description << value["description"] unless value["description"].blank?
+        end
+      end
+      unless phenotype_description.blank?
+        strain.phenotype = Phenotype.new(:description => phenotype_description.join('$$$'))
       end
 
+      #genotype
       genotypes_params = params["genotypes"]
       unless genotypes_params.blank?
         genotypes_params.each_value do |value|

@@ -60,22 +60,36 @@
                 </td>
                 <td><%= text_field_tag "genotypes[#{i}][modification][title]", genotype.modification.try(:title), :size => 10 %>
                 </td>
-                <td> <%= link_to_function image("destroy", :alt=>"Delete", :title=>"Delete this entry", :id=> "delete_#{i}"), "fadeRow('#{i}')"-%>
+                <td> <%= link_to_function image("destroy", :alt=>"Delete", :title=>"Delete this entry", :id=> "delete_genotype_#{i}"), "fadeGenotypeRow('#{i}')"-%>
                 </td>
               </tr>
               <% i += 1 %>
              <% end %>
 
         </table>
-        <img src='/images/famfamfam_silk/add.png' alt="Add more" title="Add more gene and mutation" onclick="addRow('genotype_table')"/>
+        <img src='/images/famfamfam_silk/add.png' alt="Add more" title="Add more gene and mutation" onclick="addGenotypeRow('genotype_table')"/>
       </div>
     </center>
 
     <center>
       <div class="yui-u  box_simple" style="width: 42%;margin-right: 2em; margin-top: 1em; margin-bottom: 1em;">
-      <label style="font-weight: bold"> Phenotype:</label>  <br/>
-          <%= text_area_tag "phenotype[description]", strain.phenotype.try(:description), :cols => 28 %>
-            </div>
+         <label style="font-weight: bold; border-bottom: 1px solid #DDD"> Phenotypes:</label>
+        <table id='phenotype_table'>
+          <% j=1
+           unless strain.phenotype.try(:description).blank?
+             strain.phenotype.description.split('$$$').each do |phenotype| %>
+              <tr id='phenotype_row_<%=j%>'>
+                <td> <%= text_field_tag "phenotypes[#{j}][description]", phenotype, :size => 25 %>
+                </td>
+                <td> <%= link_to_function image("destroy", :alt=>"Delete", :title=>"Delete this entry", :id=> "delete_phenotype_#{j}"), "fadePhenotypeRow('#{j}')"-%>
+                </td>
+              </tr>
+              <% j += 1 %>
+             <% end %>
+          <% end %>
+        </table>
+        <img src='/images/famfamfam_silk/add.png' alt="Add more" title="Add more phenotype" onclick="addPhenotypeRow('phenotype_table')"/>
+      </div>
     </center>
   </div>
     <%= hidden_field_tag 'strain[id]', strain.id %>
