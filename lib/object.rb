@@ -1,6 +1,3 @@
-# BioCatalogue: lib/object.rb
-
-# From: http://ozmm.org/posts/try.html
 
 class Object
   #instead of a and a.b and a.b.c and a.b.c.d?
