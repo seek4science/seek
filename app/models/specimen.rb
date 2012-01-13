@@ -20,7 +20,6 @@ class Specimen < ActiveRecord::Base
 
   alias_attribute :description, :comments
   alias_attribute :title, :donor_number
-  alias_attribute :specimen_title, :donor_number
 
   HUMANIZED_COLUMNS = {:donor_number=> "Specimen title"}
 
