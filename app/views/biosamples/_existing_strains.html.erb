@@ -55,12 +55,18 @@
         <%
            existing_strains.each do |strain| -%>
             <%
-               genotype_detail = ''
+               genotype_detail = []
                strain.genotypes.each do |genotype|
-                   genotype_detail << genotype.modification.try(:title) + ' ' + genotype.gene.try(:title) + '; ' if genotype.gene
+                   genotype_detail << genotype.modification.try(:title) + ' ' + genotype.gene.try(:title) if genotype.gene
                end
-               genotype_detail = genotype_detail.blank? ? 'wild-type' : genotype_detail
-               phenotype_detail = strain.phenotype.try(:description).blank? ? 'wild-type' : strain.phenotype.try(:description)
+               genotype_detail = genotype_detail.blank? ? 'wild-type' : genotype_detail.join('; ')
+               phenotype_detail = strain.phenotype.try(:description)
+               if phenotype_detail.blank?
+                 phenotype_detail = 'wild-type'
+               else
+                 phenotype_detail = phenotype_detail.gsub('$$$', '; ')
+               end
+
             %>
             <tr class="gradeA">
               <td><%= link_to strain.organism.title, organism_path(strain.organism.id), {:target => '_blank'} %></td>
