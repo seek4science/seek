@@ -171,7 +171,7 @@ class DataFile < ActiveRecord::Base
     presentation_attrs = attributes.delete_if { |k, v| k=="template_id" || k =="id" }
 
     returning Presentation.new(presentation_attrs) do |presentation|
-      DataFile.reflect_on_all_associations.select { |a| [:has_many, :has_and_belongs_to_many, :has_one].include?(a.macro) }.each do |a|
+      DataFile.reflect_on_all_associations.select { |a| [:has_many, :has_and_belongs_to_many, :has_one].include?(a.macro) && !a.through_reflection }.each do |a|
         #disabled, because even if the user doing the conversion would not normally
         #be able to associate an item with his data_file/presentation, the pre-existing
         #association created by someone who was allowed, should carry over to the presentation
