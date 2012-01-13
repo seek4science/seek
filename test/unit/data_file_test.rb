@@ -219,12 +219,22 @@ class DataFileTest < ActiveSupport::TestCase
 
       data_file.reload
 
+      through_associations_to_test_later = [:creators, :assays]
+      through_associations_to_test_later.each {|a| data_file.send(a).send(:load_target)}
+
+
+     # puts data_file.creators
+      #puts data_file.assays
       presentation = Factory.build :presentation,:contributor=>user
+
       data_file_converted = data_file.to_presentation!
+      data_file_converted = data_file_converted.reload
 
       assert_equal presentation.class.name, data_file_converted.class.name
       assert_equal presentation.attributes.keys.sort!, data_file_converted.attributes.keys.reject{|k|k=='id'}.sort! #???
 
+      #data_file.reload
+      #data file still has some associations that are assigned to data_file_converted, as it is NOT reloaded
       assert_equal data_file.version, data_file_converted.version
       assert_equal data_file.policy.sharing_scope, data_file_converted.policy.sharing_scope
       assert_equal data_file.policy.access_type, data_file_converted.policy.access_type
