@@ -71,7 +71,7 @@ function addPhenotypeRow(tableID) {
     var cell1 = row.insertCell(0);
     var element1 = document.createElement("input");
     element1.type = "text";
-    element1.size = 30;
+    element1.size = 25;
     element1.name = "phenotypes[".concat(rowCount.toString()).concat("][description]")
     element1.id = "phenotypes_".concat(rowCount.toString()).concat("_description")
     cell1.appendChild(element1);

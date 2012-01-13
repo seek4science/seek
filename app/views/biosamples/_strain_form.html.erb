@@ -79,7 +79,7 @@
            unless strain.phenotype.try(:description).blank?
              strain.phenotype.description.split('$$$').each do |phenotype| %>
               <tr id='phenotype_row_<%=j%>'>
-                <td> <%= text_field_tag "phenotypes[#{j}][description]", phenotype, :size => 30 %>
+                <td> <%= text_field_tag "phenotypes[#{j}][description]", phenotype, :size => 25 %>
                 </td>
                 <td> <%= link_to_function image("destroy", :alt=>"Delete", :title=>"Delete this entry", :id=> "delete_phenotype_#{j}"), "fadePhenotypeRow('#{j}')"-%>
                 </td>
@@ -88,7 +88,7 @@
              <% end %>
           <% end %>
         </table>
-        <img src='/images/famfamfam_silk/add.png' alt="Add more" title="Add more gene and mutation" onclick="addPhenotypeRow('phenotype_table')"/>
+        <img src='/images/famfamfam_silk/add.png' alt="Add more" title="Add more phenotype" onclick="addPhenotypeRow('phenotype_table')"/>
       </div>
     </center>
   </div>
