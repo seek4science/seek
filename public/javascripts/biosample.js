@@ -70,7 +70,7 @@ function getSelectedStrains() {
             strain_ids.push(strain_table.fnGetData(selected_strain_rows[i])[5]);
         }
     }
-    return strain_ids;
+    return strain_ids.join(',');
 }
 
 function getSelectedSpecimens() {
@@ -81,7 +81,7 @@ function getSelectedSpecimens() {
             specimen_ids.push(specimen_table.fnGetData(selected_specimen_rows[i])[6]);
         }
     }
-    return specimen_ids;
+    return specimen_ids.join(',');
 }
 
 /* Get the rows which are currently selected */
@@ -101,7 +101,7 @@ function fnGetSelected( oTableLocal )
 }
 
 function checkSelectOneStrain(){
-   if (getSelectedStrains().length > 1){
+   if (getSelectedStrains().split(',').length > 1){
        alert('Please select only ONE strain for this new strain to base on.');
        return false;
    }else
@@ -109,7 +109,7 @@ function checkSelectOneStrain(){
 }
 
 function checkSelectOneSpecimen(term){
-    if (getSelectedSpecimens().length > 1){
+    if (getSelectedSpecimens().split(',').length > 1){
        alert("Please select only ONE " + term + " for this sample to base on, or select NO " + term);
        return false;
    }else
