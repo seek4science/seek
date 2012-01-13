@@ -36,6 +36,7 @@ fixtures :all
   test "get organism" do
     specimen = Factory :specimen
     assert_not_nil specimen.organism
+
   end
 
 end

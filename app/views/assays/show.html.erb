@@ -73,7 +73,7 @@
 
       <p id="organism">
           <b>Organisms: </b>
-          <%= show_assay_organisms_list @assay.assay_organisms -%>
+          <%= list_assay_organism_and_strains( @assay.assay_organisms.collect{|ao| [ao.organism,ao.strain]} | @assay.samples.collect{|s| [s.specimen.organism,s.specimen.strain]}) -%>
       </p>
 
          <p id="Samples">

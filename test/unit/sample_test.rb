@@ -33,4 +33,5 @@ class SampleTest < ActiveSupport::TestCase
     #s.strains=[]
     #assert !s.valid?
   end
+
 end

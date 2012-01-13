@@ -27,16 +27,16 @@ module AssaysHelper
     end
     return result
   end
-  def show_assay_organisms_list assay_organisms,none_text="Not specified"
-      result=""
-      result="<span class='none_text'>#{none_text}</span>" if assay_organisms.empty?
-      result += "<br/>"
-    assay_organisms.each do |ao|
 
-        organism = ao.organism
-        strain = ao.strain
-
-        if organism
+  # takes an array of [organism,strain] where strain can be nil if not defined
+  def list_assay_organism_and_strains organism_and_strains,none_text="Not specified"
+    result=""
+    result="<span class='none_text'>#{none_text}</span>" if organism_and_strains.empty?
+    result += "<br/>"
+    organism_and_strains.each do |os|
+      organism=os[0]
+      strain=os[1]
+      if organism
         result += link_to h(organism.title),organism
         end
 
@@ -45,11 +45,10 @@ module AssaysHelper
           result += h(strain.title)
         end
 
-        result += ",<br/>" unless ao == assay_organisms.last
-
-      end
-      result
+        result += ",<br/>" unless os==organism_and_strains.last
     end
+    result
+  end
 
   def show_specimen_organisms_list specimens,none_text="Not specified"
     result=""
