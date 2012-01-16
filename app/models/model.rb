@@ -37,9 +37,14 @@ class Model < ActiveRecord::Base
     belongs_to :model_type
     belongs_to :model_format
 
-      def content_blobs
-          ContentBlob.find(:all, :conditions => ["asset_id =? and asset_type =? and asset_version =?", self.parent.id, self.parent.class.name, self.version])
-      end
+    def content_blobs
+      ContentBlob.find(:all, :conditions => ["asset_id =? and asset_type =? and asset_version =?", self.parent.id, self.parent.class.name, self.version])
+    end
+
+    def content_blob
+      result = Class.new.extend(Seek::ModelTypeDetection).is_jws_supported? self
+      result.nil?? content_blobs.first : result
+    end
   end
 
   def content_blob
