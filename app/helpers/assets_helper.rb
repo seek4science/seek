@@ -149,7 +149,7 @@ module AssetsHelper
         related["Project"][:items] = resource.projects
         related["Assay"][:items] = resource.assays
         related["Model"][:items] = resource.models
-        related["Sample"][:items] = resource.specimens.collect{|spec| spec.sample}
+        related["Sample"][:items] = resource.specimens.collect{|spec| spec.samples}.flatten
       when "Person"
         related["Project"][:items] = resource.projects
         related["Institution"][:items] = resource.institutions

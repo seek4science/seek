@@ -17,7 +17,6 @@ class Specimen < ActiveRecord::Base
   belongs_to :strain
 
   has_one :organism, :through=>:strain
-  has_one :sample
 
   alias_attribute :description, :comments
   alias_attribute :title, :donor_number
