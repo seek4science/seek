@@ -76,8 +76,9 @@ class Person < ActiveRecord::Base
   RELATED_RESOURCE_TYPES = [:data_files,:models,:sops,:presentations,:events,:publications]
   RELATED_RESOURCE_TYPES.each do |type|
     define_method "related_#{type}" do
-      user_items = user.try(:send,type) || []
-      user_items | self.send("created_#{type}".to_sym) if self.respond_to? "created_#{type}".to_sym
+      user_items = []
+      user_items =  user.try(:send,type) if user.respond_to?(type) && type == :events
+      user_items =  user_items | self.send("created_#{type}".to_sym) if self.respond_to? "created_#{type}".to_sym
       user_items
     end
   end
