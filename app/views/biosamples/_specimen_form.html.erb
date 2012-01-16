@@ -28,6 +28,8 @@
           <%= text_field_tag "specimen[provider_name]", nil, :style => 'float:right;margin-right:30em' %>
         </p>
 
+<br/>
+
         <%= render :partial => 'projects/project_selector', :locals => {:resource => Specimen.new()}%>
 
         <br/>
