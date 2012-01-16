@@ -205,20 +205,17 @@ module AssetsHelper
           related[k][:items] = v unless v.nil?
         end
       when "Specimen"
-
         related["Institution"][:items] = [resource.institution]
         related["Person"][:items] = resource.creators
         related["Project"][:items] = resource.projects
         related["Sample"][:items] = resource.samples
         related["Sop"][:items] = resource.sops
-
       when "Sample"
         related["Specimen"][:items] = [resource.specimen]
         related["Institution"][:items] = [resource.institution]
         related["Project"][:items] = resource.projects
         related["Assay"][:items] = resource.assays
         related["Sop"][:items] = resource.sops
-
       else
     end
     
