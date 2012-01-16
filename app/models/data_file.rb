@@ -54,7 +54,7 @@ class DataFile < ActiveRecord::Base
   explicit_versioning(:version_column => "version") do
     include SpreadsheetUtil
     acts_as_versioned_resource
-    
+    has_one :content_blob,:primary_key => :data_file_id,:foreign_key => :asset_id,:conditions => 'content_blobs.asset_version= #{self.version} and content_blobs.asset_type = "#{self.parent.class.name}"'
     has_many :studied_factors, :primary_key => "data_file_id", :foreign_key => "data_file_id", :conditions =>  'studied_factors.data_file_version = #{self.version}'
     
     def relationship_type(assay)
@@ -65,12 +65,17 @@ class DataFile < ActiveRecord::Base
       returning Presentation::Version.new do |presentation_version|
         presentation_version.attributes.keys.each do |attr|
           presentation_version.send("#{attr}=", send("#{attr}")) if respond_to? attr and attr!="id"
-          DataFile.reflect_on_all_associations.select { |a| [:has_many, :has_and_belongs_to_many, :has_one].include?(a.macro) }.each do |a|
-            disable_authorization_checks do
-              presentation_version.send("#{a.name}=", send(a.name)) if presentation_version.respond_to?("#{a.name}=")
+        end
+        DataFile::Version.reflect_on_all_associations.select { |a| [:has_many, :has_and_belongs_to_many, :has_one].include?(a.macro) }.each do |a|
+          disable_authorization_checks do
+            presentation_version.send("#{a.name}=", send(a.name)) if presentation_version.respond_to?("#{a.name}=")
+            #asset_type: 'DataFile' --> 'Presentation'. As the above assignment only change the asset_id
+            if a.name == :content_blob
+              presentation_version.send(a.name).send "asset_type=", "Presentation"
             end
           end
         end
+
       end
     end
   end
@@ -149,6 +154,10 @@ class DataFile < ActiveRecord::Base
       class << presentation
         #disabling versioning, since I have manually copied the versions of the data file over
         def save_version_on_create
+        end
+
+        def set_new_version
+          self.version = DataFile.find(self.orig_data_file_id).version
         end
       end
 

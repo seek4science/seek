@@ -34,9 +34,13 @@ class Model < ActiveRecord::Base
     belongs_to :model_type
     belongs_to :model_format
 
-      def content_blobs
-          ContentBlob.find(:all, :conditions => ["asset_id =? and asset_type =? and asset_version =?", self.parent.id, self.parent.class.name, self.version])
-      end
+    def content_blobs
+      ContentBlob.find(:all, :conditions => ["asset_id =? and asset_type =? and asset_version =?", self.parent.id, self.parent.class.name, self.version])
+    end
+
+    def content_blob
+      self.content_blobs.last
+    end
   end
 
   def content_blob

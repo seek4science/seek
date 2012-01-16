@@ -26,7 +26,7 @@ class Sop < ActiveRecord::Base
   explicit_versioning(:version_column => "version") do
     
     acts_as_versioned_resource
-    
+    has_one :content_blob,:primary_key => :sop_id,:foreign_key => :asset_id,:conditions => 'content_blobs.asset_version= #{self.version} and content_blobs.asset_type = "#{self.parent.class.name}"'
     has_many :experimental_conditions, :primary_key => "sop_id", :foreign_key => "sop_id", :conditions =>  'experimental_conditions.sop_version = #{self.version}'
     
   end
