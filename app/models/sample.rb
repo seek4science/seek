@@ -19,6 +19,8 @@ class Sample < ActiveRecord::Base
   validates_presence_of :specimen,:lab_internal_number
   validates_presence_of :donation_date if Seek::Config.is_virtualliver
 
+  acts_as_favouritable
+
   def self.sop_sql()
   'SELECT sop_versions.* FROM sop_versions ' +
   'INNER JOIN sample_sops ' +
