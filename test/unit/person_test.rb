@@ -469,15 +469,15 @@ class PersonTest < ActiveSupport::TestCase
   test "related resource" do
     user = Factory :user
     person = user.person
-    Factory :data_file,:contributor=>user
-    Factory :model,:contributor=>user
-    Factory :sop,:contributor=>user
+    AssetsCreator.create :asset=>Factory(:data_file),:creator=> person
+    AssetsCreator.create :asset=>Factory(:model),:creator=> person
+    AssetsCreator.create :asset=>Factory(:sop),:creator=> person
     Factory :event,:contributor=>user
     AssetsCreator.create :asset=>Factory(:presentation),:creator=> person
     AssetsCreator.create :asset=>Factory(:publication),:creator=>person
-    assert_equal user.data_files, person.related_data_files
-    assert_equal user.models, person.related_models
-    assert_equal user.sops,  person.related_sops
+    assert_equal person.created_data_files, person.related_data_files
+    assert_equal person.created_models, person.related_models
+    assert_equal person.created_sops,  person.related_sops
     assert_equal user.events, person.related_events
     assert_equal person.created_presentations, person.related_presentations
     assert_equal person.created_publications, person.related_publications

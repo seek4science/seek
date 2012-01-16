@@ -29,6 +29,8 @@ class DataFilesController < ApplicationController
 
       if !@presentation.new_record?
         disable_authorization_checks do
+          # first reload all associations which are already assigned to the presentation. Otherwise, all associations will be destroyed when data file is destroyed
+          @data_file.reload
           @data_file.destroy
         end
         flash[:notice]="Data File '#{@presentation.title}' is successfully converted to Presentation"
