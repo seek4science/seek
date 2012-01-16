@@ -30,3 +30,7 @@
         </p>
 
 
+        <%= render :partial => 'projects/project_selector', :locals => {:resource => Sample.new()}%>
+        <%= render :partial => "assets/sharing_form", :locals => {:object => Sample.new(), :disable_advanced_view => true} -%>
+
+

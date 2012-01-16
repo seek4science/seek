@@ -420,8 +420,8 @@ module ApplicationHelper
     count
   end
 
-  def set_parameters_for_sharing_form
-    object = eval "@#{controller_name.singularize}"
+  def set_parameters_for_sharing_form object=nil
+    object ||= eval "@#{controller_name.singularize}"
     policy = nil
     policy_type = ""
 

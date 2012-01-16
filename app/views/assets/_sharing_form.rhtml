@@ -1,5 +1,7 @@
 <%
-   set_parameters_for_sharing_form
+   object ||= nil
+   set_parameters_for_sharing_form object
+   disable_advanced_view ||= nil
    show_advanced_permissions = !@resource.respond_to?(:has_advanced_permissions?) || @resource.has_advanced_permissions?
    default_projects_access_type = @resource.is_asset? ? Policy::ACCESSIBLE : Policy::EDITING
    default_consortium_access_type = Policy::VISIBLE
@@ -34,7 +36,9 @@
           <% if try_block{@resource.can_publish?} %>
             <li>Share with the all visitors (including anonymous visitors with no login)</li>
           <% end %>
-          <li>Define more fine-grained sharing in the <em>Advanced sharing</em>: you can share within your Project/Institution only,<br/> with specific individuals, or set up custom favourite groups for people you regularly need to share with.</li>
+          <% if !disable_advanced_view%>
+            <li>Define more fine-grained sharing in the <em>Advanced sharing</em>: you can share within your Project/Institution only,<br/> with specific individuals, or set up custom favourite groups for people you regularly need to share with.</li>
+          <% end %>
         </ul>
       </div>
     </div>
@@ -99,22 +103,22 @@
         </script>
     <% end -%>
 
+    <% if !disable_advanced_view %>
+      <%= link_to_function "Advanced permissions " + expand_image, :class => 'advanced_sharing_link', :style => "display:" + (show_advanced_permissions ? 'none;' : 'block;'), :id =>'advanced_sharing_expand_image' do |page|
+          page.visual_effect :toggle_blind, "advanced sharing", :duration => 0.5
+          page["advanced_sharing_expand_image"].toggle
+          page["advanced_sharing_collapse_image"].toggle
+      end
+      -%>
+      <%= link_to_function "Advanced permissions " + collapse_image, :class => 'advanced_sharing_link', :style => "display:" + (show_advanced_permissions ? 'block;' : 'none;'), :id =>'advanced_sharing_collapse_image' do |page|
+          page.visual_effect :toggle_blind, "advanced sharing", :duration => 0.5
+          page["advanced_sharing_expand_image"].toggle
+          page["advanced_sharing_collapse_image"].toggle
+      end
+      -%>
+      <br/>
 
-    <%= link_to_function "Advanced permissions " + expand_image, :class => 'advanced_sharing_link', :style => "display:" + (show_advanced_permissions ? 'none;' : 'block;'), :id =>'advanced_sharing_expand_image' do |page|
-        page.visual_effect :toggle_blind, "advanced sharing", :duration => 0.5
-        page["advanced_sharing_expand_image"].toggle
-        page["advanced_sharing_collapse_image"].toggle
-        end
-    -%>
-    <%= link_to_function "Advanced permissions " + collapse_image, :class => 'advanced_sharing_link', :style => "display:" + (show_advanced_permissions ? 'block;' : 'none;'), :id =>'advanced_sharing_collapse_image'do |page|
-        page.visual_effect :toggle_blind, "advanced sharing", :duration => 0.5
-        page["advanced_sharing_expand_image"].toggle
-        page["advanced_sharing_collapse_image"].toggle
-        end
-    -%>
-    <br/>
-
-    <div id="advanced sharing" class='sharing_box_form' style="display:<%= show_advanced_permissions ? 'block;' : 'none;'-%>">
+      <div id="advanced sharing" class='sharing_box_form' style="display:<%= show_advanced_permissions ? 'block;' : 'none;' -%>">
         <p style="font-weight: bold;">Additional fine-grained sharing permissions</p>
 
         <div id="specific_sharing" style="display:block; margin-top: 1em;">
@@ -122,6 +126,7 @@
             <p style="color: #666666;">
               So far you have selected to share this <%= @resource_type -%> with:
             </p>
+
             <p id="shared_with_list" class="box_editing_inner" style="line-height: 1.5;">
               <span class="none_text" id="shared_with_text">Loading...</span>
             </p>
@@ -149,7 +154,7 @@
                   <%= select_tag "favourite_group_select", f_group_select_options, :style => "width: 82%; vertical-align: middle; margin-right: 0.4em;", :disabled => (favourite_groups.blank?) -%>
 
                   <%= link_to "Add", "", :id => "add_f_group_link", :style => "font-weight: bold; vertical-align: middle;", :disabled => (favourite_groups.blank?),
-                    :onclick => "javascript: if($('favourite_group_select').disabled) return(false); addContributor('FavouriteGroup', $('favourite_group_select').options[$('favourite_group_select').selectedIndex].text, parseInt($('favourite_group_select').options[$('favourite_group_select').selectedIndex].value), #{Policy::DETERMINED_BY_GROUP}); return(false);" -%>
+                              :onclick => "javascript: if($('favourite_group_select').disabled) return(false); addContributor('FavouriteGroup', $('favourite_group_select').options[$('favourite_group_select').selectedIndex].text, parseInt($('favourite_group_select').options[$('favourite_group_select').selectedIndex].value), #{Policy::DETERMINED_BY_GROUP}); return(false);" -%>
                 </p>
                 <ul style="text-align: left; margin: 1em 0 0.5em 3.2em;">
                   <li id="edit_f_group_li" style="display: <%= favourite_groups.blank? ? "none" : "block" -%>; list-style-type: disc; padding: 0;"><%= favourite_group_popup_link_action_edit(@resource.class.name) -%></li>
@@ -193,8 +198,8 @@
                       <%= image_tag icon_filename_for_key("spinner"), :id => "institutions_loading_spinner", :alt=>"loading...", :title=>"loading...", :style => "display: none; vertical-align: middle; float: right;" -%>
                       <span class="note_text" style="line-height: 1.5;">Step 1:</span> Select a project
                       <%= select("proj_project", "select",
-                        Project.find(:all).collect {|p| [ p.name, p.id ] },
-                        {:include_blank => 'All Projects @ Institution (from Step 2)'}, {:style => "width: 100%; vertical-align: middle; margin: 0.3em 0;"}) -%>
+                                 Project.find(:all).collect { |p| [p.name, p.id] },
+                                 {:include_blank => 'All Projects @ Institution (from Step 2)'}, {:style => "width: 100%; vertical-align: middle; margin: 0.3em 0;"}) -%>
                     </div>
 
                     <!-- step 2 -->
@@ -205,10 +210,11 @@
 
                     <!-- step 3 -->
                     <div id="proj_select_step_div_3" style="display: none; margin: 0; padding: 0;">
-                      <span class="note_text" style="line-height: 1.5;">Step 3:</span> Choose access rights, review and submit
+                      <span class="note_text" style="line-height: 1.5;">Step 3:</span> Choose access rights, review and
+                      submit
 
                       <select name="proj_access_type_select" id="proj_access_type_select" onchange="javascript: replaceReviewWorkGroupURL();" style="width: 100%; vertical-align: middle; margin: 0.3em 0;">
-                        <%= policy_selection_options [Policy::NO_ACCESS,Policy::VISIBLE,Policy::ACCESSIBLE,Policy::EDITING,Policy::MANAGING], @resource -%>
+                        <%= policy_selection_options [Policy::NO_ACCESS, Policy::VISIBLE, Policy::ACCESSIBLE, Policy::EDITING, Policy::MANAGING], @resource -%>
                       </select>
                     </div>
 
@@ -220,16 +226,17 @@
                       <span id="proj_select_next_link" style="display: inline; float: right;">
                         <%= link_to "Next step >", "", :onclick => "javascript: projectInstitutionStepAction(1); return(false);", :style => "font-weight: bold;" -%>
                       </span>
-                      <div id="proj_select_add_link" style="display: none; float: right;">
-                        <ul style="margin-left: 1.2em; text-align: left;">
-                          <li style="list-style-type: disc; padding: 0.3em 0;">
-                            <%= link_to "Add immediately", "", :onclick => "javascript: addProjectInstitution(); return(false);", :style => "font-weight: bold; padding: 0;" -%>
-                          </li>
-                          <li style="list-style-type: disc; padding: 0;">
-                            <div id="work_group_parent_span"><%= workgroup_member_review_popup_link(@resource.class.name) -%></div>
-                          </li>
-                        </ul>
-                      </div>
+
+                    <div id="proj_select_add_link" style="display: none; float: right;">
+                      <ul style="margin-left: 1.2em; text-align: left;">
+                        <li style="list-style-type: disc; padding: 0.3em 0;">
+                          <%= link_to "Add immediately", "", :onclick => "javascript: addProjectInstitution(); return(false);", :style => "font-weight: bold; padding: 0;" -%>
+                        </li>
+                        <li style="list-style-type: disc; padding: 0;">
+                          <div id="work_group_parent_span"><%= workgroup_member_review_popup_link(@resource.class.name) -%></div>
+                        </li>
+                      </ul>
+                    </div>
                     </p>
                     <div class="clearer"></div>
                   </div>
@@ -249,7 +256,8 @@
                 <div id="facebook" class="clearfix">
 
                   <p style="text-align: justify;">
-                    Please type names of people to share this <%= @resource_type -%> with into the box below - suggestions will be displayed as you type.
+                    Please type names of people to share this <%= @resource_type -%> with into the box below -
+                    suggestions will be displayed as you type.
                     Select access rights from drop-down menu; these will be applied to all chosen people.
                     Clicking "Add" will add selected people to the list.
                   </p>
@@ -258,10 +266,10 @@
                     <tr>
                       <td class="box_editing_inner">
                         <div tabindex="-1" id="ids" class="clearfix tokenizer" onclick="$('ip_autocomplete_input').focus();" style="width: 340px;">
-                          <span class="tokenizer_stretcher">^_^</span><span class="tab_stop"><input type="text" id="ip_hidden_input" tabindex="-1" ></span>
+                          <span class="tokenizer_stretcher">^_^</span><span class="tab_stop"><input type="text" id="ip_hidden_input" tabindex="-1"></span>
 
                           <div id="ip_autocomplete_display" class="tokenizer_input">
-                            <input type="text" size="1" tabindex="" id="ip_autocomplete_input" />
+                            <input type="text" size="1" tabindex="" id="ip_autocomplete_input"/>
                           </div>
                         </div>
                         <div id="ip_autocomplete_populate" class="clearfix autocomplete typeahead_list" style="width: 343px; height: auto; overflow-y: hidden;display:none">
@@ -282,21 +290,21 @@
 
 
                 <script type="text/javascript">
-                  var people_list = <%= @all_people_as_json -%>;
-                  var prepopulate_with = [];
+                    var people_list = <%= @all_people_as_json -%>;
+                    var prepopulate_with = [];
 
-                  var individual_people_autocompleter = new Autocompleter.LocalAdvanced(
-                  individual_people_autocompleter_id, 'ip_autocomplete_input', 'ip_autocomplete_display', 'ip_autocomplete_populate', people_list, prepopulate_with, {
-                    frequency: 0.1,
-                    updateElement: addAction,
-                    search_field: "name",
-                    hint_field: "email",
-                    id_field: "id",
-                    validation_type: "only_suggested"
-                  });
-                  var hidden_input = new HiddenInput('ip_hidden_input',individual_people_autocompleter);
+                    var individual_people_autocompleter = new Autocompleter.LocalAdvanced(
+                            individual_people_autocompleter_id, 'ip_autocomplete_input', 'ip_autocomplete_display', 'ip_autocomplete_populate', people_list, prepopulate_with, {
+                                frequency: 0.1,
+                                updateElement: addAction,
+                                search_field: "name",
+                                hint_field: "email",
+                                id_field: "id",
+                                validation_type: "only_suggested"
+                            });
+                    var hidden_input = new HiddenInput('ip_hidden_input', individual_people_autocompleter);
 
-                  autocompleters[individual_people_autocompleter_id] = individual_people_autocompleter;
+                    autocompleters[individual_people_autocompleter_id] = individual_people_autocompleter;
                 </script>
               </div>
             </div>
@@ -305,7 +313,8 @@
         </div>
         <br/>
 
-  </div>
+      </div>
+  <% end %>
   </div>
 </div>
 
