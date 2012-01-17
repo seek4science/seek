@@ -36,7 +36,49 @@
     var organism = new Array();
     check_show_existing_strains('strain_organism_ids', 'existing_strains', '<%=url_for(:controller => 'biosamples', :action => 'existing_strains')-%>');
 
-function updateCreatorSettings() {
+    function strains_of_selected_organism(organism_id){
+        var option;
+        var selection_box = $('specimen_strain_id');
+        selection_box.options.length=0;
+
+        <% ([Strain.new(:title => 'Select Strain ...')] | Strain.find(:all).sort_by(&:title).reject{|s| s.title == 'default'}).each do |strain| -%>
+
+            if ('<%= strain.title -%>' == 'Select Strain ...'){
+               option = document.createElement("OPTION");
+                option.text = '<%= escape_javascript(strain.title) -%>';
+                option.value = 0;
+                try {
+                  selection_box.add(option); //for older IE version
+                }
+                catch (ex) {
+                  selection_box.add(option, null);
+                }
+            }
+            else if ('<%= strain.organism_id -%>' == organism_id){
+                <%
+                    genotype_detail = ''
+                     strain.genotypes.each do |genotype|
+                         genotype_detail << genotype.modification.try(:title) + ' ' + genotype.gene.try(:title) + '; ' if genotype.gene
+                     end
+                     genotype_detail = genotype_detail.blank? ? 'wild-type' : genotype_detail
+                     phenotype_detail = strain.phenotype.try(:description).blank? ? 'wild-type' : strain.phenotype.try(:description).gsub('$$$', '; ')
+                     strain_info = strain.title + "(" + genotype_detail + '/' + phenotype_detail + ')'
+                     %>
+                option = document.createElement("OPTION");
+                option.text = '<%= escape_javascript(strain_info) -%>';
+                option.value = '<%= strain.id -%>';
+                try {
+                  selection_box.add(option); //for older IE version
+                }
+                catch (ex) {
+                  selection_box.add(option, null);
+                }
+            }
+         <% end %>
+
+    }
+
+    function updateCreatorSettings() {
     // iterate through all creators and build the "shared with" list;
     // in the meanwhile also assemble a minimized version of the array that
     // could be posted with the form (this won't have item titles in it)
