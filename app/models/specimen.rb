@@ -21,9 +21,9 @@ class Specimen < ActiveRecord::Base
   alias_attribute :description, :comments
 
   validates_numericality_of :age, :only_integer => true, :greater_than=> 0, :allow_nil=> true, :message => "is not a positive integer"
-  validates_presence_of :title
+  validates_presence_of :title,:lab_internal_number, :contributor, :projects,:strain
 
-  validates_presence_of :contributor, :projects,:institution,:strain, :lab_internal_number
+  validates_presence_of :institution if Seek::Config.is_virtualliver
   validates_uniqueness_of :title
 
   def self.sop_sql()
@@ -46,6 +46,9 @@ class Specimen < ActiveRecord::Base
     text :strain do
       strain.try :title
     end
+    text :institution do
+      institution.try :name
+    end if Seek::Config.is_virtualliver
   end if Seek::Config.solr_enabled
 
   acts_as_authorized

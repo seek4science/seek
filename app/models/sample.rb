@@ -38,9 +38,6 @@ class Sample < ActiveRecord::Base
     text :assays do
       assays.map{|a| a.title}
     end
-    text :institution do
-      institution.try :name
-    end
     text :specimen do
       specimen.try :title
     end
