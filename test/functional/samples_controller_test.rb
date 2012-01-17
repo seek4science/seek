@@ -4,8 +4,10 @@ class SamplesControllerTest < ActionController::TestCase
 fixtures :all
   include AuthenticatedTestHelper
   include RestTestCases
+
   # Called before every test method runs. Can be used
   # to set up fixture information.
+
   def setup
     login_as Factory(:user,:person => Factory(:person,:is_admin=> false))
     @object = Factory(:sample,:contributor => User.current_user,
@@ -22,7 +24,6 @@ fixtures :all
     assert_response :success
     assert_not_nil assigns(:samples)
     validate_xml_against_schema(@response.body)
-
   end
 
   test "show xml validates with schema" do
@@ -40,22 +41,48 @@ fixtures :all
     assert_response :success
     assert_not_nil assigns(:samples)
   end
+
   test "should get new" do
     get :new
     assert_response :success
     assert_not_nil assigns(:sample)
-
   end
+
   test "should create" do
+    specimen = Factory(:specimen, :contributor => User.current_user)
     assert_difference("Sample.count") do
       post :create, :sample => {:title => "test",
                                 :lab_internal_number =>"Do232",
                                 :donation_date => Date.today,
-                                :specimen => Factory(:specimen, :contributor => User.current_user)}
+                                :specimen_id => specimen.id }
     end
     s = assigns(:sample)
     assert_redirected_to sample_path(s)
     assert_equal "test", s.title
+    assert_equal specimen,s.specimen
+  end
+
+  test "should create sample and specimen" do
+    assert_difference("Sample.count") do
+      assert_difference("Specimen.count") do
+        post :create, :sample => {
+            :title => "test",
+                      :lab_internal_number =>"Do232",
+                      :donation_date => Date.today,
+                      :specimen => {:projects => [Factory(:project)],
+                                    :strain => Factory(:strain),
+                                    :lab_internal_number=>"Lab number",
+                                    :title=>"Donor number",
+                                    :contributor=>User.current_user
+                      }
+        }
+      end
+    end
+    s = assigns(:sample)
+    assert_redirected_to sample_path(s)
+    assert_equal "test",s.title
+    assert_not_nil s.specimen
+    assert_equal "Donor number",s.specimen.title
   end
 
   test "should get show" do
@@ -69,6 +96,7 @@ fixtures :all
     assert_response :success
     assert_not_nil assigns(:sample)
   end
+
   test "should update" do
     s = Factory(:sample, :title=>"oneSample", :policy =>policies(:editing_for_all_sysmo_users_policy))
     assert_not_equal "test", s.title
@@ -84,17 +112,20 @@ fixtures :all
       delete :destroy, :id => s.id
     end
   end
+
   test "unauthorized users cannot add new samples" do
     login_as Factory(:user,:person => Factory(:brand_new_person))
     get :new
     assert_response :redirect
   end
+
   test "unauthorized user cannot edit sample" do
     s = Factory :sample, :policy => Factory(:private_policy), :contributor => Factory(:user)
     get :edit, :id =>s.id
     assert_redirected_to sample_path(s)
     assert flash[:error]
   end
+
   test "unauthorized user cannot update sample" do
     s = Factory :sample, :policy => Factory(:private_policy), :contributor => Factory(:user)
 
@@ -113,7 +144,6 @@ fixtures :all
   end
 
   test "only current user can delete sample" do
-
     s = Factory :sample, :contributor => User.current_user
     assert_difference("Sample.count", -1, "A sample should be deleted") do
       delete :destroy, :id => s.id

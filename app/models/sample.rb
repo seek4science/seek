@@ -4,9 +4,15 @@ require 'acts_as_authorized'
 class Sample < ActiveRecord::Base
   include Subscribable
 
+  acts_as_authorized
+  acts_as_favouritable
+
   attr_accessor :from_new_link
 
   belongs_to :specimen
+
+  accepts_nested_attributes_for :specimen
+
   belongs_to :institution
   has_and_belongs_to_many :assays
 
@@ -18,8 +24,6 @@ class Sample < ActiveRecord::Base
   validates_uniqueness_of :title
   validates_presence_of :specimen,:lab_internal_number
   validates_presence_of :donation_date if Seek::Config.is_virtualliver
-
-  acts_as_favouritable
 
   def self.sop_sql()
   'SELECT sop_versions.* FROM sop_versions ' +
@@ -33,6 +37,7 @@ class Sample < ActiveRecord::Base
   has_many :sop_masters,:class_name => "SampleSop"
   grouped_pagination :pages=>("A".."Z").to_a, :default_page => Seek::Config.default_page(self.name.underscore.pluralize)
 
+
   searchable do
     text :description,:title,:lab_internal_number
     text :assays do
@@ -45,8 +50,6 @@ class Sample < ActiveRecord::Base
       specimen.try :donor_number
     end
   end if Seek::Config.solr_enabled
-
-  acts_as_authorized
 
   def can_delete? *args
     assays.empty? && super
