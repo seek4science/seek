@@ -115,3 +115,4 @@ function checkSelectOneSpecimen(term){
    }else
         return true;
 }
+

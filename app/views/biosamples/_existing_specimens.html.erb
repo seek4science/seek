@@ -75,7 +75,7 @@
                          genotype_detail << genotype.modification.try(:title) + ' ' + genotype.gene.try(:title) + '; ' if genotype.gene
                      end
                      genotype_detail = genotype_detail.blank? ? 'wild-type' : genotype_detail
-                     phenotype_detail = strain.phenotype.try(:description).blank? ? 'wild-type' : strain.phenotype.try(:description)
+                     phenotype_detail = strain.phenotype.try(:description).blank? ? 'wild-type' : strain.phenotype.try(:description).gsub('$$$', '; ')
                      strain_info = 'Strain ' + strain.title + "(" + genotype_detail + '/' + phenotype_detail + ')'
                      sop_links = []
                      specimen.sops.select(&:can_view?).each do |sop|
