@@ -92,7 +92,7 @@ class StrainsController < ApplicationController
         strain_params = params[:strain]
         flag = true
         flag =  flag && (compare_attribute attributes['title'], strain_params['title'])
-        flag =  flag && (compare_attribute attributes['organism_id'].to_s, strain_params['organism_id'])
+        #flag =  flag && (compare_attribute attributes['organism_id'].to_s, strain_params['organism_id'])
         flag =  flag && (compare_attribute attributes['synonym'], strain_params['synonym'])
         flag =  flag && (compare_attribute attributes['comment'], strain_params['comment'])
         flag =  flag && (compare_attribute attributes['provider_id'].to_s, strain_params['provider_id'])

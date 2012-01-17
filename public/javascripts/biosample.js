@@ -151,3 +151,19 @@ function validateSpecimenSampleFields(cell_culture_or_specimen){
      $('create_specimen_sample').value = "Creating...";
      $('create_specimen_sample').form.submit();
 }
+
+function validateStrainFields(){
+    if($('strain_title').value.length == 0) {
+            alert("Please enter strain title.");
+            $('strain_title').focus();
+            return(false);
+    }
+    if($('strain_organism_id').value == '0') {
+            alert("Please select one organism");
+            $('strain_organism_id').focus();
+            return(false);
+    }
+     $('create_strain').disabled = true;
+     $('create_strain').value = "Creating...";
+     $('create_strain').form.submit();
+}

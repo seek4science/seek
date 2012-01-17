@@ -11,7 +11,7 @@
 	</div>
 
     <div class="body">
-      <span style="font-weight: bold;">Organism</span>
+      <span style="font-weight: bold;">Organism</span><span class="required">*</span>
       <%= select_tag "strain[organism_id]",
         options_for_select([["Select Organism ...", 0]]|all_organisms.collect{|o| [truncate(h(o.title)), o.id]},try_block{strain.organism_id} || try_block{current_user.person.projects.first.organism_ids.first}),
         :disabled => strain.nil? ? false : true
@@ -20,7 +20,7 @@
       <div id='strain_form'></div>
 
       <div align="center" style="margin-top: 1em">
-        <%= submit_tag('Create', :disable_with=> "Creating ...", :style => "font-weight: bold;")%> Or
+        <%= submit_tag('Create', :id => 'create_strain', :style => "font-weight: bold;", :onclick => "validateStrainFields();return false;")%> Or
         <input type=button value='Cancel' onclick="RedBox.close()">
       </div>
     </div>
