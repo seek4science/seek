@@ -12,7 +12,7 @@
 <% end %>
 
 <% if resource.can_delete? %>
-    <%= image_tag_for_key('destroy', polymorphic_path(resource), nil, { :confirm => "yes?", :method => :delete }, "Delete") -%>
+    <%= image_tag_for_key('destroy', polymorphic_path(resource), nil, { :confirm => "This deletes the #{resource.class.name}. Are you sure?", :method => :delete }, "Delete") -%>
 <% end %>
 
 <!---
