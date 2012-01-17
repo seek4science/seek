@@ -9,7 +9,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20120113142412) do
+ActiveRecord::Schema.define(:version => 20120113161111) do
 
   create_table "activity_logs", :force => true do |t|
     t.string   "action"
@@ -923,6 +923,7 @@ ActiveRecord::Schema.define(:version => 20120113142412) do
     t.string   "organism_part"
     t.string   "provider_id"
     t.string   "provider_name"
+    t.integer  "age_at_sampling"
   end
 
   create_table "saved_searches", :force => true do |t|
