@@ -67,14 +67,14 @@ fixtures :all
       assert_difference("Specimen.count") do
         post :create, :sample => {
             :title => "test",
-                      :lab_internal_number =>"Do232",
-                      :donation_date => Date.today,
-                      :specimen => {:projects => [Factory(:project)],
-                                    :strain => Factory(:strain),
-                                    :lab_internal_number=>"Lab number",
-                                    :title=>"Donor number",
-                                    :contributor=>User.current_user
-                      }
+            :contributor=>User.current_user,
+            :projects=>[Factory(:project)],
+            :lab_internal_number =>"Do232",
+            :donation_date => Date.today,
+            :specimen => {:strain => Factory(:strain),
+                          :lab_internal_number=>"Lab number",
+                          :title=>"Donor number"
+            }
         }
       end
     end

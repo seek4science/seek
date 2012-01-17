@@ -39,6 +39,8 @@ class SamplesController < ApplicationController
     specimen_attr = params[:sample].delete(:specimen)
     @sample = Sample.new(params[:sample])
     @sample.specimen_attributes = specimen_attr unless specimen_attr.nil?
+    @sample.specimen.contributor = @sample.contributor if @sample.specimen.contributor.nil?
+    @sample.specimen.projects = @sample.projects if @sample.specimen.projects.blank?
 
     #add policy to sample
     @sample.policy.set_attributes_with_sharing params[:sharing], @sample.projects
