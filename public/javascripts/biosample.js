@@ -108,11 +108,46 @@ function checkSelectOneStrain(){
         return true;
 }
 
-function checkSelectOneSpecimen(term){
+function checkSelectOneSpecimen(cell_culture_or_specimen){
     if (getSelectedSpecimens().split(',').length > 1){
-       alert("Please select only ONE " + term + " for this sample to base on, or select NO " + term);
+       alert("Please select only ONE " + cell_culture_or_specimen + " for this sample to base on, or select NO " + cell_culture_or_specimen);
        return false;
    }else
         return true;
 }
 
+function validateSpecimenSampleFields(cell_culture_or_specimen){
+    if($('specimen_title').value.length == 0) {
+            alert("Please enter " + cell_culture_or_specimen + " title.");
+            $('specimen_title').focus();
+            return(false);
+    }
+    if($('specimen_lab_internal_number').value.length == 0) {
+            alert("Please enter " + cell_culture_or_specimen + " lab internal identifier.");
+            $('specimen_lab_internal_number').focus();
+            return(false);
+    }
+    if($('organism_id').value == '0') {
+            alert("Please select one organism");
+            $('organism_id').focus();
+            return(false);
+    }
+    if($('sample_title').value.length == 0) {
+            alert("Please enter sample title");
+            $('sample_title').focus();
+            return(false);
+    }
+    if($('sample_lab_internal_number').value.length == 0) {
+            alert("Please enter sample lab internal number");
+            $('sample_lab_internal_number').focus();
+            return(false);
+    }
+    if($F('sample_project_ids').length == 0) {
+            alert("Please select projects");
+            $('possible_sample_project_ids').focus();
+            return(false);
+    }
+     $('create_specimen_sample').disabled = true;
+     $('create_specimen_sample').value = "Creating...";
+     $('create_specimen_sample').form.submit();
+}

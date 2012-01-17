@@ -105,8 +105,8 @@ class BiosamplesController < ApplicationController
       specimen.policy.set_attributes_with_sharing params[:sharing], sample.projects
       #if no strain is selected, create/select the default strain
       if params[:specimen][:strain_id] == '0'
-        strain = @specimen.default_strain_for params[:organism_id]
-        specimen.strain = strain
+        #strain = @specimen.default_strain_for params[:organism_id]
+        #specimen.strain = strain
       end
       #Add creators
       AssetsCreator.add_or_update_creator_list(specimen, params[:creators])
