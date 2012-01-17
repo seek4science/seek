@@ -4,9 +4,15 @@ require 'acts_as_authorized'
 class Sample < ActiveRecord::Base
   include Subscribable
 
+  acts_as_authorized
+  acts_as_favouritable
+
   attr_accessor :from_new_link
 
   belongs_to :specimen
+
+  accepts_nested_attributes_for :specimen
+
   belongs_to :institution
   has_and_belongs_to_many :assays
 
@@ -33,6 +39,7 @@ class Sample < ActiveRecord::Base
   has_many :sop_masters,:class_name => "SampleSop"
   grouped_pagination :pages=>("A".."Z").to_a, :default_page => Seek::Config.default_page(self.name.underscore.pluralize)
 
+
   searchable do
     text :description,:title,:lab_internal_number
     text :assays do
@@ -42,8 +49,6 @@ class Sample < ActiveRecord::Base
       specimen.try :title
     end
   end if Seek::Config.solr_enabled
-
-  acts_as_authorized
 
   def can_delete? *args
     assays.empty? && super

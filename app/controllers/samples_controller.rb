@@ -36,7 +36,11 @@ class SamplesController < ApplicationController
 
 
   def create
+    specimen_attr = params[:sample].delete(:specimen)
     @sample = Sample.new(params[:sample])
+    @sample.specimen_attributes = specimen_attr unless specimen_attr.nil?
+    @sample.specimen.contributor = @sample.contributor if @sample.specimen.contributor.nil?
+    @sample.specimen.projects = @sample.projects if @sample.specimen.projects.blank?
 
     #add policy to sample
     @sample.policy.set_attributes_with_sharing params[:sharing], @sample.projects
@@ -59,7 +63,7 @@ class SamplesController < ApplicationController
     else
         respond_to do |format|
           format.html { render :action => "new" }
-          end
+        end
     end
 
   end
