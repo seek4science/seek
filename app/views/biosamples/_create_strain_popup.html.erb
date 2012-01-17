@@ -16,7 +16,11 @@
         options_for_select([["Select Organism ...", 0]]|all_organisms.collect{|o| [truncate(h(o.title)), o.id]},try_block{strain.organism_id} || try_block{current_user.person.projects.first.organism_ids.first}),
         :disabled => strain.nil? ? false : true
       -%>
-
+      <!--when organism selection box is disabled, the param strain[organism_id] is not sent to server, so need to create a hidden_field_tag
+     -->
+      <% if !strain.nil? %>
+        <%= hidden_field_tag 'strain[organism_id]', strain.try(:organism_id)-%>
+      <% end %>
       <div id='strain_form'></div>
 
       <div align="center" style="margin-top: 1em">
