@@ -130,7 +130,7 @@ environment_options=[['Unknown', 0]]|RecommendedModelEnvironment.find(:all).coll
 <p>
   <b>Preferred execution or visualisation environment:</b>
   <%= select_tag 'model[recommended_environment_id]',
-    options_for_select(environment_options, 0),
+    options_for_select(environment_options, @model.recommended_environment_id),
     {
     :style=>"width:82%",
     :name=>"model[recommended_environment_id]"
