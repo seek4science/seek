@@ -5,6 +5,75 @@
 
 <%= f.error_messages %>
 
+<h2><%= CELL_CULTURE_OR_SPECIMEN.capitalize -%> details</h2>
+
+<script type="text/javascript">
+  var organism_strains = new Array();
+  <% Organism.all.each do |org|
+    strains = org.strains.without_default -%>
+
+    organism_strains[<%= org.id -%>] = '<%= strains.to_json -%>';
+
+  <% end -%>
+
+  function update_strains_for_organism(organism_id) {
+        var strains_json = organism_strains[organism_id];
+        var strains = eval('('+strains_json+')');
+        var box = $('sample_specimen_attributes_strain_id');
+        box.options.length = 0;
+        box.insert(new Element('option',{value:0}).update("Not specified"));
+        for(var i=0;i<strains.length;i++) {
+            var strain = strains[i];
+            box.insert(new Element('option',{value:strain.strain.id}).update(strain.strain.title));
+        }
+  }
+</script>
+
+<% f.fields_for :specimen do |specimen_f| -%>
+    <p>
+        <%= specimen_f.label "#{CELL_CULTURE_OR_SPECIMEN.capitalize} title:"-%><span class="required">*</span><br/>
+        <%= specimen_f.text_field :title, :style=>"width:350px;" -%>
+    </p>
+
+    <p>
+        <%= specimen_f.label "Culture start date:" -%> <br/>
+        <%= specimen_f.calendar_date_select :born, :time => "mixed", :style=>"width:350px;" -%>
+    </p>
+
+    <p>
+        <%= specimen_f.label "Culture growth type:" -%> <br/>
+        <%= specimen_f.select :culture_growth_type_id, options_for_select(CultureGrowthType.all.collect{|c| [c.title,c.id]}),:include_blank=>"Not specified" -%>
+    </p>
+
+    <p>
+        <%= specimen_f.label "#{CELL_CULTURE_OR_SPECIMEN.capitalize} provider identifier:" -%> <br/>
+        <%= specimen_f.text_field :provider_id, :style=>"width:350px;" -%>
+    </p>
+
+    <p>
+        <%= specimen_f.label "Provider name:" -%> <br/>
+        <%= specimen_f.text_field :provider_name, :style=>"width:350px;" -%>
+    </p>
+
+    <p>
+        <%= specimen_f.label "Organism:" -%><span class="required">*</span> <br/>
+        <%= specimen_f.select :organism,
+                              options_for_select(Organism.all.collect{|o| [o.title,o.id]}),
+                              {:include_blank=>"Not specified"},
+                              {:onchange=>"update_strains_for_organism(this.value);"} -%>
+    </p>
+
+    <p>
+        <%= specimen_f.label "Strain:" -%> <br/>
+        <% strains = @sample.specimen.organism.try(:strain).try(:without_defaults) || [] %>
+        <%= specimen_f.select :strain_id,
+                              options_for_select(strains.collect{|s| [s.title,s.id]}),:include_blank=>"Not specified" -%>
+    </p>
+
+
+<% end -%>
+
+
 
 <h2>Sample Details</h2>
 
@@ -13,11 +82,6 @@
   <p>
     <%= f.label "Sample name:" -%><span class="required">*</span><br/>
     <%= f.text_field :title, :style => "width: 350px;" -%>
-  </p>
-
-  <p>
-    <%= f.label "Choose a specimen" %> <span class="required">*</span><br/>
-    <%= collection_select(:sample, :specimen_id, Specimen.all.select{|s|s.can_view?} , :id, :title,{:include_blank =>"Please Select..."},{:style=>"width:90%"}) %>
   </p>
 
   <% if Seek::Config.is_virtualliver %>
@@ -39,7 +103,7 @@
 
   <p>
     <%= f.label :sampling_date -%><br/>
-    <%= f.calendar_date_select :sampling_date, :time => "mixed" -%>
+    <%= f.calendar_date_select :sampling_date, :time => "mixed", :style=>"width:350px;" -%>
   </p>
 
   <br/>

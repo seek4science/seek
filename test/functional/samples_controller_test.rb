@@ -71,7 +71,7 @@ fixtures :all
             :projects=>[Factory(:project)],
             :lab_internal_number =>"Do232",
             :donation_date => Date.today,
-            :specimen => {:strain => Factory(:strain),
+            :specimen_attributes => {:strain_id => Factory(:strain).id,
                           :lab_internal_number=>"Lab number",
                           :title=>"Donor number"
             }

@@ -8,5 +8,7 @@ class Strain < ActiveRecord::Base
 
   validates_presence_of :title
 
+  named_scope :without_default,:conditions=>{:is_dummy=>false}
+
   include ActsAsCachedTree
 end

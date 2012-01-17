@@ -4,13 +4,14 @@ require 'subscribable'
 class Specimen < ActiveRecord::Base
   include Subscribable
 
+  acts_as_authorized
+
   before_save  :clear_garbage
 
   has_many :samples
   has_many :activity_logs, :as => :activity_loggable
   has_many :assets_creators, :dependent => :destroy, :as => :asset, :foreign_key => :asset_id
   has_many :creators, :class_name => "Person", :through => :assets_creators, :order=>'assets_creators.id'
-
 
   belongs_to :institution
   belongs_to :culture_growth_type
@@ -50,8 +51,6 @@ class Specimen < ActiveRecord::Base
       strain.try :title
     end
   end if Seek::Config.solr_enabled
-
-  acts_as_authorized
 
   def age_in_weeks
     if !age.nil?

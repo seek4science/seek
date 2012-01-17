@@ -27,6 +27,7 @@ class SamplesController < ApplicationController
   def new
     @sample = Sample.new
     @sample.from_new_link = params[:from_new_link]
+    @sample.specimen = Specimen.new
 
     respond_to do |format|
       format.html # new.html.erb
@@ -36,9 +37,8 @@ class SamplesController < ApplicationController
 
 
   def create
-    specimen_attr = params[:sample].delete(:specimen)
     @sample = Sample.new(params[:sample])
-    @sample.specimen_attributes = specimen_attr unless specimen_attr.nil?
+
     @sample.specimen.contributor = @sample.contributor if @sample.specimen.contributor.nil?
     @sample.specimen.projects = @sample.projects if @sample.specimen.projects.blank?
 
