@@ -21,9 +21,9 @@ class Specimen < ActiveRecord::Base
   alias_attribute :description, :comments
 
   validates_numericality_of :age, :only_integer => true, :greater_than=> 0, :allow_nil=> true, :message => "is not a positive integer"
-  validates_presence_of :title,:lab_internal_number, :contributor, :projects,:strain
+  validates_presence_of :title,:lab_internal_number, :contributor,:strain
 
-  validates_presence_of :institution if Seek::Config.is_virtualliver
+  validates_presence_of :institution, :projects if Seek::Config.is_virtualliver
   validates_uniqueness_of :title
 
   def self.sop_sql()
@@ -108,10 +108,4 @@ class Specimen < ActiveRecord::Base
 
     return new_object
   end
-
-
-  def self.human_attribute_name(attribute)
-    HUMANIZED_COLUMNS[attribute.to_sym] || super
-  end
-
 end
