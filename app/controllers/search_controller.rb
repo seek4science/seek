@@ -17,8 +17,15 @@ class SearchController < ApplicationController
     @results_scaled << ['all', @results]
     @results_scaled = Hash[*@results_scaled.flatten(1)]
     logger.info @results_scaled.inspect
-    @results = @results_scaled[params[:scale]]
-    @scale_title = params[:scale]
+    if params[:scale]
+      # when user does not login, params[:scale] is nil
+      @results = @results_scaled[params[:scale]]
+      @scale_title = params[:scale]
+    else
+       @results = @results_scaled['all']
+       @scale_title = 'all'
+    end
+
 
     if @results.empty?
       flash.now[:notice]="No matches found for '<b>#{@search_query}</b>'."
