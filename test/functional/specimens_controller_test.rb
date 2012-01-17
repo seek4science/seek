@@ -53,7 +53,7 @@ fixtures :all
                                   :lab_internal_number =>"Do232",
                                   :contributor => Factory(:user),
                                   :institution => Factory(:institution),
-                                  :organism => Factory(:organism),
+                                  :strain => Factory(:strain),
                                   :project_ids => [Factory(:project).id]}
 
     end

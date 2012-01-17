@@ -13,21 +13,22 @@ class Specimen < ActiveRecord::Base
 
 
   belongs_to :institution
-  belongs_to :organism
   belongs_to :culture_growth_type
   belongs_to :strain
 
+  has_one :organism, :through=>:strain
+
   alias_attribute :description, :comments
   alias_attribute :title, :donor_number
-  alias_attribute :specimen_title, :donor_number
 
   HUMANIZED_COLUMNS = {:donor_number=> "Specimen title"}
 
   validates_numericality_of :age, :only_integer => true, :greater_than=> 0, :allow_nil=> true, :message => "is not a positive integer"
   validates_presence_of :donor_number
 
-  validates_presence_of :contributor, :projects,:institution,:organism, :lab_internal_number
+  validates_presence_of :contributor, :projects,:institution,:strain, :lab_internal_number
   validates_uniqueness_of :donor_number
+
   def self.sop_sql()
   'SELECT sop_versions.* FROM sop_versions ' +
   'INNER JOIN sop_specimens ' +
@@ -45,17 +46,12 @@ class Specimen < ActiveRecord::Base
     text :culture_growth_type do
       culture_growth_type.try :title
     end
-    text :organism do
-      organism.try :title
-    end
     text :strain do
       strain.try :title
     end
   end if Seek::Config.solr_enabled
 
   acts_as_authorized
-
-
 
   def age_in_weeks
     if !age.nil?

@@ -21,16 +21,17 @@
 
   <div class="main_content_left_box">
 
-    <div class="box_about_actor">
-
-      <p>
-        <label>Specimen:</label>
-        <%= text_or_not_specified(@sample.specimen.title) %>
-      </p>
-
       <p>
         <label>Lab internal identifier:</label>
         <%= text_or_not_specified(@sample.lab_internal_number) %>
+      </p>
+      <p>
+        <label>Provider:</label>
+        <%= text_or_not_specified(@sample.provider_name) -%>
+      </p>
+      <p>
+        <label>Sampling date:</label>
+        <%= text_or_not_specified @sample.sampling_date.nil? ? nil : @sample.sampling_date.strftime('%e %b %Y') -%>
       </p>
       <% if Seek::Config.is_virtualliver %>
           <p>
@@ -44,27 +45,21 @@
                 <%= text_or_not_specified nil %>
             <% else %>
 
-                <% if @sample.donation_date.hour == 0 and @sample.donation_date.min == 0 and @sample.donation_date.sec == 0 then %>
-                    <%= h @sample.donation_date.strftime('%d/%m/%Y') %>
+                <% if @sample.donation_date.hour == 0 && @sample.donation_date.min == 0 && @sample.donation_date.sec == 0 -%>
+                    <%= h @sample.donation_date.strftime('%e %b %Y') -%>
                 <% else %>
-                    <%= h @sample.donation_date.strftime('%d/%m/%Y @ %H:%M:%S') %>
+                    <%= h @sample.donation_date.strftime('%e %b %Y @ %H:%M:%S') -%>
                 <% end %>
 
             <% end %>
           </p>
       <% end %>
-    </div>
-  </div>
-  <div style="clear:both;">
-    <p style="margin-top: 1em;">
-      <b>About the sample:</b>
 
-    <div id="description" class="box_standout">
-      <%= text_or_not_specified(@sample.comments, :description=>true, :auto_link=>true) %>
-    </div>
-    </p>
   </div>
 
+  <div style='clear:both;height:3em;'>
+    <!-- spacer -->
+  </div>
 
   <div style="clear:both">
 

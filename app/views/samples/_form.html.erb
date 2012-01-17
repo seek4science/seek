@@ -42,16 +42,6 @@
     <%= f.calendar_date_select :sampling_date, :time => "mixed" -%>
   </p>
 
-  <p>
-    <%= f.label :organism_part -%><br/>
-    <%= select_tag :organism_part,options_for_select(['Not specified', 'Whole cell', 'Membrane fraction']) -%>
-  </p>
-
-  <p>
-    <%= f.label :description -%><br/>
-    <%= f.text_area :comments, :style => "width: 99%;", :rows => 5 -%>
-  </p>
-
   <br/>
   <%= render :partial => 'projects/project_selector', :locals => {:resource => @sample,:allow_nil=>true}%>
 
@@ -61,8 +51,6 @@
       <p>
           <%= render :partial => "assets/sharing_form" -%>
       </p>
-
-      <%= fancy_multiselect @sample, :sops, :name => 'sample_sop_ids', :association_class=>Sop,:selected => (params[:sample_sop_ids] || []).map(&:to_i) | @sample.sop_masters.map(&:sop_id) %>
   <% end %>
 </div>
 

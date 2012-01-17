@@ -13,7 +13,6 @@ class Sample < ActiveRecord::Base
   has_many :assets_creators, :dependent => :destroy, :as => :asset, :foreign_key => :asset_id
   has_many :creators, :class_name => "Person", :through => :assets_creators, :order=>'assets_creators.id'
 
-
   alias_attribute :description, :comments
   validates_presence_of :title
   validates_uniqueness_of :title
@@ -55,7 +54,6 @@ class Sample < ActiveRecord::Base
     true
   end
 
-  
   def associate_sop sop
     sample_sop = sop_masters.detect{|ss|ss.sop==sop}
 
