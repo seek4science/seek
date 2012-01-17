@@ -10,6 +10,11 @@
         </p>
 
         <p style="margin-bottom: 1.5em">
+          <label style="float: left;"> Lab internal identifier:</label><span class="required">*</span>
+          <%= text_field_tag "specimen[lab_internal_number]", nil, :style => 'float:right;margin-right:30em' %>
+        </p>
+
+        <p style="margin-bottom: 1.5em">
           <label style="float: left;">Culture starting date:</label>
           <%= calendar_date_select_tag "specimen[born]", nil, :time => "mixed", :style => 'float:right;margin-right:30em' %>
         </p>
