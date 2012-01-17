@@ -1,5 +1,5 @@
 running mouse:
-  donor_number: "running mouse No.1"
+  title: "running mouse No.1"
   contributor:  owner_of_my_first_sop (User)
   lab_internal_number: "Do221"
   projects: [sysmo_project]
@@ -7,7 +7,7 @@ running mouse:
   policy: policy_for_viewable_data_file
 
 running mouse2:
-  donor_number: "running mouse No.2"
+  title: "running mouse No.2"
   contributor:  owner_of_my_first_sop (User)
   lab_internal_number: "Do251"
   projects: [sysmo_project]

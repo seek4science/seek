@@ -9,7 +9,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20120113142412) do
+ActiveRecord::Schema.define(:version => 20120117125653) do
 
   create_table "activity_logs", :force => true do |t|
     t.string   "action"
@@ -24,7 +24,7 @@ ActiveRecord::Schema.define(:version => 20120113142412) do
     t.datetime "updated_at"
     t.string   "http_referer"
     t.string   "user_agent"
-    t.text     "data",                   :limit => 2147483647
+    t.text     "data",                   :limit => 16777215
     t.string   "controller_name"
   end
 
@@ -923,6 +923,7 @@ ActiveRecord::Schema.define(:version => 20120113142412) do
     t.string   "organism_part"
     t.string   "provider_id"
     t.string   "provider_name"
+    t.integer  "age_at_sampling"
   end
 
   create_table "saved_searches", :force => true do |t|
@@ -1025,7 +1026,7 @@ ActiveRecord::Schema.define(:version => 20120113142412) do
   add_index "sops", ["contributor_id", "contributor_type"], :name => "index_sops_on_contributor_id_and_contributor_type"
 
   create_table "specimens", :force => true do |t|
-    t.string   "donor_number"
+    t.string   "title"
     t.integer  "age"
     t.string   "treatment"
     t.string   "lab_internal_number"

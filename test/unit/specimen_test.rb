@@ -4,14 +4,14 @@ class SpecimenTest < ActiveSupport::TestCase
 fixtures :all
 
   test "validation" do
-    specimen = Factory :specimen, :donor_number => "DonorNumber"
+    specimen = Factory :specimen, :title => "DonorNumber"
     assert specimen.valid?
-    assert_equal "DonorNumber",specimen.donor_number
+    assert_equal "DonorNumber",specimen.title
 
-    specimen.donor_number = nil
+    specimen.title = nil
     assert !specimen.valid?
 
-    specimen.donor_number = ""
+    specimen.title = ""
     assert !specimen.valid?
 
     specimen.reload

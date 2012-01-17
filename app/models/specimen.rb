@@ -19,15 +19,12 @@ class Specimen < ActiveRecord::Base
   has_one :organism, :through=>:strain
 
   alias_attribute :description, :comments
-  alias_attribute :title, :donor_number
-
-  HUMANIZED_COLUMNS = {:donor_number=> "Specimen title"}
 
   validates_numericality_of :age, :only_integer => true, :greater_than=> 0, :allow_nil=> true, :message => "is not a positive integer"
-  validates_presence_of :donor_number
+  validates_presence_of :title
 
   validates_presence_of :contributor, :projects,:institution,:strain, :lab_internal_number
-  validates_uniqueness_of :donor_number
+  validates_uniqueness_of :title
 
   def self.sop_sql()
   'SELECT sop_versions.* FROM sop_versions ' +
@@ -42,7 +39,7 @@ class Specimen < ActiveRecord::Base
   grouped_pagination :pages=>("A".."Z").to_a, :default_page => Seek::Config.default_page(self.name.underscore.pluralize)
 
   searchable do
-    text :description,:donor_number,:lab_internal_number
+    text :description,:title,:lab_internal_number
     text :culture_growth_type do
       culture_growth_type.try :title
     end

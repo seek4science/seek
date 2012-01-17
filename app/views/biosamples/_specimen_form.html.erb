@@ -33,7 +33,7 @@
         <br/>
 
         <span style="font-weight: bold;">Organism</span> <span class="required">*</span>
-        <%= select_tag "specimen[organism_id]",
+        <%= select_tag "organism_id",
             options_for_select([["Select Organism ...", 0]]|all_organisms.collect{|o| [truncate(h(o.title)), o.id]},try_block{strain.organism_id} || try_block{current_user.person.projects.first.organism_ids.first}),
             :onchange => "strains_of_selected_organism(this.value)"
         -%>
@@ -47,7 +47,7 @@
         <br/>
         <br/>
 
-        <%= render :partial => "assets/author_form", :locals => {:resource_type => CELL_CULTURE_OR_SPECIMEN, # this is only for presentation, not for any processing
+        <%= render :partial => "assets/author_form", :locals => {:resource_type => 'Specimen', # this is only for presentation, not for any processing
                                                                :existing_creators => [current_user.person],
                                                                :other_creators => nil
                                                                } -%>
