@@ -27,7 +27,7 @@ class SamplesController < ApplicationController
   def new
     @sample = Sample.new
     @sample.from_new_link = params[:from_new_link]
-    @sample.specimen = Specimen.new
+    @sample.specimen = Specimen.new :creators=>[User.current_user.person]
 
     respond_to do |format|
       format.html # new.html.erb

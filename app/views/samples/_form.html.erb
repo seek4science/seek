@@ -78,7 +78,7 @@
 
     <p>
       <%= render :partial => "assets/author_form", :locals => {:resource_type => 'Specimen',
-                                                               :existing_creators => @sample.specimen.creators || [User.current_user.person],
+                                                               :existing_creators => @sample.specimen.creators,
                                                                :other_creators => @sample.specimen.other_creators} -%>
     </p>
 
