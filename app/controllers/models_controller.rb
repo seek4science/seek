@@ -605,7 +605,6 @@ class ModelsController < ApplicationController
       # the creation of the new Avatar instance needs to have only one parameter - therefore, the rest should be set separately
       @model_image = ModelImage.new(params_model_image)
       @model_image.model_id = model_object.id
-      @model_image.model_version = model_object.version
       @model_image.original_content_type = params_model_image[:image_file].content_type
       @model_image.original_filename = params_model_image[:image_file].original_filename
       model_object.model_image = @model_image

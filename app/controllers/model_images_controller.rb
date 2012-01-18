@@ -13,7 +13,6 @@ class ModelImagesController < ApplicationController
          file_specified = true
          @model_image = ModelImage.new params[:model_image]
          @model_image.model_id = params[:model_id]
-         @model_image.model_version = params[:model_version]
          @model_image.original_content_type = params[:model_image][:image_file].content_type
          @model_image.original_filename =  params[:model_image][:image_file].original_filename
        else
@@ -114,7 +113,6 @@ class ModelImagesController < ApplicationController
   def check_model_specified
     @image_for = 'Model'
     @image_for_id = params[:model_id]
-    @image_for_version = Model.find(params[:model_id]).version
 
     begin
       @model_instance = Model.find(@image_for_id)
