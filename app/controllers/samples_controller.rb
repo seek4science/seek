@@ -48,12 +48,14 @@ class SamplesController < ApplicationController
     #add policy to sample and specimen
     @sample.policy.set_attributes_with_sharing params[:sharing], @sample.projects
     @sample.specimen.policy.set_attributes_with_sharing params[:sharing], @sample.projects
-    sops       = (params[:sample_sop_ids].nil?? [] : params[:sample_sop_ids].reject(&:blank?)) || []
+    sops = (params[:specimen_sop_ids].nil?? [] : params[:specimen_sop_ids].reject(&:blank?)) || []
 
     if @sample.save
         sops.each do |s_id|
           s = Sop.find(s_id)
-          @sample.associate_sop(s) if s.can_view?
+          if s.can_view?
+            SopSpecimen.create!(:sop_id => s.id,:sop_version=> s.version,:specimen_id=>@sample.specimen.id)
+          end
         end
         if @sample.from_new_link=="true"
            render :partial=>"assets/back_to_fancy_parent",:locals=>{:child=>@sample,:parent=>"assay"}
@@ -92,25 +94,25 @@ class SamplesController < ApplicationController
 
       respond_to do |format|
 
-      if @sample.save
+        if @sample.save
 
-        if sops.blank?
-          @sample.sop_masters= []
-          @sample.save
-        else
-          sops.each do |s_id|
-          s = Sop.find(s_id)
-          @sample.associate_sop(s) if s.can_view?
-        end
-        end
+          if sops.blank?
+            @sample.sop_masters= []
+            @sample.save
+          else
+            sops.each do |s_id|
+              s = Sop.find(s_id)
+              @sample.associate_sop(s) if s.can_view?
+            end
+          end
 
           flash[:notice] = 'Sample was successfully updated.'
           format.html { redirect_to(@sample) }
-          format.xml  { head :ok }
+          format.xml { head :ok }
 
-      else
-        format.html { render :action => "edit" }
-      end
+        else
+          format.html { render :action => "edit" }
+        end
     end
   end
 

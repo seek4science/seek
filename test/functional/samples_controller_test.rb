@@ -64,9 +64,11 @@ fixtures :all
   end
 
   test "should create sample and specimen" do
+    sop = Factory :sop,:contributor=>User.current_user
     assert_difference("Sample.count") do
       assert_difference("Specimen.count") do
         post :create,
+            :specimen_sop_ids=>[sop.id],
             :organism=>Factory(:organism),
             :sample => {
             :title => "test",
@@ -86,6 +88,7 @@ fixtures :all
     assert_equal "test",s.title
     assert_not_nil s.specimen
     assert_equal "Donor number",s.specimen.title
+    assert_equal [sop],s.specimen.sops.collect{|s| s.parent}
   end
 
   test "should create sample and specimen with default strain if missing" do

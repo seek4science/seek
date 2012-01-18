@@ -33,6 +33,6 @@ class Strain < ActiveRecord::Base
     end
     genotype_detail = genotype_detail.blank? ? 'wild-type' : genotype_detail.join('; ')
     phenotype_detail = phenotype.try(:description).blank? ? 'wild-type' : phenotype.try(:description).gsub('$$$', '; ')
-    title + "(" + genotype_detail + '/' + phenotype_detail + ')'
+    title + " (" + genotype_detail + '/' + phenotype_detail + ')'
   end
 end

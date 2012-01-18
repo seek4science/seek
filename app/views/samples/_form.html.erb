@@ -12,7 +12,7 @@
   <% Organism.all.each do |org|
     strains = org.strains.without_default -%>
 
-    organism_strains[<%= org.id -%>] = '<%= strains.to_json -%>';
+    organism_strains[<%= org.id -%>] = '<%= strains.collect{|s| [s.id,s.info]}.to_json -%>';
 
   <% end -%>
 
@@ -24,7 +24,7 @@
         box.insert(new Element('option',{value:0}).update("Not specified"));
         for(var i=0;i<strains.length;i++) {
             var strain = strains[i];
-            box.insert(new Element('option',{value:strain.strain.id}).update(strain.strain.title));
+            box.insert(new Element('option',{value:strain[0]}).update(strain[1]));
         }
   }
 </script>
@@ -73,6 +73,8 @@
         <%= specimen_f.collection_select :strain_id,
                               strains,:id,:info,:include_blank=>"Not specified" -%>
     </p>
+
+    <%= fancy_multiselect @sample.specimen, :sops, :name => 'specimen_sop_ids',:association_class=>Sop, :selected => @sample.specimen.sop_masters.map(&:sop_id) -%>
 
 
 <% end -%>
