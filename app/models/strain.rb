@@ -6,7 +6,7 @@ class Strain < ActiveRecord::Base
 
   named_scope :by_title
 
-  validates_presence_of :title
+  validates_presence_of :title, :organism
 
   named_scope :without_default,:conditions=>{:is_dummy=>false}
 

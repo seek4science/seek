@@ -1026,7 +1026,7 @@ ActiveRecord::Schema.define(:version => 20120117163447) do
   add_index "sops", ["contributor_id", "contributor_type"], :name => "index_sops_on_contributor_id_and_contributor_type"
 
   create_table "specimens", :force => true do |t|
-    t.string   "donor_number"
+    t.string   "title"
     t.integer  "age"
     t.string   "treatment"
     t.string   "lab_internal_number"

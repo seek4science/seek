@@ -92,7 +92,46 @@ class BiosamplesController < ApplicationController
   end
 
   def create_specimen_sample
-  end
+    params[:sharing][:permissions] = nil
 
+    sample = Sample.new(params[:sample])
+
+    sop_ids = []
+
+    specimen = Specimen.find_by_id(params[:specimen][:id])
+    if specimen.nil?
+      specimen = Specimen.new(params[:specimen])
+      sop_ids = (params[:specimen_sop_ids].nil? ? [] : params[:specimen_sop_ids].reject(&:blank?))||[]
+      specimen.policy.set_attributes_with_sharing params[:sharing], sample.projects
+      #if no strain is selected, create/select the default strain
+      if params[:specimen][:strain_id] == '0'
+        #strain = @specimen.default_strain_for params[:organism_id]
+        #specimen.strain = strain
+      end
+      #Add creators
+      AssetsCreator.add_or_update_creator_list(specimen, params[:creators])
+    end
+    sample.policy.set_attributes_with_sharing params[:sharing], sample.projects
+    sample.specimen = specimen
+    respond_to do |format|
+      if specimen.save && sample.save
+        sop_ids.each do |sop_id|
+          sop= Sop.find sop_id
+          SopSpecimen.create!(:sop_id => sop_id, :sop_version=> sop.version, :specimen_id=>specimen.id)
+        end
+      else
+        specimen_error_messages = ''
+        specimen.errors.full_messages.each do |e_m|
+          specimen_error_messages << "cell culture #{e_m.downcase}. "
+        end
+        sample_error_messages = ''
+        sample.errors.full_messages.each do |e_m|
+          sample_error_messages << "sample #{e_m.downcase}. "
+        end
+        flash[:error] = "Fail to create new sample: #{specimen_error_messages}#{sample_error_messages}"
+      end
+      format.html { redirect_to :back }
+    end
+  end
 
 end

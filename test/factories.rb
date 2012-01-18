@@ -174,7 +174,7 @@ end
 
 #Specimen
 Factory.define(:specimen) do |f|
-  f.sequence(:donor_number) { |n| "Specimen#{n}" }
+  f.sequence(:title) { |n| "Specimen#{n}" }
   f.sequence(:lab_internal_number) { |n| "Lab#{n}" }
   f.association :contributor, :factory => :user
   f.projects {[Factory.build(:project)]}

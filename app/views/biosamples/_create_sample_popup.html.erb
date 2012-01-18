@@ -1,4 +1,4 @@
-
+<% form_tag :controller => 'biosamples', :action => 'create_specimen_sample' do %>
     <div id="redbox_contents_div" class="redbox_contents" style="width:800px;">
       <div class="head">
         <%= link_to_close_redbox image_tag("close.gif"), :style => "float:right; margin-left:0.5em; vertical-align:middle;" -%>
@@ -13,18 +13,19 @@
         <% end %>
 
         <%= render :partial => 'biosamples/sample_form' %>
-
+        <%= hidden_field_tag 'specimen[id]', specimen.try(:id)%>
         <div align="center" style="margin-bottom: 1em">
-          <%= submit_tag('Create', :disable_with=> "Creating ...", :style => "font-weight: bold;") %> Or
-          <input type=button value='Cancel' onclick="RedBox.close()">
+          <%= submit_tag('Create', :id => 'create_specimen_sample' ,:style => "font-weight: bold;", :onclick => "javascript: validateSpecimenSampleFields('#{CELL_CULTURE_OR_SPECIMEN}'); return(false);"
+              ) %> Or
+          <input type=button value='Cancel' onclick="RedBox.close(); return(false);">
         </div>
 
       </div>
     </div>
-
+<% end %>
 <script type='text/javascript'>
  initialiseFolds();
  updateFancyMultiselect('sample_project_ids');
- var selected_organism = $F('specimen_organism_id')
+ var selected_organism = $F('organism_id')
  strains_of_selected_organism(selected_organism)
 </script>

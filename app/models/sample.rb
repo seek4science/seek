@@ -22,8 +22,10 @@ class Sample < ActiveRecord::Base
   alias_attribute :description, :comments
   validates_presence_of :title
   validates_uniqueness_of :title
-  validates_presence_of :specimen,:lab_internal_number
+  validates_presence_of :specimen,:lab_internal_number, :projects
   validates_presence_of :donation_date if Seek::Config.is_virtualliver
+
+  validates_numericality_of :age_at_sampling, :only_integer => true, :greater_than=> 0, :allow_nil=> true, :message => "is not a positive integer" if !Seek::Config.is_virtualliver
 
   def self.sop_sql()
   'SELECT sop_versions.* FROM sop_versions ' +
@@ -43,11 +45,8 @@ class Sample < ActiveRecord::Base
     text :assays do
       assays.map{|a| a.title}
     end
-    text :institution do
-      institution.try :name
-    end
     text :specimen do
-      specimen.try :donor_number
+      specimen.try :title
     end
   end if Seek::Config.solr_enabled
 
