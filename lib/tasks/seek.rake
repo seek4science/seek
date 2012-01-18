@@ -27,7 +27,6 @@ namespace :seek do
         file = ModPorter::UploadedFile.new :path=>content_blob.filepath, :filename=>content_blob.original_filename, :content_type=>content_blob.content_type
         model_image = ModelImage.new "image_file" => file
         model_image.model_id = mv.model_id
-        model_image.model_version = mv.version
         model_image.original_content_type = content_blob.content_type
         model_image.original_filename = content_blob.original_filename
 

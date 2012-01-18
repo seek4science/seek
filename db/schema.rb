@@ -9,7 +9,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20120111132446) do
+ActiveRecord::Schema.define(:version => 20120112110613) do
 
   create_table "activity_logs", :force => true do |t|
     t.string   "action"
@@ -533,13 +533,13 @@ ActiveRecord::Schema.define(:version => 20120111132446) do
 
   create_table "model_images", :force => true do |t|
     t.integer  "model_id"
-    t.integer  "model_version"
     t.string   "original_filename"
     t.string   "original_content_type"
     t.datetime "created_at"
     t.datetime "updated_at"
     t.integer  "image_width"
     t.integer  "image_height"
+    t.integer  "model_version"
   end
 
   create_table "model_types", :force => true do |t|
