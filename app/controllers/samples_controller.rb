@@ -45,8 +45,9 @@ class SamplesController < ApplicationController
       @sample.specimen.strain = Strain.default_strain_for_organism(params[:organism])
     end
 
-    #add policy to sample
+    #add policy to sample and specimen
     @sample.policy.set_attributes_with_sharing params[:sharing], @sample.projects
+    @sample.specimen.policy.set_attributes_with_sharing params[:sharing], @sample.projects
     sops       = (params[:sample_sop_ids].nil?? [] : params[:sample_sop_ids].reject(&:blank?)) || []
 
     if @sample.save
@@ -73,12 +74,22 @@ class SamplesController < ApplicationController
 
 
   def update
-      sops       = (params[:sample_sop_ids].nil?? [] : params[:sample_sop_ids].reject(&:blank?)) || []
 
-      @sample.attributes = params[:sample]
+      spec = params[:sample].delete(:specimen_attributes)
+      @sample.specimen.update_attributes(spec) unless spec.nil?
+      @sample.update_attributes(params[:sample])
+      @sample.contributor = @sample.specimen.contributor
+      @sample.projects = @sample.specimen.projects
+      if @sample.specimen.strain.nil?
+        @sample.specimen.strain = Strain.default_strain_for_organism(params[:organism])
+      end
+
+      sops  = (params[:sample_sop_ids].nil?? [] : params[:sample_sop_ids].reject(&:blank?)) || []
 
       #update policy to sample
       @sample.policy.set_attributes_with_sharing params[:sharing],@sample.projects
+      @sample.specimen.policy.set_attributes_with_sharing params[:sharing],@sample.projects
+
       respond_to do |format|
 
       if @sample.save

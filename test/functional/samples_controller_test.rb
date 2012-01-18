@@ -131,10 +131,22 @@ fixtures :all
   test "should update" do
     s = Factory(:sample, :title=>"oneSample", :policy =>policies(:editing_for_all_sysmo_users_policy))
     assert_not_equal "test", s.title
-    put "update", :id=>s, :sample =>{:title =>"test"}
+    put :update, :id=>s, :sample =>{:title =>"test"}
     s = assigns(:sample)
     assert_redirected_to sample_path(s)
     assert_equal "test", s.title
+  end
+
+  test "should update sample with specimen" do
+    s = Factory(:sample, :title=>"oneSample", :policy =>policies(:editing_for_all_sysmo_users_policy),
+                :specimen=>Factory(:specimen,:policy=>policies(:editing_for_all_sysmo_users_policy))
+    )
+    assert_not_equal "new sample title", s.title
+    put :update, :id=>s, :sample =>{:title =>"new sample title",:specimen_attributes=>{:title=>"new specimen title"}}
+    s = assigns(:sample)
+    assert_redirected_to sample_path(s)
+    assert_equal "new sample title", s.title
+    assert_equal "new specimen title", s.specimen.title
   end
 
   test "should destroy" do
