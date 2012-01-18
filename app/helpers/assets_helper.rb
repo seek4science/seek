@@ -215,7 +215,7 @@ module AssetsHelper
         related["Institution"][:items] = [resource.institution]
         related["Project"][:items] = resource.projects
         related["Assay"][:items] = resource.assays
-        related["Sop"][:items] = resource.sops
+        related["Sop"][:items] = resource.specimen.sops | resource.sops
       else
     end
     
