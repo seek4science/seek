@@ -14,7 +14,7 @@
 
         <%= render :partial => 'biosamples/sample_form' %>
         <%= hidden_field_tag 'specimen[id]', specimen.try(:id)%>
-        <div align="center" style="margin-bottom: 1em">
+        <div align="center" style="margin-bottom: 1em; margin-top: 2em">
           <%= submit_tag('Create', :id => 'create_specimen_sample' ,:style => "font-weight: bold;", :onclick => "javascript: validateSpecimenSampleFields('#{CELL_CULTURE_OR_SPECIMEN}'); return(false);"
               ) %> Or
           <input type=button value='Cancel' onclick="RedBox.close(); return(false);">

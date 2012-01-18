@@ -1,36 +1,36 @@
         <h2>Sample</h2>
-        <p style="margin-bottom: 1.5em">
+        <p style="margin-bottom: 0.5em">
           <label style="float: left;"> Title:</label><span class="required">*</span>
           <%= text_field_tag "sample[title]", nil, :style => 'float:right;margin-right:30em' %>
         </p>
 
-        <p style="margin-bottom: 1.5em">
+        <p style="margin-bottom: 0.5em">
           <label style="float: left;"> Lab internal identifier:</label><span class="required">*</span>
           <%= text_field_tag "sample[lab_internal_number]", nil, :style => 'float:right;margin-right:30em' %>
         </p>
 
-        <p style="margin-bottom: 1.5em">
+        <p style="margin-bottom: 2em">
           <label style="float: left;"> Provider name:</label>
           <%= text_field_tag "sample[provider_name]", nil, :style => 'float:right;margin-right:30em' %>
         </p>
 
-        <p style="margin-bottom: 1.5em">
-          <label style="float: left;"> Provider ID:</label>
+        <p style="margin-bottom: 2em">
+          <label style="float: left;"> Provider's sample identifier:</label>
           <%= text_field_tag "sample[provider_id]", nil, :style => 'float:right;margin-right:30em' %>
         </p>
 
-        <p style="margin-bottom: 1.5em">
+        <p style="margin-bottom: 0.5em">
           <label style="float: left;">Sampling date:</label>
           <%= calendar_date_select_tag "sample[sampling_date]", nil, :time => "mixed", :style => 'float:right;margin-right:30em' %>
         </p>
 
-        <p style="margin-bottom: 1.5em">
+        <p style="margin-bottom: 2em">
           <label style="float: left;">Age at sampling:</label>
           <%= text_field_tag "sample[age_at_sampling]", nil, :style => 'float:right;margin-right:30em' %> (hours)
         </p>
 
-
         <%= render :partial => 'projects/project_selector', :locals => {:resource => Sample.new()}%>
+        <br/>
         <%= render :partial => "assets/sharing_form", :locals => {:object => Sample.new(), :disable_advanced_view => true} -%>
 
 
