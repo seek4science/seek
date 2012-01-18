@@ -186,6 +186,7 @@ end
 Factory.define(:sample) do |f|
   f.sequence(:title) { |n| "Sample#{n}" }
   f.sequence(:lab_internal_number) { |n| "Lab#{n}" }
+  f.projects {[Factory.build(:project)]}
   f.donation_date Date.today
   f.association :specimen
 end
