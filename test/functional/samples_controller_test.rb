@@ -64,12 +64,15 @@ fixtures :all
   end
 
   test "should create sample and specimen" do
+    creator=Factory :person
     sop = Factory :sop,:contributor=>User.current_user
     assert_difference("Sample.count") do
       assert_difference("Specimen.count") do
         post :create,
             :specimen_sop_ids=>[sop.id],
             :organism=>Factory(:organism),
+            :creators=>[[creator.name,creator.id]].to_json,
+            :specimen=>{:other_creators=>"jesus jones"},
             :sample => {
             :title => "test",
             :contributor=>User.current_user,
@@ -88,7 +91,10 @@ fixtures :all
     assert_equal "test",s.title
     assert_not_nil s.specimen
     assert_equal "Donor number",s.specimen.title
-    assert_equal [sop],s.specimen.sops.collect{|s| s.parent}
+    assert_equal [sop],s.specimen.sops.collect{|sop| sop.parent}
+    assert s.specimen.creators.include?(creator)
+    assert_equal 1,s.specimen.creators.count
+    assert_equal "jesus jones",s.specimen.other_creators
   end
 
   test "should create sample and specimen with default strain if missing" do
@@ -117,6 +123,7 @@ fixtures :all
     assert_equal "test",s.title
     assert_not_nil s.specimen
     assert_equal "Donor number",s.specimen.title
+
   end
 
   test "should get show" do
@@ -141,15 +148,21 @@ fixtures :all
   end
 
   test "should update sample with specimen" do
+    creator=Factory :person
     s = Factory(:sample, :title=>"oneSample", :policy =>policies(:editing_for_all_sysmo_users_policy),
                 :specimen=>Factory(:specimen,:policy=>policies(:editing_for_all_sysmo_users_policy))
     )
     assert_not_equal "new sample title", s.title
-    put :update, :id=>s, :sample =>{:title =>"new sample title",:specimen_attributes=>{:title=>"new specimen title"}}
+    put :update, :id=>s, :creators=>[[creator.name,creator.id]].to_json,
+        :specimen=>{:other_creators=>"jesus jones"},
+        :sample =>{:title =>"new sample title",:specimen_attributes=>{:title=>"new specimen title"}}
     s = assigns(:sample)
     assert_redirected_to sample_path(s)
     assert_equal "new sample title", s.title
     assert_equal "new specimen title", s.specimen.title
+    assert s.specimen.creators.include?(creator)
+    assert_equal 1,s.specimen.creators.count
+    assert_equal "jesus jones",s.specimen.other_creators
   end
 
   test "should destroy" do

@@ -76,6 +76,12 @@
 
     <%= fancy_multiselect @sample.specimen, :sops, :name => 'specimen_sop_ids',:association_class=>Sop, :selected => @sample.specimen.sop_masters.map(&:sop_id) -%>
 
+    <p>
+      <%= render :partial => "assets/author_form", :locals => {:resource_type => 'Specimen',
+                                                               :existing_creators => @sample.specimen.creators || [User.current_user.person],
+                                                               :other_creators => @sample.specimen.other_creators} -%>
+    </p>
+
 
 <% end -%>
 

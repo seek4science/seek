@@ -41,14 +41,20 @@ class SamplesController < ApplicationController
 
     @sample.specimen.contributor = @sample.contributor if @sample.specimen.contributor.nil?
     @sample.specimen.projects = @sample.projects if @sample.specimen.projects.blank?
-    if @sample.specimen.strain.nil?
+    if @sample.specimen.strain.nil? && !params[:organism].blank?
       @sample.specimen.strain = Strain.default_strain_for_organism(params[:organism])
     end
 
     #add policy to sample and specimen
     @sample.policy.set_attributes_with_sharing params[:sharing], @sample.projects
     @sample.specimen.policy.set_attributes_with_sharing params[:sharing], @sample.projects
+
+    #get SOPs
     sops = (params[:specimen_sop_ids].nil?? [] : params[:specimen_sop_ids].reject(&:blank?)) || []
+
+    #add creators
+    AssetsCreator.add_or_update_creator_list(@sample.specimen, params[:creators])
+    @sample.specimen.other_creators=params[:specimen][:other_creators] if params[:specimen]
 
     if @sample.save
         sops.each do |s_id|
@@ -78,19 +84,24 @@ class SamplesController < ApplicationController
   def update
 
       spec = params[:sample].delete(:specimen_attributes)
+      #other creators gets passed as :specimen as the key due to the way the creators partial works
+      spec[:other_creators] = params[:specimen][:other_creators] if params[:specimen]
       @sample.specimen.update_attributes(spec) unless spec.nil?
       @sample.update_attributes(params[:sample])
       @sample.contributor = @sample.specimen.contributor
       @sample.projects = @sample.specimen.projects
-      if @sample.specimen.strain.nil?
+      if @sample.specimen.strain.nil? && !params[:organism].blank?
         @sample.specimen.strain = Strain.default_strain_for_organism(params[:organism])
       end
-
-      sops  = (params[:sample_sop_ids].nil?? [] : params[:sample_sop_ids].reject(&:blank?)) || []
 
       #update policy to sample
       @sample.policy.set_attributes_with_sharing params[:sharing],@sample.projects
       @sample.specimen.policy.set_attributes_with_sharing params[:sharing],@sample.projects
+
+      sops  = (params[:sample_sop_ids].nil?? [] : params[:sample_sop_ids].reject(&:blank?)) || []
+
+      #add creators
+      AssetsCreator.add_or_update_creator_list(@sample.specimen, params[:creators])
 
       respond_to do |format|
 
