@@ -51,13 +51,13 @@
     </p>
 
     <p>
-        <%= specimen_f.label "#{CELL_CULTURE_OR_SPECIMEN.capitalize} provider identifier:" -%> <br/>
-        <%= specimen_f.text_field :provider_id, :style=>"width:350px;" -%>
+        <%= specimen_f.label "Provider name:" -%> <br/>
+        <%= specimen_f.text_field :provider_name, :style=>"width:350px;" -%>
     </p>
 
     <p>
-        <%= specimen_f.label "Provider name:" -%> <br/>
-        <%= specimen_f.text_field :provider_name, :style=>"width:350px;" -%>
+        <%= specimen_f.label "Provider's #{CELL_CULTURE_OR_SPECIMEN} identifier:" -%> <br/>
+        <%= specimen_f.text_field :provider_id, :style=>"width:350px;" -%>
     </p>
 
     <p>
@@ -108,6 +108,16 @@
   <p>
     <%= f.label :sampling_date -%><br/>
     <%= f.calendar_date_select :sampling_date, :time => "mixed", :style=>"width:350px;" -%>
+  </p>
+
+  <p>
+    <%= f.label :provider_name -%><br/>
+    <%= f.text_field :provider_name, :style=>"width:350px;" -%>
+  </p>
+
+  <p>
+    <%= f.label "Provider's sample identifier" -%><br/>
+    <%= f.text_field :provider_id, :style=>"width:350px;" -%>
   </p>
 
   <br/>
