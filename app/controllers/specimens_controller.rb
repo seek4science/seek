@@ -30,15 +30,16 @@ class SpecimensController < ApplicationController
   end
 
   def create
+    organism_id = params[:specimen].delete(:organism_id)
     @specimen = Specimen.new(params[:specimen])
     sop_ids = (params[:specimen_sop_ids].nil?? [] : params[:specimen_sop_ids].reject(&:blank?))||[]
     @specimen.policy.set_attributes_with_sharing params[:sharing], @specimen.projects
 
-        #strain
+    #strain
     if params[:create_strain] == '1' || params[:create_strain] == '2'
       strain = select_or_new_strain
     else
-      strain = default_strain_for params[:specimen][:organism_id]
+      strain = Strain.default_strain_for_organism(organism_id)
     end
     @specimen.strain = strain
 
@@ -66,13 +67,14 @@ class SpecimensController < ApplicationController
 
     @specimen.attributes = params[:specimen]
 
+
     @specimen.policy.set_attributes_with_sharing params[:sharing], @specimen.projects
 
         #strain
     if params[:create_strain] == '1' || params[:create_strain] == '2'
       @specimen.strain = select_or_new_strain
     elsif params[:create_strain] == '0'
-      @specimen.strain = default_strain_for params[:specimen][:organism_id]
+      @specimen.strain = Strain.default_strain_for_organism(organism_id)
     end
 
     #update creators
@@ -203,17 +205,4 @@ class SpecimensController < ApplicationController
       strain
   end
 
-  def default_strain_for organism_id
-    strain = Strain.find(:all, :conditions => ['organism_id=? and is_dummy=?', organism_id, true]).first
-    unless strain
-      strain = Strain.new(:title => 'default', :organism_id => organism_id, :is_dummy=>true)
-      gene = Gene.find_by_title('wild-type') || Gene.create(:title => 'wild-type')
-      genotype = Genotype.new(:gene => gene)
-      phenotype = Phenotype.new(:description => 'wild-type')
-      strain.genotypes = [genotype]
-      strain.phenotype = phenotype
-      strain.save
-    end
-    strain
-  end
 end

@@ -50,6 +50,7 @@ fixtures :all
   test "should create" do
     assert_difference("Specimen.count") do
       post :create, :specimen => {:title => "running mouse NO.1",
+                                  :organism_id=>Factory(:organism).id,
                                   :lab_internal_number =>"Do232",
                                   :contributor => Factory(:user),
                                   :institution => Factory(:institution),
@@ -151,6 +152,7 @@ fixtures :all
   test "should create specimen with strings for confluency, passage, viability, and purity" do
     attrs = [:confluency, :passage, :viability, :purity]
     specimen= Factory.attributes_for :specimen, :confluency => "Test", :passage => "Test", :viability => "Test", :purity => "Test"
+    specimen[:organism_id]=Factory(:organism).id
     post :create, :specimen => specimen
     assert_response :success
     assert specimen = assigns(:specimen)

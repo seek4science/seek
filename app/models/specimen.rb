@@ -8,6 +8,7 @@ class Specimen < ActiveRecord::Base
 
   before_save  :clear_garbage
 
+
   has_many :samples
   has_many :activity_logs, :as => :activity_loggable
   has_many :assets_creators, :dependent => :destroy, :as => :asset, :foreign_key => :asset_id
@@ -107,4 +108,6 @@ class Specimen < ActiveRecord::Base
 
     return new_object
   end
+
+
 end
