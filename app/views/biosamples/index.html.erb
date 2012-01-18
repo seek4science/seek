@@ -40,32 +40,21 @@
         var option;
         var selection_box = $('specimen_strain_id');
         selection_box.options.length=0;
+        option = document.createElement("OPTION");
+        option.text = 'Select Strain ...';
+        option.value = 0;
+        try {
+          selection_box.add(option); //for older IE version
+        }
+        catch (ex) {
+          selection_box.add(option, null);
+        }
 
-        <% ([Strain.new(:title => 'Select Strain ...')] | Strain.find(:all).sort_by(&:title).reject{|s| s.is_dummy?}).each do |strain| -%>
+        <% (Strain.find(:all).sort_by(&:title).reject{|s| s.is_dummy?}).each do |strain| -%>
 
-            if ('<%= strain.title -%>' == 'Select Strain ...'){
-               option = document.createElement("OPTION");
-                option.text = '<%= escape_javascript(strain.title) -%>';
-                option.value = 0;
-                try {
-                  selection_box.add(option); //for older IE version
-                }
-                catch (ex) {
-                  selection_box.add(option, null);
-                }
-            }
-            else if ('<%= strain.organism_id -%>' == organism_id){
-                <%
-                    genotype_detail = ''
-                     strain.genotypes.each do |genotype|
-                         genotype_detail << genotype.modification.try(:title).to_s + ' ' + genotype.gene.try(:title).to_s + '; ' if genotype.gene
-                     end
-                     genotype_detail = genotype_detail.blank? ? 'wild-type' : genotype_detail
-                     phenotype_detail = strain.phenotype.try(:description).blank? ? 'wild-type' : strain.phenotype.try(:description).gsub('$$$', '; ')
-                     strain_info = strain.title + "(" + genotype_detail + '/' + phenotype_detail + ')'
-                     %>
+            if ('<%= strain.organism_id -%>' == organism_id){
                 option = document.createElement("OPTION");
-                option.text = '<%= escape_javascript(strain_info) -%>';
+                option.text = '<%= escape_javascript(strain.info) -%>';
                 option.value = '<%= strain.id -%>';
                 try {
                   selection_box.add(option); //for older IE version

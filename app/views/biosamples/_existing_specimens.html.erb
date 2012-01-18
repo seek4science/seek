@@ -70,7 +70,7 @@
                   <% end %>
                   <%
                      strain = specimen.strain
-                     strain_info = strain.info
+                     strain_info = 'Strain' + strain.info
 
                      sop_links = []
                      specimen.sops.select(&:can_view?).each do |sop|
