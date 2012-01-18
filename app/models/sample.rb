@@ -39,6 +39,7 @@ class Sample < ActiveRecord::Base
   has_many :sop_masters,:class_name => "SampleSop"
   grouped_pagination :pages=>("A".."Z").to_a, :default_page => Seek::Config.default_page(self.name.underscore.pluralize)
 
+  HUMANIZED_COLUMNS = Seek::Config.is_virtualliver ? {} : {:lab_internal_number=> "lab internal identifier", :provider_id => "provider's sample identifier"}
 
   searchable do
     text :description,:title,:lab_internal_number
@@ -78,5 +79,9 @@ class Sample < ActiveRecord::Base
     new_object.sop_masters = self.try(:sop_masters)
     new_object.project_ids = self.project_ids
     return new_object
+  end
+
+  def self.human_attribute_name(attribute)
+    HUMANIZED_COLUMNS[attribute.to_sym] || super
   end
 end
