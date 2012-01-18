@@ -41,12 +41,12 @@
     </p>
 
     <p>
-        <%= specimen_f.label "Culture start date:" -%> <br/>
+        <%= specimen_f.label "Culture starting date:" -%> <br/>
         <%= specimen_f.calendar_date_select :born, :time => "mixed", :style=>"width:350px;" -%>
     </p>
 
     <p>
-        <%= specimen_f.label "Culture growth type:" -%> <br/>
+        <%= specimen_f.label "Culture type:" -%> <br/>
         <%= specimen_f.select :culture_growth_type_id, options_for_select(CultureGrowthType.all.collect{|c| [c.title,c.id]}),:include_blank=>"Not specified" -%>
     </p>
 
