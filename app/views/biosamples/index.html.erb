@@ -41,7 +41,7 @@
         var selection_box = $('specimen_strain_id');
         selection_box.options.length=0;
 
-        <% ([Strain.new(:title => 'Select Strain ...')] | Strain.find(:all).sort_by(&:title).reject{|s| s.title == 'default'}).each do |strain| -%>
+        <% ([Strain.new(:title => 'Select Strain ...')] | Strain.find(:all).sort_by(&:title).reject{|s| s.is_dummy?}).each do |strain| -%>
 
             if ('<%= strain.title -%>' == 'Select Strain ...'){
                option = document.createElement("OPTION");

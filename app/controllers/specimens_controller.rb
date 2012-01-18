@@ -204,9 +204,9 @@ class SpecimensController < ApplicationController
   end
 
   def default_strain_for organism_id
-    strain = Strain.find(:all, :conditions => ['organism_id=? and title=?', organism_id, 'default']).first
+    strain = Strain.find(:all, :conditions => ['organism_id=? and is_dummy=?', organism_id, true]).first
     unless strain
-      strain = Strain.new(:title => 'default', :organism_id => organism_id)
+      strain = Strain.new(:title => 'default', :organism_id => organism_id, :is_dummy=>true)
       gene = Gene.find_by_title('wild-type') || Gene.create(:title => 'wild-type')
       genotype = Genotype.new(:gene => gene)
       phenotype = Phenotype.new(:description => 'wild-type')

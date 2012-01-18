@@ -44,7 +44,7 @@ class StrainsController < ApplicationController
     if params[:organism_id]
       @organism=Organism.find_by_id(params[:organism_id])
       strains=@organism.try(:strains)
-      @strains = strains ? strains.reject{|s| s.title == 'default' || s.id == params[:strain_id].to_i} : strains
+      @strains = strains ? strains.reject{|s| s.is_dummy? || s.id == params[:strain_id].to_i} : strains
     end
   end
 
@@ -173,17 +173,4 @@ class StrainsController < ApplicationController
       strain
   end
 
-  def default_strain_for organism_id
-    strain = Strain.find(:all, :conditions => ['organism_id=? and title=?', organism_id, 'default']).first
-    unless strain
-      strain = Strain.new(:title => 'default', :organism_id => organism_id)
-      gene = Gene.find_by_title('wild-type') || Gene.create(:title => 'wild-type')
-      genotype = Genotype.new(:gene => gene)
-      phenotype = Phenotype.new(:description => 'wild-type')
-      strain.genotypes = [genotype]
-      strain.phenotype = phenotype
-      strain.save
-    end
-    strain
-  end
 end

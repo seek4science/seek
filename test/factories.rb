@@ -193,17 +193,17 @@ end
 
 
 #Data File
-  Factory.define(:data_file) do |f|
-    f.sequence(:title) {|n| "A Data File_#{n}"}
-    f.projects {[Factory.build(:project)]}
-    f.association :contributor, :factory => :user
-    f.association :content_blob, :factory => :content_blob
-  end
+Factory.define(:data_file) do |f|
+  f.sequence(:title) {|n| "A Data File_#{n}"}
+  f.projects {[Factory.build(:project)]}
+  f.association :contributor, :factory => :user
+  f.association :content_blob, :factory => :content_blob
+end
 
-  Factory.define(:rightfield_datafile,:parent=>:data_file) do |f|
-    f.content_type "application/excel"
-    f.association :content_blob,:factory=>:rightfield_content_blob
-  end
+Factory.define(:rightfield_datafile,:parent=>:data_file) do |f|
+  f.content_type "application/excel"
+  f.association :content_blob,:factory=>:rightfield_content_blob
+end
 
 #Model
   Factory.define(:model) do |f|

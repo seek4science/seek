@@ -9,7 +9,7 @@ class BiosamplesController < ApplicationController
           if organism
             organisms << organism
             strains=organism.try(:strains)
-            strains_of_organisms |= strains ? strains.reject { |s| s.title == 'default' } : strains
+            strains_of_organisms |= strains ? strains.reject { |s| s.is_dummy? } : strains
           end
         end
       end
@@ -103,11 +103,7 @@ class BiosamplesController < ApplicationController
       specimen = Specimen.new(params[:specimen])
       sop_ids = (params[:specimen_sop_ids].nil? ? [] : params[:specimen_sop_ids].reject(&:blank?))||[]
       specimen.policy.set_attributes_with_sharing params[:sharing], sample.projects
-      #if no strain is selected, create/select the default strain
-      if params[:specimen][:strain_id] == '0'
-        #strain = @specimen.default_strain_for params[:organism_id]
-        #specimen.strain = strain
-      end
+
       #Add creators
       AssetsCreator.add_or_update_creator_list(specimen, params[:creators])
     end
