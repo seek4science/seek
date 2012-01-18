@@ -36,6 +36,11 @@
     </p>
 
     <p>
+        <%= specimen_f.label "Lab internal identifier:" -%> <span class="required">*</span><br/>
+        <%= specimen_f.text_field :lab_internal_number, :style=>"width:350px;" -%>
+    </p>
+
+    <p>
         <%= specimen_f.label "Culture start date:" -%> <br/>
         <%= specimen_f.calendar_date_select :born, :time => "mixed", :style=>"width:350px;" -%>
     </p>
@@ -57,15 +62,14 @@
 
     <p>
         <%= specimen_f.label "Organism:" -%><span class="required">*</span> <br/>
-        <%= specimen_f.select :organism,
-                              options_for_select(Organism.all.collect{|o| [o.title,o.id]}),
-                              {:include_blank=>"Not specified"},
-                              {:onchange=>"update_strains_for_organism(this.value);"} -%>
+        <%= select_tag :organism,
+                              options_for_select([["Not specified",""]] + Organism.all(:order=>:title).collect{|o| [o.title,o.id]}),
+                              :onchange=>"update_strains_for_organism(this.value);" -%>
     </p>
 
     <p>
         <%= specimen_f.label "Strain:" -%> <br/>
-        <% strains = @sample.specimen.organism.try(:strain).try(:without_defaults) || [] %>
+        <% strains = @sample.specimen.organism.try(:strains) || [] %>
         <%= specimen_f.select :strain_id,
                               options_for_select(strains.collect{|s| [s.title,s.id]}),:include_blank=>"Not specified" -%>
     </p>
