@@ -47,7 +47,7 @@
 
     <p>
         <%= specimen_f.label "Culture growth type:" -%> <br/>
-        <%= specimen_f.select :culture_growth_type_id, options_for_select(CultureGrowthType.all.collect{|c| [c.title,c.id]}),:include_blank=>"Not specified" -%>
+        <%= specimen_f.collection_select :culture_growth_type_id, CultureGrowthType.all,:id,:title,:include_blank=>"Not specified" -%>
     </p>
 
     <p>
@@ -69,9 +69,9 @@
 
     <p>
         <%= specimen_f.label "Strain:" -%> <br/>
-        <% strains = @sample.specimen.organism.try(:strains) || [] %>
-        <%= specimen_f.select :strain_id,
-                              options_for_select(strains.collect{|s| [s.title,s.id]}),:include_blank=>"Not specified" -%>
+        <% strains = (@sample.specimen.organism.try(:strains) || []).reject{|s| s.is_dummy?} %>
+        <%= specimen_f.collection_select :strain_id,
+                              strains,:id,:info,:include_blank=>"Not specified" -%>
     </p>
 
 

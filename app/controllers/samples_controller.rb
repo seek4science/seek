@@ -42,8 +42,7 @@ class SamplesController < ApplicationController
     @sample.specimen.contributor = @sample.contributor if @sample.specimen.contributor.nil?
     @sample.specimen.projects = @sample.projects if @sample.specimen.projects.blank?
     if @sample.specimen.strain.nil?
-      organism = Organism.find(params[:organism])
-      @sample.specimen.strain = Strain.default_strain_for_organism(organism)
+      @sample.specimen.strain = Strain.default_strain_for_organism(params[:organism])
     end
 
     #add policy to sample

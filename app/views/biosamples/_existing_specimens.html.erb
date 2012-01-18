@@ -62,7 +62,7 @@
                   <% if specimen.born.nil? %>
                       <% born = '' %>
                   <% else %>
-                      <% if specimen.try(:born).hour == 0 and specimen.try(:born).min == 0 and specimen.try(:born).sec == 0 then %>
+                      <% if specimen.try(:born).hour == 0 && specimen.try(:born).min == 0 && specimen.try(:born).sec == 0 %>
                           <% born = specimen.try(:born).strftime('%d/%m/%Y') %>
                       <% else %>
                           <% born = specimen.try(:born).strftime('%d/%m/%Y @ %H:%M:%S') %>
@@ -70,13 +70,8 @@
                   <% end %>
                   <%
                      strain = specimen.strain
-                     genotype_detail = ''
-                     strain.genotypes.each do |genotype|
-                         genotype_detail << genotype.modification.try(:title) + ' ' + genotype.gene.try(:title) + '; ' if genotype.gene
-                     end
-                     genotype_detail = genotype_detail.blank? ? 'wild-type' : genotype_detail
-                     phenotype_detail = strain.phenotype.try(:description).blank? ? 'wild-type' : strain.phenotype.try(:description).gsub('$$$', '; ')
-                     strain_info = 'Strain ' + strain.title + "(" + genotype_detail + '/' + phenotype_detail + ')'
+                     strain_info = strain.info
+
                      sop_links = []
                      specimen.sops.select(&:can_view?).each do |sop|
                         sop_links << link_to(sop.title, sop_path(sop.sop_id) + "?version=#{sop.version}", {:target => '_blank'})
