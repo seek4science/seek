@@ -42,14 +42,29 @@ class Sample < ActiveRecord::Base
   HUMANIZED_COLUMNS = Seek::Config.is_virtualliver ? {} : {:lab_internal_number=> "lab internal identifier", :provider_id => "provider's sample identifier"}
 
   searchable do
-    text :description,:title,:lab_internal_number
-    text :assays do
-      assays.map{|a| a.title}
-    end
-    text :specimen do
-      specimen.try :title
-    end
+    text :searchable_terms
   end if Seek::Config.solr_enabled
+
+
+  def searchable_terms
+    text=[]
+    text << title
+    text << description
+    text << lab_internal_number
+    text << provider_name
+    text << provider_id
+    if (specimen)
+      text << specimen.lab_internal_number
+      text << specimen.provider_id
+      text << specimen.title
+      text << specimen.provider_id
+      if (specimen.strain)
+        text << specimen.strain.info
+        text << specimen.strain.organism.title
+      end
+    end
+    text
+  end
 
   def can_delete? *args
     assays.empty? && super
