@@ -59,12 +59,12 @@
 
                   <% end %>
                   <%
-                     provider_name = sample.try_block { provider_name }
-                     provider_name = provider_name.blank? ? try_block { sample.contributor.person.name } : provider_name
+                     provider_name = sample.provider_name
+                     provider_name = provider_name.blank? ? sample.contributor.try(:person).try(:name) : provider_name
                   %>
                   <%
                      specimen = sample.specimen
-                     specimen_info = CELL_CULTURE_OR_SPECIMEN.capitalize + ' ' + specimen.lab_internal_number
+                     specimen_info = CELL_CULTURE_OR_SPECIMEN.capitalize + ' ' + specimen.title
                   %>
                   <tr class="gradeX">
                     <td><%= specimen_info %> </td>
