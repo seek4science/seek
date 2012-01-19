@@ -157,14 +157,24 @@ fixtures :all
     creator=Factory :person
     proj1=Factory(:project)
     proj2=Factory(:project)
+
+    new_sop=Factory :sop,:contributor=>User.current_user
+    original_sop = Factory :sop,:contributor=>User.current_user
+
     s = Factory(:sample, :title=>"oneSample", :policy =>policies(:editing_for_all_sysmo_users_policy),
                 :specimen=>Factory(:specimen,:policy=>policies(:editing_for_all_sysmo_users_policy))
     )
+    SopSpecimen.create!(:sop_id => original_sop.id,:sop_version=> original_sop.version,:specimen_id=>s.specimen.id)
+
     assert_not_equal "new sample title", s.title
+    assert [original_sop],s.specimen.sops.collect{|sop| sop.parent}
+
     put :update, :id=>s, :creators=>[[creator.name,creator.id]].to_json,
+        :specimen_sop_ids=>[new_sop.id],
         :specimen=>{:other_creators=>"jesus jones"},
         :sample =>{:title =>"new sample title",:projects=>[proj1,proj2],:specimen_attributes=>{:title=>"new specimen title"}}
     s = assigns(:sample)
+
     assert_redirected_to sample_path(s)
     assert_equal "new sample title", s.title
     assert_equal "new specimen title", s.specimen.title
@@ -175,6 +185,7 @@ fixtures :all
     assert s.projects.include?(proj1)
     assert s.projects.include?(proj2)
     assert_equal s.projects,s.specimen.projects
+    assert_equal [new_sop],s.specimen.sops.collect{|sop| sop.parent}
   end
 
   test "should destroy" do

@@ -57,12 +57,9 @@ class SamplesController < ApplicationController
     @sample.specimen.other_creators=params[:specimen][:other_creators] if params[:specimen]
 
     if @sample.save
-        sops.each do |s_id|
-          s = Sop.find(s_id)
-          if s.can_view?
-            SopSpecimen.create!(:sop_id => s.id,:sop_version=> s.version,:specimen_id=>@sample.specimen.id)
-          end
-        end
+
+        align_sops(@sample.specimen,sops)
+
         if @sample.from_new_link=="true"
            render :partial=>"assets/back_to_fancy_parent",:locals=>{:child=>@sample,:parent=>"assay"}
         else
@@ -101,7 +98,7 @@ class SamplesController < ApplicationController
       @sample.policy.set_attributes_with_sharing params[:sharing],@sample.projects
       @sample.specimen.policy.set_attributes_with_sharing params[:sharing],@sample.projects
 
-      sops  = (params[:sample_sop_ids].nil?? [] : params[:sample_sop_ids].reject(&:blank?)) || []
+      sops  = (params[:specimen_sop_ids].nil?? [] : params[:specimen_sop_ids].reject(&:blank?)) || []
 
       #add creators
       AssetsCreator.add_or_update_creator_list(@sample.specimen, params[:creators])
@@ -110,15 +107,7 @@ class SamplesController < ApplicationController
 
         if @sample.save
 
-          if sops.blank?
-            @sample.sop_masters= []
-            @sample.save
-          else
-            sops.each do |s_id|
-              s = Sop.find(s_id)
-              @sample.associate_sop(s) if s.can_view?
-            end
-          end
+          align_sops(@sample.specimen,sops)
 
           flash[:notice] = 'Sample was successfully updated.'
           format.html { redirect_to(@sample) }
@@ -127,6 +116,20 @@ class SamplesController < ApplicationController
         else
           format.html { render :action => "edit" }
         end
+    end
+  end
+
+  def align_sops resource,new_sop_ids
+    existing_ids = resource.sop_masters.collect{|sm| sm.sop.id}
+    to_remove = existing_ids - new_sop_ids
+    join_class = "Sop#{resource.class.name}".constantize
+    to_remove.each do |id|
+      joins = join_class.find(:all, :conditions=>{"#{resource.class.name.downcase}_id".to_sym=>resource.id,:sop_id=>id})
+      joins.each{|j| j.destroy}
+    end
+    (new_sop_ids - existing_ids).each do |id|
+      sop=Sop.find(id)
+      join_class.create!(:sop_id=>sop.id,:sop_version=>sop.version,"#{resource.class.name.downcase}_id".to_sym=>resource.id)
     end
   end
 
