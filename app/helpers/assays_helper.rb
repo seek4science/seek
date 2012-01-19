@@ -28,52 +28,7 @@ module AssaysHelper
     return result
   end
 
-  # takes an array of [organism,strain] where strain can be nil if not defined
-  def list_assay_organism_and_strains organism_and_strains,none_text="Not specified"
-    result=""
-    result="<span class='none_text'>#{none_text}</span>" if organism_and_strains.empty?
-    result += "<br/>"
-    organism_and_strains.each do |os|
-      organism=os[0]
-      strain=os[1]
-      if organism
-        result += link_to h(organism.title),organism
-        end
 
-        if strain
-          result += " : "
-          result += h(strain.title)
-        end
-
-        result += ",<br/>" unless os==organism_and_strains.last
-    end
-    result
-  end
-
-  def show_specimen_organisms_list specimens,none_text="Not specified"
-    result=""
-    result="<span class='none_text'>#{none_text}</span>" if specimens.empty?
-    organisms = specimens.collect{|s|[s.organism,s.strain]}.uniq
-
-    organisms.each do |ao|
-
-      organism = ao.first
-      strain = ao.second
-
-      if organism
-      result += link_to h(organism.title),organism
-      end
-
-      if strain
-        result += " : "
-        result += h(strain.title)
-      end
-
-      result += ",<br/>" unless ao == organisms.last
-
-    end
-    result
-  end
 
   def authorised_assays
     authorised_assets(Assay, "edit")

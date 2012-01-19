@@ -17,49 +17,43 @@
 
 <%= render :partial => "layouts/item_title", :locals=>{:item=>@sample} %>
 
+<%= render :partial => "layouts/usage_info", :locals => { :resource => @sample } -%>
+
 <div class="show_basic">
 
-  <div class="main_content_left_box">
+  <div class="main_content_left_box_narrower">
 
+    <div class="box_about_actor">
+      <p>
+        <label>Sample name:</label>
+        <%= text_or_not_specified(@sample.title) -%>
+      </p>
       <p>
         <label>Lab internal identifier:</label>
         <%= text_or_not_specified(@sample.lab_internal_number) %>
       </p>
       <p>
-        <label>Provider:</label>
-        <%= text_or_not_specified(@sample.provider_name) -%>
+        <label>Sampling date:</label>
+        <%= text_or_not_specified @sample.sampling_date.nil? ? nil : date_as_string(@sample.sampling_date) -%>
       </p>
       <p>
-        <label>Sampling date:</label>
-        <%= text_or_not_specified @sample.sampling_date.nil? ? nil : @sample.sampling_date.strftime('%e %b %Y') -%>
+        <label>Provider name:</label>
+        <%= text_or_not_specified @sample.provider_name -%>
       </p>
-      <% if Seek::Config.is_virtualliver %>
-          <p>
-            <label>Explantation time:</label>
-            <%= text_or_not_specified(@sample.explantation) %>
-          </p>
+      <p>
+        <label>Provider's sample identifier:</label>
+        <%= text_or_not_specified @sample.provider_id -%>
+      </p>
 
-          <p>
-            <label>Date of donation:</label>
-            <% if @sample.donation_date.nil? %>
-                <%= text_or_not_specified nil %>
-            <% else %>
+      <h2><%= CELL_CULTURE_OR_SPECIMEN.capitalize -%> details</h2>
 
-                <% if @sample.donation_date.hour == 0 && @sample.donation_date.min == 0 && @sample.donation_date.sec == 0 -%>
-                    <%= h @sample.donation_date.strftime('%e %b %Y') -%>
-                <% else %>
-                    <%= h @sample.donation_date.strftime('%e %b %Y @ %H:%M:%S') -%>
-                <% end %>
+      <%= render :partial=>"sample_specimen_details",:object=>@sample.specimen -%>
 
-            <% end %>
-          </p>
-      <% end %>
+    </div>
 
   </div>
-
-  <div style='clear:both;height:3em;'>
-    <!-- spacer -->
-  </div>
+  <%# Requires passing of sample.specimen rather than sample because it is this that holds the creators information -%>
+  <%= render :partial=>"assets/resource_main_content_right",:locals => { :resource => @sample.specimen } %>
 
   <div style="clear:both">
 

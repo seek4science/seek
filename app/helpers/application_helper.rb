@@ -5,6 +5,12 @@ module ApplicationHelper
   include FancyMultiselectHelper
 
 
+  def date_as_string date,show_time_of_day=false
+    str = date.strftime("#{date.day.ordinalize} %B %Y")
+    str = date.strftime("#{str} @ %H:%M:%S") if show_time_of_day
+    str
+  end
+
   def authorized_list all_items, attribute, sort=true, max_length=75, count_hidden_items=false
     items = all_items.select &:can_view?
     title_only_items = (all_items - items).select &:title_is_public?

@@ -211,7 +211,6 @@ module AssetsHelper
         related["Sample"][:items] = resource.samples
         related["Sop"][:items] = resource.sops
       when "Sample"
-        related["Specimen"][:items] = [resource.specimen]
         related["Institution"][:items] = [resource.institution]
         related["Project"][:items] = resource.projects
         related["Assay"][:items] = resource.assays
