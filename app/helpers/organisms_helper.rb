@@ -57,7 +57,7 @@ module OrganismsHelper
   def organism_and_strain strain,organism=strain.organism
     result = ""
     result << link_to(h(organism.title), organism)
-    if strain
+    if strain && !strain.is_dummy?
       result << " : #{h(strain.info)}"
     end
     result
