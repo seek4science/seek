@@ -63,7 +63,7 @@
     <p>
         <%= specimen_f.label "Organism:" -%><span class="required">*</span> <br/>
         <%= select_tag :organism,
-                              options_for_select([["Not specified",""]] + Organism.all(:order=>:title).collect{|o| [o.title,o.id]}),
+                              options_for_select([["Not specified",""]] + Organism.all(:order=>:title).collect{|o| [o.title,o.id]},@sample.specimen.organism.try(:id)),
                               :onchange=>"update_strains_for_organism(this.value);" -%>
     </p>
 
