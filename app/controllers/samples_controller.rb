@@ -82,14 +82,17 @@ class SamplesController < ApplicationController
 
 
   def update
+      if params[:sample]
+        spec = params[:sample].delete(:specimen_attributes) if params[:sample]
 
-      spec = params[:sample].delete(:specimen_attributes)
-      #other creators gets passed as :specimen as the key due to the way the creators partial works
-      spec[:other_creators] = params[:specimen][:other_creators] if params[:specimen]
-      @sample.specimen.update_attributes(spec) unless spec.nil?
-      @sample.update_attributes(params[:sample])
-      @sample.contributor = @sample.specimen.contributor
-      @sample.projects = @sample.specimen.projects
+        #other creators gets passed as :specimen as the key due to the way the creators partial works
+        spec[:other_creators] = params[:specimen][:other_creators] if params[:specimen]
+        @sample.specimen.update_attributes(spec) unless spec.nil?
+        @sample.update_attributes(params[:sample])
+        @sample.specimen.contributor = @sample.contributor
+        @sample.specimen.projects = @sample.projects
+      end
+
       if @sample.specimen.strain.nil? && !params[:organism].blank?
         @sample.specimen.strain = Strain.default_strain_for_organism(params[:organism])
       end

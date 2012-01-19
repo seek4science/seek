@@ -65,6 +65,8 @@ fixtures :all
 
   test "should create sample and specimen" do
     creator=Factory :person
+    proj1=Factory(:project)
+    proj2=Factory(:project)
     sop = Factory :sop,:contributor=>User.current_user
     assert_difference("Sample.count") do
       assert_difference("Specimen.count") do
@@ -76,7 +78,7 @@ fixtures :all
             :sample => {
             :title => "test",
             :contributor=>User.current_user,
-            :projects=>[Factory(:project)],
+            :projects=>[proj1,proj2],
             :lab_internal_number =>"Do232",
             :donation_date => Date.today,
             :specimen_attributes => {:strain_id => Factory(:strain).id,
@@ -95,6 +97,10 @@ fixtures :all
     assert s.specimen.creators.include?(creator)
     assert_equal 1,s.specimen.creators.count
     assert_equal "jesus jones",s.specimen.other_creators
+    assert_equal 2,s.projects.count
+    assert s.projects.include?(proj1)
+    assert s.projects.include?(proj2)
+    assert_equal s.projects,s.specimen.projects
   end
 
   test "should create sample and specimen with default strain if missing" do
@@ -149,13 +155,15 @@ fixtures :all
 
   test "should update sample with specimen" do
     creator=Factory :person
+    proj1=Factory(:project)
+    proj2=Factory(:project)
     s = Factory(:sample, :title=>"oneSample", :policy =>policies(:editing_for_all_sysmo_users_policy),
                 :specimen=>Factory(:specimen,:policy=>policies(:editing_for_all_sysmo_users_policy))
     )
     assert_not_equal "new sample title", s.title
     put :update, :id=>s, :creators=>[[creator.name,creator.id]].to_json,
         :specimen=>{:other_creators=>"jesus jones"},
-        :sample =>{:title =>"new sample title",:specimen_attributes=>{:title=>"new specimen title"}}
+        :sample =>{:title =>"new sample title",:projects=>[proj1,proj2],:specimen_attributes=>{:title=>"new specimen title"}}
     s = assigns(:sample)
     assert_redirected_to sample_path(s)
     assert_equal "new sample title", s.title
@@ -163,6 +171,10 @@ fixtures :all
     assert s.specimen.creators.include?(creator)
     assert_equal 1,s.specimen.creators.count
     assert_equal "jesus jones",s.specimen.other_creators
+    assert_equal 2,s.projects.count
+    assert s.projects.include?(proj1)
+    assert s.projects.include?(proj2)
+    assert_equal s.projects,s.specimen.projects
   end
 
   test "should destroy" do
