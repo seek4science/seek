@@ -27,12 +27,11 @@ class Specimen < ActiveRecord::Base
   validates_numericality_of :age, :only_integer => true, :greater_than=> 0, :allow_nil=> true, :message => "is not a positive integer"
   validates_presence_of :title,:lab_internal_number, :contributor,:strain
 
-  validates_presence_of :institution, :projects if Seek::Config.is_virtualliver
+  validates_presence_of :institution if Seek::Config.is_virtualliver
   validates_uniqueness_of :title
 
   def self.sop_sql()
-  'SELECT sop_versions.* FROM sop_versions ' +
-  'INNER JOIN sop_specimens ' +
+  'SELECT sop_versions.* FROM sop_versions ' + 'INNER JOIN sop_specimens ' +
   'ON sop_specimens.sop_id = sop_versions.sop_id ' +
   'WHERE (sop_specimens.sop_version = sop_versions.version ' +
   'AND sop_specimens.specimen_id = #{self.id})'

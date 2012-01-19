@@ -27,7 +27,7 @@ class SamplesController < ApplicationController
   def new
     @sample = Sample.new
     @sample.from_new_link = params[:from_new_link]
-    @sample.specimen = Specimen.new
+    @sample.specimen = Specimen.new :creators=>[User.current_user.person]
 
     respond_to do |format|
       format.html # new.html.erb
@@ -41,19 +41,25 @@ class SamplesController < ApplicationController
 
     @sample.specimen.contributor = @sample.contributor if @sample.specimen.contributor.nil?
     @sample.specimen.projects = @sample.projects if @sample.specimen.projects.blank?
-    if @sample.specimen.strain.nil?
+    if @sample.specimen.strain.nil? && !params[:organism].blank?
       @sample.specimen.strain = Strain.default_strain_for_organism(params[:organism])
     end
 
-    #add policy to sample
+    #add policy to sample and specimen
     @sample.policy.set_attributes_with_sharing params[:sharing], @sample.projects
-    sops       = (params[:sample_sop_ids].nil?? [] : params[:sample_sop_ids].reject(&:blank?)) || []
+    @sample.specimen.policy.set_attributes_with_sharing params[:sharing], @sample.projects
+
+    #get SOPs
+    sops = (params[:specimen_sop_ids].nil?? [] : params[:specimen_sop_ids].reject(&:blank?)) || []
+
+    #add creators
+    AssetsCreator.add_or_update_creator_list(@sample.specimen, params[:creators])
+    @sample.specimen.other_creators=params[:specimen][:other_creators] if params[:specimen]
 
     if @sample.save
-        sops.each do |s_id|
-          s = Sop.find(s_id)
-          @sample.associate_sop(s) if s.can_view?
-        end
+
+        align_sops(@sample.specimen,sops)
+
         if @sample.from_new_link=="true"
            render :partial=>"assets/back_to_fancy_parent",:locals=>{:child=>@sample,:parent=>"assay"}
         else
@@ -73,33 +79,57 @@ class SamplesController < ApplicationController
 
 
   def update
-      sops       = (params[:sample_sop_ids].nil?? [] : params[:sample_sop_ids].reject(&:blank?)) || []
+      if params[:sample]
+        spec = params[:sample].delete(:specimen_attributes) if params[:sample]
 
-      @sample.attributes = params[:sample]
+        #other creators gets passed as :specimen as the key due to the way the creators partial works
+        spec[:other_creators] = params[:specimen][:other_creators] if params[:specimen]
+        @sample.specimen.update_attributes(spec) unless spec.nil?
+        @sample.update_attributes(params[:sample])
+        @sample.specimen.contributor = @sample.contributor
+        @sample.specimen.projects = @sample.projects
+      end
+
+      if @sample.specimen.strain.nil? && !params[:organism].blank?
+        @sample.specimen.strain = Strain.default_strain_for_organism(params[:organism])
+      end
 
       #update policy to sample
       @sample.policy.set_attributes_with_sharing params[:sharing],@sample.projects
+      @sample.specimen.policy.set_attributes_with_sharing params[:sharing],@sample.projects
+
+      sops  = (params[:specimen_sop_ids].nil?? [] : params[:specimen_sop_ids].reject(&:blank?)) || []
+
+      #add creators
+      AssetsCreator.add_or_update_creator_list(@sample.specimen, params[:creators])
+
       respond_to do |format|
 
-      if @sample.save
+        if @sample.save
 
-        if sops.blank?
-          @sample.sop_masters= []
-          @sample.save
-        else
-          sops.each do |s_id|
-          s = Sop.find(s_id)
-          @sample.associate_sop(s) if s.can_view?
-        end
-        end
+          align_sops(@sample.specimen,sops)
 
           flash[:notice] = 'Sample was successfully updated.'
           format.html { redirect_to(@sample) }
-          format.xml  { head :ok }
+          format.xml { head :ok }
 
-      else
-        format.html { render :action => "edit" }
-      end
+        else
+          format.html { render :action => "edit" }
+        end
+    end
+  end
+
+  def align_sops resource,new_sop_ids
+    existing_ids = resource.sop_masters.collect{|sm| sm.sop.id}
+    to_remove = existing_ids - new_sop_ids
+    join_class = "Sop#{resource.class.name}".constantize
+    to_remove.each do |id|
+      joins = join_class.find(:all, :conditions=>{"#{resource.class.name.downcase}_id".to_sym=>resource.id,:sop_id=>id})
+      joins.each{|j| j.destroy}
+    end
+    (new_sop_ids - existing_ids).each do |id|
+      sop=Sop.find(id)
+      join_class.create!(:sop_id=>sop.id,:sop_version=>sop.version,"#{resource.class.name.downcase}_id".to_sym=>resource.id)
     end
   end
 

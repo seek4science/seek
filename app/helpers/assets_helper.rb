@@ -125,6 +125,7 @@ module AssetsHelper
         related["Study"][:items] = resource.studies
         related["Assay"][:items] = resource.assays
         related["Publication"][:items] = resource.related_publications
+        related["Sample"][:items] = resource.specimens.collect{|spec| spec.samples}.flatten.uniq
       when "Assay"
         related["Project"][:items] = resource.projects
         related["Investigation"][:items] = [resource.investigation]
@@ -211,11 +212,10 @@ module AssetsHelper
         related["Sample"][:items] = resource.samples
         related["Sop"][:items] = resource.sops
       when "Sample"
-        related["Specimen"][:items] = [resource.specimen]
         related["Institution"][:items] = [resource.institution]
         related["Project"][:items] = resource.projects
         related["Assay"][:items] = resource.assays
-        related["Sop"][:items] = resource.sops
+        related["Sop"][:items] = resource.specimen.sops | resource.sops
       else
     end
     

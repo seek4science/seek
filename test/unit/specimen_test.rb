@@ -18,11 +18,6 @@ fixtures :all
     specimen.contributor = nil
     assert !specimen.valid?
 
-
-    specimen.reload
-    User.with_current_user(specimen.contributor){specimen.projects = []}
-    assert !specimen.valid?
-
     specimen.reload
     specimen.institution= nil
     assert !specimen.valid?

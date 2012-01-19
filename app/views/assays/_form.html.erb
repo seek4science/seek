@@ -87,15 +87,9 @@
 <br style="clear:both"/>
 <% if User.current_user -%>
 
-<% if @assay.is_modelling?  -%>
-    <div id="add_organism_form">
-        <%= render :partial=>"assays/select_organisms" -%>
-    </div>
-<% else -%>
-     <%= f.fancy_multiselect :samples, :object_type_text => @assay_text, :required=>true -%>
-<% end -%>
-
-
+<div id="add_organism_form">
+    <%= render :partial=>"assays/select_organisms" -%>
+</div>
 
 <br style="clear:both"/>
 

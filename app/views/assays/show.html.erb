@@ -73,14 +73,8 @@
 
       <p id="organism">
           <b>Organisms: </b>
-          <%= list_assay_organism_and_strains( @assay.assay_organisms.collect{|ao| [ao.organism,ao.strain]} | @assay.samples.collect{|s| [s.specimen.organism,s.specimen.strain]}) -%>
+          <%= list_organisms_and_strains( @assay.assay_organisms.collect{|ao| [ao.organism,ao.strain]} | @assay.samples.collect{|s| [s.specimen.organism,s.specimen.strain]}) -%>
       </p>
-
-         <p id="Samples">
-           <b>Samples: </b>
-           <%= samples_link_list @assay.samples%>
-         </p>
-
 
      <%# FIXME: should be in a css file rather than in the middle of a page -%>
       <style type="text/css">

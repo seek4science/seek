@@ -24,6 +24,9 @@ class Sop < ActiveRecord::Base
                
   has_many :experimental_conditions, :conditions =>  'experimental_conditions.sop_version = #{self.version}'
 
+  has_many :sop_specimens
+  has_many :specimens,:through=>:sop_specimens
+
   explicit_versioning(:version_column => "version") do
     
     acts_as_versioned_resource
