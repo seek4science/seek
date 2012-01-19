@@ -125,6 +125,7 @@ module AssetsHelper
         related["Study"][:items] = resource.studies
         related["Assay"][:items] = resource.assays
         related["Publication"][:items] = resource.related_publications
+        related["Sample"][:items] = resource.specimens.collect{|spec| spec.samples}.flatten.uniq
       when "Assay"
         related["Project"][:items] = resource.projects
         related["Investigation"][:items] = [resource.investigation]
