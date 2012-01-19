@@ -21,10 +21,11 @@ class BiosamplesController < ApplicationController
   def create_strain_popup
     strain = Strain.find_by_id(params[:strain_id])
     respond_to do  |format|
-      if current_user.person.member?
+      if current_user.try(:person).try(:member?)
         format.html{render :partial => 'biosamples/create_strain_popup', :locals => {:strain => strain}}
       else
         flash[:error] = "You are not authorized to create new strain. Only members of known projects, institutions or work groups are allowed to create new content."
+        format.html {redirect_to :back}
       end
     end
   end
@@ -32,7 +33,7 @@ class BiosamplesController < ApplicationController
   def new_strain_form
     strain = Strain.find_by_id(params[:id]) || Strain.new
     render :update do |page|
-      page.replace_html 'strain_form', :partial=>"biosamples/strain_form",:locals=>{:strain => strain, :organism_id => params[:organism_id]}
+      page.replace_html 'strain_form', :partial=>"biosamples/strain_form",:locals=>{:strain => strain}
     end
   end
 
@@ -83,10 +84,11 @@ class BiosamplesController < ApplicationController
       specimen = sample.specimen
     end
     respond_to do  |format|
-      if current_user.person.member?
+      if current_user.try(:person).try(:member?)
         format.html{render :partial => 'biosamples/create_sample_popup', :locals => {:sample => sample, :specimen => specimen}}
       else
         flash[:error] = "You are not authorized to create new sample. Only members of known projects, institutions or work groups are allowed to create new content."
+        format.html {redirect_to :back}
       end
     end
   end

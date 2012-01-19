@@ -18,4 +18,24 @@ class StrainsControllerTest < ActionController::TestCase
 
   end
 
+  test 'should create strain with name and organism' do
+    @request.env["HTTP_REFERER"]  = ''
+    organism = organisms(:yeast)
+    strain = {:title => 'test', :organism => organism}
+    assert_difference ('Strain.count') do
+      post :create, :strain => strain
+    end
+  end
+
+  test 'should not be able to create strain without login' do
+    logout
+    @request.env["HTTP_REFERER"]  = ''
+    organism = organisms(:yeast)
+    strain = {:title => 'test', :organism => organism}
+    assert_no_difference ('Strain.count') do
+      post :create, :strain => strain
+    end
+    assert_not_nil flash[:error]
+  end
+
 end

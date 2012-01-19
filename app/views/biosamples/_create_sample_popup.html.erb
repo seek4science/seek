@@ -10,6 +10,8 @@
       <div class="body">
         <% if specimen.nil? %>
             <%= render :partial => 'biosamples/specimen_form' %>
+        <% else %>
+            You will create this sample based on <%=CELL_CULTURE_OR_SPECIMEN-%> <%= specimen.title-%>
         <% end %>
 
         <%= render :partial => 'biosamples/sample_form' %>

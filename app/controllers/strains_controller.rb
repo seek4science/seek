@@ -69,14 +69,18 @@ class StrainsController < ApplicationController
 
 
   def create
-    strain = select_or_new_strain
-    respond_to do |format|
-      if strain.save
-        format.html {redirect_to :back}
-      else
-        flash[:error] = "Fail to create new strain. #{strain.errors.full_messages}"
-        format.html {redirect_to :back}
+    if current_user.person.member?
+      strain = select_or_new_strain
+      respond_to do |format|
+        if strain.save
+          format.html {redirect_to :back}
+        else
+          flash[:error] = "Fail to create new strain. #{strain.errors.full_messages}"
+          format.html {redirect_to :back}
+        end
       end
+    else
+       flash[:error] = "You are not authorized to create new strain. Only members of known projects, institutions or work groups are allowed to create new content."
     end
   end
 
