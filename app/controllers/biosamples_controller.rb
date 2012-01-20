@@ -94,7 +94,7 @@ class BiosamplesController < ApplicationController
   end
 
   def create_specimen_sample
-    params[:sharing][:permissions] = nil
+    params[:sharing][:permissions] = nil if params[:sharing]
 
     sample = Sample.new(params[:sample])
 

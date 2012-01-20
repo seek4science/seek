@@ -130,4 +130,27 @@ class BioSamplesControllerTest < ActionController::TestCase
     end
   end
 
+  test 'should create sample based on selected specimen' do
+    specimen = Factory(:specimen, :contributor => User.current_user)
+    assert_difference("Sample.count") do
+      post :create_specimen_sample, :sample => {:title => "test",
+                                :projects=>[Factory(:project)],
+                                :lab_internal_number =>"Do232"},
+           :specimen => {:id => specimen.id}
+    end
+  end
+
+  test 'should create sample and specimen' do
+    assert_difference("Sample.count") do
+      assert_difference("Specimen.count") do
+        post :create_specimen_sample, :sample => {:title => "test",
+                                  :projects=>[Factory(:project)],
+                                  :lab_internal_number =>"Do232"},
+                          :specimen => {:title => 'test',
+                                  :lab_internal_number => 'lab123',
+                                  :strain => Factory(:strain)
+                                  }
+      end
+    end
+  end
 end
