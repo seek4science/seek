@@ -127,7 +127,7 @@ module ApplicationHelper
   def text_or_not_specified text, options = {}
     text=text.to_s if text.kind_of?(Numeric)
     if text.nil? or text.chomp.empty?
-      not_specified_text="Not specified"
+      not_specified_text=options[:none_text] || "Not specified"
       not_specified_text="No description set" if options[:description]==true
       res = "<span class='none_text'>#{not_specified_text}</span>"
     else      
