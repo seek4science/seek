@@ -116,42 +116,42 @@ function checkSelectOneSpecimen(cell_culture_or_specimen){
         return true;
 }
 
-function validateSpecimenSampleFields(cell_culture_or_specimen){
-    if($('specimen_title').value.length == 0) {
-            alert("Please enter " + cell_culture_or_specimen + " title.");
-            $('specimen_title').focus();
-            return(false);
+function validateSpecimenSampleFields(cell_culture_or_specimen, is_new_specimen){
+    if (is_new_specimen) {
+        if($('specimen_title').value.length == 0) {
+                alert("Please enter " + cell_culture_or_specimen + " title.");
+                $('specimen_title').focus();
+                return(false);
+        }
+        if($('specimen_lab_internal_number').value.length == 0) {
+                alert("Please enter " + cell_culture_or_specimen + " lab internal identifier.");
+                $('specimen_lab_internal_number').focus();
+                return(false);
+        }
+        if($('organism_id').value == '0') {
+                alert("Please select one organism");
+                $('organism_id').focus();
+                return(false);
+        }
     }
-    else if($('specimen_lab_internal_number').value.length == 0) {
-            alert("Please enter " + cell_culture_or_specimen + " lab internal identifier.");
-            $('specimen_lab_internal_number').focus();
-            return(false);
-    }
-    else if($('organism_id').value == '0') {
-            alert("Please select one organism");
-            $('organism_id').focus();
-            return(false);
-    }
-    else if($('sample_title').value.length == 0) {
+    if($('sample_title').value.length == 0) {
             alert("Please enter sample title");
             $('sample_title').focus();
             return(false);
     }
-    else if($('sample_lab_internal_number').value.length == 0) {
+    if($('sample_lab_internal_number').value.length == 0) {
             alert("Please enter sample lab internal number");
             $('sample_lab_internal_number').focus();
             return(false);
     }
-    else if($F('sample_project_ids').length == 0) {
+    if($F('sample_project_ids').length == 0) {
             alert("Please select projects");
             $('possible_sample_project_ids').focus();
             return(false);
     }
-    else{
             $('create_specimen_sample').disabled = true;
             $('create_specimen_sample').value = "Creating...";
             return true;
-    }
 }
 
 function validateStrainFields(){
