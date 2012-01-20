@@ -536,6 +536,7 @@ function plot_selected_cells(target_element,width,height) {
     $j("div.spreadsheet_popup").hide();
     $j("div#plot_panel").show();
 }
+
 function plot_cells(target_element,width,height)
 {
     var cells = $j('td.selected_cell');
