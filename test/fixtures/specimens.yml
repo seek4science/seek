@@ -5,6 +5,7 @@ running mouse:
   projects: [sysmo_project]
   institution: one
   policy: policy_for_viewable_data_file
+  strain: yeast1
 
 running mouse2:
   title: "running mouse No.2"
@@ -13,3 +14,4 @@ running mouse2:
   projects: [sysmo_project]
   institution: one
   policy: policy_for_viewable_data_file
+  strain: yeast1
