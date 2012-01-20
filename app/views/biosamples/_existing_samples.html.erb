@@ -13,10 +13,11 @@
             ],
             "aoColumns": [
                 null,
+                { "sWidth": "20%" },
+                { "sWidth": "20%" },
+                { "sWidth": "20%" },
                 { "sWidth": "30%" },
-                { "sWidth": "25%" },
-                { "sWidth": "30%" },
-                { "sWidth": "15%" }
+                { "sWidth": "10%" }
             ],
             "fnInitComplete": function () {
                 this.fnAdjustColumnSizing(true);
@@ -40,6 +41,7 @@
               <thead>
               <tr>
                 <th>Specimen</th>
+                <th>Title</th>
                 <th>Lab internal identifier</th>
                 <th>Sampling date</th>
                 <th>Provider name</th>
@@ -68,6 +70,7 @@
                   %>
                   <tr class="gradeX">
                     <td><%= specimen_info %> </td>
+                    <td><%= link_to sample.title, sample_path(sample.id), {:target => '_blank'} %> </td>
                     <td><%= sample.lab_internal_number %> </td>
                     <td><%= sampling_date %> </td>
                     <td><%= provider_name %></td>
