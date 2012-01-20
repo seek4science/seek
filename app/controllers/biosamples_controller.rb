@@ -136,4 +136,111 @@ class BiosamplesController < ApplicationController
     end
   end
 
+  def create_strain
+      #No need to process if current_user is not a project member, because they cant go here from UI
+      if current_user.try(:person).try(:member?)
+        strain = select_or_new_strain
+        render :update do |page|
+          if strain.save
+            page.reload
+            #page.call "check_show_existing_strains('strain_organism_ids', 'existing_strains', '')"
+          else
+            page.alert("Fail to create new strain. #{strain.errors.full_messages}")
+          end
+        end
+      end
+  end
+
+  #if the strain doesnt get changed from UI, just select that strain
+  #otherwise create the new one
+  def select_or_new_strain
+    if params['strain']['id'].blank?
+      new_strain
+    else
+      strain = Strain.find_by_id(params['strain']['id'])
+      if strain
+        attributes = strain.attributes
+        strain_params = params[:strain]
+        flag = true
+        flag =  flag && (compare_attribute attributes['title'], strain_params['title'])
+        flag =  flag && (compare_attribute attributes['organism_id'].to_s, strain_params['organism_id'])
+        flag =  flag && (compare_attribute attributes['synonym'], strain_params['synonym'])
+        flag =  flag && (compare_attribute attributes['comment'], strain_params['comment'])
+        flag =  flag && (compare_attribute attributes['provider_id'].to_s, strain_params['provider_id'])
+        flag =  flag && (compare_attribute attributes['provider_name'], strain_params['provider_name'])
+        genotype_array = []
+        unless params[:genotypes].blank?
+          params[:genotypes].each_value do |value|
+            genotype_array << [value['gene']['title'], value['modification']['title']]
+          end
+        end
+        flag =  flag && (compare_genotypes strain.genotypes.collect{|genotype| [genotype.gene.try(:title), genotype.modification.try(:title)]}, genotype_array)
+        phenotype_description = []
+        unless params[:phenotypes].blank?
+          params[:phenotypes].each_value do |value|
+            phenotype_description << value['description'] unless value["description"].blank?
+          end
+        end
+        flag =  flag && (compare_attribute strain.phenotype.try(:description), phenotype_description.join('$$$'))
+        if flag
+          strain
+        else
+          new_strain
+        end
+      end
+    end
+  end
+
+  def compare_attribute attr1, attr2
+    if attr1.blank? and attr2.blank?
+      true
+    elsif attr1 == attr2
+      true
+    else
+      false
+    end
+  end
+
+  def compare_genotypes array1, array2
+    array1.sort!
+    array2.sort!
+    if array1.blank? and array2.blank?
+      true
+    elsif array1 == array2
+      true
+    else
+      false
+    end
+  end
+
+  def new_strain
+      strain = Strain.new()
+      strain.attributes = params[:strain]
+
+      #phenotypes
+      phenotypes_params = params["phenotypes"]
+      phenotype_description = []
+      unless phenotypes_params.blank?
+        phenotypes_params.each_value do |value|
+          phenotype_description << value["description"] unless value["description"].blank?
+        end
+      end
+      unless phenotype_description.blank?
+        strain.phenotype = Phenotype.new(:description => phenotype_description.join('$$$'))
+      end
+
+      #genotype
+      genotypes_params = params["genotypes"]
+      unless genotypes_params.blank?
+        genotypes_params.each_value do |value|
+          genotype = Genotype.new()
+          gene = Gene.find_by_title(value['gene']['title']) || (Gene.new(:title => value['gene']['title']) unless value['gene']['title'].blank?)
+          modification = Modification.find_by_title(value['modification']['title']) || (Modification.new(:title => value['modification']['title']) unless value['modification']['title'].blank?)
+          genotype.gene = gene
+          genotype.modification = modification
+          strain.genotypes << genotype unless gene.blank?
+        end
+      end
+      strain
+  end
 end
