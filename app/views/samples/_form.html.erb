@@ -69,7 +69,7 @@
 
     <p>
         <%= specimen_f.label "Strain:" -%> <br/>
-        <% strains = (@sample.specimen.organism.try(:strains) || []).reject{|s| s.is_dummy?} %>
+        <% strains = @sample.specimen.organism.nil? ? [] : @sample.specimen.organism.strains.without_default -%>
         <%= specimen_f.collection_select :strain_id,
                               strains,:id,:info,:include_blank=>"Not specified" -%>
     </p>

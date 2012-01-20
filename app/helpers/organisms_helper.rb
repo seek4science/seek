@@ -47,9 +47,10 @@ module OrganismsHelper
     organism_and_strains.each do |os|
       organism=os[0]
       strain=os[1]
-      result = organism_and_strain strain,organism
-
-      result += ",<br/>" unless os==organism_and_strains.last
+      unless strain.nil? && organism.nil?
+        result = organism_and_strain strain,organism
+        result += ",<br/>" unless os==organism_and_strains.last
+      end
     end
     result
   end
