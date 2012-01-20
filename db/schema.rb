@@ -9,7 +9,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20120117163447) do
+ActiveRecord::Schema.define(:version => 20120120110115) do
 
   create_table "activity_logs", :force => true do |t|
     t.string   "action"
@@ -1070,7 +1070,7 @@ ActiveRecord::Schema.define(:version => 20120117163447) do
     t.integer  "parent_id"
     t.string   "synonym"
     t.text     "comment"
-    t.integer  "provider_id"
+    t.string   "provider_id"
     t.string   "provider_name"
     t.boolean  "is_dummy",      :default => false
   end
