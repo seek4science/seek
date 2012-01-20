@@ -67,6 +67,14 @@ class PublicationTest < ActiveSupport::TestCase
 
   end
 
+  test "editor should not be author" do
+    WebMock.allow_net_connect!
+    query=DoiQuery.new("sowen@cs.man.ac.uk")
+    result = query.fetch("10.1371/journal.pcbi.1002352")
+    assert !result.authors.collect{|auth| auth.last_name}.include?("Papin")
+    assert_equal 5,result.authors.size
+  end
+
   test "model and datafile association" do
     publication = publications(:pubmed_2)
     assert publication.related_models.include?(models(:teusink))
