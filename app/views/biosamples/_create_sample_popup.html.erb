@@ -1,5 +1,5 @@
 <% remote_form_for 'biosamples', :url => url_for(:controller => 'biosamples', :action => 'create_specimen_sample'),
-  :condition=>"validateSpecimenSampleFields('#{CELL_CULTURE_OR_SPECIMEN}')",
+  :condition=>"validateSpecimenSampleFields('#{CELL_CULTURE_OR_SPECIMEN}', #{specimen.nil? ? true : false})",
   :html=>{:method=>:post} do  -%>
     <div id="redbox_contents_div" class="redbox_contents" style="width:800px;">
       <div class="head">
