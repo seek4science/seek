@@ -20,7 +20,13 @@
   <h2>Strain details</h2>
   <table style="width:100%;">
   <thead>
-  <th>Name</th><th>Provider name</th><th>Provider's strain identifier</th><th>Genotypes</th><th>Phenotypes</th><th>Comments</th>
+    <th>Name</th>
+    <th>Provider name</th>
+    <th>Provider's strain identifier</th>
+    <th>Genotypes</th>
+    <th>Phenotypes</th>
+    <th>Synonym</th>
+    <th>Comments</th>
   </thead>
   <%= render :partial=>"strain_information_row", :collection=>@organism.strains.without_default -%>
   </table>
