@@ -1,7 +1,9 @@
 <%
   all_organisms = Organism.find(:all,:order=>:title)
 -%>
-<% form_tag :controller => 'strains', :action=>"create" do -%>
+<% remote_form_for 'biosamples', :url => url_for(:controller => 'biosamples', :action => 'create_strain'),
+  :condition=>"validateStrainFields()",
+  :html=>{:method=>:post} do  -%>
 <div id="redbox_contents_div" class="redbox_contents" style="width:760px;">
 	<div class="head">
 		<%= link_to_close_redbox image_tag("close.gif"), :style => "float:right; margin-left:0.5em; vertical-align:middle;" -%>
@@ -24,7 +26,7 @@
       <div id='strain_form'></div>
 
       <div align="center" style="margin-top: 1.5em">
-        <%= submit_tag('Create', :id => 'create_strain', :style => "font-weight: bold;", :onclick => "validateStrainFields();return false;")%> Or
+        <%= submit_tag('Create', :style => "font-weight: bold;", :id => "create_strain")%> Or
         <input type=button value='Cancel' onclick="RedBox.close()">
       </div>
     </div>

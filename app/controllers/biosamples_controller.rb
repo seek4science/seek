@@ -115,12 +115,13 @@ class BiosamplesController < ApplicationController
     end
     sample.policy.set_attributes_with_sharing params[:sharing], sample.projects
     sample.specimen = specimen
-    respond_to do |format|
-      if specimen.save && sample.save
+    render :update do |page|
+      if sample.save
         sop_ids.each do |sop_id|
           sop= Sop.find sop_id
           SopSpecimen.create!(:sop_id => sop_id, :sop_version=> sop.version, :specimen_id=>specimen.id)
         end
+        page.reload
       else
         specimen_error_messages = ''
         specimen.errors.full_messages.each do |e_m|
@@ -130,9 +131,10 @@ class BiosamplesController < ApplicationController
         sample.errors.full_messages.each do |e_m|
           sample_error_messages << "sample #{e_m.downcase}. "
         end
-        flash[:error] = "Fail to create new sample: #{specimen_error_messages}#{sample_error_messages}"
+        page.alert("Fail to create: #{specimen_error_messages}#{sample_error_messages}")
+        page['create_specimen_sample'].disabled = false
+        page['create_specimen_sample'].value = 'Create'
       end
-      format.html { redirect_to :back }
     end
   end
 

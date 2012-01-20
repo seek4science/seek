@@ -122,48 +122,53 @@ function validateSpecimenSampleFields(cell_culture_or_specimen){
             $('specimen_title').focus();
             return(false);
     }
-    if($('specimen_lab_internal_number').value.length == 0) {
+    else if($('specimen_lab_internal_number').value.length == 0) {
             alert("Please enter " + cell_culture_or_specimen + " lab internal identifier.");
             $('specimen_lab_internal_number').focus();
             return(false);
     }
-    if($('organism_id').value == '0') {
+    else if($('organism_id').value == '0') {
             alert("Please select one organism");
             $('organism_id').focus();
             return(false);
     }
-    if($('sample_title').value.length == 0) {
+    else if($('sample_title').value.length == 0) {
             alert("Please enter sample title");
             $('sample_title').focus();
             return(false);
     }
-    if($('sample_lab_internal_number').value.length == 0) {
+    else if($('sample_lab_internal_number').value.length == 0) {
             alert("Please enter sample lab internal number");
             $('sample_lab_internal_number').focus();
             return(false);
     }
-    if($F('sample_project_ids').length == 0) {
+    else if($F('sample_project_ids').length == 0) {
             alert("Please select projects");
             $('possible_sample_project_ids').focus();
             return(false);
     }
-     $('create_specimen_sample').disabled = true;
-     $('create_specimen_sample').value = "Creating...";
-     $('create_specimen_sample').form.submit();
+    else{
+            $('create_specimen_sample').disabled = true;
+            $('create_specimen_sample').value = "Creating...";
+            return true;
+    }
 }
 
 function validateStrainFields(){
     if($('strain_title').value.length == 0) {
-            alert("Please enter strain title.");
+            alert("Please enter strain name.");
             $('strain_title').focus();
             return(false);
     }
-    if($('strain_organism_id').value == '0') {
+    else if($('strain_organism_id').value == '0') {
             alert("Please select one organism");
             $('strain_organism_id').focus();
             return(false);
     }
-     $('create_strain').disabled = true;
-     $('create_strain').value = "Creating...";
-     $('create_strain').form.submit();
+    else{
+        $('create_strain').disabled = true;
+        $('create_strain').value = 'Creating...'
+        return true;
+    }
+
 }
