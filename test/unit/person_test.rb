@@ -350,9 +350,9 @@ class PersonTest < ActiveSupport::TestCase
   
   def test_roles_association
     p=people(:person_for_model_owner)
-    assert_equal 2, p.roles.size
-    assert p.roles.include?(roles(:member))
-    assert p.roles.include?(roles(:postdoc))
+    assert_equal 2, p.project_roles.size
+    assert p.project_roles.include?(project_roles(:member))
+    assert p.project_roles.include?(project_roles(:postdoc))
   end
   
   def test_update_first_letter

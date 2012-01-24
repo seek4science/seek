@@ -1,6 +1,6 @@
 <div class="fold">
   <div class="foldTitle">
-    Roles
+    Project roles
   </div>
   <div class="foldContent">
     <ul class="groups">
@@ -12,15 +12,15 @@
           <% end -%>
           <ul class="roles">
             <div id="roles_<%= group_membership.id -%>">
-              <% unless group_membership.roles.empty? -%>
-                <% for role in group_membership.roles -%>
+              <% unless group_membership.project_roles.empty? -%>
+                <% for role in group_membership.project_roles -%>
                   <% if editable -%>
                     <script type="text/javascript">
                       addRole(<%= group_membership.id %>,'<%= role.name %>',<%= role.id %>);
                     </script>
                   <% else -%>
                     <li>
-                      <%= link_to h(role.name),people_path(:role_id=>role.id) %>
+                      <%= link_to h(role.name),people_path(:project_role_id=>role.id) %>
                     </li>
                   <% end -%>
 
@@ -33,7 +33,7 @@
             </div>
             <% if editable -%>
               <div id="edit_roles_<%= group_membership.id %>" style="display:none;">
-                <%= render :partial=>"edit_roles",:locals=>{:group_membership=>group_membership} %>
+                <%= render :partial=>"edit_project_roles",:locals=>{:group_membership=>group_membership} %>
               </div>
             <% end -%>
 

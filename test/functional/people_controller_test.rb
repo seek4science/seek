@@ -306,8 +306,8 @@ class PeopleControllerTest < ActionController::TestCase
   end
 
   test "finding by role" do
-    role=roles(:member)
-    get :index,:role_id=>role.id
+    role=project_roles(:member)
+    get :index,:project_role_id=>role.id
     assert_response :success
     assert assigns(:people)
     assert assigns(:people).include?(people(:person_for_model_owner))
@@ -358,9 +358,9 @@ class PeopleControllerTest < ActionController::TestCase
     #create a datafile that this person is the contributor
     data_file = Factory(:data_file, :contributor => user, :projects => [project])
     #create pi
-    role = Role.find_by_name('PI')
+    role = ProjectRole.find_by_name('PI')
     pi =  Factory(:person_in_project, :group_memberships => [Factory(:group_membership, :work_group => work_group)])
-    pi.group_memberships.first.roles << role
+    pi.group_memberships.first.project_roles << role
     pi.save
     assert_equal pi, project.pis.first
 
@@ -388,9 +388,9 @@ class PeopleControllerTest < ActionController::TestCase
     #create a datafile that this person is the contributor and with the same project
     data_file = Factory(:data_file, :contributor => user, :projects => [project])
     #create pal
-    role = Role.find_by_name('Sysmo-DB Pal')
+    role = ProjectRole.find_by_name('Sysmo-DB Pal')
     pal =  Factory(:person_in_project, :group_memberships => [Factory(:group_membership, :work_group => work_group)])
-    pal.group_memberships.first.roles << role
+    pal.group_memberships.first.project_roles << role
     pal.is_pal = true
     pal.save
     assert_equal pal, project.pals.first

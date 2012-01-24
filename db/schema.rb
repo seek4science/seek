@@ -9,7 +9,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20120120110115) do
+ActiveRecord::Schema.define(:version => 20120124111514) do
 
   create_table "activity_logs", :force => true do |t|
     t.string   "action"
@@ -447,9 +447,9 @@ ActiveRecord::Schema.define(:version => 20120120110115) do
 
   add_index "group_memberships", ["person_id"], :name => "index_group_memberships_on_person_id"
 
-  create_table "group_memberships_roles", :id => false, :force => true do |t|
+  create_table "group_memberships_project_roles", :id => false, :force => true do |t|
     t.integer "group_membership_id"
-    t.integer "role_id"
+    t.integer "project_role_id"
   end
 
   create_table "help_attachments", :force => true do |t|
@@ -692,6 +692,7 @@ ActiveRecord::Schema.define(:version => 20120120110115) do
     t.boolean  "can_edit_institutions",               :default => false
     t.boolean  "is_admin",                            :default => false
     t.boolean  "is_project_manager",                  :default => false
+    t.integer  "roles_mask"
   end
 
   create_table "permissions", :force => true do |t|
@@ -783,6 +784,12 @@ ActiveRecord::Schema.define(:version => 20120120110115) do
   create_table "presentations_projects", :id => false, :force => true do |t|
     t.integer "project_id"
     t.integer "presentation_id"
+  end
+
+  create_table "project_roles", :force => true do |t|
+    t.string   "name"
+    t.datetime "created_at"
+    t.datetime "updated_at"
   end
 
   create_table "project_subscriptions", :force => true do |t|
@@ -889,12 +896,6 @@ ActiveRecord::Schema.define(:version => 20120120110115) do
     t.string   "predicate",    :null => false
     t.string   "object_type",  :null => false
     t.integer  "object_id",    :null => false
-    t.datetime "created_at"
-    t.datetime "updated_at"
-  end
-
-  create_table "roles", :force => true do |t|
-    t.string   "name"
     t.datetime "created_at"
     t.datetime "updated_at"
   end
