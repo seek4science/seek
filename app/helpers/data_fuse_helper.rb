@@ -47,8 +47,11 @@ module DataFuseHelper
 
     end
     result = []
-    data.keys.each do |key|
-      result << {"label"=>key,"data"=>data[key]}
+    colors = ["red","blue","green","cyan","magenta","darkgreen"]
+    data.keys.each_with_index do |key,i|
+      hash = {"label"=>key,"data"=>data[key]}
+      hash["color"]=colors[i] unless colors[i].nil?
+      result << hash
     end
     result.to_json
   end
