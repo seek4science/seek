@@ -72,6 +72,8 @@ class Person < ActiveRecord::Base
   has_many :subscriptions,:dependent => :destroy
   before_create :set_default_subscriptions
 
+  ROLES = %w[admin]
+
   def set_default_subscriptions
     projects.each do |proj|
       project_subscriptions.build :project => proj
@@ -185,6 +187,18 @@ class Person < ActiveRecord::Base
     return (firstname.gsub(/\b\w/) {|s| s.upcase} + " " + lastname.gsub(/\b\w/) {|s| s.upcase}).strip
   end
 
+  #the roles defined within SEEK
+  def roles=(roles)
+    self.roles_mask = (roles & ROLES).map { |r| 2**ROLES.index(r) }.sum
+  end
+
+  def roles
+    ROLES.reject do |r|
+      ((roles_mask || 0) & 2**ROLES.index(r)).zero?
+    end
+  end
+
+  #the roles defined within the project
   def project_roles
     project_roles = []
     group_memberships.each do |gm|
