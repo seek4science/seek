@@ -72,10 +72,15 @@ The 'lightWeight' attribute below is important for two reasons:
     <method name="removeEventListener" />
     <method name="getScreenCTM" />
     <method name="getCTM" />
+    <method name="getBBox" />
     <method name="createSVGPoint" />
     <method name="createSVGRect" />
     <method name="cloneNode" />
     <method name="getElementsByTagNameNS" />
+    <method name="beginElement" />
+    <method name="endElement" />
+    <method name="beginElementAt" />
+    <method name="endElementAt" />
     
     <defaults tabStop="false" contentEditable="false"
               canHaveHTML="false" viewInheritStyle="true"
@@ -107,10 +112,15 @@ The 'lightWeight' attribute below is important for two reasons:
   function removeEventListener(t, l, u) { return this._fakeNode.removeEventListener(t, l, u); }
   function getScreenCTM() { return this._fakeNode.getScreenCTM(); }
   function getCTM() { return this._fakeNode.getCTM(); }
+  function getBBox() { return this._fakeNode.getBBox(); }
   function createSVGPoint() { return this._fakeNode.createSVGPoint(); }
   function createSVGRect() { return this._fakeNode.createSVGRect(); }
   function cloneNode(d) { return this._fakeNode.cloneNode(d); }
   function getElementsByTagNameNS(n, l) { return this._fakeNode.getElementsByTagNameNS(n, l); }
+  function beginElement() { return this._fakeNode.beginElement(); }
+  function endElement() { return this._fakeNode.endElement(); }
+  function beginElementAt(o) { return this._fakeNode.beginElementAt(o); }
+  function endElementAt(o) { return this._fakeNode.endElementAt(o); }
 
   function _getNodeName() { return this._fakeNode.nodeName; }
   function _getNodeType() { return this._fakeNode.nodeType; }
