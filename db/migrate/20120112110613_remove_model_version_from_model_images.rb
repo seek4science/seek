@@ -1,6 +1,6 @@
 class RemoveModelVersionFromModelImages < ActiveRecord::Migration
   def self.up
-    remove_column :model_version
+    remove_column :model_images,:model_version
   end
 
   def self.down

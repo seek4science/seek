@@ -538,7 +538,6 @@ ActiveRecord::Schema.define(:version => 20120112110613) do
     t.datetime "updated_at"
     t.integer  "image_width"
     t.integer  "image_height"
-    t.integer  "model_version"
   end
 
   create_table "model_types", :force => true do |t|
