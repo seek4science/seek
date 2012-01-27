@@ -19,7 +19,7 @@ namespace :seek do
   task :seed=>[:environment,:seed_testing,:compounds,:load_help_docs]
 
   desc 'seeds the database without the loading of help document, which is currently not working for SQLITE3 (SYSMO-678). Also skips adding compounds from sabio-rk'
-  task :seed_testing=>[:environment,:refresh_controlled_vocabs,:tags,:graft_new_assay_types]
+  task :seed_testing=>[:environment,:refresh_controlled_vocabs,:tags]
 
   desc 'refreshes, or creates, the standard initial controlled vocublaries'
   task :refresh_controlled_vocabs=>[:environment,:culture_growth_types, :model_types, :model_formats, :assay_types, :disciplines, :organisms, :technology_types, :recommended_model_environments, :measured_items, :units, :roles, :assay_classes, :relationship_types, :strains]
@@ -79,72 +79,6 @@ namespace :seek do
     Organism.all.each do |o|
       o.concept({:refresh=>true})
     end
-  end
-
-  desc 'adds the new modelling assay types and creates a new root'
-  task(:graft_new_assay_types=>:environment) do
-    experimental =AssayType.find(628957644)
-
-    experimental.title="experimental assay type"
-    flux =AssayType.new(:title=>"fluxomics")
-    flux.save!
-    experimental.children << flux
-    experimental.save!
-
-    modelling_assay_type=AssayType.new(:title=>"modelling analysis type")
-    modelling_assay_type.save!
-
-    new_root =AssayType.new
-    new_root.title="assay types"
-    new_root.children << experimental
-    new_root.children << modelling_assay_type
-    new_root.save!
-
-    new_modelling_types = ["cell cycle", "enzymology", "gene expression", "gene regulatory network", "metabolic network", "metabolism", "signal transduction", "translation", "protein interations"]
-    new_modelling_types.each do |title|
-      a=AssayType.new(:title=>title)
-      a.save!
-      modelling_assay_type.children << a
-    end
-    modelling_assay_type.save!
-
-  end
-
-  desc 'populate organism-strain-specimen-sample'
-  task(:organism_strain_specimen_sample=>:environment) do
-    xml = spreadsheet_to_xml(open("config/default_data/Specimen_example_Quyen1.xls"))
-    content = Seek::SpreadsheetHandler.new().extract_content(xml)
-    content
-    #suppose to have each row of spreadsheet in one array
-    #create/select sample-specimen-strain-organism from each row data
-    success_count = 0
-    fail_count = 0
-    content.each do |row|
-      #organism
-      organism = Organism.find_by_title(row[1]) || Organism.new(row[1])
-      organism.ncbi_id = row[2]
-      #strain
-      strain = Strain.find_by_title(row[3]) || Strain.new(row[3])
-      strain_attributes = {:organism => organism, :organism_part => row[6]}
-      #need to check the attributes of the existing strain and the new attributes to see if select/create strain
-      #specimen
-      #need to create the default specimen for bundle of sample, based on which criteria?
-      specimen = Specimen.find? || Specimen.new(:strain => strain)
-
-      #sample, need also the policy and contributor
-      sample = Sample.find_by_title(row[0]) || Sample.new(row[0])
-      sample_attributes = {:organism_part => row[6], :specimen => specimen}
-      sample.attributes = sample_attributes
-      if sample.save
-        puts "sample #{row[0]} is successfully created"
-        success_count +=1
-      else
-        puts "sample #{row[0]} is failed created"
-        fail_count +=1
-      end
-    end
-    puts "#{success_count} samples are created"
-    puts "#{fail_count} samples fail to create"
   end
 
   task(:strains=>:environment) do
