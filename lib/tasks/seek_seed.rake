@@ -15,7 +15,7 @@ namespace :seek do
   task :seed=>[:environment,:seed_testing,:compounds,:load_help_docs]
 
   desc 'seeds the database without the loading of help document, which is currently not working for SQLITE3 (SYSMO-678). Also skips adding compounds from sabio-rk'
-  task :seed_testing=>[:environment,:refresh_controlled_vocabs,:tags,:graft_new_assay_types]
+  task :seed_testing=>[:environment,:refresh_controlled_vocabs,:tags]
 
   desc 'refreshes, or creates, the standard initial controlled vocublaries'
   task :refresh_controlled_vocabs=>[:environment,:culture_growth_types, :model_types, :model_formats, :assay_types, :disciplines, :organisms, :technology_types, :recommended_model_environments, :measured_items, :units, :roles, :assay_classes, :relationship_types, :strains]
@@ -75,35 +75,6 @@ namespace :seek do
     Organism.all.each do |o|
       o.concept({:refresh=>true})
     end
-  end
-
-  desc 'adds the new modelling assay types and creates a new root'
-  task(:graft_new_assay_types=>:environment) do
-    experimental =AssayType.find(628957644)
-
-    experimental.title="experimental assay type"
-    flux =AssayType.new(:title=>"fluxomics")
-    flux.save!
-    experimental.children << flux
-    experimental.save!
-
-    modelling_assay_type=AssayType.new(:title=>"modelling analysis type")
-    modelling_assay_type.save!
-
-    new_root =AssayType.new
-    new_root.title="assay types"
-    new_root.children << experimental
-    new_root.children << modelling_assay_type
-    new_root.save!
-
-    new_modelling_types = ["cell cycle", "enzymology", "gene expression", "gene regulatory network", "metabolic network", "metabolism", "signal transduction", "translation", "protein interations"]
-    new_modelling_types.each do |title|
-      a=AssayType.new(:title=>title)
-      a.save!
-      modelling_assay_type.children << a
-    end
-    modelling_assay_type.save!
-
   end
 
   task(:strains=>:environment) do
