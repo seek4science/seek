@@ -33,11 +33,11 @@ class PeopleController < ApplicationController
       @people=Person.find(:all,:include=>:disciplines,:conditions=>["disciplines.id=?",@discipline.id])
       #need to reload the people to get their full discipline list - otherwise only get those matched above. Must be a better solution to this
       @people.each(&:reload)
-    elsif (params[:role_id])
-      @role=Role.find(params[:role_id])
+    elsif (params[:project_role_id])
+      @project_role=ProjectRole.find(params[:project_role_id])
       @people=Person.find(:all,:include=>[:group_memberships])
       #FIXME: this needs double checking, (a) not sure its right, (b) can be paged when using find.
-      @people=@people.select{|p| !(p.group_memberships & @role.group_memberships).empty?}
+      @people=@people.select{|p| !(p.group_memberships & @project_role.group_memberships).empty?}
     end
 
     unless @people
@@ -191,7 +191,7 @@ class PeopleController < ApplicationController
 
     
     respond_to do |format|
-      if @person.update_attributes(params[:person]) && set_group_membership_role_ids(@person,params)
+      if @person.update_attributes(params[:person]) && set_group_membership_project_role_ids(@person,params)
         @person.save #this seems to be required to get the tags to be set correctly - update_attributes alone doesn't [SYSMO-158]
          
         flash[:notice] = 'Person was successfully updated.'
@@ -204,16 +204,16 @@ class PeopleController < ApplicationController
     end
   end
 
-  def set_group_membership_role_ids person,params
+  def set_group_membership_project_role_ids person,params
     #FIXME: Consider updating to Rails 2.3 and use Nested forms to handle this more cleanly.
     prefix="group_membership_role_ids_"
     person.group_memberships.each do |gr|
       key=prefix+gr.id.to_s
-      gr.roles.clear
+      gr.project_roles.clear
       if params[key.to_sym]
         params[key.to_sym].each do |r|
-          r=Role.find(r)
-          gr.roles << r
+          r=ProjectRole.find(r)
+          gr.project_roles << r
         end
       end
     end

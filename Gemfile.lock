@@ -16,6 +16,7 @@ GEM
     addressable (2.2.6)
     builder (3.0.0)
     calendar_date_select (1.16.2)
+    cancan (1.6.7)
     crack (0.1.8)
     daemons (1.0.10)
     delayed_job (2.0.7)
@@ -77,6 +78,7 @@ PLATFORMS
 DEPENDENCIES
   RedCloth (~> 4.2.3)
   calendar_date_select
+  cancan
   daemons
   delayed_job (~> 2.0.4)
   factory_girl

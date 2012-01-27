@@ -22,7 +22,7 @@ namespace :seek do
   task :seed_testing=>[:environment,:refresh_controlled_vocabs,:tags]
 
   desc 'refreshes, or creates, the standard initial controlled vocublaries'
-  task :refresh_controlled_vocabs=>[:environment,:culture_growth_types, :model_types, :model_formats, :assay_types, :disciplines, :organisms, :technology_types, :recommended_model_environments, :measured_items, :units, :roles, :assay_classes, :relationship_types, :strains]
+  task :refresh_controlled_vocabs=>[:environment,:culture_growth_types, :model_types, :model_formats, :assay_types, :disciplines, :organisms, :technology_types, :recommended_model_environments, :measured_items, :units, :project_roles, :assay_classes, :relationship_types, :strains]
 
   desc "adds the default tags"
   task(:tags=>:environment) do
@@ -155,10 +155,10 @@ namespace :seek do
     Fixtures.create_fixtures(File.join(RAILS_ROOT, "config/default_data"), "units")
   end
 
-  task(:roles=>:environment) do
+  task(:project_roles=>:environment) do
     revert_fixtures_identify
-    Role.delete_all
-    Fixtures.create_fixtures(File.join(RAILS_ROOT, "config/default_data"), "roles")
+    ProjectRole.delete_all
+    Fixtures.create_fixtures(File.join(RAILS_ROOT, "config/default_data"), "project_roles")
   end
 
   task(:assay_classes=>:environment) do

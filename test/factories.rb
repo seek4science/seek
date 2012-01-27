@@ -23,7 +23,7 @@
 
   Factory.define(:pal, :parent => :person) do |f|
     f.is_pal true
-    f.after_create { |pal| pal.group_memberships.first.roles << Role.pal_role}
+    f.after_create { |pal| pal.group_memberships.first.project_roles << ProjectRole.pal_role}
   end
 
 #User
@@ -234,7 +234,7 @@ end
     f.association :work_group
   end
 
-  Factory.define(:role) do |f|
+  Factory.define(:project_role) do |f|
     f.name "A Role"
   end
 

@@ -53,7 +53,7 @@ class Person < ActiveRecord::Base
   has_many :created_presentations,:through => :assets_creators,:source=>:asset,:source_type => "Presentation"
 
   searchable do
-    text :first_name, :last_name,:searchable_tags,:locations, :roles
+    text :first_name, :last_name,:searchable_tags,:locations, :project_roles
     text :disciplines do
       disciplines.map{|d| d.title}
     end
@@ -71,6 +71,8 @@ class Person < ActiveRecord::Base
 
   has_many :subscriptions,:dependent => :destroy
   before_create :set_default_subscriptions
+
+  ROLES = %w[admin]
 
   def set_default_subscriptions
     projects.each do |proj|
@@ -185,15 +187,25 @@ class Person < ActiveRecord::Base
     return (firstname.gsub(/\b\w/) {|s| s.upcase} + " " + lastname.gsub(/\b\w/) {|s| s.upcase}).strip
   end
 
-  def roles
-    roles = []
-    group_memberships.each do |gm|
-      roles = roles | gm.roles
-    end
-    roles
+  #the roles defined within SEEK
+  def roles=(roles)
+    self.roles_mask = (roles & ROLES).map { |r| 2**ROLES.index(r) }.sum
   end
 
+  def roles
+    ROLES.reject do |r|
+      ((roles_mask || 0) & 2**ROLES.index(r)).zero?
+    end
+  end
 
+  #the roles defined within the project
+  def project_roles
+    project_roles = []
+    group_memberships.each do |gm|
+      project_roles = project_roles | gm.project_roles
+    end
+    project_roles
+  end
 
   def update_first_letter
     no_last_name=last_name.nil? || last_name.strip.blank?
@@ -203,10 +215,10 @@ class Person < ActiveRecord::Base
     self.first_letter=first_letter
   end
 
-  def project_roles(project)
+  def project_roles_of_project(project)
     #Get intersection of all project memberships + person's memberships to find project membership
     memberships = group_memberships.select{|g| g.work_group.project == project}
-    return memberships.collect{|m| m.roles}.flatten
+    return memberships.collect{|m| m.project_roles}.flatten
   end
 
   def assets

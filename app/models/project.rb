@@ -78,15 +78,15 @@ class Project < ActiveRecord::Base
   end
 
   def pals
-    pal_role=Role.pal_role
+    pal_role=ProjectRole.pal_role
     people.select{|p| p.is_pal?}.select do |possible_pal|
-      possible_pal.project_roles(self).include?(pal_role)
+      possible_pal.project_roles_of_project(self).include?(pal_role)
     end
   end
 
   def pis
-    pi_role = Role.find_by_name('PI')
-    people.select{|p| p.roles.include?(pi_role)}
+    pi_role = ProjectRole.find_by_name('PI')
+    people.select{|p| p.project_roles.include?(pi_role)}
     end
 
   def locations
@@ -156,7 +156,7 @@ class Project < ActiveRecord::Base
     #Get intersection of all project memberships + person's memberships to find project membership
     project_memberships = work_groups.collect{|w| w.group_memberships}.flatten
     person_project_membership = person.group_memberships & project_memberships
-    return person_project_membership.roles
+    return person_project_membership.project_roles
   end
 
   def can_be_edited_by?(subject)

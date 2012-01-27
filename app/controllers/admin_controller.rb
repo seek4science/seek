@@ -241,8 +241,8 @@ class AdminController < ApplicationController
       when "invalid"
         collection = {}
         type = "invalid_users"
-        pal_role=Role.pal_role
-        collection[:pal_mismatch] = Person.find(:all).select {|p| p.is_pal? != p.roles.include?(pal_role)}
+        pal_role=ProjectRole.pal_role
+        collection[:pal_mismatch] = Person.find(:all).select {|p| p.is_pal? != p.project_roles.include?(pal_role)}
         collection[:duplicates] = Person.duplicates
         collection[:no_person] = User.without_profile
       when "not_activated"
