@@ -12,8 +12,9 @@ module Seek
 
       begin
         doc = LibXML::XML::Parser.string(xml).parse
-      rescue
+      rescue Exception=>e
         doc=nil
+        Rails.logger.warn "Invalid xml encountered. - #{e.message}"
       end
 
       unless doc.nil?
@@ -65,15 +66,24 @@ module Seek
       end
       unless treatment_cell_element.nil?
         #find the next column for this row that contains content
-        row = treatment_cell_element.attributes["row"]
-        col = treatment_cell_element.attributes["column"]
+        row = treatment_cell_element.attributes["row"].to_i
+        col = treatment_cell_element.attributes["column"].to_i
         next_cell_element = sheet.find("//ss:sheet[@name='#{sheet_name}']/ss:rows/ss:row/ss:cell[@row='#{row}' and @column > '#{col}']").find do |cell|
           !cell.content.blank?
         end
 
-        end_column=next_cell_element.attributes["column"] unless next_cell_element.nil?
 
-        return row.to_i+1, col.to_i, end_column.to_i-1
+        if next_cell_element.nil?
+          next_cell_element = sheet.find("//ss:sheet[@name='#{sheet_name}']/ss:rows/ss:row/ss:cell[@row='#{row.to_i+1}' and @column > '#{col}']").find do |cell|
+            !cell.content.blank?
+          end
+          end_column = next_cell_element.attributes["column"].to_i unless next_cell_element.nil?
+        else
+          end_column = next_cell_element.attributes["column"].to_i-1
+        end
+
+
+        return row+1, col, end_column.to_i
 
       end
     end
