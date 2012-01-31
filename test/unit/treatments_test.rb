@@ -1,10 +1,11 @@
 require 'test_helper'
 
 class TreatmentsTest < ActiveSupport::TestCase
+
   include SysMODB::SpreadsheetExtractor
 
-  test "extract test1" do
-    xml = xml_for_file("treatments-test1.xls")
+  test "extract normal case" do
+    xml = xml_for_file("treatments-normal-case.xls")
     assert xml.include?("workbook")
     treatment = Seek::Treatments.new xml
 
@@ -45,8 +46,8 @@ class TreatmentsTest < ActiveSupport::TestCase
 
   end
 
-  test "extract test2" do
-    xml = xml_for_file("treatments-test2.xls")
+  test "extract from misnamed sample sheet" do
+    xml = xml_for_file("treatments-mis-named-sample-sheet.xls")
     assert xml.include?("workbook")
     treatment = Seek::Treatments.new xml
 
@@ -66,8 +67,8 @@ class TreatmentsTest < ActiveSupport::TestCase
 
   end
 
-  test "extract test3" do
-    xml = xml_for_file("treatments-test3.xls")
+  test "extract treatments last columns" do
+    xml = xml_for_file("treatments-last-column.xls")
     assert xml.include?("workbook")
     treatment = Seek::Treatments.new xml
 
@@ -87,8 +88,8 @@ class TreatmentsTest < ActiveSupport::TestCase
 
   end
 
-  test "extract test4" do
-    xml = xml_for_file("treatments-test4.xls")
+  test "extract additional treatment columns" do
+    xml = xml_for_file("treatments-extra-column.xls")
     assert xml.include?("workbook")
     treatment = Seek::Treatments.new xml
 
@@ -121,6 +122,22 @@ class TreatmentsTest < ActiveSupport::TestCase
 
     assert_equal 0, treatment.sample_names.count
 
+  end
+
+  test "extract nil xml" do
+    treatment = Seek::Treatments.new nil
+
+    assert_equal 0,treatment.values.keys.count
+
+    assert_equal 0, treatment.sample_names.count
+  end
+
+  test "extract invalid xml" do
+    treatment = Seek::Treatments.new "this is not xml"
+
+    assert_equal 0,treatment.values.keys.count
+
+    assert_equal 0, treatment.sample_names.count
   end
 
   private

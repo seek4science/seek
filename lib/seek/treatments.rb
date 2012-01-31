@@ -4,34 +4,46 @@ module Seek
 
   class Treatments
 
-    attr_reader :sample_names,:values
+    attr_reader :sample_names, :values
 
     def initialize xml
-      doc = LibXML::XML::Parser.string(xml).parse
-      doc.root.namespaces.default_prefix="ss"
       @sample_names = []
       @values = {}
 
-      sample_sheet = find_samples_sheet doc
-      unless sample_sheet.nil?
-        row,first_col,last_col = find_treatment_row_and_columns_in_sheet sample_sheet
-        unless row.nil?
-          collect_values row,first_col,last_col,sample_sheet
-          collect_sample_names row,1,sample_sheet
-        end
+      begin
+        doc = LibXML::XML::Parser.string(xml).parse
+      rescue
+        doc=nil
       end
+
+      unless doc.nil?
+        extract_from_document doc
+      end
+
     end
 
     private
 
-    def collect_sample_names first_row,col,sheet
+    def extract_from_document doc
+      doc.root.namespaces.default_prefix="ss"
+      sample_sheet = find_samples_sheet doc
+      unless sample_sheet.nil?
+        row, first_col, last_col = find_treatment_row_and_columns_in_sheet sample_sheet
+        unless row.nil?
+          collect_values row, first_col, last_col, sample_sheet
+          collect_sample_names row, 1, sample_sheet
+        end
+      end
+    end
+
+    def collect_sample_names first_row, col, sheet
       sheet_name = sheet.attributes["name"]
       @sample_names = sheet.find("//ss:sheet[@name='#{sheet_name}']/ss:rows/ss:row/ss:cell[@row >= '#{(first_row+1).to_s}' and @column = '#{col.to_s}']").collect do |cell|
         cell.content
       end
     end
 
-    def collect_values row,first_col,last_col,sheet
+    def collect_values row, first_col, last_col, sheet
       sheet_name = sheet.attributes["name"]
       col_keys = {}
       sheet.find("//ss:sheet[@name='#{sheet_name}']/ss:rows/ss:row/ss:cell[@row >= '#{row.to_s}' and @column >= '#{first_col.to_s}' and @column <= '#{last_col.to_s}']").each do |cell|
@@ -61,7 +73,7 @@ module Seek
 
         end_column=next_cell_element.attributes["column"] unless next_cell_element.nil?
 
-        return row.to_i+1,col.to_i,end_column.to_i-1
+        return row.to_i+1, col.to_i, end_column.to_i-1
 
       end
     end
@@ -78,12 +90,12 @@ module Seek
     def hunt_for_sheet doc
       doc.find("//ss:sheet").find do |sheet|
         sheet_name=sheet.attributes["name"]
-        !sheet.find("//ss:sheet[@name='#{sheet_name}']/ss:rows/ss:row/ss:cell[@row='1']").find do |cell|
-          cell.content.match(/treatment.*/i)
-        end.nil?
-      end
+        !sheet.find("//ss:sheet[@name='#{sheet_name}']/ss:rows/ss:row/ss:cell[@row='1']").find do | cell |
+        cell.content.match(/treatment.*/i)
+      end.nil?
     end
-
   end
+
+end
 
 end
