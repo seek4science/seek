@@ -54,6 +54,18 @@
       <%= render :partial=>"data_files/studied_factors" %>
     </p>
 
+    <p>
+      <h2>Treatments</h2>
+      <% treatments = @data_file.treatments -%>
+      <% if treatments.values.keys.empty? -%>
+        <span class="none_text">No treatments were found in the data file.</span>
+      <% else -%>
+        <%= render :partial=>"treatment_table",:locals=>{:treatments=>treatments} -%>
+      <% end -%>
+
+
+    </p>
+
   </div>
 
   <%= render :partial=>"layouts/items_related_to",:object => @data_file %>

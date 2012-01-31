@@ -1050,6 +1050,19 @@ class DataFilesControllerTest < ActionController::TestCase
     assert_select 'div', :text => /another creator/, :count => 1
   end
 
+  test "should show treatments" do
+    data=File.new("#{Rails.root}/test/fixtures/files/treatments-normal-case.xls","rb").read
+    df = Factory :data_file,:contributor=>User.current_user,:content_type=>"application/excel",:content_blob=>Factory(:content_blob,:data=>data)
+    get :show,:id=>df
+    assert_response :success
+    assert_select "h2",:text=>/Treatments/
+    assert_select "table#treatments" do
+      assert_select "th",:text=>"pH",:count=>1
+      assert_select "td",:text=>"13a"
+      assert_select "td",:text=>"7.5",:count=>10
+    end
+  end
+
   private
 
   def mock_http
