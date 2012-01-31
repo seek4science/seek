@@ -71,7 +71,17 @@ module Seek
       sheet = doc.find_first("//ss:sheet[@name='Organism_sample']") if sheet.nil?
       sheet = doc.find_first("//ss:sheet[@name='organism_sample']") if sheet.nil?
       sheet = doc.find_first("//ss:sheet[@name='organism_Sample']") if sheet.nil?
+      sheet = hunt_for_sheet(doc) if sheet.nil?
       sheet
+    end
+
+    def hunt_for_sheet doc
+      doc.find("//ss:sheet").find do |sheet|
+        sheet_name=sheet.attributes["name"]
+        !sheet.find("//ss:sheet[@name='#{sheet_name}']/ss:rows/ss:row/ss:cell[@row='1']").find do |cell|
+          cell.content.match(/treatment.*/i)
+        end.nil?
+      end
     end
 
   end
