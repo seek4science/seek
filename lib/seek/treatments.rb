@@ -6,21 +6,21 @@ module Seek
 
     attr_reader :sample_names, :values
 
-    def initialize xml
+    def initialize xml=nil
       @sample_names = []
       @values = {}
+      unless xml.nil?
+        begin
+          doc = LibXML::XML::Parser.string(xml).parse
+        rescue Exception=>e
+          doc=nil
+          Rails.logger.warn "Invalid xml encountered. - #{e.message}"
+        end
 
-      begin
-        doc = LibXML::XML::Parser.string(xml).parse
-      rescue Exception=>e
-        doc=nil
-        Rails.logger.warn "Invalid xml encountered. - #{e.message}"
+        unless doc.nil?
+          extract_from_document doc
+        end
       end
-
-      unless doc.nil?
-        extract_from_document doc
-      end
-
     end
 
     private

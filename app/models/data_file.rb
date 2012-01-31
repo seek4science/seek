@@ -40,8 +40,32 @@ class DataFile < ActiveRecord::Base
     end
   end
 
+  if Seek::Config.events_enabled
+    has_and_belongs_to_many :events
+  else
+    def events
+      []
+    end
+
+    def event_ids
+      []
+    end
+
+    def event_ids= events_ids
+
+    end
+  end
+
   def studies
     assays.collect{|a| a.study}.uniq
+  end
+
+  def treatments
+    if is_spreadsheet?
+      Seek::Treatments.new spreadsheet_xml
+    else
+      Seek::Treatments.new
+    end
   end
 
   # get a list of DataFiles with their original uploaders - for autocomplete fields
@@ -151,21 +175,7 @@ class DataFile < ActiveRecord::Base
   end
 
 
-  if Seek::Config.events_enabled
-    has_and_belongs_to_many :events
-  else
-    def events
-      []
-    end
 
-    def event_ids
-      []
-    end
-
-    def event_ids= events_ids
-
-    end
-  end
 
   def relationship_type(assay)
     #FIXME: don't like this hardwiring to assay within data file, needs abstracting

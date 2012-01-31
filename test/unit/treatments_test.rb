@@ -140,6 +140,14 @@ class TreatmentsTest < ActiveSupport::TestCase
     assert_equal 0, treatment.sample_names.count
   end
 
+  test "initialize empty treatments" do
+    treatment = Seek::Treatments.new
+
+    assert_equal 0,treatment.values.keys.count
+
+    assert_equal 0, treatment.sample_names.count
+  end
+
   private
 
   def xml_for_file filename
