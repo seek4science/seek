@@ -38,8 +38,30 @@ module Seek
           else
             @sample_names = [].fill("",0,values.first ? values.first[1].length : 0)
           end
-
+          strip_trailing_blank_items
         end
+      end
+    end
+
+    def strip_trailing_blank_items
+      max_len=-1
+
+      keys = values.keys
+      keys.each do |key|
+        values[key].each_with_index do |val,i|
+          if (i>max_len)
+            unless val.blank?
+              max_len=i
+            end
+          end
+        end
+      end
+
+      if max_len>0
+        keys.each do |key|
+          values[key]=values[key][0..max_len]
+        end
+        @sample_names = @sample_names[0..max_len]
       end
     end
 
@@ -48,10 +70,6 @@ module Seek
       @sample_names = sheet.find("//ss:sheet[@name='#{sheet_name}']/ss:rows/ss:row/ss:cell[@row >= '#{(first_row+1).to_s}' and @column = '#{col.to_s}']").collect do |cell|
         cell.content
       end
-    end
-
-    def hunt_for_sample_name_column sheet
-
     end
 
     def collect_values row, first_col, last_col, sheet
