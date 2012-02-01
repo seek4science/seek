@@ -141,7 +141,7 @@ module Seek
           cell.content.match(/treatment.*/i)
         end
         !match.nil?
+      end
     end
   end
-end
 end
