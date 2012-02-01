@@ -32,7 +32,13 @@ module Seek
         row, first_col, last_col = find_treatment_row_and_columns_in_sheet sample_sheet
         unless row.nil?
           collect_values row, first_col, last_col, sample_sheet
-          collect_sample_names row, 1, sample_sheet
+          sample_col = hunt_for_sample_name_column sample_sheet
+          if sample_col > 0
+            collect_sample_names row, sample_col, sample_sheet
+          else
+            @sample_names = [].fill("",0,values.first ? values.first[1].length : 0)
+          end
+
         end
       end
     end
@@ -42,6 +48,10 @@ module Seek
       @sample_names = sheet.find("//ss:sheet[@name='#{sheet_name}']/ss:rows/ss:row/ss:cell[@row >= '#{(first_row+1).to_s}' and @column = '#{col.to_s}']").collect do |cell|
         cell.content
       end
+    end
+
+    def hunt_for_sample_name_column sheet
+
     end
 
     def collect_values row, first_col, last_col, sheet
@@ -86,6 +96,14 @@ module Seek
         return row+1, col, end_column.to_i
 
       end
+    end
+
+    def hunt_for_sample_name_column sheet
+      sheet_name = sheet.attributes["name"]
+      sample_cell_element = sheet.find("//ss:sheet[@name='#{sheet_name}']/ss:rows/ss:row/ss:cell").find do |cell|
+        cell.content.match(/sample.*name/i) || cell.content.match(/sample.*title/i)
+      end
+      sample_cell_element.nil? ? 0 : sample_cell_element.attributes["column"].to_i
     end
 
     def find_samples_sheet doc

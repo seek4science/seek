@@ -11,18 +11,66 @@ class TreatmentsTest < ActiveSupport::TestCase
 
     assert_equal 2,treatment.values.keys.count
     assert_equal ["Dilution_rate","pH"],treatment.values.keys.sort
-    assert_equal 19,treatment.values["pH"].count
-    assert_equal 19,treatment.values["Dilution_rate"].count
-    assert_equal "6.5",treatment.values["pH"].first
-    assert_equal "9.5",treatment.values["pH"].last
+    assert_equal 4,treatment.values["pH"].count
+    assert_equal 4,treatment.values["Dilution_rate"].count
 
-    assert_equal "0.25",treatment.values["Dilution_rate"].first
-    assert_equal "0.15",treatment.values["Dilution_rate"].last
+    assert_equal ["6.5","6.6","7.5","7.6"],treatment.values["pH"]
+    assert_equal ["0.25","0.15","0.05","0.45"],treatment.values["Dilution_rate"]
 
-    assert_equal 19, treatment.sample_names.count
-    assert_equal "1.0",treatment.sample_names.first
-    assert_equal "17.0",treatment.sample_names.last
+    assert_equal 4, treatment.sample_names.count
+    assert_equal ["samplea","sampleb","samplec","sampled"],treatment.sample_names
 
+  end
+
+  test "extract when blanks in sheet" do
+    xml = xml_for_file("treatments-with-blanks.xls")
+    assert xml.include?("workbook")
+    treatment = Seek::Treatments.new xml
+
+    assert_equal 2,treatment.values.keys.count
+    assert_equal ["Dilution_rate","pH"],treatment.values.keys.sort
+    assert_equal 4,treatment.values["pH"].count
+    assert_equal 4,treatment.values["Dilution_rate"].count
+
+    assert_equal ["6.5","","7.5","7.6"],treatment.values["pH"]
+    assert_equal ["0.25","0.15","0.05",""],treatment.values["Dilution_rate"]
+
+    assert_equal 4, treatment.sample_names.count
+    assert_equal ["samplea","sampleb","","sampled"],treatment.sample_names
+  end
+
+  test "extract samples from different column" do
+    xml = xml_for_file("treatments-with-samples-different-column.xls")
+    assert xml.include?("workbook")
+    treatment = Seek::Treatments.new xml
+
+    assert_equal 2,treatment.values.keys.count
+    assert_equal ["Dilution_rate","pH"],treatment.values.keys.sort
+    assert_equal 4,treatment.values["pH"].count
+    assert_equal 4,treatment.values["Dilution_rate"].count
+
+    assert_equal ["6.5","2.2","7.5","7.6"],treatment.values["pH"]
+    assert_equal ["0.25","0.15","0.05","1.6"],treatment.values["Dilution_rate"]
+
+    assert_equal 4, treatment.sample_names.count
+    assert_equal ["samplea","sampleb","samplec","sampled"],treatment.sample_names
+  end
+
+  test "extract when no sample names" do
+    xml = xml_for_file("treatments-with-no-sample-names.xls")
+    assert xml.include?("workbook")
+    treatment = Seek::Treatments.new xml
+
+    assert_equal 2,treatment.values.keys.count
+    assert_equal ["Dilution_rate","pH"],treatment.values.keys.sort
+    assert_equal 4,treatment.values["pH"].count
+    assert_equal 4,treatment.values["Dilution_rate"].count
+
+    assert_equal ["6.5","2.2","7.5","7.6"],treatment.values["pH"]
+    assert_equal ["0.25","0.15","0.05","1.6"],treatment.values["Dilution_rate"]
+
+    assert_equal 4, treatment.sample_names.count
+    assert_equal ["","","",""],treatment.sample_names
   end
 
   test "extract when treatment not in first row" do

@@ -1057,9 +1057,11 @@ class DataFilesControllerTest < ActionController::TestCase
     assert_response :success
     assert_select "h2",:text=>/Treatments/
     assert_select "table#treatments" do
-      assert_select "th",:text=>"pH",:count=>1
-      assert_select "td",:text=>"13a"
-      assert_select "td",:text=>"7.5",:count=>10
+      assert_select "th",:text=>"pH"
+      assert_select "th",:text=>"Dilution_rate"
+      assert_select "td",:text=>"samplea"
+      assert_select "td",:text=>"6.5"
+      assert_select "tr",:count=>4
     end
   end
 
