@@ -1,3 +1,9 @@
+<script type='text/javascript'>
+ initialiseFolds();
+ updateFancyMultiselect('sample_project_ids');
+ var selected_organism = $F('organism_id')
+ strains_of_selected_organism(selected_organism)
+</script>
 <% remote_form_for 'biosamples', :url => url_for(:controller => 'biosamples', :action => 'create_specimen_sample'),
   :condition=>"validateSpecimenSampleFields('#{CELL_CULTURE_OR_SPECIMEN}', #{specimen.nil? ? true : false})",
   :html=>{:method=>:post} do  -%>
@@ -27,9 +33,3 @@
       </div>
     </div>
 <% end %>
-<script type='text/javascript'>
- initialiseFolds();
- updateFancyMultiselect('sample_project_ids');
- var selected_organism = $F('organism_id')
- strains_of_selected_organism(selected_organism)
-</script>
