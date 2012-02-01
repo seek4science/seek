@@ -36,7 +36,7 @@ module Seek
           if sample_col > 0
             collect_sample_names row, sample_col, sample_sheet
           else
-            @sample_names = [].fill("",0,values.first ? values.first[1].length : 0)
+            @sample_names = [].fill("", 0, values.first ? values.first[1].length : 0)
           end
           strip_trailing_blank_items
         end
@@ -48,7 +48,7 @@ module Seek
 
       keys = values.keys
       keys.each do |key|
-        values[key].each_with_index do |val,i|
+        values[key].each_with_index do |val, i|
           if (i>max_len)
             unless val.blank?
               max_len=i
@@ -136,12 +136,12 @@ module Seek
     def hunt_for_sheet doc
       doc.find("//ss:sheet").find do |sheet|
         sheet_name=sheet.attributes["name"]
-        !sheet.find("//ss:sheet[@name='#{sheet_name}']/ss:rows/ss:row/ss:cell[@row='1']").find do | cell |
-        cell.content.match(/treatment.*/i)
-      end.nil?
+        possible_cells = sheet.find("//ss:sheet[@name='#{sheet_name}']/ss:rows/ss:row/ss:cell[@row='1']")
+        match = possible_cells.find do |cell|
+          cell.content.match(/treatment.*/i)
+        end
+        !match.nil?
     end
   end
-
 end
-
 end
