@@ -1060,7 +1060,6 @@ class DataFilesControllerTest < ActionController::TestCase
                  :content_blob=>Factory(:content_blob,:data=>data)
     get :show,:id=>df
     assert_response :success
-    assert_select "h2",:text=>/Treatments/
     assert_select "table#treatments" do
       assert_select "th",:text=>"pH"
       assert_select "th",:text=>"Dilution_rate"
@@ -1080,7 +1079,6 @@ class DataFilesControllerTest < ActionController::TestCase
                  :content_blob=>Factory(:content_blob,:data=>data)
     get :show,:id=>df
     assert_response :success
-    assert_select "h2",:text=>/Treatments/
     assert_select "table#treatments", :count=>0
     assert_select "span#treatments",:text=>/you do not have permission to view the treatments/i
   end
