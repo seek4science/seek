@@ -1,6 +1,10 @@
 <%
   all_organisms = Organism.find(:all,:order=>:title)
 -%>
+<script type="text/javascript">
+ new_strain_form("<%=strain.try(:id)-%>", "<%=strain.try(:organism_id)-%>", '<%=url_for(:controller => 'biosamples', :action => 'new_strain_form')-%>');
+
+</script>
 <% remote_form_for 'biosamples', :url => url_for(:controller => 'biosamples', :action => 'create_strain'),
   :condition=>"validateStrainFields()",
   :html=>{:method=>:post} do  -%>
@@ -32,7 +36,3 @@
     </div>
 </div>
 <% end %>
-<script type="text/javascript">
- new_strain_form("<%=strain.try(:id)-%>", "<%=strain.try(:organism_id)-%>", '<%=url_for(:controller => 'biosamples', :action => 'new_strain_form')-%>');
-
-</script>
