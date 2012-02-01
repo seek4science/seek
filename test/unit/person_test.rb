@@ -465,4 +465,26 @@ class PersonTest < ActiveSupport::TestCase
     assert people_ids.include? person.id
     assert people_ids.include? new_person.id
   end
+
+  test "is_admin" do
+
+    p=Factory :person
+    disable_authorization_checks do
+
+      assert !p.is_admin?
+      p.is_admin=true
+      p.save!
+      p.reload
+
+      assert p.is_admin?
+
+      p.is_admin=false
+      p.save!
+      p.reload
+
+      assert !p.is_admin?
+    end
+
+  end
+
 end
