@@ -55,15 +55,18 @@
     </p>
 
     <p>
-      <h2>Treatments</h2>
-      <% treatments = @data_file.treatments -%>
-      <% if treatments.values.keys.empty? -%>
-        <span class="none_text">No treatments were found in the data file.</span>
-      <% else -%>
-        <%= render :partial=>"treatment_table",:locals=>{:treatments=>treatments} -%>
-      <% end -%>
 
-
+    <h2>Treatments</h2>
+        <% if @data_file.can_download? -%>
+            <% treatments = @data_file.treatments -%>
+            <% if treatments.values.keys.empty? -%>
+                <span class="none_text">No treatments were found in the data file, or it does not match a known template.</span>
+            <% else -%>
+                <%= render :partial=>"treatment_table", :locals=>{:treatments=>treatments} -%>
+            <% end -%>
+        <% else -%>
+            <span id="treatments" class="none_text">You do not have permission to view the treatments for this file.</span>
+        <% end -%>
     </p>
 
   </div>

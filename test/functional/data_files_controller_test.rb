@@ -1051,8 +1051,13 @@ class DataFilesControllerTest < ActionController::TestCase
   end
 
   test "should show treatments" do
+    user = Factory :user
     data=File.new("#{Rails.root}/test/fixtures/files/treatments-normal-case.xls","rb").read
-    df = Factory :data_file,:contributor=>User.current_user,:content_type=>"application/excel",:content_blob=>Factory(:content_blob,:data=>data)
+    df = Factory :data_file,
+                 :policy=>Factory(:downloadable_public_policy),
+                 :contributor=>user,
+                 :content_type=>"application/excel",
+                 :content_blob=>Factory(:content_blob,:data=>data)
     get :show,:id=>df
     assert_response :success
     assert_select "h2",:text=>/Treatments/
@@ -1063,6 +1068,21 @@ class DataFilesControllerTest < ActionController::TestCase
       assert_select "td",:text=>"6.5"
       assert_select "tr",:count=>4
     end
+  end
+
+  test "should not show treatments if not downloadable" do
+    user = Factory :user
+    data=File.new("#{Rails.root}/test/fixtures/files/treatments-normal-case.xls","rb").read
+    df = Factory :data_file,
+                 :policy=>Factory(:publicly_viewable_policy),
+                 :contributor=>user,
+                 :content_type=>"application/excel",
+                 :content_blob=>Factory(:content_blob,:data=>data)
+    get :show,:id=>df
+    assert_response :success
+    assert_select "h2",:text=>/Treatments/
+    assert_select "table#treatments", :count=>0
+    assert_select "span#treatments",:text=>/you do not have permission to view the treatments/i
   end
 
   private
