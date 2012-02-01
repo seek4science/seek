@@ -82,7 +82,7 @@ namespace :seek do
     ActiveRecord::Base.record_timestamps = true
   end
 
-  desc 'required to upgrade to 1.0 - converts all tags from acts_as_taggable to use acts_as_annotatable'
+  desc 'required to upgrade to 0.13 - converts all tags from acts_as_taggable to use acts_as_annotatable'
   task(:upgrade_tags=>:environment) do
     include ActsAsTaggableOn
 
