@@ -25,7 +25,7 @@ class Model < ActiveRecord::Base
   belongs_to :model_format
   
   searchable do
-    text :description,:title,:original_filename,:organism_name,:searchable_tags
+    text :description,:title,:original_filename,:organism_name,:searchable_tags, :model_contents
   end if Seek::Config.solr_enabled
 
   explicit_versioning(:version_column => "version") do
@@ -77,6 +77,10 @@ class Model < ActiveRecord::Base
   #a simple container for handling the matching results returned from #matching_data_files
   class ModelMatchResult < Struct.new(:search_terms,:score,:primary_key)
 
+  end
+
+  def model_contents
+    species | parameters_and_values.keys
   end
 
   #return a an array of ModelMatchResult where the data file id is the key, and the matching terms/values are the values
