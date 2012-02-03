@@ -5,9 +5,14 @@ class ContentBlobTest < ActiveSupport::TestCase
   fixtures :content_blobs
   
   def test_md5sum_on_demand
-    blob=content_blobs(:picture_blob)
+    blob=Factory :rightfield_content_blob
     assert_not_nil blob.md5sum    
-    assert_equal "2288e57a82162f5fd7fa7050ebadbcba",blob.md5sum
+    assert_equal "01788bca93265d80e8127ca0039bb69b",blob.md5sum
+  end
+
+  def test_cache_key
+    blob=Factory :rightfield_content_blob
+    assert_equal "content_blobs/#{blob.id}-01788bca93265d80e8127ca0039bb69b",blob.cache_key
   end
   
   def test_uuid_doesnt_change
