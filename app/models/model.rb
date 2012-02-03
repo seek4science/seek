@@ -84,8 +84,9 @@ class Model < ActiveRecord::Base
     
     results = {}
 
-    if Seek::Config.solr_enabled && is_sbml?
-      search_terms = species | params_and_values.keys
+    if Seek::Config.solr_enabled && is_jws_supported?
+      search_terms = species | parameters_and_values.keys
+      puts search_terms
       search_terms.each do |key|
         DataFile.search do |query|
           query.keywords key, :fields=>[:fs_search_fields, :spreadsheet_contents_for_search,:spreadsheet_annotation_search_fields]
