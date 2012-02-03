@@ -11,10 +11,8 @@ module Seek
       elsif model.is_dat?
         parameters_and_values_from_dat model
       else
-        []
+        {}
       end
-
-
     end
 
     #returns an array of species ID and NAME extracted from SBML or JWS DAT
