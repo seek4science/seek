@@ -62,7 +62,7 @@
 
       <div class="foldContent" style="display:none;" >
         <% if @data_file.can_download? -%>
-            <% treatments = @data_file.treatments -%>
+            <% treatments = @display_data_file.treatments -%>
             <% if treatments.values.keys.empty? -%>
                 <span class="none_text">No treatments were found in the data file, or it does not match a known template.</span>
             <% else -%>
