@@ -37,7 +37,7 @@
         <p>
             <%= render :partial => "assays/associate_assays", :locals=>{:resource => @data_file, :show_relationships=>true} -%>
         </p>
-
+        <%= fields_for(@data_file) {|f| f.fancy_multiselect :samples}  -%>
         <% end -%>
         <%= preview_permission_popup_link('data_file', url_for(:controller => 'policies', :action => 'preview_permissions'), false, try_block{@data_file.contributor.id})-%>
         <p>

@@ -38,6 +38,7 @@
 
     <%= render :partial=>"specimens/select_organisms" ,:locals=>{:f=>f}-%>
 
+
     <%= render :partial=>"assets/asset_form_bottom", :locals=> { :f => f, :attribution_enable => false, :show_publications => false } -%>
 
     <%= fancy_multiselect @specimen, :sops, :name => 'specimen_sop_ids',:association_class=>Sop, :selected => (params[:specimen_sop_ids] || []).map(&:to_i) | @specimen.sop_masters.map(&:sop_id)%>

@@ -13,14 +13,29 @@ class SamplesController < ApplicationController
     unless @sample.specimen.can_view?
       @sample.specimen = nil
       flash.now[:notice] = "The specimen of the existing sample cannot be viewed, please specify your own specimen! <br/> "
+    else
+      flash.now[:notice] = ""
     end
 
+    @existing_sample.data_file_masters.each do |df|
+       if !df.can_view?
+       flash.now[:notice] << "Some or all data files of the existing sample cannot be viewed, you may specify your own! <br/>"
+        break
+      end
+    end
+    @existing_sample.model_masters.each do |m|
+       if !m.can_view?
+       flash.now[:notice] << "Some or all models of the existing sample cannot be viewed, you may specify your own! <br/>"
+        break
+      end
+    end
     @existing_sample.sop_masters.each do |s|
-       if !s.sop.can_view?
+       if !s.can_view?
        flash.now[:notice] << "Some or all sops of the existing sample cannot be viewed, you may specify your own! <br/>"
         break
       end
     end
+
     render :action=>"new"
 
   end
@@ -41,22 +56,25 @@ class SamplesController < ApplicationController
 
     #add policy to sample
     @sample.policy.set_attributes_with_sharing params[:sharing], @sample.projects
-    sops       = (params[:sample_sop_ids].nil?? [] : params[:sample_sop_ids].reject(&:blank?)) || []
+    data_file_ids = (params[:sample_data_file_ids].nil?? [] : params[:sample_data_file_ids].reject(&:blank?)) || []
+    model_ids = (params[:sample_model_ids].nil?? [] : params[:sample_model_ids].reject(&:blank?)) || []
+    sop_ids = (params[:sample_sop_ids].nil?? [] : params[:sample_sop_ids].reject(&:blank?)) || []
 
     if @sample.save
-        sops.each do |s_id|
-          s = Sop.find(s_id)
-          @sample.associate_sop(s) if s.can_view?
+
+      @sample.create_or_update_assets data_file_ids, "DataFile"
+      @sample.create_or_update_assets model_ids, "Model"
+      @sample.create_or_update_assets sop_ids, "Sop"
+
+      if @sample.from_new_link=="true"
+        render :partial=>"assets/back_to_fancy_parent", :locals=>{:child=>@sample, :parent=>"assay"}
+      else
+        respond_to do |format|
+          flash[:notice] = 'Sample was successfully created.'
+          format.html { redirect_to(@sample) }
+          format.xml { head :ok }
         end
-        if @sample.from_new_link=="true"
-           render :partial=>"assets/back_to_fancy_parent",:locals=>{:child=>@sample,:parent=>"assay"}
-        else
-          respond_to do |format|
-            flash[:notice] = 'Sample was successfully created.'
-            format.html { redirect_to(@sample) }
-            format.xml  { head :ok }
-          end
-        end
+      end
     else
         respond_to do |format|
           format.html { render :action => "new" }
@@ -67,7 +85,9 @@ class SamplesController < ApplicationController
 
 
   def update
-      sops       = (params[:sample_sop_ids].nil?? [] : params[:sample_sop_ids].reject(&:blank?)) || []
+      data_file_ids = (params[:sample_data_file_ids].nil? ? [] : params[:sample_data_file_ids].reject(&:blank?)) || []
+      model_ids = (params[:sample_model_ids].nil? ? [] : params[:sample_model_ids].reject(&:blank?)) || []
+      sop_ids = (params[:sample_sop_ids].nil? ? [] : params[:sample_sop_ids].reject(&:blank?)) || []
 
       @sample.attributes = params[:sample]
 
@@ -77,19 +97,13 @@ class SamplesController < ApplicationController
 
       if @sample.save
 
-        if sops.blank?
-          @sample.sop_masters= []
-          @sample.save
-        else
-          sops.each do |s_id|
-          s = Sop.find(s_id)
-          @sample.associate_sop(s) if s.can_view?
-        end
-        end
+        @sample.create_or_update_assets data_file_ids,"DataFile"
+        @sample.create_or_update_assets model_ids,"Model"
+        @sample.create_or_update_assets sop_ids,"Sop"
 
-          flash[:notice] = 'Sample was successfully updated.'
-          format.html { redirect_to(@sample) }
-          format.xml  { head :ok }
+        flash[:notice] = 'Sample was successfully updated.'
+        format.html { redirect_to(@sample) }
+        format.xml { head :ok }
 
       else
         format.html { render :action => "edit" }

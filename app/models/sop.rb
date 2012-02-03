@@ -18,6 +18,9 @@ class Sop < ActiveRecord::Base
 
   acts_as_solr(:fields=>[:description, :title, :original_filename,:searchable_tags,:exp_conditions_search_fields]) if Seek::Config.solr_enabled
 
+  has_many :sample_assets,:dependent=>:destroy,:as => :asset
+  has_many :samples, :through => :sample_assets
+
   #don't add a dependent=>:destroy, as the content_blob needs to remain to detect future duplicates
   has_one :content_blob, :as => :asset, :foreign_key => :asset_id ,:conditions => 'asset_version= #{self.version}'
 

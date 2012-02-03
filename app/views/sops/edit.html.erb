@@ -31,6 +31,7 @@
 		
 		<%= render :partial=>"assets/asset_form_bottom", :locals=> {:show_publications=>false, :f => f}-%>
 		<%= render :partial => "assays/associate_assays", :locals=>{:resource => @sop, :show_relationships => false} -%>
+        <%= f.fancy_multiselect :samples -%>
         <% end -%>
         <p>
           <%= preview_permission_popup_link('sop', url_for(:controller => 'policies', :action => 'preview_permissions'), false, try_block{@sop.contributor.id})-%>
