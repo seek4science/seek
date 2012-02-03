@@ -2,7 +2,9 @@
 
 <ul class="sectionIcons">
   <%= render :partial => "subscriptions/subscribe", :locals => { :object => @sample } %>
-  <% if @sample.can_edit? %>
+  <% if @sample.can_manage? %>
+      <li><%= image_tag_for_key('manage', edit_sample_path, "Manage Sample", nil, 'Manage Sample') %></li>
+  <% elsif @sample.can_edit? %>
       <li><%= image_tag_for_key('edit', edit_sample_path(@sample), "Edit Sample", nil, 'Edit Sample') %></li>
   <% end %>
   <% if @sample.can_delete? %>

@@ -59,7 +59,7 @@
 		
 		<%= render :partial=>"assets/asset_form_bottom", :locals=> { :f => f } -%>
 		<%= render :partial => "assays/associate_assays", :locals=>{:resource => @model, :show_relationships => false} -%>
-
+        <%= f.fancy_multiselect :samples -%>
 
         <% end -%>
         <p>
