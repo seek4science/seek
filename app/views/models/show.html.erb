@@ -103,7 +103,7 @@
     </div>
 </div>
 
-<% if @display_model.is_sbml? %>
+<% if @display_model.is_jws_supported? %>
         <center>
         <%= link_to_remote "Discover data that may be related to this model",
                          :url=>url_for(:controller=>"models",:action=>"matching_data_files",:id=>@model,:version=>@display_model.version),
