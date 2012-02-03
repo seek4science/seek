@@ -16,6 +16,9 @@ class DataFileTest < ActiveSupport::TestCase
     df = Factory :rightfield_datafile
     
     data = df.spreadsheet_contents_for_search
+    puts "##### spreadsheet data #####"
+    puts data
+    puts "############################"
     assert !data.empty?,"Content should not be empty"
     assert data.include?("design type")
     assert data.include?("methodological design"), "content should be humanized"
