@@ -144,8 +144,8 @@ class BiosamplesController < ApplicationController
         strain = select_or_new_strain
         render :update do |page|
           if strain.save
-            page.reload
-            #page.call "check_show_existing_strains('strain_organism_ids', 'existing_strains', '')"
+            page.call 'RedBox.close'
+            page.call "check_show_existing_strains('strain_organism_ids', 'existing_strains', #{url_for(:controller => 'biosamples', :action => 'existing_strains')})"
           else
             page.alert("Fail to create new strain. #{strain.errors.full_messages}")
           end
