@@ -213,6 +213,14 @@ class Person < ActiveRecord::Base
     end
   end
 
+  def remove_roles roles
+    if can_manage?
+      remove_roles = roles & self.roles
+      self.roles_mask -= (remove_roles & ROLES).map { |r| 2**ROLES.index(r) }.sum
+      self.save
+    end
+  end
+
   #the roles defined within the project
   def project_roles
     project_roles = []
