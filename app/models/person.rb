@@ -72,7 +72,11 @@ class Person < ActiveRecord::Base
   has_many :subscriptions,:dependent => :destroy
   before_create :set_default_subscriptions
 
-  ROLES = %w[admin]
+  ROLES = %w[admin pal pi]
+
+  def is_admin?
+     roles.include?('admin')
+  end
 
   def set_default_subscriptions
     projects.each do |proj|
@@ -198,6 +202,14 @@ class Person < ActiveRecord::Base
   def roles
     ROLES.reject do |r|
       ((roles_mask || 0) & 2**ROLES.index(r)).zero?
+    end
+  end
+
+  def concat_roles=(roles)
+    if can_manage?
+      concat_roles = roles - (roles & self.roles)
+      self.roles_mask += (concat_roles & ROLES).map { |r| 2**ROLES.index(r) }.sum
+      self.save
     end
   end
 
