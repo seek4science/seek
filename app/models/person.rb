@@ -205,10 +205,10 @@ class Person < ActiveRecord::Base
     end
   end
 
-  def concat_roles=(roles)
+  def add_roles=(roles)
     if can_manage?
-      concat_roles = roles - (roles & self.roles)
-      self.roles_mask += (concat_roles & ROLES).map { |r| 2**ROLES.index(r) }.sum
+      add_roles = roles - (roles & self.roles)
+      self.roles_mask += (add_roles & ROLES).map { |r| 2**ROLES.index(r) }.sum
       self.save
     end
   end

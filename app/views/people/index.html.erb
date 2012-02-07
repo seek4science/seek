@@ -27,3 +27,5 @@
 <% if @people.respond_to?(:page) && @people.page == "latest" && Person.find(:all).length > Seek::Config.limit_latest%>
     <%= render :partial => "layouts/paginate_see_all"%>
 <% end %>
+
+

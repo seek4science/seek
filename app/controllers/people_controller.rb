@@ -13,7 +13,7 @@ class PeopleController < ApplicationController
   skip_before_filter :profile_for_login_required,:only=>[:select,:userless_project_selected_ajax,:create]
 
   cache_sweeper :people_sweeper,:only=>[:update,:create,:destroy]
-  
+
   def auto_complete_for_tools_name
     render :json => Person.tool_counts.map(&:name).to_json
   end

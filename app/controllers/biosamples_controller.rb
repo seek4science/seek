@@ -121,7 +121,7 @@ class BiosamplesController < ApplicationController
           sop= Sop.find sop_id
           SopSpecimen.create!(:sop_id => sop_id, :sop_version=> sop.version, :specimen_id=>specimen.id)
         end
-        page.reload
+        page.call 'RedBox.close'
       else
         specimen_error_messages = ''
         specimen.errors.full_messages.each do |e_m|
@@ -145,7 +145,7 @@ class BiosamplesController < ApplicationController
         render :update do |page|
           if strain.save
             page.call 'RedBox.close'
-            page.call "check_show_existing_strains('strain_organism_ids', 'existing_strains', #{url_for(:controller => 'biosamples', :action => 'existing_strains')})"
+            #page.call "check_show_existing_strains('strain_organism_ids', 'existing_strains', #{url_for(:controller => 'biosamples', :action => 'existing_strains')})"
           else
             page.alert("Fail to create new strain. #{strain.errors.full_messages}")
           end
