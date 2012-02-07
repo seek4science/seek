@@ -465,4 +465,45 @@ class PersonTest < ActiveSupport::TestCase
     assert people_ids.include? person.id
     assert people_ids.include? new_person.id
   end
+
+  test 'assign admin role for a person' do
+    User.with_current_user Factory(:admin).user do
+      person = Factory(:person)
+      assert_equal [], person.roles
+      assert person.can_manage?
+      person.roles=['admin']
+      person.reload
+      assert_equal ['admin'], person.roles
+    end
+  end
+
+  test 'add roles for a person' do
+    User.with_current_user Factory(:admin).user do
+      person = Factory(:admin)
+      assert_equal ['admin'], person.roles
+      assert person.can_manage?
+      person.add_roles ['admin', 'pal']
+      person.reload
+      assert_equal ['admin', 'pal'].sort, person.roles.sort
+    end
+  end
+
+  test 'remove roles for a person' do
+    User.with_current_user Factory(:admin).user do
+      person = Factory(:person)
+      person.roles = ['admin','pi', 'pal']
+      person.remove_roles ['admin']
+      person.reload
+      assert_equal ['pi', 'pal'].sort, person.roles.sort
+    end
+  end
+
+  test 'non-admin can not change the roles of a person' do
+    User.with_current_user Factory(:person).user do
+      person = Factory(:person)
+      person.roles = ['admin','pi', 'pal']
+      person.reload
+      assert_equal [], person.roles
+    end
+  end
 end
