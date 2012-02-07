@@ -176,6 +176,23 @@ class SopsControllerTest < ActionController::TestCase
     assert new_assay.related_asset_ids('Sop').include?(s.id)
   end
 
+  test "associate sample" do
+     # assign to a new sop
+     sop_with_samples = valid_sop
+     sop_with_samples[:sample_ids] = [Factory(:sample,:title=>"newTestSample",:contributor=> User.current_user).id]
+     assert_difference("Sop.count") do
+       post :create,:sop => sop_with_samples
+     end
+
+    s = assigns(:sop)
+    assert_equal "newTestSample",s.samples.first.title
+
+    #edit associations of samples to an existing sop
+    put :update,:id=> s.id, :sop => {:sample_ids=> [Factory(:sample,:title=>"editTestSample",:contributor=> User.current_user).id]}
+    s = assigns(:sop)
+    assert_equal "editTestSample", s.samples.first.title
+  end
+
   test "should create sop" do
     login_as(:owner_of_my_first_sop) #can edit assay_can_edit_by_my_first_sop_owner
     assay=assays(:assay_can_edit_by_my_first_sop_owner1)
