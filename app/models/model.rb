@@ -25,7 +25,7 @@ class Model < ActiveRecord::Base
   belongs_to :model_format
   
   searchable do
-    text :description,:title,:original_filename,:organism_name,:searchable_tags
+    text :description,:title,:original_filename,:organism_name,:searchable_tags, :model_contents
   end if Seek::Config.solr_enabled
 
   explicit_versioning(:version_column => "version") do
@@ -79,13 +79,18 @@ class Model < ActiveRecord::Base
 
   end
 
+  def model_contents
+    species | parameters_and_values.keys
+  end
+
   #return a an array of ModelMatchResult where the data file id is the key, and the matching terms/values are the values
   def matching_data_files
     
     results = {}
 
-    if Seek::Config.solr_enabled && is_sbml?
-      search_terms = species | params_and_values.keys
+    if Seek::Config.solr_enabled && is_jws_supported?
+      search_terms = species | parameters_and_values.keys
+      puts search_terms
       search_terms.each do |key|
         DataFile.search do |query|
           query.keywords key, :fields=>[:fs_search_fields, :spreadsheet_contents_for_search,:spreadsheet_annotation_search_fields]

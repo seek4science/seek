@@ -6,7 +6,7 @@ require 'title_trimmer'
 
 class DataFile < ActiveRecord::Base
 
-  include SpreadsheetUtil
+  include Seek::DataFileExtraction
 
   acts_as_asset
   acts_as_trashable
@@ -27,8 +27,7 @@ class DataFile < ActiveRecord::Base
   has_many :studied_factors, :conditions =>  'studied_factors.data_file_version = #{self.version}'
 
   explicit_versioning(:version_column => "version") do
-
-    include SpreadsheetUtil
+    include Seek::DataFileExtraction
     acts_as_versioned_resource
     
     belongs_to :content_blob
@@ -60,13 +59,7 @@ class DataFile < ActiveRecord::Base
     assays.collect{|a| a.study}.uniq
   end
 
-  def treatments
-    if is_spreadsheet?
-      Seek::Treatments.new spreadsheet_xml
-    else
-      Seek::Treatments.new
-    end
-  end
+
 
   # get a list of DataFiles with their original uploaders - for autocomplete fields
   # (authorization is done immediately to save from iterating through the collection again afterwards)
@@ -218,10 +211,6 @@ class DataFile < ActiveRecord::Base
       ]
     end
     flds.flatten.uniq
-  end
-
-  def spreadsheet_contents_for_search
-    Seek::SpreadsheetHandler.new.contents_for_search self
   end
   
 end

@@ -1,12 +1,21 @@
 module Seek
-
-  #FIXME: needs consolidating with SpreadsheetUtil
-  class SpreadsheetHandler
+  #A mixin for DataFiles to handle aspects of data file extraction
+  module DataFileExtraction
     include SpreadsheetUtil
     include Seek::MimeTypes
     include SysMODB::SpreadsheetExtractor
-    
-    def contents_for_search obj=self
+
+    #returns an instance of Seek::Treatment, populated according to the contents of the spreadsheet if it matches a known template
+    def treatments
+      if is_spreadsheet?
+        Seek::Treatments.new spreadsheet_xml
+      else
+        Seek::Treatments.new
+      end
+    end
+
+    #returns an array of all cell content within the workbook.
+    def spreadsheet_contents_for_search obj=self
       content = Rails.cache.fetch("#{obj.content_blob.cache_key}-ss-content-for-search") do
         begin
           xml=obj.spreadsheet_xml
@@ -27,6 +36,8 @@ module Seek
 
       content || []
     end
+
+    private
 
     #pulls out all the content from cells into an array
     def extract_content xml
@@ -59,6 +70,4 @@ module Seek
     end
 
   end
-
-
 end

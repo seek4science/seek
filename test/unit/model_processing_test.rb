@@ -74,7 +74,26 @@ class ModelProcessingTest < ActiveSupport::TestCase
 
     #should be able to gracefully handle non sbml
     model = models(:non_sbml_xml)
-    assert_equal [],model.parameters_and_values
+    assert_equal({},model.parameters_and_values)
+  end
+
+  def test_extract_jwsdat_species
+    model = models(:jws_model)
+    assert is_dat?(model)
+    species = model.species
+    assert species.include?("F16P")
+    assert !species.include?("KmPYKPEP")
+    assert_equal 14,species.count
+  end
+
+  def test_jwsdat_parameter_extraction
+    model = models(:jws_model)
+    assert is_dat?(model)
+    params = model.parameters_and_values
+    assert !params.empty?
+    assert_equal 97,params.keys.count
+    assert params.keys.include?("KmPYKPEP")
+    assert_equal "1306.45",params["VmPGK"]
   end
 
 end
