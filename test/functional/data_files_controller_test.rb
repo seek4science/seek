@@ -129,7 +129,7 @@ class DataFilesControllerTest < ActionController::TestCase
   end
 
   test "associate sample" do
-     # assign to a new data file
+     # associate to a new data file
      data_file_with_samples = valid_data_file
      data_file_with_samples[:sample_ids] = [Factory(:sample,:title=>"newTestSample",:contributor=> User.current_user).id]
      assert_difference("DataFile.count") do
