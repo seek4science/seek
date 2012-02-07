@@ -62,7 +62,6 @@ class Person < ActiveRecord::Base
   named_scope :without_group, :include=>:group_memberships, :conditions=>"group_memberships.person_id IS NULL"
   named_scope :registered,:include=>:user,:conditions=>"users.person_id != 0"
   named_scope :pals,:conditions=>{:is_pal=>true}
-  named_scope :admins,:conditions=>{:is_admin=>true}
 
   alias_attribute :webpage,:web_page
 
@@ -193,10 +192,8 @@ class Person < ActiveRecord::Base
 
   #the roles defined within SEEK
   def roles=(roles)
-    if can_manage?
-      self.roles_mask = (roles & ROLES).map { |r| 2**ROLES.index(r) }.sum
-      self.save
-    end
+    self.roles_mask = (roles & ROLES).map { |r| 2**ROLES.index(r) }.sum
+    self.save
   end
 
   def roles
@@ -205,20 +202,16 @@ class Person < ActiveRecord::Base
     end
   end
 
-  def add_roles=(roles)
-    if can_manage?
-      add_roles = roles - (roles & self.roles)
-      self.roles_mask += (add_roles & ROLES).map { |r| 2**ROLES.index(r) }.sum
-      self.save
-    end
+  def add_roles roles
+    add_roles = roles - (roles & self.roles)
+    self.roles_mask = self.roles_mask.to_i + ((add_roles & ROLES).map { |r| 2**ROLES.index(r) }.sum)
+    self.save
   end
 
   def remove_roles roles
-    if can_manage?
-      remove_roles = roles & self.roles
-      self.roles_mask -= (remove_roles & ROLES).map { |r| 2**ROLES.index(r) }.sum
-      self.save
-    end
+    remove_roles = roles & self.roles
+    self.roles_mask = self.roles_mask.to_i - ((remove_roles & ROLES).map { |r| 2**ROLES.index(r) }.sum)
+    self.save
   end
 
   #the roles defined within the project
@@ -261,8 +254,8 @@ class Person < ActiveRecord::Base
     new_record? or user && (user.is_admin? || user.is_project_manager? || user == self.user)
   end
 
-  does_not_require_can_edit :is_admin
-  requires_can_manage :is_admin, :can_edit_projects, :can_edit_institutions
+  does_not_require_can_edit :roles_mask
+  requires_can_manage :roles_mask, :can_edit_projects, :can_edit_institutions
 
   def can_manage? user = User.current_user
     try_block{user.is_admin?}
@@ -362,8 +355,7 @@ class Person < ActiveRecord::Base
 
   #a before_save trigger, that checks if the person is the first one created, and if so defines it as admin
   def first_person_admin
-    self.is_admin=true if Person.count==0
+    self.add_roles ['admin'] if Person.count==0
   end
-
 
 end

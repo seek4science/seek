@@ -9,7 +9,7 @@ fixtures :all
   # to set up fixture information.
 
   def setup
-    login_as Factory(:user,:person => Factory(:person,:is_admin=> false))
+    login_as Factory(:user,:person => Factory(:person,:roles_mask=> 0))
     @object = Factory(:sample,:contributor => User.current_user,
             :title=> "test1",
             :policy => policies(:policy_for_viewable_data_file))
@@ -27,7 +27,7 @@ fixtures :all
   end
 
   test "show xml validates with schema" do
-    s = Factory(:sample,:contributor => Factory(:user,:person => Factory(:person,:is_admin=> true)),
+    s = Factory(:sample,:contributor => Factory(:user,:person => Factory(:person,:roles_mask=> 1)),
                 :title => "test sample",
                 :policy => policies(:policy_for_viewable_data_file))
     get :show, :id => s, :format =>"xml"

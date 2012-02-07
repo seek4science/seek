@@ -32,12 +32,6 @@ class PersonTest < ActiveSupport::TestCase
     assert !people(:quentin_person).is_downloadable_asset?
   end
 
-  def test_admins_named_scope
-    admins=Person.admins
-    assert_equal 1,admins.size
-    assert admins.include?(people(:quentin_person))
-  end
-
   def test_avatar_key
     p=people(:quentin_person)
     assert_nil p.avatar_key
@@ -54,7 +48,7 @@ class PersonTest < ActiveSupport::TestCase
     
     assert_equal 0,Person.count #no people should exist
     p=Person.new(:first_name=>"XXX",:email=>"xxx@email.com")
-    p.save!
+    p.save
     assert p.is_admin?, "Should automatically be admin, since it is the first created person"    
   end
   

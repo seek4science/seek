@@ -311,7 +311,7 @@ class PeopleController < ApplicationController
     # make sure to update people/_form if this changes
     #                   param                 => allowed access?
     restricted_params={:is_pal                => User.admin_logged_in?,
-                       :is_admin              => User.admin_logged_in?,
+                       :roles_mask              => User.admin_logged_in?,
                        :can_edit_projects     => (User.admin_logged_in? or current_user.is_project_manager?),
                        :can_edit_institutions => (User.admin_logged_in? or current_user.is_project_manager?)}
     restricted_params.each do |param, allowed|

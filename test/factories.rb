@@ -18,7 +18,7 @@
   end
 
   Factory.define(:admin,:parent=>:person) do |f|
-    f.is_admin true
+    f.roles ['admin']
   end
 
   Factory.define(:pal, :parent => :person) do |f|

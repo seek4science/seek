@@ -7,7 +7,7 @@ You are unable to login until you've been assigned to a project.
 An administrator will do this within the next 24 hours and notify you, or contact you for additional information about your project.
 
 If you have not heard from an administrator within 24 hours, please contact one of the following:
-<% for admin in Person.admins -%>
+<% for admin in Person.find(:all).select(&:is_admin?) -%>
   <%= "#{h admin.name}: " %><%= admin.email %>
 <% end -%>
 
