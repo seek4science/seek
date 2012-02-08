@@ -320,11 +320,13 @@ class PeopleController < ApplicationController
   def auth_params
     # make sure to update people/_form if this changes
     #                   param                 => allowed access?
-    restricted_params={:roles_mask              => User.admin_logged_in?,
+    restricted_params={:roles                 =>  User.admin_logged_in?,
+                       :roles_mask            => User.admin_logged_in?,
                        :can_edit_projects     => (User.admin_logged_in? or current_user.is_project_manager?),
                        :can_edit_institutions => (User.admin_logged_in? or current_user.is_project_manager?)}
     restricted_params.each do |param, allowed|
       params[:person].delete(param) if params[:person] and not allowed
+      params.delete param if params and not allowed
     end
   end
   def project_or_institution_details projects_or_institutions

@@ -86,7 +86,7 @@
 </div>
 <% end -%>
 <% if admin_logged_in? || current_user.person.is_project_manager?-%>
-<h2 style="margin-top: 1.5em;">Choose Project / Institution&nbsp;&nbsp;&nbsp;<span class="admin_warning">(This section is visible only to admins)</span></h2>
+<h2 style="margin-top: 1.5em;">Choose Project / Institution&nbsp;&nbsp;&nbsp;<span class="admin_warning">(This section is visible only to admins and project managers)</span></h2>
 <%= render :partial => "work_groups", :locals=> { :person => (person ? person : Person.new) } -%>
 <%# only makes sense to display these settings when the person has "user" associated with it; -%>
 <%# also, can only do this if the person is not an admin, too - because admins cannot edit accounts of each other -%>
@@ -109,7 +109,7 @@
             This person is a certified <b><%= Seek::Config.dm_project_name %> PAL</b>
         </label><br/>
         <label for="is_project_manager" style="font-weight: normal;">
-            <%= f.check_box :is_project_manager -%>
+            <%= check_box_tag "[roles][project_manager]", 1, person.try(:is_project_manager?) -%>
             This person is a <b>Project Manager</b>
         </label>
      <% end %>

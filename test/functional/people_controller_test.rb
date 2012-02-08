@@ -96,7 +96,7 @@ class PeopleControllerTest < ActionController::TestCase
     assert_difference('Person.count') do
       post :create, :person => {:first_name=>"test", :roles_mask => Person::ROLES_MASK_FOR_PAL, :email=>"hghg@sdfsd.com" }
     end
-    
+
     p=assigns(:person)
     assert_redirected_to person_path(p)
     assert !p.is_pal?
@@ -179,7 +179,7 @@ class PeopleControllerTest < ActionController::TestCase
     login_as(:aaron)
     p=people(:fred)
     assert !p.is_pal?
-    put :update, :id=>p.id, :person=>{:id=>p.id, :is_pal=>Person::ROLES_MASK_FOR_PAL, :email=>"ssfdsd@sdfsdf.com"}
+    put :update, :id=>p.id, :person=>{:id=>p.id, :email=>"ssfdsd@sdfsdf.com"}, :roles => {:pal => true}
     assert_not_nil flash[:error]
     p.reload
     assert !p.is_pal?
@@ -189,7 +189,7 @@ class PeopleControllerTest < ActionController::TestCase
     login_as(:aaron)
     p=people(:aaron_person)
     assert !p.is_pal?
-    put :update, :id=>p.id, :person=>{:id=>p.id, :is_pal=>Person::ROLES_MASK_FOR_PAL, :email=>"ssfdsd@sdfsdf.com"}
+    put :update, :id=>p.id, :person=>{:id=>p.id, :email=>"ssfdsd@sdfsdf.com"}, :roles => {:pal => true}
     p.reload
     assert !p.is_pal?
   end
@@ -411,14 +411,28 @@ class PeopleControllerTest < ActionController::TestCase
   end
 
   test 'set pal role for a person' do
-    work_group_id = Factory(:work_group).id
+   work_group_id = Factory(:work_group).id
     assert_difference('Person.count') do
       assert_difference('NotifieeInfo.count') do
         post :create, :person => {:first_name=>"test", :email=>"hghg@sdfsd.com", :work_group_ids => [work_group_id]}, :roles => {:pal => true}
       end
     end
     person = assigns(:person)
+    person.reload
     assert_not_nil person
     assert person.is_pal?
+  end
+
+  test 'set project_manager role for a person' do
+    work_group_id = Factory(:work_group).id
+    assert_difference('Person.count') do
+      assert_difference('NotifieeInfo.count') do
+        post :create, :person => {:first_name=>"test", :email=>"hghg@sdfsd.com", :work_group_ids => [work_group_id]}, :roles => {:project_manager => true}
+      end
+    end
+    person = assigns(:person)
+    person.reload
+    assert_not_nil person
+    assert person.is_project_manager?
   end
 end

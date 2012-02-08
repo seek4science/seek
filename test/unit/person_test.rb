@@ -535,4 +535,20 @@ class PersonTest < ActiveSupport::TestCase
       assert !person.is_pal?
     end
   end
+
+  test 'is_project_manager?' do
+     User.with_current_user Factory(:admin).user do
+      person = Factory(:person)
+      person.add_roles ['project_manager']
+      person.save!
+
+      assert person.is_project_manager?
+
+      person.remove_roles ['project_manager']
+      person.save!
+
+      assert !person.is_project_manager?
+    end
+  end
+
 end
