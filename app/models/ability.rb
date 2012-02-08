@@ -1,11 +1,10 @@
-require 'cancan'
-
 class Ability
   include CanCan::Ability
 
   def initialize(user)
-    @user = user || User.new # for guest
-    @user.person.roles.each { |role| send(role) }
+    user ||= User.new # for guest
+    person = user.person
+    person.roles.each { |role| send(role) } if person
   end
 
   def admin
