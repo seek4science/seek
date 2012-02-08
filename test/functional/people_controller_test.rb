@@ -168,7 +168,7 @@ class PeopleControllerTest < ActionController::TestCase
     login_as(:quentin)
     p=people(:fred)
     assert !p.is_pal?
-    put :update, :id=>p.id, :person=>{:id=>p.id, :is_pal=>Person::ROLES_MASK_FOR_PAL, :email=>"ssfdsd@sdfsdf.com"}
+    put :update, :id=>p.id, :person=>{:id=>p.id, :email=>"ssfdsd@sdfsdf.com"}, :roles => {:pal => true}
     assert_redirected_to person_path(p)
     assert_nil flash[:error]
     p.reload

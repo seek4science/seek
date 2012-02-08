@@ -232,7 +232,7 @@ class AdminController < ApplicationController
     case params[:id]
       when "pals"
         title = "PALs"
-        collection = Person.pals
+        collection = Person.all.select(&:is_pal?)
         type = "users"
       when "admins"
         title = "Administrators"
