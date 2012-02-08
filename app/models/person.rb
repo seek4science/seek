@@ -193,7 +193,6 @@ class Person < ActiveRecord::Base
   #the roles defined within SEEK
   def roles=(roles)
     self.roles_mask = (roles & ROLES).map { |r| 2**ROLES.index(r) }.sum
-    self.save
   end
 
   def roles
@@ -205,13 +204,11 @@ class Person < ActiveRecord::Base
   def add_roles roles
     add_roles = roles - (roles & self.roles)
     self.roles_mask = self.roles_mask.to_i + ((add_roles & ROLES).map { |r| 2**ROLES.index(r) }.sum)
-    self.save
   end
 
   def remove_roles roles
     remove_roles = roles & self.roles
     self.roles_mask = self.roles_mask.to_i - ((remove_roles & ROLES).map { |r| 2**ROLES.index(r) }.sum)
-    self.save
   end
 
   #the roles defined within the project

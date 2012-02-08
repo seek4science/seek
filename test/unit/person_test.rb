@@ -43,13 +43,14 @@ class PersonTest < ActiveSupport::TestCase
     p=Person.new(:first_name=>"XXX",:email=>"xxx@email.com")
     p.save!
     assert !p.is_admin?, "Should not automatically be admin, since people already exist"
-    
+
     Person.destroy_all
-    
+
     assert_equal 0,Person.count #no people should exist
     p=Person.new(:first_name=>"XXX",:email=>"xxx@email.com")
     p.save
-    assert p.is_admin?, "Should automatically be admin, since it is the first created person"    
+    p.reload
+    assert p.is_admin?, "Should automatically be admin, since it is the first created person"
   end
   
   def test_registered
@@ -466,6 +467,7 @@ class PersonTest < ActiveSupport::TestCase
       assert_equal [], person.roles
       assert person.can_manage?
       person.roles=['admin']
+      person.save!
       person.reload
       assert_equal ['admin'], person.roles
     end
@@ -477,6 +479,7 @@ class PersonTest < ActiveSupport::TestCase
       assert_equal ['admin'], person.roles
       assert person.can_manage?
       person.add_roles ['admin', 'pal']
+      person.save!
       person.reload
       assert_equal ['admin', 'pal'].sort, person.roles.sort
     end
@@ -487,6 +490,7 @@ class PersonTest < ActiveSupport::TestCase
       person = Factory(:person)
       person.roles = ['admin','pi', 'pal']
       person.remove_roles ['admin']
+      person.save!
       person.reload
       assert_equal ['pi', 'pal'].sort, person.roles.sort
     end
@@ -496,6 +500,7 @@ class PersonTest < ActiveSupport::TestCase
     User.with_current_user Factory(:person).user do
       person = Factory(:person)
       person.roles = ['admin','pi', 'pal']
+      person.save
       person.reload
       assert_equal [], person.roles
     end

@@ -37,7 +37,13 @@ public/stylesheets/css_cached.css
 
 .bundle/config
 
+config/default_data/Specimen_example_Quyen1.xls
+new_version
+server
+svg
+
 vendor/plugins/annotations/.git
+vendor/plugins/rails-dev-boost/*
 vendor/bundle/
 vendor/cache/
 *.~lock*
