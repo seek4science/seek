@@ -9,7 +9,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20120207175041) do
+ActiveRecord::Schema.define(:version => 20120208152620) do
 
   create_table "activity_logs", :force => true do |t|
     t.string   "action"
@@ -24,7 +24,7 @@ ActiveRecord::Schema.define(:version => 20120207175041) do
     t.datetime "updated_at"
     t.string   "http_referer"
     t.string   "user_agent"
-    t.text     "data",                   :limit => 2147483647
+    t.text     "data",                   :limit => 16777215
     t.string   "controller_name"
   end
 
@@ -685,7 +685,6 @@ ActiveRecord::Schema.define(:version => 20120207175041) do
     t.text     "description"
     t.integer  "avatar_id"
     t.integer  "status_id",                           :default => 0
-    t.boolean  "is_pal",                              :default => false
     t.string   "first_letter",          :limit => 10
     t.string   "uuid"
     t.boolean  "can_edit_projects",                   :default => false
