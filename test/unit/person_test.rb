@@ -505,4 +505,34 @@ class PersonTest < ActiveSupport::TestCase
       assert_equal [], person.roles
     end
   end
+
+  test 'is_admin?' do
+     User.with_current_user Factory(:admin).user do
+      person = Factory(:person)
+      person.add_roles ['admin']
+      person.save!
+
+      assert person.is_admin?
+
+      person.remove_roles ['admin']
+      person.save!
+
+      assert !person.is_admin?
+    end
+  end
+
+  test 'is_pal?' do
+     User.with_current_user Factory(:admin).user do
+      person = Factory(:person)
+      person.add_roles ['pal']
+      person.save!
+
+      assert person.is_pal?
+
+      person.remove_roles ['pal']
+      person.save!
+
+      assert !person.is_pal?
+    end
+  end
 end

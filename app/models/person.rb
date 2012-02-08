@@ -77,6 +77,11 @@ class Person < ActiveRecord::Base
      roles.include?('admin')
   end
 
+  def is_pal?
+     roles.include?('pal')
+  end
+
+
   def set_default_subscriptions
     projects.each do |proj|
       project_subscriptions.build :project => proj
