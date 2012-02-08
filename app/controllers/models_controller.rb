@@ -137,7 +137,7 @@ class ModelsController < ApplicationController
 
     respond_to do |format|
       if error
-        flash.now[:error]="JWS Online encountered a problem processing this model."
+        flash[:error]="JWS Online encountered a problem processing this model."
         format.html { render :action=>"builder" }
       elsif @error_keys.empty? && following_action == "simulate"
         format.html {render :action=>"simulate",:layout=>"no_sidebar"}
@@ -169,7 +169,7 @@ class ModelsController < ApplicationController
     
     respond_to do |format|
       if error
-        flash.now[:error]="JWS Online encountered a problem processing this model."
+        flash[:error]="JWS Online encountered a problem processing this model."
         format.html { redirect_to(@model,:version=>@display_model.version)}                      
       elsif !supported
         flash[:error]="This model is of neither SBML or JWS Online (Dat) format so cannot be used with JWS Online"
