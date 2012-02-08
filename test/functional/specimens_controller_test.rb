@@ -163,4 +163,13 @@ fixtures :all
       assert_equal "Test", specimen.send(attr)
     end
   end
+
+  test "should show without institution" do
+    get :show, :id => Factory(:specimen,
+                              :title=>"running mouse NO2 with no institution",
+                              :policy =>policies(:editing_for_all_sysmo_users_policy),
+                              :institution=>nil)
+    assert_response :success
+    assert_not_nil assigns(:specimen)
+  end
 end
