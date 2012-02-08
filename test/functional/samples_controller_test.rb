@@ -135,4 +135,21 @@ fixtures :all
     assert flash[:error]
     assert_redirected_to samples_path
   end
+
+  test "associate data files,models,sops" do
+      assert_difference("Sample.count") do
+      post :create, :sample => {:title=>"test",
+                                :lab_internal_number =>"Do232",
+                                :donation_date => Date.today,
+                                :specimen => Factory(:specimen, :contributor => User.current_user)},
+             :sample_data_file_ids => [Factory(:data_file,:title=>"testDF",:contributor=>User.current_user).id],
+             :sample_model_ids => [Factory(:model,:title=>"testModel",:contributor=>User.current_user).id],
+             :sample_sop_ids => [Factory(:sop,:title=>"testSop",:contributor=>User.current_user).id]
+
+    end
+    s = assigns(:sample)
+    assert_equal "testDF", s.data_files.first.title
+    assert_equal "testModel", s.models.first.title
+    assert_equal "testSop", s.sops.first.title
+  end
 end

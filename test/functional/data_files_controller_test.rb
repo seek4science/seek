@@ -125,6 +125,24 @@ class DataFilesControllerTest < ActionController::TestCase
     assert new_assay.related_asset_ids('DataFile').include?(d.id)
   end
 
+  test "associate sample" do
+     # associate to a new data file
+     data_file_with_samples = valid_data_file
+     data_file_with_samples[:sample_ids] = [Factory(:sample,:title=>"newTestSample",:contributor=> User.current_user).id]
+     assert_difference("DataFile.count") do
+       post :create,:data_file => data_file_with_samples
+     end
+
+    df = assigns(:data_file)
+    assert_equal "newTestSample", df.samples.first.title
+
+    #edit associations of samples to an existing data file
+    put :update,:id=> df.id, :data_file => {:sample_ids=> [Factory(:sample,:title=>"editTestSample",:contributor=> User.current_user).id]}
+    df = assigns(:data_file)
+    assert_equal "editTestSample", df.samples.first.title
+  end
+
+
   test "shouldn't show hidden items in index" do
     login_as(:aaron)
     get :index, :page => "all"
