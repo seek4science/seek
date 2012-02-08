@@ -94,7 +94,7 @@ class PeopleControllerTest < ActionController::TestCase
   test "non_admin_should_not_create_pal" do
     login_as(:pal_user)
     assert_difference('Person.count') do
-      post :create, :person => {:first_name=>"test", :is_pal=>true, :email=>"hghg@sdfsd.com" }
+      post :create, :person => {:first_name=>"test", :roles_mask => Person::ROLES_MASK_FOR_PAL, :email=>"hghg@sdfsd.com" }
     end
     
     p=assigns(:person)
@@ -147,7 +147,7 @@ class PeopleControllerTest < ActionController::TestCase
     login_as(:quentin)
     p=people(:fred)
     assert !p.is_admin?
-    put :update, :id=>p.id, :person=>{:id=>p.id, :roles_mask=>1, :email=>"ssfdsd@sdfsdf.com"}
+    put :update, :id=>p.id, :person=>{:id=>p.id, :roles_mask=>Person::ROLES_MASK_FOR_ADMIN, :email=>"ssfdsd@sdfsdf.com"}
     assert_redirected_to person_path(p)
     assert_nil flash[:error]
     p.reload
@@ -158,7 +158,7 @@ class PeopleControllerTest < ActionController::TestCase
     login_as(:aaron)
     p=people(:fred)
     assert !p.is_admin?
-    put :update, :id=>p.id, :person=>{:id=>p.id, :roles_mask=>1, :email=>"ssfdsd@sdfsdf.com"}
+    put :update, :id=>p.id, :person=>{:id=>p.id, :roles_mask=>Person::ROLES_MASK_FOR_ADMIN, :email=>"ssfdsd@sdfsdf.com"}
     assert_not_nil flash[:error]
     p.reload
     assert !p.is_admin?
@@ -168,7 +168,7 @@ class PeopleControllerTest < ActionController::TestCase
     login_as(:quentin)
     p=people(:fred)
     assert !p.is_pal?
-    put :update, :id=>p.id, :person=>{:id=>p.id, :is_pal=>true, :email=>"ssfdsd@sdfsdf.com"}
+    put :update, :id=>p.id, :person=>{:id=>p.id, :is_pal=>Person::ROLES_MASK_FOR_PAL, :email=>"ssfdsd@sdfsdf.com"}
     assert_redirected_to person_path(p)
     assert_nil flash[:error]
     p.reload
@@ -179,7 +179,7 @@ class PeopleControllerTest < ActionController::TestCase
     login_as(:aaron)
     p=people(:fred)
     assert !p.is_pal?
-    put :update, :id=>p.id, :person=>{:id=>p.id, :is_pal=>true, :email=>"ssfdsd@sdfsdf.com"}    
+    put :update, :id=>p.id, :person=>{:id=>p.id, :is_pal=>Person::ROLES_MASK_FOR_PAL, :email=>"ssfdsd@sdfsdf.com"}
     assert_not_nil flash[:error]
     p.reload
     assert !p.is_pal?
@@ -189,7 +189,7 @@ class PeopleControllerTest < ActionController::TestCase
     login_as(:aaron)
     p=people(:aaron_person)
     assert !p.is_pal?
-    put :update, :id=>p.id, :person=>{:id=>p.id, :is_pal=>true, :email=>"ssfdsd@sdfsdf.com"}
+    put :update, :id=>p.id, :person=>{:id=>p.id, :is_pal=>Person::ROLES_MASK_FOR_PAL, :email=>"ssfdsd@sdfsdf.com"}
     p.reload
     assert !p.is_pal?
   end
@@ -198,7 +198,7 @@ class PeopleControllerTest < ActionController::TestCase
     login_as(:aaron)
     p=people(:aaron_person)
     assert !p.is_admin?
-    put :update, :id=>p.id, :person=>{:id=>p.id, :roles_mask=>1, :email=>"ssfdsd@sdfsdf.com"}
+    put :update, :id=>p.id, :person=>{:id=>p.id, :roles_mask=>Person::ROLES_MASK_FOR_ADMIN, :email=>"ssfdsd@sdfsdf.com"}
     p.reload
     assert !p.is_admin?
   end
@@ -391,7 +391,7 @@ class PeopleControllerTest < ActionController::TestCase
     role = ProjectRole.find_by_name('Sysmo-DB Pal')
     pal =  Factory(:person_in_project, :group_memberships => [Factory(:group_membership, :work_group => work_group)])
     pal.group_memberships.first.project_roles << role
-    pal.is_pal = true
+    pal.add_roles ['pal']
     pal.save
     assert_equal pal, project.pals.first
     assert_equal 0, project.pis.count
@@ -408,5 +408,17 @@ class PeopleControllerTest < ActionController::TestCase
     assert_equal 1, permissions.count
     assert_equal pal.id, permissions.first.contributor_id
     assert_equal Policy::MANAGING, permissions.first.access_type
+  end
+
+  test 'set pal role for a person' do
+    work_group_id = Factory(:work_group).id
+    assert_difference('Person.count') do
+      assert_difference('NotifieeInfo.count') do
+        post :create, :person => {:first_name=>"test", :email=>"hghg@sdfsd.com", :work_group_ids => [work_group_id]}, :roles => {:pal => true}
+      end
+    end
+    person = assigns(:person)
+    assert_not_nil person
+    assert person.is_pal?
   end
 end

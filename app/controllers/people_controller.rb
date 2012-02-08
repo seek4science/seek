@@ -131,6 +131,7 @@ class PeopleController < ApplicationController
     redirect_action="new"
 
     set_tools_and_expertise(@person, params)
+    set_roles(@person, params)
    
     registration = false
     registration = true if (current_user.person.nil?) #indicates a profile is being created during the registration process  
@@ -183,7 +184,8 @@ class PeopleController < ApplicationController
     @person.avatar_id = ((avatar_id.kind_of?(Numeric) && avatar_id > 0) ? avatar_id : nil)
     
     set_tools_and_expertise(@person,params)    
-        
+    set_roles(@person, params)
+
     if !@person.notifiee_info.nil?
       @person.notifiee_info.receive_notifications = (params[:receive_notifications] ? true : false) 
       @person.notifiee_info.save if @person.notifiee_info.changed?
@@ -276,6 +278,14 @@ class PeopleController < ApplicationController
 
   end
 
+  def set_roles person, params
+     if params[:roles]
+       params[:roles].each do |key,value|
+         person.add_roles [key] if value
+       end
+     end
+  end
+
   def profile_belongs_to_current_or_is_admin
     @person=Person.find(params[:id])
     unless @person == current_user.person || User.admin_logged_in? || current_user.person.is_project_manager?
@@ -310,8 +320,7 @@ class PeopleController < ApplicationController
   def auth_params
     # make sure to update people/_form if this changes
     #                   param                 => allowed access?
-    restricted_params={:is_pal                => User.admin_logged_in?,
-                       :roles_mask              => User.admin_logged_in?,
+    restricted_params={:roles_mask              => User.admin_logged_in?,
                        :can_edit_projects     => (User.admin_logged_in? or current_user.is_project_manager?),
                        :can_edit_institutions => (User.admin_logged_in? or current_user.is_project_manager?)}
     restricted_params.each do |param, allowed|

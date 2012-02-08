@@ -27,7 +27,7 @@ fixtures :all
   end
 
   test "show xml validates with schema" do
-    s = Factory(:sample,:contributor => Factory(:user,:person => Factory(:person,:roles_mask=> 1)),
+    s = Factory(:sample,:contributor => Factory(:user,:person => Factory(:person,:roles_mask=> Person::ROLES_MASK_FOR_ADMIN)),
                 :title => "test sample",
                 :policy => policies(:policy_for_viewable_data_file))
     get :show, :id => s, :format =>"xml"

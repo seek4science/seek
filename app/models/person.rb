@@ -61,7 +61,6 @@ class Person < ActiveRecord::Base
 
   named_scope :without_group, :include=>:group_memberships, :conditions=>"group_memberships.person_id IS NULL"
   named_scope :registered,:include=>:user,:conditions=>"users.person_id != 0"
-  named_scope :pals,:conditions=>{:is_pal=>true}
 
   alias_attribute :webpage,:web_page
 
@@ -72,6 +71,8 @@ class Person < ActiveRecord::Base
   before_create :set_default_subscriptions
 
   ROLES = %w[admin pal pi]
+  ROLES_MASK_FOR_ADMIN = 2**ROLES.index('admin')
+  ROLES_MASK_FOR_PAL = 2**ROLES.index('pal')
 
   def is_admin?
      roles.include?('admin')
