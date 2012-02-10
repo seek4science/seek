@@ -7,7 +7,7 @@ module AdminHelper
   
   def admin_mail_to_links   
     result=""
-    admins=Person.find(:all).select(&:is_admin?)
+    admins=Person.admins
     admins.each do |person|
       result << mail_to(person.email,person.name)
       result << ", " unless admins.last==person

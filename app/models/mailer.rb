@@ -122,7 +122,7 @@ class Mailer < ActionMailer::Base
   end
   
   def admins
-    Person.find(:all).select(&:is_admin?)
+    Person.admins
   end
 
 end

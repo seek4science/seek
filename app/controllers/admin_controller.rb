@@ -18,7 +18,7 @@ class AdminController < ApplicationController
 
   def update_admins
     admin_ids = params[:admins] || []
-    current_admins = Person.all.select{|p| p.is_admin?}
+    current_admins = Person.admins
     admins = admin_ids.collect{|id| Person.find(id)}
     current_admins.each{|ca| ca.is_admin = false}
     admins.each{|a| a.is_admin = true}
@@ -232,11 +232,11 @@ class AdminController < ApplicationController
     case params[:id]
       when "pals"
         title = "PALs"
-        collection = Person.all.select(&:is_pal?)
+        collection = Person.pals
         type = "users"
       when "admins"
         title = "Administrators"
-        collection = Person.find(:all).select(&:is_admin?)
+        collection = Person.admins
         type = "users"
       when "invalid"
         collection = {}
