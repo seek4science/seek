@@ -391,7 +391,7 @@ class PeopleControllerTest < ActionController::TestCase
     role = ProjectRole.find_by_name('Sysmo-DB Pal')
     pal =  Factory(:person_in_project, :group_memberships => [Factory(:group_membership, :work_group => work_group)])
     pal.group_memberships.first.project_roles << role
-    pal.add_roles ['pal']
+    pal.is_pal = true
     pal.save
     assert_equal pal, project.pals.first
     assert_equal 0, project.pis.count

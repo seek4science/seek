@@ -28,7 +28,7 @@ module Authorization
     is_authorized = false
     
     policy = thing.policy
-    
+
     # == BASIC POLICY
     # 1. Check the user's "scope" level, to match the sharing scopes defined in policy.
     # 2. If they're in "scope", check the action they're trying to perform is allowed by the access_type    

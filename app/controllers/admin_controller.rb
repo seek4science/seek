@@ -20,8 +20,8 @@ class AdminController < ApplicationController
     admin_ids = params[:admins] || []
     current_admins = Person.all.select{|p| p.is_admin?}
     admins = admin_ids.collect{|id| Person.find(id)}
-    current_admins.each{|ca| ca.remove_roles ['admin']}
-    admins.each{|a| a.add_roles ['admin']}
+    current_admins.each{|ca| ca.is_admin = false}
+    admins.each{|a| a.is_admin = true}
     (admins | current_admins).each do |admin|
       class << admin
         def record_timestamps

@@ -281,7 +281,7 @@ class PeopleController < ApplicationController
   def set_roles person, params
      if params[:roles]
        params[:roles].each do |key,value|
-         person.add_roles [key] if value
+          person.send("is_#{key}=", true) if value
        end
      end
   end

@@ -488,18 +488,18 @@ class PersonTest < ActiveSupport::TestCase
   test 'remove roles for a person' do
     User.with_current_user Factory(:admin).user do
       person = Factory(:person)
-      person.roles = ['admin','pi', 'pal']
+      person.roles = ['admin', 'pal']
       person.remove_roles ['admin']
       person.save!
       person.reload
-      assert_equal ['pi', 'pal'].sort, person.roles.sort
+      assert_equal ['pal'], person.roles
     end
   end
 
   test 'non-admin can not change the roles of a person' do
     User.with_current_user Factory(:person).user do
       person = Factory(:person)
-      person.roles = ['admin','pi', 'pal']
+      person.roles = ['admin', 'pal']
       person.save
       person.reload
       assert_equal [], person.roles
@@ -509,12 +509,12 @@ class PersonTest < ActiveSupport::TestCase
   test 'is_admin?' do
      User.with_current_user Factory(:admin).user do
       person = Factory(:person)
-      person.add_roles ['admin']
+      person.is_admin = true
       person.save!
 
       assert person.is_admin?
 
-      person.remove_roles ['admin']
+      person.is_admin = false
       person.save!
 
       assert !person.is_admin?
@@ -524,12 +524,12 @@ class PersonTest < ActiveSupport::TestCase
   test 'is_pal?' do
      User.with_current_user Factory(:admin).user do
       person = Factory(:person)
-      person.add_roles ['pal']
+      person.is_pal = true
       person.save!
 
       assert person.is_pal?
 
-      person.remove_roles ['pal']
+      person.is_pal = false
       person.save!
 
       assert !person.is_pal?
@@ -539,16 +539,40 @@ class PersonTest < ActiveSupport::TestCase
   test 'is_project_manager?' do
      User.with_current_user Factory(:admin).user do
       person = Factory(:person)
-      person.add_roles ['project_manager']
+      person.is_project_manager= true
       person.save!
 
       assert person.is_project_manager?
 
-      person.remove_roles ['project_manager']
+      person.is_project_manager=false
       person.save!
 
       assert !person.is_project_manager?
     end
   end
 
+  test "publisher can publish items inside their project" do
+    publisher = Factory(:person, :roles => ['publisher'])
+    datafile1 = Factory(:data_file, :projects => publisher.projects)
+    datafile2 = Factory(:data_file)
+
+    ability = Ability.new(publisher.user)
+
+    assert ability.can? :publish, datafile1
+    assert ability.cannot? :publish, datafile2
+    User.with_current_user publisher.user do
+      assert datafile1.can_publish?
+      assert !datafile2.can_publish?
+    end
+  end
+
+  test 'replace admins, pals named_scope by a static function' do
+    admins = Person.admins
+    assert_equal 1, admins.count
+    assert admins.include?(people(:quentin_person))
+
+    pals = Person.pals
+    assert_equal 1, pals.count
+    assert pals.include?(people(:pal))
+  end
 end

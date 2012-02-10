@@ -70,21 +70,57 @@ class Person < ActiveRecord::Base
   has_many :subscriptions,:dependent => :destroy
   before_create :set_default_subscriptions
 
-  ROLES = %w[admin pal project_manager pi]
+  ROLES = %w[admin pal project_manager publisher]
   ROLES_MASK_FOR_ADMIN = 2**ROLES.index('admin')
   ROLES_MASK_FOR_PAL = 2**ROLES.index('pal')
   ROLES_MASK_FOR_PROJECT_MANAGER = 2**ROLES.index('project_manager')
 
-  def is_admin?
-     roles.include?('admin')
+  def self.admins
+
+  end
+  ROLES.each do |role|
+      eval <<-END_EVAL
+            def is_#{role}?
+              roles.include?('#{role}')
+            end
+
+            def is_#{role}
+              roles.include?('#{role}')
+            end
+
+            def is_#{role}=(yes)
+              if yes
+                add_roles ['#{role}']
+              else
+                remove_roles ['#{role}']
+              end
+            end
+
+            def self.#{role}s
+              Person.all.select(&:is_#{role}?)
+            end
+      END_EVAL
+    end
+
+   #the roles defined within SEEK
+  def roles=(roles)
+    self.roles_mask = (roles & ROLES).map { |r| 2**ROLES.index(r) }.sum
   end
 
-  def is_pal?
-     roles.include?('pal')
+  def roles
+    ROLES.reject do |r|
+      ((roles_mask || 0) & 2**ROLES.index(r)).zero?
+    end
   end
 
-  def is_project_manager?
-     roles.include?('project_manager')
+  def add_roles roles
+    add_roles = roles - (roles & self.roles)
+    self.roles_mask = self.roles_mask.to_i + ((add_roles & ROLES).map { |r| 2**ROLES.index(r) }.sum)
+  end
+
+  def remove_roles roles
+    remove_roles = roles & self.roles
+    self.roles_mask = self.roles_mask.to_i - ((remove_roles & ROLES).map { |r| 2**ROLES.index(r) }.sum)
   end
 
   def set_default_subscriptions
@@ -198,27 +234,6 @@ class Person < ActiveRecord::Base
     #capitalize, including double barrelled names
     #TODO: why not just store them like this rather than processing each time? Will need to reprocess exiting entries if we do this.
     return (firstname.gsub(/\b\w/) {|s| s.upcase} + " " + lastname.gsub(/\b\w/) {|s| s.upcase}).strip
-  end
-
-  #the roles defined within SEEK
-  def roles=(roles)
-    self.roles_mask = (roles & ROLES).map { |r| 2**ROLES.index(r) }.sum
-  end
-
-  def roles
-    ROLES.reject do |r|
-      ((roles_mask || 0) & 2**ROLES.index(r)).zero?
-    end
-  end
-
-  def add_roles roles
-    add_roles = roles - (roles & self.roles)
-    self.roles_mask = self.roles_mask.to_i + ((add_roles & ROLES).map { |r| 2**ROLES.index(r) }.sum)
-  end
-
-  def remove_roles roles
-    remove_roles = roles & self.roles
-    self.roles_mask = self.roles_mask.to_i - ((remove_roles & ROLES).map { |r| 2**ROLES.index(r) }.sum)
   end
 
   #the roles defined within the project
@@ -362,7 +377,7 @@ class Person < ActiveRecord::Base
 
   #a before_save trigger, that checks if the person is the first one created, and if so defines it as admin
   def first_person_admin
-    self.add_roles ['admin'] if Person.count==0
+    self.is_admin = true if Person.count==0
   end
 
 end
