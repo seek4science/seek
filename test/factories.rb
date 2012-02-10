@@ -18,11 +18,11 @@
   end
 
   Factory.define(:admin,:parent=>:person) do |f|
-    f.roles ['admin']
+    f.is_admin true
   end
 
   Factory.define(:pal, :parent => :person) do |f|
-    f.roles ['admin']
+    f.is_pal true
     f.after_create { |pal| pal.group_memberships.first.project_roles << ProjectRole.pal_role}
   end
 

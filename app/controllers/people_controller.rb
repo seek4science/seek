@@ -131,7 +131,7 @@ class PeopleController < ApplicationController
     redirect_action="new"
 
     set_tools_and_expertise(@person, params)
-    set_roles(@person, params)
+    set_roles(@person, params) if User.admin_logged_in?
    
     registration = false
     registration = true if (current_user.person.nil?) #indicates a profile is being created during the registration process  
@@ -184,7 +184,7 @@ class PeopleController < ApplicationController
     @person.avatar_id = ((avatar_id.kind_of?(Numeric) && avatar_id > 0) ? avatar_id : nil)
     
     set_tools_and_expertise(@person,params)    
-    set_roles(@person, params)
+    set_roles(@person, params) if User.admin_logged_in?
 
     if !@person.notifiee_info.nil?
       @person.notifiee_info.receive_notifications = (params[:receive_notifications] ? true : false) 
@@ -279,11 +279,15 @@ class PeopleController < ApplicationController
   end
 
   def set_roles person, params
-     if params[:roles]
-       params[:roles].each do |key,value|
-          person.send("is_#{key}=", true) if value
-       end
-     end
+    if params[:roles]
+      roles = []
+      params[:roles].each_key do |key|
+        roles << key
+      end
+      person.roles=roles
+    else
+      person.roles=[]
+    end
   end
 
   def profile_belongs_to_current_or_is_admin

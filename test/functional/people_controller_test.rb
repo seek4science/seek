@@ -435,4 +435,18 @@ class PeopleControllerTest < ActionController::TestCase
     assert_not_nil person
     assert person.is_project_manager?
   end
+
+  test 'update roles for a person' do
+    person = Factory(:pal)
+    assert_not_nil person
+    assert person.is_pal?
+
+    put :update, :id => person.id, :person => {:id => person.id}, :roles => {:project_manager => true}
+
+    person = assigns(:person)
+    person.reload
+    assert_not_nil person
+    assert person.is_project_manager?
+    assert !person.is_pal?
+  end
 end
