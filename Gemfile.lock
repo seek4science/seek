@@ -2,10 +2,6 @@ GEM
   remote: http://rubygems.org/
   remote: http://gems.github.com/
   specs:
-    POpen4 (0.1.4)
-      Platform (>= 0.4.0)
-      open4
-    Platform (0.4.0)
     RedCloth (4.2.9)
     actionmailer (2.3.14)
       actionpack (= 2.3.14)
@@ -18,8 +14,15 @@ GEM
       activesupport (= 2.3.14)
     activesupport (2.3.14)
     addressable (2.2.6)
+    builder (3.0.0)
     calendar_date_select (1.16.3)
+    cancan (1.6.7)
     crack (0.3.1)
+    daemons (1.0.10)
+    delayed_job (2.0.7)
+      activesupport (~> 2.0)
+      daemons (= 1.0.10)
+    escape (0.0.4)
     factory_girl (2.5.1)
       activesupport
     fastercsv (1.5.1)
@@ -28,7 +31,9 @@ GEM
     libxml-ruby (1.1.3)
     mime-types (1.17.2)
     mysql (2.8.1)
-    open4 (1.0.1)
+    nokogiri (1.5.0)
+    open4 (1.3.0)
+    pr_geohash (1.0.0)
     rack (1.1.3)
     rack-openid (1.1.0)
       rack (>= 0.4)
@@ -48,15 +53,23 @@ GEM
     rest-client (1.6.7)
       mime-types (>= 1.16)
     rmagick (2.12.2)
+    rsolr (1.0.6)
+      builder (>= 2.1.2)
     rubaidh-google_analytics (1.1.4)
       actionpack
       activesupport
     ruby-openid (2.1.8)
     ruby-prof (0.10.8)
-    simple-spreadsheet-extractor (0.6.4)
-      POpen4 (= 0.1.4)
-      open4 (= 1.0.1)
+    simple-spreadsheet-extractor (0.9.1)
+      open4 (= 1.3.0)
     sqlite3-ruby (1.2.5)
+    sunspot (1.3.0)
+      escape (~> 0.0.4)
+      pr_geohash (~> 1.0)
+      rsolr (~> 1.0.6)
+    sunspot_rails (1.3.0)
+      nokogiri
+      sunspot (= 1.3.0)
     timocratic-test_benchmark (0.4.3)
     uuidtools (2.1.1)
     webmock (1.7.10)
@@ -69,6 +82,9 @@ PLATFORMS
 DEPENDENCIES
   RedCloth (~> 4.2.3)
   calendar_date_select
+  cancan
+  daemons
+  delayed_job (~> 2.0.4)
   factory_girl
   fastercsv (= 1.5.1)
   hpricot (~> 0.8.2)
@@ -83,8 +99,9 @@ DEPENDENCIES
   rubaidh-google_analytics (~> 1.1.4)
   ruby-openid
   ruby-prof
-  simple-spreadsheet-extractor (= 0.6.4)
+  simple-spreadsheet-extractor (= 0.9.1)
   sqlite3-ruby (= 1.2.5)
+  sunspot_rails
   timocratic-test_benchmark
   uuidtools (= 2.1.1)
   webmock
