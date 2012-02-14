@@ -28,6 +28,7 @@ gem "cancan"
 
 group :development do
   gem "sqlite3-ruby","1.2.5",:require=>"sqlite3"
+  gem "mongrel"
 end
 
 group :test do
