@@ -24,21 +24,21 @@
                 <b>Name:</b> 
 				<%= h @person.name %>
             </p>
-            <% if current_user != nil and current_user.person == @person %>
+            <% if !current_user.nil? && (current_user.person == @person || current_user.is_admin?) %>
                 <p>
                     <b>Seek ID: </b>
                     <%= @person.id %>
                 </p>
-                <% if @person.user.login %>
+                <% if !@person.user.nil? && @person.user.login %>
                 <p>
                         <b>Login name:</b>
-                        <%= h @person.user.login %><span class='none_text'> (Only visible to you)</span>
+                        <%= h @person.user.login %><span class='none_text'> (Only visible to you and administrators)</span>
                 </p>
                 <% end %>
-                <% if @person.user.openid %>
+                <% if !@person.user.nil? && @person.user.openid %>
                     <p>
                         <b>OpenID URL:</b>
-                        <%= h @person.user.openid %><span class='none_text'> (Only visible to you)</span>
+                        <%= h @person.user.openid %><span class='none_text'> (Only visible to you and administrators)</span>
                     </p>
                 <% end %>
             <% end %>
@@ -78,7 +78,7 @@
     <div style="clear:both;">
         <br/>
         <%= render :partial=>"people/contact_details" unless hide_contact_details? %>
-        <%= render :partial=>"people/roles",:locals=>{:editable=>false} %>
+        <%= render :partial=>"people/project_roles",:locals=>{:editable=>false} %>
         <%# get, classify and authorize all assets for this person's user (assets belong to users, not people!) -%>
         <%= render :partial=>"layouts/items_related_to",:object => @person %>
         <%# show the following section only to admins and only if the @person has an associated "user", which is not an admin itself - -%>

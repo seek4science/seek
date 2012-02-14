@@ -3,7 +3,7 @@ require 'test_helper'
 class HomeHelperTest < ActionView::TestCase
 
   test "should retrieve recently added/downloaded items in the chronological order" do
-    i = 0;
+    i = 0
     item = Factory(:data_file, :policy => Factory(:public_policy))
     create_logs = []
     download_logs = []

@@ -7,7 +7,7 @@
     <div id="publications_fold_content" class="foldContent" style="display:<%= related_publications.blank? ? 'none' : 'block' -%>">
         <div class="yui-u first" style="width:66%; float:left">
             <%
-            all_publications=Publication.all.sort{|a, b| a.title<=>b.title}
+            all_publications=Publication.find(:all,:include=>:projects).sort{|a, b| a.title<=>b.title}
             project_publications=all_publications.select{|p| current_user.person.member_of?(p.projects)}
             select_truncate_length=120
             show_relationships=false -%>
@@ -35,7 +35,7 @@
                 <%= check_box_tag :include_other_project_publications, nil, false, {:onchange=>"toggle_publication_list();",:style=>"margin-top:0.5em;"} -%> Associate Publications from other projects?
             </div>
 			<br/>
-            <%= link_to_function (image("new") + " Associate with this #{resource_type}"), "addSelectedPublication(); return(false);", :id=>"add_publication_link", :class=>"block_link", :style => "width: 10em" %>
+            <%= link_to_function (image("new") + " Associate with this #{resource_type}"), "addSelectedPublication(); return(false);", :id=>"add_publication_link", :class=>"block_link" %>
         </div>
       <%= render :partial => 'assets/preview_box', :locals => {:preview_name => 'publication'} %>
     </div>

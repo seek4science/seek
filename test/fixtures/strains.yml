@@ -11,3 +11,13 @@ yeast2:
 Saccharomyces_cerevisiae1:
   title: ZX81
   organism: Saccharomyces_cerevisiae
+
+dummy_for_yeast:
+  title: default
+  organism: yeast
+  is_dummy: true
+
+dummy_for_Saccharomyces_cerevisiae:
+  title: default
+  organism: Saccharomyces_cerevisiae
+  is_dummy: true

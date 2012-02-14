@@ -1,8 +1,11 @@
 <%= javascript_include_tag "resource" -%>
 
 <%= asset_buttons @model,@display_model.version -%>
+<%# FIXME: buttons need tidying up and embedded together with other asset buttons, maybe using a block Currently they are spread across
+    multiple sectionIcons.
+    -%>
 
-<% if Seek::Config.jws_enabled && jws_supported?(@display_model) -%>
+<% if Seek::Config.jws_enabled && @display_model.is_jws_supported? -%>
 	<ul class="sectionIcons">
 		<% if @model.can_edit? -%>
 		    <li>
@@ -17,7 +20,7 @@
 	</ul>
 <% end -%>
 
-<% if Seek::Config.sycamore_enabled and @display_model.content_blob.file_exists? && Class.new.extend(Seek::ModelTypeDetection).is_sbml?(@display_model) %>
+<% if Seek::Config.sycamore_enabled and @display_model.content_blob.file_exists? && @display_model.is_sbml? %>
   <ul class="sectionIcons">
     <li>
       <span class="icon">
@@ -31,9 +34,11 @@
   </ul>
 <% end %>
 
+
 <%= render :partial=>"assets/upload_new_version_form", :locals=>{:resource=>@model} -%>
 <%= render :partial => "layouts/item_title",:locals=>{:item=>@model} %>
 <%= render :partial => "layouts/usage_info", :locals => { :resource => @model } -%>
+
 <div class="show_basic">
     <div class="main_content_left_box_narrower">
         <%= render :partial=>"assets/resource_version_details", :locals=>{:displayed_resource=>@display_model, :resource=>@model} -%>
@@ -86,10 +91,29 @@
             <p>
                 <%= embedded_isa_svg(@model, true, @model) -%>
             </p>
+
         </div>
+
     </div>
+
     <%= render :partial=>"assets/resource_main_content_right",:locals => { :resource => @model } %>
+
     <div style="clear:both;padding-top:1em;">
         <%= render :partial=>"layouts/items_related_to",:object => @model %>
     </div>
 </div>
+
+<% if @display_model.is_jws_supported? %>
+        <center>
+        <%= link_to_remote "Discover data that may be related to this model",
+                         :url=>url_for(:controller=>"models",:action=>"matching_data_files",:id=>@model,:version=>@display_model.version),
+                         :before=>"$('matching_data_files').show();show_ajax_loader('matching_data_files');"
+        -%>
+        </center>
+        <div id="matching_data_files" style="display:none;">
+
+        </div>
+        <div id="matching_results" style="display:none;height:55em;overflow-y: scroll;">
+
+        </div>
+<% end -%>

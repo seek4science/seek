@@ -5,6 +5,12 @@ module ApplicationHelper
   include FancyMultiselectHelper
 
 
+  def date_as_string date,show_time_of_day=false
+    str = date.strftime("#{date.day.ordinalize} %B %Y")
+    str = date.strftime("#{str} @ %H:%M:%S") if show_time_of_day
+    str
+  end
+
   def authorized_list all_items, attribute, sort=true, max_length=75, count_hidden_items=false
     items = all_items.select &:can_view?
     title_only_items = (all_items - items).select &:title_is_public?
@@ -121,7 +127,7 @@ module ApplicationHelper
   def text_or_not_specified text, options = {}
     text=text.to_s if text.kind_of?(Numeric)
     if text.nil? or text.chomp.empty?
-      not_specified_text="Not specified"
+      not_specified_text=options[:none_text] || "Not specified"
       not_specified_text="No description set" if options[:description]==true
       res = "<span class='none_text'>#{not_specified_text}</span>"
     else      
@@ -420,8 +426,8 @@ module ApplicationHelper
     count
   end
 
-  def set_parameters_for_sharing_form
-    object = eval "@#{controller_name.singularize}"
+  def set_parameters_for_sharing_form object=nil
+    object ||= eval "@#{controller_name.singularize}"
     policy = nil
     policy_type = ""
 
@@ -485,7 +491,7 @@ module ApplicationHelper
   end
 
   def display_people_list people
-    html = '<ul>'
+    html = "<ul class='people_list'>"
     people.each do |person|
        html<< "<li><a href='#{person_path(person[0])}' target='_blank'>#{person[1]}</a></li>"
     end

@@ -1,0 +1,10 @@
+<% strain = strain_information_row -%>
+<tr>
+  <td><%= text_or_not_specified(strain.title) -%></td>
+  <td><%= text_or_not_specified(strain.provider_name) -%></td>
+  <td><%= text_or_not_specified(strain.provider_id) -%></td>
+  <td><%= text_or_not_specified(strain.genotype_info) -%></td>
+  <td><%= text_or_not_specified(strain.phenotype_info) -%></td>
+  <td><%= text_or_not_specified(strain.synonym) -%></td>
+  <td><%= text_or_not_specified(strain.comment,{:none_text=>"None"}) -%></td>
+</tr>

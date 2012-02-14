@@ -38,6 +38,31 @@ module OrganismsHelper
       "<span class='disabled_icon disabled' onclick='javascript:alert(\"#{explanation}\")' title='#{tooltip_title_attrib(explanation)}' >"+image('destroy', {:alt=>"Delete",:class=>"disabled"}) + " Delete Organism</span>"
     end    
   end
+
+  # takes an array of [organism,strain] where strain can be nil if not defined
+  def list_organisms_and_strains organism_and_strains, none_text="Not specified"
+    result=""
+    result="<span class='none_text'>#{none_text}</span>" if organism_and_strains.empty?
+    result += "<br/>"
+    organism_and_strains.each do |os|
+      organism=os[0]
+      strain=os[1]
+      unless strain.nil? && organism.nil?
+        result = organism_and_strain strain,organism
+        result += ",<br/>" unless os==organism_and_strains.last
+      end
+    end
+    result
+  end
+
+  def organism_and_strain strain,organism=strain.organism
+    result = ""
+    result << link_to(h(organism.title), organism)
+    if strain && !strain.is_dummy?
+      result << " : #{h(strain.info)}"
+    end
+    result
+  end
   
   
   

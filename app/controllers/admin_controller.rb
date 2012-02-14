@@ -18,10 +18,10 @@ class AdminController < ApplicationController
 
   def update_admins
     admin_ids = params[:admins] || []
-    current_admins = Person.all.select{|p| p.is_admin?}
+    current_admins = Person.admins
     admins = admin_ids.collect{|id| Person.find(id)}
-    current_admins.each{|ca| ca.is_admin=false}
-    admins.each{|a| a.is_admin=true}
+    current_admins.each{|ca| ca.is_admin = false}
+    admins.each{|a| a.is_admin = true}
     (admins | current_admins).each do |admin|
       class << admin
         def record_timestamps
@@ -241,8 +241,8 @@ class AdminController < ApplicationController
       when "invalid"
         collection = {}
         type = "invalid_users"
-        pal_role=Role.pal_role
-        collection[:pal_mismatch] = Person.find(:all).select {|p| p.is_pal? != p.roles.include?(pal_role)}
+        pal_role=ProjectRole.pal_role
+        collection[:pal_mismatch] = Person.find(:all).select {|p| p.is_pal? != p.project_roles.include?(pal_role)}
         collection[:duplicates] = Person.duplicates
         collection[:no_person] = User.without_profile
       when "not_activated"

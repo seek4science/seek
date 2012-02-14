@@ -9,3 +9,4 @@ require 'rake/testtask'
 require 'rdoc/task'
 
 require 'tasks/rails'
+require 'sunspot/rails/tasks'

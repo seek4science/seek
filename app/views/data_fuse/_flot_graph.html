@@ -1,0 +1,16 @@
+<%= javascript_include_tag 'flot/excanvas.min.js' -%>
+<%= javascript_include_tag 'flot/jquery.js' -%>
+<%= javascript_include_tag 'flot/jquery.flot.js' -%>
+
+<%
+    csv_data ||= open(csv_url).read
+-%>
+
+    <div id="placeholder" style="width:800px;height:400px;"></div>
+
+<script id="source">
+$(function () {
+    var json_data = <%= csv_to_flot_data csv_data -%>;
+    $.plot($("#placeholder"), json_data);
+});
+</script>

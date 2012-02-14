@@ -3,6 +3,8 @@
 <ul class="sectionIcons">
   <%= render :partial => "subscriptions/subscribe", :locals => {:object => @specimen} %>
   <% if @specimen.can_edit? %>
+      <li><%= image_tag_for_key('manage', edit_specimen_path(@specimen), "Manage Specimen", nil, 'Manage Specimen') %></li>
+  <% elsif @specimen.can_manage? %>
       <li><%= image_tag_for_key('edit', edit_specimen_path(@specimen), "Edit Specimen", nil, 'Edit Specimen') %></li>
   <% end %>
   <% if @specimen.can_delete? %>
@@ -22,8 +24,8 @@
 
     <div class="box_about_actor">
       <p>
-        <label>Specimen number:</label>
-        <%= text_or_not_specified(@specimen.donor_number) %>
+        <label>Specimen title:</label>
+        <%= text_or_not_specified(@specimen.title) %>
       </p>
 
       <p id="organism">
@@ -90,18 +92,22 @@
             <% end %>
           </p>
       <% end %>
+
+      <%if Seek::Config.is_virtualliver%>
       <p>
         <label>Treatment:</label>
         <%= text_or_not_specified(@specimen.treatment) %>
       </p>
+      <%end%>
 
       <p>
-        <label>Lab internal No.:</label>
+        <label>Lab internal identifier:</label>
         <%= text_or_not_specified(@specimen.lab_internal_number) %>
       </p>
+
       <p>
         <label>Institution:</label>
-        <%= text_or_not_specified(@specimen.institution.name) %>
+        <%= text_or_not_specified(@specimen.institution.try(:name)) %>
       </p>
 
 

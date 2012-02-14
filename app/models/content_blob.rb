@@ -37,7 +37,11 @@ class ContentBlob < ActiveRecord::Base
       save unless other_changes
     end
     super
-  end    
+  end
+
+  def cache_key
+    "#{super}-#{md5sum}"
+  end
   
   #returns an IO Object to the data content, or nil if the data file doesn't exist. 
   # In the case that there is a URL defined, but no local copy, the IO Object is still nil.

@@ -13,7 +13,7 @@ class PeopleController < ApplicationController
   skip_before_filter :profile_for_login_required,:only=>[:select,:userless_project_selected_ajax,:create]
 
   cache_sweeper :people_sweeper,:only=>[:update,:create,:destroy]
-  
+
   def auto_complete_for_tools_name
     render :json => Person.tool_counts.map(&:name).to_json
   end
@@ -27,21 +27,17 @@ class PeopleController < ApplicationController
   # GET /people
   # GET /people.xml
   def index
-    if @expertise=params[:expertise]
-      @people=Person.tagged_with(@expertise, :on=>:expertise)      
-    elsif @tools=params[:tools]
-      @people=Person.tagged_with(@tools, :on=>:tools)
-    elsif (params[:discipline_id])
+    if (params[:discipline_id])
       @discipline=Discipline.find(params[:discipline_id])
       #FIXME: strips out the disciplines that don't match
       @people=Person.find(:all,:include=>:disciplines,:conditions=>["disciplines.id=?",@discipline.id])
       #need to reload the people to get their full discipline list - otherwise only get those matched above. Must be a better solution to this
       @people.each(&:reload)
-    elsif (params[:role_id])
-      @role=Role.find(params[:role_id])
+    elsif (params[:project_role_id])
+      @project_role=ProjectRole.find(params[:project_role_id])
       @people=Person.find(:all,:include=>[:group_memberships])
       #FIXME: this needs double checking, (a) not sure its right, (b) can be paged when using find.
-      @people=@people.select{|p| !(p.group_memberships & @role.group_memberships).empty?}
+      @people=@people.select{|p| !(p.group_memberships & @project_role.group_memberships).empty?}
     end
 
     unless @people
@@ -135,6 +131,7 @@ class PeopleController < ApplicationController
     redirect_action="new"
 
     set_tools_and_expertise(@person, params)
+    set_roles(@person, params) if User.admin_logged_in?
    
     registration = false
     registration = true if (current_user.person.nil?) #indicates a profile is being created during the registration process  
@@ -187,7 +184,8 @@ class PeopleController < ApplicationController
     @person.avatar_id = ((avatar_id.kind_of?(Numeric) && avatar_id > 0) ? avatar_id : nil)
     
     set_tools_and_expertise(@person,params)    
-        
+    set_roles(@person, params) if User.admin_logged_in?
+
     if !@person.notifiee_info.nil?
       @person.notifiee_info.receive_notifications = (params[:receive_notifications] ? true : false) 
       @person.notifiee_info.save if @person.notifiee_info.changed?
@@ -195,7 +193,7 @@ class PeopleController < ApplicationController
 
     
     respond_to do |format|
-      if @person.update_attributes(params[:person]) && set_group_membership_role_ids(@person,params)
+      if @person.update_attributes(params[:person]) && set_group_membership_project_role_ids(@person,params)
         @person.save #this seems to be required to get the tags to be set correctly - update_attributes alone doesn't [SYSMO-158]
          
         flash[:notice] = 'Person was successfully updated.'
@@ -208,16 +206,16 @@ class PeopleController < ApplicationController
     end
   end
 
-  def set_group_membership_role_ids person,params
+  def set_group_membership_project_role_ids person,params
     #FIXME: Consider updating to Rails 2.3 and use Nested forms to handle this more cleanly.
     prefix="group_membership_role_ids_"
     person.group_memberships.each do |gr|
       key=prefix+gr.id.to_s
-      gr.roles.clear
+      gr.project_roles.clear
       if params[key.to_sym]
         params[key.to_sym].each do |r|
-          r=Role.find(r)
-          gr.roles << r
+          r=ProjectRole.find(r)
+          gr.project_roles << r
         end
       end
     end
@@ -280,6 +278,18 @@ class PeopleController < ApplicationController
 
   end
 
+  def set_roles person, params
+    if params[:roles]
+      roles = []
+      params[:roles].each_key do |key|
+        roles << key
+      end
+      person.roles=roles
+    else
+      person.roles=[]
+    end
+  end
+
   def profile_belongs_to_current_or_is_admin
     @person=Person.find(params[:id])
     unless @person == current_user.person || User.admin_logged_in? || current_user.person.is_project_manager?
@@ -314,12 +324,13 @@ class PeopleController < ApplicationController
   def auth_params
     # make sure to update people/_form if this changes
     #                   param                 => allowed access?
-    restricted_params={:is_pal                => User.admin_logged_in?,
-                       :is_admin              => User.admin_logged_in?,
+    restricted_params={:roles                 =>  User.admin_logged_in?,
+                       :roles_mask            => User.admin_logged_in?,
                        :can_edit_projects     => (User.admin_logged_in? or current_user.is_project_manager?),
                        :can_edit_institutions => (User.admin_logged_in? or current_user.is_project_manager?)}
     restricted_params.each do |param, allowed|
       params[:person].delete(param) if params[:person] and not allowed
+      params.delete param if params and not allowed
     end
   end
   def project_or_institution_details projects_or_institutions

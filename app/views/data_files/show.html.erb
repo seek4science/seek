@@ -54,6 +54,25 @@
       <%= render :partial=>"data_files/studied_factors" %>
     </p>
 
+    <div class="fold">
+
+      <div class="foldTitle">
+        Treatments
+      </div>
+
+      <div class="foldContent" style="display:none;" >
+        <% if @data_file.can_download? -%>
+            <% treatments = @display_data_file.treatments -%>
+            <% if treatments.values.keys.empty? -%>
+                <span class="none_text">No treatments were found in the data file, or it does not match a known template.</span>
+            <% else -%>
+                    <%= render :partial=>"treatment_table", :locals=>{:treatments=>treatments} -%>
+            <% end -%>
+        <% else -%>
+            <span id="treatments" class="none_text">You do not have permission to view the treatments for this file.</span>
+        <% end -%>
+      </div>
+    </div>
   </div>
 
   <%= render :partial=>"layouts/items_related_to",:object => @data_file %>

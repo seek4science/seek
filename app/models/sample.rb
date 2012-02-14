@@ -4,24 +4,28 @@ require 'acts_as_authorized'
 class Sample < ActiveRecord::Base
   include Subscribable
 
+  acts_as_authorized
+  acts_as_favouritable
+
   attr_accessor :from_new_link
 
   belongs_to :specimen
+
+  accepts_nested_attributes_for :specimen
+
   belongs_to :institution
   has_and_belongs_to_many :assays
 
   has_many :assets_creators, :dependent => :destroy, :as => :asset, :foreign_key => :asset_id
   has_many :creators, :class_name => "Person", :through => :assets_creators, :order=>'assets_creators.id'
 
-
   alias_attribute :description, :comments
   validates_presence_of :title
   validates_uniqueness_of :title
-  validates_presence_of :specimen,:lab_internal_number
-  validates_presence_of :donation_date
+  validates_presence_of :specimen,:lab_internal_number, :projects
+  validates_presence_of :donation_date if Seek::Config.is_virtualliver
 
-
-
+  validates_numericality_of :age_at_sampling, :only_integer => true, :greater_than=> 0, :allow_nil=> true, :message => "is not a positive integer" if !Seek::Config.is_virtualliver
 
   def self.sop_sql()
   'SELECT sop_versions.* FROM sop_versions ' +
@@ -35,10 +39,32 @@ class Sample < ActiveRecord::Base
   has_many :sop_masters,:class_name => "SampleSop"
   grouped_pagination :pages=>("A".."Z").to_a, :default_page => Seek::Config.default_page(self.name.underscore.pluralize)
 
-  acts_as_solr(:fields=>[:description,:title,:lab_internal_number],:include=>[:institution,:specimen,:assays]) if Seek::Config.solr_enabled
+  HUMANIZED_COLUMNS = Seek::Config.is_virtualliver ? {} : {:lab_internal_number=> "lab internal identifier", :provider_id => "provider's sample identifier"}
 
-  acts_as_authorized
+  searchable do
+    text :searchable_terms
+  end if Seek::Config.solr_enabled
 
+
+  def searchable_terms
+    text=[]
+    text << title
+    text << description
+    text << lab_internal_number
+    text << provider_name
+    text << provider_id
+    if (specimen)
+      text << specimen.lab_internal_number
+      text << specimen.provider_id
+      text << specimen.title
+      text << specimen.provider_id
+      if (specimen.strain)
+        text << specimen.strain.info
+        text << specimen.strain.organism.title
+      end
+    end
+    text
+  end
 
   def can_delete? *args
     assays.empty? && super
@@ -48,7 +74,6 @@ class Sample < ActiveRecord::Base
     true
   end
 
-  
   def associate_sop sop
     sample_sop = sop_masters.detect{|ss|ss.sop==sop}
 
@@ -69,5 +94,9 @@ class Sample < ActiveRecord::Base
     new_object.sop_masters = self.try(:sop_masters)
     new_object.project_ids = self.project_ids
     return new_object
+  end
+
+  def self.human_attribute_name(attribute)
+    HUMANIZED_COLUMNS[attribute.to_sym] || super
   end
 end

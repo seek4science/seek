@@ -23,7 +23,7 @@
 
   Factory.define(:pal, :parent => :person) do |f|
     f.is_pal true
-    f.after_create { |pal| pal.group_memberships.first.roles << Role.pal_role}
+    f.after_create { |pal| pal.group_memberships.first.project_roles << ProjectRole.pal_role}
   end
 
 #User
@@ -96,6 +96,11 @@
     f.access_type Policy::EDITING
   end
 
+  Factory.define(:downloadable_public_policy,:parent=>:policy) do |f|
+    f.sharing_scope Policy::EVERYONE
+    f.access_type Policy::ACCESSIBLE
+  end
+
 #Permission
   Factory.define(:permission, :class => Permission) do |f|
     f.association :contributor, :factory => :person
@@ -164,6 +169,7 @@ end
 #Strain
 Factory.define(:strain) do |f|
   f.sequence(:title) { |n| "Strain#{n}" }
+  f.association :organism
 end
 
 #Culture growth type
@@ -173,30 +179,36 @@ end
 
 #Specimen
 Factory.define(:specimen) do |f|
-  f.sequence(:donor_number) { |n| "Specimen#{n}" }
+  f.sequence(:title) { |n| "Specimen#{n}" }
   f.sequence(:lab_internal_number) { |n| "Lab#{n}" }
   f.association :contributor, :factory => :user
   f.projects {[Factory.build(:project)]}
   f.association :institution
-  f.association :organism
+  f.association :strain
 end
 
 #Sample
 Factory.define(:sample) do |f|
   f.sequence(:title) { |n| "Sample#{n}" }
   f.sequence(:lab_internal_number) { |n| "Lab#{n}" }
+  f.projects {[Factory.build(:project)]}
   f.donation_date Date.today
   f.association :specimen
 end
 
 
 #Data File
-  Factory.define(:data_file) do |f|
-    f.sequence(:title) {|n| "A Data File_#{n}"}
-    f.projects {[Factory.build(:project)]}
-    f.association :contributor, :factory => :user
-    f.association :content_blob, :factory => :content_blob
-  end
+Factory.define(:data_file) do |f|
+  f.sequence(:title) {|n| "A Data File_#{n}"}
+  f.projects {[Factory.build(:project)]}
+  f.association :contributor, :factory => :user
+  f.association :content_blob, :factory => :content_blob
+end
+
+Factory.define(:rightfield_datafile,:parent=>:data_file) do |f|
+  f.content_type "application/excel"
+  f.association :content_blob,:factory=>:rightfield_content_blob
+end
 
 #Model
   Factory.define(:model) do |f|
@@ -214,20 +226,20 @@ end
     f.association :contributor, :factory => :user
   end
 #Presentation
-Factory.define(:presentation) do |f|
-  f.title "A Presentation"
-  f.projects {[Factory.build :project]}
- # f.data_url "http://www.virtual-liver.de/images/logo.png"
-  f.association :contributor,:factory=>:user
-  f.association :content_blob, :factory => :content_blob
-end
+  Factory.define(:presentation) do |f|
+    f.title "A Presentation"
+    f.projects {[Factory.build :project]}
+   # f.data_url "http://www.virtual-liver.de/images/logo.png"
+    f.association :contributor,:factory=>:user
+    f.association :content_blob, :factory => :content_blob
+  end
 
 #Misc
   Factory.define(:group_membership) do |f|
     f.association :work_group
   end
 
-  Factory.define(:role) do |f|
+  Factory.define(:project_role) do |f|
     f.name "A Role"
   end
 
@@ -262,6 +274,10 @@ end
   Factory.define(:content_blob) do |f|
     f.uuid UUIDTools::UUID.random_create.to_s
     f.sequence(:data) {|n| "data [#{n}]" }
+  end
+
+  Factory.define(:rightfield_content_blob,:parent=>:content_blob) do |f|
+    f.data  File.new("#{Rails.root}/test/fixtures/files/rightfield-test.xls","rb").read
   end
 
   Factory.define(:activity_log) do |f|

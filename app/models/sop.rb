@@ -16,11 +16,16 @@ class Sop < ActiveRecord::Base
   # allow same titles, but only if these belong to different users
   # validates_uniqueness_of :title, :scope => [ :contributor_id, :contributor_type ], :message => "error - you already have a SOP with such title."
 
-  acts_as_solr(:fields=>[:description, :title, :original_filename,:searchable_tags,:exp_conditions_search_fields]) if Seek::Config.solr_enabled
+  searchable do
+    text :description, :title, :original_filename,:searchable_tags,:exp_conditions_search_fields
+  end if Seek::Config.solr_enabled
 
   belongs_to :content_blob #don't add a dependent=>:destroy, as the content_blob needs to remain to detect future duplicates
                
   has_many :experimental_conditions, :conditions =>  'experimental_conditions.sop_version = #{self.version}'
+
+  has_many :sop_specimens
+  has_many :specimens,:through=>:sop_specimens
 
   explicit_versioning(:version_column => "version") do
     
@@ -42,7 +47,7 @@ class Sop < ActiveRecord::Base
   # Parameters:
   # - user - user that performs the action; this is required for authorization
   def self.get_all_as_json(user)
-    all_sops = Sop.find(:all, :order => "ID asc")
+    all_sops = Sop.find(:all, :order => "ID asc",:include=>[:policy,{:policy=>:permissions}])
     sops_with_contributors = all_sops.collect{ |s|
       s.can_view?(user) ?
         (contributor = s.contributor;

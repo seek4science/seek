@@ -31,10 +31,10 @@ namespace :seek do
     Seek::Config.solr_enabled = solr
 
     begin
-      Rake::Task["solr:reindex"].invoke if solr
+      Rake::Task["sunspot:reindex"].invoke if solr
     rescue 
       puts "Reindexing failed - maybe solr isn't running?' - Error: #{$!}."
-      puts "If not You should start solr and run rake solr:reindex manually"
+      puts "If not You should start solr and run rake sunspot:reindex manually"
     end
 
     puts "Upgrade completed successfully"
@@ -82,7 +82,7 @@ namespace :seek do
     ActiveRecord::Base.record_timestamps = true
   end
 
-  desc 'required to upgrade to 1.0 - converts all tags from acts_as_taggable to use acts_as_annotatable'
+  desc 'required to upgrade to 0.13 - converts all tags from acts_as_taggable to use acts_as_annotatable'
   task(:upgrade_tags=>:environment) do
     include ActsAsTaggableOn
 

@@ -24,4 +24,35 @@ module DataFuseHelper
     end
     res
   end
+
+  def csv_to_flot_data csv
+    data = {}
+    rows = FasterCSV.parse(csv)
+    labels = []
+    rows.each_with_index do |row,y|
+      t=nil
+      row.each_with_index do |value,x|
+        if y==0 && x!=0 #labels
+           labels[x]=value
+           data[value]=[]
+        else
+          if x==0
+            t=value
+          else
+            data[labels[x]] << [t,value]
+          end
+        end
+
+      end
+
+    end
+    result = []
+    colors = ["red","blue","green","cyan","magenta","darkgreen"]
+    data.keys.each_with_index do |key,i|
+      hash = {"label"=>key,"data"=>data[key]}
+      hash["color"]=colors[i] unless colors[i].nil?
+      result << hash
+    end
+    result.to_json
+  end
 end

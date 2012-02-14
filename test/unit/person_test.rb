@@ -32,12 +32,6 @@ class PersonTest < ActiveSupport::TestCase
     assert !people(:quentin_person).is_downloadable_asset?
   end
 
-  def test_admins_named_scope
-    admins=Person.admins
-    assert_equal 1,admins.size
-    assert admins.include?(people(:quentin_person))
-  end
-
   def test_avatar_key
     p=people(:quentin_person)
     assert_nil p.avatar_key
@@ -49,13 +43,14 @@ class PersonTest < ActiveSupport::TestCase
     p=Person.new(:first_name=>"XXX",:email=>"xxx@email.com")
     p.save!
     assert !p.is_admin?, "Should not automatically be admin, since people already exist"
-    
+
     Person.destroy_all
-    
+
     assert_equal 0,Person.count #no people should exist
     p=Person.new(:first_name=>"XXX",:email=>"xxx@email.com")
-    p.save!
-    assert p.is_admin?, "Should automatically be admin, since it is the first created person"    
+    p.save
+    p.reload
+    assert p.is_admin?, "Should automatically be admin, since it is the first created person"
   end
   
   def test_registered
@@ -350,9 +345,9 @@ class PersonTest < ActiveSupport::TestCase
   
   def test_roles_association
     p=people(:person_for_model_owner)
-    assert_equal 2, p.roles.size
-    assert p.roles.include?(roles(:member))
-    assert p.roles.include?(roles(:postdoc))
+    assert_equal 2, p.project_roles.size
+    assert p.project_roles.include?(project_roles(:member))
+    assert p.project_roles.include?(project_roles(:postdoc))
   end
   
   def test_update_first_letter
@@ -464,5 +459,120 @@ class PersonTest < ActiveSupport::TestCase
     people_ids = people_can_manage.collect{|p| p[0]}
     assert people_ids.include? person.id
     assert people_ids.include? new_person.id
+  end
+
+  test 'assign admin role for a person' do
+    User.with_current_user Factory(:admin).user do
+      person = Factory(:person)
+      assert_equal [], person.roles
+      assert person.can_manage?
+      person.roles=['admin']
+      person.save!
+      person.reload
+      assert_equal ['admin'], person.roles
+    end
+  end
+
+  test 'add roles for a person' do
+    User.with_current_user Factory(:admin).user do
+      person = Factory(:admin)
+      assert_equal ['admin'], person.roles
+      assert person.can_manage?
+      person.add_roles ['admin', 'pal']
+      person.save!
+      person.reload
+      assert_equal ['admin', 'pal'].sort, person.roles.sort
+    end
+  end
+
+  test 'remove roles for a person' do
+    User.with_current_user Factory(:admin).user do
+      person = Factory(:person)
+      person.roles = ['admin', 'pal']
+      person.remove_roles ['admin']
+      person.save!
+      person.reload
+      assert_equal ['pal'], person.roles
+    end
+  end
+
+  test 'non-admin can not change the roles of a person' do
+    User.with_current_user Factory(:person).user do
+      person = Factory(:person)
+      person.roles = ['admin', 'pal']
+      person.save
+      person.reload
+      assert_equal [], person.roles
+    end
+  end
+
+  test 'is_admin?' do
+     User.with_current_user Factory(:admin).user do
+      person = Factory(:person)
+      person.is_admin = true
+      person.save!
+
+      assert person.is_admin?
+
+      person.is_admin = false
+      person.save!
+
+      assert !person.is_admin?
+    end
+  end
+
+  test 'is_pal?' do
+     User.with_current_user Factory(:admin).user do
+      person = Factory(:person)
+      person.is_pal = true
+      person.save!
+
+      assert person.is_pal?
+
+      person.is_pal = false
+      person.save!
+
+      assert !person.is_pal?
+    end
+  end
+
+  test 'is_project_manager?' do
+     User.with_current_user Factory(:admin).user do
+      person = Factory(:person)
+      person.is_project_manager= true
+      person.save!
+
+      assert person.is_project_manager?
+
+      person.is_project_manager=false
+      person.save!
+
+      assert !person.is_project_manager?
+    end
+  end
+
+  test "publisher can publish items inside their project" do
+    publisher = Factory(:person, :roles => ['publisher'])
+    datafile1 = Factory(:data_file, :projects => publisher.projects)
+    datafile2 = Factory(:data_file)
+
+    ability = Ability.new(publisher.user)
+
+    assert ability.can? :publish, datafile1
+    assert ability.cannot? :publish, datafile2
+    User.with_current_user publisher.user do
+      assert datafile1.can_publish?
+      assert !datafile2.can_publish?
+    end
+  end
+
+  test 'replace admins, pals named_scope by a static function' do
+    admins = Person.admins
+    assert_equal 1, admins.count
+    assert admins.include?(people(:quentin_person))
+
+    pals = Person.pals
+    assert_equal 1, pals.count
+    assert pals.include?(people(:pal))
   end
 end

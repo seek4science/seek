@@ -154,7 +154,7 @@ class HomeControllerTest < ActionController::TestCase
     end
   end
 
-  test "should handle index.html" do
+  test "should handle index html" do
     assert_routing("/",{:controller=>"home",:action=>"index"})
     assert_recognizes({:controller=>"home",:action=>"index"},"/index.html")
     assert_recognizes({:controller=>"home",:action=>"index"},"/index")
@@ -225,6 +225,31 @@ class HomeControllerTest < ActionController::TestCase
 
     assert_select 'div#recently_added ul>li', recently_added_item_logs.count
     assert_select 'div#recently_downloaded ul>li', recently_downloaded_item_logs.count
+  end
+
+  test "recently added should include data_file" do
+    login_as(:aaron)
+
+    df = Factory :data_file, :title=>"A new data file", :contributor=>User.current_user.person
+    assert_difference "ActivityLog.count" do
+      log = Factory :activity_log, :activity_loggable=>df, :controller_name=>"data_files", :culprit=>User.current_user
+    end
+
+
+    get :index
+    assert_response :success
+    assert_select "div#recently_added ul>li>a[href=?]",data_file_path(df),:text=>/A new data file/
+  end
+
+  test "recently added should include presentations" do
+    login_as(:aaron)
+
+    presentation = Factory :presentation, :title=>"A new presentation", :contributor=>User.current_user.person
+    log = Factory :activity_log, :activity_loggable=>presentation, :controller_name=>"presentations", :culprit=>User.current_user
+
+    get :index
+    assert_response :success
+    assert_select "div#recently_added ul>li>a[href=?]",presentation_path(presentation),:text=>/A new presentation/
   end
 
   test "should show headline announcement" do

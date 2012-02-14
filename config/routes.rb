@@ -14,7 +14,7 @@ ActionController::Routing::Routes.draw do |map|
 
   map.resources :events
 
-  map.resources :strains
+  map.resources :strains, :collection=>{:existing_strains=>:get, :existing_strains_for_create=>:get, :show_existing_strain=>:get, :new_strain_form => :get}
 
   map.resources :publications,:collection=>{:fetch_preview=>:post},:member=>{:disassociate_authors=>:post,:update_annotations_ajax=>:post}
 
@@ -33,6 +33,8 @@ ActionController::Routing::Routes.draw do |map|
   map.resources :assays,:member=>{:update_annotations_ajax=>:post}
 
   map.resources :saved_searches
+
+  map.resources :biosamples, :collection=>{:existing_strains=>:get, :existing_specimens=>:get, :existing_samples=>:get, :new_strain_form => :get, :create_strain => :post, :create_specimen_sample => :post}
 
   map.resources :data_files, :collection=>{:test_asset_url=>:post},:member => {:download => :get,:plot=>:get, :data => :get,:preview_publish=>:get,:publish=>:post, :request_resource=>:post, :update_annotations_ajax=>:post, :explore=>:get},:new=>{:upload_for_tool => :post}  do |data_file|
     data_file.resources :studied_factors, :collection =>{:create_from_existing=>:post}
@@ -179,9 +181,13 @@ ActionController::Routing::Routes.draw do |map|
   map.tool_list_autocomplete '/tool_list_autocomplete', :controller=>'people', :action=>'auto_complete_for_tools_name'
   map.expertise_list_autocomplete '/expertise_list_autocomplete', :controller=>'people', :action=>'auto_complete_for_expertise_name'
   map.organism_list_autocomplete '/organism_list_autocomplete',:controller=>'projects',:action=>'auto_complete_for_organism_name'
-  
+
+  map.root :controller=>"home"
+  map.match "index.html",:controller=>"home"
+  map.match "index",:controller=>"home"
+
   map.signup  '/signup', :controller => 'users',   :action => 'new' 
-  map.login  '/login',  :controller => 'sessions', :action => 'new'
+  map.login  '/login',  :controller => 'home'
   map.logout '/logout', :controller => 'sessions', :action => 'destroy'  
   
   map.activate '/activate/:activation_code', :controller => 'users', :action => 'activate', :activation_code => nil
@@ -189,10 +195,6 @@ ActionController::Routing::Routes.draw do |map|
   
   # used by the "sharing" form to get settings from an existing policy 
   map.request_policy_settings '/policies/request_settings', :controller => 'policies', :action => 'send_policy_data'
-
-  map.root :controller=>"home"
-  map.match "index.html",:controller=>"home"
-  map.match "index",:controller=>"home"
 
   # See how all your routes lay out with "rake routes"
 

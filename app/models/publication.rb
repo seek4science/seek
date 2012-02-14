@@ -9,8 +9,6 @@ class Publication < ActiveRecord::Base
 
   acts_as_asset
 
-  validates_presence_of :title
-  validates_presence_of :projects
   validate :check_identifier_present
   #validates_uniqueness_of :pubmed_id, :message => "publication has already been registered with that ID."
   #validates_uniqueness_of :doi, :message => "publication has already been registered with that ID."
@@ -43,7 +41,9 @@ class Publication < ActiveRecord::Base
 
   alias :seek_authors :creators
   
-  acts_as_solr(:fields=>[:title,:abstract,:journal,:searchable_tags]) if Seek::Config.solr_enabled
+  searchable do
+    text :title,:abstract,:journal,:searchable_tags, :pubmed_id, :doi
+  end if Seek::Config.solr_enabled
 
   #TODO: refactor to something like 'sorted_by :start_date', which should create the default scope and the sort method. Maybe rename the sort method.
   default_scope :order => "#{self.table_name}.published_date DESC"

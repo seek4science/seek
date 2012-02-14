@@ -1,0 +1,109 @@
+<%= javascript_include_tag 'strain.js' %>
+<script type="text/javascript" charset="utf-8">
+    $j(document).ready(function() {
+        specimen_table = $j('#specimen_table').dataTable({
+            "bPaginate": false,
+            "bLengthChange": false,
+            "bFilter": false,
+            "bSort": true,
+            "bInfo": false,
+            "bAutoWidth": false,
+            "bRetrieve": true,
+            "aaSorting": [
+                [ 2, "asc" ]
+            ],
+            "aoColumns": [
+                null,
+                { "sWidth": "5%", 'bSortable':false },
+                { "sWidth": "20%" },
+                { "sWidth": "15%" },
+                { "sWidth": "15%" },
+                { "sWidth": "15%" },
+                { "sWidth": "5%" },
+                { "sWidth": "25%" }
+            ],
+            "fnInitComplete": function () {
+                this.fnAdjustColumnSizing(true);
+            }
+        }).rowGrouping({"sGrupingClass": 'row_group_color'});
+    });
+
+</script>
+
+<div id="existing_specimens">
+  <% unless strains.blank? %>
+      <% if Seek::Config.is_virtualliver %>
+           <h2>Specimen</h2>
+      <% else %>
+           <h2>Cell culture (chemostat or batch)</h2>
+      <% end %>
+      <% if existing_specimens.empty? -%>
+          <p class="none_text">No <%= CELL_CULTURE_OR_SPECIMEN%>s have yet been defined for selected strains.</p>
+      <% else -%>
+          <p class="none_text">Please select the <%= CELL_CULTURE_OR_SPECIMEN.capitalize%>s to see samples.</p>
+
+          <div class="scroll_box">
+            <table cellpadding="0" cellspacing="0" border="0" class="display" id="specimen_table" style="width: 100%">
+              <thead>
+              <tr>
+                <th>Strain</th>
+                <th></th>
+                <th>Title</th>
+                <th>Culture starting date</th>
+                <th>Culture type</th>
+                <th>Contributor</th>
+                <th>ID</th>
+                <th>Related SOPs</th>
+              </tr>
+              </thead>
+              <tbody>
+              <%
+                 existing_specimens.each do |specimen| -%>
+                  <% if specimen.born.nil? %>
+                      <% born = '' %>
+                  <% else %>
+                      <% if specimen.try(:born).hour == 0 && specimen.try(:born).min == 0 && specimen.try(:born).sec == 0 %>
+                          <% born = specimen.try(:born).strftime('%d/%m/%Y') %>
+                      <% else %>
+                          <% born = specimen.try(:born).strftime('%d/%m/%Y @ %H:%M:%S') %>
+                      <% end %>
+                  <% end %>
+                  <%
+                     strain = specimen.strain
+                     strain_info = 'Strain ' + strain.info + "(ID=#{strain.id})"
+
+                     sop_links = []
+                     specimen.sops.select(&:can_view?).each do |sop|
+                        sop_links << link_to(sop.title, sop_path(sop.sop_id) + "?version=#{sop.version}", {:target => '_blank'})
+                     end
+                  %>
+
+                  <tr>
+                    <td><%= strain_info -%></td>
+                    <td><%= check_box_tag "selected_specimen_#{specimen.id}", specimen.id, false, {:onchange => remote_function(:url => {:controller => 'biosamples', :action => 'existing_samples'}, :with => "'specimen_ids=' + getSelectedSpecimens()") + ";show_existing_samples();" } %></td>
+                    <td><%= specimen.title -%></td>
+                    <td><%= born -%></td>
+                    <td><%= specimen.culture_growth_type.try(:title) -%></td>
+                    <td><%= try_block{specimen.contributor.person.name}-%></td>
+                    <td><%= specimen.id %></td>
+                    <td><%= sop_links.join(", ") -%></td>
+                  </tr>
+              <% end -%>
+              </tbody>
+            </table>
+          </div>
+      <% end -%>
+      <% if logged_in? and current_user.person.member? %>
+          <ul class="sectionIcons">
+            <li><%= create_sample_popup_link -%></li>
+            <br/>
+            <br/>
+            (from new <%= CELL_CULTURE_OR_SPECIMEN %> or based on selected one)
+          </ul>
+          <br/>
+      <% end %>
+  <% end -%>
+</div>
+
+
+

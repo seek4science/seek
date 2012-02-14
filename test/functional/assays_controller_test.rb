@@ -10,7 +10,6 @@ class AssaysControllerTest < ActionController::TestCase
   def setup
     login_as(:quentin)
     @object=Factory(:experimental_assay, :policy => Factory(:public_policy))
-    Seek::Config.is_virtualliver=true
   end
 
 
@@ -240,9 +239,10 @@ class AssaysControllerTest < ActionController::TestCase
     assert_equal s, assigns(:assay).study
   end
 
-test "should not create experimental assay without sample" do
-    assert_no_difference('ActivityLog.count') do
-      assert_no_difference("Assay.count") do
+test "should create experimental assay with or without sample" do
+    #THIS TEST MAY BECOME INVALID ONCE IT IS DECIDED HOW ASSAYS LINK TO SAMPLES OR ORGANISMS
+    assert_difference('ActivityLog.count') do
+      assert_difference("Assay.count") do
         post :create, :assay=>{:title=>"test",
                                :technology_type_id=>technology_types(:gas_chromatography).id,
                                :assay_type_id=>assay_types(:metabolomics).id,
@@ -251,6 +251,11 @@ test "should not create experimental assay without sample" do
                                :owner => Factory(:person)}
       end
     end
+    a=assigns(:assay)
+    assert a.samples.empty?
+
+
+    sample = Factory(:sample)
     assert_difference('ActivityLog.count') do
       assert_difference("Assay.count") do
         post :create, :assay=>{:title=>"test",
@@ -259,13 +264,14 @@ test "should not create experimental assay without sample" do
                                :study_id=>studies(:metabolomics_study).id,
                                :assay_class=>assay_classes(:experimental_assay_class),
                                :owner => Factory(:person),
-                               :sample_ids=>[Factory(:sample).id]
+                               :sample_ids=>[sample.id]
         }
 
       end
     end
     a=assigns(:assay)
     assert_redirected_to assay_path(a)
+    assert_equal [sample],a.samples
     #assert_equal organisms(:yeast),a.organism
 end
 

@@ -1,14 +1,14 @@
 <% workbook.sheets.each_with_index do |sheet, sheet_index| -%>
   <% unless sheet.rows.empty? %>
-    <a index="<%= sheet_index -%>" class="sheet_tab <%= "selected_tab" if workbook.sheets.first == sheet -%>" href="#"><%= sheet.name -%></a>
+    <a index="<%= sheet_index -%>" class="sheet_tab <%= "selected_tab" if workbook.sheets.first == sheet -%>" href="#"><%= h(sheet.name) -%></a>
   <% end %>
 <% end %>
 
 <div class="spreadsheet_container" onselectstart="return false;">
   <!--- Sheets --->
-  <% workbook.sheets.each do |sheet| -%>
+  <% workbook.sheets.each_with_index do |sheet,sheet_index| -%>
     <% unless sheet.rows.empty? %>
-      <div style="display:none" class="sheet_container" id="<%= ("spreadsheet_" + sheet.name.sub(" ", "_").to_s) -%>">
+      <div style="display:none" class="sheet_container" id="<%= ("spreadsheet_" + sheet_index.to_s) -%>">
         <div class="corner_heading">&nbsp;</div>
         <div class="col_headings <%= "odd_heading" if sheet.last_col % 2 == 0 -%>">
           <div style="min-width:1000000px">
@@ -27,7 +27,7 @@
             <% end -%>
             <div style="height: 20px">&nbsp;</div>
           </div>
-          <div style="float: left" class="sheet" id="<%= ("spreadsheet_" + sheet.name.sub(" ", "_").to_s) -%>">
+          <div style="float: left" class="sheet" id="<%= ("spreadsheet_" + sheet_index.to_s) -%>">
             <table class="sheet" cellspacing="0" cellpadding="0">
               <!--- Columns --->
               <colgroup>

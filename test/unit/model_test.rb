@@ -16,6 +16,39 @@ class ModelTest < ActiveSupport::TestCase
     assert_equal blob,model.content_blob
   end
 
+  test "type detection" do
+    model = models(:teusink)
+    assert model.is_sbml?
+    assert model.is_jws_supported?
+    assert !model.is_dat?
+
+    model = models(:jws_model)
+    assert !model.is_sbml?
+    assert model.is_jws_supported?
+    assert model.is_dat?
+
+    model = models(:non_sbml_xml)
+    assert !model.is_sbml?
+    assert !model.is_jws_supported?
+    assert !model.is_dat?
+
+    #should also be able to handle versions
+    model = models(:teusink).latest_version
+    assert model.is_sbml?
+    assert model.is_jws_supported?
+    assert !model.is_dat?
+
+    model = models(:jws_model).latest_version
+    assert !model.is_sbml?
+    assert model.is_jws_supported?
+    assert model.is_dat?
+
+    model = models(:non_sbml_xml).latest_version
+    assert !model.is_sbml?
+    assert !model.is_jws_supported?
+    assert !model.is_dat?
+  end
+
   test "assay association" do
     model = models(:teusink)
     assay = assays(:modelling_assay_with_data_and_relationship)

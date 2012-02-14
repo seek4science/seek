@@ -9,13 +9,13 @@ class ModelsController < ApplicationController
   
   before_filter :find_assets, :only => [ :index ]
   before_filter :find_and_auth, :except => [ :build,:index, :new, :create,:create_model_metadata,:update_model_metadata,:delete_model_metadata,:request_resource,:preview,:test_asset_url, :update_annotations_ajax]
-  before_filter :find_display_asset, :only=>[:show,:download,:execute,:builder,:simulate,:submit_to_jws]
+  before_filter :find_display_asset, :only=>[:show,:download,:execute,:builder,:simulate,:submit_to_jws,:matching_data_files]
     
   before_filter :jws_enabled,:only=>[:builder,:simulate,:submit_to_jws]
 
   include Seek::Publishing
-  
-  @@model_builder = Seek::JWS::OneStop.new
+
+  @@model_builder = Seek::JWS::Builder.new
   
   # GET /models
   # GET /models.xml
@@ -55,12 +55,13 @@ class ModelsController < ApplicationController
         supported=true
         @params_hash,@attribution_annotations,@saved_file,@objects_hash,@error_keys = @@model_builder.saved_file_builder_content saved_file
       else
-        supported = @@model_builder.is_supported?(@display_model)
+        supported = @display_model.is_jws_supported?
         @params_hash,@attribution_annotations,@saved_file,@objects_hash,@error_keys = @@model_builder.builder_content @display_model if supported
       end
     rescue Exception=>e
       error=e
       logger.error "Error submitting to JWS Online OneStop - #{e.message}"
+      raise e unless Rails.env=="production"
     end
     
     respond_to do |format|
@@ -76,34 +77,23 @@ class ModelsController < ApplicationController
     end
   end    
 
-#  def annotator
-#    respond_to do |format|
-#      format.html
-#    end
-#  end
-
   def submit_to_jws
     following_action=params.delete("following_action")    
     error=nil
     begin
       if following_action == "annotate"
-        @params_hash,@attribution_annotations,@species_annotations,@reaction_annotations,@search_results,@cached_annotations,@saved_file,@error_keys = @@model_builder.annotate params
+        @params_hash,@attribution_annotations,@species_annotations,@reaction_annotations,@search_results,@cached_annotations,@saved_file,@error_keys = Seek::JWS::Annotator.new.annotate params
       else
         @params_hash,@attribution_annotations,@saved_file,@objects_hash,@error_keys = @@model_builder.construct params
       end
     rescue Exception => e
       error=e
+      raise e unless Rails.env == "production"
     end
 
     if (!error && @error_keys.empty?)
 
-      if following_action == "simulate"
-        begin
-          @applet=@@model_builder.simulate @saved_file
-        rescue Exception => e
-          error=e
-        end
-      elsif following_action == "save_new_version"
+      if following_action == "save_new_version"
         model_format=params.delete("saved_model_format") #only used for saving as a new version
         new_version_filename=params.delete("new_version_filename")
         new_version_comments=params.delete("new_version_comments")
@@ -130,7 +120,8 @@ class ModelsController < ApplicationController
         flash.now[:error]="JWS Online encountered a problem processing this model."
         format.html { render :action=>"builder" }
       elsif @error_keys.empty? && following_action == "simulate"
-        format.html {render :action=>"simulate",:layout=>"no_sidebar"}
+        @modelname=@saved_file
+        format.html {render :action=>"simulate",:layout=>"jws_simulate"}
       elsif @error_keys.empty? && following_action == "annotate"
         format.html {render :action=>"annotator"}
       elsif @error_keys.empty? && following_action == "save_new_version"
@@ -140,34 +131,34 @@ class ModelsController < ApplicationController
         format.html { render :action=>"builder" }
       end      
     end
-    
   end
-  
+
+
   def simulate
     error=nil
     begin
-      supported = @@model_builder.is_supported?(@display_model)
-      if supported
-        @data_script_hash,attribution_annotations,saved_file,@objects_hash = @@model_builder.builder_content @display_model    
-        @applet=@@model_builder.simulate saved_file
+      if @display_model.is_jws_supported?
+        @modelname = Seek::JWS::Simulator.new.simulate(@display_model)
       end
     rescue Exception=>e
+      Rails.logger.error("Problem simulating model on JWS Online #{e}")
+      raise e unless Rails.env=="production"
       error=e
     end
-    
+
     respond_to do |format|
       if error
-        flash.now[:error]="JWS Online encountered a problem processing this model."
-        format.html { redirect_to(@model,:version=>@display_model.version)}                      
-      elsif !supported
+        flash[:error]="JWS Online encountered a problem processing this model."
+        format.html { redirect_to(@model, :version=>@display_model.version) }
+      elsif !@display_model.is_jws_supported?
         flash[:error]="This model is of neither SBML or JWS Online (Dat) format so cannot be used with JWS Online"
-        format.html { redirect_to(@model,:version=>@display_model.version)}        
+        format.html { redirect_to(@model, :version=>@display_model.version) }
       else
-        format.html {render :layout=>"no_sidebar"}
+         format.html { render :simulate,:layout=>"jws_simulate" }
       end
     end
-    
   end
+
   
   def update_model_metadata
     attribute=params[:attribute]
@@ -528,7 +519,28 @@ class ModelsController < ApplicationController
     render :update do |page|
       page[:requesting_resource_status].replace_html "An email has been sent on your behalf to <b>#{resource.managers.collect{|m| m.name}.join(", ")}</b> requesting the file <b>#{h(resource.title)}</b>."
     end
-  end  
+  end
+
+  def matching_data_files
+    #FIXME: should use the correct version
+    matching_files = @model.matching_data_files
+
+    render :update do |page|
+      page.visual_effect :fade,"matching_data_files"
+      page.visual_effect :appear,'matching_results'
+      html = ""
+      matching_files.each do |match|
+        data_file = DataFile.find(match.primary_key)
+        if (data_file.can_view?)
+          html << "<div>"
+          html << "<div style='padding-top:0.5em;padding-bottom:0.2em;'>Matched with #{match.search_terms.join(', ')} - [#{match.score}]</div>"
+          html << render(:partial=>"layouts/resource_list_item", :object=>data_file)
+          html << "</div>"
+        end
+      end
+      page.replace_html "matching_results",:text=>html
+    end
+  end
   
   protected
   
@@ -547,6 +559,7 @@ class ModelsController < ApplicationController
   def translate_action action
     action="download" if action == "simulate"
     action="edit" if ["submit_to_jws","builder"].include?(action)
+    action="view" if ["matching_data_files"].include?(action)
     super action
   end
   

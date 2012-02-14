@@ -37,7 +37,7 @@ If you needed to add partner repositories, and its a good idea anyway, you shoul
 If using Ubuntu or Debian, the following commands should install most the packages you need:
  
   sudo apt-get install wget mercurial ruby rdoc ri libopenssl-ruby ruby-dev mysql-server libssl-dev build-essential openssh-server 
-  sudo apt-get install libmysqlclient16-dev libmagick++-dev libxml++2.6-dev sun-java6-jdk graphviz libsqlite3-dev sqlite3
+  sudo apt-get install libmysqlclient16-dev libmagick++-dev libxslt-dev libxml++2.6-dev sun-java6-jdk graphviz libsqlite3-dev sqlite3
 
 if you are intending to develop SEEK you will probably also want to use:
 
@@ -68,9 +68,9 @@ on how to setup Apache and {Passenger Phusion (modrails)}[http://www.modrails.co
 
 Our source code is stored within the {Sysmo-DB Google Code Repository}[http://code.google.com/p/sysmo-db/], using Mercurial[http://mercurial.selenic.com/] as the version control system. 
 
-For a stable version, you should check out according to a stable tag. Our current stable tag is v1.0, so to retrieve this version you should use:
+For a stable version, you should check out according to a stable tag. Our current stable tag is <em>0.13</em>, so to retrieve this version you should use:
 
-  hg clone https://sysmo-db.googlecode.com/hg/ -r v1.0 seek
+  hg clone https://sysmo-db.googlecode.com/hg/ -r v0.13 seek
 
 This will create a <i>seek</i> directory that contains the application.
   
@@ -126,6 +126,15 @@ If running in production mode, you should start the server with
 
   ./script/server -e production
 
+
+== Starting Delayed-Job (Background processing)
+
+Some background processing is handled using a tool called <em>Delayed Job</em>
+
+To start delayed job run the script
+
+  ./script/delayed_job start
+
 == Creating the Admin user
 
 Once the server is running you should visit the page http://localhost:3000
@@ -142,18 +151,18 @@ admin facilities for creating new projects, institutions and profiles.
 
 Here you can also define additional administrator users.
 
-== Enabling search and starting the SOLR server
+== Enabling search and starting the Sunspot SOLR server
 
 Search can be enabled in the admin setting under Admin settings, Site configuration, Enable/disable features - under "Search enabled". You will need
 to restart the server after changing this setting.
 
 To start the search server you need to run:
 
-  rake solr:start
+  rake sunspot:solr:start
 
 and to reindex any existing data that created before search was enabled:
 
-  solr:reindex
+  rake sunspot:solr:reindex
 
 == Rebranding SysMO SEEK for other projects
 

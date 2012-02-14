@@ -6,6 +6,7 @@
 <% if data_url -%>
     <%= hidden_field_tag hidden_id, "on" -%>
     <% if data_url.end_with?(".svg") -%>
+        <script src="/javascripts/svg/svg.js" data-path="/javascripts/svg/"></script>
         <%
            url = serve_svg_locally data_url #the svg viewer correctly doesn't trust svg served from a different host or port
 

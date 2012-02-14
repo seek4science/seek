@@ -1,4 +1,5 @@
 require 'acts_as_authorized'
+
 class Assay < ActiveRecord::Base
   acts_as_isa
 
@@ -60,14 +61,29 @@ class Assay < ActiveRecord::Base
   validates_presence_of :study, :message=>" must be selected"
   validates_presence_of :owner
   validates_presence_of :assay_class
-  validates_presence_of :samples,:if => Proc.new { |assay| assay.is_experimental? && Seek::Config.is_virtualliver}
+  #validates_presence_of :samples,:if => Proc.new { |assay| assay.is_experimental? }
+
   has_many :relationships, 
     :class_name => 'Relationship',
     :as => :subject,
     :dependent => :destroy
           
-  acts_as_solr(:fields=>[:description,:title,:searchable_tags],:include=>[:assay_type,:technology_type,:organisms,:strains]) if Seek::Config.solr_enabled
-  
+  searchable do
+    text :description, :title, :searchable_tags
+    text :assay_type do
+        assay_type.try :title
+    end
+    text :technology_type do
+        technology_type.try :title
+    end
+    text :organisms do
+        organisms.map{|o| o.title}
+    end
+    text :strains do
+        strains.map{|s| s.title}
+    end
+  end if Seek::Config.solr_enabled
+
   def short_description
     type=assay_type.nil? ? "No type" : assay_type.title
    

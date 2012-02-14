@@ -94,9 +94,9 @@ class PeopleControllerTest < ActionController::TestCase
   test "non_admin_should_not_create_pal" do
     login_as(:pal_user)
     assert_difference('Person.count') do
-      post :create, :person => {:first_name=>"test", :is_pal=>true, :email=>"hghg@sdfsd.com" }
+      post :create, :person => {:first_name=>"test", :roles_mask => Person::ROLES_MASK_FOR_PAL, :email=>"hghg@sdfsd.com" }
     end
-    
+
     p=assigns(:person)
     assert_redirected_to person_path(p)
     assert !p.is_pal?
@@ -147,7 +147,7 @@ class PeopleControllerTest < ActionController::TestCase
     login_as(:quentin)
     p=people(:fred)
     assert !p.is_admin?
-    put :update, :id=>p.id, :person=>{:id=>p.id, :is_admin=>true, :email=>"ssfdsd@sdfsdf.com"}
+    put :update, :id=>p.id, :person=>{:id=>p.id, :roles_mask=>Person::ROLES_MASK_FOR_ADMIN, :email=>"ssfdsd@sdfsdf.com"}
     assert_redirected_to person_path(p)
     assert_nil flash[:error]
     p.reload
@@ -158,7 +158,7 @@ class PeopleControllerTest < ActionController::TestCase
     login_as(:aaron)
     p=people(:fred)
     assert !p.is_admin?
-    put :update, :id=>p.id, :person=>{:id=>p.id, :is_admin=>true, :email=>"ssfdsd@sdfsdf.com"}    
+    put :update, :id=>p.id, :person=>{:id=>p.id, :roles_mask=>Person::ROLES_MASK_FOR_ADMIN, :email=>"ssfdsd@sdfsdf.com"}
     assert_not_nil flash[:error]
     p.reload
     assert !p.is_admin?
@@ -168,7 +168,7 @@ class PeopleControllerTest < ActionController::TestCase
     login_as(:quentin)
     p=people(:fred)
     assert !p.is_pal?
-    put :update, :id=>p.id, :person=>{:id=>p.id, :is_pal=>true, :email=>"ssfdsd@sdfsdf.com"}
+    put :update, :id=>p.id, :person=>{:id=>p.id, :email=>"ssfdsd@sdfsdf.com"}, :roles => {:pal => true}
     assert_redirected_to person_path(p)
     assert_nil flash[:error]
     p.reload
@@ -179,7 +179,7 @@ class PeopleControllerTest < ActionController::TestCase
     login_as(:aaron)
     p=people(:fred)
     assert !p.is_pal?
-    put :update, :id=>p.id, :person=>{:id=>p.id, :is_pal=>true, :email=>"ssfdsd@sdfsdf.com"}    
+    put :update, :id=>p.id, :person=>{:id=>p.id, :email=>"ssfdsd@sdfsdf.com"}, :roles => {:pal => true}
     assert_not_nil flash[:error]
     p.reload
     assert !p.is_pal?
@@ -189,7 +189,7 @@ class PeopleControllerTest < ActionController::TestCase
     login_as(:aaron)
     p=people(:aaron_person)
     assert !p.is_pal?
-    put :update, :id=>p.id, :person=>{:id=>p.id, :is_pal=>true, :email=>"ssfdsd@sdfsdf.com"}
+    put :update, :id=>p.id, :person=>{:id=>p.id, :email=>"ssfdsd@sdfsdf.com"}, :roles => {:pal => true}
     p.reload
     assert !p.is_pal?
   end
@@ -198,7 +198,7 @@ class PeopleControllerTest < ActionController::TestCase
     login_as(:aaron)
     p=people(:aaron_person)
     assert !p.is_admin?
-    put :update, :id=>p.id, :person=>{:id=>p.id, :is_admin=>true, :email=>"ssfdsd@sdfsdf.com"}        
+    put :update, :id=>p.id, :person=>{:id=>p.id, :roles_mask=>Person::ROLES_MASK_FOR_ADMIN, :email=>"ssfdsd@sdfsdf.com"}
     p.reload
     assert !p.is_admin?
   end
@@ -244,6 +244,31 @@ class PeopleControllerTest < ActionController::TestCase
     get :show, :id=> people(:aaron_person)
     assert_select ".box_about_actor p", :text=>/Seek ID :/, :count=>0
   end
+
+  def test_current_user_shows_login_name
+    current_user = Factory(:person).user
+    login_as(current_user)
+    get :show, :id=> current_user.person
+    assert_select ".box_about_actor p", :text=>/Login/m
+    assert_select ".box_about_actor p", :text=>/Login.*#{current_user.login}/m
+  end
+
+  def test_not_current_user_doesnt_show_login_name
+    current_user = Factory(:person).user
+    other_person = Factory(:person)
+    login_as(current_user)
+    get :show, :id=> other_person
+    assert_select ".box_about_actor p", :text=>/Login/m,:count=>0
+  end
+
+  def test_admin_sees_non_current_user_login_name
+    current_user = Factory(:admin).user
+    other_person = Factory(:person)
+    login_as(current_user)
+    get :show, :id=> other_person
+    assert_select ".box_about_actor p", :text=>/Login/m
+    assert_select ".box_about_actor p", :text=>/Login.*#{other_person.user.login}/m
+  end
   
   def test_should_update_person
     put :update, :id => people(:quentin_person), :person => { }
@@ -281,8 +306,8 @@ class PeopleControllerTest < ActionController::TestCase
   end
 
   test "finding by role" do
-    role=roles(:member)
-    get :index,:role_id=>role.id
+    role=project_roles(:member)
+    get :index,:project_role_id=>role.id
     assert_response :success
     assert assigns(:people)
     assert assigns(:people).include?(people(:person_for_model_owner))
@@ -333,9 +358,9 @@ class PeopleControllerTest < ActionController::TestCase
     #create a datafile that this person is the contributor
     data_file = Factory(:data_file, :contributor => user, :projects => [project])
     #create pi
-    role = Role.find_by_name('PI')
+    role = ProjectRole.find_by_name('PI')
     pi =  Factory(:person_in_project, :group_memberships => [Factory(:group_membership, :work_group => work_group)])
-    pi.group_memberships.first.roles << role
+    pi.group_memberships.first.project_roles << role
     pi.save
     assert_equal pi, project.pis.first
 
@@ -363,9 +388,9 @@ class PeopleControllerTest < ActionController::TestCase
     #create a datafile that this person is the contributor and with the same project
     data_file = Factory(:data_file, :contributor => user, :projects => [project])
     #create pal
-    role = Role.find_by_name('Sysmo-DB Pal')
+    role = ProjectRole.find_by_name('Sysmo-DB Pal')
     pal =  Factory(:person_in_project, :group_memberships => [Factory(:group_membership, :work_group => work_group)])
-    pal.group_memberships.first.roles << role
+    pal.group_memberships.first.project_roles << role
     pal.is_pal = true
     pal.save
     assert_equal pal, project.pals.first
@@ -383,5 +408,45 @@ class PeopleControllerTest < ActionController::TestCase
     assert_equal 1, permissions.count
     assert_equal pal.id, permissions.first.contributor_id
     assert_equal Policy::MANAGING, permissions.first.access_type
+  end
+
+  test 'set pal role for a person' do
+   work_group_id = Factory(:work_group).id
+    assert_difference('Person.count') do
+      assert_difference('NotifieeInfo.count') do
+        post :create, :person => {:first_name=>"test", :email=>"hghg@sdfsd.com", :work_group_ids => [work_group_id]}, :roles => {:pal => true}
+      end
+    end
+    person = assigns(:person)
+    person.reload
+    assert_not_nil person
+    assert person.is_pal?
+  end
+
+  test 'set project_manager role for a person' do
+    work_group_id = Factory(:work_group).id
+    assert_difference('Person.count') do
+      assert_difference('NotifieeInfo.count') do
+        post :create, :person => {:first_name=>"test", :email=>"hghg@sdfsd.com", :work_group_ids => [work_group_id]}, :roles => {:project_manager => true}
+      end
+    end
+    person = assigns(:person)
+    person.reload
+    assert_not_nil person
+    assert person.is_project_manager?
+  end
+
+  test 'update roles for a person' do
+    person = Factory(:pal)
+    assert_not_nil person
+    assert person.is_pal?
+
+    put :update, :id => person.id, :person => {:id => person.id}, :roles => {:project_manager => true}
+
+    person = assigns(:person)
+    person.reload
+    assert_not_nil person
+    assert person.is_project_manager?
+    assert !person.is_pal?
   end
 end

@@ -52,12 +52,15 @@ class Person < ActiveRecord::Base
   has_many :created_publications, :through => :assets_creators, :source => :asset, :source_type => "Publication"
   has_many :created_presentations,:through => :assets_creators,:source=>:asset,:source_type => "Presentation"
 
-  acts_as_solr(:fields => [ :first_name, :last_name,:searchable_tags,:locations, :roles ],:include=>[:disciplines]) if Seek::Config.solr_enabled
+  searchable do
+    text :first_name, :last_name,:searchable_tags,:locations, :project_roles
+    text :disciplines do
+      disciplines.map{|d| d.title}
+    end
+  end if Seek::Config.solr_enabled
 
   named_scope :without_group, :include=>:group_memberships, :conditions=>"group_memberships.person_id IS NULL"
   named_scope :registered,:include=>:user,:conditions=>"users.person_id != 0"
-  named_scope :pals,:conditions=>{:is_pal=>true}
-  named_scope :admins,:conditions=>{:is_admin=>true}
 
   alias_attribute :webpage,:web_page
 
@@ -66,6 +69,59 @@ class Person < ActiveRecord::Base
 
   has_many :subscriptions,:dependent => :destroy
   before_create :set_default_subscriptions
+
+  ROLES = %w[admin pal project_manager publisher]
+  ROLES_MASK_FOR_ADMIN = 2**ROLES.index('admin')
+  ROLES_MASK_FOR_PAL = 2**ROLES.index('pal')
+  ROLES_MASK_FOR_PROJECT_MANAGER = 2**ROLES.index('project_manager')
+
+  def self.admins
+
+  end
+  ROLES.each do |role|
+      eval <<-END_EVAL
+            def is_#{role}?
+              roles.include?('#{role}')
+            end
+
+            def is_#{role}
+              roles.include?('#{role}')
+            end
+
+            def is_#{role}=(yes)
+              if yes
+                add_roles ['#{role}']
+              else
+                remove_roles ['#{role}']
+              end
+            end
+
+            def self.#{role}s
+              Person.all.select(&:is_#{role}?)
+            end
+      END_EVAL
+    end
+
+   #the roles defined within SEEK
+  def roles=(roles)
+    self.roles_mask = (roles & ROLES).map { |r| 2**ROLES.index(r) }.sum
+  end
+
+  def roles
+    ROLES.reject do |r|
+      ((roles_mask || 0) & 2**ROLES.index(r)).zero?
+    end
+  end
+
+  def add_roles roles
+    add_roles = roles - (roles & self.roles)
+    self.roles_mask = self.roles_mask.to_i + ((add_roles & ROLES).map { |r| 2**ROLES.index(r) }.sum)
+  end
+
+  def remove_roles roles
+    remove_roles = roles & self.roles
+    self.roles_mask = self.roles_mask.to_i - ((remove_roles & ROLES).map { |r| 2**ROLES.index(r) }.sum)
+  end
 
   def set_default_subscriptions
     projects.each do |proj|
@@ -142,7 +198,8 @@ class Person < ActiveRecord::Base
 
   def projects
     #updating workgroups doesn't change groupmemberships until you save. And vice versa.
-    work_groups.collect {|wg| wg.project }.uniq | group_memberships.collect{|gm| gm.work_group.project}
+    @known_projects ||= work_groups.collect {|wg| wg.project }.uniq | group_memberships.collect{|gm| gm.work_group.project}
+    @known_projects
   end
 
   def member?
@@ -179,15 +236,14 @@ class Person < ActiveRecord::Base
     return (firstname.gsub(/\b\w/) {|s| s.upcase} + " " + lastname.gsub(/\b\w/) {|s| s.upcase}).strip
   end
 
-  def roles
-    roles = []
+  #the roles defined within the project
+  def project_roles
+    project_roles = []
     group_memberships.each do |gm|
-      roles = roles | gm.roles
+      project_roles = project_roles | gm.project_roles
     end
-    roles
+    project_roles
   end
-
-
 
   def update_first_letter
     no_last_name=last_name.nil? || last_name.strip.blank?
@@ -197,10 +253,10 @@ class Person < ActiveRecord::Base
     self.first_letter=first_letter
   end
 
-  def project_roles(project)
+  def project_roles_of_project(project)
     #Get intersection of all project memberships + person's memberships to find project membership
     memberships = group_memberships.select{|g| g.work_group.project == project}
-    return memberships.collect{|m| m.roles}.flatten
+    return memberships.collect{|m| m.project_roles}.flatten
   end
 
   def assets
@@ -220,8 +276,8 @@ class Person < ActiveRecord::Base
     new_record? or user && (user.is_admin? || user.is_project_manager? || user == self.user)
   end
 
-  does_not_require_can_edit :is_admin
-  requires_can_manage :is_admin, :can_edit_projects, :can_edit_institutions
+  does_not_require_can_edit :roles_mask
+  requires_can_manage :roles_mask, :can_edit_projects, :can_edit_institutions
 
   def can_manage? user = User.current_user
     try_block{user.is_admin?}
@@ -321,8 +377,7 @@ class Person < ActiveRecord::Base
 
   #a before_save trigger, that checks if the person is the first one created, and if so defines it as admin
   def first_person_admin
-    self.is_admin=true if Person.count==0
+    self.is_admin = true if Person.count==0
   end
-
 
 end

@@ -17,7 +17,8 @@ require 'acts_as_asset'
 require 'send_subscriptions_when_activity_logged'
 require 'modporter_extensions'
 require 'seek/taggable'
-
+require 'sunspot_rails'
+require 'cancan'
 
 GLOBAL_PASSPHRASE="ohx0ipuk2baiXah" unless defined? GLOBAL_PASSPHRASE
 
@@ -29,4 +30,6 @@ Seek::Config.propagate_all
 
 Annotations::Config.attribute_names_to_allow_duplicates.concat(["tag"])
 Annotations::Config.versioning_enabled = false
+
+CELL_CULTURE_OR_SPECIMEN = Seek::Config.is_virtualliver ? 'specimen' : 'cell culture'
 
