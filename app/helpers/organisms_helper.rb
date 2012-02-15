@@ -55,13 +55,15 @@ module OrganismsHelper
     result
   end
 
-  def organism_and_strain strain,organism=strain.organism
+  def organism_and_strain strain,organism=strain.organism, none_text="Not specified"
     result = ""
-    result << link_to(h(organism.title), organism)
-    if strain && !strain.is_dummy?
-      result << " : #{h(strain.info)}"
+    if organism
+      result << link_to(h(organism.title), organism)
+      if strain && !strain.is_dummy?
+        result << " : #{h(strain.info)}"
+      end
     end
-    result
+    result.empty? ? "<span class='none_text'>#{none_text}</span>" : result
   end
   
   

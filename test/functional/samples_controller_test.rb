@@ -246,4 +246,26 @@ fixtures :all
     assert flash[:error]
     assert_redirected_to samples_path
   end
+
+  test "should not show organism and strain information of a sample if there is no organism" do
+    s = Factory :sample, :contributor => User.current_user
+    s.specimen.strain.organism = nil
+    s.save
+    s.reload
+    get :show, :id => s.id
+    assert_response :success
+    assert_not_nil assigns(:sample)
+    assert_select 'p', :text => s.specimen.strain.info, :count => 0
+
+  end
+
+    test "should show organism and strain information of a sample if there is organism" do
+    s = Factory :sample, :contributor => User.current_user
+    get :show, :id => s.id
+
+    assert_response :success
+    assert_not_nil assigns(:sample)
+    assert_select 'p a[href=?]', organism_path(s.specimen.strain.organism), :count => 1
+  end
+
 end
