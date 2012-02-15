@@ -1,7 +1,8 @@
 /* Copyright (c) 2006 Yahoo! Inc. All rights reserved. */
 
 /* first or middle sibling, no children */
-.ygtvtn { background: url(../../../images/yui/treeview/folders/tn.gif) 0 0 no-repeat; width:17px; height:22px; }
+.ygtvtn { background: url(../../../images/yui/treeview/folders/tn2.gif) 0 0 no-repeat; width:34px; height:22px; }
+
 
 /* first or middle sibling, collapsable */
 .ygtvtm { background: url(../../../images/yui/treeview/folders/tm.gif) 0 0 no-repeat; width:34px; height:22px; cursor:pointer }
@@ -16,7 +17,8 @@
 .ygtvtph { background: url(../../../images/yui/treeview/folders/tph.gif) 0 0 no-repeat; width:34px; height:22px; cursor:pointer }
 
 /* last sibling, no children */
-.ygtvln { background: url(../../../images/yui/treeview/folders/ln.gif) 0 0 no-repeat; width:17px; height:22px; }
+.ygtvln { background: url(../../../images/yui/treeview/folders/ln2.gif) 0 0 no-repeat; width:34px; height:22px; }
+
 
 /* Last sibling, collapsable */
 .ygtvlm { background: url(../../../images/yui/treeview/folders/lm.gif) 0 0 no-repeat; width:34px; height:22px; cursor:pointer }
