@@ -10,6 +10,10 @@ class StudiedFactorsControllerTest < ActionController::TestCase
     login_as(:quentin)
   end
 
+  test "routes" do
+    assert_generates "/data_files/1/studied_factors", {:controller=>"studied_factors",:action=>"index",:data_file_id=>"1"}
+  end
+
   test "can only go to factors studied if the user can edit the data file" do
     df=data_files(:editable_data_file)
     df.save
