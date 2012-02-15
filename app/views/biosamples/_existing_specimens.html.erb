@@ -57,36 +57,22 @@
               </tr>
               </thead>
               <tbody>
-              <%
-                 existing_specimens.each do |specimen| -%>
-                  <% if specimen.born.nil? %>
-                      <% born = '' %>
-                  <% else %>
-                      <% if specimen.try(:born).hour == 0 && specimen.try(:born).min == 0 && specimen.try(:born).sec == 0 %>
-                          <% born = specimen.try(:born).strftime('%d/%m/%Y') %>
-                      <% else %>
-                          <% born = specimen.try(:born).strftime('%d/%m/%Y @ %H:%M:%S') %>
-                      <% end %>
-                  <% end %>
+              <% existing_specimens.each do |specimen| -%>
+
                   <%
                      strain = specimen.strain
                      strain_info = 'Strain ' + strain.info + "(ID=#{strain.id})"
-
-                     sop_links = []
-                     specimen.sops.select(&:can_view?).each do |sop|
-                        sop_links << link_to(sop.title, sop_path(sop.sop_id) + "?version=#{sop.version}", {:target => '_blank'})
-                     end
                   %>
 
                   <tr>
                     <td><%= strain_info -%></td>
                     <td><%= check_box_tag "selected_specimen_#{specimen.id}", specimen.id, false, {:onchange => remote_function(:url => {:controller => 'biosamples', :action => 'existing_samples'}, :with => "'specimen_ids=' + getSelectedSpecimens()") + ";show_existing_samples();" } %></td>
                     <td><%= specimen.title -%></td>
-                    <td><%= born -%></td>
+                    <td><%= specimen.born_info -%></td>
                     <td><%= specimen.culture_growth_type.try(:title) -%></td>
                     <td><%= try_block{specimen.contributor.person.name}-%></td>
                     <td><%= specimen.id %></td>
-                    <td><%= sop_links.join(", ") -%></td>
+                    <td><%= specimen.sop_links.join(", ") -%></td>
                   </tr>
               <% end -%>
               </tbody>

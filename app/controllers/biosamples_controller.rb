@@ -99,9 +99,10 @@ class BiosamplesController < ApplicationController
     sample = Sample.new(params[:sample])
 
     sop_ids = []
-
+    is_new_specimen = false
     specimen = Specimen.find_by_id(params[:specimen][:id])
     if specimen.nil?
+      is_new_specimen =true
       specimen = Specimen.new(params[:specimen])
       sop_ids = (params[:specimen_sop_ids].nil? ? [] : params[:specimen_sop_ids].reject(&:blank?))||[]
       specimen.policy.set_attributes_with_sharing params[:sharing], sample.projects
@@ -122,6 +123,20 @@ class BiosamplesController < ApplicationController
           SopSpecimen.create!(:sop_id => sop_id, :sop_version=> sop.version, :specimen_id=>specimen.id)
         end
         page.call 'RedBox.close'
+        if is_new_specimen
+           #also show specimen of the default strain, after this specimen is created(need to ask for this)
+           specimen_array = ['Strain ' + specimen.strain.info + "(ID=#{specimen.strain.id})",
+                            (check_box_tag "selected_specimen_#{specimen.id}", specimen.id, false, {:onchange => remote_function(:url => {:controller => 'biosamples', :action => 'existing_samples'}, :with => "'specimen_ids=' + getSelectedSpecimens()") + ";show_existing_samples();" }),
+                            specimen.title, specimen.born_info, specimen.culture_growth_type.try(:title), specimen.contributor.try(:person).try(:name), specimen.id, specimen.sop_links.join(", ")]
+
+            page.call :loadNewSpecimenAfterCreation, specimen_array
+        else
+          sample_array = [sample.specimen_info,
+                          (link_to sample.title, sample_path(sample.id), {:target => '_blank'}),
+                          sample.lab_internal_number, sample.sampling_date_info, sample.provider_name_info, sample.id]
+
+          page.call :loadNewSampleAfterCreation, sample_array
+        end
       else
         specimen_error_messages = ''
         specimen.errors.full_messages.each do |e_m|
@@ -145,7 +160,11 @@ class BiosamplesController < ApplicationController
         render :update do |page|
           if strain.save
             page.call 'RedBox.close'
-            #page.call "check_show_existing_strains('strain_organism_ids', 'existing_strains', #{url_for(:controller => 'biosamples', :action => 'existing_strains')})"
+            strain_array = [(link_to strain.organism.title, organism_path(strain.organism.id), {:target => '_blank'}),
+                            (check_box_tag "selected_strain_#{strain.id}", strain.id, false, :onchange => remote_function(:url => {:controller => 'biosamples', :action => 'existing_specimens'}, :with => "'strain_ids=' + getSelectedStrains()") +";show_existing_specimens();hide_existing_samples();"),
+                            strain.title, strain.genotype_info, strain.phenotype_info, strain.id, strain.synonym, strain.comment]
+
+            page.call :loadNewStrainAfterCreation, strain_array, strain.organism.title
           else
             page.alert("Fail to create new strain. #{strain.errors.full_messages}")
           end

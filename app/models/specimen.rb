@@ -18,7 +18,7 @@ class Specimen < ActiveRecord::Base
   belongs_to :culture_growth_type
   belongs_to :strain
 
-  has_one :organism, :through=>:strain
+
 
   alias_attribute :description, :comments
 
@@ -115,4 +115,23 @@ class Specimen < ActiveRecord::Base
     HUMANIZED_COLUMNS[attribute.to_sym] || super
   end
 
+  def born_info
+    if born.nil?
+      ''
+    else
+      if try(:born).hour == 0 && try(:born).min == 0 && try(:born).sec == 0
+        try(:born).strftime('%d/%m/%Y')
+      else
+        try(:born).strftime('%d/%m/%Y @ %H:%M:%S')
+      end
+    end
+  end
+
+  def sop_links
+    sop_links = []
+    sops.select(&:can_view?).each do |sop|
+      sop_links << link_to(sop.title, sop_path(sop.sop_id) + "?version=#{sop.version}", {:target => '_blank'})
+    end
+    sop_links
+  end
 end
