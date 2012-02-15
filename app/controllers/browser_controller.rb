@@ -41,8 +41,9 @@ class BrowserController < ApplicationController
       json << "label: '#{label}',"
       json << "className: 'fred',"
       json << "expanded: '#{expanded}'"
-
-      unless children.empty?
+      if children.empty?
+        json << ", children: []"
+      else
         json << ", children: ["
         children.sort_by(&:label).each do |child|
           json << child.to_json << ","
