@@ -18,6 +18,7 @@ class Specimen < ActiveRecord::Base
   belongs_to :culture_growth_type
   belongs_to :strain
 
+  has_one :organism, :through=>:strain
 
 
   alias_attribute :description, :comments
