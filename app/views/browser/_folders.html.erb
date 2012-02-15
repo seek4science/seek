@@ -1,0 +1,16 @@
+<script type="text/javascript">
+  var tree;
+    function treeInit() {
+        tree = new YAHOO.widget.TreeView("folders",<%= @folders_json -%>);
+        tree.render();
+    }
+</script>
+
+<div id="folders">
+
+</div>
+
+
+<script type="text/javascript">
+    treeInit();
+</script>
