@@ -411,3 +411,8 @@ end
     f.association :asset, :factory => :data_file
     f.association :creator, :factory => :person_in_project
   end
+
+  Factory.define :project_folder do |f|
+    f.association :project, :factory=>:project
+    f.sequence(:title) {|n| "project foler #{n}"}
+  end
