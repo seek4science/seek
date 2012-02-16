@@ -42,4 +42,61 @@ class ProjectFolderTest < ActiveSupport::TestCase
      assert_equal "two",pf.children[1].title
   end
 
+  test "root folders" do
+    project = Factory :project
+    assert ProjectFolder.root_folders(project).empty?
+    root1=nil
+    root2=nil
+    assert_difference("ProjectFolder.count",10) do
+      root1 = Factory :project_folder,:project=>project
+      root2 = Factory :project_folder,:project=>project
+      root1.children << Factory(:project_folder,:project=>project)
+      root1.children << Factory(:project_folder,:project=>project)
+      root1.children << Factory(:project_folder,:project=>project)
+      root1.children.first.children << Factory(:project_folder,:project=>project)
+      root2.children << Factory(:project_folder,:project=>project)
+      root1.children.first.children << Factory(:project_folder,:project=>project)
+      root1.children.first.children << Factory(:project_folder,:project=>project)
+      root1.children.first.children << Factory(:project_folder,:project=>project)
+    end
+
+    roots = ProjectFolder.root_folders project
+    assert_equal 2,roots.count
+    assert roots.include?(root1)
+    assert roots.include?(root2)
+  end
+
+  test "initialise defaults" do
+    project = Factory :project
+    default_file = File.join Rails.root,"test","fixtures","files","default_project_folders.yml"
+
+    root_folders=nil
+    assert_difference("ProjectFolder.count",6) do
+      root_folders = ProjectFolder.initialize_defaults project,default_file
+    end
+
+    assert_equal 2,root_folders.count
+    first_root = root_folders.first
+    assert_equal "data files",first_root.title
+    assert_equal 1,first_root.children.count
+    assert_equal "raw data files",first_root.children.first.title
+    assert_equal 0, first_root.children.first.children.count
+
+    second_root = root_folders[1]
+    assert_equal "models",second_root.title
+    assert_equal 2,second_root.children.count
+    assert_equal "copasi",second_root.children.first.title
+    assert_equal "sbml",second_root.children[1].title
+
+    assert_equal 1,second_root.children[1].children.count
+    assert_equal "in development",second_root.children[1].children.first.title
+
+    #don't check the actual contents from the real file, but check it works sanely and exists
+    project2 = Factory :project
+    root_folders = ProjectFolder.initialize_defaults project2
+    assert !root_folders.empty?
+
+
+  end
+
 end
