@@ -19,6 +19,25 @@ class BrowserControllerTest < ActionController::TestCase
     assert_response :success
   end
 
+  test "defaults created" do
+    assert ProjectFolder.root_folders(@project).empty?
+
+    get :index,:project_id=>@project.id
+
+    assert !ProjectFolder.root_folders(@project).empty?
+  end
+
+
+  test "defaults not created if exist" do
+    folder=Factory :project_folder,:project=>@project
+    assert_equal 1,ProjectFolder.root_folders(@project).count
+    assert_no_difference("ProjectFolder.count") do
+      get :index,:project_id=>@project.id
+    end
+    assert_equal 1,ProjectFolder.root_folders(@project).count
+  end
+
+
   test "blocked access as non member" do
     login_as(:quentin)
     get :index,:project_id=>@project.id

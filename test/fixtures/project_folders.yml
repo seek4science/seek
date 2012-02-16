@@ -1,15 +1,1 @@
 # Read about fixtures at http://ar.rubyonrails.org/classes/Fixtures.html
-
-one:
-  project_id: 1
-  title: MyString
-  description: MyText
-  parent_folder_id: 1
-  editable: false
-
-two:
-  project_id: 1
-  title: MyString
-  description: MyText
-  parent_folder_id: 1
-  editable: false

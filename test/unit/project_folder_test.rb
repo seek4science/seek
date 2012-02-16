@@ -67,6 +67,7 @@ class ProjectFolderTest < ActiveSupport::TestCase
   end
 
   test "initialise defaults" do
+
     project = Factory :project
     default_file = File.join Rails.root,"test","fixtures","files","default_project_folders.yml"
 
@@ -95,6 +96,12 @@ class ProjectFolderTest < ActiveSupport::TestCase
     project2 = Factory :project
     root_folders = ProjectFolder.initialize_defaults project2
     assert !root_folders.empty?
+
+    #check exception raised if folders already exist
+    folder = Factory :project_folder
+    assert_raise Exception do
+      ProjectFolder.initialize_defaults folder.project
+    end
 
 
   end

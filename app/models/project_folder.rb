@@ -17,6 +17,8 @@ class ProjectFolder < ActiveRecord::Base
 
   #constucts the default project folders for a given project from a yaml file, by default using $RAILS_ROOT/config/default_data/default_project_folders.yml
   def self.initialize_defaults project, yaml_path=File.join(Rails.root,"config","default_data","default_project_folders.yml")
+    raise Exception.new("This project already has folders defined") unless ProjectFolder.root_folders(project).empty?
+
     yaml=YAML::load_file yaml_path
     folders={}
 
@@ -45,5 +47,23 @@ class ProjectFolder < ActiveRecord::Base
 
     ProjectFolder.root_folders project
   end
+
+  def to_json
+      json = "{"
+      json << "type: 'text',"
+      json << "label: '#{title}',"
+      json << "className: 'fred',"
+      json << "expanded: 'true'"
+      if children.empty?
+        json << ", children: []"
+      else
+        json << ", children: ["
+        children.sort_by(&:label).each do |child|
+          json << child.to_json << ","
+        end
+        json << "]"
+      end
+      json << "}"
+    end
 
 end
