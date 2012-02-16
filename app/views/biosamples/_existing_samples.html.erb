@@ -50,30 +50,12 @@
               </thead>
               <tbody>
               <% existing_samples.each do |sample| -%>
-                  <% if sample.sampling_date.nil? %>
-                      <% sampling_date = '' %>
-                  <% else %>
-                      <% if sample.try(:sampling_date).hour == 0 and sample.try(:sampling_date).min == 0 and sample.try(:sampling_date).sec == 0 then %>
-                          <% sampling_date = sample.try(:sampling_date).strftime('%d/%m/%Y') %>
-                      <% else %>
-                          <% sampling_date = sample.try(:sampling_date).strftime('%d/%m/%Y @ %H:%M:%S') %>
-                      <% end %>
-
-                  <% end %>
-                  <%
-                     provider_name = sample.provider_name
-                     provider_name = provider_name.blank? ? sample.contributor.try(:person).try(:name) : provider_name
-                  %>
-                  <%
-                     specimen = sample.specimen
-                     specimen_info = CELL_CULTURE_OR_SPECIMEN.capitalize + ' ' + specimen.title
-                  %>
                   <tr class="gradeX">
-                    <td><%= specimen_info %> </td>
+                    <td><%= sample.specimen_info %> </td>
                     <td><%= link_to sample.title, sample_path(sample.id), {:target => '_blank'} %> </td>
                     <td><%= sample.lab_internal_number %> </td>
-                    <td><%= sampling_date %> </td>
-                    <td><%= provider_name %></td>
+                    <td><%= sample.sampling_date_info %> </td>
+                    <td><%= sample.provider_name_info %></td>
                     <td><%= sample.id %></td>
                   </tr>
               <% end -%>

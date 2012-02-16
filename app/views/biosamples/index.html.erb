@@ -42,6 +42,28 @@
     var organism = new Array();
     check_show_existing_strains('strain_organism_ids', 'existing_strains', '<%=url_for(:controller => 'biosamples', :action => 'existing_strains')-%>');
 
+    function loadNewStrainAfterCreation(strain, organism) {
+        var nodes = strain_table.fnGetNodes();
+        if ($j(nodes).filter(organism).length == 1) {
+            var a = strain_table.fnAddData(strain);
+            var nTr = strain_table.fnSettings().aoData[a[0]].nTr;
+            $j(nTr).addClass('gradeA');
+        }
+    }
+
+    function loadNewSpecimenAfterCreation(specimen) {
+        var nodes = specimen_table.fnGetNodes();
+        if ($j(nodes).filter('ID='+specimen[6].toString()).length == 1) {
+            specimen_table.fnAddData(specimen);
+        }
+    }
+
+    function loadNewSampleAfterCreation(sample) {
+        var a = sample_table.fnAddData(sample);
+        var sample_nTr = sample_table.fnSettings().aoData[a[0]].nTr;
+        $j(sample_nTr).addClass('gradeX');
+    }
+
     function strains_of_selected_organism(organism_id){
         var option;
         var selection_box = $('specimen_strain_id');
