@@ -18,6 +18,10 @@ class Ability
 
   end
 
+  def project_manager project_manager
+
+  end
+
   def publisher publisher
     can :publish, :all do |item|
       if item.respond_to?(:projects) && publisher.try(:projects)
