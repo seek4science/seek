@@ -129,7 +129,7 @@ class BiosamplesController < ApplicationController
                             (check_box_tag "selected_specimen_#{specimen.id}", specimen.id, false, {:onchange => remote_function(:url => {:controller => 'biosamples', :action => 'existing_samples'}, :with => "'specimen_ids=' + getSelectedSpecimens()") + ";show_existing_samples();" }),
                             specimen.title, specimen.born_info, specimen.culture_growth_type.try(:title), specimen.contributor.try(:person).try(:name), specimen.id, specimen.sop_links.join(", ")]
 
-            page.call :loadNewSpecimenAfterCreation, specimen_array
+            page.call :loadNewSpecimenAfterCreation, specimen_array, specimen.strain.id
         else
           sample_array = [sample.specimen_info,
                           (link_to sample.title, sample_path(sample.id), {:target => '_blank'}),
