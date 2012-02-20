@@ -13,3 +13,4 @@ presentations:
 unsorted_items:
   title: "Unsorted items"
   editable: false
+  incoming: true
