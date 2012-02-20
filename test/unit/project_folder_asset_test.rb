@@ -38,9 +38,26 @@ class ProjectFolderAssetTest < ActiveSupport::TestCase
       pf.destroy
       assert_nil ProjectFolderAsset.find_by_id(pfa.id)
     end
-
   end
 
+  test "asset added to default folder upon creation" do
+    #this will break once folder for new items is identified by a flag rather than title
+    pf = Factory :project_folder, :title=>"Unsorted items",:editable=>false
+    pf2 = Factory :project_folder, :title=>"Unsorted items",:editable=>false
+    model = Factory.build :model,:projects=>[pf.project,pf2.project],:policy=>Factory(:public_policy)
+
+    model.save!
+
+    pf.reload
+    model.reload
+    assert_equal 1,pf.assets.count
+    assert_equal 1,pf.assets.count
+    assert pf.assets.include?(model)
+    assert pf2.assets.include?(model)
+    assert_equal 2,model.folders.count
+    assert model.folders.include?(pf)
+    assert model.folders.include?(pf2)
+  end
 
   test "validations" do
     pfa = ProjectFolderAsset.new
@@ -70,4 +87,36 @@ class ProjectFolderAssetTest < ActiveSupport::TestCase
     pfa.asset=model
     assert pfa.save
   end
+
+  test "assign existing assets to folders" do
+    proj=Factory :project
+    old_sop=Factory :sop,:policy=>Factory(:public_policy),:projects=>[proj]
+    old_model=Factory :model,:policy=>Factory(:public_policy),:projects=>[proj]
+    old_presentation=Factory :presentation,:policy=>Factory(:public_policy),:projects=>[proj]
+    old_publication=Factory :publication,:policy=>Factory(:public_policy),:projects=>[proj]
+    old_datafile=Factory :data_file,:policy=>Factory(:public_policy),:projects=>[proj]
+    old_datafile_other_proj=Factory :model,:policy=>Factory(:public_policy),:projects=>[Factory(:project)]
+
+    pf = Factory :project_folder,:project=>proj
+    pf_incoming = Factory :project_folder,:project=>pf.project, :title=>"Unsorted items"
+    already_assigned_sop = Factory :sop,:policy=>Factory(:public_policy),:projects=>[proj]
+    pf.add_assets already_assigned_sop
+
+    ProjectFolderAsset.assign_existing_assets(proj)
+    pf.reload
+    pf_incoming.reload
+
+    assert_equal 1,pf.assets.count
+    assert pf.assets.include?(already_assigned_sop)
+
+    assert_equal 6,pf_incoming.assets.count
+    assert pf_incoming.assets.include?(old_sop)
+    assert pf_incoming.assets.include?(old_model)
+    assert pf_incoming.assets.include?(old_presentation)
+    assert pf_incoming.assets.include?(old_publication)
+    assert pf_incoming.assets.include?(old_datafile)
+    assert !pf_incoming.assets.include?(old_datafile_other_proj)
+
+  end
+
 end

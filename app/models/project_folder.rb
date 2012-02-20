@@ -61,6 +61,14 @@ class ProjectFolder < ActiveRecord::Base
     ProjectFolder.root_folders project
   end
 
+
+  def add_assets assets
+    assets = Array(assets)
+    assets.each do |asset|
+      ProjectFolderAsset.create :asset=>asset,:project_folder=>self
+    end
+  end
+
   #temporary method to destroy folders for a project, useful whilst developing
   def self.nuke project
     folders = ProjectFolder.find(:all,:conditions=>{:project_id=>project.id})

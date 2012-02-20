@@ -46,6 +46,7 @@ class BrowserController < ApplicationController
     project_folders = ProjectFolder.root_folders(@project)
     if project_folders.empty?
       project_folders = ProjectFolder.initialize_default_folders(@project)
+      ProjectAssetFolder.assign_existing_assets @project
     end
     project_folders
   end

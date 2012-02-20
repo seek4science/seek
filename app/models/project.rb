@@ -64,6 +64,10 @@ class Project < ActiveRecord::Base
   attr_accessor :site_username,:site_password
 
   before_save :set_credentials
+
+  def assets
+    data_files | sops | models | publications | presentations
+  end
   
   def institutions=(new_institutions)
     new_institutions.each_index do |i|

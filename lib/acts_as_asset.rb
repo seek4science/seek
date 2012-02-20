@@ -67,6 +67,8 @@ module Acts #:nodoc:
 
         has_many :activity_logs, :as => :activity_loggable
 
+        after_create :add_new_to_folder
+
         grouped_pagination :default_page => Seek::Config.default_page(self.name.underscore.pluralize)
 
         class_eval do
@@ -89,6 +91,15 @@ module Acts #:nodoc:
       # to which the current resource is attributed
       def attributions
         self.relationships.select { |a| a.predicate == Relationship::ATTRIBUTED_TO }
+      end
+
+      def add_new_to_folder
+        projects.each do |project|
+          pf = ProjectFolder.new_items_folder project
+          unless pf.nil?
+            pf.add_assets self
+          end
+        end
       end
 
       def folders
