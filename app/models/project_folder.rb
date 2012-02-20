@@ -79,7 +79,7 @@ class ProjectFolder < ActiveRecord::Base
   def to_json
       json = "{"
       json << "type: 'text',"
-      json << "label: '#{title}',"
+      json << "label: '#{title} (#{assets.count})',"
       json << "className: 'fred',"
       json << "expanded: 'true'"
       if children.empty?

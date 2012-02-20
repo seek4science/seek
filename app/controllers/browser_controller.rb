@@ -15,7 +15,6 @@ class BrowserController < ApplicationController
     end
   end
 
-  #just a temporary action whilst developing
   def nuke
       ProjectFolder.nuke @project
       redirect_to project_browser_index_path(@project)
@@ -29,7 +28,6 @@ class BrowserController < ApplicationController
       error("You must be a member of the project", "is invalid (not in project)")
     end
   end
-
 
   #provides the folder structure as json format to be used to construct the view
   def folder_structure_as_json
@@ -46,7 +44,7 @@ class BrowserController < ApplicationController
     project_folders = ProjectFolder.root_folders(@project)
     if project_folders.empty?
       project_folders = ProjectFolder.initialize_default_folders(@project)
-      ProjectAssetFolder.assign_existing_assets @project
+      ProjectFolderAsset.assign_existing_assets @project
     end
     project_folders
   end

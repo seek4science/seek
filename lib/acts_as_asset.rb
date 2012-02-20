@@ -106,7 +106,6 @@ module Acts #:nodoc:
         project_folder_assets.collect{|pfa| pfa.project_folder}
       end
 
-
       def attributions_objects
         self.attributions.collect { |a| a.object }
       end
