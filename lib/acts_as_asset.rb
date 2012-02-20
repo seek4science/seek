@@ -63,6 +63,8 @@ module Acts #:nodoc:
         has_many :assets_creators, :dependent => :destroy, :as => :asset, :foreign_key => :asset_id
         has_many :creators, :class_name => "Person", :through => :assets_creators, :order=>'assets_creators.id'
 
+        has_many :project_folder_assets, :as=>:asset, :dependent=>:destroy
+
         has_many :activity_logs, :as => :activity_loggable
 
         grouped_pagination :default_page => Seek::Config.default_page(self.name.underscore.pluralize)
@@ -77,9 +79,6 @@ module Acts #:nodoc:
       def is_asset?
         include?(Acts::Asset::InstanceMethods)
       end
-
-
-
     end
 
     module SingletonMethods
@@ -90,6 +89,10 @@ module Acts #:nodoc:
       # to which the current resource is attributed
       def attributions
         self.relationships.select { |a| a.predicate == Relationship::ATTRIBUTED_TO }
+      end
+
+      def folders
+        project_folder_assets.collect{|pfa| pfa.project_folder}
       end
 
 
