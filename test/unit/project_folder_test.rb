@@ -96,7 +96,7 @@ class ProjectFolderTest < ActiveSupport::TestCase
 
     third_root=root_folders[2]
     assert !third_root.editable
-    assert "new items",third_root.title
+    assert "Unsorted items",third_root.title
 
     #don't check the actual contents from the real file, but check it works sanely and exists
     project2 = Factory :project
@@ -108,7 +108,18 @@ class ProjectFolderTest < ActiveSupport::TestCase
     assert_raise Exception do
       ProjectFolder.initialize_defaults folder.project
     end
+  end
 
+  test "unsorted items folder" do
+    project = Factory :project
+    default_file = File.join Rails.root,"test","fixtures","files","default_project_folders.yml"
+
+    root_folders = ProjectFolder.initialize_defaults project,default_file
+
+    folder = ProjectFolder.new_items_folder project
+    assert !folder.editable
+    assert_equal project,folder.project
+    assert_equal "Unsorted items",folder.title
 
   end
 

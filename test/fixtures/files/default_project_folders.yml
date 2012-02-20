@@ -20,6 +20,6 @@ raw:
   title: "raw data files"
 
 locked:
-  title: "new items"
+  title: "Unsorted items"
   editable: false
 

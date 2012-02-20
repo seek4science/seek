@@ -15,6 +15,10 @@ class ProjectFolder < ActiveRecord::Base
     child.parent = self
   end
 
+  def self.new_items_folder project
+    ProjectFolder.find(:first,:conditions=>{:project_id=>project.id,:title=>"Unsorted items"})
+  end
+
   #constucts the default project folders for a given project from a yaml file, by default using $RAILS_ROOT/config/default_data/default_project_folders.yml
   def self.initialize_defaults project, yaml_path=File.join(Rails.root,"config","default_data","default_project_folders.yml")
     raise Exception.new("This project already has folders defined") unless ProjectFolder.root_folders(project).empty?

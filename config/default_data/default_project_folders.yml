@@ -9,3 +9,7 @@ sops:
 
 presentations:
   title: "Presentations"
+
+unsorted_items:
+  title: "Unsorted items"
+  editable: false
