@@ -22,7 +22,7 @@ class ProjectFolder < ActiveRecord::Base
   end
 
   def self.new_items_folder project
-    ProjectFolder.find(:first,:conditions=>{:project_id=>project.id,:title=>"Unsorted items"})
+    ProjectFolder.find(:first,:conditions=>{:project_id=>project.id,:incoming=>true})
   end
 
   #constucts the default project folders for a given project from a yaml file, by default using $RAILS_ROOT/config/default_data/default_project_folders.yml
@@ -37,6 +37,7 @@ class ProjectFolder < ActiveRecord::Base
       desc = yaml[key]
       new_folder=ProjectFolder.create :title=>desc["title"],
                                       :editable=>(desc["editable"].nil? ? true : desc["editable"]),
+                                      :incoming=>(desc["incoming"].nil? ? false : desc["incoming"]),
                                       :project=>project
       folders[key]=new_folder
     end

@@ -22,4 +22,5 @@ raw:
 locked:
   title: "Unsorted items"
   editable: false
+  incoming: true
 

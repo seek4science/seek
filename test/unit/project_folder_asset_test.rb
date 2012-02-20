@@ -41,9 +41,8 @@ class ProjectFolderAssetTest < ActiveSupport::TestCase
   end
 
   test "asset added to default folder upon creation" do
-    #this will break once folder for new items is identified by a flag rather than title
-    pf = Factory :project_folder, :title=>"Unsorted items",:editable=>false
-    pf2 = Factory :project_folder, :title=>"Unsorted items",:editable=>false
+    pf = Factory :project_folder, :title=>"Unsorted items",:editable=>false,:incoming=>true
+    pf2 = Factory :project_folder, :title=>"Unsorted items",:editable=>false,:incoming=>true
     model = Factory.build :model,:projects=>[pf.project,pf2.project],:policy=>Factory(:public_policy)
 
     model.save!
@@ -98,7 +97,7 @@ class ProjectFolderAssetTest < ActiveSupport::TestCase
     old_datafile_other_proj=Factory :model,:policy=>Factory(:public_policy),:projects=>[Factory(:project)]
 
     pf = Factory :project_folder,:project=>proj
-    pf_incoming = Factory :project_folder,:project=>pf.project, :title=>"Unsorted items"
+    pf_incoming = Factory :project_folder,:project=>pf.project, :title=>"New items",:incoming=>true
     already_assigned_sop = Factory :sop,:policy=>Factory(:public_policy),:projects=>[proj]
     pf.add_assets already_assigned_sop
 

@@ -79,14 +79,16 @@ class ProjectFolderTest < ActiveSupport::TestCase
     assert_equal 3,root_folders.count
     first_root = root_folders.first
     assert_equal "data files",first_root.title
-    assert first_root.editable
+    assert first_root.editable?
+    assert !first_root.incoming?
     assert_equal 1,first_root.children.count
     assert_equal "raw data files",first_root.children.first.title
     assert_equal 0, first_root.children.first.children.count
 
     second_root = root_folders[1]
     assert_equal "models",second_root.title
-    assert second_root.editable
+    assert second_root.editable?
+    assert !second_root.incoming?
     assert_equal 2,second_root.children.count
     assert_equal "copasi",second_root.children.first.title
     assert_equal "sbml",second_root.children[1].title
@@ -95,7 +97,8 @@ class ProjectFolderTest < ActiveSupport::TestCase
     assert_equal "in development",second_root.children[1].children.first.title
 
     third_root=root_folders[2]
-    assert !third_root.editable
+    assert !third_root.editable?
+    assert third_root.incoming?
     assert "Unsorted items",third_root.title
 
     #don't check the actual contents from the real file, but check it works sanely and exists
@@ -120,6 +123,7 @@ class ProjectFolderTest < ActiveSupport::TestCase
     assert !folder.editable
     assert_equal project,folder.project
     assert_equal "Unsorted items",folder.title
+    assert folder.incoming?
 
   end
 
