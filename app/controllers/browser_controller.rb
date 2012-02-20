@@ -45,7 +45,7 @@ class BrowserController < ApplicationController
   def project_folders
     project_folders = ProjectFolder.root_folders(@project)
     if project_folders.empty?
-      project_folders = ProjectFolder.initialize_defaults(@project)
+      project_folders = ProjectFolder.initialize_default_folders(@project)
     end
     project_folders
   end

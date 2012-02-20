@@ -73,7 +73,7 @@ class ProjectFolderTest < ActiveSupport::TestCase
 
     root_folders=nil
     assert_difference("ProjectFolder.count",7) do
-      root_folders = ProjectFolder.initialize_defaults project,default_file
+      root_folders = ProjectFolder.initialize_default_folders project,default_file
     end
 
     assert_equal 3,root_folders.count
@@ -100,13 +100,13 @@ class ProjectFolderTest < ActiveSupport::TestCase
 
     #don't check the actual contents from the real file, but check it works sanely and exists
     project2 = Factory :project
-    root_folders = ProjectFolder.initialize_defaults project2
+    root_folders = ProjectFolder.initialize_default_folders project2
     assert !root_folders.empty?
 
     #check exception raised if folders already exist
     folder = Factory :project_folder
     assert_raise Exception do
-      ProjectFolder.initialize_defaults folder.project
+      ProjectFolder.initialize_default_folders folder.project
     end
   end
 
@@ -114,7 +114,7 @@ class ProjectFolderTest < ActiveSupport::TestCase
     project = Factory :project
     default_file = File.join Rails.root,"test","fixtures","files","default_project_folders.yml"
 
-    root_folders = ProjectFolder.initialize_defaults project,default_file
+    ProjectFolder.initialize_default_folders project,default_file
 
     folder = ProjectFolder.new_items_folder project
     assert !folder.editable

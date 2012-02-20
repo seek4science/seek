@@ -20,7 +20,7 @@ class ProjectFolder < ActiveRecord::Base
   end
 
   #constucts the default project folders for a given project from a yaml file, by default using $RAILS_ROOT/config/default_data/default_project_folders.yml
-  def self.initialize_defaults project, yaml_path=File.join(Rails.root,"config","default_data","default_project_folders.yml")
+  def self.initialize_default_folders project, yaml_path=File.join(Rails.root,"config","default_data","default_project_folders.yml")
     raise Exception.new("This project already has folders defined") unless ProjectFolder.root_folders(project).empty?
 
     yaml=YAML::load_file yaml_path
