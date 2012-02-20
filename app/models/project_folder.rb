@@ -25,7 +25,10 @@ class ProjectFolder < ActiveRecord::Base
     #create individual folder items
     yaml.keys.each do |key|
       desc = yaml[key]
-      folders[key]=ProjectFolder.create :title=>desc["title"],:project=>project
+      new_folder=ProjectFolder.create :title=>desc["title"],
+                                      :editable=>(desc["editable"].nil? ? true : desc["editable"]),
+                                      :project=>project
+      folders[key]=new_folder
     end
 
     #now assign children

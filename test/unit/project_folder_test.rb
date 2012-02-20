@@ -72,25 +72,31 @@ class ProjectFolderTest < ActiveSupport::TestCase
     default_file = File.join Rails.root,"test","fixtures","files","default_project_folders.yml"
 
     root_folders=nil
-    assert_difference("ProjectFolder.count",6) do
+    assert_difference("ProjectFolder.count",7) do
       root_folders = ProjectFolder.initialize_defaults project,default_file
     end
 
-    assert_equal 2,root_folders.count
+    assert_equal 3,root_folders.count
     first_root = root_folders.first
     assert_equal "data files",first_root.title
+    assert first_root.editable
     assert_equal 1,first_root.children.count
     assert_equal "raw data files",first_root.children.first.title
     assert_equal 0, first_root.children.first.children.count
 
     second_root = root_folders[1]
     assert_equal "models",second_root.title
+    assert second_root.editable
     assert_equal 2,second_root.children.count
     assert_equal "copasi",second_root.children.first.title
     assert_equal "sbml",second_root.children[1].title
 
     assert_equal 1,second_root.children[1].children.count
     assert_equal "in development",second_root.children[1].children.first.title
+
+    third_root=root_folders[2]
+    assert !third_root.editable
+    assert "new items",third_root.title
 
     #don't check the actual contents from the real file, but check it works sanely and exists
     project2 = Factory :project

@@ -19,3 +19,7 @@ data:
 raw:
   title: "raw data files"
 
+locked:
+  title: "new items"
+  editable: false
+
