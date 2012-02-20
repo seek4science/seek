@@ -3,3 +3,9 @@ models:
 
 data:
   title: "Data Files"
+
+sops:
+  title: "SOPs"
+
+presentations:
+  title: "Presentations"

@@ -15,6 +15,12 @@ class BrowserController < ApplicationController
     end
   end
 
+  #just a temporary action whilst developing
+  def nuke
+      ProjectFolder.nuke @project
+      redirect_to project_browser_index_path(@project)
+  end
+
   private
 
   def check_project

@@ -48,6 +48,12 @@ class ProjectFolder < ActiveRecord::Base
     ProjectFolder.root_folders project
   end
 
+  #temporary method to destroy folders for a project, useful whilst developing
+  def self.nuke project
+    folders = ProjectFolder.find(:all,:conditions=>{:project_id=>project.id})
+    folders.each {|f| f.destroy}
+  end
+
   def to_json
       json = "{"
       json << "type: 'text',"
