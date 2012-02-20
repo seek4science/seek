@@ -4,7 +4,7 @@ class ProjectFolder < ActiveRecord::Base
   has_many :children,:class_name=>"ProjectFolder",:foreign_key=>:parent_id, :order=>:title, :after_add=>:update_child
 
   named_scope :root_folders, lambda { |project| {
-    :conditions=>{:project_id=>project.id,:parent_id=>nil},:order=>:title
+    :conditions=>{:project_id=>project.id,:parent_id=>nil},:order=>"LOWER(title)"
     }
   }
 
