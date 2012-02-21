@@ -1,0 +1,11 @@
+<%
+    li_class=asset.class.name.underscore
+    image=resource_avatar(asset,:class=>"asset_card_avatar")
+    max_title_length=60
+%>
+<li class="asset_card_item <%= li_class -%>">
+  <p class="asset_card_title">
+    <%= image -%>
+    <%= link_to h(truncate(asset.title,:length=>max_title_length)),asset -%><br/>
+  </p>
+</li>

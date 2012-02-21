@@ -1,0 +1,8 @@
+
+
+<p>Contents for Folder <%= h(folder.title) -%></p>
+
+<ul class="asset_cards">
+
+    <%= render :partial=>"asset",:collection=>folder.assets -%>
+</ul>
