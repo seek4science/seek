@@ -85,7 +85,7 @@ module Acts
       AUTHORIZATION_ACTIONS.each do |action|
         eval <<-END_EVAL
           def can_#{action}? user = User.current_user
-            new_record? or Authorization.is_authorized? "#{action}", nil, self, user or Ability.new(user).can? "#{action}".to_sym, self
+            new_record? || (Authorization.is_authorized? "#{action}", nil, self, user) || (Ability.new(user).can? "#{action}".to_sym, self)
           end
         END_EVAL
       end
