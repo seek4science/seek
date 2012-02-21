@@ -14,7 +14,7 @@ ul.asset_cards {
 
 ul.asset_cards li.asset_card_item {
     margin: 0.25em 0.25em 0.25em 0.25em;
-    padding-left: 0.5em;
+    padding-left: 0.2em;
     padding-bottom: 0em;
     border: #555 solid 1px;
     min-width: 17em;
@@ -30,7 +30,9 @@ li.asset_card_item p.asset_card_title {
 li.asset_card_item img.asset_card_avatar {
     width: 18px;
     height: 18px;
-    vertical-align: middle
+    padding-right: 0.3em;
+    vertical-align: middle;
+    float: left;
 }
 
 li.asset_card_item.data_file {

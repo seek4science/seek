@@ -127,4 +127,23 @@ class ProjectFolderTest < ActiveSupport::TestCase
 
   end
 
+  test "authorized_assets" do
+    user = Factory :user
+    project = user.person.projects.first
+    model = Factory :model, :projects=>[project],:policy=>Factory(:public_policy)
+    hidden_model = Factory :model,:projects=>[project],:policy=>Factory(:private_policy)
+    folder = Factory :project_folder, :project=>project
+
+    disable_authorization_checks do
+      folder.add_assets([model,hidden_model])
+      folder.save!
+    end
+    User.with_current_user(user) do
+      auth_assets = folder.authorized_assets
+      assert_equal 1,auth_assets.count
+      assert auth_assets.include?(model)
+    end
+
+  end
+
 end

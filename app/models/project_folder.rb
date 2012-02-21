@@ -21,6 +21,11 @@ class ProjectFolder < ActiveRecord::Base
     project_folder_assets.collect{|pfa| pfa.asset}
   end
 
+  #assets that are authorized to be shown for the current user
+  def authorized_assets
+    assets.select{|a| a.can_view?}
+  end
+
   def self.new_items_folder project
     ProjectFolder.find(:first,:conditions=>{:project_id=>project.id,:incoming=>true})
   end
@@ -66,7 +71,8 @@ class ProjectFolder < ActiveRecord::Base
   def add_assets assets
     assets = Array(assets)
     assets.each do |asset|
-      ProjectFolderAsset.create :asset=>asset,:project_folder=>self
+      pfa = ProjectFolderAsset.new :asset=>asset,:project_folder=>self
+      pfa.save!
     end
   end
 
