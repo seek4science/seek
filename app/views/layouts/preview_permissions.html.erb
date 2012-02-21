@@ -29,7 +29,7 @@
     <%unless grouped_people_by_access_type.blank?
       grouped_people_by_access_type.each do |key, value|
       case key
-        when Policy::NO_ACCESS %>
+        when Policy::NO_ACCESS %>                                                     F
             <h2 style="color: red">People have no access:</h2>
             <%= display_people_list value-%>
         <%when Policy::VISIBLE %>
@@ -48,7 +48,7 @@
                <h2>People can manage:</h2>
                <%= display_people_list value-%>
             <%end%>
-        <%when Policy::PUBLISHING %>
+        <%when Policy::DETERMINED_BY_GROUP %>
             <p class='public'>All visitors (including anonymous visitors with no login) can <span style="color: #475f30;"><%= Policy.get_access_type_wording(value, try_block{resource_name.camelize.constantize.new()}).downcase -%> </span>  </p>
        <%end%>
       <%end%>

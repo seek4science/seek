@@ -566,6 +566,51 @@ class PersonTest < ActiveSupport::TestCase
     end
   end
 
+  test "asset manager can manage the items inside their projects, except the entirely private items" do
+    asset_manager = Factory(:person, :roles => ['asset_manager'])
+    datafile1 = Factory(:data_file, :projects => asset_manager.projects, :policy => Factory(:publicly_viewable_policy))
+    datafile2 = Factory(:data_file, :projects => asset_manager.projects, :policy => Factory(:private_policy))
+
+    ability = Ability.new(asset_manager.user)
+
+    assert ability.can? :manage, datafile1
+    assert ability.cannot? :manage, datafile2
+
+    User.with_current_user asset_manager.user do
+      assert datafile1.can_manage?
+      assert !datafile2.can_manage?
+    end
+  end
+
+  test "asset manager can not manage the items outside their projects" do
+    asset_manager = Factory(:person, :roles => ['asset_manager'])
+    datafile = Factory(:data_file)
+    assert (asset_manager.projects & datafile.projects).empty?
+
+    ability = Ability.new(asset_manager.user)
+
+    assert ability.cannot? :manage, datafile
+
+    User.with_current_user asset_manager.user do
+      assert !datafile.can_manage?
+    end
+  end
+
+  test "asset manager can manage items inside their projects, the items have private sharing scope, but have permissions" do
+    asset_manager = Factory(:person, :roles => ['asset_manager'])
+    datafile = Factory(:data_file, :projects => asset_manager.projects, :policy => Factory(:private_policy, :permissions => [Factory(:permission, :access_type => Policy::VISIBLE)]))
+
+    assert !(asset_manager.projects & datafile.projects).empty?
+
+    ability = Ability.new(asset_manager.user)
+
+    assert ability.can? :manage, datafile
+
+    User.with_current_user asset_manager.user do
+      assert datafile.can_manage?
+    end
+  end
+
   test 'replace admins, pals named_scope by a static function' do
     admins = Person.admins
     assert_equal 1, admins.count

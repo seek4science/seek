@@ -254,8 +254,8 @@ class Policy < ActiveRecord::Base
         #group people by access_type
         grouped_people_by_access_type.merge!(filtered_people.group_by{|person| person[2]})
 
-        #add publishing if access_type for public > 0
-        grouped_people_by_access_type[Policy::PUBLISHING] = people_in_group['Public'] if people_in_group['Public'] > 0
+        #use Policy::DETERMINED_BY_GROUP to store public group if access_type for public > 0
+        grouped_people_by_access_type[Policy::DETERMINED_BY_GROUP] = people_in_group['Public'] if people_in_group['Public'] > 0
 
         #sort by key of the hash
         grouped_people_by_access_type = Hash[grouped_people_by_access_type.sort]

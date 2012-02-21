@@ -70,7 +70,7 @@ class Person < ActiveRecord::Base
   has_many :subscriptions,:dependent => :destroy
   before_create :set_default_subscriptions
 
-  ROLES = %w[admin pal project_manager publisher]
+  ROLES = %w[admin pal project_manager asset_manager publisher]
   ROLES_MASK_FOR_ADMIN = 2**ROLES.index('admin')
   ROLES_MASK_FOR_PAL = 2**ROLES.index('pal')
   ROLES_MASK_FOR_PROJECT_MANAGER = 2**ROLES.index('project_manager')
