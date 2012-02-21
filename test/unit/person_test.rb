@@ -620,4 +620,20 @@ class PersonTest < ActiveSupport::TestCase
     assert_equal 1, pals.count
     assert pals.include?(people(:pal))
   end
+
+  test "asset manager can manage the items inside their projects, but can not publish the items, which hasn't been set to published'" do
+    asset_manager = Factory(:person, :roles => ['asset_manager'])
+    datafile1 = Factory(:data_file, :projects => asset_manager.projects, :policy => Factory(:all_sysmo_viewable_policy))
+
+    ability = Ability.new(asset_manager.user)
+
+    assert ability.can? :manage, datafile1
+    assert ability.cannot? :publish, datafile1
+
+    User.with_current_user asset_manager.user do
+      assert datafile1.can_manage?
+      assert !datafile1.can_publish?
+    end
+  end
+
 end

@@ -24,6 +24,7 @@ class Ability
     {}
   end
 
+
   def admin admin
 
   end
