@@ -2,6 +2,16 @@ class Ability
   include CanCan::Ability
 
   def initialize(user)
+
+    alias_action  :show, :index, :search, :favourite, :favourite_delete,
+                  :comment, :comment_delete, :comments, :comments_timeline, :rate,
+                  :tag, :items, :statistics, :tag_suggestions, :preview, :to => :view
+    alias_action  :named_download, :launch, :submit_job, :data, :execute, :plot, :explore, :to => :download
+    alias_action  :new, :create, :update, :new_version, :create_version, :destroy_version, :edit_version, :update_version,
+                  :new_item, :create_item, :edit_item, :update_item, :quick_add, :resolve_link, :to => :edit
+    alias_action  :destroy, :destroy_item, :to => :delete
+    alias_action  :preview_publish, :to => :publish
+
     person = user.try(:person)
     if person
       person.roles.each do |role|
@@ -10,12 +20,16 @@ class Ability
     end
   end
 
+  def default_alias_actions
+    {}
+  end
+
   def admin admin
 
   end
 
   def pal pal
-
+     can :edit, :all
   end
 
   def project_manager project_manager
