@@ -92,6 +92,8 @@
 
             <%= "<li>This person is a <b>project manager</b></li>" if @person.is_project_manager? %>
 
+            <%= "<li>This person is an <b>asset manager</b></li>" if @person.is_asset_manager? %>
+
             <li>
               Editing <b>projects</b>, where this person is
               involved: <%= @person.can_edit_projects? ? "<span class='allowed_text'>allowed</span>" : "<span class='denied_text'>denied</span>" -%>

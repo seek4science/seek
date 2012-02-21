@@ -449,4 +449,47 @@ class PeopleControllerTest < ActionController::TestCase
     assert person.is_project_manager?
     assert !person.is_pal?
   end
+
+  test 'set the asset manager role for a person' do
+   work_group_id = Factory(:work_group).id
+    assert_difference('Person.count') do
+      assert_difference('NotifieeInfo.count') do
+        post :create, :person => {:first_name=>"assert manager", :email=>"asset_manager@sdfsd.com", :work_group_ids => [work_group_id]}, :roles => {:asset_manager => true}
+      end
+    end
+    person = assigns(:person)
+    person.reload
+    assert_not_nil person
+    assert person.is_asset_manager?
+  end
+
+  test 'admin should see the session of assigning the asset manager role to a person' do
+    person = Factory(:person)
+    get :edit, :id => person
+    assert_select "input#_roles_asset_manager", :count => 1
+  end
+
+  test 'non-admin should not see the session of assigning the asset manager role to a person' do
+    login_as(:aaron)
+    person = Factory(:person)
+    get :edit, :id => person
+    assert_select "input#_roles_asset_manager", :count => 0
+  end
+
+  test 'should show that the person is asset manager for admin' do
+    person = Factory(:person)
+    person.is_asset_manager = true
+    person.save
+    get :show, :id => person
+    assert_select "li", :text => /This person is an asset manager/, :count => 1
+  end
+
+  test 'should not show that the person is asset manager for non-admin' do
+    person = Factory(:person)
+    person.is_asset_manager = true
+    person.save
+    login_as(:aaron)
+    get :show, :id => person
+    assert_select "li", :text => /This person is an asset manager/, :count => 0
+  end
 end
