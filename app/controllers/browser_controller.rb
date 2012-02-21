@@ -20,6 +20,13 @@ class BrowserController < ApplicationController
       redirect_to project_browser_index_path(@project)
   end
 
+  def display_contents
+    folder = ProjectFolder.find(params[:folder_id])
+    render :update do |page|
+      page.replace_html "folder_contents",:partial=>"contents",:locals=>{:folder=>folder}
+    end
+  end
+
   private
 
   def check_project

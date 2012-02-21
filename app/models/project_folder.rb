@@ -80,7 +80,7 @@ class ProjectFolder < ActiveRecord::Base
       json = "{"
       json << "type: 'text',"
       json << "label: '#{title} (#{assets.count})',"
-      json << "className: 'fred',"
+      json << "href: 'javascript: folder_clicked(#{self.id},#{self.project.id});',"
       json << "expanded: 'true'"
       if children.empty?
         json << ", children: []"

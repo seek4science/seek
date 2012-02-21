@@ -4,6 +4,11 @@
         tree = new YAHOO.widget.TreeView("folders",<%= @folders_json -%>);
         tree.render();
     }
+    function folder_clicked(folder_id,project_id) {
+        show_ajax_loader('folder_contents');
+        var path = "/projects/"+project_id+"/browser/display_contents?folder_id="+folder_id;
+        new Ajax.Request(path, {asynchronous:true, evalScripts:true});
+    }
 </script>
 
 <div id="folders">
