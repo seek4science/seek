@@ -1,4 +1,4 @@
-class BrowserController < ApplicationController
+class FoldersController < ApplicationController
   before_filter :login_required
   before_filter :check_project
 
@@ -17,11 +17,11 @@ class BrowserController < ApplicationController
 
   def nuke
       ProjectFolder.nuke @project
-      redirect_to project_browser_index_path(@project)
+      redirect_to project_folders_path(@project)
   end
 
   def display_contents
-    folder = ProjectFolder.find(params[:folder_id])
+    folder = ProjectFolder.find(params[:id])
     render :update do |page|
       page.replace_html "folder_contents",:partial=>"contents",:locals=>{:folder=>folder}
     end

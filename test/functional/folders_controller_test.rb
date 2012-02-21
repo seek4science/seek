@@ -1,6 +1,6 @@
 require 'test_helper'
 
-class BrowserControllerTest < ActionController::TestCase
+class FoldersControllerTest < ActionController::TestCase
   fixtures :all
   include AuthenticatedTestHelper
 
@@ -11,7 +11,8 @@ class BrowserControllerTest < ActionController::TestCase
   end
 
   test "routes" do
-    assert_generates "/projects/1/browser", {:controller=>"browser",:action=>"index",:project_id=>"1"}
+    assert_generates "/projects/1/folders", {:controller=>"folders",:action=>"index",:project_id=>"1"}
+    assert_generates "/projects/1/folders/7", {:controller=>"folders",:action=>"show",:project_id=>"1",:id=>"7"}
   end
 
   test "access as member" do
