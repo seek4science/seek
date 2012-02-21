@@ -92,21 +92,25 @@
           selection_box.add(option, null);
         }
 
-        <% (Strain.find(:all).sort_by(&:title).reject{|s| s.is_dummy?}).each do |strain| -%>
+        <% Organism.find(:all).each do |organism|%>
+        if ('<%= organism.id -%>' == organism_id){
+                <% (organism.strains.sort_by(&:title).reject{|s| s.is_dummy?}).each do |strain| -%>
 
-            if ('<%= strain.organism_id -%>' == organism_id){
-                option = document.createElement("OPTION");
-                option.text = '<%= escape_javascript(strain.info) -%>';
-                option.value = '<%= strain.id -%>';
-                try {
-                  selection_box.add(option); //for older IE version
-                }
-                catch (ex) {
-                  selection_box.add(option, null);
-                }
-            }
-         <% end %>
+                    if ('<%= strain.organism_id -%>' == organism_id){
+                        option = document.createElement("OPTION");
+                        option.text = '<%= escape_javascript(strain.info) -%>';
+                        option.value = '<%= strain.id -%>';
+                        try {
+                          selection_box.add(option); //for older IE version
+                        }
+                        catch (ex) {
+                          selection_box.add(option, null);
+                        }
+                    }
+                 <% end %>
 
+        }
+        <% end %>
     }
 
     function updateCreatorSettings() {
