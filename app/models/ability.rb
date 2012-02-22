@@ -30,7 +30,7 @@ class Ability
   end
 
   def pal pal
-     can :edit, :all
+
   end
 
   def project_manager project_manager
