@@ -26,6 +26,11 @@ class ProjectFolder < ActiveRecord::Base
     assets.select{|a| a.can_view?}
   end
 
+  #what is displayed in the tree
+  def label
+    "#{title} (#{assets.count})"
+  end
+
   def self.new_items_folder project
     ProjectFolder.find(:first,:conditions=>{:project_id=>project.id,:incoming=>true})
   end

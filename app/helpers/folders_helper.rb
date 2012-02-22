@@ -17,7 +17,7 @@ module FoldersHelper
     root_folders.each do |folder|
       var = "node#{folder.id}"
       js << "var #{var} = new YAHOO.widget.TextNode({"
-      js << "label: '#{folder.title} (#{folder.assets.count})',"
+      js << "label: '#{folder.label}',"
       js << "href: 'javascript: folder_clicked(#{folder.id},#{folder.project.id});',"
       js << "expanded: 'true'"
       js << "},#{root});"

@@ -150,8 +150,26 @@ class ProjectFolderTest < ActiveSupport::TestCase
 
   end
 
-  test "add assets" do
+  test "label" do
+    user = Factory :user
+    project = user.person.projects.first
+    pf1=ProjectFolder.new :title=>"one",:project=>project
+    assets=(0...3).to_a.collect{Factory :sop,:projects=>[project],:policy=>Factory(:public_policy)}
+    pf1.add_assets assets
+    assert_equal "one (3)",pf1.label
+  end
 
+  test "add assets" do
+    user = Factory :user
+    project = user.person.projects.first
+
+    pf1=ProjectFolder.new :title=>"one",:project=>project
+    model = Factory :model, :projects=>[project],:policy=>Factory(:public_policy)
+    sop = Factory :sop, :projects=>[project],:policy=>Factory(:public_policy)
+    pf1.add_assets model
+    pf1.add_assets [sop]
+    pf1.reload
+    assert_equal [model,sop],pf1.assets
   end
 
   test "move asset" do
