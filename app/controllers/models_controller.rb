@@ -22,7 +22,7 @@ class ModelsController < ApplicationController
   @@model_builder = Seek::JWS::OneStop.new
 
   def visualise
-    xgmml_file = @display_model.content_blobs.first
+    xgmml_file = @@model_builder.is_xgmml? @display_model
     file = open(xgmml_file.filepath)
     doc = LibXML::XML::Parser.string(file.read).parse
 
