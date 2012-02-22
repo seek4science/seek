@@ -450,6 +450,21 @@ class PeopleControllerTest < ActionController::TestCase
     assert !person.is_pal?
   end
 
+  test 'update roles for yourself, but keep the admin role' do
+    person = User.current_user.person
+    assert person.is_admin?
+    assert_equal 1, person.roles.count
+
+    put :update, :id => person.id, :person => {:id => person.id}, :roles => {:project_manager => true}
+
+    person = assigns(:person)
+    person.reload
+    assert_not_nil person
+    assert person.is_project_manager?
+    assert person.is_admin?
+    assert_equal 2, person.roles.count
+  end
+
   test 'set the asset manager role for a person' do
    work_group_id = Factory(:work_group).id
     assert_difference('Person.count') do

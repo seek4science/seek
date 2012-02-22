@@ -279,15 +279,13 @@ class PeopleController < ApplicationController
   end
 
   def set_roles person, params
+    roles = person.is_admin? ? ['admin'] : []
     if params[:roles]
-      roles = []
       params[:roles].each_key do |key|
         roles << key
       end
-      person.roles=roles
-    else
-      person.roles=[]
     end
+    person.roles=roles
   end
 
   def profile_belongs_to_current_or_is_admin
