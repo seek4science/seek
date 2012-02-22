@@ -156,10 +156,10 @@ class PolicyTest < ActiveSupport::TestCase
 
     User.with_current_user Factory(:user) do
       people_in_group = policy1.summarize_permissions [], [asset_manager]
-      assert people_in_group[Policy::MANAGING].include?([asset_manager.id, asset_manager.name,Policy::MANAGING])
+      assert people_in_group[Policy::MANAGING].include?([asset_manager.id, asset_manager.name+'(asset manager)',Policy::MANAGING])
 
       people_in_group = policy2.summarize_permissions [], [asset_manager]
-      assert people_in_group[Policy::MANAGING].include?([asset_manager.id, asset_manager.name,Policy::MANAGING])
+      assert people_in_group[Policy::MANAGING].include?([asset_manager.id, asset_manager.name+'(asset manager)',Policy::MANAGING])
     end
   end
 
