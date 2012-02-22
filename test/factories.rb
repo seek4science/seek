@@ -30,6 +30,10 @@
     f.is_asset_manager true
   end
 
+  Factory.define(:publisher,:parent=>:person) do |f|
+    f.is_publisher true
+  end
+
 #User
   Factory.define(:brand_new_user, :class => User) do |f|
     f.sequence(:login) { |n| "user#{n}" }

@@ -865,18 +865,50 @@ class AuthorizationTest < ActiveSupport::TestCase
     end
   end
 
-  test "asset manager can manage the items inside their projects, but can not publish the items, which hasn't been set to published'" do
-     asset_manager = Factory(:person, :roles => ['asset_manager'])
-     datafile1 = Factory(:data_file, :projects => asset_manager.projects, :policy => Factory(:all_sysmo_viewable_policy))
-
-     ability = Ability.new(asset_manager.user)
-
-     assert ability.can? :manage, datafile1
-     assert ability.cannot? :publish, datafile1
+  test "asset manager can manage the items inside their projects, but can not publish the items, which hasn't been set to published" do
+     asset_manager = Factory(:asset_manager)
+     datafile = Factory(:data_file, :projects => asset_manager.projects, :policy => Factory(:all_sysmo_viewable_policy))
 
      User.with_current_user asset_manager.user do
-       assert datafile1.can_manage?
-       assert !datafile1.can_publish?
+       assert datafile.can_manage?
+       assert !datafile.can_publish?
+
+       ability = Ability.new(asset_manager.user)
+       assert asset_manager.is_asset_manager?
+       assert ability.can? :manage, datafile
+       assert ability.cannot? :publish, datafile
+
+     end
+  end
+
+  test "a person who is not an asset manager, who can manage the item, should not be able to publish the items, which hasn't been set to published" do
+     person_can_manage = Factory(:person)
+     datafile = Factory(:data_file, :projects => person_can_manage.projects, :policy => Factory(:policy))
+     permission = Factory(:permission, :contributor => person_can_manage, :access_type => Policy::MANAGING, :policy => datafile.policy)
+
+     User.with_current_user person_can_manage.user do
+       assert datafile.can_manage?
+       assert !datafile.can_publish?
+
+       ability = Ability.new(person_can_manage.user)
+       assert person_can_manage.roles.empty?
+       assert ability.cannot? :manage, datafile
+       assert ability.cannot? :publish, datafile
+     end
+  end
+
+  test "publisher should be able to publish the item, but not to manage the item" do
+     publisher = Factory(:publisher)
+     datafile = Factory(:data_file, :projects => publisher.projects, :policy => Factory(:all_sysmo_viewable_policy))
+
+     User.with_current_user publisher.user do
+       assert datafile.can_publish?
+       assert !datafile.can_manage?
+
+       ability = Ability.new(publisher.user)
+       assert publisher.is_publisher?
+       assert ability.can? :publish, datafile
+       assert ability.cannot? :manage, datafile
      end
   end
 
