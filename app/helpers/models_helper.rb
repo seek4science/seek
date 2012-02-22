@@ -52,7 +52,11 @@ module ModelsHelper
     models=Model.find(:all)
     Authorization.authorize_collection("view",models,current_user)
   end  
-  
+
+  def cytoscapeweb_supported? model
+      builder = Seek::JWS::OneStop.new
+      builder.is_xgmml? model
+  end
   def jws_supported? model
     builder = Seek::JWS::OneStop.new
     builder.is_supported? model
