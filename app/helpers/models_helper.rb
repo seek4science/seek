@@ -51,7 +51,11 @@ module ModelsHelper
   def authorised_models
     authorised_assets(Model)
   end  
-  
+
+  def cytoscapeweb_supported? model
+      builder = Seek::JWS::OneStop.new
+      builder.is_xgmml? model
+  end
   def jws_supported? model
     builder = Seek::JWS::OneStop.new
     builder.is_supported? model

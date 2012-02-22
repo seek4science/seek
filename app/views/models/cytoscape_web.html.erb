@@ -1,0 +1,39 @@
+<%= javascript_include_tag "swfobject","cytoscape_web/AC_OETags.min","cytoscape_web/cytoscapeweb.min","cytoscape_web/json2.min" %>
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN" "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html>
+
+    <head>
+        <title>Model Visualization with Cytoscape Web</title>
+        <script type="text/javascript">
+               window.onload = function() {
+                // id of Cytoscape Web container div
+                var div_id = "cytoscapeweb";
+
+                // convert xgmml file content to a string
+                var network_xgmml = <%= @graph %> ;
+                // initialization options
+                var options = {
+                    // where you have the Cytoscape Web SWF
+                    swfPath: "/swfs/CytoscapeWeb",
+                    // where you have the Flash installer SWF
+                    flashInstallerPath: "/swfs/playerProductInstall"
+                };
+
+                // init and draw
+                var vis = new org.cytoscapeweb.Visualization(div_id, options);
+                vis.draw({ network: network_xgmml});
+               };
+        </script>
+        <style>
+            /* The Cytoscape Web container must have its dimensions set. */
+            html, body { height: 100%; width: 100%; padding: 0; margin: 0; }
+            #cytoscapeweb { width: 100%; height: 100%; }
+        </style>
+       <body>
+        <div id="cytoscapeweb">
+            Cytoscape Web will replace the contents here with your graph.
+        </div>
+    </body>
+
+</html>
