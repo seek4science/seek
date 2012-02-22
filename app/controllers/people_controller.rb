@@ -4,10 +4,11 @@ class PeopleController < ApplicationController
   before_filter :find_and_auth, :only => [:show, :edit, :update, :destroy]
   before_filter :current_user_exists,:only=>[:select,:userless_project_selected_ajax,:create,:new]
   before_filter :profile_belongs_to_current_or_is_admin, :only=>[:edit, :update]
-  before_filter :profile_is_not_another_admin_except_me, :only=>[:edit,:update]
+  before_filter :profile_is_not_another_admin_except_me, :only=>[:edit,:update,:admin]
   before_filter :is_user_admin_auth,:only=>[:destroy]
   before_filter :is_user_admin_or_personless, :only=>[:new]
   before_filter :auth_params,:only=>[:update,:create]
+  before_filter :is_admin_or_is_project_manager, :only=>[:admin]
 
   skip_before_filter :project_membership_required
   skip_before_filter :profile_for_login_required,:only=>[:select,:userless_project_selected_ajax,:create]
@@ -102,6 +103,12 @@ class PeopleController < ApplicationController
       
       # clear the session data anyway
       session[possible_unsaved_data] = nil
+    end
+  end
+
+  def admin
+    respond_to do |format|
+      format.html
     end
   end
 
@@ -296,10 +303,18 @@ class PeopleController < ApplicationController
     end
   end
 
+  def is_admin_or_is_project_manager
+    @person=Person.find(params[:id])
+    unless current_user.person.try(:is_admin?) || current_user.person.try(:is_project_manager?)
+      error("You do not have the permission to administer this person", "Not admin or project manager")
+      return false
+    end
+  end
+
   def profile_is_not_another_admin_except_me
     @person=Person.find(params[:id])
     if !@person.user.nil? && @person.user!=current_user && @person.user.is_admin?
-      error("Cannot edit another Admins profile","is invalid(another admin)")
+      error("Cannot edit/administer another Admins profile","is invalid(another admin)")
       return false
     end
   end

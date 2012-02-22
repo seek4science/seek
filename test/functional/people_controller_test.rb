@@ -112,7 +112,7 @@ class PeopleControllerTest < ActionController::TestCase
     get :edit, :id => people(:quentin_person)
     assert_response :success
   end
-  
+
   def test_non_admin_cant_edit_someone_else
     login_as(:fred)
     get :edit, :id=> people(:aaron_person)
@@ -480,14 +480,15 @@ class PeopleControllerTest < ActionController::TestCase
 
   test 'admin should see the session of assigning the asset manager role to a person' do
     person = Factory(:person)
-    get :edit, :id => person
+    get :admin, :id => person
+    puts @response.body
     assert_select "input#_roles_asset_manager", :count => 1
   end
 
   test 'non-admin should not see the session of assigning the asset manager role to a person' do
     login_as(:aaron)
     person = Factory(:person)
-    get :edit, :id => person
+    get :admin, :id => person
     assert_select "input#_roles_asset_manager", :count => 0
   end
 
@@ -507,4 +508,31 @@ class PeopleControllerTest < ActionController::TestCase
     get :show, :id => person
     assert_select "li", :text => /This person is an asset manager/, :count => 0
   end
+
+   def test_project_manager_can_administer_others
+    login_as(:project_manager)
+    get :admin, :id=> people(:aaron_person)
+    assert_response :success
+  end
+
+  def test_admin_can_administer_others
+    login_as(:quentin)
+    get :admin, :id=>people(:aaron_person)
+    assert_response :success
+
+  end
+
+  test 'non-admin can not administer others' do
+    login_as(:fred)
+    get :admin, :id=> people(:aaron_person)
+    assert_redirected_to :root
+  end
+
+  test 'can not administer yourself' do
+    aaron = people(:aaron_person)
+    login_as(aaron.user)
+    get :admin, :id=> aaron
+    assert_redirected_to :root
+  end
+
 end
