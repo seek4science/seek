@@ -280,6 +280,8 @@ module ImagesHelper
         "toggle_expand_64x64.png"
       when 'collapse_minus'
         "toggle_collapse_64x64.png"
+      when 'cytoscape_web'
+        "famfamfam_silk/chart_line.png"
     else
       return nil
     end
