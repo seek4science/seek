@@ -9,6 +9,9 @@ module Seek
        model.content_blobs.detect{|content_blob| check_content content_blob.filepath,"<sbml" }
     end
 
+    def is_xgmml? model
+        model.content_blobs.detect{|content_blob| check_content(content_blob.filepath,"<graph") and check_content(content_blob.filepath,"<node") }
+    end
     def is_jws_supported? model
       is_dat?(model) || is_sbml?(model)
     end

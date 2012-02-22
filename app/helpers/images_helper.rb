@@ -276,6 +276,8 @@ module ImagesHelper
         "1315482798_presentation-slides.png"
       when 'endnote'
         "famfamfam_silk/script_go.png"
+      when 'cytoscape_web'
+        "famfamfam_silk/chart_line.png"
     else
       return nil
     end
