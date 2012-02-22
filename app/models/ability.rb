@@ -42,17 +42,13 @@ class Ability
      can :manage, :all do |item|
         if ((item.respond_to?(:projects) && asset_manager.try(:projects)) and !(item.projects & asset_manager.projects).empty?) && item.respond_to?(:policy)
             policy = item.policy
-            if policy.access_type != Policy::NO_ACCESS
+            if policy.access_type > Policy::NO_ACCESS
               true
             else
-              grouped_people_by_access_type = policy.summarize_permissions item.creators, item.contributor.try(:person)
-              grouped_people_by_access_type.delete Policy::DETERMINED_BY_GROUP
-              grouped_people_by_access_type.delete Policy::NO_ACCESS
-              people_with_permission = []
-              grouped_people_by_access_type.each_value do |value|
-                 people_with_permission |= value
-              end
-              !(people_with_permission.collect{|person| person[0]} - [item.contributor.try(:person).try(:id)]).empty?
+              creators = item.is_downloadable? ? item.creators : []
+              contributor = item.class.name=='Assay' ? item.contributor : item.contributor.try(:person)
+              grouped_people_by_access_type = policy.summarize_permissions creators, [], contributor
+              !policy.is_entirely_private? grouped_people_by_access_type, contributor
             end
         else
           false

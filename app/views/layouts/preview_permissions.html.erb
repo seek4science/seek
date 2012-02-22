@@ -29,7 +29,7 @@
     <%unless grouped_people_by_access_type.blank?
       grouped_people_by_access_type.each do |key, value|
       case key
-        when Policy::NO_ACCESS %>                                                     F
+        when Policy::NO_ACCESS %>
             <h2 style="color: red">People have no access:</h2>
             <%= display_people_list value-%>
         <%when Policy::VISIBLE %>

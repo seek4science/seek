@@ -212,7 +212,7 @@ class Policy < ActiveRecord::Base
   end
 
 #return the hash: key is access_type, value is the array of people
-  def summarize_permissions creators=[User.current_user.person], contributor=User.current_user.person
+  def summarize_permissions creators=[User.current_user.person], asset_managers = [], contributor=User.current_user.person
         #build the hash containing contributor_type as key and the people in these groups as value,exception:'Public' holds the access_type as the value
         people_in_group = {'Person' => [], 'FavouriteGroup' => [], 'WorkGroup' => [], 'Project' => [], 'Institution' => [], 'WhiteList' => [], 'BlackList' => [],'Network' => [], 'Public' => 0}
         #the result return: a hash contain the access_type as key, and array of people as value
@@ -242,17 +242,25 @@ class Policy < ActiveRecord::Base
         filtered_people = precedence(filtered_people, people_in_group['BlackList'])
 
         #add creators and assign them the Policy::EDITING right
-        creators.collect!{|c| [c.id, "#{c.first_name} #{c.last_name}", Policy::EDITING] unless c.blank?}
-        filtered_people = add_people_in_whitelist(filtered_people, creators)
+        creator_array = creators.collect{|c| [c.id, "#{c.name}", Policy::EDITING] unless c.blank?}
+        filtered_people = add_people_in_whitelist(filtered_people, creator_array)
 
         #add contributor
-        filtered_people = add_people_in_whitelist(filtered_people, [[contributor.id, "#{contributor.first_name} #{contributor.last_name}", Policy::MANAGING]]) unless contributor.blank?
+        filtered_people = add_people_in_whitelist(filtered_people, [[contributor.id, "#{contributor.name}", Policy::MANAGING]]) unless contributor.blank?
 
         #sort people by name
         filtered_people = filtered_people.sort{|a,b| a[1] <=> b[1]}
 
         #group people by access_type
         grouped_people_by_access_type.merge!(filtered_people.group_by{|person| person[2]})
+
+        if !is_entirely_private? grouped_people_by_access_type, contributor
+          asset_manage_array = asset_managers.collect{|am| [am.id, "#{am.name}", Policy::MANAGING] unless am.blank?}
+          grouped_people_by_access_type[Policy::MANAGING] |= asset_manage_array
+        end
+
+        #concat the roles to a person name
+        concat_roles_to_name grouped_people_by_access_type, creators, asset_managers
 
         #use Policy::DETERMINED_BY_GROUP to store public group if access_type for public > 0
         grouped_people_by_access_type[Policy::DETERMINED_BY_GROUP] = people_in_group['Public'] if people_in_group['Public'] > 0
@@ -435,5 +443,31 @@ class Policy < ActiveRecord::Base
      result |= people_list
      result |= whitelist
      return remove_duplicate(result)
+  end
+
+  def is_entirely_private? grouped_people_by_access_type, contributor
+    entirely_private = true
+    if access_type > Policy::NO_ACCESS
+        entirely_private = false
+    else
+        grouped_people_by_access_type.reject{|key,value| key == Policy::NO_ACCESS || key == Policy::DETERMINED_BY_GROUP}.each_value do |value|
+          value.each do |person|
+            entirely_private = false if (person[0] != contributor.try(:id))
+          end
+        end
+    end
+    return entirely_private
+  end
+
+  def concat_roles_to_name grouped_people_by_access_type, creators, asset_managers
+    creator_id_array = creators.collect{|c| c.id unless c.blank?}
+    asset_manage_id_array = asset_managers.collect{|am| am.id unless am.blank?}
+     grouped_people_by_access_type = grouped_people_by_access_type.each_value do |value|
+       value.each do |person|
+         person[1].concat('(creator)') if creator_id_array.include?(person[0])
+         person[1].concat('(asset manager)') if asset_manage_id_array.include?(person[0])
+       end
+     end
+    grouped_people_by_access_type
   end
 end

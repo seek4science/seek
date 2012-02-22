@@ -349,7 +349,7 @@ class Person < ActiveRecord::Base
     #if not or if only the contributor then assign the manage right to pis||pals
     person_related_items.each do |item|
       people_can_manage_item = item.people_can_manage
-      if people_can_manage_item.blank? || (people_can_manage_item == [[id, "#{first_name} #{last_name}", Policy::MANAGING]])
+      if people_can_manage_item.blank? || (people_can_manage_item == [[id, "#{name}", Policy::MANAGING]])
         #find the projects which this person and item belong to
         projects_in_common = projects & item.projects
         pis = projects_in_common.collect{|p| p.pis}.flatten.uniq

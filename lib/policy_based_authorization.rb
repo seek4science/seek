@@ -78,7 +78,8 @@ module Acts
         contributor = self.class.name=='Assay' ? self.contributor : try_block{self.contributor.person}
         return [[contributor.id, "#{contributor.first_name} #{contributor.last_name}", Policy::MANAGING]] if policy.blank?
         creators = is_downloadable? ? self.creators : []
-        grouped_people_by_access_type = policy.summarize_permissions creators, contributor
+        asset_managers = projects.collect(&:asset_managers).flatten
+        grouped_people_by_access_type = policy.summarize_permissions creators,asset_managers, contributor
         grouped_people_by_access_type[Policy::MANAGING]
       end
 
