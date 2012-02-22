@@ -63,7 +63,7 @@ ActionController::Routing::Routes.draw do |map|
     :collection => { :request_institutions => :get },:member=>{:admin=>:get} do |project|
     # avatars / pictures 'owned by' project
     project.resources :avatars, :member => { :select => :post }, :collection => { :new => :post }
-    project.resources :folders, :collection=>{:nuke=>:post},:member=>{:display_contents=>:post}
+    project.resources :folders, :collection=>{:nuke=>:post},:member=>{:display_contents=>:post,:move_asset_to=>:post}
   end
 
   map.resources :sops, :member => { :download => :get, :new_version=>:post, :preview_publish=>:get,:publish=>:post,:request_resource=>:post, :update_annotations_ajax=>:post } do |sop|

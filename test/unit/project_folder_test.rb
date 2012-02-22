@@ -14,6 +14,8 @@ class ProjectFolderTest < ActiveSupport::TestCase
     assert !pf.valid?
   end
 
+
+
   test "add child" do
      pf = Factory :project_folder
 
@@ -146,6 +148,45 @@ class ProjectFolderTest < ActiveSupport::TestCase
       assert auth_assets.include?(viewable_sop)
     end
 
+  end
+
+  test "add assets" do
+
+  end
+
+  test "move asset" do
+    user = Factory :user
+    project = user.person.projects.first
+
+    pf1=ProjectFolder.new :title=>"one",:project=>project
+    pf2=ProjectFolder.new :title=>"two",:project=>project
+    model = Factory :model, :projects=>[project],:policy=>Factory(:public_policy)
+    disable_authorization_checks do
+      pf1.add_assets model
+    end
+
+    pf2.move_assets model,pf1
+    model.reload
+    pf1.reload
+    pf2.reload
+    model.reload
+    assert_equal [pf2],model.folders
+    assert_equal [],pf1.assets
+    assert_equal [model],pf2.assets
+
+    #nothing happens if the destination folder doesn't match source
+    project2=Factory(:project)
+    pf1=ProjectFolder.new :title=>"one",:project=>project
+    pf2=ProjectFolder.new :title=>"two",:project=>project2
+    model = Factory :model, :projects=>[project,project2],:policy=>Factory(:public_policy)
+    disable_authorization_checks do
+      pf1.add_assets model
+    end
+
+    pf2.move_assets model,pf1
+    assert_equal [pf1],model.folders
+    assert_equal [model],pf1.assets
+    assert_equal [],pf2.assets
   end
 
 end

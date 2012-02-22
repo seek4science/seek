@@ -76,6 +76,17 @@ class ProjectFolder < ActiveRecord::Base
     end
   end
 
+  def move_assets assets,source_folder
+    assets=Array(assets)
+    if (project_id == source_folder.project_id)
+      assets.each do |asset|
+        link = ProjectFolderAsset.find(:first,:conditions=>{:asset_id=>asset.id,:asset_type=>asset.class.name,:project_folder_id=>source_folder.id})
+        link.project_folder=self
+        link.save!
+      end
+    end
+  end
+
   #temporary method to destroy folders for a project, useful whilst developing
   def self.nuke project
     folders = ProjectFolder.find(:all,:conditions=>{:project_id=>project.id})

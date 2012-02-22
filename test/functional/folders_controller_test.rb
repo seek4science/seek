@@ -84,6 +84,38 @@ class FoldersControllerTest < ActionController::TestCase
     assert @response.body.match(/Description.*Ryz9z3Z9h70wzJ243we6k8RO5xI5f3UF/).nil?
   end
 
+  test "move between folders" do
+    sop = Factory :sop, :projects=>[@project],:policy=>Factory(:public_policy),:description=>"Ryz9z3Z9h70wzJ243we6k8RO5xI5f3UF"
+    folder = Factory :project_folder, :project=>@project
+    other_folder = Factory :project_folder, :project=>@project
+    folder.add_assets(sop)
+    folder.save!
+    xhr(:post,:move_asset_to,{:asset_id=>sop.id,:asset_type=>"Sop",:id=>folder.id,:dest_folder_id=>other_folder.id,:project_id=>folder.project.id})
+    assert_response :success
+    sop.reload
+    other_folder.reload
+    folder.reload
+    assert_equal [other_folder],sop.folders
+    assert_equal [],folder.assets
+    assert_equal [sop],other_folder.assets
+  end
+
+  test "cannot move to other project folder" do
+    sop = Factory :sop, :projects=>[@project],:policy=>Factory(:public_policy),:description=>"Ryz9z3Z9h70wzJ243we6k8RO5xI5f3UF"
+    folder = Factory :project_folder, :project=>@project
+    other_folder = Factory :project_folder, :project=>Factory(:project)
+    folder.add_assets(sop)
+    folder.save!
+    xhr(:post,:move_asset_to,{:asset_id=>sop.id,:asset_type=>"Sop",:id=>folder.id,:dest_folder_id=>other_folder.id,:project_id=>folder.project.id})
+    assert_response :success
+    sop.reload
+    other_folder.reload
+    folder.reload
+    assert_equal [folder],sop.folders
+    assert_equal [],other_folder.assets
+    assert_equal [sop],folder.assets
+  end
+
   test "authorization on assets" do
     sop = Factory :sop, :projects=>[@project],:policy=>Factory(:public_policy),:description=>"Ryz9z3Z9h70wzJ243we6k8RO5xI5f3UF"
     hidden_sop = Factory :sop,:projects=>[@project],:policy=>Factory(:private_policy),:description=>"viu2q6ng3iZ0ppS5X679pPo11LfF62pS"
