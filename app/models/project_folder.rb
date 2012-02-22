@@ -82,22 +82,4 @@ class ProjectFolder < ActiveRecord::Base
     folders.each {|f| f.destroy}
   end
 
-  def to_json
-      json = "{"
-      json << "type: 'text',"
-      json << "label: '#{title} (#{assets.count})',"
-      json << "href: 'javascript: folder_clicked(#{self.id},#{self.project.id});',"
-      json << "expanded: 'true'"
-      if children.empty?
-        json << ", children: []"
-      else
-        json << ", children: ["
-        children.sort_by(&:label).each do |child|
-          json << child.to_json << ","
-        end
-        json << "]"
-      end
-      json << "}"
-    end
-
 end

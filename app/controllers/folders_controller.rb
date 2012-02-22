@@ -9,7 +9,7 @@ class FoldersController < ApplicationController
   end
 
   def index
-    @folders_json = folder_structure_as_json
+    @folders = project_folders
     respond_to do |format|
       format.html
     end
@@ -34,17 +34,6 @@ class FoldersController < ApplicationController
     if @project.nil? || !current_user.person.projects.include?(@project)
       error("You must be a member of the project", "is invalid (not in project)")
     end
-  end
-
-  #provides the folder structure as json format to be used to construct the view
-  def folder_structure_as_json
-    json = "["
-    project_folders.each do |pf|
-      json << pf.to_json << ","
-    end
-    json << "]"
-    puts json
-    json
   end
 
   def project_folders

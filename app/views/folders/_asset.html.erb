@@ -1,12 +1,16 @@
 <%
     li_class=asset.class.name.underscore
+    drag_id="#{asset.class.name}_#{asset.id}_#{folder.id}"
     image=resource_avatar(asset,:class=>"asset_card_avatar")
     max_title_length=60
 %>
-<li class="asset_card_item <%= li_class -%>" title="<%= folder_asset_item_tooltip asset -%>">
 
-  <p class="asset_card_title">
+<li class="asset_card_item <%= li_class -%>" title="<%= folder_asset_item_tooltip asset -%>" id="<%= drag_id -%>">
+
+  <p class="asset_card_title" >
     <%= image -%>
     <%= link_to h(truncate(asset.title,:length=>max_title_length)),asset -%><br/>
   </p>
 </li>
+
+<%= draggable_element drag_id,:revert=>true, :ghosting=>false -%>

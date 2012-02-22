@@ -9,7 +9,24 @@ module FoldersHelper
     end
     text << "<p><b>Filename: </b>#{asset.original_filename}" if asset.respond_to?("original_filename")
 
-    tooltip_title_attrib(text, 750)
+    tooltip_title_attrib(text, 2000)
+  end
+
+  def folder_node_creation_javascript root_folders, root="root",tree_var="tree",map_var="elementFolderIds"
+    js="";
+    root_folders.each do |folder|
+      var = "node#{folder.id}"
+      js << "var #{var} = new YAHOO.widget.TextNode({"
+      js << "label: '#{folder.title} (#{folder.assets.count})',"
+      js << "href: 'javascript: folder_clicked(#{folder.id},#{folder.project.id});',"
+      js << "expanded: 'true'"
+      js << "},#{root});"
+      js << "\n\t"
+      js << "#{map_var}[#{var}.labelElId]= #{folder.id};" << "\n\t"
+      js << folder_node_creation_javascript(folder.children,var)
+    end
+
+    js
   end
 
 end

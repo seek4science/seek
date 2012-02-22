@@ -1,5 +1,14 @@
 models:
   title: "Models"
+  children: sbml
+
+sbml:
+  title: "SBML"
+  children: published
+
+published:
+  title: "Published"
+
 
 data:
   title: "Data Files"
