@@ -8,6 +8,11 @@ div#folder_column {
     min-height: 40em;
 }
 
+.folder_hover {
+        background-color: #00008b;
+        color: #d3d3d3;
+}
+
 ul.asset_cards {
     font-size:smaller;
 }

@@ -12,7 +12,7 @@ module FoldersHelper
     tooltip_title_attrib(text, 2000)
   end
 
-  def folder_node_creation_javascript root_folders, root="root",tree_var="tree",map_var="elementFolderIds"
+  def folder_node_creation_javascript root_folders, root="root",map_var="elementFolderIds"
     js="";
     root_folders.each do |folder|
       var = "node#{folder.id}"
@@ -23,6 +23,7 @@ module FoldersHelper
       js << "},#{root});"
       js << "\n\t"
       js << "#{map_var}[#{var}.labelElId]= #{folder.id};" << "\n\t"
+
       js << folder_node_creation_javascript(folder.children,var)
     end
 

@@ -1,17 +1,33 @@
 <script type="text/javascript">
   var tree;
   var elementFolderIds = new Array();
+    function item_dropped_to_folder(element,droppable_element) {
+        var folder_id = elementFolderIds[droppable_element.id];
+        var dropped_id = element.id;
+        alert(folder_id+", "+dropped_id);
+    }
+
     function treeInit() {
         tree = new YAHOO.widget.TreeView("folders");
         root = tree.getRoot();
         <%= folder_node_creation_javascript @folders -%>
+
         tree.render();
+
+        for (var key in elementFolderIds) {
+			if (elementFolderIds.hasOwnProperty(key)) {
+				Droppables.add(key, {accept:'draggable_folder_item', hoverclass:'folder_hover', onDrop:function(element,droppable_element){
+					item_dropped_to_folder(element,droppable_element);
+				}});
+			}
+		}
     }
     function folder_clicked(folder_id,project_id) {
         show_ajax_loader('folder_contents');
         var path = "/projects/"+project_id+"/folders/"+folder_id+"/display_contents";
         new Ajax.Request(path, {asynchronous:true, evalScripts:true});
     }
+
 </script>
 
 <div id="folders">
