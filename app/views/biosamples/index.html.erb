@@ -92,25 +92,34 @@
           selection_box.add(option, null);
         }
 
-        <% Organism.find(:all).each do |organism|%>
-        if ('<%= organism.id -%>' == organism_id){
-                <% (organism.strains.sort_by(&:title).reject{|s| s.is_dummy?}).each do |strain| -%>
-
-                    if ('<%= strain.organism_id -%>' == organism_id){
+        request = new Ajax.Request("<%=url_for(:controller => 'biosamples', :action => 'strains_of_selected_organism')%>", {
+            method: 'get',
+            parameters:{
+                organism_id:organism_id
+            },
+            onSuccess : function(transport){
+                // "true" parameter to evalJSON() activates sanitization of input
+                var data = transport.responseText.evalJSON(true);
+                if (data.status == 200){
+                    var strains = data.strains
+                    for (var i=0; i< strains.length; i++){
                         option = document.createElement("OPTION");
-                        option.text = '<%= escape_javascript(strain.info) -%>';
-                        option.value = '<%= strain.id -%>';
+                        option.text = strains[i][1];
+                        option.value = strains[i][0];
                         try {
                           selection_box.add(option); //for older IE version
                         }
                         catch (ex) {
                           selection_box.add(option, null);
                         }
-                    }
-                 <% end %>
+                   }
+                }
+            },
+            onFailure: function(transport){
+              alert('Something went wrong, please try again...');
+            }
+        });
 
-        }
-        <% end %>
     }
 
     function updateCreatorSettings() {

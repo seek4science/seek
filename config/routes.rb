@@ -34,7 +34,7 @@ ActionController::Routing::Routes.draw do |map|
 
   map.resources :saved_searches
 
-  map.resources :biosamples, :collection=>{:existing_strains=>:get, :existing_specimens=>:get, :existing_samples=>:get, :new_strain_form => :get, :create_strain => :post, :create_specimen_sample => :post}
+  map.resources :biosamples, :collection=>{:existing_strains=>:get, :existing_specimens=>:get, :existing_samples=>:get, :new_strain_form => :get, :create_strain => :post, :create_specimen_sample => :post, :strains_of_selected_organism => :get}
 
   map.resources :data_files, :collection=>{:test_asset_url=>:post},:member => {:download => :get,:plot=>:get, :data => :get,:preview_publish=>:get,:publish=>:post, :request_resource=>:post, :update_annotations_ajax=>:post, :explore=>:get},:new=>{:upload_for_tool => :post}  do |data_file|
     data_file.resources :studied_factors, :collection =>{:create_from_existing=>:post}
