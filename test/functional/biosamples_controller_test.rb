@@ -171,4 +171,12 @@ class BioSamplesControllerTest < ActionController::TestCase
     assert_equal 3, received_strains.count
     assert received_strains.include?([new_strain.id, new_strain.info])
   end
+
+  test 'should have comment and sex fields in the specimen_form' do
+    xhr(:get, :create_sample_popup)
+    assert_response :success
+    assert_select "input#specimen_comments", :count => 1
+    assert_select "select#specimen_sex", :count => 1
+  end
+
 end

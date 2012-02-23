@@ -25,6 +25,16 @@
         </p>
 
         <p style="margin-bottom: 2em">
+          <label style="float: left;"> Sex:</label>
+          <%= select_tag "specimen[sex]",options_for_select([["female",true],["male",false]].insert(0,["Not specified", 0])), :style => 'float:right;width:13.5em;margin-right:30em' -%>
+        </p>
+
+        <p style="margin-bottom: 2em">
+          <label style="float: left;"> Comment:</label>
+          <%= text_field_tag "specimen[comments]", nil, :style => 'float:right;margin-right:30em' %>
+        </p>
+
+        <p style="margin-bottom: 2em">
           <label style="float: left;"> Provider's <%=CELL_CULTURE_OR_SPECIMEN-%> identifier:</label>
           <%= text_field_tag "specimen[provider_id]", nil, :style => 'float:right;margin-right:30em' %>
         </p>
