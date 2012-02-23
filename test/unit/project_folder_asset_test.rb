@@ -40,10 +40,11 @@ class ProjectFolderAssetTest < ActiveSupport::TestCase
     end
   end
 
-  test "asset added to default folder upon creation" do
+  test "assets added to default folder upon creation" do
     pf = Factory :project_folder, :title=>"Unsorted items",:editable=>false,:incoming=>true
     pf2 = Factory :project_folder, :title=>"Unsorted items",:editable=>false,:incoming=>true
     model = Factory.build :model,:projects=>[pf.project,pf2.project],:policy=>Factory(:public_policy)
+
 
     model.save!
 
@@ -94,6 +95,7 @@ class ProjectFolderAssetTest < ActiveSupport::TestCase
     old_presentation=Factory :presentation,:policy=>Factory(:public_policy),:projects=>[proj]
     old_publication=Factory :publication,:policy=>Factory(:public_policy),:projects=>[proj]
     old_datafile=Factory :data_file,:policy=>Factory(:public_policy),:projects=>[proj]
+    old_private_datafile=Factory :data_file,:policy=>Factory(:private_policy),:projects=>[proj]
     old_datafile_other_proj=Factory :model,:policy=>Factory(:public_policy),:projects=>[Factory(:project)]
 
     pf = Factory :project_folder,:project=>proj
@@ -108,12 +110,13 @@ class ProjectFolderAssetTest < ActiveSupport::TestCase
     assert_equal 1,pf.assets.count
     assert pf.assets.include?(already_assigned_sop)
 
-    assert_equal 6,pf_incoming.assets.count
+    assert_equal 7,pf_incoming.assets.count
     assert pf_incoming.assets.include?(old_sop)
     assert pf_incoming.assets.include?(old_model)
     assert pf_incoming.assets.include?(old_presentation)
     assert pf_incoming.assets.include?(old_publication)
     assert pf_incoming.assets.include?(old_datafile)
+    assert pf_incoming.assets.include?(old_private_datafile)
     assert !pf_incoming.assets.include?(old_datafile_other_proj)
 
   end

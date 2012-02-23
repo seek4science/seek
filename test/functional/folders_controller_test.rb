@@ -22,16 +22,19 @@ class FoldersControllerTest < ActionController::TestCase
 
   test "defaults created and old items assigned" do
     sop = Factory :sop, :projects=>[@project],:policy=>Factory(:public_policy)
+    private_sop  = Factory :sop, :projects=>[@project],:policy=>Factory(:private_policy)
     sop2 = Factory :sop, :projects=>[Factory(:project)],:policy=>Factory(:public_policy)
     assert ProjectFolder.root_folders(@project).empty?
 
-    assert_difference("ProjectFolderAsset.count") do
+    assert_difference("ProjectFolderAsset.count",2) do
       get :index,:project_id=>@project.id
     end
 
     @project.reload
     assert !ProjectFolder.root_folders(@project).empty?
+    assert_equal 2, ProjectFolder.new_items_folder(@project).assets.count
     assert ProjectFolder.new_items_folder(@project).assets.include?(sop)
+    assert ProjectFolder.new_items_folder(@project).assets.include?(private_sop)
     assert !ProjectFolder.new_items_folder(@project).assets.include?(sop2)
   end
 

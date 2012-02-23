@@ -18,7 +18,9 @@ class ProjectFolderAsset < ActiveRecord::Base
   def self.assign_existing_assets project
     folder_for_new_assets=ProjectFolder.new_items_folder project
     unless folder_for_new_assets.nil?
-      folder_for_new_assets.add_assets project.assets.select{|a| a.folders.empty?}
+      disable_authorization_checks do
+        folder_for_new_assets.add_assets project.assets.select{|a| a.folders.empty?}
+      end
     end
   end
 end
