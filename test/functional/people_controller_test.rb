@@ -112,7 +112,7 @@ class PeopleControllerTest < ActionController::TestCase
     get :edit, :id => people(:quentin_person)
     assert_response :success
   end
-  
+
   def test_non_admin_cant_edit_someone_else
     login_as(:fred)
     get :edit, :id=> people(:aaron_person)
@@ -449,4 +449,90 @@ class PeopleControllerTest < ActionController::TestCase
     assert person.is_project_manager?
     assert !person.is_pal?
   end
+
+  test 'update roles for yourself, but keep the admin role' do
+    person = User.current_user.person
+    assert person.is_admin?
+    assert_equal 1, person.roles.count
+
+    put :update, :id => person.id, :person => {:id => person.id}, :roles => {:project_manager => true}
+
+    person = assigns(:person)
+    person.reload
+    assert_not_nil person
+    assert person.is_project_manager?
+    assert person.is_admin?
+    assert_equal 2, person.roles.count
+  end
+
+  test 'set the asset manager role for a person' do
+   work_group_id = Factory(:work_group).id
+    assert_difference('Person.count') do
+      assert_difference('NotifieeInfo.count') do
+        post :create, :person => {:first_name=>"assert manager", :email=>"asset_manager@sdfsd.com", :work_group_ids => [work_group_id]}, :roles => {:asset_manager => true}
+      end
+    end
+    person = assigns(:person)
+    person.reload
+    assert_not_nil person
+    assert person.is_asset_manager?
+  end
+
+  test 'admin should see the session of assigning the asset manager role to a person' do
+    person = Factory(:person)
+    get :admin, :id => person
+    puts @response.body
+    assert_select "input#_roles_asset_manager", :count => 1
+  end
+
+  test 'non-admin should not see the session of assigning the asset manager role to a person' do
+    login_as(:aaron)
+    person = Factory(:person)
+    get :admin, :id => person
+    assert_select "input#_roles_asset_manager", :count => 0
+  end
+
+  test 'should show that the person is asset manager for admin' do
+    person = Factory(:person)
+    person.is_asset_manager = true
+    person.save
+    get :show, :id => person
+    assert_select "li", :text => /This person is an asset manager/, :count => 1
+  end
+
+  test 'should not show that the person is asset manager for non-admin' do
+    person = Factory(:person)
+    person.is_asset_manager = true
+    person.save
+    login_as(:aaron)
+    get :show, :id => person
+    assert_select "li", :text => /This person is an asset manager/, :count => 0
+  end
+
+   def test_project_manager_can_administer_others
+    login_as(:project_manager)
+    get :admin, :id=> people(:aaron_person)
+    assert_response :success
+  end
+
+  def test_admin_can_administer_others
+    login_as(:quentin)
+    get :admin, :id=>people(:aaron_person)
+    assert_response :success
+
+  end
+
+  test 'non-admin can not administer others' do
+    login_as(:fred)
+    get :admin, :id=> people(:aaron_person)
+    assert_redirected_to :root
+  end
+
+  test 'can not administer yourself' do
+    aaron = people(:aaron_person)
+    login_as(aaron.user)
+    get :admin, :id=> aaron
+    assert_redirected_to :root
+  end
+
 end

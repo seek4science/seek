@@ -18,6 +18,19 @@ class BiosamplesController < ApplicationController
       end
   end
 
+  def strains_of_selected_organism
+    strains = []
+    if params[:organism_id]
+      organism = Organism.find_by_id params[:organism_id].to_i
+      strains |= organism.strains if organism
+    end
+    respond_to do |format|
+          format.json{
+            render :json => {:status => 200, :strains => strains.sort_by(&:title).reject{|s| s.is_dummy?}.collect{|strain| [strain.id, strain.info]}}
+          }
+    end
+  end
+
   def create_strain_popup
     strain = Strain.find_by_id(params[:strain_id])
     respond_to do  |format|
@@ -129,7 +142,7 @@ class BiosamplesController < ApplicationController
                             (check_box_tag "selected_specimen_#{specimen.id}", specimen.id, false, {:onchange => remote_function(:url => {:controller => 'biosamples', :action => 'existing_samples'}, :with => "'specimen_ids=' + getSelectedSpecimens()") + ";show_existing_samples();" }),
                             specimen.title, specimen.born_info, specimen.culture_growth_type.try(:title), specimen.contributor.try(:person).try(:name), specimen.id, specimen.sop_links.join(", ")]
 
-            page.call :loadNewSpecimenAfterCreation, specimen_array
+            page.call :loadNewSpecimenAfterCreation, specimen_array, specimen.strain.id
         else
           sample_array = [sample.specimen_info,
                           (link_to sample.title, sample_path(sample.id), {:target => '_blank'}),

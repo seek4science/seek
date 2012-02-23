@@ -9,6 +9,11 @@
         <%= image_tag_for_key "lock", url_for({:controller=>:users, :action=>:edit, :id=>@person.user}), "Manage Account", nil, "Manage Account" -%>
     </li>
     <% end -%>
+    <% if (current_user.try :is_admin?) || (current_user.try :is_project_manager?) -%>
+    <li>
+        <%= image_tag_for_key "admin", admin_person_path(@person), "Administer", nil, "Person administration" -%>
+    </li>
+    <% end -%>
     <% if current_user.try :is_admin? -%>
     <li>
         <%= image_tag_for_key "destroy", person_path(@person), "Delete Person", { :confirm => 'Are you sure?', :method => :delete }, "Delete Person" -%>
@@ -91,6 +96,8 @@
 
 
             <%= "<li>This person is a <b>project manager</b></li>" if @person.is_project_manager? %>
+
+            <%= "<li>This person is an <b>asset manager</b></li>" if @person.is_asset_manager? %>
 
             <li>
               Editing <b>projects</b>, where this person is

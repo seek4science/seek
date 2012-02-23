@@ -34,7 +34,7 @@ ActionController::Routing::Routes.draw do |map|
 
   map.resources :saved_searches
 
-  map.resources :biosamples, :collection=>{:existing_strains=>:get, :existing_specimens=>:get, :existing_samples=>:get, :new_strain_form => :get, :create_strain => :post, :create_specimen_sample => :post}
+  map.resources :biosamples, :collection=>{:existing_strains=>:get, :existing_specimens=>:get, :existing_samples=>:get, :new_strain_form => :get, :create_strain => :post, :create_specimen_sample => :post, :strains_of_selected_organism => :get}
 
   map.resources :data_files, :collection=>{:test_asset_url=>:post},:member => {:download => :get,:plot=>:get, :data => :get,:preview_publish=>:get,:publish=>:post, :request_resource=>:post, :update_annotations_ajax=>:post, :explore=>:get},:new=>{:upload_for_tool => :post}  do |data_file|
     data_file.resources :studied_factors, :collection =>{:create_from_existing=>:post}
@@ -54,7 +54,7 @@ ActionController::Routing::Routes.draw do |map|
     :member => { :download => :get, :execute=>:post, :request_resource=>:post,:preview_publish=>:get,:publish=>:post, :builder=>:get, :submit_to_jws=>:post, :simulate=>:post, :update_annotations_ajax=>:post },
     :collection=>{:build=>:get}
 
-  map.resources :people, :collection=>{:select=>:get,:get_work_group =>:get} do |person|
+  map.resources :people, :collection=>{:select=>:get,:get_work_group =>:get}, :member=>{:admin=>:get}  do |person|
     # avatars / pictures 'owned by' person
     person.resources :avatars, :member => { :select => :post }, :collection => { :new => :post }
   end

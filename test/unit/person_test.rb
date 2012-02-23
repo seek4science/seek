@@ -551,21 +551,6 @@ class PersonTest < ActiveSupport::TestCase
     end
   end
 
-  test "publisher can publish items inside their project" do
-    publisher = Factory(:person, :roles => ['publisher'])
-    datafile1 = Factory(:data_file, :projects => publisher.projects)
-    datafile2 = Factory(:data_file)
-
-    ability = Ability.new(publisher.user)
-
-    assert ability.can? :publish, datafile1
-    assert ability.cannot? :publish, datafile2
-    User.with_current_user publisher.user do
-      assert datafile1.can_publish?
-      assert !datafile2.can_publish?
-    end
-  end
-
   test 'replace admins, pals named_scope by a static function' do
     admins = Person.admins
     assert_equal 1, admins.count
@@ -575,4 +560,5 @@ class PersonTest < ActiveSupport::TestCase
     assert_equal 1, pals.count
     assert pals.include?(people(:pal))
   end
+
 end

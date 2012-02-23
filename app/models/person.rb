@@ -70,7 +70,7 @@ class Person < ActiveRecord::Base
   has_many :subscriptions,:dependent => :destroy
   before_create :set_default_subscriptions
 
-  ROLES = %w[admin pal project_manager publisher]
+  ROLES = %w[admin pal project_manager asset_manager publisher]
   ROLES_MASK_FOR_ADMIN = 2**ROLES.index('admin')
   ROLES_MASK_FOR_PAL = 2**ROLES.index('pal')
   ROLES_MASK_FOR_PROJECT_MANAGER = 2**ROLES.index('project_manager')
@@ -349,7 +349,7 @@ class Person < ActiveRecord::Base
     #if not or if only the contributor then assign the manage right to pis||pals
     person_related_items.each do |item|
       people_can_manage_item = item.people_can_manage
-      if people_can_manage_item.blank? || (people_can_manage_item == [[id, "#{first_name} #{last_name}", Policy::MANAGING]])
+      if people_can_manage_item.blank? || (people_can_manage_item == [[id, "#{name}", Policy::MANAGING]])
         #find the projects which this person and item belong to
         projects_in_common = projects & item.projects
         pis = projects_in_common.collect{|p| p.pis}.flatten.uniq

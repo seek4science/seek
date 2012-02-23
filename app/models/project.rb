@@ -81,6 +81,7 @@ class Project < ActiveRecord::Base
     end
   end
 
+  #this role is in project roles
   def pals
     pal_role=ProjectRole.pal_role
     people.select{|p| p.is_pal?}.select do |possible_pal|
@@ -88,10 +89,16 @@ class Project < ActiveRecord::Base
     end
   end
 
+  #this role is in project roles
   def pis
     pi_role = ProjectRole.find_by_name('PI')
     people.select{|p| p.project_roles.include?(pi_role)}
     end
+
+  #this role is in seek roles
+  def asset_managers
+    people.select{|p| p.is_asset_manager?}
+  end
 
   def locations
     # infer all project's locations from the institutions where the person is member of

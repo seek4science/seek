@@ -43,17 +43,31 @@
     check_show_existing_strains('strain_organism_ids', 'existing_strains', '<%=url_for(:controller => 'biosamples', :action => 'existing_strains')-%>');
 
     function loadNewStrainAfterCreation(strain, organism) {
-        var nodes = strain_table.fnGetNodes();
-        if ($j(nodes).filter(organism).length == 1) {
+        var data = strain_table.fnGetData();
+        var load = false;
+        for (var i=0;i<data.length; i++){
+            var pattern = new RegExp(organism);
+            if (pattern.test(data[i][0]))
+                load = true;
+        }
+
+        if (load) {
             var a = strain_table.fnAddData(strain);
             var nTr = strain_table.fnSettings().aoData[a[0]].nTr;
             $j(nTr).addClass('gradeA');
         }
     }
 
-    function loadNewSpecimenAfterCreation(specimen) {
-        var nodes = specimen_table.fnGetNodes();
-        if ($j(nodes).filter('ID='+specimen[6].toString()).length == 1) {
+    function loadNewSpecimenAfterCreation(specimen, strain_id) {
+        var data = specimen_table.fnGetData();
+        var load = false;
+        for (var i=0;i<data.length; i++){
+            var pattern = new RegExp('ID='+ new Number(strain_id).toString());
+            if (pattern.test(data[i][0]))
+                load = true;
+        }
+
+        if (load) {
             specimen_table.fnAddData(specimen);
         }
     }
@@ -78,20 +92,33 @@
           selection_box.add(option, null);
         }
 
-        <% (Strain.find(:all).sort_by(&:title).reject{|s| s.is_dummy?}).each do |strain| -%>
-
-            if ('<%= strain.organism_id -%>' == organism_id){
-                option = document.createElement("OPTION");
-                option.text = '<%= escape_javascript(strain.info) -%>';
-                option.value = '<%= strain.id -%>';
-                try {
-                  selection_box.add(option); //for older IE version
+        request = new Ajax.Request("<%=url_for(:controller => 'biosamples', :action => 'strains_of_selected_organism')%>", {
+            method: 'get',
+            parameters:{
+                organism_id:organism_id
+            },
+            onSuccess : function(transport){
+                // "true" parameter to evalJSON() activates sanitization of input
+                var data = transport.responseText.evalJSON(true);
+                if (data.status == 200){
+                    var strains = data.strains
+                    for (var i=0; i< strains.length; i++){
+                        option = document.createElement("OPTION");
+                        option.text = strains[i][1];
+                        option.value = strains[i][0];
+                        try {
+                          selection_box.add(option); //for older IE version
+                        }
+                        catch (ex) {
+                          selection_box.add(option, null);
+                        }
+                   }
                 }
-                catch (ex) {
-                  selection_box.add(option, null);
-                }
+            },
+            onFailure: function(transport){
+              alert('Something went wrong, please try again...');
             }
-         <% end %>
+        });
 
     }
 

@@ -153,4 +153,22 @@ class BioSamplesControllerTest < ActionController::TestCase
       end
     end
   end
+
+  test "should update the strain list in specimen_form" do
+    organism = organisms(:yeast)
+    strains = organism.strains
+    assert_equal 2, strains.select{|s| !s.is_dummy?}.count
+    new_strain = Factory(:strain, :organism => organism)
+    organism.reload
+    strains =  organism.strains
+    assert_equal 3, strains.select{|s| !s.is_dummy?}.count
+
+    xml_http_request(:get, :strains_of_selected_organism, {:organism_id => organism.id})
+
+    received_data = ActiveSupport::JSON.decode(@response.body)
+    assert 200, received_data['status']
+    received_strains = received_data["strains"]
+    assert_equal 3, received_strains.count
+    assert received_strains.include?([new_strain.id, new_strain.info])
+  end
 end
