@@ -19,6 +19,14 @@ module PeopleHelper
     person.is_admin? ? image("admin",:alt=>"Admin",:title=>tooltip_title_attrib("#{Seek::Config.dm_project_name} Administrator"), :style=>"vertical-align: middle") : ""
   end
 
+  def asset_manager_icon person
+    person.is_asset_manager? ? image("asset_manager", :alt=>"Asset Manager", :title=>tooltip_title_attrib("#{Seek::Config.dm_project_name} Asset Manager"), :style=>"vertical-align: middle") : ""
+  end
+
+  def project_manager_icon person
+    person.is_project_manager? ? image("project_manager", :alt=>"Project Manager", :title=>tooltip_title_attrib("#{Seek::Config.dm_project_name} Project Manager"), :style=>"vertical-align: middle") : ""
+  end
+
   def discipline_list person
     unless person.disciplines.empty?
       text=""

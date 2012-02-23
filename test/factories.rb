@@ -30,6 +30,10 @@
     f.is_asset_manager true
   end
 
+  Factory.define(:project_manager,:parent=>:person) do |f|
+    f.is_project_manager true
+  end
+
   Factory.define(:publisher,:parent=>:person) do |f|
     f.is_publisher true
   end

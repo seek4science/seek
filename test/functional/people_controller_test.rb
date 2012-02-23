@@ -481,7 +481,6 @@ class PeopleControllerTest < ActionController::TestCase
   test 'admin should see the session of assigning the asset manager role to a person' do
     person = Factory(:person)
     get :admin, :id => person
-    puts @response.body
     assert_select "input#_roles_asset_manager", :count => 1
   end
 
@@ -534,5 +533,42 @@ class PeopleControllerTest < ActionController::TestCase
     get :admin, :id=> aaron
     assert_redirected_to :root
   end
+
+  test 'should have asset manager icon on person show page' do
+    asset_manager = Factory(:asset_manager)
+    get :show, :id => asset_manager
+    assert_select "img[src=/images/famfamfam_silk/medal_silver_2.png?1329333770]", :count => 1
+  end
+
+  test 'should have asset manager icon on people index page' do
+    i = 0
+    while i < 5 do
+      Factory(:asset_manager)
+      i += 1
+    end
+    get :index
+    asset_manager_number = assigns(:people).select(&:is_asset_manager?).count
+    assert_select "img[src=/images/famfamfam_silk/medal_silver_2.png?1329333770]", :count => asset_manager_number
+  end
+
+  test 'should have project manager icon on person show page' do
+    project_manager = Factory(:project_manager)
+    get :show, :id => project_manager
+    assert_select "img[src=/images/famfamfam_silk/medal_gold_1.png?1329333770]", :count => 1
+  end
+
+  test 'should have project manager icon on people index page' do
+    i = 0
+    while i < 5 do
+      Factory(:project_manager)
+      i += 1
+    end
+
+    get :index
+
+    project_manager_number = assigns(:people).select(&:is_project_manager?).count
+    assert_select "img[src=/images/famfamfam_silk/medal_gold_1.png?1329333770]", :count => project_manager_number
+  end
+
 
 end
