@@ -1,0 +1,13 @@
+<% folder = folder_details -%>
+
+<p>Contents for Folder <%= h(folder.title) -%></p>
+<% if folder.editable? -%>
+    <p>
+      <% form_remote_tag :url=>{:action=>:create_folder,:id=>folder.id} do -%>
+      <%= label_tag "New child folder" -%>
+      <%= hidden_field_tag :project_id,folder.project.id -%>
+      <%= text_field_tag :title -%>
+      <%= submit_tag(:create) -%>
+      <% end -%>
+    </p>
+<% end -%>

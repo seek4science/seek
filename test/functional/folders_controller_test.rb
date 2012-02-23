@@ -119,6 +119,14 @@ class FoldersControllerTest < ActionController::TestCase
     assert_equal [sop],folder.assets
   end
 
+  test "create a new child folder" do
+      folder = Factory :project_folder, :project=>@project
+      assert_difference("ProjectFolder.count") do
+        xhr(:post,:create_folder,{:project_id=>@project.id,:id=>folder.id,:title=>"fred"})
+      end
+      assert_response :success
+  end
+
   test "authorization on assets" do
     sop = Factory :sop, :projects=>[@project],:policy=>Factory(:public_policy),:description=>"Ryz9z3Z9h70wzJ243we6k8RO5xI5f3UF"
     hidden_sop = Factory :sop,:projects=>[@project],:policy=>Factory(:private_policy),:description=>"viu2q6ng3iZ0ppS5X679pPo11LfF62pS"

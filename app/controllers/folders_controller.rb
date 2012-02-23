@@ -1,7 +1,7 @@
 class FoldersController < ApplicationController
   before_filter :login_required
   before_filter :check_project
-  before_filter :get_folders,:only=>[:index,:move_asset_to]
+  before_filter :get_folders,:only=>[:index,:move_asset_to,:create_folder]
 
   def show
     respond_to do |format|
@@ -18,6 +18,17 @@ class FoldersController < ApplicationController
   def nuke
       ProjectFolder.nuke @project
       redirect_to project_folders_path(@project)
+  end
+
+  def create_folder
+    folder=ProjectFolder.find(params[:id])
+    title=params[:title]
+    folder.add_child(title)
+    folder.save!
+    render :update do |page|
+      page.reload
+    end
+
   end
 
   #moves the asset identified by :asset_id and :asset_type from this folder to the folder identified by :dest_folder_id

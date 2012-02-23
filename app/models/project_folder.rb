@@ -72,6 +72,10 @@ class ProjectFolder < ActiveRecord::Base
     ProjectFolder.root_folders project
   end
 
+  #adds a child with the given title, and makes sure the project is set correctly
+  def add_child title
+    children << ProjectFolder.new(:title=>title)
+  end
 
   def add_assets assets
     assets = Array(assets)

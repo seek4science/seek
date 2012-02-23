@@ -15,8 +15,23 @@ class ProjectFolderTest < ActiveSupport::TestCase
   end
 
 
-
   test "add child" do
+    pf = Factory :project_folder
+    assert_difference("ProjectFolder.count") do
+       pf.add_child "fish"
+       pf.save!
+    end
+
+     pf.reload
+     assert_equal 1,pf.children.count
+     assert_equal pf.project,pf.children.first.project
+     assert_equal pf,pf.children.first.parent
+     assert_equal "fish",pf.children.first.title
+     assert pf.children.first.editable?
+     assert !pf.children.first.incoming?
+  end
+
+  test "adding children" do
      pf = Factory :project_folder
 
      pf2 = ProjectFolder.new :title=>"one"
@@ -42,6 +57,8 @@ class ProjectFolderTest < ActiveSupport::TestCase
 
      assert_equal "one",pf.children[0].title
      assert_equal "two",pf.children[1].title
+
+
   end
 
   test "root folders" do
