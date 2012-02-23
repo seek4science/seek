@@ -11,7 +11,7 @@
         </div>
         <div class="yui-u">
             <div id="folder_contents">
-                <h1>This is where the contents go</h1>
+                <%= render :partial=>"contents",:locals=>{:folder=>initial_folder(@project)} -%>
             </div>
         </div>
     </div>
@@ -21,3 +21,4 @@
   <h3>Dev tools</h3>
   <%= link_to "Nuke",nuke_project_folders_path(@project),:method=>:post %>
 </div>
+

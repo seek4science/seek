@@ -30,4 +30,24 @@ module FoldersHelper
     js
   end
 
+  #returns the last opened folder_id for the given project according to the cookie :folder_id
+  def last_opened_folder_id project
+    cooky = cookies[:folder_browsed_json]
+    cooky||={}.to_json
+    cooky = ActiveSupport::JSON.decode(cooky)
+    folder_id = cooky[project.id.to_s]
+
+    if folder_id
+      folder_id = nil if !ProjectFolder.find_by_id(folder_id)
+    end
+
+    folder_id ||= ProjectFolder.new_items_folder(project).id
+    folder_id
+  end
+
+
+  def initial_folder project
+    folder = ProjectFolder.find(last_opened_folder_id(project))
+  end
+
 end

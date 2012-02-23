@@ -9,12 +9,12 @@
         tree.render();
 
         for (var key in elementFolderIds) {
-			if (elementFolderIds.hasOwnProperty(key)) {
-				Droppables.add(key, {accept:'draggable_folder_item', hoverclass:'folder_hover', onDrop:function(element,droppable_element){
-					item_dropped_to_folder(element,droppable_element,<%= @project.id -%>);
-				}});
-			}
-		}
+            if (elementFolderIds.hasOwnProperty(key)) {
+                Droppables.add(key, {accept:'draggable_folder_item', hoverclass:'folder_hover', onDrop:function(element, droppable_element) {
+                    item_dropped_to_folder(element, droppable_element, <%= @project.id -%>);
+                }});
+            }
+        }
     }
 </script>
 
@@ -22,7 +22,9 @@
 
 </div>
 
-
 <script type="text/javascript">
     treeInit();
+    focus_folder(<%= last_opened_folder_id(@project) -%>);
 </script>
+
+

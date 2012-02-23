@@ -49,8 +49,24 @@ class FoldersController < ApplicationController
     end
   end
 
+  def store_folder_cookie
+    cooky=cookies[:folder_browsed_json]
+    Rails.logger.error "Old cookie value: #{cooky}"
+    cooky||={}.to_json
+    folder_browsed=ActiveSupport::JSON.decode(cooky)
+    folder_browsed[@project.id.to_s]=params[:id]
+    Rails.logger.error "New cookie value: #{folder_browsed.to_json}"
+
+    cookies[:folder_browsed_json]=folder_browsed.to_json
+  end
+
   def display_contents
     folder = ProjectFolder.find(params[:id])
+    begin
+      store_folder_cookie()
+    rescue Exception=>e
+      Rails.logger.error("Error reading cookie for last folder browser - #{e.message}")
+    end
     render :update do |page|
       page.replace_html "folder_contents",:partial=>"contents",:locals=>{:folder=>folder}
     end
