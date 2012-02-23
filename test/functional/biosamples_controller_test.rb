@@ -179,4 +179,9 @@ class BioSamplesControllerTest < ActionController::TestCase
     assert_select "select#specimen_sex", :count => 1
   end
 
+  test 'should have organism_part in the sample_form' do
+    xhr(:get, :create_sample_popup)
+    assert_response :success
+    assert_select "select#sample_organism_part", :count => 1
+  end
 end
