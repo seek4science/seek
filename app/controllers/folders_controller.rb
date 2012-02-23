@@ -29,9 +29,11 @@ class FoldersController < ApplicationController
     render :update do |page|
       if (params[:dest_folder_element_id])
         page[params[:dest_folder_element_id]].update(dest_folder.label)
+        #page[params[:dest_folder_element_id]].highlight
       end
       if (params[:origin_folder_element_id])
         page[params[:origin_folder_element_id]].update(this_folder.label)
+        #page[params[:origin_folder_element_id]].highlight
       end
     end
   end
