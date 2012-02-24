@@ -9,6 +9,7 @@ class PeopleController < ApplicationController
   before_filter :is_user_admin_or_personless, :only=>[:new]
   before_filter :auth_params,:only=>[:update,:create]
   before_filter :is_admin_or_is_project_manager, :only=>[:admin]
+  before_filter :do_projects_belong_to_project_manager_projects,:only=>[:update,:create]
 
   skip_before_filter :project_membership_required
   skip_before_filter :profile_for_login_required,:only=>[:select,:userless_project_selected_ajax,:create]
@@ -238,7 +239,7 @@ class PeopleController < ApplicationController
       format.xml  { head :ok }
     end
   end
-  
+
   def userless_project_selected_ajax
     project_id=params[:project_id]
     unless project_id=="0"
@@ -359,5 +360,27 @@ class PeopleController < ApplicationController
         end
     end
     details
+  end
+
+  def do_projects_belong_to_project_manager_projects
+    if (params[:person] and params[:person][:work_group_ids])
+      if current_user.try(:person).try(:is_project_manager?) && !current_user.try(:person).try(:is_admin?)
+        projects = []
+        params[:person][:work_group_ids].each do |id|
+          work_group = WorkGroup.find_by_id(id)
+          project = work_group.try(:project)
+          projects << project unless project.nil?
+        end
+        project_manager_projects = current_user.person.projects
+        flag = true
+        projects.each do |project|
+          flag = false if !project_manager_projects.include? project
+        end
+        if flag == false
+          error("Project manager can not assign person to the projects that they are not in","Is invalid")
+        end
+        return flag
+      end
+    end
   end
 end

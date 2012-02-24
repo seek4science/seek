@@ -570,5 +570,62 @@ class PeopleControllerTest < ActionController::TestCase
     assert_select "img[src=/images/famfamfam_silk/medal_gold_1.png?1329333770]", :count => project_manager_number
   end
 
+  test "allow project manager to assign people into only their projects" do
+    project_manager = Factory(:project_manager)
 
+    project_manager_work_group_ids = project_manager.projects.collect(&:work_groups).flatten.collect(&:id)
+    a_person = Factory(:person)
+
+    login_as(project_manager.user)
+    put :update, :id => a_person, :person => { :work_group_ids => project_manager_work_group_ids}
+
+    assert_redirected_to person_path(assigns(:person))
+    assert_equal project_manager.projects.sort(&:title), assigns(:person).projects.sort(&:title)
+  end
+
+  test "not allow project manager to assign people into projects that they are not in" do
+    project_manager = Factory(:project_manager)
+    a_person = Factory(:person)
+    a_work_group = Factory(:work_group)
+    assert_not_nil a_work_group.project
+
+    login_as(project_manager.user)
+    put :update, :id => a_person, :person => { :work_group_ids => [a_work_group.id]}
+
+    assert_redirected_to :root
+    assert_not_nil flash[:error]
+    assert !a_person.projects.include?(a_work_group.project)
+  end
+
+  test "project manager see only their projects to assign people into" do
+    project_manager = Factory(:project_manager)
+    a_person = Factory(:person)
+
+    login_as(project_manager.user)
+    get :admin, :id => a_person
+
+    assert_response :success
+
+    project_manager.projects.each do |project|
+      assert_select "optgroup[label=?]", project.title, :count => 1 do
+        project.institutions.each do |institution|
+          assert_select 'option', :text => institution.title, :count => 1
+        end
+      end
+    end
+  end
+
+  test "project manager dont see the projects that they are not in to assign people into" do
+    project_manager = Factory(:project_manager)
+    a_person = Factory(:person)
+    a_work_group = Factory(:work_group)
+    assert_not_nil a_work_group.project
+
+    login_as(project_manager.user)
+    get :admin, :id => a_person
+
+    assert_response :success
+    assert_select "optgroup[label=?]", a_work_group.project.title, :count => 0
+    assert_select 'option', :text => a_work_group.institution.title, :count => 0
+  end
 end
