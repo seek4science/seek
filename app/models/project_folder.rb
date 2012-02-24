@@ -104,13 +104,16 @@ class ProjectFolder < ActiveRecord::Base
   #temporary method to destroy folders for a project, useful whilst developing
   def self.nuke project
     folders = ProjectFolder.find(:all,:conditions=>{:project_id=>project.id})
+    folder_assets = ProjectFolderAsset.all.select{|pfa| pfa.project_folder.try(:project_id)==project}
+    folder_assets.each {|a| a.destroy}
     folders.each {|f| f.destroy}
+
   end
 
   def unsort_assets_and_remove_children
 
     new_items_folder=ProjectFolder.new_items_folder(project)
-    if (new_items_folder)
+    if (new_items_folder && !self.incoming?)
       disable_authorization_checks do
         new_items_folder.add_assets(assets)
       end

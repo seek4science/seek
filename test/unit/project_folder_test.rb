@@ -20,9 +20,7 @@ class ProjectFolderTest < ActiveSupport::TestCase
 
     child=pf.add_child("fred")
     inner_child=child.add_child("frog")
-    pf.save!
-    child.save!
-    inner_child.save!
+
     pf.reload
     assets=[Factory(:sop,:projects=>[p]),Factory(:data_file,:projects=>[p]), Factory(:model,:projects=>[p])]
     assets2=[Factory(:sop,:projects=>[p]), Factory(:model,:projects=>[p])]
@@ -40,9 +38,9 @@ class ProjectFolderTest < ActiveSupport::TestCase
     end
 
     assert_difference("ProjectFolder.count",-3) do
-      #assert_no_difference("ProjectFolderAsset.count") do
+      assert_no_difference("ProjectFolderAsset.count") do
         pf.destroy
-      #end
+      end
     end
 
     p.reload
@@ -52,6 +50,26 @@ class ProjectFolderTest < ActiveSupport::TestCase
     assert_equal all_assets.count,unsorted_folder.assets.count
     assert_equal all_assets.sort_by(&:title),unsorted_folder.assets.sort_by(&:title)
 
+  end
+
+  test "dont move assets if folder being destroyed is incoming" do
+    p = Factory :project
+    assets=[Factory(:sop,:projects=>[p]),Factory(:data_file,:projects=>[p]), Factory(:model,:projects=>[p])]
+    incoming=Factory :project_folder,:project=>p,:incoming=>true
+
+    disable_authorization_checks do
+      assert_difference("ProjectFolderAsset.count",3) do
+        incoming.add_assets(assets)
+      end
+    end
+
+    assert_difference("ProjectFolder.count",-1) do
+      assert_difference("ProjectFolderAsset.count",-3) do
+        incoming.destroy
+      end
+    end
+
+    assert ProjectFolder.find(:all,:conditions=>{:project_id=>p.id}).empty?
   end
 
   test "add child" do
