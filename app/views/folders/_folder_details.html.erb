@@ -2,6 +2,7 @@
    @folder = folder_details
    @folder.description = "" if @folder.description.blank?
 -%>
+<% if @folder.editable? -%>
 
 <p>
   <span id="title_label">Title: </span>
@@ -20,6 +21,7 @@
         :external_control=>"description_label",
         :url=>url_for(:project_id=>@project.id,:action=>:set_project_folder_description,:id=>@folder.id)} -%>
 </p>
+
 <% unsorted_folder = ProjectFolder.new_items_folder(@project).try(:title) -%>
 <%= image_tag_for_key "destroy", project_folder_path(@project,@folder),
                       "Delete",
@@ -27,9 +29,6 @@
                         :method => :delete },
                       "Delete"
 -%>
-
-
-<% if @folder.editable? -%>
     <p>
       <% form_remote_tag :url=>{:action=>:create_folder,:id=>@folder.id},:html=>{:id=>:create_child_form} do -%>
       <%= label_tag "New child folder" -%>
@@ -38,4 +37,8 @@
       <%= submit_tag(:create,:onclick=>"javascript: create_child();") -%>
       <% end -%>
     </p>
+<% else -%>
+    Title: <%= h(@folder.title) -%>
+    <br/>
 <% end -%>
+<hr/>
