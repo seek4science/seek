@@ -19,6 +19,7 @@ require 'modporter_extensions'
 require 'seek/taggable'
 require 'sunspot_rails'
 require 'cancan'
+require 'in_place_editing'
 
 GLOBAL_PASSPHRASE="ohx0ipuk2baiXah" unless defined? GLOBAL_PASSPHRASE
 

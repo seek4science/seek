@@ -29,6 +29,7 @@ GEM
     fastthread (1.0.7)
     gem_plugin (0.2.3)
     hpricot (0.8.4)
+    in_place_editing (1.1.2)
     libxml-ruby (2.2.2)
     mime-types (1.16)
     mongrel (1.1.5)
@@ -93,6 +94,7 @@ DEPENDENCIES
   factory_girl
   fastercsv (= 1.5.1)
   hpricot (~> 0.8.2)
+  in_place_editing
   libxml-ruby (= 2.2.2)
   mongrel
   mysql

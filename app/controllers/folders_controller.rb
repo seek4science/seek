@@ -1,7 +1,12 @@
+
+
 class FoldersController < ApplicationController
   before_filter :login_required
   before_filter :check_project
   before_filter :get_folders,:only=>[:index,:move_asset_to,:create_folder]
+
+  in_place_edit_for :project_folder, :title
+  in_place_edit_for :project_folder, :description
 
   def show
     respond_to do |format|
