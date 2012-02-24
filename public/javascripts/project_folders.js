@@ -35,13 +35,17 @@ function folder_clicked(folder_id, project_id) {
 }
 
 function create_child() {
-    var title = $("create_child_form").title.value;
+    var child_form = $("create_child_form");
+    var title = child_form.title.value;
     if (title.strip().length<2) {
         alert("New folder name is too short.");
     }
     else {
-        $("create_child_form").commit.disable();
-        $("create_child_form").submit();
+        child_form.commit.disable();
+        child_form.commit.value="Creating ...";
+        if(child_form.onsubmit()){
+            child_form.submit();
+        }
     }
 }
 
