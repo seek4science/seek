@@ -481,7 +481,6 @@ class PeopleControllerTest < ActionController::TestCase
   test 'admin should see the session of assigning the asset manager role to a person' do
     person = Factory(:person)
     get :admin, :id => person
-    puts @response.body
     assert_select "input#_roles_asset_manager", :count => 1
   end
 
