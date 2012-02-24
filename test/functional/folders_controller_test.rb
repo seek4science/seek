@@ -1,6 +1,7 @@
 require 'test_helper'
 
 class FoldersControllerTest < ActionController::TestCase
+
   fixtures :all
   include AuthenticatedTestHelper
 
@@ -18,6 +19,46 @@ class FoldersControllerTest < ActionController::TestCase
   test "access as member" do
     get :index,:project_id=>@project.id
     assert_response :success
+  end
+
+  test "delete" do
+    sop = Factory :sop, :projects=>[@project],:policy=>Factory(:public_policy)
+    folder = Factory :project_folder,:project=>@project
+    folder.add_assets(sop)
+    child = folder.add_child("fred")
+    child.save!
+    unsorted_folder = Factory :project_folder,:project=>@project,:incoming=>true
+
+    assert_difference("ProjectFolder.count",-2) do
+      delete :destroy, :id => folder,:project_id=>@project.id
+    end
+
+    assert_redirected_to :project_folders
+    unsorted_folder.reload
+    @project.reload
+    assert_equal [unsorted_folder],ProjectFolder.find(:all,:conditions=>{:project_id=>@project.id})
+    assert_equal [sop],unsorted_folder.assets
+  end
+
+  test "cannot delete other project" do
+    project = Factory :project
+    sop = Factory :sop, :projects=>[project],:policy=>Factory(:public_policy)
+    folder = Factory :project_folder,:project=>project
+    folder.add_assets(sop)
+    child = folder.add_child("fred")
+    child.save!
+    unsorted_folder = Factory :project_folder,:project=>project,:incoming=>true
+
+    assert_no_difference("ProjectFolder.count") do
+      delete :destroy, :id => folder,:project_id=>project.id
+    end
+
+    assert_redirected_to :root
+    unsorted_folder.reload
+    @project.reload
+    assert_equal [folder,child,unsorted_folder],ProjectFolder.find(:all,:conditions=>{:project_id=>project.id}).sort_by(&:id)
+    assert_equal [],unsorted_folder.assets
+    assert_equal [sop],folder.assets
   end
 
   test "defaults created and old items assigned" do

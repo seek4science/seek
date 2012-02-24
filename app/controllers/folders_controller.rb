@@ -15,6 +15,14 @@ class FoldersController < ApplicationController
     end
   end
 
+  def destroy
+    folder=ProjectFolder.find(params[:id])
+    folder.destroy
+    respond_to do |format|
+      format.html { redirect_to(:project_folders) }
+    end
+  end
+
   def nuke
       ProjectFolder.nuke @project
       redirect_to project_folders_path(@project)
