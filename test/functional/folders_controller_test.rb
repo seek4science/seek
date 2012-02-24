@@ -45,7 +45,7 @@ class FoldersControllerTest < ActionController::TestCase
     assert_no_difference("ProjectFolder.count") do
       get :index,:project_id=>@project.id
     end
-    assert_equal 1,ProjectFolder.root_folders(@project).count
+    assert_equal [folder],ProjectFolder.root_folders(@project)
   end
 
 

@@ -1,3 +1,6 @@
+<%
+    default_folder = initial_folder(@project)
+%>
 <%= render :partial=>"yui_css_and_js" -%>
 
 <%= render :partial => "layouts/item_title",:locals=>{:title=>"Asset browser for the project '#{link_to h(@project.title),@project}'"} -%>
@@ -11,7 +14,7 @@
         </div>
         <div class="yui-u">
             <div id="folder_contents">
-                <%= render :partial=>"contents",:locals=>{:folder=>initial_folder(@project)} -%>
+                <%= render :partial=>"contents",:locals=>{:folder=>default_folder} if default_folder -%>
             </div>
         </div>
     </div>

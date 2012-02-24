@@ -30,7 +30,7 @@ module FoldersHelper
     js
   end
 
-  #returns the last opened folder_id for the given project according to the cookie :folder_id
+  #returns the last opened folder_id for the given project according to the decoded cookie :folder_browsed_json
   def last_opened_folder_id project
     cooky = cookies[:folder_browsed_json]
     cooky||={}.to_json
@@ -41,13 +41,14 @@ module FoldersHelper
       folder_id = nil if !ProjectFolder.find_by_id(folder_id)
     end
 
-    folder_id ||= ProjectFolder.new_items_folder(project).id
+    folder_id ||= ProjectFolder.new_items_folder(project).try(:id)
     folder_id
   end
 
 
   def initial_folder project
-    folder = ProjectFolder.find(last_opened_folder_id(project))
+    last_id = last_opened_folder_id(project)
+    folder = ProjectFolder.find_by_id(last_id)
   end
 
 end
