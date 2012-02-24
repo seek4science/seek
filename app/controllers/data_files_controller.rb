@@ -331,7 +331,7 @@ end
       #FIXME: Annotations need to be specific to version
       @spreadsheet.annotations = @display_data_file.spreadsheet_annotations
       respond_to do |format|
-        format.html { render :layout=>"minimal" }
+        format.html
       end
     else
      respond_to do |format|
