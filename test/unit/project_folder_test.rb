@@ -14,16 +14,57 @@ class ProjectFolderTest < ActiveSupport::TestCase
     assert !pf.valid?
   end
 
+  test "destroy" do
+    p = Factory :project
+    pf = Factory :project_folder,:project=>p
+
+    child=pf.add_child("fred")
+    inner_child=child.add_child("frog")
+    pf.save!
+    child.save!
+    inner_child.save!
+    pf.reload
+    assets=[Factory(:sop,:projects=>[p]),Factory(:data_file,:projects=>[p]), Factory(:model,:projects=>[p])]
+    assets2=[Factory(:sop,:projects=>[p]), Factory(:model,:projects=>[p])]
+    assets3=[Factory(:sop,:projects=>[p]), Factory(:presentation,:projects=>[p])]
+    all_assets = assets | assets2 | assets3
+
+    #this needs creating after the assets, otherwise they will be automatically added to it when created!
+    unsorted_folder = Factory :project_folder,:project=>p, :incoming=>true
+    assert unsorted_folder.assets.empty?
+
+    disable_authorization_checks do
+      pf.add_assets(assets)
+      child.add_assets(assets2)
+      inner_child.add_assets(assets3)
+    end
+
+    assert_difference("ProjectFolder.count",-3) do
+      #assert_no_difference("ProjectFolderAsset.count") do
+        pf.destroy
+      #end
+    end
+
+    p.reload
+    unsorted_folder.reload
+    assert_equal 1,ProjectFolder.find(:all,:conditions=>{:project_id=>p.id}).count
+    assert_equal unsorted_folder,ProjectFolder.find(:all,:conditions=>{:project_id=>p.id}).first
+    assert_equal all_assets.count,unsorted_folder.assets.count
+    assert_equal all_assets.sort_by(&:title),unsorted_folder.assets.sort_by(&:title)
+
+  end
 
   test "add child" do
     pf = Factory :project_folder
+    new_child=nil
     assert_difference("ProjectFolder.count") do
-       pf.add_child "fish"
+       new_child = pf.add_child "fish"
        pf.save!
     end
 
      pf.reload
      assert_equal 1,pf.children.count
+     assert_equal new_child,pf.children.first
      assert_equal pf.project,pf.children.first.project
      assert_equal pf,pf.children.first.parent
      assert_equal "fish",pf.children.first.title

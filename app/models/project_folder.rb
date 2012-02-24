@@ -4,6 +4,8 @@ class ProjectFolder < ActiveRecord::Base
   has_many :children,:class_name=>"ProjectFolder",:foreign_key=>:parent_id, :order=>:title, :after_add=>:update_child
   has_many :project_folder_assets, :dependent=>:destroy
 
+  before_destroy :unsort_assets_and_remove_children
+
 
   named_scope :root_folders, lambda { |project| {
     :conditions=>{:project_id=>project.id,:parent_id=>nil},:order=>"LOWER(title)"
@@ -74,7 +76,9 @@ class ProjectFolder < ActiveRecord::Base
 
   #adds a child with the given title, and makes sure the project is set correctly
   def add_child title
-    children << ProjectFolder.new(:title=>title)
+    child = ProjectFolder.new(:title=>title)
+    children << child
+    child
   end
 
   def add_assets assets
@@ -85,6 +89,7 @@ class ProjectFolder < ActiveRecord::Base
     end
   end
 
+  #moves assets to this folder, from the source folder (source folder needed incase the asset belongs to more than 1 folder)
   def move_assets assets,source_folder
     assets=Array(assets)
     if (project_id == source_folder.project_id)
@@ -100,6 +105,17 @@ class ProjectFolder < ActiveRecord::Base
   def self.nuke project
     folders = ProjectFolder.find(:all,:conditions=>{:project_id=>project.id})
     folders.each {|f| f.destroy}
+  end
+
+  def unsort_assets_and_remove_children
+
+    new_items_folder=ProjectFolder.new_items_folder(project)
+    if (new_items_folder)
+      disable_authorization_checks do
+        new_items_folder.add_assets(assets)
+      end
+    end
+    children.destroy_all
   end
 
 end

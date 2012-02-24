@@ -422,5 +422,5 @@ end
 
   Factory.define :project_folder do |f|
     f.association :project, :factory=>:project
-    f.sequence(:title) {|n| "project foler #{n}"}
+    f.sequence(:title) {|n| "project folder #{n}"}
   end
