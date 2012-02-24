@@ -193,7 +193,27 @@ class ProjectsControllerTest < ActionController::TestCase
 			assert_select "a",:count=>1
 			assert_select "a[href=?]",person_path(people(:pal)),:text=>"A PAL",:count=>1
 		end
-	end
+  end
+
+  	test "asset_managers displayed in show page" do
+    asset_manager = Factory(:asset_manager)
+    get :show,:id=>asset_manager.projects.first
+		assert_select "div.box_about_actor p.asset_managers" do
+			assert_select "label",:text=>"SysMO-DB Asset Managers:",:count=>1
+			assert_select "a",:count=>1
+			assert_select "a[href=?]",person_path(asset_manager),:text=>asset_manager.name,:count=>1
+		end
+    end
+
+  	test "project_managers displayed in show page" do
+		project_manager = Factory(:project_manager)
+    get :show,:id=>project_manager.projects.first
+		assert_select "div.box_about_actor p.project_managers" do
+			assert_select "label",:text=>"SysMO-DB Project Managers:",:count=>1
+			assert_select "a",:count=>1
+			assert_select "a[href=?]",person_path(project_manager),:text=>project_manager.name,:count=>1
+		end
+    end
 
 	test "filter projects by person" do
 		get :index, :filter => {:person => 1}
@@ -209,6 +229,26 @@ class ProjectsControllerTest < ActionController::TestCase
 			assert_select "label",:text=>"SysMO-DB PALs:",:count=>1
 			assert_select "a",:count=>0
 			assert_select "span.none_text",:text=>"No PALs for this project",:count=>1
+		end
+  end
+
+  test "no asset managers displayed for project with no asset managers" do
+		project = Factory(:project)
+    get :show,:id=>project
+		assert_select "div.box_about_actor p.asset_managers" do
+			assert_select "label",:text=>"SysMO-DB Asset Managers:",:count=>1
+			assert_select "a",:count=>0
+			assert_select "span.none_text",:text=>"No Asset Managers for this project",:count=>1
+		end
+  end
+
+  test "no project managers displayed for project with no project managers" do
+		project = Factory(:project)
+    get :show,:id=>project
+		assert_select "div.box_about_actor p.project_managers" do
+			assert_select "label",:text=>"SysMO-DB Project Managers:",:count=>1
+			assert_select "a",:count=>0
+			assert_select "span.none_text",:text=>"No Project Managers for this project",:count=>1
 		end
 	end
 
