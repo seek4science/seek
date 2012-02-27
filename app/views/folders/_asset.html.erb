@@ -2,7 +2,7 @@
     li_class=asset.class.name.underscore
     drag_id="#{asset.class.name}_#{asset.id}_#{folder.id}"
     image=resource_avatar(asset,:class=>"asset_card_avatar")
-    max_title_length=60
+    max_title_length=85
 %>
 
 <li class="asset_card_item draggable_folder_item <%= li_class -%>" title="<%= folder_asset_item_tooltip asset -%>" id="<%= drag_id -%>">

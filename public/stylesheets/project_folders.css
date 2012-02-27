@@ -1,11 +1,12 @@
 div#folder_contents {
     padding: 0em 0em 0em 0em;
     margin: 0em 0em 0em 0em;
+    max-height: 50em;
 }
 
 div#folder_column {
     border-right: 1px #666 solid;
-    min-height: 40em;
+    min-height: 50em;
     background-color: white;
 }
 
@@ -27,9 +28,10 @@ ul.asset_cards li.asset_card_item {
     padding-left: 0.2em;
     padding-bottom: 0em;
     border: #555 solid 1px;
-    min-width: 17em;
-    max-width: 17em;
-    min-height: 3em;
+    min-width: 16em;
+    max-width: 16em;
+    min-height: 5em;
+    max-height: 5em;
     float: left;
 }
 
