@@ -196,9 +196,20 @@ class ProjectFolderTest < ActiveSupport::TestCase
 
   test "cannot destroy if not deletable" do
     folder = Factory :project_folder, :deletable=>false
+    sop = Factory :sop, :projects=>[folder.project],:policy=>Factory(:public_policy)
+    folder.add_assets(sop)
+    incoming_folder = Factory :project_folder, :project=>folder.project, :incoming=>true
     assert_no_difference("ProjectFolder.count") do
-      assert !folder.destroy
+      assert_no_difference("ProjectFolderAsset.count") do
+        assert !folder.destroy
+      end
     end
+    #also check that callback to move items is also not called
+    folder.reload
+    incoming_folder.reload
+
+    assert_equal [sop],folder.assets
+    assert incoming_folder.assets.empty?
   end
 
 
