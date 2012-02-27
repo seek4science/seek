@@ -1,10 +1,11 @@
 class ProjectFolder < ActiveRecord::Base
+  before_destroy :deletable?
+
   belongs_to :project
   belongs_to :parent,:class_name=>"ProjectFolder",:foreign_key=>:parent_id
   has_many :children,:class_name=>"ProjectFolder",:foreign_key=>:parent_id, :order=>:title, :after_add=>:update_child
   has_many :project_folder_assets, :dependent=>:destroy
 
-  before_destroy :deletable?
   before_destroy :unsort_assets_and_remove_children
 
 
@@ -113,15 +114,13 @@ class ProjectFolder < ActiveRecord::Base
   end
 
   def unsort_assets_and_remove_children
-    if deletable?
-      new_items_folder=ProjectFolder.new_items_folder(project)
-      if (new_items_folder && !self.incoming?)
-        disable_authorization_checks do
-          new_items_folder.add_assets(assets)
-        end
+    new_items_folder=ProjectFolder.new_items_folder(project)
+    if (new_items_folder && !self.incoming?)
+      disable_authorization_checks do
+        new_items_folder.add_assets(assets)
       end
-      children.destroy_all
     end
+    children.destroy_all
   end
 
 end
