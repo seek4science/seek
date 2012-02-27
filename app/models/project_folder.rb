@@ -113,14 +113,15 @@ class ProjectFolder < ActiveRecord::Base
   end
 
   def unsort_assets_and_remove_children
-
-    new_items_folder=ProjectFolder.new_items_folder(project)
-    if (new_items_folder && !self.incoming?)
-      disable_authorization_checks do
-        new_items_folder.add_assets(assets)
+    if deletable?
+      new_items_folder=ProjectFolder.new_items_folder(project)
+      if (new_items_folder && !self.incoming?)
+        disable_authorization_checks do
+          new_items_folder.add_assets(assets)
+        end
       end
+      children.destroy_all
     end
-    children.destroy_all
   end
 
 end
