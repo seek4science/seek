@@ -16,8 +16,9 @@ div#tree {
 
 
 .folder_hover {
-        background-color: #00008b;
-        color: #d3d3d3;
+    background: black;
+    color: black;
+    font-weight: bolder;
 }
 
 .ygtvcontent.ygtvfocus < a {
