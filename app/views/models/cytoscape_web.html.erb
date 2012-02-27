@@ -88,10 +88,6 @@
                                     }
                                 }
                                 dataValidation[field_name] = field_value;
-//                                alert(field_name);
-//                                alert(field_value);
-//                                alert(dataValidation[field_name]["type"]);
-//                                alert(dataValidation[field_name]["defValue"]);
                             }
                             for (var i in target.data) {
                                 var variable_name = i;
@@ -105,7 +101,6 @@
                                 col1.textContent = variable_name;
                                 col1.textAlign = "left";
                                 var col2 = document.createElement('td');
-                                //col2.textContent = variable_value;
                                 // for editable properties later
                                 if (variable_name == "id"){
                                     col2.textContent = variable_value;
@@ -190,8 +185,7 @@
 
                 });
 
-                vis.draw({ network: network_xgmml});
-
+                vis.draw({ network: network_xgmml,layout:"Preset"});
 
 
                };
