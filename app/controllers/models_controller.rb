@@ -29,7 +29,7 @@ class ModelsController < ApplicationController
       head = orig_doc.to_s.split("<graph").first
       xgmml_doc = head + body
 
-      xgmml_file = "#{@display_model.title}_#{Date.today}.xgmml"
+      xgmml_file = "model_#{@display_model.id}_vis_export.xgmml"
       File.open("#{xgmml_file}", 'w') do |f|
         f.puts xgmml_doc
       end
@@ -37,9 +37,8 @@ class ModelsController < ApplicationController
       send_file "#{xgmml_file}", :type=>"#{type}", :disposition=>'attachment'
   end
   def visualise
-
+     # for xgmml file
      doc = find_xgmml_doc @display_model
-     doc.root.namespaces.default_prefix="ss"
      # convert " to \" and newline to \n
      #e.g.  "... <att type=\"string\" name=\"canonicalName\" value=\"CHEMBL178301\"/>\n ...  "
     @graph = %Q("#{doc.root.to_s.gsub(/"/, '\"').gsub!("\n",'\n')}")
