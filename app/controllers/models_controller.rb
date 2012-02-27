@@ -29,7 +29,7 @@ class ModelsController < ApplicationController
       head = orig_doc.to_s.split("<graph").first
       xgmml_doc = head + body
 
-      xgmml_file = "model_#{@display_model.id}_vis_export.xgmml"
+      xgmml_file = "model_#{@display_model.id}_version_#{@display_model.version}_vis_export.xgmml"
       File.open("#{xgmml_file}", 'w') do |f|
         f.puts xgmml_doc
       end

@@ -223,7 +223,7 @@
 
               }
                function export_vis(format) {
-                  vis.exportNetwork('xgmml', '<%= model_path(@model)%>/export_as_xgmml?type=xml&version=' + "<%= @display_model.version%>");
+                  vis.exportNetwork('xgmml', '<%= model_path(@model)%>/export_as_xgmml?type=xml');
                }
 
 
