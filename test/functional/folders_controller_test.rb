@@ -55,6 +55,7 @@ class FoldersControllerTest < ActionController::TestCase
     assert_redirected_to :project_folders
     assert_not_nil flash[:error]
     unsorted_folder.reload
+    folder.reload
     @project.reload
     assert_equal [folder,child,unsorted_folder],ProjectFolder.find(:all,:conditions=>{:project_id=>@project.id}).sort_by(&:id)
     assert_equal [],unsorted_folder.assets
