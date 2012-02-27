@@ -12,6 +12,8 @@ div#folder_column {
 
 div#tree {
     position: fixed;
+    overflow-x: auto;
+    max-width: 16em;
 }
 
 
@@ -76,3 +78,17 @@ li.asset_card_item.presentation {
 li.asset_card_item {
     background-color: red;
 }
+
+ul#folder_details li {
+    float: left;
+}
+
+ul#folder_details li.title_and_description {
+    width: 78%;
+}
+
+ul#folder_details li.actions {
+
+}
+
+

@@ -4,6 +4,7 @@
 
 <%= render :partial=>"folder_details",:object=>folder -%>
 
+
 <ul class="asset_cards">
 
     <%= render :partial=>"asset",:collection=>folder.authorized_assets,:locals=>{:folder=>folder} -%>
