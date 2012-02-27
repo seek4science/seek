@@ -1,7 +1,8 @@
 <%
    @folder = folder_details
-   @folder.description = "" if @folder.description.blank?
 -%>
+
+<%# EDITABLE -%>
 <% if @folder.editable? -%>
 
 <p>
@@ -11,8 +12,6 @@
           :url=>url_for(:project_id=>@project.id,:action=>:set_project_folder_title,:id=>@folder.id)
   } %>
 </p>
-
-
 <p>
 <span id="description_label">Description: </span>
 <%= in_place_editor_field :folder,'description',{},{
@@ -23,12 +22,6 @@
 </p>
 
 <% unsorted_folder = ProjectFolder.new_items_folder(@project).try(:title) -%>
-<%= image_tag_for_key "destroy", project_folder_path(@project,@folder),
-                      "Delete",
-                      { :confirm => "Deleting this folder will remove all subfolders, and move any files to the #{unsorted_folder}. It is not reversible. Are you sure you want to delete?",
-                        :method => :delete },
-                      "Delete"
--%>
     <p>
       <% form_remote_tag :url=>{:action=>:create_folder,:id=>@folder.id},:html=>{:id=>:create_child_form} do -%>
       <%= label_tag "New child folder" -%>
@@ -40,5 +33,15 @@
 <% else -%>
     Title: <%= h(@folder.title) -%>
     <br/>
+<% end -%>
+
+<%# DELETABLE -%>
+<% if @folder.deletable? -%>
+    <%= image_tag_for_key "destroy", project_folder_path(@project,@folder),
+                          "Delete",
+                          { :confirm => "Deleting this folder will remove all subfolders, and move any files to the #{unsorted_folder}. It is not reversible. Are you sure you want to delete?",
+                            :method => :delete },
+                          "Delete"
+    -%>
 <% end -%>
 <hr/>

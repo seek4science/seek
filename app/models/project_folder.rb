@@ -4,6 +4,7 @@ class ProjectFolder < ActiveRecord::Base
   has_many :children,:class_name=>"ProjectFolder",:foreign_key=>:parent_id, :order=>:title, :after_add=>:update_child
   has_many :project_folder_assets, :dependent=>:destroy
 
+  before_destroy :deletable?
   before_destroy :unsort_assets_and_remove_children
 
 
@@ -50,6 +51,7 @@ class ProjectFolder < ActiveRecord::Base
       new_folder=ProjectFolder.create :title=>desc["title"],
                                       :editable=>(desc["editable"].nil? ? true : desc["editable"]),
                                       :incoming=>(desc["incoming"].nil? ? false : desc["incoming"]),
+                                      :deletable=>(desc["deletable"].nil? ? true : desc["deletable"]),
                                       :project=>project
       folders[key]=new_folder
     end
@@ -106,7 +108,7 @@ class ProjectFolder < ActiveRecord::Base
     folders = ProjectFolder.find(:all,:conditions=>{:project_id=>project.id})
     folder_assets = ProjectFolderAsset.all.select{|pfa| pfa.project_folder.nil? || pfa.project_folder.try(:project_id)==project.id}
     folder_assets.each {|a| a.destroy}
-    folders.each {|f| f.destroy}
+    folders.each {|f| f.deletable=true ; f.destroy}
 
   end
 

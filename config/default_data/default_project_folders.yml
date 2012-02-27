@@ -1,3 +1,8 @@
+root:
+  title: "Project items"
+  children: models, data, sops, presentations, publications
+  deletable: false
+
 models:
   title: "Models"
   children: sbml
@@ -9,7 +14,6 @@ sbml:
 published:
   title: "Published"
 
-
 data:
   title: "Data Files"
 
@@ -19,7 +23,11 @@ sops:
 presentations:
   title: "Presentations"
 
+publications:
+  title: "Publications"
+
 unsorted_items:
   title: "Unsorted items"
   editable: false
+  deletable: false
   incoming: true

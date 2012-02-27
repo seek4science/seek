@@ -1,6 +1,7 @@
 model:
   title: "models"
   children: sbml, copasi
+  deletable: false
 
 sbml:
   title: "sbml"

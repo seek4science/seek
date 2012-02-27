@@ -159,6 +159,7 @@ class ProjectFolderTest < ActiveSupport::TestCase
     assert_equal "data files",first_root.title
     assert first_root.editable?
     assert !first_root.incoming?
+    assert first_root.deletable?
     assert_equal 1,first_root.children.count
     assert_equal "raw data files",first_root.children.first.title
     assert_equal 0, first_root.children.first.children.count
@@ -167,6 +168,7 @@ class ProjectFolderTest < ActiveSupport::TestCase
     assert_equal "models",second_root.title
     assert second_root.editable?
     assert !second_root.incoming?
+    assert !second_root.deletable?
     assert_equal 2,second_root.children.count
     assert_equal "copasi",second_root.children.first.title
     assert_equal "sbml",second_root.children[1].title
@@ -177,6 +179,7 @@ class ProjectFolderTest < ActiveSupport::TestCase
     third_root=root_folders[2]
     assert !third_root.editable?
     assert third_root.incoming?
+    assert third_root.deletable?
     assert "Unsorted items",third_root.title
 
     #don't check the actual contents from the real file, but check it works sanely and exists
@@ -190,6 +193,15 @@ class ProjectFolderTest < ActiveSupport::TestCase
       ProjectFolder.initialize_default_folders folder.project
     end
   end
+
+  test "cannot destroy if not deletable" do
+    folder = Factory :project_folder, :deletable=>false
+    assert_no_difference("ProjectFolder.count") do
+      assert !folder.destroy
+    end
+  end
+
+
 
   test "unsorted items folder" do
     project = Factory :project

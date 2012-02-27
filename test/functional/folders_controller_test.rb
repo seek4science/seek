@@ -40,6 +40,27 @@ class FoldersControllerTest < ActionController::TestCase
     assert_equal [sop],unsorted_folder.assets
   end
 
+  test "cannot delete if not deletable" do
+    sop = Factory :sop, :projects=>[@project],:policy=>Factory(:public_policy)
+    folder = Factory :project_folder,:project=>@project,:deletable=>false
+    folder.add_assets(sop)
+    child = folder.add_child("fred")
+    child.save!
+    unsorted_folder = Factory :project_folder,:project=>@project,:incoming=>true
+
+    assert_no_difference("ProjectFolder.count") do
+      delete :destroy, :id => folder,:project_id=>@project.id
+    end
+
+    assert_redirected_to :project_folders
+    assert_not_nil flash[:error]
+    unsorted_folder.reload
+    @project.reload
+    assert_equal [folder,child,unsorted_folder],ProjectFolder.find(:all,:conditions=>{:project_id=>@project.id}).sort_by(&:id)
+    assert_equal [],unsorted_folder.assets
+    assert_equal [sop],folder.assets
+  end
+
   test "cannot delete other project" do
     project = Factory :project
     sop = Factory :sop, :projects=>[project],:policy=>Factory(:public_policy)
@@ -55,7 +76,7 @@ class FoldersControllerTest < ActionController::TestCase
 
     assert_redirected_to :root
     unsorted_folder.reload
-    @project.reload
+    project.reload
     assert_equal [folder,child,unsorted_folder],ProjectFolder.find(:all,:conditions=>{:project_id=>project.id}).sort_by(&:id)
     assert_equal [],unsorted_folder.assets
     assert_equal [sop],folder.assets

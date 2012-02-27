@@ -22,8 +22,8 @@ class FoldersController < ApplicationController
 
   def destroy
     folder=ProjectFolder.find(params[:id])
-    folder.destroy
     respond_to do |format|
+      flash[:error]="Unable to delete this folder" if !folder.destroy
       format.html { redirect_to(:project_folders) }
     end
   end
