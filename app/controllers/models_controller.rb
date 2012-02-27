@@ -13,7 +13,7 @@ class ModelsController < ApplicationController
   
   before_filter :find_assets, :only => [ :index ]
   before_filter :find_and_auth, :except => [ :build,:index, :new, :create,:create_model_metadata,:update_model_metadata,:delete_model_metadata,:request_resource,:preview,:test_asset_url, :update_annotations_ajax]
-  before_filter :find_display_model, :only=>[:show,:download,:execute,:builder,:simulate,:submit_to_jws,:visualise]
+  before_filter :find_display_model, :only=>[:show,:download,:execute,:builder,:simulate,:submit_to_jws,:visualise,:export_as_xgmml]
     
   before_filter :jws_enabled,:only=>[:builder,:simulate,:submit_to_jws]
 
@@ -21,11 +21,25 @@ class ModelsController < ApplicationController
   
   @@model_builder = Seek::JWS::OneStop.new
 
-  def visualise
-    xgmml_file = @@model_builder.is_xgmml? @display_model
-    file = open(xgmml_file.filepath)
-    doc = LibXML::XML::Parser.string(file.read).parse
 
+  def export_as_xgmml
+      type =  params[:type]
+      body = @_request.body.read
+      orig_doc = find_xgmml_doc @display_model
+      head = orig_doc.to_s.split("<graph").first
+      xgmml_doc = head + body
+
+      xgmml_file = "#{@display_model.title}_#{Date.today}.xgmml"
+      File.open("#{xgmml_file}", 'w') do |f|
+        f.puts xgmml_doc
+      end
+
+      send_file "#{xgmml_file}", :type=>"#{type}", :disposition=>'attachment'
+  end
+  def visualise
+
+     doc = find_xgmml_doc @display_model
+     doc.root.namespaces.default_prefix="ss"
      # convert " to \" and newline to \n
      #e.g.  "... <att type=\"string\" name=\"canonicalName\" value=\"CHEMBL178301\"/>\n ...  "
     @graph = %Q("#{doc.root.to_s.gsub(/"/, '\"').gsub!("\n",'\n')}")
@@ -622,5 +636,12 @@ class ModelsController < ApplicationController
     end
 
    end
+
+    def find_xgmml_doc model
+      xgmml_file = @@model_builder.is_xgmml? model
+      file = open(xgmml_file.filepath)
+      doc = LibXML::XML::Parser.string(file.read).parse
+      doc
+    end
 
 end
