@@ -1,14 +1,19 @@
 div#folder_contents {
     padding: 0em 0em 0em 0em;
     margin: 0em 0em 0em 0em;
-    max-height: 50em;
+    min-height: 200em;
 }
 
 div#folder_column {
     border-right: 1px #666 solid;
-    min-height: 50em;
+    min-height: 200em;
     background-color: white;
 }
+
+div#tree {
+    position: fixed;
+}
+
 
 .folder_hover {
         background-color: #00008b;
