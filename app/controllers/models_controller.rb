@@ -29,12 +29,14 @@ class ModelsController < ApplicationController
       head = orig_doc.to_s.split("<graph").first
       xgmml_doc = head + body
 
-      xgmml_file = "model_#{@display_model.id}_version_#{@display_model.version}_vis_export.xgmml"
-      File.open("#{xgmml_file}", 'w') do |f|
-        f.puts xgmml_doc
+      xgmml_file =  "model_#{@model.id}_version_#{@display_model.version}_export.xgmml"
+      tmp_file= Tempfile.new("#{xgmml_file}","#{RAILS_ROOT}/tmp/")
+      File.open(tmp_file.path,"w") do |tmp|
+        tmp.write xgmml_doc
       end
 
-      send_file "#{xgmml_file}", :type=>"#{type}", :disposition=>'attachment'
+      send_file tmp_file.path, :type=>"#{type}", :disposition=>'attachment',:filename=>xgmml_file
+      tmp_file.close
   end
   def visualise
      # for xgmml file
