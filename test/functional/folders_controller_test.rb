@@ -208,7 +208,7 @@ class FoldersControllerTest < ActionController::TestCase
   end
 
   test "display with assays" do
-    assay = Factory :assay,:contributor=>@member.person,:policy=>Factory(:public_policy)
+    assay = Factory :experimental_assay,:contributor=>@member.person,:policy=>Factory(:public_policy)
     assay.study.investigation.projects=[@project]
     assay.study.investigation.save!
     get :index,:project_id=>@project.id

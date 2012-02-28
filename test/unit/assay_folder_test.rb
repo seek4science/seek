@@ -9,10 +9,10 @@ class AssayFolderTest < ActiveSupport::TestCase
   end
 
   test "assay folders" do
-    public_assay = Factory(:assay,:policy=>Factory(:public_policy))
-    viewable_assay = Factory(:assay,:policy=>Factory(:publicly_viewable_policy))
-    private_assay  = Factory(:assay,:policy=>Factory(:private_policy))
-    my_private_assay  = Factory(:assay,:contributor=>@user.person,:policy=>Factory(:private_policy))
+    public_assay = Factory(:experimental_assay,:policy=>Factory(:public_policy))
+    viewable_assay = Factory(:experimental_assay,:policy=>Factory(:publicly_viewable_policy))
+    private_assay  = Factory(:experimental_assay,:policy=>Factory(:private_policy))
+    my_private_assay  = Factory(:experimental_assay,:contributor=>@user.person,:policy=>Factory(:private_policy))
 
     [public_assay,viewable_assay,private_assay,my_private_assay].each do |a|
       a.study.investigation.projects=[@project]
@@ -29,7 +29,7 @@ class AssayFolderTest < ActiveSupport::TestCase
   end
 
   test "initialise assay folder" do
-    assay = Factory(:assay,:policy=>Factory(:public_policy))
+    assay = Factory(:experimental_assay,:policy=>Factory(:public_policy))
     folder = Seek::AssayFolder.new assay,assay.projects.first
 
     assert_equal assay,folder.assay
@@ -47,7 +47,7 @@ class AssayFolderTest < ActiveSupport::TestCase
   end
 
   test "invalid project" do
-    assay = Factory(:assay,:policy=>Factory(:public_policy))
+    assay = Factory(:experimental_assay,:policy=>Factory(:public_policy))
     assert_raise Exception do
       folder = Seek::AssayFolder.new assay,Factory(:project)
     end

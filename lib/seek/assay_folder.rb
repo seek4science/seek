@@ -19,7 +19,7 @@ module Seek
     end
 
     def self.assay_folders project
-       assays = project.assays.select{|assay| assay.can_edit?}.collect do |assay|
+       assays = project.assays.select{|assay| assay.is_experimental? && assay.can_edit?}.collect do |assay|
          Seek::AssayFolder.new assay,project
        end
     end
