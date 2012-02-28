@@ -217,9 +217,9 @@ class PeopleController < ApplicationController
   def administer_update
     passed_params=    {:roles                 =>  User.admin_logged_in?,
                        :roles_mask            => User.admin_logged_in?,
-                       :can_edit_projects     => (User.admin_logged_in? or current_user.is_project_manager?),
-                       :can_edit_institutions => (User.admin_logged_in? or current_user.is_project_manager?),
-                       :work_group_ids        => (User.admin_logged_in? or current_user.is_project_manager?)}
+                       :can_edit_projects     => (User.admin_logged_in? || (current_user.is_project_manager? && !(@person.projects & current_user.try(:person).try(:projects).to_a).empty?)),
+                       :can_edit_institutions => (User.admin_logged_in? || (current_user.is_project_manager? && !(@person.projects & current_user.try(:person).try(:projects).to_a).empty?)),
+                       :work_group_ids        => (User.admin_logged_in? || current_user.is_project_manager?)}
     temp = params.clone
     params[:person] = {}
     passed_params.each do |param, allowed|

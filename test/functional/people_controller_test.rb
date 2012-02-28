@@ -596,7 +596,7 @@ class PeopleControllerTest < ActionController::TestCase
     put :administer_update, :id => a_person.id, :person => {:work_group_ids => project_manager_work_group_ids}
 
     assert_redirected_to person_path(assigns(:person))
-    assert_equal project_manager.projects.sort(&:title), assigns(:person).projects.sort(&:title)
+    assert_equal project_manager.projects.sort(&:title), assigns(:person).work_groups.collect(&:project).sort(&:title)
   end
 
   test "not allow project manager to assign people into projects that they are not in" do
@@ -807,6 +807,66 @@ class PeopleControllerTest < ActionController::TestCase
     get :administer_update, :id=>people(:fred), :person => {}
     assert_redirected_to :root
     assert_not_nil flash[:error]
+  end
+
+  test 'project manager can set can_edit_project of person inside their projects' do
+    login_as(:project_manager)
+    p=people(:aaron_person)
+    assert !(users(:project_manager).person.projects & p.projects).empty?
+    assert !p.can_edit_projects?
+
+    get :admin, :id => p
+    assert_response :success
+    assert_select "input#person_can_edit_projects", :count => 1
+
+    put :administer_update, :id=>p.id, :person=>{:can_edit_projects=>true}
+    p.reload
+    assert p.can_edit_projects?
+  end
+
+  test 'project manager can not set can_edit_project of person outside their projects' do
+    login_as(:project_manager)
+    p=Factory(:person)
+    assert (users(:project_manager).person.projects & p.projects).empty?
+    assert !p.can_edit_projects?
+
+    get :admin, :id => p
+    assert_response :success
+    assert_select "input#person_can_edit_projects", :count => 0
+
+    put :administer_update, :id=>p.id, :person=>{:can_edit_projects=>true}
+    p.reload
+    assert !p.can_edit_projects?
+  end
+
+    test 'project manager can set can_edit_projects of person inside their projects' do
+    login_as(:project_manager)
+    p=people(:aaron_person)
+    assert !(users(:project_manager).person.projects & p.projects).empty?
+    assert !p.can_edit_institutions?
+
+    get :admin, :id => p
+    assert_response :success
+    assert_select "input#person_can_edit_institutions", :count => 1
+
+    put :administer_update, :id=>p.id, :person=>{:can_edit_institutions=>true}
+    p.reload
+    assert p.can_edit_institutions?
+  end
+
+  test 'project manager can not set can_edit_institutions of person outside their projects' do
+    login_as(:project_manager)
+    p=Factory(:person)
+    assert (users(:project_manager).person.projects & p.projects).empty?
+    assert !p.can_edit_institutions?
+
+    get :admin, :id => p
+    assert_response :success
+    assert_select "input#person_can_edit_institutions", :count => 0
+
+    put :administer_update, :id=>p.id, :person=>{:can_edit_institutions=>true}
+    p.reload
+    assert !p.can_edit_institutions?
   end
 
 end
