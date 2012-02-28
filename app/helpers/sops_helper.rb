@@ -1,7 +1,7 @@
 module SopsHelper
 
   def authorised_sops
-    authorised_assets(DataFile)
+    authorised_assets(Sop)
   end    
 
 end
