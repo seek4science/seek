@@ -2,7 +2,6 @@ require 'test_helper'
 
 class FoldersControllerTest < ActionController::TestCase
 
-  fixtures :all
   include AuthenticatedTestHelper
 
   def setup
@@ -92,7 +91,7 @@ class FoldersControllerTest < ActionController::TestCase
     assert_difference("ProjectFolderAsset.count",2) do
       get :index,:project_id=>@project.id
     end
-
+    assert_response :success
     @project.reload
     assert !ProjectFolder.root_folders(@project).empty?
     assert_equal 2, ProjectFolder.new_items_folder(@project).assets.count
@@ -108,12 +107,13 @@ class FoldersControllerTest < ActionController::TestCase
     assert_no_difference("ProjectFolder.count") do
       get :index,:project_id=>@project.id
     end
+    assert_response :success
     assert_equal [folder],ProjectFolder.root_folders(@project)
   end
 
 
   test "blocked access as non member" do
-    login_as(:quentin)
+    login_as(Factory(:user))
     get :index,:project_id=>@project.id
     assert_redirected_to root_path
     assert_not_nil flash[:error]
@@ -205,6 +205,14 @@ class FoldersControllerTest < ActionController::TestCase
     assert_response :success
     assert @response.body.match(/Ryz9z3Z9h70wzJ243we6k8RO5xI5f3UF/)
     assert @response.body.match(/viu2q6ng3iZ0ppS5X679pPo11LfF62pS/).nil?
+  end
+
+  test "display with assays" do
+    assay = Factory :assay,:contributor=>@member.person,:policy=>Factory(:public_policy)
+    assay.study.investigation.projects=[@project]
+    assay.study.investigation.save!
+    get :index,:project_id=>@project.id
+    assert_response :success
   end
 
 end

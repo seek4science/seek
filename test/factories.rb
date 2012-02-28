@@ -128,8 +128,9 @@
 
 #Assay
 Factory.define(:assay_base, :class => Assay) do |f|
-  f.title "An Assay"
-    f.association :contributor, :factory => :person
+  f.sequence(:title) {|n| "An Assay #{n}"}
+  f.sequence(:description) {|n| "Assay description #{n}"}
+  f.association :contributor, :factory => :person
   f.association :study
   f.association :assay_type
 
