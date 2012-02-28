@@ -714,7 +714,7 @@ class PeopleControllerTest < ActionController::TestCase
 
     login_as(project_manager.user)
     get :show, :id => admin
-    assert_select "a", :text => /Person administration/, :count => 0
+    assert_select "a", :text => /Person Administration/, :count => 0
 
     get :admin, :id => admin
 
@@ -731,7 +731,7 @@ class PeopleControllerTest < ActionController::TestCase
     admin = Factory(:admin)
 
     get :show, :id => admin
-    assert_select "a", :text => /Person administration/, :count => 0
+    assert_select "a", :text => /Person Administration/, :count => 0
 
     get :admin, :id => admin
 
@@ -798,7 +798,7 @@ class PeopleControllerTest < ActionController::TestCase
   test "can not administer themself" do
     login_as(:fred)
     get :show, :id => people(:fred)
-    assert_select "a", :text => /Person administration/, :count => 0
+    assert_select "a", :text => /Person Administration/, :count => 0
 
     get :admin, :id=>people(:fred)
     assert_redirected_to :root

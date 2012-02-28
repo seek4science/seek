@@ -18,7 +18,7 @@
   <% end %>
   <% if ((current_user.try :is_admin?) || (current_user.try :is_project_manager?)) &&  (@person.user==current_user || !@person.user.try(:is_admin?))-%>
       <li>
-        <%= image_tag_for_key "admin", admin_person_path(@person), "Administer", nil, "Person administration" -%>
+        <%= image_tag_for_key "admin", admin_person_path(@person), "Administer", nil, "Person Administration" -%>
       </li>
   <% end -%>
 </ul>
