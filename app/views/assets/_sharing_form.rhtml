@@ -7,6 +7,7 @@
 <%= hidden_field_tag "sharing[permissions][contributor_types]", "" -%>
 <%= hidden_field_tag "sharing[permissions][values]", "" -%>
 
+<%="<div class='fieldWithErrors'>" unless @policy.valid? %>
 <div class="fold">
 
   <div class="foldTitle">
@@ -337,6 +338,7 @@
   </div>
   </div>
 </div>
+<%="</div>" unless @policy.valid? %>
 
 <script type="text/javascript">
   init_sharing();
