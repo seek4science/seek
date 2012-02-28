@@ -24,9 +24,13 @@ module Seek
        end
     end
 
+    def assets
+       assay.assets.collect{|a| a.parent} | assay.related_publications
+    end
+
     #assets that are authorized to be shown for the current user
     def authorized_assets
-      assay.assets.select{|a| a.can_view?}.collect{|a| a.parent}
+      assets.select{|a| a.can_view?}
     end
 
     def title

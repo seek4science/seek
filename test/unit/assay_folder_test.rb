@@ -31,12 +31,16 @@ class AssayFolderTest < ActiveSupport::TestCase
   test "authorized assets" do
       assay = Factory(:experimental_assay,:contributor=>@user.person,:policy=>Factory(:public_policy))
       sop = Factory :sop,:policy=>Factory(:public_policy)
+      publication = Factory :publication, :contributor=>@user.person
       private_sop = Factory :sop,:policy=>Factory(:private_policy)
       project = assay.projects.first
       assay.relate(sop)
       assay.relate(private_sop)
+      Relationship.create :subject=>assay, :object=>publication, :predicate=>Relationship::RELATED_TO_PUBLICATION
+      assert_equal [publication],assay.related_publications
+
       folder = Seek::AssayFolder.new assay,project
-      assert_equal [sop],folder.authorized_assets
+      assert_equal [sop,publication],folder.authorized_assets
   end
 
   test "initialise assay folder" do
