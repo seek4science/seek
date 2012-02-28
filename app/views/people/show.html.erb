@@ -16,9 +16,15 @@
           </li>
       <% end -%>
   <% end %>
+  <!--admin or project manager can administer themselves and the other people, except the other admins-->
   <% if ((current_user.try :is_admin?) || (current_user.try :is_project_manager?)) &&  (@person.user==current_user || !@person.user.try(:is_admin?))-%>
       <li>
         <%= image_tag_for_key "admin", admin_person_path(@person), "Administer", nil, "Person Administration" -%>
+      </li>
+  <% end -%>
+  <% if current_user.try :is_project_manager?-%>
+      <li>
+        <%= image_tag_for_key "new", new_institution_path(), "New Institution", nil, "New Institution" -%>
       </li>
   <% end -%>
 </ul>

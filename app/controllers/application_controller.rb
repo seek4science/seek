@@ -97,6 +97,13 @@ class ApplicationController < ActionController::Base
     return true
   end
 
+  def is_admin_or_is_project_manager
+    unless current_user.try(:person).try(:is_admin?) || current_user.try(:person).try(:is_project_manager?)
+      error("You do not have the permission", "Not admin or project manager")
+      return false
+    end
+  end
+
   def can_manage_announcements?
     User.admin_logged_in?
   end

@@ -611,7 +611,7 @@ class PeopleControllerTest < ActionController::TestCase
     assert_redirected_to :root
     assert_not_nil flash[:error]
     a_person.reload
-    assert !a_person.projects.include?(a_work_group.project)
+    assert !a_person.work_groups.include?(a_work_group)
   end
 
   test "project manager see only their projects to assign people into" do
@@ -869,4 +869,9 @@ class PeopleControllerTest < ActionController::TestCase
     assert !p.can_edit_institutions?
   end
 
+  test "project manager has a button 'New Institution' in their profile" do
+    login_as(:project_manager)
+    get :show, :id => users(:project_manager).person
+    assert_select "a", :text => /New Institution/, :count => 1
+  end
 end

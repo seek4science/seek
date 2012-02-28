@@ -107,4 +107,15 @@ class InstitutionsControllerTest < ActionController::TestCase
     assert_redirected_to institution_path(assigns(:institution))
   end
 
+
+  test 'project manager can create institution' do
+    login_as(Factory(:project_manager).user)
+    get :new
+    assert_response :success
+
+    assert_difference("Institution.count") do
+      post :create, :institution => {:name=>"a test institution"}
+    end
+  end
 end
+

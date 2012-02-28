@@ -324,14 +324,6 @@ class PeopleController < ApplicationController
     person.roles=roles
   end
 
-  def is_admin_or_is_project_manager
-    @person=Person.find(params[:id])
-    unless current_user.try(:person).try(:is_admin?) || current_user.try(:person).try(:is_project_manager?)
-      error("You do not have the permission to administer this person", "Not admin or project manager")
-      return false
-    end
-  end
-
   def profile_is_not_another_admin_except_me
     @person=Person.find(params[:id])
     if !@person.user.nil? && @person.user!=current_user && @person.user.try(:is_admin?)
