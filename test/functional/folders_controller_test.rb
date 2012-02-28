@@ -29,7 +29,7 @@ class FoldersControllerTest < ActionController::TestCase
     unsorted_folder = Factory :project_folder,:project=>@project,:incoming=>true
 
     assert_difference("ProjectFolder.count",-2) do
-      delete :destroy, :id => folder,:project_id=>@project.id
+      delete :destroy, :id => folder.id,:project_id=>@project.id
     end
 
     assert_redirected_to :project_folders
@@ -48,7 +48,7 @@ class FoldersControllerTest < ActionController::TestCase
     unsorted_folder = Factory :project_folder,:project=>@project,:incoming=>true
 
     assert_no_difference("ProjectFolder.count") do
-      delete :destroy, :id => folder,:project_id=>@project.id
+      delete :destroy, :id => folder.id,:project_id=>@project.id
     end
 
     assert_redirected_to :project_folders
@@ -136,6 +136,28 @@ class FoldersControllerTest < ActionController::TestCase
     assert_response :success
 
     assert @response.body.match(/Description.*Ryz9z3Z9h70wzJ243we6k8RO5xI5f3UF/)
+  end
+
+  test "ajax request for assay folder contents" do
+    assay = Factory :experimental_assay,:contributor=>@member.person,:policy=>Factory(:public_policy),:title=>"Yp50U6BjlacF0r7HY5WXHEOP8E2UqXcv",:description=>"5Kx0432X6IbuzBi25BIi0OdY1xo4FRG3"
+    assay.study.investigation.projects=[@project]
+    assay.study.investigation.save!
+    assert assay.can_view?
+    xhr(:post,:display_contents,{:id=>"Assay_#{assay.id}",:project_id=>@project.id})
+    assert_response :success
+    assert @response.body.match(/Yp50U6BjlacF0r7HY5WXHEOP8E2UqXcv/)
+    assert @response.body.match(/5Kx0432X6IbuzBi25BIi0OdY1xo4FRG3/)
+  end
+
+  test "ajax request for hidden assay folder contents fails" do
+    assay = Factory :experimental_assay,:policy=>Factory(:private_policy),:title=>"Yp50U6BjlacF0r7HY5WXHEOP8E2UqXcv",:description=>"5Kx0432X6IbuzBi25BIi0OdY1xo4FRG3"
+    assay.study.investigation.projects=[@project]
+    assay.study.investigation.save!
+    assert !assay.can_view?
+    xhr(:post,:display_contents,{:id=>"Assay_#{assay.id}",:project_id=>@project.id})
+    assert_redirected_to root_path
+    assert !@response.body.match(/Yp50U6BjlacF0r7HY5WXHEOP8E2UqXcv/)
+    assert !@response.body.match(/5Kx0432X6IbuzBi25BIi0OdY1xo4FRG3/)
   end
 
   test "ajax request for folder contents rejected from non project member" do

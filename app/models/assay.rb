@@ -141,8 +141,6 @@ class Assay < ActiveRecord::Base
     assay_organism.culture_growth_type = culture_growth_type unless culture_growth_type.nil?
     assay_organism.strain=strain
 
-   
-
     existing = AssayOrganism.all.select{|ao|ao.organism==organism and ao.assay == self and ao.strain==strain and ao.culture_growth_type==culture_growth_type}
     if existing.blank?
     self.assay_organisms << assay_organism

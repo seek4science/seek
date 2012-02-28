@@ -28,6 +28,17 @@ class AssayFolderTest < ActiveSupport::TestCase
 
   end
 
+  test "authorized assets" do
+      assay = Factory(:experimental_assay,:contributor=>@user.person,:policy=>Factory(:public_policy))
+      sop = Factory :sop,:policy=>Factory(:public_policy)
+      private_sop = Factory :sop,:policy=>Factory(:private_policy)
+      project = assay.projects.first
+      assay.relate(sop)
+      assay.relate(private_sop)
+      folder = Seek::AssayFolder.new assay,project
+      assert_equal [sop],folder.authorized_assets
+  end
+
   test "initialise assay folder" do
     assay = Factory(:experimental_assay,:policy=>Factory(:public_policy))
     folder = Seek::AssayFolder.new assay,assay.projects.first

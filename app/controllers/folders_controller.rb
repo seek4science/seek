@@ -3,6 +3,7 @@
 class FoldersController < ApplicationController
   before_filter :login_required
   before_filter :check_project
+  before_filter :get_folder, :only=>[:create_folder, :destroy, :display_contents]
   before_filter :get_folders,:only=>[:index,:move_asset_to,:create_folder]
 
   in_place_edit_for :project_folder, :title
@@ -21,9 +22,8 @@ class FoldersController < ApplicationController
   end
 
   def destroy
-    folder=ProjectFolder.find(params[:id])
     respond_to do |format|
-      flash[:error]="Unable to delete this folder" if !folder.destroy
+      flash[:error]="Unable to delete this folder" if !@folder.destroy
       format.html { redirect_to(:project_folders) }
     end
   end
@@ -34,10 +34,9 @@ class FoldersController < ApplicationController
   end
 
   def create_folder
-    folder=ProjectFolder.find(params[:id])
     title=params[:title]
-    folder.add_child(title)
-    folder.save!
+    @folder.add_child(title)
+    @folder.save!
     render :update do |page|
       page.reload
     end
@@ -74,14 +73,13 @@ class FoldersController < ApplicationController
   end
 
   def display_contents
-    folder = ProjectFolder.find(params[:id])
     begin
       store_folder_cookie()
     rescue Exception=>e
       Rails.logger.error("Error reading cookie for last folder browser - #{e.message}")
     end
     render :update do |page|
-      page.replace_html "folder_contents",:partial=>"contents",:locals=>{:folder=>folder}
+      page.replace_html "folder_contents",:partial=>"contents",:locals=>{:folder=>@folder}
     end
   end
 
@@ -91,6 +89,21 @@ class FoldersController < ApplicationController
     @project = Project.find(params[:project_id])
     if @project.nil? || !current_user.person.projects.include?(@project)
       error("You must be a member of the project", "is invalid (not in project)")
+    end
+  end
+
+  def get_folder
+    id = params[:id]
+    if id.start_with?("Assay")
+      id=id.split("_")[1]
+      assay = Assay.find(id)
+      if assay.can_view?
+        @folder = Seek::AssayFolder.new assay,@project
+      else
+        error("You cannot view the contents of that assay", "is invalid or not authorized")
+      end
+    else
+      @folder = ProjectFolder.find(id)
     end
   end
 

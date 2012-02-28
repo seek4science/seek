@@ -24,8 +24,13 @@ module Seek
        end
     end
 
+    #assets that are authorized to be shown for the current user
+    def authorized_assets
+      assay.assets.select{|a| a.can_view?}.collect{|a| a.parent}
+    end
+
     def title
-      @assay.title
+      assay.title
     end
 
     def label
@@ -33,11 +38,11 @@ module Seek
     end
 
     def description
-      @assay.description
+      assay.description
     end
 
     def id
-      "Assay_#{@assay.id}"
+      "Assay_#{assay.id}"
     end
 
   end
