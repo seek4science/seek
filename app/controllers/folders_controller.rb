@@ -46,17 +46,17 @@ class FoldersController < ApplicationController
   #moves the asset identified by :asset_id and :asset_type from this folder to the folder identified by :dest_folder_id
   def move_asset_to
     asset = params[:asset_type].constantize.find(params[:asset_id])
-    this_folder=ProjectFolder.find(params[:id])
-    dest_folder=ProjectFolder.find(params[:dest_folder_id])
+    this_folder=resolve_folder params[:id]
+    dest_folder=resolve_folder params[:dest_folder_id]
     dest_folder.move_assets asset,this_folder
     render :update do |page|
       if (params[:dest_folder_element_id])
         page[params[:dest_folder_element_id]].update(dest_folder.label)
         #page[params[:dest_folder_element_id]].highlight
       end
-      if (params[:origin_folder_element_id])
+      if (params[:origin_folder_element_id] && dest_folder.is_a?(ProjectFolder))
         page[params[:origin_folder_element_id]].update(this_folder.label)
-        #page[params[:origin_folder_element_id]].highlight
+        page << "Effect.Fade(#{asset.class.name}_#{asset.id}_#{this_folder.id});"
       end
     end
   end
@@ -94,6 +94,10 @@ class FoldersController < ApplicationController
 
   def get_folder
     id = params[:id]
+    resolve_folder id
+  end
+
+  def resolve_folder id
     if id.start_with?("Assay")
       id=id.split("_")[1]
       assay = Assay.find(id)
@@ -106,6 +110,8 @@ class FoldersController < ApplicationController
       @folder = ProjectFolder.find(id)
     end
   end
+
+
 
   def get_folders
     @folders = project_folders

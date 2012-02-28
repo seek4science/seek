@@ -45,12 +45,14 @@ class AssayFolderTest < ActiveSupport::TestCase
 
   test "initialise assay folder" do
     assay = Factory(:experimental_assay,:policy=>Factory(:public_policy))
+    sop = Factory :sop,:projects=>[assay.projects.first],:policy=>Factory(:public_policy)
+    assay.relate(sop)
     folder = Seek::AssayFolder.new assay,assay.projects.first
 
     assert_equal assay,folder.assay
     assert_equal assay.title, folder.title
     assert_equal assay.description, folder.description
-    assert_equal "#{assay.title} (0)",folder.label
+    assert_equal "#{assay.title} (1)",folder.label
     assert_equal assay.projects.first,folder.project
     assert !folder.deletable?
     assert !folder.editable?
@@ -66,6 +68,19 @@ class AssayFolderTest < ActiveSupport::TestCase
     assert_raise Exception do
       folder = Seek::AssayFolder.new assay,Factory(:project)
     end
+  end
+
+  test "move assets" do
+    assay = Factory(:experimental_assay,:policy=>Factory(:public_policy))
+    sop = Factory :sop,:projects=>[assay.projects.first],:policy=>Factory(:public_policy)
+    folder = Seek::AssayFolder.new assay,assay.projects.first
+    src_folder = Factory :project_folder, :project=>assay.projects.first
+    assert_difference("AssayAsset.count") do
+      folder.move_assets sop,src_folder
+    end
+    assay.reload
+    assert_equal [sop],assay.assets.collect{|a| a.parent}
+    assert_equal [sop],folder.assets
   end
 
 end

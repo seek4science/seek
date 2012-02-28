@@ -14,7 +14,6 @@ function item_dropped_to_folder(element, droppable_element, project_id) {
         path += "&dest_folder_element_id=" + droppable_element.id + "&origin_folder_element_id=" + origin_folder_element_id;
 
         new Ajax.Request(path, {
-            onSuccess: Effect.Fade(dropped_id),
             asynchronous:true,
             evalScripts:true
         });

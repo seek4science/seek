@@ -38,7 +38,7 @@ module Seek
     end
 
     def label
-      "#{title} (#{@assay.assets.count})"
+      "#{title} (#{assets.count})"
     end
 
     def description
@@ -47,6 +47,13 @@ module Seek
 
     def id
       "Assay_#{assay.id}"
+    end
+
+    def move_assets assets, src_folder
+      assets = Array(assets)
+      assets.each do |asset|
+        assay.relate(asset)
+      end
     end
 
   end

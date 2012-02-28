@@ -188,6 +188,24 @@ class FoldersControllerTest < ActionController::TestCase
     assert_equal [sop],other_folder.assets
   end
 
+  test "move asset to assay" do
+    assay = Factory :experimental_assay,:contributor=>@member.person,:policy=>Factory(:public_policy)
+    assay.study.investigation.projects=[@project]
+    assay.study.investigation.save!
+    sop = Factory :sop, :projects=>[@project],:policy=>Factory(:public_policy)
+    folder = Factory :project_folder, :project=>@project
+    folder.add_assets(sop)
+    folder.save!
+
+    assert_difference("AssayAsset.count") do
+      xhr(:post,:move_asset_to,{:asset_id=>sop.id,:asset_type=>"Sop",:id=>folder.id,:dest_folder_id=>"Assay_#{assay.id}",:project_id=>folder.project.id})
+    end
+    assert_response :success
+    assay.reload
+    assert_equal [sop],assay.assets.collect{|a| a.parent}
+    assert_equal [sop],folder.assets
+  end
+
   test "cannot move to other project folder" do
     sop = Factory :sop, :projects=>[@project],:policy=>Factory(:public_policy),:description=>"Ryz9z3Z9h70wzJ243we6k8RO5xI5f3UF"
     folder = Factory :project_folder, :project=>@project
