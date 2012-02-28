@@ -27,6 +27,10 @@
                 // callback when Cytoscape Web has finished drawing
                 vis.ready(function() {
 
+                    //Add new comment field to nodes and edges:
+                   var comment_field = { name: "Comment", type: "string", defValue: null };
+                   vis.addDataField(comment_field);
+
                     // add a listener for when nodes and edges are clicked
                     vis.addListener("click", "nodes", function(event) {
 
@@ -51,19 +55,16 @@
                     }
 
                     function clear(group_id) {
-
                         var element =  document.getElementById(group_id);
                         var table_id = group_id + "_table";
                         var table = document.getElementById(table_id);
                         if (table != null) {
                            element.removeChild(table);
                         }
-
                         element.innerHTML = "No " + group_id + " are selected.";
                     }
 
                     function print_properties(group_id, target) {
-
                         var element = document.getElementById(group_id);
                          element.innerHTML = "";
                         var table_id = group_id + "_table";
@@ -73,9 +74,7 @@
                             table.id = table_id;
                             table.class = "properties_table";
 
-
                             var dataFields = getDataFields(group_id);
-
                             for(var j in dataFields){
                                 var field_name;
                                 var field_value= {};
@@ -92,88 +91,81 @@
                             for (var i in target.data) {
                                 var variable_name = i;
                                 var variable_value = target.data[i];
-                                if (variable_value == null){
-                                    variable_value = "null";
-                                }
-
                                 var row = document.createElement('tr');
                                 var col1 = document.createElement('th');
                                 col1.textContent = variable_name;
                                 col1.textAlign = "left";
                                 var col2 = document.createElement('td');
-                                // for editable properties later
-                                if (variable_name == "id"){
-                                    col2.textContent = variable_value;
-                                }else{
-                                    var input_text = document.createElement('input');
-
-                                    if(dataValidation[variable_name]["type"]=="boolean"){
-                                        input_text.type = "checkbox";
-                                        input_text.value = (variable_value=="true"? true : false)
-
-                                    }else{
-
-                                    input_text.type = "text";
-                                    input_text.value = variable_value;
-                                    }
-                                    input_text.id = variable_name;
-
-                                    input_text.onchange = function() {
-
-                                        var value = this.value;
-                                        if(value=="null"){
-                                           value = null;
-                                        }
-                                        var type = dataValidation[this.id]["type"];
-                                        switch (type) {
-                                            case "number":
-                                            case "real":
-                                                if (parseFloat(value) == value) {
-                                                    target.data[this.id] = parseFloat(value);
-                                                }
-                                                else
-                                                    target.data[this.id] = value;
-                                                break;
-                                            case "integer":
-                                            case "int":
-
-                                                if (parseInt(value) == value) {
-                                                    target.data[this.id] = parseInt(value);
-                                                }
-                                                else
-                                                    target.data[this.id] = value;
-                                                break;
-                                            case "string":
-                                                target.data[this.id] = value;
-                                                break;
-                                            case "boolean":
-                                                   value = this.checked;
-                                                if (value == true) {
-                                                    target.data[this.id] = true;
-                                                }
-                                                else{
-                                                    if (value == false) {
-                                                        target.data[this.id] = false;
-                                                    }
-                                                    else
-                                                     target.data[this.id] = value;
-                                                }
-
-                                                break;
-                                            default:
-                                                target.data[this.id] = value;
-                                                break;
+                                switch(variable_name){
+                                    // non-editable attributes:
+                                    case "id":
+                                    case "Name":
+                                    case "Description":
+                                    case "Synonym":
+                                    case "Smiles":
+                                        col2.textContent = variable_value;
+                                        break;
+                                    // linkable attributes:
+                                    case "Uniprot":
+                                        if (variable_value != null && variable_value != "Unspecified") {
+                                            var url = document.createElement('a');
+                                            url.href = 'http://www.uniprot.org/uniprot/' + variable_value;
+                                            url.textContent = variable_value;
+                                            url.target = "_blank";
+                                            col2.appendChild(url);
+                                        } else {
+                                            col2.textContent = variable_value;
                                         }
 
-                                        vis.updateData([target]);
-                                    };
-                                    col2.appendChild(input_text);
+                                        break;
+                                    case "label":
+                                        if (variable_value.indexOf("CHEMBL") != -1 && group_id == "nodes") {
+                                            // compound/target CHEMBLs
+                                            var url = document.createElement('a');
+                                            if(getAttributeVal(target,"Uniprot") == null){
+                                               url.href = 'https://www.ebi.ac.uk/chembldb/compound/inspect/' + variable_value;
+                                            }else{
+                                               url.href = 'https://www.ebi.ac.uk/chembldb/target/inspect/' + variable_value;
+                                            }
+                                            url.textContent = variable_value;
+                                            url.target = "_blank";
+                                            col2.appendChild(url);
+                                        } else {
+                                            var input_text = document.createElement('input');
+                                            createEditableElement(input_text, target, variable_name, variable_value);
+                                            col2.appendChild(input_text);
+                                        }
+                                        break;
+                                    // editable attributes
+                                    default:
+                                        // attributes with keywords are un-editable
+                                        var key_words = ["BindingAffinity","EvidenceType","ActivityComment","Extra Data"];
+                                        for(var i in key_words) {
+                                            if (variable_name.indexOf(key_words[i]) == 0) {
+                                                col2.textContent = variable_value;
+                                                break;
+                                            } else {
+                                                if (i == (key_words.length - 1)) {
+                                                    var input_text = document.createElement('input');
+                                                    createEditableElement(input_text, target, variable_name, variable_value);
+                                                    col2.appendChild(input_text);
+                                                }
+                                            }
+                                        }
+                                        break;
                                 }
-
                                 row.appendChild(col1);
                                 row.appendChild(col2);
 
-                                table.appendChild(row);
+                                //hide null attributes except 'Comment'
+                                if(variable_value == null){
+                                   if( variable_name =="Comment"){
+                                     table.appendChild(row);
+                                   }
+                                }else{
+                                 table.appendChild(row);
+                                }
+
                             }
                             element.appendChild(table);
                         }
@@ -189,8 +181,81 @@
 
 
                };
+               function getAttributeVal(target,attribute){
+                  for (var i in target.data) {
+                      if (i == attribute && target.data[i] != null) {
+                          return target.data[i];
+                      }
+                  }
+              }
+              function createEditableElement(element, target, variable_name, variable_value) {
+                  var input_text = element;
 
+                  if (dataValidation[variable_name]["type"] == "boolean") {
+                      input_text.type = "checkbox";
+                      input_text.value = (variable_value == "true" ? true : false)
 
+                  } else {
+
+                      input_text.type = "text";
+                      if(variable_value == null){
+                         input_text.value = "null"
+                      }else{
+                         input_text.value = variable_value;
+                      }
+
+                  }
+                  input_text.id = variable_name;
+
+                  // in place editing and validation
+                  input_text.onchange = function() {
+
+                      var value = this.value;
+
+                      var type = dataValidation[this.id]["type"];
+                      switch (type) {
+                          case "number":
+                          case "real":
+                              if (parseFloat(value) == value) {
+                                  target.data[this.id] = parseFloat(value);
+                              }
+                              else
+                                  target.data[this.id] = value;
+                              break;
+                          case "integer":
+                          case "int":
+
+                              if (parseInt(value) == value) {
+                                  target.data[this.id] = parseInt(value);
+                              }
+                              else
+                                  target.data[this.id] = value;
+                              break;
+                          case "string":
+                              target.data[this.id] = value;
+                              break;
+                          case "boolean":
+                              value = this.checked;
+                              if (value == true) {
+                                  target.data[this.id] = true;
+                              }
+                              else {
+                                  if (value == false) {
+                                      target.data[this.id] = false;
+                                  }
+                                  else
+                                      target.data[this.id] = value;
+                              }
+
+                              break;
+                          default:
+                              target.data[this.id] = value;
+                              break;
+                      }
+
+                      vis.updateData([target]);
+                  };
+              }
               function getDataFields(group_id) {
                   var schema = vis.dataSchema();
                   var nodeFields = schema.nodes;
@@ -204,18 +269,7 @@
                   }
 
               }
-              function WriteFile(path) {
 
-                  var fh = fopen(path, 3); // Open the file for writing
-
-                  if (fh != -1) // If the file has been successfully opened
-                  {
-                      var str = "Some text goes here...";
-                      fwrite(fh, str); // Write the string to a file
-                      fclose(fh); // Close the file
-                  }
-
-              }
                function export_vis(format) {
                   vis.exportNetwork('xgmml', '<%= model_path(@model)%>/export_as_xgmml?type=xml');
                }
