@@ -75,8 +75,10 @@
 <% end -%>
 
 <% if @folder.is_a?(Seek::AssayFolder) -%>
-    <div id="remove_from_assay_drop_area">
-      <p>Drop here to remove from the assay</p>
+    <div id="remove_from_assay_surround">
+        <div id="remove_from_assay_drop_area" style="display:none;">
+          <p>Drop here to remove from the assay</p>
+        </div>
     </div>
     <script type="text/javascript">
       Droppables.add("remove_from_assay_drop_area", {accept:'draggable_assay_folder_item', hoverclass:'folder_hover', onDrop:function(element, droppable_element) {

@@ -77,3 +77,18 @@ function focus_folder(folder_id) {
         $(element_id.gsub("label", "content")).toggleClassName("ygtvfocus");
     }
 }
+
+Draggables.addObserver({
+  onStart:function( eventName, draggable, event )
+  {
+    if ($("remove_from_assay_drop_area")) {
+        Effect.Appear("remove_from_assay_drop_area",{duration:0.5});
+    }
+  },
+  onEnd:function( eventName, draggable, event )
+  {
+    if ($("remove_from_assay_drop_area")) {
+        Effect.Fade("remove_from_assay_drop_area",{duration:0.5});
+    }
+  }
+});
