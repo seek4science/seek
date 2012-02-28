@@ -38,7 +38,7 @@
     <ul class="sectionIcons">
     <% if @model.can_download? -%>
       <li>
-        <%= image_tag_for_key('cytoscape_web', visualise_model_path(@model,:version=>@display_model.version),nil,{:target=>"_blank"},"Visualise Model on Cytoscape Web") -%>
+        <%= image_tag_for_key('cytoscape_web', visualise_model_path(@model,:version=>@display_model.version),nil,{:target=>"_blank"},"Visualise Model with Cytoscape Web") -%>
       </li>
     <% end -%>
   </ul>

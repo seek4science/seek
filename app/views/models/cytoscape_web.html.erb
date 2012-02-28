@@ -6,34 +6,283 @@
     <head>
         <title>Model Visualization with Cytoscape Web</title>
         <script type="text/javascript">
-               window.onload = function() {
-                // id of Cytoscape Web container div
+          // id of Cytoscape Web container div
                 var div_id = "cytoscapeweb";
-
-                // convert xgmml file content to a string
-                var network_xgmml = <%= @graph %> ;
-                // initialization options
                 var options = {
                     // where you have the Cytoscape Web SWF
                     swfPath: "/swfs/CytoscapeWeb",
                     // where you have the Flash installer SWF
                     flashInstallerPath: "/swfs/playerProductInstall"
                 };
-
-                // init and draw
+               // init and draw
                 var vis = new org.cytoscapeweb.Visualization(div_id, options);
-                vis.draw({ network: network_xgmml});
+                // data validation hash for properties of nodes and edges
+               var dataValidation = {};
+
+               window.onload = function() {
+                // convert xgmml file content to a string
+                var network_xgmml = <%= @graph %> ;
+                // initialization options
+
+                // callback when Cytoscape Web has finished drawing
+                vis.ready(function() {
+
+                    // add a listener for when nodes and edges are clicked
+                    vis.addListener("click", "nodes", function(event) {
+
+                        handle_click(event,"nodes");
+                    })
+                    .addListener("click", "edges", function(event) {
+                        handle_click(event,"edges");
+                    });
+
+                    function handle_click(event,group_id) {
+                         var target = event.target;
+
+                         if (group_id == "nodes"){
+                             clear("edges");
+                         }
+                         if (group_id == "edges") {
+                             clear("nodes");
+                         }
+
+                         print_properties(group_id,target);
+
+                    }
+
+                    function clear(group_id) {
+
+                        var element =  document.getElementById(group_id);
+                        var table_id = group_id + "_table";
+                        var table = document.getElementById(table_id);
+                        if (table != null) {
+                           element.removeChild(table);
+                        }
+
+                        element.innerHTML = "No " + group_id + " are selected.";
+                    }
+
+                    function print_properties(group_id, target) {
+
+                        var element = document.getElementById(group_id);
+                         element.innerHTML = "";
+                        var table_id = group_id + "_table";
+                        var table = document.getElementById(table_id);
+                        if (table == null) {
+                            table = document.createElement('table');
+                            table.id = table_id;
+                            table.class = "properties_table";
+
+
+                            var dataFields = getDataFields(group_id);
+
+                            for(var j in dataFields){
+                                var field_name;
+                                var field_value= {};
+                                for(var k in dataFields[j]){
+                                    if(k=="name"){
+                                        field_name = dataFields[j][k];
+                                    }else
+                                    {
+                                      field_value[k] = dataFields[j][k];
+                                    }
+                                }
+                                dataValidation[field_name] = field_value;
+                            }
+                            for (var i in target.data) {
+                                var variable_name = i;
+                                var variable_value = target.data[i];
+                                if (variable_value == null){
+                                    variable_value = "null";
+                                }
+
+                                var row = document.createElement('tr');
+                                var col1 = document.createElement('th');
+                                col1.textContent = variable_name;
+                                col1.textAlign = "left";
+                                var col2 = document.createElement('td');
+                                // for editable properties later
+                                if (variable_name == "id"){
+                                    col2.textContent = variable_value;
+                                }else{
+                                    var input_text = document.createElement('input');
+
+                                    if(dataValidation[variable_name]["type"]=="boolean"){
+                                        input_text.type = "checkbox";
+                                        input_text.value = (variable_value=="true"? true : false)
+
+                                    }else{
+
+                                    input_text.type = "text";
+                                    input_text.value = variable_value;
+                                    }
+                                    input_text.id = variable_name;
+
+                                    input_text.onchange = function() {
+
+                                        var value = this.value;
+                                        if(value=="null"){
+                                           value = null;
+                                        }
+                                        var type = dataValidation[this.id]["type"];
+                                        switch (type) {
+                                            case "number":
+                                            case "real":
+                                                if (parseFloat(value) == value) {
+                                                    target.data[this.id] = parseFloat(value);
+                                                }
+                                                else
+                                                    target.data[this.id] = value;
+                                                break;
+                                            case "integer":
+                                            case "int":
+
+                                                if (parseInt(value) == value) {
+                                                    target.data[this.id] = parseInt(value);
+                                                }
+                                                else
+                                                    target.data[this.id] = value;
+                                                break;
+                                            case "string":
+                                                target.data[this.id] = value;
+                                                break;
+                                            case "boolean":
+                                                   value = this.checked;
+                                                if (value == true) {
+                                                    target.data[this.id] = true;
+                                                }
+                                                else{
+                                                    if (value == false) {
+                                                        target.data[this.id] = false;
+                                                    }
+                                                    else
+                                                     target.data[this.id] = value;
+                                                }
+
+                                                break;
+                                            default:
+                                                target.data[this.id] = value;
+                                                break;
+                                        }
+
+                                        vis.updateData([target]);
+                                    };
+                                    col2.appendChild(input_text);
+                                }
+
+                                row.appendChild(col1);
+                                row.appendChild(col2);
+
+                                table.appendChild(row);
+                            }
+                            element.appendChild(table);
+                        }
+
+
+
+
+                    }
+
+                });
+
+                vis.draw({ network: network_xgmml,layout:"Preset"});
+
+
                };
+
+
+              function getDataFields(group_id) {
+                  var schema = vis.dataSchema();
+                  var nodeFields = schema.nodes;
+                  var edgeFields = schema.edges;
+
+                  if (group_id == "nodes") {
+                      return nodeFields;
+                  }
+                  if (group_id == "edges") {
+                      return edgeFields;
+                  }
+
+              }
+              function WriteFile(path) {
+
+                  var fh = fopen(path, 3); // Open the file for writing
+
+                  if (fh != -1) // If the file has been successfully opened
+                  {
+                      var str = "Some text goes here...";
+                      fwrite(fh, str); // Write the string to a file
+                      fclose(fh); // Close the file
+                  }
+
+              }
+               function export_vis(format) {
+                  vis.exportNetwork('xgmml', '<%= model_path(@model)%>/export_as_xgmml?type=xml');
+               }
+
+
+
         </script>
         <style>
             /* The Cytoscape Web container must have its dimensions set. */
             html, body { height: 100%; width: 100%; padding: 0; margin: 0; }
-            #cytoscapeweb { width: 100%; height: 100%; }
+            #cytoscapeweb { width: 75%; height: 100%; float: left;}
+            #properties {float:right; width: 24%}
+            .half {height: 50%}
+            .label{
+              margin-top: 1em;
+            }
+            label.title {
+                margin-top: 0.25em;
+                color: white;
+                padding: 0.4em 0.25em;
+                background: #0B94B0;
+                border-radius: 5px;
+
+            }
+            table {
+              border: 1;
+              cellpadding: 5;
+              border-color: #00008b;
+            }
+            th{
+              text-align: left;
+              color:  #0B94B0;
+              border: 1;
+            }
+            td{
+             text-align: left;
+                border: 1;
+            }
         </style>
-       <body>
+    <body>
         <div id="cytoscapeweb">
-            Cytoscape Web will replace the contents here with your graph.
+          Cytoscape Web will replace the contents here with your graph.
         </div>
+
+        <center>
+          <input type="submit" onclick="javascript:export_vis('xgmml')" value="Export As XGMML" style="margin-top: 2">
+        </center>
+
+        <div id="properties">
+          <div class="half">
+            <div class="label"><label class="title">Nodes</label></div> <br/>
+            <div id="nodes">
+              No nodes are selected.
+            </div>
+          </div>
+          <div class="half">
+            <div class="label"><label class="title">Edges</label></div><br/>
+            <div id="edges">
+              No edges are selected.
+            </div>
+          </div>
+
+
+
+        </div>
+
     </body>
+
 
 </html>
