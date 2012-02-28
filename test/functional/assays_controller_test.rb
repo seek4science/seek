@@ -27,6 +27,26 @@ class AssaysControllerTest < ActionController::TestCase
 
   end
 
+  test "check SOP and DataFile drop down contents" do
+    user = Factory :user
+    project=user.person.projects.first
+    login_as user
+    sop = Factory :sop, :contributor=>user.person,:projects=>[project]
+    data_file = Factory :data_file, :contributor=>user.person,:projects=>[project]
+    get :new, :class=>"experimental"
+    assert_response :success
+
+    assert_select "select#possible_data_files" do
+      assert_select "option[value=?]",data_file.id,:text=>/#{data_file.title}/
+      assert_select "option",:text=>/#{sop.title}/,:count=>0
+    end
+
+    assert_select "select#possible_sops" do
+      assert_select "option[value=?]",sop.id,:text=>/#{sop.title}/
+      assert_select "option",:text=>/#{data_file.title}/,:count=>0
+    end
+  end
+
   test "index includes modelling validates with schema" do
     get :index, :page=>"all", :format=>"xml"
     assert_response :success
