@@ -14,6 +14,21 @@ div#tree {
     max-width: 16em;
 }
 
+div#remove_from_assay_drop_area {
+    width: 100%;
+    height: 5em;
+    background-color: red;
+}
+
+div#remove_from_assay_drop_area.folder_hover {
+    background-color: #8b0000;
+}
+
+div#remove_from_assay_drop_area p {
+    text-align: center;
+    font-size: larger;
+}
+
 
 .folder_hover {
     background: black;
@@ -39,10 +54,6 @@ ul.asset_cards li.asset_card_item {
     min-height: 5em;
     max-height: 5em;
     float: left;
-}
-
-li.asset_card_item p.asset_card_title {
-
 }
 
 li.asset_card_item img.asset_card_avatar {

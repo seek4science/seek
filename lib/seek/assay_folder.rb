@@ -52,7 +52,22 @@ module Seek
     def move_assets assets, src_folder
       assets = Array(assets)
       assets.each do |asset|
-        assay.relate(asset)
+        if asset.is_a?(Publication)
+          Relationship.create :subject=>assay,:object=>asset,:predicate=>Relationship::RELATED_TO_PUBLICATION
+        else
+          assay.relate(asset)
+        end
+      end
+    end
+
+    def remove_assets assets
+      assets=Array(assets)
+      to_keep=[]
+      assay.assay_assets.each do |aa|
+        aa.destroy if assets.include?(aa.asset)
+      end
+      assay.relationships.each do |rel|
+        rel.destroy if assets.include?(rel.object)
       end
     end
 

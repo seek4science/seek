@@ -83,4 +83,49 @@ class AssayFolderTest < ActiveSupport::TestCase
     assert_equal [sop],folder.assets
   end
 
+  test "move publication" do
+    assay = Factory(:experimental_assay,:policy=>Factory(:public_policy))
+    pub = Factory :publication,:projects=>[assay.projects.first],:policy=>Factory(:public_policy)
+    folder = Seek::AssayFolder.new assay,assay.projects.first
+    src_folder = Factory :project_folder, :project=>assay.projects.first
+    assert_difference("Relationship.count") do
+      folder.move_assets pub,src_folder
+    end
+    assay.reload
+    assert_equal [pub],assay.related_publications
+    assert_equal [pub],folder.assets
+  end
+
+  test "remove assets" do
+    assay = Factory(:experimental_assay,:policy=>Factory(:public_policy))
+    sop = Factory :sop,:projects=>[assay.projects.first],:policy=>Factory(:public_policy)
+    assay.relate(sop)
+    assay.reload
+    folder = Seek::AssayFolder.new assay,assay.projects.first
+    assert_equal [sop],folder.assets
+    assert_equal 1,assay.assay_assets.count
+    assert_difference("AssayAsset.count",-1) do
+      folder.remove_assets sop
+    end
+    assay.reload
+    assert_equal [],folder.assets
+    assert_equal [],assay.assets
+  end
+
+  test "remove publication asset" do
+    assay = Factory(:experimental_assay,:policy=>Factory(:public_policy))
+    publication = Factory :publication, :contributor=>@user.person
+    Relationship.create :subject=>assay, :object=>publication, :predicate=>Relationship::RELATED_TO_PUBLICATION
+    assert_equal [publication],assay.related_publications
+    assay.reload
+    folder = Seek::AssayFolder.new assay,assay.projects.first
+    assert_equal [publication],folder.assets
+    assert_difference("Relationship.count",-1) do
+      folder.remove_assets publication
+    end
+    assay.reload
+    assert_equal [],folder.assets
+    assert_equal [],assay.related_publications
+  end
+
 end

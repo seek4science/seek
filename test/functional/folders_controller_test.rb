@@ -198,12 +198,34 @@ class FoldersControllerTest < ActionController::TestCase
     folder.save!
 
     assert_difference("AssayAsset.count") do
-      xhr(:post,:move_asset_to,{:asset_id=>sop.id,:asset_type=>"Sop",:id=>folder.id,:dest_folder_id=>"Assay_#{assay.id}",:project_id=>folder.project.id})
+      xhr(:post,:move_asset_to,{:asset_id=>sop.id,
+                                :asset_type=>"Sop",
+                                :id=>folder.id,
+                                :dest_folder_id=>"Assay_#{assay.id}",
+                                :project_id=>folder.project.id,
+                                :orig_folder_element_id=>"sdfhsdk",
+                                :dest_folder_element_id=>"oosdo"})
     end
     assert_response :success
     assay.reload
     assert_equal [sop],assay.assets.collect{|a| a.parent}
     assert_equal [sop],folder.assets
+  end
+
+  test "remove asset from assay" do
+    assay = Factory :experimental_assay,:contributor=>@member.person,:policy=>Factory(:public_policy)
+    assay.study.investigation.projects=[@project]
+    assay.study.investigation.save!
+    sop = Factory :sop, :projects=>[@project],:policy=>Factory(:public_policy)
+    assay.relate(sop)
+    folder = Seek::AssayFolder.new assay,@project
+    assert_difference("AssayAsset.count",-1) do
+      xhr(:post,:remove_asset,{:asset_id=>sop.id,:asset_type=>"Sop",:id=>folder.id,:project_id=>folder.project.id,:orig_folder_element_id=>"sdfhsdk"})
+    end
+
+    assay.reload
+    assert_equal [],assay.assets
+    assert_equal [],folder.assets
   end
 
   test "cannot move to other project folder" do

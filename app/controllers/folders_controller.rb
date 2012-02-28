@@ -3,8 +3,9 @@
 class FoldersController < ApplicationController
   before_filter :login_required
   before_filter :check_project
-  before_filter :get_folder, :only=>[:create_folder, :destroy, :display_contents]
+  before_filter :get_folder, :only=>[:create_folder, :destroy, :display_contents,:remove_asset]
   before_filter :get_folders,:only=>[:index,:move_asset_to,:create_folder]
+  before_filter :get_asset, :only=>[:move_asset_to,:remove_asset]
 
   in_place_edit_for :project_folder, :title
   in_place_edit_for :project_folder, :description
@@ -40,24 +41,31 @@ class FoldersController < ApplicationController
     render :update do |page|
       page.reload
     end
-
   end
 
   #moves the asset identified by :asset_id and :asset_type from this folder to the folder identified by :dest_folder_id
   def move_asset_to
-    asset = params[:asset_type].constantize.find(params[:asset_id])
     this_folder=resolve_folder params[:id]
     dest_folder=resolve_folder params[:dest_folder_id]
-    dest_folder.move_assets asset,this_folder
+    dest_folder.move_assets @asset,this_folder
     render :update do |page|
       if (params[:dest_folder_element_id])
         page[params[:dest_folder_element_id]].update(dest_folder.label)
-        #page[params[:dest_folder_element_id]].highlight
       end
       if (params[:origin_folder_element_id] && dest_folder.is_a?(ProjectFolder))
         page[params[:origin_folder_element_id]].update(this_folder.label)
-        page << "Effect.Fade(#{asset.class.name}_#{asset.id}_#{this_folder.id});"
+        page << "Effect.Fade(#{@asset.class.name}_#{@asset.id}_#{this_folder.id});"
       end
+    end
+  end
+
+  def remove_asset
+    @folder.remove_assets @asset
+    render :update do |page|
+       if (params[:origin_folder_element_id])
+        page[params[:origin_folder_element_id]].update(@folder.label)
+       end
+      page << "Effect.Fade(#{@asset.class.name}_#{@asset.id}_#{@folder.id});"
     end
   end
 
@@ -111,8 +119,6 @@ class FoldersController < ApplicationController
     end
   end
 
-
-
   def get_folders
     @folders = project_folders
   end
@@ -124,6 +130,13 @@ class FoldersController < ApplicationController
       ProjectFolderAsset.assign_existing_assets @project
     end
     project_folders
+  end
+
+  def get_asset
+    @asset = params[:asset_type].constantize.find(params[:asset_id])
+    unless @asset.can_view?
+      error("You cannot view the asset", "is invalid or not authorized")
+    end
   end
 
 end
