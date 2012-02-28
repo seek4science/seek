@@ -24,7 +24,7 @@
         </div>
     <% else -%>
         <div>
-            <b>Title: </b><%= h(@folder.title) -%>
+            <b>Title: </b><%= @folder.is_a?(Seek::AssayFolder) ? link_to(h(@folder.title),@folder.assay) : h(@folder.title) -%>
         </div>
         <div>
             <b>Description: </b><%= h(@folder.description) -%>
