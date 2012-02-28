@@ -11,8 +11,6 @@ div#folder_column {
 }
 
 div#tree {
-    position: fixed;
-    overflow-x: auto;
     max-width: 16em;
 }
 
