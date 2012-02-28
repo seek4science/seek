@@ -23,7 +23,13 @@ module WorkGroupsHelper
     
     options = []
     last_project=nil
-    work_groups = WorkGroup.find(:all,:include=>[:project,:institution])
+    #if current_user is project manager and not admin, load work_groups of projects he is in
+    if current_user.try(:person).try(:is_project_manager?) && !current_user.try(:person).try(:is_admin?)
+      work_groups = current_user.person.projects.collect(&:work_groups).flatten
+    else
+      work_groups = WorkGroup.find(:all,:include=>[:project,:institution])
+    end
+
 
     work_groups = work_groups.sort do |a,b|
       x=a.project.name <=> b.project.name
