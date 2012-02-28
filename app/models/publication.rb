@@ -9,6 +9,18 @@ class Publication < ActiveRecord::Base
 
   acts_as_asset
 
+  def default_policy
+    policy = Policy.new(:name => "publication_policy", :sharing_scope => Policy::EVERYONE, :access_type => Policy::VISIBLE)
+    #add managers (authors + contributor)
+    creators.each do |author|
+      policy.permissions.build(:contributor => author, :policy => policy, :access_type => Policy::MANAGING)
+    end
+    #Add contributor
+    c = contributor || default_contributor
+    policy.permissions.build(:contributor => c.person, :policy => policy, :access_type => Policy::MANAGING) if c
+    policy
+  end
+
   validates_presence_of :title
   validates_presence_of :projects
   validate :check_identifier_present
