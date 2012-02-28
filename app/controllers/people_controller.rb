@@ -6,10 +6,9 @@ class PeopleController < ApplicationController
   before_filter :is_user_admin_auth,:only=>[:destroy]
   before_filter :is_user_admin_or_personless, :only=>[:new]
   before_filter :removed_params,:only=>[:update,:create]
-  before_filter :is_admin_or_is_project_manager, :only=>[:admin, :administer_update]
   before_filter :do_projects_belong_to_project_manager_projects,:only=>[:administer_update]
-  before_filter :profile_is_not_another_admin_except_me, :only=>[:admin, :administer_update]
   before_filter :editable_by_user, :only => [:edit, :update]
+  before_filter :administerable_by_user, :only => [:admin, :administer_update]
 
   skip_before_filter :project_membership_required
   skip_before_filter :profile_for_login_required,:only=>[:select,:userless_project_selected_ajax,:create]
@@ -324,13 +323,6 @@ class PeopleController < ApplicationController
     person.roles=roles
   end
 
-  def profile_is_not_another_admin_except_me
-    @person=Person.find(params[:id])
-    if !@person.user.nil? && @person.user!=current_user && @person.user.try(:is_admin?)
-      error("Cannot edit/administer another Admins profile","is invalid(another admin)")
-      return false
-    end
-  end
 
   def is_user_admin_or_personless
     unless User.admin_logged_in? || current_user.person.nil?
@@ -396,6 +388,14 @@ class PeopleController < ApplicationController
 
   def editable_by_user
     unless @person.can_be_edited_by?(current_user)
+      error("Insufficient privileges", "is invalid (insufficient_privileges)")
+      return false
+    end
+  end
+
+  def administerable_by_user
+    @person=Person.find(params[:id])
+    unless @person.can_be_administered_by?(current_user)
       error("Insufficient privileges", "is invalid (insufficient_privileges)")
       return false
     end

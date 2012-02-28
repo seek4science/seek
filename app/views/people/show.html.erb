@@ -16,8 +16,8 @@
           </li>
       <% end -%>
   <% end %>
-  <!--admin or project manager can administer themselves and the other people, except the other admins-->
-  <% if ((current_user.try :is_admin?) || (current_user.try :is_project_manager?)) &&  (@person.user==current_user || !@person.user.try(:is_admin?))-%>
+
+  <% if @person.can_be_administered_by?(current_user)-%>
       <li>
         <%= image_tag_for_key "admin", admin_person_path(@person), "Administer", nil, "Person Administration" -%>
       </li>
