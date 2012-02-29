@@ -308,6 +308,135 @@ class ProjectsControllerTest < ActionController::TestCase
 		assert Permission.find_by_policy_id(project.default_policy).contributor_id == person.id
 	end
 
+  test 'project manager can administer their projects' do
+    project_manager = Factory(:project_manager)
+    project = project_manager.projects.first
+    login_as(project_manager.user)
+
+    get :show, :id => project
+    assert_response :success
+    assert_select "a", :text => /Project administration/, :count => 1
+
+    get :admin, :id => project
+    assert_response :success
+
+    new_institution = Institution.create(:name => 'a test institution')
+    put :update, :id => project, :project => {:institution_ids => (project.institutions + [new_institution]).collect(&:id)}
+    assert_redirected_to project_path(project)
+    project.reload
+    assert project.institutions.include?new_institution
+  end
+
+  test 'project manager can not administer the projects that they are not in' do
+    project_manager = Factory(:project_manager)
+    a_project = Factory(:project)
+    assert !(project_manager.projects.include?a_project)
+    login_as(project_manager.user)
+
+    get :show, :id => a_project
+    assert_response :success
+    assert_select "a", :text => /Project administration/, :count => 0
+
+    get :admin, :id => a_project
+    assert_redirected_to :root
+    assert_not_nil flash[:error]
+
+    new_institution = Institution.create(:name => 'a test institution')
+    put :update, :id => a_project, :project => {:institution_ids => (a_project.institutions + [new_institution]).collect(&:id)}
+    assert_redirected_to :root
+    assert_not_nil flash[:error]
+    a_project.reload
+    assert !(a_project.institutions.include?new_institution)
+  end
+
+  test 'project manager can only see the new institutions (which are not yet in any projects) and the institutions this project' do
+    project_manager = Factory(:project_manager)
+    project = project_manager.projects.first
+    login_as(project_manager.user)
+
+    new_institution = Institution.create(:name => 'a test institution')
+    a_project = Factory(:project)
+    a_project.institutions << Factory(:institution)
+
+    get :admin, :id => project
+    assert_response :success
+    assert_select "select#project_institution_ids", :count => 1 do
+      (project.institutions + [new_institution]).each do |institution|
+         assert_select 'option', :text => institution.title, :count => 1
+      end
+      a_project.institutions.each do |institution|
+         assert_select 'option', :text => institution.title, :count => 0
+      end
+    end
+  end
+
+  test 'project manager can assign only the new institutions (which are not yet in any projects) to their project' do
+    project_manager = Factory(:project_manager)
+    project = project_manager.projects.first
+    login_as(project_manager.user)
+
+    new_institution = Institution.create(:name => 'a test institution')
+
+    put :update, :id => project, :project => {:institution_ids => (project.institutions + [new_institution]).collect(&:id)}
+    assert_redirected_to project_path(project)
+    project.reload
+    assert project.institutions.include?new_institution
+  end
+
+  test 'project manager can not assign the institutions (which are already in the other projects) to their project' do
+    project_manager = Factory(:project_manager)
+    project = project_manager.projects.first
+    a_project = Factory(:project)
+    a_project.institutions << Factory(:institution)
+
+    login_as(project_manager.user)
+
+    put :update, :id => project, :project => {:institution_ids => (project.institutions + a_project.institutions).collect(&:id)}
+    assert_redirected_to :root
+    assert_not_nil flash[:error]
+    project.reload
+    a_project.institutions.each do |i|
+       assert !(project.institutions.include?i)
+    end
+  end
+
+  test 'project manager can not administer sharing policy' do
+    project_manager = Factory(:project_manager)
+    project = project_manager.projects.first
+    policy = project.default_policy
+
+		sharing = {}
+		sharing[:sharing_scope] = Policy::EVERYONE
+    sharing["access_type_#{sharing[:sharing_scope]}"] = Policy::VISIBLE
+
+    assert_not_equal policy.sharing_scope, sharing[:sharing_scope]
+    assert_not_equal policy.access_type, sharing["access_type_#{sharing[:sharing_scope]}"]
+
+    login_as(project_manager.user)
+		put :update, :id => project.id, :project => valid_project, :sharing => sharing
+    project.reload
+    assert_redirected_to project
+		assert_not_equal project.default_policy.sharing_scope, sharing[:sharing_scope]
+    assert_not_equal project.default_policy.access_type, sharing["access_type_#{sharing[:sharing_scope]}"]
+  end
+
+  test 'project manager can not administer jerm detail' do
+    project_manager = Factory(:project_manager)
+    project = project_manager.projects.first
+    assert_nil project.site_root_uri
+    assert_nil project.site_username
+    assert_nil project.site_password
+
+    login_as(project_manager.user)
+		put :update, :id => project.id, :project => {:site_root_uri => 'test', :site_username => 'test', :site_password => 'test'}
+
+    project.reload
+    assert_redirected_to project
+		assert_nil project.site_root_uri
+    assert_nil project.site_username
+    assert_nil project.site_password
+  end
+
 	private
 
 	def valid_project
