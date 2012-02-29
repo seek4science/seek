@@ -175,4 +175,8 @@ class Project < ActiveRecord::Base
     subject == nil ? false : (subject.is_admin? || (self.people.include?(subject.person) && (subject.can_edit_projects? || subject.is_project_manager?)))
   end
 
+  def can_be_administered_by?(subject)
+    subject == nil ? false : (subject.is_admin? || (self.people.include?(subject.person) && (subject.is_project_manager?)))
+  end
+
 end

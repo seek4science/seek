@@ -874,4 +874,10 @@ class PeopleControllerTest < ActionController::TestCase
     get :show, :id => users(:project_manager).person
     assert_select "a", :text => /New Institution/, :count => 1
   end
+
+  test "project manager does not have a button 'New Institution' in other profile" do
+    login_as(:project_manager)
+    get :show, :id => users(:aaron).person
+    assert_select "a", :text => /New Institution/, :count => 0
+  end
 end
