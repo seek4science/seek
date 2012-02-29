@@ -479,7 +479,7 @@ end
     assert_select "a", :text=>/A modelling analysis/i, :count=>1
   end
 
-  test "get new with class doesn't present options for class" do
+  test "get new with class doesnt present options for class" do
     login_as(:model_owner)
     get :new, :class=>"experimental"
     assert_response :success

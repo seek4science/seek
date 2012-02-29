@@ -1,7 +1,6 @@
 <%
     resource_text ||= text_for_resource(resource)
-    all_sops=authorised_sops.sort{|a, b| a.title<=>b.title}
-    project_sops=all_sops.select{|s| current_user.person.member_of?(s.projects)}
+    project_sops=authorised_sops(current_user.person.projects).sort_by &:title
     select_truncate_length=120
     associated_sops = resource.is_a?(Publication) ? resource.related_sops : resource.sops
 -%>
@@ -35,8 +34,7 @@
         <%= select_tag :assay_sop_ids, options_from_collection_for_select([], :id, :title), {:multiple=>true, :style=>"display:none;"} -%>
         
         <br/>
-      
-        <%= check_box_tag :include_other_project_sops, nil, false, {:onchange=>"toggle_sop_list();",:style=>"margin-top:0.5em;"} -%> Associate SOPs from other projects?
+
       </div>
 	  <br/>
       <%= link_to_function (image("new") + " Associate with this #{resource_text}"), "addSelectedSop(); return(false);", :id=>"add_sop_link", :class=>"block_link" %>
@@ -47,43 +45,7 @@
 </div>
 
 <script type="text/javascript">
-    function toggle_sop_list() {
-        var checked = $('include_other_project_sops').checked;
-        var option;
-        var selection_box = $('possible_sops');
 
-        selection_box.options.length=0;        
-
-        if (checked) {
-        <% ([["Select SOP ...",0]]|all_sops.collect{|s| [truncate(h(s.title),:length=>select_truncate_length),s.id]}).each do |sop_details| -%>
-            option = document.createElement("OPTION");
-            option.text = '<%= escape_javascript(sop_details[0]) -%>';
-            option.value = '<%= sop_details[1] -%>';
-            try {
-                selection_box.add(option); //for older IE version
-            }
-            catch (ex) {
-                selection_box.add(option, null);
-            }
-        <% end -%>
-        }
-        else {
-           <% ([["Select SOP ...",0]]|project_sops.collect{|s| [truncate(h(s.title),:length=>select_truncate_length),s.id]}).each do |sop_details| -%>
-            option = document.createElement("OPTION");
-            option.text = '<%= escape_javascript(sop_details[0]) -%>';
-            option.value = '<%= sop_details[1] -%>';
-            try {
-                selection_box.add(option); //for older IE version
-            }
-            catch (ex) {
-                selection_box.add(option, null);
-            }
-        <% end -%>
-        }
-
-        selection_box.onchange();
-    }  
-  
     <% @assay.sop_masters.each do |s| -%>    
       <% if s.can_view? -%>
         sop_id = '<%= s.id -%>';
