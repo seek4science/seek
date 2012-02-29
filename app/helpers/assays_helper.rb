@@ -84,8 +84,8 @@ module AssaysHelper
     result
   end
 
-  def authorised_assays
-    authorised_assets(Assay, "edit")
+  def authorised_assays projects=nil
+    authorised_assets(Assay, projects, "edit")
   end
 
   def list_assay_samples_and_organisms attribute,assay_samples,assay_organisms, none_text="Not Specified"
