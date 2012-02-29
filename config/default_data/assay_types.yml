@@ -4,6 +4,7 @@ assay types:
   children: experimental_assay_type, modelling_analysis_type
 
 experimental_assay_type:
+  title: experimental assay type
   children: genomics,metabolomics,proteomics,single_cell,transcriptomics, fluxomics
 
 fluxomics:
