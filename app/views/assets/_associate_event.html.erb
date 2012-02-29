@@ -1,4 +1,4 @@
-<% project_events = Event.all.select(&:can_view?).sort_by(&:title).select {|e| !(e.projects & resource.projects).empty?} %>
+<% project_events = authorised_events(current_user.person.projects) -%>
 <% type = resource.class.name.underscore -%>
 
 <% fancy_multiselect resource, :events,{:hidden=> resource.events.blank? ? true : false} do %>
