@@ -174,16 +174,16 @@ class SopTest < ActiveSupport::TestCase
   end
 
   test "is restorable after destroy" do
-    sop = sops(:my_first_sop)
+    sop = Factory :sop, :policy => Factory(:all_sysmo_viewable_policy), :title => 'is it restorable?'
     User.current_user = sop.contributor
     assert_difference("Sop.count",-1) do
       sop.destroy
     end
-    assert_nil Sop.find_by_id(sop.id)
+    assert_nil Sop.find_by_title 'is it restorable?'
     assert_difference("Sop.count",1) do
       disable_authorization_checks {Sop.restore_trash!(sop.id)}
     end
-    assert_not_nil Sop.find_by_id(sop.id)
+    assert_not_nil Sop.find_by_title 'is it restorable?'
   end
 
   test 'failing to delete due to can_delete does not create trash' do
