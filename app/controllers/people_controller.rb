@@ -1,4 +1,6 @@
 class PeopleController < ApplicationController
+
+  include CommonSweepers
   
   #before_filter :login_required,:except=>[:select,:userless_project_selected_ajax,:create,:new]
   before_filter :find_and_auth, :only => [:show, :edit, :update, :destroy]
@@ -266,14 +268,11 @@ class PeopleController < ApplicationController
   private
   
   def set_tools_and_expertise person,params
+      exp_changed = person.tag_with_params params,"expertise"
+      tools_changed = person.tag_with_params params,"tool"
 
-      person.expertise =  params
-      person.tools = params
-
-      #FIXME: don't like this, but is a temp solution for handling lack of observer callback when removing a tag. Also should only expire when they have changed.
-      expire_fragment("sidebar_tag_cloud")
-      expire_fragment("super_tag_cloud")
-
+      expire_annotation_fragments("expertise") if exp_changed
+      expire_annotation_fragments("tool") if tools_changed
   end
 
   def profile_belongs_to_current_or_is_admin
