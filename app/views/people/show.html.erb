@@ -22,7 +22,7 @@
         <%= image_tag_for_key "admin", admin_person_path(@person), "Administer", nil, "Person Administration" -%>
       </li>
   <% end -%>
-  <% if current_user.try :is_project_manager?-%>
+  <% if (current_user.try :is_project_manager?) && mine?(@person)-%>
       <li>
         <%= image_tag_for_key "new", new_institution_path(), "New Institution", nil, "New Institution" -%>
       </li>
