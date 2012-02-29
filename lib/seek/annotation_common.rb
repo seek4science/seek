@@ -36,7 +36,7 @@ module Seek
     def update_annotations entity, attr='tag', owner=User.current_user
       unless owner.nil?
         entity.tag_with_params params, attr
-        expire_annotation_fragments
+        expire_annotation_fragments(attr)
       end
       
     end
@@ -46,7 +46,7 @@ module Seek
     def update_owned_annotations entity, attr='tag', owner=User.current_user
       unless owner.nil?
         entity.tag_as_user_with_params params, attr
-        expire_annotation_fragments
+        expire_annotation_fragments(attr)
       end
     end
   end
