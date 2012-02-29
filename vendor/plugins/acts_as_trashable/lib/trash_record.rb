@@ -25,11 +25,8 @@ class TrashRecord < ActiveRecord::Base
     end
     
     attrs, association_attrs = attributes_and_associations(restore_class, self.trashable_attributes)
-    
-    record = restore_class.new
-    attrs.each_pair do |key, value|
-      record.send("#{key}=", value)
-    end
+
+    record = restore_class.new attrs
     
     association_attrs.each_pair do |association, attribute_values|
       restore_association(record, association, attribute_values)
