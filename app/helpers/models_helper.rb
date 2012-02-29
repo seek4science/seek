@@ -48,8 +48,8 @@ module ModelsHelper
     h(model_format.title)
   end
   
-  def authorised_models
-    authorised_assets(Model)
+  def authorised_models projects=nil
+    authorised_assets(Model,projects)
   end  
   
   def jws_supported? model
