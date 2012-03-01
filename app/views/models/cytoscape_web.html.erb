@@ -17,8 +17,9 @@
                // init and draw
                 var vis = new org.cytoscapeweb.Visualization(div_id, options);
                 // data validation hash for properties of nodes and edges
+               var nodesDataSchema = {};
+               var edgesDataSchema = {};
                var dataValidation = {};
-
                window.onload = function() {
                 // convert xgmml file content to a string
                 var network_xgmml = <%= @graph %> ;
@@ -27,13 +28,24 @@
                 // callback when Cytoscape Web has finished drawing
                 vis.ready(function() {
 
-                    //Add new comment field to nodes and edges:
-                   var comment_field = { name: "Comment", type: "string", defValue: null };
-                   vis.addDataField(comment_field);
+                    //get all data fields of nodes and edges
+                    nodesDataSchema = getDataSchema("nodes");
+                    edgesDataSchema = getDataSchema("edges");
+
+                    var comment_field = { name: "Comment", type: "string", defValue: null };
+                    //Add new comment field to nodes and edges if not existed:
+                    if (checkDataField("nodes","Comment") == undefined) {
+                        vis.addDataField("nodes",comment_field);
+                        nodesDataSchema = getDataSchema("nodes");
+                    }
+                    if (checkDataField("edges","Comment") == undefined) {
+                        vis.addDataField("edges",comment_field);
+                        edgesDataSchema = getDataSchema("edges");
+                    }
 
                     // add a listener for when nodes and edges are clicked
                     vis.addListener("click", "nodes", function(event) {
-
+                        //Add new comment field to nodes and edges if not existed:
                         handle_click(event,"nodes");
                     })
                     .addListener("click", "edges", function(event) {
@@ -42,7 +54,6 @@
 
                     function handle_click(event,group_id) {
                          var target = event.target;
-
                          if (group_id == "nodes"){
                              clear("edges");
                          }
@@ -74,19 +85,10 @@
                             table.id = table_id;
                             table.class = "properties_table";
 
-                            var dataFields = getDataFields(group_id);
-                            for(var j in dataFields){
-                                var field_name;
-                                var field_value= {};
-                                for(var k in dataFields[j]){
-                                    if(k=="name"){
-                                        field_name = dataFields[j][k];
-                                    }else
-                                    {
-                                      field_value[k] = dataFields[j][k];
-                                    }
-                                }
-                                dataValidation[field_name] = field_value;
+
+                            if(target.data["Comment"] == undefined){
+                               target.data["Comment"] = null;
+                               vis.updateData([target]);
                             }
                             for (var i in target.data) {
                                 var variable_name = i;
@@ -99,8 +101,7 @@
                                 switch(variable_name){
                                     // non-editable attributes:
                                     case "id":
-                                    case "Name":
-                                    case "Description":
+                                    case "description":
                                     case "Synonym":
                                     case "Smiles":
                                         col2.textContent = variable_value;
@@ -119,10 +120,10 @@
 
                                         break;
                                     case "label":
-                                        if (variable_value.indexOf("CHEMBL") != -1 && group_id == "nodes") {
+                                        if (variable_value != null && variable_value.indexOf("CHEMBL") != -1 && group_id == "nodes") {
                                             // compound/target CHEMBLs
                                             var url = document.createElement('a');
-                                            if(getAttributeVal(target,"Uniprot") == null){
+                                            if(target.data["Uniprot"] == null){
                                                url.href = 'https://www.ebi.ac.uk/chembldb/compound/inspect/' + variable_value;
                                             }else{
                                                url.href = 'https://www.ebi.ac.uk/chembldb/target/inspect/' + variable_value;
@@ -132,7 +133,7 @@
                                             col2.appendChild(url);
                                         } else {
                                             var input_text = document.createElement('input');
-                                            createEditableElement(input_text, target, variable_name, variable_value);
+                                            createEditableElement(input_text, target, variable_name, variable_value,group_id);
                                             col2.appendChild(input_text);
                                         }
                                         break;
@@ -145,9 +146,10 @@
                                                 col2.textContent = variable_value;
                                                 break;
                                             } else {
+                                                //others are editable
                                                 if (i == (key_words.length - 1)) {
                                                     var input_text = document.createElement('input');
-                                                    createEditableElement(input_text, target, variable_name, variable_value);
+                                                    createEditableElement(input_text, target, variable_name, variable_value,group_id);
                                                     col2.appendChild(input_text);
                                                 }
                                             }
@@ -159,6 +161,7 @@
 
                                 //hide null attributes except 'Comment'
                                 if(variable_value == null){
+
                                    if( variable_name =="Comment"){
                                      table.appendChild(row);
                                    }
@@ -181,16 +184,15 @@
 
 
                };
-               function getAttributeVal(target,attribute){
-                  for (var i in target.data) {
-                      if (i == attribute && target.data[i] != null) {
-                          return target.data[i];
-                      }
-                  }
+
+              function checkDataField(group_id, field){
+                  var val = group_id == "nodes"? nodesDataSchema[field] : (group_id == "edges"? edgesDataSchema[field] : -1);
+                  return val;
               }
-              function createEditableElement(element, target, variable_name, variable_value) {
+              function createEditableElement(element, target, variable_name, variable_value,group_id) {
                   var input_text = element;
 
+                   dataValidation = ( (group_id == "nodes")? nodesDataSchema : edgesDataSchema );
                   if (dataValidation[variable_name]["type"] == "boolean") {
                       input_text.type = "checkbox";
                       input_text.value = (variable_value == "true" ? true : false)
@@ -256,17 +258,23 @@
                       vis.updateData([target]);
                   };
               }
-              function getDataFields(group_id) {
+              function getDataSchema(group_id) {
                   var schema = vis.dataSchema();
-                  var nodeFields = schema.nodes;
-                  var edgeFields = schema.edges;
-
-                  if (group_id == "nodes") {
-                      return nodeFields;
-                  }
-                  if (group_id == "edges") {
-                      return edgeFields;
-                  }
+                  var dataFields = (group_id == "nodes"? schema.nodes : (group_id== "edges"? schema.edges : []));
+                  var data = {};
+                 for (var j in dataFields) {
+                        var field_name;
+                        var field_value = {};
+                        for (var k in dataFields[j]) {
+                            if (k == "name") {
+                                field_name = dataFields[j][k];
+                            } else {
+                                field_value[k] = dataFields[j][k];
+                            }
+                        }
+                        data[field_name] = field_value;
+                    }
+                  return data;
 
               }
 
