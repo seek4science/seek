@@ -694,7 +694,7 @@ namespace :seek do
           Policy.all.each do |policy|
             Acts::Authorized::AUTHORIZATION_ACTIONS.each do |action|
               person_key = user ? user.person.cache_key : nil
-              cache_key = {:purpose => :authorization, :policy => policy.cache_key, :person => person_key, :action => action}
+              cache_key = "can_#{action}?#{policy.cache_key}#{person_key}"
               val = Rails.cache.read cache_key
               csv << [person_key, policy.cache_key, action, val]
             end
