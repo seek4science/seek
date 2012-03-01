@@ -3,6 +3,7 @@ require 'test_helper'
 class PresentationsControllerTest < ActionController::TestCase
 
   include AuthenticatedTestHelper
+  include SharingFormTestHelper
 
   def setup
     WebMock.allow_net_connect!
@@ -20,7 +21,7 @@ class PresentationsControllerTest < ActionController::TestCase
     presentation_attrs =   Factory.attributes_for(:presentation, :data => nil, :data_url => "http://www.virtual-liver.de/images/logo.png")
 
     assert_difference "Presentation.count" do
-      post :create,:presentation => presentation_attrs
+      post :create,:presentation => presentation_attrs, :sharing => valid_sharing
     end
   end
 
@@ -28,7 +29,7 @@ class PresentationsControllerTest < ActionController::TestCase
     presentation_attrs = Factory.attributes_for(:presentation,:contributor=>User.current_user, :data => fixture_file_upload('files/file_picture.png'))
 
     assert_difference "Presentation.count" do
-      post :create,:presentation => presentation_attrs
+      post :create,:presentation => presentation_attrs, :sharing => valid_sharing
       puts assigns(:presentation).errors.full_messages
     end
   end

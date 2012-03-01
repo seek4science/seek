@@ -53,18 +53,18 @@ class DataFileTest < ActiveSupport::TestCase
   end
 
   test "validation" do
-    asset=DataFile.new :title=>"fred",:projects=>[projects(:sysmo_project)]
+    asset=DataFile.new :title=>"fred",:projects=>[projects(:sysmo_project)], :policy => Factory(:private_policy)
     assert asset.valid?
 
-    asset=DataFile.new :projects=>[projects(:sysmo_project)]
+    asset=DataFile.new :projects=>[projects(:sysmo_project)], :policy => Factory(:private_policy)
     assert !asset.valid?
 
     #VL only:allow no projects
-    asset=DataFile.new :title=>"fred"
+    asset=DataFile.new :title=>"fred", :policy => Factory(:private_policy)
     assert asset.valid?
 
 
-    asset = DataFile.new :title => "fred", :projects => []
+    asset = DataFile.new :title => "fred", :projects => [], :policy => Factory(:private_policy)
     assert asset.valid?
   end
 
@@ -83,19 +83,19 @@ class DataFileTest < ActiveSupport::TestCase
     assert_equal [p],df.projects
     assert_equal [p],df.latest_version.projects
   end
-  
-  def test_defaults_to_private_policy
+
+  def test_defaults_to_blank_policy
     df_hash = Factory.attributes_for(:data_file)
     df_hash[:policy] = nil
     df=DataFile.new(df_hash)
-    df.save!
-    df.reload
-    assert_not_nil df.policy
-    assert_equal Policy::PRIVATE, df.policy.sharing_scope
-    assert_equal Policy::NO_ACCESS, df.policy.access_type
+
+    assert !df.valid?
+    assert !df.policy.valid?
+    assert_blank df.policy.sharing_scope
+    assert_blank df.policy.access_type
     assert_equal false,df.policy.use_whitelist
     assert_equal false,df.policy.use_blacklist
-    assert df.policy.permissions.empty?
+    assert_blank df.policy.permissions
   end
 
   test "data_file with no contributor" do
@@ -157,14 +157,14 @@ class DataFileTest < ActiveSupport::TestCase
       assert_nil DataFile.restore_trash(df.id)
     end
   end
-  
+
   test "test uuid generated" do
     x = data_files(:picture)
     assert_nil x.attributes["uuid"]
     x.save
     assert_not_nil x.attributes["uuid"]
   end
-  
+
   test "title_trimmed" do
     df= Factory :data_file ,:policy=>Factory(:policy,:sharing_scope=>Policy::ALL_SYSMO_USERS,:access_type=>Policy::EDITING) #data_files(:picture)
     df.title=" should be trimmed"
@@ -179,7 +179,7 @@ class DataFileTest < ActiveSupport::TestCase
     x.save
     assert_equal x.uuid, uuid
   end
-  
+
   test "can get relationship type" do
     df = data_file_versions(:picture_v1)
     assay = assays(:modelling_assay_with_data_and_relationship)
@@ -292,7 +292,7 @@ class DataFileTest < ActiveSupport::TestCase
       iron = Factory(:compound,:name=>"iron")
       metal = Factory :synonym,:name=>"metal",:substance=>iron
       Factory :mapping_link,:substance=>iron,:mapping=>Factory(:mapping,:chebi_id=>"12345",:kegg_id=>"789",:sabiork_id=>111)
-      
+
       sf1 = Factory :studied_factor_link,:substance=>suger
       sf2 = Factory :studied_factor_link, :substance=>metal
 
@@ -310,5 +310,5 @@ class DataFileTest < ActiveSupport::TestCase
       assert_equal 8,df.fs_search_fields.count
     end
   end
-  
+
 end

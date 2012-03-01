@@ -4,6 +4,7 @@ class SamplesControllerTest < ActionController::TestCase
 fixtures :all
   include AuthenticatedTestHelper
   include RestTestCases
+  include SharingFormTestHelper
   # Called before every test method runs. Can be used
   # to set up fixture information.
   def setup
@@ -52,7 +53,7 @@ fixtures :all
       post :create, :sample => {:title => "test",
                                 :lab_internal_number =>"Do232",
                                 :donation_date => Date.today,
-                                :specimen => Factory(:specimen, :contributor => User.current_user)}
+                                :specimen => Factory(:specimen, :contributor => User.current_user)}, :sharing=>valid_sharing
     end
     s = assigns(:sample)
     assert_redirected_to sample_path(s)

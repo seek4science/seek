@@ -6,6 +6,7 @@ class AssaysControllerTest < ActionController::TestCase
 
   include AuthenticatedTestHelper
   include RestTestCases
+  include SharingFormTestHelper
 
   def setup
     login_as(:quentin)
@@ -248,7 +249,7 @@ test "should not create experimental assay without sample" do
                                :assay_type_id=>assay_types(:metabolomics).id,
                                :study_id=>studies(:metabolomics_study).id,
                                :assay_class=>assay_classes(:experimental_assay_class),
-                               :owner => Factory(:person)}
+                               :owner => Factory(:person)}, :sharing => valid_sharing
       end
     end
 
@@ -262,7 +263,7 @@ test "should not create experimental assay without sample" do
                                :assay_class=>assay_classes(:experimental_assay_class),
                                :owner => Factory(:person),
                                :sample_ids=>[Factory(:sample).id]
-        }
+        }, :sharing => valid_sharing
 
       end
     end
@@ -283,7 +284,7 @@ end
                              :study_id=>studies(:metabolomics_study).id,
                              :assay_class=>assay_classes(:experimental_assay_class),
                              :owner => Factory(:person),
-                             :samples => [Factory(:sample)]}, :assay_organism_ids =>[Factory(:organism).id,Factory(:strain).title,Factory(:culture_growth_type).title,tissue_and_cell_type.id,tissue_and_cell_type.title].to_s
+                             :samples => [Factory(:sample)]}, :assay_organism_ids =>[Factory(:organism).id,Factory(:strain).title,Factory(:culture_growth_type).title,tissue_and_cell_type.id,tissue_and_cell_type.title].to_s, :sharing => valid_sharing
     end
 
     assert_difference("Assay.count") do
@@ -294,7 +295,7 @@ end
                              :assay_class=>assay_classes(:experimental_assay_class),
                              :owner => Factory(:person),
                              :samples => [Factory(:sample)]},
-           :assay_organism_ids => [Factory(:organism).id, Factory(:strain).title, Factory(:culture_growth_type).title].to_s
+           :assay_organism_ids => [Factory(:organism).id, Factory(:strain).title, Factory(:culture_growth_type).title].to_s, :sharing => valid_sharing
     end
     a=assigns(:assay)
     assert_redirected_to assay_path(a)
@@ -307,7 +308,7 @@ end
                              :assay_type_id=>assay_types(:metabolomics).id,
                              :study_id=>studies(:metabolomics_study).id,
                              :assay_class=>assay_classes(:modelling_assay_class),
-                             :owner => Factory(:person)}
+                             :owner => Factory(:person)}, :sharing => valid_sharing
     end
 
     assert_difference("Assay.count") do
@@ -316,7 +317,7 @@ end
                              :study_id=>studies(:metabolomics_study).id,
                              :assay_class=>assay_classes(:modelling_assay_class),
                              :owner => Factory(:person)},
-           :assay_organism_ids => [Factory(:organism).id, Factory(:strain).title, Factory(:culture_growth_type).title].to_s
+           :assay_organism_ids => [Factory(:organism).id, Factory(:strain).title, Factory(:culture_growth_type).title].to_s, :sharing => valid_sharing
     end
     a=assigns(:assay)
     assert_redirected_to assay_path(a)
@@ -330,7 +331,7 @@ end
         :assay_class=>assay_classes(:experimental_assay_class),
         :owner => Factory(:person),
         :sample_ids=>[Factory(:sample).id]
-      },:assay_organism_ids=>[Factory(:organism).id.to_s,"",""].join(",").to_a
+      },:assay_organism_ids=>[Factory(:organism).id.to_s,"",""].join(",").to_a, :sharing => valid_sharing
     end
     end
     a=assigns(:assay)

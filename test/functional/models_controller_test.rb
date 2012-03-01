@@ -32,7 +32,7 @@ class ModelsControllerTest < ActionController::TestCase
     assert_not_nil flash[:error]    
   end
 
-  test 'creators show in list item' do
+  test 'creators do not show in list item' do
     p1=Factory :person
     p2=Factory :person
     model=Factory(:model,:title=>"ZZZZZ",:creators=>[p2],:contributor=>p1.user,:policy=>Factory(:public_policy, :access_type=>Policy::VISIBLE))
@@ -49,9 +49,7 @@ class ModelsControllerTest < ActionController::TestCase
       assert_select "a[href=?]",person_path(p2) do
         assert_select "img"
       end
-      assert_select "a[href=?]",person_path(p1) do
-        assert_select "img"
-      end
+      assert_select ["a[href=?]", person_path(p1)], 0
     end
   end
   
@@ -162,27 +160,20 @@ class ModelsControllerTest < ActionController::TestCase
     assert assay.related_asset_ids('Model').include? assigns(:model).id
   end
   
-  def test_missing_sharing_should_default_to_private
-    assert_difference('Model.count') do
-      assert_difference('ContentBlob.count') do
+  def test_missing_sharing_should_default_to_blank
+    assert_no_difference('Model.count') do
+      assert_no_difference('ContentBlob.count') do
         post :create, :model => valid_model,:content_blob=>{:file_0=>fixture_file_upload('files/little_file.txt',Mime::TEXT)}
       end
     end
-    assert_redirected_to model_path(assigns(:model))
-    assert_equal users(:model_owner),assigns(:model).contributor
-    assert assigns(:model)
-    
-    model=assigns(:model)
-    private_policy = policies(:private_policy_for_asset_of_my_first_sop)
-    assert_equal private_policy.sharing_scope,model.policy.sharing_scope
-    assert_equal private_policy.access_type,model.policy.access_type
-    assert_equal private_policy.use_whitelist,model.policy.use_whitelist
-    assert_equal private_policy.use_blacklist,model.policy.use_blacklist
-    assert model.policy.permissions.empty?
-    
-    #check it doesn't create an error when retreiving the index
-    get :index
-    assert_response :success    
+
+    m = assigns(:model)
+    assert !m.valid?
+    assert !m.policy.valid?
+    assert_blank m.policy.sharing_scope
+    assert_blank m.policy.access_type
+    assert_blank m.policy.permissions
+
   end
   
   test "should create model with url" do

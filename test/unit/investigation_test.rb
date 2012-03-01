@@ -33,7 +33,7 @@ class InvestigationTest < ActiveSupport::TestCase
   
   test "validations" do
     
-    inv=Investigation.new(:title=>"Test",:projects=>[projects(:sysmo_project)])
+    inv=Investigation.new(:title=>"Test",:projects=>[projects(:sysmo_project)],:policy => Factory(:private_policy))
     assert inv.valid?
     inv.title=""
     assert !inv.valid?

@@ -69,7 +69,7 @@ class StudyTest < ActiveSupport::TestCase
   
 
   test "validation" do
-    s=Study.new(:title=>"title",:investigation=>investigations(:metabolomics_investigation))
+    s=Study.new(:title=>"title",:investigation=>investigations(:metabolomics_investigation), :policy => Factory(:private_policy))
     assert s.valid?
 
     s.title=nil

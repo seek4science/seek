@@ -6,6 +6,7 @@ class InvestigationsControllerTest < ActionController::TestCase
 
   include AuthenticatedTestHelper
   include RestTestCases
+  include SharingFormTestHelper
   
   def setup
     login_as(:quentin)
@@ -82,7 +83,7 @@ class InvestigationsControllerTest < ActionController::TestCase
   test "should create" do
     login_as(Factory :user)
     assert_difference("Investigation.count") do
-      put :create, :investigation=> Factory.attributes_for(:investigation, :projects => [User.current_user.person.projects.first])
+      put :create, :investigation=> Factory.attributes_for(:investigation, :projects => [User.current_user.person.projects.first]), :sharing => valid_sharing
     end
     assert assigns(:investigation)
     assert !assigns(:investigation).new_record?

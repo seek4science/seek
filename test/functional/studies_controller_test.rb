@@ -6,6 +6,7 @@ class StudiesControllerTest < ActionController::TestCase
 
   include AuthenticatedTestHelper
   include RestTestCases
+  include SharingFormTestHelper
 
   def setup
     login_as(:quentin)
@@ -113,7 +114,7 @@ class StudiesControllerTest < ActionController::TestCase
 
   test "should create" do
     assert_difference("Study.count") do
-      post :create,:study=>{:title=>"test",:investigation=>investigations(:metabolomics_investigation)}
+      post :create,:study=>{:title=>"test",:investigation=>investigations(:metabolomics_investigation)}, :sharing=>valid_sharing
     end
     s=assigns(:study)
     assert_redirected_to study_path(s)

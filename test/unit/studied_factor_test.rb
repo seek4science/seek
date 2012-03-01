@@ -51,7 +51,7 @@ class StudiedFactorTest < ActiveSupport::TestCase
     #create bunch of data_files and FSes which belong to the same project and the datafiles can not be viewed
     i=0
     while i < 10  do
-      d = Factory(:data_file, :projects => [Factory(:project),data_file.projects.first])
+      d = Factory(:data_file, :projects => [Factory(:project),data_file.projects.first], :policy => Factory(:private_policy))
       Factory(:studied_factor, :data_file => d, :start_value => i)
       i +=1
     end

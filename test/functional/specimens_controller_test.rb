@@ -5,6 +5,7 @@ class SpecimensControllerTest < ActionController::TestCase
 fixtures :all
   include AuthenticatedTestHelper
   include RestTestCases
+  include SharingFormTestHelper
 
   def setup
     Seek::Config.is_virtualliver = true
@@ -55,7 +56,7 @@ fixtures :all
                                   :contributor => Factory(:user),
                                   :institution => Factory(:institution),
                                   :organism => Factory(:organism),
-                                  :project_ids => [Factory(:project).id]}
+                                  :project_ids => [Factory(:project).id]}, :sharing=>valid_sharing
 
     end
     s = assigns(:specimen)

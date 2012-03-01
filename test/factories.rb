@@ -62,6 +62,7 @@
     f.title "This Sop"
     f.projects {[Factory.build(:project)]}
     f.association :contributor, :factory => :user
+    f.association :policy, :factory => :private_policy
 
     f.after_create do |sop|
       sop.content_blob = Factory.create(:content_blob, :content_type=>"application/pdf", :asset => sop, :asset_version=>sop.version)
@@ -128,7 +129,7 @@ Factory.define(:assay_base, :class => Assay) do |f|
     f.association :contributor, :factory => :person
   f.association :study
   f.association :assay_type
-
+  f.association :policy, :factory => :private_policy
 end
 
 Factory.define(:modelling_assay_class, :class => AssayClass) do |f|
@@ -162,12 +163,14 @@ Factory.define(:study) do |f|
   f.sequence(:title) { |n| "Study#{n}" }
   f.association :investigation
   f.association :contributor, :factory => :person
+  f.association :policy, :factory => :private_policy
 end
 
 #Investigation
 Factory.define(:investigation) do |f|
   f.projects {[Factory.build(:project)]}
   f.sequence(:title) { |n| "Investigation#{n}" }
+  f.association :policy, :factory => :private_policy
 end
 
 #Strain
@@ -194,6 +197,7 @@ Factory.define(:specimen) do |f|
   f.projects {[Factory.build(:project)]}
   f.association :institution
   f.association :organism
+  f.association :policy, :factory => :private_policy
 end
 
 #Sample
@@ -202,6 +206,7 @@ Factory.define(:sample) do |f|
   f.sequence(:lab_internal_number) { |n| "Lab#{n}" }
   f.donation_date Date.today
   f.association :specimen
+  f.association :policy, :factory => :private_policy
 end
 
 
@@ -210,6 +215,7 @@ end
     f.sequence(:title) {|n| "A Data File_#{n}"}
     f.projects {[Factory.build(:project)]}
     f.association :contributor, :factory => :user
+    f.association :policy, :factory => :private_policy
     f.after_create do |data_file|
        data_file.content_blob = Factory.create(:pdf, :asset => data_file, :asset_version=>data_file.version) if data_file.content_blob.blank?
     end
@@ -220,6 +226,7 @@ end
     f.title "A Model"
     f.projects {[Factory.build(:project)]}
     f.association :contributor, :factory => :user
+    f.association :policy, :factory => :private_policy
     f.after_create do |model|
        model.content_blobs = [Factory.create(:pdf, :asset => model,:asset_version=>model.version)] if model.content_blobs.blank?
     end
@@ -231,6 +238,7 @@ end
     f.pubmed_id 1
     f.projects {[Factory.build(:project)]}
     f.association :contributor, :factory => :user
+    f.association :policy, :factory => :private_policy
   end
 
 #Presentation
@@ -239,6 +247,7 @@ Factory.define(:presentation) do |f|
   f.projects {[Factory.build :project]}
  # f.data_url "http://www.virtual-liver.de/images/logo.png"
   f.association :contributor,:factory=>:user
+  f.association :policy, :factory => :private_policy
   f.after_create do |presentation|
     presentation.content_blob = Factory.create(:content_blob,:original_filename=>"test.pdf", :content_type=>"application/pdf", :asset => presentation, :asset_version=>presentation.version)
   end
@@ -298,6 +307,7 @@ end
     f.title "An Event"
     f.start_date Time.now
     f.end_date 1.days.from_now
+    f.association :policy, :factory => :private_policy
   end
 
 #Content_blob

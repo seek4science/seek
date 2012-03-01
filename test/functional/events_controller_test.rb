@@ -3,6 +3,7 @@ require 'test_helper'
 class EventsControllerTest < ActionController::TestCase
   include AuthenticatedTestHelper
   include RestTestCases
+  include SharingFormTestHelper
 
   def setup
     login_as(:datafile_owner)
@@ -39,11 +40,6 @@ class EventsControllerTest < ActionController::TestCase
     assert assigns(:events).count < Event.find(:all).count #fails if all events are assigned to @events
   end
 
-  test "should create hidden event by default" do
-    post :create, :event => valid_event
-    assert !assigns(:event).can_view?(users(:aaron)) #must be a user other than the one you are logged in as
-  end
-
   test "xml for projectless event" do
     id = Factory(:event, :policy => Factory(:public_policy)).id
     get :show, :id => id, :format => "xml"
@@ -77,7 +73,7 @@ class EventsControllerTest < ActionController::TestCase
 
   test "should create valid event" do
     assert_difference('Event.count', 1) do
-      post :create, :event => valid_event
+      post :create, :event => valid_event, :sharing => valid_sharing
     end
   end
 

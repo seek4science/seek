@@ -6,6 +6,7 @@ class PublicationsControllerTest < ActionController::TestCase
 
   include AuthenticatedTestHelper
   include RestTestCases
+  include SharingFormTestHelper
   
   def setup
     WebMock.allow_net_connect!
@@ -33,6 +34,7 @@ class PublicationsControllerTest < ActionController::TestCase
     assay=assays(:metabolomics_assay)
     assert_difference('Publication.count') do
       post :create, :publication => {:pubmed_id => 3,:projects=>[projects(:sysmo_project)]},:assay_ids=>[assay.id.to_s]
+      p assigns(:publication).errors.full_messages
     end
 
     assert_redirected_to edit_publication_path(assigns(:publication))

@@ -51,7 +51,7 @@ class ExperimentalConditionTest < ActiveSupport::TestCase
     #create bunch of sops and ECs which belong to the same project and the sops can not be viewed
     i=0
     while i < 10 do
-      s = Factory(:sop, :projects => [sop.projects.first, Factory(:project)])
+      s = Factory(:sop, :projects => [sop.projects.first, Factory(:project)], :policy => Factory(:private_policy))
       Factory(:experimental_condition, :sop => s, :start_value => i)
       i +=1
     end

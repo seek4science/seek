@@ -22,7 +22,9 @@ class SpecialAuthCodeTest < ActiveSupport::TestCase
   end
 
   test "auth codes allow access to private items until they expire" do
-    auth_code = Factory :special_auth_code, :expiration_date => (Time.now + 1.days)
+    auth_code = Factory :special_auth_code,
+                        :expiration_date => (Time.now + 1.days),
+                        :asset => Factory(:data_file, :policy => Factory(:private_policy))
     item = auth_code.asset
     User.current_user = Factory(:user)
 
