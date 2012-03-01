@@ -300,9 +300,9 @@ class Person < ActiveRecord::Base
 
   def expertise= tags
     if tags.kind_of? Hash
-      tag_with_params tags,"expertise"
+      return tag_with_params(tags,"expertise")
     else
-      tag_with tags,"expertise"
+      return tag_with(tags,"expertise")
     end
   end
 
@@ -312,7 +312,6 @@ class Person < ActiveRecord::Base
     else
       tag_with tags,"tool"
     end
-
   end
 
   def expertise
