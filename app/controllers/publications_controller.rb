@@ -73,17 +73,6 @@ class PublicationsController < ApplicationController
           Relationship.create_or_update_attributions(assay,[["Publication", @publication.id]], Relationship::RELATED_TO_PUBLICATION) if assay.can_edit?
         end
 
-        #Make a policy
-        policy = Policy.create(:name => "publication_policy", :sharing_scope => Policy::EVERYONE, :access_type => Policy::VISIBLE)
-        @publication.policy = policy
-        @publication.save
-        #add managers (authors + contributor)
-        @publication.creators.each do |author|
-          policy.permissions << Permission.create(:contributor => author, :policy => policy, :access_type => Policy::MANAGING)
-        end
-        #Add contributor
-        @publication.policy.permissions << Permission.create(:contributor => @publication.contributor.person, :policy => policy, :access_type => Policy::MANAGING)
-        
         flash[:notice] = 'Publication was successfully created.'
         format.html { redirect_to(edit_publication_url(@publication)) }
         format.xml  { render :xml => @publication, :status => :created, :location => @publication }

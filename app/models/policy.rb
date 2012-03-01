@@ -10,9 +10,17 @@ class Policy < ActiveRecord::Base
            :autosave => true,
            :after_add => proc {|policy, perm| perm.policy = policy}
 
-  validates_presence_of :sharing_scope, :access_type
-
-  validates_numericality_of :sharing_scope, :access_type
+  #basically the same as validates_numericality_of :sharing_scope, :access_type
+  #but with a more generic error message because our users don't know what
+  #sharing_scope and access_type are.
+  validates_each(:sharing_scope, :access_type) do |record, attr, value|
+    raw_value = record.send("#{attr}_before_type_cast") || value
+    begin
+      Kernel.Float(raw_value)
+    rescue ArgumentError, TypeError
+      record.errors.add_to_base "Sharing policy is invalid" unless value.is_a? Integer
+    end
+  end
 
   alias_attribute :title, :name
 

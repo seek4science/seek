@@ -32,7 +32,12 @@ class SessionsController < ApplicationController
   def destroy    
     logout_user
     flash[:notice] = "You have been logged out."
-    redirect_back
+
+    begin
+      redirect_back
+    rescue RedirectBackError
+      redirect :controller => :home, :action => :index
+    end
   end
 
   protected

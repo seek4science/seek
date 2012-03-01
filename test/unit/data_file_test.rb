@@ -136,16 +136,16 @@ class DataFileTest < ActiveSupport::TestCase
   end
 
   test "is restorable after destroy" do
-    df = Factory :data_file,:policy => Factory(:all_sysmo_viewable_policy)
+    df = Factory :data_file,:policy => Factory(:all_sysmo_viewable_policy), :title => 'is it restorable?'
     User.current_user = df.contributor
     assert_difference("DataFile.count",-1) do
       df.destroy
     end
-    assert_nil DataFile.find_by_id(df.id)
+    assert_nil DataFile.find_by_title 'is it restorable?'
     assert_difference("DataFile.count",1) do
       disable_authorization_checks {DataFile.restore_trash!(df.id)}
     end
-    assert_not_nil DataFile.find_by_id(df.id)
+    assert_not_nil DataFile.find_by_title 'is it restorable?'
   end
 
   test 'failing to delete due to can_delete does not create trash' do

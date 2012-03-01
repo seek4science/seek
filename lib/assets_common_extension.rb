@@ -193,7 +193,7 @@ module AssetsCommonExtension
   end
 
   def handle_download_zip asset
-    t = Tempfile.new("#{Time.now.year}#{Time.now.month}#{Time.now.day}_#{asset.class.name.downcase}_#{asset.title}_#{asset.id}","#{RAILS_ROOT}/tmp")
+    t = Tempfile.new("#{Time.now.year}#{Time.now.month}#{Time.now.day}_#{asset.class.name.downcase}_#{asset.id}","#{RAILS_ROOT}/tmp")
   # Give the path of the temp file to the zip outputstream, it won't try to open it as an archive.
     Zip::ZipOutputStream.open(t.path) do |zos|
       if asset.respond_to?(:model_image) && asset.model_image
