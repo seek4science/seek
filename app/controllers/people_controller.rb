@@ -161,7 +161,14 @@ class PeopleController < ApplicationController
       if @person.save && current_user.save
         if (!current_user.active?)
           if_sysmo_member||=false
+          #send mail to admin
           Mailer.deliver_contact_admin_new_user_no_profile(member_details,current_user,base_host) if is_sysmo_member
+
+          #send mail to project managers
+          project_managers = project_managers_of_selected_projects params[:projects]
+          project_managers.each do |project_manager|
+            Mailer.deliver_contact_project_manager_new_user_no_profile(project_manager, member_details,current_user,base_host) if is_sysmo_member
+          end
           Mailer.deliver_signup(current_user,base_host)          
           flash[:notice]="An email has been sent to you to confirm your email address. You need to respond to this email before you can login"          
           logout_user
@@ -362,6 +369,18 @@ class PeopleController < ApplicationController
         end
     end
     details
+  end
+
+  def project_managers_of_selected_projects projects_param
+    project_manager_list = []
+    unless projects_param.blank?
+      projects_param.each do |project_param|
+        project_detail = project_param.split(',')
+        project = Project.find_by_id(project_detail[1])
+        project_managers = project.try(:project_managers)
+        project_manager_list |= project_managers unless project_managers.nil?
+      end
+    end
   end
 
   def do_projects_belong_to_project_manager_projects

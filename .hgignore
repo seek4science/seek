@@ -16,6 +16,8 @@ filestore*/
 debug.log
 .project
 
+seek_test.sql
+
 tmp/pids/*
 tmp/cache/*
 tmp/data.sql
