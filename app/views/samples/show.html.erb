@@ -44,6 +44,10 @@
         <label>Provider's sample identifier:</label>
         <%= text_or_not_specified @sample.provider_id -%>
       </p>
+      <p>
+        <label>Organism part:</label>
+        <%= text_or_not_specified @sample.organism_part -%>
+      </p>
 
       <h2><%= CELL_CULTURE_OR_SPECIMEN.capitalize -%> details</h2>
 

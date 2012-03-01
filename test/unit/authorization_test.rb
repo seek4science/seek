@@ -827,7 +827,8 @@ class AuthorizationTest < ActiveSupport::TestCase
 
     ability = Ability.new(asset_manager.user)
 
-    assert ability.can? :manage, datafile1
+    assert ability.can? :manage_asset, datafile1
+    assert ability.cannot? :manage_asset, datafile2
     assert ability.cannot? :manage, datafile2
 
     User.with_current_user asset_manager.user do
@@ -843,6 +844,7 @@ class AuthorizationTest < ActiveSupport::TestCase
 
     ability = Ability.new(asset_manager.user)
 
+    assert ability.cannot? :manage_asset, datafile
     assert ability.cannot? :manage, datafile
 
     User.with_current_user asset_manager.user do
@@ -858,7 +860,7 @@ class AuthorizationTest < ActiveSupport::TestCase
 
     ability = Ability.new(asset_manager.user)
 
-    assert ability.can? :manage, datafile
+    assert ability.can? :manage_asset, datafile
 
     User.with_current_user asset_manager.user do
       assert datafile.can_manage?
@@ -875,7 +877,7 @@ class AuthorizationTest < ActiveSupport::TestCase
 
        ability = Ability.new(asset_manager.user)
        assert asset_manager.is_asset_manager?
-       assert ability.can? :manage, datafile
+       assert ability.can? :manage_asset, datafile
        assert ability.cannot? :publish, datafile
 
      end
@@ -892,6 +894,7 @@ class AuthorizationTest < ActiveSupport::TestCase
 
        ability = Ability.new(person_can_manage.user)
        assert person_can_manage.roles.empty?
+       assert ability.cannot? :manage_asset, datafile
        assert ability.cannot? :manage, datafile
        assert ability.cannot? :publish, datafile
      end
@@ -908,6 +911,7 @@ class AuthorizationTest < ActiveSupport::TestCase
        ability = Ability.new(publisher.user)
        assert publisher.is_publisher?
        assert ability.can? :publish, datafile
+       assert ability.cannot? :manage_asset, datafile
        assert ability.cannot? :manage, datafile
      end
   end

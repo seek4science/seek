@@ -276,6 +276,10 @@ module ImagesHelper
         "misc_icons/1315482798_presentation-slides.png"
       when "graph"
         "famfamfam_silk/chart_line.png"
+      when "project_manager"
+        "famfamfam_silk/medal_gold_1.png"
+      when "asset_manager"
+        "famfamfam_silk/medal_silver_2.png"
     else
       return nil
     end

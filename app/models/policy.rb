@@ -255,8 +255,12 @@ class Policy < ActiveRecord::Base
         grouped_people_by_access_type.merge!(filtered_people.group_by{|person| person[2]})
 
         if !is_entirely_private? grouped_people_by_access_type, contributor
-          asset_manage_array = asset_managers.collect{|am| [am.id, "#{am.name}", Policy::MANAGING] unless am.blank?}
-          grouped_people_by_access_type[Policy::MANAGING] |= asset_manage_array
+          asset_manager_array = asset_managers.collect{|am| [am.id, "#{am.name}", Policy::MANAGING] unless am.blank?}
+          if grouped_people_by_access_type[Policy::MANAGING].blank?
+            grouped_people_by_access_type[Policy::MANAGING] = asset_manager_array
+          else
+            grouped_people_by_access_type[Policy::MANAGING] |= asset_manager_array
+          end
         end
 
         #concat the roles to a person name
@@ -462,7 +466,7 @@ class Policy < ActiveRecord::Base
   def concat_roles_to_name grouped_people_by_access_type, creators, asset_managers
     creator_id_array = creators.collect{|c| c.id unless c.blank?}
     asset_manage_id_array = asset_managers.collect{|am| am.id unless am.blank?}
-     grouped_people_by_access_type = grouped_people_by_access_type.each_value do |value|
+     grouped_people_by_access_type = grouped_people_by_access_type.reject{|key,value| key == Policy::DETERMINED_BY_GROUP}.each_value do |value|
        value.each do |person|
          person[1].concat('(creator)') if creator_id_array.include?(person[0])
          person[1].concat('(asset manager)') if asset_manage_id_array.include?(person[0])

@@ -107,4 +107,36 @@ class InstitutionsControllerTest < ActionController::TestCase
     assert_redirected_to institution_path(assigns(:institution))
   end
 
+
+  test 'project manager can create institution' do
+    login_as(Factory(:project_manager).user)
+    get :new
+    assert_response :success
+
+    assert_difference("Institution.count") do
+      post :create, :institution => {:name=>"a test institution"}
+    end
+  end
+
+  test "project manager can edit institution, which belongs to project they are project manager, not necessary the institution they are in" do
+    project_manager = Factory(:project_manager)
+    assert_equal 1, project_manager.projects.count
+    project  = project_manager.projects.first
+    institution = Factory(:institution)
+    project.institutions << institution
+
+    assert project.institutions.include?institution
+    assert !(project_manager.institutions.include?institution)
+
+    login_as(project_manager.user)
+    get :edit, :id => institution
+    assert_response :success
+
+    put :update, :id => institution, :institution => {:name => 'test'}
+    assert_redirected_to institution
+    institution.reload
+    assert_equal 'test', institution.name
+  end
+
 end
+

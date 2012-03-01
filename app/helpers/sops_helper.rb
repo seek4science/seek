@@ -1,7 +1,7 @@
 module SopsHelper
 
-  def authorised_sops
-    authorised_assets(Sop)
+  def authorised_sops projects=nil
+    authorised_assets(Sop,projects)
   end    
 
 end

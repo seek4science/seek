@@ -11,9 +11,10 @@ class PersonTest < ActiveSupport::TestCase
 
   def test_can_be_edited_by?
     Person.all.each do |p|
-      assert p.can_be_edited_by? users(:quentin) unless p.is_admin?
-      assert p.can_be_edited_by? users(:project_manager) unless p.is_admin?
-      assert !p.can_be_edited_by?(users(:can_edit))
+      assert p.can_be_edited_by? p.user if p.user
+      assert p.can_be_edited_by? users(:quentin) if (!p.is_admin? && p.user != users(:quentin))
+      assert p.can_be_edited_by? users(:project_manager) if (!p.is_admin? && p.user != users(:quentin) && !(p.projects & users(:project_manager).person.projects).empty?)
+      assert !p.can_be_edited_by?(users(:can_edit)) unless (p.user == users(:can_edit))
     end
   end
 

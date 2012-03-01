@@ -268,4 +268,34 @@ fixtures :all
     assert_select 'p a[href=?]', organism_path(s.specimen.strain.organism), :count => 1
   end
 
+  test 'should have comment and sex fields in the specimen/sample show page' do
+    s = Factory :sample, :contributor => User.current_user
+    get :show, :id => s.id
+    assert_response :success
+    assert_select "label", :text => /Comment/, :count => 1
+    assert_select "label", :text => /Sex/, :count => 1
+  end
+
+  test 'should have comment and sex fields in the specimen/sample edit page' do
+    s = Factory :sample, :contributor => User.current_user
+    get :edit, :id => s.id
+    assert_response :success
+    assert_select "input#sample_specimen_attributes_comments", :count => 1
+    assert_select "select#sample_specimen_attributes_sex", :count => 1
+  end
+
+  test 'should have organism_part in the specimen/sample show page' do
+    s = Factory :sample, :contributor => User.current_user
+    get :show, :id => s.id
+    assert_response :success
+    assert_select "label", :text => /Organism part/, :count => 1
+  end
+
+  test 'should have organism_part in the specimen/sample edit page' do
+    s = Factory :sample, :contributor => User.current_user
+    get :edit, :id => s.id
+    assert_response :success
+    assert_select "select#sample_organism_part", :count => 1
+  end
+
 end

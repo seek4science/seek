@@ -81,23 +81,28 @@ class Project < ActiveRecord::Base
     end
   end
 
-  #this role is in project roles
+  #this is the intersection of project role and seek role
   def pals
     pal_role=ProjectRole.pal_role
     people.select{|p| p.is_pal?}.select do |possible_pal|
-      possible_pal.project_roles_of_project(self).include?(pal_role)
+      possible_pal.project_roles.include?(pal_role)
     end
   end
 
-  #this role is in project roles
+  #this is project role
   def pis
     pi_role = ProjectRole.find_by_name('PI')
     people.select{|p| p.project_roles.include?(pi_role)}
-    end
+  end
 
-  #this role is in seek roles
+  #this is seek role
   def asset_managers
-    people.select{|p| p.is_asset_manager?}
+    people.select(&:is_asset_manager?)
+  end
+
+  #this is seek role
+  def project_managers
+    people.select(&:is_project_manager?)
   end
 
   def locations
@@ -172,6 +177,10 @@ class Project < ActiveRecord::Base
 
   def can_be_edited_by?(subject)
     subject == nil ? false : (subject.is_admin? || (self.people.include?(subject.person) && (subject.can_edit_projects? || subject.is_project_manager?)))
+  end
+
+  def can_be_administered_by?(subject)
+    subject == nil ? false : (subject.is_admin? || (self.people.include?(subject.person) && (subject.is_project_manager?)))
   end
 
 end

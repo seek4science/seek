@@ -263,11 +263,18 @@ class Person < ActiveRecord::Base
     created_data_files | created_models | created_sops | created_publications | created_presentations
   end
 
+  #can be edited by:
+  #(admin or project managers of this person) and (this person does not have a user or not the other admin)
+  #themself
   def can_be_edited_by?(subject)
-    subject == nil ? false : ((subject.is_admin? || subject.is_project_manager?) && (self.user.nil? || !self.is_admin?))
+    subject == nil ? false : (((subject.is_admin? || (!(self.projects & subject.try(:person).try(:projects).to_a).empty? && subject.is_project_manager?)) && (self.user.nil? || !self.is_admin?)) || (subject == self.user))
   end
 
- 
+  #admin or project manager can administer themselves and the other people, except the other admins
+  def can_be_administered_by?(user)
+    user == nil ? false : ((user.is_admin?) || (user.is_project_manager?)) &&  (self.user==user || !self.user.try(:is_admin?))
+  end
+
   def can_view? user = User.current_user
     !user.nil? || !Seek::Config.is_virtualliver
   end
@@ -277,7 +284,7 @@ class Person < ActiveRecord::Base
   end
 
   does_not_require_can_edit :roles_mask
-  requires_can_manage :roles_mask, :can_edit_projects, :can_edit_institutions
+  requires_can_manage :roles_mask
 
   def can_manage? user = User.current_user
     try_block{user.is_admin?}
@@ -293,9 +300,9 @@ class Person < ActiveRecord::Base
 
   def expertise= tags
     if tags.kind_of? Hash
-      tag_with_params tags,"expertise"
+      return tag_with_params(tags,"expertise")
     else
-      tag_with tags,"expertise"
+      return tag_with(tags,"expertise")
     end
   end
 
@@ -305,7 +312,6 @@ class Person < ActiveRecord::Base
     else
       tag_with tags,"tool"
     end
-
   end
 
   def expertise
