@@ -553,7 +553,7 @@ class PeopleControllerTest < ActionController::TestCase
   test 'should have asset manager icon on person show page' do
     asset_manager = Factory(:asset_manager)
     get :show, :id => asset_manager
-    assert_select "img[src=/images/famfamfam_silk/medal_silver_2.png?1329333770]", :count => 1
+    assert_select "img[src*=?]", /medal_silver_2.png/,:count => 1
   end
 
   test 'should have asset manager icon on people index page' do
@@ -564,13 +564,13 @@ class PeopleControllerTest < ActionController::TestCase
     end
     get :index
     asset_manager_number = assigns(:people).select(&:is_asset_manager?).count
-    assert_select "img[src=/images/famfamfam_silk/medal_silver_2.png?1329333770]", :count => asset_manager_number
+    assert_select "img[src*=?]", /medal_silver_2/, :count => asset_manager_number
   end
 
   test 'should have project manager icon on person show page' do
     project_manager = Factory(:project_manager)
     get :show, :id => project_manager
-    assert_select "img[src=/images/famfamfam_silk/medal_gold_1.png?1329333770]", :count => 1
+    assert_select "img[src*=?]", /medal_gold_1.png/, :count => 1
   end
 
   test 'should have project manager icon on people index page' do
@@ -583,7 +583,7 @@ class PeopleControllerTest < ActionController::TestCase
     get :index
 
     project_manager_number = assigns(:people).select(&:is_project_manager?).count
-    assert_select "img[src=/images/famfamfam_silk/medal_gold_1.png?1329333770]", :count => project_manager_number
+    assert_select "img[src*=?]", /medal_gold_1.png/, :count => project_manager_number
   end
 
   test "allow project manager to assign people into only their projects" do
