@@ -380,6 +380,7 @@ class PeopleController < ApplicationController
         project_manager_list |= project_managers unless project_managers.nil?
       end
     end
+    project_manager_list
   end
 
   def do_projects_belong_to_project_manager_projects
