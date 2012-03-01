@@ -12,7 +12,7 @@ class TaggableTest < ActiveSupport::TestCase
        end
      end
      p.reload
-     assert_equal ["golf","fishing"],p.expertise.collect{|t| t.text}
+     assert_equal ["golf","fishing"].sort, p.expertise.collect{|t| t.text}.sort
   end
 
   test "tag_with_params" do
@@ -28,7 +28,7 @@ class TaggableTest < ActiveSupport::TestCase
        end
      end
      p.reload
-     assert_equal ["golf","fishing"],p.expertise.collect{|t| t.text}
+     assert_equal ["golf","fishing"].sort, p.expertise.collect{|t| t.text}.sort
   end
 
   test "tag_with changed response" do
