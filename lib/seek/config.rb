@@ -46,24 +46,17 @@ module Seek
   module Propagators
     def scales_propagate
       if ActiveRecord::Base.connection.table_exists? 'scales'
-        existing_scale_titles = Scale.all.map(&:title)
-        new_scale_titles = self.scales - existing_scale_titles
-        old_scale_titles = existing_scale_titles - self.scales
-        old_scales = []
-        old_scale_titles.each do |scale|
-          old_scales <<  Scale.find(:all,:conditions=>["BINARY title =?",scale])
+	Scale.all.group_by(&:title).each do |title, scales|
+	  Scale.destroy_all(:id => scales.map(&:id)) unless self.scales.include?(title)
         end
 
-        Scale.destroy_all(:id=>old_scales.flatten.map(&:id))
-
-        if !new_scale_titles.blank?
-          new_scale_titles.each do |scale|
-            Scale.create!(:title=>scale) if Scale.find(:first,:conditions=>["BINARY title =?",scale]).nil?
-          end
+	new_scale_titles = self.scales.dup - Scale.all.map(&:title)
+        new_scale_titles.each do |scale|
+          Scale.create!(:title=>scale)
         end
       end
-
     end
+
     def site_base_host_propagate
       ActionMailer::Base.default_url_options = { :host => self.site_base_host.gsub(/https?:\/\//, '').gsub(/\/$/,'') }
     end
