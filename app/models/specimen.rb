@@ -128,11 +128,4 @@ class Specimen < ActiveRecord::Base
     end
   end
 
-  def sop_links
-    sop_links = []
-    sops.select(&:can_view?).each do |sop|
-      sop_links << link_to(sop.title, sop_path(sop.sop_id) + "?version=#{sop.version}", {:target => '_blank'})
-    end
-    sop_links
-  end
 end

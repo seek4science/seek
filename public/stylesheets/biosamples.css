@@ -1,0 +1,9 @@
+.row_group_color {
+    background-color: #dcdcdc;
+}
+
+div.scroll_box
+{
+    height:250px;
+    overflow:scroll;
+}
