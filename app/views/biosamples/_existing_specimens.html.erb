@@ -72,7 +72,7 @@
                     <td><%= specimen.culture_growth_type.try(:title) -%></td>
                     <td><%= try_block{specimen.contributor.person.name}-%></td>
                     <td><%= specimen.id %></td>
-                    <td><%= specimen.sop_links.join(", ") -%></td>
+                    <td><%= asset_version_links(specimen.sops).join(", ") -%></td>
                   </tr>
               <% end -%>
               </tbody>

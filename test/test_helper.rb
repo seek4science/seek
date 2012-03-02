@@ -6,6 +6,7 @@ require 'rest_test_cases'
 require 'ruby-prof'
 require 'factory_girl'
 require 'webmock/test_unit'
+require 'action_view/test_case'
 
 Factory.find_definitions #It looks like requiring factory_girl _should_ do this automatically, but it doesn't seem to work
 

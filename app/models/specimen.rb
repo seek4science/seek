@@ -3,7 +3,6 @@ require 'acts_as_authorized'
 require 'subscribable'
 class Specimen < ActiveRecord::Base
   include Subscribable
-  include ActionController::UrlWriter
 
   acts_as_authorized
 
@@ -129,11 +128,4 @@ class Specimen < ActiveRecord::Base
     end
   end
 
-  def sop_links
-    sop_links = []
-    sops.select(&:can_view?).each do |sop|
-      sop_links << ActionController::Base.helpers.link_to(sop.title, sop_path(sop.sop_id) + "?version=#{sop.version}", {:target => '_blank'})
-    end
-    sop_links
-  end
 end
