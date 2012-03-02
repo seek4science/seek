@@ -716,7 +716,8 @@ namespace :seek do
         person_key = row[0]
         policy_key = row[1]
         action = row[2]
-        val = row[3]
+        val = row[3].blank? ? nil : row[3].to_sym
+        raise "invalid authorization value, must be either :true, :false, or nil. value: #{val.inspect} person_key: #{person_key} policy_key: #{policy_key} action: #{action}" unless [:true, :false, nil].include? val
         Rails.cache.write "can_#{action}?#{policy_key}#{person_key}", val
         end
     else
