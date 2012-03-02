@@ -77,7 +77,7 @@ class ApplicationController < ActionController::Base
 
   def is_current_user_auth
     begin
-      @user = User.find(params[:id], :conditions => ["id = ?", current_user.id])
+      @user = User.find(params[:id], :conditions => ["id = ?", current_user.try(:id)])
     rescue ActiveRecord::RecordNotFound
       error("User not found (id not authorized)", "is invalid (not owner)")
       return false

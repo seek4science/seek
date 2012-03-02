@@ -154,7 +154,14 @@ class UsersControllerTest < ActionController::TestCase
     assert flash[:error]
     assert self.current_user, users(:aaron)    
   end
-  
+
+  test 'should handle no current_user when edit user' do
+    logout
+    get :edit, :id => users(:aaron), :user => {}
+    assert_redirected_to :root
+    assert_not_nil flash[:error]
+  end
+
   protected
   def create_user(options = {})
     post :create, { :login => 'quire', :email => 'quire@example.com',
