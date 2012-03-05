@@ -117,4 +117,11 @@ class TechnologyTypesControllerTest < ActionController::TestCase
     assert flash[:error]
     assert_redirected_to manage_technology_types_path
   end
+
+  test "should show technology types to public" do
+    logout
+    get :show, :id => technology_types(:technology_type_with_child)
+    assert_response :success
+    assert_not_nil assigns(:technology_type)
+  end
 end

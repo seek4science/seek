@@ -117,4 +117,11 @@ class AssayTypesControllerTest < ActionController::TestCase
     assert flash[:error]
     assert_redirected_to manage_assay_types_path
   end
+
+  test "should show assay types to public" do
+    logout
+    get :show, :id => assay_types(:metabolomics)
+    assert_response :success
+    assert_not_nil assigns(:assay_type)
+  end
 end
