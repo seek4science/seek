@@ -20,7 +20,7 @@
   <%= image("arrow_down",{:title=>"Children",:alt=>"Children",:style=>"vertical-align:middle"}) -%>
   <% if @technology_type.has_children? -%>
     <% for child_type in @technology_type.children  -%>
-      <%= link_to h(child_type.title.capitalize), child_type %> (<%= child_type.get_child_assays.count %>)
+      <%= link_to h(child_type.title.capitalize), child_type %> (<%= child_type.get_child_assays.select(&:can_view?).count %>)
       <%= " | " unless @technology_type.children.last==child_type %>
     <% end -%>
   <% else -%>
@@ -30,5 +30,5 @@
 
 <h2>Related assays</h2>
 <div class="list_items_container">
-  <%= render :partial => "layouts/resource_list_item", :collection=>@technology_type.get_child_assays %>
+  <%= render :partial => "layouts/resource_list_item", :collection=>@technology_type.get_child_assays.select(&:can_view?) %>
 </div>
