@@ -5,7 +5,7 @@
 
 <%= list_item_authorized_list resource.creators, "Creator" %>
 
-<%= list_item_attribute "Other creator", resource.other_creators -%>
+<%= list_item_optional_attribute "Other creator", resource.other_creators, nil -%>
 
 <%= list_item_optional_attribute "Model type", resource.model_type.try(:title) %>
 
