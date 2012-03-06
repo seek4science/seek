@@ -22,12 +22,7 @@
         <%= image_tag_for_key "admin", admin_person_path(@person), "Administer", nil, "Person Administration" -%>
       </li>
   <% end -%>
-  <% if (current_user.try :is_project_manager?) && mine?(@person)-%>
-      <li>
-        <%= image_tag_for_key "new", new_institution_path(), "New Institution", nil, "New Institution" -%>
-      </li>
-  <% end -%>
-</ul>
+
 
 <%= render :partial => "layouts/item_title", :locals=>{:item=>@person} %>
 <div class="show_basic">
@@ -77,9 +72,9 @@
 
       <%= render :partial=>"areas_of_expertise", :locals => {:person=>@person} %>
 
-      <% if current_user.is_admin? %>
+      <% if admin_logged_in? %>
           <p>
-            <b>Registered at:</b>
+            <b>Registered on:</b>
             <label>
               <%=  @person.try(:user).try(:created_at).nil? ? text_or_not_specified(nil) : date_as_string(@person.try(:user).try(:created_at))-%>
             </label>

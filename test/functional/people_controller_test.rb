@@ -870,18 +870,6 @@ class PeopleControllerTest < ActionController::TestCase
     assert !p.can_edit_institutions?
   end
 
-  test "project manager has a button 'New Institution' in their profile" do
-    login_as(:project_manager)
-    get :show, :id => users(:project_manager).person
-    assert_select "a", :text => /New Institution/, :count => 1
-  end
-
-  test "project manager does not have a button 'New Institution' in other profile" do
-    login_as(:project_manager)
-    get :show, :id => users(:aaron).person
-    assert_select "a", :text => /New Institution/, :count => 0
-  end
-
   test "should show the registered date for this person, only for admin" do
     a_person = Factory(:person)
     get :show, :id => a_person

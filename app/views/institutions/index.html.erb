@@ -1,4 +1,10 @@
-<!--<%= link_to 'New institution', new_institution_path %>-->
+<ul class="sectionIcons">
+    <% if (current_user.try :is_project_manager?)-%>
+        <li>
+          <%= image_tag_for_key "new", new_institution_path(), "New Institution", nil, "New Institution" -%>
+        </li>
+    <% end -%>
+</ul>
 
 <% if @institutions.public_methods.include?("page_totals") %>
   <!-- only do the page links if the collection supports it -->
