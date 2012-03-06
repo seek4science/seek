@@ -6,6 +6,7 @@ class PeopleControllerTest < ActionController::TestCase
 
   include AuthenticatedTestHelper
   include RestTestCases
+  include ApplicationHelper
 
   def setup
     login_as(:quentin)
@@ -879,5 +880,36 @@ class PeopleControllerTest < ActionController::TestCase
     login_as(:project_manager)
     get :show, :id => users(:aaron).person
     assert_select "a", :text => /New Institution/, :count => 0
+  end
+
+  test "should show the registered date for this person, only for admin" do
+    a_person = Factory(:person)
+    get :show, :id => a_person
+    assert_response :success
+    assert_select 'p label', :text => date_as_string(a_person.user.created_at), :count => 1
+
+    get :index
+    assert_response :success
+    assigns(:people).each do |person|
+      unless person.try(:user).try(:created_at).nil?
+        assert_select 'p.list_item_attribute label', :text => date_as_string(person.user.created_at), :count => 1
+      end
+    end
+  end
+
+  test "if not admin login, should not show the registered date for this person" do
+    login_as(:aaron)
+    a_person = Factory(:person)
+    get :show, :id => a_person
+    assert_response :success
+    assert_select 'p label', :text => date_as_string(a_person.user.created_at), :count => 0
+
+    get :index
+    assert_response :success
+    assigns(:people).each do |person|
+      unless person.try(:user).try(:created_at).nil?
+        assert_select 'p.list_item_attribute label', :text => date_as_string(person.user.created_at), :count => 0
+      end
+    end
   end
 end

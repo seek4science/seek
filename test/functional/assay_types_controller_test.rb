@@ -118,6 +118,13 @@ class AssayTypesControllerTest < ActionController::TestCase
     assert_redirected_to manage_assay_types_path
   end
 
+  test "should show assay types to public" do
+    logout
+    get :show, :id => assay_types(:metabolomics)
+    assert_response :success
+    assert_not_nil assigns(:assay_type)
+  end
+
   test 'should show only related authorized assays' do
     assays = assay_types(:child_assay_type_with_assay).assays
     authorized_assays = assays.select(&:can_view?)

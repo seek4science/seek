@@ -118,6 +118,13 @@ class TechnologyTypesControllerTest < ActionController::TestCase
     assert_redirected_to manage_technology_types_path
   end
 
+  test "should show technology types to public" do
+    logout
+    get :show, :id => technology_types(:technology_type_with_child)
+    assert_response :success
+    assert_not_nil assigns(:technology_type)
+  end
+
   test 'should show only related authorized assays' do
     assays = technology_types(:child_technology_type_with_assay).assays
     authorized_assays = assays.select(&:can_view?)
