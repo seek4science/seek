@@ -495,17 +495,21 @@ class PeopleControllerTest < ActionController::TestCase
     assert person.is_asset_manager?
   end
 
-  test 'admin should see the session of assigning the asset manager role to a person' do
+  test 'admin should see the session of assigning roles to a person' do
     person = Factory(:person)
     get :admin, :id => person
     assert_select "input#_roles_asset_manager", :count => 1
+    assert_select "input#_roles_project_manager", :count => 1
+    assert_select "input#_roles_publisher", :count => 1
   end
 
-  test 'non-admin should not see the session of assigning the asset manager role to a person' do
+  test 'non-admin should not see the session of assigning roles to a person' do
     login_as(:aaron)
     person = Factory(:person)
     get :admin, :id => person
     assert_select "input#_roles_asset_manager", :count => 0
+    assert_select "input#_roles_project_manager", :count => 0
+    assert_select "input#_roles_publisher", :count => 0
   end
 
   test 'should show that the person is asset manager for admin' do
@@ -554,7 +558,7 @@ class PeopleControllerTest < ActionController::TestCase
   test 'should have asset manager icon on person show page' do
     asset_manager = Factory(:asset_manager)
     get :show, :id => asset_manager
-    assert_select "img[src*=?]", /medal_silver_2.png/,:count => 1
+    assert_select "img[src*=?]", /medal_bronze_3.png/,:count => 1
   end
 
   test 'should have asset manager icon on people index page' do
@@ -565,7 +569,7 @@ class PeopleControllerTest < ActionController::TestCase
     end
     get :index
     asset_manager_number = assigns(:people).select(&:is_asset_manager?).count
-    assert_select "img[src*=?]", /medal_silver_2/, :count => asset_manager_number
+    assert_select "img[src*=?]", /medal_bronze_3/, :count => asset_manager_number
   end
 
   test 'should have project manager icon on person show page' do
@@ -902,5 +906,54 @@ class PeopleControllerTest < ActionController::TestCase
         assert_select 'p', :text => /#{date_as_string(person.user.created_at)}/, :count => 0
       end
     end
+  end
+
+  test 'set publisher role for a person' do
+    work_group_id = Factory(:work_group).id
+    assert_difference('Person.count') do
+      assert_difference('NotifieeInfo.count') do
+        post :create, :person => {:first_name=>"test", :email=>"hghg@sdfsd.com"}
+      end
+    end
+    person = assigns(:person)
+    put :administer_update, :id => person, :person =>{:work_group_ids => [work_group_id]}, :roles => {:publisher => true}
+
+    person = assigns(:person)
+    assert_not_nil person
+    assert person.is_publisher?
+  end
+
+  test 'should show that the person is publisher for admin' do
+    person = Factory(:person)
+    person.is_publisher = true
+    person.save
+    get :show, :id => person
+    assert_select "li", :text => /This person is a publisher/, :count => 1
+  end
+
+  test 'should not show that the person is publisher for non-admin' do
+    person = Factory(:person)
+    person.is_publisher = true
+    person.save
+    login_as(:aaron)
+    get :show, :id => person
+    assert_select "li", :text => /This person is a publisher/, :count => 0
+  end
+
+  test 'should have publisher icon on person show page' do
+    publisher = Factory(:publisher)
+    get :show, :id => publisher
+    assert_select "img[src*=?]", /medal_silver_2.png/,:count => 1
+  end
+
+  test 'should have publisher icon on people index page' do
+    i = 0
+    while i < 5 do
+      Factory(:publisher)
+      i += 1
+    end
+    get :index
+    publisher_number = assigns(:people).select(&:is_publisher?).count
+    assert_select "img[src*=?]", /medal_silver_2/, :count => publisher_number
   end
 end

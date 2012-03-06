@@ -101,6 +101,11 @@ class Project < ActiveRecord::Base
     people.select(&:is_project_manager?)
   end
 
+  #this is seek role
+  def publishers
+    people.select(&:is_publisher?)
+  end
+
   def locations
     # infer all project's locations from the institutions where the person is member of
     locations = self.institutions.collect { |i| i.country unless i.country.blank? }

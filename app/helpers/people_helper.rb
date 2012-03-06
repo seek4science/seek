@@ -11,20 +11,12 @@ module PeopleHelper
     end
   end
 
-  def pal_icon person
-    person.is_pal? ? image("pal",:alt=>"Pal",:title=>tooltip_title_attrib("Official #{Seek::Config.dm_project_name} Pal"), :style=>"vertical-align: middle")  : ""
-  end
-
-  def admin_icon person
-    person.is_admin? ? image("admin",:alt=>"Admin",:title=>tooltip_title_attrib("#{Seek::Config.dm_project_name} Administrator"), :style=>"vertical-align: middle") : ""
-  end
-
-  def asset_manager_icon person
-    person.is_asset_manager? ? image("asset_manager", :alt=>"Asset Manager", :title=>tooltip_title_attrib("#{Seek::Config.dm_project_name} Asset Manager"), :style=>"vertical-align: middle") : ""
-  end
-
-  def project_manager_icon person
-    person.is_project_manager? ? image("project_manager", :alt=>"Project Manager", :title=>tooltip_title_attrib("#{Seek::Config.dm_project_name} Project Manager"), :style=>"vertical-align: middle") : ""
+  def seek_role_icons person
+    icons = ''
+    person.roles.each do |role|
+      icons << image("#{role}",:alt=>"#{role}",:title=>tooltip_title_attrib("Official #{Seek::Config.dm_project_name} #{role.humanize}"), :style=>"vertical-align: middle")
+    end
+    icons
   end
 
   def discipline_list person

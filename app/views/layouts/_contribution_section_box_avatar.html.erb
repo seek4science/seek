@@ -9,9 +9,6 @@
   </div>
   
   <% if object.instance_of?(Person) -%>
-    <%= pal_icon(@person) -%>
-    <%= asset_manager_icon(@person) -%>
-    <%= project_manager_icon(@person) -%>
-    <%= admin_icon(@person) -%>
+    <%= seek_role_icons(@person) -%>
   <% end -%>
 </div>

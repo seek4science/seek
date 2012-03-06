@@ -34,7 +34,8 @@ module ResourceListItemHelper
     html = "<div class=\"list_item_title\">"
 
     if resource.class.name.split("::")[0] == "Person"
-      html << "<p>#{link_to title, (url.nil? ? show_resource_path(resource) : url)} #{admin_icon(resource) + " " + project_manager_icon(resource)+ " " + asset_manager_icon(resource) + " " + pal_icon(resource)}</p>"
+      icons = seek_role_icons(resource)
+      html << "<p>#{link_to title, (url.nil? ? show_resource_path(resource) : url)} #{icons}</p>"
     else
       if include_avatar && (resource.avatar_key || resource.use_mime_type_for_avatar?)
         image=resource_avatar resource,:style=>"width: 24px; height: 24px; vertical-align: middle"

@@ -215,6 +215,16 @@ class ProjectsControllerTest < ActionController::TestCase
 		end
     end
 
+  test "publishers displayed in show page" do
+    publisher = Factory(:publisher)
+    get :show, :id => publisher.projects.first
+    assert_select "div.box_about_actor p.publishers" do
+      assert_select "label", :text => "SysMO-DB Publishers:", :count => 1
+      assert_select "a", :count => 1
+      assert_select "a[href=?]", person_path(publisher), :text => publisher.name, :count => 1
+    end
+  end
+
 	test "filter projects by person" do
 		get :index, :filter => {:person => 1}
 		assert_response :success
@@ -252,6 +262,15 @@ class ProjectsControllerTest < ActionController::TestCase
 		end
 	end
 
+  test "no publishers displayed for project with no publishers" do
+		project = Factory(:project)
+    get :show,:id=>project
+		assert_select "div.box_about_actor p.publishers" do
+			assert_select "label",:text=>"SysMO-DB Publishers:",:count=>1
+			assert_select "a",:count=>0
+			assert_select "span.none_text",:text=>"No Publishers for this project",:count=>1
+		end
+	end
 
 	test "non admin cannot administer project" do
 		login_as(:pal_user)
