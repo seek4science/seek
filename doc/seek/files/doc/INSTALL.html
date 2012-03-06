@@ -56,7 +56,7 @@
     </tr>
     <tr class="top-aligned-row">
       <td><strong>Last Update:</strong></td>
-      <td>Wed Feb 01 15:26:17 +0000 2012</td>
+      <td>Mon Mar 05 10:02:36 +0000 2012</td>
     </tr>
     </table>
   </div>
@@ -193,11 +193,11 @@ as the version control system.
 </p>
 <p>
 For a stable version, you should check out according to a stable tag. Our
-current stable tag is <em>0.13</em>, so to retrieve this version you should
-use:
+current stable tag is <em>0.13.1</em>, so to retrieve this version you
+should use:
 </p>
 <pre>
-  hg clone https://sysmo-db.googlecode.com/hg/ -r v0.13 seek
+  hg clone https://sysmo-db.googlecode.com/hg/ -r v0.13.1 seek
 </pre>
 <p>
 This will create a <em>seek</em> directory that contains the application.
@@ -286,6 +286,12 @@ To start delayed job run the script
 </p>
 <pre>
   ./script/delayed_job start
+</pre>
+<p>
+or for production:
+</p>
+<pre>
+  RAILS_ENV=production ./script/delayed_job start
 </pre>
 <h2>Creating the Admin user</h2>
 <p>
