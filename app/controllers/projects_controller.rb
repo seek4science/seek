@@ -219,7 +219,7 @@ class ProjectsController < ApplicationController
 
   def auth_institution_list_for_project_manager
      if (params[:project] and params[:project][:institution_ids])
-      if current_user.try(:person).try(:is_project_manager?) && !current_user.try(:person).try(:is_admin?)
+      if User.project_manager_logged_in? && !User.admin_logged_in?
         institutions = []
         params[:project][:institution_ids].each do |id|
           institution = Institution.find_by_id(id)

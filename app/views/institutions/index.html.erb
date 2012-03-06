@@ -1,5 +1,5 @@
 <ul class="sectionIcons">
-    <% if (current_user.try :is_project_manager?)-%>
+    <% if project_manager_logged_in?-%>
         <li>
           <%= image_tag_for_key "new", new_institution_path(), "New Institution", nil, "New Institution" -%>
         </li>
