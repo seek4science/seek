@@ -22,6 +22,7 @@
         <%= image_tag_for_key "admin", admin_person_path(@person), "Administer", nil, "Person Administration" -%>
       </li>
   <% end -%>
+</ul>
 
 
 <%= render :partial => "layouts/item_title", :locals=>{:item=>@person} %>
@@ -74,12 +75,10 @@
 
       <% if admin_logged_in? %>
           <p>
-            <b>Registered on:</b>
-            <label>
-              <%=  @person.try(:user).try(:created_at).nil? ? text_or_not_specified(nil) : date_as_string(@person.try(:user).try(:created_at))-%>
-            </label>
+            <b>Registered:</b>
+               <%= @person.registered? ? date_as_string(@person.user.created_at) : text_or_not_specified(nil)-%>
           </p>
-      <%end%>
+      <% end %>
 
       <p>
         <b>About me:</b>
