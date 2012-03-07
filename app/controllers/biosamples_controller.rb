@@ -146,7 +146,7 @@ class BiosamplesController < ApplicationController
         else
           sample_array = [sample.specimen_info,
                           (link_to sample.title, sample_path(sample.id), {:target => '_blank'}),
-                          sample.lab_internal_number, sample.sampling_date_info, sample.provider_name_info, sample.id]
+                          sample.lab_internal_number, sample.sampling_date_info, sample.age_at_sampling, sample.provider_name_info, sample.id]
 
           page.call :loadNewSampleAfterCreation, sample_array
         end
