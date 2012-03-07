@@ -138,5 +138,17 @@ class InstitutionsControllerTest < ActionController::TestCase
     assert_equal 'test', institution.name
   end
 
+  test "project manager has a 'New Institution' link in the institution index" do
+    login_as(Factory(:project_manager).user)
+    get :index
+
+    assert_select "a[href=?]", new_institution_path(), :count => 1
+  end
+
+  test "non-project manager  doesnt has a 'New Institution' link in the institution index" do
+    get :index
+    assert_select "a[href=?]", new_institution_path(), :count => 0
+  end
+
 end
 

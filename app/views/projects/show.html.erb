@@ -8,7 +8,7 @@
     <% if @project.try(:can_be_administered_by?, current_user) -%>
       <li><%= image_tag_for_key "admin", admin_project_path(@project), "Administer", nil, "Project administration" -%></li>
      <% end -%>
-    <% if current_user.try :is_admin? -%>
+    <% if admin_logged_in? -%>
       <li><%= image_tag_for_key "destroy", project_path(@project), "Delete Project", { :confirm => 'Are you sure?', :method => :delete }, "Delete Project" -%></li>
     <% end -%>
   </ul>
@@ -53,6 +53,10 @@
           <%= project_managers_link_list @project -%>
         </p>
 
+        <p class="publishers">
+          <label><%= Seek::Config.dm_project_name %> Publishers:</label>
+          <%= publishers_link_list @project -%>
+        </p>
 
 
     </div>

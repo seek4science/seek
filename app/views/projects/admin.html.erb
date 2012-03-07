@@ -10,9 +10,11 @@
   
     <%= f.error_messages %>
 
-    <%= render :partial=>"jerm_details",:locals=>{:f=>f} %>
-    <br/>
-    <%= render :partial=>"assets/sharing_form"%>
+    <% if admin_logged_in?%>
+        <%= render :partial=>"jerm_details",:locals=>{:f=>f} %>
+        <br/>
+        <%= render :partial=>"assets/sharing_form"%>
+    <%end%>
 
     <h2 style="margin-top: 2em;">Participating Institutions</h2>
 
@@ -21,9 +23,9 @@
       <%= f.label :institution_ids, "Please select the institutions that participate in this project", :style => "line-height: 2;" -%><br/>
       <%
          institution_list = []
-         if current_user.is_admin?
+         if admin_logged_in?
             institution_list |= Institution.find(:all)
-         elsif current_user.is_project_manager?
+         elsif project_manager_logged_in?
             institution_list |= (Institution.find(:all).select{|i| i.projects.empty?} + @project.institutions).uniq
          end
       %>

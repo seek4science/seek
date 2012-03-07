@@ -41,4 +41,12 @@ module ProjectsHelper
       project.project_managers.select(&:can_view?).collect { |p| link_to(h(p.name), p) }.join(", ")
     end
   end
+
+  def publishers_link_list project
+    if project.publishers.empty?
+      "<span class='none_text'>No Publishers for this project</span>";
+    else
+      project.publishers.select(&:can_view?).collect { |p| link_to(h(p.name), p) }.join(", ")
+    end
+  end
 end

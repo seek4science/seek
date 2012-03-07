@@ -10,7 +10,7 @@
             <%= image_tag_for_key "lock", url_for({:controller=>:users, :action=>:edit, :id=>@person.user}), "Manage Account", nil, "Manage Account" -%>
           </li>
       <% end -%>
-      <% if current_user.try :is_admin? -%>
+      <% if admin_logged_in? -%>
           <li>
             <%= image_tag_for_key "destroy", person_path(@person), "Delete Person", {:confirm => 'Are you sure?', :method => :delete}, "Delete Person" -%>
           </li>
@@ -22,12 +22,8 @@
         <%= image_tag_for_key "admin", admin_person_path(@person), "Administer", nil, "Person Administration" -%>
       </li>
   <% end -%>
-  <% if (current_user.try :is_project_manager?) && mine?(@person)-%>
-      <li>
-        <%= image_tag_for_key "new", new_institution_path(), "New Institution", nil, "New Institution" -%>
-      </li>
-  <% end -%>
 </ul>
+
 
 <%= render :partial => "layouts/item_title", :locals=>{:item=>@person} %>
 <div class="show_basic">
@@ -37,7 +33,7 @@
         <b>Name:</b>
         <%= h @person.name %>
       </p>
-      <% if !current_user.nil? && (current_user.person == @person || current_user.is_admin?) %>
+      <% if (current_user.try(:person) == @person || admin_logged_in?) %>
           <p>
             <b>Seek ID: </b>
             <%= @person.id %>
@@ -77,14 +73,12 @@
 
       <%= render :partial=>"areas_of_expertise", :locals => {:person=>@person} %>
 
-      <% if current_user.is_admin? %>
+      <% if admin_logged_in? %>
           <p>
-            <b>Registered at:</b>
-            <label>
-              <%=  @person.try(:user).try(:created_at).nil? ? text_or_not_specified(nil) : date_as_string(@person.try(:user).try(:created_at))-%>
-            </label>
+            <b>Registered:</b>
+               <%= @person.registered? ? date_as_string(@person.user.created_at) : text_or_not_specified(nil)-%>
           </p>
-      <%end%>
+      <% end %>
 
       <p>
         <b>About me:</b>
@@ -108,7 +102,7 @@
     <%= render :partial=>"layouts/items_related_to", :object => @person %>
     <%# show the following section only to admins and only if the @person has an associated "user", which is not an admin itself - -%>
     <%# this is because it's not needed then: admins can see everything anyway -%>
-    <% if current_user.try :is_admin? -%>
+    <% if admin_logged_in? -%>
         <h3 class="admin_warning" style="margin-top: 2.5em;">Access Rights Information - Only Visible to Admins</h3>
         <ul>
 
@@ -118,6 +112,7 @@
           <%= "<li>This person is a <b>project manager</b></li>" if @person.is_project_manager? %>
 
           <%= "<li>This person is an <b>asset manager</b></li>" if @person.is_asset_manager? %>
+          <%= "<li>This person is a <b>publisher</b></li>" if @person.is_publisher? %>
 
           <li>
             Editing <b>projects</b>, where this person is

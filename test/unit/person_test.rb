@@ -552,6 +552,21 @@ class PersonTest < ActiveSupport::TestCase
     end
   end
 
+  test 'is_publisher?' do
+     User.with_current_user Factory(:admin).user do
+      person = Factory(:person)
+      person.is_publisher= true
+      person.save!
+
+      assert person.is_publisher?
+
+      person.is_publisher=false
+      person.save!
+
+      assert !person.is_publisher?
+    end
+  end
+
   test 'replace admins, pals named_scope by a static function' do
     admins = Person.admins
     assert_equal 1, admins.count
