@@ -70,7 +70,7 @@ module Acts
       end
       #contritutor or person who can manage the item and the item was published
       def can_publish?
-        (Ability.new(User.current_user).can? :publish, self) || self.contributor == User.current_user || try_block{self.contributor.user} == User.current_user || (self.can_manage? && self.policy.sharing_scope == Policy::EVERYONE) || Seek::Config.is_virtualliver
+        ((Ability.new(User.current_user).can? :publish, self) && self.can_manage?) || self.contributor == User.current_user || try_block{self.contributor.user} == User.current_user || (self.can_manage? && self.policy.sharing_scope == Policy::EVERYONE) || Seek::Config.is_virtualliver
       end
 
       #use request_permission_summary to retrieve who can manage the item
