@@ -76,7 +76,7 @@
       <% if admin_logged_in? %>
           <p>
             <b>Registered:</b>
-               <%= @person.registered? ? date_as_string(@person.user.created_at) : text_or_not_specified(nil)-%>
+               <%= @person.registered? ? date_as_string(@person.user.created_at) : 'Not yet registered'-%>
           </p>
       <% end %>
 
