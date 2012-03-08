@@ -215,7 +215,7 @@ class BiosamplesController < ApplicationController
             phenotype_description << value['description'] unless value["description"].blank?
           end
         end
-        flag =  flag && (compare_attribute strain.phenotype.try(:description), phenotype_description.join('$$$'))
+        flag =  flag && (compare_attribute strain.phenotypes.collect(&:description).sort, phenotype_description.sort)
         if flag
           strain
         else
@@ -259,8 +259,8 @@ class BiosamplesController < ApplicationController
           phenotype_description << value["description"] unless value["description"].blank?
         end
       end
-      unless phenotype_description.blank?
-        strain.phenotype = Phenotype.new(:description => phenotype_description.join('$$$'))
+      phenotype_description.each do |description|
+        strain.phenotypes << Phenotype.new(:description => description)
       end
 
       #genotype

@@ -1,7 +1,7 @@
 class Strain < ActiveRecord::Base
   belongs_to :organism
   has_many :genotypes, :dependent => :destroy
-  has_one :phenotype, :dependent => :destroy
+  has_many :phenotypes, :dependent => :destroy
   has_many :specimens
 
   named_scope :by_title
@@ -40,6 +40,11 @@ class Strain < ActiveRecord::Base
   end
 
   def phenotype_info
-    phenotype_detail = phenotype.try(:description).blank? ? 'wild-type' : phenotype.try(:description).gsub('$$$', '; ')
+    phenotype_detail = []
+    phenotypes.each do |phenotype|
+      phenotype_detail << phenotype.try(:description) unless phenotype.try(:description).blank?
+    end
+    phenotype_detail = phenotype_detail.blank? ? 'wild-type' : phenotype_detail.join('; ')
+    phenotype_detail
   end
 end
