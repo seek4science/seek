@@ -19,7 +19,7 @@ class Strain < ActiveRecord::Base
       gene = Gene.find_by_title('wild-type') || Gene.create(:title => 'wild-type')
       genotype = Genotype.new(:gene => gene)
       phenotype = Phenotype.new(:description => 'wild-type')
-      strain = Strain.create :organism=>organism,:is_dummy=>true,:title=>"default",:genotypes=>[genotype],:phenotype=>phenotype
+      strain = Strain.create :organism=>organism,:is_dummy=>true,:title=>"default",:genotypes=>[genotype],:phenotypes=>[phenotype]
     end
 
     strain
