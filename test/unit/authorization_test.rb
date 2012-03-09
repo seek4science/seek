@@ -947,6 +947,22 @@ class AuthorizationTest < ActiveSupport::TestCase
      end
   end
 
+  test "should handle different types of contributor of resource (Person, User)" do
+    asset_manager = Factory(:asset_manager)
+    policy = Factory(:private_policy)
+    permission = Factory(:permission, :contributor => Factory(:person), :access_type => 1)
+    policy.permissions = [permission]
+
+    #resources are not entirely private
+    datafile = Factory(:data_file, :projects => asset_manager.projects, :policy => policy)
+    investigation = Factory(:investigation, :projects => asset_manager.projects, :policy => policy)
+
+    User.with_current_user asset_manager.user do
+      assert datafile.can_manage?
+      assert investigation.can_manage?
+    end
+  end
+
   private 
 
   def actions
