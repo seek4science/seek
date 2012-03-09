@@ -78,11 +78,10 @@
       <div class="yui-u  box_simple" style="width: 42%;margin-right: 2em; margin-top: 1em; margin-bottom: 1em;">
          <label style="font-weight: bold; border-bottom: 1px solid #DDD"> Phenotypes:</label>
         <table id='phenotype_table'>
-          <% j=1
-           unless strain.phenotype.try(:description).blank?
-             strain.phenotype.description.split('$$$').each do |phenotype| %>
+          <% j=0
+             strain.phenotypes.each do |phenotype| %>
               <tr id='phenotype_row_<%=j%>'>
-                <td> <%= text_field_tag "phenotypes[#{j}][description]", phenotype, :size => 25 %>
+                <td> <%= text_field_tag "phenotypes[#{j}][description]", phenotype.description, :size => 25 %>
                 </td>
                 <td> <%= link_to_function image("destroy", :alt=>"Delete", :title=>"Delete this entry", :id=> "delete_phenotype_#{j}"), "fadePhenotypeRow('#{j}')"-%>
                 </td>

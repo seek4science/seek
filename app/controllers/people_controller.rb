@@ -339,7 +339,7 @@ class PeopleController < ApplicationController
 
   def current_user_exists
     if !current_user
-      redirect_to("/")
+      redirect_to(:root)
     end
     !!current_user
   end

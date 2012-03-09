@@ -54,28 +54,14 @@
         <tbody>
         <%
            existing_strains.each do |strain| -%>
-            <%
-               genotype_detail = []
-               strain.genotypes.each do |genotype|
-                   genotype_detail << genotype.modification.try(:title).to_s + ' ' + genotype.gene.try(:title).to_s if genotype.gene
-               end
-               genotype_detail = genotype_detail.blank? ? 'wild-type' : genotype_detail.join('; ')
-               phenotype_detail = strain.phenotype.try(:description)
-               if phenotype_detail.blank?
-                 phenotype_detail = 'wild-type'
-               else
-                 phenotype_detail = phenotype_detail.gsub('$$$', '; ')
-               end
-
-            %>
             <tr class="gradeA">
               <td><%= link_to strain.organism.title, organism_path(strain.organism.id), {:target => '_blank'} %></td>
               <td><%= check_box_tag "selected_strain_#{strain.id}", strain.id, false, :onchange => remote_function(:url => {:controller => 'biosamples', :action => 'existing_specimens'}, :with => "'strain_ids=' + getSelectedStrains()") +
                       ";show_existing_specimens();hide_existing_samples();" %>
               </td>
               <td><%= strain.title %> </td>
-              <td><%= genotype_detail %> </td>
-              <td><%= phenotype_detail %></td>
+              <td><%= strain.genotype_info %> </td>
+              <td><%= strain.phenotype_info %></td>
               <td><%= strain.id %></td>
               <td><%= strain.synonym %> </td>
               <td><%= strain.comment %></td>

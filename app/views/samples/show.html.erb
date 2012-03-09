@@ -33,7 +33,7 @@
         <%= text_or_not_specified(@sample.lab_internal_number) %>
       </p>
       <p>
-        <label>Sampling date:</label>
+        <label>Date at sampling:</label>
         <%= text_or_not_specified @sample.sampling_date.nil? ? nil : date_as_string(@sample.sampling_date) -%>
       </p>
       <p>
