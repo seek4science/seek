@@ -75,7 +75,7 @@ module Acts
 
       #use request_permission_summary to retrieve who can manage the item
       def people_can_manage
-        contributor = self.is_isa? ? self.contributor : self.contributor.try(:person)
+        contributor = self.contributor.kind_of?(Person) ? self.contributor : self.contributor.try(:person)
         return [[contributor.id, "#{contributor.first_name} #{contributor.last_name}", Policy::MANAGING]] if policy.blank?
         creators = is_downloadable? ? self.creators : []
         asset_managers = projects.collect(&:asset_managers).flatten
