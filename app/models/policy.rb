@@ -212,7 +212,7 @@ class Policy < ActiveRecord::Base
   end
 
 #return the hash: key is access_type, value is the array of people
-  def summarize_permissions creators=[User.current_user.person], asset_managers = [], contributor=User.current_user.person
+  def summarize_permissions creators=[User.current_user.try(:person)], asset_managers = [], contributor=User.current_user.try(:person)
         #build the hash containing contributor_type as key and the people in these groups as value,exception:'Public' holds the access_type as the value
         people_in_group = {'Person' => [], 'FavouriteGroup' => [], 'WorkGroup' => [], 'Project' => [], 'Institution' => [], 'WhiteList' => [], 'BlackList' => [],'Network' => [], 'Public' => 0}
         #the result return: a hash contain the access_type as key, and array of people as value
