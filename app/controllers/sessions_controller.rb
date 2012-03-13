@@ -98,14 +98,14 @@ class SessionsController < ApplicationController
         end
       end
       
-      format.html { return_to_url.nil? || (return_to_url && URI.parse(return_to_url).path == '/') ? redirect_to(root_url) : redirect_to(return_to_url) }
+      format.html { return_to_url.nil? || (return_to_url && URI.parse(return_to_url).path == root_url) ? redirect_to(root_url) : redirect_to(return_to_url) }
     end
   end
 
   def failed_login(message)
     logout_user
     flash[:error] = message
-    redirect_to("/")
+    redirect_to(:root)
   end
 
   #will initiate creating an initial admin user if no users are present

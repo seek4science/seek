@@ -15,8 +15,9 @@
                 null,
                 { "sWidth": "20%" },
                 { "sWidth": "20%" },
+                { "sWidth": "15%" },
+                { "sWidth": "15%" },
                 { "sWidth": "20%" },
-                { "sWidth": "30%" },
                 { "sWidth": "10%" }
             ],
             "fnInitComplete": function () {
@@ -43,7 +44,8 @@
                 <th>Specimen</th>
                 <th>Title</th>
                 <th>Lab internal identifier</th>
-                <th>Sampling date</th>
+                <th>Date at sampling</th>
+                <th>Age at sampling(hours)</th>
                 <th>Provider name</th>
                 <th>ID</th>
               </tr>
@@ -55,6 +57,7 @@
                     <td><%= link_to sample.title, sample_path(sample.id), {:target => '_blank'} %> </td>
                     <td><%= sample.lab_internal_number %> </td>
                     <td><%= sample.sampling_date_info %> </td>
+                    <td><%= sample.age_at_sampling %> </td>
                     <td><%= sample.provider_name_info %></td>
                     <td><%= sample.id %></td>
                   </tr>

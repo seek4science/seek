@@ -805,18 +805,50 @@ class AuthorizationTest < ActiveSupport::TestCase
     assert !item.can_manage?
   end
 
-  test "publisher can publish items inside their project" do
+  test "publisher can publish items inside their project, only if they can manage it as well" do
     publisher = Factory(:person, :roles => ['publisher'])
-    datafile1 = Factory(:data_file, :projects => publisher.projects)
-    datafile2 = Factory(:data_file)
+    datafile = Factory(:data_file, :projects => publisher.projects)
+
+    #adding manage right for publisher
+    User.with_current_user datafile.contributor do
+      policy  = Factory(:policy)
+      policy.permissions = [Factory(:permission, :contributor => publisher, :access_type => Policy::MANAGING)]
+      datafile.policy = policy
+      datafile.save
+    end
 
     ability = Ability.new(publisher.user)
+    assert ability.can? :publish, datafile
 
-    assert ability.can? :publish, datafile1
-    assert ability.cannot? :publish, datafile2
     User.with_current_user publisher.user do
-      assert datafile1.can_publish?
-      assert !datafile2.can_publish?
+      assert datafile.can_manage?
+      assert datafile.can_publish?
+    end
+  end
+
+  test "publisher can not publish items inside their project, if they can not manage it" do
+      publisher = Factory(:person, :roles => ['publisher'])
+      datafile = Factory(:data_file, :projects => publisher.projects)
+
+      ability = Ability.new(publisher.user)
+      assert ability.can? :publish, datafile
+
+      User.with_current_user publisher.user do
+        assert !datafile.can_manage?
+        assert !datafile.can_publish?
+      end
+    end
+
+
+  test "publisher can not publish items outside their project" do
+    publisher = Factory(:person, :roles => ['publisher'])
+    datafile = Factory(:data_file)
+
+    ability = Ability.new(publisher.user)
+    assert ability.cannot? :publish, datafile
+
+    User.with_current_user publisher.user do
+      assert !datafile.can_publish?
     end
   end
 
@@ -900,12 +932,11 @@ class AuthorizationTest < ActiveSupport::TestCase
      end
   end
 
-  test "publisher should be able to publish the item, but not to manage the item" do
+  test "publisher should not be able to manage the item" do
      publisher = Factory(:publisher)
      datafile = Factory(:data_file, :projects => publisher.projects, :policy => Factory(:all_sysmo_viewable_policy))
 
      User.with_current_user publisher.user do
-       assert datafile.can_publish?
        assert !datafile.can_manage?
 
        ability = Ability.new(publisher.user)
@@ -914,6 +945,23 @@ class AuthorizationTest < ActiveSupport::TestCase
        assert ability.cannot? :manage_asset, datafile
        assert ability.cannot? :manage, datafile
      end
+  end
+
+  test "should handle different types of contributor of resource (Person, User)" do
+    asset_manager = Factory(:asset_manager)
+
+    policy = Factory(:private_policy)
+    permission = Factory(:permission, :contributor => Factory(:person), :access_type => 1)
+    policy.permissions = [permission]
+
+    #resources are not entirely private
+    datafile = Factory(:data_file, :projects => asset_manager.projects, :policy => policy)
+    investigation = Factory(:investigation, :contributor => Factory(:person), :projects => asset_manager.projects, :policy => policy)
+
+    User.with_current_user asset_manager.user do
+      assert datafile.can_manage?
+      assert investigation.can_manage?
+    end
   end
 
   private 

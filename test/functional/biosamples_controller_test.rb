@@ -184,4 +184,11 @@ class BioSamplesControllerTest < ActionController::TestCase
     assert_response :success
     assert_select "select#sample_organism_part", :count => 1
   end
+
+  test "should have age at sampling in sample table" do
+    specimen = specimens("running mouse")
+    xhr(:get, :existing_samples, {:specimen_ids => "#{specimen.id}"})
+    assert_response :success
+    assert_select "table#sample_table thead tr th", :text => "Age at sampling(hours)", :count => 1
+  end
 end

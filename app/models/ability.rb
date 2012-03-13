@@ -46,7 +46,7 @@ class Ability
               true
             else
               creators = item.is_downloadable? ? item.creators : []
-              contributor = item.class.name=='Assay' ? item.contributor : item.contributor.try(:person)
+              contributor = item.is_isa? ? item.contributor : item.contributor.try(:person)
               grouped_people_by_access_type = policy.summarize_permissions creators, [], contributor
               !policy.is_entirely_private? grouped_people_by_access_type, contributor
             end
