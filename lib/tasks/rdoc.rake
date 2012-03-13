@@ -15,6 +15,7 @@ namespace :doc do
 #    rdoc.rdoc_files.include('doc/ARCHITECTURE')
     rdoc.rdoc_files.include('doc/CREDITS')
     rdoc.rdoc_files.include('doc/INSTALL')
+    rdoc.rdoc_files.include('doc/UPGRADING')
 #    rdoc.rdoc_files.include('app/**/*.rb')
 
 #    rdoc.rdoc_files.include('lib/jerm/resource.rb')
