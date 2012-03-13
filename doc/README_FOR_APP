@@ -8,6 +8,10 @@ Please visit the {Sysmo-DB Website}[http://www.sysmo-db.org] for more informatio
 
 Please read INSTALL[link:files/doc/INSTALL.html] for details on how to setup SEEK for the first time.
 
+== Upgrading
+
+Please read UPGRADING[link:files/doc/UPGRADING.html] for details on how to upgrade your installed SEEK from a previous version.
+
 == Credits
 
 Please read the CREDITS[link:files/doc/CREDITS.html] document.
