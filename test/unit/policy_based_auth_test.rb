@@ -37,4 +37,9 @@ class PolicyBasedAuthTest < ActiveSupport::TestCase
     assay.policy.permissions << Factory(:permission,:contributor=>Factory(:project),:access_type=>Policy::VISIBLE)
     assert assay.has_advanced_permissions?
   end
+
+  test "should cache" do
+
+  end
+
 end
