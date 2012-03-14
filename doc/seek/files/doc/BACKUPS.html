@@ -56,7 +56,7 @@
     </tr>
     <tr class="top-aligned-row">
       <td><strong>Last Update:</strong></td>
-      <td>Wed Mar 14 13:31:34 +0000 2012</td>
+      <td>Wed Mar 14 16:49:32 +0000 2012</td>
     </tr>
     </table>
   </div>
@@ -69,8 +69,8 @@
   <div id="contextContent">
 
     <div id="description">
-      <h2>Backing Up</h2>
-<h3>Backing up the database</h3>
+      <h1>Backing Up</h1>
+<h2>Backing up the database</h2>
 <p>
 You can backup the database using <a
 href="http://linuxcommand.org/man_pages/mysqldump1.html">mysqldump</a>
@@ -82,14 +82,14 @@ suggested.
 <pre>
   mysqldump -umysqluser -pmysqlpassword seek_production &gt; seek_production.sql
 </pre>
-<h3>Backing up files</h3>
+<h2>Backing up files</h2>
 <p>
 The is also no harm in backing up the entire SEEK directory, however the
 essential directory to backup it the <em>filestore/</em> directory. This is
 the directory that contains all asset files, and other potentially
 important files.
 </p>
-<h3>Restoring</h3>
+<h2>Restoring</h2>
 <p>
 Should you ever need to restore the database you can do so by logging into
 mysql
@@ -110,7 +110,7 @@ and importing the dump:
 The files can be restored simply by copying the
 &lt;em&gt;filestore/&lt;em&gt; directory back into the SEEK root directory.
 </p>
-<h3>Incremental Backups</h3>
+<h2>Incremental Backups</h2>
 <p>
 Incremental backups allow you to recover a particular version of the backup
 from a given point in time, depending upon the frequency of the backup and
