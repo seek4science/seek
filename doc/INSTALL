@@ -214,6 +214,10 @@ and configured a virtual host (probably in <i>/etc/apache2/sites-enabled/default
       </Directory>
    </VirtualHost>
 
+== Backing up
+
+Please read our {Backup Guide}[link:files/doc/BACKUPS.html] for suggestions on how to backup a SEEK installation.
+
 == Contacting us and other developers 
 
 There is a public Google Group available for SEEK development at http://groups.google.com/group/seek-development

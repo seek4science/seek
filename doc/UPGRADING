@@ -1,50 +1,25 @@
 = Upgrading SEEK
 
-This guide assumes that SEEK has been installed following the INSTALL[link:files/doc/INSTALL.html] guide. It assumes it is
+<b>Always backup your SEEK data before starting to upgrade!!</b> - see the {Backup Guide}[link:files/doc/BACKUPS.html].
+
+This guide assumes that SEEK has been installed following the {Installation Guide}[link:files/doc/INSTALL.html] guide. It assumes it is
 a production server that is being updated, and that commands are run from the root directory of the SEEK application.
 
-== Backing up
+If your current installation is not linked to to the SEEK GoogleCode mercurial repository, it can still easily be updated by
+taking the next stable tag, reconfiguring the database configuration to point at your existing database, and copying across the
+<em>filestore/</em> directory. The upgrade steps can then be followed, with the Mercurial (hg) steps omitted.
 
-<b>You should always backup before starting to upgrade !!</b>
-There are 2 things you need to backup - the database and filestore.
-
-=== Backing up the database
-
-You can backup the database using <em>mysqldump</em> using the following syntax. The database name, username and password
-follows that which was used in the install guide - however the username and password should be different for you if you'd
-changed them as suggested.
-
-  mysqldump -umysqluser -pmysqlpassword seek_production > seek_production.sql
-
-=== Backing up files
-
-All assets are stored in the directory filestore/ and this should be backed up to another location. The upgrade process
-would never normally touch these files, but always better to be safe than sorry.
-
-=== Restoring
-
-Should you ever need to restore the database you can do so by logging into mysql
-
-  mysql -umysqluser -pmysqlpassword
-
-and creating the database (assuming it no longer exists), connecting to it, and importing the dump:
-
-  >create database seek_production;
-  >\r seek_production
-  >\. ./seek_production.sql
-
-The files can be restored simply by copying the folder back over to filestore/
 
 == Identifying your version
 
-You can tell which version you have installed by looking at the config/version.yml file, so for example version 0.13.1
+You can tell which version you have installed by looking at the <em>config/version.yml</em> file, so for example version 0.13.1
 looks something like:
 
   major: 0
   minor: 13
   patch: 1
 
-== Upgrading between versions
+== General notes about versions and upgrading
 
 <b>If upgrading from a version earlier than v0.11.x please contact our GoogleGroup at http://groups.google.com/group/seek-development</b>
 

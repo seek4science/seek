@@ -56,7 +56,7 @@
     </tr>
     <tr class="top-aligned-row">
       <td><strong>Last Update:</strong></td>
-      <td>Tue Mar 13 17:30:31 +0000 2012</td>
+      <td>Wed Mar 14 13:45:27 +0000 2012</td>
     </tr>
     </table>
   </div>
@@ -71,65 +71,35 @@
     <div id="description">
       <h1>Upgrading SEEK</h1>
 <p>
+<b>Always backup your SEEK data before starting to upgrade!!</b> - see the
+<a href="BACKUPS.html">Backup Guide</a>.
+</p>
+<p>
 This guide assumes that SEEK has been installed following the <a
-href="INSTALL.html">INSTALL</a> guide. It assumes it is a production server
-that is being updated, and that commands are run from the root directory of
-the SEEK application.
+href="INSTALL.html">Installation Guide</a> guide. It assumes it is a
+production server that is being updated, and that commands are run from the
+root directory of the SEEK application.
 </p>
-<h2>Backing up</h2>
 <p>
-<b>You should always backup before starting to upgrade !!</b> There are 2
-things you need to backup - the database and filestore.
-</p>
-<h3>Backing up the database</h3>
-<p>
-You can backup the database using <em>mysqldump</em> using the following
-syntax. The database name, username and password follows that which was
-used in the install guide - however the username and password should be
-different for you if you&#8216;d changed them as suggested.
-</p>
-<pre>
-  mysqldump -umysqluser -pmysqlpassword seek_production &gt; seek_production.sql
-</pre>
-<h3>Backing up files</h3>
-<p>
-All assets are stored in the directory filestore/ and this should be backed
-up to another location. The upgrade process would never normally touch
-these files, but always better to be safe than sorry.
-</p>
-<h3>Restoring</h3>
-<p>
-Should you ever need to restore the database you can do so by logging into
-mysql
-</p>
-<pre>
-  mysql -umysqluser -pmysqlpassword
-</pre>
-<p>
-and creating the database (assuming it no longer exists), connecting to it,
-and importing the dump:
-</p>
-<pre>
-  &gt;create database seek_production;
-  &gt;\r seek_production
-  &gt;\. ./seek_production.sql
-</pre>
-<p>
-The files can be restored simply by copying the folder back over to
-filestore/
+If your current installation is not linked to to the SEEK GoogleCode
+mercurial repository, it can still easily be updated by taking the next
+stable tag, reconfiguring the database configuration to point at your
+existing database, and copying across the <em>filestore/</em> directory.
+The upgrade steps can then be followed, with the Mercurial (hg) steps
+omitted.
 </p>
 <h2>Identifying your version</h2>
 <p>
 You can tell which version you have installed by looking at the
-config/version.yml file, so for example version 0.13.1 looks something
-like:
+<em>config/version.yml</em> file, so for example version 0.13.1 looks
+something like:
 </p>
 <pre>
   major: 0
   minor: 13
   patch: 1
 </pre>
-<h2>Upgrading between versions</h2>
+<h2>General notes about versions and upgrading</h2>
 <p>
 <b>If upgrading from a version earlier than v0.11.x please contact our
 GoogleGroup at <a
