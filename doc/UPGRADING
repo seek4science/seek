@@ -77,6 +77,7 @@ This example uses v0.13.2 as an example.
   hg merge # if necessary
   hg commit -m "merged" # if necessary
   bundle install --deployment
+  rake db:migrate RAILS_ENV=production
   rake tmp:assets:clear RAILS_ENV=production
   rake tmp:clear RAILS_ENV=production
 
