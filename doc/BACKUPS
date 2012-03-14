@@ -1,7 +1,7 @@
-== Backing Up
+= Backing Up
 
 
-=== Backing up the database
+== Backing up the database
 
 You can backup the database using mysqldump[http://linuxcommand.org/man_pages/mysqldump1.html] using the following syntax.
 The database name, username and password follows that which was used in the install guide - however the username and
@@ -9,13 +9,13 @@ password should be different for you if you'd changed them as suggested.
 
   mysqldump -umysqluser -pmysqlpassword seek_production > seek_production.sql
 
-=== Backing up files
+== Backing up files
 
 The is also no harm in backing up the entire SEEK directory, however the essential directory to backup it the <em>filestore/</em> directory.
 This is the directory that contains all asset files, and other potentially important files.
 
 
-=== Restoring
+== Restoring
 
 Should you ever need to restore the database you can do so by logging into mysql
 
@@ -30,7 +30,7 @@ and creating the database (assuming it no longer exists), connecting to it, and 
 The files can be restored simply by copying the <em>filestore/<em> directory back into the SEEK root directory.
 
 
-=== Incremental Backups
+== Incremental Backups
 
 Incremental backups allow you to recover a particular version of the backup from a given point in time, depending upon the
 frequency of the backup and when the back ups started.
