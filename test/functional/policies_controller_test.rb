@@ -141,4 +141,13 @@ class PoliciesControllerTest < ActionController::TestCase
     end
   end
 
+  test 'should show the correct manager(contributor) when updating a study' do
+    study = Factory(:study)
+    contributor = study.contributor
+    post :preview_permissions, :sharing_scope => Policy::EVERYONE, :access_type => Policy::VISIBLE, :is_new_file => "false", :contributor_id => contributor.user.id
+
+    assert_select "h2",:text=>"People can manage:", :count=>1
+    assert_select 'a', :count => 1
+    assert_select 'a', :text=>"#{contributor.name}", :count => 1
+  end
 end
