@@ -1,0 +1,205 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html 
+     PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+     "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+  <title>File: UPGRADING</title>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <meta http-equiv="Content-Script-Type" content="text/javascript" />
+  <link rel="stylesheet" href="../.././rdoc-style.css" type="text/css" media="screen" />
+  <script type="text/javascript">
+  // <![CDATA[
+
+  function popupCode( url ) {
+    window.open(url, "Code", "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
+  }
+
+  function toggleCode( id ) {
+    if ( document.getElementById )
+      elem = document.getElementById( id );
+    else if ( document.all )
+      elem = eval( "document.all." + id );
+    else
+      return false;
+
+    elemStyle = elem.style;
+    
+    if ( elemStyle.display != "block" ) {
+      elemStyle.display = "block"
+    } else {
+      elemStyle.display = "none"
+    }
+
+    return true;
+  }
+  
+  // Make codeblocks hidden by default
+  document.writeln( "<style type=\"text/css\">div.method-source-code { display: none }</style>" )
+  
+  // ]]>
+  </script>
+
+</head>
+<body>
+
+
+
+  <div id="fileHeader">
+    <h1>UPGRADING</h1>
+    <table class="header-table">
+    <tr class="top-aligned-row">
+      <td><strong>Path:</strong></td>
+      <td>doc/UPGRADING
+      </td>
+    </tr>
+    <tr class="top-aligned-row">
+      <td><strong>Last Update:</strong></td>
+      <td>Wed Mar 14 13:45:27 +0000 2012</td>
+    </tr>
+    </table>
+  </div>
+  <!-- banner header -->
+
+  <div id="bodyContent">
+
+
+
+  <div id="contextContent">
+
+    <div id="description">
+      <h1>Upgrading SEEK</h1>
+<p>
+<b>Always backup your SEEK data before starting to upgrade!!</b> - see the
+<a href="BACKUPS.html">Backup Guide</a>.
+</p>
+<p>
+This guide assumes that SEEK has been installed following the <a
+href="INSTALL.html">Installation Guide</a> guide. It assumes it is a
+production server that is being updated, and that commands are run from the
+root directory of the SEEK application.
+</p>
+<p>
+If your current installation is not linked to to the SEEK GoogleCode
+mercurial repository, it can still easily be updated by taking the next
+stable tag, reconfiguring the database configuration to point at your
+existing database, and copying across the <em>filestore/</em> directory.
+The upgrade steps can then be followed, with the Mercurial (hg) steps
+omitted.
+</p>
+<h2>Identifying your version</h2>
+<p>
+You can tell which version you have installed by looking at the
+<em>config/version.yml</em> file, so for example version 0.13.1 looks
+something like:
+</p>
+<pre>
+  major: 0
+  minor: 13
+  patch: 1
+</pre>
+<h2>General notes about versions and upgrading</h2>
+<p>
+<b>If upgrading from a version earlier than v0.11.x please contact our
+GoogleGroup at <a
+href="http://groups.google.com/group/seek-development">groups.google.com/group/seek-development</a></b>
+</p>
+<p>
+When upgrading between versions greater than v0.11.x you need to upgrade to
+each released version in order incrementally. The released versions are
+listed below:
+</p>
+<ul>
+<li>0.11.x
+
+</li>
+<li>0.13.1
+
+</li>
+</ul>
+<p>
+<em>(Note there was no 0.12.x version released, this was an internal
+release)</em>
+</p>
+<p>
+Each version has a tag in mercurial that is the version preceeded by a
+<em>v</em> - e.g. v0.11.1, v0.13.1
+</p>
+<p>
+When upgrading between minor versions (i.e. from 0.11.x to 0.13.x) it is
+necessary to run a seek:upgrade rake task to perform upgrade changes and
+import any new data. The upgrade task may require an internet connection,
+and sometimes can take some time to run, so please be patient.
+</p>
+<p>
+When upgrading between patch versions (i.e between 0.13.0 and 0.13.1) it
+should only be necessary to a db:migrate rake task. Using seek:upgrade
+should still work, but could take a lot of unnecessary time.
+</p>
+<h2>Steps to upgrade from 0.11.x to 0.13.x</h2>
+<p>
+There follows the commands required to upgrade. Anything after # are notes
+and do not need to be included in the command run.
+</p>
+<pre>
+    rake solr:stop RAILS_ENV=production # this is specific to this upgrade, since the command to stop and start the search has changed.
+    hg pull https://sysmo-db.googlecode.com/hg/ -r v0.13.1
+    hg update
+    hg merge # only required if you've made changes since installing. If you have you may need to deal with conflicts.
+    hg commit -m &quot;merged&quot; # likewise - only required if you made changes since installing
+    bundle install --deployment
+    rake seek:upgrade
+    rake sunspot:solr:start RAILS_ENV=production # to restart the search server
+    rake sunspot:solr:reindex RAILS_ENV=production  # to reindex
+    rake tmp:assets:clear RAILS_ENV=production
+    rake tmp:clear RAILS_ENV=production
+</pre>
+<p>
+SEEK v0.13.1 and beyond now uses a Ruby tool called <a
+href="https://github.com/tobi/delayed_job">Delayed Job</a> to handle
+background processing which now needs to be started using:
+</p>
+<pre>
+    RAILS_ENV=production ./script/delayed_job start
+</pre>
+<p>
+And now SEEK should be ready to restart. If running together with Passenger
+Phusion as described in the install guide this is simply a case of:
+</p>
+<pre>
+   touch tmp/restart.txt
+</pre>
+
+    </div>
+
+
+   </div>
+
+
+  </div>
+
+
+    <!-- if includes -->
+
+    <div id="section">
+
+
+
+
+
+      
+
+
+    <!-- if method_list -->
+
+
+  </div>
+
+
+<div id="validator-badges">
+  <p><small><a href="http://validator.w3.org/check/referer">[Validate]</a></small></p>
+</div>
+
+</body>
+</html>
