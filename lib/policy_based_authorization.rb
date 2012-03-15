@@ -86,8 +86,9 @@ module Acts
       AUTHORIZATION_ACTIONS.each do |action|
         eval <<-END_EVAL
           def can_#{action}? user = User.current_user
-              cache_keys = cache_keys(user, "#{action}")
-              new_record? || Rails.cache.fetch(cache_keys) {((Authorization.is_authorized? "#{action}", nil, self, user) || (Ability.new(user).can? "#{action}".to_sym, self) || (Ability.new(user).can? "#{action}_asset".to_sym, self)) ? :true : :false} == :true
+              new_record? || (Authorization.is_authorized? "#{action}", nil, self, user) || (Ability.new(user).can? "#{action}".to_sym, self) || (Ability.new(user).can? "#{action}_asset".to_sym, self)
+              #cache_keys = cache_keys(user, "#{action}")
+              #new_record? || Rails.cache.fetch(cache_keys) {((Authorization.is_authorized? "#{action}", nil, self, user) || (Ability.new(user).can? "#{action}".to_sym, self) || (Ability.new(user).can? "#{action}_asset".to_sym, self)) ? :true : :false} == :true
           end
         END_EVAL
       end
