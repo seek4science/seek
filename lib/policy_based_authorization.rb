@@ -145,17 +145,13 @@ module Acts
       end
 
       def generate_person_key person
-        keys = []
-        keys << person.try(:cache_key)
+        keys = [person.try(:cache_key)]
         #group_memberships + favourite_group_memberships
         unless person.nil?
            keys |= person.group_memberships.sort_by(&:id).collect(&:cache_key)
            keys |= person.favourite_group_memberships.sort_by(&:id).collect(&:cache_key)
         end
-        keys
-        #person to be authorized
-        cache_keys << person.try(:cache_key)
-
+        keys        
       end
     end
   end
