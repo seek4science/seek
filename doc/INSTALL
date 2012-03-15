@@ -1,4 +1,4 @@
-= Installation
+= Installing SEEK
 
 SEEK is based upon the Ruby on Rails platform. Although the information on this page should provide you with everything you need to get a basic installation of
 SEEK up and running, some background reading on Ruby on Rails would be beneficial if it is new to you. Documentation and resources describing Ruby on Rails can be found
@@ -68,9 +68,9 @@ on how to setup Apache and {Passenger Phusion (modrails)}[http://www.modrails.co
 
 Our source code is stored within the {Sysmo-DB Google Code Repository}[http://code.google.com/p/sysmo-db/], using Mercurial[http://mercurial.selenic.com/] as the version control system. 
 
-For a stable version, you should check out according to a stable tag. Our current stable tag is <em>0.13.1</em>, so to retrieve this version you should use:
+For a stable version, you should check out according to a stable tag. Our current stable tag is <em>0.13.2</em>, so to retrieve this version you should use:
 
-  hg clone https://sysmo-db.googlecode.com/hg/ -r v0.13.1 seek
+  hg clone https://sysmo-db.googlecode.com/hg/ -r v0.13.2 seek
 
 This will create a <i>seek</i> directory that contains the application.
   
@@ -213,6 +213,10 @@ and configured a virtual host (probably in <i>/etc/apache2/sites-enabled/default
          Options -MultiViews            
       </Directory>
    </VirtualHost>
+
+== Backing up
+
+Please read our {Backup Guide}[link:files/doc/BACKUPS.html] for suggestions on how to backup a SEEK installation.
 
 == Contacting us and other developers 
 
