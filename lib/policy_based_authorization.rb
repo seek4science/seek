@@ -86,10 +86,18 @@ module Acts
       AUTHORIZATION_ACTIONS.each do |action|
         eval <<-END_EVAL
           def can_#{action}? user = User.current_user
-              cache_keys = cache_keys(user, "#{action}")
-              new_record? || Rails.cache.fetch(cache_keys) {((Authorization.is_authorized? "#{action}", nil, self, user) || (Ability.new(user).can? "#{action}".to_sym, self) || (Ability.new(user).can? "#{action}_asset".to_sym, self)) ? :true : :false} == :true
+              if Seek::Config.auth_caching_enabled
+                key = cache_keys(user, "#{action}")
+                new_record? || Rails.cache.fetch(key) {perform_auth(user,"#{action}") ? :true : :false} == :true
+              else
+                new_record?  || perform_auth(user,"#{action}")
+              end
           end
         END_EVAL
+      end
+
+      def perform_auth user,action
+        (Authorization.is_authorized? action, nil, self, user) || (Ability.new(user).can? action.to_sym, self) || (Ability.new(user).can? "#{action}_asset".to_sym, self)
       end
 
       #returns a list of the people that can manage this file
