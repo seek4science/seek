@@ -5,15 +5,9 @@ require 'pp'
 
 module RestTestCases
 
-  
   SCHEMA_FILE_PATH = File.join(RAILS_ROOT, 'public', '2010', 'xml', 'rest', 'schema-v1.xsd')
-
-  def run_rest_tests?
-    run_secondary_tests?
-  end
   
   def test_index_xml
-    return unless run_rest_tests?
     get :index, :format=>"xml"
     assert_response :success
 
@@ -22,9 +16,8 @@ module RestTestCases
     validate_xml_against_schema(@response.body)
   end
 
-  def test_get_xml
-    return unless run_rest_tests?
-    get :show,:id=>@object, :format=>"xml"
+  def test_get_xml object=@object
+    get :show,:id=>object, :format=>"xml"
     perform_api_checks
   end
   
