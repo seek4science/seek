@@ -86,7 +86,8 @@ module Acts
       AUTHORIZATION_ACTIONS.each do |action|
         eval <<-END_EVAL
           def can_#{action}? user = User.current_user
-            new_record? || (Authorization.is_authorized? "#{action}", nil, self, user) || (Ability.new(user).can? "#{action}".to_sym, self) || (Ability.new(user).can? "#{action}_asset".to_sym, self)
+              cache_keys = cache_keys(user, "#{action}")
+              new_record? || Rails.cache.fetch(cache_keys) {((Authorization.is_authorized? "#{action}", nil, self, user) || (Ability.new(user).can? "#{action}".to_sym, self) || (Ability.new(user).can? "#{action}_asset".to_sym, self)) ? :true : :false} == :true
           end
         END_EVAL
       end
@@ -108,6 +109,36 @@ module Acts
           end
         end
         people.uniq
+      end
+
+      def cache_keys user, action
+        cache_keys = []
+        person = user.try(:person)
+        #action
+        cache_keys << "can_#{action}?"
+
+        #item (to invalidate when contributor is changed)
+        cache_keys << self.cache_key
+
+        #item creators (to invalidate when creators are changed)
+        if self.respond_to? :assets_creators
+          cache_keys |= self.assets_creators.sort_by(&:id).collect(&:cache_key)
+        end
+
+        #person to be authorized
+        cache_keys << person.try(:cache_key)
+        #policy
+        cache_keys << policy.cache_key
+
+        #permissions
+        cache_keys |= policy.permissions.sort_by(&:id).collect(&:cache_key)
+
+        #group_memberships + favourite_group_memberships
+        unless person.nil?
+           cache_keys |= person.group_memberships.sort_by(&:id).collect(&:cache_key)
+           cache_keys |= person.favourite_group_memberships.sort_by(&:id).collect(&:cache_key)
+        end
+        cache_keys
       end
     end
   end
