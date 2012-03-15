@@ -120,8 +120,10 @@ module Acts
       end
 
       def cache_keys user, action
-        cache_keys = []
-        person = user.try(:person)
+
+        #start off with the keys for the person
+        cache_keys = generate_person_key(user.try(:person))
+
         #action
         cache_keys << "can_#{action}?"
 
@@ -133,20 +135,24 @@ module Acts
           cache_keys |= self.assets_creators.sort_by(&:id).collect(&:cache_key)
         end
 
-        #person to be authorized
-        cache_keys << person.try(:cache_key)
         #policy
         cache_keys << policy.cache_key
 
         #permissions
         cache_keys |= policy.permissions.sort_by(&:id).collect(&:cache_key)
 
+        cache_keys
+      end
+
+      def generate_person_key person
+        keys = []
+        keys << person.try(:cache_key)
         #group_memberships + favourite_group_memberships
         unless person.nil?
-           cache_keys |= person.group_memberships.sort_by(&:id).collect(&:cache_key)
-           cache_keys |= person.favourite_group_memberships.sort_by(&:id).collect(&:cache_key)
+           keys |= person.group_memberships.sort_by(&:id).collect(&:cache_key)
+           keys |= person.favourite_group_memberships.sort_by(&:id).collect(&:cache_key)
         end
-        cache_keys
+        keys
       end
     end
   end
