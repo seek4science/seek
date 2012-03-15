@@ -122,26 +122,26 @@ module Acts
       def cache_keys user, action
 
         #start off with the keys for the person
-        cache_keys = generate_person_key(user.try(:person))
+        keys = generate_person_key(user.try(:person))
 
         #action
-        cache_keys << "can_#{action}?"
+        keys << "can_#{action}?"
 
         #item (to invalidate when contributor is changed)
-        cache_keys << self.cache_key
+        keys << self.cache_key
 
         #item creators (to invalidate when creators are changed)
         if self.respond_to? :assets_creators
-          cache_keys |= self.assets_creators.sort_by(&:id).collect(&:cache_key)
+          keys |= self.assets_creators.sort_by(&:id).collect(&:cache_key)
         end
 
         #policy
-        cache_keys << policy.cache_key
+        keys << policy.cache_key
 
         #permissions
-        cache_keys |= policy.permissions.sort_by(&:id).collect(&:cache_key)
+        keys |= policy.permissions.sort_by(&:id).collect(&:cache_key)
 
-        cache_keys
+        keys
       end
 
       def generate_person_key person
