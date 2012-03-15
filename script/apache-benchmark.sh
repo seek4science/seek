@@ -12,7 +12,7 @@ echo
 
 read -p "Path: " url
 
-n=100
+read -p "Number of requests: " n
 
 for c in 1 5 10
 do
