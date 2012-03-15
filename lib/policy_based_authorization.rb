@@ -125,8 +125,6 @@ module Acts
           cache_keys |= self.assets_creators.sort_by(&:id).collect(&:cache_key)
         end
 
-        #person to be authorized
-        cache_keys << person.try(:cache_key)
         #policy
         cache_keys << policy.cache_key
 
@@ -138,6 +136,10 @@ module Acts
            cache_keys |= person.group_memberships.sort_by(&:id).collect(&:cache_key)
            cache_keys |= person.favourite_group_memberships.sort_by(&:id).collect(&:cache_key)
         end
+
+        #person to be authorized
+        cache_keys << person.try(:cache_key)
+
         cache_keys
       end
     end
