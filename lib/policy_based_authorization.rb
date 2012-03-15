@@ -86,10 +86,18 @@ module Acts
       AUTHORIZATION_ACTIONS.each do |action|
         eval <<-END_EVAL
           def can_#{action}? user = User.current_user
-              cache_keys = cache_keys(user, "#{action}")
-              new_record? || Rails.cache.fetch(cache_keys) {((Authorization.is_authorized? "#{action}", nil, self, user) || (Ability.new(user).can? "#{action}".to_sym, self) || (Ability.new(user).can? "#{action}_asset".to_sym, self)) ? :true : :false} == :true
+              if Seek::Config.auth_caching_enabled
+                key = cache_keys(user, "#{action}")
+                new_record? || Rails.cache.fetch(key) {perform_auth(user,"#{action}") ? :true : :false} == :true
+              else
+                new_record?  || perform_auth(user,"#{action}")
+              end
           end
         END_EVAL
+      end
+
+      def perform_auth user,action
+        (Authorization.is_authorized? action, nil, self, user) || (Ability.new(user).can? action.to_sym, self) || (Ability.new(user).can? "#{action}_asset".to_sym, self)
       end
 
       #returns a list of the people that can manage this file
@@ -112,8 +120,10 @@ module Acts
       end
 
       def cache_keys user, action
-        cache_keys = []
-        person = user.try(:person)
+
+        #start off with the keys for the person
+        cache_keys = generate_person_key(user.try(:person))
+
         #action
         cache_keys << "can_#{action}?"
 
@@ -131,16 +141,21 @@ module Acts
         #permissions
         cache_keys |= policy.permissions.sort_by(&:id).collect(&:cache_key)
 
+        cache_keys
+      end
+
+      def generate_person_key person
+        keys = []
+        keys << person.try(:cache_key)
         #group_memberships + favourite_group_memberships
         unless person.nil?
-           cache_keys |= person.group_memberships.sort_by(&:id).collect(&:cache_key)
-           cache_keys |= person.favourite_group_memberships.sort_by(&:id).collect(&:cache_key)
+           keys |= person.group_memberships.sort_by(&:id).collect(&:cache_key)
+           keys |= person.favourite_group_memberships.sort_by(&:id).collect(&:cache_key)
         end
-
+        keys
         #person to be authorized
         cache_keys << person.try(:cache_key)
 
-        cache_keys
       end
     end
   end
