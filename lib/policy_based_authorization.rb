@@ -115,7 +115,7 @@ module Acts
         cache_keys = []
         person = user.try(:person)
         #action
-        cache_keys << ["can_#{action}?"]
+        cache_keys << "can_#{action}?"
 
         #item (to invalidate when contributor is changed)
         cache_keys << self.cache_key
