@@ -84,16 +84,22 @@ module Acts
       end
 
       AUTHORIZATION_ACTIONS.each do |action|
-        eval <<-END_EVAL
+        if Seek::Config.auth_caching_enabled
+          eval <<-END_EVAL
           def can_#{action}? user = User.current_user
-              if Seek::Config.auth_caching_enabled
                 key = cache_keys(user, "#{action}")
                 new_record? || Rails.cache.fetch(key) {perform_auth(user,"#{action}") ? :true : :false} == :true
-              else
-                new_record?  || perform_auth(user,"#{action}")
-              end
           end
-        END_EVAL
+          END_EVAL
+        else
+          eval <<-END_EVAL
+          def can_#{action}? user = User.current_user
+                new_record?  || perform_auth(user,"#{action}")
+          end
+          END_EVAL
+        end
+
+
       end
 
       def perform_auth user,action
