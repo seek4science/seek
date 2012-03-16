@@ -80,7 +80,12 @@ class Model < ActiveRecord::Base
   end
 
   def model_contents
-    species | parameters_and_values.keys
+    if content_blob.file_exists?
+      species | parameters_and_values.keys
+    else
+      Rails.logger.error("Unable to find data contents for Model #{self.id}")
+      []
+    end
   end
 
   #return a an array of ModelMatchResult where the data file id is the key, and the matching terms/values are the values

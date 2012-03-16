@@ -84,16 +84,22 @@ module Acts
       end
 
       AUTHORIZATION_ACTIONS.each do |action|
-        eval <<-END_EVAL
+        if Seek::Config.auth_caching_enabled
+          eval <<-END_EVAL
           def can_#{action}? user = User.current_user
-              if Seek::Config.auth_caching_enabled
                 key = cache_keys(user, "#{action}")
                 new_record? || Rails.cache.fetch(key) {perform_auth(user,"#{action}") ? :true : :false} == :true
-              else
-                new_record?  || perform_auth(user,"#{action}")
-              end
           end
-        END_EVAL
+          END_EVAL
+        else
+          eval <<-END_EVAL
+          def can_#{action}? user = User.current_user
+                new_record?  || perform_auth(user,"#{action}")
+          end
+          END_EVAL
+        end
+
+
       end
 
       def perform_auth user,action
@@ -122,37 +128,36 @@ module Acts
       def cache_keys user, action
 
         #start off with the keys for the person
-        cache_keys = generate_person_key(user.try(:person))
+        keys = generate_person_key(user.try(:person))
 
         #action
-        cache_keys << "can_#{action}?"
+        keys << "can_#{action}?"
 
         #item (to invalidate when contributor is changed)
-        cache_keys << self.cache_key
+        keys << self.cache_key
 
         #item creators (to invalidate when creators are changed)
         if self.respond_to? :assets_creators
-          cache_keys |= self.assets_creators.sort_by(&:id).collect(&:cache_key)
+          keys |= self.assets_creators.sort_by(&:id).collect(&:cache_key)
         end
 
         #policy
-        cache_keys << policy.cache_key
+        keys << policy.cache_key
 
         #permissions
-        cache_keys |= policy.permissions.sort_by(&:id).collect(&:cache_key)
+        keys |= policy.permissions.sort_by(&:id).collect(&:cache_key)
 
-        cache_keys
+        keys
       end
 
       def generate_person_key person
-        keys = []
-        keys << person.try(:cache_key)
+        keys = [person.try(:cache_key)]
         #group_memberships + favourite_group_memberships
         unless person.nil?
            keys |= person.group_memberships.sort_by(&:id).collect(&:cache_key)
            keys |= person.favourite_group_memberships.sort_by(&:id).collect(&:cache_key)
         end
-        keys
+        keys        
       end
     end
   end

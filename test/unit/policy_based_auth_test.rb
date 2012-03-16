@@ -13,14 +13,12 @@ class PolicyBasedAuthTest < ActiveSupport::TestCase
     df = Factory :data_file, :policy => Factory(:private_policy), :contributor => user.person,:projects=>[proj1]
 
     assert !df.has_advanced_permissions?
-    df.policy.permissions << Factory(:permission,:contributor=>person1,:access_type=>Policy::EDITING)
-    df.save!
+    Factory(:permission,:contributor=>person1,:access_type=>Policy::EDITING, :policy => df.policy)
     assert df.has_advanced_permissions?
 
     model = Factory :model,:policy=>Factory(:public_policy),:contributor=>user.person,:projects=>[proj1,proj2]
     assert !model.has_advanced_permissions?
-    model.policy.permissions << Factory(:permission,:contributor=>Factory(:institution),:access_type=>Policy::ACCESSIBLE)
-    model.save!
+    Factory(:permission,:contributor=>Factory(:institution),:access_type=>Policy::ACCESSIBLE, :policy => model.policy)
     assert model.has_advanced_permissions?
 
     #when having a sharing_scope policy of Policy::ALL_SYSMO_USERS it is concidered to have advanced permissions if any of the permissions do not relate to the projects associated with the resource (ISA or Asset))

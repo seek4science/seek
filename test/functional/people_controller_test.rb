@@ -889,25 +889,25 @@ class PeopleControllerTest < ActionController::TestCase
     assert !p.can_edit_institutions?
   end
 
-  test "should show the registered date for this person, only for admin" do
-    a_person = Factory(:person)
-    get :show, :id => a_person
-    assert_response :success
-    text = date_as_string(a_person.user.created_at)
-    assert_select 'p', :text => /#{text}/, :count => 1
+  #test "should show the registered date for this person only for admin" do
+  #  a_person = Factory(:person)
+  #  get :show, :id => a_person
+  #  assert_response :success
+  #  text = date_as_string(a_person.user.created_at)
+  #  assert_select 'p', :text => /#{text}/, :count => 1
+  #
+  #
+  #
+  #  get :index
+  #  assert_response :success
+  #  assigns(:people).each do |person|
+  #    unless person.try(:user).try(:created_at).nil?
+  #      assert_select 'p', :text => /#{date_as_string(person.user.created_at)}/, :count => 1
+  #    end
+  #  end
+  #end
 
-
-
-    get :index
-    assert_response :success
-    assigns(:people).each do |person|
-      unless person.try(:user).try(:created_at).nil?
-        assert_select 'p', :text => /#{date_as_string(person.user.created_at)}/, :count => 1
-      end
-    end
-  end
-
-  test "if not admin login, should not show the registered date for this person" do
+  test "if not admin login should not show the registered date for this person" do
     login_as(:aaron)
     a_person = Factory(:person)
     get :show, :id => a_person

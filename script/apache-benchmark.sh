@@ -11,8 +11,8 @@ stty echo
 echo
 
 read -p "Path: " url
-read -p "Number of requests: " n
 
+read -p "Number of requests: " n
 
 for c in 1 5 10
 do

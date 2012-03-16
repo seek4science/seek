@@ -14,5 +14,6 @@ if Rails.env.test?
 
     Settings.defaults[:email_enabled] = true
     Settings.defaults[:publish_button_enabled] = true
+    Settings.defaults[:auth_caching_enabled] = true
   end
 end
