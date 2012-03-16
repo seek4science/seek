@@ -128,8 +128,7 @@ module Acts
       def cache_keys user, action
 
         #start off with the keys for the person
-        #keys = generate_person_key(user.try(:person))
-        keys = []
+        keys = generate_person_key(user.try(:person))
 
         #action
         keys << "can_#{action}?"
