@@ -172,6 +172,7 @@ class Project < ActiveRecord::Base
       
     end
   end
+
   
   def person_roles(person)
     #Get intersection of all project memberships + person's memberships to find project membership

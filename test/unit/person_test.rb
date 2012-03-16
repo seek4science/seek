@@ -33,6 +33,14 @@ class PersonTest < ActiveSupport::TestCase
     assert !people(:quentin_person).is_downloadable_asset?
   end
 
+  def test_member_of
+    p=Factory :person
+    proj = Factory :project
+    assert !p.projects.empty?
+    assert p.member_of?(p.projects.first)
+    assert !p.member_of?(proj)
+  end
+
   def test_avatar_key
     p=people(:quentin_person)
     assert_nil p.avatar_key

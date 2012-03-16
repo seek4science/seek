@@ -66,7 +66,24 @@ class ProjectsControllerTest < ActionController::TestCase
 			delete :destroy, :id => projects(:four)
 		end
 
-	end
+  end
+
+  test "should show organise link for member" do
+    p=Factory :person
+    login_as p.user
+    get :show,:id=>p.projects.first
+    assert_response :success
+    assert_select "a[href=?]",project_folders_path(p.projects.first)
+  end
+
+  test "should not show organise link for non member" do
+    p=Factory :person
+    proj = Factory :project
+    login_as p.user
+    get :show,:id=>proj
+    assert_response :success
+    assert_select "a[href=?]",project_folders_path(p.projects.first), :count=>0
+  end
 
 	test 'should get index for non-project member, non-login user' do
 		login_as(:registered_user_with_no_projects)

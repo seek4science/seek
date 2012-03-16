@@ -282,6 +282,8 @@ module ImagesHelper
         "famfamfam_silk/medal_bronze_3.png"
       when "publisher"
         "famfamfam_silk/medal_silver_2.png"
+      when "organise"
+        "famfamfam_silk/folder.png"
     else
       return nil
     end

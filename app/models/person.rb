@@ -207,7 +207,7 @@ class Person < ActiveRecord::Base
   end
 
   def member_of?(item_or_array)
-    array = [item_or_array].flatten
+    array = Array(item_or_array)
     array.detect {|item| projects.include?(item)}
   end
 
