@@ -16,24 +16,27 @@ module Seek
 
     #returns an array of all cell content within the workbook.
     def spreadsheet_contents_for_search obj=self
-      content = Rails.cache.fetch("#{obj.content_blob.cache_key}-ss-content-for-search") do
-        begin
-          xml=obj.spreadsheet_xml
-          unless xml.nil?
-            content = extract_content(xml)
-            content = humanize_content(content)
-            content = filter_content(content)
-            content
-          else
-            []
+      if obj.content_blob.file_exists?
+        content = Rails.cache.fetch("#{obj.content_blob.cache_key}-ss-content-for-search") do
+          begin
+            xml=obj.spreadsheet_xml
+            unless xml.nil?
+              content = extract_content(xml)
+              content = humanize_content(content)
+              content = filter_content(content)
+              content
+            else
+              []
+            end
+          rescue Exception=>e
+            Rails.logger.error("Error processing spreadsheet for content_blob #{obj.content_blob_id} #{e}")
+            raise e unless Rails.env=="production"
+            nil
           end
-        rescue Exception=>e
-          Rails.logger.error("Error processing spreadsheet for content_blob #{obj.content_blob_id} #{e}")
-          raise e unless Rails.env=="production"
-          nil
         end
+      else
+        Rails.logger.error("Unable to find file contents for #{obj.class.name} #{obj.id}")
       end
-
       content || []
     end
 
