@@ -50,10 +50,10 @@ module IndexPager
     key = person.nil? ? ['anonymous_user'] : person.generate_person_key
     key << action
     key << objects.first.class.name
-    authorized_object_ids =  Rails.cache.fetch(key){
-      objects.select{|o| o.send "can_#{action}?"}.collect(&:id)
+    authorized_objects =  Rails.cache.fetch(key){
+      objects.select{|o| o.send "can_#{action}?"}
     }
-    objects.select{|o| authorized_object_ids.include?(o.id)}
+    authorized_objects
   end
   
   def find_assets    
