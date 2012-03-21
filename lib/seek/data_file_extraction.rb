@@ -7,16 +7,17 @@ module Seek
 
     #returns an instance of Seek::Treatment, populated according to the contents of the spreadsheet if it matches a known template
     def treatments
-      begin
-        if is_spreadsheet?
-          Seek::Treatments.new spreadsheet_xml
-        else
-          Seek::Treatments.new
-        end
-      rescue Exception=>e
-        Rails.logger.error("Error reading spreadsheet #{e.message}")
-        Seek::Treatments.new
-      end
+      Seek::Treatments.new
+      #begin
+      #  if is_spreadsheet?
+      #    Seek::Treatments.new spreadsheet_xml
+      #  else
+      #    Seek::Treatments.new
+      #  end
+      #rescue Exception=>e
+      #  Rails.logger.error("Error reading spreadsheet #{e.message}")
+      #  Seek::Treatments.new
+      #end
     end
 
     #returns an array of all cell content within the workbook.
