@@ -128,11 +128,7 @@ module Acts
       def cache_keys user, action
 
         #start off with the keys for the person
-        unless user.try(:person).nil?
-          keys = user.person.generate_person_key
-        else
-          keys = []
-        end
+        keys = generate_person_key(user.try(:person))
 
         #action
         keys << "can_#{action}?"
@@ -152,6 +148,16 @@ module Acts
         keys |= policy.permissions.sort_by(&:id).collect(&:cache_key)
 
         keys
+      end
+
+      def generate_person_key person
+        keys = [person.try(:cache_key)]
+        #group_memberships + favourite_group_memberships
+        unless person.nil?
+           keys |= person.group_memberships.sort_by(&:id).collect(&:cache_key)
+           keys |= person.favourite_group_memberships.sort_by(&:id).collect(&:cache_key)
+        end
+        keys        
       end
     end
   end

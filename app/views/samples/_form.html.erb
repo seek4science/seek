@@ -22,7 +22,7 @@
         var box = $('sample_specimen_attributes_strain_id');
         box.options.length = 0;
         box.insert(new Element('option',{value:0}).update("Not specified"));
-        for(var i=0; i< strains.length;i++) {
+        for(var i=0;i<strains.length;i++) {
             var strain = strains[i];
             box.insert(new Element('option',{value:strain[0]}).update(strain[1]));
         }
