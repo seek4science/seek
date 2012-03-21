@@ -191,7 +191,9 @@ class ContentBlobTest < ActiveSupport::TestCase
   end
 
   def test_filesize
-    cb = Factory :content_blob, :data=>nil
+    cb = Factory :content_blob, :data=>"z"
+    assert_equal 1, cb.filesize
+    File.delete(cb.filepath)
     assert_nil cb.filesize
     cb = Factory :rightfield_content_blob
     assert_not_nil cb.filesize

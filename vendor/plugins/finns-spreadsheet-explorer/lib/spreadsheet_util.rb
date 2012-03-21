@@ -12,7 +12,7 @@ module SpreadsheetUtil
 
   #is excel and is smaller than 10Mb
   def is_extractable_spreadsheet?
-    is_excel? && content_blob.filesize<=EXTRACTABLE_FILE_SIZE
+    is_excel? && !content_blob.filesize.nil? && content_blob.filesize<=EXTRACTABLE_FILE_SIZE
   end
 
   def is_excel?
