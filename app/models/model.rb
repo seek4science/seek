@@ -22,7 +22,7 @@ class Model < ActiveRecord::Base
   belongs_to :model_type
   belongs_to :model_format
   
-  searchable do
+  searchable(:ignore_attribute_changes_of=>[:updated_at,:last_used_at]) do
     text :description,:title,:original_filename,:organism_name,:searchable_tags
   end if Seek::Config.solr_enabled
 
