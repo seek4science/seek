@@ -189,6 +189,14 @@ class ContentBlobTest < ActiveSupport::TestCase
     blob.save!
     assert_nil blob.data_io_object
   end
+
+  def test_filesize
+    cb = Factory :content_blob, :data=>nil
+    assert_nil cb.filesize
+    cb = Factory :rightfield_content_blob
+    assert_not_nil cb.filesize
+    assert_equal 9216,cb.filesize
+  end
   
   def test_exception_when_both_data_and_io_object
     io_object = StringIO.new("frog")
