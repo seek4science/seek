@@ -63,6 +63,7 @@
                      strain = specimen.strain
                      strain_info = 'Strain ' + strain.info + "(ID=#{strain.id})"
                      creators = specimen.creators.collect(&:name).join(', ')
+                     creators << (', 'specimen.other_creators) unless specimen.other_creators.blank?
                   %>
 
                   <tr>
