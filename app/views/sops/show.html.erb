@@ -1,6 +1,8 @@
 <%= javascript_include_tag "resource" -%>
 
-<%= asset_buttons @sop,@display_sop.version -%>
+<ul class="sectionIcons">
+    <%= asset_buttons @sop,@display_sop.version -%>
+</ul>
 
 <%= render :partial=>"assets/upload_new_version_form", :locals=>{:resource=>@sop} -%>
 
