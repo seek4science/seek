@@ -56,7 +56,7 @@
     </tr>
     <tr class="top-aligned-row">
       <td><strong>Last Update:</strong></td>
-      <td>Wed Mar 14 16:43:34 +0000 2012</td>
+      <td>Thu Mar 22 14:48:15 +0000 2012</td>
     </tr>
     </table>
   </div>
@@ -91,13 +91,13 @@ omitted.
 <h2>Identifying your version</h2>
 <p>
 You can tell which version you have installed by looking at the
-<em>config/version.yml</em> file, so for example version 0.13.1 looks
+<em>config/version.yml</em> file, so for example version 0.13.2 looks
 something like:
 </p>
 <pre>
   major: 0
   minor: 13
-  patch: 1
+  patch: 2
 </pre>
 <h2>General notes about versions and upgrading</h2>
 <p>
@@ -115,6 +115,9 @@ listed below:
 
 </li>
 <li>0.13.2
+
+</li>
+<li>0.13.3
 
 </li>
 </ul>
@@ -147,7 +150,7 @@ processing.
 </p>
 <pre>
     rake solr:stop RAILS_ENV=production # this is specific to this upgrade, since the command to stop and start the search has changed.
-    hg pull https://sysmo-db.googlecode.com/hg/ -r v0.13.2
+    hg pull https://sysmo-db.googlecode.com/hg/ -r v0.13.3
     hg update
     hg merge # only required if you've made changes since installing. If you have you may need to deal with conflicts.
     hg commit -m &quot;merged&quot; # likewise - only required if you made changes since installing
@@ -173,13 +176,13 @@ Phusion as described in the install guide this is simply a case of:
 <pre>
    touch tmp/restart.txt
 </pre>
-<h2>Steps to upgrade between patches (e.g. between 0.13.0 and 0.13.2)</h2>
+<h2>Steps to upgrade between patches (e.g. between 0.13.2 and 0.13.3)</h2>
 <p>
 This should remain the same for all upgrades for minor bugfix patches,
 unless we state otherwise. This example uses v0.13.2 as an example.
 </p>
 <pre>
-  hg pull https://sysmo-db.googlecode.com/hg/ -r v0.13.2
+  hg pull https://sysmo-db.googlecode.com/hg/ -r v0.13.3
   hg update
   hg merge # if necessary
   hg commit -m &quot;merged&quot; # if necessary
