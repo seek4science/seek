@@ -14,7 +14,7 @@ module PeopleHelper
   def seek_role_icons person
     icons = ''
     person.roles.each do |role|
-      icons << image("#{role}",:alt=>"#{role}",:title=>tooltip_title_attrib("Official #{Seek::Config.dm_project_name} #{role.humanize}"), :style=>"vertical-align: middle")
+      icons << image("#{role}",:alt=>"#{role}",:title=>tooltip_title_attrib(role.humanize), :style=>"vertical-align: middle")
     end
     icons
   end
