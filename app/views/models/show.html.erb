@@ -1,39 +1,35 @@
 <%= javascript_include_tag "resource" -%>
 
-<%= asset_buttons @model,@display_model.version -%>
-<%# FIXME: buttons need tidying up and embedded together with other asset buttons, maybe using a block Currently they are spread across
-    multiple sectionIcons.
-    -%>
+<ul class="sectionIcons">
+  <%= asset_buttons @model,@display_model.version -%>
 
-<% if Seek::Config.jws_enabled && @display_model.is_jws_supported? -%>
-	<ul class="sectionIcons">
-		<% if @model.can_edit? -%>
-		    <li>
-		        <%= image_tag_for_key('jws_builder', builder_model_path(@model,:version=>@display_model.version),nil,nil,"JWS One Stop") -%>
-		    </li>
-	    <% end -%>
-	    <% if @model.can_download? -%>
-		    <li>
-		        <%= image_tag_for_key('execute', simulate_model_path(@model,:version=>@display_model.version),nil,{:method=>:post},"Simulate Model on JWS") -%>
-		    </li>
-	    <% end -%>
-	</ul>
-<% end -%>
+  <% if Seek::Config.jws_enabled && @display_model.is_jws_supported? -%>
 
-<% if Seek::Config.sycamore_enabled and @display_model.content_blob.file_exists? && @display_model.is_sbml? %>
-  <ul class="sectionIcons">
-    <li>
+      <% if @model.can_edit? -%>
+          <li>
+            <%= image_tag_for_key('jws_builder', builder_model_path(@model,:version=>@display_model.version),nil,nil,"JWS One Stop") -%>
+          </li>
+      <% end -%>
+      <% if @model.can_download? -%>
+          <li>
+            <%= image_tag_for_key('execute', simulate_model_path(@model,:version=>@display_model.version),nil,{:method=>:post},"Simulate Model on JWS") -%>
+          </li>
+      <% end -%>
+
+  <% end -%>
+
+  <% if Seek::Config.sycamore_enabled and @display_model.content_blob.file_exists? && @display_model.is_sbml? %>
+      <li>
       <span class="icon">
         <% form_tag("http://sycamore.eml.org/sycamore/submission.jsp", :id=>'sycamore-form', :target => '_blank') do -%>
           <%= hidden_field_tag 'sbml_model', h(IO.read(@display_model.content_blob.filepath).gsub(/\n/, '')) -%>
-          <%= hidden_field_tag 'sender', 'seek' -%>
-          <%= link_to_function "#{image_tag(icon_filename_for_key 'execute')}Simulate Model on Sycamore", "$('sycamore-form').submit()" -%>
+            <%= hidden_field_tag 'sender', 'seek' -%>
+            <%= link_to_function "#{image_tag(icon_filename_for_key 'execute')}Simulate Model on Sycamore", "$('sycamore-form').submit()" -%>
         <% end -%>
       </span>
-    </li>
-  </ul>
-<% end %>
-
+      </li>
+  <% end %>
+</ul>
 
 <%= render :partial=>"assets/upload_new_version_form", :locals=>{:resource=>@model} -%>
 <%= render :partial => "layouts/item_title",:locals=>{:item=>@model} %>
