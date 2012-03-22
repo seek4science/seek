@@ -17,21 +17,25 @@
    default_selected_organisms =  try_block{current_user.person.projects.first.organism_ids}.blank? ? [0] : try_block{current_user.person.projects.first.organism_ids}
 -%>
 
-<h4 style="margin-left: 10em;margin-top:1em;margin-bottom: -1.5em;font-style:italic;color:gray;">From Organism to Sample: browsing available and creation new entries</h4>
+<div class="contribution_title">
+     <h1>Browse organisms, strains, cultures and samples</h1>
+</div>
+
 <br/>
 <div class='yui-g'>
-  <div class='yui-u first' style="width: 48%;margin-left: 0.5em;margin-top: 1em">
+  <div class='yui-u first' style="margin-left: 0.5em;margin-top: 1em">
   <h2>Organism</h2>
+  <p class="none_text">Please select the organisms to browse the associated strains</p>
   <%= select_tag "strain[organism_ids]",
                  options_for_select([["Select Organisms ...", 0]]|all_organisms.collect { |o| [truncate(h(o.title), :length=>select_truncate_length), o.id] }, :selected => default_selected_organisms),
                  {:onchange=>remote_function(:url=>{:action=>"existing_strains", :controller=>"biosamples"},
                                              :with=>"'organism_ids='+$F('strain_organism_ids')",
                                              :before=>"show_ajax_loader('existing_strains')")+ ";check_show_existing_strains('strain_organism_ids', 'existing_strains', '');hide_existing_specimens();
                                              hide_existing_samples();return(false);",
-                 :multiple => true} -%>
+                 :multiple => true,:size=>15,:style=>"width:75%"} -%>
 
   </div>
-  <div class='yui-u' id="existing_strains" style="width: 48%;margin-right: 0.5em"></div>
+  <div class='yui-u' id="existing_strains" style="margin-right: 0.5em"></div>
 </div>
 <div class="yui-g">
   <div class="yui-u first" id="existing_specimens" style="width: 48%;margin-left: 0.5em"></div>

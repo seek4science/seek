@@ -13,7 +13,7 @@ module BiosamplesHelper
   end
 
    def create_sample_popup_link
-     return link_to_remote_redbox(image_tag("famfamfam_silk/add.png") + 'Create new sample',
+     return link_to_remote_redbox(image_tag("famfamfam_silk/add.png") + 'Create new sample and cell culture',
       { :url => url_for(:controller => 'biosamples', :action => 'create_sample_popup') ,
         :failure => "alert('Sorry, an error has occurred.'); RedBox.close();",
         :with => "'specimen_id=' + getSelectedSpecimens()",

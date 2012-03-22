@@ -38,9 +38,9 @@
            <h2>Cell culture (chemostat or batch)</h2>
       <% end %>
       <% if existing_specimens.empty? -%>
-          <p class="none_text">No <%= CELL_CULTURE_OR_SPECIMEN%>s have yet been defined for selected strains.</p>
+          <p class="none_text">No <%= CELL_CULTURE_OR_SPECIMEN%>s have yet been defined for the selected strains.</p>
       <% else -%>
-          <p class="none_text">Please select the <%= CELL_CULTURE_OR_SPECIMEN.capitalize%>s to see samples.</p>
+          <p class="none_text">Please select the <%= CELL_CULTURE_OR_SPECIMEN.capitalize%>s to browse the associated samples.</p>
 
           <div class="scroll_box">
             <table cellpadding="0" cellspacing="0" border="0" class="display" id="specimen_table" style="width: 100%">
@@ -84,7 +84,7 @@
             <li><%= create_sample_popup_link -%></li>
             <br/>
             <br/>
-            (from new <%= CELL_CULTURE_OR_SPECIMEN %> or based on selected one)
+            (create a new sample and <%= CELL_CULTURE_OR_SPECIMEN %> or base them on the selected one)
           </ul>
           <br/>
       <% end %>
