@@ -20,7 +20,7 @@ class DataFile < ActiveRecord::Base
 
   belongs_to :content_blob #don't add a dependent=>:destroy, as the content_blob needs to remain to detect future duplicates
 
-  searchable do
+  searchable(:ignore_attribute_changes_of=>[:updated_at,:last_used_at]) do
     text :description, :title, :original_filename, :searchable_tags, :spreadsheet_annotation_search_fields,:fs_search_fields, :spreadsheet_contents_for_search
   end if Seek::Config.solr_enabled
 

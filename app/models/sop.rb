@@ -16,7 +16,7 @@ class Sop < ActiveRecord::Base
   # allow same titles, but only if these belong to different users
   # validates_uniqueness_of :title, :scope => [ :contributor_id, :contributor_type ], :message => "error - you already have a SOP with such title."
 
-  searchable do
+  searchable(:ignore_attribute_changes_of=>[:updated_at,:last_used_at]) do
     text :description, :title, :original_filename,:searchable_tags,:exp_conditions_search_fields
   end if Seek::Config.solr_enabled
 
