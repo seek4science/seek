@@ -53,7 +53,7 @@ GEM
       activesupport (= 2.3.8)
       rake (>= 0.8.3)
     rake (0.8.7)
-    ratom (0.6.10)
+    ratom (0.6.8)
       libxml-ruby (>= 1.1.2)
     rest-client (1.6.1)
       mime-types (>= 1.16)
@@ -100,7 +100,7 @@ DEPENDENCIES
   mysql
   rack-openid (= 1.1.0)
   rails (= 2.3.8)
-  ratom (>= 0.6.9)
+  ratom (= 0.6.8)
   rest-client (>= 1.6.1)
   rmagick (= 2.12.2)
   rubaidh-google_analytics (~> 1.1.4)
