@@ -1,8 +1,10 @@
 
 
-
-
-<%= render :partial=>"folder_details",:object=>folder -%>
+<% if @folder.respond_to?(:assay) -%>
+    <%= render :partial=>"assay_folder_details" -%>
+<% else -%>
+    <%= render :partial=>"folder_details",:object=>folder -%>
+<% end -%>
 
 
 <ul class="asset_cards">
