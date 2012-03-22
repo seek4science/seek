@@ -1040,8 +1040,11 @@ ul.horiz_list_items li {
     line-height: 1;	
 }
 
+#ft td.left {
+    width: 10em;
+}
+
 #ft td.left p {
-    width: 110px;
     text-align: center;
 }
 
