@@ -273,7 +273,7 @@ ActiveRecord::Schema.define(:version => 20120313171509) do
     t.datetime "last_used_at"
     t.datetime "created_at"
     t.datetime "updated_at"
-    t.integer  "version"
+    t.integer  "version",                        :default => 1
     t.string   "first_letter",      :limit => 1
     t.text     "other_creators"
     t.string   "uuid"
@@ -598,7 +598,7 @@ ActiveRecord::Schema.define(:version => 20120313171509) do
     t.integer  "organism_id"
     t.integer  "model_type_id"
     t.integer  "model_format_id"
-    t.integer  "version"
+    t.integer  "version",                                 :default => 1
     t.string   "first_letter",               :limit => 1
     t.text     "other_creators"
     t.string   "uuid"
@@ -781,6 +781,26 @@ ActiveRecord::Schema.define(:version => 20120313171509) do
   create_table "presentations_projects", :id => false, :force => true do |t|
     t.integer "project_id"
     t.integer "presentation_id"
+  end
+
+  create_table "project_folder_assets", :force => true do |t|
+    t.integer  "asset_id"
+    t.string   "asset_type"
+    t.integer  "project_folder_id"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
+  create_table "project_folders", :force => true do |t|
+    t.integer  "project_id"
+    t.string   "title"
+    t.text     "description"
+    t.integer  "parent_id"
+    t.boolean  "editable",    :default => true
+    t.datetime "created_at"
+    t.datetime "updated_at"
+    t.boolean  "incoming",    :default => false
+    t.boolean  "deletable",   :default => true
   end
 
   create_table "project_roles", :force => true do |t|
@@ -1014,7 +1034,7 @@ ActiveRecord::Schema.define(:version => 20120313171509) do
     t.datetime "created_at"
     t.datetime "updated_at"
     t.datetime "last_used_at"
-    t.integer  "version"
+    t.integer  "version",                        :default => 1
     t.string   "first_letter",      :limit => 1
     t.text     "other_creators"
     t.string   "uuid"
