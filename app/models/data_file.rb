@@ -226,7 +226,7 @@ class DataFile < ActiveRecord::Base
     results = {}
 
     if Seek::Config.solr_enabled && is_extractable_spreadsheet?
-      search_terms = spreadsheet_annotation_search_fields | spreadsheet_contents_for_search
+      search_terms = spreadsheet_annotation_search_fields | spreadsheet_contents_for_search | fs_search_fields
       #make the array uniq! case-insensistive whilst mainting the original case
       dc = []
       search_terms = search_terms.inject([]) do |r,v|
