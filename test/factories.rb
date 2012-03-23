@@ -23,7 +23,19 @@
 
   Factory.define(:pal, :parent => :person) do |f|
     f.is_pal true
-    f.after_create { |pal| pal.group_memberships.first.roles << Role.pal_role}
+    f.after_create { |pal| pal.group_memberships.first.project_roles << ProjectRole.pal_role}
+  end
+
+  Factory.define(:asset_manager,:parent=>:person) do |f|
+    f.is_asset_manager true
+  end
+
+  Factory.define(:project_manager,:parent=>:person) do |f|
+    f.is_project_manager true
+  end
+
+  Factory.define(:publisher,:parent=>:person) do |f|
+    f.is_publisher true
   end
 
 #User
@@ -104,6 +116,16 @@ end
     f.sharing_scope Policy::ALL_SYSMO_USERS
     f.access_type Policy::ACCESSIBLE
   end
+  
+  Factory.define(:editing_public_policy,:parent=>:policy) do |f|
+    f.sharing_scope Policy::EVERYONE
+    f.access_type Policy::EDITING
+  end
+
+  Factory.define(:downloadable_public_policy,:parent=>:policy) do |f|
+    f.sharing_scope Policy::EVERYONE
+    f.access_type Policy::ACCESSIBLE
+  end
 
 #Permission
   Factory.define(:permission, :class => Permission) do |f|
@@ -173,6 +195,7 @@ end
 #Strain
 Factory.define(:strain) do |f|
   f.sequence(:title) { |n| "Strain#{n}" }
+  f.association :organism
 end
 
 #Culture growth type
@@ -182,32 +205,43 @@ end
 
 #Specimen
 Factory.define(:specimen) do |f|
-  f.sequence(:donor_number) { |n| "Specimen#{n}" }
+  f.sequence(:title) { |n| "Specimen#{n}" }
   f.sequence(:lab_internal_number) { |n| "Lab#{n}" }
   f.association :contributor, :factory => :user
   f.projects {[Factory.build(:project)]}
   f.association :institution
-  f.association :organism
+  f.association :strain
 end
 
 #Sample
 Factory.define(:sample) do |f|
   f.sequence(:title) { |n| "Sample#{n}" }
   f.sequence(:lab_internal_number) { |n| "Lab#{n}" }
+  f.projects {[Factory.build(:project)]}
   f.donation_date Date.today
   f.association :specimen
 end
 
 
 #Data File
-  Factory.define(:data_file) do |f|
-    f.sequence(:title) {|n| "A Data File_#{n}"}
-    f.projects {[Factory.build(:project)]}
-    f.association :contributor, :factory => :user
-    f.after_create do |data_file|
-       data_file.content_blob = Factory.create(:pdf, :asset => data_file, :asset_version=>data_file.version) if data_file.content_blob.blank?
+Factory.define(:data_file) do |f|
+  f.sequence(:title) {|n| "A Data File_#{n}"}
+  f.projects {[Factory.build(:project)]}
+  f.association :contributor, :factory => :user
+  f.after_create do |data_file|
+    if data_file.content_blob.blank?
+      data_file.content_blob = Factory.create(:pdf, :asset => data_file, :asset_version=>data_file.version)
+    else
+      data_file.content_blob.asset = data_file
+      data_file.content_blob.asset_version = data_file.version
+      data_file.content_blob.save
     end
   end
+end
+
+Factory.define(:rightfield_datafile,:parent=>:data_file) do |f|
+  f.association :content_blob,:factory=>:rightfield_content_blob
+end
 
 #Model
   Factory.define(:model) do |f|
@@ -228,11 +262,11 @@ end
   end
 
 #Presentation
-Factory.define(:presentation) do |f|
-  f.title "A Presentation"
-  f.projects {[Factory.build :project]}
- # f.data_url "http://www.virtual-liver.de/images/logo.png"
-  f.association :contributor,:factory=>:user
+  Factory.define(:presentation) do |f|
+    f.title "A Presentation"
+    f.projects {[Factory.build :project]}
+   # f.data_url "http://www.virtual-liver.de/images/logo.png"
+    f.association :contributor,:factory=>:user
   f.after_create do |presentation|
     presentation.content_blob = Factory.create(:content_blob,:original_filename=>"test.pdf", :content_type=>"application/pdf", :asset => presentation, :asset_version=>presentation.version)
   end
@@ -257,14 +291,14 @@ end
 #Presentation Version
 Factory.define(:presentation_version) do |f|
   f.association :presentation
-end
+  end
 
 #Misc
   Factory.define(:group_membership) do |f|
     f.association :work_group
   end
 
-  Factory.define(:role) do |f|
+  Factory.define(:project_role) do |f|
     f.name "A Role"
   end
 
@@ -304,6 +338,11 @@ end
   Factory.define(:pdf, :parent => :content_blob) do |f|
     f.original_filename "test.pdf"
     f.content_type "application/pdf"
+  end
+  
+  Factory.define(:rightfield_content_blob,:parent=>:content_blob) do |f|
+    f.data  File.new("#{Rails.root}/test/fixtures/files/rightfield-test.xls","rb").read
+    f.content_type "application/excel"
   end
 
   Factory.define(:spreadsheet, :parent => :content_blob) do |f|
@@ -422,6 +461,7 @@ end
   Factory.define :annotation do |f|
     f.sequence(:value) {|n| "anno #{n}"}
     f.association :source, :factory=>:person
+    f.attribute_name "annotation"
   end
 
   Factory.define :tag,:parent=>:annotation do |f|
@@ -455,4 +495,3 @@ end
     f.cell_range "A1:B3"
     f.association :worksheet
   end
-

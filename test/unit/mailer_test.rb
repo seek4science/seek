@@ -160,6 +160,23 @@ class MailerTest < ActionMailer::TestCase
     
   end
 
+  test "contact_project_manager_new_user_no_profile" do
+    project_manager = Factory(:project_manager)
+    @expected.subject = 'SEEK member signed up, please assign this person to the projects which you are project manager'
+    @expected.to = project_manager.email_with_name
+    @expected.from    = "no-reply@sysmo-db.org"
+    @expected.reply_to = "Aaron Spiggle <aaron@email.com>"
+    @expected.date    = Time.now
+
+    @expected.body    = read_fixture('contact_project_manager_new_user_no_profile')
+
+    pretend_now_is(@expected.date) do
+      assert_equal @expected.encoded,
+        Mailer.create_contact_project_manager_new_user_no_profile(project_manager,"test message",users(:aaron),"localhost").encoded
+    end
+
+  end
+
   test "welcome" do
     @expected.subject = 'Welcome to SEEK'
     @expected.to = "Quentin Jones <quentin@email.com>"

@@ -13,9 +13,6 @@ class SpreadsheetTest < ActiveSupport::TestCase
 
   test "spreadsheet is properly parsed" do
     datafile = data_files(:downloadable_data_file)
-    if File.exists?(datafile.cached_spreadsheet_path)
-      FileUtils.rm(datafile.cached_spreadsheet_path)
-    end
 
     spreadsheet = datafile.spreadsheet
 
@@ -30,41 +27,18 @@ class SpreadsheetTest < ActiveSupport::TestCase
     assert_equal 4, spreadsheet.sheets[1].actual_rows.first.actual_cells.size
 
     assert_equal "a", spreadsheet.sheets[2].actual_rows[0].actual_cells[1].value
-
-    assert File.exists?(datafile.cached_spreadsheet_path)
   end
 
   test "spreadsheet xml is cached" do
     datafile = data_files(:downloadable_data_file)
-    if File.exists?(datafile.cached_spreadsheet_path)
-      FileUtils.rm(datafile.cached_spreadsheet_path)
-    end
-    assert !File.exists?(datafile.cached_spreadsheet_path)
+    Rails.cache.clear
+    assert_nil Rails.cache.fetch("#{datafile.content_blob.cache_key}-ss-xml")
+
 
     #Creates spreadsheet
     assert !datafile.spreadsheet.nil?
 
-    assert File.exists?(datafile.cached_spreadsheet_path)
-  end
-
-  test "cache is being read" do
-    datafile = data_files(:downloadable_data_file)
-    if File.exists?(datafile.cached_spreadsheet_path)
-      FileUtils.rm(datafile.cached_spreadsheet_path)
-    end
-    assert !File.exists?(datafile.cached_spreadsheet_path)
-
-    #Creates spreadsheet
-    assert !datafile.spreadsheet.nil?
-    assert datafile.spreadsheet.sheets.first.name == "Sheet1"
-
-    #Modify cached spreadsheet file
-    new_content = File.open(datafile.cached_spreadsheet_path, "r"){|f| f.read}.gsub("Sheet1","ModifiedSheet1")
-    File.open(datafile.cached_spreadsheet_path, "w"){|f| f.write(new_content)}
-
-    assert (datafile.spreadsheet.sheets.first.name == "ModifiedSheet1")
-
-    assert File.exists?(datafile.cached_spreadsheet_path)
+    assert_not_nil Rails.cache.fetch("#{datafile.content_blob.cache_key}-ss-xml")
   end
 
   test "alphabetical and numeric column conversion" do

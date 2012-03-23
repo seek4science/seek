@@ -34,8 +34,6 @@
           </li>
         </ul>
 
-        
-
         <p>
           <%= f.label "Event Website" -%><br/>
           <%= f.text_field :url, :style => "width:100%" -%>
@@ -60,9 +58,6 @@
             <%= render :partial => "projects/project_selector", :locals => {:resource => @event, :allow_nil=> true} -%>
         <% end -%>
 
-        <%= render :partial => "assets/associate_publication", :locals=>{:f=>f, :resource => @event} -%>
-        <br/>
-        <%= render :partial => "assets/associate_data_file", :locals=>{:f=>f, :resource => @event, :show_relationships=>false} -%>
         <% if current_user_authorized_to_manage -%>
             <p>
               <%= render :partial => "assets/sharing_form" -%>
@@ -71,6 +66,11 @@
               <%= render :partial => "assets/special_auth_code_form", :locals => {:f => f} %>
             </p>
         <% end %>
+
+        <%= render :partial => "assets/associate_publication", :locals=>{:f=>f, :resource => @event} -%>
+        <br/>
+        <%= render :partial => "assets/associate_data_file", :locals=>{:f=>f, :resource => @event, :show_relationships=>false} -%>
+
       </div>
       <p>
         <%

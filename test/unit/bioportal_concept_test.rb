@@ -12,4 +12,5 @@ class BioportalConceptTest < ActiveSupport::TestCase
 
     assert bc.save!
   end
+    
 end

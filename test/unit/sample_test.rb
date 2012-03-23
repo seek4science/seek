@@ -23,12 +23,15 @@ class SampleTest < ActiveSupport::TestCase
     s.lab_internal_number=nil
     assert !s.valid?
 
-    s.reload
-    s.donation_date=nil
-    assert !s.valid?
+    if Seek::Config.is_virtualliver
+      s.reload
+      s.donation_date=nil
+      assert !s.valid?
+    end
 
     #s.reload
     #s.strains=[]
     #assert !s.valid?
   end
+
 end

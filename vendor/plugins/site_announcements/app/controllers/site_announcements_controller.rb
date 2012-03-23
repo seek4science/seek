@@ -65,12 +65,11 @@ class SiteAnnouncementsController < ApplicationController
     @site_announcement=SiteAnnouncement.new(params[:site_announcement])
     @site_announcement.announcer = currently_logged_in
     
-    if (@site_announcement.email_notification?)
-      send_announcement_emails(@site_announcement)
-    end
-    
     respond_to do |format|
       if @site_announcement.save
+        if (@site_announcement.email_notification?)
+              send_announcement_emails(@site_announcement)
+        end
         flash[:notice] = 'The Announcement was successfully announced.'
         format.html { redirect_to(@site_announcement) }
         format.xml  { render :xml => @site_announcement, :status => :created, :location => @site_announcement }

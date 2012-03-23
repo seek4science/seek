@@ -9,7 +9,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20120201145756) do
+ActiveRecord::Schema.define(:version => 20120308092147) do
 
   create_table "activity_logs", :force => true do |t|
     t.string   "action"
@@ -79,7 +79,7 @@ ActiveRecord::Schema.define(:version => 20120201145756) do
     t.integer  "annotatable_id",                                        :null => false
     t.integer  "attribute_id",                                          :null => false
     t.string   "old_value",                        :default => ""
-    t.integer  "version",                                               :null => false
+    t.integer  "version"
     t.integer  "version_creator_id"
     t.datetime "created_at"
     t.datetime "updated_at"
@@ -118,10 +118,9 @@ ActiveRecord::Schema.define(:version => 20120201145756) do
     t.integer  "organism_id"
     t.integer  "culture_growth_type_id"
     t.integer  "strain_id"
-    t.integer  "phenotype_id"
-    t.integer  "genotype_id"
     t.datetime "created_at"
     t.datetime "updated_at"
+    t.integer  "tissue_and_cell_type_id"
   end
 
   add_index "assay_organisms", ["assay_id"], :name => "index_assay_organisms_on_assay_id"
@@ -292,7 +291,7 @@ ActiveRecord::Schema.define(:version => 20120201145756) do
     t.datetime "last_used_at"
     t.datetime "created_at"
     t.datetime "updated_at"
-    t.integer  "version",                       :default => 1
+    t.integer  "version"
     t.string   "first_letter",     :limit => 1
     t.text     "other_creators"
     t.string   "uuid"
@@ -314,6 +313,21 @@ ActiveRecord::Schema.define(:version => 20120201145756) do
   create_table "db_files", :force => true do |t|
     t.binary "data", :limit => 2147483647
   end
+
+  create_table "delayed_jobs", :force => true do |t|
+    t.integer  "priority",   :default => 0
+    t.integer  "attempts",   :default => 0
+    t.text     "handler"
+    t.text     "last_error"
+    t.datetime "run_at"
+    t.datetime "locked_at"
+    t.datetime "failed_at"
+    t.string   "locked_by"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
+  add_index "delayed_jobs", ["priority", "run_at"], :name => "delayed_jobs_priority"
 
   create_table "disciplines", :force => true do |t|
     t.string   "title"
@@ -425,6 +439,23 @@ ActiveRecord::Schema.define(:version => 20120201145756) do
     t.text    "description_html"
   end
 
+  create_table "genes", :force => true do |t|
+    t.string   "title"
+    t.string   "symbol"
+    t.text     "description"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
+  create_table "genotypes", :force => true do |t|
+    t.integer  "gene_id"
+    t.integer  "modification_id"
+    t.integer  "strain_id"
+    t.text     "comment"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
   create_table "group_memberships", :force => true do |t|
     t.integer  "person_id"
     t.integer  "work_group_id"
@@ -434,9 +465,9 @@ ActiveRecord::Schema.define(:version => 20120201145756) do
 
   add_index "group_memberships", ["person_id"], :name => "index_group_memberships_on_person_id"
 
-  create_table "group_memberships_roles", :id => false, :force => true do |t|
+  create_table "group_memberships_project_roles", :id => false, :force => true do |t|
     t.integer "group_membership_id"
-    t.integer "role_id"
+    t.integer "project_role_id"
   end
 
   create_table "help_attachments", :force => true do |t|
@@ -590,7 +621,7 @@ ActiveRecord::Schema.define(:version => 20120201145756) do
     t.integer  "organism_id"
     t.integer  "model_type_id"
     t.integer  "model_format_id"
-    t.integer  "version",                                 :default => 1
+    t.integer  "version"
     t.string   "first_letter",               :limit => 1
     t.text     "other_creators"
     t.string   "uuid"
@@ -611,6 +642,15 @@ ActiveRecord::Schema.define(:version => 20120201145756) do
   end
 
   add_index "moderatorships", ["forum_id"], :name => "index_moderatorships_on_forum_id"
+
+  create_table "modifications", :force => true do |t|
+    t.string   "title"
+    t.string   "symbol"
+    t.text     "description"
+    t.string   "position"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
 
   create_table "monitorships", :force => true do |t|
     t.integer "topic_id"
@@ -639,7 +679,7 @@ ActiveRecord::Schema.define(:version => 20120201145756) do
   add_index "number_value_versions", ["number_value_id"], :name => "index_number_value_versions_on_number_value_id"
 
   create_table "number_values", :force => true do |t|
-    t.integer  "version",            :null => false
+    t.integer  "version"
     t.integer  "version_creator_id"
     t.integer  "number",             :null => false
     t.datetime "created_at"
@@ -648,9 +688,6 @@ ActiveRecord::Schema.define(:version => 20120201145756) do
 
   create_table "organisms", :force => true do |t|
     t.string   "title"
-    t.integer  "ncbi_id"
-    t.string   "genotype"
-    t.string   "phenotype"
     t.datetime "created_at"
     t.datetime "updated_at"
   end
@@ -672,13 +709,11 @@ ActiveRecord::Schema.define(:version => 20120201145756) do
     t.text     "description"
     t.integer  "avatar_id"
     t.integer  "status_id",                           :default => 0
-    t.boolean  "is_pal",                              :default => false
     t.string   "first_letter",          :limit => 10
     t.string   "uuid"
     t.boolean  "can_edit_projects",                   :default => false
     t.boolean  "can_edit_institutions",               :default => false
-    t.boolean  "is_admin",                            :default => false
-    t.boolean  "is_project_manager",                  :default => false
+    t.integer  "roles_mask"
   end
 
   create_table "permissions", :force => true do |t|
@@ -691,6 +726,14 @@ ActiveRecord::Schema.define(:version => 20120201145756) do
   end
 
   add_index "permissions", ["policy_id"], :name => "index_permissions_on_policy_id"
+
+  create_table "phenotypes", :force => true do |t|
+    t.text     "description"
+    t.text     "comment"
+    t.integer  "strain_id"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
 
   create_table "policies", :force => true do |t|
     t.string   "name"
@@ -758,12 +801,20 @@ ActiveRecord::Schema.define(:version => 20120201145756) do
     t.integer "presentation_id"
   end
 
+  create_table "project_roles", :force => true do |t|
+    t.string   "name"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
   create_table "project_subscriptions", :force => true do |t|
     t.integer "person_id"
     t.integer "project_id"
     t.string  "unsubscribed_types"
     t.string  "frequency"
   end
+
+  add_index "project_subscriptions", ["person_id", "project_id"], :name => "index_project_subscriptions_on_person_id_and_project_id"
 
   create_table "projects", :force => true do |t|
     t.string   "name"
@@ -779,7 +830,6 @@ ActiveRecord::Schema.define(:version => 20120201145756) do
     t.string   "site_root_uri"
     t.datetime "last_jerm_run"
     t.string   "uuid"
-    t.integer  "parent_id"
   end
 
   create_table "projects_publications", :id => false, :force => true do |t|
@@ -841,6 +891,13 @@ ActiveRecord::Schema.define(:version => 20120201145756) do
     t.datetime "updated_at"
   end
 
+  create_table "reindexing_queues", :force => true do |t|
+    t.string   "item_type"
+    t.integer  "item_id"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
   create_table "relationship_types", :force => true do |t|
     t.string   "title"
     t.text     "description"
@@ -854,12 +911,6 @@ ActiveRecord::Schema.define(:version => 20120201145756) do
     t.string   "predicate",    :null => false
     t.string   "object_type",  :null => false
     t.integer  "object_id",    :null => false
-    t.datetime "created_at"
-    t.datetime "updated_at"
-  end
-
-  create_table "roles", :force => true do |t|
-    t.string   "name"
     t.datetime "created_at"
     t.datetime "updated_at"
   end
@@ -893,6 +944,16 @@ ActiveRecord::Schema.define(:version => 20120201145756) do
     t.integer  "contributor_id"
     t.string   "contributor_type"
     t.integer  "institution_id"
+    t.datetime "sampling_date"
+    t.string   "organism_part"
+    t.string   "provider_id"
+    t.string   "provider_name"
+    t.integer  "age_at_sampling"
+  end
+
+  create_table "samples_tissue_and_cell_types", :id => false, :force => true do |t|
+    t.integer "sample_id"
+    t.integer "tissue_and_cell_type_id"
   end
 
   create_table "saved_searches", :force => true do |t|
@@ -994,7 +1055,7 @@ ActiveRecord::Schema.define(:version => 20120201145756) do
     t.datetime "created_at"
     t.datetime "updated_at"
     t.datetime "last_used_at"
-    t.integer  "version",                       :default => 1
+    t.integer  "version"
     t.string   "first_letter",     :limit => 1
     t.text     "other_creators"
     t.string   "uuid"
@@ -1013,7 +1074,7 @@ ActiveRecord::Schema.define(:version => 20120201145756) do
   end
 
   create_table "specimens", :force => true do |t|
-    t.string   "donor_number"
+    t.string   "title"
     t.integer  "age"
     t.string   "treatment"
     t.string   "lab_internal_number"
@@ -1027,7 +1088,6 @@ ActiveRecord::Schema.define(:version => 20120201145756) do
     t.string   "contributor_type"
     t.datetime "created_at"
     t.datetime "updated_at"
-    t.integer  "organism_id"
     t.integer  "culture_growth_type_id"
     t.integer  "strain_id"
     t.string   "medium"
@@ -1040,6 +1100,15 @@ ActiveRecord::Schema.define(:version => 20120201145756) do
     t.string   "purity"
     t.boolean  "sex"
     t.datetime "born"
+    t.string   "ploidy"
+    t.string   "provider_id"
+    t.string   "provider_name"
+    t.boolean  "is_dummy",               :default => false
+  end
+
+  create_table "strain_descendants", :id => false, :force => true do |t|
+    t.integer "ancestor_id"
+    t.integer "descendant_id"
   end
 
   create_table "strains", :force => true do |t|
@@ -1047,6 +1116,12 @@ ActiveRecord::Schema.define(:version => 20120201145756) do
     t.integer  "organism_id"
     t.datetime "created_at"
     t.datetime "updated_at"
+    t.integer  "parent_id"
+    t.string   "synonym"
+    t.text     "comment"
+    t.string   "provider_id"
+    t.string   "provider_name"
+    t.boolean  "is_dummy",      :default => false
   end
 
   create_table "studied_factor_links", :force => true do |t|
@@ -1137,10 +1212,10 @@ ActiveRecord::Schema.define(:version => 20120201145756) do
   end
 
   create_table "text_value_versions", :force => true do |t|
-    t.integer  "text_value_id",                            :null => false
-    t.integer  "version",                                  :null => false
+    t.integer  "text_value_id",                          :null => false
+    t.integer  "version",                                :null => false
     t.integer  "version_creator_id"
-    t.text     "text",               :limit => 2147483647, :null => false
+    t.text     "text",               :limit => 16777215, :null => false
     t.datetime "created_at"
     t.datetime "updated_at"
   end
@@ -1148,12 +1223,20 @@ ActiveRecord::Schema.define(:version => 20120201145756) do
   add_index "text_value_versions", ["text_value_id"], :name => "index_text_value_versions_on_text_value_id"
 
   create_table "text_values", :force => true do |t|
-    t.integer  "version",                                  :null => false
+    t.integer  "version"
     t.integer  "version_creator_id"
-    t.text     "text",               :limit => 2147483647, :null => false
+    t.text     "text",               :limit => 16777215, :null => false
     t.datetime "created_at"
     t.datetime "updated_at"
   end
+
+  create_table "tissue_and_cell_types", :force => true do |t|
+    t.string   "title"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
+  add_index "tissue_and_cell_types", ["title"], :name => "title", :unique => true
 
   create_table "topics", :force => true do |t|
     t.integer  "forum_id"

@@ -239,7 +239,7 @@ module ApiHelper
     object=object.parent if (object.class.name.include?("::Version"))
     associated = get_related_resources object
     builder.tag! "associated" do
-      associated.keys.each do |key|        
+      associated.keys.sort.each do |key|
         attr={}
         attr[:total]=associated[key][:items].count
         if (associated[key][:hidden_count])

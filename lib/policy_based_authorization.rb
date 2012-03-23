@@ -52,25 +52,41 @@ module Acts
         User.current_user
       end
 
+      #when having a sharing_scope policy of Policy::ALL_SYSMO_USERS it is concidered to have advanced permissions if any of the permissions do not relate to the projects associated with the resource (ISA or Asset))
+      #this is a temporary work-around for the loss of the custom_permissions flag when defining a pre-canned permission of shared with sysmo, but editable/downloadable within mhy project
+      #other policy sharing scopes are simpler, and are concidered to have advanced permissions if there are more than zero permissions defined
+      def has_advanced_permissions?
+        if policy.sharing_scope==Policy::ALL_SYSMO_USERS
+          !(policy.permissions.collect{|p| p.contributor} - projects).empty?
+        else
+          policy.permissions.count > 0
+        end
+      end
+
       def contributor_or_default_if_new
         if self.new_record? && contributor.nil?
           self.contributor = default_contributor
         end
       end
+      #contritutor or person who can manage the item and the item was published
+      def can_publish?
+        ((Ability.new(User.current_user).can? :publish, self) && self.can_manage?) || self.contributor == User.current_user || try_block{self.contributor.user} == User.current_user || (self.can_manage? && self.policy.sharing_scope == Policy::EVERYONE) || Seek::Config.is_virtualliver
+      end
 
       #use request_permission_summary to retrieve who can manage the item
       def people_can_manage
-        contributor = self.class.name=='Assay' ? self.contributor : try_block{self.contributor.person}
+        contributor = self.is_isa? ? self.contributor : self.contributor.try(:person)
         return [[contributor.id, "#{contributor.first_name} #{contributor.last_name}", Policy::MANAGING]] if policy.blank?
         creators = is_downloadable? ? self.creators : []
-        grouped_people_by_access_type = policy.summarize_permissions creators, contributor
+        asset_managers = projects.collect(&:asset_managers).flatten
+        grouped_people_by_access_type = policy.summarize_permissions creators,asset_managers, contributor
         grouped_people_by_access_type[Policy::MANAGING]
       end
 
       AUTHORIZATION_ACTIONS.each do |action|
         eval <<-END_EVAL
           def can_#{action}? user = User.current_user
-            new_record? or Authorization.is_authorized? "#{action}", nil, self, user
+            new_record? || (Authorization.is_authorized? "#{action}", nil, self, user) || (Ability.new(user).can? "#{action}".to_sym, self) || (Ability.new(user).can? "#{action}_asset".to_sym, self)
           end
         END_EVAL
       end

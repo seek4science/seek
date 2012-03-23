@@ -11,7 +11,14 @@ module Seek
         eval("@#{controller_name.singularize} = entity")
         render :update do |page|
           page.replace_html 'tags_box', :partial=>'assets/tags_box'
-          page.replace_html 'sidebar_tag_cloud', :partial=>'gadgets/tag_cloud_gadget'
+
+          # The tag cloud is generation is quite an expensive process and doesn't need to automatically update when filled up already.
+          # When it is small its nice to see new tags appear in the cloud.
+          # The cache is expired and will be regenerated on the next page load anyway, and the delay is more acceptable on a page load.
+          unless Annotation.count > (Seek::Config.max_visible_tags * 2)
+            page.replace_html 'sidebar_tag_cloud', :partial=>'gadgets/tag_cloud_gadget'
+          end
+
           page.visual_effect :highlight, 'tags_box'
           page.visual_effect :highlight, 'sidebar_tag_cloud'
         end
@@ -26,17 +33,20 @@ module Seek
 
     #Updates all annotations as the owner of the entity, using the parameters passed through the web interface Any tags that do not match those passed in are removed as a tagging for this item.
     #New tags are assigned to the owner, which defaults to the current user.
-    def update_annotations entity, attr='tag', use_autocomplete = true, owner=User.current_user
+    def update_annotations entity, attr='tag', owner=User.current_user
       unless owner.nil?
-        entity.tag_with_params params, attr, use_autocomplete
+        entity.tag_with_params params, attr
+        expire_annotation_fragments(attr)
       end
+      
     end
 
     #Updates tags for a given owner using the params passed through the tagging web interface. This just updates the tags for a given owner, which defaults
     #to the current user - it doesn't affect other peoples tags for that item.
-    def update_owned_annotations entity, attr='tag', use_autocomplete = true, owner=User.current_user
+    def update_owned_annotations entity, attr='tag', owner=User.current_user
       unless owner.nil?
-        entity.tag_as_user_with_params params, attr, use_autocomplete
+        entity.tag_as_user_with_params params, attr
+        expire_annotation_fragments(attr)
       end
     end
   end

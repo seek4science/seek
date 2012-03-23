@@ -4,34 +4,35 @@ require 'subscribable'
 class Specimen < ActiveRecord::Base
   include Subscribable
 
+  acts_as_authorized
+
   before_save  :clear_garbage
+
 
   has_many :samples
   has_many :activity_logs, :as => :activity_loggable
   has_many :assets_creators, :dependent => :destroy, :as => :asset, :foreign_key => :asset_id
   has_many :creators, :class_name => "Person", :through => :assets_creators, :order=>'assets_creators.id'
 
-
   belongs_to :institution
-  belongs_to :organism
   belongs_to :culture_growth_type
   belongs_to :strain
 
-  alias_attribute :description, :comments
-  alias_attribute :title, :donor_number
-  alias_attribute :specimen_number, :donor_number
+  has_one :organism, :through=>:strain
 
-  HUMANIZED_COLUMNS = {:donor_number => "Specimen number"}
+
+  alias_attribute :description, :comments
+
+  HUMANIZED_COLUMNS = Seek::Config.is_virtualliver ? {} : {:lab_internal_number=> "lab internal identifier", :born => 'culture starting date', :culture_growth_type => 'culture type', :provider_id => "provider's cell culture identifier"}
 
   validates_numericality_of :age, :only_integer => true, :greater_than=> 0, :allow_nil=> true, :message => "is not a positive integer"
-  validates_presence_of :donor_number
+  validates_presence_of :title,:lab_internal_number, :contributor,:strain
 
-  validates_presence_of :contributor,:lab_internal_number,:projects,:institution,:organism
+  validates_presence_of :institution if Seek::Config.is_virtualliver
+  validates_uniqueness_of :title
 
-  validates_uniqueness_of :donor_number
   def self.sop_sql()
-  'SELECT sop_versions.* FROM sop_versions ' +
-  'INNER JOIN sop_specimens ' +
+  'SELECT sop_versions.* FROM sop_versions ' + 'INNER JOIN sop_specimens ' +
   'ON sop_specimens.sop_id = sop_versions.sop_id ' +
   'WHERE (sop_specimens.sop_version = sop_versions.version ' +
   'AND sop_specimens.specimen_id = #{self.id})'
@@ -41,14 +42,24 @@ class Specimen < ActiveRecord::Base
   has_many :sop_masters,:class_name => "SopSpecimen"
   grouped_pagination :pages=>("A".."Z").to_a, :default_page => Seek::Config.default_page(self.name.underscore.pluralize)
 
-  acts_as_solr(:fields=>[:description,:donor_number,:lab_internal_number],:include=>[:culture_growth_type,:organism,:strain]) if Seek::Config.solr_enabled
-
-
-  acts_as_authorized
-
   def related_people
     creators
-  end
+  end  
+  
+  searchable do
+    text :description,:title,:lab_internal_number
+    text :culture_growth_type do
+      culture_growth_type.try :title
+    end
+    
+    text :strain do
+      strain.try :title
+    end
+    
+    text :institution do
+      institution.try :name
+    end if Seek::Config.is_virtualliver
+  end if Seek::Config.solr_enabled
 
   def age_in_weeks
     if !age.nil?
@@ -109,6 +120,18 @@ class Specimen < ActiveRecord::Base
 
   def self.human_attribute_name(attribute)
     HUMANIZED_COLUMNS[attribute.to_sym] || super
+  end
+
+  def born_info
+    if born.nil?
+      ''
+    else
+      if try(:born).hour == 0 && try(:born).min == 0 && try(:born).sec == 0
+        try(:born).strftime('%d/%m/%Y')
+      else
+        try(:born).strftime('%d/%m/%Y @ %H:%M:%S')
+      end
+    end
   end
 
 end

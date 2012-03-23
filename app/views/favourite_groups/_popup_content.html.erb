@@ -20,7 +20,7 @@
 		<div class="body">
 			<div id="facebook" class="clearfix">
 				<%= hidden_field_tag "f_group_id", @f_group.id -%>
-				
+
 				<% unless @f_group.is_whitelist_or_blacklist? -%>
 					<label for="group_name"><strong>Group Name:</strong></label>
 					<%= text_field_tag "group_name", @f_group.name, :class => "to_field_identical", :style => "width: 300px; margin-left: 0.3em; vertical-align: middle;" -%>

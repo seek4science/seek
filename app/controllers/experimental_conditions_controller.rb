@@ -1,6 +1,7 @@
 class ExperimentalConditionsController < ApplicationController
   include Seek::FactorStudied
   include Seek::AnnotationCommon
+  include Seek::AssetsCommon
 
   before_filter :login_required
   before_filter :find_and_auth_sop  
@@ -25,7 +26,7 @@ class ExperimentalConditionsController < ApplicationController
       @experimental_condition.experimental_condition_links.build(:substance => substance )
     end
 
-    update_annotations(@experimental_condition, 'description', false) if try_block{!params[:annotation][:value].blank?}
+    update_annotations(@experimental_condition, 'description') if try_block{!params[:annotation][:value].blank?}
 
     render :update do |page|
       if @experimental_condition.save
@@ -34,7 +35,8 @@ class ExperimentalConditionsController < ApplicationController
         # clear the _add_factor form
         page.call "autocompleters['substance_autocompleter'].deleteAllTokens"
         page[:add_condition_or_factor_form].reset
-        page[:substance_autocomplete_input].disabled = true
+        page[:substance_condition_factor].hide
+        page[:growth_medium_or_buffer_description].hide
       else
         page.alert(@experimental_condition.errors.full_messages)
       end
@@ -61,7 +63,7 @@ class ExperimentalConditionsController < ApplicationController
       end
       params[:annotation] = {}
       params[:annotation][:value] = try_block{Annotation.for_annotatable(experimental_condition.class.name, experimental_condition.id).with_attribute_name('description').first.value.text}
-      update_annotations(new_experimental_condition, 'description', false) if try_block{!params[:annotation][:value].blank?}
+      update_annotations(new_experimental_condition, 'description') if try_block{!params[:annotation][:value].blank?}
 
       new_experimental_conditions.push new_experimental_condition
     end
@@ -109,7 +111,7 @@ class ExperimentalConditionsController < ApplicationController
       end
       @experimental_condition.experimental_condition_links = experimental_condition_links
 
-      update_annotations(@experimental_condition, 'description', false) if try_block{!params[:annotation][:value].blank?}
+      update_annotations(@experimental_condition, 'description') if try_block{!params[:annotation][:value].blank?}
 
       render :update do |page|
         if  @experimental_condition.update_attributes(params[:experimental_condition])
@@ -130,11 +132,7 @@ class ExperimentalConditionsController < ApplicationController
       sop = Sop.find(params[:sop_id])
       if sop.can_edit? current_user
         @sop = sop
-        if logged_in? and current_user.person.member? and params[:version]
-          @display_sop = @sop.find_version(params[:version]) ? @sop.find_version(params[:version]) : @sop.latest_version
-        else
-          @display_sop = @sop.latest_version
-        end
+        find_display_asset @sop
       else
         respond_to do |format|
           flash[:error] = "You are not authorized to perform this action"

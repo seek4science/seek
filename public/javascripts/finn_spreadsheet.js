@@ -289,7 +289,9 @@ function bindAnnotations(annotation_sources) {
       annotationIndexTable.append(createAnnotationStub(ann));
 
       //bind annotations to respective table cells
-      bindAnnotation(ann);
+      if (ann.type!="plot_data") {
+        bindAnnotation(ann);
+      }
     }
   }
   //Text displayed in annotation index if no annotations present
@@ -304,9 +306,20 @@ function bindAnnotations(annotation_sources) {
 //Small annotation summary that jumps to said annotation when clicked
 function createAnnotationStub(ann)
 {
-  var stub = $j("<tr></tr>").addClass("annotation_stub")
+    var type_class;
+    var content;
+    if (ann.type=="plot_data") {
+        type_class="plot_data_type";
+        content = "Graph data";
+    }
+    else {
+        type_class="text_annotation_type";
+        content = ann.content.substring(0,40);
+    }
+    var stub = $j("<tr></tr>").addClass("annotation_stub")
+      .append($j("<td>&nbsp;</td>").addClass(type_class))
       .append($j("<td>Sheet"+(ann.sheetNumber+1)+"."+ann.cellRange+"</td>"))
-      .append($j("<td>"+ann.content.substring(0,40)+"</td>"))
+      .append($j("<td>"+content+"</td>"))
       .append($j("<td>"+ann.dateCreated+"</td>"))
       .click( function (){
         jumpToAnnotation(ann.id, ann.sheetNumber, ann.cellRange);
@@ -317,6 +330,7 @@ function createAnnotationStub(ann)
 
 function bindAnnotation(ann) {
   $j("table.sheet:eq("+ann.sheetNumber+") tr").slice(ann.startRow-1,ann.endRow).each(function() {
+            
     $j(this).children("td.cell").slice(ann.startCol-1,ann.endCol).addClass("annotated_cell")
           .click(function () {show_annotation(ann.id,
               $j(this).position().left + $j(this).outerWidth(),
@@ -341,10 +355,15 @@ function toggle_annotation_form(annotation_id) {
 function show_annotation(id,x,y) {
   var annotation_container = $j("#annotation_container");
   var annotation = $j("#annotation_" + id);
+  var plot_element_id = "annotation_plot_data_"+id;
   annotation_container.css('left',x+20);
   annotation_container.css('top',y-20);
   annotation_container.show();
   annotation.show();
+  if ($j(plot_element_id)) {
+    plot_cells(plot_element_id,'450','300');
+  }
+
 }
 
 
@@ -435,7 +454,7 @@ function select_cells(startCol, startRow, endCol, endRow) {
   $j('#selection_data').val(selection);
 
   //Update cell coverage in annotation form
-  $j('input#annotation_cell_coverage').attr("value",selection);
+  $j('input.annotation_cell_coverage_class').attr("value",selection);
 
   //Show selection-dependent controls
   $j('.requires_selection').show();
@@ -445,7 +464,7 @@ function activateSheet(sheet, sheetTab) {
   if(sheetTab == null)
     sheetTab = $j("a.sheet_tab:eq(" + sheet +")");
 
-  var sheetName = sheetTab.html().replace(" ","_");
+  var sheetIndex = sheetTab.attr("index")
 
   //Clean up
   //Hide annotations
@@ -465,9 +484,9 @@ function activateSheet(sheet, sheetTab) {
   sheetTab.addClass('selected_tab');
 
   //Show the sheet
-  $j("div.sheet_container#spreadsheet_" + sheetName).show();
+  $j("div.sheet_container#spreadsheet_" + sheetIndex).show();
 
-  var activeSheet = $j("div.sheet#spreadsheet_" + sheetName);
+  var activeSheet = $j("div.sheet#spreadsheet_" + sheetIndex);
 
   //Show the div + set sheet active
   activeSheet.addClass('active_sheet');
@@ -481,7 +500,7 @@ function activateSheet(sheet, sheetTab) {
   deselect_cells();
 
   //Record current sheet in annotation form
-  $j('input#annotation_sheet_id').attr("value",sheetTab.attr("index"));
+  $j('input#annotation_sheet_id').attr("value",sheetIndex);
 
   //Reset variables
   isMouseDown = false,
@@ -511,4 +530,68 @@ function copy_cells()
   $j("textarea#export_data").val(text);
   $j("div.spreadsheet_popup").hide();
   $j("div#export_form").show();
+}
+function plot_selected_cells(target_element,width,height) {
+    plot_cells(target_element,width,height);
+    $j("div.spreadsheet_popup").hide();
+    $j("div#plot_panel").show();
+}
+
+function plot_cells(target_element,width,height)
+{
+    var cells = $j('td.selected_cell');
+    var columns = $j('.col_heading.selected_heading').size();
+    var text = "";
+
+    for(var i = 0; i < cells.size(); i += columns)
+    {
+      for(var j = 0; j < columns; j += 1)
+      {
+        text += (cells.eq(i + j).html() + "\t");
+      }
+      text += "\n";
+    }
+    $j("textarea.annotation_content_class").val(text);
+      var chart;
+      function drawChart() {
+        var data = new google.visualization.DataTable();
+        chart = new google.visualization.LineChart(document.getElementById(target_element));
+        for(var i = 0; i < cells.size(); i += columns)
+        {
+            var array = new Array();
+            for(var j = 0; j < columns; j += 1)
+            {
+                var value = cells.eq(i + j).html();
+                if (i==0) {
+                    var type;
+                    if (j==0) {
+                        type="string"
+                    }
+                    else {
+                        type="number"
+                    }
+                    data.addColumn(type,value);
+                }
+                else {
+                    if (j==0) {
+                        array.push(value);
+                    }
+                    else {
+                        array.push(parseInt(value));
+                    }
+                }
+            }
+            if (i!=0) {
+                data.addRow(array);
+            }
+        }
+        chart.draw(data, {curveType:'function',
+            width: width,
+            height: height,
+            title: '',
+            vAxis: {title:'',minValue:0,baseline:0},
+            hAxis: {title:'time(min)'}
+        });
+      }
+      drawChart();
 }

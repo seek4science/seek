@@ -25,7 +25,7 @@
         <%= fields_for(@sop) { |f|  f.fancy_multiselect :samples } -%>
         <p>
           <%= preview_permission_popup_link('sop', url_for(:controller => 'policies', :action => 'preview_permissions'), true)-%>
-          <%= submit_tag "Upload and Save", :id => "sop_submit_btn", :onclick => "validateResourceFields(true,'sop'); return(false);" -%> or <%= link_to 'Cancel', sops_path -%>
+          <%= submit_tag "Upload and Save", :id => "sop_submit_btn", :onclick => "validateResourceFields(true,'sop',true); return(false);" -%> or <%= link_to 'Cancel', sops_path -%>
         </p>
 		</div>
      <% end -%>    

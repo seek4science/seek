@@ -805,6 +805,165 @@ class AuthorizationTest < ActiveSupport::TestCase
     assert !item.can_manage?
   end
 
+  test "publisher can publish items inside their project, only if they can manage it as well" do
+    publisher = Factory(:person, :roles => ['publisher'])
+    datafile = Factory(:data_file, :projects => publisher.projects)
+
+    #adding manage right for publisher
+    User.with_current_user datafile.contributor do
+      policy  = Factory(:policy)
+      policy.permissions = [Factory(:permission, :contributor => publisher, :access_type => Policy::MANAGING)]
+      datafile.policy = policy
+      datafile.save
+    end
+
+    ability = Ability.new(publisher.user)
+    assert ability.can? :publish, datafile
+
+    User.with_current_user publisher.user do
+      assert datafile.can_manage?
+      assert datafile.can_publish?
+    end
+  end
+
+  test "publisher can not publish items inside their project, if they can not manage it" do
+      publisher = Factory(:person, :roles => ['publisher'])
+      datafile = Factory(:data_file, :projects => publisher.projects)
+
+      ability = Ability.new(publisher.user)
+      assert ability.can? :publish, datafile
+
+      User.with_current_user publisher.user do
+        assert !datafile.can_manage?
+        assert !datafile.can_publish?
+      end
+    end
+
+
+  test "publisher can not publish items outside their project" do
+    publisher = Factory(:person, :roles => ['publisher'])
+    datafile = Factory(:data_file)
+
+    ability = Ability.new(publisher.user)
+    assert ability.cannot? :publish, datafile
+
+    User.with_current_user publisher.user do
+      assert !datafile.can_publish?
+    end
+  end
+
+  test "asset manager can manage the items inside their projects, except the entirely private items" do
+    asset_manager = Factory(:person, :roles => ['asset_manager'])
+    datafile1 = Factory(:data_file, :projects => asset_manager.projects, :policy => Factory(:publicly_viewable_policy))
+    datafile2 = Factory(:data_file, :projects => asset_manager.projects, :policy => Factory(:private_policy))
+
+    ability = Ability.new(asset_manager.user)
+
+    assert ability.can? :manage_asset, datafile1
+    assert ability.cannot? :manage_asset, datafile2
+    assert ability.cannot? :manage, datafile2
+
+    User.with_current_user asset_manager.user do
+      assert datafile1.can_manage?
+      assert !datafile2.can_manage?
+    end
+  end
+
+  test "asset manager can not manage the items outside their projects" do
+    asset_manager = Factory(:person, :roles => ['asset_manager'])
+    datafile = Factory(:data_file)
+    assert (asset_manager.projects & datafile.projects).empty?
+
+    ability = Ability.new(asset_manager.user)
+
+    assert ability.cannot? :manage_asset, datafile
+    assert ability.cannot? :manage, datafile
+
+    User.with_current_user asset_manager.user do
+      assert !datafile.can_manage?
+    end
+  end
+
+  test "asset manager can manage items inside their projects, the items have private sharing scope, but have permissions" do
+    asset_manager = Factory(:person, :roles => ['asset_manager'])
+    datafile = Factory(:data_file, :projects => asset_manager.projects, :policy => Factory(:private_policy, :permissions => [Factory(:permission, :access_type => Policy::VISIBLE)]))
+
+    assert !(asset_manager.projects & datafile.projects).empty?
+
+    ability = Ability.new(asset_manager.user)
+
+    assert ability.can? :manage_asset, datafile
+
+    User.with_current_user asset_manager.user do
+      assert datafile.can_manage?
+    end
+  end
+
+  test "asset manager can manage the items inside their projects, but can not publish the items, which hasn't been set to published" do
+     asset_manager = Factory(:asset_manager)
+     datafile = Factory(:data_file, :projects => asset_manager.projects, :policy => Factory(:all_sysmo_viewable_policy))
+
+     User.with_current_user asset_manager.user do
+       assert datafile.can_manage?
+       assert !datafile.can_publish?
+
+       ability = Ability.new(asset_manager.user)
+       assert asset_manager.is_asset_manager?
+       assert ability.can? :manage_asset, datafile
+       assert ability.cannot? :publish, datafile
+
+     end
+  end
+
+  test "a person who is not an asset manager, who can manage the item, should not be able to publish the items, which hasn't been set to published" do
+     person_can_manage = Factory(:person)
+     datafile = Factory(:data_file, :projects => person_can_manage.projects, :policy => Factory(:policy))
+     permission = Factory(:permission, :contributor => person_can_manage, :access_type => Policy::MANAGING, :policy => datafile.policy)
+
+     User.with_current_user person_can_manage.user do
+       assert datafile.can_manage?
+       assert !datafile.can_publish?
+
+       ability = Ability.new(person_can_manage.user)
+       assert person_can_manage.roles.empty?
+       assert ability.cannot? :manage_asset, datafile
+       assert ability.cannot? :manage, datafile
+       assert ability.cannot? :publish, datafile
+     end
+  end
+
+  test "publisher should not be able to manage the item" do
+     publisher = Factory(:publisher)
+     datafile = Factory(:data_file, :projects => publisher.projects, :policy => Factory(:all_sysmo_viewable_policy))
+
+     User.with_current_user publisher.user do
+       assert !datafile.can_manage?
+
+       ability = Ability.new(publisher.user)
+       assert publisher.is_publisher?
+       assert ability.can? :publish, datafile
+       assert ability.cannot? :manage_asset, datafile
+       assert ability.cannot? :manage, datafile
+     end
+  end
+
+  test "should handle different types of contributor of resource (Person, User)" do
+    asset_manager = Factory(:asset_manager)
+
+    policy = Factory(:private_policy)
+    permission = Factory(:permission, :contributor => Factory(:person), :access_type => 1)
+    policy.permissions = [permission]
+
+    #resources are not entirely private
+    datafile = Factory(:data_file, :projects => asset_manager.projects, :policy => policy)
+    investigation = Factory(:investigation, :contributor => Factory(:person), :projects => asset_manager.projects, :policy => policy)
+
+    User.with_current_user asset_manager.user do
+      assert datafile.can_manage?
+      assert investigation.can_manage?
+    end
+  end
+
   private 
 
   def actions
@@ -858,5 +1017,6 @@ class AuthorizationTest < ActiveSupport::TestCase
     #Use favourite_group_membership in place of permission. It has access_type so duck typing will save us.
     person.favourite_group_memberships.select {|x| favourite_group_ids.include?(x.favourite_group_id)}
   end
+
 
 end

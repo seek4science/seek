@@ -43,6 +43,10 @@ module StudiedFactorsHelper
    end
 
   class Substance
+
+     #required to appear like a text tag
+     alias_attribute :text,:name
+
      def id
        @id
      end

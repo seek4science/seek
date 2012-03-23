@@ -66,7 +66,7 @@ module AuthenticatedSystem
     respond_to do |format|
       format.html do
         store_location
-        redirect_to new_session_path
+        redirect_to login_path
       end
       format.any do
         request_http_basic_authentication 'Web Password'
@@ -89,7 +89,12 @@ module AuthenticatedSystem
   end
 
   def redirect_back
-    redirect_to(:back)
+    if request.env['HTTP_REFERER']
+      redirect_to(:back)
+    else
+      redirect_to :root
+    end
+    
     session[:return_to] = nil
   end
   

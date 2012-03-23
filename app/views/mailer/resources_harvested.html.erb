@@ -28,8 +28,8 @@ The following resources were uploaded, but are missing information:
 <% end -%>
 <% end -%>
 If you are having trouble accessing your files, or if you think a file has been uploaded by mistake, please contact one of the <%= Seek::Config.dm_project_name %> administrators listed below:
-<% User.find(:all,:conditions=>{:is_admin=>true}, :include=>:person).each do |admin| -%>
-  <%= "#{h admin.person.name}: " %><%= admin.person.email %>
+<% Person.admins do |admin| -%>
+    <%= "#{h admin.name}: " %><%= admin.email %>
 <% end -%>
 
 Regards,

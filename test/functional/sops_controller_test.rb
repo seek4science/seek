@@ -9,7 +9,6 @@ class SopsControllerTest < ActionController::TestCase
   include SharingFormTestHelper
 
   def setup
-    WebMock.allow_net_connect!
     login_as(:quentin)
     @object=sops(:downloadable_sop)
   end
@@ -576,9 +575,17 @@ class SopsControllerTest < ActionController::TestCase
     assert flash[:error]
   end
 
+  test 'should show <Not specified> for  other creators if no other creators' do
+    get :index
+    assert_response :success
+    no_other_creator_sops = assigns(:sops).select { |s| s.other_creators.blank? }
+    assert_select 'p.list_item_attribute', :text => /Other creator: Not specified/, :count => no_other_creator_sops.count
+  end
+
   private
 
   def valid_sop_with_url
+    mock_remote_file "#{Rails.root}/test/fixtures/files/file_picture.png","http://www.sysmo-db.org/images/sysmo-db-logo-grad2.png"
     {:title=>"Test", :data_url=>"http://www.sysmo-db.org/images/sysmo-db-logo-grad2.png",:projects=>[projects(:sysmo_project)]}
   end
 

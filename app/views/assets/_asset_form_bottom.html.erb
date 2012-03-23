@@ -34,7 +34,7 @@
     <p>
       <%= render :partial => "assets/attribution_form", :locals => {:resource_type => resource_type, # this is only for presentation, not for any processing
                                                                     :existing_attributions => existing_attributions,
-                                                                    :attribution_suggestions => eval("#{resource_type}.get_all_as_json(current_user)")} -%>
+                                                                    :attribution_suggestions => resource_type.constantize.get_all_as_json(current_user) }   -%>
     </p>
 <% end %>
 <% if creators_enable %>

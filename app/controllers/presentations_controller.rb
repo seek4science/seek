@@ -10,7 +10,7 @@ class PresentationsController < ApplicationController
   #before_filter :login_required
   before_filter :find_assets, :only => [ :index ]
   before_filter :find_and_auth, :except => [ :index, :new, :create, :preview,:update_annotations_ajax]
-  before_filter :find_display_presentation, :only=>[:show,:download]
+  before_filter :find_display_asset, :only=>[:show,:download]
 
   #before_filter :convert_to_swf, :only => :show
 
@@ -244,15 +244,4 @@ class PresentationsController < ApplicationController
     end
   end
 
-
-  protected
-  def find_display_presentation
-    if @presentation
-      if logged_in? and current_user.person.member? and params[:version]
-        @display_presentation = @presentation.find_version(params[:version]) ? @presentation.find_version(params[:version]) : @presentation.latest_version
-      else
-        @display_presentation = @presentation.latest_version
-      end
-    end
-  end
 end

@@ -16,8 +16,9 @@ class ReindexerObserver < ActiveRecord::Observer
 
   def reindex item
     consequences(item).each do |consequence|
-      consequence.solr_save
+      ReindexingQueue.create :item=>consequence
     end
+    Delayed::Job.enqueue(ReindexingJob.new,0,5.seconds.from_now) unless ReindexingJob.exists?
   end
 
 end

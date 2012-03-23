@@ -1,19 +1,21 @@
 <%= list_item_title resource %>
 
 <div class="list_item_left_column">
-  <%= list_item_authorized_attribute "Contributor", resource.contributor.try(:person) %>
+  <%= list_item_authorized_attribute "Creator", resource.contributor.try(:person) %>
 
-  <%= list_item_optional_attribute "Specimen", resource.specimen.try(:title),resource.specimen %>
+  <%= list_item_attribute "Lab internal ID", h(resource.lab_internal_number) %>
 
+  <%= list_item_attribute "Date at sampling", text_or_not_specified(resource.sampling_date.nil? ? nil : date_as_string(resource.sampling_date)) -%>
 
+  <%= list_item_attribute "Organism",organism_and_strain(resource.specimen.strain) -%>
 </div>
 
 <div class="list_item_right_column">
 
-  <%= list_item_attribute "Date of donation", resource.donation_date.strftime("%d/%m/%y")%>
-  <%= list_item_authorized_list resource.sops, "SOPs", true, 50, true %>
+  <%= list_item_authorized_list resource.specimen.sops,"SOPs", true, 50, true %>
 
-</div>
-<div class="list_item_whole_width">
-  <%= list_item_description resource.description %>
+  <%= list_item_attribute "Provider name",text_or_not_specified(resource.provider_name) -%>
+  <%= list_item_attribute "Provider's sample ID",text_or_not_specified(resource.provider_id) -%>
+
+
 </div>

@@ -6,57 +6,32 @@ require 'title_trimmer'
 
 class DataFile < ActiveRecord::Base
 
-  include SpreadsheetUtil
+  include Seek::DataFileExtraction
 
   acts_as_asset
   acts_as_trashable
 
   title_trimmer
 
-   def included_to_be_copied? symbol
-     case symbol.to_s
-       when "activity_logs","versions","attributions","relationships","inverse_relationships","annotations"
-         return false
-       else
-         return true
-     end
-   end
-
-
-
-  if Seek::Config.events_enabled
-    has_and_belongs_to_many :events
-  else
-    def events
-      []
-    end
-
-    def event_ids
-      []
-    end
-
-    def event_ids= events_ids
-      
-    end
-  end
-
   validates_presence_of :title
 
   # allow same titles, but only if these belong to different users
   # validates_uniqueness_of :title, :scope => [ :contributor_id, :contributor_type ], :message => "error - you already have a Data file with such title."
-  has_many :sample_assets,:dependent=>:destroy,:as => :asset
-  has_many :samples, :through => :sample_assets
 
-  has_one :content_blob, :as => :asset, :foreign_key => :asset_id ,:conditions => 'asset_version= #{self.version}'
+    has_one :content_blob, :as => :asset, :foreign_key => :asset_id ,:conditions => 'asset_version= #{self.version}'
 
-  acts_as_solr(:fields=>[:description,:title,:original_filename,:searchable_tags,:spreadsheet_annotation_search_fields,:fs_search_fields]) if Seek::Config.solr_enabled
+  searchable do
+    text :description, :title, :original_filename, :searchable_tags, :spreadsheet_annotation_search_fields,:fs_search_fields, :spreadsheet_contents_for_search
+  end if Seek::Config.solr_enabled
 
   has_many :studied_factors, :conditions =>  'studied_factors.data_file_version = #{self.version}'
 
   explicit_versioning(:version_column => "version") do
-    include SpreadsheetUtil
+    include Seek::DataFileExtraction
     acts_as_versioned_resource
+    
     has_one :content_blob,:primary_key => :data_file_id,:foreign_key => :asset_id,:conditions => 'content_blobs.asset_version= #{self.version} and content_blobs.asset_type = "#{self.parent.class.name}"'
+    
     has_many :studied_factors, :primary_key => "data_file_id", :foreign_key => "data_file_id", :conditions =>  'studied_factors.data_file_version = #{self.version}'
     
     def relationship_type(assay)
@@ -82,10 +57,27 @@ class DataFile < ActiveRecord::Base
     end
   end
 
+  if Seek::Config.events_enabled
+    has_and_belongs_to_many :events
+  else
+    def events
+      []
+    end
+
+    def event_ids
+      []
+    end
+
+    def event_ids= events_ids
+
+    end
+  end
 
   def studies
     assays.collect{|a| a.study}.uniq
   end
+
+
 
   # get a list of DataFiles with their original uploaders - for autocomplete fields
   # (authorization is done immediately to save from iterating through the collection again afterwards)
@@ -93,7 +85,7 @@ class DataFile < ActiveRecord::Base
   # Parameters:
   # - user - user that performs the action; this is required for authorization
   def self.get_all_as_json(user)
-    all_datafiles = DataFile.find(:all, :order => "ID asc")
+    all_datafiles = DataFile.find(:all, :order => "ID asc",:include=>[:policy,{:policy=>:permissions}])
     datafiles_with_contributors = all_datafiles.collect{ |d|
         d.can_view?(user) ?
         (contributor = d.contributor;
@@ -107,6 +99,25 @@ class DataFile < ActiveRecord::Base
 
     return datafiles_with_contributors.to_json
   end
+
+  def included_to_be_copied? symbol
+     case symbol.to_s
+       when "activity_logs","versions","attributions","relationships","inverse_relationships", "annotations"
+         return false
+       else
+         return true
+     end
+   end
+
+
+
+  has_many :sample_assets,:dependent=>:destroy,:as => :asset
+  has_many :samples, :through => :sample_assets
+
+    
+
+
+
 
   def relationship_type(assay)
     #FIXME: don't like this hardwiring to assay within data file, needs abstracting
@@ -198,4 +209,5 @@ class DataFile < ActiveRecord::Base
       presentation.orig_data_file_id = id
     end
   end
+  
 end

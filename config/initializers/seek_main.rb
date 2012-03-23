@@ -20,7 +20,8 @@ require "attachment_fu_extension"
 require 'seek/taggable'
 require "bio"
 require 'assets_common_extension'
-
+require 'sunspot_rails'
+require 'cancan'
 
 GLOBAL_PASSPHRASE="ohx0ipuk2baiXah" unless defined? GLOBAL_PASSPHRASE
 
@@ -31,4 +32,7 @@ PORTER_SECRET = "" unless defined? PORTER_SECRET
 Seek::Config.propagate_all
 
 Annotations::Config.attribute_names_to_allow_duplicates.concat(["tag"])
+Annotations::Config.versioning_enabled = false
+
+CELL_CULTURE_OR_SPECIMEN = Seek::Config.is_virtualliver ? 'specimen' : 'cell culture'
 

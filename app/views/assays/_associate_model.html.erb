@@ -1,19 +1,20 @@
 <%
-    all_models=authorised_models.sort{|a, b| a.title<=>b.title}
-    project_models=all_models.select{|s| current_user.person.member_of?(s.projects)}
+   resource_text ||= text_for_resource(resource)
+    project_models=authorised_models(current_user.person.projects).sort_by &:title
     select_truncate_length=120
     associated_models = resource.is_a?(Publication) ? resource.related_models : resource.models
 -%>
-<div  class="fold">
+
+<div class="fold">
   <div class="foldTitle">
-    <%= help_icon("Here you associate models in SEEK to this assay.") -%>
-    Associate Models
+    <%= help_icon("Here you associate Models in SEEK to this #{resource_text}.") -%>
+    Models
   </div>
 
   <div id="associate_model_fold_content" class="foldContent" style="display:<%= associated_models.blank? ? 'none' : 'block' -%>">
     <div class="yui-u first" style="width:66%; float:left">
       <p style="color: #666666;">
-        The following model is involved in this <%= @assay_text -%>:
+        The following Models are involved in this <%= resource_text -%>:
       </p>
       <div id="model_to_list" class="box_editing_inner" style="line-height: 1.5;">
         <span class="none_text" id="models">Loading...</span>
@@ -34,10 +35,9 @@
 
           <br/>
 
-          <%= check_box_tag :include_other_project_models, nil, false, {:onchange=>"toggle_model_list();",:style=>"margin-top:0.5em;"} -%> Include Models from other projects?
         </div>
 		<br/>
-        <%= link_to_function (image("new") + " Include in the assay"), "addSelectedModel(); return(false);", :id=>"add_model_link", :class=>"block_link", :style => "width: 11em" %>
+        <%= link_to_function (image("new") + " Associate with this #{resource_text}"), "addSelectedModel(); return(false);", :id=>"add_model_link", :class=>"block_link" %>
       </div>
     </div>
     <%= render :partial => 'assets/preview_box', :locals => {:preview_name => 'model'} %>
@@ -45,44 +45,8 @@
 </div>
 
 <script type="text/javascript">
-  function toggle_model_list() {
-    var checked = $('include_other_project_models').checked;
-    var option;
-    var selection_box = $('possible_models');
 
-    selection_box.options.length=0;
-
-    if (checked) {
-<% ([["Select Model ...",0]]|all_models.collect{|s| [truncate(h(s.title),:length=>select_truncate_length),s.id]}).each do |model_details| -%>
-        option = document.createElement("OPTION");
-        option.text = '<%= escape_javascript(model_details[0]) -%>';
-        option.value = '<%= model_details[1] -%>';
-        try {
-          selection_box.add(option); //for older IE version
-        }
-        catch (ex) {
-          selection_box.add(option, null);
-        }
-<% end -%>
-    }
-    else {
-<% ([["Select Model ...",0]]|project_models.collect{|s| [truncate(h(s.title),:length=>select_truncate_length),s.id]}).each do |model_details| -%>
-        option = document.createElement("OPTION");
-        option.text = '<%= escape_javascript(model_details[0]) -%>';
-        option.value = '<%= model_details[1] -%>';
-        try {
-          selection_box.add(option); //for older IE version
-        }
-        catch (ex) {
-          selection_box.add(option, null);
-        }
-<% end -%>
-    }
-
-    selection_box.onchange();
-  }
-  
-<% @assay.model_masters.each do |s| -%>    
+<% @assay.model_masters.each do |s| -%>
   <% if s.can_view? -%>
       model_id = '<%= s.id -%>';
       model_title = '<%= escape_javascript(s.title) -%>';

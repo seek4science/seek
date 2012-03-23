@@ -3,7 +3,6 @@ require 'test_helper'
 
 class ChangeProjectToProjectsTest < ActionController::IntegrationTest
   ASSETS_WITH_MULTIPLE_PROJECTS = %w[data_files events investigations models publications sops samples specimens presentations]
-
   def setup
     User.current_user = Factory(:user, :login => 'test')
     post '/sessions/create', :login => 'test', :password => 'blah'
@@ -30,9 +29,12 @@ class ChangeProjectToProjectsTest < ActionController::IntegrationTest
     #publications are skipped, because they don't have a sharing form
     ASSETS_WITH_MULTIPLE_PROJECTS.reject { |t| t=='publications' }.each do |type_name|
       item = Factory(type_name.singularize.to_sym, :contributor => User.current_user)
-      item.projects = [Factory(:project), Factory(:project)]
 
-      post "/#{type_name}/update/#{item.id}", :sharing=>{"access_type_#{Policy::ALL_SYSMO_USERS}"=>Policy::VISIBLE, :sharing_scope=>Policy::ALL_SYSMO_USERS, :your_proj_access_type => Policy::ACCESSIBLE}
+      item.projects = [Factory(:project), Factory(:project)]
+      disable_authorization_checks do
+        post "/#{type_name}/update/#{item.id}",
+           :sharing=>{"access_type_#{Policy::ALL_SYSMO_USERS}"=>Policy::VISIBLE, :sharing_scope=>Policy::ALL_SYSMO_USERS, :your_proj_access_type => Policy::ACCESSIBLE}
+      end
       item.reload
       assert_equal 2, item.policy.permissions.count
     end

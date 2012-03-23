@@ -117,12 +117,12 @@ class JwsFunctionalTest < ActionController::TestCase
       assert_select "object[type='image/svg+xml']",:count=>1
     end
 
-    test "simulate model" do
+    def test_simulate_model
       m=models(:teusink)
       m.content_blob.dump_data_to_file
       post :simulate, :id=>m, :version=>m.version
       assert_response :success
-      assert_select "object[type='application/x-java-applet']", :count=>1
+      assert_select "iframe",:count=>1
     end
 
     test "changing model with jws builder" do
@@ -145,7 +145,7 @@ class JwsFunctionalTest < ActionController::TestCase
 
       post :submit_to_jws,params
       assert_response :success
-      assert_select "object[type='application/x-java-applet']", :count=>1
+      assert_select "iframe",:count=>1
     end
 
     test "annotate" do

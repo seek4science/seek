@@ -28,9 +28,6 @@ module ModelsHelper
     model.recommended_environment ? h(model.recommended_environment.title) : "<span class='none_text'>Unknown</span>" 
   end
 
-  def model_jws_online_compatible? model
-    !model.recommended_environment.nil? && model.recommended_environment.title.downcase=="jws online"
-  end
 
   def execute_model_label
     icon_filename=icon_filename_for_key("execute")
@@ -48,18 +45,12 @@ module ModelsHelper
     h(model_format.title)
   end
   
-  def authorised_models
-    models=Model.find(:all)
-    Authorization.authorize_collection("view",models,current_user)
-  end  
+  def authorised_models projects=nil
+    authorised_assets(Model,projects)
+  end
 
   def cytoscapeweb_supported? model
-      builder = Seek::JWS::OneStop.new
-      builder.is_xgmml? model
-  end
-  def jws_supported? model
-    builder = Seek::JWS::OneStop.new
-    builder.is_supported? model
+      model.is_xgmml?
   end
 
   def jws_annotator_hidden_fields params_hash

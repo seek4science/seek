@@ -1,0 +1,97 @@
+<%= stylesheet_link_tag 'styles.css' -%>
+<div  id="strain_form">
+       <% parent_strain = strain.title %>
+       <p class="none_text" style="margin-left: 15em;">
+       <%= parent_strain.blank? ? '' : "You will create this new strain based on #{parent_strain}"%>
+       </p>
+
+  <div class="yui-g">
+    <center>
+      <div class="yui-u first" style="width: 42%; margin-left: 2em; margin-top: 1em; margin-bottom: 1em;">
+        <p style="margin-bottom: 1.5em">
+          <label style="float: left;"> Name:</label><span class="required">*</span>
+          <%= text_field_tag "strain[title]", strain.title, :style => 'float:right' %>
+        </p>
+
+        <p style="margin-bottom: 1.5em">
+          <label style="float: left;">Provider's strain ID:</label>
+          <%= text_field_tag "strain[provider_id]", strain.provider_id, :style => 'float:right' %>
+        </p>
+
+        <p style="margin-bottom: 1.5em">
+          <label style="float: left;"> Provider Name:</label>
+          <%= text_field_tag "strain[provider_name]", strain.provider_name, :style => 'float:right' %>
+        </p>
+
+      </div>
+    </center>
+
+    <center>
+      <div class="yui-u" style="width: 42%;margin-right: 2em; margin-top: 1em; margin-bottom: 1em;">
+
+        <p style="margin-bottom: 1.5em">
+          <label style="float: left;"> Synonym:</label>
+          <%= text_field_tag "strain[synonym]", strain.synonym, :style => 'float:right' %>
+        </p>
+
+        <p style="margin-bottom: 1.5em">
+          <label style="float: left;"> Comment:</label>
+          <%= text_area_tag "strain[comment]", strain.comment, :style => 'float:right', :cols => 18 %>
+        </p>
+
+      </div>
+    </center>
+  </div>
+
+  <div class="yui-g">
+    <center>
+      <div class="yui-u first  box_simple" style="width: 42%; margin-left: 2em; margin-top: 1em; margin-bottom: 1em;">
+        <label style="font-weight: bold; border-bottom: 1px solid #DDD"> Genotypes:</label>
+        <table id='genotype_table'>
+          <tr>
+            <th>Gene affected</th>
+            <th>Kind of mutation</th>
+          </tr>
+
+          <% i=1
+             strain.genotypes.each do |genotype| %>
+              <tr id='genotype_row_<%=i%>'>
+                <td> <%= text_field_tag "genotypes[#{i}][gene][title]", genotype.gene.try(:title), :size => 10 %>
+                </td>
+                <td><%= text_field_tag "genotypes[#{i}][modification][title]", genotype.modification.try(:title), :size => 10 %>
+                </td>
+                <td> <%= link_to_function image("destroy", :alt=>"Delete", :title=>"Delete this entry", :id=> "delete_genotype_#{i}"), "fadeGenotypeRow('#{i}')"-%>
+                </td>
+              </tr>
+              <% i += 1 %>
+             <% end %>
+
+        </table>
+        <img src='/images/famfamfam_silk/add.png' alt="Add more" title="Add more gene and mutation" onclick="addGenotypeRow('genotype_table')"/>
+      </div>
+    </center>
+
+    <center>
+      <div class="yui-u  box_simple" style="width: 42%;margin-right: 2em; margin-top: 1em; margin-bottom: 1em;">
+         <label style="font-weight: bold; border-bottom: 1px solid #DDD"> Phenotypes:</label>
+        <table id='phenotype_table'>
+          <% j=0
+             strain.phenotypes.each do |phenotype| %>
+              <tr id='phenotype_row_<%=j%>'>
+                <td> <%= text_field_tag "phenotypes[#{j}][description]", phenotype.description, :size => 25 %>
+                </td>
+                <td> <%= link_to_function image("destroy", :alt=>"Delete", :title=>"Delete this entry", :id=> "delete_phenotype_#{j}"), "fadePhenotypeRow('#{j}')"-%>
+                </td>
+              </tr>
+              <% j += 1 %>
+             <% end %>
+        </table>
+        <img src='/images/famfamfam_silk/add.png' alt="Add more" title="Add more phenotype" onclick="addPhenotypeRow('phenotype_table')"/>
+      </div>
+    </center>
+  </div>
+    <%= hidden_field_tag 'strain[id]', strain.id %>
+    <%= hidden_field_tag 'strain[parent_id]', strain.id %>
+</div>
+
+

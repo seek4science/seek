@@ -57,7 +57,9 @@ class Project < ActiveRecord::Base
 
   has_and_belongs_to_many :organisms  
   
-  acts_as_solr(:fields => [ :name , :description, :locations],:include=>[:organisms]) if Seek::Config.solr_enabled
+  searchable do
+    text :name , :description, :locations
+  end if Seek::Config.solr_enabled
 
   attr_accessor :site_username,:site_password
 
@@ -75,17 +77,34 @@ class Project < ActiveRecord::Base
     end
   end
 
+  #this is the intersection of project role and seek role
   def pals
-    pal_role=Role.pal_role
+    pal_role=ProjectRole.pal_role
     people.select{|p| p.is_pal?}.select do |possible_pal|
-      possible_pal.project_roles(self).include?(pal_role)
+      possible_pal.project_roles.include?(pal_role)
     end
   end
 
+  #this is project role
   def pis
-    pi_role = Role.find_by_name('PI')
-    people.select{|p| p.roles.include?(pi_role)}
-    end
+    pi_role = ProjectRole.find_by_name('PI')
+    people.select{|p| p.project_roles.include?(pi_role)}
+  end
+
+  #this is seek role
+  def asset_managers
+    people.select(&:is_asset_manager?)
+  end
+
+  #this is seek role
+  def project_managers
+    people.select(&:is_project_manager?)
+  end
+
+  #this is seek role
+  def publishers
+    people.select(&:is_publisher?)
+  end
 
   def locations
     # infer all project's locations from the institutions where the person is member of
@@ -154,11 +173,15 @@ class Project < ActiveRecord::Base
     #Get intersection of all project memberships + person's memberships to find project membership
     project_memberships = work_groups.collect{|w| w.group_memberships}.flatten
     person_project_membership = person.group_memberships & project_memberships
-    return person_project_membership.roles
+    return person_project_membership.project_roles
   end
 
   def can_be_edited_by?(subject)
     subject == nil ? false : (subject.is_admin? || (self.people.include?(subject.person) && (subject.can_edit_projects? || subject.is_project_manager?)))
+  end
+
+  def can_be_administered_by?(subject)
+    subject == nil ? false : (subject.is_admin? || (self.people.include?(subject.person) && (subject.is_project_manager?)))
   end
 
 end

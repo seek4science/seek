@@ -1,8 +1,7 @@
 module SopsHelper
 
-  def authorised_sops
-    sops = Sop.all
-    Authorization.authorize_collection("view",sops,current_user)
+  def authorised_sops projects=nil
+    authorised_assets(Sop,projects)
   end    
 
 end

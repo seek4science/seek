@@ -10,7 +10,6 @@ class AssaysControllerTest < ActionController::TestCase
   def setup
     login_as(:quentin)
     @object=Factory(:experimental_assay, :policy => Factory(:public_policy))
-    Seek::Config.is_virtualliver=true
   end
 
 
@@ -25,6 +24,26 @@ class AssaysControllerTest < ActionController::TestCase
 
     validate_xml_against_schema(@response.body)
 
+  end
+
+  test "check SOP and DataFile drop down contents" do
+    user = Factory :user
+    project=user.person.projects.first
+    login_as user
+    sop = Factory :sop, :contributor=>user.person,:projects=>[project]
+    data_file = Factory :data_file, :contributor=>user.person,:projects=>[project]
+    get :new, :class=>"experimental"
+    assert_response :success
+
+    assert_select "select#possible_data_files" do
+      assert_select "option[value=?]",data_file.id,:text=>/#{data_file.title}/
+      assert_select "option",:text=>/#{sop.title}/,:count=>0
+    end
+
+    assert_select "select#possible_sops" do
+      assert_select "option[value=?]",sop.id,:text=>/#{sop.title}/
+      assert_select "option",:text=>/#{data_file.title}/,:count=>0
+    end
   end
 
   test "index includes modelling validates with schema" do
@@ -240,9 +259,10 @@ class AssaysControllerTest < ActionController::TestCase
     assert_equal s, assigns(:assay).study
   end
 
-test "should not create experimental assay without sample" do
-    assert_no_difference('ActivityLog.count') do
-      assert_no_difference("Assay.count") do
+test "should create experimental assay with or without sample" do
+    #THIS TEST MAY BECOME INVALID ONCE IT IS DECIDED HOW ASSAYS LINK TO SAMPLES OR ORGANISMS
+    assert_difference('ActivityLog.count') do
+      assert_difference("Assay.count") do
         post :create, :assay=>{:title=>"test",
                                :technology_type_id=>technology_types(:gas_chromatography).id,
                                :assay_type_id=>assay_types(:metabolomics).id,
@@ -251,8 +271,11 @@ test "should not create experimental assay without sample" do
                                :owner => Factory(:person)}
       end
     end
+    a=assigns(:assay)
+    assert a.samples.empty?
 
-    #create assay only with samples
+
+    sample = Factory(:sample)
     assert_difference('ActivityLog.count') do
       assert_difference("Assay.count") do
         post :create, :assay=>{:title=>"test",
@@ -261,13 +284,14 @@ test "should not create experimental assay without sample" do
                                :study_id=>studies(:metabolomics_study).id,
                                :assay_class=>assay_classes(:experimental_assay_class),
                                :owner => Factory(:person),
-                               :sample_ids=>[Factory(:sample).id]
+                               :sample_ids=>[sample.id]
         }
 
       end
     end
     a=assigns(:assay)
     assert_redirected_to assay_path(a)
+    assert_equal [sample],a.samples
     #assert_equal organisms(:yeast),a.organism
 end
 
@@ -389,6 +413,17 @@ end
     assert_redirected_to assays_path
   end
 
+  test "should show edit when not logged in" do
+    logout
+    a = Factory :experimental_assay,:contributor=>Factory(:person),:policy=>Factory(:editing_public_policy)
+    get :edit,:id=>a
+    assert_response :success
+
+    a = Factory :modelling_assay,:contributor=>Factory(:person),:policy=>Factory(:editing_public_policy)
+    get :edit,:id=>a
+    assert_response :success
+  end
+
   test "should not edit assay when not project pal" do
     a = assays(:assay_with_just_a_study)
     login_as(:datafile_owner)
@@ -466,7 +501,7 @@ end
     assert_select "a", :text=>/A modelling analysis/i, :count=>1
   end
 
-  test "get new with class doesn't present options for class" do
+  test "get new with class doesnt present options for class" do
     login_as(:model_owner)
     get :new, :class=>"experimental"
     assert_response :success

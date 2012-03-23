@@ -6,10 +6,6 @@ class HomeControllerTest < ActionController::TestCase
   include AuthenticatedTestHelper
   include HomeHelper
 
-  def setup
-    WebMock.allow_net_connect!
-  end
-
   test "test should be accessible to seek even if not logged in" do
     get :index
     assert_response :success
@@ -139,15 +135,43 @@ class HomeControllerTest < ActionController::TestCase
     assert_select "div[class='yui-u home_panel'][style='display:none']", :count => 1
   end
 
+  test "feed reader should handle feed title as subtitle" do
+    xml = %!<?xml version="1.0" encoding="UTF-8"?>
+      <feed xmlns="http://www.w3.org/2005/Atom" xml:lang="en"><link rel="alternate" type="text/html" href="http://www.sysmo-db.org/news_feed.xml" /><atom10:link xmlns:atom10="http://www.w3.org/2005/Atom" rel="self" type="application/atom+xml" href="http://feeds.feedburner.com/sysmo-db/ALIS" /><subtitle type="html">Latest news</subtitle><updated>1970-01-01T00:00:00+00:00</updated><atom10:link xmlns:atom10="http://www.w3.org/2005/Atom" rel="self" type="application/rss+xml" href="http://feeds.feedburner.com/sysmo-db/ALIS" /><feedburner:info xmlns:feedburner="http://rssnamespace.org/feedburner/ext/1.0" uri="sysmo-db/alis" /><atom10:link xmlns:atom10="http://www.w3.org/2005/Atom" rel="hub" href="http://pubsubhubbub.appspot.com/" /><entry><title type="text">Semi-Bad News</title><link rel="alternate" type="text/html" href="http://www.sysmo-db.org/node/50" /><author><name>sowen</name></author><updated>2011-10-21T11:36:33-07:00</updated><id>50 at http://www.sysmo-db.org</id><content type="html">&lt;p&gt;There is a 30 minute maximum delay before feedburner updates.&lt;br /&gt;
+      But we can live with that, and its possible to ping it if we need it to update sooner.&lt;/p&gt;</content></entry><entry><title type="text">Good News</title><link rel="alternate" type="text/html" href="http://www.sysmo-db.org/node/49" /><author><name>sowen</name></author><updated>2011-10-21T11:30:44-07:00</updated><id>49 at http://www.sysmo-db.org</id><content type="html">&lt;p&gt;Sysmo-DB news feed now working correctly and working in SEEK&lt;/p&gt;</content></entry><entry><title type="text">Some more news</title><link rel="alternate" type="text/html" href="http://www.sysmo-db.org/node/47" /><author><name>sowen</name></author><updated>2011-10-21T08:45:08-07:00</updated><id>47 at http://www.sysmo-db.org</id><content type="html">&lt;p&gt;This is some more exiting news.&lt;/p&gt;</content></entry><entry><title type="text">Some news</title><link rel="alternate" type="text/html" href="http://www.sysmo-db.org/node/46" /><author><name>sowen</name></author><updated>2011-10-21T08:44:42-07:00</updated><id>46 at http://www.sysmo-db.org</id><content type="html">&lt;p&gt;Here is some news&lt;/p&gt;</content></entry></feed>!
+
+    stub_request(:get,"http://feed.rss").to_return(:status=>200,:body=>xml)
+    Seek::Config.project_news_enabled=true
+    Seek::Config.project_news_feed_urls = "http://feed.rss"
+    Seek::Config.project_news_number_of_entries = "5"
+
+    get :index
+
+    assert_response :success
+
+    assert_select "li.homepanel_item" do
+      assert_select "div.feedinfo",:text=>/Latest news/,:count=>4
+    end
+  end
+
+  test "should handle index html" do
+    assert_routing("/",{:controller=>"home",:action=>"index"})
+    assert_recognizes({:controller=>"home",:action=>"index"},"/index.html")
+    assert_recognizes({:controller=>"home",:action=>"index"},"/index")
+  end
+
   test "should show the content of project news and community news with the configurable number of entries" do
+    sbml = mock_response_contents "http://sbml.atom.feed","sbml_atom.xml"
+    bbc = mock_response_contents "http://bbc.atom.feed","bbc_atom.xml"
+    guardian = mock_response_contents "http://guardian.atom.feed","guardian_atom.xml"
     #project news
     Seek::Config.project_news_enabled=true
-    Seek::Config.project_news_feed_urls = "http://www.google.com/reader/public/atom/user%2F02837181562898136579%2Fbundle%2Fsystembiology, http://www.google.com/reader/public/atom/user%2F03588343170344705149%2Fbundle%2FSBML"
+    Seek::Config.project_news_feed_urls = "#{bbc}, #{sbml}"
     Seek::Config.project_news_number_of_entries = "5"
 
     #community news
     Seek::Config.community_news_enabled=true
-    Seek::Config.community_news_feed_urls = "http://www.google.com/reader/public/atom/user%2F03588343170344705149%2Fbundle%2FSBML"
+    Seek::Config.community_news_feed_urls = "#{guardian}"
     Seek::Config.community_news_number_of_entries = "7"
 
     login_as(:aaron)
@@ -201,6 +225,31 @@ class HomeControllerTest < ActionController::TestCase
 
     assert_select 'div#recently_added ul>li', recently_added_item_logs.count
     assert_select 'div#recently_downloaded ul>li', recently_downloaded_item_logs.count
+  end
+
+  test "recently added should include data_file" do
+    login_as(:aaron)
+
+    df = Factory :data_file, :title=>"A new data file", :contributor=>User.current_user.person
+    assert_difference "ActivityLog.count" do
+      log = Factory :activity_log, :activity_loggable=>df, :controller_name=>"data_files", :culprit=>User.current_user
+    end
+
+
+    get :index
+    assert_response :success
+    assert_select "div#recently_added ul>li>a[href=?]",data_file_path(df),:text=>/A new data file/
+  end
+
+  test "recently added should include presentations" do
+    login_as(:aaron)
+
+    presentation = Factory :presentation, :title=>"A new presentation", :contributor=>User.current_user.person
+    log = Factory :activity_log, :activity_loggable=>presentation, :controller_name=>"presentations", :culprit=>User.current_user
+
+    get :index
+    assert_response :success
+    assert_select "div#recently_added ul>li>a[href=?]",presentation_path(presentation),:text=>/A new presentation/
   end
 
   test "should show headline announcement" do

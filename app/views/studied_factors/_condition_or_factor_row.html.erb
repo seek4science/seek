@@ -35,7 +35,7 @@
     <li id="values">
       <!--don't show dimensionless unit-->
       <%= object.range_text.blank? ? '': (h "#{object.range_text}" + (object.unit.symbol == 'dimensionless' ? '' : "#{object.unit.symbol}"))  %>
-    </li>       
+    </li>
     <% if asset == 'data_file' %>
       <li id="standard_deviation">
         <%= h object.standard_deviation %>
