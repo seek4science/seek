@@ -34,8 +34,8 @@
           <%= select_tag "sample[organism_part]", options_for_select(['whole cell', 'membrane fraction'].insert(0,'Not specified')), :style => 'float:right;margin-right:30em' %>
         </p>
 
-        <%= render :partial => 'projects/project_selector', :locals => {:resource => Sample.new()}%>
+        <%= render :partial => 'projects/project_selector', :locals => {:resource => sample}%>
         <br/>
-        <%= render :partial => "assets/sharing_form", :locals => {:object => Sample.new(), :disable_advanced_view => true} -%>
+        <%= render :partial => "assets/sharing_form", :locals => {:object => sample, :disable_advanced_view => true} -%>
 
 
