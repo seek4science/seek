@@ -87,8 +87,12 @@ module Acts
         if Seek::Config.auth_caching_enabled
           eval <<-END_EVAL
           def can_#{action}? user = User.current_user
-                key = cache_keys(user, "#{action}")
-                new_record? || Rails.cache.fetch(key) {perform_auth(user,"#{action}") ? :true : :false} == :true
+            if self.new_record?
+              return true
+            else
+              key = cache_keys(user, "#{action}")
+              Rails.cache.fetch(key) {perform_auth(user,"#{action}") ? :true : :false} == :true
+            end
           end
           END_EVAL
         else
