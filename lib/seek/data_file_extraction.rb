@@ -71,10 +71,11 @@ module Seek
       blacklist = ["seek id"] #not yet defined, and should probably be regular expressions
       content = content - blacklist
 
-      #filter out numbers
+      #filter out numbers and blank strings
       content.reject do |val|
-        val.to_s.match(/\A[+-]?\d+?(\.\d+)?\Z/) != nil
+        val.strip.empty? || val.to_s.match(/\A[+-]?\d+?(\.\d+)?\Z/) != nil
       end
+
     end
 
   end

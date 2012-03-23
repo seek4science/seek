@@ -227,8 +227,15 @@ class DataFile < ActiveRecord::Base
 
     if Seek::Config.solr_enabled && is_extractable_spreadsheet?
       search_terms = spreadsheet_annotation_search_fields | spreadsheet_contents_for_search
-      search_terms.uniq!
-      search_terms = search_terms.select{|t| !t.strip.empty?}
+      #make the array uniq! case-insensistive whilst mainting the original case
+      dc = []
+      search_terms = search_terms.inject([]) do |r,v|
+        unless dc.include?(v.downcase)
+          r << v
+          dc << v.downcase
+        end
+        r
+      end
       search_terms.each do |key|
         Model.search do |query|
           query.keywords key, :fields=>[:model_contents, :description]
