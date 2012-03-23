@@ -526,8 +526,8 @@ class ModelsController < ApplicationController
     matching_files = @model.matching_data_files
 
     render :update do |page|
-      page.visual_effect :fade,"matching_data_files"
-      page.visual_effect :appear,'matching_results'
+      page.visual_effect :toggle_blind,"matching_data_files"
+      page.visual_effect :toggle_blind,'matching_results'
       html = ""
       matching_files.each do |match|
         data_file = DataFile.find(match.primary_key)

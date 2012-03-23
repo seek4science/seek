@@ -29,6 +29,17 @@
       </span>
       </li>
   <% end %>
+
+  <% if @display_model.is_jws_supported? %>
+      <li>
+        <span class='icon'>
+        <%= link_to_remote image("search")+" Find related data files",
+                         :url=>url_for(:controller=>"models",:action=>"matching_data_files",:id=>@model,:version=>@display_model.version),
+                         :before=>"$('matching_data_files').show();show_large_ajax_loader('matching_data_files');"
+        -%>
+        </span>
+      </li>
+  <% end -%>
 </ul>
 
 <%= render :partial=>"assets/upload_new_version_form", :locals=>{:resource=>@model} -%>
@@ -36,7 +47,12 @@
 <%= render :partial => "layouts/usage_info", :locals => { :resource => @model } -%>
 
 <div class="show_basic">
+
+    <div id="matching_data_files" style="display:none;text-align:center";></div>
+    <div id="matching_results" style="display:none;height:55em;overflow-y: scroll;"></div>
+
     <div class="main_content_left_box_narrower">
+
         <%= render :partial=>"assets/resource_version_details", :locals=>{:displayed_resource=>@display_model, :resource=>@model} -%>
         <div class="box_about_actor">
             <p>
@@ -99,17 +115,4 @@
     </div>
 </div>
 
-<% if @display_model.is_jws_supported? %>
-        <center>
-        <%= link_to_remote "Discover data that may be related to this model",
-                         :url=>url_for(:controller=>"models",:action=>"matching_data_files",:id=>@model,:version=>@display_model.version),
-                         :before=>"$('matching_data_files').show();show_ajax_loader('matching_data_files');"
-        -%>
-        </center>
-        <div id="matching_data_files" style="display:none;">
 
-        </div>
-        <div id="matching_results" style="display:none;height:55em;overflow-y: scroll;">
-
-        </div>
-<% end -%>
