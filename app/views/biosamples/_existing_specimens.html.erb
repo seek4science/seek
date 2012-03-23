@@ -62,8 +62,8 @@
                   <%
                      strain = specimen.strain
                      strain_info = 'Strain ' + strain.info + "(ID=#{strain.id})"
-                     creators = specimen.creators.collect(&:name).join(', ')
-                     creators << (', ' + specimen.other_creators) unless specimen.other_creators.blank?
+                     creators = specimen.creators.collect(&:name)
+                     creators << specimen.other_creators unless specimen.other_creators.blank?
                   %>
 
                   <tr>
@@ -72,7 +72,7 @@
                     <td><%= specimen.title -%></td>
                     <td><%= specimen.born_info -%></td>
                     <td><%= specimen.culture_growth_type.try(:title) -%></td>
-                    <td><%= creators-%></td>
+                    <td><%= creators.join(', ')-%></td>
                     <td><%= specimen.id %></td>
                     <td><%= asset_version_links(specimen.sops).join(", ") -%></td>
                   </tr>
