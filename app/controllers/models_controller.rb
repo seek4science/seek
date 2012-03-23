@@ -526,14 +526,14 @@ class ModelsController < ApplicationController
     matching_files = @model.matching_data_files
 
     render :update do |page|
-      page.visual_effect :fade,"matching_data_files"
-      page.visual_effect :appear,'matching_results'
+      page.visual_effect :toggle_blind,"matching_data_files"
+      page.visual_effect :toggle_blind,'matching_results'
       html = ""
       matching_files.each do |match|
         data_file = DataFile.find(match.primary_key)
         if (data_file.can_view?)
           html << "<div>"
-          html << "<div style='padding-top:0.5em;padding-bottom:0.2em;'>Matched with #{match.search_terms.join(', ')} - [#{match.score}]</div>"
+          html << "<div class='matchmake_result'>Matched with <b>#{match.search_terms.join(', ')}</b></div>"
           html << render(:partial=>"layouts/resource_list_item", :object=>data_file)
           html << "</div>"
         end

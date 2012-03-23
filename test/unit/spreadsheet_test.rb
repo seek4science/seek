@@ -8,7 +8,8 @@ class SpreadsheetTest < ActiveSupport::TestCase
 
   test "spreadsheets are spreadsheets" do
     datafile = data_files(:downloadable_data_file)
-    assert datafile.is_spreadsheet?
+    assert datafile.is_excel?
+    assert datafile.is_extractable_spreadsheet?
   end
 
   test "spreadsheet is properly parsed" do

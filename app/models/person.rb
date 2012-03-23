@@ -379,6 +379,15 @@ class Person < ActiveRecord::Base
     end
   end
 
+  def generate_person_key
+    keys = [self.cache_key]
+    #group_memberships + favourite_group_memberships
+    keys |= group_memberships.sort_by(&:id).collect(&:cache_key)
+    keys |= favourite_group_memberships.sort_by(&:id).collect(&:cache_key)
+
+    keys
+  end
+
   private
 
   #a before_save trigger, that checks if the person is the first one created, and if so defines it as admin

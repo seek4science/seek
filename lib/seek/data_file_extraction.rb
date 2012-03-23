@@ -8,7 +8,7 @@ module Seek
     #returns an instance of Seek::Treatment, populated according to the contents of the spreadsheet if it matches a known template
     def treatments
       begin
-        if is_spreadsheet?
+        if is_extractable_spreadsheet?
           Seek::Treatments.new spreadsheet_xml
         else
           Seek::Treatments.new
@@ -21,7 +21,7 @@ module Seek
 
     #returns an array of all cell content within the workbook.
     def spreadsheet_contents_for_search obj=self
-      if obj.content_blob.file_exists?
+      if obj.is_extractable_spreadsheet? && obj.content_blob.file_exists?
         content = Rails.cache.fetch("#{obj.content_blob.cache_key}-ss-content-for-search") do
           begin
             xml=obj.spreadsheet_xml
@@ -71,10 +71,11 @@ module Seek
       blacklist = ["seek id"] #not yet defined, and should probably be regular expressions
       content = content - blacklist
 
-      #filter out numbers
+      #filter out numbers and blank strings
       content.reject do |val|
-        val.to_s.match(/\A[+-]?\d+?(\.\d+)?\Z/) != nil
+        val.strip.empty? || val.to_s.match(/\A[+-]?\d+?(\.\d+)?\Z/) != nil
       end
+
     end
 
   end

@@ -28,6 +28,15 @@ class ContentBlob < ActiveRecord::Base
   def spreadsheet_annotations
     worksheets.collect {|w| w.cell_ranges.collect {|c| c.annotations}}.flatten
   end
+
+  #returns the size of the file in bytes, or nil if the file doesn't exist
+  def filesize
+    if file_exists?
+      File.size(filepath)
+    else
+      nil
+    end
+  end
   
   def md5sum
     if super.nil?

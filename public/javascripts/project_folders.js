@@ -48,7 +48,7 @@ function element_id_for_folder_id(folder_id) {
 }
 
 function folder_clicked(folder_id, project_id) {
-    show_ajax_loader('folder_contents');
+    show_large_ajax_loader('folder_contents');
     var path = "/projects/" + project_id + "/folders/" + folder_id + "/display_contents";
     displayed_folder_id = folder_id;
     new Ajax.Request(path, {asynchronous:true, evalScripts:true});

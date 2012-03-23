@@ -150,13 +150,6 @@ class AdminController < ApplicationController
     update_redirect_to update_flag,'others'
   end
 
-  def finalize_config_changes
-    flash[:notice] = RESTART_MSG
-    #expires all fragment caching
-    expire_all_fragments
-    redirect_to :action=>:show
-  end
-
   def restart_server
     system ("touch #{RAILS_ROOT}/tmp/restart.txt")
     flash[:notice] = 'The server was restarted'

@@ -13,6 +13,8 @@ class Model < ActiveRecord::Base
   include Seek::ModelProcessing
   
   validates_presence_of :title
+
+  after_save :queue_asset_reindexing if Seek::Config.solr_enabled
   
   # allow same titles, but only if these belong to different users
   # validates_uniqueness_of :title, :scope => [ :contributor_id, :contributor_type ], :message => "error - you already have a Model with such title."
@@ -24,7 +26,7 @@ class Model < ActiveRecord::Base
   belongs_to :model_type
   belongs_to :model_format
   
-  searchable do
+  searchable(:auto_index=>false) do
     text :description,:title,:original_filename,:organism_name,:searchable_tags, :model_contents
   end if Seek::Config.solr_enabled
 
@@ -74,11 +76,6 @@ class Model < ActiveRecord::Base
     true
   end
 
-  #a simple container for handling the matching results returned from #matching_data_files
-  class ModelMatchResult < Struct.new(:search_terms,:score,:primary_key)
-
-  end
-
   def model_contents
     if content_blob.file_exists?
       species | parameters_and_values.keys
@@ -88,19 +85,33 @@ class Model < ActiveRecord::Base
     end
   end
 
-  #return a an array of ModelMatchResult where the data file id is the key, and the matching terms/values are the values
+  #a simple container for handling the matching results returned from #matching_data_files
+  class DataFileMatchResult < Struct.new(:search_terms,:score,:primary_key);end
+
+  #return a an array of DataFileMatchResult where the data file id is the key, and the matching terms/values are the values
   def matching_data_files
     
     results = {}
 
     if Seek::Config.solr_enabled && is_jws_supported?
-      search_terms = species | parameters_and_values.keys
-      puts search_terms
+      search_terms = species | parameters_and_values.keys | searchable_tags
+      #make the array uniq! case-insensistive whilst mainting the original case
+      dc = []
+      search_terms = search_terms.inject([]) do |r,v|
+        unless dc.include?(v.downcase)
+          r << v
+          dc << v.downcase
+        end
+        r
+      end
+      puts "###########################"
+      puts search_terms.join(", ")
+      puts "###########################"
       search_terms.each do |key|
         DataFile.search do |query|
-          query.keywords key, :fields=>[:fs_search_fields, :spreadsheet_contents_for_search,:spreadsheet_annotation_search_fields]
+          query.keywords key, :fields=>[:fs_search_fields, :spreadsheet_contents_for_search,:spreadsheet_annotation_search_fields, :searchable_tags]
         end.hits.each do |hit|
-          results[hit.primary_key]||=ModelMatchResult.new([],0,hit.primary_key)
+          results[hit.primary_key]||=DataFileMatchResult.new([],0,hit.primary_key)
           results[hit.primary_key].search_terms << key
           results[hit.primary_key].score += hit.score unless hit.score.nil?
         end

@@ -144,8 +144,13 @@ module Acts #:nodoc:
         project_assays
       end
 
-      # def asset; return self; end
-      # def resource; return self; end
+      def queue_asset_reindexing
+        unless (self.changed - ["updated_at", "last_used_at"]).empty?
+          Rails.logger.info("About to reindex #{self.class.name} #{self.id}")
+          ReindexingQueue.create :item=>self
+          Delayed::Job.enqueue(ReindexingJob.new, 0, 5.seconds.from_now) unless ReindexingJob.exists?
+        end
+      end
 
     end
   end

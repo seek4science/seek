@@ -330,7 +330,8 @@ class DataFileTest < ActiveSupport::TestCase
         data=File.new("#{Rails.root}/test/fixtures/files/treatments-normal-case.xls","rb").read
         df = Factory :data_file,:contributor=>user,:content_type=>"application/excel",:content_blob=>Factory(:content_blob,:data=>data)
         assert_not_nil df.spreadsheet_xml
-        assert df.is_spreadsheet?
+        assert df.is_excel?
+        assert df.is_extractable_spreadsheet?
         assert_not_nil df.treatments
         assert_equal 2,df.treatments.values.keys.count
         assert_equal ["Dilution_rate","pH"],df.treatments.values.keys.sort

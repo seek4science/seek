@@ -87,8 +87,12 @@ module Acts
         if Seek::Config.auth_caching_enabled
           eval <<-END_EVAL
           def can_#{action}? user = User.current_user
-                key = cache_keys(user, "#{action}")
-                new_record? || Rails.cache.fetch(key) {perform_auth(user,"#{action}") ? :true : :false} == :true
+            if self.new_record?
+              return true
+            else
+              key = cache_keys(user, "#{action}")
+              Rails.cache.fetch(key) {perform_auth(user,"#{action}") ? :true : :false} == :true
+            end
           end
           END_EVAL
         else
@@ -128,7 +132,11 @@ module Acts
       def cache_keys user, action
 
         #start off with the keys for the person
-        keys = generate_person_key(user.try(:person))
+        unless user.try(:person).nil?
+          keys = user.person.generate_person_key
+        else
+          keys = []
+        end
 
         #action
         keys << "can_#{action}?"
@@ -148,16 +156,6 @@ module Acts
         keys |= policy.permissions.sort_by(&:id).collect(&:cache_key)
 
         keys
-      end
-
-      def generate_person_key person
-        keys = [person.try(:cache_key)]
-        #group_memberships + favourite_group_memberships
-        unless person.nil?
-           keys |= person.group_memberships.sort_by(&:id).collect(&:cache_key)
-           keys |= person.favourite_group_memberships.sort_by(&:id).collect(&:cache_key)
-        end
-        keys        
       end
     end
   end
