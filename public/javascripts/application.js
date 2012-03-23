@@ -118,8 +118,9 @@ function toggleAuthorAvatarList(objectId){
     div = $('authorAvatarList'+objectId)
     link = $('authorAvatarListLink'+objectId)    
     if (div.style.display == "none") { //EXPAND
-      div.style.display = "";
-      link.innerHTML = '(Hide)';
+        link.innerHTML = "(Hide)";
+        div.style.display = "block";
+
     }
     else { //COLLAPSE
       div.style.display = "none";
