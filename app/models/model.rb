@@ -13,6 +13,8 @@ class Model < ActiveRecord::Base
   include Seek::ModelProcessing
   
   validates_presence_of :title
+
+  after_save :queue_asset_reindexing if Seek::Config.solr_enabled
   
   # allow same titles, but only if these belong to different users
   # validates_uniqueness_of :title, :scope => [ :contributor_id, :contributor_type ], :message => "error - you already have a Model with such title."
@@ -24,7 +26,7 @@ class Model < ActiveRecord::Base
   belongs_to :model_type
   belongs_to :model_format
   
-  searchable(:ignore_attribute_changes_of=>[:updated_at,:last_used_at]) do
+  searchable(:auto_index=>false) do
     text :description,:title,:original_filename,:organism_name,:searchable_tags, :model_contents
   end if Seek::Config.solr_enabled
 
