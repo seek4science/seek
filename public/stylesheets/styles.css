@@ -1680,4 +1680,8 @@ ul.modification_row li {
     min-height: 2em;
 }
 
+div.matchmake_result {
+    padding-top:0.25em;
+    padding-bottom:0.25em;
+}
 

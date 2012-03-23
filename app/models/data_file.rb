@@ -228,6 +228,7 @@ class DataFile < ActiveRecord::Base
     if Seek::Config.solr_enabled && is_extractable_spreadsheet?
       search_terms = spreadsheet_annotation_search_fields | spreadsheet_contents_for_search
       search_terms.uniq!
+      search_terms = search_terms.select{|t| !t.strip.empty?}
       search_terms.each do |key|
         Model.search do |query|
           query.keywords key, :fields=>[:model_contents, :description]

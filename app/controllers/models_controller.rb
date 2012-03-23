@@ -533,7 +533,7 @@ class ModelsController < ApplicationController
         data_file = DataFile.find(match.primary_key)
         if (data_file.can_view?)
           html << "<div>"
-          html << "<div style='padding-top:0.5em;padding-bottom:0.2em;'>Matched with #{match.search_terms.join(', ')} - [#{match.score}]</div>"
+          html << "<div class='matchmake_result'>Matched with <b>#{match.search_terms.join(', ')}</b></div>"
           html << render(:partial=>"layouts/resource_list_item", :object=>data_file)
           html << "</div>"
         end
