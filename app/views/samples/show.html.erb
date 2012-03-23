@@ -48,20 +48,26 @@
         <label>Organism part:</label>
         <%= text_or_not_specified @sample.organism_part -%>
       </p>
-
-      <h2><%= CELL_CULTURE_OR_SPECIMEN.capitalize -%> details</h2>
-
-      <%= render :partial=>"sample_specimen_details",:object=>@sample.specimen -%>
-
     </div>
 
   </div>
-  <%# Requires passing of sample.specimen rather than sample because it is this that holds the creators information -%>
-  <%= render :partial=>"assets/resource_main_content_right",:locals => { :resource => @sample.specimen } %>
+
+  <%= render :partial => "assets/resource_main_content_right", :locals => {:resource => @sample, :title => 'Owner'} %>
 
   <div style="clear:both">
+    <br/>
+    <h2><%= CELL_CULTURE_OR_SPECIMEN.capitalize -%> details</h2>
 
-    <%= render :partial=>"layouts/items_related_to", :object => @sample %>
+    <div class="main_content_left_box_narrower">
+      <%= render :partial => "sample_specimen_details", :object => @sample.specimen %>
+    </div>
+    <br/>
+    <%= render :partial => "assets/resource_main_content_right", :locals => {:resource => @sample.specimen, :title => 'Owner and creators'} %>
+  </div>
+
+  <div style="clear:both">
+    <br/>
+    <%= render :partial => "layouts/items_related_to", :object => @sample %>
   </div>
 
 </div>
