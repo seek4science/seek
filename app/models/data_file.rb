@@ -214,5 +214,32 @@ class DataFile < ActiveRecord::Base
     end
     flds.flatten.uniq
   end
+
+
+
+  #a simple container for handling the matching results returned from #matching_data_files
+  class ModelMatchResult < Struct.new(:search_terms,:score,:primary_key); end
+
+  #return a an array of ModelMatchResult where the model id is the key, and the matching terms/values are the values
+  def matching_models
+
+    results = {}
+
+    if Seek::Config.solr_enabled && is_extractable_spreadsheet?
+      search_terms = spreadsheet_annotation_search_fields | spreadsheet_contents_for_search
+      search_terms.uniq!
+      search_terms.each do |key|
+        Model.search do |query|
+          query.keywords key, :fields=>[:model_contents, :description]
+        end.hits.each do |hit|
+          results[hit.primary_key]||=ModelMatchResult.new([],0,hit.primary_key)
+          results[hit.primary_key].search_terms << key
+          results[hit.primary_key].score += hit.score unless hit.score.nil?
+        end
+      end
+    end
+
+    results.values.sort_by{|a| -a.score}
+  end
   
 end

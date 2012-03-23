@@ -15,7 +15,7 @@ class DataFilesController < ApplicationController
   
   before_filter :find_assets, :only => [ :index ]
   before_filter :find_and_auth, :except => [ :index, :new, :upload_for_tool, :create, :request_resource, :preview, :test_asset_url, :update_annotations_ajax]
-  before_filter :find_display_asset, :only=>[:show,:download,:explore]
+  before_filter :find_display_asset, :only=>[:show,:download,:explore,:matching_models]
 
   #has to come after the other filters
   include Seek::Publishing
@@ -339,12 +339,34 @@ end
         format.html { redirect_to data_file_path(@data_file,:version=>@display_data_file.version) }
       end
     end
-  end 
+  end
+
+  def matching_models
+    #FIXME: should use the correct version
+    matching_models = @data_file.matching_models
+
+    render :update do |page|
+      page.visual_effect :toggle_blind,"matching_models"
+      page.visual_effect :toggle_blind,'matching_results'
+      html = ""
+      matching_models.each do |match|
+        model = Model.find(match.primary_key)
+        if (model.can_view?)
+          html << "<div>"
+          html << "<div style='padding-top:0.5em;padding-bottom:0.2em;'>Matched with #{match.search_terms.join(', ')} - [#{match.score}]</div>"
+          html << render(:partial=>"layouts/resource_list_item", :object=>model)
+          html << "</div>"
+        end
+      end
+      page.replace_html "matching_results",:text=>html
+    end
+  end
   
   protected
 
   def translate_action action
     action="download" if action=="data"
+    action="view" if ["matching_models"].include?(action)
     super action
   end
 
