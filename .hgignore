@@ -34,8 +34,7 @@ solr/test/
 solr/data/
 
 public/help_images/*
-public/javascripts/js_cached.js
-public/stylesheets/css_cached.css
+public/javascripts/*_cached.js
 
 .bundle/config
 
