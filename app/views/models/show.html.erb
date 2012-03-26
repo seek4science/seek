@@ -30,6 +30,16 @@
       </li>
   <% end %>
 
+  <% if @display_model.is_jws_supported? %>
+      <li>
+        <span class='icon'>
+        <%= link_to_remote image("search")+" Find related data files",
+                         :url=>url_for(:controller=>"models",:action=>"matching_data_files",:id=>@model,:version=>@display_model.version),
+                         :before=>"$('matching_data_files').show();show_large_ajax_loader('matching_data_files');"
+        -%>
+        </span>
+      </li>
+  <% end -%>
 </ul>
 
 <%= render :partial=>"assets/upload_new_version_form", :locals=>{:resource=>@model} -%>
