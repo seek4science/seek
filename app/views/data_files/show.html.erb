@@ -4,17 +4,6 @@
 <ul class="sectionIcons">
 <%= asset_buttons @data_file,@display_data_file.version -%>
 
-<% if @display_data_file.is_extractable_spreadsheet? %>
-      <li>
-        <span class='icon'>
-        <%= link_to_remote image("search")+" Find related models",
-                         :url=>url_for(:controller=>"data_files",:action=>"matching_models",:id=>@data_file,:version=>@display_data_file.version),
-                         :before=>"$('matching_models').show();show_large_ajax_loader('matching_models');"
-        -%>
-        </span>
-      </li>
-  <% end -%>
-
 </ul>
 
 <%= render :partial=>"assets/upload_new_version_form", :locals=>{:resource=>@data_file} -%>
