@@ -5,9 +5,9 @@ resource_type = text_for_resource(resource)
 
 <% if Seek::Config.email_enabled && !resource.managers.empty? -%>
 
-    <span id="request_resource_button">
-    <%= link_to_function request_request_label(resource),"Effect.Appear('request_resource_form');Effect.Fade('request_resource_button');" -%>
-  </span>
+    <span id="request_resource_button" class="icon">
+        <%= link_to_function request_request_label(resource),"Effect.Appear('request_resource_form');Effect.Fade('request_resource_button');" -%>
+    </span>
     <center>
 
           <div id="request_resource_form" style="display:none;width:100%">
@@ -33,5 +33,7 @@ resource_type = text_for_resource(resource)
 
 
 <% else -%>
-    <%= link_to_function request_request_label(resource),"alert('Unable to send emails - email is disabled');" -%>
+    <span class="icon">
+        <%= link_to_function request_request_label(resource),"alert('Unable to send emails - email is disabled');" -%>
+    </span>
 <% end -%>
