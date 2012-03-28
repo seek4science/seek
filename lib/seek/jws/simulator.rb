@@ -3,7 +3,7 @@ module Seek
 
     class Simulator
 
-      NEW_UPLOAD_URL = "#{Seek::Config.jws_online_root}/webMathematica/model_upload_SEEK_xml.jsp"
+      UPLOAD_URL = "#{Seek::Config.jws_online_root}/webMathematica/model_upload_SEEK_xml.jsp"
 
 
       def simulate model
@@ -11,7 +11,7 @@ module Seek
           #this is necessary to get the correct filename and especially extension, which JWS relies on
         tmpfile = Tempfile.new(model.original_filename)
         FileUtils.cp(filepath, tmpfile.path)
-        response = RestClient.post(new_upload_url, :upfile=>tmpfile, :uploadModel=>true,:filename=>model.original_filename, :multipart=>true) { |response, request, result, &block |
+        response = RestClient.post(upload_url, :upfile=>tmpfile, :uploadModel=>true,:filename=>model.original_filename, :multipart=>true) { |response, request, result, &block |
         if [301, 302, 307].include? response.code
           response.follow_redirection(request, result, &block)
         else
@@ -23,8 +23,8 @@ module Seek
 
       private
 
-      def new_upload_url
-        return Seek::JWS::Simulator::NEW_UPLOAD_URL
+      def upload_url
+        return Seek::JWS::Simulator::UPLOAD_URL
       end
 
       def extract_modelname_from_response response
