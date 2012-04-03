@@ -233,10 +233,10 @@ function adjust_container_dimensions() {
     $j(".sheet").width(sheet_width);
     $j(".sheet_container").width(sheet_container_width);
 
-    var spreadsheet_container_height = $j("div.spreadsheet_container").height();
-    var sheet_height = spreadsheet_container_height - 20;
-    $j(".sheet").height(sheet_height);
-    $j(".sheet_container").height(spreadsheet_container_height);
+//    var spreadsheet_container_height = $j("div.spreadsheet_container").height();
+//    var sheet_height = spreadsheet_container_height - 20;
+//    $j(".sheet").height(sheet_height);
+//    $j(".sheet_container").height(spreadsheet_container_height);
 }
 
 //Convert a numeric column index to an alphabetic one

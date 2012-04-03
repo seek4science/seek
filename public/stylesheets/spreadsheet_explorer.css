@@ -85,6 +85,7 @@ a.selected_tab
 
 div.sheet {
   overflow: auto;
+  height: 500px;
   margin: 0px;
 }
 
@@ -93,13 +94,13 @@ div.spreadsheet_container
   border: 1px solid black;
   padding: 0px;
   width: 95%;
-  height: 600px;
   overflow:  hidden;
 }
 
 div.sheet_container
 {
   background-color: #DDD;
+  height: 520px;
   overflow:  hidden;
 }
 
