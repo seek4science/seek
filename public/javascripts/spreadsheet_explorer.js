@@ -23,6 +23,11 @@ function annotation(id, type, sheet_number, cell_range, content, date_created) {
 
 var $j = jQuery.noConflict(); //To prevent conflicts with prototype
 
+$j(window)
+      .resize(function(e) {
+        adjust_container_dimensions();
+});
+
 $j(document).ready(function ($) {
 
   //Auto scrolling
@@ -38,6 +43,7 @@ $j(document).ready(function ($) {
       startCol,
       endRow,
       endCol;
+
 
   //To disable text-selection
   //http://stackoverflow.com/questions/2700000/how-to-disable-text-selection-using-jquery
@@ -216,9 +222,22 @@ $j(document).ready(function ($) {
         select_cells(1,row,last_col,row);
       })
   ;
+
+  adjust_container_dimensions();
 });
 
+function adjust_container_dimensions() {
+    var spreadsheet_container_width = $j("div.spreadsheet_container").width();
+    var sheet_container_width = spreadsheet_container_width + 14;
+    var sheet_width = spreadsheet_container_width - 39;
+    $j(".sheet").width(sheet_width);
+    $j(".sheet_container").width(sheet_container_width);
 
+    var spreadsheet_container_height = $j("div.spreadsheet_container").height();
+    var sheet_height = spreadsheet_container_height - 20;
+    $j(".sheet").height(sheet_height);
+    $j(".sheet_container").height(spreadsheet_container_height);
+}
 
 //Convert a numeric column index to an alphabetic one
 function num2alpha(col) {

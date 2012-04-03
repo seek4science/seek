@@ -9,7 +9,7 @@
 
 <h1>Exploring Data File</h1>
 
-<div style="margin-left: auto; margin-right: auto; width: 1092px;">
+<div style="margin-left: auto; margin-right: auto; width: 98%;">
   <div id="spreadsheet_errors"></div>
   
   <input size="10" id="selection_data"></input>
@@ -32,7 +32,7 @@
   
   <%= render :partial => "spreadsheets/spreadsheet_styles", :locals => {:styles => @spreadsheet.styles} %>
   
-  <div class="spreadsheet_viewer">
+  <div class="spreadsheet_viewer" id="spreadsheet_outer_frame">
     <%= render :partial => "spreadsheets/annotation_form" %>
     <%= render :partial => "spreadsheets/export" %>
     <%= render :partial => "spreadsheets/plot" %>
