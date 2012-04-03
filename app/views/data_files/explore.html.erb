@@ -1,5 +1,5 @@
-<%= stylesheet_link_tag('finn_spreadsheet', 'jquery-ui-1.8.14.custom') %>
-<%= javascript_include_tag 'jquery-1.5.1.min.js','jquery-ui-1.8.14.custom.min.js', 'finn_spreadsheet.js' %>
+<%= stylesheet_link_tag('spreadsheet_explorer', 'jquery-ui-1.8.14.custom') %>
+<%= javascript_include_tag 'jquery-1.5.1.min.js','jquery-ui-1.8.14.custom.min.js', 'spreadsheet_explorer.js' %>
 
 <ul class="sectionIcons">
   <li>
@@ -9,7 +9,7 @@
 
 <h1>Exploring Data File</h1>
 
-<div style="margin-left: auto; margin-right: auto; width: 1092px;">
+<div style="margin-left: auto; margin-right: auto; width: 98%;">
   <div id="spreadsheet_errors"></div>
   
   <input size="10" id="selection_data"></input>
@@ -32,7 +32,7 @@
   
   <%= render :partial => "spreadsheets/spreadsheet_styles", :locals => {:styles => @spreadsheet.styles} %>
   
-  <div class="spreadsheet_viewer">
+  <div class="spreadsheet_viewer" id="spreadsheet_outer_frame">
     <%= render :partial => "spreadsheets/annotation_form" %>
     <%= render :partial => "spreadsheets/export" %>
     <%= render :partial => "spreadsheets/plot" %>
