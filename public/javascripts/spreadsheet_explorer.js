@@ -227,7 +227,16 @@ $j(document).ready(function ($) {
 });
 
 function adjust_container_dimensions() {
-    var spreadsheet_container_width = $j("div.spreadsheet_container").width();
+    var max_width = $j(".corner_heading").width();
+        $j(".col_heading:visible").each(function() {
+           max_width += $(this).offsetWidth;
+        });
+        var spreadsheet_container_width = $j("div.spreadsheet_container").width();
+        if (spreadsheet_container_width>max_width) {
+            $j(".spreadsheet_container").width(max_width);
+            spreadsheet_container_width=max_width;
+        }
+
     var sheet_container_width = spreadsheet_container_width + 14;
     var sheet_width = spreadsheet_container_width - 39;
     $j(".sheet").width(sheet_width);
