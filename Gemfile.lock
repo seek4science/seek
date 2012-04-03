@@ -95,6 +95,7 @@ DEPENDENCIES
   mysql
   rack-openid (= 1.1.0)
   rails (= 2.3.8)
+  rake (= 0.8.7)
   ratom (= 0.6.8)
   rest-client (>= 1.6.1)
   rmagick (= 2.12.2)
