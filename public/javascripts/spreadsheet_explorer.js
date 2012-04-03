@@ -543,6 +543,8 @@ function activateSheet(sheet, sheetTab) {
       startCol = 0,
       endRow = 0,
       endCol = 0;
+
+  adjust_container_dimensions();
   return false;
 }
 
