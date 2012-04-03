@@ -240,9 +240,13 @@ function max_container_width() {
 function adjust_container_dimensions() {
         var max_width = max_container_width();
         var spreadsheet_container_width = $j("div.spreadsheet_container").width();
-        if (spreadsheet_container_width>max_width) {
+        if (spreadsheet_container_width>=max_width) {
             $j(".spreadsheet_container").width(max_width);
             spreadsheet_container_width=max_width;
+        }
+        else {
+            $j(".spreadsheet_container").width("95%");
+            spreadsheet_container_width = $j("div.spreadsheet_container").width();
         }
         var sheet_container_width = spreadsheet_container_width + 14;
         var sheet_width = spreadsheet_container_width - 39;
@@ -543,6 +547,8 @@ function activateSheet(sheet, sheetTab) {
       startCol = 0,
       endRow = 0,
       endCol = 0;
+
+  adjust_container_dimensions();
   return false;
 }
 
