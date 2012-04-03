@@ -26,6 +26,7 @@ GEM
     factory_girl (1.3.3)
     fastercsv (1.5.1)
     hpricot (0.8.4)
+    hpricot (0.8.6)
     in_place_editing (1.1.2)
     kgio (2.7.4)
     libxml-ruby (2.2.2)
@@ -97,6 +98,7 @@ DEPENDENCIES
   mysql
   rack-openid (= 1.1.0)
   rails (= 2.3.8)
+  rake (= 0.8.7)
   ratom (= 0.6.8)
   rest-client (>= 1.6.1)
   rmagick (= 2.12.2)
