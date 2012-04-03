@@ -199,6 +199,9 @@ $j(document).ready(function ($) {
         handles: 'e',
         stop: function (){
           $("table.active_sheet col:eq("+($(this).index()-1)+")").width($(this).width());
+          if ($j("div.spreadsheet_container").width()>max_container_width()) {
+            adjust_container_dimensions();
+          }
         }
       })
       .mousedown(function(){
@@ -226,21 +229,25 @@ $j(document).ready(function ($) {
   adjust_container_dimensions();
 });
 
-function adjust_container_dimensions() {
+function max_container_width() {
     var max_width = $j(".corner_heading").width();
-        $j(".col_heading:visible").each(function() {
-           max_width += $(this).offsetWidth;
-        });
+    $j(".col_heading:visible").each(function() {
+       max_width += $(this).offsetWidth;
+    });
+    return max_width;
+}
+
+function adjust_container_dimensions() {
+        var max_width = max_container_width();
         var spreadsheet_container_width = $j("div.spreadsheet_container").width();
         if (spreadsheet_container_width>max_width) {
             $j(".spreadsheet_container").width(max_width);
             spreadsheet_container_width=max_width;
         }
-
-    var sheet_container_width = spreadsheet_container_width + 14;
-    var sheet_width = spreadsheet_container_width - 39;
-    $j(".sheet").width(sheet_width);
-    $j(".sheet_container").width(sheet_container_width);
+        var sheet_container_width = spreadsheet_container_width + 14;
+        var sheet_width = spreadsheet_container_width - 39;
+        $j(".sheet").width(sheet_width);
+        $j(".sheet_container").width(sheet_container_width);
 
 //    var spreadsheet_container_height = $j("div.spreadsheet_container").height();
 //    var sheet_height = spreadsheet_container_height - 20;
