@@ -46,7 +46,7 @@ GEM
       activesupport (= 2.3.8)
       rake (>= 0.8.3)
     raindrops (0.8.0)
-    rake (0.9.2.2)
+    rake (0.8.7)
     ratom (0.6.8)
       libxml-ruby (>= 1.1.2)
     rest-client (1.6.7)
@@ -96,6 +96,7 @@ DEPENDENCIES
   mysql
   rack-openid (= 1.1.0)
   rails (= 2.3.8)
+  rake (= 0.8.7)
   ratom (= 0.6.8)
   rest-client (>= 1.6.1)
   rmagick (= 2.12.2)
