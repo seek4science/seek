@@ -64,6 +64,9 @@ class Assay < ActiveRecord::Base
   validates_presence_of :owner
   validates_presence_of :assay_class
 
+  #a temporary store of added assets - see AssayReindexer
+  attr_reader :pending_related_assets
+
   has_many :relationships, 
     :class_name => 'Relationship',
     :as => :subject,
@@ -118,6 +121,9 @@ class Assay < ActiveRecord::Base
     assay_asset.version = asset.version
     assay_asset.relationship_type = r_type unless r_type.nil?
     assay_asset.save if assay_asset.changed?
+
+    @pending_related_assets ||= []
+    @pending_related_assets << asset
 
     return assay_asset
   end

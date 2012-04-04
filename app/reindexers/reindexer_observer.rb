@@ -15,8 +15,7 @@ class ReindexerObserver < ActiveRecord::Observer
   end
 
   def reindex item
-    concs = consequences(item)
-    puts "========   FOUND #{concs.count} CONSEQUENCES"
+    concs = Array(consequences(item))
     unless concs.empty?
       concs.each do |consequence|
         ReindexingQueue.create :item=>consequence
