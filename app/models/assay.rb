@@ -33,6 +33,8 @@ class Assay < ActiveRecord::Base
   has_many :strains, :through=>:assay_organisms
 
   has_many :assay_assets, :dependent => :destroy
+
+  after_save :queue_background_reindexing if Seek::Config.solr_enabled
   
   def self.asset_sql(asset_class)
     asset_class_underscored = asset_class.underscore
@@ -61,15 +63,14 @@ class Assay < ActiveRecord::Base
   validates_presence_of :study, :message=>" must be selected"
   validates_presence_of :owner
   validates_presence_of :assay_class
-  #validates_presence_of :samples,:if => Proc.new { |assay| assay.is_experimental? }
 
   has_many :relationships, 
     :class_name => 'Relationship',
     :as => :subject,
     :dependent => :destroy
           
-  searchable do
-    text :description, :title, :searchable_tags
+  searchable(:auto_index=>false) do
+    text :description, :title, :searchable_tags, :organism_terms
     text :assay_type do
         assay_type.try :title
     end
@@ -186,5 +187,9 @@ class Assay < ActiveRecord::Base
   def validate
     #FIXME: allows at the moment until fixtures and factories are updated: JIRA: SYSMO-734
     errors.add_to_base "You cannot associate a modelling analysis with a sample" if is_modelling? && !samples.empty?
+  end
+
+  def organism_terms
+    organisms.collect{|o| o.searchable_terms}.flatten
   end
 end

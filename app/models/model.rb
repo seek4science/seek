@@ -14,7 +14,7 @@ class Model < ActiveRecord::Base
   
   validates_presence_of :title
 
-  after_save :queue_asset_reindexing if Seek::Config.solr_enabled
+  after_save :queue_background_reindexing if Seek::Config.solr_enabled
   
   # allow same titles, but only if these belong to different users
   # validates_uniqueness_of :title, :scope => [ :contributor_id, :contributor_type ], :message => "error - you already have a Model with such title."
@@ -27,7 +27,7 @@ class Model < ActiveRecord::Base
   belongs_to :model_format
   
   searchable(:auto_index=>false) do
-    text :description,:title,:original_filename,:organism_name,:searchable_tags, :model_contents
+    text :description,:title,:original_filename,:organism_terms,:searchable_tags, :model_contents
   end if Seek::Config.solr_enabled
 
   explicit_versioning(:version_column => "version") do
@@ -67,8 +67,12 @@ class Model < ActiveRecord::Base
     return models_with_contributors.to_json
   end
 
-  def organism_name
-    organism.title unless organism.nil?
+  def organism_terms
+    if organism
+      organism.searchable_terms
+    else
+      []
+    end
   end
 
   #defines that this is a user_creatable object, and appears in the "New Object" gadget
