@@ -48,9 +48,25 @@ function generate_json_data() {
     return result;
 }
 
+function set_text_annotation_content() {
+    var cells = $j('td.selected_cell');
+    var columns = $j('.col_heading.selected_heading').size();
+    var text;
+    for(var i = 0; i < cells.size(); i += columns)
+    {
+    for(var j = 0; j < columns; j += 1)
+    {
+    text += (cells.eq(i + j).html() + "\t");
+    }
+    text += "\n";
+    }
+    $j("textarea.annotation_content_class").val(text);
+}
+
 function plot_cells(target_element,width,height)
 {
-    var text = "";
+    set_text_annotation_content();
+
     var json_data = generate_json_data();
     var element = $j("#"+target_element);
     element.width(width);
