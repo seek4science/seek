@@ -132,6 +132,14 @@ module Acts #:nodoc:
         project_assays
       end
 
+      def assay_type_titles
+        assays.collect{|a| a.assay_type.try(:title)}.compact
+      end
+
+      def technology_type_titles
+        assays.collect{|a| a.technology_type.try(:title)}.compact
+      end
+
     end
   end
 
