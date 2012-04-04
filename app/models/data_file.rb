@@ -15,7 +15,7 @@ class DataFile < ActiveRecord::Base
 
   validates_presence_of :title
 
-  after_save :queue_asset_reindexing if Seek::Config.solr_enabled
+  after_save :queue_background_reindexing if Seek::Config.solr_enabled
 
   # allow same titles, but only if these belong to different users
   # validates_uniqueness_of :title, :scope => [ :contributor_id, :contributor_type ], :message => "error - you already have a Data file with such title."
@@ -23,7 +23,8 @@ class DataFile < ActiveRecord::Base
   belongs_to :content_blob #don't add a dependent=>:destroy, as the content_blob needs to remain to detect future duplicates
 
   searchable(:auto_index=>false) do
-    text :description, :title, :original_filename, :searchable_tags, :spreadsheet_annotation_search_fields,:fs_search_fields, :spreadsheet_contents_for_search
+    text :description, :title, :original_filename, :searchable_tags, :spreadsheet_annotation_search_fields,:fs_search_fields, :spreadsheet_contents_for_search,
+         :assay_type_titles,:technology_type_titles
   end if Seek::Config.solr_enabled
 
   has_many :studied_factors, :conditions =>  'studied_factors.data_file_version = #{self.version}'

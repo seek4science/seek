@@ -75,6 +75,7 @@ module Acts #:nodoc:
           extend Acts::Asset::SingletonMethods
         end
         include Acts::Asset::InstanceMethods
+        include BackgroundReindexing
         include Subscribable
       end
 
@@ -144,12 +145,12 @@ module Acts #:nodoc:
         project_assays
       end
 
-      def queue_asset_reindexing
-        unless (self.changed - ["updated_at", "last_used_at"]).empty?
-          Rails.logger.info("About to reindex #{self.class.name} #{self.id}")
-          ReindexingQueue.create :item=>self
-          Delayed::Job.enqueue(ReindexingJob.new, 0, 5.seconds.from_now) unless ReindexingJob.exists?
-        end
+      def assay_type_titles
+        assays.collect{|a| a.assay_type.try(:title)}.compact
+      end
+
+      def technology_type_titles
+        assays.collect{|a| a.technology_type.try(:title)}.compact
       end
 
     end

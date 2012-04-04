@@ -19,4 +19,14 @@ class Organism < ActiveRecord::Base
     models.empty? && assays.empty? && projects.empty?
   end
 
+  def searchable_terms
+    terms = [title]
+    if concept
+      terms = terms | concept[:synonyms].collect{|s| s.gsub("\"","")}
+      terms = terms | concept[:related_synonyms].collect{|s| s.gsub("\"","")}
+      terms = terms | concept[:definitions].collect{|s| s.gsub("\"","")}
+    end
+    terms
+  end
+
 end

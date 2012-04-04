@@ -17,7 +17,7 @@ class Sop < ActiveRecord::Base
   # validates_uniqueness_of :title, :scope => [ :contributor_id, :contributor_type ], :message => "error - you already have a SOP with such title."
 
   searchable(:ignore_attribute_changes_of=>[:updated_at,:last_used_at]) do
-    text :description, :title, :original_filename,:searchable_tags,:exp_conditions_search_fields
+    text :description, :title, :original_filename,:searchable_tags,:exp_conditions_search_fields,:assay_type_titles,:technology_type_titles
   end if Seek::Config.solr_enabled
 
   belongs_to :content_blob #don't add a dependent=>:destroy, as the content_blob needs to remain to detect future duplicates
