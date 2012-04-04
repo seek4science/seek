@@ -73,6 +73,7 @@ Rails::Initializer.run do |config|
 
   # Activate observers that should always be running
   config.active_record.observers = :annotation_reindexer,
+      :assay_reindexer,
       :measured_item_reindexer,
       :studied_factor_reindexer,
       :experimental_condition_reindexer,
@@ -80,7 +81,6 @@ Rails::Initializer.run do |config|
       :mapping_link_reindexer,
       :compound_reindexer,
       :synonym_reindexer
-
 end
 
 

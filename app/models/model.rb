@@ -27,7 +27,7 @@ class Model < ActiveRecord::Base
   belongs_to :model_format
   
   searchable(:auto_index=>false) do
-    text :description,:title,:original_filename,:organism_terms,:searchable_tags, :model_contents
+    text :description,:title,:original_filename,:organism_terms,:searchable_tags, :model_contents,:assay_type_titles,:technology_type_titles
   end if Seek::Config.solr_enabled
 
   explicit_versioning(:version_column => "version") do
