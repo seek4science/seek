@@ -24,9 +24,14 @@
 
     <div class="box_about_actor">
       <p>
-        <label>Specimen number:</label>
+        <label>Title:</label>
         <%= text_or_not_specified(@specimen.donor_number) %>
       </p>
+
+      <p>
+        <label>Seek Specimen ID:</label>
+        <%= @specimen.id %>
+      </p> 
 
       <p id="organism">
           <label>Organism and strain: </label>
