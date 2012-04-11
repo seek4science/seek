@@ -81,14 +81,14 @@ class Project < ActiveRecord::Base
   def pals
     pal_role=ProjectRole.pal_role
     people.select{|p| p.is_pal?}.select do |possible_pal|
-      possible_pal.project_roles.include?(pal_role)
+      possible_pal.project_roles_of_project(self).include?(pal_role)
     end
   end
 
   #this is project role
   def pis
     pi_role = ProjectRole.find_by_name('PI')
-    people.select{|p| p.project_roles.include?(pi_role)}
+    people.select{|p| p.project_roles_of_project(self).include?(pi_role)}
   end
 
   #this is seek role
