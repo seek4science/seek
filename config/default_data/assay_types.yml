@@ -1,7 +1,14 @@
 
 assay types:
   title: assay types
-  children: genomics,metabolomics,proteomics,single_cell,transcriptomics
+  children: experimental_assay_type, modelling_analysis_type
+
+experimental_assay_type:
+  title: experimental assay type
+  children: genomics,metabolomics,proteomics,single_cell,transcriptomics, fluxomics
+
+fluxomics:
+  title: fluxomics
 
 genomics:
   title: genomics
@@ -32,7 +39,7 @@ metabolite_profiling:
   children: catabolic_response,flux_balance_analysis
 
 flux_balance_analysis:
-  title: flux balanace analysis
+  title: flux balance analysis
 
 catabolic_response:
   title: catabolic response
@@ -107,3 +114,35 @@ RNAi:
 
 tiling_path:
   title: tiling path
+
+
+modelling_analysis_type:
+  title: modelling analysis type
+  children: cell_cycle,enzymology,gene_expression,gene_regulatory_network,metabolic_network,metabolism,signal_transduction,translation, protein_interations
+
+cell_cycle:
+  title: cell cycle
+
+enzymology:
+  title: enzymology
+
+gene_expression:
+  title: gene expression
+
+gene_regulatory_network:
+  title: gene regulatory network
+
+metabolic_network:
+  title: metabolic network
+
+metabolism:
+  title: metabolism
+
+signal_transduction:
+  title: signal transduction
+
+translation:
+  title: translation
+
+protein_interations:
+  title: protein interactions

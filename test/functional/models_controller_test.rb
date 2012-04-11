@@ -136,7 +136,7 @@ class ModelsControllerTest < ActionController::TestCase
      model_with_samples = valid_model
      model_with_samples[:sample_ids] = [Factory(:sample,:title=>"newTestSample",:contributor=> User.current_user).id]
      assert_difference("Model.count") do
-       post :create,:model => model_with_samples,:content_blob=>{:file_0=>fixture_file_upload('files/little_file.txt',Mime::TEXT)}
+       post :create,:model => model_with_samples,:content_blob=>{:file_0=>fixture_file_upload('files/little_file.txt',Mime::TEXT)}, :sharing => valid_sharing
      end
 
     m = assigns(:model)
@@ -193,7 +193,7 @@ class ModelsControllerTest < ActionController::TestCase
     assert_equal "image/png", assigns(:model).content_type
   end
   
-  test "should create sop and store with url and store flag" do
+  test "should create model and store with url and store flag" do
     WebMock.allow_net_connect!
 
     model_details=valid_model_with_url
@@ -718,12 +718,39 @@ class ModelsControllerTest < ActionController::TestCase
     assert flash[:error]
   end
 
+  test "should set the other creators " do
+    model=models(:teusink)
+    assert model.can_manage?,"The sop must be manageable for this test to succeed"
+    put :update, :id => model, :model => {:other_creators => 'marry queen'}
+    model.reload
+    assert_equal 'marry queen', model.other_creators
+  end
+
+  test 'should show the other creators on the model index' do
+    model=models(:teusink)
+    model.other_creators = 'another creator'
+    model.save
+    get :index
+
+    assert_select 'p.list_item_attribute', :text => /: another creator/, :count => 1
+  end
+
+  test 'should show the other creators in -uploader and creators- box' do
+    model=models(:teusink)
+    model.other_creators = 'another creator'
+    model.save
+    get :show, :id => model
+
+    assert_select 'div', :text => /another creator/, :count => 1
+  end
+
   def valid_model
     { :title=>"Test",:projects=>[projects(:sysmo_project)]}
   end
 
   def valid_model_with_url
-    { :title=>"Test",:projects=>[projects(:sysmo_project)]}
+    mock_remote_file "#{Rails.root}/test/fixtures/files/file_picture.png","http://www.sysmo-db.org/images/sysmo-db-logo-grad2.png"
+    { :title=>"Test",:data_url=>"http://www.sysmo-db.org/images/sysmo-db-logo-grad2.png",:projects=>[projects(:sysmo_project)]}
   end
   
 end

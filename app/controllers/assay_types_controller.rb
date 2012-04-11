@@ -1,6 +1,5 @@
 class AssayTypesController < ApplicationController
 
-  before_filter :login_required
   before_filter :check_allowed_to_manage_types, :except=>[:show,:index]
 
   def show

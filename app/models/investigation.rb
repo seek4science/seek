@@ -10,11 +10,12 @@ class Investigation < ActiveRecord::Base
 
 
   validates_presence_of :title
-  validates_uniqueness_of :title
 
   has_many :assays,:through=>:studies
 
-  acts_as_solr(:fields=>[:description,:title]) if Seek::Config.solr_enabled
+  searchable do
+    text :description,:title
+  end if Seek::Config.solr_enabled
 
   def can_delete? *args
     studies.empty? && super

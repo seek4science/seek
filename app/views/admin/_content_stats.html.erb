@@ -6,7 +6,6 @@
   total_accessible_data_files = 0
   total_accessible_models = 0
   total_accessible_sops = 0
-  total_registered_people = 0
 %>
 
 <h3>Content statistics</h3>
@@ -26,8 +25,7 @@ For data, models and SOPs, the numbers are split as <em>total</em> / <em>visible
   <% stats.each do |stat| %>
   <tr>
     <td><%= link_to stat.project.name, stat.project -%></td>
-    <% registered_people = stat.registered_people.count
-       total_registered_people += registered_people %>
+    <% registered_people = stat.registered_people.count %>
     <td><%= stat.people.count -%> (<%= registered_people -%>)</td>
     <td><%= stat.investigations.count -%></td>
     <td><%= stat.studies.count -%></td>
@@ -52,7 +50,7 @@ For data, models and SOPs, the numbers are split as <em>total</em> / <em>visible
   <% end %>
   <tr style="background-color: #DEF">
     <td><b>Overall</b></td>
-    <td><%= Person.count -%> (<%= total_registered_people -%>)<em>*</em></td>
+    <td><%= Person.count -%> (<%= User.count(:all,:conditions=>"person_id IS NOT NULL") -%>)<em>*</em></td>
     <td><%= Investigation.count -%></td>
     <td><%= Study.count -%></td>
     <td><%= Assay.count -%></td>

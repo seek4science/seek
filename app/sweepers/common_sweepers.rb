@@ -5,7 +5,7 @@
 module CommonSweepers
 
   def expire_all_fragments
-    expire_tag_fragments
+    expire_annotation_fragments
     expire_all_favourite_fragments
     expire_organism_gadget
     expire_header_and_footer
@@ -22,15 +22,14 @@ module CommonSweepers
     expire_fragment "footer"
   end
 
-  def expire_tag_fragments
+  def expire_annotation_fragments name=nil
     expire_fragment "sidebar_tag_cloud"
     expire_fragment "super_tag_cloud"
-  end
-
-
-  def expire_annotation_fragments
-    expire_fragment "sidebar_tag_cloud"
-    expire_fragment "super_tag_cloud"
+    if (name.nil?)
+      expire_fragment(/suggestion_for.*/)
+    else
+      expire_fragment "suggestions_for_#{name}"
+    end
   end
 
   #expires ALL fragment caches related to favourites

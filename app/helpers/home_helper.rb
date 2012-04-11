@@ -79,7 +79,7 @@ module HomeHelper
   end
 
   def recently_added_item_logs time=1.month.ago, number_of_item=10
-    item_types = ['DataFile', 'Model', 'Sop', 'Publication', 'Investigation', 'Study', 'Assay']
+    item_types = Seek::Util.user_creatable_types.collect{|type| type.name}
     activity_logs = ActivityLog.find(:all, :include => "activity_loggable", :order => "created_at DESC", :conditions => ["action = ? AND created_at > ? AND activity_loggable_type in (?)", 'create', time, item_types])
     selected_activity_logs = []
     count = 0
@@ -128,13 +128,13 @@ module HomeHelper
       html=''
       unless entry.blank?
           #get the link of the entry
-          entry_links = try_block{entry.links}
-          entry_link = try_block{entry_links.alternate.href}
-          entry_title, feed_title = (try_block{entry.title} || '').split('***')
+          entry_link = try_block{entry.links.alternate.href}
+          entry_title = entry.title || "Unknown title"
+          feed_title = entry.feed_title || "Unknown publisher"
           entry_date = try_block{entry.updated} || try_block{entry.published} || try_block{entry.last_modified}
           entry_summary = truncate(strip_tags(entry.summary || entry.content),:length=>500)
           tooltip=tooltip_title_attrib("<p>#{entry_summary}</p><p class='feedinfo none_text'>#{entry_date.strftime('%c') unless entry_date.nil?}</p>")
-          unless entry_title.blank? or entry_link.blank?
+          unless entry_title.blank? || entry_link.blank?
             html << "<li class='homepanel_item'>"
             html << link_to("#{entry_title}", "#{entry_link}", :title => tooltip, :target=>"_blank")
             html << "<div class='feedinfo none_text'>"
@@ -152,9 +152,6 @@ module HomeHelper
       html=''
        unless item.blank?
          image=resource_avatar(item,:class=>"home_asset_icon")
-#          image_key = item.class.name.underscore
-#          image_key = 'assay_modelling_avatar' if try_block{item.is_modelling?}
-#          image = image_tag(icon_filename_for_key(image_key), :class => "home_asset_icon")
           icon  = link_to_draggable(image, show_resource_path(item), :id=>model_to_drag_id(item), :class=> "asset", :title => tooltip_title_attrib(text_for_resource(item)))
 
           path = url_for(item)
@@ -164,7 +161,7 @@ module HomeHelper
           html << "#{icon} "
           html << link_to("#{item.title}", path, :title => tooltip)
           html << "<div class='feedinfo none_text'>"
-          html << "<span>#{text_for_resource(item)} - #{action} #{time_ago_in_words(at_time)} ago<span>"
+          html << "<span>#{text_for_resource(item)} - #{action} #{time_ago_in_words(at_time)} ago</span>"
           html << "</div>"
           html << "</li>"
       end

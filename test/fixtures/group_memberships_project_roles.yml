@@ -1,0 +1,11 @@
+group_for_model_owner_member:
+  group_membership_id: <%= Fixtures.identify(:group_for_model_owner) %>
+  project_role_id: <%= Fixtures.identify(:member) %>
+
+group_for_model_owner_postdoc:
+  group_membership_id: <%= Fixtures.identify(:group_for_model_owner) %>
+  project_role_id: <%= Fixtures.identify(:postdoc) %>
+  
+pal_association:
+  group_membership_id: <%= Fixtures.identify(:group_for_pal) %>
+  project_role_id: <%= Fixtures.identify(:pal) %>

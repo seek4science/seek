@@ -3,8 +3,8 @@
 <ul class="sectionIcons">
   <%= render :partial => "subscriptions/subscribe", :locals => { :object => @sample } %>
   <% if @sample.can_manage? %>
-      <li><%= image_tag_for_key('manage', edit_sample_path, "Manage Sample", nil, 'Manage Sample') %></li>
-  <% elsif @sample.can_edit? %>
+      <li><%= image_tag_for_key('manage', edit_sample_path(@sample), "Manage Sample", nil, 'Manage Sample') %></li>
+   <% elsif @sample.can_edit? %>
       <li><%= image_tag_for_key('edit', edit_sample_path(@sample), "Edit Sample", nil, 'Edit Sample') %></li>
   <% end %>
   <% if @sample.can_delete? %>
@@ -17,17 +17,17 @@
 
 <%= render :partial => "layouts/item_title", :locals=>{:item=>@sample} %>
 
+<%= render :partial => "layouts/usage_info", :locals => { :resource => @sample } -%>
+
 <div class="show_basic">
 
   <div class="main_content_left_box_narrower">
 
     <div class="box_about_actor">
-
       <p>
-        <label>Specimen:</label>
-        <%= text_or_not_specified(@sample.specimen.title) %>
+        <label>Sample name:</label>
+        <%= text_or_not_specified(@sample.title) -%>
       </p>
-
       <p>
         <label>Seek Sample ID:</label>
         <%= @sample.id %>
@@ -39,46 +39,37 @@
        </p>
 
       <p>
-        <label>Explantation time:</label>
-        <%= text_or_not_specified(@sample.explantation) %>
-      </p>
-
-      <p>
-        <label>Lab internal No.:</label>
+        <label>Lab internal identifier:</label>
         <%= text_or_not_specified(@sample.lab_internal_number) %>
       </p>
-
-
       <p>
-        <label>Date of donation:</label>
-
-
-        <% if @sample.donation_date.nil? %>
-            <%= text_or_not_specified nil %>
-        <% else %>
-
-            <% if @sample.donation_date.hour == 0 and @sample.donation_date.min == 0 and @sample.donation_date.sec == 0 then %>
-                <%= h @sample.donation_date.strftime('%d/%m/%Y') %>
-            <% else %>
-                <%= h @sample.donation_date.strftime('%d/%m/%Y @ %H:%M:%S') %>
-            <% end %>
-
-        <% end %>
+        <label>Date at sampling:</label>
+        <%= text_or_not_specified @sample.sampling_date.nil? ? nil : date_as_string(@sample.sampling_date) -%>
       </p>
+      <p>
+        <label>Provider name:</label>
+        <%= text_or_not_specified @sample.provider_name -%>
+      </p>
+      <p>
+        <label>Provider's sample identifier:</label>
+        <%= text_or_not_specified @sample.provider_id -%>
+      </p>
+      <p>
+        <label>Organism part:</label>
+        <%= text_or_not_specified @sample.organism_part -%>
+      </p>
+
+      <h2><%= CELL_CULTURE_OR_SPECIMEN.capitalize -%> details</h2>
+
+      <%= render :partial=>"sample_specimen_details",:object=>@sample.specimen -%>
     </div>
-  </div>
   <div class="main_content_right_box_wider">
     <%= render :partial => "assets/resource_scales_box", :locals => { :resource => @sample}-%>
   </div>
-  <div style="clear:both;">
-    <p style="margin-top: 1em;">
-      <b>About the sample:</b>
 
-    <div id="description" class="box_standout">
-      <%= text_or_not_specified(@sample.comments, :description=>true, :auto_link=>true) %>
-    </div>
-    </p>
   </div>
+  <%# Requires passing of sample.specimen rather than sample because it is this that holds the creators information -%>
+  <%= render :partial=>"assets/resource_main_content_right",:locals => { :resource => @sample.specimen } %>
 
   <div style="clear:both">
 

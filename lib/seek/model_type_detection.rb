@@ -1,19 +1,29 @@
 module Seek
+  #Detectes the type of the model based on the content, and determines whether it is SBML or JWS Dat format.
+  #methods either take a model or content_blob, or can be mixed in with a Model entity.
+  #It doesn't test whether the SBML is valid at this time.
   module ModelTypeDetection
     
-    def is_dat? model
-      model.content_blobs.detect{|content_blob| check_content content_blob.filepath,"begin name",25000}
+    def is_dat? model_or_blob=self
+      content_blobs_for(model_or_blob).detect{|content_blob| check_content content_blob.filepath,"begin name",25000}
     end                      
     
-    def is_sbml? model                        
-       model.content_blobs.detect{|content_blob| check_content content_blob.filepath,"<sbml" }
+    def is_sbml? model_or_blob=self
+       content_blobs_for(model_or_blob).detect{|content_blob| check_content content_blob.filepath,"<sbml" }
     end
 
-    def is_xgmml? model
-        model.content_blobs.detect{|content_blob| check_content(content_blob.filepath,"<graph") and check_content(content_blob.filepath,"<node") }
+    def is_xgmml? model_or_blob=self
+      content_blobs_for(model_or_blob).detect{|content_blob| check_content(content_blob.filepath,"<graph") and check_content(content_blob.filepath,"<node") }
     end
-    def is_jws_supported? model
-      is_dat?(model) || is_sbml?(model)
+    
+    def is_jws_supported? model_or_blob=self
+      is_dat?(model_or_blob) || is_sbml?(model_or_blob)
+    end
+
+    private
+    
+    def content_blobs_for model_or_blob
+      model_or_blob.is_a?(ContentBlob) ? [model_or_blob] : model_or_blob.content_blobs
     end
     
     def check_content filepath, str, max_length=1500      

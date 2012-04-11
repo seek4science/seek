@@ -11,6 +11,8 @@
 
 <% resource_type_attributed_to_types = "Creators" -%>
 
+<% original_resource_type = resource_type -%>
+<% resource_type = CELL_CULTURE_OR_SPECIMEN if resource_type == 'Specimen' %>
 <% resource_type = text_for_resource(resource_type) -%>
 
 
@@ -56,7 +58,7 @@
           </td>
         </tr>
 		<tr>
-			<td><%= link_to_function (image("new") + " Add creator"), "addCreators(); return(false);", :id=>"add_creator", :class=>"block_link", :style => "width: 10em" %></td>
+			<td><%= link_to_function (image("new") + " Add creator"), "addCreators(); return(false);", :id=>"add_creator", :class=>"block_link" %></td>
 		</tr>
       </table>
 
@@ -86,7 +88,7 @@
       <p>
         If anyone not registered with SEEK assisted with the creation of this <%= resource_type %>, you can specify them below.
       </p>
-      <%= text_field_tag resource_type.underscore+"[other_creators]", other_creators, :size=>90 %>
+      <%= text_field_tag original_resource_type.underscore+"[other_creators]", other_creators, :size=>90 %>
     </div>
   </div>
 </div>
@@ -114,41 +116,41 @@ function updateCreatorSettings() {
     // iterate through all creators and build the "shared with" list;
     // in the meanwhile also assemble a minimized version of the array that
     // could be posted with the form (this won't have item titles in it)
-  
+
     var creators = '';
     var creators_arr = new Array();
-  
+
     for(var i = 0; i < creator_settings.length; i++) {
         creator_name = creator_settings[i][0];
         creator_email = creator_settings[i][1];
-        creator_id = creator_settings[i][2];   
+        creator_id = creator_settings[i][2];
         creator_email_text = "";
         if (<%= hide_contact_details? -%> == "true") {
           creator_email_text = ': ' + creator_email
-        }     
+        }
         creators += '<b>' + creator_name + '</b>' + creator_email_text
         + '&nbsp;&nbsp;&nbsp;<small style="vertical-align: middle;">'
         + '[<a href="" onclick="javascript:deleteCreator(\''+ creator_name +'\', '+ creator_id +'); return(false);">remove</a>]</small><br/>';
-    
+
         creators_arr.push([creator_name, creator_id]);
     }
-  
-  
+
+
     // remove the last line break
     if(creators.length > 0) {
         creators = creators.slice(0,-5);
     }
-  
-  
+
+
     // update the page
     if(creators.length == 0) {
         $('creators_list').innerHTML = '<span class="none_text">No creators</span>';
     }
-    else {      
+    else {
         $('creators_list').innerHTML = creators;
     }
-  
-  
+
+
     // UPDATE THE FIELDS WHICH WILL BE SUBMITTED WITH THE PAGE
     $('creators').value = Object.toJSON(creators_arr);
 }
@@ -156,22 +158,22 @@ function updateCreatorSettings() {
 
 function checkCreatorNotInList(creator_name, creator_id) {
     rtn = true;
-  
+
     for(var i = 0; i < creator_settings.length; i++)
         if(creator_settings[i][0] == creator_name && creator_settings[i][2] == creator_id) {
             rtn = false;
             break;
         }
-  
+
     return(rtn);
 }
 
 
 // adds an creator to the list and updates the displayed list
 function addCreator(creator_name, creator_email, creator_id) {
-    if(checkCreatorNotInList(creator_name, creator_id)) {      
+    if(checkCreatorNotInList(creator_name, creator_id)) {
         creator_settings.push([creator_name, creator_email, creator_id]);
-    
+
         // update visible page
         updateCreatorSettings();
     }
@@ -190,7 +192,7 @@ function deleteCreator(creator_name, creator_id) {
             creator_settings.splice(i, 1);
             break;
         }
-  
+
     // update the page
     updateCreatorSettings();
 }
@@ -198,7 +200,7 @@ function deleteCreator(creator_name, creator_id) {
 
 function addCreators() {
     var selIDs = autocompleters[creator_autocompleter_id].getRecognizedSelectedIDs();
-  
+
     if(selIDs == "") {
         // no creators to add
         alert("Please choose some creators!");
@@ -209,17 +211,17 @@ function addCreators() {
         // within the new list, but some entries in the new list
         // may replicate those in the main creator list: this
         // will be checked by addCreator()
-    
+
         for(var i = 0; i < selIDs.length; i++) {
             id = parseInt(selIDs[i]);
             email = autocompleters[creator_autocompleter_id].getValueFromJsonArray(autocompleters[creator_autocompleter_id].itemIDsToJsonArrayIDs([id])[0], 'email');
             name = autocompleters[creator_autocompleter_id].getValueFromJsonArray(autocompleters[creator_autocompleter_id].itemIDsToJsonArrayIDs([id])[0], 'name');
             addCreator(name, email, id);
         }
-      
+
         // remove all tokens from autocomplete text box
         autocompleters[creator_autocompleter_id].deleteAllTokens();
-    
+
         return(true);
     }
 }

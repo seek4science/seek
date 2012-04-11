@@ -1,57 +1,75 @@
-<%= javascript_include_tag "sharing.js" -%>
+<%= javascript_include_tag "sharing.js", 'strain.js' -%>
+<%= javascript_include_tag "resource.js"%>
 
 <%= f.error_messages %>
-
-
-
-<h2>Specimen Details</h2>
-
-
+<%
+   existing_creators = []
+   if action == :new
+     existing_creators = [current_user.person]
+   elsif action == :edit
+     existing_creators = @specimen.creators
+   end
+%>
  <div style="width: 95%;">
-    <p>
-      <%= f.label :title -%><span class="required">*</span><br/>
-      <%= f.text_field :donor_number, :style => "width: 350px;" -%>
-    </p>
+       <% unless Seek::Config.is_virtualliver %>
+            <p class="none_text" style="margin-left: 10em">Specimen is the portion of the bacterial cells growing together in a chemostat or in a batch</p>
+       <% end %>
+
+       <h2>Specimen Details</h2>
+       <p>
+         <%= f.label :specimen_title -%><span class="required">*</span><br/>
+         <%= f.text_field :title, :style => "width: 350px;" -%>
+       </p>
+  
     <p>
       <%= f.label :description -%><br/>
       <%= f.text_area :comments, :style => "width: 85%;", :rows => 5 -%>
     </p>
 
-
-    <p>
-      <%= f.label :treatment -%><br/>
-      <%= f.text_field :treatment, :style => "width: 350px;" -%>
-    </p>
-
-    <p>
-      <%= f.label :lab_internal_number -%><span class="required">*</span><br/>
-      <%= f.text_field :lab_internal_number, :style => "width: 350px;" -%>
-    </p>
+    <% if Seek::Config.is_virtualliver %>
+           <p>
+             <%= f.label :treatment -%><br/>
+             <%= f.text_field :treatment, :style => "width: 350px;" -%>
+           </p>
+    <% end %>
 
 
+   <p>
+     <%= f.label :lab_internal_identifier -%><span class="required">*</span><br/>
+     <%= f.text_field :lab_internal_number, :style => "width: 350px;" -%>
+   </p>
+
+   <br/>
    <%= render :partial => 'projects/project_selector', :locals => {:resource => @specimen}%>
 
   <p>
     <%= f.label "Institution" %><span class="required">*</span><br/>
     <%= collection_select(:specimen, :institution_id, Institution.all, :id, :name, {:include_blank => "Please Select"},{:style=>"width:90%"}) %>
   </p>
+  <br/>
+  <p>
+    <%# render :partial=>"specimens/select_organisms" ,:locals=>{:f=>f, :action => action}-%>
+  </p>
 
-    <%= render :partial=>"specimens/select_organisms" ,:locals=>{:f=>f}-%>
         <%= f.fancy_multiselect :scales, {:possibilities=>sort_scales(Scale.all)} -%>
-    </p>
+  <% if @specimen.can_manage? %>
+       <%= render :partial=>"assets/asset_form_bottom", :locals=> {:f => f, :attribution_enable => false, :show_publications => false, :existing_creators=>existing_creators} -%>
 
-
-    <%= render :partial=>"assets/asset_form_bottom", :locals=> { :f => f, :attribution_enable => false, :show_publications => false } if @specimen.can_manage?-%>    
     <%= fancy_multiselect @specimen, :sops, :name => 'specimen_sop_ids',:association_class=>Sop, :selected => (params[:specimen_sop_ids] || []).map(&:to_i) | @specimen.sop_masters.map(&:sop_id)%>
-
-
-
+  <% end %>
   </div>
 
-
-
-
 <p style="margin-top: 2em; text-align: center;">
-  <%= f.submit(action==:edit ? "Update" : "Create", :disable_with=>(action==:edit ? "Updating..." : "Creating...")) -%>
+  <%
+     button_text=action==:edit ? "Update" : "Create"
+     disabled_text=action==:edit ? "Updating..." : "Creating..."
+     is_new_file=action==:edit ? false : true
+  %>
+  <% if @specimen.can_manage? %>
+      <%= preview_permission_popup_link('specimen', url_for(:controller => 'policies', :action => 'preview_permissions'), is_new_file, try_block{@specimen.contributor.user.id})-%>
+      <%= f.submit button_text, :id => "specimen_submit_btn", :onclick => "javascript: clickLink($('preview_permission'));return(false);" -%>
+  <% else %>
+      <%= f.submit button_text, :id => "specimen_submit_btn", :disable_with=>disabled_text-%>
+  <% end %>
   or <%= link_to 'Cancel', (@specimen.id ? specimen_path(@specimen.id) : specimens_path) -%>
 </p>

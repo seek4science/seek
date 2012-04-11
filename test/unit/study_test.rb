@@ -81,10 +81,6 @@ class StudyTest < ActiveSupport::TestCase
     s.investigation=nil
     assert !s.valid?
 
-    #duplicate title
-    s=Study.new(:title=>"A Metabolomics Study",:investigation=>investigations(:metabolomics_investigation))
-    assert !s.valid?
-
   end
 
   test "study with 1 assay" do

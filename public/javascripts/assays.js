@@ -94,7 +94,7 @@ function updateSops() {
 
     // update the page
     if(sops_assets.length == 0) {
-        $('sop_to_list').innerHTML = '<span class="none_text">No sops</span>';
+        $('sop_to_list').innerHTML = '<span class="none_text">None</span>';
     }
     else {
         $('sop_to_list').innerHTML = sop_text;
@@ -173,7 +173,7 @@ function updateDataFiles() {
 
     // update the page
     if(data_files_assets.length == 0) {
-        $('data_file_to_list').innerHTML = '<span class="none_text">No data files</span>';
+        $('data_file_to_list').innerHTML = '<span class="none_text">None</span>';
     }
     else {
         $('data_file_to_list').innerHTML = data_file_text;
@@ -249,7 +249,7 @@ function updateModels() {
 
     // update the page
     if(models_assets.length == 0) {
-        $('model_to_list').innerHTML = '<span class="none_text">No models</span>';
+        $('model_to_list').innerHTML = '<span class="none_text">None</span>';
     }
     else {
         $('model_to_list').innerHTML = model_text;
@@ -330,7 +330,7 @@ function updateAssays() {
 
     // update the page
     if (assays_array.length == 0) {
-        $('assay_to_list').innerHTML = '<span class="none_text">No assays</span>';
+        $('assay_to_list').innerHTML = '<span class="none_text">None</span>';
     }
     else {
         $('assay_to_list').innerHTML = assay_text;

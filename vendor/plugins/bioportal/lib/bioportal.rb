@@ -342,6 +342,13 @@ module BioPortal
       synonyms.each do |synonym|
         result[:synonyms] << synonym.content
       end
+      result[:related_synonyms] = []
+      related_synonyms = element.first.find(element.path + "/relations/entry[string='RELATED SYNONYM']/list/string")
+      unless related_synonyms.nil?
+        related_synonyms.each do |s|
+          result[:related_synonyms] << s.content
+        end
+      end
 
       definitions = element.first.find(element.path + "/definitions/string")
       result[:definitions] = []

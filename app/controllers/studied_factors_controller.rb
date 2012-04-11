@@ -1,6 +1,7 @@
 class StudiedFactorsController < ApplicationController
   include Seek::FactorStudied
   include Seek::AnnotationCommon
+  include Seek::AssetsCommon
 
   before_filter :login_required
   before_filter :find_data_file_auth
@@ -26,7 +27,7 @@ class StudiedFactorsController < ApplicationController
       @studied_factor.studied_factor_links.build(:substance => substance )
     end
 
-    update_annotations(@studied_factor, 'description', false) if try_block{!params[:annotation][:value].blank?}
+    update_annotations(@studied_factor, 'description') if try_block{!params[:annotation][:value].blank?}
 
     render :update do |page|
       if @studied_factor.save
@@ -35,7 +36,8 @@ class StudiedFactorsController < ApplicationController
           # clear the _add_factor form
           page.call "autocompleters['substance_autocompleter'].deleteAllTokens"
           page[:add_condition_or_factor_form].reset
-          page[:substance_autocomplete_input].disabled = true
+          page[:substance_condition_factor].hide
+          page[:growth_medium_or_buffer_description].hide
       else
           page.alert(@studied_factor.errors.full_messages)
       end
@@ -112,7 +114,7 @@ class StudiedFactorsController < ApplicationController
     end
     @studied_factor.studied_factor_links = studied_factor_links
 
-    update_annotations(@studied_factor, 'description', false) if try_block{!params[:annotation][:value].blank?}
+    update_annotations(@studied_factor, 'description') if try_block{!params[:annotation][:value].blank?}
 
     render :update do |page|
       if  @studied_factor.update_attributes(params[:studied_factor])
@@ -132,11 +134,7 @@ class StudiedFactorsController < ApplicationController
       data_file = DataFile.find(params[:data_file_id])
       if data_file.can_edit? current_user
         @data_file = data_file
-        if logged_in? and current_user.person.member? and params[:version]
-          @display_data_file = @data_file.find_version(params[:version]) ? @data_file.find_version(params[:version]) : @data_file.latest_version
-        else
-          @display_data_file = @data_file.latest_version
-        end
+        find_display_asset @data_file
       else
         respond_to do |format|
           flash[:error] = "You are not authorized to perform this action"

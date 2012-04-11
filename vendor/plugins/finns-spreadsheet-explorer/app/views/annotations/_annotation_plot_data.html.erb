@@ -1,0 +1,43 @@
+<% annotation = annotation_plot_data -%>
+<div class="annotation" id="annotation_<%=annotation.id-%>" style="width:40em;">
+    <% form_remote_tag(:url=>{:controller=>"spreadsheet_annotations", :action=>"update", :id => annotation.id},
+                     :method => :put,
+                     :update => { :success => "annotations", :failure => "spreadsheet_errors"},
+                     :success => "$j('#spreadsheet_errors').hide();",
+                     :failure => "$j('#spreadsheet_errors').show();",
+                     :loading => "$j('#spinner" + annotation.id.to_s + "').show();",
+                     :complete => "$j('#spinner" + annotation.id.to_s + "').hide();", :html => {:id => "annotation_form"}) do %>
+      <div class="annotation_content">
+        <div class="annotation_avatar">
+          <%= avatar(annotation.source.person, 24) -%>
+        </div>
+        <div class="annotation_text">
+          <%= link_to(annotation.source.person.name, annotation.source.person)%><br/>
+        </div>
+        <div id="annotation_plot_data_<%= annotation.id -%>">
+
+        </div>
+        <br style="clear:both"/>
+      </div>
+      <div class="annotation_footer">
+        <div style="float:left"><%= time_ago_in_words(annotation.created_at) %> ago</div>
+        <div style="float:right">
+          <% if annotation.source == current_user %>
+            <%= link_to_remote(image('spreadsheet_annotation_destroy', :title => "Delete Annotation"), :url=>{:controller=>"spreadsheet_annotations", :action=>"destroy", :id => annotation.id},
+                       :method => :delete,
+                       :update => { :success => "annotations", :failure => "spreadsheet_errors"},
+                       :loading => "$j('#spinner" + annotation.id.to_s + "').show();",
+                       :success => "$j('#spreadsheet_errors').hide();",
+                       :failure => "$j('#spreadsheet_errors').show();",
+                       :complete => "$j('#spinner" + annotation.id.to_s + "').hide();") -%>
+            <%= image_tag "ajax-loader.gif", :id => "spinner"+annotation.id.to_s, :class => 'spinner', :style => 'display:none;' -%>
+          <% end -%>
+          <span class="cell_coverage"><a href="#" onclick="select_range(this.innerHTML);return false;"><%= annotation.annotatable.cell_range -%></a></span>
+        </div>
+        <br style="clear:both"/>
+        <div id="annotation_controls" style="display:none">
+          <%= submit_tag 'Save Changes',:id=>"fetch_button" %> or <%= link_to "Cancel", "", :onclick => "toggle_annotation_form('" + annotation.id.to_s + "'); return false;"-%>
+        </div>
+      </div>
+      <% end %>
+</div>

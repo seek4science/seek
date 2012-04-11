@@ -16,6 +16,33 @@ class DataFileTest < ActiveSupport::TestCase
     assert_equal blob,datafile.content_blob
   end
 
+  test "spreadsheet contents for search" do
+    df = Factory :rightfield_datafile
+    
+    data = df.spreadsheet_contents_for_search
+    assert !data.empty?,"Content should not be empty"
+    assert data.include?("design type")
+    assert data.include?("methodological design"), "content should be humanized"
+    assert data.include?("MethodologicalDesign"),"should also preserve original form before humanizing"
+    assert data.include?("absolute")
+    assert !data.include?("ontology"),"Shouldn't include content from hidden sheets"
+    assert !data.include?("relative"),"Shouldn't include content from hidden sheets"
+
+    assert !data.include?("44.0"),"Should not include numbers"
+    assert !data.include?("1.0"),"Should not include numbers"
+    assert !data.include?("1.7"),"Should not include numbers"
+
+    assert !data.include?(44),"Should not include numbers"
+    assert !data.include?(1),"Should not include numbers"
+    assert !data.include?(1.7),"Should not include numbers"
+
+    assert !data.include?("seek id"),"Should not include blacklisted text"
+
+    df = data_files(:picture)
+    assert_equal [],df.spreadsheet_contents_for_search
+  end
+
+
   test "event association" do
     User.with_current_user Factory(:user) do
       datafile = Factory :data_file, :contributor => User.current_user
@@ -233,6 +260,7 @@ class DataFileTest < ActiveSupport::TestCase
       data_file_converted = data_file.to_presentation!
       data_file_converted = data_file_converted.reload
 
+
       assert_equal presentation.class.name, data_file_converted.class.name
       assert_equal presentation.attributes.keys.sort!, data_file_converted.attributes.keys.reject{|k|k=='id'}.sort! #???
 
@@ -259,7 +287,30 @@ class DataFileTest < ActiveSupport::TestCase
       assert_equal data_file.scalings,data_file_converted.scalings
       assert_equal data_file.scales,data_file_converted.scales
       assert_equal data_file.versions.map(&:updated_at).sort, data_file_converted.versions.map(&:updated_at).sort
+
     }
+  end
+
+  test 'should convert tag from datafile to presentation' do
+      user = Factory :user
+      User.with_current_user(user) {
+        data_file = Factory :data_file,:contributor=>user
+        Factory :tag,:annotatable=>data_file,:source=>user,:value=>"fish"
+
+        assert_equal 1, data_file.annotations.count
+        assert_equal 0, data_file.annotations.first.versions.count
+        assert 'fish', data_file.annotations.first.value.text
+
+        data_file_converted = data_file.to_presentation!
+        data_file_converted.reload
+        data_file.reload
+
+        assert [], data_file.annotations
+        assert [], Annotation::Version.find(:all, :conditions => ['annotatable_type=? and annotatable_id=?', 'DataFile', data_file.id])
+        assert_equal 1, data_file_converted.annotations.count
+        assert_equal 0, data_file_converted.annotations.first.versions.count
+        assert 'fish', data_file_converted.annotations.first.value.text
+      }
   end
 
   test "fs_search_fields" do
@@ -296,8 +347,6 @@ class DataFileTest < ActiveSupport::TestCase
       sf1 = Factory :studied_factor_link,:substance=>suger
       sf2 = Factory :studied_factor_link, :substance=>metal
 
-
-
       Factory :studied_factor,:studied_factor_links=>[sf1,sf2],:data_file=>df
       assert df.fs_search_fields.include?("sugar")
       assert df.fs_search_fields.include?("metal")
@@ -309,6 +358,24 @@ class DataFileTest < ActiveSupport::TestCase
       assert df.fs_search_fields.include?("789")
       assert_equal 8,df.fs_search_fields.count
     end
+  end
+
+  test "get treatments" do
+      user = Factory :user
+      User.with_current_user user do
+        data=File.new("#{Rails.root}/test/fixtures/files/treatments-normal-case.xls","rb").read
+        df = Factory :data_file,:contributor=>user,:content_blob=>Factory(:content_blob,:data=>data,:content_type=>"application/excel")
+        assert_not_nil df.spreadsheet_xml
+        assert df.is_spreadsheet?
+        assert_not_nil df.treatments
+        assert_equal 2,df.treatments.values.keys.count
+        assert_equal ["Dilution_rate","pH"],df.treatments.values.keys.sort
+
+        data=File.new("#{Rails.root}/test/fixtures/files/file_picture.png","rb").read
+        df = Factory :data_file,:contributor=>user,:content_blob=>Factory(:content_blob,:data=>data)
+        assert_not_nil df.treatments
+        assert_equal 0,df.treatments.values.keys.count
+      end
   end
 
 end

@@ -99,7 +99,7 @@ module Seek
     end
     
     def download_jerm_asset asset
-      project=asset.project
+      project=asset.projects.first
       project.decrypt_credentials
       downloader=Jerm::DownloaderFactory.create project.name
       resource_type = asset.class.name.split("::")[0] #need to handle versions, e.g. Sop::Version
@@ -260,7 +260,24 @@ module Seek
         redirect_to asset
       end
     end
-    
+
+    def find_display_asset asset=eval("@#{self.controller_name.singularize}");
+      name = asset.class.name.underscore
+      if asset
+          #if no version is specified, show the latest version
+          #otherwise, show the specified version, if (this version is correct for login and project member user or if (this is the latest version and the user doesn't login or is not project member')
+          if params[:version]
+            if asset.find_version(params[:version]).blank? || (!(logged_in? and try_block{current_user.person.member?}) && params[:version].to_i != asset.latest_version.version)
+              error('This version is not available', "invalid route")
+              return false
+            else
+              eval "@display_#{name} = asset.find_version(params[:version])"
+            end
+          else
+            eval "@display_#{name} = asset.latest_version"
+          end
+        end
+    end
   end
 
 end

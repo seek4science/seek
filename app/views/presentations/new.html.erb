@@ -34,7 +34,7 @@
 
         <p>
           <%= preview_permission_popup_link('presentation', url_for(:controller => 'policies', :action => 'preview_permissions'), true)-%>
-          <%= submit_tag "Upload and Save", :id => "presentation_submit_btn", :onclick => "javascript: validateResourceFields(true,'presentation'); return(false);" -%> or <%= link_to 'Cancel', presentations_path -%>
+          <%= submit_tag "Upload and Save", :id => "presentation_submit_btn", :onclick => "javascript: validateResourceFields(true,'presentation',true); return(false);" -%> or <%= link_to 'Cancel', presentations_path -%>
         </p>
 		</div>
      <% end -%>

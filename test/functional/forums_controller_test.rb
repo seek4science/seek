@@ -8,7 +8,7 @@ class ForumsControllerTest < ActionController::TestCase
   def test_login_required_for_index
     get :index
     assert_response :redirect
-    assert_redirected_to new_session_path
+    assert_redirected_to login_path
   end
   
   def test_index

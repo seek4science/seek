@@ -273,7 +273,7 @@ module ImagesHelper
       when 'subscribe'
         "famfamfam_silk/email_add.png"
       when 'presentation_avatar','presentation','presentations'
-        "1315482798_presentation-slides.png"
+        "misc_icons/1315482798_presentation-slides.png"
       when 'endnote'
         "famfamfam_silk/script_go.png"
       when 'expand_plus'
@@ -282,6 +282,14 @@ module ImagesHelper
         "toggle_collapse_64x64.png"
       when 'cytoscape_web'
         "famfamfam_silk/chart_line.png"
+      when "graph"
+        "famfamfam_silk/chart_line.png"
+      when "project_manager"
+        "famfamfam_silk/medal_gold_1.png"
+      when "asset_manager"
+        "famfamfam_silk/medal_bronze_3.png"
+      when "publisher"
+        "famfamfam_silk/medal_silver_2.png"
     else
       return nil
     end

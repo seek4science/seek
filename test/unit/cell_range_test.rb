@@ -24,7 +24,6 @@ class CellRangeTest < ActiveSupport::TestCase
     assert cell.errors.length == 1
     cell.errors.each_full {|e| res = e}
 
-    puts "#{res}"
     assert res == "One or more cells between <b>A1</b> and <b>AB3</b> are outside the worksheets range. Please select cells between <b>A1</b> and <b>J10</b>"
   end
 
@@ -36,7 +35,6 @@ class CellRangeTest < ActiveSupport::TestCase
     assert cell.errors.length == 1
     cell.errors.each_full {|e| res = e}
 
-    puts "#{res}"
     assert res == "Invalid cell range entered. Must be in the format of <b>A1</b> or <b>A1:B1</b>"
   end
 

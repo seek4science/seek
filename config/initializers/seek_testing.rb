@@ -13,5 +13,6 @@ if Rails.env.test?
     Settings.defaults[:events_enabled] = true
 
     Settings.defaults[:email_enabled] = true
+    Settings.defaults[:publish_button_enabled] = true
   end
 end

@@ -111,33 +111,6 @@ class PolicyTest < ActiveSupport::TestCase
     end
   end
 
-  test'should remove people who are in the blacklist' do
-    #create bundle of people
-    people_with_access_type = []
-    i = 0
-    while i<10
-      people_with_access_type.push [i, 'name' + i.to_s, rand(5) ]
-      i +=1
-    end
-    #create a blacklist
-    black_list = []
-    i = 0
-    while i<5
-      random_id = rand(10)
-      black_list.push [random_id, 'name' + random_id.to_s, 0 ]
-      i +=1
-    end
-    black_list.uniq!
-    black_list_ids = black_list.collect{|person| person[0]}
-    filtered_people = Policy.new().remove_people_in_blacklist(people_with_access_type, black_list)
-
-    assert_equal (people_with_access_type.count - black_list.count), filtered_people.count
-
-    filtered_people.each do |person|
-      assert !black_list_ids.include?(person[1])
-    end
-  end
-
   test'should add people who are in the whitelist' do
     #create bundle of people
     people_with_access_type = []
@@ -156,9 +129,62 @@ class PolicyTest < ActiveSupport::TestCase
     end
     whitelist =  Policy.new().remove_duplicate(whitelist)
     whitelist_added= whitelist.select{|person| person[0]>9}
-    puts whitelist_added.inspect
     filtered_people = Policy.new().add_people_in_whitelist(people_with_access_type, whitelist)
-    puts filtered_people
     assert_equal (people_with_access_type.count + whitelist_added.count), filtered_people.count
   end
+
+  test 'should not have asset managers in the summarize_permissions if the asset is entirely private' do
+    asset_manager = Factory(:asset_manager)
+    policy = Factory(:private_policy)
+    User.with_current_user Factory(:user) do
+      people_in_group = policy.summarize_permissions [], [asset_manager]
+      puts people_in_group.inspect
+      assert !people_in_group[Policy::MANAGING].include?([asset_manager.id, asset_manager.name,Policy::MANAGING])
+    end
+  end
+
+  test 'should have asset managers in the summarize_permissions if the asset is not entirely private' do
+    asset_manager = Factory(:asset_manager)
+
+    #private policy but with permissions
+    policy1 = Factory(:private_policy)
+    permission =  Factory(:permission, :contributor => Factory(:person), :access_type => Policy::VISIBLE, :policy => policy1)
+    assert !policy1.permissions.empty?
+
+    #share within network
+    policy2 = Factory(:all_sysmo_viewable_policy)
+
+    User.with_current_user Factory(:user) do
+      people_in_group = policy1.summarize_permissions [], [asset_manager]
+      assert people_in_group[Policy::MANAGING].include?([asset_manager.id, asset_manager.name+'(asset manager)',Policy::MANAGING])
+
+      people_in_group = policy2.summarize_permissions [], [asset_manager]
+      assert people_in_group[Policy::MANAGING].include?([asset_manager.id, asset_manager.name+'(asset manager)',Policy::MANAGING])
+    end
+  end
+
+  test 'should concat the roles of a person after name' do
+    asset_manager = Factory(:asset_manager)
+    creator = Factory(:person)
+    policy = Factory(:public_policy)
+    User.with_current_user Factory(:user) do
+      people_in_group = policy.summarize_permissions [creator], [asset_manager]
+      #creator
+      people_in_group[Policy::EDITING].each do |person|
+        if person[0] == creator.id
+          assert person[1].include?('(creator)')
+        else
+          assert !person[1].include?('(creator)')
+        end
+      end
+      people_in_group[Policy::MANAGING].each do |person|
+        if person[0] == asset_manager.id
+          assert person[1].include?('(asset manager)')
+        else
+          assert !person[1].include?('(asset manager)')
+        end
+      end
+    end
+  end
+
 end

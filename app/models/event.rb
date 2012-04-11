@@ -12,7 +12,9 @@ class Event < ActiveRecord::Base
   #TODO: refactor to something like 'sorted_by :start_date', which should create the default scope and the sort method. Maybe rename the sort method.
   default_scope :order => "#{self.table_name}.start_date DESC"
 
-  acts_as_solr(:fields=>[:address,:city,:country,:url,:description,:title]) if Seek::Config.solr_enabled
+  searchable do
+    text :address,:city,:country,:url,:description,:title
+  end if Seek::Config.solr_enabled
 
   def self.sort events
     events.sort_by &:start_date

@@ -89,6 +89,10 @@ class User < ActiveRecord::Base
     self.logged_in_and_registered? && self.current_user.person.is_admin?
   end
 
+  def self.project_manager_logged_in?
+    self.logged_in_and_registered? && self.current_user.person.is_project_manager?
+  end
+
   #a person can be logged in but not fully registered during
   #the registration process whilst selecting or creating a profile
   def self.logged_in_and_registered?

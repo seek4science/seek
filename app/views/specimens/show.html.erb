@@ -24,8 +24,8 @@
 
     <div class="box_about_actor">
       <p>
-        <label>Title:</label>
-        <%= text_or_not_specified(@specimen.donor_number) %>
+        <label>Specimen title:</label>
+        <%= text_or_not_specified(@specimen.title) %>
       </p>
 
       <p>
@@ -97,18 +97,22 @@
             <% end %>
           </p>
       <% end %>
+
+      <%if Seek::Config.is_virtualliver%>
       <p>
         <label>Treatment:</label>
         <%= text_or_not_specified(@specimen.treatment) %>
       </p>
+      <%end%>
 
       <p>
-        <label>Lab internal No.:</label>
+        <label>Lab internal identifier:</label>
         <%= text_or_not_specified(@specimen.lab_internal_number) %>
       </p>
+
       <p>
         <label>Institution:</label>
-        <%= text_or_not_specified(@specimen.institution.name) %>
+        <%= text_or_not_specified(@specimen.institution.try(:name)) %>
       </p>
 
     </div>

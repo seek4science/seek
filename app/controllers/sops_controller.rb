@@ -8,7 +8,7 @@ class SopsController < ApplicationController
   #before_filter :login_required
   before_filter :find_assets, :only => [ :index ]
   before_filter :find_and_auth, :except => [ :index, :new, :create, :request_resource,:preview, :test_asset_url, :update_annotations_ajax]
-  before_filter :find_display_sop, :only=>[:show,:download]
+  before_filter :find_display_asset, :only=>[:show,:download]
 
   include Seek::Publishing
   
@@ -216,16 +216,4 @@ class SopsController < ApplicationController
     end
   end
 
-  protected
-  
-  def find_display_sop
-    if @sop
-        if logged_in? and current_user.person.member? and params[:version]
-          @display_sop = @sop.find_version(params[:version]) ? @sop.find_version(params[:version]) : @sop.latest_version
-        else
-          @display_sop = @sop.latest_version
-        end
-    end
-  end
-  
 end

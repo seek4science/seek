@@ -42,7 +42,7 @@ function updateEvents() {
 
     // update the page
     if (events_array.length == 0) {
-        $('event_to_list').innerHTML = '<span class="none_text">No events</span>';
+        $('event_to_list').innerHTML = '<span class="none_text">No Event</span>';
     }
     else {
         $('event_to_list').innerHTML = event_text;

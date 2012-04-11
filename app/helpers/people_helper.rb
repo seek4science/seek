@@ -11,12 +11,12 @@ module PeopleHelper
     end
   end
 
-  def pal_icon person
-    person.is_pal? ? image("pal",:alt=>"Pal",:title=>tooltip_title_attrib("Official #{Seek::Config.dm_project_name} Pal"), :style=>"vertical-align: middle")  : ""
-  end
-
-  def admin_icon person
-    person.is_admin? ? image("admin",:alt=>"Admin",:title=>tooltip_title_attrib("#{Seek::Config.dm_project_name} Administrator"), :style=>"vertical-align: middle") : ""
+  def seek_role_icons person
+    icons = ''
+    person.roles.each do |role|
+      icons << image("#{role}",:alt=>"#{role}",:title=>tooltip_title_attrib("Official #{Seek::Config.dm_project_name} #{role.humanize}"), :style=>"vertical-align: middle")
+    end
+    icons
   end
 
   def discipline_list person
@@ -32,12 +32,12 @@ module PeopleHelper
     return text
   end
 
-  def role_list person
-    unless person.roles.empty?
+  def project_role_list person
+    unless person.project_roles.empty?
       text=""
-      person.roles.each do |r|
-        text += link_to(h(r.title),people_path(:role_id=>r.id))
-        text += ", " unless person.roles.last==r
+      person.project_roles.each do |r|
+        text += link_to(h(r.title),people_path(:project_role_id=>r.id))
+        text += ", " unless person.project_roles.last==r
       end
     else
       text="<span class='none_text'>None specified</span>"

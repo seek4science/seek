@@ -29,8 +29,9 @@ class PresentationsControllerTest < ActionController::TestCase
     presentation_attrs = Factory.attributes_for(:presentation,:contributor=>User.current_user, :data => fixture_file_upload('files/file_picture.png'))
 
     assert_difference "Presentation.count" do
-      post :create,:presentation => presentation_attrs, :sharing => valid_sharing
-      puts assigns(:presentation).errors.full_messages
+      assert_difference "ActivityLog.count" do
+        post :create,:presentation => presentation_attrs, :sharing => valid_sharing
+      end
     end
   end
 
@@ -158,6 +159,28 @@ class PresentationsControllerTest < ActionController::TestCase
     assert_equal ["golf","soup"],presentation.annotations.select{|a| a.source==p.user}.collect{|a| a.value.text}.sort
     assert_equal ["golf","sparrow"],presentation.annotations.select{|a|a.source==p2.user}.collect{|a| a.value.text}.sort
 
+  end
+
+  test "should set the other creators " do
+    user = Factory(:user)
+    presentation = Factory(:presentation, :contributor => user)
+    login_as(user)
+    assert presentation.can_manage?,"The presentation must be manageable for this test to succeed"
+    put :update, :id => presentation, :presentation => {:other_creators => 'marry queen'}
+    presentation.reload
+    assert_equal 'marry queen', presentation.other_creators
+  end
+
+  test 'should show the other creators on the presentation index' do
+    Factory(:presentation, :policy => Factory(:public_policy), :other_creators => 'another creator')
+    get :index
+    assert_select 'p.list_item_attribute', :text => /: another creator/, :count => 1
+  end
+
+  test 'should show the other creators in -uploader and creators- box' do
+    presentation=Factory(:presentation, :policy => Factory(:public_policy), :other_creators => 'another creator')
+    get :show, :id => presentation
+    assert_select 'div', :text => /another creator/, :count => 1
   end
 
 end

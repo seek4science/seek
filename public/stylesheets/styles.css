@@ -1,7 +1,8 @@
 body {
-	background: #8e8e8e url('/images/body-bg.png') repeat-y center;
 	font-family: arial;
-	line-height: 1.0;	
+	line-height: 1.0;
+    border-left: #8e8e8e solid 10px;
+    border-right: #8e8e8e solid 10px;
 }
 
 
@@ -96,7 +97,7 @@ min-width:
 }
 
 .tabnav {
-    text-align: left;
+    text-align: center;
     font-weight: bolder;
     font-size: 95%;
     padding: 4px 0 3px 2em;
@@ -1363,6 +1364,7 @@ a.block_link {
   margin-top: 0.3em;
   text-align: left;
   vertical-align: middle;
+  width: 17em;
 }
 
 a.block_link_active {
@@ -1614,8 +1616,65 @@ div.compounds {
     padding: 0 1em 0.5em 1em;
 }
 
+div.strain {
+    border: 1px solid #DDD;
+    float: left;
+    margin-left: 2em;
+    margin-top: 1em;
+    margin-bottom: 1em;
+    margin-right: 2em;
+    width: 50em;
+    padding: 0 1em 0.5em 1em;
+}
+
+ul.genes li {
+    list-style-type:none;
+}
+
+ul.genes {
+    float: left;
+    margin-top: 2em;
+}
+
+ul.gene_row {
+    clear:both;
+    border-bottom: dotted #d3d3d3 1px;
+}
+
+ul.gene_row li {
+    float:left;
+    padding: 0 0.6em 0.25em 0.25em;
+    text-align:left;
+    min-height: 2em;
+}
+
+ul.modifications li {
+    list-style-type:none;
+}
+
+ul.modifications {
+    float: left;
+    margin-top: 2em;
+}
+#search_box input[type="text"] {
+    width: 28em;
+}
+
+#search_box input[type="text"] {
+    width: 28em;
+}
 
 
+ul.modification_row {
+    clear:both;
+    border-bottom: dotted #d3d3d3 1px;
+}
 
+ul.modification_row li {
+    float:left;
+    padding: 0 0.6em 0.25em 0.25em;
+    text-align:left;
+    min-height: 2em;
+}
 
 

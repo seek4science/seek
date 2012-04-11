@@ -1,0 +1,47 @@
+<% specimen = sample_specimen_details -%>
+
+<p>
+  <label><%= CELL_CULTURE_OR_SPECIMEN.capitalize -%> name:</label>
+  <%= text_or_not_specified(specimen.title) -%>
+</p>
+<p>
+  <label>Lab internal identifier:</label>
+  <%= text_or_not_specified(specimen.lab_internal_number) %>
+</p>
+<p>
+  <label>Culture starting date:</label>
+  <%= text_or_not_specified specimen.born.nil? ? nil : date_as_string(specimen.born) -%>
+</p>
+<p>
+  <label>Culture growth type:</label>
+  <%= text_or_not_specified specimen.culture_growth_type.try(:title) -%>
+</p>
+<p>
+  <label>Sex:</label>
+  <%
+     if specimen.sex == false
+       sex = 'male'
+     elsif specimen.sex == true
+       sex = 'female'
+     else
+       sex = nil
+     end
+  %>
+  <%= text_or_not_specified sex -%>
+</p>
+<p>
+  <label>Comment:</label>
+  <%= text_or_not_specified specimen.comments -%>
+</p>
+<p>
+  <label>Provider name:</label>
+  <%= text_or_not_specified specimen.provider_name -%>
+</p>
+<p>
+  <label>Provider's <%= CELL_CULTURE_OR_SPECIMEN -%> identifier:</label>
+  <%= text_or_not_specified specimen.provider_id -%>
+</p>
+<p>
+  <label>Organism and strain:</label>
+  <%= organism_and_strain( specimen.strain) -%>
+</p>

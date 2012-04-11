@@ -67,12 +67,18 @@ class PoliciesController < ApplicationController
       set_no_layout
       creators = (params["creators"].blank? ? [] : ActiveSupport::JSON.decode(params["creators"])).uniq
       creators.collect!{|c| Person.find(c[1])}
+      asset_managers = []
+      selected_projects = get_selected_projects
+      selected_projects.each do |project|
+        asset_managers |= project.asset_managers
+      end
+
       policy = sharing_params_to_policy
       if params['is_new_file'] == 'false'
         contributor = try_block{User.find_by_id(params['contributor_id'].to_i).person}
-        grouped_people_by_access_type = policy.summarize_permissions creators, contributor
+        grouped_people_by_access_type = policy.summarize_permissions creators, asset_managers, contributor
       else
-        grouped_people_by_access_type = policy.summarize_permissions creators
+        grouped_people_by_access_type = policy.summarize_permissions creators, asset_managers
       end
 
       respond_to do |format|
@@ -131,6 +137,26 @@ class PoliciesController < ApplicationController
     policy
   end
 
+  def get_selected_projects params=params
+    if (params["resource_name"] == 'study') and (!params["project_ids"].blank?)
+      investigation = Investigation.find_by_id(params["project_ids"].to_i)
+      projects = investigation.projects
+
+      #when resource is assay, id of the study is sent, so get the project_ids from the study
+    elsif (params["resource_name"] == 'assay') and (!params["project_ids"].blank?)
+      study = Study.find_by_id(params["project_ids"].to_i)
+      projects = study.projects
+      #normal case, the project_ids is sent
+    else
+      project_ids = params["project_ids"].blank? ? [] : params["project_ids"].split(',')
+      projects = []
+      project_ids.each do |id|
+        project = Project.find_by_id(id.to_i)
+        projects << project if project
+      end
+    end
+    projects
+  end
 end
 
 

@@ -30,14 +30,14 @@ as follows:
 
 (if you need more information, see https://help.ubuntu.com/community/Repositories/Ubuntu#Adding+Canonical+Partner+Repositories).
 
-If you needed to add partner repositories, and its a good idea anyway, you should do an apt-get update
+If you needed to add partner repositories, and its a good idea anyway, you should now do an apt-get update and an apt-get upgrade to make sure things are up to date:
 
-  sudo apt-get update
+  sudo apt-get update && sudo apt-get -y upgrade
 
 If using Ubuntu or Debian, the following commands should install most the packages you need:
  
   sudo apt-get install wget mercurial ruby rdoc ri libopenssl-ruby ruby-dev mysql-server libssl-dev build-essential openssh-server 
-  sudo apt-get install libmysqlclient16-dev libmagick++-dev libxml++2.6-dev sun-java6-jdk graphviz libsqlite3-dev sqlite3
+  sudo apt-get install libmysqlclient16-dev libmagick++-dev libxslt-dev libxml++2.6-dev sun-java6-jdk graphviz libsqlite3-dev sqlite3
 
 if you are intending to develop SEEK you will probably also want to use:
 
@@ -63,43 +63,34 @@ The following commands should install rubygems for you on a Ubuntu/Debian system
 
 == Getting the source code
 
+On a production server we would recommend installing into the directory <i>/srv/rails/</i> and installing as the user www-data. There is also more information later
+on how to setup Apache and {Passenger Phusion (modrails)}[http://www.modrails.com/].
+
 Our source code is stored within the {Sysmo-DB Google Code Repository}[http://code.google.com/p/sysmo-db/], using Mercurial[http://mercurial.selenic.com/] as the version control system. 
 
-For a stable version, you should check out according to a stable tag. Our current tag is v0.11.3, so to retrieve this version you should use:
+For a stable version, you should check out according to a stable tag. Our current stable tag is <em>0.13.1</em>, so to retrieve this version you should use:
 
-  hg clone https://sysmo-db.googlecode.com/hg/ -r v0.11.3 seek
+  hg clone https://sysmo-db.googlecode.com/hg/ -r v0.13.1 seek
+
+This will create a <i>seek</i> directory that contains the application.
   
 Bundler[http://gembundler.com/] is used to manage gems, so to install the required gems you first need to install the bundler gem:
 
-  gem install -d bundler rake
+  gem install -d bundler
   
-Then from within the sysmo-seek directory run
+Then from within the seek directory run
 
   bundle install  
   
 If you are requested for a root or sudo password, but you do not have this level of access then you should use
 
   bundle install --deployment
-  
-
 
 == The RAILS_ENV environment variable
 
 If you are setting up SEEK as a production environment, rather than for development, you should set the RAILS_ENV variable before proceeding
 
   export RAILS_ENV=production
-
-== Rebranding SysMO SEEK for other projects
-
-If you are running SEEK for a project other than SysMO, copy config/initializers/seek_local.rb.pre to config/initializers/seek_local.rb. This file contains several constants that you should set, to reflect the name of your project/application.
-
-To insert your application/project name into the help documents for SEEK, and to remove the logos/links to SEEK's 'related projects and friends' use
-
-  rake seek:rebrand
-
-If you only want to change the help documents, you can instead use
-
-  rake seek:rebrand_help_docs
 
 == Configuring the database
 
@@ -121,18 +112,9 @@ To add users to the MySQL database, first login to the database as an administra
     mysql> GRANT ALL PRIVILEGES ON *.* TO 'mysqluser'@'localhost' WITH GRANT OPTION;
 
 
-Run the rake tasks (the final task installs some default controlled vocubulary data)
+Run the rake database setup task, this creates the database, loads the schema and seeds the database with any default data
 
-  rake db:create:all
-  rake db:schema:load
-  rake seek:seed
-
-== A quick test
-
-You can quickly check that everything is in order by running the system tests as follows
-
-  rake db:test:prepare
-  rake test
+  rake db:setup
 
 == Starting the server
 
@@ -143,6 +125,19 @@ You can now start the server with the command
 If running in production mode, you should start the server with
 
   ./script/server -e production
+
+
+== Starting Delayed-Job (Background processing)
+
+Some background processing is handled using a tool called <em>Delayed Job</em>
+
+To start delayed job run the script
+
+  ./script/delayed_job start
+
+or for production:
+
+  RAILS_ENV=production ./script/delayed_job start
 
 == Creating the Admin user
 
@@ -159,6 +154,65 @@ Once logged in as an administrator, you will notice a link on the right-hand sid
 admin facilities for creating new projects, institutions and profiles.
 
 Here you can also define additional administrator users.
+
+== Enabling search and starting the Sunspot SOLR server
+
+Search can be enabled in the admin setting under Admin settings, Site configuration, Enable/disable features - under "Search enabled". You will need
+to restart the server after changing this setting.
+
+To start the search server you need to run:
+
+  rake sunspot:solr:start
+
+and to reindex any existing data that created before search was enabled:
+
+  rake sunspot:solr:reindex
+
+== Rebranding SysMO SEEK for other projects
+
+If you are running SEEK for a project other than SysMO you can change various text elements under Admin, Site branding.
+
+To insert your application/project name into the help documents for SEEK, and to remove the logos/links to SEEK's 'related projects and friends' use
+
+  rake seek:rebrand
+
+If you only want to change the help documents, you can instead use
+
+  rake seek:rebrand_help_docs
+
+== Setting up Passenger Phusion and Apache for production servers.
+
+This section is only relevant if setting up a production deployment, and assumes that seek has been deployed to /srv/rails/seek as the user www-data, and that you have used RAILS_ENV=production whilst setting up.
+Most of these steps are already very well documented at {Passenger Phusion Install Guide}[http://www.modrails.com/install.html] and the installation is a guided process.
+
+If you have not done so already, then beforehand install some additional libaries using:
+
+  sudo apt-get install apache2-mpm-prefork apache2-prefork-dev libapr1-dev libaprutil1-dev libcurl4-openssl-dev
+
+Next install the passenger gem
+
+  sudo gem install passenger
+
+Next run the following command to compile and install the modrails Apache modules, and follow the instructions it provides
+
+  sudo passenger-install-apache2-module
+
+If you've followed the instructions, you will have added something like the following (the version numbers may differ) to your <i>/etc/apache/http.conf</i>
+
+  LoadModule passenger_module /usr/lib/ruby/gems/1.8/gems/passenger-3.0.7/ext/apache2/mod_passenger.so
+  PassengerRoot /usr/lib/ruby/gems/1.8/gems/passenger-3.0.7
+  PassengerRuby /usr/bin/ruby1.8
+
+and configured a virtual host (probably in <i>/etc/apache2/sites-enabled/default</i>) that looks something like:
+
+  <VirtualHost *:80>
+     ServerName www.yourhost.com
+     DocumentRoot /srv/rails/seek/public
+        <Directory /srv/rails/seek/public>
+         AllowOverride all
+         Options -MultiViews            
+      </Directory>
+   </VirtualHost>
 
 == Contacting us and other developers 
 

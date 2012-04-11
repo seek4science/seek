@@ -20,9 +20,33 @@ module ProjectsHelper
 
   def pals_link_list project
     if project.pals.empty?
-      "<span class='none_text'>No Pals for this project</span>";
+      "<span class='none_text'>No PALs for this project</span>";
     else
       project.pals.select(&:can_view?).collect { |p| link_to(h(p.name), p) }.join(", ")
+    end
+  end
+
+  def asset_managers_link_list project
+    if project.asset_managers.empty?
+      "<span class='none_text'>No Asset Managers for this project</span>";
+    else
+      project.asset_managers.select(&:can_view?).collect { |p| link_to(h(p.name), p) }.join(", ")
+    end
+  end
+
+  def project_managers_link_list project
+    if project.project_managers.empty?
+      "<span class='none_text'>No Project Managers for this project</span>";
+    else
+      project.project_managers.select(&:can_view?).collect { |p| link_to(h(p.name), p) }.join(", ")
+    end
+  end
+
+  def publishers_link_list project
+    if project.publishers.empty?
+      "<span class='none_text'>No Publishers for this project</span>";
+    else
+      project.publishers.select(&:can_view?).collect { |p| link_to(h(p.name), p) }.join(", ")
     end
   end
 

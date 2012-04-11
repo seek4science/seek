@@ -202,11 +202,41 @@ class ProjectsControllerTest < ActionController::TestCase
 	test "pals displayed in show page" do
 		get :show,:id=>projects(:sysmo_project)
 		assert_select "div.box_about_actor p.pals" do
-			assert_select "label",:text=>"SysMO-DB Pals:",:count=>1
+			assert_select "label",:text=>"SysMO-DB PALs:",:count=>1
 			assert_select "a",:count=>1
-			assert_select "a[href=?]",person_path(people(:pal)),:text=>"A Pal",:count=>1
+			assert_select "a[href=?]",person_path(people(:pal)),:text=>"A PAL",:count=>1
 		end
-	end
+  end
+
+  	test "asset_managers displayed in show page" do
+    asset_manager = Factory(:asset_manager)
+    get :show,:id=>asset_manager.projects.first
+		assert_select "div.box_about_actor p.asset_managers" do
+			assert_select "label",:text=>"SysMO-DB Asset Managers:",:count=>1
+			assert_select "a",:count=>1
+			assert_select "a[href=?]",person_path(asset_manager),:text=>asset_manager.name,:count=>1
+		end
+    end
+
+  	test "project_managers displayed in show page" do
+		project_manager = Factory(:project_manager)
+    get :show,:id=>project_manager.projects.first
+		assert_select "div.box_about_actor p.project_managers" do
+			assert_select "label",:text=>"SysMO-DB Project Managers:",:count=>1
+			assert_select "a",:count=>1
+			assert_select "a[href=?]",person_path(project_manager),:text=>project_manager.name,:count=>1
+		end
+    end
+
+  test "publishers displayed in show page" do
+    publisher = Factory(:publisher)
+    get :show, :id => publisher.projects.first
+    assert_select "div.box_about_actor p.publishers" do
+      assert_select "label", :text => "SysMO-DB Publishers:", :count => 1
+      assert_select "a", :count => 1
+      assert_select "a[href=?]", person_path(publisher), :text => publisher.name, :count => 1
+    end
+  end
 
 	test "filter projects by person" do
 		get :index, :filter => {:person => 1}
@@ -219,12 +249,41 @@ class ProjectsControllerTest < ActionController::TestCase
 	test "no pals displayed for project with no pals" do
 		get :show,:id=>projects(:myexperiment_project)
 		assert_select "div.box_about_actor p.pals" do
-			assert_select "label",:text=>"SysMO-DB Pals:",:count=>1
+			assert_select "label",:text=>"SysMO-DB PALs:",:count=>1
 			assert_select "a",:count=>0
-			assert_select "span.none_text",:text=>"No Pals for this project",:count=>1
+			assert_select "span.none_text",:text=>"No PALs for this project",:count=>1
+		end
+  end
+
+  test "no asset managers displayed for project with no asset managers" do
+		project = Factory(:project)
+    get :show,:id=>project
+		assert_select "div.box_about_actor p.asset_managers" do
+			assert_select "label",:text=>"SysMO-DB Asset Managers:",:count=>1
+			assert_select "a",:count=>0
+			assert_select "span.none_text",:text=>"No Asset Managers for this project",:count=>1
+		end
+  end
+
+  test "no project managers displayed for project with no project managers" do
+		project = Factory(:project)
+    get :show,:id=>project
+		assert_select "div.box_about_actor p.project_managers" do
+			assert_select "label",:text=>"SysMO-DB Project Managers:",:count=>1
+			assert_select "a",:count=>0
+			assert_select "span.none_text",:text=>"No Project Managers for this project",:count=>1
 		end
 	end
 
+  test "no publishers displayed for project with no publishers" do
+		project = Factory(:project)
+    get :show,:id=>project
+		assert_select "div.box_about_actor p.publishers" do
+			assert_select "label",:text=>"SysMO-DB Publishers:",:count=>1
+			assert_select "a",:count=>0
+			assert_select "span.none_text",:text=>"No Publishers for this project",:count=>1
+		end
+	end
 
 	test "non admin cannot administer project" do
 		#login_as(:pal_user)
@@ -281,6 +340,135 @@ class ProjectsControllerTest < ActionController::TestCase
 		assert project.default_policy_id
 		assert Permission.find_by_policy_id(project.default_policy).contributor_id == person.id
 	end
+
+  test 'project manager can administer their projects' do
+    project_manager = Factory(:project_manager)
+    project = project_manager.projects.first
+    login_as(project_manager.user)
+
+    get :show, :id => project
+    assert_response :success
+    assert_select "a", :text => /Project administration/, :count => 1
+
+    get :admin, :id => project
+    assert_response :success
+
+    new_institution = Institution.create(:name => 'a test institution')
+    put :update, :id => project, :project => {:institution_ids => (project.institutions + [new_institution]).collect(&:id)}
+    assert_redirected_to project_path(project)
+    project.reload
+    assert project.institutions.include?new_institution
+  end
+
+  test 'project manager can not administer the projects that they are not in' do
+    project_manager = Factory(:project_manager)
+    a_project = Factory(:project)
+    assert !(project_manager.projects.include?a_project)
+    login_as(project_manager.user)
+
+    get :show, :id => a_project
+    assert_response :success
+    assert_select "a", :text => /Project administration/, :count => 0
+
+    get :admin, :id => a_project
+    assert_redirected_to :root
+    assert_not_nil flash[:error]
+
+    new_institution = Institution.create(:name => 'a test institution')
+    put :update, :id => a_project, :project => {:institution_ids => (a_project.institutions + [new_institution]).collect(&:id)}
+    assert_redirected_to :root
+    assert_not_nil flash[:error]
+    a_project.reload
+    assert !(a_project.institutions.include?new_institution)
+  end
+
+  test 'project manager can only see the new institutions (which are not yet in any projects) and the institutions this project' do
+    project_manager = Factory(:project_manager)
+    project = project_manager.projects.first
+    login_as(project_manager.user)
+
+    new_institution = Institution.create(:name => 'a test institution')
+    a_project = Factory(:project)
+    a_project.institutions << Factory(:institution)
+
+    get :admin, :id => project
+    assert_response :success
+    assert_select "select#project_institution_ids", :count => 1 do
+      (project.institutions + [new_institution]).each do |institution|
+         assert_select 'option', :text => institution.title, :count => 1
+      end
+      a_project.institutions.each do |institution|
+         assert_select 'option', :text => institution.title, :count => 0
+      end
+    end
+  end
+
+  test 'project manager can assign only the new institutions (which are not yet in any projects) to their project' do
+    project_manager = Factory(:project_manager)
+    project = project_manager.projects.first
+    login_as(project_manager.user)
+
+    new_institution = Institution.create(:name => 'a test institution')
+
+    put :update, :id => project, :project => {:institution_ids => (project.institutions + [new_institution]).collect(&:id)}
+    assert_redirected_to project_path(project)
+    project.reload
+    assert project.institutions.include?new_institution
+  end
+
+  test 'project manager can not assign the institutions (which are already in the other projects) to their project' do
+    project_manager = Factory(:project_manager)
+    project = project_manager.projects.first
+    a_project = Factory(:project)
+    a_project.institutions << Factory(:institution)
+
+    login_as(project_manager.user)
+
+    put :update, :id => project, :project => {:institution_ids => (project.institutions + a_project.institutions).collect(&:id)}
+    assert_redirected_to :root
+    assert_not_nil flash[:error]
+    project.reload
+    a_project.institutions.each do |i|
+       assert !(project.institutions.include?i)
+    end
+  end
+
+  test 'project manager can not administer sharing policy' do
+    project_manager = Factory(:project_manager)
+    project = project_manager.projects.first
+    policy = project.default_policy
+
+		sharing = {}
+		sharing[:sharing_scope] = Policy::EVERYONE
+    sharing["access_type_#{sharing[:sharing_scope]}"] = Policy::VISIBLE
+
+    assert_not_equal policy.sharing_scope, sharing[:sharing_scope]
+    assert_not_equal policy.access_type, sharing["access_type_#{sharing[:sharing_scope]}"]
+
+    login_as(project_manager.user)
+		put :update, :id => project.id, :project => valid_project, :sharing => sharing
+    project.reload
+    assert_redirected_to project
+		assert_not_equal project.default_policy.sharing_scope, sharing[:sharing_scope]
+    assert_not_equal project.default_policy.access_type, sharing["access_type_#{sharing[:sharing_scope]}"]
+  end
+
+  test 'project manager can not administer jerm detail' do
+    project_manager = Factory(:project_manager)
+    project = project_manager.projects.first
+    assert_nil project.site_root_uri
+    assert_nil project.site_username
+    assert_nil project.site_password
+
+    login_as(project_manager.user)
+		put :update, :id => project.id, :project => {:site_root_uri => 'test', :site_username => 'test', :site_password => 'test'}
+
+    project.reload
+    assert_redirected_to project
+		assert_nil project.site_root_uri
+    assert_nil project.site_username
+    assert_nil project.site_password
+  end
 
 	private
 

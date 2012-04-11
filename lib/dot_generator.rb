@@ -259,8 +259,8 @@ module DotGenerator
             av_url = avatar(object, 14, true).match(/src=\"[^\"]*\"/).to_s.gsub("src=", "").gsub("\"", "")
             rect_node = LibXML::XML::Node.new("rect width=\"18\" height=\"18\" x=\"#{x2.to_f + 3}\" y=\"#{y2.to_f + 3}\" style=\"fill: rgb(255,255,255);stroke:rgb(120,120,120);\"")
             image_node = LibXML::XML::Node.new("image width=\"14\" height=\"14\" x=\"#{x2.to_f + 5}\" y=\"#{y2.to_f + 5}\" xlink:href=\"#{av_url}\"")
-            a.add_element(rect_node)
-            a.add_element(image_node)
+            a<<(rect_node)
+            a<<(image_node)
           end
 
         end

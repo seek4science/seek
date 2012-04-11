@@ -16,7 +16,9 @@ class Sop < ActiveRecord::Base
   # allow same titles, but only if these belong to different users
   # validates_uniqueness_of :title, :scope => [ :contributor_id, :contributor_type ], :message => "error - you already have a SOP with such title."
 
-  acts_as_solr(:fields=>[:description, :title, :original_filename,:searchable_tags,:exp_conditions_search_fields]) if Seek::Config.solr_enabled
+  searchable do
+    text :description, :title, :original_filename,:searchable_tags,:exp_conditions_search_fields
+  end if Seek::Config.solr_enabled
 
   has_many :sample_assets,:dependent=>:destroy,:as => :asset
   has_many :samples, :through => :sample_assets
@@ -25,6 +27,9 @@ class Sop < ActiveRecord::Base
   has_one :content_blob, :as => :asset, :foreign_key => :asset_id ,:conditions => 'asset_version= #{self.version}'
 
   has_many :experimental_conditions, :conditions =>  'experimental_conditions.sop_version = #{self.version}'
+
+  has_many :sop_specimens
+  has_many :specimens,:through=>:sop_specimens
 
   explicit_versioning(:version_column => "version") do
     

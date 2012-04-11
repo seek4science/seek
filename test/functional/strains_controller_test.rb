@@ -10,4 +10,11 @@ class StrainsControllerTest < ActionController::TestCase
     login_as(:aaron)
     @object=strains(:yeast1)
   end
+
+  test "get existing strains with no organism" do
+
+    xml_http_request :get,:show_existing_strains,{:organism_id=>"0"}
+    assert_response :success
+
+  end
 end

@@ -10,16 +10,26 @@
   
     <%= f.error_messages %>
 
-    <%= render :partial=>"jerm_details",:locals=>{:f=>f} %>
-    <br/>
-    <%= render :partial=>"assets/sharing_form"%>
+    <% if admin_logged_in?%>
+        <%= render :partial=>"jerm_details",:locals=>{:f=>f} %>
+        <br/>
+        <%= render :partial=>"assets/sharing_form"%>
+    <%end%>
 
     <h2 style="margin-top: 2em;">Participating Institutions</h2>
 
     <div style="width: 95%; text-align: left;">
       <%= help_icon("To select multiple institutions press & hold CTRL<br/>while making your selection from the list below.") -%>
       <%= f.label :institution_ids, "Please select the institutions that participate in this project", :style => "line-height: 2;" -%><br/>
-      <%= f.collection_select :institution_ids, Institution.find(:all), :id, :name, {}, {:style => "width: 85%; height: 200px;", :multiple=>true} -%>
+      <%
+         institution_list = []
+         if admin_logged_in?
+            institution_list |= Institution.find(:all)
+         elsif project_manager_logged_in?
+            institution_list |= (Institution.find(:all).select{|i| i.projects.empty?} + @project.institutions).uniq
+         end
+      %>
+      <%= f.collection_select :institution_ids, institution_list, :id, :name, {}, {:style => "width: 85%; height: 200px;", :multiple=>true} -%>
     </div>
 
     <p style="margin-top: 2em; text-align: center;">

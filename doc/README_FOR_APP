@@ -2,15 +2,11 @@
 
 = SYSMO-SEEK
 
-Please visit the Sysmo-DB Website[http://www.sysmo-db.org] for more information about Sysmo-SEEK and Sysmo-DB in general.
+Please visit the {Sysmo-DB Website}[http://www.sysmo-db.org] for more information about SEEK and Sysmo-DB in general.
 
 == Installation
 
 Please read INSTALL[link:files/doc/INSTALL.html] for details on how to setup SEEK for the first time.
-
-== JERM (Just Enough Results Model)
-
-For information about the JERM and how to extend it please read the JERM[link:files/doc/JERM.html] document.
 
 == Credits
 
@@ -18,5 +14,5 @@ Please read the CREDITS[link:files/doc/CREDITS.html] document.
 
 
 Author::    Stuart Owen  (mailto:stuart.owen@manchester.ac.uk)
-Copyright:: Copyright (c) 2009 The University of Manchester UK &  EML Research gGmbH
+Copyright:: Copyright (c) 2011 The University of Manchester UK &  HITS gGmbH
 License::   New BSD Licence[http://www.opensource.org/licenses/bsd-license.php]

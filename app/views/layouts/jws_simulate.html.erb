@@ -1,0 +1,79 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+
+  <head>
+    <meta http-equiv="content-type" content="text/html;charset=UTF-8" />
+    <title><%= page_title controller.controller_name, controller.action_name %></title>
+
+    <link rel="shortcut icon" href="/favicon.ico" type="image/x-icon" />
+    
+    <%= javascript_include_tag 'prototype.js','effects.js','dragdrop.js','boxover.js','scriptaculous.js','controls.js', 'redbox.js','builder.js','application.js','autocompleter_advanced.js',:cache=>'js_cached' %>
+    <%= stylesheet_link_tag 'reset-fonts-grids', 'base-min', 'my_exp', 'gadgets', 'acts_as_taggable_stylesheet', 'styles', 'fast_auto_complete', 'redbox', 'autocompleter_advanced', 'alphabetical_pagination', :cache=>'css_cached'%>
+
+    <script type="text/javascript">
+      function show_ajax_loader(element) {
+        $(element).innerHTML=<%= "'"+image_tag("ajax-loader.gif")+"'" -%>;
+      }
+    </script>
+
+  </head>
+
+  <body id="body" style="background: #FFF">
+
+    <div id="doc3" class="yui-t2">
+      <div id="hd">
+        <% if logged_in? %>
+        <div id="logged_in_as">
+          Logged in as  
+          <%= image_tag_for_key "user", current_user.person, current_user.person.name, {}, current_user.person.name -%>
+          | <%= image_tag_for_key "logout", logout_path, "Logout", {}, "Logout" -%>
+        </div>
+        <% end %>
+        <div id="header">
+          <%= render :partial=>"layouts/header_main" %>
+        </div>
+        <%= tabbar %>
+        <div id="topbar">
+          <%= render :partial=>"search/search_bar" %>
+        </div>
+      </div>
+      <div id="bd">
+        <div id="yui-main">
+          <div  id="content">
+
+            <%# applying styling to error / notice messages -%>
+            <% if flash[:error] %>
+              <div id="error_flash" class="box_standout" style="color: red; font-weight: bold; margin: 0.8em 0.8em; line-height: 1.4;">
+                <%= link_to_function image_tag("close.gif", :style => "float: right;"),
+                  visual_effect(:toggle_slide, "error_flash", :duration => 0.3) %>
+                <%= white_list flash[:error] %>
+              </div>
+            <% end %>
+            <% if flash[:notice] %>
+              <div id="notice_flash" class="box_standout" style="color: green; font-weight: bold; margin: 0.8em 0.8em; line-height: 1.4;">
+                <%= link_to_function image_tag("close.gif", :style => "float: right;"),
+                  visual_effect(:toggle_slide, "notice_flash", :duration => 0.3) %>
+                <%= white_list flash[:notice] %>
+              </div>
+            <% end %>
+
+            <%# main content part of every page -%>
+            <%= yield :layout %>
+
+          </div>
+          <br style="clear:both"/>
+        </div>
+      </div>
+      <div id="ft">
+        <%= render :partial=>"layouts/footer" %>
+      </div>
+
+    </div>
+
+    <%# NB! These javascript include should be here - otherwise folds / tabs will not be displayed on any pages. -%>
+    <%= javascript_include_tag "folds.js" %>
+    <%= javascript_include_tag "tabber-minimized.js" %>
+  </body>
+</html>

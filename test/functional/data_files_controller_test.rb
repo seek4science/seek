@@ -130,7 +130,7 @@ class DataFilesControllerTest < ActionController::TestCase
      data_file_with_samples = valid_data_file
      data_file_with_samples[:sample_ids] = [Factory(:sample,:title=>"newTestSample",:contributor=> User.current_user).id]
      assert_difference("DataFile.count") do
-       post :create,:data_file => data_file_with_samples
+       post :create,:data_file => data_file_with_samples, :sharing => valid_sharing
      end
 
     df = assigns(:data_file)
@@ -895,7 +895,200 @@ class DataFilesControllerTest < ActionController::TestCase
     df=data_files(:picture)
     get :explore,:id=>df,:version=>1
     assert_redirected_to data_file_path(df,:version=>1)
+    assert flash[:error]
+  end
+
+  test "uploader can publish the item" do
+    uploader = Factory(:user)
+    data_file = Factory(:data_file, :contributor => uploader)
+    assert_not_equal Policy::EVERYONE, data_file.policy.sharing_scope
+    login_as(uploader)
+    put :update, :id => data_file, :sharing => {:sharing_scope =>Policy::EVERYONE, "access_type_#{Policy::EVERYONE}".to_sym => Policy::VISIBLE}
+
+    assert_nil flash[:error]
+  end
+
+  test "the person who has the manage right to the item, but not the uploader, CAN NOT publish the item, if the item WAS NOT published" do
+    person = Factory(:person)
+    policy = Factory(:policy)
+    Factory(:permission, :policy => policy, :contributor => person, :access_type => Policy::MANAGING)
+    data_file = Factory(:data_file, :policy => policy)
+    assert_not_equal Policy::EVERYONE, data_file.policy.sharing_scope
+    login_as(person.user)
+    assert data_file.can_manage?
+    put :update, :id => data_file, :sharing => {:sharing_scope =>Policy::EVERYONE, "access_type_#{Policy::EVERYONE}".to_sym => Policy::VISIBLE}
+
     assert_not_nil flash[:error]
+  end
+
+  test "the person who has the manage right to the item, but not the uploader, CAN publish the item, if the item WAS published" do
+      person = Factory(:person)
+      policy = Factory(:policy, :sharing_scope => Policy::EVERYONE)
+      Factory(:permission, :policy => policy, :contributor => person, :access_type => Policy::MANAGING)
+      data_file = Factory(:data_file, :policy => policy)
+      assert_equal Policy::EVERYONE, data_file.policy.sharing_scope
+      login_as(person.user)
+      assert data_file.can_manage?
+      put :update, :id => data_file, :sharing => {:sharing_scope =>Policy::EVERYONE, "access_type_#{Policy::EVERYONE}".to_sym => Policy::VISIBLE}
+
+      assert_nil flash[:error]
+    end
+
+  test "should enable the policy scope 'all visitor...' when uploader edit the item" do
+      uploader = Factory(:user)
+      data_file = Factory(:data_file, :contributor => uploader)
+      assert_not_equal Policy::EVERYONE, data_file.policy.sharing_scope
+      login_as(uploader)
+      get :edit, :id => data_file
+
+      assert_select "input[type=radio][id='sharing_scope_4'][value='4'][disabled='true']", :count => 0
+  end
+
+  test "should disable the policy scope 'all visitor...' for the manager if the item was not published" do
+    person = Factory(:person)
+    policy = Factory(:policy)
+    Factory(:permission, :policy => policy, :contributor => person, :access_type => Policy::MANAGING)
+    data_file = Factory(:data_file, :policy => policy)
+    assert_not_equal Policy::EVERYONE, data_file.policy.sharing_scope
+    login_as(person.user)
+    assert data_file.can_manage?
+
+    get :edit, :id => data_file
+
+      assert_select "input[type=radio][id='sharing_scope_4'][value='4'][disabled='true']"
+  end
+
+  test "should enable the policy scope 'all visitor...' for the manager if the item was published" do
+    person = Factory(:person)
+    policy = Factory(:policy, :sharing_scope => Policy::EVERYONE)
+    Factory(:permission, :policy => policy, :contributor => person, :access_type => Policy::MANAGING)
+    data_file = Factory(:data_file, :policy => policy)
+    assert_equal Policy::EVERYONE, data_file.policy.sharing_scope
+    login_as(person.user)
+    assert data_file.can_manage?
+
+    get :edit, :id => data_file
+
+    assert_select "input[type=radio][id='sharing_scope_4'][value='4'][disabled='true']", :count => 0
+  end
+
+  test "should show the latest version if the params[:version] is not specified" do
+    data_file=data_files(:editable_data_file)
+    get :show, :id => data_file
+    assert_response :success
+    assert_nil flash[:error]
+
+    logout
+    published_data_file = Factory(:data_file, :policy => Factory(:public_policy))
+    get :show, :id => published_data_file
+    assert_response :success
+    assert_nil flash[:error]
+  end
+
+  test "should show the correct version" do
+    data_file=data_files(:downloadable_spreadsheet_data_file)
+    get :show, :id => data_file, :version => 1
+    assert_response :success
+    assert_nil flash[:error]
+
+    get :show, :id => data_file, :version => 2
+    assert_response :success
+    assert_nil flash[:error]
+  end
+
+  test "should show error for the incorrect version" do
+    data_file=data_files(:editable_data_file)
+    get :show, :id => data_file, :version => 2
+    assert_redirected_to root_path
+    assert_not_nil flash[:error]
+  end
+
+  test "should show error for the user who doesn't login or is not the project member, when the user specify the version and this version is not the latest version" do
+    published_data_file = Factory(:data_file, :policy => Factory(:public_policy))
+
+    published_data_file.save_as_new_version
+    Factory(:content_blob, :asset => published_data_file, :asset_version => published_data_file.version)
+    published_data_file.reload
+
+    logout
+    get :show, :id => published_data_file, :version => 1
+    assert_redirected_to root_path
+    assert_not_nil flash[:error]
+
+    flash[:error] = nil
+    get :show, :id => published_data_file, :version => 2
+    assert_response :success
+    assert_nil flash[:error]
+
+    login_as(Factory(:user_not_in_project))
+    get :show, :id => published_data_file, :version => 1
+    assert_redirected_to root_path
+    assert_not_nil flash[:error]
+
+    flash[:error] = nil
+    get :show, :id => published_data_file, :version => 2
+    assert_response :success
+    assert_nil flash[:error]
+  end
+
+  test "should set the other creators " do
+    data_file=data_files(:picture)
+    assert data_file.can_manage?,"The data file must be manageable for this test to succeed"
+    put :update, :id => data_file, :data_file => {:other_creators => 'marry queen'}
+    data_file.reload
+    assert_equal 'marry queen', data_file.other_creators
+  end
+
+  test 'should show the other creators on the data file index' do
+    data_file=data_files(:picture)
+    data_file.other_creators = 'another creator'
+    data_file.save
+    get :index
+
+    assert_select 'p.list_item_attribute', :text => /: another creator/, :count => 1
+  end
+
+  test 'should show the other creators in -uploader and creators- box' do
+    data_file=data_files(:picture)
+    data_file.other_creators = 'another creator'
+    data_file.save
+    get :show, :id => data_file
+
+    assert_select 'div', :text => /another creator/, :count => 1
+  end
+
+  test "should show treatments" do
+    user = Factory :user
+    data=File.new("#{Rails.root}/test/fixtures/files/treatments-normal-case.xls","rb").read
+    df = Factory :data_file,
+                 :policy=>Factory(:downloadable_public_policy),
+                 :contributor=>user,
+                 :content_blob => Factory(:content_blob,:data=>data,:content_type=>"application/excel")
+
+
+    get :show,:id=>df
+    assert_response :success
+    assert_select "table#treatments" do
+      assert_select "th",:text=>"pH"
+      assert_select "th",:text=>"Dilution_rate"
+      assert_select "td",:text=>"samplea"
+      assert_select "td",:text=>"6.5"
+      assert_select "tr",:count=>4
+    end
+  end
+
+  test "should not show treatments if not downloadable" do
+    user = Factory :user
+    data=File.new("#{Rails.root}/test/fixtures/files/treatments-normal-case.xls","rb").read
+    df = Factory :data_file,
+                 :policy=>Factory(:publicly_viewable_policy),
+                 :contributor=>user,
+                 :content_blob => Factory(:content_blob,:data=>data,:content_type=>"application/excel")
+
+    get :show,:id=>df
+    assert_response :success
+    assert_select "table#treatments", :count=>0
+    assert_select "span#treatments",:text=>/you do not have permission to view the treatments/i
   end
 
   private

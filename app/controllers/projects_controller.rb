@@ -5,9 +5,12 @@ class ProjectsController < ApplicationController
   include IndexPager
   
   before_filter :find_assets, :only=>[:index]
-  before_filter :is_user_admin_auth, :except=>[:index, :show, :edit, :update, :request_institutions]
-  before_filter :editable_by_user, :only=>[:edit,:update,:admin]
+  before_filter :is_user_admin_auth, :except=>[:index, :show, :edit, :update, :request_institutions, :admin]
+  before_filter :editable_by_user, :only=>[:edit,:update]
   before_filter :is_user_admin_auth,:only=>[:manage]
+  before_filter :administerable_by_user, :only =>[:admin]
+  before_filter :auth_params,:only=>[:update]
+  before_filter :auth_institution_list_for_project_manager, :only => [:update]
   skip_before_filter :project_membership_required
 
   cache_sweeper :projects_sweeper,:only=>[:update,:create,:destroy]
@@ -201,6 +204,49 @@ class ProjectsController < ApplicationController
     unless User.admin_logged_in? || @project.can_be_edited_by?(current_user)
       error("Insufficient privileges", "is invalid (insufficient_privileges)")
       return false
+    end
+  end
+
+  def administerable_by_user
+    @project = Project.find(params[:id])
+    unless User.admin_logged_in? || @project.can_be_administered_by?(current_user)
+      error("Insufficient privileges", "is invalid (insufficient_privileges)")
+      return false
+    end
+  end
+
+  def auth_params
+    restricted_params={:sharing => User.admin_logged_in?,
+                       :site_root_uri => User.admin_logged_in?,
+                       :site_username => User.admin_logged_in?,
+                       :site_password => User.admin_logged_in?,
+                       :institution_ids => (User.admin_logged_in? || @project.can_be_administered_by?(current_user))}
+    restricted_params.each do |param, allowed|
+      params[:project].delete(param) if params[:project] and not allowed
+      params.delete param if params and not allowed
+    end
+  end
+
+  def auth_institution_list_for_project_manager
+     if (params[:project] and params[:project][:institution_ids])
+      if User.project_manager_logged_in? && !User.admin_logged_in?
+        institutions = []
+        params[:project][:institution_ids].each do |id|
+          institution = Institution.find_by_id(id)
+          institutions << institution unless institution.nil?
+        end
+        institutions_of_this_project = @project.institutions
+        institutions_of_no_project = Institution.all.select{|i| i.projects.empty?}
+        allowed_institution_list =  (institutions_of_this_project + institutions_of_no_project).uniq
+        flag = true
+        institutions.each do |i|
+          flag = false if !allowed_institution_list.include? i
+        end
+        if flag == false
+          error("Insufficient privileges","is invalid (insufficient_privileges)")
+        end
+        return flag
+      end
     end
   end
 end

@@ -42,6 +42,6 @@ module SamplesHelper
      end
      result += "</table>"
     return result
-  end
+   end
 
 end

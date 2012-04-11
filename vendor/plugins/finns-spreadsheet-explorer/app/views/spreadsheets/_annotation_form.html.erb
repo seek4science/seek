@@ -16,13 +16,13 @@
     
     <p>
       Cell Range:<br/>
-      <%= text_field_tag :annotation_cell_coverage %>
+      <%= text_field_tag :annotation_cell_coverage, nil,:class=>"annotation_cell_coverage_class" %>
     </p>
 
     <%#The stuff here can potentially be abstracted out into a partial when dealing with different annotation types%>
     <p>
       Content:<br/>
-      <%= text_area_tag :annotation_content %>
+      <%= text_area_tag :annotation_content,nil %>
       <%= hidden_field_tag :annotation_attribute_name, "annotation" %>
     </p>
     <%# --- %>

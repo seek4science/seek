@@ -10,5 +10,10 @@ module SessionsHelper
   def admin_logged_in?
     User.admin_logged_in?
   end
+
+    #returns true if there is somebody logged in and they are an project manager
+  def project_manager_logged_in?
+    User.project_manager_logged_in?
+  end
   
 end
