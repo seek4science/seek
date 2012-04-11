@@ -28,7 +28,7 @@ module Seek
             []
           end
         rescue Exception=>e
-          Rails.logger.error("Error processing spreadsheet for content_blob #{obj.content_blob_id} #{e}")
+          Rails.logger.error("Error processing spreadsheet for content_blob #{obj.content_blob.id} #{e}")
           raise e unless Rails.env=="production"
           nil
         end
