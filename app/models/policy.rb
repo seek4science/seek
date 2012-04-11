@@ -102,8 +102,8 @@ class Policy < ActiveRecord::Base
 
         # read the permission data from sharing
         unless sharing[:permissions].blank?
-          contributor_types = ActiveSupport::JSON.decode(sharing[:permissions][:contributor_types])
-          new_permission_data = ActiveSupport::JSON.decode(sharing[:permissions][:values])
+          contributor_types = ActiveSupport::JSON.decode(sharing[:permissions][:contributor_types]) || []
+          new_permission_data = ActiveSupport::JSON.decode(sharing[:permissions][:values]) || {}
         else
           contributor_types = []
           new_permission_data = {}
