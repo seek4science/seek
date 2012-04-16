@@ -33,18 +33,19 @@ function generate_json_data() {
         for (row=0;row<rows.size();row++) {
             var r = rows[row];
 
-            data.push([r[0],r[col]]);
+            data.push([parseFloat(r[0]),parseFloat(r[col])]);
         }
         json = {
             label : headings[col],
             data: data
         }
+
         if (col<colors.size()) {
-            json["color"]=colors[col];
+            json["color"]=colors[col-1];
+            json["curvedLines"]={show:true}
         }
         result.push(json);
     }
-
     return result;
 }
 
@@ -72,5 +73,12 @@ function plot_cells(target_element,width,height)
     element.width(width);
     element.height(height);
 
-    $j.plot(element,json_data);
+    var options = { series: {
+        curvedLines: {
+            active: true
+        }
+    }
+    };
+
+    $j.plot(element,json_data,options);
 }

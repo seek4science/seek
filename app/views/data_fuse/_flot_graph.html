@@ -11,8 +11,15 @@
 
 <script id="source">
 $(function () {
-    var json_data = <%= csv_to_flot_data csv_data -%>;
+    var json_data = <%= csv_to_flot_data(csv_data) -%>;
 
-    $.plot($("#placeholder"), json_data );
+    var options = { series: {
+        curvedLines: {
+            active: true
+        }
+    }
+    };
+
+    $.plot($("#placeholder"), json_data,options );
 });
 </script>
