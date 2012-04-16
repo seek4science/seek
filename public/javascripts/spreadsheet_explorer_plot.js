@@ -39,8 +39,9 @@ function generate_json_data() {
             label : headings[col],
             data: data
         }
+
         if (col<colors.size()) {
-            json["color"]=colors[col];
+            json["color"]=colors[col-1];
             json["curvedLines"]={show:true}
         }
         result.push(json);

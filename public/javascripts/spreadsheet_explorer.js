@@ -400,7 +400,7 @@ function show_annotation(id,x,y) {
   annotation_container.show();
   annotation.show();
   if ($j(plot_element_id)) {
-    plot_cells(plot_element_id,'450','300');
+    plot_cells(plot_element_id,'500','300');
   }
 
 }
