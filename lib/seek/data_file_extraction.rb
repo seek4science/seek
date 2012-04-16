@@ -9,7 +9,8 @@ module Seek
     def treatments
       begin
         if is_extractable_spreadsheet?
-          Seek::Treatments.new spreadsheet_xml
+	  xml = spreadsheet_xml
+          Seek::Treatments.new xml
         else
           Seek::Treatments.new
         end
