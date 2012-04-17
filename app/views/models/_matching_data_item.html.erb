@@ -9,8 +9,6 @@
     <%= list_item_title data_file -%>
     <span class="score">
      - matched by <b><%= matching_data_item.search_terms.join(", ") -%></b>
-    </span>
-    <span class="score">
         ( <%= matching_data_item.score -%> )
     </span>
   </div>
@@ -18,6 +16,9 @@
   <%= list_item_tag_list data_file -%>
   <div class="box_standout description">
       <%= text_or_not_specified(data_file.description, :description=>true, :length=>500) -%>
+  </div>
+  <div class="explore">
+    <%= link_to "Explore",polymorphic_path(data_file,:action=>:explore),:target=>"blank" -%>
   </div>
 
   <div>
