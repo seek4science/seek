@@ -3,45 +3,7 @@
 <%= javascript_include_tag 'flot/jquery.flot.js' -%>
 <%= javascript_include_tag 'flot/curvedLines.js' -%>
 
-<style>
-    ul.matching_data_items {
-        margin-top: 1em;
-        margin-right: 2em;
-        width: auto;
-    }
-
-    li.matching_data_item {
-        background-color: #efefef;
-        border: #999 1px solid;
-        padding-left: 1em;
-        margin-top: 1em;
-        width: 100%;
-        padding-bottom: 0.75em;
-    }
-
-    li.matching_data_item ul.plots li.plot {
-        background-color: white;
-        border: #999 1px solid;
-    }
-
-    .score {
-        font-size: smaller;
-        color: #444;
-        margin-left: 2em;
-    }
-
-    .description {
-        width: 90%;
-    }
-
-    ul.plots li.plot {
-        margin-top: 1em;
-        margin-right: 1em;
-        float: left;
-        width: 450px;
-        height: 300px;
-    }
-</style>
+<%= stylesheet_link_tag "match_making" -%>
 
 <div class="contribution_title">
   <h1>Data that may be of interest to <%= link_to h(@model.title),@model -%></h1>

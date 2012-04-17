@@ -93,12 +93,15 @@ class Model < ActiveRecord::Base
   class DataFileMatchResult < Struct.new(:search_terms,:score,:primary_key);end
 
   #return a an array of DataFileMatchResult where the data file id is the key, and the matching terms/values are the values
-  def matching_data_files
+  def matching_data_files params_only=false
     
     results = {}
 
     if Seek::Config.solr_enabled && is_jws_supported?
-      search_terms = species | parameters_and_values.keys | searchable_tags | organism_terms
+      search_terms = parameters_and_values.keys
+      unless params_only
+        search_terms = search_terms | species | searchable_tags | organism_terms
+      end
       #make the array uniq! case-insensistive whilst mainting the original case
       dc = []
       search_terms = search_terms.inject([]) do |r,v|
@@ -109,9 +112,11 @@ class Model < ActiveRecord::Base
         r
       end
 
+      fields = [:fs_search_fields, :spreadsheet_contents_for_search,:spreadsheet_annotation_search_fields, :searchable_tags]
+
       search_terms.each do |key|
         DataFile.search do |query|
-          query.keywords key, :fields=>[:fs_search_fields, :spreadsheet_contents_for_search,:spreadsheet_annotation_search_fields, :searchable_tags]
+          query.keywords key, :fields=>fields
         end.hits.each do |hit|
           unless hit.score.nil?
             results[hit.primary_key]||=DataFileMatchResult.new([],0,hit.primary_key)

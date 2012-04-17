@@ -32,14 +32,36 @@ class DataFuseController < ApplicationController
 
   end
 
-  def show
-    xls_types = mime_types_for_extension("xls")
-
-    @data_files=Authorization.authorize_collection("download", DataFile.all, current_user).select do |df|
-      xls_types.include?(df.content_type)
+  def preview_model
+    element=params[:element]
+    model = Model.find_by_id(params[:id])
+    render :update do |page|
+      page.replace_html element, :partial=>"models/resource_list_item", :locals=>{:resource=>model}
     end
+  end
 
-    @models=Authorization.authorize_collection("download", Model.all, current_user).select { |m| @@model_builder.is_sbml?(m) }
+  def preview_data_file
+    element=params[:element]
+    df = DataFile.find_by_id(params[:id])
+    render :update do |page|
+      page.replace_html element, :partial=>"data_files/resource_list_item", :locals=>{:resource=>df}
+    end
+  end
+
+
+
+  def matching_data_files
+    element=params[:element]
+    model = Model.find_by_id(params[:id])
+
+    @matching_data_files = model.matching_data_files(true)
+    render :update do |page|
+      page.replace_html element, :partial=>"matching_data_select"
+    end
+  end
+
+  def show
+    @models=Model.all.select{|m| m.can_download? && m.is_jws_supported?}
     respond_to do |format|
       format.html
     end
