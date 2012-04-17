@@ -51,7 +51,7 @@ ActionController::Routing::Routes.draw do |map|
   end
 
   map.resources :models, 
-    :member => { :download => :get, :execute=>:post, :request_resource=>:post,:preview_publish=>:get,:publish=>:post, :builder=>:get, :submit_to_jws=>:post, :simulate=>:post, :update_annotations_ajax=>:post },
+    :member => { :download => :get, :matching_data=>:get, :execute=>:post, :request_resource=>:post,:preview_publish=>:get,:publish=>:post, :builder=>:get, :submit_to_jws=>:post, :simulate=>:post, :update_annotations_ajax=>:post },
     :collection=>{:build=>:get}
 
   map.resources :people, :collection=>{:select=>:get,:get_work_group =>:get}, :member=>{:admin=>:get}  do |person|

@@ -30,14 +30,9 @@
       </li>
   <% end %>
 
-  <% if @display_model.is_jws_supported? %>
+  <% if Seek::Config.solr_enabled && @display_model.is_jws_supported? -%>
       <li>
-        <span class='icon'>
-        <%= link_to_remote image("search")+" Find related data files",
-                         :url=>url_for(:controller=>"models",:action=>"matching_data_files",:id=>@model,:version=>@display_model.version),
-                         :before=>"$('matching_data_files').show();show_large_ajax_loader('matching_data_files');"
-        -%>
-        </span>
+        <%= image_tag_for_key("search",matching_data_model_path(@model,:version=>@display_model.version),nil,nil,"Find related data") -%>
       </li>
   <% end -%>
 </ul>
@@ -47,9 +42,6 @@
 <%= render :partial => "layouts/usage_info", :locals => { :resource => @model } -%>
 
 <div class="show_basic">
-
-    <div id="matching_data_files" style="display:none;text-align:center";></div>
-    <div id="matching_results" style="display:none;height:55em;overflow-y: scroll;"></div>
 
     <div class="main_content_left_box_narrower">
 

@@ -25,9 +25,19 @@ module DataFuseHelper
     res
   end
 
+  def tsv_to_flot_data tsv
+    rows = FasterCSV.parse(tsv,:col_sep=>"\t")
+    rows_to_flot_data(rows)
+  end
+
   def csv_to_flot_data csv
-    data = {}
     rows = FasterCSV.parse(csv)
+    rows_to_flot_data(rows)
+  end
+
+
+  def rows_to_flot_data rows
+    data = {}
     labels = []
     rows.each_with_index do |row,y|
       t=nil

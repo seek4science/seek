@@ -9,7 +9,7 @@ class ModelsController < ApplicationController
   
   before_filter :find_assets, :only => [ :index ]
   before_filter :find_and_auth, :except => [ :build,:index, :new, :create,:create_model_metadata,:update_model_metadata,:delete_model_metadata,:request_resource,:preview,:test_asset_url, :update_annotations_ajax]
-  before_filter :find_display_asset, :only=>[:show,:download,:execute,:builder,:simulate,:submit_to_jws,:matching_data_files]
+  before_filter :find_display_asset, :only=>[:show,:download,:execute,:builder,:simulate,:submit_to_jws,:matching_data]
     
   before_filter :jws_enabled,:only=>[:builder,:simulate,:submit_to_jws]
 
@@ -547,25 +547,28 @@ class ModelsController < ApplicationController
     end
   end
 
-  def matching_data_files
+  def matching_data
     #FIXME: should use the correct version
-    matching_files = @model.matching_data_files
-
-    render :update do |page|
-      page.visual_effect :toggle_blind,"matching_data_files"
-      page.visual_effect :toggle_blind,'matching_results'
-      html = ""
-      matching_files.each do |match|
-        data_file = DataFile.find(match.primary_key)
-        if (data_file.can_view?)
-          html << "<div>"
-          html << "<div class='matchmake_result'>Matched with <b>#{match.search_terms.join(', ')}</b></div>"
-          html << render(:partial=>"layouts/resource_list_item", :object=>data_file)
-          html << "</div>"
-        end
-      end
-      page.replace_html "matching_results",:text=>html
+    @matching_data_files = @model.matching_data_files
+    respond_to do |format|
+      format.html
     end
+
+    #render :update do |page|
+    #  page.visual_effect :toggle_blind,"matching_data_files"
+    #  page.visual_effect :toggle_blind,'matching_results'
+    #  html = ""
+    #  matching_files.each do |match|
+    #    data_file = DataFile.find(match.primary_key)
+    #    if (data_file.can_view?)
+    #      html << "<div>"
+    #      html << "<div class='matchmake_result'>Matched with <b>#{match.search_terms.join(', ')}</b></div>"
+    #      html << render(:partial=>"layouts/resource_list_item", :object=>data_file)
+    #      html << "</div>"
+    #    end
+    #  end
+    #  page.replace_html "matching_results",:text=>html
+    #end
   end
   
   protected
@@ -585,7 +588,7 @@ class ModelsController < ApplicationController
   def translate_action action
     action="download" if action == "simulate"
     action="edit" if ["submit_to_jws","builder"].include?(action)
-    action="view" if ["matching_data_files"].include?(action)
+    action="view" if ["matching_data"].include?(action)
     super action
   end
   

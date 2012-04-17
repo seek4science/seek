@@ -7,6 +7,7 @@ title_prefix||=""
 title_postfix||=""
 title||=h(item.title)
 %>
+
 <div style='font-size: 140%; text-align: center;'>
   <%=
       if item && item.respond_to?(:private?) && item.respond_to?(:public?) && try_block{item.can_manage?}

@@ -113,9 +113,11 @@ class Model < ActiveRecord::Base
         DataFile.search do |query|
           query.keywords key, :fields=>[:fs_search_fields, :spreadsheet_contents_for_search,:spreadsheet_annotation_search_fields, :searchable_tags]
         end.hits.each do |hit|
-          results[hit.primary_key]||=DataFileMatchResult.new([],0,hit.primary_key)
-          results[hit.primary_key].search_terms << key
-          results[hit.primary_key].score += (0.75 + hit.score) unless hit.score.nil?
+          unless hit.score.nil?
+            results[hit.primary_key]||=DataFileMatchResult.new([],0,hit.primary_key)
+            results[hit.primary_key].search_terms << key
+            results[hit.primary_key].score += (0.75 + hit.score)
+          end
         end
       end
     end

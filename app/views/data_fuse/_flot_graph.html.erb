@@ -1,13 +1,16 @@
 <%= javascript_include_tag 'flot/excanvas.min.js' -%>
 <%= javascript_include_tag 'jquery-1.5.1.min.js' -%>
 <%= javascript_include_tag 'flot/jquery.flot.js' -%>
-    <%= javascript_include_tag 'flot/curvedLines.js' -%>
+<%= javascript_include_tag 'flot/curvedLines.js' -%>
+
+
 
 <%
     csv_data ||= open(csv_url).read
+    div_id="chart_#{UUIDTools::UUID.random_create.to_s}"
 -%>
 
-    <div id="placeholder" style="width:800px;height:400px;"></div>
+<div id="<%= div_id -%>" style="width:800px;height:400px;"></div>
 
 <script id="source">
 $(function () {
@@ -20,6 +23,6 @@ $(function () {
     }
     };
 
-    $.plot($("#placeholder"), json_data,options );
+    $.plot($("#<%= div_id -%>"), json_data,options );
 });
 </script>
