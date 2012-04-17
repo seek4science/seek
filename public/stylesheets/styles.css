@@ -921,7 +921,7 @@ ul.related_asset_list li{
     padding-top: 0.5em;
     background-color: #F0F0F0;
     margin-left: 1em;
-    margin-top: 1em;
+    margin-top: 0.5em;
     text-align: center;
 	margin-bottom: 0.5em;
 }
@@ -1678,6 +1678,10 @@ ul.modification_row li {
     padding: 0 0.6em 0.25em 0.25em;
     text-align:left;
     min-height: 2em;
+}
+
+div.sharing_summary {
+    text-align: center;
 }
 
 
