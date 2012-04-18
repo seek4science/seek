@@ -158,7 +158,7 @@ class Assay < ActiveRecord::Base
   end
   
   def assets
-    asset_masters
+    asset_masters.collect {|a| a.latest_version} |  (data_files + models + sops)
   end
 
   def asset_masters
