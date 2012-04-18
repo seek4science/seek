@@ -145,6 +145,7 @@ module AssetsHelper
         related["Study"][:items] = resource.studies
         related["Assay"][:items] = resource.assays
         related["DataFile"][:items] = resource.data_files
+        related["Model"][:items] = resource.models
         related["Sop"][:items] = resource.sops
       when "Study"
         related["Project"][:items] = resource.projects
@@ -152,6 +153,7 @@ module AssetsHelper
         related["Assay"][:items] = resource.assays
         related["DataFile"][:items] = resource.data_files
         related["Sop"][:items] = resource.sops
+        related["Model"][:items] = resource.models
       when "Organism"
         related["Project"][:items] = resource.projects
         related["Assay"][:items] = resource.assays

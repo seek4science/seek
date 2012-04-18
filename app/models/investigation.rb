@@ -30,6 +30,10 @@ class Investigation < ActiveRecord::Base
     assays.collect{|assay| assay.sops}.flatten.uniq
   end
 
+  def models
+    assays.collect{|assay| assay.models}.flatten.uniq
+  end
+
   def clone_with_associations
     new_object= self.clone
     new_object.policy = self.policy.deep_copy

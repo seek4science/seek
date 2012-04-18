@@ -35,6 +35,10 @@ class Study < ActiveRecord::Base
     assays.collect{|a| a.sops}.flatten.uniq
   end
 
+  def models
+    assays.collect{|a| a.models}.flatten.uniq
+  end
+
   def can_delete? *args
     assays.empty? && super
   end
