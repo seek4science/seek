@@ -468,8 +468,8 @@ class Policy < ActiveRecord::Base
     asset_manage_id_array = asset_managers.collect{|am| am.id unless am.blank?}
      grouped_people_by_access_type = grouped_people_by_access_type.reject{|key,value| key == Policy::DETERMINED_BY_GROUP}.each_value do |value|
        value.each do |person|
-         person[1].concat('(creator)') if creator_id_array.include?(person[0])
-         person[1].concat('(asset manager)') if asset_manage_id_array.include?(person[0])
+         person[1].concat(' (creator)') if creator_id_array.include?(person[0])
+         person[1].concat(' (asset manager)') if asset_manage_id_array.include?(person[0])
        end
      end
     grouped_people_by_access_type
