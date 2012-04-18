@@ -136,24 +136,24 @@ module AssetsHelper
         related["Project"][:items] = resource.projects
         related["Investigation"][:items] = [resource.investigation]
         related["Study"][:items] = [resource.study]
-        related["DataFile"][:items] = resource.data_files
-        related["Model"][:items] = resource.models if resource.is_modelling? #MODELLING ASSAY
-        related["Sop"][:items] = resource.sops
+        related["DataFile"][:items] = resource.data_file_masters
+        related["Model"][:items] = resource.model_masters if resource.is_modelling? #MODELLING ASSAY
+        related["Sop"][:items] = resource.sop_masters
         related["Publication"][:items] = resource.related_publications
       when "Investigation"
         related["Project"][:items] = resource.projects
         related["Study"][:items] = resource.studies
         related["Assay"][:items] = resource.assays
-        related["DataFile"][:items] = resource.data_files
-        related["Model"][:items] = resource.models
-        related["Sop"][:items] = resource.sops
+        related["DataFile"][:items] = resource.data_file_masters
+        related["Model"][:items] = resource.model_masters
+        related["Sop"][:items] = resource.sop_masters
       when "Study"
         related["Project"][:items] = resource.projects
         related["Investigation"][:items] = [resource.investigation]
         related["Assay"][:items] = resource.assays
-        related["DataFile"][:items] = resource.data_files
-        related["Sop"][:items] = resource.sops
-        related["Model"][:items] = resource.models
+        related["DataFile"][:items] = resource.data_file_masters
+        related["Sop"][:items] = resource.sop_masters
+        related["Model"][:items] = resource.model_masters
       when "Organism"
         related["Project"][:items] = resource.projects
         related["Assay"][:items] = resource.assays

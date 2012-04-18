@@ -75,6 +75,8 @@ module Acts #:nodoc:
         include Subscribable
       end
 
+
+
       def is_asset?
         include?(Acts::Asset::InstanceMethods)
       end
@@ -87,6 +89,11 @@ module Acts #:nodoc:
     end
 
     module InstanceMethods
+
+      def studies
+        assays.collect{|a| a.study}.uniq
+      end
+
       # this method will take attributions' association and return a collection of resources,
       # to which the current resource is attributed
       def attributions
