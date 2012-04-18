@@ -39,7 +39,7 @@
             <h2>People who can view the summary and get contents:</h2>
             <%= display_people_list value-%>
         <%when Policy::EDITING %>
-            <h2>People who can view and edit summary, and contents:</h2>
+            <h2>People who can view and edit the summary and contents:</h2>
             <%= display_people_list value-%>
         <%when Policy::MANAGING %>
             <%if (grouped_people_by_access_type.count == 1) && (value.count == 1 and value.first[0] == try_block{current_user.person.id})%>
