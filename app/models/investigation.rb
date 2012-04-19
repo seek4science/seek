@@ -22,12 +22,16 @@ class Investigation < ActiveRecord::Base
     studies.empty? && super
   end
   
-  def data_files
-    assays.collect{|assay| assay.data_files}.flatten.uniq
-  end
-  
-  def sops
-    assays.collect{|assay| assay.sops}.flatten.uniq
+  #FIXME: see comment in Assay about reversing these
+  ["data_file","sop","model"].each do |type|
+    eval <<-END_EVAL
+      def #{type}_masters
+        studies.collect{|study| study.send(:#{type}_masters)}.flatten.uniq
+      end
+      def #{type}s
+        studies.collect{|study| study.send(:#{type}s)}.flatten.uniq
+      end
+    END_EVAL
   end
 
   def clone_with_associations

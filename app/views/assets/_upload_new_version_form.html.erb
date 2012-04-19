@@ -19,7 +19,7 @@ upload_field = controller_name.downcase.singularize.underscore
     <% form_tag({:action=>"new_version", :id=>resource}, :multipart => true) do -%>
     <center>
         <div style="width:95%;margin-top:0.75em;">
-			<%= render :partial=>"assets/upload_box" -%>
+			<%= render :partial=>"assets/upload_box",:locals=>{:new_version=>true} -%>
             <p>
                 <b>Revision comments (optional)</b>
                 <br/>

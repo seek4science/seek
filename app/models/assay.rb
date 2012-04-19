@@ -45,7 +45,9 @@ class Assay < ActiveRecord::Base
     'WHERE (assay_assets.version = ' + asset_class_underscored + '_versions.version ' +
     'AND assay_assets.assay_id = #{self.id})' 
   end
-  
+
+  #FIXME: These should be reversed, with the concrete version becoming the primary case, and versioned assets becoming secondary
+  # i.e. - so data_files returnes [DataFile], and data_file_masters is replaced with versioned_data_files, returning [DataFile::Version]
   has_many :data_files, :class_name => "DataFile::Version", :finder_sql => self.asset_sql("DataFile")
   has_many :sops, :class_name => "Sop::Version", :finder_sql => self.asset_sql("Sop")
   has_many :models, :class_name => "Model::Version", :finder_sql => self.asset_sql("Model")
@@ -54,9 +56,7 @@ class Assay < ActiveRecord::Base
   has_many :sop_masters, :through => :assay_assets, :source => :asset, :source_type => "Sop"
   has_many :model_masters, :through => :assay_assets, :source => :asset, :source_type => "Model"
 
-  has_one :investigation,:through=>:study    
-
-  has_many :assets,:through=>:assay_assets
+  has_one :investigation,:through=>:study
 
   validates_presence_of :assay_type
   validates_presence_of :technology_type, :unless=>:is_modelling?
