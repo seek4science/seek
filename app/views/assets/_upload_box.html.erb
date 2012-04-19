@@ -1,3 +1,6 @@
+<%
+    new_version ||= false
+%>
 <script type="text/javascript">
     function from_url_selected(){
         Effect.Fade("upload_from_file", {
@@ -22,7 +25,8 @@
     <div class="foldTitle">
         Upload
     </div>
+
     <div class="foldContent" style="display: block;">
-        <%= render :partial=>"assets/upload" -%>
+        <%= render :partial=>"assets/upload",:locals=>{:new_version=>new_version} -%>
     </div>
 </div>
