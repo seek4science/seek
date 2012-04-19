@@ -244,7 +244,6 @@ class StudiesControllerTest < ActionController::TestCase
 
   def test_assay_tab_doesnt_show_private_sops_or_datafiles
     login_as(:model_owner)
-    assay=assays(:assay_with_public_and_private_sops_and_datafiles)
     study=studies(:study_with_assay_with_public_private_sops_and_datafile)
     get :show,:id=>study
     assert_response :success
@@ -256,7 +255,7 @@ class StudiesControllerTest < ActionController::TestCase
     end
     
     assert_select "div.list_item" do
-      the Assay resource_list_item
+      #the Assay resource_list_item
       assert_select "p.list_item_attribute a[title=?]",sops(:sop_with_fully_public_policy).title,:count=>1
       assert_select "p.list_item_attribute a[href=?]",sop_path(sops(:sop_with_fully_public_policy)),:count=>1
       assert_select "p.list_item_attribute a[title=?]",sops(:sop_with_private_policy_and_custom_sharing).title,:count=>0
