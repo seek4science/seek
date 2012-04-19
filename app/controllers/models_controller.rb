@@ -560,7 +560,7 @@ class ModelsController < ApplicationController
         if (data_file.can_view?)
           html << "<div>"
           html << "<div style='padding-top:0.5em;padding-bottom:0.2em;'>Matched with #{match.search_terms.join(', ')} - [#{match.score}]</div>"
-          html << render(:partial=>"layouts/resource_list_item", :object=>data_file)
+          html << render(:partial=>"assets/resource_list_item", :object=>data_file)
           html << "</div>"
         end
       end
