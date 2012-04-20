@@ -81,26 +81,27 @@ namespace :seek_dev do
     private_data.each { |d| d.destroy }
   end
 
-  task(:populate_auth_lookup=>:environment) do
-    n_people=500
-    n_assets=1000
-    people = (1..n_people).to_a
-    assets = (1..n_assets).to_a
-    ActiveRecord::Base.connection.execute("delete from data_file_auth_lookup")
-    assets.each do |p_id|
-      ActiveRecord::Base.transaction do
-        people.each do |a_id|
-            can_view=rand(2)==0
-            can_edit=rand(2)==0
-            can_download=rand(2)==0
-            can_manage=rand(2)==0
-            sql = "insert into data_file_auth_lookup(person_id,asset_id,can_view,can_edit,can_download,can_manage) values (#{p_id},#{a_id},#{can_view},#{can_edit},#{can_download},#{can_manage});"
+  task(:repopulate_df_auth_lookup_for_person=>:environment) do
+    puts "Please provide the person id:"
+    person_id = STDIN.gets.chomp
+    person = Person.find(person_id)
+    ActiveRecord::Base.connection.execute("delete from data_file_auth_lookup where person_id = #{person_id}")
+    assets = DataFile.all
+    c=0
+    total=assets.count
+    ActiveRecord::Base.transaction do
+      assets.each do |asset|
+            can_view=asset.can_view? person.user
+            can_edit=asset.can_edit? person.user
+            can_download=asset.can_download? person.user
+            can_manage=asset.can_manage? person.user
+            sql = "insert into data_file_auth_lookup(person_id,asset_id,can_view,can_edit,can_download,can_manage) values (#{person_id},#{asset.id},#{can_view},#{can_edit},#{can_download},#{can_manage});"
             ActiveRecord::Base.connection.execute(sql)
-        end
+            c+=1
+            puts "#{c} done out of #{total}" if c%10==0
       end
-      GC.start
     end
-    count = ActiveRecord::Base.connection.select_one("select count(*) from data_file_auth_lookup").values[0]
+    count = ActiveRecord::Base.connection.select_one("select count(*) from data_file_auth_lookup where person_id = #{person_id}").values[0]
     puts "inserted #{count} records"
   end
 
