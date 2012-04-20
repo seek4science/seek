@@ -9,7 +9,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20120313171509) do
+ActiveRecord::Schema.define(:version => 20120419120423) do
 
   create_table "activity_logs", :force => true do |t|
     t.string   "action"
@@ -231,6 +231,17 @@ ActiveRecord::Schema.define(:version => 20120313171509) do
     t.datetime "created_at"
     t.datetime "updated_at"
   end
+
+  create_table "data_file_auth_lookup", :id => false, :force => true do |t|
+    t.integer "person_id"
+    t.integer "asset_id"
+    t.boolean "can_view"
+    t.boolean "can_manage"
+    t.boolean "can_edit"
+    t.boolean "can_download"
+  end
+
+  add_index "data_file_auth_lookup", ["person_id", "can_view"], :name => "index_data_file_auth_lookup_on_person_id_and_can_view"
 
   create_table "data_file_versions", :force => true do |t|
     t.integer  "data_file_id"

@@ -81,4 +81,27 @@ namespace :seek_dev do
     private_data.each { |d| d.destroy }
   end
 
+  task(:populate_auth_lookup=>:environment) do
+    n_people=500
+    n_assets=1000
+    people = (1..n_people).to_a
+    assets = (1..n_assets).to_a
+    ActiveRecord::Base.connection.execute("delete from data_file_auth_lookup")
+    assets.each do |p_id|
+      ActiveRecord::Base.transaction do
+        people.each do |a_id|
+            can_view=rand(2)==0
+            can_edit=rand(2)==0
+            can_download=rand(2)==0
+            can_manage=rand(2)==0
+            sql = "insert into data_file_auth_lookup(person_id,asset_id,can_view,can_edit,can_download,can_manage) values (#{p_id},#{a_id},#{can_view},#{can_edit},#{can_download},#{can_manage});"
+            ActiveRecord::Base.connection.execute(sql)
+        end
+      end
+      GC.start
+    end
+    count = ActiveRecord::Base.connection.select_one("select count(*) from data_file_auth_lookup").values[0]
+    puts "inserted #{count} records"
+  end
+
 end
