@@ -236,5 +236,64 @@ class DataFile < ActiveRecord::Base
     ActiveRecord::Base.connection.select_one("select count(*) from data_file_auth_lookup where person_id = #{person_id}").values[0].to_i
   end
 
+  def self.lookup_for_asset action,person_id,asset_id
+    attribute = "can_#{action}"
+    res = ActiveRecord::Base.connection.select_one("select #{attribute} from data_file_auth_lookup where person_id=#{person_id} and asset_id=#{asset_id}")
+    if res.nil?
+      nil
+    else
+      res[attribute] == "1" || res[attribute]==true
+    end
+  end
+
+  #will be consolidated after experimentation
+  def can_view? user=User.current_user
+    person_id = user.nil? ? 0 : user.person.id
+    lookup = DataFile.lookup_for_asset "view", person_id,self.id
+    if lookup.nil?
+      #Rails.logger.warn("No entry found in lookup table for #{self.class.name}:#{self.id} for person_id #{person_id} - doing things the slow way")
+      super
+    else
+      #Rails.logger.warn("Entry found in lookup table for #{self.class.name}:#{self.id} for person_id #{person_id} - result is #{lookup}")
+      lookup
+    end
+  end
+
+  def can_manage? user=User.current_user
+    person_id = user.nil? ? 0 : user.person.id
+    lookup = DataFile.lookup_for_asset "manage", person_id,self.id
+    if lookup.nil?
+      #Rails.logger.warn("No entry found in lookup table for #{self.class.name}:#{self.id} for person_id #{person_id} - doing things the slow way")
+      super
+    else
+      #Rails.logger.warn("Entry found in lookup table for #{self.class.name}:#{self.id} for person_id #{person_id} - result is #{lookup}")
+      lookup
+    end
+  end
+
+  def can_download? user=User.current_user
+    person_id = user.nil? ? 0 : user.person.id
+    lookup = DataFile.lookup_for_asset "download", person_id,self.id
+    if lookup.nil?
+      #Rails.logger.warn("No entry found in lookup table for #{self.class.name}:#{self.id} for person_id #{person_id} - doing things the slow way")
+      super
+    else
+      #Rails.logger.warn("Entry found in lookup table for #{self.class.name}:#{self.id} for person_id #{person_id} - result is #{lookup}")
+      lookup
+    end
+  end
+
+  def can_edit? user=User.current_user
+    person_id = user.nil? ? 0 : user.person.id
+    lookup = DataFile.lookup_for_asset "edit", person_id,self.id
+    if lookup.nil?
+      #Rails.logger.warn("No entry found in lookup table for #{self.class.name}:#{self.id} for person_id #{person_id} - doing things the slow way")
+      super
+    else
+      #Rails.logger.warn("Entry found in lookup table for #{self.class.name}:#{self.id} for person_id #{person_id} - result is #{lookup}")
+      lookup
+    end
+  end
+
   
 end
