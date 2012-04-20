@@ -209,5 +209,32 @@ class DataFile < ActiveRecord::Base
     end
     flds.flatten.uniq
   end
+
+
+  #experimental stuff
+  #this will eventually be moved to a generic mix, infact probably acts_as_authorized
+  def self.all_authorized_for action, user=User.current_user
+    person_id = user.nil? ? 0 : user.person.id
+    c = lookup_count_for_action_and_user person_id
+    if (c==DataFile.count)
+      Rails.logger.warn("Lookup table is complete for person_id = #{person_id}")
+      ids = lookup_ids_for_person_and_action action,person_id
+      DataFile.find_all_by_id(ids)
+    else
+      Rails.logger.warn("Lookup table is incomplete for person_id = #{person_id} - doing things the slow way")
+      #trigger background task to update table
+
+      DataFile.all.select{|df| df.send("can_#{action}?") }
+    end
+  end
+
+  def self.lookup_ids_for_person_and_action action,person_id
+    ActiveRecord::Base.connection.select_all("select asset_id from data_file_auth_lookup where person_id = #{person_id} and can_#{action}=true").collect{|k| k.values}.flatten
+  end
+
+  def self.lookup_count_for_action_and_user person_id
+    ActiveRecord::Base.connection.select_one("select count(*) from data_file_auth_lookup where person_id = #{person_id}").values[0].to_i
+  end
+
   
 end

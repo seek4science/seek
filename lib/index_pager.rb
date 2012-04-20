@@ -1,6 +1,7 @@
 module IndexPager    
 
   def index
+    raise Exception.new
     controller = self.controller_name.downcase    
     model_name=controller.classify
     model_class=eval(model_name)
