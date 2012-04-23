@@ -85,24 +85,30 @@ namespace :seek_dev do
     puts "Please provide the person id:"
     person_id = STDIN.gets.chomp
     person = Person.find(person_id)
-    ActiveRecord::Base.connection.execute("delete from data_file_auth_lookup where person_id = #{person_id}")
-    assets = DataFile.all
-    c=0
-    total=assets.count
-    ActiveRecord::Base.transaction do
-      assets.each do |asset|
-            can_view=asset.can_view? person.user
-            can_edit=asset.can_edit? person.user
-            can_download=asset.can_download? person.user
-            can_manage=asset.can_manage? person.user
-            sql = "insert into data_file_auth_lookup(person_id,asset_id,can_view,can_edit,can_download,can_manage) values (#{person_id},#{asset.id},#{can_view},#{can_edit},#{can_download},#{can_manage});"
-            ActiveRecord::Base.connection.execute(sql)
-            c+=1
-            puts "#{c} done out of #{total}" if c%10==0
+    Seek::Util.authorized_types.each do |type|
+      table_name = "#{type.name.underscore}_auth_lookup"
+      ActiveRecord::Base.connection.execute("delete from #{table_name} where person_id = #{person_id}")
+      assets = type.all
+      c=0
+      total=assets.count
+      ActiveRecord::Base.transaction do
+        assets.each do |asset|
+          can_view=asset.can_view? person.user
+          can_edit=asset.can_edit? person.user
+          can_download=asset.can_download? person.user
+          can_manage=asset.can_manage? person.user
+          can_delete=asset.can_delete? person.user
+          sql = "insert into #{table_name} (person_id,asset_id,can_view,can_edit,can_download,can_manage,can_delete) values (#{person_id},#{asset.id},#{can_view},#{can_edit},#{can_download},#{can_manage},#{can_delete});"
+          ActiveRecord::Base.connection.execute(sql)
+          c+=1
+          puts "#{c} done out of #{total} for #{type.name}" if c%10==0
+        end
       end
+      count = ActiveRecord::Base.connection.select_one("select count(*) from #{table_name} where person_id = #{person_id}").values[0]
+      puts "inserted #{count} records for #{type.name}"
+      GC.start
     end
-    count = ActiveRecord::Base.connection.select_one("select count(*) from data_file_auth_lookup where person_id = #{person_id}").values[0]
-    puts "inserted #{count} records"
+
   end
 
 end
