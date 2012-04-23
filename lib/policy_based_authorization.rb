@@ -75,6 +75,20 @@ module Acts
           END_EVAL
       end
 
+      def update_lookup_table person_id=0
+        if person_id == 0
+          user=nil
+        else
+          user = Person.find(person_id).user
+        end
+
+        sql = "delete from #{self.class.lookup_table_name} where person_id=#{person_id} and asset_id=#{id}"
+        ActiveRecord::Base.connection.execute(sql)
+        sql = "insert into #{self.class.lookup_table_name} (person_id,asset_id,can_view,can_edit,can_download,can_manage,can_delete) values (#{person_id},#{id},#{can_view?},#{can_edit?},#{can_download?},#{can_manage?},#{can_delete?});"
+        ActiveRecord::Base.connection.execute(sql)
+
+      end
+
       def contributor_credited?
         true
       end

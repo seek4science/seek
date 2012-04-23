@@ -93,13 +93,7 @@ namespace :seek_dev do
       total=assets.count
       ActiveRecord::Base.transaction do
         assets.each do |asset|
-          can_view=asset.can_view? user
-          can_edit=asset.can_edit? user
-          can_download=asset.can_download? user
-          can_manage=asset.can_manage? user
-          can_delete=asset.can_delete? user
-          sql = "insert into #{table_name} (person_id,asset_id,can_view,can_edit,can_download,can_manage,can_delete) values (#{person_id},#{asset.id},#{can_view},#{can_edit},#{can_download},#{can_manage},#{can_delete});"
-          ActiveRecord::Base.connection.execute(sql)
+          asset.update_lookup_table person_id
           c+=1
           puts "#{c} done out of #{total} for #{type.name}" if c%10==0
         end
