@@ -4,6 +4,7 @@ module Acts
     module PolicyBasedAuthorization
       def self.included klass
         klass.extend ClassMethods
+        klass.extend AuthLookupMethods
         klass.class_eval do
           belongs_to :contributor, :polymorphic => true unless method_defined? :contributor
           after_initialize :contributor_or_default_if_new
@@ -18,6 +19,60 @@ module Acts
       end
 
       module ClassMethods
+
+      end
+
+      module AuthLookupMethods
+        def all_authorized_for action, user=User.current_user
+          person_id = user.nil? ? 0 : user.person.id
+          c = lookup_count_for_action_and_user person_id
+          if (c==count)
+            Rails.logger.warn("Lookup table is complete for person_id = #{person_id}")
+            ids = lookup_ids_for_person_and_action action, person_id
+            find_all_by_id(ids)
+          else
+            Rails.logger.warn("Lookup table is incomplete for person_id = #{person_id} - doing things the slow way")
+            #trigger background task to update table
+            all.select { |df| df.send("can_#{action}?") }
+          end
+        end
+
+        def lookup_table_name
+          "#{self.name.underscore}_auth_lookup"
+        end
+
+        def lookup_ids_for_person_and_action action,person_id
+          ActiveRecord::Base.connection.select_all("select asset_id from #{lookup_table_name} where person_id = #{person_id} and can_#{action}=true").collect{|k| k.values}.flatten
+        end
+
+        def lookup_count_for_action_and_user person_id
+          ActiveRecord::Base.connection.select_one("select count(*) from #{lookup_table_name} where person_id = #{person_id}").values[0].to_i
+        end
+
+        def lookup_for_asset action,person_id,asset_id
+          attribute = "can_#{action}"
+          res = ActiveRecord::Base.connection.select_one("select #{attribute} from #{lookup_table_name} where person_id=#{person_id} and asset_id=#{asset_id}")
+          if res.nil?
+            nil
+          else
+            res[attribute] == "1" || res[attribute]==true
+          end
+        end
+      end
+
+      AUTHORIZATION_ACTIONS.each do |action|
+          eval <<-END_EVAL
+            def can_#{action}? user = User.current_user
+                return true if new_record?
+                person_id = user.nil? ? 0 : user.person.id
+                lookup = self.class.lookup_for_asset("#{action}", person_id,self.id)
+                if lookup.nil?
+                  perform_auth(user,"#{action}")
+                else
+                  lookup
+                end
+            end
+          END_EVAL
       end
 
       def contributor_credited?
@@ -81,29 +136,6 @@ module Acts
         asset_managers = projects.collect(&:asset_managers).flatten
         grouped_people_by_access_type = policy.summarize_permissions creators,asset_managers, contributor
         grouped_people_by_access_type[Policy::MANAGING]
-      end
-
-      AUTHORIZATION_ACTIONS.each do |action|
-        if Seek::Config.auth_caching_enabled
-          eval <<-END_EVAL
-          def can_#{action}? user = User.current_user
-            if self.new_record?
-              return true
-            else
-              key = cache_keys(user, "#{action}")
-              Rails.cache.fetch(key) {perform_auth(user,"#{action}") ? :true : :false} == :true
-            end
-          end
-          END_EVAL
-        else
-          eval <<-END_EVAL
-          def can_#{action}? user = User.current_user
-                new_record?  || perform_auth(user,"#{action}")
-          end
-          END_EVAL
-        end
-
-
       end
 
       def perform_auth user,action
