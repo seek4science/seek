@@ -81,24 +81,30 @@ namespace :seek_dev do
     private_data.each { |d| d.destroy }
   end
 
-  task(:repopulate_df_auth_lookup_for_person=>:environment) do
-    puts "Please provide the person id:"
-    person_id = STDIN.gets.chomp
-    user = person_id=="0" ? nil : Person.find(person_id).user
+  task(:clear_auth_lookup_tables=>:environment) do
     Seek::Util.authorized_types.each do |type|
-      table_name = "#{type.name.underscore}_auth_lookup"
-      ActiveRecord::Base.connection.execute("delete from #{table_name} where person_id = #{person_id}")
+      type.clear_lookup_table
+    end
+  end
+
+  task(:repopulate_df_auth_lookup_for_user=>:environment) do
+    puts "Please provide the user id:"
+    user_id = STDIN.gets.chomp
+    user = user_id=="0" ? nil : User.find(user_id)
+    Seek::Util.authorized_types.each do |type|
+      table_name = type.lookup_table_name
+      ActiveRecord::Base.connection.execute("delete from #{table_name} where user_id = #{user_id}")
       assets = type.all(:include=>:policy)
       c=0
       total=assets.count
       ActiveRecord::Base.transaction do
         assets.each do |asset|
-          asset.update_lookup_table person_id
+          asset.update_lookup_table user
           c+=1
           puts "#{c} done out of #{total} for #{type.name}" if c%10==0
         end
       end
-      count = ActiveRecord::Base.connection.select_one("select count(*) from #{table_name} where person_id = #{person_id}").values[0]
+      count = ActiveRecord::Base.connection.select_one("select count(*) from #{table_name} where user_id = #{user_id}").values[0]
       puts "inserted #{count} records for #{type.name}"
       GC.start
     end

@@ -9,7 +9,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20120423110831) do
+ActiveRecord::Schema.define(:version => 20120423152049) do
 
   create_table "activity_logs", :force => true do |t|
     t.string   "action"
@@ -106,7 +106,7 @@ ActiveRecord::Schema.define(:version => 20120423110831) do
   add_index "assay_assets", ["asset_id", "asset_type"], :name => "index_assay_assets_on_asset_id_and_asset_type"
 
   create_table "assay_auth_lookup", :id => false, :force => true do |t|
-    t.integer "person_id"
+    t.integer "user_id"
     t.integer "asset_id"
     t.boolean "can_view",     :default => false
     t.boolean "can_manage",   :default => false
@@ -115,7 +115,7 @@ ActiveRecord::Schema.define(:version => 20120423110831) do
     t.boolean "can_delete",   :default => false
   end
 
-  add_index "assay_auth_lookup", ["person_id", "can_view"], :name => "index_assay_auth_lookup_on_person_id_and_can_view"
+  add_index "assay_auth_lookup", ["user_id", "can_view"], :name => "index_assay_auth_lookup_on_user_id_and_can_view"
 
   create_table "assay_classes", :force => true do |t|
     t.string   "title"
@@ -245,7 +245,7 @@ ActiveRecord::Schema.define(:version => 20120423110831) do
   end
 
   create_table "data_file_auth_lookup", :id => false, :force => true do |t|
-    t.integer "person_id"
+    t.integer "user_id"
     t.integer "asset_id"
     t.boolean "can_view"
     t.boolean "can_manage"
@@ -254,7 +254,7 @@ ActiveRecord::Schema.define(:version => 20120423110831) do
     t.boolean "can_delete",   :default => false
   end
 
-  add_index "data_file_auth_lookup", ["person_id", "can_view"], :name => "index_data_file_auth_lookup_on_person_id_and_can_view"
+  add_index "data_file_auth_lookup", ["user_id", "can_view"], :name => "index_data_file_auth_lookup_on_user_id_and_can_view"
 
   create_table "data_file_versions", :force => true do |t|
     t.integer  "data_file_id"
@@ -349,7 +349,7 @@ ActiveRecord::Schema.define(:version => 20120423110831) do
   add_index "disciplines_people", ["person_id"], :name => "index_disciplines_people_on_person_id"
 
   create_table "event_auth_lookup", :id => false, :force => true do |t|
-    t.integer "person_id"
+    t.integer "user_id"
     t.integer "asset_id"
     t.boolean "can_view",     :default => false
     t.boolean "can_manage",   :default => false
@@ -358,7 +358,7 @@ ActiveRecord::Schema.define(:version => 20120423110831) do
     t.boolean "can_delete",   :default => false
   end
 
-  add_index "event_auth_lookup", ["person_id", "can_view"], :name => "index_event_auth_lookup_on_person_id_and_can_view"
+  add_index "event_auth_lookup", ["user_id", "can_view"], :name => "index_event_auth_lookup_on_user_id_and_can_view"
 
   create_table "events", :force => true do |t|
     t.datetime "start_date"
@@ -534,7 +534,7 @@ ActiveRecord::Schema.define(:version => 20120423110831) do
   end
 
   create_table "investigation_auth_lookup", :id => false, :force => true do |t|
-    t.integer "person_id"
+    t.integer "user_id"
     t.integer "asset_id"
     t.boolean "can_view",     :default => false
     t.boolean "can_manage",   :default => false
@@ -543,7 +543,7 @@ ActiveRecord::Schema.define(:version => 20120423110831) do
     t.boolean "can_delete",   :default => false
   end
 
-  add_index "investigation_auth_lookup", ["person_id", "can_view"], :name => "index_investigation_auth_lookup_on_person_id_and_can_view"
+  add_index "investigation_auth_lookup", ["user_id", "can_view"], :name => "index_investigation_auth_lookup_on_user_id_and_can_view"
 
   create_table "investigations", :force => true do |t|
     t.string   "title"
@@ -586,7 +586,7 @@ ActiveRecord::Schema.define(:version => 20120423110831) do
   end
 
   create_table "model_auth_lookup", :id => false, :force => true do |t|
-    t.integer "person_id"
+    t.integer "user_id"
     t.integer "asset_id"
     t.boolean "can_view",     :default => false
     t.boolean "can_manage",   :default => false
@@ -595,7 +595,7 @@ ActiveRecord::Schema.define(:version => 20120423110831) do
     t.boolean "can_delete",   :default => false
   end
 
-  add_index "model_auth_lookup", ["person_id", "can_view"], :name => "index_model_auth_lookup_on_person_id_and_can_view"
+  add_index "model_auth_lookup", ["user_id", "can_view"], :name => "index_model_auth_lookup_on_user_id_and_can_view"
 
   create_table "model_formats", :force => true do |t|
     t.string   "title"
@@ -796,7 +796,7 @@ ActiveRecord::Schema.define(:version => 20120423110831) do
   add_index "posts", ["user_id", "created_at"], :name => "index_posts_on_user_id"
 
   create_table "presentation_auth_lookup", :id => false, :force => true do |t|
-    t.integer "person_id"
+    t.integer "user_id"
     t.integer "asset_id"
     t.boolean "can_view",     :default => false
     t.boolean "can_manage",   :default => false
@@ -805,7 +805,7 @@ ActiveRecord::Schema.define(:version => 20120423110831) do
     t.boolean "can_delete",   :default => false
   end
 
-  add_index "presentation_auth_lookup", ["person_id", "can_view"], :name => "index_presentation_auth_lookup_on_person_id_and_can_view"
+  add_index "presentation_auth_lookup", ["user_id", "can_view"], :name => "index_presentation_auth_lookup_on_user_id_and_can_view"
 
   create_table "presentation_versions", :force => true do |t|
     t.integer  "presentation_id"
@@ -912,7 +912,7 @@ ActiveRecord::Schema.define(:version => 20120423110831) do
   end
 
   create_table "publication_auth_lookup", :id => false, :force => true do |t|
-    t.integer "person_id"
+    t.integer "user_id"
     t.integer "asset_id"
     t.boolean "can_view",     :default => false
     t.boolean "can_manage",   :default => false
@@ -921,7 +921,7 @@ ActiveRecord::Schema.define(:version => 20120423110831) do
     t.boolean "can_delete",   :default => false
   end
 
-  add_index "publication_auth_lookup", ["person_id", "can_view"], :name => "index_publication_auth_lookup_on_person_id_and_can_view"
+  add_index "publication_auth_lookup", ["user_id", "can_view"], :name => "index_publication_auth_lookup_on_user_id_and_can_view"
 
   create_table "publication_authors", :force => true do |t|
     t.string   "first_name"
@@ -982,7 +982,7 @@ ActiveRecord::Schema.define(:version => 20120423110831) do
   end
 
   create_table "sample_auth_lookup", :id => false, :force => true do |t|
-    t.integer "person_id"
+    t.integer "user_id"
     t.integer "asset_id"
     t.boolean "can_view",     :default => false
     t.boolean "can_manage",   :default => false
@@ -991,7 +991,7 @@ ActiveRecord::Schema.define(:version => 20120423110831) do
     t.boolean "can_delete",   :default => false
   end
 
-  add_index "sample_auth_lookup", ["person_id", "can_view"], :name => "index_sample_auth_lookup_on_person_id_and_can_view"
+  add_index "sample_auth_lookup", ["user_id", "can_view"], :name => "index_sample_auth_lookup_on_user_id_and_can_view"
 
   create_table "sample_sops", :force => true do |t|
     t.integer "sample_id"
@@ -1071,7 +1071,7 @@ ActiveRecord::Schema.define(:version => 20120423110831) do
   end
 
   create_table "sop_auth_lookup", :id => false, :force => true do |t|
-    t.integer "person_id"
+    t.integer "user_id"
     t.integer "asset_id"
     t.boolean "can_view",     :default => false
     t.boolean "can_manage",   :default => false
@@ -1080,7 +1080,7 @@ ActiveRecord::Schema.define(:version => 20120423110831) do
     t.boolean "can_delete",   :default => false
   end
 
-  add_index "sop_auth_lookup", ["person_id", "can_view"], :name => "index_sop_auth_lookup_on_person_id_and_can_view"
+  add_index "sop_auth_lookup", ["user_id", "can_view"], :name => "index_sop_auth_lookup_on_user_id_and_can_view"
 
   create_table "sop_specimens", :force => true do |t|
     t.integer "specimen_id"
@@ -1132,7 +1132,7 @@ ActiveRecord::Schema.define(:version => 20120423110831) do
   add_index "sops", ["contributor_id", "contributor_type"], :name => "index_sops_on_contributor_id_and_contributor_type"
 
   create_table "specimen_auth_lookup", :id => false, :force => true do |t|
-    t.integer "person_id"
+    t.integer "user_id"
     t.integer "asset_id"
     t.boolean "can_view",     :default => false
     t.boolean "can_manage",   :default => false
@@ -1141,7 +1141,7 @@ ActiveRecord::Schema.define(:version => 20120423110831) do
     t.boolean "can_delete",   :default => false
   end
 
-  add_index "specimen_auth_lookup", ["person_id", "can_view"], :name => "index_specimen_auth_lookup_on_person_id_and_can_view"
+  add_index "specimen_auth_lookup", ["user_id", "can_view"], :name => "index_specimen_auth_lookup_on_user_id_and_can_view"
 
   create_table "specimens", :force => true do |t|
     t.string   "title"
@@ -1235,7 +1235,7 @@ ActiveRecord::Schema.define(:version => 20120423110831) do
   end
 
   create_table "study_auth_lookup", :id => false, :force => true do |t|
-    t.integer "person_id"
+    t.integer "user_id"
     t.integer "asset_id"
     t.boolean "can_view",     :default => false
     t.boolean "can_manage",   :default => false
@@ -1244,7 +1244,7 @@ ActiveRecord::Schema.define(:version => 20120423110831) do
     t.boolean "can_delete",   :default => false
   end
 
-  add_index "study_auth_lookup", ["person_id", "can_view"], :name => "index_study_auth_lookup_on_person_id_and_can_view"
+  add_index "study_auth_lookup", ["user_id", "can_view"], :name => "index_study_auth_lookup_on_user_id_and_can_view"
 
   create_table "subscriptions", :force => true do |t|
     t.integer  "person_id"

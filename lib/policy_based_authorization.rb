@@ -24,14 +24,14 @@ module Acts
 
       module AuthLookupMethods
         def all_authorized_for action, user=User.current_user
-          person_id = user.nil? ? 0 : user.person.id
-          c = lookup_count_for_action_and_user person_id
+          user_id = user.nil? ? 0 : user.id
+          c = lookup_count_for_action_and_user user_id
           if (c==count)
-            Rails.logger.warn("Lookup table is complete for person_id = #{person_id}")
-            ids = lookup_ids_for_person_and_action action, person_id
+            Rails.logger.warn("Lookup table is complete for user_id = #{user_id}")
+            ids = lookup_ids_for_person_and_action action, user_id
             find_all_by_id(ids)
           else
-            Rails.logger.warn("Lookup table is incomplete for person_id = #{person_id} - doing things the slow way")
+            Rails.logger.warn("Lookup table is incomplete for user_id = #{user_id} - doing things the slow way")
             #trigger background task to update table
             all.select { |df| df.send("can_#{action}?") }
           end
@@ -41,17 +41,21 @@ module Acts
           "#{self.name.underscore}_auth_lookup"
         end
 
-        def lookup_ids_for_person_and_action action,person_id
-          ActiveRecord::Base.connection.select_all("select asset_id from #{lookup_table_name} where person_id = #{person_id} and can_#{action}=true").collect{|k| k.values}.flatten
+        def clear_lookup_table
+          ActiveRecord::Base.connection.execute("delete from #{lookup_table_name}")
         end
 
-        def lookup_count_for_action_and_user person_id
-          ActiveRecord::Base.connection.select_one("select count(*) from #{lookup_table_name} where person_id = #{person_id}").values[0].to_i
+        def lookup_ids_for_person_and_action action,user_id
+          ActiveRecord::Base.connection.select_all("select asset_id from #{lookup_table_name} where user_id = #{user_id} and can_#{action}=true").collect{|k| k.values}.flatten
         end
 
-        def lookup_for_asset action,person_id,asset_id
+        def lookup_count_for_action_and_user user_id
+          ActiveRecord::Base.connection.select_one("select count(*) from #{lookup_table_name} where user_id = #{user_id}").values[0].to_i
+        end
+
+        def lookup_for_asset action,user_id,asset_id
           attribute = "can_#{action}"
-          res = ActiveRecord::Base.connection.select_one("select #{attribute} from #{lookup_table_name} where person_id=#{person_id} and asset_id=#{asset_id}")
+          res = ActiveRecord::Base.connection.select_one("select #{attribute} from #{lookup_table_name} where user_id=#{user_id} and asset_id=#{asset_id}")
           if res.nil?
             nil
           else
@@ -64,8 +68,8 @@ module Acts
           eval <<-END_EVAL
             def can_#{action}? user = User.current_user
                 return true if new_record?
-                person_id = user.nil? ? 0 : user.person.id
-                lookup = self.class.lookup_for_asset("#{action}", person_id,self.id)
+                user_id = user.nil? ? 0 : user.id
+                lookup = self.class.lookup_for_asset("#{action}", user_id,self.id)
                 if lookup.nil?
                   perform_auth(user,"#{action}")
                 else
@@ -75,16 +79,12 @@ module Acts
           END_EVAL
       end
 
-      def update_lookup_table person_id=0
-        if person_id == 0
-          user=nil
-        else
-          user = Person.find(person_id).user
-        end
+      def update_lookup_table user=nil
+        user_id = user.nil? ? 0 : user.id
 
-        sql = "delete from #{self.class.lookup_table_name} where person_id=#{person_id} and asset_id=#{id}"
+        sql = "delete from #{self.class.lookup_table_name} where user_id=#{user_id} and asset_id=#{id}"
         ActiveRecord::Base.connection.execute(sql)
-        sql = "insert into #{self.class.lookup_table_name} (person_id,asset_id,can_view,can_edit,can_download,can_manage,can_delete) values (#{person_id},#{id},#{can_view?},#{can_edit?},#{can_download?},#{can_manage?},#{can_delete?});"
+        sql = "insert into #{self.class.lookup_table_name} (user_id,asset_id,can_view,can_edit,can_download,can_manage,can_delete) values (#{user_id},#{id},#{can_view?},#{can_edit?},#{can_download?},#{can_manage?},#{can_delete?});"
         ActiveRecord::Base.connection.execute(sql)
 
       end
