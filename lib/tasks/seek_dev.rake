@@ -84,20 +84,20 @@ namespace :seek_dev do
   task(:repopulate_df_auth_lookup_for_person=>:environment) do
     puts "Please provide the person id:"
     person_id = STDIN.gets.chomp
-    person = Person.find(person_id)
+    user = person_id=="0" ? nil : Person.find(person_id).user
     Seek::Util.authorized_types.each do |type|
       table_name = "#{type.name.underscore}_auth_lookup"
       ActiveRecord::Base.connection.execute("delete from #{table_name} where person_id = #{person_id}")
-      assets = type.all
+      assets = type.all(:include=>:policy)
       c=0
       total=assets.count
       ActiveRecord::Base.transaction do
         assets.each do |asset|
-          can_view=asset.can_view? person.user
-          can_edit=asset.can_edit? person.user
-          can_download=asset.can_download? person.user
-          can_manage=asset.can_manage? person.user
-          can_delete=asset.can_delete? person.user
+          can_view=asset.can_view? user
+          can_edit=asset.can_edit? user
+          can_download=asset.can_download? user
+          can_manage=asset.can_manage? user
+          can_delete=asset.can_delete? user
           sql = "insert into #{table_name} (person_id,asset_id,can_view,can_edit,can_download,can_manage,can_delete) values (#{person_id},#{asset.id},#{can_view},#{can_edit},#{can_download},#{can_manage},#{can_delete});"
           ActiveRecord::Base.connection.execute(sql)
           c+=1

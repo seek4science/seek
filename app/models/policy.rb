@@ -15,6 +15,8 @@ class Policy < ActiveRecord::Base
   validates_numericality_of :sharing_scope, :access_type
   
   alias_attribute :title, :name
+
+  default_scope :include=>:permissions
   
   
   # *****************************************************************************
