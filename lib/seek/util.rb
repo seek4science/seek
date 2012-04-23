@@ -42,5 +42,13 @@ module Seek
       end
     end
 
+    def self.authorized_types
+      @@policy_authorised_types ||= begin
+        persistent_classes.select do |c|
+          c.respond_to?(:authorization_supported?) && c.authorization_supported?
+        end.sort_by(&:name)
+      end
+    end
+
   end
 end
