@@ -43,19 +43,16 @@ class Sop < ActiveRecord::Base
   # Parameters:
   # - user - user that performs the action; this is required for authorization
   def self.get_all_as_json(user)
-    all_sops = Sop.find(:all, :order => "ID asc",:include=>[:policy,{:policy=>:permissions}])
-    sops_with_contributors = all_sops.collect{ |s|
-      s.can_view?(user) ?
-        (contributor = s.contributor;
-        { "id" => s.id,
-          "title" => s.title,
+    all = Sop.all_authorized_for "view",user
+    with_contributors = all.collect{ |d|
+        contributor = d.contributor;
+        { "id" => d.id,
+          "title" => d.title,
           "contributor" => contributor.nil? ? "" : "by " + contributor.person.name,
-          "type" => self.name } ) :
-        nil }
-
-    sops_with_contributors.delete(nil)
-
-    return sops_with_contributors.to_json
+          "type" => self.name
+        }
+    }
+    return with_contributors.to_json
   end
 
   def organism_title
