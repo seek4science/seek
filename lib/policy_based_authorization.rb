@@ -84,7 +84,7 @@ module Acts
 
         sql = "delete from #{self.class.lookup_table_name} where user_id=#{user_id} and asset_id=#{id}"
         ActiveRecord::Base.connection.execute(sql)
-        sql = "insert into #{self.class.lookup_table_name} (user_id,asset_id,can_view,can_edit,can_download,can_manage,can_delete) values (#{user_id},#{id},#{can_view?},#{can_edit?},#{can_download?},#{can_manage?},#{can_delete?});"
+        sql = "insert into #{self.class.lookup_table_name} (user_id,asset_id,can_view,can_edit,can_download,can_manage,can_delete) values (#{user_id},#{id},#{can_view?(user)},#{can_edit?(user)},#{can_download?(user)},#{can_manage?(user)},#{can_delete?(user)});"
         ActiveRecord::Base.connection.execute(sql)
 
       end
