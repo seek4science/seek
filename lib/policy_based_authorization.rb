@@ -174,35 +174,6 @@ module Acts
         end
         people.uniq
       end
-
-      def cache_keys user, action
-
-        #start off with the keys for the person
-        unless user.try(:person).nil?
-          keys = user.person.generate_person_key
-        else
-          keys = []
-        end
-
-        #action
-        keys << "can_#{action}?"
-
-        #item (to invalidate when contributor is changed)
-        keys << self.cache_key
-
-        #item creators (to invalidate when creators are changed)
-        if self.respond_to? :assets_creators
-          keys |= self.assets_creators.sort_by(&:id).collect(&:cache_key)
-        end
-
-        #policy
-        keys << policy.cache_key
-
-        #permissions
-        keys |= policy.permissions.sort_by(&:id).collect(&:cache_key)
-
-        keys
-      end
     end
   end
 end
