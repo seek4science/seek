@@ -28,13 +28,19 @@ module Acts
         def all_authorized_for action, user=User.current_user
           user_id = user.nil? ? 0 : user.id
           c = lookup_count_for_action_and_user user_id
-          if (c==count)
+          last_stored_asset_id = last_asset_id_for_user user_id
+          last_asset_id = self.last(:order=>:id).try(:id)
+
+          #cannot rely purly on the count, since an item could have been deleted and a new one added
+          if (c==count && last_stored_asset_id == last_asset_id)
             Rails.logger.warn("Lookup table is complete for user_id = #{user_id}")
             ids = lookup_ids_for_person_and_action action, user_id
             find_all_by_id(ids)
           else
             Rails.logger.warn("Lookup table is incomplete for user_id = #{user_id} - doing things the slow way")
-            #trigger background task to update table
+            if (c==0 && !last_asset_id.nil?)
+              AuthLookupUpdateJob.add_items_to_queue user
+            end
             all.select { |df| df.send("can_#{action}?") }
           end
         end
@@ -55,6 +61,11 @@ module Acts
           ActiveRecord::Base.connection.select_one("select count(*) from #{lookup_table_name} where user_id = #{user_id}").values[0].to_i
         end
 
+        def last_asset_id_for_user user_id
+          v = ActiveRecord::Base.connection.select_one("select max(asset_id) from #{lookup_table_name} where user_id = #{user_id}").values[0]
+          v.nil? ? -1 : v.to_i
+        end
+
         def lookup_for_asset action,user_id,asset_id
           attribute = "can_#{action}"
           res = ActiveRecord::Base.connection.select_one("select #{attribute} from #{lookup_table_name} where user_id=#{user_id} and asset_id=#{asset_id}")
@@ -70,12 +81,8 @@ module Acts
           eval <<-END_EVAL
             def can_#{action}? user = User.current_user
                 return true if new_record?
-                if skip_lookup
-                  lookup=nil
-                else
-                  user_id = user.nil? ? 0 : user.id
-                  lookup = self.class.lookup_for_asset("#{action}", user_id,self.id)
-                end
+                user_id = user.nil? ? 0 : user.id
+                lookup = self.class.lookup_for_asset("#{action}", user_id,self.id)
 
                 if lookup.nil?
                   perform_auth(user,"#{action}")
@@ -87,7 +94,7 @@ module Acts
       end
 
       def queue_update_auth_table
-        #FIXME: somewhat aggressively does this after every save - this is to cover projects changing - can be refined in the future
+        #FIXME: somewhat aggressively does this after every save can be refined in the future
         unless (self.changed - ["updated_at", "last_used_at"]).empty?
           AuthLookupUpdateJob.add_items_to_queue self
         end
@@ -96,14 +103,22 @@ module Acts
       def update_lookup_table user=nil
         user_id = user.nil? ? 0 : user.id
 
-        sql = "delete from #{self.class.lookup_table_name} where user_id=#{user_id} and asset_id=#{id}"
-        ActiveRecord::Base.connection.execute(sql)
         can_view = ActiveRecord::Base.connection.quote perform_auth(user,"view")
         can_edit = ActiveRecord::Base.connection.quote perform_auth(user,"edit")
         can_download = ActiveRecord::Base.connection.quote perform_auth(user,"download")
         can_manage = ActiveRecord::Base.connection.quote perform_auth(user,"manage")
         can_delete = ActiveRecord::Base.connection.quote perform_auth(user,"delete")
-        sql = "insert into #{self.class.lookup_table_name} (user_id,asset_id,can_view,can_edit,can_download,can_manage,can_delete) values (#{user_id},#{id},#{can_view},#{can_edit},#{can_download},#{can_manage},#{can_delete});"
+
+        #check to see if an insert of update is needed, action used is arbitary
+        lookup = self.class.lookup_for_asset("view",user_id,self.id)
+        insert = lookup.nil?
+
+        if insert
+          sql = "insert into #{self.class.lookup_table_name} (user_id,asset_id,can_view,can_edit,can_download,can_manage,can_delete) values (#{user_id},#{id},#{can_view},#{can_edit},#{can_download},#{can_manage},#{can_delete});"
+        else
+          sql = "update #{self.class.lookup_table_name} set can_view=#{can_view}, can_edit=#{can_edit}, can_download=#{can_download},can_manage=#{can_manage},can_delete=#{can_delete} where user_id=#{user_id} and asset_id=#{id}"
+        end
+
         ActiveRecord::Base.connection.execute(sql)
 
       end
