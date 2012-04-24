@@ -56,7 +56,7 @@ class Project < ActiveRecord::Base
 
   has_and_belongs_to_many :organisms  
   
-  searchable(:ignore_attribute_changes_of=>:updated_at) do
+  searchable(:ignore_attribute_changes_of=>[:updated_at]) do
     text :name , :description, :locations
   end if Seek::Config.solr_enabled
 
