@@ -9,7 +9,9 @@ class Permission < ActiveRecord::Base
   after_save :queue_update_auth_table
 
   def queue_update_auth_table
-    AuthLookupUpdateJob.add_items_to_queue policy.assets
+    assets = policy.assets
+    assets = assets | Policy.find(policy_id_was).assets unless policy_id_was.blank?
+    AuthLookupUpdateJob.add_items_to_queue assets
   end
   
   # TODO implement duplicate check in :before_create

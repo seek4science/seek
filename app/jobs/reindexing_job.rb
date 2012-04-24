@@ -16,7 +16,7 @@ class ReindexingJob
   def add_items_to_queue items, t=1.seconds.from_now
     items = Array(items)
     disable_authorization_checks do
-      items.each do |item|
+      items.uniq.each do |item|
         ReindexingQueue.create :item=>item
       end
     end

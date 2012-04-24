@@ -40,7 +40,7 @@ class AuthLookupUpdateJob
   def self.add_items_to_queue items, t=5.seconds.from_now
     items = Array(items)
     disable_authorization_checks do
-      items.each do |item|
+      items.uniq.each do |item|
         #immediately update for the current user
         if item.authorization_supported?
           item.update_lookup_table(User.current_user)
