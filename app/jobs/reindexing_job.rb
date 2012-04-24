@@ -13,7 +13,7 @@ class ReindexingJob
     end
   end
 
-  def add_items_to_queue items, t=1.seconds.from_now
+  def self.add_items_to_queue items, t=1.seconds.from_now
     items = Array(items)
     disable_authorization_checks do
       items.uniq.each do |item|
