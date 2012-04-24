@@ -22,7 +22,11 @@ module IndexPager
   def find_assets
     controller = self.controller_name.downcase
     model_class=controller.classify.constantize
-    found = model_class.all_authorized_for "view",User.current_user
+    if model_class.respond_to? :all_authorized_for
+      found = model_class.all_authorized_for "view",User.current_user
+    else
+      found = model_class.all
+    end
     found = apply_filters(found)
     
     eval("@" + controller + " = found")
