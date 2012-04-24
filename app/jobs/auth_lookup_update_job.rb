@@ -3,7 +3,7 @@ class AuthLookupUpdateJob
   @@my_yaml = AuthLookupUpdateJob.new.to_yaml
 
   def perform
-    todo = AuthLookupUpdateQueue.all.collect do |queued|
+    todo = AuthLookupUpdateQueue.all(:limit=>15).collect do |queued|
       todo = queued.item
       queued.destroy
       todo
@@ -19,6 +19,9 @@ class AuthLookupUpdateJob
         #should never get here
         Delayed::Job.logger.error("Unexecpted type encountered: #{item.class.name}")
       end
+    end
+    if AuthLookupUpdateQueue.count>0 && !AuthLookupUpdateJob.exists?
+      Delayed::Job.enqueue(AuthLookupUpdateJob.new,0,1.seconds.from_now)
     end
   end
 
