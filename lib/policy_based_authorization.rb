@@ -70,8 +70,13 @@ module Acts
           eval <<-END_EVAL
             def can_#{action}? user = User.current_user
                 return true if new_record?
-                user_id = user.nil? ? 0 : user.id
-                lookup = self.class.lookup_for_asset("#{action}", user_id,self.id)
+                if skip_lookup
+                  lookup=nil
+                else
+                  user_id = user.nil? ? 0 : user.id
+                  lookup = self.class.lookup_for_asset("#{action}", user_id,self.id)
+                end
+
                 if lookup.nil?
                   perform_auth(user,"#{action}")
                 else
@@ -93,7 +98,12 @@ module Acts
 
         sql = "delete from #{self.class.lookup_table_name} where user_id=#{user_id} and asset_id=#{id}"
         ActiveRecord::Base.connection.execute(sql)
-        sql = "insert into #{self.class.lookup_table_name} (user_id,asset_id,can_view,can_edit,can_download,can_manage,can_delete) values (#{user_id},#{id},#{can_view?(user)},#{can_edit?(user)},#{can_download?(user)},#{can_manage?(user)},#{can_delete?(user)});"
+        can_view = ActiveRecord::Base.connection.quote perform_auth(user,"view")
+        can_edit = ActiveRecord::Base.connection.quote perform_auth(user,"edit")
+        can_download = ActiveRecord::Base.connection.quote perform_auth(user,"download")
+        can_manage = ActiveRecord::Base.connection.quote perform_auth(user,"manage")
+        can_delete = ActiveRecord::Base.connection.quote perform_auth(user,"delete")
+        sql = "insert into #{self.class.lookup_table_name} (user_id,asset_id,can_view,can_edit,can_download,can_manage,can_delete) values (#{user_id},#{id},#{can_view},#{can_edit},#{can_download},#{can_manage},#{can_delete});"
         ActiveRecord::Base.connection.execute(sql)
 
       end
