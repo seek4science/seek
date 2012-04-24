@@ -18,9 +18,8 @@ class ReindexerObserver < ActiveRecord::Observer
     concs = Array(consequences(item))
     unless concs.empty?
       concs.each do |consequence|
-        ReindexingQueue.create :item=>consequence
+        ReindexingJob.add_item_to_queue(:item=>consequence,10.seconds.from_now)
       end
-      Delayed::Job.enqueue(ReindexingJob.new,1,10.seconds.from_now) unless ReindexingJob.exists?
     end
 
   end
