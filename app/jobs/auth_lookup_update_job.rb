@@ -36,8 +36,10 @@ class AuthLookupUpdateJob
   end
 
   def self.add_item_to_queue item
-    AuthLookupUpdateQueue.create :item=>item
-    Delayed::Job.enqueue(AuthLookupUpdateJob.new,0,1.seconds.from_now) unless AuthLookupUpdateJob.exists?
+    disable_authorization_checks do
+      AuthLookupUpdateQueue.create :item=>item
+      Delayed::Job.enqueue(AuthLookupUpdateJob.new,0,1.seconds.from_now) unless AuthLookupUpdateJob.exists?
+    end
   end
 
   def self.exists?
