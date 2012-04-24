@@ -46,7 +46,7 @@ module Acts
         end
 
         def lookup_ids_for_person_and_action action,user_id
-          ActiveRecord::Base.connection.select_all("select asset_id from #{lookup_table_name} where user_id = #{user_id} and can_#{action}=true").collect{|k| k.values}.flatten
+          ActiveRecord::Base.connection.select_all("select asset_id from #{lookup_table_name} where user_id = #{user_id} and can_#{action}=#{ActiveRecord::Base.connection.quoted_true}").collect{|k| k.values}.flatten
         end
 
         def lookup_count_for_action_and_user user_id
@@ -59,7 +59,7 @@ module Acts
           if res.nil?
             nil
           else
-            res[attribute] == "1" || res[attribute]==true
+            res[attribute] == ActiveRecord::Base.connection.quoted_true
           end
         end
       end
