@@ -4,7 +4,6 @@ class WorkGroup < ActiveRecord::Base
   has_many :group_memberships
   has_many :people, :through=>:group_memberships
   
-  
   def destroy
     if people.empty?
         super

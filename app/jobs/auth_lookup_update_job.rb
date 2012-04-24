@@ -13,6 +13,8 @@ class AuthLookupUpdateJob
         update_for_each_user item
       elsif item.is_a?(User)
         update_assets_for_user item
+      elsif item.is_a?(Person)
+        update_assets_for_user item.user unless item.user.nil?
       else
         #should never get here
         Delayed::Job.logger.error("Unexecpted type encountered: #{item.class.name}")
@@ -35,10 +37,14 @@ class AuthLookupUpdateJob
     end
   end
 
-  def self.add_item_to_queue item
+  def self.add_items_to_queue items, t=5.seconds.from_now
+    items = Array(items)
     disable_authorization_checks do
-      AuthLookupUpdateQueue.create :item=>item
-      Delayed::Job.enqueue(AuthLookupUpdateJob.new,0,1.seconds.from_now) unless AuthLookupUpdateJob.exists?
+      items.each do |item|
+        AuthLookupUpdateQueue.create :item=>item
+      end
+      Rails.logger.warn "#{AuthLookupUpdateQueue.count} items in AuthLookupUpdateQueue"
+      Delayed::Job.enqueue(AuthLookupUpdateJob.new,0,t) unless AuthLookupUpdateJob.exists?
     end
   end
 

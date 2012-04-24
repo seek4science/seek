@@ -13,8 +13,13 @@ class ReindexingJob
     end
   end
 
-  def add_item_to_queue item, t=1.seconds.from_now
-    ReindexingQueue.create :item=>item
+  def add_items_to_queue items, t=1.seconds.from_now
+    items = Array(items)
+    disable_authorization_checks do
+      items.each do |item|
+        ReindexingQueue.create :item=>item
+      end
+    end
     Delayed::Job.enqueue(ReindexingJob.new, 1, t) unless ReindexingJob.exists?
   end
 

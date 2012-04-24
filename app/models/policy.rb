@@ -17,6 +17,12 @@ class Policy < ActiveRecord::Base
   alias_attribute :title, :name
 
   default_scope :include=>:permissions
+
+  after_save :queue_update_auth_table
+
+  def queue_update_auth_table
+    AuthLookupUpdateJob.add_items_to_queue assets
+  end
   
   
   # *****************************************************************************

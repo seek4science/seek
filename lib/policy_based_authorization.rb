@@ -15,6 +15,8 @@ module Acts
           include ProjectCompat unless method_defined? :projects
 
           belongs_to :policy, :required_access_to_owner => :manage, :autosave => true
+
+          after_save :queue_update_auth_table
         end
       end
 
@@ -77,6 +79,11 @@ module Acts
                 end
             end
           END_EVAL
+      end
+
+      def queue_update_auth_table
+        #FIXME: somewhat aggressively does this after every save - this is to cover projects changing - can be refined in the future
+        AuthLookupUpdateJob.add_items_to_queue self
       end
 
       def update_lookup_table user=nil
