@@ -83,7 +83,9 @@ module Acts
 
       def queue_update_auth_table
         #FIXME: somewhat aggressively does this after every save - this is to cover projects changing - can be refined in the future
-        AuthLookupUpdateJob.add_items_to_queue self
+        unless (self.changed - ["updated_at", "last_used_at"]).empty?
+          AuthLookupUpdateJob.add_items_to_queue self
+        end
       end
 
       def update_lookup_table user=nil

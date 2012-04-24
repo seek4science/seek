@@ -41,6 +41,10 @@ class AuthLookupUpdateJob
     items = Array(items)
     disable_authorization_checks do
       items.each do |item|
+        #immediately update for the current user
+        if item.authorization_supported?
+          item.update_lookup_table(User.current_user)
+        end
         AuthLookupUpdateQueue.create :item=>item
       end
       Rails.logger.warn "#{AuthLookupUpdateQueue.count} items in AuthLookupUpdateQueue"
