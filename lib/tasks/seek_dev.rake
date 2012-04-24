@@ -87,7 +87,17 @@ namespace :seek_dev do
     end
   end
 
-  task(:repopulate_df_auth_lookup_for_user=>:environment) do
+  task(:repopulate_auth_lookup_tables=>:environment) do
+    User.all.each do |user|
+      Seek::Util.authorized_types.each do |type|
+        ActiveRecord::Base.transaction do
+
+        end
+      end
+    end
+  end
+
+  task(:repopulate_auth_lookup_for_user=>:environment) do
     puts "Please provide the user id:"
     user_id = STDIN.gets.chomp
     user = user_id=="0" ? nil : User.find(user_id)
