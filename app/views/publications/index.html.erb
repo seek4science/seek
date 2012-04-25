@@ -10,7 +10,7 @@
 <% end %>
 
 <div class="list_items_container">
-  <%= render :partial=>"layouts/resource_list_item", :collection=>@publications %>
+  <%= render :partial=>"assets/resource_list_item", :collection=>@publications %>
 </div>
 
 <% if @publications.page == "latest" && Publication.find(:all).length > Seek::Config.limit_latest%>

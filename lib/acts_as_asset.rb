@@ -72,8 +72,11 @@ module Acts #:nodoc:
           extend Acts::Asset::SingletonMethods
         end
         include Acts::Asset::InstanceMethods
+        include BackgroundReindexing
         include Subscribable
       end
+
+
 
       def is_asset?
         include?(Acts::Asset::InstanceMethods)
@@ -88,10 +91,15 @@ module Acts #:nodoc:
 
     module InstanceMethods
 
+      def studies
+        assays.collect{|a| a.study}.uniq
+      end
+
 
       def related_people
         self.creators
       end
+      
       # adapt for moving original_filename,content_type to content_blob
 
       def original_filename
@@ -152,8 +160,13 @@ module Acts #:nodoc:
         project_assays
       end
 
-      # def asset; return self; end
-      # def resource; return self; end
+      def assay_type_titles
+        assays.collect{|a| a.assay_type.try(:title)}.compact
+      end
+
+      def technology_type_titles
+        assays.collect{|a| a.technology_type.try(:title)}.compact
+      end
 
     end
   end

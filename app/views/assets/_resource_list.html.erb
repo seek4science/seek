@@ -6,7 +6,7 @@
 
     <% collection.each do |item| -%>
 		  <% if authorization_for_showing_already_done || item.can_view? -%>  
-				<%= render :partial => "layouts/resource_list_item",:object=>item -%>
+				<%= render :partial => "assets/resource_list_item",:object=>item -%>
 			<% end -%>
 		<% end -%>
 	</div>

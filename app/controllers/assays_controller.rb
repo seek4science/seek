@@ -116,6 +116,8 @@ class AssaysController < ApplicationController
         # update related publications
         Relationship.create_or_update_attributions(@assay, params[:related_publication_ids].collect { |i| ["Publication", i.split(",").first] }, Relationship::RELATED_TO_PUBLICATION) unless params[:related_publication_ids].nil?
 
+        #required to trigger the after_save callback after the assets have been associated
+        @assay.save
 
         if @assay.create_from_asset =="true"
           render :action=>:update_assays_list

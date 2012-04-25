@@ -10,7 +10,7 @@
 <% end %>
 
 <div class="list_items_container">
-  <%= render :partial=>"layouts/resource_list_item", :collection=>@samples %>
+  <%= render :partial=>"assets/resource_list_item", :collection=>@samples %>
 </div>
 <% if @samples.page == "latest" && Sample.find(:all).length > Seek::Config.limit_latest%>
     <%= render :partial => "layouts/paginate_see_all"%>

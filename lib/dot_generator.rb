@@ -403,28 +403,13 @@ class AssayNode < SeekNode
   end
 end
 
-class VersionedAssetNode < AssetNode
-  def self.is_node_class_for? item
-    super and item.class.name.end_with? "::Version"
-  end
 
-  def initialize versioned_asset
-    @version = versioned_asset.version
-    #this means that all versioned_assets with the same parent will get the same entry_identifier. Is that really correct? I think that means that later nodes can 'shadow' earlier ones, only displaying the last one.
-    super versioned_asset.parent
-  end
-
-  def url
-    controller.polymorphic_path(item, :version => @version)
-  end
-
-end
 
 #AssayAssetNode is only used for children of Assay
-class AssayAssetNode < VersionedAssetNode
+class AssayAssetNode < AssetNode
   def initialize assay_asset
     @assay_asset = assay_asset
-    super assay_asset.versioned_asset
+    super assay_asset.asset
   end
 
   def edge other, attributes={}

@@ -326,8 +326,8 @@ class AssayTest < ActiveSupport::TestCase
   test "related models" do
     model_assay = Factory :modelling_assay,:model_master_ids => [Factory(:model).id]
     exp_assay = Factory :experimental_assay,:model_master_ids => [Factory(:model).id]
-    assert_equal model_assay.models, model_assay.related_models
-    assert_not_equal exp_assay.models,exp_assay.related_models
+    assert_equal model_assay.model_masters, model_assay.related_models
+    assert_not_equal exp_assay.model_masters,exp_assay.related_models
     assert_equal [], exp_assay.related_models
   end
 end

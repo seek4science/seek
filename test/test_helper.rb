@@ -87,10 +87,6 @@ class ActiveSupport::TestCase
     end
   end
 
-  def run_secondary_tests?
-    @@run_secondary ||= File.exists? "#{Rails.root}/tmp/run_secondary_tests"
-  end
-
   ## stuff for mocking
 
   def mock_remote_file path,route

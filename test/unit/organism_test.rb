@@ -10,6 +10,11 @@ class OrganismTest < ActiveSupport::TestCase
     assert_equal 1,o.assays.size
     assert o.assays.include?(a)
   end
+
+  test "searchable_terms" do
+    o=organisms(:Saccharomyces_cerevisiae)
+    assert o.searchable_terms.include?("Saccharomyces cerevisiae")
+  end
  
   test "bioportal_link" do
     o=organisms(:yeast_with_bioportal_concept)

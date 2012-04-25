@@ -15,6 +15,46 @@ class AssetTest < ActiveSupport::TestCase
     assert_equal nil,model.contributor
   end
 
+  test "assay type titles" do
+    df = Factory :data_file
+    assay = Factory :experimental_assay,:assay_type=>Factory(:assay_type,:title=>"aaa")
+    assay2 = Factory :modelling_assay,:assay_type=>Factory(:assay_type,:title=>"bbb")
+
+    disable_authorization_checks do
+      assay.relate(df)
+      assay2.relate(df)
+      assay.reload
+      assay2.reload
+      df.reload
+    end
+
+    assert_equal ["aaa","bbb"],df.assay_type_titles.sort
+    m=Factory :model
+    assert_equal [],m.assay_type_titles
+
+  end
+
+  test "tech type titles" do
+    df = Factory :data_file
+    assay = Factory :experimental_assay,:technology_type=>Factory(:technology_type,:title=>"aaa")
+    assay2 = Factory :modelling_assay,:technology_type=>Factory(:technology_type,:title=>"bbb")
+    assay3 = Factory :modelling_assay,:technology_type=>nil
+
+    disable_authorization_checks do
+      assay.relate(df)
+      assay2.relate(df)
+      assay3.relate(df)
+      assay.reload
+      assay2.reload
+      df.reload
+    end
+
+    assert_equal ["aaa","bbb"],df.technology_type_titles.sort
+    m=Factory :model
+    assert_equal [],m.technology_type_titles
+
+  end
+
   test "classifying and authorizing resources" do
     resource_array = []
     sop=sops(:my_first_sop)

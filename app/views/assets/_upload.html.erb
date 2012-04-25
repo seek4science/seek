@@ -8,22 +8,32 @@ attr_accessor :data_url,:local_copy
 end unless obj.nil?
 obj.local_copy=1 unless obj.nil?
 asset_name = text_for_resource upload_field
+new_version ||= false
 -%>
 
 <div class="box_infotext">
+
     <p>
         You can register a <%= asset_name -%> by either directly uploading a file, or registering a URL. Please test the URL before submitting. <%= link_to_function "More info " + expand_image, visual_effect(:toggle_blind, "more_upload_info", :duration => 0.3) -%>
     </p>
     <span id="more_upload_info" style="display:none;">
         <p>
-            When registering a URL you can specify that a copy of the data should be stored 
-            within SEEK. This is recommended and is equivalent to uploading a file. It also means that should the data behind the URL the data is still available from SEEK. 
+            When registering a URL you can specify that a copy of the data should be stored
+            within SEEK. This is recommended and is equivalent to uploading a file. It also means that should the data behind the URL the data is still available from SEEK.
         </p>
         <p>
             If the URL results in a redirection or unauthorized response, then SEEK has no option but to store only the URL. In this case, when another user selects to download the <%= asset_name -%>
             then they will simply directed to the URL (for example, so that they can login to access the file).
         </p>
+        <p></p>
     </span>
+    <% if new_version -%>
+    <p>
+      You are about to upload a new verison of this <%= asset_name -%>. You should only upload a new version if you have made minor modifications, such as tidying up or fixing errors, that do not change the original purpose
+      of the file. If you think this new version changes the original purpose or meaning of the <%= asset_name -%>, then you should <%= link_to "upload it as a new item",polymorphic_path(obj,:action=>:new) -%>
+      rather than create a new version.
+    </p>
+    <% end -%>
 </div>
 
 <div>

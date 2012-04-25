@@ -3,9 +3,6 @@ require 'acts_as_authorized'
 class Assay < ActiveRecord::Base
   acts_as_isa
 
-  def related_models
-     is_modelling?? models : []
-  end
   def projects
     try_block {study.investigation.projects} || []
   end
@@ -36,6 +33,8 @@ class Assay < ActiveRecord::Base
   has_many :strains, :through=>:assay_organisms
 
   has_many :assay_assets, :dependent => :destroy
+
+  after_save :queue_background_reindexing if Seek::Config.solr_enabled
   
   def self.asset_sql(asset_class)
     asset_class_underscored = asset_class.underscore
@@ -46,7 +45,9 @@ class Assay < ActiveRecord::Base
     'WHERE (assay_assets.version = ' + asset_class_underscored + '_versions.version ' +
     'AND assay_assets.assay_id = #{self.id})' 
   end
-  
+
+  #FIXME: These should be reversed, with the concrete version becoming the primary case, and versioned assets becoming secondary
+  # i.e. - so data_files returnes [DataFile], and data_file_masters is replaced with versioned_data_files, returning [DataFile::Version]
   has_many :data_files, :class_name => "DataFile::Version", :finder_sql => self.asset_sql("DataFile")
   has_many :sops, :class_name => "Sop::Version", :finder_sql => self.asset_sql("Sop")
   has_many :models, :class_name => "Model::Version", :finder_sql => self.asset_sql("Model")
@@ -55,24 +56,37 @@ class Assay < ActiveRecord::Base
   has_many :sop_masters, :through => :assay_assets, :source => :asset, :source_type => "Sop"
   has_many :model_masters, :through => :assay_assets, :source => :asset, :source_type => "Model"
 
-  has_one :investigation,:through=>:study    
+  ["data_file","sop"].each do |type|
+    eval <<-END_EVAL
+      #related items hash will use data_file_masters instead of data_files, etc. (sops, models)
+      def related_#{type.pluralize}
+        #{type}_masters
+      end
+    END_EVAL
+  end
 
-  has_many :assets,:through=>:assay_assets
+  def related_models
+    is_modelling? ? model_masters : []
+  end
+
+  has_one :investigation,:through=>:study
 
   validates_presence_of :assay_type
   validates_presence_of :technology_type, :unless=>:is_modelling?
   validates_presence_of :study, :message=>" must be selected"
   validates_presence_of :owner
   validates_presence_of :assay_class
-  #validates_presence_of :samples,:if => Proc.new { |assay| assay.is_experimental? }
+
+  #a temporary store of added assets - see AssayReindexer
+  attr_reader :pending_related_assets
 
   has_many :relationships, 
     :class_name => 'Relationship',
     :as => :subject,
     :dependent => :destroy
           
-  searchable do
-    text :description, :title, :searchable_tags
+  searchable(:auto_index=>false) do
+    text :description, :title, :searchable_tags, :organism_terms
     text :assay_type do
         assay_type.try :title
     end
@@ -120,7 +134,10 @@ class Assay < ActiveRecord::Base
     assay_asset.version = asset.version
     assay_asset.relationship_type = r_type unless r_type.nil?
     assay_asset.save if assay_asset.changed?
-    
+
+    @pending_related_assets ||= []
+    @pending_related_assets << asset
+
     return assay_asset
   end
 
@@ -189,5 +206,9 @@ class Assay < ActiveRecord::Base
   def validate
     #FIXME: allows at the moment until fixtures and factories are updated: JIRA: SYSMO-734
     errors.add_to_base "You cannot associate a modelling analysis with a sample" if is_modelling? && !samples.empty?
+  end
+
+  def organism_terms
+    organisms.collect{|o| o.searchable_terms}.flatten
   end
 end

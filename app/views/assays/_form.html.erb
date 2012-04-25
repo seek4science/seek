@@ -123,7 +123,15 @@
      is_new_file=action==:edit ? false : true
   %>
   <% if @assay.can_manage? %>
-      <%= preview_permission_popup_link('assay', url_for(:controller => 'policies', :action => 'preview_permissions'), is_new_file, try_block{@assay.contributor.user.id})-%>
+      <% if @assay.contributor.kind_of?(Person)
+            contributor_id = @assay.contributor.try(:user).try(:id)
+         elsif @assay.contributor.kind_of?(User)
+           contributor_id = @assay.contributor.try(:id)
+         else
+            contributor_id = nil
+         end
+      %>
+      <%= preview_permission_popup_link('assay', url_for(:controller => 'policies', :action => 'preview_permissions'), is_new_file, contributor_id)-%>
       <%= f.submit button_text, :id => "assay_submit_btn", :onclick => "javascript: clickLink($('preview_permission'));return(false);" -%>
   <% else %>
       <%= f.submit button_text, :disable_with=>disabled_text, :id => "assay_submit_btn", :onclick => "javascript: $('assay_submit_btn').form.submit();return(false);" -%>
