@@ -1,13 +1,13 @@
 <script type='text/javascript'>
  initialiseFolds();
  updateFancyMultiselect('sample_project_ids');
- if(<%=specimen.nil?%>){
+ if(<%=specimen.new_record?%>){
      var selected_organism = $F('organism_id')
      strains_of_selected_organism(selected_organism)
  }
 </script>
 <% remote_form_for 'biosamples', :url => url_for(:controller => 'biosamples', :action => 'create_specimen_sample'),
-  :condition=>"validateSpecimenSampleFields('#{CELL_CULTURE_OR_SPECIMEN}', #{specimen.nil? ? true : false})",
+  :condition=>"validateSpecimenSampleFields('#{CELL_CULTURE_OR_SPECIMEN}', #{specimen.new_record? ? true : false})",
   :html=>{:method=>:post} do  -%>
     <div id="redbox_contents_div" class="redbox_contents" style="width:800px;">
       <div class="head">
@@ -18,13 +18,13 @@
       </div>
 
       <div class="body">
-        <% if specimen.nil? %>
-            <%= render :partial => 'biosamples/specimen_form' %>
+        <% if specimen.new_record? %>
+            <%= render :partial => 'biosamples/specimen_form', :locals => {:specimen => specimen} %>
         <% else %>
             You will create this sample based on <%=CELL_CULTURE_OR_SPECIMEN-%> <%= specimen.title-%>
         <% end %>
 
-        <%= render :partial => 'biosamples/sample_form' %>
+        <%= render :partial => 'biosamples/sample_form', :locals => {:sample => sample} %>
         <%= hidden_field_tag 'specimen[id]', specimen.try(:id)%>
         <div align="center" style="margin-bottom: 1em; margin-top: 2em">
           <%= submit_tag('Create', :id => 'create_specimen_sample' ,:style => "font-weight: bold;"

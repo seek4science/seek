@@ -1,8 +1,9 @@
 <%= javascript_include_tag "resource" -%>
 <% truncate_length_for_boxes = 22 -%>
 
-<%= asset_buttons @presentation,@display_presentation.version -%>
-
+<ul class="sectionIcons">
+    <%= asset_buttons @presentation,@display_presentation.version -%>
+</ul>
 
 <%= render :partial=>"assets/upload_new_version_form", :locals=>{:resource=>@presentation} -%>
 

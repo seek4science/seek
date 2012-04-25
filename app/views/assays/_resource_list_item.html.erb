@@ -27,9 +27,10 @@
 
   <%= list_assay_samples_and_organisms "Samples",resource.samples,resource.assay_organisms %>
 
-  <%= list_item_authorized_list resource.sops, "SOPs", true, 50, true %>
+  <%= list_item_authorized_list resource.sop_masters, "SOPs", true, 50, true %>
 
-  <%= list_item_authorized_list resource.data_files, "Data files", true, 50, true %>
+  <%= list_item_authorized_list resource.data_file_masters, "Data files", true, 50, true %>
+
 </div>
 
 <div class="list_item_whole_width">

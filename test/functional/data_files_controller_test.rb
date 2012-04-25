@@ -29,6 +29,15 @@ class DataFilesControllerTest < ActionController::TestCase
     perform_api_checks
 
   end
+
+  test "XML for data file with tags" do
+    p=Factory :person
+    df = Factory(:data_file,:policy=>Factory(:public_policy, :access_type=>Policy::VISIBLE))
+    Factory :tag,:annotatable=>df,:source=>p,:value=>"golf"
+
+    test_get_xml df
+
+  end
   
   test "should show index" do
     get :index

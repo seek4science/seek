@@ -40,9 +40,9 @@
            <h2>Cell culture (chemostat or batch)</h2>
       <% end %>
       <% if existing_specimens.empty? -%>
-          <p class="none_text">No <%= CELL_CULTURE_OR_SPECIMEN%>s have yet been defined for selected strains.</p>
+          <p class="none_text">No <%= CELL_CULTURE_OR_SPECIMEN%>s have yet been defined for the selected strains.</p>
       <% else -%>
-          <p class="none_text">Please select the <%= CELL_CULTURE_OR_SPECIMEN.capitalize%>s to see samples.</p>
+          <p class="none_text">Please select the <%= CELL_CULTURE_OR_SPECIMEN.capitalize%>s to browse the associated samples.</p>
 
           <div class="scroll_box">
             <table cellpadding="0" cellspacing="0" border="0" class="display" id="specimen_table" style="width: 100%">
@@ -55,7 +55,8 @@
                 <th>Culture type</th>
                 <th>Genotypes</th>
                 <th>Phenotypes</th>
-                <th>Contributor</th>
+                 <th>Creators</th>
+
                 <th>ID</th>
                 <th>Related SOPs</th>
               </tr>
@@ -71,6 +72,9 @@
                        strain_info = ''
                        selected = true
                      end
+                     creators = specimen.creators.collect(&:name)
+                     creators << specimen.other_creators unless specimen.other_creators.blank?
+
 
                   %>
 
@@ -82,7 +86,7 @@
                     <td><%= specimen.culture_growth_type.try(:title) -%></td>
                     <td><%= specimen.genotype_info %> </td>
                     <td><%= specimen.phenotype_info %></td>
-                    <td><%= try_block{specimen.contributor.person.name}-%></td>
+                    <td><%= creators.join(', ')-%></td>
                     <td><%= specimen.id %></td>
                     <td><%= asset_version_links(specimen.sops).join(", ") -%></td>
                   </tr>
@@ -96,7 +100,7 @@
             <li><%= create_sample_popup_link -%></li>
             <br/>
             <br/>
-            (from new <%= CELL_CULTURE_OR_SPECIMEN %> or based on selected one)
+            (create a new sample and <%= CELL_CULTURE_OR_SPECIMEN %>, or create a new sample for the selected <%= CELL_CULTURE_OR_SPECIMEN %>)
           </ul>
           <br/>
       <% end %>

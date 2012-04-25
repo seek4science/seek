@@ -53,7 +53,7 @@ class Person < ActiveRecord::Base
   has_many :created_presentations,:through => :assets_creators,:source=>:asset,:source_type => "Presentation"
 
   searchable do
-    text :first_name, :last_name,:searchable_tags,:locations, :project_roles
+    text :first_name, :last_name,:description, :searchable_tags,:locations, :project_roles
     text :disciplines do
       disciplines.map{|d| d.title}
     end
@@ -386,6 +386,15 @@ class Person < ActiveRecord::Base
         end
       end
     end
+  end
+
+  def generate_person_key
+    keys = [self.cache_key]
+    #group_memberships + favourite_group_memberships
+    keys |= group_memberships.sort_by(&:id).collect(&:cache_key)
+    keys |= favourite_group_memberships.sort_by(&:id).collect(&:cache_key)
+
+    keys
   end
 
   private

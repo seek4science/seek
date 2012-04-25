@@ -107,12 +107,8 @@ class BiosamplesController < ApplicationController
   end
 
   def create_sample_popup
-    sample = Sample.find_by_id(params[:sample_id])
-    unless sample
-      specimen = Specimen.find_by_id(params[:specimen_id])
-    else
-      specimen = sample.specimen
-    end
+    sample = Sample.new
+    specimen = Specimen.find_by_id(params[:specimen_id]) || Specimen.new
     respond_to do  |format|
       if current_user.try(:person).try(:member?)
         format.html{render :partial => 'biosamples/create_sample_popup', :locals => {:sample => sample, :specimen => specimen}}
