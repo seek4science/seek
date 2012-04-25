@@ -89,7 +89,9 @@ namespace :seek_dev do
 
   task(:repopulate_auth_lookup_tables=>:environment) do
     User.all.each do |user|
-      AuthLookupUpdateJob.add_items_to_queue user,5.seconds.from_now,1
+      unless AuthLookupUpdateQueue.exists?(user)
+        AuthLookupUpdateJob.add_items_to_queue user,5.seconds.from_now,1
+      end
     end
   end
 
