@@ -38,7 +38,7 @@ module Acts
             find_all_by_id(ids)
           else
             Rails.logger.warn("Lookup table is incomplete for user_id = #{user_id} - doing things the slow way")
-            if (c==0 && !last_asset_id.nil?)
+            if (c==0 && !last_asset_id.nil? && !AuthLookupUpdateQueue.exists?(user))
               AuthLookupUpdateJob.add_items_to_queue user
             end
             all.select { |df| df.send("can_#{action}?") }
