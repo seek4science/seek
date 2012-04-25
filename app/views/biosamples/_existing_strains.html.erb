@@ -56,8 +56,8 @@
            existing_strains.each do |strain| -%>
             <tr class="gradeA">
               <td><%= link_to strain.organism.title, organism_path(strain.organism.id), {:target => '_blank'} %></td>
-              <td><%= check_box_tag "selected_strain_#{strain.id}", strain.id, false, :onchange => remote_function(:url => {:controller => 'biosamples', :action => 'existing_specimens'}, :with => "'strain_ids=' + getSelectedStrains()") +
-                      ";show_existing_specimens();hide_existing_samples();" %>
+              <td><%= check_box_tag "selected_strain_#{strain.id}", strain.id, false, :onchange => remote_function(:url => {:controller => 'biosamples', :action => 'existing_specimens'}, :with => "'strain_ids=' + getSelectedStrains()+'&organism_ids='+$F('strain_organism_ids')") +
+                      ";" %>
               </td>
               <td><%= strain.title %> </td>
               <td><%= strain.genotype_info %> </td>

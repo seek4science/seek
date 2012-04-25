@@ -26,8 +26,10 @@
                  options_for_select([["Select Organisms ...", 0]]|all_organisms.collect { |o| [truncate(h(o.title), :length=>select_truncate_length), o.id] }, :selected => default_selected_organisms),
                  {:onchange=>remote_function(:url=>{:action=>"existing_strains", :controller=>"biosamples"},
                                              :with=>"'organism_ids='+$F('strain_organism_ids')",
-                                             :before=>"show_ajax_loader('existing_strains')")+ ";check_show_existing_strains('strain_organism_ids', 'existing_strains', '');hide_existing_specimens();
-                                             hide_existing_samples();return(false);",
+                                             :before=>"show_ajax_loader('existing_strains')")+ ";"+
+                         remote_function(:url => {:controller => 'biosamples', :action => 'existing_specimens'}, :with => "'strain_ids=' + getSelectedStrains() + '&organism_ids='+$F('strain_organism_ids')") + ";"+
+                         "check_show_existing_strains('strain_organism_ids', 'existing_strains', '');
+                                             return(false);",
                  :multiple => true} -%>
 
   </div>

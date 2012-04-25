@@ -17,10 +17,12 @@
                 { "sWidth": "5%", 'bSortable':false },
                 { "sWidth": "20%" },
                 { "sWidth": "15%" },
-                { "sWidth": "15%" },
-                { "sWidth": "15%" },
+                { "sWidth": "10%" },
+                { "sWidth": "10%" },
+                { "sWidth": "10%" },
+                { "sWidth": "10%" },
                 { "sWidth": "5%" },
-                { "sWidth": "25%" }
+                { "sWidth": "15%" }
             ],
             "fnInitComplete": function () {
                 this.fnAdjustColumnSizing(true);
@@ -51,6 +53,8 @@
                 <th>Title</th>
                 <th>Culture starting date</th>
                 <th>Culture type</th>
+                <th>Genotypes</th>
+                <th>Phenotypes</th>
                 <th>Contributor</th>
                 <th>ID</th>
                 <th>Related SOPs</th>
@@ -62,14 +66,22 @@
                   <%
                      strain = specimen.strain
                      strain_info = 'Strain ' + strain.info + "(ID=#{strain.id})"
+                     selected = false
+                     if strain.is_default?
+                       strain_info = ''
+                       selected = true
+                     end
+
                   %>
 
                   <tr>
                     <td><%= strain_info -%></td>
-                    <td><%= check_box_tag "selected_specimen_#{specimen.id}", specimen.id, false, {:onchange => remote_function(:url => {:controller => 'biosamples', :action => 'existing_samples'}, :with => "'specimen_ids=' + getSelectedSpecimens()") + ";show_existing_samples();" } %></td>
+                    <td><%= check_box_tag "selected_specimen_#{specimen.id}", specimen.id, selected, {:onchange => remote_function(:url => {:controller => 'biosamples', :action => 'existing_samples'}, :with => "'specimen_ids=' + getSelectedSpecimens()") + ";show_existing_samples();" } %></td>
                     <td><%= specimen.title -%></td>
                     <td><%= specimen.born_info -%></td>
                     <td><%= specimen.culture_growth_type.try(:title) -%></td>
+                    <td><%= specimen.genotype_info %> </td>
+                    <td><%= specimen.phenotype_info %></td>
                     <td><%= try_block{specimen.contributor.person.name}-%></td>
                     <td><%= specimen.id %></td>
                     <td><%= asset_version_links(specimen.sops).join(", ") -%></td>
