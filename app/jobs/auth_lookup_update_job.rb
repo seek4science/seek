@@ -13,12 +13,15 @@ class AuthLookupUpdateJob
   end
 
   def process_queue
+    #including item_type in the order, encourages assets to be processed before users (since they are much quicker), due to tha happy coincidence
+    #that User falls last alphabetically. Its not that important if a new authorized type is added after User in the future.
     todo = AuthLookupUpdateQueue.all(:limit=>BATCHSIZE,:order=>"priority,item_type,id").collect do |queued|
       todo = queued.item
       queued.destroy
       todo
     end
     todo.uniq.each do |item|
+      Delayed::Job.logger.error("About to process '#{item.class.name}:#{item.id}'")
       begin
         if item.authorization_supported?
           update_for_each_user item
