@@ -69,7 +69,7 @@
                   <tr>
                     <td><%= strain_info -%></td>
                     <td><%= check_box_tag "selected_specimen_#{specimen.id}", specimen.id, false, {:onchange => remote_function(:url => {:controller => 'biosamples', :action => 'existing_samples'}, :with => "'specimen_ids=' + getSelectedSpecimens()") + ";show_existing_samples();" } %></td>
-                    <td><%= specimen.title -%></td>
+                    <td><%= link_to specimen.title, specimen_path(specimen.id), {:target => '_blank'} -%></td>
                     <td><%= specimen.born_info -%></td>
                     <td><%= specimen.culture_growth_type.try(:title) -%></td>
                     <td><%= creators.join(', ')-%></td>
