@@ -21,9 +21,10 @@ class AuthLookupUpdateJob
       todo
     end
     todo.uniq.each do |item|
-      Delayed::Job.logger.error("About to process '#{item.class.name}:#{item.id}'")
       begin
-        if item.authorization_supported?
+        if item.nil?
+          update_assets_for_user nil
+        elsif item.authorization_supported?
           update_for_each_user item
         elsif item.is_a?(User)
           update_assets_for_user item
@@ -34,7 +35,6 @@ class AuthLookupUpdateJob
           Delayed::Job.logger.error("Unexecpted type encountered: #{item.class.name}")
         end
       rescue Exception=>e
-        Delayed::Job.logger.error("Error occurred handing #{item.class.name}:#{item.id} - #{e.message}")
         AuthLookupUpdateJob.add_items_to_queue(item)
       end
     end
@@ -42,7 +42,7 @@ class AuthLookupUpdateJob
 
   def update_for_each_user item
     User.transaction(:requires_new=>:true) do
-       item.update_lookup_table(nil)
+      item.update_lookup_table(nil)
       User.all.each do |user|
         item.update_lookup_table(user)
       end
@@ -63,11 +63,14 @@ class AuthLookupUpdateJob
 
   def self.add_items_to_queue items, t=5.seconds.from_now, priority=0
     if Seek::Config.auth_lookup_enabled
+
+      items = [items] if items.nil?
       items = Array(items)
+
       disable_authorization_checks do
         items.uniq.each do |item|
           #immediately update for the current user
-          if item.authorization_supported?
+          if item.respond_to?(:authorization_supported?) && item.authorization_supported?
             item.update_lookup_table(User.current_user)
           end
           AuthLookupUpdateQueue.create(:item=>item, :priority=>priority) unless AuthLookupUpdateQueue.exists?(item)
