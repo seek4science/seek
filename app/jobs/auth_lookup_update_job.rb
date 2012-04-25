@@ -31,7 +31,8 @@ class AuthLookupUpdateJob
           Delayed::Job.logger.error("Unexecpted type encountered: #{item.class.name}")
         end
       rescue Exception=>e
-        AuthLookupUpdateQueue.add_items_to_queue(item)
+        Delayed::Job.logger.error("Error occurred handing #{item.class.name}:#{item.id} - #{e.message}")
+        AuthLookupUpdateJob.add_items_to_queue(item)
       end
     end
   end
