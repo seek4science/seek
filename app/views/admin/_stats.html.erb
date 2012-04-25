@@ -8,7 +8,7 @@
                       ["Invalid Users/Profiles", "invalid"],
                       ["Users Requiring Activation", "not_activated"],
                       ["Non-project Members", "projectless"],
-                      ["Authorization update job queue","auth_job_queue"]
+                      ["Job queue","job_queue"]
                      ],:length=>10),
     {:style=>"",
      :onchange=>remote_function(:url=>{:action=>"get_stats",:controller=>"admin",:element=>"stats_list"},
