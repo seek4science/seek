@@ -30,17 +30,21 @@ module Acts
           c = lookup_count_for_action_and_user user_id
           last_stored_asset_id = last_asset_id_for_user user_id
           last_asset_id = self.last(:order=>:id).try(:id)
-
-          #cannot rely purly on the count, since an item could have been deleted and a new one added
-          if (c==count && last_stored_asset_id == last_asset_id)
-            Rails.logger.warn("Lookup table is complete for user_id = #{user_id}")
-            ids = lookup_ids_for_person_and_action action, user_id
-            find_all_by_id(ids)
-          else
-            Rails.logger.warn("Lookup table is incomplete for user_id = #{user_id} - doing things the slow way")
-            if (c==0 && !last_asset_id.nil? && !AuthLookupUpdateQueue.exists?(user))
-              AuthLookupUpdateJob.add_items_to_queue user
+          if Seek::Config.auth_lookup_enabled
+            #cannot rely purly on the count, since an item could have been deleted and a new one added
+            if (c==count && last_stored_asset_id == last_asset_id)
+              Rails.logger.warn("Lookup table #{lookup_table_name} is complete for user_id = #{user_id}")
+              ids = lookup_ids_for_person_and_action action, user_id
+              find_all_by_id(ids)
+            else
+              Rails.logger.warn("Lookup table #{lookup_table_name} is incomplete for user_id = #{user_id} - doing things the slow way")
+              #trigger off a full update for that user if the count is zero and items should exist for that type
+              if (c==0 && !last_asset_id.nil?)
+                AuthLookupUpdateJob.add_items_to_queue user
+              end
+              all.select { |df| df.send("can_#{action}?") }
             end
+          else
             all.select { |df| df.send("can_#{action}?") }
           end
         end
@@ -82,8 +86,11 @@ module Acts
             def can_#{action}? user = User.current_user
                 return true if new_record?
                 user_id = user.nil? ? 0 : user.id
-                lookup = self.class.lookup_for_asset("#{action}", user_id,self.id)
-
+                if Seek::Config.auth_lookup_enabled
+                  lookup = self.class.lookup_for_asset("#{action}", user_id,self.id)
+                else
+                  lookup=nil
+                end
                 if lookup.nil?
                   perform_auth(user,"#{action}")
                 else

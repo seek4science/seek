@@ -2,7 +2,7 @@ class AuthLookupUpdateJob
 
   @@my_yaml = AuthLookupUpdateJob.new.to_yaml
 
-  BATCHSIZE=10
+  BATCHSIZE=3
 
   def perform
     process_queue
@@ -13,7 +13,7 @@ class AuthLookupUpdateJob
   end
 
   def process_queue
-    todo = AuthLookupUpdateQueue.all(:limit=>BATCHSIZE,:order=>"priority,id").collect do |queued|
+    todo = AuthLookupUpdateQueue.all(:limit=>BATCHSIZE,:order=>"priority,item_type,id").collect do |queued|
       todo = queued.item
       queued.destroy
       todo
@@ -58,18 +58,20 @@ class AuthLookupUpdateJob
     GC.start
   end
 
-  def self.add_items_to_queue items, t=5.seconds.from_now,priority=0
-    items = Array(items)
-    disable_authorization_checks do
-      items.uniq.each do |item|
-        #immediately update for the current user
-        if item.authorization_supported?
-          item.update_lookup_table(User.current_user)
+  def self.add_items_to_queue items, t=5.seconds.from_now, priority=0
+    if Seek::Config.auth_lookup_enabled
+      items = Array(items)
+      disable_authorization_checks do
+        items.uniq.each do |item|
+          #immediately update for the current user
+          if item.authorization_supported?
+            item.update_lookup_table(User.current_user)
+          end
+          AuthLookupUpdateQueue.create(:item=>item, :priority=>priority) unless AuthLookupUpdateQueue.exists?(item)
         end
-        AuthLookupUpdateQueue.create :item=>item,:priority=>priority
+        Rails.logger.warn "#{AuthLookupUpdateQueue.count} items in AuthLookupUpdateQueue"
+        Delayed::Job.enqueue(AuthLookupUpdateJob.new, 0, t) unless AuthLookupUpdateJob.exists?
       end
-      Rails.logger.warn "#{AuthLookupUpdateQueue.count} items in AuthLookupUpdateQueue"
-      Delayed::Job.enqueue(AuthLookupUpdateJob.new,0,t) unless AuthLookupUpdateJob.exists?
     end
   end
 
