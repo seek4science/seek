@@ -13,7 +13,7 @@ class AuthLookupUpdateJob
   end
 
   def process_queue
-    todo = AuthLookupUpdateQueue.all(:limit=>BATCHSIZE,:order=>:priorty).collect do |queued|
+    todo = AuthLookupUpdateQueue.all(:limit=>BATCHSIZE,:order=>:priority).collect do |queued|
       todo = queued.item
       queued.destroy
       todo
