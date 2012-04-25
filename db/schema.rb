@@ -9,7 +9,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20120424101637) do
+ActiveRecord::Schema.define(:version => 20120425092308) do
 
   create_table "activity_logs", :force => true do |t|
     t.string   "action"
@@ -192,6 +192,7 @@ ActiveRecord::Schema.define(:version => 20120424101637) do
     t.string   "item_type"
     t.datetime "created_at"
     t.datetime "updated_at"
+    t.integer  "priority",   :default => 0
   end
 
   create_table "avatars", :force => true do |t|

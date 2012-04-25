@@ -13,7 +13,7 @@ class AuthLookupUpdateJob
   end
 
   def process_queue
-    todo = AuthLookupUpdateQueue.all(:limit=>BATCHSIZE).collect do |queued|
+    todo = AuthLookupUpdateQueue.all(:limit=>BATCHSIZE,:order=>:priorty).collect do |queued|
       todo = queued.item
       queued.destroy
       todo
@@ -57,7 +57,7 @@ class AuthLookupUpdateJob
     GC.start
   end
 
-  def self.add_items_to_queue items, t=5.seconds.from_now
+  def self.add_items_to_queue items, t=5.seconds.from_now,priority=0
     items = Array(items)
     disable_authorization_checks do
       items.uniq.each do |item|
@@ -65,7 +65,7 @@ class AuthLookupUpdateJob
         if item.authorization_supported?
           item.update_lookup_table(User.current_user)
         end
-        AuthLookupUpdateQueue.create :item=>item
+        AuthLookupUpdateQueue.create :item=>item,:priority=>priority
       end
       Rails.logger.warn "#{AuthLookupUpdateQueue.count} items in AuthLookupUpdateQueue"
       Delayed::Job.enqueue(AuthLookupUpdateJob.new,0,t) unless AuthLookupUpdateJob.exists?
