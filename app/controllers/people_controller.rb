@@ -1,6 +1,6 @@
 class PeopleController < ApplicationController
 
-  include CommonSweepers
+  include Seek::AnnotationCommon
   
   #before_filter :login_required,:except=>[:select,:userless_project_selected_ajax,:create,:new]
   before_filter :find_and_auth, :only => [:show, :edit, :update, :destroy]
@@ -97,10 +97,6 @@ class PeopleController < ApplicationController
         
         # update those attributes of a person that we want to be updated from the session
         @person.attributes = session[possible_unsaved_data][:person]
-
-        #FIXME: needs updating to handle new tools and expertise tag field
-#        @person.tool_list = session[possible_unsaved_data][:tool][:list] if session[]
-#        @person.expertise_list = session[possible_unsaved_data][:expertise][:list]
       end
       
       # clear the session data anyway
@@ -314,9 +310,13 @@ class PeopleController < ApplicationController
   def set_tools_and_expertise person,params
       exp_changed = person.tag_with_params params,"expertise"
       tools_changed = person.tag_with_params params,"tool"
+      if immediately_clear_tag_cloud?
+        expire_annotation_fragments("expertise") if exp_changed
+        expire_annotation_fragments("tool") if tools_changed
+      else
+         #TODO: should expire and rebuild in a background task
+      end
 
-      expire_annotation_fragments("expertise") if exp_changed
-      expire_annotation_fragments("tool") if tools_changed
   end
 
   def set_roles person, params
