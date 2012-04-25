@@ -8,11 +8,11 @@ class FavouriteGroupMembership < ActiveRecord::Base
   after_destroy :queue_update_auth_table
 
   def queue_update_auth_table
-    people = [Person.find(person_id)]
+    people = [Person.find_by_id(person_id)]
 
-    people << Person.find(person_id_was) unless person_id_was.blank?
+    people << Person.find_by_id(person_id_was) unless person_id_was.blank?
 
-    AuthLookupUpdateJob.add_items_to_queue people
+    AuthLookupUpdateJob.add_items_to_queue people.compact
   end
 
 
