@@ -1,8 +1,7 @@
 class PeopleController < ApplicationController
 
   include Seek::AnnotationCommon
-  
-  #before_filter :login_required,:except=>[:select,:userless_project_selected_ajax,:create,:new]
+
   before_filter :find_and_auth, :only => [:show, :edit, :update, :destroy]
   before_filter :current_user_exists,:only=>[:select,:userless_project_selected_ajax,:create,:new]
   before_filter :is_user_admin_auth,:only=>[:destroy]
