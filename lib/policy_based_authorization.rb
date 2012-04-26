@@ -25,7 +25,7 @@ module Acts
       end
 
       module AuthLookupClassMethods
-        def all_authorized_for action, user=User.current_user
+        def all_authorized_for action, user=User.current_user, projects=nil
           user_id = user.nil? ? 0 : user.id
           c = lookup_count_for_action_and_user user_id
           last_stored_asset_id = last_asset_id_for_user user_id
@@ -34,8 +34,12 @@ module Acts
             #cannot rely purly on the count, since an item could have been deleted and a new one added
             if (c==count && last_stored_asset_id == last_asset_id)
               Rails.logger.warn("Lookup table #{lookup_table_name} is complete for user_id = #{user_id}")
-              ids = lookup_ids_for_person_and_action action, user_id
-              find_all_by_id(ids)
+              ids = lookup_ids_for_person_and_action action, user_id,projects
+              if !projects.nil? && (self == Assay || self == Study)
+                find_all_by_id(ids).select{|a| !(a.projects & projects).empty?}
+              else
+                find_all_by_id(ids)
+              end
             else
               Rails.logger.warn("Lookup table #{lookup_table_name} is incomplete for user_id = #{user_id} - doing things the slow way")
               #trigger off a full update for that user if the count is zero and items should exist for that type
@@ -57,8 +61,24 @@ module Acts
           ActiveRecord::Base.connection.execute("delete from #{lookup_table_name}")
         end
 
-        def lookup_ids_for_person_and_action action,user_id
-          ActiveRecord::Base.connection.select_all("select asset_id from #{lookup_table_name} where user_id = #{user_id} and can_#{action}=#{ActiveRecord::Base.connection.quoted_true}").collect{|k| k.values}.flatten
+        def lookup_ids_for_person_and_action action,user_id,projects
+          #Study's and Assays have to be treated differently, as they are linked to a project through the investigation'
+          if (projects.nil? || (self == Study || self == Assay))
+            sql = "select asset_id from #{lookup_table_name} where user_id = #{user_id} and can_#{action}=#{ActiveRecord::Base.connection.quoted_true}"
+            ActiveRecord::Base.connection.select_all(sql).collect{|k| k["asset_id"]}
+          else
+            projects = Array(projects)
+            project_map_table = ["#{self.name.underscore.pluralize}", 'projects'].sort.join('_')
+            project_map_asset_id = "#{self.name.underscore}_id"
+            project_clause = projects.collect{|p| "#{project_map_table}.project_id = #{p.id}"}.join(" or ")
+            sql = "select asset_id,#{project_map_asset_id} from #{lookup_table_name}"
+            sql << " inner join #{project_map_table}"
+            sql << " on #{lookup_table_name}.asset_id = #{project_map_table}.#{project_map_asset_id}"
+            sql << " where #{lookup_table_name}.user_id = #{user_id} and (#{project_clause})"
+            sql << " and can_#{action}=#{ActiveRecord::Base.connection.quoted_true}"
+            ActiveRecord::Base.connection.select_all(sql).collect{|k| k["asset_id"]}
+          end
+
         end
 
         def lookup_count_for_action_and_user user_id

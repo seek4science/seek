@@ -20,13 +20,6 @@ class DataFilesController < ApplicationController
   #has to come after the other filters
   include Seek::Publishing
 
-  def index
-    params[:page] ||= DataFile.default_page
-    @data_files = DataFile.all_authorized_for "view",User.current_user
-    @data_files = apply_filters(@data_files)
-    @data_files = DataFile.paginate_after_fetch(@data_files, :page=>params[:page]) unless @data_files.respond_to?("page_totals")
-  end
-
   def convert_to_presentation
     @data_file = DataFile.find params[:id]
     @presentation = @data_file.convert_to_presentation
