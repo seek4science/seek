@@ -66,7 +66,7 @@ class BiosamplesController < ApplicationController
         end
       end
     end
-    if params[:organism_ids]
+    if Seek::Config.is_virtualliver && params[:organism_ids]
       organism_ids = params[:organism_ids].split(",")
       organism_ids.each do |organism_id|
        default_strains = Strain.find_all_by_title_and_organism_id "default", organism_id
@@ -187,7 +187,7 @@ class BiosamplesController < ApplicationController
           if strain.save
             page.call 'RedBox.close'
             strain_array = [(link_to strain.organism.title, organism_path(strain.organism.id), {:target => '_blank'}),
-                            (check_box_tag "selected_strain_#{strain.id}", strain.id, false, :onchange => remote_function(:url => {:controller => 'biosamples', :action => 'existing_specimens'}, :with => "'strain_ids=' + getSelectedStrains()+'&organism_ids='+$F('strain_organism_ids')") +";"),
+                            (check_box_tag "selected_strain_#{strain.id}", strain.id, false, :onchange => strain_checkbox_onchange_function),
                             strain.title, strain.genotype_info, strain.phenotype_info, strain.id, strain.synonym, strain.comment]
 
             page.call :loadNewStrainAfterCreation, strain_array, strain.organism.title

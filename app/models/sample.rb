@@ -21,7 +21,7 @@ class Sample < ActiveRecord::Base
   has_many :assets,:through => :sample_assets
   has_many :sample_assets,:dependent => :destroy
   validates_numericality_of :age_at_sampling, :only_integer => true, :greater_than=> 0, :allow_nil=> true, :message => "is not a positive integer" if !Seek::Config.is_virtualliver
-
+  validates_presence_of :projects unless Seek::Config.is_virtualliver
   def self.sop_sql()
   'SELECT sop_versions.* FROM sop_versions ' +
   'INNER JOIN sample_sops ' +

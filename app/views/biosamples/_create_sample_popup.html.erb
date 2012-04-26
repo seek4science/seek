@@ -2,12 +2,12 @@
  initialiseFolds();
  updateFancyMultiselect('sample_project_ids');
  if(<%=specimen.new_record?%>){
-     var selected_organism = $F('organism_id')
-     strains_of_selected_organism(selected_organism)
+     var selected_organism = $F('organism_id');
+     strains_of_selected_organism(selected_organism);
  }
 </script>
 <% remote_form_for 'biosamples', :url => url_for(:controller => 'biosamples', :action => 'create_specimen_sample'),
-  :condition=>"validateSpecimenSampleFields('#{CELL_CULTURE_OR_SPECIMEN}', #{specimen.new_record? ? true : false})",
+  :condition=>"validateSpecimenSampleFields('#{CELL_CULTURE_OR_SPECIMEN}', #{specimen.new_record? ? true : false},#{Seek::Config.is_virtualliver})",
   :html=>{:method=>:post} do  -%>
     <div id="redbox_contents_div" class="redbox_contents" style="width:800px;">
       <div class="head">

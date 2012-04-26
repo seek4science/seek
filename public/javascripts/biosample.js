@@ -3,10 +3,10 @@ var specimen_table = null;
 var sample_table = null;
 
 
-function check_show_existing_strains(organism_element_id, existing_strains_element_id, url) {
+function check_show_existing_items(organism_element_id, existing_items_element_id, url) {
     var selected_ids = $F(organism_element_id).join();
     if (selected_ids == '0') {
-        Effect.Fade(existing_strains_element_id, { duration: 0.25 });
+        Effect.Fade(existing_items_element_id, { duration: 0.25 });
     }
     else {
         if (url != '') {
@@ -17,7 +17,7 @@ function check_show_existing_strains(organism_element_id, existing_strains_eleme
                         organism_ids: selected_ids
                     },
                     onSuccess: function(transport) {
-                        Effect.Appear(existing_strains_element_id, { duration: 0.25 });
+                        Effect.Appear(existing_items_element_id, { duration: 0.25 });
                     },
                     onFailure: function(transport) {
                         alert('Something went wrong, please try again...');
@@ -25,7 +25,7 @@ function check_show_existing_strains(organism_element_id, existing_strains_eleme
                 });
         }
         else {
-            Effect.Appear(existing_strains_element_id, { duration: 0.25 });
+            Effect.Appear(existing_items_element_id, { duration: 0.25 });
         }
     }
 }
@@ -126,7 +126,7 @@ function checkSelectOneSpecimen(cell_culture_or_specimen){
         return true;
 }
 
-function validateSpecimenSampleFields(cell_culture_or_specimen, is_new_specimen){
+function validateSpecimenSampleFields(cell_culture_or_specimen, is_new_specimen, is_virtualliver){
     if (is_new_specimen) {
         if($('specimen_title').value.length == 0) {
                 alert("Please enter " + cell_culture_or_specimen + " title.");
@@ -138,6 +138,11 @@ function validateSpecimenSampleFields(cell_culture_or_specimen, is_new_specimen)
                 $('specimen_lab_internal_number').focus();
                 return(false);
         }
+        if(is_virtualliver && $('specimen_institution_id').value == '0') {
+                        alert("Please select one institution");
+                        $('specimen_institution_id').focus();
+                        return(false);
+         }
         if($('organism_id').value == '0') {
                 alert("Please select one organism");
                 $('organism_id').focus();
@@ -154,7 +159,7 @@ function validateSpecimenSampleFields(cell_culture_or_specimen, is_new_specimen)
             $('sample_lab_internal_number').focus();
             return(false);
     }
-    if($F('sample_project_ids').length == 0) {
+    if(!is_virtualliver && $F('sample_project_ids').length == 0) {
             alert("Please select projects");
             $('possible_sample_project_ids').focus();
             return(false);
