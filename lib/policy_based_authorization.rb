@@ -4,7 +4,7 @@ module Acts
     module PolicyBasedAuthorization
       def self.included klass
         klass.extend ClassMethods
-        klass.extend AuthLookupMethods
+        klass.extend AuthLookupClassMethods
         klass.class_eval do
           belongs_to :contributor, :polymorphic => true unless method_defined? :contributor
           after_initialize :contributor_or_default_if_new
@@ -24,7 +24,7 @@ module Acts
 
       end
 
-      module AuthLookupMethods
+      module AuthLookupClassMethods
         def all_authorized_for action, user=User.current_user
           user_id = user.nil? ? 0 : user.id
           c = lookup_count_for_action_and_user user_id

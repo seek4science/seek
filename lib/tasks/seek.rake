@@ -126,6 +126,13 @@ namespace :seek do
 
   end
 
+  desc "Creates background jobs to reindex all searchable things"
+  task(:reindex_all=>:environment) do
+    Seek::Util.searchable_types.each do |type|
+      ReindexingJob.add_items_to_queue type.all
+    end
+  end
+
   private
 
   def send_subscription_mails logs, frequency

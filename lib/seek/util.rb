@@ -50,5 +50,14 @@ module Seek
       end
     end
 
+    def self.searchable_types
+      @@searchable_types ||= begin
+        persistent_classes.select do |c|
+          c.respond_to?(:searchable?) && c.searchable?
+        end.sort_by(&:name)
+      end
+
+    end
+
   end
 end
