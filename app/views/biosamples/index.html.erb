@@ -47,32 +47,46 @@
     check_show_existing_strains('strain_organism_ids', 'existing_strains', '<%=url_for(:controller => 'biosamples', :action => 'existing_strains')-%>');
 
     function loadNewStrainAfterCreation(strain, organism) {
-        var data = strain_table.fnGetData();
-        var load = false;
-        for (var i=0;i<data.length; i++){
-            var pattern = new RegExp(organism);
-            if (pattern.test(data[i][0]))
-                load = true;
-        }
+        if(strain_table && strain_table.length > 0) {
+            var data = strain_table.fnGetData();
+            var load = false;
+            for (var i=0;i<data.length; i++){
+                var pattern = new RegExp(organism);
+                if (pattern.test(data[i][0]))
+                    load = true;
+            }
 
-        if (load) {
-            var a = strain_table.fnAddData(strain);
-            var nTr = strain_table.fnSettings().aoData[a[0]].nTr;
-            $j(nTr).addClass('gradeA');
+            if (load) {
+                var a = strain_table.fnAddData(strain);
+                var nTr = strain_table.fnSettings().aoData[a[0]].nTr;
+                $j(nTr).addClass('gradeA');
+            }
+        }
+        else {
+          if($$('#strain_organism_ids [selected="selected"]').pluck('text').include(organism))
+            check_show_existing_strains('strain_organism_ids', 'existing_strains', '<%=url_for(:controller => 'biosamples', :action => 'existing_strains')-%>');
         }
     }
 
     function loadNewSpecimenAfterCreation(specimen, strain_id) {
-        var data = specimen_table.fnGetData();
-        var load = false;
-        for (var i=0;i<data.length; i++){
-            var pattern = new RegExp('ID='+ new Number(strain_id).toString());
-            if (pattern.test(data[i][0]))
-                load = true;
-        }
+        if(specimen_table && specimen_table.length > 0) {
+            var data = specimen_table.fnGetData();
+            var load = false;
+            for (var i=0;i<data.length; i++){
+                var pattern = new RegExp('ID='+ new Number(strain_id).toString());
+                if (pattern.test(data[i][0]))
+                    load = true;
+            }
 
-        if (load) {
-            specimen_table.fnAddData(specimen);
+            if (load) {
+                specimen_table.fnAddData(specimen);
+            }
+        } else {
+            if(getSelectedStrains().include(strain_id)) {
+                <%=remote_function(:url => {:controller => 'biosamples', :action => 'existing_specimens'}, :with => "'strain_ids=' + getSelectedStrains()");%>
+                show_existing_specimens();
+            }
+
         }
     }
 
