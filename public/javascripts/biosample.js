@@ -67,7 +67,8 @@ function getSelectedStrains() {
     if (strain_table.length != 0){
         var selected_strain_rows = fnGetSelected(strain_table);
         for (var i=0; i< selected_strain_rows.length; i++){
-            strain_ids.push(strain_table.fnGetData(selected_strain_rows[i])[5]);
+            var id_index = getAttributeColumn("ID",strain_table);
+            strain_ids.push(strain_table.fnGetData(selected_strain_rows[i])[id_index+1]);
         }
     }
     return strain_ids.join(',');
@@ -78,12 +79,21 @@ function getSelectedSpecimens() {
     if (specimen_table.length != 0){
         var selected_specimen_rows = fnGetSelected(specimen_table);
         for (var i=0; i< selected_specimen_rows.length; i++){
-            specimen_ids.push(specimen_table.fnGetData(selected_specimen_rows[i])[6]);
+            var id_index = getAttributeColumn("ID",specimen_table);
+            specimen_ids.push(specimen_table.fnGetData(selected_specimen_rows[i])[id_index+1]);
         }
     }
     return specimen_ids.join(',');
 }
-
+/*get the column number of attribute in the table*/
+function getAttributeColumn( attribute, table){
+    var th_columns =  document.evaluate('//table[@id="'+ table.fnSettings().sTableId +'"]/thead/tr/th',document, null, XPathResult.ORDERED_NODE_SNAPSHOT_TYPE, null );
+    for (var l = 0; l < th_columns.snapshotLength; l++){
+         if(th_columns.snapshotItem(l).innerHTML==attribute){
+             return l;
+         }
+    }
+}
 /* Get the rows which are currently selected */
 function fnGetSelected( oTableLocal )
 {
