@@ -30,26 +30,29 @@ module Acts
           c = lookup_count_for_action_and_user user_id
           last_stored_asset_id = last_asset_id_for_user user_id
           last_asset_id = self.last(:order=>:id).try(:id)
+          assets = []
+          programatic_project_filter = !projects.nil? && (!Seek::Config.auth_lookup_enabled || (self==Assay || self==Study))
           if Seek::Config.auth_lookup_enabled
             #cannot rely purly on the count, since an item could have been deleted and a new one added
             if (c==count && last_stored_asset_id == last_asset_id)
               Rails.logger.warn("Lookup table #{lookup_table_name} is complete for user_id = #{user_id}")
-              ids = lookup_ids_for_person_and_action action, user_id,projects
-              if !projects.nil? && (self == Assay || self == Study)
-                find_all_by_id(ids).select{|a| !(a.projects & projects).empty?}
-              else
-                find_all_by_id(ids)
-              end
+              assets = lookup_for_person_and_action action, user_id,projects
             else
               Rails.logger.warn("Lookup table #{lookup_table_name} is incomplete for user_id = #{user_id} - doing things the slow way")
               #trigger off a full update for that user if the count is zero and items should exist for that type
               if (c==0 && !last_asset_id.nil?)
                 AuthLookupUpdateJob.add_items_to_queue user
               end
-              all.select { |df| df.send("can_#{action}?") }
+              assets = all.select { |df| df.send("can_#{action}?") }
+              programatic_project_filter = !projects.nil?
             end
           else
-            all.select { |df| df.send("can_#{action}?") }
+            assets = all.select { |df| df.send("can_#{action}?") }
+          end
+          if programatic_project_filter
+            assets.select{|a| !(a.projects & projects).empty?}
+          else
+            assets
           end
         end
 
@@ -61,11 +64,11 @@ module Acts
           ActiveRecord::Base.connection.execute("delete from #{lookup_table_name}")
         end
 
-        def lookup_ids_for_person_and_action action,user_id,projects
+        def lookup_for_person_and_action action,user_id,projects
           #Study's and Assays have to be treated differently, as they are linked to a project through the investigation'
           if (projects.nil? || (self == Study || self == Assay))
             sql = "select asset_id from #{lookup_table_name} where user_id = #{user_id} and can_#{action}=#{ActiveRecord::Base.connection.quoted_true}"
-            ActiveRecord::Base.connection.select_all(sql).collect{|k| k["asset_id"]}
+            ids = ActiveRecord::Base.connection.select_all(sql).collect{|k| k["asset_id"]}
           else
             projects = Array(projects)
             project_map_table = ["#{self.name.underscore.pluralize}", 'projects'].sort.join('_')
@@ -76,9 +79,9 @@ module Acts
             sql << " on #{lookup_table_name}.asset_id = #{project_map_table}.#{project_map_asset_id}"
             sql << " where #{lookup_table_name}.user_id = #{user_id} and (#{project_clause})"
             sql << " and can_#{action}=#{ActiveRecord::Base.connection.quoted_true}"
-            ActiveRecord::Base.connection.select_all(sql).collect{|k| k["asset_id"]}
+            ids = ActiveRecord::Base.connection.select_all(sql).collect{|k| k["asset_id"]}
           end
-
+          find_all_by_id(ids)
         end
 
         def lookup_count_for_action_and_user user_id
