@@ -50,12 +50,15 @@ module Seek
 
     #pulls out all the content from cells into an array
     def extract_content xml
+
       doc = LibXML::XML::Parser.string(xml).parse
       doc.root.namespaces.default_prefix="ss"
 
       content = doc.find("//ss:sheet[@hidden='false' and @very_hidden='false']/ss:rows/ss:row/ss:cell").collect do |cell|
         cell.content
-      end.reject!{|v| v.blank?}.uniq!
+      end
+      content.reject!{|v| v.blank?}
+      content.uniq!
       content
     end
 
@@ -69,7 +72,7 @@ module Seek
 
     #filters out numbers and text declared in a black list
     def filter_content content
-      blacklist = ["seek id"] #not yet defined, and should probably be regular expressions
+      blacklist = ["SEEK ID"] #not yet defined, and should probably be regular expressions
       content = content - blacklist
 
       #filter out numbers
