@@ -8,7 +8,7 @@ module SpreadsheetUtil
   include SpreadsheetRepresentation
   include SysMODB::SpreadsheetExtractor
 
-  EXTRACTABLE_FILE_SIZE=1*1024*1024
+  EXTRACTABLE_FILE_SIZE=0.25*1024*1024
 
   #is excel and is smaller than 10Mb
   def is_extractable_spreadsheet?
