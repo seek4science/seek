@@ -28,8 +28,8 @@ module Seek
             xml=obj.spreadsheet_xml
             unless xml.nil?
               content = extract_content(xml)
-              content = humanize_content(content)
               content = filter_content(content)
+              content = humanize_content(content)
               content
             else
               []
@@ -55,7 +55,7 @@ module Seek
 
       content = doc.find("//ss:sheet[@hidden='false' and @very_hidden='false']/ss:rows/ss:row/ss:cell").collect do |cell|
         cell.content
-      end
+      end.reject!{|v| v.blank?}.uniq!
       content
     end
 
@@ -73,9 +73,10 @@ module Seek
       content = content - blacklist
 
       #filter out numbers
-      content.reject do |val|
+      content.reject! do |val|
         val.to_s.match(/\A[+-]?\d+?(\.\d+)?\Z/) != nil
       end
+      content
     end
 
   end
