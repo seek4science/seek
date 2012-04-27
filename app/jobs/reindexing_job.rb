@@ -2,7 +2,7 @@ class ReindexingJob
 
   @@my_yaml = ReindexingJob.new.to_yaml
 
-  BATCHSIZE=1
+  BATCHSIZE=10
 
   def perform
     todo = ReindexingQueue.all(:limit=>BATCHSIZE,:order=>:id).collect do |queued|
