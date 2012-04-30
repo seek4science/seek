@@ -1,9 +1,5 @@
 class Policy < ActiveRecord::Base
   
-  has_many :assets,
-           :dependent => :nullify,
-           :order => "resource_type ASC"
-  
   has_many :permissions,
            :dependent => :destroy,
            :order => "created_at ASC",
@@ -15,6 +11,20 @@ class Policy < ActiveRecord::Base
   validates_numericality_of :sharing_scope, :access_type
   
   alias_attribute :title, :name
+
+  default_scope :include=>:permissions
+
+  after_save :queue_update_auth_table
+
+  def queue_update_auth_table
+    AuthLookupUpdateJob.add_items_to_queue assets
+  end
+
+  def assets
+    Seek::Util.authorized_types.collect do |type|
+      type.find(:all,:conditions=>{:policy_id=>id})
+    end.flatten.uniq
+  end
   
   
   # *****************************************************************************
