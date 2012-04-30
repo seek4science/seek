@@ -175,7 +175,7 @@ class BioSamplesControllerTest < ActionController::TestCase
   test 'should have comment and sex fields in the specimen_form' do
     xhr(:get, :create_sample_popup)
     assert_response :success
-    assert_select "input#specimen_comments", :count => 1
+    assert_select "textarea#specimen_comments", :count => 1
     assert_select "select#specimen_sex", :count => 1
   end
 
@@ -190,5 +190,18 @@ class BioSamplesControllerTest < ActionController::TestCase
     xhr(:get, :existing_samples, {:specimen_ids => "#{specimen.id}"})
     assert_response :success
     assert_select "table#sample_table thead tr th", :text => "Age at sampling(hours)", :count => 1
+  end
+
+  test 'should have comment in the sample_form' do
+    xhr(:get, :create_sample_popup)
+    assert_response :success
+    assert_select "textarea#sample_comments", :count => 1
+  end
+
+  test "should have comment in sample table" do
+    specimen = specimens("running mouse")
+    xhr(:get, :existing_samples, {:specimen_ids => "#{specimen.id}"})
+    assert_response :success
+    assert_select "table#sample_table thead tr th", :text => "Comment", :count => 1
   end
 end

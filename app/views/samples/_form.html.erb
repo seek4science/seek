@@ -139,6 +139,11 @@
   </p>
 
   <p>
+    <%= f.label "Comment" -%><br/>
+    <%= f.text_field :comments, :style=>"width:350px;" -%>
+  </p>
+
+  <p>
     <%= f.label "Organism part" -%><br/>
     <%= f.select :organism_part, options_for_select(['whole cell', 'membrane fraction'].insert(0,'Not specified'), @sample.organism_part), :style => 'float:right;margin-right:30em' %>
   </p>

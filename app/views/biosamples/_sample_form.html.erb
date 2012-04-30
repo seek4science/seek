@@ -29,6 +29,11 @@
           <%= text_field_tag "sample[age_at_sampling]", nil, :style => 'float:right;margin-right:30em' %> (hours)
         </p>
 
+        <p style="margin-bottom: 4em">
+          <label style="float: left;">Comment:</label>
+          <%= text_area_tag "sample[comments]", nil, :style => 'float:right;margin-right:30em' %>
+        </p>
+
         <p style="margin-bottom: 3em">
           <label style="float: left;">Organism part:</label>
           <%= select_tag "sample[organism_part]", options_for_select(['whole cell', 'membrane fraction'].insert(0,'Not specified')), :style => 'float:right;margin-right:30em' %>
