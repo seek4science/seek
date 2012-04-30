@@ -171,7 +171,7 @@ class BiosamplesController < ApplicationController
             page.call 'RedBox.close'
             strain_array = [(link_to strain.organism.title, organism_path(strain.organism.id), {:target => '_blank'}),
                             (check_box_tag "selected_strain_#{strain.id}", strain.id, false, :onchange => remote_function(:url => {:controller => 'biosamples', :action => 'existing_specimens'}, :with => "'strain_ids=' + getSelectedStrains()") +";show_existing_specimens();hide_existing_samples();"),
-                            strain.title, strain.genotype_info, strain.phenotype_info, strain.id, strain.synonym, strain.comment]
+                            strain.title, strain.genotype_info, strain.phenotype_info, strain.id, strain.synonym, strain.comment, strain.parent_strain]
 
             page.call :loadNewStrainAfterCreation, strain_array, strain.organism.title
           else

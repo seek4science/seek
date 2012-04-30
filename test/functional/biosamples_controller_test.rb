@@ -204,4 +204,11 @@ class BioSamplesControllerTest < ActionController::TestCase
     assert_response :success
     assert_select "table#sample_table thead tr th", :text => "Comment", :count => 1
   end
+
+  test "should have parent strain in strain table" do
+    organism = organisms(:yeast)
+    get :existing_strains, :organism_ids => organism.id.to_s
+    assert_response :success
+    assert_select "table#strain_table thead tr th", :text => "Parent", :count => 1
+  end
 end
