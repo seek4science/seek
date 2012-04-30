@@ -11,6 +11,7 @@ class Strain < ActiveRecord::Base
   named_scope :without_default,:conditions=>{:is_dummy=>false}
 
   include ActsAsCachedTree
+  acts_as_authorized
 
   def self.default_strain_for_organism organism
     organism = Organism.find(organism) unless organism.is_a?(Organism)
