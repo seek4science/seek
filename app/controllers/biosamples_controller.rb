@@ -9,7 +9,7 @@ class BiosamplesController < ApplicationController
           if organism
             organisms << organism
             strains=organism.try(:strains)
-            strains_of_organisms |= strains ? strains.reject { |s| s.is_dummy? } : strains
+            strains_of_organisms |= strains ? strains.without_default : strains
           end
         end
       end
@@ -26,7 +26,7 @@ class BiosamplesController < ApplicationController
     end
     respond_to do |format|
           format.json{
-            render :json => {:status => 200, :strains => strains.sort_by(&:title).reject{|s| s.is_dummy?}.collect{|strain| [strain.id, strain.info]}}
+            render :json => {:status => 200, :strains => strains.sort_by(&:title).without_default.collect{|strain| [strain.id, strain.info]}}
           }
     end
   end
@@ -166,6 +166,7 @@ class BiosamplesController < ApplicationController
       #No need to process if current_user is not a project member, because they cant go here from UI
       if current_user.try(:person).try(:member?)
         strain = select_or_new_strain
+        strain.policy.set_attributes_with_sharing params[:sharing], strain.projects
         render :update do |page|
           if strain.save
             page.call 'RedBox.close'
