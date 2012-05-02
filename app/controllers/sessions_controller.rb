@@ -43,7 +43,7 @@ class SessionsController < ApplicationController
 
   protected
   
-  def open_id_authentication    
+  def open_id_authentication
     authenticate_with_open_id do |result, identity_url|
       if result.successful?
         if @user = User.find_by_openid(identity_url)          
@@ -104,13 +104,17 @@ class SessionsController < ApplicationController
       end
       
       format.html { return_to_url.nil? || (return_to_url && URI.parse(return_to_url).path == root_url) ? redirect_to(root_url) : redirect_to(return_to_url) }
+      format.xml { head :ok }
     end
   end
 
   def failed_login(message)
     logout_user
     flash[:error] = message
-    redirect_to(:root)
+    respond_to do |format|
+      format.html { redirect_to(:root) }
+      format.xml { head :not_found }
+    end
   end
 
   #will initiate creating an initial admin user if no users are present
