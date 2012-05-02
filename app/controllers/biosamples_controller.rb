@@ -1,4 +1,5 @@
 class BiosamplesController < ApplicationController
+  before_filter :check_auth_strain, :check_auth_specimen, :only => [:create_specimen_sample]
   def existing_strains
       strains_of_organisms = []
       organisms = []
@@ -9,7 +10,7 @@ class BiosamplesController < ApplicationController
           if organism
             organisms << organism
             strains=organism.try(:strains)
-            strains_of_organisms |= strains ? strains.without_default : strains
+            strains_of_organisms |= strains ? strains.reject{|s| s.is_dummy? == true}.select(&:can_view?) : strains
           end
         end
       end
@@ -26,7 +27,7 @@ class BiosamplesController < ApplicationController
     end
     respond_to do |format|
           format.json{
-            render :json => {:status => 200, :strains => strains.sort_by(&:title).without_default.collect{|strain| [strain.id, strain.info]}}
+            render :json => {:status => 200, :strains => strains.sort_by(&:title).reject{|s| s.is_dummy? == true}.select(&:can_view?).collect{|strain| [strain.id, strain.info]}}
           }
     end
   end
@@ -273,5 +274,25 @@ class BiosamplesController < ApplicationController
         end
       end
       strain
+  end
+
+  def check_auth_strain
+    if params[:specimen] and params[:specimen][:strain_id] and params[:specimen][:strain_id] != "0"
+      strain = Strain.find_by_id(params[:specimen][:strain_id].to_i)
+      if strain && !strain.can_view?
+        error("You are not allowed to select this strain", "is invalid (no permissions)")
+        return false
+      end
+    end
+  end
+
+  def check_auth_specimen
+    if params[:specimen] and params[:specimen][:id]
+      specimen = Specimen.find_by_id(params[:specimen][:id].to_i)
+      if specimen && !specimen.can_view?
+        error("You are not allowed to select this #{CELL_CULTURE_OR_SPECIMEN}", "is invalid (no permissions)")
+        return false
+      end
+    end
   end
 end
