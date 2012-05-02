@@ -23,6 +23,11 @@ function annotation(id, type, sheet_number, cell_range, content, date_created) {
 
 var $j = jQuery.noConflict(); //To prevent conflicts with prototype
 
+$j(window)
+      .resize(function(e) {
+        adjust_container_dimensions();
+});
+
 $j(document).ready(function ($) {
 
   //Auto scrolling
@@ -38,6 +43,7 @@ $j(document).ready(function ($) {
       startCol,
       endRow,
       endCol;
+
 
   //To disable text-selection
   //http://stackoverflow.com/questions/2700000/how-to-disable-text-selection-using-jquery
@@ -193,6 +199,9 @@ $j(document).ready(function ($) {
         handles: 'e',
         stop: function (){
           $("table.active_sheet col:eq("+($(this).index()-1)+")").width($(this).width());
+          if ($j("div.spreadsheet_container").width()>max_container_width()) {
+            adjust_container_dimensions();
+          }
         }
       })
       .mousedown(function(){
@@ -216,9 +225,39 @@ $j(document).ready(function ($) {
         select_cells(1,row,last_col,row);
       })
   ;
+
+  adjust_container_dimensions();
 });
 
+function max_container_width() {
+    var max_width = $j(".corner_heading").width();
+    $j(".col_heading:visible").each(function() {
+       max_width += $(this).offsetWidth;
+    });
+    return max_width;
+}
 
+function adjust_container_dimensions() {
+        var max_width = max_container_width();
+        var spreadsheet_container_width = $j("div.spreadsheet_container").width();
+        if (spreadsheet_container_width>=max_width) {
+            $j(".spreadsheet_container").width(max_width);
+            spreadsheet_container_width=max_width;
+        }
+        else {
+            $j(".spreadsheet_container").width("95%");
+            spreadsheet_container_width = $j("div.spreadsheet_container").width();
+        }
+        var sheet_container_width = spreadsheet_container_width + 14;
+        var sheet_width = spreadsheet_container_width - 39;
+        $j(".sheet").width(sheet_width);
+        $j(".sheet_container").width(sheet_container_width);
+
+//    var spreadsheet_container_height = $j("div.spreadsheet_container").height();
+//    var sheet_height = spreadsheet_container_height - 20;
+//    $j(".sheet").height(sheet_height);
+//    $j(".sheet_container").height(spreadsheet_container_height);
+}
 
 //Convert a numeric column index to an alphabetic one
 function num2alpha(col) {
@@ -361,7 +400,7 @@ function show_annotation(id,x,y) {
   annotation_container.show();
   annotation.show();
   if ($j(plot_element_id)) {
-    plot_cells(plot_element_id,'450','300');
+    plot_cells(plot_element_id,'500','300');
   }
 
 }
@@ -508,6 +547,8 @@ function activateSheet(sheet, sheetTab) {
       startCol = 0,
       endRow = 0,
       endCol = 0;
+
+  adjust_container_dimensions();
   return false;
 }
 
@@ -530,68 +571,4 @@ function copy_cells()
   $j("textarea#export_data").val(text);
   $j("div.spreadsheet_popup").hide();
   $j("div#export_form").show();
-}
-function plot_selected_cells(target_element,width,height) {
-    plot_cells(target_element,width,height);
-    $j("div.spreadsheet_popup").hide();
-    $j("div#plot_panel").show();
-}
-
-function plot_cells(target_element,width,height)
-{
-    var cells = $j('td.selected_cell');
-    var columns = $j('.col_heading.selected_heading').size();
-    var text = "";
-
-    for(var i = 0; i < cells.size(); i += columns)
-    {
-      for(var j = 0; j < columns; j += 1)
-      {
-        text += (cells.eq(i + j).html() + "\t");
-      }
-      text += "\n";
-    }
-    $j("textarea.annotation_content_class").val(text);
-      var chart;
-      function drawChart() {
-        var data = new google.visualization.DataTable();
-        chart = new google.visualization.LineChart(document.getElementById(target_element));
-        for(var i = 0; i < cells.size(); i += columns)
-        {
-            var array = new Array();
-            for(var j = 0; j < columns; j += 1)
-            {
-                var value = cells.eq(i + j).html();
-                if (i==0) {
-                    var type;
-                    if (j==0) {
-                        type="string"
-                    }
-                    else {
-                        type="number"
-                    }
-                    data.addColumn(type,value);
-                }
-                else {
-                    if (j==0) {
-                        array.push(value);
-                    }
-                    else {
-                        array.push(parseInt(value));
-                    }
-                }
-            }
-            if (i!=0) {
-                data.addRow(array);
-            }
-        }
-        chart.draw(data, {curveType:'function',
-            width: width,
-            height: height,
-            title: '',
-            vAxis: {title:'',minValue:0,baseline:0},
-            hAxis: {title:'time(min)'}
-        });
-      }
-      drawChart();
 }

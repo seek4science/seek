@@ -75,7 +75,7 @@ module Acts
 
       #use request_permission_summary to retrieve who can manage the item
       def people_can_manage
-        contributor = self.is_isa? ? self.contributor : self.contributor.try(:person)
+        contributor = self.contributor.kind_of?(Person) ? self.contributor : self.contributor.try(:person)
         return [[contributor.id, "#{contributor.first_name} #{contributor.last_name}", Policy::MANAGING]] if policy.blank?
         creators = is_downloadable? ? self.creators : []
         asset_managers = projects.collect(&:asset_managers).flatten
@@ -84,15 +84,30 @@ module Acts
       end
 
       AUTHORIZATION_ACTIONS.each do |action|
-        eval <<-END_EVAL
+        if Seek::Config.auth_caching_enabled
+          eval <<-END_EVAL
           def can_#{action}? user = User.current_user
-            person_key = (user.try :person).try :cache_key
-            new_record? or Rails.cache.fetch([:can_#{action}?, policy.cache_key, person_key]) {
-              auth = Authorization.is_authorized?("#{action}", nil, self, user) || (Ability.new(user).can? "#{action}".to_sym, self) || (Ability.new(user).can? "#{action}_asset".to_sym, self)
-              auth ? :true : :false
-            } == :true
+            if self.new_record?
+              return true
+            else
+              key = cache_keys(user, "#{action}")
+              Rails.cache.fetch(key) {perform_auth(user,"#{action}") ? :true : :false} == :true
+            end
           end
-        END_EVAL
+          END_EVAL
+        else
+          eval <<-END_EVAL
+          def can_#{action}? user = User.current_user
+                new_record?  || perform_auth(user,"#{action}")
+          end
+          END_EVAL
+        end
+
+
+      end
+
+      def perform_auth user,action
+        (Authorization.is_authorized? action, nil, self, user) || (Ability.new(user).can? action.to_sym, self) || (Ability.new(user).can? "#{action}_asset".to_sym, self)
       end
 
       #returns a list of the people that can manage this file
@@ -112,6 +127,35 @@ module Acts
           end
         end
         people.uniq
+      end
+
+      def cache_keys user, action
+
+        #start off with the keys for the person
+        unless user.try(:person).nil?
+          keys = user.person.generate_person_key
+        else
+          keys = []
+        end
+
+        #action
+        keys << "can_#{action}?"
+
+        #item (to invalidate when contributor is changed)
+        keys << self.cache_key
+
+        #item creators (to invalidate when creators are changed)
+        if self.respond_to? :assets_creators
+          keys |= self.assets_creators.sort_by(&:id).collect(&:cache_key)
+        end
+
+        #policy
+        keys << policy.cache_key
+
+        #permissions
+        keys |= policy.permissions.sort_by(&:id).collect(&:cache_key)
+
+        keys
       end
     end
   end

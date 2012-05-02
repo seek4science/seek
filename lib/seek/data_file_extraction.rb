@@ -7,33 +7,42 @@ module Seek
 
     #returns an instance of Seek::Treatment, populated according to the contents of the spreadsheet if it matches a known template
     def treatments
-      if is_spreadsheet?
-        Seek::Treatments.new spreadsheet_xml
-      else
+      begin
+        if is_extractable_spreadsheet?
+	  xml = spreadsheet_xml
+          Seek::Treatments.new xml
+        else
+          Seek::Treatments.new
+        end
+      rescue Exception=>e
+        Rails.logger.error("Error reading spreadsheet #{e.message}")
         Seek::Treatments.new
       end
     end
 
     #returns an array of all cell content within the workbook.
     def spreadsheet_contents_for_search obj=self
-      content = Rails.cache.fetch("#{obj.content_blob.cache_key}-ss-content-for-search") do
-        begin
-          xml=obj.spreadsheet_xml
-          unless xml.nil?
-            content = extract_content(xml)
-            content = humanize_content(content)
-            content = filter_content(content)
-            content
-          else
-            []
+      if obj.is_extractable_spreadsheet? && obj.content_blob.file_exists?
+        content = Rails.cache.fetch("#{obj.content_blob.cache_key}-ss-content-for-search") do
+          begin
+            xml=obj.spreadsheet_xml
+            unless xml.nil?
+              content = extract_content(xml)
+              content = humanize_content(content)
+              content = filter_content(content)
+              content
+            else
+              []
+            end
+          rescue Exception=>e
+            Rails.logger.error("Error processing spreadsheet for content_blob #{obj.content_blob.id} #{e}")
+            raise e unless Rails.env=="production"
+            nil
           end
-        rescue Exception=>e
-          Rails.logger.error("Error processing spreadsheet for content_blob #{obj.content_blob.id} #{e}")
-          raise e unless Rails.env=="production"
-          nil
         end
+      else
+        Rails.logger.error("Unable to find file contents for #{obj.class.name} #{obj.id}")
       end
-
       content || []
     end
 

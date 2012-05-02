@@ -90,12 +90,8 @@ class BiosamplesController < ApplicationController
   end
 
   def create_sample_popup
-    sample = Sample.find_by_id(params[:sample_id])
-    unless sample
-      specimen = Specimen.find_by_id(params[:specimen_id])
-    else
-      specimen = sample.specimen
-    end
+    sample = Sample.new
+    specimen = Specimen.find_by_id(params[:specimen_id]) || Specimen.new
     respond_to do  |format|
       if current_user.try(:person).try(:member?)
         format.html{render :partial => 'biosamples/create_sample_popup', :locals => {:sample => sample, :specimen => specimen}}
@@ -140,7 +136,7 @@ class BiosamplesController < ApplicationController
            #also show specimen of the default strain, after this specimen is created(need to ask for this)
            specimen_array = ['Strain ' + specimen.strain.info + "(ID=#{specimen.strain.id})",
                             (check_box_tag "selected_specimen_#{specimen.id}", specimen.id, false, {:onchange => remote_function(:url => {:controller => 'biosamples', :action => 'existing_samples'}, :with => "'specimen_ids=' + getSelectedSpecimens()") + ";show_existing_samples();" }),
-                            specimen.title, specimen.born_info, specimen.culture_growth_type.try(:title), specimen.contributor.try(:person).try(:name), specimen.id, asset_version_links(specimen.sops).join(", ")]
+                            link_to(specimen.title, specimen_path(specimen.id), {:target => '_blank'}), specimen.born_info, specimen.culture_growth_type.try(:title), specimen.contributor.try(:person).try(:name), specimen.id, asset_version_links(specimen.sops).join(", ")]
 
             page.call :loadNewSpecimenAfterCreation, specimen_array, specimen.strain.id
         else

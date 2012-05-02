@@ -33,6 +33,12 @@ Kernel.class_eval do
 end
 
 class ActiveSupport::TestCase
+  teardown :wait_a_bit
+
+  def wait_a_bit
+    sleep 30 while `sensors | grep temp8 | cut -c15-20`.to_i > 90
+  end
+
   # Transactional fixtures accelerate your tests by wrapping each test method
   # in a transaction that's rolled back on completion.  This ensures that the
   # test database remains unchanged so your fixtures don't have to be reloaded
@@ -85,10 +91,6 @@ class ActiveSupport::TestCase
     File.open "#{Rails.root}/tmp/#{prefix}-flat.txt", 'w' do |file|
       RubyProf::FlatPrinter.new(results).print(file)
     end
-  end
-
-  def run_secondary_tests?
-    @@run_secondary ||= File.exists? "#{Rails.root}/tmp/run_secondary_tests"
   end
 
   ## stuff for mocking

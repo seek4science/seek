@@ -42,12 +42,12 @@ class PoliciesControllerTest < ActionController::TestCase
     post :preview_permissions, :sharing_scope => 2, :access_type => Policy::VISIBLE, :project_ids => your_project.id.to_s, :project_access_type => Policy::ACCESSIBLE
 
     assert_response :success
-    assert_select "h2",:text=>"People can view summary:", :count=>1
+    assert_select "h2",:text=>"People who can view the summary:", :count=>1
     network_members.each do |member|
       assert_select 'a', :text=>"#{member.first_name} #{member.last_name}", :count => 1
     end
 
-    assert_select "h2",:text=>"People can view summary and get contents:", :count=>1
+    assert_select "h2",:text=>"People who can view the summary and get contents:", :count=>1
     assert_select 'a', :text=>"#{your_project_member.first_name} #{your_project_member.last_name}", :count => 1
   end
 
@@ -88,17 +88,17 @@ class PoliciesControllerTest < ActionController::TestCase
     post :preview_permissions, :sharing_scope => 0, :contributor_types => ActiveSupport::JSON.encode(contributor_types), :contributor_values => ActiveSupport::JSON.encode(contributor_values)
 
     assert_response :success
-    assert_select "h2",:text=>"People can view summary and get contents:", :count=>1
+    assert_select "h2",:text=>"People who can view the summary and get contents:", :count=>1
     project_members.each do |member|
       assert_select 'a', :text=>"#{member.first_name} #{member.last_name}", :count => 1
     end
 
-    assert_select "h2",:text=>"People can view and edit summary and contents:", :count=>1
+    assert_select "h2",:text=>"People who can view and edit the summary and contents:", :count=>1
     fg_members.each do |member|
       assert_select 'a', :text=>"#{member.first_name} #{member.last_name}", :count => 1
     end
 
-    assert_select "h2",:text=>"People can manage:", :count=>1
+    assert_select "h2",:text=>"People who can manage:", :count=>1
     assert_select 'a', :text=>"#{person.first_name} #{person.last_name}", :count => 1
   end
 
@@ -130,15 +130,24 @@ class PoliciesControllerTest < ActionController::TestCase
 
     post :preview_permissions, :sharing_scope => 0, :use_blacklist => 'true', :use_whitelist => 'true'
 
-    assert_select "h2",:text=>"People have no access:", :count=>1
+    assert_select "h2",:text=>"People who have no access:", :count=>1
     black_list_members.each do |member|
       assert_select 'a', :text=>"#{member.first_name} #{member.last_name}", :count => 1
     end
 
-    assert_select "h2",:text=>"People can view summary and get contents:", :count=>1
+    assert_select "h2",:text=>"People who can view the summary and get contents:", :count=>1
     white_list_members.each do |member|
       assert_select 'a', :text=>"#{member.first_name} #{member.last_name}", :count => 1
     end
   end
 
+  test 'should show the correct manager(contributor) when updating a study' do
+    study = Factory(:study)
+    contributor = study.contributor
+    post :preview_permissions, :sharing_scope => Policy::EVERYONE, :access_type => Policy::VISIBLE, :is_new_file => "false", :contributor_id => contributor.user.id
+
+    assert_select "h2",:text=>"People who can manage:", :count=>1
+    assert_select 'a', :count => 1
+    assert_select 'a', :text=>"#{contributor.name}", :count => 1
+  end
 end

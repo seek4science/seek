@@ -16,8 +16,8 @@ class Sop < ActiveRecord::Base
   # allow same titles, but only if these belong to different users
   # validates_uniqueness_of :title, :scope => [ :contributor_id, :contributor_type ], :message => "error - you already have a SOP with such title."
 
-  searchable do
-    text :description, :title, :original_filename,:searchable_tags,:exp_conditions_search_fields
+  searchable(:ignore_attribute_changes_of=>[:updated_at,:last_used_at]) do
+    text :description, :title, :original_filename,:searchable_tags,:exp_conditions_search_fields,:assay_type_titles,:technology_type_titles
   end if Seek::Config.solr_enabled
 
   has_many :sample_assets,:dependent=>:destroy,:as => :asset
@@ -37,10 +37,6 @@ class Sop < ActiveRecord::Base
     has_one :content_blob,:primary_key => :sop_id,:foreign_key => :asset_id,:conditions => 'content_blobs.asset_version= #{self.version} and content_blobs.asset_type = "#{self.parent.class.name}"'
     has_many :experimental_conditions, :primary_key => "sop_id", :foreign_key => "sop_id", :conditions =>  'experimental_conditions.sop_version = #{self.version}'
     
-  end
-
-  def studies
-    assays.collect{|a| a.study}.uniq
   end
 
   # get a list of SOPs with their original uploaders - for autocomplete fields

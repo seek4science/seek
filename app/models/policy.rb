@@ -237,7 +237,7 @@ class Policy < ActiveRecord::Base
   end
 
 #return the hash: key is access_type, value is the array of people
-  def summarize_permissions creators=[User.current_user.person], asset_managers = [], contributor=User.current_user.person
+  def summarize_permissions creators=[User.current_user.try(:person)], asset_managers = [], contributor=User.current_user.try(:person)
         #build the hash containing contributor_type as key and the people in these groups as value,exception:'Public' holds the access_type as the value
         people_in_group = {'Person' => [], 'FavouriteGroup' => [], 'WorkGroup' => [], 'Project' => [], 'Institution' => [], 'WhiteList' => [], 'BlackList' => [],'Network' => [], 'Public' => 0}
         #the result return: a hash contain the access_type as key, and array of people as value
@@ -493,8 +493,8 @@ class Policy < ActiveRecord::Base
     asset_manage_id_array = asset_managers.collect{|am| am.id unless am.blank?}
      grouped_people_by_access_type = grouped_people_by_access_type.reject{|key,value| key == Policy::DETERMINED_BY_GROUP}.each_value do |value|
        value.each do |person|
-         person[1].concat('(creator)') if creator_id_array.include?(person[0])
-         person[1].concat('(asset manager)') if asset_manage_id_array.include?(person[0])
+         person[1].concat(' (creator)') if creator_id_array.include?(person[0])
+         person[1].concat(' (asset manager)') if asset_manage_id_array.include?(person[0])
        end
      end
     grouped_people_by_access_type

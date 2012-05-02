@@ -35,7 +35,7 @@
       <p class="none_text">No strains have yet been defined for
         <span style="font-weight: bold;"> <%= h(organisms_title) -%></span>.</p>
   <% else -%>
-      <p class="none_text">Please select the strains to see <%= CELL_CULTURE_OR_SPECIMEN -%>s.
+      <p class="none_text">Please select the strains to browse the associated <%= CELL_CULTURE_OR_SPECIMEN -%>s.
       </p>
       <div class="scroll_box">
       <table cellpadding="0" cellspacing="0" class="display" id="strain_table">
@@ -76,7 +76,7 @@
     <li><%= create_strain_popup_link() -%></li>
     <br/>
     <br/>
-    (create new strain or based on selected one)
+    (create a new strain or one based on the selected one)
   </ul>
   <% end %>
 </div>

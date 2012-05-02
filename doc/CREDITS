@@ -1,6 +1,8 @@
 = Credits
 
-== Other Projects
+== Related Projects
+
+Virtual Liver Network - http://www.virtual-liver.de/
 
 myExperiment - http://www.myexperiment.org
 
@@ -8,9 +10,13 @@ BioCatalogue - http://www.biocatalogue.org
 
 BioPortal - http://bioportal.bioontology.org
 
+MethodBox - https://www.methodbox.org/
+
 == Javascript tools
 
-Flot plotting library - http://code.google.com/p/flot/
+FLOT plotting library - http://code.google.com/p/flot/
+
+Curved Lines plugin for FLOT - https://github.com/MichaelZinsmaier/CurvedLines
 
 == Icons and themes
 

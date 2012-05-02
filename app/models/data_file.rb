@@ -16,13 +16,16 @@ class DataFile < ActiveRecord::Base
 
   validates_presence_of :title
 
+  after_save :queue_background_reindexing if Seek::Config.solr_enabled
+
   # allow same titles, but only if these belong to different users
   # validates_uniqueness_of :title, :scope => [ :contributor_id, :contributor_type ], :message => "error - you already have a Data file with such title."
 
     has_one :content_blob, :as => :asset, :foreign_key => :asset_id ,:conditions => 'asset_version= #{self.version}'
 
-  searchable do
-    text :description, :title, :original_filename, :searchable_tags, :spreadsheet_annotation_search_fields,:fs_search_fields, :spreadsheet_contents_for_search
+  searchable(:auto_index=>false) do
+    text :description, :title, :original_filename, :searchable_tags, :spreadsheet_annotation_search_fields,:fs_search_fields, :spreadsheet_contents_for_search,
+         :assay_type_titles,:technology_type_titles
   end if Seek::Config.solr_enabled
 
   has_many :studied_factors, :conditions =>  'studied_factors.data_file_version = #{self.version}'
@@ -73,12 +76,6 @@ class DataFile < ActiveRecord::Base
 
     end
   end
-
-  def studies
-    assays.collect{|a| a.study}.uniq
-  end
-
-
 
   # get a list of DataFiles with their original uploaders - for autocomplete fields
   # (authorization is done immediately to save from iterating through the collection again afterwards)
