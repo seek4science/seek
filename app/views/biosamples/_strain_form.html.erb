@@ -97,7 +97,8 @@ initialiseFolds();
   <br/>
   <%= render :partial => 'projects/project_selector', :locals => {:resource => strain}%>
   <br/>
-  <%= render :partial => "assets/sharing_form", :locals => {:object => strain, :disable_advanced_view => true} -%>
+
+  <%= render :partial => "assets/sharing_form", :locals => {:object => strain, :disable_advanced_view => true, :disable_can_publish_check => true} -%>
 
     <%= hidden_field_tag 'strain[id]', strain.id %>
     <%= hidden_field_tag 'strain[parent_id]', strain.id %>
