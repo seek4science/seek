@@ -148,7 +148,7 @@ class BioSamplesControllerTest < ActionController::TestCase
                                   :lab_internal_number =>"Do232"},
                           :specimen => {:title => 'test',
                                   :lab_internal_number => 'lab123',
-                                  :strain => Factory(:strain)
+                                  :strain => Factory(:strain, :policy => Factory(:public_policy))
                                   }
       end
     end
@@ -211,4 +211,41 @@ class BioSamplesControllerTest < ActionController::TestCase
     assert_response :success
     assert_select "table#strain_table thead tr th", :text => "Parent", :count => 1
   end
+
+  test "should be able to view only can_view strain" do
+    organism = organisms(:yeast)
+    private_strain = Factory(:strain, :organism => organism, :policy => Factory(:private_policy))
+    assert organism.strains.include?private_strain
+    get :existing_strains, :organism_ids => organism.id.to_s
+    assert_response :success
+    assert_select "table#strain_table tbody tr td", :text => private_strain.title, :count => 0
+    assert_select "table#strain_table tbody tr td", :text => 'default', :count => 0
+    assert_select "table#strain_table tbody tr td", :text => 'TRS99', :count => 1
+    assert_select "table#strain_table tbody tr td", :text => 'ZX81', :count => 1
+  end
+
+  test 'should not allow to create specimen_sample which associates with the un-viewable strain' do
+    assert_no_difference("Sample.count") do
+      assert_no_difference("Specimen.count") do
+        post :create_specimen_sample, :sample => {:title => "test",
+                                                  :projects => [Factory(:project)],
+                                                  :lab_internal_number => "Do232"},
+             :specimen => {:title => 'test',
+                           :lab_internal_number => 'lab123',
+                           :strain => Factory(:strain, :policy => Factory(:private_policy))
+             }
+      end
+    end
+  end
+
+  test 'should not allow to create sample which associates with the un-viewable specimen' do
+      assert_no_difference("Sample.count") do
+        post :create_specimen_sample, :sample => {:title => "test",
+                                                  :projects => [Factory(:project)],
+                                                  :lab_internal_number => "Do232"},
+             :specimen => Factory(:specimen, :policy => Factory(:private_policy))
+
+      end
+  end
+
 end
