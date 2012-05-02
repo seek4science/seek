@@ -126,6 +126,31 @@ class DataFilesController < ApplicationController
       end
     end
   end
+
+  def upload_from_email
+    if current_user.is_admin? && Seek::Config.admin_impersonation_enabled
+      User.with_current_user User.find(params[:sender_id]) do
+        if handle_data
+          @data_file = DataFile.new params[:data_file]
+
+          Policy.new_from_email(@data_file, params[:recipient_ids], params[:cc_ids])
+
+          if @data_file.save
+            @data_file.creators = [current_user.person]
+            create_content_blobs
+
+            flash.now[:notice] ="Data file was successfully uploaded and saved." if flash.now[:notice].nil?
+            render :text => flash.now[:notice]
+          else
+            errors = (@data_file.errors.map { |e| e.join(" ") }.join("\n"))
+            render :text => errors, :status => 500
+          end
+        end
+      end
+    else
+      render :text => "This user is not permitted to act on behalf of other users", :status => :forbidden
+    end
+  end
   
   def create
     if handle_data
