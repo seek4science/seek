@@ -61,23 +61,10 @@
         <%
            existing_strains.each do |strain| -%>
             <tr class="gradeA">
-              <td><%= link_to strain.organism.title, organism_path(strain.organism.id), {:target => '_blank'} %></td>
-              <td><%= check_box_tag "selected_strain_#{strain.id}", strain.id, false, :onchange => remote_function(:url => {:controller => 'biosamples', :action => 'existing_specimens'}, :with => "'strain_ids=' + getSelectedStrains()") +
-                      ";show_existing_specimens();hide_existing_samples();" %>
-              </td>
-              <td><%= strain.title %> </td>
-              <td><%= strain.genotype_info %> </td>
-              <td><%= strain.phenotype_info %></td>
-              <td><%= strain.id %></td>
-              <td><%= strain.synonym %> </td>
-              <td><%= strain.comment %></td>
-              <td><%= strain.parent_strain %></td>
-              <td><%= link_to_remote image("destroy",:alt=>"Delete",:title=>"Delete this entry"),
-                           :url => { :action => "destroy", :controller => 'biosamples', :id => strain.id, :class => 'strain', :id_column_position => 5},
-                           :confirm=>"Are you sure?",:method=>:delete if strain.can_delete?
-                  -%>
-              </td>
-              <td><%= edit_strain_popup_link strain %></td>
+              <% strain_row_data = strain_row_data strain %>
+              <% strain_row_data.each do |column_data| %>
+                <td><%= column_data %></td>
+              <% end %>
             </tr>
         <% end -%>
         </tbody>

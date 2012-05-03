@@ -42,4 +42,29 @@ module BiosamplesHelper
                                    :title => "Edit this strain")
     end
   end
+
+  def strain_row_data strain
+    [(link_to strain.organism.title, organism_path(strain.organism.id), {:target => '_blank'}),
+     (check_box_tag "selected_strain_#{strain.id}", strain.id, false, :onchange => remote_function(:url => {:controller => 'biosamples', :action => 'existing_specimens'}, :with => "'strain_ids=' + getSelectedStrains()") +";show_existing_specimens();hide_existing_samples();"),
+     strain.title, strain.genotype_info, strain.phenotype_info, strain.id, strain.synonym, strain.comment, strain.parent_strain,
+     (link_to_remote image("destroy", :alt => "Delete", :title => "Delete this entry"),
+                     :url => {:action => "destroy", :controller => 'biosamples', :id => strain.id, :class => 'strain', :id_column_position => 5},
+                     :confirm => "Are you sure?", :method => :delete if strain.can_delete?),
+     edit_strain_popup_link(strain)]
+  end
+
+  def specimen_row_data specimen
+    creators = specimen.creators.collect(&:name)
+    creators << specimen.other_creators unless specimen.other_creators.blank?
+    ['Strain ' + specimen.strain.info + "(ID=#{specimen.strain.id})",
+     (check_box_tag "selected_specimen_#{specimen.id}", specimen.id, false, {:onchange => remote_function(:url => {:controller => 'biosamples', :action => 'existing_samples'}, :with => "'specimen_ids=' + getSelectedSpecimens()") + ";show_existing_samples();"}),
+     link_to(specimen.title, specimen_path(specimen.id), {:target => '_blank'}), specimen.born_info, specimen.culture_growth_type.try(:title), creators, specimen.id, asset_version_links(specimen.sops).join(", ")]
+  end
+
+  def sample_row_data sample
+    [sample.specimen_info,
+     (link_to sample.title, sample_path(sample.id), {:target => '_blank'}),
+     sample.lab_internal_number, sample.sampling_date_info, sample.age_at_sampling, sample.provider_name_info, sample.id, sample.comments]
+  end
+
 end

@@ -55,14 +55,10 @@
               <tbody>
               <% existing_samples.each do |sample| -%>
                   <tr class="gradeX">
-                    <td><%= sample.specimen_info %> </td>
-                    <td><%= link_to sample.title, sample_path(sample.id), {:target => '_blank'} %> </td>
-                    <td><%= sample.lab_internal_number %> </td>
-                    <td><%= sample.sampling_date_info %> </td>
-                    <td><%= sample.age_at_sampling %> </td>
-                    <td><%= sample.provider_name_info %></td>
-                    <td><%= sample.id %></td>
-                    <td><%= sample.comments %></td>
+                    <% sample_row_data = sample_row_data sample %>
+                    <% sample_row_data.each do |column_data| %>
+                        <td><%= column_data %></td>
+                    <% end %>
                   </tr>
               <% end -%>
               </tbody>

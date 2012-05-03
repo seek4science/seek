@@ -213,17 +213,9 @@ class BiosamplesController < ApplicationController
         page.call 'RedBox.close'
         if is_new_specimen
            #also show specimen of the default strain, after this specimen is created(need to ask for this)
-           specimen_array = ['Strain ' + specimen.strain.info + "(ID=#{specimen.strain.id})",
-                            (check_box_tag "selected_specimen_#{specimen.id}", specimen.id, false, {:onchange => remote_function(:url => {:controller => 'biosamples', :action => 'existing_samples'}, :with => "'specimen_ids=' + getSelectedSpecimens()") + ";show_existing_samples();" }),
-                            link_to(specimen.title, specimen_path(specimen.id), {:target => '_blank'}), specimen.born_info, specimen.culture_growth_type.try(:title), specimen.contributor.try(:person).try(:name), specimen.id, asset_version_links(specimen.sops).join(", ")]
-
-            page.call :loadNewSpecimenAfterCreation, specimen_array, specimen.strain.id
+            page.call :loadNewSpecimenAfterCreation, specimen_row_data(specimen), specimen.strain.id
         else
-          sample_array = [sample.specimen_info,
-                          (link_to sample.title, sample_path(sample.id), {:target => '_blank'}),
-                          sample.lab_internal_number, sample.sampling_date_info, sample.age_at_sampling, sample.provider_name_info, sample.id, sample.comments]
-
-          page.call :loadNewSampleAfterCreation, sample_array
+          page.call :loadNewSampleAfterCreation, sample_row_data(sample)
         end
       else
         specimen_error_messages = ''
@@ -249,11 +241,7 @@ class BiosamplesController < ApplicationController
         render :update do |page|
           if strain.save
             page.call 'RedBox.close'
-            strain_array = [(link_to strain.organism.title, organism_path(strain.organism.id), {:target => '_blank'}),
-                            (check_box_tag "selected_strain_#{strain.id}", strain.id, false, :onchange => remote_function(:url => {:controller => 'biosamples', :action => 'existing_specimens'}, :with => "'strain_ids=' + getSelectedStrains()") +";show_existing_specimens();hide_existing_samples();"),
-                            strain.title, strain.genotype_info, strain.phenotype_info, strain.id, strain.synonym, strain.comment, strain.parent_strain]
-
-            page.call :loadNewStrainAfterCreation, strain_array, strain.organism.title
+            page.call :loadNewStrainAfterCreation, strain_row_data(strain), strain.organism.title
           else
             page.alert("Fail to create new strain. #{strain.errors.full_messages}")
           end
