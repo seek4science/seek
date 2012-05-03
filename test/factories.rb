@@ -426,3 +426,23 @@ end
     f.association :asset, :factory => :data_file
     f.association :creator, :factory => :person_in_project
   end
+
+
+  Factory.define :genotype do |f|
+    f.association :gene, :factory => :gene
+    f.association :modification, :factory => :modification
+    f.association :strain, :factory => :strain
+  end
+
+  Factory.define :gene do |f|
+    f.sequence(:title) {|n| "gene #{n}"}
+  end
+
+  Factory.define :modification do |f|
+    f.sequence(:title) {|n| "modification #{n}"}
+  end
+
+  Factory.define :phenotype do |f|
+    f.sequence(:description) {|n| "phenotype #{n}"}
+    f.association :strain, :factory => :strain
+  end

@@ -23,5 +23,23 @@ module BiosamplesHelper
       #:alt => "Click to create a new favourite group (opens popup window)",#options[:tooltip_text],
       #:title => tooltip_title_attrib("Opens a popup window, where you can create a new favourite<br/>group, add people to it and set individual access rights.") }  #options[:tooltip_text]
     )
+   end
+
+  def edit_strain_popup_link strain
+    if strain.can_manage?
+      return link_to_remote_redbox(image_tag("famfamfam_silk/wrench.png"),
+                                   {:url => url_for(:controller => 'biosamples', :action => 'edit_strain_popup'),
+                                    :failure => "alert('Sorry, an error has occurred.'); RedBox.close();",
+                                    :with => "'strain_id=' + #{strain.id}"
+                                   },
+                                   :title => "Manage this strain")
+    elsif strain.can_edit?
+      return link_to_remote_redbox(image_tag("famfamfam_silk/page_white_edit.png"),
+                                   {:url => url_for(:controller => 'biosamples', :action => 'edit_strain_popup'),
+                                    :failure => "alert('Sorry, an error has occurred.'); RedBox.close();",
+                                    :with => "'strain_id=' + #{strain.id}"
+                                   },
+                                   :title => "Edit this strain")
+    end
   end
 end

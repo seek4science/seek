@@ -46,6 +46,17 @@
     var organism = new Array();
     check_show_existing_strains('strain_organism_ids', 'existing_strains', '<%=url_for(:controller => 'biosamples', :action => 'existing_strains')-%>');
 
+    function removeRowAfterDestroy(table, id, id_column_position) {
+        var table = eval(table)
+        var data = table.fnGetData();
+        for (var i = 0; i < data.length; i++) {
+            if (data[i][id_column_position] == id.toString()) {
+                table.fnDeleteRow(i);
+                break;
+            }
+        }
+    }
+
     function loadNewStrainAfterCreation(strain, organism) {
         var data = strain_table.fnGetData();
         var load = false;

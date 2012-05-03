@@ -44,14 +44,15 @@ function hide_existing_samples() {
     Effect.Fade('existing_samples', { duration: 0.25 })
 }
 
-function new_strain_form(strain_id, organism_id, url) {
+function strain_form(strain_id, organism_id, action, url) {
     if (url != '') {
         request = new Ajax.Request(url,
             {
                 method: 'get',
                 parameters: {
                     id: strain_id,
-                    organism_id:organism_id
+                    organism_id:organism_id,
+                    strain_action: action
                 },
                 onSuccess: function(transport) {
                 },
@@ -154,7 +155,7 @@ function validateSpecimenSampleFields(cell_culture_or_specimen, is_new_specimen)
             return true;
 }
 
-function validateStrainFields(){
+function validateStrainFields(action){
     if ($('strain_title').value.length == 0) {
         alert("Please enter strain name.");
         $('strain_title').focus();
@@ -171,7 +172,13 @@ function validateStrainFields(){
         return(false);
     }
 
-    $('create_strain').disabled = true;
-    $('create_strain').value = 'Creating...'
+    if(action == 'edit'){
+        $('edit_strain').disabled = true;
+        $('edit_strain').value = 'Updating...'
+    }
+    else{
+        $('create_strain').disabled = true;
+        $('create_strain').value = 'Creating...'
+    }
     return true;
 }

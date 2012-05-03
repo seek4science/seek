@@ -26,7 +26,7 @@ class BioSamplesControllerTest < ActionController::TestCase
   end
 
   test 'should get strain form' do
-    get :new_strain_form
+    get :strain_form
     assert_response :success
   end
 
@@ -246,6 +246,55 @@ class BioSamplesControllerTest < ActionController::TestCase
              :specimen => Factory(:specimen, :policy => Factory(:private_policy))
 
       end
+  end
+
+  test "should update strain" do
+    strain = Factory(:strain)
+    login_as(strain.contributor)
+    new_project = Factory(:project)
+    new_title = 'new title'
+    put :update_strain, :strain => {:id => strain.id, :project_ids =>[new_project.id.to_s], :title => new_title}, :sharing =>{:sharing_scope => Policy::PRIVATE, :access_type_0 => Policy::NO_ACCESS}
+    assert_response :success
+    updated_strain = Strain.find_by_id strain.id
+    assert_equal new_title, updated_strain.title
+    assert_equal [new_project], updated_strain.projects
+    assert_equal Policy::PRIVATE, updated_strain.policy.sharing_scope
+    assert_equal Policy::NO_ACCESS, updated_strain.policy.access_type
+  end
+
+  test "should update strain phenotypes" do
+      strain = Factory(:strain)
+      phenotype1 = Factory(:phenotype, :strain => strain)
+      phenotype2 = Factory(:phenotype, :strain => strain)
+
+      new_phenotype_description = 'new phenotype'
+      login_as(strain.contributor)
+      put :update_strain, :strain => {:id => strain.id}, :phenotypes => {'0' => {:description => phenotype1.description}, '1' => {:description => new_phenotype_description}}
+      assert_response :success
+
+      updated_strain = Strain.find_by_id strain.id
+      new_phenotype = Phenotype.find_by_description(new_phenotype_description)
+      updated_phenotypes = [phenotype1, new_phenotype].sort_by(&:description)
+      assert_equal updated_phenotypes, updated_strain.phenotypes.sort_by(&:description)
+  end
+
+  test "should update strain genotypes" do
+        strain = Factory(:strain)
+        genotype1 = Factory(:genotype, :strain => strain)
+        genotype2 = Factory(:genotype, :strain => strain)
+
+        new_gene_title = 'new gene'
+        new_modification_title = 'new modification'
+        login_as(strain.contributor)
+        put :update_strain, :strain => {:id => strain.id}, :genotypes => {'0' => {:gene => {:title => new_gene_title }, :modification => {:title => new_modification_title }}, '1' => {:gene => {:title => genotype2.gene.title}, :modification => {:title => genotype2.modification.title}} }
+        assert_response :success
+
+        updated_strain = Strain.find_by_id strain.id
+        new_gene = Gene.find_by_title(new_gene_title)
+        new_modification = Modification.find_by_title(new_modification_title)
+        new_genotype = Genotype.find(:all, :conditions => ["gene_id=? and modification_id=?", new_gene.id, new_modification.id]).first
+        updated_genotypes = [genotype2, new_genotype].sort_by(&:id)
+        assert_equal updated_genotypes, updated_strain.genotypes.sort_by(&:id)
   end
 
 end

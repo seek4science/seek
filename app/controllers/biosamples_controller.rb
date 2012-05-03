@@ -10,7 +10,7 @@ class BiosamplesController < ApplicationController
           if organism
             organisms << organism
             strains=organism.try(:strains)
-            strains_of_organisms |= strains ? strains.reject{|s| s.is_dummy? == true}.select(&:can_view?) : strains
+            strains_of_organisms |= strains ? strains.reject{|s| s.is_dummy?}.select(&:can_view?) : strains
           end
         end
       end
@@ -26,9 +26,9 @@ class BiosamplesController < ApplicationController
       strains |= organism.strains if organism
     end
     respond_to do |format|
-          format.json{
-            render :json => {:status => 200, :strains => strains.sort_by(&:title).reject{|s| s.is_dummy? == true}.select(&:can_view?).collect{|strain| [strain.id, strain.info]}}
-          }
+      format.json{
+        render :json => {:status => 200, :strains => strains.sort_by(&:title).reject{|s| s.is_dummy?}.select(&:can_view?).collect{|strain| [strain.id, strain.info]}}
+      }
     end
   end
 
@@ -44,10 +44,88 @@ class BiosamplesController < ApplicationController
     end
   end
 
-  def new_strain_form
+  def edit_strain_popup
+    strain = Strain.find_by_id(params[:strain_id])
+    respond_to do  |format|
+      if current_user.can_edit?
+        format.html{render :partial => 'biosamples/edit_strain_popup', :locals => {:strain => strain}}
+      else
+        flash[:error] = "You are not authorized to edit this strain."
+        format.html {redirect_to :back}
+      end
+    end
+  end
+
+  def update_strain
+    strain = Strain.find_by_id params[:strain][:id]
+    strain.attributes = params[:strain]
+
+    old_phenotypes = strain.phenotypes
+    # Update new phenotypes
+    updated_phenotypes = []
+    phenotypes_params = params["phenotypes"]
+    unless phenotypes_params.blank?
+      phenotypes_params.each_value do |value|
+        phenotype = Phenotype.find(:all, :conditions => ["description=? and strain_id=?", value["description"], strain.id]).first
+        if phenotype
+          updated_phenotypes << phenotype
+        else
+          updated_phenotypes << Phenotype.create(:description => value["description"], :strain_id => strain.id) unless value[:description].blank?
+        end
+      end
+    end
+    #Destroy uneeded phenotypes
+    (old_phenotypes - updated_phenotypes.compact).each { |p| p.destroy }
+
+    old_genotypes = strain.genotypes
+    # Update new genotypes
+    updated_genotypes = []
+    genotypes_params = params["genotypes"]
+    unless genotypes_params.blank?
+      genotypes_params.each_value do |value|
+        gene = Gene.find_by_title(value['gene']['title']) || (Gene.create(:title => value['gene']['title']) unless value['gene']['title'].blank?)
+        modification = Modification.find_by_title(value['modification']['title']) || (Modification.create(:title => value['modification']['title']) unless value['modification']['title'].blank?)
+        genotype = Genotype.find(:all, :conditions => ['gene_id=? and modification_id=? and strain_id=?', gene.id, modification.id, strain.id]).first
+        if genotype
+          updated_genotypes << genotype
+        else
+          updated_genotypes << Genotype.create(:gene_id => gene.id, :modification_id => modification.id, :strain_id => strain.id)
+        end
+      end
+    end
+    #Destroy uneeded genotypes
+    (old_genotypes - updated_genotypes.compact).each { |g| g.destroy }
+
+    if params[:sharing]
+      strain.policy.set_attributes_with_sharing params[:sharing], strain.projects
+    end
+    render :update do |page|
+      if strain.save
+        page.call 'RedBox.close'
+        #page.call :updateRow, 'strain_table', strain
+      else
+        page.alert("Fail to create new strain. #{strain.errors.full_messages}")
+      end
+    end
+
+  end
+
+
+  def destroy
+    object=params[:class].capitalize.constantize.find(params[:id])
+    render :update do |page|
+      if object.can_delete? && object.destroy
+        page.call :removeRowAfterDestroy, "#{params[:class]}_table", object.id, params[:id_column_position]
+      else
+        page.alert(object.errors.full_messages)
+      end
+    end
+  end
+
+  def strain_form
     strain = Strain.find_by_id(params[:id]) || Strain.new
     render :update do |page|
-      page.replace_html 'strain_form', :partial=>"biosamples/strain_form",:locals=>{:strain => strain}
+      page.replace_html 'strain_form', :partial=>"biosamples/strain_form",:locals=>{:strain => strain, :action => params[:strain_action]}
     end
   end
 
