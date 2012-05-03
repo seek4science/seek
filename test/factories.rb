@@ -182,6 +182,9 @@ end
 Factory.define(:strain) do |f|
   f.sequence(:title) { |n| "Strain#{n}" }
   f.association :organism
+  f.projects {[Factory.build(:project)]}
+  f.association :contributor, :factory => :user
+  f.association :policy, :factory => :public_policy
 end
 
 #Culture growth type

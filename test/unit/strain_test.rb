@@ -7,7 +7,7 @@ class StrainTest < ActiveSupport::TestCase
     org = Factory :organism
     Strain.create :title=>"fred",:is_dummy=>false, :organism=>org
     Strain.create :title=>"default",:is_dummy=>true, :organism=>org
-    strains=Strain.without_default
+    strains=org.strains.without_default
     assert_equal 1,strains.count
     assert_equal "fred",strains.first.title
   end

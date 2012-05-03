@@ -155,20 +155,23 @@ function validateSpecimenSampleFields(cell_culture_or_specimen, is_new_specimen)
 }
 
 function validateStrainFields(){
-    if($('strain_title').value.length == 0) {
-            alert("Please enter strain name.");
-            $('strain_title').focus();
-            return(false);
+    if ($('strain_title').value.length == 0) {
+        alert("Please enter strain name.");
+        $('strain_title').focus();
+        return(false);
     }
-    else if($('strain_organism_id').value == '0') {
-            alert("Please select one organism");
-            $('strain_organism_id').focus();
-            return(false);
+    if ($('strain_organism_id').value == '0') {
+        alert("Please select one organism");
+        $('strain_organism_id').focus();
+        return(false);
     }
-    else{
-        $('create_strain').disabled = true;
-        $('create_strain').value = 'Creating...'
-        return true;
+    if ($F('strain_project_ids').length == 0) {
+        alert("Please select projects");
+        $('possible_strain_project_ids').focus();
+        return(false);
     }
 
+    $('create_strain').disabled = true;
+    $('create_strain').value = 'Creating...'
+    return true;
 }

@@ -12,7 +12,6 @@ class Project < ActiveRecord::Base
   
   validates_uniqueness_of :name
 
-
   grouped_pagination :pages=>("A".."Z").to_a, :default_page => Seek::Config.default_page(self.name.underscore.pluralize) #shouldn't need "Other" tab for project
   
 
@@ -57,7 +56,7 @@ class Project < ActiveRecord::Base
 
   has_and_belongs_to_many :organisms  
   
-  searchable do
+  searchable(:ignore_attribute_changes_of=>[:updated_at]) do
     text :name , :description, :locations
   end if Seek::Config.solr_enabled
 

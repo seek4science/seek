@@ -1,4 +1,5 @@
 class BiosamplesController < ApplicationController
+  before_filter :check_auth_strain, :check_auth_specimen, :only => [:create_specimen_sample]
   def existing_strains
       strains_of_organisms = []
       organisms = []
@@ -9,7 +10,7 @@ class BiosamplesController < ApplicationController
           if organism
             organisms << organism
             strains=organism.try(:strains)
-            strains_of_organisms |= strains ? strains.reject { |s| s.is_dummy? } : strains
+            strains_of_organisms |= strains ? strains.reject{|s| s.is_dummy? == true}.select(&:can_view?) : strains
           end
         end
       end
@@ -26,7 +27,7 @@ class BiosamplesController < ApplicationController
     end
     respond_to do |format|
           format.json{
-            render :json => {:status => 200, :strains => strains.sort_by(&:title).reject{|s| s.is_dummy?}.collect{|strain| [strain.id, strain.info]}}
+            render :json => {:status => 200, :strains => strains.sort_by(&:title).reject{|s| s.is_dummy? == true}.select(&:can_view?).collect{|strain| [strain.id, strain.info]}}
           }
     end
   end
@@ -142,7 +143,7 @@ class BiosamplesController < ApplicationController
         else
           sample_array = [sample.specimen_info,
                           (link_to sample.title, sample_path(sample.id), {:target => '_blank'}),
-                          sample.lab_internal_number, sample.sampling_date_info, sample.age_at_sampling, sample.provider_name_info, sample.id]
+                          sample.lab_internal_number, sample.sampling_date_info, sample.age_at_sampling, sample.provider_name_info, sample.id, sample.comments]
 
           page.call :loadNewSampleAfterCreation, sample_array
         end
@@ -166,12 +167,13 @@ class BiosamplesController < ApplicationController
       #No need to process if current_user is not a project member, because they cant go here from UI
       if current_user.try(:person).try(:member?)
         strain = select_or_new_strain
+        strain.policy.set_attributes_with_sharing params[:sharing], strain.projects
         render :update do |page|
           if strain.save
             page.call 'RedBox.close'
             strain_array = [(link_to strain.organism.title, organism_path(strain.organism.id), {:target => '_blank'}),
                             (check_box_tag "selected_strain_#{strain.id}", strain.id, false, :onchange => remote_function(:url => {:controller => 'biosamples', :action => 'existing_specimens'}, :with => "'strain_ids=' + getSelectedStrains()") +";show_existing_specimens();hide_existing_samples();"),
-                            strain.title, strain.genotype_info, strain.phenotype_info, strain.id, strain.synonym, strain.comment]
+                            strain.title, strain.genotype_info, strain.phenotype_info, strain.id, strain.synonym, strain.comment, strain.parent_strain]
 
             page.call :loadNewStrainAfterCreation, strain_array, strain.organism.title
           else
@@ -272,5 +274,25 @@ class BiosamplesController < ApplicationController
         end
       end
       strain
+  end
+
+  def check_auth_strain
+    if params[:specimen] and params[:specimen][:strain_id] and params[:specimen][:strain_id] != "0"
+      strain = Strain.find_by_id(params[:specimen][:strain_id].to_i)
+      if strain && !strain.can_view?
+        error("You are not allowed to select this strain", "is invalid (no permissions)")
+        return false
+      end
+    end
+  end
+
+  def check_auth_specimen
+    if params[:specimen] and params[:specimen][:id]
+      specimen = Specimen.find_by_id(params[:specimen][:id].to_i)
+      if specimen && !specimen.can_view?
+        error("You are not allowed to select this #{CELL_CULTURE_OR_SPECIMEN}", "is invalid (no permissions)")
+        return false
+      end
+    end
   end
 end

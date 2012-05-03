@@ -7,7 +7,7 @@
     <div id="publications_fold_content" class="foldContent" style="display:<%= related_publications.blank? ? 'none' : 'block' -%>">
         <div class="yui-u first" style="width:66%; float:left">
             <%
-            project_publications=current_user.person.projects.collect{|p| p.publications}.flatten.uniq.sort_by(&:title)
+            project_publications=authorised_publications(current_user.person.projects).sort_by(&:title)
             select_truncate_length=120
             show_relationships=false -%>
             <p class="pale_text">

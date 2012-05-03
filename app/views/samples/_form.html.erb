@@ -10,7 +10,7 @@
 <script type="text/javascript">
   var organism_strains = new Array();
   <% Organism.all.each do |org|
-    strains = org.strains.without_default -%>
+    strains = org.strains.without_default.select(&:can_view?) -%>
 
     organism_strains[<%= org.id -%>] = '<%= strains.collect{|s| [s.id,s.info]}.to_json -%>';
 
@@ -136,6 +136,11 @@
   <p>
     <%= f.label "Provider's sample identifier" -%><br/>
     <%= f.text_field :provider_id, :style=>"width:350px;" -%>
+  </p>
+
+  <p>
+    <%= f.label "Comment" -%><br/>
+    <%= f.text_field :comments, :style=>"width:350px;" -%>
   </p>
 
   <p>
