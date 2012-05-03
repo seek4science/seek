@@ -14,7 +14,7 @@
 
 
 <div style="height: 100%;width: 100%;">
-    <iframe src="http://jjj.mib.ac.uk/webMathematica/UItester.jsp?fileName=<%=@modelname-%>&noHeader=true" id="jws_simulator" width="100%" height="100%" frameborder=0>You need a Frames Capable browser to view this content.</iframe>
+    <iframe src="<%= Seek::Config.jws_online_root -%>/webMathematica/UItester.jsp?fileName=<%=@modelname-%>&noHeader=true" id="jws_simulator" width="100%" height="100%" frameborder=0>You need a Frames Capable browser to view this content.</iframe>
 </div>
 
 <% if @display_model.is_jws_supported? %>
