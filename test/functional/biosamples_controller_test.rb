@@ -297,4 +297,32 @@ class BioSamplesControllerTest < ActionController::TestCase
         assert_equal updated_genotypes, updated_strain.genotypes.sort_by(&:id)
   end
 
+  test "should not be able to update the policy of the strain when having no manage rights" do
+    strain = Factory(:strain, :policy => Factory(:policy, :sharing_scope => Policy::ALL_SYSMO_USERS, :access_type => Policy::EDITING))
+    user = Factory(:user)
+    assert strain.can_edit?user
+    assert !strain.can_manage?(user)
+
+    login_as(user)
+      put :update_strain, :strain => {:id => strain.id}, :sharing =>{:sharing_scope => Policy::EVERYONE, :access_type_4 => Policy::EDITING }
+    assert_response :success
+
+    updated_strain = Strain.find_by_id strain.id
+    assert_equal Policy::ALL_SYSMO_USERS, updated_strain.policy.sharing_scope
+  end
+
+  test "should not be able to update the permissions of the strain when having no manage rights" do
+      strain = Factory(:strain, :policy => Factory(:policy, :sharing_scope => Policy::ALL_SYSMO_USERS, :access_type => Policy::EDITING))
+      user = Factory(:user)
+      assert strain.can_edit?user
+      assert !strain.can_manage?(user)
+
+      login_as(user)
+        put :update_strain, :strain => {:id => strain.id}, :sharing=>{:permissions =>{:contributor_types => ActiveSupport::JSON.encode(['Person']), :values => ActiveSupport::JSON.encode({"Person" => {user.person.id =>  {"access_type" =>  Policy::MANAGING}}})}}
+      assert_response :success
+
+      updated_strain = Strain.find_by_id strain.id
+      assert updated_strain.policy.permissions.empty?
+      assert !updated_strain.can_manage?(user)
+  end
 end
