@@ -54,11 +54,14 @@ module BiosamplesHelper
   end
 
   def specimen_row_data specimen
-    creators = specimen.creators.collect(&:name)
+    creators = []
+    specimen.creators.each do |creator|
+      creators << link_to(creator.name, person_path(creator.id), {:target => '_blank'})
+    end
     creators << specimen.other_creators unless specimen.other_creators.blank?
     ['Strain ' + specimen.strain.info + "(ID=#{specimen.strain.id})",
      (check_box_tag "selected_specimen_#{specimen.id}", specimen.id, false, {:onchange => remote_function(:url => {:controller => 'biosamples', :action => 'existing_samples'}, :with => "'specimen_ids=' + getSelectedSpecimens()") + ";show_existing_samples();"}),
-     link_to(specimen.title, specimen_path(specimen.id), {:target => '_blank'}), specimen.born_info, specimen.culture_growth_type.try(:title), creators, specimen.id, asset_version_links(specimen.sops).join(", ")]
+     link_to(specimen.title, specimen_path(specimen.id), {:target => '_blank'}), specimen.born_info, specimen.culture_growth_type.try(:title), creators.join(", "), specimen.id, asset_version_links(specimen.sops).join(", ")]
   end
 
   def sample_row_data sample
