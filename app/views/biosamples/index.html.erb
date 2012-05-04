@@ -57,6 +57,26 @@
         }
     }
 
+    function updateRow(table, row_data, id_column_position){
+        var table = eval(table)
+        var data = table.fnGetData();
+        for (var i = 0; i < data.length; i++) {
+            //look for the strain position which is updated
+            if (data[i][id_column_position] == row_data[id_column_position]){
+                //if organism hasn't been changed
+                if (data[i][0] == row_data[0]){
+                    table.fnUpdate(row_data, i, 0);
+                    break;
+                }
+                //if organism is updated, refresh the strain table
+                else{
+                    check_show_existing_strains('strain_organism_ids', 'existing_strains', '<%=url_for(:controller => 'biosamples', :action => 'existing_strains')-%>');
+                    break;
+                }
+            }
+        }
+    }
+
     function loadNewStrainAfterCreation(strain, organism) {
         if(strain_table && strain_table.length > 0) {
             var data = strain_table.fnGetData();
