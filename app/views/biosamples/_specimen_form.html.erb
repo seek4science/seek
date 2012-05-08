@@ -45,16 +45,19 @@
         </p>
 
          <span style="font-weight: bold;">Organism</span> <span class="required">*</span>
+        <%url = url_for(:controller => 'biosamples', :action => 'strains_of_selected_organism').to_s%>
         <%= select_tag "organism_id",
             options_for_select([["Select Organism ...", 0]]|all_organisms.collect{|o| [truncate(h(o.title)), o.id]}, current_user.try(:person).try(:projects).try(:first).try(:organism_ids).try(:first)),
-            :onchange => "strains_of_selected_organism(this.value)"
+            :onchange => "show_ajax_loader('strains_of_selected_organism');strains_of_selected_organism('#{url}', this.value)"
         -%>
         <br/>
         <br/>
         <span style="font-weight: bold;">Strain</span>
-        <%= select_tag "specimen[strain_id]",
-                     options_for_select([["Select Strain ...", 0]])
-        -%>
+        <span id='strains_of_selected_organism'>
+            <%= select_tag "specimen[strain_id]",
+                                 options_for_select([["Select Strain ...", 0]])
+                    -%>
+        </span>
 
         <br/>
         <br/>

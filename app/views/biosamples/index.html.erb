@@ -136,49 +136,6 @@
         $j(sample_nTr).addClass('gradeX');
     }
 
-    function strains_of_selected_organism(organism_id){
-        var option;
-        var selection_box = $('specimen_strain_id');
-        selection_box.options.length=0;
-        option = document.createElement("OPTION");
-        option.text = 'Select Strain ...';
-        option.value = 0;
-        try {
-          selection_box.add(option); //for older IE version
-        }
-        catch (ex) {
-          selection_box.add(option, null);
-        }
-
-        request = new Ajax.Request("<%=url_for(:controller => 'biosamples', :action => 'strains_of_selected_organism')%>", {
-            method: 'get',
-            parameters:{
-                organism_id:organism_id
-            },
-            onSuccess : function(transport){
-                // "true" parameter to evalJSON() activates sanitization of input
-                var data = transport.responseText.evalJSON(true);
-                if (data.status == 200){
-                    var strains = data.strains
-                    for (var i=0; i< strains.length; i++){
-                        option = document.createElement("OPTION");
-                        option.text = strains[i][1];
-                        option.value = strains[i][0];
-                        try {
-                          selection_box.add(option); //for older IE version
-                        }
-                        catch (ex) {
-                          selection_box.add(option, null);
-                        }
-                   }
-                }
-            },
-            onFailure: function(transport){
-              alert('Something went wrong, please try again...');
-            }
-        });
-
-    }
 
     function updateCreatorSettings() {
     // iterate through all creators and build the "shared with" list;

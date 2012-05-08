@@ -182,3 +182,30 @@ function validateStrainFields(action){
     }
     return true;
 }
+
+function strains_of_selected_organism(url, organism_id){
+    var updated_selection_box = "<select id='specimen_strain_id'>"
+        updated_selection_box += "<option value='0'>Select Strain ...</option>";
+        request = new Ajax.Request(url, {
+            method: 'get',
+            parameters:{
+                organism_id:organism_id
+            },
+            onSuccess : function(transport){
+                // "true" parameter to evalJSON() activates sanitization of input
+                var data = transport.responseText.evalJSON(true);
+                if (data.status == 200){
+                    var strains = data.strains
+                    for (var i=0; i< strains.length; i++){
+                        updated_selection_box += '<option value="\''+ strains[i][0] + '\'">'+ strains[i][1] +'</option>';
+
+                   }
+                }
+                $('strains_of_selected_organism').innerHTML = updated_selection_box;
+            },
+            onFailure: function(transport){
+              alert('Something went wrong, please try again...');
+            }
+        });
+
+    }
