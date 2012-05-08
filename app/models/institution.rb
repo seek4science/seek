@@ -16,7 +16,7 @@ class Institution < ActiveRecord::Base
   has_many :work_groups, :dependent => :destroy
   has_many :projects, :through=>:work_groups
 
-  searchable do
+  searchable(:ignore_attribute_changes_of=>[:updated_at]) do
     text :name,:country,:city
   end if Seek::Config.solr_enabled
 
@@ -31,7 +31,7 @@ class Institution < ActiveRecord::Base
 
    def can_be_edited_by?(subject)
     subject == nil ? false : (subject.is_admin? ||
-          (self.people.include?(subject.person) && (subject.can_edit_institutions? || subject.is_project_manager?)))
+          (self.people.include?(subject.person) && (subject.can_edit_institutions?)) || (subject.is_project_manager? && !(self.projects & subject.person.projects).empty?))
   end
 
   # get a listing of all known institutions

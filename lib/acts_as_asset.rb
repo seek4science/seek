@@ -63,7 +63,11 @@ module Acts #:nodoc:
         has_many :assets_creators, :dependent => :destroy, :as => :asset, :foreign_key => :asset_id
         has_many :creators, :class_name => "Person", :through => :assets_creators, :order=>'assets_creators.id'
 
+        has_many :project_folder_assets, :as=>:asset, :dependent=>:destroy
+
         has_many :activity_logs, :as => :activity_loggable
+
+        after_create :add_new_to_folder
 
         grouped_pagination :default_page => Seek::Config.default_page(self.name.underscore.pluralize)
 
@@ -71,27 +75,44 @@ module Acts #:nodoc:
           extend Acts::Asset::SingletonMethods
         end
         include Acts::Asset::InstanceMethods
+        include BackgroundReindexing
         include Subscribable
       end
+
+
 
       def is_asset?
         include?(Acts::Asset::InstanceMethods)
       end
-
-
-
     end
 
     module SingletonMethods
     end
 
     module InstanceMethods
+
+      def studies
+        assays.collect{|a| a.study}.uniq
+      end
+
       # this method will take attributions' association and return a collection of resources,
       # to which the current resource is attributed
       def attributions
         self.relationships.select { |a| a.predicate == Relationship::ATTRIBUTED_TO }
       end
 
+      def add_new_to_folder
+        projects.each do |project|
+          pf = ProjectFolder.new_items_folder project
+          unless pf.nil?
+            pf.add_assets self
+          end
+        end
+      end
+
+      def folders
+        project_folder_assets.collect{|pfa| pfa.project_folder}
+      end
 
       def attributions_objects
         self.attributions.collect { |a| a.object }
@@ -131,8 +152,13 @@ module Acts #:nodoc:
         project_assays
       end
 
-      # def asset; return self; end
-      # def resource; return self; end
+      def assay_type_titles
+        assays.collect{|a| a.assay_type.try(:title)}.compact
+      end
+
+      def technology_type_titles
+        assays.collect{|a| a.technology_type.try(:title)}.compact
+      end
 
     end
   end

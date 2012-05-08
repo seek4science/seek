@@ -1,7 +1,8 @@
 <% truncate_length_for_boxes = 22 -%>
+<%title ||= 'Uploader and creators' %>
 
 <div class="main_content_right_box_wider">  
-  <%= render :partial => "assets/resource_authors_box", :locals => { :title=>"Uploader and creators",:resource => resource, :truncate_to => truncate_length_for_boxes } if resource.respond_to?("creators") -%>
+  <%= render :partial => "assets/resource_authors_box", :locals => { :title=>title,:resource => resource, :truncate_to => truncate_length_for_boxes } if resource.respond_to?("creators") -%>
 
   <% if resource.class.is_taggable? -%>
     <%= item_tags_and_tag_entry -%>

@@ -3,7 +3,7 @@ class SearchController < ApplicationController
   def index
 
     if Seek::Config.solr_enabled
-      perform_search()
+      perform_search
     else
       @results = []
     end

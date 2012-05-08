@@ -26,6 +26,18 @@
     f.after_create { |pal| pal.group_memberships.first.project_roles << ProjectRole.pal_role}
   end
 
+  Factory.define(:asset_manager,:parent=>:person) do |f|
+    f.is_asset_manager true
+  end
+
+  Factory.define(:project_manager,:parent=>:person) do |f|
+    f.is_project_manager true
+  end
+
+  Factory.define(:publisher,:parent=>:person) do |f|
+    f.is_publisher true
+  end
+
 #User
   Factory.define(:brand_new_user, :class => User) do |f|
     f.sequence(:login) { |n| "user#{n}" }
@@ -120,8 +132,9 @@
 
 #Assay
 Factory.define(:assay_base, :class => Assay) do |f|
-  f.title "An Assay"
-    f.association :contributor, :factory => :person
+  f.sequence(:title) {|n| "An Assay #{n}"}
+  f.sequence(:description) {|n| "Assay description #{n}"}
+  f.association :contributor, :factory => :person
   f.association :study
   f.association :assay_type
 
@@ -410,4 +423,9 @@ end
   Factory.define :assets_creator do |f|
     f.association :asset, :factory => :data_file
     f.association :creator, :factory => :person_in_project
+  end
+
+  Factory.define :project_folder do |f|
+    f.association :project, :factory=>:project
+    f.sequence(:title) {|n| "project folder #{n}"}
   end

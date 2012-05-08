@@ -17,6 +17,23 @@
   <%= text_or_not_specified specimen.culture_growth_type.try(:title) -%>
 </p>
 <p>
+  <label>Sex:</label>
+  <%
+     if specimen.sex == false
+       sex = 'male'
+     elsif specimen.sex == true
+       sex = 'female'
+     else
+       sex = nil
+     end
+  %>
+  <%= text_or_not_specified sex -%>
+</p>
+<p>
+  <label>Comment:</label>
+  <%= text_or_not_specified specimen.comments -%>
+</p>
+<p>
   <label>Provider name:</label>
   <%= text_or_not_specified specimen.provider_name -%>
 </p>

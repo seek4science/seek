@@ -59,8 +59,8 @@ class Sample < ActiveRecord::Base
       text << specimen.title
       text << specimen.provider_id
       if (specimen.strain)
-        text << specimen.strain.info
-        text << specimen.strain.organism.title
+        text << specimen.try(:strain).try(:info).to_s
+        text << specimen.try(:strain).try(:organism).try(:title).to_s
       end
     end
     text
@@ -98,5 +98,26 @@ class Sample < ActiveRecord::Base
 
   def self.human_attribute_name(attribute)
     HUMANIZED_COLUMNS[attribute.to_sym] || super
+  end
+
+  def sampling_date_info
+    if sampling_date.nil?
+      ''
+    else
+      if try(:sampling_date).hour == 0 and try(:sampling_date).min == 0 and try(:sampling_date).sec == 0 then
+        try(:sampling_date).strftime('%d/%m/%Y')
+      else
+        try(:sampling_date).strftime('%d/%m/%Y @ %H:%M:%S')
+      end
+
+    end
+  end
+
+  def provider_name_info
+    provider_name.blank? ? contributor.try(:person).try(:name) : provider_name
+  end
+
+  def specimen_info
+    specimen.nil? ? '' : CELL_CULTURE_OR_SPECIMEN.capitalize + ' ' + specimen.title
   end
 end

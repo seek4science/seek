@@ -1,11 +1,11 @@
 <%= list_item_title resource %>
 
 <div class="list_item_left_column">
-  <%= list_item_authorized_attribute "Creator", resource.contributor.try(:person) %>
+  <%= list_item_authorized_attribute "Owner", resource.contributor.try(:person) %>
 
   <%= list_item_attribute "Lab internal ID", h(resource.lab_internal_number) %>
 
-  <%= list_item_attribute "Sampling date", text_or_not_specified(resource.sampling_date.nil? ? nil : date_as_string(resource.sampling_date)) -%>
+  <%= list_item_attribute "Date at sampling", text_or_not_specified(resource.sampling_date.nil? ? nil : date_as_string(resource.sampling_date)) -%>
 
   <%= list_item_attribute "Organism",organism_and_strain(resource.specimen.strain) -%>
 </div>

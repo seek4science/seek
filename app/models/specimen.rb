@@ -20,6 +20,7 @@ class Specimen < ActiveRecord::Base
 
   has_one :organism, :through=>:strain
 
+
   alias_attribute :description, :comments
 
   HUMANIZED_COLUMNS = Seek::Config.is_virtualliver ? {} : {:lab_internal_number=> "lab internal identifier", :born => 'culture starting date', :culture_growth_type => 'culture type', :provider_id => "provider's cell culture identifier"}
@@ -113,6 +114,18 @@ class Specimen < ActiveRecord::Base
 
   def self.human_attribute_name(attribute)
     HUMANIZED_COLUMNS[attribute.to_sym] || super
+  end
+
+  def born_info
+    if born.nil?
+      ''
+    else
+      if try(:born).hour == 0 && try(:born).min == 0 && try(:born).sec == 0
+        try(:born).strftime('%d/%m/%Y')
+      else
+        try(:born).strftime('%d/%m/%Y @ %H:%M:%S')
+      end
+    end
   end
 
 end

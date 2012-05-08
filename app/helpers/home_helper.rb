@@ -135,7 +135,7 @@ module HomeHelper
           tooltip=tooltip_title_attrib("<p>#{entry_summary}</p><p class='feedinfo none_text'>#{entry_date.strftime('%c') unless entry_date.nil?}</p>")
           unless entry_title.blank? || entry_link.blank?
             html << "<li class='homepanel_item'>"
-            html << link_to("#{entry_title}", "#{entry_link}", :title => tooltip, :target=>"_blank")
+            html << link_to("#{h(entry_title)}", "#{entry_link}", :title => tooltip, :target=>"_blank")
             html << "<div class='feedinfo none_text'>"
             html << feed_title
             html << " - #{time_ago_in_words(entry_date)} ago" unless entry_date.nil?
@@ -155,10 +155,10 @@ module HomeHelper
 
           path = url_for(item)
           description = try_block{item.description} || try_block{item.abstract}
-          tooltip=tooltip_title_attrib("<p>#{description.blank? ? 'No description' : description}</p><p class='feedinfo none_text'>#{at_time}</p>")
+          tooltip=tooltip_title_attrib("<p>#{description.blank? ? 'No description' : h(description)}</p><p class='feedinfo none_text'>#{at_time}</p>")
           html << "<li class='homepanel_item'>"
           html << "#{icon} "
-          html << link_to("#{item.title}", path, :title => tooltip)
+          html << link_to("#{h(item.title)}", path, :title => tooltip)
           html << "<div class='feedinfo none_text'>"
           html << "<span>#{text_for_resource(item)} - #{action} #{time_ago_in_words(at_time)} ago</span>"
           html << "</div>"

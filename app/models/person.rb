@@ -10,6 +10,15 @@ class Person < ActiveRecord::Base
 
   acts_as_notifiee
   acts_as_annotatable :name_field=>:name
+
+  after_save :queue_update_auth_table
+
+  def queue_update_auth_table
+    if changes.include?("roles_mask")
+      AuthLookupUpdateJob.add_items_to_queue self
+    end
+  end
+
   include Seek::Taggable
 
   def receive_notifications
@@ -52,8 +61,8 @@ class Person < ActiveRecord::Base
   has_many :created_publications, :through => :assets_creators, :source => :asset, :source_type => "Publication"
   has_many :created_presentations,:through => :assets_creators,:source=>:asset,:source_type => "Presentation"
 
-  searchable do
-    text :first_name, :last_name,:searchable_tags,:locations, :project_roles
+  searchable(:ignore_attribute_changes_of=>[:updated_at]) do
+    text :first_name, :last_name,:description, :searchable_tags,:locations, :project_roles
     text :disciplines do
       disciplines.map{|d| d.title}
     end
@@ -70,7 +79,7 @@ class Person < ActiveRecord::Base
   has_many :subscriptions,:dependent => :destroy
   before_create :set_default_subscriptions
 
-  ROLES = %w[admin pal project_manager publisher]
+  ROLES = %w[admin pal project_manager asset_manager publisher]
   ROLES_MASK_FOR_ADMIN = 2**ROLES.index('admin')
   ROLES_MASK_FOR_PAL = 2**ROLES.index('pal')
   ROLES_MASK_FOR_PROJECT_MANAGER = 2**ROLES.index('project_manager')
@@ -207,7 +216,7 @@ class Person < ActiveRecord::Base
   end
 
   def member_of?(item_or_array)
-    array = [item_or_array].flatten
+    array = Array(item_or_array)
     array.detect {|item| projects.include?(item)}
   end
 
@@ -263,11 +272,18 @@ class Person < ActiveRecord::Base
     created_data_files | created_models | created_sops | created_publications | created_presentations
   end
 
+  #can be edited by:
+  #(admin or project managers of this person) and (this person does not have a user or not the other admin)
+  #themself
   def can_be_edited_by?(subject)
-    subject == nil ? false : ((subject.is_admin? || subject.is_project_manager?) && (self.user.nil? || !self.is_admin?))
+    subject == nil ? false : (((subject.is_admin? || (!(self.projects & subject.try(:person).try(:projects).to_a).empty? && subject.is_project_manager?)) && (self.user.nil? || !self.is_admin?)) || (subject == self.user))
   end
 
- 
+  #admin or project manager can administer themselves and the other people, except the other admins
+  def can_be_administered_by?(user)
+    user == nil ? false : ((user.is_admin?) || (user.is_project_manager?)) &&  (self.user==user || !self.user.try(:is_admin?))
+  end
+
   def can_view? user = User.current_user
     !user.nil? || !Seek::Config.is_virtualliver
   end
@@ -277,7 +293,7 @@ class Person < ActiveRecord::Base
   end
 
   does_not_require_can_edit :roles_mask
-  requires_can_manage :roles_mask, :can_edit_projects, :can_edit_institutions
+  requires_can_manage :roles_mask
 
   def can_manage? user = User.current_user
     try_block{user.is_admin?}
@@ -293,9 +309,9 @@ class Person < ActiveRecord::Base
 
   def expertise= tags
     if tags.kind_of? Hash
-      tag_with_params tags,"expertise"
+      return tag_with_params(tags,"expertise")
     else
-      tag_with tags,"expertise"
+      return tag_with(tags,"expertise")
     end
   end
 
@@ -305,7 +321,6 @@ class Person < ActiveRecord::Base
     else
       tag_with tags,"tool"
     end
-
   end
 
   def expertise
@@ -349,7 +364,7 @@ class Person < ActiveRecord::Base
     #if not or if only the contributor then assign the manage right to pis||pals
     person_related_items.each do |item|
       people_can_manage_item = item.people_can_manage
-      if people_can_manage_item.blank? || (people_can_manage_item == [[id, "#{first_name} #{last_name}", Policy::MANAGING]])
+      if people_can_manage_item.blank? || (people_can_manage_item == [[id, "#{name}", Policy::MANAGING]])
         #find the projects which this person and item belong to
         projects_in_common = projects & item.projects
         pis = projects_in_common.collect{|p| p.pis}.flatten.uniq
@@ -371,6 +386,15 @@ class Person < ActiveRecord::Base
         end
       end
     end
+  end
+
+  def generate_person_key
+    keys = [self.cache_key]
+    #group_memberships + favourite_group_memberships
+    keys |= group_memberships.sort_by(&:id).collect(&:cache_key)
+    keys |= favourite_group_memberships.sort_by(&:id).collect(&:cache_key)
+
+    keys
   end
 
   private

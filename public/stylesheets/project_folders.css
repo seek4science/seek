@@ -1,0 +1,107 @@
+div#folder_contents {
+    padding: 0em 0em 0em 0em;
+    margin: 0em 0em 0em 0em;
+    min-height: 200em;
+}
+
+div#folder_column {
+    border-right: 1px #666 solid;
+    min-height: 200em;
+    background-color: white;
+}
+
+div#tree {
+    max-width: 16em;
+}
+
+div#remove_from_assay_surround {
+    width: 100%;
+    height: 3em;
+}
+
+div#remove_from_assay_drop_area {
+    background-color: red;
+}
+
+div#remove_from_assay_drop_area.folder_hover {
+    background-color: #8b0000;
+}
+
+div#remove_from_assay_drop_area p {
+    text-align: center;
+    font-size: larger;
+    vertical-align: middle;
+}
+
+
+.folder_hover {
+    background: black;
+    color: black;
+    font-weight: bolder;
+}
+
+.ygtvcontent.ygtvfocus < a {
+    background-color: green;
+}
+
+ul.asset_cards {
+    font-size:smaller;
+}
+
+ul.asset_cards li.asset_card_item {
+    margin: 0.25em 0.25em 0.25em 0.25em;
+    padding-left: 0.2em;
+    padding-bottom: 0em;
+    border: #555 solid 1px;
+    min-width: 16em;
+    max-width: 16em;
+    min-height: 5em;
+    max-height: 5em;
+    float: left;
+}
+
+li.asset_card_item img.asset_card_avatar {
+    width: 18px;
+    height: 18px;
+    padding-right: 0.3em;
+    vertical-align: middle;
+    float: left;
+}
+
+li.asset_card_item.data_file {
+    background-color: #eec591;
+}
+
+li.asset_card_item.model {
+    background-color: #cdcd00;
+}
+
+li.asset_card_item.publication {
+    background-color: #84b5fd;
+}
+
+li.asset_card_item.sop {
+    background-color: #7ac5cd;
+}
+
+li.asset_card_item.presentation {
+    background-color: #8ee5ee;
+}
+
+li.asset_card_item {
+    background-color: red;
+}
+
+ul#folder_details li {
+    float: left;
+}
+
+ul#folder_details li.title_and_description {
+    width: 78%;
+}
+
+ul#folder_details li.actions {
+
+}
+
+

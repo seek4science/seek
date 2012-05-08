@@ -35,12 +35,14 @@ module Seek
       tag_with tags,attr,owner,true
     end
 
+    #returns true or false to indicate the tags have changed
     def tag_with tags, attr="tag", owner=User.current_user,owned_tags_only=false
 
       #FIXME: yuck! - this is required so that self has an id and can be assigned to an Annotation.annotatable
       return if self.new_record? && !self.save
 
       current = self.annotations_with_attribute(attr)
+      original = current
       current = current.select{|c| c.source==owner} if owned_tags_only
       for_removal = []
       current.each do |cur|
@@ -61,7 +63,6 @@ module Seek
             matching = Annotation.for_annotatable(self.class.name, self.id).with_attribute_name(attr).select { |a| a.value.text==tag }
           end
 
-
           if matching.empty?
             annotation = Annotation.new(:source => owner,
                                         :annotatable => self,
@@ -80,7 +81,10 @@ module Seek
       for_removal.each do |annotation|
         annotation.destroy
       end
-
+      #return if the annotations have changed. just use the text to avoid issues with ID's changing
+      original = original.collect{|a| a.value.text}.sort
+      new = self.annotations_with_attribute(attr).collect{|a| a.value.text}.sort
+      original != new
     end
 
     def searchable_tags

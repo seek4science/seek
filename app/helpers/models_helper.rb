@@ -45,10 +45,10 @@ module ModelsHelper
     h(model_format.title)
   end
   
-  def authorised_models
-    authorised_assets(Model)
-  end    
-
+  def authorised_models projects=nil
+    authorised_assets(Model,projects)
+  end  
+  
   def jws_annotator_hidden_fields params_hash
     required_params=["assignmentRules", "annotationsReactions", "annotationsSpecies", "modelname", "parameterset", "kinetics", "functions", "initVal", "reaction", "events", "steadystateanalysis", "plotGraphPanel", "plotKineticsPanel"]
     required_params.collect do |param|

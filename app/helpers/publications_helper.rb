@@ -30,4 +30,8 @@ module PublicationsHelper
       "Journal"
     end
   end
+
+  def authorised_publications projects=nil
+    authorised_assets(Publication,projects)
+  end
 end

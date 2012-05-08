@@ -77,7 +77,7 @@ class ApplicationController < ActionController::Base
 
   def is_current_user_auth
     begin
-      @user = User.find(params[:id], :conditions => ["id = ?", current_user.id])
+      @user = User.find(params[:id], :conditions => ["id = ?", current_user.try(:id)])
     rescue ActiveRecord::RecordNotFound
       error("User not found (id not authorized)", "is invalid (not owner)")
       return false
@@ -95,6 +95,13 @@ class ApplicationController < ActionController::Base
       return false
     end
     return true
+  end
+
+  def is_admin_or_is_project_manager
+    unless User.admin_logged_in? || User.project_manager_logged_in?
+      error("You do not have the permission", "Not admin or project manager")
+      return false
+    end
   end
 
   def can_manage_announcements?

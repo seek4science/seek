@@ -22,7 +22,7 @@ class StrainTest < ActiveSupport::TestCase
       assert_equal org,strain.organism
       assert_equal 1,strain.genotypes.count
       assert_equal 'wild-type',strain.genotypes.first.gene.title
-      assert_equal 'wild-type',strain.phenotype.description
+      assert_equal 'wild-type',strain.phenotypes.first.description
       assert strain.is_dummy?
     end
 
@@ -42,7 +42,7 @@ class StrainTest < ActiveSupport::TestCase
       assert_equal org,strain.organism
       assert_equal 1,strain.genotypes.count
       assert_equal 'wild-type',strain.genotypes.first.gene.title
-      assert_equal 'wild-type',strain.phenotype.description
+      assert_equal 'wild-type',strain.phenotypes.first.description
       assert strain.is_dummy?
     end
 

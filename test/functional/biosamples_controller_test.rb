@@ -153,4 +153,42 @@ class BioSamplesControllerTest < ActionController::TestCase
       end
     end
   end
+
+  test "should update the strain list in specimen_form" do
+    organism = organisms(:yeast)
+    strains = organism.strains
+    assert_equal 2, strains.select{|s| !s.is_dummy?}.count
+    new_strain = Factory(:strain, :organism => organism)
+    organism.reload
+    strains =  organism.strains
+    assert_equal 3, strains.select{|s| !s.is_dummy?}.count
+
+    xml_http_request(:get, :strains_of_selected_organism, {:organism_id => organism.id})
+
+    received_data = ActiveSupport::JSON.decode(@response.body)
+    assert 200, received_data['status']
+    received_strains = received_data["strains"]
+    assert_equal 3, received_strains.count
+    assert received_strains.include?([new_strain.id, new_strain.info])
+  end
+
+  test 'should have comment and sex fields in the specimen_form' do
+    xhr(:get, :create_sample_popup)
+    assert_response :success
+    assert_select "input#specimen_comments", :count => 1
+    assert_select "select#specimen_sex", :count => 1
+  end
+
+  test 'should have organism_part in the sample_form' do
+    xhr(:get, :create_sample_popup)
+    assert_response :success
+    assert_select "select#sample_organism_part", :count => 1
+  end
+
+  test "should have age at sampling in sample table" do
+    specimen = specimens("running mouse")
+    xhr(:get, :existing_samples, {:specimen_ids => "#{specimen.id}"})
+    assert_response :success
+    assert_select "table#sample_table thead tr th", :text => "Age at sampling(hours)", :count => 1
+  end
 end

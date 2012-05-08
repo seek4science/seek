@@ -15,13 +15,16 @@ class DataFile < ActiveRecord::Base
 
   validates_presence_of :title
 
+  after_save :queue_background_reindexing if Seek::Config.solr_enabled
+
   # allow same titles, but only if these belong to different users
   # validates_uniqueness_of :title, :scope => [ :contributor_id, :contributor_type ], :message => "error - you already have a Data file with such title."
 
   belongs_to :content_blob #don't add a dependent=>:destroy, as the content_blob needs to remain to detect future duplicates
 
-  searchable do
-    text :description, :title, :original_filename, :searchable_tags, :spreadsheet_annotation_search_fields,:fs_search_fields, :spreadsheet_contents_for_search
+  searchable(:auto_index=>false) do
+    text :description, :title, :original_filename, :searchable_tags, :spreadsheet_annotation_search_fields,:fs_search_fields, :spreadsheet_contents_for_search,
+         :assay_type_titles,:technology_type_titles
   end if Seek::Config.solr_enabled
 
   has_many :studied_factors, :conditions =>  'studied_factors.data_file_version = #{self.version}'
@@ -55,31 +58,23 @@ class DataFile < ActiveRecord::Base
     end
   end
 
-  def studies
-    assays.collect{|a| a.study}.uniq
-  end
-
-
-
   # get a list of DataFiles with their original uploaders - for autocomplete fields
   # (authorization is done immediately to save from iterating through the collection again afterwards)
   #
   # Parameters:
   # - user - user that performs the action; this is required for authorization
   def self.get_all_as_json(user)
-    all_datafiles = DataFile.find(:all, :order => "ID asc",:include=>[:policy,{:policy=>:permissions}])
-    datafiles_with_contributors = all_datafiles.collect{ |d|
-        d.can_view?(user) ?
-        (contributor = d.contributor;
+    #FIXME: could probably be moved into a mixin rather than being dupilcated across assets
+    all = DataFile.all_authorized_for "view",user
+    with_contributors = all.collect{ |d|
+        contributor = d.contributor;
         { "id" => d.id,
           "title" => d.title,
           "contributor" => contributor.nil? ? "" : "by " + contributor.person.name,
-          "type" => self.name } ) :
-        nil }
-
-    datafiles_with_contributors.delete(nil)
-
-    return datafiles_with_contributors.to_json
+          "type" => self.name
+        }
+    }
+    return with_contributors.to_json
   end
 
   def included_to_be_copied? symbol
@@ -211,6 +206,41 @@ class DataFile < ActiveRecord::Base
       ]
     end
     flds.flatten.uniq
+  end
+
+
+
+  #a simple container for handling the matching results returned from #matching_data_files
+  class ModelMatchResult < Struct.new(:search_terms,:score,:primary_key); end
+
+  #return a an array of ModelMatchResult where the model id is the key, and the matching terms/values are the values
+  def matching_models
+
+    results = {}
+
+    if Seek::Config.solr_enabled && is_extractable_spreadsheet?
+      search_terms = spreadsheet_annotation_search_fields | spreadsheet_contents_for_search | fs_search_fields | searchable_tags
+      #make the array uniq! case-insensistive whilst mainting the original case
+      dc = []
+      search_terms = search_terms.inject([]) do |r,v|
+        unless dc.include?(v.downcase)
+          r << v
+          dc << v.downcase
+        end
+        r
+      end
+      search_terms.each do |key|
+        Model.search do |query|
+          query.keywords key, :fields=>[:model_contents, :description, :searchable_tags]
+        end.hits.each do |hit|
+          results[hit.primary_key]||=ModelMatchResult.new([],0,hit.primary_key)
+          results[hit.primary_key].search_terms << key
+          results[hit.primary_key].score += hit.score unless hit.score.nil?
+        end
+      end
+    end
+
+    results.values.sort_by{|a| -a.score}
   end
   
 end

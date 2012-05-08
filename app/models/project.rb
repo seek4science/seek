@@ -12,7 +12,6 @@ class Project < ActiveRecord::Base
   
   validates_uniqueness_of :name
 
-
   grouped_pagination :pages=>("A".."Z").to_a, :default_page => Seek::Config.default_page(self.name.underscore.pluralize) #shouldn't need "Other" tab for project
   
 
@@ -57,13 +56,17 @@ class Project < ActiveRecord::Base
 
   has_and_belongs_to_many :organisms  
   
-  searchable do
+  searchable(:ignore_attribute_changes_of=>[:updated_at]) do
     text :name , :description, :locations
   end if Seek::Config.solr_enabled
 
   attr_accessor :site_username,:site_password
 
   before_save :set_credentials
+
+  def assets
+    data_files | sops | models | publications | presentations
+  end
   
   def institutions=(new_institutions)
     new_institutions.each_index do |i|
@@ -77,17 +80,34 @@ class Project < ActiveRecord::Base
     end
   end
 
+  #this is the intersection of project role and seek role
   def pals
     pal_role=ProjectRole.pal_role
     people.select{|p| p.is_pal?}.select do |possible_pal|
-      possible_pal.project_roles_of_project(self).include?(pal_role)
+      possible_pal.project_roles.include?(pal_role)
     end
   end
 
+  #this is project role
   def pis
     pi_role = ProjectRole.find_by_name('PI')
     people.select{|p| p.project_roles.include?(pi_role)}
-    end
+  end
+
+  #this is seek role
+  def asset_managers
+    people.select(&:is_asset_manager?)
+  end
+
+  #this is seek role
+  def project_managers
+    people.select(&:is_project_manager?)
+  end
+
+  #this is seek role
+  def publishers
+    people.select(&:is_publisher?)
+  end
 
   def locations
     # infer all project's locations from the institutions where the person is member of
@@ -151,6 +171,7 @@ class Project < ActiveRecord::Base
       
     end
   end
+
   
   def person_roles(person)
     #Get intersection of all project memberships + person's memberships to find project membership
@@ -161,6 +182,10 @@ class Project < ActiveRecord::Base
 
   def can_be_edited_by?(subject)
     subject == nil ? false : (subject.is_admin? || (self.people.include?(subject.person) && (subject.can_edit_projects? || subject.is_project_manager?)))
+  end
+
+  def can_be_administered_by?(subject)
+    subject == nil ? false : (subject.is_admin? || (self.people.include?(subject.person) && (subject.is_project_manager?)))
   end
 
 end

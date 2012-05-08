@@ -132,4 +132,59 @@ class PolicyTest < ActiveSupport::TestCase
     filtered_people = Policy.new().add_people_in_whitelist(people_with_access_type, whitelist)
     assert_equal (people_with_access_type.count + whitelist_added.count), filtered_people.count
   end
+
+  test 'should not have asset managers in the summarize_permissions if the asset is entirely private' do
+    asset_manager = Factory(:asset_manager)
+    policy = Factory(:private_policy)
+    User.with_current_user Factory(:user) do
+      people_in_group = policy.summarize_permissions [], [asset_manager]
+      puts people_in_group.inspect
+      assert !people_in_group[Policy::MANAGING].include?([asset_manager.id, asset_manager.name,Policy::MANAGING])
+    end
+  end
+
+  test 'should have asset managers in the summarize_permissions if the asset is not entirely private' do
+    asset_manager = Factory(:asset_manager)
+
+    #private policy but with permissions
+    policy1 = Factory(:private_policy)
+    permission =  Factory(:permission, :contributor => Factory(:person), :access_type => Policy::VISIBLE, :policy => policy1)
+    assert !policy1.permissions.empty?
+
+    #share within network
+    policy2 = Factory(:all_sysmo_viewable_policy)
+
+    User.with_current_user Factory(:user) do
+      people_in_group = policy1.summarize_permissions [], [asset_manager]
+      assert people_in_group[Policy::MANAGING].include?([asset_manager.id, asset_manager.name+' (asset manager)',Policy::MANAGING])
+
+      people_in_group = policy2.summarize_permissions [], [asset_manager]
+      assert people_in_group[Policy::MANAGING].include?([asset_manager.id, asset_manager.name+' (asset manager)',Policy::MANAGING])
+    end
+  end
+
+  test 'should concat the roles of a person after name' do
+    asset_manager = Factory(:asset_manager)
+    creator = Factory(:person)
+    policy = Factory(:public_policy)
+    User.with_current_user Factory(:user) do
+      people_in_group = policy.summarize_permissions [creator], [asset_manager]
+      #creator
+      people_in_group[Policy::EDITING].each do |person|
+        if person[0] == creator.id
+          assert person[1].include?('(creator)')
+        else
+          assert !person[1].include?('(creator)')
+        end
+      end
+      people_in_group[Policy::MANAGING].each do |person|
+        if person[0] == asset_manager.id
+          assert person[1].include?('(asset manager)')
+        else
+          assert !person[1].include?('(asset manager)')
+        end
+      end
+    end
+  end
+
 end

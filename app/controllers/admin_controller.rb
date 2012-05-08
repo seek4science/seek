@@ -150,13 +150,6 @@ class AdminController < ApplicationController
     update_redirect_to update_flag,'others'
   end
 
-  def finalize_config_changes
-    flash[:notice] = RESTART_MSG
-    #expires all fragment caching
-    expire_all_fragments
-    redirect_to :action=>:show
-  end
-
   def restart_server
     system ("touch #{RAILS_ROOT}/tmp/restart.txt")
     flash[:notice] = 'The server was restarted'
@@ -259,6 +252,8 @@ class AdminController < ApplicationController
         type = "activity_stats"
       when "search"
         type = "search_stats"
+      when "job_queue"
+        type = "job_queue"
       when "none"
         type = "none"
     end
@@ -274,6 +269,8 @@ class AdminController < ApplicationController
           format.html { render :partial => "admin/activity_stats", :locals => {:stats => Seek::ActivityStats.new} }
         when "search_stats"
           format.html { render :partial => "admin/search_stats", :locals => {:stats => Seek::SearchStats.new} }
+        when "job_queue"
+          format.html { render :partial => "admin/job_queue" }
         when "none"
           format.html { render :text=>"" }
       end

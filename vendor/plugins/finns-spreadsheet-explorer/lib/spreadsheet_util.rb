@@ -8,12 +8,19 @@ module SpreadsheetUtil
   include SpreadsheetRepresentation
   include SysMODB::SpreadsheetExtractor
 
-  def is_spreadsheet?
-    self.content_type == "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" ||
+  EXTRACTABLE_FILE_SIZE=1*1024*1024
+
+  #is excel and is smaller than 10Mb
+  def is_extractable_spreadsheet?
+    is_excel? && !content_blob.filesize.nil? && content_blob.filesize<=EXTRACTABLE_FILE_SIZE
+  end
+
+  def is_excel?
     self.content_type == "application/vnd.ms-excel" ||
     self.content_type == "application/vnd.excel" ||
     self.content_type == "application/excel" ||
-    self.content_type == "application/x-msexcel"
+    self.content_type == "application/x-msexcel" ||
+    self.content_type == "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
   end
 
   def spreadsheet_annotations
@@ -23,7 +30,7 @@ module SpreadsheetUtil
   #Return the data file's spreadsheet
   #If it doesn't exist yet, it gets created
   def spreadsheet
-    if is_spreadsheet?
+    if is_extractable_spreadsheet?
       workbook = parse_spreadsheet_xml(spreadsheet_xml)
       if content_blob.worksheets.empty?
         workbook.sheets.each_with_index do |sheet, sheet_number|
@@ -40,7 +47,7 @@ module SpreadsheetUtil
   #Return the data file's spreadsheet XML
   #If it doesn't exist yet, it gets created
   def spreadsheet_xml
-    if is_spreadsheet?
+    if is_extractable_spreadsheet?
       Rails.cache.fetch("#{content_blob.cache_key}-ss-xml") do
         spreadsheet_to_xml(open(content_blob.filepath))
       end

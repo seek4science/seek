@@ -16,6 +16,8 @@ filestore*/
 debug.log
 .project
 
+seek_test.sql
+
 tmp/pids/*
 tmp/cache/*
 tmp/data.sql
@@ -32,8 +34,8 @@ solr/test/
 solr/data/
 
 public/help_images/*
-public/javascripts/js_cached.js
-public/stylesheets/css_cached.css
+public/javascripts/*_cached.js
+public/stylesheets/*_cached.css
 
 .bundle/config
 

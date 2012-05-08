@@ -11,9 +11,10 @@ class PersonTest < ActiveSupport::TestCase
 
   def test_can_be_edited_by?
     Person.all.each do |p|
-      assert p.can_be_edited_by? users(:quentin) unless p.is_admin?
-      assert p.can_be_edited_by? users(:project_manager) unless p.is_admin?
-      assert !p.can_be_edited_by?(users(:can_edit))
+      assert p.can_be_edited_by? p.user if p.user
+      assert p.can_be_edited_by? users(:quentin) if (!p.is_admin? && p.user != users(:quentin))
+      assert p.can_be_edited_by? users(:project_manager) if (!p.is_admin? && p.user != users(:quentin) && !(p.projects & users(:project_manager).person.projects).empty?)
+      assert !p.can_be_edited_by?(users(:can_edit)) unless (p.user == users(:can_edit))
     end
   end
 
@@ -30,6 +31,14 @@ class PersonTest < ActiveSupport::TestCase
     assert !Person.is_asset?
     assert !people(:quentin_person).is_asset?
     assert !people(:quentin_person).is_downloadable_asset?
+  end
+
+  def test_member_of
+    p=Factory :person
+    proj = Factory :project
+    assert !p.projects.empty?
+    assert p.member_of?(p.projects.first)
+    assert !p.member_of?(proj)
   end
 
   def test_avatar_key
@@ -551,18 +560,18 @@ class PersonTest < ActiveSupport::TestCase
     end
   end
 
-  test "publisher can publish items inside their project" do
-    publisher = Factory(:person, :roles => ['publisher'])
-    datafile1 = Factory(:data_file, :projects => publisher.projects)
-    datafile2 = Factory(:data_file)
+  test 'is_publisher?' do
+     User.with_current_user Factory(:admin).user do
+      person = Factory(:person)
+      person.is_publisher= true
+      person.save!
 
-    ability = Ability.new(publisher.user)
+      assert person.is_publisher?
 
-    assert ability.can? :publish, datafile1
-    assert ability.cannot? :publish, datafile2
-    User.with_current_user publisher.user do
-      assert datafile1.can_publish?
-      assert !datafile2.can_publish?
+      person.is_publisher=false
+      person.save!
+
+      assert !person.is_publisher?
     end
   end
 
@@ -575,4 +584,5 @@ class PersonTest < ActiveSupport::TestCase
     assert_equal 1, pals.count
     assert pals.include?(people(:pal))
   end
+
 end

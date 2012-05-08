@@ -1,7 +1,8 @@
 body {
-    background: #8e8e8e url('/images/body-bg.png') repeat-y center;
 	font-family: arial;
-	line-height: 1.0;	
+	line-height: 1.0;
+    border-left: #8e8e8e solid 10px;
+    border-right: #8e8e8e solid 10px;
 }
 
 
@@ -96,7 +97,7 @@ min-width:
 }
 
 .tabnav {
-    text-align: left;
+    text-align: center;
     font-weight: bolder;
     font-size: 95%;
     padding: 4px 0 3px 2em;
@@ -920,7 +921,7 @@ ul.related_asset_list li{
     padding-top: 0.5em;
     background-color: #F0F0F0;
     margin-left: 1em;
-    margin-top: 1em;
+    margin-top: 0.5em;
     text-align: center;
 	margin-bottom: 0.5em;
 }
@@ -1039,8 +1040,11 @@ ul.horiz_list_items li {
     line-height: 1;	
 }
 
+#ft td.left {
+    width: 10em;
+}
+
 #ft td.left p {
-    width: 110px;
     text-align: center;
 }
 
@@ -1676,14 +1680,13 @@ ul.modification_row li {
     min-height: 2em;
 }
 
-.row_group_color {
-    background-color: #dcdcdc;
+div.matchmake_result {
+    padding-top:0.25em;
+    padding-bottom:0.25em;
 }
 
-div.scroll_box
-{
-    height:250px;
-    width: 400px;
-    overflow:scroll;
+div.sharing_summary {
+    text-align: center;
 }
+
 

@@ -25,9 +25,19 @@ module DataFuseHelper
     res
   end
 
+  def tsv_to_flot_data tsv
+    rows = FasterCSV.parse(tsv,:col_sep=>"\t")
+    rows_to_flot_data(rows)
+  end
+
   def csv_to_flot_data csv
-    data = {}
     rows = FasterCSV.parse(csv)
+    rows_to_flot_data(rows)
+  end
+
+
+  def rows_to_flot_data rows
+    data = {}
     labels = []
     rows.each_with_index do |row,y|
       t=nil
@@ -39,7 +49,7 @@ module DataFuseHelper
           if x==0
             t=value
           else
-            data[labels[x]] << [t,value]
+            data[labels[x]] << [t.to_f,value.to_f]
           end
         end
 
@@ -48,8 +58,11 @@ module DataFuseHelper
     end
     result = []
     colors = ["red","blue","green","cyan","magenta","darkgreen"]
-    data.keys.each_with_index do |key,i|
-      hash = {"label"=>key,"data"=>data[key]}
+    data.keys.reverse.each_with_index do |key,i|
+      hash = {"label"=>key,
+              "data"=>data[key],
+              "curvedLines"=>{"show"=>true}
+      }
       hash["color"]=colors[i] unless colors[i].nil?
       result << hash
     end

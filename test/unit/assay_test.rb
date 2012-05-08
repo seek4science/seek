@@ -121,7 +121,7 @@ class AssayTest < ActiveSupport::TestCase
       #an modelling assay can be valid without a technology type, sample or organism
     assay.assay_class=assay_classes(:modelling_assay_class)
     assay.technology_type=nil
-      assay.samples = []
+    assay.samples = []
     assert assay.valid?
     
     #an experimental assay can be invalid without a sample

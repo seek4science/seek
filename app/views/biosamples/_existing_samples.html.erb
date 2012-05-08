@@ -3,7 +3,7 @@
         sample_table = $j('#sample_table').dataTable({
             "bPaginate": false,
             "bLengthChange": false,
-            "bFilter": false,
+            "bFilter": true,
             "bSort": true,
             "bInfo": false,
             "bAutoWidth": false,
@@ -15,8 +15,9 @@
                 null,
                 { "sWidth": "20%" },
                 { "sWidth": "20%" },
+                { "sWidth": "15%" },
+                { "sWidth": "15%" },
                 { "sWidth": "20%" },
-                { "sWidth": "30%" },
                 { "sWidth": "10%" }
             ],
             "fnInitComplete": function () {
@@ -30,7 +31,7 @@
   <% unless specimens.blank? %>
       <h2>Sample</h2>
       <% if existing_samples.empty? -%>
-          <p class="none_text">No samples have yet been defined for selected <%= CELL_CULTURE_OR_SPECIMEN -%>s
+          <p class="none_text">No samples have yet been defined for the selected <%= CELL_CULTURE_OR_SPECIMEN -%>s
           </p>
       <% else -%>
           <br/>
@@ -43,37 +44,21 @@
                 <th>Specimen</th>
                 <th>Title</th>
                 <th>Lab internal identifier</th>
-                <th>Sampling date</th>
+                <th>Date at sampling</th>
+                <th>Age at sampling(hours)</th>
                 <th>Provider name</th>
                 <th>ID</th>
               </tr>
               </thead>
               <tbody>
               <% existing_samples.each do |sample| -%>
-                  <% if sample.sampling_date.nil? %>
-                      <% sampling_date = '' %>
-                  <% else %>
-                      <% if sample.try(:sampling_date).hour == 0 and sample.try(:sampling_date).min == 0 and sample.try(:sampling_date).sec == 0 then %>
-                          <% sampling_date = sample.try(:sampling_date).strftime('%d/%m/%Y') %>
-                      <% else %>
-                          <% sampling_date = sample.try(:sampling_date).strftime('%d/%m/%Y @ %H:%M:%S') %>
-                      <% end %>
-
-                  <% end %>
-                  <%
-                     provider_name = sample.provider_name
-                     provider_name = provider_name.blank? ? sample.contributor.try(:person).try(:name) : provider_name
-                  %>
-                  <%
-                     specimen = sample.specimen
-                     specimen_info = CELL_CULTURE_OR_SPECIMEN.capitalize + ' ' + specimen.title
-                  %>
                   <tr class="gradeX">
-                    <td><%= specimen_info %> </td>
+                    <td><%= sample.specimen_info %> </td>
                     <td><%= link_to sample.title, sample_path(sample.id), {:target => '_blank'} %> </td>
                     <td><%= sample.lab_internal_number %> </td>
-                    <td><%= sampling_date %> </td>
-                    <td><%= provider_name %></td>
+                    <td><%= sample.sampling_date_info %> </td>
+                    <td><%= sample.age_at_sampling %> </td>
+                    <td><%= sample.provider_name_info %></td>
                     <td><%= sample.id %></td>
                   </tr>
               <% end -%>

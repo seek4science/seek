@@ -1,0 +1,27 @@
+model:
+  title: "models"
+  children: sbml, copasi
+  deletable: false
+
+sbml:
+  title: "sbml"
+  children: in_development
+
+in_development:
+  title: "in development"
+
+copasi:
+  title: "copasi"
+
+data:
+  title: "data files"
+  children: raw
+
+raw:
+  title: "raw data files"
+
+locked:
+  title: "Unsorted items"
+  editable: false
+  incoming: true
+

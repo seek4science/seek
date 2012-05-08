@@ -556,6 +556,13 @@ class SopsControllerTest < ActionController::TestCase
     assert flash[:error]
   end
 
+  test 'should show <Not specified> for  other creators if no other creators' do
+    get :index
+    assert_response :success
+    no_other_creator_sops = assigns(:sops).select { |s| s.other_creators.blank? }
+    assert_select 'p.list_item_attribute', :text => /Other creator: Not specified/, :count => no_other_creator_sops.count
+  end
+
   private
 
   def valid_sop_with_url

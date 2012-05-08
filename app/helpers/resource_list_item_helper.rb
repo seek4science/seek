@@ -34,7 +34,8 @@ module ResourceListItemHelper
     html = "<div class=\"list_item_title\">"
 
     if resource.class.name.split("::")[0] == "Person"
-      html << "<p>#{link_to title, (url.nil? ? show_resource_path(resource) : url)} #{admin_icon(resource) + " " + pal_icon(resource)}</p>"
+      icons = seek_role_icons(resource)
+      html << "<p>#{link_to title, (url.nil? ? show_resource_path(resource) : url)} #{icons}</p>"
     else
       if include_avatar && (resource.avatar_key || resource.use_mime_type_for_avatar?)
         image=resource_avatar resource,:style=>"width: 24px; height: 24px; vertical-align: middle"
@@ -106,6 +107,12 @@ module ResourceListItemHelper
       html << " <b>Last updated:</b> " + resource.updated_at.strftime('%d/%m/%Y @ %H:%M:%S')
     end
     html << "</p>"
+    return html
+  end
+
+  def list_profile_registered_timestamp resource
+    html = "<p class=\"list_item_attribute none_text\" style=\"text-align:center;\"><b>Registered:</b> <label>" + (resource.try(:user).try(:created_at).nil? ? "Not yet registered" : date_as_string(resource.try(:user).try(:created_at)))
+    html << "</label></p>"
     return html
   end
 

@@ -246,4 +246,66 @@ fixtures :all
     assert flash[:error]
     assert_redirected_to samples_path
   end
+
+  test "should not show organism and strain information of a sample if there is no organism" do
+    s = Factory :sample, :contributor => User.current_user
+    s.specimen.strain.organism = nil
+    s.save
+    s.reload
+    get :show, :id => s.id
+    assert_response :success
+    assert_not_nil assigns(:sample)
+    assert_select 'p', :text => s.specimen.strain.info, :count => 0
+
+  end
+
+    test "should show organism and strain information of a sample if there is organism" do
+    s = Factory :sample, :contributor => User.current_user
+    get :show, :id => s.id
+
+    assert_response :success
+    assert_not_nil assigns(:sample)
+    assert_select 'p a[href=?]', organism_path(s.specimen.strain.organism), :count => 1
+  end
+
+  test 'should have comment and sex fields in the specimen/sample show page' do
+    s = Factory :sample, :contributor => User.current_user
+    get :show, :id => s.id
+    assert_response :success
+    assert_select "label", :text => /Comment/, :count => 1
+    assert_select "label", :text => /Sex/, :count => 1
+  end
+
+  test 'should have comment and sex fields in the specimen/sample edit page' do
+    s = Factory :sample, :contributor => User.current_user
+    get :edit, :id => s.id
+    assert_response :success
+    assert_select "input#sample_specimen_attributes_comments", :count => 1
+    assert_select "select#sample_specimen_attributes_sex", :count => 1
+  end
+
+  test 'should have organism_part in the specimen/sample show page' do
+    s = Factory :sample, :contributor => User.current_user
+    get :show, :id => s.id
+    assert_response :success
+    assert_select "label", :text => /Organism part/, :count => 1
+  end
+
+  test 'should have organism_part in the specimen/sample edit page' do
+    s = Factory :sample, :contributor => User.current_user
+    get :edit, :id => s.id
+    assert_response :success
+    assert_select "select#sample_organism_part", :count => 1
+  end
+
+  test "should not have 'New sample based on this one' for sysmo" do
+    s = Factory :sample, :contributor => User.current_user
+    get :show, :id => s.id
+    assert_response :success
+    assert_select "a", :text => /New sample based on this one/, :count => 0
+
+    post :new_object_based_on_existing_one, :id => s.id
+    assert_redirected_to :root
+    assert_not_nil flash[:error]
+  end
 end

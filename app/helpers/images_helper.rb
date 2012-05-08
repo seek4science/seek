@@ -276,13 +276,27 @@ module ImagesHelper
         "misc_icons/1315482798_presentation-slides.png"
       when "graph"
         "famfamfam_silk/chart_line.png"
+      when "project_manager"
+        "famfamfam_silk/medal_gold_1.png"
+      when "asset_manager"
+        "famfamfam_silk/medal_bronze_3.png"
+      when "publisher"
+        "famfamfam_silk/medal_silver_2.png"
+      when "organise"
+        "famfamfam_silk/folder.png"
+      when "search"
+        "famfamfam_silk/eye.png"
     else
       return nil
     end
   end
+
+  def image key,options={}
+    image_tag(icon_filename_for_key(key),options)
+  end
   
   def help_icon(text, delay=200, extra_style="")
-    image_tag icon_filename_for_key("info"), :alt=>"help", :title=>tooltip_title_attrib(text,delay), :style => "vertical-align: middle;#{extra_style}"
+    image("info", :alt=>"help", :title=>tooltip_title_attrib(text,delay), :style => "vertical-align: middle;#{extra_style}")
   end
   
   def flag_icon(country, text=country, margin_right='0.3em')
@@ -403,8 +417,6 @@ module ImagesHelper
     image_tag icon_filename_for_key("collapse"), :style => "margin-left: #{margin_left}; vertical-align: middle;", :alt => 'Collapse', :title=>tooltip_title_attrib("Collapse the details")
   end
   
-  def image key,options={}
-    image_tag(icon_filename_for_key(key),options)
-  end
+
   
 end

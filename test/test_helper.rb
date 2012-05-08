@@ -6,6 +6,7 @@ require 'rest_test_cases'
 require 'ruby-prof'
 require 'factory_girl'
 require 'webmock/test_unit'
+require 'action_view/test_case'
 
 Factory.find_definitions #It looks like requiring factory_girl _should_ do this automatically, but it doesn't seem to work
 
@@ -84,10 +85,6 @@ class ActiveSupport::TestCase
     File.open "#{Rails.root}/tmp/#{prefix}-flat.txt", 'w' do |file|
       RubyProf::FlatPrinter.new(results).print(file)
     end
-  end
-
-  def run_secondary_tests?
-    @@run_secondary ||= File.exists? "#{Rails.root}/tmp/run_secondary_tests"
   end
 
   ## stuff for mocking

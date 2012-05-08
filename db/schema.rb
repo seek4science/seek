@@ -9,7 +9,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20120209100707) do
+ActiveRecord::Schema.define(:version => 20120425092308) do
 
   create_table "activity_logs", :force => true do |t|
     t.string   "action"
@@ -24,7 +24,7 @@ ActiveRecord::Schema.define(:version => 20120209100707) do
     t.datetime "updated_at"
     t.string   "http_referer"
     t.string   "user_agent"
-    t.text     "data",                   :limit => 2147483647
+    t.text     "data",                   :limit => 16777215
     t.string   "controller_name"
   end
 
@@ -105,6 +105,18 @@ ActiveRecord::Schema.define(:version => 20120209100707) do
   add_index "assay_assets", ["assay_id"], :name => "index_assay_assets_on_assay_id"
   add_index "assay_assets", ["asset_id", "asset_type"], :name => "index_assay_assets_on_asset_id_and_asset_type"
 
+  create_table "assay_auth_lookup", :id => false, :force => true do |t|
+    t.integer "user_id"
+    t.integer "asset_id"
+    t.boolean "can_view",     :default => false
+    t.boolean "can_manage",   :default => false
+    t.boolean "can_edit",     :default => false
+    t.boolean "can_download", :default => false
+    t.boolean "can_delete",   :default => false
+  end
+
+  add_index "assay_auth_lookup", ["user_id", "can_view"], :name => "index_assay_auth_lookup_on_user_id_and_can_view"
+
   create_table "assay_classes", :force => true do |t|
     t.string   "title"
     t.text     "description"
@@ -118,8 +130,6 @@ ActiveRecord::Schema.define(:version => 20120209100707) do
     t.integer  "organism_id"
     t.integer  "culture_growth_type_id"
     t.integer  "strain_id"
-    t.integer  "phenotype_id"
-    t.integer  "genotype_id"
     t.datetime "created_at"
     t.datetime "updated_at"
   end
@@ -170,9 +180,19 @@ ActiveRecord::Schema.define(:version => 20120209100707) do
   end
 
   create_table "assets_creators", :force => true do |t|
-    t.integer "asset_id"
-    t.integer "creator_id"
-    t.string  "asset_type"
+    t.integer  "asset_id"
+    t.integer  "creator_id"
+    t.string   "asset_type"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
+  create_table "auth_lookup_update_queues", :force => true do |t|
+    t.integer  "item_id"
+    t.string   "item_type"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+    t.integer  "priority",   :default => 0
   end
 
   create_table "avatars", :force => true do |t|
@@ -231,6 +251,18 @@ ActiveRecord::Schema.define(:version => 20120209100707) do
     t.datetime "created_at"
     t.datetime "updated_at"
   end
+
+  create_table "data_file_auth_lookup", :id => false, :force => true do |t|
+    t.integer "user_id"
+    t.integer "asset_id"
+    t.boolean "can_view"
+    t.boolean "can_manage"
+    t.boolean "can_edit"
+    t.boolean "can_download"
+    t.boolean "can_delete",   :default => false
+  end
+
+  add_index "data_file_auth_lookup", ["user_id", "can_view"], :name => "index_data_file_auth_lookup_on_user_id_and_can_view"
 
   create_table "data_file_versions", :force => true do |t|
     t.integer  "data_file_id"
@@ -323,6 +355,18 @@ ActiveRecord::Schema.define(:version => 20120209100707) do
   end
 
   add_index "disciplines_people", ["person_id"], :name => "index_disciplines_people_on_person_id"
+
+  create_table "event_auth_lookup", :id => false, :force => true do |t|
+    t.integer "user_id"
+    t.integer "asset_id"
+    t.boolean "can_view",     :default => false
+    t.boolean "can_manage",   :default => false
+    t.boolean "can_edit",     :default => false
+    t.boolean "can_download", :default => false
+    t.boolean "can_delete",   :default => false
+  end
+
+  add_index "event_auth_lookup", ["user_id", "can_view"], :name => "index_event_auth_lookup_on_user_id_and_can_view"
 
   create_table "events", :force => true do |t|
     t.datetime "start_date"
@@ -497,6 +541,18 @@ ActiveRecord::Schema.define(:version => 20120209100707) do
     t.string   "uuid"
   end
 
+  create_table "investigation_auth_lookup", :id => false, :force => true do |t|
+    t.integer "user_id"
+    t.integer "asset_id"
+    t.boolean "can_view",     :default => false
+    t.boolean "can_manage",   :default => false
+    t.boolean "can_edit",     :default => false
+    t.boolean "can_download", :default => false
+    t.boolean "can_delete",   :default => false
+  end
+
+  add_index "investigation_auth_lookup", ["user_id", "can_view"], :name => "index_investigation_auth_lookup_on_user_id_and_can_view"
+
   create_table "investigations", :force => true do |t|
     t.string   "title"
     t.text     "description"
@@ -536,6 +592,18 @@ ActiveRecord::Schema.define(:version => 20120209100707) do
     t.datetime "updated_at"
     t.boolean  "factors_studied", :default => true
   end
+
+  create_table "model_auth_lookup", :id => false, :force => true do |t|
+    t.integer "user_id"
+    t.integer "asset_id"
+    t.boolean "can_view",     :default => false
+    t.boolean "can_manage",   :default => false
+    t.boolean "can_edit",     :default => false
+    t.boolean "can_download", :default => false
+    t.boolean "can_delete",   :default => false
+  end
+
+  add_index "model_auth_lookup", ["user_id", "can_view"], :name => "index_model_auth_lookup_on_user_id_and_can_view"
 
   create_table "model_formats", :force => true do |t|
     t.string   "title"
@@ -735,6 +803,18 @@ ActiveRecord::Schema.define(:version => 20120209100707) do
   add_index "posts", ["topic_id", "created_at"], :name => "index_posts_on_topic_id"
   add_index "posts", ["user_id", "created_at"], :name => "index_posts_on_user_id"
 
+  create_table "presentation_auth_lookup", :id => false, :force => true do |t|
+    t.integer "user_id"
+    t.integer "asset_id"
+    t.boolean "can_view",     :default => false
+    t.boolean "can_manage",   :default => false
+    t.boolean "can_edit",     :default => false
+    t.boolean "can_download", :default => false
+    t.boolean "can_delete",   :default => false
+  end
+
+  add_index "presentation_auth_lookup", ["user_id", "can_view"], :name => "index_presentation_auth_lookup_on_user_id_and_can_view"
+
   create_table "presentation_versions", :force => true do |t|
     t.integer  "presentation_id"
     t.integer  "version"
@@ -781,6 +861,26 @@ ActiveRecord::Schema.define(:version => 20120209100707) do
   create_table "presentations_projects", :id => false, :force => true do |t|
     t.integer "project_id"
     t.integer "presentation_id"
+  end
+
+  create_table "project_folder_assets", :force => true do |t|
+    t.integer  "asset_id"
+    t.string   "asset_type"
+    t.integer  "project_folder_id"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
+  create_table "project_folders", :force => true do |t|
+    t.integer  "project_id"
+    t.string   "title"
+    t.text     "description"
+    t.integer  "parent_id"
+    t.boolean  "editable",    :default => true
+    t.datetime "created_at"
+    t.datetime "updated_at"
+    t.boolean  "incoming",    :default => false
+    t.boolean  "deletable",   :default => true
   end
 
   create_table "project_roles", :force => true do |t|
@@ -839,6 +939,18 @@ ActiveRecord::Schema.define(:version => 20120209100707) do
     t.integer "specimen_id"
   end
 
+  create_table "publication_auth_lookup", :id => false, :force => true do |t|
+    t.integer "user_id"
+    t.integer "asset_id"
+    t.boolean "can_view",     :default => false
+    t.boolean "can_manage",   :default => false
+    t.boolean "can_edit",     :default => false
+    t.boolean "can_download", :default => false
+    t.boolean "can_delete",   :default => false
+  end
+
+  add_index "publication_auth_lookup", ["user_id", "can_view"], :name => "index_publication_auth_lookup_on_user_id_and_can_view"
+
   create_table "publication_authors", :force => true do |t|
     t.string   "first_name"
     t.string   "last_name"
@@ -896,6 +1008,18 @@ ActiveRecord::Schema.define(:version => 20120209100707) do
     t.datetime "created_at"
     t.datetime "updated_at"
   end
+
+  create_table "sample_auth_lookup", :id => false, :force => true do |t|
+    t.integer "user_id"
+    t.integer "asset_id"
+    t.boolean "can_view",     :default => false
+    t.boolean "can_manage",   :default => false
+    t.boolean "can_edit",     :default => false
+    t.boolean "can_download", :default => false
+    t.boolean "can_delete",   :default => false
+  end
+
+  add_index "sample_auth_lookup", ["user_id", "can_view"], :name => "index_sample_auth_lookup_on_user_id_and_can_view"
 
   create_table "sample_sops", :force => true do |t|
     t.integer "sample_id"
@@ -974,6 +1098,18 @@ ActiveRecord::Schema.define(:version => 20120209100707) do
     t.datetime "updated_at"
   end
 
+  create_table "sop_auth_lookup", :id => false, :force => true do |t|
+    t.integer "user_id"
+    t.integer "asset_id"
+    t.boolean "can_view",     :default => false
+    t.boolean "can_manage",   :default => false
+    t.boolean "can_edit",     :default => false
+    t.boolean "can_download", :default => false
+    t.boolean "can_delete",   :default => false
+  end
+
+  add_index "sop_auth_lookup", ["user_id", "can_view"], :name => "index_sop_auth_lookup_on_user_id_and_can_view"
+
   create_table "sop_specimens", :force => true do |t|
     t.integer "specimen_id"
     t.integer "sop_id"
@@ -1023,6 +1159,18 @@ ActiveRecord::Schema.define(:version => 20120209100707) do
 
   add_index "sops", ["contributor_id", "contributor_type"], :name => "index_sops_on_contributor_id_and_contributor_type"
 
+  create_table "specimen_auth_lookup", :id => false, :force => true do |t|
+    t.integer "user_id"
+    t.integer "asset_id"
+    t.boolean "can_view",     :default => false
+    t.boolean "can_manage",   :default => false
+    t.boolean "can_edit",     :default => false
+    t.boolean "can_download", :default => false
+    t.boolean "can_delete",   :default => false
+  end
+
+  add_index "specimen_auth_lookup", ["user_id", "can_view"], :name => "index_specimen_auth_lookup_on_user_id_and_can_view"
+
   create_table "specimens", :force => true do |t|
     t.string   "title"
     t.integer  "age"
@@ -1053,6 +1201,7 @@ ActiveRecord::Schema.define(:version => 20120209100707) do
     t.string   "ploidy"
     t.string   "provider_id"
     t.string   "provider_name"
+    t.boolean  "is_dummy",               :default => false
   end
 
   create_table "strain_descendants", :id => false, :force => true do |t|
@@ -1112,6 +1261,18 @@ ActiveRecord::Schema.define(:version => 20120209100707) do
     t.integer  "contributor_id"
     t.string   "contributor_type"
   end
+
+  create_table "study_auth_lookup", :id => false, :force => true do |t|
+    t.integer "user_id"
+    t.integer "asset_id"
+    t.boolean "can_view",     :default => false
+    t.boolean "can_manage",   :default => false
+    t.boolean "can_edit",     :default => false
+    t.boolean "can_download", :default => false
+    t.boolean "can_delete",   :default => false
+  end
+
+  add_index "study_auth_lookup", ["user_id", "can_view"], :name => "index_study_auth_lookup_on_user_id_and_can_view"
 
   create_table "subscriptions", :force => true do |t|
     t.integer  "person_id"

@@ -18,6 +18,19 @@ class BiosamplesController < ApplicationController
       end
   end
 
+  def strains_of_selected_organism
+    strains = []
+    if params[:organism_id]
+      organism = Organism.find_by_id params[:organism_id].to_i
+      strains |= organism.strains if organism
+    end
+    respond_to do |format|
+          format.json{
+            render :json => {:status => 200, :strains => strains.sort_by(&:title).reject{|s| s.is_dummy?}.collect{|strain| [strain.id, strain.info]}}
+          }
+    end
+  end
+
   def create_strain_popup
     strain = Strain.find_by_id(params[:strain_id])
     respond_to do  |format|
@@ -77,12 +90,8 @@ class BiosamplesController < ApplicationController
   end
 
   def create_sample_popup
-    sample = Sample.find_by_id(params[:sample_id])
-    unless sample
-      specimen = Specimen.find_by_id(params[:specimen_id])
-    else
-      specimen = sample.specimen
-    end
+    sample = Sample.new
+    specimen = Specimen.find_by_id(params[:specimen_id]) || Specimen.new
     respond_to do  |format|
       if current_user.try(:person).try(:member?)
         format.html{render :partial => 'biosamples/create_sample_popup', :locals => {:sample => sample, :specimen => specimen}}
@@ -99,9 +108,10 @@ class BiosamplesController < ApplicationController
     sample = Sample.new(params[:sample])
 
     sop_ids = []
-
+    is_new_specimen = false
     specimen = Specimen.find_by_id(params[:specimen][:id])
     if specimen.nil?
+      is_new_specimen =true
       specimen = Specimen.new(params[:specimen])
       sop_ids = (params[:specimen_sop_ids].nil? ? [] : params[:specimen_sop_ids].reject(&:blank?))||[]
       specimen.policy.set_attributes_with_sharing params[:sharing], sample.projects
@@ -122,6 +132,20 @@ class BiosamplesController < ApplicationController
           SopSpecimen.create!(:sop_id => sop_id, :sop_version=> sop.version, :specimen_id=>specimen.id)
         end
         page.call 'RedBox.close'
+        if is_new_specimen
+           #also show specimen of the default strain, after this specimen is created(need to ask for this)
+           specimen_array = ['Strain ' + specimen.strain.info + "(ID=#{specimen.strain.id})",
+                            (check_box_tag "selected_specimen_#{specimen.id}", specimen.id, false, {:onchange => remote_function(:url => {:controller => 'biosamples', :action => 'existing_samples'}, :with => "'specimen_ids=' + getSelectedSpecimens()") + ";show_existing_samples();" }),
+                            specimen.title, specimen.born_info, specimen.culture_growth_type.try(:title), specimen.contributor.try(:person).try(:name), specimen.id, asset_version_links(specimen.sops).join(", ")]
+
+            page.call :loadNewSpecimenAfterCreation, specimen_array, specimen.strain.id
+        else
+          sample_array = [sample.specimen_info,
+                          (link_to sample.title, sample_path(sample.id), {:target => '_blank'}),
+                          sample.lab_internal_number, sample.sampling_date_info, sample.age_at_sampling, sample.provider_name_info, sample.id]
+
+          page.call :loadNewSampleAfterCreation, sample_array
+        end
       else
         specimen_error_messages = ''
         specimen.errors.full_messages.each do |e_m|
@@ -145,7 +169,11 @@ class BiosamplesController < ApplicationController
         render :update do |page|
           if strain.save
             page.call 'RedBox.close'
-            #page.call "check_show_existing_strains('strain_organism_ids', 'existing_strains', #{url_for(:controller => 'biosamples', :action => 'existing_strains')})"
+            strain_array = [(link_to strain.organism.title, organism_path(strain.organism.id), {:target => '_blank'}),
+                            (check_box_tag "selected_strain_#{strain.id}", strain.id, false, :onchange => remote_function(:url => {:controller => 'biosamples', :action => 'existing_specimens'}, :with => "'strain_ids=' + getSelectedStrains()") +";show_existing_specimens();hide_existing_samples();"),
+                            strain.title, strain.genotype_info, strain.phenotype_info, strain.id, strain.synonym, strain.comment]
+
+            page.call :loadNewStrainAfterCreation, strain_array, strain.organism.title
           else
             page.alert("Fail to create new strain. #{strain.errors.full_messages}")
           end
@@ -183,7 +211,7 @@ class BiosamplesController < ApplicationController
             phenotype_description << value['description'] unless value["description"].blank?
           end
         end
-        flag =  flag && (compare_attribute strain.phenotype.try(:description), phenotype_description.join('$$$'))
+        flag =  flag && (compare_attribute strain.phenotypes.collect(&:description).sort, phenotype_description.sort)
         if flag
           strain
         else
@@ -227,8 +255,8 @@ class BiosamplesController < ApplicationController
           phenotype_description << value["description"] unless value["description"].blank?
         end
       end
-      unless phenotype_description.blank?
-        strain.phenotype = Phenotype.new(:description => phenotype_description.join('$$$'))
+      phenotype_description.each do |description|
+        strain.phenotypes << Phenotype.new(:description => description)
       end
 
       #genotype

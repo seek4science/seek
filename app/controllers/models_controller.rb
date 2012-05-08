@@ -9,7 +9,7 @@ class ModelsController < ApplicationController
   
   before_filter :find_assets, :only => [ :index ]
   before_filter :find_and_auth, :except => [ :build,:index, :new, :create,:create_model_metadata,:update_model_metadata,:delete_model_metadata,:request_resource,:preview,:test_asset_url, :update_annotations_ajax]
-  before_filter :find_display_asset, :only=>[:show,:download,:execute,:builder,:simulate,:submit_to_jws,:matching_data_files]
+  before_filter :find_display_asset, :only=>[:show,:download,:execute,:builder,:simulate,:submit_to_jws,:matching_data]
     
   before_filter :jws_enabled,:only=>[:builder,:simulate,:submit_to_jws]
 
@@ -92,7 +92,9 @@ class ModelsController < ApplicationController
     end
 
     if (!error && @error_keys.empty?)
-
+      #if following_action == "simulate"
+      #  @applet = Seek::JWS::SimulatorApplet.new.simulate(@saved_file)
+      #elsif following_action == "save_new_version"
       if following_action == "save_new_version"
         model_format=params.delete("saved_model_format") #only used for saving as a new version
         new_version_filename=params.delete("new_version_filename")
@@ -114,13 +116,13 @@ class ModelsController < ApplicationController
       end
     end
 
-
     respond_to do |format|
       if error
         flash.now[:error]="JWS Online encountered a problem processing this model."
         format.html { render :action=>"builder" }
       elsif @error_keys.empty? && following_action == "simulate"
         @modelname=@saved_file
+        #format.html {render :action=>"simulate_applet"}
         format.html {render :action=>"simulate",:layout=>"jws_simulate"}
       elsif @error_keys.empty? && following_action == "annotate"
         format.html {render :action=>"annotator"}
@@ -158,6 +160,31 @@ class ModelsController < ApplicationController
       end
     end
   end
+
+  #def simulate
+  #  error=nil
+  #  begin
+  #    if @display_model.is_jws_supported?
+  #      @applet = Seek::JWS::SimulatorApplet.new.simulate(@display_model)
+  #    end
+  #  rescue Exception=>e
+  #    Rails.logger.error("Problem simulating model on JWS Online #{e}")
+  #    raise e unless Rails.env=="production"
+  #    error=e
+  #  end
+  #
+  #  respond_to do |format|
+  #    if error
+  #      flash[:error]="JWS Online encountered a problem processing this model."
+  #      format.html { redirect_to(@model, :version=>@display_model.version) }
+  #    elsif !@display_model.is_jws_supported?
+  #      flash[:error]="This model is of neither SBML or JWS Online (Dat) format so cannot be used with JWS Online"
+  #      format.html { redirect_to(@model, :version=>@display_model.version) }
+  #    else
+  #       format.html { render :simulate_applet }
+  #    end
+  #  end
+  #end
 
   
   def update_model_metadata
@@ -521,25 +548,28 @@ class ModelsController < ApplicationController
     end
   end
 
-  def matching_data_files
+  def matching_data
     #FIXME: should use the correct version
-    matching_files = @model.matching_data_files
-
-    render :update do |page|
-      page.visual_effect :fade,"matching_data_files"
-      page.visual_effect :appear,'matching_results'
-      html = ""
-      matching_files.each do |match|
-        data_file = DataFile.find(match.primary_key)
-        if (data_file.can_view?)
-          html << "<div>"
-          html << "<div style='padding-top:0.5em;padding-bottom:0.2em;'>Matched with #{match.search_terms.join(', ')} - [#{match.score}]</div>"
-          html << render(:partial=>"layouts/resource_list_item", :object=>data_file)
-          html << "</div>"
-        end
-      end
-      page.replace_html "matching_results",:text=>html
+    @matching_data_files = @model.matching_data_files
+    respond_to do |format|
+      format.html
     end
+
+    #render :update do |page|
+    #  page.visual_effect :toggle_blind,"matching_data_files"
+    #  page.visual_effect :toggle_blind,'matching_results'
+    #  html = ""
+    #  matching_files.each do |match|
+    #    data_file = DataFile.find(match.primary_key)
+    #    if (data_file.can_view?)
+    #      html << "<div>"
+    #      html << "<div class='matchmake_result'>Matched with <b>#{match.search_terms.join(', ')}</b></div>"
+    #      html << render(:partial=>"layouts/resource_list_item", :object=>data_file)
+    #      html << "</div>"
+    #    end
+    #  end
+    #  page.replace_html "matching_results",:text=>html
+    #end
   end
   
   protected
@@ -559,7 +589,7 @@ class ModelsController < ApplicationController
   def translate_action action
     action="download" if action == "simulate"
     action="edit" if ["submit_to_jws","builder"].include?(action)
-    action="view" if ["matching_data_files"].include?(action)
+    action="view" if ["matching_data"].include?(action)
     super action
   end
   

@@ -30,25 +30,25 @@
       grouped_people_by_access_type.each do |key, value|
       case key
         when Policy::NO_ACCESS %>
-            <h2 style="color: red">People have no access:</h2>
+            <h2 style="color: red">People who have no access:</h2>
             <%= display_people_list value-%>
         <%when Policy::VISIBLE %>
-            <h2>People can view summary:</h2>
+            <h2>People who can view the summary:</h2>
             <%= display_people_list value-%>
         <%when Policy::ACCESSIBLE %>
-            <h2>People can view summary and get contents:</h2>
+            <h2>People who can view the summary and get contents:</h2>
             <%= display_people_list value-%>
         <%when Policy::EDITING %>
-            <h2>People can view and edit summary and contents:</h2>
+            <h2>People who can view and edit the summary and contents:</h2>
             <%= display_people_list value-%>
         <%when Policy::MANAGING %>
             <%if (grouped_people_by_access_type.count == 1) && (value.count == 1 and value.first[0] == try_block{current_user.person.id})%>
                <p class='private'>You keep this item private (only visible to you)</p>
             <%else%>
-               <h2>People can manage:</h2>
+               <h2>People who can manage:</h2>
                <%= display_people_list value-%>
             <%end%>
-        <%when Policy::PUBLISHING %>
+        <%when Policy::DETERMINED_BY_GROUP %>
             <p class='public'>All visitors (including anonymous visitors with no login) can <span style="color: #475f30;"><%= Policy.get_access_type_wording(value, try_block{resource_name.camelize.constantize.new()}).downcase -%> </span>  </p>
        <%end%>
       <%end%>

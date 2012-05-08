@@ -26,6 +26,26 @@ class AssaysControllerTest < ActionController::TestCase
 
   end
 
+  test "check SOP and DataFile drop down contents" do
+    user = Factory :user
+    project=user.person.projects.first
+    login_as user
+    sop = Factory :sop, :contributor=>user.person,:projects=>[project]
+    data_file = Factory :data_file, :contributor=>user.person,:projects=>[project]
+    get :new, :class=>"experimental"
+    assert_response :success
+
+    assert_select "select#possible_data_files" do
+      assert_select "option[value=?]",data_file.id,:text=>/#{data_file.title}/
+      assert_select "option",:text=>/#{sop.title}/,:count=>0
+    end
+
+    assert_select "select#possible_sops" do
+      assert_select "option[value=?]",sop.id,:text=>/#{sop.title}/
+      assert_select "option",:text=>/#{data_file.title}/,:count=>0
+    end
+  end
+
   test "index includes modelling validates with schema" do
     get :index, :page=>"all", :format=>"xml"
     assert_response :success
@@ -465,7 +485,7 @@ end
     assert_select "a", :text=>/A modelling analysis/i, :count=>1
   end
 
-  test "get new with class doesn't present options for class" do
+  test "get new with class doesnt present options for class" do
     login_as(:model_owner)
     get :new, :class=>"experimental"
     assert_response :success
@@ -501,7 +521,7 @@ end
     assert_response :success
 
     assert_select "div.list_item div.list_item_actions" do
-      path=download_sop_path(sops(:my_first_sop), :version=>1)
+      path=download_sop_path(sops(:my_first_sop))
       assert_select "a[href=?]", path, :minumum=>1
     end
   end
@@ -515,7 +535,7 @@ end
     assert_response :success
 
     assert_select "div.list_item div.list_item_actions" do
-      path=sop_path(sops(:my_first_sop), :version=>1)
+      path=sop_path(sops(:my_first_sop))
       assert_select "a[href=?]", path, :minumum=>1
     end
   end
@@ -543,7 +563,7 @@ end
     assert_response :success
 
     assert_select "div.list_item div.list_item_actions" do
-      path=download_data_file_path(data_files(:picture), :version=>1)
+      path=download_data_file_path(data_files(:picture))
       assert_select "a[href=?]", path, :minumum=>1
     end
   end
@@ -557,7 +577,7 @@ end
     assert_response :success
 
     assert_select "div.list_item div.list_item_actions" do
-      path=data_file_path(data_files(:picture), :version=>1)
+      path=data_file_path(data_files(:picture))
       assert_select "a[href=?]", path, :minumum=>1
     end
   end
@@ -578,7 +598,7 @@ end
 
   test "links have nofollow in sop tabs" do
     login_as(:owner_of_my_first_sop)
-    sop_version=sops(:my_first_sop).find_version(1)
+    sop_version=sops(:my_first_sop)
     sop_version.description="http://news.bbc.co.uk"
     sop_version.save!
     assert_difference('ActivityLog.count') do
@@ -592,7 +612,7 @@ end
 
   test "links have nofollow in data_files tabs" do
     login_as(:owner_of_my_first_sop)
-    data_file_version=data_files(:picture).find_version(1)
+    data_file_version=data_files(:picture)
     data_file_version.description="http://news.bbc.co.uk"
     data_file_version.save!
     assert_difference('ActivityLog.count') do
@@ -633,15 +653,15 @@ end
     end
 
     assert_select "div.list_item" do
-      assert_select "div.list_item_title a[href=?]", sop_path(sops(:sop_with_fully_public_policy), :version=>1), :text=>"SOP with fully public policy", :count=>1
-      assert_select "div.list_item_actions a[href=?]", sop_path(sops(:sop_with_fully_public_policy), :version=>1), :count=>1
-      assert_select "div.list_item_title a[href=?]", sop_path(sops(:sop_with_private_policy_and_custom_sharing), :version=>1), :count=>0
-      assert_select "div.list_item_actions a[href=?]", sop_path(sops(:sop_with_private_policy_and_custom_sharing), :version=>1), :count=>0
+      assert_select "div.list_item_title a[href=?]", sop_path(sops(:sop_with_fully_public_policy)), :text=>"SOP with fully public policy", :count=>1
+      assert_select "div.list_item_actions a[href=?]", sop_path(sops(:sop_with_fully_public_policy)), :count=>1
+      assert_select "div.list_item_title a[href=?]", sop_path(sops(:sop_with_private_policy_and_custom_sharing)), :count=>0
+      assert_select "div.list_item_actions a[href=?]", sop_path(sops(:sop_with_private_policy_and_custom_sharing)), :count=>0
 
-      assert_select "div.list_item_title a[href=?]", data_file_path(data_files(:downloadable_data_file), :version=>1), :text=>"Download Only", :count=>1
-      assert_select "div.list_item_actions a[href=?]", data_file_path(data_files(:downloadable_data_file), :version=>1), :count=>1
-      assert_select "div.list_item_title a[href=?]", data_file_path(data_files(:private_data_file), :version=>1), :count=>0
-      assert_select "div.list_item_actions a[href=?]", data_file_path(data_files(:private_data_file), :version=>1), :count=>0
+      assert_select "div.list_item_title a[href=?]", data_file_path(data_files(:downloadable_data_file)), :text=>"Download Only", :count=>1
+      assert_select "div.list_item_actions a[href=?]", data_file_path(data_files(:downloadable_data_file)), :count=>1
+      assert_select "div.list_item_title a[href=?]", data_file_path(data_files(:private_data_file)), :count=>0
+      assert_select "div.list_item_actions a[href=?]", data_file_path(data_files(:private_data_file)), :count=>0
     end
 
   end

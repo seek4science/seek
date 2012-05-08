@@ -1,13 +1,15 @@
 class PeopleController < ApplicationController
-  
-  #before_filter :login_required,:except=>[:select,:userless_project_selected_ajax,:create,:new]
+
+  include Seek::AnnotationCommon
+
   before_filter :find_and_auth, :only => [:show, :edit, :update, :destroy]
   before_filter :current_user_exists,:only=>[:select,:userless_project_selected_ajax,:create,:new]
-  before_filter :profile_belongs_to_current_or_is_admin, :only=>[:edit, :update]
-  before_filter :profile_is_not_another_admin_except_me, :only=>[:edit,:update]
   before_filter :is_user_admin_auth,:only=>[:destroy]
   before_filter :is_user_admin_or_personless, :only=>[:new]
-  before_filter :auth_params,:only=>[:update,:create]
+  before_filter :removed_params,:only=>[:update,:create]
+  before_filter :do_projects_belong_to_project_manager_projects,:only=>[:administer_update]
+  before_filter :editable_by_user, :only => [:edit, :update]
+  before_filter :administerable_by_user, :only => [:admin, :administer_update]
 
   skip_before_filter :project_membership_required
   skip_before_filter :profile_for_login_required,:only=>[:select,:userless_project_selected_ajax,:create]
@@ -94,14 +96,16 @@ class PeopleController < ApplicationController
         
         # update those attributes of a person that we want to be updated from the session
         @person.attributes = session[possible_unsaved_data][:person]
-
-        #FIXME: needs updating to handle new tools and expertise tag field
-#        @person.tool_list = session[possible_unsaved_data][:tool][:list] if session[]
-#        @person.expertise_list = session[possible_unsaved_data][:expertise][:list]
       end
       
       # clear the session data anyway
       session[possible_unsaved_data] = nil
+    end
+  end
+
+  def admin
+    respond_to do |format|
+      format.html
     end
   end
 
@@ -131,7 +135,6 @@ class PeopleController < ApplicationController
     redirect_action="new"
 
     set_tools_and_expertise(@person, params)
-    set_roles(@person, params) if User.admin_logged_in?
    
     registration = false
     registration = true if (current_user.person.nil?) #indicates a profile is being created during the registration process  
@@ -155,7 +158,14 @@ class PeopleController < ApplicationController
       if @person.save && current_user.save
         if (!current_user.active?)
           if_sysmo_member||=false
+          #send mail to admin
           Mailer.deliver_contact_admin_new_user_no_profile(member_details,current_user,base_host) if is_sysmo_member
+
+          #send mail to project managers
+          project_managers = project_managers_of_selected_projects params[:projects]
+          project_managers.each do |project_manager|
+            Mailer.deliver_contact_project_manager_new_user_no_profile(project_manager, member_details,current_user,base_host) if is_sysmo_member
+          end
           Mailer.deliver_signup(current_user,base_host)          
           flash[:notice]="An email has been sent to you to confirm your email address. You need to respond to this email before you can login"          
           logout_user
@@ -184,7 +194,6 @@ class PeopleController < ApplicationController
     @person.avatar_id = ((avatar_id.kind_of?(Numeric) && avatar_id > 0) ? avatar_id : nil)
     
     set_tools_and_expertise(@person,params)    
-    set_roles(@person, params) if User.admin_logged_in?
 
     if !@person.notifiee_info.nil?
       @person.notifiee_info.receive_notifications = (params[:receive_notifications] ? true : false) 
@@ -201,6 +210,36 @@ class PeopleController < ApplicationController
         format.xml  { head :ok }
       else
         format.html { render :action => "edit" }
+        format.xml  { render :xml => @person.errors, :status => :unprocessable_entity }
+      end
+    end
+  end
+
+    # PUT /people/1
+  # PUT /people/1.xml
+  def administer_update
+    passed_params=    {:roles                 =>  User.admin_logged_in?,
+                       :roles_mask            => User.admin_logged_in?,
+                       :can_edit_projects     => (User.admin_logged_in? || (User.project_manager_logged_in? && !(@person.projects & current_user.try(:person).try(:projects).to_a).empty?)),
+                       :can_edit_institutions => (User.admin_logged_in? || (User.project_manager_logged_in? && !(@person.projects & current_user.try(:person).try(:projects).to_a).empty?)),
+                       :work_group_ids        => (User.admin_logged_in? || User.project_manager_logged_in?)}
+    temp = params.clone
+    params[:person] = {}
+    passed_params.each do |param, allowed|
+      params[:person]["#{param}"] = temp[:person]["#{param}"] if temp[:person]["#{param}"] and allowed
+      params["#{param}"] = temp["#{param}"] if temp["#{param}"] and allowed
+    end
+    set_roles(@person, params) if User.admin_logged_in?
+
+    respond_to do |format|
+      if @person.update_attributes(params[:person])
+        @person.save #this seems to be required to get the tags to be set correctly - update_attributes alone doesn't [SYSMO-158]
+
+        flash[:notice] = 'Person was successfully updated.'
+        format.html { redirect_to(@person) }
+        format.xml  { head :ok }
+      else
+        format.html { render :action => "admin" }
         format.xml  { render :xml => @person.errors, :status => :unprocessable_entity }
       end
     end
@@ -231,7 +270,7 @@ class PeopleController < ApplicationController
       format.xml  { head :ok }
     end
   end
-  
+
   def userless_project_selected_ajax
     project_id=params[:project_id]
     unless project_id=="0"
@@ -268,43 +307,27 @@ class PeopleController < ApplicationController
   private
   
   def set_tools_and_expertise person,params
-
-      person.expertise =  params
-      person.tools = params
-
-      #FIXME: don't like this, but is a temp solution for handling lack of observer callback when removing a tag. Also should only expire when they have changed.
-      expire_fragment("sidebar_tag_cloud")
-      expire_fragment("super_tag_cloud")
+      exp_changed = person.tag_with_params params,"expertise"
+      tools_changed = person.tag_with_params params,"tool"
+      if immediately_clear_tag_cloud?
+        expire_annotation_fragments("expertise") if exp_changed
+        expire_annotation_fragments("tool") if tools_changed
+      else
+         #TODO: should expire and rebuild in a background task
+      end
 
   end
 
   def set_roles person, params
+    roles = person.is_admin? ? ['admin'] : []
     if params[:roles]
-      roles = []
       params[:roles].each_key do |key|
         roles << key
       end
-      person.roles=roles
-    else
-      person.roles=[]
     end
+    person.roles=roles
   end
 
-  def profile_belongs_to_current_or_is_admin
-    @person=Person.find(params[:id])
-    unless @person == current_user.person || User.admin_logged_in? || current_user.person.is_project_manager?
-      error("Not the current person", "is invalid (not owner)")
-      return false
-    end
-  end
-
-  def profile_is_not_another_admin_except_me
-    @person=Person.find(params[:id])
-    if !@person.user.nil? && @person.user!=current_user && @person.user.is_admin?
-      error("Cannot edit another Admins profile","is invalid(another admin)")
-      return false
-    end
-  end
 
   def is_user_admin_or_personless
     unless User.admin_logged_in? || current_user.person.nil?
@@ -315,22 +338,20 @@ class PeopleController < ApplicationController
 
   def current_user_exists
     if !current_user
-      redirect_to("/")
+      redirect_to(:root)
     end
     !!current_user
   end
 
   #checks the params attributes and strips those that cannot be set by non-admins, or other policy
-  def auth_params
+  def removed_params
     # make sure to update people/_form if this changes
     #                   param                 => allowed access?
-    restricted_params={:roles                 =>  User.admin_logged_in?,
-                       :roles_mask            => User.admin_logged_in?,
-                       :can_edit_projects     => (User.admin_logged_in? or current_user.is_project_manager?),
-                       :can_edit_institutions => (User.admin_logged_in? or current_user.is_project_manager?)}
-    restricted_params.each do |param, allowed|
-      params[:person].delete(param) if params[:person] and not allowed
-      params.delete param if params and not allowed
+    removed_params = [:roles, :roles_mask, :can_edit_projects, :can_edit_institutions, :work_group_ids]
+
+    removed_params.each do |param|
+      params[:person].delete(param) if params[:person]
+      params.delete param if params
     end
   end
   def project_or_institution_details projects_or_institutions
@@ -346,5 +367,55 @@ class PeopleController < ApplicationController
         end
     end
     details
+  end
+
+  def project_managers_of_selected_projects projects_param
+    project_manager_list = []
+    unless projects_param.blank?
+      projects_param.each do |project_param|
+        project_detail = project_param.split(',')
+        project = Project.find_by_id(project_detail[1])
+        project_managers = project.try(:project_managers)
+        project_manager_list |= project_managers unless project_managers.nil?
+      end
+    end
+    project_manager_list
+  end
+
+  def do_projects_belong_to_project_manager_projects
+    if (params[:person] and params[:person][:work_group_ids])
+      if User.project_manager_logged_in? && !User.admin_logged_in?
+        projects = []
+        params[:person][:work_group_ids].each do |id|
+          work_group = WorkGroup.find_by_id(id)
+          project = work_group.try(:project)
+          projects << project unless project.nil?
+        end
+        project_manager_projects = current_user.person.projects
+        flag = true
+        projects.each do |project|
+          flag = false if !project_manager_projects.include? project
+        end
+        if flag == false
+          error("Project manager can not assign person to the projects that they are not in","Is invalid")
+        end
+        return flag
+      end
+    end
+  end
+
+  def editable_by_user
+    unless @person.can_be_edited_by?(current_user)
+      error("Insufficient privileges", "is invalid (insufficient_privileges)")
+      return false
+    end
+  end
+
+  def administerable_by_user
+    @person=Person.find(params[:id])
+    unless @person.can_be_administered_by?(current_user)
+      error("Insufficient privileges", "is invalid (insufficient_privileges)")
+      return false
+    end
   end
 end

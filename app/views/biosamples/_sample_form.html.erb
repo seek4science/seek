@@ -20,17 +20,22 @@
         </p>
 
         <p style="margin-bottom: 0.5em">
-          <label style="float: left;">Sampling date:</label>
+          <label style="float: left;">Date at sampling:</label>
           <%= calendar_date_select_tag "sample[sampling_date]", nil, :time => "mixed", :style => 'float:right;margin-right:30em' %>
         </p>
 
-        <p style="margin-bottom: 2em">
+        <p style="margin-bottom: 0.5em">
           <label style="float: left;">Age at sampling:</label>
           <%= text_field_tag "sample[age_at_sampling]", nil, :style => 'float:right;margin-right:30em' %> (hours)
         </p>
 
-        <%= render :partial => 'projects/project_selector', :locals => {:resource => Sample.new()}%>
+        <p style="margin-bottom: 3em">
+          <label style="float: left;">Organism part:</label>
+          <%= select_tag "sample[organism_part]", options_for_select(['whole cell', 'membrane fraction'].insert(0,'Not specified')), :style => 'float:right;margin-right:30em' %>
+        </p>
+
+        <%= render :partial => 'projects/project_selector', :locals => {:resource => sample}%>
         <br/>
-        <%= render :partial => "assets/sharing_form", :locals => {:object => Sample.new(), :disable_advanced_view => true} -%>
+        <%= render :partial => "assets/sharing_form", :locals => {:object => sample, :disable_advanced_view => true} -%>
 
 
