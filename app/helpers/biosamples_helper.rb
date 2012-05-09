@@ -56,9 +56,9 @@ module BiosamplesHelper
                          :confirm => "Are you sure?", :method => :delete) : nil
     update_icon = nil
     if specimen.can_manage?
-      update_icon = link_to image("manage"), edit_specimen_path(specimen), {:title => "Manage this #{CELL_CULTURE_OR_SPECIMEN}", :target => '_blank'}
+      update_icon = link_to image("manage"), edit_specimen_path(specimen) + "?from_biosamples=true", {:title => "Manage this #{CELL_CULTURE_OR_SPECIMEN}", :target => '_blank'}
     elsif specimen.can_edit?
-      update_icon = link_to image("edit"), edit_specimen_path(specimen), {:title => "Edit this #{CELL_CULTURE_OR_SPECIMEN}", :target => '_blank'}
+      update_icon = link_to image("edit"), edit_specimen_path(specimen) + "?from_biosamples=true", {:title => "Edit this #{CELL_CULTURE_OR_SPECIMEN}", :target => '_blank'}
     end
 
     ['Strain ' + specimen.strain.info + "(ID=#{specimen.strain.id})",
@@ -72,9 +72,9 @@ module BiosamplesHelper
                              :confirm => "Are you sure?", :method => :delete) : nil
     update_icon = nil
     if sample.can_manage?
-      update_icon = link_to image("manage"), edit_sample_path(sample), {:title => "Manage this sample", :target => '_blank'}
+      update_icon = link_to image("manage"), edit_sample_path(sample) + "?from_biosamples=true", {:title => "Manage this sample", :target => '_blank'}
     elsif sample.can_edit?
-      update_icon = link_to image("edit"), edit_sample_path(sample), {:title => "Edit this sample}", :target => '_blank'}
+      update_icon = link_to image("edit"), edit_sample_path(sample) + "?from_biosamples=true", {:title => "Edit this sample}", :target => '_blank'}
     end
 
     [sample.specimen_info,

@@ -37,6 +37,13 @@ class SamplesController < ApplicationController
     end
   end
 
+  def edit
+    @sample.from_biosamples = params[:from_biosamples]
+    respond_to do |format|
+      format.html # new.html.erb
+      format.xml
+    end
+  end
 
   def create
     @sample = Sample.new(params[:sample])
@@ -113,20 +120,23 @@ class SamplesController < ApplicationController
       #add creators
       AssetsCreator.add_or_update_creator_list(@sample.specimen, params[:creators])
 
-      respond_to do |format|
+      if @sample.save
+        align_sops(@sample.specimen, sops)
 
-        if @sample.save
-
-          align_sops(@sample.specimen,sops)
-
-          flash[:notice] = 'Sample was successfully updated.'
-          format.html { redirect_to(@sample) }
-          format.xml { head :ok }
-
+        if @sample.from_biosamples=="true"
+          render :partial => "biosamples/back_to_biosamples", :locals => {:action => 'update', :object => @sample}
         else
+          respond_to do |format|
+            flash[:notice] = 'Sample was successfully updated.'
+            format.html { redirect_to(@sample) }
+            format.xml { head :ok }
+          end
+        end
+      else
+        respond_to do |format|
           format.html { render :action => "edit" }
         end
-    end
+      end
   end
 
   def align_sops resource,new_sop_ids
