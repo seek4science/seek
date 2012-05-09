@@ -20,11 +20,6 @@ class BioSamplesControllerTest < ActionController::TestCase
     assert_response :success
     end
 
-  test 'should get the create sample popup' do
-    get :create_sample_popup
-    assert_response :success
-  end
-
   test 'should get strain form' do
     get :strain_form
     assert_response :success
@@ -34,13 +29,6 @@ class BioSamplesControllerTest < ActionController::TestCase
     @request.env["HTTP_REFERER"]  = ''
     logout
     get :create_strain_popup
-    assert_not_nil flash[:error]
-  end
-
-  test 'should not be able to go to the create_sample_popup without login' do
-    @request.env["HTTP_REFERER"]  = ''
-    logout
-    get :create_sample_popup
     assert_not_nil flash[:error]
   end
 
@@ -130,29 +118,6 @@ class BioSamplesControllerTest < ActionController::TestCase
     end
   end
 
-  test 'should create sample based on selected specimen' do
-    specimen = Factory(:specimen, :contributor => User.current_user)
-    assert_difference("Sample.count") do
-      post :create_specimen_sample, :sample => {:title => "test",
-                                :projects=>[Factory(:project)],
-                                :lab_internal_number =>"Do232"},
-           :specimen => {:id => specimen.id}
-    end
-  end
-
-  test 'should create sample and specimen' do
-    assert_difference("Sample.count") do
-      assert_difference("Specimen.count") do
-        post :create_specimen_sample, :sample => {:title => "test",
-                                  :projects=>[Factory(:project)],
-                                  :lab_internal_number =>"Do232"},
-                          :specimen => {:title => 'test',
-                                  :lab_internal_number => 'lab123',
-                                  :strain => Factory(:strain, :policy => Factory(:public_policy))
-                                  }
-      end
-    end
-  end
 
   test "should update the strain list in specimen_form" do
     organism = organisms(:yeast)
@@ -172,30 +137,11 @@ class BioSamplesControllerTest < ActionController::TestCase
     assert received_strains.include?([new_strain.id, new_strain.info])
   end
 
-  test 'should have comment and sex fields in the specimen_form' do
-    xhr(:get, :create_sample_popup)
-    assert_response :success
-    assert_select "textarea#specimen_comments", :count => 1
-    assert_select "select#specimen_sex", :count => 1
-  end
-
-  test 'should have organism_part in the sample_form' do
-    xhr(:get, :create_sample_popup)
-    assert_response :success
-    assert_select "select#sample_organism_part", :count => 1
-  end
-
   test "should have age at sampling in sample table" do
     specimen = specimens("running mouse")
     xhr(:get, :existing_samples, {:specimen_ids => "#{specimen.id}"})
     assert_response :success
     assert_select "table#sample_table thead tr th", :text => "Age at sampling(hours)", :count => 1
-  end
-
-  test 'should have comment in the sample_form' do
-    xhr(:get, :create_sample_popup)
-    assert_response :success
-    assert_select "textarea#sample_comments", :count => 1
   end
 
   test "should have comment in sample table" do
