@@ -1,5 +1,4 @@
 class BiosamplesController < ApplicationController
-  before_filter :check_auth_strain, :check_auth_specimen, :only => [:create_specimen_sample]
   def existing_strains
       strains_of_organisms = []
       organisms = []
@@ -169,71 +168,6 @@ class BiosamplesController < ApplicationController
     end
   end
 
-  def create_sample_popup
-    sample = Sample.new
-    specimen = Specimen.find_by_id(params[:specimen_id]) || Specimen.new
-    respond_to do  |format|
-      if current_user.try(:person).try(:member?)
-        format.html{render :partial => 'biosamples/create_sample_popup', :locals => {:sample => sample, :specimen => specimen}}
-      else
-        flash[:error] = "You are not authorized to create new sample. Only members of known projects, institutions or work groups are allowed to create new content."
-        format.html {redirect_to :back}
-      end
-    end
-  end
-
-  def create_specimen_sample
-    params[:sharing][:permissions] = nil if params[:sharing]
-
-    sample = Sample.new(params[:sample])
-
-    sop_ids = []
-    is_new_specimen = false
-    specimen = Specimen.find_by_id(params[:specimen][:id])
-    if specimen.nil?
-      is_new_specimen =true
-      specimen = Specimen.new(params[:specimen])
-      sop_ids = (params[:specimen_sop_ids].nil? ? [] : params[:specimen_sop_ids].reject(&:blank?))||[]
-      specimen.policy.set_attributes_with_sharing params[:sharing], sample.projects
-      #if no strain is selected, create/select the default strain
-      if params[:specimen][:strain_id] == '0'
-        strain = Strain.default_strain_for_organism params[:organism_id]
-        specimen.strain = strain
-      end
-      #Add creators
-      AssetsCreator.add_or_update_creator_list(specimen, params[:creators])
-    end
-    sample.policy.set_attributes_with_sharing params[:sharing], sample.projects
-    sample.specimen = specimen
-    render :update do |page|
-      if sample.save
-        sop_ids.each do |sop_id|
-          sop= Sop.find sop_id
-          SopSpecimen.create!(:sop_id => sop_id, :sop_version=> sop.version, :specimen_id=>specimen.id)
-        end
-        page.call 'RedBox.close'
-        if is_new_specimen
-           #also show specimen of the default strain, after this specimen is created(need to ask for this)
-            page.call :loadNewSpecimenAfterCreation, specimen_row_data(specimen), specimen.strain.id
-        else
-          page.call :loadNewSampleAfterCreation, sample_row_data(sample)
-        end
-      else
-        specimen_error_messages = ''
-        specimen.errors.full_messages.each do |e_m|
-          specimen_error_messages << "cell culture #{e_m.downcase}. "
-        end
-        sample_error_messages = ''
-        sample.errors.full_messages.each do |e_m|
-          sample_error_messages << "sample #{e_m.downcase}. "
-        end
-        page.alert("Fail to create: #{specimen_error_messages}#{sample_error_messages}")
-        page['create_specimen_sample'].disabled = false
-        page['create_specimen_sample'].value = 'Create'
-      end
-    end
-  end
-
   def create_strain
       #No need to process if current_user is not a project member, because they cant go here from UI
       if current_user.try(:person).try(:member?)
@@ -291,13 +225,4 @@ class BiosamplesController < ApplicationController
     end
   end
 
-  def check_auth_specimen
-    if params[:specimen] and params[:specimen][:id]
-      specimen = Specimen.find_by_id(params[:specimen][:id].to_i)
-      if specimen && !specimen.can_view?
-        error("You are not allowed to select this #{CELL_CULTURE_OR_SPECIMEN}", "is invalid (no permissions)")
-        return false
-      end
-    end
-  end
 end
