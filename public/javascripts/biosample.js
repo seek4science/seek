@@ -109,12 +109,29 @@ function checkSelectOneStrain(){
         return true;
 }
 
+//if more than one specimen are selected, display the notice message
+//if one specimen is selected, add the param specimen_id to the link
+//else send the link without any params
 function checkSelectOneSpecimen(cell_culture_or_specimen){
-    if (getSelectedSpecimens().split(',').length > 1){
+    var selected_specimens = getSelectedSpecimens().split(',')
+    if (selected_specimens.length > 1){
        alert("Please select only ONE " + cell_culture_or_specimen + " for this sample to base on, or select NO " + cell_culture_or_specimen);
        return false;
-   }else
+   }else if (selected_specimens.length == 1 && selected_specimens[0] != "" ){
+        //add selected specimen_id to the link param
+        var old_link = $('new_sample_link').href;
+        var new_link = old_link.split('?')[0];
+        new_link = new_link.concat('?specimen_id=' + selected_specimens[0]);
+        new_link = new_link.concat('&from_biosamples=true');
+        $('new_sample_link').href = new_link
         return true;
+    }else{
+        var old_link = $('new_sample_link').href;
+        var new_link = old_link.split('?')[0];
+        new_link = new_link.concat('?from_biosamples=true');
+        $('new_sample_link').href = new_link
+        return true;
+    }
 }
 
 function validateSpecimenSampleFields(cell_culture_or_specimen, is_new_specimen){

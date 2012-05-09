@@ -28,7 +28,8 @@ class SamplesController < ApplicationController
   def new
     @sample = Sample.new
     @sample.from_new_link = params[:from_new_link]
-    @sample.specimen = Specimen.new :creators=>[User.current_user.person]
+    @sample.from_biosamples = params[:from_biosamples]
+    @sample.specimen = Specimen.find_by_id(params[:specimen_id]) || Specimen.new(:creators=>[User.current_user.person])
 
     respond_to do |format|
       format.html # new.html.erb
@@ -39,30 +40,38 @@ class SamplesController < ApplicationController
 
   def create
     @sample = Sample.new(params[:sample])
+    spe = Specimen.find_by_id(params[:specimen_id])
+    if spe && (@sample.from_biosamples=='true')
+      @sample.specimen = spe
+    else
+      @sample.specimen.contributor = @sample.contributor if @sample.specimen.contributor.nil?
+      @sample.specimen.projects = @sample.projects if @sample.specimen.projects.blank?
+      if @sample.specimen.strain.nil? && !params[:organism].blank?
+        @sample.specimen.strain = Strain.default_strain_for_organism(params[:organism])
+      end
 
-    @sample.specimen.contributor = @sample.contributor if @sample.specimen.contributor.nil?
-    @sample.specimen.projects = @sample.projects if @sample.specimen.projects.blank?
-    if @sample.specimen.strain.nil? && !params[:organism].blank?
-      @sample.specimen.strain = Strain.default_strain_for_organism(params[:organism])
+      #add policy to specimen
+
+      @sample.specimen.policy.set_attributes_with_sharing params[:sharing], @sample.projects
+
+      #get SOPs
+      sops = (params[:specimen_sop_ids].nil?? [] : params[:specimen_sop_ids].reject(&:blank?)) || []
+
+      #add creators
+      AssetsCreator.add_or_update_creator_list(@sample.specimen, params[:creators])
+      @sample.specimen.other_creators=params[:specimen][:other_creators] if params[:specimen]
     end
 
-    #add policy to sample and specimen
     @sample.policy.set_attributes_with_sharing params[:sharing], @sample.projects
-    @sample.specimen.policy.set_attributes_with_sharing params[:sharing], @sample.projects
-
-    #get SOPs
-    sops = (params[:specimen_sop_ids].nil?? [] : params[:specimen_sop_ids].reject(&:blank?)) || []
-
-    #add creators
-    AssetsCreator.add_or_update_creator_list(@sample.specimen, params[:creators])
-    @sample.specimen.other_creators=params[:specimen][:other_creators] if params[:specimen]
 
     if @sample.save
 
-        align_sops(@sample.specimen,sops)
+        align_sops(@sample.specimen,sops) unless spe
 
         if @sample.from_new_link=="true"
            render :partial=>"assets/back_to_fancy_parent",:locals=>{:child=>@sample,:parent=>"assay"}
+        elsif @sample.from_biosamples=="true"
+          render :partial=>"biosamples/back_to_biosamples",:locals=>{:action => 'create', :object=>@sample, :new_specimen => spe ? false : true}
         else
           respond_to do |format|
             flash[:notice] = 'Sample was successfully created.'

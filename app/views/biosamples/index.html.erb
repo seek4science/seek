@@ -112,8 +112,9 @@
                 var load = false;
                 for (var i=0;i<data.length; i++){
                     var pattern = new RegExp('ID='+ new Number(strain_id).toString());
-                    if (pattern.test(data[i][0]))
+                    if (pattern.test(data[i][0])){
                         load = true;
+                    }
                 }
 
                 if (load) {
