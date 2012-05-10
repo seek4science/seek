@@ -231,6 +231,12 @@ end
     f.association :content_blob, :factory => :content_blob
   end
 
+  Factory.define(:cronwright_model,:parent=>:model) do |f|
+    f.content_type "text/xml"
+    f.association :content_blob,:factory=>:cronwright_model_content_blob
+    f.original_filename "cronwright.xml"
+  end
+
 #Publication
   Factory.define(:publication) do |f|
     f.title "A Model"
@@ -291,6 +297,10 @@ end
 
   Factory.define(:rightfield_content_blob,:parent=>:content_blob) do |f|
     f.data  File.new("#{Rails.root}/test/fixtures/files/rightfield-test.xls","rb").read
+  end
+
+  Factory.define(:cronwright_model_content_blob,:parent=>:content_blob) do |f|
+    f.data  File.new("#{Rails.root}/test/fixtures/files/cronwright.xml","rb").read
   end
 
   Factory.define(:activity_log) do |f|

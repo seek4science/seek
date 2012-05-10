@@ -69,7 +69,6 @@ module Seek
           if response.instance_of?(Net::HTTPInternalServerError)
             raise Exception.new(response.body.gsub(/<head\>.*<\/head>/, ""))
           end
-          puts response.body
           process_response_body(response.body)
       end
 

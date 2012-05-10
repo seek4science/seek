@@ -6,7 +6,7 @@
 </style>
 
 <%
-   simulator_url = "#{Seek::Config.jws_online_root}/webMathematica/UItester.jsp?fileName=#{@modelname}&noHeader=true"
+   simulator_url = Seek::JWS::Simulator.simulator_frame_url @modelname
 -%>
 
 

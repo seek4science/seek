@@ -1,0 +1,177 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Created with PySCeS (0.1.5) on Tue, 19 Apr 2005 21:39:38 by JS -->
+<sbml xmlns="http://www.sbml.org/sbml/level2" level="2" version="1">
+  <model name="cronwright">
+    <listOfCompartments>
+      <compartment id="compartment" size="1"/>
+    </listOfCompartments>
+    <listOfSpecies>
+      <species id="G3P" compartment="compartment" initialConcentration="0"/>
+      <species id="Gly" compartment="compartment" initialConcentration="0" boundaryCondition="true"/>
+      <species id="DHAP" compartment="compartment" initialConcentration="0.59" boundaryCondition="true"/>
+    </listOfSpecies>
+    <listOfReactions>
+      <reaction id="v1">
+        <listOfReactants>
+          <speciesReference species="DHAP"/>
+        </listOfReactants>
+        <listOfProducts>
+          <speciesReference species="G3P"/>
+        </listOfProducts>
+        <kineticLaw>
+          <math xmlns="http://www.w3.org/1998/Math/MathML">
+            <apply>
+              <divide/>
+              <apply>
+                <times/>
+                <apply>
+                  <divide/>
+                  <ci> Vf1 </ci>
+                  <apply>
+                    <times/>
+                    <ci> K1nadh </ci>
+                    <ci> K1dhap </ci>
+                  </apply>
+                </apply>
+                <apply>
+                  <minus/>
+                  <apply>
+                    <times/>
+                    <ci> NADH </ci>
+                    <ci> DHAP </ci>
+                  </apply>
+                  <apply>
+                    <divide/>
+                    <apply>
+                      <times/>
+                      <ci> NAD </ci>
+                      <ci> G3P </ci>
+                    </apply>
+                    <ci> Keq1 </ci>
+                  </apply>
+                </apply>
+              </apply>
+              <apply>
+                <times/>
+                <apply>
+                  <plus/>
+                  <cn type="integer"> 1 </cn>
+                  <apply>
+                    <divide/>
+                    <ci> F16BP </ci>
+                    <ci> K1f16bp </ci>
+                  </apply>
+                  <apply>
+                    <divide/>
+                    <ci> ATP </ci>
+                    <ci> K1atp </ci>
+                  </apply>
+                  <apply>
+                    <divide/>
+                    <ci> ADP </ci>
+                    <ci> K1adp </ci>
+                  </apply>
+                </apply>
+                <apply>
+                  <plus/>
+                  <cn type="integer"> 1 </cn>
+                  <apply>
+                    <divide/>
+                    <ci> NADH </ci>
+                    <ci> K1nadh </ci>
+                  </apply>
+                  <apply>
+                    <divide/>
+                    <ci> NAD </ci>
+                    <ci> K1nad </ci>
+                  </apply>
+                </apply>
+                <apply>
+                  <plus/>
+                  <cn type="integer"> 1 </cn>
+                  <apply>
+                    <divide/>
+                    <ci> DHAP </ci>
+                    <ci> K1dhap </ci>
+                  </apply>
+                  <apply>
+                    <divide/>
+                    <ci> G3P </ci>
+                    <ci> K1g3p </ci>
+                  </apply>
+                </apply>
+              </apply>
+            </apply>
+          </math>
+          <listOfParameters>
+            <parameter id="Vf1" value="47"/>
+            <parameter id="K1nadh" value="0.023"/>
+            <parameter id="K1dhap" value="0.54"/>
+            <parameter id="NADH" value="1.87"/>
+            <parameter id="NAD" value="1.45"/>
+            <parameter id="Keq1" value="10000"/>
+            <parameter id="F16BP" value="6.01"/>
+            <parameter id="K1f16bp" value="4.8"/>
+            <parameter id="ATP" value="2.37"/>
+            <parameter id="K1atp" value="0.73"/>
+            <parameter id="ADP" value="2.17"/>
+            <parameter id="K1adp" value="2"/>
+            <parameter id="K1nad" value="0.93"/>
+            <parameter id="K1g3p" value="1.2"/>
+          </listOfParameters>
+        </kineticLaw>
+      </reaction>
+      <reaction id="v2">
+        <listOfReactants>
+          <speciesReference species="G3P"/>
+        </listOfReactants>
+        <listOfProducts>
+          <speciesReference species="Gly"/>
+        </listOfProducts>
+        <kineticLaw>
+          <math xmlns="http://www.w3.org/1998/Math/MathML">
+            <apply>
+              <divide/>
+              <apply>
+                <divide/>
+                <apply>
+                  <times/>
+                  <ci> V2 </ci>
+                  <ci> G3P </ci>
+                </apply>
+                <ci> K2g3p </ci>
+              </apply>
+              <apply>
+                <times/>
+                <apply>
+                  <plus/>
+                  <cn type="integer"> 1 </cn>
+                  <apply>
+                    <divide/>
+                    <ci> G3P </ci>
+                    <ci> K2g3p </ci>
+                  </apply>
+                </apply>
+                <apply>
+                  <plus/>
+                  <cn type="integer"> 1 </cn>
+                  <apply>
+                    <divide/>
+                    <ci> Phi </ci>
+                    <ci> K2phi </ci>
+                  </apply>
+                </apply>
+              </apply>
+            </apply>
+          </math>
+          <listOfParameters>
+            <parameter id="V2" value="53"/>
+            <parameter id="K2g3p" value="3.5"/>
+            <parameter id="Phi" value="1"/>
+            <parameter id="K2phi" value="1"/>
+          </listOfParameters>
+        </kineticLaw>
+      </reaction>
+    </listOfReactions>
+  </model>
+</sbml>
