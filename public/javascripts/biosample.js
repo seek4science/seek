@@ -201,7 +201,7 @@ function validateStrainFields(action){
 }
 
 function strains_of_selected_organism(organism_id){
-    var updated_selection_box = "<select id='specimen_strain_id'>"
+    var updated_selection_box = "<select id='sample_specimen_attributes_strain_id' name='sample[specimen_attributes][strain_id]'>";
         updated_selection_box += "<option value='0'>Select Strain ...</option>";
         url = "/biosamples/strains_of_selected_organism"
         request = new Ajax.Request(url, {
@@ -215,7 +215,7 @@ function strains_of_selected_organism(organism_id){
                 if (data.status == 200){
                     var strains = data.strains
                     for (var i=0; i< strains.length; i++){
-                        updated_selection_box += '<option value="\''+ strains[i][0] + '\'">'+ strains[i][1] +'</option>';
+                        updated_selection_box += '<option value=\''+ strains[i][0] + '\'>'+ strains[i][1] +'</option>';
 
                    }
                 }
