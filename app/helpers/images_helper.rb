@@ -8,7 +8,13 @@ module ImagesHelper
       :title => tooltip_title_attrib(info_text, delay),
       :style => "vertical-align:middle;")
   end
-  
+
+  #mirrors image_tag but uses a key instead of a source
+  def simple_image_tag_for_key key, options={}
+    return nil unless (filename = icon_filename_for_key(key.downcase))
+    image_tag filename,options
+  end
+
   def image_tag_for_key(key, url=nil, alt=nil, url_options={}, label=key.humanize, remote=false, size=nil)
 
     if (label == 'Destroy')
@@ -282,6 +288,8 @@ module ImagesHelper
         "famfamfam_silk/medal_bronze_3.png"
       when "publisher"
         "famfamfam_silk/medal_silver_2.png"
+      when "jws_shadow"
+        "jws/shadow2.gif"
     else
       return nil
     end
