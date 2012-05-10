@@ -200,8 +200,8 @@ function validateStrainFields(action){
     return true;
 }
 
-function strains_of_selected_organism(organism_id){
-    var updated_selection_box = "<select id='sample_specimen_attributes_strain_id' name='sample[specimen_attributes][strain_id]'>";
+function strains_of_selected_organism(organism_id, strain_selection_box_id, strain_selection_box_name){
+    var updated_selection_box = '<select id=\''+ strain_selection_box_id +'\' name=\''+ strain_selection_box_name +'\'>';
         updated_selection_box += "<option value='0'>Select Strain ...</option>";
         url = "/biosamples/strains_of_selected_organism"
         request = new Ajax.Request(url, {
