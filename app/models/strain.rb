@@ -11,6 +11,7 @@ class Strain < ActiveRecord::Base
   named_scope :without_default,:conditions=>{:is_dummy=>false}
 
   include ActsAsCachedTree
+  acts_as_authorized
 
   def self.default_strain_for_organism organism
     organism = Organism.find(organism) unless organism.is_a?(Organism)
@@ -21,7 +22,6 @@ class Strain < ActiveRecord::Base
       phenotype = Phenotype.new(:description => 'wild-type')
       strain = Strain.create :organism=>organism,:is_dummy=>true,:title=>"default",:genotypes=>[genotype],:phenotypes=>[phenotype]
     end
-
     strain
   end
 
@@ -46,5 +46,14 @@ class Strain < ActiveRecord::Base
     end
     phenotype_detail = phenotype_detail.blank? ? 'wild-type' : phenotype_detail.join('; ')
     phenotype_detail
+  end
+
+  def parent_strain
+    parent_strain = Strain.find_by_id(parent_id)
+    parent_strain.nil? ? '' : (parent_strain.title + "(ID=#{parent_strain.id})")
+  end
+
+  def can_delete?
+    super && (specimens.empty? || ((specimens.count == 1) && specimens.first.is_dummy? && specimens.first.samples.empty?))
   end
 end

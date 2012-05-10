@@ -8,7 +8,7 @@ class StrainsControllerTest < ActionController::TestCase
   
   def setup
     login_as(:aaron)
-    @object=strains(:yeast1)
+    @object=Factory :strain
   end
 
   test "get existing strains with no organism" do

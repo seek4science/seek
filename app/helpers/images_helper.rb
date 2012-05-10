@@ -8,7 +8,7 @@ module ImagesHelper
       :title => tooltip_title_attrib(info_text, delay),
       :style => "vertical-align:middle;")
   end
-  
+
   def image_tag_for_key(key, url=nil, alt=nil, url_options={}, label=key.humanize, remote=false, size=nil)
 
     if (label == 'Destroy')

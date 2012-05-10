@@ -44,14 +44,15 @@ function hide_existing_samples() {
     Effect.Fade('existing_samples', { duration: 0.25 })
 }
 
-function new_strain_form(strain_id, organism_id, url) {
+function strain_form(strain_id, organism_id, action, url) {
     if (url != '') {
         request = new Ajax.Request(url,
             {
                 method: 'get',
                 parameters: {
                     id: strain_id,
-                    organism_id:organism_id
+                    organism_id:organism_id,
+                    strain_action: action
                 },
                 onSuccess: function(transport) {
                 },
@@ -108,12 +109,29 @@ function checkSelectOneStrain(){
         return true;
 }
 
+//if more than one specimen are selected, display the notice message
+//if one specimen is selected, add the param specimen_id to the link
+//else send the link without any params
 function checkSelectOneSpecimen(cell_culture_or_specimen){
-    if (getSelectedSpecimens().split(',').length > 1){
+    var selected_specimens = getSelectedSpecimens().split(',')
+    if (selected_specimens.length > 1){
        alert("Please select only ONE " + cell_culture_or_specimen + " for this sample to base on, or select NO " + cell_culture_or_specimen);
        return false;
-   }else
+   }else if (selected_specimens.length == 1 && selected_specimens[0] != "" ){
+        //add selected specimen_id to the link param
+        var old_link = $('new_sample_link').href;
+        var new_link = old_link.split('?')[0];
+        new_link = new_link.concat('?specimen_id=' + selected_specimens[0]);
+        new_link = new_link.concat('&from_biosamples=true');
+        $('new_sample_link').href = new_link
         return true;
+    }else{
+        var old_link = $('new_sample_link').href;
+        var new_link = old_link.split('?')[0];
+        new_link = new_link.concat('?from_biosamples=true');
+        $('new_sample_link').href = new_link
+        return true;
+    }
 }
 
 function validateSpecimenSampleFields(cell_culture_or_specimen, is_new_specimen){
@@ -154,21 +172,58 @@ function validateSpecimenSampleFields(cell_culture_or_specimen, is_new_specimen)
             return true;
 }
 
-function validateStrainFields(){
-    if($('strain_title').value.length == 0) {
-            alert("Please enter strain name.");
-            $('strain_title').focus();
-            return(false);
+function validateStrainFields(action){
+    if ($('strain_title').value.length == 0) {
+        alert("Please enter strain name.");
+        $('strain_title').focus();
+        return(false);
     }
-    else if($('strain_organism_id').value == '0') {
-            alert("Please select one organism");
-            $('strain_organism_id').focus();
-            return(false);
+    if ($('strain_organism_id').value == '0') {
+        alert("Please select one organism");
+        $('strain_organism_id').focus();
+        return(false);
+    }
+    if ($F('strain_project_ids').length == 0) {
+        alert("Please select projects");
+        $('possible_strain_project_ids').focus();
+        return(false);
+    }
+
+    if(action == 'edit'){
+        $('edit_strain').disabled = true;
+        $('edit_strain').value = 'Updating...'
     }
     else{
         $('create_strain').disabled = true;
         $('create_strain').value = 'Creating...'
-        return true;
     }
-
+    return true;
 }
+
+function strains_of_selected_organism(organism_id, strain_selection_box_id, strain_selection_box_name){
+    var updated_selection_box = '<select id=\''+ strain_selection_box_id +'\' name=\''+ strain_selection_box_name +'\'>';
+        updated_selection_box += "<option value='0'>Select Strain ...</option>";
+        url = "/biosamples/strains_of_selected_organism"
+        request = new Ajax.Request(url, {
+            method: 'get',
+            parameters:{
+                organism_id:organism_id
+            },
+            onSuccess : function(transport){
+                // "true" parameter to evalJSON() activates sanitization of input
+                var data = transport.responseText.evalJSON(true);
+                if (data.status == 200){
+                    var strains = data.strains
+                    for (var i=0; i< strains.length; i++){
+                        updated_selection_box += '<option value=\''+ strains[i][0] + '\'>'+ strains[i][1] +'</option>';
+
+                   }
+                }
+                $('strains_of_selected_organism').innerHTML = updated_selection_box;
+            },
+            onFailure: function(transport){
+              alert('Something went wrong, please try again...');
+            }
+        });
+
+    }

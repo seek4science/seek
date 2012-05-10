@@ -35,7 +35,7 @@ h1 {
 }
 
 h2 {
-	background-image: url('/images/header-bg.png');
+	background-image: url('../images/header-bg.png');
 	background-position: top;
 	background-repeat: repeat-x;
 	background-color: #EEEEEE;
@@ -138,7 +138,7 @@ li {
 #myexp_searchbar {
 	height: 20px;
 	text-align: center;
-	background-image: url('/images/searchfade.png');
+	background-image: url('../images/searchfade.png');
 	background-repeat: no-repeat;
 	background-position: top center;
 	padding: 10px 0;
@@ -170,7 +170,7 @@ li {
 }
 
 #openid_url {
-	background: url(/images/openid.gif) no-repeat;
+	background: url("../images/openid-16x16.gif") no-repeat;
 	background-color: #FFFFFF;
 	padding-left: 16px;
 }
@@ -233,7 +233,7 @@ li {
 	border-right: 1px solid #BBBBBB;
 	border-bottom: 1px solid transparent;
 	text-decoration: none;
-	background-image: url('/images/tab-bg.png');
+	background-image: url('../images/tab-bg.png');
 	background-position: top;
 	background-repeat: repeat-x;
 	background-color: #EDEDED;
@@ -399,7 +399,7 @@ ul.breadcrumb_list a:hover {
 	color: #222222;
 	padding: 0.1em 1em 0.4em 1em;
 	text-align: center;
-	background-image: url('/images/header-bg2.png');
+	background-image: url('../images/header-bg2.png');
 	background-position: top;
 	background-repeat: repeat-x;
 	background-color: #CFDFEF;
@@ -920,7 +920,7 @@ a.button_slim * {
 	padding: 0.6em 0.5em 0.4em 0.5em;
 	border: 0px dotted #999999;
 	border-width: 0 0 1px 0;
-	background-image: url('/images/box-bg1.png');
+	background-image: url('../images/box-bg1.png');
 	background-position: top;
 	background-repeat: repeat-x;
 	background-color: #FFFFCC;

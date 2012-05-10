@@ -113,7 +113,8 @@
                         </p>
                     </div>
                 </div>
-                <img src="/images/jws/shadow2.gif" height="10" alt="" width="100%" />
+                <%= simple_image_tag_for_key "jws_shadow",:height=>"10",:width=>"100%" -%>
+
             </div>
             <div id="equations_top" class="builder_box">
                 <div class="squarebox">
@@ -149,7 +150,7 @@
                                 :locals=>{:objects_hash=>@objects_hash,:key=>"kineticsImage",:hidden_id=>"plotKineticsPanel",:object_element_id=>"resizeableElement2",:javascript_var=>"rc2"} -%>
                         </p>
                     </div>
-                </div><img src="/images/jws/shadow2.gif" height="10" alt="" width="100%" />
+                </div><%= simple_image_tag_for_key "jws_shadow",:height=>"10",:width=>"100%" -%>
             </div>
 
             <%= render :partial=>"models/builder/builder_box",:locals=>{:title=>"Annotations for processes",:prefix=>"annotated_reactions",:key=>"annotationsReactions",:javascript_var=>"rtAnnotatedReactions"} -%>
