@@ -8,7 +8,13 @@ module ImagesHelper
       :title => tooltip_title_attrib(info_text, delay),
       :style => "vertical-align:middle;")
   end
-  
+
+  #mirrors image_tag but uses a key instead of a source
+  def simple_image_tag_for_key key, options={}
+    return nil unless (filename = icon_filename_for_key(key.downcase))
+    image_tag filename,options
+  end
+
   def image_tag_for_key(key, url=nil, alt=nil, url_options={}, label=key.humanize, remote=false, size=nil)
 
     if (label == 'Destroy')
@@ -282,21 +288,15 @@ module ImagesHelper
         "famfamfam_silk/medal_bronze_3.png"
       when "publisher"
         "famfamfam_silk/medal_silver_2.png"
-      when "organise"
-        "famfamfam_silk/folder.png"
-      when "search"
-        "famfamfam_silk/eye.png"
+      when "jws_shadow"
+        "jws/shadow2.gif"
     else
       return nil
     end
   end
-
-  def image key,options={}
-    image_tag(icon_filename_for_key(key),options)
-  end
   
   def help_icon(text, delay=200, extra_style="")
-    image("info", :alt=>"help", :title=>tooltip_title_attrib(text,delay), :style => "vertical-align: middle;#{extra_style}")
+    image_tag icon_filename_for_key("info"), :alt=>"help", :title=>tooltip_title_attrib(text,delay), :style => "vertical-align: middle;#{extra_style}"
   end
   
   def flag_icon(country, text=country, margin_right='0.3em')
@@ -417,6 +417,8 @@ module ImagesHelper
     image_tag icon_filename_for_key("collapse"), :style => "margin-left: #{margin_left}; vertical-align: middle;", :alt => 'Collapse', :title=>tooltip_title_attrib("Collapse the details")
   end
   
-
+  def image key,options={}
+    image_tag(icon_filename_for_key(key),options)
+  end
   
 end
