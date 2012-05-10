@@ -32,9 +32,10 @@ class ChangeProjectToProjectsTest < ActionController::IntegrationTest
 
       item.projects = [Factory(:project), Factory(:project)]
       disable_authorization_checks do
-        post "/#{type_name}/update/#{item.id}",
+        post "/#{type_name}/update/#{item.id}", "#{item.class.name.downcase}".to_sym => {:id => item.id},
            :sharing=>{"access_type_#{Policy::ALL_SYSMO_USERS}"=>Policy::VISIBLE, :sharing_scope=>Policy::ALL_SYSMO_USERS, :your_proj_access_type => Policy::ACCESSIBLE}
       end
+
       item.reload
       assert_equal 2, item.policy.permissions.count
     end

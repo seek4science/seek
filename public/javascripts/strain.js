@@ -38,7 +38,7 @@ function addGenotypeRow(tableID) {
 
     var cell3 = row.insertCell(2);
     var element3 = document.createElement("img");
-    element3.src = "/images/famfamfam_silk/cross.png";
+    element3.src = "../images/famfamfam_silk/cross.png";
     element3.alt = "Delete"
     element3.id = "delete_genotype_".concat(rowCount.toString())
     element3.title = "Delete this entry"
@@ -78,7 +78,7 @@ function addPhenotypeRow(tableID) {
 
     var cell2 = row.insertCell(1);
     var element2 = document.createElement("img");
-    element2.src = "/images/famfamfam_silk/cross.png";
+    element2.src = "../images/famfamfam_silk/cross.png";
     element2.alt = "Delete"
     element2.id = "delete_phenotype_".concat(rowCount.toString())
     element2.title = "Delete this entry"

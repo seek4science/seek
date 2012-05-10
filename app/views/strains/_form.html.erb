@@ -70,7 +70,7 @@
              <% end %>
 
         </table>
-        <img src='/images/famfamfam_silk/add.png' alt="Add more" title="Add more gene and mutation" onclick="addGenotypeRow('genotype_table')"/>
+        <%= simple_image_tag_for_key "add",:alt=>"Add more",:title=>"Add more genes and mutations", :onclick=>"addGenotypeRow('genotype_table')" -%>
       </div>
     </center>
 
@@ -90,7 +90,7 @@
              <% end %>
           <% end %>
         </table>
-        <img src='/images/famfamfam_silk/add.png' alt="Add more" title="Add more phenotype" onclick="addPhenotypeRow('phenotype_table')"/>
+        <%= simple_image_tag_for_key "add",:alt=>"Add more",:title=>"Add more phenotypes", :onclick=>"addPhenotypeRow('phenotype_table')" -%>
       </div>
     </center>
   </div>
