@@ -30,7 +30,6 @@ module Seek
         if response.instance_of?(Net::HTTPInternalServerError)
           raise Exception.new(response.body.gsub(/<head\>.*<\/head>/, ""))
         end
-
         process_response_body(response.body)
       end
 
@@ -70,7 +69,7 @@ module Seek
           if response.instance_of?(Net::HTTPInternalServerError)
             raise Exception.new(response.body.gsub(/<head\>.*<\/head>/, ""))
           end
-
+          puts response.body
           process_response_body(response.body)
       end
 
@@ -86,6 +85,16 @@ module Seek
           end
         end
         url
+      end
+
+      def saved_file_builder_content saved_file
+        model_name=saved_file.gsub("\.dat", "")
+        response = RestClient.get(builder_url, :params=>{:loadModel=>model_name, :userModel=>true})
+
+        if response.instance_of?(Net::HTTPInternalServerError)
+          raise Exception.new(response.body.gsub(/<head\>.*<\/head>/, ""))
+        end
+        process_response_body(response.body)
       end
 
       private
@@ -104,16 +113,6 @@ module Seek
 
       def upload_sbml_url
         "#{Seek::JWS::UPLOAD_URL}?SBMLFilePostedToIFC=true&xmlOutput=true"
-      end
-
-      def saved_file_builder_content saved_file
-        model_name=saved_file.gsub("\.dat", "")
-        response = RestClient.get(builder_url, :params=>{:loadModel=>model_name, :userModel=>true})
-
-        if response.instance_of?(Net::HTTPInternalServerError)
-          raise Exception.new(response.body.gsub(/<head\>.*<\/head>/, ""))
-        end
-        process_response_body(response.body)
       end
 
     end
