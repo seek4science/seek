@@ -41,7 +41,7 @@
 
           <p>
               <%= f.label "Sex:" -%> <br/>
-              <%= f.select :sex, options_for_select([["female",true],["male",false]].insert(0,["Not specified", 0]),@specimen.try(:sex)) -%>
+              <%= f.select :sex, options_for_select(sex_list_for_selection.insert(0,["Not specified", '']),@specimen.try(:sex)) -%>
           </p>
 
           <p>
