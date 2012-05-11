@@ -46,47 +46,99 @@
     var organism = new Array();
     check_show_existing_strains('strain_organism_ids', 'existing_strains', '<%=url_for(:controller => 'biosamples', :action => 'existing_strains')-%>');
 
-    function loadNewStrainAfterCreation(strain, organism) {
-        if(strain_table && strain_table.length > 0) {
-            var data = strain_table.fnGetData();
-            var load = false;
-            for (var i=0;i<data.length; i++){
-                var pattern = new RegExp(organism);
-                if (pattern.test(data[i][0]))
-                    load = true;
+    function removeRowAfterDestroy(table, id, id_column_position) {
+        var table = eval(table)
+        var data = table.fnGetData();
+        for (var i = 0; i < data.length; i++) {
+            if (data[i][id_column_position] == id.toString()) {
+                table.fnDeleteRow(i);
+                break;
             }
+        }
+    }
 
-            if (load) {
-                var a = strain_table.fnAddData(strain);
-                var nTr = strain_table.fnSettings().aoData[a[0]].nTr;
-                $j(nTr).addClass('gradeA');
+    function updateRow(table, row_data, id_column_position){
+        var table_name = table;
+        var table = eval(table)
+        var data = table.fnGetData();
+        for (var i = 0; i < data.length; i++) {
+            //look for the position which is updated
+            if (data[i][id_column_position] == row_data[id_column_position]){
+                //if first column hasn't been changed
+                if (data[i][0] == row_data[0]){
+                    table.fnUpdate(row_data, i, 0);
+                    break;
+                }
+                //if the first column is updated, refresh the table
+                else{
+                    if (table_name == 'strain_table' ){
+                        check_show_existing_strains('strain_organism_ids', 'existing_strains', '<%=url_for(:controller => 'biosamples', :action => 'existing_strains')-%>');
+                        break;
+                    }else if(table_name == 'specimen_table'){
+                        <%=remote_function(:url => {:controller => 'biosamples', :action => 'existing_specimens'}, :with => "'strain_ids=' + getSelectedStrains()");%>
+                        show_existing_specimens();
+                        break;
+                    }else if (table_name == 'sample_table'){
+                         <%=remote_function(:url => {:controller => 'biosamples', :action => 'existing_samples'}, :with => "'specimen_ids=' + getSelectedSpecimens()");%>
+                         show_existing_samples();
+                        break;
+                    }
+                }
+            }
+        }
+    }
+
+    function loadNewStrainAfterCreation(strain, organism) {
+        //if there is strain table
+        if(strain_table.length > 0){
+            var data = strain_table.fnGetData();
+            //if there is data in strain table
+            if (data.length > 0) {
+                var load = false;
+                for (var i=0;i<data.length; i++){
+                    var pattern = new RegExp(organism);
+                    if (pattern.test(data[i][0]))
+                        load = true;
+                }
+
+                if (load) {
+                    var a = strain_table.fnAddData(strain);
+                    var nTr = strain_table.fnSettings().aoData[a[0]].nTr;
+                    $j(nTr).addClass('gradeA');
+                }
+            }
+            else{
+               check_show_existing_strains('strain_organism_ids', 'existing_strains', '<%=url_for(:controller => 'biosamples', :action => 'existing_strains')-%>');
             }
         }
         else {
-          if($$('#strain_organism_ids [selected="selected"]').pluck('text').include(organism))
             check_show_existing_strains('strain_organism_ids', 'existing_strains', '<%=url_for(:controller => 'biosamples', :action => 'existing_strains')-%>');
         }
     }
 
     function loadNewSpecimenAfterCreation(specimen, strain_id) {
-        if(specimen_table && specimen_table.length > 0) {
+        if(specimen_table.length > 0) {
             var data = specimen_table.fnGetData();
-            var load = false;
-            for (var i=0;i<data.length; i++){
-                var pattern = new RegExp('ID='+ new Number(strain_id).toString());
-                if (pattern.test(data[i][0]))
-                    load = true;
-            }
+            if (data.length > 0){
+                var load = false;
+                for (var i=0;i<data.length; i++){
+                    var pattern = new RegExp('ID='+ new Number(strain_id).toString());
+                    if (pattern.test(data[i][0])){
+                        load = true;
+                    }
+                }
 
-            if (load) {
-                specimen_table.fnAddData(specimen);
+                if (load) {
+                    specimen_table.fnAddData(specimen);
+                }
             }
-        } else {
-            if(getSelectedStrains().include(strain_id)) {
+            else{
                 <%=remote_function(:url => {:controller => 'biosamples', :action => 'existing_specimens'}, :with => "'strain_ids=' + getSelectedStrains()");%>
                 show_existing_specimens();
             }
-
+        } else {
+                <%=remote_function(:url => {:controller => 'biosamples', :action => 'existing_specimens'}, :with => "'strain_ids=' + getSelectedStrains()");%>
+                show_existing_specimens();
         }
     }
 
@@ -96,49 +148,6 @@
         $j(sample_nTr).addClass('gradeX');
     }
 
-    function strains_of_selected_organism(organism_id){
-        var option;
-        var selection_box = $('specimen_strain_id');
-        selection_box.options.length=0;
-        option = document.createElement("OPTION");
-        option.text = 'Select Strain ...';
-        option.value = 0;
-        try {
-          selection_box.add(option); //for older IE version
-        }
-        catch (ex) {
-          selection_box.add(option, null);
-        }
-
-        request = new Ajax.Request("<%=url_for(:controller => 'biosamples', :action => 'strains_of_selected_organism')%>", {
-            method: 'get',
-            parameters:{
-                organism_id:organism_id
-            },
-            onSuccess : function(transport){
-                // "true" parameter to evalJSON() activates sanitization of input
-                var data = transport.responseText.evalJSON(true);
-                if (data.status == 200){
-                    var strains = data.strains
-                    for (var i=0; i< strains.length; i++){
-                        option = document.createElement("OPTION");
-                        option.text = strains[i][1];
-                        option.value = strains[i][0];
-                        try {
-                          selection_box.add(option); //for older IE version
-                        }
-                        catch (ex) {
-                          selection_box.add(option, null);
-                        }
-                   }
-                }
-            },
-            onFailure: function(transport){
-              alert('Something went wrong, please try again...');
-            }
-        });
-
-    }
 
     function updateCreatorSettings() {
     // iterate through all creators and build the "shared with" list;

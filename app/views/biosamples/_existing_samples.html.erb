@@ -13,12 +13,15 @@
             ],
             "aoColumns": [
                 null,
-                { "sWidth": "20%" },
-                { "sWidth": "20%" },
                 { "sWidth": "15%" },
                 { "sWidth": "15%" },
-                { "sWidth": "20%" },
-                { "sWidth": "10%" }
+                { "sWidth": "15%" },
+                { "sWidth": "15%" },
+                { "sWidth": "15%" },
+                { "sWidth": "5%" },
+                { "sWidth": "10%" },
+                { "sWidth": "5%", 'bSortable':false },
+                { "sWidth": "5%", 'bSortable':false }
             ],
             "fnInitComplete": function () {
                 this.fnAdjustColumnSizing(true);
@@ -48,18 +51,16 @@
                 <th>Age at sampling(hours)</th>
                 <th>Provider name</th>
                 <th>ID</th>
+                <th>Comment</th>
               </tr>
               </thead>
               <tbody>
               <% existing_samples.each do |sample| -%>
                   <tr class="gradeX">
-                    <td><%= sample.specimen_info %> </td>
-                    <td><%= link_to sample.title, sample_path(sample.id), {:target => '_blank'} %> </td>
-                    <td><%= sample.lab_internal_number %> </td>
-                    <td><%= sample.sampling_date_info %> </td>
-                    <td><%= sample.age_at_sampling %> </td>
-                    <td><%= sample.provider_name_info %></td>
-                    <td><%= sample.id %></td>
+                    <% sample_row_data = sample_row_data sample %>
+                    <% sample_row_data.each do |column_data| %>
+                        <td><%= column_data %></td>
+                    <% end %>
                   </tr>
               <% end -%>
               </tbody>

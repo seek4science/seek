@@ -6,8 +6,12 @@ module ApplicationHelper
 
 
   def date_as_string date,show_time_of_day=false
-    str = date.strftime("#{date.day.ordinalize} %B %Y")
-    str = date.strftime("#{str} @ %H:%M:%S") if show_time_of_day
+    if date.blank?
+      str="<span class='none_text'>No date defined</span>"
+    else
+      str = date.strftime("#{date.day.ordinalize} %B %Y")
+      str = date.strftime("#{str} @ %H:%M:%S") if show_time_of_day
+    end
     str
   end
 

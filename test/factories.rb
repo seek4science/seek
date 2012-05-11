@@ -196,6 +196,9 @@ end
 Factory.define(:strain) do |f|
   f.sequence(:title) { |n| "Strain#{n}" }
   f.association :organism
+  f.projects {[Factory.build(:project)]}
+  f.association :contributor, :factory => :user
+  f.association :policy, :factory => :public_policy
 end
 
 #Culture growth type
@@ -494,4 +497,24 @@ Factory.define(:presentation_version) do |f|
   Factory.define :cell_range do |f|
     f.cell_range "A1:B3"
     f.association :worksheet
+  end
+
+
+  Factory.define :genotype do |f|
+    f.association :gene, :factory => :gene
+    f.association :modification, :factory => :modification
+    f.association :strain, :factory => :strain
+  end
+
+  Factory.define :gene do |f|
+    f.sequence(:title) {|n| "gene #{n}"}
+  end
+
+  Factory.define :modification do |f|
+    f.sequence(:title) {|n| "modification #{n}"}
+  end
+
+  Factory.define :phenotype do |f|
+    f.sequence(:description) {|n| "phenotype #{n}"}
+    f.association :strain, :factory => :strain
   end

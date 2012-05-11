@@ -701,6 +701,23 @@ class DataFilesControllerTest < ActionController::TestCase
 
   end
 
+  test "should not be able to update sharing permission without manage rights" do
+       login_as(:quentin)
+       user = users(:quentin)
+       df = data_files(:editable_data_file)
+       assert df.can_edit?(user), "data file should be editable but not manageable for this test"
+       assert !df.can_manage?(user), "data file should be editable but not manageable for this test"
+       assert_equal Policy::EDITING,df.policy.access_type,"data file should have an initial policy with access type for editing"
+       assert_difference('ActivityLog.count') do
+        put :update, :id => df, :data_file => {:title=>"new title" },:sharing=>{:permissions =>{:contributor_types => ActiveSupport::JSON.encode('Person'), :values => ActiveSupport::JSON.encode({"Person" => {user.person.id =>  {"access_type" =>  Policy::MANAGING}}})}}
+       end
+
+       assert_redirected_to data_file_path(df)
+       df.reload
+       assert_equal "new title",df.title
+       assert !df.can_manage?(user)
+    end
+
   test "fail gracefullly when trying to access a missing data file" do
     get :show,:id=>99999
     assert_redirected_to data_files_path

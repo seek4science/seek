@@ -7,6 +7,7 @@ class Specimen < ActiveRecord::Base
   acts_as_authorized
 
   before_save  :clear_garbage
+  attr_accessor :from_biosamples
 
 
   has_many :samples

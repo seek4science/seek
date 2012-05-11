@@ -20,7 +20,9 @@
                 { "sWidth": "15%" },
                 { "sWidth": "15%" },
                 { "sWidth": "5%" },
-                { "sWidth": "25%" }
+                { "sWidth": "15%" },
+                { "sWidth": "5%", 'bSortable':false },
+                { "sWidth": "5%", 'bSortable':false }
             ],
             "fnInitComplete": function () {
                 this.fnAdjustColumnSizing(true);
@@ -58,23 +60,11 @@
               </thead>
               <tbody>
               <% existing_specimens.each do |specimen| -%>
-
-                  <%
-                     strain = specimen.strain
-                     strain_info = 'Strain ' + strain.info + "(ID=#{strain.id})"
-                     creators = specimen.creators.collect(&:name)
-                     creators << specimen.other_creators unless specimen.other_creators.blank?
-                  %>
-
                   <tr>
-                    <td><%= strain_info -%></td>
-                    <td><%= check_box_tag "selected_specimen_#{specimen.id}", specimen.id, false, {:onchange => remote_function(:url => {:controller => 'biosamples', :action => 'existing_samples'}, :with => "'specimen_ids=' + getSelectedSpecimens()") + ";show_existing_samples();" } %></td>
-                    <td><%= link_to specimen.title, specimen_path(specimen.id), {:target => '_blank'} -%></td>
-                    <td><%= specimen.born_info -%></td>
-                    <td><%= specimen.culture_growth_type.try(:title) -%></td>
-                    <td><%= creators.join(', ')-%></td>
-                    <td><%= specimen.id %></td>
-                    <td><%= asset_version_links(specimen.sops).join(", ") -%></td>
+                  <% specimen_row_data = specimen_row_data specimen %>
+                  <% specimen_row_data.each do |column_data| %>
+                      <td><%= column_data %></td>
+                  <% end %>
                   </tr>
               <% end -%>
               </tbody>

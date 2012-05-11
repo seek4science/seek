@@ -1,14 +1,21 @@
 <%= stylesheet_link_tag 'styles.css' -%>
+<script type="text/javascript">
+    initialiseFolds();
+    updateFancyMultiselect('strain_project_ids');
+</script>
 <div  id="strain_form">
-       <% parent_strain = strain.title %>
-       <p class="none_text" style="margin-left: 15em;">
-       <%= parent_strain.blank? ? '' : "You will create this new strain based on #{parent_strain}"%>
-       </p>
+       <% if action == 'create' %>
+           <% parent_strain = strain.title %>
+           <p class="none_text" style="margin-left: 15em;">
+           <%= parent_strain.blank? ? '' : "You will create this new strain based on #{parent_strain}"%>
+           </p>
+           <%= hidden_field_tag 'strain[parent_id]', strain.id %>
+       <% end %>
 
   <div class="yui-g">
     <center>
       <div class="yui-u first" style="width: 42%; margin-left: 2em; margin-top: 1em; margin-bottom: 1em;">
-        <p style="margin-bottom: 1.5em">
+        <p style="margin-bottom: 0.5em">
           <label style="float: left;"> Name:</label><span class="required">*</span>
           <%= text_field_tag "strain[title]", strain.title, :style => 'float:right' %>
         </p>
@@ -90,8 +97,16 @@
       </div>
     </center>
   </div>
+  <br/>
+
+  <%= render :partial => 'projects/project_selector', :locals => {:resource => strain}%>
+  <br/>
+
+  <% if (action == 'create') || (action == 'edit' && strain.can_manage?) %>
+      <%= render :partial => "assets/sharing_form", :locals => {:object => strain, :disable_advanced_view => true, :disable_can_publish_check => true} -%>
+  <% end %>
+
     <%= hidden_field_tag 'strain[id]', strain.id %>
-    <%= hidden_field_tag 'strain[parent_id]', strain.id %>
 </div>
 
 
