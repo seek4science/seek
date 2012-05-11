@@ -7,7 +7,7 @@ class DataFuseController < ApplicationController
   include Seek::MimeTypes
   include Seek::ModelProcessing
   include SysMODB::SpreadsheetExtractor
-  include Seek::DataFuse
+  include Seek::JWS::DataFuse
   
   before_filter :login_required
   before_filter :is_user_admin_auth

@@ -62,40 +62,50 @@ class SpecimensController < ApplicationController
     end
   end
 
+  def edit
+    @specimen.from_biosamples = params[:from_biosamples]
+    respond_to do |format|
+      format.html # new.html.erb
+      format.xml
+    end
+  end
+
   def update
     sop_ids = (params[:specimen_sop_ids].nil?? [] : params[:specimen_sop_ids].reject(&:blank?)) ||[]
 
     @specimen.attributes = params[:specimen]
-
-
     @specimen.policy.set_attributes_with_sharing params[:sharing], @specimen.projects
 
-        #strain
-    if params[:create_strain] == '1' || params[:create_strain] == '2'
-      @specimen.strain = select_or_new_strain
-    elsif params[:create_strain] == '0'
-      @specimen.strain = Strain.default_strain_for_organism(organism_id)
+    #if no strain is selected, create/select the default strain
+    if params[:specimen][:strain_id] == '0'
+      strain = Strain.default_strain_for_organism params[:organism_id]
+      @specimen.strain = strain
     end
 
     #update creators
     AssetsCreator.add_or_update_creator_list(@specimen, params[:creators])
-     respond_to do |format|
-      if @specimen.save
-          sop_ids.each do |sop_id|
-            sop= Sop.find sop_id
-            existing = @specimen.sop_masters.select{|ss|ss.sop == sop}
-            if existing.blank?
-               SopSpecimen.create!(:sop_id => sop_id,:sop_version=> sop.version,:specimen_id=>@specimen.id)
-            end
-          end
 
+    if @specimen.save
+      sop_ids.each do |sop_id|
+        sop= Sop.find sop_id
+        existing = @specimen.sop_masters.select { |ss| ss.sop == sop }
+        if existing.blank?
+          SopSpecimen.create!(:sop_id => sop_id, :sop_version => sop.version, :specimen_id => @specimen.id)
+        end
+      end
+      if @specimen.from_biosamples=='true'
+        render :partial => "biosamples/back_to_biosamples", :locals => {:action => 'update', :object => @specimen}
+      else
+        respond_to do |format|
           flash[:notice] = 'Specimen was successfully updated.'
           format.html { redirect_to(@specimen) }
-          format.xml  { head :ok }
-      else
+          format.xml { head :ok }
+        end
+      end
+    else
+      respond_to do |format|
         format.html { render :action => "edit" }
       end
-
     end
   end
 

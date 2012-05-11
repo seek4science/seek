@@ -1,4 +1,5 @@
 require 'test_helper'
+require 'open-uri'
 
 class JwsFunctionalTest < ActionController::TestCase
   tests ModelsController
@@ -6,6 +7,8 @@ class JwsFunctionalTest < ActionController::TestCase
   fixtures :all
 
   include AuthenticatedTestHelper
+
+  #FIXME: some of these tests would be better suited as integration tests using capybara - https://github.com/jnicklas/capybara
 
   def setup
     WebMock.allow_net_connect!
@@ -137,7 +140,7 @@ class JwsFunctionalTest < ActionController::TestCase
       assert_select "script", :text=>/VmGLT = 99.999/, :count=>1 #check that one of the parameter sets has been recognized from the uploaded file
     end
 
-    test "simulate model through builder" do
+    def test_simulate_model_through_builder
       #submits to jws, but passes the following_action param as 'simulate'
       m=models(:jws_model)
       m.content_blob.dump_data_to_file
@@ -146,7 +149,18 @@ class JwsFunctionalTest < ActionController::TestCase
 
       post :submit_to_jws,params
       assert_response :success
-      assert_select "iframe",:count=>1
+      assert assigns(:modelname)
+      expected_url = Seek::JWS::Simulator.simulator_frame_url(assigns(:modelname))
+      assert_select "div#jws_simulator_wrapper > iframe[src=?]",expected_url,:count=>1
+      simulator_frame_content = open(expected_url).read
+      assert_not_nil simulator_frame_content
+      assert simulator_frame_content.length > 1
+
+      #Franco informs me for a successful result the content should not contain the following
+      assert_nil simulator_frame_content =~ /JWSparam\[\[1\]\]/
+
+      #should contain one of the parameters passed
+      assert_not_nil simulator_frame_content =~ /KeqGLT/
     end
 
     test "annotate" do

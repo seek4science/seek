@@ -1,0 +1,33 @@
+<%
+  all_organisms = Organism.find(:all,:order=>:title)
+-%>
+<script type="text/javascript">
+    strain_form("<%=strain.id-%>","<%=strain.organism_id-%>","edit", '<%=url_for(:controller => 'biosamples', :action => 'strain_form')-%>');
+</script>
+<% remote_form_for 'biosamples', :url => url_for(:controller => 'biosamples', :action => 'update_strain'),
+  :condition=>"validateStrainFields('edit')",
+  :html=>{:method=>:put} do  -%>
+<div id="redbox_contents_div" class="redbox_contents" style="width:800px;">
+	<div class="head">
+		<%= link_to_close_redbox image_tag("close.gif"), :style => "float:right; margin-left:0.5em; vertical-align:middle;" -%>
+		<span style="vertical-align:middle;">
+		<%= strain.can_manage? ? 'Manage strain' : 'Edit strain'%>
+		</span>
+	</div>
+
+    <div class="body">
+      <span style="font-weight: bold;">Organism</span><span class="required">*</span>
+      <%= select_tag "strain[organism_id]",
+        options_for_select([["Select Organism ...", 0]]|all_organisms.collect{|o| [truncate(h(o.title)), o.id]},try_block{strain.organism_id} || try_block{current_user.person.projects.first.organism_ids.first})
+
+      -%>
+
+      <div id='strain_form'></div>
+
+      <div align="center" style="margin-top: 1.5em">
+        <%= submit_tag('Update', :style => "font-weight: bold;", :id => "edit_strain")%> Or
+        <input type=button value='Cancel' onclick="RedBox.close()">
+      </div>
+    </div>
+</div>
+<% end %>

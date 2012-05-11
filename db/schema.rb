@@ -9,7 +9,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20120425092308) do
+ActiveRecord::Schema.define(:version => 20120502094436) do
 
   create_table "activity_logs", :force => true do |t|
     t.string   "action"
@@ -939,6 +939,11 @@ ActiveRecord::Schema.define(:version => 20120425092308) do
     t.integer "specimen_id"
   end
 
+  create_table "projects_strains", :id => false, :force => true do |t|
+    t.integer "project_id"
+    t.integer "strain_id"
+  end
+
   create_table "publication_auth_lookup", :id => false, :force => true do |t|
     t.integer "user_id"
     t.integer "asset_id"
@@ -1204,6 +1209,18 @@ ActiveRecord::Schema.define(:version => 20120425092308) do
     t.boolean  "is_dummy",               :default => false
   end
 
+  create_table "strain_auth_lookup", :id => false, :force => true do |t|
+    t.integer "user_id"
+    t.integer "asset_id"
+    t.boolean "can_view",     :default => false
+    t.boolean "can_manage",   :default => false
+    t.boolean "can_edit",     :default => false
+    t.boolean "can_download", :default => false
+    t.boolean "can_delete",   :default => false
+  end
+
+  add_index "strain_auth_lookup", ["user_id", "can_view"], :name => "index_strain_auth_lookup_on_user_id_and_can_view"
+
   create_table "strain_descendants", :id => false, :force => true do |t|
     t.integer "ancestor_id"
     t.integer "descendant_id"
@@ -1219,7 +1236,10 @@ ActiveRecord::Schema.define(:version => 20120425092308) do
     t.text     "comment"
     t.string   "provider_id"
     t.string   "provider_name"
-    t.boolean  "is_dummy",      :default => false
+    t.boolean  "is_dummy",         :default => false
+    t.string   "contributor_type"
+    t.integer  "contributor_id"
+    t.integer  "policy_id"
   end
 
   create_table "studied_factor_links", :force => true do |t|

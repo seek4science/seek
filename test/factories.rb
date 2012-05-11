@@ -183,6 +183,9 @@ end
 Factory.define(:strain) do |f|
   f.sequence(:title) { |n| "Strain#{n}" }
   f.association :organism
+  f.projects {[Factory.build(:project)]}
+  f.association :contributor, :factory => :user
+  f.association :policy, :factory => :public_policy
 end
 
 #Culture growth type
@@ -229,6 +232,12 @@ end
     f.projects {[Factory.build(:project)]}
     f.association :contributor, :factory => :user
     f.association :content_blob, :factory => :content_blob
+  end
+
+  Factory.define(:cronwright_model,:parent=>:model) do |f|
+    f.content_type "text/xml"
+    f.association :content_blob,:factory=>:cronwright_model_content_blob
+    f.original_filename "cronwright.xml"
   end
 
 #Publication
@@ -291,6 +300,10 @@ end
 
   Factory.define(:rightfield_content_blob,:parent=>:content_blob) do |f|
     f.data  File.new("#{Rails.root}/test/fixtures/files/rightfield-test.xls","rb").read
+  end
+
+  Factory.define(:cronwright_model_content_blob,:parent=>:content_blob) do |f|
+    f.data  File.new("#{Rails.root}/test/fixtures/files/cronwright.xml","rb").read
   end
 
   Factory.define(:activity_log) do |f|
@@ -428,4 +441,24 @@ end
   Factory.define :project_folder do |f|
     f.association :project, :factory=>:project
     f.sequence(:title) {|n| "project folder #{n}"}
+  end
+
+
+  Factory.define :genotype do |f|
+    f.association :gene, :factory => :gene
+    f.association :modification, :factory => :modification
+    f.association :strain, :factory => :strain
+  end
+
+  Factory.define :gene do |f|
+    f.sequence(:title) {|n| "gene #{n}"}
+  end
+
+  Factory.define :modification do |f|
+    f.sequence(:title) {|n| "modification #{n}"}
+  end
+
+  Factory.define :phenotype do |f|
+    f.sequence(:description) {|n| "phenotype #{n}"}
+    f.association :strain, :factory => :strain
   end

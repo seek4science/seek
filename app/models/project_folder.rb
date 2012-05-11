@@ -32,7 +32,7 @@ class ProjectFolder < ActiveRecord::Base
 
   #what is displayed in the tree
   def label
-    "#{title} (#{assets.count})"
+    "#{title} (#{authorized_assets.count})"
   end
 
   def self.new_items_folder project

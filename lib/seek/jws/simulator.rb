@@ -4,6 +4,7 @@ module Seek
     class Simulator
 
       UPLOAD_URL = "#{Seek::Config.jws_online_root}/webMathematica/model_upload_SEEK_xml.jsp"
+      SIMULATE_BASE_URL = "#{Seek::Config.jws_online_root}/webMathematica/UItester.jsp"
 
 
       def simulate model
@@ -32,6 +33,10 @@ module Seek
         doc = parser.parse
         name = doc.find_first("//uploader/modelname").content
         name.strip
+      end
+
+      def self.simulator_frame_url modelname
+        "#{SIMULATE_BASE_URL}?fileName=#{modelname}&noHeader=true"
       end
 
     end
