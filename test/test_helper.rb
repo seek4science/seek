@@ -33,11 +33,6 @@ Kernel.class_eval do
 end
 
 class ActiveSupport::TestCase
-  teardown :wait_a_bit
-
-  def wait_a_bit
-    sleep 30 while `sensors | grep temp8 | cut -c15-20`.to_i > 90
-  end
 
   teardown do
     Rails.cache.clear
