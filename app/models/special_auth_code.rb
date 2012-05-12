@@ -4,6 +4,7 @@ class SpecialAuthCode < ActiveRecord::Base
 
   after_initialize :defaults
 
+  named_scope :unexpired, :conditions => ['expiration_date > ?', Time.now]
 
   def can_edit?(u=User.current_user)
     asset.can_manage?(u)
@@ -20,7 +21,7 @@ class SpecialAuthCode < ActiveRecord::Base
   @@current_auth_code = nil
   def self.with_auth_code auth_code
     original_value = @@current_auth_code
-    @@current_auth_code = auth_code
+    @@current_auth_code = unexpired.find_by_code(auth_code)
     yield
   ensure
     @@current_auth_code = original_value
