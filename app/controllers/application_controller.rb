@@ -45,6 +45,18 @@ class ApplicationController < ActionController::Base
 
   helper :all
 
+  def strip_root_for_xml_requests
+    #intended to use as a before filter on requests that lack a single root model.
+    #XML requests are required to have a single root node. This assumes the root node
+    #will be named xml. Turns a params hash like.. {:xml => {:param_one => "val", :param_two => "val2"}}
+    # into {:param_one => "val", :param_two => "val2"}
+
+    #This should probably be used with prepend_before_filter, since some filters might need this to happen so they can check params.
+    #see sessions controller for an example usage
+    params[:xml].each {|k,v| params[k] = v} if request.format.xml? and
+        params[:xml]
+  end
+
   layout "main"
 
   protect_from_forgery
