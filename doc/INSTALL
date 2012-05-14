@@ -24,7 +24,7 @@ Before starting, its a good idea to get up to date:
 
   sudo apt-get update && sudo apt-get -y upgrade
 
-If using Ubuntu or Debian, the following commands should install most the packages you need:
+The following commands will install the core required packages:
  
   sudo apt-get install wget mercurial ruby rdoc ri libopenssl-ruby ruby-dev mysql-server libssl-dev build-essential openssh-server 
   sudo apt-get install libmysqlclient16-dev libmagick++-dev libxslt-dev libxml++2.6-dev openjdk-6-jdk graphviz libsqlite3-dev sqlite3
