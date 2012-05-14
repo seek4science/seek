@@ -14,6 +14,19 @@ module Acts
           include ProjectCompat unless method_defined? :projects
 
           belongs_to :policy, :required_access_to_owner => :manage, :autosave => true
+
+          before_save :update_timestamp_if_policy_or_permissions_change
+
+          def update_timestamp_if_policy_or_permissions_change
+            if changed_for_autosave?
+              current_time = current_time_from_proper_timezone
+
+              write_attribute('updated_at', current_time) if respond_to?(:updated_at)
+              write_attribute('updated_on', current_time) if respond_to?(:updated_on)
+            end
+          end
+
+
         end
       end
 
@@ -90,7 +103,9 @@ module Acts
             if self.new_record?
               return true
             else
-              key = cache_keys(user, "#{action}")
+              key = [user.try(:person).try(:cache_key), 
+"can_#{action}?", 
+self.cache_key]
               Rails.cache.fetch(key) {perform_auth(user,"#{action}") ? :true : :false} == :true
             end
           end
@@ -129,34 +144,6 @@ module Acts
         people.uniq
       end
 
-      def cache_keys user, action
-
-        #start off with the keys for the person
-        unless user.try(:person).nil?
-          keys = user.person.generate_person_key
-        else
-          keys = []
-        end
-
-        #action
-        keys << "can_#{action}?"
-
-        #item (to invalidate when contributor is changed)
-        keys << self.cache_key
-
-        #item creators (to invalidate when creators are changed)
-        if self.respond_to? :assets_creators
-          keys |= self.assets_creators.sort_by(&:id).collect(&:cache_key)
-        end
-
-        #policy
-        keys << policy.cache_key
-
-        #permissions
-        keys |= policy.permissions.sort_by(&:id).collect(&:cache_key)
-
-        keys
-      end
     end
   end
 end
