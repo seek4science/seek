@@ -779,7 +779,6 @@ ActiveRecord::Schema.define(:version => 20120201145756) do
     t.string   "site_root_uri"
     t.datetime "last_jerm_run"
     t.string   "uuid"
-    t.integer  "parent_id"
   end
 
   create_table "projects_publications", :id => false, :force => true do |t|
