@@ -9,6 +9,19 @@
           <%= text_field_tag "sample[lab_internal_number]", nil, :style => 'float:right;margin-right:30em' %>
         </p>
 
+        <% if Seek::Config.is_virtualliver %>
+
+              <p style="margin-bottom: 2em">
+                <label style="float: left;"> Explantation time:</label>
+                <%= text_field_tag "sample[explantation]", nil, :style => 'float:right;margin-right:30em' %>
+              </p>
+
+              <p style="margin-bottom: 0.5em">
+                <label style="float: left;"> Donation date:</label><span class="required">*</span>
+                <%= calendar_date_select_tag "sample[donation_date]", nil,:time => "mixed",  :style => 'float:right;margin-right:30em' %>
+              </p>
+        <% end %>
+
         <p style="margin-bottom: 2em">
           <label style="float: left;"> Provider name:</label>
           <%= text_field_tag "sample[provider_name]", nil, :style => 'float:right;margin-right:30em' %>

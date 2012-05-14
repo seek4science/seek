@@ -2,6 +2,8 @@ class Strain < ActiveRecord::Base
   belongs_to :organism
   has_many :genotypes, :dependent => :destroy
   has_many :phenotypes, :dependent => :destroy
+  accepts_nested_attributes_for :genotypes,:allow_destroy=>true
+  accepts_nested_attributes_for :phenotypes,:allow_destroy=>true
   has_many :specimens
 
   named_scope :by_title

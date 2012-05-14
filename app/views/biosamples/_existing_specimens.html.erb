@@ -69,7 +69,7 @@
                      strain_info = 'Strain ' + strain.info + "(ID=#{strain.id})"
                      selected = false
                      if strain.is_default?
-                       strain_info = ''
+                       #strain_info = ''
                        selected = true
                      end
                      creators = specimen.creators.collect(&:name)

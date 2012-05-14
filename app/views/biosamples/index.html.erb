@@ -68,7 +68,7 @@
         }
     }
 
-    function loadNewSpecimenAfterCreation(specimen, strain_id) {
+    function loadNewSpecimenAfterCreation(specimen, strain_id,strain_title) {
         if(specimen_table && specimen_table.length > 0) {
             var data = specimen_table.fnGetData();
             var load = false;
@@ -82,8 +82,8 @@
                 specimen_table.fnAddData(specimen);
             }
         } else {
-            if(getSelectedStrains().include(strain_id)) {
-                <%=remote_function(:url => {:controller => 'biosamples', :action => 'existing_specimens'}, :with => "'strain_ids=' + getSelectedStrains()");%>
+            if(getSelectedStrains().include(strain_id) || strain_title=="default" ) {
+                <%=remote_function(:url => {:controller => 'biosamples', :action => 'existing_specimens'}, :with => "'strain_ids=' + getSelectedStrains()+ '&organism_ids='+$F('strain_organism_ids')");%>
                 show_existing_specimens();
             }
 

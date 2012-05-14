@@ -180,10 +180,36 @@ function validateStrainFields(){
             $('strain_organism_id').focus();
             return(false);
     }
+    else if (!validateGenoTypeFields() || !validatePhenoTypeFields()) {
+            return(false);
+    }
     else{
         $('create_strain').disabled = true;
         $('create_strain').value = 'Creating...'
         return true;
     }
+}
+function validateGenoTypeFields(){
+    var genotype_genes = document.getElementsByName("strain[genotypes_attributes][][gene_attributes][title]");
+    for(var i = 0 ; i < genotype_genes.length; i++){
+        if(genotype_genes[i].value==""){
+            alert("Genotype Gene cannot be empty.");
+            genotype_genes[i].focus();
+            return false;
+        }
+    }
+    return true;
+}
+
+function validatePhenoTypeFields(){
+    var phenotype_descriptions = document.getElementsByName("strain[phenotypes_attributes][][description]");
+       for(var i = 0 ; i < phenotype_descriptions.length; i++){
+           if(phenotype_descriptions[i].value==""){
+               alert("Phenotype description cannot be empty.");
+               phenotype_descriptions[i].focus();
+               return false;
+           }
+       }
+       return true;
 
 }

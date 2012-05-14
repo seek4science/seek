@@ -6,21 +6,30 @@
         <th>Gene affected</th>
         <th>Kind of mutation</th>
       </tr>
+      <% item.genotypes.each_with_index do |genotype, index| %>
+          <tr id='genotype_row_<%= index %>'>
+            <% f.fields_for :genotypes, genotype do |genotype_form| %>
 
-      <% i=1
-         item.genotypes.each do |genotype| %>
-          <tr id='genotype_row_<%= i %>'>
-            <td> <%= text_field_tag "genotypes[#{i}][gene][title]", genotype.gene.try(:title), :size => 10 %>
-            </td>
-            <td><%= text_field_tag "genotypes[#{i}][modification][title]", genotype.modification.try(:title), :size => 10 %>
-            </td>
-            <td> <%= link_to_function image("destroy", :alt => "Delete", :title => "Delete this entry", :id => "delete_genotype_#{i}"), "fadeGenotypeRow('#{i}')" -%>
-            </td>
+                <td>
+                  <% genotype_form.fields_for :gene, genotype.gene do |gene_form| %>
+                      <%= gene_form.text_field :title, :size => 10 %>
+
+                  <% end %>
+                </td>
+                <td>
+                  <% genotype_form.fields_for :modification, genotype.modification do |modification_form| %>
+                      <%= modification_form.text_field :title, :size => 10 %>
+                  <% end %>
+                </td>
+                <td> <%= link_to_function image("destroy", :alt => "Delete", :title => "Delete this entry", :id => "delete_genotype_#{index}"), "fadeGenotypeRow('#{index}')" -%>
+                </td>
+
+            <% end %>
           </tr>
-          <% i += 1 %>
       <% end %>
 
+
     </table>
-    <img src='/images/famfamfam_silk/add.png' alt="Add more" title="Add more gene and mutation" onclick="addGenotypeRow('genotype_table')"/>
+    <img src='/images/famfamfam_silk/add.png' alt="Add more" title="Add more gene and mutation" onclick="addGenotypeRow('genotype_table','<%=item.class.name.underscore%>')"/>
   </div>
 </center>

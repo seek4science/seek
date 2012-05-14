@@ -44,8 +44,12 @@
   </div>
 
   <div class="yui-g">
-    <%= render :partial => "genotype_form",:locals => {:item=>strain} %>
-    <%= render :partial => "phenotype_form",:locals => {:item=>strain} %>
+    <%form_for :strain, strain, :url => url_for(:controller => 'biosamples', :action => 'create_strain') do |strain_form| %>
+
+        <%= render :partial => "genotype_form",:locals => {:item=>strain,  :f=>strain_form} %>
+        <%= render :partial => "phenotype_form",:locals => {:item=>strain, :f=>strain_form} %>
+    <% end %>
+
   </div>
     <%= hidden_field_tag 'strain[id]', strain.id %>
     <%= hidden_field_tag 'strain[parent_id]', strain.id %>

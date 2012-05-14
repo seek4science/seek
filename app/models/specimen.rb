@@ -10,6 +10,8 @@ class Specimen < ActiveRecord::Base
 
   has_many :genotypes,:dependent => :destroy
   has_many :phenotypes,:dependent => :destroy
+  accepts_nested_attributes_for :genotypes, :allow_destroy => true
+  accepts_nested_attributes_for :phenotypes, :allow_destroy => true
 
   has_many :samples
   has_many :activity_logs, :as => :activity_loggable
