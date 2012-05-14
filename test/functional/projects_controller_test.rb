@@ -196,17 +196,19 @@ class ProjectsControllerTest < ActionController::TestCase
   end
 
   	test "asset_managers displayed in show page" do
-    asset_manager = Factory(:asset_manager)
-    get :show,:id=>asset_manager.projects.first
-		assert_select "div.box_about_actor p.asset_managers" do
-			assert_select "label",:text=>"Asset Managers:",:count=>1
-			assert_select "a",:count=>1
-			assert_select "a[href=?]",person_path(asset_manager),:text=>asset_manager.name,:count=>1
-		end
+      asset_manager = Factory(:asset_manager)
+      login_as asset_manager.user
+      get :show,:id=>asset_manager.projects.first
+      assert_select "div.box_about_actor p.asset_managers" do
+        assert_select "label",:text=>"Asset Managers:",:count=>1
+        assert_select "a",:count=>1
+        assert_select "a[href=?]",person_path(asset_manager),:text=>asset_manager.name,:count=>1
+      end
     end
 
   	test "project_managers displayed in show page" do
 		project_manager = Factory(:project_manager)
+    login_as project_manager.user
     get :show,:id=>project_manager.projects.first
 		assert_select "div.box_about_actor p.project_managers" do
 			assert_select "label",:text=>"Project Managers:",:count=>1
@@ -217,6 +219,7 @@ class ProjectsControllerTest < ActionController::TestCase
 
   test "publishers displayed in show page" do
     publisher = Factory(:publisher)
+    login_as publisher.user
     get :show, :id => publisher.projects.first
     assert_select "div.box_about_actor p.publishers" do
       assert_select "label", :text => "Publishers:", :count => 1
@@ -273,7 +276,10 @@ class ProjectsControllerTest < ActionController::TestCase
   end
 
   test "no asset managers displayed for project with no asset managers" do
-		project = Factory(:project)
+    project = Factory(:project)
+    work_group = Factory(:work_group, :project => project)
+    person = Factory(:person, :group_memberships => [Factory(:group_membership, :work_group => work_group)])
+    login_as person.user
     get :show,:id=>project
 		assert_select "div.box_about_actor p.asset_managers" do
 			assert_select "label",:text=>"Asset Managers:",:count=>1
@@ -283,7 +289,10 @@ class ProjectsControllerTest < ActionController::TestCase
   end
 
   test "no project managers displayed for project with no project managers" do
-		project = Factory(:project)
+    project = Factory(:project)
+    work_group = Factory(:work_group, :project => project)
+    person = Factory(:person, :group_memberships => [Factory(:group_membership, :work_group => work_group)])
+    login_as person.user
     get :show,:id=>project
 		assert_select "div.box_about_actor p.project_managers" do
 			assert_select "label",:text=>"Project Managers:",:count=>1
@@ -293,7 +302,10 @@ class ProjectsControllerTest < ActionController::TestCase
 	end
 
   test "no publishers displayed for project with no publishers" do
-		project = Factory(:project)
+    project = Factory(:project)
+    work_group = Factory(:work_group, :project => project)
+    person = Factory(:person, :group_memberships => [Factory(:group_membership, :work_group => work_group)])
+    login_as person.user
     get :show,:id=>project
 		assert_select "div.box_about_actor p.publishers" do
 			assert_select "label",:text=>"Publishers:",:count=>1
