@@ -267,6 +267,7 @@ fixtures :all
       post :create, :sample => {:title=>"test",
                                 :lab_internal_number =>"Do232",
                                 :donation_date => Date.today,
+                                 :project_ids =>[Factory(:project).id],
                                 :specimen => Factory(:specimen, :contributor => User.current_user)},
              :sharing => valid_sharing,
              :sample_data_file_ids => [Factory(:data_file,:title=>"testDF",:contributor=>User.current_user).id],
