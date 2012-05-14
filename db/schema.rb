@@ -9,7 +9,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20120502094436) do
+ActiveRecord::Schema.define(:version => 20120511134443) do
 
   create_table "activity_logs", :force => true do |t|
     t.string   "action"
@@ -1201,7 +1201,7 @@ ActiveRecord::Schema.define(:version => 20120502094436) do
     t.string   "passage"
     t.string   "viability"
     t.string   "purity"
-    t.boolean  "sex"
+    t.integer  "sex"
     t.datetime "born"
     t.string   "ploidy"
     t.string   "provider_id"

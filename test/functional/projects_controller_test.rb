@@ -242,6 +242,36 @@ class ProjectsControllerTest < ActionController::TestCase
     end
   end
 
+  test "dont display the roles(except pals) for people who are not the members of this showed project" do
+    project = Factory(:project)
+    work_group = Factory(:work_group, :project => project)
+
+    asset_manager = Factory(:asset_manager, :group_memberships => [Factory(:group_membership, :work_group => work_group)])
+    project_manager = Factory(:project_manager, :group_memberships => [Factory(:group_membership, :work_group => work_group)])
+    publisher = Factory(:publisher, :group_memberships => [Factory(:group_membership, :work_group => work_group)])
+    pal = Factory(:pal, :group_memberships => [Factory(:group_membership, :work_group => work_group)])
+
+    a_person = Factory(:person)
+
+    assert !a_person.projects.include?(project)
+
+    login_as(a_person.user)
+    get :show, :id => project
+    assert_select "div.box_about_actor p" do
+      assert_select "label", :text => "Asset Managers:", :count => 0
+      assert_select "a[href=?]", person_path(asset_manager), :text => asset_manager.name, :count => 0
+
+      assert_select "label", :text => "Project Managers:", :count => 0
+      assert_select "a[href=?]", person_path(project_manager), :text => project_manager.name, :count => 0
+
+      assert_select "label", :text => "Publishers:", :count => 0
+      assert_select "a[href=?]", person_path(publisher), :text => publisher.name, :count => 0
+
+      assert_select "label", :text => "SysMO-DB PALs:", :count => 1
+      assert_select "a[href=?]", person_path(pal), :text => pal.name, :count => 1
+    end
+  end
+
 	test "filter projects by person" do
 		get :index, :filter => {:person => 1}
 		assert_response :success

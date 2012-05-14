@@ -35,9 +35,11 @@ module BiosamplesHelper
   end
 
   def strain_row_data strain
+    creator = strain.contributor.try(:person)
+    creator_link = creator ? link_to(creator.name, person_path(creator.id), {:target => '_blank'}) : ""
     [(link_to strain.organism.title, organism_path(strain.organism.id), {:target => '_blank'}),
      (check_box_tag "selected_strain_#{strain.id}", strain.id, false, :onchange => remote_function(:url => {:controller => 'biosamples', :action => 'existing_specimens'}, :with => "'strain_ids=' + getSelectedStrains()", :before=>"show_ajax_loader('existing_specimens')") +";show_existing_specimens();hide_existing_samples();"),
-     strain.title, strain.genotype_info, strain.phenotype_info, strain.id, strain.synonym, strain.comment, strain.parent_strain,
+     strain.title, strain.genotype_info, strain.phenotype_info, strain.id, strain.synonym, creator_link, strain.parent_strain,
      (link_to_remote image("destroy", :alt => "Delete", :title => "Delete this strain"),
                      :url => {:action => "destroy", :controller => 'biosamples', :id => strain.id, :class => 'strain', :id_column_position => 5},
                      :confirm => "Are you sure?", :method => :delete if strain.can_delete?),
