@@ -1,0 +1,25 @@
+<center>
+  <div class="yui-u  box_simple" style="width: 42%;margin-right: 2em; margin-top: 1em; margin-bottom: 1em;">
+    <label style="font-weight: bold; border-bottom: 1px solid #DDD"> Phenotypes:</label>
+
+    <table id='phenotype_table'>
+      <% item.phenotypes.each_with_index do |phenotype,index| %>
+
+          <tr id='phenotype_row_<%= index %>'>
+            <td>
+              <% f.fields_for :phenotypes, phenotype do |phenotype_form| %>
+              <%= phenotype_form.text_field :description, :size=>25 %>
+              <% end %>
+            </td>
+            <td> <%= link_to_function image("destroy", :alt => "Delete", :title => "Delete this entry", :id => "delete_phenotype_#{index}"), "fadePhenotypeRow('#{index}')" -%>
+            </td>
+          </tr>
+
+
+
+      <% end %>
+
+    </table>
+    <img src='/images/famfamfam_silk/add.png' alt="Add more" title="Add more phenotype" onclick="addPhenotypeRow('phenotype_table','<%=item.class.name.underscore%>')"/>
+  </div>
+</center>

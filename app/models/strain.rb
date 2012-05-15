@@ -2,6 +2,8 @@ class Strain < ActiveRecord::Base
   belongs_to :organism
   has_many :genotypes, :dependent => :destroy
   has_many :phenotypes, :dependent => :destroy
+  accepts_nested_attributes_for :genotypes,:allow_destroy=>true
+  accepts_nested_attributes_for :phenotypes,:allow_destroy=>true
   has_many :specimens
 
   named_scope :by_title
@@ -12,6 +14,10 @@ class Strain < ActiveRecord::Base
 
   include ActsAsCachedTree
   acts_as_authorized
+
+  def is_default?
+    title=="default" && is_dummy==true
+  end
 
   def self.default_strain_for_organism organism
     organism = Organism.find(organism) unless organism.is_a?(Organism)

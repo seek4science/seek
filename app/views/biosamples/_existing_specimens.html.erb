@@ -15,10 +15,12 @@
             "aoColumns": [
                 null,
                 { "sWidth": "5%", 'bSortable':false },
-                { "sWidth": "20%" },
                 { "sWidth": "15%" },
-                { "sWidth": "15%" },
-                { "sWidth": "15%" },
+                { "sWidth": "10%" },
+                { "sWidth": "10%" },
+                { "sWidth": "10%" },
+                { "sWidth": "10%" },
+                { "sWidth": "10%" },
                 { "sWidth": "5%" },
                 { "sWidth": "15%" },
                 { "sWidth": "5%", 'bSortable':false },
@@ -40,9 +42,9 @@
            <h2>Cell culture (chemostat or batch)</h2>
       <% end %>
       <% if existing_specimens.empty? -%>
-          <p class="none_text">No <%= CELL_CULTURE_OR_SPECIMEN%>s have yet been defined for the selected strains.</p>
+          <p class="none_text">No <%= CELL_CULTURE_OR_SPECIMEN%>s have yet been defined for the selected organisms and strains.</p>
       <% else -%>
-          <p class="none_text">Please select the <%= CELL_CULTURE_OR_SPECIMEN.capitalize%>s to browse the associated samples.</p>
+          <p class="none_text">Please select the <%= CELL_CULTURE_OR_SPECIMEN%>s to browse the associated samples.</p>
 
           <div class="scroll_box">
             <table cellpadding="0" cellspacing="0" border="0" class="display" id="specimen_table" style="width: 100%">
@@ -53,13 +55,18 @@
                 <th>Title</th>
                 <th>Culture starting date</th>
                 <th>Culture type</th>
-                <th>Creators</th>
+                <th>Genotypes</th>
+                <th>Phenotypes</th>
+                 <th>Creators</th>
+
                 <th>ID</th>
                 <th>Related SOPs</th>
               </tr>
               </thead>
               <tbody>
               <% existing_specimens.each do |specimen| -%>
+
+
                   <tr>
                   <% specimen_row_data = specimen_row_data specimen %>
                   <% specimen_row_data.each do |column_data| %>
