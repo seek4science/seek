@@ -27,7 +27,7 @@ module Acts
       module AuthLookupClassMethods
         def all_authorized_for action, user=User.current_user, projects=nil
           user_id = user.nil? ? 0 : user.id
-          c = lookup_count_for_action_and_user user_id
+          c = lookup_count_for_user user_id
           last_stored_asset_id = last_asset_id_for_user user_id
           last_asset_id = self.last(:order=>:id).try(:id)
           assets = []
@@ -36,7 +36,7 @@ module Acts
             #cannot rely purly on the count, since an item could have been deleted and a new one added
             if (c==count && last_stored_asset_id == last_asset_id)
               Rails.logger.warn("Lookup table #{lookup_table_name} is complete for user_id = #{user_id}")
-              assets = lookup_for_person_and_action action, user_id,projects
+              assets = lookup_for_action_and_user action, user_id,projects
             else
               Rails.logger.warn("Lookup table #{lookup_table_name} is incomplete for user_id = #{user_id} - doing things the slow way")
               #trigger off a full update for that user if the count is zero and items should exist for that type
@@ -64,7 +64,7 @@ module Acts
           ActiveRecord::Base.connection.execute("delete from #{lookup_table_name}")
         end
 
-        def lookup_for_person_and_action action,user_id,projects
+        def lookup_for_action_and_user action,user_id,projects
           #Study's and Assays have to be treated differently, as they are linked to a project through the investigation'
           if (projects.nil? || (self == Study || self == Assay))
             sql = "select asset_id from #{lookup_table_name} where user_id = #{user_id} and can_#{action}=#{ActiveRecord::Base.connection.quoted_true}"
@@ -84,7 +84,7 @@ module Acts
           find_all_by_id(ids)
         end
 
-        def lookup_count_for_action_and_user user_id
+        def lookup_count_for_user user_id
           ActiveRecord::Base.connection.select_one("select count(*) from #{lookup_table_name} where user_id = #{user_id}").values[0].to_i
         end
 
@@ -95,11 +95,12 @@ module Acts
 
         def lookup_for_asset action,user_id,asset_id
           attribute = "can_#{action}"
+          @@expected_true_value ||= ActiveRecord::Base.connection.quoted_true.gsub("'","")
           res = ActiveRecord::Base.connection.select_one("select #{attribute} from #{lookup_table_name} where user_id=#{user_id} and asset_id=#{asset_id}")
           if res.nil?
             nil
           else
-            res[attribute] == ActiveRecord::Base.connection.quoted_true
+            res[attribute]==@@expected_true_value
           end
         end
       end

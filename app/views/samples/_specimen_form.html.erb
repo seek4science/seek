@@ -59,7 +59,7 @@
 
     <br/>
 
-    <%= fancy_multiselect specimen, :sops, :name => 'specimen_sop_ids',:association_class=>Sop, :selected => specimen.sop_masters.map(&:sop_id) -%>
+    <%= fancy_multiselect specimen, :sops, {:name => 'specimen_sop_ids',:association_class=>Sop, :selected => specimen.sop_masters.map(&:sop_id), :hidden=> specimen.sops.blank? ? true : false, :other_projects_checkbox => true} %>
 
     <p>
       <%= render :partial => "assets/author_form", :locals => {:resource_type => 'Specimen',
@@ -67,3 +67,8 @@
                                                                :other_creators => specimen.other_creators} -%>
     </p>
 <% end %>
+
+<script type="text/javascript">
+    show_ajax_loader('strains_of_selected_organism');
+    strains_of_selected_organism($F('organism'), 'sample_specimen_attributes_strain_id', 'sample[specimen_attributes][strain_id]');
+</script>
