@@ -59,7 +59,7 @@
 
     <br/>
 
-    <%= fancy_multiselect specimen, :sops, :name => 'specimen_sop_ids',:association_class=>Sop, :selected => specimen.sop_masters.map(&:sop_id) -%>
+    <%= fancy_multiselect specimen, :sops, {:name => 'specimen_sop_ids',:association_class=>Sop, :selected => specimen.sop_masters.map(&:sop_id), :hidden=> specimen.sops.blank? ? true : false, :other_projects_checkbox => true} %>
 
     <p>
       <%= render :partial => "assets/author_form", :locals => {:resource_type => 'Specimen',
