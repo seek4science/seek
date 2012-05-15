@@ -322,4 +322,10 @@ class AssayTest < ActiveSupport::TestCase
     )
 
   end
+
+  test "contributing_user" do
+      assay = Factory :assay
+      assert assay.contributor
+      assert_equal assay.contributor.user, assay.contributing_user
+  end
 end
