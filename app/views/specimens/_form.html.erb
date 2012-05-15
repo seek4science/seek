@@ -88,7 +88,7 @@
                             :other_creators => @specimen.other_creators
                     } -%>
 
-                   <%= fancy_multiselect @specimen, :sops, :name => 'specimen_sop_ids', :association_class => Sop, :selected => (params[:specimen_sop_ids] || []).map(&:to_i) | @specimen.sop_masters.map(&:sop_id) %>
+                    <%= fancy_multiselect @specimen, :sops, :name => 'specimen_sop_ids',:association_class=>Sop, :selected => (params[:specimen_sop_ids] || []).map(&:to_i) | @specimen.sop_masters.map(&:sop_id), :hidden=> @specimen.sops.blank? ? true : false, :other_projects_checkbox => true %>
           <% end %>
           <%= f.hidden_field :from_biosamples %>
 </div>
@@ -107,3 +107,8 @@
   <% end %>
   or <%= link_to 'Cancel', (@specimen.id ? specimen_path(@specimen.id) : specimens_path) -%>
 </p>
+
+<script type="text/javascript">
+    show_ajax_loader('strains_of_selected_organism');
+    strains_of_selected_organism($F('organism'), 'specimen_strain_id', 'specimen[strain_id]');
+</script>
