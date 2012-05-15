@@ -17,7 +17,7 @@ class Policy < ActiveRecord::Base
   after_save :queue_update_auth_table
 
   def queue_update_auth_table
-    AuthLookupUpdateJob.add_items_to_queue assets
+    AuthLookupUpdateJob.add_items_to_queue(assets) unless assets.empty?
   end
 
   def assets
