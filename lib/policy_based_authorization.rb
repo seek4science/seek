@@ -95,13 +95,12 @@ module Acts
 
         def lookup_for_asset action,user_id,asset_id
           attribute = "can_#{action}"
+          @@expected_true_value ||= ActiveRecord::Base.connection.quoted_true.gsub("'","")
           res = ActiveRecord::Base.connection.select_one("select #{attribute} from #{lookup_table_name} where user_id=#{user_id} and asset_id=#{asset_id}")
           if res.nil?
             nil
           else
-            #checking if the quoted value includes the actual value is to get round mysql including the quotes in selected value, whereas derby doesn't - so can't just directly compare the values
-            #i.e derby returns "t" whereas quoted_true is "'t'", mysql the quoted true is just "1" since it is a number and doesn't need quoting'
-            ActiveRecord::Base.connection.quoted_true.include?(res[attribute])
+            res[attribute]==@@expected_true_value
           end
         end
       end
