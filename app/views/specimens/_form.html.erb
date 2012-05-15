@@ -107,3 +107,8 @@
   <% end %>
   or <%= link_to 'Cancel', (@specimen.id ? specimen_path(@specimen.id) : specimens_path) -%>
 </p>
+
+<script type="text/javascript">
+    show_ajax_loader('strains_of_selected_organism');
+    strains_of_selected_organism($F('organism'), 'specimen_strain_id', 'specimen[strain_id]');
+</script>
