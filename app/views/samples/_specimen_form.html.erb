@@ -69,7 +69,7 @@
 <% end %>
 
 <script type="text/javascript">
-  if ('<%= action.to_s%>' == 'new' ){
+  if ('<%= action.to_s%>' == 'new' && <%= f.error_messages.blank?%> ){
     show_ajax_loader('strains_of_selected_organism');
     strains_of_selected_organism($F('organism'), 'sample_specimen_attributes_strain_id', 'sample[specimen_attributes][strain_id]');
   }

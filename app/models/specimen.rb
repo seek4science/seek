@@ -132,4 +132,7 @@ class Specimen < ActiveRecord::Base
     end
   end
 
+  def organism
+    strain.try(:organism)
+  end
 end
