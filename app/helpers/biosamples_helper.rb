@@ -81,6 +81,6 @@ module BiosamplesHelper
 
     [sample.specimen_info,
      (link_to sample.title, sample_path(sample.id), {:target => '_blank'}),
-     sample.lab_internal_number, sample.sampling_date_info, sample.age_at_sampling, sample.provider_name_info, sample.id, sample.comments, delete_icon, update_icon]
+     sample.lab_internal_number, sample.sampling_date_info, sample.age_at_sampling, sample.provider_name, sample.id, sample.comments, delete_icon, update_icon]
   end
 end
