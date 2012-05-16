@@ -160,6 +160,26 @@ class BiosamplesController < ApplicationController
       end
   end
 
+  def new_strain
+      strain = Strain.new
+      # to delete id hash which is saved in the hidden id field (automatically generated in form with fields_for)
+      try_block {
+        params[:strain][:genotypes_attributes].each_value do |genotype_value|
+          genotype_value.delete_if { |k, v| k=="id" }
+          genotype_value[:gene_attributes].delete_if { |k, v| k=="id" }
+          genotype_value[:modification_attributes].delete_if { |k, v| k=="id" }
+        end
+        params[:strain][:phenotypes_attributes].each_value do |value|
+          value.delete_if { |k, v| k=="id" }
+        end
+      }
+
+      strain.attributes = params[:strain]
+
+
+      strain
+  end
+
   def check_auth_strain
     if params[:specimen] and params[:specimen][:strain_id] and params[:specimen][:strain_id] != "0"
       strain = Strain.find_by_id(params[:specimen][:strain_id].to_i)
