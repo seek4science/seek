@@ -215,7 +215,7 @@ class BioSamplesControllerTest < ActionController::TestCase
 
       new_phenotype_description = 'new phenotype'
       login_as(strain.contributor)
-      put :update_strain, :strain => {:id => strain.id}, :phenotypes => {'0' => {:description => phenotype1.description}, '1' => {:description => new_phenotype_description}}
+      put :update_strain, :strain => {:id => strain.id, :phenotypes_attributes => {'0' => {:description => phenotype1.description}, '1' => {:description => new_phenotype_description}}}
       assert_response :success
 
       updated_strain = Strain.find_by_id strain.id
@@ -232,7 +232,7 @@ class BioSamplesControllerTest < ActionController::TestCase
         new_gene_title = 'new gene'
         new_modification_title = 'new modification'
         login_as(strain.contributor)
-        put :update_strain, :strain => {:id => strain.id}, :genotypes => {'0' => {:gene => {:title => new_gene_title }, :modification => {:title => new_modification_title }}, '1' => {:gene => {:title => genotype2.gene.title}, :modification => {:title => genotype2.modification.title}} }
+        put :update_strain, :strain => {:id => strain.id, :genotypes_attributes => {'0' => {:gene_attributes => {:title => new_gene_title, :id => genotype2.gene.id }, :id=>genotype2.id, :modification_attributes => {:title => new_modification_title }}, '1' => {:gene_attributes => {:title => genotype2.gene.title}, :modification_attributes => {:title => genotype2.modification.title}}, "2"=>{:id => genotype1.id, :_destroy => true}} }
         assert_response :success
 
         updated_strain = Strain.find_by_id strain.id

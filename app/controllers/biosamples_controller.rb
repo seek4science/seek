@@ -26,7 +26,7 @@ class BiosamplesController < ApplicationController
     end
     respond_to do |format|
       format.json{
-        render :json => {:status => 200, :strains => strains.sort_by(&:title).reject{|s| s.is_dummy?}.select(&:can_view?).collect{|strain| [strain.id, strain.info]}}
+        render :json => {:status => 200, :strains => strains.sort_by(&:title).reject{|s| s.is_dummy}.select(&:can_view?).collect{|strain| [strain.id, strain.info]}}
       }
     end
   end
@@ -58,42 +58,6 @@ class BiosamplesController < ApplicationController
   def update_strain
     strain = Strain.find_by_id params[:strain][:id]
     strain.attributes = params[:strain]
-
-    old_phenotypes = strain.phenotypes
-    # Update new phenotypes
-    updated_phenotypes = []
-    phenotypes_params = params["phenotypes"]
-    unless phenotypes_params.blank?
-      phenotypes_params.each_value do |value|
-        phenotype = Phenotype.find(:all, :conditions => ["description=? and strain_id=?", value["description"], strain.id]).first
-        if phenotype
-          updated_phenotypes << phenotype
-        else
-          updated_phenotypes << Phenotype.create(:description => value["description"], :strain_id => strain.id) unless value[:description].blank?
-        end
-      end
-    end
-    #Destroy uneeded phenotypes
-    (old_phenotypes - updated_phenotypes.compact).each { |p| p.destroy }
-
-    old_genotypes = strain.genotypes
-    # Update new genotypes
-    updated_genotypes = []
-    genotypes_params = params["genotypes"]
-    unless genotypes_params.blank?
-      genotypes_params.each_value do |value|
-        gene = Gene.find_by_title(value['gene']['title']) || (Gene.create(:title => value['gene']['title']) unless value['gene']['title'].blank?)
-        modification = Modification.find_by_title(value['modification']['title']) || (Modification.create(:title => value['modification']['title']) unless value['modification']['title'].blank?)
-        genotype = Genotype.find(:all, :conditions => ['gene_id=? and modification_id=? and strain_id=?', gene.id, modification.id, strain.id]).first
-        if genotype
-          updated_genotypes << genotype
-        else
-          updated_genotypes << Genotype.create(:gene_id => gene.id, :modification_id => modification.id, :strain_id => strain.id)
-        end
-      end
-    end
-    #Destroy uneeded genotypes
-    (old_genotypes - updated_genotypes.compact).each { |g| g.destroy }
 
     if params[:sharing]
       strain.policy.set_attributes_with_sharing params[:sharing], strain.projects
@@ -133,7 +97,6 @@ class BiosamplesController < ApplicationController
     specimens_of_strains = []
     strains = []
     specimens_with_default_strain =[]
-    samples_of_specimen_with_default_strain = []
     if params[:strain_ids]
       strain_ids = params[:strain_ids].split(',')
       strain_ids.each do |strain_id|
@@ -153,16 +116,12 @@ class BiosamplesController < ApplicationController
          strains << default_strain
          specimens_with_default_strain = default_strain.specimens.select(&:can_view?)
          specimens_of_strains |= specimens_with_default_strain
-         specimens_with_default_strain.each do |specimen|
-           samples_of_specimen_with_default_strain |= specimen.samples.select(&:can_view?)
-         end
        end
       end
     end
 
     render :update do |page|
         page.replace_html 'existing_specimens', :partial=>"biosamples/existing_specimens",:object=>specimens_of_strains, :locals=>{:strains=>strains}
-        page.replace_html 'existing_samples', :partial=>"biosamples/existing_samples",:object=>samples_of_specimen_with_default_strain,:locals=>{:specimens=>specimens_of_strains}
     end
   end
 
@@ -185,79 +144,6 @@ class BiosamplesController < ApplicationController
     end
   end
 
-  def create_sample_popup
-    sample = Sample.new
-    specimen = Specimen.find_by_id(params[:specimen_id]) || Specimen.new
-    respond_to do  |format|
-      if current_user.try(:person).try(:member?)
-        format.html{render :partial => 'biosamples/create_sample_popup', :locals => {:sample => sample, :specimen => specimen}}
-      else
-        flash[:error] = "You are not authorized to create new sample. Only members of known projects, institutions or work groups are allowed to create new content."
-        format.html {redirect_to :back}
-      end
-    end
-  end
-
-  def create_specimen_sample
-    params[:sharing][:permissions] = nil if params[:sharing]
-
-    sample = Sample.new(params[:sample])
-
-    sop_ids = []
-    is_new_specimen = false
-    specimen = Specimen.find_by_id(params[:specimen][:id])
-    if specimen.nil?
-      is_new_specimen =true
-      specimen = Specimen.new(params[:specimen])
-      sop_ids = (params[:specimen_sop_ids].nil? ? [] : params[:specimen_sop_ids].reject(&:blank?))||[]
-      specimen.policy.set_attributes_with_sharing params[:sharing], sample.projects
-      #if no strain is selected, create/select the default strain
-      if params[:specimen][:strain_id] == '0'
-        strain = Strain.default_strain_for_organism params[:organism_id]
-        specimen.strain = strain
-      end
-      #Add creators
-      AssetsCreator.add_or_update_creator_list(specimen, params[:creators])
-    end
-    sample.policy.set_attributes_with_sharing params[:sharing], sample.projects
-    sample.specimen = specimen
-    render :update do |page|
-      if sample.save
-        sop_ids.each do |sop_id|
-          sop= Sop.find sop_id
-          SopSpecimen.create!(:sop_id => sop_id, :sop_version=> sop.version, :specimen_id=>specimen.id)
-        end
-        page.call 'RedBox.close'
-        if is_new_specimen
-           #also show specimen of the default strain, after this specimen is created(need to ask for this)
-           specimen_array = ['Strain ' + specimen.strain.info + "(ID=#{specimen.strain.id})",
-                            (check_box_tag "selected_specimen_#{specimen.id}", specimen.id, false, {:onchange => remote_function(:url => {:controller => 'biosamples', :action => 'existing_samples'}, :with => "'specimen_ids=' + getSelectedSpecimens()") + ";show_existing_samples();" }),
-                            link_to(specimen.title, specimen_path(specimen.id), {:target => '_blank'}), specimen.born_info, specimen.culture_growth_type.try(:title), specimen.genotype_info,specimen.phenotype_info,specimen.contributor.try(:person).try(:name), specimen.id, asset_version_links(specimen.sops).join(", ")]
-
-            page.call :loadNewSpecimenAfterCreation, specimen_array, specimen.strain.id,specimen.strain.title
-        else
-          sample_array = [sample.specimen_info,
-                          (link_to sample.title, sample_path(sample.id), {:target => '_blank'}),
-                          sample.lab_internal_number, sample.sampling_date_info, sample.age_at_sampling, sample.provider_name_info, sample.id]
-
-          page.call :loadNewSampleAfterCreation, sample_array
-        end
-      else
-        specimen_error_messages = ''
-        specimen.errors.full_messages.each do |e_m|
-          specimen_error_messages << "cell culture #{e_m.downcase}. "
-        end
-        sample_error_messages = ''
-        sample.errors.full_messages.each do |e_m|
-          sample_error_messages << "sample #{e_m.downcase}. "
-        end
-        page.alert("Fail to create: #{specimen_error_messages}#{sample_error_messages}")
-        page['create_specimen_sample'].disabled = false
-        page['create_specimen_sample'].value = 'Create'
-      end
-    end
-  end
-
   def create_strain
       #No need to process if current_user is not a project member, because they cant go here from UI
       if current_user.try(:person).try(:member?)
@@ -274,79 +160,10 @@ class BiosamplesController < ApplicationController
       end
   end
 
-  #if the strain doesnt get changed from UI, just select that strain
-  #otherwise create the new one
-  def select_or_new_strain
-    if params['strain']['id'].blank?
-      new_strain
-    else
-      strain = Strain.find_by_id(params['strain']['id'])
-      if strain
-        attributes = strain.attributes
-        strain_params = params[:strain]
-        flag = true
-        flag =  flag && (compare_attribute attributes['title'], strain_params['title'])
-        flag =  flag && (compare_attribute attributes['organism_id'].to_s, strain_params['organism_id'])
-        flag =  flag && (compare_attribute attributes['synonym'], strain_params['synonym'])
-        flag =  flag && (compare_attribute attributes['comment'], strain_params['comment'])
-        flag =  flag && (compare_attribute attributes['provider_id'].to_s, strain_params['provider_id'])
-        flag =  flag && (compare_attribute attributes['provider_name'], strain_params['provider_name'])
-
-
-
-        genotype_array = []
-        unless params[:strain][:genotypes_attributes].blank?
-          params[:strain][:genotypes_attributes].each_value do |value|
-            genotype_array << [value['gene_attributes']['title'], value['modification_attributes']['title']]
-          end
-        end
-        flag =  flag && (compare_genotypes strain.genotypes.collect{|genotype| [genotype.gene.try(:title), genotype.modification.try(:title)]}, genotype_array )
-
-        phenotype_description = []
-        unless params[:strain][:phenotypes_attributes].blank?
-          params[:strain][:phenotypes_attributes].each_value do |value|
-            phenotype_description << value['description']
-          end
-        end
-        flag =  flag && (compare_attribute strain.phenotypes.collect(&:description).sort, phenotype_description.sort)
-        if flag
-          strain
-        else
-
-          new_strain
-          #strain.attributes = params[:strain] unless flag
-          #strain
-        end
-      end
-    end
-  end
-
-  def compare_attribute attr1, attr2
-    if attr1.blank? and attr2.blank?
-      true
-    elsif attr1 == attr2
-      true
-    else
-      false
-    end
-  end
-
-  def compare_genotypes array1, array2
-    array1.sort!
-    array2.sort!
-    if array1.blank? and array2.blank?
-      true
-    elsif array1 == array2
-      true
-    else
-      false
-    end
-  end
-
   def new_strain
-     strain = Strain.new
-     # to delete id hash which is saved in the hidden id field (automatically generated in form with fields_for)
-     try_block {
+      strain = Strain.new
+      # to delete id hash which is saved in the hidden id field (automatically generated in form with fields_for)
+      try_block {
         params[:strain][:genotypes_attributes].each_value do |genotype_value|
           genotype_value.delete_if { |k, v| k=="id" }
           genotype_value[:gene_attributes].delete_if { |k, v| k=="id" }
@@ -355,34 +172,11 @@ class BiosamplesController < ApplicationController
         params[:strain][:phenotypes_attributes].each_value do |value|
           value.delete_if { |k, v| k=="id" }
         end
-     }
+      }
 
       strain.attributes = params[:strain]
 
-      #phenotypes
-      #phenotypes_params = params["phenotypes"]
-      #phenotype_description = []
-      #unless phenotypes_params.blank?
-      #  phenotypes_params.each_value do |value|
-      #    phenotype_description << value["description"] unless value["description"].blank?
-      #  end
-      #end
-      #phenotype_description.each do |description|
-      #  strain.phenotypes << Phenotype.new(:description => description)
-      #end
-      #
-      ##genotype
-      #genotypes_params = params["genotypes"]
-      #unless genotypes_params.blank?
-      #  genotypes_params.each_value do |value|
-      #    genotype = Genotype.new()
-      #    gene = Gene.find_by_title(value['gene']['title']) || (Gene.new(:title => value['gene']['title']) unless value['gene']['title'].blank?)
-      #    modification = Modification.find_by_title(value['modification']['title']) || (Modification.new(:title => value['modification']['title']) unless value['modification']['title'].blank?)
-      #    genotype.gene = gene
-      #    genotype.modification = modification
-      #    strain.genotypes << genotype unless gene.blank?
-      #  end
-      #end
+
       strain
   end
 

@@ -77,8 +77,8 @@ class SpecimensController < ApplicationController
     @specimen.policy.set_attributes_with_sharing params[:sharing], @specimen.projects
 
     #if no strain is selected, create/select the default strain
-    if params[:specimen][:strain_id] == '0'
-      strain = Strain.default_strain_for_organism params[:organism_id]
+    if params[:specimen][:strain_id] == '0' || params[:specimen][:strain_id] == ''
+      strain = Strain.default_strain_for_organism params[:organism]
       @specimen.strain = strain
     end
 
@@ -140,19 +140,19 @@ class SpecimensController < ApplicationController
         flag =  flag && (compare_attribute attributes['provider_id'].to_s, strain_params['provider_id'])
         flag =  flag && (compare_attribute attributes['provider_name'], strain_params['provider_name'])
         genotype_array = []
-        unless params[:genotypes].blank?
-          params[:genotypes].each_value do |value|
-            genotype_array << [value['gene']['title'], value['modification']['title']]
+        unless params[:strain][:genotypes_attributes].blank?
+          params[:strain][:genotypes_attributes].each_value do |value|
+            genotype_array << [value['gene_attributes']['title'], value['modification_attributes']['title']]
           end
         end
-        flag =  flag && (compare_genotypes strain.genotypes.collect{|genotype| [genotype.gene.try(:title), genotype.modification.try(:title)]}, genotype_array)
+        flag = flag && (compare_genotypes strain.genotypes.collect { |genotype| [genotype.gene.try(:title), genotype.modification.try(:title)] }, genotype_array)
         phenotype_description = []
-        unless params[:phenotypes].blank?
-          params[:phenotypes].each_value do |value|
-            phenotype_description << value['description'] unless value["description"].blank?
+        unless params[:strain][:phenotypes_attributes].blank?
+          params[:strain][:phenotypes_attributes].each_value do |value|
+            phenotype_description << value['description']
           end
         end
-        flag =  flag && (compare_attribute strain.phenotypes.collect(&:description).sort, phenotype_description.sort)
+        flag = flag && (compare_attribute strain.phenotypes.collect(&:description).sort, phenotype_description.sort)
         if flag
           strain
         else
@@ -185,34 +185,23 @@ class SpecimensController < ApplicationController
   end
 
   def new_strain
-      strain = Strain.new()
-      strain.attributes = params[:strain]
+    strain = Strain.new
+    # to delete id hash which is saved in the hidden id field (automatically generated in form with fields_for)
+    try_block {
+      params[:strain][:genotypes_attributes].each_value do |genotype_value|
+        genotype_value.delete_if { |k, v| k=="id" }
+        genotype_value[:gene_attributes].delete_if { |k, v| k=="id" }
+        genotype_value[:modification_attributes].delete_if { |k, v| k=="id" }
+      end
+      params[:strain][:phenotypes_attributes].each_value do |value|
+        value.delete_if { |k, v| k=="id" }
+      end
+    }
 
-      #phenotypes
-      phenotypes_params = params["phenotypes"]
-      phenotype_description = []
-      unless phenotypes_params.blank?
-        phenotypes_params.each_value do |value|
-          phenotype_description << value["description"] unless value["description"].blank?
-        end
-      end
-      phenotype_description.each do |description|
-              strain.phenotypes << Phenotype.new(:description => description)
-      end
+    strain.attributes = params[:strain]
 
-      #genotype
-      genotypes_params = params["genotypes"]
-      unless genotypes_params.blank?
-        genotypes_params.each_value do |value|
-          genotype = Genotype.new()
-          gene = Gene.find_by_title(value['gene']['title']) || (Gene.new(:title => value['gene']['title']) unless value['gene']['title'].blank?)
-          modification = Modification.find_by_title(value['modification']['title']) || (Modification.new(:title => value['modification']['title']) unless value['modification']['title'].blank?)
-          genotype.gene = gene
-          genotype.modification = modification
-          strain.genotypes << genotype unless gene.blank?
-        end
-      end
-      strain
+
+    strain
   end
 
 end

@@ -12,23 +12,9 @@ module BiosamplesHelper
     )
   end
 
-=begin
-   def create_sample_popup_link_old
-          return link_to_remote_redbox(image_tag("famfamfam_silk/add.png") + 'Create new sample and '+ CELL_CULTURE_OR_SPECIMEN,
-      { :url => url_for(:controller => 'biosamples', :action => 'create_sample_popup') ,
-        :failure => "alert('Sorry, an error has occurred.'); RedBox.close();",
-        :with => "'specimen_id=' + getSelectedSpecimens()+'&organism_ids='+$F('strain_organism_ids')",
-        :condition => "checkSelectOneSpecimen('#{CELL_CULTURE_OR_SPECIMEN}')"
-      }
-      #,
-      #:alt => "Click to create a new favourite group (opens popup window)",#options[:tooltip_text],
-      #:title => tooltip_title_attrib("Opens a popup window, where you can create a new favourite<br/>group, add people to it and set individual access rights.") }  #options[:tooltip_text]
-    )  
-   end 
-=end
   
    def create_sample_popup_link
-     link_to image("new") + 'Create new sample and cell culture', new_sample_path(), {:id => 'new_sample_link', :target => '_blank', :onclick => "if (checkSelectOneSpecimen('#{CELL_CULTURE_OR_SPECIMEN}')) {return(true);} else {return(false);}"}
+     link_to image("new") + "Create new sample and #{CELL_CULTURE_OR_SPECIMEN }", new_sample_path(), {:id => 'new_sample_link', :target => '_blank', :onclick => "if (checkSelectOneSpecimen('#{CELL_CULTURE_OR_SPECIMEN}')) {return(true);} else {return(false);}"}
    end
 
   def edit_strain_popup_link strain
@@ -79,6 +65,7 @@ module BiosamplesHelper
   end   
 
   def specimen_row_data specimen
+    id_column = Seek::Config.is_virtualliver ? 8 : 6
     creators = []
     specimen.creators.each do |creator|
       creators << link_to(creator.name, person_path(creator.id), {:target => '_blank'})
@@ -86,7 +73,7 @@ module BiosamplesHelper
     creators << specimen.other_creators unless specimen.other_creators.blank?
 
     delete_icon = specimen.can_delete? ? (link_to_remote image("destroy", :alt => "Delete", :title => "Delete this #{CELL_CULTURE_OR_SPECIMEN}"),
-                         :url => {:action => "destroy", :controller => 'biosamples', :id => specimen.id, :class => 'specimen', :id_column_position => 6},
+                         :url => {:action => "destroy", :controller => 'biosamples', :id => specimen.id, :class => 'specimen', :id_column_position => id_column},
                          :confirm => "Are you sure?", :method => :delete) : nil
     update_icon = nil
     if specimen.can_manage?
@@ -96,14 +83,9 @@ module BiosamplesHelper
     end
     strain = specimen.strain
     strain_info = 'Strain ' + strain.info + "(ID=#{strain.id})"
-    selected = false
-    if strain.is_default?
-      #strain_info = ''
-      selected = true
-    end
 
     [strain_info,
-     (check_box_tag "selected_specimen_#{specimen.id}", specimen.id, selected, {:onchange => remote_function(:url => {:controller => 'biosamples', :action => 'existing_samples'}, :with => "'specimen_ids=' + getSelectedSpecimens()", :before=>"show_ajax_loader('existing_samples')") + ";show_existing_samples();"}),
+     (check_box_tag "selected_specimen_#{specimen.id}", specimen.id, false, {:onchange => remote_function(:url => {:controller => 'biosamples', :action => 'existing_samples'}, :with => "'specimen_ids=' + getSelectedSpecimens()", :before=>"show_ajax_loader('existing_samples')") + ";show_existing_samples();"}),
      link_to(specimen.title, specimen_path(specimen.id), {:target => '_blank'}), specimen.born_info, specimen.culture_growth_type.try(:title), specimen.genotype_info,specimen.phenotype_info,creators.join(", "), specimen.id, asset_version_links(specimen.sops).join(", "), delete_icon, update_icon]
   end
 
