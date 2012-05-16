@@ -8,7 +8,7 @@
         <div class="yui-u first" style="width:66%; float:left">
             <%
             all_publications=authorised_publications.sort_by(&:title)
-            project_publications=all_publications.select{|p| current_user.person.member_of?(p.projects)}
+            project_publications=authorised_publications(current_user.person.projects).sort_by &:title
             select_truncate_length=120
             show_relationships=false -%>
             <p class="pale_text">

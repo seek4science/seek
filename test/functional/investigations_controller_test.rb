@@ -214,5 +214,15 @@ class InvestigationsControllerTest < ActionController::TestCase
     get :index, :filter => {:project => project.id}
     assert_response :success
   end
-  
+
+  test 'should show the contributor avatar' do
+    investigation = Factory(:investigation, :policy => Factory(:public_policy))
+    get :show, :id => investigation
+    assert_response :success
+    assert_select ".author_avatar" do
+      assert_select "a[href=?]",person_path(investigation.contributing_user.person) do
+        assert_select "img"
+      end
+    end
+  end
 end

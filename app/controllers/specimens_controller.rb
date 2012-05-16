@@ -35,10 +35,8 @@ class SpecimensController < ApplicationController
     sop_ids = (params[:specimen_sop_ids].nil?? [] : params[:specimen_sop_ids].reject(&:blank?))||[]
     @specimen.policy.set_attributes_with_sharing params[:sharing], @specimen.projects
 
-       #if no strain is selected, create/select the default strain
-    if params[:specimen][:strain_id] == '0'
-      strain = Strain.default_strain_for_organism params[:organism_id]
-      @specimen.strain = strain
+    if @specimen.strain.nil? && !params[:organism].blank?
+      @specimen.strain = Strain.default_strain_for_organism(params[:organism])
     end
 
     #Add creators
@@ -74,10 +72,8 @@ class SpecimensController < ApplicationController
     @specimen.attributes = params[:specimen]
     @specimen.policy.set_attributes_with_sharing params[:sharing], @specimen.projects
 
-    #if no strain is selected, create/select the default strain
-    if params[:specimen][:strain_id] == '0'
-      strain = Strain.default_strain_for_organism params[:organism_id]
-      @specimen.strain = strain
+    if @specimen.strain.nil? && !params[:organism].blank?
+        @specimen.strain = Strain.default_strain_for_organism(params[:organism])
     end
 
     #update creators
