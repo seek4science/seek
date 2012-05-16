@@ -38,33 +38,44 @@ module Acts
 
       module AuthLookupClassMethods
         def all_authorized_for action, user=User.current_user, projects=nil
-          user_id = user.nil? ? 0 : user.id
-          c = lookup_count_for_action_and_user user_id
-          last_stored_asset_id = last_asset_id_for_user user_id
-          last_asset_id = self.last(:order=>:id).try(:id)
-          assets = []
-          programatic_project_filter = !projects.nil? && (!Seek::Config.auth_lookup_enabled || (self==Assay || self==Study))
-          if Seek::Config.auth_lookup_enabled
-            #cannot rely purly on the count, since an item could have been deleted and a new one added
-            if (c==count && last_stored_asset_id == last_asset_id)
-              Rails.logger.warn("Lookup table #{lookup_table_name} is complete for user_id = #{user_id}")
-              assets = lookup_for_person_and_action action, user_id,projects
-            else
-              Rails.logger.warn("Lookup table #{lookup_table_name} is incomplete for user_id = #{user_id} - doing things the slow way")
-              #trigger off a full update for that user if the count is zero and items should exist for that type
-              if (c==0 && !last_asset_id.nil?)
-                AuthLookupUpdateJob.add_items_to_queue user
+          if Seek::Config.auth_caching_enabled
+            assets = if projects
+              if reflection = reflect_on_association(:projects) && reflection.macro(:has_and_belongs_to_many)
+                self.class.find(:all, :include => :projects, :conditions => ["#{reflection.options[:join_table]}.project_id IN (?)", projects.map(&:id)])
+              else
+                all.select {|asset| !(asset.projects & projects).empty?}
               end
-              assets = all.select { |df| df.send("can_#{action}?") }
-              programatic_project_filter = !projects.nil?
             end
+            assets.select(&"can_#{action}?".to_sym)
           else
-            assets = all.select { |df| df.send("can_#{action}?") }
-          end
-          if programatic_project_filter
-            assets.select{|a| !(a.projects & projects).empty?}
-          else
-            assets
+            user_id = user.nil? ? 0 : user.id
+            c = lookup_count_for_action_and_user user_id
+            last_stored_asset_id = last_asset_id_for_user user_id
+            last_asset_id = self.last(:order => :id).try(:id)
+            assets = []
+            programatic_project_filter = !projects.nil? && (!Seek::Config.auth_lookup_enabled || (self==Assay || self==Study))
+            if Seek::Config.auth_lookup_enabled
+              #cannot rely purly on the count, since an item could have been deleted and a new one added
+              if (c==count && last_stored_asset_id == last_asset_id)
+                Rails.logger.warn("Lookup table #{lookup_table_name} is complete for user_id = #{user_id}")
+                assets = lookup_for_person_and_action action, user_id, projects
+              else
+                Rails.logger.warn("Lookup table #{lookup_table_name} is incomplete for user_id = #{user_id} - doing things the slow way")
+                #trigger off a full update for that user if the count is zero and items should exist for that type
+                if (c==0 && !last_asset_id.nil?)
+                  AuthLookupUpdateJob.add_items_to_queue user
+                end
+                assets = all.select { |df| df.send("can_#{action}?") }
+                programatic_project_filter = !projects.nil?
+              end
+            else
+              assets = all.select { |df| df.send("can_#{action}?") }
+            end
+            if programatic_project_filter
+              assets.select { |a| !(a.projects & projects).empty? }
+            else
+              assets
+            end
           end
         end
 
@@ -116,6 +127,10 @@ module Acts
         end
       end
 
+      def auth_key user, action
+        [user.try(:person).try(:cache_key), "can_#{action}?", cache_key]
+      end
+
       AUTHORIZATION_ACTIONS.each do |action|
         if Seek::Config.auth_caching_enabled
           eval <<-END_EVAL
@@ -123,8 +138,7 @@ module Acts
             if self.new_record?
               return true
             else
-              key = [user.try(:person).try(:cache_key), "can_#{action}?", self.cache_key]
-              Rails.cache.fetch(key) {perform_auth(user,"#{action}") ? :true : :false} == :true
+              Rails.cache.fetch(auth_key(user, "#{action}") {perform_auth(user,"#{action}") ? :true : :false} == :true
             end
           end
           END_EVAL
