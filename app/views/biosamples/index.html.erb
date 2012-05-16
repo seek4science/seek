@@ -46,6 +46,41 @@
     var organism = new Array();
     check_show_existing_strains('strain_organism_ids', 'existing_strains', '<%=url_for(:controller => 'biosamples', :action => 'existing_strains')-%>');
 
+    function selectAll(table){
+        var table_name = table;
+        var table = eval(table);
+        var aTrs = table.fnGetNodes();
+        for ( var i=0 ; i<aTrs.length ; i++ )
+        {
+            aTrs[i].cells[0].firstChild.checked = true;
+        };
+        if (table_name == 'strain_table'){
+            <%=remote_function(:url => {:controller => 'biosamples', :action => 'existing_specimens'}, :with => "'strain_ids=' + getSelectedStrains()", :before=>"show_ajax_loader('existing_specimens')");%>
+            show_existing_specimens();
+            hide_existing_samples();
+        }else if (table_name == 'specimen_table'){
+            <%=remote_function(:url => {:controller => 'biosamples', :action => 'existing_samples'}, :with => "'specimen_ids=' + getSelectedSpecimens()",:before=>"show_ajax_loader('existing_samples')");%>
+            show_existing_samples();
+        }
+    }
+
+    function deselectAll(table){
+        var table_name = table;
+        var table = eval(table);
+        var aTrs = table.fnGetNodes();
+        for ( var i=0 ; i<aTrs.length ; i++ )
+        {
+            aTrs[i].cells[0].firstChild.checked = false;
+        };
+        if (table_name == 'strain_table'){
+            <%=remote_function(:url => {:controller => 'biosamples', :action => 'existing_specimens'}, :with => "'strain_ids=' + getSelectedStrains()", :before=>"show_ajax_loader('existing_specimens')");%>
+            show_existing_specimens();
+            hide_existing_samples();
+        }else if (table_name == 'specimen_table'){
+            <%=remote_function(:url => {:controller => 'biosamples', :action => 'existing_samples'}, :with => "'specimen_ids=' + getSelectedSpecimens()", :before=>"show_ajax_loader('existing_samples')");%>
+        }
+    }
+
     function removeRowAfterDestroy(table, id, id_column_position) {
         var table = eval(table)
         var data = table.fnGetData();
