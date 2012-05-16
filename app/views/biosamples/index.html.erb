@@ -148,7 +148,7 @@
                 //if the first column is updated, refresh the table
                 else{
                     <%=remote_function(:url => {:controller => 'biosamples', :action => 'existing_samples'}, :with => "'specimen_ids=' + getSelectedSpecimens()");%>
-                    hide_existing_samples();
+                    show_existing_samples();
                     break;
                 }
             }
