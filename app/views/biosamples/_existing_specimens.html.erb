@@ -35,7 +35,6 @@
 </script>
 
 <div id="existing_specimens">
-  <% unless strains.blank? %>
       <% if Seek::Config.is_virtualliver %>
            <h2>Specimen</h2>
       <% else %>
@@ -78,16 +77,15 @@
             </table>
           </div>
       <% end -%>
-      <% if logged_in? and current_user.person.member? %>
-          <ul class="sectionIcons">
-            <li><%= create_sample_popup_link -%></li>
+  <% if logged_in? and current_user.person.member? %>
+            <ul class="sectionIcons">
+              <li><%= create_sample_popup_link -%></li>
+              <br/>
+              <br/>
+              (create a new sample and <%= CELL_CULTURE_OR_SPECIMEN %>, or create a new sample for the selected <%= CELL_CULTURE_OR_SPECIMEN %>)
+            </ul>
             <br/>
-            <br/>
-            (create a new sample and <%= CELL_CULTURE_OR_SPECIMEN %>, or create a new sample for the selected <%= CELL_CULTURE_OR_SPECIMEN %>)
-          </ul>
-          <br/>
-      <% end %>
-  <% end -%>
+  <% end %>
 </div>
 
 

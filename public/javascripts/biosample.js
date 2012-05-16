@@ -68,7 +68,7 @@ function getSelectedStrains() {
     if (strain_table.length != 0){
         var selected_strain_rows = fnGetSelected(strain_table);
         for (var i=0; i< selected_strain_rows.length; i++){
-            var id_index = getAttributeColumn("ID",strain_table);
+            var id_index = getAttributeColumn(strain_table,"ID");
             strain_ids.push(strain_table.fnGetData(selected_strain_rows[i])[id_index+1]);
         }
     }
@@ -80,14 +80,14 @@ function getSelectedSpecimens() {
     if (specimen_table.length != 0){
         var selected_specimen_rows = fnGetSelected(specimen_table);
         for (var i=0; i< selected_specimen_rows.length; i++){
-            var id_index = getAttributeColumn("ID",specimen_table);
+            var id_index = getAttributeColumn(specimen_table,"ID");
             specimen_ids.push(specimen_table.fnGetData(selected_specimen_rows[i])[id_index+1]);
         }
     }
     return specimen_ids.join(',');
 }
 /*get the column number of attribute in the table*/
-function getAttributeColumn( attribute, table){
+function getAttributeColumn( table,attribute){
     var th_columns =  document.evaluate('//table[@id="'+ table.fnSettings().sTableId +'"]/thead/tr/th',document, null, XPathResult.ORDERED_NODE_SNAPSHOT_TYPE, null );
     for (var l = 0; l < th_columns.snapshotLength; l++){
          if(th_columns.snapshotItem(l).innerHTML==attribute){
@@ -203,7 +203,9 @@ function validateStrainFields(action){
         $('possible_strain_project_ids').focus();
         return(false);
     }
-
+    if (!validateGenoTypeFields() || !validatePhenoTypeFields()) {
+        return(false);
+    }
     if(action == 'edit'){
         $('edit_strain').disabled = true;
         $('edit_strain').value = 'Updating...'
@@ -213,7 +215,6 @@ function validateStrainFields(action){
         $('create_strain').value = 'Creating...'
     }
     return true;
-}
 }
 function validateGenoTypeFields(){
     var genotype_genes = document.getElementsByName("strain[genotypes_attributes][][gene_attributes][title]");
@@ -237,9 +238,9 @@ function validatePhenoTypeFields(){
            }
        }
        return true;
-
-function strains_of_selected_organism(organism_id){
-    var updated_selection_box = "<select id='specimen_strain_id'>"
+}
+function strains_of_selected_organism(organism_id, strain_selection_box_id, strain_selection_box_name){
+      var updated_selection_box = '<select id=\''+ strain_selection_box_id +'\' name=\''+ strain_selection_box_name +'\'>';
         updated_selection_box += "<option value='0'>Select Strain ...</option>";
         url = "/biosamples/strains_of_selected_organism"
         request = new Ajax.Request(url, {
@@ -253,7 +254,7 @@ function strains_of_selected_organism(organism_id){
                 if (data.status == 200){
                     var strains = data.strains
                     for (var i=0; i< strains.length; i++){
-                        updated_selection_box += '<option value="\''+ strains[i][0] + '\'">'+ strains[i][1] +'</option>';
+                        updated_selection_box += '<option value=\''+ strains[i][0] + '\'>'+ strains[i][1] +'</option>';
 
                    }
                 }

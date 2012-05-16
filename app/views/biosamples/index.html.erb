@@ -72,7 +72,7 @@
                 //if the first column is updated, refresh the table
                 else{
                     if (table_name == 'strain_table' ){
-                        check_show_existing_strains('strain_organism_ids', 'existing_strains', '<%=url_for(:controller => 'biosamples', :action => 'existing_strains')-%>');
+                        check_show_existing_items('strain_organism_ids', 'existing_strains', '<%=url_for(:controller => 'biosamples', :action => 'existing_strains')-%>');
                         break;
                     }else if(table_name == 'specimen_table'){
                         <%=remote_function(:url => {:controller => 'biosamples', :action => 'existing_specimens'}, :with => "'strain_ids=' + getSelectedStrains()");%>
@@ -108,15 +108,15 @@
                 }
             }
             else{
-               check_show_existing_strains('strain_organism_ids', 'existing_strains', '<%=url_for(:controller => 'biosamples', :action => 'existing_strains')-%>');
+               check_show_existing_items('strain_organism_ids', 'existing_strains', '<%=url_for(:controller => 'biosamples', :action => 'existing_strains')-%>');
             }
         }
         else {
-            check_show_existing_strains('strain_organism_ids', 'existing_strains', '<%=url_for(:controller => 'biosamples', :action => 'existing_strains')-%>');
+            check_show_existing_items('strain_organism_ids', 'existing_strains', '<%=url_for(:controller => 'biosamples', :action => 'existing_strains')-%>');
         }
     }
 
-    function loadNewSpecimenAfterCreation(specimen, strain_id,strain_title) {
+    function loadNewSpecimenAfterCreation(specimen, strain_id,is_dummy_strain) {
         if(specimen_table.length > 0) {
             var data = specimen_table.fnGetData();
             if (data.length > 0){
@@ -132,17 +132,10 @@
                     specimen_table.fnAddData(specimen);
                 }
             }
-            else{
-                if(getSelectedStrains().include(strain_id) || strain_title=="default" ) {
-                <%=remote_function(:url => {:controller => 'biosamples', :action => 'existing_specimens'}, :with => "'strain_ids=' + getSelectedStrains()+ '&organism_ids='+$F('strain_organism_ids')");%>
-                show_existing_specimens();
-                }
-            }            
-        } else {
-        if(getSelectedStrains().include(strain_id) || strain_title=="default" ) {
-                <%=remote_function(:url => {:controller => 'biosamples', :action => 'existing_specimens'}, :with => "'strain_ids=' + getSelectedStrains()");%>
-                show_existing_specimens();
-        }
+       }
+        if(getSelectedStrains().include(strain_id) || is_dummy_strain=="true" ) {
+            <%=remote_function(:url => {:controller => 'biosamples', :action => 'existing_specimens'}, :with => "'strain_ids=' + getSelectedStrains()+ '&organism_ids='+$F('strain_organism_ids')");%>
+            show_existing_specimens();
         }
     }
 

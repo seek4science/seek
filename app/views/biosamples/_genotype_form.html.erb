@@ -1,3 +1,6 @@
+<%= javascript_include_tag 'strain.js', 'biosample.js' %>
+<%= stylesheet_link_tag  "biosamples" %>
+<% parent_name ||= item.class.name.underscore%>
 <center>
   <div class="yui-u first  box_simple" style="width: 42%; margin-left: 2em; margin-top: 1em; margin-bottom: 1em;">
     <label style="font-weight: bold; border-bottom: 1px solid #DDD"> Genotypes:</label>
@@ -30,6 +33,6 @@
 
 
     </table>
-    <img src='/images/famfamfam_silk/add.png' alt="Add more" title="Add more gene and mutation" onclick="addGenotypeRow('genotype_table','<%=item.class.name.underscore%>')"/>
+    <img src='/images/famfamfam_silk/add.png' alt="Add more" title="Add more gene and mutation" onclick="addGenotypeRow('genotype_table','<%=parent_name%>')"/>
   </div>
 </center>

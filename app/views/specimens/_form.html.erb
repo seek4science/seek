@@ -63,7 +63,7 @@
               <%= f.label "Organism:" -%><span class="required">*</span> <br/>
               <%= select_tag :organism,
                                     options_for_select([["Not specified",""]] + Organism.all(:order=>:title).collect{|o| [o.title,o.id]},@specimen.organism.try(:id)),
-                                    :onchange=>"show_ajax_loader('strains_of_selected_organism');strains_of_selected_organism(this.value);" -%>
+                                    :onchange=>"show_ajax_loader('strains_of_selected_organism');strains_of_selected_organism(this.value, 'specimen_strain_id', 'specimen[strain_id]');" -%>
           </p>
 
           <p>
