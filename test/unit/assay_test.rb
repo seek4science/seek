@@ -330,4 +330,10 @@ class AssayTest < ActiveSupport::TestCase
     assert_not_equal exp_assay.model_masters,exp_assay.related_models
     assert_equal [], exp_assay.related_models
   end
+
+  test "contributing_user" do
+      assay = Factory :assay
+      assert assay.contributor
+      assert_equal assay.contributor.user, assay.contributing_user
+  end
 end

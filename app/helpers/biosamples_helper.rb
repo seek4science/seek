@@ -36,12 +36,14 @@ module BiosamplesHelper
   end
 
   def strain_row_data strain
+    creator = strain.contributor.try(:person)
+    creator_link = creator ? link_to(creator.name, person_path(creator.id), {:target => '_blank'}) : ""
     [(link_to strain.organism.title, organism_path(strain.organism.id), {:target => '_blank'}),
      (check_box_tag "selected_strain_#{strain.id}", strain.id, false, :onchange => strain_checkbox_onchange_function)   ,
-     strain.title, strain.genotype_info, strain.phenotype_info, strain.id, strain.synonym, strain.comment, strain.parent_strain,
+     strain.title, strain.genotype_info, strain.phenotype_info, strain.id, strain.synonym, creator_link, strain.parent_strain,
      (link_to_remote image("destroy", :alt => "Delete", :title => "Delete this strain"),
                      :url => {:action => "destroy", :controller => 'biosamples', :id => strain.id, :class => 'strain', :id_column_position => 5},
-                     :confirm => "Are you sure?", :method => :delete if strain.can_delete?),
+                     :confirm => "Are you sure you want to delete this strain?", :method => :delete if strain.can_delete?),
      edit_strain_popup_link(strain)]
   end
   
@@ -74,7 +76,7 @@ module BiosamplesHelper
 
     delete_icon = specimen.can_delete? ? (link_to_remote image("destroy", :alt => "Delete", :title => "Delete this #{CELL_CULTURE_OR_SPECIMEN}"),
                          :url => {:action => "destroy", :controller => 'biosamples', :id => specimen.id, :class => 'specimen', :id_column_position => id_column},
-                         :confirm => "Are you sure?", :method => :delete) : nil
+                         :confirm => "Are you sure you want to delete this cell culture?", :method => :delete) : nil
     update_icon = nil
     if specimen.can_manage?
       update_icon = link_to image("manage"), edit_specimen_path(specimen) + "?from_biosamples=true", {:title => "Manage this #{CELL_CULTURE_OR_SPECIMEN}", :target => '_blank'}
@@ -92,7 +94,7 @@ module BiosamplesHelper
   def sample_row_data sample
     delete_icon = sample.can_delete? ? (link_to_remote image("destroy", :alt => "Delete", :title => "Delete this sample"),
                              :url => {:action => "destroy", :controller => 'biosamples', :id => sample.id, :class => 'sample', :id_column_position => 6},
-                             :confirm => "Are you sure?", :method => :delete) : nil
+                             :confirm => "Are you sure you want to delete this sample?", :method => :delete) : nil
     update_icon = nil
     if sample.can_manage?
       update_icon = link_to image("manage"), edit_sample_path(sample) + "?from_biosamples=true", {:title => "Manage this sample", :target => '_blank'}
@@ -102,6 +104,6 @@ module BiosamplesHelper
 
     [sample.specimen_info,
      (link_to sample.title, sample_path(sample.id), {:target => '_blank'}),
-     sample.lab_internal_number, sample.sampling_date_info, sample.age_at_sampling, sample.provider_name_info, sample.id, sample.comments, delete_icon, update_icon]
+     sample.lab_internal_number, sample.sampling_date_info, sample.age_at_sampling, sample.provider_name, sample.id, sample.comments, delete_icon, update_icon]
   end
 end

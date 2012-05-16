@@ -23,7 +23,7 @@
 
 <br/>
 <div class='yui-g'>
-  <div class='yui-u first' style="margin-left: 0.5em;margin-top: 1em">
+  <div class='yui-u first' style="width: 48%;margin-left: 0.5em;margin-top: 1em">
   <h2>Organism</h2>
   <p class="none_text">Please select the organisms to browse the associated strains</p>
   <%= select_tag "strain[organism_ids]",
@@ -32,7 +32,7 @@
                                               :multiple => true,:size=>15,:style=>"width:75%"} -%>
 
   </div>
-  <div class='yui-u' id="existing_strains" style="margin-right: 0.5em"></div>
+  <div class='yui-u' id="existing_strains" style="width: 48%;margin-right: 0.5em"></div>
 </div>
 <div class="yui-g">
   <div class="yui-u first" id="existing_specimens" style="width: 48%;margin-left: 0.5em"></div>
@@ -57,32 +57,64 @@
         }
     }
 
-    function updateRow(table, row_data, id_column_position){
-        var table_name = table;
-        var table = eval(table)
-        var data = table.fnGetData();
+    function updateStrainRow(row_data, id_column_position){
+        var data = strain_table.fnGetData();
         for (var i = 0; i < data.length; i++) {
             //look for the position which is updated
             if (data[i][id_column_position] == row_data[id_column_position]){
-                //if first column hasn't been changed
+                //if first column hasn't been changed, update row, but without checkbox column (second column)
                 if (data[i][0] == row_data[0]){
-                    table.fnUpdate(row_data, i, 0);
-                    break;
+                    for (var j =2; j<row_data.length; j++){
+                        strain_table.fnUpdate(row_data[j], i, j);
+                    }
                 }
                 //if the first column is updated, refresh the table
                 else{
-                    if (table_name == 'strain_table' ){
-                        check_show_existing_items('strain_organism_ids', 'existing_strains', '<%=url_for(:controller => 'biosamples', :action => 'existing_strains')-%>');
-                        break;
-                    }else if(table_name == 'specimen_table'){
-                        <%=remote_function(:url => {:controller => 'biosamples', :action => 'existing_specimens'}, :with => "'strain_ids=' + getSelectedStrains()");%>
-                        show_existing_specimens();
-                        break;
-                    }else if (table_name == 'sample_table'){
-                         <%=remote_function(:url => {:controller => 'biosamples', :action => 'existing_samples'}, :with => "'specimen_ids=' + getSelectedSpecimens()");%>
-                         show_existing_samples();
-                        break;
+                    check_show_existing_items('strain_organism_ids', 'existing_strains', '<%=url_for(:controller => 'biosamples', :action => 'existing_strains')-%>');
+                    hide_existing_specimens();
+                    hide_existing_samples();
+                    break;
+                }
+            }
+        }
+    }
+
+    function updateSpecimenRow(row_data, id_column_position){
+        var data = specimen_table.fnGetData();
+        for (var i = 0; i < data.length; i++) {
+            //look for the position which is updated
+            if (data[i][id_column_position] == row_data[id_column_position]){
+                //if first column hasn't been changed, update row, but without checkbox column (second column)
+                if (data[i][0] == row_data[0]){
+                    for (var j =2; j<row_data.length; j++){
+                        specimen_table.fnUpdate(row_data[j], i, j);
                     }
+                }
+                //if the first column is updated, refresh the table
+                else{
+                    <%=remote_function(:url => {:controller => 'biosamples', :action => 'existing_specimens'}, :with => "'strain_ids=' + getSelectedStrains()");%>
+                    show_existing_specimens();
+                    hide_existing_samples();
+                    break;
+                }
+            }
+        }
+    }
+
+    function updateSampleRow(row_data, id_column_position){
+        var data = sample_table.fnGetData();
+        for (var i = 0; i < data.length; i++) {
+            //look for the position which is updated
+            if (data[i][id_column_position] == row_data[id_column_position]){
+                //if first column hasn't been changed, update row
+                if (data[i][0] == row_data[0]){
+                    sample_table.fnUpdate(row_data, i, 0);
+                }
+                //if the first column is updated, refresh the table
+                else{
+                    <%=remote_function(:url => {:controller => 'biosamples', :action => 'existing_samples'}, :with => "'specimen_ids=' + getSelectedSpecimens()");%>
+                    hide_existing_samples();
+                    break;
                 }
             }
         }

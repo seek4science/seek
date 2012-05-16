@@ -66,7 +66,7 @@ class BiosamplesController < ApplicationController
       if strain.save
         strain.reload
         page.call 'RedBox.close'
-        page.call :updateRow, 'strain_table', strain_row_data(strain), 5
+        page.call :updateStrainRow, strain_row_data(strain), 5
       else
         page.alert("Fail to create new strain. #{strain.errors.full_messages}")
       end

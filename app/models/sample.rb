@@ -59,7 +59,7 @@ class Sample < ActiveRecord::Base
 
   grouped_pagination :pages=>("A".."Z").to_a, :default_page => Seek::Config.default_page(self.name.underscore.pluralize)
 
-  HUMANIZED_COLUMNS = Seek::Config.is_virtualliver ? {} : {:lab_internal_number=> "lab internal identifier", :provider_id => "provider's sample identifier"}
+  HUMANIZED_COLUMNS = {:title => "Sample name", :lab_internal_number=> "Sample lab internal identifier", :provider_id => "Provider's sample identifier"}
 
   searchable do
     text :searchable_terms

@@ -248,7 +248,7 @@ end
 
 #Model
   Factory.define(:model) do |f|
-    f.title "A Model"
+    f.sequence(:title) {|n| "A Model #{n}"}
     f.projects {[Factory.build(:project)]}
     f.association :contributor, :factory => :user
     f.after_create do |model|
@@ -258,7 +258,7 @@ end
 
 #Publication
   Factory.define(:publication) do |f|
-    f.title "A Model"
+    f.sequence(:title) {|n| "A Publication #{n}"}
     f.pubmed_id 1
     f.projects {[Factory.build(:project)]}
     f.association :contributor, :factory => :user
@@ -266,7 +266,7 @@ end
 
 #Presentation
   Factory.define(:presentation) do |f|
-    f.title "A Presentation"
+    f.sequence(:title) {|n| "A Presentation #{n}"}
     f.projects {[Factory.build :project]}
    # f.data_url "http://www.virtual-liver.de/images/logo.png"
     f.association :contributor,:factory=>:user

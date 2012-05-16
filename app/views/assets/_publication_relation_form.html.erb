@@ -7,7 +7,8 @@
     <div id="publications_fold_content" class="foldContent" style="display:<%= related_publications.blank? ? 'none' : 'block' -%>">
         <div class="yui-u first" style="width:66%; float:left">
             <%
-            project_publications=authorised_publications(current_user.person.projects).sort_by(&:title)
+            all_publications=authorised_publications.sort_by(&:title)
+            project_publications=authorised_publications(current_user.person.projects).sort_by &:title
             select_truncate_length=120
             show_relationships=false -%>
             <p class="pale_text">
@@ -31,6 +32,7 @@
                 <%= select_tag :publication_relationship_type, options_for_select([["None",0]]) %>
                 <% end -%>
                 <br/>
+              <%= check_box_tag :include_other_project_publications, nil, false, {:onchange=>"toggle_publication_list();",:style=>"margin-top:0.5em;"} -%> Associate Publications from other projects?
             </div>
 			<br/>
             <%= link_to_function (image("new") + " Associate with this #{resource_type}"), "addSelectedPublication(); return(false);", :id=>"add_publication_link", :class=>"block_link" %>
@@ -39,7 +41,43 @@
     </div>
 </div>
 <script type="text/javascript">
-    
+    function toggle_publication_list() {
+            var checked = $('include_other_project_publications').checked;
+            var selection_box = $('possible_publications');
+            var option;
+
+            selection_box.options.length=0;
+
+            if (checked) {
+        <% ([["Select Publication...",0]]|all_publications.collect{|s| [truncate(h(s.title),:length=>select_truncate_length),s.id]}).each do |details| -%>
+                option = document.createElement("OPTION");
+                option.text = '<%= escape_javascript(details[0]) -%>';
+                option.value = '<%= details[1] -%>';
+                try {
+                  selection_box.add(option); //for older IE version
+                }
+                catch (ex) {
+                  selection_box.add(option, null);
+                }
+        <% end -%>
+            }
+            else {
+        <% ([["Select Publication ...",0]]|project_publications.collect{|s| [truncate(h(s.title),:length=>select_truncate_length),s.id]}).each do |details| -%>
+                option = document.createElement("OPTION");
+                option.text = '<%= escape_javascript(details[0]) -%>';
+                option.value = '<%= details[1] -%>';
+                try {
+                  selection_box.add(option); //for older IE version
+                }
+                catch (ex) {
+                  selection_box.add(option, null);
+                }
+        <% end -%>
+            }
+            selection_box.selectedIndex=0;
+            selection_box.onchange();
+          }
+
     <% related_publications.each do |publication| -%>    
       <% if publication.can_view?-%>
           publication_id = '<%= publication.id -%>';

@@ -28,7 +28,7 @@ class ApplicationController < ActionController::Base
   around_filter :with_current_user
   def with_current_user
     User.with_current_user current_user do
-      yield
+        yield
     end
   end
 

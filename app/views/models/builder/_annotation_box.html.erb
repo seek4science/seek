@@ -17,7 +17,7 @@
         <%= title -%>
       </div>
       <div style="float: right; vertical-align: middle">
-        <img id="<%= chevron_id -%>" title="Show/Hide" src="/images/jws/expand.gif" border="0" height="14" alt="Show/Hide" width="13"/>
+        <%= image_tag "jws/expand.gif", :border=>"0",:height=>"14",:alt=>"Show/Hide",:width=>"13", :id=>chevron_id-%>
       </div>
     </div>
     <div id="<%= panel_id -%>" class="squareboxcontent" style="display: none">
@@ -71,7 +71,7 @@
       </p>
     </div>
   </div>
-  <img src="/images/jws/shadow2.gif" height="10" alt="" width="100%"/>
+  <%= simple_image_tag_for_key "jws_shadow",:height=>"10",:width=>"100%" -%>
 </div>
 
 <script type="text/javascript">

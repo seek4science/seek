@@ -312,5 +312,16 @@ class StudiesControllerTest < ActionController::TestCase
     get :edit, :id => study.id
   end
 
+  test 'should show the contributor avatar' do
+    study = Factory(:study, :policy => Factory(:public_policy))
+    get :show, :id => study
+    assert_response :success
+    assert_select ".author_avatar" do
+      assert_select "a[href=?]",person_path(study.contributing_user.person) do
+        assert_select "img"
+      end
+    end
+  end
+
 
 end
