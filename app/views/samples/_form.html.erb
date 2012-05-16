@@ -7,7 +7,7 @@
 <%= f.error_messages %>
 
 <% unless action == :new && !@sample.specimen.new_record?%>
-<%= render :partial => "samples/specimen_form", :locals => {:f => f, :specimen => @sample.specimen}%>
+<%= render :partial => "samples/specimen_form", :locals => {:f => f, :specimen => @sample.specimen, :action => action}%>
 <% end %>
 
 <h2>Sample Details</h2>
