@@ -139,7 +139,7 @@ module Acts
             if self.new_record?
               return true
             else
-              Rails.cache.fetch(auth_key(user, "#{action}") {perform_auth(user,"#{action}") ? :true : :false} == :true
+              Rails.cache.fetch(auth_key(user, "#{action}")) {perform_auth(user,"#{action}") ? :true : :false} == :true
             end
           end
           END_EVAL
