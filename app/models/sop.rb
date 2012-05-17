@@ -4,7 +4,7 @@ require 'grouped_pagination'
 require 'title_trimmer'
 require 'acts_as_versioned_resource'
 
-class op < ActiveRecord::Base
+class Sop < ActiveRecord::Base
 
   acts_as_asset
   acts_as_trashable
