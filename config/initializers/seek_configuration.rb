@@ -35,8 +35,6 @@ Seek::Config.default :home_description, 'Some (configurable) information about t
 Seek::Config.default :publish_button_enabled,false
 Seek::Config.default :auth_lookup_enabled,true
 
-Seek::Config.default :presentations_enabled,true
-
 # Branding
 Seek::Config.default :project_name,'SysMO'
 Seek::Config.default :project_type,'Consortium'
