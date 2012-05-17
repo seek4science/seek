@@ -32,17 +32,14 @@ module Acts
         def all_authorized_for action, user=User.current_user, projects=nil
           projects=Array(projects) unless projects.nil?
           user_id = user.nil? ? 0 : user.id
-          last_asset_id = self.last(:order=>:id).try(:id)
           assets = []
           programatic_project_filter = !projects.nil? && (!Seek::Config.auth_lookup_enabled || (self==Assay || self==Study))
           if Seek::Config.auth_lookup_enabled
-            if (lookup_table_constistent?(user_id))
-              Rails.logger.info("Lookup table #{lookup_table_name} is complete for user_id = #{user.try(:id)}")
+            if (lookup_table_consistent?(user_id))
+              Rails.logger.info("Lookup table #{lookup_table_name} is complete for user_id = #{user_id}")
               assets = lookup_for_action_and_user action, user_id,projects
             else
-              Rails.logger.info("Lookup table #{lookup_table_name} is incomplete for user_id = #{user.try(:id)} - doing things the slow way")
-
-
+              Rails.logger.info("Lookup table #{lookup_table_name} is incomplete for user_id = #{user_id} - doing things the slow way")
               assets = all.select { |df| df.send("can_#{action}?") }
               programatic_project_filter = !projects.nil?
             end
@@ -56,13 +53,15 @@ module Acts
           end
         end
 
+        #determines whether the lookup table records are consistent with the number of asset items in the database and the last id of the item added
         def lookup_table_consistent? user_id
           unless user_id.is_a?(Numeric)
             user_id = user_id.nil? ? 0 : user_id.id
           end
-          #cannot rely purly on the count, since an item could have been deleted and a new one added
+          #cannot rely purely on the count, since an item could have been deleted and a new one added
           c = lookup_count_for_user user_id
           last_stored_asset_id = last_asset_id_for_user user_id
+          last_asset_id = self.last(:order=>:id).try(:id)
 
           #trigger off a full update for that user if the count is zero and items should exist for that type
           if (c==0 && !last_asset_id.nil?)
