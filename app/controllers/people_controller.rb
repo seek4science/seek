@@ -313,7 +313,7 @@ class PeopleController < ApplicationController
         expire_annotation_fragments("expertise") if exp_changed
         expire_annotation_fragments("tool") if tools_changed
       else
-         #TODO: should expire and rebuild in a background task
+         RebuildTagCloudJob.create_job
       end
 
   end
