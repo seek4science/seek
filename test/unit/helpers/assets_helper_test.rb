@@ -36,13 +36,17 @@ class AssetsHelperTest < ActionView::TestCase
     with_auth_lookup_enabled do
 
       assert_not_equal Sop.count,Sop.lookup_count_for_user(@user)
-      check_expected_authorised
+      assert !Sop.lookup_table_consistent?(@user.id)
+
+      #check_expected_authorised
 
       update_lookup_tables
 
       assert_equal DataFile.count,DataFile.lookup_count_for_user(@user.id)
       assert_equal Sop.count,Sop.lookup_count_for_user(@user.id)
       assert_equal Sop.count,Sop.lookup_count_for_user(@user)
+      assert Sop.lookup_table_consistent?(@user.id)
+      assert Sop.lookup_table_consistent?(nil)
 
       check_expected_authorised
     end
@@ -89,7 +93,7 @@ class AssetsHelperTest < ActionView::TestCase
   private
 
   def update_lookup_tables
-    User.all.each do |u|
+    User.all.push(nil).each do |u|
       @assets.each{|a| a.update_lookup_table(u)}
     end
 
