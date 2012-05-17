@@ -24,7 +24,7 @@ module Seek
           if clear_cloud
             page.replace_html 'sidebar_tag_cloud', :partial=>'gadgets/tag_cloud_gadget'
           else
-            RebuildTagCloudJob.create_job
+            RebuildTagCloudsJob.create_job
           end
 
           page.visual_effect :highlight, 'tags_box'
@@ -47,7 +47,7 @@ module Seek
         if immediately_clear_tag_cloud?
           expire_annotation_fragments(attr)
         else
-          RebuildTagCloudJob.create_job
+          RebuildTagCloudsJob.create_job
         end
       end
       
