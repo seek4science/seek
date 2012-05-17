@@ -23,10 +23,6 @@ class ConfigTest < ActiveSupport::TestCase
     Seek::Config.is_virtualliver = original_value
   end
 
-  test "presentations enabled" do
-     assert_equal true, Seek::Config.presentations_enabled
-  end
-
   test "email_enabled" do
     #NOTE: this is the value in seek_testing.rb, the actual default is 'false'
     assert_equal true ,Seek::Config.email_enabled

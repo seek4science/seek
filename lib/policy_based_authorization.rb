@@ -17,6 +17,7 @@ module Acts
           belongs_to :policy, :required_access_to_owner => :manage, :autosave => true
 
           after_save :queue_update_auth_table
+          after_destroy :remove_from_lookup_table
         end
       end
 
@@ -25,24 +26,23 @@ module Acts
       end
 
       module AuthLookupClassMethods
+
+        #returns all the authorised items for a given action and optionally a user and set of projects. If user is nil, the items authorised for an
+        #anonymous user are returned. If one or more projects are provided, then only the assets linked to those projects are included.
         def all_authorized_for action, user=User.current_user, projects=nil
+          projects=Array(projects) unless projects.nil?
           user_id = user.nil? ? 0 : user.id
-          c = lookup_count_for_user user_id
-          last_stored_asset_id = last_asset_id_for_user user_id
           last_asset_id = self.last(:order=>:id).try(:id)
           assets = []
           programatic_project_filter = !projects.nil? && (!Seek::Config.auth_lookup_enabled || (self==Assay || self==Study))
           if Seek::Config.auth_lookup_enabled
-            #cannot rely purly on the count, since an item could have been deleted and a new one added
-            if (c==count && last_stored_asset_id == last_asset_id)
-              Rails.logger.warn("Lookup table #{lookup_table_name} is complete for user_id = #{user_id}")
+            if (lookup_table_constistent?(user_id))
+              Rails.logger.info("Lookup table #{lookup_table_name} is complete for user_id = #{user.try(:id)}")
               assets = lookup_for_action_and_user action, user_id,projects
             else
-              Rails.logger.warn("Lookup table #{lookup_table_name} is incomplete for user_id = #{user_id} - doing things the slow way")
-              #trigger off a full update for that user if the count is zero and items should exist for that type
-              if (c==0 && !last_asset_id.nil?)
-                AuthLookupUpdateJob.add_items_to_queue user
-              end
+              Rails.logger.info("Lookup table #{lookup_table_name} is incomplete for user_id = #{user.try(:id)} - doing things the slow way")
+
+
               assets = all.select { |df| df.send("can_#{action}?") }
               programatic_project_filter = !projects.nil?
             end
@@ -56,12 +56,37 @@ module Acts
           end
         end
 
+        def lookup_table_consistent? user_id
+          unless user_id.is_a?(Numeric)
+            user_id = user_id.nil? ? 0 : user_id.id
+          end
+          #cannot rely purly on the count, since an item could have been deleted and a new one added
+          c = lookup_count_for_user user_id
+          last_stored_asset_id = last_asset_id_for_user user_id
+
+          #trigger off a full update for that user if the count is zero and items should exist for that type
+          if (c==0 && !last_asset_id.nil?)
+            AuthLookupUpdateJob.add_items_to_queue User.find_by_id(user_id)
+          end
+          c==count && last_stored_asset_id == last_asset_id
+        end
+
+        #the name of the lookup table, holding authorisation lookup information, for this given authorised type
         def lookup_table_name
           "#{self.name.underscore}_auth_lookup"
         end
 
+        #removes all entries from the authorization lookup type for this authorized type
         def clear_lookup_table
           ActiveRecord::Base.connection.execute("delete from #{lookup_table_name}")
+        end
+
+        #the record count for entries within the authorization lookup table for a given user_id or user. Used to determine if the table is complete
+        def lookup_count_for_user user_id
+          unless user_id.is_a?(Numeric)
+            user_id = user_id.nil? ? 0 : user_id.id
+          end
+          ActiveRecord::Base.connection.select_one("select count(*) from #{lookup_table_name} where user_id = #{user_id}").values[0].to_i
         end
 
         def lookup_for_action_and_user action,user_id,projects
@@ -70,7 +95,6 @@ module Acts
             sql = "select asset_id from #{lookup_table_name} where user_id = #{user_id} and can_#{action}=#{ActiveRecord::Base.connection.quoted_true}"
             ids = ActiveRecord::Base.connection.select_all(sql).collect{|k| k["asset_id"]}
           else
-            projects = Array(projects)
             project_map_table = ["#{self.name.underscore.pluralize}", 'projects'].sort.join('_')
             project_map_asset_id = "#{self.name.underscore}_id"
             project_clause = projects.collect{|p| "#{project_map_table}.project_id = #{p.id}"}.join(" or ")
@@ -84,15 +108,17 @@ module Acts
           find_all_by_id(ids)
         end
 
-        def lookup_count_for_user user_id
-          ActiveRecord::Base.connection.select_one("select count(*) from #{lookup_table_name} where user_id = #{user_id}").values[0].to_i
-        end
-
+        #the highest asset id recorded in authorization lookup table for a given user_id or user. Used to determine if the table is complete
         def last_asset_id_for_user user_id
+          unless user_id.is_a?(Numeric)
+            user_id = user_id.nil? ? 0 : user_id.id
+          end
           v = ActiveRecord::Base.connection.select_one("select max(asset_id) from #{lookup_table_name} where user_id = #{user_id}").values[0]
           v.nil? ? -1 : v.to_i
         end
 
+        #looks up the entry in the authorization lookup table for a single authorised type, for a given action, user_id and asset_id. A user id of zero
+        #indicates an anonymous user. Returns nil if there is no record available
         def lookup_for_asset action,user_id,asset_id
           attribute = "can_#{action}"
           @@expected_true_value ||= ActiveRecord::Base.connection.quoted_true.gsub("'","")
@@ -105,25 +131,13 @@ module Acts
         end
       end
 
-      AUTHORIZATION_ACTIONS.each do |action|
-          eval <<-END_EVAL
-            def can_#{action}? user = User.current_user
-                return true if new_record?
-                user_id = user.nil? ? 0 : user.id
-                if Seek::Config.auth_lookup_enabled
-                  lookup = self.class.lookup_for_asset("#{action}", user_id,self.id)
-                else
-                  lookup=nil
-                end
-                if lookup.nil?
-                  perform_auth(user,"#{action}")
-                else
-                  lookup
-                end
-            end
-          END_EVAL
+      #removes all entries related to this item from the authorization lookup table
+      def remove_from_lookup_table
+        id=self.id
+        ActiveRecord::Base.connection.execute("delete from #{self.class.lookup_table_name} where asset_id=#{id}")
       end
 
+      #triggers a background task to update or create the authorization lookup table records for this item
       def queue_update_auth_table
         #FIXME: somewhat aggressively does this after every save can be refined in the future
         unless (self.changed - ["updated_at", "last_used_at"]).empty?
@@ -131,6 +145,7 @@ module Acts
         end
       end
 
+      #updates or creates the authorization lookup entries for this item and the provided user (nil indicating anonymous user)
       def update_lookup_table user=nil
         user_id = user.nil? ? 0 : user.id
 
@@ -151,7 +166,25 @@ module Acts
         end
 
         ActiveRecord::Base.connection.execute(sql)
+      end
 
+      AUTHORIZATION_ACTIONS.each do |action|
+          eval <<-END_EVAL
+            def can_#{action}? user = User.current_user
+                return true if new_record?
+                user_id = user.nil? ? 0 : user.id
+                if Seek::Config.auth_lookup_enabled
+                  lookup = self.class.lookup_for_asset("#{action}", user_id,self.id)
+                else
+                  lookup=nil
+                end
+                if lookup.nil?
+                  perform_auth(user,"#{action}")
+                else
+                  lookup
+                end
+            end
+          END_EVAL
       end
 
       def contributor_credited?
