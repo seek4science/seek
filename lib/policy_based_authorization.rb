@@ -272,6 +272,20 @@ module Acts
         end
         people.uniq
       end
+
+      def contributing_user
+        unless self.kind_of?(Assay)
+          if contributor.kind_of?Person
+            contributor.try(:user)
+          elsif contributor.kind_of?User
+            contributor
+          else
+            nil
+          end
+        else
+          owner.try(:user)
+        end
+      end
     end
   end
 end
