@@ -1,6 +1,6 @@
 require 'test_helper'
 
-class RebuildTagCloudJobTest < ActiveSupport::TestCase
+class RebuildTagCloudsJobTest < ActiveSupport::TestCase
   def setup
     Delayed::Job.destroy_all
   end
