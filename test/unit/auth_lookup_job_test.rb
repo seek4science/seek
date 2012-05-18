@@ -41,6 +41,7 @@ class AuthLookupJobTest  < ActiveSupport::TestCase
     job.locked_at = Time.now
     job.save!
     assert_equal 0, AuthLookupUpdateJob.count,"Should ignore locked jobs"
+    assert_equal 1,AuthLookupUpdateJob.count(false),"Should not ignore locked jobs when requested"
   end
 
   test "add items to queue" do

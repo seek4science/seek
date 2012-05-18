@@ -261,6 +261,8 @@ class AdminController < ApplicationController
         type = "search_stats"
       when "job_queue"
         type = "job_queue"
+      when "auth_consistency"
+        type = "auth_consistency"
       when "none"
         type = "none"
     end
@@ -278,6 +280,8 @@ class AdminController < ApplicationController
           format.html { render :partial => "admin/search_stats", :locals => {:stats => Seek::SearchStats.new} }
         when "job_queue"
           format.html { render :partial => "admin/job_queue" }
+        when "auth_consistency"
+          format.html { render :partial => "admin/auth_consistency" }
         when "none"
           format.html { render :text=>"" }
       end

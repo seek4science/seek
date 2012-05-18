@@ -88,8 +88,12 @@ class AuthLookupUpdateJob
     count!=0
   end
 
-  def self.count
-    Delayed::Job.find(:all,:conditions=>['handler = ? AND locked_at IS ?',@@my_yaml,nil]).count
+  def self.count ignore_locked=true
+    if ignore_locked
+      Delayed::Job.find(:all,:conditions=>['handler = ? AND locked_at IS ? AND failed_at IS ?',@@my_yaml,nil,nil]).count
+    else
+      Delayed::Job.find(:all,:conditions=>['handler = ? AND failed_at IS ?',@@my_yaml,nil]).count
+    end
   end
 
   
