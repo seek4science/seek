@@ -71,11 +71,13 @@
       </table>
       </div>
       <br/>
-      <input type="button" id='select_all_strains' name="select_all_strains" value="Select all" onclick="selectAll('strain_table')">
-      <input type="button" id='deselect_all_strains' name="deselect_all_strains" value="Deselect all" onclick="deselectAll('strain_table')">
+      <div style="margin-bottom: -2em">
+          <input type="button" id='select_all_strains' name="select_all_strains" value="Select all" onclick="selectAll('strain_table')">
+          <input type="button" id='deselect_all_strains' name="deselect_all_strains" value="Deselect all" onclick="deselectAll('strain_table')">
+      </div>
   <% end -%>
 <% if logged_in? and current_user.person.member? %>
-  <ul class="sectionIcons" style="margin-top: -1.5em">
+  <ul class="sectionIcons">
     <li><%= create_strain_popup_link() -%></li>
     <br/>
     <br/>
