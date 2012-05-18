@@ -3,12 +3,11 @@
     <%= render :partial => "gadgets/new_object_gadget" -%>
     <%= render :partial=>"gadgets/announcements_gadget" %>
     <%= render :partial => "gadgets/favourites" -%>
-
-    <% cache "sidebar_tag_cloud" do -%>
-        <div id="sidebar_tag_cloud">
+    <div id="sidebar_tag_cloud">
+      <% cache "sidebar_tag_cloud" do -%>
           <%= render :partial=>"gadgets/tag_cloud_gadget" %>
-        </div>
-    <% end -%>
+      <% end -%>
+    </div>
 
     <%= render :partial=>"gadgets/organism_gadget" %>
 
@@ -16,11 +15,11 @@
 
     <%= render :partial => "gadgets/sign_in" -%>
 
-    <% cache "sidebar_tag_cloud" do -%>
-        <div id="sidebar_tag_cloud">
+    <div id="sidebar_tag_cloud">
+      <% cache "sidebar_tag_cloud" do -%>
           <%= render :partial=>"gadgets/tag_cloud_gadget" %>
-        </div>
-    <% end -%>
+      <% end -%>
+    </div>
 
     <%= render :partial=>"gadgets/organism_gadget" %>
 
