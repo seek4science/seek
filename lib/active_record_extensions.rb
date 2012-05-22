@@ -49,7 +49,8 @@ module ActiveRecordExtensions
 
   end
 
-  def update_timestamp
+  #takes and ignores arguments for use in :after_add => :update_timestamp, etc.
+  def update_timestamp *args
     current_time = current_time_from_proper_timezone
 
     write_attribute('updated_at', current_time) if respond_to?(:updated_at)
