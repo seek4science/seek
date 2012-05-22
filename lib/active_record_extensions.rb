@@ -49,6 +49,13 @@ module ActiveRecordExtensions
 
   end
 
+  def update_timestamp
+    current_time = current_time_from_proper_timezone
+
+    write_attribute('updated_at', current_time) if respond_to?(:updated_at)
+    write_attribute('updated_on', current_time) if respond_to?(:updated_on)
+  end
+
   def defines_own_avatar?
     respond_to?(:avatar)
   end
