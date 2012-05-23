@@ -105,7 +105,7 @@ class SessionsController < ApplicationController
       end
       
       format.html { return_to_url.nil? || (return_to_url && URI.parse(return_to_url).path == root_url) ? redirect_to(root_url) : redirect_to(return_to_url) }
-      format.xml { head :ok }
+      format.xml {session[:xml_login] = true; head :ok }
     end
   end
 
