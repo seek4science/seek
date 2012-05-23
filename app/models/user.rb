@@ -65,6 +65,9 @@ class User < ActiveRecord::Base
     end
   end
 
+  def user
+    self
+  end
 
   def can_manage_types?
     unless Seek::Config.type_managers_enabled

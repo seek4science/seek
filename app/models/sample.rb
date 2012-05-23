@@ -18,7 +18,7 @@ class Sample < ActiveRecord::Base
   has_and_belongs_to_many :assays
 
   has_many :assets_creators, :dependent => :destroy, :as => :asset, :foreign_key => :asset_id
-  has_many :creators, :class_name => "Person", :through => :assets_creators, :order=>'assets_creators.id'
+  has_many :creators, :class_name => "Person", :through => :assets_creators, :order=>'assets_creators.id', :after_add => :update_timestamp, :after_remove => :update_timestamp
   has_many :assets,:through => :sample_assets
   has_many :sample_assets,:dependent => :destroy
   validates_numericality_of :age_at_sampling, :only_integer => true, :greater_than=> 0, :allow_nil=> true, :message => "is not a positive integer" if !Seek::Config.is_virtualliver

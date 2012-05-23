@@ -17,15 +17,11 @@ module Acts
           belongs_to :policy, :required_access_to_owner => :manage, :autosave => true
 
           after_save :queue_update_auth_table
-          before_save :update_timestamp_if_policy_or_permissions_change
+          before_save :update_timestamp_if_policy_was_saved
 
-          def update_timestamp_if_policy_or_permissions_change
-            if changed_for_autosave?
-              current_time = current_time_from_proper_timezone
-
-              write_attribute('updated_at', current_time) if respond_to?(:updated_at)
-              write_attribute('updated_on', current_time) if respond_to?(:updated_on)
-            end
+          def update_timestamp_if_policy_was_saved
+            #autosaved belongs_to associations get saved before the parent, so to check if it has changed, see if it has a newer updated_at
+            update_timestamp if updated_at && policy.updated_at > updated_at
           end
 
 
@@ -40,12 +36,14 @@ module Acts
         def all_authorized_for action, user=User.current_user, projects=nil
           if Seek::Config.auth_caching_enabled
             assets = if projects
-              if reflection = reflect_on_association(:projects) && reflection.macro(:has_and_belongs_to_many)
-                self.class.find(:all, :include => :projects, :conditions => ["#{reflection.options[:join_table]}.project_id IN (?)", projects.map(&:id)])
-              else
-                all.select {|asset| !(asset.projects & projects).empty?}
-              end
-            end
+                       if reflection = reflect_on_association(:projects) and reflection.macro == :has_and_belongs_to_many
+                         find(:all, :include => :projects, :conditions => ["#{reflection.options[:join_table]}.project_id IN (?)", projects.map(&:id)])
+                       else
+                         all.select { |asset| !(asset.projects & projects).empty? }
+                       end
+                     else
+                       all
+                     end
             assets.select(&"can_#{action}?".to_sym)
           else
             user_id = user.nil? ? 0 : user.id
@@ -139,7 +137,7 @@ module Acts
             if self.new_record?
               return true
             else
-              Rails.cache.fetch(auth_key(user, "#{action}") {perform_auth(user,"#{action}") ? :true : :false} == :true
+              Rails.cache.fetch(auth_key(user, "#{action}")) {perform_auth(user,"#{action}") ? :true : :false} == :true
             end
           end
           END_EVAL
