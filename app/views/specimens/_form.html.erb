@@ -1,110 +1,145 @@
 <%= javascript_include_tag 'calendar_date_select/calendar_date_select' %>
 <%= stylesheet_link_tag 'calendar_date_select/default' %>
 <%= javascript_include_tag "sharing.js" -%>
-<%= javascript_include_tag "resource.js"%>
-<%= javascript_include_tag "biosample.js"%>
+<%= javascript_include_tag "resource.js" %>
+<%= javascript_include_tag "biosample.js" %>
 
 <%= f.error_messages %>
 
 <h2><%= CELL_CULTURE_OR_SPECIMEN.capitalize -%> details</h2>
 
 <%
+   specimen ||=@specimen
+   from_biosamples ||= specimen.from_biosamples
+   strain_selection_box_id = from_biosamples && action.to_s=="new" ? 'sample_specimen_attributes_strain_id' : 'specimen_strain_id'
+   strain_selection_box_name = from_biosamples && action.to_s=="new" ? 'sample[specimen_attributes][strain_id]' : 'specimen[strain_id]'
+   parent_name =  from_biosamples && action.to_s=="new" ?  "sample[specimen_attributes]" : "specimen"
+   all_institutions = Institution.find(:all, :order => :name)
    existing_creators = []
    if action == :new
      existing_creators = [current_user.person]
    elsif action == :edit
-     existing_creators = @specimen.creators
+     existing_creators = specimen.creators
    end
 %>
-<div style="width: 95%;">
-      <p class="none_text">Cell culture is the portion of the bacterial cells growing together in a chemostat or in a
-        batch</p>
-          <p>
-              <%= f.label "#{CELL_CULTURE_OR_SPECIMEN.capitalize} title:"-%><span class="required">*</span><br/>
-              <%= f.text_field :title, :style=>"width:350px;" -%>
-          </p>
 
-          <p>
-              <%= f.label "Lab internal identifier:" -%> <span class="required">*</span><br/>
-              <%= f.text_field :lab_internal_number, :style=>"width:350px;" -%>
-          </p>
-
-          <p>
-              <%= f.label "Culture starting date:" -%> <br/>
-              <%= f.calendar_date_select :born, :time => "mixed", :style=>"width:350px;" -%>
-          </p>
-
-          <p>
-              <%= f.label "Culture growth type:" -%> <br/>
-              <%= f.collection_select :culture_growth_type_id, CultureGrowthType.all,:id,:title,:include_blank=>"Not specified" -%>
-          </p>
-
-          <p>
-              <%= f.label "Sex:" -%> <br/>
-              <%= f.select :sex, options_for_select(sex_list_for_selection.insert(0,["Not specified", '']),@specimen.try(:sex)) -%>
-          </p>
-
-          <p>
-              <%= f.label "Comment:" -%> <br/>
-              <%= f.text_field :comments, :style=>"width:350px;" -%>
-          </p>
-
-          <p>
-              <%= f.label "Provider name:" -%> <br/>
-              <%= f.text_field :provider_name, :style=>"width:350px;" -%>
-          </p>
-
-          <p>
-              <%= f.label "Provider's #{CELL_CULTURE_OR_SPECIMEN} identifier:" -%> <br/>
-              <%= f.text_field :provider_id, :style=>"width:350px;" -%>
-          </p>
-
-          <p>
-              <%= f.label "Organism:" -%><span class="required">*</span> <br/>
-              <%= select_tag :organism,
-                                    options_for_select([["Not specified",""]] + Organism.all(:order=>:title).collect{|o| [o.title,o.id]},@specimen.organism.try(:id) || current_user.try(:person).try(:projects).try(:first).try(:organism_ids).try(:first)),
-                                    :onchange=>"show_ajax_loader('strains_of_selected_organism');strains_of_selected_organism(this.value, 'specimen_strain_id', 'specimen[strain_id]');" -%>
-          </p>
-
-          <p>
-              <%= f.label "Strain:" -%>
-              <div id = 'strains_of_selected_organism'>
-                  <% strains = @specimen.organism.nil? ? [] : @specimen.organism.strains.without_default -%>
-                  <%= f.collection_select :strain_id,
-                                        strains,:id,:info,:include_blank=>"Not specified" -%>
-              </div>
-          </p>
-
-          <br/>
-
-          <%= render :partial => 'projects/project_selector', :locals => {:resource => @specimen,:allow_nil=>true}%>
-
-          <% if @specimen.can_manage? %>
-       <%= render :partial=>"assets/asset_form_bottom", :locals=> {:f => f, :attribution_enable => false, :show_publications => false, :existing_creators=>existing_creators} -%>
-
-                    <%= fancy_multiselect @specimen, :sops, :name => 'specimen_sop_ids',:association_class=>Sop, :selected => (params[:specimen_sop_ids] || []).map(&:to_i) | @specimen.sop_masters.map(&:sop_id), :hidden=> @specimen.sops.blank? ? true : false, :other_projects_checkbox => true %>
-          <% end %>
-          <%= f.hidden_field :from_biosamples %>
-</div>
-
-<p style="margin-top: 2em; text-align: center;">
-  <%
-     button_text=action==:edit ? "Update" : "Create"
-     disabled_text=action==:edit ? "Updating..." : "Creating..."
-     is_new_file=action==:edit ? false : true
-  %>
-  <% if @specimen.can_manage? %>
-      <%= preview_permission_popup_link('specimen', url_for(:controller => 'policies', :action => 'preview_permissions'), is_new_file, try_block { @specimen.contributor.id }) -%>
-      <%= f.submit button_text, :id => "specimen_submit_btn", :onclick => "javascript: clickLink($('preview_permission'));return(false);" -%>
-  <% else %>
-      <%= f.submit button_text, :id => "specimen_submit_btn", :disable_with => disabled_text -%>
-  <% end %>
-  or <%= link_to 'Cancel', (@specimen.id ? specimen_path(@specimen.id) : specimens_path) -%>
+<p>
+  <%= f.label "#{CELL_CULTURE_OR_SPECIMEN.capitalize} title:" -%><span class="required">*</span><br/>
+  <%= f.text_field :title, :style => "width:350px;" -%>
 </p>
 
+<p>
+  <%= f.label "Lab internal identifier:" -%> <span class="required">*</span><br/>
+  <%= f.text_field :lab_internal_number, :style => "width:350px;" -%>
+</p>
+
+<p>
+  <%= f.label "Institution:" -%>
+
+  <span class="required">
+                    <% if Seek::Config.is_virtualliver %>
+                    *
+                    <% end %>
+                  </span><br/>
+
+  <%= f.select :institution_id,
+               options_for_select([["Please Select ...", 0]]|all_institutions.collect { |o| [h(o.name), o.id] }, current_user.try(:person).try(:projects).try(:first).try(:institution_ids).try(:first)), {}, :style => "width:350px;" %>
+</p>
+
+<p>
+  <%= f.label "Culture starting date:" -%> <br/>
+  <%= f.calendar_date_select :born, :time => "mixed", :style => "width:350px;" -%>
+</p>
+
+<p>
+  <%= f.label "Culture growth type:" -%> <br/>
+  <%= f.collection_select :culture_growth_type_id, CultureGrowthType.all, :id, :title, :include_blank => "Not specified" -%>
+</p>
+
+<p>
+  <%= f.label "Sex:" -%> <br/>
+  <%= f.select :sex, options_for_select(sex_list_for_selection.insert(0, ["Not specified", '']), specimen.try(:sex)) -%>
+</p>
+
+<p>
+  <%= f.label "Comment:" -%> <br/>
+  <%= f.text_field :comments, :style => "width:350px;" -%>
+</p>
+
+<p>
+  <%= f.label "Provider name:" -%> <br/>
+  <%= f.text_field :provider_name, :style => "width:350px;" -%>
+</p>
+
+<p>
+  <%= f.label "Provider's #{CELL_CULTURE_OR_SPECIMEN} identifier:" -%> <br/>
+  <%= f.text_field :provider_id, :style => "width:350px;" -%>
+</p>
+
+<p>
+  <%= f.label "Organism:" -%><span class="required">*</span> <br/>
+  <%= select_tag :organism,
+                 options_for_select([["Not specified", ""]] + Organism.all(:order => :title).collect { |o| [o.title, o.id] }, specimen.organism.try(:id) || current_user.try(:person).try(:projects).try(:first).try(:organism_ids).try(:first)),
+                 :onchange => "show_ajax_loader('strains_of_selected_organism');strains_of_selected_organism(this.value, 'specimen_strain_id', 'specimen[strain_id]');" -%>
+</p>
+
+<p>
+  <%= f.label "Strain:" -%>
+<div id='strains_of_selected_organism'>
+  <% strains = specimen.organism.nil? ? [] : specimen.organism.strains.without_default -%>
+  <%= f.collection_select :strain_id,
+                          strains, :id, :info, :include_blank => "Not specified" -%>
+</div>
+</p>
+
+<% if Seek::Config.is_virtualliver %>
+    <div class="yui-g" style="width:700px;">
+      <%= f.label "Genotypes and Phenotypes:" -%>
+      <%= render :partial => "biosamples/genotype_form", :locals => {:item => specimen, :f => f, :parent_name => parent_name, :action => action.to_s} %>
+      <%= render :partial => "biosamples/phenotype_form", :locals => {:item => specimen, :f => f, :parent_name => parent_name, :action => action.to_s} %>
+    </div>
+
+<% end %>
+<br/>
+<%  unless from_biosamples && action.to_s=="new"  %>
+    <%= render :partial => 'projects/project_selector', :locals => {:resource => specimen, :allow_nil => true} %>
+
+    <% if specimen.can_manage? %>
+        <p>
+          <%= render :partial => "assets/sharing_form" ,:locals=>{:object=>specimen}-%>
+        </p>
+
+        <%= render :partial => 'assets/special_auth_code_form', :locals => {:f => f} %>
+    <% end %>
+<% end %>
+<%= fancy_multiselect specimen, :sops, :name => 'specimen_sop_ids', :association_class => Sop, :selected => (params[:specimen_sop_ids] || []).map(&:to_i) | specimen.sop_masters.map(&:sop_id), :hidden => specimen.sops.blank? ? true : false, :other_projects_checkbox => true %>
+
+<p>
+  <%= render :partial => "assets/author_form", :locals => {:resource_type => 'Specimen',
+                                                           :existing_creators => existing_creators,
+                                                           :other_creators => specimen.other_creators} -%>
+</p>
+<%= f.hidden_field :from_biosamples %>
+
+<% unless from_biosamples && action.to_s=="new" %>
+    <p style="margin-top: 2em; text-align: center;">
+      <%
+         button_text=action==:edit ? "Update" : "Create"
+         disabled_text=action==:edit ? "Updating..." : "Creating..."
+         is_new_file=action==:edit ? false : true
+      %>
+      <% if specimen.can_manage? %>
+          <%= preview_permission_popup_link('specimen', url_for(:controller => 'policies', :action => 'preview_permissions'), is_new_file, try_block { specimen.contributor.id }) -%>
+          <%= f.submit button_text, :id => "specimen_submit_btn", :onclick => "javascript: clickLink($('preview_permission'));return(false);" -%>
+      <% else %>
+          <%= f.submit button_text, :id => "specimen_submit_btn", :disable_with => disabled_text -%>
+      <% end %>
+      or <%= link_to 'Cancel', (specimen.id ? specimen_path(specimen.id) : specimens_path) -%>
+    </p>
+<% end %>
 <script type="text/javascript">
-    if ('<%= action.to_s%>' == 'new' && <%= f.error_messages.blank?%>){
+    if ('<%= action.to_s%>' == 'new' && <%= f.error_messages.blank?%>) {
         show_ajax_loader('strains_of_selected_organism');
-        strains_of_selected_organism($F('organism'), 'specimen_strain_id', 'specimen[strain_id]');
+        strains_of_selected_organism($F('organism'), '<%= strain_selection_box_id%>', '<%= strain_selection_box_name%>');
     }
 </script>
