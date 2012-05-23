@@ -1,14 +1,16 @@
 class Policy < ActiveRecord::Base
   
-  has_many :assets,
-           :dependent => :nullify,
-           :order => "resource_type ASC"
-  
   has_many :permissions,
            :dependent => :destroy,
            :order => "created_at ASC",
            :autosave => true,
            :after_add => proc {|policy, perm| perm.policy = policy}
+
+  before_save :update_timestamp_if_permissions_change
+
+  def update_timestamp_if_permissions_change
+    update_timestamp if changed_for_autosave?
+  end
 
   #basically the same as validates_numericality_of :sharing_scope, :access_type
   #but with a more generic error message because our users don't know what
@@ -24,15 +26,18 @@ class Policy < ActiveRecord::Base
 
   alias_attribute :title, :name
 
-  before_save :update_timestamp_if_permissions_change
+  default_scope :include=>:permissions
 
-  def update_timestamp_if_permissions_change
-    if changed_for_autosave?
-      current_time = current_time_from_proper_timezone
+  after_save :queue_update_auth_table
 
-      write_attribute('updated_at', current_time) if respond_to?(:updated_at)
-      write_attribute('updated_on', current_time) if respond_to?(:updated_on)
-    end
+  def queue_update_auth_table
+    AuthLookupUpdateJob.add_items_to_queue(assets) unless assets.empty?
+  end
+
+  def assets
+    Seek::Util.authorized_types.collect do |type|
+      type.find(:all,:conditions=>{:policy_id=>id})
+    end.flatten.uniq
   end
   
   
@@ -117,7 +122,7 @@ class Policy < ActiveRecord::Base
         # NOW PROCESS THE PERMISSIONS
 
         # read the permission data from sharing
-        unless sharing[:permissions].blank?
+        unless sharing[:permissions].blank? or sharing[:permissions][:contributor_types].blank?
           contributor_types = ActiveSupport::JSON.decode(sharing[:permissions][:contributor_types]) || []
           new_permission_data = ActiveSupport::JSON.decode(sharing[:permissions][:values]) || {}
         else

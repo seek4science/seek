@@ -223,7 +223,54 @@ namespace :seek do
   task :send_monthly_subscription => :environment do
     send_subscription_mails ActivityLog.scoped(:include => :activity_loggable, :conditions => ['created_at>=?', 30.days.ago]), 'monthly'
   end
+  
+  desc "Clears out all the lookup tables, used to speed up authorization. Use with care as they can take a while to rebuild."
+  task(:clear_auth_lookup_tables=>:environment) do
+    Seek::Util.authorized_types.each do |type|
+      type.clear_lookup_table
+    end
+  end
 
+  desc "Creates background jobs to rebuild all authorization lookup table for all users."
+  task(:repopulate_auth_lookup_tables=>:environment) do
+    AuthLookupUpdateJob.add_items_to_queue nil,5.seconds.from_now,1
+    User.all.each do |user|
+      unless AuthLookupUpdateQueue.exists?(user)
+        AuthLookupUpdateJob.add_items_to_queue user,5.seconds.from_now,1
+      end
+    end
+  end
+
+  desc "Rebuilds all authorization tables for a given user - you are prompted for a user id"
+  task(:repopulate_auth_lookup_for_user=>:environment) do
+    puts "Please provide the user id:"
+    user_id = STDIN.gets.chomp
+    user = user_id=="0" ? nil : User.find(user_id)
+    Seek::Util.authorized_types.each do |type|
+      table_name = type.lookup_table_name
+      ActiveRecord::Base.connection.execute("delete from #{table_name} where user_id = #{user_id}")
+      assets = type.all(:include=>:policy)
+      c=0
+      total=assets.count
+      ActiveRecord::Base.transaction do
+        assets.each do |asset|
+          asset.update_lookup_table user
+          c+=1
+          puts "#{c} done out of #{total} for #{type.name}" if c%10==0
+        end
+      end
+      count = ActiveRecord::Base.connection.select_one("select count(*) from #{table_name} where user_id = #{user_id}").values[0]
+      puts "inserted #{count} records for #{type.name}"
+      GC.start
+    end
+  end
+
+  desc "Creates background jobs to reindex all searchable things"
+  task(:reindex_all=>:environment) do
+    Seek::Util.searchable_types.each do |type|
+      ReindexingJob.add_items_to_queue type.all
+    end
+  end
 
   desc "warm authorization memcache"
   task :warm_memcache=> :environment do

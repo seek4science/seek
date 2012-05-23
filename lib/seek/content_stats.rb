@@ -62,8 +62,7 @@ module Seek
         return size
       end
     end  
-    
-    
+
     def self.generate    
       result=[]    
       Project.all.each do |project|

@@ -4,9 +4,16 @@ module Seek
   module AnnotationCommon
     include CommonSweepers
 
+    #determines whether the tag cloud should be immediately updated, dependent on the number of tags. A large number of tags can make rebuilding it
+    #an expensive process on the next page reload. The limit is based upon the number of visible tags set in the configuration
+    def immediately_clear_tag_cloud?
+      Annotation.count < (Seek::Config.max_visible_tags * 2)
+    end
+
     def update_annotations_ajax
       entity=controller_name.singularize.camelize.constantize.find(params[:id])
       if entity.can_view?
+        clear_cloud = immediately_clear_tag_cloud?
         update_owned_annotations entity
         eval("@#{controller_name.singularize} = entity")
         render :update do |page|
@@ -15,7 +22,7 @@ module Seek
           # The tag cloud is generation is quite an expensive process and doesn't need to automatically update when filled up already.
           # When it is small its nice to see new tags appear in the cloud.
           # The cache is expired and will be regenerated on the next page load anyway, and the delay is more acceptable on a page load.
-          unless Annotation.count > (Seek::Config.max_visible_tags * 2)
+          if clear_cloud
             page.replace_html 'sidebar_tag_cloud', :partial=>'gadgets/tag_cloud_gadget'
           end
 
@@ -36,7 +43,11 @@ module Seek
     def update_annotations entity, attr='tag', owner=User.current_user
       unless owner.nil?
         entity.tag_with_params params, attr
-        expire_annotation_fragments(attr)
+        if immediately_clear_tag_cloud?
+          expire_annotation_fragments(attr)
+        else
+          #TODO: should expire and rebuild in a background task
+        end
       end
       
     end
@@ -46,7 +57,11 @@ module Seek
     def update_owned_annotations entity, attr='tag', owner=User.current_user
       unless owner.nil?
         entity.tag_as_user_with_params params, attr
-        expire_annotation_fragments(attr)
+        if immediately_clear_tag_cloud?
+          expire_annotation_fragments(attr)
+        else
+          #TODO: should expire and rebuild in a background task
+        end
       end
     end
   end

@@ -14,12 +14,15 @@
             "aoColumns": [
             null,
             { "sWidth": "5%", "bSortable": false },
-            { "sWidth": "20%" },
-            { "sWidth": "20%" },
+            { "sWidth": "15%" },
+            { "sWidth": "15%" },
             { "sWidth": "20%" },
             { "sWidth": "5%" },
-            { "sWidth": "20%" },
-            { "sWidth": "20%" }
+            { "sWidth": "10%" },
+            { "sWidth": "15%" },
+            { "sWidth": "15%" },
+            { "sWidth": "5%", "bSortable": false },
+            { "sWidth": "5%", "bSortable": false }
             ]
         }).rowGrouping({"sGrupingClass": 'row_group_color'});
     });
@@ -48,23 +51,20 @@
           <th>Phenotypes</th>
           <th>ID</th>
           <th>Synonym</th>
-          <th>Comment</th>
+          <th>Creator</th>
+          <th>Based on</th>
+          <th></th>
+          <th></th>
         </tr>
         </thead>
         <tbody>
         <%
            existing_strains.each do |strain| -%>
             <tr class="gradeA">
-              <td><%= link_to strain.organism.title, organism_path(strain.organism.id), {:target => '_blank'} %></td>
-              <td><%= check_box_tag "selected_strain_#{strain.id}", strain.id, false, :onchange => remote_function(:url => {:controller => 'biosamples', :action => 'existing_specimens'}, :with => "'strain_ids=' + getSelectedStrains()") +
-                      ";show_existing_specimens();hide_existing_samples();" %>
-              </td>
-              <td><%= strain.title %> </td>
-              <td><%= strain.genotype_info %> </td>
-              <td><%= strain.phenotype_info %></td>
-              <td><%= strain.id %></td>
-              <td><%= strain.synonym %> </td>
-              <td><%= strain.comment %></td>
+              <% strain_row_data = strain_row_data strain %>
+              <% strain_row_data.each do |column_data| %>
+                <td><%= column_data %></td>
+              <% end %>
             </tr>
         <% end -%>
         </tbody>

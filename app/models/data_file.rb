@@ -83,19 +83,17 @@ class DataFile < ActiveRecord::Base
   # Parameters:
   # - user - user that performs the action; this is required for authorization
   def self.get_all_as_json(user)
-    all_datafiles = DataFile.find(:all, :order => "ID asc",:include=>[:policy,{:policy=>:permissions}])
-    datafiles_with_contributors = all_datafiles.collect{ |d|
-        d.can_view?(user) ?
-        (contributor = d.contributor;
+    #FIXME: could probably be moved into a mixin rather than being dupilcated across assets
+    all = DataFile.all_authorized_for "view",user
+    with_contributors = all.collect{ |d|
+        contributor = d.contributor;
         { "id" => d.id,
           "title" => d.title,
           "contributor" => contributor.nil? ? "" : "by " + contributor.person.name,
-          "type" => self.name } ) :
-        nil }
-
-    datafiles_with_contributors.delete(nil)
-
-    return datafiles_with_contributors.to_json
+          "type" => self.name
+        }
+    }
+    return with_contributors.to_json
   end
 
   def included_to_be_copied? symbol
@@ -207,5 +205,5 @@ class DataFile < ActiveRecord::Base
       presentation.orig_data_file_id = id
     end
   end
-  
+
 end

@@ -96,12 +96,11 @@ class AssaysController < ApplicationController
       @assay.associate_organism(o_id, strain, culture_growth,t_id,t_title)
     end
 
-
-    update_annotations @assay
-
     @assay.owner=current_user.person
 
     @assay.policy.set_attributes_with_sharing params[:sharing], @assay.projects
+
+    update_annotations @assay #this saves the assay
 
 
       if @assay.save

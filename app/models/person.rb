@@ -10,6 +10,15 @@ class Person < ActiveRecord::Base
 
   acts_as_notifiee
   acts_as_annotatable :name_field=>:name
+
+  after_save :queue_update_auth_table
+
+  def queue_update_auth_table
+    if changes.include?("roles_mask")
+      AuthLookupUpdateJob.add_items_to_queue self
+    end
+  end
+
   include Seek::Taggable
 
   def receive_notifications
@@ -18,6 +27,10 @@ class Person < ActiveRecord::Base
   
   def registered?
     !user.nil?
+  end
+
+  def person
+    self
   end
 
   #grouped_pagination :pages=>("A".."Z").to_a #shouldn't need "Other" tab for people
@@ -52,7 +65,7 @@ class Person < ActiveRecord::Base
   has_many :created_publications, :through => :assets_creators, :source => :asset, :source_type => "Publication"
   has_many :created_presentations,:through => :assets_creators,:source=>:asset,:source_type => "Presentation"
 
-  searchable do
+  searchable(:ignore_attribute_changes_of=>[:updated_at]) do
     text :first_name, :last_name,:description, :searchable_tags,:locations, :project_roles
     text :disciplines do
       disciplines.map{|d| d.title}
@@ -386,15 +399,6 @@ class Person < ActiveRecord::Base
         end
       end
     end
-  end
-
-  def generate_person_key
-    keys = [self.cache_key]
-    #group_memberships + favourite_group_memberships
-    keys |= group_memberships.sort_by(&:id).collect(&:cache_key)
-    keys |= favourite_group_memberships.sort_by(&:id).collect(&:cache_key)
-
-    keys
   end
 
   private

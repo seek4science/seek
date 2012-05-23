@@ -20,6 +20,7 @@
   <h2>Strain details</h2>
   <table style="width:100%;">
   <thead>
+    <th>ID</th>
     <th>Name</th>
     <th>Provider name</th>
     <th>Provider's strain ID</th>
@@ -27,8 +28,9 @@
     <th>Phenotypes</th>
     <th>Synonym</th>
     <th>Comments</th>
+    <th>Based on</th>
   </thead>
-  <%= render :partial=>"strain_information_row", :collection=>@organism.strains.without_default -%>
+  <%= render :partial=>"strain_information_row", :collection=>@organism.strains.without_default.select(&:can_view?) -%>
   </table>
 <%= render :partial=>"layouts/items_related_to",:object => @organism %>
 </div>

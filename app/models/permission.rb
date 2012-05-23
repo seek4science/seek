@@ -5,6 +5,14 @@ class Permission < ActiveRecord::Base
   validates_presence_of :contributor
   validates_presence_of :policy
   validates_presence_of :access_type
+
+  after_save :queue_update_auth_table
+
+  def queue_update_auth_table
+    assets = policy.assets
+    assets = assets | Policy.find_by_id(policy_id_was).try(:assets) unless policy_id_was.blank?
+    AuthLookupUpdateJob.add_items_to_queue assets.compact
+  end
   
   # TODO implement duplicate check in :before_create
 

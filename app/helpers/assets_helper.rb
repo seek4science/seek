@@ -156,15 +156,7 @@ module AssetsHelper
   #provides a list of assets, according to the class, that are authorized acording the 'action' which defaults to view
   #if projects is provided, only authorizes the assets for that project
   def authorised_assets asset_class,projects=nil, action="view"
-    assets=nil
-    if (projects.nil?)
-      assets = asset_class.find(:all,:include=>[:policy,{:policy=>:permissions}])
-    else
-      projects=Array(projects)
-      method = asset_class.name.underscore.pluralize
-      assets = projects.collect{|p| p.send(method)}.flatten.uniq
-    end
-    Authorization.authorize_collection(action, assets, current_user)
+    asset_class.all_authorized_for action, current_user, projects
   end
 
   def asset_buttons asset,version=nil,delete_confirm_message=nil

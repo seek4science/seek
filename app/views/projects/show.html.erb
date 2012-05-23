@@ -46,6 +46,7 @@
           <label>Project Coordinators:</label>
           <%= project_coordinators_link_list @project -%>
         </p>
+        <% if @project.people.include?(current_user.try(:person))%>
         <p class="asset_managers">
           <label>Asset Managers:</label>
           <%= asset_managers_link_list @project -%>
@@ -60,6 +61,7 @@
           <label>Publishers:</label>
           <%= publishers_link_list @project -%>
         </p>
+        <% end %>
 
 
     </div>

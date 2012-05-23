@@ -16,7 +16,7 @@ module Acts
     [:view, :download].each do |action|
         eval <<-END_EVAL
           def can_#{action}? user = User.current_user
-            special_auth_codes.map(&:code).include? SpecialAuthCode.current_auth_code or super
+            SpecialAuthCode.current_auth_code.try(:asset) == self or super
           end
         END_EVAL
     end

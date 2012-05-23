@@ -154,7 +154,7 @@ fixtures :all
     attrs = [:confluency, :passage, :viability, :purity]
     specimen= Factory.attributes_for :specimen, :confluency => "Test", :passage => "Test", :viability => "Test", :purity => "Test"
 
-    specimen[:organism_id]=Factory(:organism).id
+    specimen[:strain_id]=Factory(:strain).id
     specimen[:institution_id]=Factory(:institution).id
     post :create, :specimen => specimen, :sharing => valid_sharing
     assert specimen = assigns(:specimen)
