@@ -1,6 +1,10 @@
-function fadeGenotypeRow(id) {
+function fadeGenotypeRow(id,action) {
     try {
         var genotype_row_id = 'genotype_row_'.concat(id.toString());
+        var genotype_id =  'genotype_'.concat(id.toString());
+        if (action == 'edit') {
+            $(genotype_id).value = 1;
+        }
         //Dont remove the row coz it messes up the row id
         Effect.Fade(genotype_row_id, { duration: 0.25 });
         while ($(genotype_row_id).firstChild) {
@@ -11,7 +15,7 @@ function fadeGenotypeRow(id) {
     }
 }
 
-function addGenotypeRow(tableID,parent_name) {
+function addGenotypeRow(tableID,parent_name,action) {
     var table = document.getElementById(tableID);
     var rowCount = table.rows.length;
     var row = table.insertRow(rowCount);
@@ -24,7 +28,7 @@ function addGenotypeRow(tableID,parent_name) {
     var new_id = new Date().getTime();
     element1.name = object_name.concat("[genotypes_attributes][").concat(new_id).concat("][gene_attributes][title]");
     //element1.name =  object_name.concat("[genotypes_attributes][][gene_attributes][title]");
-    element1.id = object_name.concat("_genotypes_attributes_").concat(new_id).concat("_gene_attributes_title");
+    element1.id = object_name.replace("[","_").replace("]","").concat("_genotypes_attributes_").concat(new_id).concat("_gene_attributes_title");
     cell1.appendChild(element1);
 
     var cell2 = row.insertCell(1);
@@ -33,7 +37,7 @@ function addGenotypeRow(tableID,parent_name) {
     element2.size = 10;
     element2.name = object_name.concat("[genotypes_attributes][").concat(new_id).concat("][modification_attributes][title]");
     //element2.name = object_name.concat("[genotypes_attributes][][modification_attributes][title]");
-    element2.id = object_name.concat("_genotypes_attributes_").concat(new_id).concat("_modification_attributes_title");
+    element2.id = object_name.replace("[","_").replace("]","").concat("_genotypes_attributes_").concat(new_id).concat("_modification_attributes_title");
     cell2.appendChild(element2);
 
     var cell3 = row.insertCell(2);
@@ -44,13 +48,18 @@ function addGenotypeRow(tableID,parent_name) {
     element3.title = "Delete this entry"
     cell3.appendChild(element3);
     cell3.children[0].onclick = function() {
-        fadeGenotypeRow(rowCount)
+        fadeGenotypeRow(rowCount,action);
     }
 }
 
-function fadePhenotypeRow(id) {
+function fadePhenotypeRow(id,action) {
     try {
         var phenotype_row_id = 'phenotype_row_'.concat(id.toString());
+        var phenotype_id = 'phenotype_'.concat(id.toString());
+        if (action == 'edit') {
+            $(phenotype_id).value = 1;
+        }
+
         //Dont remove the row coz it messes up the row id
         Effect.Fade(phenotype_row_id, { duration: 0.25 });
         while ($(phenotype_row_id).firstChild) {
@@ -61,7 +70,7 @@ function fadePhenotypeRow(id) {
     }
 }
 
-function addPhenotypeRow(tableID,parent_name) {
+function addPhenotypeRow(tableID,parent_name,action) {
     var table = document.getElementById(tableID);
     var rowCount = table.rows.length;
     var row = table.insertRow(rowCount);
@@ -75,7 +84,7 @@ function addPhenotypeRow(tableID,parent_name) {
     var new_id = new Date().getTime();
     element1.name = object_name.concat("[phenotypes_attributes][").concat(new_id).concat("][description]") ;
     //element1.name =   object_name.concat("[phenotypes_attributes][][description]") ;
-    element1.id = object_name.concat("_phenotype_attributes_").concat(new_id).concat("_description");
+    element1.id = object_name.replace("[","_").replace("]","").concat("_phenotypes_attributes_").concat(new_id).concat("_description");
     cell1.appendChild(element1);
 
     var cell2 = row.insertCell(1);
@@ -86,7 +95,7 @@ function addPhenotypeRow(tableID,parent_name) {
     element2.title = "Delete this entry"
     cell2 .appendChild(element2);
     cell2 .children[0].onclick = function() {
-        fadePhenotypeRow(rowCount)
+        fadePhenotypeRow(rowCount,action)
     }
 }
 

@@ -1,6 +1,8 @@
 <%= javascript_include_tag 'strain.js', 'biosample.js' %>
 <%= stylesheet_link_tag  "biosamples" %>
-<% parent_name ||= item.class.name.underscore%>
+<% parent_name ||= item.class.name.underscore
+   action ||=nil
+%>
 <center>
   <div class="yui-u first  box_simple" style="width: 42%; margin-left: 2em; margin-top: 1em; margin-bottom: 1em;">
     <label style="font-weight: bold; border-bottom: 1px solid #DDD"> Genotypes:</label>
@@ -10,9 +12,9 @@
         <th>Kind of mutation</th>
       </tr>
       <% item.genotypes.each_with_index do |genotype, index| %>
-          <tr id='genotype_row_<%= index %>'>
-            <% f.fields_for :genotypes, genotype do |genotype_form| %>
 
+            <% f.fields_for :genotypes, genotype do |genotype_form| %>
+              <tr id='genotype_row_<%= index %>'>
                 <td>
                   <% genotype_form.fields_for :gene, genotype.gene do |gene_form| %>
                       <%= gene_form.text_field :title, :size => 10 %>
@@ -24,15 +26,15 @@
                       <%= modification_form.text_field :title, :size => 10 %>
                   <% end %>
                 </td>
-                <td> <%= link_to_function image("destroy", :alt => "Delete", :title => "Delete this entry", :id => "delete_genotype_#{index}"), "fadeGenotypeRow('#{index}')" -%>
+                <td> <%= link_to_function image("destroy", :alt => "Delete", :title => "Delete this entry", :id => "delete_genotype_#{index}"), "fadeGenotypeRow('#{index}','#{action}');" -%>
                 </td>
-
+              </tr>
             <% end %>
-          </tr>
+          <%= genotype_form.hidden_field :_destroy,{:id => "genotype_#{index}",:value=>0} %>
       <% end %>
 
 
     </table>
-    <img src='/images/famfamfam_silk/add.png' alt="Add more" title="Add more gene and mutation" onclick="addGenotypeRow('genotype_table','<%=parent_name%>')"/>
+    <img src='/images/famfamfam_silk/add.png' alt="Add more" title="Add more gene and mutation" onclick="addGenotypeRow('genotype_table','<%=parent_name%>','<%=action%>')"/>
   </div>
 </center>

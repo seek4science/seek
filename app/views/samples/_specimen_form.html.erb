@@ -74,8 +74,8 @@
     <% if Seek::Config.is_virtualliver %>
         <div class="yui-g" style="width:700px;">
           <%= specimen_f.label "Genotypes and Phenotypes:" -%>
-          <%= render :partial => "biosamples/genotype_form", :locals => {:item => specimen,:f=>specimen_f,:parent_name=>"sample[specimen_attributes]"} %>
-          <%= render :partial => "biosamples/phenotype_form", :locals => {:item => specimen,:f=>specimen_f,:parent_name=>"sample[specimen_attributes]"} %>
+          <%= render :partial => "biosamples/genotype_form", :locals => {:item => specimen,:f=>specimen_f,:parent_name=>"sample[specimen_attributes]",:action=>action.to_s} %>
+          <%= render :partial => "biosamples/phenotype_form", :locals => {:item => specimen,:f=>specimen_f,:parent_name=>"sample[specimen_attributes]",:action=>action.to_s} %>
          </div>
 
     <% end %>
