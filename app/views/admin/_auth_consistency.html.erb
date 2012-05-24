@@ -12,8 +12,8 @@
 </p>
 
 <p style="font-weight: bolder;">
-  <% if AuthLookupUpdateJob.count(true)>0 -%>
-      There are <%= AuthLookupUpdateJob.count(true) -%> jobs waiting to run, or currently running.
+  <% if AuthLookupUpdateJob.count(false)>0 -%>
+      There are <%= AuthLookupUpdateJob.count(false) -%> jobs waiting to run, or currently running.
   <% else -%>
       There are no jobs waiting to be run, or currently running.
   <% end -%>
