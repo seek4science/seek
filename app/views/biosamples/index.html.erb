@@ -1,5 +1,5 @@
 <%= javascript_include_tag 'DataTables-1.8.2/jquery.js', 'DataTables-1.8.2/jquery.dataTables.js', 'DataTables-1.8.2/jquery.dataTables.rowGrouping.js', 'DataTables-1.8.2/Scroller.js' %>
-  <%= stylesheet_link_tag  'data_tables.css' %>
+<%= stylesheet_link_tag 'data_tables.css' %>
 <script type="text/javascript">
     jQuery.noConflict();
     var $j = jQuery;
@@ -8,76 +8,77 @@
 <%= javascript_include_tag 'strain.js', 'biosample.js' %>
 <%= stylesheet_link_tag 'calendar_date_select/default', "biosamples" %>
 <%= javascript_include_tag "sharing.js" -%>
-<%= javascript_include_tag "resource.js"%>
-<%= javascript_include_tag "fancy_multiselect.js"%>
+<%= javascript_include_tag "resource.js" %>
+<%= javascript_include_tag "fancy_multiselect.js" %>
 
 <%
    select_truncate_length=120
-   all_organisms = Organism.find(:all, :order=>:title)
-   default_selected_organisms =  try_block{current_user.person.projects.first.organism_ids}.blank? ? [0] : try_block{current_user.person.projects.first.organism_ids}
+   all_organisms = Organism.find(:all, :order => :title)
+   default_selected_organisms = try_block { current_user.person.projects.first.organism_ids }.blank? ? [0] : try_block { current_user.person.projects.first.organism_ids }
 -%>
 
 <div class="contribution_title">
-     <h1>Browse organisms, strains, cell cultures and samples</h1>
+  <h1>Browse organisms, strains, cell cultures and samples</h1>
 </div>
 
 <br/>
-<div class='yui-g'>
-  <div class='yui-u first' style="width: 48%;margin-left: 0.5em;margin-top: 1em">
-  <h2>Organism</h2>
-  <p class="none_text">Please select the organisms to browse the associated strains</p>
-  <%= select_tag "strain[organism_ids]",
-                 options_for_select([["Select Organisms ...", 0]]|all_organisms.collect { |o| [truncate(h(o.title), :length=>select_truncate_length), o.id] }, :selected => default_selected_organisms),
-                 {:onchange=>remote_function(:url=>{:action=>"existing_strains", :controller=>"biosamples"},
-                                             :with=>"'organism_ids='+$F('strain_organism_ids')",
-                                             :before=>"show_ajax_loader('existing_strains')")+ ";check_show_existing_strains('strain_organism_ids', 'existing_strains', '');hide_existing_specimens();
+<div class="fold" style="margin-left: 1em; width: 35em">
+  <div class="foldTitle">
+    Organism
+  </div>
+  <div class="foldContent">
+    <p class="none_text">Please select the organisms to browse the associated strains</p>
+    <%= select_tag "strain[organism_ids]",
+                   options_for_select([["Select Organisms ...", 0]]|all_organisms.collect { |o| [truncate(h(o.title), :length => select_truncate_length), o.id] }, :selected => default_selected_organisms),
+                   {:onchange => remote_function(:url => {:action => "existing_strains", :controller => "biosamples"},
+                                                 :with => "'organism_ids='+$F('strain_organism_ids')",
+                                                 :before => "show_ajax_loader('existing_strains')")+ ";check_show_existing_strains('strain_organism_ids', 'existing_strains', '');hide_existing_specimens();
                                              hide_existing_samples();return(false);",
-                 :multiple => true,:size=>15,:style=>"width:75%"} -%>
+                    :multiple => true, :size => 15, :style => "width:30em"} -%>
 
   </div>
-  <div class='yui-u' id="existing_strains" style="width: 48%;margin-right: 0.5em"></div>
 </div>
-<div class="yui-g">
-  <div class="yui-u first" id="existing_specimens" style="width: 48%;margin-left: 0.5em"></div>
-  <div class="yui-u" id="existing_samples" style="width: 48%;margin-right: 0.5em"></div>
-</div>
+<div id="existing_strains"></div>
+<div id="existing_specimens"></div>
+<div id="existing_samples"></div>
+
 
 <script type="text/javascript">
     var organism = new Array();
     check_show_existing_strains('strain_organism_ids', 'existing_strains', '<%=url_for(:controller => 'biosamples', :action => 'existing_strains')-%>');
 
-    function selectAll(table){
+    function selectAll(table) {
         var table_name = table;
         var table = eval(table);
         var aTrs = table.fnGetNodes();
-        for ( var i=0 ; i<aTrs.length ; i++ )
-        {
+        for (var i = 0; i < aTrs.length; i++) {
             aTrs[i].cells[0].firstChild.checked = true;
-        };
-        if (table_name == 'strain_table'){
-            <%=remote_function(:url => {:controller => 'biosamples', :action => 'existing_specimens'}, :with => "'strain_ids=' + getSelectedStrains()", :before=>"show_ajax_loader('existing_specimens')");%>
+        }
+        ;
+        if (table_name == 'strain_table') {
+        <%=remote_function(:url => {:controller => 'biosamples', :action => 'existing_specimens'}, :with => "'strain_ids=' + getSelectedStrains()", :before=>"show_ajax_loader('existing_specimens')");%>
             show_existing_specimens();
             hide_existing_samples();
-        }else if (table_name == 'specimen_table'){
-            <%=remote_function(:url => {:controller => 'biosamples', :action => 'existing_samples'}, :with => "'specimen_ids=' + getSelectedSpecimens()",:before=>"show_ajax_loader('existing_samples')");%>
+        } else if (table_name == 'specimen_table') {
+        <%=remote_function(:url => {:controller => 'biosamples', :action => 'existing_samples'}, :with => "'specimen_ids=' + getSelectedSpecimens()",:before=>"show_ajax_loader('existing_samples')");%>
             show_existing_samples();
         }
     }
 
-    function deselectAll(table){
+    function deselectAll(table) {
         var table_name = table;
         var table = eval(table);
         var aTrs = table.fnGetNodes();
-        for ( var i=0 ; i<aTrs.length ; i++ )
-        {
+        for (var i = 0; i < aTrs.length; i++) {
             aTrs[i].cells[0].firstChild.checked = false;
-        };
-        if (table_name == 'strain_table'){
-            <%=remote_function(:url => {:controller => 'biosamples', :action => 'existing_specimens'}, :with => "'strain_ids=' + getSelectedStrains()", :before=>"show_ajax_loader('existing_specimens')");%>
+        }
+        ;
+        if (table_name == 'strain_table') {
+        <%=remote_function(:url => {:controller => 'biosamples', :action => 'existing_specimens'}, :with => "'strain_ids=' + getSelectedStrains()", :before=>"show_ajax_loader('existing_specimens')");%>
             show_existing_specimens();
             hide_existing_samples();
-        }else if (table_name == 'specimen_table'){
-            <%=remote_function(:url => {:controller => 'biosamples', :action => 'existing_samples'}, :with => "'specimen_ids=' + getSelectedSpecimens()", :before=>"show_ajax_loader('existing_samples')");%>
+        } else if (table_name == 'specimen_table') {
+        <%=remote_function(:url => {:controller => 'biosamples', :action => 'existing_samples'}, :with => "'specimen_ids=' + getSelectedSpecimens()", :before=>"show_ajax_loader('existing_samples')");%>
         }
     }
 
@@ -92,19 +93,19 @@
         }
     }
 
-    function updateStrainRow(row_data, id_column_position){
+    function updateStrainRow(row_data, id_column_position) {
         var data = strain_table.fnGetData();
         for (var i = 0; i < data.length; i++) {
             //look for the position which is updated
-            if (data[i][id_column_position] == row_data[id_column_position]){
+            if (data[i][id_column_position] == row_data[id_column_position]) {
                 //if first column hasn't been changed, update row, but without checkbox column (second column)
-                if (data[i][0] == row_data[0]){
-                    for (var j =2; j<row_data.length; j++){
+                if (data[i][0] == row_data[0]) {
+                    for (var j = 2; j < row_data.length; j++) {
                         strain_table.fnUpdate(row_data[j], i, j);
                     }
                 }
                 //if the first column is updated, refresh the table
-                else{
+                else {
                     check_show_existing_strains('strain_organism_ids', 'existing_strains', '<%=url_for(:controller => 'biosamples', :action => 'existing_strains')-%>');
                     hide_existing_specimens();
                     hide_existing_samples();
@@ -114,20 +115,20 @@
         }
     }
 
-    function updateSpecimenRow(row_data, id_column_position){
+    function updateSpecimenRow(row_data, id_column_position) {
         var data = specimen_table.fnGetData();
         for (var i = 0; i < data.length; i++) {
             //look for the position which is updated
-            if (data[i][id_column_position] == row_data[id_column_position]){
+            if (data[i][id_column_position] == row_data[id_column_position]) {
                 //if first column hasn't been changed, update row, but without checkbox column (second column)
-                if (data[i][0] == row_data[0]){
-                    for (var j =2; j<row_data.length; j++){
+                if (data[i][0] == row_data[0]) {
+                    for (var j = 2; j < row_data.length; j++) {
                         specimen_table.fnUpdate(row_data[j], i, j);
                     }
                 }
                 //if the first column is updated, refresh the table
-                else{
-                    <%=remote_function(:url => {:controller => 'biosamples', :action => 'existing_specimens'}, :with => "'strain_ids=' + getSelectedStrains()");%>
+                else {
+                <%=remote_function(:url => {:controller => 'biosamples', :action => 'existing_specimens'}, :with => "'strain_ids=' + getSelectedStrains()");%>
                     show_existing_specimens();
                     hide_existing_samples();
                     break;
@@ -136,18 +137,18 @@
         }
     }
 
-    function updateSampleRow(row_data, id_column_position){
+    function updateSampleRow(row_data, id_column_position) {
         var data = sample_table.fnGetData();
         for (var i = 0; i < data.length; i++) {
             //look for the position which is updated
-            if (data[i][id_column_position] == row_data[id_column_position]){
+            if (data[i][id_column_position] == row_data[id_column_position]) {
                 //if first column hasn't been changed, update row
-                if (data[i][0] == row_data[0]){
+                if (data[i][0] == row_data[0]) {
                     sample_table.fnUpdate(row_data, i, 0);
                 }
                 //if the first column is updated, refresh the table
-                else{
-                    <%=remote_function(:url => {:controller => 'biosamples', :action => 'existing_samples'}, :with => "'specimen_ids=' + getSelectedSpecimens()");%>
+                else {
+                <%=remote_function(:url => {:controller => 'biosamples', :action => 'existing_samples'}, :with => "'specimen_ids=' + getSelectedSpecimens()");%>
                     show_existing_samples();
                     break;
                 }
@@ -157,12 +158,12 @@
 
     function loadNewStrainAfterCreation(strain, organism) {
         //if there is strain table
-        if(strain_table.length > 0){
+        if (strain_table.length > 0) {
             var data = strain_table.fnGetData();
             //if there is data in strain table
             if (data.length > 0) {
                 var load = false;
-                for (var i=0;i<data.length; i++){
+                for (var i = 0; i < data.length; i++) {
                     var pattern = new RegExp(organism);
                     if (pattern.test(data[i][0]))
                         load = true;
@@ -174,8 +175,8 @@
                     $j(nTr).addClass('gradeA');
                 }
             }
-            else{
-               check_show_existing_strains('strain_organism_ids', 'existing_strains', '<%=url_for(:controller => 'biosamples', :action => 'existing_strains')-%>');
+            else {
+                check_show_existing_strains('strain_organism_ids', 'existing_strains', '<%=url_for(:controller => 'biosamples', :action => 'existing_strains')-%>');
             }
         }
         else {
@@ -184,13 +185,13 @@
     }
 
     function loadNewSpecimenAfterCreation(specimen, strain_id) {
-        if(specimen_table.length > 0) {
+        if (specimen_table.length > 0) {
             var data = specimen_table.fnGetData();
-            if (data.length > 0){
+            if (data.length > 0) {
                 var load = false;
-                for (var i=0;i<data.length; i++){
-                    var pattern = new RegExp('ID='+ new Number(strain_id).toString());
-                    if (pattern.test(data[i][0])){
+                for (var i = 0; i < data.length; i++) {
+                    var pattern = new RegExp('ID=' + new Number(strain_id).toString());
+                    if (pattern.test(data[i][0])) {
                         load = true;
                     }
                 }
@@ -199,13 +200,13 @@
                     specimen_table.fnAddData(specimen);
                 }
             }
-            else{
-                <%=remote_function(:url => {:controller => 'biosamples', :action => 'existing_specimens'}, :with => "'strain_ids=' + getSelectedStrains()");%>
+            else {
+            <%=remote_function(:url => {:controller => 'biosamples', :action => 'existing_specimens'}, :with => "'strain_ids=' + getSelectedStrains()");%>
                 show_existing_specimens();
             }
         } else {
-                <%=remote_function(:url => {:controller => 'biosamples', :action => 'existing_specimens'}, :with => "'strain_ids=' + getSelectedStrains()");%>
-                show_existing_specimens();
+        <%=remote_function(:url => {:controller => 'biosamples', :action => 'existing_specimens'}, :with => "'strain_ids=' + getSelectedStrains()");%>
+            show_existing_specimens();
         }
     }
 
@@ -217,120 +218,122 @@
 
 
     function updateCreatorSettings() {
-    // iterate through all creators and build the "shared with" list;
-    // in the meanwhile also assemble a minimized version of the array that
-    // could be posted with the form (this won't have item titles in it)
+        // iterate through all creators and build the "shared with" list;
+        // in the meanwhile also assemble a minimized version of the array that
+        // could be posted with the form (this won't have item titles in it)
 
-    var creators = '';
-    var creators_arr = new Array();
+        var creators = '';
+        var creators_arr = new Array();
 
-    for(var i = 0; i < creator_settings.length; i++) {
-        creator_name = creator_settings[i][0];
-        creator_email = creator_settings[i][1];
-        creator_id = creator_settings[i][2];
-        creator_email_text = "";
-        if (<%= hide_contact_details? -%> == "true") {
-          creator_email_text = ': ' + creator_email
-        }
-        creators += '<b>' + creator_name + '</b>' + creator_email_text
-        + '&nbsp;&nbsp;&nbsp;<small style="vertical-align: middle;">'
-        + '[<a href="" onclick="javascript:deleteCreator(\''+ creator_name +'\', '+ creator_id +'); return(false);">remove</a>]</small><br/>';
+        for (var i = 0; i < creator_settings.length; i++) {
+            creator_name = creator_settings[i][0];
+            creator_email = creator_settings[i][1];
+            creator_id = creator_settings[i][2];
+            creator_email_text = "";
+            if (<%= hide_contact_details? -%> == "true"
+        )
+            {
+                creator_email_text = ': ' + creator_email
+            }
+            creators += '<b>' + creator_name + '</b>' + creator_email_text
+                    + '&nbsp;&nbsp;&nbsp;<small style="vertical-align: middle;">'
+                    + '[<a href="" onclick="javascript:deleteCreator(\'' + creator_name + '\', ' + creator_id + '); return(false);">remove</a>]</small><br/>';
 
-        creators_arr.push([creator_name, creator_id]);
-    }
-
-
-    // remove the last line break
-    if(creators.length > 0) {
-        creators = creators.slice(0,-5);
-    }
-
-
-    // update the page
-    if(creators.length == 0) {
-        $('creators_list').innerHTML = '<span class="none_text">No creators</span>';
-    }
-    else {
-        $('creators_list').innerHTML = creators;
-    }
-
-
-    // UPDATE THE FIELDS WHICH WILL BE SUBMITTED WITH THE PAGE
-    $('creators').value = Object.toJSON(creators_arr);
-}
-
-
-function checkCreatorNotInList(creator_name, creator_id) {
-    rtn = true;
-
-    for(var i = 0; i < creator_settings.length; i++)
-        if(creator_settings[i][0] == creator_name && creator_settings[i][2] == creator_id) {
-            rtn = false;
-            break;
+            creators_arr.push([creator_name, creator_id]);
         }
 
-    return(rtn);
-}
+
+        // remove the last line break
+        if (creators.length > 0) {
+            creators = creators.slice(0, -5);
+        }
 
 
-// adds an creator to the list and updates the displayed list
-function addCreator(creator_name, creator_email, creator_id) {
-    if(checkCreatorNotInList(creator_name, creator_id)) {
-        creator_settings.push([creator_name, creator_email, creator_id]);
+        // update the page
+        if (creators.length == 0) {
+            $('creators_list').innerHTML = '<span class="none_text">No creators</span>';
+        }
+        else {
+            $('creators_list').innerHTML = creators;
+        }
 
-        // update visible page
+
+        // UPDATE THE FIELDS WHICH WILL BE SUBMITTED WITH THE PAGE
+        $('creators').value = Object.toJSON(creators_arr);
+    }
+
+
+    function checkCreatorNotInList(creator_name, creator_id) {
+        rtn = true;
+
+        for (var i = 0; i < creator_settings.length; i++)
+            if (creator_settings[i][0] == creator_name && creator_settings[i][2] == creator_id) {
+                rtn = false;
+                break;
+            }
+
+        return(rtn);
+    }
+
+
+    // adds an creator to the list and updates the displayed list
+    function addCreator(creator_name, creator_email, creator_id) {
+        if (checkCreatorNotInList(creator_name, creator_id)) {
+            creator_settings.push([creator_name, creator_email, creator_id]);
+
+            // update visible page
+            updateCreatorSettings();
+        }
+        else {
+            // alert('The following entity was not added (already in the list of creators):\n\n' +
+            //     creator_name + ': ' + creator_email);
+        }
+    }
+
+
+    // removes creator from creator list and updates the displayed list
+    function deleteCreator(creator_name, creator_id) {
+        // remove the actual record for the creator
+        for (var i = 0; i < creator_settings.length; i++)
+            if (creator_settings[i][0] == creator_name && creator_settings[i][2] == creator_id) {
+                creator_settings.splice(i, 1);
+                break;
+            }
+
+        // update the page
         updateCreatorSettings();
     }
-    else {
-       // alert('The following entity was not added (already in the list of creators):\n\n' +
-       //     creator_name + ': ' + creator_email);
-    }
-}
 
 
-// removes creator from creator list and updates the displayed list
-function deleteCreator(creator_name, creator_id) {
-    // remove the actual record for the creator
-    for(var i = 0; i < creator_settings.length; i++)
-        if(creator_settings[i][0] == creator_name && creator_settings[i][2] == creator_id) {
-            creator_settings.splice(i, 1);
-            break;
+    function addCreators() {
+        var selIDs = autocompleters[creator_autocompleter_id].getRecognizedSelectedIDs();
+
+        if (selIDs == "") {
+            // no creators to add
+            alert("Please choose some creators!");
+            return(false);
         }
+        else {
+            // some creators to add - known that don't have duplicates
+            // within the new list, but some entries in the new list
+            // may replicate those in the main creator list: this
+            // will be checked by addCreator()
 
-    // update the page
-    updateCreatorSettings();
-}
+            for (var i = 0; i < selIDs.length; i++) {
+                id = parseInt(selIDs[i]);
+                email = autocompleters[creator_autocompleter_id].getValueFromJsonArray(autocompleters[creator_autocompleter_id].itemIDsToJsonArrayIDs([id])[0], 'email');
+                name = autocompleters[creator_autocompleter_id].getValueFromJsonArray(autocompleters[creator_autocompleter_id].itemIDsToJsonArrayIDs([id])[0], 'name');
+                addCreator(name, email, id);
+            }
 
+            // remove all tokens from autocomplete text box
+            autocompleters[creator_autocompleter_id].deleteAllTokens();
 
-function addCreators() {
-    var selIDs = autocompleters[creator_autocompleter_id].getRecognizedSelectedIDs();
-
-    if(selIDs == "") {
-        // no creators to add
-        alert("Please choose some creators!");
-        return(false);
-    }
-    else {
-        // some creators to add - known that don't have duplicates
-        // within the new list, but some entries in the new list
-        // may replicate those in the main creator list: this
-        // will be checked by addCreator()
-
-        for(var i = 0; i < selIDs.length; i++) {
-            id = parseInt(selIDs[i]);
-            email = autocompleters[creator_autocompleter_id].getValueFromJsonArray(autocompleters[creator_autocompleter_id].itemIDsToJsonArrayIDs([id])[0], 'email');
-            name = autocompleters[creator_autocompleter_id].getValueFromJsonArray(autocompleters[creator_autocompleter_id].itemIDsToJsonArrayIDs([id])[0], 'name');
-            addCreator(name, email, id);
+            return(true);
         }
-
-        // remove all tokens from autocomplete text box
-        autocompleters[creator_autocompleter_id].deleteAllTokens();
-
-        return(true);
     }
-}
 
-    function updateInstitutionList(data, project_name){
+    function updateInstitutionList(data, project_name) {
         data = data.evalJSON(true);
         element = $('adv_creator_select_institutions');
         spinner = $('adv_creator_select_project_spinner');
@@ -346,7 +349,7 @@ function addCreators() {
         $('adv_creator_select_add').style.display = 'inline-block';
     }
 
-    function addPeopleToList(data){
+    function addPeopleToList(data) {
         data = data.evalJSON(true);
         for (var i = 0; i < data.people_list.length; i++) {
             addCreator(data.people_list[i][0], data.people_list[i][1], data.people_list[i][2])

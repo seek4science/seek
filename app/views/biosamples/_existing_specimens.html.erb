@@ -29,16 +29,19 @@
             }
         }).rowGrouping({"sGrupingClass": 'row_group_color'});
     });
-
+    initialiseFold('existing_specimens');
 </script>
 
-<div id="existing_specimens">
-  <% unless strains.blank? %>
-      <% if Seek::Config.is_virtualliver %>
-           <h2>Specimen</h2>
+<% unless strains.blank?%>
+<div class="fold" id="existing_specimens" style="margin-left: 1em">
+  <div class="foldTitle">
+    <% if Seek::Config.is_virtualliver %>
+           Specimen
       <% else %>
-           <h2>Cell culture (chemostat or batch)</h2>
+          Cell culture (chemostat or batch)
       <% end %>
+  </div>
+  <div class="foldContent">
       <% if existing_specimens.empty? -%>
           <p class="none_text">No <%= CELL_CULTURE_OR_SPECIMEN%>s have yet been defined for the selected strains.</p>
       <% else -%>
@@ -85,8 +88,9 @@
           </ul>
           <br/>
       <% end %>
-  <% end -%>
+  </div>
 </div>
+<% end %>
 
 
 

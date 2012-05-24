@@ -94,5 +94,26 @@ function initialiseFolds() {
   }
 }
 
+function initialiseFold(element_id) {
+    var divs = document.getElementsByTagName('DIV');
+
+      for (var i = 0; i < divs.length; i++) {
+
+        var div = divs[i];
+
+        if (div.className == 'fold' && div.id == element_id) {
+
+          var paneCommands = document.createElement('SPAN');
+          var title        = getPaneTitleDiv(div);
+
+          title.insertBefore(paneCommands, title.firstChild);
+
+          div.titleHTML = title.innerHTML;
+
+          foldUpdate(div);
+        }
+      }
+}
+
 initialiseFolds();
 
