@@ -28,7 +28,14 @@ class HomeControllerTest < ActionController::TestCase
     login_as(:quentin)
     get :feedback
     assert_response :success
-  end  
+  end
+
+  test "should send feedback for anonymous user" do
+    logout
+    assert_emails(1) do
+      post :send_feedback, :anon => false, :details => 'test feedback', :subject => 'test feedback'
+    end
+  end
 
   test "admin link not visible to non admin" do
     login_as(:aaron)
