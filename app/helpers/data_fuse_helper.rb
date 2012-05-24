@@ -39,7 +39,7 @@ module DataFuseHelper
           if x==0
             t=value
           else
-            data[labels[x]] << [t,value]
+            data[labels[x]] << [t.to_f,value.to_f]
           end
         end
 
@@ -48,8 +48,11 @@ module DataFuseHelper
     end
     result = []
     colors = ["red","blue","green","cyan","magenta","darkgreen"]
-    data.keys.each_with_index do |key,i|
-      hash = {"label"=>key,"data"=>data[key]}
+    data.keys.reverse.each_with_index do |key,i|
+      hash = {"label"=>key,
+              "data"=>data[key],
+              "curvedLines"=>{"show"=>true}
+      }
       hash["color"]=colors[i] unless colors[i].nil?
       result << hash
     end

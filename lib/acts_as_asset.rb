@@ -62,7 +62,7 @@ module Acts #:nodoc:
         has_many :assays, :through => :assay_assets
 
         has_many :assets_creators, :dependent => :destroy, :as => :asset, :foreign_key => :asset_id
-        has_many :creators, :class_name => "Person", :through => :assets_creators, :order=>'assets_creators.id'
+        has_many :creators, :class_name => "Person", :through => :assets_creators, :order=>'assets_creators.id', :after_remove => :update_timestamp, :after_add => :update_timestamp
 
         has_many :activity_logs, :as => :activity_loggable
 
@@ -72,8 +72,11 @@ module Acts #:nodoc:
           extend Acts::Asset::SingletonMethods
         end
         include Acts::Asset::InstanceMethods
+        include BackgroundReindexing
         include Subscribable
       end
+
+
 
       def is_asset?
         include?(Acts::Asset::InstanceMethods)
@@ -88,10 +91,15 @@ module Acts #:nodoc:
 
     module InstanceMethods
 
+      def studies
+        assays.collect{|a| a.study}.uniq
+      end
+
 
       def related_people
         self.creators
       end
+      
       # adapt for moving original_filename,content_type to content_blob
 
       def original_filename
@@ -152,8 +160,13 @@ module Acts #:nodoc:
         project_assays
       end
 
-      # def asset; return self; end
-      # def resource; return self; end
+      def assay_type_titles
+        assays.collect{|a| a.assay_type.try(:title)}.compact
+      end
+
+      def technology_type_titles
+        assays.collect{|a| a.technology_type.try(:title)}.compact
+      end
 
     end
   end

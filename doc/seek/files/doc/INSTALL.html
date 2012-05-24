@@ -56,7 +56,7 @@
     </tr>
     <tr class="top-aligned-row">
       <td><strong>Last Update:</strong></td>
-      <td>Mon Mar 05 10:02:36 +0000 2012</td>
+      <td>Mon May 14 14:39:41 +0100 2012</td>
     </tr>
     </table>
   </div>
@@ -69,7 +69,7 @@
   <div id="contextContent">
 
     <div id="description">
-      <h1>Installation</h1>
+      <h1>Installing SEEK</h1>
 <p>
 SEEK is based upon the Ruby on Rails platform. Although the information on
 this page should provide you with everything you need to get a basic
@@ -86,7 +86,10 @@ be useful as well.
 <p>
 We recommend that you run SEEK on a Linux system. All of the examples here
 describe installing on an Ubuntu (10.04 LTS) or Debian system, but should
-be easily transferrable to other Linux systems such as Fedora.
+be easily transferrable to other Linux systems such as Fedora. There is a
+script for CentOS that was contributed to us by Mark Woodbridge (Imperial
+College, London) available at <a
+href="https://gist.github.com/2127663">gist.github.com/2127663</a>
 </p>
 <p>
 Although possible, installing and running Ruby on Rails on a Windows system
@@ -112,39 +115,23 @@ compilation. The Ubuntu/Debian package <em>build-essentials</em> should be
 sufficient
 </p>
 <p>
-SEEK uses Lucene as its search engine, and this requires that java is
-installed. We use the Sun Java 1.6 package <em>sun-java6-jdk</em>
+The following steps outline the commands required to install all the
+required packages for Ubuntu or Debian. SEEK uses Lucene as its search
+engine, and this requires that java is installed. Sun Java is no longer
+available for Ubuntu, but OpenJDK should work fine.
 </p>
 <p>
-<b>Note:</b>If using Ubuntu, you will need to enable Partner sources to
-install sun-java6-jdk . To do this edit <em>/etc/apt/sources.list</em> and
-uncomment the lines so that they appear as follows:
-</p>
-<pre>
-  ## This software is not part of Ubuntu, but is offered by Canonical and the
-  ## respective vendors as a service to Ubuntu users.
-  deb http://archive.canonical.com/ubuntu lucid partner
-  deb-src http://archive.canonical.com/ubuntu lucid partner
-</pre>
-<p>
-(if you need more information, see <a
-href="https://help.ubuntu.com/community/Repositories/Ubuntu#Adding+Canonical+Partner+Repositories">help.ubuntu.com/community/Repositories/Ubuntu#Adding+Canonical+Partner+Repositories</a>).
-</p>
-<p>
-If you needed to add partner repositories, and its a good idea anyway, you
-should now do an apt-get update and an apt-get upgrade to make sure things
-are up to date:
+Before starting, its a good idea to get up to date:
 </p>
 <pre>
   sudo apt-get update &amp;&amp; sudo apt-get -y upgrade
 </pre>
 <p>
-If using Ubuntu or Debian, the following commands should install most the
-packages you need:
+The following commands will install the core required packages:
 </p>
 <pre>
   sudo apt-get install wget mercurial ruby rdoc ri libopenssl-ruby ruby-dev mysql-server libssl-dev build-essential openssh-server
-  sudo apt-get install libmysqlclient16-dev libmagick++-dev libxslt-dev libxml++2.6-dev sun-java6-jdk graphviz libsqlite3-dev sqlite3
+  sudo apt-get install libmysqlclient16-dev libmagick++-dev libxslt-dev libxml++2.6-dev openjdk-6-jdk graphviz libsqlite3-dev sqlite3
 </pre>
 <p>
 if you are intending to develop SEEK you will probably also want to use:
@@ -193,11 +180,11 @@ as the version control system.
 </p>
 <p>
 For a stable version, you should check out according to a stable tag. Our
-current stable tag is <em>0.13.1</em>, so to retrieve this version you
+current stable tag is <em>0.13.3</em>, so to retrieve this version you
 should use:
 </p>
 <pre>
-  hg clone https://sysmo-db.googlecode.com/hg/ -r v0.13.1 seek
+  hg clone https://sysmo-db.googlecode.com/hg/ -r v0.13.3 seek
 </pre>
 <p>
 This will create a <em>seek</em> directory that contains the application.
@@ -407,6 +394,11 @@ and configured a virtual host (probably in
       &lt;/Directory&gt;
    &lt;/VirtualHost&gt;
 </pre>
+<h2>Backing up</h2>
+<p>
+Please read our <a href="BACKUPS.html">Backup Guide</a> for suggestions on
+how to backup a SEEK installation.
+</p>
 <h2>Contacting us and other developers</h2>
 <p>
 There is a public Google Group available for SEEK development at <a

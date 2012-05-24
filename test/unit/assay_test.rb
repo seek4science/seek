@@ -272,6 +272,7 @@ class AssayTest < ActiveSupport::TestCase
 
   test "associate organism with strain" do
     assay=assays(:metabolomics_assay2)
+    User.current_user = assay.owner.user
     organism=organisms(:Streptomyces_coelicolor)
     assert_equal 0,assay.assay_organisms.count,"This test relies on this assay having no organisms"
     assert_equal 0,organism.strains.count, "This test relies on this organism having no strains"
@@ -327,11 +328,14 @@ class AssayTest < ActiveSupport::TestCase
   test "related models" do
     model_assay = Factory :modelling_assay,:model_master_ids => [Factory(:model).id]
     exp_assay = Factory :experimental_assay,:model_master_ids => [Factory(:model).id]
-    assert_equal model_assay.models, model_assay.related_models
-    assert_not_equal exp_assay.models,exp_assay.related_models
+    assert_equal model_assay.model_masters, model_assay.related_models
+    assert_not_equal exp_assay.model_masters,exp_assay.related_models
     assert_equal [], exp_assay.related_models
   end
 
-
-
+  test "contributing_user" do
+      assay = Factory :assay
+      assert assay.contributor
+      assert_equal assay.contributor.user, assay.contributing_user
+  end
 end

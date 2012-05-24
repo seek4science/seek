@@ -3,6 +3,7 @@ class SamplesController < ApplicationController
   include IndexPager
   before_filter :find_assets, :only => [:index]
   before_filter :find_and_auth, :only => [:show, :edit, :update, :destroy]
+  before_filter :virtualliver_only, :only => [:new_object_based_on_existing_one]
 
 
   def new_object_based_on_existing_one
@@ -42,7 +43,8 @@ class SamplesController < ApplicationController
   def new
     @sample = Sample.new
     @sample.from_new_link = params[:from_new_link]
-    @sample.specimen = Specimen.new :creators=>[User.current_user.person]
+    @sample.from_biosamples = params[:from_biosamples]
+    @sample.specimen = Specimen.find_by_id(params[:specimen_id]) || Specimen.new(:creators=>[User.current_user.person])
 
     respond_to do |format|
       format.html # new.html.erb
@@ -50,31 +52,44 @@ class SamplesController < ApplicationController
     end
   end
 
+  def edit
+    @sample.from_biosamples = params[:from_biosamples]
+    respond_to do |format|
+      format.html # new.html.erb
+      format.xml
+    end
+  end
 
   def create
     @sample = Sample.new(params[:sample])
+    spe = Specimen.find_by_id(params[:specimen_id])
+    if spe && (@sample.from_biosamples=='true')
+      @sample.specimen = spe
+    else
+      @sample.specimen.contributor = @sample.contributor if @sample.specimen.contributor.nil?
+      @sample.specimen.projects = @sample.projects if @sample.specimen.projects.blank?
+      if @sample.specimen.strain.nil? && !params[:organism].blank?
+        @sample.specimen.strain = Strain.default_strain_for_organism(params[:organism])
+      end
 
-    @sample.specimen.contributor = @sample.contributor if @sample.specimen.contributor.nil?
-    @sample.specimen.projects = @sample.projects if @sample.specimen.projects.blank?
-    if @sample.specimen.strain.nil? && !params[:organism].blank?
-      @sample.specimen.strain = Strain.default_strain_for_organism(params[:organism])
+      #add policy to specimen
+    tissue_and_cell_types = params[:tissue_and_cell_type_ids]||[]
+
+      @sample.specimen.policy.set_attributes_with_sharing params[:sharing], @sample.projects
+
+      #get SOPs
+      sops = (params[:specimen_sop_ids].nil?? [] : params[:specimen_sop_ids].reject(&:blank?)) || []
+
+      #add creators
+      AssetsCreator.add_or_update_creator_list(@sample.specimen, params[:creators])
+      @sample.specimen.other_creators=params[:specimen][:other_creators] if params[:specimen]
     end
 
-    #add policy to sample and specimen
     @sample.policy.set_attributes_with_sharing params[:sharing], @sample.projects
-    tissue_and_cell_types = params[:tissue_and_cell_type_ids]||[]
-    @sample.specimen.policy.set_attributes_with_sharing params[:sharing], @sample.projects
- 
+
     data_file_ids = (params[:sample_data_file_ids].nil?? [] : params[:sample_data_file_ids].reject(&:blank?)) || []
     model_ids = (params[:sample_model_ids].nil?? [] : params[:sample_model_ids].reject(&:blank?)) || []
     sop_ids = (params[:sample_sop_ids].nil?? [] : params[:sample_sop_ids].reject(&:blank?)) || []
-    
-    #get SOPs
-    sops = (params[:specimen_sop_ids].nil?? [] : params[:specimen_sop_ids].reject(&:blank?)) || []
-
-    #add creators
-    AssetsCreator.add_or_update_creator_list(@sample.specimen, params[:creators])
-    @sample.specimen.other_creators=params[:specimen][:other_creators] if params[:specimen]
 
     if @sample.save
         tissue_and_cell_types.each do |t|
@@ -86,11 +101,13 @@ class SamplesController < ApplicationController
       @sample.create_or_update_assets model_ids, "Model"
       @sample.create_or_update_assets sop_ids, "Sop"
       
-      align_sops(@sample.specimen,sops)
+      align_sops(@sample.specimen,sops) unless spe
 
 
       if @sample.from_new_link=="true"
         render :partial=>"assets/back_to_fancy_parent", :locals=>{:child=>@sample, :parent=>"assay"}
+        elsif @sample.from_biosamples=="true"
+          render :partial=>"biosamples/back_to_biosamples",:locals=>{:action => 'create', :object=>@sample, :new_specimen => spe ? false : true}
       else
         respond_to do |format|
           flash[:notice] = 'Sample was successfully created.'
@@ -139,9 +156,7 @@ class SamplesController < ApplicationController
       #add creators
       AssetsCreator.add_or_update_creator_list(@sample.specimen, params[:creators])
 
-      respond_to do |format|
-
-        if @sample.save
+      if @sample.save
         if tissue_and_cell_types.blank?
           @sample.tissue_and_cell_types= tissue_and_cell_types
           @sample.save
@@ -151,21 +166,26 @@ class SamplesController < ApplicationController
           @sample.associate_tissue_and_cell_type(t_id, t_title)
           end
         end
-
           @sample.create_or_update_assets data_file_ids,"DataFile"
           @sample.create_or_update_assets model_ids,"Model"
           @sample.create_or_update_assets sop_ids,"Sop"
           
-          align_sops(@sample.specimen,sops)
+        align_sops(@sample.specimen, sops)
 
-        flash[:notice] = 'Sample was successfully updated.'
-        format.html { redirect_to(@sample) }
-        format.xml { head :ok }
-
+        if @sample.from_biosamples=="true"
+          render :partial => "biosamples/back_to_biosamples", :locals => {:action => 'update', :object => @sample}
         else
+          respond_to do |format|
+            flash[:notice] = 'Sample was successfully updated.'
+            format.html { redirect_to(@sample) }
+            format.xml { head :ok }
+          end
+        end
+      else
+        respond_to do |format|
           format.html { render :action => "edit" }
         end
-    end
+      end
   end
 
   def align_sops resource,new_sop_ids

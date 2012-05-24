@@ -15,8 +15,10 @@ class DataFilesController < ApplicationController
   #before_filter :login_required
   
   before_filter :find_assets, :only => [ :index ]
-  before_filter :find_and_auth, :except => [ :index, :new, :upload_for_tool, :create, :request_resource, :preview, :test_asset_url, :update_annotations_ajax]
+  before_filter :find_and_auth, :except => [ :index, :new, :upload_for_tool, :upload_from_email, :create, :request_resource, :preview, :test_asset_url, :update_annotations_ajax]
   before_filter :find_display_asset, :only=>[:show,:download,:explore]
+  skip_before_filter :verify_authenticity_token, :only => [:upload_for_tool, :upload_from_email]
+  before_filter :xml_login_only, :only => [:upload_for_tool, :upload_from_email]
 
   #has to come after the other filters
   include Seek::Publishing
@@ -67,6 +69,13 @@ class DataFilesController < ApplicationController
             new_f.save
           end
           flash[:notice] = "New version uploaded - now on version #{@data_file.version}"
+
+          bio_samples = @data_file.bio_samples_population
+          unless bio_samples.instance_values["errors"].blank?
+            flash[:error] = "Warning: sample database population is not completely successful.<br/>"
+            flash[:error] << bio_samples.instance_values["errors"].html_safe
+          end
+          bio_samples.instance_values["assay"].try(:relate, @data_file)
         else
           flash[:error] = "Unable to save new version"
         end
@@ -91,7 +100,6 @@ class DataFilesController < ApplicationController
   end
   
   def new
-    #DataFile.find(13).destroy
     @data_file = DataFile.new
     respond_to do |format|
       if current_user.person.member?
@@ -126,6 +134,31 @@ class DataFilesController < ApplicationController
       end
     end
   end
+
+  def upload_from_email
+    if current_user.is_admin? && Seek::Config.admin_impersonation_enabled
+      User.with_current_user Person.find(params[:sender_id]).user do
+        if handle_data
+          @data_file = DataFile.new params[:data_file]
+
+          Policy.new_from_email(@data_file, params[:recipient_ids], params[:cc_ids])
+
+          if @data_file.save
+            @data_file.creators = [User.current_user.person]
+            create_content_blobs
+
+            flash.now[:notice] ="Data file was successfully uploaded and saved." if flash.now[:notice].nil?
+            render :text => flash.now[:notice]
+          else
+            errors = (@data_file.errors.map { |e| e.join(" ") }.join("\n"))
+            render :text => errors, :status => 500
+          end
+        end
+      end
+    else
+      render :text => "This user is not permitted to act on behalf of other users", :status => :forbidden
+    end
+  end
   
   def create
     if handle_data
@@ -133,13 +166,13 @@ class DataFilesController < ApplicationController
       @data_file = DataFile.new params[:data_file]
       #@data_file.content_blob = ContentBlob.new :tmp_io_object => @tmp_io_object, :url=>@data_url
 
-     update_annotations @data_file
 
       @data_file.policy.set_attributes_with_sharing params[:sharing], @data_file.projects
 
       assay_ids = params[:assay_ids] || []
       respond_to do |format|
         if @data_file.save
+            update_annotations @data_file
 
           create_content_blobs
 
@@ -151,11 +184,15 @@ class DataFilesController < ApplicationController
           
           #Add creators
           AssetsCreator.add_or_update_creator_list(@data_file, params[:creators])
+            flash[:notice] = 'Data file was successfully uploaded and saved.' if flash.now[:notice].nil?
 
-          flash.now[:notice] = 'Data file was successfully uploaded and saved.' if flash.now[:notice].nil?
-          format.html { redirect_to data_file_path(@data_file) }
+              bio_samples = @data_file.bio_samples_population
+              unless  bio_samples.instance_values["errors"].blank?
+                flash[:error] = "Warning: Sample database population is not completely successful.<br/>"
+                flash[:error] << bio_samples.instance_values["errors"].html_safe
+              end
 
-
+            bio_samples.instance_values["assay"].try(:relate, @data_file)
           assay_ids.each do |text|
             a_id, r_type = text.split(",")
             @assay = Assay.find(a_id)
@@ -163,6 +200,7 @@ class DataFilesController < ApplicationController
               @assay.relate(@data_file, RelationshipType.find_by_title(r_type))
             end
           end
+            format.html { redirect_to data_file_path(@data_file)}
         else
           format.html {
             render :action => "new"
@@ -316,7 +354,7 @@ end
   end  
   
   def explore
-    if @display_data_file.is_spreadsheet?
+    if @display_data_file.is_extractable_spreadsheet?
       #Generate Ruby spreadsheet model from XML
       @spreadsheet = @display_data_file.spreadsheet
 
@@ -333,11 +371,28 @@ end
     end
   end 
   
+  def clear_population bio_samples
+      specimens = Specimen.find_all_by_title bio_samples.instance_values["specimen_names"].values
+      samples = Sample.find_all_by_title bio_samples.instance_values["sample_names"].values
+      samples.each do |s|
+        s.assays.clear
+        s.destroy
+      end
+      specimens.each &:destroy
+  end
+  
   protected
 
   def translate_action action
     action="download" if action=="data"
     super action
+  end
+
+  def xml_login_only
+    unless session[:xml_login]
+      flash[:error] = "Only available when logged in via xml"
+      redirect_to root_url
+    end
   end
 
 end

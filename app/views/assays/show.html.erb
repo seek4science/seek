@@ -101,7 +101,7 @@
           <b><%= @assay.models.size > 1 ? "Models" : "Model" %>:</b>
           <br/>
           <ul>
-              <% @assay.models.each do |m| %>
+              <% @assay.model_masters.each do |m| %>
               <li>
                   <%= link_to truncate(h(m.title), :length=>110), show_resource_path(m) %>
               </li>
@@ -112,7 +112,7 @@
           <b>Data:</b>
           <br/>
           <ul>
-              <% @assay.data_files.each do |d| %>
+              <% @assay.data_file_masters.each do |d| %>
               <li>
                   <%= link_to truncate(h(d.title), :length=>110), show_resource_path(d) %><%= d.relationship_type(@assay) ? " <span>(" + d.relationship_type(@assay).title + ")</span>" : "" %>
               </li>

@@ -199,6 +199,9 @@ end
 Factory.define(:strain) do |f|
   f.sequence(:title) { |n| "Strain#{n}" }
   f.association :organism
+  f.projects {[Factory.build(:project)]}
+  f.association :contributor, :factory => :user
+  f.association :policy, :factory => :public_policy
 end
 
 #Culture growth type
@@ -257,7 +260,7 @@ end
 
 #Model
   Factory.define(:model) do |f|
-    f.title "A Model"
+    f.sequence(:title) {|n| "A Model #{n}"}
     f.projects {[Factory.build(:project)]}
     f.association :contributor, :factory => :user
     f.association :policy, :factory => :private_policy
@@ -268,7 +271,7 @@ end
 
 #Publication
   Factory.define(:publication) do |f|
-    f.title "A Model"
+    f.sequence(:title) {|n| "A Publication #{n}"}
     f.pubmed_id 1
     f.projects {[Factory.build(:project)]}
     f.association :contributor, :factory => :user
@@ -277,7 +280,7 @@ end
 
 #Presentation
   Factory.define(:presentation) do |f|
-    f.title "A Presentation"
+    f.sequence(:title) {|n| "A Presentation #{n}"}
     f.projects {[Factory.build :project]}
    # f.data_url "http://www.virtual-liver.de/images/logo.png"
     f.association :contributor,:factory=>:user
@@ -524,4 +527,24 @@ end
   Factory.define :cell_range do |f|
     f.cell_range "A1:B3"
     f.association :worksheet
+  end
+
+
+  Factory.define :genotype do |f|
+    f.association :gene, :factory => :gene
+    f.association :modification, :factory => :modification
+    f.association :strain, :factory => :strain
+  end
+
+  Factory.define :gene do |f|
+    f.sequence(:title) {|n| "gene #{n}"}
+  end
+
+  Factory.define :modification do |f|
+    f.sequence(:title) {|n| "modification #{n}"}
+  end
+
+  Factory.define :phenotype do |f|
+    f.sequence(:description) {|n| "phenotype #{n}"}
+    f.association :strain, :factory => :strain
   end

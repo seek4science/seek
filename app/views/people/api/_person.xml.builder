@@ -20,11 +20,11 @@ core_xlink(person).merge(is_root ? xml_root_attributes : {}) do
     
     parent_xml.tag! "tags" do
       person.tools.each do |tool|
-        parent_xml.tag! "tag",tool.name,{:context=>:tool}
+        parent_xml.tag! "tag",tool.text,{:context=>:tool}
       end
       
       person.expertise.each do |tool|
-        parent_xml.tag! "tag",tool.name,{:context=>:expertise}
+        parent_xml.tag! "tag",tool.text,{:context=>:expertise}
       end
     end
     

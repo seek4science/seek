@@ -16,13 +16,16 @@ class DataFile < ActiveRecord::Base
 
   validates_presence_of :title
 
+  after_save :queue_background_reindexing if Seek::Config.solr_enabled
+
   # allow same titles, but only if these belong to different users
   # validates_uniqueness_of :title, :scope => [ :contributor_id, :contributor_type ], :message => "error - you already have a Data file with such title."
 
     has_one :content_blob, :as => :asset, :foreign_key => :asset_id ,:conditions => 'asset_version= #{self.version}'
 
-  searchable do
-    text :description, :title, :original_filename, :searchable_tags, :spreadsheet_annotation_search_fields,:fs_search_fields, :spreadsheet_contents_for_search
+  searchable(:auto_index=>false) do
+    text :description, :title, :original_filename, :searchable_tags, :spreadsheet_annotation_search_fields,:fs_search_fields, :spreadsheet_contents_for_search,
+         :assay_type_titles,:technology_type_titles
   end if Seek::Config.solr_enabled
 
   has_many :studied_factors, :conditions =>  'studied_factors.data_file_version = #{self.version}'
@@ -74,31 +77,23 @@ class DataFile < ActiveRecord::Base
     end
   end
 
-  def studies
-    assays.collect{|a| a.study}.uniq
-  end
-
-
-
   # get a list of DataFiles with their original uploaders - for autocomplete fields
   # (authorization is done immediately to save from iterating through the collection again afterwards)
   #
   # Parameters:
   # - user - user that performs the action; this is required for authorization
   def self.get_all_as_json(user)
-    all_datafiles = DataFile.find(:all, :order => "ID asc",:include=>[:policy,{:policy=>:permissions}])
-    datafiles_with_contributors = all_datafiles.collect{ |d|
-        d.can_view?(user) ?
-        (contributor = d.contributor;
+    #FIXME: could probably be moved into a mixin rather than being dupilcated across assets
+    all = DataFile.all_authorized_for "view",user
+    with_contributors = all.collect{ |d|
+        contributor = d.contributor;
         { "id" => d.id,
           "title" => d.title,
           "contributor" => contributor.nil? ? "" : "by " + contributor.person.name,
-          "type" => self.name } ) :
-        nil }
-
-    datafiles_with_contributors.delete(nil)
-
-    return datafiles_with_contributors.to_json
+          "type" => self.name
+        }
+    }
+    return with_contributors.to_json
   end
 
   def included_to_be_copied? symbol
@@ -210,5 +205,5 @@ class DataFile < ActiveRecord::Base
       presentation.orig_data_file_id = id
     end
   end
-  
+
 end

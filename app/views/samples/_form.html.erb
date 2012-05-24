@@ -2,100 +2,15 @@
 <%= stylesheet_link_tag 'calendar_date_select/default' %>
 <%= javascript_include_tag "sharing.js" -%>
 <%= javascript_include_tag "resource.js"%>
+<%= javascript_include_tag "biosample.js"%>
 
 <%= f.error_messages %>
 
-<h2><%= CELL_CULTURE_OR_SPECIMEN.capitalize -%> details</h2>
-
-<script type="text/javascript">
-  var organism_strains = new Array();
-  <% Organism.all.each do |org|
-    strains = org.strains.without_default -%>
-
-    organism_strains[<%= org.id -%>] = '<%= strains.collect{|s| [s.id,s.info]}.to_json -%>';
-
-  <% end -%>
-
-  function update_strains_for_organism(organism_id) {
-        var strains_json = organism_strains[organism_id];
-        var strains = eval('('+strains_json+')');
-        var box = $('sample_specimen_attributes_strain_id');
-        box.options.length = 0;
-        box.insert(new Element('option',{value:0}).update("Not specified"));
-        for(var i=0;i<strains.length;i++) {
-            var strain = strains[i];
-            box.insert(new Element('option',{value:strain[0]}).update(strain[1]));
-        }
-  }
-</script>
-
-<% f.fields_for :specimen do |specimen_f| -%>
-    <p>
-        <%= specimen_f.label "#{CELL_CULTURE_OR_SPECIMEN.capitalize} title:"-%><span class="required">*</span><br/>
-        <%= specimen_f.text_field :title, :style=>"width:350px;" -%>
-    </p>
-
-    <p>
-        <%= specimen_f.label "Lab internal identifier:" -%> <span class="required">*</span><br/>
-        <%= specimen_f.text_field :lab_internal_number, :style=>"width:350px;" -%>
-    </p>
-
-    <p>
-        <%= specimen_f.label "Culture starting date:" -%> <br/>
-        <%= specimen_f.calendar_date_select :born, :time => "mixed", :style=>"width:350px;" -%>
-    </p>
-
-    <p>
-        <%= specimen_f.label "Culture growth type:" -%> <br/>
-        <%= specimen_f.collection_select :culture_growth_type_id, CultureGrowthType.all,:id,:title,:include_blank=>"Not specified" -%>
-    </p>
-
-    <p>
-        <%= specimen_f.label "Sex:" -%> <br/>
-        <%= specimen_f.select :sex, options_for_select([["female",true],["male",false]].insert(0,["Not specified", 0]),@sample.specimen.try(:sex)) -%>
-    </p>
-
-    <p>
-        <%= specimen_f.label "Comment:" -%> <br/>
-        <%= specimen_f.text_field :comments, :style=>"width:350px;" -%>
-    </p>
-
-    <p>
-        <%= specimen_f.label "Provider name:" -%> <br/>
-        <%= specimen_f.text_field :provider_name, :style=>"width:350px;" -%>
-    </p>
-
-    <p>
-        <%= specimen_f.label "Provider's #{CELL_CULTURE_OR_SPECIMEN} identifier:" -%> <br/>
-        <%= specimen_f.text_field :provider_id, :style=>"width:350px;" -%>
-    </p>
-
-    <p>
-        <%= specimen_f.label "Organism:" -%><span class="required">*</span> <br/>
-        <%= select_tag :organism,
-                              options_for_select([["Not specified",""]] + Organism.all(:order=>:title).collect{|o| [o.title,o.id]},@sample.specimen.organism.try(:id)),
-                              :onchange=>"update_strains_for_organism(this.value);" -%>
-    </p>
-
-    <p>
-        <%= specimen_f.label "Strain:" -%> <br/>
-        <% strains = @sample.specimen.organism.nil? ? [] : @sample.specimen.organism.strains.without_default -%>
-        <%= specimen_f.collection_select :strain_id,
-                              strains,:id,:info,:include_blank=>"Not specified" -%>
-    </p>
-
-    <%= fancy_multiselect @sample.specimen, :sops, :name => 'specimen_sop_ids',:association_class=>Sop, :selected => @sample.specimen.sop_masters.map(&:sop_id) -%>
-
-    <p>
-      <%= render :partial => "assets/author_form", :locals => {:resource_type => 'Specimen',
-                                                               :existing_creators => @sample.specimen.creators,
-                                                               :other_creators => @sample.specimen.other_creators} -%>
-    </p>
-
-
-<% end -%>
-
-
+<% unless action == :new && !@sample.specimen.new_record?%>
+    <% f.fields_for :specimen do |specimen_f| %>
+        <%= render :partial => "specimens/form", :locals => {:f => specimen_f, :specimen => @sample.specimen, :action => action,:from_biosamples=>true}%>
+    <% end %>
+<% end %>
 
 <h2>Sample Details</h2>
 
@@ -144,6 +59,11 @@
   </p>
 
   <p>
+    <%= f.label "Comment" -%><br/>
+    <%= f.text_field :comments, :style=>"width:350px;" -%>
+  </p>
+
+  <p>
     <%= f.label "Organism part" -%><br/>
     <%= f.select :organism_part, options_for_select(['whole cell', 'membrane fraction'].insert(0,'Not specified'), @sample.organism_part), :style => 'float:right;margin-right:30em' %>
   </p>
@@ -171,6 +91,8 @@
 </div>
 
 <%= f.hidden_field :from_new_link %>
+<%= f.hidden_field :from_biosamples %>
+<%= hidden_field_tag :specimen_id, @sample.specimen.try(:id) %>
 
 <p style="margin-top: 2em; text-align: center;">
   <%
@@ -179,8 +101,9 @@
      is_new_file=action==:edit ? false : true
   %>
   <% if @sample.can_manage? %>
-      <%= preview_permission_popup_link('sample', url_for(:controller => 'policies', :action => 'preview_permissions'), is_new_file, try_block{@sample.contributor.user.id})-%>
-      <%= f.submit button_text, :id => "sample_submit_btn", :onclick => "javascript: clickLink($('preview_permission'));return(false);" -%>
+      <%= preview_permission_popup_link('sample', url_for(:controller => 'policies', :action => 'preview_permissions'), is_new_file, try_block{@sample.contributor.id})-%>
+      <%= f.submit button_text, :id => "sample_submit_btn", :onclick => "javascript: if($F('organism')=='' || $F('organism')=='0' ){alert('Please select organism');return false;};clickLink($('preview_permission'));return(false);" -%>
+
   <% else %>
       <%= f.submit button_text, :id => "sample_submit_btn", :disable_with=>disabled_text-%>
   <% end %>

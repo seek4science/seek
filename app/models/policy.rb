@@ -1,14 +1,16 @@
 class Policy < ActiveRecord::Base
   
-  has_many :assets,
-           :dependent => :nullify,
-           :order => "resource_type ASC"
-  
   has_many :permissions,
            :dependent => :destroy,
            :order => "created_at ASC",
            :autosave => true,
            :after_add => proc {|policy, perm| perm.policy = policy}
+
+  before_save :update_timestamp_if_permissions_change
+
+  def update_timestamp_if_permissions_change
+    update_timestamp if changed_for_autosave?
+  end
 
   #basically the same as validates_numericality_of :sharing_scope, :access_type
   #but with a more generic error message because our users don't know what
@@ -24,15 +26,18 @@ class Policy < ActiveRecord::Base
 
   alias_attribute :title, :name
 
-  before_save :update_timestamp_if_permissions_change
+  default_scope :include=>:permissions
 
-  def update_timestamp_if_permissions_change
-    if changed_for_autosave?
-      current_time = current_time_from_proper_timezone
+  after_save :queue_update_auth_table
 
-      write_attribute('updated_at', current_time) if respond_to?(:updated_at)
-      write_attribute('updated_on', current_time) if respond_to?(:updated_on)
-    end
+  def queue_update_auth_table
+    AuthLookupUpdateJob.add_items_to_queue(assets) unless assets.empty?
+  end
+
+  def assets
+    Seek::Util.authorized_types.collect do |type|
+      type.find(:all,:conditions=>{:policy_id=>id})
+    end.flatten.uniq
   end
   
   
@@ -86,6 +91,22 @@ class Policy < ActiveRecord::Base
     return policy
   end
 
+  def self.new_from_email(resource, recipients, accessors)
+    policy = resource.build_policy(:name               => 'auto',
+                                   :sharing_scope      => Policy::PRIVATE,
+                                   :access_type        => Policy::NO_ACCESS)
+    recipients.each do |id|
+      policy.permissions.build :contributor_type => "Person", :contributor_id => id, :access_type => Policy::EDITING
+    end if recipients
+
+    accessors.each do |id|
+      policy.permissions.build :contributor_type => "Person", :contributor_id => id, :access_type => Policy::ACCESSIBLE
+    end if accessors
+
+    return policy
+  end
+
+
   def set_attributes_with_sharing sharing, projects
     # if no data about sharing is given, it should be some user (not the owner!)
     # who is editing the asset - no need to do anything with policy / permissions: return success
@@ -101,7 +122,7 @@ class Policy < ActiveRecord::Base
         # NOW PROCESS THE PERMISSIONS
 
         # read the permission data from sharing
-        unless sharing[:permissions].blank?
+        unless sharing[:permissions].blank? or sharing[:permissions][:contributor_types].blank?
           contributor_types = ActiveSupport::JSON.decode(sharing[:permissions][:contributor_types]) || []
           new_permission_data = ActiveSupport::JSON.decode(sharing[:permissions][:values]) || {}
         else
@@ -237,7 +258,7 @@ class Policy < ActiveRecord::Base
   end
 
 #return the hash: key is access_type, value is the array of people
-  def summarize_permissions creators=[User.current_user.person], asset_managers = [], contributor=User.current_user.person
+  def summarize_permissions creators=[User.current_user.try(:person)], asset_managers = [], contributor=User.current_user.try(:person)
         #build the hash containing contributor_type as key and the people in these groups as value,exception:'Public' holds the access_type as the value
         people_in_group = {'Person' => [], 'FavouriteGroup' => [], 'WorkGroup' => [], 'Project' => [], 'Institution' => [], 'WhiteList' => [], 'BlackList' => [],'Network' => [], 'Public' => 0}
         #the result return: a hash contain the access_type as key, and array of people as value
@@ -493,8 +514,8 @@ class Policy < ActiveRecord::Base
     asset_manage_id_array = asset_managers.collect{|am| am.id unless am.blank?}
      grouped_people_by_access_type = grouped_people_by_access_type.reject{|key,value| key == Policy::DETERMINED_BY_GROUP}.each_value do |value|
        value.each do |person|
-         person[1].concat('(creator)') if creator_id_array.include?(person[0])
-         person[1].concat('(asset manager)') if asset_manage_id_array.include?(person[0])
+         person[1].concat(' (creator)') if creator_id_array.include?(person[0])
+         person[1].concat(' (asset manager)') if asset_manage_id_array.include?(person[0])
        end
      end
     grouped_people_by_access_type

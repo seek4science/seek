@@ -209,4 +209,12 @@ class SopTest < ActiveSupport::TestCase
     x.save
     assert_equal x.uuid, uuid
   end
+
+  test "contributing_user" do
+    sop = Factory :sop
+    assert sop.contributor
+    assert_equal sop.contributor, sop.contributing_user
+    sop_without_contributor = Factory :sop, :contributor => nil
+    assert_equal nil, sop_without_contributor.contributing_user
+  end
 end

@@ -4,6 +4,7 @@ ActionController::Routing::Routes.draw do |map|
   map.resources :subscriptions
   map.resources :specimens
   map.resources :samples
+  map.resources :data_file_with_samples
 
   map.resources :events
   map.resources :tissue_and_cell_types
@@ -27,9 +28,9 @@ ActionController::Routing::Routes.draw do |map|
 
   map.resources :saved_searches
 
-  map.resources :biosamples, :collection=>{:existing_strains=>:get, :existing_specimens=>:get, :existing_samples=>:get, :new_strain_form => :get, :create_strain => :post, :create_specimen_sample => :post, :strains_of_selected_organism => :get}
+  map.resources :biosamples, :collection=>{:existing_strains=>:get, :existing_specimens=>:get, :existing_samples=>:get, :strain_form => :get, :create_strain => :post, :update_strain => :put,  :create_specimen_sample => :post, :strains_of_selected_organism => :get}
 
-  map.resources :data_files, :collection=>{:test_asset_url=>:post},:member => {:download => :get,:plot=>:get, :data => :get,:preview_publish=>:get,:publish=>:post, :request_resource=>:post, :update_annotations_ajax=>:post, :explore=>:get},:new=>{:upload_for_tool => :post}  do |data_file|
+  map.resources :data_files, :collection=>{:test_asset_url=>:post},:member => {:download => :get,:plot=>:get, :data => :get,:preview_publish=>:get,:publish=>:post, :request_resource=>:post, :update_annotations_ajax=>:post, :explore=>:get},:new=>{:upload_for_tool => :post, :upload_from_email => :post}  do |data_file|
     data_file.resources :studied_factors, :collection =>{:create_from_existing=>:post}
   end
   

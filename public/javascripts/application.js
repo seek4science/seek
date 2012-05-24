@@ -118,8 +118,9 @@ function toggleAuthorAvatarList(objectId){
     div = $('authorAvatarList'+objectId)
     link = $('authorAvatarListLink'+objectId)    
     if (div.style.display == "none") { //EXPAND
-      div.style.display = "";
-      link.innerHTML = '(Hide)';
+        link.innerHTML = "(Hide)";
+        div.style.display = "block";
+
     }
     else { //COLLAPSE
       div.style.display = "none";
@@ -162,12 +163,12 @@ function toggle_collapsable_div(id) {
   var toggle_img = $('collapsable_div_img_' + id);
   if (elem.style.display == 'none') {
     //Effect.BlindDown(('collapsable_div_' + id),{duration:0.2});
-    toggle_img.src = "/images/folds/fold.png";
+    toggle_img.src = "../../images/folds/fold.png";
     elem.show();    
   }
   else {
     //Effect.BlindUp(('collapsable_div_' + id),{duration:0.2});
-    toggle_img.src = "/images/folds/unfold.png";
+    toggle_img.src = "../../images/folds/unfold.png";
     elem.hide();    
   }
 }

@@ -96,12 +96,11 @@ class AssaysController < ApplicationController
       @assay.associate_organism(o_id, strain, culture_growth,t_id,t_title)
     end
 
-
-    update_annotations @assay
-
     @assay.owner=current_user.person
 
     @assay.policy.set_attributes_with_sharing params[:sharing], @assay.projects
+
+    update_annotations @assay #this saves the assay
 
 
       if @assay.save
@@ -122,6 +121,8 @@ class AssaysController < ApplicationController
         # update related publications
         Relationship.create_or_update_attributions(@assay, params[:related_publication_ids].collect { |i| ["Publication", i.split(",").first] }, Relationship::RELATED_TO_PUBLICATION) unless params[:related_publication_ids].nil?
 
+        #required to trigger the after_save callback after the assets have been associated
+        @assay.save
 
         if @assay.create_from_asset =="true"
           render :action=>:update_assays_list

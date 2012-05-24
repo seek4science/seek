@@ -9,12 +9,17 @@ class Specimen < ActiveRecord::Base
   acts_as_authorized
 
   before_save  :clear_garbage
+  attr_accessor :from_biosamples
 
+  has_many :genotypes,:dependent => :destroy
+  has_many :phenotypes,:dependent => :destroy
+  accepts_nested_attributes_for :genotypes, :allow_destroy => true
+  accepts_nested_attributes_for :phenotypes, :allow_destroy => true
 
   has_many :samples
   has_many :activity_logs, :as => :activity_loggable
   has_many :assets_creators, :dependent => :destroy, :as => :asset, :foreign_key => :asset_id
-  has_many :creators, :class_name => "Person", :through => :assets_creators, :order=>'assets_creators.id'
+  has_many :creators, :class_name => "Person", :through => :assets_creators, :order=>'assets_creators.id', :after_add => :update_timestamp, :after_remove => :update_timestamp
 #  accepts_nested_attributes_for :creators
   belongs_to :institution
   belongs_to :culture_growth_type
@@ -25,7 +30,10 @@ class Specimen < ActiveRecord::Base
 
   alias_attribute :description, :comments
 
-  HUMANIZED_COLUMNS = Seek::Config.is_virtualliver ? {} : {:lab_internal_number=> "lab internal identifier", :born => 'culture starting date', :culture_growth_type => 'culture type', :provider_id => "provider's cell culture identifier"}
+  HUMANIZED_COLUMNS = Seek::Config.is_virtualliver ? {} : {:born => 'culture starting date', :culture_growth_type => 'culture type'}
+  HUMANIZED_COLUMNS[:title] = "#{CELL_CULTURE_OR_SPECIMEN.capitalize} title"
+  HUMANIZED_COLUMNS[:lab_internal_number] = "#{CELL_CULTURE_OR_SPECIMEN.capitalize} lab internal identifier"
+  HUMANIZED_COLUMNS[:provider_id] = "provider's #{CELL_CULTURE_OR_SPECIMEN} identifier"
 
   validates_numericality_of :age, :only_integer => true, :greater_than=> 0, :allow_nil=> true, :message => "is not a positive integer"
   validates_presence_of :title,:lab_internal_number, :contributor,:strain
@@ -43,6 +51,34 @@ class Specimen < ActiveRecord::Base
   has_many :sops,:class_name => "Sop::Version",:finder_sql => self.sop_sql()
   has_many :sop_masters,:class_name => "SopSpecimen"
   grouped_pagination :pages=>("A".."Z").to_a, :default_page => Seek::Config.default_page(self.name.underscore.pluralize)
+
+  def build_sop_masters sop_ids
+    # map string ids to int ids for ["1","2"].include? 1 == false
+    sop_ids = sop_ids.map &:to_i
+    sop_ids.each do |sop_id|
+      if sop = Sop.find(sop_id)
+        self.sop_masters.build :sop_id => sop.id, :sop_version => sop.version unless sop_masters.map(&:sop_id).include?(sop_id)
+      end
+    end
+    self.sop_masters = self.sop_masters.select { |s| sop_ids.include? s.sop_id }
+  end
+  def genotype_info
+        genotype_detail = []
+      genotypes.each do |genotype|
+        genotype_detail << genotype.modification.try(:title).to_s + ' ' + genotype.gene.try(:title).to_s if genotype.gene
+      end
+      genotype_detail = genotype_detail.blank? ? 'wild-type' : genotype_detail.join('; ')
+      genotype_detail
+    end
+
+    def phenotype_info
+      phenotype_detail = []
+      phenotypes.each do |phenotype|
+        phenotype_detail << phenotype.try(:description) unless phenotype.try(:description).blank?
+      end
+      phenotype_detail = phenotype_detail.blank? ? 'wild-type' : phenotype_detail.join('; ')
+      phenotype_detail
+    end
 
   def related_people
     creators
@@ -137,4 +173,7 @@ class Specimen < ActiveRecord::Base
     end
   end
 
+  def organism
+    strain.try(:organism)
+  end
 end

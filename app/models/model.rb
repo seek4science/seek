@@ -14,7 +14,8 @@ class Model < ActiveRecord::Base
   
   validates_presence_of :title
 
-
+  after_save :queue_background_reindexing if Seek::Config.solr_enabled
+  
   # allow same titles, but only if these belong to different users
   # validates_uniqueness_of :title, :scope => [ :contributor_id, :contributor_type ], :message => "error - you already have a Model with such title."
   has_many :sample_assets,:dependent=>:destroy,:as => :asset
@@ -30,8 +31,8 @@ class Model < ActiveRecord::Base
   belongs_to :model_type
   belongs_to :model_format
   
-  searchable do
-    text :description,:title,:original_filename,:organism_name,:searchable_tags, :model_contents
+  searchable(:auto_index=>false) do
+    text :description,:title,:original_filename,:organism_terms,:searchable_tags, :model_contents,:assay_type_titles,:technology_type_titles
   end if Seek::Config.solr_enabled
 
   explicit_versioning(:version_column => "version") do
@@ -60,34 +61,30 @@ class Model < ActiveRecord::Base
       result.nil?? content_blobs.first : result
   end
 
-  def studies
-    assays.collect{|a| a.study}.uniq
-  end  
-
   # get a list of Models with their original uploaders - for autocomplete fields
   # (authorization is done immediately to save from iterating through the collection again afterwards)
   #
   # Parameters:
   # - user - user that performs the action; this is required for authorization
   def self.get_all_as_json(user)
-    all_models = Model.find(:all, :order => "ID asc",:include=>[:policy,{:policy=>:permissions}])
-
-    models_with_contributors = all_models.collect{ |m|
-      m.can_view?(user) ?
-        (contributor = m.contributor;
-        { "id" => m.id,
-          "title" => m.title,
+    all = Model.all_authorized_for "view",user
+    with_contributors = all.collect{ |d|
+        contributor = d.contributor;
+        { "id" => d.id,
+          "title" => d.title,
           "contributor" => contributor.nil? ? "" : "by " + contributor.person.name,
-          "type" => self.name } ) :
-        nil }
-
-    models_with_contributors.delete(nil)
-
-    return models_with_contributors.to_json
+          "type" => self.name
+        }
+    }
+    return with_contributors.to_json
   end
 
-  def organism_name
-    organism.title unless organism.nil?
+  def organism_terms
+    if organism
+      organism.searchable_terms
+    else
+      []
+    end
   end
 
   #defines that this is a user_creatable object, and appears in the "New Object" gadget
@@ -101,7 +98,12 @@ class Model < ActiveRecord::Base
   end
 
   def model_contents
-    species | parameters_and_values.keys
+    if content_blob.file_exists?
+      species | parameters_and_values.keys
+    else
+      Rails.logger.error("Unable to find data contents for Model #{self.id}")
+      []
+    end
   end
 
   #return a an array of ModelMatchResult where the data file id is the key, and the matching terms/values are the values

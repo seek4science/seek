@@ -17,6 +17,7 @@ three:
   id: 3
   first_name: "no_user"
   last_name: "smith"
+  email: "no_user@email.com"
 
 fred:  
   first_name: "fred"
@@ -28,10 +29,12 @@ fred:
 no_first_name:
   id: 6
   last_name: "lastname"
+  email: "lastname@email.com"
 
 no_last_name:
   id: 7        
   first_name: "firstname"
+  email: "firstname@email.com"
 
 double_firstname:
   id: 8        
@@ -43,11 +46,13 @@ double_lastname:
   id: 9        
   first_name: "Fred"
   last_name: "Smith Jones"
+  email: "Fred1@email.com"
 
 double_barrelled_lastname:
   id: 10        
   first_name: "Fred"
   last_name: "Smith-Jones"
+  email: "Fred2@email.com"
 
 cant_edit:
   id: 11        
@@ -55,6 +60,7 @@ cant_edit:
   last_name: "Edit"
   can_edit_projects: false
   can_edit_institutions: false
+  email: "cantedit@email.com"
 
 can_edit:
   id: 12
@@ -62,6 +68,7 @@ can_edit:
   last_name: "Edit"
   can_edit_projects: true
   can_edit_institutions: true
+  email: "canedit@email.com"
 
 not_registered:
   id: 13
@@ -94,21 +101,25 @@ person_for_owner_of_my_first_sop:
 person_for_owner_of_fully_public_policy:
   first_name: "OwnerOf"
   last_name: "FullyPublicPolicy"
+  email: "ownerof_fullypublicpolicy@email.com"
 
 
 person_for_owner_of_download_for_all_sysmo_users_policy:
   first_name: "OwnerOf"
   last_name: "DownloadForAllSysmoUsersPolicy"
+  email: "ownerof_downloadforallsysmouserspolicy@email.com"
 
 
 person_for_owner_of_editing_for_all_sysmo_users_policy:
   first_name: "OwnerOf"
   last_name: "EditingForAllSysMOUsersPolicy"
+  email: "ownerof_editingforallsysmouserspolicy@email.com"
 
 
 person_for_owner_of_private_policy_using_custom_sharing:
   first_name: "OwnerOf"
   last_name: "PrivatePolicyUsingCustomSharing"
+  email: "ownerof_privatepolicyusingcustomsharing@email.com"
 
 
 random_userless_person:
@@ -126,35 +137,41 @@ person_not_associated_with_any_projects:
 person_to_associate_with_sops_owning_users:
   first_name: "person"
   last_name: "place_holder"
-
+  email: "person_place_holder@email.com"
 
 person_for_test_user_only_in_whitelist:
   first_name: "TestAccessor"
   last_name: "OnlyInWhitelist"
+  email: "testaccessor_onlyinwhitelist@email.com"
 
 
 person_for_test_user_only_in_blacklist:
   first_name: "TestAccessor"
   last_name: "OnlyInBlacklist"
+  email: "testaccessor_onlyinblacklist@email.com"
 
 
 person_for_sysmo_user_in_blacklist:
   first_name: "SysMO-User"
   last_name: "InBlacklist"
+  email: "sysmo-user_inblacklist@email.com"
 
 
 person_for_sysmo_user_both_in_blacklist_and_whitelist:
   first_name: "SysMO-User"
   last_name: "InWhitelistAndBlacklist"
+  email: "sysmo-userinwhitelistandblacklist@email.com"
 
 
 person_for_sysmo_user_who_wants_to_access_different_things:
   first_name: "Registered-User"
   last_name: "WantsToAccessManyThingsAndHasSomePermissions"
+  email: "registered-userwantstoaccessmanythingsandhassomepermissions@email.com"
 
 person_for_model_owner:
   first_name: "Model"
   last_name: "Owner"
+  email: "model_owner@email.com"
 
 person_for_datafile_owner:
   first_name: "Datafile"
@@ -207,5 +224,6 @@ person_for_project_manager:
   can_edit_projects: false
   can_edit_institutions: false
   roles_mask: 4
+  email: "project_manager@email.com"
   
 

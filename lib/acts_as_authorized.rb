@@ -41,6 +41,7 @@ module Acts #:nodoc:
           policy.access_type=Policy::ACCESSIBLE
           policy.sharing_scope=Policy::EVERYONE
           policy.save
+          touch
         else
           false
         end

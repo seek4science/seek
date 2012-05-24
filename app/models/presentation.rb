@@ -11,7 +11,7 @@ class Presentation < ActiveRecord::Base
 
    has_one :content_blob, :as => :asset, :foreign_key => :asset_id ,:conditions => 'asset_version= #{self.version}'
 
-   searchable do
+   searchable(:ignore_attribute_changes_of=>[:updated_at,:last_used_at]) do
     text :description,:title,:original_filename,:searchable_tags
    end if Seek::Config.solr_enabled
 
@@ -42,19 +42,16 @@ class Presentation < ActiveRecord::Base
   # Parameters:
   # - user - user that performs the action; this is required for authorization
   def self.get_all_as_json(user)
-    all_presentations = Presentation.find(:all, :order => "ID asc",:include=>[:policy,{:policy=>:permissions}])
-    presentations_with_contributors = all_presentations.collect{ |p|
-      p.can_view?(user) ?
-        (contributor = p.contributor
-        { "id" => p.id,
-          "title" => p.title,
+    all = Presentation.all_authorized_for "view",user
+    with_contributors = all.collect{ |d|
+        contributor = d.contributor;
+        { "id" => d.id,
+          "title" => d.title,
           "contributor" => contributor.nil? ? "" : "by " + contributor.person.name,
-          "type" => self.name } ) :
-        nil }
-
-    presentations_with_contributors.delete(nil)
-
-    return presentations_with_contributors.to_json
+          "type" => self.name
+        }
+    }
+    return with_contributors.to_json
   end
 
    #defines that this is a user_creatable object type, and appears in the "New Object" gadget

@@ -4,6 +4,7 @@ module Acts
     module PolicyBasedAuthorization
       def self.included klass
         klass.extend ClassMethods
+        klass.extend AuthLookupClassMethods
         klass.class_eval do
           belongs_to :contributor, :polymorphic => true unless method_defined? :contributor
           after_initialize :contributor_or_default_if_new
@@ -14,10 +15,180 @@ module Acts
           include ProjectCompat unless method_defined? :projects
 
           belongs_to :policy, :required_access_to_owner => :manage, :autosave => true
+
+          after_save :queue_update_auth_table
+          before_save :update_timestamp_if_policy_was_saved
+
+          def update_timestamp_if_policy_was_saved
+            #autosaved belongs_to associations get saved before the parent, so to check if it has changed, see if it has a newer updated_at
+            update_timestamp if updated_at && policy.updated_at > updated_at
+          end
+
+
         end
       end
 
       module ClassMethods
+
+      end
+
+      module AuthLookupClassMethods
+        def all_authorized_for action, user=User.current_user, projects=nil
+          if Seek::Config.auth_caching_enabled
+            assets = if projects
+                       if reflection = reflect_on_association(:projects) and reflection.macro == :has_and_belongs_to_many
+                         find(:all, :include => :projects, :conditions => ["#{reflection.options[:join_table]}.project_id IN (?)", projects.map(&:id)])
+                       else
+                         all.select { |asset| !(asset.projects & projects).empty? }
+                       end
+                     else
+                       all
+                     end
+            assets.select(&"can_#{action}?".to_sym)
+          else
+            user_id = user.nil? ? 0 : user.id
+            c = lookup_count_for_user user_id
+            last_stored_asset_id = last_asset_id_for_user user_id
+            last_asset_id = self.last(:order => :id).try(:id)
+            assets = []
+            programatic_project_filter = !projects.nil? && (!Seek::Config.auth_lookup_enabled || (self==Assay || self==Study))
+            if Seek::Config.auth_lookup_enabled
+              #cannot rely purly on the count, since an item could have been deleted and a new one added
+              if (c==count && last_stored_asset_id == last_asset_id)
+                Rails.logger.warn("Lookup table #{lookup_table_name} is complete for user_id = #{user_id}")
+                assets = lookup_for_action_and_user action, user_id,projects
+              else
+                Rails.logger.warn("Lookup table #{lookup_table_name} is incomplete for user_id = #{user_id} - doing things the slow way")
+                #trigger off a full update for that user if the count is zero and items should exist for that type
+                if (c==0 && !last_asset_id.nil?)
+                  AuthLookupUpdateJob.add_items_to_queue user
+                end
+                assets = all.select { |df| df.send("can_#{action}?") }
+                programatic_project_filter = !projects.nil?
+              end
+            else
+              assets = all.select { |df| df.send("can_#{action}?") }
+            end
+            if programatic_project_filter
+              assets.select { |a| !(a.projects & projects).empty? }
+            else
+              assets
+            end
+          end
+        end
+
+        def lookup_table_name
+          "#{self.name.underscore}_auth_lookup"
+        end
+
+        def clear_lookup_table
+          ActiveRecord::Base.connection.execute("delete from #{lookup_table_name}")
+        end
+
+        def lookup_for_action_and_user action,user_id,projects
+          #Study's and Assays have to be treated differently, as they are linked to a project through the investigation'
+          if (projects.nil? || (self == Study || self == Assay))
+            sql = "select asset_id from #{lookup_table_name} where user_id = #{user_id} and can_#{action}=#{ActiveRecord::Base.connection.quoted_true}"
+            ids = ActiveRecord::Base.connection.select_all(sql).collect{|k| k["asset_id"]}
+          else
+            projects = Array(projects)
+            project_map_table = ["#{self.name.underscore.pluralize}", 'projects'].sort.join('_')
+            project_map_asset_id = "#{self.name.underscore}_id"
+            project_clause = projects.collect{|p| "#{project_map_table}.project_id = #{p.id}"}.join(" or ")
+            sql = "select asset_id,#{project_map_asset_id} from #{lookup_table_name}"
+            sql << " inner join #{project_map_table}"
+            sql << " on #{lookup_table_name}.asset_id = #{project_map_table}.#{project_map_asset_id}"
+            sql << " where #{lookup_table_name}.user_id = #{user_id} and (#{project_clause})"
+            sql << " and can_#{action}=#{ActiveRecord::Base.connection.quoted_true}"
+            ids = ActiveRecord::Base.connection.select_all(sql).collect{|k| k["asset_id"]}
+          end
+          find_all_by_id(ids)
+        end
+
+        def lookup_count_for_user user_id
+          ActiveRecord::Base.connection.select_one("select count(*) from #{lookup_table_name} where user_id = #{user_id}").values[0].to_i
+        end
+
+        def last_asset_id_for_user user_id
+          v = ActiveRecord::Base.connection.select_one("select max(asset_id) from #{lookup_table_name} where user_id = #{user_id}").values[0]
+          v.nil? ? -1 : v.to_i
+        end
+
+        def lookup_for_asset action,user_id,asset_id
+          attribute = "can_#{action}"
+          @@expected_true_value ||= ActiveRecord::Base.connection.quoted_true.gsub("'","")
+          res = ActiveRecord::Base.connection.select_one("select #{attribute} from #{lookup_table_name} where user_id=#{user_id} and asset_id=#{asset_id}")
+          if res.nil?
+            nil
+          else
+            res[attribute]==@@expected_true_value
+          end
+        end
+      end
+
+      def auth_key user, action
+        [user.try(:person).try(:cache_key), "can_#{action}?", cache_key]
+      end
+
+      AUTHORIZATION_ACTIONS.each do |action|
+        if Seek::Config.auth_caching_enabled
+          eval <<-END_EVAL
+          def can_#{action}? user = User.current_user
+            if self.new_record?
+              return true
+            else
+              Rails.cache.fetch(auth_key(user, "#{action}")) {perform_auth(user,"#{action}") ? :true : :false} == :true
+            end
+          end
+          END_EVAL
+        else
+          eval <<-END_EVAL
+            def can_#{action}? user = User.current_user
+                return true if new_record?
+                user_id = user.nil? ? 0 : user.id
+                if Seek::Config.auth_lookup_enabled
+                  lookup = self.class.lookup_for_asset("#{action}", user_id,self.id)
+                else
+                  lookup=nil
+                end
+                if lookup.nil?
+                  perform_auth(user,"#{action}")
+                else
+                  lookup
+                end
+            end
+          END_EVAL
+        end
+      end
+
+      def queue_update_auth_table
+        #FIXME: somewhat aggressively does this after every save can be refined in the future
+        unless (self.changed - ["updated_at", "last_used_at"]).empty?
+          AuthLookupUpdateJob.add_items_to_queue self
+        end
+      end
+
+      def update_lookup_table user=nil
+        user_id = user.nil? ? 0 : user.id
+
+        can_view = ActiveRecord::Base.connection.quote perform_auth(user,"view")
+        can_edit = ActiveRecord::Base.connection.quote perform_auth(user,"edit")
+        can_download = ActiveRecord::Base.connection.quote perform_auth(user,"download")
+        can_manage = ActiveRecord::Base.connection.quote perform_auth(user,"manage")
+        can_delete = ActiveRecord::Base.connection.quote perform_auth(user,"delete")
+
+        #check to see if an insert of update is needed, action used is arbitary
+        lookup = self.class.lookup_for_asset("view",user_id,self.id)
+        insert = lookup.nil?
+
+        if insert
+          sql = "insert into #{self.class.lookup_table_name} (user_id,asset_id,can_view,can_edit,can_download,can_manage,can_delete) values (#{user_id},#{id},#{can_view},#{can_edit},#{can_download},#{can_manage},#{can_delete});"
+        else
+          sql = "update #{self.class.lookup_table_name} set can_view=#{can_view}, can_edit=#{can_edit}, can_download=#{can_download},can_manage=#{can_manage},can_delete=#{can_delete} where user_id=#{user_id} and asset_id=#{id}"
+        end
+
+        ActiveRecord::Base.connection.execute(sql)
+
       end
 
       def contributor_credited?
@@ -75,7 +246,7 @@ module Acts
 
       #use request_permission_summary to retrieve who can manage the item
       def people_can_manage
-        contributor = self.is_isa? ? self.contributor : self.contributor.try(:person)
+        contributor = self.contributor.kind_of?(Person) ? self.contributor : self.contributor.try(:person)
         return [[contributor.id, "#{contributor.first_name} #{contributor.last_name}", Policy::MANAGING]] if policy.blank?
         creators = is_downloadable? ? self.creators : []
         asset_managers = projects.collect(&:asset_managers).flatten
@@ -83,16 +254,8 @@ module Acts
         grouped_people_by_access_type[Policy::MANAGING]
       end
 
-      AUTHORIZATION_ACTIONS.each do |action|
-        eval <<-END_EVAL
-          def can_#{action}? user = User.current_user
-            person_key = (user.try :person).try :cache_key
-            new_record? or Rails.cache.fetch([:can_#{action}?, policy.cache_key, person_key]) {
-              auth = Authorization.is_authorized?("#{action}", nil, self, user) || (Ability.new(user).can? "#{action}".to_sym, self) || (Ability.new(user).can? "#{action}_asset".to_sym, self)
-              auth ? :true : :false
-            } == :true
-          end
-        END_EVAL
+      def perform_auth user,action
+        (Authorization.is_authorized? action, nil, self, user) || (Ability.new(user).can? action.to_sym, self) || (Ability.new(user).can? "#{action}_asset".to_sym, self)
       end
 
       #returns a list of the people that can manage this file
@@ -112,6 +275,20 @@ module Acts
           end
         end
         people.uniq
+      end
+
+      def contributing_user
+        unless self.kind_of?(Assay)
+          if contributor.kind_of?Person
+            contributor.try(:user)
+          elsif contributor.kind_of?User
+            contributor
+          else
+            nil
+          end
+        else
+          owner.try(:user)
+        end
       end
     end
   end

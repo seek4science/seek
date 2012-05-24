@@ -67,7 +67,14 @@
   <div class="main_content_right_box_wider">
       <%= render :partial => "assets/resource_scales_box", :locals => { :resource => @study}-%>
   </div>
-  <%= embedded_isa_svg(@study.investigation,false,@study) -%>
+  <div class="main_content_right_box_wider">
+    <%= render :partial=>"assets/resource_authors_box",:locals => { :resource => @study, :creators => [@study.contributing_user.try(:person)] } %>
+   </div>
 
-  <%= render :partial=>"layouts/items_related_to", :object => @study %>
+  <div style="clear:both;">
+    <%= embedded_isa_svg(@study.investigation,false,@study) -%>
+  </div>
+
+    <%= render :partial=>"layouts/items_related_to", :object => @study %>
+
 </div>

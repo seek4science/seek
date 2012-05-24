@@ -8,12 +8,12 @@
 <% box_width += 10 if actions_partial.blank? %>
 <% box_width += 12 if avatar_partial.blank? %>
 <%
-   access_based_css_class = if try_block{resource.private?}
+   access_based_css_class = "list_item " + if resource.respond_to?(:private?) && resource.private?
        "private_list_item"
-   elsif try_block{resource.public?}
+   elsif resource.respond_to?(:public?) && resource.public?
      "public_list_item"
    else
-     "list_item"
+     ""
    end
 %>
 <div class="<%= access_based_css_class%>">

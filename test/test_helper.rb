@@ -8,6 +8,24 @@ require 'factory_girl'
 require 'webmock/test_unit'
 require 'action_view/test_case'
 
+Rails.cache.class.class_eval do
+  #Doesn't do any good if the cache is being used directly via read/write
+  def fetch_with_paranoid_double_checking key
+    if block_given?
+      calculated_result = yield
+      fetch_result = fetch_without_paranoid_double_checking(key) {calculated_result}
+      if calculated_result != fetch_result
+        raise "fetch result (#{fetch_result}) for key (#{key}) does not match calculated result(#{calculated_result})"
+      end
+      calculated_result
+    else
+      fetch_without_paranoid_double_checking(key)
+    end
+  end
+
+  alias_method_chain :fetch, :paranoid_double_checking
+end
+
 Factory.find_definitions #It looks like requiring factory_girl _should_ do this automatically, but it doesn't seem to work
 
 Factory.class_eval do
@@ -33,6 +51,10 @@ Kernel.class_eval do
 end
 
 class ActiveSupport::TestCase
+
+  setup do
+    Rails.cache.clear
+  end
   # Transactional fixtures accelerate your tests by wrapping each test method
   # in a transaction that's rolled back on completion.  This ensures that the
   # test database remains unchanged so your fixtures don't have to be reloaded
@@ -85,10 +107,6 @@ class ActiveSupport::TestCase
     File.open "#{Rails.root}/tmp/#{prefix}-flat.txt", 'w' do |file|
       RubyProf::FlatPrinter.new(results).print(file)
     end
-  end
-
-  def run_secondary_tests?
-    @@run_secondary ||= File.exists? "#{Rails.root}/tmp/run_secondary_tests"
   end
 
   ## stuff for mocking

@@ -16,8 +16,8 @@ class Sop < ActiveRecord::Base
   # allow same titles, but only if these belong to different users
   # validates_uniqueness_of :title, :scope => [ :contributor_id, :contributor_type ], :message => "error - you already have a SOP with such title."
 
-  searchable do
-    text :description, :title, :original_filename,:searchable_tags,:exp_conditions_search_fields
+  searchable(:ignore_attribute_changes_of=>[:updated_at,:last_used_at]) do
+    text :description, :title, :original_filename,:searchable_tags,:exp_conditions_search_fields,:assay_type_titles,:technology_type_titles
   end if Seek::Config.solr_enabled
 
   has_many :sample_assets,:dependent=>:destroy,:as => :asset
@@ -39,29 +39,22 @@ class Sop < ActiveRecord::Base
     
   end
 
-  def studies
-    assays.collect{|a| a.study}.uniq
-  end
-
   # get a list of SOPs with their original uploaders - for autocomplete fields
   # (authorization is done immediately to save from iterating through the collection again afterwards)
   #
   # Parameters:
   # - user - user that performs the action; this is required for authorization
   def self.get_all_as_json(user)
-    all_sops = Sop.find(:all, :order => "ID asc",:include=>[:policy,{:policy=>:permissions}])
-    sops_with_contributors = all_sops.collect{ |s|
-      s.can_view?(user) ?
-        (contributor = s.contributor;
-        { "id" => s.id,
-          "title" => s.title,
+    all = Sop.all_authorized_for "view",user
+    with_contributors = all.collect{ |d|
+        contributor = d.contributor;
+        { "id" => d.id,
+          "title" => d.title,
           "contributor" => contributor.nil? ? "" : "by " + contributor.person.name,
-          "type" => self.name } ) :
-        nil }
-
-    sops_with_contributors.delete(nil)
-
-    return sops_with_contributors.to_json
+          "type" => self.name
+        }
+    }
+    return with_contributors.to_json
   end
 
   def organism_title

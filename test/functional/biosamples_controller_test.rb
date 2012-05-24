@@ -21,13 +21,8 @@ class BioSamplesControllerTest < ActionController::TestCase
     assert_response :success
     end
 
-  test 'should get the create sample popup' do
-    get :create_sample_popup
-    assert_response :success
-  end
-
   test 'should get strain form' do
-    get :new_strain_form
+    get :strain_form
     assert_response :success
   end
 
@@ -35,13 +30,6 @@ class BioSamplesControllerTest < ActionController::TestCase
     @request.env["HTTP_REFERER"]  = ''
     logout
     get :create_strain_popup
-    assert_not_nil flash[:error]
-  end
-
-  test 'should not be able to go to the create_sample_popup without login' do
-    @request.env["HTTP_REFERER"]  = ''
-    logout
-    get :create_sample_popup
     assert_not_nil flash[:error]
   end
 
@@ -131,35 +119,6 @@ class BioSamplesControllerTest < ActionController::TestCase
     end
   end
 
-  test 'should create sample based on selected specimen' do
-    specimen = Factory(:specimen, :contributor => User.current_user)
-    assert_difference("Sample.count") do
-      post :create_specimen_sample, :sample => {:title => "test",
-                                :projects=>[Factory(:project)],
-                                :donation_date => Date.today,
-                                :lab_internal_number =>"Do232"},
-           :sharing => valid_sharing,
-           :specimen => {:id => specimen.id}
-    end
-  end
-
-  test 'should create sample and specimen' do
-    assert_difference("Sample.count") do
-      assert_difference("Specimen.count") do
-        post :create_specimen_sample, :sample => {:title => "test",
-                                  :projects=>[Factory(:project)],
-                                  :donation_date => Date.today,
-                                  :lab_internal_number =>"Do232"},
-                          :specimen => {:title => 'test',
-                                  :lab_internal_number => 'lab123',
-                                  :strain => Factory(:strain),
-                                  :institution => Factory(:institution)
-                                  },
-                          :sharing => valid_sharing
-
-      end
-    end
-  end
 
   test "should update the strain list in specimen_form" do
     organism = organisms(:yeast)
@@ -179,23 +138,139 @@ class BioSamplesControllerTest < ActionController::TestCase
     assert received_strains.include?([new_strain.id, new_strain.info])
   end
 
-  test 'should have comment and sex fields in the specimen_form' do
-    xhr(:get, :create_sample_popup)
-    assert_response :success
-    assert_select "input#specimen_comments", :count => 1
-    assert_select "select#specimen_sex", :count => 1
-  end
-
-  test 'should have organism_part in the sample_form' do
-    xhr(:get, :create_sample_popup)
-    assert_response :success
-    assert_select "select#sample_organism_part", :count => 1
-  end
-
   test "should have age at sampling in sample table" do
     specimen = specimens("running mouse")
     xhr(:get, :existing_samples, {:specimen_ids => "#{specimen.id}"})
     assert_response :success
     assert_select "table#sample_table thead tr th", :text => "Age at sampling(hours)", :count => 1
+  end
+
+  test "should have comment in sample table" do
+    specimen = specimens("running mouse")
+    xhr(:get, :existing_samples, {:specimen_ids => "#{specimen.id}"})
+    assert_response :success
+    assert_select "table#sample_table thead tr th", :text => "Comment", :count => 1
+  end
+
+  test "should have based on strain in strain table" do
+    organism = organisms(:yeast)
+    get :existing_strains, :organism_ids => organism.id.to_s
+    assert_response :success
+    assert_select "table#strain_table thead tr th", :text => "Based on", :count => 1
+  end
+
+  test "should be able to view only can_view strain" do
+    organism = organisms(:yeast)
+    private_strain = Factory(:strain, :organism => organism, :policy => Factory(:private_policy))
+    assert organism.strains.include?private_strain
+    get :existing_strains, :organism_ids => organism.id.to_s
+    assert_response :success
+    assert_select "table#strain_table tbody tr td", :text => private_strain.title, :count => 0
+    assert_select "table#strain_table tbody tr td", :text => 'default', :count => 0
+    assert_select "table#strain_table tbody tr td", :text => 'TRS99', :count => 1
+    assert_select "table#strain_table tbody tr td", :text => 'ZX81', :count => 1
+  end
+
+  test 'should not allow to create specimen_sample which associates with the un-viewable strain' do
+    assert_no_difference("Sample.count") do
+      assert_no_difference("Specimen.count") do
+        post :create_specimen_sample, :sample => {:title => "test",
+                                                  :projects => [Factory(:project)],
+                                                  :lab_internal_number => "Do232"},
+             :specimen => {:title => 'test',
+                           :lab_internal_number => 'lab123',
+                           :strain => Factory(:strain, :policy => Factory(:private_policy))
+             }
+      end
+    end
+  end
+
+  test 'should not allow to create sample which associates with the un-viewable specimen' do
+      assert_no_difference("Sample.count") do
+        post :create_specimen_sample, :sample => {:title => "test",
+                                                  :projects => [Factory(:project)],
+                                                  :lab_internal_number => "Do232"},
+             :specimen => Factory(:specimen, :policy => Factory(:private_policy))
+
+      end
+  end
+
+  test "should update strain" do
+    strain = Factory(:strain)
+    login_as(strain.contributor)
+    new_project = Factory(:project)
+    new_title = 'new title'
+    put :update_strain, :strain => {:id => strain.id, :project_ids =>[new_project.id.to_s], :title => new_title}, :sharing =>{:sharing_scope => Policy::PRIVATE, :access_type_0 => Policy::NO_ACCESS}
+    assert_response :success
+    updated_strain = Strain.find_by_id strain.id
+    assert_equal new_title, updated_strain.title
+    assert_equal [new_project], updated_strain.projects
+    assert_equal Policy::PRIVATE, updated_strain.policy.sharing_scope
+    assert_equal Policy::NO_ACCESS, updated_strain.policy.access_type
+  end
+
+  test "should update strain phenotypes" do
+      strain = Factory(:strain)
+      phenotype1 = Factory(:phenotype, :strain => strain)
+      phenotype2 = Factory(:phenotype, :strain => strain)
+
+      new_phenotype_description = 'new phenotype'
+      login_as(strain.contributor)
+      put :update_strain, :strain => {:id => strain.id, :phenotypes_attributes => {'0' => {:description => phenotype1.description,:id=>phenotype1.id}, '1' => {:description => new_phenotype_description},'2'=>{:description=>phenotype2.description,:id=>phenotype2.id,:_destroy=>1}}}
+      assert_response :success
+
+      updated_strain = Strain.find_by_id strain.id
+      new_phenotype = Phenotype.find_by_description(new_phenotype_description)
+      updated_phenotypes = [phenotype1, new_phenotype].sort_by(&:description)
+      assert_equal updated_phenotypes, updated_strain.phenotypes.sort_by(&:description)
+  end
+
+  test "should update strain genotypes" do
+          strain = Factory(:strain)
+          genotype1 = Factory(:genotype, :strain => strain)
+          genotype2 = Factory(:genotype, :strain => strain)
+
+          new_gene_title = 'new gene'
+          new_modification_title = 'new modification'
+          login_as(strain.contributor)
+          #[genotype1,genotype2] =>[genotype2,new genotype]
+          put :update_strain, :strain => {:id => strain.id, :genotypes_attributes => {'0' => {:gene_attributes => {:title => genotype2.gene.title, :id => genotype2.gene.id }, :id=>genotype2.id, :modification_attributes => {:title => genotype2.modification.title,:id=>genotype2.modification.id }},"2"=>{:gene_attributes => {:title => new_gene_title},:modification_attributes => {:title => new_modification_title }},  "1"=>{:id => genotype1.id, :_destroy => 1}} }
+          assert_response :success
+
+          updated_strain = Strain.find_by_id strain.id
+          new_gene = Gene.find_by_title(new_gene_title)
+          new_modification = Modification.find_by_title(new_modification_title)
+          new_genotype = Genotype.find(:all, :conditions => ["gene_id=? and modification_id=?", new_gene.id, new_modification.id]).first
+          updated_genotypes = [genotype2, new_genotype].sort_by(&:id)
+          assert_equal updated_genotypes, updated_strain.genotypes.sort_by(&:id)
+    end
+
+  test "should not be able to update the policy of the strain when having no manage rights" do
+    strain = Factory(:strain, :policy => Factory(:policy, :sharing_scope => Policy::ALL_SYSMO_USERS, :access_type => Policy::EDITING))
+    user = Factory(:user)
+    assert strain.can_edit?user
+    assert !strain.can_manage?(user)
+
+    login_as(user)
+      put :update_strain, :strain => {:id => strain.id}, :sharing =>{:sharing_scope => Policy::EVERYONE, :access_type_4 => Policy::EDITING }
+    assert_response :success
+
+    updated_strain = Strain.find_by_id strain.id
+    assert_equal Policy::ALL_SYSMO_USERS, updated_strain.policy.sharing_scope
+  end
+
+  test "should not be able to update the permissions of the strain when having no manage rights" do
+      strain = Factory(:strain, :policy => Factory(:policy, :sharing_scope => Policy::ALL_SYSMO_USERS, :access_type => Policy::EDITING))
+      user = Factory(:user)
+      assert strain.can_edit?user
+      assert !strain.can_manage?(user)
+
+      login_as(user)
+        put :update_strain, :strain => {:id => strain.id}, :sharing=>{:permissions =>{:contributor_types => ActiveSupport::JSON.encode(['Person']), :values => ActiveSupport::JSON.encode({"Person" => {user.person.id =>  {"access_type" =>  Policy::MANAGING}}})}}
+      assert_response :success
+
+      updated_strain = Strain.find_by_id strain.id
+      assert updated_strain.policy.permissions.empty?
+      assert !updated_strain.can_manage?(user)
   end
 end

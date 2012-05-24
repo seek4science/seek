@@ -19,13 +19,7 @@
 <p>
   <label>Sex:</label>
   <%
-     if specimen.sex == false
-       sex = 'male'
-     elsif specimen.sex == true
-       sex = 'female'
-     else
-       sex = nil
-     end
+     sex = sex_list_for_selection.select{|s| s[1] == specimen.sex}.collect{|s| s[0]}.first
   %>
   <%= text_or_not_specified sex -%>
 </p>

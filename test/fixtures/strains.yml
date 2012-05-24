@@ -3,21 +3,26 @@
 yeast1:
   title: ZX81
   organism: yeast
+  policy: public_policy_visible_only
 
 yeast2:
   title: TRS99
   organism: yeast
+  policy: public_policy_visible_only
 
 Saccharomyces_cerevisiae1:
   title: ZX81
   organism: Saccharomyces_cerevisiae
+  policy: public_policy_visible_only
 
 dummy_for_yeast:
   title: default
   organism: yeast
   is_dummy: true
+  policy: public_policy_visible_only
 
 dummy_for_Saccharomyces_cerevisiae:
   title: default
   organism: Saccharomyces_cerevisiae
   is_dummy: true
+  policy: public_policy_visible_only
