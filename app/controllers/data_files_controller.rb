@@ -137,14 +137,14 @@ class DataFilesController < ApplicationController
 
   def upload_from_email
     if current_user.is_admin? && Seek::Config.admin_impersonation_enabled
-      User.with_current_user User.find(params[:sender_id]) do
+      User.with_current_user Person.find(params[:sender_id]).user do
         if handle_data
           @data_file = DataFile.new params[:data_file]
 
           Policy.new_from_email(@data_file, params[:recipient_ids], params[:cc_ids])
 
           if @data_file.save
-            @data_file.creators = [current_user.person]
+            @data_file.creators = [User.current_user.person]
             create_content_blobs
 
             flash.now[:notice] ="Data file was successfully uploaded and saved." if flash.now[:notice].nil?
