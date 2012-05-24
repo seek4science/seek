@@ -67,7 +67,7 @@ module Acts
           if (c==0 && !last_asset_id.nil?)
             AuthLookupUpdateJob.add_items_to_queue User.find_by_id(user_id)
           end
-          c==count && last_stored_asset_id == last_asset_id
+          c==count && (count==0 || (last_stored_asset_id == last_asset_id))
         end
 
         #the name of the lookup table, holding authorisation lookup information, for this given authorised type
