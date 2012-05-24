@@ -1,13 +1,14 @@
 class Mailer < ActionMailer::Base
 
   def feedback user,topic,details,send_anonymously,base_host
+    send_anonymously = true unless user.try(:person)
     subject "#{Seek::Config.application_name} Feedback provided - #{topic}"
     recipients admin_emails
     from Seek::Config.noreply_sender
     reply_to user.person.email_with_name unless  send_anonymously
     sent_on Time.now
 
-    body :topic=>topic,:details=>details,:anon=>send_anonymously,:host=>base_host,:person=>user.person
+    body :topic=>topic,:details=>details,:anon=>send_anonymously,:host=>base_host,:person=>user.try(:person)
   end
 
   def file_uploaded uploader,receiver,file,base_host

@@ -20,7 +20,9 @@ module SpreadsheetUtil
     self.content_type == "application/vnd.excel" ||
     self.content_type == "application/excel" ||
     self.content_type == "application/x-msexcel" ||
-    self.content_type == "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+    self.content_type == "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" ||
+    self.content_type == "application/vnd.ms-excel.sheet.macroEnabled.12" ||
+    self.content_type.try(:include?,"excel")
   end
 
   def spreadsheet_annotations

@@ -53,8 +53,7 @@ class ApplicationController < ActionController::Base
 
     #This should probably be used with prepend_before_filter, since some filters might need this to happen so they can check params.
     #see sessions controller for an example usage
-    params[:xml].each {|k,v| params[k] = v} if request.format.xml? and
-        params[:xml]
+    params[:xml].each {|k,v| params[k] = v} if request.format.xml? and params[:xml]
   end
 
   layout "main"
