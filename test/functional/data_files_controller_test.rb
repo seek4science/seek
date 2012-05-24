@@ -367,9 +367,20 @@ class DataFilesControllerTest < ActionController::TestCase
     assert assay.related_asset_ids('DataFile').include? assigns(:data_file).id
   end
 
+  test "upload_for_tool inacessible with normal login" do
+    post :upload_for_tool, :data_file => { :title=>"Test",:data=>fixture_file_upload('files/file_picture.png'),:project_id=>projects(:sysmo_project).id}, :recipient_id => people(:quentin_person).id
+    assert_redirected_to root_url
+  end
+
+  test "upload_from_email inacessible with normal login" do
+    post :upload_from_email, :data_file => { :title=>"Test",:data=>fixture_file_upload('files/file_picture.png'),:project_id=>projects(:sysmo_project).id}, :recipient_ids => [people(:quentin_person).id], :cc_ids => []
+    assert_redirected_to root_url
+  end
+
   test "should create data file for upload tool" do
     assert_difference('DataFile.count') do
       assert_difference('ContentBlob.count') do
+        session[:xml_login] = true
         post :upload_for_tool, :data_file => { :title=>"Test",:data=>fixture_file_upload('files/file_picture.png'),:project_id=>projects(:sysmo_project).id}, :recipient_id => people(:quentin_person).id
       end
     end
@@ -387,7 +398,33 @@ class DataFilesControllerTest < ActionController::TestCase
     assert df.creators
     assert_equal df.creators.first, users(:datafile_owner).person
   end
-  
+
+  test "should create data file from email tool" do
+    old_admin_impersonation = Seek::Config.admin_impersonation_enabled
+    Seek::Config.admin_impersonation_enabled = true
+    login_as Factory(:admin).user
+    assert_difference('DataFile.count') do
+      assert_difference('ContentBlob.count') do
+        session[:xml_login] = true
+        post :upload_from_email, :data_file => { :title=>"Test",:data=>fixture_file_upload('files/file_picture.png'),:project_ids=>[projects(:sysmo_project).id]}, :recipient_ids => [people(:quentin_person).id], :sender_id => users(:datafile_owner).person_id
+      end
+    end
+
+    assert_response :success
+    df = assigns(:data_file)
+    df.reload
+    assert_equal users(:datafile_owner), df.contributor
+
+    assert !df.content_blob.data_io_object.read.nil?
+    assert df.content_blob.url.blank?
+    assert df.policy
+    assert df.policy.permissions
+    assert_equal df.policy.permissions.first.contributor, people(:quentin_person)
+    assert df.creators
+    assert_equal df.creators.first, users(:datafile_owner).person
+    Seek::Config.admin_impersonation_enabled = old_admin_impersonation
+  end
+
   def test_missing_sharing_should_default_to_private
     assert_difference('ActivityLog.count') do
       assert_difference('DataFile.count') do
