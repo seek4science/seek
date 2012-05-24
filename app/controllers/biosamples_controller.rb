@@ -1,5 +1,4 @@
 class BiosamplesController < ApplicationController
-  require "pp"
   def existing_strains
       strains_of_organisms = []
       organisms = []
@@ -188,8 +187,6 @@ class BiosamplesController < ApplicationController
           params[:strain][:phenotypes_attributes].delete(key) if value.keys== ["_destroy"]
         end
      # }
-
-      PP::pp params[:strain]
 
 
 
