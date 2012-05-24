@@ -76,7 +76,7 @@ module BiosamplesHelper
 
     delete_icon = specimen.can_delete? ? (link_to_remote image("destroy", :alt => "Delete", :title => "Delete this #{CELL_CULTURE_OR_SPECIMEN}"),
                          :url => {:action => "destroy", :controller => 'biosamples', :id => specimen.id, :class => 'specimen', :id_column_position => id_column},
-                         :confirm => "Are you sure you want to delete this cell culture?", :method => :delete) : nil
+                         :confirm => "Are you sure you want to delete this #{CELL_CULTURE_OR_SPECIMEN}?", :method => :delete) : nil
     update_icon = nil
     if specimen.can_manage?
       update_icon = link_to image("manage"), edit_specimen_path(specimen) + "?from_biosamples=true", {:title => "Manage this #{CELL_CULTURE_OR_SPECIMEN}", :target => '_blank'}

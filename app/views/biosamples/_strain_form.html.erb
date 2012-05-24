@@ -54,8 +54,8 @@
     <% form_action = action=="create"? 'create_strain' : 'update_strain' %>
     <%form_for :strain, strain, :url => url_for(:controller => 'biosamples', :action => form_action) do |strain_form| %>
 
-        <%= render :partial => "genotype_form",:locals => {:item=>strain,  :f=>strain_form} %>
-        <%= render :partial => "phenotype_form",:locals => {:item=>strain, :f=>strain_form} %>
+        <%= render :partial => "genotype_form",:locals => {:item=>strain,  :f=>strain_form,:action=>action} %>
+        <%= render :partial => "phenotype_form",:locals => {:item=>strain, :f=>strain_form,:action=>action} %>
     <% end %>
 
   </div>

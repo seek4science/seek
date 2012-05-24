@@ -97,11 +97,11 @@ class Policy < ActiveRecord::Base
                                    :access_type        => Policy::NO_ACCESS)
     recipients.each do |id|
       policy.permissions.build :contributor_type => "Person", :contributor_id => id, :access_type => Policy::EDITING
-    end
+    end if recipients
 
     accessors.each do |id|
       policy.permissions.build :contributor_type => "Person", :contributor_id => id, :access_type => Policy::ACCESSIBLE
-    end
+    end if accessors
 
     return policy
   end

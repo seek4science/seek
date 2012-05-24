@@ -52,6 +52,16 @@ class Specimen < ActiveRecord::Base
   has_many :sop_masters,:class_name => "SopSpecimen"
   grouped_pagination :pages=>("A".."Z").to_a, :default_page => Seek::Config.default_page(self.name.underscore.pluralize)
 
+  def build_sop_masters sop_ids
+    # map string ids to int ids for ["1","2"].include? 1 == false
+    sop_ids = sop_ids.map &:to_i
+    sop_ids.each do |sop_id|
+      if sop = Sop.find(sop_id)
+        self.sop_masters.build :sop_id => sop.id, :sop_version => sop.version unless sop_masters.map(&:sop_id).include?(sop_id)
+      end
+    end
+    self.sop_masters = self.sop_masters.select { |s| sop_ids.include? s.sop_id }
+  end
   def genotype_info
         genotype_detail = []
       genotypes.each do |genotype|

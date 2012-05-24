@@ -1069,6 +1069,7 @@ ActiveRecord::Schema.define(:version => 20120502094436) do
     t.string   "provider_name"
     t.integer  "age_at_sampling"
     t.string   "sample_type"
+    t.string   "treatment"
   end
 
   create_table "samples_tissue_and_cell_types", :id => false, :force => true do |t|
