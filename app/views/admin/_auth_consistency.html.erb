@@ -12,8 +12,8 @@
 </p>
 
 <p style="font-weight: bolder;">
-  <% if AuthLookupUpdateJob.count(true)>0 -%>
-      There are <%= AuthLookupUpdateJob.count(true) -%> jobs waiting to run, or currently running.
+  <% if AuthLookupUpdateJob.count(false)>0 -%>
+      There are <%= AuthLookupUpdateJob.count(false) -%> jobs waiting to run, or currently running.
   <% else -%>
       There are no jobs waiting to be run, or currently running.
   <% end -%>
@@ -24,20 +24,25 @@
     <th>Item type</th>
     <th>Lookup table count</th>
     <th>Asset item count</th>
+    <th>Lookup table last ID</th>
+    <th>Asset last ID</th>
   </tr>
   <% User.all.push(nil).each do |user| -%>
       <% Seek::Util.authorized_types.each do |type| -%>
-          <%
-             asset_count = type.count
-             lookup_count = type.lookup_count_for_user user
 
-             if asset_count != lookup_count
-          %>
+           <%  if !type.lookup_table_consistent?(user)
+                asset_count = type.count
+                lookup_count = type.lookup_count_for_user user
+                last_asset_id = type.last(:order=>:id).try(:id)
+                last_stored_asset_id = type.last_asset_id_for_user user
+           %>
               <tr>
                 <td><%= user.nil? ? "anon" : user.id -%></td>
                 <td><%= type.name -%></td>
                 <td><%= lookup_count -%></td>
                 <td><%= asset_count -%></td>
+                <td><%= last_stored_asset_id -%></td>
+                <td><%= last_asset_id -%></td>
               </tr>
           <% end -%>
       <% end -%>
