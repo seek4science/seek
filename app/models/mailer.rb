@@ -31,6 +31,17 @@ class Mailer < ActionMailer::Base
     body :host=>base_host,:owner=>owner, :publisher=>publisher,:resources=>resources
   end
 
+  def request_publish_approval(gatekeepers,user,resource,base_host,approve_link,reject_link)
+
+      subject "A #{Seek::Config.application_name} member requested your approval to publish: #{resource.title}"
+      recipients gatekeepers.collect{|m| m.email_with_name}
+      from Seek::Config.noreply_sender
+      reply_to user.person.email_with_name
+      sent_on Time.now
+
+      body :gatekeepers=>gatekeepers,:requester=>user.person,:resource=>resource,:host=>base_host, :approve_link => approve_link, :reject_link => reject_link
+  end
+
   def request_resource(user,resource,details,base_host)
 
     subject "A #{Seek::Config.application_name} member requested a protected file: #{resource.title}"

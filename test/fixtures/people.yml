@@ -207,4 +207,8 @@ person_for_project_manager:
   can_edit_institutions: false
   roles_mask: 4
   
-
+gatekeeper_person:
+  first_name: "Gatekeeper"
+  last_name: "Last"
+  email: "gatekeeper@email.com"
+  roles_mask: 16
