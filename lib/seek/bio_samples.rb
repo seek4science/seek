@@ -96,8 +96,11 @@ module Seek
       study.investigation = investigation
       study.save!
 
-      assay_class = AssayClass.find_by_title "Experimental Assay"
-      assay_type = AssayType.find_by_title assay_type_title
+      assay_class = AssayClass.find_by_title("Experimental Assay")
+      assay_class = AssayClass.create :title => "Experimental Assay" unless assay_class
+      assay_type =  AssayType.find_by_title(assay_type_title)
+      assay_type = AssayType.create :title=> assay_type_title unless assay_type
+
       assay_title = filename.nil? ? "dummy assay" : filename.split(".").first
       @assay = Assay.all.detect{|a|a.title == assay_title and a.study_id == study.id and a.assay_class_id == assay_class.try(:id) and a.assay_type == assay_type and a.owner_id == User.current_user.person.id}
       @assay = Assay.new :title => assay_title  unless @assay
@@ -107,6 +110,7 @@ module Seek
       @assay.technology_type = TechnologyType.first
       @assay.study = study
       @assay.save!
+      @assay.relate @file
     end
 
     def populate_bio_samples sheet

@@ -379,4 +379,67 @@ class DataFileTest < ActiveSupport::TestCase
       end
   end
 
+  test "populate samples database with parser" do
+    user = Factory :user
+    User.with_current_user user do
+      #clean sample database
+      disable_authorization_checks do
+        Unit.destroy_all
+        Treatment.destroy_all
+        Sample.destroy_all
+        Specimen.destroy_all
+        DataFile.destroy_all
+        DataFile::Version.destroy_all
+        AssayAsset.destroy_all
+        Assay.destroy_all
+        Study.destroy_all
+        Investigation.destroy_all
+
+        #create creator in the database
+        creator = Factory :person, :first_name=>"Tester",:last_name=>"SEEK",:email=>"SEEK.tester@test.com"
+        Factory :user,:person_id=>creator.id
+      end
+
+
+      data=File.new("#{Rails.root}/test/fixtures/files/parser/jenage-excel_template-without-protection.xlsm","rb").read
+      df = Factory :data_file,:contributor=>user,:content_blob=>Factory(:content_blob,:data=>data,:content_type=>"application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",:original_filename=>"jenage-excel_template-without-protection.xlsm")
+      xml = df.spreadsheet_xml
+      doc = LibXML::XML::Parser.string(xml).parse
+      doc.root.namespaces.default_prefix = "ss"
+      template_sheet = doc.find_first("//ss:sheet[@name='IDF']")
+
+      assert_not_nil xml
+      assert df.is_excel?
+      assert df.is_extractable_spreadsheet?
+
+      bio_samples =  df.bio_samples_population
+      assert_not_nil bio_samples
+
+      investigation_title = bio_samples.send :hunt_for_horizontal_field_value, template_sheet, "Investigation Title"
+      assay_type_title = bio_samples.send :hunt_for_horizontal_field_value ,template_sheet, "Experiment Class"
+      study_title = bio_samples.send :hunt_for_horizontal_field_value ,template_sheet, "Experiment Description"
+
+      assert_equal "Effects of mild stress on ageing in a multi-species approach" ,investigation_title
+      study = Study.find_by_title_and_contributor_id study_title, user.id
+      assay_title =  "jenage-excel_template-without-protection"
+      assay_class = AssayClass.find_by_title("Experimental Assay")
+      assay_type = AssayType.find_by_title(assay_type_title)
+      assay = Assay.all.detect{|a|a.title == assay_title and a.study_id == study.id and a.assay_class_id == assay_class.try(:id) and a.assay_type == assay_type and a.owner_id == user.person.id}
+      assert_not_nil assay
+
+      assert_equal true, df.assays.include?(assay)
+
+      assert_equal Sample.all.sort_by(&:title), assay.samples.sort_by(&:title)
+
+      assert_equal false, bio_samples.instance_values["specimen_names"].blank?
+      assert_equal false, bio_samples.instance_values["treatments"].blank?
+      assert_equal false, bio_samples.instance_values["rna_extractions"].blank?
+      assert_equal true, bio_samples.instance_values["sequencing"].blank?
+
+
+
+    end
+  end
+
+
 end

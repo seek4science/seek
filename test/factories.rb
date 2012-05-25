@@ -534,6 +534,7 @@ end
     f.association :gene, :factory => :gene
     f.association :modification, :factory => :modification
     f.association :strain, :factory => :strain
+    f.association :specimen,:factory => :specimen
   end
 
   Factory.define :gene do |f|
@@ -547,4 +548,5 @@ end
   Factory.define :phenotype do |f|
     f.sequence(:description) {|n| "phenotype #{n}"}
     f.association :strain, :factory => :strain
+    f.association :specimen,:factory => :specimen
   end

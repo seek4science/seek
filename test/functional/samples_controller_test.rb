@@ -85,7 +85,8 @@ fixtures :all
             :specimen_attributes => {:strain_id => Factory(:strain).id,
                           :institution => Factory(:institution),
                           :lab_internal_number=>"Lab number",
-                          :title=>"Donor number"
+                          :title=>"Donor number",
+                          :institution_id =>Factory(:institution).id
             }
         }
       end
@@ -120,9 +121,8 @@ fixtures :all
                    :donation_date => Date.today,
                    :specimen_attributes => {
                        :lab_internal_number=>"Lab number",
-                       :title=>"Donor number",
-                       :institution => Factory(:institution)
-                   }
+                       :institution_id =>Factory(:institution).id,
+                       :title=>"Donor number"
                }
         end
       end
@@ -135,6 +135,44 @@ fixtures :all
     assert_equal "Donor number",s.specimen.title
 
   end
+
+  test "should create sample specimen with genotypes and phenotypes" do
+    new_gene_title = 'new gene'
+    new_modification_title = 'new modification'
+    new_phenotype_description = "new phenotype"
+    assert_difference(["Sample.count","Specimen.count"]) do
+          post :create,
+               :organism => Factory(:organism),
+               :sample => {
+                   :title => "test",
+                   :contributor => User.current_user,
+                   :projects => [Factory(:project)],
+                   :lab_internal_number => "Do232",
+                   :donation_date => Date.today,
+                   :specimen_attributes => {
+                       :lab_internal_number => "Lab number",
+                       :institution_id =>Factory(:institution).id,
+                       :title => "Donor number",
+                       :genotypes_attributes => {"1234432"=>{:gene_attributes => {:title => new_gene_title},
+                                                               :modification_attributes => {:title => new_modification_title}}},
+                        :phenotypes_attributes => {"213213"=>{:description => new_phenotype_description}}
+                       }
+
+                   }
+
+    end
+    s = assigns(:sample)
+
+    assert_redirected_to sample_path(s)
+    assert_equal "test", s.title
+    assert_not_nil s.specimen
+    assert_equal "Donor number", s.specimen.title
+    assert_equal "new modification new gene", s.specimen.genotype_info
+    assert_equal "new phenotype", s.specimen.phenotype_info
+
+  end
+
+
 
   test "should get show" do
     get :show, :id => Factory(:sample, :title=>"test", :policy =>policies(:editing_for_all_sysmo_users_policy))
