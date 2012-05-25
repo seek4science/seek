@@ -56,7 +56,7 @@
     </tr>
     <tr class="top-aligned-row">
       <td><strong>Last Update:</strong></td>
-      <td>Mon May 14 14:39:41 +0100 2012</td>
+      <td>Fri May 25 16:08:14 +0100 2012</td>
     </tr>
     </table>
   </div>
@@ -266,7 +266,7 @@ If running in production mode, you should start the server with
 <h2>Starting Delayed-Job (Background processing)</h2>
 <p>
 Some background processing is handled using a tool called <em>Delayed
-Job</em>
+Job</em>.
 </p>
 <p>
 To start delayed job run the script
@@ -321,6 +321,32 @@ and to reindex any existing data that created before search was enabled:
 </p>
 <pre>
   rake sunspot:solr:reindex
+</pre>
+<p>
+If you want Sunspot SOLR to start automatically whenever you restart the
+machine SEEK is running on, you probably want to create an init.d/ script.
+A script we use is available at <a
+href="https://gist.github.com/2788607">gist.github.com/2788607</a> (the
+APP_PATH may need changing for you)
+</p>
+<p>
+On Ubuntu or Debian, after putting the script in init.d/ you should run
+(assuming you called he file seek-solr)
+</p>
+<pre>
+  sudo update-rc.d seek-solr defaults
+</pre>
+<p>
+You can then stop the service with
+</p>
+<pre>
+  service seek-solr start
+</pre>
+<p>
+.. and stop with
+</p>
+<pre>
+  service seek-solr stop
 </pre>
 <h2>Rebranding SysMO SEEK for other projects</h2>
 <p>
