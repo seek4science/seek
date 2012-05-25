@@ -92,8 +92,7 @@ class MailerTest < ActionMailer::TestCase
 
   test "request publish approval" do
     resource = data_files(:picture)
-    work_group = Factory(:work_group, :project => resource.projects.first)
-    gatekeeper = Factory(:publisher, :group_memberships => [Factory(:group_membership, :work_group => work_group)])
+    gatekeeper = people(:gatekeeper_person)
     @expected.subject = "A SEEK member requested your approval to publish: #{resource.title}"
     #TODO: hardcoding the formating rather than passing an array was require for rails 2.3.8 upgrade
     @expected.to = gatekeeper.email_with_name
