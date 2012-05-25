@@ -1,5 +1,9 @@
 <%
     resource_text ||= text_for_resource(resource)
+    all_assays=authorised_assays.sort_by &:title
+    all_assays = authorised_assays.select do |assay|
+            assay.is_modelling?
+         end if resource.is_a? Model
 
     project_assays=authorised_assays(current_user.person.projects).sort_by &:title
     project_assays=project_assays.select{|a| a.is_modelling?} if resource.is_a?(Model)
@@ -60,6 +64,8 @@
 
 	  <br/>
       <%= link_to_function (image("new") + " Associate with this #{resource_text}"), "addSelectedAssay(); return(false);", :id=>"add_assay_link", :class=>"block_link" %>
+
+      <%= check_box_tag :include_other_project_assays, nil, false, {:onchange=>"toggle_assay_list();",:style=>"margin-top:0.5em;"} -%> Associate Assays from other projects?
     </div>
   
     <%= render :partial => 'assets/preview_box', :locals => {:preview_name => 'assay'}%>
@@ -83,6 +89,42 @@
        }
     }
 
+  function toggle_assay_list() {
+          var checked = $('include_other_project_assays').checked;
+          var selection_box = $('possible_assays');
+          var option;
+
+          selection_box.options.length = 0;
+
+          if (checked) {
+          <% ([["Select Assay ...",0]]|all_assays.collect{|s| [truncate(h(s.title),:length=>select_truncate_length),s.id]}).each do |df_details| -%>
+              option = document.createElement("OPTION");
+              option.text = '<%= escape_javascript(df_details[0]) -%>';
+              option.value = '<%= df_details[1] -%>';
+              try {
+                  selection_box.add(option); //for older IE version
+              }
+              catch (ex) {
+                  selection_box.add(option, null);
+              }
+          <% end -%>
+          }
+          else {
+          <% ([["Select Assay ...",0]]|project_assays.collect{|s| [truncate(h(s.title),:length=>select_truncate_length),s.id]}).each do |df_details| -%>
+              option = document.createElement("OPTION");
+              option.text = '<%= escape_javascript(df_details[0]) -%>';
+              option.value = '<%= df_details[1] -%>';
+              try {
+                  selection_box.add(option); //for older IE version
+              }
+              catch (ex) {
+                  selection_box.add(option, null);
+              }
+          <% end -%>
+          }
+          selection_box.selectedIndex = 0;
+          selection_box.onchange();
+      }
 
 <% associated_assay_ids = resource.is_a?(Publication) ? resource.related_assays.collect(&:id) : resource.assays.collect(&:id) %>
   <% associated_assay_ids.each do |associated_assay_id|%>
@@ -95,7 +137,7 @@
     <% end %>
 <% end -%>
 
-<% project_assays.each do |assay|%>
+<% all_assays.each do |assay|%>
     assay_id = '<%= assay.id -%>';
     assay_relationship = '<%=(assay.is_modelling?) -%>';
     id_rel_array.push([assay_id, assay_relationship])

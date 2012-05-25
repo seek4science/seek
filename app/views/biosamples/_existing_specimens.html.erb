@@ -70,6 +70,11 @@
               </tbody>
             </table>
           </div>
+          <br/>
+          <div style="margin-bottom: -2em">
+              <input type="button" id='select_all_specimens' name="select_all_specimens" value="Select all" onclick="selectAll('specimen_table')">
+              <input type="button" id='deselect_all_specimens' name="deselect_all_specimens" value="Deselect all" onclick="deselectAll('specimen_table')">
+          </div>
       <% end -%>
       <% if logged_in? and current_user.person.member? %>
           <ul class="sectionIcons">

@@ -73,6 +73,10 @@ class AuthLookupUpdateJob
           if item.respond_to?(:authorization_supported?) && item.authorization_supported?
             item.update_lookup_table(User.current_user)
           end
+          # Could potentially delete the records for this item (either by asset_id or user_id) to ensure an immediate reflection of the change,
+          # but with some slowdown until the changes have been reapplied.
+          # for assets its simply - item.remove_from_lookup_table
+          # for some additional simple code is required.
           AuthLookupUpdateQueue.create(:item=>item, :priority=>priority) unless AuthLookupUpdateQueue.exists?(item)
         end
         Delayed::Job.enqueue(AuthLookupUpdateJob.new, 0, t) unless AuthLookupUpdateJob.count>10
@@ -84,8 +88,12 @@ class AuthLookupUpdateJob
     count!=0
   end
 
-  def self.count
-    Delayed::Job.find(:all,:conditions=>['handler = ? AND locked_at IS ?',@@my_yaml,nil]).count
+  def self.count ignore_locked=true
+    if ignore_locked
+      Delayed::Job.find(:all,:conditions=>['handler = ? AND locked_at IS ? AND failed_at IS ?',@@my_yaml,nil,nil]).count
+    else
+      Delayed::Job.find(:all,:conditions=>['handler = ? AND failed_at IS ?',@@my_yaml,nil]).count
+    end
   end
 
   

@@ -75,5 +75,10 @@ module SpecimensHelper
     return result
   end
 
+  def sex_list_for_selection
+    sex_list = [["male",0], ["female",1]]
+    sex_list |= [["F+",2],["F-",3]] unless Seek::Config.is_virtualliver
+    sex_list
+  end
 
 end

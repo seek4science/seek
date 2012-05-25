@@ -28,7 +28,7 @@
     <th>Phenotypes</th>
     <th>Synonym</th>
     <th>Comments</th>
-    <th>Parent</th>
+    <th>Based on</th>
   </thead>
   <%= render :partial=>"strain_information_row", :collection=>@organism.strains.without_default.select(&:can_view?) -%>
   </table>

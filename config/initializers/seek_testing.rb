@@ -1,4 +1,4 @@
-#Default values required for the automated unit, functional and integration testing to behave as expected.
+  #Default values required for the automated unit, functional and integration testing to behave as expected.
 if Rails.env.test?
   silence_warnings do
     Settings.defaults[:application_title] = 'The Sysmo SEEK'

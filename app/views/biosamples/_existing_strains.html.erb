@@ -51,8 +51,8 @@
           <th>Phenotypes</th>
           <th>ID</th>
           <th>Synonym</th>
-          <th>Comment</th>
-          <th>Parent</th>
+          <th>Creator</th>
+          <th>Based on</th>
           <th></th>
           <th></th>
         </tr>
@@ -69,6 +69,11 @@
         <% end -%>
         </tbody>
       </table>
+      </div>
+      <br/>
+      <div style="margin-bottom: -2em">
+          <input type="button" id='select_all_strains' name="select_all_strains" value="Select all" onclick="selectAll('strain_table')">
+          <input type="button" id='deselect_all_strains' name="deselect_all_strains" value="Deselect all" onclick="deselectAll('strain_table')">
       </div>
   <% end -%>
 <% if logged_in? and current_user.person.member? %>

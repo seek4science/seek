@@ -23,7 +23,7 @@
 
     <p>
         <%= specimen_f.label "Sex:" -%> <br/>
-        <%= specimen_f.select :sex, options_for_select([["female",true],["male",false]].insert(0,["Not specified", 0]),specimen.try(:sex)) -%>
+        <%= specimen_f.select :sex, options_for_select(sex_list_for_selection.insert(0,["Not specified", '']),specimen.try(:sex)) -%>
     </p>
 
     <p>
@@ -44,7 +44,7 @@
     <p>
         <%= specimen_f.label "Organism:" -%><span class="required">*</span> <br/>
         <%= select_tag :organism,
-                              options_for_select([["Not specified",""]] + Organism.all(:order=>:title).collect{|o| [o.title,o.id]},specimen.organism.try(:id)),
+                              options_for_select([["Not specified",""]] + Organism.all(:order=>:title).collect{|o| [o.title,o.id]},specimen.organism.try(:id) || current_user.try(:person).try(:projects).try(:first).try(:organism_ids).try(:first)),
                               :onchange=>"show_ajax_loader('strains_of_selected_organism');strains_of_selected_organism(this.value, 'sample_specimen_attributes_strain_id', 'sample[specimen_attributes][strain_id]');" -%>
     </p>
 
@@ -57,7 +57,9 @@
       </div>
     </p>
 
-    <%= fancy_multiselect specimen, :sops, :name => 'specimen_sop_ids',:association_class=>Sop, :selected => specimen.sop_masters.map(&:sop_id) -%>
+    <br/>
+
+    <%= fancy_multiselect specimen, :sops, {:name => 'specimen_sop_ids',:association_class=>Sop, :selected => specimen.sop_masters.map(&:sop_id), :hidden=> specimen.sops.blank? ? true : false, :other_projects_checkbox => true} %>
 
     <p>
       <%= render :partial => "assets/author_form", :locals => {:resource_type => 'Specimen',
@@ -65,3 +67,10 @@
                                                                :other_creators => specimen.other_creators} -%>
     </p>
 <% end %>
+
+<script type="text/javascript">
+  if ('<%= action.to_s%>' == 'new' && <%= f.error_messages.blank?%> ){
+    show_ajax_loader('strains_of_selected_organism');
+    strains_of_selected_organism($F('organism'), 'sample_specimen_attributes_strain_id', 'sample[specimen_attributes][strain_id]');
+  }
+</script>
