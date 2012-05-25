@@ -100,6 +100,7 @@ class DataFilesController < ApplicationController
   
   def new
     @data_file = DataFile.new
+    @page_title = params[:page_title]
     respond_to do |format|
       if current_user.person.member?
         format.html # new.html.erb
