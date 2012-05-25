@@ -227,3 +227,19 @@ function strains_of_selected_organism(organism_id, strain_selection_box_id, stra
         });
 
     }
+
+function scrollToElement(element_id){
+    var element = $(element_id);
+    window.scroll(0,findPos(element)*0.5);
+}
+
+function findPos(obj) {
+	var curtop = 0;
+	if (obj.offsetParent) {
+		do {
+			curtop += obj.offsetTop;
+		} while (obj = obj.offsetParent);
+	return [curtop];
+	}
+}
+
