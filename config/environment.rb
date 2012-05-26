@@ -85,7 +85,6 @@ Rails::Initializer.run do |config|
 
 end
 Mime::Type.register "application/x-endnote-refer", :enw
-RAILS_CACHE = ActiveSupport::Cache::MemCacheStore.new
 
 
 
