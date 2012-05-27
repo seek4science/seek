@@ -30,4 +30,4 @@ production:
         
 test:
     adapter: sqlite3
-    database: db/test.sqlite3
+    database: db/test.sqlite3<%= ENV['TEST_ENV_NUMBER'] %>

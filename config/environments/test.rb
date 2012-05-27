@@ -22,4 +22,4 @@ config.action_controller.allow_forgery_protection    = false
 config.action_mailer.delivery_method = :test
 
 config.cache_store = :memory_store
-
+config.eager_load_paths.clear
