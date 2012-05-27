@@ -14,6 +14,8 @@ class Sample < ActiveRecord::Base
 
   accepts_nested_attributes_for :specimen
 
+ has_and_belongs_to_many :tissue_and_cell_types
+
   belongs_to :institution
   has_and_belongs_to_many :assays
 
