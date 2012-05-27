@@ -12,7 +12,7 @@ end
 
 desc "task for cruise control"
 task :cruise, :run_secondary do |t, args|
-  args.with_defaults :run_secondary => true, :count => 10  #count determines the number of processes that parallel_tests will use
+  args.with_defaults :run_secondary => true, :count => 8  #count determines the number of processes that parallel_tests will use
   run_secondary_signal = "#{RAILS_ROOT}/tmp/run_secondary_tests"
   if args[:run_secondary]
     File.new(run_secondary_signal, 'w') unless File.exists? run_secondary_signal
