@@ -166,8 +166,8 @@ class Project < ActiveRecord::Base
 
   def people
     #TODO: look into doing this with a named_scope or direct query
-    res = work_groups.scoped(:include => :people).collect(&:people)
-    res = res + descendants.scoped(:include => [:work_groups, {:work_groups => :people}]).collect(&:people)
+    res = work_groups.collect(&:people)
+    res = res + descendants.collect(&:people)
 
     #TODO: write a test to check they are ordered
     res = res.flatten.uniq.compact

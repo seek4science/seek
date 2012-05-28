@@ -24,6 +24,7 @@ require 'assets_common_extension'
 require 'acts_as_cached_tree'
 require 'sunspot_rails'
 require 'cancan'
+require 'strategic_eager_loading'
 
 GLOBAL_PASSPHRASE="ohx0ipuk2baiXah" unless defined? GLOBAL_PASSPHRASE
 
