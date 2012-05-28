@@ -75,7 +75,6 @@ class DataFilesController < ApplicationController
             flash[:error] = "Warning: sample database population is not completely successful.<br/>"
             flash[:error] << bio_samples.instance_values["errors"].html_safe
           end
-          bio_samples.instance_values["assay"].try(:relate, @data_file)
         else
           flash[:error] = "Unable to save new version"
         end
@@ -101,6 +100,7 @@ class DataFilesController < ApplicationController
   
   def new
     @data_file = DataFile.new
+    @page_title = params[:page_title]
     respond_to do |format|
       if current_user.person.member?
         format.html # new.html.erb
@@ -192,7 +192,6 @@ class DataFilesController < ApplicationController
                 flash[:error] << bio_samples.instance_values["errors"].html_safe
               end
 
-            bio_samples.instance_values["assay"].try(:relate, @data_file)
           assay_ids.each do |text|
             a_id, r_type = text.split(",")
             @assay = Assay.find(a_id)
