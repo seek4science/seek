@@ -105,8 +105,8 @@ class Project < ActiveRecord::Base
   end
 
   #this is seek role
-  def publishers
-    people.select(&:is_publisher?)
+  def gatekeepers
+    people.select(&:is_gatekeeper?)
   end
 
   def locations
