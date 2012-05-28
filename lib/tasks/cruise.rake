@@ -30,9 +30,10 @@ task :cruise do |t, args|
     #run_in_parallel('rake db:test:load RAILS_ENV=test', args) #parallel_tests has a built in task for this, but unfortunately it doesn't pass RAILS_ENV=test
     #run_in_parallel('rake seek:seed_testing RAILS_ENV=test',args)
 
-  Rake::Task["db:create"].invoke(args[:count])
-  Rake::Task["db:test:load"].invoke(args[:count])
-  Rake::Task["seek:seed_testing"].invoke(args[:count])
+  Rake::Task["db:create"].invoke
+  Rake::Task["db:test:load"].invoke
+  Rake::Task["seek:seed_testing"].invoke
+
   (2..args[:count]).each do |db_ndx|
      FileUtils.copy(Dir.pwd+"/db/test.sqlite3", Dir.pwd+"/db/test.sqlite3#{db_ndx}")
   end
