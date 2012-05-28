@@ -560,18 +560,18 @@ class PersonTest < ActiveSupport::TestCase
     end
   end
 
-  test 'is_publisher?' do
+  test 'is_gatekeeperr?' do
      User.with_current_user Factory(:admin).user do
       person = Factory(:person)
-      person.is_publisher= true
+      person.is_gatekeeper= true
       person.save!
 
-      assert person.is_publisher?
+      assert person.is_gatekeeper?
 
-      person.is_publisher=false
+      person.is_gatekeeper=false
       person.save!
 
-      assert !person.is_publisher?
+      assert !person.is_gatekeeper?
     end
   end
 

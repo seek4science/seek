@@ -34,8 +34,8 @@
     f.is_project_manager true
   end
 
-  Factory.define(:publisher,:parent=>:person) do |f|
-    f.is_publisher true
+  Factory.define(:gatekeeper,:parent=>:person) do |f|
+    f.is_gatekeeper true
   end
 
 #User

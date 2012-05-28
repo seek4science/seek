@@ -2,12 +2,21 @@ GEM
   remote: http://rubygems.org/
   remote: http://gems.github.com/
   specs:
+    RedCloth (4.2.7)
     RedCloth (4.2.9)
     actionmailer (2.3.14)
       actionpack (= 2.3.14)
+    actionmailer (2.3.8)
+      actionpack (= 2.3.8)
+    actionmailer (2.3.8)
+      actionpack (= 2.3.8)
     actionpack (2.3.14)
       activesupport (= 2.3.14)
+    actionpack (2.3.8)
+      activesupport (= 2.3.8)
       rack (~> 1.1.0)
+    actionpack (2.3.8)
+      activesupport (= 2.3.8)
     activerecord (2.3.14)
       activesupport (= 2.3.14)
     activeresource (2.3.14)
@@ -85,7 +94,7 @@ PLATFORMS
   ruby
 
 DEPENDENCIES
-  RedCloth (~> 4.2.3)
+  RedCloth (= 4.2.9)
   calendar_date_select
   cancan
   daemons

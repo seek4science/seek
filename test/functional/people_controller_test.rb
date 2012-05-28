@@ -515,7 +515,7 @@ class PeopleControllerTest < ActionController::TestCase
     get :admin, :id => person
     assert_select "input#_roles_asset_manager", :count => 1
     assert_select "input#_roles_project_manager", :count => 1
-    assert_select "input#_roles_publisher", :count => 1
+    assert_select "input#_roles_gatekeeper", :count => 1
   end
 
   test 'non-admin should not see the session of assigning roles to a person' do
@@ -524,7 +524,7 @@ class PeopleControllerTest < ActionController::TestCase
     get :admin, :id => person
     assert_select "input#_roles_asset_manager", :count => 0
     assert_select "input#_roles_project_manager", :count => 0
-    assert_select "input#_roles_publisher", :count => 0
+    assert_select "input#_roles_gatekeeper", :count => 0
   end
 
   test 'should show that the person is asset manager for admin' do
@@ -923,7 +923,7 @@ class PeopleControllerTest < ActionController::TestCase
     end
   end
 
-  test 'set publisher role for a person' do
+  test 'set gatekeeper role for a person' do
     work_group_id = Factory(:work_group).id
     assert_difference('Person.count') do
       assert_difference('NotifieeInfo.count') do
@@ -931,44 +931,44 @@ class PeopleControllerTest < ActionController::TestCase
       end
     end
     person = assigns(:person)
-    put :administer_update, :id => person, :person =>{:work_group_ids => [work_group_id]}, :roles => {:publisher => true}
+    put :administer_update, :id => person, :person =>{:work_group_ids => [work_group_id]}, :roles => {:gatekeeper => true}
 
     person = assigns(:person)
     assert_not_nil person
-    assert person.is_publisher?
+    assert person.is_gatekeeper?
   end
 
-  test 'should show that the person is publisher for admin' do
+  test 'should show that the person is gatekeeper for admin' do
     person = Factory(:person)
-    person.is_publisher = true
+    person.is_gatekeeper = true
     person.save
     get :show, :id => person
-    assert_select "li", :text => /This person is a publisher/, :count => 1
+    assert_select "li", :text => /This person is a gatekeeper/, :count => 1
   end
 
-  test 'should not show that the person is publisher for non-admin' do
+  test 'should not show that the person is gatekeeper for non-admin' do
     person = Factory(:person)
-    person.is_publisher = true
+    person.is_gatekeeper = true
     person.save
     login_as(:aaron)
     get :show, :id => person
-    assert_select "li", :text => /This person is a publisher/, :count => 0
+    assert_select "li", :text => /This person is a gatekeeper/, :count => 0
   end
 
-  test 'should have publisher icon on person show page' do
-    publisher = Factory(:publisher)
-    get :show, :id => publisher
+  test 'should have gatekeeper icon on person show page' do
+    gatekeeper = Factory(:gatekeeper)
+    get :show, :id => gatekeeper
     assert_select "img[src*=?]", /medal_silver_2.png/,:count => 1
   end
 
-  test 'should have publisher icon on people index page' do
+  test 'should have gatekeeper icon on people index page' do
     i = 0
     while i < 5 do
-      Factory(:publisher)
+      Factory(:gatekeeper)
       i += 1
     end
     get :index
-    publisher_number = assigns(:people).select(&:is_publisher?).count
-    assert_select "img[src*=?]", /medal_silver_2/, :count => publisher_number
+    gatekeeper_number = assigns(:people).select(&:is_gatekeeper?).count
+    assert_select "img[src*=?]", /medal_silver_2/, :count => gatekeeper_number
   end
 end

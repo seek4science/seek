@@ -146,6 +146,7 @@ class BiosamplesController < ApplicationController
 
     render :update do |page|
         page.replace_html 'existing_specimens', :partial=>"biosamples/existing_specimens",:object=>specimens_of_strains, :locals=>{:strains=>strains}
+        page.call :scrollToElement, 'existing_specimens'
     end
   end
 
@@ -165,6 +166,7 @@ class BiosamplesController < ApplicationController
     end
     render :update do |page|
         page.replace_html 'existing_samples', :partial=>"biosamples/existing_samples",:object=>samples_of_specimens,:locals=>{:specimens=>specimens}
+        page.call :scrollToElement, 'existing_samples'
     end
   end
 
