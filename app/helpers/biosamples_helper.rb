@@ -54,7 +54,11 @@ module BiosamplesHelper
      function += remote_function(:url => {:controller => 'biosamples', :action => 'existing_specimens'},
                                                                   :with => "'strain_ids=' + getSelectedStrains() + '&organism_ids='+$F('strain_organism_ids')") + ";"  if Seek::Config.is_virtualliver
      function +=  "check_show_existing_items('strain_organism_ids', 'existing_strains', '');"
-     function += "hide_existing_specimens();hide_existing_samples();" unless Seek::Config.is_virtualliver
+     if Seek::Config.is_virtualliver
+       function +=  "check_show_existing_items('strain_organism_ids', 'existing_specimens', '');"
+     else
+       function += "hide_existing_specimens();hide_existing_samples();"
+     end
      function += "return(false);"
      function
    end
