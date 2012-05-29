@@ -2,8 +2,38 @@ module Seek
   module Publishing
 
     def self.included(base)
-      base.before_filter :set_asset, :only=>[:preview_publish,:publish]
+      base.before_filter :set_asset, :only=>[:preview_publish,:publish,:approve_or_reject_publish,:approve_publish,:reject_publish]
       base.before_filter :publish_auth, :only=>[:preview_publish,:publish]
+      base.before_filter :gatekeeper_auth, :only => [:approve_or_reject_publish, :approve_publish, :reject_publish]
+    end
+
+    def approve_or_reject_publish
+      asset_type_name = @template.text_for_resource @asset
+
+      respond_to do |format|
+        format.html { render :template=>"assets/publish/approve_or_reject_publish",:locals=>{:asset_type_name=>asset_type_name} }
+      end
+    end
+
+    def approve_publish
+      policy = @asset.policy
+      policy.access_type=Policy::ACCESSIBLE
+      policy.sharing_scope=Policy::EVERYONE
+      respond_to do |format|
+         if policy.save
+           flash.now[:notice]="Publishing complete"
+           format.html{redirect_to @asset}
+         else
+           flash[:error] = "There is a problem in making this item published"
+         end
+      end
+    end
+
+    def reject_publish
+      respond_to do |format|
+         flash.now[:notice]="You rejected to publish this item"
+         format.html{redirect_to @asset}
+      end
     end
 
     def preview_publish
@@ -36,12 +66,19 @@ module Seek
 
     def set_asset
       c = self.controller_name.downcase
-      @asset = eval("@"+c.singularize)
+      @asset = eval("@"+c.singularize) || self.controller_name.classify.constantize.find_by_id(params[:id])
     end
 
     def publish_auth
       unless Seek::Config.publish_button_enabled
         error("This feature is is not yet currently available","invalid route")
+        return false
+      end
+    end
+
+    def gatekeeper_auth
+      unless current_user.try(:person).try(:is_gatekeeper?) && !(@asset.projects & current_user.try(:person).try(:projects)).empty?
+        error("You have to login as a gatekeeper to perform this action", "is invalid (insufficient_privileges)")
         return false
       end
     end

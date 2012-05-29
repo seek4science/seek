@@ -218,6 +218,62 @@ class PublishingTest < ActionController::TestCase
     end
   end
 
+  test 'should not allow to approve/reject publishing for non-gatekeeper' do
+    login_as(:quentin)
+    df = Factory(:data_file,:projects => people(:quentin_person).projects)
+    get :approve_or_reject_publish, :id=>df.id
+    assert_redirected_to :root
+    assert_not_nil flash[:error]
+
+    get :approve_publish, :id => df.id
+    assert_redirected_to :root
+    assert_not_nil flash[:error]
+
+    get :reject_publish, :id => df.id
+    assert_redirected_to :root
+    assert_not_nil flash[:error]
+  end
+
+  test 'gatekeeper should approve/reject publishing' do
+    gatekeeper = Factory(:gatekeeper)
+    df = Factory(:data_file,:projects => gatekeeper.projects)
+    login_as(gatekeeper.user)
+    get :approve_or_reject_publish, :id=>df.id
+    assert_response :success
+    assert_nil flash[:error]
+
+    post :reject_publish, :id => df.id
+    assert_redirected_to data_file_path(df)
+    assert_nil flash[:error]
+    df.reload
+    assert_not_equal Policy::EVERYONE, df.policy.sharing_scope
+
+    post :approve_publish, :id => df.id
+    assert_redirected_to data_file_path(df)
+    assert_nil flash[:error]
+    df.reload
+    assert_equal Policy::EVERYONE, df.policy.sharing_scope
+    assert_equal Policy::ACCESSIBLE, df.policy.access_type
+  end
+
+  test 'should not allow to approve/reject publishing for gatekeeper from other projects' do
+      gatekeeper = Factory(:gatekeeper)
+      df = Factory(:data_file)
+      assert (df.projects&gatekeeper.projects).empty?
+      login_as(gatekeeper.user)
+      get :approve_or_reject_publish, :id=>df.id
+      assert_redirected_to :root
+      assert_not_nil flash[:error]
+
+      get :approve_publish, :id => df.id
+      assert_redirected_to :root
+      assert_not_nil flash[:error]
+
+      get :reject_publish, :id => df.id
+      assert_redirected_to :root
+      assert_not_nil flash[:error]
+  end
+
   private
 
   def data_file_for_publishing(owner=users(:datafile_owner))
