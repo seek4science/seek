@@ -170,7 +170,7 @@ class MailerTest < ActionMailer::TestCase
 
     @expected.body    = read_fixture('contact_project_manager_new_user_no_profile')
 
-    pretend_now_is(@expected.date) do
+    force_now_is(@expected.date) do
       assert_equal @expected.encoded,
         Mailer.create_contact_project_manager_new_user_no_profile(project_manager,"test message",users(:aaron),"localhost").encoded
     end

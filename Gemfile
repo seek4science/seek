@@ -26,7 +26,7 @@ gem 'sunspot_rails',"1.2.1"
 gem "delayed_job","~>2.0.4"
 gem "daemons"
 gem "cancan"
-
+gem "parallel_tests", :group => :development
 
 
 
