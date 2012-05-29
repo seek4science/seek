@@ -1,0 +1,106 @@
+<div id="fields_for_cultured_cell_line_and_primary_cell_culture" style="display:none;">
+  <table id="table1" border="1" cellpadding="10">
+    <tr>
+      <td> <%= f.label :medium -%></td>
+      <td> <%= f.text_field :medium %></td>
+    </tr>
+    <tr>
+      <td><%= f.label :culture_format -%></td>
+      <td> <%= f.text_field :culture_format %></td>
+    </tr>
+    <tr>
+      <td><%= f.label :temperature -%></td>
+      <td><%= f.text_field :temperature %> </td>
+    </tr>
+    <tr>
+      <td><%= f.label :ph, "pH" -%></td>
+      <td><%= f.text_field :ph %></td>
+    </tr>
+    <tr>
+      <td><%= f.label :confluency -%></td>
+      <td><%= f.text_field :confluency %> </td>
+    </tr>
+    <tr>
+      <td><%= f.label :passage -%></td>
+      <td><%= f.text_field :passage %> </td>
+    </tr>
+    <tr>
+      <td><%= f.label :viability -%></td>
+      <td><%= f.text_field :viability %> </td>
+    </tr>
+    <tr>
+      <td><%= f.label :purity -%></td>
+      <td><%= f.text_field :purity %> </td>
+    </tr>
+  </table>
+</div>
+
+<div id="fields_for_vivo" style="display:none;">
+  <br/>
+  <table id="table2" border="1">
+    <tr>
+      <td style="text-align:left;"><%= f.label :sex -%></td>
+      <td style="text-align:left;"><%= f.select :sex, options_for_select({"male" => 0, "female" => 1,"hermaphrodite"=>2}, specimen.sex), :include_blank => "Not Specified" %> </td>
+    </tr>
+
+    <tr>
+      <td style="text-align:left;"><%= f.label :age -%></td>
+      <td style="text-align:left;"><%= f.text_field :age, :style => "width: 150px;" -%> weeks</td>
+    </tr>
+
+    <tr>
+      <td style="text-align:left;"><%= f.label "Birthday" -%></td>
+      <td style="text-align:left;"> <%= f.calendar_date_select :born, :time => "mixed" -%></td>
+    </tr>
+  </table>
+</div>
+
+<div id="fields_for_batch_and_chemostat" style="display:none;">
+  <table id="table3" border="1" cellpadding="10">
+    <tr>
+      <td><%= f.label :ploidy -%></td>
+      <td><%= f.text_field :ploidy %> </td>
+    </tr>
+    <tr>
+      <td><%= f.label :sex -%></td>
+      <td style="text-align:left;"><%= f.select :sex, options_for_select({"male" => 0, "female" => 1,"hermaphrodite"=>2}, specimen.sex), :include_blank => "Not Specified" %> </td>
+    </tr>
+  </table>
+</div>
+<script type="text/javascript">
+
+    function check_show_which_fields() {
+        var selection_list_id = '<%= parent_id_prefix%>_culture_growth_type_id';
+        if ($(selection_list_id)) {
+            selected_option_index = $(selection_list_id).selectedIndex;
+            selected_option = $(selection_list_id).options[selected_option_index];
+            title = selected_option.text;
+            var div1 = document.getElementById('fields_for_cultured_cell_line_and_primary_cell_culture');
+            var div2 = document.getElementById('fields_for_vivo');
+            var div3 = document.getElementById('fields_for_batch_and_chemostat');
+
+            if (title == "cultured cell line" || title == "primary cell culture") {
+                div1.style.display = 'block';
+                div2.style.display = 'none';
+                div3.style.display = 'none';
+            }
+            else if (title == "in vivo") {
+                div2.style.display = 'block';
+                div1.style.display = 'none';
+                div3.style.display = 'none';
+
+            } else if (title == "batch" || title == "chemostat") {
+                div1.style.display = 'none';
+                div2.style.display = 'none';
+                div3.style.display = 'block';
+            }
+            else {
+                div1.style.display = 'none';
+                div2.style.display = 'none';
+                div3.style.display = 'none';
+            }
+        }
+    }
+
+    check_show_which_fields();
+</script>

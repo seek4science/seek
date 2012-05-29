@@ -14,6 +14,7 @@
    strain_selection_box_id = from_biosamples && action.to_s=="new" ? 'sample_specimen_attributes_strain_id' : 'specimen_strain_id'
    strain_selection_box_name = from_biosamples && action.to_s=="new" ? 'sample[specimen_attributes][strain_id]' : 'specimen[strain_id]'
    parent_name =  from_biosamples && action.to_s=="new" ?  "sample[specimen_attributes]" : "specimen"
+   parent_id_prefix =   from_biosamples && action.to_s=="new" ?  "sample_specimen_attributes" : "specimen"
    all_institutions = Institution.find(:all, :order => :name)
    existing_creators = []
    if action == :new
@@ -53,13 +54,9 @@
 
 <p>
   <%= f.label "Culture growth type:" -%> <br/>
-  <%= f.collection_select :culture_growth_type_id, CultureGrowthType.all, :id, :title, :include_blank => "Not specified" -%>
+  <%= f.collection_select :culture_growth_type_id, CultureGrowthType.all, :id, :title,{:include_blank => "Not specified"}, {:onchange=>"check_show_which_fields();return(false);"} -%>
 </p>
-
-<p>
-  <%= f.label "Sex:" -%> <br/>
-  <%= f.select :sex, options_for_select(sex_list_for_selection.insert(0, ["Not specified", '']), specimen.try(:sex)) -%>
-</p>
+<%= render :partial => "specimens/additional_fields",:locals => {:f=>f,:specimen=>specimen,:parent_id_prefix=>parent_id_prefix} %>
 
 <p>
   <%= f.label "Comment:" -%> <br/>
