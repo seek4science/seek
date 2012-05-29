@@ -4,7 +4,6 @@ ActionController::Routing::Routes.draw do |map|
   map.resources :subscriptions
   map.resources :specimens
   map.resources :samples
-  map.resources :data_file_with_samples
 
   map.resources :events
 
