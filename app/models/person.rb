@@ -215,7 +215,7 @@ class Person < ActiveRecord::Base
   end
 
   def institutions
-    work_groups.scoped(:include => :institution).collect {|wg| wg.institution }.uniq
+    work_groups.collect {|wg| wg.institution }.uniq
   end
 
   def projects
