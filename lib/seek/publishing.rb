@@ -4,7 +4,7 @@ module Seek
     def self.included(base)
       base.before_filter :set_asset, :only=>[:preview_publish,:publish,:approve_or_reject_publish,:approve_publish,:reject_publish]
       base.before_filter :publish_auth, :only=>[:preview_publish,:publish]
-      base.before_filter :gatekeeper_auth, :only => [:approve_or_reject_publish, :approve_publish, :reject_publish]
+      base.before_filter :gatekeeper_auth, :uuid_auth, :only => [:approve_or_reject_publish, :approve_publish, :reject_publish]
     end
 
     def approve_or_reject_publish
@@ -81,6 +81,13 @@ module Seek
         error("You have to login as a gatekeeper to perform this action", "is invalid (insufficient_privileges)")
         return false
       end
+    end
+
+    def uuid_auth
+        unless @asset.respond_to?(:uuid) and params[:uuid] == @asset.uuid
+          error("Invalid route", "is invalid (invalid route)")
+          return false
+        end
     end
 
     private
