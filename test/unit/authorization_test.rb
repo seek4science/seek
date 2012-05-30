@@ -947,6 +947,19 @@ class AuthorizationTest < ActiveSupport::TestCase
      end
   end
 
+  test "manager should be able to publish if the projects have no gatekeepers" do
+     person_can_manage = Factory(:person)
+     datafile = Factory(:data_file, :projects => person_can_manage.projects, :policy => Factory(:policy))
+     permission = Factory(:permission, :contributor => person_can_manage, :access_type => Policy::MANAGING, :policy => datafile.policy)
+
+
+     User.with_current_user person_can_manage.user do
+       assert datafile.gatekeepers.empty?
+       assert datafile.can_manage?
+       assert datafile.can_publish?
+     end
+  end
+
   test "should handle different types of contributor of resource (Person, User)" do
     asset_manager = Factory(:asset_manager)
 

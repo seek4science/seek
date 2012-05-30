@@ -234,9 +234,9 @@ module Acts
           self.contributor = default_contributor
         end
       end
-      #(gatekeeper also manager) or (manager and the item was published)
+      #(gatekeeper also manager) or (manager and projects have no gatekeeper) or (manager and the item was published)
       def can_publish?
-        (Ability.new(User.current_user).can? :publish, self) || (self.can_manage? && self.policy.sharing_scope == Policy::EVERYONE) || Seek::Config.is_virtualliver
+        (Ability.new(User.current_user).can? :publish, self) || (self.can_manage? && self.gatekeepers.empty?) || (self.can_manage? && self.policy.sharing_scope == Policy::EVERYONE) || Seek::Config.is_virtualliver
       end
 
       #use request_permission_summary to retrieve who can manage the item
@@ -284,6 +284,10 @@ module Acts
         else
           owner.try(:user)
         end
+      end
+
+      def gatekeepers
+         self.projects.collect(&:gatekeepers).flatten
       end
     end
   end
