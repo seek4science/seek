@@ -2,7 +2,12 @@ require 'tempfile'
 
 module ISAHelper
   
-  NO_DELETE_EXPLANTIONS={Assay=>"You cannot delete an assay that has items associated with it.",Study=>"You cannot delete a Study that has Assays associated with it.",Investigation=>"You cannot delete an Investigation that has Studies associated with it."}
+  NO_DELETE_EXPLANTIONS={Assay=>"You cannot delete an assay that has items associated with it.",
+                         Study=>"You cannot delete a Study that has Assays associated with it.",
+                         Investigation=>"You cannot delete an Investigation that has Studies associated with it." ,
+                         Specimen=>"You cannot delete a Specimen that has Samples associated with it.",
+                         Sample=>"You cannot delete a Sample that has Assays associated with it."
+  }
   
   include DotGenerator
   
