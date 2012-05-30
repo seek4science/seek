@@ -831,7 +831,7 @@ class AuthorizationTest < ActiveSupport::TestCase
       datafile = Factory(:data_file, :projects => gatekeeper.projects)
 
       ability = Ability.new(gatekeeper.user)
-      assert ability.can? :publish, datafile
+      assert ability.cannot? :publish, datafile
 
       User.with_current_user gatekeeper.user do
         assert !datafile.can_manage?
@@ -941,7 +941,7 @@ class AuthorizationTest < ActiveSupport::TestCase
 
        ability = Ability.new(gatekeeper.user)
        assert gatekeeper.is_gatekeeper?
-       assert ability.can? :publish, datafile
+       assert ability.cannot? :publish, datafile
        assert ability.cannot? :manage_asset, datafile
        assert ability.cannot? :manage, datafile
      end
