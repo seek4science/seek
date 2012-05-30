@@ -12,6 +12,7 @@ class Strain < ActiveRecord::Base
 
   include ActsAsCachedTree
   acts_as_authorized
+  acts_as_uniquely_identifiable
 
   def self.default_strain_for_organism organism
     organism = Organism.find(organism) unless organism.is_a?(Organism)

@@ -6,6 +6,7 @@ class Sample < ActiveRecord::Base
 
   acts_as_authorized
   acts_as_favouritable
+  acts_as_uniquely_identifiable
 
   attr_accessor :from_new_link
   attr_accessor :from_biosamples

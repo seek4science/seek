@@ -1,4 +1,4 @@
-# This file is auto-generated from the current state of the database. Instead of editing this file,
+# This file is auto-generated from the current state of the database. Instead of editing this file, 
 # please use the migrations feature of Active Record to incrementally modify your database, and
 # then regenerate this schema definition.
 #
@@ -9,7 +9,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20120511134443) do
+ActiveRecord::Schema.define(:version => 20120530143818) do
 
   create_table "activity_logs", :force => true do |t|
     t.string   "action"
@@ -24,7 +24,7 @@ ActiveRecord::Schema.define(:version => 20120511134443) do
     t.datetime "updated_at"
     t.string   "http_referer"
     t.string   "user_agent"
-    t.text     "data",                   :limit => 2147483647
+    t.text     "data",                   :limit => 16777215
     t.string   "controller_name"
   end
 
@@ -863,6 +863,26 @@ ActiveRecord::Schema.define(:version => 20120511134443) do
     t.integer "presentation_id"
   end
 
+  create_table "project_folder_assets", :force => true do |t|
+    t.integer  "asset_id"
+    t.string   "asset_type"
+    t.integer  "project_folder_id"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
+  create_table "project_folders", :force => true do |t|
+    t.integer  "project_id"
+    t.string   "title"
+    t.text     "description"
+    t.integer  "parent_id"
+    t.boolean  "editable",    :default => true
+    t.datetime "created_at"
+    t.datetime "updated_at"
+    t.boolean  "incoming",    :default => false
+    t.boolean  "deletable",   :default => true
+  end
+
   create_table "project_roles", :force => true do |t|
     t.string   "name"
     t.datetime "created_at"
@@ -1031,6 +1051,7 @@ ActiveRecord::Schema.define(:version => 20120511134443) do
     t.string   "provider_id"
     t.string   "provider_name"
     t.integer  "age_at_sampling"
+    t.string   "uuid"
   end
 
   create_table "saved_searches", :force => true do |t|
@@ -1187,6 +1208,7 @@ ActiveRecord::Schema.define(:version => 20120511134443) do
     t.string   "provider_id"
     t.string   "provider_name"
     t.boolean  "is_dummy",               :default => false
+    t.string   "uuid"
   end
 
   create_table "strain_auth_lookup", :id => false, :force => true do |t|
@@ -1220,6 +1242,7 @@ ActiveRecord::Schema.define(:version => 20120511134443) do
     t.string   "contributor_type"
     t.integer  "contributor_id"
     t.integer  "policy_id"
+    t.string   "uuid"
   end
 
   create_table "studied_factor_links", :force => true do |t|
