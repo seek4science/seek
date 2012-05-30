@@ -18,7 +18,13 @@ module AssetsHelper
   end
 
   def text_for_resource resource_or_text
-    text=resource_or_text.is_a?(String) ? resource_or_text : resource_or_text.class.name
+    if resource_or_text.is_a?(String)
+      text = resource_or_text
+    elsif resource_or_text.kind_of?(Specimen)
+      text = CELL_CULTURE_OR_SPECIMEN
+    else
+      text = resource_or_text.class.name
+    end
     text.underscore.humanize
   end
 

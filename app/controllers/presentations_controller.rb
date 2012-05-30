@@ -13,6 +13,8 @@ class PresentationsController < ApplicationController
 
   #before_filter :convert_to_swf, :only => :show
 
+  include Seek::Publishing
+
   def new_version
     if (handle_data nil)
       comments=params[:revision_comment]

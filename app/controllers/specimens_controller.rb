@@ -5,6 +5,7 @@ class SpecimensController < ApplicationController
   before_filter :find_and_auth, :only => [:show, :update, :edit, :destroy]
 
   include IndexPager
+  include Seek::Publishing
 
   def new_object_based_on_existing_one
     @existing_specimen =  Specimen.find(params[:id])

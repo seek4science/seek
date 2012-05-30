@@ -7,7 +7,8 @@ class StudiesController < ApplicationController
   before_filter :find_and_auth, :only=>[:edit, :update, :destroy, :show]
 
   before_filter :check_assays_are_not_already_associated_with_another_study,:only=>[:create,:update]
-  
+
+  include Seek::Publishing
 
   def new_object_based_on_existing_one
     @existing_study =  Study.find(params[:id])

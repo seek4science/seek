@@ -21,7 +21,7 @@ module Seek
       policy.sharing_scope=Policy::EVERYONE
       respond_to do |format|
          if policy.save
-           flash.now[:notice]="Publishing complete"
+           flash[:notice]="Publishing complete"
            format.html{redirect_to @asset}
          else
            flash[:error] = "There is a problem in making this item published"
@@ -31,7 +31,7 @@ module Seek
 
     def reject_publish
       respond_to do |format|
-         flash.now[:notice]="You rejected to publish this item"
+         flash[:notice]="You rejected to publish this item"
          format.html{redirect_to @asset}
       end
     end

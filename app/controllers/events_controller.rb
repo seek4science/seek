@@ -7,6 +7,7 @@ class EventsController < ApplicationController
   before_filter :check_events_enabled
 
   include IndexPager
+  include Seek::Publishing
   
   def show
     
