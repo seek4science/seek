@@ -390,52 +390,72 @@ class DataFileTest < ActiveSupport::TestCase
         Assay.destroy_all
         Study.destroy_all
         Investigation.destroy_all
-
-        #create creator in the database
-        creator = Factory :person, :first_name=>"Tester",:last_name=>"SEEK",:email=>"SEEK.tester@test.com"
-        Factory :user,:person_id=>creator.id
       end
 
+       #create creator in the database
+      creator = Factory :person, :first_name => "Tester", :last_name => "SEEK", :email => "SEEK.tester@test.com"
+      Factory :user, :person_id => creator.id
 
-      data=File.new("#{Rails.root}/test/fixtures/files/parser/jenage-excel_template-without-protection.xlsm","rb").read
-      df = Factory :data_file,:contributor=>user,:content_blob=>Factory(:content_blob,:data=>data,:content_type=>"application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",:original_filename=>"jenage-excel_template-without-protection.xlsm")
-      xml = df.spreadsheet_xml
-      doc = LibXML::XML::Parser.string(xml).parse
-      doc.root.namespaces.default_prefix = "ss"
-      template_sheet = doc.find_first("//ss:sheet[@name='IDF']")
+      filepath =  "#{Rails.root}/test/fixtures/files/parser/jenage-excel_template.xlsm"
+      filename =  "jenage-excel_template"
+      content_type = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
 
-      assert_not_nil xml
-      assert df.is_excel?
-      assert df.is_extractable_spreadsheet?
-
-      bio_samples =  df.bio_samples_population
+      data_file, assay, bio_samples = data_file_with_sample_parser filepath,filename,content_type
+      assert data_file.is_excel?
+      assert data_file.is_extractable_spreadsheet?
       assert_not_nil bio_samples
-
-      investigation_title = bio_samples.send :hunt_for_horizontal_field_value, template_sheet, "Investigation Title"
-      assay_type_title = bio_samples.send :hunt_for_horizontal_field_value ,template_sheet, "Experiment Class"
-      study_title = bio_samples.send :hunt_for_horizontal_field_value ,template_sheet, "Experiment Description"
-
-      assert_equal "Effects of mild stress on ageing in a multi-species approach" ,investigation_title
-      study = Study.find_by_title_and_contributor_id study_title, user.id
-      assay_title =  "jenage-excel_template-without-protection"
-      assay_class = AssayClass.find_by_title("Experimental Assay")
-      assay_type = AssayType.find_by_title(assay_type_title)
-      assay = Assay.all.detect{|a|a.title == assay_title and a.study_id == study.id and a.assay_class_id == assay_class.try(:id) and a.assay_type == assay_type and a.owner_id == user.person.id}
       assert_not_nil assay
-
-      assert_equal true, df.assays.include?(assay)
-
-      assert_equal Sample.all.sort_by(&:title), assay.samples.sort_by(&:title)
-
+      assert_equal true, data_file.assays.include?(assay)
+      assay.samples.each{|s|assert_equal true, Sample.all.include?(s)}
       assert_equal false, bio_samples.instance_values["specimen_names"].blank?
       assert_equal false, bio_samples.instance_values["treatments"].blank?
       assert_equal false, bio_samples.instance_values["rna_extractions"].blank?
       assert_equal true, bio_samples.instance_values["sequencing"].blank?
 
+      #test data file with empty cells which return nil in the parsed xml
+      filepath =  "#{Rails.root}/test/fixtures/files/parser/error.xlsx"
+      filename =  "error"
+      content_type = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
 
+      data_file, assay, bio_samples = data_file_with_sample_parser filepath,filename,content_type
+      assert data_file.is_excel?
+      assert data_file.is_extractable_spreadsheet?
+      assert_not_nil bio_samples
+      assert_not_nil assay
+      assert_equal true, data_file.assays.include?(assay)
+      assay.samples.each{|s|assert_equal true, Sample.all.include?(s)}
+      assert_equal false, bio_samples.instance_values["specimen_names"].blank?
+      assert_equal false, bio_samples.instance_values["treatments"].blank?
+      assert_equal false, bio_samples.instance_values["rna_extractions"].blank?
+      assert_equal true, bio_samples.instance_values["sequencing"].blank?
 
     end
   end
 
+  private
+
+  def data_file_with_sample_parser filepath,filename,content_type
+      user = User.current_user
+      data=File.new("#{filepath}","rb").read
+      df = Factory :data_file,:contributor=>user,:content_blob=>Factory(:content_blob,:data=>data,:content_type=>content_type,:original_filename=>filename)
+      xml = df.spreadsheet_xml
+      doc = LibXML::XML::Parser.string(xml).parse
+      doc.root.namespaces.default_prefix = "ss"
+      template_sheet = doc.find_first("//ss:sheet[@name='IDF']")
+
+      bio_samples =  df.bio_samples_population
+
+      assay_type_title = bio_samples.send :hunt_for_horizontal_field_value ,template_sheet, "Experiment Class"
+      study_title = bio_samples.send :hunt_for_horizontal_field_value ,template_sheet, "Experiment Description"
+
+      study = Study.find_by_title_and_contributor_id study_title, user.id
+      assay_title = filename
+      assay_class = AssayClass.find_by_title("Experimental Assay")
+      assay_type = AssayType.find_by_title(assay_type_title)
+      assay = Assay.all.detect{|a|a.title == assay_title and a.study_id == study.id and a.assay_class_id == assay_class.try(:id) and a.assay_type == assay_type and a.owner_id == user.person.id}
+
+
+      return df, assay, bio_samples
+  end
 
 end
