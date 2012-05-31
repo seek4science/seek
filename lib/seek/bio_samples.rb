@@ -119,7 +119,8 @@ module Seek
 
       #populate treatments
       treatment_protocols = hunt_for_field_values sheet, "Treatment"
-      treatment_attributes = get_attribute_names sheet, treatment_protocols.first.attributes["row"].to_i - 2, treatment_protocols.first.attributes["column"].to_i, "Treatment"
+      treatment_attributes = []
+      treatment_attributes = get_attribute_names sheet, treatment_protocols.first.attributes["row"].to_i - 2, treatment_protocols.first.attributes["column"].to_i, "Treatment" unless treatment_protocols.blank?
       treatment_protocols.each do |treatment_protocol|
         if  @to_populate
           populate_treatment sheet, treatment_protocol
@@ -151,9 +152,11 @@ module Seek
       #extract RNA and sequencing from the file
       rna_protocols = hunt_for_field_values sheet, "RNA Extraction"
       sequencing_protocols = hunt_for_field_values sheet, "Sequencing"
+      rna_attribute_names= []
+      sequencing_attribute_names =[]
 
-      rna_attribute_names = get_attribute_names sheet, rna_protocols.first.attributes["row"].to_i, rna_protocols.first.attributes["column"].to_i, "RNA Extraction"
-      sequencing_attribute_names = get_attribute_names sheet, sequencing_protocols.first.attributes["row"].to_i, sequencing_protocols.first.attributes["column"].to_i, "Sequencing"
+      rna_attribute_names = get_attribute_names sheet, rna_protocols.first.attributes["row"].to_i, rna_protocols.first.attributes["column"].to_i, "RNA Extraction" unless rna_protocols.blank?
+      sequencing_attribute_names = get_attribute_names sheet, sequencing_protocols.first.attributes["row"].to_i, sequencing_protocols.first.attributes["column"].to_i, "Sequencing" unless sequencing_protocols.blank?
 
       rna_protocols.each do |rna_p|
         set_rna_extractions sheet, rna_p, rna_attribute_names unless rna_p == rna_protocols[0] || rna_p == rna_protocols[1]
@@ -229,9 +232,9 @@ module Seek
       row = treatment_protocol.attributes["row"].to_i
       col = treatment_protocol.attributes["column"].to_i
       treatment_protocol = treatment_protocol.content.tr('""', "")
-      substance = sheet.find("//ss:sheet[@name='#{sheet_name}']/ss:rows/ss:row/ss:cell[@row=#{row} and @column=#{col+1}]").first.content.tr('""', "")
-      concentration = sheet.find("//ss:sheet[@name='#{sheet_name}']/ss:rows/ss:row/ss:cell[@row=#{row} and @column=#{col+2}]").first.content.tr('""', "")
-      unit_symbol = sheet.find("//ss:sheet[@name='#{sheet_name}']/ss:rows/ss:row/ss:cell[@row=#{row} and @column=#{col+3}]").first.content.tr('""', "")
+      substance = try_block{ sheet.find("//ss:sheet[@name='#{sheet_name}']/ss:rows/ss:row/ss:cell[@row=#{row} and @column=#{col+1}]").first.content.tr('""', "") }
+      concentration = try_block{ sheet.find("//ss:sheet[@name='#{sheet_name}']/ss:rows/ss:row/ss:cell[@row=#{row} and @column=#{col+2}]").first.content.tr('""', "") }
+      unit_symbol = try_block{ sheet.find("//ss:sheet[@name='#{sheet_name}']/ss:rows/ss:row/ss:cell[@row=#{row} and @column=#{col+3}]").first.content.tr('""', "")  }
 
 
       unit = Unit.find_by_symbol unit_symbol
@@ -253,9 +256,9 @@ module Seek
       row = specimen_name_cell.attributes["row"].to_i
       col = specimen_name_cell.attributes["column"].to_i
       specimen_title = specimen_name_cell.try :content
-      organism_title = sheet.find("//ss:sheet[@name='#{sheet_name}']/ss:rows/ss:row/ss:cell[@row=#{row} and @column=#{col+1}]").first.content.tr('""', "")
-      strain_title = sheet.find("//ss:sheet[@name='#{sheet_name}']/ss:rows/ss:row/ss:cell[@row=#{row} and @column=#{col+2}]").first.content.tr('""', "")
-      sex = sheet.find("//ss:sheet[@name='#{sheet_name}']/ss:rows/ss:row/ss:cell[@row=#{row} and @column=#{col+3}]").first.content.tr('""', "")
+      organism_title = try_block{ sheet.find("//ss:sheet[@name='#{sheet_name}']/ss:rows/ss:row/ss:cell[@row=#{row} and @column=#{col+1}]").first.content.tr('""', "") }
+      strain_title = try_block{ sheet.find("//ss:sheet[@name='#{sheet_name}']/ss:rows/ss:row/ss:cell[@row=#{row} and @column=#{col+2}]").first.content.tr('""', "")  }
+      sex = try_block{ sheet.find("//ss:sheet[@name='#{sheet_name}']/ss:rows/ss:row/ss:cell[@row=#{row} and @column=#{col+3}]").first.content.tr('""', "")   }
 
       case sex
         when "female"
@@ -270,8 +273,8 @@ module Seek
           sex = nil
       end
 
-      age = sheet.find("//ss:sheet[@name='#{sheet_name}']/ss:rows/ss:row/ss:cell[@row=#{row} and @column=#{col+4}]").first.content.tr('""', "").to_i
-      age_time_unit = sheet.find("//ss:sheet[@name='#{sheet_name}']/ss:rows/ss:row/ss:cell[@row=#{row} and @column=#{col+5}]").first.content.tr('""', "")
+      age = try_block{ sheet.find("//ss:sheet[@name='#{sheet_name}']/ss:rows/ss:row/ss:cell[@row=#{row} and @column=#{col+4}]").first.content.tr('""', "").to_i}
+      age_time_unit = try_block{ sheet.find("//ss:sheet[@name='#{sheet_name}']/ss:rows/ss:row/ss:cell[@row=#{row} and @column=#{col+5}]").first.content.tr('""', "")}
 
 
       organism = Organism.find_by_title organism_title
@@ -320,15 +323,15 @@ module Seek
 
       sample_title = sample_name_cell.content
       #samples.sample_type
-      sample_type = sheet.find("//ss:sheet[@name='#{sheet_name}']/ss:rows/ss:row/ss:cell[@row=#{row} and @column=#{col+1}]").first.content.tr('""', "")
-      tissue_and_cell_type_title = sheet.find("//ss:sheet[@name='#{sheet_name}']/ss:rows/ss:row/ss:cell[@row=#{row} and @column=#{col+3}]").first.content.tr('""', "")
-      sop_title = sheet.find("//ss:sheet[@name='#{sheet_name}']/ss:rows/ss:row/ss:cell[@row=#{row} and @column=#{col+4}]").first.content.tr('""', "")
+      sample_type =try_block{ sheet.find("//ss:sheet[@name='#{sheet_name}']/ss:rows/ss:row/ss:cell[@row=#{row} and @column=#{col+1}]").first.content.tr('""', "")   }
+      tissue_and_cell_type_title = try_block{ sheet.find("//ss:sheet[@name='#{sheet_name}']/ss:rows/ss:row/ss:cell[@row=#{row} and @column=#{col+3}]").first.content.tr('""', "") }
+      sop_title = try_block{ sheet.find("//ss:sheet[@name='#{sheet_name}']/ss:rows/ss:row/ss:cell[@row=#{row} and @column=#{col+4}]").first.content.tr('""', "") }
       sop_title = nil if sop_title=="NO STORAGE"
-      donation_date = sheet.find("//ss:sheet[@name='#{sheet_name}']/ss:rows/ss:row/ss:cell[@row=#{row} and @column=#{col+5}]").first.content.tr('""', "")
-      institution_name = sheet.find("//ss:sheet[@name='#{sheet_name}']/ss:rows/ss:row/ss:cell[@row=#{row} and @column=#{col+6}]").first.content.tr('""', "")
+      donation_date = try_block{ sheet.find("//ss:sheet[@name='#{sheet_name}']/ss:rows/ss:row/ss:cell[@row=#{row} and @column=#{col+5}]").first.content.tr('""', "")}
+      institution_name = try_block{ sheet.find("//ss:sheet[@name='#{sheet_name}']/ss:rows/ss:row/ss:cell[@row=#{row} and @column=#{col+6}]").first.content.tr('""', "")}
 
       tissue_and_cell_type = TissueAndCellType.find_by_title tissue_and_cell_type_title
-      tissue_and_cell_type = TissueAndCellType.create :title => tissue_and_cell_type_title unless tissue_and_cell_type
+      tissue_and_cell_type = TissueAndCellType.create :title => tissue_and_cell_type_title if !tissue_and_cell_type && tissue_and_cell_type_title
       sop = Sop.find_by_title sop_title
       institution = Institution.find_by_name institution_name
 
@@ -351,7 +354,7 @@ module Seek
         sample.sample_type = sample_type
         sample.donation_date = donation_date
         sample.institution = institution
-        sample.tissue_and_cell_types << tissue_and_cell_type unless sample.tissue_and_cell_types.include?(tissue_and_cell_type)
+        sample.tissue_and_cell_types << tissue_and_cell_type if tissue_and_cell_type.try(:id) && !sample.tissue_and_cell_types.include?(tissue_and_cell_type)
         sample.associate_sop sop if sop
         sample.specimen = specimen if specimen
         sample.comments = comments
@@ -432,13 +435,13 @@ module Seek
       sheet_name = sheet.attributes["name"]
       end_col = get_end_column sheet, get_next_table_name(sheet, table_name)
 
-      rna_attribute_names = {}
+      attribute_names = {}
       sheet.find("//ss:sheet[@name='#{sheet_name}']/ss:rows/ss:row/ss:cell[@row = #{row} and @column >= #{col} and @column <= #{end_col}]").collect do |cell|
         cell_col = cell.attributes["column"].to_i
-        rna_attribute_names[cell_col] = cell.content
+        attribute_names[cell_col] = cell.content
       end
 
-      return rna_attribute_names
+      return attribute_names
     end
 
     def get_end_column sheet, next_table_name=nil
@@ -452,7 +455,7 @@ module Seek
           end_col = field_cell.attributes["column"].to_i - 1
         end
       else
-        end_col = sheet.find("//ss:sheet[@name='#{sheet_name}']/ss:rows/ss:row/ss:cell[@row = 1 and @column > 0]").collect.last.attributes["column"].to_i
+        end_col = try_block{ sheet.find("//ss:sheet[@name='#{sheet_name}']/ss:rows/ss:row/ss:cell[@row = 1 and @column > 0]").collect.last.attributes["column"].to_i}
       end
 
       return end_col
