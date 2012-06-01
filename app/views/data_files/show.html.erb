@@ -64,11 +64,20 @@
 
       <div class="foldContent" style="display:none;" >
         <% if @data_file.can_download? -%>
-                <% treatments = @display_data_file.treatments -%>
-                <% if treatments.values.keys.empty? -%>
+                <% if Seek::Config.is_virtualliver
+                     treatments = bio_samples.instance_values["treatments"]
+                     is_empty = treatments.empty?
+                     treatment_table = render :partial => "extractions_table", :locals => {:extractions => treatments, :sample_names => sample_names} unless is_empty
+                   else
+                     treatments = @display_data_file.treatments
+                     is_empty = treatments.values.keys.empty?
+                     treatment_table = render :partial => "treatment_table", :locals => {:treatments => treatments} unless is_empty
+                   end
+                 -%>
+                <% if is_empty -%>
                     <span class="none_text">No treatments were found in the data file, or it does not match a known template.</span>
                 <% else -%>
-                    <%= render :partial => "treatment_table", :locals => {:treatments => treatments} -%>
+                    <%= treatment_table -%>
                 <% end -%>
         <% else -%>
             <span id="treatments" class="none_text">You do not have permission to view the treatments for this file.</span>
@@ -76,63 +85,38 @@
       </div>
     </div>
 
-    <div class="fold">
+    <% rna_extractions = bio_samples.instance_values["rna_extractions"] -%>
+    <% unless rna_extractions.empty? %>
+        <div class="fold">
           <div class="foldTitle">
-            Populated Treatments with Parser
+            RNA Extractions
           </div>
-
-          <div class="foldContent" style="display:none;" >
+          <div class="foldContent" style="display:none;">
             <% if @data_file.can_download? -%>
-                    <% treatments = bio_samples.instance_values["treatments"]
-                       if treatments.empty? %>
-                        <span class="none_text">No treatments were found in the data file, or it does not match a known template.</span>
-                    <% else %>
-                        <%= render :partial => "extractions_table", :locals => {:extractions => treatments, :sample_names => sample_names} %>
-                    <% end %>
+                <%= render :partial => "extractions_table", :locals => {:extractions => rna_extractions, :sample_names => sample_names} %>
             <% else -%>
-                <span id="treatments" class="none_text">You do not have permission to view the treatments for this file.</span>
+                <span id="rna_extractions" class="none_text">You do not have permission to view the RNA extractions for this file.</span>
             <% end -%>
           </div>
-    </div>
-
-
-
-    <div class="fold">
-      <div class="foldTitle">
-        RNA Extractions
-      </div>
-      <div class="foldContent" style="display:none;" >
-        <% if @data_file.can_download? -%>
-            <% rna_extractions = bio_samples.instance_values["rna_extractions"]-%>
-           <% if rna_extractions.empty? %>
-                <span class="none_text">No RNA extractions were found in the data file, or it does not match a known template.</span>
-           <% else %>
-            <%= render :partial => "extractions_table",:locals => {:extractions=> rna_extractions,:sample_names => sample_names} %>
-           <% end %>
-        <% else -%>
-            <span id="rna_extractions" class="none_text">You do not have permission to view the RNA extractions for this file.</span>
-        <% end -%>
-      </div>
-    </div>
-
-    <div class="fold">
+        </div>
+    <% end %>
+    <% sequencing = bio_samples.instance_values["sequencing"] -%>
+    <% unless sequencing.empty? %>
+        <div class="fold">
           <div class="foldTitle">
             Sequencing
           </div>
-          <div class="foldContent" style="display:none;" >
+          <div class="foldContent" style="display:none;">
             <% if @data_file.can_download? -%>
-               <% sequencing = bio_samples.instance_values["sequencing"]-%>
-               <% if sequencing.empty? %>
-                    <span class="none_text">No sequencing were found in the data file, or it does not match a known template.</span>
-               <% else %>
-                <%= render :partial => "extractions_table",:locals => {:extractions=> sequencing,:sample_names => sample_names} %>
-               <% end %>
+
+                <%= render :partial => "extractions_table", :locals => {:extractions => sequencing, :sample_names => sample_names} %>
+
             <% else -%>
                 <span id="sequencing" class="none_text">You do not have permission to view the sequencing for this file.</span>
             <% end -%>
           </div>
-    </div>
-
+        </div>
+    <% end %>
   </div>
   <%= render :partial=>"layouts/items_related_to",:object => @data_file %>
 
