@@ -121,9 +121,8 @@ color:#17B274;
 	height:300px;
 	width:500px;
 /*	border: 1px dashed black; */
-	position:absolute;
+	position:relative;
 	overflow:hidden;
-	clear:left;
     float:left;
     margin-left: 0em;
     min-height: 6em;
@@ -177,7 +176,7 @@ color:#17B274;
     text-align: right;
 }
 #options{
-	float:right;
+	float:left;
 }
 
 
