@@ -2,7 +2,7 @@ function fadeGenotypeRow(id,action) {
     try {
         var genotype_row_id = 'genotype_row_'.concat(id.toString());
         var genotype_id =  'genotype_'.concat(id.toString());
-        if (action == 'edit') {
+        if ($(genotype_id) && action == 'edit') {
             $(genotype_id).value = 1;
         }
         //Dont remove the row coz it messes up the row id
@@ -42,7 +42,7 @@ function addGenotypeRow(tableID,parent_name,action) {
 
     var cell3 = row.insertCell(2);
     var element3 = document.createElement("img");
-    element3.src = "../images/famfamfam_silk/cross.png";
+    element3.src = "/images/famfamfam_silk/cross.png";
     element3.alt = "Delete"
     element3.id = "delete_genotype_".concat(rowCount.toString());
     element3.title = "Delete this entry"
@@ -56,7 +56,7 @@ function fadePhenotypeRow(id,action) {
     try {
         var phenotype_row_id = 'phenotype_row_'.concat(id.toString());
         var phenotype_id = 'phenotype_'.concat(id.toString());
-        if (action == 'edit') {
+        if ($(phenotype_id) && action == 'edit') {
             $(phenotype_id).value = 1;
         }
 
@@ -89,7 +89,7 @@ function addPhenotypeRow(tableID,parent_name,action) {
 
     var cell2 = row.insertCell(1);
     var element2 = document.createElement("img");
-    element2.src = "../images/famfamfam_silk/cross.png";
+    element2.src = "/images/famfamfam_silk/cross.png";
     element2.alt = "Delete"
     element2.id = "delete_phenotype_".concat(rowCount.toString());
     element2.title = "Delete this entry"
