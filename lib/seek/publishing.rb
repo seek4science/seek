@@ -92,6 +92,12 @@ module Seek
 
     private
 
+    def deliver_request_publish_approval sharing, item
+      if (sharing and sharing[:request_publish_approval]) && Seek::Config.email_enabled && !item.gatekeepers.empty?
+        Mailer.deliver_request_publish_approval item.gatekeepers, User.current_user,item,base_host
+      end
+    end
+
     def deliver_publishing_notifications items_for_notification
       owners_items={}
       items_for_notification.each do |item|

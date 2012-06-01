@@ -73,7 +73,7 @@ class SamplesController < ApplicationController
     @sample.policy.set_attributes_with_sharing params[:sharing], @sample.projects
 
     if @sample.save
-
+      deliver_request_publish_approval params[:sharing], @sample
         align_sops(@sample.specimen,sops) unless spe
 
         if @sample.from_new_link=="true"
@@ -122,6 +122,7 @@ class SamplesController < ApplicationController
       AssetsCreator.add_or_update_creator_list(@sample.specimen, params[:creators])
 
       if @sample.save
+        deliver_request_publish_approval params[:sharing], @sample
         align_sops(@sample.specimen, sops)
 
         if @sample.from_biosamples=="true"

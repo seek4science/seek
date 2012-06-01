@@ -50,6 +50,7 @@ class EventsController < ApplicationController
 
     respond_to do | format |
       if @event.save
+        deliver_request_publish_approval params[:sharing], @event
         flash.now[:notice] = 'Event was successfully saved.' if flash.now[:notice].nil?
         format.html { redirect_to @event }
       else
@@ -81,6 +82,7 @@ class EventsController < ApplicationController
 
     respond_to do | format |
       if @event.save
+        deliver_request_publish_approval params[:sharing], @event
         flash.now[:notice] = 'Event was updated successfully.' if flash.now[:notice].nil?
         format.html { redirect_to @event }
       else
