@@ -97,7 +97,10 @@ module StrategicEagerLoading
         !$STRATEGIC_EAGER_LOADING_DISABLED &&
             !records.nil? &&
             !proxy_reflection.options[:finder_sql] &&
-            !proxy_reflection.options[:conditions]
+            #conditions like '#{self.version}' cause missing method exceptions. They also break standard rails includes.
+            !proxy_reflection.options[:conditions] &&
+            #has many through associations that specify a source type somehow lose the type based restriction if you first include the join model association. You can reproduce this in plain ActiveRecord by trying Assay.find(:all, :include => [:assay_assets, :sop_masters]). If you reverse the order the to [:sop_masters, :assay_assets] then there is no problem.
+            !(proxy_reflection.options[:source_type] && proxy_reflection.options[:through] && proxy_owner.send(proxy_reflection.options[:through]).loaded?)
       end
     end
   end
