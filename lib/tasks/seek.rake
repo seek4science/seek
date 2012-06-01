@@ -211,17 +211,17 @@ namespace :seek do
   
   desc "Send mail daily to users"
   task :send_daily_subscription => :environment do
-    send_subscription_mails ActivityLog.scoped(:include => :activity_loggable, :conditions => ['created_at=?', Date.yesterday]), 'daily'
+    send_subscription_mails ActivityLog.find(:all, :include => :activity_loggable, :conditions => ['created_at=?', Date.yesterday]), 'daily'
   end
 
   desc "Send mail weekly to users"
   task :send_weekly_subscription => :environment do
-    send_subscription_mails ActivityLog.scoped(:include => :activity_loggable, :conditions => ['created_at>=?', 7.days.ago]), 'weekly'
+    send_subscription_mails ActivityLog.find(:all, :include => :activity_loggable, :conditions => ['created_at>=?', 7.days.ago]), 'weekly'
   end
 
   desc "Send mail monthly to users"
   task :send_monthly_subscription => :environment do
-    send_subscription_mails ActivityLog.scoped(:include => :activity_loggable, :conditions => ['created_at>=?', 30.days.ago]), 'monthly'
+     send_subscription_mails ActivityLog.find(:all, :include => :activity_loggable, :conditions => ['created_at>=?', 30.days.ago]), 'monthly'
   end
   
   desc "Clears out all the lookup tables, used to speed up authorization. Use with care as they can take a while to rebuild."
@@ -350,8 +350,8 @@ namespace :seek do
   private
 
   def send_subscription_mails logs, frequency
-    Person.scoped(:include => :subscriptions).select { |p| p.receive_notifications? }.each do |person|
-      activity_logs = person.subscriptions.scoped(:include => :subscribable).select { |s| s.frequency == frequency }.collect do |sub|
+    Person.all.select{|p|p.receive_notifications?}.each do |person|
+      activity_logs = person.subscriptions.select{|s|s.frequency == frequency}.collect do |sub|
         logs.select { |log| log.activity_loggable.try(:can_view?, person.user) and log.activity_loggable.subscribable? and log.activity_loggable.subscribers_are_notified_of?(log.action) and log.activity_loggable == sub.subscribable }
       end.flatten(1)
       SubMailer.deliver_send_digest_subscription person, activity_logs unless activity_logs.blank?

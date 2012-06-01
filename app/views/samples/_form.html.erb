@@ -8,7 +8,7 @@
 
 <% unless action == :new && !@sample.specimen.new_record?%>
     <% f.fields_for :specimen do |specimen_f| %>
-        <%= render :partial => "specimens/form", :locals => {:f => specimen_f, :specimen => @sample.specimen, :action => action,:from_biosamples=>true}%>
+        <%= render :partial => "specimens/form", :locals => {:f => specimen_f, :specimen => @sample.specimen, :action => action}%>
     <% end %>
 <% end %>
 

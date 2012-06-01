@@ -77,9 +77,14 @@ class BiosamplesController < ApplicationController
 
   def destroy
     object=params[:class].capitalize.constantize.find(params[:id])
+    if object && object.is_a?(Sample)
+       specimen = object.specimen
+       id_column = Seek::Config.is_virtualliver ? 8 : 6
+    end
     render :update do |page|
       if object.can_delete? && object.destroy
         page.call :removeRowAfterDestroy, "#{params[:class]}_table", object.id, params[:id_column_position]
+        page.call :updateSpecimenRow, specimen_row_data(specimen),id_column if specimen
       else
         page.alert(object.errors.full_messages)
       end
