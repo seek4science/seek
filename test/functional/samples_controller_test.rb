@@ -335,10 +335,18 @@ fixtures :all
 
   test 'should have specimen comment and sex fields in the specimen/sample edit page' do
     s = Factory :sample, :contributor => User.current_user
+    if Seek::Config.is_virtualliver
+      culture_growth_type =  CultureGrowthType.create :title=> "in vivo"
+    else
+      culture_growth_type =  CultureGrowthType.create :title=> "batch"
+    end
+
+    s.specimen.culture_growth_type = culture_growth_type
+
     get :edit, :id => s.id
     assert_response :success
     assert_select "input#sample_specimen_attributes_comments", :count => 1
-    assert_select "select#sample_specimen_attributes_sex", :count => 1
+    assert_select "select#sample_specimen_attributes_sex", :count => 2 # one is in fields_for_in_vivo(VL), the other one is in fields_for_batch_and_chemostat(Sysmo).
   end
 
   test 'should have sample organism_part in the specimen/sample show page' do

@@ -65,7 +65,7 @@ function strain_form(strain_id, organism_id, action, url) {
 
 function getSelectedStrains() {
     var strain_ids  = new Array();
-    if (strain_table.length != 0){
+    if (strain_table && strain_table.length != 0){
         var selected_strain_rows = fnGetSelected(strain_table);
         for (var i=0; i< selected_strain_rows.length; i++){
             var id_index = getAttributeColumn(strain_table,"ID");
