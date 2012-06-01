@@ -900,24 +900,29 @@ class AuthorizationTest < ActiveSupport::TestCase
   end
 
   test "asset manager can manage the items inside their projects, but can not publish the items, which hasn't been set to published" do
-     asset_manager = Factory(:asset_manager)
-     datafile = Factory(:data_file, :projects => asset_manager.projects, :policy => Factory(:all_sysmo_viewable_policy))
+    project = Factory(:project)
+    work_group = Factory(:work_group, :project => project)
 
-     User.with_current_user asset_manager.user do
-       assert datafile.can_manage?
-       assert !datafile.can_publish?
+    asset_manager = Factory(:asset_manager, :group_memberships => [Factory(:group_membership, :work_group => work_group)])
+    gatekeeper = Factory(:gatekeeper, :group_memberships => [Factory(:group_membership, :work_group => work_group)])
 
-       ability = Ability.new(asset_manager.user)
-       assert asset_manager.is_asset_manager?
-       assert ability.can? :manage_asset, datafile
-       assert ability.cannot? :publish, datafile
+    datafile = Factory(:data_file, :projects => asset_manager.projects, :policy => Factory(:all_sysmo_viewable_policy))
 
+    User.with_current_user asset_manager.user do
+      assert datafile.can_manage?
+      assert !datafile.can_publish?
+
+      ability = Ability.new(asset_manager.user)
+      assert asset_manager.is_asset_manager?
+      assert ability.can? :manage_asset, datafile
+      assert ability.cannot? :publish, datafile
      end
   end
 
   test "a person who is not an asset manager, who can manage the item, should not be able to publish the items, which hasn't been set to published" do
      person_can_manage = Factory(:person)
-     datafile = Factory(:data_file, :projects => person_can_manage.projects, :policy => Factory(:policy))
+     gatekeeper = Factory(:gatekeeper)
+     datafile = Factory(:data_file, :projects => gatekeeper.projects, :policy => Factory(:policy))
      permission = Factory(:permission, :contributor => person_can_manage, :access_type => Policy::MANAGING, :policy => datafile.policy)
 
      User.with_current_user person_can_manage.user do
