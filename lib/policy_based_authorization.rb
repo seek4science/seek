@@ -235,8 +235,8 @@ module Acts
         end
       end
       #(gatekeeper also manager) or (manager and projects have no gatekeeper) or (manager and the item was published)
-      def can_publish?
-        (Ability.new(User.current_user).can? :publish, self) || (self.can_manage? && self.gatekeepers.empty?) || (self.can_manage? && self.policy.sharing_scope == Policy::EVERYONE) || Seek::Config.is_virtualliver
+      def can_publish? user=User.current_user
+        (Ability.new(user).can? :publish, self) || (self.can_manage? && self.gatekeepers.empty?) || (self.can_manage? && self.policy.sharing_scope == Policy::EVERYONE) || Seek::Config.is_virtualliver
       end
 
       #use request_permission_summary to retrieve who can manage the item
