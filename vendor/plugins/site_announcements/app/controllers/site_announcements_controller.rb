@@ -103,7 +103,7 @@ class SiteAnnouncementsController < ApplicationController
     
     respond_to do |format|
       if @site_announcement.update_attributes(params[:site_announcement])
-        flash[:notice] = 'Study was successfully updated.'
+        flash[:notice] = 'Announcement was successfully updated.'
         format.html { redirect_to(@site_announcement) }
         format.xml  { head :ok }
       else
