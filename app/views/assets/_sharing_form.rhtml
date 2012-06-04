@@ -6,7 +6,7 @@
    default_projects_access_type = @resource.is_asset? ? Policy::ACCESSIBLE : Policy::EDITING
    default_consortium_access_type = Policy::VISIBLE
    #@resource.projects = current_user.person.projects if !Seek::Config.is_virtualliver && @resource.new_record? && @resource.errors.empty? && (current_user.person.projects.count == 1)
-   can_publish = @resource.can_publish?
+   can_publish = @resource.respond_to?(:can_publish) ? @resource.can_publish? : true
 %>
 <%# initialization: required to keep javascript independent of the access type codes, to allow the use the constants instead -%>
 <%= render :partial=>"assets/sharing_constants" %>
