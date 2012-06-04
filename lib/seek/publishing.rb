@@ -4,7 +4,8 @@ module Seek
     def self.included(base)
       base.before_filter :set_asset, :only=>[:preview_publish,:publish,:approve_or_reject_publish,:approve_publish,:reject_publish]
       base.before_filter :publish_auth, :only=>[:preview_publish,:publish]
-      base.before_filter :gatekeeper_auth, :uuid_auth, :only => [:approve_or_reject_publish, :approve_publish, :reject_publish]
+      base.before_filter :gatekeeper_auth, :only => [:approve_or_reject_publish, :approve_publish, :reject_publish]
+      base.before_filter :uuid_auth, :only => [:approve_or_reject_publish]
     end
 
     def approve_or_reject_publish
@@ -77,7 +78,7 @@ module Seek
     end
 
     def gatekeeper_auth
-      unless current_user.try(:person).try(:is_gatekeeper?) && !(@asset.projects & current_user.try(:person).try(:projects)).empty?
+      unless @asset.gatekeepers.include?(current_user.try(:person))
         error("You have to login as a gatekeeper to perform this action", "is invalid (insufficient_privileges)")
         return false
       end

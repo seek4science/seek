@@ -523,7 +523,7 @@ class SopsControllerTest < ActionController::TestCase
 
   test "do publish" do
     login_as(:owner_of_my_first_sop)
-    sop=sops(:my_first_sop)
+    sop=sops(:sop_with_project_without_gatekeeper)
     assert sop.can_manage?,"The sop must be manageable for this test to succeed"
     post :publish,:id=>sop
     assert_response :success
@@ -532,7 +532,7 @@ class SopsControllerTest < ActionController::TestCase
   end
 
   test "do not publish if not can_manage?" do
-    sop=sops(:my_first_sop)
+    sop=sops(:sop_with_project_without_gatekeeper)
     assert !sop.can_manage?,"The sop must not be manageable for this test to succeed"
     post :publish,:id=>sop
     assert_redirected_to sop
@@ -542,7 +542,7 @@ class SopsControllerTest < ActionController::TestCase
 
   test "get preview_publish" do
     login_as(:owner_of_my_first_sop)
-    sop=sops(:my_first_sop)
+    sop=sops(:sop_with_project_without_gatekeeper)
     assert sop.can_manage?,"The sop must be manageable for this test to succeed"
     get :preview_publish, :id=>sop
     assert_response :success

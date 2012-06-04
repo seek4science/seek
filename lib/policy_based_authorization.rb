@@ -240,7 +240,6 @@ module Acts
         if self.new_record?
           (Ability.new(user).can? :publish, self) || (self.can_manage? && self.gatekeepers.empty?) || Seek::Config.is_virtualliver
         else
-          puts (self.policy.sharing_scope_was == Policy::EVERYONE)
           (Ability.new(user).can? :publish, self) || (self.can_manage? && self.gatekeepers.empty?) || (self.can_manage? && (self.policy.sharing_scope_was == Policy::EVERYONE)) || Seek::Config.is_virtualliver
         end
       end
