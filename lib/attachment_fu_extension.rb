@@ -28,7 +28,7 @@ Technoweenie::AttachmentFu::InstanceMethods.module_eval do
 
       return upload_result
     else
-      uploaded_data_without_extension=(file_data)
+      self.uploaded_data_without_extension=(file_data)
     end
   end
 
