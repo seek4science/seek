@@ -4,7 +4,7 @@ class ActiveRecord::Base
       def record_timestamps; false; end
     end
   
-    truth = save
+    truth = update_without_callbacks
   
     class << self
       remove_method :record_timestamps
