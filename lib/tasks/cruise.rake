@@ -46,7 +46,7 @@ task :cruise_ram do |t, args|
   args.with_defaults :count => 8  #count determines the number of processes that parallel_tests will use
 
   RAILS_ENV = ENV['RAILS_ENV'] = 'test'
-
+  Rake["seek:seed_testing"].invoke
   FileUtils.copy(Dir.pwd+"/config/database.cc.ram.yml", Dir.pwd+"/config/database.yml")
 
   Rake::Task["parallel:test"].invoke(args[:count])
