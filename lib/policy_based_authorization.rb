@@ -16,6 +16,7 @@ module Acts
 
           belongs_to :policy, :required_access_to_owner => :manage, :autosave => true
 
+          before_validation :publishing_auth unless Seek::Config.is_virtualliver
           after_save :queue_update_auth_table
           after_destroy :remove_from_lookup_table
         end
@@ -236,7 +237,12 @@ module Acts
       end
       #(gatekeeper also manager) or (manager and projects have no gatekeeper) or (manager and the item was published)
       def can_publish? user=User.current_user
-        (Ability.new(user).can? :publish, self) || (self.can_manage? && self.gatekeepers.empty?) || (self.can_manage? && self.policy.sharing_scope == Policy::EVERYONE) || Seek::Config.is_virtualliver
+        if self.new_record?
+          (Ability.new(user).can? :publish, self) || (self.can_manage? && self.gatekeepers.empty?) || Seek::Config.is_virtualliver
+        else
+          puts (self.policy.sharing_scope_was == Policy::EVERYONE)
+          (Ability.new(user).can? :publish, self) || (self.can_manage? && self.gatekeepers.empty?) || (self.can_manage? && (self.policy.sharing_scope_was == Policy::EVERYONE)) || Seek::Config.is_virtualliver
+        end
       end
 
       #use request_permission_summary to retrieve who can manage the item
@@ -288,6 +294,16 @@ module Acts
 
       def gatekeepers
          self.projects.collect(&:gatekeepers).flatten
+      end
+
+      def publishing_auth
+        #only check if doing publishing
+        if self.policy.sharing_scope == Policy::EVERYONE
+            unless self.can_publish?
+              errors.add_to_base("You are not permitted to publish this #{self.class.name.underscore.humanize}")
+              return false
+            end
+        end
       end
     end
   end

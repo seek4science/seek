@@ -982,6 +982,72 @@ class AuthorizationTest < ActiveSupport::TestCase
     end
   end
 
+  test "can_publish for new asset" do
+    #gatekeeper can publish
+    gatekeeper = Factory(:gatekeeper)
+    User.with_current_user gatekeeper.user do
+      specimen = Specimen.new(:title => 'test1', :strain => strains(:yeast1), :lab_internal_number => '1234', :projects => gatekeeper.projects, :policy => Policy.new(:sharing_scope => Policy::EVERYONE, :access_type => Policy::ACCESSIBLE))
+      assert specimen.can_publish?
+      assert specimen.save
+    end
+
+    #contributor can not publish if projects associated with asset have gatekeepers
+    User.with_current_user Factory(:user) do
+      specimen = Specimen.new(:title => 'test2', :strain => strains(:yeast1), :lab_internal_number => '1234', :projects => gatekeeper.projects, :policy => Policy.new(:sharing_scope => Policy::EVERYONE, :access_type => Policy::ACCESSIBLE))
+      assert !specimen.gatekeepers.empty?
+      assert !specimen.can_publish?
+      assert !specimen.save
+    end
+
+    #contributor can publish if projects associated with asset have no gatekeepers
+    User.with_current_user Factory(:user) do
+      specimen = Specimen.new(:title => 'test3', :strain => strains(:yeast1), :lab_internal_number => '1234', :policy => Policy.new(:sharing_scope => Policy::EVERYONE, :access_type => Policy::ACCESSIBLE))
+      assert specimen.gatekeepers.empty?
+      assert specimen.can_publish?
+      assert specimen.save
+    end
+  end
+
+  test "can_publish when updating asset" do
+    #gatekeeper can publish
+    gatekeeper = Factory(:gatekeeper)
+    User.with_current_user gatekeeper.user do
+      specimen = Factory(:specimen, :projects => gatekeeper.projects, :contributor => gatekeeper)
+      specimen.policy.sharing_scope = Policy::EVERYONE
+      assert specimen.can_publish?
+      assert specimen.save
+    end
+
+    work_group = Factory(:work_group, :project => gatekeeper.projects.first)
+    contributor = Factory(:person, :group_memberships => [Factory(:group_membership, :work_group => work_group)])
+    #contributor can not publish if projects associated with asset have gatekeepers
+    User.with_current_user contributor.user do
+      specimen = Factory(:specimen, :projects => gatekeeper.projects, :contributor => contributor)
+      specimen.policy.sharing_scope = Policy::EVERYONE
+      assert !specimen.can_publish?
+      assert !specimen.save
+    end
+
+    #contributor can publish if projects associated with asset have no gatekeepers
+    User.with_current_user contributor.user do
+      specimen = Factory(:specimen, :contributor => contributor)
+      specimen.policy.sharing_scope = Policy::EVERYONE
+      assert specimen.can_publish?
+      assert specimen.save
+    end
+
+    #contributor can publish if asset was already published
+    specimen = specimens(:public_specimen)
+    User.with_current_user specimen.contributor do
+      assert !specimen.gatekeepers.empty?
+      assert !specimen.contributor.person.is_gatekeeper?
+      assert_equal Policy::EVERYONE, specimen.policy.sharing_scope
+      specimen.policy.sharing_scope = Policy::EVERYONE
+      assert specimen.can_publish?
+      assert specimen.save
+    end
+  end
+
   private 
 
   def actions
