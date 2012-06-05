@@ -21,6 +21,7 @@
     <p>
       <label>Culture growth type:</label>
       <%= text_or_not_specified specimen.culture_growth_type.try(:title) -%>
+    </p>
       <% if specimen.culture_growth_type.try(:title)=="cultured cell line" || specimen.culture_growth_type.try(:title)=="primary cell culture" %>
         <table border="1" cellpadding="10">
           <tr>
@@ -73,7 +74,7 @@
           <% end %>
         </p>
     <% end %>
-    </p>
+
     <p>
       <label>Treatment:</label>
       <%= text_or_not_specified(specimen.treatment) %>
