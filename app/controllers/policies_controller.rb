@@ -91,6 +91,7 @@ class PoliciesController < ApplicationController
     resource_class = params[:resource_name].camelize.constantize
     resource = resource_class.find_by_id(params[:resource_id]) || resource_class.new
     clone_resource = resource.clone
+    clone_resource.policy = resource.policy.deep_copy
     if clone_resource.kind_of?Assay
       clone_resource.study = Study.find_by_id(params[:project_ids].to_i)
     elsif clone_resource.kind_of?Study
@@ -100,7 +101,11 @@ class PoliciesController < ApplicationController
       clone_resource.projects = selected_projects
     end
 
-    updated_can_publish = clone_resource.can_publish?
+    if !resource.new_record? && resource.policy.sharing_scope == Policy::EVERYONE
+      updated_can_publish = true
+    else
+      updated_can_publish = clone_resource.can_publish?
+    end
 
     respond_to do |format|
       format.json {render :json => {:updated_can_publish => updated_can_publish}}
