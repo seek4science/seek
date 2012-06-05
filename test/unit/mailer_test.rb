@@ -103,7 +103,7 @@ class MailerTest < ActionMailer::TestCase
     @expected.body = read_fixture('request_publish_approval')
     user=users(:aaron)
     pretend_now_is(@expected.date) do
-      assert_equal @expected.encoded,Mailer.create_request_publish_approval([gatekeeper],user,resource,"localhost",'an approval link','a reject link').encoded
+      assert_equal @expected.encoded,Mailer.create_request_publish_approval([gatekeeper],user,resource,"localhost").encoded
     end
   end
 

@@ -564,7 +564,7 @@ class ModelsControllerTest < ActionController::TestCase
   end
 
   test "owner should be able to choose policy 'share with everyone' when creating a model" do
-    model=valid_model
+    model={ :title=>"Test",:data=>fixture_file_upload('files/little_file.txt'),:projects=>[projects(:moses_project)]}
     post :create, :model => model, :sharing=>{:use_whitelist=>"0", :user_blacklist=>"0", :sharing_scope =>Policy::EVERYONE, "access_type_#{Policy::EVERYONE}"=>Policy::VISIBLE}
     assert_redirected_to model_path(assigns(:model))
     assert_equal users(:model_owner),assigns(:model).contributor
@@ -581,7 +581,7 @@ class ModelsControllerTest < ActionController::TestCase
   test "owner should be able to choose policy 'share with everyone' when updating a model" do
     login_as(:model_owner)
     user = users(:model_owner)
-    model   = models(:model_with_links_in_description)
+    model   = models(:teusink_with_project_without_gatekeeper)
     assert model.can_edit?(user), "model should be editable and manageable for this test"
     assert model.can_manage?(user), "model should be editable and manageable for this test"
     assert_equal Policy::EDITING, model.policy.access_type, "data file should have an initial policy with access type for editing"
@@ -656,7 +656,7 @@ class ModelsControllerTest < ActionController::TestCase
   end
 
   test "do publish" do
-    model=models(:teusink)
+    model=models(:teusink_with_project_without_gatekeeper)
     assert model.can_manage?,"The sop must be manageable for this test to succeed"
     post :publish,:id=>model
     assert_response :success
@@ -666,7 +666,7 @@ class ModelsControllerTest < ActionController::TestCase
 
   test "do not publish if not can_manage?" do
     login_as(:quentin)
-    model=models(:teusink)
+    model=models(:teusink_with_project_without_gatekeeper)
     assert !model.can_manage?,"The sop must not be manageable for this test to succeed"
     post :publish,:id=>model
     assert_redirected_to model
@@ -675,7 +675,7 @@ class ModelsControllerTest < ActionController::TestCase
   end
 
   test "get preview_publish" do
-    model=models(:teusink)
+    model=models(:teusink_with_project_without_gatekeeper)
     assert model.can_manage?,"The sop must be manageable for this test to succeed"
     get :preview_publish, :id=>model
     assert_response :success
@@ -699,7 +699,7 @@ class ModelsControllerTest < ActionController::TestCase
 
   test "cannot get preview_publish when not manageable" do
     login_as(:quentin)
-    model=models(:teusink)
+    model=models(:teusink_with_project_without_gatekeeper)
     assert !model.can_manage?,"The sop must not be manageable for this test to succeed"
     get :preview_publish, :id=>model
     assert_redirected_to model

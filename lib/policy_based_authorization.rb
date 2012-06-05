@@ -16,6 +16,7 @@ module Acts
 
           belongs_to :policy, :required_access_to_owner => :manage, :autosave => true
 
+          before_validation :publishing_auth unless Seek::Config.is_virtualliver
           after_save :queue_update_auth_table
           after_destroy :remove_from_lookup_table
         end
@@ -234,9 +235,13 @@ module Acts
           self.contributor = default_contributor
         end
       end
-      #contritutor or person who can manage the item and the item was published
-      def can_publish?
-        ((Ability.new(User.current_user).can? :publish, self) && self.can_manage?) || self.contributor == User.current_user || try_block{self.contributor.user} == User.current_user || (self.can_manage? && self.policy.sharing_scope == Policy::EVERYONE) || Seek::Config.is_virtualliver
+      #(gatekeeper also manager) or (manager and projects have no gatekeeper) or (manager and the item was published)
+      def can_publish? user=User.current_user
+        if self.new_record?
+          (Ability.new(user).can? :publish, self) || (self.can_manage? && self.gatekeepers.empty?) || Seek::Config.is_virtualliver
+        else
+          (Ability.new(user).can? :publish, self) || (self.can_manage? && self.gatekeepers.empty?) || (self.can_manage? && (self.policy.sharing_scope_was == Policy::EVERYONE)) || Seek::Config.is_virtualliver
+        end
       end
 
       #use request_permission_summary to retrieve who can manage the item
@@ -283,6 +288,20 @@ module Acts
           end
         else
           owner.try(:user)
+        end
+      end
+
+      def gatekeepers
+         self.projects.collect(&:gatekeepers).flatten
+      end
+
+      def publishing_auth
+        #only check if doing publishing
+        if self.policy.sharing_scope == Policy::EVERYONE
+            unless self.can_publish?
+              errors.add_to_base("You are not permitted to publish this #{self.class.name.underscore.humanize}")
+              return false
+            end
         end
       end
     end

@@ -116,6 +116,7 @@ class SopsController < ApplicationController
               assay.relate(@sop)
             end
           end
+          deliver_request_publish_approval params[:sharing], @sop
         else
           format.html { 
             render :action => "new" 
@@ -172,6 +173,7 @@ class SopsController < ApplicationController
             AssayAsset.destroy(assay_asset.id)
           end
         end
+        deliver_request_publish_approval params[:sharing], @sop
       else
         format.html { 
           render :action => "edit" 

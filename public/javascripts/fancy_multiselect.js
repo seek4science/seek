@@ -2,6 +2,9 @@
         if (!$F(multiselect).include(value)) {
             $(multiselect).setValue($F(multiselect).concat(value));
             updateFancyMultiselect(multiselect);
+            if (new RegExp('_project_ids').test(multiselect)){
+                updatePublicSharing(true);
+            }
         } else {
             alert('Item already exists!');
         }
@@ -10,6 +13,9 @@
     function removeFromFancy(multiselect, value) {
         $(multiselect).setValue($F(multiselect).without(value));
         updateFancyMultiselect(multiselect);
+        if (new RegExp('_project_ids').test(multiselect)) {
+            updatePublicSharing(true);
+        }
     }
 
     function insertFancyListItem(multiselect, displaylist, option) {

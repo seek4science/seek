@@ -12,30 +12,34 @@ Although possible, installing and running Ruby on Rails on a Windows system is t
 
 We recommend you use ruby, version 1.8.7.
 
+The steps in the next section outline the commands required to install all the required packages for Ubuntu or Debian. 
+
 MySQL server needs to be installed installed, along the development package (required to compile the MySQL rubygem). We use the Ubuntu/Debian packages <em>mysql-server</em> and <em>libmysqlclient15-dev</em>
 
 The ImageMagick libraries need to be installed, as these are required by the rmagic gem. We use the The Ubuntu/Debian package <em>libmagick++9-dev</em>
 
 You will need a minimal build environment, as some of the ruby gems require compilation. The Ubuntu/Debian package <em>build-essentials</em> should be sufficient
 
-The following steps outline the commands required to install all the required packages for Ubuntu or Debian. SEEK uses Lucene as its search engine, and this requires that java is installed. Sun Java is no longer available for Ubuntu, but OpenJDK should work fine.
+SEEK uses Lucene as its search engine, and this requires that java is installed. Sun Java is no longer available for Ubuntu, but OpenJDK should work fine.
 
 Before starting, its a good idea to get up to date:
 
   sudo apt-get update && sudo apt-get -y upgrade
 
 The following commands will install the core required packages:
- 
+
+for Ubuntu Precise 12.04 (LTS):
+  sudo apt-get install wget mercurial ruby ri1.8 libruby1.8 ruby-dev mysql-server libssl-dev build-essential openssh-server
+  sudo apt-get install libmysqlclient-dev libmagick++-dev libxslt1-dev libxml++2.6-dev openjdk-6-jdk graphviz libsqlite3-dev sqlite3
+
+for Ubuntu Lucid 10.04 (LTS):
   sudo apt-get install wget mercurial ruby rdoc ri libopenssl-ruby ruby-dev mysql-server libssl-dev build-essential openssh-server 
   sudo apt-get install libmysqlclient16-dev libmagick++-dev libxslt-dev libxml++2.6-dev openjdk-6-jdk graphviz libsqlite3-dev sqlite3
-
-if you are intending to develop SEEK you will probably also want to use:
-
-  sudo apt-get install curl irb
   
-if setting up for production deployment using the {Passenger Phusion (modrails)}[http://www.modrails.com/] module you can save a step later by also using:
+If setting up for production deployment using the {Passenger Phusion (modrails)}[http://www.modrails.com/] module you can save a step later by also using:
 
   sudo apt-get install apache2-mpm-prefork apache2-prefork-dev libapr1-dev libaprutil1-dev libcurl4-openssl-dev
+
 
 You now need to install rubygems (1.3.7). Rather than install through apt-get, we recommend downloading and installing from the rubygems website: http://rubygems.org/pages/download.
 The following commands should install rubygems for you on a Ubuntu/Debian system.
@@ -66,7 +70,7 @@ This will create a <i>seek</i> directory that contains the application.
   
 Bundler[http://gembundler.com/] is used to manage gems, so to install the required gems you first need to install the bundler gem:
 
-  gem install -d bundler
+  sudo gem install -d bundler rake
   
 Then from within the seek directory run
 
@@ -104,17 +108,7 @@ To add users to the MySQL database, first login to the database as an administra
 
 Run the rake database setup task, this creates the database, loads the schema and seeds the database with any default data
 
-  rake db:setup
-
-== Starting the server
-
-You can now start the server with the command
-
-  ./script/server
-
-If running in production mode, you should start the server with
-
-  ./script/server -e production
+  bundle exec rake db:setup
 
 
 == Starting Delayed-Job (Background processing)
@@ -128,6 +122,16 @@ To start delayed job run the script
 or for production:
 
   RAILS_ENV=production ./script/delayed_job start
+
+== Starting the server
+
+You can now start the server with the command
+
+  ./script/server
+
+If running in production mode, you should start the server with
+
+  ./script/server -e production
 
 == Creating the Admin user
 
@@ -152,11 +156,11 @@ to restart the server after changing this setting.
 
 To start the search server you need to run:
 
-  rake sunspot:solr:start
+  bundle exec rake sunspot:solr:start
 
 and to reindex any existing data that created before search was enabled:
 
-  rake sunspot:solr:reindex
+  bundle exec rake sunspot:solr:reindex
 
 If you want Sunspot SOLR to start automatically whenever you restart the machine SEEK is running on, you probably want to create an init.d/ script.
 A script we use is available at https://gist.github.com/2788607 (the APP_PATH may need changing for you)
@@ -174,18 +178,17 @@ You can then stop the service with
   service seek-solr stop
 
 
-
 == Rebranding SysMO SEEK for other projects
 
 If you are running SEEK for a project other than SysMO you can change various text elements under Admin, Site branding.
 
 To insert your application/project name into the help documents for SEEK, and to remove the logos/links to SEEK's 'related projects and friends' use
 
-  rake seek:rebrand
+  bundle exec rake seek:rebrand
 
 If you only want to change the help documents, you can instead use
 
-  rake seek:rebrand_help_docs
+  bundle exec rake seek:rebrand_help_docs
 
 == Setting up Passenger Phusion and Apache for production servers.
 

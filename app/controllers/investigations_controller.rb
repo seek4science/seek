@@ -6,6 +6,8 @@ class InvestigationsController < ApplicationController
   before_filter :find_assets, :only=>[:index]
   before_filter :find_and_auth,:only=>[:edit, :update, :destroy]
 
+  include Seek::Publishing
+
   def new_object_based_on_existing_one
     @existing_investigation =  Investigation.find(params[:id])
     @investigation = @existing_investigation.clone_with_associations
@@ -39,6 +41,7 @@ class InvestigationsController < ApplicationController
     @investigation.policy.set_attributes_with_sharing params[:sharing], @investigation.projects
 
     if @investigation.save
+      deliver_request_publish_approval params[:sharing], @investigation
        if @investigation.new_link_from_study=="true"
           render :partial => "assets/back_to_singleselect_parent",:locals => {:child=>@investigation,:parent=>"study"}
        else
@@ -93,6 +96,7 @@ class InvestigationsController < ApplicationController
 
     respond_to do |format|
       if @investigation.save
+        deliver_request_publish_approval params[:sharing], @investigation
         flash[:notice] = 'Investigation was successfully updated.'
         format.html { redirect_to(@investigation) }
         format.xml  { head :ok }

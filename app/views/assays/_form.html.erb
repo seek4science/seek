@@ -50,7 +50,7 @@
           <% options << "</optgroup>" %>
         <% end %>
       <% end %>
-    <select id="assay_study_id" name="assay[study_id]" onMouseOut="hideTitle()" style="width:100%">
+    <select id="assay_study_id" name="assay[study_id]" onMouseOut="hideTitle()" style="width:100%" onchange="updatePublicSharing(false)">
         <%= options %>
     </select>
     </p>

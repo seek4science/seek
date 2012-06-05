@@ -5,6 +5,7 @@ class SamplesController < ApplicationController
   before_filter :find_and_auth, :only => [:show, :edit, :update, :destroy]
   before_filter :virtualliver_only, :only => [:new_object_based_on_existing_one]
 
+  include Seek::Publishing
 
   def new_object_based_on_existing_one
     @existing_sample =  Sample.find(params[:id])
@@ -72,7 +73,7 @@ class SamplesController < ApplicationController
     @sample.policy.set_attributes_with_sharing params[:sharing], @sample.projects
 
     if @sample.save
-
+      deliver_request_publish_approval params[:sharing], @sample
         align_sops(@sample.specimen,sops) unless spe
 
         if @sample.from_new_link=="true"
@@ -121,6 +122,7 @@ class SamplesController < ApplicationController
       AssetsCreator.add_or_update_creator_list(@sample.specimen, params[:creators])
 
       if @sample.save
+        deliver_request_publish_approval params[:sharing], @sample
         align_sops(@sample.specimen, sops)
 
         if @sample.from_biosamples=="true"

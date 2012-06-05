@@ -14,6 +14,6 @@
           :url=>{:action=>"investigation_selected_ajax"},
           :with=>"'investigation_id='+this.value",
           :before=>"show_ajax_loader('person_responsible_collection')"
-        )
+        )+";updatePublicSharing(false);"
   }
 -%>
