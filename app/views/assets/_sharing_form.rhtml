@@ -15,7 +15,7 @@
 <%= hidden_field_tag "sharing[permissions][contributor_types]", "" -%>
 <%= hidden_field_tag "sharing[permissions][values]", "" -%>
 
-<div class="fold">
+<div class="fold" id="sharing_form">
 
   <div class="foldTitle">
     <%= help_icon("Here you can specify who can <b>see</b>#{', <b>download</b>' if @resource.is_downloadable?} and <b>edit</b> this #{@resource_type}.") -%>
