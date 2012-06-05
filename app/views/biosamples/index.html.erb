@@ -47,6 +47,10 @@
     var organism = new Array();
     check_show_existing_strains('strain_organism_ids', 'existing_strains', '<%=url_for(:controller => 'biosamples', :action => 'existing_strains')-%>');
 
+    function updatePublicSharing(alert_message){
+       /*do nothing*/
+    }
+
     function selectAll(table) {
         var table_name = table;
         var table = eval(table);
