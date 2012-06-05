@@ -249,4 +249,23 @@ class PoliciesControllerTest < ActionController::TestCase
     json_response = ActiveSupport::JSON.decode(@response.body)
     assert !json_response["updated_can_publish"]
   end
+
+  test 'always can publish for the published item' do
+          gatekeeper = Factory(:gatekeeper)
+          a_person = Factory(:person)
+          login_as(gatekeeper.user)
+          sample = Factory(:sample, :contributor => gatekeeper.user, :policy => Factory(:public_policy), :projects => gatekeeper.projects)
+          Factory(:permission, :contributor => a_person, :access_type => Policy::MANAGING, :policy => sample.policy)
+          sample.reload
+
+          login_as(a_person.user)
+          assert sample.can_manage?
+          assert sample.can_publish?
+
+          put :updated_can_publish, :project_ids => gatekeeper.projects.first.id, :resource_name => 'sample', :resource_id => sample.id
+          assert_response :success
+
+          json_response = ActiveSupport::JSON.decode(@response.body)
+          assert json_response["updated_can_publish"]
+    end
 end
