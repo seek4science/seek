@@ -3,7 +3,7 @@
     var text,value,child_list_id;
     text = "<%= child.title %>";
     value = "<%= child.id %>";
-    child_type = "<%= child.class.name.downcase%>";
+    child_type = "<%= child.class.name.underscore%>";
     parent_type ="<%= parent%>";
     if (!window.opener) {
         alert("New "+ child_type +" was created but its parent window was closed.");
