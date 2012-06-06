@@ -1413,11 +1413,6 @@ ActiveRecord::Schema.define(:version => 20120606091324) do
 
   add_index "tissue_and_cell_types", ["title"], :name => "title", :unique => true
 
-  create_table "tissue_and_cell_types_old", :force => true do |t|
-    t.string   "title"
-    t.datetime "created_at"
-    t.datetime "updated_at"
-  end
 
   create_table "topics", :force => true do |t|
     t.integer  "forum_id"
