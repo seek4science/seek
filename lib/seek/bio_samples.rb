@@ -37,13 +37,10 @@ module Seek
       doc.root.namespaces.default_prefix = "ss"
       template_sheet = find_template_sheet doc
       samples_sheet = find_samples_sheet doc
-
-      set_creator template_sheet
-      @file.creators << @creator unless @file.creators.include?(@creator) || @creator.nil?
-     # @file.save!
-
-      if template_sheet && @to_populate
-        populate_assay template_sheet, filename
+      if template_sheet
+        set_creator template_sheet
+        @file.creators << @creator unless @file.creators.include?(@creator) || @creator.nil?
+        populate_assay template_sheet, filename if @to_populate
       end
       if samples_sheet
         populate_bio_samples samples_sheet

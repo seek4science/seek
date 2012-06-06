@@ -3,7 +3,7 @@ require 'acts_as_ontology'
 class TechnologyType < ActiveRecord::Base
 
   has_many :assays
-
+  attr_accessor :parent_name
   acts_as_ontology
 
   def get_child_assays technology_type=self
