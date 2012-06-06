@@ -12,7 +12,7 @@ class AssayTypesController < ApplicationController
 
   def new
     @assay_type=AssayType.new
-
+    @assay_type.parent_name= params[:parent_name]
     respond_to do |format|
       format.html
       format.xml  { render :xml => @assay_type }
@@ -46,20 +46,28 @@ class AssayTypesController < ApplicationController
   end
   
   def create
-    @assay_type = AssayType.new(:title => params[:assay_type][:title])
+    @assay_type = AssayType.new(params[:assay_type].reject{|k,v|k=='parent_id'})
     @assay_type.parents = params[:assay_type][:parent_id].collect {|p_id| AssayType.find_by_id(p_id)}
     #@assay_type.owner=current_user.person    
     
-    respond_to do |format|
-      if @assay_type.save        
-        flash[:notice] = 'Assay type was successfully created.'
-        format.html { redirect_to(:action => 'manage') }
-        format.xml  { render :xml => @assay_type, :status => :created, :location => @assay_type }
+
+      if @assay_type.save
+        if @assay_type.parent_name
+          render :partial => "assets/back_to_singleselect_parent",:locals => {:child=>@assay_type,:parent=>@assay_type.parent_name}
+        else
+         respond_to do |format|
+          flash[:notice] = 'Assay type was successfully created.'
+          format.html { redirect_to(:action => 'manage') }
+          format.xml  { render :xml => @assay_type, :status => :created, :location => @assay_type }
+           end
+        end
+
       else
+        respond_to do |format|
         format.html { render :action => "new" }
         format.xml  { render :xml => @assay_type.errors, :status => :unprocessable_entity }
+        end
       end
-    end
   end
   
   def update

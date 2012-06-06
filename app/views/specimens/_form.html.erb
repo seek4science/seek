@@ -53,12 +53,12 @@
   <%= f.select :institution_id,
                options_for_select([["Please Select ...", 0]]|all_institutions.collect { |o| [h(o.name), o.id] }, current_user.try(:person).try(:projects).try(:first).try(:institution_ids).try(:first)), {}, :style => "width:350px;" %>
 </p>
-
+<% unless Seek::Config.is_virtualliver %>
 <p>
   <%= f.label "Culture starting date:" -%> <br/>
   <%= f.calendar_date_select :born, :time => "mixed", :style => "width:350px;" -%>
 </p>
-
+<% end %>
 <p>
   <%= f.label "Culture growth type:" -%> <br/>
   <%= f.collection_select :culture_growth_type_id, CultureGrowthType.all, :id, :title,{:include_blank => "Not specified"}, {:onchange=>"check_show_which_fields();return(false);"} -%>

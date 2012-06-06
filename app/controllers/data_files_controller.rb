@@ -69,11 +69,12 @@ class DataFilesController < ApplicationController
             new_f.save
           end
           flash[:notice] = "New version uploaded - now on version #{@data_file.version}"
-
-          bio_samples = @data_file.bio_samples_population
-          unless bio_samples.instance_values["errors"].blank?
-            flash[:error] = "Warning: sample database population is not completely successful.<br/>"
-            flash[:error] << bio_samples.instance_values["errors"].html_safe
+          if @data_file.is_with_sample?
+            bio_samples = @data_file.bio_samples_population
+            unless bio_samples.instance_values["errors"].blank?
+              flash[:error] = "Warning: sample database population is not completely successful.<br/>"
+              flash[:error] << bio_samples.instance_values["errors"].html_safe
+            end
           end
         else
           flash[:error] = "Unable to save new version"
@@ -100,6 +101,7 @@ class DataFilesController < ApplicationController
   
   def new
     @data_file = DataFile.new
+    @data_file.is_with_sample= params[:is_with_sample]
     @page_title = params[:page_title]
     respond_to do |format|
       if current_user.person.member?
@@ -172,26 +174,27 @@ class DataFilesController < ApplicationController
       assay_ids = params[:assay_ids] || []
       respond_to do |format|
         if @data_file.save
-            update_annotations @data_file
+          update_annotations @data_file
 
           create_content_blobs
 
           # update attributions
           Relationship.create_or_update_attributions(@data_file, params[:attributions])
-          
+
           # update related publications
-          Relationship.create_or_update_attributions(@data_file, params[:related_publication_ids].collect {|i| ["Publication", i.split(",").first]}, Relationship::RELATED_TO_PUBLICATION) unless params[:related_publication_ids].nil?
-          
+          Relationship.create_or_update_attributions(@data_file, params[:related_publication_ids].collect { |i| ["Publication", i.split(",").first] }, Relationship::RELATED_TO_PUBLICATION) unless params[:related_publication_ids].nil?
+
           #Add creators
           AssetsCreator.add_or_update_creator_list(@data_file, params[:creators])
-            flash[:notice] = 'Data file was successfully uploaded and saved.' if flash.now[:notice].nil?
-
-              bio_samples = @data_file.bio_samples_population
-              unless  bio_samples.instance_values["errors"].blank?
-                flash[:error] = "Warning: Sample database population is not completely successful.<br/>"
-                flash[:error] << bio_samples.instance_values["errors"].html_safe
-              end
-
+          flash[:notice] = 'Data file was successfully uploaded and saved.' if flash.now[:notice].nil?
+          #parse the data file if it is with sample data
+          if @data_file.is_with_sample
+            bio_samples = @data_file.bio_samples_population
+            unless  bio_samples.instance_values["errors"].blank?
+              flash[:error] = "Warning: Sample database population is not completely successful.<br/>"
+              flash[:error] << bio_samples.instance_values["errors"].html_safe
+            end
+          end
           assay_ids.each do |text|
             a_id, r_type = text.split(",")
             @assay = Assay.find(a_id)
@@ -199,7 +202,7 @@ class DataFilesController < ApplicationController
               @assay.relate(@data_file, RelationshipType.find_by_title(r_type))
             end
           end
-            format.html { redirect_to data_file_path(@data_file)}
+          format.html { redirect_to data_file_path(@data_file) }
         else
           format.html {
             render :action => "new"

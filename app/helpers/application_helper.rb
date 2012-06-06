@@ -102,7 +102,7 @@ module ApplicationHelper
     Seek::Util.user_creatable_types.each do |c|
       name=c.name.underscore
       path = eval "new_#{name}_path"
-      data_file_with_sample_path = eval "new_data_file_path(:page_title=>'Data File with Sample Parsing')"
+      data_file_with_sample_path = eval "new_data_file_path(:page_title=>'Data File with Sample Parsing',:is_with_sample=>true)"
       if c==Seek::Util.user_creatable_types.first
         script << "if "
       else

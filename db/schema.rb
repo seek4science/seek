@@ -9,7 +9,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20120502094436) do
+ActiveRecord::Schema.define(:version => 20120606091324) do
 
   create_table "activity_logs", :force => true do |t|
     t.string   "action"
@@ -306,6 +306,7 @@ ActiveRecord::Schema.define(:version => 20120502094436) do
     t.text     "other_creators"
     t.string   "uuid"
     t.integer  "policy_id"
+    t.boolean  "is_with_sample"
   end
 
   add_index "data_file_versions", ["contributor_id", "contributor_type"], :name => "index_data_file_versions_on_contributor_id_and_contributor_type"
@@ -330,6 +331,7 @@ ActiveRecord::Schema.define(:version => 20120502094436) do
     t.text     "other_creators"
     t.string   "uuid"
     t.integer  "policy_id"
+    t.boolean  "is_with_sample"
   end
 
   add_index "data_files", ["contributor_id", "contributor_type"], :name => "index_data_files_on_contributor_id_and_contributor_type"
