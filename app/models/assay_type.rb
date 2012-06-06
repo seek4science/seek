@@ -3,8 +3,8 @@ require 'acts_as_ontology'
 class AssayType < ActiveRecord::Base
 
   has_many :assays
-  
-  acts_as_ontology    
+  attr_accessor :parent_name
+  acts_as_ontology
 
   def get_child_assays assay_type=self
     #TODO: needs unit test
