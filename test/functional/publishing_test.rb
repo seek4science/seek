@@ -33,6 +33,13 @@ class PublishingTest < ActionController::TestCase
     assert_nil flash[:notice]
   end
 
+  test "get publish redirects to show" do
+    #This is useful because if you logout it redirects back to the current page.
+    #If you just published something, that will do a get request to *Controller#publish
+    get :publish
+    assert_response :redirect
+  end
+
   test "get preview_publish" do
     df=data_with_isa
     assay=df.assays.first
