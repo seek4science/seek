@@ -9,7 +9,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20120502094436) do
+ActiveRecord::Schema.define(:version => 20120606091324) do
 
   create_table "activity_logs", :force => true do |t|
     t.string   "action"
@@ -132,7 +132,6 @@ ActiveRecord::Schema.define(:version => 20120502094436) do
     t.integer  "strain_id"
     t.datetime "created_at"
     t.datetime "updated_at"
-    t.integer  "tissue_and_cell_type_id"
   end
 
   add_index "assay_organisms", ["assay_id"], :name => "index_assay_organisms_on_assay_id"
@@ -306,6 +305,7 @@ ActiveRecord::Schema.define(:version => 20120502094436) do
     t.text     "other_creators"
     t.string   "uuid"
     t.integer  "policy_id"
+    t.boolean  "is_with_sample"
   end
 
   add_index "data_file_versions", ["contributor_id", "contributor_type"], :name => "index_data_file_versions_on_contributor_id_and_contributor_type"
@@ -325,11 +325,12 @@ ActiveRecord::Schema.define(:version => 20120502094436) do
     t.datetime "last_used_at"
     t.datetime "created_at"
     t.datetime "updated_at"
-    t.integer  "version"
+    t.integer  "version",                       :default => 1
     t.string   "first_letter",     :limit => 1
     t.text     "other_creators"
     t.string   "uuid"
     t.integer  "policy_id"
+    t.boolean  "is_with_sample"
   end
 
   add_index "data_files", ["contributor_id", "contributor_type"], :name => "index_data_files_on_contributor_id_and_contributor_type"
@@ -692,7 +693,7 @@ ActiveRecord::Schema.define(:version => 20120502094436) do
     t.integer  "organism_id"
     t.integer  "model_type_id"
     t.integer  "model_format_id"
-    t.integer  "version"
+    t.integer  "version",                                 :default => 1
     t.string   "first_letter",               :limit => 1
     t.text     "other_creators"
     t.string   "uuid"
@@ -934,6 +935,7 @@ ActiveRecord::Schema.define(:version => 20120502094436) do
     t.string   "site_root_uri"
     t.datetime "last_jerm_run"
     t.string   "uuid"
+    t.integer  "parent_id"
   end
 
   create_table "projects_publications", :id => false, :force => true do |t|
@@ -1202,7 +1204,7 @@ ActiveRecord::Schema.define(:version => 20120502094436) do
     t.datetime "created_at"
     t.datetime "updated_at"
     t.datetime "last_used_at"
-    t.integer  "version"
+    t.integer  "version",                       :default => 1
     t.string   "first_letter",     :limit => 1
     t.text     "other_creators"
     t.string   "uuid"
@@ -1399,10 +1401,10 @@ ActiveRecord::Schema.define(:version => 20120502094436) do
   end
 
   create_table "text_value_versions", :force => true do |t|
-    t.integer  "text_value_id",                          :null => false
-    t.integer  "version",                                :null => false
+    t.integer  "text_value_id",                            :null => false
+    t.integer  "version",                                  :null => false
     t.integer  "version_creator_id"
-    t.text     "text",               :limit => 16777215, :null => false
+    t.text     "text",               :limit => 2147483647, :null => false
     t.datetime "created_at"
     t.datetime "updated_at"
   end
@@ -1412,7 +1414,7 @@ ActiveRecord::Schema.define(:version => 20120502094436) do
   create_table "text_values", :force => true do |t|
     t.integer  "version"
     t.integer  "version_creator_id"
-    t.text     "text",               :limit => 16777215, :null => false
+    t.text     "text",               :limit => 2147483647, :null => false
     t.datetime "created_at"
     t.datetime "updated_at"
   end
@@ -1422,8 +1424,6 @@ ActiveRecord::Schema.define(:version => 20120502094436) do
     t.datetime "created_at"
     t.datetime "updated_at"
   end
-
-  add_index "tissue_and_cell_types", ["title"], :name => "title", :unique => true
 
   create_table "topics", :force => true do |t|
     t.integer  "forum_id"

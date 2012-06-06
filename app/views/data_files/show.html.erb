@@ -1,7 +1,9 @@
 <%= javascript_include_tag "resource" -%>
 <% truncate_length_for_boxes = 22 -%>
-<% bio_samples = @display_data_file.bio_samples_population false
+<% if @data_file.is_with_sample?
+   bio_samples = @display_data_file.bio_samples_population false
    sample_names = bio_samples.instance_values["sample_names"]
+  end
 %>
 <ul class="sectionIcons">
 <%= asset_buttons @data_file,@display_data_file.version -%>
@@ -64,7 +66,7 @@
 
       <div class="foldContent" style="display:none;" >
         <% if @data_file.can_download? -%>
-                <% if Seek::Config.is_virtualliver
+                <% if Seek::Config.is_virtualliver &&  @data_file.is_with_sample?
                      treatments = bio_samples.instance_values["treatments"]
                      is_empty = treatments.empty?
                      treatment_table = render :partial => "extractions_table", :locals => {:extractions => treatments, :sample_names => sample_names} unless is_empty
@@ -84,7 +86,7 @@
         <% end -%>
       </div>
     </div>
-
+  <% if @data_file.is_with_sample? %>
     <% rna_extractions = bio_samples.instance_values["rna_extractions"] -%>
     <% unless rna_extractions.empty? %>
         <div class="fold">
@@ -117,6 +119,7 @@
           </div>
         </div>
     <% end %>
+  <% end %>
   </div>
 
   <%= render :partial=>"layouts/items_related_to",:object => @data_file %>
