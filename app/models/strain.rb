@@ -51,7 +51,7 @@ class Strain < ActiveRecord::Base
 
   def parent_strain
     parent_strain = Strain.find_by_id(parent_id)
-    parent_strain.nil? ? '' : (parent_strain.title + "(ID=#{parent_strain.id})")
+    parent_strain.nil? ? '' : (parent_strain.title + "(Seek ID=#{parent_strain.id})")
   end
 
   def can_delete?
