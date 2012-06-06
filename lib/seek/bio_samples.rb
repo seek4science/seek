@@ -84,12 +84,16 @@ module Seek
       unless investigation
         investigation = Investigation.new :title => investigation_title
         investigation.projects = User.current_user.person.projects
+        investigation.policy = Policy.private_policy
         investigation.save!
       end
 
       #create new assay and study
       study = Study.find_by_title study_title
-      study = Study.new :title => study_title unless study && study.contributor==User.current_user
+      unless study && study.contributor==User.current_user
+              study = Study.new :title => study_title
+              study.policy = Policy.private_policy
+      end
       study.investigation = investigation
       study.save!
 
@@ -100,7 +104,10 @@ module Seek
 
       assay_title = filename.nil? ? "dummy assay" : filename.split(".").first
       @assay = Assay.all.detect{|a|a.title == assay_title and a.study_id == study.id and a.assay_class_id == assay_class.try(:id) and a.assay_type == assay_type and a.owner_id == User.current_user.person.id}
-      @assay = Assay.new :title => assay_title  unless @assay
+      unless @assay
+        @assay = Assay.new :title => assay_title
+        @assay.policy = Policy.private_policy
+      end
       @assay.assay_class = assay_class
       @assay.assay_type = assay_type
       ### unknown technology type
