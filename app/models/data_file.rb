@@ -187,7 +187,7 @@ class DataFile < ActiveRecord::Base
   end
 
   def to_presentation
-    presentation_attrs = attributes.delete_if { |k, v| k=="template_id" || k =="id" }
+    presentation_attrs = attributes.delete_if { |k, v| !Presentation.new.attributes.include? k}
 
     returning Presentation.new(presentation_attrs) do |presentation|
       DataFile.reflect_on_all_associations.select { |a| [:has_many, :has_and_belongs_to_many, :has_one].include?(a.macro) && !a.through_reflection }.each do |a|
