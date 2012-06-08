@@ -105,7 +105,7 @@ class SamplesController < ApplicationController
 
 
       if @sample.from_new_link=="true"
-        render :partial=>"assets/back_to_fancy_parent", :locals=>{:child=>@sample, :parent=>"assay"}
+        render :partial=>"assets/back_to_fancy_parent", :locals=>{:child=>@sample, :parent_name=>"assay"}
         elsif @sample.from_biosamples=="true"
           render :partial=>"biosamples/back_to_biosamples",:locals=>{:action => 'create', :object=>@sample, :new_specimen => spe ? false : true}
       else

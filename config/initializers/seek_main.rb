@@ -39,3 +39,4 @@ Annotations::Config.versioning_enabled = false
 
 CELL_CULTURE_OR_SPECIMEN = Seek::Config.is_virtualliver ? 'specimen' : 'cell culture'
 
+ENV['LANG'] = 'en_US.UTF-8'

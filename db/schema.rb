@@ -326,7 +326,7 @@ ActiveRecord::Schema.define(:version => 20120606091324) do
     t.datetime "last_used_at"
     t.datetime "created_at"
     t.datetime "updated_at"
-    t.integer  "version",                       :default => 1
+    t.integer  "version"
     t.string   "first_letter",     :limit => 1
     t.text     "other_creators"
     t.string   "uuid"
@@ -694,7 +694,7 @@ ActiveRecord::Schema.define(:version => 20120606091324) do
     t.integer  "organism_id"
     t.integer  "model_type_id"
     t.integer  "model_format_id"
-    t.integer  "version",                                 :default => 1
+    t.integer  "version"
     t.string   "first_letter",               :limit => 1
     t.text     "other_creators"
     t.string   "uuid"
@@ -921,7 +921,6 @@ ActiveRecord::Schema.define(:version => 20120606091324) do
     t.string   "site_root_uri"
     t.datetime "last_jerm_run"
     t.string   "uuid"
-    t.integer  "parent_id"
   end
 
   create_table "projects_publications", :id => false, :force => true do |t|
@@ -1190,7 +1189,7 @@ ActiveRecord::Schema.define(:version => 20120606091324) do
     t.datetime "created_at"
     t.datetime "updated_at"
     t.datetime "last_used_at"
-    t.integer  "version",                       :default => 1
+    t.integer  "version"
     t.string   "first_letter",     :limit => 1
     t.text     "other_creators"
     t.string   "uuid"
