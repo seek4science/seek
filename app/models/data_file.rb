@@ -8,6 +8,7 @@ class DataFile < ActiveRecord::Base
 
   include Seek::DataFileExtraction
 
+  attr_accessor :parent_name
   acts_as_asset
   acts_as_trashable
 
