@@ -6,6 +6,7 @@ var sample_table = null;
 function check_show_existing_items(organism_element_id, existing_items_element_id, url) {
     var selected_ids = $F(organism_element_id).join();
     if (selected_ids == '0') {
+        Effect.Fade(existing_items_element_id + "_spinner");
         Effect.Fade(existing_items_element_id, { duration: 0.25 });
     }
     else {

@@ -42,7 +42,7 @@ class SamplesController < ApplicationController
 
   def new
     @sample = Sample.new
-    @sample.from_new_link = params[:from_new_link]
+    @sample.parent_name = params[:parent_name]
     @sample.from_biosamples = params[:from_biosamples]
     @sample.specimen = Specimen.find_by_id(params[:specimen_id]) || Specimen.new(:creators=>[User.current_user.person])
 
@@ -104,8 +104,8 @@ class SamplesController < ApplicationController
       align_sops(@sample.specimen,sops) unless spe
 
 
-      if @sample.from_new_link=="true"
-        render :partial=>"assets/back_to_fancy_parent", :locals=>{:child=>@sample, :parent=>"assay"}
+      if @sample.parent_name=="assay"
+        render :partial=>"assets/back_to_fancy_parent", :locals=>{:child=>@sample, :parent_name=>"assay"}
         elsif @sample.from_biosamples=="true"
           render :partial=>"biosamples/back_to_biosamples",:locals=>{:action => 'create', :object=>@sample, :new_specimen => spe ? false : true}
       else

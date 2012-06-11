@@ -101,6 +101,7 @@ class DataFilesController < ApplicationController
   
   def new
     @data_file = DataFile.new
+    @data_file.parent_name = params[:parent_name]
     @data_file.is_with_sample= params[:is_with_sample]
     @page_title = params[:page_title]
     respond_to do |format|
@@ -172,7 +173,7 @@ class DataFilesController < ApplicationController
       @data_file.policy.set_attributes_with_sharing params[:sharing], @data_file.projects
 
       assay_ids = params[:assay_ids] || []
-      respond_to do |format|
+
         if @data_file.save
           update_annotations @data_file
 
@@ -186,29 +187,36 @@ class DataFilesController < ApplicationController
 
           #Add creators
           AssetsCreator.add_or_update_creator_list(@data_file, params[:creators])
-          flash[:notice] = 'Data file was successfully uploaded and saved.' if flash.now[:notice].nil?
-          #parse the data file if it is with sample data
-          if @data_file.is_with_sample
-            bio_samples = @data_file.bio_samples_population
-            unless  bio_samples.instance_values["errors"].blank?
-              flash[:error] = "Warning: Sample database population is not completely successful.<br/>"
-              flash[:error] << bio_samples.instance_values["errors"].html_safe
+          if @data_file.parent_name=="assay"
+            render :partial=>"assets/back_to_fancy_parent", :locals=>{:child=>@data_file, :parent_name=>@data_file.parent_name,:is_not_fancy=>true}
+          else
+            respond_to do |format|
+              flash[:notice] = 'Data file was successfully uploaded and saved.' if flash.now[:notice].nil?
+              #parse the data file if it is with sample data
+              if @data_file.is_with_sample
+                bio_samples = @data_file.bio_samples_population
+                unless  bio_samples.instance_values["errors"].blank?
+                  flash[:error] = "Warning: Sample database population is not completely successful.<br/>"
+                  flash[:error] << bio_samples.instance_values["errors"].html_safe
+                end
+              end
+              assay_ids.each do |text|
+                a_id, r_type = text.split(",")
+                @assay = Assay.find(a_id)
+                if @assay.can_edit?
+                  @assay.relate(@data_file, RelationshipType.find_by_title(r_type))
+                end
+              end
+              format.html { redirect_to data_file_path(@data_file) }
             end
           end
-          assay_ids.each do |text|
-            a_id, r_type = text.split(",")
-            @assay = Assay.find(a_id)
-            if @assay.can_edit?
-              @assay.relate(@data_file, RelationshipType.find_by_title(r_type))
-            end
-          end
-          format.html { redirect_to data_file_path(@data_file) }
         else
+          respond_to do |format|
           format.html {
             render :action => "new"
           }
+          end
         end
-      end   
     end
   end
   

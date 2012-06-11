@@ -3,6 +3,7 @@
 <h1><%= @page_title %></h1>
 <div class="show_basic">
     <% form_tag({:action => :create}, :multipart => true) do -%>
+      <%= hidden_field_tag 'data_file[parent_name]', @data_file.parent_name%>
       <%= hidden_field_tag 'data_file[is_with_sample]', @data_file.is_with_sample%>
     <div class="asset_form">
         <%= error_messages_for :data_file -%>

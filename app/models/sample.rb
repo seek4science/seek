@@ -8,7 +8,7 @@ class Sample < ActiveRecord::Base
   acts_as_authorized
   acts_as_favouritable
 
-  attr_accessor :from_new_link
+  attr_accessor :parent_name
   attr_accessor :from_biosamples
 
   belongs_to :specimen

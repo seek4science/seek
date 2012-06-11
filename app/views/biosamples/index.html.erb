@@ -32,10 +32,24 @@
                                               :multiple => true,:size=>15,:style=>"width:75%"} -%>
 
   </div>
-  <div class='yui-u' id="existing_strains" style="width: 48%;margin-right: 0.5em"></div>
+  <div class='yui-u' id="existing_strains" style="width: 48%;margin-right: 0.5em">
+    <div id="existing_strains_spinner">
+        <center>
+          <%= image_tag "ajax-loader-large.gif" -%>
+        </center>
+    </div>
+  </div>
 </div>
 <div class="yui-g">
-  <div class="yui-u first" id="existing_specimens" style="width: 48%;margin-left: 0.5em"></div>
+  <div class="yui-u first" id="existing_specimens" style="width: 48%;margin-left: 0.5em">
+    <% if Seek::Config.is_virtualliver %>
+    <div id="existing_specimens_spinner" style="width: 48%;margin-left: 0.5em;">
+          <center>
+            <%= image_tag "ajax-loader-large.gif" -%>
+          </center>
+     </div>
+    <% end %>
+  </div>
   <div class="yui-u" id="existing_samples" style="width: 48%;margin-right: 0.5em"></div>
 </div>
 
