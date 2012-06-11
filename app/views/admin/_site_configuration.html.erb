@@ -17,6 +17,11 @@
     - control whether individual index pages list all items, or just the latest
   </li>
   <li>
+      <%= link_to "Bio-samples attributes renaming", url_for(:action=>"biosamples_renaming", :controller=>"admin") %>
+      - rename attributes described in SEEK to suit your own bio-samples database
+  </li>
+
+  <li>
     <%= link_to "Additional settings", url_for(:action=>"others", :controller=>"admin") %>
     - some additional properties, such as controls over tags and the email used for DOI and PubMed
   </li>

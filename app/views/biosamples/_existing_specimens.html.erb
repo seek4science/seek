@@ -40,9 +40,9 @@
            <h2>Cell culture (chemostat or batch)</h2>
       <% end %>
       <% if existing_specimens.empty? -%>
-          <p class="none_text">No <%= CELL_CULTURE_OR_SPECIMEN%>s have yet been defined for the selected organisms and strains.</p>
+          <p class="none_text">No <%= Seek::Config.sample_parent_term%>s have yet been defined for the selected organisms and strains.</p>
       <% else -%>
-          <p class="none_text">Please select the <%= CELL_CULTURE_OR_SPECIMEN%>s to browse the associated samples.</p>
+          <p class="none_text">Please select the <%= Seek::Config.sample_parent_term%>s to browse the associated samples.</p>
 
           <div class="scroll_box">
             <table cellpadding="0" cellspacing="0" border="0" class="display" id="specimen_table" style="width: 100%">
@@ -51,11 +51,11 @@
                 <th>Strain</th>
                 <th></th>
                 <th>Title</th>
-                <th>Culture starting date</th>
+                <th><%= Seek::Config.specimen_culture_starting_date%></th>
                 <th>Culture type</th>
                 <th>Genotypes</th>
                 <th>Phenotypes</th>
-                 <th>Creators</th>
+                 <th><%= Seek::Config.specimen_creators%></th>
 
                 <th>ID</th>
                 <th>Related SOPs</th>
@@ -81,7 +81,7 @@
               <li><%= create_sample_popup_link -%></li>
               <br/>
               <br/>
-              (create a new sample and <%= CELL_CULTURE_OR_SPECIMEN %>, or create a new sample for the selected <%= CELL_CULTURE_OR_SPECIMEN %>)
+              (create a new sample and <%= Seek::Config.sample_parent_term %>, or create a new sample for the selected <%= Seek::Config.sample_parent_term %>)
             </ul>
             <br/>
   <% end %>

@@ -22,9 +22,9 @@ class Organism < ActiveRecord::Base
   def searchable_terms
     terms = [title]
     if concept
-      terms = terms | concept[:synonyms].collect{|s| s.gsub("\"","")}
-      terms = terms | concept[:related_synonyms].collect{|s| s.gsub("\"","")}
-      terms = terms | concept[:definitions].collect{|s| s.gsub("\"","")}
+      terms = terms | concept[:synonyms].collect{|s| s.gsub("\"","")} if concept[:synonyms]
+      terms = terms | concept[:related_synonyms].collect{|s| s.gsub("\"","")} if concept[:related_synonyms]
+      terms = terms | concept[:definitions].collect{|s| s.gsub("\"","")} if concept[:definitions]
     end
     terms
   end

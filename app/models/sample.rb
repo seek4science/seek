@@ -193,6 +193,6 @@ class Sample < ActiveRecord::Base
   end
 
   def specimen_info
-    specimen.nil? ? '' : CELL_CULTURE_OR_SPECIMEN.capitalize + ' ' + specimen.title
+    specimen.nil? ? '' : Seek::Config.sample_parent_term.capitalize + ': ' + specimen.title
  end
 end

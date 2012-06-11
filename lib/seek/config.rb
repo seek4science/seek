@@ -246,7 +246,7 @@ module Seek
       :google_analytics_tracker_id,:piwik_analytics_enabled,:piwik_analytics_url, :exception_notification_enabled,:exception_notification_recipients,:open_id_authentication_store, :sycamore_enabled,
       :project_news_enabled,:project_news_feed_urls,:community_news_enabled,:community_news_feed_urls,:is_virtualliver,:presentations_enabled, :sabiork_ws_base_url, :publish_button_enabled,
       :seek_video_link, :scales, #putting vl settings on their own line to simplify merges
-      :admin_impersonation_enabled, :auth_caching_enabled, :auth_lookup_enabled, :strategic_eager_loading]
+      :admin_impersonation_enabled, :auth_caching_enabled, :auth_lookup_enabled, :strategic_eager_loading,:sample_parent_term,:specimen_culture_starting_date,:sample_age,:specimen_creators]
 
     #Settings that require a conversion to integer
     setting :tag_threshold,:convert=>"to_i"
