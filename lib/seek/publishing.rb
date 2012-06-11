@@ -20,10 +20,13 @@ module Seek
       policy = @asset.policy
       policy.access_type=Policy::ACCESSIBLE
       policy.sharing_scope=Policy::EVERYONE
+      if @asset.kind_of?(Strain)
+        policy.permissions = []
+      end
       respond_to do |format|
          if policy.save
            flash[:notice]="Publishing complete"
-           format.html{redirect_to @asset}
+           format.html{redirect_to @asset.kind_of?(Strain) ? biosamples_path : @asset}
          else
            flash[:error] = "There is a problem in making this item published"
          end
@@ -33,7 +36,7 @@ module Seek
     def reject_publish
       respond_to do |format|
          flash[:notice]="You rejected to publish this item"
-         format.html{redirect_to @asset}
+         format.html{redirect_to @asset.kind_of?(Strain) ? biosamples_path : @asset}
       end
     end
 

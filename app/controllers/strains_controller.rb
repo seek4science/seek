@@ -1,6 +1,7 @@
 class StrainsController < ApplicationController
   before_filter :get_strains,:only=>[:show_existing_strains, :existing_strains_for_assay_organism]
   before_filter :get_strain, :only =>:show_existing_strain
+  include Seek::Publishing
 
   def show_existing_strains
     render :update do |page|
