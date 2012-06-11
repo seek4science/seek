@@ -94,10 +94,10 @@ class Assay < ActiveRecord::Base
         technology_type.try :title
     end
     text :organisms do
-        organisms.map{|o| o.title}
+        organisms.compact.map{|o| o.title}
     end
     text :strains do
-        strains.map{|s| s.title}
+        strains.compact.map{|s| s.title}
     end
   end if Seek::Config.solr_enabled
 
