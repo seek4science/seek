@@ -58,20 +58,25 @@ module BiosamplesHelper
      function =  remote_function(:url=>{:action=>"existing_strains", :controller=>"biosamples"},
                                                       :with=>"'organism_ids='+$F('strain_organism_ids')",
                                                       :before=>"show_ajax_loader('existing_strains')")+ ";"
-     function += remote_function(:url => {:controller => 'biosamples', :action => 'existing_specimens'},
-                                                                  :with => "'strain_ids=' + getSelectedStrains() + '&organism_ids='+$F('strain_organism_ids')") + ";"  if Seek::Config.is_virtualliver
+     function += remote_function(:url => {:controller => 'biosamples',
+                                          :action => 'existing_specimens'},
+                                          :with => "'strain_ids=' + getSelectedStrains() + '&organism_ids='+$F('strain_organism_ids')",
+                                          :before=>"show_ajax_loader('existing_specimens')") + ";"  if Seek::Config.is_virtualliver
      function +=  "check_show_existing_items('strain_organism_ids', 'existing_strains', '');"
      if Seek::Config.is_virtualliver
        function +=  "check_show_existing_items('strain_organism_ids', 'existing_specimens', '');"
      else
-       function += "hide_existing_specimens();hide_existing_samples();"
+       function += "hide_existing_specimens();"
      end
-     function += "return(false);"
+     function += "hide_existing_samples();return(false);"
      function
    end
 
   def strain_checkbox_onchange_function
-        function = remote_function(:url => {:controller => 'biosamples', :action => 'existing_specimens'}, :with => "'strain_ids=' + getSelectedStrains()+'&organism_ids='+$F('strain_organism_ids')") +";"
+        function = remote_function(:url => {:controller => 'biosamples',
+                                            :action => 'existing_specimens'},
+                                            :with => "'strain_ids=' + getSelectedStrains()+'&organism_ids='+$F('strain_organism_ids')",
+                                            :before=>"show_ajax_loader('existing_specimens')")+ ";"
         function += "show_existing_specimens();hide_existing_samples();" unless Seek::Config.is_virtualliver
         function += "return(false);"
         function
@@ -105,7 +110,10 @@ module BiosamplesHelper
     strain_info = 'Strain ' + strain.info + "(ID=#{strain.id})"
 
     [strain_info,
-     (check_box_tag "selected_specimen_#{specimen.id}", specimen.id, false, {:onchange => remote_function(:url => {:controller => 'biosamples', :action => 'existing_samples'}, :with => "'specimen_ids=' + getSelectedSpecimens()", :before=>"show_ajax_loader('existing_samples')") + ";show_existing_samples();"}),
+     (check_box_tag "selected_specimen_#{specimen.id}", specimen.id, false, {:onchange => remote_function(:url => {:controller => 'biosamples',
+                                                                                                                   :action => 'existing_samples'},
+                                                                                                                  :with => "'specimen_ids=' + getSelectedSpecimens()",
+                                                                                                                  :before=>"show_ajax_loader('existing_samples')") + ";show_existing_samples();"}),
      link_to(specimen.title, specimen_path(specimen.id), {:target => '_blank'}), specimen.born_info, specimen.culture_growth_type.try(:title), specimen.genotype_info,specimen.phenotype_info,creators.join(", "), specimen.id, asset_version_links(specimen.sops).join(", "), delete_icon, update_icon]
   end
 
