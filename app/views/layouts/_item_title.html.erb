@@ -29,9 +29,8 @@ title||=h(item.title)
     <h1><%= title_prefix + title + title_postfix -%></h1>
 </div>
 
-<% if item.is_downloadable_pdf?
-   version ||= 1
-   download_url = polymorphic_path(item, :version => version, :action => 'download') %>
+<% if display_item and display_item.is_downloadable_pdf?
+   download_url = polymorphic_path(item, :version => display_item.version, :action => 'download') %>
     <center>
     <%= link_to_function 'View content' + expand_image, :onclick => "viewPDFContent('#{download_url}')", :id => 'view_content_expand_image', :class=> 'link_text' do |page|
         page["view_content_expand_image"].toggle
