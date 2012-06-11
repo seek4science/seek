@@ -9,7 +9,7 @@
             <fieldset <%= sub_form.object.new_record? ? "id='new_temporary_link_form' style='display: none'" : ''%> >
               <p>
                   <% temporary_link = url_for :action => :show, :only_path => false, :code => sub_form.object.code, :escape => false %>
-                  Visitors can view this <%= f.object.class.name.humanize %> with: <%= link_to temporary_link, temporary_link %>
+                  Visitors can view this <%= f.object.class.name.underscore.humanize %> with: <%= link_to temporary_link, temporary_link %>
                   <%= sub_form.hidden_field :code %>
               </p>
               <p>
