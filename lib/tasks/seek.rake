@@ -275,18 +275,10 @@ namespace :seek do
   desc "warm authorization memcache"
   task :warm_memcache=> :environment do
     klasses = Seek::Util.persistent_classes.select { |klass| klass.reflect_on_association(:policy) }.reject { |klass| klass.name == 'Permission' || klass.name.match(/::Version$/) }
-    items = klasses.map do |k|
-      case k.class_name
-        when "Assay"
-          k.scoped :include => [:owner, {:policy => {:permissions => :contributor}}]
-        else
-          k.scoped :include => [:contributor, {:policy => {:permissions => :contributor}}]
-      end
-    end
+    items = klasses.map(&:all).flatten
 
-    items = items.flatten
     total = items.count
-    users = User.all.sort { |a, b| a.id <=> b.id }
+    users = User.find(:all, :order => "id")
 
     items.each_with_index do |i, index|
       users.each do |u|
@@ -310,13 +302,16 @@ namespace :seek do
       FasterCSV.open("#{args[:filename]}", "w") do |csv|
         users = User.all.select { |u| u.person }
         users << nil
+        klasses = Seek::Util.persistent_classes.select { |klass| klass.reflect_on_association(:policy) }.reject { |klass| klass.name == 'Permission' || klass.name.match(/::Version$/) }
+        items = klasses.map(&:all).flatten
+
         users.each do |user|
-          Policy.all.each do |policy|
+          items.each do |item|
             Acts::Authorized::AUTHORIZATION_ACTIONS.each do |action|
-              person_key = user ? user.person.cache_key : nil
-              cache_key = "can_#{action}?#{policy.cache_key}#{person_key}"
-              val = Rails.cache.read cache_key
-              csv << [person_key, policy.cache_key, action, val]
+
+              item_auth_key = item.auth_key(user, action)
+              val = Rails.cache.read item_auth_key
+              csv << [item_auth_key, val].flatten
             end
           end
         end
@@ -334,11 +329,11 @@ namespace :seek do
     if args[:filename]
       FasterCSV.foreach("#{args[:filename]}") do |row|
         person_key = row[0]
-        policy_key = row[1]
-        action = row[2]
+        action = row[1]
+        item_key = row[2]
         val = row[3].blank? ? nil : row[3].to_sym
         raise "invalid authorization value, must be either :true, :false, or nil. value: #{val.inspect} person_key: #{person_key} policy_key: #{policy_key} action: #{action}" unless [:true, :false, nil].include? val
-        Rails.cache.write "can_#{action}?#{policy_key}#{person_key}", val
+        Rails.cache.write [person_key, action, item_key], val
         end
     else
         puts "please specify the load file name... e.g. rake seek:load_policy_authorization_caching[filename]"
