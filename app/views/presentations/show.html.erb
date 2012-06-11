@@ -7,7 +7,7 @@
 
 <%= render :partial=>"assets/upload_new_version_form", :locals=>{:resource=>@presentation} -%>
 
-<%= render :partial => "layouts/item_title",:locals=>{:item=>@presentation} %>
+<%= render :partial => "layouts/item_title",:locals=>{:item=>@presentation, :version=>@display_presentation.version} %>
 
 <%= render :partial => "layouts/usage_info", :locals => { :resource => @presentation } -%>
 

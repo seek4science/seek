@@ -30,6 +30,7 @@ title||=h(item.title)
 </div>
 
 <% if item.is_downloadable_pdf?
+   version ||= 1
    download_url = polymorphic_path(item, :version => version, :action => 'download') %>
     <center>
     <%= link_to_function 'View content' + expand_image, :onclick => "viewPDFContent('#{download_url}')", :id => 'view_content_expand_image', :class=> 'link_text' do |page|
