@@ -59,7 +59,7 @@ class Strain < ActiveRecord::Base
     parent_strain.nil? ? '' : (parent_strain.title + "(ID=#{parent_strain.id})")
   end
 
-  def can_delete?
+  def can_delete? *args
     super && (specimens.empty? || ((specimens.count == 1) && specimens.first.is_dummy? && specimens.first.samples.empty?))
   end
 end
