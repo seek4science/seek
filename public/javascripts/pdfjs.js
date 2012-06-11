@@ -31,7 +31,6 @@ function isCanvasSupportBrowser(){
 
 function hidePDFContent(){
     document.getElementById('pdf_content_display').style['display'] = 'none';
-    document.getElementById('pdf-display-canvas').innerHTML="";
 }
 
 
