@@ -1,4 +1,5 @@
-
+<%= javascript_include_tag 'pdfjs' -%>
+<%= stylesheet_link_tag 'pdfjs.css' -%>
 <%
 
 item||=nil
@@ -27,4 +28,23 @@ title||=h(item.title)
     <% end -%>
     <h1><%= title_prefix + title + title_postfix -%></h1>
 </div>
+
+<% if item.is_downloadable_pdf?
+   download_url = polymorphic_path(item, :version => version, :action => 'download') %>
+    <center>
+    <%= link_to_function 'View content' + expand_image, :onclick => "viewPDFContent('#{download_url}')", :id => 'view_content_expand_image', :class=> 'link_text' do |page|
+        page["view_content_expand_image"].toggle
+        page["hide_content_collapse_image"].toggle
+    end
+  %>
+  <%= link_to_function 'Hide content' + collapse_image, :onclick => "hidePDFContent('')", :id => 'hide_content_collapse_image', :class=> 'link_text', :style => "display:none" do |page|
+
+        page["view_content_expand_image"].toggle
+        page["hide_content_collapse_image"].toggle
+        end
+  %>
+   </center>
+  <br/>
+  <%= render :partial =>  'layouts/pdf_content_display'%>
+<% end %>
 

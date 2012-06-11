@@ -36,6 +36,7 @@ solr/data/
 public/help_images/*
 public/javascripts/*_cached.js
 public/stylesheets/*_cached.css
+public/javascripts/pdfjs/*
 
 .bundle/config
 

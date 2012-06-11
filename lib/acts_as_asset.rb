@@ -24,6 +24,13 @@ module Acts #:nodoc:
       is_asset? && is_downloadable?
     end
 
+    def is_downloadable_pdf?
+      is_downloadable_asset? && can_download? && is_pdf? && !content_blob.filesize.nil?
+    end
+
+    def is_pdf?
+      content_type == "application/pdf"
+    end
     module ClassMethods
 
       def acts_as_asset

@@ -216,4 +216,17 @@ class SopTest < ActiveSupport::TestCase
     sop_without_contributor = Factory :sop, :contributor => nil
     assert_equal nil, sop_without_contributor.contributing_user
   end
+
+  test 'is_downloadable_pdf' do
+    sop_with_pdf_format = Factory(:sop, :content_type=>"application/pdf", :content_blob => Factory(:content_blob, :data => File.new("#{Rails.root}/test/fixtures/files/a_pdf_file.pdf","rb").read))
+    User.with_current_user sop_with_pdf_format.contributor do
+      assert sop_with_pdf_format.is_pdf?
+      assert sop_with_pdf_format.is_downloadable_pdf?
+    end
+    sop_with_no_pdf_format = Factory(:sop, :content_blob => Factory(:content_blob, :data => File.new("#{Rails.root}/test/fixtures/files/little_file.txt","rb").read))
+    User.with_current_user sop_with_pdf_format.contributor do
+       assert !sop_with_no_pdf_format.is_downloadable_pdf?
+    end
+
+  end
 end
