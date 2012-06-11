@@ -33,7 +33,7 @@
   <% unless specimens.blank? %>
       <h2>Sample</h2>
       <% if existing_samples.empty? -%>
-          <p class="none_text">No samples have yet been defined for the selected <%= CELL_CULTURE_OR_SPECIMEN -%>s
+          <p class="none_text">No samples have yet been defined for the selected <%= Seek::Config.sample_parent_term -%>s
           </p>
       <% else -%>
           <br/>
@@ -47,7 +47,7 @@
                 <th>Title</th>
                 <th>Lab internal identifier</th>
                 <th>Date at sampling</th>
-                <th>Age at sampling(hours)</th>
+                <th><%= Seek::Config.sample_age%></th>
                 <th>Provider name</th>
                 <th>ID</th>
                 <th>Comment</th>

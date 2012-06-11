@@ -151,6 +151,14 @@ class AdminController < ApplicationController
     update_redirect_to update_flag,'others'
   end
 
+  def update_biosamples_renaming
+    update_flag = true
+    Seek::Config.sample_parent_term = params[:sample_parent_term]
+    Seek::Config.specimen_creators = params[:specimen_creators]
+    Seek::Config.specimen_culture_starting_date = params[:specimen_culture_starting_date]
+    Seek::Config.sample_age = params[:sample_age]
+    update_redirect_to update_flag,'biosamples_renaming'
+  end
   def finalize_config_changes
     flash[:notice] = RESTART_MSG
     #expires all fragment caching

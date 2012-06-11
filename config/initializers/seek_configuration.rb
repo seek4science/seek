@@ -70,4 +70,11 @@ Seek::Config.default :crossref_api_email,nil
 Seek::Config.default :site_base_host,"http://localhost:3000"
 Seek::Config.default :open_id_authentication_store,:memory
 
+#Biosamples renaming
+Seek::Config.default :sample_parent_term, "cell culture batch"
+Seek::Config.default :specimen_culture_starting_date,"Culture starting date"
+Seek::Config.default :sample_age, "Age at sampling(hours)"
+Seek::Config.default :specimen_creators, "Creators"
+
+
 Seek::Config.default :max_attachments_num,100

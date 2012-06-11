@@ -1,7 +1,7 @@
 <% specimen = sample_specimen_details -%>
 
 <p>
-  <label><%= CELL_CULTURE_OR_SPECIMEN.capitalize -%> name:</label>
+  <label><%= Seek::Config.sample_parent_term.capitalize -%> name:</label>
   <%= text_or_not_specified(specimen.title) -%>
 </p>
 <% if Seek::Config.is_virtualliver %>
@@ -114,7 +114,7 @@
   <%= text_or_not_specified specimen.provider_name -%>
 </p>
 <p>
-  <label>Provider's <%= CELL_CULTURE_OR_SPECIMEN -%> identifier:</label>
+  <label>Provider's <%= Seek::Config.sample_parent_term -%> identifier:</label>
   <%= text_or_not_specified specimen.provider_id -%>
 </p>
 <% unless Seek::Config.is_virtualliver %>
