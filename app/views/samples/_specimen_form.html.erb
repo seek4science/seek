@@ -2,11 +2,11 @@
    all_institutions = Institution.find(:all,:order=>:name)
 
 %>
-<h2><%= CELL_CULTURE_OR_SPECIMEN.capitalize -%> details</h2>
+<h2><%= Seek::Config.sample_parent_term.capitalize -%> details</h2>
 
 <% f.fields_for :specimen do |specimen_f| %>
     <p>
-        <%= specimen_f.label "#{CELL_CULTURE_OR_SPECIMEN.capitalize} title:"-%><span class="required">*</span><br/>
+        <%= specimen_f.label "#{Seek::Config.sample_parent_term.capitalize} title:"-%><span class="required">*</span><br/>
         <%= specimen_f.text_field :title, :style=>"width:350px;" -%>
     </p>
 
@@ -52,7 +52,7 @@
     </p>
 
     <p>
-        <%= specimen_f.label "Provider's #{CELL_CULTURE_OR_SPECIMEN} identifier:" -%> <br/>
+        <%= specimen_f.label "Provider's #{Seek::Config.sample_parent_term} identifier:" -%> <br/>
         <%= specimen_f.text_field :provider_id, :style=>"width:350px;" -%>
     </p>
 
