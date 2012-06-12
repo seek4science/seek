@@ -3,7 +3,6 @@
 ActiveSupport::Inflector.inflections do |inflect|
   inflect.human 'sop', "SOP"
   inflect.human 'sops', 'SOPs'
-  inflect.human 'Specimen' , Seek::Config.sample_parent_term
 end
 
 #the Inflector module's definition of 'humanize' does not act
