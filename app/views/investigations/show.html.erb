@@ -36,21 +36,18 @@
         </div>
     </p>
    </div>
-  <div class="main_content_right_box_wider">
-    <%= render :partial => "assets/resource_scales_box", :locals => {:resource => @investigation} -%>
-  </div>
 
   <br/>
-  </div>
 
   <div class="main_content_right_box_wider">
+    <%= render :partial => "assets/resource_scales_box", :locals => {:resource => @investigation} -%>
     <%= render :partial=>"assets/resource_authors_box",:locals => {:resource => @investigation, :creators => [@investigation.contributing_user.try(:person)] } %>
   </div>
 
   <div style="clear:both;">
 	<%= embedded_isa_svg(@investigation,false) -%>
   </div>
-
+  <div>
     <%= render :partial=>"layouts/items_related_to", :object => @investigation %>
   </div>
 </div>
