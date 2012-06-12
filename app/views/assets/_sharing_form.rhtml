@@ -15,6 +15,7 @@
 <%= hidden_field_tag "sharing[permissions][contributor_types]", "" -%>
 <%= hidden_field_tag "sharing[permissions][values]", "" -%>
 
+<%="<div class='fieldWithErrors'>" if !@resource.errors.empty? and !@policy.valid? %>
 <div class="fold" id="sharing_form">
 
   <div class="foldTitle">
@@ -89,7 +90,7 @@
                    value="<%= Policy::EVERYONE -%>" <%= 'disabled="true"' if !can_publish -%>/>
             - All visitors (including anonymous visitors with no login):
           </label>
-              <%= render :partial => "assets/sharing_form_access_type_dropdown", :locals => { :access_type_selector_for_scope => Policy::EVERYONE,
+           <%= render :partial => "assets/sharing_form_access_type_dropdown", :locals => { :access_type_selector_for_scope => Policy::EVERYONE,
             :sharing_scope => @sharing_mode, :access_type => @access_mode } -%>
            <%= additional_advanced_permissions_included @resource, Policy::EVERYONE -%>
           <br/>
@@ -323,6 +324,7 @@
   <% end %>
   </div>
 </div>
+<%="</div>" if !@resource.errors.empty? and !@policy.valid? %>
 
 <script type="text/javascript">
   init_sharing();
@@ -334,7 +336,6 @@
   UPDATE_FAVOURITE_GROUP_LINK = '<%= update_favourite_group_path -%>';
 
   REVIEW_WORK_GROUP_LINK = '<%= review_work_group_path("type", "id", "access_type") -%>';
-
 
 <% if show_advanced_permissions -%>
     <% @policy.permissions.each do |p| -%>
@@ -371,7 +372,6 @@
 <% if !disable_advanced_view -%>
   updateCustomSharingSettings();
 <% end %>
-
   updatePublicSharing(false);
 
   function updatePublicSharing(alert_message) {

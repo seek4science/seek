@@ -26,7 +26,7 @@ class BiosamplesController < ApplicationController
     end
     respond_to do |format|
       format.json{
-        render :json => {:status => 200, :strains => strains.sort_by(&:title).reject{|s| s.is_dummy?}.select(&:can_view?).collect{|strain| [strain.id, strain.info]}}
+        render :json => {:status => 200, :strains => strains.sort_by(&:title).reject{|s| s.is_dummy}.select(&:can_view?).collect{|strain| [strain.id, strain.info]}}
       }
     end
   end
@@ -59,42 +59,6 @@ class BiosamplesController < ApplicationController
     strain = Strain.find_by_id params[:strain][:id]
     strain.attributes = params[:strain]
 
-    old_phenotypes = strain.phenotypes
-    # Update new phenotypes
-    updated_phenotypes = []
-    phenotypes_params = params["phenotypes"]
-    unless phenotypes_params.blank?
-      phenotypes_params.each_value do |value|
-        phenotype = Phenotype.find(:all, :conditions => ["description=? and strain_id=?", value["description"], strain.id]).first
-        if phenotype
-          updated_phenotypes << phenotype
-        else
-          updated_phenotypes << Phenotype.create(:description => value["description"], :strain_id => strain.id) unless value[:description].blank?
-        end
-      end
-    end
-    #Destroy uneeded phenotypes
-    (old_phenotypes - updated_phenotypes.compact).each { |p| p.destroy }
-
-    old_genotypes = strain.genotypes
-    # Update new genotypes
-    updated_genotypes = []
-    genotypes_params = params["genotypes"]
-    unless genotypes_params.blank?
-      genotypes_params.each_value do |value|
-        gene = Gene.find_by_title(value['gene']['title']) || (Gene.create(:title => value['gene']['title']) unless value['gene']['title'].blank?)
-        modification = Modification.find_by_title(value['modification']['title']) || (Modification.create(:title => value['modification']['title']) unless value['modification']['title'].blank?)
-        genotype = Genotype.find(:all, :conditions => ['gene_id=? and modification_id=? and strain_id=?', gene.id, modification.id, strain.id]).first
-        if genotype
-          updated_genotypes << genotype
-        else
-          updated_genotypes << Genotype.create(:gene_id => gene.id, :modification_id => modification.id, :strain_id => strain.id)
-        end
-      end
-    end
-    #Destroy uneeded genotypes
-    (old_genotypes - updated_genotypes.compact).each { |g| g.destroy }
-
     if params[:sharing]
       strain.policy.set_attributes_with_sharing params[:sharing], strain.projects
     end
@@ -113,9 +77,14 @@ class BiosamplesController < ApplicationController
 
   def destroy
     object=params[:class].capitalize.constantize.find(params[:id])
+    if object && object.is_a?(Sample)
+       specimen = object.specimen
+       id_column = Seek::Config.is_virtualliver ? 8 : 6
+    end
     render :update do |page|
       if object.can_delete? && object.destroy
         page.call :removeRowAfterDestroy, "#{params[:class]}_table", object.id, params[:id_column_position]
+        page.call :updateSpecimenRow, specimen_row_data(specimen),id_column if specimen
       else
         page.alert(object.errors.full_messages)
       end
@@ -132,6 +101,7 @@ class BiosamplesController < ApplicationController
   def existing_specimens
     specimens_of_strains = []
     strains = []
+    specimens_with_default_strain =[]
     if params[:strain_ids]
       strain_ids = params[:strain_ids].split(',')
       strain_ids.each do |strain_id|
@@ -141,6 +111,17 @@ class BiosamplesController < ApplicationController
           specimens=strain.specimens
           specimens_of_strains |= specimens.select(&:can_view?)
         end
+      end
+    end
+    if Seek::Config.is_virtualliver && params[:organism_ids]
+      organism_ids = params[:organism_ids].split(",")
+      organism_ids.each do |organism_id|
+       default_strains = Strain.find_all_by_title_and_organism_id "default", organism_id
+       default_strains.each do |default_strain|
+         strains << default_strain
+         specimens_with_default_strain = default_strain.specimens.select(&:can_view?)
+         specimens_of_strains |= specimens_with_default_strain
+       end
       end
     end
 
@@ -187,33 +168,38 @@ class BiosamplesController < ApplicationController
   end
 
   def new_strain
-      strain = Strain.new()
+      strain = Strain.new
+      # to delete id hash which is saved in the hidden id field (automatically generated in form with fields_for)
+     # try_block {
+        #delete id hashes of genotypes/phenotypes
+        params[:strain][:genotypes_attributes].try(:delete, "id")
+        params[:strain][:phenotypes_attributes].try(:delete, "id")
+        #delete id hashes of gene_attributes/modification_attributes
+        params[:strain][:genotypes_attributes].try(:each) do |genotype_key,genotype_value|
+
+          genotype_value.delete_if { |k, v| k=="id" }
+          #delete if,e.g. "0"=>{"_destroy"=>0} for genotypes
+          params[:strain][:genotypes_attributes].delete(genotype_key) if genotype_value.keys == ["_destroy"]
+
+          genotype_value[:gene_attributes].try(:delete_if) { |k, v| k=="id"}
+          genotype_value[:modification_attributes].try(:delete_if) { |k, v| k=="id"}
+
+          #delete if,e.g. "0"=>{"_destroy"=>0}  for gene_attributes/modification_attributes (which means new genes/modifications with empty title), this must be done after the id hashes are deleted!!!
+          genotype_value.delete("gene_attributes") if genotype_value[:gene_attributes].try(:keys) == ["_destroy"]
+          genotype_value.delete("modification_attributes") if genotype_value[:modification_attributes].try(:keys) == ["_destroy"]
+        end
+        params[:strain][:phenotypes_attributes].try(:each) do |key, value|
+          value.delete_if { |k, v| k=="id" }
+          #delete if ,e.g. "0"=>{"_destroy"=>0} for phenotypes
+          params[:strain][:phenotypes_attributes].delete(key) if value.keys== ["_destroy"]
+        end
+     # }
+
+
+
       strain.attributes = params[:strain]
 
-      #phenotypes
-      phenotypes_params = params["phenotypes"]
-      phenotype_description = []
-      unless phenotypes_params.blank?
-        phenotypes_params.each_value do |value|
-          phenotype_description << value["description"] unless value["description"].blank?
-        end
-      end
-      phenotype_description.each do |description|
-        strain.phenotypes << Phenotype.new(:description => description)
-      end
 
-      #genotype
-      genotypes_params = params["genotypes"]
-      unless genotypes_params.blank?
-        genotypes_params.each_value do |value|
-          genotype = Genotype.new()
-          gene = Gene.find_by_title(value['gene']['title']) || (Gene.new(:title => value['gene']['title']) unless value['gene']['title'].blank?)
-          modification = Modification.find_by_title(value['modification']['title']) || (Modification.new(:title => value['modification']['title']) unless value['modification']['title'].blank?)
-          genotype.gene = gene
-          genotype.modification = modification
-          strain.genotypes << genotype unless gene.blank?
-        end
-      end
       strain
   end
 

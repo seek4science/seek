@@ -130,6 +130,7 @@ class AdminController < ApplicationController
    Seek::Config.set_default_page "models", params[:models]
    Seek::Config.set_default_page "sops", params[:sops]
    Seek::Config.set_default_page "publications", params[:publications]
+   Seek::Config.set_default_page "presentations", params[:presentations]
    Seek::Config.set_default_page "events", params[:events]
    Seek::Config.limit_latest= params[:limit_latest] if only_positive_integer params[:limit_latest], "latest limit"
    update_redirect_to (only_positive_integer params[:limit_latest], 'latest limit'),'pagination'
@@ -150,6 +151,14 @@ class AdminController < ApplicationController
     update_redirect_to update_flag,'others'
   end
 
+  def update_biosamples_renaming
+    update_flag = true
+    Seek::Config.sample_parent_term = params[:sample_parent_term]
+    Seek::Config.specimen_creators = params[:specimen_creators]
+    Seek::Config.specimen_culture_starting_date = params[:specimen_culture_starting_date]
+    Seek::Config.sample_age = params[:sample_age]
+    update_redirect_to update_flag,'biosamples_renaming'
+  end
   def restart_server
     system ("touch #{RAILS_ROOT}/tmp/restart.txt")
     flash[:notice] = 'The server was restarted'

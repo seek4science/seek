@@ -6,9 +6,10 @@ require File.expand_path(File.dirname(__FILE__) + "/../config/environment")
 class Time
   class <<self
     attr_accessor :testing_offset
+    attr_accessor :fake_now
     alias_method :real_now, :now
     def now
-      real_now - testing_offset
+      fake_now || real_now - testing_offset
     end
     alias_method :new, :now
   end
@@ -23,6 +24,15 @@ class Test::Unit::TestCase
       yield
     ensure
       Time.testing_offset = 0
+    end
+  end
+
+  def force_now_is(time)
+    begin
+      Time.fake_now = time
+      yield
+    ensure
+      Time.fake_now = nil
     end
   end
 end

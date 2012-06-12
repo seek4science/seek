@@ -14,21 +14,36 @@ class SamplesController < ApplicationController
     unless @sample.specimen.can_view?
       @sample.specimen = nil
       flash.now[:notice] = "The specimen of the existing sample cannot be viewed, please specify your own specimen! <br/> "
+    else
+      flash.now[:notice] = ""
     end
 
+    @existing_sample.data_file_masters.each do |df|
+       if !df.can_view?
+       flash.now[:notice] << "Some or all data files of the existing sample cannot be viewed, you may specify your own! <br/>"
+        break
+      end
+    end
+    @existing_sample.model_masters.each do |m|
+       if !m.can_view?
+       flash.now[:notice] << "Some or all models of the existing sample cannot be viewed, you may specify your own! <br/>"
+        break
+      end
+    end
     @existing_sample.sop_masters.each do |s|
-       if !s.sop.can_view?
+       if !s.can_view?
        flash.now[:notice] << "Some or all sops of the existing sample cannot be viewed, you may specify your own! <br/>"
         break
       end
     end
+
     render :action=>"new"
 
   end
 
   def new
     @sample = Sample.new
-    @sample.from_new_link = params[:from_new_link]
+    @sample.parent_name = params[:parent_name]
     @sample.from_biosamples = params[:from_biosamples]
     @sample.specimen = Specimen.find_by_id(params[:specimen_id]) || Specimen.new(:creators=>[User.current_user.person])
 
@@ -72,21 +87,30 @@ class SamplesController < ApplicationController
 
     @sample.policy.set_attributes_with_sharing params[:sharing], @sample.projects
 
+    data_file_ids = (params[:sample_data_file_ids].nil?? [] : params[:sample_data_file_ids].reject(&:blank?)) || []
+    model_ids = (params[:sample_model_ids].nil?? [] : params[:sample_model_ids].reject(&:blank?)) || []
+    sop_ids = (params[:sample_sop_ids].nil?? [] : params[:sample_sop_ids].reject(&:blank?)) || []
+
     if @sample.save
       deliver_request_publish_approval params[:sharing], @sample
-        align_sops(@sample.specimen,sops) unless spe
+      @sample.create_or_update_assets data_file_ids, "DataFile"
+      @sample.create_or_update_assets model_ids, "Model"
+      @sample.create_or_update_assets sop_ids, "Sop"
+      
+      align_sops(@sample.specimen,sops) unless spe
 
-        if @sample.from_new_link=="true"
-           render :partial=>"assets/back_to_fancy_parent",:locals=>{:child=>@sample,:parent=>"assay"}
+
+      if @sample.parent_name=="assay"
+        render :partial=>"assets/back_to_fancy_parent", :locals=>{:child=>@sample, :parent_name=>"assay"}
         elsif @sample.from_biosamples=="true"
           render :partial=>"biosamples/back_to_biosamples",:locals=>{:action => 'create', :object=>@sample, :new_specimen => spe ? false : true}
-        else
-          respond_to do |format|
-            flash[:notice] = 'Sample was successfully created.'
-            format.html { redirect_to(@sample) }
-            format.xml  { head :ok }
-          end
+      else
+        respond_to do |format|
+          flash[:notice] = 'Sample was successfully created.'
+          format.html { redirect_to(@sample) }
+          format.xml { head :ok }
         end
+      end
     else
         respond_to do |format|
           format.html { render :action => "new" }
@@ -97,8 +121,13 @@ class SamplesController < ApplicationController
 
 
   def update
+      data_file_ids = (params[:sample_data_file_ids].nil? ? [] : params[:sample_data_file_ids].reject(&:blank?)) || []
+      model_ids = (params[:sample_model_ids].nil? ? [] : params[:sample_model_ids].reject(&:blank?)) || []
+             
       if params[:sample]
         spec = params[:sample].delete(:specimen_attributes) if params[:sample]
+
+      sop_ids = (params[:sample_sop_ids].nil? ? [] : params[:sample_sop_ids].reject(&:blank?)) || []
 
         #other creators gets passed as :specimen as the key due to the way the creators partial works
         spec[:other_creators] = params[:specimen][:other_creators] if params[:specimen]
@@ -123,6 +152,10 @@ class SamplesController < ApplicationController
 
       if @sample.save
         deliver_request_publish_approval params[:sharing], @sample
+          @sample.create_or_update_assets data_file_ids,"DataFile"
+          @sample.create_or_update_assets model_ids,"Model"
+          @sample.create_or_update_assets sop_ids,"Sop"
+          
         align_sops(@sample.specimen, sops)
 
         if @sample.from_biosamples=="true"

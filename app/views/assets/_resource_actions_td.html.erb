@@ -8,6 +8,11 @@
   <%= image_tag_for_key "edit", edit_resource_path(resource), nil, nil, "Edit" -%>
 <% end -%>
 
+
+<% if resource.can_delete? %>
+    <%= image_tag_for_key('destroy', polymorphic_path(resource), nil, { :confirm => "This deletes the #{resource.class.name}. Are you sure?", :method => :delete }, "Delete") -%>
+<% end %>
+
 <!---
 <%= link_to_remote image_tag_for_key("favourite"), :url=>{:controller => "favourites", :action => "add", :id => model_to_drag_id(resource)},
     :before => "Element.show('fav_ajax-loader');Element.show('fav_ajax-loader#{model_to_drag_id(resource)}')",

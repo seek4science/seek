@@ -113,6 +113,16 @@ module Acts
           false
         end
 
+        def touch
+          if changed?
+            super
+          else
+            disable_authorization_checks do
+              super
+            end
+          end
+        end
+
         module ClassMethods
           #does not require can_edit isn't the best name..
           #really the meaning is that changing the listed

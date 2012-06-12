@@ -5,10 +5,24 @@ class Policy < ActiveRecord::Base
            :order => "created_at ASC",
            :autosave => true,
            :after_add => proc {|policy, perm| perm.policy = policy}
-  
-  validates_presence_of :sharing_scope, :access_type
 
-  validates_numericality_of :sharing_scope, :access_type
+  before_save :update_timestamp_if_permissions_change
+
+  def update_timestamp_if_permissions_change
+    update_timestamp if changed_for_autosave?
+  end
+
+  #basically the same as validates_numericality_of :sharing_scope, :access_type
+  #but with a more generic error message because our users don't know what
+  #sharing_scope and access_type are.
+  validates_each(:sharing_scope, :access_type) do |record, attr, value|
+    raw_value = record.send("#{attr}_before_type_cast") || value
+    begin
+      Kernel.Float(raw_value)
+    rescue ArgumentError, TypeError
+      record.errors.add_to_base "Sharing policy is invalid" unless value.is_a? Integer
+    end
+  end
   
   alias_attribute :title, :name
 
@@ -77,6 +91,22 @@ class Policy < ActiveRecord::Base
     return policy
   end
 
+  def self.new_from_email(resource, recipients, accessors)
+    policy = resource.build_policy(:name               => 'auto',
+                                   :sharing_scope      => Policy::PRIVATE,
+                                   :access_type        => Policy::NO_ACCESS)
+    recipients.each do |id|
+      policy.permissions.build :contributor_type => "Person", :contributor_id => id, :access_type => Policy::EDITING
+    end if recipients
+
+    accessors.each do |id|
+      policy.permissions.build :contributor_type => "Person", :contributor_id => id, :access_type => Policy::ACCESSIBLE
+    end if accessors
+
+    return policy
+  end
+
+
   def set_attributes_with_sharing sharing, projects
     # if no data about sharing is given, it should be some user (not the owner!)
     # who is editing the asset - no need to do anything with policy / permissions: return success
@@ -93,8 +123,8 @@ class Policy < ActiveRecord::Base
 
         # read the permission data from sharing
         unless sharing[:permissions].blank? or sharing[:permissions][:contributor_types].blank?
-          contributor_types = ActiveSupport::JSON.decode(sharing[:permissions][:contributor_types])
-          new_permission_data = ActiveSupport::JSON.decode(sharing[:permissions][:values])
+          contributor_types = ActiveSupport::JSON.decode(sharing[:permissions][:contributor_types]) || []
+          new_permission_data = ActiveSupport::JSON.decode(sharing[:permissions][:values]) || {}
         else
           contributor_types = []
           new_permission_data = {}

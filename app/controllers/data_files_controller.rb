@@ -9,43 +9,34 @@ class DataFilesController < ApplicationController
   include MimeTypesHelper  
   include DotGenerator  
   include Seek::AssetsCommon
+  include AssetsCommonExtension
   include Seek::AnnotationCommon
 
   #before_filter :login_required
   
   before_filter :find_assets, :only => [ :index ]
-  before_filter :find_and_auth, :except => [ :index, :new, :upload_for_tool, :create, :request_resource, :preview, :test_asset_url, :update_annotations_ajax]
+  before_filter :find_and_auth, :except => [ :index, :new, :upload_for_tool, :upload_from_email, :create, :request_resource, :preview, :test_asset_url, :update_annotations_ajax]
   before_filter :find_display_asset, :only=>[:show,:download,:explore,:matching_models]
+  skip_before_filter :verify_authenticity_token, :only => [:upload_for_tool, :upload_from_email]
+  before_filter :xml_login_only, :only => [:upload_for_tool, :upload_from_email]
 
   #has to come after the other filters
   include Seek::Publishing
 
   def convert_to_presentation
     @data_file = DataFile.find params[:id]
-    @presentation = @data_file.convert_to_presentation
-
-   saved = nil
-    if current_user.admin? or @data_file.can_delete?
-      disable_authorization_checks {
-        saved = @presentation.save
-      }
-    end
+    @presentation = @data_file.to_presentation!
 
     respond_to do |format|
 
-      if saved
+      if !@presentation.new_record?
         disable_authorization_checks do
-          # update attributions
-          Relationship.create_or_update_attributions(@presentation, @data_file.attributions_objects.collect { |a| [a.class.name, a.id] })
-
-          # update related publications
-          Relationship.create_or_update_attributions(@presentation, @data_file.related_publications.collect { |p| ["Publication", p.id.to_json] }, Relationship::RELATED_TO_PUBLICATION) unless @data_file.related_publications.blank?
-
+          # first reload all associations which are already assigned to the presentation. Otherwise, all associations will be destroyed when data file is destroyed
+          @data_file.reload
           @data_file.destroy
-
-          flash[:notice]="Data File '#{@presentation.title}' is successfully converted to Presentation"
-          format.html { redirect_to presentation_path(@presentation) }
         end
+        flash[:notice]="Data File '#{@presentation.title}' is successfully converted to Presentation"
+        format.html { redirect_to presentation_path(@presentation) }
       else
         flash[:error] = "Data File failed to convert to Presentation!!"
         format.html {
@@ -66,21 +57,27 @@ class DataFilesController < ApplicationController
   def new_version
     if (handle_data nil)          
       comments=params[:revision_comment]
-      @data_file.content_blob = ContentBlob.new(:tmp_io_object => @tmp_io_object, :url=>@data_url)      
-      @data_file.content_type = params[:data_file][:content_type]
-      @data_file.original_filename=params[:data_file][:original_filename]
+
       factors = @data_file.studied_factors
       respond_to do |format|
         if @data_file.save_as_new_version(comments)
+          create_content_blobs
           #Duplicate studied factors
           factors.each do |f|
             new_f = f.clone
             new_f.data_file_version = @data_file.version
             new_f.save
           end
-          flash[:notice]="New version uploaded - now on version #{@data_file.version}"
+          flash[:notice] = "New version uploaded - now on version #{@data_file.version}"
+          if @data_file.is_with_sample?
+            bio_samples = @data_file.bio_samples_population
+            unless bio_samples.instance_values["errors"].blank?
+              flash[:error] = "Warning: sample database population is not completely successful.<br/>"
+              flash[:error] << bio_samples.instance_values["errors"].html_safe
+            end
+          end
         else
-          flash[:error]="Unable to save new version"          
+          flash[:error] = "Unable to save new version"
         end
         format.html {redirect_to @data_file }
       end
@@ -104,6 +101,9 @@ class DataFilesController < ApplicationController
   
   def new
     @data_file = DataFile.new
+    @data_file.parent_name = params[:parent_name]
+    @data_file.is_with_sample= params[:is_with_sample]
+    @page_title = params[:page_title]
     respond_to do |format|
       if current_user.person.member?
         format.html # new.html.erb
@@ -120,12 +120,12 @@ class DataFilesController < ApplicationController
       params[:data_file][:project_ids] = [params[:data_file].delete(:project_id)] if params[:data_file][:project_id]
       @data_file = DataFile.new params[:data_file]
 
-      @data_file.content_blob = ContentBlob.new :tmp_io_object => @tmp_io_object, :url=>@data_url
+      #@data_file.content_blob = ContentBlob.new :tmp_io_object => @tmp_io_object, :url=>@data_url
       Policy.new_for_upload_tool(@data_file, params[:recipient_id])
 
       if @data_file.save
         @data_file.creators = [current_user.person]
-
+        create_content_blobs
         #send email to the file uploader and receiver
         Mailer.deliver_file_uploaded(current_user,Person.find(params[:recipient_id]),@data_file,base_host)
 
@@ -137,49 +137,89 @@ class DataFilesController < ApplicationController
       end
     end
   end
+
+  def upload_from_email
+    if current_user.is_admin? && Seek::Config.admin_impersonation_enabled
+      User.with_current_user Person.find(params[:sender_id]).user do
+        if handle_data
+          @data_file = DataFile.new params[:data_file]
+
+          Policy.new_from_email(@data_file, params[:recipient_ids], params[:cc_ids])
+
+          if @data_file.save
+            @data_file.creators = [User.current_user.person]
+            create_content_blobs
+
+            flash.now[:notice] ="Data file was successfully uploaded and saved." if flash.now[:notice].nil?
+            render :text => flash.now[:notice]
+          else
+            errors = (@data_file.errors.map { |e| e.join(" ") }.join("\n"))
+            render :text => errors, :status => 500
+          end
+        end
+      end
+    else
+      render :text => "This user is not permitted to act on behalf of other users", :status => :forbidden
+    end
+  end
   
   def create
     if handle_data
       
       @data_file = DataFile.new params[:data_file]
-      @data_file.content_blob = ContentBlob.new :tmp_io_object => @tmp_io_object, :url=>@data_url
+      #@data_file.content_blob = ContentBlob.new :tmp_io_object => @tmp_io_object, :url=>@data_url
 
-     update_annotations @data_file
 
       @data_file.policy.set_attributes_with_sharing params[:sharing], @data_file.projects
 
       assay_ids = params[:assay_ids] || []
-      respond_to do |format|
+
         if @data_file.save
+          update_annotations @data_file
+
+          create_content_blobs
+
           # update attributions
           Relationship.create_or_update_attributions(@data_file, params[:attributions])
-          
+
           # update related publications
-          Relationship.create_or_update_attributions(@data_file, params[:related_publication_ids].collect {|i| ["Publication", i.split(",").first]}, Relationship::RELATED_TO_PUBLICATION) unless params[:related_publication_ids].nil?
-          
+          Relationship.create_or_update_attributions(@data_file, params[:related_publication_ids].collect { |i| ["Publication", i.split(",").first] }, Relationship::RELATED_TO_PUBLICATION) unless params[:related_publication_ids].nil?
+
           #Add creators
           AssetsCreator.add_or_update_creator_list(@data_file, params[:creators])
-
-          flash.now[:notice] = 'Data file was successfully uploaded and saved.' if flash.now[:notice].nil?
-          format.html { redirect_to data_file_path(@data_file) }
-
-
-          assay_ids.each do |text|
-            a_id, r_type = text.split(",")
-            @assay = Assay.find(a_id)
-            if @assay.can_edit?
-              @assay.relate(@data_file, RelationshipType.find_by_title(r_type))
+          if @data_file.parent_name=="assay"
+            render :partial=>"assets/back_to_fancy_parent", :locals=>{:child=>@data_file, :parent_name=>@data_file.parent_name,:is_not_fancy=>true}
+          else
+            respond_to do |format|
+              flash[:notice] = 'Data file was successfully uploaded and saved.' if flash.now[:notice].nil?
+              #parse the data file if it is with sample data
+              if @data_file.is_with_sample
+                bio_samples = @data_file.bio_samples_population
+                unless  bio_samples.instance_values["errors"].blank?
+                  flash[:error] = "Warning: Sample database population is not completely successful.<br/>"
+                  flash[:error] << bio_samples.instance_values["errors"].html_safe
+                end
+              end
+              assay_ids.each do |text|
+                a_id, r_type = text.split(",")
+                @assay = Assay.find(a_id)
+                if @assay.can_edit?
+                  @assay.relate(@data_file, RelationshipType.find_by_title(r_type))
+                end
+              end
+              format.html { redirect_to data_file_path(@data_file) }
             end
           end
 
           deliver_request_publish_approval params[:sharing], @data_file
 
         else
+          respond_to do |format|
           format.html {
             render :action => "new"
           }
+          end
         end
-      end   
     end
   end
   
@@ -346,6 +386,16 @@ end
     end
   end
 
+  def clear_population bio_samples
+      specimens = Specimen.find_all_by_title bio_samples.instance_values["specimen_names"].values
+      samples = Sample.find_all_by_title bio_samples.instance_values["sample_names"].values
+      samples.each do |s|
+        s.assays.clear
+        s.destroy
+      end
+      specimens.each &:destroy
+  end
+  
   def matching_models
     #FIXME: should use the correct version
     matching_models = @data_file.matching_models
@@ -373,6 +423,13 @@ end
     action="download" if action=="data"
     action="view" if ["matching_models"].include?(action)
     super action
+  end
+
+  def xml_login_only
+    unless session[:xml_login]
+      flash[:error] = "Only available when logged in via xml"
+      redirect_to root_url
+    end
   end
 
 end

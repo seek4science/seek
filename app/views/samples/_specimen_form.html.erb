@@ -1,8 +1,12 @@
-<h2><%= CELL_CULTURE_OR_SPECIMEN.capitalize -%> details</h2>
+<%
+   all_institutions = Institution.find(:all,:order=>:name)
+
+%>
+<h2><%= Seek::Config.sample_parent_term.capitalize -%> details</h2>
 
 <% f.fields_for :specimen do |specimen_f| %>
     <p>
-        <%= specimen_f.label "#{CELL_CULTURE_OR_SPECIMEN.capitalize} title:"-%><span class="required">*</span><br/>
+        <%= specimen_f.label "#{Seek::Config.sample_parent_term.capitalize} title:"-%><span class="required">*</span><br/>
         <%= specimen_f.text_field :title, :style=>"width:350px;" -%>
     </p>
 
@@ -10,7 +14,18 @@
         <%= specimen_f.label "Lab internal identifier:" -%> <span class="required">*</span><br/>
         <%= specimen_f.text_field :lab_internal_number, :style=>"width:350px;" -%>
     </p>
+    <p>
+      <%= specimen_f.label "Institution:" -%>
 
+                  <span class="required">
+                    <% if Seek::Config.is_virtualliver %>
+                    *
+                    <% end %>
+                  </span><br/>
+
+      <%= specimen_f.select :institution_id,
+                            options_for_select([["Please Select ...", 0]]|all_institutions.collect{|o| [h(o.name), o.id]}, current_user.try(:person).try(:projects).try(:first).try(:institution_ids).try(:first)),{},:style=>"width:350px;"%>
+    </p>
     <p>
         <%= specimen_f.label "Culture starting date:" -%> <br/>
         <%= specimen_f.calendar_date_select :born, :time => "mixed", :style=>"width:350px;" -%>
@@ -37,7 +52,7 @@
     </p>
 
     <p>
-        <%= specimen_f.label "Provider's #{CELL_CULTURE_OR_SPECIMEN} identifier:" -%> <br/>
+        <%= specimen_f.label "Provider's #{Seek::Config.sample_parent_term} identifier:" -%> <br/>
         <%= specimen_f.text_field :provider_id, :style=>"width:350px;" -%>
     </p>
 
@@ -56,7 +71,14 @@
                               strains,:id,:info,:include_blank=>"Not specified" -%>
       </div>
     </p>
+    <% if Seek::Config.is_virtualliver %>
+        <div class="yui-g" style="width:700px;">
+          <%= specimen_f.label "Genotypes and Phenotypes:" -%>
+          <%= render :partial => "biosamples/genotype_form", :locals => {:item => specimen,:f=>specimen_f,:parent_name=>"sample[specimen_attributes]",:action=>action.to_s} %>
+          <%= render :partial => "biosamples/phenotype_form", :locals => {:item => specimen,:f=>specimen_f,:parent_name=>"sample[specimen_attributes]",:action=>action.to_s} %>
+         </div>
 
+    <% end %>
     <br/>
 
     <%= fancy_multiselect specimen, :sops, {:name => 'specimen_sop_ids',:association_class=>Sop, :selected => specimen.sop_masters.map(&:sop_id), :hidden=> specimen.sops.blank? ? true : false, :other_projects_checkbox => true} %>

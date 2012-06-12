@@ -280,6 +280,10 @@ module ImagesHelper
         "famfamfam_silk/email_add.png"
       when 'presentation_avatar','presentation','presentations'
         "misc_icons/1315482798_presentation-slides.png"
+      when 'endnote'
+        "famfamfam_silk/script_go.png"
+      when 'cytoscape_web'
+        "famfamfam_silk/chart_line.png"
       when "graph"
         "famfamfam_silk/chart_line.png"
       when "project_manager"
@@ -393,7 +397,18 @@ module ImagesHelper
     
     return basic_url
   end
-  
+
+    def model_image_url(model_instance, model_image_id, size=nil)
+    basic_url = eval("model_model_image_path(#{model_instance.id}, #{model_image_id})")
+
+    if size
+      basic_url += "?size=#{size}"
+      basic_url += "x#{size}" if size.kind_of?(Numeric)
+    end
+
+    return basic_url
+    end
+
   def default_avatar(object_class_name, size=200, alt="Anonymous", onclick_options="")
     avatar_filename=icon_filename_for_key("#{object_class_name.downcase}_avatar")
     

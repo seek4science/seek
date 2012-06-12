@@ -18,7 +18,7 @@
 -%>
 
 <div class="contribution_title">
-  <h1>Browse organisms, strains, cell cultures and samples</h1>
+     <h1>Browse organisms, strains, <%= Seek::Config.sample_parent_term%>s and samples</h1>
 </div>
 
 <br/>
@@ -30,22 +30,37 @@
     <p class="none_text">Please select the organisms to browse the associated strains</p>
     <%= select_tag "strain[organism_ids]",
                    options_for_select([["Select Organisms ...", 0]]|all_organisms.collect { |o| [truncate(h(o.title), :length => select_truncate_length), o.id] }, :selected => default_selected_organisms),
-                   {:onchange => remote_function(:url => {:action => "existing_strains", :controller => "biosamples"},
-                                                 :with => "'organism_ids='+$F('strain_organism_ids')",
-                                                 :before => "show_ajax_loader('existing_strains')")+ ";check_show_existing_strains('strain_organism_ids', 'existing_strains', '');hide_existing_specimens();
-                                             hide_existing_samples();return(false);",
+                 {:onchange=> organism_selection_onchange_function,
                     :multiple => true, :size => 15, :style => "width:30em"} -%>
 
   </div>
 </div>
-<div id="existing_strains"></div>
-<div id="existing_specimens"></div>
-<div id="existing_samples"></div>
+  
+  <div id="existing_strains">
+    <div id="existing_strains_spinner">
+        <center>
+          <%= image_tag "ajax-loader-large.gif" -%>
+        </center>
+    </div>
+  </div>
+  <div id="existing_specimens">
+    <% if Seek::Config.is_virtualliver %>
+    <div id="existing_specimens_spinner" style="width: 48%;margin-left: 0.5em;">
+          <center>
+            <%= image_tag "ajax-loader-large.gif" -%>
+          </center>
+     </div>
+    <% end %>
+  </div>
+  <div id="existing_samples"></div>
 
 
 <script type="text/javascript">
     var organism = new Array();
-    check_show_existing_strains('strain_organism_ids', 'existing_strains', '<%=url_for(:controller => 'biosamples', :action => 'existing_strains')-%>');
+    check_show_existing_items('strain_organism_ids', 'existing_strains', '<%=url_for(:controller => 'biosamples', :action => 'existing_strains')-%>');
+    if(<%= Seek::Config.is_virtualliver%>){
+        check_show_existing_items('strain_organism_ids', 'existing_specimens', '<%=url_for(:controller => 'biosamples', :action => 'existing_specimens')-%>');
+    }
 
     function updatePublicSharing(alert_message){
        /*do nothing*/
@@ -110,7 +125,7 @@
                 }
                 //if the first column is updated, refresh the table
                 else {
-                    check_show_existing_strains('strain_organism_ids', 'existing_strains', '<%=url_for(:controller => 'biosamples', :action => 'existing_strains')-%>');
+                    check_show_existing_items('strain_organism_ids', 'existing_strains', '<%=url_for(:controller => 'biosamples', :action => 'existing_strains')-%>');
                     hide_existing_specimens();
                     hide_existing_samples();
                     break;
@@ -180,15 +195,15 @@
                 }
             }
             else {
-                check_show_existing_strains('strain_organism_ids', 'existing_strains', '<%=url_for(:controller => 'biosamples', :action => 'existing_strains')-%>');
+               check_show_existing_items('strain_organism_ids', 'existing_strains', '<%=url_for(:controller => 'biosamples', :action => 'existing_strains')-%>');
             }
         }
         else {
-            check_show_existing_strains('strain_organism_ids', 'existing_strains', '<%=url_for(:controller => 'biosamples', :action => 'existing_strains')-%>');
+            check_show_existing_items('strain_organism_ids', 'existing_strains', '<%=url_for(:controller => 'biosamples', :action => 'existing_strains')-%>');
         }
     }
 
-    function loadNewSpecimenAfterCreation(specimen, strain_id) {
+    function loadNewSpecimenAfterCreation(specimen, strain_id,is_dummy_strain) {
         if (specimen_table.length > 0) {
             var data = specimen_table.fnGetData();
             if (data.length > 0) {
@@ -209,7 +224,9 @@
                 show_existing_specimens();
             }
         } else {
-        <%=remote_function(:url => {:controller => 'biosamples', :action => 'existing_specimens'}, :with => "'strain_ids=' + getSelectedStrains()");%>
+       
+        if(getSelectedStrains().include(strain_id) || is_dummy_strain=="true" ) {
+            <%=remote_function(:url => {:controller => 'biosamples', :action => 'existing_specimens'}, :with => "'strain_ids=' + getSelectedStrains()+ '&organism_ids='+$F('strain_organism_ids')");%>
             show_existing_specimens();
         }
     }
@@ -229,19 +246,17 @@
         var creators = '';
         var creators_arr = new Array();
 
-        for (var i = 0; i < creator_settings.length; i++) {
-            creator_name = creator_settings[i][0];
-            creator_email = creator_settings[i][1];
-            creator_id = creator_settings[i][2];
-            creator_email_text = "";
-            if (<%= hide_contact_details? -%> == "true"
-        )
-            {
-                creator_email_text = ': ' + creator_email
-            }
-            creators += '<b>' + creator_name + '</b>' + creator_email_text
-                    + '&nbsp;&nbsp;&nbsp;<small style="vertical-align: middle;">'
-                    + '[<a href="" onclick="javascript:deleteCreator(\'' + creator_name + '\', ' + creator_id + '); return(false);">remove</a>]</small><br/>';
+    for(var i = 0; i < creator_settings.length; i++) {
+        creator_name = creator_settings[i][0];
+        creator_email = creator_settings[i][1];
+        creator_id = creator_settings[i][2];
+        creator_email_text = "";
+        if (<%= hide_contact_details? -%> == "true") {
+          creator_email_text = ': ' + creator_email
+        }
+        creators += '<b>' + creator_name + '</b>' + creator_email_text
+        + '&nbsp;&nbsp;&nbsp;<small style="vertical-align: middle;">'
+        + '[<a href="" onclick="javascript:deleteCreator(\''+ creator_name +'\', '+ creator_id +'); return(false);">remove</a>]</small><br/>';
 
             creators_arr.push([creator_name, creator_id]);
         }

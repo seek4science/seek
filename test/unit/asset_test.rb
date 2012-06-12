@@ -165,5 +165,23 @@ class AssetTest < ActiveSupport::TestCase
     assert_equal ["java","trowel"],p.tags_as_text_array.sort
   end
 
+  test "related people" do
+    df = Factory :data_file
+    sop = Factory :sop
+    model = Factory :model
+    presentation = Factory :presentation
+    publication = Factory :publication
+    df.creators = [Factory(:person),Factory(:person)]
+    sop.creators = [Factory(:person),Factory(:person)]
+    model.creators = [Factory(:person),Factory(:person)]
+    presentation.creators = [Factory(:person),Factory(:person)]
+    publication.creators = [Factory(:person),Factory(:person)]
+
+    assert_equal df.creators,df.related_people
+    assert_equal sop.creators,sop.related_people
+    assert_equal model.creators,model.related_people
+    assert_equal presentation.creators,presentation.related_people
+    assert_equal publication.creators,publication.related_people
+  end
 
 end

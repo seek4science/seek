@@ -1,35 +1,70 @@
-class ModelsController < ApplicationController    
-  
+ require 'zip/zip'
+ require 'zip/zipfilesystem'
+ require 'libxml'
+class ModelsController < ApplicationController
+
   include WhiteListHelper
   include IndexPager
   include DotGenerator
   include Seek::AssetsCommon
-  
+  include AssetsCommonExtension
+
   before_filter :pal_or_admin_required,:only=> [:create_model_metadata,:update_model_metadata,:delete_model_metadata ]
   
   before_filter :find_assets, :only => [ :index ]
   before_filter :find_and_auth, :except => [ :build,:index, :new, :create,:create_model_metadata,:update_model_metadata,:delete_model_metadata,:request_resource,:preview,:test_asset_url, :update_annotations_ajax]
-  before_filter :find_display_asset, :only=>[:show,:download,:execute,:builder,:simulate,:submit_to_jws,:matching_data]
+  before_filter :find_display_asset, :only=>[:show,:download,:execute,:builder,:simulate,:submit_to_jws,:matching_data,:visualise,:export_as_xgmml]
     
   before_filter :jws_enabled,:only=>[:builder,:simulate,:submit_to_jws]
 
   include Seek::Publishing
 
   @@model_builder = Seek::JWS::Builder.new
-  
+
+
+  def export_as_xgmml
+      type =  params[:type]
+      body = @_request.body.read
+      orig_doc = find_xgmml_doc @display_model
+      head = orig_doc.to_s.split("<graph").first
+      xgmml_doc = head + body
+
+      xgmml_file =  "model_#{@model.id}_version_#{@display_model.version}_export.xgmml"
+      tmp_file= Tempfile.new("#{xgmml_file}","#{RAILS_ROOT}/tmp/")
+      File.open(tmp_file.path,"w") do |tmp|
+        tmp.write xgmml_doc
+      end
+
+      send_file tmp_file.path, :type=>"#{type}", :disposition=>'attachment',:filename=>xgmml_file
+      tmp_file.close
+  end
+  def visualise
+     # for xgmml file
+     doc = find_xgmml_doc @display_model
+     # convert " to \" and newline to \n
+     #e.g.  "... <att type=\"string\" name=\"canonicalName\" value=\"CHEMBL178301\"/>\n ...  "
+    @graph = %Q("#{doc.root.to_s.gsub(/"/, '\"').gsub!("\n",'\n')}")
+    render :cytoscape_web,:layout => false
+  end
+  def send_image
+    @model = Model.find params[:id]
+    @display_model = @model.find_version params[:version]
+    image = @display_model.model_image
+      send_file "#{image.file_path  }", :type=>"JPEG", :disposition=>'inline'
+
+  end
+
   # GET /models
   # GET /models.xml
   
   def new_version
-    if (handle_data nil)
+    if (handle_batch_data nil)
       
       comments = params[:revision_comment]
-      @model.content_blob = ContentBlob.new(:tmp_io_object => @tmp_io_object, :url=>@data_url)
-      @model.content_type = params[:model][:content_type]
-      @model.original_filename = params[:model][:original_filename]
-      
+
       respond_to do |format|
-        create_new_version comments
+        create_new_version  comments
+        create_content_blobs
         format.html {redirect_to @model }
       end
     else
@@ -66,7 +101,7 @@ class ModelsController < ApplicationController
     
     respond_to do |format|
       if error
-        flash.now[:error]="JWS Online encountered a problem processing this model."
+        flash[:error]="JWS Online encountered a problem processing this model."
         format.html { redirect_to model_path(@model,:version=>@display_model.version)}
       elsif !supported
         flash[:error]="This model is of neither SBML or JWS Online (Dat) format so cannot be used with JWS Online"
@@ -80,6 +115,7 @@ class ModelsController < ApplicationController
   def submit_to_jws
     following_action=params.delete("following_action")    
     error=nil
+    content_blob = @model.content_blob
     begin
       if following_action == "annotate"
         @params_hash,@attribution_annotations,@species_annotations,@reaction_annotations,@search_results,@cached_annotations,@saved_file,@error_keys = Seek::JWS::Annotator.new.annotate params
@@ -105,17 +141,17 @@ class ModelsController < ApplicationController
           downloader=Seek::RemoteDownloader.new
           data_hash = downloader.get_remote_data url
           File.open(data_hash[:data_tmp_path],"r") do |f|
-            @model.content_blob=ContentBlob.new(:data=>f.read)
+            content_blob = @model.content_blobs.build(:data=>f.read)
           end
-          @model.content_type=model_format=="sbml" ? "text/xml" : "text/plain"
-          @model.original_filename=new_version_filename
+          content_blob.content_type=model_format=="sbml" ? "text/xml" : "text/plain"
+          content_blob.original_filename=new_version_filename
         end
       end
     end
 
     respond_to do |format|
       if error
-        flash.now[:error]="JWS Online encountered a problem processing this model."
+        flash[:error]="JWS Online encountered a problem processing this model."
         format.html { render :action=>"builder" }
       elsif @error_keys.empty? && following_action == "simulate"
         @modelname=@saved_file
@@ -124,6 +160,8 @@ class ModelsController < ApplicationController
         format.html {render :action=>"annotator"}
       elsif @error_keys.empty? && following_action == "save_new_version"
         create_new_version(new_version_comments)
+        content_blob.asset_version = @model.version
+        content_blob.save!
         format.html {redirect_to  model_path(@model,:version=>@model.version) }
       else
         format.html { render :action=>"builder" }
@@ -366,7 +404,8 @@ class ModelsController < ApplicationController
   def show
     # store timestamp of the previous last usage
     @last_used_before_now = @model.last_used_at
-    
+
+
     # update timestamp in the current Model record
     # (this will also trigger timestamp update in the corresponding Asset)
     @model.last_used_at = Time.now
@@ -385,6 +424,7 @@ class ModelsController < ApplicationController
   # GET /models/new.xml
   def new    
     @model=Model.new
+    @content_blob= ContentBlob.new
     respond_to do |format|
       if current_user.person.member?
         format.html # new.html.erb
@@ -397,22 +437,24 @@ class ModelsController < ApplicationController
   
   # GET /models/1/edit
   def edit
-    
+
   end
   
   # POST /models
   # POST /models.xml
-  def create    
-    if handle_data
+  def create
+    if handle_batch_data
       @model = Model.new(params[:model])
-      @model.content_blob = ContentBlob.new(:tmp_io_object => @tmp_io_object,:url=>@data_url)
 
       @model.policy.set_attributes_with_sharing params[:sharing], @model.projects
 
       update_annotations @model
+      build_model_image @model,params[:model_image]
       assay_ids = params[:assay_ids] || []
       respond_to do |format|
         if @model.save
+
+          create_content_blobs
           # update attributions
           Relationship.create_or_update_attributions(@model, params[:attributions])
           
@@ -439,75 +481,88 @@ class ModelsController < ApplicationController
     end
     
   end
-  
+
   # GET /models/1/download
   def download
     # update timestamp in the current Model record
     # (this will also trigger timestamp update in the corresponding Asset)
     @model.last_used_at = Time.now
     @model.save_without_timestamping    
-    
-    handle_download @display_model
+
+    if @display_model.content_blobs.count==1 and @display_model.model_image.nil?
+       handle_download @display_model
+    else
+      handle_download_zip @display_model
+    end
+
   end
-  
+
+  def download_one_file
+    content_blob = ContentBlob.find params[:id]
+    if File.file? content_blob.filepath
+      send_file content_blob.filepath, :type=>content_blob.content_type, :disposition => 'attachment'
+    else
+      download_via_url @display_model
+    end
+  end
   # PUT /models/1
   # PUT /models/1.xml
   def update
     # remove protected columns (including a "link" to content blob - actual data cannot be updated!)
-    if params[:model]
-      [:contributor_id, :contributor_type, :original_filename, :content_type, :content_blob_id, :created_at, :updated_at, :last_used_at].each do |column_name|
-        params[:model].delete(column_name)
+      if params[:model]
+        [:contributor_id, :contributor_type, :original_filename, :content_type, :content_blob_id, :created_at, :updated_at, :last_used_at].each do |column_name|
+          params[:model].delete(column_name)
+        end
+
+        # update 'last_used_at' timestamp on the Model
+        params[:model][:last_used_at] = Time.now
       end
-      
-      # update 'last_used_at' timestamp on the Model
-      params[:model][:last_used_at] = Time.now
-    end
 
     update_annotations @model
-    publication_params    = params[:related_publication_ids].nil?? [] : params[:related_publication_ids].collect { |i| ["Publication", i.split(",").first]}
+      publication_params    = params[:related_publication_ids].nil?? [] : params[:related_publication_ids].collect { |i| ["Publication", i.split(",").first]}
 
-    @model.attributes = params[:model]
+      @model.attributes = params[:model]
 
-    if params[:sharing]
-      @model.policy_or_default
-      @model.policy.set_attributes_with_sharing params[:sharing], @model.projects
-    end
-
-    assay_ids = params[:assay_ids] || []
-    respond_to do |format|
-      if @model.save
-
-        # update attributions
-        Relationship.create_or_update_attributions(@model, params[:attributions])
-        
-        # update related publications
-        Relationship.create_or_update_attributions(@model,publication_params, Relationship::RELATED_TO_PUBLICATION)
-        
-        #update creators
-        AssetsCreator.add_or_update_creator_list(@model, params[:creators])
-        
-        flash[:notice] = 'Model metadata was successfully updated.'
-        format.html { redirect_to model_path(@model) }
-        # Update new assay_asset
-        Assay.find(assay_ids).each do |assay|
-          if assay.can_edit?
-            assay.relate(@model)
-          end
-        end
-        #Destroy AssayAssets that aren't needed
-        assay_assets = @model.assay_assets
-        assay_assets.each do |assay_asset|
-          if assay_asset.assay.can_edit? and !assay_ids.include?(assay_asset.assay_id.to_s)
-            AssayAsset.destroy(assay_asset.id)
-          end
-        end
-        deliver_request_publish_approval params[:sharing], @model
-      else
-        format.html {
-          render :action => "edit"
-        }
+      if params[:sharing]
+        @model.policy_or_default
+        @model.policy.set_attributes_with_sharing params[:sharing], @model.projects
       end
-    end
+
+      assay_ids = params[:assay_ids] || []
+      respond_to do |format|
+        if @model.save
+
+          # update attributions
+          Relationship.create_or_update_attributions(@model, params[:attributions])
+
+          # update related publications
+          Relationship.create_or_update_attributions(@model,publication_params, Relationship::RELATED_TO_PUBLICATION)
+
+          #update creators
+          AssetsCreator.add_or_update_creator_list(@model, params[:creators])
+
+          flash[:notice] = 'Model metadata was successfully updated.'
+          format.html { redirect_to model_path(@model) }
+          # Update new assay_asset
+          Assay.find(assay_ids).each do |assay|
+            if assay.can_edit?
+              assay.relate(@model)
+            end
+          end
+          #Destroy AssayAssets that aren't needed
+          assay_assets = @model.assay_assets
+          assay_assets.each do |assay_asset|
+            if assay_asset.assay.can_edit? and !assay_ids.include?(assay_asset.assay_id.to_s)
+              AssayAsset.destroy(assay_asset.id)
+            end
+          end
+        deliver_request_publish_approval params[:sharing], @model
+        else
+          format.html {
+            render :action => "edit"
+          }
+        end
+      end
   end
   
   # DELETE /models/1
@@ -520,7 +575,7 @@ class ModelsController < ApplicationController
       format.xml  { head :ok }
     end
   end
-  
+
   def preview
     
     element = params[:element]
@@ -600,5 +655,25 @@ class ModelsController < ApplicationController
       return false
     end
   end
-  
+
+   def build_model_image model_object, params_model_image
+      unless params_model_image.blank? || params_model_image[:image_file].blank?
+
+      # the creation of the new Avatar instance needs to have only one parameter - therefore, the rest should be set separately
+      @model_image = ModelImage.new(params_model_image)
+      @model_image.model_id = model_object.id
+      @model_image.original_content_type = params_model_image[:image_file].content_type
+      @model_image.original_filename = params_model_image[:image_file].original_filename
+      model_object.model_image = @model_image
+    end
+
+   end
+
+    def find_xgmml_doc model
+      xgmml_file = model.is_xgmml?
+      file = open(xgmml_file.filepath)
+      doc = LibXML::XML::Parser.string(file.read).parse
+      doc
+    end
+
 end

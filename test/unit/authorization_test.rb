@@ -754,8 +754,13 @@ class AuthorizationTest < ActiveSupport::TestCase
     User.with_current_user user do
       assert item.can_view?
     end
-    item.policy.permissions << Factory(:permission, :contributor => project, :access_type => Policy::NO_ACCESS, :policy => item.policy)
-                
+
+    User.with_current_user(item.contributor) do
+      sleep 2
+      item.policy.permissions.build Factory.build(:permission, :contributor => project, :access_type => Policy::NO_ACCESS, :policy => item.policy).attributes
+      item.save; item.reload
+    end
+
     User.with_current_user user do
       assert !item.can_view?
     end
@@ -764,7 +769,13 @@ class AuthorizationTest < ActiveSupport::TestCase
     User.with_current_user user do
       assert !item.can_view?
     end
-    item.policy.permissions << Factory(:permission, :contributor => project, :access_type => Policy::VISIBLE, :policy => item.policy)
+
+    User.with_current_user(item.contributor) do
+      sleep 2
+      item.policy.permissions.build Factory.build(:permission, :contributor => project, :access_type => Policy::VISIBLE, :policy => item.policy).attributes
+      item.save; item.reload
+    end
+
     User.with_current_user user do
       assert item.can_view?
     end

@@ -9,7 +9,7 @@ creators = creators.select &:can_view?
 %>
 
 <div style="text-align: center">
-  
+
   <% unless creators.empty? -%>
     <% if creators.size <= 2 %>
       <% creators.each do |a|  -%>

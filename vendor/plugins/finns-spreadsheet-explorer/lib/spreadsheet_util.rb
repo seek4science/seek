@@ -20,7 +20,9 @@ module SpreadsheetUtil
     self.content_type == "application/vnd.excel" ||
     self.content_type == "application/excel" ||
     self.content_type == "application/x-msexcel" ||
-    self.content_type == "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+    self.content_type == "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" ||
+    self.content_type == "application/vnd.ms-excel.sheet.macroEnabled.12" ||
+    self.content_type.try(:include?,"excel")
   end
 
   def spreadsheet_annotations
@@ -153,6 +155,31 @@ module SpreadsheetUtil
       result += (c.ord - 64) * (26 ** (col.length - (i+1)))
     end
     result
+  end
+
+  #the cache file for a given feed url
+  def cached_spreadsheet_path
+    File.join(cached_spreadsheet_dir,"spreadsheet_blob_#{Rails.env}_#{content_blob.id.to_s}.xml")
+  end
+
+  private
+
+  #the directory used to contain the cached spreadsheets
+  def cached_spreadsheet_dir
+    if Rails.env=="test"
+      dir = File.join(Dir.tmpdir,"seek-cache","spreadsheet-xml")
+    else
+      dir = File.join(Rails.root,"tmp","cache","spreadsheet-xml")
+    end
+    FileUtils.mkdir_p dir if !File.exists?(dir)
+    dir
+  end
+
+  #Cache the data file's spreadsheet XML, and returns it
+  def cache_spreadsheet
+    xml = spreadsheet_to_xml(open(content_blob.filepath))
+    File.open(cached_spreadsheet_path, "w") {|f| f.write(xml)}
+    return xml
   end
   
 end

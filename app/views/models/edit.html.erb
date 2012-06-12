@@ -8,7 +8,7 @@
 </ul>
 <h1>Editing Model: <%= link_to(h(@model.title), model_path(@model)) -%></h1>
 <div class="show_basic">
-    <% form_for(@model) do |f| %>
+    <% form_for(@model ,:html => {:multipart => true, :method => :put}) do |f| %>
     <div class="asset_form">
         <%= f.error_messages %>
         <p>
@@ -39,18 +39,25 @@
             <%= render :partial => "organisms/select_organism",:locals=>{:model_class=>Model} -%>
         </p>        
 
-        <%# only the owner should be able to change sharing permissions -%>
+
+
+       <% if @model && (mine?(@model) || @model.can_edit?) -%>
+          <div class="fold">
+            <div class="foldTitle">
+              Model image
+            </div>
+            <div class="foldContent">
+              <%= render :partial => "model_images/image_selector", :locals => {:image_for_instance => @model, :form_instance => f} -%>
+            </div>
+          </div>
+      <% end -%>
+
+
         <% if current_user_authorized_to_manage -%>
 		
-		<%= render :partial=>"assets/asset_form_bottom", :locals=> {
-					:resource_type => "Model",
-					:existing_attributions=>Authorization.authorize_collection("view", @model.attributions_objects, current_user),
-					:existing_creators=>@model.creators,
-					:other_creators=>@model.other_creators,
-					:related_publications=>@model.related_publications
-				} 
-    	-%>
+		<%= render :partial=>"assets/asset_form_bottom", :locals=> { :f => f } -%>
 		<%= render :partial => "assays/associate_assays", :locals=>{:resource => @model, :show_relationships => false} -%>
+        <%= f.fancy_multiselect :samples -%>
 
         <% end -%>
         <p>

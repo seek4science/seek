@@ -74,8 +74,7 @@ class SpreadsheetAnnotationsController < ApplicationController
     end
 
     unless @content_blob.nil?
-      df = DataFile.find_by_content_blob_id(@content_blob.id) ||
-           DataFile::Version.find_by_content_blob_id(@content_blob.id)
+      df = @content_blob.asset
       if !df.can_download?
         flash[:error] = "You are not permitted to annotate this spreadsheet."
         redirect_to data_file_path(df)

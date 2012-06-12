@@ -37,6 +37,13 @@ module Acts #:nodoc:
     end
 
     module InstanceMethods
+
+      def content_type
+          self.content_blob.content_type
+      end
+      def original_filename
+          self.content_blob.original_filename
+      end
       # this method will take attributions' association and return a collection of resources,
       # to which the current resource is attributed
       def attributions_objects

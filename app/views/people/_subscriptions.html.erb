@@ -8,7 +8,16 @@
     Subscriptions
   </div>
   <div class="foldContent">
-    <label><b>Projects:</b></label> <br/>
+    <span class="none_text"> The following projects are subscribed by you, you may click it to view or edit the subscription: </span>
+     <ul id="project_subscription_list">
+      <%   @person.project_subscriptions.each do |ps|  %>
+       <li id="<%= ps.project_id %>_li">
+         <%= link_to_function ps.project.title,"$('select_project_subscription').value = #{ps.project.id};show_project_subscription();$('select_project_subscription').value =0;return false;"%>
+       </li>
+       <% end %>
+     </ul>
+    <br/>
+     <span class="none_text"> You can subscribe other projects: </span> <br/>
     <%= select_tag :select_project_subscription,
                    options_for_select([["Select Project ...", 0]]|projects.collect { |p| [truncate(h(p.title), :length=>select_truncate_length), p.id] }),
                    {:style=>"width:90%",
@@ -33,7 +42,7 @@
                   <%= sub_form.radio_button :frequency, freq %> <%= "#{freq.capitalize}" %>
               <% end %>
               <br/>
-              Subscribe: <%= sub_form.check_box :_destroy, {:checked => !sub_form.object.marked_for_destruction?}, 0, 1 %>
+              Subscribe: <%= sub_form.check_box :_destroy, {:checked => !sub_form.object.marked_for_destruction?,:onclick=>"updateSubscribedProjectsList(this,#{project_subscription.project_id},'#{project_subscription.project.title}');"}, 0, 1 %>
             </p>
           </fieldset>
         </div>
@@ -60,6 +69,29 @@
         var new_project_subscription = "subscription" + $F('select_project_subscription');
         swap_subscription(project_subscription, new_project_subscription);
         project_subscription = new_project_subscription;
+    }
+
+    function updateSubscribedProjectsList(element, project_id, project_title) {
+        var child_id = project_id + '_li';
+        var child = $(child_id);
+        if (element.checked) {
+            if (!child) {
+                child = document.createElement('LI');
+                child.id = child_id;
+                child.onclick = function() {
+                    $('select_project_subscription').value = project_id;
+                    show_project_subscription();
+                    $('select_project_subscription').value = 0;
+                    return false;
+                } ;
+                var child_link = document.createElement('a');
+                child_link.href = "#";
+                child_link.textContent = project_title;
+                child.appendChild(child_link);
+                $('project_subscription_list').appendChild(child);
+            }
+        }else
+         child.remove();
     }
 
 </script>

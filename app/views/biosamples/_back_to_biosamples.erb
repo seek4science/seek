@@ -1,16 +1,17 @@
 <% sample_row = []
    specimen_row = []
    new_specimen ||= false
-   strain_id=nil
    if object.kind_of?(Sample)
     sample_row = sample_row_data(object)
     specimen_row = specimen_row_data(object.specimen)
-    strain_id = object.specimen.strain.try(:id)
+    strain = object.specimen.strain
    elsif object.kind_of?(Specimen)
      specimen_row = specimen_row_data(object)
-     strain_id = object.strain.try(:id)
+     strain = object.strain
    end
-    %>
+   strain_id = strain.try(:id)
+   id_column = Seek::Config.is_virtualliver ? 8 : 6
+ %>
 
 <script type="text/javascript">
   /* submit and close Popup window for creating/updating sample/specimen after clicking create/update link from biosamples page.
@@ -32,16 +33,16 @@
     <%end%>
 
     if (action == 'create' && object_class == 'sample' && "<%=new_specimen%>" == "true" ){
-        window.opener.loadNewSpecimenAfterCreation(specimen_row, '<%=strain_id%>');
+        window.opener.loadNewSpecimenAfterCreation(specimen_row, '<%=strain_id%>','<%=strain.is_dummy%>');
     }else if (action == 'create' && object_class == 'sample' && "<%=new_specimen%>" == "false"){
         window.opener.loadNewSampleAfterCreation(sample_row);
     }else if (action == 'create' && object_class == 'specimen' ){
-        window.opener.loadNewSpecimenAfterCreation(specimen_row,'<%=strain_id%>');
+        window.opener.loadNewSpecimenAfterCreation(specimen_row,'<%=strain_id%>','<%=strain.is_dummy%>');
     }else if (action == 'update' && object_class == 'sample'){
-        window.opener.updateSpecimenRow(specimen_row, 6);
+        window.opener.updateSpecimenRow(specimen_row, <%= id_column%>);
         window.opener.updateSampleRow(sample_row, 6);
     }else if (action == 'update' && object_class == 'specimen'){
-        window.opener.updateSpecimenRow( specimen_row, 6);
+        window.opener.updateSpecimenRow( specimen_row,<%= id_column%>);
     }
     alert("New item was " + action + "d!");
     window.close();

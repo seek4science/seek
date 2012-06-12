@@ -2,6 +2,8 @@ class Strain < ActiveRecord::Base
   belongs_to :organism
   has_many :genotypes, :dependent => :destroy
   has_many :phenotypes, :dependent => :destroy
+  accepts_nested_attributes_for :genotypes,:allow_destroy=>true
+  accepts_nested_attributes_for :phenotypes,:allow_destroy=>true
   has_many :specimens
 
   named_scope :by_title
@@ -13,6 +15,10 @@ class Strain < ActiveRecord::Base
   include ActsAsCachedTree
   acts_as_authorized
   acts_as_uniquely_identifiable
+
+  def is_default?
+    title=="default" && is_dummy==true
+  end
 
   def self.default_strain_for_organism organism
     organism = Organism.find(organism) unless organism.is_a?(Organism)
@@ -54,7 +60,7 @@ class Strain < ActiveRecord::Base
     parent_strain.nil? ? '' : (parent_strain.title + "(Seek ID=#{parent_strain.id})")
   end
 
-  def can_delete?
+  def can_delete? *args
     super && (specimens.empty? || ((specimens.count == 1) && specimens.first.is_dummy? && specimens.first.samples.empty?))
   end
 end

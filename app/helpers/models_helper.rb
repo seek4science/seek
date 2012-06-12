@@ -47,8 +47,12 @@ module ModelsHelper
   
   def authorised_models projects=nil
     authorised_assets(Model,projects)
-  end  
-  
+  end
+
+  def cytoscapeweb_supported? model
+      model.is_xgmml?
+  end
+
   def jws_annotator_hidden_fields params_hash
     required_params=["assignmentRules", "annotationsReactions", "annotationsSpecies", "modelname", "parameterset", "kinetics", "functions", "initVal", "reaction", "events", "steadystateanalysis", "plotGraphPanel", "plotKineticsPanel"]
     required_params.collect do |param|

@@ -29,6 +29,10 @@ class Person < ActiveRecord::Base
     !user.nil?
   end
 
+  def person
+    self
+  end
+
   #grouped_pagination :pages=>("A".."Z").to_a #shouldn't need "Other" tab for people
   #load the configuration for the pagination
   grouped_pagination :pages=>("A".."Z").to_a, :default_page => Seek::Config.default_page(self.name.underscore.pluralize)
@@ -138,6 +142,15 @@ class Person < ActiveRecord::Base
     end
   end
 
+  RELATED_RESOURCE_TYPES = [:data_files,:models,:sops,:presentations,:events,:publications]
+  RELATED_RESOURCE_TYPES.each do |type|
+    define_method "related_#{type}" do
+      user_items = []
+      user_items =  user.try(:send,type) if user.respond_to?(type) && type == :events
+      user_items =  user_items | self.send("created_#{type}".to_sym) if self.respond_to? "created_#{type}".to_sym
+      user_items
+    end
+  end
   #FIXME: change userless_people to use this scope - unit tests
   named_scope :not_registered,:include=>:user,:conditions=>"users.person_id IS NULL"
 
@@ -202,7 +215,7 @@ class Person < ActiveRecord::Base
   end
 
   def institutions
-    work_groups.scoped(:include => :institution).collect {|wg| wg.institution }.uniq
+    work_groups.collect {|wg| wg.institution }.uniq
   end
 
   def projects

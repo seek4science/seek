@@ -33,8 +33,14 @@ class Study < ActiveRecord::Base
       def #{type}_masters
         assays.collect{|a| a.send(:#{type}_masters)}.flatten.uniq
       end
+
       def #{type}s
         assays.collect{|a| a.send(:#{type}s)}.flatten.uniq
+      end
+
+      #related items hash will use data_file_masters instead of data_files, etc. (sops, models)
+      def related_#{type.pluralize}
+        #{type}_masters
       end
     END_EVAL
   end

@@ -41,6 +41,7 @@ module Acts #:nodoc:
         acts_as_annotatable :name_field=>:title
         acts_as_favouritable
 
+        attr_writer :original_filename,:content_type
         does_not_require_can_edit :last_used_at
 
         default_scope :order => "#{self.table_name}.updated_at DESC"
@@ -68,7 +69,7 @@ module Acts #:nodoc:
         has_many :assays, :through => :assay_assets
 
         has_many :assets_creators, :dependent => :destroy, :as => :asset, :foreign_key => :asset_id
-        has_many :creators, :class_name => "Person", :through => :assets_creators, :order=>'assets_creators.id'
+        has_many :creators, :class_name => "Person", :through => :assets_creators, :order=>'assets_creators.id', :after_remove => :update_timestamp, :after_add => :update_timestamp
 
         has_many :project_folder_assets, :as=>:asset, :dependent=>:destroy
 
@@ -101,6 +102,22 @@ module Acts #:nodoc:
       def studies
         assays.collect{|a| a.study}.uniq
       end
+
+
+      def related_people
+        self.creators
+      end
+      
+      # adapt for moving original_filename,content_type to content_blob
+
+      def original_filename
+        try_block {content_blob.original_filename}
+      end
+
+      def content_type
+        try_block {content_blob.content_type}
+      end
+
 
       # this method will take attributions' association and return a collection of resources,
       # to which the current resource is attributed
@@ -138,10 +155,14 @@ module Acts #:nodoc:
             downloader            =Jerm::DownloaderFactory.create p.name
             resource_type         = self.class.name.split("::")[0] #need to handle versions, e.g. Sop::Version
             data_hash             = downloader.get_remote_data self.content_blob.url, p.site_username, p.site_password, resource_type
-            self.content_blob.tmp_io_object = File.open data_hash[:data_tmp_path],"r"
-            self.content_type     = data_hash[:content_type]
-            self.content_blob.save
-            self.save
+            cb = self.content_blob
+            cb.tmp_io_object = File.open data_hash[:data_tmp_path],"r"
+            cb.content_type     = data_hash[:content_type]
+            cb.original_filename = data_hash[:filename]
+            cb.save!
+            self.save!
+
+
           rescue Exception=>e
             puts "Error caching remote data for url=#{self.content_blob.url} #{e.message[0..50]} ..."
           end

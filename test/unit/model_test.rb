@@ -108,10 +108,10 @@ class ModelTest < ActiveSupport::TestCase
   test "cache_remote_content" do
     mock_remote_file "#{Rails.root}/test/fixtures/files/Teusink.xml","http://mockedlocation.com/teusink.xml"
 
-    model = Factory :model,
-        :content_blob => ContentBlob.new(:url=>"http://mockedlocation.com/teusink.xml"),
-        :original_filename => "teusink.xml"
-
+    model = Factory.build :model
+    model.content_blobs.build(:data=>nil,:url=>"http://mockedlocation.com/teusink.xml",
+    :original_filename=>"teusink.xml")
+    model.save!
     assert !model.content_blob.file_exists?
 
     model.cache_remote_content_blob
@@ -178,16 +178,16 @@ class ModelTest < ActiveSupport::TestCase
   end
 
   test "is restorable after destroy" do
-    model = models(:teusink)
+    model = Factory :model, :policy  => Factory(:all_sysmo_viewable_policy), :title => 'is it restorable?'
     User.current_user = model.contributor
     assert_difference("Model.count",-1) do
       model.destroy
     end
-    assert_nil Model.find_by_id(model.id)
+    assert_nil Model.find_by_title 'is it restorable?'
     assert_difference("Model.count",1) do
       disable_authorization_checks {Model.restore_trash!(model.id)}
     end
-    assert_not_nil Model.find_by_id(model.id)
+    assert_not_nil Model.find_by_title 'is it restorable?'
   end
 
 

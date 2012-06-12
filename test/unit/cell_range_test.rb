@@ -9,6 +9,12 @@ class CellRangeTest < ActiveSupport::TestCase
       assert cell.save
   end
 
+  test "cell range reindexing consequences" do
+    #I'm not sure what reindexing_consequences is for, so its hard to write a better test.
+    cell = Factory :cell_range
+    assert cell.reindexing_consequences == [cell.worksheet.content_blob.asset]
+  end
+
 
   #check it doesn't save, it produces only 1 error and it produces the correct error message
   test "input invalid cell range value" do

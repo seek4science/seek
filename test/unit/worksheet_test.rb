@@ -4,7 +4,7 @@ class WorksheetTest < ActiveSupport::TestCase
   fixtures :all
 
   test "create worksheet" do
-    ws = Worksheet.new(:content_blob => content_blobs(:spreadsheet_blob), :last_row => 20, :last_column => 20)
+    ws = Worksheet.new(:content_blob => content_blobs(:unique_spreadsheet_blob), :last_row => 20, :last_column => 20)
     assert ws.save
   end
   test "rows cannot be less than 1" do

@@ -1,0 +1,21 @@
+<div style=" height:250px; width: 100%; overflow:scroll;">
+<table id="treatments" cellpadding="5"  cellspacing="1" style="table-layout: fixed">
+
+  <thead>
+  <th>Sample Name</th>
+  <% extractions[extractions.keys.first].keys.each do |k| %>
+      <th><%= h(k) -%></th>
+  <% end -%>
+  </thead>
+  <tbody>
+  <% extractions.keys.each do |sample_row| %>
+      <tr>
+        <td> <%= h(sample_names[sample_row]) %></td>
+        <% extractions[sample_row].values.each do |v| -%>
+            <td><%= h(v) -%></td>
+        <% end -%>
+      </tr>
+  <% end -%>
+  </tbody>
+</table>
+</div>

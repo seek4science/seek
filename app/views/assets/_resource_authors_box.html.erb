@@ -4,30 +4,40 @@
 <%# - truncate_to - length of the texts after which truncation is activated -%>
 <%# - title - the title of the box (defaults to Creators if missing) -%>
 <%
-
-title||="Creators"
-creators ||= resource.creators unless resource.respond_to?(:contributor)
-creators ||= [resource.contributor.nil? ? nil : resource.contributor.person] | resource.creators
-
+creators ||= nil
+if resource.respond_to?(:contributor) and resource.contributor_credited? and !creators
+    creators = (resource.try(:creators) || []) | [resource.contributor.nil? ? nil : resource.contributor.person]
+    title ||= "Uploader and creators"
+else
+    creators ||= resource.creators.dup
+    title ||= "Creators"
+end
 %>
 <div class="contribution_section_box">  
   <p class="heading">
     <%= help_icon("The authors are the people who originally created this file.") -%>
     <%= h(title) -%>
   </p>
- 
   <p class="author_list">
-  <% creators.each do |creator| %>
-    <% if creators.count < 6 and (creator.nil? or creator.can_view?)%>
+    <% creators.shift(5).each do |creator| %>
+        <% if creator.nil? or creator.can_view? %>
             <span class="author_avatar"><%= creator.nil? ? the_jerm : favouritable_icon(creator, 50) -%></span>
-    <% elsif creator.nil?%>
-            The JERM
-    <% elsif creator.can_view?%>
-            <%= link_to(h(creator.name), url_for(creator))%>
-    <% elsif creator.title_is_public?%>
-            <%= creator.name %>
+        <% elsif creator.title_is_public? %>
+            [<%= creator.name %>]
+        <% end %>
     <% end %>
-  <% end %>
+    <span id='unexpanded'><br \><%= link_to_function "Expand", "$('unexpanded').hide();$('expanded').show();" unless creators.empty? %></span>
+
+    <span id='expanded' style="display: none;">
+      <% creators.each do |creator| %>
+          <% if creator.nil? or creator.can_view? %>
+              <span class="author_avatar"><%= creator.nil? ? the_jerm : favouritable_icon(creator, 50) -%></span>
+          <% elsif creator.title_is_public? %>
+              [<%= creator.name %>]
+          <% end %>
+      <% end %>
+      <br \><%= link_to_function "Unexpand", "$('expanded').hide();$('unexpanded').show();"%>
+    </span>
   </p>
 
   <% if resource.respond_to?(:other_creators) && !resource.other_creators.blank? -%>

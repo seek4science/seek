@@ -1339,7 +1339,7 @@
 
 
   <xsd:complexType name="AssociatedItems">
-    <xsd:sequence>
+    <xsd:all>
       <xsd:element name="assays" type="AssociatedAssays" minOccurs="0" maxOccurs="1"></xsd:element>
       <xsd:element name="data_files" type="AssociatedDataFiles" minOccurs="0" maxOccurs="1"></xsd:element>
       <xsd:element name="events" type="AssociatedEvents" minOccurs="0" maxOccurs="1"></xsd:element>
@@ -1354,7 +1354,7 @@
       <xsd:element name="sops" type="AssociatedSops" minOccurs="0" maxOccurs="1"></xsd:element>
       <xsd:element name="specimens" type="AssociatedSpecimens" minOccurs="0" maxOccurs="1"></xsd:element>
       <xsd:element name="studies" type="AssociatedStudies" minOccurs="0" maxOccurs="1"></xsd:element>
-    </xsd:sequence>
+    </xsd:all>
   </xsd:complexType>
 
   <xsd:complexType name="AssociatedLinks">

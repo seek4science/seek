@@ -1,0 +1,25 @@
+<% if f.object.can_manage? %>
+  <% title_and_help = capture do %>
+        <%= help_icon("Here you can create temporary access links for visitors and others who would not normally be allowed to view/download this asset") %>
+        Temporary Access Links
+  <% end %>
+
+  <% content = capture do %>
+        <% f.fields_for :special_auth_codes, f.object.special_auth_codes + [SpecialAuthCode.new.tap(&:mark_for_destruction)] do |sub_form|%>
+            <fieldset <%= sub_form.object.new_record? ? "id='new_temporary_link_form' style='display: none'" : ''%> >
+              <p>
+                  <% temporary_link = url_for :action => :show, :only_path => false, :code => sub_form.object.code, :escape => false %>
+                  Visitors can view this <%= f.object.class.name.underscore.humanize %> with: <%= link_to temporary_link, temporary_link %>
+                  <%= sub_form.hidden_field :code %>
+              </p>
+              <p>
+                <%= sub_form.label :expiration_date %>
+                <%= sub_form.calendar_date_select :expiration_date %>
+              </p>
+              <%= sub_form.subform_delete_link 'Revoke', {}, :class => 'hidden_destroy_field' %>
+            </fieldset>
+        <% end %>
+        <%= link_to_function "Add a Temporary Link", "$('new_temporary_link_form').show();$('new_temporary_link_form').select('.hidden_destroy_field')[0].setValue('false');$(this).hide()" %>
+   <% end %>
+  <%= render :partial => 'assets/folding_box', :locals => {:hidden => true, :fold_id => 'temporary_links', :fold_title => title_and_help, :contents => content} %>
+<% end %>

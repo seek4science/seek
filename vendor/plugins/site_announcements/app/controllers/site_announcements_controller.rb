@@ -64,11 +64,11 @@ class SiteAnnouncementsController < ApplicationController
   def create
     @site_announcement=SiteAnnouncement.new(params[:site_announcement])
     @site_announcement.announcer = currently_logged_in
-    
+
     respond_to do |format|
       if @site_announcement.save
         if (@site_announcement.email_notification?)
-              send_announcement_emails(@site_announcement)
+          send_announcement_emails(@site_announcement)
         end
         flash[:notice] = 'The Announcement was successfully announced.'
         format.html { redirect_to(@site_announcement) }
@@ -103,7 +103,7 @@ class SiteAnnouncementsController < ApplicationController
     
     respond_to do |format|
       if @site_announcement.update_attributes(params[:site_announcement])
-        flash[:notice] = 'Study was successfully updated.'
+        flash[:notice] = 'Announcement was successfully updated.'
         format.html { redirect_to(@site_announcement) }
         format.xml  { head :ok }
       else

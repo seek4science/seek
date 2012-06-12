@@ -20,6 +20,7 @@ class TechnologyTypesController < ApplicationController
   
   def new
     @technology_type=TechnologyType.new
+    @technology_type.parent_name= params[:parent_name]
     respond_to do |format|
       format.html
       format.xml  { render :xml => @technology_type }
@@ -43,20 +44,28 @@ class TechnologyTypesController < ApplicationController
       format.xml  { render :xml => @technology_type }
     end
   end
-  
+
   def create
-    @technology_type = TechnologyType.new(:title => params[:technology_type][:title])
-    @technology_type.parents = params[:technology_type][:parent_id].collect {|p_id| TechnologyType.find_by_id(p_id)}
+    @technology_type = TechnologyType.new(params[:technology_type].reject { |k, v| k=='parent_id' })
+    @technology_type.parents = params[:technology_type][:parent_id].collect { |p_id| TechnologyType.find_by_id(p_id) }
     #@technology_type.owner=current_user.person    
-    
-    respond_to do |format|
-      if @technology_type.save        
-        flash[:notice] = 'Technology type was successfully created.'
-        format.html { redirect_to(:action => 'manage') }
-        format.xml  { render :xml => @technology_type, :status => :created, :location => @technology_type }
+
+
+    if @technology_type.save
+      if  @technology_type.parent_name=="assay"
+        render :partial => "assets/back_to_singleselect_parent",:locals => {:child=>@technology_type,:parent=>@technology_type.parent_name}
       else
+        respond_to do |format|
+          flash[:notice] = 'Technology type was successfully created.'
+          format.html { redirect_to(:action => 'manage') }
+          format.xml { render :xml => @technology_type, :status => :created, :location => @technology_type }
+        end
+
+      end
+    else
+      respond_to do |format|
         format.html { render :action => "new" }
-        format.xml  { render :xml => @technology_type.errors, :status => :unprocessable_entity }
+        format.xml { render :xml => @technology_type.errors, :status => :unprocessable_entity }
       end
     end
   end

@@ -20,6 +20,7 @@ class ProjectSubscriptionTest < ActiveSupport::TestCase
 
     #when joining a project
     person.work_groups.create :project => @proj, :institution => Factory(:institution)
+    person.reload
     assert_equal person.projects.sort_by(&:title), person.project_subscriptions.map(&:project).sort_by(&:title)
   end
 

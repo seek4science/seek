@@ -5,6 +5,7 @@ class PresentationsController < ApplicationController
   include IndexPager
   include DotGenerator
   include Seek::AssetsCommon
+  include AssetsCommonExtension
 
   #before_filter :login_required
   before_filter :find_assets, :only => [ :index ]
@@ -19,14 +20,14 @@ class PresentationsController < ApplicationController
     if (handle_data nil)
       comments=params[:revision_comment]
 
-      @presentation.content_blob = ContentBlob.new(:tmp_io_object => @tmp_io_object, :url=>@data_url)
-      @presentation.content_type = params[:presentation][:content_type]
-      @presentation.original_filename = params[:presentation][:original_filename]
+      #@presentation.content_blob = ContentBlob.new(:tmp_io_object => @tmp_io_object, :url=>@data_url)
+      #@presentation.content_type = params[:presentation][:content_type]
+      #@presentation.original_filename = params[:presentation][:original_filename]
 
 
       respond_to do |format|
         if @presentation.save_as_new_version(comments)
-
+          create_content_blobs
           flash[:notice]="New version uploaded - now on version #{@presentation.version}"
         else
           flash[:error]="Unable to save new version"
@@ -59,7 +60,6 @@ class PresentationsController < ApplicationController
   def create
     if handle_data
       @presentation = Presentation.new(params[:presentation])
-      @presentation.content_blob = ContentBlob.new(:tmp_io_object => @tmp_io_object,:url=>@data_url)
 
       @presentation.policy.set_attributes_with_sharing params[:sharing], @presentation.projects
 
@@ -67,6 +67,9 @@ class PresentationsController < ApplicationController
       assay_ids = params[:assay_ids] || []
       respond_to do |format|
         if @presentation.save
+
+          create_content_blobs
+
           # update attributions
           Relationship.create_or_update_attributions(@presentation, params[:attributions])
 

@@ -82,7 +82,9 @@ Rails::Initializer.run do |config|
       :mapping_link_reindexer,
       :compound_reindexer,
       :synonym_reindexer
+
 end
+Mime::Type.register "application/x-endnote-refer", :enw
 
 
 

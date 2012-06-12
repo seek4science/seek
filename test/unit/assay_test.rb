@@ -5,7 +5,8 @@ class AssayTest < ActiveSupport::TestCase
 
 
   test "shouldnt edit the assay" do
-    user = users(:aaron)
+    non_admin = Factory :user,:person=> Factory(:person,:is_admin=>false)
+    user = non_admin #users(:aaron)
     assay = assays(:modelling_assay_with_data_and_relationship)
     assert_equal false, assay.can_edit?(user)
   end
@@ -320,7 +321,14 @@ class AssayTest < ActiveSupport::TestCase
       :assay_class => assay_classes(:experimental_assay_class),
       :samples => [Factory :sample]
     )
+  end
 
+  test "related models" do
+    model_assay = Factory :modelling_assay,:model_master_ids => [Factory(:model).id]
+    exp_assay = Factory :experimental_assay,:model_master_ids => [Factory(:model).id]
+    assert_equal model_assay.model_masters, model_assay.related_models
+    assert_not_equal exp_assay.model_masters,exp_assay.related_models
+    assert_equal [], exp_assay.related_models
   end
 
   test "contributing_user" do
