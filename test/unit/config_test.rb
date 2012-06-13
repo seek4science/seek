@@ -28,6 +28,11 @@ class ConfigTest < ActiveSupport::TestCase
     assert_equal true ,Seek::Config.email_enabled
   end
 
+  test "sample_parser_enabled" do
+    #NOTE: this is the value in seek_testing.rb, the actual default is 'false'
+    assert_equal true ,Seek::Config.sample_parser_enabled
+  end
+
   test "smtp_settings port" do
     assert_equal "25" ,Seek::Config.smtp_settings("port")
   end

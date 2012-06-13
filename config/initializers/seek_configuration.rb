@@ -36,6 +36,7 @@ Seek::Config.default :publish_button_enabled,false
 Seek::Config.default :auth_caching_enabled,false
 Seek::Config.default :strategic_eager_loading, true
 Seek::Config.default :auth_lookup_enabled,true
+Seek::Config.default :sample_parser_enabled,false
 
 # Branding
 Seek::Config.default :project_name,'SysMO'
