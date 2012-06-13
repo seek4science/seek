@@ -121,7 +121,7 @@ class Project < ActiveRecord::Base
 
   def project_coordinators
     coordinator_role = ProjectRole.project_coordinator_role
-    people.select{|p| p.project_roles_of_project(self).include?(coordinator_role)} | descendants.collect(&:project_coordinators).flatten
+    ([self] + descendants).map {|proj| proj.people.select{|p| p.project_roles_of_project(proj).include?(coordinator_role)}}.flatten.uniq
   end
 
   #this is the intersection of project role and seek role
@@ -166,12 +166,7 @@ class Project < ActiveRecord::Base
 
   def people
     #TODO: look into doing this with a named_scope or direct query
-    res = work_groups.collect(&:people)
-    res = res + descendants.collect(&:people)
-
-    #TODO: write a test to check they are ordered
-    res = res.flatten.uniq.compact
-    res.sort_by{|a| (a.last_name.blank? ? a.name : a.last_name)}
+    ([self] + descendants).collect {|proj| proj.work_groups.collect(&:people)}.flatten.uniq.compact
   end
 
   # provides a list of people that are said to be members of this project, but are not associated with any user
