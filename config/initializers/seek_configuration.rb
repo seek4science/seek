@@ -35,7 +35,7 @@ Seek::Config.default :home_description, 'Some (configurable) information about t
 Seek::Config.default :publish_button_enabled,false
 Seek::Config.default :auth_caching_enabled,false
 Seek::Config.default :strategic_eager_loading, true
-Seek::Config.default :auth_lookup_enabled,false
+Seek::Config.default :auth_lookup_enabled,true
 
 # Branding
 Seek::Config.default :project_name,'SysMO'
