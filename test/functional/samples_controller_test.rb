@@ -330,7 +330,7 @@ fixtures :all
     get :show, :id => s.id
     assert_response :success
     assert_select "label", :text => /Comment/, :count => 2 #one for specimen, one for sample
-    assert_select "label", :text => /Sex/, :count => 1
+    assert_select "label", :text => /Gender/, :count => 1
   end
 
   test 'should have specimen comment and sex fields in the specimen/sample edit page' do

@@ -106,7 +106,7 @@
   <%= text_or_not_specified specimen.ploidy -%>
 </p>
 <p>
-  <label>Sex:</label>
+  <label>Gender:</label>
   <%
      sex = sex_list_for_selection.select{|s| s[1] == specimen.sex}.collect{|s| s[0]}.first
   %>
