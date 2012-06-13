@@ -102,6 +102,10 @@
   <%= text_or_not_specified specimen.culture_growth_type.try(:title) -%>
 </p>
 <p>
+  <label>Ploidy:</label>
+  <%= text_or_not_specified specimen.ploidy -%>
+</p>
+<p>
   <label>Sex:</label>
   <%
      sex = sex_list_for_selection.select{|s| s[1] == specimen.sex}.collect{|s| s[0]}.first
