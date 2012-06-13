@@ -153,10 +153,10 @@ class AdminController < ApplicationController
 
   def update_biosamples_renaming
     update_flag = true
-    Seek::Config.sample_parent_term = params[:sample_parent_term]
-    Seek::Config.specimen_creators = params[:specimen_creators]
-    Seek::Config.specimen_culture_starting_date = params[:specimen_culture_starting_date]
-    Seek::Config.sample_age = params[:sample_age]
+    Seek::Config.sample_parent_term = params[:sample_parent_term] unless params[:sample_parent_term].blank?
+    Seek::Config.specimen_creators = params[:specimen_creators] unless params[:specimen_creators].blank?
+    Seek::Config.specimen_culture_starting_date = params[:specimen_culture_starting_date] unless params[:specimen_culture_starting_date].blank?
+    Seek::Config.sample_age = params[:sample_age] unless params[:sample_age].blank?
     update_redirect_to update_flag,'biosamples_renaming'
   end
   def restart_server

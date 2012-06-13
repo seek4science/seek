@@ -70,9 +70,9 @@ class BioSamplesControllerTest < ActionController::TestCase
     get :existing_specimens, :strain_ids => strain_ids
     assert_response :success
     assert_select "table#specimen_table tbody" do
-      assert_select 'tr td', :text => "Strain " + strain1.info + "(Seek ID=#{strain1.id})", :count => specimens_of_strain1.length
-      assert_select 'tr td', :text => "Strain " + strain2.info + "(Seek ID=#{strain2.id})", :count => specimens_of_strain2.length
-      assert_select 'tr td', :text => "Strain " + strain3.info + "(Seek ID=#{strain3.id})", :count => specimens_of_strain3.length
+      assert_select 'tr td', :text => "Strain: " + strain1.info + "(Seek ID=#{strain1.id})", :count => specimens_of_strain1.length
+      assert_select 'tr td', :text => "Strain: " + strain2.info + "(Seek ID=#{strain2.id})", :count => specimens_of_strain2.length
+      assert_select 'tr td', :text => "Strain: " + strain3.info + "(Seek ID=#{strain3.id})", :count => specimens_of_strain3.length
       specimens.each do |specimen|
         assert_select 'tr td', :text => specimen.id, :count => 1
       end
@@ -91,8 +91,8 @@ class BioSamplesControllerTest < ActionController::TestCase
     get :existing_samples, :specimen_ids => specimen_ids
     assert_response :success
     assert_select "table#sample_table tbody" do
-      assert_select 'tr td', :text => Seek::Config.sample_parent_term.capitalize + ' ' + specimen1.title, :count => samples_of_specimen1.length
-      assert_select 'tr td', :text => Seek::Config.sample_parent_term.capitalize + ' ' + specimen2.title, :count => samples_of_specimen2.length
+      assert_select 'tr td', :text => Seek::Config.sample_parent_term.capitalize + ': ' + specimen1.title, :count => samples_of_specimen1.length
+      assert_select 'tr td', :text => Seek::Config.sample_parent_term.capitalize + ': ' + specimen2.title, :count => samples_of_specimen2.length
       samples.each do |sample|
         assert_select 'tr td', :text => sample.id, :count => 1
       end

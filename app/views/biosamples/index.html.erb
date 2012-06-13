@@ -224,10 +224,10 @@
                 show_existing_specimens();
             }
         } else {
-       
-        if(getSelectedStrains().include(strain_id) || is_dummy_strain=="true" ) {
-            <%=remote_function(:url => {:controller => 'biosamples', :action => 'existing_specimens'}, :with => "'strain_ids=' + getSelectedStrains()+ '&organism_ids='+$F('strain_organism_ids')");%>
-            show_existing_specimens();
+            if(getSelectedStrains().include(strain_id) || is_dummy_strain=="true" ) {
+                <%=remote_function(:url => {:controller => 'biosamples', :action => 'existing_specimens'}, :with => "'strain_ids=' + getSelectedStrains()+ '&organism_ids='+$F('strain_organism_ids')");%>
+                show_existing_specimens();
+            }
         }
     }
 
@@ -280,6 +280,7 @@
         // UPDATE THE FIELDS WHICH WILL BE SUBMITTED WITH THE PAGE
         $('creators').value = Object.toJSON(creators_arr);
     }
+
 
 
     function checkCreatorNotInList(creator_name, creator_id) {

@@ -59,19 +59,16 @@
                 <th><%= Seek::Config.specimen_culture_starting_date%></th>
                 <th>Culture type</th>
                 <% if Seek::Config.is_virtualliver %>
-                <th>Genotypes</th>
-                <th>Phenotypes</th>
+                    <th>Genotypes</th>
+                    <th>Phenotypes</th>
                 <% end %>
-                 <th><%= Seek::Config.specimen_creators%></th>
-
+                <th><%= Seek::Config.specimen_creators%></th>
                 <th>Seek ID</th>
                 <th>Related SOPs</th>
               </tr>
               </thead>
               <tbody>
               <% existing_specimens.each do |specimen| -%>
-
-
                   <tr>
                   <% specimen_row_data = specimen_row_data specimen %>
                   <% specimen_row_data.each do |column_data| %>
