@@ -1,36 +1,55 @@
 <%= javascript_include_tag 'strain.js' %>
 <script type="text/javascript" charset="utf-8">
     $j(document).ready(function() {
-        specimen_table = $j('#specimen_table').dataTable({
-            "bPaginate": false,
-            "bLengthChange": false,
-            "bFilter": true,
-            "bSort": true,
-            "bInfo": false,
-            "bAutoWidth": false,
-            "bRetrieve": true,
-            "aaSorting": [
-                [ 2, "asc" ]
-            ],
-            "aoColumns": [
-                null,
-                { "sWidth": "5%", 'bSortable':false },
-                { "sWidth": "15%" },
-                { "sWidth": "10%" },
-                { "sWidth": "10%" },
-                { "sWidth": "10%" },
-                { "sWidth": "10%" },
-                { "sWidth": "10%" },
-                { "sWidth": "5%" },
-                { "sWidth": "15%" },
-                { "sWidth": "5%", 'bSortable':false },
-                { "sWidth": "5%", 'bSortable':false }
-            ],
-            "fnInitComplete": function () {
-                this.fnAdjustColumnSizing(true);
+            var aoColumns;
+            if (<%= Seek::Config.is_virtualliver%>) {
+                aoColumns = [
+                    null,
+                    { "sWidth":"5%", 'bSortable':false },
+                    { "sWidth":"15%" },
+                    { "sWidth":"10%" },
+                    { "sWidth":"10%" },
+                    { "sWidth":"10%" },
+                    { "sWidth":"10%" },
+                    { "sWidth":"10%" },
+                    { "sWidth":"5%" },
+                    { "sWidth":"15%" },
+                    { "sWidth":"5%", 'bSortable':false },
+                    { "sWidth":"5%", 'bSortable':false }
+                ]
+            } else {
+                aoColumns = [
+                    null,
+                    { "sWidth":"5%", 'bSortable':false },
+                    { "sWidth":"20%" },
+                    { "sWidth":"15%" },
+                    { "sWidth":"15%" },
+                    { "sWidth":"15%" },
+                    { "sWidth":"5%" },
+                    { "sWidth":"15%" },
+                    { "sWidth":"5%", 'bSortable':false },
+                    { "sWidth":"5%", 'bSortable':false }
+                ]
             }
-        }).rowGrouping({"sGrupingClass": 'row_group_color'});
-    });
+
+            specimen_table = $j('#specimen_table').dataTable({
+                "bPaginate": false,
+                "bLengthChange": false,
+                "bFilter": true,
+                "bSort": true,
+                "bInfo": false,
+                "bAutoWidth": false,
+                "bRetrieve": true,
+                "aaSorting": [
+                    [ 2, "asc" ]
+                ],
+                "aoColumns": aoColumns,
+                "fnInitComplete": function () {
+                    this.fnAdjustColumnSizing(true);
+                }
+            }).rowGrouping({"sGrupingClass": 'row_group_color'});
+        });
+
     initialiseFold('existing_specimens');
 </script>
 
