@@ -75,11 +75,11 @@
         }
         ;
         if (table_name == 'strain_table') {
-        <%=remote_function(:url => {:controller => 'biosamples', :action => 'existing_specimens'}, :with => "'strain_ids=' + getSelectedStrains()", :before=>"show_ajax_loader('existing_specimens')");%>
+        <%=remote_function(:url => {:controller => 'biosamples', :action => 'existing_specimens'}, :with => "'strain_ids=' + getSelectedStrains()", :before=>"show_large_ajax_loader('existing_specimens')");%>
             show_existing_specimens();
             hide_existing_samples();
         } else if (table_name == 'specimen_table') {
-        <%=remote_function(:url => {:controller => 'biosamples', :action => 'existing_samples'}, :with => "'specimen_ids=' + getSelectedSpecimens()",:before=>"show_ajax_loader('existing_samples')");%>
+        <%=remote_function(:url => {:controller => 'biosamples', :action => 'existing_samples'}, :with => "'specimen_ids=' + getSelectedSpecimens()",:before=>"show_large_ajax_loader('existing_samples')");%>
             show_existing_samples();
         }
     }
@@ -93,11 +93,11 @@
         }
         ;
         if (table_name == 'strain_table') {
-        <%=remote_function(:url => {:controller => 'biosamples', :action => 'existing_specimens'}, :with => "'strain_ids=' + getSelectedStrains()", :before=>"show_ajax_loader('existing_specimens')");%>
+        <%=remote_function(:url => {:controller => 'biosamples', :action => 'existing_specimens'}, :with => "'strain_ids=' + getSelectedStrains()", :before=>"show_large_ajax_loader('existing_specimens')");%>
             show_existing_specimens();
             hide_existing_samples();
         } else if (table_name == 'specimen_table') {
-        <%=remote_function(:url => {:controller => 'biosamples', :action => 'existing_samples'}, :with => "'specimen_ids=' + getSelectedSpecimens()", :before=>"show_ajax_loader('existing_samples')");%>
+        <%=remote_function(:url => {:controller => 'biosamples', :action => 'existing_samples'}, :with => "'specimen_ids=' + getSelectedSpecimens()", :before=>"show_large_ajax_loader('existing_samples')");%>
         }
     }
 
