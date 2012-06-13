@@ -10,9 +10,15 @@
     <% f.fields_for :specimen do |specimen_f| %>
         <%= render :partial => "specimens/form", :locals => {:f => specimen_f, :specimen => @sample.specimen, :action => action}%>
     <% end %>
-<% end %>
 
-<h2>Sample Details</h2>
+    <h2>Sample Details</h2>
+<% else %>
+    <h2>Sample Details</h2>
+    <p>
+      <label>Specimen:</label>
+      <%= link_to @sample.specimen.title, @sample.specimen %>
+    </p>
+<% end %>
 
 <div style="width: 95%;">
 
