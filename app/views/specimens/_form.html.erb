@@ -56,7 +56,7 @@
 <% unless Seek::Config.is_virtualliver %>
 <p>
   <%= f.label "Culture starting date:" -%> <br/>
-  <%= f.calendar_date_select :born, :time => "mixed", :style => "width:350px;" -%>
+  <%= f.calendar_date_select :born, :time => "mixed", :year_range => 100, :style => "width:350px;" -%>
 </p>
 <% end %>
 <p>
