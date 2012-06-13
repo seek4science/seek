@@ -58,7 +58,7 @@ class Event < ActiveRecord::Base
 
   #defines that this is a user_creatable object type, and appears in the "New Object" gadget
   def self.user_creatable?
-    true
+    Seek::Config.events_enabled
   end
 
 end
