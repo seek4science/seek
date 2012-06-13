@@ -298,7 +298,7 @@ module Acts
 
       def publishing_auth
         #only check if doing publishing
-        if self.policy.sharing_scope == Policy::EVERYONE
+        if self.policy.sharing_scope == Policy::EVERYONE && !self.kind_of?(Publication)
             unless self.can_publish?
               errors.add_to_base("You are not permitted to publish this #{self.class.name.underscore.humanize}")
               return false
