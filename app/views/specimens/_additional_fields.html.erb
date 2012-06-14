@@ -40,7 +40,7 @@
   <table id="table2" border="1">
     <tr>
       <td style="text-align:left;"><%= f.label :sex -%></td>
-      <td style="text-align:left;"><%= f.select :sex, options_for_select({"male" => 0, "female" => 1,"hermaphrodite"=>2}, specimen.sex), :include_blank => "Not Specified" %> </td>
+      <td id="sex_1" style="text-align:left;"><%= f.select :sex, options_for_select({"male" => 0, "female" => 1,"hermaphrodite"=>2}, specimen.sex), :include_blank => "Not Specified" %> </td>
     </tr>
 
     <tr>
@@ -63,7 +63,7 @@
     </tr>
     <tr>
       <td><%= f.label :sex -%></td>
-      <td style="text-align:left;"><%= f.select :sex, options_for_select({"male" => 0, "female" => 1,"hermaphrodite"=>2}, specimen.sex), :include_blank => "Not Specified" %> </td>
+      <td id="sex_2" style="text-align:left;"><%= f.select :sex, options_for_select({"male" => 0, "female" => 1,"hermaphrodite"=>2}, specimen.sex), {:include_blank => "Not Specified"}%> </td>
     </tr>
   </table>
 </div>
@@ -75,9 +75,9 @@
             selected_option_index = $(selection_list_id).selectedIndex;
             selected_option = $(selection_list_id).options[selected_option_index];
             title = selected_option.text;
-            var div1 = document.getElementById('fields_for_cultured_cell_line_and_primary_cell_culture');
-            var div2 = document.getElementById('fields_for_vivo');
-            var div3 = document.getElementById('fields_for_batch_and_chemostat');
+            var div1 = $('fields_for_cultured_cell_line_and_primary_cell_culture');
+            var div2 = $('fields_for_vivo');
+            var div3 = $('fields_for_batch_and_chemostat');
 
             if (title == "cultured cell line" || title == "primary cell culture") {
                 div1.style.display = 'block';
@@ -88,11 +88,15 @@
                 div2.style.display = 'block';
                 div1.style.display = 'none';
                 div3.style.display = 'none';
+                div2.select('select','input').invoke('enable');
+                div3.select('select','input').invoke('disable');
 
             } else if (title == "batch" || title == "chemostat") {
                 div1.style.display = 'none';
                 div2.style.display = 'none';
                 div3.style.display = 'block';
+                div3.select('select','input').invoke('enable');
+                div2.select('select','input').invoke('disable');
             }
             else {
                 div1.style.display = 'none';
