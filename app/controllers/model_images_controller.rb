@@ -46,7 +46,7 @@ class ModelImagesController < ApplicationController
     params[:size] ||='200x200'
 
     if params[:size]=='large'
-      size = ModelImage.LARGE_SIZE
+      size = ModelImage::LARGE_SIZE
     else
       size = params[:size]
     end
