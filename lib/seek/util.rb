@@ -33,12 +33,9 @@ module Seek
     #returns a list of all types that respond_to and return true for user_creatable?
     def self.user_creatable_types
       @@creatable_model_classes ||= begin
-        classes=persistent_classes.select do |c|
+        persistent_classes.select do |c|
           c.respond_to?("user_creatable?") && c.user_creatable?
         end.sort_by { |a| [a.is_asset? ? -1 : 1, a.is_isa? ? -1 : 1, a.name] }
-        classes.delete(Event) unless Seek::Config.events_enabled
-        classes.delete(Specimen)
-        classes
       end
     end
 

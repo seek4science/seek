@@ -1,3 +1,4 @@
+require 'active_record_include_bugfixes'
 module StrategicEagerLoading
   # Inspired by DataMapper.
   # When you do something like DataFile.all.each {|df| df.policy } you would normally
@@ -31,58 +32,20 @@ module StrategicEagerLoading
       end
     end
 
+    def reload
+      self.strategic_siblings = []
+      super
+    end
+
     module ClassMethods
 
       # All this does is set strategic_siblings for each record returned by find_every
       def find_every_with_strategic_eager_loading *args
         found_records = find_every_without_strategic_eager_loading(*args)
-        found_records.each {|r| r.strategic_siblings = found_records.compact} if found_records and found_records.compact.uniq.count > 1
+        found_records.each { |r| r.strategic_siblings = found_records.compact } if found_records and found_records.compact.uniq.count > 1
         found_records
       end
 
-
-      #There is an ActiveRecord bug in the standard implementation of this method.
-      #has many through associations that specify a source type lose the type based restriction
-      #if you first include the through records' association. It also resets the included through association.
-      #You can reproduce this in plain ActiveRecord by trying:
-      #
-      #    assays = Assay.find(:all, :include => [:assay_assets, :sop_masters])
-      #    assays.map(&:sop_masters).flatten # this will include data_files and models as well as sops
-      #    assays.first.assay_assets.loaded? # this will return false
-      #
-      #If you reverse the order the to [:sop_masters, :assay_assets] then there is no problem.
-      #
-      #This happens because while it is preloading :sop_masters, it calls preload_association to load
-      #the assay_assets, with a condition to restrict it to the subset of the assay_assets that point to a sop.
-      #Then since it has only loaded a subset, it resets each of the assay_asset proxies afterward. But if the association has already
-      #been loaded, preload_has_many_association (called by preload_association) will return without doing
-      #anything, which leaves _whole_ set of assay_assets loaded, not just the subset which points to a sop.
-      #Then the assay_assets get reset afterward.
-
-      #As a work around, if the reflection has a source type, I am moving the through models existing proxies' targets to safety, and putting them back afterwards.
-      def preload_through_records(records, reflection, through_association)
-        if reflection.options[:source_type]
-          records.compact!
-          through_proxies = {}
-          records.each do |r|
-            proxy = r.send(through_association)
-            through_proxies[r.object_id] = proxy.proxy_target
-            proxy.reset
-          end
-          through_records = super
-          records.each do |r|
-            proxy = r.send(through_association)
-            if old_target = through_proxies[r.object_id]
-              proxy.target = old_target
-            else
-              proxy.reset
-            end
-          end
-          through_records
-        else
-          super
-        end
-      end
     end
 
   end

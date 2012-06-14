@@ -14,7 +14,7 @@ module BiosamplesHelper
 
   
    def create_sample_popup_link
-     link_to image("new") + "Create new sample and #{Seek::Config.sample_parent_term}", new_sample_path(), {:id => 'new_sample_link', :target => '_blank', :onclick => "if (checkSelectOneSpecimen('#{Seek::Config.sample_parent_term}')) {return(true);} else {return(false);}"}
+     link_to image("new") + "Create new sample", new_sample_path(), {:id => 'new_sample_link', :target => '_blank', :onclick => "if (checkSelectOneSpecimen('#{Seek::Config.sample_parent_term}')) {return(true);} else {return(false);}"}
    end
 
   def edit_strain_popup_link strain
