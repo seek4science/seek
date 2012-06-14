@@ -127,7 +127,7 @@ module ApplicationHelper
     #select_tag :new_resource_type, options_for_select(Seek::Util.user_creatable_types.collect{|c| [(c.name.underscore.humanize == "Sop" ? "SOP" : c.name.underscore.humanize),c.name.underscore] })
   end
   
-  def ispecial_auth_codes_nil_or_empty? thing
+  def is_nil_or_empty? thing
     thing.nil? or thing.empty?
   end
   
