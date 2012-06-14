@@ -40,7 +40,7 @@
   <table id="table2" border="1">
     <tr>
       <td style="text-align:left;"><%= f.label "Gender" -%></td>
-      <td style="text-align:left;"><%= f.select :sex, options_for_select(sex_list_for_selection), :include_blank => "Not Specified" %> </td>
+      <td style="text-align:left;"><%= f.select :sex, options_for_select(sex_list_for_selection.insert(0,["Not specified", '']),specimen.sex) %> </td>
     </tr>
 
     <tr>
@@ -63,7 +63,7 @@
     </tr>
     <tr>
       <td><%= f.label 'Gender' -%></td>
-      <td style="text-align:left;"><%= f.select :sex, options_for_select(sex_list_for_selection), :include_blank => "Not Specified" %> </td>
+      <td style="text-align:left;"><%= f.select :sex, options_for_select(sex_list_for_selection.insert(0,["Not specified", '']),specimen.sex) %> </td>
     </tr>
   </table>
 </div>
