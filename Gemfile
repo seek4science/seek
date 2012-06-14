@@ -25,6 +25,8 @@ gem "delayed_job","~>2.0.4"
 gem "daemons"
 gem "cancan"
 gem "in_place_editing"
+gem "rdf"
+gem "rdf-rdfxml"
 
 
 

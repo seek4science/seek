@@ -226,6 +226,11 @@ Factory.define(:rightfield_datafile,:parent=>:data_file) do |f|
   f.association :content_blob,:factory=>:rightfield_content_blob
 end
 
+Factory.define(:rightfield_annotated_datafile,:parent=>:data_file) do |f|
+  f.content_type "application/excel"
+  f.association :content_blob,:factory=>:rightfield_annotated_content_blob
+end
+
 #Model
   Factory.define(:model) do |f|
     f.sequence(:title) {|n| "A Model #{n}"}
@@ -300,6 +305,10 @@ end
 
   Factory.define(:rightfield_content_blob,:parent=>:content_blob) do |f|
     f.data  File.new("#{Rails.root}/test/fixtures/files/rightfield-test.xls","rb").read
+  end
+
+  Factory.define(:rightfield_annotated_content_blob,:parent=>:content_blob) do |f|
+    f.data  File.new("#{Rails.root}/test/fixtures/files/simple_populated_rightfield.xls","rb").read
   end
 
   Factory.define(:cronwright_model_content_blob,:parent=>:content_blob) do |f|
