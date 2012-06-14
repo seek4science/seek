@@ -12,7 +12,7 @@ end
 
 desc "task for cruise control"
 task :cruise do |t, args|
-  args.with_defaults :count => 8  #count determines the number of processes that parallel_tests will use
+  args.with_defaults :count => 2  #count determines the number of processes that parallel_tests will use
 
   RAILS_ENV = ENV['RAILS_ENV'] = 'test'
 
