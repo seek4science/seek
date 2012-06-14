@@ -17,6 +17,7 @@ class RightFieldTest < ActiveSupport::TestCase
     #just checks it is valid rdf/xml and contains some statements for now
     RDF::RDFXML::Reader.open(f.path) do |reader|
       assert_equal 3,reader.statements.count
+      assert_equal RDF::URI.new("http://localhost:3000/data_files/#{df.id}"), reader.statements.first.subject
       reader.each_statement do |statement|
         puts statement.inspect
       end

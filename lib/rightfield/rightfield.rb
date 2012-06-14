@@ -1,15 +1,16 @@
 require 'open4'
+
 module RightField
 
   JAR_PATH = File.dirname(__FILE__) + "/rightfield-bin.jar"
 
-  def invoke_command path
-    id="ddd:42"
-    "java -jar #{JAR_PATH} -export -format rdf -id #{id} #{path}"
+  def invoke_command datafile
+    id=Seek::Config.site_base_host+"/data_files/#{datafile.id}"
+    "java -jar #{JAR_PATH} -export -format rdf -id #{id} #{datafile.content_blob.filepath}"
   end
 
   def generate_rdf datafile
-    cmd = invoke_command datafile.content_blob.filepath
+    cmd = invoke_command datafile
 
     output = ""
       err_message = ""
