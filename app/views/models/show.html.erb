@@ -17,12 +17,20 @@
             <%= image_tag_for_key('execute', simulate_model_path(@model, :version => @display_model.version), nil, {:method => :post}, "Simulate Model on JWS") -%>
           </li>
       <% end -%>
-
+      <% if cytoscapeweb_supported?(@display_model) %>
+          <% if @model.can_download? -%>
+              <li>
+                <%= image_tag_for_key('cytoscape_web', visualise_model_path(@model, :version => @display_model.version), nil, {:target => "_blank"}, "Visualise Model with Cytoscape Web") -%>
+              </li>
+          <% end -%>
+      <% end %>
   <% end -%>
+</ul>
 
   <% if Seek::Config.sycamore_enabled and @display_model.is_sbml? %>
       <% if @model.can_download? -%>
-          <li>
+       <ul class="sectionIcons">
+        <li>
       <span class="icon">
         <% form_tag("http://sycamore.eml.org/sycamore/submission.jsp", :id => 'sycamore-form', :target => '_blank') do -%>
           <%= hidden_field_tag 'sbml_model', h(IO.read(@display_model.content_blob.filepath).gsub(/\n/, '')) -%>
@@ -31,16 +39,9 @@
         <% end -%>
       </span>
           </li>
-      <% end -%>
-  <% end %>
-  <% if cytoscapeweb_supported?(@display_model) %>
-      <% if @model.can_download? -%>
-          <li>
-            <%= image_tag_for_key('cytoscape_web', visualise_model_path(@model, :version => @display_model.version), nil, {:target => "_blank"}, "Visualise Model with Cytoscape Web") -%>
-          </li>
-      <% end -%>
-  <% end %>
-</ul>
+       </ul>
+    <% end -%>
+<% end %>
 
 
 <%= render :partial=>"assets/upload_new_version_form", :locals=>{:resource=>@model} -%>
