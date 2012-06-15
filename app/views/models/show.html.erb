@@ -17,14 +17,14 @@
             <%= image_tag_for_key('execute', simulate_model_path(@model, :version => @display_model.version), nil, {:method => :post}, "Simulate Model on JWS") -%>
           </li>
       <% end -%>
-      <% if cytoscapeweb_supported?(@display_model) %>
-          <% if @model.can_download? -%>
-              <li>
-                <%= image_tag_for_key('cytoscape_web', visualise_model_path(@model, :version => @display_model.version), nil, {:target => "_blank"}, "Visualise Model with Cytoscape Web") -%>
-              </li>
-          <% end -%>
-      <% end %>
   <% end -%>
+  <% if cytoscapeweb_supported?(@display_model) %>
+           <% if @model.can_download? -%>
+               <li>
+                 <%= image_tag_for_key('cytoscape_web', visualise_model_path(@model, :version => @display_model.version), nil, {:target => "_blank"}, "Visualise Model with Cytoscape Web") -%>
+               </li>
+           <% end -%>
+   <% end %>
 </ul>
 
   <% if Seek::Config.sycamore_enabled and @display_model.is_sbml? %>
