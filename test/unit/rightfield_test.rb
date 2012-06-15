@@ -18,9 +18,49 @@ class RightFieldTest < ActiveSupport::TestCase
     RDF::RDFXML::Reader.open(f.path) do |reader|
       assert_equal 3,reader.statements.count
       assert_equal RDF::URI.new("http://localhost:3000/data_files/#{df.id}"), reader.statements.first.subject
-      reader.each_statement do |statement|
-        puts statement.inspect
-      end
+    end
+  end
+
+  test "rdf graph generation" do
+    df=Factory :rightfield_annotated_datafile
+    rdf = generate_rdf_graph(df)
+    assert_not_nil rdf
+    assert rdf.is_a?(RDF::Graph)
+    assert_equal 3,rdf.statements.count
+    assert_equal RDF::URI.new("http://localhost:3000/data_files/#{df.id}"), rdf.statements.first.subject
+    assert rdf.named?
+
+  end
+
+  test "datafile to_rdf" do
+    df=Factory :rightfield_annotated_datafile
+    rdf = df.to_rdf
+    assert_not_nil rdf
+
+    f=Tempfile.new("rdf")
+    f.write(rdf)
+    f.flush
+
+    #just checks it is valid rdf/xml and contains some statements for now
+    RDF::RDFXML::Reader.open(f.path) do |reader|
+      assert reader.statements.count > 0
+      assert_equal 5,reader.statements.count
+      assert_equal RDF::URI.new("http://localhost:3000/data_files/#{df.id}"), reader.statements.first.subject
+    end
+  end
+
+  test "non spreadsheet datafile to_rdf" do
+    df=Factory :non_spreadsheet_datafile
+    rdf = df.to_rdf
+    assert_not_nil rdf
+
+    f=Tempfile.new("rdf")
+    f.write(rdf)
+    f.flush
+
+    RDF::RDFXML::Reader.open(f.path) do |reader|
+      assert reader.statements.count > 0
+      assert_equal RDF::URI.new("http://localhost:3000/data_files/#{df.id}"), reader.statements.first.subject
     end
   end
 

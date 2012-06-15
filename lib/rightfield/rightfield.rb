@@ -1,12 +1,17 @@
 require 'open4'
+require 'rdf/rdfxml'
 
 module RightField
 
   JAR_PATH = File.dirname(__FILE__) + "/rightfield-bin.jar"
 
   def invoke_command datafile
-    id=Seek::Config.site_base_host+"/data_files/#{datafile.id}"
+    id=rdf_resource_uri(datafile)
     "java -jar #{JAR_PATH} -export -format rdf -id #{id} #{datafile.content_blob.filepath}"
+  end
+
+  def rdf_resource_uri datafile
+    Seek::Config.site_base_host+"/data_files/#{datafile.id}"
   end
 
   def generate_rdf datafile
@@ -32,6 +37,15 @@ module RightField
       end
 
       output.strip
+  end
+
+  def generate_rdf_graph datafile
+    rdf = generate_rdf datafile
+    f=Tempfile.new("rdf")
+    f.write(rdf)
+    f.flush
+    RDF::Graph.load(f.path)
+
   end
 
 end

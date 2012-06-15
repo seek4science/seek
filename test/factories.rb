@@ -231,6 +231,11 @@ Factory.define(:rightfield_annotated_datafile,:parent=>:data_file) do |f|
   f.association :content_blob,:factory=>:rightfield_annotated_content_blob
 end
 
+Factory.define(:non_spreadsheet_datafile,:parent=>:data_file) do |f|
+  f.content_type "text/xml"
+  f.association :content_blob,:factory=>:cronwright_model_content_blob
+end
+
 #Model
   Factory.define(:model) do |f|
     f.sequence(:title) {|n| "A Model #{n}"}
