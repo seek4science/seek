@@ -3,6 +3,7 @@ module Acts
   module Authorized
     module PolicyBasedAuthorization
       def self.included klass
+        attr_accessor :permission_for
         klass.extend ClassMethods
         klass.extend AuthLookupClassMethods
         klass.class_eval do
