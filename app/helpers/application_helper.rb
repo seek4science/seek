@@ -120,7 +120,7 @@ module ApplicationHelper
 
   #selection of assets for new asset gadget
   def new_creatable_selection
-    creatable_options = Seek::Util.user_creatable_types.reject {|type| type == Sample}.collect { |c| [(c.name.underscore.humanize == "Sop" ? "SOP" : c.name.underscore.humanize), c.name.underscore] }
+    creatable_options = Seek::Util.user_creatable_types.collect { |c| [(c.name.underscore.humanize == "Sop" ? "SOP" : c.name.underscore.humanize), c.name.underscore] }
     creatable_options << ["Data file & sample", "data_file_with_sample"]
     select_tag :new_resource_type, options_for_select(creatable_options)
 
