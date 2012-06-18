@@ -276,69 +276,40 @@ namespace :seek do
   task :warm_memcache=> :environment do
     klasses = Seek::Util.persistent_classes.select { |klass| klass.reflect_on_association(:policy) }.reject { |klass| klass.name == 'Permission' || klass.name.match(/::Version$/) }
     items = klasses.map(&:all).flatten
+    users = User.all.select(&:person)
+    actions = Acts::Authorized::AUTHORIZATION_ACTIONS.map {|a| "can_#{a}?"}
 
-    total = items.count
-    users = User.find(:all, :order => "id")
-
-    items.each_with_index do |i, index|
-      users.each do |u|
-        puts "Total: #{total}, now: #{index} for user: #{u.id}"
-        Acts::Authorized::AUTHORIZATION_ACTIONS.each do |action|
-          i.send "can_#{action}?", u
-          puts action
+    Rails.logger.silence do
+      items.product(users).each do |i, u|
+        actions.each do |a|
+          i.send a, u
         end
       end
-
-      Acts::Authorized::AUTHORIZATION_ACTIONS.each do |action|
-        i.send "can_#{action}?", nil
-      end
     end
-
   end
 
   desc "dump policy authorization caching"
   task :dump_policy_authorization_caching, :filename, :needs => :environment do |t, args|
-    if args[:filename]
-      FasterCSV.open("#{args[:filename]}", "w") do |csv|
-        users = User.all.select { |u| u.person }
-        users << nil
-        klasses = Seek::Util.persistent_classes.select { |klass| klass.reflect_on_association(:policy) }.reject { |klass| klass.name == 'Permission' || klass.name.match(/::Version$/) }
-        items = klasses.map(&:all).flatten
+    filename = args[:filename] ? args[:filename].to_s : 'cache_dump.yaml'
 
-        users.each do |user|
-          items.each do |item|
-            Acts::Authorized::AUTHORIZATION_ACTIONS.each do |action|
-
-              item_auth_key = item.auth_key(user, action)
-              val = Rails.cache.read item_auth_key
-              csv << [item_auth_key, val].flatten
-            end
-          end
-        end
-      end
-    else
-      puts "please specify the dump file name... e.g. rake seek:dump_policy_authorization_caching[filename]"
-      raise
+    klasses = Seek::Util.persistent_classes.select { |klass| klass.reflect_on_association(:policy) }.reject { |klass| klass.name == 'Permission' || klass.name.match(/::Version$/) }
+    items = klasses.map(&:all).flatten.map(&:cache_key)
+    people = User.all.map(&:person).compact.map(&:cache_key)
+    actions = Acts::Authorized::AUTHORIZATION_ACTIONS.map {|action| "can_#{action}?"}
+    auth_keys = people.product(actions, items).map(&:to_s)
+    auth_hash = {}
+    auth_keys.each_slice(150000) {|keys| auth_hash.merge! Rails.cache.read_multi(*keys)}
+    puts "Printing"
+    File.open(filename, 'w') do |f|
+      f.print(YAML::dump(auth_hash))
     end
-
   end
 
 
   desc "load policy authorization caching"
   task :load_policy_authorization_caching,:filename,:needs => :environment do |t,args|
-    if args[:filename]
-      FasterCSV.foreach("#{args[:filename]}") do |row|
-        person_key = row[0]
-        action = row[1]
-        item_key = row[2]
-        val = row[3].blank? ? nil : row[3].to_sym
-        raise "invalid authorization value, must be either :true, :false, or nil. value: #{val.inspect} person_key: #{person_key} policy_key: #{policy_key} action: #{action}" unless [:true, :false, nil].include? val
-        Rails.cache.write [person_key, action, item_key], val
-        end
-    else
-        puts "please specify the load file name... e.g. rake seek:load_policy_authorization_caching[filename]"
-        raise
-    end
+    filename = args[:filename] ? args[:filename].to_s : 'cache_dump.yaml'
+    YAML.load(File.read(filename.to_s)).each_pair {|k,v| Rails.cache.write(k,v)}
   end
 
 

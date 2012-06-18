@@ -17,25 +17,33 @@ class Permission < ActiveRecord::Base
   # TODO implement duplicate check in :before_create
 
   def controls_access_for? person
-    contributor == person || try_block {contributor.people.include? person}
+    if contributor.respond_to?(:people)
+      contributor.people.include? person
+    else
+      contributor == person
+    end
   end
 
   #precedence of permission types. Highest precedence is listed first
-  @@precedence = ['Person', 'FavouriteGroup', 'WorkGroup', 'Project', 'Institution'].reverse
+  @@precedence = ['Person', 'FavouriteGroup', 'WorkGroup', 'Project', 'Institution']
 
-  #takes a list of permissions, and gives you the effective permission
-  def self.choose_for person, list
-    return nil if list.empty?
-    list.inject do |p, p2|
-      permissions = [p, p2]
+  #takes a list of permissions, and gives you a list from the highest precedence to the lowest
+  def self.sort_for person, list
+    return [] if list.empty?
+    #sort would list things from low to high, so the sort block will return -1 when p has a higher permission than p2
+    list.sort do |p, p2|
       unless p.contributor_type == p2.contributor_type
-        #return highest precedence
-        permissions.max_by{|p| @@precedence.index(p.contributor_type)}
+        #@@precedence has a smaller index for higher precedence types
+        p.compare_by(p2) {|p| @@precedence.index(p.contributor_type)}
       else
-        #if those match, return the highest access type
-        permissions.max_by{|p| p.access_type_for person}
+        #highest access type should come first so we need to reverse it
+        p.compare_by(p2) {|p| p.access_type_for(person)} * -1
       end
     end
+  end
+
+  def compare_by(other)
+    yield(self) <=> yield(other)
   end
 
 
