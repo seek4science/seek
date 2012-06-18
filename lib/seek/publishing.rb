@@ -117,6 +117,7 @@ module Seek
                                          :culprit => current_user,
                                          :resource=>object,
                                          :publish_state=>ResourcePublishLog::PUBLISHED)
+            #unpublish
             elsif object.policy.sharing_scope != Policy::EVERYONE && object.is_published_before_save
                             ResourcePublishLog.create(
                                          :culprit => current_user,
