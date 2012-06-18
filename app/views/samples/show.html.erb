@@ -68,10 +68,6 @@
 
   <%= render :partial => "assets/resource_main_content_right", :locals => {:resource => @sample, :title => 'Owner'} %>
 
-   <div class="main_content_right_box_wider">
-    <%= render :partial => "assets/resource_scales_box", :locals => { :resource => @sample}-%>
-  </div>
-  
   <div style="clear:both">
     <br/>
     <h2><%= Seek::Config.sample_parent_term.capitalize -%> details</h2>
