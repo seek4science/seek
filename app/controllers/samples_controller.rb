@@ -73,17 +73,18 @@ class SamplesController < ApplicationController
       end
 
       #add policy to specimen
-    tissue_and_cell_types = params[:tissue_and_cell_type_ids]||[]
 
       @sample.specimen.policy.set_attributes_with_sharing params[:sharing], @sample.projects
 
-      #get SOPs
+      #get specimen SOPs
       sops = (params[:specimen_sop_ids].nil?? [] : params[:specimen_sop_ids].reject(&:blank?)) || []
 
       #add creators
       AssetsCreator.add_or_update_creator_list(@sample.specimen, params[:creators])
       @sample.specimen.other_creators=params[:specimen][:other_creators] if params[:specimen]
     end
+
+    tissue_and_cell_types = params[:tissue_and_cell_type_ids]||[]
 
     @sample.policy.set_attributes_with_sharing params[:sharing], @sample.projects
 
