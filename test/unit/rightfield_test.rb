@@ -9,6 +9,7 @@ class RightFieldTest < ActiveSupport::TestCase
     df=Factory :rightfield_annotated_datafile
     assert_not_nil(df.content_blob)
     rdf = generate_rdf(df)
+    puts rdf
     assert_not_nil(rdf)
     f=Tempfile.new("rdf")
     f.write(rdf)
@@ -51,6 +52,22 @@ class RightFieldTest < ActiveSupport::TestCase
 
   test "non spreadsheet datafile to_rdf" do
     df=Factory :non_spreadsheet_datafile
+    rdf = df.to_rdf
+    assert_not_nil rdf
+
+    f=Tempfile.new("rdf")
+    f.write(rdf)
+    f.flush
+
+    RDF::RDFXML::Reader.open(f.path) do |reader|
+      assert reader.statements.count > 0
+      assert_equal RDF::URI.new("http://localhost:3000/data_files/#{df.id}"), reader.statements.first.subject
+    end
+  end
+
+  test "xlsx datafile to_rdf" do
+    df=Factory :xlsx_spreadsheet_datafile
+
     rdf = df.to_rdf
     assert_not_nil rdf
 

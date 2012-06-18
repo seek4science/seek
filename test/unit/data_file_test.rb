@@ -343,4 +343,12 @@ class DataFileTest < ActiveSupport::TestCase
       end
   end
 
+  test "is_xls" do
+    df = Factory :rightfield_datafile
+    assert df.is_xls?
+
+    df = Factory :xlsx_spreadsheet_datafile
+    assert !df.is_xls?
+  end
+
 end

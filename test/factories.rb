@@ -236,6 +236,11 @@ Factory.define(:non_spreadsheet_datafile,:parent=>:data_file) do |f|
   f.association :content_blob,:factory=>:cronwright_model_content_blob
 end
 
+Factory.define(:xlsx_spreadsheet_datafile,:parent=>:data_file) do |f|
+  f.content_type "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+  f.association :content_blob,:factory=>:xlsx_content_blob
+end
+
 #Model
   Factory.define(:model) do |f|
     f.sequence(:title) {|n| "A Model #{n}"}
@@ -314,6 +319,10 @@ end
 
   Factory.define(:rightfield_annotated_content_blob,:parent=>:content_blob) do |f|
     f.data  File.new("#{Rails.root}/test/fixtures/files/simple_populated_rightfield.xls","rb").read
+  end
+
+  Factory.define(:xlsx_content_blob,:parent=>:content_blob) do |f|
+    f.data  File.new("#{Rails.root}/test/fixtures/files/lihua_column_index_error.xlsx","rb").read
   end
 
   Factory.define(:cronwright_model_content_blob,:parent=>:content_blob) do |f|

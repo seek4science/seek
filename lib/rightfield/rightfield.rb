@@ -18,25 +18,22 @@ module RightField
     cmd = invoke_command datafile
 
     output = ""
-      err_message = ""
 
-      status = Open4::popen4(cmd) do |pid, stdin, stdout, stderr|
-        while ((line = stdout.gets) != nil) do
-          output << line
-        end
-        stdout.close
-
-        while ((line=stderr.gets)!= nil) do
-          err_message << line
-        end
-        stderr.close
+    status = Open4::popen4(cmd) do |pid, stdin, stdout, stderr|
+      while ((line = stdout.gets) != nil) do
+        output << line
       end
+      stdout.close
 
-      if status.to_i != 0
-        raise Exception.new(err_message)
-      end
+      stderr.close
+    end
 
-      output.strip
+    if status.to_i != 0
+      #error message is coming out through stdout rather than stderr due to log4j configuration.
+      raise Exception.new(output)
+    end
+
+    output.strip
   end
 
   def generate_rdf_graph datafile
