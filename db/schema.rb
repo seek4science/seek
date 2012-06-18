@@ -9,7 +9,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20120530143818) do
+ActiveRecord::Schema.define(:version => 20120615100546) do
 
   create_table "activity_logs", :force => true do |t|
     t.string   "action"
@@ -24,7 +24,7 @@ ActiveRecord::Schema.define(:version => 20120530143818) do
     t.datetime "updated_at"
     t.string   "http_referer"
     t.string   "user_agent"
-    t.text     "data",                   :limit => 16777215
+    t.text     "data",                   :limit => 2147483647
     t.string   "controller_name"
   end
 
@@ -990,6 +990,16 @@ ActiveRecord::Schema.define(:version => 20120530143818) do
     t.string   "predicate",    :null => false
     t.string   "object_type",  :null => false
     t.integer  "object_id",    :null => false
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
+  create_table "resource_publish_logs", :force => true do |t|
+    t.string   "resource_type"
+    t.integer  "resource_id"
+    t.string   "culprit_type"
+    t.integer  "culprit_id"
+    t.string   "publish_state"
     t.datetime "created_at"
     t.datetime "updated_at"
   end

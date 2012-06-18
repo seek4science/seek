@@ -4,7 +4,8 @@ module Seek
     def self.included(base)
       base.before_filter :set_asset, :only=>[:preview_publish,:publish,:approve_or_reject_publish,:approve_publish,:reject_publish]
       base.before_filter :publish_auth, :only=>[:preview_publish,:publish]
-      base.before_filter :gatekeeper_auth, :only => [:approve_or_reject_publish, :approve_publish, :reject_publish]
+      base.before_filter :gatekeeper_auth, :waiting_for_approval_auth, :only => [:approve_or_reject_publish, :approve_publish, :reject_publish]
+      base.after_filter :log_publishing, :only => [:create, :update, :approve_publish]
     end
 
     def approve_or_reject_publish
@@ -83,6 +84,45 @@ module Seek
       unless @asset.gatekeepers.include?(current_user.try(:person))
         error("You have to login as a gatekeeper to perform this action", "is invalid (insufficient_privileges)")
         return false
+      end
+    end
+
+    def waiting_for_approval_auth
+      latest_publish_state = ResourcePublishLog.find(:last, :conditions => ["resource_type=? AND resource_id=?", @asset.class.name, @asset.id])
+      unless latest_publish_state.try(:publish_state).to_i == ResourcePublishLog::WAITING_FOR_APPROVAL
+              error("You are not requested to approve/reject to publish this item", "is invalid (insufficient_privileges)")
+              return false
+      end
+    end
+
+    def log_publishing
+      User.with_current_user current_user do
+            c = self.controller_name.downcase
+            a = self.action_name.downcase
+
+            object = eval("@"+c.singularize)
+
+            #don't log if the object is not valid or has not been saved, as this will a validation error on update or create
+            return if object.nil? || (object.respond_to?("new_record?") && object.new_record?) || (object.respond_to?("errors") && !object.errors.empty?)
+
+            #waiting for approval
+            if params[:sharing] and params[:sharing][:request_publish_approval]
+                ResourcePublishLog.create(
+                           :culprit => current_user,
+                           :resource=>object,
+                           :publish_state=>ResourcePublishLog::WAITING_FOR_APPROVAL)
+            #publish
+            elsif object.policy.sharing_scope == Policy::EVERYONE && !object.is_published_before_save
+                ResourcePublishLog.create(
+                                         :culprit => current_user,
+                                         :resource=>object,
+                                         :publish_state=>ResourcePublishLog::PUBLISHED)
+            elsif object.policy.sharing_scope != Policy::EVERYONE && object.is_published_before_save
+                            ResourcePublishLog.create(
+                                         :culprit => current_user,
+                                         :resource=>object,
+                                         :publish_state=>ResourcePublishLog::UNPUBLISHED)
+            end
       end
     end
 
