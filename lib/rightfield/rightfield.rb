@@ -41,7 +41,13 @@ module RightField
     f=Tempfile.new("rdf")
     f.write(rdf)
     f.flush
-    RDF::Graph.load(f.path)
+    graph = RDF::Graph.new
+    RDF::Reader.for(:rdfxml).new(rdf) do |reader|
+      reader.each_statement do |stmt|
+        graph << stmt
+      end
+    end
+    graph
 
   end
 

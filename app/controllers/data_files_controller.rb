@@ -195,6 +195,7 @@ class DataFilesController < ApplicationController
     respond_to do |format|
       format.html # show.html.erb
       format.xml
+      format.rdf { render :text=>@data_file.to_rdf }
       format.svg { render :text=>to_svg(@data_file,params[:deep]=='true',@data_file)}
       format.dot { render :text=>to_dot(@data_file,params[:deep]=='true',@data_file)}
       format.png { render :text=>to_png(@data_file,params[:deep]=='true',@data_file)}

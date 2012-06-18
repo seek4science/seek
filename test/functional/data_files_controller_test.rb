@@ -30,6 +30,19 @@ class DataFilesControllerTest < ActionController::TestCase
 
   end
 
+  test "get as rdf" do
+    df = Factory :rightfield_annotated_datafile, :contributor=>users(:datafile_owner)
+    assert df.can_view?
+    get :show, :id=>df, :format=>"rdf"
+    assert_response :success
+    rdf = @response.body
+    RDF::Reader.for(:rdfxml).new(rdf) do |reader|
+      assert reader.statements.count > 0
+      assert_equal RDF::URI.new("http://localhost:3000/data_files/#{df.id}"), reader.statements.first.subject
+    end
+
+  end
+
   test "XML for data file with tags" do
     p=Factory :person
     df = Factory(:data_file,:policy=>Factory(:public_policy, :access_type=>Policy::VISIBLE))
