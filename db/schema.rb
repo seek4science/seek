@@ -863,6 +863,26 @@ ActiveRecord::Schema.define(:version => 20120615100546) do
     t.integer "presentation_id"
   end
 
+  create_table "project_folder_assets", :force => true do |t|
+    t.integer  "asset_id"
+    t.string   "asset_type"
+    t.integer  "project_folder_id"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
+  create_table "project_folders", :force => true do |t|
+    t.integer  "project_id"
+    t.string   "title"
+    t.text     "description"
+    t.integer  "parent_id"
+    t.boolean  "editable",    :default => true
+    t.datetime "created_at"
+    t.datetime "updated_at"
+    t.boolean  "incoming",    :default => false
+    t.boolean  "deletable",   :default => true
+  end
+
   create_table "project_roles", :force => true do |t|
     t.string   "name"
     t.datetime "created_at"
