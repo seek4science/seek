@@ -1,3 +1,6 @@
+Dear person.name,
+Below is the subcription report:
+
 <% @activity_logs.group_by(&:action).each do |action, logs| %>
     <label style="color:#f0342a;"><b><%= action.capitalize%></b></label>
     <div id="new_resources" class="new_resources" >
@@ -29,4 +32,11 @@
     <br style="clear:both"/>
 <% end %>
 
+You can change your subscription setting by editing your profile:
+<%= edit_person_url(person,:host=>@host) -%>.
 
+You can unsubscribe a particular resource by clicking the Unsubscribe link from the subscription report above
+or by visiting that resource in <%= Seek::Config.dm_project_name %> Seek
+
+kind regards,
+- The <%= Seek::Config.dm_project_name %> Team
