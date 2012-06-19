@@ -2,8 +2,42 @@ module Seek
   module Publishing
 
     def self.included(base)
-      base.before_filter :set_asset, :only=>[:preview_publish,:publish]
+      base.before_filter :set_asset, :only=>[:preview_publish,:publish,:approve_or_reject_publish,:approve_publish,:reject_publish]
       base.before_filter :publish_auth, :only=>[:preview_publish,:publish]
+      base.before_filter :gatekeeper_auth, :waiting_for_approval_auth, :only => [:approve_or_reject_publish, :approve_publish, :reject_publish]
+      base.after_filter :log_publishing, :only => [:create, :update, :approve_publish]
+    end
+
+    def approve_or_reject_publish
+      asset_type_name = @template.text_for_resource @asset
+
+      respond_to do |format|
+        format.html { render :template=>"assets/publish/approve_or_reject_publish",:locals=>{:asset_type_name=>asset_type_name} }
+      end
+    end
+
+    def approve_publish
+      policy = @asset.policy
+      policy.access_type=Policy::ACCESSIBLE
+      policy.sharing_scope=Policy::EVERYONE
+      if @asset.kind_of?(Strain)
+        policy.permissions = []
+      end
+      respond_to do |format|
+         if policy.save
+           flash[:notice]="Publishing complete"
+           format.html{redirect_to @asset.kind_of?(Strain) ? biosamples_path : @asset}
+         else
+           flash[:error] = "There is a problem in making this item published"
+         end
+      end
+    end
+
+    def reject_publish
+      respond_to do |format|
+         flash[:notice]="You rejected to publish this item"
+         format.html{redirect_to @asset.kind_of?(Strain) ? biosamples_path : @asset}
+      end
     end
 
     def preview_publish
@@ -36,7 +70,7 @@ module Seek
 
     def set_asset
       c = self.controller_name.downcase
-      @asset = eval("@"+c.singularize)
+      @asset = eval("@"+c.singularize) || self.controller_name.classify.constantize.find_by_id(params[:id])
     end
 
     def publish_auth
@@ -46,7 +80,60 @@ module Seek
       end
     end
 
+    def gatekeeper_auth
+      unless @asset.gatekeepers.include?(current_user.try(:person))
+        error("You have to login as a gatekeeper to perform this action", "is invalid (insufficient_privileges)")
+        return false
+      end
+    end
+
+    def waiting_for_approval_auth
+      latest_publish_state = ResourcePublishLog.find(:last, :conditions => ["resource_type=? AND resource_id=?", @asset.class.name, @asset.id])
+      unless latest_publish_state.try(:publish_state).to_i == ResourcePublishLog::WAITING_FOR_APPROVAL
+              error("You are not requested to approve/reject to publish this item", "is invalid (insufficient_privileges)")
+              return false
+      end
+    end
+
+    def log_publishing
+      User.with_current_user current_user do
+            c = self.controller_name.downcase
+            a = self.action_name.downcase
+
+            object = eval("@"+c.singularize)
+
+            #don't log if the object is not valid or has not been saved, as this will a validation error on update or create
+            return if object.nil? || (object.respond_to?("new_record?") && object.new_record?) || (object.respond_to?("errors") && !object.errors.empty?)
+
+            #waiting for approval
+            if params[:sharing] and params[:sharing][:request_publish_approval]
+                ResourcePublishLog.create(
+                           :culprit => current_user,
+                           :resource=>object,
+                           :publish_state=>ResourcePublishLog::WAITING_FOR_APPROVAL)
+            #publish
+            elsif object.policy.sharing_scope == Policy::EVERYONE && !object.is_published_before_save
+                ResourcePublishLog.create(
+                                         :culprit => current_user,
+                                         :resource=>object,
+                                         :publish_state=>ResourcePublishLog::PUBLISHED)
+            #unpublish
+            elsif object.policy.sharing_scope != Policy::EVERYONE && object.is_published_before_save
+                            ResourcePublishLog.create(
+                                         :culprit => current_user,
+                                         :resource=>object,
+                                         :publish_state=>ResourcePublishLog::UNPUBLISHED)
+            end
+      end
+    end
+
     private
+
+    def deliver_request_publish_approval sharing, item
+      if (sharing and sharing[:request_publish_approval]) && Seek::Config.email_enabled && !item.gatekeepers.empty?
+        Mailer.deliver_request_publish_approval item.gatekeepers, User.current_user,item,base_host
+      end
+    end
 
     def deliver_publishing_notifications items_for_notification
       owners_items={}

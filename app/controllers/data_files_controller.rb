@@ -171,6 +171,9 @@ class DataFilesController < ApplicationController
               @assay.relate(@data_file, RelationshipType.find_by_title(r_type))
             end
           end
+
+          deliver_request_publish_approval params[:sharing], @data_file
+
         else
           format.html {
             render :action => "new"
@@ -260,6 +263,8 @@ class DataFilesController < ApplicationController
             AssayAsset.destroy(assay_asset.id)
           end
         end
+        deliver_request_publish_approval params[:sharing], @data_file
+
       else
         format.html {
           render :action => "edit"

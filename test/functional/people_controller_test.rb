@@ -810,7 +810,7 @@ class PeopleControllerTest < ActionController::TestCase
     get :edit, :id=>people(:fred)
     assert_response :success
 
-    get :update, :id=>people(:fred), :person => {:first_name => 'fred1'}
+    put :update, :id=>people(:fred), :person => {:first_name => 'fred1'}
     assert_redirected_to assigns(:person)
     assert_equal 'fred1', assigns(:person).first_name
   end

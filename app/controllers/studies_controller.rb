@@ -7,7 +7,8 @@ class StudiesController < ApplicationController
   before_filter :find_and_auth, :only=>[:edit, :update, :destroy, :show]
 
   before_filter :check_assays_are_not_already_associated_with_another_study,:only=>[:create,:update]
-  
+
+  include Seek::Publishing
 
   def new_object_based_on_existing_one
     @existing_study =  Study.find(params[:id])
@@ -79,6 +80,7 @@ class StudiesController < ApplicationController
 
     respond_to do |format|
       if @study.save
+        deliver_request_publish_approval params[:sharing], @study
         flash[:notice] = 'Study was successfully updated.'
         format.html { redirect_to(@study) }
         format.xml  { head :ok }
@@ -109,6 +111,7 @@ class StudiesController < ApplicationController
 
 
   if @study.save
+    deliver_request_publish_approval params[:sharing], @study
     if @study.new_link_from_assay=="true"
       render :partial => "assets/back_to_singleselect_parent",:locals => {:child=>@study,:parent=>"assay"}
     else

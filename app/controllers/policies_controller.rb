@@ -68,7 +68,7 @@ class PoliciesController < ApplicationController
       creators = (params["creators"].blank? ? [] : ActiveSupport::JSON.decode(params["creators"])).uniq
       creators.collect!{|c| Person.find(c[1])}
       asset_managers = []
-      selected_projects = get_selected_projects
+      selected_projects = get_selected_projects params[:project_ids], params[:resource_name]
       selected_projects.each do |project|
         asset_managers |= project.asset_managers
       end
@@ -84,6 +84,32 @@ class PoliciesController < ApplicationController
       respond_to do |format|
         format.html { render :template=>"layouts/preview_permissions", :locals => {:grouped_people_by_access_type => grouped_people_by_access_type}}
       end
+  end
+
+  #This happens when changing the projects associated with item
+  def updated_can_publish
+    resource_class = params[:resource_name].camelize.constantize
+    resource = resource_class.find_by_id(params[:resource_id]) || resource_class.new
+    clone_resource = resource.clone
+    clone_resource.policy = resource.policy.deep_copy
+    if clone_resource.kind_of?Assay
+      clone_resource.study = Study.find_by_id(params[:project_ids].to_i)
+    elsif clone_resource.kind_of?Study
+       clone_resource.investigation = Investigation.find_by_id(params[:project_ids].to_i)
+    else
+      selected_projects = get_selected_projects params[:project_ids], params[:resource_name]
+      clone_resource.projects = selected_projects
+    end
+
+    if !resource.new_record? && resource.policy.sharing_scope == Policy::EVERYONE
+      updated_can_publish = true
+    else
+      updated_can_publish = clone_resource.can_publish?
+    end
+
+    respond_to do |format|
+      format.json {render :json => {:updated_can_publish => updated_can_publish}}
+    end
   end
 
   protected
@@ -137,18 +163,18 @@ class PoliciesController < ApplicationController
     policy
   end
 
-  def get_selected_projects params=params
-    if (params["resource_name"] == 'study') and (!params["project_ids"].blank?)
-      investigation = Investigation.find_by_id(params["project_ids"].to_i)
+  def get_selected_projects project_ids, resource_name
+    if (resource_name == 'study') and (!project_ids.blank?)
+      investigation = Investigation.find_by_id(project_ids.to_i)
       projects = investigation.projects
 
       #when resource is assay, id of the study is sent, so get the project_ids from the study
-    elsif (params["resource_name"] == 'assay') and (!params["project_ids"].blank?)
-      study = Study.find_by_id(params["project_ids"].to_i)
+    elsif (resource_name == 'assay') and (!project_ids.blank?)
+      study = Study.find_by_id(project_ids.to_i)
       projects = study.projects
       #normal case, the project_ids is sent
     else
-      project_ids = params["project_ids"].blank? ? [] : params["project_ids"].split(',')
+      project_ids = project_ids.blank? ? [] : project_ids.split(',')
       projects = []
       project_ids.each do |id|
         project = Project.find_by_id(id.to_i)

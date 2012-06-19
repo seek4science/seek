@@ -1,6 +1,7 @@
 <%= stylesheet_link_tag 'styles.css' -%>
 <script type="text/javascript">
-    initialiseFolds();
+    initialiseFold('add_projects_form');
+    initialiseFold('sharing_form');
     updateFancyMultiselect('strain_project_ids');
 </script>
 <div  id="strain_form">
@@ -103,7 +104,7 @@
   <br/>
 
   <% if (action == 'create') || (action == 'edit' && strain.can_manage?) %>
-      <%= render :partial => "assets/sharing_form", :locals => {:object => strain, :disable_advanced_view => true, :disable_can_publish_check => true} -%>
+      <%= render :partial => "assets/sharing_form", :locals => {:object => strain, :disable_advanced_view => true} -%>
   <% end %>
 
     <%= hidden_field_tag 'strain[id]', strain.id %>

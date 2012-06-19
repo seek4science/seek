@@ -13,6 +13,8 @@ class PresentationsController < ApplicationController
 
   #before_filter :convert_to_swf, :only => :show
 
+  include Seek::Publishing
+
   def new_version
     if (handle_data nil)
       comments=params[:revision_comment]
@@ -81,6 +83,7 @@ class PresentationsController < ApplicationController
               assay.relate(@presentation)
             end
           end
+          deliver_request_publish_approval params[:sharing], @presentation
         else
           format.html {
             render :action => "new"
@@ -208,6 +211,7 @@ class PresentationsController < ApplicationController
             AssayAsset.destroy(assay_asset.id)
           end
         end
+        deliver_request_publish_approval params[:sharing], @presentation
       else
         format.html {
           render :action => "edit"

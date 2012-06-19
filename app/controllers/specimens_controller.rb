@@ -5,6 +5,7 @@ class SpecimensController < ApplicationController
   before_filter :find_and_auth, :only => [:show, :update, :edit, :destroy]
 
   include IndexPager
+  include Seek::Publishing
 
   def new_object_based_on_existing_one
     @existing_specimen =  Specimen.find(params[:id])
@@ -43,6 +44,7 @@ class SpecimensController < ApplicationController
     AssetsCreator.add_or_update_creator_list(@specimen, params[:creators])
     respond_to do |format|
       if @specimen.save
+        deliver_request_publish_approval params[:sharing], @specimen
         sop_ids.each do |sop_id|
           sop= Sop.find sop_id
           SopSpecimen.create!(:sop_id => sop_id,:sop_version=> sop.version,:specimen_id=>@specimen.id)
@@ -80,6 +82,7 @@ class SpecimensController < ApplicationController
     AssetsCreator.add_or_update_creator_list(@specimen, params[:creators])
 
     if @specimen.save
+      deliver_request_publish_approval params[:sharing], @specimen
       sop_ids.each do |sop_id|
         sop= Sop.find sop_id
         existing = @specimen.sop_masters.select { |ss| ss.sop == sop }
