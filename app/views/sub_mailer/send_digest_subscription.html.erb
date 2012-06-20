@@ -1,4 +1,4 @@
-Dear person.name,
+Dear <%= @person.name%>,
 The following resources have been created/updated in <%= Seek::Config.project_name %> Seek:
 
 <% @activity_logs.group_by(&:action).each do |action, logs| %>
@@ -33,7 +33,7 @@ The following resources have been created/updated in <%= Seek::Config.project_na
 <% end %>
 
 You can change your subscription setting by editing your profile:
-<%= edit_person_url(person,:host=>@host) -%>.
+<%= link_to 'Edit profile', edit_person_path(@person) -%>.
 
 You can unsubscribe a particular resource by clicking the Unsubscribe link from the subscription report above
 or by visiting that resource in <%= Seek::Config.project_name %> Seek

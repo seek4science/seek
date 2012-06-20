@@ -6,17 +6,16 @@ class SubscriptionJob
 
   def perform
       todo = SubscriptionQueue.all(:limit=>BATCHSIZE,:order=>:id).collect do |queued|
-        todo = queued.item
+        todo = queued.activity_log
         queued.destroy
         todo
       end
       todo.uniq.each do |item|
         begin
-          activity_log = item.activity_log
-          activity_loggable = activity_log.activity_loggable
-          activity_loggable.send_immediate_subscriptions(activity_log) if activity_loggable.respond_to? :send_immediate_subscriptions
+          activity_loggable = item.activity_loggable
+          activity_loggable.send_immediate_subscriptions(item) if activity_loggable.respond_to? :send_immediate_subscriptions
         rescue Exception=>e
-          SubscriptionQueue.add_items_to_queue(item, 3, 1.seconds.from_now)
+          SubscriptionJob.add_items_to_queue(item, 3, 1.seconds.from_now)
         end
       end
 
@@ -25,7 +24,8 @@ class SubscriptionJob
       end
   end
 
-    def self.add_items_to_queue items, priority = 3, t=20.minutes.from_now
+    def self.add_items_to_queue items, priority = 3, t=Time.now
+      items = [items] if items.nil?
       items = Array(items)
       disable_authorization_checks do
         items.uniq.each do |item|
