@@ -85,6 +85,15 @@ namespace :seek do
     revert_fixtures_identify
     Strain.delete_all
     Fixtures.create_fixtures(File.join(RAILS_ROOT, "config/default_data"), "strains")
+    disable_authorization_checks do
+      #create policy for strains
+      Strain.all.each do |strain|
+        if strain.policy.nil?
+          strain.policy = Policy.public_policy
+          strain.save!
+        end
+      end
+    end
   end
 
   task(:culture_growth_types=>:environment) do
