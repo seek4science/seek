@@ -297,6 +297,7 @@ module Acts
       end
 
       def publishing_auth
+        return true if $authorization_checks_disabled
         #only check if doing publishing
         if self.policy.sharing_scope == Policy::EVERYONE && !self.kind_of?(Publication)
             unless self.can_publish?
