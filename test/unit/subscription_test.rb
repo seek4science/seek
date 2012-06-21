@@ -42,15 +42,18 @@ class SubscriptionTest < ActiveSupport::TestCase
     
     assert_emails(1) do
       Factory(:activity_log, :activity_loggable => s, :action => 'update')
+      SubscriptionJob.new.perform
     end
 
 
     other_guy = Factory(:person)
     other_guy.project_subscriptions.create :project => proj, :frequency => 'immediately'
+    s.reload
     s.subscribe(other_guy); s.save!
 
     assert_emails(2) do
       Factory(:activity_log, :activity_loggable => s, :action => 'update')
+      SubscriptionJob.new.perform
     end
   end
 
