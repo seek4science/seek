@@ -9,8 +9,8 @@ module ApplicationHelper
     if date.blank?
       str="<span class='none_text'>No date defined</span>"
     else
-      str = date.strftime("#{date.day.ordinalize} %B %Y")
-      str = date.strftime("#{str} @ %H:%M:%S") if show_time_of_day
+      str = date.localtime.strftime("#{date.day.ordinalize} %B %Y")
+      str = date.localtime.strftime("#{str} @ %H:%M:%S") if show_time_of_day
     end
     str
   end
