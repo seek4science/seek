@@ -15,23 +15,23 @@ class SendPeriodicEmailsJobTest < ActiveSupport::TestCase
   end
 
   test "exists" do
-    assert !SendPeriodicEmailsJob.exists?
+    assert !SendPeriodicEmailsJob.daily_exists?
     assert_difference("Delayed::Job.count",1) do
-      Delayed::Job.enqueue SendPeriodicEmailsJob.new
+      Delayed::Job.enqueue SendPeriodicEmailsJob.new('daily')
     end
 
-    assert SendPeriodicEmailsJob.exists?
+    assert SendPeriodicEmailsJob.daily_exists?
 
     job=Delayed::Job.first
     assert_nil job.locked_at
     job.locked_at = Time.now
     job.save!
-    assert !SendPeriodicEmailsJob.exists?,"Should ignore locked jobs"
+    assert !SendPeriodicEmailsJob.daily_exists?,"Should ignore locked jobs"
 
     job.locked_at=nil
     job.failed_at = Time.now
     job.save!
-    assert !SendPeriodicEmailsJob.exists?,"Should ignore failed jobs"
+    assert !SendPeriodicEmailsJob.daily_exists?,"Should ignore failed jobs"
   end
 
   test "perform" do

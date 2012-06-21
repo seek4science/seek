@@ -1,7 +1,5 @@
 class SendPeriodicEmailsJob < Struct.new(:frequency)
 
-  @@my_yaml = SendPeriodicEmailsJob.new.to_yaml
-
   def perform
     next_run_at = Time.new
     if frequency == 'daily'
@@ -18,12 +16,16 @@ class SendPeriodicEmailsJob < Struct.new(:frequency)
     SendPeriodicEmailsJob.create_job(frequency, next_run_at, 1)
   end
 
-  def self.exists?
-    Delayed::Job.find(:first,:conditions=>['handler = ? AND locked_at IS ? AND failed_at IS ?',@@my_yaml,nil,nil]) != nil
+  Subscription::FREQUENCIES.drop(1).each do |frequency|
+    eval <<-END_EVAL
+    def self.#{frequency}_exists?
+      Delayed::Job.find(:first,:conditions=>['handler = ? AND locked_at IS ? AND failed_at IS ?',SendPeriodicEmailsJob.new('#{frequency}').to_yaml,nil,nil]) != nil
+    end
+    END_EVAL
   end
 
   def self.create_job frequency,t, priority=1
-      Delayed::Job.enqueue(SendPeriodicEmailsJob.new(frequency),priority,t) unless exists?
+      Delayed::Job.enqueue(SendPeriodicEmailsJob.new(frequency),priority,t) unless send("#{frequency}_exists?")
   end
 
   def send_subscription_mails logs, frequency
