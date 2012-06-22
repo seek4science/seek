@@ -4,8 +4,15 @@ class SubscriptionTest < ActiveSupport::TestCase
 
   def setup
     User.current_user = Factory(:user)
+    @val = Seek::Config.email_enabled
+    Seek::Config.email_enabled=true
+    Delayed::Job.destroy_all
   end
 
+  def teardown
+      Delayed::Job.destroy_all
+      Seek::Config.email_enabled=@val
+  end
   
 
   test 'subscribing and unsubscribing toggle subscribed?' do
@@ -41,16 +48,19 @@ class SubscriptionTest < ActiveSupport::TestCase
     s.subscribe; s.save!
     
     assert_emails(1) do
-      Factory(:activity_log, :activity_loggable => s, :action => 'update')
+      al = Factory(:activity_log, :activity_loggable => s, :action => 'update')
+      SendImmediateEmailsJob.new(al.id).perform
     end
 
 
     other_guy = Factory(:person)
     other_guy.project_subscriptions.create :project => proj, :frequency => 'immediately'
+    s.reload
     s.subscribe(other_guy); s.save!
 
     assert_emails(2) do
-      Factory(:activity_log, :activity_loggable => s, :action => 'update')
+      al = Factory(:activity_log, :activity_loggable => s, :action => 'update')
+      SendImmediateEmailsJob.new(al.id).perform
     end
   end
 
@@ -72,7 +82,8 @@ class SubscriptionTest < ActiveSupport::TestCase
 
     assert_no_emails do
       User.with_current_user(s.contributor) do
-        Factory(:activity_log, :activity_loggable => s, :action => 'update')
+        al = Factory(:activity_log, :activity_loggable => s, :action => 'update')
+        SendImmediateEmailsJob.new(al.id).perform
       end
     end
   end
@@ -90,7 +101,8 @@ class SubscriptionTest < ActiveSupport::TestCase
     s.subscribe; s.save!
 
     assert_no_emails do
-      Factory(:activity_log, :activity_loggable => s, :action => 'update')
+      al = Factory(:activity_log, :activity_loggable => s, :action => 'update')
+      SendImmediateEmailsJob.new(al.id).perform
     end
 
   end
@@ -106,7 +118,8 @@ class SubscriptionTest < ActiveSupport::TestCase
     end
 
     assert_no_emails do
-      Factory(:activity_log, :activity_loggable => s, :action => 'update')
+      al = Factory(:activity_log, :activity_loggable => s, :action => 'update')
+      SendImmediateEmailsJob.new(al.id).perform
     end
 
   end

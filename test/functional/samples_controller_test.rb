@@ -146,46 +146,13 @@ fixtures :all
 
   test "should update" do
     s = Factory(:sample, :title=>"oneSample", :policy =>policies(:editing_for_all_sysmo_users_policy))
+    new_specimen = Factory(:specimen, :policy => Factory(:public_policy))
     assert_not_equal "test", s.title
-    put :update, :id=>s, :sample =>{:title =>"test"}
+    put :update, :id=>s, :sample =>{:title =>"test", :specimen_id => new_specimen.id}
     s = assigns(:sample)
     assert_redirected_to sample_path(s)
     assert_equal "test", s.title
-  end
-
-  test "should update sample with specimen" do
-    creator=Factory :person
-    proj1=Factory(:project)
-    proj2=Factory(:project)
-
-    new_sop=Factory :sop,:contributor=>User.current_user
-    original_sop = Factory :sop,:contributor=>User.current_user
-
-    s = Factory(:sample, :title=>"oneSample", :policy =>policies(:editing_for_all_sysmo_users_policy),
-                :specimen=>Factory(:specimen,:policy=>policies(:editing_for_all_sysmo_users_policy))
-    )
-    SopSpecimen.create!(:sop_id => original_sop.id,:sop_version=> original_sop.version,:specimen_id=>s.specimen.id)
-
-    assert_not_equal "new sample title", s.title
-    assert [original_sop],s.specimen.sops.collect{|sop| sop.parent}
-
-    put :update, :id=>s, :creators=>[[creator.name,creator.id]].to_json,
-        :specimen_sop_ids=>[new_sop.id],
-        :specimen=>{:other_creators=>"jesus jones"},
-        :sample =>{:title =>"new sample title",:projects=>[proj1,proj2],:specimen_attributes=>{:title=>"new specimen title"}}
-    s = assigns(:sample)
-
-    assert_redirected_to sample_path(s)
-    assert_equal "new sample title", s.title
-    assert_equal "new specimen title", s.specimen.title
-    assert s.specimen.creators.include?(creator)
-    assert_equal 1,s.specimen.creators.count
-    assert_equal "jesus jones",s.specimen.other_creators
-    assert_equal 2,s.projects.count
-    assert s.projects.include?(proj1)
-    assert s.projects.include?(proj2)
-    assert_equal s.projects,s.specimen.projects
-    assert_equal [new_sop],s.specimen.sops.collect{|sop| sop.parent}
+    assert_equal new_specimen, s.specimen
   end
 
   test "should destroy" do
@@ -276,14 +243,6 @@ fixtures :all
     assert_select "label", :text => /Sex/, :count => 1
   end
 
-  test 'should have specimen comment and sex fields in the specimen/sample edit page' do
-    s = Factory :sample, :contributor => User.current_user
-    get :edit, :id => s.id
-    assert_response :success
-    assert_select "input#sample_specimen_attributes_comments", :count => 1
-    assert_select "select#sample_specimen_attributes_sex", :count => 1
-  end
-
   test 'should have sample organism_part in the specimen/sample show page' do
     s = Factory :sample, :contributor => User.current_user
     get :show, :id => s.id
@@ -291,7 +250,7 @@ fixtures :all
     assert_select "label", :text => /Organism part/, :count => 1
   end
 
-  test 'should have sample organism_part in the specimen/sample edit page' do
+  test 'should have sample organism_part in the sample edit page' do
     s = Factory :sample, :contributor => User.current_user
     get :edit, :id => s.id
     assert_response :success
@@ -305,7 +264,7 @@ test 'should have sample Comment in the specimen/sample show page' do
     assert_select "label", :text => /Comment/, :count => 2 #one for specimen, one for sample
 end
 
-test 'should have sample comment in the specimen/sample edit page' do
+test 'should have sample comment in the sample edit page' do
   s = Factory :sample, :contributor => User.current_user
   get :edit, :id => s.id
   assert_response :success
@@ -321,5 +280,16 @@ end
     post :new_object_based_on_existing_one, :id => s.id
     assert_redirected_to :root
     assert_not_nil flash[:error]
+  end
+
+  test 'combined sample_specimen form when creating new sample' do
+    get :new
+    assert_response :success
+    assert_select 'input#sample_specimen_attributes_title', :count => 1
+  end
+  test 'only sample form when updating sample' do
+    get :edit, :id => Factory(:sample, :policy => policies(:editing_for_all_sysmo_users_policy))
+    assert_response :success
+    assert_select 'input#sample_specimen_attributes_title', :count => 0
   end
 end

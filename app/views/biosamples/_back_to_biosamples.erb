@@ -38,7 +38,6 @@
     }else if (action == 'create' && object_class == 'specimen' ){
         window.opener.loadNewSpecimenAfterCreation(specimen_row,'<%=strain_id%>');
     }else if (action == 'update' && object_class == 'sample'){
-        window.opener.updateSpecimenRow(specimen_row, 6);
         window.opener.updateSampleRow(sample_row, 6);
     }else if (action == 'update' && object_class == 'specimen'){
         window.opener.updateSpecimenRow( specimen_row, 6);

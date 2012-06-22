@@ -6,8 +6,13 @@
 
 <%= f.error_messages %>
 
-<% unless action == :new && !@sample.specimen.new_record?%>
-<%= render :partial => "samples/specimen_form", :locals => {:f => f, :specimen => @sample.specimen, :action => action}%>
+<% if @sample.new_record? && @sample.specimen.new_record?%>
+    <%= render :partial => "samples/specimen_form", :locals => {:f => f, :specimen => @sample.specimen, :action => action}%>
+<% else %>
+    <p>
+      <%= f.label "Choose a specimen" %> <span class="required">*</span><br/>
+      <%= f.collection_select(:specimen_id, Specimen.all_authorized_for('view'), :id, :title,{:include_blank =>"Please Select..."},{:style=>"width:50%"}) %>
+    </p>
 <% end %>
 
 <h2>Sample Details</h2>

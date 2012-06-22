@@ -1048,6 +1048,38 @@ class AuthorizationTest < ActiveSupport::TestCase
     end
   end
 
+  test 'unauthorized_change_to_autosave?' do
+    df = Factory(:data_file)
+    assert Policy::PRIVATE, df.policy.sharing_scope
+    df.policy.sharing_scope = Policy::ALL_SYSMO_USERS
+    assert !df.save
+    df.reload
+    assert_equal Policy::PRIVATE, df.policy.sharing_scope
+
+    disable_authorization_checks do
+      df.policy.sharing_scope = Policy::ALL_SYSMO_USERS
+      assert df.save
+      df.reload
+      assert_equal Policy::ALL_SYSMO_USERS, df.policy.sharing_scope
+    end
+  end
+
+  test 'disable authorization check for publishing_auth' do
+    df = Factory(:data_file)
+    assert_equal Policy::PRIVATE, df.policy.sharing_scope
+    user = Factory(:user)
+    User.with_current_user user do
+      assert !df.can_publish?
+    end
+
+    disable_authorization_checks do
+      df.policy.sharing_scope = Policy::EVERYONE
+      assert df.save
+      df.reload
+      assert_equal Policy::EVERYONE, df.policy.sharing_scope
+    end
+  end
+
   private 
 
   def actions

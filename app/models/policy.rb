@@ -150,6 +150,15 @@ class Policy < ActiveRecord::Base
     return policy
   end
 
+  def self.public_policy
+      policy = Policy.new(:name => "default public",
+                          :sharing_scope => EVERYONE,
+                          :access_type => ACCESSIBLE
+      )
+
+      return policy
+  end
+
   #The default policy to use when creating authorized items if no other policy is specified
   def self.default resource=nil
     private_policy
