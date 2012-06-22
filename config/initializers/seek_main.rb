@@ -34,8 +34,4 @@ Annotations::Config.versioning_enabled = false
 CELL_CULTURE_OR_SPECIMEN = Seek::Config.is_virtualliver ? 'specimen' : 'cell culture'
 ENV['LANG'] = 'en_US.UTF-8'
 
-#initialize the delay job for periodic email seding of subscription report
-SendPeriodicEmailsJob.create_job('daily', Time.at(75600))   #at 21:00
-SendPeriodicEmailsJob.create_job('weekly', Time.at(79200))  #at 22:00
-SendPeriodicEmailsJob.create_job('monthly', Time.at(82800)) #at 23:00
 

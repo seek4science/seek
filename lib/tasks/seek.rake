@@ -110,4 +110,12 @@ namespace :seek do
       ReindexingJob.add_items_to_queue type.all
     end
   end
+
+  desc "Initialize background jobs for sending subscription periodic emails"
+    task(:send_periodic_subscription_emails=>:environment) do
+      t=Time.now
+      SendPeriodicEmailsJob.create_job('daily', Time.local_time(t.year, t.month,t.day,21,00,00))   #at 21:00:00
+      SendPeriodicEmailsJob.create_job('weekly', Time.local_time(t.year, t.month,t.day,22,00,00))  #at 22:00:00
+      SendPeriodicEmailsJob.create_job('monthly', Time.local_time(t.year, t.month,t.day,23,00,00)) #at 23:00:00
+  end
 end
