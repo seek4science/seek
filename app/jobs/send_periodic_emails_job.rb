@@ -3,7 +3,7 @@ class SendPeriodicEmailsJob < Struct.new(:frequency)
   def perform
     next_run_at = Time.new
     if frequency == 'daily'
-      send_subscription_mails ActivityLog.scoped(:include => :activity_loggable, :conditions => ['created_at>=?', Date.yesterday]), 'daily'
+      send_subscription_mails ActivityLog.scoped(:include => :activity_loggable, :conditions => ['created_at>=?', Time.now.yesterday.utc]), 'daily'
       next_run_at += 1.day
     elsif frequency == 'weekly'
       send_subscription_mails ActivityLog.scoped(:include => :activity_loggable, :conditions => ['created_at>=?', 7.days.ago]), 'weekly'
