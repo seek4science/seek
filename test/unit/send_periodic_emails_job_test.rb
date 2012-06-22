@@ -34,6 +34,19 @@ class SendPeriodicEmailsJobTest < ActiveSupport::TestCase
     assert !SendPeriodicEmailsJob.daily_exists?,"Should ignore failed jobs"
   end
 
+  test "create job" do
+      assert_equal 0,Delayed::Job.count
+      SendPeriodicEmailsJob.create_job('daily', Time.now)
+      assert_equal 1,Delayed::Job.count
+
+      job = Delayed::Job.first
+      assert_equal 1,job.priority
+
+      SendPeriodicEmailsJob.create_job('daily', Time.now)
+      assert_equal 1,Delayed::Job.count
+  end
+
+
   test "perform" do
     Delayed::Job.destroy_all
     person1 = Factory(:person)
