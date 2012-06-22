@@ -56,8 +56,12 @@ class SendPeriodicEmailsJobTest < ActiveSupport::TestCase
     ProjectSubscription.create(:person_id => person1.id, :project_id => sop.projects.first.id, :frequency => 'daily')
     ProjectSubscription.create(:person_id => person2.id, :project_id => sop.projects.first.id, :frequency => 'weekly')
     ProjectSubscription.create(:person_id => person3.id, :project_id => sop.projects.first.id, :frequency => 'monthly')
+    sop.reload
 
-    assert_emails 1 do
+    SendPeriodicEmailsJob.create_job('daily', 15.minutes.from_now)
+    SendPeriodicEmailsJob.create_job('weekly', 15.minutes.from_now)
+    SendPeriodicEmailsJob.create_job('monthly', 15.minutes.from_now)
+    assert_emails 3 do
       disable_authorization_checks do
         ActivityLog.create(:activity_loggable => sop, :culprit => Factory(:user), :action => 'create')
       end
