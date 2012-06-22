@@ -33,7 +33,7 @@ resource_type = text_for_resource(resource)
 
 
 <% else -%>
-    <span class="icon">
+    <span id="request_resource_button" class="icon">
         <%= link_to_function request_request_label(resource),"alert('Unable to send emails - email is disabled');" -%>
     </span>
 <% end -%>
