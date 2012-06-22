@@ -97,33 +97,16 @@ class SamplesController < ApplicationController
 
 
   def update
-      if params[:sample]
-        spec = params[:sample].delete(:specimen_attributes) if params[:sample]
+    sops = (params[:sample_sop_ids].nil?? [] : params[:sample_sop_ids].reject(&:blank?)) || []
+    @sample.attributes = params[:sample]
+    #update policy to sample
+    @sample.policy.set_attributes_with_sharing params[:sharing],@sample.projects
 
-        #other creators gets passed as :specimen as the key due to the way the creators partial works
-        spec[:other_creators] = params[:specimen][:other_creators] if params[:specimen]
-        @sample.specimen.update_attributes(spec) unless spec.nil?
-        @sample.update_attributes(params[:sample])
-        @sample.specimen.contributor = @sample.contributor
-        @sample.specimen.projects = @sample.projects
-      end
-
-      if @sample.specimen.strain.nil? && !params[:organism].blank?
-        @sample.specimen.strain = Strain.default_strain_for_organism(params[:organism])
-      end
-
-      #update policy to sample
-      @sample.policy.set_attributes_with_sharing params[:sharing],@sample.projects
-      @sample.specimen.policy.set_attributes_with_sharing params[:sharing],@sample.projects
-
-      sops  = (params[:specimen_sop_ids].nil?? [] : params[:specimen_sop_ids].reject(&:blank?)) || []
-
-      #add creators
-      AssetsCreator.add_or_update_creator_list(@sample.specimen, params[:creators])
+    sops  = (params[:specimen_sop_ids].nil?? [] : params[:specimen_sop_ids].reject(&:blank?)) || []
 
       if @sample.save
         deliver_request_publish_approval params[:sharing], @sample
-        align_sops(@sample.specimen, sops)
+        align_sops(@sample, sops)
 
         if @sample.from_biosamples=="true"
           render :partial => "biosamples/back_to_biosamples", :locals => {:action => 'update', :object => @sample}
@@ -144,7 +127,8 @@ class SamplesController < ApplicationController
   def align_sops resource,new_sop_ids
     existing_ids = resource.sop_masters.collect{|sm| sm.sop.id}
     to_remove = existing_ids - new_sop_ids
-    join_class = "Sop#{resource.class.name}".constantize
+    join_class_string = ['Sop', resource.class.name].sort.join
+    join_class = join_class_string.constantize
     to_remove.each do |id|
       joins = join_class.find(:all, :conditions=>{"#{resource.class.name.downcase}_id".to_sym=>resource.id,:sop_id=>id})
       joins.each{|j| j.destroy}
