@@ -90,7 +90,7 @@ module Seek
     def waiting_for_approval_auth
       latest_publish_state = ResourcePublishLog.find(:last, :conditions => ["resource_type=? AND resource_id=?", @asset.class.name, @asset.id])
       unless latest_publish_state.try(:publish_state).to_i == ResourcePublishLog::WAITING_FOR_APPROVAL
-              error("You are not requested to approve/reject to publish this item", "is invalid (insufficient_privileges)")
+              error("You are not requested to approve/reject to publish this item or this item is already published", "is invalid (insufficient_privileges)")
               return false
       end
     end
@@ -101,6 +101,7 @@ module Seek
             a = self.action_name.downcase
 
             object = eval("@"+c.singularize)
+            object = @asset if a == 'approve_publish'
 
             #don't log if the object is not valid or has not been saved, as this will a validation error on update or create
             return if object.nil? || (object.respond_to?("new_record?") && object.new_record?) || (object.respond_to?("errors") && !object.errors.empty?)
