@@ -61,7 +61,7 @@ module ProjectsHelper
       if project.people.empty?
         "<span class='none_text'>No People in this project</span>";
       else
-        "<span>" + project.people.select(&:can_view?).map{|p|link_to(h(p.name), p) + " (" + p.email + ")"}.join(";<br/>") + "</span>";
+        "<span>" + project.people.sort_by(&:last_name).select(&:can_view?).map{|p|link_to(h(p.name), p) + " (" + p.email + ")"}.join(";<br/>") + "</span>";
       end
   end
 
