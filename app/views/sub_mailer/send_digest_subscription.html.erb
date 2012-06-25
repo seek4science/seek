@@ -1,5 +1,7 @@
 Dear <%= @person.name%>,
+<br/>
 The following resources have been created/updated in <%= Seek::Config.project_name %> Seek:
+<br/>
 
 <% @activity_logs.group_by(&:action).each do |action, logs| %>
     <label style="color:#f0342a;"><b><%= action.capitalize%></b></label>
@@ -31,12 +33,16 @@ The following resources have been created/updated in <%= Seek::Config.project_na
            </table></div>
     <br style="clear:both"/>
 <% end %>
-
+<br/>
 You can change your subscription setting by editing your profile:
 <%= link_to 'Edit profile', edit_person_path(@person) -%>.
+<br/>
 
 You can unsubscribe a particular resource by clicking the Unsubscribe link from the subscription report above
+<br/>
 or by visiting that resource in <%= Seek::Config.project_name %> Seek
+<br/>
 
 kind regards,
+<br/>
 - The <%= Seek::Config.dm_project_name %> Team
