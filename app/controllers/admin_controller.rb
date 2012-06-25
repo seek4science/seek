@@ -115,6 +115,9 @@ class AdminController < ApplicationController
 
     Seek::Config.copyright_addendum_enabled= string_to_boolean params[:copyright_addendum_enabled]
     Seek::Config.copyright_addendum_content= params[:copyright_addendum_content]
+
+    Seek::Config.noreply_sender= params[:noreply_sender]
+
     update_redirect_to true,'rebrand'
   end
 
