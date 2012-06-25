@@ -41,7 +41,7 @@ The following resources have been created/updated in <%= Seek::Config.project_na
 <% end %>
 <br/>
 You can change your subscription setting by editing your profile:
-<%= link_to 'Edit profile', edit_person_path(@person) -%>.
+<%= link_to('Edit profile', send("#{@person.class.name.underscore}_url", @person.id)) -%>.
 <br/>
 
 You can unsubscribe a particular resource by clicking the Unsubscribe link from the subscription report above
