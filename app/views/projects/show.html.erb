@@ -79,7 +79,7 @@
       <ul><%= Rails.cache.fetch([:project_tree_editor, @project.cache_key]) { tree_editor_display Project, false, false, @project.id, "Person", true, true } %></ul>
     </div>
   </div>
-  <% if @project.try(:can_be_administered_by?, current_user) -%>
+  <% if logged_in? and current_user.person.member? %>
       <div style="clear:both;">
         <b>Project mailing list
           (<%= link_to_function "show", visual_effect(:toggle_appear, "project_mailing_list")+"$('project_mailing_list').style.display=='none'? this.innerHTML='hide' : this.innerHTML='show';" %>
