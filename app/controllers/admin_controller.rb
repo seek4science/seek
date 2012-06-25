@@ -355,7 +355,7 @@ class AdminController < ApplicationController
      if flag
        flash[:notice] = RESTART_MSG
        #expires all fragment caching
-       expire_all_fragments
+       expire_header_and_footer
        redirect_to :action=>:show
      else
        redirect_to :action=> action.to_s
