@@ -33,7 +33,7 @@ class SendPeriodicEmailsJob < Struct.new(:frequency)
        activity_logs = person.subscriptions.scoped(:include => :subscribable).select{|s|s.frequency == frequency}.collect do |sub|
           logs.select{|log|log.activity_loggable.try(:can_view?, person.user) and log.activity_loggable.subscribable? and log.activity_loggable.subscribers_are_notified_of?(log.action) and log.activity_loggable == sub.subscribable}
        end.flatten(1)
-       SubMailer.deliver_send_digest_subscription person, activity_logs unless activity_logs.blank?
+       SubMailer.deliver_send_digest_subscription person, activity_logs, frequency unless activity_logs.blank?
      end
    end
 end
