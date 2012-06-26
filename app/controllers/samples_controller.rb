@@ -102,7 +102,6 @@ class SamplesController < ApplicationController
     #update policy to sample
     @sample.policy.set_attributes_with_sharing params[:sharing],@sample.projects
 
-    sops  = (params[:specimen_sop_ids].nil?? [] : params[:specimen_sop_ids].reject(&:blank?)) || []
 
       if @sample.save
         deliver_request_publish_approval params[:sharing], @sample
