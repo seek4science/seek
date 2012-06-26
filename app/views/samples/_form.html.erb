@@ -6,7 +6,7 @@
 
 <%= f.error_messages %>
 
-<% if @sample.new_record? && @sample.specimen.new_record?%>
+<% if @sample.new_record? && @sample.specimen.try(:new_record?)%>
     <%= render :partial => "samples/specimen_form", :locals => {:f => f, :specimen => @sample.specimen, :action => action}%>
 <% else %>
     <p>
@@ -79,7 +79,6 @@
 
 <%= f.hidden_field :from_new_link %>
 <%= f.hidden_field :from_biosamples %>
-<%= hidden_field_tag :specimen_id, @sample.specimen.try(:id) %>
 
 <p style="margin-top: 2em; text-align: center;">
   <%
