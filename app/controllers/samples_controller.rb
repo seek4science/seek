@@ -74,6 +74,7 @@ class SamplesController < ApplicationController
 
     if @sample.save
       deliver_request_publish_approval params[:sharing], @sample
+      deliver_request_publish_approval params[:sharing], @sample.specimen
         align_sops(@sample.specimen,sops) unless spe
 
         if @sample.from_new_link=="true"
