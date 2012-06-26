@@ -4,7 +4,14 @@ Dear <%= @person.name%>,
 <% if @frequency == 'immediately' %>
 The following resources have just been created/updated in <%= Seek::Config.project_name %> Seek:
 <% else %>
-The following resources have been created/updated in <%= Seek::Config.project_name %> Seek since last <%= @frequency%>:
+    <%
+       if @frequency == 'daily'
+         frequency = 'date'
+       else
+         frequency = @frequency.chomp('ly')
+       end
+    %>
+    The following resources have been created/updated in <%= Seek::Config.project_name %> Seek since last <%= frequency %>:
 <% end %>
 <br/>
 <br/>
