@@ -1,10 +1,19 @@
 Dear <%= @person.name%>,
 <br/>
+<br/>
 <% if @frequency == 'immediately' %>
 The following resources have just been created/updated in <%= Seek::Config.project_name %> Seek:
 <% else %>
-The following resources have been created/updated in <%= Seek::Config.project_name %> Seek since last <%= @frequency%>:
+    <%
+       if @frequency == 'daily'
+         frequency = 'date'
+       else
+         frequency = @frequency.chomp('ly')
+       end
+    %>
+    The following resources have been created/updated in <%= Seek::Config.project_name %> Seek since last <%= frequency %>:
 <% end %>
+<br/>
 <br/>
 
 <% @activity_logs.group_by(&:action).each do |action, logs| %>
@@ -39,12 +48,13 @@ The following resources have been created/updated in <%= Seek::Config.project_na
 <% end %>
 <br/>
 You can change your subscription setting by editing your profile:
-<%= link_to 'Edit profile', edit_person_path(@person) -%>.
+<%= link_to('Edit profile', send("#{@person.class.name.underscore}_url", @person.id)) -%>.
 <br/>
 
 You can unsubscribe a particular resource by clicking the Unsubscribe link from the subscription report above
 <br/>
 or by visiting that resource in <%= Seek::Config.project_name %> Seek
+<br/>
 <br/>
 
 kind regards,

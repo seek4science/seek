@@ -267,5 +267,16 @@ class PoliciesControllerTest < ActionController::TestCase
 
           json_response = ActiveSupport::JSON.decode(@response.body)
           assert json_response["updated_can_publish"]
-    end
+  end
+
+  test 'should show the preview permission for resource without projects' do
+    post :preview_permissions, :sharing_scope => 2, :access_type => Policy::VISIBLE, :project_access_type => Policy::ACCESSIBLE, :project_ids => '0', :resource_name => 'study'
+    assert_response :success
+
+    post :preview_permissions, :sharing_scope => 2, :access_type => Policy::VISIBLE, :project_access_type => Policy::ACCESSIBLE, :project_ids => '0', :resource_name => 'assay'
+    assert_response :success
+
+    post :preview_permissions, :sharing_scope => 2, :access_type => Policy::VISIBLE, :project_access_type => Policy::ACCESSIBLE, :project_ids => '0', :resource_name => 'sop'
+    assert_response :success
+  end
 end

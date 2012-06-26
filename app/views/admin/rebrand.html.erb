@@ -91,6 +91,13 @@
                 :field=>text_field_tag(:copyright_addendum_content, Seek::Config.copyright_addendum_content)
             } -%>
          </ul>
+
+          <%= render :partial=>'setting_li',:locals=>{
+            :description=>"An email that is used to send notification from SEEK.",
+            :name=>"Noreply sender",
+            :field=>text_field_tag(:noreply_sender, Seek::Config.noreply_sender)
+         } -%>
+
         <li>
             <%= submit_tag "Update",:disable_with=>"Updating..." -%>
         </li>

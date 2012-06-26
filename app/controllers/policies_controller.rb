@@ -127,22 +127,9 @@ class PoliciesController < ApplicationController
       #if share with your project and with all_sysmo_user is chosen
       if (policy.sharing_scope == Policy::ALL_SYSMO_USERS)
           your_proj_access_type = params["project_access_type"].blank? ? nil : params["project_access_type"].to_i
-          project_ids = []
-          #when resource is study, id of the investigation is sent, so get the project_ids from the investigation
-          if (params["resource_name"] == 'study') and (!params["project_ids"].blank?)
-            investigation = Investigation.find_by_id(try_block{params["project_ids"].to_i})
-            project_ids = try_block{investigation.projects.collect{|p| p.id}}
-
-          #when resource is assay, id of the study is sent, so get the project_ids from the study
-          elsif (params["resource_name"] == 'assay') and (!params["project_ids"].blank?)
-            study = Study.find_by_id(try_block{params["project_ids"].to_i})
-            project_ids = try_block{study.projects.collect{|p| p.id}}
-          #normal case, the project_ids is sent
-          else
-            project_ids = params["project_ids"].blank? ? [] : params["project_ids"].split(',')
-          end
-          project_ids.each do |project_id|
-            project_id = project_id.to_i
+          selected_projects = get_selected_projects params[:project_ids], params[:resource_name]
+          selected_projects.each do |selected_project|
+            project_id = selected_project.id
             #add Project to contributor_type
             contributor_types << "Project" if !contributor_types.include? "Project"
             #add one hash {project.id => {"access_type" => sharing[:your_proj_access_type].to_i}} to new_permission_data
@@ -166,12 +153,12 @@ class PoliciesController < ApplicationController
   def get_selected_projects project_ids, resource_name
     if (resource_name == 'study') and (!project_ids.blank?)
       investigation = Investigation.find_by_id(project_ids.to_i)
-      projects = investigation.projects
+      projects = investigation.nil? ? [] : investigation.projects
 
       #when resource is assay, id of the study is sent, so get the project_ids from the study
     elsif (resource_name == 'assay') and (!project_ids.blank?)
       study = Study.find_by_id(project_ids.to_i)
-      projects = study.projects
+      projects = study.nil? ? [] : study.projects
       #normal case, the project_ids is sent
     else
       project_ids = project_ids.blank? ? [] : project_ids.split(',')
