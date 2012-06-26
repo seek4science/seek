@@ -17,26 +17,28 @@
     <li><%= image_tag_for_key('destroy', polymorphic_path(asset), nil, { :confirm => delete_confirm_message, :method => :delete }, "Delete #{human_name}") -%></li>
   <% end -%>
 
+  <% if (asset.can_delete? or current_user.try(:admin?)) and asset.respond_to? :to_presentation %>
+      <li>
+        <%= image_tag_for_key "arrow_right", {:controller=>"data_files",:action => "convert_to_presentation",:id=>asset.id}, nil, {:title => "click to move this data file to presentations",:confirm => "Are you sure you wish to move this data file to presentations? Doing so is irreversible!"}, 'Move to presentations'%>
+     </li>
+   <% end %>
+
   <% if asset.is_downloadable? -%>
       <% if asset.can_download? -%>
-        <li>
+          <li>
           <%= image_tag_for_key('download', polymorphic_path(asset,:version=>version,:action=>:download), "Download #{human_name}", nil, "Download #{human_name}") -%>
-        </li>
+          </li>
+          <% if asset.is_a?(DataFile) && asset.is_extractable_spreadsheet? %>
+              <li>
+                <%= image_tag_for_key('spreadsheet', polymorphic_path(asset, :version => version, :action => :explore), "Explore #{human_name}", nil, "Explore #{human_name}") -%>
+              </li>
+          <% end -%>
       <% elsif logged_in? -%>
-        <li>
+          <li>
           <%= render :partial=>"assets/request_resource",:locals=>{:resource=>asset} %>
-        </li>
-      <% end -%>
-      <% if asset.can_download? && asset.is_a?(DataFile) && asset.is_extractable_spreadsheet? %>
-        <li>
-          <%= image_tag_for_key('spreadsheet', polymorphic_path(asset,:version=>version,:action=>:explore), "Explore #{human_name}", nil, "Explore #{human_name}") -%>
-        </li>
+          </li>
       <% end -%>
   <% end -%>
 
-  <% if (asset.can_delete? or current_user.try(:admin?)) and asset.respond_to? :to_presentation %>
-     <li>
-       <%= image_tag_for_key "arrow_right", {:controller=>"data_files",:action => "convert_to_presentation",:id=>asset.id}, nil, {:title => "click to move this data file to presentations",:confirm => "Are you sure you wish to move this data file to presentations? Doing so is irreversible!"}, 'Move to presentations'%>
-    </li>
-  <% end %>
+
 
