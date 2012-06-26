@@ -120,41 +120,20 @@ class SamplesController < ApplicationController
 
 
   def update
-      data_file_ids = (params[:sample_data_file_ids].nil? ? [] : params[:sample_data_file_ids].reject(&:blank?)) || []
-      model_ids = (params[:sample_model_ids].nil? ? [] : params[:sample_model_ids].reject(&:blank?)) || []
-             
-      if params[:sample]
-        spec = params[:sample].delete(:specimen_attributes) if params[:sample]
+    data_file_ids = (params[:sample_data_file_ids].nil? ? [] : params[:sample_data_file_ids].reject(&:blank?)) || []
+    model_ids = (params[:sample_model_ids].nil? ? [] : params[:sample_model_ids].reject(&:blank?)) || []
 
-      sop_ids = (params[:sample_sop_ids].nil? ? [] : params[:sample_sop_ids].reject(&:blank?)) || []
+    sop_ids = (params[:sample_sop_ids].nil? ? [] : params[:sample_sop_ids].reject(&:blank?)) || []
+    @sample.attributes = params[:sample]
 
-        #other creators gets passed as :specimen as the key due to the way the creators partial works
-        spec[:other_creators] = params[:specimen][:other_creators] if params[:specimen]
-        @sample.specimen.update_attributes(spec) unless spec.nil?
-        @sample.update_attributes(params[:sample])
-        @sample.specimen.contributor = @sample.contributor
-        @sample.specimen.projects = @sample.projects
-      end
+    #update policy to sample
+    @sample.policy.set_attributes_with_sharing params[:sharing], @sample.projects
 
-      if @sample.specimen.strain.nil? && !params[:organism].blank?
-        @sample.specimen.strain = Strain.default_strain_for_organism(params[:organism])
-      end
-
-      #update policy to sample
-      @sample.policy.set_attributes_with_sharing params[:sharing],@sample.projects
-      @sample.specimen.policy.set_attributes_with_sharing params[:sharing],@sample.projects
-
-      sops  = (params[:specimen_sop_ids].nil?? [] : params[:specimen_sop_ids].reject(&:blank?)) || []
-
-      #add creators
-      AssetsCreator.add_or_update_creator_list(@sample.specimen, params[:creators])
 
       if @sample.save
           @sample.create_or_update_assets data_file_ids,"DataFile"
           @sample.create_or_update_assets model_ids,"Model"
           @sample.create_or_update_assets sop_ids,"Sop"
-          
-        align_sops(@sample.specimen, sops)
 
         if @sample.from_biosamples=="true"
           render :partial => "biosamples/back_to_biosamples", :locals => {:action => 'update', :object => @sample}
@@ -175,7 +154,8 @@ class SamplesController < ApplicationController
   def align_sops resource,new_sop_ids
     existing_ids = resource.sop_masters.collect{|sm| sm.sop.id}
     to_remove = existing_ids - new_sop_ids
-    join_class = "Sop#{resource.class.name}".constantize
+    join_class_string = ['Sop', resource.class.name].sort.join
+    join_class = join_class_string.constantize
     to_remove.each do |id|
       joins = join_class.find(:all, :conditions=>{"#{resource.class.name.downcase}_id".to_sym=>resource.id,:sop_id=>id})
       joins.each{|j| j.destroy}
