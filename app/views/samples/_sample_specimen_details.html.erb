@@ -50,7 +50,7 @@
     <% if specimen.culture_growth_type.try(:title)=="in vivo" %>
         <p>
           <label>Age:</label>
-          <%= text_or_not_specified(specimen.age_in_weeks) %>
+          <%= text_or_not_specified(specimen.age_with_unit) %>
         </p>
         <p>
           <label>Sex:</label>
