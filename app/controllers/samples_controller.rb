@@ -48,10 +48,8 @@ class SamplesController < ApplicationController
 
   def create
     @sample = Sample.new(params[:sample])
-    spe = Specimen.find_by_id(params[:specimen_id])
-    if spe && (@sample.from_biosamples=='true')
-      @sample.specimen = spe
-    else
+    is_new_spec = params[:sample][:specimen_id].nil? ? true : false
+    if is_new_spec
       @sample.specimen.contributor = @sample.contributor if @sample.specimen.contributor.nil?
       @sample.specimen.projects = @sample.projects if @sample.specimen.projects.blank?
       if @sample.specimen.strain.nil? && !params[:organism].blank?
@@ -75,12 +73,12 @@ class SamplesController < ApplicationController
     if @sample.save
       deliver_request_publish_approval params[:sharing], @sample
       deliver_request_publish_approval params[:sharing], @sample.specimen
-        align_sops(@sample.specimen,sops) unless spe
+        align_sops(@sample.specimen,sops) if is_new_spec
 
         if @sample.from_new_link=="true"
            render :partial=>"assets/back_to_fancy_parent",:locals=>{:child=>@sample,:parent=>"assay"}
         elsif @sample.from_biosamples=="true"
-          render :partial=>"biosamples/back_to_biosamples",:locals=>{:action => 'create', :object=>@sample, :new_specimen => spe ? false : true}
+          render :partial=>"biosamples/back_to_biosamples",:locals=>{:action => 'create', :object=>@sample, :new_specimen => is_new_spec ? true : false}
         else
           respond_to do |format|
             flash[:notice] = 'Sample was successfully created.'
