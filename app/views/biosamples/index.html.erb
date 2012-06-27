@@ -185,14 +185,35 @@
         }
     }
 
-    function loadNewSampleAfterCreation(sample) {
-        var a = sample_table.fnAddData(sample);
-        var sample_nTr = sample_table.fnSettings().aoData[a[0]].nTr;
-        $j(sample_nTr).addClass('gradeX');
+    function loadNewSampleAfterCreation(sample, specimen_title) {
+        if (sample_table.length > 0) {
+            var data = sample_table.fnGetData();
+            if (data.length > 0) {
+                var load = false;
+                for (var i = 0; i < data.length; i++) {
+                    var pattern = new RegExp(specimen_title);
+                    if (pattern.test(data[i][0])) {
+                        load = true;
+                    }
+                }
+                if (load) {
+                    var a = sample_table.fnAddData(sample);
+                    var nTr = sample_table.fnSettings().aoData[a[0]].nTr;
+                    $j(nTr).addClass('gradeX');
+
+                }
+            }
+            else {
+            <%=remote_function(:url => {:controller => 'biosamples', :action => 'existing_samples'}, :with => "'specimen_ids=' + getSelectedSpecimens()");%>
+                show_existing_samples();
+            }
+        } else {
+        <%=remote_function(:url => {:controller => 'biosamples', :action => 'existing_samples'}, :with => "'specimen_ids=' + getSelectedSpecimens()");%>
+            show_existing_samples();
+        }
+
     }
-
-
-    function updateCreatorSettings() {
+        function updateCreatorSettings() {
     // iterate through all creators and build the "shared with" list;
     // in the meanwhile also assemble a minimized version of the array that
     // could be posted with the form (this won't have item titles in it)
