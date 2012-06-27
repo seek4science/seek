@@ -42,7 +42,7 @@ class Specimen < ActiveRecord::Base
   validates_presence_of :institution if Seek::Config.is_virtualliver
   validates_uniqueness_of :title
 
-  AGE_UNITS = ["day", "hour", "minute", "month", "second", "week", "year"]
+  AGE_UNITS = ["second","minute","hour","day","week","month","year"]
 
   def self.sop_sql()
   'SELECT sop_versions.* FROM sop_versions ' + 'INNER JOIN sop_specimens ' +
