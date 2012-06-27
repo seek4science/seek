@@ -62,23 +62,19 @@ class SamplesController < ApplicationController
 
   def create
     @sample = Sample.new(params[:sample])
-    spe = Specimen.find_by_id(params[:specimen_id])
-    if spe && (@sample.from_biosamples=='true')
-      @sample.specimen = spe
-    else
+    # create new specimen only for combined form
+    is_new_spec = params[:sample][:specimen_id].nil? ? true : false
+
+    if is_new_spec
       @sample.specimen.contributor = @sample.contributor if @sample.specimen.contributor.nil?
       @sample.specimen.projects = @sample.projects if @sample.specimen.projects.blank?
       if @sample.specimen.strain.nil? && !params[:organism].blank?
         @sample.specimen.strain = Strain.default_strain_for_organism(params[:organism])
       end
-
       #add policy to specimen
-
       @sample.specimen.policy.set_attributes_with_sharing params[:sharing], @sample.projects
-
       #get SOPs
-      sops = (params[:specimen_sop_ids].nil?? [] : params[:specimen_sop_ids].reject(&:blank?)) || []
-
+      specimen_sop_ids = (params[:specimen_sop_ids].nil?? [] : params[:specimen_sop_ids].reject(&:blank?)) || []
       #add creators
       AssetsCreator.add_or_update_creator_list(@sample.specimen, params[:creators])
       @sample.specimen.other_creators=params[:specimen][:other_creators] if params[:specimen]
@@ -96,13 +92,13 @@ class SamplesController < ApplicationController
       @sample.create_or_update_assets model_ids, "Model"
       @sample.create_or_update_assets sop_ids, "Sop"
       
-      align_sops(@sample.specimen,sops) unless spe
+      align_sops(@sample.specimen, specimen_sop_ids) if is_new_spec
 
 
       if @sample.parent_name=="assay"
         render :partial=>"assets/back_to_fancy_parent", :locals=>{:child=>@sample, :parent_name=>"assay"}
         elsif @sample.from_biosamples=="true"
-          render :partial=>"biosamples/back_to_biosamples",:locals=>{:action => 'create', :object=>@sample, :new_specimen => spe ? false : true}
+          render :partial=>"biosamples/back_to_biosamples",:locals=>{:action => 'create', :object=>@sample, :new_specimen => is_new_spec}
       else
         respond_to do |format|
           flash[:notice] = 'Sample was successfully created.'

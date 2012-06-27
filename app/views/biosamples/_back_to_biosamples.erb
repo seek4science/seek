@@ -35,7 +35,7 @@
     if (action == 'create' && object_class == 'sample' && "<%=new_specimen%>" == "true" ){
         window.opener.loadNewSpecimenAfterCreation(specimen_row, '<%=strain_id%>','<%=strain.is_dummy%>');
     }else if (action == 'create' && object_class == 'sample' && "<%=new_specimen%>" == "false"){
-        window.opener.loadNewSampleAfterCreation(sample_row);
+        window.opener.loadNewSampleAfterCreation(sample_row, '<%=object.specimen.title%>' );
     }else if (action == 'create' && object_class == 'specimen' ){
         window.opener.loadNewSpecimenAfterCreation(specimen_row,'<%=strain_id%>','<%=strain.is_dummy%>');
     }else if (action == 'update' && object_class == 'sample'){
