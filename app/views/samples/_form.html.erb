@@ -69,7 +69,8 @@
 
   <p>
     <%= f.label "Organism part" -%><br/>
-    <%= f.select :organism_part, options_for_select(['whole cell', 'membrane fraction'].insert(0,'Not specified'), @sample.organism_part), :style => 'float:right;margin-right:30em' %>
+    <% organism_part_options = Seek::Config.is_virtualliver ? ['whole organism','organ','tissue','intercellular','cell','subcellular','blood','serum']:['whole cell', 'membrane fraction'] %>
+    <%= f.select :organism_part, options_for_select(organism_part_options.insert(0,'Not specified'), @sample.organism_part), :style => 'float:right;margin-right:30em' %>
   </p>
   <br/>
   <%= render :partial => 'projects/project_selector', :locals => {:resource => @sample,:allow_nil=>true}%>
