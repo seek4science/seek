@@ -13,6 +13,16 @@ namespace :seek do
   desc 'an alternative to the doc:seek task'
   task(:docs=>["doc:seek"])
 
+  desc 'set age_unit to be week for Virtual Liver old specimens which use week as age unit'
+  task(:update_age_unit => :environment) do
+    Specimen.all.each do |sp|
+      sp.age_unit = "week" unless sp.age_unit
+      disable_authorization_checks do
+        sp.save!
+      end
+    end
+  end
+
   desc 'move sample-sop relation from sample_sops to sample_assets'
   task(:copy_old_sample_sops => :environment) do
     SampleSop.all.each do |ss|

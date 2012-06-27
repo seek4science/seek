@@ -45,7 +45,7 @@
 
     <tr>
       <td style="text-align:left;"><%= f.label :age -%></td>
-      <td style="text-align:left;"><%= f.text_field :age, :style => "width: 150px;" -%> weeks</td>
+      <td style="text-align:left;"><%= f.text_field :age, :style => "width: 150px;" -%><%= f.select :age_unit, options_for_select(Specimen::AGE_UNITS, specimen.age_unit) -%>(s)</td>
     </tr>
 
     <tr>

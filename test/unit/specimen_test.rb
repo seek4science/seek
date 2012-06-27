@@ -25,9 +25,9 @@ fixtures :all
 
   end
 
-  test "age in weeks" do
-    specimen = Factory :specimen,:age => 12
-    assert_equal "#{specimen.age} (weeks)",specimen.age_in_weeks
+  test "age with unit" do
+    specimen = Factory :specimen,:age => 12,:age_unit=>"year"
+    assert_equal "12(years)",specimen.age_with_unit
   end
 
   test "get organism" do
