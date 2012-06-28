@@ -2,7 +2,7 @@ Dear <%= @person.name%>,
 <br/>
 <br/>
 <% if @frequency == 'immediately' %>
-The following resources have just been created/updated in <%= Seek::Config.project_name %> Seek:
+The following resources have just been created/updated in <%= Seek::Config.application_title %> Seek:
 <% else %>
     <%
        if @frequency == 'daily'
@@ -11,7 +11,7 @@ The following resources have just been created/updated in <%= Seek::Config.proje
          frequency = @frequency.chomp('ly')
        end
     %>
-    The following resources have been created/updated in <%= Seek::Config.project_name %> Seek since last <%= frequency %>:
+    The following resources have been created/updated in <%= Seek::Config.application_title %> Seek since last <%= frequency %>:
 <% end %>
 <br/>
 <br/>
@@ -37,9 +37,9 @@ The following resources have just been created/updated in <%= Seek::Config.proje
                 <td><%= log.referenced.nil? ? "<span style='font-style:italic;color:#666666'>Not Specified</span>" : log.referenced.name %></td>
                 <td><%= log.activity_loggable_type.humanize %></td>
                 <td><%= try_block{link_to(log.activity_loggable.title, send("#{log.activity_loggable.class.name.underscore}_url", log.activity_loggable))} || log.activity_loggable.title%></td>
-                <td><%= link_to h(try_block{log.culprit.person.name}), "mailto:#{try_block{log.culprit.person.email_with_name}}" %></td>
+                <td><%= link_to h(try_block{log.culprit.person.name}), send("#{log.culprit.person.class.name.underscore}_url", log.culprit.person.id) %></td>
                 <td> <%= log.created_at %></td>
-                <td> <%= link_to "Unsubscribe", Seek::Config.site_base_host.end_with?('/') ? "#{Seek::Config.site_base_host}" : "#{Seek::Config.site_base_host}/" + "subscriptions/destroy/#{Subscription.find_by_subscribable_id_and_subscribable_type_and_person_id(log.activity_loggable_id, log.activity_loggable_type, @person.id).id}" %></td>
+                <td> <%= link_to "Unsubscribe", send("#{log.activity_loggable.class.name.underscore}_url", log.activity_loggable) %></td>
               </tr>
 
       <% end %>
@@ -51,12 +51,10 @@ You can change your subscription setting by editing your profile:
 <%= link_to('Edit profile', send("edit_#{@person.class.name.underscore}_url", @person.id)) -%>.
 <br/>
 
-You can unsubscribe a particular resource by clicking the Unsubscribe link from the subscription report above
+You can unsubscribe from a particular resource by clicking on the Unsubscribe link in the subscription report above
 <br/>
-or by visiting that resource in <%= Seek::Config.project_name %> Seek
+or by visiting that resource in <%= Seek::Config.application_title %> Seek
 <br/>
 <br/>
 
-kind regards,
-<br/>
-- The <%= Seek::Config.dm_project_name %> Team
+This is an automated email.
