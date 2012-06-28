@@ -1000,6 +1000,8 @@ class PeopleControllerTest < ActionController::TestCase
     assert_redirected_to current_person
     assert current_person.project_subscriptions.empty?
 
+    sop.reload
+    df.reload
     assert !sop.subscribed?(current_person)
     assert !df.subscribed?(current_person)
     assert current_person.receive_notifications?
