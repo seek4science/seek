@@ -84,9 +84,6 @@ class Person < ActiveRecord::Base
   ROLES_MASK_FOR_PAL = 2**ROLES.index('pal')
   ROLES_MASK_FOR_PROJECT_MANAGER = 2**ROLES.index('project_manager')
 
-  def self.admins
-
-  end
   ROLES.each do |role|
       eval <<-END_EVAL
             def is_#{role}?

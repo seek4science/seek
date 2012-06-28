@@ -1,11 +1,11 @@
 <%
   #So we don't have to run lengthy authorization a second time when calculating total stats
-  total_visible_data_files = 0
-  total_visible_models = 0
-  total_visible_sops = 0
-  total_accessible_data_files = 0
-  total_accessible_models = 0
-  total_accessible_sops = 0
+  total_visible_data_files = []
+  total_visible_models = []
+  total_visible_sops = []
+  total_accessible_data_files = []
+  total_accessible_models = []
+  total_accessible_sops = []
 %>
 
 <h3>Content statistics</h3>
@@ -30,21 +30,21 @@ For data, models and SOPs, the numbers are split as <em>total</em> / <em>visible
     <td><%= stat.investigations.count -%></td>
     <td><%= stat.studies.count -%></td>
     <td><%= stat.assays.count -%></td>
-    <% visible_data_files = stat.visible_data_files.count
-       total_visible_data_files += visible_data_files %>
-	<% accessible_data_files = stat.accessible_data_files.count
-       total_accessible_data_files += accessible_data_files %>
-    <td><%= "#{stat.data_files.count}/#{visible_data_files}/#{accessible_data_files}" -%></td>
-    <% visible_models = stat.visible_models.count
-       total_visible_models += visible_models %>
-	<% accessible_models = stat.accessible_models.count
-       total_accessible_models += accessible_models %>
-    <td><%= "#{stat.models.count}/#{visible_models}/#{accessible_models}" -%></td>
-    <% visible_sops = stat.visible_sops.count
-       total_visible_sops += visible_sops %>
-	<% accessible_sops = stat.accessible_sops.count
-       total_accessible_sops += accessible_sops %>
-    <td><%= "#{stat.sops.count}/#{visible_sops}/#{accessible_sops}" -%></td>
+    <% visible_data_files = stat.visible_data_files
+       total_visible_data_files |= visible_data_files %>
+	<% accessible_data_files = stat.accessible_data_files
+       total_accessible_data_files |= accessible_data_files %>
+    <td><%= "#{stat.data_files.count}/#{visible_data_files.count}/#{accessible_data_files.count}" -%></td>
+    <% visible_models = stat.visible_models
+       total_visible_models |= visible_models %>
+	<% accessible_models = stat.accessible_models
+       total_accessible_models |= accessible_models %>
+    <td><%= "#{stat.models.count}/#{visible_models.count}/#{accessible_models.count}" -%></td>
+    <% visible_sops = stat.visible_sops
+       total_visible_sops |= visible_sops %>
+	<% accessible_sops = stat.accessible_sops
+       total_accessible_sops |= accessible_sops %>
+    <td><%= "#{stat.sops.count}/#{visible_sops.count}/#{accessible_sops.count}" -%></td>
     <td><%= stat.publications.count -%> </td>
   </tr>
   <% end %>
@@ -54,9 +54,9 @@ For data, models and SOPs, the numbers are split as <em>total</em> / <em>visible
     <td><%= Investigation.count -%></td>
     <td><%= Study.count -%></td>
     <td><%= Assay.count -%></td>
-    <td><%= "#{DataFile.count}/#{total_visible_data_files}/#{total_accessible_data_files}" -%></td>
-    <td><%= "#{Model.count}/#{total_visible_models}/#{total_accessible_models}" -%></td>
-    <td><%= "#{Sop.count}/#{total_visible_sops}/#{total_accessible_sops}" -%></td>
+    <td><%= "#{DataFile.count}/#{total_visible_data_files.count}/#{total_accessible_data_files.count}" -%></td>
+    <td><%= "#{Model.count}/#{total_visible_models.count}/#{total_accessible_models.count}" -%></td>
+    <td><%= "#{Sop.count}/#{total_visible_sops.count}/#{total_accessible_sops.count}" -%></td>
     <td><%= Publication.count -%></td>
   </tr>
 </table>
