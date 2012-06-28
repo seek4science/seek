@@ -29,12 +29,12 @@ module Seek
       doc.root.namespaces.default_prefix="ss"
       sample_sheet = find_samples_sheet doc
       unless sample_sheet.nil?
-        row, first_col, last_col = find_treatment_row_and_columns_in_sheet sample_sheet
-        unless row.nil?
-          collect_values row, first_col, last_col, sample_sheet
+        treatments_heading_row, treatments_first_col, treatments_last_col = find_treatment_row_and_columns_in_sheet sample_sheet
+        unless treatments_heading_row.nil?
           sample_col = hunt_for_sample_name_column sample_sheet
+          collect_treatment_values_and_title treatments_heading_row, treatments_first_col, treatments_last_col, sample_sheet
           if sample_col > 0
-            collect_sample_names row, sample_col, sample_sheet
+            collect_sample_names treatments_heading_row, sample_col, treatments_first_col, treatments_last_col,sample_sheet
           else
             @sample_names = [].fill("", 0, values.first ? values.first[1].length : 0)
           end
@@ -65,24 +65,71 @@ module Seek
       end
     end
 
-    def collect_sample_names first_row, col, sheet
+    def collect_sample_names first_row, col, treatments_first_col, treatments_last_col,sheet
+
       sheet_name = sheet.attributes["name"]
-      @sample_names = sheet.find("//ss:sheet[@name='#{sheet_name}']/ss:rows/ss:row/ss:cell[@row >= '#{(first_row+1).to_s}' and @column = '#{col.to_s}']").collect do |cell|
-        cell.content
+      next_row = first_row + 1
+      @sample_names = []
+      sheet.find("//ss:sheet[@name='#{sheet_name}']/ss:rows/ss:row/ss:cell[@row >= '#{(next_row).to_s}' and @column = '#{col.to_s}']").each do |cell|
+        row = cell.attributes["row"].to_i
+        if row > next_row
+          #fill missing rows
+          (next_row...row).to_a.each do |missing_row|
+            if treatments_exist_for_row? missing_row,treatments_first_col,treatments_last_col,sheet
+              @sample_names << ""
+            end
+          end
+        else
+          treatments_exist = treatments_exist_for_row? row,treatments_first_col,treatments_last_col,sheet
+          #only include samples where at least one of the treatments cells contain content
+          if treatments_exist
+            @sample_names << cell.content
+          end
+        end
+
+        next_row = row + 1
       end
+
     end
 
-    def collect_values row, first_col, last_col, sheet
+    def treatments_exist_for_row? row,treatments_first_col,treatments_last_col, sheet
+      treatment_content_count = 0
+      sheet_name = sheet.attributes["name"]
+      #count them to take into account blank cells that may be missing from the XML
+      sheet.find("//ss:sheet[@name='#{sheet_name}']/ss:rows/ss:row/ss:cell[@row = '#{row}' and @column >= '#{treatments_first_col.to_s}' and @column <= '#{treatments_last_col.to_s}']").each do |treatment_cell|
+        treatment_content_count+=1 if (!treatment_cell.content.blank?)
+      end
+      treatment_content_count > 0
+    end
+
+    def collect_treatment_values_and_title treatments_heading_row, first_col, last_col, sheet
+      #FIXME: this needs simplifying - maybe by copying all into a matrix first and dealing with that
       sheet_name = sheet.attributes["name"]
       col_keys = {}
-      sheet.find("//ss:sheet[@name='#{sheet_name}']/ss:rows/ss:row/ss:cell[@row >= '#{row.to_s}' and @column >= '#{first_col.to_s}' and @column <= '#{last_col.to_s}']").each do |cell|
-        this_col_alpha = cell.attributes["column_alpha"]
-        if cell.attributes["row"]==row.to_s
 
-          @values[cell.content]=[]
-          col_keys[this_col_alpha]=cell.content
+      rows = sheet.find("//ss:sheet[@name='#{sheet_name}']/ss:rows/ss:row[@index>= '#{treatments_heading_row.to_s}']")
+      rows.each do |row|
+        values = {}
+        row.find("//ss:sheet[@name='#{sheet_name}']/ss:rows/ss:row/ss:cell[@row = '#{row.attributes["index"]}' and @column >= '#{first_col.to_s}' and @column <= '#{last_col.to_s}']").each do |cell|
+          this_col_alpha = cell.attributes["column_alpha"]
+          values[this_col_alpha]=cell.content
+        end
+        if row.attributes["index"]==treatments_heading_row.to_s
+          values.keys.each do |col_alpha|
+            content = values[col_alpha]
+            @values[content]=[]
+            col_keys[col_alpha]=content
+          end
+
         else
-          @values[col_keys[this_col_alpha]] << cell.content
+          if (!values.values.select { |v| !v.blank? }.empty?)
+            values.keys.each do |col_alpha|
+              key = col_keys[col_alpha]
+              @values[key] << values[col_alpha]
+            end
+          else
+            break #stop once encountering a row with no treatments defined. Subsequent rows will not be included (solves an issue where there is more information below the sample table)
+          end
         end
       end
     end

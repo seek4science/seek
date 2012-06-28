@@ -161,6 +161,31 @@ class TreatmentsTest < ActiveSupport::TestCase
 
   end
 
+  test "extract from katys populated problematic file" do
+    xml = xml_for_file("JERM_2DGel_SEEKJERM_edited.xls")
+    assert xml.include?("workbook")
+    treatment = Seek::Treatments.new xml
+    assert_equal 1,treatment.sample_names.count
+    assert_equal "",treatment.sample_names.first
+    assert_equal 2, treatment.values.keys.count
+    assert_equal ["activity","growth_medium"],treatment.values.keys.sort
+    assert_equal 1,treatment.values["activity"].count
+    assert_equal 1,treatment.values["growth_medium"].count
+    assert_equal "25.0",treatment.values["activity"].first
+    assert_equal "raspberry jam",treatment.values["growth_medium"].first
+  end
+
+  test "extract from katys original problematic file" do
+    xml = xml_for_file("JERM_2DGel_SEEKJERM_original.xls")
+    assert xml.include?("workbook")
+    treatment = Seek::Treatments.new xml
+    assert_equal 0,treatment.sample_names.count
+    assert_equal 2, treatment.values.keys.count
+    assert_equal ["e.g Growth medium","e.g temperature"],treatment.values.keys.sort
+    assert_equal 0,treatment.values["e.g Growth medium"].count
+    assert_equal 0,treatment.values["e.g temperature"].count
+  end
+
   test "extract no treatments" do
     xml = xml_for_file("small-test-spreadsheet.xls")
     assert xml.include?("workbook")
