@@ -48,15 +48,6 @@ class ProjectSubscription < ActiveRecord::Base
   after_create :subscribe_to_all_in_project
 
   def subscribe_to_all_in_project
-    all_in_project.each{|item| item.subscriptions.build(:person => person, :project_subscription_id => id) unless item.subscribed?(person) }.each {|i| disable_authorization_checks {i.save(false)} if i.changed_for_autosave?}
-  end
-
-  def unsubscribe_to_all_in_project
-    all_in_project.each{|item| item.unsubscribe(person)}.each {|i| disable_authorization_checks {i.save(false)} if i.changed_for_autosave?}
-  end
-
-  private
-  def all_in_project
-    subscribable_types.map(&:constantize).collect {|klass| if klass.reflect_on_association(:projects) then klass.scoped(:include => :projects) else klass.all end}.flatten.select {|item| item.projects.include? project}
+    ProjectSubscriptionJob.create_job id
   end
 end
