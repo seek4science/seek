@@ -43,7 +43,7 @@ class PeopleController < ApplicationController
     end
 
     unless @people
-      if (params[:page]=='latest' || params[:page]=="all")
+      if (params[:page].blank? || params[:page]=='latest' || params[:page]=="all")
         @people = Person.active
       else
         @people = Person.all
