@@ -135,6 +135,18 @@ class SubscriptionTest < ActiveSupport::TestCase
     assert_equal proj, current_person.subscriptions.first.project_subscription.project
   end
 
+  test 'set_default_subscriptions when a study is created' do
+    proj = Factory(:project)
+    current_person.project_subscriptions.create :project => proj, :frequency => 'weekly'
+    assert Subscription.all.empty?
+
+    s = Factory(:study, :investigation => Factory(:investigation, :projects => [proj]), :policy => Factory(:public_policy))
+
+    assert s.subscribed?(current_person)
+    assert_equal 2, current_person.subscriptions.count
+    assert_equal proj, current_person.subscriptions.first.project_subscription.project
+  end
+
   test 'subscribe to all the items in a project when subscribing to that project' do
     proj = Factory(:project)
     s1 = Factory(:subscribable, :projects => [Factory(:project), proj], :policy => Factory(:public_policy))
