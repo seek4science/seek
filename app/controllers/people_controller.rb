@@ -43,7 +43,12 @@ class PeopleController < ApplicationController
     end
 
     unless @people
-      @people = apply_filters(Person.all).select(&:can_view?)
+      if (params[:page].blank? || params[:page]=='latest' || params[:page]=="all")
+        @people = Person.active
+      else
+        @people = Person.all
+      end
+      @people = apply_filters(@people).select(&:can_view?)
       @people=Person.paginate_after_fetch(@people, :page=>params[:page])
     else
       @people = @people.select(&:can_view?)

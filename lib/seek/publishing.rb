@@ -90,7 +90,7 @@ module Seek
     def waiting_for_approval_auth
       latest_publish_state = ResourcePublishLog.find(:last, :conditions => ["resource_type=? AND resource_id=?", @asset.class.name, @asset.id])
       unless latest_publish_state.try(:publish_state).to_i == ResourcePublishLog::WAITING_FOR_APPROVAL
-              error("You are not requested to approve/reject to publish this item or this item is already published", "is invalid (insufficient_privileges)")
+              error("You are not authorized to approve/reject the publishing of this item, or this item is already published", "is invalid (insufficient_privileges)")
               return false
       end
     end

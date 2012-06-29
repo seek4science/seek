@@ -5,6 +5,9 @@ class Person < ActiveRecord::Base
   acts_as_yellow_pages
   default_scope :order => "last_name, first_name"
 
+  #those that have updated time stamps and avatars appear first. A future enhancement could be to judge activity by last asset updated timestamp
+  named_scope :active, :order=> "avatar_id is null, updated_at DESC"
+
   before_save :first_person_admin
   before_destroy :clean_up_and_assign_permissions
 
