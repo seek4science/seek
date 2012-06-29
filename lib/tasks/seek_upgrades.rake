@@ -7,7 +7,8 @@ namespace :seek do
   
   #these are the tasks required for this version upgrade
   task :upgrade_version_tasks=>[
-            :environment
+            :environment,
+            :rebuild_default_subscriptions
   ]
 
   desc("upgrades SEEK from the last released version to the latest released version")
@@ -38,7 +39,7 @@ namespace :seek do
   end
 
   desc "Resubscribe all existing people by their projects with weekly frequency"
-  task :create_default_subscriptions => :environment do
+  task :rebuild_default_subscriptions => :environment do
     ProjectSubscription.delete_all
     Subscription.delete_all
     Person.all.each do |p|
