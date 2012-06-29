@@ -135,6 +135,26 @@ class SubscriptionTest < ActiveSupport::TestCase
     assert_equal proj, current_person.subscriptions.first.project_subscription.project
   end
 
+  test 'subscribe to all the items in a project when subscribing to that project' do
+    proj = Factory(:project)
+    s1 = Factory(:subscribable, :projects => [Factory(:project), proj], :policy => Factory(:public_policy))
+    s2 = Factory(:subscribable, :projects => [Factory(:project), proj], :policy => Factory(:public_policy))
+
+    assert !s1.subscribed?(current_person)
+    assert !s2.subscribed?(current_person)
+
+    current_person.project_subscriptions.create :project => proj, :frequency => 'weekly'
+
+    s1.reload
+    s2.reload
+    assert s1.subscribed?(current_person)
+    assert s2.subscribed?(current_person)
+    assert_equal 2, current_person.subscriptions.count
+    current_person.subscriptions.each do |s|
+      assert_equal proj, s.project_subscription.project
+    end
+  end
+
   private
 
   def current_person
