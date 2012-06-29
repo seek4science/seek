@@ -971,4 +971,46 @@ class PeopleControllerTest < ActionController::TestCase
     gatekeeper_number = assigns(:people).select(&:is_gatekeeper?).count
     assert_select "img[src*=?]", /medal_silver_2/, :count => gatekeeper_number
   end
+
+  test 'unsubscribe to a project should unsubscribe all the items of that project' do
+    temp = Seek::Config.email_enabled
+    Seek::Config.email_enabled=true
+
+    proj = Factory(:project)
+    sop = Factory(:sop, :projects => [proj], :policy => Factory(:public_policy))
+    df = Factory(:data_file, :projects => [proj], :policy => Factory(:public_policy))
+
+    #subscribe to project
+    current_person=User.current_user.person
+    put :update, :id => current_person, :receive_notifications => true, :person => {:project_subscriptions_attributes => {'0' => {:project_id => proj.id, :frequency => 'weekly', :_destroy => '0'}}}
+    assert_redirected_to current_person
+
+    assert sop.subscribed?(current_person)
+    assert df.subscribed?(current_person)
+    assert current_person.receive_notifications?
+
+    assert_emails 1 do
+      Factory(:activity_log, :activity_loggable => sop, :action => 'update')
+      Factory(:activity_log, :activity_loggable => df, :action => 'update')
+      SendPeriodicEmailsJob.new('weekly').perform
+    end
+
+    #unsubscribe to project
+    put :update, :id => current_person, :receive_notifications => true, :person => {:project_subscriptions_attributes => {'0' => {:id => current_person.project_subscriptions.first.id, :project_id => proj.id, :frequency => 'weekly', :_destroy => '1'}}}
+    assert_redirected_to current_person
+    assert current_person.project_subscriptions.empty?
+
+    sop.reload
+    df.reload
+    assert !sop.subscribed?(current_person)
+    assert !df.subscribed?(current_person)
+    assert current_person.receive_notifications?
+
+    assert_emails 0 do
+        Factory(:activity_log, :activity_loggable => sop, :action => 'update')
+        Factory(:activity_log, :activity_loggable => df, :action => 'update')
+        SendPeriodicEmailsJob.new('weekly').perform
+    end
+    Seek::Config.email_enabled=temp
+  end
 end
