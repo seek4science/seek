@@ -9,7 +9,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20120625080934) do
+ActiveRecord::Schema.define(:version => 20120628164147) do
 
   create_table "activity_logs", :force => true do |t|
     t.string   "action"
@@ -24,7 +24,7 @@ ActiveRecord::Schema.define(:version => 20120625080934) do
     t.datetime "updated_at"
     t.string   "http_referer"
     t.string   "user_agent"
-    t.text     "data",                   :limit => 16777215
+    t.text     "data",                   :limit => 2147483647
     t.string   "controller_name"
   end
 
@@ -1314,6 +1314,7 @@ ActiveRecord::Schema.define(:version => 20120625080934) do
     t.string   "subscription_type"
     t.datetime "created_at"
     t.datetime "updated_at"
+    t.integer  "project_subscription_id"
   end
 
   create_table "synonyms", :force => true do |t|
