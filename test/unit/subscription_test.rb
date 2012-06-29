@@ -124,6 +124,17 @@ class SubscriptionTest < ActiveSupport::TestCase
 
   end
 
+  test 'set_default_subscriptions when one item is created' do
+    proj = Factory(:project)
+    current_person.project_subscriptions.create :project => proj, :frequency => 'weekly'
+    assert Subscription.all.empty?
+
+    s = Factory(:subscribable, :projects => [Factory(:project), proj], :policy => Factory(:public_policy))
+    assert s.subscribed?(current_person)
+    assert_equal 1, current_person.subscriptions.count
+    assert_equal proj, current_person.subscriptions.first.project_subscription.project
+  end
+
   private
 
   def current_person
