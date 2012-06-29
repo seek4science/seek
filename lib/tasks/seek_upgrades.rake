@@ -37,4 +37,13 @@ namespace :seek do
     ActivityLog.remove_duplicate_creates
   end
 
+  desc "Resubscribe all existing people by their projects with weekly frequency"
+  task :create_default_subscriptions => :environment do
+    ProjectSubscription.delete_all
+    Subscription.delete_all
+    Person.all.each do |p|
+      p.set_default_subscriptions
+      disable_authorization_checks { p.save(false) }
+    end
+  end
 end
