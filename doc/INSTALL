@@ -145,9 +145,9 @@ Once created this user will become the admin user of the system.
 == Administering the system
 
 Once logged in as an administrator, you will notice a link on the right-hand side of the tabs/search bar "Admin Enabled". Selecting this will provide you with some
-admin facilities for creating new projects, institutions and profiles.
+admin facilities for creating new projects, institutions and profiles; defining additional administrators; or modifying the behaviour of SEEK.
 
-Here you can also define additional administrator users.
+Some of the key settings required for a new installation are described in the following sections.
 
 == Enabling search and starting the Sunspot SOLR server
 
@@ -177,18 +177,24 @@ You can then stop the service with
 
   service seek-solr stop
 
+== Configuring BioPortal
 
-== Rebranding SysMO SEEK for other projects
+BioPortal[http://bioportal.bioontology.org/] is a service used in SEEK for supporting and searching ontologies, which we communicate with via its API. However, the API requires an api-key
+that we are unable to distribute with SEEK. To be able to link organisms with NCBI terms, or search for organisms when defining new ones, an api-key has to be setup. We also have future plans for
+more widespread uses of ontologies - such as for the Assay and Technology types, and for tagging with semantic terms.
 
-If you are running SEEK for a project other than SysMO you can change various text elements under Admin, Site branding.
+To get an api-key you first need to register with BioPortal at http://bioportal.bioontology.org/accounts/new, and once registred and logged in your api-key should be shown under Account details. More information is available
+at http://www.bioontology.org/wiki/index.php/BioPortal_REST_services.
 
-To insert your application/project name into the help documents for SEEK, and to remove the logos/links to SEEK's 'related projects and friends' use
+In SEEK, you apply the BioPortal api-key under the Admin->Site Configuration->Additional Settings.
 
-  bundle exec rake seek:rebrand
+== Configuring DOI and PubMed search
 
-If you only want to change the help documents, you can instead use
+To be able to support adding publications using a PubMed[http://www.ncbi.nlm.nih.gov/pubmed] ID or DOI to your SEEK installation, you need to do 2 things.
 
-  bundle exec rake seek:rebrand_help_docs
+* For PubMed you simply need to add your email address under Admin->Site Configuration->Additional Settings
+* For DOI - you need to register your email address with CrossRef[http://www.crossref.org/] at http://www.crossref.org/requestaccount/ and then provide that email to SEEK under Admin->Site Configuration->Additional Settings
+
 
 == Setting up Passenger Phusion and Apache for production servers.
 
@@ -224,11 +230,25 @@ and configured a virtual host (probably in <i>/etc/apache2/sites-enabled/default
       </Directory>
    </VirtualHost>
 
+== Rebranding SysMO SEEK for other projects
+
+
+If you are running SEEK for a project other than SysMO you can change various text elements under Admin->Site Configuration->Site branding.
+
+To insert your application/project name into the help documents for SEEK, and to remove the logos/links to SEEK's 'related projects and friends' use
+
+  bundle exec rake seek:rebrand
+
+If you only want to change the help documents, you can instead use
+
+  bundle exec rake seek:rebrand_help_docs
+
 == Backing up
 
 Please read our {Backup Guide}[link:files/doc/BACKUPS.html] for suggestions on how to backup a SEEK installation.
 
-== Contacting us and other developers 
+
+== Contacting us and other developers
 
 There is a public Google Group available for SEEK development at http://groups.google.com/group/seek-development
 

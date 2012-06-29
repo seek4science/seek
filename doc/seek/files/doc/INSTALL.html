@@ -56,7 +56,7 @@
     </tr>
     <tr class="top-aligned-row">
       <td><strong>Last Update:</strong></td>
-      <td>Tue May 29 17:00:42 +0100 2012</td>
+      <td>Fri Jun 29 12:12:00 +0100 2012</td>
     </tr>
     </table>
   </div>
@@ -306,10 +306,12 @@ Once created this user will become the admin user of the system.
 Once logged in as an administrator, you will notice a link on the
 right-hand side of the tabs/search bar &quot;Admin Enabled&quot;. Selecting
 this will provide you with some admin facilities for creating new projects,
-institutions and profiles.
+institutions and profiles; defining additional administrators; or modifying
+the behaviour of SEEK.
 </p>
 <p>
-Here you can also define additional administrator users.
+Some of the key settings required for a new installation are described in
+the following sections.
 </p>
 <h2>Enabling search and starting the Sunspot SOLR server</h2>
 <p>
@@ -355,25 +357,46 @@ You can then stop the service with
 <pre>
   service seek-solr stop
 </pre>
-<h2>Rebranding SysMO SEEK for other projects</h2>
+<h2>Configuring BioPortal</h2>
 <p>
-If you are running SEEK for a project other than SysMO you can change
-various text elements under Admin, Site branding.
+<a href="http://bioportal.bioontology.org/">BioPortal</a> is a service used
+in SEEK for supporting and searching ontologies, which we communicate with
+via its API. However, the API requires an api-key that we are unable to
+distribute with SEEK. To be able to link organisms with NCBI terms, or
+search for organisms when defining new ones, an api-key has to be setup. We
+also have future plans for more widespread uses of ontologies - such as for
+the Assay and Technology types, and for tagging with semantic terms.
 </p>
 <p>
-To insert your application/project name into the help documents for SEEK,
-and to remove the logos/links to SEEK&#8216;s &#8216;related projects and
-friends&#8217; use
+To get an api-key you first need to register with BioPortal at <a
+href="http://bioportal.bioontology.org/accounts/new">bioportal.bioontology.org/accounts/new</a>,
+and once registred and logged in your api-key should be shown under Account
+details. More information is available at <a
+href="http://www.bioontology.org/wiki/index.php/BioPortal_REST_services">www.bioontology.org/wiki/index.php/BioPortal_REST_services</a>.
 </p>
-<pre>
-  bundle exec rake seek:rebrand
-</pre>
 <p>
-If you only want to change the help documents, you can instead use
+In SEEK, you apply the BioPortal api-key under the Admin-&gt;Site
+Configuration-&gt;Additional Settings.
 </p>
-<pre>
-  bundle exec rake seek:rebrand_help_docs
-</pre>
+<h2>Configuring DOI and PubMed search</h2>
+<p>
+To be able to support adding publications using a <a
+href="http://www.ncbi.nlm.nih.gov/pubmed">PubMed</a> ID or DOI to your SEEK
+installation, you need to do 2 things.
+</p>
+<ul>
+<li>For PubMed you simply need to add your email address under Admin-&gt;Site
+Configuration-&gt;Additional Settings
+
+</li>
+<li>For DOI - you need to register your email address with <a
+href="http://www.crossref.org/">CrossRef</a> at <a
+href="http://www.crossref.org/requestaccount">www.crossref.org/requestaccount</a>/
+and then provide that email to SEEK under Admin-&gt;Site
+Configuration-&gt;Additional Settings
+
+</li>
+</ul>
 <h2>Setting up Passenger Phusion and Apache for production servers.</h2>
 <p>
 This section is only relevant if setting up a production deployment, and
@@ -426,6 +449,25 @@ and configured a virtual host (probably in
          Options -MultiViews
       &lt;/Directory&gt;
    &lt;/VirtualHost&gt;
+</pre>
+<h2>Rebranding SysMO SEEK for other projects</h2>
+<p>
+If you are running SEEK for a project other than SysMO you can change
+various text elements under Admin-&gt;Site Configuration-&gt;Site branding.
+</p>
+<p>
+To insert your application/project name into the help documents for SEEK,
+and to remove the logos/links to SEEK&#8216;s &#8216;related projects and
+friends&#8217; use
+</p>
+<pre>
+  bundle exec rake seek:rebrand
+</pre>
+<p>
+If you only want to change the help documents, you can instead use
+</p>
+<pre>
+  bundle exec rake seek:rebrand_help_docs
 </pre>
 <h2>Backing up</h2>
 <p>
