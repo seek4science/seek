@@ -18,6 +18,34 @@ class PersonTest < ActiveSupport::TestCase
     end
   end
 
+  def test_active_ordered_by_updated_at_and_avatar_not_null
+
+    Person.destroy_all
+
+    avatar = Factory :avatar
+
+    Factory :person,:avatar=>avatar, :updated_at=>1.week.ago
+    Factory :person,:avatar=>avatar, :updated_at=>1.minute.ago
+    Factory :person,:updated_at=>1.day.ago
+    Factory :person,:updated_at=>1.hour.ago
+    Factory :person,:updated_at=>2.minutes.ago
+
+    sorted = Person.all.sort do |x,y|
+      if x.avatar.nil? == y.avatar.nil?
+        y.updated_at <=> x.updated_at
+      else
+        if x.avatar.nil?
+          1
+        else
+          -1
+        end
+      end
+    end
+
+    assert_equal sorted, Person.active
+
+  end
+
   def test_ordered_by_last_name
     sorted = Person.find(:all).sort_by do |p|
       lname = "" || p.last_name.try(:downcase)
