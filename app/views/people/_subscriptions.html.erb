@@ -1,10 +1,11 @@
 <%
    select_truncate_length=120
    projects = @person.projects + Project.all.reject { |p| @person.projects.include?(p)}
+   info_text = "Here you can customize your subscriptions to projects. You will be informed by email of resources that have been created or updated within the projects that you have subscribed to, during the time period you specified. You will only be notified of items that you are authorized to view. By default, your subscription is for weekly notifications about activity in your own projects."
 %>
 <div class="fold">
   <div class="foldTitle">
-    <%= help_icon("Here you can customize your project subscriptions. By default, you subscribe to your projects. You will be informed by email the new created resources or the updated resources within the projects that you subscribe and you have the right to view them.") -%>
+    <%= help_icon(info_text) -%>
     Subscriptions
   </div>
   <div class="foldContent">
