@@ -985,6 +985,8 @@ class PeopleControllerTest < ActionController::TestCase
     put :update, :id => current_person, :receive_notifications => true, :person => {:project_subscriptions_attributes => {'0' => {:project_id => proj.id, :frequency => 'weekly', :_destroy => '0'}}}
     assert_redirected_to current_person
 
+    project_subscription_id = ProjectSubscription.find_by_project_id(proj.id).id
+    ProjectSubscriptionJob.new(project_subscription_id).perform
     assert sop.subscribed?(current_person)
     assert df.subscribed?(current_person)
     assert current_person.receive_notifications?

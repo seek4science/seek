@@ -53,8 +53,10 @@ class SendImmediateEmailsJobTest < ActiveSupport::TestCase
     person1 = Factory(:person)
     person2 = Factory(:person)
     sop = Factory(:sop, :policy => Factory(:public_policy))
-    ProjectSubscription.create(:person_id => person1.id, :project_id => sop.projects.first.id, :frequency => 'immediately')
-    ProjectSubscription.create(:person_id => person2.id, :project_id => sop.projects.first.id, :frequency => 'immediately')
+    project_subscription1 = ProjectSubscription.create(:person_id => person1.id, :project_id => sop.projects.first.id, :frequency => 'immediately')
+    project_subscription2 = ProjectSubscription.create(:person_id => person2.id, :project_id => sop.projects.first.id, :frequency => 'immediately')
+    ProjectSubscriptionJob.new(project_subscription1.id).perform
+    ProjectSubscriptionJob.new(project_subscription2.id).perform
     assert_emails 2 do
       disable_authorization_checks do
         al = ActivityLog.create(:activity_loggable => sop, :culprit => Factory(:user), :action => 'create')

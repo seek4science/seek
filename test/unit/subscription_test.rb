@@ -155,8 +155,8 @@ class SubscriptionTest < ActiveSupport::TestCase
     assert !s1.subscribed?(current_person)
     assert !s2.subscribed?(current_person)
 
-    current_person.project_subscriptions.create :project => proj, :frequency => 'weekly'
-
+    project_subscription = current_person.project_subscriptions.create :project => proj, :frequency => 'weekly'
+    ProjectSubscriptionJob.new(project_subscription.id).perform
     s1.reload
     s2.reload
     assert s1.subscribed?(current_person)
