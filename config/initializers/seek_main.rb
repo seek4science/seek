@@ -35,6 +35,8 @@ Annotations::Config.versioning_enabled = false
 CELL_CULTURE_OR_SPECIMEN = Seek::Config.is_virtualliver ? 'specimen' : 'cell culture'
 ENV['LANG'] = 'en_US.UTF-8'
 
-SendPeriodicEmailsJob.create_initial_jobs
+if ActiveRecord::Base.connection.table_exists? 'delayed_jobs'
+  SendPeriodicEmailsJob.create_initial_jobs
+end
 
 
