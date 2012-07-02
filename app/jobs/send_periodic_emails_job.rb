@@ -49,4 +49,15 @@ class SendPeriodicEmailsJob < Struct.new(:frequency)
       end
     end
   end
+
+  # puts the initial jobs on the queue for each period - daily, weekly, monthly - if they do not exist already
+  # starting at midday
+  def self.create_initial_jobs
+    t=Time.now
+    # start tomorrow if time now is later than midday
+    t = t + 1.day if t > Time.local_time(t.year, t.month,t.day,12,00,00)
+    SendPeriodicEmailsJob.create_job('daily', Time.local_time(t.year, t.month,t.day,12,00,00))   #at 12:00:00
+    SendPeriodicEmailsJob.create_job('weekly', Time.local_time(t.year, t.month,t.day,12,05,00))  #at 12:05:00
+    SendPeriodicEmailsJob.create_job('monthly', Time.local_time(t.year, t.month,t.day,12,10,00)) #at 12:10:00
+  end
 end
