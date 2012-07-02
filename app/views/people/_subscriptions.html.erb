@@ -1,6 +1,6 @@
 <%
    select_truncate_length=120
-   projects = @person.projects + Project.all.reject { |p| @person.projects.include?(p)}
+   projects = Project.all
    info_text = "Here you can customize your subscriptions to projects. You will be informed by email of resources that have been created or updated within the projects that you have subscribed to, during the time period you specified. You will only be notified of items that you are authorized to view. By default, your subscription is for weekly notifications about activity in your own projects."
 %>
 <div class="fold">
