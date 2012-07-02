@@ -19,7 +19,7 @@ class ProjectSubscriptionJob < Struct.new(:project_subscription_id)
     Delayed::Job.find(:first, :conditions => ['handler = ? AND locked_at IS ? AND failed_at IS ?', ProjectSubscriptionJob.new(project_subscription_id).to_yaml, nil, nil]) != nil
   end
 
-  def self.create_job project_subscription_id, t=15.seconds.from_now, priority=2
+  def self.create_job project_subscription_id, t=15.seconds.from_now, priority=0
     Delayed::Job.enqueue(ProjectSubscriptionJob.new(project_subscription_id), priority, t) unless exists? project_subscription_id
   end
 
