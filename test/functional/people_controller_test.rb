@@ -1046,4 +1046,33 @@ class PeopleControllerTest < ActionController::TestCase
       assert a_person.work_groups.empty?
       assert !a_person.project_subscriptions.collect(&:project).include?(projects.first)
   end
+
+  test 'should show subscription list to only yourself and admin' do
+    a_person = Factory(:person)
+    login_as(a_person.user)
+    get :show, :id => a_person
+    assert_response :success
+    assert_select "div.foldTitle", :text => "Subscriptions", :count => 1
+
+    logout
+
+    login_as(:quentin)
+    get :show, :id => a_person
+    assert_response :success
+    assert_select "div.foldTitle", :text => "Subscriptions", :count => 1
+  end
+
+  test 'should not show subscription list to people that are not yourself and admin' do
+      a_person = Factory(:person)
+      login_as(Factory(:user))
+      get :show, :id => a_person
+      assert_response :success
+      assert_select "div.foldTitle", :text => "Subscriptions", :count => 0
+
+      logout
+
+      get :show, :id => a_person
+      assert_response :success
+      assert_select "div.foldTitle", :text => "Subscriptions", :count => 0
+  end
 end
