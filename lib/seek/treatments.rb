@@ -32,104 +32,8 @@ module Seek
         treatments_heading_row, treatments_first_col, treatments_last_col = find_treatment_row_and_columns_in_sheet sample_sheet
         unless treatments_heading_row.nil?
           sample_col = hunt_for_sample_name_column sample_sheet
-          collect_treatment_values_and_title treatments_heading_row, treatments_first_col, treatments_last_col, sample_sheet
-          if sample_col > 0
-            collect_sample_names treatments_heading_row, sample_col, treatments_first_col, treatments_last_col,sample_sheet
-          else
-            @sample_names = [].fill("", 0, values.first ? values.first[1].length : 0)
-          end
-          strip_trailing_blank_items
-        end
-      end
-    end
-
-    def strip_trailing_blank_items
-      max_len=-1
-
-      keys = values.keys
-      keys.each do |key|
-        values[key].each_with_index do |val, i|
-          if (i>max_len)
-            unless val.blank?
-              max_len=i
-            end
-          end
-        end
-      end
-
-      if max_len>0
-        keys.each do |key|
-          values[key]=values[key][0..max_len]
-        end
-        @sample_names = @sample_names[0..max_len]
-      end
-    end
-
-    def collect_sample_names first_row, col, treatments_first_col, treatments_last_col,sheet
-
-      sheet_name = sheet.attributes["name"]
-      next_row = first_row + 1
-      @sample_names = []
-      sheet.find("//ss:sheet[@name='#{sheet_name}']/ss:rows/ss:row/ss:cell[@row >= '#{(next_row).to_s}' and @column = '#{col.to_s}']").each do |cell|
-        row = cell.attributes["row"].to_i
-        if row > next_row
-          #fill missing rows
-          (next_row...row).to_a.each do |missing_row|
-            if treatments_exist_for_row? missing_row,treatments_first_col,treatments_last_col,sheet
-              @sample_names << ""
-            end
-          end
-        else
-          treatments_exist = treatments_exist_for_row? row,treatments_first_col,treatments_last_col,sheet
-          #only include samples where at least one of the treatments cells contain content
-          if treatments_exist
-            @sample_names << cell.content
-          end
-        end
-
-        next_row = row + 1
-      end
-
-    end
-
-    def treatments_exist_for_row? row,treatments_first_col,treatments_last_col, sheet
-      treatment_content_count = 0
-      sheet_name = sheet.attributes["name"]
-      #count them to take into account blank cells that may be missing from the XML
-      sheet.find("//ss:sheet[@name='#{sheet_name}']/ss:rows/ss:row/ss:cell[@row = '#{row}' and @column >= '#{treatments_first_col.to_s}' and @column <= '#{treatments_last_col.to_s}']").each do |treatment_cell|
-        treatment_content_count+=1 if (!treatment_cell.content.blank?)
-      end
-      treatment_content_count > 0
-    end
-
-    def collect_treatment_values_and_title treatments_heading_row, first_col, last_col, sheet
-      #FIXME: this needs simplifying - maybe by copying all into a matrix first and dealing with that
-      sheet_name = sheet.attributes["name"]
-      col_keys = {}
-
-      rows = sheet.find("//ss:sheet[@name='#{sheet_name}']/ss:rows/ss:row[@index>= '#{treatments_heading_row.to_s}']")
-      rows.each do |row|
-        values = {}
-        row.find("//ss:sheet[@name='#{sheet_name}']/ss:rows/ss:row/ss:cell[@row = '#{row.attributes["index"]}' and @column >= '#{first_col.to_s}' and @column <= '#{last_col.to_s}']").each do |cell|
-          this_col_alpha = cell.attributes["column_alpha"]
-          values[this_col_alpha]=cell.content
-        end
-        if row.attributes["index"]==treatments_heading_row.to_s
-          values.keys.each do |col_alpha|
-            content = values[col_alpha]
-            @values[content]=[]
-            col_keys[col_alpha]=content
-          end
-
-        else
-          if (!values.values.select { |v| !v.blank? }.empty?)
-            values.keys.each do |col_alpha|
-              key = col_keys[col_alpha]
-              @values[key] << values[col_alpha]
-            end
-          else
-            break #stop once encountering a row with no treatments defined. Subsequent rows will not be included (solves an issue where there is more information below the sample table)
-          end
+          table = extract_as_table treatments_heading_row, sample_col, treatments_first_col,treatments_last_col,sample_sheet
+          extract_sample_names_and_values table
         end
       end
     end
@@ -189,6 +93,72 @@ module Seek
         end
         !match.nil?
       end
+    end
+
+    # reads out the relevant data into a well formed table, with equal length rows and nils replaces with empty strings.
+    # stops after a row with no sample name or treatment information
+    def extract_as_table treatments_heading_row, sample_col, treatments_first_col,treatments_last_col,sheet
+      table = []
+      sheet_name = sheet.attributes["name"]
+      cells = sheet.find("//ss:sheet[@name='#{sheet_name}']/ss:rows/ss:row/ss:cell[@row >= '#{(treatments_heading_row).to_s}' and (@column = '#{sample_col.to_s}' or (@column>='#{treatments_first_col.to_s}' and @column<='#{treatments_last_col.to_s}'))]")
+
+      cells.each do |cell|
+        row = cell.attributes['row'].to_i
+        col = cell.attributes['column'].to_i
+
+        #normalise row and column, to leave a table only containing the required content
+        row = row - treatments_heading_row
+        if col == sample_col
+          col = 0
+        else
+          col = col - treatments_first_col + 1
+        end
+
+        table[row]||=[]
+        table[row][col]=cell.content
+
+      end
+
+      #chop where all in row are nil or blank
+      lasti=table.size
+      maxwidth=0
+      table.each_with_index do |row,i|
+        maxwidth = row.size unless row.nil? || row.size<maxwidth
+        if row.nil? || row.empty? || row.select{|v| !v.blank?}.empty?
+          lasti=i
+          break
+        end
+      end
+
+      #tidy up the table, stripping after the last complete row, and padding rows up to the maximum width, and replacing
+      #nils with empty strings
+      table = table[0...lasti]
+      table.each do |row|
+        if row.size<maxwidth
+          row.fill("",row.size,maxwidth-row.size)
+        end
+        row.map!{|v| v.nil? ? "" : v}
+      end
+
+      table
+    end
+
+    def extract_sample_names_and_values table
+      heading_row = table[0]
+      table = table[1..-1]
+      heading_row[1..-1].each do |heading|
+        @values[heading]=[]
+      end
+      table.each do |row|
+        row.each_with_index do |v,i|
+          if i==0
+            @sample_names << v
+          else
+            @values[heading_row[i]] << v
+          end
+        end
+      end
+
     end
   end
 end
