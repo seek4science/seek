@@ -119,7 +119,9 @@ module Seek
 
       end
 
-      #chop where all in row are nil or blank
+
+      #tidy up the table, removing rows once a completely empty row is encountered, and padding rows up to the maximum width, and replacing
+      #nils with empty strings
       lasti=table.size
       maxwidth=0
       table.each_with_index do |row,i|
@@ -129,9 +131,6 @@ module Seek
           break
         end
       end
-
-      #tidy up the table, stripping after the last complete row, and padding rows up to the maximum width, and replacing
-      #nils with empty strings
       table = table[0...lasti]
       table.each do |row|
         if row.size<maxwidth
