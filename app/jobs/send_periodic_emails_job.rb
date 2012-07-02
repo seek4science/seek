@@ -35,14 +35,29 @@ class SendPeriodicEmailsJob < Struct.new(:frequency)
 
   def send_subscription_mails logs, frequency
     if Seek::Config.email_enabled
-      Person.scoped(:include => :subscriptions).select{|p|p.receive_notifications?}.each do |person|
-         activity_logs = person.subscriptions.scoped(:include => :subscribable).select{|s|s.frequency == frequency}.collect do |sub|
+      Person.scoped(:include => :subscriptions).select { |p| p.receive_notifications? }.each do |person|
+        begin
+          activity_logs = person.subscriptions.scoped(:include => :subscribable).select { |s| s.frequency == frequency }.collect do |sub|
             logs.select do |log|
               log.activity_loggable.try(:can_view?, person.user) && log.activity_loggable.subscribable? && log.activity_loggable.subscribers_are_notified_of?(log.action) && log.activity_loggable == sub.subscribable
             end
-         end.flatten(1)
-         SubMailer.deliver_send_digest_subscription person, activity_logs, frequency unless activity_logs.blank?
-       end
+          end.flatten(1)
+          SubMailer.deliver_send_digest_subscription person, activity_logs, frequency unless activity_logs.blank?
+        rescue Exception => e
+          Delayed::Job.logger.error("Error sending subscription emails to person #{person.id} - #{e.message}")
+        end
       end
     end
+  end
+
+  # puts the initial jobs on the queue for each period - daily, weekly, monthly - if they do not exist already
+  # starting at midday
+  def self.create_initial_jobs
+    t=Time.now
+    # start tomorrow if time now is later than midday
+    t = t + 1.day if t > Time.local_time(t.year, t.month,t.day,12,00,00)
+    SendPeriodicEmailsJob.create_job('daily', Time.local_time(t.year, t.month,t.day,12,00,00))   #at 12:00:00
+    SendPeriodicEmailsJob.create_job('weekly', Time.local_time(t.year, t.month,t.day,12,05,00))  #at 12:05:00
+    SendPeriodicEmailsJob.create_job('monthly', Time.local_time(t.year, t.month,t.day,12,10,00)) #at 12:10:00
+  end
 end

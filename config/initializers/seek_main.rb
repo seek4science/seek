@@ -20,6 +20,7 @@ require 'seek/taggable'
 require 'sunspot_rails'
 require 'cancan'
 
+
 GLOBAL_PASSPHRASE="ohx0ipuk2baiXah" unless defined? GLOBAL_PASSPHRASE
 
 ASSET_ORDER                = ['Person', 'Project', 'Institution', 'Investigation', 'Study', 'Assay', 'Sample','Specimen','DataFile', 'Model', 'Sop', 'Publication', 'Presentation','SavedSearch', 'Organism', 'Event']
@@ -33,5 +34,7 @@ Annotations::Config.versioning_enabled = false
 
 CELL_CULTURE_OR_SPECIMEN = Seek::Config.is_virtualliver ? 'specimen' : 'cell culture'
 ENV['LANG'] = 'en_US.UTF-8'
+
+SendPeriodicEmailsJob.create_initial_jobs
 
 
