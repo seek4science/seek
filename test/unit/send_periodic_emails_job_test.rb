@@ -53,9 +53,12 @@ class SendPeriodicEmailsJobTest < ActiveSupport::TestCase
     person2 = Factory(:person)
     person3 = Factory(:person)
     sop = Factory(:sop, :policy => Factory(:public_policy))
-    ProjectSubscription.create(:person_id => person1.id, :project_id => sop.projects.first.id, :frequency => 'daily')
-    ProjectSubscription.create(:person_id => person2.id, :project_id => sop.projects.first.id, :frequency => 'weekly')
-    ProjectSubscription.create(:person_id => person3.id, :project_id => sop.projects.first.id, :frequency => 'monthly')
+    project_subscription1 = ProjectSubscription.create(:person_id => person1.id, :project_id => sop.projects.first.id, :frequency => 'daily')
+    project_subscription2 = ProjectSubscription.create(:person_id => person2.id, :project_id => sop.projects.first.id, :frequency => 'weekly')
+    project_subscription3 = ProjectSubscription.create(:person_id => person3.id, :project_id => sop.projects.first.id, :frequency => 'monthly')
+    ProjectSubscriptionJob.new(project_subscription1.id).perform
+    ProjectSubscriptionJob.new(project_subscription2.id).perform
+    ProjectSubscriptionJob.new(project_subscription3.id).perform
     sop.reload
 
     SendPeriodicEmailsJob.create_job('daily', 15.minutes.from_now)
@@ -69,7 +72,5 @@ class SendPeriodicEmailsJobTest < ActiveSupport::TestCase
       SendPeriodicEmailsJob.new('weekly').perform
       SendPeriodicEmailsJob.new('monthly').perform
     end
-
-    assert_equal 4, Delayed::Job.count #one job for sending immediately
   end
 end
