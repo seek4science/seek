@@ -33,7 +33,15 @@
           You may:
         <ul style="padding-left:1em;">
           <li>Keep the <%= @resource_type -%> private, and only visible to yourself.</li>
-          <li>Share within the selected projects and with all other users that are a member of a <%= Seek::Config.project_name %> project.</li>
+          <%
+             through_resource = ''
+             if @resource.kind_of?(Assay)
+               through_resource = '(through projects associated with selected study)'
+             elsif @resource.kind_of?(Study)
+               through_resource = '(through projects associated with selected investigation)'
+             end
+          %>
+          <li>Share within members of projects associated with this <%= @resource_type -%> <%= through_resource%> and with all other users that are a member of a <%= Seek::Config.project_name %> project.</li>
           <li>Share with the all visitors (including anonymous visitors with no login)</li>
               <li style="margin-left: 2em">You can share with the all visitors right away if you are the gatekeeper or if the projects associated with this <%= @resource_type -%> have no gatekeeper</li>
               <li style="margin-left: 2em">Or you can request the gatekeepers for their approval to share with all visitors</li>
