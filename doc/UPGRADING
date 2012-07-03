@@ -23,22 +23,46 @@ looks something like:
 
 <b>If upgrading from a version earlier than v0.11.x please contact our GoogleGroup at http://groups.google.com/group/seek-development</b>
 
-When upgrading between versions greater than v0.11.x you need to upgrade to each released version in order incrementally. The released versions are listed below:
+When upgrading between versions greater than v0.11.x you need to upgrade to each released minor version in order incrementally (i.e. 0.13.2->0.14.0, you can skip patch versions such as 0.13.3).
+The released versions are listed below:
 
 * 0.11.x
 * 0.13.2
 * 0.13.3
+* 0.14.0
 
 <em>(Note there was no 0.12.x version released externally, this was an internal release)</em>
 
-Each version has a tag in mercurial that is the version preceeded by a <em>v</em> - e.g. v0.11.1, v0.13.2
+Each version has a tag in mercurial that is the version preceeded by a <em>v</em> - e.g. v0.11.1, v0.13.2, v0.14.0
 
 When upgrading between minor versions (i.e. from 0.11.x to 0.13.x) it is necessary to run a seek:upgrade rake task to perform
 upgrade changes and import any new data. The upgrade task may require an internet connection, and sometimes can take some time to run,
-so please be patient.
+so please be patient. There are instructions for upgrading between each minor version listed below, but they will generally follow the
+same pattern.
 
 When upgrading between patch versions (i.e between 0.13.0 and 0.13.2) it should
 only be necessary to a db:migrate rake task. Using seek:upgrade should still work, but could take a lot of unnecessary time.
+
+== Steps to upgrade from 0.13.x to 0.14.x
+
+These are the fairly standard steps when upgrading between minor versions. Note, the seek:upgrade task can take a while
+if there are many people and assets in your SEEK, as it needs to populate some tables for the default subscriptions (for
+email notifications).
+
+    RAILS_ENV=production ./script/delayed_job stop
+    bundle exec rake sunspot:solr:stop RAILS_ENV=production
+    hg pull https://sysmo-db.googlecode.com/hg/ -r v0.14.0
+    hg update
+    hg merge # only required if you've made changes since installing. If you have you may need to deal with conflicts.
+    hg commit -m "merged" # likewise - only required if you made changes since installing
+    bundle install --deployment
+    bundle exec rake seek:upgrade RAILS_ENV=production
+    bundle exec rake tmp:assets:clear RAILS_ENV=production
+    bundle exec rake tmp:clear RAILS_ENV=production
+
+    bundle exec rake sunspot:solr:start RAILS_ENV=production # to restart the search server
+    RAILS_ENV=production ./script/delayed_job start
+    touch tmp/restart.txt
 
 == Steps to upgrade from 0.11.x to 0.13.x
 
@@ -46,17 +70,17 @@ There follows the commands required to upgrade. Anything after # are notes and d
 There are a few additional steps for this upgrade due to the switch from Solr to Sunspot as the search system,
 and the introduction of Delayed Job for background processing.
 
-    rake solr:stop RAILS_ENV=production # this is specific to this upgrade, since the command to stop and start the search has changed.
+    bundle exec rake solr:stop RAILS_ENV=production # this is specific to this upgrade, since the command to stop and start the search has changed.
     hg pull https://sysmo-db.googlecode.com/hg/ -r v0.13.3
     hg update
     hg merge # only required if you've made changes since installing. If you have you may need to deal with conflicts.
     hg commit -m "merged" # likewise - only required if you made changes since installing
     bundle install --deployment
-    rake seek:upgrade RAILS_ENV=production
-    rake sunspot:solr:start RAILS_ENV=production # to restart the search server
-    rake sunspot:solr:reindex RAILS_ENV=production  # to reindex
-    rake tmp:assets:clear RAILS_ENV=production
-    rake tmp:clear RAILS_ENV=production
+    bundle exec rake seek:upgrade RAILS_ENV=production
+    bundle exec rake sunspot:solr:start RAILS_ENV=production # to restart the search server
+    bundle exec rake sunspot:solr:reindex RAILS_ENV=production  # to reindex
+    bundle exec rake tmp:assets:clear RAILS_ENV=production
+    bundle exec rake tmp:clear RAILS_ENV=production
 
 SEEK v0.13.x now uses a Ruby tool called {Delayed Job}[https://github.com/tobi/delayed_job] to handle background processing
 which now needs to be started using:
@@ -71,16 +95,16 @@ this is simply a case of:
 == Steps to upgrade between patches (e.g. between 0.13.2 and 0.13.3)
 
 This should remain the same for all upgrades for minor bugfix patches, unless we state otherwise.
-This example uses v0.13.2 as an example.
+This example uses v0.13.3 as an example.
 
   hg pull https://sysmo-db.googlecode.com/hg/ -r v0.13.3
   hg update
   hg merge # if necessary
   hg commit -m "merged" # if necessary
   bundle install --deployment
-  rake db:migrate RAILS_ENV=production
-  rake tmp:assets:clear RAILS_ENV=production
-  rake tmp:clear RAILS_ENV=production
+  bundle exec rake db:migrate RAILS_ENV=production
+  bundle exec rake tmp:assets:clear RAILS_ENV=production
+  bundle exec rake tmp:clear RAILS_ENV=production
 
   RAILS_ENV=production ./script/delayed_job stop
   RAILS_ENV=production ./script/delayed_job start

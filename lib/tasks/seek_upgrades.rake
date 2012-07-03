@@ -8,6 +8,8 @@ namespace :seek do
   #these are the tasks required for this version upgrade
   task :upgrade_version_tasks=>[
             :environment,
+            :repopulate_auth_lookup_tables,
+            :reindex_all,
             :rebuild_default_subscriptions
   ]
 
