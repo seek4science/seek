@@ -81,6 +81,47 @@ namespace :seek_dev do
     private_data.each { |d| d.destroy }
   end
 
+  desc "Dumps help documents and attachments/images"
+  task :dump_help_docs => :environment do
+    format_class = "YamlDb::Helper"
+    dir = 'help_dump_tmp'
+      #Clear path
+    puts "Clearing existing backup directories"
+    FileUtils.rm_r('config/default_data/help', :force => true)
+    FileUtils.rm_r('config/default_data/help_images', :force => true)
+    FileUtils.rm_r('db/help_dump_tmp/', :force => true)
+      #Dump DB
+    puts "Dumping database"
+    SerializationHelper::Base.new(format_class.constantize).dump_to_dir dump_dir("/#{dir}")
+      #Copy relevant yaml files
+    puts "Copying files"
+    FileUtils.mkdir('config/default_data/help') rescue ()
+    FileUtils.copy('db/help_dump_tmp/help_documents.yml', 'config/default_data/help/')
+    FileUtils.copy('db/help_dump_tmp/help_attachments.yml', 'config/default_data/help/')
+    FileUtils.copy('db/help_dump_tmp/help_images.yml', 'config/default_data/help/')
+    FileUtils.copy('db/help_dump_tmp/db_files.yml', 'config/default_data/help/')
+      #Delete everything else
+    puts "Cleaning up"
+    FileUtils.rm_r('db/help_dump_tmp/')
+      #Copy image folder
+    puts "Copying images"
+    FileUtils.mkdir('public/help_images') rescue ()
+    FileUtils.cp_r('public/help_images', 'config/default_data/') rescue ()
+  end
+
+  desc "Dumps current compounds and synoymns to a yaml file for the seed process"
+  task :dump_compounds_and_synonyms => :environment do
+    format_class = "YamlDb::Helper"
+    dir = 'compound_dump_tmp'
+    puts "Dumping database"
+    SerializationHelper::Base.new(format_class.constantize).dump_to_dir dump_dir("/#{dir}")
+    puts "Copying compound and synonym files"
+    FileUtils.copy("db/#{dir}/compounds.yml", 'config/default_data/')
+    FileUtils.copy("db/#{dir}/synonyms.yml", 'config/default_data/')
+    puts "Cleaning up"
+    FileUtils.rm_r("db/#{dir}/")
+  end
+
 
 
 end
