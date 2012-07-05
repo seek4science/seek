@@ -253,6 +253,35 @@ class SubscriptionTest < ActiveSupport::TestCase
 
   end
 
+  test 'should update subscriptions for a study and an assay associated with this study when updating the investigation associating with this study' do
+      proj = Factory(:project)
+      current_person.project_subscriptions.create :project => proj, :frequency => 'weekly'
+      assert Subscription.all.empty?
+      investigation = Factory(:investigation, :projects => [proj])
+      study = Factory(:study, :investigation => investigation)
+      assay = Factory(:assay, :study => study, :policy => Factory(:public_policy))
+
+      assert investigation.subscribed?(current_person)
+      assert study.subscribed?(current_person)
+      assert assay.subscribed?(current_person)
+
+      #changing investigation associated with the study
+      study.reload
+      disable_authorization_checks do
+        study.investigation = Factory(:investigation)
+        study.save
+      end
+
+      investigation.reload
+      study.reload
+      assay.reload
+      assert investigation.subscribed?(current_person)
+      assert !study.subscribed?(current_person)
+      assert !assay.subscribed?(current_person)
+
+    end
+
+
   private
 
   def current_person

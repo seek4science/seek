@@ -145,6 +145,7 @@ namespace :seek do
         end
       end
     end
+
   end
 
   task(:technology_types=>:environment) do
