@@ -10,22 +10,22 @@ MC4100:
 
 168:
   id: 3
-  organism: Bacillus_subtilis
+  organism: Bacillus subtilis
   title: 168
 
 NCIB3610:
   id: 4
-  organism: Bacillus_subtilis
+  organism: Bacillus subtilis
   title: NCIB3610
 
 JW49:
   id: 5
-  organism: Bacillus_subtilis
+  organism: Bacillus subtilis
   title: JW49
 
 ATCC6633:
   id: 6
-  organism: Bacillus_subtilis
+  organism: Bacillus subtilis
   title: ATCC6633
 
 V583:
