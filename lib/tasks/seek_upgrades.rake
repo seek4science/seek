@@ -47,9 +47,7 @@ namespace :seek do
     ReindexingJob.add_items_to_queue Investigation.all, 5.seconds.from_now,2
 
     ReindexingJob.add_items_to_queue Person.all, 5.seconds.from_now,2
-    ReindexingJob.add_items_to_queue Investigation.all, 5.seconds.from_now,2
     ReindexingJob.add_items_to_queue Project.all, 5.seconds.from_now,2
-    ReindexingJob.add_items_to_queue Strain.all, 5.seconds.from_now,2
     ReindexingJob.add_items_to_queue Specimen.all, 5.seconds.from_now,2
     ReindexingJob.add_items_to_queue Sample.all, 5.seconds.from_now,2
   end
