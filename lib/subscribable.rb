@@ -57,10 +57,10 @@ module Subscribable
            #also build subscriptions for studies and assays associating with this investigation
           if self.kind_of?(Investigation)
             self.studies.each do |study|
-              study.subscriptions.build(:person => person, :project_subscription_id => ps.id) if !self.subscribed?(person)
+              study.subscriptions.build(:person => person, :project_subscription_id => ps.id) if !study.subscribed?(person)
             end
             self.assays.each do |assay|
-              assay.subscriptions.build(:person => person, :project_subscription_id => ps.id) if !self.subscribed?(person)
+              assay.subscriptions.build(:person => person, :project_subscription_id => ps.id) if !assay.subscribed?(person)
             end
           end
         end
@@ -89,11 +89,18 @@ module Subscribable
 
   def update_subscriptions_if_study_or_assay
     if self.kind_of?(Study) && self.investigation_id_changed?
+      #update subscriptions for study
       set_default_subscriptions self.investigation.projects
       old_investigation_id = self.investigation_id_was
       old_investigation = Investigation.find_by_id old_investigation_id
       old_investigation_projects = old_investigation.nil? ? [] : old_investigation.projects
       remove_subscriptions old_investigation_projects
+      #update subscriptions for assays associated with this study
+      self.assays.each do |assay|
+        assay.set_default_subscriptions self.investigation.projects
+        assay.remove_subscriptions old_investigation_projects
+      end
+
     elsif self.kind_of?(Assay) && self.study_id_changed?
       set_default_subscriptions self.study.projects
       old_study_id = self.study_id_was
