@@ -10,8 +10,8 @@ namespace :seek do
             :environment,
             :relink_strains,
             :repopulate_auth_lookup_tables,
-            :reindex_all,
-            :rebuild_default_subscriptions
+            :rebuild_default_subscriptions,
+            :reindex_things
   ]
 
   desc("upgrades SEEK from the last released version to the latest released version")
@@ -40,6 +40,27 @@ namespace :seek do
   task(:remove_duplicate_activity_creates=>:environment) do
     ActivityLog.remove_duplicate_creates
   end
+
+  task :reindex_things => :environment do
+    #reindex_all task doesn't seem to work as part of the upgrade, because it doesn't successfully discover searchable types (possibly due to classes being in memory before the migration)
+    ReindexingJob.add_items_to_queue DataFile.all, 5.seconds.from_now,2
+    ReindexingJob.add_items_to_queue Model.all, 5.seconds.from_now,2
+    ReindexingJob.add_items_to_queue Sop.all, 5.seconds.from_now,2
+    ReindexingJob.add_items_to_queue Publication.all, 5.seconds.from_now,2
+    ReindexingJob.add_items_to_queue Presentation.all, 5.seconds.from_now,2
+
+    ReindexingJob.add_items_to_queue Assay.all, 5.seconds.from_now,2
+    ReindexingJob.add_items_to_queue Study.all, 5.seconds.from_now,2
+    ReindexingJob.add_items_to_queue Investigation.all, 5.seconds.from_now,2
+
+    ReindexingJob.add_items_to_queue Person.all, 5.seconds.from_now,2
+    ReindexingJob.add_items_to_queue Investigation.all, 5.seconds.from_now,2
+    ReindexingJob.add_items_to_queue Project.all, 5.seconds.from_now,2
+    ReindexingJob.add_items_to_queue Strain.all, 5.seconds.from_now,2
+    ReindexingJob.add_items_to_queue Specimen.all, 5.seconds.from_now,2
+    ReindexingJob.add_items_to_queue Sample.all, 5.seconds.from_now,2
+  end
+
 
   task :relink_strains => :environment do
     disable_authorization_checks do
