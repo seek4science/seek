@@ -54,7 +54,8 @@ class Project < ActiveRecord::Base
   alias_attribute :webpage, :web_page
   alias_attribute :internal_webpage, :wiki_page
 
-  has_and_belongs_to_many :organisms  
+  has_and_belongs_to_many :organisms
+  has_many :project_subscriptions,:dependent => :destroy
   
   searchable(:ignore_attribute_changes_of=>[:updated_at]) do
     text :name , :description, :locations

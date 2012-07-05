@@ -147,6 +147,24 @@ class SubscriptionTest < ActiveSupport::TestCase
     assert_equal proj, current_person.subscriptions.first.project_subscription.project
   end
 
+  test 'update subscriptions when changing a study associated to an assay' do
+    proj = Factory(:project)
+    current_person.project_subscriptions.create :project => proj, :frequency => 'weekly'
+    assert Subscription.all.empty?
+
+    s = Factory(:assay, :study => Factory(:study, :investigation => Factory(:investigation, :projects => [proj])), :policy => Factory(:public_policy))
+
+    assert s.subscribed?(current_person)
+    assert_equal 3, current_person.subscriptions.count
+    assert_equal proj, current_person.subscriptions.first.project_subscription.project
+
+    s.study = Factory(:study)
+    disable_authorization_checks{s.save}
+
+    s.reload
+    assert !s.subscribed?(current_person)
+  end
+
   test 'subscribe to all the items in a project when subscribing to that project' do
     proj = Factory(:project)
     s1 = Factory(:subscribable, :projects => [Factory(:project), proj], :policy => Factory(:public_policy))
@@ -165,6 +183,74 @@ class SubscriptionTest < ActiveSupport::TestCase
     current_person.subscriptions.each do |s|
       assert_equal proj, s.project_subscription.project
     end
+  end
+
+  test 'should update subscription when changing the project associated with the item and a person did not subscribe to this project' do
+    proj = Factory(:project)
+    current_person.project_subscriptions.create :project => proj, :frequency => 'weekly'
+    s = Factory(:subscribable, :projects => [Factory(:project), proj], :policy => Factory(:public_policy))
+
+    assert s.subscribed?(current_person)
+    assert_equal 1, current_person.subscriptions.count
+    assert_equal proj, current_person.subscriptions.first.project_subscription.project
+
+    #changing projects associated with the item
+    updated_project = Factory(:project)
+
+    disable_authorization_checks do
+      s.projects = [updated_project]
+      s.save
+    end
+    s.reload
+    assert 1, s.projects.count
+    assert updated_project, s.projects.first
+
+    #should no longer subscribe to this item because of changing project
+    assert !s.subscribed?(current_person)
+  end
+
+  test 'should update subscription when associating the project to the item and a person subscribed to this project' do
+    proj = Factory(:project)
+    current_person.project_subscriptions.create :project => proj, :frequency => 'weekly'
+    s = Factory(:subscribable, :policy => Factory(:public_policy))
+    assert !s.subscribed?(current_person)
+
+    #changing projects associated with the item
+    disable_authorization_checks do
+      s.projects << proj
+      s.save
+    end
+
+    s.reload
+    assert s.subscribed?(current_person)
+  end
+
+  test 'should update subscriptions when updating the projects associating to an investigation' do
+    proj = Factory(:project)
+    current_person.project_subscriptions.create :project => proj, :frequency => 'weekly'
+    assert Subscription.all.empty?
+    investigation = Factory(:investigation, :projects => [proj])
+    study = Factory(:study, :investigation => investigation)
+    assay = Factory(:assay, :study => study, :policy => Factory(:public_policy))
+
+    assert investigation.subscribed?(current_person)
+    assert study.subscribed?(current_person)
+    assert assay.subscribed?(current_person)
+
+    #changing projects associated with the investigation
+    investigation.reload
+    disable_authorization_checks do
+      investigation.projects = [Factory(:project)]
+      investigation.save
+    end
+
+    investigation.reload
+    study.reload
+    assay.reload
+    assert !investigation.subscribed?(current_person)
+    assert !study.subscribed?(current_person)
+    assert !assay.subscribed?(current_person)
+
   end
 
   private

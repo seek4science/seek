@@ -22,7 +22,7 @@ namespace :seek do
   task :seed_testing=>[:environment,:refresh_controlled_vocabs,:tags,:compounds]
 
   desc 'refreshes, or creates, the standard initial controlled vocublaries'
-  task :refresh_controlled_vocabs=>[:environment,:culture_growth_types, :model_types, :model_formats, :assay_types, :disciplines, :organisms, :technology_types, :recommended_model_environments, :measured_items, :units, :project_roles, :assay_classes, :relationship_types, :strains]
+  task :refresh_controlled_vocabs=>[:environment,:culture_growth_types, :model_types, :model_formats, :assay_types, :disciplines, :organisms, :technology_types, :recommended_model_environments, :measured_items, :units, :project_roles, :assay_classes, :relationship_types]
 
   desc "adds the default tags"
   task(:tags=>:environment) do
@@ -87,23 +87,6 @@ namespace :seek do
     end
   end
 
-  task(:strains=>:environment) do
-    revert_fixtures_identify
-    Strain.delete_all
-    Fixtures.create_fixtures(File.join(RAILS_ROOT, "config/default_data"), "strains")
-    disable_authorization_checks do
-      #create policy for strains
-      Strain.all.each do |strain|
-        if strain.policy.nil?
-          policy = Policy.public_policy
-          policy.save
-          strain.policy_id = policy.id
-          strain.send(:update_without_callbacks)
-        end
-      end
-    end
-  end
-
   task(:culture_growth_types=>:environment) do
     revert_fixtures_identify
     CultureGrowthType.delete_all
@@ -144,8 +127,24 @@ namespace :seek do
     revert_fixtures_identify
     Organism.delete_all
     Fixtures.create_fixtures(File.join(RAILS_ROOT, "config/default_data"), "organisms")
+
     BioportalConcept.delete_all
     Fixtures.create_fixtures(File.join(RAILS_ROOT, "config/default_data"), "bioportal_concepts")
+
+    revert_fixtures_identify
+    Strain.delete_all
+    Fixtures.create_fixtures(File.join(RAILS_ROOT, "config/default_data"), "strains")
+    disable_authorization_checks do
+      #create policy for strains
+      Strain.all.each do |strain|
+        if strain.policy.nil?
+          policy = Policy.public_policy
+          policy.save
+          strain.policy_id = policy.id
+          strain.send(:update_without_callbacks)
+        end
+      end
+    end
   end
 
   task(:technology_types=>:environment) do
