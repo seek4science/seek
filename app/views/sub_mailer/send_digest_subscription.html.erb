@@ -24,7 +24,7 @@ The following resources have just been created/updated in <%= Seek::Config.appli
               width: 100%;">
 
       <tr>
-        <th align="left">Project Name</th>
+        <th align="left">Project Names</th>
         <th align="left">Resource Type</th>
         <th align="left">Resource Name</th>
         <th align="left">Person</th>
@@ -32,9 +32,14 @@ The following resources have just been created/updated in <%= Seek::Config.appli
         <th align="left">Unsubscribe?</th>
       </tr>
       <% logs.each do |log| %>
+             <% resource_projects = log.try(:activity_loggable).try(:projects)
+                person_subscribed_projects = @person.project_subscriptions.collect(&:project)
+                reported_projects = resource_projects.to_a & person_subscribed_projects
+                project_names = reported_projects.collect(&:name).join(',')
+             %>
 
               <tr>
-                <td><%= log.referenced.nil? ? "<span style='font-style:italic;color:#666666'>Not Specified</span>" : log.referenced.name %></td>
+                <td><%= project_names.blank? ? "<span style='font-style:italic;color:#666666'>Not Specified</span>" : project_names %></td>
                 <td><%= log.activity_loggable_type.humanize %></td>
                 <td><%= try_block{link_to(log.activity_loggable.title, send("#{log.activity_loggable.class.name.underscore}_url", log.activity_loggable))} || log.activity_loggable.title%></td>
                 <td><%= link_to h(try_block{log.culprit.person.name}), send("#{log.culprit.person.class.name.underscore}_url", log.culprit.person.id) %></td>
