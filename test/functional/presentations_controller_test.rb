@@ -112,7 +112,7 @@ class PresentationsControllerTest < ActionController::TestCase
 
   test "can destroy" do
     presentation = Factory :presentation,:contributor=>User.current_user
-    content_blob_id = presentation.content_blob_id
+    content_blob_id = presentation.content_blob.id
      assert_difference("Presentation.count",-1) do
        delete :destroy,:id => presentation
      end

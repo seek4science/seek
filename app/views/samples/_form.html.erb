@@ -7,14 +7,15 @@
 <%= f.error_messages %>
 
 <% if @sample.new_record? && @sample.specimen.try(:new_record?)%>
-    <%= render :partial => "samples/specimen_form", :locals => {:f => f, :specimen => @sample.specimen, :action => action}%>
+    <% f.fields_for :specimen do |specimen_f| %>
+        <%= render :partial => "specimens/form", :locals => {:f => specimen_f, :specimen => @sample.specimen, :action => action}%>
+    <% end %>
 <% else %>
     <p>
-      <%= f.label "Choose a specimen" %> <span class="required">*</span><br/>
-      <%= f.collection_select(:specimen_id, Specimen.all_authorized_for('view'), :id, :title,{:include_blank =>"Please Select..."},{:style=>"width:50%"}) %>
-    </p>
+       <%= f.label "Choose a #{Seek::Config.sample_parent_term}" %> <span class="required">*</span><br/>
+       <%= f.collection_select(:specimen_id, Specimen.all_authorized_for('view'), :id, :title,{:include_blank =>"Please Select..."},{:style=>"width:50%"}) %>
+      </p>
 <% end %>
-
 <h2>Sample Details</h2>
 
 <div style="width: 95%;">
@@ -23,8 +24,13 @@
     <%= f.label "Sample name:" -%><span class="required">*</span><br/>
     <%= f.text_field :title, :style => "width: 350px;" -%>
   </p>
-
+  
   <% if Seek::Config.is_virtualliver %>
+      <p>
+          <%= f.label :description -%><br/>
+          <%= f.text_area :comments, :style => "width: 85%;", :rows => 5 -%>
+      </p>
+
       <p>
         <%= f.label "Explantation time" -%><br/>
         <%= f.text_field :explantation, :style => "width: 350px;" -%>
@@ -63,7 +69,8 @@
 
   <p>
     <%= f.label "Organism part" -%><br/>
-    <%= f.select :organism_part, options_for_select(['whole cell', 'membrane fraction'].insert(0,'Not specified'), @sample.organism_part), :style => 'float:right;margin-right:30em' %>
+    <% organism_part_options = Seek::Config.is_virtualliver ? ['whole organism','organ','tissue','intercellular','cell','subcellular','blood','serum']:['whole cell', 'membrane fraction'] %>
+    <%= f.select :organism_part, options_for_select(organism_part_options.insert(0,'Not specified'), @sample.organism_part), :style => 'float:right;margin-right:30em' %>
   </p>
   <br/>
   <%= render :partial => 'projects/project_selector', :locals => {:resource => @sample,:allow_nil=>true}%>
@@ -74,10 +81,16 @@
       <p>
           <%= render :partial => "assets/sharing_form" -%>
       </p>
-  <% end %>
+      
+   <%= render :partial => 'assets/special_auth_code_form', :locals => {:f => f}%>
+  <% end %>      
+
+  <%= fancy_multiselect @sample, :data_files, :name => 'sample_data_file_ids', :association_class => DataFile,:selected => (params[:sample_data_file_ids] || []).map(&:to_i) | @sample.data_file_masters.map(&:id) %>
+  <%= fancy_multiselect @sample, :models, :name => 'sample_model_ids', :association_class => Model,:selected => (params[:sample_model_ids] || []).map(&:to_i) | @sample.model_masters.map(&:id) %>
+  <%= fancy_multiselect @sample, :sops, :name => 'sample_sop_ids', :association_class => Sop,:selected => (params[:sample_sop_ids] || []).map(&:to_i) | @sample.sop_masters.map(&:id) %>
 </div>
 
-<%= f.hidden_field :from_new_link %>
+<%= f.hidden_field :parent_name %>
 <%= f.hidden_field :from_biosamples %>
 
 <p style="margin-top: 2em; text-align: center;">
@@ -88,7 +101,7 @@
   %>
   <% if @sample.can_manage? %>
       <%= preview_permission_popup_link('sample', url_for(:controller => 'policies', :action => 'preview_permissions'), is_new_file, try_block{@sample.contributor.id})-%>
-      <%= f.submit button_text, :id => "sample_submit_btn", :onclick => "javascript: clickLink($('preview_permission'));return(false);" -%>
+      <%= f.submit button_text, :id => "sample_submit_btn", :onclick => "javascript: if($F('organism')=='' || $F('organism')=='0' ){alert('Please select organism');return false;};clickLink($('preview_permission'));return(false);" -%>
 
   <% else %>
       <%= f.submit button_text, :id => "sample_submit_btn", :disable_with=>disabled_text-%>

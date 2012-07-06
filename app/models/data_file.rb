@@ -9,6 +9,7 @@ class DataFile < ActiveRecord::Base
   include Seek::DataFileExtraction
   include RightField
 
+  attr_accessor :parent_name
   acts_as_asset
   acts_as_trashable
 
@@ -21,7 +22,7 @@ class DataFile < ActiveRecord::Base
   # allow same titles, but only if these belong to different users
   # validates_uniqueness_of :title, :scope => [ :contributor_id, :contributor_type ], :message => "error - you already have a Data file with such title."
 
-  belongs_to :content_blob #don't add a dependent=>:destroy, as the content_blob needs to remain to detect future duplicates
+    has_one :content_blob, :as => :asset, :foreign_key => :asset_id ,:conditions => 'asset_version= #{self.version}'
 
   searchable(:auto_index=>false) do
     text :description, :title, :original_filename, :searchable_tags, :spreadsheet_annotation_search_fields,:fs_search_fields, :spreadsheet_contents_for_search,
@@ -34,12 +35,30 @@ class DataFile < ActiveRecord::Base
     include Seek::DataFileExtraction
     acts_as_versioned_resource
     
-    belongs_to :content_blob
+    has_one :content_blob,:primary_key => :data_file_id,:foreign_key => :asset_id,:conditions => 'content_blobs.asset_version= #{self.version} and content_blobs.asset_type = "#{self.parent.class.name}"'
     
     has_many :studied_factors, :primary_key => "data_file_id", :foreign_key => "data_file_id", :conditions =>  'studied_factors.data_file_version = #{self.version}'
     
     def relationship_type(assay)
       parent.relationship_type(assay)
+    end
+
+    def to_presentation_version
+      returning Presentation::Version.new do |presentation_version|
+        presentation_version.attributes.keys.each do |attr|
+          presentation_version.send("#{attr}=", send("#{attr}")) if respond_to? attr and attr!="id"
+        end
+        DataFile::Version.reflect_on_all_associations.select { |a| [:has_many, :has_and_belongs_to_many, :has_one].include?(a.macro) }.each do |a|
+          disable_authorization_checks do
+            presentation_version.send("#{a.name}=", send(a.name)) if presentation_version.respond_to?("#{a.name}=")
+            #asset_type: 'DataFile' --> 'Presentation'. As the above assignment only change the asset_id
+            if a.name == :content_blob
+              presentation_version.send(a.name).send "asset_type=", "Presentation"
+            end
+          end
+        end
+
+      end
     end
   end
 
@@ -87,81 +106,12 @@ class DataFile < ActiveRecord::Base
      end
    end
 
-  def convert_to_presentation
-     presentation_attrs = self.attributes.delete_if{|k,v|k=="template_id" || k =="id"}
-     presentation = Presentation.new presentation_attrs
 
-      DataFile.reflect_on_all_associations.each do |a|
-       if presentation.respond_to? "#{a.name.to_s.singularize}_ids=".to_sym and a.macro!=:belongs_to and !a.options.include? :through and included_to_be_copied?(a.name)
-          association = self.send a.name
 
-         if a.options.include? :as
-           if !association.blank?
-             association.each do |item|
-               attrs = item.attributes.delete_if{|k,v|k=="id" || k =="#{a.options[:as]}_id" || k =="#{a.options[:as]}_type"}
-               if !attrs["person_id"].nil? and Person.find(:first,:conditions => ["id =?",attrs["person_id"].to_i]).nil?
-                 attrs["person_id"] = self.contributor.person.id
-               end
-              presentation.send("#{a.name}".to_sym).send :build,attrs
-             end
-           end
-         else
-          presentation.send "#{a.name.to_s.singularize}_ids=".to_sym, association.map(&:id)
-         end
-       end
-     end
+  has_many :sample_assets,:dependent=>:destroy,:as => :asset
+  has_many :samples, :through => :sample_assets
 
-      presentation.policy = self.policy.deep_copy
-      presentation.orig_data_file_id= self.id
-
-    class << presentation
-      def clone_versioned_data_file_model versioned_presentation, versioned_data_file
-          versioned_presentation.attributes.keys.each do |key|
-            versioned_presentation.send("#{key}=", eval("versioned_data_file.#{key}")) if versioned_data_file.respond_to? key.to_sym  and key!="id"
-          end
-      end
-
-      def set_new_version
-         self.version = DataFile.find(self.orig_data_file_id).version
-      end
-
-      def save_version_on_create
-         df_versions = DataFile::Version.find(:all,:conditions=>["data_file_id =?",self.orig_data_file_id])
-         df_versions.each do |df_version|
-            rev = Presentation::Version.new
-            self.clone_versioned_data_file_model(rev,df_version)
-            rev.presentation_id = self.id
-            saved = rev.save
-            if saved
-              # Now update timestamp columns on main model.
-              # Note: main model doesnt get saved yet.
-              update_timestamps(rev, self)
-            end
-         end
-      end
-
-      #Need to copy the annotations from the data_file to the presentation after the presentation got saved
-      def after_save
-        df = DataFile.find_by_id(self.orig_data_file_id)
-        unless df.blank?
-           df.annotations.each do |a|
-             a.annotatable = self
-             #need to call update without callbacks, otherwise a new version is created
-             a.send(:update_without_callbacks)
-
-             #versions for annotations are no longer enabled in SEEK - but this code is left here incase they are re-enabled in the future.
-             a.versions.each do |av|
-               av.annotatable =self
-               av.save
-             end
-           end
-        end
-        super
-      end
-    end
-
-    presentation
-  end
+    
 
 
 
@@ -207,6 +157,54 @@ class DataFile < ActiveRecord::Base
       ]
     end
     flds.flatten.uniq
+  end
+
+  def to_presentation!
+    returning self.to_presentation do |presentation|
+      class << presentation
+        #disabling versioning, since I have manually copied the versions of the data file over
+        def save_version_on_create
+        end
+
+        def set_new_version
+          self.version = DataFile.find(self.orig_data_file_id).version
+        end
+      end
+
+      #TODO: should we throw an exception if the user isn't authorized to make these changes?
+      if User.current_user.admin? or self.can_delete?
+        disable_authorization_checks {
+          presentation.save!
+          #TODO: perhaps the deletion of the data file should also be here? We are already throwing an exception if save fails for some reason
+        }
+      end
+
+      #copying annotations has to be done after saving the presentation due to limitations of the annotation plugin
+      disable_authorization_checks do #disabling because annotations should be copied over even if the user would normally lack permission to do so
+        presentation.annotations = self.annotations
+      end
+    end
+  end
+
+  def to_presentation
+    presentation_attrs = attributes.delete_if { |k, v| !Presentation.new.attributes.include? k}
+
+    returning Presentation.new(presentation_attrs) do |presentation|
+      DataFile.reflect_on_all_associations.select { |a| [:has_many, :has_and_belongs_to_many, :has_one].include?(a.macro) && !a.through_reflection }.each do |a|
+        #disabled, because even if the user doing the conversion would not normally
+        #be able to associate an item with his data_file/presentation, the pre-existing
+        #association created by someone who was allowed, should carry over to the presentation
+        #based on the data file.
+        disable_authorization_checks do
+          #annotations and versions have to be handled specially
+          presentation.send("#{a.name}=", send(a.name)) if presentation.respond_to?("#{a.name}=") and a.name != :annotations and a.name != :versions
+        end
+      end
+
+      disable_authorization_checks { presentation.versions = versions.map(&:to_presentation_version) }
+      presentation.policy = policy.deep_copy
+      presentation.orig_data_file_id = id
+    end
   end
 
 

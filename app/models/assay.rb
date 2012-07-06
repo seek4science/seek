@@ -56,6 +56,19 @@ class Assay < ActiveRecord::Base
   has_many :sop_masters, :through => :assay_assets, :source => :asset, :source_type => "Sop"
   has_many :model_masters, :through => :assay_assets, :source => :asset, :source_type => "Model"
 
+  ["data_file","sop"].each do |type|
+    eval <<-END_EVAL
+      #related items hash will use data_file_masters instead of data_files, etc. (sops, models)
+      def related_#{type.pluralize}
+        #{type}_masters
+      end
+    END_EVAL
+  end
+
+  def related_models
+    is_modelling? ? model_masters : []
+  end
+
   has_one :investigation,:through=>:study
 
   validates_presence_of :assay_type
@@ -81,10 +94,10 @@ class Assay < ActiveRecord::Base
         technology_type.try :title
     end
     text :organisms do
-        organisms.map{|o| o.title}
+        organisms.compact.map{|o| o.title}
     end
     text :strains do
-        strains.map{|s| s.title}
+        strains.compact.map{|s| s.title}
     end
   end if Seek::Config.solr_enabled
 

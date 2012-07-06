@@ -98,6 +98,10 @@ module Seek
       #for now do nothing.
     end
 
+    def pubmed_api_email_propagate
+      Bio::NCBI.default_email = "(#{self.pubmed_api_email})"
+    end
+
     def propagate_all
       prop_methods=self.methods.select{|m| m.end_with?("_propagate")}
       prop_methods.each do |m|
@@ -229,7 +233,7 @@ module Seek
       :header_image_enabled,:header_image_link,:header_image_title,:google_analytics_enabled,
       :google_analytics_tracker_id,:piwik_analytics_enabled,:piwik_analytics_url, :exception_notification_enabled,:exception_notification_recipients,:open_id_authentication_store, :sycamore_enabled,
       :project_news_enabled,:project_news_feed_urls,:community_news_enabled,:community_news_feed_urls,:is_virtualliver, :sabiork_ws_base_url, :publish_button_enabled,
-      :auth_lookup_enabled]
+      :admin_impersonation_enabled, :auth_caching_enabled, :auth_lookup_enabled, :strategic_eager_loading,:sample_parent_term,:specimen_culture_starting_date,:sample_age,:specimen_creators, :sample_parser_enabled]
 
     #Settings that require a conversion to integer
     setting :tag_threshold,:convert=>"to_i"

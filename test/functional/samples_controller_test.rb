@@ -83,7 +83,8 @@ fixtures :all
             :donation_date => Date.today,
             :specimen_attributes => {:strain_id => Factory(:strain).id,
                           :lab_internal_number=>"Lab number",
-                          :title=>"Donor number"
+                          :title=>"Donor number",
+                          :institution_id =>Factory(:institution).id
             }
         }
       end
@@ -117,6 +118,7 @@ fixtures :all
                    :donation_date => Date.today,
                    :specimen_attributes => {
                        :lab_internal_number=>"Lab number",
+                       :institution_id =>Factory(:institution).id,
                        :title=>"Donor number"
                    }
                }
@@ -131,6 +133,44 @@ fixtures :all
     assert_equal "Donor number",s.specimen.title
 
   end
+
+  test "should create sample specimen with genotypes and phenotypes" do
+    new_gene_title = 'new gene'
+    new_modification_title = 'new modification'
+    new_phenotype_description = "new phenotype"
+    assert_difference(["Sample.count","Specimen.count"]) do
+          post :create,
+               :organism => Factory(:organism),
+               :sample => {
+                   :title => "test",
+                   :contributor => User.current_user,
+                   :projects => [Factory(:project)],
+                   :lab_internal_number => "Do232",
+                   :donation_date => Date.today,
+                   :specimen_attributes => {
+                       :lab_internal_number => "Lab number",
+                       :institution_id =>Factory(:institution).id,
+                       :title => "Donor number",
+                       :genotypes_attributes => {"1234432"=>{:gene_attributes => {:title => new_gene_title},
+                                                               :modification_attributes => {:title => new_modification_title}}},
+                        :phenotypes_attributes => {"213213"=>{:description => new_phenotype_description}}
+                       }
+
+                   }
+
+    end
+    s = assigns(:sample)
+
+    assert_redirected_to sample_path(s)
+    assert_equal "test", s.title
+    assert_not_nil s.specimen
+    assert_equal "Donor number", s.specimen.title
+    assert_equal "new modification new gene", s.specimen.genotype_info
+    assert_equal "new phenotype", s.specimen.phenotype_info
+
+  end
+
+
 
   test "should get show" do
     get :show, :id => Factory(:sample, :title=>"test", :policy =>policies(:editing_for_all_sysmo_users_policy))
@@ -223,10 +263,27 @@ fixtures :all
     assert_response :success
     assert_not_nil assigns(:sample)
     assert_select 'p', :text => s.specimen.strain.info, :count => 0
+  end
+  
+  test "associate data files,models,sops" do
+      assert_difference("Sample.count") do
+      post :create, :sample => {:title=>"test",
+                                :lab_internal_number =>"Do232",
+                                :donation_date => Date.today,
+                                 :project_ids =>[Factory(:project).id],
+                                :specimen => Factory(:specimen, :contributor => User.current_user)},
+             :sample_data_file_ids => [Factory(:data_file,:title=>"testDF",:contributor=>User.current_user).id],
+             :sample_model_ids => [Factory(:model,:title=>"testModel",:contributor=>User.current_user).id],
+             :sample_sop_ids => [Factory(:sop,:title=>"testSop",:contributor=>User.current_user).id]
 
+    end
+    s = assigns(:sample)
+    assert_equal "testDF", s.data_files.first.title
+    assert_equal "testModel", s.models.first.title
+    assert_equal "testSop", s.sops.first.title
   end
 
-    test "should show organism and strain information of a sample if there is organism" do
+  test "should show organism and strain information of a sample if there is organism" do
     s = Factory :sample, :contributor => User.current_user
     get :show, :id => s.id
 
@@ -240,7 +297,7 @@ fixtures :all
     get :show, :id => s.id
     assert_response :success
     assert_select "label", :text => /Comment/, :count => 2 #one for specimen, one for sample
-    assert_select "label", :text => /Sex/, :count => 1
+    assert_select "label", :text => /Gender/, :count => 1
   end
 
   test 'should have sample organism_part in the specimen/sample show page' do
@@ -292,4 +349,16 @@ end
     assert_response :success
     assert_select 'input#sample_specimen_attributes_title', :count => 0
   end
+
+test 'combined sample_specimen form when creating new sample' do
+  get :new
+  assert_response :success
+  assert_select 'input#sample_specimen_attributes_title', :count => 1
+end
+test 'only sample form when updating sample' do
+  get :edit, :id => Factory(:sample, :policy => policies(:editing_for_all_sysmo_users_policy))
+  assert_response :success
+  assert_select 'input#sample_specimen_attributes_title', :count => 0
+end
+
 end

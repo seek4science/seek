@@ -53,12 +53,12 @@ module Seek
     
     def test_asset_url
       c = self.controller_name.downcase
-      symb=c.singularize.to_sym
+      symb= params[:symb].nil?? c.singularize.to_sym : params[:symb].to_sym
       
       icon_filename=icon_filename_for_key("error")
       code=""
       msg=""
-      asset_url=params[symb][:data_url]
+      asset_url=  params[:symb].nil?? params[symb][:data_url] : params[symb].values.first
       begin        
         code = url_response_code(asset_url)        
         if code == "200"

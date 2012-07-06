@@ -2,6 +2,10 @@ require 'test_helper'
 
 class StrainTest < ActiveSupport::TestCase
 
+  def setup
+    User.current_user = Factory(:user)
+  end
+
   test "without default" do
     Strain.destroy_all
     org = Factory :organism

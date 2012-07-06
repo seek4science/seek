@@ -33,9 +33,37 @@ class ApplicationController < ActionController::Base
   end
 
   before_filter :profile_for_login_required
+  around_filter :with_auth_code
+  def with_auth_code
+    session[:code] = params[:code] if params[:code]
+    SpecialAuthCode.with_auth_code(session[:code]) do
+      yield
+    end
+  end
+
+  #When I set log_level :error in production.rb it didn't seem to work
+  around_filter :silence_logging if Rails.env == 'production'
+  def silence_logging
+    Rails.logger.silence do
+      yield
+    end
+  end
+
+
   before_filter :project_membership_required,:only=>[:create,:new]
 
   helper :all
+
+  def strip_root_for_xml_requests
+    #intended to use as a before filter on requests that lack a single root model.
+    #XML requests are required to have a single root node. This assumes the root node
+    #will be named xml. Turns a params hash like.. {:xml => {:param_one => "val", :param_two => "val2"}}
+    # into {:param_one => "val", :param_two => "val2"}
+
+    #This should probably be used with prepend_before_filter, since some filters might need this to happen so they can check params.
+    #see sessions controller for an example usage
+    params[:xml].each {|k,v| params[k] = v} if request.format.xml? and params[:xml]
+  end
 
   layout "main"
 
@@ -49,6 +77,10 @@ class ApplicationController < ActionController::Base
     request.host_with_port
   end
 
+  def application_root
+    return  "http://#{base_host}"
+  end
+  helper_method :application_root
 
   def self.fast_auto_complete_for(object, method, options = {})
     define_method("auto_complete_for_#{object}_#{method}") do
@@ -214,7 +246,7 @@ class ApplicationController < ActionController::Base
           'tag', 'items', 'statistics', 'tag_suggestions', 'preview'
         'view'
 
-      when 'download', 'named_download', 'launch', 'submit_job', 'data', 'execute','plot', 'explore'
+      when 'download', 'named_download', 'launch', 'submit_job', 'data', 'execute','plot', 'explore','visualise' ,'export_as_xgmml'
         'download'
 
       when 'edit', 'new', 'create', 'update', 'new_version', 'create_version',
@@ -400,6 +432,7 @@ class ApplicationController < ActionController::Base
         :current_logged_in_user=>current_user
     }
   end
+
 end
 
 

@@ -85,14 +85,14 @@ class Project < ActiveRecord::Base
   def pals
     pal_role=ProjectRole.pal_role
     people.select{|p| p.is_pal?}.select do |possible_pal|
-      possible_pal.project_roles.include?(pal_role)
+      possible_pal.project_roles_of_project(self).include?(pal_role)
     end
   end
 
   #this is project role
   def pis
     pi_role = ProjectRole.find_by_name('PI')
-    people.select{|p| p.project_roles.include?(pi_role)}
+    people.select{|p| p.project_roles_of_project(self).include?(pi_role)}
   end
 
   #this is seek role
@@ -123,7 +123,7 @@ class Project < ActiveRecord::Base
 
   def people
     #TODO: look into doing this with a named_scope or direct query
-    res = work_groups.scoped(:include => :people).collect(&:people).flatten.uniq.compact
+    res = work_groups.collect(&:people).flatten.uniq.compact
     #TODO: write a test to check they are ordered
     res.sort_by{|a| (a.last_name.blank? ? a.name : a.last_name)}
   end

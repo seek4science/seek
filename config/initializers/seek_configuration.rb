@@ -33,7 +33,10 @@ Seek::Config.default :community_news_feed_urls,''
 Seek::Config.default :community_news_number_of_entries,10
 Seek::Config.default :home_description, 'Some (configurable) information about the project and what we do goes here.'
 Seek::Config.default :publish_button_enabled,false
+Seek::Config.default :auth_caching_enabled,false
+Seek::Config.default :strategic_eager_loading, true
 Seek::Config.default :auth_lookup_enabled,true
+Seek::Config.default :sample_parser_enabled,false
 
 # Branding
 Seek::Config.default :project_name,'SysMO'
@@ -65,3 +68,12 @@ Seek::Config.default :pubmed_api_email,nil
 Seek::Config.default :crossref_api_email,nil
 Seek::Config.default :site_base_host,"http://localhost:3000"
 Seek::Config.default :open_id_authentication_store,:memory
+
+#Biosamples renaming
+Seek::Config.default :sample_parent_term, "cell culture"
+Seek::Config.default :specimen_culture_starting_date,"Culture starting date"
+Seek::Config.default :sample_age, "Age at sampling(hours)"
+Seek::Config.default :specimen_creators, "Creators"
+
+
+Seek::Config.default :max_attachments_num,100

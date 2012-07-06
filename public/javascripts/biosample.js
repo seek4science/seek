@@ -3,10 +3,12 @@ var specimen_table = null;
 var sample_table = null;
 
 
-function check_show_existing_strains(organism_element_id, existing_strains_element_id, url) {
+function check_show_existing_items(organism_element_id, existing_items_element_id, url) {
     var selected_ids = $F(organism_element_id).join();
     if (selected_ids == '0') {
-        Effect.Fade(existing_strains_element_id, { duration: 0.25 });
+        if ($(existing_items_element_id + "_spinner") != null)
+            Effect.Fade(existing_items_element_id + "_spinner");
+        Effect.Fade(existing_items_element_id, { duration: 0.25 });
     }
     else {
         if (url != '') {
@@ -17,7 +19,7 @@ function check_show_existing_strains(organism_element_id, existing_strains_eleme
                         organism_ids: selected_ids
                     },
                     onSuccess: function(transport) {
-                        Effect.Appear(existing_strains_element_id, { duration: 0.25 });
+                        Effect.Appear(existing_items_element_id, { duration: 0.25 });
                     },
                     onFailure: function(transport) {
                         alert('Something went wrong, please try again...');
@@ -25,7 +27,7 @@ function check_show_existing_strains(organism_element_id, existing_strains_eleme
                 });
         }
         else {
-            Effect.Appear(existing_strains_element_id, { duration: 0.25 });
+            Effect.Appear(existing_items_element_id, { duration: 0.25 });
         }
     }
 }
@@ -65,10 +67,11 @@ function strain_form(strain_id, organism_id, action, url) {
 
 function getSelectedStrains() {
     var strain_ids  = new Array();
-    if (strain_table.length != 0){
+    if (strain_table && strain_table.length != 0){
         var selected_strain_rows = fnGetSelected(strain_table);
         for (var i=0; i< selected_strain_rows.length; i++){
-            strain_ids.push(strain_table.fnGetData(selected_strain_rows[i])[5]);
+            var id_index = getAttributeColumn(strain_table,"Seek ID");
+            strain_ids.push(strain_table.fnGetData(selected_strain_rows[i])[id_index+1]);
         }
     }
     return strain_ids.join(',');
@@ -79,12 +82,21 @@ function getSelectedSpecimens() {
     if (specimen_table.length != 0){
         var selected_specimen_rows = fnGetSelected(specimen_table);
         for (var i=0; i< selected_specimen_rows.length; i++){
-            specimen_ids.push(specimen_table.fnGetData(selected_specimen_rows[i])[6]);
+            var id_index = getAttributeColumn(specimen_table,"Seek ID");
+            specimen_ids.push(specimen_table.fnGetData(selected_specimen_rows[i])[id_index+1]);
         }
     }
     return specimen_ids.join(',');
 }
-
+/*get the column number of attribute in the table*/
+function getAttributeColumn( table,attribute){
+    var th_columns =  document.evaluate('//table[@id="'+ table.fnSettings().sTableId +'"]/thead/tr/th',document, null, XPathResult.ORDERED_NODE_SNAPSHOT_TYPE, null );
+    for (var l = 0; l < th_columns.snapshotLength; l++){
+         if(th_columns.snapshotItem(l).innerHTML==attribute){
+             return l;
+         }
+    }
+}
 /* Get the rows which are currently selected */
 function fnGetSelected( oTableLocal )
 {
@@ -134,7 +146,7 @@ function checkSelectOneSpecimen(cell_culture_or_specimen){
     }
 }
 
-function validateSpecimenSampleFields(cell_culture_or_specimen, is_new_specimen){
+function validateSpecimenSampleFields(cell_culture_or_specimen, is_new_specimen, is_virtualliver){
     if (is_new_specimen) {
         if($('specimen_title').value.length == 0) {
                 alert("Please enter " + cell_culture_or_specimen + " title.");
@@ -146,6 +158,11 @@ function validateSpecimenSampleFields(cell_culture_or_specimen, is_new_specimen)
                 $('specimen_lab_internal_number').focus();
                 return(false);
         }
+        if(is_virtualliver && $('specimen_institution_id').value == '0') {
+                        alert("Please select one institution");
+                        $('specimen_institution_id').focus();
+                        return(false);
+         }
         if($('organism_id').value == '0') {
                 alert("Please select one organism");
                 $('organism_id').focus();
@@ -162,7 +179,7 @@ function validateSpecimenSampleFields(cell_culture_or_specimen, is_new_specimen)
             $('sample_lab_internal_number').focus();
             return(false);
     }
-    if($F('sample_project_ids').length == 0) {
+    if(!is_virtualliver && $F('sample_project_ids').length == 0) {
             alert("Please select projects");
             $('possible_sample_project_ids').focus();
             return(false);
@@ -188,7 +205,9 @@ function validateStrainFields(action){
         $('possible_strain_project_ids').focus();
         return(false);
     }
-
+    if (!validateGenoTypeFields() || !validatePhenoTypeFields()) {
+        return(false);
+    }
     if(action == 'edit'){
         $('edit_strain').disabled = true;
         $('edit_strain').value = 'Updating...'
@@ -199,9 +218,31 @@ function validateStrainFields(action){
     }
     return true;
 }
+function validateGenoTypeFields(){
+    var genotype_genes = document.getElementsByName("strain[genotypes_attributes][][gene_attributes][title]");
+    for(var i = 0 ; i < genotype_genes.length; i++){
+        if(genotype_genes[i].value==""){
+            alert("Genotype Gene cannot be empty.");
+            genotype_genes[i].focus();
+            return false;
+        }
+    }
+    return true;
+}
 
+function validatePhenoTypeFields(){
+    var phenotype_descriptions = document.getElementsByName("strain[phenotypes_attributes][][description]");
+       for(var i = 0 ; i < phenotype_descriptions.length; i++){
+           if(phenotype_descriptions[i].value==""){
+               alert("Phenotype description cannot be empty.");
+               phenotype_descriptions[i].focus();
+               return false;
+           }
+       }
+       return true;
+}
 function strains_of_selected_organism(organism_id, strain_selection_box_id, strain_selection_box_name){
-    var updated_selection_box = '<select id=\''+ strain_selection_box_id +'\' name=\''+ strain_selection_box_name +'\'>';
+      var updated_selection_box = '<select id=\''+ strain_selection_box_id +'\' name=\''+ strain_selection_box_name +'\'>';
         updated_selection_box += "<option value='0'>Select Strain ...</option>";
         url = "/biosamples/strains_of_selected_organism"
         request = new Ajax.Request(url, {

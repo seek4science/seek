@@ -10,7 +10,7 @@
  association_step_content ||= nil
 
  with_new_link ||=false
- new_association_path = eval "new_#{association.to_s.singularize}_path(:from_new_link=>#{with_new_link})"
+ new_association_path = eval "new_#{association.to_s.singularize}_path(:parent_name=>'#{controller_name.underscore.singularize}')"
 
  default_choice = [default_choice_text, 0]
  collection_id = name.to_s.gsub(']','').gsub(/[^-a-zA-Z0-9:.]/, "_")

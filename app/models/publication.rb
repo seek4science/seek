@@ -9,6 +9,18 @@ class Publication < ActiveRecord::Base
 
   acts_as_asset
 
+  def default_policy
+    policy = Policy.new(:name => "publication_policy", :sharing_scope => Policy::EVERYONE, :access_type => Policy::VISIBLE)
+    #add managers (authors + contributor)
+    creators.each do |author|
+      policy.permissions.build(:contributor => author, :policy => policy, :access_type => Policy::MANAGING)
+    end
+    #Add contributor
+    c = contributor || default_contributor
+    policy.permissions.build(:contributor => c.person, :policy => policy, :access_type => Policy::MANAGING) if c
+    policy
+  end
+
   validate :check_identifier_present
   #validates_uniqueness_of :pubmed_id, :message => "publication has already been registered with that ID."
   #validates_uniqueness_of :doi, :message => "publication has already been registered with that ID."
@@ -86,9 +98,24 @@ class Publication < ActiveRecord::Base
   def self.subscribers_are_notified_of? action
     action == 'create'
   end
+
+  def endnote
+   bio_reference.endnote
+  end
   
   private
-  
+
+  def bio_reference
+    if pubmed_id
+      Bio::MEDLINE.new(Bio::PubMed.efetch(pubmed_id).first).reference
+    else
+      #TODO: Bio::Reference supports a 'url' option. Should this be the URL on seek, or the URL of the 'View Publication' button, or neither?
+      Bio::Reference.new({:title => title, :journal => journal, :abstract => abstract,
+                          :authors => (seek_authors + non_seek_authors).map {|e| [e.last_name, e.first_name].join(', ')},
+                          :year => published_date.year}.with_indifferent_access)
+    end
+  end
+
   def check_identifier_present
     if self.doi.nil? && self.pubmed_id.nil?
       self.errors.add_to_base("Please specify either a PubMed ID or DOI")

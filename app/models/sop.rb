@@ -20,8 +20,12 @@ class Sop < ActiveRecord::Base
     text :description, :title, :original_filename,:searchable_tags,:exp_conditions_search_fields,:assay_type_titles,:technology_type_titles
   end if Seek::Config.solr_enabled
 
-  belongs_to :content_blob #don't add a dependent=>:destroy, as the content_blob needs to remain to detect future duplicates
-               
+  has_many :sample_assets,:dependent=>:destroy,:as => :asset
+  has_many :samples, :through => :sample_assets
+
+  #don't add a dependent=>:destroy, as the content_blob needs to remain to detect future duplicates
+  has_one :content_blob, :as => :asset, :foreign_key => :asset_id ,:conditions => 'asset_version= #{self.version}'
+
   has_many :experimental_conditions, :conditions =>  'experimental_conditions.sop_version = #{self.version}'
 
   has_many :sop_specimens
@@ -30,9 +34,7 @@ class Sop < ActiveRecord::Base
   explicit_versioning(:version_column => "version") do
     
     acts_as_versioned_resource
-    
-    belongs_to :content_blob
-    
+    has_one :content_blob,:primary_key => :sop_id,:foreign_key => :asset_id,:conditions => 'content_blobs.asset_version= #{self.version} and content_blobs.asset_type = "#{self.parent.class.name}"'
     has_many :experimental_conditions, :primary_key => "sop_id", :foreign_key => "sop_id", :conditions =>  'experimental_conditions.sop_version = #{self.version}'
     
   end

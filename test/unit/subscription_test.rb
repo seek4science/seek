@@ -88,10 +88,20 @@ class SubscriptionTest < ActiveSupport::TestCase
     end
   end
 
-  test 'subscribers who do not receive notifications dont receive emails' do
+  test 'wonky people' do
+    Person.all.each do |p|
+      unless p.valid?
+        puts p.inspect
+        puts p.errors.full_messages
+      end
+    end
+  end
 
+  test 'subscribers who do not receive notifications dont receive emails' do
+    current_person.reload
     current_person.notifiee_info.receive_notifications = false
     current_person.notifiee_info.save!
+    current_person.reload
 
     assert !current_person.receive_notifications?
     

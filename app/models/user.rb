@@ -57,6 +57,18 @@ class User < ActiveRecord::Base
 
   cattr_accessor :current_user
 
+  # related_#{type} are resources that user created
+  RELATED_RESOURCE_TYPES = [:data_files,:models,:sops,:events,:presentations,:publications]
+  RELATED_RESOURCE_TYPES.each do |type|
+    define_method "related_#{type}" do
+      person.send "related_#{type}"
+    end
+  end
+
+  def user
+    self
+  end
+
   def can_manage_types?
     unless Seek::Config.type_managers_enabled
       return false

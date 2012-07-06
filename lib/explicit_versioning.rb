@@ -119,9 +119,8 @@ module Jits
           return false unless self.valid?
           without_update_callbacks do
             set_new_version
-            self.save
-            self.reload
             save_version_on_create(revision_comment)
+            self.save
           end
         end
 

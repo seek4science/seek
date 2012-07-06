@@ -5,20 +5,26 @@ module Seek
   module ModelTypeDetection
     
     def is_dat? model_or_blob=self
-      content_blob = model_or_blob.is_a?(ContentBlob) ?  model_or_blob : model_or_blob.content_blob
-      content_blob.file_exists? && check_content(content_blob.filepath,"begin name",25000)
+      content_blobs_for(model_or_blob).detect{|content_blob| check_content content_blob.filepath,"begin name",25000}
     end                      
     
     def is_sbml? model_or_blob=self
-      content_blob = model_or_blob.is_a?(ContentBlob) ?  model_or_blob : model_or_blob.content_blob
-      content_blob.file_exists? && (check_content content_blob.filepath,"<sbml")
+       content_blobs_for(model_or_blob).detect{|content_blob| check_content content_blob.filepath,"<sbml" }
     end
 
+    def is_xgmml? model_or_blob=self
+      content_blobs_for(model_or_blob).detect{|content_blob| check_content(content_blob.filepath,"<graph") and check_content(content_blob.filepath,"<node") }
+    end
+    
     def is_jws_supported? model_or_blob=self
       is_dat?(model_or_blob) || is_sbml?(model_or_blob)
     end
 
     private
+    
+    def content_blobs_for model_or_blob
+      model_or_blob.is_a?(ContentBlob) ? [model_or_blob] : model_or_blob.content_blobs
+    end
     
     def check_content filepath, str, max_length=1500      
       char_count=0      

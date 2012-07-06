@@ -80,7 +80,11 @@
     f.title "This Sop"
     f.projects {[Factory.build(:project)]}
     f.association :contributor, :factory => :user
-  end
+
+    f.after_create do |sop|
+      sop.content_blob = Factory.create(:content_blob, :content_type=>"application/pdf", :asset => sop, :asset_version=>sop.version)
+    end
+end
 
 #Policy
   Factory.define(:policy, :class => Policy) do |f|
@@ -104,11 +108,21 @@
     f.access_type Policy::VISIBLE
   end
 
+  Factory.define(:all_sysmo_downloadable_policy,:parent=>:policy) do |f|
+    f.sharing_scope Policy::ALL_SYSMO_USERS
+    f.access_type Policy::ACCESSIBLE
+  end
+    
   Factory.define(:publicly_viewable_policy, :parent=>:policy) do |f|
     f.sharing_scope Policy::EVERYONE
     f.access_type Policy::VISIBLE
   end
 
+  Factory.define(:public_download_and_no_custom_sharing,:parent=>:policy) do |f|
+    f.sharing_scope Policy::ALL_SYSMO_USERS
+    f.access_type Policy::ACCESSIBLE
+  end
+  
   Factory.define(:editing_public_policy,:parent=>:policy) do |f|
     f.sharing_scope Policy::EVERYONE
     f.access_type Policy::EDITING
@@ -224,11 +238,18 @@ Factory.define(:data_file) do |f|
   f.sequence(:title) {|n| "A Data File_#{n}"}
   f.projects {[Factory.build(:project)]}
   f.association :contributor, :factory => :user
-  f.association :content_blob, :factory => :content_blob
+  f.after_create do |data_file|
+    if data_file.content_blob.blank?
+      data_file.content_blob = Factory.create(:pdf, :asset => data_file, :asset_version=>data_file.version)
+    else
+      data_file.content_blob.asset = data_file
+      data_file.content_blob.asset_version = data_file.version
+      data_file.content_blob.save
+    end
+  end
 end
 
 Factory.define(:rightfield_datafile,:parent=>:data_file) do |f|
-  f.content_type "application/excel"
   f.association :content_blob,:factory=>:rightfield_content_blob
 end
 
@@ -252,7 +273,9 @@ end
     f.sequence(:title) {|n| "A Model #{n}"}
     f.projects {[Factory.build(:project)]}
     f.association :contributor, :factory => :user
-    f.association :content_blob, :factory => :content_blob
+    f.after_create do |model|
+       model.content_blobs = [Factory.create(:pdf, :asset => model,:asset_version=>model.version)] if model.content_blobs.blank?
+    end
   end
 
   Factory.define(:cronwright_model,:parent=>:model) do |f|
@@ -268,13 +291,37 @@ end
     f.projects {[Factory.build(:project)]}
     f.association :contributor, :factory => :user
   end
+
 #Presentation
   Factory.define(:presentation) do |f|
     f.sequence(:title) {|n| "A Presentation #{n}"}
     f.projects {[Factory.build :project]}
    # f.data_url "http://www.virtual-liver.de/images/logo.png"
     f.association :contributor,:factory=>:user
-    f.association :content_blob, :factory => :content_blob
+  f.after_create do |presentation|
+    presentation.content_blob = Factory.create(:content_blob,:original_filename=>"test.pdf", :content_type=>"application/pdf", :asset => presentation, :asset_version=>presentation.version)
+  end
+end
+
+#Model Version
+Factory.define(:model_version) do |f|
+  f.association :model
+
+end
+
+#SOP Version
+Factory.define(:sop_version) do |f|
+  f.association :sop
+end
+
+#DataFile Version
+Factory.define(:data_file_version) do |f|
+  f.association :data_file
+end
+
+#Presentation Version
+Factory.define(:presentation_version) do |f|
+  f.association :presentation
   end
 
 #Misc
@@ -319,8 +366,18 @@ end
     f.sequence(:data) {|n| "data [#{n}]" }
   end
 
+  Factory.define(:pdf, :parent => :content_blob) do |f|
+    f.original_filename "test.pdf"
+    f.content_type "application/pdf"
+  end
+  
   Factory.define(:rightfield_content_blob,:parent=>:content_blob) do |f|
     f.data  File.new("#{Rails.root}/test/fixtures/files/rightfield-test.xls","rb").read
+    f.content_type "application/excel"
+  end
+
+  Factory.define(:spreadsheet, :parent => :content_blob) do |f|
+    f.original_filename "test.xls"
   end
 
   Factory.define(:rightfield_annotated_content_blob,:parent=>:content_blob) do |f|
@@ -406,6 +463,10 @@ end
 
   Factory.define(:attribution, :parent => :relationship) {}
 
+  Factory.define(:special_auth_code) do |f|
+    f.association :asset, :factory => :data_file
+  end
+  
   Factory.define(:experimental_condition_link) do |f|
     f.association :substance, :factory => :compound
     f.association :experimental_condition
@@ -472,11 +533,23 @@ end
     f.sequence(:title) {|n| "project folder #{n}"}
   end
 
+  Factory.define :worksheet do |f|
+    f.content_blob { Factory.build(:spreadsheet, :asset => Factory(:data_file))}
+    f.last_row 10
+    f.last_column 10
+  end
+
+  Factory.define :cell_range do |f|
+    f.cell_range "A1:B3"
+    f.association :worksheet
+  end
+
 
   Factory.define :genotype do |f|
     f.association :gene, :factory => :gene
     f.association :modification, :factory => :modification
     f.association :strain, :factory => :strain
+    f.association :specimen,:factory => :specimen
   end
 
   Factory.define :gene do |f|
@@ -490,4 +563,5 @@ end
   Factory.define :phenotype do |f|
     f.sequence(:description) {|n| "phenotype #{n}"}
     f.association :strain, :factory => :strain
+    f.association :specimen,:factory => :specimen
   end

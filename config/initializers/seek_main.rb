@@ -16,10 +16,14 @@ require 'acts_as_favouritable'
 require 'acts_as_asset'
 require 'send_subscriptions_when_activity_logged'
 require 'modporter_extensions'
+require "attachment_fu_extension"
 require 'seek/taggable'
+require "bio"
+require 'assets_common_extension'
 require 'sunspot_rails'
 require 'cancan'
 require 'in_place_editing'
+require 'strategic_eager_loading'
 
 
 GLOBAL_PASSPHRASE="ohx0ipuk2baiXah" unless defined? GLOBAL_PASSPHRASE
@@ -30,10 +34,15 @@ PORTER_SECRET = "" unless defined? PORTER_SECRET
 
 Seek::Config.propagate_all
 
+#these inflections are put here, because the config variables are just loaded after the propagation
+ActiveSupport::Inflector.inflections do |inflect|
+  inflect.human 'Specimen', Seek::Config.sample_parent_term.capitalize  unless Seek::Config.sample_parent_term.blank?
+  inflect.human 'specimen', Seek::Config.sample_parent_term.capitalize  unless Seek::Config.sample_parent_term.blank?
+end
+
 Annotations::Config.attribute_names_to_allow_duplicates.concat(["tag"])
 Annotations::Config.versioning_enabled = false
 
-CELL_CULTURE_OR_SPECIMEN = Seek::Config.is_virtualliver ? 'specimen' : 'cell culture'
 ENV['LANG'] = 'en_US.UTF-8'
 
 if ActiveRecord::Base.connection.table_exists? 'delayed_jobs'

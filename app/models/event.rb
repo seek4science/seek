@@ -41,13 +41,11 @@ class Event < ActiveRecord::Base
 
   validate :validate_end_date
   def validate_end_date
-    errors.add(:end_date, "is before start date.") unless self.end_date.nil? || self.start_date.nil? || self.end_date > self.start_date
+    errors.add(:end_date, "is before start date.") unless self.end_date.nil? || self.start_date.nil? || self.end_date >= self.start_date
   end
 
   validates_presence_of :title
   validates_presence_of :start_date
-  validates_presence_of :end_date
-  #validates_uniqueness_of :title
 
   #validates_is_url_string :url
   validates_format_of :url, :with=>/(^$)|(^(http|https):\/\/[a-z0-9]+([\-\.]{1}[a-z0-9]+)*\.[a-z]{2,5}(([0-9]{1,5})?\/.*)?$)/ix,:allow_nil=>true,:allow_blank=>true
@@ -60,7 +58,7 @@ class Event < ActiveRecord::Base
 
   #defines that this is a user_creatable object type, and appears in the "New Object" gadget
   def self.user_creatable?
-    true
+    Seek::Config.events_enabled
   end
 
 end

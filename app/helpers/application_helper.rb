@@ -102,9 +102,13 @@ module ApplicationHelper
     Seek::Util.user_creatable_types.each do |c|
       name=c.name.underscore
       path = eval "new_#{name}_path"
+      data_file_with_sample_path = eval "new_data_file_path(:page_title=>'Data File with Sample Parsing',:is_with_sample=>true)"
       if c==Seek::Util.user_creatable_types.first
         script << "if "
       else
+        script << "else if(selected_model == 'data_file_with_sample'){
+          \n location.href = '#{data_file_with_sample_path}';\n
+        } \n"
         script << "else if "
       end
       script << "(selected_model == '#{name}') {\n location.href = '#{path}';\n }\n"
@@ -116,7 +120,11 @@ module ApplicationHelper
 
   #selection of assets for new asset gadget
   def new_creatable_selection
-    select_tag :new_resource_type, options_for_select(Seek::Util.user_creatable_types.collect{|c| [(c.name.underscore.humanize == "Sop" ? "SOP" : c.name.underscore.humanize),c.name.underscore] })
+    creatable_options = Seek::Util.user_creatable_types.collect { |c| [(c.name.underscore.humanize == "Sop" ? "SOP" : c.name.underscore.humanize), c.name.underscore] }
+    creatable_options << ["Data file with sample", "data_file_with_sample"] if Seek::Config.sample_parser_enabled
+    select_tag :new_resource_type, options_for_select(creatable_options)
+
+    #select_tag :new_resource_type, options_for_select(Seek::Util.user_creatable_types.collect{|c| [(c.name.underscore.humanize == "Sop" ? "SOP" : c.name.underscore.humanize),c.name.underscore] })
   end
   
   def is_nil_or_empty? thing
@@ -514,6 +522,10 @@ end
 class ApplicationFormBuilder< ActionView::Helpers::FormBuilder
   def fancy_multiselect association, options = {}
     @template.fancy_multiselect object, association, options
+  end
+
+  def subform_delete_link(link_text='remove', link_options = {}, hidden_field_options = {})
+    hidden_field(:_destroy, hidden_field_options) + @template.link_to_function(link_text, "$(this).previous().value = '1';$(this).up().hide();", link_options)
   end
 end
 

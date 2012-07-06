@@ -32,8 +32,9 @@ class SpecimensController < ApplicationController
 
   def create
     organism_id = params[:specimen].delete(:organism_id)
-    @specimen = Specimen.new(params[:specimen])
-    sop_ids = (params[:specimen_sop_ids].nil?? [] : params[:specimen_sop_ids].reject(&:blank?))||[]
+    @specimen = new_specimen
+    sop_ids = (params[:specimen_sop_ids].nil? ? [] : params[:specimen_sop_ids].reject(&:blank?))||[]
+    @specimen.build_sop_masters sop_ids
     @specimen.policy.set_attributes_with_sharing params[:sharing], @specimen.projects
 
     if @specimen.strain.nil? && !params[:organism].blank?
@@ -45,11 +46,6 @@ class SpecimensController < ApplicationController
     respond_to do |format|
       if @specimen.save
         deliver_request_publish_approval params[:sharing], @specimen
-        sop_ids.each do |sop_id|
-          sop= Sop.find sop_id
-          SopSpecimen.create!(:sop_id => sop_id,:sop_version=> sop.version,:specimen_id=>@specimen.id)
-        end
-
         flash[:notice] = 'Specimen was successfully created.'
         format.html { redirect_to(@specimen) }
         format.xml  { head :ok }
@@ -70,6 +66,7 @@ class SpecimensController < ApplicationController
 
   def update
     sop_ids = (params[:specimen_sop_ids].nil?? [] : params[:specimen_sop_ids].reject(&:blank?)) ||[]
+    @specimen.build_sop_masters sop_ids
 
     @specimen.attributes = params[:specimen]
     @specimen.policy.set_attributes_with_sharing params[:sharing], @specimen.projects
@@ -83,14 +80,9 @@ class SpecimensController < ApplicationController
 
     if @specimen.save
       deliver_request_publish_approval params[:sharing], @specimen
-      sop_ids.each do |sop_id|
-        sop= Sop.find sop_id
-        existing = @specimen.sop_masters.select { |ss| ss.sop == sop }
-        if existing.blank?
-          SopSpecimen.create!(:sop_id => sop_id, :sop_version => sop.version, :specimen_id => @specimen.id)
-        end
-      end
       if @specimen.from_biosamples=='true'
+        #reload to get updated nested attributes,e.g. genotypes/phenotypes
+        @specimen.reload
         render :partial => "biosamples/back_to_biosamples", :locals => {:action => 'update', :object => @specimen}
       else
         respond_to do |format|
@@ -118,4 +110,34 @@ class SpecimensController < ApplicationController
       end
     end
   end
+
+  private
+  def new_specimen
+        specimen = Specimen.new
+        # to delete id hash which is saved in the hidden id field (automatically generated in form with fields_for)
+          #delete id hashes of genotypes/phenotypes
+          params[:specimen][:genotypes_attributes].try(:delete, "id")
+          params[:specimen][:phenotypes_attributes].try(:delete, "id")
+          #delete id hashes of gene_attributes/modification_attributes
+          params[:specimen][:genotypes_attributes].try(:each) do |genotype_key,genotype_value|
+
+            genotype_value.delete_if { |k, v| k=="id" }
+            #delete if,e.g. "0"=>{"_destroy"=>0} for genotypes
+            params[:specimen][:genotypes_attributes].delete(genotype_key) if genotype_value.keys == ["_destroy"]
+
+            genotype_value[:gene_attributes].try(:delete_if) { |k, v| k=="id"}
+            genotype_value[:modification_attributes].try(:delete_if) { |k, v| k=="id"}
+
+            #delete if,e.g. "0"=>{"_destroy"=>0}  for gene_attributes/modification_attributes (which means new genes/modifications with empty title), this must be done after the id hashes are deleted!!!
+            genotype_value.delete("gene_attributes") if genotype_value[:gene_attributes].try(:keys) == ["_destroy"]
+            genotype_value.delete("modification_attributes") if genotype_value[:modification_attributes].try(:keys) == ["_destroy"]
+          end
+          params[:specimen][:phenotypes_attributes].try(:each) do |key, value|
+            value.delete_if { |k, v| k=="id" }
+            #delete if ,e.g. "0"=>{"_destroy"=>0} for phenotypes
+            params[:specimen][:phenotypes_attributes].delete(key) if value.keys== ["_destroy"]
+          end
+        specimen.attributes = params[:specimen]
+        specimen
+    end
 end

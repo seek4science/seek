@@ -49,4 +49,12 @@ module ProjectsHelper
       project.gatekeepers.select(&:can_view?).collect { |p| link_to(h(p.name), p) }.join(", ")
     end
   end
+
+  def project_mailing_list project
+      if project.people.empty?
+        "<span class='none_text'>No People in this project</span>";
+      else
+        "<span>" + project.people.sort_by(&:last_name).select(&:can_view?).map{|p|link_to(h(p.name), p) + " (" + p.email + ")"}.join(";<br/>") + "</span>";
+      end
+  end
 end

@@ -22,7 +22,7 @@
                    :complete => "Element.hide('spinner_plot');Element.hide('plot_panel');", :html => {:id => "plot_panel"}) do %>
 
     <div style="display:none;">
-      <%= hidden_field_tag :annotation_content_blob_id, @display_data_file.content_blob_id %>
+      <%= hidden_field_tag :annotation_content_blob_id, @display_data_file.content_blob.id %>
       <%= hidden_field_tag :annotation_sheet_id, "0" %>
 
       <%= text_field_tag :annotation_cell_coverage, nil,:class=>"annotation_cell_coverage_class" %>

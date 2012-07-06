@@ -3,6 +3,7 @@ module Acts
   module Authorized
     module PolicyBasedAuthorization
       def self.included klass
+        attr_accessor :permission_for
         klass.extend ClassMethods
         klass.extend AuthLookupClassMethods
         klass.class_eval do
@@ -20,6 +21,14 @@ module Acts
           before_validation :publishing_auth unless Seek::Config.is_virtualliver
           after_save :queue_update_auth_table
           after_destroy :remove_from_lookup_table
+          before_save :update_timestamp_if_policy_was_saved if Seek::Config.is_virtualliver
+
+          def update_timestamp_if_policy_was_saved
+            #autosaved belongs_to associations get saved before the parent, so to check if it has changed, see if it has a newer updated_at
+            update_timestamp if updated_at && policy.updated_at > updated_at
+          end
+
+
         end
       end
 
@@ -33,25 +42,38 @@ module Acts
         #anonymous user are returned. If one or more projects are provided, then only the assets linked to those projects are included.
         def all_authorized_for action, user=User.current_user, projects=nil
           projects=Array(projects) unless projects.nil?
-          user_id = user.nil? ? 0 : user.id
-          assets = []
-          programatic_project_filter = !projects.nil? && (!Seek::Config.auth_lookup_enabled || (self==Assay || self==Study))
-          if Seek::Config.auth_lookup_enabled
+          if Seek::Config.auth_caching_enabled
+            assets = if projects
+                       if reflection = reflect_on_association(:projects) and reflection.macro == :has_and_belongs_to_many
+                         find(:all, :include => :projects, :conditions => ["#{reflection.options[:join_table]}.project_id IN (?)", projects.map(&:id)])
+                       else
+                         all.select { |asset| !(asset.projects & projects).empty? }
+                       end
+                     else
+                       all
+                     end
+            assets.select(&"can_#{action}?".to_sym)
+          else
+            user_id = user.nil? ? 0 : user.id
+            assets = []
+            programatic_project_filter = !projects.nil? && (!Seek::Config.auth_lookup_enabled || (self==Assay || self==Study))
+            if Seek::Config.auth_lookup_enabled
             if (lookup_table_consistent?(user_id))
               Rails.logger.info("Lookup table #{lookup_table_name} is complete for user_id = #{user_id}")
-              assets = lookup_for_action_and_user action, user_id,projects
-            else
+                assets = lookup_for_action_and_user action, user_id,projects
+              else
               Rails.logger.info("Lookup table #{lookup_table_name} is incomplete for user_id = #{user_id} - doing things the slow way")
+                assets = all.select { |df| df.send("can_#{action}?") }
+                programatic_project_filter = !projects.nil?
+              end
+            else
               assets = all.select { |df| df.send("can_#{action}?") }
-              programatic_project_filter = !projects.nil?
             end
-          else
-            assets = all.select { |df| df.send("can_#{action}?") }
-          end
-          if programatic_project_filter
-            assets.select{|a| !(a.projects & projects).empty?}
-          else
-            assets
+            if programatic_project_filter
+              assets.select { |a| !(a.projects & projects).empty? }
+            else
+              assets
+            end
           end
         end
 
@@ -132,10 +154,45 @@ module Acts
         end
       end
 
+      def auth_key user, action
+        [user.try(:person).try(:cache_key), "can_#{action}?", cache_key]
+      end
+
       #removes all entries related to this item from the authorization lookup table
       def remove_from_lookup_table
         id=self.id
         ActiveRecord::Base.connection.execute("delete from #{self.class.lookup_table_name} where asset_id=#{id}")
+      end
+        
+      AUTHORIZATION_ACTIONS.each do |action|
+        if Seek::Config.auth_caching_enabled
+          eval <<-END_EVAL
+          def can_#{action}? user = User.current_user
+            if self.new_record?
+              return true
+            else
+              Rails.cache.fetch(auth_key(user, "#{action}")) {perform_auth(user,"#{action}") ? :true : :false} == :true
+            end
+          end
+          END_EVAL
+        else
+          eval <<-END_EVAL
+            def can_#{action}? user = User.current_user
+                return true if new_record?
+                user_id = user.nil? ? 0 : user.id
+                if Seek::Config.auth_lookup_enabled
+                  lookup = self.class.lookup_for_asset("#{action}", user_id,self.id)
+                else
+                  lookup=nil
+                end
+                if lookup.nil?
+                  perform_auth(user,"#{action}")
+                else
+                  lookup
+                end
+            end
+          END_EVAL
+        end
       end
 
       #triggers a background task to update or create the authorization lookup table records for this item
@@ -167,25 +224,7 @@ module Acts
         end
 
         ActiveRecord::Base.connection.execute(sql)
-      end
 
-      AUTHORIZATION_ACTIONS.each do |action|
-          eval <<-END_EVAL
-            def can_#{action}? user = User.current_user
-                return true if new_record?
-                user_id = user.nil? ? 0 : user.id
-                if Seek::Config.auth_lookup_enabled
-                  lookup = self.class.lookup_for_asset("#{action}", user_id,self.id)
-                else
-                  lookup=nil
-                end
-                if lookup.nil?
-                  perform_auth(user,"#{action}")
-                else
-                  lookup
-                end
-            end
-          END_EVAL
       end
 
       def contributor_credited?

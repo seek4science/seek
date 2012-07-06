@@ -1,4 +1,14 @@
+<%= javascript_include_tag 'calendar_date_select/calendar_date_select' %>
+<%= stylesheet_link_tag 'calendar_date_select/default' %>
 <%
+   if f ||= nil
+     resource_type ||= f.object.class.name
+     existing_attributions ||= try_block{f.object.attributions_objects.select &:can_view?}
+	 existing_creators ||= f.object.try(:creators)
+     existing_creators =  [current_user.person] if existing_creators.blank?
+	 other_creators ||= f.object.try :other_creators
+	 related_publications ||= try_block { f.object.related_publications }
+   end
    existing_attributions||=[]
    existing_creators||=[current_user.person]
    related_publications||=[]
@@ -40,3 +50,6 @@
                                                                              :related_publications => related_publications} -%>
     </p>
 <% end -%>
+<% if try_block{f.object.is_a?(Acts::Authorized::CodeBasedAuthorization)} %>
+    <%= render :partial => 'assets/special_auth_code_form', :locals => {:f => f}%>
+<% end %>

@@ -29,7 +29,7 @@
           </li>
           <li>
             <%= f.label :end_date %>
-            <span class="required">*</span><br/>
+            <br/>
             <%= f.calendar_date_select :end_date, :time => :mixed%>
           </li>
         </ul>
@@ -61,6 +61,9 @@
         <% if current_user_authorized_to_manage -%>
             <p>
               <%= render :partial => "assets/sharing_form" -%>
+            </p>
+            <p>
+              <%= render :partial => "assets/special_auth_code_form", :locals => {:f => f} %>
             </p>
         <% end %>
 

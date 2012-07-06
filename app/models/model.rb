@@ -18,8 +18,13 @@ class Model < ActiveRecord::Base
   
   # allow same titles, but only if these belong to different users
   # validates_uniqueness_of :title, :scope => [ :contributor_id, :contributor_type ], :message => "error - you already have a Model with such title."
+  has_many :sample_assets,:dependent=>:destroy,:as => :asset
+  has_many :samples, :through => :sample_assets
 
-  belongs_to :content_blob #don't add a dependent=>:destroy, as the content_blob needs to remain to detect future duplicates    
+  has_many :model_images
+  belongs_to :model_image
+
+  has_many :content_blobs, :as => :asset, :foreign_key => :asset_id,:conditions => 'asset_version= #{self.version}'
 
   belongs_to :organism
   belongs_to :recommended_environment,:class_name=>"RecommendedModelEnvironment"
@@ -33,12 +38,27 @@ class Model < ActiveRecord::Base
   explicit_versioning(:version_column => "version") do
     include Seek::ModelProcessing
     acts_as_versioned_resource
-    
-    belongs_to :content_blob             
+
+    belongs_to :model_image
     belongs_to :organism
     belongs_to :recommended_environment,:class_name=>"RecommendedModelEnvironment"
     belongs_to :model_type
     belongs_to :model_format
+
+    def content_blobs
+      ContentBlob.find(:all, :conditions => ["asset_id =? and asset_type =? and asset_version =?", self.parent.id, self.parent.class.name, self.version])
+    end
+
+    def content_blob
+      result = Class.new.extend(Seek::ModelTypeDetection).is_jws_supported? self
+      result.nil?? content_blobs.first : result
+    end
+  end
+
+  def content_blob
+    # return the first content blob which is jws supported (is_dat? or is_sbml?)
+      result = Class.new.extend(Seek::ModelTypeDetection).is_jws_supported? self
+      result.nil?? content_blobs.first : result
   end
 
   # get a list of Models with their original uploaders - for autocomplete fields

@@ -8,9 +8,8 @@ class Presentation < ActiveRecord::Base
    attr_accessor :orig_data_file_id
 
    acts_as_asset
-   belongs_to :content_blob
 
-   validates_presence_of :content_blob
+   has_one :content_blob, :as => :asset, :foreign_key => :asset_id ,:conditions => 'asset_version= #{self.version}'
 
    searchable(:ignore_attribute_changes_of=>[:updated_at,:last_used_at]) do
     text :description,:title,:original_filename,:searchable_tags
@@ -18,7 +17,7 @@ class Presentation < ActiveRecord::Base
 
    explicit_versioning(:version_column => "version") do
     acts_as_versioned_resource
-    belongs_to :content_blob
+    has_one :content_blob,:primary_key => :presentation_id,:foreign_key => :asset_id,:conditions => 'content_blobs.asset_version= #{self.version} and content_blobs.asset_type = "#{self.parent.class.name}"'
   end
 
    if Seek::Config.events_enabled

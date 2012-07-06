@@ -20,12 +20,14 @@ gem 'rest-client',">=1.6.1"
 gem 'calendar_date_select'
 gem 'factory_girl'
 gem 'ratom',"0.6.8"
+gem 'rubyzip'
+gem 'bio'
 gem 'sunspot_rails',"1.2.1"
 gem "delayed_job","~>2.0.4"
 gem "daemons"
 gem "cancan"
 gem "in_place_editing"
-
+gem "parallel_tests", :group => :development
 gem "rdf"
 gem "rdf-rdfxml"
 gem "equivalent-xml"
