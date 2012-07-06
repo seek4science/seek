@@ -69,7 +69,11 @@
             </table>
           </div>
       <% end -%>
-   </div>
-</div>
+    <% if logged_in? and current_user.person.member? %>
+        <ul class="sectionIcons">
+          <li><%= create_sample_popup_link -%></li>
+        </ul>
+        <br/>
+    <% end %>
 <% end -%>
 

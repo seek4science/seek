@@ -106,10 +106,7 @@
       <% end -%>
   <% if logged_in? and current_user.person.member? %>
             <ul class="sectionIcons">
-              <li><%= create_sample_popup_link -%></li>
-              <br/>
-              <br/>
-              (create a new sample and <%= Seek::Config.sample_parent_term %>, or create a new sample for the selected <%= Seek::Config.sample_parent_term %>)
+              <li><%= link_to image("new") + "Create new #{Seek::Config.sample_parent_term}", new_specimen_path(), {:id => 'new_specimen_link', :target => '_blank'} -%></li>
             </ul>
             <br/>
   <% end %>

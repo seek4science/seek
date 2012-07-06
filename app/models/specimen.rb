@@ -41,6 +41,8 @@ class Specimen < ActiveRecord::Base
   validates_presence_of :institution if Seek::Config.is_virtualliver
   validates_uniqueness_of :title
 
+  AGE_UNITS = ["second","minute","hour","day","week","month","year"]
+
   def self.sop_sql()
   'SELECT sop_versions.* FROM sop_versions ' + 'INNER JOIN sop_specimens ' +
   'ON sop_specimens.sop_id = sop_versions.sop_id ' +
@@ -99,10 +101,8 @@ class Specimen < ActiveRecord::Base
     end if Seek::Config.is_virtualliver
   end if Seek::Config.solr_enabled
 
-  def age_in_weeks
-    if !age.nil?
-      age.to_s + " (weeks)"
-    end
+  def age_with_unit
+      age.nil? ? "" : "#{age}(#{age_unit}s)"
   end
 
   def can_delete? user=User.current_user
@@ -151,7 +151,8 @@ class Specimen < ActiveRecord::Base
     new_object.sop_masters = self.try(:sop_masters)
     new_object.creators = self.try(:creators)
     new_object.project_ids = self.project_ids
-
+    new_object.genotypes = self.genotypes.map &:clone
+    new_object.phenotypes = self.phenotypes.map &:clone
     return new_object
   end
 

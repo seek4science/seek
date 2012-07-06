@@ -6,12 +6,16 @@
 
 <%= f.error_messages %>
 
-<% unless action == :new && !@sample.specimen.new_record?%>
+<% if @sample.new_record? && @sample.specimen.try(:new_record?)%>
     <% f.fields_for :specimen do |specimen_f| %>
         <%= render :partial => "specimens/form", :locals => {:f => specimen_f, :specimen => @sample.specimen, :action => action}%>
     <% end %>
+<% else %>
+    <p>
+       <%= f.label "Choose a #{Seek::Config.sample_parent_term}" %> <span class="required">*</span><br/>
+       <%= f.collection_select(:specimen_id, Specimen.all_authorized_for('view'), :id, :title,{:include_blank =>"Please Select..."},{:style=>"width:50%"}) %>
+      </p>
 <% end %>
-
 <h2>Sample Details</h2>
 
 <div style="width: 95%;">
@@ -65,7 +69,8 @@
 
   <p>
     <%= f.label "Organism part" -%><br/>
-    <%= f.select :organism_part, options_for_select(['whole cell', 'membrane fraction'].insert(0,'Not specified'), @sample.organism_part), :style => 'float:right;margin-right:30em' %>
+    <% organism_part_options = Seek::Config.is_virtualliver ? ['whole organism','organ','tissue','intercellular','cell','subcellular','blood','serum']:['whole cell', 'membrane fraction'] %>
+    <%= f.select :organism_part, options_for_select(organism_part_options.insert(0,'Not specified'), @sample.organism_part), :style => 'float:right;margin-right:30em' %>
   </p>
   <br/>
   <%= render :partial => 'projects/project_selector', :locals => {:resource => @sample,:allow_nil=>true}%>
@@ -87,7 +92,6 @@
 
 <%= f.hidden_field :parent_name %>
 <%= f.hidden_field :from_biosamples %>
-<%= hidden_field_tag :specimen_id, @sample.specimen.try(:id) %>
 
 <p style="margin-top: 2em; text-align: center;">
   <%

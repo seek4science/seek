@@ -66,8 +66,17 @@ module Authorization
       # 2. Check if there is a permission for a FavouriteGroup they're in
       # 3. Check if there is a permission for their project
       # 4. Check the action is allowed by the access_type of the permission
-      permissions_for_user = policy.permissions.select { |p| p.controls_access_for? user.person }
-      permission = Permission.choose_for(user.person, permissions_for_user)
+      person = user.person
+      thing.permission_for ||= {}
+      permission = if p = thing.permission_for[person]
+        p == :nil ? nil : p
+      else
+        permissions = Permission.sort_for(person, policy.permissions)
+        permission = permissions.detect { |p| p.controls_access_for? user.person }
+        permission ? thing.permission_for[person] = permission : thing.permission_for[person] = :nil
+        permission
+      end
+
       is_authorized = permission.allows_action? action, user.person if permission
       # == END CUSTOM PERMISSIONS
     end
