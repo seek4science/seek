@@ -1047,6 +1047,15 @@ ActiveRecord::Schema.define(:version => 20120628164147) do
     t.datetime "updated_at"
   end
 
+  create_table "sample_assets", :force => true do |t|
+    t.integer  "sample_id"
+    t.integer  "asset_id"
+    t.integer  "version"
+    t.string   "asset_type"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
   create_table "sample_auth_lookup", :id => false, :force => true do |t|
     t.integer "user_id"
     t.integer "asset_id"
