@@ -9,7 +9,8 @@ class ProjectSubscriptionTest < ActiveSupport::TestCase
   end
 
   test 'subscribing to a project subscribes to subscribable items in the project' do
-    current_person.project_subscriptions.create :project => @proj
+    ps = current_person.project_subscriptions.create :project => @proj
+    ProjectSubscriptionJob.new(ps.id).perform
     assert @subscribables_in_proj.all?(&:subscribed?)
   end
 
@@ -20,16 +21,19 @@ class ProjectSubscriptionTest < ActiveSupport::TestCase
 
     #when joining a project
     person.work_groups.create :project => @proj, :institution => Factory(:institution)
+    person.reload
     assert_equal person.projects.sort_by(&:title), person.project_subscriptions.map(&:project).sort_by(&:title)
   end
 
   test 'subscribers to a project auto subscribe to new items in the project' do
-    current_person.project_subscriptions.create :project => @proj
+    ps = current_person.project_subscriptions.create :project => @proj
+    ProjectSubscriptionJob.new(ps.id).perform
     assert Factory(:subscribable, :projects => [Factory(:project),@proj]).subscribed?
   end
 
   test 'individual subscription frequency set by project subscription frequency' do
     ps = current_person.project_subscriptions.create :project => @proj, :frequency => 'daily'
+    ProjectSubscriptionJob.new(ps.id).perform
     assert @subscribables_in_proj.map(&:current_users_subscription).all?(&:daily?)
     ps.frequency = 'monthly'; ps.save!
     assert @subscribables_in_proj.map(&:current_users_subscription).all?(&:monthly?)
