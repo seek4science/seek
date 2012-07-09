@@ -1,3 +1,4 @@
+<%SendPeriodicEmailsJob.new('daily').perform%>
 <% if logged_in? and current_user.person.member?%>
     <ul class="sectionIcons">
         <li><%= image_tag_for_key "new", new_sop_path, "Upload a SOP", nil, "Upload a SOP" %></li>

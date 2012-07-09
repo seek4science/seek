@@ -31,24 +31,31 @@ The following resources have just been created/updated in <%= Seek::Config.appli
         <th align="left"><%= action.capitalize%> Date</th>
         <th align="left">Unsubscribe?</th>
       </tr>
-      <% logs.each do |log| %>
+         <%
+            removed_duplicated_logs = []
+            logs.sort { |a, b| b.updated_at <=> a.updated_at }.each do |log|
+              removed_duplicated_logs << log unless removed_duplicated_logs.collect(&:activity_loggable).include?(log.activity_loggable)
+            end
+         %>
+         <% removed_duplicated_logs.each do |log| %>
              <% resource_projects = log.try(:activity_loggable).try(:projects)
                 person_subscribed_projects = @person.project_subscriptions.collect(&:project)
                 reported_projects = resource_projects.to_a & person_subscribed_projects
                 project_names = reported_projects.collect(&:name).join(',')
              %>
 
-              <tr>
-                <td><%= project_names.blank? ? "<span style='font-style:italic;color:#666666'>Not Specified</span>" : project_names %></td>
-                <td><%= log.activity_loggable_type.humanize %></td>
-                <td><%= try_block{link_to(log.activity_loggable.title, send("#{log.activity_loggable.class.name.underscore}_url", log.activity_loggable))} || log.activity_loggable.title%></td>
-                <td><%= link_to h(try_block{log.culprit.person.name}), send("#{log.culprit.person.class.name.underscore}_url", log.culprit.person.id) %></td>
-                <td> <%= log.created_at %></td>
-                <td> <%= link_to "Unsubscribe", send("#{log.activity_loggable.class.name.underscore}_url", log.activity_loggable) %></td>
-              </tr>
+             <tr>
+               <td><%= project_names.blank? ? "<span style='font-style:italic;color:#666666'>Not Specified</span>" : project_names %></td>
+               <td><%= log.activity_loggable_type.humanize %></td>
+               <td><%= try_block { link_to(log.activity_loggable.title, send("#{log.activity_loggable.class.name.underscore}_url", log.activity_loggable)) } || log.activity_loggable.title %></td>
+               <td><%= link_to h(try_block { log.culprit.person.name }), send("#{log.culprit.person.class.name.underscore}_url", log.culprit.person.id) %></td>
+               <td> <%= log.created_at %></td>
+               <td> <%= link_to "Unsubscribe", send("#{log.activity_loggable.class.name.underscore}_url", log.activity_loggable) %></td>
+             </tr>
 
-      <% end %>
-           </table></div>
+         <% end %>
+       </table>
+    </div>
     <br style="clear:both"/>
 <% end %>
 <br/>
