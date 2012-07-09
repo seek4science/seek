@@ -58,9 +58,11 @@ module Subscribable
           if self.kind_of?(Investigation)
             self.studies.each do |study|
               study.subscriptions.build(:person => person, :project_subscription_id => ps.id) if !study.subscribed?(person)
+              study.save
             end
             self.assays.each do |assay|
               assay.subscriptions.build(:person => person, :project_subscription_id => ps.id) if !assay.subscribed?(person)
+              assay.save
             end
           end
         end
@@ -98,6 +100,7 @@ module Subscribable
       #update subscriptions for assays associated with this study
       self.assays.each do |assay|
         assay.set_default_subscriptions self.investigation.projects
+        assay.save
         assay.remove_subscriptions old_investigation_projects
       end
 
