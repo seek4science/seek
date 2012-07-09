@@ -20,6 +20,11 @@ module Seek
       end
     end
 
+    #is an XLS Excel file rather than the newer XLSX format
+    def is_xls?
+      mime_extension(self.content_type) == "xls"
+    end
+
     def bio_samples_population to_populate=true
       begin
         if is_extractable_spreadsheet?
