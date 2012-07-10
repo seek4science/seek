@@ -1693,6 +1693,9 @@ div.breadcrumbs{
     margin-left: 1em;
     margin-top: 0.5em;
     font-size: 14px;
-    border-bottom: solid #d3d3d3 1px;
+}
+
+div.breadcrumbs a:link{
+   text-decoration: underline;
 }
 
