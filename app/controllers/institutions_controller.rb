@@ -11,7 +11,7 @@ class InstitutionsController < ApplicationController
   before_filter :is_admin_or_is_project_manager, :only => [:new, :create]
 
   cache_sweeper :institutions_sweeper,:only=>[:update,:create,:destroy]
-  
+  include Seek::BreadCrumbs
 
   # GET /institutions/1
   # GET /institutions/1.xml

@@ -8,6 +8,7 @@ class AssaysController < ApplicationController
   before_filter :find_and_auth, :only=>[:edit, :update, :destroy, :show]
 
   include Seek::Publishing
+  include Seek::BreadCrumbs
 
    def new_object_based_on_existing_one
     @existing_assay =  Assay.find(params[:id])

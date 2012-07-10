@@ -1,47 +1,17 @@
 module Seek
   module BreadCrumbs
     def self.included(base)
-      base.before_filter :set_resource, :except => :index
-      base.class_eval do
-         alias_method_chain :index, :breadcrumb
-         alias_method_chain :show, :breadcrumb
-         alias_method_chain :new, :breadcrumb
-         alias_method_chain :edit, :breadcrumb
-      end
+      base.before_filter :add_breadcrumbs
     end
 
-
-    def index_with_breadcrumb
+    def add_breadcrumbs
       add_breadcrumb "Home", :root_path
-      add_breadcrumb "#{controller_name.humanize} index",send("#{controller_name.downcase.underscore}_path")
-      index_without_breadcrumb
-    end
+      add_breadcrumb "#{controller_name.humanize} Index",send("#{controller_name}_path")
+      @resource = eval("@"+controller_name.singularize) || controller_name.singularize.camelize.constantize.find_by_id(params[:id])
+      add_breadcrumb "#{@resource.title}", send("#{controller_name.singularize}_path", @resource) if @resource
 
-    def show_with_breadcrumb
-      add_breadcrumb "Home", :root_path
-      add_breadcrumb "#{controller_name.humanize} index",send("#{controller_name.downcase.underscore}_path")
-      add_breadcrumb "#{@resource.title}", send("#{controller_name.downcase.underscore.singularize}_path", @resource)
-      show_without_breadcrumb
-    end
+      add_breadcrumb "#{action_name.capitalize}", url_for(:controller => controller_name, :action => action_name, :id => @resource.try(:id)) unless action_name == 'index' || action_name == 'show'
 
-    def new_with_breadcrumb
-      add_breadcrumb "Home", :root_path
-      add_breadcrumb "#{controller_name.humanize} index",send("#{controller_name.downcase.underscore}_path")
-      add_breadcrumb "New", send("new_#{controller_name.downcase.underscore.singularize}_path", @resource)
-      new_without_breadcrumb
-    end
-
-    def edit_with_breadcrumb
-      add_breadcrumb "Home", :root_path
-      add_breadcrumb "#{controller_name.humanize} index",send("#{controller_name.downcase.underscore}_path")
-      add_breadcrumb "#{@resource.title}", send("#{controller_name.downcase.underscore.singularize}_path", @resource)
-      add_breadcrumb "Edit", send("edit_#{controller_name.downcase.underscore.singularize}_path", @resource)
-      edit_without_breadcrumb
-    end
-
-    def set_resource
-      c = self.controller_name.downcase
-      @resource = eval("@"+c.singularize)
     end
   end
 end

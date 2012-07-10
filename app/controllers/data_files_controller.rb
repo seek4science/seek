@@ -22,6 +22,7 @@ class DataFilesController < ApplicationController
 
   #has to come after the other filters
   include Seek::Publishing
+  include Seek::BreadCrumbs
 
   def convert_to_presentation
     @data_file = DataFile.find params[:id]

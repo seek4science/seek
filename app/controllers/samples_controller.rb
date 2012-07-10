@@ -6,6 +6,7 @@ class SamplesController < ApplicationController
   before_filter :virtualliver_only, :only => [:new_object_based_on_existing_one]
 
   include Seek::Publishing
+  include Seek::BreadCrumbs
 
   def new_object_based_on_existing_one
     @existing_sample =  Sample.find(params[:id])

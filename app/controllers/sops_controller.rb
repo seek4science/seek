@@ -10,9 +10,9 @@ class SopsController < ApplicationController
   before_filter :find_and_auth, :except => [ :index, :new, :create, :request_resource,:preview, :test_asset_url, :update_annotations_ajax]
   before_filter :find_display_asset, :only=>[:show,:download]
 
-
   include Seek::Publishing
-  
+  include Seek::BreadCrumbs
+
   def new_version
     if (handle_data nil)      
       comments=params[:revision_comment]
@@ -218,7 +218,4 @@ class SopsController < ApplicationController
       page[:requesting_resource_status].replace_html "An email has been sent on your behalf to <b>#{resource.managers.collect{|m| m.name}.join(", ")}</b> requesting the file <b>#{h(resource.title)}</b>."
     end
   end
-
-  include Seek::BreadCrumbs
-
 end

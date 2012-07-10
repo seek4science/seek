@@ -7,6 +7,7 @@ class InvestigationsController < ApplicationController
   before_filter :find_and_auth,:only=>[:edit, :update, :destroy]
 
   include Seek::Publishing
+  include Seek::BreadCrumbs
 
   def new_object_based_on_existing_one
     @existing_investigation =  Investigation.find(params[:id])

@@ -6,6 +6,7 @@ class SpecimensController < ApplicationController
 
   include IndexPager
   include Seek::Publishing
+  include Seek::BreadCrumbs
 
   def new_object_based_on_existing_one
     @existing_specimen =  Specimen.find(params[:id])

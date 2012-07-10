@@ -18,6 +18,7 @@ class ModelsController < ApplicationController
   before_filter :jws_enabled,:only=>[:builder,:simulate,:submit_to_jws]
 
   include Seek::Publishing
+  include Seek::BreadCrumbs
 
   @@model_builder = Seek::JWS::Builder.new
 

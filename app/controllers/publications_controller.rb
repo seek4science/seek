@@ -9,7 +9,9 @@ class PublicationsController < ApplicationController
   before_filter :find_assets, :only => [ :index ]
   before_filter :fetch_publication, :only => [:show, :edit, :update, :destroy]
   before_filter :associate_authors, :only => [:edit, :update]
-  
+
+  include Seek::BreadCrumbs
+
   def preview
     element=params[:element]
     @publication = Publication.find_by_id(params[:id])

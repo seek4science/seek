@@ -14,6 +14,7 @@ class ProjectsController < ApplicationController
   skip_before_filter :project_membership_required
 
   cache_sweeper :projects_sweeper,:only=>[:update,:create,:destroy]
+  include Seek::BreadCrumbs
 
   def auto_complete_for_organism_name
     render :json => Project.organism_counts.map(&:name).to_json
