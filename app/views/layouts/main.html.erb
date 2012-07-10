@@ -66,7 +66,9 @@
               <%= white_list flash[:notice] %>
             </div>
         <% end %>
-
+        <div class="breadcrumbs">
+            <%= render_breadcrumbs :separator => ' > ' if Seek::Util.breadcrumb_types.collect{|t| t.name.underscore.pluralize}.include?(controller_name)%>
+        </div>
         <%# main content part of every page -%>
         <%= yield :layout %>
 

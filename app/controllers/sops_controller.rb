@@ -41,7 +41,7 @@ class SopsController < ApplicationController
     end
     
   end
-  
+
   # GET /sops/1
   def show
     # store timestamp of the previous last usage
@@ -62,7 +62,7 @@ class SopsController < ApplicationController
       format.png { render :text=>to_png(@sop,params[:deep]=='true',@sop)}
     end
   end
-  
+
   # GET /sops/1/download
   def download
     # update timestamp in the current SOP record 
@@ -90,7 +90,7 @@ class SopsController < ApplicationController
   def edit
     
   end
-  
+
   # POST /sops
   def create    
 
@@ -218,5 +218,7 @@ class SopsController < ApplicationController
       page[:requesting_resource_status].replace_html "An email has been sent on your behalf to <b>#{resource.managers.collect{|m| m.name}.join(", ")}</b> requesting the file <b>#{h(resource.title)}</b>."
     end
   end
+
+  include Seek::BreadCrumbs
 
 end

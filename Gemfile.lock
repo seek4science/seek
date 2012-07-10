@@ -16,6 +16,7 @@ GEM
     addressable (2.2.6)
     backports (2.6.1)
     bio (1.4.2)
+    breadcrumbs_on_rails (1.0.1)
     builder (3.0.0)
     calendar_date_select (1.16.2)
     cancan (1.6.7)
@@ -103,6 +104,7 @@ PLATFORMS
 DEPENDENCIES
   RedCloth (= 4.2.9)
   bio
+  breadcrumbs_on_rails (= 1.0.1)
   calendar_date_select
   cancan
   daemons

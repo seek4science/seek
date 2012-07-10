@@ -31,6 +31,7 @@ gem "parallel_tests", :group => :development
 gem "rdf"
 gem "rdf-rdfxml"
 gem "equivalent-xml"
+gem "breadcrumbs_on_rails","1.0.1"
 
 
 
