@@ -24,7 +24,7 @@ require 'sunspot_rails'
 require 'cancan'
 require 'in_place_editing'
 require 'strategic_eager_loading'
-require 'seek/breadscrumbs'
+require 'seek/breadcrumbs'
 
 
 GLOBAL_PASSPHRASE="ohx0ipuk2baiXah" unless defined? GLOBAL_PASSPHRASE
