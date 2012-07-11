@@ -10,6 +10,8 @@ class FoldersController < ApplicationController
   in_place_edit_for :project_folder, :title
   in_place_edit_for :project_folder, :description
 
+  include Seek::BreadCrumbs
+
   def show
     respond_to do |format|
       format.html

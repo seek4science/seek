@@ -10,6 +10,8 @@ class AvatarsController < ApplicationController
   cache_sweeper :avatars_sweeper,:only=>[:destroy,:select,:create]
   
   protect_from_forgery :except => [ :new ]
+
+  include Seek::BreadCrumbs
   
   # GET /people/1/avatars/new
   # GET /people/new
