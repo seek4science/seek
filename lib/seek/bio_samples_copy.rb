@@ -1,3 +1,4 @@
+=begin
 require "libxml"
 
 module Seek
@@ -532,4 +533,4 @@ module Seek
       return table_names[index+1].content
     end
   end
-end
+end=end

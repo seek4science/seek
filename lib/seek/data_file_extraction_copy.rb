@@ -1,3 +1,4 @@
+=begin
 module Seek
   #A mixin for DataFiles to handle aspects of data file extraction
   module DataFileExtraction
@@ -110,3 +111,4 @@ module Seek
 
   end
 end
+=end
