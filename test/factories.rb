@@ -382,6 +382,7 @@ Factory.define(:presentation_version) do |f|
 
   Factory.define(:rightfield_annotated_content_blob,:parent=>:content_blob) do |f|
     f.data  File.new("#{Rails.root}/test/fixtures/files/simple_populated_rightfield.xls","rb").read
+    f.content_type "application/excel"
   end
 
   Factory.define(:xlsx_content_blob,:parent=>:content_blob) do |f|

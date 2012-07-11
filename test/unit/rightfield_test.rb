@@ -9,7 +9,6 @@ class RightFieldTest < ActiveSupport::TestCase
     df=Factory :rightfield_annotated_datafile
     assert_not_nil(df.content_blob)
     rdf = generate_rdf(df)
-    puts rdf
     assert_not_nil(rdf)
 
     #just checks it is valid rdf/xml and contains some statements for now
