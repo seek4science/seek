@@ -1705,7 +1705,3 @@ div.return_to_search {
     margin-top: -1em;
     font-size: 14px;
 }
-
-div.return_to_search a:link{
-   text-decoration: underline;
-}

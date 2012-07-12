@@ -523,6 +523,7 @@ module ApplicationHelper
           var a = document.createElement('a');
           a.onclick = function(){window.history.back()}
           a.appendChild(document.createTextNode('Return to search'));
+          a.style.textDecoration='underline'
           document.getElementById('return_to_search').appendChild(a)
         }
       "
