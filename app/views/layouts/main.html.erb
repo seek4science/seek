@@ -66,9 +66,15 @@
               <%= white_list flash[:notice] %>
             </div>
         <% end %>
+
         <div class="breadcrumbs">
-            <%= render_breadcrumbs :separator => ' > '%>
+            <%= render_breadcrumbs %>
         </div>
+
+        <div class="return_to_search">
+            <%= add_return_to_search%>
+        </div>
+
         <%# main content part of every page -%>
         <%= yield :layout %>
 

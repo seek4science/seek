@@ -514,6 +514,14 @@ module ApplicationHelper
     html << '</ul>'
   end
 
+  def add_return_to_search
+    referer = request.headers["Referer"]
+    search_path = search_url.end_with?('/') ? search_url : (search_url.concat('/'))
+    if referer == search_path
+      link_to_function 'Return to search', "window.history.back(-1);"
+
+    end
+  end
 
   private  
   PAGE_TITLES={"home"=>"Home", "projects"=>"Projects","institutions"=>"Institutions", "people"=>"People", "sessions"=>"Login","users"=>"Signup","search"=>"Search","assays"=>"Assays","sops"=>"SOPs","models"=>"Models","data_files"=>"Data","publications"=>"Publications","investigations"=>"Investigations","studies"=>"Studies","specimens"=>"Specimens","samples"=>"Samples","presentations"=>"Presentations"}

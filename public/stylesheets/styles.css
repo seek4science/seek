@@ -1699,3 +1699,13 @@ div.breadcrumbs a:link{
    text-decoration: underline;
 }
 
+div.return_to_search {
+    float: right;
+    margin-right: 1em;
+    margin-top: -1em;
+    font-size: 14px;
+}
+
+div.return_to_search a:link{
+   text-decoration: underline;
+}
