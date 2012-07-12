@@ -518,8 +518,15 @@ module ApplicationHelper
     referer = request.headers["Referer"]
     search_path = search_url.end_with?('/') ? search_url : (search_url.concat('/'))
     if referer == search_path
-      link_to_function 'Return to search', "window.history.back(-1);"
-
+      javascript_tag "
+        if (window.history.length > 1){
+          var a = document.createElement('a');
+          a.onclick = function(){window.history.back()}
+          a.appendChild(document.createTextNode('Return to search'));
+          document.getElementById('return_to_search').appendChild(a)
+        }
+      "
+      #link_to_function 'Return to search', "window.history.back();"
     end
   end
 
