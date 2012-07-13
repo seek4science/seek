@@ -18,7 +18,7 @@ gem "mysql"
 gem 'rest-client',">=1.6.1"
 gem 'calendar_date_select'
 gem 'factory_girl',"1.3.3"
-gem 'ratom',"0.6.8"
+gem 'ratom',"0.6.9"
 gem 'sunspot_rails',"1.2.1"
 gem "delayed_job","~>2.0.4"
 gem "daemons"

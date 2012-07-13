@@ -51,7 +51,7 @@ GEM
       rake (>= 0.8.3)
     raindrops (0.10.0)
     rake (0.9.2.2)
-    ratom (0.6.8)
+    ratom (0.6.9)
       libxml-ruby (>= 1.1.2)
     rdf (0.3.7)
       addressable (>= 2.2.6)
@@ -113,7 +113,7 @@ DEPENDENCIES
   mysql
   rack-openid (= 1.1.0)
   rails (= 2.3.14)
-  ratom (= 0.6.8)
+  ratom (= 0.6.9)
   rdf
   rdf-rdfxml
   rdoc
