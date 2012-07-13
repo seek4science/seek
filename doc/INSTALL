@@ -2,7 +2,7 @@
 
 SEEK is based upon the Ruby on Rails platform. Although the information on this page should provide you with everything you need to get a basic installation of
 SEEK up and running, some background reading on Ruby on Rails would be beneficial if it is new to you. Documentation and resources describing Ruby on Rails can be found
-at http://rubyonrails.org/documentation. Since SEEK uses v2.3.8 of Rails, http://guides.rubyonrails.org/v2.3.8/ and http://api.rubyonrails.org/v2.3.8 may be useful as well.
+at http://rubyonrails.org/documentation. Since SEEK uses v2.3.14 of Rails, http://guides.rubyonrails.org/v2.3.14/ and http://api.rubyonrails.org/v2.3.14 may be useful as well.
 
 We recommend that you run SEEK on a Linux system. All of the examples here describe installing on an Ubuntu (10.04 LTS) or Debian system, but should be easily transferrable to other Linux systems such as Fedora. There is a script for CentOS that was contributed to us by Mark Woodbridge (Imperial College, London) available at https://gist.github.com/2127663
 
@@ -41,19 +41,17 @@ If setting up for production deployment using the {Passenger Phusion (modrails)}
   sudo apt-get install apache2-mpm-prefork apache2-prefork-dev libapr1-dev libaprutil1-dev libcurl4-openssl-dev
 
 
-You now need to install rubygems (1.3.7). Rather than install through apt-get, we recommend downloading and installing from the rubygems website: http://rubygems.org/pages/download.
+You now need to install the latest rubygems (currently 1.8.24). Rather than install through apt-get, we recommend downloading and installing from the rubygems website: http://rubygems.org/pages/download.
 The following commands should install rubygems for you on a Ubuntu/Debian system.
 
   cd /tmp
-  wget http://production.cf.rubygems.org/rubygems/rubygems-1.3.7.tgz
-  tar zfxv rubygems-1.3.7.tgz
-  cd rubygems-1.3.7/
+  wget http://production.cf.rubygems.org/rubygems/rubygems-1.8.24.tgz
+  tar zfxv rubygems-1.8.24.tgz
+  cd rubygems-1.8.24/
   sudo ruby ./setup.rb
   cd /usr/bin/
   sudo ln -s gem1.8 gem
   cd -
-
-
 
 == Getting the source code
 

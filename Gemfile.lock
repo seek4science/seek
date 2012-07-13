@@ -31,6 +31,7 @@ GEM
     fastercsv (1.5.1)
     hpricot (0.8.6)
     in_place_editing (1.2.0)
+    json (1.7.3)
     kgio (2.7.4)
     libxml-ruby (2.2.2)
     mime-types (1.19)
@@ -62,6 +63,8 @@ GEM
       backports
       nokogiri (>= 1.5.0)
       rdf (>= 0.3.4)
+    rdoc (3.12)
+      json (~> 1.4)
     rest-client (1.6.7)
       mime-types (>= 1.16)
     rmagick (2.12.2)
@@ -114,6 +117,7 @@ DEPENDENCIES
   ratom (= 0.6.8)
   rdf
   rdf-rdfxml
+  rdoc
   rest-client (>= 1.6.1)
   rmagick (= 2.12.2)
   rubaidh-google_analytics (~> 1.1.4)
