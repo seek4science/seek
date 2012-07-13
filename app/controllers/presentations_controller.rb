@@ -95,36 +95,7 @@ class PresentationsController < ApplicationController
 
   end
 
-#  def convert_to_swf
-#      file_type = nil
-#      if @presentation
-#        case @presentation.content_type
-#          when "application/pdf"
-#             file_type = "pdf"
-#          when "application/text"
-#            file_type = "text"
-#          else
-#
-#        end
-#
-#        begin
-#          FlashTool::FlashObject.new("#{ContentBlob::DATA_STORAGE_PATH}#{RAILS_ENV}/#{@presentation.content_blob.uuid}.dat", file_type) do |f|
-#            f.output("public/swf/presentations/#{@presentation.title}.swf")
-#            f.fonts
-#            f.flashversion("9")
-#            f.stop
-#            f.set('param="storeallcharacters"')
-#            f.flatten
-#            f.save()
-#          end
-#        rescue Exception=>e
-#
-#          flash[:error]=e.message#[0..50]
-#
-#        end
-#      end
-#
-#  end
+
   # GET /presentations/1
   # GET /presentations/1.xml
   def show
