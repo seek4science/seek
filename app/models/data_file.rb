@@ -109,7 +109,11 @@ class DataFile < ActiveRecord::Base
           presentation.send "#{a.name.to_s.singularize}_ids=".to_sym, association.map(&:id)
          end
        end
-     end
+      end
+
+      presentation.project_folder_assets.each do |pfa|
+        pfa.asset=presentation
+      end
 
       presentation.policy = self.policy.deep_copy
       presentation.orig_data_file_id= self.id

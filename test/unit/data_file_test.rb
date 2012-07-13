@@ -254,6 +254,27 @@ class DataFileTest < ActiveSupport::TestCase
     }
   end
 
+  test "convert to presentation when linked to project folder" do
+    user = Factory :user
+    project = user.person.projects.first
+    User.with_current_user(user) do
+      project_folder = Factory :project_folder,:project=>project
+      data_file = Factory :data_file,:contributor=>user, :projects=>[project]
+      pfa=ProjectFolderAsset.create :asset=>data_file,:project_folder=>project_folder
+
+      data_file.reload
+      assert_equal [project_folder],data_file.folders
+      presentation = Factory.build :presentation,:contributor=>user
+      data_file_converted = data_file.convert_to_presentation
+
+      data_file_converted.save!
+      assert_equal [project_folder],data_file_converted.folders
+
+      assert_equal presentation.attributes.keys.sort!, data_file_converted.attributes.keys.reject{|k|k=='id'}.sort!
+    end
+  end
+
+
   test 'should convert tag from datafile to presentation' do
       user = Factory :user
       User.with_current_user(user) {

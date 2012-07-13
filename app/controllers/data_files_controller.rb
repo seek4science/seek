@@ -27,7 +27,7 @@ class DataFilesController < ApplicationController
    saved = nil
     if current_user.admin? || @data_file.can_delete?
       disable_authorization_checks {
-        saved = @presentation.save!
+        saved = @presentation.save
       }
     end
 
