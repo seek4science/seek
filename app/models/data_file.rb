@@ -159,6 +159,7 @@ class DataFile < ActiveRecord::Base
     flds.flatten.uniq
   end
 
+  #FIXME: shouldn't end in ! unless the object called is modified
   def to_presentation!
     returning self.to_presentation do |presentation|
       class << presentation
