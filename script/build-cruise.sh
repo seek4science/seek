@@ -4,6 +4,7 @@
 
 desired_ruby=ruby-1.8.7
 project_name=seek015
+rubygems=1.6.2
 
 # remove annoying "warning: Insecure world writable dir"
 function remove_annoying_warning() {
@@ -21,6 +22,8 @@ rvm list | grep $desired_ruby > /dev/null || rvm install $desired_ruby || exit 1
 
 # use our ruby with a custom gemset
 rvm use ${desired_ruby}@${project_name} --create
+rvm rubygems ${rubygems} || exit 1
+
 remove_annoying_warning
 
 # install bundler if necessary
