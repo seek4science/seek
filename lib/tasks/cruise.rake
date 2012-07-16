@@ -31,3 +31,20 @@ task :cruise, :run_secondary do |t, args|
 
   File.delete(run_secondary_signal) if File.exists? run_secondary_signal
 end
+
+"Second cruise task for running with .rvm via ./script/build-cruise.sh (just units to start with)"
+task :cruise2 do |t,args|
+  FileUtils.copy(Dir.pwd+"/config/database.cc.yml", Dir.pwd+"/config/database.yml")
+
+  begin
+    Rake::Task["db:drop:all"].invoke
+  rescue Exception => e
+    puts "Error dropping the database, probably it doesn't exist:#{e.message}"
+  end
+
+  Rake::Task["db:create:all"].invoke
+  Rake::Task["db:test:load"].invoke
+  Rake::Task["db:test:prepare"].invoke
+  Rake::Task["seek:seed_testing"].invoke
+  Rake::Task["test:units"].invoke
+end
