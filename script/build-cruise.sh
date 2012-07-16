@@ -1,7 +1,7 @@
 #!/bin/sh
 source $HOME/.rvm/scripts/rvm
 
-source .rmvrc
+rvm use ruby-1.8.7@seek015 --create
 
 gem list --local bundler | grep bundler || gem install bundler || exit 1
 
