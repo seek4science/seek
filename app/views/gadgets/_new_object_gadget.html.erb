@@ -1,26 +1,125 @@
+<%= javascript_include_tag 'DataTables-1.8.2/jquery.js', 'DataTables-1.8.2/jquery.dataTables.js', 'DataTables-1.8.2/jquery.dataTables.rowGrouping.js', 'DataTables-1.8.2/Scroller.js' %>
+<%= stylesheet_link_tag 'data_tables.css' %>
+
+
+<style type="text/css">
+    div#creatable_selection_list {
+        position: fixed;
+        z-index: 1
+    }
+
+    input.new_asset_button {
+        background-color: #307af5;
+        font-weight: bolder;
+        width: 6em;
+        height: 2em;
+        border: thin #dcdcdc;
+        border-radius: 3px;
+        color: white;
+
+    }
+
+    table#creatable_selection_table tbody tr.even:hover, #creatable_selection_table tbody tr.even td.highlighted {
+        background-color: #307af5;
+    }
+
+    table#creatable_selection_table tbody tr.odd:hover, #creatable_selection_table tbody tr.odd td.highlighted {
+        background-color: #307af5;
+    }
+
+    table#creatable_selection_table tr.even:hover {
+        background-color: #307af5;
+    }
+
+    table#creatable_selection_table tr.odd:hover {
+        background-color: #307af5;
+    }
+
+    table#creatable_selection_table tr.row_color {
+        background-color: white;
+    }
+</style>
+
 <% unless current_user.person.work_groups.empty? -%>
-  <% cache "new_object_gadget" do -%>
+    <% cache "new_object_gadget" do -%>
 
-   <%= new_creatable_javascript -%>
+        <%= new_creatable_javascript -%>
 
-    <div id="new_asset" class="sysmo_gadget">
-      
-      <div class="header">
-        New or upload
-      </div>
+        <div id="new_asset" class="sysmo_gadget">
 
-      <div class="contents">
-        <div style="text-align: center; padding-left: 0.5em;">
-          <ul class="gadget_list">
-            <form id="new_resource_form" onsubmit="$('new_asset_button').disabled=true;newAsset();return(false)">
-              <%= new_creatable_selection -%>
-              <%= submit_tag "Go", :id=>"new_asset_button" -%>
-            </form>
-          </ul>
+          <div class="header">
+            New or upload
+          </div>
+
+          <div class="contents">
+            <div style="text-align: center; padding-left: 0.5em;">
+              <ul class="gadget_list">
+                  <input type=button id="new_asset_button" class="new_asset_button" value="CREATE" onclick="new_creatable_selection()"/>
+                  <div id='creatable_selection_list' style="display: none;">
+                    <table cellpadding="0" cellspacing="0" class="display" id="creatable_selection_table" style="width: 12em; margin-top: -0.5em; margin-left: 3em;">
+                      <thead>
+                      <tr>
+                        <th></th>
+                        <th></th>
+                      </tr>
+                      </thead>
+                      <tbody>
+                      <% new_creatable_selection.each do |c| %>
+                          <tr class="row_color">
+                            <td style="text-align: left"><%= c.first %></td>
+                            <td><%= c.last %></td>
+                          </tr>
+                      <% end %>
+                      </tbody>
+                    </table>
+                  </div>
+                  <%= hidden_field_tag :new_resource_type %>
+              </ul>
+            </div>
+          </div>
+
         </div>
-      </div>
-      
-    </div>
-  <% end -%>
+    <% end -%>
 <% end -%>
 
+<script type="text/javascript">
+    jQuery.noConflict();
+    var $j = jQuery;
+    $j(document).ready(function () {
+        creatable_selection_table = $j('#creatable_selection_table').dataTable({
+            "bPaginate":false,
+            "bLengthChange":false,
+            "bFilter":false,
+            "bSort":false,
+            "bInfo":false,
+            "bAutoWidth":false,
+            "aoColumns":[
+                {"bVisible":true},
+                { "bVisible":false}
+            ]
+        });
+        $j('#creatable_selection_table tbody tr').click(function () {
+            var data = creatable_selection_table.fnGetData(this);
+            $j('#new_resource_type')[0].value = data[1];
+            $j('#new_asset_button')[0].disabled=true;
+            newAsset();
+        });
+        $j(document).click(function(e) {
+           $j('#creatable_selection_list')[0].style.display = 'none';
+        });
+        $j('#new_asset_button').click(function(e) {
+           e.stopPropagation();
+        });
+        $j('#creatable_selection_table').click(function(e) {
+           e.stopPropagation();
+        });
+    });
+
+    function new_creatable_selection() {
+        var new_resource_list = document.getElementById('creatable_selection_list');
+        if (new_resource_list.style.display == 'none')
+            new_resource_list.style.display = 'block';
+        else
+            new_resource_list.style.display = 'none';
+    }
+</script>
