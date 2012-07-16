@@ -109,7 +109,7 @@ function MultiSelector(list_target,object_name,method) {
 
 
         new_col2.innerHTML = '<img src="/images/file_icons/small/genericGray.png">';
-        new_col3.innerHTML =  element.type=="text"? parseUri( element.value).file : element.value.split('/')[element.value.split('/').length - 1];
+        new_col3.innerHTML =  element.type=="text"? parseUri( element.value).file : element.value.split(/\\/)[element.value.split(/\\/).length - 1];
         new_col3.style.textAlign = "left";
 
 
