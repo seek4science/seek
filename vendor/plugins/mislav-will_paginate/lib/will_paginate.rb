@@ -35,12 +35,12 @@ module WillPaginate
 
       # support pagination on associations
       a = ActiveRecord::Associations
-      returning([ a::AssociationCollection ]) { |classes|
+      [ a::AssociationCollection ].tap do |classes|
         # detect http://dev.rubyonrails.org/changeset/9230
         unless a::HasManyThroughAssociation.superclass == a::HasManyAssociation
           classes << a::HasManyThroughAssociation
         end
-      }.each do |klass|
+      end.each do |klass|
         klass.send :include, Finder::ClassMethods
         klass.class_eval { alias_method_chain :method_missing, :paginate }
       end

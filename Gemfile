@@ -29,9 +29,6 @@ gem "rdf"
 gem "rdf-rdfxml"
 gem "equivalent-xml"
 
-
-
-
 group :development do
   gem "sqlite3-ruby","1.2.5",:require=>"sqlite3"
   gem "unicorn"
