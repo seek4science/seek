@@ -33,7 +33,7 @@ class RegistrationStateTest < ActionController::IntegrationTest
     get sop_path(Factory :sop)
     assert_redirected_to select_people_path
 
-    get "/logout"
+    get logout_path
     assert_redirected_to root_path
 
   end

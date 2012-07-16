@@ -9,4 +9,5 @@ require 'rake/testtask'
 
 
 require 'tasks/rails'
-require 'sunspot/rails/tasks'
+require 'sunspot/solr/tasks'
+
