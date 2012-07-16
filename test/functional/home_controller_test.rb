@@ -65,8 +65,8 @@ class HomeControllerTest < ActionController::TestCase
   test "SOP upload option should be capitalized" do
     login_as(:quentin)
     get :index
-    assert_select "select#new_resource_type",:count=>1 do
-      assert_select "option[value=?]","sop",:text=>"SOP"
+    assert_select "table#creatable_selection_table",:count=>1 do
+      assert_select "tbody tr td", :text=>"SOP", :count => 1
     end
   end
 
