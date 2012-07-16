@@ -159,6 +159,7 @@ class DataFile < ActiveRecord::Base
     flds.flatten.uniq
   end
 
+  #FIXME: shouldn't end in ! unless the object called is modified
   def to_presentation!
     returning self.to_presentation do |presentation|
       class << presentation
@@ -172,7 +173,7 @@ class DataFile < ActiveRecord::Base
       end
 
       #TODO: should we throw an exception if the user isn't authorized to make these changes?
-      if User.current_user.admin? or self.can_delete?
+      if User.current_user.admin? || self.can_delete?
         disable_authorization_checks {
           presentation.save!
           #TODO: perhaps the deletion of the data file should also be here? We are already throwing an exception if save fails for some reason

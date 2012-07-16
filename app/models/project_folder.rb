@@ -8,7 +8,6 @@ class ProjectFolder < ActiveRecord::Base
 
   before_destroy :unsort_assets_and_remove_children
 
-
   named_scope :root_folders, lambda { |project| {
     :conditions=>{:project_id=>project.id,:parent_id=>nil},:order=>"LOWER(title)"
     }
