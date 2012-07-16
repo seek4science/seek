@@ -15,7 +15,7 @@
 
 <div class="box_infotext">
   <p>
-    You can register a <%= asset_name -%> by either directly uploading a file, or registering a URL. Please test the URL
+    You can register a <%= asset_name.pluralize -%> by either directly uploading one/multiple files, or registering one/multiple URLs. Please test the URLs
     before
     submitting. <%= link_to_function "More info " + expand_image, visual_effect(:toggle_blind, "more_upload_info", :duration => 0.3) -%>
   </p>
@@ -24,11 +24,6 @@
           When registering a URL you can specify that a copy of the data should be stored
           within SEEK. This is recommended and is equivalent to uploading a file. It also means that should the data
           behind the URL the data is still available from SEEK.
-        </p>
-        <p>
-          If the URL results in a redirection or unauthorized response, then SEEK has no option but to store only the
-          URL. In this case, when another user selects to download the <%= asset_name -%>
-          then they will simply directed to the URL (for example, so that they can login to access the file).
         </p>
     </span>
 </div>
@@ -59,7 +54,7 @@
         </div>
         <div id="upload_from_url" style="display:none;">
           <p>
-            <b>URL:</b>
+            <b>URL:</b>You can register a
             <span class="required">*</span>
 
 
@@ -122,7 +117,7 @@
             }
 
         }else{
-            alert("The URL cannot be parsed!");
+            alert("The URL cannot be parsed. The data behind the URL may not exist or be available from SEEK");
         }
 
 
