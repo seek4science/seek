@@ -254,7 +254,7 @@ class DataFileTest < ActiveSupport::TestCase
       #puts data_file.assays
       presentation = Factory.build :presentation,:contributor=>user
 
-      data_file_converted = data_file.to_presentation!
+      data_file_converted = data_file.to_presentation
       data_file_converted = data_file_converted.reload
 
 
@@ -298,7 +298,7 @@ class DataFileTest < ActiveSupport::TestCase
       data_file.reload
       assert_equal [project_folder],data_file.folders
       presentation = Factory.build :presentation,:contributor=>user
-      data_file_converted = data_file.to_presentation!
+      data_file_converted = data_file.to_presentation
 
       data_file_converted.save!
       assert_equal [project_folder],data_file_converted.folders
@@ -315,7 +315,7 @@ class DataFileTest < ActiveSupport::TestCase
         assert_equal 0, data_file.annotations.first.versions.count
         assert 'fish', data_file.annotations.first.value.text
 
-        data_file_converted = data_file.to_presentation!
+        data_file_converted = data_file.to_presentation
         data_file_converted.reload
         data_file.reload
 

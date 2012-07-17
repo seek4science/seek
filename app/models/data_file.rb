@@ -159,9 +159,25 @@ class DataFile < ActiveRecord::Base
     flds.flatten.uniq
   end
 
-  #FIXME: shouldn't end in ! unless the object called is modified
-  def to_presentation!
-    returning self.to_presentation do |presentation|
+  def to_presentation
+    presentation_attrs = attributes.delete_if { |k, v| !Presentation.new.attributes.include? k}
+
+    returning Presentation.new(presentation_attrs) do |presentation|
+      DataFile.reflect_on_all_associations.select { |a| [:has_many, :has_and_belongs_to_many, :has_one].include?(a.macro) && !a.through_reflection }.each do |a|
+        #disabled, because even if the user doing the conversion would not normally
+        #be able to associate an item with his data_file/presentation, the pre-existing
+        #association created by someone who was allowed, should carry over to the presentation
+        #based on the data file.
+        disable_authorization_checks do
+          #annotations and versions have to be handled specially
+          presentation.send("#{a.name}=", send(a.name)) if presentation.respond_to?("#{a.name}=") and a.name != :annotations and a.name != :versions
+        end
+      end
+
+      disable_authorization_checks { presentation.versions = versions.map(&:to_presentation_version) }
+      presentation.policy = policy.deep_copy
+      presentation.orig_data_file_id = id
+
       class << presentation
         #disabling versioning, since I have manually copied the versions of the data file over
         def save_version_on_create
@@ -184,27 +200,6 @@ class DataFile < ActiveRecord::Base
       disable_authorization_checks do #disabling because annotations should be copied over even if the user would normally lack permission to do so
         presentation.annotations = self.annotations
       end
-    end
-  end
-
-  def to_presentation
-    presentation_attrs = attributes.delete_if { |k, v| !Presentation.new.attributes.include? k}
-
-    returning Presentation.new(presentation_attrs) do |presentation|
-      DataFile.reflect_on_all_associations.select { |a| [:has_many, :has_and_belongs_to_many, :has_one].include?(a.macro) && !a.through_reflection }.each do |a|
-        #disabled, because even if the user doing the conversion would not normally
-        #be able to associate an item with his data_file/presentation, the pre-existing
-        #association created by someone who was allowed, should carry over to the presentation
-        #based on the data file.
-        disable_authorization_checks do
-          #annotations and versions have to be handled specially
-          presentation.send("#{a.name}=", send(a.name)) if presentation.respond_to?("#{a.name}=") and a.name != :annotations and a.name != :versions
-        end
-      end
-
-      disable_authorization_checks { presentation.versions = versions.map(&:to_presentation_version) }
-      presentation.policy = policy.deep_copy
-      presentation.orig_data_file_id = id
     end
   end
 

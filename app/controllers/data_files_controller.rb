@@ -27,7 +27,7 @@ class DataFilesController < ApplicationController
 
   def convert_to_presentation
     @data_file = DataFile.find params[:id]
-    @presentation = @data_file.to_presentation!
+    @presentation = @data_file.to_presentation
 
     respond_to do |format|
 
