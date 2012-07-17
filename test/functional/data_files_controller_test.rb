@@ -241,6 +241,36 @@ class DataFilesControllerTest < ActionController::TestCase
     assert_equal "a-piccy.png", assigns(:data_file).original_filename
     assert_equal "image/png", assigns(:data_file).content_type
   end
+
+  test "should create data file with https_url" do
+      mock_https
+
+      assert_difference('DataFile.count') do
+        assert_difference('ContentBlob.count') do
+          post :create, :data_file => valid_data_file_with_https_url, :sharing=>valid_sharing
+        end
+      end
+
+      assert_redirected_to data_file_path(assigns(:data_file))
+      assert_equal users(:datafile_owner),assigns(:data_file).contributor
+      assert !assigns(:data_file).content_blob.url.blank?
+      assert assigns(:data_file).content_blob.data_io_object.nil?
+      assert !assigns(:data_file).content_blob.file_exists?
+      assert_equal "a-piccy.png", assigns(:data_file).original_filename
+      assert_equal "image/png", assigns(:data_file).content_type
+  end
+
+  test 'test_asset_url' do
+    WebMock.allow_net_connect!
+    #http
+    xhr(:post, :test_asset_url, {:data_file => {:data_url => 'http://www.bbc.co.uk'}})
+    assert_response :success
+    assert @response.body.include?('The URL was accessed successfully')
+    #https
+    xhr(:post, :test_asset_url, {:data_file => {:data_url => 'https://seek.sysmo-db.org/'}})
+    assert_response :success
+    assert @response.body.include?('The URL was accessed successfully')
+  end
   
   test "should not create data file with file url" do
     file_path=File.expand_path(__FILE__) #use the current file
@@ -1171,13 +1201,27 @@ class DataFilesControllerTest < ActionController::TestCase
     stub_request(:any, "http://mocked401.com").to_return(:status=>401)
     stub_request(:any, "http://mocked404.com").to_return(:status=>404)
   end
-  
+
+  def mock_https
+    file="#{Rails.root}/test/fixtures/files/file_picture.png"
+    stub_request(:get, "https://mockedlocation.com/a-piccy.png").to_return(:body => File.new(file), :status => 200, :headers=>{'Content-Type' => 'image/png'})
+    stub_request(:head, "https://mockedlocation.com/a-piccy.png")
+
+    stub_request(:any, "https://mocked302.com").to_return(:status=>302)
+    stub_request(:any, "https://mocked401.com").to_return(:status=>401)
+    stub_request(:any, "https://mocked404.com").to_return(:status=>404)
+  end
+
   def valid_data_file
     { :title=>"Test",:data=>fixture_file_upload('files/file_picture.png'),:projects=>[projects(:sysmo_project)]}
   end
   
   def valid_data_file_with_http_url
     { :title=>"Test HTTP",:data_url=>"http://mockedlocation.com/a-piccy.png",:projects=>[projects(:sysmo_project)]}
+  end
+
+  def valid_data_file_with_https_url
+    { :title=>"Test HTTPS",:data_url=>"https://mockedlocation.com/a-piccy.png",:projects=>[projects(:sysmo_project)]}
   end
   
   def valid_data_file_with_ftp_url
