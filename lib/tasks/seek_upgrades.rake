@@ -49,4 +49,10 @@ namespace :seek do
     ReindexingJob.add_items_to_queue Specimen.all, 5.seconds.from_now,2
     ReindexingJob.add_items_to_queue Sample.all, 5.seconds.from_now,2
   end
+
+  task(:update_first_letter_for_strain => :environment) do
+    Strain.all.each do |strain|
+      disable_authorization_checks{strain.save(false)}
+    end
+  end
 end

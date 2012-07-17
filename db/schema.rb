@@ -9,7 +9,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20120628164147) do
+ActiveRecord::Schema.define(:version => 20120717120848) do
 
   create_table "activity_logs", :force => true do |t|
     t.string   "action"
@@ -1296,6 +1296,7 @@ ActiveRecord::Schema.define(:version => 20120628164147) do
     t.integer  "contributor_id"
     t.integer  "policy_id"
     t.string   "uuid"
+    t.string   "first_letter"
   end
 
   create_table "studied_factor_links", :force => true do |t|

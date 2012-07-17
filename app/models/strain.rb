@@ -1,3 +1,6 @@
+require 'grouped_pagination'
+require 'acts_as_authorized'
+
 class Strain < ActiveRecord::Base
   belongs_to :organism
   has_many :genotypes, :dependent => :destroy
@@ -13,8 +16,12 @@ class Strain < ActiveRecord::Base
   named_scope :without_default,:conditions=>{:is_dummy=>false}
 
   include ActsAsCachedTree
+  include Subscribable
   acts_as_authorized
   acts_as_uniquely_identifiable
+  acts_as_favouritable
+
+  grouped_pagination :pages=>("A".."Z").to_a, :default_page => Seek::Config.default_page(self.name.underscore.pluralize)
 
   def is_default?
     title=="default" && is_dummy==true

@@ -38,6 +38,7 @@ class GroupedPaginationTest < ActiveSupport::TestCase
     assert_equal Seek::Config.limit_latest,Sop.latest_limit
     assert_equal Seek::Config.limit_latest,Publication.latest_limit
     assert_equal Seek::Config.limit_latest,Event.latest_limit
+    assert_equal Seek::Config.limit_latest,Strain.latest_limit
   end
 
   def test_paginate_no_options    

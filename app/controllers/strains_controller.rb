@@ -1,4 +1,8 @@
 class StrainsController < ApplicationController
+  include IndexPager
+  before_filter :find_assets, :only => [:index]
+  before_filter :find_and_auth, :only => [:show, :edit, :update, :destroy]
+
   before_filter :get_strains,:only=>[:show_existing_strains, :existing_strains_for_assay_organism]
   before_filter :get_strain, :only =>:show_existing_strain
   include Seek::Publishing
@@ -54,15 +58,9 @@ class StrainsController < ApplicationController
       @strain=Strain.find_by_id(params[:id])
     end
   end
+
   def show
     @strain=Strain.find(params[:id])
-    respond_to do |format|
-      format.xml
-    end
-  end
-
-  def index
-    @strains=Strain.all
     respond_to do |format|
       format.xml
     end
