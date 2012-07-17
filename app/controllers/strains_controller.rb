@@ -1,5 +1,6 @@
 class StrainsController < ApplicationController
   include IndexPager
+  include Seek::AnnotationCommon
   before_filter :find_assets, :only => [:index]
   before_filter :find_and_auth, :only => [:show, :edit, :update, :destroy]
 
@@ -59,10 +60,4 @@ class StrainsController < ApplicationController
     end
   end
 
-  def show
-    @strain=Strain.find(params[:id])
-    respond_to do |format|
-      format.xml
-    end
-  end
 end

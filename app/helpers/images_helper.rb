@@ -230,7 +230,7 @@ module ImagesHelper
       "project_64x64.png"
       when "institution_avatar"
       "institution_64x64.png"
-      when "organism_avatar"
+      when "organism_avatar",'strain_avatar'
       "misc_icons/cell3.png"
       when "publication_avatar", "publication", "publications"
      "crystal_project/64x64/mimetypes/wordprocessing.png"

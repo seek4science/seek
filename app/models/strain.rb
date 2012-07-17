@@ -20,6 +20,7 @@ class Strain < ActiveRecord::Base
   acts_as_authorized
   acts_as_uniquely_identifiable
   acts_as_favouritable
+  acts_as_annotatable :name_field=>:title
 
   grouped_pagination :pages=>("A".."Z").to_a, :default_page => Seek::Config.default_page(self.name.underscore.pluralize)
 
