@@ -188,6 +188,7 @@ class AssaysControllerTest < ActionController::TestCase
     end
 
     assert_response :success
+
     assert_not_nil assigns(:assay)
 
     assert_select "p#assay_type", :text=>/Metabalomics/, :count=>1

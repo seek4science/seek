@@ -1,4 +1,3 @@
-require 'atom'
 
 module HomeHelper
 

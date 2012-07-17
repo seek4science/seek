@@ -36,6 +36,7 @@ solr/production/
 solr/development/
 solr/test/
 solr/data/
+solr/pids/
 
 public/help_images/*
 public/javascripts/*_cached.js

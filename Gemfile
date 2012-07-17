@@ -1,9 +1,8 @@
 source :gemcutter
 source 'http://gems.github.com'
 
-gem "rails", "2.3.8"
-
-gem "rake", "0.8.7"
+gem "rails", "2.3.14"
+gem "rdoc"
 
 gem 'rubaidh-google_analytics', "~>1.1.4",:require => 'rubaidh/google_analytics'
 gem 'hpricot',"~>0.8.2"
@@ -18,11 +17,14 @@ gem "rmagick","2.12.2"
 gem "mysql"
 gem 'rest-client',">=1.6.1"
 gem 'calendar_date_select'
-gem 'factory_girl'
-gem 'ratom',"0.6.8"
+gem 'factory_girl',"1.3.3"
+gem 'ratom',"0.6.9"
 gem 'rubyzip'
 gem 'bio'
-gem 'sunspot_rails',"1.2.1"
+
+gem 'sunspot_rails'
+gem 'sunspot_solr'
+
 gem "delayed_job","~>2.0.4"
 gem "daemons"
 gem "cancan"

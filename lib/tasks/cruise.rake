@@ -41,13 +41,19 @@ task :cruise do |t, args|
   Rake::Task["parallel:test"].invoke(args[:count])
 end
 
-desc "task for running cruise control with a ram based db"
-task :cruise_ram do |t, args|
-  args.with_defaults :count => 8  #count determines the number of processes that parallel_tests will use
+"Second cruise task for running with .rvm via ./script/build-cruise.sh (just units to start with)"
+task :cruise2 do |t,args|
+  FileUtils.copy(Dir.pwd+"/config/database.cc.yml", Dir.pwd+"/config/database.yml")
 
-  RAILS_ENV = ENV['RAILS_ENV'] = 'test'
-  FileUtils.copy(Dir.pwd+"/config/database.cc.ram.yml", Dir.pwd+"/config/database.yml")
+  begin
+    Rake::Task["db:drop:all"].invoke
+  rescue Exception => e
+    puts "Error dropping the database, probably it doesn't exist:#{e.message}"
+  end
+
+  Rake::Task["db:create:all"].invoke
+  Rake::Task["db:test:load"].invoke
+  Rake::Task["db:test:prepare"].invoke
   Rake::Task["seek:seed_testing"].invoke
-
-  Rake::Task["parallel:test"].invoke(args[:count])
+  Rake::Task["test"].invoke
 end
