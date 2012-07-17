@@ -7,6 +7,7 @@ require 'ruby-prof'
 require 'factory_girl'
 require 'webmock/test_unit'
 require 'action_view/test_case'
+require 'tmpdir'
 
 Factory.find_definitions #It looks like requiring factory_girl _should_ do this automatically, but it doesn't seem to work
 
@@ -116,6 +117,19 @@ class ActiveSupport::TestCase
     xml=File.open(contents_path,"r").read
     stub_request(:get,path).to_return(:status=>200,:body=>xml)
     path
+  end
+
+  #debugging
+
+  #saves the @response.body to a temp file, and prints out the file path
+  def record_body
+      dir=Dir.mktmpdir("seek")
+      f=File.new("#{dir}/body.html","w+")
+      f.write(@response.body)
+      f.flush
+      f.close
+      puts "Written @response.body to #{f.path}"
+
   end
   
 end

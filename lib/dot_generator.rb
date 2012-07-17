@@ -198,6 +198,7 @@ module DotGenerator
     file = File.new(tmpfile.path, 'w')
     file.puts to_dot(root_item, deep, current_item)
     file.close
+
     post_process_svg(`dot -Tsvg #{tmpfile.path}`)
   end
 
@@ -252,6 +253,13 @@ module DotGenerator
     svg_el = document.find_first("//svg:svg")
     svg_el.attributes["width"]="500pt"
     svg = document.to_s
+
+    if (Rails.env == 'test')
+      #strip out the <?xml ..?> as the test parser doesn't like this and spits out millions of warnings
+      svg = svg.gsub(/<\?xml.*\?>/,"")
+    end
+
+    svg
   end
 end
 
