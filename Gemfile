@@ -19,7 +19,7 @@ gem 'rest-client',">=1.6.1"
 gem 'calendar_date_select'
 gem 'factory_girl',"1.3.3"
 gem 'ratom',"0.6.9"
-gem 'rubyzip'
+gem 'rubyzip2'
 gem 'bio'
 
 gem 'sunspot_rails'
@@ -29,18 +29,16 @@ gem "delayed_job","~>2.0.4"
 gem "daemons"
 gem "cancan"
 gem "in_place_editing"
-gem "parallel_tests", :group => :development
+
 gem "rdf"
 gem "rdf-rdfxml"
 gem "equivalent-xml"
 gem "breadcrumbs_on_rails","1.0.1"
 
-
-
-
 group :development do
   gem "sqlite3-ruby","1.2.5",:require=>"sqlite3"
   gem "unicorn"
+  gem "parallel_tests"
 end
 
 group :test do
