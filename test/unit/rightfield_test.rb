@@ -14,7 +14,7 @@ class RightFieldTest < ActiveSupport::TestCase
 
     #just checks it is valid rdf/xml and contains some statements for now
     RDF::Reader.for(:rdfxml).new(rdf) do |reader|
-      assert_equal 3,reader.statements.count
+      assert_equal 2,reader.statements.count
       assert_equal RDF::URI.new("http://localhost:3000/data_files/#{df.id}"), reader.statements.first.subject
     end
   end
@@ -24,7 +24,7 @@ class RightFieldTest < ActiveSupport::TestCase
     rdf = generate_rdf_graph(df)
     assert_not_nil rdf
     assert rdf.is_a?(RDF::Graph)
-    assert_equal 3,rdf.statements.count
+    assert_equal 2,rdf.statements.count
     assert_equal RDF::URI.new("http://localhost:3000/data_files/#{df.id}"), rdf.statements.first.subject
 
   end
@@ -37,7 +37,7 @@ class RightFieldTest < ActiveSupport::TestCase
     #just checks it is valid rdf/xml and contains some statements for now
     RDF::Reader.for(:rdfxml).new(rdf) do |reader|
       assert reader.statements.count > 0
-      assert_equal 5,reader.statements.count
+      assert_equal 4,reader.statements.count
       assert_equal RDF::URI.new("http://localhost:3000/data_files/#{df.id}"), reader.statements.first.subject
     end
   end
