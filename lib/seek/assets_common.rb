@@ -25,7 +25,9 @@ module Seek
       code=""
       begin
         if (["http","https"].include?(url.scheme))
-          Net::HTTP.start(url.host, url.port) do |http|
+          http =  Net::HTTP.new(url.host, url.port)
+          http.use_ssl=true if url.scheme=="https"
+          http.start do |http|
             code = http.head(url.request_uri).code        
           end
         elsif (url.scheme=="ftp")        
