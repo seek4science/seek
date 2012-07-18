@@ -2,9 +2,9 @@
 
 #based on example at http://pivotallabs.com/users/mbarinek/blog/articles/1450-rails-3-with-rvm-and-cruise-control
 
-desired_ruby=ruby-1.9.3
+desired_ruby=ruby-1.8.7
 project_name=seek015
-rubygems=1.8.24
+rubygems=1.6.2
 
 # remove annoying "warning: Insecure world writable dir"
 function remove_annoying_warning() {
