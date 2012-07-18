@@ -11,10 +11,12 @@ class Specimen < ActiveRecord::Base
   before_save  :clear_garbage
   attr_accessor :from_biosamples
 
-  has_many :genotypes,:dependent => :destroy
-  has_many :phenotypes,:dependent => :destroy
+  has_many :genotypes,:dependent => :nullify
+  has_many :phenotypes,:dependent => :nullify
   accepts_nested_attributes_for :genotypes, :allow_destroy => true
   accepts_nested_attributes_for :phenotypes, :allow_destroy => true
+
+  before_destroy :destroy_genotypes_phenotypes
 
   has_many :samples
   has_many :activity_logs, :as => :activity_loggable
@@ -175,5 +177,20 @@ class Specimen < ActiveRecord::Base
 
   def organism
     strain.try(:organism)
+  end
+
+  def destroy_genotypes_phenotypes
+    genotypes = self.genotypes
+    phenotypes = self.phenotypes
+    genotypes.each do |g|
+      if g.strain.nil?
+        g.destroy
+      end
+    end
+    phenotypes.each do |p|
+      if p.strain.nil?
+        p.destroy
+      end
+    end
   end
 end

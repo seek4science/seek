@@ -96,4 +96,28 @@ class StrainTest < ActiveSupport::TestCase
     assert !strain.valid?
   end
 
+  test 'destroy strain' do
+    genotype = Factory(:genotype, :specimen => nil, :strain => nil)
+    phenotype = Factory(:phenotype, :specimen => nil, :strain => nil)
+    strain = Factory(:strain, :genotypes => [genotype], :phenotypes => [phenotype])
+    disable_authorization_checks{strain.destroy}
+    assert_equal nil, Strain.find_by_id(strain.id)
+    assert_equal nil, Genotype.find_by_id(genotype.id)
+    assert_equal nil, Phenotype.find_by_id(phenotype.id)
+  end
+
+  test 'when destroying strain, should not destroy genotypes/phenotypes that are linked to specimen' do
+      genotype1 = Factory(:genotype, :specimen => nil, :strain => nil)
+      genotype2 = Factory(:genotype, :specimen => nil, :strain => nil)
+      phenotype1 = Factory(:phenotype, :specimen => nil, :strain => nil)
+      phenotype2 = Factory(:phenotype, :specimen => nil, :strain => nil)
+      strain = Factory(:strain, :genotypes => [genotype1,genotype2], :phenotypes => [phenotype1,phenotype2])
+      specimen = Factory(:specimen,:genotypes => [genotype1], :phenotypes => [phenotype1])
+      disable_authorization_checks{strain.destroy}
+      assert_equal nil, Strain.find_by_id(strain.id)
+      assert_equal nil, Genotype.find_by_id(genotype2.id)
+      assert_equal nil, Phenotype.find_by_id(phenotype2.id)
+      assert_not_nil Genotype.find_by_id(genotype1.id)
+      assert_not_nil Phenotype.find_by_id(phenotype1.id)
+  end
 end

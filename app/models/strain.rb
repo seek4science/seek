@@ -3,12 +3,13 @@ require 'acts_as_authorized'
 
 class Strain < ActiveRecord::Base
   belongs_to :organism
-  has_many :genotypes, :dependent => :destroy
-  has_many :phenotypes, :dependent => :destroy
+  has_many :genotypes, :dependent =>  :nullify
+  has_many :phenotypes, :dependent =>  :nullify
   accepts_nested_attributes_for :genotypes,:allow_destroy=>true
   accepts_nested_attributes_for :phenotypes,:allow_destroy=>true
   has_many :specimens
 
+  before_destroy :destroy_genotypes_phenotypes
   named_scope :by_title
 
   validates_presence_of :title, :organism
@@ -73,5 +74,20 @@ class Strain < ActiveRecord::Base
 
   def can_delete? *args
     super && (specimens.empty? || ((specimens.count == 1) && specimens.first.is_dummy? && specimens.first.samples.empty?))
+  end
+
+  def destroy_genotypes_phenotypes
+    genotypes = self.genotypes
+    phenotypes = self.phenotypes
+    genotypes.each do |g|
+      if g.specimen.nil?
+        g.destroy
+      end
+    end
+    phenotypes.each do |p|
+      if p.specimen.nil?
+        p.destroy
+      end
+    end
   end
 end
