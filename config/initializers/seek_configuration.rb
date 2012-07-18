@@ -34,6 +34,7 @@ Seek::Config.default :community_news_number_of_entries,10
 Seek::Config.default :home_description, 'Some (configurable) information about the project and what we do goes here.'
 Seek::Config.default :publish_button_enabled,false
 Seek::Config.default :auth_lookup_enabled,true
+Seek::Config.default :project_browser_enabled,false
 
 # Branding
 Seek::Config.default :project_name,'SysMO'

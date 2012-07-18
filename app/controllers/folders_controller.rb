@@ -3,6 +3,7 @@
 class FoldersController < ApplicationController
   before_filter :login_required
   before_filter :check_project
+  before_filter :browser_enabled
   before_filter :get_folder, :only=>[:create_folder, :destroy, :display_contents,:remove_asset]
   before_filter :get_folders,:only=>[:index,:move_asset_to,:create_folder]
   before_filter :get_asset, :only=>[:move_asset_to,:remove_asset]
@@ -97,6 +98,13 @@ class FoldersController < ApplicationController
     @project = Project.find(params[:project_id])
     if @project.nil? || !current_user.person.projects.include?(@project)
       error("You must be a member of the project", "is invalid (not in project)")
+    end
+  end
+
+  def browser_enabled
+    if !Seek::Config.project_browser_enabled
+      flash[:error]="Not available"
+      redirect_to @project
     end
   end
 
