@@ -106,4 +106,16 @@ class StrainsController < ApplicationController
     end
   end
 
+  def destroy
+    respond_to do |format|
+      if @strain.destroy
+        format.html { redirect_to(strains_path) }
+        format.xml { head :ok }
+      else
+        flash.now[:error]="Unable to delete the strain."
+        format.html { render :action=>"show" }
+        format.xml { render :xml => @strain.errors, :status => :unprocessable_entity }
+      end
+    end
+  end
 end

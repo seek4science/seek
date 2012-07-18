@@ -9,6 +9,10 @@
   <% end %>
   <% if @strain.can_delete? %>
       <li><%= image_tag_for_key "destroy", strain_path(@strain), "Delete Strain", {:confirm => 'Are you sure?', :method => :delete}, "Delete Strain" -%></li>
+  <!--show disabled delete button if current_user can manage but can not delete-->
+  <% elsif !@strain.can_delete? && @strain.can_manage? %>
+      <% explanation=unable_to_delete_text @strain %>
+      <li><%= image_tag_for_key "destroy", strain_path(@strain) , "Delete Strain", {:title=>"#{tooltip_title_attrib(explanation)}", :class=>"disabled", :onclick => "alert(\"#{explanation}\")"}, "Delete Strain", :function -%></li>
   <% end %>
 </ul>
 
