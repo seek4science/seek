@@ -30,8 +30,7 @@ title||=h(item.title)
     <h1><%= title_prefix + title + title_postfix -%></h1>
 </div>
 
-<% display_item ||=nil
-   if display_item and display_item.is_downloadable_pdf?
+<% if Seek::Config.experimental_features_enabled && (display_item ||=nil) && display_item.is_downloadable_pdf?
    download_url = polymorphic_path(item, :version => display_item.version, :action => 'download') %>
     <center>
     <%= link_to_function 'View content' + expand_image, :onclick => "viewPDFContent('#{download_url}')", :id => 'view_content_expand_image', :class=> 'link_text' do |page|
