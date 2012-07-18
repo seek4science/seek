@@ -55,6 +55,12 @@ class Publication < ActiveRecord::Base
   
   searchable(:ignore_attribute_changes_of=>[:updated_at,:last_used_at]) do
     text :title,:abstract,:journal,:searchable_tags, :pubmed_id, :doi
+    text :seek_authors do
+      seek_authors.compact.map(&:name)
+    end
+    text :non_seek_authors do
+      non_seek_authors.compact.map(&:first_name) + non_seek_authors.compact.map(&:last_name)
+    end
   end if Seek::Config.solr_enabled
 
   #TODO: refactor to something like 'sorted_by :start_date', which should create the default scope and the sort method. Maybe rename the sort method.
