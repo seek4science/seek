@@ -1,7 +1,7 @@
 require 'test_helper'
 
 class StrainTest < ActiveSupport::TestCase
-
+  fixtures :all
   def setup
     User.current_user = Factory(:user)
   end
@@ -77,4 +77,23 @@ class StrainTest < ActiveSupport::TestCase
     assert strain.specimens.first.samples.empty?
     assert strain.can_delete?
   end
+
+  test "validation" do
+    strain=Strain.new :title => "strain", :projects => [projects(:sysmo_project)], :organism => organisms(:yeast)
+    assert strain.valid?
+
+    strain=Strain.new :title => "strain", :projects => [projects(:sysmo_project)]
+    assert !strain.valid?
+
+    strain=Strain.new :title => "strain", :organism => organisms(:yeast)
+    unless Seek::Config.is_virtualliver
+      assert !strain.valid?
+    else
+      assert strain.valid?
+    end
+
+    strain = Strain.new :organism => organisms(:yeast), :projects => [projects(:sysmo_project)]
+    assert !strain.valid?
+  end
+
 end
