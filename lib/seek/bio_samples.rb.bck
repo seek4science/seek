@@ -3,32 +3,10 @@ require "libxml"
 module Seek
 
   class BioSamples
-
-    attr_reader :investigation, :study, :assay, :assay_class, :assay_type,
-                :units, :treatments, :organisms, :strains, :culture_growth_type, :tissue_and_cell_types,
-                :specimens, :samples,  :specimen_names, :sample_names, :treatments,:treatments_text,
-                :rna_extractions, :sequencing
-    attr_accessor :errors,:warnings
-
     def initialize file, xml=nil, to_populate=true
       @file = file
-
-      @investigation = nil
-      @study = nil
       @assay = nil
-      @assay_class = nil
-      @assay_type = nil
-
-      @units = {}
-      @treatments = {}
-
-      @organisms = {}
-      @strains = {}
-      @culture_growth_type = nil
-      @tissue_and_cell_types = {}
-      @specimens = {}
-      @samples = {}
-
+      @treatment_objs = {}
       @sample_comments = {}
       @creator = nil
       @errors = ""
@@ -36,7 +14,7 @@ module Seek
 
       @specimen_names = {}
       @sample_names = {}
-      @treatments_text = {}
+      @treatments = {}
       @rna_extractions = {}
       @sequencing = {}
       if xml
@@ -63,15 +41,9 @@ module Seek
         set_creator template_sheet
         @file.creators << @creator unless @file.creators.include?(@creator) || @creator.nil?
         populate_assay template_sheet, filename if @to_populate
-      else
-        @errors << "This data file does not match the template."
-        raise  @errors
       end
       if samples_sheet
         populate_bio_samples samples_sheet
-      else
-        @errors << "No samples sheet is found."
-        raise @errors
       end
     end
 
@@ -107,23 +79,22 @@ module Seek
       assay_type_title = hunt_for_horizontal_field_value sheet, "Experiment Class"
       study_title = hunt_for_horizontal_field_value sheet, "Experiment Description"
 
-      @investigation = Investigation.find_all_by_title(investigation_title).detect{|i|i.can_view? User.current_user}
+      investigation = Investigation.find_all_by_title(investigation_title).detect{|i|i.can_view? User.current_user}
 
-      unless @investigation
-        @investigation = Investigation.new :title => investigation_title
-        @investigation.projects = User.current_user.person.projects
-        @investigation.policy = Policy.private_policy
+      unless investigation
+        investigation = Investigation.new :title => investigation_title
+        investigation.projects = User.current_user.person.projects
+        investigation.policy = Policy.private_policy
         investigation.save!
       end
 
       #create new assay and study
-      @study = Study.find_by_title(study_title).detect{|s|s.can_edit? User.current_user}
-      unless @study
-        @study = Study.new :title => study_title
-        @study.policy = Policy.private_policy
+      study = Study.find_by_title study_title
+      unless study && study.contributor==User.current_user
+              study = Study.new :title => study_title
+              study.policy = Policy.private_policy
       end
-      @study.lock!
-      @study.investigation = @investigation
+      study.investigation = investigation
       study.save!
 
       assay_class = AssayClass.find_by_title("Experimental Assay")
@@ -137,7 +108,6 @@ module Seek
         @assay = Assay.new :title => assay_title
         @assay.policy = Policy.private_policy
       end
-      @assay.lock!
       @assay.assay_class = assay_class
       @assay.assay_type = assay_type
       ### unknown technology type
@@ -162,6 +132,7 @@ module Seek
         set_treatments sheet, treatment_protocol, treatment_attributes
       end
 
+
       #extract specimen and sample names from the file
       specimen_name_cells = hunt_for_field_values sheet, "Specimen"
       set_specimen_names specimen_name_cells
@@ -169,6 +140,7 @@ module Seek
       sample_name_cells = hunt_for_field_values sheet, "Sample Name"
       set_sample_names sample_name_cells
       @sample_comments = hunt_for_field_values sheet, "Optional"
+
 
       #populate specimens and samples
       if @to_populate
@@ -224,7 +196,7 @@ module Seek
         cell_col = cell.attributes["column"].to_i
         row_value[treatment_attribute_names[cell_col]] = cell.content.tr('""', "")
       end
-      @treatments_text[start_row] = row_value
+      @treatments[start_row] = row_value
     end
 
     def set_rna_extractions sheet, rna_extraction_protocol, rna_attribute_names
@@ -280,7 +252,7 @@ module Seek
       treatment = Treatment.new :substance => substance, :concentration => concentration, :unit_id => unit.id, :treatment_protocol => treatment_protocol unless treatment
 
       treatment.save!
-      @treatments[row] = treatment
+      @treatment_objs[row] = treatment
     end
 
     def populate_specimen sheet, specimen_name_cell
@@ -339,27 +311,13 @@ module Seek
             specimen.strain == strain &&
             specimen.sex == sex &&
             specimen.age == age &&
-            specimen.age_unit == age_time_unit
-            sleep(1);
-            new_sp = specimen.clone
-            now = Time.now
-            new_sp.title = "#{speicmen_title}-#{now}"
-            new_sp.contributor = User.current_user
-            new_sp.projects = specimen.projects
-            new_sp.created_at = now;
-            new_sp.save!
-            @warnings << "Warning: specimen with the name '#{specimen_title}' in row #{row} is already created in SEEK.<br/>"
-            @warnings << "It is renamed and saved as '#{new_sp.title}'.<br/>"
-            @warnings << "You may rename it and upload the file as new version!<br/>"
-        else
-          if !specimen.can_view?(User.current_user)
-            @warnings << "Warning: specimen with the name '#{specimen_title}' in row #{row_num} is already created in SEEK.<br/>"
-            @warnings << "But you are not authorized to view it. You can contact '#{specimen.contributor.person.name} for authorizations'<br/>"
-          end
+            specimen.age_unit == age_time_unit &&
+            specimen.can_view?(User.current_user)
+          @errors << "Warning: specimen with the name '#{specimen_title}' in row #{row} is already created in SEEK."
+          @errors << "But you are not authorized to view it." if !specimen.can_view?(User.current_user)
+          @errors << "You may rename it and upload the file as new version!<br/>"
         end
       end
-
-      @specimens[row] = specimen
     end
 
     def populate_sample sheet, sample_name_cell
@@ -392,9 +350,9 @@ module Seek
                             :lab_internal_number => sample_title
         sample.projects = User.current_user.person.projects
         treatment = ""
-        @treatments_text[row].try(:each) do |k, v|
+        @treatments[row].try(:each) do |k, v|
           treatment << k.to_s + ":" + v.to_s
-          treatment << "," unless k == @treatments_text[row].keys.last
+          treatment << "," unless k == @treatments[row].keys.last
         end
 
         sample.sample_type = sample_type
@@ -408,28 +366,16 @@ module Seek
         sample.policy = @file.policy.deep_copy
         sample.save!
       else
-        unless sample.specimen == @specimens[row] &&
-            sample.sample_type == sample_type &&
-            sample.tissue_and_cell_type == tissue_and_cell_type &&
-            sample.donation_date == donation_date &&
+        unless sample.sample_type == sample_type &&
             sample.institution == institution &&
-            sample.comments == comments
-            sleep(1);
-            sample.title =  "#{sample_title}-#{Time.now}"
-            sample.save!
-          @warnings << "Warning: sample with the name '#{sample_title}' in row #{row} is already created in SEEK."
-          @warnings << "It is renamed and saved as '#{sample.title}'.<br/>"
-          @warnings << "You may rename it and upload the file as new version!<br/>"
-        else
-          if !sample.can_view?(User.current_user)
-            @warnings << "Warning: specimen with the name '#{sample_title}' in row #{row} is already created in SEEK.<br/>"
-            @warnings << "But you are not authorized to view it. You can contact '#{sample.contributor.person.name} for authorizations'<br/>"
-          end
+            sample.comments == comments &&
+            sample.can_view?(User.current_user)
+          @errors << "Warning: sample with the name '#{sample_title}' in row #{row} is already created in SEEK."
+          @errors << "But you are not authorized to view it." if !sample.can_view?(User.current_user)
+          @errors << "You may rename it and upload the file as new version!<br/>"
         end
 
       end
-
-      @samples[row] = sample
       unless @assay.samples.include?(sample)
         @assay.samples << sample
         @assay.save!

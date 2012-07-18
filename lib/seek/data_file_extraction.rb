@@ -23,18 +23,29 @@ module Seek
     def bio_samples_population to_populate=true
       begin
         if is_extractable_spreadsheet?
-            Seek::BioSamples.new self, spreadsheet_xml, to_populate
+          ActiveRecord::Base.transaction do
+           begin
+               Seek::BioSamples.new self, spreadsheet_xml, to_populate
+           rescue  Exception => e
+             bio_samples = Seek::BioSamples.new self, nil,false
+             bio_samples.errors = "Error parsing spreadsheet: #{e.message}"
+             Rails.logger.error bio_samples.errors
+             raise ActiveRecord::Rollback
+           end
+          end
         else
-          Seek::BioSamples.new self
+         Seek::BioSamples.new self,nil,false
         end
       rescue Exception => e
         Rails.logger.error("Error parsing spreadsheet #{e.message}")
-        bio_samples = Seek::BioSamples.new self
-        bio_samples.instance_variable_set :@errors, "Error parsing spreadsheet #{e.message}"
+        bio_samples = Seek::BioSamples.new self, nil,false
+        bio_samples.errors = "Error parsing spreadsheet: #{e.backtrace.join('<br/>')}"
         bio_samples
       end
 
     end
+
+
 
     #returns an array of all cell content within the workbook.
     def spreadsheet_contents_for_search obj=self
@@ -51,7 +62,7 @@ module Seek
               []
             end
           rescue Exception=>e
-            Rails.logger.error("Error processing spreadsheet for content_blob #{obj.content_blob.id} #{e}")
+            Rails.logger.error("Error processing spreadsheet for content_blob #{obj.content_blob_id} #{e}")
             raise e unless Rails.env=="production"
             nil
           end
