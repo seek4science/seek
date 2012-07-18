@@ -21,6 +21,9 @@ class Strain < ActiveRecord::Base
   acts_as_uniquely_identifiable
   acts_as_favouritable
   acts_as_annotatable :name_field=>:title
+  include Seek::Taggable
+
+  validates_presence_of :projects unless Seek::Config.is_virtualliver
 
   grouped_pagination :pages=>("A".."Z").to_a, :default_page => Seek::Config.default_page(self.name.underscore.pluralize)
 

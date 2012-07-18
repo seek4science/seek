@@ -8,6 +8,52 @@ class StrainsController < ApplicationController
   before_filter :get_strain, :only =>:show_existing_strain
   include Seek::Publishing
 
+  def new
+    @strain = Strain.new()
+  end
+
+
+  def create
+    @strain = BiosamplesController.new().new_strain(params[:strain])
+    @strain.policy.set_attributes_with_sharing params[:sharing], @strain.projects
+    update_annotations @strain
+    if @strain.save
+      deliver_request_publish_approval params[:sharing], @strain
+      respond_to do |format|
+        flash[:notice] = 'Strain was successfully created.'
+        format.html { redirect_to(@strain) }
+        format.xml { render :xml => @strain, :status => :created, :location => @strain }
+      end
+    else
+      respond_to do |format|
+        format.html { render :action => "new" }
+        format.xml { render :xml => @strain.errors, :status => :unprocessable_entity }
+      end
+    end
+  end
+
+  def update
+    update_annotations @strain
+    if params[:sharing]
+      @strain.policy.set_attributes_with_sharing params[:sharing], @strain.projects
+    end
+    @strain.attributes = params[:strain]
+    if @strain.save
+      deliver_request_publish_approval params[:sharing], @strain
+      respond_to do |format|
+        flash[:notice] = 'Strain was successfully updated.'
+        format.html { redirect_to(@strain) }
+        format.xml { render :xml => @strain, :status => :created, :location => @strain }
+      end
+    else
+      respond_to do |format|
+        format.html { render :action => "edit" }
+        format.xml { render :xml => @strain.errors, :status => :unprocessable_entity }
+      end
+    end
+  end
+
+
   def show_existing_strains
     render :update do |page|
       if @strains && @organism

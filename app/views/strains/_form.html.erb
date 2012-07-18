@@ -1,29 +1,30 @@
 <%= stylesheet_link_tag 'styles.css' -%>
-<% action ||= nil%>
-<div class="strain" id="strain_form">
-  <% if action == 'edit' %>
-       <% parent_strain = Strain.find_by_id(strain.parent_id).try(:title) %>
-       <p class="none_text" style="margin-left: 15em;">
-       <%= parent_strain.blank? ? '' : "This strain is created based on #{parent_strain}"%>
-       </p>
-  <% end %>
+<%= javascript_include_tag 'strain.js', 'biosample.js', 'sharing.js', 'resource.js' -%>
+<script type="text/javascript">
+    initialiseFold('add_projects_form');
+    initialiseFold('sharing_form');
+    updateFancyMultiselect('strain_project_ids');
+</script>
 
+<%= f.error_messages -%>
+
+<div  id="strain_form">
   <div class="yui-g">
     <center>
       <div class="yui-u first" style="width: 42%; margin-left: 2em; margin-top: 1em; margin-bottom: 1em;">
-        <p style="margin-bottom: 1.5em">
-          <label style="float: left;"> Name:</label>
-          <%= text_field_tag "strain[title]", strain.title, :style => 'float:right' %>
+        <p style="margin-bottom: 0.5em">
+          <%= label_tag 'Name:', nil,  :style => 'float:left' %><span class="required">*</span>
+          <%= f.text_field :title, :style => 'float:right' %>
         </p>
 
         <p style="margin-bottom: 1.5em">
-          <label style="float: left;">Provider's strain ID:</label>
-          <%= text_field_tag "strain[provider_id]", strain.provider_id, :style => 'float:right' %>
+          <%= label_tag "Provider's strain ID:", nil, :style => 'float:left' %>
+          <%= f.text_field :provider_id, :style => 'float:right' %>
         </p>
 
         <p style="margin-bottom: 1.5em">
-          <label style="float: left;"> Provider Name:</label>
-          <%= text_field_tag "strain[provider_name]", strain.provider_name, :style => 'float:right' %>
+          <%= label_tag "Provider Name:", nil, :style => 'float:left' %>
+          <%= f.text_field :provider_name, :style => 'float:right' %>
         </p>
 
       </div>
@@ -33,13 +34,13 @@
       <div class="yui-u" style="width: 42%;margin-right: 2em; margin-top: 1em; margin-bottom: 1em;">
 
         <p style="margin-bottom: 1.5em">
-          <label style="float: left;"> Synonym:</label>
-          <%= text_field_tag "strain[synonym]", strain.synonym, :style => 'float:right' %>
+          <%= label_tag "Synonym:", nil,  :style => 'float:left' %>
+          <%= f.text_field :synonym, :style => 'float:right' %>
         </p>
 
         <p style="margin-bottom: 1.5em">
-          <label style="float: left;"> Comment:</label>
-          <%= text_area_tag "strain[comment]", strain.comment, :style => 'float:right', :cols => 18 %>
+          <%= label_tag "Comment:", nil, :style => 'float:left' %>
+          <%= f.text_area :comment, :style => 'float:right', :cols => 33, :rows => 3 %>
         </p>
 
       </div>
@@ -47,57 +48,58 @@
   </div>
 
   <div class="yui-g">
-    <center>
-      <div class="yui-u first  box_simple" style="width: 42%; margin-left: 2em; margin-top: 1em; margin-bottom: 1em;">
-        <label style="font-weight: bold; border-bottom: 1px solid #DDD"> Genotypes:</label>
-        <table id='genotype_table'>
-          <tr>
-            <th>Gene affected</th>
-            <th>Kind of mutation</th>
-          </tr>
-
-          <% i=1
-             strain.genotypes.each do |genotype| %>
-              <tr id='genotype_row_<%=i%>'>
-                <td> <%= text_field_tag "genotypes[#{i}][gene][title]", genotype.gene.try(:title), :size => 10 %>
-                </td>
-                <td><%= text_field_tag "genotypes[#{i}][modification][title]", genotype.modification.try(:title), :size => 10 %>
-                </td>
-                <td> <%= link_to_function image("destroy", :alt=>"Delete", :title=>"Delete this entry", :id=> "delete_genotype_#{i}"), "fadeGenotypeRow('#{i}')"-%>
-                </td>
-              </tr>
-              <% i += 1 %>
-             <% end %>
-
-        </table>
-        <%= simple_image_tag_for_key "add",:alt=>"Add more",:title=>"Add more genes and mutations", :onclick=>"addGenotypeRow('genotype_table')" -%>
-      </div>
-    </center>
-
-    <center>
-      <div class="yui-u  box_simple" style="width: 42%;margin-right: 2em; margin-top: 1em; margin-bottom: 1em;">
-         <label style="font-weight: bold; border-bottom: 1px solid #DDD"> Phenotypes:</label>
-        <table id='phenotype_table'>
-          <% j=0
-             strain.phenotypes.each do |phenotype| %>
-              <tr id='phenotype_row_<%=j%>'>
-                <td> <%= text_field_tag "phenotypes[#{j}][description]", phenotype.description, :size => 25 %>
-                </td>
-                <td> <%= link_to_function image("destroy", :alt=>"Delete", :title=>"Delete this entry", :id=> "delete_phenotype_#{j}"), "fadePhenotypeRow('#{j}')"-%>
-                </td>
-              </tr>
-              <% j += 1 %>
-             <% end %>
-          <% end %>
-        </table>
-        <%= simple_image_tag_for_key "add",:alt=>"Add more",:title=>"Add more phenotypes", :onclick=>"addPhenotypeRow('phenotype_table')" -%>
-      </div>
-    </center>
+    <%= render :partial => "biosamples/genotype_form", :locals => {:item => @strain, :f => f, :action => action} %>
+    <%= render :partial => "biosamples/phenotype_form", :locals => {:item => @strain, :f => f, :action => action} %>
   </div>
+  <br/>
 
-    <%= hidden_field_tag 'strain[organism_id]', organism_id %>
-    <%= hidden_field_tag 'strain[id]', strain.id %>
-    <%= hidden_field_tag 'strain[parent_id]', strain.id %>
+  <p>
+    <%= f.label "Organism:" -%><span class="required">*</span>
+    <%= f.select :organism_id,
+                 options_for_select([["Not specified", ""]] + Organism.all(:order => :title).collect { |o| [o.title, o.id] }, @strain.organism.try(:id) || current_user.try(:person).try(:projects).try(:first).try(:organism_ids).try(:first)), {},
+                 :onchange => "show_ajax_loader('strains_of_selected_organism');strains_of_selected_organism(this.value,'strain_parent_id', 'strain[parent_id]');"
+    -%>
+  </p>
+
+  <p>
+            <% strains = @strain.organism.nil? ? [] : @strain.organism.strains.without_default.select(&:can_view?) -%>
+    <%= label_tag "Based on:", nil, :style => 'float:left' %>
+
+  <div id='strains_of_selected_organism'>
+    <%= f.collection_select :parent_id,
+                            strains, :id, :info, :include_blank => "Not specified" -%>
+
+  </div>
+  </p>
+
+  <%= render :partial => 'projects/project_selector', :locals => {:resource => @strain} %>
+  <br/>
+
+  <% if (action == 'create') || (action == 'edit' && @strain.can_manage?) %>
+      <%= render :partial => "assets/sharing_form", :locals => {:object => @strain} -%>
+  <% end %>
+
+  <%= f.hidden_field :id %>
+  <%
+     button_text=action=="edit" ? "Update" : "Create"
+     disabled_text=action=="edit" ? "Updating..." : "Creating..."
+     is_new_file=action=="edit" ? false : true
+  %>
+  <br/>
+  <% if @strain.can_manage? %>
+      <%= preview_permission_popup_link('strain', url_for(:controller => 'policies', :action => 'preview_permissions'), is_new_file, @strain.contributor.try(:id)) -%>
+      <%= f.submit button_text, :id => "strain_submit_btn", :onclick => "clickLink($('preview_permission'));return(false);" -%>
+  <% else %>
+      <%= f.submit button_text, :disable_with => disabled_text, :id => "strain_submit_btn" -%>
+  <% end %>
+  or <%= link_to 'Cancel', (@strain.id ? strain_path(@strain.id) : strains_path) -%>
 </div>
+
+<script type="text/javascript">
+    if ('<%= action.to_s%>' == 'create' && <%= f.error_messages.blank?%>) {
+        show_ajax_loader('strains_of_selected_organism');
+        strains_of_selected_organism($F('strain_organism_id'), 'strain_parent_id', 'strain[parent_id]');
+    }
+</script>
 
 
