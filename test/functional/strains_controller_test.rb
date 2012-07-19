@@ -10,11 +10,6 @@ class StrainsControllerTest < ActionController::TestCase
     login_as :owner_of_fully_public_policy
   end
 
-  test "get existing strains with no organism" do
-    xml_http_request :get, :show_existing_strains, {:organism_id => "0"}
-    assert_response :success
-  end
-
   test "should get index" do
     get :index
     assert_response :success
