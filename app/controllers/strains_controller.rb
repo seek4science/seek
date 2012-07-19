@@ -12,7 +12,6 @@ class StrainsController < ApplicationController
     @strain = Strain.new()
   end
 
-
   def create
     @strain = BiosamplesController.new().new_strain(params[:strain])
     @strain.policy.set_attributes_with_sharing params[:sharing], @strain.projects

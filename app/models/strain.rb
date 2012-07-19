@@ -24,7 +24,7 @@ class Strain < ActiveRecord::Base
   acts_as_annotatable :name_field=>:title
   include Seek::Taggable
 
-  validates_presence_of :projects unless Seek::Config.is_virtualliver
+  validates_presence_of :projects, :unless => Proc.new{|s| s.is_dummy? || Seek::Config.is_virtualliver}
 
   grouped_pagination :pages=>("A".."Z").to_a, :default_page => Seek::Config.default_page(self.name.underscore.pluralize)
 

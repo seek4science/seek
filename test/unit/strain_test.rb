@@ -94,6 +94,10 @@ class StrainTest < ActiveSupport::TestCase
 
     strain = Strain.new :organism => organisms(:yeast), :projects => [projects(:sysmo_project)]
     assert !strain.valid?
+
+    #dummy strain
+    strain = Strain.new :title => 'strain', :organism => organisms(:yeast), :is_dummy => true
+    assert strain.valid?
   end
 
   test 'destroy strain' do
