@@ -113,7 +113,7 @@ module Subscribable
 
   module ClassMethods
     def subscribers_are_notified_of? action
-      action != 'show' && action != 'download' && action != 'destroy'
+      action!="show" && action!="download" && action!="destroy"
     end
   end
 end

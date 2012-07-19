@@ -73,4 +73,33 @@ class SendPeriodicEmailsJobTest < ActiveSupport::TestCase
       SendPeriodicEmailsJob.new('monthly').perform
     end
   end
+
+  test "perform ignores unwanted actions" do
+    Delayed::Job.destroy_all
+    person1 = Factory(:person)
+    person2 = Factory(:person)
+    person3 = Factory(:person)
+    sop = Factory(:sop, :policy => Factory(:public_policy))
+    project_subscription1 = ProjectSubscription.create(:person_id => person1.id, :project_id => sop.projects.first.id, :frequency => 'daily')
+    project_subscription2 = ProjectSubscription.create(:person_id => person2.id, :project_id => sop.projects.first.id, :frequency => 'weekly')
+    project_subscription3 = ProjectSubscription.create(:person_id => person3.id, :project_id => sop.projects.first.id, :frequency => 'monthly')
+    ProjectSubscriptionJob.new(project_subscription1.id).perform
+    ProjectSubscriptionJob.new(project_subscription2.id).perform
+    ProjectSubscriptionJob.new(project_subscription3.id).perform
+    sop.reload
+
+    SendPeriodicEmailsJob.create_job('daily', 15.minutes.from_now)
+    SendPeriodicEmailsJob.create_job('weekly', 15.minutes.from_now)
+    SendPeriodicEmailsJob.create_job('monthly', 15.minutes.from_now)
+    assert_emails 0 do
+      disable_authorization_checks do
+        ActivityLog.create(:activity_loggable => sop, :culprit => Factory(:user), :action => 'show')
+        ActivityLog.create(:activity_loggable => sop, :culprit => Factory(:user), :action => 'download')
+        ActivityLog.create(:activity_loggable => sop, :culprit => Factory(:user), :action => 'destroy')
+      end
+      SendPeriodicEmailsJob.new('daily').perform
+      SendPeriodicEmailsJob.new('weekly').perform
+      SendPeriodicEmailsJob.new('monthly').perform
+    end
+  end
 end

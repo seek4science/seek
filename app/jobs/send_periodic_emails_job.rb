@@ -35,13 +35,18 @@ class SendPeriodicEmailsJob < Struct.new(:frequency)
 
   def send_subscription_mails logs, frequency
     if Seek::Config.email_enabled
-      Person.scoped(:include => :subscriptions).select { |p| p.receive_notifications? }.each do |person|
+      #strip the logs down to those that are relevant
+      logs.reject!{|log| !log.activity_loggable.subscribers_are_notified_of?(log.action) || !log.activity_loggable.subscribable?}
+
+      Person.scoped(:include => [:notifiee_info,:subscriptions]).select{ |p| p.receive_notifications? }.each do |person|
         begin
-          activity_logs = person.subscriptions.scoped(:include => :subscribable).select { |s| s.frequency == frequency }.collect do |sub|
-            logs.select do |log|
-              log.activity_loggable.try(:can_view?, person.user) && log.activity_loggable.subscribable? && log.activity_loggable.subscribers_are_notified_of?(log.action) && log.activity_loggable == sub.subscribable
-            end
-          end.flatten(1)
+          #get only the logs for items that are visible to this person
+          logs_for_visible_items = logs.select{|log| log.activity_loggable.try(:can_view?,person.user)}
+
+          #get the logs for this persons subscribable items, and where the subscription is within the correct frequency
+          activity_logs = logs_for_visible_items.select do |log|
+            !person.subscriptions.for_subscribable(log.activity_loggable).scoped(:include =>[:subscribable, :project_subscription]).select{ |s| s.frequency == frequency }.empty?
+          end
           SubMailer.deliver_send_digest_subscription person, activity_logs, frequency unless activity_logs.blank?
         rescue Exception => e
           Delayed::Job.logger.error("Error sending subscription emails to person #{person.id} - #{e.message}")
