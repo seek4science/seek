@@ -5,12 +5,7 @@ class ProjectSubscriptionJob < Struct.new(:project_subscription_id)
     if ps
       items = all_in_project(ps)
       items.each do |item|
-        item.subscriptions.build(:person => ps.person, :project_subscription_id => project_subscription_id) unless item.subscribed?(ps.person)
-        if item.changed_for_autosave?
-          disable_authorization_checks do
-            item.save(false)
-          end
-        end
+        item.subscriptions.<< Subscription.new(:person => ps.person, :project_subscription_id => project_subscription_id) unless item.subscribed?(ps.person)
       end
     end
   end
