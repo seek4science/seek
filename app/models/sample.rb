@@ -68,7 +68,6 @@ class Sample < ActiveRecord::Base
     text :searchable_terms
   end if Seek::Config.solr_enabled
 
-
   def searchable_terms
     text=[]
     text << title

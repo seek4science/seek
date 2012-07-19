@@ -28,6 +28,27 @@ class Strain < ActiveRecord::Base
 
   grouped_pagination :pages=>("A".."Z").to_a, :default_page => Seek::Config.default_page(self.name.underscore.pluralize)
 
+  searchable do
+      text :searchable_terms
+  end if Seek::Config.solr_enabled
+
+  def searchable_terms
+      text=[]
+      text << title
+      text << synonym
+      text << comment
+      text << provider_name
+      text << provider_id
+      text << searchable_tags
+      genotypes.compact.each do |g|
+        text << g.gene.try(:title)
+      end
+      phenotypes.compact.each do |p|
+        text << p.description
+      end
+      text
+  end
+
   def is_default?
     title=="default" && is_dummy==true
   end
