@@ -9,7 +9,7 @@ class StrainTest < ActiveSupport::TestCase
   test "without default" do
     Strain.destroy_all
     org = Factory :organism
-    Strain.create :title=>"fred",:is_dummy=>false, :organism=>org
+    Strain.create :title=>"fred",:is_dummy=>false, :organism=>org, :projects => [Factory(:project)]
     Strain.create :title=>"default",:is_dummy=>true, :organism=>org
     strains=org.strains.without_default
     assert_equal 1,strains.count

@@ -290,7 +290,7 @@ module Seek
         organism.save!
       end
 
-      strain = Strain.new :title => strain_title unless strain
+      strain = Strain.new :title => strain_title, :projects => User.current_user.person.projects unless strain
       strain.organism = organism
       strain.save!
 

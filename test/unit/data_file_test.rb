@@ -472,7 +472,6 @@ class DataFileTest < ActiveSupport::TestCase
       assay_type = AssayType.find_by_title(assay_type_title)
       assay = Assay.all.detect{|a|a.title == assay_title and a.study_id == study.id and a.assay_class_id == assay_class.try(:id) and a.assay_type == assay_type and a.owner_id == user.person.id}
 
-
       return df, assay, bio_samples
   end
 
