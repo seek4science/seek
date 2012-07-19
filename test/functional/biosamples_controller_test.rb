@@ -102,7 +102,7 @@ class BioSamplesControllerTest < ActionController::TestCase
 
   test 'should create strain with name and organism' do
     organism = organisms(:yeast)
-    strain = {:title => 'test', :organism => organism}
+    strain = {:title => 'test', :organism => organism, :project_ids => [Factory(:project).id]}
     assert_difference ('Strain.count') do
       post :create_strain, :strain => strain
     end
