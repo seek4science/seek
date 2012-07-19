@@ -169,7 +169,7 @@ On Ubuntu or Debian, after putting the script in init.d/ you should run (assumin
 
   sudo update-rc.d seek-solr defaults
 
-You can then stop the service with
+You can then start the service with
 
   service seek-solr start
 
