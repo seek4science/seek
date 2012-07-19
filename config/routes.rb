@@ -7,7 +7,7 @@ ActionController::Routing::Routes.draw do |map|
 
   map.resources :events
 
-  map.resources :strains, :collection=>{:existing_strains=>:get, :existing_strains_for_create=>:get, :show_existing_strain=>:get, :new_strain_form => :get}
+  map.resources :strains, :member => {:update_annotations_ajax=>:post}
 
   map.resources :publications,:collection=>{:fetch_preview=>:post},:member=>{:disassociate_authors=>:post,:update_annotations_ajax=>:post}
 
