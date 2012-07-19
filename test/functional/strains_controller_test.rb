@@ -8,6 +8,7 @@ class StrainsControllerTest < ActionController::TestCase
 
   def setup
     login_as :owner_of_fully_public_policy
+    @object = Factory(:strain)
   end
 
   test "should get index" do
