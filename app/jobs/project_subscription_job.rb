@@ -5,7 +5,7 @@ class ProjectSubscriptionJob < Struct.new(:project_subscription_id)
     if ps
       items = all_in_project(ps)
       items.each do |item|
-        item.subscriptions.<< Subscription.new(:person => ps.person, :project_subscription_id => project_subscription_id) unless item.subscribed?(ps.person)
+        item.subscriptions << Subscription.new(:person => ps.person, :project_subscription_id => project_subscription_id) unless item.subscribed?(ps.person)
       end
     end
   end
