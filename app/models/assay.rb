@@ -93,9 +93,6 @@ class Assay < ActiveRecord::Base
     text :technology_type do
         technology_type.try :title
     end
-    text :organisms do
-        organisms.compact.map{|o| o.title}
-    end
     text :strains do
         strains.compact.map{|s| s.title}
     end
