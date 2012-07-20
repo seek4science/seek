@@ -297,7 +297,7 @@ module Seek
       specimen = Specimen.find_by_title specimen_title
 
       unless specimen
-        specimen = Specimen.new :title => specimen_title, :lab_internal_number => specimen_title
+        specimen = Specimen.new :title => specimen_title, :lab_internal_number => specimen_title, :projects => User.current_user.person.projects
         specimen.sex = sex
         specimen.age = age
         specimen.age_unit = age_time_unit
