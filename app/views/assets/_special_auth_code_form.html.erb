@@ -16,10 +16,10 @@
                 <%= sub_form.label :expiration_date %>
                 <%= sub_form.calendar_date_select :expiration_date %>
               </p>
-              <%= sub_form.subform_delete_link 'Revoke', {}, :class => 'hidden_destroy_field' %>
+              <%= sub_form.subform_delete_link 'Revoke', {:onclick => "$('add_a_temporary_link').show()"}, :class => 'hidden_destroy_field' %>
             </fieldset>
         <% end %>
-        <%= link_to_function "Add a Temporary Link", "$('new_temporary_link_form').show();$('new_temporary_link_form').select('.hidden_destroy_field')[0].setValue('false');$(this).hide()" %>
+        <%= link_to_function "Add a Temporary Link", "$('new_temporary_link_form').show();$('new_temporary_link_form').select('.hidden_destroy_field')[0].setValue('false');$(this).hide()",  :id => "add_a_temporary_link" %>
    <% end %>
   <%= render :partial => 'assets/folding_box', :locals => {:hidden => true, :fold_id => 'temporary_links', :fold_title => title_and_help, :contents => content} %>
 <% end %>

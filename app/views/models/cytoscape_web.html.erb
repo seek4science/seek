@@ -90,12 +90,18 @@
                                target.data["Comment"] = null;
                                vis.updateData([target]);
                             }
-                            for (var i in target.data) {
-                                var variable_name = i;
-                                var variable_value = target.data[i];
+
+                            var sorted_keys = sort_keys(target.data);
+
+                            for (var i in sorted_keys) {
+                                var variable_name = sorted_keys[i];
+                                var variable_value = target.data[variable_name];
                                 var row = document.createElement('tr');
                                 var col1 = document.createElement('th');
-                                col1.textContent = variable_name;
+                                if (variable_name == 'name')
+                                    col1.textContent = 'type of the node';
+                                else
+                                    col1.textContent = variable_name;
                                 col1.textAlign = "left";
                                 var col2 = document.createElement('td');
                                 switch(variable_name){
@@ -166,18 +172,13 @@
                                      table.appendChild(row);
                                    }
                                 }else{
-                                 table.appendChild(row);
+                                    table.appendChild(row);
                                 }
 
                             }
                             element.appendChild(table);
                         }
-
-
-
-
                     }
-
                 });
 
                 vis.draw({ network: network_xgmml,layout:"Preset"});
@@ -185,7 +186,19 @@
 
                };
 
-              function checkDataField(group_id, field){
+          function sort_keys(hash) {
+              var keys = [],
+                      k, i, len;
+              for (k in hash) {
+                  if (hash.hasOwnProperty(k)) {
+                      keys.push(k);
+                  }
+              }
+              keys.sort();
+              return keys;
+          }
+
+          function checkDataField(group_id, field){
                   var val = group_id == "nodes"? nodesDataSchema[field] : (group_id == "edges"? edgesDataSchema[field] : -1);
                   return val;
               }
