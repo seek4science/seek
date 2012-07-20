@@ -35,7 +35,10 @@ class ProjectSubscriptionTest < ActiveSupport::TestCase
     ps = current_person.project_subscriptions.create :project => @proj, :frequency => 'daily'
     ProjectSubscriptionJob.new(ps.id).perform
     assert @subscribables_in_proj.map(&:current_users_subscription).all?(&:daily?)
-    ps.frequency = 'monthly'; ps.save!
+    ps.frequency = 'monthly'
+    ps.save!
+    ProjectSubscriptionJob.new(ps.id).perform
+    @subscribables_in_proj.each(&:reload)
     assert @subscribables_in_proj.map(&:current_users_subscription).all?(&:monthly?)
   end
 

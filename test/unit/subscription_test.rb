@@ -39,17 +39,21 @@ class SubscriptionTest < ActiveSupport::TestCase
     s = Factory(:subscribable)
 
     assert !s.subscribed?
-    s.subscribe; s.save!; s.reload
+    s.subscribe
+    s.reload
     assert s.subscribed?
 
-    s.unsubscribe; s.save!; s.reload
+    s.unsubscribe
+    s.reload
     assert !s.subscribed?
 
     another_person = Factory(:person)
     assert !s.subscribed?(another_person)
-    s.subscribe(another_person); s.save!; s.reload
+    s.subscribe(another_person)
+    s.reload
     assert s.subscribed?(another_person)
-    s.unsubscribe(another_person); s.save!; s.reload
+    s.unsubscribe(another_person)
+    s.reload
     assert !s.subscribed?(another_person)
   end
 
@@ -65,18 +69,17 @@ class SubscriptionTest < ActiveSupport::TestCase
     proj = Factory(:project)
     current_person.project_subscriptions.create :project => proj, :frequency => 'immediately'
     s = Factory(:subscribable, :projects => [Factory(:project), proj], :policy => Factory(:public_policy))
-    s.subscribe; s.save!
-    
+    s.subscribe
+
     assert_emails(1) do
       al = Factory(:activity_log, :activity_loggable => s, :action => 'update')
       SendImmediateEmailsJob.new(al.id).perform
     end
 
-
     other_guy = Factory(:person)
     other_guy.project_subscriptions.create :project => proj, :frequency => 'immediately'
     s.reload
-    s.subscribe(other_guy); s.save!
+    s.subscribe(other_guy)
 
     assert_emails(2) do
       al = Factory(:activity_log, :activity_loggable => s, :action => 'update')
@@ -88,7 +91,8 @@ class SubscriptionTest < ActiveSupport::TestCase
     proj = Factory(:project)
     current_person.project_subscriptions.create :project => proj, :frequency => 'weekly'
     s = Factory(:subscribable, :projects =>[proj], :policy => Factory(:public_policy))
-    s.subscribe; s.save!
+    s.subscribe
+
 
     assert_no_emails do
       Factory(:activity_log, :activity_loggable => s, :action => 'update')
@@ -128,7 +132,7 @@ class SubscriptionTest < ActiveSupport::TestCase
     proj = Factory(:project)
     current_person.project_subscriptions.create :project => proj, :frequency => 'immediately'
     s = Factory(:subscribable, :projects => [proj], :policy => Factory(:public_policy))
-    s.subscribe; s.save!
+    s.subscribe
 
     assert_no_emails do
       al = Factory(:activity_log, :activity_loggable => s, :action => 'update')
@@ -144,7 +148,7 @@ class SubscriptionTest < ActiveSupport::TestCase
 
     disable_authorization_checks do
       person.project_subscriptions.create :project => proj, :frequency => 'immediately'
-      s.subscribe; s.save!
+      s.subscribe
     end
 
     assert_no_emails do
