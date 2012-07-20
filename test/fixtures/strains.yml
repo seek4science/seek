@@ -26,3 +26,8 @@ dummy_for_Saccharomyces_cerevisiae:
   organism: Saccharomyces_cerevisiae
   is_dummy: true
   policy: public_policy_visible_only
+
+strain_for_streptomyces_coelicolor:
+  title: M145
+  organism: Streptomyces_coelicolor
+  policy: public_policy_visible_only

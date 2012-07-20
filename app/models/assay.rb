@@ -149,19 +149,15 @@ class Assay < ActiveRecord::Base
     assay_organism.assay = self
     assay_organism.organism = organism
     strain=nil
-    if (strain_title && !strain_title.empty?)
+    if (!strain_title.blank?)
       strain=organism.strains.find_by_title(strain_title)
-      if strain.nil?
-        strain=Strain.new(:title=>strain_title,:organism_id=>organism.id)
-        strain.save!
-      end
     end
     assay_organism.culture_growth_type = culture_growth_type unless culture_growth_type.nil?
     assay_organism.strain=strain
 
     existing = AssayOrganism.all.select{|ao|ao.organism==organism and ao.assay == self and ao.strain==strain and ao.culture_growth_type==culture_growth_type}
     if existing.blank?
-    self.assay_organisms << assay_organism
+      self.assay_organisms << assay_organism
     end
 
   end
