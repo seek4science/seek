@@ -26,12 +26,29 @@ class SendPeriodicEmailsJobTest < ActiveSupport::TestCase
     assert_nil job.locked_at
     job.locked_at = Time.now
     job.save!
-    assert !SendPeriodicEmailsJob.daily_exists?,"Should ignore locked jobs"
+    assert SendPeriodicEmailsJob.daily_exists?,"Should not ignore locked jobs"
 
     job.locked_at=nil
     job.failed_at = Time.now
     job.save!
     assert !SendPeriodicEmailsJob.daily_exists?,"Should ignore failed jobs"
+
+    job.failed_at = nil
+    job.save!
+    assert SendPeriodicEmailsJob.daily_exists?
+
+    assert !SendPeriodicEmailsJob.weekly_exists?
+    assert_difference("Delayed::Job.count",1) do
+      Delayed::Job.enqueue SendPeriodicEmailsJob.new("weekly")
+    end
+    assert SendPeriodicEmailsJob.weekly_exists?
+
+    assert !SendPeriodicEmailsJob.monthly_exists?
+    assert_difference("Delayed::Job.count",1) do
+      Delayed::Job.enqueue SendPeriodicEmailsJob.new("monthly")
+    end
+    assert SendPeriodicEmailsJob.monthly_exists?
+
   end
 
   test "create job" do
@@ -64,13 +81,52 @@ class SendPeriodicEmailsJobTest < ActiveSupport::TestCase
     SendPeriodicEmailsJob.create_job('daily', 15.minutes.from_now)
     SendPeriodicEmailsJob.create_job('weekly', 15.minutes.from_now)
     SendPeriodicEmailsJob.create_job('monthly', 15.minutes.from_now)
-    assert_emails 3 do
+    disable_authorization_checks do
+      Factory :activity_log,:activity_loggable => sop, :culprit => Factory(:user), :action => 'create'
+    end
+    assert_emails 1 do
+      SendPeriodicEmailsJob.new('daily').perform
+    end
+    assert_emails 1 do
+      SendPeriodicEmailsJob.new('weekly').perform
+    end
+    assert_emails 1 do
+      SendPeriodicEmailsJob.new('monthly').perform
+    end
+  end
+
+  test "perform ignores unwanted actions" do
+    Delayed::Job.destroy_all
+    person1 = Factory(:person)
+    person2 = Factory(:person)
+    person3 = Factory(:person)
+    sop = Factory(:sop, :policy => Factory(:public_policy))
+    project_subscription1 = ProjectSubscription.create(:person_id => person1.id, :project_id => sop.projects.first.id, :frequency => 'daily')
+    project_subscription2 = ProjectSubscription.create(:person_id => person2.id, :project_id => sop.projects.first.id, :frequency => 'weekly')
+    project_subscription3 = ProjectSubscription.create(:person_id => person3.id, :project_id => sop.projects.first.id, :frequency => 'monthly')
+    ProjectSubscriptionJob.new(project_subscription1.id).perform
+    ProjectSubscriptionJob.new(project_subscription2.id).perform
+    ProjectSubscriptionJob.new(project_subscription3.id).perform
+    sop.reload
+
+    SendPeriodicEmailsJob.create_job('daily', 15.minutes.from_now)
+    SendPeriodicEmailsJob.create_job('weekly', 15.minutes.from_now)
+    SendPeriodicEmailsJob.create_job('monthly', 15.minutes.from_now)
+    assert_emails 0 do
       disable_authorization_checks do
-        ActivityLog.create(:activity_loggable => sop, :culprit => Factory(:user), :action => 'create')
+        Factory :activity_log,:activity_loggable => sop, :culprit => Factory(:user), :action => 'show'
+        Factory :activity_log,:activity_loggable => sop, :culprit => Factory(:user), :action => 'download'
+        Factory :activity_log,:activity_loggable => sop, :culprit => Factory(:user), :action => 'destroy'
       end
       SendPeriodicEmailsJob.new('daily').perform
       SendPeriodicEmailsJob.new('weekly').perform
       SendPeriodicEmailsJob.new('monthly').perform
     end
+  end
+
+  test "perform2" do
+    Delayed::Job.destroy_all
+    person1 = Factory(:person)
+    person2 = Factory(:person)
   end
 end

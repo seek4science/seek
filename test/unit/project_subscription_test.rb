@@ -1,5 +1,5 @@
 require 'test_helper'
-#Authorization tests that are specific to public access
+
 class ProjectSubscriptionTest < ActiveSupport::TestCase
 
   def setup

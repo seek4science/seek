@@ -57,12 +57,10 @@ module Subscribable
            #also build subscriptions for studies and assays associating with this investigation
           if self.kind_of?(Investigation)
             self.studies.each do |study|
-              study.subscriptions.build(:person => person, :project_subscription_id => ps.id) if !study.subscribed?(person)
-              study.save
+              study.subscriptions << Subscription.new(:person => person, :project_subscription_id => ps.id) if !study.subscribed?(person)
             end
             self.assays.each do |assay|
-              assay.subscriptions.build(:person => person, :project_subscription_id => ps.id) if !assay.subscribed?(person)
-              assay.save
+              assay.subscriptions << Subscription.new(:person => person, :project_subscription_id => ps.id) if !assay.subscribed?(person)
             end
           end
         end
@@ -115,7 +113,7 @@ module Subscribable
 
   module ClassMethods
     def subscribers_are_notified_of? action
-      action != 'show' && action != 'download' && action != 'destroy'
+      action!="show" && action!="download" && action!="destroy"
     end
   end
 end
