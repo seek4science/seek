@@ -41,6 +41,7 @@ class Specimen < ActiveRecord::Base
   validates_presence_of :title,:lab_internal_number, :contributor,:strain
 
   validates_presence_of :institution if Seek::Config.is_virtualliver
+  validates_presence_of :projects, :unless => Proc.new{|s| s.is_dummy? || Seek::Config.is_virtualliver}
   validates_uniqueness_of :title
 
   AGE_UNITS = ["second","minute","hour","day","week","month","year"]
