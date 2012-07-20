@@ -8,10 +8,11 @@ SEEK will try and suggest the correct person based on the author's name. If this
       <th>Author name</th>
       <th>SEEK person</th>
     </tr>
+    <% people = Person.all.select(&:can_view?) %>
     <% authors.each do |author| %>
     <tr>    
       <td><%= author.last_name + " " + author.first_name -%></td>
-      <td><select name="author[<%= author.id -%>]"><option value="">None</option><%= people_by_project_options(Project.all,author_associations[author.id],[project]) -%></select></td>
+      <td><select name="author[<%= author.id -%>]"><option value="">None</option><%= people.map {|person| "<option #{person == author_associations[author.id] ? 'selected="selected"' : ''} value=\"#{person.id}\" title=\"#{h person.name}\">#{h truncate(person.name)}</option>"} -%></select></td>
     </tr>
     <% end %>
   </table>
