@@ -13,6 +13,26 @@ class SubscriptionTest < ActiveSupport::TestCase
       Delayed::Job.destroy_all
       Seek::Config.email_enabled=@val
   end
+
+  test "for_susbscribable" do
+    p=User.current_user.person
+    p2=Factory :person
+    sop=Factory :sop
+    sop2=Factory :sop
+    assay=Factory :sop
+    assay2=Factory :sop
+    Factory :subscription, :person=>p,:subscribable=>sop
+    Factory :subscription, :person=>p2,:subscribable=>sop
+    Factory :subscription, :person=>p,:subscribable=>sop2
+    Factory :subscription, :person=>p,:subscribable=>assay
+    Factory :subscription, :person=>p,:subscribable=>assay2
+
+    assert_equal 2,Subscription.for_subscribable(sop).count
+    assert_equal [sop,sop],Subscription.for_subscribable(sop).collect{|s| s.subscribable}
+    assert_equal [assay],Subscription.for_subscribable(assay).collect{|s| s.subscribable}
+    assert_equal [sop],p.subscriptions.for_subscribable(sop).collect{|s| s.subscribable}
+
+  end
   
 
   test 'subscribing and unsubscribing toggle subscribed?' do
