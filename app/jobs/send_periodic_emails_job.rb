@@ -36,16 +36,18 @@ class SendPeriodicEmailsJob < Struct.new(:frequency)
   def send_subscription_mails logs, frequency
     if Seek::Config.email_enabled
       #strip the logs down to those that are relevant
-      logs.reject!{|log| !log.activity_loggable.subscribers_are_notified_of?(log.action) || !log.activity_loggable.subscribable?}
+      logs.reject! do |log|
+        !(log.activity_loggable.subscribable? && log.activity_loggable.subscribers_are_notified_of?(log.action))
+      end
 
       Person.scoped(:include => [:notifiee_info,:subscriptions]).select{ |p| p.receive_notifications? }.each do |person|
         begin
           #get only the logs for items that are visible to this person
           logs_for_visible_items = logs.select{|log| log.activity_loggable.try(:can_view?,person.user)}
 
-          #get the logs for this persons subscribable items, and where the subscription is within the correct frequency
+          #get the logs for this persons subscribable items, where the subscription has the correct frequency
           activity_logs = logs_for_visible_items.select do |log|
-            !person.subscriptions.for_subscribable(log.activity_loggable).scoped(:include =>[:subscribable, :project_subscription]).select{ |s| s.frequency == frequency }.empty?
+            !person.subscriptions.for_subscribable(log.activity_loggable).select{ |s| s.frequency == frequency }.empty?
           end
           SubMailer.deliver_send_digest_subscription person, activity_logs, frequency unless activity_logs.blank?
         rescue Exception => e
