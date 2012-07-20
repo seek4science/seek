@@ -140,20 +140,18 @@ class PublicationsControllerTest < ActionController::TestCase
 
 
   test "should associate authors" do
-    p = publications(:pubmed_2)
-    assert_equal 2, p.non_seek_authors.size
+    p = Factory(:publication, :publication_authors => [Factory.build(:publication_author), Factory.build(:publication_author)])
+    assert_equal 2, p.publication_authors.size
     assert_equal 0, p.creators.size
     
     seek_author1 = people(:modeller_person)
     seek_author2 = people(:quentin_person)    
     
     #Associate a non-seek author to a seek person
-
-    #Check the non_seek_authors (PublicationAuthors) decrease by 1, and the
-    # seek_authors (AssetsCreators) increase by 1.
-    assert_difference('PublicationAuthor.count', -2) do
+.
+    assert_difference('PublicationAuthor.count', 0) do
       assert_difference('AssetsCreator.count', 2) do
-        put :update, :id => p.id, :author => {p.non_seek_authors[1].id => seek_author2.id,p.non_seek_authors[0].id => seek_author1.id}
+        put :update, :id => p.id, :author => {p.publication_authors[1].id => seek_author2.id,p.publication_authors[0].id => seek_author1.id}
       end
     end
     
@@ -170,12 +168,12 @@ class PublicationsControllerTest < ActionController::TestCase
     p.creators << people(:quentin_person)
     p.creators << people(:aaron_person)
     
-    assert_equal 0, p.non_seek_authors.size
+    assert_equal 2, p.publication_authors.size
+    assert_equal 2, p.publication_authors.reject(&:person)
     assert_equal 2, p.creators.size
     
-    #Check the non_seek_authors (PublicationAuthors) increase by 2, and the
-    # seek_authors (AssetsCreators) decrease by 2.
-    assert_difference('PublicationAuthor.count', 2) do
+    assert_difference('PublicationAuthor.count', 0) do
+      # seek_authors (AssetsCreators) decrease by 2.
       assert_difference('AssetsCreator.count', -2) do
         post :disassociate_authors, :id => p.id
       end 

@@ -91,7 +91,7 @@ class PublicationTest < ActiveSupport::TestCase
   test "sort by published_date" do
     assert_equal Publication.find(:all).sort_by { |p| p.published_date}.reverse, Publication.find(:all)
   end
-  
+
   test "title trimmed" do
     x = Factory :publication, :title => " a pub"
     assert_equal("a pub",x.title)
@@ -112,28 +112,6 @@ class PublicationTest < ActiveSupport::TestCase
 
     asset=Publication.new :title=>"fred",:doi=>"111"
     assert asset.valid?
-  end
-  
-  test "creators order is returned in the order they were added" do
-    p=Factory :publication
-    assert_equal 0,p.creators.size
-    
-    p1=people(:modeller_person)
-    p2=people(:fred)    
-    p3=people(:aaron_person)
-    p4=people(:pal)
-
-    User.with_current_user(p.contributor) do
-      p.creators << p1
-      p.creators << p2
-      p.creators << p3
-      p.creators << p4
-
-      p.save!
-    end
-    
-    assert_equal 4,p.creators.size
-    assert_equal [p1,p2,p3,p4],p.creators
   end
   
   test "uuid doesn't change" do
