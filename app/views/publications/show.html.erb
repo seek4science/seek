@@ -42,16 +42,17 @@
       </p>
 
       <p>
-        <label>Author<%= @publication.seek_authors.size + @publication.non_seek_authors.size > 1 ? "s" : "" -%>:</label>
-        <% if @publication.seek_authors.empty? && @publication.non_seek_authors.empty? %>
-          <span class='none_text'>Not specified</span>
+        <b>Author<%= @publication.publication_authors.size > 1 ? "s" : "" -%>:</b>
+        <% if @publication.publication_authors.empty? %>
+            <span class='none_text'>Not specified</span>
         <% else %>
-          <% @publication.seek_authors.select(&:can_view?).each do |author| %>
-            <%= (link_to get_object_title(author), show_resource_path(author)) + ((author == @publication.creators.last) && (@publication.non_seek_authors.empty?) ? "" : ", ") %>
-          <% end %>
-          <% (@publication.non_seek_authors + @publication.seek_authors.reject(&:can_view?)).each do |author| %>
-            <%= author.last_name + " " + author.first_name + ((author == @publication.non_seek_authors.last) ? "" : ", ") %>
-          <% end %>
+            <%= @publication.publication_authors.map do |author|
+              if author.person && author.person.can_view?
+                link_to get_object_title(author.person), show_resource_path(author.person)
+              else
+                author.last_name + " " + author.first_name
+              end
+            end.join(', ') %>
         <% end %>
       </p>
 

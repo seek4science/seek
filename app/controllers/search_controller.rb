@@ -65,15 +65,19 @@ class SearchController < ApplicationController
           sources = [Person, Project, Institution, Sop, Model, Study, DataFile, Assay, Investigation, Publication, Presentation, Event, Sample, Specimen]
           sources.delete(Specimen) if !Seek::Config.is_virtualliver
           sources.each do |source|
-            @results |=  source.search do |query|
-               query.keywords downcase_query
+            search_result = source.search do |query|
+              query.keywords downcase_query
             end.results
+            search_result.sort_by(&:published_date).reverse if source == Publication
+            @results |= search_result
           end
       else
            object = type=='data_files' ? DataFile : type.singularize.capitalize.constantize
-           @results =  object.search do |query|
-              query.keywords downcase_query
-          end.results
+           search_result = object.search do |query|
+             query.keywords downcase_query
+           end.results
+           search_result.sort_by(&:published_date).reverse if object == Publication
+           @results = search_result
       end
     end
   end

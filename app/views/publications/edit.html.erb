@@ -26,14 +26,14 @@
     To reset the author list to the state of the original PubMed article, click the "Disassociate All Authors".<br/>
     
     <div style="margin:1em; float: left; width:45%" class="box_editing_inner">
-      <h4>Unassociated authors</h4>
-      <% unless @publication.non_seek_authors.empty? %>
+      <h4>Author Associations</h4>
+      <% unless @publication.publication_authors.empty? %>
         <table>
           <tr>
             <th>Author name</th>
             <th>SEEK person</th>
           </tr>
-          <% @publication.non_seek_authors.each do |author| %>
+          <% @publication.publication_authors.each do |author| %>
           <tr>    
             <td><%= author.last_name + " " + author.first_name -%></td>
             <td><select name="author[<%= author.id -%>]"><option value="">None</option><%= people_by_project_options(Project.all,@author_associations[author.id],projects) -%></select></td>

@@ -26,7 +26,24 @@ class Publication < ActiveRecord::Base
   #validates_uniqueness_of :doi, :message => "publication has already been registered with that ID."
   validates_uniqueness_of :title, :message => "not unique - A publication has already been registered with that title."
   
-  has_many :non_seek_authors, :class_name => 'PublicationAuthor', :dependent => :destroy
+  has_many :publication_authors, :dependent => :destroy, :autosave => true
+
+  after_update :update_creators_from_publication_authors
+  after_update :update_policy_from_publication_authors
+
+  def update_creators_from_publication_authors
+    self.creators = publication_authors.map(&:person).compact
+  end
+
+  def update_policy_from_publication_authors
+    #Update policy so current authors have manage permissions
+    policy.permissions.clear
+    creators.each do |author|
+      policy.permissions << Permission.create(:contributor => author, :policy => policy, :access_type => Policy::MANAGING)
+    end
+    #Add contributor
+   policy.permissions << Permission.create(:contributor => contributor.person, :policy => policy, :access_type => Policy::MANAGING)
+  end
   
   has_many :backwards_relationships, 
     :class_name => 'Relationship',
@@ -52,14 +69,14 @@ class Publication < ActiveRecord::Base
   end
 
   alias :seek_authors :creators
-  
+
   searchable(:ignore_attribute_changes_of=>[:updated_at,:last_used_at]) do
     text :title,:abstract,:journal,:searchable_tags, :pubmed_id, :doi
     text :seek_authors do
       seek_authors.compact.map(&:name)
     end
-    text :non_seek_authors do
-      non_seek_authors.compact.map(&:first_name) + non_seek_authors.compact.map(&:last_name)
+    text :publication_authors do
+      publication_authors.compact.map(&:first_name) + publication_authors.compact.map(&:last_name)
     end
   end if Seek::Config.solr_enabled
 
@@ -117,7 +134,7 @@ class Publication < ActiveRecord::Base
     else
       #TODO: Bio::Reference supports a 'url' option. Should this be the URL on seek, or the URL of the 'View Publication' button, or neither?
       Bio::Reference.new({:title => title, :journal => journal, :abstract => abstract,
-                          :authors => (seek_authors + non_seek_authors).map {|e| [e.last_name, e.first_name].join(', ')},
+                          :authors => publication_authors.map {|e| e.person ? [e.person.last_name, e.person.first_name].join(', ') : [e.last_name, e.first_name].join(', ')},
                           :year => published_date.year}.with_indifferent_access)
     end
   end

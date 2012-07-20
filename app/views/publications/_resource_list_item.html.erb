@@ -1,17 +1,17 @@
 <%= list_item_title resource %>
 
 <p class="list_item_attribute">
-  <b>Author<%= resource.seek_authors.size + resource.non_seek_authors.size > 1 ? "s" : "" -%>:</b>
-  <% if resource.seek_authors.empty? && resource.non_seek_authors.empty? %>
+  <b>Author<%= resource.publication_authors.size > 1 ? "s" : "" -%>:</b>
+  <% if resource.publication_authors.empty? %>
     <span class='none_text'>Not specified</span>
   <% else %>
-    <% resource.seek_authors.select(&:can_view?).each do |author| %>
-          <%  %>
-      <%= (link_to get_object_title(author), show_resource_path(author)) + ((author == resource.creators.last) && (resource.non_seek_authors.empty?) ? "" : ", ") %>
-    <% end %>
-    <% (resource.non_seek_authors + resource.seek_authors.reject(&:can_view?)).each do |author| %>
-      <%= author.last_name + " " + author.first_name + ((author == resource.non_seek_authors.last) ? "" : ", ") %>
-    <% end %>
+    <%= resource.publication_authors.map do |author|
+      if author.person && author.person.can_view?
+        link_to get_object_title(author.person), show_resource_path(author.person)
+      else
+        author.last_name + " " + author.first_name
+      end
+    end.join(', ') %>
   <% end %>
 </p>
 
