@@ -47,7 +47,7 @@ class SendPeriodicEmailsJob < Struct.new(:frequency)
 
           #get the logs for this persons subscribable items, where the subscription has the correct frequency
           activity_logs = logs_for_visible_items.select do |log|
-            !person.subscriptions.for_subscribable(log.activity_loggable).scoped(:include =>[:subscribable, :project_subscription]).select{ |s| s.frequency == frequency }.empty?
+            !person.subscriptions.for_subscribable(log.activity_loggable).select{ |s| s.frequency == frequency }.empty?
           end
           SubMailer.deliver_send_digest_subscription person, activity_logs, frequency unless activity_logs.blank?
         rescue Exception => e
