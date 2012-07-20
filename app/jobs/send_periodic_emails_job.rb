@@ -24,7 +24,7 @@ class SendPeriodicEmailsJob < Struct.new(:frequency)
   Subscription::FREQUENCIES.drop(1).each do |frequency|
     eval <<-END_EVAL
     def self.#{frequency}_exists?
-      Delayed::Job.find(:first,:conditions=>['handler = ? AND locked_at IS ? AND failed_at IS ?',SendPeriodicEmailsJob.new('#{frequency}').to_yaml,nil,nil]) != nil
+      Delayed::Job.find(:first,:conditions=>['handler = ? AND failed_at IS ?',SendPeriodicEmailsJob.new('#{frequency}').to_yaml,nil]) != nil
     end
     END_EVAL
   end
