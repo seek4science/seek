@@ -1,3 +1,5 @@
+require 'atom'
+
 module Seek
   class FeedReader
 

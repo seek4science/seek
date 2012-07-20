@@ -17,6 +17,8 @@ class ModelsController < ApplicationController
     
   before_filter :jws_enabled,:only=>[:builder,:simulate,:submit_to_jws]
 
+  before_filter :experimental_features, :only=>[:matching_data]
+
   include Seek::Publishing
   include Seek::BreadCrumbs
 
@@ -608,25 +610,16 @@ class ModelsController < ApplicationController
     respond_to do |format|
       format.html
     end
-
-    #render :update do |page|
-    #  page.visual_effect :toggle_blind,"matching_data_files"
-    #  page.visual_effect :toggle_blind,'matching_results'
-    #  html = ""
-    #  matching_files.each do |match|
-    #    data_file = DataFile.find(match.primary_key)
-    #    if (data_file.can_view?)
-    #      html << "<div>"
-    #      html << "<div class='matchmake_result'>Matched with <b>#{match.search_terms.join(', ')}</b></div>"
-    #      html << render(:partial=>"layouts/resource_list_item", :object=>data_file)
-    #      html << "</div>"
-    #    end
-    #  end
-    #  page.replace_html "matching_results",:text=>html
-    #end
   end
   
   protected
+
+  def experimental_features
+    if !Seek::Config.experimental_features_enabled
+      flash[:error]="Not available"
+      redirect_to @model
+    end
+  end
   
   def create_new_version comments
     if @model.save_as_new_version(comments)

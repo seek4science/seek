@@ -7,6 +7,7 @@ require 'ruby-prof'
 require 'factory_girl'
 require 'webmock/test_unit'
 require 'action_view/test_case'
+require 'tmpdir'
 
 Rails.cache.class.class_eval do
   #Doesn't do any good if the cache is being used directly via read/write
@@ -138,6 +139,19 @@ class ActiveSupport::TestCase
     xml=File.open(contents_path,"r").read
     stub_request(:get,path).to_return(:status=>200,:body=>xml)
     path
+  end
+
+  #debugging
+
+  #saves the @response.body to a temp file, and prints out the file path
+  def record_body
+      dir=Dir.mktmpdir("seek")
+      f=File.new("#{dir}/body.html","w+")
+      f.write(@response.body)
+      f.flush
+      f.close
+      puts "Written @response.body to #{f.path}"
+
   end
   
 end
