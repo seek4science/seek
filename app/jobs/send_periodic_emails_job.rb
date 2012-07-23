@@ -65,10 +65,10 @@ class SendPeriodicEmailsJob < Struct.new(:frequency)
   #returns an enumaration of the people subscribed to the items in the logs
   def people_subscribed_to_logged_items logs
     items = logs.collect{|log| log.activity_loggable}.uniq
-    people = items.collect do |item|
+    items.collect do |item|
       subscriptions = Subscription.find_all_by_subscribable_type_and_subscribable_id(item.class.name,item.id)
       subscriptions.collect{|sub| sub.person}
-    end.flatten.uniq
+    end.flatten.compact.uniq
   end
 
   # puts the initial jobs on the queue for each period - daily, weekly, monthly - if they do not exist already
