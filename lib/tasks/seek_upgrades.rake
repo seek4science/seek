@@ -2,6 +2,7 @@ require 'rubygems'
 require 'rake'
 require 'active_record/fixtures'
 require 'uuidtools'
+require 'fastercsv'
 
 namespace :seek do
   
@@ -37,6 +38,57 @@ namespace :seek do
             pa.last_name = author.last_name
             pa.author_index = index
             pa.save
+          end
+        end
+      end
+    end
+  end
+
+  desc "guess publication authors and dump to a csv"
+  task :guess_publication_authors_to_csv => [:environment] do
+    FasterCSV.open("publication_authors.csv", "w") do |csv|
+      Publication.all.each do |publication|
+        publication.publication_authors.each do |author|
+          matches = []
+          #Get author by last name
+          last_name_matches = Person.find_all_by_last_name(author.last_name)
+          matches = last_name_matches
+          #If no results, try searching by normalised name, taken from grouped_pagination.rb
+          if matches.size < 1
+            text = author.last_name
+            #handle the characters that can't be handled through normalization
+            %w[ØO].each do |s|
+              text.gsub!(/[#{s[0..-2]}]/, s[-1..-1])
+            end
+
+            codepoints = text.mb_chars.normalize(:d).split(//u)
+            ascii=codepoints.map(&:to_s).reject { |e| e.length > 1 }.join
+
+            last_name_matches = Person.find_all_by_last_name(ascii)
+            matches = last_name_matches
+          end
+
+          #If more than one result, filter by project
+          if matches.size > 1
+            project_matches = matches.select { |p| p.member_of?(projects) }
+            if project_matches.size >= 1 #use this result unless it resulted in no matches
+              matches = project_matches
+            end
+          end
+
+          #If more than one result, filter by first initial
+          if matches.size > 1
+            first_and_last_name_matches = matches.select { |p| p.first_name.at(0).upcase == author.first_name.at(0).upcase }
+            if first_and_last_name_matches.size >= 1 #use this result unless it resulted in no matches
+              matches = first_and_last_name_matches
+            end
+          end
+
+          #Take the first match as the guess
+          if match = matches.first
+            csv << [publication.name, link_to(publication), author.first_name, author.last_name, link_to(author), match.first_name, match.last_name, link_to(match)]
+          else
+            csv << [publication.name, link_to(publication), author.first_name, author.last_name, link_to(author), nil, nil, nil]
           end
         end
       end
