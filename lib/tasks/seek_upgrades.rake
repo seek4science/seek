@@ -49,7 +49,8 @@ namespace :seek do
     FasterCSV.open("publication_authors.csv", "w") do |csv|
       Publication.all.each do |publication|
         publication.publication_authors.each do |author|
-	  projects = publication.projects.empty? ? (publication.contributor.try(:projects) || []) : publication.project
+	  projects = publication.projects.empty? ? 
+(publication.contributor.try(:person).try(:projects) || []) : publication.project
           matches = []
           #Get author by last name
           last_name_matches = Person.find_all_by_last_name(author.last_name)
