@@ -44,7 +44,7 @@ class DataFile < ActiveRecord::Base
     end
 
     def to_presentation_version
-      returning Presentation::Version.new do |presentation_version|
+      Presentation::Version.new.tap do |presentation_version|
         presentation_version.attributes.keys.each do |attr|
           presentation_version.send("#{attr}=", send("#{attr}")) if respond_to? attr and attr!="id"
         end
@@ -162,7 +162,7 @@ class DataFile < ActiveRecord::Base
   def to_presentation
     presentation_attrs = attributes.delete_if { |k, v| !Presentation.new.attributes.include? k}
 
-    returning Presentation.new(presentation_attrs) do |presentation|
+    Presentation.new(presentation_attrs).tap do |presentation|
       DataFile.reflect_on_all_associations.select { |a| [:has_many, :has_and_belongs_to_many, :has_one].include?(a.macro) && !a.through_reflection }.each do |a|
         #disabled, because even if the user doing the conversion would not normally
         #be able to associate an item with his data_file/presentation, the pre-existing
@@ -198,7 +198,7 @@ class DataFile < ActiveRecord::Base
 
       #copying annotations has to be done after saving the presentation due to limitations of the annotation plugin
       disable_authorization_checks do #disabling because annotations should be copied over even if the user would normally lack permission to do so
-        presentation.annotations = self.annotations
+        presentation.annotations = self.annotations.select{|a| a.attribute_name == 'tag'}
       end
     end
   end

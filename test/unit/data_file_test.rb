@@ -240,7 +240,7 @@ class DataFileTest < ActiveSupport::TestCase
       Factory :attribution,:subject=>data_file,:object=>attribution_df
       Factory :relationship,:subject=>data_file,:object=>Factory(:publication),:predicate=>Relationship::RELATED_TO_PUBLICATION
       data_file.creators = [Factory(:person),Factory(:person)]
-      Factory :annotation,:attribute_name=>"tags",:annotatable=> data_file,:attribute_id => AnnotationAttribute.create(:name=>"tags").id
+      Factory :annotation,:attribute_name=>"tag",:annotatable=> data_file,:attribute_id => AnnotationAttribute.create(:name=>"tags").id
       data_file.events = [Factory(:event)]
       data_file.save!
 
@@ -314,6 +314,31 @@ class DataFileTest < ActiveSupport::TestCase
         assert_equal 1, data_file.annotations.count
         assert_equal 0, data_file.annotations.first.versions.count
         assert 'fish', data_file.annotations.first.value.text
+
+        data_file_converted = data_file.to_presentation
+        data_file_converted.reload
+        data_file.reload
+
+        assert [], data_file.annotations
+        assert [], Annotation::Version.find(:all, :conditions => ['annotatable_type=? and annotatable_id=?', 'DataFile', data_file.id])
+        assert_equal 1, data_file_converted.annotations.count
+        assert_equal 0, data_file_converted.annotations.first.versions.count
+        assert 'fish', data_file_converted.annotations.first.value.text
+      }
+  end
+
+  test 'should not convert other annotation types but tag from datafile to presentation' do
+      user = Factory :user
+      User.with_current_user(user) {
+        data_file = Factory :data_file,:contributor=>user
+        Factory :tag,:annotatable=>data_file,:source=>user,:value=>"fish"
+        Factory :annotation, :annotatable => data_file, :source=>user,:value=>"cat"
+
+        assert_equal 2, data_file.annotations.count
+        assert_equal 0, data_file.annotations.first.versions.count
+        assert_equal 0, data_file.annotations.last.versions.count
+        assert data_file.annotations.collect(&:value).collect(&:text).include?('fish')
+        assert data_file.annotations.collect(&:value).collect(&:text).include?('cat')
 
         data_file_converted = data_file.to_presentation
         data_file_converted.reload
