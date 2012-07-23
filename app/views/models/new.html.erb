@@ -4,7 +4,8 @@
     <% form_tag({:action => :create}, :multipart => true) do -%>
     <div class="asset_form">
         <%= error_messages_for :model -%>
-        <%= render :partial=>"assets/upload_box",:locals=>{:resource=>@model} -%>
+        <%= render :partial=>"assets/upload_box",:locals=>{:resource=>@model} -%>       
+
         <p style="margin-top: 1.5em;">
             <b>Title</b>
             <span class="required">*</span>
@@ -18,22 +19,9 @@
             <% model_description_value = (params[:model].blank? || params[:model][:description].blank?) ? nil : params[:model][:description] -%>
             <%= text_area_tag 'model[description]', model_description_value, :style => "width: 100%;", :rows => 10 -%>
         </p>
-        <p>
-            <div class="fold">
-                <div class="foldTitle">
-                    Other information 
-                </div>
-                <div class="foldContent">
-                  <%= render :partial => "projects/project_selector", :locals => { :resource => @model } -%>
-                    <%= render :partial=>"model_metadata" -%>
-                </div>
-            </div>
-        </p>
 
-
-        <%= render :partial => "organisms/select_organism",:locals=>{:model_class=>Model} -%>
-
-      <% if @model && (mine?(@model) || @model.can_edit?) -%>
+      <p>
+        <% if @model && (mine?(@model) || @model.can_edit?) -%>
           <div class="fold">
             <div class="foldTitle">
               <%= help_icon("Here you can also upload image for this model") -%>
@@ -49,6 +37,21 @@
             </div>
           </div>
       <% end -%>
+      </p>
+      <p>
+            <div class="fold">
+                <div class="foldTitle">
+                    Other information 
+                </div>
+                <div class="foldContent">
+                  <%= render :partial => "projects/project_selector", :locals => { :resource => @model } -%>
+                    <%= render :partial=>"model_metadata" -%>
+                </div>
+            </div>
+        </p>
+
+
+        <%= render :partial => "organisms/select_organism",:locals=>{:model_class=>Model} -%>
 
         <%= fields_for(@model) {|f| render :partial=>"assets/asset_form_bottom", :locals=> {:f => f}} -%>
         <%= render :partial => "assays/associate_assays", :locals=>{:resource => @model, :show_relationships => false} -%>
