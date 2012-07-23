@@ -86,9 +86,9 @@ namespace :seek do
 
           #Take the first match as the guess
           if match = matches.first
-            csv << [publication.name, link_to(publication), author.first_name, author.last_name, link_to(author), match.first_name, match.last_name, link_to(match)]
+            csv << [publication.title, link_to(publication), author.first_name, author.last_name, link_to(author), match.first_name, match.last_name, link_to(match)]
           else
-            csv << [publication.name, link_to(publication), author.first_name, author.last_name, link_to(author), nil, nil, nil]
+            csv << [publication.title, link_to(publication), author.first_name, author.last_name, link_to(author), nil, nil, nil]
           end
         end
       end
