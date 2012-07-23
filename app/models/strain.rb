@@ -111,4 +111,9 @@ class Strain < ActiveRecord::Base
       end
     end
   end
+
+  #defines that this is a user_creatable object, and appears in the "New Object" gadget
+  def self.user_creatable?
+    true
+  end
 end
