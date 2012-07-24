@@ -38,7 +38,7 @@ class SendPeriodicEmailsJob < Struct.new(:frequency)
     if Seek::Config.email_enabled
       #strip the logs down to those that are relevant
       logs.reject! do |log|
-        !(log.activity_loggable.subscribable? && log.activity_loggable.subscribers_are_notified_of?(log.action))
+        log.activity_loggable.nil? || !(log.activity_loggable.subscribable? && log.activity_loggable.subscribers_are_notified_of?(log.action))
       end
 
       #limit to only the people subscribed to the items logged, and those that are set to receive notifications
