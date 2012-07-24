@@ -1,0 +1,22 @@
+<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <soapenv:Body>
+    <ns1:getModelsIdByNameResponse soapenv:encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" xmlns:ns1="http://biomodels.ebi.ac.uk">
+      <getModelsIdByNameReturn soapenc:arrayType="xsd:string[14]" xsi:type="soapenc:Array" xmlns:soapenc="http://schemas.xmlsoap.org/soap/encoding/">
+        <getModelsIdByNameReturn xsi:type="xsd:string">MODEL0072364382</getModelsIdByNameReturn>
+        <getModelsIdByNameReturn xsi:type="xsd:string">MODEL8459127548</getModelsIdByNameReturn>
+        <getModelsIdByNameReturn xsi:type="xsd:string">MODEL1011020000</getModelsIdByNameReturn>
+        <getModelsIdByNameReturn xsi:type="xsd:string">MODEL1002240000</getModelsIdByNameReturn>
+        <getModelsIdByNameReturn xsi:type="xsd:string">MODEL1012110001</getModelsIdByNameReturn>
+        <getModelsIdByNameReturn xsi:type="xsd:string">MODEL1001200000</getModelsIdByNameReturn>
+        <getModelsIdByNameReturn xsi:type="xsd:string">MODEL1201230000</getModelsIdByNameReturn>
+        <getModelsIdByNameReturn xsi:type="xsd:string">BIOMD0000000245</getModelsIdByNameReturn>
+        <getModelsIdByNameReturn xsi:type="xsd:string">BIOMD0000000406</getModelsIdByNameReturn>
+        <getModelsIdByNameReturn xsi:type="xsd:string">MODEL1009220000</getModelsIdByNameReturn>
+        <getModelsIdByNameReturn xsi:type="xsd:string">MODEL1107190000</getModelsIdByNameReturn>
+        <getModelsIdByNameReturn xsi:type="xsd:string">MODEL1008240001</getModelsIdByNameReturn>
+        <getModelsIdByNameReturn xsi:type="xsd:string">MODEL1004070001</getModelsIdByNameReturn>
+        <getModelsIdByNameReturn xsi:type="xsd:string">BIOMD0000000111</getModelsIdByNameReturn>
+      </getModelsIdByNameReturn>
+    </ns1:getModelsIdByNameResponse>
+  </soapenv:Body>
+</soapenv:Envelope>

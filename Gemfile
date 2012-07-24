@@ -19,13 +19,17 @@ gem 'rest-client',">=1.6.1"
 gem 'calendar_date_select'
 gem 'factory_girl',"1.3.3"
 gem 'ratom',"0.6.9"
-gem 'sunspot_rails'
-gem 'sunspot_solr'
+gem 'sunspot_rails','1.3.3'
+gem 'sunspot_solr','1.3.3'
+gem 'search_biomodel', ">=2.1.6"
+gem 'savon'
 
 gem "delayed_job","~>2.0.4"
 gem "daemons"
 gem "cancan"
 gem "in_place_editing"
+
+
 
 gem "rdf"
 gem "rdf-rdfxml"

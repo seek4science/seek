@@ -55,7 +55,7 @@ class SearchController < ApplicationController
             end.results
           end
       else
-           object = type=='data_files' ? DataFile : type.singularize.capitalize.constantize
+           object = type.singularize.camelize.constantize
            @results =  object.search do |query|
               query.keywords downcase_query
           end.results
