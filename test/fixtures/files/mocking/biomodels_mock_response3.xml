@@ -1,0 +1,7 @@
+<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <soapenv:Body>
+    <ns1:getModelsIdByPersonResponse soapenv:encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" xmlns:ns1="http://biomodels.ebi.ac.uk">
+      <getModelsIdByPersonReturn xsi:type="soapenc:Array" xsi:nil="true" xmlns:soapenc="http://schemas.xmlsoap.org/soap/encoding/"/>
+    </ns1:getModelsIdByPersonResponse>
+  </soapenv:Body>
+</soapenv:Envelope>

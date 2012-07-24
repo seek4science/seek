@@ -18,6 +18,7 @@ class SendPeriodicEmailsJob < Struct.new(:frequency)
     rescue Exception=>e
       #add job for next period
       SendPeriodicEmailsJob.create_job(frequency, next_run_at, 1)
+      raise e
     end
   end
 
@@ -37,10 +38,14 @@ class SendPeriodicEmailsJob < Struct.new(:frequency)
     if Seek::Config.email_enabled
       #strip the logs down to those that are relevant
       logs.reject! do |log|
-        !(log.activity_loggable.subscribable? && log.activity_loggable.subscribers_are_notified_of?(log.action))
+        log.activity_loggable.nil? || !(log.activity_loggable.subscribable? && log.activity_loggable.subscribers_are_notified_of?(log.action))
       end
 
-      Person.scoped(:include => [:notifiee_info,:subscriptions]).select{ |p| p.receive_notifications? }.each do |person|
+      #limit to only the people subscribed to the items logged, and those that are set to receive notifications
+      people = people_subscribed_to_logged_items logs
+      people.reject!{|person| !person.receive_notifications?}
+
+      people.each do |person|
         begin
           #get only the logs for items that are visible to this person
           logs_for_visible_items = logs.select{|log| log.activity_loggable.try(:can_view?,person.user)}
@@ -55,6 +60,15 @@ class SendPeriodicEmailsJob < Struct.new(:frequency)
         end
       end
     end
+  end
+
+  #returns an enumaration of the people subscribed to the items in the logs
+  def people_subscribed_to_logged_items logs
+    items = logs.collect{|log| log.activity_loggable}.uniq
+    items.collect do |item|
+      subscriptions = Subscription.find_all_by_subscribable_type_and_subscribable_id(item.class.name,item.id)
+      subscriptions.collect{|sub| sub.person}
+    end.flatten.compact.uniq
   end
 
   # puts the initial jobs on the queue for each period - daily, weekly, monthly - if they do not exist already

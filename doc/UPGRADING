@@ -70,6 +70,16 @@ There follows the commands required to upgrade. Anything after # are notes and d
 There are a few additional steps for this upgrade due to the switch from Solr to Sunspot as the search system,
 and the introduction of Delayed Job for background processing.
 
+First there is an additionaldependency you will need, which on Ubuntu 10.04 or Debian can be installed with:
+
+    sudo apt-get install libxslt-dev
+
+on Ubuntu 12.04 this will be:
+
+    sudo apt-get install libxslt1-dev
+
+then the following steps will update the SEEK server:
+
     bundle exec rake solr:stop RAILS_ENV=production # this is specific to this upgrade, since the command to stop and start the search has changed.
     hg pull https://sysmo-db.googlecode.com/hg/ -r v0.13.3
     hg update
@@ -91,6 +101,9 @@ And now SEEK should be ready to restart. If running together with Passenger Phus
 this is simply a case of:
 
    touch tmp/restart.txt
+
+If you auto start solr with an init.d/ script - this will need updating to reflect the change to sunspot:solr:start. The
+updated script should look something like: https://gist.github.com/3143434
 
 == Steps to upgrade between patches (e.g. between 0.13.2 and 0.13.3)
 

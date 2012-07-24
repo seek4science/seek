@@ -1,0 +1,1269 @@
+HTTP/1.1 200 OK
+Server: Apache-Coyote/1.1
+Content-Type: text/xml;charset=utf-8
+Date: Mon, 23 Jul 2012 15:55:16 GMT
+Transfer-Encoding: chunked
+Connection: Keep-Alive
+
+<?xml version="1.0" encoding="UTF-8"?>
+<wsdl:definitions targetNamespace="http://www.ebi.ac.uk/biomodels-main/services/BioModelsWebServices" xmlns:apachesoap="http://xml.apache.org/xml-soap" xmlns:impl="http://www.ebi.ac.uk/biomodels-main/services/BioModelsWebServices" xmlns:intf="http://www.ebi.ac.uk/biomodels-main/services/BioModelsWebServices" xmlns:soapenc="http://schemas.xmlsoap.org/soap/encoding/" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:wsdlsoap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+<!--WSDL created by Apache Axis version: 1.3
+Built on Oct 05, 2005 (05:23:37 EDT)-->
+ <wsdl:types>
+  <schema targetNamespace="http://xml.apache.org/xml-soap" xmlns="http://www.w3.org/2001/XMLSchema">
+   <import namespace="http://www.ebi.ac.uk/biomodels-main/services/BioModelsWebServices"/>
+   <import namespace="http://schemas.xmlsoap.org/soap/encoding/"/>
+   <complexType name="mapItem">
+    <sequence>
+     <element name="key" nillable="true" type="xsd:anyType"/>
+     <element name="value" nillable="true" type="xsd:anyType"/>
+    </sequence>
+   </complexType>
+   <complexType name="Map">
+    <sequence>
+     <element maxOccurs="unbounded" minOccurs="0" name="item" type="apachesoap:mapItem"/>
+    </sequence>
+   </complexType>
+  </schema>
+  <schema targetNamespace="http://www.ebi.ac.uk/biomodels-main/services/BioModelsWebServices" xmlns="http://www.w3.org/2001/XMLSchema">
+   <import namespace="http://xml.apache.org/xml-soap"/>
+   <import namespace="http://schemas.xmlsoap.org/soap/encoding/"/>
+   <complexType name="ArrayOf_xsd_string">
+    <complexContent>
+     <restriction base="soapenc:Array">
+      <attribute ref="soapenc:arrayType" wsdl:arrayType="xsd:string[]"/>
+     </restriction>
+    </complexContent>
+   </complexType>
+  </schema>
+ </wsdl:types>
+
+   <wsdl:message name="getModelsIdByTaxonomyIdResponse">
+
+      <wsdl:part name="getModelsIdByTaxonomyIdReturn" type="impl:ArrayOf_xsd_string"/>
+
+   </wsdl:message>
+
+   <wsdl:message name="getModelSBMLByIdResponse">
+
+      <wsdl:part name="getModelSBMLByIdReturn" type="xsd:string"/>
+
+   </wsdl:message>
+
+   <wsdl:message name="getAllCuratedModelsIdResponse">
+
+      <wsdl:part name="getAllCuratedModelsIdReturn" type="impl:ArrayOf_xsd_string"/>
+
+   </wsdl:message>
+
+   <wsdl:message name="getLastModifiedDateByModelIdResponse">
+
+      <wsdl:part name="getLastModifiedDateByModelIdReturn" type="xsd:string"/>
+
+   </wsdl:message>
+
+   <wsdl:message name="getSimpleModelsRelatedWithChEBIResponse">
+
+      <wsdl:part name="getSimpleModelsRelatedWithChEBIReturn" type="xsd:string"/>
+
+   </wsdl:message>
+
+   <wsdl:message name="getSimpleModelsByChEBIIdsRequest">
+
+      <wsdl:part name="ChEBIIds" type="impl:ArrayOf_xsd_string"/>
+
+   </wsdl:message>
+
+   <wsdl:message name="getModelNameByIdResponse">
+
+      <wsdl:part name="getModelNameByIdReturn" type="xsd:string"/>
+
+   </wsdl:message>
+
+   <wsdl:message name="helloBioModelsRequest">
+
+   </wsdl:message>
+
+   <wsdl:message name="getModelsIdByPublicationRequest">
+
+      <wsdl:part name="publicationIdOrText" type="xsd:string"/>
+
+   </wsdl:message>
+
+   <wsdl:message name="getAllCuratedModelsIdRequest">
+
+   </wsdl:message>
+
+   <wsdl:message name="getPublicationByModelIdResponse">
+
+      <wsdl:part name="getPublicationByModelIdReturn" type="xsd:string"/>
+
+   </wsdl:message>
+
+   <wsdl:message name="getAuthorsByModelIdResponse">
+
+      <wsdl:part name="getAuthorsByModelIdReturn" type="impl:ArrayOf_xsd_string"/>
+
+   </wsdl:message>
+
+   <wsdl:message name="getAllModelsResponse">
+
+      <wsdl:part name="getAllModelsReturn" type="apachesoap:Map"/>
+
+   </wsdl:message>
+
+   <wsdl:message name="getModelNameByIdRequest">
+
+      <wsdl:part name="id" type="xsd:string"/>
+
+   </wsdl:message>
+
+   <wsdl:message name="getSimpleModelsByChEBIIdsResponse">
+
+      <wsdl:part name="getSimpleModelsByChEBIIdsReturn" type="xsd:string"/>
+
+   </wsdl:message>
+
+   <wsdl:message name="getAllModelsRequest">
+
+      <wsdl:part name="category" type="xsd:string"/>
+
+   </wsdl:message>
+
+   <wsdl:message name="getModelsIdByUniprotIdRequest">
+
+      <wsdl:part name="uniprotId" type="xsd:string"/>
+
+   </wsdl:message>
+
+   <wsdl:message name="getModelsIdByChEBIIdRequest">
+
+      <wsdl:part name="ChEBIId" type="xsd:string"/>
+
+   </wsdl:message>
+
+   <wsdl:message name="getModelsIdByGORequest">
+
+      <wsdl:part name="text" type="xsd:string"/>
+
+   </wsdl:message>
+
+   <wsdl:message name="getModelsIdByNameRequest">
+
+      <wsdl:part name="modelName" type="xsd:string"/>
+
+   </wsdl:message>
+
+   <wsdl:message name="getModelsIdByUniprotIdsRequest">
+
+      <wsdl:part name="uniprotIds" type="impl:ArrayOf_xsd_string"/>
+
+   </wsdl:message>
+
+   <wsdl:message name="getSimpleModelsByReactomeIdsResponse">
+
+      <wsdl:part name="getSimpleModelsByReactomeIdsReturn" type="xsd:string"/>
+
+   </wsdl:message>
+
+   <wsdl:message name="getModelSBMLByIdRequest">
+
+      <wsdl:part name="id" type="xsd:string"/>
+
+   </wsdl:message>
+
+   <wsdl:message name="getAllNonCuratedModelsIdRequest">
+
+   </wsdl:message>
+
+   <wsdl:message name="getModelsIdByChEBIIdResponse">
+
+      <wsdl:part name="getModelsIdByChEBIIdReturn" type="impl:ArrayOf_xsd_string"/>
+
+   </wsdl:message>
+
+   <wsdl:message name="getModelByIdResponse">
+
+      <wsdl:part name="getModelByIdReturn" type="xsd:string"/>
+
+   </wsdl:message>
+
+   <wsdl:message name="getModelsIdByNameResponse">
+
+      <wsdl:part name="getModelsIdByNameReturn" type="impl:ArrayOf_xsd_string"/>
+
+   </wsdl:message>
+
+   <wsdl:message name="getSimpleModelsRelatedWithChEBIRequest">
+
+   </wsdl:message>
+
+   <wsdl:message name="getModelsIdByUniprotIdsResponse">
+
+      <wsdl:part name="getModelsIdByUniprotIdsReturn" type="impl:ArrayOf_xsd_string"/>
+
+   </wsdl:message>
+
+   <wsdl:message name="getModelsIdByTaxonomyRequest">
+
+      <wsdl:part name="text" type="xsd:string"/>
+
+   </wsdl:message>
+
+   <wsdl:message name="getDateLastModifByModelIdRequest">
+
+      <wsdl:part name="modelId" type="xsd:string"/>
+
+   </wsdl:message>
+
+   <wsdl:message name="getSubModelSBMLResponse">
+
+      <wsdl:part name="getSubModelSBMLReturn" type="xsd:string"/>
+
+   </wsdl:message>
+
+   <wsdl:message name="getModelByIdRequest">
+
+      <wsdl:part name="id" type="xsd:string"/>
+
+   </wsdl:message>
+
+   <wsdl:message name="getModelsIdByGOIdResponse">
+
+      <wsdl:part name="getModelsIdByGOIdReturn" type="impl:ArrayOf_xsd_string"/>
+
+   </wsdl:message>
+
+   <wsdl:message name="getModelsIdByGOResponse">
+
+      <wsdl:part name="getModelsIdByGOReturn" type="impl:ArrayOf_xsd_string"/>
+
+   </wsdl:message>
+
+   <wsdl:message name="getModelsIdByPersonResponse">
+
+      <wsdl:part name="getModelsIdByPersonReturn" type="impl:ArrayOf_xsd_string"/>
+
+   </wsdl:message>
+
+   <wsdl:message name="getSimpleModelsByReactomeIdsRequest">
+
+      <wsdl:part name="ReactomeIds" type="impl:ArrayOf_xsd_string"/>
+
+   </wsdl:message>
+
+   <wsdl:message name="getModelsIdByTaxonomyResponse">
+
+      <wsdl:part name="getModelsIdByTaxonomyReturn" type="impl:ArrayOf_xsd_string"/>
+
+   </wsdl:message>
+
+   <wsdl:message name="getEncodersByModelIdRequest">
+
+      <wsdl:part name="modelId" type="xsd:string"/>
+
+   </wsdl:message>
+
+   <wsdl:message name="helloBioModelsResponse">
+
+      <wsdl:part name="helloBioModelsReturn" type="xsd:string"/>
+
+   </wsdl:message>
+
+   <wsdl:message name="getPublicationByModelIdRequest">
+
+      <wsdl:part name="modelId" type="xsd:string"/>
+
+   </wsdl:message>
+
+   <wsdl:message name="getModelsIdByUniprotResponse">
+
+      <wsdl:part name="getModelsIdByUniprotReturn" type="impl:ArrayOf_xsd_string"/>
+
+   </wsdl:message>
+
+   <wsdl:message name="getModelsIdByPublicationResponse">
+
+      <wsdl:part name="getModelsIdByPublicationReturn" type="impl:ArrayOf_xsd_string"/>
+
+   </wsdl:message>
+
+   <wsdl:message name="getSimpleModelsByUniprotIdsResponse">
+
+      <wsdl:part name="getSimpleModelsByUniprotIdsReturn" type="xsd:string"/>
+
+   </wsdl:message>
+
+   <wsdl:message name="getSimpleModelsByUniprotIdsRequest">
+
+      <wsdl:part name="UniProtIds" type="impl:ArrayOf_xsd_string"/>
+
+   </wsdl:message>
+
+   <wsdl:message name="getSimpleModelByIdRequest">
+
+      <wsdl:part name="id" type="xsd:string"/>
+
+   </wsdl:message>
+
+   <wsdl:message name="getModelsIdByPersonRequest">
+
+      <wsdl:part name="personName" type="xsd:string"/>
+
+   </wsdl:message>
+
+   <wsdl:message name="getModelsIdByChEBIRequest">
+
+      <wsdl:part name="text" type="xsd:string"/>
+
+   </wsdl:message>
+
+   <wsdl:message name="getDateLastModifByModelIdResponse">
+
+      <wsdl:part name="getDateLastModifByModelIdReturn" type="xsd:string"/>
+
+   </wsdl:message>
+
+   <wsdl:message name="getAuthorsByModelIdRequest">
+
+      <wsdl:part name="modelId" type="xsd:string"/>
+
+   </wsdl:message>
+
+   <wsdl:message name="getModelsIdByTaxonomyIdRequest">
+
+      <wsdl:part name="taxonomyId" type="xsd:string"/>
+
+   </wsdl:message>
+
+   <wsdl:message name="getModelsIdByUniprotIdResponse">
+
+      <wsdl:part name="getModelsIdByUniprotIdReturn" type="impl:ArrayOf_xsd_string"/>
+
+   </wsdl:message>
+
+   <wsdl:message name="getAllNonCuratedModelsIdResponse">
+
+      <wsdl:part name="getAllNonCuratedModelsIdReturn" type="impl:ArrayOf_xsd_string"/>
+
+   </wsdl:message>
+
+   <wsdl:message name="getSubModelSBMLRequest">
+
+      <wsdl:part name="modelId" type="xsd:string"/>
+
+      <wsdl:part name="elementsIds" type="impl:ArrayOf_xsd_string"/>
+
+   </wsdl:message>
+
+   <wsdl:message name="getModelsIdByUniprotRequest">
+
+      <wsdl:part name="text" type="xsd:string"/>
+
+   </wsdl:message>
+
+   <wsdl:message name="getSimpleModelByIdResponse">
+
+      <wsdl:part name="getSimpleModelByIdReturn" type="xsd:string"/>
+
+   </wsdl:message>
+
+   <wsdl:message name="getAllModelsIdRequest">
+
+   </wsdl:message>
+
+   <wsdl:message name="getSimpleModelsByIdsResponse">
+
+      <wsdl:part name="getSimpleModelsByIdsReturn" type="xsd:string"/>
+
+   </wsdl:message>
+
+   <wsdl:message name="getModelsIdByChEBIResponse">
+
+      <wsdl:part name="getModelsIdByChEBIReturn" type="impl:ArrayOf_xsd_string"/>
+
+   </wsdl:message>
+
+   <wsdl:message name="getModelsIdByGOIdRequest">
+
+      <wsdl:part name="GOId" type="xsd:string"/>
+
+   </wsdl:message>
+
+   <wsdl:message name="getSimpleModelsByIdsRequest">
+
+      <wsdl:part name="ids" type="impl:ArrayOf_xsd_string"/>
+
+   </wsdl:message>
+
+   <wsdl:message name="getAllModelsIdResponse">
+
+      <wsdl:part name="getAllModelsIdReturn" type="impl:ArrayOf_xsd_string"/>
+
+   </wsdl:message>
+
+   <wsdl:message name="getEncodersByModelIdResponse">
+
+      <wsdl:part name="getEncodersByModelIdReturn" type="impl:ArrayOf_xsd_string"/>
+
+   </wsdl:message>
+
+   <wsdl:message name="getLastModifiedDateByModelIdRequest">
+
+      <wsdl:part name="modelId" type="xsd:string"/>
+
+   </wsdl:message>
+
+   <wsdl:portType name="BioModelsWebServices">
+
+      <wsdl:operation name="helloBioModels">
+
+         <wsdl:input message="impl:helloBioModelsRequest" name="helloBioModelsRequest"/>
+
+         <wsdl:output message="impl:helloBioModelsResponse" name="helloBioModelsResponse"/>
+
+      </wsdl:operation>
+
+      <wsdl:operation name="getAllModels" parameterOrder="category">
+
+         <wsdl:input message="impl:getAllModelsRequest" name="getAllModelsRequest"/>
+
+         <wsdl:output message="impl:getAllModelsResponse" name="getAllModelsResponse"/>
+
+      </wsdl:operation>
+
+      <wsdl:operation name="getAllModelsId">
+
+         <wsdl:input message="impl:getAllModelsIdRequest" name="getAllModelsIdRequest"/>
+
+         <wsdl:output message="impl:getAllModelsIdResponse" name="getAllModelsIdResponse"/>
+
+      </wsdl:operation>
+
+      <wsdl:operation name="getAllCuratedModelsId">
+
+         <wsdl:input message="impl:getAllCuratedModelsIdRequest" name="getAllCuratedModelsIdRequest"/>
+
+         <wsdl:output message="impl:getAllCuratedModelsIdResponse" name="getAllCuratedModelsIdResponse"/>
+
+      </wsdl:operation>
+
+      <wsdl:operation name="getAllNonCuratedModelsId">
+
+         <wsdl:input message="impl:getAllNonCuratedModelsIdRequest" name="getAllNonCuratedModelsIdRequest"/>
+
+         <wsdl:output message="impl:getAllNonCuratedModelsIdResponse" name="getAllNonCuratedModelsIdResponse"/>
+
+      </wsdl:operation>
+
+      <wsdl:operation name="getModelById" parameterOrder="id">
+
+         <wsdl:input message="impl:getModelByIdRequest" name="getModelByIdRequest"/>
+
+         <wsdl:output message="impl:getModelByIdResponse" name="getModelByIdResponse"/>
+
+      </wsdl:operation>
+
+      <wsdl:operation name="getModelSBMLById" parameterOrder="id">
+
+         <wsdl:input message="impl:getModelSBMLByIdRequest" name="getModelSBMLByIdRequest"/>
+
+         <wsdl:output message="impl:getModelSBMLByIdResponse" name="getModelSBMLByIdResponse"/>
+
+      </wsdl:operation>
+
+      <wsdl:operation name="getSimpleModelById" parameterOrder="id">
+
+         <wsdl:input message="impl:getSimpleModelByIdRequest" name="getSimpleModelByIdRequest"/>
+
+         <wsdl:output message="impl:getSimpleModelByIdResponse" name="getSimpleModelByIdResponse"/>
+
+      </wsdl:operation>
+
+      <wsdl:operation name="getSimpleModelsByIds" parameterOrder="ids">
+
+         <wsdl:input message="impl:getSimpleModelsByIdsRequest" name="getSimpleModelsByIdsRequest"/>
+
+         <wsdl:output message="impl:getSimpleModelsByIdsResponse" name="getSimpleModelsByIdsResponse"/>
+
+      </wsdl:operation>
+
+      <wsdl:operation name="getModelNameById" parameterOrder="id">
+
+         <wsdl:input message="impl:getModelNameByIdRequest" name="getModelNameByIdRequest"/>
+
+         <wsdl:output message="impl:getModelNameByIdResponse" name="getModelNameByIdResponse"/>
+
+      </wsdl:operation>
+
+      <wsdl:operation name="getAuthorsByModelId" parameterOrder="modelId">
+
+         <wsdl:input message="impl:getAuthorsByModelIdRequest" name="getAuthorsByModelIdRequest"/>
+
+         <wsdl:output message="impl:getAuthorsByModelIdResponse" name="getAuthorsByModelIdResponse"/>
+
+      </wsdl:operation>
+
+      <wsdl:operation name="getEncodersByModelId" parameterOrder="modelId">
+
+         <wsdl:input message="impl:getEncodersByModelIdRequest" name="getEncodersByModelIdRequest"/>
+
+         <wsdl:output message="impl:getEncodersByModelIdResponse" name="getEncodersByModelIdResponse"/>
+
+      </wsdl:operation>
+
+      <wsdl:operation name="getPublicationByModelId" parameterOrder="modelId">
+
+         <wsdl:input message="impl:getPublicationByModelIdRequest" name="getPublicationByModelIdRequest"/>
+
+         <wsdl:output message="impl:getPublicationByModelIdResponse" name="getPublicationByModelIdResponse"/>
+
+      </wsdl:operation>
+
+      <wsdl:operation name="getDateLastModifByModelId" parameterOrder="modelId">
+
+         <wsdl:input message="impl:getDateLastModifByModelIdRequest" name="getDateLastModifByModelIdRequest"/>
+
+         <wsdl:output message="impl:getDateLastModifByModelIdResponse" name="getDateLastModifByModelIdResponse"/>
+
+      </wsdl:operation>
+
+      <wsdl:operation name="getLastModifiedDateByModelId" parameterOrder="modelId">
+
+         <wsdl:input message="impl:getLastModifiedDateByModelIdRequest" name="getLastModifiedDateByModelIdRequest"/>
+
+         <wsdl:output message="impl:getLastModifiedDateByModelIdResponse" name="getLastModifiedDateByModelIdResponse"/>
+
+      </wsdl:operation>
+
+      <wsdl:operation name="getModelsIdByName" parameterOrder="modelName">
+
+         <wsdl:input message="impl:getModelsIdByNameRequest" name="getModelsIdByNameRequest"/>
+
+         <wsdl:output message="impl:getModelsIdByNameResponse" name="getModelsIdByNameResponse"/>
+
+      </wsdl:operation>
+
+      <wsdl:operation name="getModelsIdByPublication" parameterOrder="publicationIdOrText">
+
+         <wsdl:input message="impl:getModelsIdByPublicationRequest" name="getModelsIdByPublicationRequest"/>
+
+         <wsdl:output message="impl:getModelsIdByPublicationResponse" name="getModelsIdByPublicationResponse"/>
+
+      </wsdl:operation>
+
+      <wsdl:operation name="getModelsIdByPerson" parameterOrder="personName">
+
+         <wsdl:input message="impl:getModelsIdByPersonRequest" name="getModelsIdByPersonRequest"/>
+
+         <wsdl:output message="impl:getModelsIdByPersonResponse" name="getModelsIdByPersonResponse"/>
+
+      </wsdl:operation>
+
+      <wsdl:operation name="getModelsIdByChEBIId" parameterOrder="ChEBIId">
+
+         <wsdl:input message="impl:getModelsIdByChEBIIdRequest" name="getModelsIdByChEBIIdRequest"/>
+
+         <wsdl:output message="impl:getModelsIdByChEBIIdResponse" name="getModelsIdByChEBIIdResponse"/>
+
+      </wsdl:operation>
+
+      <wsdl:operation name="getSimpleModelsRelatedWithChEBI">
+
+         <wsdl:input message="impl:getSimpleModelsRelatedWithChEBIRequest" name="getSimpleModelsRelatedWithChEBIRequest"/>
+
+         <wsdl:output message="impl:getSimpleModelsRelatedWithChEBIResponse" name="getSimpleModelsRelatedWithChEBIResponse"/>
+
+      </wsdl:operation>
+
+      <wsdl:operation name="getSimpleModelsByChEBIIds" parameterOrder="ChEBIIds">
+
+         <wsdl:input message="impl:getSimpleModelsByChEBIIdsRequest" name="getSimpleModelsByChEBIIdsRequest"/>
+
+         <wsdl:output message="impl:getSimpleModelsByChEBIIdsResponse" name="getSimpleModelsByChEBIIdsResponse"/>
+
+      </wsdl:operation>
+
+      <wsdl:operation name="getModelsIdByChEBI" parameterOrder="text">
+
+         <wsdl:input message="impl:getModelsIdByChEBIRequest" name="getModelsIdByChEBIRequest"/>
+
+         <wsdl:output message="impl:getModelsIdByChEBIResponse" name="getModelsIdByChEBIResponse"/>
+
+      </wsdl:operation>
+
+      <wsdl:operation name="getModelsIdByUniprotId" parameterOrder="uniprotId">
+
+         <wsdl:input message="impl:getModelsIdByUniprotIdRequest" name="getModelsIdByUniprotIdRequest"/>
+
+         <wsdl:output message="impl:getModelsIdByUniprotIdResponse" name="getModelsIdByUniprotIdResponse"/>
+
+      </wsdl:operation>
+
+      <wsdl:operation name="getModelsIdByUniprotIds" parameterOrder="uniprotIds">
+
+         <wsdl:input message="impl:getModelsIdByUniprotIdsRequest" name="getModelsIdByUniprotIdsRequest"/>
+
+         <wsdl:output message="impl:getModelsIdByUniprotIdsResponse" name="getModelsIdByUniprotIdsResponse"/>
+
+      </wsdl:operation>
+
+      <wsdl:operation name="getSimpleModelsByUniprotIds" parameterOrder="UniProtIds">
+
+         <wsdl:input message="impl:getSimpleModelsByUniprotIdsRequest" name="getSimpleModelsByUniprotIdsRequest"/>
+
+         <wsdl:output message="impl:getSimpleModelsByUniprotIdsResponse" name="getSimpleModelsByUniprotIdsResponse"/>
+
+      </wsdl:operation>
+
+      <wsdl:operation name="getModelsIdByUniprot" parameterOrder="text">
+
+         <wsdl:input message="impl:getModelsIdByUniprotRequest" name="getModelsIdByUniprotRequest"/>
+
+         <wsdl:output message="impl:getModelsIdByUniprotResponse" name="getModelsIdByUniprotResponse"/>
+
+      </wsdl:operation>
+
+      <wsdl:operation name="getSimpleModelsByReactomeIds" parameterOrder="ReactomeIds">
+
+         <wsdl:input message="impl:getSimpleModelsByReactomeIdsRequest" name="getSimpleModelsByReactomeIdsRequest"/>
+
+         <wsdl:output message="impl:getSimpleModelsByReactomeIdsResponse" name="getSimpleModelsByReactomeIdsResponse"/>
+
+      </wsdl:operation>
+
+      <wsdl:operation name="getModelsIdByGOId" parameterOrder="GOId">
+
+         <wsdl:input message="impl:getModelsIdByGOIdRequest" name="getModelsIdByGOIdRequest"/>
+
+         <wsdl:output message="impl:getModelsIdByGOIdResponse" name="getModelsIdByGOIdResponse"/>
+
+      </wsdl:operation>
+
+      <wsdl:operation name="getModelsIdByGO" parameterOrder="text">
+
+         <wsdl:input message="impl:getModelsIdByGORequest" name="getModelsIdByGORequest"/>
+
+         <wsdl:output message="impl:getModelsIdByGOResponse" name="getModelsIdByGOResponse"/>
+
+      </wsdl:operation>
+
+      <wsdl:operation name="getModelsIdByTaxonomyId" parameterOrder="taxonomyId">
+
+         <wsdl:input message="impl:getModelsIdByTaxonomyIdRequest" name="getModelsIdByTaxonomyIdRequest"/>
+
+         <wsdl:output message="impl:getModelsIdByTaxonomyIdResponse" name="getModelsIdByTaxonomyIdResponse"/>
+
+      </wsdl:operation>
+
+      <wsdl:operation name="getModelsIdByTaxonomy" parameterOrder="text">
+
+         <wsdl:input message="impl:getModelsIdByTaxonomyRequest" name="getModelsIdByTaxonomyRequest"/>
+
+         <wsdl:output message="impl:getModelsIdByTaxonomyResponse" name="getModelsIdByTaxonomyResponse"/>
+
+      </wsdl:operation>
+
+      <wsdl:operation name="getSubModelSBML" parameterOrder="modelId elementsIds">
+
+         <wsdl:input message="impl:getSubModelSBMLRequest" name="getSubModelSBMLRequest"/>
+
+         <wsdl:output message="impl:getSubModelSBMLResponse" name="getSubModelSBMLResponse"/>
+
+      </wsdl:operation>
+
+   </wsdl:portType>
+
+   <wsdl:binding name="BioModelsWebServicesSoapBinding" type="impl:BioModelsWebServices">
+
+      <wsdlsoap:binding style="rpc" transport="http://schemas.xmlsoap.org/soap/http"/>
+
+      <wsdl:operation name="helloBioModels">
+
+         <wsdlsoap:operation soapAction=""/>
+
+         <wsdl:input name="helloBioModelsRequest">
+
+            <wsdlsoap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" namespace="http://biomodels.ebi.ac.uk" use="encoded"/>
+
+         </wsdl:input>
+
+         <wsdl:output name="helloBioModelsResponse">
+
+            <wsdlsoap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" namespace="http://www.ebi.ac.uk/biomodels-main/services/BioModelsWebServices" use="encoded"/>
+
+         </wsdl:output>
+
+      </wsdl:operation>
+
+      <wsdl:operation name="getAllModels">
+
+         <wsdlsoap:operation soapAction=""/>
+
+         <wsdl:input name="getAllModelsRequest">
+
+            <wsdlsoap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" namespace="http://biomodels.ebi.ac.uk" use="encoded"/>
+
+         </wsdl:input>
+
+         <wsdl:output name="getAllModelsResponse">
+
+            <wsdlsoap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" namespace="http://www.ebi.ac.uk/biomodels-main/services/BioModelsWebServices" use="encoded"/>
+
+         </wsdl:output>
+
+      </wsdl:operation>
+
+      <wsdl:operation name="getAllModelsId">
+
+         <wsdlsoap:operation soapAction=""/>
+
+         <wsdl:input name="getAllModelsIdRequest">
+
+            <wsdlsoap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" namespace="http://biomodels.ebi.ac.uk" use="encoded"/>
+
+         </wsdl:input>
+
+         <wsdl:output name="getAllModelsIdResponse">
+
+            <wsdlsoap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" namespace="http://www.ebi.ac.uk/biomodels-main/services/BioModelsWebServices" use="encoded"/>
+
+         </wsdl:output>
+
+      </wsdl:operation>
+
+      <wsdl:operation name="getAllCuratedModelsId">
+
+         <wsdlsoap:operation soapAction=""/>
+
+         <wsdl:input name="getAllCuratedModelsIdRequest">
+
+            <wsdlsoap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" namespace="http://biomodels.ebi.ac.uk" use="encoded"/>
+
+         </wsdl:input>
+
+         <wsdl:output name="getAllCuratedModelsIdResponse">
+
+            <wsdlsoap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" namespace="http://www.ebi.ac.uk/biomodels-main/services/BioModelsWebServices" use="encoded"/>
+
+         </wsdl:output>
+
+      </wsdl:operation>
+
+      <wsdl:operation name="getAllNonCuratedModelsId">
+
+         <wsdlsoap:operation soapAction=""/>
+
+         <wsdl:input name="getAllNonCuratedModelsIdRequest">
+
+            <wsdlsoap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" namespace="http://biomodels.ebi.ac.uk" use="encoded"/>
+
+         </wsdl:input>
+
+         <wsdl:output name="getAllNonCuratedModelsIdResponse">
+
+            <wsdlsoap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" namespace="http://www.ebi.ac.uk/biomodels-main/services/BioModelsWebServices" use="encoded"/>
+
+         </wsdl:output>
+
+      </wsdl:operation>
+
+      <wsdl:operation name="getModelById">
+
+         <wsdlsoap:operation soapAction=""/>
+
+         <wsdl:input name="getModelByIdRequest">
+
+            <wsdlsoap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" namespace="http://biomodels.ebi.ac.uk" use="encoded"/>
+
+         </wsdl:input>
+
+         <wsdl:output name="getModelByIdResponse">
+
+            <wsdlsoap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" namespace="http://www.ebi.ac.uk/biomodels-main/services/BioModelsWebServices" use="encoded"/>
+
+         </wsdl:output>
+
+      </wsdl:operation>
+
+      <wsdl:operation name="getModelSBMLById">
+
+         <wsdlsoap:operation soapAction=""/>
+
+         <wsdl:input name="getModelSBMLByIdRequest">
+
+            <wsdlsoap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" namespace="http://biomodels.ebi.ac.uk" use="encoded"/>
+
+         </wsdl:input>
+
+         <wsdl:output name="getModelSBMLByIdResponse">
+
+            <wsdlsoap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" namespace="http://www.ebi.ac.uk/biomodels-main/services/BioModelsWebServices" use="encoded"/>
+
+         </wsdl:output>
+
+      </wsdl:operation>
+
+      <wsdl:operation name="getSimpleModelById">
+
+         <wsdlsoap:operation soapAction=""/>
+
+         <wsdl:input name="getSimpleModelByIdRequest">
+
+            <wsdlsoap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" namespace="http://biomodels.ebi.ac.uk" use="encoded"/>
+
+         </wsdl:input>
+
+         <wsdl:output name="getSimpleModelByIdResponse">
+
+            <wsdlsoap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" namespace="http://www.ebi.ac.uk/biomodels-main/services/BioModelsWebServices" use="encoded"/>
+
+         </wsdl:output>
+
+      </wsdl:operation>
+
+      <wsdl:operation name="getSimpleModelsByIds">
+
+         <wsdlsoap:operation soapAction=""/>
+
+         <wsdl:input name="getSimpleModelsByIdsRequest">
+
+            <wsdlsoap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" namespace="http://biomodels.ebi.ac.uk" use="encoded"/>
+
+         </wsdl:input>
+
+         <wsdl:output name="getSimpleModelsByIdsResponse">
+
+            <wsdlsoap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" namespace="http://www.ebi.ac.uk/biomodels-main/services/BioModelsWebServices" use="encoded"/>
+
+         </wsdl:output>
+
+      </wsdl:operation>
+
+      <wsdl:operation name="getModelNameById">
+
+         <wsdlsoap:operation soapAction=""/>
+
+         <wsdl:input name="getModelNameByIdRequest">
+
+            <wsdlsoap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" namespace="http://biomodels.ebi.ac.uk" use="encoded"/>
+
+         </wsdl:input>
+
+         <wsdl:output name="getModelNameByIdResponse">
+
+            <wsdlsoap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" namespace="http://www.ebi.ac.uk/biomodels-main/services/BioModelsWebServices" use="encoded"/>
+
+         </wsdl:output>
+
+      </wsdl:operation>
+
+      <wsdl:operation name="getAuthorsByModelId">
+
+         <wsdlsoap:operation soapAction=""/>
+
+         <wsdl:input name="getAuthorsByModelIdRequest">
+
+            <wsdlsoap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" namespace="http://biomodels.ebi.ac.uk" use="encoded"/>
+
+         </wsdl:input>
+
+         <wsdl:output name="getAuthorsByModelIdResponse">
+
+            <wsdlsoap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" namespace="http://www.ebi.ac.uk/biomodels-main/services/BioModelsWebServices" use="encoded"/>
+
+         </wsdl:output>
+
+      </wsdl:operation>
+
+      <wsdl:operation name="getEncodersByModelId">
+
+         <wsdlsoap:operation soapAction=""/>
+
+         <wsdl:input name="getEncodersByModelIdRequest">
+
+            <wsdlsoap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" namespace="http://biomodels.ebi.ac.uk" use="encoded"/>
+
+         </wsdl:input>
+
+         <wsdl:output name="getEncodersByModelIdResponse">
+
+            <wsdlsoap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" namespace="http://www.ebi.ac.uk/biomodels-main/services/BioModelsWebServices" use="encoded"/>
+
+         </wsdl:output>
+
+      </wsdl:operation>
+
+      <wsdl:operation name="getPublicationByModelId">
+
+         <wsdlsoap:operation soapAction=""/>
+
+         <wsdl:input name="getPublicationByModelIdRequest">
+
+            <wsdlsoap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" namespace="http://biomodels.ebi.ac.uk" use="encoded"/>
+
+         </wsdl:input>
+
+         <wsdl:output name="getPublicationByModelIdResponse">
+
+            <wsdlsoap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" namespace="http://www.ebi.ac.uk/biomodels-main/services/BioModelsWebServices" use="encoded"/>
+
+         </wsdl:output>
+
+      </wsdl:operation>
+
+      <wsdl:operation name="getDateLastModifByModelId">
+
+         <wsdlsoap:operation soapAction=""/>
+
+         <wsdl:input name="getDateLastModifByModelIdRequest">
+
+            <wsdlsoap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" namespace="http://biomodels.ebi.ac.uk" use="encoded"/>
+
+         </wsdl:input>
+
+         <wsdl:output name="getDateLastModifByModelIdResponse">
+
+            <wsdlsoap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" namespace="http://www.ebi.ac.uk/biomodels-main/services/BioModelsWebServices" use="encoded"/>
+
+         </wsdl:output>
+
+      </wsdl:operation>
+
+      <wsdl:operation name="getLastModifiedDateByModelId">
+
+         <wsdlsoap:operation soapAction=""/>
+
+         <wsdl:input name="getLastModifiedDateByModelIdRequest">
+
+            <wsdlsoap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" namespace="http://biomodels.ebi.ac.uk" use="encoded"/>
+
+         </wsdl:input>
+
+         <wsdl:output name="getLastModifiedDateByModelIdResponse">
+
+            <wsdlsoap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" namespace="http://www.ebi.ac.uk/biomodels-main/services/BioModelsWebServices" use="encoded"/>
+
+         </wsdl:output>
+
+      </wsdl:operation>
+
+      <wsdl:operation name="getModelsIdByName">
+
+         <wsdlsoap:operation soapAction=""/>
+
+         <wsdl:input name="getModelsIdByNameRequest">
+
+            <wsdlsoap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" namespace="http://biomodels.ebi.ac.uk" use="encoded"/>
+
+         </wsdl:input>
+
+         <wsdl:output name="getModelsIdByNameResponse">
+
+            <wsdlsoap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" namespace="http://www.ebi.ac.uk/biomodels-main/services/BioModelsWebServices" use="encoded"/>
+
+         </wsdl:output>
+
+      </wsdl:operation>
+
+      <wsdl:operation name="getModelsIdByPublication">
+
+         <wsdlsoap:operation soapAction=""/>
+
+         <wsdl:input name="getModelsIdByPublicationRequest">
+
+            <wsdlsoap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" namespace="http://biomodels.ebi.ac.uk" use="encoded"/>
+
+         </wsdl:input>
+
+         <wsdl:output name="getModelsIdByPublicationResponse">
+
+            <wsdlsoap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" namespace="http://www.ebi.ac.uk/biomodels-main/services/BioModelsWebServices" use="encoded"/>
+
+         </wsdl:output>
+
+      </wsdl:operation>
+
+      <wsdl:operation name="getModelsIdByPerson">
+
+         <wsdlsoap:operation soapAction=""/>
+
+         <wsdl:input name="getModelsIdByPersonRequest">
+
+            <wsdlsoap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" namespace="http://biomodels.ebi.ac.uk" use="encoded"/>
+
+         </wsdl:input>
+
+         <wsdl:output name="getModelsIdByPersonResponse">
+
+            <wsdlsoap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" namespace="http://www.ebi.ac.uk/biomodels-main/services/BioModelsWebServices" use="encoded"/>
+
+         </wsdl:output>
+
+      </wsdl:operation>
+
+      <wsdl:operation name="getModelsIdByChEBIId">
+
+         <wsdlsoap:operation soapAction=""/>
+
+         <wsdl:input name="getModelsIdByChEBIIdRequest">
+
+            <wsdlsoap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" namespace="http://biomodels.ebi.ac.uk" use="encoded"/>
+
+         </wsdl:input>
+
+         <wsdl:output name="getModelsIdByChEBIIdResponse">
+
+            <wsdlsoap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" namespace="http://www.ebi.ac.uk/biomodels-main/services/BioModelsWebServices" use="encoded"/>
+
+         </wsdl:output>
+
+      </wsdl:operation>
+
+      <wsdl:operation name="getSimpleModelsRelatedWithChEBI">
+
+         <wsdlsoap:operation soapAction=""/>
+
+         <wsdl:input name="getSimpleModelsRelatedWithChEBIRequest">
+
+            <wsdlsoap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" namespace="http://biomodels.ebi.ac.uk" use="encoded"/>
+
+         </wsdl:input>
+
+         <wsdl:output name="getSimpleModelsRelatedWithChEBIResponse">
+
+            <wsdlsoap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" namespace="http://www.ebi.ac.uk/biomodels-main/services/BioModelsWebServices" use="encoded"/>
+
+         </wsdl:output>
+
+      </wsdl:operation>
+
+      <wsdl:operation name="getSimpleModelsByChEBIIds">
+
+         <wsdlsoap:operation soapAction=""/>
+
+         <wsdl:input name="getSimpleModelsByChEBIIdsRequest">
+
+            <wsdlsoap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" namespace="http://biomodels.ebi.ac.uk" use="encoded"/>
+
+         </wsdl:input>
+
+         <wsdl:output name="getSimpleModelsByChEBIIdsResponse">
+
+            <wsdlsoap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" namespace="http://www.ebi.ac.uk/biomodels-main/services/BioModelsWebServices" use="encoded"/>
+
+         </wsdl:output>
+
+      </wsdl:operation>
+
+      <wsdl:operation name="getModelsIdByChEBI">
+
+         <wsdlsoap:operation soapAction=""/>
+
+         <wsdl:input name="getModelsIdByChEBIRequest">
+
+            <wsdlsoap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" namespace="http://biomodels.ebi.ac.uk" use="encoded"/>
+
+         </wsdl:input>
+
+         <wsdl:output name="getModelsIdByChEBIResponse">
+
+            <wsdlsoap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" namespace="http://www.ebi.ac.uk/biomodels-main/services/BioModelsWebServices" use="encoded"/>
+
+         </wsdl:output>
+
+      </wsdl:operation>
+
+      <wsdl:operation name="getModelsIdByUniprotId">
+
+         <wsdlsoap:operation soapAction=""/>
+
+         <wsdl:input name="getModelsIdByUniprotIdRequest">
+
+            <wsdlsoap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" namespace="http://biomodels.ebi.ac.uk" use="encoded"/>
+
+         </wsdl:input>
+
+         <wsdl:output name="getModelsIdByUniprotIdResponse">
+
+            <wsdlsoap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" namespace="http://www.ebi.ac.uk/biomodels-main/services/BioModelsWebServices" use="encoded"/>
+
+         </wsdl:output>
+
+      </wsdl:operation>
+
+      <wsdl:operation name="getModelsIdByUniprotIds">
+
+         <wsdlsoap:operation soapAction=""/>
+
+         <wsdl:input name="getModelsIdByUniprotIdsRequest">
+
+            <wsdlsoap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" namespace="http://biomodels.ebi.ac.uk" use="encoded"/>
+
+         </wsdl:input>
+
+         <wsdl:output name="getModelsIdByUniprotIdsResponse">
+
+            <wsdlsoap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" namespace="http://www.ebi.ac.uk/biomodels-main/services/BioModelsWebServices" use="encoded"/>
+
+         </wsdl:output>
+
+      </wsdl:operation>
+
+      <wsdl:operation name="getSimpleModelsByUniprotIds">
+
+         <wsdlsoap:operation soapAction=""/>
+
+         <wsdl:input name="getSimpleModelsByUniprotIdsRequest">
+
+            <wsdlsoap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" namespace="http://biomodels.ebi.ac.uk" use="encoded"/>
+
+         </wsdl:input>
+
+         <wsdl:output name="getSimpleModelsByUniprotIdsResponse">
+
+            <wsdlsoap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" namespace="http://www.ebi.ac.uk/biomodels-main/services/BioModelsWebServices" use="encoded"/>
+
+         </wsdl:output>
+
+      </wsdl:operation>
+
+      <wsdl:operation name="getModelsIdByUniprot">
+
+         <wsdlsoap:operation soapAction=""/>
+
+         <wsdl:input name="getModelsIdByUniprotRequest">
+
+            <wsdlsoap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" namespace="http://biomodels.ebi.ac.uk" use="encoded"/>
+
+         </wsdl:input>
+
+         <wsdl:output name="getModelsIdByUniprotResponse">
+
+            <wsdlsoap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" namespace="http://www.ebi.ac.uk/biomodels-main/services/BioModelsWebServices" use="encoded"/>
+
+         </wsdl:output>
+
+      </wsdl:operation>
+
+      <wsdl:operation name="getSimpleModelsByReactomeIds">
+
+         <wsdlsoap:operation soapAction=""/>
+
+         <wsdl:input name="getSimpleModelsByReactomeIdsRequest">
+
+            <wsdlsoap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" namespace="http://biomodels.ebi.ac.uk" use="encoded"/>
+
+         </wsdl:input>
+
+         <wsdl:output name="getSimpleModelsByReactomeIdsResponse">
+
+            <wsdlsoap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" namespace="http://www.ebi.ac.uk/biomodels-main/services/BioModelsWebServices" use="encoded"/>
+
+         </wsdl:output>
+
+      </wsdl:operation>
+
+      <wsdl:operation name="getModelsIdByGOId">
+
+         <wsdlsoap:operation soapAction=""/>
+
+         <wsdl:input name="getModelsIdByGOIdRequest">
+
+            <wsdlsoap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" namespace="http://biomodels.ebi.ac.uk" use="encoded"/>
+
+         </wsdl:input>
+
+         <wsdl:output name="getModelsIdByGOIdResponse">
+
+            <wsdlsoap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" namespace="http://www.ebi.ac.uk/biomodels-main/services/BioModelsWebServices" use="encoded"/>
+
+         </wsdl:output>
+
+      </wsdl:operation>
+
+      <wsdl:operation name="getModelsIdByGO">
+
+         <wsdlsoap:operation soapAction=""/>
+
+         <wsdl:input name="getModelsIdByGORequest">
+
+            <wsdlsoap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" namespace="http://biomodels.ebi.ac.uk" use="encoded"/>
+
+         </wsdl:input>
+
+         <wsdl:output name="getModelsIdByGOResponse">
+
+            <wsdlsoap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" namespace="http://www.ebi.ac.uk/biomodels-main/services/BioModelsWebServices" use="encoded"/>
+
+         </wsdl:output>
+
+      </wsdl:operation>
+
+      <wsdl:operation name="getModelsIdByTaxonomyId">
+
+         <wsdlsoap:operation soapAction=""/>
+
+         <wsdl:input name="getModelsIdByTaxonomyIdRequest">
+
+            <wsdlsoap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" namespace="http://biomodels.ebi.ac.uk" use="encoded"/>
+
+         </wsdl:input>
+
+         <wsdl:output name="getModelsIdByTaxonomyIdResponse">
+
+            <wsdlsoap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" namespace="http://www.ebi.ac.uk/biomodels-main/services/BioModelsWebServices" use="encoded"/>
+
+         </wsdl:output>
+
+      </wsdl:operation>
+
+      <wsdl:operation name="getModelsIdByTaxonomy">
+
+         <wsdlsoap:operation soapAction=""/>
+
+         <wsdl:input name="getModelsIdByTaxonomyRequest">
+
+            <wsdlsoap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" namespace="http://biomodels.ebi.ac.uk" use="encoded"/>
+
+         </wsdl:input>
+
+         <wsdl:output name="getModelsIdByTaxonomyResponse">
+
+            <wsdlsoap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" namespace="http://www.ebi.ac.uk/biomodels-main/services/BioModelsWebServices" use="encoded"/>
+
+         </wsdl:output>
+
+      </wsdl:operation>
+
+      <wsdl:operation name="getSubModelSBML">
+
+         <wsdlsoap:operation soapAction=""/>
+
+         <wsdl:input name="getSubModelSBMLRequest">
+
+            <wsdlsoap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" namespace="http://biomodels.ebi.ac.uk" use="encoded"/>
+
+         </wsdl:input>
+
+         <wsdl:output name="getSubModelSBMLResponse">
+
+            <wsdlsoap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" namespace="http://www.ebi.ac.uk/biomodels-main/services/BioModelsWebServices" use="encoded"/>
+
+         </wsdl:output>
+
+      </wsdl:operation>
+
+   </wsdl:binding>
+
+   <wsdl:service name="BioModelsWebServicesService">
+
+      <wsdl:port binding="impl:BioModelsWebServicesSoapBinding" name="BioModelsWebServices">
+
+         <wsdlsoap:address location="http://www.ebi.ac.uk/biomodels-main/services/BioModelsWebServices"/>
+
+      </wsdl:port>
+
+   </wsdl:service>
+
+</wsdl:definitions>

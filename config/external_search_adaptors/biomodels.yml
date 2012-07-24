@@ -1,0 +1,12 @@
+name: biomodels
+adaptor_class_name: Seek::SearchBiomodelsAdaptor
+search_type: models
+legal: "Please retain original author attributes"
+attributes:
+  models:
+      - model_name
+      - model_id
+      - creator_name
+      - pub_id
+      - last_modified
+      - description
