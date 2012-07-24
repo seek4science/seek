@@ -94,17 +94,13 @@
         <p>
           <label for="sharing_scope_<%= Policy::EVERYONE -%>">
             <input type="radio" <%= 'checked="checked"' if @sharing_mode == Policy::EVERYONE -%> id="sharing_scope_<%= Policy::EVERYONE -%>" name="sharing[sharing_scope]"
-                   value="<%= Policy::EVERYONE -%>" <%= 'disabled="true"' if !can_publish -%>/>
+                   value="<%= Policy::EVERYONE -%>"/>
             - All visitors (including anonymous visitors with no login):
           </label>
               <%= render :partial => "assets/sharing_form_access_type_dropdown", :locals => { :access_type_selector_for_scope => Policy::EVERYONE,
             :sharing_scope => @sharing_mode, :access_type => @access_mode } -%>
            <%= additional_advanced_permissions_included @resource, Policy::EVERYONE -%>
           <br/>
-          <label style="margin-left: 2em">
-              <%= check_box_tag 'sharing[request_publish_approval]', 1, false, :disabled => can_publish%>
-              - Request approval from the gatekeepers to share with all visitors
-          </label>
         </p>
 
     </div>
@@ -380,42 +376,4 @@
   updateCustomSharingSettings();
 <% end %>
 
-  updatePublicSharing(false);
-
-  function updatePublicSharing(alert_message) {
-      var resource_name = '<%=@resource.class.name.underscore%>'
-      var resource_id = '<%=@resource.id%>'
-      var project_ids = getProjectIds(resource_name);
-
-      var url = '<%= url_for(:controller => 'policies', :action => 'updated_can_publish')%>'
-      request = new Ajax.Request(url,
-          {
-              method: 'get',
-              parameters: {
-                  project_ids: project_ids,
-                  resource_name: resource_name,
-                  resource_id: resource_id
-              },
-              onSuccess: function(transport){
-                  var data = transport.responseText.evalJSON(true);
-
-                      var public_sharing_radio_button = $('sharing_scope_<%= Policy::EVERYONE -%>');
-                      var updated_can_publish = data.updated_can_publish
-                      if (public_sharing_radio_button.disabled == updated_can_publish){
-                          public_sharing_radio_button.disabled = !updated_can_publish
-                          var request_publish_element = $('sharing_request_publish_approval')
-                          request_publish_element.disabled = updated_can_publish
-                          if (public_sharing_radio_button.checked) {
-                              $("sharing_scope_<%= Policy::ALL_SYSMO_USERS-%>").checked = true;
-                          }
-                          if (alert_message)
-                            alert('Associating/dissociating this project with this <%= @resource_type -%> change your permission to share it publicly. Please check again the sharing session');
-                      }
-              },
-              onFailure: function(transport){
-                  alert('Something went wrong, please try again...');
-              }
-          });
-
-    }
 </script>

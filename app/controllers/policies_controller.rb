@@ -82,7 +82,7 @@ class PoliciesController < ApplicationController
       end
 
       respond_to do |format|
-        format.html { render :template=>"layouts/preview_permissions", :locals => {:grouped_people_by_access_type => grouped_people_by_access_type}}
+        format.html { render :template=>"layouts/preview_permissions", :locals => {:grouped_people_by_access_type => grouped_people_by_access_type, :updated_can_publish => updated_can_publish}}
       end
   end
 
@@ -107,9 +107,7 @@ class PoliciesController < ApplicationController
       updated_can_publish = clone_resource.can_publish?
     end
 
-    respond_to do |format|
-      format.json {render :json => {:updated_can_publish => updated_can_publish}}
-    end
+    updated_can_publish
   end
 
   protected

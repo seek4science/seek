@@ -50,6 +50,9 @@
             <%end%>
         <%when Policy::DETERMINED_BY_GROUP %>
             <p class='public'>All visitors (including anonymous visitors with no login) can <span style="color: #475f30;"><%= Policy.get_access_type_wording(value, try_block{resource_name.camelize.constantize.new()}).downcase -%> </span>  </p>
+            <% if !updated_can_publish %>
+                <span style="color: red;">(One email will be sent to the gatekeepers of the projects associated with this <%= resource_name.humanize%> to ask for publishing approval. This <%= resource_name.humanize%> is not published until one of the gatekeeper approves)</span>
+            <% end %>
        <%end%>
       <%end%>
     <%end%>
