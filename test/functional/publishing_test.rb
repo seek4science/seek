@@ -238,7 +238,7 @@ class PublishingTest < ActionController::TestCase
     gatekeeper = Factory(:gatekeeper)
     df = Factory(:data_file,:projects => gatekeeper.projects)
     login_as(df.contributor)
-    put :update, :id => df.id, :sharing => {:sharing_scope => Policy::PRIVATE, "access_type_#{Policy::PRIVATE}" => Policy::NO_ACCESS, :request_publish_approval => true}
+    put :update, :id => df.id, :sharing => {:sharing_scope => Policy::EVERYONE, "access_type#{Policy::EVERYONE}" => Policy::VISIBLE}
 
     logout
 
@@ -265,7 +265,7 @@ class PublishingTest < ActionController::TestCase
       gatekeeper = Factory(:gatekeeper)
       df = Factory(:data_file)
       login_as(df.contributor)
-      put :update, :id => df.id, :sharing => {:sharing_scope => Policy::PRIVATE, "access_type_#{Policy::PRIVATE}" => Policy::NO_ACCESS, :request_publish_approval => true}
+      put :update, :id => df.id, :sharing => {:sharing_scope => Policy::EVERYONE, "access_type#{Policy::EVERYONE}" => Policy::VISIBLE}
       logout
 
       assert (df.projects&gatekeeper.projects).empty?
@@ -300,7 +300,7 @@ class PublishingTest < ActionController::TestCase
     test 'log when creating item and request publish it' do
       @controller = SopsController.new()
       assert_difference ('ResourcePublishLog.count') do
-        post :create, :sop => valid_sop, :sharing => {:sharing_scope => Policy::PRIVATE, "access_type_#{Policy::PRIVATE}" => Policy::NO_ACCESS, :request_publish_approval => true}
+        post :create, :sop => valid_sop, :sharing => {:sharing_scope => Policy::EVERYONE, "access_type#{Policy::EVERYONE}" => Policy::VISIBLE}
       end
       publish_log = ResourcePublishLog.find(:last)
       assert_equal ResourcePublishLog::WAITING_FOR_APPROVAL, publish_log.publish_state.to_i
@@ -345,7 +345,7 @@ class PublishingTest < ActionController::TestCase
       assert !sop.can_publish?
 
       assert_difference ('ResourcePublishLog.count') do
-        put :update, :id => sop.id, :sharing => {:sharing_scope => Policy::PRIVATE, "access_type_#{Policy::PRIVATE}" => Policy::NO_ACCESS, :request_publish_approval => true}
+        put :update, :id => sop.id, :sharing => {:sharing_scope => Policy::EVERYONE, "access_type#{Policy::EVERYONE}" => Policy::VISIBLE}
       end
       publish_log = ResourcePublishLog.find(:last)
       assert_equal ResourcePublishLog::WAITING_FOR_APPROVAL, publish_log.publish_state.to_i
@@ -387,7 +387,7 @@ class PublishingTest < ActionController::TestCase
         df = Factory(:data_file, :projects => gatekeeper.projects)
 
         login_as(df.contributor)
-        put :update, :id => df.id, :sharing => {:sharing_scope => Policy::PRIVATE, "access_type_#{Policy::PRIVATE}" => Policy::NO_ACCESS, :request_publish_approval => true}
+        put :update, :id => df.id, :sharing => {:sharing_scope => Policy::EVERYONE, "access_type#{Policy::EVERYONE}" => Policy::VISIBLE}
 
         logout
 
@@ -419,7 +419,7 @@ class PublishingTest < ActionController::TestCase
     df = Factory(:data_file, :projects => gatekeeper.projects)
 
     login_as(df.contributor)
-    put :update, :id => df.id, :sharing => {:sharing_scope => Policy::PRIVATE, "access_type_#{Policy::PRIVATE}" => Policy::NO_ACCESS, :request_publish_approval => true}
+    put :update, :id => df.id, :sharing => {:sharing_scope => Policy::EVERYONE, "access_type#{Policy::EVERYONE}" => Policy::VISIBLE}
 
     logout
 
