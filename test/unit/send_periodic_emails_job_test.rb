@@ -86,6 +86,7 @@ class SendPeriodicEmailsJobTest < ActiveSupport::TestCase
     SendPeriodicEmailsJob.create_job('monthly', 15.minutes.from_now)
 
     Factory :activity_log,:activity_loggable => sop, :culprit => Factory(:user), :action => 'create'
+    Factory :activity_log,:activity_loggable=>nil,:culprit => Factory(:user), :action => 'search'
 
     assert_emails 1 do
       SendPeriodicEmailsJob.new('daily').perform
