@@ -45,6 +45,13 @@ Kernel.class_eval do
     yield
     Seek::Config.auth_lookup_enabled=val
   end
+
+  def with_config_value config,value
+    oldval = Seek::Config.send(config)
+    Seek::Config.send("#{config.to_s}=",value)
+    yield
+    Seek::Config.send("#{config.to_s}=",oldval)
+  end
 end
 
 class ActiveSupport::TestCase

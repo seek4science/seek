@@ -21,7 +21,8 @@ class PubmedQuery
       params[:tool] = self.tool unless params[:tool]
       params[:email] = self.email unless params[:tool]
       url = FETCH_URL + "?" + params.delete_if{|k,v| k.nil?}.to_param
-  
+
+      puts url
       doc = query(url)  
       
       return parse_article(doc.find_first("//PubmedArticle"))
