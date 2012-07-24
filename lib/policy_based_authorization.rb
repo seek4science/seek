@@ -17,7 +17,7 @@ module Acts
 
           belongs_to :policy, :required_access_to_owner => :manage, :autosave => true
 
-          before_validation :change_policy_if_cannot_publish, :publishing_auth unless Seek::Config.is_virtualliver
+          before_validation :temporary_policy_while_waiting_for_publishing_approval, :publishing_auth unless Seek::Config.is_virtualliver
           after_save :queue_update_auth_table
           after_destroy :remove_from_lookup_table
         end
@@ -315,8 +315,10 @@ module Acts
         end
       end
 
-      #this is for changing policy from public to sysmo_and_projects_policy, if the item can not be published
-      def change_policy_if_cannot_publish
+      #while item is waiting for publishing approval,set the policy of the item to:
+      #new item: sysmo_and_project_policy
+      #updated item: keep the policy as before
+      def temporary_policy_while_waiting_for_publishing_approval
         if self.new_record? && self.policy.sharing_scope == Policy::EVERYONE && !self.kind_of?(Publication) && !self.can_publish?
           self.policy = Policy.sysmo_and_projects_policy self.projects
         elsif !self.new_record? && self.policy.sharing_scope == Policy::EVERYONE && !self.kind_of?(Publication) && !self.can_publish?
