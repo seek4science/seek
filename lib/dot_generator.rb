@@ -262,6 +262,11 @@ module DotGenerator
             image_node = LibXML::XML::Node.new("image width=\"14\" height=\"14\" x=\"#{x2.to_f + 5}\" y=\"#{y2.to_f + 5}\" xlink:href=\"#{av_url}\"")
             a<<(rect_node)
             a<<(image_node)
+            a.find(".//svg:text").collect do |node|
+              text_position_x =node.attributes['x'].to_i
+              text_position_x +=10
+              node.attributes['x'] = text_position_x.to_s
+            end
           end
 
         end
