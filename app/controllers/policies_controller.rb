@@ -86,18 +86,18 @@ class PoliciesController < ApplicationController
       end
   end
 
-  #This happens when changing the projects associated with item
-  def updated_can_publish
-    resource_class = params[:resource_name].camelize.constantize
-    resource = resource_class.find_by_id(params[:resource_id]) || resource_class.new
+  #To check where the can_publish? changes when changing the projects associated with the resource
+  def updated_can_publish resource_name=params[:resource_name], resource_id=params[:resource_id], project_ids=params[:project_ids]
+    resource_class = resource_name.camelize.constantize
+    resource = resource_class.find_by_id(resource_id) || resource_class.new
     clone_resource = resource.clone
     clone_resource.policy = resource.policy.deep_copy
     if clone_resource.kind_of?Assay
-      clone_resource.study = Study.find_by_id(params[:project_ids].to_i)
+      clone_resource.study = Study.find_by_id(project_ids.to_i)
     elsif clone_resource.kind_of?Study
-       clone_resource.investigation = Investigation.find_by_id(params[:project_ids].to_i)
+       clone_resource.investigation = Investigation.find_by_id(project_ids.to_i)
     else
-      selected_projects = get_selected_projects params[:project_ids], params[:resource_name]
+      selected_projects = get_selected_projects project_ids, resource_name
       clone_resource.projects = selected_projects
     end
 
