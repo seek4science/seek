@@ -986,7 +986,9 @@ class PeopleControllerTest < ActionController::TestCase
     assert_redirected_to current_person
 
     project_subscription_id = ProjectSubscription.find_by_project_id(proj.id).id
-    ProjectSubscriptionJob.new(project_subscription_id).perform
+    assert_difference "Subscription.count",2 do
+      ProjectSubscriptionJob.new(project_subscription_id).perform
+    end
     assert sop.subscribed?(current_person)
     assert df.subscribed?(current_person)
     assert current_person.receive_notifications?

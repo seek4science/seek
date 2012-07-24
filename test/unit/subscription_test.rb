@@ -13,23 +13,47 @@ class SubscriptionTest < ActiveSupport::TestCase
       Delayed::Job.destroy_all
       Seek::Config.email_enabled=@val
   end
+
+  test "for_susbscribable" do
+    p=User.current_user.person
+    p2=Factory :person
+    sop=Factory :sop
+    sop2=Factory :sop
+    assay=Factory :sop
+    assay2=Factory :sop
+    Factory :subscription, :person=>p,:subscribable=>sop
+    Factory :subscription, :person=>p2,:subscribable=>sop
+    Factory :subscription, :person=>p,:subscribable=>sop2
+    Factory :subscription, :person=>p,:subscribable=>assay
+    Factory :subscription, :person=>p,:subscribable=>assay2
+
+    assert_equal 2,Subscription.for_subscribable(sop).count
+    assert_equal [sop,sop],Subscription.for_subscribable(sop).collect{|s| s.subscribable}
+    assert_equal [assay],Subscription.for_subscribable(assay).collect{|s| s.subscribable}
+    assert_equal [sop],p.subscriptions.for_subscribable(sop).collect{|s| s.subscribable}
+
+  end
   
 
   test 'subscribing and unsubscribing toggle subscribed?' do
     s = Factory(:subscribable)
 
     assert !s.subscribed?
-    s.subscribe; s.save!; s.reload
+    s.subscribe
+    s.reload
     assert s.subscribed?
 
-    s.unsubscribe; s.save!; s.reload
+    s.unsubscribe
+    s.reload
     assert !s.subscribed?
 
     another_person = Factory(:person)
     assert !s.subscribed?(another_person)
-    s.subscribe(another_person); s.save!; s.reload
+    s.subscribe(another_person)
+    s.reload
     assert s.subscribed?(another_person)
-    s.unsubscribe(another_person); s.save!; s.reload
+    s.unsubscribe(another_person)
+    s.reload
     assert !s.subscribed?(another_person)
   end
 
@@ -45,18 +69,17 @@ class SubscriptionTest < ActiveSupport::TestCase
     proj = Factory(:project)
     current_person.project_subscriptions.create :project => proj, :frequency => 'immediately'
     s = Factory(:subscribable, :projects => [Factory(:project), proj], :policy => Factory(:public_policy))
-    s.subscribe; s.save!
-    
+    s.subscribe
+
     assert_emails(1) do
       al = Factory(:activity_log, :activity_loggable => s, :action => 'update')
       SendImmediateEmailsJob.new(al.id).perform
     end
 
-
     other_guy = Factory(:person)
     other_guy.project_subscriptions.create :project => proj, :frequency => 'immediately'
     s.reload
-    s.subscribe(other_guy); s.save!
+    s.subscribe(other_guy)
 
     assert_emails(2) do
       al = Factory(:activity_log, :activity_loggable => s, :action => 'update')
@@ -68,7 +91,8 @@ class SubscriptionTest < ActiveSupport::TestCase
     proj = Factory(:project)
     current_person.project_subscriptions.create :project => proj, :frequency => 'weekly'
     s = Factory(:subscribable, :projects =>[proj], :policy => Factory(:public_policy))
-    s.subscribe; s.save!
+    s.subscribe
+
 
     assert_no_emails do
       Factory(:activity_log, :activity_loggable => s, :action => 'update')
@@ -108,7 +132,7 @@ class SubscriptionTest < ActiveSupport::TestCase
     proj = Factory(:project)
     current_person.project_subscriptions.create :project => proj, :frequency => 'immediately'
     s = Factory(:subscribable, :projects => [proj], :policy => Factory(:public_policy))
-    s.subscribe; s.save!
+    s.subscribe
 
     assert_no_emails do
       al = Factory(:activity_log, :activity_loggable => s, :action => 'update')
@@ -124,7 +148,7 @@ class SubscriptionTest < ActiveSupport::TestCase
 
     disable_authorization_checks do
       person.project_subscriptions.create :project => proj, :frequency => 'immediately'
-      s.subscribe; s.save!
+      s.subscribe
     end
 
     assert_no_emails do
