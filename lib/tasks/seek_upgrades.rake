@@ -44,6 +44,32 @@ namespace :seek do
     end
   end
 
+  desc "read publication authors from spreadsheet"
+  task :read_publication_authors => [:environment] do
+    FasterCSV.foreach("publication_authors.csv") do |row|
+      next if row[0] == 'publication name'
+      publication = Publication.find(row[1].match(/\d*$/).to_s.to_i)
+      pa = publication.publication_authors.detect {|pa| pa.first_name == row[2] and pa.last_name == row[3]}
+      if pa.nil?
+        raise "Could not find #{row[2]} #{row[3]} for #{publication.title} id: #{publication.id}"
+      end
+      unless row[7] == "NO LINK"
+        if !row[9].blank?
+          person = Person.find(row[9].match(/\d*$/).to_s.to_i)
+          raise "#{row[9]} did not resolve to a valid person" unless person
+        elsif !row[6].blank?
+          person = Person.find(row[6].match(/\d*$/).to_s.to_i) if !row[6].blank?
+          raise "#{row[9]} did not resolve to a valid person" unless person
+        end
+
+        if person
+          pa.person = person
+          disable_authorization_checks {pa.save!}
+        end
+      end
+    end
+  end
+
   desc "guess publication authors and dump to a csv"
   task :guess_publication_authors_to_csv => [:environment] do
     FasterCSV.open("publication_authors.csv", "w") do |csv|
