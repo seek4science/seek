@@ -97,14 +97,6 @@
 
     </div>
 
-    <!-- some javascript to set the default permissions for new records -->
-    <% if @resource.new_record? && @resource.errors.empty? -%>
-        <script type="text/javascript">
-          $("sharing_scope_<%= Policy::ALL_SYSMO_USERS-%>").checked=true;
-
-        </script>
-    <% end -%>
-
     <% if !disable_advanced_view %>
       <%= link_to_function "Advanced permissions " + expand_image, :class => 'advanced_sharing_link', :style => "display:" + (show_advanced_permissions ? 'none;' : 'block;'), :id =>'advanced_sharing_expand_image' do |page|
           page.visual_effect :toggle_blind, "advanced sharing", :duration => 0.5
