@@ -68,6 +68,20 @@ class PoliciesControllerTest < ActionController::TestCase
     assert_select "p",:text=>"#{contributor.name} can manage as an uploader", :count=>1
   end
 
+  test 'should show asset managers for not entirely private item' do
+    asset_manager = Factory(:asset_manager)
+    post :preview_permissions, :sharing_scope => Policy::EVERYONE, :access_type => Policy::VISIBLE, :is_new_file => "true", :resource_name => 'investigation', :project_ids => asset_manager.projects.first.id.to_s
+
+    assert_select "p",:text=>"#{asset_manager.name} can manage as an asset manager", :count=>1
+  end
+
+  test 'should not show asset managers for entirely private item' do
+      asset_manager = Factory(:asset_manager)
+      post :preview_permissions, :sharing_scope => Policy::PRIVATE, :access_type => Policy::NO_ACCESS, :is_new_file => "true", :resource_name => 'assay', :project_ids => asset_manager.projects.first.id.to_s
+
+      assert_select "p",:text=>"#{asset_manager.name} can manage as an asset manager", :count=>0
+  end
+
   test 'when creating an item, can not publish the item if associate to it the project which has gatekeeper' do
       gatekeeper = Factory(:gatekeeper)
       a_person = Factory(:person)
