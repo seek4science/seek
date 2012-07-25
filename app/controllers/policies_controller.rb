@@ -108,7 +108,6 @@ class PoliciesController < ApplicationController
     asset_managers = []
     resource.projects.each do |project|
       asset_managers |= project.asset_managers
-    end
     asset_managers.reject!{|am| !resource.perform_auth(am.user, 'manage') }
     asset_managers
   end
