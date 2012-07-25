@@ -996,7 +996,7 @@ class AuthorizationTest < ActiveSupport::TestCase
       specimen = Specimen.new(:title => 'test2', :strain => strains(:yeast1), :lab_internal_number => '1234', :projects => gatekeeper.projects, :policy => Policy.new(:sharing_scope => Policy::EVERYONE, :access_type => Policy::ACCESSIBLE))
       assert !specimen.gatekeepers.empty?
       assert !specimen.can_publish?
-      assert !specimen.save
+      assert specimen.save
     end
 
     #contributor can publish if projects associated with asset have no gatekeepers
@@ -1025,7 +1025,7 @@ class AuthorizationTest < ActiveSupport::TestCase
       specimen = Factory(:specimen, :projects => gatekeeper.projects, :contributor => contributor)
       specimen.policy.sharing_scope = Policy::EVERYONE
       assert !specimen.can_publish?
-      assert !specimen.save
+      assert specimen.save
     end
 
     #contributor can publish if projects associated with asset have no gatekeepers
