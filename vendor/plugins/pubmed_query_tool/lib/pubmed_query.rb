@@ -24,7 +24,7 @@ class PubmedQuery
       params[:retmode] = "xml"
       params[:id] = id unless params[:id]
       params[:tool] = self.tool unless params[:tool]
-      params[:email] = self.email unless params[:tool]
+      params[:email] = self.email unless params[:email]
       url = FETCH_URL + "?" + params.delete_if{|k,v| k.nil?}.to_param
 
       puts url

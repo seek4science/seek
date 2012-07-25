@@ -9,7 +9,7 @@ module Seek
     end
 
     def populate pubmed_id
-      query = PubmedQuery.new("seek", Seek::Config.pubmed_api_email)
+      query = PubmedQuery.new("seek@sysmo-db.org", Seek::Config.pubmed_api_email)
       self.pubmed_id = pubmed_id
       query_result = Rails.cache.read(pubmed_id)
       if query_result.nil?

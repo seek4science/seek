@@ -24,11 +24,11 @@ class SearchBiomodelsAdaptorTest < ActiveSupport::TestCase
     end
   end
 
-  test "search no pubmed id" do
+  test "search no pubmed email" do
     with_config_value :pubmed_api_email,"" do
       adaptor = Seek::SearchBiomodelsAdaptor.new({})
       results = adaptor.search("yeast")
-      assert results.empty?
+      assert_equal 0,results.count
     end
   end
 
@@ -43,6 +43,7 @@ class SearchBiomodelsAdaptorTest < ActiveSupport::TestCase
   private
 
   def mock_service_calls
+    #WebMock.allow_net_connect!
     wsdl = File.new("#{Rails.root}/test/fixtures/files/mocking/biomodels.wsdl")
     stub_request(:get, "http://www.ebi.ac.uk/biomodels-main/services/BioModelsWebServices?wsdl").to_return(wsdl)
 
@@ -68,7 +69,7 @@ class SearchBiomodelsAdaptorTest < ActiveSupport::TestCase
 
     ["18846089"].each do |pubmed_id|
       response = File.new("#{Rails.root}/test/fixtures/files/mocking/pubmed_#{pubmed_id}.xml")
-      stub_request(:get, "http://eutils.ncbi.nlm.nih.gov/entrez/eutils/efetch.fcgi?db=pubmed&id=#{pubmed_id}&retmode=xml&tool=seek").to_return(:status=>200,:body=>response.read)
+      stub_request(:get, "http://eutils.ncbi.nlm.nih.gov/entrez/eutils/efetch.fcgi?db=pubmed&email=seek@sysmo-db.org&id=#{pubmed_id}&retmode=xml&tool=seek@sysmo-db.org").to_return(:status=>200,:body=>response.read)
     end
 
   end
