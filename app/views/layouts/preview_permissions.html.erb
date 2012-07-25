@@ -35,7 +35,7 @@
           <% elsif policy.sharing_scope == Policy::EVERYONE  %>
               <p class='public'>All visitors (including anonymous visitors with no login) can <%= Policy.get_access_type_wording(policy.access_type, try_block{resource_name.camelize.constantize.new()}).downcase -%></p>
               <% if !updated_can_publish %>
-                  <span style="color: red;">(One email will be sent to the gatekeepers of the projects associated with this <%= resource_name.humanize %> to ask for publishing approval. This <%= resource_name.humanize %> is not published until one of the gatekeeper approves)</span>
+              <span style="color: red;">(An email will be sent to the Gatekeepers of the projects associated with this <%= resource_name.humanize %> to ask for publishing approval. This <%= resource_name.humanize %> will not be published until one of the Gatekeepers has granted approval)</span>
               <% end %>
           <% end %>
 
