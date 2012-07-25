@@ -11,12 +11,12 @@ module Seek
     def populate pubmed_id
       query = PubmedQuery.new("seek@sysmo-db.org", Seek::Config.pubmed_api_email)
       self.pubmed_id = pubmed_id
-      query_result = Rails.cache.read(pubmed_id)
-      if query_result.nil?
-        query_result = query.fetch(pubmed_id)
-        Rails.cache.write(pubmed_id, query_result)
+      puts "pubmed_id = #{pubmed_id}"
+      query_result_yaml = Rails.cache.fetch("pubmed_fetch_#{pubmed_id}") do
+        result = query.fetch(pubmed_id)
+        result.to_yaml
       end
-
+      query_result = YAML::load(query_result_yaml)
       if (query_result.authors.size > 0)
         query_result.authors.each do |pubname|
           self.authors << pubname.name.to_s
