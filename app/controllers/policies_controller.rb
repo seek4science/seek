@@ -108,9 +108,11 @@ class PoliciesController < ApplicationController
     asset_managers = []
     resource.projects.each do |project|
       asset_managers |= project.asset_managers
+    end
     asset_managers.reject!{|am| !resource.perform_auth(am.user, 'manage') }
     asset_managers
   end
+
   def resource_with_assigned_projects resource_name, resource_id, project_ids
     resource_class = resource_name.camelize.constantize
      resource = resource_class.find_by_id(resource_id) || resource_class.new
