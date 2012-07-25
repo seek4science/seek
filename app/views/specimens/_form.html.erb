@@ -97,10 +97,9 @@
   <%
      button_text=action==:edit ? "Update" : "Create"
      disabled_text=action==:edit ? "Updating..." : "Creating..."
-     is_new_file=action==:edit ? false : true
   %>
   <% if @specimen.can_manage? %>
-      <%= preview_permission_popup_link('specimen', url_for(:controller => 'policies', :action => 'preview_permissions'), is_new_file, try_block { @specimen.contributor.id }) -%>
+      <%= preview_permission_popup_link(@specimen) -%>
       <%= f.submit button_text, :id => "specimen_submit_btn", :onclick => "javascript: clickLink($('preview_permission'));return(false);" -%>
   <% else %>
       <%= f.submit button_text, :id => "specimen_submit_btn", :disable_with => disabled_text -%>
