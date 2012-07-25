@@ -5,27 +5,27 @@ module Seek
   class BiomodelsSearchResult < Struct.new(:authors, :abstract, :title, :date_published, :pubmed_id)
 
     def initialize
-      @authors = []
+      self.authors = []
     end
 
     def populate pubmed_id
       query = PubmedQuery.new("seek", Seek::Config.pubmed_api_email)
-      @pubmed_id = pubmed_id
-      query_result = Rails.cache.read(@pubmed_id)
+      self.pubmed_id = pubmed_id
+      query_result = Rails.cache.read(pubmed_id)
       if query_result.nil?
-        query_result = query.fetch(@pubmed_id)
-        Rails.cache.write(@pubmed_id, query_result)
+        query_result = query.fetch(pubmed_id)
+        Rails.cache.write(pubmed_id, query_result)
       end
 
       if (query_result.authors.size > 0)
-
         query_result.authors.each do |pubname|
-          @authors << pubname.name.to_s
+          self.authors << pubname.name.to_s
         end
       end
-      @abstract = query_result.abstract
-      @date_published = query_result.date_published
-      @title = query_result.title
+
+      self.abstract = query_result.abstract
+      self.date_published = query_result.date_published
+      self.title = query_result.title
     end
 
   end

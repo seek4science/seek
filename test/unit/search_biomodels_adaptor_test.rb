@@ -7,10 +7,21 @@ class SearchBiomodelsAdaptorTest < ActiveSupport::TestCase
   end
 
   test "search" do
-    adaptor = Seek::SearchBiomodelsAdaptor.new({})
-    results = adaptor.search("yeast")
-    assert_equal 10,results.count
-    assert_equal 10,results.select{|r| r.kind_of?(Seek::BiomodelsSearchResult)}.count
+    with_config_value :pubmed_api_email, "seek@sysmo-db.org" do
+      adaptor = Seek::SearchBiomodelsAdaptor.new({})
+      results = adaptor.search("yeast")
+      assert_equal 10,results.count
+      assert_equal 10,results.select{|r| r.kind_of?(Seek::BiomodelsSearchResult)}.count
+      #results will all be the same due to the mocking of getSimpleModelById webservice call
+      result = results.first
+      assert_equal 34,result.authors.count
+      assert_equal "Markus J Herrgård",result.authors.first
+      assert_equal "A consensus yeast metabolic network reconstruction obtained from a community approach to systems biology.",result.title
+      assert_equal "18846089",result.pubmed_id
+      assert_match /Genomic data allow the large-scale manual or semi-automated assembly/,result.abstract
+      assert result.date_published.kind_of?(Date)
+      assert_equal Date.new(2008,10,11),result.date_published
+    end
   end
 
   test "search no pubmed id" do
@@ -23,7 +34,6 @@ class SearchBiomodelsAdaptorTest < ActiveSupport::TestCase
 
   test "abstract adaptor" do
     adaptor = Seek::AbstractSearchAdaptor.new({})
-
     assert_raise(NoMethodError) do
       adaptor.search("yeast")
     end
