@@ -201,9 +201,9 @@ class Policy < ActiveRecord::Base
       when Policy::VISIBLE
         return resource.try(:is_downloadable?) ? "View summary only (NO DOWNLOAD)" : "View summary"
       when Policy::ACCESSIBLE
-        return resource.try(:is_downloadable?) ? "View summary and download contents" : "View summary"
+        return resource.try(:is_downloadable?) ? "Download" : "View summary"
       when Policy::EDITING
-        return resource.try(:is_downloadable?) ? "View and edit summary and contents" : "View and edit summary"
+        return resource.try(:is_downloadable?) ? "Edit" : "View and edit summary"
       when Policy::MANAGING
         return "Manage"
       else
