@@ -67,28 +67,23 @@ class PoliciesController < ApplicationController
       set_no_layout
       policy = sharing_params_to_policy
       current_person = User.current_user.try(:person)
-      contributor = (params['is_new_file'] == 'false') ?  User.find_by_id(params['contributor_id'].to_i).try(:person) : current_person
+      contributor_person = (params['is_new_file'] == 'false') ?  User.find_by_id(params['contributor_id'].to_i).try(:person) : current_person
       creators = (params["creators"].blank? ? [] : ActiveSupport::JSON.decode(params["creators"])).uniq
       creators.collect!{|c| Person.find(c[1])}
-      asset_managers = []
-      selected_projects = get_selected_projects params[:project_ids], params[:resource_name]
-      selected_projects.each do |project|
-        asset_managers |= project.asset_managers
-      end
-      resource_class = params[:resource_name].camelize.constantize
-      resource = resource_class.find_by_id(params[:resource_id]) || resource_class.new
+
+      resource = resource_with_assigned_projects params[:resource_name],params[:resource_id],params[:project_ids]
       resource.policy = policy
-      resource.creators = creators
-      resource.contributor = contributor
-      resource.projects = selected_projects
-      asset_managers.reject!{|am| !resource.perform_auth(am.user, 'manage')}
+      resource.creators = creators if resource.respond_to?:creators
+      resource.contributor = contributor_person
+
+      asset_managers = get_asset_managers resource
 
       privileged_people = {}
       #exclude the current_person from the privileged people
-      contributor = nil if contributor == current_person
+      contributor_person = nil if contributor_person == current_person
       creators.delete(current_person)
       asset_managers.delete(current_person)
-      privileged_people['contributor'] = [contributor] if contributor
+      privileged_people['contributor'] = [contributor_person] if contributor_person
       privileged_people['creators'] = creators unless creators.empty?
       privileged_people['asset_managers'] = asset_managers unless asset_managers.empty?
 
@@ -99,29 +94,38 @@ class PoliciesController < ApplicationController
 
   #To check where the can_publish? changes when changing the projects associated with the resource
   def updated_can_publish resource_name=params[:resource_name], resource_id=params[:resource_id], project_ids=params[:project_ids]
-    resource_class = resource_name.camelize.constantize
-    resource = resource_class.find_by_id(resource_id) || resource_class.new
-    clone_resource = resource.clone
-    clone_resource.policy = resource.policy.deep_copy
-    if clone_resource.kind_of?Assay
-      clone_resource.study = Study.find_by_id(project_ids.to_i)
-    elsif clone_resource.kind_of?Study
-       clone_resource.investigation = Investigation.find_by_id(project_ids.to_i)
-    else
-      selected_projects = get_selected_projects project_ids, resource_name
-      clone_resource.projects = selected_projects
-    end
-
+    resource = resource_with_assigned_projects resource_name, resource_id, project_ids
     if !resource.new_record? && resource.policy.sharing_scope == Policy::EVERYONE
       updated_can_publish = true
     else
-      updated_can_publish = clone_resource.can_publish?
+      updated_can_publish = resource.can_publish?
     end
-
     updated_can_publish
   end
 
   protected
+  def get_asset_managers resource
+    asset_managers = []
+    resource.projects.each do |project|
+      asset_managers |= project.asset_managers
+    end
+    asset_managers.reject! { |am| !resource.perform_auth(am.user, 'manage') }
+    asset_managers
+  end
+  def resource_with_assigned_projects resource_name, resource_id, project_ids
+    resource_class = resource_name.camelize.constantize
+     resource = resource_class.find_by_id(resource_id) || resource_class.new
+     if resource.kind_of?Assay
+       resource.study = Study.find_by_id(project_ids.to_i)
+     elsif resource.kind_of?Study
+        resource.investigation = Investigation.find_by_id(project_ids.to_i)
+     else
+       selected_projects = get_selected_projects project_ids, resource_name
+       resource.projects = selected_projects
+     end
+     resource
+  end
+
   def sharing_params_to_policy params=params
       policy =Policy.new()
       policy.sharing_scope = params["sharing_scope"].to_i
