@@ -65,6 +65,9 @@ class PoliciesController < ApplicationController
 
   def preview_permissions
       set_no_layout
+      policy = sharing_params_to_policy
+      current_person = User.current_user.try(:person)
+      contributor = (params['is_new_file'] == 'false') ?  User.find_by_id(params['contributor_id'].to_i).try(:person) : current_person
       creators = (params["creators"].blank? ? [] : ActiveSupport::JSON.decode(params["creators"])).uniq
       creators.collect!{|c| Person.find(c[1])}
       asset_managers = []
@@ -72,17 +75,25 @@ class PoliciesController < ApplicationController
       selected_projects.each do |project|
         asset_managers |= project.asset_managers
       end
+      resource_class = params[:resource_name].camelize.constantize
+      resource = resource_class.find_by_id(params[:resource_id]) || resource_class.new
+      resource.policy = policy
+      resource.creators = creators
+      resource.contributor = contributor
+      resource.projects = selected_projects
+      asset_managers.reject!{|am| !resource.perform_auth(am.user, 'manage')}
 
-      policy = sharing_params_to_policy
-      if params['is_new_file'] == 'false'
-        contributor = try_block{User.find_by_id(params['contributor_id'].to_i).person}
-        grouped_people_by_access_type = policy.summarize_permissions creators, asset_managers, contributor
-      else
-        grouped_people_by_access_type = policy.summarize_permissions creators, asset_managers
-      end
+      privileged_people = {}
+      #exclude the current_person from the privileged people
+      contributor = nil if contributor == current_person
+      creators.delete(current_person)
+      asset_managers.delete(current_person)
+      privileged_people['contributor'] = [contributor] if contributor
+      privileged_people['creators'] = creators unless creators.empty?
+      privileged_people['asset_managers'] = asset_managers unless asset_managers.empty?
 
       respond_to do |format|
-        format.html { render :template=>"layouts/preview_permissions", :locals => {:grouped_people_by_access_type => grouped_people_by_access_type, :updated_can_publish => updated_can_publish}}
+        format.html { render :template=>"layouts/preview_permissions", :locals => {:policy => policy, :privileged_people => privileged_people, :updated_can_publish => updated_can_publish}}
       end
   end
 
