@@ -111,7 +111,7 @@ module Seek
             return if object.nil? || (object.respond_to?("new_record?") && object.new_record?) || (object.respond_to?("errors") && !object.errors.empty?)
 
             #waiting for approval
-            if params[:sharing] and params[:sharing][:request_publish_approval]
+            if params[:sharing] && params[:sharing][:sharing_scope] == Policy::EVERYONE && !object.can_publish?
                 ResourcePublishLog.create(
                            :culprit => current_user,
                            :resource=>object,
@@ -135,7 +135,7 @@ module Seek
     private
 
     def deliver_request_publish_approval sharing, item
-      if (sharing and sharing[:request_publish_approval]) && Seek::Config.email_enabled && !item.gatekeepers.empty?
+      if (Seek::Config.email_enabled && !item.gatekeepers.empty? && !item.can_publish? && sharing && (sharing[:sharing_scope] == Policy::EVERYONE))
         Mailer.deliver_request_publish_approval item.gatekeepers, User.current_user,item,base_host
       end
     end

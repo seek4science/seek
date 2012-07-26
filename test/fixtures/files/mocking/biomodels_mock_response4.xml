@@ -1,0 +1,57 @@
+<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <soapenv:Body>
+    <ns1:getSimpleModelByIdResponse soapenv:encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" xmlns:ns1="http://biomodels.ebi.ac.uk">
+      <getSimpleModelByIdReturn xsi:type="xsd:string"><![CDATA[<?xml version="1.0" encoding="UTF-8"?>
+<simpleModels>
+<simpleModel>
+	<referenceId>18846089</referenceId>
+	<modelId>MODEL0072364382</modelId>
+	<modelSubmissionId>MODEL0072364382</modelSubmissionId>
+	<modelName>Herrgård2008_MetabolicNetwork_Yeast</modelName>
+	<publicationId>18846089</publicationId>
+	<authors>
+		<author>Herrgård MJ</author>
+		<author>Swainston N</author>
+		<author>Dobson P</author>
+		<author>Dunn WB</author>
+		<author>Arga KY</author>
+		<author>Arvas M</author>
+		<author>Blüthgen N</author>
+		<author>Borger S</author>
+		<author>Costenoble R</author>
+		<author>Heinemann M</author>
+		<author>Hucka M</author>
+		<author>Le Novère N</author>
+		<author>Li P</author>
+		<author>Liebermeister W</author>
+		<author>Mo ML</author>
+		<author>Oliveira AP</author>
+		<author>Petranovic D</author>
+		<author>Pettifer S</author>
+		<author>Simeonidis E</author>
+		<author>Smallbone K</author>
+		<author>Spasić I</author>
+		<author>Weichart D</author>
+		<author>Brent R</author>
+		<author>Broomhead DS</author>
+		<author>Westerhoff HV</author>
+		<author>Kirdar B</author>
+		<author>Penttilä M</author>
+		<author>Klipp E</author>
+		<author>Palsson BØ</author>
+		<author>Sauer U</author>
+		<author>Oliver SG</author>
+		<author>Mendes P</author>
+		<author>Nielsen J</author>
+		<author>Kell DB</author>
+	</authors>
+	<encoders>
+		<encoder>Markus Herrgard</encoder>
+		<encoder>Neil Swainston</encoder>
+	</encoders>
+	<lastModificationDate>2012-02-03T13:12:17+00:00</lastModificationDate>
+</simpleModel>
+</simpleModels>]]></getSimpleModelByIdReturn>
+    </ns1:getSimpleModelByIdResponse>
+  </soapenv:Body>
+</soapenv:Envelope>

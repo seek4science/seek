@@ -14,41 +14,21 @@ class PoliciesControllerTest < ActionController::TestCase
     post :preview_permissions, :sharing_scope => 4, :access_type => 2, :resource_name => 'data_file'
 
     assert_response :success
-    assert_select "p",:text=>"All visitors (including anonymous visitors with no login) can view summary and get contents",:count=>1
+    assert_select "p",:text=>"All visitors (including anonymous visitors with no login) can #{Policy.get_access_type_wording(2, 'data_file'.camelize.constantize.new()).downcase}",:count=>1
   end
 
   test 'should show the preview permission when choosing private scope' do
-    post :preview_permissions, :sharing_scope => 0
+    post :preview_permissions, :sharing_scope => 0, :resource_name => 'data_file'
 
     assert_response :success
-    assert_select "p",:text=>"You keep this item private (only visible to you)", :count=>1
+    assert_select "p",:text=>"You keep this Data file private (only visible to you)", :count=>1
   end
 
   test 'should show the preview permission when choosing network scope' do
-    #create your project and member
-    your_project = Factory(:project)
-    your_work_group = Factory(:work_group, :project => your_project)
-    your_project_member = Factory(:person_in_project, :group_memberships => [Factory(:group_membership, :work_group => your_work_group)])
-
-    #create some projects and members
-    i=0
-    network_members = []
-    while i<5
-      network_members.push Factory(:person_in_project)
-      i +=1
-    end
-
-    #set access_type for your project = Policy::ACCESSIBLE, network = Policy::VISIBLE
-    post :preview_permissions, :sharing_scope => 2, :access_type => Policy::VISIBLE, :project_ids => your_project.id.to_s, :project_access_type => Policy::ACCESSIBLE
+    post :preview_permissions, :sharing_scope => Policy::ALL_SYSMO_USERS, :access_type => Policy::VISIBLE, :resource_name => 'data_file'
 
     assert_response :success
-    assert_select "h2",:text=>"People who can view the summary:", :count=>1
-    network_members.each do |member|
-      assert_select 'a', :text=>"#{member.first_name} #{member.last_name}", :count => 1
-    end
-
-    assert_select "h2",:text=>"People who can view the summary and get contents:", :count=>1
-    assert_select 'a', :text=>"#{your_project_member.first_name} #{your_project_member.last_name}", :count => 1
+    assert_select "p", :text => "All the project members within the network can #{Policy.get_access_type_wording(Policy::VISIBLE, 'data_file'.camelize.constantize.new()).downcase}", :count => 1
   end
 
   test 'should show the preview permission when custom the permissions for Person, Project and FavouriteGroup' do
@@ -64,91 +44,57 @@ class PoliciesControllerTest < ActionController::TestCase
 
     #create a favourite group and members, set access_type to Policy::EDITING
     favorite_group = Factory(:favourite_group, :user => user)
-    fg_members = []
-    i=0
-    while i<5
-      person_in_fg = Factory(:person)
-      Factory(:favourite_group_membership, :favourite_group => favorite_group, :person => person_in_fg, :access_type => Policy::EDITING )
-      fg_members.push person_in_fg
-      i +=1
-    end
     contributor_values['FavouriteGroup']= {favorite_group.id => {"access_type" => -1}}
 
     #create a project and members and set access_type to Policy::ACCESSIBLE
     project = Factory(:project)
-    work_group = Factory(:work_group, :project => project)
-    project_members = []
-    i=0
-    while i<5
-      project_members.push Factory(:person_in_project, :group_memberships => [Factory(:group_membership, :work_group => work_group)])
-      i +=1
-    end
     contributor_values['Project']= {project.id => {"access_type" => Policy::ACCESSIBLE}}
 
-    post :preview_permissions, :sharing_scope => 0, :contributor_types => ActiveSupport::JSON.encode(contributor_types), :contributor_values => ActiveSupport::JSON.encode(contributor_values)
+    post :preview_permissions, :sharing_scope => 0, :contributor_types => ActiveSupport::JSON.encode(contributor_types), :contributor_values => ActiveSupport::JSON.encode(contributor_values), :resource_name => 'data_file'
 
     assert_response :success
-    assert_select "h2",:text=>"People who can view the summary and get contents:", :count=>1
-    project_members.each do |member|
-      assert_select 'a', :text=>"#{member.first_name} #{member.last_name}", :count => 1
-    end
+    assert_select "h2",:text=>"Additional fine-grained sharing permissions:", :count=>1
 
-    assert_select "h2",:text=>"People who can view and edit the summary and contents:", :count=>1
-    fg_members.each do |member|
-      assert_select 'a', :text=>"#{member.first_name} #{member.last_name}", :count => 1
-    end
-
-    assert_select "h2",:text=>"People who can manage:", :count=>1
-    assert_select 'a', :text=>"#{person.first_name} #{person.last_name}", :count => 1
-  end
-
-  test 'should show the preview permission when choosing blacklist and whitelist' do
-    user = Factory(:user)
-    login_as(user)
-
-    #create a blacklist and members
-    black_list = Factory(:favourite_group, :user => user, :name => '__blacklist__')
-    black_list_members = []
-    i=0
-    while i<5
-      person_in_bl = Factory(:person)
-      Factory(:favourite_group_membership, :favourite_group => black_list, :person => person_in_bl, :access_type => Policy::NO_ACCESS )
-      black_list_members.push person_in_bl
-      i +=1
-    end
-
-    #create a whitelist and members
-    white_list = Factory(:favourite_group, :user => user, :name => '__whitelist__')
-    white_list_members = []
-    i=0
-    while i<5
-      person_in_wl = Factory(:person)
-      Factory(:favourite_group_membership, :favourite_group => white_list, :person => person_in_wl, :access_type => Policy::ACCESSIBLE )
-      white_list_members.push person_in_wl
-      i +=1
-    end
-
-    post :preview_permissions, :sharing_scope => 0, :use_blacklist => 'true', :use_whitelist => 'true'
-
-    assert_select "h2",:text=>"People who have no access:", :count=>1
-    black_list_members.each do |member|
-      assert_select 'a', :text=>"#{member.first_name} #{member.last_name}", :count => 1
-    end
-
-    assert_select "h2",:text=>"People who can view the summary and get contents:", :count=>1
-    white_list_members.each do |member|
-      assert_select 'a', :text=>"#{member.first_name} #{member.last_name}", :count => 1
-    end
+    assert_select 'p', :text=>"#{person.name} can #{Policy.get_access_type_wording(Policy::MANAGING, 'data_file'.camelize.constantize.new()).downcase}", :count => 1
+    assert_select 'p', :text=>"Members of Favourite group #{favorite_group.name} have #{Policy.get_access_type_wording(Policy::DETERMINED_BY_GROUP, 'data_file'.camelize.constantize.new()).downcase}", :count => 1
+    assert_select 'p', :text=>"Members of Project #{project.name} can #{Policy.get_access_type_wording(Policy::ACCESSIBLE, 'data_file'.camelize.constantize.new()).downcase}", :count => 1
   end
 
   test 'should show the correct manager(contributor) when updating a study' do
     study = Factory(:study)
     contributor = study.contributor
-    post :preview_permissions, :sharing_scope => Policy::EVERYONE, :access_type => Policy::VISIBLE, :is_new_file => "false", :contributor_id => contributor.user.id
+    post :preview_permissions, :sharing_scope => Policy::EVERYONE, :access_type => Policy::VISIBLE, :is_new_file => "false", :contributor_id => contributor.user.id, :resource_name => 'study'
 
-    assert_select "h2",:text=>"People who can manage:", :count=>1
-    assert_select 'a', :count => 1
-    assert_select 'a', :text=>"#{contributor.name}", :count => 1
+    assert_select "p",:text=>"#{contributor.name} can manage as an uploader", :count=>1
+  end
+
+  test 'should show asset managers for not entirely private item' do
+    asset_manager = Factory(:asset_manager)
+    post :preview_permissions, :sharing_scope => Policy::EVERYONE, :access_type => Policy::VISIBLE, :is_new_file => "true", :resource_name => 'investigation', :project_ids => asset_manager.projects.first.id.to_s
+
+    assert_select "p",:text=>"#{asset_manager.name} can manage as an asset manager", :count=>1
+  end
+
+  test 'should not show asset managers for entirely private item' do
+      asset_manager = Factory(:asset_manager)
+      post :preview_permissions, :sharing_scope => Policy::PRIVATE, :access_type => Policy::NO_ACCESS, :is_new_file => "true", :resource_name => 'assay', :project_ids => asset_manager.projects.first.id.to_s
+
+      assert_select "p",:text=>"#{asset_manager.name} can manage as an asset manager", :count=>0
+  end
+
+  test 'should show notice message when an item is requested to be published' do
+      gatekeeper = Factory(:gatekeeper)
+      sop = Factory(:sop)
+      login_as(sop.contributor)
+      post :preview_permissions, :sharing_scope => Policy::EVERYONE, :access_type => Policy::VISIBLE, :is_new_file => "false", :resource_name => 'sop', :resource_id => sop.id,:project_ids => gatekeeper.projects.first.id.to_s
+
+      assert_select "span",:text=>"(An email will be sent to the Gatekeepers of the projects associated with this SOP to ask for publishing approval. This SOP will not be published until one of the Gatekeepers has granted approval)", :count=>1
+  end
+
+  test 'should not show notice message when an item can be published right away' do
+      post :preview_permissions, :sharing_scope => Policy::EVERYONE, :access_type => Policy::VISIBLE, :is_new_file => "true", :resource_name => 'sop', :project_ids => Factory(:project).id.to_s
+
+      assert_select "span",:text=>"(An email will be sent to the Gatekeepers of the projects associated with this SOP to ask for publishing approval. This SOP will not be published until one of the Gatekeepers has granted approval)", :count=>0
   end
 
   test 'when creating an item, can not publish the item if associate to it the project which has gatekeeper' do
@@ -160,11 +106,8 @@ class PoliciesControllerTest < ActionController::TestCase
       assert sample.can_manage?
       assert sample.can_publish?
 
-      put :updated_can_publish, :project_ids => gatekeeper.projects.first.id, :resource_name => 'sample', :resource_id => sample.id
-      assert_response :success
-
-      json_response = ActiveSupport::JSON.decode(@response.body)
-      assert !json_response["updated_can_publish"]
+      updated_can_publish = PoliciesController.new().updated_can_publish('sample', sample.id, gatekeeper.projects.first.id.to_s)
+      assert !updated_can_publish
   end
 
   test 'when creating an item, can publish the item if associate to it the project which has no gatekeeper' do
@@ -175,11 +118,8 @@ class PoliciesControllerTest < ActionController::TestCase
         assert sample.can_manage?
         assert sample.can_publish?
 
-        put :updated_can_publish, :project_ids => Factory(:project).id, :resource_name => 'sample', :resource_id => sample.id
-        assert_response :success
-
-        json_response = ActiveSupport::JSON.decode(@response.body)
-        assert json_response["updated_can_publish"]
+        updated_can_publish = PoliciesController.new().updated_can_publish('sample', sample.id, Factory(:project).id.to_s)
+        assert updated_can_publish
     end
 
   test 'when updating an item, can not publish the item if associate to it the project which has gatekeeper' do
@@ -193,11 +133,8 @@ class PoliciesControllerTest < ActionController::TestCase
     assert sample.can_manage?
     assert sample.can_publish?
 
-    put :updated_can_publish, :project_ids => gatekeeper.projects.first.id, :resource_name => 'sample', :resource_id => sample.id
-    assert_response :success
-
-    json_response = ActiveSupport::JSON.decode(@response.body)
-    assert !json_response["updated_can_publish"]
+    updated_can_publish = PoliciesController.new().updated_can_publish('sample', sample.id, gatekeeper.projects.first.id.to_s)
+    assert !updated_can_publish
   end
 
   test 'when updating an item, can publish the item if dissociate to it the project which has gatekeeper' do
@@ -211,11 +148,8 @@ class PoliciesControllerTest < ActionController::TestCase
         assert sample.can_manage?
         assert !sample.can_publish?
 
-        put :updated_can_publish, :project_ids => Factory(:project).id, :resource_name => 'sample', :resource_id => sample.id
-        assert_response :success
-
-        json_response = ActiveSupport::JSON.decode(@response.body)
-        assert json_response["updated_can_publish"]
+        updated_can_publish = PoliciesController.new().updated_can_publish('sample', sample.id, Factory(:project).id.to_s)
+        assert updated_can_publish
   end
 
   test 'can publish assay without study' do
@@ -226,11 +160,8 @@ class PoliciesControllerTest < ActionController::TestCase
     assert assay.can_manage?
     assert assay.can_publish?
 
-    put :updated_can_publish, :project_ids => '', :resource_name => 'assay', :resource_id => assay.id
-    assert_response :success
-
-    json_response = ActiveSupport::JSON.decode(@response.body)
-    assert json_response["updated_can_publish"]
+    updated_can_publish = PoliciesController.new().updated_can_publish('assay', assay.id, '')
+    assert updated_can_publish
   end
 
   test 'can not publish assay having project with gatekeeper' do
@@ -243,11 +174,8 @@ class PoliciesControllerTest < ActionController::TestCase
     assert assay.can_manage?
     assert !assay.can_publish?
 
-    put :updated_can_publish, :project_ids => assay.study.id, :resource_name => 'assay', :resource_id => assay.id
-    assert_response :success
-
-    json_response = ActiveSupport::JSON.decode(@response.body)
-    assert !json_response["updated_can_publish"]
+    updated_can_publish = PoliciesController.new().updated_can_publish('assay', assay.id, assay.study.id.to_s)
+    assert !updated_can_publish
   end
 
   test 'always can publish for the published item' do
@@ -262,11 +190,8 @@ class PoliciesControllerTest < ActionController::TestCase
           assert sample.can_manage?
           assert sample.can_publish?
 
-          put :updated_can_publish, :project_ids => gatekeeper.projects.first.id, :resource_name => 'sample', :resource_id => sample.id
-          assert_response :success
-
-          json_response = ActiveSupport::JSON.decode(@response.body)
-          assert json_response["updated_can_publish"]
+          updated_can_publish = PoliciesController.new().updated_can_publish('sample', sample.id, gatekeeper.projects.first.id.to_s)
+          assert updated_can_publish
   end
 
   test 'should show the preview permission for resource without projects' do

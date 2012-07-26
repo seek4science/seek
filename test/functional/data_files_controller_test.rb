@@ -1062,7 +1062,7 @@ class DataFilesControllerTest < ActionController::TestCase
       assert_select "input[type=radio][id='sharing_scope_4'][value='4'][disabled='true']", :count => 0
   end
 
-  test "should disable the policy scope 'all visitor...' for the manager if the item was not published" do
+  test "should enable the policy scope 'all visitor...' for the manager even though he does not have the right to publish it" do
     person = Factory(:person)
     policy = Factory(:policy)
     Factory(:permission, :policy => policy, :contributor => person, :access_type => Policy::MANAGING)
@@ -1079,10 +1079,10 @@ class DataFilesControllerTest < ActionController::TestCase
 
     get :edit, :id => data_file
 
-      assert_select "input[type=radio][id='sharing_scope_4'][value='4'][disabled='true']"
+      assert_select "input[type=radio][id='sharing_scope_4'][value='4'][disabled='true']", :count => 0
   end
 
-  test "should enable the policy scope 'all visitor...' for the manager if the item was published" do
+  test "should enable the policy scope 'all visitor...' for the manager" do
     person = Factory(:person)
     policy = Factory(:policy, :sharing_scope => Policy::EVERYONE)
     Factory(:permission, :policy => policy, :contributor => person, :access_type => Policy::MANAGING)

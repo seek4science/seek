@@ -1,43 +1,55 @@
 require 'search_biomodel'
 
 module Seek
-  class SearchBiomodelsAdaptor < SearchAdaptor
+
+  class BiomodelsSearchResult < Struct.new(:authors, :abstract, :title, :date_published, :pubmed_id)
+
+    def initialize
+      self.authors = []
+    end
+
+    def populate pubmed_id
+      query = PubmedQuery.new("seek", Seek::Config.pubmed_api_email)
+      self.pubmed_id = pubmed_id
+      query_result = Rails.cache.read(pubmed_id)
+      if query_result.nil?
+        query_result = query.fetch(pubmed_id)
+        Rails.cache.write(pubmed_id, query_result)
+      end
+
+      if (query_result.authors.size > 0)
+        query_result.authors.each do |pubname|
+          self.authors << pubname.name.to_s
+        end
+      end
+
+      self.abstract = query_result.abstract
+      self.date_published = query_result.date_published
+      self.title = query_result.title
+    end
+
+  end
+
+  class SearchBiomodelsAdaptor < AbstractSearchAdaptor
 
     def search query
-      connection = SysMODB::SearchBiomodel.instance
-      connection.models(query)
+      if !Seek::Config.pubmed_api_email.blank?
+        connection = SysMODB::SearchBiomodel.instance
+        connection.models(query).collect do |result|
+          if !result.nil? && !result[:publication_id].blank?
+            r=BiomodelsSearchResult.new
+            r.populate result[:publication_id]
+            r
+          else
+            nil
+          end
+        end.compact
+      else
+        Rails.logger.warn("Pubmed email not defined, so skipping biomodels search")
+        []
+      end
     end
+
   end
 
 end
-
-
-
-#@ext_results["biomodels"] = []
-#@connection = SysMODB::SearchBiomodel.instance
-#@ext_results["biomodels"] = @connection.models(@search_query)
-#@ext_results["biomodels"].each_with_index do |res, i|
-#  sleep 0.4
-#  query = PubmedQuery.new("seek", Seek::Config.pubmed_api_email)
-#  if !res.nil? && !res[:publication_id].nil? && res[:publication_id] != ""
-#    query_result = Rails.cache.read(res[:publication_id])
-#    if query_result.nil?
-#      query_result = query.fetch(res[:publication_id])
-#      Rails.cache.write(res[:publication_id], query_result)
-#    else
-#      #flash.now[:notice] = "#{Rails.cache.read(:publication_id).abstract}"
-#    end
-#
-#    if (query_result.authors.size > 0)
-#      @ext_results["biomodels"][i][:authors] = Array.new
-#      query_result.authors.each_with_index do |pubname, j|
-#        @ext_results["biomodels"][i][:authors][j] = pubname.name.to_s
-#      end
-#    end
-#    @ext_results["biomodels"][i][:abstract] = query_result.abstract
-#    @ext_results["biomodels"][i][:date_published] = query_result.date_published
-#    @ext_results["biomodels"][i][:title] = query_result.title
-#  else
-#    @ext_results["biomodels"].delete_at(i)
-#  end
-#end
