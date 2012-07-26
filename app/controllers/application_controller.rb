@@ -50,7 +50,7 @@ class ApplicationController < ActionController::Base
   end
 
 
-  before_filter :project_membership_required,:only=>[:create,:new]
+  before_filter :project_membership_required
 
   helper :all
 
@@ -144,23 +144,33 @@ class ApplicationController < ActionController::Base
     current_user.forget_me if logged_in?
     cookies.delete :auth_token
     cookies.delete :open_id
+    error = flash[:error]
+    notice = flash[:notice]
     reset_session
+    flash[:error] = error
+    flash[:notice] = notice
   end
 
   private
 
   def project_membership_required
-    unless try_block {current_user.person.member? or User.admin_logged_in?}
-      flash[:error] = "Only members of known projects, institutions or work groups are allowed to create new content."
-      respond_to do |format|
-        format.html do
-          try_block {redirect_to eval("#{controller_name}_path")} or redirect_to root_url
+    unless current_user.try(:person).try(:member?) or User.admin_logged_in?
+      if current_user
+        flash[:error] = "Only members of known projects, institutions or work groups are allowed to access seek. Please contact a Project Manager or Admin."
+        respond_to do |format|
+          format.html {redirect_to logout_path}
+          format.json { render :json => {:status => 401, :error_message => flash[:error] } }
         end
-        format.json { render :json => {:status => 401, :error_message => flash[:error] } }
+      elsif [:new, :create].include? params[:action]
+        flash[:error] = "Only members of known projects, institutions or work groups are allowed to create new content."
+        respond_to do |format|
+          format.html do
+            try_block {redirect_to eval("#{controller_name}_path")} or redirect_to root_url
+            format.json { render :json => {:status => 401, :error_message => flash[:error] } }
+          end
+        end
       end
-
     end
-
   end
 
   def pal_or_admin_required
