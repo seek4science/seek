@@ -38,10 +38,10 @@ class PeopleController < ApplicationController
     end
 
     unless @people
-      @people = apply_filters(Person.all).select(&:can_view?)
+      @people = apply_filters(Person.all).select(&:can_view?).reject {|p| p.projects.empty? }
       @people=Person.paginate_after_fetch(@people, :page=>params[:page])
     else
-      @people = @people.select(&:can_view?)
+      @people = @people.select(&:can_view?).reject {|p| p.projects.empty?}
     end
 
     respond_to do |format|
