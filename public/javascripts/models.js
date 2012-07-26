@@ -60,3 +60,12 @@ function model_format_selection_changed() {
         $('update_model_format_button').disabled=true;
     }
 }
+
+function detectFileFormat(){
+    var file_path_array = $('model_image_image_file').value.split('.');
+    var file_format = file_path_array[file_path_array.length -1];
+    if (file_format != 'jpg' && file_format != 'gif' && file_format != 'png'){
+        $('model_image_image_file').value = '';
+        alert('Only jpg, gif and png formats are supported.');
+    }
+}

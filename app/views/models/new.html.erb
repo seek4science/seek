@@ -32,7 +32,7 @@
               <%= hidden_field_tag(:model_id, @model.id) -%>
               <p>
                 <b>Image file: </b>
-                <%= file_field :model_image, :image_file %>
+                <%= file_field :model_image, :image_file, :onchange => "detectFileFormat()" %>
               </p>
             </div>
           </div>
