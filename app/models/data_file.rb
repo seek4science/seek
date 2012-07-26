@@ -9,6 +9,13 @@ class DataFile < ActiveRecord::Base
   include Seek::DataFileExtraction
 
   attr_accessor :parent_name
+
+  #searchable must come before acts_as_asset call
+  searchable(:auto_index=>false) do
+    text :description, :title, :original_filename, :searchable_tags, :spreadsheet_annotation_search_fields,:fs_search_fields, :spreadsheet_contents_for_search,
+         :assay_type_titles,:technology_type_titles
+  end if Seek::Config.solr_enabled
+
   acts_as_asset
   acts_as_trashable
 
@@ -23,11 +30,6 @@ class DataFile < ActiveRecord::Base
   # validates_uniqueness_of :title, :scope => [ :contributor_id, :contributor_type ], :message => "error - you already have a Data file with such title."
 
     has_one :content_blob, :as => :asset, :foreign_key => :asset_id ,:conditions => 'asset_version= #{self.version}'
-
-  searchable(:auto_index=>false) do
-    text :description, :title, :original_filename, :searchable_tags, :spreadsheet_annotation_search_fields,:fs_search_fields, :spreadsheet_contents_for_search,
-         :assay_type_titles,:technology_type_titles
-  end if Seek::Config.solr_enabled
 
   has_many :studied_factors, :conditions =>  'studied_factors.data_file_version = #{self.version}'
 

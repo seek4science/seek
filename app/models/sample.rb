@@ -70,6 +70,9 @@ class Sample < ActiveRecord::Base
 
   searchable do
     text :searchable_terms
+    text :creators do
+      creators.compact.map(&:name)
+    end
   end if Seek::Config.solr_enabled
 
 

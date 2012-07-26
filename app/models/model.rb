@@ -7,6 +7,12 @@ require 'title_trimmer'
 class Model < ActiveRecord::Base
 
   title_trimmer
+
+  #searchable must come before acts_as_asset call
+  searchable(:auto_index=>false) do
+    text :description,:title,:original_filename,:organism_terms,:searchable_tags, :model_contents,:assay_type_titles,:technology_type_titles
+  end if Seek::Config.solr_enabled
+
   acts_as_asset
   acts_as_trashable
 
@@ -30,10 +36,7 @@ class Model < ActiveRecord::Base
   belongs_to :recommended_environment,:class_name=>"RecommendedModelEnvironment"
   belongs_to :model_type
   belongs_to :model_format
-  
-  searchable(:auto_index=>false) do
-    text :description,:title,:original_filename,:organism_terms,:searchable_tags, :model_contents,:assay_type_titles,:technology_type_titles
-  end if Seek::Config.solr_enabled
+
 
   explicit_versioning(:version_column => "version") do
     include Seek::ModelProcessing
