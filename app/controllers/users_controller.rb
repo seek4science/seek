@@ -162,7 +162,16 @@ class UsersController < ApplicationController
     
     redirect_to :controller => 'home', :action => 'index'
   end
-  
+
+  def hide_guide_box
+    if current_user
+      current_user.show_guide_box = '0'
+      current_user.save(false)
+    end
+    render :update do |page|
+       page.visual_effect :fade, 'guide_box', :duration => 0.25
+    end
+  end
   protected
   
   def open_id_authentication(identity_url)

@@ -162,6 +162,15 @@ class UserTest < ActiveSupport::TestCase
     assert_equal x.uuid, uuid
   end
 
+  test 'test show_guide_box' do
+    x = users(:aaron)
+    assert x.show_guide_box?
+    x.show_guide_box = false
+    x.save
+    x.reload
+    assert !x.show_guide_box?
+  end
+
 protected
   def create_user(options = {})
     record = User.new({ :login => 'quire', :email => 'quire@example.com', :password => 'quire', :password_confirmation => 'quire' }.merge(options))
