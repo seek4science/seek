@@ -52,15 +52,15 @@ module AssetsCommonExtension
     params_files = calculate_params(:content_blob)
     params_data = params_files.first
     params_url = params_files.second
-
+    params_image_file = params[controller_name.singularize+'_image'].nil? ? nil : params[controller_name.singular+'_image']['image_file']
 
     if render_action_on_error==:new || render_action_on_error.nil?
       params_files = params_data + params_url
     elsif render_action_on_error==:edit
       params_files = object.content_blobs
     end
-    if params_files.blank?
-      flash.now[:error] = "Please select at least a file to upload or provide a URL to the data."
+    if params_files.blank? && params_image_file.blank?
+      flash.now[:error] = "Please select at least a file/image to upload or provide a URL to the data."
       if render_action_on_error
         init_asset_for_render params
         respond_to do |format|

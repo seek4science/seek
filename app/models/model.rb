@@ -11,7 +11,7 @@ class Model < ActiveRecord::Base
   acts_as_trashable
 
   include Seek::ModelProcessing
-  
+
   validates_presence_of :title
 
   after_save :queue_background_reindexing if Seek::Config.solr_enabled

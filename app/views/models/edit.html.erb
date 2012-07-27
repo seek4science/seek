@@ -11,17 +11,6 @@
     <% form_for(@model ,:html => {:multipart => true, :method => :put}) do |f| %>
     <div class="asset_form">
         <%= f.error_messages %>
-        <p>
-            <b>Title:</b>
-            <br/>
-            <%= f.text_area :title, :style => "width: 100%;",:rows=>2 -%>
-        </p>
-        <p>
-            <b>Description:</b>
-            <br/>
-            <%= f.text_area :description, :style => "width: 100%;", :rows => 10 -%>
-        </p>
-
       <p>
         <% if @model && (mine?(@model) || @model.can_edit?) -%>
           <div class="fold">
@@ -32,9 +21,18 @@
               <%= render :partial => "model_images/image_selector", :locals => {:image_for_instance => @model, :form_instance => f} -%>
             </div>
           </div>
-      <% end -%>
+        <% end -%>
       </p>
-      
+        <p>
+            <b>Title:</b>
+            <br/>
+            <%= f.text_area :title, :style => "width: 100%;",:rows=>2 -%>
+        </p>
+        <p>
+            <b>Description:</b>
+            <br/>
+            <%= f.text_area :description, :style => "width: 100%;", :rows => 10 -%>
+        </p>
         <p>
             <div class="fold">
                 <div class="foldTitle">
