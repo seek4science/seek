@@ -19,7 +19,7 @@
 
   <% if (asset.can_delete? or current_user.try(:admin?)) and asset.respond_to? :to_presentation %>
       <li>
-        <%= image_tag_for_key "arrow_right", {:controller=>"data_files",:action => "convert_to_presentation",:id=>asset.id}, nil, {:title => "click to move this data file to presentations",:confirm => "Are you sure you wish to move this data file to presentations? Doing so is irreversible!"}, 'Move to presentations'%>
+        <%= image_tag_for_key "arrow_right", convert_to_presentation_data_file_path(asset.id), nil, {:title => "click to move this data file to presentations",:confirm => "Are you sure you wish to move this data file to presentations? Doing so is irreversible!", :method => :post}, 'Move to presentations'%>
      </li>
    <% end %>
 
