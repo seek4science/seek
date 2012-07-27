@@ -74,11 +74,15 @@ class PoliciesController < ApplicationController
       end
 
       policy = sharing_params_to_policy
-      if params['is_new_file'] == 'false'
-        contributor = try_block{User.find_by_id(params['contributor_id'].to_i).person}
-        grouped_people_by_access_type = policy.summarize_permissions creators, asset_managers, contributor
+      if policy.sharing_scope.blank? && policy.access_type.blank?
+        flash[:error] = "Sharing policy is invalid"
       else
-        grouped_people_by_access_type = policy.summarize_permissions creators, asset_managers
+        if params['is_new_file'] == 'false'
+          contributor = try_block{User.find_by_id(params['contributor_id'].to_i).person}
+          grouped_people_by_access_type = policy.summarize_permissions creators, asset_managers, contributor
+        else
+          grouped_people_by_access_type = policy.summarize_permissions creators, asset_managers
+        end
       end
 
       respond_to do |format|
@@ -89,8 +93,8 @@ class PoliciesController < ApplicationController
   protected
   def sharing_params_to_policy params=params
       policy =Policy.new()
-      policy.sharing_scope = params["sharing_scope"].to_i
-      policy.access_type = params["access_type"].to_i
+      policy.sharing_scope = params["sharing_scope"].to_i unless params[:sharing_scope].blank?
+      policy.access_type = params["access_type"].to_i unless params[:access_type].blank?
       policy.use_whitelist = params["use_whitelist"] == 'true' ? true : false
       policy.use_blacklist = params["use_blacklist"] == 'true' ? true : false
 

@@ -909,8 +909,11 @@ function selectedSharingScope(){
 function selectedAccessType(sharing_scope){
 //get access_type
     var access_type
+    //unselected
+    if(sharing_scope == "")
+      access_type = ""
     //private
-    if (parseInt(sharing_scope) == 0)
+    else if (parseInt(sharing_scope) == 0)
         access_type = $('access_type_select_'.concat(sharing_scope)).value
     else
         access_type = $('access_type_select_'.concat(sharing_scope)).options[$('access_type_select_'.concat(sharing_scope)).selectedIndex].value

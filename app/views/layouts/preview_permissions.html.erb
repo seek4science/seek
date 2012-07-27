@@ -52,7 +52,11 @@
             <p class='public'>All visitors (including anonymous visitors with no login) can <span style="color: #475f30;"><%= Policy.get_access_type_wording(value, try_block{resource_name.camelize.constantize.new()}).downcase -%> </span>  </p>
        <%end%>
       <%end%>
-    <%end%>
+    <%else %>
+      <% if flash[:error]%>
+        <p class="private"><%= flash[:error] %></p>
+      <% end %>
+    <% end %>
 
     <div align="center" style="margin-top: 1em">
       <input type=button value='OK' style="width: 5em" onclick="createOrUpdateResource('<%= is_new_file -%>', '<%= resource_name -%>')">
