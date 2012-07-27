@@ -1,0 +1,8 @@
+
+  <% externals ||= resources %>
+        <% externals.each do |ext| %>
+                <% resource_name = ext.fetch("name").to_s %>
+                <span id="resource_<%= resource_name %>">
+                  <%= resource_name %> <%= check_box_tag resource_name, "true", :disabled => true %>
+                </span>
+            <% end %>

@@ -88,8 +88,9 @@ module ApplicationHelper
     results={}
 
     result_collection.each do |res|
-      results[res.class.name] = {:items => [], :hidden_count => 0} unless results[res.class.name]
-      results[res.class.name][:items] << res
+      tab = res.respond_to?(:tab) ? res.tab : res.class.name
+      results[tab] = {:items => [], :hidden_count => 0} unless results[tab]
+      results[tab][:items] << res
     end
 
     return results

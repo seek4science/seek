@@ -1,5 +1,7 @@
 class SearchController < ApplicationController
 
+  include Seek::ExternalSearch
+
   def index
 
     if Seek::Config.solr_enabled
@@ -58,10 +60,20 @@ class SearchController < ApplicationController
               query.keywords downcase_query
           end.results
       end
+
+      if include_external_search?
+        @results |= external_search downcase_query,type
+      end
+
     end
   end
 
-  private  
+  private
+
+  def include_external_search?
+    #true
+    false
+  end
 
   #Removes all results from the search results collection passed in that are not Authorised to show for the current user (if one is logged in)
   def select_authorised collection

@@ -1,0 +1,38 @@
+<div class="list_item_title">
+  <% if resource.has_key?("title".to_sym) %>
+      <%= "<p> #{resource[:title]}</p>" %>
+      <% resource.delete("title".to_sym) %>
+  <% end %>
+  <% if resource.has_key?("description".to_sym) %>
+      <% description = resource[:description] %>
+      <% resource.delete("description".to_sym) %>
+  <% end %>
+
+</div>
+<div class="list_item_left_column">
+
+  <% beginning_html = "<p class='list_item_attribute'>" %>
+  <% end_html = "</p>" %>
+  <% if resource.class == Hash %>
+      <% resource.each do |key, val| %>
+          <% if val.class == Array %>
+              <%= beginning_html + "<b>" + key.to_s + ": </b>\n" %>
+              <%= val.each { |x| "#{x} \n" } %>
+              <%= end_html %>
+          <% else %>
+              <%= beginning_html + "<b>" + key.to_s + ": </b>" + val + end_html %>
+          <% end %>
+      <% end %>
+  <% else %>
+      <%= beginning_html + resource.to_s + end_html %>
+  <% end %>
+</div>
+
+<div class="list_item_right_column">
+</div>
+
+<div class="list_item_whole_width">
+  <% if !description.blank? && !description.nil? %>
+     <%= beginning_html + "<b> Description: </b> " + list_item_description(description) + end_html %>
+  <% end %>
+</div>

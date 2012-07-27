@@ -19,4 +19,15 @@ module Seek
     end
 
   end
+
+  module ExternalSearchResult
+    def can_view?
+      true
+    end
+
+    def is_external_search_result?
+      true
+    end
+  end
+
 end
