@@ -165,8 +165,8 @@ class UsersController < ApplicationController
 
   def hide_guide_box
     if current_user
-      current_user.show_guide_box = '0'
-      current_user.save(false)
+      current_user.show_guide_box = false
+      current_user.save
     end
     render :update do |page|
        page.visual_effect :fade, 'guide_box', :duration => 0.25
