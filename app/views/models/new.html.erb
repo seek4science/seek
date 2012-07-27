@@ -21,24 +21,6 @@
         </p>
 
       <p>
-        <% if @model && (mine?(@model) || @model.can_edit?) -%>
-          <div class="fold">
-            <div class="foldTitle">
-              <%= help_icon("Here you can also upload image for this model") -%>
-              Model image (optional)
-            </div>
-            <div class="foldContent">
-
-              <%= hidden_field_tag(:model_id, @model.id) -%>
-              <p>
-                <b>Image file: </b>
-                <%= file_field :model_image, :image_file, :onchange => "detectFileFormat()" %>
-              </p>
-            </div>
-          </div>
-      <% end -%>
-      </p>
-      <p>
             <div class="fold">
                 <div class="foldTitle">
                     Other information 

@@ -1,4 +1,4 @@
-<%= javascript_include_tag 'attachments' %>
+<%= javascript_include_tag 'attachments', 'models' %>
 
 <%
    # determine the asset type from the controller
@@ -76,17 +76,24 @@
               <span id="test_url_result_icon"></span>
               <span id="test_url_msg" style="display:none;"></span>
             </p>
-
-
-            </div>
-
+          </div>
       </li>
     </ul>
-
   </div>
+
   <table id="pending_files">
   </table>
 </div>
+
+<% if resource && resource.kind_of?(Model) && (mine?(resource) || resource.can_edit?) -%>
+  <div>
+      <%= hidden_field_tag(:model_id, @model.id) -%>
+      <p>
+        <b>Image file: </b>
+        <%= file_field :model_image, :image_file, :onchange => "detectFileFormat()" %>
+      </p>
+  </div>
+<% end -%>
 
 <script type="text/javascript">
     from_file_selected();
