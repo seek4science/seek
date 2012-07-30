@@ -10,7 +10,7 @@ class PeopleController < ApplicationController
   before_filter :do_projects_belong_to_project_manager_projects,:only=>[:administer_update]
   before_filter :editable_by_user, :only => [:edit, :update]
   before_filter :administerable_by_user, :only => [:admin, :administer_update]
-  skip_before_filter :project_membership_required
+  skip_before_filter :project_membership_required, :only => [:create, :new]
   skip_before_filter :profile_for_login_required,:only=>[:select,:userless_project_selected_ajax,:create]
 
   cache_sweeper :people_sweeper,:only=>[:update,:create,:destroy]

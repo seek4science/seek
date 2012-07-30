@@ -11,7 +11,7 @@ class ProjectsController < ApplicationController
   before_filter :administerable_by_user, :only =>[:admin]
   before_filter :auth_params,:only=>[:update]
   before_filter :auth_institution_list_for_project_manager, :only => [:update]
-  skip_before_filter :project_membership_required
+  skip_before_filter :project_membership_required, :only => [:create, :new]
 
   cache_sweeper :projects_sweeper,:only=>[:update,:create,:destroy]
 
