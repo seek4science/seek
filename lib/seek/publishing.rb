@@ -69,8 +69,7 @@ module Seek
     end
 
     def set_asset
-      c = self.controller_name.downcase
-      @asset = eval("@"+c.singularize) || self.controller_name.classify.constantize.find_by_id(params[:id])
+      @asset = self.controller_name.classify.constantize.find_by_id(params[:id])
     end
 
     def publish_auth
@@ -81,6 +80,10 @@ module Seek
     end
 
     def gatekeeper_auth
+      if @asset.nil?
+         error("This #{self.controller_name.humanize.singularize} no longer exists, and may have been deleted since the request to publish was made.", "asset missing")
+        return false
+      end
       unless @asset.gatekeepers.include?(current_user.try(:person))
         error("You have to login as a gatekeeper to perform this action", "is invalid (insufficient_privileges)")
         return false
