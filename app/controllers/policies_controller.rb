@@ -77,6 +77,7 @@ class PoliciesController < ApplicationController
       if policy.sharing_scope.blank? && policy.access_type.blank?
         flash[:error] = "Sharing policy is invalid.\nPlease select who may access the item by defining a sharing policy."
       else
+        flash[:error] = nil
         if params['is_new_file'] == 'false'
           contributor = try_block{User.find_by_id(params['contributor_id'].to_i).person}
           grouped_people_by_access_type = policy.summarize_permissions creators, asset_managers, contributor
