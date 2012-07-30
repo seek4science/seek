@@ -41,7 +41,6 @@ class SearchBiomodelsAdaptorTest < ActiveSupport::TestCase
     end
   end
 
-
   private
 
   def mock_service_calls
