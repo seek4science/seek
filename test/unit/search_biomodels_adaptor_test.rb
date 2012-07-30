@@ -10,8 +10,8 @@ class SearchBiomodelsAdaptorTest < ActiveSupport::TestCase
     with_config_value :pubmed_api_email, "seek@sysmo-db.org" do
       adaptor = Seek::SearchBiomodelsAdaptor.new({})
       results = adaptor.search("yeast")
-      assert_equal 10,results.count
-      assert_equal 10,results.select{|r| r.kind_of?(Seek::BiomodelsSearchResult)}.count
+      assert_equal 14,results.count
+      assert_equal 14,results.select{|r| r.kind_of?(Seek::BiomodelsSearchResult)}.count
       #results will all be the same due to the mocking of getSimpleModelById webservice call
       result = results.first
       assert_equal 34,result.authors.count
