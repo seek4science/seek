@@ -8,24 +8,16 @@ module Seek
 
     def search query
       if !Seek::Config.pubmed_api_email.blank?
-        connection = SysMODB::SearchBiomodel.instance
-        #FIXME: needs redoing, as we need more than the pubmed id - also need the model_id and last_modification_date
-        pubmed_ids = Rails.cache.fetch("biomodels_search_#{query}",:expires_in=>1.hour) do
-          biomodels_result = connection.models(query)
-          biomodels_result.collect do |r|
-            if r.nil? || r[:publication_id].blank?
-              nil
-            else
-              r[:publication_id]
-            end
-          end.compact
+        yaml = Rails.cache.fetch("biomodels_search_#{URI::encode(query)}",:expires_in=>1.day) do
+          connection = SysMODB::SearchBiomodel.instance
+          biomodels_search_results = connection.models(query).select do |result|
+            !(result.nil? || result[:publication_id].nil?)
+          end
+          biomodels_search_results.collect do |result|
+            r=BiomodelsSearchResult.new result
+          end.compact.to_yaml
         end
-
-        pubmed_ids.collect do |id|
-            r=BiomodelsSearchResult.new
-            r.populate id
-            r
-        end
+        YAML::load(yaml)
       else
         Rails.logger.warn("Pubmed email not defined, so skipping biomodels search")
         []
@@ -38,31 +30,32 @@ module Seek
 
     include Seek::ExternalSearchResult
 
-    def initialize
+
+    def initialize biomodels_search_result
       self.authors = []
       self.tab="Biomodels"
-      self.model_id="1"
+      self.model_id=biomodels_search_result[:model_id]
+      self.last_modification_date=biomodels_search_result[:last_modification_date]
+      populate biomodels_search_result[:publication_id]
     end
 
-    def populate pubmed_id
-      query = PubmedQuery.new("seek@sysmo-db.org", Seek::Config.pubmed_api_email)
-      self.pubmed_id = pubmed_id
-      query_result_yaml = Rails.cache.fetch("pubmed_fetch_#{pubmed_id}",:expires_in=>1.week) do
-        result = query.fetch(pubmed_id)
-        result.to_yaml
-      end
-      puts query_result_yaml
-      query_result = YAML::load(query_result_yaml)
-      if (query_result.authors.size > 0)
-        query_result.authors.each do |pubname|
-          self.authors << pubname.name.to_s
-        end
-      end
+    private
 
-      self.abstract = query_result.abstract
-      self.date_published = query_result.date_published
-      self.last_modification_date = Time.now
-      self.title = query_result.title
+    def populate pubmed_id
+      self.pubmed_id = pubmed_id
+      query_result = Rails.cache.fetch("pubmed_fetch_#{pubmed_id}",:expires_in=>1.week) do
+        result = PubmedQuery.new("seek@sysmo-db.org", Seek::Config.pubmed_api_email).fetch(pubmed_id)
+        hash = {}
+        hash[:abstract]=result.abstract
+        hash[:title]=result.title
+        hash[:date_published]=result.date_published
+        hash[:authors]=result.authors.collect{|a| a.name.to_s}
+        hash
+      end
+      self.abstract = query_result[:abstract]
+      self.date_published = query_result[:date_published]
+      self.title = query_result[:title]
+      self.authors = query_result[:authors]
     end
 
   end

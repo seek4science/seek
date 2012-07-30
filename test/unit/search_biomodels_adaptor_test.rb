@@ -20,7 +20,9 @@ class SearchBiomodelsAdaptorTest < ActiveSupport::TestCase
       assert_equal "18846089",result.pubmed_id
       assert_match /Genomic data allow the large-scale manual or semi-automated assembly/,result.abstract
       assert result.date_published.kind_of?(Date)
-      assert_equal Date.new(2008,10,11),result.date_published
+      assert_equal DateTime.parse("2008-10-11"),result.date_published
+      assert_equal "MODEL0072364382",result.model_id
+      assert_equal DateTime.parse("2012-02-03T13:12:17+00:00"),result.last_modification_date
     end
   end
 

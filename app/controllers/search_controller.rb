@@ -71,8 +71,8 @@ class SearchController < ApplicationController
   private
 
   def include_external_search?
-    #true
-    false
+    true
+    #false
   end
 
   #Removes all results from the search results collection passed in that are not Authorised to show for the current user (if one is logged in)
