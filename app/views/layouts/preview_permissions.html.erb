@@ -25,7 +25,9 @@
 
 <div class="redbox_contents" id="preview_permissions" style="width:500px;">
     <div class="body">
-    <h1>You will share this item with:</h1>
+    <% unless flash[:error] %>
+        <h1>You will share this item with:</h1>
+    <% end %>
     <%unless grouped_people_by_access_type.blank?
       grouped_people_by_access_type.each do |key, value|
       case key
