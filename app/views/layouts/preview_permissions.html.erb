@@ -59,7 +59,9 @@
     <% end %>
 
     <div align="center" style="margin-top: 1em">
-      <input type=button value='OK' style="width: 5em" onclick="createOrUpdateResource('<%= is_new_file -%>', '<%= resource_name -%>')">
+      <% unless flash[:error] %>
+          <input type=button value='OK' style="width: 5em" onclick="createOrUpdateResource('<%= is_new_file -%>', '<%= resource_name -%>')">
+      <% end %>
       <input type=button value='Cancel' onclick="RedBox.close()">
     </div>
   </div>
