@@ -2,28 +2,30 @@
  <%= "<p> #{resource.title}</p>" %>
 </div>
 
-<%= "#{resource.tab}"  %>
 <div class="list_item_left_column">
 
 
-<% beginning_html =  "<p class='list_item_attribute'>" %>
-<% end_html = "</p>" %>
-<% authors = "" %>
+    <p class='list_item_attribute'>
 
-<% resource.authors.each { |x| authors.concat(" <br>      " + x + ",")} %>
-
-
-<%= beginning_html + "<b> Original Authors: </b> " + authors.chop + end_html %>
+    <%= "<b> Original Authors: </b> " + resource.authors.join(", ") %>
+    </p>
 </div>
 
 <div class="list_item_right_column">
-    <%= beginning_html + "<b> Publication Date: </b> " + resource.date_published.to_s + end_html %>
-    <%= beginning_html + "<b> Last Modified: </b>" + resource.last_modification_date.to_s + end_html %>
+    <p class='list_item_attribute'>
+        <%= "<b> Publication Date: </b> " + date_as_string(resource.date_published) %>
+    </p>
+    <p class='list_item_attribute'>
+      <%= "<b> Last Modified: </b>" + date_as_string(resource.last_modification_date, true) %>
+    </p>
 </div>
 
 
 <div class="list_item_whole_width">
-  <%= beginning_html + "<b> URL of Original: </b> " + link_to("http://www.ebi.ac.uk/biomodels-main/#{resource.model_id}", "http://www.ebi.ac.uk/biomodels-main/#{resource.model_id}") + end_html %>
-  <%= beginning_html + "<b> Abstract: </b> " + list_item_description(resource.abstract) + end_html %>
-  <%=  "<p class=\"list_item_attribute none_text\" style=\"text-align:center;\"><b>Last Modified:</b> " + (resource.last_modification_date).strftime('%d/%m/%Y @ %H:%M:%S')  %>
+  <p class='list_item_attribute'>
+    <%= "<b> URL of Original: </b> " + link_to("http://www.ebi.ac.uk/biomodels-main/#{resource.model_id}", "http://www.ebi.ac.uk/biomodels-main/#{resource.model_id}",:target=>"_blank") %>
+  </p>
+  <p class='list_item_attribute'>
+    <%= "<b> Abstract: </b> " + list_item_description(resource.abstract,true,1000) %>
+  </p>
 </div>
