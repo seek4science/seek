@@ -199,32 +199,6 @@ class ModelsController < ApplicationController
       end
     end
   end
-
-  #def simulate
-  #  error=nil
-  #  begin
-  #    if @display_model.is_jws_supported?
-  #      @applet = Seek::JWS::SimulatorApplet.new.simulate(@display_model)
-  #    end
-  #  rescue Exception=>e
-  #    Rails.logger.error("Problem simulating model on JWS Online #{e}")
-  #    raise e unless Rails.env=="production"
-  #    error=e
-  #  end
-  #
-  #  respond_to do |format|
-  #    if error
-  #      flash[:error]="JWS Online encountered a problem processing this model."
-  #      format.html { redirect_to(@model, :version=>@display_model.version) }
-  #    elsif !@display_model.is_jws_supported?
-  #      flash[:error]="This model is of neither SBML or JWS Online (Dat) format so cannot be used with JWS Online"
-  #      format.html { redirect_to(@model, :version=>@display_model.version) }
-  #    else
-  #       format.html { render :simulate_applet }
-  #    end
-  #  end
-  #end
-
   
   def update_model_metadata
     attribute=params[:attribute]

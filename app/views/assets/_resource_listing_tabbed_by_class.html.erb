@@ -70,7 +70,7 @@
         <div id="<%= resource_type.downcase.pluralize -%>" class="tabbertab"> 
           <% unless resources.empty? && extra_count < 1 %>
             <h3><%= "#{visible_resource_type} (#{resources.length+extra_count}#{"+"+hidden_count.to_s if hidden_count > 0})" -%></h3>
-            <%= render :partial => "assets/resource_list", :locals => { :collection => resources, :narrow_view => narrow_view, :authorization_for_showing_already_done => true } -%>
+                <%= render :partial => "assets/resource_list", :locals => { :collection => resources, :narrow_view => narrow_view, :authorization_for_showing_already_done => true } -%>
           <% else %>
             <h3><%= "#{visible_resource_type} (0+#{hidden_count})" -%></h3>
           <% end %>
@@ -83,7 +83,7 @@
                     else
                         link_to "View all items", eval("#{resource_type.pluralize.underscore}_path")
                     end
-                        %>
+                -%>
               </div>
               <br style="clear:both"/>
             </div>

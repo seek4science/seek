@@ -167,7 +167,7 @@ module Seek
             # store properties and contents of the file temporarily and remove the latter from params[],
             # so that when saving main object params[] wouldn't contain the binary data anymore
             params[symb][:content_type] = (params[symb][:data]).content_type
-            params[symb][:original_filename] = (params[symb][:data]).original_filename
+            params[symb][:original_filename] = (params[symb][:data]).original_filename if params[symb][:original_filename].blank?
             @tmp_io_object = params[symb][:data]
           elsif !(params[symb][:data_url]).blank?
             make_local_copy = (params[symb][:local_copy]=="1")
@@ -180,7 +180,7 @@ module Seek
               @tmp_io_object=File.open data_hash[:data_tmp_path],"r" if make_local_copy
               
               params[symb][:content_type] = data_hash[:content_type]
-              params[symb][:original_filename] = data_hash[:filename]
+              params[symb][:original_filename] = data_hash[:filename] if params[symb][:original_filename].blank?
             elsif (["302","401"].include?(code))
               params[symb][:content_type] = ""
               params[symb][:original_filename] = ""

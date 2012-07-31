@@ -13,8 +13,21 @@ module Seek
     end
 
     def external_search query,type='all'
-
+      search_adaptors(type).collect do |adaptor|
+        adaptor.search query
+      end.flatten
     end
 
   end
+
+  module ExternalSearchResult
+    def can_view?
+      true
+    end
+
+    def is_external_search_result?
+      true
+    end
+  end
+
 end

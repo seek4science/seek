@@ -1,0 +1,16 @@
+<% resource = external_resource_list_item %>
+<% resource_type = resource.tab.downcase  %>
+
+<% content_partial = "external_search/#{resource_type}_resource_list_item" -%>
+
+<div class="list_item">
+  <%= render :partial=> content_partial, :locals=>{:resource => resource, :resource_origin => resource_type} %>
+
+  <% if false && resource_type == "Biomodels" %>
+      <div class="list_item_actions">
+        <%= image_tag_for_key "view as XML", :controller => "external_search", :action => resource_type, :id => resource.model_id %>
+        <%= image_tag_for_key "download", :controller => "models", :action => "new", :method=>"post", :resource_url=>"http://www.ebi.ac.uk/biomodels-main/download?mid=".concat(resource[:model_id]), :publication_id => resource[:publication_id], :source=>"biomodels" %>
+      </div>
+  <% end %>
+</div>
+<br style="clear:both"/>
