@@ -11,6 +11,10 @@ asset_name = text_for_resource upload_field
 new_version ||= false
 -%>
 
+<%
+   obj.data_url=params[:model][:data_url] if params[:model] && params[:model][:data_url]
+-%>
+
 <div class="box_infotext">
 
     <p>

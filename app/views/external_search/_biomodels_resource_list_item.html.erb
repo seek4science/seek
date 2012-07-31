@@ -29,3 +29,18 @@
     <%= "<b> Abstract: </b> " + list_item_description(resource.abstract,true,1000) %>
   </p>
 </div>
+
+<%
+   biomodel_link = "http://www.ebi.ac.uk/biomodels-main/download?mid=#{resource.model_id}"
+   description_for_import = resource.abstract || ""
+   description_for_import += "\n\n"
+   description_for_import += "Originating from BioModels: #{biomodel_link}"
+   -%>
+
+<%= image_tag_for_key "download",
+                      :controller => "models",
+                      :action => "new",
+                      :model=>{:title=>resource.title,:description=>description_for_import,:data_url=>biomodel_link},
+                      :source=>resource.tab
+-%>
+

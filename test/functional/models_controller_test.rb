@@ -54,6 +54,7 @@ class ModelsControllerTest < ActionController::TestCase
       end
     end
   end
+
   
   test "shouldn't show hidden items in index" do
     login_as(:aaron)
@@ -92,7 +93,15 @@ class ModelsControllerTest < ActionController::TestCase
     get :new    
     assert_response :success
     assert_select "h1",:text=>"New Model"
-  end    
+  end
+
+  test "should get new populated from params" do
+    get :new, :model=>{:title=>"the title",:description=>"the description",:data_url=>"wibblebibble"}
+    assert_response :success
+    assert_select "textarea#model_title",:text=>"the title"
+    assert_select "textarea#model_description",:text=>"the description"
+    assert_select "input#model_data_url",:value=>"wibblebibble"
+  end
   
   test "should correctly handle bad data url" do
     model={:title=>"Test",:data_url=>"http://sdfsdfkh.com/sdfsd.png",:projects=>[projects(:sysmo_project)]}
