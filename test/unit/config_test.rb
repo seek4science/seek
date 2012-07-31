@@ -23,6 +23,17 @@ class ConfigTest < ActiveSupport::TestCase
     Seek::Config.is_virtualliver = original_value
   end
 
+  test "external search" do
+    with_config_value :external_search_enabled,true do
+      assert Seek::Config.external_search_enabled
+    end
+
+    with_config_value :external_search_enabled,false do
+      assert !Seek::Config.external_search_enabled
+    end
+
+  end
+
   test "email_enabled" do
     #NOTE: this is the value in seek_testing.rb, the actual default is 'false'
     assert_equal true ,Seek::Config.email_enabled
