@@ -25,7 +25,19 @@ new_version ||= false
 <div class="box_infotext">
 
     <p>
-        You can register a <%= asset_name -%> by either directly uploading a file, or registering a URL. Please test the URL before submitting. <%= link_to_function "More info " + expand_image, visual_effect(:toggle_blind, "more_upload_info", :duration => 0.3) -%>
+        You can register a <%= asset_name -%> by either directly uploading a file, or registering a URL. Please test the URL before submitting.
+      <%= link_to_function "More info "+image("expand"), :id => 'more_info_expand_image' do |page|
+        page.visual_effect(:toggle_appear, "more_upload_info", :duration => 0.3)
+        page["more_info_expand_image"].toggle
+        page["more_info_collapse_image"].toggle
+      end
+      -%>
+      <%= link_to_function "More info "+image("collapse"), :id => 'more_info_collapse_image', :style => "display:none" do |page|
+        page.visual_effect(:toggle_appear, "more_upload_info", :duration => 0.3)
+        page["more_info_expand_image"].toggle
+        page["more_info_collapse_image"].toggle
+      end
+      -%>
     </p>
     <span id="more_upload_info" style="display:none;">
         <p>

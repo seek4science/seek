@@ -18,7 +18,19 @@
   <p>
     You can register a <%= asset_name.pluralize -%> by either directly uploading one/multiple files, or registering one/multiple URLs or uploading a image file. Please test the URLs
     before
-    submitting. <%= link_to_function "More info " + expand_image, visual_effect(:toggle_blind, "more_upload_info", :duration => 0.3) -%>
+    submitting.
+    <%= link_to_function "More info "+image("expand"), :id => 'more_info_expand_image' do |page|
+      page.visual_effect(:toggle_appear, "more_upload_info", :duration => 0.3)
+      page["more_info_expand_image"].toggle
+      page["more_info_collapse_image"].toggle
+    end
+    -%>
+    <%= link_to_function "More info "+image("collapse"), :id => 'more_info_collapse_image', :style => "display:none" do |page|
+      page.visual_effect(:toggle_appear, "more_upload_info", :duration => 0.3)
+      page["more_info_expand_image"].toggle
+      page["more_info_collapse_image"].toggle
+    end
+    -%>
   </p>
     <span id="more_upload_info" style="display:none;">
         <p>
