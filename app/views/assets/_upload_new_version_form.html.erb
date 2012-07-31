@@ -4,11 +4,23 @@ upload_field = 'content_blob'  if resource.respond_to?(:content_blobs)
 %>
 <script>
     function validateUploadFormFields(form){
-        if ($('<%= "#{upload_field}_data" -%>').value.length == 0 && $('<%= "#{upload_field}_data_url" -%>').value.length == 0) {
-            alert("Please specify the name of the file to upload or provide a URL	");
-            $('<%= "#{upload_field}_data" -%>').focus();
-            return (false);
+        if (<%= resource.respond_to?(:content_blobs) %>){
+            if ($('pending_files').children.length == 0 && $('<%= "#{controller_name.singularize}_image_image_file" -%>') == null){
+                alert("Please specify at least a file to upload or provide a URL.");
+                return (false);
+            }else if ($('pending_files').children.length == 0 && $('<%= "#{controller_name.singularize}_image_image_file" -%>') != null && $('<%= "#{controller_name.singularize}_image_image_file" -%>').value == ''){
+               alert("Please specify at least a file/image to upload or provide a URL.");
+               return (false);
+            }
+        }else{
+            if ($('<%= "#{upload_field}_data" -%>').value.length == 0 && $('<%= "#{upload_field}_data_url" -%>').value.length == 0){
+                alert("Please specify at least a file to upload or provide a URL.");
+                $('<%= "#{upload_field}_data" -%>').focus();
+                return (false);
+
+            }
         }
+
         $('new_version_submit_btn').disabled = true;
         $('new_version_submit_btn').value = "Uploading ...";
         $('new_version_submit_btn').form.submit();
