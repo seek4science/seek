@@ -1,0 +1,31 @@
+<div class="list_item_title">
+ <%= "<p> #{resource.title}</p>" %>
+</div>
+
+<div class="list_item_left_column">
+
+
+    <p class='list_item_attribute'>
+
+    <%= "<b> Original Authors: </b> " + resource.authors.join(", ") %>
+    </p>
+</div>
+
+<div class="list_item_right_column">
+    <p class='list_item_attribute'>
+        <%= "<b> Publication Date: </b> " + date_as_string(resource.date_published) %>
+    </p>
+    <p class='list_item_attribute'>
+      <%= "<b> Last Modified: </b>" + date_as_string(resource.last_modification_date, true) %>
+    </p>
+</div>
+
+
+<div class="list_item_whole_width">
+  <p class='list_item_attribute'>
+    <%= "<b> URL of Original: </b> " + link_to("http://www.ebi.ac.uk/biomodels-main/#{resource.model_id}", "http://www.ebi.ac.uk/biomodels-main/#{resource.model_id}",:target=>"_blank") %>
+  </p>
+  <p class='list_item_attribute'>
+    <%= "<b> Abstract: </b> " + list_item_description(resource.abstract,true,1000) %>
+  </p>
+</div>

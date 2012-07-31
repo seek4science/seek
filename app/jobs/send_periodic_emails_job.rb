@@ -14,24 +14,33 @@ class SendPeriodicEmailsJob < Struct.new(:frequency)
         send_subscription_mails ActivityLog.scoped(:include => :activity_loggable, :conditions => ['created_at>=?', 1.month.ago]), 'monthly'
       end
       #add job for next period
-      SendPeriodicEmailsJob.create_job(frequency, next_run_at, 1)
+      SendPeriodicEmailsJob.create_job(frequency, next_run_at, 1, true)
     rescue Exception=>e
       #add job for next period
-      SendPeriodicEmailsJob.create_job(frequency, next_run_at, 1)
-      raise e
+      SendPeriodicEmailsJob.create_job(frequency, next_run_at, 1,true)
     end
   end
 
   Subscription::FREQUENCIES.drop(1).each do |frequency|
     eval <<-END_EVAL
     def self.#{frequency}_exists?
-      Delayed::Job.find(:first,:conditions=>['handler = ? AND failed_at IS ?',SendPeriodicEmailsJob.new('#{frequency}').to_yaml,nil]) != nil
+      exists? '#{frequency}'
     end
     END_EVAL
   end
 
-  def self.create_job frequency,t, priority=1
-      Delayed::Job.enqueue(SendPeriodicEmailsJob.new(frequency),priority,t) unless send("#{frequency}_exists?")
+  def self.exists? frequency, ignore_locked=false
+    if ignore_locked
+      Delayed::Job.find(:first,:conditions=>['handler = ? AND locked_at IS ? AND failed_at IS ?',SendPeriodicEmailsJob.new("#{frequency}").to_yaml,nil,nil]) != nil
+    else
+      Delayed::Job.find(:first,:conditions=>['handler = ? AND failed_at IS ?',SendPeriodicEmailsJob.new("#{frequency}").to_yaml,nil]) != nil
+    end
+
+  end
+
+
+  def self.create_job frequency,t, priority=1, ignore_locked=false
+      Delayed::Job.enqueue(SendPeriodicEmailsJob.new(frequency),priority,t) unless exists?(frequency,ignore_locked)
   end
 
   def send_subscription_mails logs, frequency

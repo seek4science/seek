@@ -250,10 +250,12 @@ Factory.define(:data_file) do |f|
 end
 
 Factory.define(:rightfield_datafile,:parent=>:data_file) do |f|
+  f.content_type "application/excel"
   f.association :content_blob,:factory=>:rightfield_content_blob
 end
 
 Factory.define(:rightfield_annotated_datafile,:parent=>:data_file) do |f|
+  f.content_type "application/excel"
   f.association :content_blob,:factory=>:rightfield_annotated_content_blob
 end
 

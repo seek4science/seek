@@ -21,46 +21,105 @@ class SendPeriodicEmailsJobTest < ActiveSupport::TestCase
     end
 
     assert SendPeriodicEmailsJob.daily_exists?
+    assert SendPeriodicEmailsJob.exists? "daily"
+    assert SendPeriodicEmailsJob.exists? "daily",true
 
     job=Delayed::Job.first
     assert_nil job.locked_at
     job.locked_at = Time.now
     job.save!
     assert SendPeriodicEmailsJob.daily_exists?,"Should not ignore locked jobs"
+    assert SendPeriodicEmailsJob.exists?("daily")
+    assert !SendPeriodicEmailsJob.exists?("daily",true)
 
     job.locked_at=nil
     job.failed_at = Time.now
     job.save!
     assert !SendPeriodicEmailsJob.daily_exists?,"Should ignore failed jobs"
+    assert !SendPeriodicEmailsJob.exists?("daily")
+    assert !SendPeriodicEmailsJob.exists?("daily",true)
 
     job.failed_at = nil
     job.save!
     assert SendPeriodicEmailsJob.daily_exists?
+    assert SendPeriodicEmailsJob.exists?("daily")
 
     assert !SendPeriodicEmailsJob.weekly_exists?
     assert_difference("Delayed::Job.count",1) do
-      Delayed::Job.enqueue SendPeriodicEmailsJob.new("weekly")
+      job=Delayed::Job.enqueue SendPeriodicEmailsJob.new("weekly")
     end
     assert SendPeriodicEmailsJob.weekly_exists?
+    assert SendPeriodicEmailsJob.exists?("weekly")
+    assert SendPeriodicEmailsJob.exists?("weekly", true)
+    job.locked_at=Time.now
+    job.save!
+    assert SendPeriodicEmailsJob.weekly_exists?
+    assert SendPeriodicEmailsJob.exists?("weekly")
+    assert !SendPeriodicEmailsJob.exists?("weekly",true)
 
     assert !SendPeriodicEmailsJob.monthly_exists?
     assert_difference("Delayed::Job.count",1) do
-      Delayed::Job.enqueue SendPeriodicEmailsJob.new("monthly")
+      job=Delayed::Job.enqueue SendPeriodicEmailsJob.new("monthly")
     end
     assert SendPeriodicEmailsJob.monthly_exists?
+    assert SendPeriodicEmailsJob.exists?("monthly")
+    assert SendPeriodicEmailsJob.exists?("monthly",true)
+    job.locked_at=Time.now
+    job.save!
+    assert SendPeriodicEmailsJob.weekly_exists?
+    assert SendPeriodicEmailsJob.exists?("monthly")
+    assert !SendPeriodicEmailsJob.exists?("monthly",true)
 
   end
 
   test "create job" do
       assert_equal 0,Delayed::Job.count
-      SendPeriodicEmailsJob.create_job('daily', Time.now)
+      assert_difference("Delayed::Job.count",1) do
+        SendPeriodicEmailsJob.create_job('daily', Time.now)
+      end
+
       assert_equal 1,Delayed::Job.count
 
       job = Delayed::Job.first
       assert_equal 1,job.priority
 
-      SendPeriodicEmailsJob.create_job('daily', Time.now)
+      assert_no_difference("Delayed::Job.count") do
+        SendPeriodicEmailsJob.create_job('daily', Time.now)
+      end
+
       assert_equal 1,Delayed::Job.count
+
+      assert_difference("Delayed::Job.count",1) do
+        job = SendPeriodicEmailsJob.create_job('weekly', Time.now)
+      end
+      assert_no_difference("Delayed::Job.count") do
+        SendPeriodicEmailsJob.create_job('weekly', Time.now)
+      end
+      job.locked_at = Time.now
+      job.save!
+      assert_no_difference("Delayed::Job.count") do
+        SendPeriodicEmailsJob.create_job('weekly', Time.now)
+      end
+      assert_difference("Delayed::Job.count",1) do
+        SendPeriodicEmailsJob.create_job('weekly', Time.now,1, true)
+      end
+
+  end
+
+
+  test "creation of follow on job after perform" do
+    #checks that a new job is created when perform is comples despite the current one being locked
+    Delayed::Job.destroy_all
+    person1 = Factory(:person)
+    job = nil
+    assert_difference("Delayed::Job.count",1) do
+      job = SendPeriodicEmailsJob.create_job('daily', 15.minutes.from_now)
+    end
+    job.locked_at = Time.now
+    job.save!
+    assert_difference("Delayed::Job.count",1) do
+      SendPeriodicEmailsJob.new('daily').perform
+    end
   end
 
 
@@ -97,6 +156,7 @@ class SendPeriodicEmailsJobTest < ActiveSupport::TestCase
     assert_emails 2 do
       SendPeriodicEmailsJob.new('monthly').perform
     end
+
   end
 
   test "perform ignores unwanted actions" do

@@ -5,8 +5,12 @@
   <div class="list_items_container">
 
     <% collection.each do |item| -%>
-		  <% if authorization_for_showing_already_done || item.can_view? -%>  
-				<%= render :partial => "assets/resource_list_item",:object=>item -%>
+		  <% if authorization_for_showing_already_done || item.can_view? -%>
+                <% if item.respond_to?(:is_external_search_result?) -%>
+                    <%= render :partial=> "external_search/external_resource_list_item",:object=>item -%>
+                <% else -%>
+				    <%= render :partial => "assets/resource_list_item",:object=>item -%>
+                <% end -%>
 			<% end -%>
 		<% end -%>
 	</div>

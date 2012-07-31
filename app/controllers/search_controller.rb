@@ -1,5 +1,7 @@
 class SearchController < ApplicationController
 
+  include Seek::ExternalSearch
+
   def index
 
     if Seek::Config.solr_enabled
@@ -27,10 +29,8 @@ class SearchController < ApplicationController
     @search_type = params[:search_type]
     type=@search_type.downcase unless @search_type.nil?
 
-    if @search_query.start_with?("*") || @search_query.start_with?("?")
-      flash.now[:error]="You cannot start a query with a wildcard, so this was removed. You CAN however include wildcards at the end or within the query."
-      @search_query=@search_query[1..-1] while @search_query.start_with?("*") || @search_query.start_with?("?")
-    end
+    @search_query = @search_query.gsub("*","")
+    @search_query = @search_query.gsub("?","")
 
     @search_query.strip!
 
@@ -60,10 +60,19 @@ class SearchController < ApplicationController
               query.keywords downcase_query
           end.results
       end
+
+      if include_external_search?
+        @results |= external_search downcase_query,type
+      end
+
     end
   end
 
-  private  
+  private
+
+  def include_external_search?
+    Seek::Config.external_search_enabled
+  end
 
   #Removes all results from the search results collection passed in that are not Authorised to show for the current user (if one is logged in)
   def select_authorised collection

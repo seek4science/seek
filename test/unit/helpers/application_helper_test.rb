@@ -24,4 +24,15 @@ class ApplicationHelperTest < ActionView::TestCase
 
     assert date_as_string(created_at, true).include?(local_created_at.strftime('%H:%M:%S'))
   end
+
+  test "date_as_string with Date or DateTime" do
+    date = DateTime.parse("2011-10-28")
+    assert_equal "28th October 2011",date_as_string(date)
+
+    date = Date.new(2011,10,28)
+    assert_equal "28th October 2011",date_as_string(date)
+
+    date = Time.parse("2011-10-28")
+    assert_equal "28th October 2011",date_as_string(date)
+  end
 end

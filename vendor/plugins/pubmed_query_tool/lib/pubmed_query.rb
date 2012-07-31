@@ -3,6 +3,11 @@ require 'open-uri'
 
 class PubmedQuery
   attr_accessor :tool, :email
+
+  #used to prevent queries breaking ncbi terms of use, of no more than 3 queries per second
+  @@last_query_time=Time.now
+  #0.33 seconds
+  MINIMUM_INTERVAL=0.33
   
   FETCH_URL = "http://eutils.ncbi.nlm.nih.gov/entrez/eutils/efetch.fcgi"
   SEARCH_URL = "http://eutils.ncbi.nlm.nih.gov/entrez/eutils/esearch.fcgi"
@@ -19,10 +24,9 @@ class PubmedQuery
       params[:retmode] = "xml"
       params[:id] = id unless params[:id]
       params[:tool] = self.tool unless params[:tool]
-      params[:email] = self.email unless params[:tool]
+      params[:email] = self.email unless params[:email]
       url = FETCH_URL + "?" + params.delete_if{|k,v| k.nil?}.to_param
 
-      puts url
       doc = query(url)  
       
       return parse_article(doc.find_first("//PubmedArticle"))
@@ -171,6 +175,7 @@ class PubmedQuery
   end
   
   def query(url)
+    pause_for_terms_of_usage
     doc = nil
     begin
       doc = open(url)
@@ -184,6 +189,15 @@ class PubmedQuery
         raise "Error occurred whilst parsing XML"
       end
     end
+  end
+
+  #pauses for a gap since the last call of a minimum of 0.33 seconds, to abide by the terms of usage
+  def pause_for_terms_of_usage
+    gap=Time.now-@@last_query_time
+    if gap<MINIMUM_INTERVAL
+      sleep MINIMUM_INTERVAL-gap
+    end
+    @@last_query_time=Time.now
   end
   
   def parse_date(xml_date)

@@ -6,6 +6,7 @@ module ApplicationHelper
 
 
   def date_as_string date,show_time_of_day=false
+    date = Time.parse(date.to_s) unless date.is_a?(Time)
     if date.blank?
       str="<span class='none_text'>No date defined</span>"
     else
@@ -88,8 +89,9 @@ module ApplicationHelper
     results={}
 
     result_collection.each do |res|
-      results[res.class.name] = {:items => [], :hidden_count => 0} unless results[res.class.name]
-      results[res.class.name][:items] << res
+      tab = res.respond_to?(:tab) ? res.tab : res.class.name
+      results[tab] = {:items => [], :hidden_count => 0} unless results[tab]
+      results[tab][:items] << res
     end
 
     return results
