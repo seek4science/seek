@@ -42,7 +42,7 @@
 <%= image_tag_for_key "import",
         {:controller => "models",
         :action => "new",
-        :model=>{:title=>resource.title,:description=>description_for_import,:data_url=>biomodel_link},
+        :model=>{:title=>resource.title,:description=>description_for_import,:data_url=>biomodel_link,:original_filename=>"#{resource.model_id}.xml"},
         :source=>resource.tab },
         "import",{},
         "Import" %>

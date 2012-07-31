@@ -178,7 +178,7 @@ module Seek
               @tmp_io_object=File.open data_hash[:data_tmp_path],"r" if make_local_copy
               
               params[symb][:content_type] = data_hash[:content_type]
-              params[symb][:original_filename] = data_hash[:filename]
+              params[symb][:original_filename] ||= data_hash[:filename]
             elsif (["302","401"].include?(code))
               params[symb][:content_type] = ""
               params[symb][:original_filename] = ""
