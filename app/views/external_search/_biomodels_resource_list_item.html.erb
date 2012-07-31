@@ -1,31 +1,51 @@
-<div class="list_item_title">
- <%= "<p> #{resource.title}</p>" %>
+<div class="list_item_content">
+    <div class="list_item_title">
+     <%= "<p> #{resource.title}</p>" %>
+    </div>
+
+    <div class="list_item_left_column">
+
+
+        <p class='list_item_attribute'>
+
+        <%= "<b> Original Authors: </b> " + resource.authors.join(", ") %>
+        </p>
+    </div>
+
+    <div class="list_item_right_column">
+        <p class='list_item_attribute'>
+            <%= "<b> Publication Date: </b> " + date_as_string(resource.date_published) %>
+        </p>
+        <p class='list_item_attribute'>
+          <%= "<b> Last Modified: </b>" + date_as_string(resource.last_modification_date, true) %>
+        </p>
+    </div>
+
+
+    <div class="list_item_whole_width">
+      <p class='list_item_attribute'>
+        <%= "<b> URL of Original: </b> " + link_to("http://www.ebi.ac.uk/biomodels-main/#{resource.model_id}", "http://www.ebi.ac.uk/biomodels-main/#{resource.model_id}",:target=>"_blank") %>
+      </p>
+      <p class='list_item_attribute'>
+        <%= "<b> Abstract: </b> " + list_item_description(resource.abstract,true,1000) %>
+      </p>
+    </div>
+</div>
+<div class="list_item_actions">
+<%
+   biomodel_link = "http://www.ebi.ac.uk/biomodels-main/download?mid=#{resource.model_id}"
+   description_for_import = resource.abstract || ""
+   description_for_import += "\n\n"
+   description_for_import += "Originating from BioModels: #{biomodel_link}"
+-%>
+<%= image_tag_for_key "download",biomodel_link,"download",{},"Download" %>
+<%= image_tag_for_key "import",
+        {:controller => "models",
+        :action => "new",
+        :model=>{:title=>resource.title,:description=>description_for_import,:data_url=>biomodel_link,:original_filename=>"#{resource.model_id}.xml"},
+        :source=>resource.tab },
+        "import",{},
+        "Import" %>
+
 </div>
 
-<div class="list_item_left_column">
-
-
-    <p class='list_item_attribute'>
-
-    <%= "<b> Original Authors: </b> " + resource.authors.join(", ") %>
-    </p>
-</div>
-
-<div class="list_item_right_column">
-    <p class='list_item_attribute'>
-        <%= "<b> Publication Date: </b> " + date_as_string(resource.date_published) %>
-    </p>
-    <p class='list_item_attribute'>
-      <%= "<b> Last Modified: </b>" + date_as_string(resource.last_modification_date, true) %>
-    </p>
-</div>
-
-
-<div class="list_item_whole_width">
-  <p class='list_item_attribute'>
-    <%= "<b> URL of Original: </b> " + link_to("http://www.ebi.ac.uk/biomodels-main/#{resource.model_id}", "http://www.ebi.ac.uk/biomodels-main/#{resource.model_id}",:target=>"_blank") %>
-  </p>
-  <p class='list_item_attribute'>
-    <%= "<b> Abstract: </b> " + list_item_description(resource.abstract,true,1000) %>
-  </p>
-</div>

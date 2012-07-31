@@ -9,6 +9,15 @@ end unless obj.nil?
 obj.local_copy=1 unless obj.nil?
 asset_name = text_for_resource upload_field
 new_version ||= false
+
+-%>
+
+<%
+   if params[upload_field.to_sym]
+     obj.data_url=params[upload_field.to_sym][:data_url] if params[upload_field.to_sym][:data_url]
+     obj.original_filename = params[upload_field.to_sym][:original_filename] if params[upload_field.to_sym][:original_filename]
+   end
+
 -%>
 
 <div class="box_infotext">
@@ -29,7 +38,7 @@ new_version ||= false
     </span>
     <% if new_version -%>
     <p>
-      You are about to upload a new verison of this <%= asset_name -%>. You should only upload a new version if you have made minor modifications, such as tidying up or fixing errors, that do not change the original purpose
+      You are about to upload a new version of this <%= asset_name -%>. You should only upload a new version if you have made minor modifications, such as tidying up or fixing errors, that do not change the original purpose
       of the file. If you think this new version changes the original purpose or meaning of the <%= asset_name -%>, then you should <%= link_to "upload it as a new item",polymorphic_path(obj,:action=>:new) -%>
       rather than create a new version.
     </p>
@@ -69,6 +78,7 @@ new_version ||= false
                         <b>Make a copy?</b>
                         <%= check_box upload_field, :local_copy,:id=>"local_copy" -%>
                     </p>
+                    <%= hidden_field upload_field,:original_filename  -%>
                 </p>
                 <p>
                     <span id="test_url_result_icon"></span>
