@@ -52,7 +52,7 @@ module AssetsCommonExtension
     params_files = calculate_params(:content_blob)
     params_data = params_files.first
     params_url = params_files.second
-    params_image_file = params[controller_name.singularize+'_image'].nil? ? nil : params[controller_name.singular+'_image']['image_file']
+    params_image_file = params[controller_name.singularize+'_image'].nil? ? nil : params[controller_name.singularize+'_image']['image_file']
 
     if render_action_on_error==:new || render_action_on_error.nil?
       params_files = params_data + params_url
