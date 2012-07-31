@@ -1,12 +1,5 @@
 name: biomodels
-adaptor_class_name: Seek::SearchBiomodelsAdaptor
+adaptor_class_name: Seek::BiomodelsSearch::SearchBiomodelsAdaptor
 search_type: models
 legal: "Please retain original author attributes"
-attributes:
-  models:
-      - model_name
-      - model_id
-      - creator_name
-      - pub_id
-      - last_modified
-      - description
+partial_path: "lib/seek/biomodels_search/_biomodels_resource_list_item.html.erb"

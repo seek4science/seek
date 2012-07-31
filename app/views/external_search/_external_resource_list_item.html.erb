@@ -1,10 +1,10 @@
 <% resource = external_resource_list_item %>
 <% resource_type = resource.tab.downcase  %>
 
-<% content_partial = "external_search/#{resource_type}_resource_list_item" -%>
+<% content_partial = "#{Rails.root}/#{resource.partial_path}" -%>
 
 <div class="list_item">
-  <%= render :partial=> content_partial, :locals=>{:resource => resource, :resource_origin => resource_type} %>
+  <%= render :file=> content_partial, :locals=>{:resource => resource, :resource_origin => resource_type} %>
 
   <% if false && resource_type == "Biomodels" %>
       <div class="list_item_actions">
