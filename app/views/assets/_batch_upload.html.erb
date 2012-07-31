@@ -11,11 +11,12 @@
    resource.local_copy=1 unless resource.nil?
    asset_name = text_for_resource upload_field
    @content_blob ||= ContentBlob.new
+   with_image_file = resource && resource.kind_of?(Model) && (mine?(resource) || resource.can_edit?)
 -%>
 
 <div class="box_infotext">
   <p>
-    You can register a <%= asset_name.pluralize -%> by either directly uploading one/multiple files, or registering one/multiple URLs. Please test the URLs
+    You can register a <%= asset_name.pluralize -%> by either directly uploading one/multiple files, or registering one/multiple URLs or uploading a image file. Please test the URLs
     before
     submitting. <%= link_to_function "More info " + expand_image, visual_effect(:toggle_blind, "more_upload_info", :duration => 0.3) -%>
   </p>
@@ -26,9 +27,18 @@
           behind the URL the data is still available from SEEK.
         </p>
     </span>
+  <% if new_version -%>
+      <p>
+        You are about to upload a new version of this <%= resource.class.name.humanize -%>. You should only upload a new version if you have made minor modifications, such as tidying up or fixing errors, that do not change the original purpose
+        of the file. If you think this new version changes the original purpose or meaning of the <%= resource.class.name.humanize -%>, then you should <span style="text-decoration: underline"><%= link_to "upload it as a new item",polymorphic_path(resource,:action=>:new) -%> </span>
+        rather than create a new version.
+      </p>
+  <% end -%>
 </div>
 
-<div>
+<div class="yui-g">
+  <div class="yui-u first" style="width: <%= with_image_file ? '42%' : '100%'%>; margin-left: 2em; margin-top: 1em; margin-bottom: 1em;">
+
   <div id="upload_type_selection">
     <ul id="switch_upload_buttons">
       <li>
@@ -85,16 +95,17 @@
   </table>
 </div>
 
-<% if resource && resource.kind_of?(Model) && (mine?(resource) || resource.can_edit?) -%>
-  <div>
+<div class="yui-u" style="width: <%= with_image_file ? '42%' : '0%'%>;margin-right: 2em; margin-top: 1em; margin-bottom: 1em;">
+<% if with_image_file -%>
     <%resource_name = resource.class.name.underscore%>
     <%= hidden_field_tag("#{resource_name}_id", resource.id) -%>
       <p>
         <b>Image file: </b>
         <%= file_field "#{resource_name}_image", :image_file, :onchange => "detectFileFormat('#{resource_name}_image_image_file')" %>
       </p>
-  </div>
 <% end -%>
+</div>
+</div>
 
 <script type="text/javascript">
     from_file_selected();
