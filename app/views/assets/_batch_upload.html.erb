@@ -87,17 +87,17 @@
 
 <% if resource && resource.kind_of?(Model) && (mine?(resource) || resource.can_edit?) -%>
   <div>
-      <%= hidden_field_tag(:model_id, @model.id) -%>
+    <%resource_name = resource.class.name.underscore%>
+    <%= hidden_field_tag("#{resource_name}_id", resource.id) -%>
       <p>
         <b>Image file: </b>
-        <%= file_field :model_image, :image_file, :onchange => "detectFileFormat()" %>
+        <%= file_field "#{resource_name}_image", :image_file, :onchange => "detectFileFormat('#{resource_name}_image_image_file')" %>
       </p>
   </div>
 <% end -%>
 
 <script type="text/javascript">
     from_file_selected();
-
 
      var multi_selector = new MultiSelector($('pending_files'));
 
@@ -126,9 +126,5 @@
         }else{
             alert("The URL cannot be parsed. The data behind the URL may not exist or be available from SEEK");
         }
-
-
     }
-
-
 </script>
