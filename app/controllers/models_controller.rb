@@ -62,12 +62,14 @@ class ModelsController < ApplicationController
   
   def new_version
     if (handle_batch_data nil)
-      
+      build_model_image @model,params[:model_image]
+
       comments = params[:revision_comment]
 
       respond_to do |format|
         create_new_version  comments
         create_content_blobs
+        update_model_image_for_latest_version
         format.html {redirect_to @model }
       end
     else
