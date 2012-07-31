@@ -161,6 +161,58 @@ class ModelsControllerTest < ActionController::TestCase
     assay.reload
     assert assay.related_asset_ids('Model').include? assigns(:model).id
   end
+
+  test "should create model with image" do
+      login_as(:model_owner)
+      assert_difference('Model.count') do
+          post :create, :model => valid_model,:content_blob=>{:file_0=>fixture_file_upload('files/little_file.txt',Mime::TEXT)}, :sharing=>valid_sharing, :model_image => {:image_file => fixture_file_upload('files/file_picture.png', 'image/png')}
+      end
+
+      model = assigns(:model)
+      assert_redirected_to model_path(model)
+      assert_equal "file_picture.png", model.model_image.original_filename
+  end
+
+  test "should create model with image and without content_blob" do
+      login_as(:model_owner)
+      assert_difference('Model.count') do
+          post :create, :model => valid_model, :sharing=>valid_sharing, :model_image => {:image_file => fixture_file_upload('files/file_picture.png', 'image/png')}
+      end
+
+      model = assigns(:model)
+      assert_redirected_to model_path(model)
+      assert_equal 'Test', model.title
+      assert_equal "file_picture.png", model.model_image.original_filename
+  end
+
+  test "should not create model without image and without content_blob" do
+      login_as(:model_owner)
+      assert_no_difference('Model.count') do
+          post :create, :model => valid_model, :sharing=>valid_sharing
+      end
+      assert_not_nil flash[:error]
+  end
+
+  test "should create model version with image" do
+       m=models(:model_with_format_and_type)
+       assert_difference("Model::Version.count", 1) do
+         post :new_version, :id=>m, :model=>{},:content_blob=>{:file_0=>fixture_file_upload('files/little_file.txt',Mime::TEXT)}, :revision_comment=>"This is a new revision", :model_image => {:image_file => fixture_file_upload('files/file_picture.png', 'image/png')}
+       end
+
+       assert_redirected_to model_path(m)
+       assert assigns(:model)
+
+       m=Model.find(m.id)
+       assert_equal 2,m.versions.size
+       assert_equal 2,m.version
+       assert_equal "little_file.txt",m.original_filename
+       assert_equal "little_file.txt",m.versions[1].original_filename
+       assert_equal "This is a new revision",m.versions[1].revision_comments
+       assert_equal 'file_picture.png',assigns(:model).versions[1].model_image.original_filename
+       assert_equal 'file_picture.png',assigns(:model).model_image.original_filename
+
+       assert_equal "Teusink.xml",m.versions[0].original_filename
+  end
   
   def test_missing_sharing_should_default_to_private
     assert_difference('Model.count') do
