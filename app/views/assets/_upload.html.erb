@@ -9,7 +9,6 @@ end unless obj.nil?
 obj.local_copy=1 unless obj.nil?
 asset_name = text_for_resource upload_field
 new_version ||= false
-
 -%>
 
 <%
@@ -17,6 +16,9 @@ new_version ||= false
      obj.data_url=params[upload_field.to_sym][:data_url] if params[upload_field.to_sym][:data_url]
      obj.original_filename = params[upload_field.to_sym][:original_filename] if params[upload_field.to_sym][:original_filename]
    end
+
+   upload_display=obj.data_url.blank? ? "block" : "none"
+   from_url_display=upload_display=="block" ? "none" : "block"
 
 -%>
 
@@ -55,7 +57,7 @@ new_version ||= false
                 <%= link_to_function image("internet_large"),"from_url_selected(); return (false);",:class=>"block_link",:id=>"upload_from_url_button",:title=>tooltip_title_attrib('Add from a remote URL') -%>
             </li>
             <li id="upload_options">
-                <div id="upload_from_file">
+                <div id="upload_from_file" style="display:<%= upload_display -%>;">
                     <p>
                         <b>File to upload:</b>
                         <span class="required">*</span>
@@ -63,7 +65,7 @@ new_version ||= false
                         <%= file_field upload_field, :data -%>
                     </p>
                 </div>
-                <div id="upload_from_url" style="display:none;">
+                <div id="upload_from_url" style="display:<%= from_url_display -%>;">
                 <p>
                     <b>URL:</b>
                     <span class="required">*</span>                    
@@ -92,5 +94,11 @@ new_version ||= false
 </div>
 
 <script type="text/javascript">
-	from_file_selected();
+  <% if obj.data_url.blank? -%>
+  from_file_selected();
+  <% else -%>
+  from_url_selected();
+  <% end -%>
+
 </script>
+
