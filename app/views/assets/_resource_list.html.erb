@@ -2,7 +2,7 @@
 <% narrow_view ||= false -%>
 
 <% unless collection.empty? -%>
-  <div class="list_items_container">
+  <div class="list_items_container" id="<%=collection.first.class.name%>_list_items_container">
 
     <% collection.each do |item| -%>
 		  <% if authorization_for_showing_already_done || item.can_view? -%>
