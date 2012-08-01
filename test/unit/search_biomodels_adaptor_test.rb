@@ -8,10 +8,10 @@ class SearchBiomodelsAdaptorTest < ActiveSupport::TestCase
 
   test "search" do
     with_config_value :pubmed_api_email, "seek@sysmo-db.org" do
-      adaptor = Seek::SearchBiomodelsAdaptor.new({})
+      adaptor = Seek::BiomodelsSearch::SearchBiomodelsAdaptor.new({"partial_path"=>"lib/test-partial.erb"})
       results = adaptor.search("yeast")
       assert_equal 14,results.count
-      assert_equal 14,results.select{|r| r.kind_of?(Seek::BiomodelsSearchResult)}.count
+      assert_equal 14,results.select{|r| r.kind_of?(Seek::BiomodelsSearch::BiomodelsSearchResult)}.count
       #results will all be the same due to the mocking of getSimpleModelById webservice call
       result = results.first
       assert_equal 34,result.authors.count
@@ -23,19 +23,20 @@ class SearchBiomodelsAdaptorTest < ActiveSupport::TestCase
       assert_equal DateTime.parse("2008-10-11"),result.date_published
       assert_equal "MODEL0072364382",result.model_id
       assert_equal DateTime.parse("2012-02-03T13:12:17+00:00"),result.last_modification_date
+      assert_equal "lib/test-partial.erb",result.partial_path
     end
   end
 
   test "search no pubmed email" do
     with_config_value :pubmed_api_email,"" do
-      adaptor = Seek::SearchBiomodelsAdaptor.new({})
+      adaptor = Seek::BiomodelsSearch::SearchBiomodelsAdaptor.new({"partial_path"=>"lib/test-partial.erb"})
       results = adaptor.search("yeast")
       assert_equal 0,results.count
     end
   end
 
   test "abstract adaptor" do
-    adaptor = Seek::AbstractSearchAdaptor.new({})
+    adaptor = Seek::AbstractSearchAdaptor.new({"partial_path"=>"lib/test-partial.erb"})
     assert_raise(NoMethodError) do
       adaptor.search("yeast")
     end
