@@ -25,7 +25,7 @@ module Seek
 
     end
 
-    class BiomodelsSearchResult < Struct.new(:authors, :abstract, :title, :date_published, :pubmed_id, :tab, :model_id, :last_modification_date, :partial_path)
+    class BiomodelsSearchResult < Struct.new(:authors, :abstract, :title, :date_published, :pubmed_id, :model_id, :last_modification_date)
 
       include Seek::ExternalSearchResult
 

@@ -24,6 +24,7 @@ module Seek
   end
 
   module ExternalSearchResult
+    attr_accessor :tab, :partial_path
     def can_view?
       true
     end
