@@ -32,7 +32,6 @@ module Seek
 
       def initialize biomodels_search_result
         self.authors = []
-        self.tab="Biomodels"
         self.model_id=biomodels_search_result[:model_id]
         self.last_modification_date=biomodels_search_result[:last_modification_date]
         populate biomodels_search_result[:publication_id]
