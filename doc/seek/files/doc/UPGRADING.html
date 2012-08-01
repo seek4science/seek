@@ -56,7 +56,7 @@
     </tr>
     <tr class="top-aligned-row">
       <td><strong>Last Update:</strong></td>
-      <td>Tue Jul 24 13:03:52 +0100 2012</td>
+      <td>Wed Aug 01 10:13:16 +0100 2012</td>
     </tr>
     </table>
   </div>
@@ -227,13 +227,13 @@ reflect the change to sunspot:solr:start. The updated script should look
 something like: <a
 href="https://gist.github.com/3143434">gist.github.com/3143434</a>
 </p>
-<h2>Steps to upgrade between patches (e.g. between 0.13.2 and 0.13.3)</h2>
+<h2>Steps to upgrade between patches (e.g. between 0.14.0 to 0.14.1)</h2>
 <p>
 This should remain the same for all upgrades for minor bugfix patches,
-unless we state otherwise. This example uses v0.13.3 as an example.
+unless we state otherwise. This example uses v0.14.1 as an example.
 </p>
 <pre>
-  hg pull https://sysmo-db.googlecode.com/hg/ -r v0.13.3
+  hg pull https://sysmo-db.googlecode.com/hg/ -r v0.14.1
   hg update
   hg merge # if necessary
   hg commit -m &quot;merged&quot; # if necessary

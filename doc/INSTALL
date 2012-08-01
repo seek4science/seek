@@ -60,9 +60,9 @@ on how to setup Apache and {Passenger Phusion (modrails)}[http://www.modrails.co
 
 Our source code is stored within the {Sysmo-DB Google Code Repository}[http://code.google.com/p/sysmo-db/], using Mercurial[http://mercurial.selenic.com/] as the version control system. 
 
-For a stable version, you should check out according to a stable tag. Our current stable tag is <em>0.14.0</em>, so to retrieve this version you should use:
+For a stable version, you should check out according to a stable tag. Our current stable tag is <em>0.14.1</em>, so to retrieve this version you should use:
 
-  hg clone https://sysmo-db.googlecode.com/hg/ -r v0.14.0 seek
+  hg clone https://sysmo-db.googlecode.com/hg/ -r v0.14.1 seek
 
 This will create a <i>seek</i> directory that contains the application.
   
@@ -111,7 +111,8 @@ Run the rake database setup task, this creates the database, loads the schema an
 
 == Starting Delayed-Job (Background processing)
 
-Some background processing is handled using a tool called <em>Delayed Job</em>.
+Some background processing is handled using a tool called <em>Delayed Job</em>, and it is essential this is running for
+SEEK to behave correctly.
 
 To start delayed job run the script
 
@@ -120,6 +121,20 @@ To start delayed job run the script
 or for production:
 
   RAILS_ENV=production ./script/delayed_job start
+
+For production servers, we recommend setting up an init.d script to automatically start and stop delayed_job. An example
+script can be found at: https://gist.github.com/3169625
+Put this script in /etc/init.d/, called maybe seek-delayed-job, and edit the APP_PATH accordingly. Then run
+
+  sudo update-rc.d seek-delayed-job defaults
+
+You can then start and stop delayed job using:
+
+  sudo service seek-delayed-job start
+
+and
+
+  sudo service seek-delayed-job stop
 
 == Starting the server
 
@@ -227,6 +242,9 @@ and configured a virtual host (probably in <i>/etc/apache2/sites-enabled/default
          Options -MultiViews            
       </Directory>
    </VirtualHost>
+
+When setting up a production server, it is recommended that init.d/ scripts are added for delayed job, and sunspot. See the
+delayed job and Sunspot sections above for instructions on how to do this.
 
 == Rebranding SysMO SEEK for other projects
 
