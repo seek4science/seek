@@ -108,7 +108,7 @@ updated script should look something like: https://gist.github.com/3143434
 == Steps to upgrade between patches (e.g. between 0.14.0 to 0.14.1)
 
 This should remain the same for all upgrades for minor bugfix patches, unless we state otherwise.
-This example uses v0.13.3 as an example.
+This example uses v0.14.1 as an example.
 
   hg pull https://sysmo-db.googlecode.com/hg/ -r v0.14.1
   hg update
