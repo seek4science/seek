@@ -96,12 +96,11 @@ class ModelsControllerTest < ActionController::TestCase
   end
 
   test "should get new populated from params" do
-    get :new, :model=>{:title=>"the title",:description=>"the description",:data_url=>"wibblebibble", :original_filename=>"afile.xml"}
+    get :new, :model=>{:title=>"the title",:description=>"the description",:data_url=>"wibblebibble"}
     assert_response :success
     assert_select "textarea#model_title",:text=>"the title"
     assert_select "textarea#model_description",:text=>"the description"
-    assert_select "input#model_data_url",:value=>"wibblebibble"
-    assert_select "input#model_original_filename[type='hidden']",:value=>"afile.xml"
+    assert_select "input#content_blob_data_url",:value=>"wibblebibble"
   end
   
   test "should correctly handle bad data url" do
@@ -123,7 +122,8 @@ class ModelsControllerTest < ActionController::TestCase
     end
     assert_not_nil flash.now[:error]
   end
-    test "associates assay" do
+
+  test "associates assay" do
     login_as(:model_owner) #can edit assay_can_edit_by_my_first_sop_owner
     m = models(:teusink)
     original_assay = assays(:assay_with_a_model)
