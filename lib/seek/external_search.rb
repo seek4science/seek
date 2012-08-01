@@ -15,11 +15,25 @@ module Seek
       end
     end
 
+
     def external_search query,type='all'
       search_adaptors(type).collect do |adaptor|
         adaptor.search query
-      end.flatten
+      end.flatten.uniq
     end
+
+    #TODO: code to do each search adaptor in parallel - but currently removed due a random set of errors (that I can't now reproduce') - will revisit after holidy
+    #def external_search query,type='all'
+    #  threads = search_adaptors(type).collect do |adaptor|
+    #    Thread.new do
+    #      Thread.current[:result]=adaptor.search query
+    #    end
+    #  end
+    #  threads.each{|thr| thr.join}
+    #  threads.collect do |thread|
+    #    thread[:result]
+    #  end.flatten.uniq
+    #end
 
   end
 

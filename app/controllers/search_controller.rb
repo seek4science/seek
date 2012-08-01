@@ -44,6 +44,14 @@ class SearchController < ApplicationController
     downcase_query = @search_query.downcase
     downcase_query.gsub!(":","")
 
+    external_search_thread = Thread.new do
+      if include_external_search?
+        Thread.current[:result]=external_search downcase_query,type
+      else
+        Thread.current[:result] = []
+      end
+    end
+
     @results=[]
     if (Seek::Config.solr_enabled and !downcase_query.blank?)
       if type == "all"
@@ -61,9 +69,9 @@ class SearchController < ApplicationController
           end.results
       end
 
-      if include_external_search?
-        @results |= external_search downcase_query,type
-      end
+      external_search_thread.join
+      external_results = external_search_thread[:result]
+      @results |= external_results
 
     end
   end
