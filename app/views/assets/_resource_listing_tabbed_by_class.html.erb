@@ -20,9 +20,10 @@
 %>
 <% limit ||= nil
    if limit
-       resource_hash.each_key do |key|
+     resource_hash.each_key do |key|
       if limit && resource_hash[key][:items].size > limit
         resource_hash[key][:extra_count] = resource_hash[key][:items].size - limit
+        resource_hash[key][:extra_items] = resource_hash[key][:items][limit...(resource_hash[key][:items].size)]
         resource_hash[key][:items] = resource_hash[key][:items][0...limit]
       end
     end
@@ -77,10 +78,19 @@
           <% unless extra_count < 1 %>
             <div class="list_items_container">
               <div class="hidden_list_item" style="color:#000">
-                <%= item ||= nil
-                    if item
-                        link_to "View all "+(extra_count + resources.size).to_s+" items", filter_url(resource_type, item)
-                    else
+                <% item ||= nil
+                    if item %>
+                      <%= link_to_function "View all "+(extra_count + resources.size).to_s+" items", :id => "view_#{resource_type}s_and_extra" do |page|
+                        page.replace_html "#{resource_type}_list_items_container", :partial => "assets/resource_list", :locals => {:collection => resource_hash[resource_type][:items] + resource_hash[resource_type][:extra_items], :narrow_view => narrow_view, :authorization_for_showing_already_done => true}
+                        page.visual_effect :toggle_blind, "view_#{resource_type}s", :duration => 0.2
+                        page.visual_effect :toggle_blind, "view_#{resource_type}s_and_extra", :duration => 0.2
+                      end -%>
+                      <%= link_to_function "View " + resources.size.to_s + " items", :style => 'display:none', :id => "view_#{resource_type}s" do |page|
+                        page.replace_html "#{resource_type}_list_items_container", :partial => "assets/resource_list", :locals => {:collection => resource_hash[resource_type][:items], :narrow_view => narrow_view, :authorization_for_showing_already_done => true}
+                        page.visual_effect :toggle_blind, "view_#{resource_type}s", :duration => 0.2
+                        page.visual_effect :toggle_blind, "view_#{resource_type}s_and_extra", :duration => 0.2
+                      end %>
+                    <% else
                         link_to "View all items", eval("#{resource_type.pluralize.underscore}_path")
                     end
                 -%>

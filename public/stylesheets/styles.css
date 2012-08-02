@@ -1409,7 +1409,7 @@ div.asset_form {
 
 div#upload_type_selection {
     padding-left: 0.5em;
-    height: 60px;
+    height: 100px;
 }
 
 ul#switch_upload_buttons {
@@ -1422,6 +1422,7 @@ ul#switch_upload_buttons li {
 	list-style: none;
     float: left;
     padding-right: 0.75em;
+    padding-top: 10px;
 }
 
 ul#switch_upload_buttons a {
