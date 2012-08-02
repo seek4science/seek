@@ -12,7 +12,7 @@ require 'tmpdir'
 #FIXME: this needs removing, this isn't the proper way to write good test code.
 Rails.cache.class.class_eval do
   #Doesn't do any good if the cache is being used directly via read/write
-  def fetch_with_paranoid_double_checking key,options=nil
+  def fetch_with_paranoid_double_checking key,options={}
     if block_given?
       calculated_result = yield
       fetch_result = fetch_without_paranoid_double_checking(key,options) {calculated_result}
