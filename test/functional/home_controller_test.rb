@@ -276,5 +276,37 @@ class HomeControllerTest < ActionController::TestCase
     assert_response :success
     assert_select "p.headline_announcement",:count=>0
   end
+
+  test "should show external search when not logged in" do
+    with_config_value :solr_enabled,true do
+      with_config_value :external_search_enabled, true do
+        get :index
+        assert_response :success
+        assert_select "div#search_box input#include_external_search",:count=>1
+      end
+    end
+  end
+
+  test "should show external search when logged in" do
+    login_as Factory(:user)
+    with_config_value :solr_enabled,true do
+      with_config_value :external_search_enabled, true do
+        get :index
+        assert_response :success
+        assert_select "div#search_box input#include_external_search",:count=>1
+      end
+    end
+  end
+
+  test "should not show external search when disabled" do
+    login_as Factory(:user)
+    with_config_value :solr_enabled,true do
+      with_config_value :external_search_enabled, false do
+        get :index
+        assert_response :success
+        assert_select "div#search_box input#include_external_search",:count=>0
+      end
+    end
+  end
   
 end
