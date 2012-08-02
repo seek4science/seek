@@ -20,7 +20,7 @@ module Seek
 
     
     def url_response_code asset_url
-      url = URI.parse(asset_url)
+      url = URI.parse(URI.encode(asset_url.strip))
       code=""
       begin
         if (["http","https"].include?(url.scheme))
