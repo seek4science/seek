@@ -9,18 +9,19 @@ require 'webmock/test_unit'
 require 'action_view/test_case'
 require 'tmpdir'
 
+#FIXME: this needs removing, this isn't the proper way to write good test code.
 Rails.cache.class.class_eval do
   #Doesn't do any good if the cache is being used directly via read/write
-  def fetch_with_paranoid_double_checking key
+  def fetch_with_paranoid_double_checking key,options=nil
     if block_given?
       calculated_result = yield
-      fetch_result = fetch_without_paranoid_double_checking(key) {calculated_result}
+      fetch_result = fetch_without_paranoid_double_checking(key,options) {calculated_result}
       if calculated_result != fetch_result
         raise "fetch result (#{fetch_result}) for key (#{key}) does not match calculated result(#{calculated_result})"
       end
       calculated_result
     else
-      fetch_without_paranoid_double_checking(key)
+      fetch_without_paranoid_double_checking(key,options)
     end
   end
 
