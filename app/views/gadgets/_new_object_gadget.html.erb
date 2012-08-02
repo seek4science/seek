@@ -1,4 +1,4 @@
-<% unless current_user.person.work_groups.empty? -%>
+<% if current_user.person.can_create_new_items? -%>
   <% cache "new_object_gadget" do -%>
 
    <%= new_creatable_javascript -%>
