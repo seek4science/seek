@@ -6,9 +6,18 @@ class SearchBiomodelsAdaptorTest < ActiveSupport::TestCase
     mock_service_calls
   end
 
+  test "initialize" do
+    yaml = YAML.load_file("#{Rails.root}/test/fixtures/files/search_adaptor_config.yml")
+    adaptor = Seek::BiomodelsSearch::SearchBiomodelsAdaptor.new yaml
+    assert_equal false,adaptor.enabled?
+    assert_equal "lib/seek/biomodels_search/_biomodels_resource_list_item.html.erb",adaptor.partial_path
+    assert_equal "biomodels",adaptor.name
+    assert_equal "models",adaptor.search_type
+  end
+
   test "search" do
     with_config_value :pubmed_api_email, "seek@sysmo-db.org" do
-      adaptor = Seek::BiomodelsSearch::SearchBiomodelsAdaptor.new({"partial_path"=>"lib/test-partial.erb"})
+      adaptor = Seek::BiomodelsSearch::SearchBiomodelsAdaptor.new({"partial_path"=>"lib/test-partial.erb","name"=>"biomodels"})
       results = adaptor.search("yeast")
       assert_equal 14,results.count
       assert_equal 14,results.select{|r| r.kind_of?(Seek::BiomodelsSearch::BiomodelsSearchResult)}.count
@@ -24,6 +33,7 @@ class SearchBiomodelsAdaptorTest < ActiveSupport::TestCase
       assert_equal "MODEL0072364382",result.model_id
       assert_equal DateTime.parse("2012-02-03T13:12:17+00:00"),result.last_modification_date
       assert_equal "lib/test-partial.erb",result.partial_path
+      assert_equal "Biomodels",result.tab
     end
   end
 
@@ -32,13 +42,6 @@ class SearchBiomodelsAdaptorTest < ActiveSupport::TestCase
       adaptor = Seek::BiomodelsSearch::SearchBiomodelsAdaptor.new({"partial_path"=>"lib/test-partial.erb"})
       results = adaptor.search("yeast")
       assert_equal 0,results.count
-    end
-  end
-
-  test "abstract adaptor" do
-    adaptor = Seek::AbstractSearchAdaptor.new({"partial_path"=>"lib/test-partial.erb"})
-    assert_raise(NoMethodError) do
-      adaptor.search("yeast")
     end
   end
 

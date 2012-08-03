@@ -215,6 +215,10 @@ class Person < ActiveRecord::Base
     return  res
   end
 
+  def can_create_new_items?
+    member?
+  end
+
   def institutions
     work_groups.collect {|wg| wg.institution }.uniq
   end

@@ -44,6 +44,8 @@ class SearchController < ApplicationController
     downcase_query = @search_query.downcase
     downcase_query.gsub!(":","")
 
+
+
     @results=[]
     if (Seek::Config.solr_enabled and !downcase_query.blank?)
       if type == "all"
@@ -61,9 +63,8 @@ class SearchController < ApplicationController
           end.results
       end
 
-      if include_external_search?
-        @results |= external_search downcase_query,type
-      end
+      external_results = external_search downcase_query,type
+      @results |= external_results
 
     end
   end
@@ -71,7 +72,7 @@ class SearchController < ApplicationController
   private
 
   def include_external_search?
-    Seek::Config.external_search_enabled
+    Seek::Config.external_search_enabled && params[:include_external_search]
   end
 
   #Removes all results from the search results collection passed in that are not Authorised to show for the current user (if one is logged in)
