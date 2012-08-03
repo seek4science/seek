@@ -45,11 +45,9 @@ class Sample < ActiveRecord::Base
   end
 
   has_many :data_files, :class_name => "DataFile::Version", :finder_sql => self.asset_sql("DataFile")
-  has_many :models, :class_name => "Model::Version", :finder_sql => self.asset_sql("Model")
   has_many :sops, :class_name => "Sop::Version", :finder_sql => self.asset_sql("Sop")
 
   has_many :data_file_masters, :through => :sample_assets, :source => :asset, :source_type => 'DataFile'
-  has_many :model_masters, :through => :sample_assets, :source => :asset, :source_type => 'Model'
   has_many :sop_masters, :through => :sample_assets, :source => :asset, :source_type => 'Sop'
   #has_many :sop_masters,:class_name => "SampleSop"
 
@@ -132,7 +130,6 @@ class Sample < ActiveRecord::Base
    new_object= self.clone
    new_object.policy = self.policy.deep_copy
    new_object.data_file_masters = self.data_file_masters.select(&:can_view?)
-   new_object.model_masters = self.model_masters.select(&:can_view?)
    new_object.sop_masters = self.sop_masters.select(&:can_view?)
    new_object.project_ids = self.project_ids
    return new_object

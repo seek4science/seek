@@ -18,8 +18,6 @@ class Model < ActiveRecord::Base
   
   # allow same titles, but only if these belong to different users
   # validates_uniqueness_of :title, :scope => [ :contributor_id, :contributor_type ], :message => "error - you already have a Model with such title."
-  has_many :sample_assets,:dependent=>:destroy,:as => :asset
-  has_many :samples, :through => :sample_assets
 
   has_many :model_images
   belongs_to :model_image
