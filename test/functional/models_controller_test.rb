@@ -143,23 +143,6 @@ class ModelsControllerTest < ActionController::TestCase
     assert new_assay.related_asset_ids('Model').include?(m.id)
     end
 
-  test "associate sample" do
-     # assign to a new model
-     model_with_samples = valid_model
-     model_with_samples[:sample_ids] = [Factory(:sample,:title=>"newTestSample",:contributor=> User.current_user).id]
-     assert_difference("Model.count") do
-       post :create,:model => model_with_samples,:content_blob=>{:file_0=>fixture_file_upload('files/little_file.txt',Mime::TEXT)}
-     end
-
-    m = assigns(:model)
-    assert_equal "newTestSample", m.samples.first.title
-
-    #edit associations of samples to an existing model
-    put :update,:id=> m.id, :model => {:sample_ids=> [Factory(:sample,:title=>"editTestSample",:contributor=> User.current_user).id]}
-    m = assigns(:model)
-    assert_equal "editTestSample", m.samples.first.title
-  end
-
   test "should create model" do
     login_as(:model_owner)
     assay = assays(:modelling_assay)
