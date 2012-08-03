@@ -25,6 +25,7 @@ class ApplicationController < ActionController::Base
   after_filter :log_event
 
   include AuthenticatedSystem
+  include Seek::ResourceRelatedTabs
   around_filter :with_current_user
   def with_current_user
     User.with_current_user current_user do
