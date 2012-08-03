@@ -9,12 +9,13 @@ end unless obj.nil?
 obj.local_copy=1 unless obj.nil?
 asset_name = text_for_resource upload_field
 new_version ||= false
+original_filename=nil
 -%>
 
 <%
    if params[upload_field.to_sym]
      obj.data_url=params[upload_field.to_sym][:data_url] if params[upload_field.to_sym][:data_url]
-     obj.original_filename = params[upload_field.to_sym][:original_filename] if params[upload_field.to_sym][:original_filename]
+     original_filename = params[upload_field.to_sym][:original_filename] if params[upload_field.to_sym][:original_filename]
    end
 
    upload_display=obj.data_url.blank? ? "block" : "none"
@@ -92,7 +93,7 @@ new_version ||= false
                         <b>Make a copy?</b>
                         <%= check_box upload_field, :local_copy,:id=>"local_copy" -%>
                     </p>
-                    <%= hidden_field upload_field,:original_filename  -%>
+                    <%= hidden_field_tag "#{upload_field}[original_filename]", original_filename -%>
                 </p>
                 <p>
                     <span id="test_url_result_icon"></span>
