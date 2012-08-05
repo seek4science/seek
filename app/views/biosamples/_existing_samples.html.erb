@@ -19,9 +19,9 @@
                 { "sWidth": "15%" },
                 { "sWidth": "15%" },
                 { "sWidth": "5%" },
-                { "sWidth": "10%" },
-                { "sWidth": "5%", 'bSortable':false },
-                { "sWidth": "5%", 'bSortable':false }
+                { "sWidth": "15%" },
+                { "sWidth": "2.5%", 'bSortable':false },
+                { "sWidth": "2.5%", 'bSortable':false }
             ],
             "fnInitComplete": function () {
                 this.fnAdjustColumnSizing(true);
@@ -29,16 +29,19 @@
         }).rowGrouping({"sGrupingClass": 'row_group_color'});
 
     });
+    initialiseFold('existing_samples');
 </script>
-  <% unless specimens.blank? %>
-      <h2>Sample</h2>
+<br/>
+<% unless specimens.blank? %>
+<div class='fold' id="existing_samples" style="margin-left: 1em">
+   <div class='foldTitle'>
+      Sample
+   </div>
+   <div class='foldContent'>
       <% if existing_samples.empty? -%>
           <p class="none_text">No samples have yet been defined for the selected <%= Seek::Config.sample_parent_term -%>s
           </p>
       <% else -%>
-          <br/>
-          <br/>
-
           <div class="scroll_box">
             <table cellpadding="0" cellspacing="0" border="0" class="display" id="sample_table">
               <thead>
@@ -49,7 +52,7 @@
                 <th>Date at sampling</th>
                 <th><%= Seek::Config.sample_age%></th>
                 <th>Provider name</th>
-                <th>ID</th>
+                <th>Seek ID</th>
                 <th>Comment</th>
               </tr>
               </thead>
@@ -72,4 +75,7 @@
         </ul>
         <br/>
     <% end %>
+   </div>
+</div>
 <% end -%>
+

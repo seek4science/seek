@@ -225,10 +225,242 @@ class PublishingTest < ActionController::TestCase
     end
   end
 
+  test 'should not allow to approve/reject publishing for non-gatekeeper' do
+    login_as(:quentin)
+    df = Factory(:data_file,:projects => people(:quentin_person).projects)
+    get :approve_or_reject_publish, :id=>df.id
+    assert_redirected_to :root
+    assert_not_nil flash[:error]
+
+    get :approve_publish, :id => df.id
+    assert_redirected_to :root
+    assert_not_nil flash[:error]
+
+    get :reject_publish, :id => df.id
+    assert_redirected_to :root
+    assert_not_nil flash[:error]
+  end
+
+  test "gracefully handle approve_or_reject for deleted items" do
+    gatekeeper = Factory(:gatekeeper)
+    df = Factory(:data_file,:projects => gatekeeper.projects)
+    login_as(df.contributor)
+    put :update, :id => df.id, :sharing => {:sharing_scope => Policy::EVERYONE, "access_type#{Policy::EVERYONE}" => Policy::VISIBLE}
+
+    id = df.id
+    disable_authorization_checks do
+      df.destroy
+      assert_nil(DataFile.find_by_id(df.id))
+    end
+
+    logout
+    login_as(gatekeeper.user)
+    get :approve_or_reject_publish, :id=>0
+    assert_redirected_to :root
+    assert_not_nil flash[:error]
+    assert_equal "This Data file no longer exists, and may have been deleted since the request to publish was made.",flash[:error]
+  end
+
+  test 'gatekeeper should approve/reject publishing' do
+    gatekeeper = Factory(:gatekeeper)
+    df = Factory(:data_file,:projects => gatekeeper.projects)
+    login_as(df.contributor)
+    put :update, :id => df.id, :sharing => {:sharing_scope => Policy::EVERYONE, "access_type#{Policy::EVERYONE}" => Policy::VISIBLE}
+
+    logout
+
+    login_as(gatekeeper.user)
+    get :approve_or_reject_publish, :id=>df.id
+    assert_response :success
+    assert_nil flash[:error]
+
+    post :reject_publish, :id => df.id
+    assert_redirected_to data_file_path(df)
+    assert_nil flash[:error]
+    df.reload
+    assert_not_equal Policy::EVERYONE, df.policy.sharing_scope
+
+    post :approve_publish, :id => df.id
+    assert_redirected_to data_file_path(df)
+    assert_nil flash[:error]
+    df.reload
+    assert_equal Policy::EVERYONE, df.policy.sharing_scope
+    assert_equal Policy::ACCESSIBLE, df.policy.access_type
+  end
+
+  test 'should not allow to approve/reject publishing for gatekeeper from other projects' do
+      gatekeeper = Factory(:gatekeeper)
+      df = Factory(:data_file)
+      login_as(df.contributor)
+      put :update, :id => df.id, :sharing => {:sharing_scope => Policy::EVERYONE, "access_type#{Policy::EVERYONE}" => Policy::VISIBLE}
+      logout
+
+      assert (df.projects&gatekeeper.projects).empty?
+      login_as(gatekeeper.user)
+      get :approve_or_reject_publish, :id=>df.id
+      assert_redirected_to :root
+      assert_not_nil flash[:error]
+
+      get :approve_publish, :id => df.id
+      assert_redirected_to :root
+      assert_not_nil flash[:error]
+
+      get :reject_publish, :id => df.id
+      assert_redirected_to :root
+      assert_not_nil flash[:error]
+  end
+
+  test 'log when creating the public item' do
+      @controller = SopsController.new()
+      sop_params = valid_sop
+      sop_params[:projects] = [projects(:three)] #this project has no gatekeeper
+      assert_difference ('ResourcePublishLog.count') do
+        post :create, :sop => sop_params, :sharing => public_sharing
+      end
+      publish_log = ResourcePublishLog.find(:last)
+      assert_equal ResourcePublishLog::PUBLISHED, publish_log.publish_state.to_i
+      sop = assigns(:sop)
+      assert_equal sop, publish_log.resource
+      assert_equal sop.contributor, publish_log.culprit
+    end
+
+    test 'log when creating item and request publish it' do
+      @controller = SopsController.new()
+      assert_difference ('ResourcePublishLog.count') do
+        post :create, :sop => valid_sop, :sharing => {:sharing_scope => Policy::EVERYONE, "access_type#{Policy::EVERYONE}" => Policy::VISIBLE}
+      end
+      publish_log = ResourcePublishLog.find(:last)
+      assert_equal ResourcePublishLog::WAITING_FOR_APPROVAL, publish_log.publish_state.to_i
+      sop = assigns(:sop)
+      assert_equal sop, publish_log.resource
+      assert_equal sop.contributor, publish_log.culprit
+    end
+
+    test 'dont log when creating the non-public item' do
+      @controller = SopsController.new()
+      assert_no_difference ('ResourcePublishLog.count') do
+        post :create, :sop => valid_sop
+      end
+
+      assert_not_equal Policy::EVERYONE, assigns(:sop).policy.sharing_scope
+    end
+
+    test 'log when updating an item from non-public to public' do
+      @controller = SopsController.new()
+      login_as(:owner_of_my_first_sop)
+
+      sop = sops(:sop_with_project_without_gatekeeper)
+      assert_not_equal Policy::EVERYONE, sop.policy.sharing_scope
+      assert sop.can_publish?
+
+      assert_difference ('ResourcePublishLog.count') do
+        put :update, :id => sop.id, :sharing => public_sharing
+      end
+      publish_log = ResourcePublishLog.find(:last)
+      assert_equal ResourcePublishLog::PUBLISHED, publish_log.publish_state.to_i
+      sop = assigns(:sop)
+      assert_equal sop, publish_log.resource
+      assert_equal sop.contributor, publish_log.culprit
+    end
+
+    test 'log when sending the publish request approval during updating a non-public item' do
+      @controller = SopsController.new()
+      login_as(:owner_of_my_first_sop)
+
+      sop = sops(:my_first_sop)
+      assert_not_equal Policy::EVERYONE, sop.policy.sharing_scope
+      assert !sop.can_publish?
+
+      assert_difference ('ResourcePublishLog.count') do
+        put :update, :id => sop.id, :sharing => {:sharing_scope => Policy::EVERYONE, "access_type#{Policy::EVERYONE}" => Policy::VISIBLE}
+      end
+      publish_log = ResourcePublishLog.find(:last)
+      assert_equal ResourcePublishLog::WAITING_FOR_APPROVAL, publish_log.publish_state.to_i
+      sop = assigns(:sop)
+      assert_equal sop, publish_log.resource
+      assert_equal sop.contributor, publish_log.culprit
+    end
+
+    test 'dont log when updating an item with the not-related public sharing' do
+      @controller = SopsController.new()
+      login_as(:owner_of_my_first_sop)
+      sop = sops(:my_first_sop)
+      assert_not_equal Policy::EVERYONE, sop.policy.sharing_scope
+
+      assert_no_difference ('ResourcePublishLog.count') do
+        put :update, :id => sop.id, :sharing => {:sharing_scope => Policy::PRIVATE, "access_type_#{Policy::PRIVATE}" => Policy::NO_ACCESS}
+      end
+    end
+
+    test 'log when un-publishing an item' do
+      @controller = SopsController.new()
+      login_as(:owner_of_fully_public_policy)
+
+      sop = sops(:sop_with_fully_public_policy)
+      assert_equal Policy::EVERYONE, sop.policy.sharing_scope
+
+      assert_difference ('ResourcePublishLog.count') do
+        put :update, :id => sop.id, :sharing => {:sharing_scope => Policy::PRIVATE, "access_type_#{Policy::PRIVATE}" => Policy::NO_ACCESS}
+      end
+      publish_log = ResourcePublishLog.find(:last)
+      assert_equal ResourcePublishLog::UNPUBLISHED, publish_log.publish_state.to_i
+      sop = assigns(:sop)
+      assert_equal sop, publish_log.resource
+      assert_equal sop.contributor, publish_log.culprit
+    end
+
+    test 'log when approving publishing an item' do
+        gatekeeper = Factory(:gatekeeper)
+        df = Factory(:data_file, :projects => gatekeeper.projects)
+
+        login_as(df.contributor)
+        put :update, :id => df.id, :sharing => {:sharing_scope => Policy::EVERYONE, "access_type#{Policy::EVERYONE}" => Policy::VISIBLE}
+
+        logout
+
+        login_as(gatekeeper.user)
+        assert_difference ('ResourcePublishLog.count') do
+          put :approve_publish, :id => df.id
+        end
+
+        publish_log = ResourcePublishLog.find(:last)
+        assert_equal ResourcePublishLog::PUBLISHED, publish_log.publish_state.to_i
+        df = assigns(:data_file)
+        assert_equal df, publish_log.resource
+        assert_equal gatekeeper.user, publish_log.culprit
+    end
+
+  test 'do not allow to approve_publish if the asset is not in waiting_for_approval state' do
+    gatekeeper = Factory(:gatekeeper)
+    df = Factory(:data_file, :projects => gatekeeper.projects)
+
+    login_as(gatekeeper.user)
+    put :approve_publish, :id => df.id
+
+    assert_redirected_to :root
+    assert_not_nil flash[:error]
+  end
+
+  test 'allow to approve_publish if the asset is in waiting_for_approval state' do
+    gatekeeper = Factory(:gatekeeper)
+    df = Factory(:data_file, :projects => gatekeeper.projects)
+
+    login_as(df.contributor)
+    put :update, :id => df.id, :sharing => {:sharing_scope => Policy::EVERYONE, "access_type#{Policy::EVERYONE}" => Policy::VISIBLE}
+
+    logout
+
+    login_as(gatekeeper.user)
+    put :approve_publish, :id => df.id
+
+    assert_nil flash[:error]
+  end
+
+
   private
 
   def data_file_for_publishing(owner=users(:datafile_owner))
-    Factory :data_file, :contributor=>owner, :projects=>owner.person.projects
+    Factory :data_file, :contributor=>owner, :projects=>[projects(:moses_project)]
   end
 
   def isa_with_complex_sharing
@@ -250,7 +482,7 @@ class PublishingTest < ActionController::TestCase
 
     df1 = Factory :data_file,:contributor=>userB.person,:projects=>userB.person.projects
     df2 = Factory :data_file,:contributor=>userC.person,:projects=>userC.person.projects
-    df3 = Factory :data_file,:contributor=>userA.person,:projects=>userA.person.projects
+    df3 = Factory :data_file,:contributor=>userA.person,:projects=>[projects(:moses_project)]
 
     df1.policy.permissions << Factory(:permission,:policy=>df1.policy,:contributor=>userD.person, :access_type=>Policy::VISIBLE)
     df2.policy.permissions << Factory(:permission,:policy=>df2.policy,:contributor=>userD.person, :access_type=>Policy::VISIBLE)
@@ -315,5 +547,12 @@ class PublishingTest < ActionController::TestCase
     df
   end
 
+  def public_sharing
+    {:sharing_scope => Policy::EVERYONE, "access_type_#{Policy::EVERYONE}" => Policy::ACCESSIBLE}
+  end
+
+  def valid_sop
+    {:title => "Test", :data => fixture_file_upload('files/file_picture.png'), :projects => [projects(:sysmo_project)]}
+  end
 end
 

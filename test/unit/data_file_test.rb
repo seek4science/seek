@@ -184,7 +184,7 @@ class DataFileTest < ActiveSupport::TestCase
   end
 
   test "test uuid generated" do
-    x = data_files(:picture)
+    x = data_files(:private_data_file)
     assert_nil x.attributes["uuid"]
     x.save
     assert_not_nil x.attributes["uuid"]

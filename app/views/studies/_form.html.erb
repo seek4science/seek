@@ -65,18 +65,9 @@
   <%
      button_text=action==:edit ? "Update" : "Create"
      disabled_text=action==:edit ? "Updating..." : "Creating..."
-     is_new_file=action==:edit ? false : true
   %>
   <% if @study.can_manage? %>
-      <% if @study.contributor.kind_of?(Person)
-            contributor_id = @study.contributor.try(:user).try(:id)
-         elsif @study.contributor.kind_of?(User)
-           contributor_id = @study.contributor.try(:id)
-         else
-            contributor_id = nil
-         end
-      %>
-      <%= preview_permission_popup_link('study', url_for(:controller => 'policies', :action => 'preview_permissions'), is_new_file, contributor_id)-%>
+      <%= preview_permission_popup_link(@study)-%>
       <%= f.submit button_text, :id => "study_submit_btn", :onclick => "javascript: clickLink($('preview_permission'));return(false);" -%>
   <% else %>
       <%= f.submit button_text, :disable_with=>disabled_text, :id => "study_submit_btn", :onclick => "javascript: $('study_submit_btn').form.submit();return(false);" -%>

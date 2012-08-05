@@ -48,6 +48,20 @@ Kernel.class_eval do
     yield
     Seek::Config.is_virtualliver=vl
   end
+
+  def with_auth_lookup_enabled
+    val = Seek::Config.auth_lookup_enabled
+    Seek::Config.auth_lookup_enabled=true
+    yield
+    Seek::Config.auth_lookup_enabled=val
+  end
+
+  def with_auth_lookup_disabled
+    val = Seek::Config.auth_lookup_enabled
+    Seek::Config.auth_lookup_enabled=false
+    yield
+    Seek::Config.auth_lookup_enabled=val
+  end
 end
 
 class ActiveSupport::TestCase

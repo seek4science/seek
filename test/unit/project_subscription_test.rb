@@ -1,5 +1,5 @@
 require 'test_helper'
-#Authorization tests that are specific to public access
+
 class ProjectSubscriptionTest < ActiveSupport::TestCase
 
   def setup
@@ -9,7 +9,8 @@ class ProjectSubscriptionTest < ActiveSupport::TestCase
   end
 
   test 'subscribing to a project subscribes to subscribable items in the project' do
-    current_person.project_subscriptions.create :project => @proj
+    ps = current_person.project_subscriptions.create :project => @proj
+    ProjectSubscriptionJob.new(ps.id).perform
     assert @subscribables_in_proj.all?(&:subscribed?)
   end
 
@@ -25,14 +26,19 @@ class ProjectSubscriptionTest < ActiveSupport::TestCase
   end
 
   test 'subscribers to a project auto subscribe to new items in the project' do
-    current_person.project_subscriptions.create :project => @proj
+    ps = current_person.project_subscriptions.create :project => @proj
+    ProjectSubscriptionJob.new(ps.id).perform
     assert Factory(:subscribable, :projects => [Factory(:project),@proj]).subscribed?
   end
 
   test 'individual subscription frequency set by project subscription frequency' do
     ps = current_person.project_subscriptions.create :project => @proj, :frequency => 'daily'
+    ProjectSubscriptionJob.new(ps.id).perform
     assert @subscribables_in_proj.map(&:current_users_subscription).all?(&:daily?)
-    ps.frequency = 'monthly'; ps.save!
+    ps.frequency = 'monthly'
+    ps.save!
+    ProjectSubscriptionJob.new(ps.id).perform
+    @subscribables_in_proj.each(&:reload)
     assert @subscribables_in_proj.map(&:current_users_subscription).all?(&:monthly?)
   end
 

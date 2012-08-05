@@ -37,8 +37,6 @@ Seek::Config.default :auth_caching_enabled,true
 Seek::Config.default :strategic_eager_loading, true
 Seek::Config.default :auth_lookup_enabled,false
 
-Seek::Config.default :presentations_enabled,true
-
 # Branding
 Seek::Config.default :project_name,'SysMO'
 Seek::Config.default :project_type,'Consortium'

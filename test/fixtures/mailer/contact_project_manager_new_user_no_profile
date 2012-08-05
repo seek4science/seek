@@ -1,14 +1,14 @@
 Hi,
 
 The new user Aaron Spiggle just signed up and indicated that they were not listed as a Sysmo project member.
-He/She left the following details about their projects:
+They have provided the following details about their projects:
 
 "test message"
 
-Please assign he/she to the projects that you are project manager,by:
+If you know they are genuine member of the projects you can manage, please assign him/her to the projects by:
 - Go to http://localhost/people/2
 - Choose 'Person Administration'
-- You will see the list of projects and institutions that you can assign this person into
+- At the bottom. you will see the list of projects and institutions that you can assign this person to
 
 If there are not yet the institutions, you can create the new institution, by:
 - Go to Institutions tab
@@ -18,5 +18,5 @@ After the institution is created successfully, you need to assign it to the proj
 - Choose 'Project administration'
 - You will see the list institutions that you can select for this project
 
-For the person details: http://localhost/people/2, whose email address is aaron@email.com .
+If you need to contact the person, here are their details: http://localhost/people/2, whose email address is aaron@email.com .
 -- end --

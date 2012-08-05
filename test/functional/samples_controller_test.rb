@@ -344,6 +344,7 @@ test 'combined sample_specimen form when creating new sample' do
   assert_response :success
   assert_select 'input#sample_specimen_attributes_title', :count => 1
 end
+
 test 'only sample form when updating sample' do
   get :edit, :id => Factory(:sample, :policy => policies(:editing_for_all_sysmo_users_policy))
   assert_response :success

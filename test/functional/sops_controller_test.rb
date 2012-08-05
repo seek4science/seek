@@ -542,7 +542,7 @@ class SopsControllerTest < ActionController::TestCase
 
   test "do publish" do
     login_as(:owner_of_my_first_sop)
-    sop=sops(:my_first_sop)
+    sop=sops(:sop_with_project_without_gatekeeper)
     assert sop.can_manage?,"The sop must be manageable for this test to succeed"
     post :publish,:id=>sop
     assert_response :success
@@ -551,7 +551,7 @@ class SopsControllerTest < ActionController::TestCase
   end
 
   test "do not publish if not can_manage?" do
-    sop=sops(:my_first_sop)
+    sop=sops(:sop_with_project_without_gatekeeper)
     assert !sop.can_manage?,"The sop must not be manageable for this test to succeed"
     post :publish,:id=>sop
     assert_redirected_to sop
@@ -561,7 +561,7 @@ class SopsControllerTest < ActionController::TestCase
 
   test "get preview_publish" do
     login_as(:owner_of_my_first_sop)
-    sop=sops(:my_first_sop)
+    sop=sops(:sop_with_project_without_gatekeeper)
     assert sop.can_manage?,"The sop must be manageable for this test to succeed"
     get :preview_publish, :id=>sop
     assert_response :success
@@ -582,6 +582,32 @@ class SopsControllerTest < ActionController::TestCase
     assert_select 'p.list_item_attribute', :text => /Other creator: Not specified/, :count => no_other_creator_sops.count
   end
 
+  test "should set the policy to sysmo_and_projects if the item is requested to be published, when creating new sop" do
+    gatekeeper = Factory(:gatekeeper)
+    post :create, :sop => {:title => 'test', :projects => gatekeeper.projects, :data => fixture_file_upload('files/file_picture.png')}, :sharing => {:sharing_scope => Policy::EVERYONE, "access_type_#{Policy::EVERYONE}" => Policy::VISIBLE}
+    sop = assigns(:sop)
+    assert_redirected_to (sop)
+    policy = sop.policy
+    assert_equal Policy::ALL_SYSMO_USERS , policy.sharing_scope
+    assert_equal Policy::VISIBLE, policy.access_type
+    assert_equal 1, policy.permissions.count
+    assert_equal gatekeeper.projects.first, policy.permissions.first.contributor
+    assert_equal Policy::ACCESSIBLE, policy.permissions.first.access_type
+  end
+
+  test "should not change the policy if the item is requested to be published, when managing sop" do
+      gatekeeper = Factory(:gatekeeper)
+      policy = Factory(:policy, :sharing_scope => Policy::PRIVATE, :permissions => [Factory(:permission)])
+      sop = Factory(:sop, :projects => gatekeeper.projects, :policy => policy)
+      login_as(sop.contributor)
+      assert sop.can_manage?
+      put :update, :id => sop.id, :sop =>{}, :sharing => {:sharing_scope => Policy::EVERYONE, "access_type_#{Policy::EVERYONE}" => Policy::VISIBLE}
+      sop = assigns(:sop)
+      assert_redirected_to(sop)
+      updated_policy = sop.policy
+      assert_equal policy, updated_policy
+      assert_equal policy.permissions, updated_policy.permissions
+  end
   private
 
   def valid_sop_with_url

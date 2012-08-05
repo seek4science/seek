@@ -7,6 +7,7 @@ class AssaysController < ApplicationController
   before_filter :find_assets, :only=>[:index]
   before_filter :find_and_auth, :only=>[:edit, :update, :destroy, :show]
 
+  include Seek::Publishing
 
    def new_object_based_on_existing_one
     @existing_assay =  Assay.find(params[:id])
@@ -118,6 +119,8 @@ class AssaysController < ApplicationController
         #required to trigger the after_save callback after the assets have been associated
         @assay.save
 
+        deliver_request_publish_approval params[:sharing], @assay
+
         if @assay.create_from_asset =="true"
           render :action=>:update_assays_list
         else
@@ -188,6 +191,7 @@ class AssaysController < ApplicationController
         #FIXME: required to update timestamp. :touch=>true on AssayAsset association breaks acts_as_trashable
         @assay.updated_at=Time.now
         @assay.save!
+        deliver_request_publish_approval params[:sharing], @assay
 
         flash[:notice] = 'Assay was successfully updated.'
         format.html { redirect_to(@assay) }

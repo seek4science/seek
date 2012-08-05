@@ -277,8 +277,6 @@ class ApplicationController < ActionController::Base
 
       object = name.camelize.constantize.find(params[:id])
 
-      action = 'publish' if ['update', 'edit'].include?action and object.authorization_supported? and try_block{params[:sharing][:sharing_scope].to_i} == Policy::EVERYONE
-
       if object.can_perform? action
         eval "@#{name} = object"
         params.delete :sharing unless object.can_manage?(current_user)

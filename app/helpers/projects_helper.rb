@@ -42,11 +42,11 @@ module ProjectsHelper
     end
   end
 
-  def publishers_link_list project
-    if project.publishers.empty?
-      "<span class='none_text'>No Publishers for this project</span>";
+  def gatekeepers_link_list project
+    if project.gatekeepers.empty?
+      "<span class='none_text'>No Gatekeepers for this project</span>";
     else
-      project.publishers.select(&:can_view?).collect { |p| link_to(h(p.name), p) }.join(", ")
+      project.gatekeepers.select(&:can_view?).collect { |p| link_to(h(p.name), p) }.join(", ")
     end
   end
 

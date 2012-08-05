@@ -49,11 +49,11 @@ class ExperimentalConditionsControllerTest < ActionController::TestCase
       kegg_ids.push m.kegg_id if (!kegg_ids.include?m.kegg_id and !m.kegg_id.blank?)
       chebi_ids.push m.chebi_id if (!chebi_ids.include?m.chebi_id and !m.chebi_id.blank?)
     end
-    assert_equal kegg_ids, compound_annotation['kegg_ids']
-    assert_equal chebi_ids, compound_annotation['chebi_ids']
+    assert_equal kegg_ids.sort, compound_annotation['kegg_ids'].sort
+    assert_equal chebi_ids.sort, compound_annotation['chebi_ids'].sort
 
     synonyms = substance.synonyms.collect{|s| s.name}
-    assert_equal synonyms, compound_annotation['synonyms']
+    assert_equal synonyms.sort, compound_annotation['synonyms'].sort
   end
 
   test 'should not create the experimental condition with the concentration of no substance' do

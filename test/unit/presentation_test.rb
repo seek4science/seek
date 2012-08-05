@@ -33,8 +33,7 @@ class PresentationTest < ActiveSupport::TestCase
     presentation = Factory :presentation
     old_attrs = presentation.attributes
 
-    presentation.save_as_new_version("new version")
-
+    User.with_current_user(presentation.contributor) {presentation.save_as_new_version("new version")}
     assert_equal 1,old_attrs["version"]
     assert_equal 2, presentation.version
 

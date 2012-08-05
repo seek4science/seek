@@ -108,6 +108,10 @@ class User < ActiveRecord::Base
     self.logged_in? && self.current_user.person
   end
 
+  def self.logged_in_and_member?
+    self.logged_in? && self.current_user.person.try(:member?)
+  end
+
   def self.logged_in?
     self.current_user
   end

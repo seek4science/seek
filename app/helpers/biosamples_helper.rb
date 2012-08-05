@@ -107,7 +107,7 @@ module BiosamplesHelper
       update_icon = image('edit', {:alt=>"Edit",:class=>"disabled",:onclick=>"javascript:alert(\"#{explanation}\")",:title=>"#{tooltip_title_attrib(explanation)}"})
     end
     strain = specimen.strain
-    strain_info = 'Strain' + ": "+ strain.info + "(ID=#{strain.id})"
+    strain_info = 'Strain ' + strain.info + "(Seek ID=#{strain.id})"
 
     [strain_info,
      (check_box_tag "selected_specimen_#{specimen.id}", specimen.id, false, {:onchange => remote_function(:url => {:controller => 'biosamples',

@@ -16,13 +16,13 @@ namespace :seek do
 
   
   desc 'seeds the database with the controlled vocabularies'
-  task :seed=>[:environment,:seed_testing,:compounds,:load_help_docs]
+  task :seed=>[:environment,:seed_testing,:load_help_docs]
 
-  desc 'seeds the database without the loading of help document, which is currently not working for SQLITE3 (SYSMO-678). Also skips adding compounds from sabio-rk'
-  task :seed_testing=>[:environment,:refresh_controlled_vocabs,:tags]
+  desc 'seeds the database without the loading of help document, which is currently not working for SQLITE3 (SYSMO-678).'
+  task :seed_testing=>[:environment,:refresh_controlled_vocabs,:tags,:compounds]
 
   desc 'refreshes, or creates, the standard initial controlled vocublaries'
-  task :refresh_controlled_vocabs=>[:environment,:culture_growth_types, :model_types, :model_formats, :assay_types, :disciplines, :organisms, :technology_types, :recommended_model_environments, :measured_items, :units, :project_roles, :assay_classes, :relationship_types, :strains]
+  task :refresh_controlled_vocabs=>[:environment,:culture_growth_types, :model_types, :model_formats, :assay_types, :disciplines, :organisms, :technology_types, :recommended_model_environments, :measured_items, :units, :project_roles, :assay_classes, :relationship_types]
 
   desc "adds the default tags"
   task(:tags=>:environment) do
@@ -42,9 +42,15 @@ namespace :seek do
     end
   end
 
-    #update the old compounds and their annotations, add the new compounds and their annotations if they dont exist
-  desc "adds or updates the compounds, synonyms and mappings using the Sabio-RK webservices"
+  desc "seeds the database with the list of compounds and synonyms extracted from sabio-rk and stored in config/default_data/"
   task(:compounds=>:environment) do
+    SerializationHelper::Base.new(YamlDb::Helper).load("config/default_data/compounds.yml")
+    SerializationHelper::Base.new(YamlDb::Helper).load("config/default_data/synonyms.yml")
+  end
+
+  #update the old compounds and their annotations, add the new compounds and their annotations if they dont exist
+  desc "updates the compounds, synonyms and mappings using the Sabio-RK webservices"
+  task(:update_compounds=>:environment) do
     compound_list = []
     File.open('config/default_data/compound.list').each do |compound|
       unless compound.blank?
@@ -79,12 +85,6 @@ namespace :seek do
     Organism.all.each do |o|
       o.concept({:refresh=>true})
     end
-  end
-
-  task(:strains=>:environment) do
-    revert_fixtures_identify
-    Strain.delete_all
-    Fixtures.create_fixtures(File.join(RAILS_ROOT, "config/default_data"), "strains")
   end
 
   task(:culture_growth_types=>:environment) do
@@ -127,8 +127,25 @@ namespace :seek do
     revert_fixtures_identify
     Organism.delete_all
     Fixtures.create_fixtures(File.join(RAILS_ROOT, "config/default_data"), "organisms")
+
     BioportalConcept.delete_all
     Fixtures.create_fixtures(File.join(RAILS_ROOT, "config/default_data"), "bioportal_concepts")
+
+    revert_fixtures_identify
+    Strain.delete_all
+    Fixtures.create_fixtures(File.join(RAILS_ROOT, "config/default_data"), "strains")
+    disable_authorization_checks do
+      #create policy for strains
+      Strain.all.each do |strain|
+        if strain.policy.nil?
+          policy = Policy.public_policy
+          policy.save
+          strain.policy_id = policy.id
+          strain.send(:update_without_callbacks)
+        end
+      end
+    end
+
   end
 
   task(:technology_types=>:environment) do
@@ -165,34 +182,6 @@ namespace :seek do
     revert_fixtures_identify
     AssayClass.delete_all
     Fixtures.create_fixtures(File.join(RAILS_ROOT, "config/default_data"), "assay_classes")
-  end
-
-  desc "Dumps help documents and attachments/images"
-  task :dump_help_docs => :environment do
-    format_class = "YamlDb::Helper"
-    dir = 'help_dump_tmp'
-      #Clear path
-    puts "Clearing existing backup directories"
-    FileUtils.rm_r('config/default_data/help', :force => true)
-    FileUtils.rm_r('config/default_data/help_images', :force => true)
-    FileUtils.rm_r('db/help_dump_tmp/', :force => true)
-      #Dump DB
-    puts "Dumping database"
-    SerializationHelper::Base.new(format_class.constantize).dump_to_dir dump_dir("/#{dir}")
-      #Copy relevant yaml files
-    puts "Copying files"
-    FileUtils.mkdir('config/default_data/help') rescue ()
-    FileUtils.copy('db/help_dump_tmp/help_documents.yml', 'config/default_data/help/')
-    FileUtils.copy('db/help_dump_tmp/help_attachments.yml', 'config/default_data/help/')
-    FileUtils.copy('db/help_dump_tmp/help_images.yml', 'config/default_data/help/')
-    FileUtils.copy('db/help_dump_tmp/db_files.yml', 'config/default_data/help/')
-      #Delete everything else
-    puts "Cleaning up"
-    FileUtils.rm_r('db/help_dump_tmp/')
-      #Copy image folder
-    puts "Copying images"
-    FileUtils.mkdir('public/help_images') rescue ()
-    FileUtils.cp_r('public/help_images', 'config/default_data/') rescue ()
   end
 
   desc "Loads help documents and attachments/images"

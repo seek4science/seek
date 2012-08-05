@@ -290,7 +290,7 @@ module ImagesHelper
         "famfamfam_silk/medal_gold_1.png"
       when "asset_manager"
         "famfamfam_silk/medal_bronze_3.png"
-      when "publisher"
+      when "gatekeeper"
         "famfamfam_silk/medal_silver_2.png"
       when "jws_shadow"
         "jws/shadow2.gif"

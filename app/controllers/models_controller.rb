@@ -474,6 +474,7 @@ class ModelsController < ApplicationController
               assay.relate(@model)
             end
           end
+          deliver_request_publish_approval params[:sharing], @model
         else
           format.html {
             render :action => "new"
@@ -558,6 +559,7 @@ class ModelsController < ApplicationController
               AssayAsset.destroy(assay_asset.id)
             end
           end
+        deliver_request_publish_approval params[:sharing], @model
         else
           format.html {
             render :action => "edit"

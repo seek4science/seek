@@ -34,8 +34,8 @@
     f.is_project_manager true
   end
 
-  Factory.define(:publisher,:parent=>:person) do |f|
-    f.is_publisher true
+  Factory.define(:gatekeeper,:parent=>:person) do |f|
+    f.is_gatekeeper true
   end
 
 #User
@@ -44,6 +44,12 @@
     test_password = "blah"
     f.password test_password
     f.password_confirmation test_password
+  end
+
+  Factory.define(:avatar) do |f|
+    f.original_filename "#{Rails.root}/test/fixtures/files/file_picture.png"
+    f.image_file File.new("#{Rails.root}/test/fixtures/files/file_picture.png","rb")
+    f.association :owner,:factory=>:person
   end
 
   #activated_user mainly exists for :person to use in its association

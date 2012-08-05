@@ -4,7 +4,7 @@ module Seek
 
     include Seek::AnnotationCommon
     #required to get the icon_filename_for_key
-    include ImagesHelper    
+    include ImagesHelper
 
 #this is required to initialise the @<model> (e.g. @sop), before re-rendering the :new page 
     def init_asset_for_render params                                                            

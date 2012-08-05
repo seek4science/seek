@@ -5,6 +5,9 @@ class Person < ActiveRecord::Base
   acts_as_yellow_pages
   default_scope :order => "last_name, first_name"
 
+  #those that have updated time stamps and avatars appear first. A future enhancement could be to judge activity by last asset updated timestamp
+  named_scope :active, :order=> "avatar_id is null, updated_at DESC"
+
   before_save :first_person_admin
   before_destroy :clean_up_and_assign_permissions
 
@@ -52,7 +55,8 @@ class Person < ActiveRecord::Base
   has_many :favourite_group_memberships, :dependent => :destroy
   has_many :favourite_groups, :through => :favourite_group_memberships
 
-  has_many :work_groups, :through=>:group_memberships, :before_add => proc {|person, wg| person.project_subscriptions.build :project => wg.project unless person.project_subscriptions.detect {|ps| ps.project == wg.project}}
+  has_many :work_groups, :through=>:group_memberships, :before_add => proc {|person, wg| person.project_subscriptions.build :project => wg.project unless person.project_subscriptions.detect {|ps| ps.project == wg.project}},
+  :before_remove => proc {|person, wg| person.project_subscriptions.delete(person.project_subscriptions.detect {|ps| ps.project == wg.project})}
   has_many :studies, :foreign_key => :person_responsible_id
   has_many :assays,:foreign_key => :owner_id
 
@@ -83,14 +87,11 @@ class Person < ActiveRecord::Base
   has_many :subscriptions,:dependent => :destroy
   before_create :set_default_subscriptions
 
-  ROLES = %w[admin pal project_manager asset_manager publisher]
+  ROLES = %w[admin pal project_manager asset_manager gatekeeper]
   ROLES_MASK_FOR_ADMIN = 2**ROLES.index('admin')
   ROLES_MASK_FOR_PAL = 2**ROLES.index('pal')
   ROLES_MASK_FOR_PROJECT_MANAGER = 2**ROLES.index('project_manager')
 
-  def self.admins
-
-  end
   ROLES.each do |role|
       eval <<-END_EVAL
             def is_#{role}?

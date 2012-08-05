@@ -14,6 +14,17 @@ teusink:
   projects: [sysmo_project]
   policy: policy_for_test_with_projects_institutions
 
+teusink_with_project_without_gatekeeper:
+  contributor: model_owner (User)
+  title: Teusink
+  description: Teusink from JWS Online
+  recommended_environment: jws
+  result_graph: Grapsh
+  last_used_at: 2009-04-03 11:09:18
+  version: 2
+  projects: [moses_project]
+  policy: sysmo_member_edit
+
 teusink_with_space:
   contributor: model_owner (User)
   title: Teusink with space

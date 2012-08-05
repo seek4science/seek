@@ -6,6 +6,7 @@ class Specimen < ActiveRecord::Base
 
   acts_as_authorized
   acts_as_favouritable
+  acts_as_uniquely_identifiable
 
   before_save  :clear_garbage
   attr_accessor :from_biosamples

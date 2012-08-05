@@ -9,7 +9,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20120606091324) do
+ActiveRecord::Schema.define(:version => 20120628164147) do
 
   create_table "activity_logs", :force => true do |t|
     t.string   "action"
@@ -1038,6 +1038,16 @@ ActiveRecord::Schema.define(:version => 20120606091324) do
     t.datetime "updated_at"
   end
 
+  create_table "resource_publish_logs", :force => true do |t|
+    t.string   "resource_type"
+    t.integer  "resource_id"
+    t.string   "culprit_type"
+    t.integer  "culprit_id"
+    t.string   "publish_state"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
   create_table "sample_assets", :force => true do |t|
     t.integer  "sample_id"
     t.integer  "asset_id"
@@ -1086,6 +1096,7 @@ ActiveRecord::Schema.define(:version => 20120606091324) do
     t.integer  "age_at_sampling"
     t.string   "sample_type"
     t.string   "treatment"
+    t.string   "uuid"
   end
 
   create_table "samples_tissue_and_cell_types", :id => false, :force => true do |t|
@@ -1266,6 +1277,7 @@ ActiveRecord::Schema.define(:version => 20120606091324) do
     t.string   "provider_name"
     t.boolean  "is_dummy",               :default => false
     t.string   "age_unit"
+    t.string   "uuid"
   end
 
   create_table "strain_auth_lookup", :id => false, :force => true do |t|
@@ -1299,6 +1311,7 @@ ActiveRecord::Schema.define(:version => 20120606091324) do
     t.string   "contributor_type"
     t.integer  "contributor_id"
     t.integer  "policy_id"
+    t.string   "uuid"
   end
 
   create_table "studied_factor_links", :force => true do |t|
@@ -1360,6 +1373,7 @@ ActiveRecord::Schema.define(:version => 20120606091324) do
     t.string   "subscription_type"
     t.datetime "created_at"
     t.datetime "updated_at"
+    t.integer  "project_subscription_id"
   end
 
   create_table "synonyms", :force => true do |t|
@@ -1401,10 +1415,10 @@ ActiveRecord::Schema.define(:version => 20120606091324) do
   end
 
   create_table "text_value_versions", :force => true do |t|
-    t.integer  "text_value_id",                          :null => false
-    t.integer  "version",                                :null => false
+    t.integer  "text_value_id",                            :null => false
+    t.integer  "version",                                  :null => false
     t.integer  "version_creator_id"
-    t.text     "text",               :limit => 16777215, :null => false
+    t.text     "text",               :limit => 2147483647, :null => false
     t.datetime "created_at"
     t.datetime "updated_at"
   end
@@ -1414,7 +1428,7 @@ ActiveRecord::Schema.define(:version => 20120606091324) do
   create_table "text_values", :force => true do |t|
     t.integer  "version"
     t.integer  "version_creator_id"
-    t.text     "text",               :limit => 16777215, :null => false
+    t.text     "text",               :limit => 2147483647, :null => false
     t.datetime "created_at"
     t.datetime "updated_at"
   end

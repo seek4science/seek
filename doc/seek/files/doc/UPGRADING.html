@@ -56,7 +56,7 @@
     </tr>
     <tr class="top-aligned-row">
       <td><strong>Last Update:</strong></td>
-      <td>Thu Mar 22 14:48:15 +0000 2012</td>
+      <td>Tue Jul 24 13:03:52 +0100 2012</td>
     </tr>
     </table>
   </div>
@@ -107,7 +107,8 @@ href="http://groups.google.com/group/seek-development">groups.google.com/group/s
 </p>
 <p>
 When upgrading between versions greater than v0.11.x you need to upgrade to
-each released version in order incrementally. The released versions are
+each released minor version in order incrementally (i.e. 0.13.2-&gt;0.14.0,
+you can skip patch versions such as 0.13.3). The released versions are
 listed below:
 </p>
 <ul>
@@ -120,6 +121,9 @@ listed below:
 <li>0.13.3
 
 </li>
+<li>0.14.0
+
+</li>
 </ul>
 <p>
 <em>(Note there was no 0.12.x version released externally, this was an
@@ -127,19 +131,44 @@ internal release)</em>
 </p>
 <p>
 Each version has a tag in mercurial that is the version preceeded by a
-<em>v</em> - e.g. v0.11.1, v0.13.2
+<em>v</em> - e.g. v0.11.1, v0.13.2, v0.14.0
 </p>
 <p>
 When upgrading between minor versions (i.e. from 0.11.x to 0.13.x) it is
 necessary to run a seek:upgrade rake task to perform upgrade changes and
 import any new data. The upgrade task may require an internet connection,
-and sometimes can take some time to run, so please be patient.
+and sometimes can take some time to run, so please be patient. There are
+instructions for upgrading between each minor version listed below, but
+they will generally follow the same pattern.
 </p>
 <p>
 When upgrading between patch versions (i.e between 0.13.0 and 0.13.2) it
 should only be necessary to a db:migrate rake task. Using seek:upgrade
 should still work, but could take a lot of unnecessary time.
 </p>
+<h2>Steps to upgrade from 0.13.x to 0.14.x</h2>
+<p>
+These are the fairly standard steps when upgrading between minor versions.
+Note, the seek:upgrade task can take a while if there are many people and
+assets in your SEEK, as it needs to populate some tables for the default
+subscriptions (for email notifications).
+</p>
+<pre>
+    RAILS_ENV=production ./script/delayed_job stop
+    bundle exec rake sunspot:solr:stop RAILS_ENV=production
+    hg pull https://sysmo-db.googlecode.com/hg/ -r v0.14.0
+    hg update
+    hg merge # only required if you've made changes since installing. If you have you may need to deal with conflicts.
+    hg commit -m &quot;merged&quot; # likewise - only required if you made changes since installing
+    bundle install --deployment
+    bundle exec rake seek:upgrade RAILS_ENV=production
+    bundle exec rake tmp:assets:clear RAILS_ENV=production
+    bundle exec rake tmp:clear RAILS_ENV=production
+
+    bundle exec rake sunspot:solr:start RAILS_ENV=production # to restart the search server
+    RAILS_ENV=production ./script/delayed_job start
+    touch tmp/restart.txt
+</pre>
 <h2>Steps to upgrade from 0.11.x to 0.13.x</h2>
 <p>
 There follows the commands required to upgrade. Anything after # are notes
@@ -148,18 +177,34 @@ additional steps for this upgrade due to the switch from Solr to Sunspot as
 the search system, and the introduction of Delayed Job for background
 processing.
 </p>
+<p>
+First there is an additionaldependency you will need, which on Ubuntu 10.04
+or Debian can be installed with:
+</p>
 <pre>
-    rake solr:stop RAILS_ENV=production # this is specific to this upgrade, since the command to stop and start the search has changed.
+    sudo apt-get install libxslt-dev
+</pre>
+<p>
+on Ubuntu 12.04 this will be:
+</p>
+<pre>
+    sudo apt-get install libxslt1-dev
+</pre>
+<p>
+then the following steps will update the SEEK server:
+</p>
+<pre>
+    bundle exec rake solr:stop RAILS_ENV=production # this is specific to this upgrade, since the command to stop and start the search has changed.
     hg pull https://sysmo-db.googlecode.com/hg/ -r v0.13.3
     hg update
     hg merge # only required if you've made changes since installing. If you have you may need to deal with conflicts.
     hg commit -m &quot;merged&quot; # likewise - only required if you made changes since installing
     bundle install --deployment
-    rake seek:upgrade RAILS_ENV=production
-    rake sunspot:solr:start RAILS_ENV=production # to restart the search server
-    rake sunspot:solr:reindex RAILS_ENV=production  # to reindex
-    rake tmp:assets:clear RAILS_ENV=production
-    rake tmp:clear RAILS_ENV=production
+    bundle exec rake seek:upgrade RAILS_ENV=production
+    bundle exec rake sunspot:solr:start RAILS_ENV=production # to restart the search server
+    bundle exec rake sunspot:solr:reindex RAILS_ENV=production  # to reindex
+    bundle exec rake tmp:assets:clear RAILS_ENV=production
+    bundle exec rake tmp:clear RAILS_ENV=production
 </pre>
 <p>
 SEEK v0.13.x now uses a Ruby tool called <a
@@ -176,10 +221,16 @@ Phusion as described in the install guide this is simply a case of:
 <pre>
    touch tmp/restart.txt
 </pre>
+<p>
+If you auto start solr with an init.d/ script - this will need updating to
+reflect the change to sunspot:solr:start. The updated script should look
+something like: <a
+href="https://gist.github.com/3143434">gist.github.com/3143434</a>
+</p>
 <h2>Steps to upgrade between patches (e.g. between 0.13.2 and 0.13.3)</h2>
 <p>
 This should remain the same for all upgrades for minor bugfix patches,
-unless we state otherwise. This example uses v0.13.2 as an example.
+unless we state otherwise. This example uses v0.13.3 as an example.
 </p>
 <pre>
   hg pull https://sysmo-db.googlecode.com/hg/ -r v0.13.3
@@ -187,9 +238,9 @@ unless we state otherwise. This example uses v0.13.2 as an example.
   hg merge # if necessary
   hg commit -m &quot;merged&quot; # if necessary
   bundle install --deployment
-  rake db:migrate RAILS_ENV=production
-  rake tmp:assets:clear RAILS_ENV=production
-  rake tmp:clear RAILS_ENV=production
+  bundle exec rake db:migrate RAILS_ENV=production
+  bundle exec rake tmp:assets:clear RAILS_ENV=production
+  bundle exec rake tmp:clear RAILS_ENV=production
 
   RAILS_ENV=production ./script/delayed_job stop
   RAILS_ENV=production ./script/delayed_job start

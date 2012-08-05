@@ -7,18 +7,21 @@ module Acts
         klass.extend ClassMethods
         klass.extend AuthLookupClassMethods
         klass.class_eval do
+          attr_accessor :is_published_before_save #this is for logging purpose, to store the publish status of an item before it is updated
           belongs_to :contributor, :polymorphic => true unless method_defined? :contributor
           after_initialize :contributor_or_default_if_new
 
           #checks a policy exists, and if missing resorts to using a private policy
-          after_initialize :policy_or_default_if_new
+          after_initialize :policy_or_default_if_new, :assign_is_published_before_save
 
           include ProjectCompat unless method_defined? :projects
 
           belongs_to :policy, :required_access_to_owner => :manage, :autosave => true
 
+          before_validation :temporary_policy_while_waiting_for_publishing_approval, :publishing_auth unless Seek::Config.is_virtualliver
           after_save :queue_update_auth_table
           before_save :update_timestamp_if_policy_was_saved
+          after_destroy :remove_from_lookup_table
 
           def update_timestamp_if_policy_was_saved
             #autosaved belongs_to associations get saved before the parent, so to check if it has changed, see if it has a newer updated_at
@@ -34,7 +37,11 @@ module Acts
       end
 
       module AuthLookupClassMethods
+
+        #returns all the authorised items for a given action and optionally a user and set of projects. If user is nil, the items authorised for an
+        #anonymous user are returned. If one or more projects are provided, then only the assets linked to those projects are included.
         def all_authorized_for action, user=User.current_user, projects=nil
+          projects=Array(projects) unless projects.nil?
           if Seek::Config.auth_caching_enabled
             assets = if projects
                        if reflection = reflect_on_association(:projects) and reflection.macro == :has_and_belongs_to_many
@@ -48,22 +55,14 @@ module Acts
             assets.select(&"can_#{action}?".to_sym)
           else
             user_id = user.nil? ? 0 : user.id
-            c = lookup_count_for_user user_id
-            last_stored_asset_id = last_asset_id_for_user user_id
-            last_asset_id = self.last(:order => :id).try(:id)
             assets = []
             programatic_project_filter = !projects.nil? && (!Seek::Config.auth_lookup_enabled || (self==Assay || self==Study))
             if Seek::Config.auth_lookup_enabled
-              #cannot rely purly on the count, since an item could have been deleted and a new one added
-              if (c==count && last_stored_asset_id == last_asset_id)
-                Rails.logger.warn("Lookup table #{lookup_table_name} is complete for user_id = #{user_id}")
+            if (lookup_table_consistent?(user_id))
+              Rails.logger.info("Lookup table #{lookup_table_name} is complete for user_id = #{user_id}")
                 assets = lookup_for_action_and_user action, user_id,projects
               else
-                Rails.logger.warn("Lookup table #{lookup_table_name} is incomplete for user_id = #{user_id} - doing things the slow way")
-                #trigger off a full update for that user if the count is zero and items should exist for that type
-                if (c==0 && !last_asset_id.nil?)
-                  AuthLookupUpdateJob.add_items_to_queue user
-                end
+              Rails.logger.info("Lookup table #{lookup_table_name} is incomplete for user_id = #{user_id} - doing things the slow way")
                 assets = all.select { |df| df.send("can_#{action}?") }
                 programatic_project_filter = !projects.nil?
               end
@@ -78,12 +77,39 @@ module Acts
           end
         end
 
+        #determines whether the lookup table records are consistent with the number of asset items in the database and the last id of the item added
+        def lookup_table_consistent? user_id
+          unless user_id.is_a?(Numeric)
+            user_id = user_id.nil? ? 0 : user_id.id
+          end
+          #cannot rely purely on the count, since an item could have been deleted and a new one added
+          c = lookup_count_for_user user_id
+          last_stored_asset_id = last_asset_id_for_user user_id
+          last_asset_id = self.last(:order=>:id).try(:id)
+
+          #trigger off a full update for that user if the count is zero and items should exist for that type
+          if (c==0 && !last_asset_id.nil?)
+            AuthLookupUpdateJob.add_items_to_queue User.find_by_id(user_id)
+          end
+          c==count && (count==0 || (last_stored_asset_id == last_asset_id))
+        end
+
+        #the name of the lookup table, holding authorisation lookup information, for this given authorised type
         def lookup_table_name
           "#{self.name.underscore}_auth_lookup"
         end
 
+        #removes all entries from the authorization lookup type for this authorized type
         def clear_lookup_table
           ActiveRecord::Base.connection.execute("delete from #{lookup_table_name}")
+        end
+
+        #the record count for entries within the authorization lookup table for a given user_id or user. Used to determine if the table is complete
+        def lookup_count_for_user user_id
+          unless user_id.is_a?(Numeric)
+            user_id = user_id.nil? ? 0 : user_id.id
+          end
+          ActiveRecord::Base.connection.select_one("select count(*) from #{lookup_table_name} where user_id = #{user_id}").values[0].to_i
         end
 
         def lookup_for_action_and_user action,user_id,projects
@@ -92,7 +118,6 @@ module Acts
             sql = "select asset_id from #{lookup_table_name} where user_id = #{user_id} and can_#{action}=#{ActiveRecord::Base.connection.quoted_true}"
             ids = ActiveRecord::Base.connection.select_all(sql).collect{|k| k["asset_id"]}
           else
-            projects = Array(projects)
             project_map_table = ["#{self.name.underscore.pluralize}", 'projects'].sort.join('_')
             project_map_asset_id = "#{self.name.underscore}_id"
             project_clause = projects.collect{|p| "#{project_map_table}.project_id = #{p.id}"}.join(" or ")
@@ -106,15 +131,17 @@ module Acts
           find_all_by_id(ids)
         end
 
-        def lookup_count_for_user user_id
-          ActiveRecord::Base.connection.select_one("select count(*) from #{lookup_table_name} where user_id = #{user_id}").values[0].to_i
-        end
-
+        #the highest asset id recorded in authorization lookup table for a given user_id or user. Used to determine if the table is complete
         def last_asset_id_for_user user_id
+          unless user_id.is_a?(Numeric)
+            user_id = user_id.nil? ? 0 : user_id.id
+          end
           v = ActiveRecord::Base.connection.select_one("select max(asset_id) from #{lookup_table_name} where user_id = #{user_id}").values[0]
           v.nil? ? -1 : v.to_i
         end
 
+        #looks up the entry in the authorization lookup table for a single authorised type, for a given action, user_id and asset_id. A user id of zero
+        #indicates an anonymous user. Returns nil if there is no record available
         def lookup_for_asset action,user_id,asset_id
           attribute = "can_#{action}"
           @@expected_true_value ||= ActiveRecord::Base.connection.quoted_true.gsub("'","")
@@ -131,6 +158,12 @@ module Acts
         [user.try(:person).try(:cache_key), "can_#{action}?", cache_key]
       end
 
+      #removes all entries related to this item from the authorization lookup table
+      def remove_from_lookup_table
+        id=self.id
+        ActiveRecord::Base.connection.execute("delete from #{self.class.lookup_table_name} where asset_id=#{id}")
+      end
+      
       AUTHORIZATION_ACTIONS.each do |action|
         if Seek::Config.auth_caching_enabled
           eval <<-END_EVAL
@@ -162,6 +195,7 @@ module Acts
         end
       end
 
+      #triggers a background task to update or create the authorization lookup table records for this item
       def queue_update_auth_table
         #FIXME: somewhat aggressively does this after every save can be refined in the future
         unless (self.changed - ["updated_at", "last_used_at"]).empty?
@@ -169,6 +203,7 @@ module Acts
         end
       end
 
+      #updates or creates the authorization lookup entries for this item and the provided user (nil indicating anonymous user)
       def update_lookup_table user=nil
         user_id = user.nil? ? 0 : user.id
 
@@ -189,7 +224,25 @@ module Acts
         end
 
         ActiveRecord::Base.connection.execute(sql)
+      end
 
+      AUTHORIZATION_ACTIONS.each do |action|
+          eval <<-END_EVAL
+            def can_#{action}? user = User.current_user
+                return true if new_record?
+                user_id = user.nil? ? 0 : user.id
+                if Seek::Config.auth_lookup_enabled
+                  lookup = self.class.lookup_for_asset("#{action}", user_id,self.id)
+                else
+                  lookup=nil
+                end
+                if lookup.nil?
+                  perform_auth(user,"#{action}")
+                else
+                  lookup
+                end
+            end
+          END_EVAL
       end
 
       def contributor_credited?
@@ -240,9 +293,13 @@ module Acts
           self.contributor = default_contributor
         end
       end
-      #contritutor or person who can manage the item and the item was published
-      def can_publish?
-        ((Ability.new(User.current_user).can? :publish, self) && self.can_manage?) || self.contributor == User.current_user || try_block{self.contributor.user} == User.current_user || (self.can_manage? && self.policy.sharing_scope == Policy::EVERYONE) || Seek::Config.is_virtualliver
+      #(gatekeeper also manager) or (manager and projects have no gatekeeper) or (manager and the item was published)
+      def can_publish? user=User.current_user
+        if self.new_record?
+          (Ability.new(user).can? :publish, self) || (self.can_manage? && self.gatekeepers.empty?) || Seek::Config.is_virtualliver
+        else
+          (Ability.new(user).can? :publish, self) || (self.can_manage? && self.gatekeepers.empty?) || (self.can_manage? && (self.policy.sharing_scope_was == Policy::EVERYONE)) || Seek::Config.is_virtualliver
+        end
       end
 
       #use request_permission_summary to retrieve who can manage the item
@@ -289,6 +346,41 @@ module Acts
           end
         else
           owner.try(:user)
+        end
+      end
+
+      def gatekeepers
+         self.projects.collect(&:gatekeepers).flatten
+      end
+
+      def publishing_auth
+        return true if $authorization_checks_disabled
+        #only check if doing publishing
+        if self.policy.sharing_scope == Policy::EVERYONE && !self.kind_of?(Publication)
+            unless self.can_publish?
+              errors.add_to_base("You are not permitted to publish this #{self.class.name.underscore.humanize}")
+              return false
+            end
+        end
+      end
+
+      def assign_is_published_before_save
+        if self.policy.try(:sharing_scope_was) == Policy::EVERYONE
+          self.is_published_before_save=true
+        else
+          self.is_published_before_save=false
+        end
+      end
+
+      #while item is waiting for publishing approval,set the policy of the item to:
+      #new item: sysmo_and_project_policy
+      #updated item: keep the policy as before
+      def temporary_policy_while_waiting_for_publishing_approval
+        return true if $authorization_checks_disabled
+        if self.new_record? && self.policy.sharing_scope == Policy::EVERYONE && !self.kind_of?(Publication) && !self.can_publish?
+          self.policy = Policy.sysmo_and_projects_policy self.projects
+        elsif !self.new_record? && self.policy.sharing_scope == Policy::EVERYONE && !self.kind_of?(Publication) && !self.can_publish?
+          self.policy = Policy.find_by_id(self.policy.id)
         end
       end
     end

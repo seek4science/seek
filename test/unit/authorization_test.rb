@@ -816,49 +816,49 @@ class AuthorizationTest < ActiveSupport::TestCase
     assert !item.can_manage?
   end
 
-  test "publisher can publish items inside their project, only if they can manage it as well" do
-    publisher = Factory(:person, :roles => ['publisher'])
-    datafile = Factory(:data_file, :projects => publisher.projects)
+  test "gatekeeper can publish items inside their project, only if they can manage it as well" do
+    gatekeeper = Factory(:person, :roles => ['gatekeeper'])
+    datafile = Factory(:data_file, :projects => gatekeeper.projects)
 
-    #adding manage right for publisher
+    #adding manage right for gatekeeper
     User.with_current_user datafile.contributor do
       policy  = Factory(:policy)
-      policy.permissions = [Factory(:permission, :contributor => publisher, :access_type => Policy::MANAGING)]
+      policy.permissions = [Factory(:permission, :contributor => gatekeeper, :access_type => Policy::MANAGING)]
       datafile.policy = policy
       datafile.save
     end
 
-    ability = Ability.new(publisher.user)
+    ability = Ability.new(gatekeeper.user)
     assert ability.can? :publish, datafile
 
-    User.with_current_user publisher.user do
+    User.with_current_user gatekeeper.user do
       assert datafile.can_manage?
       assert datafile.can_publish?
     end
   end
 
-  test "publisher can not publish items inside their project, if they can not manage it" do
-      publisher = Factory(:person, :roles => ['publisher'])
-      datafile = Factory(:data_file, :projects => publisher.projects)
+  test "gatekeeper can not publish items inside their project, if they can not manage it" do
+      gatekeeper = Factory(:person, :roles => ['gatekeeper'])
+      datafile = Factory(:data_file, :projects => gatekeeper.projects)
 
-      ability = Ability.new(publisher.user)
-      assert ability.can? :publish, datafile
+      ability = Ability.new(gatekeeper.user)
+      assert ability.cannot? :publish, datafile
 
-      User.with_current_user publisher.user do
+      User.with_current_user gatekeeper.user do
         assert !datafile.can_manage?
         assert !datafile.can_publish?
       end
     end
 
 
-  test "publisher can not publish items outside their project" do
-    publisher = Factory(:person, :roles => ['publisher'])
+  test "gatekeeper can not publish items outside their project" do
+    gatekeeper = Factory(:person, :roles => ['gatekeeper'])
     datafile = Factory(:data_file)
 
-    ability = Ability.new(publisher.user)
+    ability = Ability.new(gatekeeper.user)
     assert ability.cannot? :publish, datafile
 
-    User.with_current_user publisher.user do
+    User.with_current_user gatekeeper.user do
       assert !datafile.can_publish?
     end
   end
@@ -911,24 +911,29 @@ class AuthorizationTest < ActiveSupport::TestCase
   end
 
   test "asset manager can manage the items inside their projects, but can not publish the items, which hasn't been set to published" do
-     asset_manager = Factory(:asset_manager)
-     datafile = Factory(:data_file, :projects => asset_manager.projects, :policy => Factory(:all_sysmo_viewable_policy))
+    project = Factory(:project)
+    work_group = Factory(:work_group, :project => project)
 
-     User.with_current_user asset_manager.user do
-       assert datafile.can_manage?
-       assert !datafile.can_publish?
+    asset_manager = Factory(:asset_manager, :group_memberships => [Factory(:group_membership, :work_group => work_group)])
+    gatekeeper = Factory(:gatekeeper, :group_memberships => [Factory(:group_membership, :work_group => work_group)])
 
-       ability = Ability.new(asset_manager.user)
-       assert asset_manager.is_asset_manager?
-       assert ability.can? :manage_asset, datafile
-       assert ability.cannot? :publish, datafile
+    datafile = Factory(:data_file, :projects => asset_manager.projects, :policy => Factory(:all_sysmo_viewable_policy))
 
+    User.with_current_user asset_manager.user do
+      assert datafile.can_manage?
+      assert !datafile.can_publish?
+
+      ability = Ability.new(asset_manager.user)
+      assert asset_manager.is_asset_manager?
+      assert ability.can? :manage_asset, datafile
+      assert ability.cannot? :publish, datafile
      end
   end
 
   test "a person who is not an asset manager, who can manage the item, should not be able to publish the items, which hasn't been set to published" do
      person_can_manage = Factory(:person)
-     datafile = Factory(:data_file, :projects => person_can_manage.projects, :policy => Factory(:policy))
+     gatekeeper = Factory(:gatekeeper)
+     datafile = Factory(:data_file, :projects => gatekeeper.projects, :policy => Factory(:policy))
      permission = Factory(:permission, :contributor => person_can_manage, :access_type => Policy::MANAGING, :policy => datafile.policy)
 
      User.with_current_user person_can_manage.user do
@@ -943,18 +948,31 @@ class AuthorizationTest < ActiveSupport::TestCase
      end
   end
 
-  test "publisher should not be able to manage the item" do
-     publisher = Factory(:publisher)
-     datafile = Factory(:data_file, :projects => publisher.projects, :policy => Factory(:all_sysmo_viewable_policy))
+  test "gatekeeper should not be able to manage the item" do
+    gatekeeper = Factory(:gatekeeper)
+     datafile = Factory(:data_file, :projects => gatekeeper.projects, :policy => Factory(:all_sysmo_viewable_policy))
 
-     User.with_current_user publisher.user do
+     User.with_current_user gatekeeper.user do
        assert !datafile.can_manage?
 
-       ability = Ability.new(publisher.user)
-       assert publisher.is_publisher?
-       assert ability.can? :publish, datafile
+       ability = Ability.new(gatekeeper.user)
+       assert gatekeeper.is_gatekeeper?
+       assert ability.cannot? :publish, datafile
        assert ability.cannot? :manage_asset, datafile
        assert ability.cannot? :manage, datafile
+     end
+  end
+
+  test "manager should be able to publish if the projects have no gatekeepers" do
+     person_can_manage = Factory(:person)
+     datafile = Factory(:data_file, :projects => person_can_manage.projects, :policy => Factory(:policy))
+     permission = Factory(:permission, :contributor => person_can_manage, :access_type => Policy::MANAGING, :policy => datafile.policy)
+
+
+     User.with_current_user person_can_manage.user do
+       assert datafile.gatekeepers.empty?
+       assert datafile.can_manage?
+       assert datafile.can_publish?
      end
   end
 
@@ -972,6 +990,104 @@ class AuthorizationTest < ActiveSupport::TestCase
     User.with_current_user asset_manager.user do
       assert datafile.can_manage?
       assert investigation.can_manage?
+    end
+  end
+
+  test "can_publish for new asset" do
+    #gatekeeper can publish
+    gatekeeper = Factory(:gatekeeper)
+    User.with_current_user gatekeeper.user do
+      specimen = Specimen.new(:title => 'test1', :strain => strains(:yeast1), :lab_internal_number => '1234', :projects => gatekeeper.projects, :policy => Policy.new(:sharing_scope => Policy::EVERYONE, :access_type => Policy::ACCESSIBLE))
+      assert specimen.can_publish?
+      assert specimen.save
+    end
+
+    #contributor can not publish if projects associated with asset have gatekeepers
+    User.with_current_user Factory(:user) do
+      specimen = Specimen.new(:title => 'test2', :strain => strains(:yeast1), :lab_internal_number => '1234', :projects => gatekeeper.projects, :policy => Policy.new(:sharing_scope => Policy::EVERYONE, :access_type => Policy::ACCESSIBLE))
+      assert !specimen.gatekeepers.empty?
+      assert !specimen.can_publish?
+      assert specimen.save
+    end
+
+    #contributor can publish if projects associated with asset have no gatekeepers
+    User.with_current_user Factory(:user) do
+      specimen = Specimen.new(:title => 'test3', :strain => strains(:yeast1), :lab_internal_number => '1234', :policy => Policy.new(:sharing_scope => Policy::EVERYONE, :access_type => Policy::ACCESSIBLE))
+      assert specimen.gatekeepers.empty?
+      assert specimen.can_publish?
+      assert specimen.save
+    end
+  end
+
+  test "can_publish when updating asset" do
+    #gatekeeper can publish
+    gatekeeper = Factory(:gatekeeper)
+    User.with_current_user gatekeeper.user do
+      specimen = Factory(:specimen, :projects => gatekeeper.projects, :contributor => gatekeeper)
+      specimen.policy.sharing_scope = Policy::EVERYONE
+      assert specimen.can_publish?
+      assert specimen.save
+    end
+
+    work_group = Factory(:work_group, :project => gatekeeper.projects.first)
+    contributor = Factory(:person, :group_memberships => [Factory(:group_membership, :work_group => work_group)])
+    #contributor can not publish if projects associated with asset have gatekeepers
+    User.with_current_user contributor.user do
+      specimen = Factory(:specimen, :projects => gatekeeper.projects, :contributor => contributor)
+      specimen.policy.sharing_scope = Policy::EVERYONE
+      assert !specimen.can_publish?
+      assert specimen.save
+    end
+
+    #contributor can publish if projects associated with asset have no gatekeepers
+    User.with_current_user contributor.user do
+      specimen = Factory(:specimen, :contributor => contributor)
+      specimen.policy.sharing_scope = Policy::EVERYONE
+      assert specimen.can_publish?
+      assert specimen.save
+    end
+
+    #contributor can publish if asset was already published
+    specimen = specimens(:public_specimen)
+    User.with_current_user specimen.contributor do
+      assert !specimen.gatekeepers.empty?
+      assert !specimen.contributor.person.is_gatekeeper?
+      assert_equal Policy::EVERYONE, specimen.policy.sharing_scope
+      specimen.policy.sharing_scope = Policy::EVERYONE
+      assert specimen.can_publish?
+      assert specimen.save
+    end
+  end
+
+  test 'unauthorized_change_to_autosave?' do
+    df = Factory(:data_file)
+    assert Policy::PRIVATE, df.policy.sharing_scope
+    df.policy.sharing_scope = Policy::ALL_SYSMO_USERS
+    assert !df.save
+    df.reload
+    assert_equal Policy::PRIVATE, df.policy.sharing_scope
+
+    disable_authorization_checks do
+      df.policy.sharing_scope = Policy::ALL_SYSMO_USERS
+      assert df.save
+      df.reload
+      assert_equal Policy::ALL_SYSMO_USERS, df.policy.sharing_scope
+    end
+  end
+
+  test 'disable authorization check for publishing_auth' do
+    df = Factory(:data_file)
+    assert_equal Policy::PRIVATE, df.policy.sharing_scope
+    user = Factory(:user)
+    User.with_current_user user do
+      assert !df.can_publish?
+    end
+
+    disable_authorization_checks do
+      df.policy.sharing_scope = Policy::EVERYONE
+      assert df.save
+      df.reload
+      assert_equal Policy::EVERYONE, df.policy.sharing_scope
     end
   end
 

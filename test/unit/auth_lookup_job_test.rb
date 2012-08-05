@@ -41,6 +41,7 @@ class AuthLookupJobTest  < ActiveSupport::TestCase
     job.locked_at = Time.now
     job.save!
     assert_equal 0, AuthLookupUpdateJob.count,"Should ignore locked jobs"
+    assert_equal 1,AuthLookupUpdateJob.count(false),"Should not ignore locked jobs when requested"
   end
 
   test "add items to queue" do
@@ -95,6 +96,20 @@ class AuthLookupJobTest  < ActiveSupport::TestCase
     assert_equal sop.perform_auth(other_user,"manage"),sop.can_manage?(other_user)
     assert_equal sop.perform_auth(other_user,"download"),sop.can_download?(other_user)
     assert_equal sop.perform_auth(other_user,"delete"),sop.can_delete?(other_user)
+  end
+
+  test "lookup table counts" do
+    user = Factory :user
+    disable_authorization_checks do
+      Sop.clear_lookup_table
+      assert_equal 0,Sop.lookup_count_for_user(user.id)
+      sop = Factory :sop
+      assert_equal 0,Sop.lookup_count_for_user(user.id)
+      sop.update_lookup_table(user)
+      assert_equal 1,Sop.lookup_count_for_user(user.id)
+      assert sop.destroy
+      assert_equal 0,Sop.lookup_count_for_user(user.id)
+    end
   end
 
 end

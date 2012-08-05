@@ -225,4 +225,8 @@ person_for_project_manager:
   roles_mask: 4
   email: "project_manager@email.com"
   
-
+gatekeeper_person:
+  first_name: "Gatekeeper"
+  last_name: "Last"
+  email: "gatekeeper@email.com"
+  roles_mask: 16

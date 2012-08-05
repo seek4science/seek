@@ -6,6 +6,7 @@ picture:
   version: 1
   projects: [sysmo_project]
   policy: policy_for_test_with_projects_institutions
+  uuid: aaaa-hhhh-jjjj-kkkk
 
 private_data_file:
   contributor: datafile_owner (User)

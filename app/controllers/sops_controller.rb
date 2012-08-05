@@ -10,6 +10,7 @@ class SopsController < ApplicationController
   before_filter :find_and_auth, :except => [ :index, :new, :create, :request_resource,:preview, :test_asset_url, :update_annotations_ajax]
   before_filter :find_display_asset, :only=>[:show,:download]
 
+
   include Seek::Publishing
   
   def new_version
@@ -117,6 +118,7 @@ class SopsController < ApplicationController
               assay.relate(@sop)
             end
           end
+          deliver_request_publish_approval params[:sharing], @sop
         else
           format.html { 
             render :action => "new" 
@@ -173,6 +175,7 @@ class SopsController < ApplicationController
             AssayAsset.destroy(assay_asset.id)
           end
         end
+        deliver_request_publish_approval params[:sharing], @sop
       else
         format.html { 
           render :action => "edit" 
