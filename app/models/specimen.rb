@@ -99,6 +99,10 @@ class Specimen < ActiveRecord::Base
     text :institution do
       institution.try :name
     end if Seek::Config.is_virtualliver
+
+    text :creators do
+      creators.compact.map(&:name)
+    end
   end if Seek::Config.solr_enabled
 
   def age_with_unit

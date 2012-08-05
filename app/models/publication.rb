@@ -7,6 +7,11 @@ class Publication < ActiveRecord::Base
   
   title_trimmer
 
+  #searchable must come before acts_as_asset is called
+  searchable(:ignore_attribute_changes_of=>[:updated_at,:last_used_at]) do
+    text :title,:abstract,:journal,:searchable_tags, :pubmed_id, :doi
+  end if Seek::Config.solr_enabled
+
   acts_as_asset
 
   def default_policy
@@ -52,10 +57,6 @@ class Publication < ActiveRecord::Base
   end
 
   alias :seek_authors :creators
-  
-  searchable(:ignore_attribute_changes_of=>[:updated_at,:last_used_at]) do
-    text :title,:abstract,:journal,:searchable_tags, :pubmed_id, :doi
-  end if Seek::Config.solr_enabled
 
   #TODO: refactor to something like 'sorted_by :start_date', which should create the default scope and the sort method. Maybe rename the sort method.
   default_scope :order => "#{self.table_name}.published_date DESC"
