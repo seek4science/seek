@@ -40,7 +40,9 @@ function MultiSelector(list_target,object_name,method) {
         } else{
             if (element.tagName == 'INPUT' && element.type == 'text') {
                 element.name = 'content_blob[url_' + (this.id_url++) + ']';
+                var original_filename_element = document.getElementsByName('content_blob[original_filename_' + (this.id_url -1) + ']')[0];
                 element.multi_selector = this;
+
 
 //                if (this.max != -1 && this.count > this.max) {
 //                    element.disabled = true;
@@ -49,6 +51,7 @@ function MultiSelector(list_target,object_name,method) {
 //                ;
 //                this.count++;
                 this.current_url_element = element;
+                this.current_original_filename_url_element = original_filename_element;
                 this.current_element  = element;
             }else{
                 alert('Error: neither a file input element nor a text field for file url');
@@ -109,7 +112,8 @@ function MultiSelector(list_target,object_name,method) {
 
 
         new_col2.innerHTML = '<img src="/images/file_icons/small/genericGray.png">';
-        new_col3.innerHTML =  element.type=="text"? parseUri( element.value).file : element.value.split(/\\/)[element.value.split(/\\/).length - 1];
+        var original_filename =document.getElementsByName('content_blob[original_filename_' + (this.id_url - 2) + ']')[0].value;
+        new_col3.innerHTML =  element.type=="text"? (original_filename || parseUri( element.value).file) : element.value.split(/\\/)[element.value.split(/\\/).length - 1];
         new_col3.style.textAlign = "left";
 
 

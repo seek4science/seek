@@ -17,10 +17,6 @@ original_filename=nil
      obj.data_url=params[upload_field.to_sym][:data_url] if params[upload_field.to_sym][:data_url]
      original_filename = params[upload_field.to_sym][:original_filename] if params[upload_field.to_sym][:original_filename]
    end
-
-   upload_display=obj.data_url.blank? ? "block" : "none"
-   from_url_display=upload_display=="block" ? "none" : "block"
-
 -%>
 
 <div class="box_infotext">
@@ -70,7 +66,7 @@ original_filename=nil
                 <%= link_to_function image("internet_large"),"from_url_selected(); return (false);",:class=>"block_link",:id=>"upload_from_url_button",:title=>tooltip_title_attrib('Add from a remote URL') -%>
             </li>
             <li id="upload_options">
-                <div id="upload_from_file" style="display:<%= upload_display -%>;">
+                <div id="upload_from_file">
                     <p>
                         <b>File to upload:</b>
                         <span class="required">*</span>
@@ -78,7 +74,7 @@ original_filename=nil
                         <%= file_field upload_field, :data -%>
                     </p>
                 </div>
-                <div id="upload_from_url" style="display:<%= from_url_display -%>;">
+                <div id="upload_from_url" style="display:none;">
                 <p>
                     <b>URL:</b>
                     <span class="required">*</span>                    

@@ -20,6 +20,7 @@ module AssetsCommonExtension
     i = 0
     local_set = []
     url_set = []
+    original_filename_from_url_set = []
     while !params[symbol].blank?
       if !params[symbol]['file_'+i.to_s].nil?
         if params[symbol]['file_'+i.to_s] != ""
@@ -33,10 +34,16 @@ module AssetsCommonExtension
         end
         params[symbol].delete 'url_'+i.to_s
       end
+      if !params[symbol]['original_filename_'+i.to_s].nil?
+        if params[symbol]['original_filename_'+i.to_s] != ""
+          original_filename_from_url_set << params[symbol]['original_filename_'+i.to_s]
+        end
+        params[symbol].delete 'original_filename_'+i.to_s
+      end
       i += 1
     end
 
-    return [local_set, url_set]
+    return [local_set, url_set, original_filename_from_url_set]
   end
 
   def handle_batch_data render_action_on_error=:new
@@ -52,6 +59,7 @@ module AssetsCommonExtension
     params_files = calculate_params(:content_blob)
     params_data = params_files.first
     params_url = params_files.second
+    params_original_filename_from_ulr = params_files.third
     params_image_file = params[controller_name.singularize+'_image'].nil? ? nil : params[controller_name.singularize+'_image']['image_file']
 
     if render_action_on_error==:new || render_action_on_error.nil?
@@ -96,7 +104,7 @@ module AssetsCommonExtension
           make_local_copy = (params[symb][:local_copy]=="1")
           @data_urls=params_url
 
-          @data_urls.each do |data_url|
+          @data_urls.each_with_index do |data_url,index|
 
             code = url_response_code data_url
             if (code == "200")
@@ -106,7 +114,7 @@ module AssetsCommonExtension
               @tmp_io_objects_url << File.open(data_hash[:data_tmp_path], "r") if make_local_copy
 
               @content_types << data_hash[:content_type]
-              @original_filenames << data_hash[:filename]
+              @original_filenames << (params_original_filename_from_ulr[index] || data_hash[:filename])
             elsif (["302", "401"].include?(code))
               @tmp_io_objects_url << ""
               @content_types << ""

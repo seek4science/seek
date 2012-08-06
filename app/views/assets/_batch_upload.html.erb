@@ -12,6 +12,14 @@
    asset_name = text_for_resource upload_field
    @content_blob ||= ContentBlob.new
    with_image_file = resource && resource.kind_of?(Model) && (mine?(resource) || resource.can_edit?)
+   original_filename=nil
+-%>
+
+<%
+   if params[upload_field.to_sym]
+     resource.data_url=params[upload_field.to_sym][:data_url] if params[upload_field.to_sym][:data_url]
+     original_filename = params[upload_field.to_sym][:original_filename] if params[upload_field.to_sym][:original_filename]
+   end
 -%>
 
 <div class="box_infotext">
@@ -79,7 +87,8 @@
             <span class="required">*</span>
 
 
-            <input id="content_blob_data_url" type="text" size="55">
+            <%= text_field_tag "content_blob[data_url]", resource.data_url, :size => 55 %>
+
                 <%= link_to_function (image("new") + "Add"), "addToList()" %>
                 <%= link_to_remote image("test", :title=>"Test", :alt=>"Test")+" Test",
                                    :url=>{:action=>:test_asset_url, :symb=>"content_blob"},
@@ -92,6 +101,7 @@
                   <b>Make a copy?</b>
                   <%= check_box upload_field, :local_copy, :id=>"local_copy" -%>
                 </p>
+            <%= hidden_field_tag "content_blob[original_filename_0]", original_filename -%>
             </p>
             <p>
               <span id="test_url_result_icon"></span>
@@ -119,23 +129,30 @@
 </div>
 
 <script type="text/javascript">
-    from_file_selected();
+    var multi_selector = new MultiSelector($('pending_files'));
 
-     var multi_selector = new MultiSelector($('pending_files'));
+         multi_selector.addElement($('content_blob_data'));
+         multi_selector.addElement($('content_blob_data_url'));
 
-     multi_selector.addElement($('content_blob_data'));
-     multi_selector.addElement($('content_blob_data_url'));
+    <% if resource.data_url.blank? -%>
+        from_file_selected();
+    <% else -%>
+        from_url_selected();
+    <% end -%>
 
 
     function addToList() {
-         var url_element = $('content_blob_data_url');
-        var url = parseUri(multi_selector.current_url_element.value).file;
+        var url = multi_selector.current_original_filename_url_element.value || parseUri(multi_selector.current_url_element.value).file;
 
         if (url != "" && url != null) {
             var new_element = document.createElement('input');
             new_element.type = 'text';
             new_element.size = '55';
             var old_element = document.getElementsByName('content_blob[url_' + (multi_selector.id_url - 1) + ']')[0];
+            var original_filename_element = document.createElement('input');
+            original_filename_element.type = 'hidden';
+            original_filename_element.name = 'content_blob[original_filename_' + (multi_selector.id_url) + ']';
+            $('upload_from_url').appendChild(original_filename_element);
             if (old_element.value != "") {
                 old_element.parentNode.insertBefore(new_element, old_element);
                 old_element.multi_selector.addElement(new_element);
