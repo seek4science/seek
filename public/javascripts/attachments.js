@@ -112,8 +112,11 @@ function MultiSelector(list_target,object_name,method) {
 
 
         new_col2.innerHTML = '<img src="/images/file_icons/small/genericGray.png">';
-        var original_filename =document.getElementsByName('content_blob[original_filename_' + (this.id_url - 2) + ']')[0].value;
-        new_col3.innerHTML =  element.type=="text"? (original_filename || parseUri( element.value).file) : element.value.split(/\\/)[element.value.split(/\\/).length - 1];
+        if (element.type =='text'){
+           var original_filename =document.getElementsByName('content_blob[original_filename_' + (this.id_url - 2) + ']')[0].value;
+           new_col3.innerHTML = (original_filename || parseUri( element.value).file);
+        }else
+            new_col3.innerHTML =  element.value.split(/\\/)[element.value.split(/\\/).length - 1];
         new_col3.style.textAlign = "left";
 
 
