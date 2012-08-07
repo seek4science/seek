@@ -520,9 +520,9 @@ module ApplicationHelper
   end
 
   def add_return_to_search
-    referer = request.headers["Referer"]
-    request_uri = request.headers['REQUEST_URI']
-    search_path = search_url.end_with?('/') ? search_url : (search_url.concat('/'))
+    referer = request.headers["Referer"].try(:normalize_trailing_slash)
+    request_uri = request.headers['REQUEST_URI'].try(:normalize_trailing_slash)
+    search_path = search_url.normalize_trailing_slash
     if referer == search_path && referer != request_uri
       javascript_tag "
         if (window.history.length > 1){
