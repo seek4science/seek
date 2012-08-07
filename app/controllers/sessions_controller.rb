@@ -36,7 +36,11 @@ class SessionsController < ApplicationController
     flash[:notice] = "You have been logged out."
 
     begin
-      redirect_back
+      if request.env['HTTP_REFERER'] == search_url.concat('/')
+        redirect_to :root
+      else
+        redirect_back
+      end
     rescue RedirectBackError
       redirect :controller => :home, :action => :index
     end

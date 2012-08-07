@@ -21,8 +21,7 @@ class SearchController < ApplicationController
     end
     
   end
-
-  def perform_search
+                                                                        def perform_search
     @search_query = params[:search_query]
     @search=@search_query # used for logging, and logs the origin search query - see ApplicationController#log_event
     @search_query||=""
