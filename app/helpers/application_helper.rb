@@ -523,7 +523,8 @@ module ApplicationHelper
     referer = request.headers["Referer"].try(:normalize_trailing_slash)
     request_uri = request.headers['REQUEST_URI'].try(:normalize_trailing_slash)
     search_path = search_url.normalize_trailing_slash
-    if referer == search_path && referer != request_uri
+    root_path = root_url.normalize_trailing_slash
+    if referer == search_path && referer != request_uri && request_uri != root_path
       javascript_tag "
         if (window.history.length > 1){
           var a = document.createElement('a');
