@@ -521,15 +521,16 @@ module ApplicationHelper
 
   def add_return_to_search
     referer = request.headers["Referer"]
+    request_uri = request.headers['REQUEST_URI']
     search_path = search_url.end_with?('/') ? search_url : (search_url.concat('/'))
-    if referer == search_path
+    if referer == search_path && referer != request_uri
       javascript_tag "
         if (window.history.length > 1){
           var a = document.createElement('a');
-          a.onclick = function(){window.history.back()}
+          a.onclick = function(){window.history.back()};
           a.appendChild(document.createTextNode('Return to search'));
-          a.style.textDecoration='underline'
-          document.getElementById('return_to_search').appendChild(a)
+          a.style.textDecoration='underline';
+          document.getElementById('return_to_search').appendChild(a);
         }
       "
       #link_to_function 'Return to search', "window.history.back();"
