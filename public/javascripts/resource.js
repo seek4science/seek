@@ -10,11 +10,9 @@ function validateResourceFields(is_new_file, resource_name, is_managed) {
 
     // only make this test if that's a new SOP
     if(is_new_file) {
-        if($(resource_name + '_data').value.length == 0 && $(resource_name + '_data_url').value.length == 0) {
-            alert("Please specify the file to upload, or provide a URL.");
-            $(resource_name + '_data').focus();
-            return(false);
-        }
+        var respond_to_content_blobs = resource_name=='model' ? true :false;
+        if (!validateUploadFormFields(respond_to_content_blobs, resource_name))
+           return (false);
     }
 
     // other tests are applicable to both editing and creating new SOP
@@ -83,4 +81,32 @@ function createOrUpdateResource(is_new_file, resource_name){
     $(resource_name + '_submit_btn').form.submit();
 
     RedBox.close();
+}
+
+function validateUploadFormFields(respond_to_content_blobs, resource_name) {
+    if (respond_to_content_blobs) {
+        if ($('pending_files').children.length == 0 && $(resource_name + "_image_image_file") == null) {
+            alert("Please specify at least a file to upload or provide a URL.");
+            return (false);
+        } else if ($('pending_files').children.length == 0 && $(resource_name + "_image_image_file") != null && $(resource_name + "_image_image_file").value == '') {
+            alert("Please specify at least a file/image to upload or provide a URL.");
+            return (false);
+        }
+    } else {
+        if ($(resource_name + '_data').value.length == 0 && $(resource_name + '_data_url').value.length == 0) {
+            alert("Please specify at least a file to upload or provide a URL.");
+            $(resource_name + '_data').focus();
+            return (false);
+        }
+    }
+    return (true);
+}
+
+function validateUploadNewVersion(respond_to_content_blobs, resource_name){
+    if (!validateUploadFormFields(respond_to_content_blobs, resource_name))
+        return (false);
+    $('new_version_submit_btn').disabled = true;
+    $('new_version_submit_btn').value = "Uploading ...";
+    $('new_version_submit_btn').form.submit();
+    return (true);
 }
