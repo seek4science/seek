@@ -7,7 +7,12 @@ class SpecialAuthCodesAccessTest < ActionController::IntegrationTest
   def setup
     User.current_user = Factory(:user, :login => 'test')
     post '/sessions/create', :login => 'test', :password => 'blah'
+    @val = Seek::Config.is_virtualliver
     Seek::Config.is_virtualliver = true
+  end
+
+  def teardown
+    Seek::Config.is_virtualliver = @val
   end
 
   test 'form allows creating temporary access links' do
