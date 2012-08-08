@@ -62,14 +62,12 @@ class ModelsController < ApplicationController
   
   def new_version
     if (handle_batch_data nil)
-      build_model_image @model,params[:model_image]
-
       comments = params[:revision_comment]
 
       respond_to do |format|
         create_new_version  comments
         create_content_blobs
-        update_model_image_for_latest_version
+        create_model_image @model,params[:model_image]
         format.html {redirect_to @model }
       end
     else
@@ -645,5 +643,13 @@ class ModelsController < ApplicationController
       doc = LibXML::XML::Parser.string(file.read).parse
       doc
     end
+
+  def create_model_image model_object, params_model_image
+    build_model_image model_object, params_model_image
+    model_object.save(false)
+    latest_version = model_object.latest_version
+    latest_version.model_image_id = model_object.model_image_id
+    latest_version.save
+  end
 
 end

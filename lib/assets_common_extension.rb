@@ -200,13 +200,6 @@ module AssetsCommonExtension
 
   end
 
-  def update_model_image_for_latest_version
-    asset = eval "@#{self.controller_name.downcase.singularize}"
-    latest_version = asset.latest_version
-    latest_version.model_image_id = asset.model_image_id
-    latest_version.save
-  end
-
   def handle_download_zip asset
     t = Tempfile.new("#{Time.now.year}#{Time.now.month}#{Time.now.day}_#{asset.class.name.downcase}_#{asset.id}","#{RAILS_ROOT}/tmp")
   # Give the path of the temp file to the zip outputstream, it won't try to open it as an archive.
