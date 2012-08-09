@@ -17,6 +17,7 @@
 </ul>
 
 <%= render :partial => "layouts/item_title", :locals=>{:item=>@specimen} %>
+<%= render :partial => "layouts/usage_info", :locals => { :resource => @specimen } -%>
 
 <div class="show_basic">
 

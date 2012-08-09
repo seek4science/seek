@@ -65,7 +65,7 @@
   <div style="clear:both">
     <br/>
     <h2><%= Seek::Config.sample_parent_term.capitalize -%> details</h2>
-
+    <%= render :partial => "layouts/usage_info", :locals => { :resource => @sample.specimen } -%>
     <div class="main_content_left_box_narrower">
       <%= render :partial => "sample_specimen_details", :object => @sample.specimen %>
     </div>
