@@ -17,10 +17,10 @@
 </ul>
 
 <%= render :partial => "layouts/item_title", :locals=>{:item=>@strain} %>
+<%= render :partial => "layouts/usage_info", :locals => { :resource => @strain } -%>
 
 <div class="show_basic">
     <div class="main_content_left_box_narrower">
-      <%= render :partial => "layouts/usage_info", :locals => { :resource => @strain } -%>
       <p>
         <label>Name:</label>
         <%= @strain.title %>
