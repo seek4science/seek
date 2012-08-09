@@ -9,7 +9,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20120606091324) do
+ActiveRecord::Schema.define(:version => 20120803084456) do
 
   create_table "activity_logs", :force => true do |t|
     t.string   "action"
@@ -307,6 +307,7 @@ ActiveRecord::Schema.define(:version => 20120606091324) do
     t.string   "uuid"
     t.integer  "policy_id"
     t.boolean  "is_with_sample"
+    t.string   "template_name",                  :default => "none"
   end
 
   add_index "data_file_versions", ["contributor_id", "contributor_type"], :name => "index_data_file_versions_on_contributor_id_and_contributor_type"
@@ -332,6 +333,7 @@ ActiveRecord::Schema.define(:version => 20120606091324) do
     t.string   "uuid"
     t.integer  "policy_id"
     t.boolean  "is_with_sample"
+    t.string   "template_name",                 :default => "none"
   end
 
   add_index "data_files", ["contributor_id", "contributor_type"], :name => "index_data_files_on_contributor_id_and_contributor_type"
@@ -1401,10 +1403,10 @@ ActiveRecord::Schema.define(:version => 20120606091324) do
   end
 
   create_table "text_value_versions", :force => true do |t|
-    t.integer  "text_value_id",                          :null => false
-    t.integer  "version",                                :null => false
+    t.integer  "text_value_id",                            :null => false
+    t.integer  "version",                                  :null => false
     t.integer  "version_creator_id"
-    t.text     "text",               :limit => 16777215, :null => false
+    t.text     "text",               :limit => 2147483647, :null => false
     t.datetime "created_at"
     t.datetime "updated_at"
   end
@@ -1414,7 +1416,7 @@ ActiveRecord::Schema.define(:version => 20120606091324) do
   create_table "text_values", :force => true do |t|
     t.integer  "version"
     t.integer  "version_creator_id"
-    t.text     "text",               :limit => 16777215, :null => false
+    t.text     "text",               :limit => 2147483647, :null => false
     t.datetime "created_at"
     t.datetime "updated_at"
   end

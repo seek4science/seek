@@ -174,6 +174,7 @@ class DataFilesController < ApplicationController
 
       assay_ids = params[:assay_ids] || []
 
+
         if @data_file.save
           update_annotations @data_file
 
@@ -194,10 +195,17 @@ class DataFilesController < ApplicationController
               flash[:notice] = 'Data file was successfully uploaded and saved.' if flash.now[:notice].nil?
               #parse the data file if it is with sample data
               if @data_file.is_with_sample
-                bio_samples = @data_file.bio_samples_population
+                bio_samples = @data_file.bio_samples_population params[:institution_id]
+                #@bio_samples = bio_samples
+                #Rails.logger.warn "BIO SAMPLES ::: " + @bio_samples.treatments_text
                 unless  bio_samples.errors.blank?
                   flash[:notice] << "<br/> However, Sample database population failed."
                   flash[:error] = bio_samples.errors.html_safe
+                  #respond_to do |format|
+                  #  format.html{
+                  #    render :action => "new"
+                  #  }
+                 # end
                 end
               end
               assay_ids.each do |text|
@@ -207,7 +215,9 @@ class DataFilesController < ApplicationController
                   @assay.relate(@data_file, RelationshipType.find_by_title(r_type))
                 end
               end
-              format.html { redirect_to data_file_path(@data_file) }
+
+                format.html { redirect_to data_file_path(@data_file) }
+
             end
           end
         else
@@ -228,9 +238,11 @@ class DataFilesController < ApplicationController
     # (this will also trigger timestamp update in the corresponding Asset)
     @data_file.last_used_at = Time.now
     @data_file.save_without_timestamping
-    
+
+    #Rails.logger.warn "template in data_files_controller/show : #{params[:parsing_template]}"
+
     respond_to do |format|
-      format.html # show.html.erb
+      format.html #{render :locals => {:template => params[:parsing_template]}}# show.html.erb
       format.xml
       format.svg { render :text=>to_svg(@data_file,params[:deep]=='true',@data_file)}
       format.dot { render :text=>to_dot(@data_file,params[:deep]=='true',@data_file)}

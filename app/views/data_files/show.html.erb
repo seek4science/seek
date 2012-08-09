@@ -1,17 +1,18 @@
-<%= javascript_include_tag "resource" -%>
+<%= javascript_include_tag "resource" -%> <% #sharing.js","associate_events.js","assays.js","attribution.js", "application", "resource.js", "prototype", "scriptaculous", "autocompleter_advanced", "tabber-minimized" -%>
 <% truncate_length_for_boxes = 22 -%>
 <% if @data_file.is_with_sample?
-   bio_samples = @display_data_file.bio_samples_population false
+   bio_samples = @data_file.bio_samples_population nil, false
    sample_names = bio_samples.instance_values["sample_names"]
   end
-%>
+-%>
+
 <ul class="sectionIcons">
 <%= asset_buttons @data_file,@display_data_file.version -%>
 </ul>
 
 <%= render :partial=>"assets/upload_new_version_form", :locals=>{:resource=>@data_file} -%>
 
-<%= render :partial => "layouts/item_title",:locals=>{:item=>@data_file} %>
+<%= render :partial => "layouts/item_title",:locals=>{:item=>@data_file} -%>
 
 <%= render :partial => "layouts/usage_info", :locals => { :resource => @data_file } -%>
 
@@ -20,7 +21,7 @@
   <div class="main_content_left_box_narrower">
     <%= render :partial=>"assets/resource_version_details", :locals=>{:displayed_resource=>@display_data_file, :resource=>@data_file} -%>
     <div class="box_about_actor">
-      <%= render :partial => 'projects/show_project_relationship', :locals => {:resource => @data_file}  %>
+      <%= render :partial => 'projects/show_project_relationship', :locals => {:resource => @data_file}  -%>
       <p>
         <label>File name:</label>
         <%=h @display_data_file.original_filename -%>
@@ -47,7 +48,7 @@
 
     </div>
   </div>
-  <%= render :partial=>"assets/resource_main_content_right",:locals => { :resource => @data_file } %>
+  <%= render :partial=>"assets/resource_main_content_right",:locals => { :resource => @data_file } -%>
   
   <div style="clear:both;">
     <p>
@@ -55,7 +56,7 @@
       </p>
     <p>
       <h2>Factors studied:</h2>
-      <%= render :partial=>"data_files/studied_factors" %>
+      <%= render :partial=>"data_files/studied_factors" -%>
     </p>
 
     <div class="fold">
@@ -67,8 +68,13 @@
       <div class="foldContent" style="display:none;" >
         <% if @data_file.can_download? -%>
                 <% if Seek::Config.is_virtualliver &&  @data_file.is_with_sample?
-                     treatments = bio_samples.instance_values["treatments"]
+
+                     treatments = bio_samples.instance_values["treatments_text"]
                      is_empty = treatments.empty?
+                     #treatments = Hash[treatments.sort] unless treatments.length == 0
+                     #sample_names = Hash[sample_names.sort] unless sample_names.length == 0
+                     #Rails.logger.warn "samples to render in extractions table: #{sample_names}"
+
                      treatment_table = render :partial => "extractions_table", :locals => {:extractions => treatments, :sample_names => sample_names} unless is_empty
                    else
                      treatments = @display_data_file.treatments
@@ -86,42 +92,46 @@
         <% end -%>
       </div>
     </div>
-  <% if @data_file.is_with_sample? %>
+  <% if @data_file.is_with_sample? -%>
     <% rna_extractions = bio_samples.instance_values["rna_extractions"] -%>
-    <% unless rna_extractions.empty? %>
-        <div class="fold">
-          <div class="foldTitle">
-            RNA Extractions
-          </div>
-          <div class="foldContent" style="display:none;">
-            <% if @data_file.can_download? -%>
-                <%= render :partial => "extractions_table", :locals => {:extractions => rna_extractions, :sample_names => sample_names} %>
-            <% else -%>
-                <span id="rna_extractions" class="none_text">You do not have permission to view the RNA extractions for this file.</span>
-            <% end -%>
-          </div>
-        </div>
-    <% end %>
+    <% unless rna_extractions.nil? -%>
+        <% unless rna_extractions.empty? -%>
+            <div class="fold">
+              <div class="foldTitle">
+                RNA Extractions
+              </div>
+              <div class="foldContent" style="display:none;">
+                <% if @data_file.can_download? -%>
+                    <%= render :partial => "extractions_table", :locals => {:extractions => rna_extractions, :sample_names => sample_names} -%>
+                <% else -%>
+                    <span id="rna_extractions" class="none_text">You do not have permission to view the RNA extractions for this file.</span>
+                <% end -%>
+              </div>
+            </div>
+        <% end -%>
+    <% end -%>
     <% sequencing = bio_samples.instance_values["sequencing"] -%>
-    <% unless sequencing.empty? %>
-        <div class="fold">
-          <div class="foldTitle">
-            Sequencing
-          </div>
-          <div class="foldContent" style="display:none;">
-            <% if @data_file.can_download? -%>
+    <% unless sequencing.nil? -%>
+        <% unless sequencing.empty? -%>
+            <div class="fold">
+              <div class="foldTitle">
+                Sequencing
+              </div>
+              <div class="foldContent" style="display:none;">
+                <% if @data_file.can_download? -%>
 
-                <%= render :partial => "extractions_table", :locals => {:extractions => sequencing, :sample_names => sample_names} %>
+                    <%= render :partial => "extractions_table", :locals => {:extractions => sequencing, :sample_names => sample_names} -%>
 
-            <% else -%>
-                <span id="sequencing" class="none_text">You do not have permission to view the sequencing for this file.</span>
-            <% end -%>
-          </div>
-        </div>
-    <% end %>
-  <% end %>
+                <% else -%>
+                    <span id="sequencing" class="none_text">You do not have permission to view the sequencing for this file.</span>
+                <% end -%>
+              </div>
+            </div>
+        <% end -%>
+    <% end -%>
+  <% end -%>
   </div>
 
-  <%= render :partial=>"layouts/items_related_to",:object => @data_file %>
+  <%= render :partial=>"layouts/items_related_to",:object => @data_file -%>
 
 </div>
