@@ -365,6 +365,11 @@ module Acts
           self.policy = Policy.find_by_id(self.policy.id)
         end
       end
+
+      #members of project can see some information of hidden items of their project
+      def can_see_hidden_item?(person)
+        person.member_of?(self.projects)
+      end
     end
   end
 end
