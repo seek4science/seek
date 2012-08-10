@@ -113,6 +113,7 @@ module AssetsHelper
 
     related.each_key do |key|
       related[key][:items] = []
+      related[key][:hidden_items] = []
       related[key][:hidden_count] = 0
       related[key][:extra_count] = 0
     end
@@ -137,6 +138,7 @@ module AssetsHelper
       resource_hash[:items].compact!
       unless resource_hash[:items].empty?
         total_count = resource_hash[:items].size
+        resource_hash[:hidden_items] = resource_hash[:items] -  resource_hash[:items].select(&:can_view?)
         resource_hash[:items] = resource_hash[:items].select &:can_view?
         resource_hash[:hidden_count] = total_count - resource_hash[:items].size
       end

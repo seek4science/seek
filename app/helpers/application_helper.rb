@@ -41,9 +41,29 @@ module ApplicationHelper
 
       if count_hidden_items && hidden_item_count>0
         html << "<span class=\"none_text\">#{items.size > 0 ? " and " : ""}#{hidden_item_count} hidden #{hidden_item_count > 1 ? "items" :"item"}</span>"
+        contributor_links = hidden_item_contributor_links hidden_items
+        if !contributor_links.empty?
+          html << "<span class=\"none_text\">(Please contact: #{contributor_links.join(', ')})</span>"
+        end
       end
     end
     html
+  end
+
+  def hidden_item_contributor_links hidden_items
+    contributor_links = []
+    hidden_items = hidden_items.select { |hi| !hi.contributing_user.person.nil? }
+    hidden_items.sort! { |a, b| a.contributing_user.person.name <=> b.contributing_user.person.name }
+    hidden_items.each do |hi|
+      contributor_person = hi.contributing_user.person
+      contributor_link = nil
+      if current_user.try(:person) && hi.can_see_hidden_item?(current_user.person) && contributor_person.can_view?
+        contributor_name = contributor_person.name
+        contributor_link = link_to(contributor_name, person_path(contributor_person))
+      end
+      contributor_links << contributor_link if contributor_link && !contributor_links.include?(contributor_link)
+    end
+    contributor_links
   end
 
   def tabbar
