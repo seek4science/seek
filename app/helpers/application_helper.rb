@@ -23,8 +23,10 @@ module ApplicationHelper
   def authorized_list all_items, attribute, sort=true, max_length=75, count_hidden_items=false
     items = all_items.select &:can_view?
     title_only_items = (all_items - items).select &:title_is_public?
+    hidden_items = []
+    hidden_items |= (all_items - items - title_only_items)
     html  = "<b>#{(items.size > 1 ? attribute.pluralize : attribute)}:</b> "
-    if items.empty? and title_only_items.empty?
+    if items.empty? && title_only_items.empty? && hidden_items.empty?
       html << "<span class='none_text'>No #{attribute}</span>"
     else
       original_size     = all_items.size
