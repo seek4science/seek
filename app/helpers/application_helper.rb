@@ -56,12 +56,11 @@ module ApplicationHelper
     hidden_items.sort! { |a, b| a.contributing_user.person.name <=> b.contributing_user.person.name }
     hidden_items.each do |hi|
       contributor_person = hi.contributing_user.person
-      contributor_link = nil
       if current_user.try(:person) && hi.can_see_hidden_item?(current_user.person) && contributor_person.can_view?
         contributor_name = contributor_person.name
         contributor_link = link_to(contributor_name, person_path(contributor_person))
+        contributor_links << contributor_link if contributor_link && !contributor_links.include?(contributor_link)
       end
-      contributor_links << contributor_link if contributor_link && !contributor_links.include?(contributor_link)
     end
     contributor_links
   end
