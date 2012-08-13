@@ -5,7 +5,7 @@
 <style type="text/css">
     div#creatable_selection_list {
         position: absolute;
-        z-index: 1
+        z-index: 2
     }
 
     input.new_asset_button {
@@ -58,7 +58,7 @@
                   <div id='creatable_selection_list' style="display: none;">
                     <table cellpadding="0" cellspacing="0" id="creatable_selection_table" class="display" style="width: 12em; margin-top: -0.5em; margin-left: 3em;">
                       <tbody>
-                      <% new_creatable_selection.each do |c| %>
+                      <% new_creatable_selection_list.each do |c| %>
                           <tr class="row_color">
                             <td style="text-align: left"><%= c.first %></td>
                             <td><%= c.last %></td>

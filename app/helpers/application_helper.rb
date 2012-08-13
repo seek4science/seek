@@ -142,12 +142,12 @@ module ApplicationHelper
   end
 
   #selection of assets for new asset gadget
-  def new_creatable_selection
+  def new_creatable_selection_list
     creatable_options = Seek::Util.user_creatable_types.collect { |c| [c.name.underscore.humanize, c.name.underscore] }
     creatable_options << ["Data file with sample", "data_file_with_sample"] if Seek::Config.sample_parser_enabled
     creatable_options
   end
-  
+
   def is_nil_or_empty? thing
     thing.nil? or thing.empty?
   end
