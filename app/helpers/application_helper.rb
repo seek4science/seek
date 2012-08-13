@@ -52,7 +52,7 @@ module ApplicationHelper
 
   def hidden_item_contributor_links hidden_items
     contributor_links = []
-    hidden_items = hidden_items.select { |hi| !hi.contributing_user.person.nil? }
+    hidden_items = hidden_items.select { |hi| !hi.contributing_user.try(:person).nil? }
     hidden_items.sort! { |a, b| a.contributing_user.person.name <=> b.contributing_user.person.name }
     hidden_items.each do |hi|
       contributor_person = hi.contributing_user.person
