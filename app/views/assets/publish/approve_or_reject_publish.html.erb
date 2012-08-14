@@ -1,0 +1,25 @@
+
+<% content_partial = get_list_item_content_partial(@asset) %>
+
+  <h1>You are requested to approve or reject to publish <%= asset_type_name -%> '<%= @asset.title -%>'. </h1>
+<center>
+    <div style="width: 80%;margin-top: 3em;">
+        <%= render :partial=> content_partial,:locals=>{:resource => @asset} %>
+    </div>
+
+  <div style="clear: both;">
+    <br/>
+    <br/>
+    <% if @asset.policy.sharing_scope < Policy::EVERYONE %>
+        <%= button_to "Approve", {:controller => @asset.class.to_s.tableize, :action => 'approve_publish', :id => @asset.id} -%>
+        <br/>
+        <%= button_to "Reject", {:controller => @asset.class.to_s.tableize, :action => 'reject_publish', :id => @asset.id} -%>
+    <% else %>
+    <span style="font-size: 18px; font-weight: bold;"> This <%= asset_type_name -%> is already published!</span>
+    <% end %>
+  </div>
+</center>
+
+
+
+

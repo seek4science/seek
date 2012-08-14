@@ -152,7 +152,7 @@ class PeopleControllerTest < ActionController::TestCase
   end
 
   def test_non_admin_cant_edit_someone_else
-    login_as(:fred)
+    login_as(Factory(:user))
     get :edit, :id=> people(:aaron_person)
     assert_redirected_to people(:aaron_person)
   end
@@ -262,8 +262,21 @@ class PeopleControllerTest < ActionController::TestCase
 
   def test_can_edit_person_and_user_id_different
     #where a user_id for a person are not the same
-    login_as(:fred)
-    get :edit, :id=>people(:fred)
+    user = Factory(:user)
+    if user.id == user.person.id
+      new_person = Factory(:person)
+      disable_authorization_checks do
+        user.person = new_person
+        user.save!
+        person.user = user
+        person.save!
+        user.reload
+        person.reload
+      end
+    end
+    assert_not_equal user.id, user.person.id
+    login_as(user)
+    get :edit, :id => user.person.id
     assert_response :success
   end
 
@@ -528,7 +541,7 @@ class PeopleControllerTest < ActionController::TestCase
     get :admin, :id => person
     assert_select "input#_roles_asset_manager", :count => 1
     assert_select "input#_roles_project_manager", :count => 1
-    assert_select "input#_roles_publisher", :count => 1
+    assert_select "input#_roles_gatekeeper", :count => 1
   end
 
   test 'non-admin should not see the session of assigning roles to a person' do
@@ -537,7 +550,7 @@ class PeopleControllerTest < ActionController::TestCase
     get :admin, :id => person
     assert_select "input#_roles_asset_manager", :count => 0
     assert_select "input#_roles_project_manager", :count => 0
-    assert_select "input#_roles_publisher", :count => 0
+    assert_select "input#_roles_gatekeeper", :count => 0
   end
 
   test 'should show that the person is asset manager for admin' do
@@ -571,7 +584,7 @@ class PeopleControllerTest < ActionController::TestCase
   end
 
   test 'non-admin can not administer others' do
-    login_as(:fred)
+    login_as(Factory(:user))
     get :admin, :id=> people(:aaron_person)
     assert_redirected_to :root
   end
@@ -816,24 +829,24 @@ class PeopleControllerTest < ActionController::TestCase
   end
 
   test "can edit themself" do
-    login_as(:fred)
-    get :show, :id => people(:fred)
+    login_as(Factory(:user))
+    get :show, :id => User.current_user.person.id
     assert_select "a", :text => /Edit Profile/, :count => 1
 
-    get :edit, :id=>people(:fred)
+    get :edit, :id=>User.current_user.person.id
     assert_response :success
 
-    get :update, :id=>people(:fred), :person => {:first_name => 'fred1'}
+    put :update, :id=>User.current_user.person.id, :person => {:first_name => 'fred1'}
     assert_redirected_to assigns(:person)
     assert_equal 'fred1', assigns(:person).first_name
   end
 
   test "can not administer themself" do
-    login_as(:fred)
-    get :show, :id => people(:fred)
+    login_as(Factory(:user))
+    get :show, :id => User.current_user.person.id
     assert_select "a", :text => /Person Administration/, :count => 0
 
-    get :admin, :id=>people(:fred)
+    get :admin, :id=>User.current_user.person.id
     assert_redirected_to :root
     assert_not_nil flash[:error]
 
@@ -936,7 +949,7 @@ class PeopleControllerTest < ActionController::TestCase
     end
   end
 
-  test 'set publisher role for a person' do
+  test 'set gatekeeper role for a person' do
     work_group_id = Factory(:work_group).id
     assert_difference('Person.count') do
       assert_difference('NotifieeInfo.count') do
@@ -944,44 +957,144 @@ class PeopleControllerTest < ActionController::TestCase
       end
     end
     person = assigns(:person)
-    put :administer_update, :id => person, :person =>{:work_group_ids => [work_group_id]}, :roles => {:publisher => true}
+    put :administer_update, :id => person, :person =>{:work_group_ids => [work_group_id]}, :roles => {:gatekeeper => true}
 
     person = assigns(:person)
     assert_not_nil person
-    assert person.is_publisher?
+    assert person.is_gatekeeper?
   end
 
-  test 'should show that the person is publisher for admin' do
+  test 'should show that the person is gatekeeper for admin' do
     person = Factory(:person)
-    person.is_publisher = true
+    person.is_gatekeeper = true
     person.save
     get :show, :id => person
-    assert_select "li", :text => /This person is a publisher/, :count => 1
+    assert_select "li", :text => /This person is a gatekeeper/, :count => 1
   end
 
-  test 'should not show that the person is publisher for non-admin' do
+  test 'should not show that the person is gatekeeper for non-admin' do
     person = Factory(:person)
-    person.is_publisher = true
+    person.is_gatekeeper = true
     person.save
     login_as(:aaron)
     get :show, :id => person
-    assert_select "li", :text => /This person is a publisher/, :count => 0
+    assert_select "li", :text => /This person is a gatekeeper/, :count => 0
   end
 
-  test 'should have publisher icon on person show page' do
-    publisher = Factory(:publisher)
-    get :show, :id => publisher
+  test 'should have gatekeeper icon on person show page' do
+    gatekeeper = Factory(:gatekeeper)
+    get :show, :id => gatekeeper
     assert_select "img[src*=?]", /medal_silver_2.png/,:count => 1
   end
 
-  test 'should have publisher icon on people index page' do
+  test 'should have gatekeeper icon on people index page' do
     i = 0
     while i < 5 do
-      Factory(:publisher)
+      Factory(:gatekeeper)
       i += 1
     end
     get :index
-    publisher_number = assigns(:people).select(&:is_publisher?).count
-    assert_select "img[src*=?]", /medal_silver_2/, :count => publisher_number
+    gatekeeper_number = assigns(:people).select(&:is_gatekeeper?).count
+    assert_select "img[src*=?]", /medal_silver_2/, :count => gatekeeper_number
+  end
+
+  test 'unsubscribe to a project should unsubscribe all the items of that project' do
+    temp = Seek::Config.email_enabled
+    Seek::Config.email_enabled=true
+
+    proj = Factory(:project)
+    sop = Factory(:sop, :projects => [proj], :policy => Factory(:public_policy))
+    df = Factory(:data_file, :projects => [proj], :policy => Factory(:public_policy))
+
+    #subscribe to project
+    current_person=User.current_user.person
+    put :update, :id => current_person, :receive_notifications => true, :person => {:project_subscriptions_attributes => {'0' => {:project_id => proj.id, :frequency => 'weekly', :_destroy => '0'}}}
+    assert_redirected_to current_person
+
+    project_subscription_id = ProjectSubscription.find_by_project_id(proj.id).id
+    assert_difference "Subscription.count",2 do
+      ProjectSubscriptionJob.new(project_subscription_id).perform
+    end
+    assert sop.subscribed?(current_person)
+    assert df.subscribed?(current_person)
+    assert current_person.receive_notifications?
+
+    assert_emails 1 do
+      Factory(:activity_log, :activity_loggable => sop, :action => 'update')
+      Factory(:activity_log, :activity_loggable => df, :action => 'update')
+      SendPeriodicEmailsJob.new('weekly').perform
+    end
+
+    #unsubscribe to project
+    put :update, :id => current_person, :receive_notifications => true, :person => {:project_subscriptions_attributes => {'0' => {:id => current_person.project_subscriptions.first.id, :project_id => proj.id, :frequency => 'weekly', :_destroy => '1'}}}
+    assert_redirected_to current_person
+    assert current_person.project_subscriptions.empty?
+
+    sop.reload
+    df.reload
+    assert !sop.subscribed?(current_person)
+    assert !df.subscribed?(current_person)
+    assert current_person.receive_notifications?
+
+    assert_emails 0 do
+        Factory(:activity_log, :activity_loggable => sop, :action => 'update')
+        Factory(:activity_log, :activity_loggable => df, :action => 'update')
+        SendPeriodicEmailsJob.new('weekly').perform
+    end
+    Seek::Config.email_enabled=temp
+  end
+
+  test 'should subscribe a person to a project when assign a person to that project' do
+      a_person = Factory(:person)
+      project = Factory(:project)
+      work_group = Factory(:work_group, :project => project)
+
+      #assign a person to a project
+      put :administer_update, :id => a_person, :person =>{:work_group_ids => [work_group.id]}
+
+      assert_redirected_to a_person
+      a_person.reload
+      assert a_person.work_groups.include?(work_group)
+      assert a_person.project_subscriptions.collect(&:project).include?(project)
+  end
+
+  test 'should unsubscribe a person to a project when unassign a person to that project' do
+      a_person = Factory(:person)
+      work_groups = a_person.work_groups
+      projects = a_person.projects
+      assert_equal 1, projects.count
+      assert_equal 1, work_groups.count
+      assert a_person.project_subscriptions.collect(&:project).include?(projects.first)
+
+      #unassign a person to a project
+      put :administer_update, :id => a_person, :person =>{:work_group_ids => []}
+
+      assert_redirected_to a_person
+      a_person.reload
+      assert a_person.work_groups.empty?
+      assert !a_person.project_subscriptions.collect(&:project).include?(projects.first)
+  end
+
+  test 'should show subscription list to only yourself and admin' do
+    a_person = Factory(:person)
+    login_as(a_person.user)
+    get :show, :id => a_person
+    assert_response :success
+    assert_select "div.foldTitle", :text => "Subscriptions", :count => 1
+
+    logout
+
+    login_as(:quentin)
+    get :show, :id => a_person
+    assert_response :success
+    assert_select "div.foldTitle", :text => "Subscriptions", :count => 1
+  end
+
+  test 'should not show subscription list to people that are not yourself and admin' do
+      a_person = Factory(:person)
+      login_as(Factory(:user))
+      get :show, :id => a_person
+      assert_response :success
+      assert_select "div.foldTitle", :text => "Subscriptions", :count => 0
   end
 end

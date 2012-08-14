@@ -90,6 +90,23 @@ class MailerTest < ActionMailer::TestCase
     end
   end
 
+  test "request publish approval" do
+    resource = data_files(:picture)
+    gatekeeper = people(:gatekeeper_person)
+    @expected.subject = "A SEEK member requested your approval to publish: #{resource.title}"
+    #TODO: hardcoding the formating rather than passing an array was require for rails 2.3.8 upgrade
+    @expected.to = gatekeeper.email_with_name
+    @expected.from = "no-reply@sysmo-db.org"
+    @expected.reply_to = "Aaron Spiggle <aaron@email.com>"
+    @expected.date = Time.now
+
+    @expected.body = read_fixture('request_publish_approval')
+    user=users(:aaron)
+    pretend_now_is(@expected.date) do
+      assert_equal @expected.encoded,Mailer.create_request_publish_approval([gatekeeper],user,resource,"localhost").encoded
+    end
+  end
+
   test "request publishing" do
 
     @expected.subject = "A SEEK member requests you make some items public"

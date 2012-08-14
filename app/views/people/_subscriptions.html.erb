@@ -1,21 +1,24 @@
 <%
    select_truncate_length=120
-   projects = @person.projects + Project.all.reject { |p| @person.projects.include?(p)}
+   projects = Project.all
+   info_text = "Here you can customize your subscriptions to projects. You will be informed by email of resources that have been created or updated within the projects that you have subscribed to, during the time period you specified. You will only be notified of items that you are authorized to view. By default, your subscription is for weekly notifications about activity in your own projects."
 %>
 <div class="fold">
   <div class="foldTitle">
-    <%= help_icon("Here you can customize your project subscriptions. By default, you subscribe to your projects.") -%>
+    <%= help_icon(info_text) -%>
     Subscriptions
   </div>
   <div class="foldContent">
     <span class="none_text"> The following projects are subscribed by you, you may click it to view or edit the subscription: </span>
-     <ul id="project_subscription_list">
-      <%   @person.project_subscriptions.each do |ps|  %>
-       <li id="<%= ps.project_id %>_li">
-         <%= link_to_function ps.project.title,"$('select_project_subscription').value = #{ps.project.id};show_project_subscription();$('select_project_subscription').value =0;return false;"%>
-       </li>
-       <% end %>
-     </ul>
+    <ul id="project_subscription_list">
+      <% project_subscriptions = @person.project_subscriptions %>
+      <span class="none_text" id="no_project_text" style="display: <%= project_subscriptions.empty? ? 'block' : 'none' %>">None</span>
+      <% project_subscriptions.each do |ps| %>
+          <li id="<%= ps.project_id %>_li">
+            <%= link_to_function ps.project.title, "$('select_project_subscription').value = #{ps.project.id};show_project_subscription();$('select_project_subscription').value =0;return false;" %>
+          </li>
+      <% end %>
+    </ul>
     <br/>
      <span class="none_text"> You can subscribe other projects: </span> <br/>
     <%= select_tag :select_project_subscription,
@@ -37,12 +40,13 @@
             <%= sub_form.hidden_field :project_id %>
             <br/>
 
+            Check to subscribe: <%= sub_form.check_box :_destroy, {:checked => !sub_form.object.marked_for_destruction?,:onclick=>"updateSubscribedProjectsList(this,#{project_subscription.project_id},'#{project_subscription.project.title}');"}, 0, 1 %>
+            <br/>
             <p> Would you like to receive emails:
               <% Subscription::FREQUENCIES.each do |freq| %>
                   <%= sub_form.radio_button :frequency, freq %> <%= "#{freq.capitalize}" %>
               <% end %>
-              <br/>
-              Subscribe: <%= sub_form.check_box :_destroy, {:checked => !sub_form.object.marked_for_destruction?,:onclick=>"updateSubscribedProjectsList(this,#{project_subscription.project_id},'#{project_subscription.project.title}');"}, 0, 1 %>
+
             </p>
           </fieldset>
         </div>
@@ -92,6 +96,12 @@
             }
         }else
          child.remove();
+
+        //hide/display -None-
+        if ($('project_subscription_list').getElementsByTagName('li').length > 0)
+           $('no_project_text').style['display'] = 'none'
+        else
+           $('no_project_text').style['display'] = 'block'
     }
 
 </script>

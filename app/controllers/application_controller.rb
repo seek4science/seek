@@ -155,13 +155,13 @@ class ApplicationController < ActionController::Base
 
   def project_membership_required
     unless current_user.try(:person).try(:member?) or User.admin_logged_in?
-      if current_user
+      if current_user.try(:person)
         flash[:error] = "Only members of known projects, institutions or work groups are allowed to access seek. Please contact a Project Manager or Admin."
         respond_to do |format|
           format.html {redirect_to logout_path}
           format.json { render :json => {:status => 401, :error_message => flash[:error] } }
         end
-      elsif [:new, :create].include? params[:action]
+      elsif ["new", "create"].include? params[:action]
         flash[:error] = "Only members of known projects, institutions or work groups are allowed to create new content."
         respond_to do |format|
           format.html do
@@ -286,8 +286,6 @@ class ApplicationController < ActionController::Base
       return if action.nil?
 
       object = name.camelize.constantize.find(params[:id])
-
-      action = 'publish' if ['update', 'edit'].include?action and object.authorization_supported? and try_block{params[:sharing][:sharing_scope].to_i} == Policy::EVERYONE
 
       if object.can_perform? action
         eval "@#{name} = object"

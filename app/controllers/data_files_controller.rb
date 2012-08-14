@@ -210,6 +210,9 @@ class DataFilesController < ApplicationController
               format.html { redirect_to data_file_path(@data_file) }
             end
           end
+
+          deliver_request_publish_approval params[:sharing], @data_file
+
         else
           respond_to do |format|
           format.html {
@@ -300,6 +303,8 @@ class DataFilesController < ApplicationController
             AssayAsset.destroy(assay_asset.id)
           end
         end
+        deliver_request_publish_approval params[:sharing], @data_file
+
       else
         format.html {
           render :action => "edit"

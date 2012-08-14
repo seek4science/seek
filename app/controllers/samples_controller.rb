@@ -5,6 +5,7 @@ class SamplesController < ApplicationController
   before_filter :find_and_auth, :only => [:show, :edit, :update, :destroy]
   before_filter :virtualliver_only, :only => [:new_object_based_on_existing_one]
 
+  include Seek::Publishing
 
   def new_object_based_on_existing_one
     @existing_sample =  Sample.find(params[:id])
@@ -89,11 +90,13 @@ class SamplesController < ApplicationController
     sop_ids = (params[:sample_sop_ids].nil?? [] : params[:sample_sop_ids].reject(&:blank?)) || []
 
     if @sample.save
+      deliver_request_publish_approval params[:sharing], @sample
+      deliver_request_publish_approval params[:sharing], @sample.specimen
+      align_sops(@sample.specimen,sop_ids) if is_new_spec
         tissue_and_cell_types.each do |t|
           t_id, t_title = t.split(",")
           @sample.associate_tissue_and_cell_type(t_id, t_title)
         end
-
       @sample.create_or_update_assets data_file_ids, "DataFile"
       @sample.create_or_update_assets model_ids, "Model"
       @sample.create_or_update_assets sop_ids, "Sop"
@@ -122,19 +125,19 @@ class SamplesController < ApplicationController
 
 
   def update
+    sops = (params[:sample_sop_ids].nil?? [] : params[:sample_sop_ids].reject(&:blank?)) || []
+    @sample.attributes = params[:sample]
     data_file_ids = (params[:sample_data_file_ids].nil? ? [] : params[:sample_data_file_ids].reject(&:blank?)) || []
     model_ids = (params[:sample_model_ids].nil? ? [] : params[:sample_model_ids].reject(&:blank?)) || []
-
-    sop_ids = (params[:sample_sop_ids].nil? ? [] : params[:sample_sop_ids].reject(&:blank?)) || []
-    @sample.attributes = params[:sample]
       tissue_and_cell_types = params[:tissue_and_cell_type_ids]||[]
 
-
     #update policy to sample
-    @sample.policy.set_attributes_with_sharing params[:sharing], @sample.projects
+    @sample.policy.set_attributes_with_sharing params[:sharing],@sample.projects
 
 
       if @sample.save
+        deliver_request_publish_approval params[:sharing], @sample
+        align_sops(@sample, sops)
         if tissue_and_cell_types.blank?
           @sample.tissue_and_cell_types= tissue_and_cell_types
           @sample.save
@@ -146,7 +149,7 @@ class SamplesController < ApplicationController
         end
           @sample.create_or_update_assets data_file_ids,"DataFile"
           @sample.create_or_update_assets model_ids,"Model"
-          @sample.create_or_update_assets sop_ids,"Sop"
+          @sample.create_or_update_assets sops,"Sop"
 
         if @sample.from_biosamples=="true"
           render :partial => "biosamples/back_to_biosamples", :locals => {:action => 'update', :object => @sample}

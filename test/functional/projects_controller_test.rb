@@ -81,11 +81,10 @@ class ProjectsControllerTest < ActionController::TestCase
     assert_not_nil flash[:error]
   end
 
-	test 'should get index for non-project member, non-login user' do
+	test 'should not get index for non-project member, should for non-login user' do
 		login_as(:registered_user_with_no_projects)
 		get :index
-		assert_response :success
-		assert_not_nil assigns(:projects)
+		assert_response :redirect
 
 		logout
 		get :index
@@ -96,7 +95,7 @@ class ProjectsControllerTest < ActionController::TestCase
 	test 'should show project for non-project member and non-login user' do
 		login_as(:registered_user_with_no_projects)
 		get :show, :id=>projects(:three)
-		assert_response :success
+		assert_response :redirect
 
 		logout
 		get :show, :id=>projects(:three)
@@ -106,8 +105,7 @@ class ProjectsControllerTest < ActionController::TestCase
 	test 'non-project member and non-login user can not edit project' do
 		login_as(:registered_user_with_no_projects)
 		get :show, :id=>projects(:three)
-		assert_response :success
-		assert_select "a",:text=>/Edit Project/,:count=>0
+		assert_response :redirect
 
 		logout
 		get :show, :id=>projects(:three)
@@ -230,14 +228,14 @@ class ProjectsControllerTest < ActionController::TestCase
 		end
     end
 
-  test "publishers displayed in show page" do
-    publisher = Factory(:publisher)
-    login_as publisher.user
-    get :show, :id => publisher.projects.first
-    assert_select "div.box_about_actor p.publishers" do
-      assert_select "label", :text => "Publishers:", :count => 1
+  test "gatekeepers displayed in show page" do
+    gatekeeper = Factory(:gatekeeper)
+    login_as gatekeeper.user
+    get :show, :id => gatekeeper.projects.first
+    assert_select "div.box_about_actor p.gatekeepers" do
+      assert_select "label", :text => "Gatekeepers:", :count => 1
       assert_select "a", :count => 1
-      assert_select "a[href=?]", person_path(publisher), :text => publisher.name, :count => 1
+      assert_select "a[href=?]", person_path(gatekeeper), :text => gatekeeper.name, :count => 1
     end
   end
 
@@ -247,7 +245,7 @@ class ProjectsControllerTest < ActionController::TestCase
 
     asset_manager = Factory(:asset_manager, :group_memberships => [Factory(:group_membership, :work_group => work_group)])
     project_manager = Factory(:project_manager, :group_memberships => [Factory(:group_membership, :work_group => work_group)])
-    publisher = Factory(:publisher, :group_memberships => [Factory(:group_membership, :work_group => work_group)])
+    gatekeeper = Factory(:gatekeeper, :group_memberships => [Factory(:group_membership, :work_group => work_group)])
     pal = Factory(:pal, :group_memberships => [Factory(:group_membership, :work_group => work_group)])
 
     a_person = Factory(:person)
@@ -263,8 +261,8 @@ class ProjectsControllerTest < ActionController::TestCase
       assert_select "label", :text => "Project Managers:", :count => 0
       assert_select "a[href=?]", person_path(project_manager), :text => project_manager.name, :count => 0
 
-      assert_select "label", :text => "Publishers:", :count => 0
-      assert_select "a[href=?]", person_path(publisher), :text => publisher.name, :count => 0
+      assert_select "label", :text => "Gatekeepers:", :count => 0
+      assert_select "a[href=?]", person_path(gatekeeper), :text => gatekeeper.name, :count => 0
 
       assert_select "label", :text => "SysMO-DB PALs:", :count => 1
       assert_select "a[href=?]", person_path(pal), :text => pal.name, :count => 1
@@ -314,16 +312,16 @@ class ProjectsControllerTest < ActionController::TestCase
 		end
 	end
 
-  test "no publishers displayed for project with no publishers" do
+  test "no gatekeepers displayed for project with no gatekeepers" do
     project = Factory(:project)
     work_group = Factory(:work_group, :project => project)
     person = Factory(:person, :group_memberships => [Factory(:group_membership, :work_group => work_group)])
     login_as person.user
     get :show,:id=>project
-		assert_select "div.box_about_actor p.publishers" do
-			assert_select "label",:text=>"Publishers:",:count=>1
+		assert_select "div.box_about_actor p.gatekeepers" do
+			assert_select "label",:text=>"Gatekeepers:",:count=>1
 			assert_select "a",:count=>0
-			assert_select "span.none_text",:text=>"No Publishers for this project",:count=>1
+			assert_select "span.none_text",:text=>"No Gatekeepers for this project",:count=>1
 		end
 	end
 

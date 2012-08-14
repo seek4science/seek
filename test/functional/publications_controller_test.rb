@@ -148,7 +148,7 @@ class PublicationsControllerTest < ActionController::TestCase
     seek_author2 = people(:quentin_person)    
     
     #Associate a non-seek author to a seek person
-.
+    login_as p.contributor
     assert_difference('PublicationAuthor.count', 0) do
       assert_difference('AssetsCreator.count', 2) do
         put :update, :id => p.id, :author => {p.publication_authors[1].id => seek_author2.id,p.publication_authors[0].id => seek_author1.id}
@@ -165,11 +165,12 @@ class PublicationsControllerTest < ActionController::TestCase
   
   test "should disassociate authors" do
     p = publications(:one)
+    p.publication_authors << PublicationAuthor.new(:publication => p, :first_name => people(:quentin_person).first_name, :last_name => people(:quentin_person).last_name, :person => people(:quentin_person))
+    p.publication_authors << PublicationAuthor.new(:publication => p, :first_name => people(:aaron_person).first_name, :last_name => people(:aaron_person).last_name, :person => people(:aaron_person))
     p.creators << people(:quentin_person)
     p.creators << people(:aaron_person)
     
     assert_equal 2, p.publication_authors.size
-    assert_equal 2, p.publication_authors.reject(&:person)
     assert_equal 2, p.creators.size
     
     assert_difference('PublicationAuthor.count', 0) do

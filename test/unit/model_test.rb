@@ -192,6 +192,7 @@ class ModelTest < ActiveSupport::TestCase
 
 
   test 'failing to delete due to can_delete does not create trash' do
+    User.current_user = nil
     model = Factory :model, :policy => Factory(:private_policy)
     assert_no_difference("Model.count") do
       model.destroy

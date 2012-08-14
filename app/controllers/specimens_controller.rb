@@ -5,6 +5,7 @@ class SpecimensController < ApplicationController
   before_filter :find_and_auth, :only => [:show, :update, :edit, :destroy]
 
   include IndexPager
+  include Seek::Publishing
 
   def new_object_based_on_existing_one
     @existing_specimen =  Specimen.find(params[:id])
@@ -44,6 +45,7 @@ class SpecimensController < ApplicationController
     AssetsCreator.add_or_update_creator_list(@specimen, params[:creators])
     respond_to do |format|
       if @specimen.save
+        deliver_request_publish_approval params[:sharing], @specimen
         flash[:notice] = 'Specimen was successfully created.'
         format.html { redirect_to(@specimen) }
         format.xml  { head :ok }
@@ -77,6 +79,7 @@ class SpecimensController < ApplicationController
     AssetsCreator.add_or_update_creator_list(@specimen, params[:creators])
 
     if @specimen.save
+      deliver_request_publish_approval params[:sharing], @specimen
       if @specimen.from_biosamples=='true'
         #reload to get updated nested attributes,e.g. genotypes/phenotypes
         @specimen.reload

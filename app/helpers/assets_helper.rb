@@ -18,7 +18,13 @@ module AssetsHelper
   end
 
   def text_for_resource resource_or_text
-    text=resource_or_text.is_a?(String) ? resource_or_text : resource_or_text.class.name
+    if resource_or_text.is_a?(String)
+      text = resource_or_text
+    elsif resource_or_text.kind_of?(Specimen)
+      text = CELL_CULTURE_OR_SPECIMEN
+    else
+      text = resource_or_text.class.name
+    end
     text.underscore.humanize
   end
 
@@ -156,7 +162,7 @@ module AssetsHelper
   #provides a list of assets, according to the class, that are authorized acording the 'action' which defaults to view
   #if projects is provided, only authorizes the assets for that project
   def authorised_assets asset_class,projects=nil, action="view"
-    asset_class.all_authorized_for action, current_user, projects
+    asset_class.all_authorized_for action, User.current_user, projects
   end
 
   def asset_buttons asset,version=nil,delete_confirm_message=nil

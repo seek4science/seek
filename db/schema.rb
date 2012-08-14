@@ -1026,6 +1026,16 @@ ActiveRecord::Schema.define(:version => 20120718174723) do
     t.datetime "updated_at"
   end
 
+  create_table "resource_publish_logs", :force => true do |t|
+    t.string   "resource_type"
+    t.integer  "resource_id"
+    t.string   "culprit_type"
+    t.integer  "culprit_id"
+    t.string   "publish_state"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
   create_table "sample_assets", :force => true do |t|
     t.integer  "sample_id"
     t.integer  "asset_id"
@@ -1074,6 +1084,7 @@ ActiveRecord::Schema.define(:version => 20120718174723) do
     t.integer  "age_at_sampling"
     t.string   "sample_type"
     t.string   "treatment"
+    t.string   "uuid"
   end
 
   create_table "samples_tissue_and_cell_types", :id => false, :force => true do |t|
@@ -1254,6 +1265,7 @@ ActiveRecord::Schema.define(:version => 20120718174723) do
     t.string   "provider_name"
     t.boolean  "is_dummy",               :default => false
     t.string   "age_unit"
+    t.string   "uuid"
   end
 
   create_table "strain_auth_lookup", :id => false, :force => true do |t|
@@ -1287,6 +1299,7 @@ ActiveRecord::Schema.define(:version => 20120718174723) do
     t.string   "contributor_type"
     t.integer  "contributor_id"
     t.integer  "policy_id"
+    t.string   "uuid"
   end
 
   create_table "studied_factor_links", :force => true do |t|
@@ -1348,6 +1361,7 @@ ActiveRecord::Schema.define(:version => 20120718174723) do
     t.string   "subscription_type"
     t.datetime "created_at"
     t.datetime "updated_at"
+    t.integer  "project_subscription_id"
   end
 
   create_table "synonyms", :force => true do |t|

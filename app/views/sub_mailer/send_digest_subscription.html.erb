@@ -1,3 +1,21 @@
+Dear <%= @person.name%>,
+<br/>
+<br/>
+<% if @frequency == 'immediately' %>
+The following resources have just been created/updated in <%= Seek::Config.application_title %>:
+<% else %>
+    <%
+       if @frequency == 'daily'
+         frequency = 'yesterday'
+       else
+         frequency = 'last ' +  @frequency.chomp('ly')
+       end
+    %>
+    The following resources have been created/updated in <%= Seek::Config.application_title %> since <%= frequency %>:
+<% end %>
+<br/>
+<br/>
+
 <% @activity_logs.group_by(&:action).each do |action, logs| %>
     <label style="color:#f0342a;"><b><%= action.capitalize%></b></label>
     <div id="new_resources" class="new_resources" >
@@ -6,27 +24,49 @@
               width: 100%;">
 
       <tr>
-        <th align="left">Project Name</th>
+        <th align="left">Project Names</th>
         <th align="left">Resource Type</th>
         <th align="left">Resource Name</th>
         <th align="left">Person</th>
         <th align="left"><%= action.capitalize%> Date</th>
         <th align="left">Unsubscribe?</th>
       </tr>
-      <% logs.each do |log| %>
+         <%
+            removed_duplicated_logs = []
+            logs.sort { |a, b| b.updated_at <=> a.updated_at }.each do |log|
+              removed_duplicated_logs << log unless removed_duplicated_logs.collect(&:activity_loggable).include?(log.activity_loggable)
+            end
+         %>
+         <% removed_duplicated_logs.each do |log| %>
+             <% resource_projects = log.try(:activity_loggable).try(:projects)
+                person_subscribed_projects = @person.project_subscriptions.collect(&:project)
+                reported_projects = resource_projects.to_a & person_subscribed_projects
+                project_names = reported_projects.collect(&:name).join(',')
+             %>
 
-              <tr>
-                <td><%= log.referenced.nil? ? "<span style='font-style:italic;color:#666666'>Not Specified</span>" : log.referenced.name %></td>
-                <td><%= log.activity_loggable_type.humanize %></td>
-                <td><%= try_block{link_to(log.activity_loggable.title, send("#{log.activity_loggable.class.name.underscore}_url", log.activity_loggable))} || log.activity_loggable.title%></td>
-                <td><%= link_to h(try_block{log.culprit.person.name}), "mailto:#{try_block{log.culprit.person.email_with_name}}" %></td>
-                <td> <%= log.created_at %></td>
-                <td> <%= link_to "Unsubscribe", (Seek::Config.site_base_host.end_with?('/') ? "#{Seek::Config.site_base_host}" : "#{Seek::Config.site_base_host}/") + "subscriptions/destroy/#{Subscription.find_by_subscribable_id_and_subscribable_type_and_person_id(log.activity_loggable_id, log.activity_loggable_type, @person.id).id}" %></td>
-              </tr>
+             <tr>
+               <td><%= project_names.blank? ? "<span style='font-style:italic;color:#666666'>Not Specified</span>" : project_names %></td>
+               <td><%= log.activity_loggable_type.humanize %></td>
+               <td><%= try_block { link_to(log.activity_loggable.title, send("#{log.activity_loggable.class.name.underscore}_url", log.activity_loggable)) } || log.activity_loggable.title %></td>
+               <td><%= link_to h(try_block { log.culprit.person.name }), send("#{log.culprit.person.class.name.underscore}_url", log.culprit.person.id) %></td>
+               <td> <%= log.created_at %></td>
+               <td> <%= link_to "Unsubscribe", send("#{log.activity_loggable.class.name.underscore}_url", log.activity_loggable) %></td>
+             </tr>
 
-      <% end %>
-           </table></div>
+         <% end %>
+       </table>
+    </div>
     <br style="clear:both"/>
 <% end %>
+<br/>
+You can change your subscription setting by editing your profile:
+<%= link_to('Edit profile', send("edit_#{@person.class.name.underscore}_url", @person.id)) -%>.
+<br/>
 
+You can unsubscribe from a particular resource by clicking on the Unsubscribe link in the subscription report above
+<br/>
+or by visiting that resource in <%= Seek::Config.application_title %>
+<br/>
+<br/>
 
+This is an automated email.

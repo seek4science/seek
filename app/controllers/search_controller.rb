@@ -42,10 +42,8 @@ class SearchController < ApplicationController
     @search_type = params[:search_type]
     type=@search_type.downcase unless @search_type.nil?
 
-    if @search_query.start_with?("*") || @search_query.start_with?("?")
-      flash.now[:error]="You cannot start a query with a wildcard, so this was removed. You CAN however include wildcards at the end or within the query."
-      @search_query=@search_query[1..-1] while @search_query.start_with?("*") || @search_query.start_with?("?")
-    end
+    @search_query = @search_query.gsub("*","")
+    @search_query = @search_query.gsub("?","")
 
     @search_query.strip!
 

@@ -40,9 +40,9 @@
                 </label>
                 <br/>
 
-                <label for="is_publisher" style="font-weight: normal;">
-                  <%= check_box_tag "[roles][publisher]", 1, @person.try(:is_publisher?) -%>
-                  This person is a <b>Publisher</b>
+                <label for="is_gatekeeper" style="font-weight: normal;">
+                  <%= check_box_tag "[roles][gatekeeper]", 1, @person.try(:is_gatekeeper?) -%>
+                  This person is a <b>Gatekeeper</b>
                 </label>
             <% end %>
           </p>

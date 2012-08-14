@@ -56,10 +56,10 @@ class Ability
      end
   end
 
-  def publisher publisher
+  def gatekeeper gatekeeper
     can :publish, :all do |item|
-      if item.respond_to?(:projects) && publisher.try(:projects)
-       !(item.projects & publisher.projects).empty?
+      if item.respond_to?(:projects) && gatekeeper.try(:projects) && item.respond_to?(:policy)
+       !(item.projects & gatekeeper.projects).empty? && item.can_manage?(gatekeeper.try(:user))
       else
         false
       end

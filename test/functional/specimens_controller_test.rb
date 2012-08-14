@@ -103,15 +103,16 @@ fixtures :all
     login_as Factory(:user,:person => Factory(:brand_new_person))
     s = Factory :specimen, :policy => Factory(:private_policy)
     get :edit, :id =>s.id
-    assert_redirected_to specimen_path(s)
+    assert_response :redirect
     assert flash[:error]
   end
+
   test "unauthorized user cannot update specimen" do
     login_as Factory(:user,:person => Factory(:brand_new_person))
     s = Factory :specimen, :policy => Factory(:private_policy)
 
     put :update, :id=> s.id, :specimen =>{:title =>"test"}
-    assert_redirected_to specimen_path(s)
+    assert_response :redirect
     assert flash[:error]
   end
 
@@ -122,7 +123,7 @@ fixtures :all
       delete :destroy, :id => s.id
     end
     assert flash[:error]
-    assert_redirected_to specimens_path
+    assert_response :redirect
   end
 
   test "only current user can delete specimen" do

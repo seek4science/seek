@@ -43,7 +43,7 @@
     <br/>
     <%= render :partial=>"people/contact_details" unless hide_contact_details? %>
     <%= render :partial=>"people/project_roles", :locals=>{:editable=>false} %>
-        <%= render :partial=>"people/project_subscriptions",:locals => {:person=>@person} %>
+    <%= render :partial=>"people/project_subscriptions",:locals => {:person=>@person} if (mine?(@person) || current_user.try(:person).try(:is_admin?))  %>
     <%# get, classify and authorize all assets for this person's user (assets belong to users, not people!) -%>
     <%= render :partial=>"layouts/items_related_to", :object => @person %>
     <%# show the following section only to admins and only if the @person has an associated "user", which is not an admin itself - -%>
@@ -58,7 +58,7 @@
           <%= "<li>This person is a <b>project manager</b></li>" if @person.is_project_manager? %>
 
           <%= "<li>This person is an <b>asset manager</b></li>" if @person.is_asset_manager? %>
-          <%= "<li>This person is a <b>publisher</b></li>" if @person.is_publisher? %>
+          <%= "<li>This person is a <b>gatekeeper</b></li>" if @person.is_gatekeeper? %>
 
           <li>
             Editing <b>projects</b>, where this person is

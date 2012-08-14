@@ -1,6 +1,7 @@
 class ProjectSubscription < ActiveRecord::Base
   belongs_to :person
   belongs_to :project
+  has_many :subscriptions, :dependent => :destroy
 
   validates_presence_of :person
   validates_presence_of :project
@@ -47,11 +48,6 @@ class ProjectSubscription < ActiveRecord::Base
   after_create :subscribe_to_all_in_project
 
   def subscribe_to_all_in_project
-    project.subscribable_items.each{|item| item.subscribe(person)}.each {|i| disable_authorization_checks {i.save(false)} if i.changed_for_autosave?}
+    ProjectSubscriptionJob.create_job id
   end
-
-  def unsubscribe_to_all_in_project
-    project.subscribable_items.each{|item| item.unsubscribe(person)}.each {|i| disable_authorization_checks {i.save(false)} if i.changed_for_autosave?}
-  end
-
 end

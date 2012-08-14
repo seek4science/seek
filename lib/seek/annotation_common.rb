@@ -21,9 +21,10 @@ module Seek
 
           # The tag cloud is generation is quite an expensive process and doesn't need to automatically update when filled up already.
           # When it is small its nice to see new tags appear in the cloud.
-          # The cache is expired and will be regenerated on the next page load anyway, and the delay is more acceptable on a page load.
           if clear_cloud
             page.replace_html 'sidebar_tag_cloud', :partial=>'gadgets/tag_cloud_gadget'
+          else
+            RebuildTagCloudsJob.create_job
           end
 
           page.visual_effect :highlight, 'tags_box'
@@ -46,7 +47,7 @@ module Seek
         if immediately_clear_tag_cloud?
           expire_annotation_fragments(attr)
         else
-          #TODO: should expire and rebuild in a background task
+          RebuildTagCloudsJob.create_job
         end
       end
       

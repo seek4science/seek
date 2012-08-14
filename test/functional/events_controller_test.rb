@@ -67,7 +67,7 @@ class EventsControllerTest < ActionController::TestCase
   test "should get unauthorized message" do
     login_as :registered_user_with_no_projects
     get :new
-    assert_redirected_to events_path
+    assert_response :redirect
     assert_not_nil flash[:error]
   end
 

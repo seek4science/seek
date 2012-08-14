@@ -26,6 +26,7 @@ require 'sunspot_rails'
 require 'cancan'
 require 'strategic_eager_loading'
 
+
 GLOBAL_PASSPHRASE="ohx0ipuk2baiXah" unless defined? GLOBAL_PASSPHRASE
 
 ASSET_ORDER                = ['Person', 'Project', 'Institution', 'Investigation', 'Study', 'Assay', 'Sample','Specimen','DataFile', 'Model', 'Sop', 'Publication', 'Presentation','SavedSearch', 'Organism', 'Event']
@@ -44,5 +45,11 @@ Annotations::Config.attribute_names_to_allow_duplicates.concat(["tag"])
 Annotations::Config.versioning_enabled = false
 
 CELL_CULTURE_OR_SPECIMEN = Seek::Config.is_virtualliver ? 'specimen' : 'cell culture'
+ENV['LANG'] = 'en_US.UTF-8'
+
+if ActiveRecord::Base.connection.table_exists? 'delayed_jobs'
+  SendPeriodicEmailsJob.create_initial_jobs
+end
+
 
 ENV['LANG'] = 'en_US.UTF-8'

@@ -115,9 +115,7 @@ class Policy < ActiveRecord::Base
 
         # obtain parameters from sharing hash
         policy.sharing_scope = sharing[:sharing_scope]
-        policy.access_type = sharing["access_type_#{sharing_scope}"]
-        policy.use_whitelist = sharing[:use_whitelist]
-        policy.use_blacklist = sharing[:use_blacklist]
+        policy.access_type = sharing["access_type_#{sharing_scope}"].blank? ? 0 : sharing["access_type_#{sharing_scope}"]
 
         # NOW PROCESS THE PERMISSIONS
 
@@ -184,6 +182,26 @@ class Policy < ActiveRecord::Base
                :access_type => ACCESSIBLE,
                :use_whitelist => false,
                :use_blacklist => false)
+  end
+
+  def self.public_policy
+      policy = Policy.new(:name => "default public",
+                          :sharing_scope => EVERYONE,
+                          :access_type => ACCESSIBLE
+      )
+
+      return policy
+  end
+
+  def self.sysmo_and_projects_policy projects=[]
+      policy = Policy.new(:name => "default sysmo and projects policy",
+                          :sharing_scope => ALL_SYSMO_USERS,
+                          :access_type => VISIBLE
+      )
+      projects.each do |project|
+        policy.permissions << Permission.new(:contributor => project, :access_type => ACCESSIBLE)
+      end
+      return policy
   end
 
   #The default policy to use when creating authorized items if no other policy is specified
@@ -368,7 +386,11 @@ class Policy < ActiveRecord::Base
   end
 
   def get_person person_id, access_type
-      person = Person.find(person_id)
+      person = begin
+        Person.find(person_id)
+      rescue ActiveRecord::RecordNotFound
+        nil
+      end
       if person
         return [person.id, "#{person.name}", access_type]
       end

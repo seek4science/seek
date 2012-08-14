@@ -115,6 +115,9 @@ class AdminController < ApplicationController
 
     Seek::Config.copyright_addendum_enabled= string_to_boolean params[:copyright_addendum_enabled]
     Seek::Config.copyright_addendum_content= params[:copyright_addendum_content]
+
+    Seek::Config.noreply_sender= params[:noreply_sender]
+
     update_redirect_to true,'rebrand'
   end
 
@@ -159,13 +162,6 @@ class AdminController < ApplicationController
     Seek::Config.sample_age = params[:sample_age] unless params[:sample_age].blank?
     update_redirect_to update_flag,'biosamples_renaming'
   end
-  def finalize_config_changes
-    flash[:notice] = RESTART_MSG
-    #expires all fragment caching
-    expire_all_fragments
-    redirect_to :action=>:show
-  end
-
   def restart_server
     system ("touch #{RAILS_ROOT}/tmp/restart.txt")
     flash[:notice] = 'The server was restarted'
@@ -270,6 +266,8 @@ class AdminController < ApplicationController
         type = "search_stats"
       when "job_queue"
         type = "job_queue"
+      when "auth_consistency"
+        type = "auth_consistency"
       when "none"
         type = "none"
     end
@@ -287,6 +285,8 @@ class AdminController < ApplicationController
           format.html { render :partial => "admin/search_stats", :locals => {:stats => Seek::SearchStats.new} }
         when "job_queue"
           format.html { render :partial => "admin/job_queue" }
+        when "auth_consistency"
+          format.html { render :partial => "admin/auth_consistency" }
         when "none"
           format.html { render :text=>"" }
       end
@@ -357,7 +357,7 @@ class AdminController < ApplicationController
      if flag
        flash[:notice] = RESTART_MSG
        #expires all fragment caching
-       expire_all_fragments
+       expire_header_and_footer
        redirect_to :action=>:show
      else
        redirect_to :action=> action.to_s

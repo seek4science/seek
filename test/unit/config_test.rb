@@ -23,10 +23,6 @@ class ConfigTest < ActiveSupport::TestCase
     Seek::Config.is_virtualliver = original_value
   end
 
-  test "presentations enabled" do
-     assert_equal true, Seek::Config.presentations_enabled
-  end
-
   test "scales" do
     assert_equal ["organism","liver","liverLobule","intercellular","cell"],Seek::Config.scales
   end

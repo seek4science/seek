@@ -2,10 +2,10 @@
    object ||= nil
    set_parameters_for_sharing_form object
    disable_advanced_view ||= nil
-   disable_can_publish_check ||= false
    show_advanced_permissions = !@resource.respond_to?(:has_advanced_permissions?) || @resource.has_advanced_permissions?
    default_projects_access_type = @resource.is_asset? ? Policy::ACCESSIBLE : Policy::EDITING
    default_consortium_access_type = Policy::ACCESSIBLE
+   can_publish = @resource.respond_to?(:can_publish?) ? @resource.can_publish? : true
 %>
 <%# initialization: required to keep javascript independent of the access type codes, to allow the use the constants instead -%>
 <%= render :partial=>"assets/sharing_constants" %>
@@ -16,7 +16,7 @@
 <%= hidden_field_tag "sharing[permissions][values]", "" -%>
 
 <%="<div class='fieldWithErrors'>" if !@resource.errors.empty? and !@policy.valid? %>
-<div class="fold">
+<div class="fold" id="sharing_form">
 
   <div class="foldTitle">
     <%= help_icon("Here you can specify who can <b>see</b>#{', <b>download</b>' if @resource.is_downloadable?} and <b>edit</b> this #{@resource_type}.") -%>
@@ -34,10 +34,18 @@
           You may:
         <ul style="padding-left:1em;">
           <li>Keep the <%= @resource_type -%> private, and only visible to yourself.</li>
-          <li>Share within the selected projects and with all other users that are a member of a <%= Seek::Config.project_name %> project.</li>
-          <% if try_block{@resource.can_publish?} %>
-            <li>Share with the all visitors (including anonymous visitors with no login)</li>
-          <% end %>
+          <%
+             through_resource = ''
+             if @resource.kind_of?(Assay)
+               through_resource = '(through projects associated with selected study)'
+             elsif @resource.kind_of?(Study)
+               through_resource = '(through projects associated with selected investigation)'
+             end
+          %>
+          <li>Share within members of projects associated with this <%= @resource_type -%> <%= through_resource%> and with all other users that are a member of a <%= Seek::Config.project_name %> project.</li>
+          <li>Share with the all visitors (including anonymous visitors with no login)</li>
+              <li style="margin-left: 2em">You can share with the all visitors right away if you are the gatekeeper or if the projects associated with this <%= @resource_type -%> have no gatekeeper</li>
+              <li style="margin-left: 2em">Or you can request the gatekeepers for their approval to share with all visitors</li>
           <% if !disable_advanced_view%>
             <li>Define more fine-grained sharing in the <em>Advanced sharing</em>: you can share within your Project/Institution only,<br/> with specific individuals, or set up custom favourite groups for people you regularly need to share with.</li>
           <% end %>
@@ -87,12 +95,13 @@
         <p>
           <label for="sharing_scope_<%= Policy::EVERYONE -%>">
             <input type="radio" <%= 'checked="checked"' if @sharing_mode == Policy::EVERYONE -%> id="sharing_scope_<%= Policy::EVERYONE -%>" name="sharing[sharing_scope]"
-                   value="<%= Policy::EVERYONE -%>" <%= 'disabled="true"' if !disable_can_publish_check && @resource.respond_to?(:can_publish?) && !@resource.can_publish? -%>/>
+                   value="<%= Policy::EVERYONE -%>"/>
             - All visitors (including anonymous visitors with no login):
           </label>
            <%= render :partial => "assets/sharing_form_access_type_dropdown", :locals => { :access_type_selector_for_scope => Policy::EVERYONE,
             :sharing_scope => Policy::EVERYONE, :access_type => (@sharing_mode == Policy::EVERYONE) ? @access_type : Policy::ACCESSIBLE } -%>
            <%= additional_advanced_permissions_included @resource, Policy::EVERYONE -%>
+          <br/>
         </p>
 
     </div>

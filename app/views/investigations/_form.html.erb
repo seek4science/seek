@@ -30,18 +30,9 @@
   <%
      button_text=action==:edit ? "Update" : "Create"
      disabled_text=action==:edit ? "Updating..." : "Creating..."
-     is_new_file=action==:edit ? false : true
   %>
   <% if @investigation.can_manage? %>
-      <% if @investigation.contributor.kind_of?(Person)
-            contributor_id = @investigation.contributor.try(:user).try(:id)
-         elsif @investigation.contributor.kind_of?(User)
-           contributor_id = @investigation.contributor.try(:id)
-         else
-            contributor_id = nil
-         end
-      %>
-      <%= preview_permission_popup_link('investigation', url_for(:controller => 'policies', :action => 'preview_permissions'), is_new_file, contributor_id)-%>
+      <%= preview_permission_popup_link(@investigation)-%>
       <%= f.submit button_text, :id => "investigation_submit_btn", :onclick => "javascript: clickLink($('preview_permission'));return(false);" -%>
   <% else %>
       <%= f.submit button_text, :disable_with=>disabled_text, :id => "investigation_submit_btn", :onclick => "javascript: $('investigation_submit_btn').form.submit();return(false);" -%>

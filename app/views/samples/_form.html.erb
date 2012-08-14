@@ -102,10 +102,9 @@
   <%
      button_text=action==:edit ? "Update" : "Create"
      disabled_text=action==:edit ? "Updating..." : "Creating..."
-     is_new_file=action==:edit ? false : true
   %>
   <% if @sample.can_manage? %>
-      <%= preview_permission_popup_link('sample', url_for(:controller => 'policies', :action => 'preview_permissions'), is_new_file, try_block{@sample.contributor.id})-%>
+      <%= preview_permission_popup_link(@sample)-%>
       <%= f.submit button_text, :id => "sample_submit_btn", :onclick => "javascript: if($F('organism')=='' || $F('organism')=='0' ){alert('Please select organism');return false;};clickLink($('preview_permission'));return(false);" -%>
 
   <% else %>

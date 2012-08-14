@@ -123,6 +123,7 @@ fixtures :all
                        :lab_internal_number=>"Lab number",
                        :institution_id =>Factory(:institution).id,
                        :title=>"Donor number"
+                   }
                }
         end
       end
@@ -158,7 +159,8 @@ fixtures :all
                         :phenotypes_attributes => {"213213"=>{:description => new_phenotype_description}}
                        }
 
-                   }
+                   },
+               :sharing => valid_sharing
 
     end
     s = assigns(:sample)
@@ -336,6 +338,7 @@ test 'combined sample_specimen form when creating new sample' do
   assert_response :success
   assert_select 'input#sample_specimen_attributes_title', :count => 1
 end
+
 test 'only sample form when updating sample' do
   get :edit, :id => Factory(:sample, :policy => policies(:editing_for_all_sysmo_users_policy))
   assert_response :success

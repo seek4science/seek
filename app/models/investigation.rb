@@ -6,7 +6,7 @@ class Investigation < ActiveRecord::Base
 
   attr_accessor :new_link_from_study
 
-  has_many :studies  
+  has_many :studies
 
 
   validates_presence_of :title

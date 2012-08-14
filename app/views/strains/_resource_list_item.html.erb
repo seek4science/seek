@@ -1,0 +1,20 @@
+<%= list_item_title resource, {:include_avatar => false, :url => ''} %>
+
+<div class="list_item_left_column">
+  <%= list_item_authorized_attribute "Creator", resource.contributor.try(:person) %>
+  <%= list_item_attribute "Provider Name", text_or_not_specified(resource.provider_name) -%>
+  <%= list_item_attribute "Provider's strain ID", text_or_not_specified(resource.provider_id) %>
+  <%= list_item_attribute "Organism", organisms_link_list([resource.organism]) -%>
+
+</div>
+
+<div class="list_item_right_column">
+  <%= list_item_attribute "Genotypes", text_or_not_specified(resource.genotype_info) %>
+  <%= list_item_attribute "Phenotypes", text_or_not_specified(resource.phenotype_info) %>
+  <%= list_item_attribute "Comment", text_or_not_specified(resource.comment) %>
+  <%= render :partial => 'projects/show_project_relationship', :locals => {:resource => resource, :list_item => true} %>
+</div>
+
+<div class="list_item_whole_width">
+  <%= list_item_timestamp resource %>
+</div>

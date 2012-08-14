@@ -38,7 +38,12 @@ class PeopleController < ApplicationController
     end
 
     unless @people
-      @people = apply_filters(Person.all).select(&:can_view?).reject {|p| p.projects.empty? }
+      if (params[:page].blank? || params[:page]=='latest' || params[:page]=="all")
+        @people = Person.active
+      else
+        @people = Person.all
+      end
+      @people = apply_filters(@people).select(&:can_view?).reject {|p| p.projects.empty? }
       @people=Person.paginate_after_fetch(@people, :page=>params[:page])
     else
       @people = @people.select(&:can_view?).reject {|p| p.projects.empty?}
@@ -131,8 +136,8 @@ class PeopleController < ApplicationController
     set_tools_and_expertise(@person, params)
    
     registration = false
-    registration = true if (current_user.person.nil?) #indicates a profile is being created during the registration process  
-    
+    registration = true if (current_user.person.nil?) #indicates a profile is being created during the registration process
+
     if registration    
       current_user.person=@person      
       @userless_projects=Project.with_userless_people
@@ -150,29 +155,31 @@ class PeopleController < ApplicationController
 
     respond_to do |format|
       if @person.save && current_user.save
-        if (!current_user.active?)
-          if_sysmo_member||=false
+        #send notification email to admin and project managers, if a new member is registering as a new person
+        if Seek::Config.email_enabled && registration && is_sysmo_member
           #send mail to admin
-          Mailer.deliver_contact_admin_new_user_no_profile(member_details,current_user,base_host) if is_sysmo_member
+          Mailer.deliver_contact_admin_new_user_no_profile(member_details, current_user, base_host)
 
           #send mail to project managers
           project_managers = project_managers_of_selected_projects params[:projects]
           project_managers.each do |project_manager|
-            Mailer.deliver_contact_project_manager_new_user_no_profile(project_manager, member_details,current_user,base_host) if is_sysmo_member
+            Mailer.deliver_contact_project_manager_new_user_no_profile(project_manager, member_details, current_user, base_host)
           end
-          Mailer.deliver_signup(current_user,base_host)          
-          flash[:notice]="An email has been sent to you to confirm your email address. You need to respond to this email before you can login"          
+        end
+        if (!current_user.active?)
+          Mailer.deliver_signup(current_user, base_host)
+          flash[:notice]="An email has been sent to you to confirm your email address. You need to respond to this email before you can login"
           logout_user
-          format.html {redirect_to :controller=>"users",:action=>"activation_required"}
+          format.html { redirect_to :controller => "users", :action => "activation_required" }
         else
           flash[:notice] = 'Person was successfully created.'
           format.html { redirect_to(@person) }
-          format.xml  { render :xml => @person, :status => :created, :location => @person }
+          format.xml { render :xml => @person, :status => :created, :location => @person }
         end
-        
-      else        
+
+      else
         format.html { render :action => redirect_action }
-        format.xml  { render :xml => @person.errors, :status => :unprocessable_entity }
+        format.xml { render :xml => @person.errors, :status => :unprocessable_entity }
       end
     end
   end
@@ -306,7 +313,7 @@ class PeopleController < ApplicationController
         expire_annotation_fragments("expertise") if exp_changed
         expire_annotation_fragments("tool") if tools_changed
       else
-         #TODO: should expire and rebuild in a background task
+         RebuildTagCloudsJob.create_job
       end
 
   end

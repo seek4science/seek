@@ -35,7 +35,7 @@ class AuthLookupUpdateJob
           Delayed::Job.logger.error("Unexecpted type encountered: #{item.class.name}")
         end
       rescue Exception=>e
-        AuthLookupUpdateJob.add_items_to_queue(item)
+        AuthLookupUpdateJob.add_items_to_queue(item,15.seconds.from_now,1)
       end
     end
   end
@@ -61,7 +61,7 @@ class AuthLookupUpdateJob
     GC.start
   end
 
-  def self.add_items_to_queue items, t=5.seconds.from_now, priority=0
+  def self.add_items_to_queue items, t=5.seconds.from_now, priority=0, queuepriority=priority
     if Seek::Config.auth_lookup_enabled
 
       items = [items] if items.nil?
@@ -73,9 +73,13 @@ class AuthLookupUpdateJob
           if item.respond_to?(:authorization_supported?) && item.authorization_supported?
             item.update_lookup_table(User.current_user)
           end
-          AuthLookupUpdateQueue.create(:item=>item, :priority=>priority) unless AuthLookupUpdateQueue.exists?(item)
+          # Could potentially delete the records for this item (either by asset_id or user_id) to ensure an immediate reflection of the change,
+          # but with some slowdown until the changes have been reapplied.
+          # for assets its simply - item.remove_from_lookup_table
+          # for users some additional simple code is required.
+          AuthLookupUpdateQueue.create(:item=>item, :priority=>queuepriority) unless AuthLookupUpdateQueue.exists?(item)
         end
-        Delayed::Job.enqueue(AuthLookupUpdateJob.new, 0, t) unless AuthLookupUpdateJob.count>10
+        Delayed::Job.enqueue(AuthLookupUpdateJob.new, priority, t) unless AuthLookupUpdateJob.count>10
       end
     end
   end
@@ -84,8 +88,12 @@ class AuthLookupUpdateJob
     count!=0
   end
 
-  def self.count
-    Delayed::Job.find(:all,:conditions=>['handler = ? AND locked_at IS ?',@@my_yaml,nil]).count
+  def self.count ignore_locked=true
+    if ignore_locked
+      Delayed::Job.find(:all,:conditions=>['handler = ? AND locked_at IS ? AND failed_at IS ?',@@my_yaml,nil,nil]).count
+    else
+      Delayed::Job.find(:all,:conditions=>['handler = ? AND failed_at IS ?',@@my_yaml,nil]).count
+    end
   end
 
   

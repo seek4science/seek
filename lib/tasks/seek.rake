@@ -219,28 +219,6 @@ namespace :seek do
     end
   end
   
-  desc "Send mail daily to users"
-  task :send_daily_subscription => :environment do
-    send_subscription_mails ActivityLog.find(:all, :include => :activity_loggable, :conditions => ['created_at=?', Date.yesterday]), 'daily'
-  end
-
-  desc "Send mail weekly to users"
-  task :send_weekly_subscription => :environment do
-    send_subscription_mails ActivityLog.find(:all, :include => :activity_loggable, :conditions => ['created_at>=?', 7.days.ago]), 'weekly'
-  end
-
-  desc "Send mail monthly to users"
-  task :send_monthly_subscription => :environment do
-     send_subscription_mails ActivityLog.find(:all, :include => :activity_loggable, :conditions => ['created_at>=?', 30.days.ago]), 'monthly'
-  end
-  
-  desc "Clears out all the lookup tables, used to speed up authorization. Use with care as they can take a while to rebuild."
-  task(:clear_auth_lookup_tables=>:environment) do
-    Seek::Util.authorized_types.each do |type|
-      type.clear_lookup_table
-    end
-  end
-
   desc "Creates background jobs to rebuild all authorization lookup table for all users."
   task(:repopulate_auth_lookup_tables=>:environment) do
     AuthLookupUpdateJob.add_items_to_queue nil,5.seconds.from_now,1
@@ -278,10 +256,15 @@ namespace :seek do
   desc "Creates background jobs to reindex all searchable things"
   task(:reindex_all=>:environment) do
     Seek::Util.searchable_types.each do |type|
-      ReindexingJob.add_items_to_queue type.all
+      ReindexingJob.add_items_to_queue type.all, 5.seconds.from_now,2
     end
   end
 
+  desc "Initialize background jobs for sending subscription periodic emails"
+  task(:send_periodic_subscription_emails=>:environment) do
+      SendPeriodicEmailsJob.create_initial_jobs
+  end
+  
   desc "warm authorization memcache"
   task :warm_memcache=> :environment do
     klasses = Seek::Util.persistent_classes.select { |klass| klass.reflect_on_association(:policy) }.reject { |klass| klass.name == 'Permission' || klass.name.match(/::Version$/) }
@@ -322,17 +305,6 @@ namespace :seek do
     YAML.load(File.read(filename.to_s)).each_pair {|k,v| Rails.cache.write(k,v)}
   end
 
-
-  private
-
-  def send_subscription_mails logs, frequency
-    Person.all.select{|p|p.receive_notifications?}.each do |person|
-      activity_logs = person.subscriptions.select{|s|s.frequency == frequency}.collect do |sub|
-        logs.select { |log| log.activity_loggable.try(:can_view?, person.user) and log.activity_loggable.subscribable? and log.activity_loggable.subscribers_are_notified_of?(log.action) and log.activity_loggable == sub.subscribable }
-      end.flatten(1)
-      SubMailer.deliver_send_digest_subscription person, activity_logs unless activity_logs.blank?
-    end
-  end
 
   def set_projects_parent array, parent
     array.each do |proj|

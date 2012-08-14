@@ -56,7 +56,7 @@
     </tr>
     <tr class="top-aligned-row">
       <td><strong>Last Update:</strong></td>
-      <td>Mon May 14 14:39:41 +0100 2012</td>
+      <td>Thu Jul 19 13:27:29 +0100 2012</td>
     </tr>
     </table>
   </div>
@@ -100,6 +100,10 @@ is troublesome and is not covered here.
 We recommend you use ruby, version 1.8.7.
 </p>
 <p>
+The steps in the next section outline the commands required to install all
+the required packages for Ubuntu or Debian.
+</p>
+<p>
 MySQL server needs to be installed installed, along the development package
 (required to compile the MySQL rubygem). We use the Ubuntu/Debian packages
 <em>mysql-server</em> and <em>libmysqlclient15-dev</em>
@@ -115,10 +119,9 @@ compilation. The Ubuntu/Debian package <em>build-essentials</em> should be
 sufficient
 </p>
 <p>
-The following steps outline the commands required to install all the
-required packages for Ubuntu or Debian. SEEK uses Lucene as its search
-engine, and this requires that java is installed. Sun Java is no longer
-available for Ubuntu, but OpenJDK should work fine.
+SEEK uses Lucene as its search engine, and this requires that java is
+installed. Sun Java is no longer available for Ubuntu, but OpenJDK should
+work fine.
 </p>
 <p>
 Before starting, its a good idea to get up to date:
@@ -129,18 +132,22 @@ Before starting, its a good idea to get up to date:
 <p>
 The following commands will install the core required packages:
 </p>
+<p>
+for Ubuntu Precise 12.04 (LTS):
+</p>
+<pre>
+  sudo apt-get install wget mercurial ruby ri1.8 libruby1.8 ruby-dev mysql-server libssl-dev build-essential openssh-server
+  sudo apt-get install libmysqlclient-dev libmagick++-dev libxslt1-dev libxml++2.6-dev openjdk-6-jdk graphviz libsqlite3-dev sqlite3
+</pre>
+<p>
+for Ubuntu Lucid 10.04 (LTS):
+</p>
 <pre>
   sudo apt-get install wget mercurial ruby rdoc ri libopenssl-ruby ruby-dev mysql-server libssl-dev build-essential openssh-server
   sudo apt-get install libmysqlclient16-dev libmagick++-dev libxslt-dev libxml++2.6-dev openjdk-6-jdk graphviz libsqlite3-dev sqlite3
 </pre>
 <p>
-if you are intending to develop SEEK you will probably also want to use:
-</p>
-<pre>
-  sudo apt-get install curl irb
-</pre>
-<p>
-if setting up for production deployment using the <a
+If setting up for production deployment using the <a
 href="http://www.modrails.com/">Passenger Phusion (modrails)</a> module you
 can save a step later by also using:
 </p>
@@ -180,11 +187,11 @@ as the version control system.
 </p>
 <p>
 For a stable version, you should check out according to a stable tag. Our
-current stable tag is <em>0.13.3</em>, so to retrieve this version you
+current stable tag is <em>0.14.0</em>, so to retrieve this version you
 should use:
 </p>
 <pre>
-  hg clone https://sysmo-db.googlecode.com/hg/ -r v0.13.3 seek
+  hg clone https://sysmo-db.googlecode.com/hg/ -r v0.14.0 seek
 </pre>
 <p>
 This will create a <em>seek</em> directory that contains the application.
@@ -194,7 +201,7 @@ This will create a <em>seek</em> directory that contains the application.
 install the required gems you first need to install the bundler gem:
 </p>
 <pre>
-  gem install -d bundler
+  sudo gem install -d bundler rake
 </pre>
 <p>
 Then from within the seek directory run
@@ -248,7 +255,24 @@ Run the rake database setup task, this creates the database, loads the
 schema and seeds the database with any default data
 </p>
 <pre>
-  rake db:setup
+  bundle exec rake db:setup
+</pre>
+<h2>Starting Delayed-Job (Background processing)</h2>
+<p>
+Some background processing is handled using a tool called <em>Delayed
+Job</em>.
+</p>
+<p>
+To start delayed job run the script
+</p>
+<pre>
+  ./script/delayed_job start
+</pre>
+<p>
+or for production:
+</p>
+<pre>
+  RAILS_ENV=production ./script/delayed_job start
 </pre>
 <h2>Starting the server</h2>
 <p>
@@ -262,23 +286,6 @@ If running in production mode, you should start the server with
 </p>
 <pre>
   ./script/server -e production
-</pre>
-<h2>Starting Delayed-Job (Background processing)</h2>
-<p>
-Some background processing is handled using a tool called <em>Delayed
-Job</em>
-</p>
-<p>
-To start delayed job run the script
-</p>
-<pre>
-  ./script/delayed_job start
-</pre>
-<p>
-or for production:
-</p>
-<pre>
-  RAILS_ENV=production ./script/delayed_job start
 </pre>
 <h2>Creating the Admin user</h2>
 <p>
@@ -299,10 +306,12 @@ Once created this user will become the admin user of the system.
 Once logged in as an administrator, you will notice a link on the
 right-hand side of the tabs/search bar &quot;Admin Enabled&quot;. Selecting
 this will provide you with some admin facilities for creating new projects,
-institutions and profiles.
+institutions and profiles; defining additional administrators; or modifying
+the behaviour of SEEK.
 </p>
 <p>
-Here you can also define additional administrator users.
+Some of the key settings required for a new installation are described in
+the following sections.
 </p>
 <h2>Enabling search and starting the Sunspot SOLR server</h2>
 <p>
@@ -314,33 +323,80 @@ You will need to restart the server after changing this setting.
 To start the search server you need to run:
 </p>
 <pre>
-  rake sunspot:solr:start
+  bundle exec rake sunspot:solr:start
 </pre>
 <p>
 and to reindex any existing data that created before search was enabled:
 </p>
 <pre>
-  rake sunspot:solr:reindex
-</pre>
-<h2>Rebranding SysMO SEEK for other projects</h2>
-<p>
-If you are running SEEK for a project other than SysMO you can change
-various text elements under Admin, Site branding.
-</p>
-<p>
-To insert your application/project name into the help documents for SEEK,
-and to remove the logos/links to SEEK&#8216;s &#8216;related projects and
-friends&#8217; use
-</p>
-<pre>
-  rake seek:rebrand
+  bundle exec rake sunspot:solr:reindex
 </pre>
 <p>
-If you only want to change the help documents, you can instead use
+If you want Sunspot SOLR to start automatically whenever you restart the
+machine SEEK is running on, you probably want to create an init.d/ script.
+A script we use is available at <a
+href="https://gist.github.com/3143434">gist.github.com/3143434</a> (the
+APP_PATH may need changing for you)
+</p>
+<p>
+On Ubuntu or Debian, after putting the script in init.d/ you should run
+(assuming you called he file seek-solr)
 </p>
 <pre>
-  rake seek:rebrand_help_docs
+  sudo update-rc.d seek-solr defaults
 </pre>
+<p>
+You can then start the service with
+</p>
+<pre>
+  service seek-solr start
+</pre>
+<p>
+.. and stop with
+</p>
+<pre>
+  service seek-solr stop
+</pre>
+<h2>Configuring BioPortal</h2>
+<p>
+<a href="http://bioportal.bioontology.org/">BioPortal</a> is a service used
+in SEEK for supporting and searching ontologies, which we communicate with
+via its API. However, the API requires an api-key that we are unable to
+distribute with SEEK. To be able to link organisms with NCBI terms, or
+search for organisms when defining new ones, an api-key has to be setup. We
+also have future plans for more widespread uses of ontologies - such as for
+the Assay and Technology types, and for tagging with semantic terms.
+</p>
+<p>
+To get an api-key you first need to register with BioPortal at <a
+href="http://bioportal.bioontology.org/accounts/new">bioportal.bioontology.org/accounts/new</a>,
+and once registred and logged in your api-key should be shown under Account
+details. More information is available at <a
+href="http://www.bioontology.org/wiki/index.php/BioPortal_REST_services">www.bioontology.org/wiki/index.php/BioPortal_REST_services</a>.
+</p>
+<p>
+In SEEK, you apply the BioPortal api-key under the Admin-&gt;Site
+Configuration-&gt;Additional Settings.
+</p>
+<h2>Configuring DOI and PubMed search</h2>
+<p>
+To be able to support adding publications using a <a
+href="http://www.ncbi.nlm.nih.gov/pubmed">PubMed</a> ID or DOI to your SEEK
+installation, you need to do 2 things.
+</p>
+<ul>
+<li>For PubMed you simply need to add your email address under Admin-&gt;Site
+Configuration-&gt;Additional Settings
+
+</li>
+<li>For DOI - you need to register your email address with <a
+href="http://www.crossref.org/">CrossRef</a> at <a
+href="http://www.crossref.org/requestaccount">www.crossref.org/requestaccount</a>/
+and then provide that email to SEEK under Admin-&gt;Site
+Configuration-&gt;Additional Settings
+
+</li>
+</ul>
 <h2>Setting up Passenger Phusion and Apache for production servers.</h2>
 <p>
 This section is only relevant if setting up a production deployment, and
@@ -393,6 +449,25 @@ and configured a virtual host (probably in
          Options -MultiViews
       &lt;/Directory&gt;
    &lt;/VirtualHost&gt;
+</pre>
+<h2>Rebranding SysMO SEEK for other projects</h2>
+<p>
+If you are running SEEK for a project other than SysMO you can change
+various text elements under Admin-&gt;Site Configuration-&gt;Site branding.
+</p>
+<p>
+To insert your application/project name into the help documents for SEEK,
+and to remove the logos/links to SEEK&#8216;s &#8216;related projects and
+friends&#8217; use
+</p>
+<pre>
+  bundle exec rake seek:rebrand
+</pre>
+<p>
+If you only want to change the help documents, you can instead use
+</p>
+<pre>
+  bundle exec rake seek:rebrand_help_docs
 </pre>
 <h2>Backing up</h2>
 <p>
