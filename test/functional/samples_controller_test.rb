@@ -348,4 +348,30 @@ end
     assert_response :success
     assert_select 'input#sample_specimen_attributes_title', :count => 0
   end
+
+  test "sample-sop association when sop has multiple versions" do
+    sop = Factory :sop, :contributor => User.current_user
+    sop_version_2 = Factory("Sop::Version", :sop => sop)
+    assert 2, sop.versions.count
+    assert_equal sop.latest_version, sop_version_2
+
+    assert_difference("Sample.count") do
+      post :create, :sample => {:title => "test",
+                                :lab_internal_number => "Do232",
+                                :donation_date => Date.today,
+                                :project_ids => [Factory(:project).id],
+                                :specimen => Factory(:specimen, :contributor => User.current_user)},
+           :sample_sop_ids => [sop.id]
+
+
+    end
+    s = assigns(:sample)
+    assert_redirected_to sample_path(s)
+    assert_nil flash[:error]
+    assert_equal "test", s.title
+    assert_equal 1, s.sop_masters.length
+    assert_equal sop, s.sop_masters.first
+    assert_equal 1, s.sops.length
+    assert_equal sop_version_2, s.sops.first
+  end
 end
