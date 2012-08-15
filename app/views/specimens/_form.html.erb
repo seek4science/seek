@@ -113,7 +113,7 @@
         <%= render :partial => 'assets/special_auth_code_form', :locals => {:f => f} %>
     <% end %>
 <% end %>
-<%= fancy_multiselect specimen, :sops, :name => 'specimen_sop_ids', :association_class => Sop, :selected => (params[:specimen_sop_ids] || []).map(&:to_i) | specimen.sop_masters.map(&:sop_id), :hidden => specimen.sops.blank? ? true : false, :other_projects_checkbox => true %>
+<%= fancy_multiselect specimen, :sops, :name => 'specimen_sop_ids', :association_class => Sop, :selected => (params[:specimen_sop_ids] || []).map(&:to_i) | specimen.sop_masters.map(&:sop_id), :hidden => specimen.sop_masters.blank? ? true : false, :other_projects_checkbox => true %>
 
 <p>
   <%= render :partial => "assets/author_form", :locals => {:resource_type => 'Specimen',
