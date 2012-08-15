@@ -303,23 +303,23 @@ end
 end
 
 #Model Version
-Factory.define(:model_version) do |f|
+Factory.define("Model_Version") do |f|
   f.association :model
 
 end
 
 #SOP Version
-Factory.define(:sop_version) do |f|
+Factory.define("Sop::Version") do |f|
   f.association :sop
 end
 
 #DataFile Version
-Factory.define(:data_file_version) do |f|
+Factory.define("DataFile::Version") do |f|
   f.association :data_file
 end
 
 #Presentation Version
-Factory.define(:presentation_version) do |f|
+Factory.define("Presentation::Version") do |f|
   f.association :presentation
   end
 
