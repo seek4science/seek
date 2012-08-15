@@ -98,4 +98,37 @@ fixtures :all
       assert_not_nil Genotype.find_by_id(genotype1.id)
       assert_not_nil Phenotype.find_by_id(phenotype1.id)
   end
+
+  test "specimen-sop associations" do
+    User.with_current_user Factory(:user) do
+      specimen = Factory :specimen, :contributor => User.current_user
+      sop = Factory :sop, :contributor => User.current_user
+      specimen.build_sop_masters [sop.id]
+      assert specimen.valid?
+      assert specimen.save
+
+      assert_equal 1, specimen.sop_masters.count
+      assert_equal sop, specimen.sop_masters.map(&:sop).first
+      assert_equal 1, specimen.sops.count
+      assert_equal sop.latest_version, specimen.sops.first
+    end
+  end
+
+  test "specimen-sop associations when sop has multiple versions" do
+    User.with_current_user Factory(:user) do
+      specimen = Factory :specimen, :contributor => User.current_user
+      sop = Factory :sop, :contributor => User.current_user
+      sop_version_2 = Factory("Sop::Version", :sop => sop)
+      assert 2, sop.versions.count
+
+      specimen.build_sop_masters [sop.id]
+      assert specimen.valid?
+      assert specimen.save
+
+      assert_equal 1, specimen.sop_masters.count
+      assert_equal sop, specimen.sop_masters.map(&:sop).first
+      assert_equal 1, specimen.sops.count
+      assert_equal sop.latest_version, sop_version_2
+    end
+  end
 end

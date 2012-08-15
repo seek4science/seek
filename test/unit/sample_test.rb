@@ -34,4 +34,24 @@ class SampleTest < ActiveSupport::TestCase
     #assert !s.valid?
   end
 
+  test "sample-asset associations" do
+    User.with_current_user Factory(:user) do
+      sample = Factory :sample, :contributor => User.current_user
+      data_file = Factory :data_file, :contributor => User.current_user
+      sample.data_file_masters << data_file
+      sop = Factory :sop, :contributor => User.current_user
+      sample.sop_masters << sop
+      assert sample.valid?
+      assert sample.save
+      assert_equal 1, sample.data_file_masters.count
+      assert_equal data_file, sample.data_file_masters.first
+      assert_equal 1, sample.data_files.count
+      assert_equal data_file.latest_version, sample.data_files.first
+
+      assert_equal 1, sample.sop_masters.count
+      assert_equal sop, sample.sop_masters.first
+      assert_equal 1, sample.sops.count
+      assert_equal sop.latest_version, sample.sops.first
+    end
+  end
 end
