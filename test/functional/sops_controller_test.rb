@@ -647,6 +647,15 @@ class SopsControllerTest < ActionController::TestCase
       assert_equal policy, updated_policy
       assert_equal policy.permissions, updated_policy.permissions
   end
+
+  test 'should be able to view pdf content' do
+     sop = Factory(:sop, :policy => Factory(:all_sysmo_downloadable_policy))
+     assert sop.is_downloadable_pdf?
+     get :show, :id => sop.id
+     assert_response :success
+     assert_select 'a', :text => /View content/, :count => 1
+  end
+
   private
 
   def valid_sop_with_url
