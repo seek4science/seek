@@ -7,7 +7,7 @@ require 'acts_as_versioned_resource'
 class Sop < ActiveRecord::Base
 
   #searchable must come before acts_as_asset is called
-  searchable(:ignore_attribute_changes_of=>[:updated_at,:last_used_at]) do
+  searchable do
     text :description, :title, :original_filename,:searchable_tags,:exp_conditions_search_fields,:assay_type_titles,:technology_type_titles
   end if Seek::Config.solr_enabled
 

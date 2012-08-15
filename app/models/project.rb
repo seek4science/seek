@@ -112,7 +112,7 @@ class Project < ActiveRecord::Base
   has_and_belongs_to_many :organisms
   has_many :project_subscriptions,:dependent => :destroy
   
-  searchable(:ignore_attribute_changes_of=>[:updated_at]) do
+  searchable do
     text :name , :description, :locations
   end if Seek::Config.solr_enabled
 

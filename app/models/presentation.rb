@@ -8,7 +8,7 @@ class Presentation < ActiveRecord::Base
    attr_accessor :orig_data_file_id
 
    #searchable must come before acts_as_asset is called
-   searchable(:ignore_attribute_changes_of=>[:updated_at,:last_used_at]) do
+   searchable do
      text :description,:title,:original_filename,:searchable_tags
    end if Seek::Config.solr_enabled
 

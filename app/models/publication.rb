@@ -8,7 +8,7 @@ class Publication < ActiveRecord::Base
   title_trimmer
 
   #searchable must come before acts_as_asset is called
-  searchable(:ignore_attribute_changes_of=>[:updated_at,:last_used_at]) do
+  searchable do
     text :title,:abstract,:journal,:searchable_tags, :pubmed_id, :doi
     text :publication_authors do
       publication_authors.compact.map(&:first_name) + publication_authors.compact.map(&:last_name)
