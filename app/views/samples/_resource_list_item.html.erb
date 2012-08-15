@@ -11,8 +11,8 @@
 </div>
 
 <div class="list_item_right_column">
-
-  <%= list_item_authorized_list resource.specimen.sops,"SOPs", true, 50, true %>
+  <%= list_item_authorized_list resource.data_file_masters,"Data files", true, 50, true %>
+  <%= list_item_authorized_list resource.sop_masters,"SOPs", true, 50, true %>
 
   <%= list_item_attribute "Provider name",text_or_not_specified(resource.provider_name) -%>
   <%= list_item_attribute "Provider's sample ID",text_or_not_specified(resource.provider_id) -%>
