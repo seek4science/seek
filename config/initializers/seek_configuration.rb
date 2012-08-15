@@ -39,7 +39,7 @@ Seek::Config.default :auth_lookup_enabled,true
 Seek::Config.default :sample_parser_enabled,false
 Seek::Config.default :external_search_enabled, false
 Seek::Config.default :project_browser_enabled,false
-Seek::Config.default :experimental_features_enabled,false
+Seek::Config.default :experimental_features_enabled,true
 
 # Branding
 Seek::Config.default :project_name,'SysMO'

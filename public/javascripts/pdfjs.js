@@ -5,7 +5,7 @@ function viewPDFContent(url) {
 
         pdfDoc = null;
         pageNum = 1;
-        scale = 1;
+        scale = 1.5;
         document.getElementById('pdf_content_display').style['display'] = 'block';
         canvas = document.getElementById('pdf-display-canvas');
         ctx = canvas.getContext('2d');
