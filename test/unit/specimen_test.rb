@@ -120,6 +120,7 @@ fixtures :all
       sop = Factory :sop, :contributor => User.current_user
       sop_version_2 = Factory("Sop::Version", :sop => sop)
       assert 2, sop.versions.count
+      assert_equal sop_version_2, sop.latest_version
 
       specimen.build_sop_masters [sop.id]
       assert specimen.valid?
@@ -128,7 +129,8 @@ fixtures :all
       assert_equal 1, specimen.sop_masters.count
       assert_equal sop, specimen.sop_masters.map(&:sop).first
       assert_equal 1, specimen.sops.count
-      assert_equal sop.latest_version, sop_version_2
+      assert_equal sop_version_2, specimen.sops.first
+
     end
   end
 end
