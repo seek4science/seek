@@ -31,7 +31,7 @@
 		
 		<%= render :partial=>"assets/asset_form_bottom", :locals=> {:show_publications=>false, :f => f}-%>
 		<%= render :partial => "assays/associate_assays", :locals=>{:resource => @sop, :show_relationships => false} -%>
-        <%= f.fancy_multiselect :samples -%>
+        <%= f.fancy_multiselect :samples, {:hidden=> @sop.samples.blank?  ? true : false, :other_projects_checkbox => true} -%>
         <% end -%>
         <p>
           <%= preview_permission_popup_link(@sop)-%>
