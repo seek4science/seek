@@ -10,8 +10,8 @@ class Publication < ActiveRecord::Base
   acts_as_asset
 
   validate :check_identifier_present
-  #validates_uniqueness_of :pubmed_id, :message => "publication has already been registered with that ID."
-  #validates_uniqueness_of :doi, :message => "publication has already been registered with that ID."
+  validates_uniqueness_of :pubmed_id, :message => "publication has already been registered with that ID.", :if =>  proc{|p| !p.pubmed_id.blank?}
+  validates_uniqueness_of :doi, :message => "publication has already been registered with that ID.", :if => proc{|p| !p.doi.blank?}
   validates_uniqueness_of :title, :message => "not unique - A publication has already been registered with that title."
   
   has_many :non_seek_authors, :class_name => 'PublicationAuthor', :dependent => :destroy
