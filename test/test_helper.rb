@@ -9,9 +9,9 @@ require 'webmock/test_unit'
 require 'action_view/test_case'
 require 'tmpdir'
 
-Factory.find_definitions #It looks like requiring factory_girl _should_ do this automatically, but it doesn't seem to work
+FactoryGirl.find_definitions #It looks like requiring factory_girl _should_ do this automatically, but it doesn't seem to work
 
-Factory.class_eval do
+FactoryGirl.class_eval do
   def self.create_with_privileged_mode *args
     disable_authorization_checks {create_without_privileged_mode *args}
   end
