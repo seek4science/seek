@@ -54,4 +54,18 @@ class SampleTest < ActiveSupport::TestCase
       assert_equal sop.latest_version, sample.sops.first
     end
   end
+
+  test "related sops and data_files" do
+    User.with_current_user Factory(:user) do
+      sample = Factory :sample, :contributor => User.current_user
+      data_file = Factory :data_file, :contributor => User.current_user
+      sample.data_file_masters << data_file
+      sop = Factory :sop, :contributor => User.current_user
+      sample.sop_masters << sop
+      assert sample.save
+
+      assert_equal [sop], sample.related_sops
+      assert_equal [data_file], sample.related_data_files
+    end
+  end
 end

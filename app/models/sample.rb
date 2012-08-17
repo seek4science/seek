@@ -62,6 +62,15 @@ class Sample < ActiveRecord::Base
 
   HUMANIZED_COLUMNS = {:title => "Sample name", :lab_internal_number=> "Sample lab internal identifier", :provider_id => "Provider's sample identifier"}
 
+  ["data_file","sop"].each do |type|
+     eval <<-END_EVAL
+       #related items hash will use data_file_masters instead of data_files, etc. (sops, models)
+       def related_#{type.pluralize}
+         #{type}_masters
+       end
+     END_EVAL
+  end
+
   searchable do
     text :searchable_terms
   end if Seek::Config.solr_enabled
