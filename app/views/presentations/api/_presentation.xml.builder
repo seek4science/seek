@@ -6,6 +6,13 @@ parent_xml.tag! "presentation",
   render :partial=>"api/standard_elements",:locals=>{:parent_xml => parent_xml,:is_root=>is_root,:object=>presentation}
   if (is_root)
     parent_xml.tag! 'filename', presentation.original_filename
+
+    parent_xml.tag! "tags" do
+      presentation.annotations.each do |a|
+        parent_xml.tag! "tag", a.value.text, {:context => :tag}
+      end
+    end
+
     associated_resources_xml parent_xml,presentation
   end
 end
