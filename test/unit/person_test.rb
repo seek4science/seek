@@ -588,7 +588,7 @@ class PersonTest < ActiveSupport::TestCase
     end
   end
 
-  test 'is_gatekeeperr?' do
+  test 'is_gatekeeper?' do
      User.with_current_user Factory(:admin).user do
       person = Factory(:person)
       person.is_gatekeeper= true
@@ -611,6 +611,20 @@ class PersonTest < ActiveSupport::TestCase
     pals = Person.pals
     assert_equal 1, pals.count
     assert pals.include?(people(:pal))
+  end
+
+  test "can_create_new_items" do
+    p=Factory :person
+    assert p.can_create_new_items?
+    assert p.member?
+
+    p.group_memberships.destroy_all
+
+    #this is necessary because Person caches the projects in the instance variable @known_projects
+    p = Person.find(p.id)
+    assert !p.member?
+    assert !p.can_create_new_items?
+
   end
 
 end
