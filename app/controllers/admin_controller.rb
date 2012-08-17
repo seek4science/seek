@@ -284,6 +284,30 @@ class AdminController < ApplicationController
     end
   end
 
+  def test_email_configuration
+    smtp_hash_old = ActionMailer::Base.smtp_settings
+    smtp_hash_new = {:address => params[:address], :domain => params[:domain], :authentication => params[:authentication].to_sym, :user_name => params[:user_name], :password => params[:password]}
+    smtp_hash_new[:port] = params[:port] if only_integer params[:port], 'port'
+    ActionMailer::Base.smtp_settings = smtp_hash_new
+    raise_delivery_errors_setting = ActionMailer::Base.raise_delivery_errors
+    ActionMailer::Base.raise_delivery_errors = true
+    begin
+      Mailer.deliver_test_email params[:testing_email]
+      render :update do |page|
+        page.replace_html "ajax_loader_position", "<div id='ajax_loader_position'></div>"
+        page.alert("test email is sent successfully to #{params[:testing_email]}")
+      end
+    rescue Exception => e
+      render :update do |page|
+        page.replace_html "ajax_loader_position", "<div id='ajax_loader_position'></div>"
+        page.alert("Fail to send test email, #{e.message}")
+      end
+    ensure
+      ActionMailer::Base.smtp_settings = smtp_hash_old
+      ActionMailer::Base.raise_delivery_errors = raise_delivery_errors_setting
+    end
+  end
+
   private
 
   def created_at_data_for_model model
