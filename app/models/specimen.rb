@@ -87,7 +87,11 @@ class Specimen < ActiveRecord::Base
 
   def related_people
     creators
-  end  
+  end
+
+  def related_sops
+    sop_masters.collect(&:sop)
+  end
   
   searchable do
     text :description,:title,:lab_internal_number

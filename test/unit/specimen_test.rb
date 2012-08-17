@@ -43,6 +43,17 @@ fixtures :all
     assert_equal specimen.creators, specimen.related_people
   end
 
+  test "related sops" do
+    User.with_current_user Factory(:user) do
+      specimen = Factory :specimen, :contributor => User.current_user
+      sop = Factory :sop, :contributor => User.current_user
+      specimen.build_sop_masters [sop.id]
+      assert specimen.save
+
+      assert_equal [sop], specimen.related_sops
+    end
+  end
+
   test "genotype_attributes" do
     specimen = Factory :specimen
     User.current_user = specimen.contributor
