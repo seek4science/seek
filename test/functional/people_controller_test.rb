@@ -747,23 +747,6 @@ class PeopleControllerTest < ActionController::TestCase
     assert_not_nil flash[:error]
   end
 
-  test 'admin can not administer other admin' do
-    admin = Factory(:admin)
-
-    get :show, :id => admin
-    assert_select "a", :text => /Person Administration/, :count => 0
-
-    get :admin, :id => admin
-
-    assert_redirected_to :root
-    assert_not_nil flash[:error]
-
-    put :administer_update, :id => admin, :person => {}
-
-    assert_redirected_to :root
-    assert_not_nil flash[:error]
-  end
-
   test "project manager can not edit admin" do
     project_manager = Factory(:project_manager)
     admin = Factory(:admin)
@@ -783,23 +766,36 @@ class PeopleControllerTest < ActionController::TestCase
     assert_not_nil flash[:error]
   end
 
-  test 'admin can not edit other admin' do
+  test 'admin can administer other admin' do
+    admin = Factory(:admin)
+
+    get :show, :id => admin
+    assert_select "a", :text => /Person Administration/, :count => 1
+
+    get :admin, :id => admin
+    assert_response :success
+
+    assert !admin.is_gatekeeper?
+    put :administer_update, :id => admin, :person => {}, :roles => {:gatekeeper => true}
+    assert_redirected_to person_path(admin)
+    assert assigns(:person).is_gatekeeper?
+  end
+
+  test 'admin can edit other admin' do
     admin = Factory(:admin)
     assert_not_nil admin.user
     assert_not_equal User.current_user, admin.user
 
     get :show, :id => admin
-    assert_select "a", :text => /Edit Profile/, :count => 0
+    assert_select "a", :text => /Edit Profile/, :count => 1
 
     get :edit, :id => admin
+    assert_response :success
 
-    assert_redirected_to :root
-    assert_not_nil flash[:error]
-
-    put :update, :id => admin, :person => {}
-
-    assert_redirected_to :root
-    assert_not_nil flash[:error]
+    assert_not_equal 'test', admin.title
+    put :update, :id => admin, :person => {:first_name => 'test'}
+    assert_redirected_to person_path(admin)
+    assert_equal 'test', assigns(:person).first_name
   end
 
   test "can edit themself" do

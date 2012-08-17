@@ -51,6 +51,18 @@ class DataFilesControllerTest < ActionController::TestCase
     test_get_xml df
 
   end
+
+  test "should include tags in XML" do
+      p=Factory :person
+      df = Factory(:data_file,:policy=>Factory(:public_policy, :access_type=>Policy::VISIBLE))
+      Factory :tag,:annotatable=>df,:source=>p,:value=>"golf"
+      get :show,:id=>df, :format=>"xml"
+
+      assert_response :success
+      xml = @response.body
+      assert xml.include?('<tags>')
+      assert xml.include?('<tag context="tag">')
+  end
   
   test "should show index" do
     get :index

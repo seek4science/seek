@@ -291,15 +291,15 @@ class Person < ActiveRecord::Base
   end
 
   #can be edited by:
-  #(admin or project managers of this person) and (this person does not have a user or not the other admin)
+  #admin or (project managers of this person and this person does not have a user or not the other admin)
   #themself
   def can_be_edited_by?(subject)
-    subject == nil ? false : (((subject.is_admin? || (!(self.projects & subject.try(:person).try(:projects).to_a).empty? && subject.is_project_manager?)) && (self.user.nil? || !self.is_admin?)) || (subject == self.user))
+    subject == nil ? false : (((subject.is_admin? || (!(self.projects & subject.try(:person).try(:projects).to_a).empty? && subject.is_project_manager? && (self.user.nil? || !self.is_admin?)))) || (subject == self.user))
   end
 
-  #admin or project manager can administer themselves and the other people, except the other admins
+  #admin or (project manager can administer themselves and the other people, except the other admins)
   def can_be_administered_by?(user)
-    user == nil ? false : ((user.is_admin?) || (user.is_project_manager?)) &&  (self.user==user || !self.user.try(:is_admin?))
+    user == nil ? false : ((user.is_admin?) || (user.is_project_manager? && (self.user==user || !self.user.try(:is_admin?))))
   end
 
   def can_view? user = User.current_user

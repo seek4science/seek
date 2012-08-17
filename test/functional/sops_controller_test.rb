@@ -656,6 +656,26 @@ class SopsControllerTest < ActionController::TestCase
      assert_select 'a', :text => /View content/, :count => 1
   end
 
+  test 'duplicated logs are NOT created by uploading new version' do
+    assert_difference('ActivityLog.count', 1) do
+      assert_difference('Sop.count', 1) do
+        post :create, :sop => valid_sop, :sharing => valid_sharing
+      end
+    end
+    al1= ActivityLog.last
+    s=assigns(:sop)
+    assert_difference('ActivityLog.count', 1) do
+      assert_difference("Sop::Version.count", 1) do
+        post :new_version, :id => s, :sop => {:data => fixture_file_upload('files/file_picture.png')}, :revision_comment => "This is a new revision"
+      end
+    end
+    al2=ActivityLog.last
+    assert_equal al1.activity_loggable, al2.activity_loggable
+    assert_equal al1.culprit, al2.culprit
+    assert_equal 'create', al1.action
+    assert_equal 'update', al2.action
+  end
+
   private
 
   def valid_sop_with_url

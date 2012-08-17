@@ -17,7 +17,7 @@ gem "rmagick","2.12.2"
 gem "mysql"
 gem 'rest-client',">=1.6.1"
 gem 'calendar_date_select'
-gem 'factory_girl',"1.3.3"
+gem 'factory_girl',"2.6.4"
 gem 'ratom',"0.6.9"
 gem 'rubyzip2'
 gem 'bio'
@@ -50,3 +50,7 @@ group :test do
   gem "ruby-prof"
   gem "webmock"
 end
+
+gem "pry", :group => :development
+gem "pry-doc", :group => :development
+gem 'ruby18_source_location', :group => :development

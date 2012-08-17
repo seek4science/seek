@@ -150,5 +150,19 @@ class PublicationTest < ActiveSupport::TestCase
     p.projects=[projects(:sysmo_project)]
     assert p.valid?
   end
+
+  test 'validate uniqueness of pubmed_id and doi' do
+    p1=Publication.new(:title=>"test1",:pubmed_id=>"1234", :project_ids => [projects(:sysmo_project).id])
+    assert p1.valid?
+    assert p1.save
+    p2=Publication.new(:title=>"test2",:pubmed_id=>"1234", :project_ids => [projects(:sysmo_project).id])
+    assert !p2.valid?
+
+    p3=Publication.new(:title=>"test3",:doi=>"1234", :project_ids => [projects(:sysmo_project).id])
+    assert p3.valid?
+    assert p3.save
+    p4=Publication.new(:title=>"test4",:doi=>"1234", :project_ids => [projects(:sysmo_project).id])
+    assert !p4.valid?
+  end
   
 end
