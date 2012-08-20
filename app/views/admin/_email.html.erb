@@ -11,7 +11,7 @@
             <li>Authentication: <%= text_field_tag(:authentication, Seek::Config.smtp_settings('authentication')) %> </li>
             <li>User name: <%= text_field_tag(:user_name, Seek::Config.smtp_settings('user_name')) %> </li>
             <li>Password: <%= password_field_tag(:password, Seek::Config.smtp_settings('password'), :autocomplete => 'off') %> </li>
-            <li class="box_simple" style="width: 40em;">Test email configuration: Here you can input an email for a test message to be sent to.
+            <li class="box_simple" style="width: 40em;">Test email configuration: Here you can input an email for a testing message to be sent to.
                 <br/>
                 Testing email: <%= text_field_tag :testing_email %>
                 <%= link_to_remote image("test",:title=>"Send testing email",:alt=>"Test")+" Test",
