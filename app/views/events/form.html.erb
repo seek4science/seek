@@ -63,7 +63,7 @@
               <%= render :partial => "assets/sharing_form" -%>
             </p>
             <p>
-              <%= render :partial => "assets/special_auth_code_form", :locals => {:f => f} %>
+              <%= render :partial => "assets/special_auth_code_form", :locals => {:f => f} if !@event.try(:new_record?)-%>
             </p>
         <% end %>
 

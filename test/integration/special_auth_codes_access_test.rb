@@ -19,10 +19,10 @@ class SpecialAuthCodesAccessTest < ActionController::IntegrationTest
     ASSETS_WITH_AUTH_CODES.each do |type_name|
       p type_name
       get "/#{type_name}/new"
-      assert_select "form div#temporary_links"
+      assert_select "form div#temporary_links", :count => 0
 
       get "/#{type_name}/#{Factory(type_name.singularize.to_sym, :policy => Factory(:public_policy)).id}/edit"
-        assert_select "form div#temporary_links"
+      assert_select "form div#temporary_links"
     end
   end
 

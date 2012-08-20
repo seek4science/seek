@@ -82,7 +82,7 @@
           <%= render :partial => "assets/sharing_form" -%>
       </p>
       
-   <%= render :partial => 'assets/special_auth_code_form', :locals => {:f => f}%>
+   <%= render :partial => 'assets/special_auth_code_form', :locals => {:f => f} if !@sample.try(:new_record?)%>
   <% end %>      
 
   <%= fancy_multiselect @sample, :data_files,  {:name => 'sample_data_file_ids', :association_class => DataFile,:selected => (params[:sample_data_file_ids] || []).map(&:to_i) | @sample.data_file_masters.map(&:id), :hidden=> @sample.data_file_masters.blank? ? true : false, :other_projects_checkbox => true} %>
