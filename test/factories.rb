@@ -303,7 +303,7 @@ end
 end
 
 #Model Version
-Factory.define("Model::Version") do |f|
+Factory.define("Model::Version".to_sym) do |f|
   f.association :model
   f.after_create do |model_version|
     model_version.model.version +=1
@@ -315,7 +315,7 @@ Factory.define("Model::Version") do |f|
 end
 
 #SOP Version
-Factory.define("Sop::Version") do |f|
+Factory.define("Sop::Version".to_sym) do |f|
   f.association :sop
   f.after_create do |sop_version|
     sop_version.sop.version +=1
@@ -326,7 +326,7 @@ Factory.define("Sop::Version") do |f|
 end
 
 #DataFile Version
-Factory.define("DataFile::Version") do |f|
+Factory.define("DataFile::Version".to_sym) do |f|
   f.association :data_file
   f.after_create do |data_file_version|
     data_file_version.data_file.version +=1
@@ -337,7 +337,7 @@ Factory.define("DataFile::Version") do |f|
 end
 
 #Presentation Version
-Factory.define("Presentation::Version") do |f|
+Factory.define("Presentation::Version".to_sym) do |f|
   f.association :presentation
   f.after_create do |presentation_version|
     presentation_version.presentation.version +=1
