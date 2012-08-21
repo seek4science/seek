@@ -124,6 +124,11 @@
         <b>Image file: </b>
         <%= file_field "#{resource_name}_image", :image_file, :onchange => "detectFileFormat('#{resource_name}_image_image_file')" %>
       </p>
+      <% if new_version && previous_version_image_file = resource.latest_version.model_image.try(:original_filename) -%>
+          <p>
+            The image file of previous version <span style="font-weight: bold;"><%= previous_version_image_file %> </span> will be used if you dont specify model image file
+          </p>
+      <% end -%>
 <% end -%>
 </div>
 </div>
