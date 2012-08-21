@@ -20,6 +20,7 @@ module Seek
         "text/x-comma-separated-values" => {:name => "Comma-seperated-values file", :icon_key => "misc_file", :extension=>"csv"},
         "text/xml" => {:name => "XML document", :icon_key => "xml_file", :extension=>"xml"},
         "application/xml" => {:name => "XML document", :icon_key => "xml_file", :extension=>"xml"},
+        "application/sbml+xml" => {:name => "SBML and XML document", :icon_key => "xml_file", :extension=>"xml"},
         "text/x-objcsrc" => {:name => "Objective C file", :icon_key => "misc_file", :extension=>"objc"}
     }
 
