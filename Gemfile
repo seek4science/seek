@@ -54,3 +54,4 @@ end
 gem "pry", :group => :development
 gem "pry-doc", :group => :development
 gem 'ruby18_source_location', :group => :development
+gem "pry-remote", :group => :development

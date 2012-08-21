@@ -137,6 +137,7 @@ class Mailer < ActionMailer::Base
     recipients testing_email
     from Seek::Config.noreply_sender
     sent_on Time.now
+    body
   end
 
   private

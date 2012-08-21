@@ -17,8 +17,8 @@
                 <%= link_to_remote image("test",:title=>"Send testing email",:alt=>"Test")+" Test",
                             :url=>{:action=>'test_email_configuration'},
                             :method=>:post,
-                            :with=>"'address=' + $F('address') + '&port=' + $F('port') + '&domain=' + $F('domain')
-                            + '&authentication=' + $F('authentication') + '&user_name=' + $F('user_name') + '&password=' + $F('password')",
+                            :with=>"'address=' + $F('address') + '&port=' + $F('port') + '&domain=' + $F('domain') + '&authentication=' + $F('authentication')
+                             + '&user_name=' + $F('user_name') + '&password=' + $F('password') + '&testing_email=' + $F('testing_email')",
                             :before => "show_ajax_loader('ajax_loader_position');"-%>
                 <div id='ajax_loader_position'></div>
             </li>
