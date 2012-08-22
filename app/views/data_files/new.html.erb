@@ -1,6 +1,7 @@
 <%= javascript_include_tag "sharing.js","associate_events.js","assays.js","attribution.js","resource.js" -%>
 <% @page_title ||= "New Data file" %>
 <h1><%= @page_title %></h1>
+<% all_institutions = Institution.find(:all, :order => :name) %>
 <div class="show_basic">
     <% form_tag({:action => :create}, :multipart => true) do -%>
       <%= hidden_field_tag 'data_file[parent_name]', @data_file.parent_name%>
@@ -15,6 +16,27 @@
             <% data_file_title_value = (params[:data_file].blank? || params[:data_file][:title].blank?) ? nil : params[:data_file][:title] -%>
             <%= text_area_tag 'data_file[title]', data_file_title_value, :style => "width: 100%;", :rows=>2 -%>
         </p>
+        <% if @data_file.is_with_sample? %>
+        <p style="margin-top: 0.5em;">
+          <b>Institution</b>
+          <span class="required">
+                    <% if Seek::Config.is_virtualliver %>
+                    *
+                    <% end %>
+          </span><br/>
+          <%= select_tag :institution_id,
+                       options_for_select(all_institutions.collect { |o| [h(o.name), o.id] }, current_user.try(:person).try(:projects).try(:first).try(:institution_ids).try(:first)), {} %>
+
+
+        </p>
+        <% end %>
+       <% if @data_file.is_with_sample? %>
+        <p style="margin-top: 0.5em;">
+          <b>Template</b>
+          <br>
+          <%=  select_tag 'data_file[template_name]', options_for_select(["Autodetect by filename", "Jena", "Duesseldorf_Bode", "Dortmund_Hengstler", "Dortmund_BCat_KO"], "Autodetect by filename") %>
+        </p>
+       <% end %>
         <p style="margin-top: 0.5em;">
             <b>Description</b>
             <br/>

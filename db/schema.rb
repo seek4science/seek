@@ -307,6 +307,7 @@ ActiveRecord::Schema.define(:version => 20120628164147) do
     t.string   "uuid"
     t.integer  "policy_id"
     t.boolean  "is_with_sample"
+    t.string   "template_name",                  :default => "none"
   end
 
   add_index "data_file_versions", ["contributor_id", "contributor_type"], :name => "index_data_file_versions_on_contributor_id_and_contributor_type"
@@ -332,6 +333,7 @@ ActiveRecord::Schema.define(:version => 20120628164147) do
     t.string   "uuid"
     t.integer  "policy_id"
     t.boolean  "is_with_sample"
+    t.string   "template_name",                 :default => "none"
   end
 
   add_index "data_files", ["contributor_id", "contributor_type"], :name => "index_data_files_on_contributor_id_and_contributor_type"

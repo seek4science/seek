@@ -4,7 +4,7 @@
   <thead>
   <th>Sample Name</th>
   <% extractions[extractions.keys.first].keys.each do |k| %>
-      <th><%= h(k) -%></th>
+      <th><%= h(k).capitalize -%></th>
   <% end -%>
   </thead>
   <tbody>
