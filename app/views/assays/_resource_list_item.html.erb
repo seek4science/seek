@@ -16,7 +16,7 @@
 
   <%= list_item_optional_attribute "Study", resource.study.try(:title), resource.study if resource.study.can_view?%>
 
-  <%= list_item_authorized_list(resource.models, "Models", true, 50, true) if resource.is_modelling? %>
+  <%= list_item_authorized_list(resource.model_masters, "Models", true, 50, true) if resource.is_modelling? %>
 
 </div>
 
