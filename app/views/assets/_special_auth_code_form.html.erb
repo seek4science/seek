@@ -21,5 +21,5 @@
         <% end %>
         <%= link_to_function "Add a Temporary Link", "$('new_temporary_link_form').show();$('new_temporary_link_form').select('.hidden_destroy_field')[0].setValue('false');$(this).hide()",  :id => "add_a_temporary_link" %>
    <% end %>
-  <%= render :partial => 'assets/folding_box', :locals => {:hidden => true, :fold_id => 'temporary_links', :fold_title => title_and_help, :contents => content} %>
+  <%= render :partial => 'assets/folding_box', :locals => {:hidden => f.object.special_auth_codes.empty? ? true : false, :fold_id => 'temporary_links', :fold_title => title_and_help, :contents => content} %>
 <% end %>
