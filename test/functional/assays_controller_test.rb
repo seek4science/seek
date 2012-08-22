@@ -894,4 +894,44 @@ end
     assert_select "a[href=?]", data_file_path(df), :text => df.title
     assert_select "a[href=?]", model_path(model), :text => model.title
   end
+
+  test 'should have associated datafiles, models and sops on assay index page for modelling assays' do
+      Assay.delete_all
+      df = Factory(:data_file,:contributor => User.current_user)
+      model = Factory(:model,:contributor => User.current_user)
+      sop = Factory(:sop,:contributor => User.current_user)
+      assay= Factory(:modelling_assay,:contributor => User.current_user.person,
+                              :study => (Factory(:study, :investigation => (Factory(:investigation)))))
+      assay.data_file_masters << df
+      assay.model_masters << model
+      assay.sop_masters << sop
+      assert assay.save
+      assert assay.is_modelling?
+
+      get :index
+      assert_response :success
+      assert_select "a[href=?]", data_file_path(df), :text => df.title
+      assert_select "a[href=?]", model_path(model), :text => model.title
+      assert_select "a[href=?]", sop_path(sop), :text => sop.title
+  end
+
+  test 'should have only associated datafiles and sops on assay index page for experimental assays' do
+        Assay.delete_all
+        df = Factory(:data_file,:contributor => User.current_user)
+        model = Factory(:model,:contributor => User.current_user)
+        sop = Factory(:sop,:contributor => User.current_user)
+        assay= Factory(:experimental_assay,:contributor => User.current_user.person,
+                                :study => (Factory(:study, :investigation => (Factory(:investigation)))))
+        assay.data_file_masters << df
+        assay.model_masters << model
+        assay.sop_masters << sop
+        assert assay.save
+        assert assay.is_experimental?
+
+        get :index
+        assert_response :success
+        assert_select "a[href=?]", data_file_path(df), :text => df.title
+        assert_select "a[href=?]", model_path(model), :text => model.title, :count => 0
+        assert_select "a[href=?]", sop_path(sop), :text => sop.title
+   end
 end
