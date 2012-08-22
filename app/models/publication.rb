@@ -10,6 +10,9 @@ class Publication < ActiveRecord::Base
   #searchable must come before acts_as_asset is called
   searchable(:ignore_attribute_changes_of=>[:updated_at,:last_used_at]) do
     text :title,:abstract,:journal,:searchable_tags, :pubmed_id, :doi
+    text :non_seek_authors do
+      non_seek_authors.compact.map(&:first_name) + non_seek_authors.compact.map(&:last_name)
+    end
   end if Seek::Config.solr_enabled
 
   acts_as_asset
