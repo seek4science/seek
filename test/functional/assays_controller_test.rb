@@ -878,4 +878,20 @@ end
       assert_equal update_permission.access_type, Policy::EDITING
     end
   end
+
+  test 'should have associated datafiles, models, on modelling assay show page' do
+    df = Factory(:data_file,:contributor => User.current_user)
+    model = Factory(:model,:contributor => User.current_user)
+    assay= Factory(:assay,:contributor => User.current_user.person,
+                            :study => (Factory(:study, :investigation => (Factory(:investigation)))))
+    assay.data_file_masters << df
+    assay.model_masters << model
+    assert assay.save
+    assert assay.is_modelling?
+
+    get :show, :id => assay
+    assert_response :success
+    assert_select "a[href=?]", data_file_path(df), :text => df.title
+    assert_select "a[href=?]", model_path(model), :text => model.title
+  end
 end
