@@ -35,6 +35,7 @@ GEM
     delayed_job (2.0.7)
       activesupport (~> 2.0)
       daemons (= 1.0.10)
+    docsplit (0.6.3)
     equivalent-xml (0.2.9)
       nokogiri (>= 1.4.3)
     factory_girl (2.6.4)
@@ -152,6 +153,7 @@ DEPENDENCIES
   cancan
   daemons
   delayed_job (~> 2.0.4)
+  docsplit
   equivalent-xml
   factory_girl (= 2.6.4)
   fastercsv (= 1.5.1)

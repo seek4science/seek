@@ -1,6 +1,7 @@
 module Seek
   module AssetsCommon
     require 'net/ftp'
+    require 'docsplit'
 
     include Seek::AnnotationCommon
     #required to get the icon_filename_for_key
@@ -280,6 +281,41 @@ module Seek
           end
         end
     end
-  end
 
+    def self.included(base)
+      base.before_filter :view_content_auth, :only => [:get_pdf]
+    end
+
+    def view_content_auth
+      name = self.controller_name.singularize
+      asset = name.camelize.constantize.find(params[:id])
+      display_asset = asset.find_version(params[:version])
+      if asset.can_download? && display_asset.can_download?
+        eval "@#{name} = asset"
+        eval "@display_#{name} = display_asset"
+      else
+        flash[:error] = "You are not authorized to view content of this  #{name.humanize}"
+        return false
+      end
+    end
+
+    def get_pdf
+      display_asset = eval("@display_#{self.controller_name.singularize}")
+      if display_asset.is_pdf?
+        send_file display_asset.content_blob.filepath, :filename => display_asset.original_filename, :content_type => display_asset.content_type, :disposition => 'attachment'
+      else
+        #convert to pdf
+        pdf_filepath = display_asset.content_blob.filepath.gsub(/dat/, 'pdf')
+        pdf_filepath_array = pdf_filepath.split('/')
+        pdf_filepath_array.delete_at(pdf_filepath_array.length - 1)
+        output_directory = pdf_filepath_array.join('/')
+        begin
+          Docsplit.extract_pdf(display_asset.content_blob.filepath, :output => output_directory)
+          send_file pdf_filepath, :filename => display_asset.original_filename, :content_type => display_asset.content_type, :disposition => 'attachment'
+        rescue
+          render :text => ''
+        end
+      end
+    end
+  end
 end

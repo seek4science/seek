@@ -1,4 +1,4 @@
-class SopsController < ApplicationController  
+class SopsController < ApplicationController
   
   include IndexPager
   include DotGenerator
