@@ -89,18 +89,31 @@ class ContentBlob < ActiveRecord::Base
   def file_exists?
     File.exist?(filepath)
   end
+
+  def pdf_file_exists?
+    File.exist?(pdf_filepath)
+  end
   
   def filepath uuid_to_use=nil
     uuid_to_use ||= uuid
+    path = directory_storage_path
+    return "#{path}/#{uuid_to_use}.dat"
+  end
+
+  def pdf_filepath
+      file_path.gsub(/dat/, 'pdf')
+  end
+
+  def directory_storage_path
     if RAILS_ENV == "test"
       path = "#{Dir::tmpdir}/seek_content_blobs"
     else
       path = "#{RAILS_ROOT}/#{DATA_STORAGE_PATH}/#{RAILS_ENV}"
     end
     FileUtils.mkdir_p(path)
-    return "#{path}/#{uuid_to_use}.dat"
+    return path
   end
-  
+
   def dump_data_to_file        
     raise Exception.new("You cannot define both :data content and a :tmp_io_object") unless @data.nil? || @tmp_io_object.nil?
     check_uuid
