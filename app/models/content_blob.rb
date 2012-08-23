@@ -86,22 +86,14 @@ class ContentBlob < ActiveRecord::Base
     end
   end        
   
-  def file_exists?
-    File.exist?(filepath)
+  def file_exists?file_path=filepath
+    File.exist?(file_path)
   end
 
-  def pdf_file_exists?
-    File.exist?(pdf_filepath)
-  end
-  
-  def filepath uuid_to_use=nil
+  def filepath format='dat',uuid_to_use=nil
     uuid_to_use ||= uuid
     path = directory_storage_path
-    return "#{path}/#{uuid_to_use}.dat"
-  end
-
-  def pdf_filepath
-      file_path.gsub(/dat/, 'pdf')
+    return "#{path}/#{uuid_to_use}.#{format}"
   end
 
   def directory_storage_path

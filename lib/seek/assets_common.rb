@@ -305,7 +305,7 @@ module Seek
         send_file display_asset.content_blob.filepath, :filename => display_asset.original_filename, :content_type => display_asset.content_type, :disposition => 'attachment'
       else
         #convert to pdf
-        pdf_filepath = display_asset.content_blob.pdf_filepath
+        pdf_filepath = display_asset.content_blob.filepath('pdf')
         output_directory = directory_storage_path
         begin
           Docsplit.extract_pdf(display_asset.content_blob.filepath, :output => output_directory)
