@@ -93,11 +93,11 @@
   end
 
   Factory.define(:ms_word_sop, :parent => :sop) do |f|
-    f.content_blob :ms_word_content_blob
+    f.association :content_blob, :factory => :ms_word_content_blob
   end
 
   Factory.define(:openoffice_word_sop, :parent => :sop) do |f|
-    f.content_blob :openoffice_word_content_blob
+    f.association :content_blob, :factory => :openoffice_word_content_blob
   end
 
 #Policy
@@ -323,11 +323,11 @@ end
   end
 
   Factory.define(:ms_ppt_presentation, :parent => :presentation) do |f|
-    f.content_blob :ms_ppt_content_blob
+    f.association :content_blob, :factory => :ms_ppt_content_blob
   end
 
   Factory.define(:openoffice_ppt_presentation, :parent => :presentation) do |f|
-    f.content_blob :openoffice_ppt_content_blob
+    f.association :content_blob, :factory => :openoffice_ppt_content_blob
   end
 
 #Model Version

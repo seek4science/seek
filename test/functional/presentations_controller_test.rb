@@ -182,4 +182,17 @@ class PresentationsControllerTest < ActionController::TestCase
     assert_select 'div', :text => /another creator/, :count => 1
   end
 
+  test 'should be able to view ms/open office ppt content' do
+    ms_ppt_presentation = Factory(:ms_ppt_presentation, :policy => Factory(:all_sysmo_downloadable_policy))
+    assert ms_ppt_presentation.is_content_viewable?
+    get :show, :id => ms_ppt_presentation.id
+    assert_response :success
+    assert_select 'a', :text => /View content/, :count => 1
+
+    openoffice_ppt_presentation = Factory(:openoffice_ppt_presentation, :policy => Factory(:all_sysmo_downloadable_policy))
+    assert openoffice_ppt_presentation.is_content_viewable?
+    get :show, :id => openoffice_ppt_presentation.id
+    assert_response :success
+    assert_select 'a', :text => /View content/, :count => 1
+  end
 end

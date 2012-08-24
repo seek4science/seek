@@ -656,6 +656,28 @@ class SopsControllerTest < ActionController::TestCase
      assert_select 'a', :text => /View content/, :count => 1
   end
 
+  test 'should be able to view ms/open office word content' do
+     ms_word_sop = Factory(:ms_word_sop, :policy => Factory(:all_sysmo_downloadable_policy))
+     assert ms_word_sop.is_content_viewable?
+     get :show, :id => ms_word_sop.id
+     assert_response :success
+     assert_select 'a', :text => /View content/, :count => 1
+
+     openoffice_word_sop = Factory(:openoffice_word_sop, :policy => Factory(:all_sysmo_downloadable_policy))
+     assert openoffice_word_sop.is_content_viewable?
+     get :show, :id => openoffice_word_sop.id
+     assert_response :success
+     assert_select 'a', :text => /View content/, :count => 1
+  end
+
+  test 'get_pdf' do
+    ms_word_sop = Factory(:ms_word_sop, :policy => Factory(:all_sysmo_downloadable_policy))
+    post :get_pdf, {:id => ms_word_sop.id, :version => '1'}
+    assert_response :success
+    assert ms_word_sop.content_blob.file_exists?(ms_word_sop.content_blob.filepath)
+    assert ms_word_sop.content_blob.file_exists?(ms_word_sop.content_blob.filepath('pdf'))
+  end
+
   test 'duplicated logs are NOT created by uploading new version' do
     assert_difference('ActivityLog.count', 1) do
       assert_difference('Sop.count', 1) do
