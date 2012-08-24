@@ -207,5 +207,5 @@ class ContentBlobTest < ActiveSupport::TestCase
       blob.save
     end
   end
-  
+
 end

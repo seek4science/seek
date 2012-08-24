@@ -217,16 +217,32 @@ class SopTest < ActiveSupport::TestCase
     assert_equal nil, sop_without_contributor.contributing_user
   end
 
-  test 'is_downloadable_pdf' do
-    sop_with_pdf_format = Factory(:sop, :content_type=>"application/pdf", :content_blob => Factory(:content_blob, :data => File.new("#{Rails.root}/test/fixtures/files/a_pdf_file.pdf","rb").read))
+  test 'is_downloadable_pdf?' do
+    sop_with_pdf_format = Factory(:sop, :content_blob => Factory(:content_blob, :content_type=>"application/pdf", :data => File.new("#{Rails.root}/test/fixtures/files/a_pdf_file.pdf","rb").read))
     User.with_current_user sop_with_pdf_format.contributor do
       assert sop_with_pdf_format.is_pdf?
       assert sop_with_pdf_format.is_downloadable_pdf?
     end
-    sop_with_no_pdf_format = Factory(:sop, :content_blob => Factory(:content_blob, :data => File.new("#{Rails.root}/test/fixtures/files/little_file.txt","rb").read))
-    User.with_current_user sop_with_pdf_format.contributor do
-       assert !sop_with_no_pdf_format.is_downloadable_pdf?
+    sop_with_no_pdf_format = Factory(:sop, :content_blob => Factory(:content_blob, :content_type=>"text/plain", :data => File.new("#{Rails.root}/test/fixtures/files/little_file.txt","rb").read))
+    User.with_current_user sop_with_no_pdf_format.contributor do
+      assert !sop_with_no_pdf_format.is_pdf?
+      assert !sop_with_no_pdf_format.is_downloadable_pdf?
     end
+  end
 
+  test 'is_content_viewable?' do
+    viewable_formats= %w[application/pdf application/msword application/vnd.ms-powerpoint application/vnd.oasis.opendocument.presentation application/vnd.oasis.opendocument.text]
+    viewable_formats.each do |viewable_format|
+      sop_with_content_viewable_format = Factory(:sop, :content_blob => Factory(:content_blob, :content_type=>viewable_format, :data => File.new("#{Rails.root}/test/fixtures/files/a_pdf_file.pdf","rb").read))
+      User.with_current_user sop_with_content_viewable_format.contributor do
+        assert sop_with_content_viewable_format.is_viewable_format?
+        assert sop_with_content_viewable_format.is_content_viewable?
+      end
+    end
+    sop_with_no_viewable_format = Factory(:sop, :content_blob => Factory(:content_blob, :content_type=>"text/plain", :data => File.new("#{Rails.root}/test/fixtures/files/little_file.txt","rb").read))
+    User.with_current_user sop_with_no_viewable_format.contributor do
+       assert !sop_with_no_viewable_format.is_viewable_format?
+       assert !sop_with_no_viewable_format.is_content_viewable?
+    end
   end
 end
