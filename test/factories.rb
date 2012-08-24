@@ -78,13 +78,19 @@
 #Sop
   Factory.define(:sop) do |f|
     f.title "This Sop"
-    f.projects {[Factory.build(:project)]}
+    f.projects { [Factory.build(:project)] }
     f.association :contributor, :factory => :user
 
     f.after_create do |sop|
-      sop.content_blob = Factory.create(:content_blob, :content_type=>"application/pdf", :asset => sop, :asset_version=>sop.version)
+      if sop.content_blob.blank?
+        sop.content_blob = Factory.create(:content_blob, :content_type => "application/pdf", :asset => sop, :asset_version => sop.version)
+      else
+        sop.content_blob.asset = sop
+        sop.content_blob.asset_version = sop.version
+        sop.content_blob.save
+      end
     end
-end
+  end
 
 #Policy
   Factory.define(:policy, :class => Policy) do |f|
@@ -293,14 +299,20 @@ end
 
 #Presentation
   Factory.define(:presentation) do |f|
-    f.sequence(:title) {|n| "A Presentation #{n}"}
-    f.projects {[Factory.build :project]}
-   # f.data_url "http://www.virtual-liver.de/images/logo.png"
-    f.association :contributor,:factory=>:user
-  f.after_create do |presentation|
-    presentation.content_blob = Factory.create(:content_blob,:original_filename=>"test.pdf", :content_type=>"application/pdf", :asset => presentation, :asset_version=>presentation.version)
+    f.sequence(:title) { |n| "A Presentation #{n}" }
+    f.projects { [Factory.build :project] }
+    # f.data_url "http://www.virtual-liver.de/images/logo.png"
+    f.association :contributor, :factory => :user
+    f.after_create do |presentation|
+      if presentation.content_blob.blank?
+        presentation.content_blob = Factory.create(:content_blob, :original_filename => "test.pdf", :content_type => "application/pdf", :asset => presentation, :asset_version => presentation.version)
+      else
+        presentation.content_blob.asset = presentation
+        presentation.content_blob.asset_version = presentation.version
+        presentation.content_blob.save
+      end
+    end
   end
-end
 
 #Model Version
 Factory.define("Model::Version".to_sym) do |f|
