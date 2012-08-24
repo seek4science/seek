@@ -208,4 +208,13 @@ class ContentBlobTest < ActiveSupport::TestCase
     end
   end
 
+  test 'directory_storage_path and filepath' do
+    content_blob = Factory(:content_blob)
+    directory_storage_path = content_blob.directory_storage_path
+    assert_equal  "/tmp/seek_content_blobs", directory_storage_path
+    assert_equal (directory_storage_path + '/' + content_blob.uuid + '.dat'), content_blob.filepath
+    assert_equal (directory_storage_path + '/' + content_blob.uuid + '.pdf'), content_blob.filepath('pdf')
+    assert_equal (directory_storage_path + '/' + content_blob.uuid + '.txt'), content_blob.filepath('txt')
+
+  end
 end
