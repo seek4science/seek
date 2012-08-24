@@ -215,6 +215,13 @@ class ContentBlobTest < ActiveSupport::TestCase
     assert_equal (directory_storage_path + '/' + content_blob.uuid + '.dat'), content_blob.filepath
     assert_equal (directory_storage_path + '/' + content_blob.uuid + '.pdf'), content_blob.filepath('pdf')
     assert_equal (directory_storage_path + '/' + content_blob.uuid + '.txt'), content_blob.filepath('txt')
-
   end
+
+  test 'file_exists?' do
+      content_blob = Factory(:content_blob)
+      assert content_blob.file_exists?
+      assert content_blob.file_exists?(content_blob.filepath)
+      assert !content_blob.file_exists?(content_blob.filepath('pdf'))
+      assert !content_blob.file_exists?(content_blob.filepath('txt'))
+    end
 end
