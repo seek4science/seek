@@ -82,7 +82,11 @@ module Acts #:nodoc:
 
         has_many :project_folder_assets, :as=>:asset, :dependent=>:destroy
 
-        has_many :project_folder_assets, :as=>:asset, :dependent=>:destroy
+        searchable do
+          text :creators do
+            creators.compact.map(&:name)
+          end
+        end if Seek::Config.solr_enabled
 
         has_many :activity_logs, :as => :activity_loggable
 

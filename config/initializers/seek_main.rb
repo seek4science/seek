@@ -52,3 +52,4 @@ if ActiveRecord::Base.connection.table_exists? 'delayed_jobs'
 end
 
 
+ENV['LANG'] = 'en_US.UTF-8'

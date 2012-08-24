@@ -11,6 +11,7 @@ upload_field = 'content_blob'  if resource.respond_to?(:content_blobs)
            <% locals = resource.respond_to?(:content_blobs) ? {:resource=>resource, :new_version=>true} : {:new_version=>true}  %>
            <%= render :partial=>"assets/upload_box" ,:locals=>locals-%>
 
+
             <p>
                 <b>Revision comments (optional)</b>
                 <br/>

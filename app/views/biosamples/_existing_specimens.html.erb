@@ -53,7 +53,6 @@
     initialiseFold('existing_specimens');
 </script>
 
-<% unless strains.blank?%>
 <div class="fold" id="existing_specimens" style="margin-left: 1em">
   <div class="foldTitle">
     <% if Seek::Config.is_virtualliver %>
@@ -88,6 +87,8 @@
               </thead>
               <tbody>
               <% existing_specimens.each do |specimen| -%>
+
+
                   <tr>
                   <% specimen_row_data = specimen_row_data specimen %>
                   <% specimen_row_data.each do |column_data| %>
@@ -112,7 +113,7 @@
   <% end %>
   </div>
 </div>
-<% end %>
+
 
 
 

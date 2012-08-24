@@ -6,6 +6,10 @@ class StrainTest < ActiveSupport::TestCase
     User.current_user = Factory(:user)
   end
 
+  def setup
+    User.current_user = Factory(:user)
+  end
+
   test "without default" do
     Strain.destroy_all
     org = Factory :organism

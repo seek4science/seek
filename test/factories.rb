@@ -98,7 +98,7 @@
 
   Factory.define(:openoffice_word_sop, :parent => :sop) do |f|
     f.association :content_blob, :factory => :openoffice_word_content_blob
-  end
+end
 
 #Policy
   Factory.define(:policy, :class => Policy) do |f|

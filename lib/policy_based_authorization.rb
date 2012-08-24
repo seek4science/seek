@@ -163,6 +163,37 @@ module Acts
         id=self.id
         ActiveRecord::Base.connection.execute("delete from #{self.class.lookup_table_name} where asset_id=#{id}")
       end
+      
+      AUTHORIZATION_ACTIONS.each do |action|
+        if Seek::Config.auth_caching_enabled
+          eval <<-END_EVAL
+          def can_#{action}? user = User.current_user
+            if self.new_record?
+              return true
+            else
+              Rails.cache.fetch(auth_key(user, "#{action}")) {perform_auth(user,"#{action}") ? :true : :false} == :true
+            end
+          end
+          END_EVAL
+        else
+          eval <<-END_EVAL
+            def can_#{action}? user = User.current_user
+                return true if new_record?
+                user_id = user.nil? ? 0 : user.id
+                if Seek::Config.auth_lookup_enabled
+                  lookup = self.class.lookup_for_asset("#{action}", user_id,self.id)
+                else
+                  lookup=nil
+                end
+                if lookup.nil?
+                  perform_auth(user,"#{action}")
+                else
+                  lookup
+                end
+            end
+          END_EVAL
+        end
+      end
         
       AUTHORIZATION_ACTIONS.each do |action|
         if Seek::Config.auth_caching_enabled

@@ -73,9 +73,9 @@ class DataFilesController < ApplicationController
           flash[:notice] = "New version uploaded - now on version #{@data_file.version}"
           if @data_file.is_with_sample?
             bio_samples = @data_file.bio_samples_population
-            unless bio_samples.instance_values["errors"].blank?
-              flash[:error] = "Warning: sample database population is not completely successful.<br/>"
-              flash[:error] << bio_samples.instance_values["errors"].html_safe
+            unless bio_samples.errors.blank?
+              flash[:notice] << "<br/> However, Sample database population failed."
+              flash[:error] = bio_samples.errors.html_safe
             end
           end
         else
@@ -176,6 +176,7 @@ class DataFilesController < ApplicationController
 
       assay_ids = params[:assay_ids] || []
 
+
         if @data_file.save
           update_annotations @data_file
 
@@ -196,10 +197,17 @@ class DataFilesController < ApplicationController
               flash[:notice] = 'Data file was successfully uploaded and saved.' if flash.now[:notice].nil?
               #parse the data file if it is with sample data
               if @data_file.is_with_sample
-                bio_samples = @data_file.bio_samples_population
-                unless  bio_samples.instance_values["errors"].blank?
-                  flash[:error] = "Warning: Sample database population is not completely successful.<br/>"
-                  flash[:error] << bio_samples.instance_values["errors"].html_safe
+                bio_samples = @data_file.bio_samples_population params[:institution_id]
+                #@bio_samples = bio_samples
+                #Rails.logger.warn "BIO SAMPLES ::: " + @bio_samples.treatments_text
+                unless  bio_samples.errors.blank?
+                  flash[:notice] << "<br/> However, Sample database population failed."
+                  flash[:error] = bio_samples.errors.html_safe
+                  #respond_to do |format|
+                  #  format.html{
+                  #    render :action => "new"
+                  #  }
+                 # end
                 end
               end
               assay_ids.each do |text|
@@ -210,6 +218,11 @@ class DataFilesController < ApplicationController
                 end
               end
               format.html { redirect_to data_file_path(@data_file) }
+            end
+          end
+
+                format.html { redirect_to data_file_path(@data_file) }
+
             end
           end
 
@@ -233,9 +246,11 @@ class DataFilesController < ApplicationController
     # (this will also trigger timestamp update in the corresponding Asset)
     @data_file.last_used_at = Time.now
     @data_file.save_without_timestamping
-    
+
+    #Rails.logger.warn "template in data_files_controller/show : #{params[:parsing_template]}"
+
     respond_to do |format|
-      format.html # show.html.erb
+      format.html #{render :locals => {:template => params[:parsing_template]}}# show.html.erb
       format.xml
       format.rdf { render :text=>@data_file.to_rdf }
       format.svg { render :text=>to_svg(@data_file,params[:deep]=='true',@data_file)}

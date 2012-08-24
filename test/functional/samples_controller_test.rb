@@ -265,6 +265,17 @@ fixtures :all
     assert_select 'p', :text => s.specimen.strain.info, :count => 0
   end
   
+  test "associate data files,models,sops" do
+      assert_difference("Sample.count") do
+      post :create, :sample => {:title=>"test",
+                                :lab_internal_number =>"Do232",
+                                :donation_date => Date.today,
+                                 :project_ids =>[Factory(:project).id],
+                                :specimen => Factory(:specimen, :contributor => User.current_user)},
+             :sample_data_file_ids => [Factory(:data_file,:title=>"testDF",:contributor=>User.current_user).id],
+             :sample_model_ids => [Factory(:model,:title=>"testModel",:contributor=>User.current_user).id],
+             :sample_sop_ids => [Factory(:sop,:title=>"testSop",:contributor=>User.current_user).id]
+  
   test "associate data files,sops" do
       assert_difference("Sample.count") do
       post :create, :sample => {:title=>"test",
@@ -278,6 +289,11 @@ fixtures :all
     end
     s = assigns(:sample)
     assert_equal "testDF", s.data_files.first.title
+    assert_equal "testSop", s.sops.first.title
+    end
+    s = assigns(:sample)
+    assert_equal "testDF", s.data_files.first.title
+    assert_equal "testModel", s.models.first.title
     assert_equal "testSop", s.sops.first.title
   end
 
@@ -337,16 +353,16 @@ end
     assert_not_nil flash[:error]
   end
 
-  test 'combined sample_specimen form when creating new sample' do
-    get :new
-    assert_response :success
-    assert_select 'input#sample_specimen_attributes_title', :count => 1
-  end
+test 'combined sample_specimen form when creating new sample' do
+  get :new
+  assert_response :success
+  assert_select 'input#sample_specimen_attributes_title', :count => 1
+end
 
-  test 'only sample form when updating sample' do
-    get :edit, :id => Factory(:sample, :policy => policies(:editing_for_all_sysmo_users_policy))
-    assert_response :success
-    assert_select 'input#sample_specimen_attributes_title', :count => 0
+test 'only sample form when updating sample' do
+  get :edit, :id => Factory(:sample, :policy => policies(:editing_for_all_sysmo_users_policy))
+  assert_response :success
+  assert_select 'input#sample_specimen_attributes_title', :count => 0
   end
 
   test "sample-sop association when sop has multiple versions" do
@@ -373,5 +389,6 @@ end
     assert_equal sop, s.sop_masters.first
     assert_equal 1, s.sops.length
     assert_equal sop_version_2, s.sops.first
-  end
+end
+
 end

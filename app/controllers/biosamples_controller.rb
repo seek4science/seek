@@ -192,7 +192,7 @@ class BiosamplesController < ApplicationController
         value.delete_if { |k, v| k=="id" }
         #delete if ,e.g. "0"=>{"_destroy"=>0} for phenotypes
         strain_params[:phenotypes_attributes].delete(key) if value.keys== ["_destroy"]
-      end
+        end
       # }
 
       strain.attributes = strain_params

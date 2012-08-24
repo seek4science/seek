@@ -146,6 +146,8 @@ module ApplicationHelper
     creatable_options = Seek::Util.user_creatable_types.collect { |c| [c.name.underscore.humanize, c.name.underscore] }
     creatable_options << ["Data file with sample", "data_file_with_sample"] if Seek::Config.sample_parser_enabled
     creatable_options
+
+    #select_tag :new_resource_type, options_for_select(Seek::Util.user_creatable_types.collect{|c| [(c.name.underscore.humanize == "Sop" ? "SOP" : c.name.underscore.humanize),c.name.underscore] })
   end
 
   def is_nil_or_empty? thing

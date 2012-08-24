@@ -173,39 +173,39 @@ fixtures :all
     assert_not_nil assigns(:specimen)
   end
 
-  test "should update genotypes and phenotypes" do
-           specimen = Factory(:specimen)
-           genotype1 = Factory(:genotype, :specimen => specimen)
-           genotype2 = Factory(:genotype, :specimen => specimen)
+test "should update genotypes and phenotypes" do
+         specimen = Factory(:specimen)
+         genotype1 = Factory(:genotype, :specimen => specimen)
+         genotype2 = Factory(:genotype, :specimen => specimen)
 
-           phenotype1 = Factory(:phenotype, :specimen => specimen)
-           phenotype2 = Factory(:phenotype, :specimen => specimen)
+         phenotype1 = Factory(:phenotype, :specimen => specimen)
+         phenotype2 = Factory(:phenotype, :specimen => specimen)
 
-           new_gene_title = 'new gene'
-           new_modification_title = 'new modification'
-           new_phenotype_description = "new phenotype"
-           login_as(specimen.contributor)
-           #[genotype1,genotype2] =>[genotype2,new genotype]
-           put :update,:id=>specimen.id,
-                                      :specimen => {
-                                      :genotypes_attributes => {'0' => {:gene_attributes => {:title => genotype2.gene.title, :id => genotype2.gene.id }, :id=>genotype2.id, :modification_attributes => {:title => genotype2.modification.title,:id=>genotype2.modification.id }},
-                                                                "2"=>{:gene_attributes => {:title => new_gene_title},:modification_attributes => {:title => new_modification_title }},
-                                                                "1"=>{:id => genotype1.id, :_destroy => 1}},
-                                      :phenotypes_attributes => { '0'=>{:description=>phenotype2.description,:id=>phenotype2.id},'2343243'=>{:id=>phenotype1.id,:_destroy=>1},"1"=>{:description=>new_phenotype_description} }
-                                      }
-           assert_redirected_to specimen_path(specimen)
+         new_gene_title = 'new gene'
+         new_modification_title = 'new modification'
+         new_phenotype_description = "new phenotype"
+         login_as(specimen.contributor)
+         #[genotype1,genotype2] =>[genotype2,new genotype]
+         put :update,:id=>specimen.id,
+                                    :specimen => {
+                                    :genotypes_attributes => {'0' => {:gene_attributes => {:title => genotype2.gene.title, :id => genotype2.gene.id }, :id=>genotype2.id, :modification_attributes => {:title => genotype2.modification.title,:id=>genotype2.modification.id }},
+                                                              "2"=>{:gene_attributes => {:title => new_gene_title},:modification_attributes => {:title => new_modification_title }},
+                                                              "1"=>{:id => genotype1.id, :_destroy => 1}},
+                                    :phenotypes_attributes => { '0'=>{:description=>phenotype2.description,:id=>phenotype2.id},'2343243'=>{:id=>phenotype1.id,:_destroy=>1},"1"=>{:description=>new_phenotype_description} }
+                                    }
+         assert_redirected_to specimen_path(specimen)
 
-           updated_specimen = Specimen.find_by_id specimen.id
-           new_gene = Gene.find_by_title(new_gene_title)
-           new_modification = Modification.find_by_title(new_modification_title)
-           new_genotype = Genotype.find(:all, :conditions => ["gene_id=? and modification_id=?", new_gene.id, new_modification.id]).first
-           new_phenotype = Phenotype.find_all_by_description(new_phenotype_description).sort_by(&:created_at).last
-           updated_genotypes = [genotype2, new_genotype].sort_by(&:id)
-           assert_equal updated_genotypes, updated_specimen.genotypes.sort_by(&:id)
+         updated_specimen = Specimen.find_by_id specimen.id
+         new_gene = Gene.find_by_title(new_gene_title)
+         new_modification = Modification.find_by_title(new_modification_title)
+         new_genotype = Genotype.find(:all, :conditions => ["gene_id=? and modification_id=?", new_gene.id, new_modification.id]).first
+         new_phenotype = Phenotype.find_all_by_description(new_phenotype_description).sort_by(&:created_at).last
+         updated_genotypes = [genotype2, new_genotype].sort_by(&:id)
+         assert_equal updated_genotypes, updated_specimen.genotypes.sort_by(&:id)
 
-           updated_phenotypes = [phenotype2, new_phenotype].sort_by(&:id)
-           assert_equal updated_phenotypes, updated_specimen.phenotypes.sort_by(&:id)
-  end
+         updated_phenotypes = [phenotype2, new_phenotype].sort_by(&:id)
+         assert_equal updated_phenotypes, updated_specimen.phenotypes.sort_by(&:id)
+   end
 
   test "specimen-sop association when sop has multiple versions" do
     sop = Factory :sop, :contributor => User.current_user

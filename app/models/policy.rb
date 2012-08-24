@@ -380,7 +380,11 @@ class Policy < ActiveRecord::Base
   end
 
   def get_person person_id, access_type
-      person = Person.find(person_id)
+      person = begin
+        Person.find(person_id)
+      rescue ActiveRecord::RecordNotFound
+        nil
+      end
       if person
         return [person.id, "#{person.name}", access_type]
       end

@@ -42,6 +42,15 @@ class ApplicationController < ActionController::Base
     end
   end
 
+  #When I set log_level :error in production.rb it didn't seem to work
+  around_filter :silence_logging if Rails.env == 'production'
+  def silence_logging
+    Rails.logger.silence do
+      yield
+    end
+  end
+
+
   before_filter :project_membership_required,:only=>[:create,:new]
 
   helper :all

@@ -21,7 +21,7 @@ module Seek
       def regenerate_uuid        
         self.uuid = "#{UUIDTools::UUID.random_create.to_s}"       
       end
-      
+
       def uuid
         unless changed.include?("uuid")
           regenerate_uuid if super.nil?

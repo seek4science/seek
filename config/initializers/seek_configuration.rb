@@ -35,7 +35,7 @@ Seek::Config.default :home_description, 'Some (configurable) information about t
 Seek::Config.default :publish_button_enabled,false
 Seek::Config.default :auth_caching_enabled,false
 Seek::Config.default :strategic_eager_loading, false
-Seek::Config.default :auth_lookup_enabled,true
+Seek::Config.default :auth_lookup_enabled,false
 Seek::Config.default :sample_parser_enabled,false
 Seek::Config.default :external_search_enabled, false
 Seek::Config.default :project_browser_enabled,false
@@ -56,7 +56,7 @@ Seek::Config.default :header_image,'sysmo-db-logo_smaller.png'
 Seek::Config.default :copyright_addendum_enabled,false
 Seek::Config.default :copyright_addendum_content,'Additions copyright ...'
 
-Seek::Config.default :is_virtualliver, false
+Seek::Config.default :is_virtualliver, true
 
 # Pagination
 Seek::Config.default :default_pages,{:specimens => 'latest',:samples => 'latest', :people => 'latest', :projects => 'latest', :institutions => 'latest', :investigations => 'latest',:studies => 'latest', :assays => 'latest', :data_files => 'latest', :models => 'latest',:sops => 'latest', :publications => 'latest',:events => 'latest', :strains => 'latest', :presentations => 'latest'}

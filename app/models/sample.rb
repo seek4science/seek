@@ -58,6 +58,8 @@ class Sample < ActiveRecord::Base
   validates_presence_of :specimen,:lab_internal_number
   validates_presence_of :donation_date if Seek::Config.is_virtualliver
 
+  validates_presence_of :donation_date if Seek::Config.is_virtualliver
+
   grouped_pagination :pages=>("A".."Z").to_a, :default_page => Seek::Config.default_page(self.name.underscore.pluralize)
 
   HUMANIZED_COLUMNS = {:title => "Sample name", :lab_internal_number=> "Sample lab internal identifier", :provider_id => "Provider's sample identifier"}
@@ -73,6 +75,9 @@ class Sample < ActiveRecord::Base
 
   searchable do
     text :searchable_terms
+    text :creators do
+      creators.compact.map(&:name)
+    end
   end if Seek::Config.solr_enabled
 
   def searchable_terms

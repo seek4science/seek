@@ -13,7 +13,7 @@ class ModelsController < ApplicationController
   
   before_filter :find_assets, :only => [ :index ]
   before_filter :find_and_auth, :except => [ :build,:index, :new, :create,:create_model_metadata,:update_model_metadata,:delete_model_metadata,:request_resource,:preview,:test_asset_url, :update_annotations_ajax]
-  before_filter :find_display_asset, :only=>[:show,:download,:execute,:builder,:simulate,:submit_to_jws,:matching_data,:visualise,:export_as_xgmml]
+  before_filter :find_display_asset, :only=>[:show,:download,:execute,:builder,:simulate,:submit_to_jws,:matching_data_files,:visualise,:export_as_xgmml]
     
   before_filter :jws_enabled,:only=>[:builder,:simulate,:submit_to_jws]
 
@@ -472,7 +472,7 @@ class ModelsController < ApplicationController
       handle_download_zip @display_model
     end
 
-  end
+    end
 
   def download_one_file
     content_blob = ContentBlob.find params[:id]
@@ -480,6 +480,8 @@ class ModelsController < ApplicationController
       send_file content_blob.filepath, :type=>content_blob.content_type, :disposition => 'attachment'
     else
       download_via_url @display_model
+    end
+  end
     end
   end
   # PUT /models/1

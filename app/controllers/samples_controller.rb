@@ -64,7 +64,9 @@ class SamplesController < ApplicationController
 
   def create
     @sample = Sample.new(params[:sample])
+    # create new specimen only for combined form
     is_new_spec = params[:sample][:specimen_id].nil? ? true : false
+
     if is_new_spec
       @sample.specimen.contributor = @sample.contributor if @sample.specimen.contributor.nil?
       @sample.specimen.projects = @sample.projects if @sample.specimen.projects.blank?

@@ -53,6 +53,10 @@ class Strain < ActiveRecord::Base
     title=="default" && is_dummy==true
   end
 
+  def is_default?
+    title=="default" && is_dummy==true
+  end
+
   def self.default_strain_for_organism organism
     organism = Organism.find(organism) unless organism.is_a?(Organism)
     strain = Strain.find(:first,:conditions=>{:organism_id=>organism.id,:is_dummy=>true})
