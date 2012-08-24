@@ -301,14 +301,15 @@ module Seek
 
     def get_pdf
       display_asset = eval("@display_#{self.controller_name.singularize}")
+      dat_filepath = display_asset.content_blob.filepath
+      pdf_filepath = display_asset.content_blob.filepath('pdf')
       if display_asset.is_pdf?
-        send_file display_asset.content_blob.filepath, :filename => display_asset.original_filename, :content_type => display_asset.content_type, :disposition => 'attachment'
+        send_file dat_filepath, :filename => display_asset.original_filename, :content_type => display_asset.content_type, :disposition => 'attachment'
       else
         #convert to pdf
-        pdf_filepath = display_asset.content_blob.filepath('pdf')
-        output_directory = directory_storage_path
+        output_directory = display_asset.content_blob.directory_storage_path
         begin
-          Docsplit.extract_pdf(display_asset.content_blob.filepath, :output => output_directory)
+          Docsplit.extract_pdf(dat_filepath, :output => output_directory) unless display_asset.content_blob.file_exists?(pdf_filepath)
           send_file pdf_filepath, :filename => display_asset.original_filename, :content_type => display_asset.content_type, :disposition => 'attachment'
         rescue
           render :text => ''
