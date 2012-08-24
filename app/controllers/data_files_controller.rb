@@ -164,10 +164,10 @@ class DataFilesController < ApplicationController
       render :text => "This user is not permitted to act on behalf of other users", :status => :forbidden
     end
   end
-  
+
   def create
     if handle_data
-      
+
       @data_file = DataFile.new params[:data_file]
       #@data_file.content_blob = ContentBlob.new :tmp_io_object => @tmp_io_object, :url=>@data_url
 
@@ -177,66 +177,64 @@ class DataFilesController < ApplicationController
       assay_ids = params[:assay_ids] || []
 
 
-        if @data_file.save
-          update_annotations @data_file
+      if @data_file.save
+        update_annotations @data_file
 
-          create_content_blobs
+        create_content_blobs
 
-          # update attributions
-          Relationship.create_or_update_attributions(@data_file, params[:attributions])
+        # update attributions
+        Relationship.create_or_update_attributions(@data_file, params[:attributions])
 
-          # update related publications
-          Relationship.create_or_update_attributions(@data_file, params[:related_publication_ids].collect { |i| ["Publication", i.split(",").first] }, Relationship::RELATED_TO_PUBLICATION) unless params[:related_publication_ids].nil?
+        # update related publications
+        Relationship.create_or_update_attributions(@data_file, params[:related_publication_ids].collect { |i| ["Publication", i.split(",").first] }, Relationship::RELATED_TO_PUBLICATION) unless params[:related_publication_ids].nil?
 
-          #Add creators
-          AssetsCreator.add_or_update_creator_list(@data_file, params[:creators])
-          if @data_file.parent_name=="assay"
-            render :partial=>"assets/back_to_fancy_parent", :locals=>{:child=>@data_file, :parent_name=>@data_file.parent_name,:is_not_fancy=>true}
-          else
-            respond_to do |format|
-              flash[:notice] = 'Data file was successfully uploaded and saved.' if flash.now[:notice].nil?
-              #parse the data file if it is with sample data
-              if @data_file.is_with_sample
-                bio_samples = @data_file.bio_samples_population params[:institution_id]
-                #@bio_samples = bio_samples
-                #Rails.logger.warn "BIO SAMPLES ::: " + @bio_samples.treatments_text
-                unless  bio_samples.errors.blank?
-                  flash[:notice] << "<br/> However, Sample database population failed."
-                  flash[:error] = bio_samples.errors.html_safe
-                  #respond_to do |format|
-                  #  format.html{
-                  #    render :action => "new"
-                  #  }
-                 # end
-                end
-              end
-              assay_ids.each do |text|
-                a_id, r_type = text.split(",")
-                @assay = Assay.find(a_id)
-                if @assay.can_edit?
-                  @assay.relate(@data_file, RelationshipType.find_by_title(r_type))
-                end
-              end
-              format.html { redirect_to data_file_path(@data_file) }
-            end
-          end
-
-                format.html { redirect_to data_file_path(@data_file) }
-
-            end
-          end
-
-          deliver_request_publish_approval params[:sharing], @data_file
-
+        #Add creators
+        AssetsCreator.add_or_update_creator_list(@data_file, params[:creators])
+        if @data_file.parent_name=="assay"
+          render :partial => "assets/back_to_fancy_parent", :locals => {:child => @data_file, :parent_name => @data_file.parent_name, :is_not_fancy => true}
         else
           respond_to do |format|
+            flash[:notice] = 'Data file was successfully uploaded and saved.' if flash.now[:notice].nil?
+            #parse the data file if it is with sample data
+            if @data_file.is_with_sample
+              bio_samples = @data_file.bio_samples_population params[:institution_id]
+              #@bio_samples = bio_samples
+              #Rails.logger.warn "BIO SAMPLES ::: " + @bio_samples.treatments_text
+              unless  bio_samples.errors.blank?
+                flash[:notice] << "<br/> However, Sample database population failed."
+                flash[:error] = bio_samples.errors.html_safe
+                #respond_to do |format|
+                #  format.html{
+                #    render :action => "new"
+                #  }
+                # end
+              end
+            end
+            assay_ids.each do |text|
+              a_id, r_type = text.split(",")
+              @assay = Assay.find(a_id)
+              if @assay.can_edit?
+                @assay.relate(@data_file, RelationshipType.find_by_title(r_type))
+              end
+            end
+            format.html { redirect_to data_file_path(@data_file) }
+          end
+        end
+        deliver_request_publish_approval params[:sharing], @data_file
+
+      else
+        respond_to do |format|
           format.html {
             render :action => "new"
           }
-          end
         end
+
+      end
     end
   end
+
+
+
   
   def show
     # store timestamp of the previous last usage

@@ -9,7 +9,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20120726155438) do
+ActiveRecord::Schema.define(:version => 20120803084456) do
 
   create_table "activity_logs", :force => true do |t|
     t.string   "action"
@@ -132,7 +132,6 @@ ActiveRecord::Schema.define(:version => 20120726155438) do
     t.integer  "strain_id"
     t.datetime "created_at"
     t.datetime "updated_at"
-    t.integer  "tissue_and_cell_type_id"
   end
 
   add_index "assay_organisms", ["assay_id"], :name => "index_assay_organisms_on_assay_id"
@@ -1096,16 +1095,9 @@ ActiveRecord::Schema.define(:version => 20120726155438) do
     t.string   "provider_id"
     t.string   "provider_name"
     t.integer  "age_at_sampling"
-    t.string   "sample_type"
-    t.string   "treatment"
     t.string   "uuid"
     t.string   "sample_type"
     t.string   "treatment"
-  end
-
-  create_table "samples_tissue_and_cell_types", :id => false, :force => true do |t|
-    t.integer "sample_id"
-    t.integer "tissue_and_cell_type_id"
   end
 
   create_table "samples_tissue_and_cell_types", :id => false, :force => true do |t|
@@ -1117,21 +1109,6 @@ ActiveRecord::Schema.define(:version => 20120726155438) do
     t.integer  "user_id"
     t.text     "search_query"
     t.text     "search_type"
-    t.datetime "created_at"
-    t.datetime "updated_at"
-  end
-
-  create_table "scales", :force => true do |t|
-    t.string   "title"
-    t.datetime "created_at"
-    t.datetime "updated_at"
-  end
-
-  create_table "scalings", :force => true do |t|
-    t.integer  "scale_id"
-    t.integer  "scalable_id"
-    t.integer  "person_id"
-    t.string   "scalable_type"
     t.datetime "created_at"
     t.datetime "updated_at"
   end
@@ -1285,7 +1262,6 @@ ActiveRecord::Schema.define(:version => 20120726155438) do
     t.string   "provider_id"
     t.string   "provider_name"
     t.boolean  "is_dummy",               :default => false
-    t.string   "age_unit"
     t.string   "uuid"
     t.string   "age_unit"
   end
@@ -1450,8 +1426,6 @@ ActiveRecord::Schema.define(:version => 20120726155438) do
     t.datetime "updated_at"
   end
 
-  add_index "tissue_and_cell_types", ["title"], :name => "title", :unique => true
-
   create_table "topics", :force => true do |t|
     t.integer  "forum_id"
     t.integer  "user_id"
@@ -1480,15 +1454,6 @@ ActiveRecord::Schema.define(:version => 20120726155438) do
 
   add_index "trash_records", ["created_at", "trashable_type"], :name => "index_trash_records_on_created_at_and_trashable_type"
   add_index "trash_records", ["trashable_type", "trashable_id"], :name => "index_trash_records_on_trashable_type_and_trashable_id"
-
-  create_table "treatments", :force => true do |t|
-    t.string   "substance"
-    t.float    "concentration"
-    t.integer  "unit_id"
-    t.string   "treatment_protocol"
-    t.datetime "created_at"
-    t.datetime "updated_at"
-  end
 
   create_table "treatments", :force => true do |t|
     t.string   "substance"

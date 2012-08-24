@@ -20,7 +20,6 @@ GEM
       activesupport (= 2.3.14)
     activesupport (2.3.14)
     addressable (2.3.2)
-    bio (1.4.2)
     akami (1.2.0)
       gyoku (>= 0.4.0)
       nokogiri (>= 1.4.0)

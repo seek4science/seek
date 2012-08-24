@@ -40,9 +40,6 @@ class SessionsController < ApplicationController
         redirect_to :root
       else
         redirect_back
-    rescue RedirectBackError
-      redirect :controller => :home, :action => :index
-    end
       end
     rescue RedirectBackError
       redirect :controller => :home, :action => :index

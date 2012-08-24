@@ -482,8 +482,7 @@ class ModelsController < ApplicationController
       download_via_url @display_model
     end
   end
-    end
-  end
+
   # PUT /models/1
   # PUT /models/1.xml
   def update
