@@ -428,6 +428,26 @@ end
     f.data  File.new("#{Rails.root}/test/fixtures/files/cronwright.xml","rb").read
   end
 
+  Factory.define(:ms_word_content_blob, :parent => :content_blob) do |f|
+    f.data File.new("#{Rails.root}/test/fixtures/files/ms_word_test.doc", "rb").read
+    f.content_type 'application/msword'
+  end
+
+  Factory.define(:openoffice_word_content_blob, :parent => :content_blob) do |f|
+    f.data File.new("#{Rails.root}/test/fixtures/files/openoffice_word_test.odt", "rb").read
+    f.content_type 'application/vnd.oasis.opendocument.text'
+  end
+
+  Factory.define(:ms_ppt_content_blob, :parent => :content_blob) do |f|
+    f.data File.new("#{Rails.root}/test/fixtures/files/ms_ppt_test.doc", "rb").read
+    f.content_type 'application/vnd.ms-powerpoint'
+  end
+
+  Factory.define(:openoffice_ppt_content_blob, :parent => :content_blob) do |f|
+    f.data File.new("#{Rails.root}/test/fixtures/files/openoffice_ppt_test.odp", "rb").read
+    f.content_type 'application/vnd.oasis.opendocument.presentation'
+  end
+
   Factory.define(:activity_log) do |f|
     f.action "create"
     f.association :activity_loggable, :factory => :data_file
