@@ -92,6 +92,14 @@
     end
   end
 
+  Factory.define(:ms_word_sop, :parent => :sop) do |f|
+    f.content_blob :ms_word_content_blob
+  end
+
+  Factory.define(:openoffice_word_sop, :parent => :sop) do |f|
+    f.content_blob :openoffice_word_content_blob
+  end
+
 #Policy
   Factory.define(:policy, :class => Policy) do |f|
     f.name "test policy"
@@ -314,6 +322,14 @@ end
     end
   end
 
+  Factory.define(:ms_ppt_presentation, :parent => :presentation) do |f|
+    f.content_blob :ms_ppt_content_blob
+  end
+
+  Factory.define(:openoffice_ppt_presentation, :parent => :presentation) do |f|
+    f.content_blob :openoffice_ppt_content_blob
+  end
+
 #Model Version
 Factory.define("Model::Version".to_sym) do |f|
   f.association :model
@@ -402,8 +418,9 @@ end
   end
 
   Factory.define(:pdf, :parent => :content_blob) do |f|
-    f.original_filename "test.pdf"
+    f.original_filename "a_pdf_file.pdf"
     f.content_type "application/pdf"
+    f.data  File.new("#{Rails.root}/test/fixtures/files/a_pdf_file.pdf","rb").read
   end
   
   Factory.define(:rightfield_content_blob,:parent=>:content_blob) do |f|
@@ -439,7 +456,7 @@ end
   end
 
   Factory.define(:ms_ppt_content_blob, :parent => :content_blob) do |f|
-    f.data File.new("#{Rails.root}/test/fixtures/files/ms_ppt_test.doc", "rb").read
+    f.data File.new("#{Rails.root}/test/fixtures/files/ms_ppt_test.ppt", "rb").read
     f.content_type 'application/vnd.ms-powerpoint'
   end
 
