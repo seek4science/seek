@@ -32,7 +32,7 @@ task :cruise, :run_secondary do |t, args|
   File.delete(run_secondary_signal) if File.exists? run_secondary_signal
 end
 
-"Second cruise task for running with .rvm via ./script/build-cruise.sh (just units to start with)"
+"Second cruise task for running with .rvm via ./script/build-cruise.sh"
 task :cruise2 do |t,args|
   FileUtils.copy(Dir.pwd+"/config/database.cc.yml", Dir.pwd+"/config/database.yml")
 
