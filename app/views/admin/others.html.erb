@@ -24,7 +24,7 @@
     } -%>
 
     <%= render :partial=>'setting_li',:locals=>{
-            :description=>"This base URL for this SEEK installation. This is required for the REST API",
+            :description=>"This base URL for this SEEK installation. This is required cases where the host cannot be determined from the request - particularly within the REST API and Subscription email notifications.",
             :name=>"Site base URL",
             :field=>text_field_tag(:site_base_host, Seek::Config.site_base_host, :title => 'this is needed for the xlinks in the REST API')
     } -%>
