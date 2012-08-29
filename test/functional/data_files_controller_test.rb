@@ -14,6 +14,7 @@ class DataFilesControllerTest < ActionController::TestCase
   def setup
     login_as(:datafile_owner)
     @object=data_files(:picture)
+    @object.tag_with "tag1,tag2"
   end
   
   def test_title
@@ -57,7 +58,8 @@ class DataFilesControllerTest < ActionController::TestCase
       df = Factory(:data_file,:policy=>Factory(:public_policy, :access_type=>Policy::VISIBLE))
       Factory :tag,:annotatable=>df,:source=>p,:value=>"golf"
       Factory :tag,:annotatable=>df,:source=>p,:value=>"<fish>"
-      Factory :tag,:annotatable=>df,:source=>p,:value=>"frog",:attribute_name=>"anothercontext"
+      Factory :tag,:annotatable=>df,:source=>p,:value=>"frog",:attribute_name=>"tool"
+      Factory :tag,:annotatable=>df,:source=>p,:value=>"stuff",:attribute_name=>"expertise"
 
       test_get_xml df
 
@@ -66,7 +68,8 @@ class DataFilesControllerTest < ActionController::TestCase
       assert xml.include?('<tags>')
       assert xml.include?('<tag context="tag">golf')
       assert xml.include?('<tag context="tag">&lt;fish&gt;')
-      assert xml.include?('<tag context="anothercontext">frog')
+      assert xml.include?('<tag context="tool">frog')
+      assert xml.include?('<tag context="expertise">stuff')
 
   end
   

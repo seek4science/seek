@@ -581,6 +581,8 @@
           <xsd:element name="creators" type="Creators" minOccurs="1"
                        maxOccurs="1"></xsd:element>
           <xsd:element name="policy" type="xsd:anyType" minOccurs="0" maxOccurs="1"></xsd:element>
+          <xsd:element name="tags" type="Tags" maxOccurs="1"
+                       minOccurs="1"></xsd:element>
           <xsd:element name="doi" type="xsd:string" minOccurs="1"
                        maxOccurs="1" nillable="true"></xsd:element>
           <xsd:element name="pubmed_id" type="xsd:string"
@@ -1052,7 +1054,7 @@
   <xsd:complexType name="Tag">
     <xsd:simpleContent>
       <xsd:extension base="xsd:string">
-        <xsd:attribute name="context" type="xsd:string" use="required"></xsd:attribute>
+        <xsd:attribute name="context" type="AnnotationContext" use="required"></xsd:attribute>
       </xsd:extension>
     </xsd:simpleContent>
   </xsd:complexType>
@@ -1290,6 +1292,14 @@
                    maxOccurs="1" minOccurs="1"></xsd:element>
     </xsd:sequence>
   </xsd:complexType>
+
+  <xsd:simpleType name="AnnotationContext">
+    <xsd:restriction base="xsd:string">
+      <xsd:enumeration value="tag"></xsd:enumeration>
+      <xsd:enumeration value="expertise"></xsd:enumeration>
+      <xsd:enumeration value="tool"></xsd:enumeration>
+    </xsd:restriction>
+  </xsd:simpleType>
 
   <xsd:simpleType name="ResourceType">
     <xsd:restriction base="xsd:string">
