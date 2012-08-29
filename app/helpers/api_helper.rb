@@ -186,7 +186,20 @@ module ApiHelper
       builder.tag! "avatars" do
         builder.tag! "avatar",avatar_xlink(object.avatar) unless object.avatar.nil?
       end      
-    end    
+    end
+    tags_xml builder,object
+
+  end
+
+  def tags_xml builder,object
+    object = object.parent if object.class.name.include?("::Version")
+    if object.respond_to?(:tags_as_text_array)
+      builder.tag! "tags" do
+        object.annotations.each do |annotation|
+          builder.tag! "tag",annotation.value.text,{:context=>annotation.attribute.name}
+        end
+      end
+    end
   end
   
   def policy_xml builder,asset
@@ -211,7 +224,7 @@ module ApiHelper
     else
       builder.tag! "policy",{"xsi:nil"=>"true"}
     end
-  end    
+  end
   
   def resource_xml builder,resource 
     builder.tag! "resource",core_xlink(resource)

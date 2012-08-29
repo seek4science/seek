@@ -114,6 +114,7 @@ module Acts #:nodoc:
       def annotations
         parent.annotations if parent.respond_to? :annotations
       end
+
     end
   end
 end

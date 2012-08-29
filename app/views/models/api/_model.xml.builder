@@ -5,11 +5,6 @@ core_xlink(model).merge(is_root ? xml_root_attributes : {}) do
   
   render :partial=>"api/standard_elements",:locals=>{:parent_xml => parent_xml,:is_root=>is_root,:object=>model}
   if (is_root)
-    parent_xml.tag! "tags" do
-      model.annotations.each do |a|
-        parent_xml.tag! "tag", a.value.text, {:context => :tag}
-      end
-    end
 
     model.model_type.nil? ? parent_xml.tag!("model_type","",{"xsi:nil"=>true}) : parent_xml.tag!("model_type",model.model_type.title)
     model.model_format.nil? ? parent_xml.tag!("model_format","",{"xsi:nil"=>true}) : parent_xml.tag!("model_format",model.model_format.title)

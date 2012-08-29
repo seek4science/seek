@@ -56,12 +56,18 @@ class DataFilesControllerTest < ActionController::TestCase
       p=Factory :person
       df = Factory(:data_file,:policy=>Factory(:public_policy, :access_type=>Policy::VISIBLE))
       Factory :tag,:annotatable=>df,:source=>p,:value=>"golf"
-      get :show,:id=>df, :format=>"xml"
+      Factory :tag,:annotatable=>df,:source=>p,:value=>"<fish>"
+      Factory :tag,:annotatable=>df,:source=>p,:value=>"frog",:attribute_name=>"anothercontext"
+
+      test_get_xml df
 
       assert_response :success
       xml = @response.body
       assert xml.include?('<tags>')
-      assert xml.include?('<tag context="tag">')
+      assert xml.include?('<tag context="tag">golf')
+      assert xml.include?('<tag context="tag">&lt;fish&gt;')
+      assert xml.include?('<tag context="anothercontext">frog')
+
   end
   
   test "should show index" do
