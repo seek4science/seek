@@ -50,7 +50,10 @@ module Seek
 
     end
 
-
+    #is an XLS Excel file rather than the newer XLSX format
+    def is_xls?
+      mime_extension(self.content_type) == "xls"
+    end
 
     #returns an array of all cell content within the workbook.
     def spreadsheet_contents_for_search obj=self

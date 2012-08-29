@@ -240,7 +240,7 @@ class DataFileTest < ActiveSupport::TestCase
       Factory :attribution,:subject=>data_file,:object=>attribution_df
       Factory :relationship,:subject=>data_file,:object=>Factory(:publication),:predicate=>Relationship::RELATED_TO_PUBLICATION
       data_file.creators = [Factory(:person),Factory(:person)]
-      Factory :annotation,:attribute_name=>"tags",:annotatable=> data_file,:attribute_id => AnnotationAttribute.create(:name=>"tags").id
+      Factory :annotation,:attribute_name=>"tag",:annotatable=> data_file,:attribute_id => AnnotationAttribute.create(:name=>"tag").id
       data_file.events = [Factory(:event)]
       data_file.save!
 
