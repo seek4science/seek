@@ -47,18 +47,7 @@
 
         <%= render :partial=>"assets/resource_version_details", :locals=>{:displayed_resource=>@display_model, :resource=>@model} -%>
         <div class="box_about_actor">
-            <p>
-                <b>Title:</b>
-                <span class="title"><%=h @display_model.title -%></span>
-            </p>
-            <p>
-                <b>File name:</b>
-                <%=h @display_model.original_filename -%>
-            </p>
-            <p>
-                <b>Format:</b>
-                <%=h mime_nice_name(@display_model.content_type) -%>
-            </p>
+          <%= render :partial => 'assets/fileinfo',:object=>@display_model -%>
             <p>
                 <b>Organism:</b>
                 <% if @display_model.organism -%>

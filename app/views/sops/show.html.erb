@@ -19,21 +19,7 @@
     <%= render :partial=>"assets/resource_version_details", :locals=>{:displayed_resource=>@display_sop, :resource=>@sop} -%>
   
     <div class="box_about_actor">
-      <p>
-        <b>Title:</b>
-        <span class="title"><%= h @display_sop.title -%></span>
-      </p>
-
-
-      <p>
-        <b>File name:</b>
-        <%= h @display_sop.original_filename -%>
-      </p>
-
-      <p>
-        <b>Format:</b>
-        <%= h mime_nice_name(@display_sop.content_type) -%>
-      </p>
+      <%= render :partial => 'assets/fileinfo',:object=>@display_sop -%>
 
       <br/>
 

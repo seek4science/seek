@@ -24,15 +24,8 @@
     <%= render :partial=>"assets/resource_version_details", :locals=>{:displayed_resource=>@display_data_file, :resource=>@data_file} -%>
     <div class="box_about_actor">
       <%= render :partial => 'projects/show_project_relationship', :locals => {:resource => @data_file}  %>
-      <p>
-        <label>File name:</label>
-        <%=h @display_data_file.original_filename -%>
-      </p>
+      <%= render :partial => 'assets/fileinfo',:object=>@display_data_file -%>
 
-      <p>
-        <label>Format:</label>
-        <%=h mime_nice_name(@display_data_file.content_type) -%>
-      </p>
       <br/>
 
       <p>

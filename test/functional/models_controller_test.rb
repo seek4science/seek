@@ -223,10 +223,21 @@ class ModelsControllerTest < ActionController::TestCase
   end
   
   test "should show model" do
-    m = models(:teusink)
-    m.save
-    get :show, :id => m
+    m = Factory :cronwright_model,:policy=>Factory(:public_policy)
+    assert_difference('ActivityLog.count') do
+      get :show, :id => m
+    end
+
     assert_response :success
+
+    assert_select "div.box_about_actor" do
+      assert_select "p > b",:text=>/File name:/
+      assert_select "p",:text=>/cronwright\.xml/
+      assert_select "p > b",:text=>/Format:/
+      assert_select "p",:text=>/XML document/
+      assert_select "p > b",:text=>/Size:/
+      assert_select "p",:text=>/5\.9 KB/
+    end
   end
   
   test "should show model with format and type" do

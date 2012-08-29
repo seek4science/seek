@@ -430,18 +430,28 @@ class DataFilesControllerTest < ActionController::TestCase
   end
   
   test "should show data file" do
-    d = data_files(:picture)
+    d = Factory :rightfield_datafile,:policy=>Factory(:public_policy)
     assert_difference('ActivityLog.count') do
       get :show, :id => d
     end
-
     assert_response :success
+
+    assert_select "div.box_about_actor" do
+      assert_select "p > b",:text=>/File name:/
+      assert_select "p",:text=>/rightfield\.xls/
+      assert_select "p > b",:text=>/Format:/
+      assert_select "p",:text=>/Spreadsheet/
+      assert_select "p > b",:text=>/Size:/
+      assert_select "p",:text=>/9\.2 KB/
+    end
+
   end
 
+
+
   test "svg handles quotes in title" do
-    d = data_files(:picture)
-    d.title="\"Title with quote"
-    d.save!
+    d = Factory :rightfield_datafile, :title=>"\"Title with quote",:policy=>Factory(:public_policy)
+
     assert_difference('ActivityLog.count') do
       get :show, :id => d
     end

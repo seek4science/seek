@@ -82,6 +82,13 @@
     f.association :contributor, :factory => :user
   end
 
+  Factory.define(:pdf_sop,:parent=>:sop) do |f|
+    f.content_type "application/pdf"
+    f.association :content_blob,:factory=>:pdf_content_blob
+    f.original_filename "pdfsop.pdf"
+  end
+
+
 #Policy
   Factory.define(:policy, :class => Policy) do |f|
     f.name "test policy"
@@ -229,6 +236,7 @@ end
 
 Factory.define(:rightfield_datafile,:parent=>:data_file) do |f|
   f.content_type "application/excel"
+  f.original_filename "rightfield.xls"
   f.association :content_blob,:factory=>:rightfield_content_blob
 end
 
@@ -275,6 +283,12 @@ end
    # f.data_url "http://www.virtual-liver.de/images/logo.png"
     f.association :contributor,:factory=>:user
     f.association :content_blob, :factory => :content_blob
+  end
+
+  Factory.define(:annotation_presentation,:parent=>:presentation) do |f|
+    f.content_type "application/vnd.ms-powerpoint"
+    f.original_filename "annotation-presentation.ppt"
+    f.association :content_blob,:factory=>:annotation_presentation_content_blob
   end
 
 #Misc
@@ -334,6 +348,15 @@ end
   Factory.define(:cronwright_model_content_blob,:parent=>:content_blob) do |f|
     f.data  File.new("#{Rails.root}/test/fixtures/files/cronwright.xml","rb").read
   end
+
+  Factory.define(:annotation_presentation_content_blob,:parent=>:content_blob) do |f|
+    f.data  File.new("#{Rails.root}/test/fixtures/files/data-annotation-rightfield.ppt","rb").read
+  end
+
+
+Factory.define(:pdf_content_blob,:parent=>:content_blob) do |f|
+  f.data  File.new("#{Rails.root}/test/fixtures/files/a_pdf_file.pdf","rb").read
+end
 
   Factory.define(:activity_log) do |f|
     f.action "create"

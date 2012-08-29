@@ -20,26 +20,7 @@
     <%= render :partial=>"assets/resource_version_details", :locals=>{:displayed_resource=>@display_presentation, :resource=>@presentation} -%>
 
     <div class="box_about_actor">
-      <p>
-        <b>Title:</b>
-        <span class="title"><%= h @display_presentation.title -%></span>
-      </p>
-
-
-      <p>
-        <b>File name:</b>
-        <%= h @display_presentation.original_filename -%>
-
-
-      </p>
-      <div id="div_for_viewerPlaceHolder" style="width:600px;height:480px;display:none">
-          <a id="viewerPlaceHolder" style="width:595px;height:480px;display:block"></a>
-      </div>
-      <p>
-        <b>Format:</b>
-        <%= h mime_nice_name(@display_presentation.content_type) -%>
-      </p>
-
+      <%= render :partial => 'assets/fileinfo',:object=>@display_presentation -%>
       <br/>
 
       <p>
