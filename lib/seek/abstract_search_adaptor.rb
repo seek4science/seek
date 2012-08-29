@@ -12,7 +12,7 @@ module Seek
     def search query
       perform_search(query).each do |result|
         result.partial_path ||= partial_path
-        result.tab ||= name.capitalize
+        result.tab ||= name
       end
     end
 
