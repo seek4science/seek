@@ -180,7 +180,7 @@ module ApiHelper
     end
     
     policy_xml builder,object if try_block{current_user.person.is_admin?} && object.respond_to?("policy")
-    blob_xml builder,object.content_blob if object.respond_to?("content_blob")
+    blob_xml builder,object,object.content_blob if object.respond_to?("content_blob")
     
     if object.respond_to?("avatar")
       builder.tag! "avatars" do
@@ -230,11 +230,12 @@ module ApiHelper
     builder.tag! "resource",core_xlink(resource)
   end
   
-  def blob_xml builder,blob
+  def blob_xml builder,object,blob
     builder.tag! "blob",core_xlink(blob) do      
       builder.tag! "uuid",blob.uuid
       builder.tag! "md5sum",blob.md5sum
       builder.tag! "url",blob.url
+      builder.tag! "original_filename",object.original_filename
       builder.tag! "is_remote",!blob.file_exists?
     end
   end
