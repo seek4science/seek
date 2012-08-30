@@ -74,13 +74,6 @@ fixtures :all
     assert specimen.phenotypes.detect {|p| p.description == 'test phenotype2'}
   end
 
-  test "related people" do
-    specimen = Factory :specimen
-    specimen.creators = [Factory(:person),Factory(:person)]
-
-    assert_equal specimen.creators, specimen.related_people
-  end
-
   test "related sops" do
     User.with_current_user Factory(:user) do
       specimen = Factory :specimen, :contributor => User.current_user
