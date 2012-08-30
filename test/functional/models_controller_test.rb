@@ -300,13 +300,14 @@ class ModelsControllerTest < ActionController::TestCase
   end
   
   test "should show model" do
-    m = Factory :cronwright_model,:policy=>Factory(:public_policy)
+    m = Factory :model,:policy=>Factory(:public_policy)
     assert_difference('ActivityLog.count') do
       get :show, :id => m
     end
 
     assert_response :success
 
+    #FIXME: this is currently failing due to changes in model fileinfo details being required - due to models having multiple files.
     assert_select "div.box_about_actor" do
       assert_select "p > b",:text=>/File name:/
       assert_select "p",:text=>/cronwright\.xml/

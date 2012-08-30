@@ -290,12 +290,8 @@ end
     f.projects {[Factory.build(:project)]}
     f.association :contributor, :factory => :user
     f.after_create do |model|
-       model.content_blobs = [Factory.create(:pdf_content_blob, :asset => model,:asset_version=>model.version)] if model.content_blobs.blank?
+       model.content_blobs = [Factory.create(:cronwright_model_content_blob, :asset => model,:asset_version=>model.version)] if model.content_blobs.blank?
     end
-  end
-
-  Factory.define(:cronwright_model,:parent=>:model) do |f|
-    f.association :content_blob,:factory=>:cronwright_model_content_blob
   end
 
 #Publication
