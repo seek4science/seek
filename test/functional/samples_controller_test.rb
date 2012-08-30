@@ -265,7 +265,7 @@ fixtures :all
     assert_select 'p', :text => s.specimen.strain.info, :count => 0
   end
   
-  test "associate data files,sops" do
+  test "associate data files and sops" do
       assert_difference("Sample.count") do
       post :create, :sample => {:title=>"test",
                                 :lab_internal_number =>"Do232",
@@ -279,14 +279,10 @@ fixtures :all
     s = assigns(:sample)
     assert_equal "testDF", s.data_files.first.title
     assert_equal "testSop", s.sops.first.title
+  end
 
-    s = assigns(:sample)
-    assert_equal "testDF", s.data_files.first.title
-    assert_equal "testModel", s.models.first.title
-    assert_equal "testSop", s.sops.first.title
-   end
 
-  test "should show organism and strain information of a sample if there is organism" do
+test "should show organism and strain information of a sample if there is organism" do
     s = Factory :sample, :contributor => User.current_user
     get :show, :id => s.id
 
