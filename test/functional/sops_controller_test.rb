@@ -278,7 +278,7 @@ class SopsControllerTest < ActionController::TestCase
     assert_response :success
     assert_select "div.box_about_actor" do
       assert_select "p > b",:text=>/File name:/
-      assert_select "p",:text=>/pdfsop\.pdf/
+      assert_select "p",:text=>/a_pdf_file\.pdf/
       assert_select "p > b",:text=>/Format:/
       assert_select "p",:text=>/PDF document/
       assert_select "p > b",:text=>/Size:/
@@ -295,8 +295,6 @@ class SopsControllerTest < ActionController::TestCase
     #this is to check the SOP is all upper case in the sharing form
     assert_select "label",:text=>/Keep this SOP private/
   end
-
-  
 
   test "publications excluded in form for sops" do
     login_as(:owner_of_my_first_sop)

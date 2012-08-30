@@ -101,9 +101,7 @@
 end
 
   Factory.define(:pdf_sop,:parent=>:sop) do |f|
-    f.content_type "application/pdf"
     f.association :content_blob,:factory=>:pdf_content_blob
-    f.original_filename "pdfsop.pdf"
   end
 
 
@@ -261,7 +259,7 @@ Factory.define(:data_file) do |f|
   f.association :contributor, :factory => :user
   f.after_create do |data_file|
     if data_file.content_blob.blank?
-      data_file.content_blob = Factory.create(:pdf, :asset => data_file, :asset_version=>data_file.version)
+      data_file.content_blob = Factory.create(:pdf_content_blob, :asset => data_file, :asset_version=>data_file.version)
     else
       data_file.content_blob.asset = data_file
       data_file.content_blob.asset_version = data_file.version
@@ -271,8 +269,6 @@ Factory.define(:data_file) do |f|
 end
 
 Factory.define(:rightfield_datafile,:parent=>:data_file) do |f|
-  f.content_type "application/excel"
-  f.original_filename "rightfield.xls"
   f.association :content_blob,:factory=>:rightfield_content_blob
 end
 
@@ -281,12 +277,10 @@ Factory.define(:rightfield_annotated_datafile,:parent=>:data_file) do |f|
 end
 
 Factory.define(:non_spreadsheet_datafile,:parent=>:data_file) do |f|
-  f.content_type "text/xml"
   f.association :content_blob,:factory=>:cronwright_model_content_blob
 end
 
 Factory.define(:xlsx_spreadsheet_datafile,:parent=>:data_file) do |f|
-  f.content_type "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
   f.association :content_blob,:factory=>:xlsx_content_blob
 end
 
@@ -296,14 +290,12 @@ end
     f.projects {[Factory.build(:project)]}
     f.association :contributor, :factory => :user
     f.after_create do |model|
-       model.content_blobs = [Factory.create(:pdf, :asset => model,:asset_version=>model.version)] if model.content_blobs.blank?
+       model.content_blobs = [Factory.create(:pdf_content_blob, :asset => model,:asset_version=>model.version)] if model.content_blobs.blank?
     end
   end
 
   Factory.define(:cronwright_model,:parent=>:model) do |f|
-    f.content_type "text/xml"
     f.association :content_blob,:factory=>:cronwright_model_content_blob
-    f.original_filename "cronwright.xml"
   end
 
 #Publication
@@ -339,10 +331,49 @@ end
     f.association :content_blob, :factory => :openoffice_ppt_content_blob
   end
 
-  Factory.define(:annotation_presentation,:parent=>:presentation) do |f|
-    f.content_type "application/vnd.ms-powerpoint"
-    f.original_filename "annotation-presentation.ppt"
-    f.association :content_blob,:factory=>:annotation_presentation_content_blob
+  #Model Version
+  Factory.define("Model::Version".to_sym) do |f|
+    f.association :model
+    f.after_create do |model_version|
+      model_version.model.version +=1
+      model_version.model.save
+      model_version.version = model_version.model.version
+      model_version.save
+    end
+
+  end
+
+  #SOP Version
+  Factory.define("Sop::Version".to_sym) do |f|
+    f.association :sop
+    f.after_create do |sop_version|
+      sop_version.sop.version +=1
+      sop_version.sop.save
+      sop_version.version = sop_version.sop.version
+      sop_version.save
+    end
+  end
+
+  #DataFile Version
+  Factory.define("DataFile::Version".to_sym) do |f|
+    f.association :data_file
+    f.after_create do |data_file_version|
+      data_file_version.data_file.version +=1
+      data_file_version.data_file.save
+      data_file_version.version = data_file_version.data_file.version
+      data_file_version.save
+    end
+  end
+
+  #Presentation Version
+  Factory.define("Presentation::Version".to_sym) do |f|
+    f.association :presentation
+    f.after_create do |presentation_version|
+      presentation_version.presentation.version +=1
+      presentation_version.presentation.save
+      presentation_version.version = presentation_version.presentation.version
+      presentation_version.save
+    end
   end
 
 #Misc
@@ -387,18 +418,20 @@ end
     f.sequence(:data) {|n| "data [#{n}]" }
   end
 
-  Factory.define(:pdf, :parent => :content_blob) do |f|
+  Factory.define(:pdf_content_blob, :parent => :content_blob) do |f|
     f.original_filename "a_pdf_file.pdf"
     f.content_type "application/pdf"
     f.data  File.new("#{Rails.root}/test/fixtures/files/a_pdf_file.pdf","rb").read
   end
   
   Factory.define(:rightfield_content_blob,:parent=>:content_blob) do |f|
-    f.data  File.new("#{Rails.root}/test/fixtures/files/rightfield-test.xls","rb").read
     f.content_type "application/excel"
+    f.original_filename "rightfield.xls"
+    f.data  File.new("#{Rails.root}/test/fixtures/files/rightfield-test.xls","rb").read
   end
 
-  Factory.define(:spreadsheet, :parent => :content_blob) do |f|
+  Factory.define(:spreadsheet_content_blob, :parent => :content_blob) do |f|
+    f.content_type "application/excel"
     f.original_filename "test.xls"
   end
 
@@ -408,21 +441,36 @@ end
   end
 
   Factory.define(:xlsx_content_blob,:parent=>:content_blob) do |f|
+    f.content_type "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
     f.data  File.new("#{Rails.root}/test/fixtures/files/lihua_column_index_error.xlsx","rb").read
   end
 
   Factory.define(:cronwright_model_content_blob,:parent=>:content_blob) do |f|
+    f.content_type "text/xml"
+    f.original_filename "cronwright.xml"
     f.data  File.new("#{Rails.root}/test/fixtures/files/cronwright.xml","rb").read
   end
 
-  Factory.define(:annotation_presentation_content_blob,:parent=>:content_blob) do |f|
-    f.data  File.new("#{Rails.root}/test/fixtures/files/data-annotation-rightfield.ppt","rb").read
+  Factory.define(:ms_word_content_blob, :parent => :content_blob) do |f|
+    f.data File.new("#{Rails.root}/test/fixtures/files/ms_word_test.doc", "rb").read
+    f.content_type 'application/msword'
   end
 
+  Factory.define(:openoffice_word_content_blob, :parent => :content_blob) do |f|
+    f.data File.new("#{Rails.root}/test/fixtures/files/openoffice_word_test.odt", "rb").read
+    f.content_type 'application/vnd.oasis.opendocument.text'
+  end
 
-Factory.define(:pdf_content_blob,:parent=>:content_blob) do |f|
-  f.data  File.new("#{Rails.root}/test/fixtures/files/a_pdf_file.pdf","rb").read
-end
+  Factory.define(:ms_ppt_content_blob, :parent => :content_blob) do |f|
+    f.original_filename "ms_ppt_presentation.ppt"
+    f.data File.new("#{Rails.root}/test/fixtures/files/ms_ppt_test.ppt", "rb").read
+    f.content_type 'application/vnd.ms-powerpoint'
+  end
+
+  Factory.define(:openoffice_ppt_content_blob, :parent => :content_blob) do |f|
+    f.data File.new("#{Rails.root}/test/fixtures/files/openoffice_ppt_test.odp", "rb").read
+    f.content_type 'application/vnd.oasis.opendocument.presentation'
+  end
 
   Factory.define(:activity_log) do |f|
     f.action "create"
@@ -566,7 +614,7 @@ end
   end
 
   Factory.define :worksheet do |f|
-    f.content_blob { Factory.build(:spreadsheet, :asset => Factory(:data_file))}
+    f.content_blob { Factory.build(:spreadsheet_content_blob, :asset => Factory(:data_file))}
     f.last_row 10
     f.last_column 10
   end

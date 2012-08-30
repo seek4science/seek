@@ -51,7 +51,7 @@ class PresentationsControllerTest < ActionController::TestCase
   end
 
   test "can show" do
-    presentation = Factory :annotation_presentation,:contributor=>User.current_user
+    presentation = Factory :ms_ppt_presentation,:contributor=>User.current_user
     assert_difference "ActivityLog.count" do
       get :show,:id=>presentation
     end
@@ -60,11 +60,11 @@ class PresentationsControllerTest < ActionController::TestCase
 
     assert_select "div.box_about_actor" do
       assert_select "p > b",:text=>/File name:/
-      assert_select "p",:text=>/annotation-presentation.ppt/
+      assert_select "p",:text=>/ms_ppt_presentation\.ppt/
       assert_select "p > b",:text=>/Format:/
       assert_select "p",:text=>/PowerPoint presentation/
       assert_select "p > b",:text=>/Size:/
-      assert_select "p",:text=>/266\.2 KB/
+      assert_select "p",:text=>/81\.9 KB/
     end
   end
 
