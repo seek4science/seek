@@ -11,13 +11,13 @@ class SearchBiomodelsAdaptorTest < ActiveSupport::TestCase
     adaptor = Seek::BiomodelsSearch::SearchBiomodelsAdaptor.new yaml
     assert_equal false,adaptor.enabled?
     assert_equal "lib/seek/biomodels_search/_biomodels_resource_list_item.html.erb",adaptor.partial_path
-    assert_equal "biomodels",adaptor.name
+    assert_equal "Biomodels",adaptor.name
     assert_equal "models",adaptor.search_type
   end
 
   test "search" do
     with_config_value :pubmed_api_email, "seek@sysmo-db.org" do
-      adaptor = Seek::BiomodelsSearch::SearchBiomodelsAdaptor.new({"partial_path"=>"lib/test-partial.erb","name"=>"biomodels"})
+      adaptor = Seek::BiomodelsSearch::SearchBiomodelsAdaptor.new({"partial_path"=>"lib/test-partial.erb","name"=>"Biomodels"})
       results = adaptor.search("yeast")
       assert_equal 14,results.count
       assert_equal 14,results.select{|r| r.kind_of?(Seek::BiomodelsSearch::BiomodelsSearchResult)}.count
