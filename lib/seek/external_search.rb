@@ -4,15 +4,27 @@ module Seek
 
     #returns an array of instantiated search adaptors that match the appropriate search type, or for any search type if 'all' or nothing is specified.
     def search_adaptors type="all"
-      file_names = Dir.glob("config/external_search_adaptors/*.yml")
-      files = file_names.collect{|filename| YAML::load_file(filename)}
+
+      files = search_adaptor_files type
 
       adaptors = files.collect do |file|
         file["adaptor_class_name"].constantize.new(file)
       end
-      adaptors.select do |adaptor|
-        adaptor.enabled? && (type=="all" ? true : adaptor.search_type==type)
+
+    end
+
+    def search_adaptor_files type="all"
+      file_names = Dir.glob("config/external_search_adaptors/*.yml")
+      files = file_names.collect{|filename| YAML::load_file(filename)}
+
+      unless type=="all"
+        files = files.select{|f| f["search_type"]==type}
       end
+      files.select{|f| f["enabled"]==true}
+    end
+
+    def search_adaptor_names type="all"
+      search_adaptor_files(type).collect{|f| f["name"]}
     end
 
 

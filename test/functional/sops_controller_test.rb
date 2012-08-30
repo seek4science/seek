@@ -269,9 +269,21 @@ class SopsControllerTest < ActionController::TestCase
 
   test "should show sop" do
     login_as(:owner_of_my_first_sop)
-    s=sops(:my_first_sop)
-    get :show, :id => s.id
+    s=Factory :pdf_sop,:policy=>Factory(:public_policy)
+
+    assert_difference('ActivityLog.count') do
+      get :show, :id => s.id
+    end
+
     assert_response :success
+    assert_select "div.box_about_actor" do
+      assert_select "p > b",:text=>/File name:/
+      assert_select "p",:text=>/pdfsop\.pdf/
+      assert_select "p > b",:text=>/Format:/
+      assert_select "p",:text=>/PDF document/
+      assert_select "p > b",:text=>/Size:/
+      assert_select "p",:text=>/22\.4 KB/
+    end
   end
 
   test "should get edit" do

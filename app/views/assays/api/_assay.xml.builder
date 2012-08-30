@@ -28,12 +28,6 @@ core_xlink(assay).merge(is_root ? xml_root_attributes : {}) do
       assay_data_relationships_xml parent_xml,assay
     end
 
-    parent_xml.tag! "tags" do
-      assay.annotations.each do |a|
-        parent_xml.tag! "tag", a.value.text, {:context => :tag}
-      end
-    end
-
     associated_resources_xml parent_xml,assay
     
   end

@@ -41,7 +41,7 @@ task :cruise do |t, args|
   Rake::Task["parallel:test"].invoke(args[:count])
 end
 
-"Second cruise task for running with .rvm via ./script/build-cruise.sh (just units to start with)"
+"Second cruise task for running with .rvm via ./script/build-cruise.sh"
 task :cruise2 do |t,args|
   FileUtils.copy(Dir.pwd+"/config/database.cc.yml", Dir.pwd+"/config/database.yml")
 

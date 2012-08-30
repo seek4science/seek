@@ -11,12 +11,19 @@ class ExternalSearchTest < ActiveSupport::TestCase
     an_instance = adaptors.select{|a| a.kind_of?(Seek::BiomodelsSearch::SearchBiomodelsAdaptor)}.first
     assert an_instance.kind_of?(Seek::AbstractSearchAdaptor)
     assert_equal true, an_instance.enabled?
-    assert_equal "biomodels",an_instance.name
+    assert_equal "Biomodels",an_instance.name
 
     adaptors = search_adaptors "models"
     assert !adaptors.select{|a| a.kind_of?(Seek::BiomodelsSearch::SearchBiomodelsAdaptor)}.empty?
 
     adaptors = search_adaptors "data_files"
     assert adaptors.select{|a| a.kind_of?(Seek::BiomodelsSearch::SearchBiomodelsAdaptor)}.empty?
+  end
+
+  test "search adaptor names" do
+    assert_equal ["Biomodels"],search_adaptor_names("all")
+    assert_equal ["Biomodels"],search_adaptor_names
+    assert_equal ["Biomodels"],search_adaptor_names("models")
+    assert_equal [],search_adaptor_names("sops")
   end
 end

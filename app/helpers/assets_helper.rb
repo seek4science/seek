@@ -6,6 +6,16 @@ module AssetsHelper
     image_tag(icon_filename,:alt=>"Request",:title=>"Request") + " Request #{resource_type}"
   end
 
+  def filesize_as_text resource
+    size=resource.content_blob.nil? ? 0 : resource.content_blob.filesize
+    if size.nil?
+      "<span class='none_text'>Unknown</span>"
+    else
+      size = size/1000.0
+      "%.1f KB" % size
+    end
+  end
+
   #returns all the classes for models that return true for is_asset?
   def asset_model_classes
     @@asset_model_classes ||= Seek::Util.persistent_classes.select do |c|

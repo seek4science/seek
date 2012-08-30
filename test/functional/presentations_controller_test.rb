@@ -3,11 +3,14 @@ require 'test_helper'
 class PresentationsControllerTest < ActionController::TestCase
 
   include AuthenticatedTestHelper
+  include RestTestCases
 
   def setup
     WebMock.allow_net_connect!
     login_as Factory(:user)
     User.current_user.person.set_default_subscriptions
+    @object = Factory :presentation,:contributor=>User.current_user
+    @object.tag_with "tag1"
   end
 
   test "index" do
@@ -48,9 +51,21 @@ class PresentationsControllerTest < ActionController::TestCase
   end
 
   test "can show" do
-    presentation = Factory :presentation,:contributor=>User.current_user
-    get :show,:id=>presentation
+    presentation = Factory :annotation_presentation,:contributor=>User.current_user
+    assert_difference "ActivityLog.count" do
+      get :show,:id=>presentation
+    end
+
     assert_response :success
+
+    assert_select "div.box_about_actor" do
+      assert_select "p > b",:text=>/File name:/
+      assert_select "p",:text=>/annotation-presentation.ppt/
+      assert_select "p > b",:text=>/Format:/
+      assert_select "p",:text=>/PowerPoint presentation/
+      assert_select "p > b",:text=>/Size:/
+      assert_select "p",:text=>/266\.2 KB/
+    end
   end
 
   test "can download" do

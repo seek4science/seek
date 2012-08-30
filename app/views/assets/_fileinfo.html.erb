@@ -1,0 +1,14 @@
+<p>
+  <b>File name:</b>
+  <%=h fileinfo.original_filename -%>
+</p>
+
+<p>
+  <b>Format:</b>
+  <%=h mime_nice_name(fileinfo.content_type) -%>
+</p>
+
+<p>
+  <b>Size:</b>
+  <%= filesize_as_text(fileinfo) %>
+</p>
