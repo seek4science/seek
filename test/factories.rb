@@ -299,7 +299,7 @@ end
     f.sequence(:title) {|n| "A Publication #{n}"}
     f.pubmed_id 1
     f.projects {[Factory.build(:project)]}
-    f.association :contributor, :factory => :user
+    f.contributor :factory => :user
   end
 
 #Presentation
