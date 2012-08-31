@@ -7,8 +7,8 @@
 
 <% if !logged_in? || current_user.try(:show_guide_box?) %>
     <div id='guide_box' class='top_home_panel' style="min-height: 4em;">
-      <p style="text-align:center">For <span style="font-weight:bolder">Help and FAQ</span>, please visit <%= link_to 'Help and FAQ', help_documents_path, :target => "_blank"%></p>
-      <p style="text-align:center">For information about <span style="font-weight:bolder">Templates</span>, please visit <%= link_to 'Templates', help_documents_path + '/templates', :target => "_blank"%></p>
+      <p style="text-align:center">For <span style="font-weight:bolder">Help and FAQ</span>, please visit <%= link_to 'Help and FAQ', help_documents_path %></p>
+      <p style="text-align:center">For information about <span style="font-weight:bolder">Templates</span>, please visit <%= link_to 'Templates', help_documents_path + '/templates' %></p>
       <span style="float: right;margin-right: 0.5em;margin-top: -3em"><%= link_to_remote(image('destroy',:method => :post, :title => "#{logged_in? ? 'After deleting this box, it will not be showed next time you login to the page' : 'Delete this box'}"), {:url => hide_guide_box_users_path()})%></span>
     </div>
 <% end %>
