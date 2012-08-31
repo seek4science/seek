@@ -138,7 +138,6 @@ class PolicyTest < ActiveSupport::TestCase
     policy = Factory(:private_policy)
     User.with_current_user Factory(:user) do
       people_in_group = policy.summarize_permissions [], [asset_manager]
-      puts people_in_group.inspect
       assert !people_in_group[Policy::MANAGING].include?([asset_manager.id, asset_manager.name,Policy::MANAGING])
     end
   end

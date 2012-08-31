@@ -39,15 +39,4 @@ class RemoteDownloaderTest < ActiveSupport::TestCase
     assert_equal "a-file.txt",res[:filename]
   end
 
-  def test_fetch_from_ftp
-    puts "Skipping RemoteDownloaderTest#test_fetch_from_ftp"
-    return
-    ftp_url = "ftp://ftp.mirrorservice.org/sites/amd64.debian.net/robots.txt"
-    
-    res = @downloader.get_remote_data(ftp_url)
-    assert_not_nil res[:data_tmp_path]
-    assert File.exists?(res[:data_tmp_path])
-    assert_equal "robots.txt",res[:filename]
-  end
-
 end
