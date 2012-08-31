@@ -242,24 +242,6 @@ class DataFilesControllerTest < ActionController::TestCase
     assert_equal "image/png", assigns(:data_file).content_type
   end
   
-  test "should create data file with ftp_url" do
-    #FIXME FTP call needs mocking out
-    return puts("Skipping test DataFileControllerTest 'should create data file with ftp_url'")
-    assert_difference('ActivityLog.count') do
-      assert_difference('DataFile.count') do
-        assert_difference('ContentBlob.count') do
-          post :create, :data_file => valid_data_file_with_ftp_url, :sharing=>valid_sharing
-        end
-      end
-    end
-    assert_redirected_to data_file_path(assigns(:data_file))
-    assert_equal users(:datafile_owner),assigns(:data_file).contributor
-    assert !assigns(:data_file).content_blob.url.blank?
-    assert assigns(:data_file).content_blob.data_io_object.nil?
-    assert !assigns(:data_file).content_blob.file_exists?
-    assert_equal "robots.txt", assigns(:data_file).original_filename    
-  end
-  
   test "should not create data file with file url" do
     file_path=File.expand_path(__FILE__) #use the current file
     file_url="file://"+file_path
@@ -1181,7 +1163,7 @@ class DataFilesControllerTest < ActionController::TestCase
   end
   
   def valid_data_file_with_ftp_url
-      { :title=>"Test FTP",:data_url=>"ftp://ftp.mirrorservice.org/sites/amd64.debian.net/robots.txt",:projects=>[projects(:sysmo_project)]}
+      { :title=>"Test FTP",:data_url=>"ftp://mockedlocation.com/file.txt",:projects=>[projects(:sysmo_project)]}
   end
   
 end
