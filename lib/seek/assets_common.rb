@@ -13,7 +13,8 @@ module Seek
         symb  =c.to_sym                                                                           
         params[symb].delete 'data_url'                                                            
         params[symb].delete 'data'                                                                
-        params[symb].delete 'local_copy'                                                          
+        params[symb].delete 'local_copy'
+        params[symb].delete 'external_link'
         obj=model.new params[symb]                                                                
         eval "@#{c.singularize} = obj"                                                            
     end
@@ -119,7 +120,7 @@ module Seek
     
     def download_via_url asset    
       code = url_response_code(asset.content_blob.url)
-      if (["302","401"].include?(code))
+      if (["302","401"].include?(code)) || asset.content_blob.external_link?
         redirect_to(asset.content_blob.url,:target=>"_blank")
       elsif code=="404"
         flash[:error]="This item is referenced at a remote location, which is currently unavailable"
@@ -170,6 +171,7 @@ module Seek
           elsif !(params[symb][:data_url]).blank?
             make_local_copy = (params[symb][:local_copy]=="1")
             @data_url=params[symb][:data_url]
+            @external_link = (params[symb][:external_link] == "1")
             code = url_response_code @data_url
             if (code == "200")
               downloader=RemoteDownloader.new
@@ -220,7 +222,8 @@ module Seek
         end
         params[symb].delete 'data_url'
         params[symb].delete 'data'
-        params[symb].delete 'local_copy' 
+        params[symb].delete 'local_copy'
+        params[symb].delete 'external_link'
         return true
       end
     end  
@@ -237,7 +240,7 @@ module Seek
           if asset.contributor.nil? #A jerm generated resource
             download_jerm_asset asset
           else
-            if asset.content_blob.file_exists?
+            if asset.content_blob.file_exists? && !asset.content_blob.external_link?
               send_file asset.content_blob.filepath, :filename => asset.original_filename, :content_type => asset.content_type, :disposition => 'attachment'
             else
               download_via_url asset

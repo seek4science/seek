@@ -45,6 +45,7 @@ class PresentationsController < ApplicationController
   # GET /presentations/new.xml
   def new
     @presentation=Presentation.new
+    @presentation.parent_name = params[:parent_name]
     respond_to do |format|
       if current_user.person.member?
         format.html # new.html.erb
@@ -65,7 +66,6 @@ class PresentationsController < ApplicationController
 
       update_annotations @presentation
       assay_ids = params[:assay_ids] || []
-      respond_to do |format|
         if @presentation.save
 
           create_content_blobs
@@ -79,8 +79,14 @@ class PresentationsController < ApplicationController
           #Add creators
           AssetsCreator.add_or_update_creator_list(@presentation, params[:creators])
 
-          flash[:notice] = 'Presentation was successfully uploaded and saved.'
-          format.html { redirect_to presentation_path(@presentation) }
+          if !@presentation.parent_name.blank?
+            render :partial=>"assets/back_to_fancy_parent", :locals=>{:child=>@presentation, :parent_name=>@presentation.parent_name}
+          else
+            flash[:notice] = 'Presentation was successfully uploaded and saved.'
+            respond_to do |format|
+              format.html { redirect_to presentation_path(@presentation) }
+            end
+          end
           Assay.find(assay_ids).each do |assay|
             if assay.can_edit?
               assay.relate(@presentation)
@@ -88,11 +94,12 @@ class PresentationsController < ApplicationController
           end
           deliver_request_publish_approval params[:sharing], @presentation
         else
-          format.html {
-            render :action => "new"
-          }
+          respond_to do |format|
+            format.html {
+              render :action => "new"
+            }
+          end
         end
-      end
 
     end
 

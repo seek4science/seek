@@ -9,7 +9,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20120718174723) do
+ActiveRecord::Schema.define(:version => 20120822134905) do
 
   create_table "activity_logs", :force => true do |t|
     t.string   "action"
@@ -260,6 +260,7 @@ ActiveRecord::Schema.define(:version => 20120718174723) do
     t.integer "asset_id"
     t.string  "asset_type"
     t.integer "asset_version"
+    t.boolean "external_link"
   end
 
   create_table "culture_growth_types", :force => true do |t|
@@ -307,6 +308,7 @@ ActiveRecord::Schema.define(:version => 20120718174723) do
     t.string   "uuid"
     t.integer  "policy_id"
     t.boolean  "is_with_sample"
+    t.string   "template_name",                  :default => "none"
   end
 
   add_index "data_file_versions", ["contributor_id", "contributor_type"], :name => "index_data_file_versions_on_contributor_id_and_contributor_type"
@@ -332,6 +334,7 @@ ActiveRecord::Schema.define(:version => 20120718174723) do
     t.string   "uuid"
     t.integer  "policy_id"
     t.boolean  "is_with_sample"
+    t.string   "template_name",                 :default => "none"
   end
 
   add_index "data_files", ["contributor_id", "contributor_type"], :name => "index_data_files_on_contributor_id_and_contributor_type"

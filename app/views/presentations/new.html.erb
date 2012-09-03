@@ -23,6 +23,7 @@
         <%= fancy_multiselect @presentation,:scales, {:possibilities=>sort_scales(Scale.all)} -%>
        </p>
 
+		<%= fields_for(@presentation) {|f|  f.hidden_field :parent_name } -%>
   	<%= fields_for(@presentation) {|f| render :partial=>"assets/asset_form_bottom", :locals=> {:f => f}} -%>
        
         <p>
