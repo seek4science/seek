@@ -8,7 +8,7 @@ class DataFile < ActiveRecord::Base
 
   include Seek::DataFileExtraction
 
-  attr_accessor :parent_name
+
 
   #searchable must come before acts_as_asset call
   searchable(:auto_index=>false) do

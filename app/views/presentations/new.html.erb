@@ -20,6 +20,7 @@
         </p>
         <%= render :partial => "projects/project_selector", :locals => { :resource => @presentation} -%>
 
+		<%= fields_for(@presentation) {|f|  f.hidden_field :parent_name } -%>
 		<%= fields_for(@presentation) {|f| render :partial=>"assets/asset_form_bottom", :locals=> {:f => f}} -%>
         <p>
             <% if Seek::Config.events_enabled -%>

@@ -188,7 +188,7 @@ class DataFilesController < ApplicationController
 
           #Add creators
           AssetsCreator.add_or_update_creator_list(@data_file, params[:creators])
-          if @data_file.parent_name=="assay"
+          if !@data_file.parent_name.blank?
             render :partial=>"assets/back_to_fancy_parent", :locals=>{:child=>@data_file, :parent_name=>@data_file.parent_name,:is_not_fancy=>true}
           else
             respond_to do |format|

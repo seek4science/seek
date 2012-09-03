@@ -40,6 +40,7 @@ class PublicationsController < ApplicationController
   # GET /publications/new.xml
   def new
     @publication = Publication.new
+    @publication.parent_name = params[:parent_name]
     respond_to do |format|
       format.html # new.html.erb
       format.xml 
@@ -59,7 +60,7 @@ class PublicationsController < ApplicationController
 
     result = get_data(@publication, @publication.pubmed_id, @publication.doi)
     assay_ids = params[:assay_ids] || []
-    respond_to do |format|
+
       if @publication.save
         result.authors.each do |author|
           pa = PublicationAuthor.new()
@@ -72,15 +73,21 @@ class PublicationsController < ApplicationController
         Assay.find(assay_ids).each do |assay|
           Relationship.create_or_update_attributions(assay,[["Publication", @publication.id]], Relationship::RELATED_TO_PUBLICATION) if assay.can_edit?
         end
-
-        flash[:notice] = 'Publication was successfully created.'
-        format.html { redirect_to(edit_publication_url(@publication)) }
-        format.xml  { render :xml => @publication, :status => :created, :location => @publication }
+        if !@publication.parent_name.blank?
+          render :partial=>"assets/back_to_fancy_parent", :locals=>{:child=>@publication, :parent_name=>@publication.parent_name}
+        else
+          respond_to do |format|
+            flash[:notice] = 'Publication was successfully created.'
+            format.html { redirect_to(edit_publication_url(@publication)) }
+            format.xml  { render :xml => @publication, :status => :created, :location => @publication }
+          end
+        end
       else
-        format.html { render :action => "new" }
-        format.xml  { render :xml => @publication.errors, :status => :unprocessable_entity }
+        respond_to do |format|
+          format.html { render :action => "new" }
+          format.xml  { render :xml => @publication.errors, :status => :unprocessable_entity }
+        end
       end
-    end
   end
 
   # PUT /publications/1

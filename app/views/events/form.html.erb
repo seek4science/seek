@@ -67,11 +67,11 @@
             </p>
         <% end %>
 
-        <%= render :partial => "assets/associate_publication", :locals=>{:f=>f, :resource => @event} -%>
+        <%=  f.fancy_multiselect :publications,:with_new_link=>true,:other_projects_checkbox=>true -%>
         <br/>
         <%= render :partial => "assets/associate_data_file", :locals=>{:f=>f, :resource => @event, :show_relationships=>false} -%>
         <br/>
-        <%= f.fancy_multiselect :presentations %>
+        <%= f.fancy_multiselect :presentations,:with_new_link=>true,:other_projects_checkbox=>true %>
 
 
       </div>

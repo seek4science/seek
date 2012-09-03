@@ -27,6 +27,7 @@ module Acts #:nodoc:
     module ClassMethods
 
       def acts_as_asset
+        attr_accessor :parent_name
         include Seek::Taggable
 
         acts_as_authorized
