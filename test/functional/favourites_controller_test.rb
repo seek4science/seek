@@ -124,22 +124,27 @@ class FavouritesControllerTest < ActionController::TestCase
   end
 
   def test_delete_saved_search
+    Favourite.destroy_all
+    SavedSearch.destroy_all
     ss=Factory :saved_search
     login_as(ss.user)
+
+    f=Favourite.create(:resource=>ss,:user=>ss.user)
+
     assert_not_nil Favourite.find_by_resource_type("SavedSearch")
     assert_not_nil SavedSearch.find_by_search_query("cheese")
-
-    id=ss.id
+    assert_not_nil Favourite.find_by_id(f.id)
 
     assert_difference("Favourite.count",-1) do
       assert_difference("SavedSearch.count",-1) do
-        xml_http_request(:delete,:delete,{:id=>"fav_#{id}"})
+        xml_http_request(:delete,:delete,{:id=>"fav_#{f.id}"})
       end
     end
     assert_response :success
     
     assert_nil Favourite.find_by_resource_type("SavedSearch")
     assert_nil SavedSearch.find_by_search_query("cheese")
+    assert_nil Favourite.find_by_id(f.id)
   end
 
   def test_valid_delete
