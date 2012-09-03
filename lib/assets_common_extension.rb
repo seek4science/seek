@@ -165,6 +165,7 @@ module AssetsCommonExtension
 
       asset.create_content_blob(:tmp_io_object => @tmp_io_object,
                                 :url=>@data_url,
+                                :external_link=>@external_link,
                                 :original_filename=>params[sym][:original_filename],
                                 :content_type=>params[sym][:content_type],
                                 :asset_version=>version
