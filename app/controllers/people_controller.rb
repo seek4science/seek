@@ -391,7 +391,7 @@ class PeopleController < ApplicationController
           project = work_group.try(:project)
           projects << project unless project.nil?
         end
-        project_manager_projects = current_user.person.projects
+        project_manager_projects = current_user.person.projects_and_descendants
         flag = true
         projects.each do |project|
           flag = false if !project_manager_projects.include? project

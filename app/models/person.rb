@@ -234,10 +234,18 @@ class Person < ActiveRecord::Base
     work_groups.collect {|wg| wg.institution }.uniq
   end
 
-  def projects
+  def direct_projects
     #updating workgroups doesn't change groupmemberships until you save. And vice versa.
-    @known_projects ||= work_groups.collect {|wg| wg.project }.uniq | group_memberships.collect{|gm| gm.work_group.project}
-    @known_projects.collect{|proj| [proj]+proj.ancestors}.flatten.uniq
+    work_groups.collect {|wg| wg.project }.uniq | group_memberships.collect{|gm| gm.work_group.project}
+  end
+
+  def projects
+    @known_project ||= direct_projects.collect{|proj| [proj] + proj.ancestors}.flatten.uniq
+  end
+
+
+  def projects_and_descendants
+    @project_and_descendants ||= direct_projects.collect{|proj| [proj] + proj.descendants}.flatten.uniq
   end
 
   def member?
@@ -305,7 +313,7 @@ class Person < ActiveRecord::Base
   #(admin or project managers of this person) and (this person does not have a user or not the other admin)
   #themself
   def can_be_edited_by?(subject)
-    subject == nil ? false : (((subject.is_admin? || (!(self.projects & subject.try(:person).try(:projects).to_a).empty? && subject.is_project_manager?)) && (self.user.nil? || !self.is_admin?)) || (subject == self.user))
+    subject == nil ? false : (((subject.is_admin? || subject.is_project_manager?) && (self.user.nil? || !self.is_admin?)) || (subject == self.user))
   end
 
   #admin or project manager can administer themselves and the other people, except the other admins

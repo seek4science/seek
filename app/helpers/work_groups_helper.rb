@@ -25,7 +25,7 @@ module WorkGroupsHelper
     last_project=nil
     #if current_user is project manager and not admin, load work_groups of projects he is in
     if project_manager_logged_in? && !admin_logged_in?
-      work_groups = current_user.person.projects.collect(&:work_groups).flatten
+      work_groups = current_user.person.projects.collect(&:work_groups).flatten.uniq
     else
       work_groups = WorkGroup.find(:all,:include=>[:project,:institution])
     end
