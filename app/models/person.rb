@@ -55,8 +55,23 @@ class Person < ActiveRecord::Base
   has_many :favourite_group_memberships, :dependent => :destroy
   has_many :favourite_groups, :through => :favourite_group_memberships
 
-  has_many :work_groups, :through=>:group_memberships, :before_add => proc {|person, wg| person.project_subscriptions.build :project => wg.project unless person.project_subscriptions.detect {|ps| ps.project == wg.project}},
-  :before_remove => proc {|person, wg| person.project_subscriptions.delete(person.project_subscriptions.detect {|ps| ps.project == wg.project})}
+  has_many :work_groups, :through=>:group_memberships, :before_add => [:subscribe_to_work_group_project, :touch_work_group_project],
+  :before_remove => [:unsubscribe_to_work_group_project, :touch_work_group_project]
+
+  def subscribe_to_work_group_project wg
+    project_subscriptions.build :project => wg.project unless project_subscriptions.detect {|ps| ps.project == wg.project}
+  end
+
+  def unsubscribe_to_work_group_project wg
+    if ps = project_subscriptions.detect {|ps| ps.project == wg.project}
+      project_subscriptions.delete ps
+    end
+  end
+
+  def touch_work_group_project wg
+    wg.project.touch
+  end
+
   has_many :studies, :foreign_key => :person_responsible_id
   has_many :assays,:foreign_key => :owner_id
 
