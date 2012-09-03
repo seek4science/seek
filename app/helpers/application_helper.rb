@@ -505,6 +505,15 @@ module ApplicationHelper
     end
   end
 
+  def resource_tab_title resource_type
+    if resource_type.include?"DataFile"
+      resource_type.titleize.pluralize
+    else
+      resource_type.pluralize
+    end
+
+  end
+
   def display_people_list people
     html = "<ul class='people_list'>"
     people.each do |person|
