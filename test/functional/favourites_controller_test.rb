@@ -5,7 +5,7 @@ class FavouritesControllerTest < ActionController::TestCase
   include AuthenticatedTestHelper
   include FavouritesHelper
   
-  fixtures :users, :favourites, :projects, :people, :institutions,:saved_searches
+  fixtures :users, :favourites, :projects, :people, :institutions
   
   def setup
     login_as(:quentin)
@@ -70,11 +70,29 @@ class FavouritesControllerTest < ActionController::TestCase
     ss=fav.resource
     assert_equal "fred bloggs",ss.search_query
     assert_equal "All",ss.search_type
-    
+    assert !ss.include_external_search
+  end
+
+  def test_add_search_with_external
+
+    assert_difference("Favourite.count",1) do
+      assert_difference("SavedSearch.count",1) do
+        xml_http_request(:post,:add,{:id=>"drag_search",:search_query=>"fred bloggs",:search_type=>"All",:include_external_search=>"1"})
+      end
+    end
+    assert_response :success
+    fav=Favourite.last
+    assert_equal "SavedSearch",fav.resource_type
+    ss=fav.resource
+    assert_equal "fred bloggs",ss.search_query
+    assert_equal "All",ss.search_type
+    assert ss.include_external_search
+
   end
 
   def test_cant_add_dupicate_search
-    login_as(:pal_user)
+    ss=Factory :saved_search
+    login_as(ss.user)
     assert_no_difference("Favourite.count") do
       assert_no_difference("SavedSearch.count") do
         xml_http_request(:post,:add,{:id=>"drag_search",:search_query=>"cheese",:search_type=>"All"})
@@ -84,7 +102,8 @@ class FavouritesControllerTest < ActionController::TestCase
   end
 
   def test_can_add_dupicate_search_with_different_type
-    login_as(:pal_user)
+    ss=Factory :saved_search
+    login_as(ss.user)
     assert_difference("Favourite.count",1) do
       assert_difference("SavedSearch.count",1) do
         xml_http_request(:post,:add,{:id=>"drag_search",:search_query=>"cheese",:search_type=>"Assays"})
@@ -93,23 +112,39 @@ class FavouritesControllerTest < ActionController::TestCase
     assert_response :success
   end
 
+  def test_can_add_dupicate_search_with_different_external_search_flag
+    ss=Factory :saved_search
+    login_as(ss.user)
+    assert_difference("Favourite.count",1) do
+      assert_difference("SavedSearch.count",1) do
+        xml_http_request(:post,:add,{:id=>"drag_search",:search_query=>"cheese",:search_type=>"All",:include_external_search=>"1"})
+      end
+    end
+    assert_response :success
+  end
+
   def test_delete_saved_search
-    login_as(:pal_user)
+    Favourite.destroy_all
+    SavedSearch.destroy_all
+    ss=Factory :saved_search
+    login_as(ss.user)
+
+    f=Favourite.create(:resource=>ss,:user=>ss.user)
+
     assert_not_nil Favourite.find_by_resource_type("SavedSearch")
     assert_not_nil SavedSearch.find_by_search_query("cheese")
-    
-    fav=favourites(:saved_search)
-    ss=saved_searches(:cheese)
-    id=fav.id
+    assert_not_nil Favourite.find_by_id(f.id)
+
     assert_difference("Favourite.count",-1) do
       assert_difference("SavedSearch.count",-1) do
-        xml_http_request(:delete,:delete,{:id=>"fav_#{id}"})
+        xml_http_request(:delete,:delete,{:id=>"fav_#{f.id}"})
       end
     end
     assert_response :success
     
     assert_nil Favourite.find_by_resource_type("SavedSearch")
     assert_nil SavedSearch.find_by_search_query("cheese")
+    assert_nil Favourite.find_by_id(f.id)
   end
 
   def test_valid_delete

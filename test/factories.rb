@@ -407,6 +407,13 @@ end
     f.end_date 1.days.from_now
   end
 
+  Factory.define(:saved_search) do |f|
+    f.search_query "cheese"
+    f.search_type "All"
+    f.user :factory=>:user
+    f.include_external_search false
+  end
+
 #Content_blob
 #either url or data should be provided for assets
   Factory.define(:content_blob) do |f|

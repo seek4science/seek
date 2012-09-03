@@ -10,11 +10,11 @@ class AbstractSearchAdaptorTest < ActiveSupport::TestCase
   end
 
   test "reading base config" do
-    adaptor = Seek::AbstractSearchAdaptor.new({"enabled"=>true,"partial_path"=>"lib/a-path.erb","name"=>"fred","search_type"=>"sops"})
+    adaptor = Seek::AbstractSearchAdaptor.new({"enabled"=>true,"partial_path"=>"lib/a-path.erb","name"=>"NATure Protocols","search_type"=>"sops"})
 
     assert adaptor.enabled?
     assert_equal "lib/a-path.erb",adaptor.partial_path
-    assert_equal "fred",adaptor.name
+    assert_equal "NATure Protocols",adaptor.name
     assert_equal "sops",adaptor.search_type
 
     adaptor = Seek::AbstractSearchAdaptor.new({"enabled"=>false,"partial_path"=>"lib/a-path.erb"})

@@ -35,4 +35,12 @@ class ApplicationHelperTest < ActionView::TestCase
     date = Time.parse("2011-10-28")
     assert_equal "28th October 2011",date_as_string(date)
   end
+
+  test "resource tab title" do
+    assert_equal "EBI Biomodels",resource_tab_title("EBI Biomodels")
+    assert_equal "Models",resource_tab_title("Model")
+    assert_equal "Data Files",resource_tab_title("DataFile")
+    assert_equal "Data Files",resource_tab_title("DataFiles")
+    assert_equal "SOPs",resource_tab_title("SOP")
+  end
 end
