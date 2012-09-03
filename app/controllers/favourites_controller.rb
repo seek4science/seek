@@ -6,9 +6,9 @@ class FavouritesController < ApplicationController
   
   def add
     if request.post?
-      if params[:id]=="drag_search" #needs to creat the SavedSearch resource first
-        saved_search = SavedSearch.new(:user_id => current_user.id, :search_query => params[:search_query], :search_type => params[:search_type])
-        if SavedSearch.find_by_user_id_and_search_query_and_search_type(current_user,params[:search_query],params[:search_type]).nil? && saved_search.save
+      if params[:id]=="drag_search" #needs to create the SavedSearch resource first
+        saved_search = SavedSearch.new(:user_id => current_user.id, :search_query => params[:search_query], :search_type => params[:search_type],:include_external_search=>params[:include_external_search]=="1")
+        if SavedSearch.find_by_user_id_and_search_query_and_search_type_and_include_external_search(current_user,params[:search_query],params[:search_type],params[:include_external_search]=="1").nil? && saved_search.save
           resource=saved_search
         end
       else

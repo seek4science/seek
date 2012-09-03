@@ -6,6 +6,10 @@ class SavedSearch < ActiveRecord::Base
 
   #generates the title, for the Favourite tooltip for example.
   def title
-    "Search: '#{search_query}' (#{search_type})"
+    if (include_external_search)
+      "Search: '#{search_query}' (#{search_type} - including external sites)"
+    else
+      "Search: '#{search_query}' (#{search_type})"
+    end
   end
 end
