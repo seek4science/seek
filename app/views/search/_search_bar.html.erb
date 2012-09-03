@@ -20,7 +20,9 @@
       <%= text_field_tag :search_query, @search_query -%>
       <%= select_tag :search_type, options_for_select(search_type_options,@search_type)  %>
       <% if Seek::Config.external_search_enabled %>
-        <span title='<%= tooltip_title_attrib(external_search_tooltip_text) -%>'><%= check_box_tag :include_external_search -%>External</span>
+        <span title='<%= tooltip_title_attrib(external_search_tooltip_text) -%>'>
+          <%= check_box_tag :include_external_search, 1, @include_external_search -%>External
+        </span>
       <% end %>
       <%= submit_tag "Go" -%>
     </div>
