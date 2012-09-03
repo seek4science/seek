@@ -121,7 +121,7 @@ class DataFilesController < ApplicationController
       @data_file = DataFile.new params[:data_file]
 
       #@data_file.content_blob = ContentBlob.new :tmp_io_object => @tmp_io_object, :url=>@data_url
-      Policy.new_for_upload_tool(@data_file, params[:recipient_id])
+      @data_file.policy = Policy.new_for_upload_tool(@data_file, params[:recipient_id])
 
       if @data_file.save
         @data_file.creators = [current_user.person]
@@ -144,7 +144,7 @@ class DataFilesController < ApplicationController
         if handle_data
           @data_file = DataFile.new params[:data_file]
 
-          Policy.new_from_email(@data_file, params[:recipient_ids], params[:cc_ids])
+          @data_file.policy = Policy.new_from_email(@data_file, params[:recipient_ids], params[:cc_ids])
 
           if @data_file.save
             @data_file.creators = [User.current_user.person]
