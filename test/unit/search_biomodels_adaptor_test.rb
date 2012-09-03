@@ -17,7 +17,7 @@ class SearchBiomodelsAdaptorTest < ActiveSupport::TestCase
 
   test "search" do
     with_config_value :pubmed_api_email, "seek@sysmo-db.org" do
-      adaptor = Seek::BiomodelsSearch::SearchBiomodelsAdaptor.new({"partial_path"=>"lib/test-partial.erb","name"=>"Biomodels"})
+      adaptor = Seek::BiomodelsSearch::SearchBiomodelsAdaptor.new({"partial_path"=>"lib/test-partial.erb","name"=>"EBI Biomodels"})
       results = adaptor.search("yeast")
       assert_equal 14,results.count
       assert_equal 14,results.select{|r| r.kind_of?(Seek::BiomodelsSearch::BiomodelsSearchResult)}.count
@@ -33,7 +33,7 @@ class SearchBiomodelsAdaptorTest < ActiveSupport::TestCase
       assert_equal "MODEL0072364382",result.model_id
       assert_equal DateTime.parse("2012-02-03T13:12:17+00:00"),result.last_modification_date
       assert_equal "lib/test-partial.erb",result.partial_path
-      assert_equal "Biomodels",result.tab
+      assert_equal "EBI Biomodels",result.tab
     end
   end
 
@@ -48,7 +48,6 @@ class SearchBiomodelsAdaptorTest < ActiveSupport::TestCase
   private
 
   def mock_service_calls
-    #WebMock.allow_net_connect!
     wsdl = File.new("#{Rails.root}/test/fixtures/files/mocking/biomodels.wsdl")
     stub_request(:get, "http://www.ebi.ac.uk/biomodels-main/services/BioModelsWebServices?wsdl").to_return(wsdl)
 
