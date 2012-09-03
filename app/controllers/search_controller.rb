@@ -19,30 +19,30 @@ class SearchController < ApplicationController
     else
       flash.now[:notice]="#{@results.size} #{@results.size==1 ? 'item' : 'items'} matched '<b>#{@search_query}</b>' within their title or content."
     end
-    
+
   end
-                                                                        def perform_search
+
+  def perform_search
     @search_query = params[:search_query]
     @search=@search_query # used for logging, and logs the origin search query - see ApplicationController#log_event
     @search_query||=""
     @search_type = params[:search_type]
     type=@search_type.downcase unless @search_type.nil?
 
-    @search_query = @search_query.gsub("*","")
-    @search_query = @search_query.gsub("?","")
+    @search_query = @search_query.gsub("*", "")
+    @search_query = @search_query.gsub("?", "")
 
     @search_query.strip!
 
     #if you use colon in query, solr understands that field_name:value, so if you put the colon at the end of the search query, solr will throw exception
     #remove the : if the string ends with :
-    if @search_query.ends_with?':'
+    if @search_query.ends_with? ':'
       flash.now[:error]="You cannot end a query with a colon, so this was removed"
       @search_query.chop!
     end
 
     downcase_query = @search_query.downcase
-    downcase_query.gsub!(":","")
-
+    downcase_query.gsub!(":", "")
 
 
     @results=[]
@@ -54,7 +54,7 @@ class SearchController < ApplicationController
             search_result = source.search do |query|
               query.keywords downcase_query
             end.results
-            search_result.sort_by(&:published_date).reverse if source == Publication
+            search_result = search_result.sort_by(&:published_date).reverse if source == Publication
             @results |= search_result
           end
       else
@@ -62,7 +62,7 @@ class SearchController < ApplicationController
            search_result = object.search do |query|
              query.keywords downcase_query
            end.results
-           search_result.sort_by(&:published_date).reverse if object == Publication
+           search_result = search_result.sort_by(&:published_date).reverse if object == Publication
            @results = search_result
       end
 
