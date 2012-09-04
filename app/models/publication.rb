@@ -10,9 +10,8 @@ class Publication < ActiveRecord::Base
   acts_as_asset
 
   validate :check_identifier_present
-  validates_uniqueness_of :pubmed_id, :message => "publication has already been registered with that ID.", :if =>  proc{|p| !p.pubmed_id.blank?}
-  validates_uniqueness_of :doi, :message => "publication has already been registered with that ID.", :if => proc{|p| !p.doi.blank?}
-  validates_uniqueness_of :title, :message => "not unique - A publication has already been registered with that title."
+  validate :check_uniqueness_of_identifier_within_project
+  validate :check_uniqueness_of_title_within_project
   
   has_many :non_seek_authors, :class_name => 'PublicationAuthor', :dependent => :destroy
   
@@ -40,6 +39,10 @@ class Publication < ActiveRecord::Base
   end
 
   alias :seek_authors :creators
+
+  def unique_for_project? doi_or_pubmed
+    true
+  end
   
   searchable(:ignore_attribute_changes_of=>[:updated_at,:last_used_at]) do
     text :title,:abstract,:journal,:searchable_tags, :pubmed_id, :doi
@@ -90,11 +93,52 @@ class Publication < ActiveRecord::Base
   private
   
   def check_identifier_present
-    if self.doi.nil? && self.pubmed_id.nil?
+    if doi.blank? && pubmed_id.blank?
       self.errors.add_to_base("Please specify either a PubMed ID or DOI")
-      false
-    else
-      true
+      return false
+    end
+
+    if !doi.blank? && !pubmed_id.blank?
+      self.errors.add_to_base("Can't have both a PubMed ID and a DOI")
+      return false
+    end
+
+    true
+
+  end
+
+  def check_uniqueness_of_identifier_within_project
+    if !doi.blank?
+      existing = Publication.find_all_by_doi(doi) - [self]
+      if !existing.empty?
+        matching_projects = existing.collect(&:projects).flatten.uniq & projects
+        if !matching_projects.empty?
+          self.errors.add_to_base("You cannot register the same DOI within the same project")
+          return false
+        end
+      end
+    end
+    if !pubmed_id.blank?
+      existing = Publication.find_all_by_pubmed_id(pubmed_id) - [self]
+      if !existing.empty?
+        matching_projects = existing.collect(&:projects).flatten.uniq & projects
+        if !matching_projects.empty?
+          self.errors.add_to_base("You cannot register the same PubMed ID within the same project")
+          return false
+        end
+      end
+    end
+    true
+  end
+
+  def check_uniqueness_of_title_within_project
+    existing = Publication.find_all_by_title(title) - [self]
+    if !existing.empty?
+      matching_projects = existing.collect(&:projects).flatten.uniq & projects
+      if !matching_projects.empty?
+        self.errors.add_to_base("You cannot register the same Title within the same project")
+        return false
+      end
     end
   end
 

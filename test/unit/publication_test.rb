@@ -6,14 +6,15 @@ class PublicationTest < ActiveSupport::TestCase
   fixtures :all
 
   test "event association" do
-    publication = publications(:one)
+    publication = Factory :publication
     assert publication.events.empty?
     event = events(:event_with_no_files)
     User.with_current_user(publication.contributor) do
       publication.events << event
       assert publication.valid?
-      assert publication.save
+      publication.save!
     end
+    publication = Publication.find(publication.id)
     assert_equal 1, publication.events.count
   end
 
@@ -98,20 +99,29 @@ class PublicationTest < ActiveSupport::TestCase
   end
 
   test "validation" do
-    asset=Publication.new :title=>"fred",:projects=>[projects(:sysmo_project)],:doi=>"111"
+    project = Factory :project
+    asset=Publication.new :title=>"fred",:projects=>[project],:doi=>"111"
     assert asset.valid?
 
-    asset=Publication.new :title=>"fred",:projects=>[projects(:sysmo_project)],:pubmed_id=>"111"
+    asset=Publication.new :title=>"fred",:projects=>[project],:pubmed_id=>"111"
     assert asset.valid?
 
-    asset=Publication.new :title=>"fred",:projects=>[projects(:sysmo_project)]
+    asset=Publication.new :title=>"fred",:projects=>[project]
     assert !asset.valid?
 
-    asset=Publication.new :projects=>[projects(:sysmo_project)],:doi=>"111"
+    asset=Publication.new :projects=>[project],:doi=>"111"
     assert !asset.valid?
 
     asset=Publication.new :title=>"fred",:doi=>"111"
     assert !asset.valid?
+
+    #cant have both a pubmed and doi
+    asset = Publication.new :title=>"bob",:doi=>"777",:projects=>[project]
+    assert asset.valid?
+    asset.pubmed_id="999"
+    assert !asset.valid?
+    asset.doi=nil
+    assert asset.valid?
   end
   
   test "creators order is returned in the order they were added" do
@@ -151,18 +161,63 @@ class PublicationTest < ActiveSupport::TestCase
     assert p.valid?
   end
 
-  test 'validate uniqueness of pubmed_id and doi' do
-    p1=Publication.new(:title=>"test1",:pubmed_id=>"1234", :project_ids => [projects(:sysmo_project).id])
-    assert p1.valid?
-    assert p1.save
-    p2=Publication.new(:title=>"test2",:pubmed_id=>"1234", :project_ids => [projects(:sysmo_project).id])
-    assert !p2.valid?
+  test 'validate uniqueness of pubmed_id and doi within project only' do
+    project1=Factory :project
+    pub=Publication.new(:title=>"test1",:pubmed_id=>"1234", :projects => [project1])
+    assert pub.valid?
+    assert pub.save
+    pub=Publication.new(:title=>"test2",:pubmed_id=>"1234", :projects => [project1])
+    assert !pub.valid?
 
-    p3=Publication.new(:title=>"test3",:doi=>"1234", :project_ids => [projects(:sysmo_project).id])
-    assert p3.valid?
-    assert p3.save
-    p4=Publication.new(:title=>"test4",:doi=>"1234", :project_ids => [projects(:sysmo_project).id])
-    assert !p4.valid?
+    pub=Publication.new(:title=>"test3",:doi=>"1234", :projects => [project1])
+    assert pub.valid?
+    assert pub.save
+    pub=Publication.new(:title=>"test4",:doi=>"1234", :projects => [project1])
+    assert !pub.valid?
+
+    #should be allowed for another project, but only that project on its own
+    project2=Factory :project
+    pub=Publication.new(:title=>"test5",:pubmed_id=>"1234", :projects => [project2])
+    assert pub.valid?
+    pub=Publication.new(:title=>"test5",:pubmed_id=>"1234", :projects => [project1,project2])
+    assert !pub.valid?
+
+    pub=Publication.new(:title=>"test5",:doi=>"1234", :projects => [project2])
+    assert pub.valid?
+    pub=Publication.new(:title=>"test5",:doi=>"1234", :projects => [project1,project2])
+    assert !pub.valid?
+
+    #make sure you can edit yourself!
+    p=Factory :publication
+    User.with_current_user p.contributor do
+      p.save!
+      p.abstract="an abstract"
+      assert p.valid?
+      p.save!
+    end
+
+  end
+
+  test "validate uniqueness of title in project only" do
+    project1=Factory :project
+    pub=Publication.new(:title=>"test1",:pubmed_id=>"1234", :projects => [project1])
+    assert pub.valid?
+    assert pub.save
+    pub=Publication.new(:title=>"test1",:pubmed_id=>"33343", :projects => [project1])
+    assert !pub.valid?
+
+    project2=Factory :project
+    pub=Publication.new(:title=>"test1",:pubmed_id=>"234", :projects => [project2])
+    assert pub.valid?
+
+    #make sure you can edit yourself!
+    p=Factory :publication
+    User.with_current_user p.contributor do
+      p.save!
+      p.abstract="an abstract"
+      assert p.valid?
+      p.save!
+    end
   end
   
 end
