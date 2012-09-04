@@ -43,6 +43,28 @@ same pattern.
 When upgrading between patch versions (i.e between 0.13.0 and 0.13.2) it should
 only be necessary to a db:migrate rake task. Using seek:upgrade should still work, but could take a lot of unnecessary time.
 
+== Steps to upgrade from 0.15.x to 0.16.x
+
+First there are additional dependencies you will need, which on Ubuntu 10.04/12.04 can be installed with:
+    sudo apt-get install poppler-utils tesseract-ocr openoffice.org openoffice.org-java-common
+
+These are the fairly standard steps when upgrading between minor versions.
+
+    RAILS_ENV=production ./script/delayed_job stop
+    bundle exec rake sunspot:solr:stop RAILS_ENV=production
+    hg pull https://sysmo-db.googlecode.com/hg/ -r v0.16.0
+    hg update
+    hg merge # only required if you've made changes since installing. If you have you may need to deal with conflicts.
+    hg commit -m "merged" # likewise - only required if you made changes since installing
+    bundle install --deployment
+    bundle exec rake seek:upgrade RAILS_ENV=production
+    bundle exec rake tmp:assets:clear RAILS_ENV=production
+    bundle exec rake tmp:clear RAILS_ENV=production
+
+    bundle exec rake sunspot:solr:start RAILS_ENV=production # to restart the search server
+    RAILS_ENV=production ./script/delayed_job start
+    touch tmp/restart.txt
+
 == Steps to upgrade from 0.13.x to 0.14.x
 
 These are the fairly standard steps when upgrading between minor versions. Note, the seek:upgrade task can take a while
