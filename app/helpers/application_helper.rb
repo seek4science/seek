@@ -6,7 +6,7 @@ module ApplicationHelper
 
 
   def date_as_string date,show_time_of_day=false
-    date = Time.parse(date.to_s) unless date.is_a?(Time)
+    date = Time.parse(date.to_s) unless date.is_a?(Time) || date.blank?
     if date.blank?
       str="<span class='none_text'>No date defined</span>"
     else
