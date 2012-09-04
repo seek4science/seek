@@ -1,4 +1,4 @@
-name: Biomodels
+name: EBI Biomodels
 adaptor_class_name: Seek::BiomodelsSearch::SearchBiomodelsAdaptor
 search_type: models
 enabled: true

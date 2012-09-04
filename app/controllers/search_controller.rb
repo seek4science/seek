@@ -20,6 +20,12 @@ class SearchController < ApplicationController
       flash.now[:notice]="#{@results.size} #{@results.size==1 ? 'item' : 'items'} matched '<b>#{@search_query}</b>' within their title or content."
     end
 
+    @include_external_search = params[:include_external_search]=="1"
+
+    respond_to do |format|
+      format.html
+    end
+    
   end
 
   def perform_search
@@ -44,7 +50,6 @@ class SearchController < ApplicationController
     downcase_query = @search_query.downcase
     downcase_query.gsub!(":", "")
 
-
     @results=[]
     if (Seek::Config.solr_enabled and !downcase_query.blank?)
       if type == "all"
@@ -66,8 +71,10 @@ class SearchController < ApplicationController
            @results = search_result
       end
 
-      external_results = external_search downcase_query,type
-      @results |= external_results
+      if (params[:include_external_search]=="1")
+        external_results = external_search downcase_query,type
+        @results |= external_results
+      end
 
     end
   end

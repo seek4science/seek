@@ -299,7 +299,7 @@ end
     f.sequence(:title) {|n| "A Publication #{n}"}
     f.pubmed_id 1
     f.projects {[Factory.build(:project)]}
-    f.contributor :factory => :user
+    f.association :contributor, :factory => :user
   end
 
 #Presentation
@@ -405,6 +405,13 @@ end
     f.title "An Event"
     f.start_date Time.now
     f.end_date 1.days.from_now
+  end
+
+  Factory.define(:saved_search) do |f|
+    f.search_query "cheese"
+    f.search_type "All"
+    f.user :factory=>:user
+    f.include_external_search false
   end
 
 #Content_blob

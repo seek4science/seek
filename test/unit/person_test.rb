@@ -147,98 +147,101 @@ class PersonTest < ActiveSupport::TestCase
 
   def test_assign_expertise
     p=Factory :person
-    User.current_user = p.user
-    assert_equal 0,p.expertise.size
-    assert_difference("Annotation.count",2) do
-      assert_difference("TextValue.count",2) do
-        p.expertise = ["golf","fishing"]
+    User.with_current_user p.user do
+      assert_equal 0,p.expertise.size
+      assert_difference("Annotation.count",2) do
+        assert_difference("TextValue.count",2) do
+          p.expertise = ["golf","fishing"]
+        end
+      end
+
+      assert_equal 2,p.expertise.size
+      assert p.expertise.collect{|e| e.text}.include?("golf")
+      assert p.expertise.collect{|e| e.text}.include?("fishing")
+
+      assert_difference("Annotation.count",-1) do
+        assert_no_difference("TextValue.count") do
+          p.expertise = ["golf"]
+        end
+      end
+
+      assert_equal 1,p.expertise.size
+      assert_equal "golf",p.expertise[0].text
+
+      p2=Factory :person
+      assert_difference("Annotation.count") do
+        assert_no_difference("TextValue.count") do
+          p2.expertise = ["golf"]
+        end
       end
     end
-
-    assert_equal 2,p.expertise.size
-    assert p.expertise.collect{|e| e.text}.include?("golf")
-    assert p.expertise.collect{|e| e.text}.include?("fishing")
-
-    assert_difference("Annotation.count",-1) do
-      assert_no_difference("TextValue.count") do
-        p.expertise = ["golf"]
-      end
-    end
-
-    assert_equal 1,p.expertise.size
-    assert_equal "golf",p.expertise[0].text
-
-    p2=Factory :person
-    assert_difference("Annotation.count") do
-      assert_no_difference("TextValue.count") do
-        p2.expertise = ["golf"]
-      end
-    end
-
-
   end
 
   def test_assigns_tools
     p=Factory :person
-    User.current_user = p.user
-    assert_equal 0,p.tools.size
-    assert_difference("Annotation.count",2) do
-      assert_difference("TextValue.count",2) do
-        p.tools = ["golf","fishing"]
+    User.with_current_user p.user do
+      assert_equal 0,p.tools.size
+      assert_difference("Annotation.count",2) do
+        assert_difference("TextValue.count",2) do
+          p.tools = ["golf","fishing"]
+        end
+      end
+
+      assert_equal 2,p.tools.size
+      assert p.tools.collect{|e| e.text}.include?("golf")
+      assert p.tools.collect{|e| e.text}.include?("fishing")
+
+      assert_difference("Annotation.count",-1) do
+        assert_no_difference("TextValue.count") do
+          p.tools = ["golf"]
+        end
+      end
+
+      assert_equal 1,p.tools.size
+      assert_equal "golf",p.tools[0].text
+
+      p2=Factory :person
+      assert_difference("Annotation.count") do
+        assert_no_difference("TextValue.count") do
+          p2.tools = ["golf"]
+        end
       end
     end
 
-    assert_equal 2,p.tools.size
-    assert p.tools.collect{|e| e.text}.include?("golf")
-    assert p.tools.collect{|e| e.text}.include?("fishing")
-
-    assert_difference("Annotation.count",-1) do
-      assert_no_difference("TextValue.count") do
-        p.tools = ["golf"]
-      end
-    end
-
-    assert_equal 1,p.tools.size
-    assert_equal "golf",p.tools[0].text
-
-    p2=Factory :person
-    assert_difference("Annotation.count") do
-      assert_no_difference("TextValue.count") do
-        p2.tools = ["golf"]
-      end
-    end
   end
 
   def test_removes_previously_assigned
     p=Factory :person
-    User.current_user = p.user
-    p.tools = ["one","two"]
-    assert_equal 2,p.tools.size
-    p.tools = ["three"]
-    assert_equal 1,p.tools.size
-    assert_equal "three",p.tools[0].text
-    
-    p=Factory :person
-    p.expertise = ["aaa","bbb"]
-    assert_equal 2,p.expertise.size
-    p.expertise = ["ccc"]
-    assert_equal 1,p.expertise.size
-    assert_equal "ccc",p.expertise[0].text
+    User.with_current_user p.user do
+      p.tools = ["one","two"]
+      assert_equal 2,p.tools.size
+      p.tools = ["three"]
+      assert_equal 1,p.tools.size
+      assert_equal "three",p.tools[0].text
+
+      p=Factory :person
+      p.expertise = ["aaa","bbb"]
+      assert_equal 2,p.expertise.size
+      p.expertise = ["ccc"]
+      assert_equal 1,p.expertise.size
+      assert_equal "ccc",p.expertise[0].text
+    end
+
   end
 
   def test_expertise_and_tools_with_same_name
     p=Factory :person
-    User.current_user = p.user
-
-    assert_difference("Annotation.count",2) do
-      assert_difference("TextValue.count",2) do
-        p.tools = ["golf","fishing"]
+    User.with_current_user p.user do
+      assert_difference("Annotation.count",2) do
+        assert_difference("TextValue.count",2) do
+          p.tools = ["golf","fishing"]
+        end
       end
-    end
 
-    assert_difference("Annotation.count",2) do
-      assert_no_difference("TextValue.count") do
-        p.expertise = ["golf","fishing"]
+      assert_difference("Annotation.count",2) do
+        assert_no_difference("TextValue.count") do
+          p.expertise = ["golf","fishing"]
+        end
       end
     end
   end
@@ -501,18 +504,20 @@ class PersonTest < ActiveSupport::TestCase
   test "related resource" do
     user = Factory :user
     person = user.person
-    AssetsCreator.create :asset=>Factory(:data_file),:creator=> person
-    AssetsCreator.create :asset=>Factory(:model),:creator=> person
-    AssetsCreator.create :asset=>Factory(:sop),:creator=> person
-    Factory :event,:contributor=>user
-    AssetsCreator.create :asset=>Factory(:presentation),:creator=> person
-    AssetsCreator.create :asset=>Factory(:publication),:creator=>person
-    assert_equal person.created_data_files, person.related_data_files
-    assert_equal person.created_models, person.related_models
-    assert_equal person.created_sops,  person.related_sops
-    assert_equal user.events, person.related_events
-    assert_equal person.created_presentations, person.related_presentations
-    assert_equal person.created_publications, person.related_publications
+    User.with_current_user(user) do
+      AssetsCreator.create :asset=>Factory(:data_file),:creator=> person
+      AssetsCreator.create :asset=>Factory(:model),:creator=> person
+      AssetsCreator.create :asset=>Factory(:sop),:creator=> person
+      Factory :event,:contributor=>user
+      AssetsCreator.create :asset=>Factory(:presentation),:creator=> person
+      AssetsCreator.create :asset=>Factory(:publication),:creator=>person
+      assert_equal person.created_data_files, person.related_data_files
+      assert_equal person.created_models, person.related_models
+      assert_equal person.created_sops,  person.related_sops
+      assert_equal user.events, person.related_events
+      assert_equal person.created_presentations, person.related_presentations
+      assert_equal person.created_publications, person.related_publications
+    end
   end
   
   test 'assign admin role for a person' do

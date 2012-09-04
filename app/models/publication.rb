@@ -21,11 +21,11 @@ class Publication < ActiveRecord::Base
     policy = Policy.new(:name => "publication_policy", :sharing_scope => Policy::EVERYONE, :access_type => Policy::VISIBLE)
     #add managers (authors + contributor)
     creators.each do |author|
-      policy.permissions.build(:contributor => author, :policy => policy, :access_type => Policy::MANAGING)
+      policy.permissions << Permissions.create(:contributor => author, :policy => policy, :access_type => Policy::MANAGING)
     end
     #Add contributor
     c = contributor || default_contributor
-    policy.permissions.build(:contributor => c.person, :policy => policy, :access_type => Policy::MANAGING) if c
+    policy.permissions << Permission.create(:contributor => c.person, :policy => policy, :access_type => Policy::MANAGING) if c
     policy
   end
 

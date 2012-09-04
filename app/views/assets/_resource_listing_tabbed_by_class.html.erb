@@ -53,7 +53,7 @@
        end
     %>
     <% assets.each do |resource_type| -%>
-      <% visible_resource_type = resource_type.titleize.pluralize -%>
+      <% visible_resource_type = resource_tab_title(resource_type) -%>
       <% visible_resource_type = "SOPs" if visible_resource_type=="Sops" %>
       <% hidden_count = 0 %>
       <% extra_count = 0 %>
