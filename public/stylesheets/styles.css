@@ -1689,4 +1689,8 @@ div.sharing_summary {
     text-align: center;
 }
 
+p.import_details {
+    font-style: italic;
+}
+
 

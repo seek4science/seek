@@ -81,6 +81,7 @@
                 </p>
                 <% end -%>
             </p>
+            <%= render :partial=>"import_details", :object=>@display_model %>
             <p>
                 <%= embedded_isa_svg(@model, true, @model) -%>
             </p>

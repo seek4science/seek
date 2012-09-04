@@ -11,6 +11,7 @@
     <% form_for(@model) do |f| %>
     <div class="asset_form">
         <%= f.error_messages %>
+        <%= render :partial => "form_import_details" -%>
         <p>
             <b>Title:</b>
             <br/>
