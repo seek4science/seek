@@ -36,6 +36,10 @@ class ApplicationHelperTest < ActionView::TestCase
     assert_equal "28th October 2011",date_as_string(date)
   end
 
+  test "date_as_string with nil date" do
+    assert_equal "<span class='none_text'>No date defined</span>",date_as_string(nil)
+  end
+
   test "resource tab title" do
     assert_equal "EBI Biomodels",resource_tab_title("EBI Biomodels")
     assert_equal "Models",resource_tab_title("Model")
