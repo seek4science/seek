@@ -1,3 +1,6 @@
+<%
+    biomodel_link = "http://www.ebi.ac.uk/biomodels-main/#{resource.model_id}"
+%>
 <div class="list_item_content">
     <div class="list_item_title">
      <%= "<p> #{resource.title}</p>" %>
@@ -24,7 +27,7 @@
 
     <div class="list_item_whole_width">
       <p class='list_item_attribute'>
-        <%= "<b> URL of Original: </b> " + link_to("http://www.ebi.ac.uk/biomodels-main/#{resource.model_id}", "http://www.ebi.ac.uk/biomodels-main/#{resource.model_id}",:target=>"_blank") %>
+        <%= "<b> URL of Original: </b> " + link_to(biomodel_link, "http://www.ebi.ac.uk/biomodels-main/#{resource.model_id}",:target=>"_blank") %>
       </p>
       <p class='list_item_attribute'>
         <%= "<b> Abstract: </b> " + list_item_description(resource.abstract,true,1000) %>
@@ -34,7 +37,7 @@
 
 <div class="list_item_actions">
 <%
-   biomodel_link = "http://www.ebi.ac.uk/biomodels-main/download?mid=#{resource.model_id}"
+   biomodel_download_link = "http://www.ebi.ac.uk/biomodels-main/download?mid=#{resource.model_id}"
    description_for_import = resource.abstract || ""
    description_for_import += "\n\n"
    description_for_import += "Originating from BioModels: #{biomodel_link}"
@@ -44,8 +47,8 @@
 <%= image_tag_for_key "import",
         {:controller => "models",
         :action => "new",
-        :model=>{:title=>resource.title,:description=>description_for_import,:data_url=>biomodel_link,:original_filename=>"#{resource.model_id}.xml",:model_format_id=>ModelFormat.sbml.try(:id)},
-        :source=>resource.tab },
+        :model=>{:title=>resource.title,:imported_source=>resource.tab,:imported_url=>biomodel_link,:data_url=>biomodel_download_link,:original_filename=>"#{resource.model_id}.xml",:model_format_id=>ModelFormat.sbml.try(:id),:description=>description_for_import},
+        },
         "import",{},
         "Import" %>
 <% end %>

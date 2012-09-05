@@ -1705,3 +1705,8 @@ div.return_to_search {
     margin-top: -1em;
     font-size: 14px;
 }
+p.import_details {
+    font-style: italic;
+}
+
+

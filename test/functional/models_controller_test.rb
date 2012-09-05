@@ -102,7 +102,8 @@ class ModelsControllerTest < ActionController::TestCase
     assert_select "textarea#model_description",:text=>"the description"
     assert_select "input#content_blob_data_url",:value=>"wibblebibble"
     assert_select "input#content_blob_original_filename_0[type='hidden']",:value=>"afile.xml"
-
+    assert_select "input#model_imported_source[type='hidden']",:value=>"BioModels"
+    assert_select "input#model_imported_url[type='hidden']",:value=>"http://biomodels/model.xml"
   end
   
   test "should correctly handle bad data url" do
@@ -227,6 +228,23 @@ class ModelsControllerTest < ActionController::TestCase
        assert_equal "This is a new revision",m.versions[1].revision_comments
        assert_equal "Teusink.xml",m.versions[0].original_filename
   end
+
+  test "should create model with import details" do
+    user = Factory :user
+    login_as(user)
+    model_details = valid_model
+    model_details[:imported_source]="BioModels"
+    model_details[:imported_url]="http://biomodels/model.xml"
+
+    assert_difference('Model.count') do
+      post :create, :model => model_details, :sharing=>valid_sharing,:content_blob=>{:file_0=>fixture_file_upload('files/little_file.txt',Mime::TEXT)}, :sharing=>valid_sharing, :model_image => {:image_file => fixture_file_upload('files/file_picture.png', 'image/png')}
+    end
+    model = assigns(:model)
+    assert_redirected_to model_path(model)
+    assert_equal "BioModels",model.imported_source
+    assert_equal "http://biomodels/model.xml",model.imported_url
+    assert_equal user, model.contributor
+  end
   
   def test_missing_sharing_should_default_to_private
     assert_difference('Model.count') do
@@ -316,7 +334,23 @@ class ModelsControllerTest < ActionController::TestCase
       assert_select "p > b",:text=>/Size:/
       assert_select "p",:text=>/5\.9 KB/
     end
+    assert_select "p.import_details",:count=>0
   end
+
+  test "should show model with import details" do
+    m = Factory :model,:policy=>Factory(:public_policy), :imported_source=>"Some place",:imported_url=>"http://somewhere/model.xml"
+    assert_difference('ActivityLog.count') do
+      get :show, :id => m
+    end
+
+    assert_response :success
+    assert_select "p.import_details",:text=>/This Model was originally imported from/ do
+      assert_select "strong",:text=>"Some place"
+      assert_select "a[href=?][target='_blank']","http://somewhere/model.xml",:text=>"http://somewhere/model.xml"
+    end
+
+  end
+
   
   test "should show model with format and type" do
     m = models(:model_with_format_and_type)
