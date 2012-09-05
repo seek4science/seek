@@ -270,25 +270,25 @@ class ModelsControllerTest < ActionController::TestCase
   end
   
   test "should create model with url" do
-    WebMock.allow_net_connect!
+    mock_remote_file "#{Rails.root}/test/fixtures/files/file_picture.png","http://www.sysmo-db.org/images/sysmo-db-logo-grad2.png"
 
     assert_difference('Model.count') do
       assert_difference('ContentBlob.count') do
         post :create, :model => valid_model_with_url,:content_blob=>{:url_0=>"http://www.sysmo-db.org/images/sysmo-db-logo-grad2.png"}, :sharing=>valid_sharing
       end
     end
-    assert_redirected_to model_path(assigns(:model))
-    assert_equal users(:model_owner),assigns(:model).contributor   
-    assert !assigns(:model).content_blob.url.blank?
-    assert assigns(:model).content_blob.data_io_object.nil?
-    assert !assigns(:model).content_blob.file_exists?
-    assert_equal "sysmo-db-logo-grad2.png", assigns(:model).original_filename
-    assert_equal "image/png", assigns(:model).content_type
+    model = assigns(:model)
+    assert_redirected_to model_path(model)
+    assert_equal users(:model_owner),model.contributor
+    assert_equal 1,model.content_blobs.count
+    assert !model.content_blobs.first.url.blank?
+    assert model.content_blobs.first.data_io_object.nil?
+    assert !model.content_blobs.first.file_exists?
+    assert_equal "sysmo-db-logo-grad2.png", model.content_blobs.first.original_filename
+    assert_equal "image/png", model.content_blobs.first.content_type
   end
   
   test "should create model and store with url and store flag" do
-    WebMock.allow_net_connect!
-
     model_details=valid_model_with_url
     model_details[:local_copy]="1"
     assert_difference('Model.count') do
@@ -296,13 +296,15 @@ class ModelsControllerTest < ActionController::TestCase
         post :create, :model => model_details,:content_blob=>{:url_0=>"http://www.sysmo-db.org/images/sysmo-db-logo-grad2.png"}, :sharing=>valid_sharing
       end
     end
-    assert_redirected_to model_path(assigns(:model))
-    assert_equal users(:model_owner),assigns(:model).contributor
-    assert !assigns(:model).content_blob.url.blank?
-    assert !assigns(:model).content_blob.data_io_object.read.nil?
-    assert assigns(:model).content_blob.file_exists?
-    assert_equal "sysmo-db-logo-grad2.png", assigns(:model).original_filename
-    assert_equal "image/png", assigns(:model).content_type
+    model = assigns(:model)
+    assert_redirected_to model_path(model)
+    assert_equal users(:model_owner),model.contributor
+    assert_equal 1,model.content_blobs.count
+    assert !model.content_blobs.first.url.blank?
+    assert !model.content_blobs.first.data_io_object.read.nil?
+    assert model.content_blobs.first.file_exists?
+    assert_equal "sysmo-db-logo-grad2.png", model.content_blobs.first.original_filename
+    assert_equal "image/png", model.content_blobs.first.content_type
   end  
   
   test "should create with preferred environment" do
