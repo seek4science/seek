@@ -325,16 +325,48 @@ class ModelsControllerTest < ActionController::TestCase
 
     assert_response :success
 
-    #FIXME: this is currently failing due to changes in model fileinfo details being required - due to models having multiple files.
     assert_select "div.box_about_actor" do
-      assert_select "p > b",:text=>/File name:/
-      assert_select "p",:text=>/cronwright\.xml/
-      assert_select "p > b",:text=>/Format:/
-      assert_select "p",:text=>/XML document/
-      assert_select "p > b",:text=>/Size:/
-      assert_select "p",:text=>/5\.9 KB/
+      assert_select "p > strong",:text=>"1 file:"
+      assert_select "ul.fileinfo_list" do
+        assert_select "li.fileinfo" do
+            assert_select "p > b",:text=>/Filename:/
+            assert_select "p",:text=>/cronwright\.xml/
+            assert_select "p > b",:text=>/Format:/
+            assert_select "p",:text=>/XML document/
+            assert_select "p > b",:text=>/Size:/
+            assert_select "p",:text=>/5\.9 KB/
+        end
+      end
     end
+
     assert_select "p.import_details",:count=>0
+  end
+
+  test "should show model with multiple files" do
+    m = Factory :model_2_files,:policy=>Factory(:public_policy)
+
+    assert_difference('ActivityLog.count') do
+      get :show, :id => m
+    end
+
+    assert_response :success
+
+    assert_select "div.box_about_actor" do
+      assert_select "p > strong",:text=>"2 files:"
+      assert_select "ul.fileinfo_list" do
+        assert_select "li.fileinfo",:count=>2 do
+          assert_select "p > b",:text=>/Filename:/,:count=>2
+          assert_select "p",:text=>/cronwright\.xml/
+          assert_select "p",:text=>/rightfield\.xls/
+          assert_select "p > b",:text=>/Format:/,:count=>2
+          assert_select "p",:text=>/XML document/
+          assert_select "p",:text=>/Spreadsheet/
+          assert_select "p > b",:text=>/Size:/,:count=>2
+          assert_select "p",:text=>/5\.9 KB/
+          assert_select "p",:text=>/9\.2 KB/
+        end
+      end
+    end
   end
 
   test "should show model with import details" do
@@ -600,7 +632,6 @@ class ModelsControllerTest < ActionController::TestCase
     assert assigns(:model)
     assert_not_nil flash[:notice]
     assert_nil flash[:error]
-    
     
     m=Model.find(m.id)
     assert_equal 2,m.versions.size

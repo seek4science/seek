@@ -60,19 +60,8 @@
 
         <%= render :partial=>"assets/resource_version_details", :locals=>{:displayed_resource=>@display_model, :resource=>@model} -%>
         <div class="box_about_actor">
-            <p>
-                <b>Title:</b>
-                <span class="title"><%=h @display_model.title -%></span>
-            </p>
-            <p>
-              <% files = @display_model.content_blobs %>
-                <b>All Files</b> (<span style="font-style: italic;"><%= files.count %> in total</span>):<br/>
-              <% files.each do |content_blob|%>
-               <%= h(content_blob.original_filename) -%> (<%=h mime_nice_name(content_blob.content_type) -%>)
-               <br/>
-              <% end %>
-            </p>
-          <%= render :partial => 'assets/fileinfo',:object=>@display_model -%>
+            <%= render :partial=>"assets/multiple_fileinfo", :object=>@display_model -%>
+
             <p>
                 <b>Organism:</b>
                 <% if @display_model.organism -%>

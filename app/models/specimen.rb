@@ -140,7 +140,6 @@ class Specimen < ActiveRecord::Base
       self.born=nil
       self.age=nil
     end
-
   end
 
   def strain_title

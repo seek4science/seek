@@ -6,8 +6,8 @@ module AssetsHelper
     image_tag(icon_filename,:alt=>"Request",:title=>"Request") + " Request #{resource_type}"
   end
 
-  def filesize_as_text resource
-    size=resource.content_blob.nil? ? 0 : resource.content_blob.filesize
+  def filesize_as_text content_blob
+    size=content_blob.nil? ? 0 : content_blob.filesize
     if size.nil?
       "<span class='none_text'>Unknown</span>"
     else

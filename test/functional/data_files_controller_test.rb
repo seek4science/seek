@@ -504,7 +504,7 @@ class DataFilesControllerTest < ActionController::TestCase
     assert_response :success
 
     assert_select "div.box_about_actor" do
-      assert_select "p > b",:text=>/File name:/
+      assert_select "p > b",:text=>/Filename:/
       assert_select "p",:text=>/rightfield\.xls/
       assert_select "p > b",:text=>/Format:/
       assert_select "p",:text=>/Spreadsheet/

@@ -277,7 +277,7 @@ class SopsControllerTest < ActionController::TestCase
 
     assert_response :success
     assert_select "div.box_about_actor" do
-      assert_select "p > b",:text=>/File name:/
+      assert_select "p > b",:text=>/Filename:/
       assert_select "p",:text=>/a_pdf_file\.pdf/
       assert_select "p > b",:text=>/Format:/
       assert_select "p",:text=>/PDF document/
