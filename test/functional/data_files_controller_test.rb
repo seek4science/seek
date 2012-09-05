@@ -891,12 +891,30 @@ class DataFilesControllerTest < ActionController::TestCase
 
 
   test "can move to presentations" do
-    data_file = Factory :data_file,:contributor=>User.current_user
+    data_file = Factory :data_file, :contributor => User.current_user
     assert_difference("DataFile.count", -1) do
       assert_difference("Presentation.count") do
-        post :convert_to_presentation, :id=>data_file
+        post :convert_to_presentation, :id => data_file
       end
     end
+    assert assigns(:presentation)
+    assert_redirected_to assigns(:presentation)
+  end
+
+  test "converting to presentation logs creation activity" do
+    data_file = Factory :data_file,:contributor=>User.current_user
+    assert_difference("ActivityLog.count") do
+          post :convert_to_presentation, :id=>data_file
+    end
+    assert assigns(:presentation)
+    presentation = assigns(:presentation)
+
+    #needs to mimic the logging of a presentation being created
+    al = ActivityLog.last
+    assert_equal "create",al.action
+    assert_equal User.current_user,al.culprit
+    assert_equal presentation,al.activity_loggable
+    assert_equal "data_files",al.controller_name
   end
 
   test "converted presentations have correct attributions" do
