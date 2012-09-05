@@ -39,10 +39,6 @@ class Publication < ActiveRecord::Base
   end
 
   alias :seek_authors :creators
-
-  def unique_for_project? doi_or_pubmed
-    true
-  end
   
   searchable(:ignore_attribute_changes_of=>[:updated_at,:last_used_at]) do
     text :title,:abstract,:journal,:searchable_tags, :pubmed_id, :doi
