@@ -245,4 +245,19 @@ class SopTest < ActiveSupport::TestCase
        assert !sop_with_no_viewable_format.is_content_viewable?
     end
   end
+
+  test 'filter_text_content' do
+    ms_word_sop = Factory(:ms_word_sop)
+    content = "test \n content \f only"
+    filtered_content = ms_word_sop.filter_text_content(content)
+    assert !filtered_content.include?('\n')
+    assert !filtered_content.include?('\f')
+  end
+
+  test 'pdf_contents_for_search' do
+    ms_word_sop = Factory(:ms_word_sop)
+    assert ms_word_sop.is_viewable_format?
+    content = ms_word_sop.pdf_contents_for_search
+    assert_equal 'This is a ms word file', content
+  end
 end

@@ -187,6 +187,47 @@ module Acts #:nodoc:
         end
       end
 
+      def pdf_contents_for_search obj=self
+        content_blob = obj.content_blob
+        content = nil
+        if content_blob.file_exists?
+          if obj.is_viewable_format?
+            content = Rails.cache.fetch("#{content_blob.cache_key}-pdf-content-for-search") do
+              begin
+                output_directory = content_blob.directory_storage_path
+                dat_filepath = content_blob.filepath
+                pdf_filepath = content_blob.filepath('pdf')
+                txt_filepath = content_blob.filepath('txt')
+                Docsplit.extract_pdf(dat_filepath, :output => output_directory) unless content_blob.file_exists?(pdf_filepath)
+                Docsplit.extract_text(pdf_filepath, :output => output_directory) unless content_blob.file_exists?(txt_filepath)
+                file_content = File.open(txt_filepath).read
+                unless file_content.blank?
+                  filter_text_content file_content
+                else
+                  file_content
+                end
+              rescue Exception => e
+                Rails.logger.error("Error processing content for content_blob #{obj.content_blob.id} #{e}")
+                raise e unless Rails.env=="production"
+                nil
+              end
+            end
+          end
+        else
+          Rails.logger.error("Unable to find file contents for #{obj.class.name} #{obj.id}")
+        end
+        content
+      end
+
+      #filters special characters \n \f
+      def filter_text_content content
+        special_characters = ['\n', '\f']
+        special_characters.each do |sc|
+          content.gsub!(/#{sc}/, '')
+        end
+        content
+      end
+
       def project_assays
         all_assays=Assay.all.select{|assay| assay.can_edit?(User.current_user)}.sort_by &:title
         all_assays = all_assays.select do |assay|
