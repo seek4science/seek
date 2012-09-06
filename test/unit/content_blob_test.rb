@@ -287,16 +287,4 @@ class ContentBlobTest < ActiveSupport::TestCase
       assert ms_word_file_content.include?('This is an open office ppt file')
   end
 
-  test 'docsplit should not convert a pdf file to pdf' do
-    #specify uuid here to avoid repeating uuid of other content_blob when running the whole test file
-    pdf_content_blob = Factory(:pdf_content_blob, :uuid => '2222')
-    assert !pdf_content_blob.file_exists?(pdf_content_blob.filepath('pdf'))
-    directory_storage_path = pdf_content_blob.directory_storage_path
-    begin
-      Docsplit.extract_pdf(pdf_content_blob.filepath, :output => directory_storage_path)
-    rescue
-    end
-    assert pdf_content_blob.file_exists?(pdf_content_blob.filepath)
-    assert !pdf_content_blob.file_exists?(pdf_content_blob.filepath('pdf'))
-  end
 end
