@@ -200,7 +200,7 @@ module Seek
       assay_type = AssayType.create :title=> assay_type_title unless assay_type
 
       assay_title = filename.nil? ? "dummy assay" : filename.split(".").first
-      @assay = Assay.all.detect{|a|a.title == assay_title and a.study_id == study.id and a.assay_class_id == assay_class.try(:id) and a.assay_type == assay_type and a.owner_id == User.current_user.person.id}
+      @assay = Assay.all.detect{|a|a.title == assay_title && a.study_id == study.id && a.assay_class_id == assay_class.try(:id) && a.assay_type == assay_type && a.owner_id == User.current_user.person.id}
       unless @assay
         @assay = Assay.new :title => assay_title
         @assay.policy = Policy.private_policy
@@ -547,8 +547,6 @@ module Seek
         strain.organism = organism
         strain.save!
 
-
-
         specimen = Specimen.find_by_title specimen_title
 
         institution = Institution.find_by_name @institution_name
@@ -610,8 +608,6 @@ module Seek
     end
 
     def populate_sample sample_data
-
-
 
       sample_data.each do |it|
 

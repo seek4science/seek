@@ -20,7 +20,7 @@ module Seek
       end
     end
 
-    def bio_samples_population institution_id, to_populate=true
+    def bio_samples_population institution_id=nil, to_populate=true
       begin
         if is_extractable_spreadsheet?
 
@@ -34,7 +34,6 @@ module Seek
              bio_samples.errors = "Error parsing spreadsheet: #{e.message}"
              #Rails.logger.error bio_samples.errors
              raise ActiveRecord::Rollback
-
            end
           end
           bio_samples
