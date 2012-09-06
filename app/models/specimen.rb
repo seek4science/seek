@@ -93,14 +93,15 @@ class Specimen < ActiveRecord::Base
     sop_masters.collect(&:sop)
   end
   
-  searchable do
-    text :description,:title,:lab_internal_number
+  searchable(:ignore_attribute_changes_of=>[:updated_at]) do
+    text :searchable_terms
     text :culture_growth_type do
       culture_growth_type.try :title
     end
-    
+
     text :strain do
       strain.try :title
+      strain.try(:organism).try(:title).to_s
     end
     
     text :institution do
@@ -111,6 +112,18 @@ class Specimen < ActiveRecord::Base
       creators.compact.map(&:name)
     end
   end if Seek::Config.solr_enabled
+
+  def searchable_terms
+      text=[]
+      text << title
+      text << description
+      text << lab_internal_number
+      if (strain)
+        text << strain.info
+        text << strain.try(:organism).try(:title).to_s
+      end
+      text
+  end
 
   def age_with_unit
       age.nil? ? "" : "#{age}(#{age_unit}s)"

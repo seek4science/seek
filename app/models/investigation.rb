@@ -14,7 +14,7 @@ class Investigation < ActiveRecord::Base
 
   has_many :assays,:through=>:studies
 
-  searchable do
+  searchable(:ignore_attribute_changes_of=>[:updated_at]) do
     text :description,:title
   end if Seek::Config.solr_enabled
 
