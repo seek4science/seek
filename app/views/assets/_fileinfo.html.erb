@@ -1,11 +1,11 @@
 <p>
-  <b>File name:</b>
-  <%=h fileinfo.content_blob.original_filename -%>
+  <b>Filename:</b>
+  <%=h fileinfo.original_filename -%>
 </p>
 
 <p>
   <b>Format:</b>
-  <%=h mime_nice_name(fileinfo.content_blob.content_type) -%>
+  <%=h mime_nice_name(fileinfo.content_type) -%>
 </p>
 
 <p>

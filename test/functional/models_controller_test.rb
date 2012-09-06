@@ -102,7 +102,8 @@ class ModelsControllerTest < ActionController::TestCase
     assert_select "textarea#model_description",:text=>"the description"
     assert_select "input#content_blob_data_url",:value=>"wibblebibble"
     assert_select "input#content_blob_original_filename_0[type='hidden']",:value=>"afile.xml"
-
+    assert_select "input#model_imported_source[type='hidden']",:value=>"BioModels"
+    assert_select "input#model_imported_url[type='hidden']",:value=>"http://biomodels/model.xml"
   end
   
   test "should correctly handle bad data url" do
@@ -227,6 +228,23 @@ class ModelsControllerTest < ActionController::TestCase
        assert_equal "This is a new revision",m.versions[1].revision_comments
        assert_equal "Teusink.xml",m.versions[0].original_filename
   end
+
+  test "should create model with import details" do
+    user = Factory :user
+    login_as(user)
+    model_details = valid_model
+    model_details[:imported_source]="BioModels"
+    model_details[:imported_url]="http://biomodels/model.xml"
+
+    assert_difference('Model.count') do
+      post :create, :model => model_details, :sharing=>valid_sharing,:content_blob=>{:file_0=>fixture_file_upload('files/little_file.txt',Mime::TEXT)}, :sharing=>valid_sharing, :model_image => {:image_file => fixture_file_upload('files/file_picture.png', 'image/png')}
+    end
+    model = assigns(:model)
+    assert_redirected_to model_path(model)
+    assert_equal "BioModels",model.imported_source
+    assert_equal "http://biomodels/model.xml",model.imported_url
+    assert_equal user, model.contributor
+  end
   
   def test_missing_sharing_should_default_to_private
     assert_difference('Model.count') do
@@ -252,25 +270,25 @@ class ModelsControllerTest < ActionController::TestCase
   end
   
   test "should create model with url" do
-    WebMock.allow_net_connect!
+    mock_remote_file "#{Rails.root}/test/fixtures/files/file_picture.png","http://www.sysmo-db.org/images/sysmo-db-logo-grad2.png"
 
     assert_difference('Model.count') do
       assert_difference('ContentBlob.count') do
         post :create, :model => valid_model_with_url,:content_blob=>{:url_0=>"http://www.sysmo-db.org/images/sysmo-db-logo-grad2.png"}, :sharing=>valid_sharing
       end
     end
-    assert_redirected_to model_path(assigns(:model))
-    assert_equal users(:model_owner),assigns(:model).contributor   
-    assert !assigns(:model).content_blob.url.blank?
-    assert assigns(:model).content_blob.data_io_object.nil?
-    assert !assigns(:model).content_blob.file_exists?
-    assert_equal "sysmo-db-logo-grad2.png", assigns(:model).original_filename
-    assert_equal "image/png", assigns(:model).content_type
+    model = assigns(:model)
+    assert_redirected_to model_path(model)
+    assert_equal users(:model_owner),model.contributor
+    assert_equal 1,model.content_blobs.count
+    assert !model.content_blobs.first.url.blank?
+    assert model.content_blobs.first.data_io_object.nil?
+    assert !model.content_blobs.first.file_exists?
+    assert_equal "sysmo-db-logo-grad2.png", model.content_blobs.first.original_filename
+    assert_equal "image/png", model.content_blobs.first.content_type
   end
   
   test "should create model and store with url and store flag" do
-    WebMock.allow_net_connect!
-
     model_details=valid_model_with_url
     model_details[:local_copy]="1"
     assert_difference('Model.count') do
@@ -278,13 +296,15 @@ class ModelsControllerTest < ActionController::TestCase
         post :create, :model => model_details,:content_blob=>{:url_0=>"http://www.sysmo-db.org/images/sysmo-db-logo-grad2.png"}, :sharing=>valid_sharing
       end
     end
-    assert_redirected_to model_path(assigns(:model))
-    assert_equal users(:model_owner),assigns(:model).contributor
-    assert !assigns(:model).content_blob.url.blank?
-    assert !assigns(:model).content_blob.data_io_object.read.nil?
-    assert assigns(:model).content_blob.file_exists?
-    assert_equal "sysmo-db-logo-grad2.png", assigns(:model).original_filename
-    assert_equal "image/png", assigns(:model).content_type
+    model = assigns(:model)
+    assert_redirected_to model_path(model)
+    assert_equal users(:model_owner),model.contributor
+    assert_equal 1,model.content_blobs.count
+    assert !model.content_blobs.first.url.blank?
+    assert !model.content_blobs.first.data_io_object.read.nil?
+    assert model.content_blobs.first.file_exists?
+    assert_equal "sysmo-db-logo-grad2.png", model.content_blobs.first.original_filename
+    assert_equal "image/png", model.content_blobs.first.content_type
   end  
   
   test "should create with preferred environment" do
@@ -307,16 +327,64 @@ class ModelsControllerTest < ActionController::TestCase
 
     assert_response :success
 
-    #FIXME: this is currently failing due to changes in model fileinfo details being required - due to models having multiple files.
     assert_select "div.box_about_actor" do
-      assert_select "p > b",:text=>/File name:/
-      assert_select "p",:text=>/cronwright\.xml/
-      assert_select "p > b",:text=>/Format:/
-      assert_select "p",:text=>/XML document/
-      assert_select "p > b",:text=>/Size:/
-      assert_select "p",:text=>/5\.9 KB/
+      assert_select "p > strong",:text=>"1 file:"
+      assert_select "ul.fileinfo_list" do
+        assert_select "li.fileinfo" do
+            assert_select "p > b",:text=>/Filename:/
+            assert_select "p",:text=>/cronwright\.xml/
+            assert_select "p > b",:text=>/Format:/
+            assert_select "p",:text=>/XML document/
+            assert_select "p > b",:text=>/Size:/
+            assert_select "p",:text=>/5\.9 KB/
+        end
+      end
+    end
+
+    assert_select "p.import_details",:count=>0
+  end
+
+  test "should show model with multiple files" do
+    m = Factory :model_2_files,:policy=>Factory(:public_policy)
+
+    assert_difference('ActivityLog.count') do
+      get :show, :id => m
+    end
+
+    assert_response :success
+
+    assert_select "div.box_about_actor" do
+      assert_select "p > strong",:text=>"2 files:"
+      assert_select "ul.fileinfo_list" do
+        assert_select "li.fileinfo",:count=>2 do
+          assert_select "p > b",:text=>/Filename:/,:count=>2
+          assert_select "p",:text=>/cronwright\.xml/
+          assert_select "p",:text=>/rightfield\.xls/
+          assert_select "p > b",:text=>/Format:/,:count=>2
+          assert_select "p",:text=>/XML document/
+          assert_select "p",:text=>/Spreadsheet/
+          assert_select "p > b",:text=>/Size:/,:count=>2
+          assert_select "p",:text=>/5\.9 KB/
+          assert_select "p",:text=>/9\.2 KB/
+        end
+      end
     end
   end
+
+  test "should show model with import details" do
+    m = Factory :model,:policy=>Factory(:public_policy), :imported_source=>"Some place",:imported_url=>"http://somewhere/model.xml"
+    assert_difference('ActivityLog.count') do
+      get :show, :id => m
+    end
+
+    assert_response :success
+    assert_select "p.import_details",:text=>/This Model was originally imported from/ do
+      assert_select "strong",:text=>"Some place"
+      assert_select "a[href=?][target='_blank']","http://somewhere/model.xml",:text=>"http://somewhere/model.xml"
+    end
+
+  end
+
   
   test "should show model with format and type" do
     m = models(:model_with_format_and_type)
@@ -566,7 +634,6 @@ class ModelsControllerTest < ActionController::TestCase
     assert assigns(:model)
     assert_not_nil flash[:notice]
     assert_nil flash[:error]
-    
     
     m=Model.find(m.id)
     assert_equal 2,m.versions.size

@@ -5,12 +5,5 @@
 
 <div class="list_item">
   <%= render :file=> content_partial, :locals=>{:resource => resource, :resource_origin => resource_type} %>
-
-  <% if false && resource_type == "Biomodels" %>
-      <div class="list_item_actions">
-        <%= image_tag_for_key "view as XML", :controller => "external_search", :action => resource_type, :id => resource.model_id %>
-        <%= image_tag_for_key "download", :controller => "models", :action => "new", :method=>"post", :resource_url=>"http://www.ebi.ac.uk/biomodels-main/download?mid=".concat(resource[:model_id]), :publication_id => resource[:publication_id], :source=>"biomodels" %>
-      </div>
-  <% end %>
 </div>
 <br style="clear:both"/>

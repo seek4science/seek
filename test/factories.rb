@@ -294,10 +294,19 @@ end
     end
   end
 
+Factory.define(:model_2_files,:class=>Model) do |f|
+  f.sequence(:title) {|n| "A Model #{n}"}
+  f.projects {[Factory.build(:project)]}
+  f.association :contributor, :factory => :user
+  f.after_create do |model|
+    model.content_blobs = [Factory.create(:cronwright_model_content_blob, :asset => model,:asset_version=>model.version),Factory.create(:rightfield_content_blob, :asset => model,:asset_version=>model.version)] if model.content_blobs.blank?
+  end
+end
+
 #Publication
   Factory.define(:publication) do |f|
     f.sequence(:title) {|n| "A Publication #{n}"}
-    f.pubmed_id 1
+    f.sequence(:pubmed_id) {|n| n}
     f.projects {[Factory.build(:project)]}
     f.association :contributor, :factory => :user
   end
@@ -417,7 +426,7 @@ end
 #Content_blob
 #either url or data should be provided for assets
   Factory.define(:content_blob) do |f|
-    f.uuid UUIDTools::UUID.random_create.to_s
+    f.sequence(:uuid) {|n| "uuid-#{n}"}
     f.sequence(:data) {|n| "data [#{n}]" }
   end
 

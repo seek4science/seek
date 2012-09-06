@@ -1,0 +1,17 @@
+<%
+   n = multiple_fileinfo.content_blobs.count
+%>
+<p>
+  <strong> <%= pluralize(n, 'file') -%>:</strong>
+<ul class='fileinfo_list'>
+
+  <% multiple_fileinfo.content_blobs.each do |blob| -%>
+      <li class='fileinfo'>
+        <%= render :partial => "assets/fileinfo", :object => blob -%>
+      </li>
+  <% end -%>
+</ul>
+<div style="clear:both"></div>
+</p>
+
+

@@ -1,0 +1,6 @@
+<%
+@model.imported_source = params[:model][:imported_source] if params[:model]
+@model.imported_url = params[:model][:imported_url] if params[:model]
+%>
+<%= hidden_field :model,:imported_source -%>
+<%= hidden_field :model,:imported_url -%>

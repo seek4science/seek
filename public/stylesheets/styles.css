@@ -1705,3 +1705,18 @@ div.return_to_search {
     margin-top: -1em;
     font-size: 14px;
 }
+p.import_details {
+    font-style: italic;
+}
+
+ul.fileinfo_list {
+    margin-left: 2em;
+}
+
+ul.fileinfo_list li.fileinfo {
+    float: left;
+    padding-right: 1.5em;
+    margin-bottom: 1em;
+}
+
+

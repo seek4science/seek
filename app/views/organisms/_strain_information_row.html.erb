@@ -1,12 +1,11 @@
 <% strain = strain_information_row -%>
 <tr>
-  <td><%= text_or_not_specified(strain.id) -%></td>
-  <td><%= text_or_not_specified(strain.title) -%></td>
+  <td><%= link_to strain.title,strain -%></td>
   <td><%= text_or_not_specified(strain.provider_name) -%></td>
   <td><%= text_or_not_specified(strain.provider_id) -%></td>
   <td><%= text_or_not_specified(strain.genotype_info) -%></td>
   <td><%= text_or_not_specified(strain.phenotype_info) -%></td>
   <td><%= text_or_not_specified(strain.synonym) -%></td>
   <td><%= text_or_not_specified(strain.comment,{:none_text=>"None"}) -%></td>
-  <td><%= text_or_not_specified(strain.parent_strain) -%></td>
+  <td><%= strain.parent.nil? ? text_or_not_specified(strain.parent) : link_to(strain.parent.title,strain.parent) -%></td>
 </tr>

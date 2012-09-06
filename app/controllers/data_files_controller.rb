@@ -37,6 +37,8 @@ class DataFilesController < ApplicationController
           @data_file.reload
           @data_file.destroy
         end
+
+        ActivityLog.create :action=>"create",:culprit=>User.current_user,:activity_loggable=>@presentation,:controller_name=>controller_name.downcase
         flash[:notice]="Data File '#{@presentation.title}' is successfully converted to Presentation"
         format.html { redirect_to presentation_path(@presentation) }
       else
