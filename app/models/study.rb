@@ -23,7 +23,7 @@ class Study < ActiveRecord::Base
 
   validates_presence_of :investigation
 
-  searchable do
+  searchable(:ignore_attribute_changes_of=>[:updated_at]) do
     text :description,:title
   end if Seek::Config.solr_enabled
 

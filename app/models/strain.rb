@@ -28,7 +28,7 @@ class Strain < ActiveRecord::Base
 
   grouped_pagination :pages=>("A".."Z").to_a, :default_page => Seek::Config.default_page(self.name.underscore.pluralize)
 
-  searchable do
+  searchable(:ignore_attribute_changes_of=>[:updated_at]) do
       text :searchable_terms
   end if Seek::Config.solr_enabled
 

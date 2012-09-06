@@ -73,7 +73,7 @@ class Sample < ActiveRecord::Base
      END_EVAL
   end
 
-  searchable do
+  searchable(:ignore_attribute_changes_of=>[:updated_at]) do
     text :searchable_terms
     text :creators do
       creators.compact.map(&:name)

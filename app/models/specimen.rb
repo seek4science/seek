@@ -93,7 +93,7 @@ class Specimen < ActiveRecord::Base
     sop_masters.collect(&:sop)
   end
   
-  searchable do
+  searchable(:ignore_attribute_changes_of=>[:updated_at]) do
     text :description,:title,:lab_internal_number
     text :culture_growth_type do
       culture_growth_type.try :title
