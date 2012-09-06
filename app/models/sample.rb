@@ -93,8 +93,8 @@ class Sample < ActiveRecord::Base
       text << specimen.title
       text << specimen.provider_id
       if (specimen.strain)
-        text << specimen.try(:strain).try(:info).to_s
-        text << specimen.try(:strain).try(:organism).try(:title).to_s
+        text << specimen.strain.info
+        text << specimen.strain.try(:organism).try(:title).to_s
       end
     end
     text
