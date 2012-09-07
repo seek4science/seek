@@ -249,7 +249,7 @@ class SopTest < ActiveSupport::TestCase
   test 'filter_text_content' do
     ms_word_sop = Factory(:ms_word_sop)
     content = "test \n content \f only"
-    filtered_content = ms_word_sop.filter_text_content(content)
+    filtered_content = ms_word_sop.send(:filter_text_content,content)
     assert !filtered_content.include?('\n')
     assert !filtered_content.include?('\f')
   end
