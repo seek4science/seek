@@ -21,7 +21,9 @@ module Seek
         "text/xml" => {:name => "XML document", :icon_key => "xml_file", :extension=>"xml"},
         "application/xml" => {:name => "XML document", :icon_key => "xml_file", :extension=>"xml"},
         "application/sbml+xml" => {:name => "SBML and XML document", :icon_key => "xml_file", :extension=>"xml"},
-        "text/x-objcsrc" => {:name => "Objective C file", :icon_key => "misc_file", :extension=>"objc"}
+        "text/x-objcsrc" => {:name => "Objective C file", :icon_key => "misc_file", :extension=>"objc"},
+        "application/vnd.oasis.opendocument.presentation" => {:name => "PowerPoint presentation", :icon_key => "ppt_file", :extension=>"odp"},
+        "application/vnd.oasis.opendocument.text" => {:name => "Word document", :icon_key => "doc_file", :extension=>"odt"}
     }
 
     #Get a nice, human readable name for the MIME type
