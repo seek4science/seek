@@ -18,17 +18,27 @@ class PersonTest < ActiveSupport::TestCase
     end
   end
 
+  #checks the updated_at doesn't get artificially changed between created and reloading
+  def test_updated_at
+    person = Factory(:person, :updated_at=>1.week.ago)
+    updated_at = person.updated_at
+    person = Person.find(person.id)
+    assert_equal updated_at.to_s,person.updated_at.to_s
+  end
+
   def test_active_ordered_by_updated_at_and_avatar_not_null
 
     Person.destroy_all
 
     avatar = Factory :avatar
 
-    Factory :person,:avatar=>avatar, :updated_at=>1.week.ago
-    Factory :person,:avatar=>avatar, :updated_at=>1.minute.ago
-    Factory :person,:updated_at=>1.day.ago
-    Factory :person,:updated_at=>1.hour.ago
-    Factory :person,:updated_at=>2.minutes.ago
+    people = []
+
+    people << Factory(:person,:avatar=>avatar, :updated_at=>1.week.ago)
+    people << Factory(:person,:avatar=>avatar, :updated_at=>1.minute.ago)
+    people << Factory(:person,:updated_at=>1.day.ago)
+    people << Factory(:person,:updated_at=>1.hour.ago)
+    people << Factory(:person,:updated_at=>2.minutes.ago)
 
     sorted = Person.all.sort do |x,y|
       if x.avatar.nil? == y.avatar.nil?
