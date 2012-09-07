@@ -24,25 +24,6 @@ module Acts #:nodoc:
       is_asset? && is_downloadable?
     end
 
-    def is_downloadable_pdf?
-      is_downloadable_asset? && can_download? && is_pdf? && !content_blob.filesize.nil?
-    end
-
-    def is_content_viewable?
-      is_downloadable_asset? && can_download? && is_viewable_format? && !content_blob.filesize.nil?
-    end
-
-    def is_viewable_format?
-      #FIXME: should be updated to use mime_helper, rather than redefining the mime types here. A new module may be required that consolidates format related stuff
-      viewable_formats= %w[application/pdf application/msword application/vnd.ms-powerpoint application/vnd.oasis.opendocument.presentation application/vnd.oasis.opendocument.text]
-      viewable_formats.include?(content_type)
-    end
-
-    def is_pdf?
-      #FIXME: should be updated to use mime_helper, rather than redefining the mime types here. A new module may be required that consolidates format related stuff
-      content_type == "application/pdf"
-    end
-
     module ClassMethods
 
       def acts_as_asset
@@ -186,6 +167,7 @@ module Acts #:nodoc:
           end
         end
       end
+
 
       def project_assays
         all_assays=Assay.all.select{|assay| assay.can_edit?(User.current_user)}.sort_by &:title
