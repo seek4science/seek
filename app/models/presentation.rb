@@ -8,17 +8,21 @@ class Presentation < ActiveRecord::Base
    attr_accessor :orig_data_file_id
 
    #searchable must come before acts_as_asset is called
-   searchable(:ignore_attribute_changes_of=>[:updated_at,:last_used_at]) do
+   searchable(:auto_index => false) do
      text :description,:title,:original_filename,:searchable_tags
    end if Seek::Config.solr_enabled
 
    acts_as_asset
+   include Seek::PdfExtraction
+
+   after_save :queue_background_reindexing if Seek::Config.solr_enabled
 
    has_one :content_blob, :as => :asset, :foreign_key => :asset_id ,:conditions => 'asset_version= #{self.version}'
 
    explicit_versioning(:version_column => "version") do
-    acts_as_versioned_resource
-    has_one :content_blob,:primary_key => :presentation_id,:foreign_key => :asset_id,:conditions => 'content_blobs.asset_version= #{self.version} and content_blobs.asset_type = "#{self.parent.class.name}"'
+     include Seek::PdfExtraction
+     acts_as_versioned_resource
+     has_one :content_blob,:primary_key => :presentation_id,:foreign_key => :asset_id,:conditions => 'content_blobs.asset_version= #{self.version} and content_blobs.asset_type = "#{self.parent.class.name}"'
   end
 
    if Seek::Config.events_enabled

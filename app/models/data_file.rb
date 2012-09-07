@@ -7,6 +7,7 @@ require 'title_trimmer'
 class DataFile < ActiveRecord::Base
 
   include Seek::DataFileExtraction
+  include Seek::PdfExtraction
   include RightField
 
   attr_accessor :parent_name
@@ -35,6 +36,7 @@ class DataFile < ActiveRecord::Base
 
   explicit_versioning(:version_column => "version") do
     include Seek::DataFileExtraction
+    include Seek::PdfExtraction
     acts_as_versioned_resource
     
     has_one :content_blob,:primary_key => :data_file_id,:foreign_key => :asset_id,:conditions => 'content_blobs.asset_version= #{self.version} and content_blobs.asset_type = "#{self.parent.class.name}"'
