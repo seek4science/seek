@@ -11,8 +11,7 @@ module Seek
     end
 
     def is_viewable_format?
-      #FIXME: should be updated to use mime_helper, rather than redefining the mime types here. A new module may be required that consolidates format related stuff
-      viewable_formats= %w[pdf doc ppt odt odp]
+      viewable_formats= %w[pdf doc docx ppt pptx pps odt fodt odp fodp rtf]
       viewable_formats.include?(mime_extension(content_type))
     end
 
