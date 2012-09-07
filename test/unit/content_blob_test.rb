@@ -230,7 +230,7 @@ class ContentBlobTest < ActiveSupport::TestCase
   test 'docsplit should convert ms word to pdf; and then pdf to txt' do
     #convert ms word to pdf
     #then convert pdf file to txt file
-    ms_word_content_blob = Factory(:ms_word_content_blob)
+    ms_word_content_blob = Factory(:doc_content_blob)
     directory_storage_path = ms_word_content_blob.directory_storage_path
     Docsplit.extract_pdf(ms_word_content_blob.filepath, :output => directory_storage_path)
     Docsplit.extract_text(ms_word_content_blob.filepath('pdf'), :output => directory_storage_path)
@@ -245,7 +245,7 @@ class ContentBlobTest < ActiveSupport::TestCase
   test 'docsplit should convert open office word to pdf; and then pdf to txt' do
       #convert open office word to pdf
       #then convert pdf file to txt file
-      openoffice_word_content_blob = Factory(:openoffice_word_content_blob)
+      openoffice_word_content_blob = Factory(:odt_content_blob)
       directory_storage_path = openoffice_word_content_blob.directory_storage_path
       Docsplit.extract_pdf(openoffice_word_content_blob.filepath, :output => directory_storage_path)
       Docsplit.extract_text(openoffice_word_content_blob.filepath('pdf'), :output => directory_storage_path)
@@ -260,7 +260,7 @@ class ContentBlobTest < ActiveSupport::TestCase
   test 'docsplit should convert ms ppt to pdf; and then pdf to txt' do
       #convert ms ppt to pdf
       #then convert pdf file to txt file
-      ms_ppt_content_blob = Factory(:ms_ppt_content_blob)
+      ms_ppt_content_blob = Factory(:ppt_content_blob)
       directory_storage_path = ms_ppt_content_blob.directory_storage_path
       Docsplit.extract_pdf(ms_ppt_content_blob.filepath, :output => directory_storage_path)
       Docsplit.extract_text(ms_ppt_content_blob.filepath('pdf'), :output => directory_storage_path)
@@ -275,7 +275,7 @@ class ContentBlobTest < ActiveSupport::TestCase
   test 'docsplit should convert open office ppt to pdf; and then pdf to txt' do
       #convert open office ppt to pdf
       #then convert pdf file to txt file
-      openoffice_ppt_content_blob = Factory(:openoffice_ppt_content_blob)
+      openoffice_ppt_content_blob = Factory(:odp_content_blob)
       directory_storage_path = openoffice_ppt_content_blob.directory_storage_path
       Docsplit.extract_pdf(openoffice_ppt_content_blob.filepath, :output => directory_storage_path)
       Docsplit.extract_text(openoffice_ppt_content_blob.filepath('pdf'), :output => directory_storage_path)

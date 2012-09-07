@@ -92,12 +92,12 @@
     end
   end
 
-  Factory.define(:ms_word_sop, :parent => :sop) do |f|
-    f.association :content_blob, :factory => :ms_word_content_blob
+  Factory.define(:doc_sop, :parent => :sop) do |f|
+    f.association :content_blob, :factory => :doc_content_blob
   end
 
-  Factory.define(:openoffice_word_sop, :parent => :sop) do |f|
-    f.association :content_blob, :factory => :openoffice_word_content_blob
+  Factory.define(:odt_sop, :parent => :sop) do |f|
+    f.association :content_blob, :factory => :odt_content_blob
 end
 
   Factory.define(:pdf_sop,:parent=>:sop) do |f|
@@ -328,12 +328,12 @@ end
     end
   end
 
-  Factory.define(:ms_ppt_presentation, :parent => :presentation) do |f|
-    f.association :content_blob, :factory => :ms_ppt_content_blob
+  Factory.define(:ppt_presentation, :parent => :presentation) do |f|
+    f.association :content_blob, :factory => :ppt_content_blob
   end
 
-  Factory.define(:openoffice_ppt_presentation, :parent => :presentation) do |f|
-    f.association :content_blob, :factory => :openoffice_ppt_content_blob
+  Factory.define(:odp_presentation, :parent => :presentation) do |f|
+    f.association :content_blob, :factory => :odp_content_blob
   end
 
   #Model Version
@@ -463,23 +463,23 @@ end
     f.data  File.new("#{Rails.root}/test/fixtures/files/cronwright.xml","rb").read
   end
 
-  Factory.define(:ms_word_content_blob, :parent => :content_blob) do |f|
+  Factory.define(:doc_content_blob, :parent => :content_blob) do |f|
     f.data File.new("#{Rails.root}/test/fixtures/files/ms_word_test.doc", "rb").read
     f.content_type 'application/msword'
   end
 
-  Factory.define(:openoffice_word_content_blob, :parent => :content_blob) do |f|
+  Factory.define(:odt_content_blob, :parent => :content_blob) do |f|
     f.data File.new("#{Rails.root}/test/fixtures/files/openoffice_word_test.odt", "rb").read
     f.content_type 'application/vnd.oasis.opendocument.text'
   end
 
-  Factory.define(:ms_ppt_content_blob, :parent => :content_blob) do |f|
+  Factory.define(:ppt_content_blob, :parent => :content_blob) do |f|
     f.original_filename "ms_ppt_presentation.ppt"
     f.data File.new("#{Rails.root}/test/fixtures/files/ms_ppt_test.ppt", "rb").read
     f.content_type 'application/vnd.ms-powerpoint'
   end
 
-  Factory.define(:openoffice_ppt_content_blob, :parent => :content_blob) do |f|
+  Factory.define(:odp_content_blob, :parent => :content_blob) do |f|
     f.data File.new("#{Rails.root}/test/fixtures/files/openoffice_ppt_test.odp", "rb").read
     f.content_type 'application/vnd.oasis.opendocument.presentation'
   end

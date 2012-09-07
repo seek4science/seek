@@ -247,7 +247,7 @@ class SopTest < ActiveSupport::TestCase
   end
 
   test 'filter_text_content' do
-    ms_word_sop = Factory(:ms_word_sop)
+    ms_word_sop = Factory(:doc_sop)
     content = "test \n content \f only"
     filtered_content = ms_word_sop.send(:filter_text_content,content)
     assert !filtered_content.include?('\n')
@@ -255,7 +255,7 @@ class SopTest < ActiveSupport::TestCase
   end
 
   test 'pdf_contents_for_search' do
-    ms_word_sop = Factory(:ms_word_sop)
+    ms_word_sop = Factory(:doc_sop)
     assert ms_word_sop.is_viewable_format?
     content = ms_word_sop.pdf_contents_for_search
     assert_equal 'This is a ms word file', content

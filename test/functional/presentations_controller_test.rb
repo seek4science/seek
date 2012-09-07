@@ -51,7 +51,7 @@ class PresentationsControllerTest < ActionController::TestCase
   end
 
   test "can show" do
-    presentation = Factory :ms_ppt_presentation,:contributor=>User.current_user
+    presentation = Factory :ppt_presentation,:contributor=>User.current_user
     assert_difference "ActivityLog.count" do
       get :show,:id=>presentation
     end
@@ -198,13 +198,13 @@ class PresentationsControllerTest < ActionController::TestCase
   end
 
   test 'should be able to view ms/open office ppt content' do
-    ms_ppt_presentation = Factory(:ms_ppt_presentation, :policy => Factory(:all_sysmo_downloadable_policy))
+    ms_ppt_presentation = Factory(:ppt_presentation, :policy => Factory(:all_sysmo_downloadable_policy))
     assert ms_ppt_presentation.is_content_viewable?
     get :show, :id => ms_ppt_presentation.id
     assert_response :success
     assert_select 'a', :text => /View content/, :count => 1
 
-    openoffice_ppt_presentation = Factory(:openoffice_ppt_presentation, :policy => Factory(:all_sysmo_downloadable_policy))
+    openoffice_ppt_presentation = Factory(:odp_presentation, :policy => Factory(:all_sysmo_downloadable_policy))
     assert openoffice_ppt_presentation.is_content_viewable?
     get :show, :id => openoffice_ppt_presentation.id
     assert_response :success
