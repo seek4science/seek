@@ -5,6 +5,10 @@
       &nbsp; &nbsp;
       <span>Page: <span id="page_num"></span> / <span id="page_count"></span>
       </span>
+      &nbsp; &nbsp;
+      <%= link_to_function image('zoom_in'), 'zoomIn()' %>
+      <%= link_to_function image('show'), 'zoom()' %>
+      <%= link_to_function image('zoom_out'), 'zoomOut()' %>
     <br/>
       <canvas id="pdf-display-canvas" class="pdf-display-canvas"></canvas>
     <div id='ajax_loader'></div>

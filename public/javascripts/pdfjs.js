@@ -5,7 +5,7 @@ function viewPDFContent(url) {
 
         pdfDoc = null;
         pageNum = 1;
-        scale = 1.5;
+        scale = 1;
         document.getElementById('pdf_content_display').style['display'] = 'block';
         canvas = document.getElementById('pdf-display-canvas');
         ctx = canvas.getContext('2d');
@@ -71,5 +71,24 @@ function goNext() {
     if (pageNum >= pdfDoc.numPages)
         return;
     pageNum++;
+    renderPage(pageNum);
+}
+
+function zoomIn(){
+    scale += 0.5;
+    renderPage(pageNum);
+}
+
+function zoom(){
+    scale = 1;
+    renderPage(pageNum);
+}
+
+function zoomOut(){
+    scale -= 0.5;
+    if (scale <= 0){
+      scale += 0.5;
+      return;
+    }
     renderPage(pageNum);
 }
