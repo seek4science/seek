@@ -468,20 +468,49 @@ end
     f.content_type 'application/msword'
   end
 
+  Factory.define(:docx_content_blob, :parent => :content_blob) do |f|
+    f.data File.new("#{Rails.root}/test/fixtures/files/ms_word_test.docx", "rb").read
+    f.content_type "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+  end
+
   Factory.define(:odt_content_blob, :parent => :content_blob) do |f|
     f.data File.new("#{Rails.root}/test/fixtures/files/openoffice_word_test.odt", "rb").read
     f.content_type 'application/vnd.oasis.opendocument.text'
   end
 
+  Factory.define(:fodt_content_blob, :parent => :content_blob) do |f|
+    f.data File.new("#{Rails.root}/test/fixtures/files/openoffice_word_test.fodt", "rb").read
+    f.content_type "application/vnd.oasis.opendocument.text-flat-xml"
+  end
+
   Factory.define(:ppt_content_blob, :parent => :content_blob) do |f|
-    f.original_filename "ms_ppt_presentation.ppt"
     f.data File.new("#{Rails.root}/test/fixtures/files/ms_ppt_test.ppt", "rb").read
     f.content_type 'application/vnd.ms-powerpoint'
+  end
+
+  Factory.define(:pptx_content_blob, :parent => :content_blob) do |f|
+    f.data File.new("#{Rails.root}/test/fixtures/files/ms_ppt_test.pptx", "rb").read
+    f.content_type "application/vnd.openxmlformats-officedocument.presentationml.presentation"
+  end
+
+  Factory.define(:pps_content_blob, :parent => :content_blob) do |f|
+    f.data File.new("#{Rails.root}/test/fixtures/files/ms_ppt_test.pps", "rb").read
+    f.content_type "application/vnd.openxmlformats-officedocument.presentationml.presentation"
   end
 
   Factory.define(:odp_content_blob, :parent => :content_blob) do |f|
     f.data File.new("#{Rails.root}/test/fixtures/files/openoffice_ppt_test.odp", "rb").read
     f.content_type 'application/vnd.oasis.opendocument.presentation'
+  end
+
+  Factory.define(:fodp_content_blob, :parent => :content_blob) do |f|
+    f.data File.new("#{Rails.root}/test/fixtures/files/openoffice_ppt_test.fodp", "rb").read
+    f.content_type "application/vnd.oasis.opendocument.presentation-flat-xml"
+  end
+
+  Factory.define(:rtf_content_blob, :parent => :content_blob) do |f|
+    f.data File.new("#{Rails.root}/test/fixtures/files/rtf_test.rtf", "rb").read
+    f.content_type "application/rtf"
   end
 
   Factory.define(:activity_log) do |f|

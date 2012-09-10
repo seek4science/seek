@@ -231,7 +231,17 @@ class SopTest < ActiveSupport::TestCase
   end
 
   test 'is_content_viewable?' do
-    viewable_formats= %w[application/pdf application/msword application/vnd.ms-powerpoint application/vnd.oasis.opendocument.presentation application/vnd.oasis.opendocument.text]
+    viewable_formats= %w[application/pdf]
+    viewable_formats << "application/msword"
+    viewable_formats << "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+    viewable_formats << "application/vnd.ms-powerpoint"
+    viewable_formats << "application/vnd.openxmlformats-officedocument.presentationml.presentation"
+    viewable_formats << "application/vnd.oasis.opendocument.text"
+    viewable_formats << "application/vnd.oasis.opendocument.text-flat-xml"
+    viewable_formats << "application/vnd.oasis.opendocument.presentation"
+    viewable_formats << "application/vnd.oasis.opendocument.presentation-flat-xml"
+    viewable_formats << "application/rtf"
+
     viewable_formats.each do |viewable_format|
       sop_with_content_viewable_format = Factory(:sop, :content_blob => Factory(:content_blob, :content_type=>viewable_format, :data => File.new("#{Rails.root}/test/fixtures/files/a_pdf_file.pdf","rb").read))
       User.with_current_user sop_with_content_viewable_format.contributor do
