@@ -239,7 +239,7 @@ class ContentBlobTest < ActiveSupport::TestCase
     assert ms_word_content_blob.file_exists?(ms_word_content_blob.filepath('txt'))
 
     ms_word_file_content = File.open(ms_word_content_blob.filepath('txt'), 'rb').read
-    assert ms_word_file_content.include?('This is a ms word file')
+    assert ms_word_file_content.include?('This is a ms word doc format')
   end
 
   test 'docsplit should convert open office word to pdf; and then pdf to txt' do
@@ -254,7 +254,7 @@ class ContentBlobTest < ActiveSupport::TestCase
       assert openoffice_word_content_blob.file_exists?(openoffice_word_content_blob.filepath('txt'))
 
       ms_word_file_content = File.open(openoffice_word_content_blob.filepath('txt'), 'rb').read
-      assert ms_word_file_content.include?('This is an open office word file')
+      assert ms_word_file_content.include?('This is an open office word odt format')
   end
 
   test 'docsplit should convert ms ppt to pdf; and then pdf to txt' do
@@ -269,7 +269,7 @@ class ContentBlobTest < ActiveSupport::TestCase
       assert ms_ppt_content_blob.file_exists?(ms_ppt_content_blob.filepath('txt'))
 
       ms_word_file_content = File.open(ms_ppt_content_blob.filepath('txt'), 'rb').read
-      assert ms_word_file_content.include?('This is a ms ppt file')
+      assert ms_word_file_content.include?('This is a ms power point ppt format')
   end
 
   test 'docsplit should convert open office ppt to pdf; and then pdf to txt' do
@@ -284,7 +284,7 @@ class ContentBlobTest < ActiveSupport::TestCase
       assert openoffice_ppt_content_blob.file_exists?(openoffice_ppt_content_blob.filepath('txt'))
 
       ms_word_file_content = File.open(openoffice_ppt_content_blob.filepath('txt'), 'rb').read
-      assert ms_word_file_content.include?('This is an open office ppt file')
+      assert ms_word_file_content.include?('This is an open office power point odp format')
   end
 
   test 'docsplit should not convert a pdf file to pdf' do

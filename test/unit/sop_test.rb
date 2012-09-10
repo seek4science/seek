@@ -258,6 +258,6 @@ class SopTest < ActiveSupport::TestCase
     ms_word_sop = Factory(:doc_sop)
     assert ms_word_sop.is_viewable_format?
     content = ms_word_sop.pdf_contents_for_search
-    assert_equal 'This is a ms word file', content
+    assert_equal 'This is a ms word doc format', content
   end
 end
