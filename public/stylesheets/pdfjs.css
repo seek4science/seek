@@ -7,3 +7,10 @@
     font-weight: bold;
 }
 
+.disabled_link_text {
+    font-size: 14px;
+    font-weight: bold;
+    color: #808080;
+    cursor: default;
+}
+
