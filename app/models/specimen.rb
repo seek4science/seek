@@ -101,7 +101,7 @@ class Specimen < ActiveRecord::Base
     end if Seek::Config.is_virtualliver
 
     text :creators do
-      creators.compact.map(&:name)
+      creators.compact.map(&:name).join(' ')
     end
   end if Seek::Config.solr_enabled
 

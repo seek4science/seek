@@ -67,7 +67,7 @@ module Acts #:nodoc:
 
         searchable do
           text :creators do
-            creators.compact.map(&:name)
+            creators.compact.map(&:name).join(' ')
           end
         end if Seek::Config.solr_enabled
 
