@@ -33,11 +33,10 @@ Seek::Config.default :community_news_feed_urls,''
 Seek::Config.default :community_news_number_of_entries,10
 Seek::Config.default :home_description, 'Some (configurable) information about the project and what we do goes here.'
 Seek::Config.default :publish_button_enabled,false
-Seek::Config.default :auth_caching_enabled,false
 Seek::Config.default :strategic_eager_loading, false
 Seek::Config.default :auth_lookup_enabled,true
 Seek::Config.default :sample_parser_enabled,false
-Seek::Config.default :external_search_enabled, false
+Seek::Config.default :external_search_enabled, true
 Seek::Config.default :project_browser_enabled,false
 Seek::Config.default :experimental_features_enabled,true
 

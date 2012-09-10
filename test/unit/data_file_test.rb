@@ -443,7 +443,9 @@ class DataFileTest < ActiveSupport::TestCase
       filename =  "jenage-excel_template"
       content_type = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
 
+
       data_file, assay, bio_samples = data_file_with_sample_parser filepath,filename,content_type
+
       assert data_file.is_excel?
       assert data_file.is_extractable_spreadsheet?
       assert_not_nil bio_samples
@@ -495,7 +497,7 @@ class DataFileTest < ActiveSupport::TestCase
       assay_title = filename
       assay_class = AssayClass.find_by_title("Experimental Assay")
       assay_type = AssayType.find_by_title(assay_type_title)
-      assay = Assay.all.detect{|a|a.title == assay_title and a.study_id == study.id and a.assay_class_id == assay_class.try(:id) and a.assay_type == assay_type and a.owner_id == user.person.id}
+      assay = Assay.all.detect{|a|a.title == assay_title && a.study_id == study.id && a.assay_class_id == assay_class.try(:id) && a.assay_type == assay_type && a.owner_id == user.person.id}
 
       return df, assay, bio_samples
   end
