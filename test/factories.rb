@@ -269,6 +269,17 @@ end
     f.original_filename "cronwright.xml"
   end
 
+  Factory.define(:teusink_model,:parent=>:model) do |f|
+    f.content_type "text/xml"
+    f.association :content_blob,:factory=>:teusink_model_content_blob
+    f.original_filename "teusink.xml"
+  end
+
+  Factory.define(:teusink_jws_model,:parent=>:model) do |f|
+    f.association :content_blob,:factory=>:teusink_jws_model_content_blob
+    f.original_filename "teusink.dat"
+  end
+
 #Publication
   Factory.define(:publication) do |f|
     f.sequence(:title) {|n| "A Publication #{n}"}
@@ -355,6 +366,14 @@ end
   Factory.define(:cronwright_model_content_blob,:parent=>:content_blob) do |f|
     f.data  File.new("#{Rails.root}/test/fixtures/files/cronwright.xml","rb").read
   end
+
+  Factory.define(:teusink_model_content_blob,:parent=>:content_blob) do |f|
+    f.data  File.new("#{Rails.root}/test/fixtures/files/Teusink.xml","rb").read
+  end
+
+Factory.define(:teusink_jws_model_content_blob,:parent=>:content_blob) do |f|
+  f.data  File.new("#{Rails.root}/test/fixtures/files/Teusink2010921171725.dat","rb").read
+end
 
   Factory.define(:annotation_presentation_content_blob,:parent=>:content_blob) do |f|
     f.data  File.new("#{Rails.root}/test/fixtures/files/data-annotation-rightfield.ppt","rb").read
