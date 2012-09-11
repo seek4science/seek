@@ -17,7 +17,7 @@
 
 'use strict';
 
-var kDefaultURL = 'http://localhost:3001/sops/19/get_pdf?version=35';
+var kDefaultURL = '';
 var kDefaultScale = 'auto';
 var kDefaultScaleDelta = 1.1;
 var kUnknownScale = 0;
