@@ -283,7 +283,7 @@ module Seek
     end
 
     def self.included(base)
-      base.before_filter :view_content_auth, :only => [:get_pdf]
+      base.before_filter :view_content_auth, :only => [:get_pdf, :view_pdf_content]
     end
 
     def view_content_auth
@@ -294,9 +294,16 @@ module Seek
         eval "@#{name} = asset"
         eval "@display_#{name} = display_asset"
       else
-        flash[:error] = "You are not authorized to view content of this  #{name.humanize}"
+        flash[:error] = "You are not authorized to view content of this  #{name.humanize} or this file format is not supported"
         return false
       end
+    end
+
+    def view_pdf_content
+      asset = eval("@#{self.controller_name.singularize}")
+      display_asset = eval("@display_#{self.controller_name.singularize}")
+      get_pdf_url = polymorphic_path(asset, :version => display_asset.version, :action => 'get_pdf')
+      render :partial => 'layouts/pdf_content_display', :locals => {:get_pdf_url => get_pdf_url }
     end
 
     def get_pdf
