@@ -10,7 +10,8 @@
    end
    view_pdf_content_url = polymorphic_path(item, :version => display_item.version, :action => 'view_pdf_content')
 %>
-<%= link_to 'View content', view_pdf_content_url, :onclick => is_inline_viewable ? "isCanvasSupportBrowser();" : "alert('#{title}');return false;", :class => is_inline_viewable ? 'link_text' : 'disabled_link_text', :title => title %>
+<%= link_to 'View content', view_pdf_content_url, :onclick => is_inline_viewable ? "isCanvasSupportBrowser();" : "alert('#{title}');return false;", :class => is_inline_viewable ? 'link_text' : 'disabled_link_text', :title => title, :target=>"_blank"
+%>
 <br/>
 
 <style type="text/css">
