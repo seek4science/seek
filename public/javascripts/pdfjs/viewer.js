@@ -15,6 +15,10 @@
  * limitations under the License.
  */
 
+<!--
+ This file has been modified
+-->
+
 'use strict';
 
 var kDefaultURL = '';
