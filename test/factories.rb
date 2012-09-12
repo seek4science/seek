@@ -495,7 +495,7 @@ end
 
   Factory.define(:pps_content_blob, :parent => :content_blob) do |f|
     f.data File.new("#{Rails.root}/test/fixtures/files/ms_ppt_test.pps", "rb").read
-    f.content_type "application/vnd.openxmlformats-officedocument.presentationml.presentation"
+    f.content_type "application/vnd.ms-powerpoint"
   end
 
   Factory.define(:odp_content_blob, :parent => :content_blob) do |f|
