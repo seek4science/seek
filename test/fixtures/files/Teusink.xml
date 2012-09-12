@@ -6,7 +6,6 @@
     <compartment id="compartment" name="compartment" size="1"/>
   </listOfCompartments>
   <listOfSpecies>
-    <species id="Prb" compartment="compartment" initialConcentration="0.087"/>
     <species id="GLCi" name="GLCi" compartment="compartment" initialConcentration="0.087"/>
     <species id="Prb" name="Prb" compartment="compartment" initialConcentration="5"/>
     <species id="G6P" name="G6P" compartment="compartment" initialConcentration="1.39"/>
