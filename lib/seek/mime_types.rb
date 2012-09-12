@@ -13,7 +13,6 @@ module Seek
         "application/vnd.openxmlformats-officedocument.presentationml.presentation" => {:name => "PowerPoint presentation", :icon_key => "ppt_file", :extension=>"pptx"},
         "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" => {:name => "Spreadsheet", :icon_key => "xls_file", :extension=>"xlsx"},
         "application/vnd.ms-powerpoint" => {:name => "PowerPoint presentation", :icon_key => "ppt_file", :extension=>"ppt"},
-        "application/vnd.ms-powerpoint" => {:name => "PowerPoint presentation", :icon_key => "ppt_file", :extension=>"pps"},
         "application/zip" => {:name => "Zip file", :icon_key => "zip_file", :extension=>"zip"},
         "image/gif" => {:name => "GIF image", :icon_key => "gif_file", :extension=>"gif"},
         "image/jpeg" => {:name => "JPG image", :icon_key => "jpg_file", :extension=>"jpeg"},
