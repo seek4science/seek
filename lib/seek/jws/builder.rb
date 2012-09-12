@@ -52,6 +52,7 @@ module Seek
             elsif response.code == "404"
               raise Exception.new("Page not found on JWS Online for url: #{upload_sbml_url}")
             elsif response.code == "500"
+              Rails.logger.error(response.body)
               raise Exception.new("Server error on JWS Online for url: #{upload_sbml_url}")
             else
               raise Exception.new("Expected a redirection from JWS Online but got #{response.code}, for url: #{upload_sbml_url}")
