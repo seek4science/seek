@@ -66,7 +66,7 @@ class SearchController < ApplicationController
             search_result = source.search do |query|
               query.keywords downcase_query
             end.results
-            search_result.sort_by(&:published_date).reverse if source == Publication
+            search_result = search_result.sort_by(&:published_date).reverse if source == Publication
             @results |= search_result
           end
       else
@@ -74,7 +74,7 @@ class SearchController < ApplicationController
            search_result = object.search do |query|
              query.keywords downcase_query
            end.results
-           search_result.sort_by(&:published_date).reverse if object == Publication
+           search_result = search_result.sort_by(&:published_date).reverse if object == Publication
            @results = search_result
       end
     end
