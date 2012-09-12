@@ -11,14 +11,12 @@ module Seek
     end
 
     def is_viewable_format?
-      #FIXME: should be updated to use mime_helper, rather than redefining the mime types here. A new module may be required that consolidates format related stuff
-      viewable_formats= %w[application/pdf application/msword application/vnd.ms-powerpoint application/vnd.oasis.opendocument.presentation application/vnd.oasis.opendocument.text]
-      viewable_formats.include?(content_type)
+      viewable_formats= %w[pdf doc docx ppt pptx pps odt fodt odp fodp rtf]
+      viewable_formats.include?(mime_extension(content_type))
     end
 
     def is_pdf?
-      #FIXME: should be updated to use mime_helper, rather than redefining the mime types here. A new module may be required that consolidates format related stuff
-      content_type == "application/pdf"
+      mime_extension(content_type) == 'pdf'
     end
 
     def pdf_contents_for_search obj=self
@@ -26,7 +24,6 @@ module Seek
       content = nil
       if content_blob.file_exists?
         if obj.is_viewable_format?
-          content = Rails.cache.fetch("#{content_blob.cache_key}-pdf-content-for-search") do
             begin
               output_directory = content_blob.directory_storage_path
               dat_filepath = content_blob.filepath
@@ -34,18 +31,17 @@ module Seek
               txt_filepath = content_blob.filepath('txt')
               Docsplit.extract_pdf(dat_filepath, :output => output_directory) unless content_blob.file_exists?(pdf_filepath)
               Docsplit.extract_text(pdf_filepath, :output => output_directory) unless content_blob.file_exists?(txt_filepath)
-              file_content = File.open(txt_filepath).read
-              unless file_content.blank?
-                filter_text_content file_content
+              content = File.open(txt_filepath).read
+              unless content.blank?
+                filter_text_content content
               else
-                file_content
+                content
               end
             rescue Exception => e
               Rails.logger.error("Error processing content for content_blob #{obj.content_blob.id} #{e}")
               raise e unless Rails.env=="production"
               nil
             end
-          end
         end
       else
         Rails.logger.error("Unable to find file contents for #{obj.class.name} #{obj.id}")

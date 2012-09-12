@@ -1,20 +1,37 @@
-<%= javascript_include_tag  'pdf.js'-%>   <!-- this is library-->
-<%= javascript_include_tag 'pdfjs'-%>    <!--this is internal code-->
-<%= stylesheet_link_tag 'pdfjs.css'-%>   <!--this is internal code-->
+<% is_inline_viewable = Seek::Config.experimental_features_enabled && (display_item ||=nil) && display_item.is_content_viewable?
+   title = ''
+   resource_text = item.class.name.humanize
+   if is_inline_viewable
+     title = "View inline the content of this #{resource_text}"
+   elsif !display_item.can_download?
+     title = "You are not authorized to view the content of this #{resource_text}"
+   elsif !display_item.is_viewable_format?
+     title = "This file format is not inline viewable supported"
+   end
+   view_pdf_content_url = polymorphic_path(item, :version => display_item.version, :action => 'view_pdf_content')
+%>
+<%= link_to 'View content', view_pdf_content_url, :onclick => is_inline_viewable ? "isCanvasSupportBrowser();" : "alert('#{title}');return false;", :class => is_inline_viewable ? 'link_text' : 'disabled_link_text', :title => title, :target=>"_blank"
+%>
+<br/>
 
-<% if Seek::Config.experimental_features_enabled && (display_item ||=nil) && display_item.is_content_viewable?
-     download_url = polymorphic_path(item, :version => display_item.version, :action => 'get_pdf', :version => display_item.version) %>
-      <%= link_to_function 'View content' + expand_image, :onclick => "viewPDFContent('#{download_url}')", :id => 'view_content_expand_image', :class => 'link_text' do |page|
-        page["view_content_expand_image"].toggle
-        page["hide_content_collapse_image"].toggle
-      end
-      %>
-      <%= link_to_function 'Hide content' + collapse_image, :onclick => "hidePDFContent('')", :id => 'hide_content_collapse_image', :class => 'link_text', :style => "display:none" do |page|
+<style type="text/css">
+    .link_text {
+        font-size: 14px;
+        font-weight: bold;
+    }
 
-        page["view_content_expand_image"].toggle
-        page["hide_content_collapse_image"].toggle
-      end
-      %>
-    <br/>
-    <%= render :partial => 'layouts/pdf_content_display' %>
-<% end %>
+    .disabled_link_text {
+        font-size: 14px;
+        font-weight: bold;
+        color: #808080;
+        cursor: default;
+    }
+</style>
+
+<script type="text/javascript">
+    function isCanvasSupportBrowser(){
+        var test_canvas = document.createElement("canvas") //try and create sample canvas element
+        var canvas_check=(test_canvas.getContext)? true : false //check if object supports getContext() method, a method of the canvas element
+        return canvas_check;
+    }
+</script>

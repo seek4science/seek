@@ -10,8 +10,10 @@ module Seek
         "application/msexcel" => {:name => "Spreadsheet", :icon_key => "xls_file", :extension=>"xls"},
         "application/vnd.ms-excel" => {:name => "Spreadsheet", :icon_key => "xls_file", :extension=>"xls"},
         "application/vnd.openxmlformats-officedocument.wordprocessingml.document" => {:name => "Word document", :icon_key => "doc_file", :extension=>"docx"},
+        "application/vnd.openxmlformats-officedocument.presentationml.presentation" => {:name => "PowerPoint presentation", :icon_key => "ppt_file", :extension=>"pptx"},
         "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" => {:name => "Spreadsheet", :icon_key => "xls_file", :extension=>"xlsx"},
         "application/vnd.ms-powerpoint" => {:name => "PowerPoint presentation", :icon_key => "ppt_file", :extension=>"ppt"},
+        "application/vnd.ms-powerpoint" => {:name => "PowerPoint presentation", :icon_key => "ppt_file", :extension=>"pps"},
         "application/zip" => {:name => "Zip file", :icon_key => "zip_file", :extension=>"zip"},
         "image/gif" => {:name => "GIF image", :icon_key => "gif_file", :extension=>"gif"},
         "image/jpeg" => {:name => "JPG image", :icon_key => "jpg_file", :extension=>"jpeg"},
@@ -21,7 +23,13 @@ module Seek
         "text/xml" => {:name => "XML document", :icon_key => "xml_file", :extension=>"xml"},
         "application/xml" => {:name => "XML document", :icon_key => "xml_file", :extension=>"xml"},
         "application/sbml+xml" => {:name => "SBML and XML document", :icon_key => "xml_file", :extension=>"xml"},
-        "text/x-objcsrc" => {:name => "Objective C file", :icon_key => "misc_file", :extension=>"objc"}
+        "text/x-objcsrc" => {:name => "Objective C file", :icon_key => "misc_file", :extension=>"objc"},
+        "application/vnd.oasis.opendocument.presentation" => {:name => "PowerPoint presentation", :icon_key => "ppt_file", :extension=>"odp"},
+        "application/vnd.oasis.opendocument.presentation-flat-xml" => {:name => "PowerPoint presentation", :icon_key => "ppt_file", :extension=>"fodp"},
+        "application/vnd.oasis.opendocument.text" => {:name => "Word document", :icon_key => "doc_file", :extension=>"odt"},
+        "application/vnd.oasis.opendocument.text-flat-xml" => {:name => "Word document", :icon_key => "doc_file", :extension=>"fodt"},
+        "application/vnd.oasis.opendocument.spreadsheet" => {:name => "Spreadsheet", :icon_key => "xls_file", :extension=>"ods"},
+        "application/rtf" => {:name => "Document file", :icon_key => "rtf_file", :extension=>"rtf"}
     }
 
     #Get a nice, human readable name for the MIME type
