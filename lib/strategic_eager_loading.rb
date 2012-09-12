@@ -8,7 +8,7 @@ module StrategicEagerLoading
   # just like doing DataFile.find(:all, :include => :policy).
 
   # This behavior nests, so DataFile.all.each {|df| df.policy.permissions.each {|perm| perm.contributor}}
-  # should execute 3 queries + 1 query for each contributor_type (contributor is polymorphic). In my dev database it does 8 queries.
+  # should execute 3 queries + 1 query for each contributor_type (contributor is polymorphic). In my dev database it does 8 queries because there are 5 contributor types
   # This can even include some things that you can't get via standard includes. DataFile.all.each {|df| df.policy.permissions.each {|perm| perm.contributor.people if perm.contributor.respond_to?(:people)}}
   # will load the people, which can't be included because contributor is polymorphic. (for my dev db this is about 14 queries in total.)
 
@@ -60,7 +60,7 @@ module StrategicEagerLoading
         # includes the class name so that calling find_target_without_.. in the superclass of a subclass
         # which also includes these extensions we get a recursive infinite loop (stack overflows of course)
         # Example:
-        # HasOneThroughAssociation is a subclass of HasManyThroughAssociation
+        # HasOneThroughAssociation is a subclass of HasManyThroughAssociation: class HasOneThroughAssociation < HasManyThroughAssociation
         # calling find target on a HasOneThroughAssociation hits find_target_with_strategic_eager_loading.
         # If it decides not to do eager loading, it calls find_target_without.. which calls the original
         # definition of HasOneThroughAssociation#find_target shown here:
@@ -130,7 +130,7 @@ if Seek::Config.strategic_eager_loading
     # I think it is better to execute one query to eager load them for everyone.
     # Undefining it gives me AssociationCollection's standard behavior for Array methods, loading
     # the target and passing it on to it. Which triggers the strategic eager loading, if appropriate.
-    undef_method :include?
+    #undef_method :include?
   end
 
   ActiveRecord::Base.class_eval { include StrategicEagerLoading::ActiveRecordExtensions }
