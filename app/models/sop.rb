@@ -17,7 +17,7 @@ class Sop < ActiveRecord::Base
   title_trimmer
 
   include Seek::PdfExtraction
-  #after_save :queue_background_reindexing if Seek::Config.solr_enabled
+  after_save :queue_background_reindexing if Seek::Config.solr_enabled
 
   validates_presence_of :title
 
