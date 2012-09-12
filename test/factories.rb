@@ -294,14 +294,26 @@ end
     end
   end
 
-Factory.define(:model_2_files,:class=>Model) do |f|
-  f.sequence(:title) {|n| "A Model #{n}"}
-  f.projects {[Factory.build(:project)]}
-  f.association :contributor, :factory => :user
-  f.after_create do |model|
-    model.content_blobs = [Factory.create(:cronwright_model_content_blob, :asset => model,:asset_version=>model.version),Factory.create(:rightfield_content_blob, :asset => model,:asset_version=>model.version)] if model.content_blobs.blank?
+  Factory.define(:model_2_files,:class=>Model) do |f|
+    f.sequence(:title) {|n| "A Model #{n}"}
+    f.projects {[Factory.build(:project)]}
+    f.association :contributor, :factory => :user
+    f.after_create do |model|
+      model.content_blobs = [Factory.create(:cronwright_model_content_blob, :asset => model,:asset_version=>model.version),Factory.create(:rightfield_content_blob, :asset => model,:asset_version=>model.version)] if model.content_blobs.blank?
+    end
   end
-end
+
+  Factory.define(:teusink_model,:parent=>:model) do |f|
+    f.after_create do |model|
+      model.content_blobs = [Factory.create(:teusink_model_content_blob, :asset=>model,:asset_version=>model.version)]
+    end
+  end
+
+  Factory.define(:teusink_jws_model,:parent=>:model) do |f|
+    f.after_create do |model|
+      model.content_blobs = [Factory.create(:teusink_jws_model_content_blob, :asset=>model,:asset_version=>model.version)]
+    end
+  end
 
 #Publication
   Factory.define(:publication) do |f|
@@ -461,6 +473,17 @@ end
     f.content_type "text/xml"
     f.original_filename "cronwright.xml"
     f.data  File.new("#{Rails.root}/test/fixtures/files/cronwright.xml","rb").read
+  end
+
+  Factory.define(:teusink_model_content_blob,:parent=>:content_blob) do |f|
+    f.content_type "text/xml"
+    f.original_filename "teusink.xml"
+    f.data  File.new("#{Rails.root}/test/fixtures/files/Teusink.xml","rb").read
+  end
+
+  Factory.define(:teusink_jws_model_content_blob,:parent=>:content_blob) do |f|
+    f.data  File.new("#{Rails.root}/test/fixtures/files/Teusink2010921171725.dat","rb").read
+    f.original_filename "teusink.dat"
   end
 
   Factory.define(:doc_content_blob, :parent => :content_blob) do |f|
