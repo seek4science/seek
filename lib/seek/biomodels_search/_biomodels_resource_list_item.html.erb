@@ -38,9 +38,7 @@
 <div class="list_item_actions">
 <%
    biomodel_download_link = "http://www.ebi.ac.uk/biomodels-main/download?mid=#{resource.model_id}"
-   description_for_import = resource.abstract || ""
-   description_for_import += "\n\n"
-   description_for_import += "Originating from BioModels: #{biomodel_link}"
+   description_for_import = resource.abstract
 -%>
 <%= image_tag_for_key "download",biomodel_link,"download",{},"Download" %>
 <% if logged_in? && current_user.person.can_create_new_items? %>
