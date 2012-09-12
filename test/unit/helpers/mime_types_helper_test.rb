@@ -15,9 +15,15 @@ class MimeTypesHelperTest < ActionView::TestCase
   TEXT=%w{text/plain}
   CSV=%w{text/x-comma-separated-values}
   XML=%w{text/xml}
+  ODP=%w{application/vnd.oasis.opendocument.presentation}
+  FODP=%w{application/vnd.oasis.opendocument.presentation-flat-xml}
+  ODT=%w{application/vnd.oasis.opendocument.text}
+  FODT=%w{application/vnd.oasis.opendocument.text-flat-xml}
+  RTF=%w{application/rtf}
+
   
   def test_recognised
-    supported_types=MISC+EXCEL+EXCELX+DOC+DOCX+PPT+PDF+IMAGE+TEXT+CSV+XML
+    supported_types=MISC+EXCEL+EXCELX+DOC+DOCX+PPT+PDF+IMAGE+TEXT+CSV+XML+ODP+FODP+ODT+FODT+RTF
     supported_types.each do |type|
       assert_not_equal "Unknown file type", mime_nice_name(type),"Didn't recognise mime type #{type}"
     end
@@ -84,14 +90,44 @@ class MimeTypesHelperTest < ActionView::TestCase
       assert_equal "Comma-seperated-values file",mime_nice_name(type)
       assert_equal icon_filename_for_key("misc_file"),mime_icon_url(type)
     end
-    
+
     XML.each do |type|
-      assert_equal "xml",mime_extension(type)
-      assert_equal "XML document",mime_nice_name(type)
-      assert_equal icon_filename_for_key("xml_file"),mime_icon_url(type)
+      assert_equal "xml", mime_extension(type)
+      assert_equal "XML document", mime_nice_name(type)
+      assert_equal icon_filename_for_key("xml_file"), mime_icon_url(type)
+    end
+
+    ODP.each do |type|
+      assert_equal "odp", mime_extension(type)
+      assert_equal "PowerPoint presentation", mime_nice_name(type)
+      assert_equal icon_filename_for_key("ppt_file"), mime_icon_url(type)
+    end
+
+    FODP.each do |type|
+      assert_equal "fodp", mime_extension(type)
+      assert_equal "PowerPoint presentation", mime_nice_name(type)
+      assert_equal icon_filename_for_key("ppt_file"), mime_icon_url(type)
+    end
+
+    ODT.each do |type|
+      assert_equal "odt", mime_extension(type)
+      assert_equal "Word document", mime_nice_name(type)
+      assert_equal icon_filename_for_key("doc_file"), mime_icon_url(type)
+    end
+
+    FODT.each do |type|
+      assert_equal "fodt", mime_extension(type)
+      assert_equal "Word document", mime_nice_name(type)
+      assert_equal icon_filename_for_key("doc_file"), mime_icon_url(type)
+    end
+
+    RTF.each do |type|
+      assert_equal "rtf", mime_extension(type)
+      assert_equal "Document file", mime_nice_name(type)
+      assert_equal icon_filename_for_key("rtf_file"), mime_icon_url(type)
     end
   end
-  
+
   def test_not_recognised
     assert_equal "Unknown file type", mime_find("application/foobar-zoo-fish-squirrel")[:name]
   end
