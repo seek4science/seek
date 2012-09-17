@@ -278,14 +278,16 @@ class DataFilesControllerTest < ActionController::TestCase
       assert_equal "image/png", assigns(:data_file).content_type
   end
 
-  test 'test_asset_url' do
-    WebMock.allow_net_connect!
+  test 'asset url' do
+
     #http
-    xhr(:post, :test_asset_url, {:data_file => {:data_url => 'http://www.bbc.co.uk'}})
+    mock_http
+    xhr(:post, :test_asset_url, {:data_file => {:data_url => 'http://mockedlocation.com/a-piccy.png'}})
     assert_response :success
     assert @response.body.include?('The URL was accessed successfully')
     #https
-    xhr(:post, :test_asset_url, {:data_file => {:data_url => 'https://seek.sysmo-db.org/'}})
+    mock_https
+    xhr(:post, :test_asset_url, {:data_file => {:data_url => 'https://mockedlocation.com/a-piccy.png'}})
     assert_response :success
     assert @response.body.include?('The URL was accessed successfully')
   end
