@@ -294,7 +294,7 @@ module Seek
         eval "@#{name} = asset"
         eval "@display_#{name} = display_asset"
       else
-        flash[:error] = "You are not authorized to view content of this  #{name.humanize} or this file format is not supported"
+        error("You are not authorized to view content of this  #{name.humanize} or this file format is not supported", 'is invalid')
         return false
       end
     end
