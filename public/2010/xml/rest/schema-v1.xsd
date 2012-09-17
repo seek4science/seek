@@ -74,8 +74,6 @@
                        minOccurs="0" maxOccurs="1"></xsd:element>
           <xsd:element name="creators" type="Creators" minOccurs="1"
                        maxOccurs="1"></xsd:element>
-          <xsd:element name="content_type" type="xsd:string"
-                       minOccurs="1" maxOccurs="1"></xsd:element>
           <xsd:element name="version" type="xsd:string"
                        minOccurs="1" maxOccurs="1"></xsd:element>
           <xsd:element name="revision_comments" type="xsd:string"
@@ -107,8 +105,6 @@
                        minOccurs="0" maxOccurs="1"></xsd:element>
           <xsd:element name="creators" type="Creators" minOccurs="1"
                        maxOccurs="1"></xsd:element>
-          <xsd:element name="content_type" type="xsd:string"
-                       minOccurs="1" maxOccurs="1"></xsd:element>
           <xsd:element name="version" type="xsd:string"
                        minOccurs="1" maxOccurs="1"></xsd:element>
           <xsd:element name="revision_comments" type="xsd:string"
