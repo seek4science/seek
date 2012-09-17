@@ -99,7 +99,7 @@ class Model < ActiveRecord::Base
   end
 
   def model_contents
-    if content_blob.file_exists?
+    if content_blob.try(:file_exists?)
       species | parameters_and_values.keys
     else
       Rails.logger.error("Unable to find data contents for Model #{self.id}")
