@@ -553,9 +553,13 @@ module ApplicationHelper
 
   def add_return_to_search
     referer = request.headers["Referer"].try(:normalize_trailing_slash)
-    request_uri = request.headers['REQUEST_URI'].try(:normalize_trailing_slash)
     search_path = search_url.normalize_trailing_slash
     root_path = root_url.normalize_trailing_slash
+    request_uri = request.headers['REQUEST_URI'].try(:normalize_trailing_slash)
+    if !request_uri.include?(root_path)
+      request_uri = root_path.chop + request_uri
+    end
+
     if referer == search_path && referer != request_uri && request_uri != root_path
       javascript_tag "
         if (window.history.length > 1){
