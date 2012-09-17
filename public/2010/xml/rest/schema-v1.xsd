@@ -94,6 +94,46 @@
     </xsd:complexContent>
   </xsd:complexType>
 
+  <xsd:complexType name="MultipleContentBlobsAssetType">
+    <xsd:complexContent>
+      <xsd:extension base="MinimalType">
+        <xsd:sequence>
+          <xsd:element ref="dc:creator" maxOccurs="1" minOccurs="0"></xsd:element>
+          <xsd:element name="uuid" type="xsd:string" minOccurs="1"
+                       maxOccurs="1"></xsd:element>
+          <xsd:element name="submitter" type="Submitter"
+                       minOccurs="1" maxOccurs="1"></xsd:element>
+          <xsd:element name="organisms" type="OrganismItems"
+                       minOccurs="0" maxOccurs="1"></xsd:element>
+          <xsd:element name="creators" type="Creators" minOccurs="1"
+                       maxOccurs="1"></xsd:element>
+          <xsd:element name="content_type" type="xsd:string"
+                       minOccurs="1" maxOccurs="1"></xsd:element>
+          <xsd:element name="version" type="xsd:string"
+                       minOccurs="1" maxOccurs="1"></xsd:element>
+          <xsd:element name="revision_comments" type="xsd:string"
+                       minOccurs="0" maxOccurs="1"></xsd:element>
+          <xsd:element name="latest_version" type="ResourceLink"
+                       minOccurs="1" maxOccurs="1"></xsd:element>
+          <xsd:element name="versions" type="VersionLinks"
+                       minOccurs="1" maxOccurs="1"></xsd:element>
+          <xsd:element name="policy" type="xsd:anyType" minOccurs="0" maxOccurs="1"></xsd:element>
+          <xsd:element name="blobs" type="Blobs" minOccurs="1"
+                       maxOccurs="1"></xsd:element>
+          <xsd:element name="tags" type="Tags" maxOccurs="1"
+                       minOccurs="1"></xsd:element>
+        </xsd:sequence>
+      </xsd:extension>
+    </xsd:complexContent>
+  </xsd:complexType>
+
+  <xsd:complexType name="Blobs">
+    <xsd:sequence>
+      <xsd:element name="blob" type="Blob" minOccurs="0"
+                   maxOccurs="unbounded"></xsd:element>
+    </xsd:sequence>
+  </xsd:complexType>
+
   <xsd:complexType name="Blob">
     <xsd:complexContent>
       <xsd:extension base="ResourceLink">
@@ -105,6 +145,8 @@
           <xsd:element name="url" type="xsd:string" minOccurs="1"
                        maxOccurs="1"></xsd:element>
           <xsd:element name="original_filename" type="xsd:string" minOccurs="1"
+                       maxOccurs="1"></xsd:element>
+          <xsd:element name="content_type" type="xsd:string" minOccurs="1"
                        maxOccurs="1"></xsd:element>
           <xsd:element name="is_remote" type="xsd:boolean"
                        minOccurs="1" maxOccurs="1"></xsd:element>
@@ -524,7 +566,7 @@
 
   <xsd:complexType name="Model">
     <xsd:complexContent>
-      <xsd:extension base="AssetType">
+      <xsd:extension base="MultipleContentBlobsAssetType">
         <xsd:sequence>
           <xsd:element name="model_type" type="xsd:string"
                        minOccurs="1" maxOccurs="1" nillable="true"></xsd:element>
