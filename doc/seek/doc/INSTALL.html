@@ -101,7 +101,7 @@ is troublesome and is not covered here.</p>
 
 <h2 id="label-Prerequesites">Prerequesites</h2>
 
-<p>We recommend you use ruby, version 1.8.7.</p>
+<p>SEEK requires Ruby version 1.8.7.</p>
 
 <p>The steps in the next section outline the commands required to install all
 the required packages for Ubuntu or Debian.</p>
@@ -131,12 +131,14 @@ work fine.</p>
 <p>for Ubuntu Precise 12.04 (LTS):</p>
 
 <pre>sudo apt-get install wget mercurial ruby ri1.8 libruby1.8 ruby-dev mysql-server libssl-dev build-essential openssh-server
-sudo apt-get install libmysqlclient-dev libmagick++-dev libxslt1-dev libxml++2.6-dev openjdk-6-jdk graphviz libsqlite3-dev sqlite3</pre>
+sudo apt-get install libmysqlclient-dev libmagick++-dev libxslt1-dev libxml++2.6-dev openjdk-6-jdk graphviz libsqlite3-dev sqlite3
+sudo apt-get install poppler-utils tesseract-ocr openoffice.org openoffice.org-java-common</pre>
 
 <p>for Ubuntu Lucid 10.04 (LTS):</p>
 
 <pre>sudo apt-get install wget mercurial ruby rdoc ri libopenssl-ruby ruby-dev mysql-server libssl-dev build-essential openssh-server 
-sudo apt-get install libmysqlclient16-dev libmagick++-dev libxslt-dev libxml++2.6-dev openjdk-6-jdk graphviz libsqlite3-dev sqlite3</pre>
+sudo apt-get install libmysqlclient16-dev libmagick++-dev libxslt-dev libxml++2.6-dev openjdk-6-jdk graphviz libsqlite3-dev sqlite3
+sudo apt-get install poppler-utils tesseract-ocr openoffice.org openoffice.org-java-common</pre>
 
 <p>If setting up for production deployment using the <a
 href="http://www.modrails.com/">Passenger Phusion (modrails)</a> module you
@@ -144,21 +146,26 @@ can save a step later by also using:</p>
 
 <pre>sudo apt-get install apache2-mpm-prefork apache2-prefork-dev libapr1-dev libaprutil1-dev libcurl4-openssl-dev</pre>
 
-<p>You now need to install the latest rubygems (currently 1.8.24). Rather than
-install through apt-get, we recommend downloading and installing from the
-rubygems website: <a
+<p>You now need to install Rubygems version 1.6.2. (SEEK does work with the
+latest version of Rubygems, but you do get some deprecation warning
+messages from the Rails code). Rather than install through apt-get, we
+recommend downloading and installing from the rubygems website: <a
 href="http://rubygems.org/pages/download.">rubygems.org/pages/download.</a>
 The following commands should install rubygems for you on a Ubuntu/Debian
 system.</p>
 
 <pre>cd /tmp
-wget http://production.cf.rubygems.org/rubygems/rubygems-1.8.24.tgz
-tar zfxv rubygems-1.8.24.tgz
-cd rubygems-1.8.24/
+wget http://production.cf.rubygems.org/rubygems/rubygems-1.6.2.tgz
+tar zfxv rubygems-1.6.2.tgz
+cd rubygems-1.6.2/
 sudo ruby ./setup.rb
 cd /usr/bin/
 sudo ln -s gem1.8 gem
 cd -</pre>
+
+<p>Note - we also recommend the use of <a href="https://rvm.io/">Ruby Version
+Manager (RVM)</a> for managing your version of Ruby and Rubygems. Follow
+the link to find out more about RVM, and how to install and use it.</p>
 
 <h2 id="label-Getting+the+source+code">Getting the source code</h2>
 
@@ -173,10 +180,10 @@ Repository</a>, using <a href="http://mercurial.selenic.com/">Mercurial</a>
 as the version control system.</p>
 
 <p>For a stable version, you should check out according to a stable tag. Our
-current stable tag is <em>0.14.0</em>, so to retrieve this version you
+current stable tag is <em>0.14.1</em>, so to retrieve this version you
 should use:</p>
 
-<pre>hg clone https://sysmo-db.googlecode.com/hg/ -r v0.14.0 seek</pre>
+<pre>hg clone https://sysmo-db.googlecode.com/hg/ -r v0.14.1 seek</pre>
 
 <p>This will create a <em>seek</em> directory that contains the application.</p>
 
@@ -233,7 +240,7 @@ schema and seeds the database with any default data</p>
 <h2 id="label-Starting+Delayed-Job+%28Background+processing%29">Starting Delayed-Job (Background processing)</h2>
 
 <p>Some background processing is handled using a tool called <em>Delayed
-Job</em>.</p>
+Job</em>, and it is essential this is running for SEEK to behave correctly.</p>
 
 <p>To start delayed job run the script</p>
 
@@ -242,6 +249,22 @@ Job</em>.</p>
 <p>or for production:</p>
 
 <pre>RAILS_ENV=production ./script/delayed_job start</pre>
+
+<p>For production servers, we recommend setting up an init.d script to
+automatically start and stop delayed_job. An example script can be found
+at: <a href="https://gist.github.com/3169625">gist.github.com/3169625</a>
+Put this script in /etc/init.d/, called maybe seek-delayed-job, and edit
+the APP_PATH accordingly. Then run</p>
+
+<pre>sudo update-rc.d seek-delayed-job defaults</pre>
+
+<p>You can then start and stop delayed job using:</p>
+
+<pre>sudo service seek-delayed-job start</pre>
+
+<p>and</p>
+
+<pre>sudo service seek-delayed-job stop</pre>
 
 <h2 id="label-Starting+the+server">Starting the server</h2>
 
@@ -293,7 +316,7 @@ will need to restart the server after changing this setting.</p>
 <p>If you want Sunspot SOLR to start automatically whenever you restart the
 machine SEEK is running on, you probably want to create an init.d/ script.
 A script we use is available at <a
-href="https://gist.github.com/2788607">gist.github.com/2788607</a> (the
+href="https://gist.github.com/3143434">gist.github.com/3143434</a> (the
 APP_PATH may need changing for you)</p>
 
 <p>On Ubuntu or Debian, after putting the script in init.d/ you should run
@@ -301,7 +324,7 @@ APP_PATH may need changing for you)</p>
 
 <pre>sudo update-rc.d seek-solr defaults</pre>
 
-<p>You can then stop the service with</p>
+<p>You can then start the service with</p>
 
 <pre>service seek-solr start</pre>
 
@@ -387,6 +410,10 @@ PassengerRuby /usr/bin/ruby1.8</pre>
        Options -MultiViews            
     &lt;/Directory&gt;
  &lt;/VirtualHost&gt;</pre>
+
+<p>When setting up a production server, it is recommended that init.d/ scripts
+are added for delayed job, and sunspot. See the delayed job and Sunspot
+sections above for instructions on how to do this.</p>
 
 <h2 id="label-Rebranding+SysMO+SEEK+for+other+projects">Rebranding SysMO SEEK for other projects</h2>
 
