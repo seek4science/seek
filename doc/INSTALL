@@ -10,7 +10,7 @@ Although possible, installing and running Ruby on Rails on a Windows system is t
 
 == Prerequesites
 
-We recommend you use ruby, version 1.8.7.
+SEEK requires Ruby version 1.8.7.
 
 The steps in the next section outline the commands required to install all the required packages for Ubuntu or Debian. 
 
@@ -42,18 +42,20 @@ If setting up for production deployment using the {Passenger Phusion (modrails)}
 
   sudo apt-get install apache2-mpm-prefork apache2-prefork-dev libapr1-dev libaprutil1-dev libcurl4-openssl-dev
 
-
-You now need to install the latest rubygems (currently 1.8.24). Rather than install through apt-get, we recommend downloading and installing from the rubygems website: http://rubygems.org/pages/download.
+You now need to install Rubygems version 1.6.2. (SEEK does work with the latest version of Rubygems, but you do get some deprecation warning messages from the Rails code).
+Rather than install through apt-get, we recommend downloading and installing from the rubygems website: http://rubygems.org/pages/download.
 The following commands should install rubygems for you on a Ubuntu/Debian system.
 
   cd /tmp
-  wget http://production.cf.rubygems.org/rubygems/rubygems-1.8.24.tgz
-  tar zfxv rubygems-1.8.24.tgz
-  cd rubygems-1.8.24/
+  wget http://production.cf.rubygems.org/rubygems/rubygems-1.6.2.tgz
+  tar zfxv rubygems-1.6.2.tgz
+  cd rubygems-1.6.2/
   sudo ruby ./setup.rb
   cd /usr/bin/
   sudo ln -s gem1.8 gem
   cd -
+
+Note - we also recommend the use of {Ruby Version Manager (RVM)}[https://rvm.io/] for managing your version of Ruby and Rubygems. Follow the link to find out more about RVM, and how to install and use it.
 
 == Getting the source code
 

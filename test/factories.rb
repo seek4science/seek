@@ -509,6 +509,7 @@ end
   Factory.define(:ppt_content_blob, :parent => :content_blob) do |f|
     f.data File.new("#{Rails.root}/test/fixtures/files/ms_ppt_test.ppt", "rb").read
     f.content_type 'application/vnd.ms-powerpoint'
+    f.original_filename "ppt_presentation.ppt"
   end
 
   Factory.define(:pptx_content_blob, :parent => :content_blob) do |f|

@@ -30,6 +30,8 @@ The released versions are listed below:
 * 0.13.2
 * 0.13.3
 * 0.14.0
+* 0.14.1
+* 0.15.0
 
 <em>(Note there was no 0.12.x version released externally, this was an internal release)</em>
 
@@ -64,6 +66,36 @@ These are the fairly standard steps when upgrading between minor versions.
     bundle exec rake sunspot:solr:start RAILS_ENV=production # to restart the search server
     RAILS_ENV=production ./script/delayed_job start
     touch tmp/restart.txt
+
+== Steps to upgrade from 0.14.x to 0.15.x
+
+SEEK 0.15 upgraded Rails to the latest 2 version,2.3.14. This requires an update of Rubygems to 1.6.2. You can update rubygems directly by running
+
+    gem update --system -v 1.6.2
+
+or install from scratch by reading the INSTALL guide. You can also use RVM[https://rvm.io/]. SEEK 0.15 also runs fine on the latest Rubygems (currently 1.8.24) but
+you will get some deprecation warnings.
+You can check you have the correct version of rubygems by running
+
+    gem -v
+
+Once Rubygems has been updated, the upgrade is the typical:
+
+    RAILS_ENV=production ./script/delayed_job stop
+    bundle exec rake sunspot:solr:stop RAILS_ENV=production
+    hg pull https://sysmo-db.googlecode.com/hg/ -r v0.15.0
+    hg update
+    hg merge # only required if you've made changes since installing. If you have you may need to deal with conflicts.
+    hg commit -m "merged" # likewise - only required if you made changes since installing
+    bundle install --deployment
+    bundle exec rake seek:upgrade RAILS_ENV=production
+    bundle exec rake tmp:assets:clear RAILS_ENV=production
+    bundle exec rake tmp:clear RAILS_ENV=production
+
+    bundle exec rake sunspot:solr:start RAILS_ENV=production # to restart the search server
+    RAILS_ENV=production ./script/delayed_job start
+    touch tmp/restart.txt
+
 
 == Steps to upgrade from 0.13.x to 0.14.x
 

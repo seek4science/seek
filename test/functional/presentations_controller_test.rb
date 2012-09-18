@@ -60,11 +60,11 @@ class PresentationsControllerTest < ActionController::TestCase
 
     assert_select "div.box_about_actor" do
       assert_select "p > b",:text=>/Filename:/
-      assert_select "p",:text=>/ms_ppt_presentation\.ppt/
+      assert_select "p",:text=>/ppt_presentation\.ppt/
       assert_select "p > b",:text=>/Format:/
       assert_select "p",:text=>/PowerPoint presentation/
       assert_select "p > b",:text=>/Size:/
-      assert_select "p",:text=>/81\.9 KB/
+      assert_select "p",:text=>/82\.4 KB/
     end
   end
 
