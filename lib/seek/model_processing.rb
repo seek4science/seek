@@ -29,50 +29,67 @@ module Seek
     private
 
     def species_from_sbml model
-      parser = LibXML::XML::Parser.file(model.content_blob.filepath)
-      doc = parser.parse
-      doc.root.namespaces.default_prefix="sbml"
-      species=[]
-      doc.find("//sbml:listOfSpecies/sbml:species").each do |node|
-        species << node.attributes["name"]
-        species << node.attributes["id"]
+      begin
+        parser = LibXML::XML::Parser.file(model.content_blob.filepath)
+        doc = parser.parse
+        doc.root.namespaces.default_prefix="sbml"
+        species=[]
+        doc.find("//sbml:listOfSpecies/sbml:species").each do |node|
+          species << node.attributes["name"]
+          species << node.attributes["id"]
+        end
+        species.select { |s| !s.blank? }.uniq
+      rescue Exception => e
+        Rails.logger.error("Error processing sbml model content for content_blob #{model.content_blob.id} #{e}")
+        []
       end
-      species.select{|s| !s.blank?}.uniq
     end
 
     def species_from_dat model
-      species = []
-      contents = open(model.content_blob.filepath).read
-      start_tag = "begin initial conditions"
-      start=contents.index(start_tag)
-      unless start.nil?
-        last = contents.index("end initial conditions")
-        unless last.nil?
-           interesting_bit = (contents[start+start_tag.length..last-1]).strip
-           unless interesting_bit.blank?
-             interesting_bit.each_line do |line|
-               unless line.index("[").nil?
-                 species << line.gsub(/\[.*/,"").strip
-               end
-             end
-           end
+      begin
+        species = []
+        contents = open(model.content_blob.filepath).read
+        start_tag = "begin initial conditions"
+        start=contents.index(start_tag)
+        unless start.nil?
+          last = contents.index("end initial conditions")
+          unless last.nil?
+            interesting_bit = (contents[start+start_tag.length..last-1]).strip
+            unless interesting_bit.blank?
+              interesting_bit.each_line do |line|
+                unless line.index("[").nil?
+                  species << line.gsub(/\[.*/, "").strip
+                end
+              end
+            end
+          end
         end
+        species
+      rescue Exception => e
+        Rails.logger.error("Error processing dat model content for content_blob #{model.content_blob.id} #{e}")
+        []
       end
-      species
     end
+
     def parameters_and_values_from_sbml model
-    parser = LibXML::XML::Parser.file(model.content_blob.filepath)
-      doc = parser.parse
-      doc.root.namespaces.default_prefix="sbml"
-      params={}
-      doc.find("//sbml:listOfParameters/sbml:parameter").each do |node|
-        value = node.attributes["value"] || nil
-        params[node.attributes["id"]]=value
+      begin
+        parser = LibXML::XML::Parser.file(model.content_blob.filepath)
+        doc = parser.parse
+        doc.root.namespaces.default_prefix="sbml"
+        params={}
+        doc.find("//sbml:listOfParameters/sbml:parameter").each do |node|
+          value = node.attributes["value"] || nil
+          params[node.attributes["id"]]=value
+        end
+        params
+      rescue Exception => e
+        Rails.logger.error("Error processing sbml model content for content_blob #{model.content_blob.id} #{e}")
+        {}
       end
-      params
-  end
+    end
 
   def parameters_and_values_from_dat model
+    begin
       params_and_values = {}
       contents = open(model.content_blob.filepath).read
       start_tag = "begin parameters"
@@ -80,18 +97,22 @@ module Seek
       unless start.nil?
         last = contents.index("end parameters")
         unless last.nil?
-           interesting_bit = (contents[start+start_tag.length..last-1]).strip
-           unless interesting_bit.blank?
-             interesting_bit.each_line do |line|
-               unless line.index("=").nil?
-                 p_and_v = line.split("=")
-                 params_and_values[p_and_v[0].strip]=p_and_v[1].strip
-               end
-             end
-           end
+          interesting_bit = (contents[start+start_tag.length..last-1]).strip
+          unless interesting_bit.blank?
+            interesting_bit.each_line do |line|
+              unless line.index("=").nil?
+                p_and_v = line.split("=")
+                params_and_values[p_and_v[0].strip]=p_and_v[1].strip
+              end
+            end
+          end
         end
       end
       params_and_values
+    rescue Exception => e
+      Rails.logger.error("Error processing dat model content for content_blob #{model.content_blob.id} #{e}")
+      {}
     end
+  end
   end
 end
