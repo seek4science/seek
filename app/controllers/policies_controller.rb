@@ -71,12 +71,15 @@ class PoliciesController < ApplicationController
       creators = (params["creators"].blank? ? [] : ActiveSupport::JSON.decode(params["creators"])).uniq
       creators.collect!{|c| Person.find(c[1])}
 
-      resource = resource_with_assigned_projects params[:resource_name],params[:resource_id],params[:project_ids]
-      resource.policy = policy
-      resource.creators = creators if resource.respond_to?:creators
-      resource.contributor = contributor_person
+      resource_class = params[:resource_name].camelize.constantize
+      resource = resource_class.find_by_id(params[:resource_id]) || resource_class.new
+      cloned_resource = resource.clone
+      cloned_resource= resource_with_assigned_projects cloned_resource,params[:project_ids]
+      cloned_resource.policy = policy
+      cloned_resource.creators = creators if cloned_resource.respond_to?:creators
+      cloned_resource.contributor = contributor_person
 
-      asset_managers = get_asset_managers resource
+      asset_managers = get_asset_managers cloned_resource
 
       privileged_people = {}
       #exclude the current_person from the privileged people
@@ -88,17 +91,19 @@ class PoliciesController < ApplicationController
       privileged_people['asset_managers'] = asset_managers unless asset_managers.empty?
 
       respond_to do |format|
-        format.html { render :template=>"layouts/preview_permissions", :locals => {:policy => policy, :privileged_people => privileged_people, :updated_can_publish => updated_can_publish}}
+        format.html { render :template=>"layouts/preview_permissions", :locals => {:policy => policy, :privileged_people => privileged_people, :updated_can_publish => updated_can_publish(resource)}}
       end
   end
 
   #To check where the can_publish? changes when changing the projects associated with the resource
-  def updated_can_publish resource_name=params[:resource_name], resource_id=params[:resource_id], project_ids=params[:project_ids]
-    resource = resource_with_assigned_projects resource_name, resource_id, project_ids
+  def updated_can_publish resource, project_ids=params[:project_ids]
+    cloned_resource = resource.clone
+    cloned_resource.policy = resource.policy.deep_copy
+    cloned_resource = resource_with_assigned_projects cloned_resource,project_ids
     if !resource.new_record? && resource.policy.sharing_scope == Policy::EVERYONE
       updated_can_publish = true
     else
-      updated_can_publish = resource.can_publish?
+      updated_can_publish = cloned_resource.can_publish?
     end
     updated_can_publish
   end
@@ -113,15 +118,13 @@ class PoliciesController < ApplicationController
     asset_managers
   end
 
-  def resource_with_assigned_projects resource_name, resource_id, project_ids
-    resource_class = resource_name.camelize.constantize
-     resource = resource_class.find_by_id(resource_id) || resource_class.new
+  def resource_with_assigned_projects resource, project_ids
      if resource.kind_of?Assay
        resource.study = Study.find_by_id(project_ids.to_i)
      elsif resource.kind_of?Study
         resource.investigation = Investigation.find_by_id(project_ids.to_i)
      else
-       selected_projects = get_selected_projects project_ids, resource_name
+       selected_projects = get_selected_projects project_ids, resource.class.name.underscore
        resource.projects = selected_projects
      end
      resource
