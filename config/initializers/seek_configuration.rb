@@ -35,6 +35,9 @@ Seek::Config.default :home_description, 'Some (configurable) information about t
 Seek::Config.default :publish_button_enabled,false
 Seek::Config.default :auth_lookup_enabled,true
 
+#time in minutes that the feeds on the front page are cached for
+Seek::Config.default :home_feeds_cache_timeout,2
+
 # Branding
 Seek::Config.default :project_name,'SysMO'
 Seek::Config.default :project_type,'Consortium'
