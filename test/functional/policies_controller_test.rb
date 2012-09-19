@@ -106,7 +106,7 @@ class PoliciesControllerTest < ActionController::TestCase
       assert sample.can_manage?
       assert sample.can_publish?
 
-      updated_can_publish = PoliciesController.new().updated_can_publish('sample', sample.id, gatekeeper.projects.first.id.to_s)
+      updated_can_publish = PoliciesController.new().updated_can_publish(sample, gatekeeper.projects.first.id.to_s)
       assert !updated_can_publish
   end
 
@@ -118,7 +118,7 @@ class PoliciesControllerTest < ActionController::TestCase
         assert sample.can_manage?
         assert sample.can_publish?
 
-        updated_can_publish = PoliciesController.new().updated_can_publish('sample', sample.id, Factory(:project).id.to_s)
+        updated_can_publish = PoliciesController.new().updated_can_publish(sample, Factory(:project).id.to_s)
         assert updated_can_publish
     end
 
@@ -133,7 +133,7 @@ class PoliciesControllerTest < ActionController::TestCase
     assert sample.can_manage?
     assert sample.can_publish?
 
-    updated_can_publish = PoliciesController.new().updated_can_publish('sample', sample.id, gatekeeper.projects.first.id.to_s)
+    updated_can_publish = PoliciesController.new().updated_can_publish(sample, gatekeeper.projects.first.id.to_s)
     assert !updated_can_publish
   end
 
@@ -148,7 +148,7 @@ class PoliciesControllerTest < ActionController::TestCase
         assert sample.can_manage?
         assert !sample.can_publish?
 
-        updated_can_publish = PoliciesController.new().updated_can_publish('sample', sample.id, Factory(:project).id.to_s)
+        updated_can_publish = PoliciesController.new().updated_can_publish(sample, Factory(:project).id.to_s)
         assert updated_can_publish
   end
 
@@ -160,7 +160,7 @@ class PoliciesControllerTest < ActionController::TestCase
     assert assay.can_manage?
     assert assay.can_publish?
 
-    updated_can_publish = PoliciesController.new().updated_can_publish('assay', assay.id, '')
+    updated_can_publish = PoliciesController.new().updated_can_publish(assay, '')
     assert updated_can_publish
   end
 
@@ -174,7 +174,7 @@ class PoliciesControllerTest < ActionController::TestCase
     assert assay.can_manage?
     assert !assay.can_publish?
 
-    updated_can_publish = PoliciesController.new().updated_can_publish('assay', assay.id, assay.study.id.to_s)
+    updated_can_publish = PoliciesController.new().updated_can_publish(assay, assay.study.id.to_s)
     assert !updated_can_publish
   end
 
@@ -190,7 +190,7 @@ class PoliciesControllerTest < ActionController::TestCase
           assert sample.can_manage?
           assert sample.can_publish?
 
-          updated_can_publish = PoliciesController.new().updated_can_publish('sample', sample.id, gatekeeper.projects.first.id.to_s)
+          updated_can_publish = PoliciesController.new().updated_can_publish(sample, gatekeeper.projects.first.id.to_s)
           assert updated_can_publish
   end
 
