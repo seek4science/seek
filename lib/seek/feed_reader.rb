@@ -45,7 +45,8 @@ module Seek
     end
 
     def self.cache_timeout
-      Seek::Config.home_feeds_cache_timeout
+      t = Seek::Config.home_feeds_cache_timeout
+      t.minutes.ago
     end
   
     private
