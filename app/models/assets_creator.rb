@@ -18,9 +18,8 @@ class AssetsCreator < ActiveRecord::Base
     
     #Remove any creators in the database but not in the list
     ids_to_remove.each do |i|
-      #Get the Person object to remove. (this is much faster than doing find_by_id)
-      creator_to_remove = existing_creators.select {|a| a.id == i}.first
-      resource.creators.delete(creator_to_remove)
+      assets_creators = resource.assets_creators.select{|ac| ac.creator_id==i}
+      assets_creators.each{|ac| ac.destroy}
       #changes_made = true
     end
     
