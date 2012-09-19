@@ -94,6 +94,12 @@ class ActiveSupport::TestCase
 
   #profiling
 
+  def with_profiling
+    start_profiling
+    yield
+    stop_profiling
+  end
+
   def start_profiling
     RubyProf.start
   end
