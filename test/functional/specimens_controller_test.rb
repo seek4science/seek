@@ -2,7 +2,7 @@ require "test_helper"
 
 class SpecimensControllerTest < ActionController::TestCase
 
-fixtures :all
+  fixtures :all
   include AuthenticatedTestHelper
   include RestTestCases
 

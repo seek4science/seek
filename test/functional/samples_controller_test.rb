@@ -1,7 +1,7 @@
 require "test_helper"
 
 class SamplesControllerTest < ActionController::TestCase
-fixtures :all
+  fixtures :policies
   include AuthenticatedTestHelper
   include RestTestCases
 
