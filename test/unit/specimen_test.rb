@@ -1,7 +1,7 @@
 require "test_helper"
 
 class SpecimenTest < ActiveSupport::TestCase
-fixtures :all
+
 
   test "validation" do
 
