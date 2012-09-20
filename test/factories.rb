@@ -303,18 +303,6 @@ end
     end
   end
 
-  #Model Version
-  Factory.define(:model_version,:class=>Model::Version) do |f|
-    f.association :model
-    f.after_create do |model_version|
-      model_version.model.version +=1
-      model_version.model.save
-      model_version.version = model_version.model.version
-      model_version.title = model_version.model.title
-      model_version.save
-    end
-  end
-
   Factory.define(:cronwright_model,:parent=>:model) do |f|
     f.content_type "text/xml"
     f.association :content_blob,:factory=>:cronwright_model_content_blob
@@ -367,46 +355,49 @@ end
   end
 
   #Model Version
-  Factory.define("Model::Version".to_sym) do |f|
+  Factory.define(:model_version,:class=>Model::Version) do |f|
     f.association :model
     f.after_create do |model_version|
       model_version.model.version +=1
       model_version.model.save
       model_version.version = model_version.model.version
+      model_version.title = model_version.model.title
       model_version.save
     end
-
   end
 
   #SOP Version
-  Factory.define("Sop::Version".to_sym) do |f|
+  Factory.define(:sop_version,:class=>Sop::Version) do |f|
     f.association :sop
     f.after_create do |sop_version|
       sop_version.sop.version +=1
       sop_version.sop.save
       sop_version.version = sop_version.sop.version
+      sop_version.title = sop_version.sop.title
       sop_version.save
     end
   end
 
   #DataFile Version
-  Factory.define("DataFile::Version".to_sym) do |f|
+  Factory.define(:data_file_version,:class=>DataFile::Version) do |f|
     f.association :data_file
     f.after_create do |data_file_version|
       data_file_version.data_file.version +=1
       data_file_version.data_file.save
       data_file_version.version = data_file_version.data_file.version
+      data_file_version.title = data_file_version.data_file.title
       data_file_version.save
     end
   end
 
   #Presentation Version
-  Factory.define("Presentation::Version".to_sym) do |f|
+  Factory.define(:presentation_version,:class=>Presentation::Version) do |f|
     f.association :presentation
     f.after_create do |presentation_version|
       presentation_version.presentation.version +=1
       presentation_version.presentation.save
       presentation_version.version = presentation_version.presentation.version
+      presentation_version.title = presentation_version.presentation.title
       presentation_version.save
     end
   end

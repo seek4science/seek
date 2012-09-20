@@ -129,7 +129,7 @@ fixtures :all
     User.with_current_user Factory(:user) do
       specimen = Factory :specimen, :contributor => User.current_user
       sop = Factory :sop, :contributor => User.current_user
-      sop_version_2 = Factory("Sop::Version", :sop => sop)
+      sop_version_2 = Factory(:sop_version, :sop => sop)
       assert 2, sop.versions.count
       assert_equal sop_version_2, sop.latest_version
 
