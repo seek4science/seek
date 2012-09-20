@@ -1,7 +1,7 @@
 require 'test_helper'
 
 class ExperimentalConditionTest < ActiveSupport::TestCase
-  fixtures :all
+  fixtures :units, :sops, :measured_items, :users, :synonyms
   include StudiedFactorsHelper
 
   test 'should not create experimental condition with the concentration of no substance' do
@@ -37,29 +37,27 @@ class ExperimentalConditionTest < ActiveSupport::TestCase
     end
   end
 
-  test 'should list the existing ECes of the project the sop belongs to, filtered by can_view' do
-    user = Factory(:user)
+  test 'should list the existing ECes of the project the sop belongs to filtered by can_view' do
+    user = Factory :user
+    other_user = Factory :user
     sop = Factory(:sop, :contributor => user)
     #create bunch of sops and ECs which belong to the same project and the sops can be viewed
-    i=0
-    while i < 10  do
-      s = Factory(:sop, :projects => [Factory(:project), sop.projects.first], :policy => Factory(:all_sysmo_viewable_policy))
+    n=2
+    (0...n).to_a.each do |i|
+      s = Factory(:sop, :projects => [Factory(:project), sop.projects.first], :policy => Factory(:all_sysmo_viewable_policy), :contributor=>other_user)
       Factory(:experimental_condition, :sop => s, :start_value => i)
-      i +=1
     end
 
     #create bunch of sops and ECs which belong to the same project and the sops can not be viewed
-    i=0
-    while i < 10 do
-      s = Factory(:sop, :projects => [sop.projects.first, Factory(:project)])
+    (0...n).to_a.each do |i|
+      s = Factory(:sop, :projects => [sop.projects.first, Factory(:project)], :contributor=>other_user)
       Factory(:experimental_condition, :sop => s, :start_value => i)
-      i +=1
     end
 
     User.with_current_user  user do
         assert sop.can_edit?
         ecs = fses_or_ecs_of_project sop, 'experimental_conditions'
-        assert_equal 10, ecs.count
+        assert_equal n, ecs.count
         ecs.each do |ec|
           assert ec.sop.can_view?
           assert !(ec.sop.project_ids & sop.project_ids).empty?
@@ -71,29 +69,26 @@ class ExperimentalConditionTest < ActiveSupport::TestCase
     ec_array = []
     s = Factory(:sop)
     #create bunch of FSes which are different
-    i=0
-    number_of_different_ecs = 10
-    number_of_the_same_ecs = 5
-    while i < number_of_different_ecs  do
+
+    number_of_different_ecs = 2
+    number_of_the_same_ecs = 2
+    (0...number_of_different_ecs).to_a.each do |i|
       ec_array.push Factory(:experimental_condition, :sop => s, :start_value => i)
-      i +=1
     end
     #create bunch of ECes which are the same based on the set (measured_item, unit, value, substances)
     compound = Factory(:compound, :name => 'glucose')
     measured_item = Factory(:measured_item)
     unit = Factory(:unit)
-    j=0
-    while j < number_of_the_same_ecs  do
+    (0...number_of_the_same_ecs).to_a.each do
       experimental_condition_link = Factory(:experimental_condition_link, :substance => compound)
-      ec = Factory(:experimental_condition, :measured_item => measured_item, :unit => unit)
+      ec = Factory(:experimental_condition, :measured_item => measured_item, :unit => unit, :sop=>s)
       ec.experimental_condition_links = [experimental_condition_link]
       ec.save
       ec_array.push ec
-      j +=1
     end
-    assert_equal ec_array.count, i+j
+    assert_equal 4,ec_array.count
     uniq_ec_array = uniq_fs_or_ec ec_array
-    assert_equal uniq_ec_array.count, i+1
+    assert_equal 3, uniq_ec_array.count
   end
 
   test "should create experimental condition and the association has_many compounds , through experimental_condition_links table" do
