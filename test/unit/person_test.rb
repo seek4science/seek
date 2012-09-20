@@ -1,7 +1,7 @@
 require 'test_helper'
 
 class PersonTest < ActiveSupport::TestCase
-  fixtures :all
+  fixtures :users, :people
   
   # Replace this with your real tests.
   def test_work_groups
@@ -20,7 +20,7 @@ class PersonTest < ActiveSupport::TestCase
 
   def test_active_ordered_by_updated_at_and_avatar_not_null
 
-    Person.destroy_all
+    Person.delete_all
 
     avatar = Factory :avatar
 
@@ -374,17 +374,20 @@ class PersonTest < ActiveSupport::TestCase
   end
   
   def test_disciplines
-    p=people(:modeller_person)
+    p = Factory :person,:disciplines=>[Factory(:discipline,:title=>"A"),Factory(:discipline, :title=>"B")]
+    p.reload
     assert_equal 2,p.disciplines.size
-    assert p.disciplines.include?(disciplines(:modeller))
-    assert p.disciplines.include?(disciplines(:experimentalist))
+    assert_equal "A",p.disciplines[0].title
+    assert_equal "B",p.disciplines[1].title
+
   end
   
   def test_roles_association
-    p=people(:person_for_model_owner)
-    assert_equal 2, p.project_roles.size
-    assert p.project_roles.include?(project_roles(:member))
-    assert p.project_roles.include?(project_roles(:postdoc))
+    role = Factory(:project_role)
+    p=Factory :person
+    p.group_memberships.first.project_roles << role
+    assert_equal 1, p.project_roles.size
+    assert p.project_roles.include?(role)
   end
   
   def test_update_first_letter

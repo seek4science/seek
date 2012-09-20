@@ -339,6 +339,10 @@ end
     f.access_type 1
   end
 
+  Factory.define :discipline do |f|
+    f.sequence(:title) {|n| "Discipline #{n}"}
+  end
+
   Factory.define(:organism) do |f|
     f.title "An Organism"
   end
