@@ -81,7 +81,7 @@ class PersonTest < ActiveSupport::TestCase
     p.save!
     assert !p.is_admin?, "Should not automatically be admin, since people already exist"
 
-    Person.destroy_all
+    Person.delete_all
 
     assert_equal 0,Person.count #no people should exist
     p=Person.new(:first_name=>"XXX",:email=>"xxx@email.com")
