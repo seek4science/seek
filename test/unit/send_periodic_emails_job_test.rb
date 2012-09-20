@@ -1,7 +1,6 @@
 require 'test_helper'
 
 class SendPeriodicEmailsJobTest < ActiveSupport::TestCase
-  #fixtures :all
 
   def setup
     @val = Seek::Config.email_enabled
