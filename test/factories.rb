@@ -303,6 +303,24 @@ end
     end
   end
 
+  #Model Version
+  Factory.define(:model_version,:class=>Model::Version) do |f|
+    f.association :model
+    f.after_create do |model_version|
+      model_version.model.version +=1
+      model_version.model.save
+      model_version.version = model_version.model.version
+      model_version.title = model_version.model.title
+      model_version.save
+    end
+  end
+
+  Factory.define(:cronwright_model,:parent=>:model) do |f|
+    f.content_type "text/xml"
+    f.association :content_blob,:factory=>:cronwright_model_content_blob
+    f.original_filename "cronwright.xml"
+  end
+
   Factory.define(:teusink_model,:parent=>:model) do |f|
     f.after_create do |model|
       model.content_blobs = [Factory.create(:teusink_model_content_blob, :asset=>model,:asset_version=>model.version)]

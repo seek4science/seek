@@ -1160,6 +1160,24 @@ class DataFilesControllerTest < ActionController::TestCase
     assert_not_nil flash[:error]
   end
 
+  test "should not show private data file to logged out user" do
+    df=Factory :data_file
+    logout
+    get :show, :id=>df
+    assert_redirected_to data_files_path
+    assert_not_nil flash[:error]
+    assert_equal "You are not authorized to view this Data file, you may need to login first.",flash[:error]
+  end
+
+  test "should not show private data file to another user" do
+
+    df=Factory :data_file,:contributor=>Factory(:user)
+    get :show, :id=>df
+    assert_redirected_to data_files_path
+    assert_not_nil flash[:error]
+    assert_equal "You are not authorized to view this Data file.",flash[:error]
+  end
+
   test "should show error for the user who doesn't login or is not the project member, when the user specify the version and this version is not the latest version" do
     published_data_file = Factory(:data_file, :policy => Factory(:public_policy))
 

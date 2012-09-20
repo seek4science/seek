@@ -276,9 +276,9 @@ class ApplicationController < ActionController::Base
         respond_to do |format|
           #TODO: can_*? methods should report _why_ you can't do what you want. Perhaps something similar to how active_record_object.save stores 'why' in active_record_object.errors
           if User.current_user.nil?
-            flash[:error] = "You may not #{action} #{name}:#{params[:id]} , please log in first"
+            flash[:error] = "You are not authorized to #{action} this #{name.humanize}, you may need to login first."
           else
-            flash[:error] = "You are not authorized to #{action} this  #{name.humanize}"
+            flash[:error] = "You are not authorized to #{action} this #{name.humanize}."
           end
 
           format.html do

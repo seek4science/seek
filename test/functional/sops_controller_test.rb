@@ -117,6 +117,23 @@ class SopsControllerTest < ActionController::TestCase
     assert_equal assigns(:sops).sort_by(&:id), Authorization.authorize_collection("view", assigns(:sops), users(:aaron)).sort_by(&:id), "sops haven't been authorized properly"
   end
 
+  test "should not show private sop to logged out user" do
+    sop=Factory :sop
+    logout
+    get :show, :id=>sop
+    assert_redirected_to sops_path
+    assert_not_nil flash[:error]
+    assert_equal "You are not authorized to view this SOP, you may need to login first.",flash[:error]
+  end
+
+  test "should not show private sop to another user" do
+    sop=Factory :sop,:contributor=>Factory(:user)
+    get :show, :id=>sop
+    assert_redirected_to sops_path
+    assert_not_nil flash[:error]
+    assert_equal "You are not authorized to view this SOP.",flash[:error]
+  end
+
   test "should get new" do
     get :new
     assert_response :success

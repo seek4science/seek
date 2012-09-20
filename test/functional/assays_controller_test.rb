@@ -362,14 +362,14 @@ end
   end
 
   test "should not create modelling assay with sample" do
-    #FIXME: its allows at the moment due to time constraints before pals meeting, and fixtures and factories need updating. JIRA: SYSMO-734
+    person = Factory(:person)
     assert_no_difference("Assay.count") do
       post :create, :assay=>{:title=>"test",
                              :technology_type_id=>technology_types(:gas_chromatography).id,
                              :assay_type_id=>assay_types(:metabolomics).id,
                              :study_id=>studies(:metabolomics_study).id,
                              :assay_class=>assay_classes(:modelling_assay_class),
-                             :owner => Factory(:person),
+                             :owner => person,
                              :sample_ids=>[Factory(:sample).id, Factory(:sample).id]
       }
     end
