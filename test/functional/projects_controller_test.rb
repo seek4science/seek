@@ -201,11 +201,13 @@ class ProjectsControllerTest < ActionController::TestCase
 	end
 
 	test "pals displayed in show page" do
-		get :show,:id=>projects(:sysmo_project)
+    pal = Factory :pal,:first_name=>"A",:last_name=>"PAL"
+    project = pal.projects.first
+		get :show,:id=>project
 		assert_select "div.box_about_actor p.pals" do
 			assert_select "label",:text=>"SysMO-DB PALs:",:count=>1
 			assert_select "a",:count=>1
-			assert_select "a[href=?]",person_path(people(:pal)),:text=>"A PAL",:count=>1
+			assert_select "a[href=?]",person_path(pal),:text=>"A PAL",:count=>1
 		end
   end
 
