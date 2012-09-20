@@ -21,7 +21,6 @@ class AssetsHelperTest < ActionView::TestCase
       assert_equal 2, model_version_links.count
       link1 = link_to('Teusink', "/models/#{model.id}" + "?version=1")
       link2 = link_to('Teusink', "/models/#{model.id}" + "?version=2")
-      puts model_version_links
       assert model_version_links.include?link1
       assert model_version_links.include?link2
     end
@@ -101,6 +100,7 @@ class AssetsHelperTest < ActionView::TestCase
   end
 
   def create_a_bunch_of_assets
+    other_user = Factory :user
     disable_authorization_checks do
       Sop.delete_all
       DataFile.delete_all
@@ -108,14 +108,14 @@ class AssetsHelperTest < ActionView::TestCase
     assert_blank Sop.all
     assert_blank DataFile.all
     assets = []
-    assets << Factory(:sop, :title=>"A",:policy=>Factory(:public_policy),:projects=>[@project])
+    assets << Factory(:sop, :title=>"A",:contributor=>other_user,:policy=>Factory(:public_policy),:projects=>[@project])
     assets << Factory(:sop, :title=>"B",:contributor=>@user,:policy=>Factory(:private_policy))
-    assets << Factory(:sop, :title=>"C",:policy=>Factory(:private_policy))
+    assets << Factory(:sop, :title=>"C",:contributor=>other_user,:policy=>Factory(:private_policy))
     assets << Factory(:sop, :title=>"D",:contributor=>@user,:policy=>Factory(:publicly_viewable_policy))
-    assets << Factory(:sop, :title=>"E",:policy=>Factory(:publicly_viewable_policy),:projects=>@user.person.projects)
+    assets << Factory(:sop, :title=>"E",:contributor=>other_user,:policy=>Factory(:publicly_viewable_policy),:projects=>@user.person.projects)
 
     assets << Factory(:data_file,:title=>"A",:contributor=>@user,:policy=>Factory(:downloadable_public_policy))
-    assets << Factory(:data_file,:title=>"B",:policy=>Factory(:downloadable_public_policy),:projects=>[@project,Factory(:project)])
+    assets << Factory(:data_file,:title=>"B",:contributor=>other_user,:policy=>Factory(:downloadable_public_policy),:projects=>[@project,Factory(:project)])
     assets
   end
 end
