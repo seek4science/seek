@@ -25,7 +25,7 @@ class ApplicationController < ActionController::Base
   after_filter :log_event
 
   include AuthenticatedSystem
-  include Seek::ResourceRelatedTabs
+
   around_filter :with_current_user
   def with_current_user
     User.with_current_user current_user do
@@ -137,6 +137,21 @@ class ApplicationController < ActionController::Base
     cookies.delete :auth_token
     cookies.delete :open_id
     reset_session
+  end
+
+  #called via ajax to provide the full list of resources for the tabs
+  def view_items_in_tab
+    resource_type = params[:resource_type]
+    resource_ids = (params[:resource_ids] || []).split(',')
+    render :update do |page|
+      if !resource_type.blank?
+        resources = resource_type.constantize.find(resource_ids).select { |r| r.can_view? }
+
+        page.replace_html "#{resource_type}_list_items_container", :partial => "assets/resource_list", :locals => {:collection => resources, :narrow_view => true, :authorization_for_showing_already_done => true}
+        page.visual_effect :toggle_blind, "view_#{resource_type}s", :duration => 0.05
+        page.visual_effect :toggle_blind, "view_#{resource_type}s_and_extra", :duration => 0.05
+      end
+    end
   end
 
   private

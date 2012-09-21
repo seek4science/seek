@@ -2,6 +2,7 @@ require 'test_helper'
 
 
 class AssaysControllerTest < ActionController::TestCase
+
   fixtures :all
 
   include AuthenticatedTestHelper

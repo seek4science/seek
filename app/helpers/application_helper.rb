@@ -537,18 +537,11 @@ module ApplicationHelper
   def resource_tab_title resource_type
     if resource_type.include?"DataFile"
       resource_type.titleize.pluralize
+    elsif resource_type.downcase=="sop"
+      "SOPs"
     else
       resource_type.pluralize
     end
-
-  end
-
-  def display_people_list people
-    html = "<ul class='people_list'>"
-    people.each do |person|
-       html<< "<li><a href='#{person_path(person[0])}' target='_blank'>#{person[1]}</a></li>"
-    end
-    html << '</ul>'
   end
 
   def add_return_to_search
