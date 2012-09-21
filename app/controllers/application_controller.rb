@@ -34,6 +34,7 @@ class ApplicationController < ActionController::Base
   end
 
   before_filter :profile_for_login_required
+
   around_filter :with_auth_code
   def with_auth_code
     session[:code] = params[:code] if params[:code]
@@ -145,7 +146,7 @@ class ApplicationController < ActionController::Base
     resource_ids = (params[:resource_ids] || []).split(',')
     render :update do |page|
       if !resource_type.blank?
-        resources = resource_type.constantize.find(resource_ids).select { |r| r.can_view? }
+        resources = resource_type.constantize.find_all_by_id(resource_ids).select { |r| r.can_view? }
 
         page.replace_html "#{resource_type}_list_items_container", :partial => "assets/resource_list", :locals => {:collection => resources, :narrow_view => true, :authorization_for_showing_already_done => true}
         page.visual_effect :toggle_blind, "view_#{resource_type}s", :duration => 0.05
