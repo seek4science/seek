@@ -5,7 +5,7 @@
      title = "View inline the content of this #{resource_text}"
    elsif !display_item.can_download?
      title = "You are not authorized to view the content of this #{resource_text}"
-   elsif !display_item.is_viewable_format?
+   elsif !display_item.content_blob.is_viewable_format?
      title = "This file format is not inline viewable supported"
    end
    view_pdf_content_url = polymorphic_path(item, :version => display_item.version, :action => 'view_pdf_content')
