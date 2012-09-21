@@ -377,4 +377,45 @@ class ContentBlobTest < ActiveSupport::TestCase
     assert ms_word_file_content.include?('This is a rtf format')
   end
 
+
+  test 'is_content_viewable?' do
+    viewable_formats= %w[application/pdf]
+    viewable_formats << "application/msword"
+    viewable_formats << "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+    viewable_formats << "application/vnd.ms-powerpoint"
+    viewable_formats << "application/vnd.openxmlformats-officedocument.presentationml.presentation"
+    viewable_formats << "application/vnd.oasis.opendocument.text"
+    viewable_formats << "application/vnd.oasis.opendocument.presentation"
+    viewable_formats << "application/rtf"
+    viewable_formats << "text/plain"
+
+    viewable_formats.each do |viewable_format|
+      cb_with_content_viewable_format = Factory(:content_blob, :content_type=>viewable_format, :asset => Factory(:sop), :data => File.new("#{Rails.root}/test/fixtures/files/a_pdf_file.pdf","rb").read)
+      User.with_current_user cb_with_content_viewable_format.asset.contributor do
+        assert cb_with_content_viewable_format.is_viewable_format?
+        assert cb_with_content_viewable_format.is_content_viewable?
+      end
+    end
+    cb_with_no_viewable_format = Factory(:content_blob, :content_type=>"application/excel", :asset => Factory(:sop), :data => File.new("#{Rails.root}/test/fixtures/files/spreadsheet.xls","rb").read)
+    User.with_current_user cb_with_no_viewable_format.asset.contributor do
+      assert !cb_with_no_viewable_format.is_viewable_format?
+      assert !cb_with_no_viewable_format.is_content_viewable?
+    end
+  end
+
+  test 'filter_text_content' do
+    ms_word_sop_cb = Factory(:doc_content_blob)
+    content = "test \n content \f only"
+    filtered_content = ms_word_sop_cb.send(:filter_text_content,content)
+    assert !filtered_content.include?('\n')
+    assert !filtered_content.include?('\f')
+  end
+
+  test 'pdf_contents_for_search' do
+    ms_word_sop_content_blob = Factory(:doc_content_blob)
+    assert ms_word_sop_content_blob.is_pdf_convertable?
+    content = ms_word_sop_content_blob.pdf_contents_for_search
+    assert_equal 'This is a ms word doc format', content
+  end
+
 end
