@@ -6,12 +6,12 @@ The following resources have just been created/updated in <%= Seek::Config.appli
 <% else %>
     <%
        if @frequency == 'daily'
-         frequency = 'yesterday'
+         frequency = 'day'
        else
-         frequency = 'last ' +  @frequency.chomp('ly')
+         frequency = @frequency.chomp('ly')
        end
     %>
-    The following resources have been created/updated in <%= Seek::Config.application_title %> since <%= frequency %>:
+    For the projects you have subscribed to receive notifications, the following resources have been created or updated in <%= Seek::Config.application_title %> during the past <%= frequency %>:
 <% end %>
 <br/>
 <br/>
