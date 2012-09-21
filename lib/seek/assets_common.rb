@@ -1,7 +1,6 @@
 module Seek
   module AssetsCommon
     require 'net/ftp'
-    require 'docsplit'
 
     include Seek::AnnotationCommon
     #required to get the icon_filename_for_key
