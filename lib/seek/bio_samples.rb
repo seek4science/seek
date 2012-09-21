@@ -128,8 +128,10 @@ module Seek
 
 
       if @to_populate
-          Rails.logger.warn "JAAAAAAAAAAAASON:"
+          Rails.logger.warn "MOCK JASON:"
           Rails.logger.warn build_mock_json_import
+          Rails.logger.warn "Populate db"
+          populate_db build_mock_json_import
       end
 
     end
@@ -181,7 +183,7 @@ module Seek
       end
     end
 
-    def build_assay_mock_json sheet
+    def build_assay_mock_json sheet          # still too jena specific
 
       investigation_title = hunt_for_horizontal_field_value_mapped sheet, :"investigation.title", @assay_mapping
       assay_type_title = hunt_for_horizontal_field_value_mapped sheet, :"assay_type.title", @assay_mapping
@@ -244,6 +246,8 @@ module Seek
       @assay.study = study
       @assay.save!
       @assay.relate @file
+
+      @assay
     end
 
     # population of treatments, specimens and samples if to_populate = true
@@ -453,7 +457,31 @@ module Seek
     def populate_db data
 
       set_creator data["assay"]
-      populate_assay data["assay"], @file.original_filename
+      assay = populate_assay data["assay"], @file.original_filename
+
+      data["rows"].each do |data_row|
+
+        specimen_json = data_row["specimen"]
+        sample_json = data_row["sample"]
+        treatment_json = data_row["treatment"]
+
+        sample = nil
+        specimen = nil
+
+        if specimen_json
+          specimen = populate_specimen specimen_json
+        end
+
+        if sample_json && specimen
+          sample = populate_sample sample_json, specimen, assay
+        end
+
+        if treatment_json && (specimen || sample)
+          populate_treatment treatment_json # todo add links to specimen and/or sample
+        end
+
+
+      end
 
 
     end
@@ -561,7 +589,7 @@ module Seek
 
     def populate_treatment treatment_json
 
-        unless treatment_json["start value"]
+        if treatment_json["start value"]
 
           unit = Unit.find_by_symbol treatment_json["unit"]
           unit = Unit.create :symbol => treatment_json["unit"], :factors_studied => false unless unit
@@ -693,12 +721,13 @@ module Seek
               new_sp.projects = specimen.projects
               new_sp.created_at = now
               new_sp.save!
-              @warnings << "Warning: specimen with the name '#{specimen_title}' in row #{row} is already created in SEEK.<br/>"
+              @warnings << "Warning: specimen with the name '#{specimen_title}' is already created in SEEK.<br/>"
               @warnings << "It is renamed and saved as '#{new_sp.title}'.<br/>"
               @warnings << "You may rename it and upload the file as new version!<br/>"
+              specimen = new_sp
           else
             if !specimen.can_view?(User.current_user)
-              @warnings << "Warning: specimen with the name '#{specimen_title}' in row #{row_num} is already created in SEEK.<br/>"
+              @warnings << "Warning: specimen with the name '#{specimen_title}' is already created in SEEK.<br/>"
               @warnings << "But you are not authorized to view it. You can contact '#{specimen.contributor.person.name} for authorizations'<br/>"
             end
           end
@@ -717,6 +746,9 @@ module Seek
           genotype  = Genotype.new :gene_id => gene.id, :modification_id => modification.id, :specimen_id => specimen.id, :strain_id => strain.id unless genotype
           genotype.save!
         end
+
+
+        specimen
 
         
       
@@ -792,7 +824,8 @@ module Seek
           #  treatment << k.to_s + ":" + v.to_s
           #  treatment << "," unless k == @treatments_text[row].keys.last
           #end
-          treatment = @treatments_text[row] ? @treatments_text[row] : ""
+          #treatment = @treatments_text[row] ? @treatments_text[row] : ""
+          treatment =  "" # will be linked to 0 ... n treatments anyway
 
           sample.sample_type = sample_type
           sample.donation_date = donation_date
@@ -814,12 +847,12 @@ module Seek
               sleep(1);
               sample.title =  "#{sample_title}-#{Time.now}"
               sample.save!
-            @warnings << "Warning: sample with the name '#{sample_title}' in row #{row} is already created in SEEK."
+            @warnings << "Warning: sample with the name '#{sample_title}' is already created in SEEK."
             @warnings << "It is renamed and saved as '#{sample.title}'.<br/>"
             @warnings << "You may rename it and upload the file as new version!<br/>"
           else
             if !sample.can_view?(User.current_user)
-              @warnings << "Warning: specimen with the name '#{sample_title}' in row #{row} is already created in SEEK.<br/>"
+              @warnings << "Warning: specimen with the name '#{sample_title}' is already created in SEEK.<br/>"
               @warnings << "But you are not authorized to view it. You can contact '#{sample.contributor.person.name} for authorizations'<br/>"
             end
           end
@@ -835,6 +868,8 @@ module Seek
       else
         Rails.logger.warn "no assay defined for samples"
       end
+
+      sample
 
     end
 
