@@ -10,7 +10,16 @@
   end
 
   Factory.define(:person_in_project, :parent => :brand_new_person) do |f|
-    f.group_memberships {[Factory.build :group_membership]}
+    #f.group_memberships {[Factory.build :group_membership]}
+    f.after_create do |person|
+      if person.group_memberships.empty?
+        if WorkGroup.first.nil?
+          person.group_memberships << Factory(:group_membership)
+        else
+          person.work_groups << WorkGroup.first
+        end
+      end
+    end
   end
 
   Factory.define(:person, :parent => :person_in_project) do |f|
