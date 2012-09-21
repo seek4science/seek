@@ -1,16 +1,15 @@
 require 'test_helper'
 
 class SendImmediateEmailsJobTest < ActiveSupport::TestCase
-  fixtures :all
 
   def setup
     @val = Seek::Config.email_enabled
     Seek::Config.email_enabled=true
-    Delayed::Job.destroy_all
+    Delayed::Job.delete_all
   end
 
   def teardown
-    Delayed::Job.destroy_all
+    Delayed::Job.delete_all
     Seek::Config.email_enabled=@val
   end
 
@@ -49,7 +48,7 @@ class SendImmediateEmailsJobTest < ActiveSupport::TestCase
 
 
   test "perform" do
-    Delayed::Job.destroy_all
+    Delayed::Job.delete_all
     person1 = Factory(:person)
     person2 = Factory(:person)
     sop = Factory(:sop, :policy => Factory(:public_policy))
