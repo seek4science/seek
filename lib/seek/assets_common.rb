@@ -311,8 +311,8 @@ module Seek
       content_blob = display_asset.content_blob
       dat_filepath = content_blob.filepath
       pdf_filepath = content_blob.filepath('pdf')
-      if display_asset.is_pdf?
-        send_file dat_filepath, :filename => content_blob.original_filename, :content_type => content_blob.content_type, :disposition => 'attachment'
+      if display_asset.content_blob.is_pdf?
+          send_file dat_filepath, :filename => content_blob.original_filename, :content_type => content_blob.content_type, :disposition => 'attachment'
       else
         content_blob.convert_to_pdf
         if content_blob.file_exists?(pdf_filepath)
