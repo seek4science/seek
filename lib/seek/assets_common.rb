@@ -290,7 +290,7 @@ module Seek
       name = self.controller_name.singularize
       asset = name.camelize.constantize.find(params[:id])
       display_asset = asset.find_version(params[:version])
-      if display_asset.is_content_viewable?
+      if display_asset.content_blob.is_content_viewable?
         eval "@#{name} = asset"
         eval "@display_#{name} = display_asset"
       else

@@ -668,13 +668,13 @@ class SopsControllerTest < ActionController::TestCase
 
   test 'should be able to view ms/open office word content' do
      ms_word_sop = Factory(:doc_sop, :policy => Factory(:all_sysmo_downloadable_policy))
-     assert ms_word_sop.is_content_viewable?
+     assert ms_word_sop.content_blob.is_content_viewable?
      get :show, :id => ms_word_sop.id
      assert_response :success
      assert_select 'a', :text => /View content/, :count => 1
 
      openoffice_word_sop = Factory(:odt_sop, :policy => Factory(:all_sysmo_downloadable_policy))
-     assert openoffice_word_sop.is_content_viewable?
+     assert openoffice_word_sop.content_blob.is_content_viewable?
      get :show, :id => openoffice_word_sop.id
      assert_response :success
      assert_select 'a', :text => /View content/, :count => 1

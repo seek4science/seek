@@ -199,13 +199,13 @@ class PresentationsControllerTest < ActionController::TestCase
 
   test 'should be able to view ms/open office ppt content' do
     ms_ppt_presentation = Factory(:ppt_presentation, :policy => Factory(:all_sysmo_downloadable_policy))
-    assert ms_ppt_presentation.is_content_viewable?
+    assert ms_ppt_presentation.content_blob.is_content_viewable?
     get :show, :id => ms_ppt_presentation.id
     assert_response :success
     assert_select 'a', :text => /View content/, :count => 1
 
     openoffice_ppt_presentation = Factory(:odp_presentation, :policy => Factory(:all_sysmo_downloadable_policy))
-    assert openoffice_ppt_presentation.is_content_viewable?
+    assert openoffice_ppt_presentation.content_blob.is_content_viewable?
     get :show, :id => openoffice_ppt_presentation.id
     assert_response :success
     assert_select 'a', :text => /View content/, :count => 1

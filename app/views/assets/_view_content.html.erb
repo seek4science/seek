@@ -1,4 +1,4 @@
-<% is_inline_viewable = Seek::Config.experimental_features_enabled && (display_item ||=nil) && display_item.is_content_viewable?
+<% is_inline_viewable = Seek::Config.experimental_features_enabled && (display_item ||=nil) && display_item.content_blob.is_content_viewable?
    title = ''
    resource_text = item.class.name.humanize
    if is_inline_viewable

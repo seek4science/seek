@@ -245,14 +245,14 @@ class SopTest < ActiveSupport::TestCase
     viewable_formats.each do |viewable_format|
       sop_with_content_viewable_format = Factory(:sop, :content_blob => Factory(:content_blob, :content_type=>viewable_format, :data => File.new("#{Rails.root}/test/fixtures/files/a_pdf_file.pdf","rb").read))
       User.with_current_user sop_with_content_viewable_format.contributor do
-        assert sop_with_content_viewable_format.is_viewable_format?
-        assert sop_with_content_viewable_format.is_content_viewable?
+        assert sop_with_content_viewable_format.content_blob.is_viewable_format?
+        assert sop_with_content_viewable_format.content_blob.is_content_viewable?
       end
     end
     sop_with_no_viewable_format = Factory(:sop, :content_blob => Factory(:content_blob, :content_type=>"text/plain", :data => File.new("#{Rails.root}/test/fixtures/files/little_file.txt","rb").read))
     User.with_current_user sop_with_no_viewable_format.contributor do
-       assert !sop_with_no_viewable_format.is_viewable_format?
-       assert !sop_with_no_viewable_format.is_content_viewable?
+       assert !sop_with_no_viewable_format.content_blob.is_viewable_format?
+       assert !sop_with_no_viewable_format.content_blob.is_content_viewable?
     end
   end
 
