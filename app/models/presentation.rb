@@ -10,17 +10,18 @@ class Presentation < ActiveRecord::Base
    #searchable must come before acts_as_asset is called
    searchable(:auto_index => false) do
      text :description,:title,:original_filename,:searchable_tags
+     text :content_blob do
+       content_blob.pdf_contents_for_search
+     end
    end if Seek::Config.solr_enabled
 
    acts_as_asset
-   include Seek::PdfExtraction
 
    after_save :queue_background_reindexing if Seek::Config.solr_enabled
 
    has_one :content_blob, :as => :asset, :foreign_key => :asset_id ,:conditions => 'asset_version= #{self.version}'
 
    explicit_versioning(:version_column => "version") do
-     include Seek::PdfExtraction
      acts_as_versioned_resource
      has_one :content_blob,:primary_key => :presentation_id,:foreign_key => :asset_id,:conditions => 'content_blobs.asset_version= #{self.version} and content_blobs.asset_type = "#{self.parent.class.name}"'
   end

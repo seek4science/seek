@@ -5,6 +5,7 @@ require 'tmpdir'
 
 class ContentBlob < ActiveRecord::Base
 
+  include Seek::PdfExtraction
 
   belongs_to :asset, :polymorphic => true
 
@@ -115,7 +116,7 @@ class ContentBlob < ActiveRecord::Base
       dump_data_object_to_file
     end    
   end
-  
+
   private
   
   def dump_data_object_to_file
