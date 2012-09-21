@@ -2,14 +2,6 @@ require 'test_helper'
 
 class PersonTest < ActiveSupport::TestCase
   fixtures :users, :people
-
-  test "factory assigns the same project by default" do
-    p = Factory :person
-    assert_equal 1,p.projects.count
-    p2 = Factory :person
-    assert_equal 1,p2.projects.count
-    assert_equal p.projects,p2.projects
-  end
   
   # Replace this with your real tests.
   def test_work_groups
