@@ -88,5 +88,16 @@ Rails::Initializer.run do |config|
 end
 Mime::Type.register "application/x-endnote-refer", :enw
 
-
+Nailgun::NailgunConfig.options =
+    {
+        :java_bin => "java",
+        :server_address =>'localhost',
+        :port_no=>'2113'
+    }
+ConvertOffice::ConvertOfficeConfig.options =
+    {
+        :java_bin=>"java",
+        :soffice_port=>8100,
+        :nailgun=>true
+    }
 
