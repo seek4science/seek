@@ -1,0 +1,8 @@
+#!/usr/bin/env ruby
+
+require File.expand_path(File.join(File.dirname(__FILE__), '..', 'config', 'environment'))
+require File.expand_path(File.join(File.dirname(__FILE__), '..', 'vendor', 'plugins','nailgun','lib','nailgun.rb'))
+convert_office_jar_path = File.expand_path(File.join(File.dirname(__FILE__), '..', 'vendor', 'plugins','convert_office','lib','java','jar','convert_office.jar'))
+# ADD IN NAILGUN CLASS
+Nailgun::NgCommand.ng_cp(convert_office_jar_path)
+Nailgun::NgCommand.ng_alias("con","com.artofsolving.jodconverter.cli.ConvertDocument")

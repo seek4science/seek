@@ -1,0 +1,8 @@
+#!/usr/bin/env ruby
+
+  require 'rubygems'
+  require 'fileutils'
+  src_file = File.expand_path(File.join(File.dirname(__FILE__),'..','lib','generator' ,'nailgun_binary'))
+	FileUtils.cp_r(src_file, "nailgun_config")
+	puts "Nailgun Binary is generated as nailgun_config"
+	File.chmod(0755,"nailgun_config")

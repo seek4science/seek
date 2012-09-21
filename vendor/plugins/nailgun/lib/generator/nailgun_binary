@@ -1,0 +1,12 @@
+#!/usr/bin/env ruby
+require 'rubygems'
+require 'nailgun'
+
+Nailgun::NailgunConfig.options =
+  {
+    :java_bin => "java",
+    :server_address =>'localhost',
+    :port_no=>'2113'
+  }
+  
+Nailgun::NailgunServer.new(ARGV).daemonize
