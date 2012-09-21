@@ -398,7 +398,7 @@ module Seek
                   :"treatment.substance" => mapping_entry("FIXED", proc {"LPS"}),
                   :"treatment.concentration" => mapping_entry("LPS (µg/g KG)", proc do |data|
                     if data =~ concentration_regex
-                      $1
+                      $1.gsub(/,/, ".")
                     else
                       ""
                     end
