@@ -8,9 +8,15 @@ myExperiment - http://www.myexperiment.org
 
 BioCatalogue - http://www.biocatalogue.org
 
-BioPortal - http://bioportal.bioontology.org
-
 MethodBox - https://www.methodbox.org/
+
+== External Services we use
+
+Sabio-RK - http://sabio.villa-bosch.de
+
+CytoScape - http://cytoscapeweb.cytoscape.org
+
+BioPortal - http://bioportal.bioontology.org
 
 == Javascript tools
 
