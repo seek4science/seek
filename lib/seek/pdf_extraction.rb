@@ -2,54 +2,83 @@ module Seek
   module PdfExtraction
     include Seek::MimeTypes
 
-    def is_downloadable_pdf?
-      is_downloadable_asset? && can_download? && is_pdf? && !content_blob.filesize.nil?
-    end
+    MAXIMUM_PDF_CONVERT_TIME = 10.minutes
+    PDF_CONVERTABLE_FORMAT = %w[doc docx ppt pptx odt odp rtf txt]
 
     def is_content_viewable?
-      is_downloadable_asset? && can_download? && is_viewable_format? && !content_blob.filesize.nil?
+      asset.is_downloadable_asset? && asset.can_download? && is_viewable_format? && !filesize.nil?
     end
 
     def is_viewable_format?
-      viewable_formats= %w[pdf doc docx ppt pptx pps odt fodt odp fodp rtf]
-      viewable_formats.include?(mime_extension(content_type))
+      (PDF_CONVERTABLE_FORMAT << 'pdf').include?(mime_extension(content_type))
+    end
+
+    def is_pdf_convertable?
+      PDF_CONVERTABLE_FORMAT.include?(mime_extension(content_type))
     end
 
     def is_pdf?
       mime_extension(content_type) == 'pdf'
     end
 
-    def pdf_contents_for_search obj=self
-      content_blob = obj.content_blob
+    def pdf_contents_for_search
       content = nil
-      if content_blob.file_exists?
-        if obj.is_viewable_format?
-            begin
-              output_directory = content_blob.directory_storage_path
-              dat_filepath = content_blob.filepath
-              pdf_filepath = content_blob.filepath('pdf')
-              txt_filepath = content_blob.filepath('txt')
-              Docsplit.extract_pdf(dat_filepath, :output => output_directory) unless content_blob.file_exists?(pdf_filepath)
-              Docsplit.extract_text(pdf_filepath, :output => output_directory) unless content_blob.file_exists?(txt_filepath)
-              content = File.open(txt_filepath).read
-              unless content.blank?
-                filter_text_content content
-              else
-                content
-              end
-            rescue Exception => e
-              Rails.logger.error("Error processing content for content_blob #{obj.content_blob.id} #{e}")
-              raise e unless Rails.env=="production"
-              nil
-            end
+      if file_exists?
+        if is_pdf_convertable?
+           convert_to_pdf
+           content = extract_text_from_pdf
         end
       else
-        Rails.logger.error("Unable to find file contents for #{obj.class.name} #{obj.id}")
+        Rails.logger.error("Unable to find file contents for content blob #{id}")
       end
       content
     end
 
+    def convert_to_pdf
+      dat_filepath = filepath
+      pdf_filepath = filepath('pdf')
+      begin
+        unless file_exists?(pdf_filepath)
+          #copy dat file to original file extension in order to convert to pdf on this file
+          file_extension = mime_extension(content_type)
+          copied_filepath = filepath(file_extension)
+          FileUtils.cp dat_filepath, copied_filepath
+          ConvertOffice::ConvertOfficeFormat.new.convert(copied_filepath,pdf_filepath)
+
+          t = Time.now
+          while !file_exists?(pdf_filepath) || (Time.now - t) > MAXIMUM_PDF_CONVERT_TIME
+            sleep(1)
+          end
+          #remove copied file
+          FileUtils.rm copied_filepath
+        end
+      rescue Exception=> e
+        Rails.logger.error("Problem with converting file of content_blob #{id} to pdf")
+      end
+  end
+
     private
+
+    def extract_text_from_pdf
+      output_directory = directory_storage_path
+      pdf_filepath = filepath('pdf')
+      txt_filepath = filepath('txt')
+      content = nil
+      if file_exists?(pdf_filepath)
+        begin
+          Docsplit.extract_text(pdf_filepath, :output => output_directory) unless file_exists?(txt_filepath)
+          content = File.open(txt_filepath).read
+          unless content.blank?
+            filter_text_content content
+          else
+            content
+          end
+        rescue Exception => e
+          Rails.logger.error("Problem with extracting text from pdf #{id} #{e}")
+          nil
+        end
+      end
+    end
 
     #filters special characters \n \f
     def filter_text_content content
