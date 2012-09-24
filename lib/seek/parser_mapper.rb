@@ -115,6 +115,8 @@ module Seek
           :assay_mapping => {
 
               :assay_sheet_name => "IDF",
+              :parsing_direction => "horizontal",
+              :probing_column => "",
 
               :"investigation.title" => mapping_entry("Investigation Title"),
               :"assay_type.title" => mapping_entry("Experiment Class"),
@@ -246,7 +248,30 @@ module Seek
 
       },
 
-          :assay_mapping => nil
+          :assay_mapping => {
+
+              :assay_sheet_name => "Tabelle1",
+              :parsing_direction => "vertical",
+              :probing_column => :"creator.last_name",
+
+              :"investigation.title" => mapping_entry("FIXED", proc { "How to kill mice" }),
+              :"assay_type.title" => mapping_entry("FIXED", proc { "fluxomics" }),
+              :"study.title" => mapping_entry("FIXED", proc { "Determine effects of this on that" }),
+
+              :"creator.email" => mapping_entry("FIXED", proc { "seddik.hammad@hengstler.de" }),
+              :"creator.last_name" => mapping_entry("Experimentator", proc do |data|
+                if data.split(/\s+/)
+                  data.split(/\s+/)[1]
+                end
+              end),
+              :"creator.first_name" => mapping_entry("Experimentator", proc do |data|
+                if data.split(/\s+/)
+                  data.split(/\s+/)[0]
+                end
+              end)
+
+          }
+
 
 
 

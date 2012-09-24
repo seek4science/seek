@@ -183,14 +183,22 @@ module Seek
       end
     end
 
-    def build_assay_mock_json sheet          # still too jena specific
+    def build_assay_mock_json sheet
 
-      investigation_title = hunt_for_horizontal_field_value_mapped sheet, :"investigation.title", @assay_mapping
-      assay_type_title = hunt_for_horizontal_field_value_mapped sheet, :"assay_type.title", @assay_mapping
-      study_title = hunt_for_horizontal_field_value_mapped sheet, :"study.title", @assay_mapping
-      creator_email = hunt_for_horizontal_field_value_mapped sheet, :"creator.email", @assay_mapping
-      creator_last_name = hunt_for_horizontal_field_value_mapped sheet, :"creator.last_name", @assay_mapping
-      creator_first_name = hunt_for_horizontal_field_value_mapped sheet, :"creator.first_name", @assay_mapping
+      if @assay_mapping[:parsing_direction] == "horizontal"
+        mapped_field_hunter = method(:hunt_for_horizontal_field_value_mapped)
+      else
+        mapped_field_hunter = method(:hunt_for_field_values_mapped)
+        # probing number of rows with data in sheet
+        hunt_for_field_values_mapped sheet, @assay_mapping[:probing_column], @assay_mapping, true
+      end
+
+      investigation_title =  mapped_field_hunter.call(sheet, :"investigation.title", @assay_mapping).first() ? mapped_field_hunter.call(sheet, :"investigation.title", @assay_mapping).first()[:value] : nil
+      assay_type_title = mapped_field_hunter.call( sheet, :"assay_type.title", @assay_mapping).first() ? mapped_field_hunter.call( sheet, :"assay_type.title", @assay_mapping).first()[:value] : nil
+      study_title = mapped_field_hunter.call( sheet, :"study.title", @assay_mapping).first() ? mapped_field_hunter.call( sheet, :"study.title", @assay_mapping).first()[:value] : nil
+      creator_email = mapped_field_hunter.call( sheet, :"creator.email", @assay_mapping).first() ? mapped_field_hunter.call( sheet, :"creator.email", @assay_mapping).first()[:value] : nil
+      creator_last_name = mapped_field_hunter.call( sheet, :"creator.last_name", @assay_mapping).first() ? mapped_field_hunter.call( sheet, :"creator.last_name", @assay_mapping).first()[:value] : nil
+      creator_first_name = mapped_field_hunter.call( sheet, :"creator.first_name", @assay_mapping).first() ? mapped_field_hunter.call( sheet, :"creator.first_name", @assay_mapping).first()[:value] : nil
 
       assay = {"investigation title" => investigation_title,
                "assay type title" => assay_type_title,
@@ -456,8 +464,19 @@ module Seek
     # takes the intermediate hash map format and populates the database with this data
     def populate_db data
 
-      set_creator data["assay"]
-      assay = populate_assay data["assay"], @file.original_filename
+      assay = nil
+      assay_json = data["assay"]
+
+      if assay_json
+        if assay_json["creator last name"] && assay_json["creator first name"]
+          set_creator data["assay"]
+        end
+        if assay_json["investigation title"] &&
+           assay_json["assay type title"] &&
+           assay_json["study title"]
+            assay = populate_assay data["assay"], @file.original_filename
+        end
+      end
 
       data["rows"].each do |data_row|
 
@@ -940,7 +959,7 @@ module Seek
     end
 
     def hunt_for_horizontal_field_value_mapped sheet, field_name, mapping
-      mapping[field_name][:value].call((hunt_for_horizontal_field_value(sheet, mapping[field_name][:column])))
+      mapping[field_name][:value].call((hunt_for_horizontal_field_value(sheet, mapping[field_name][:column]))).map { |it| {:value => it}}
     end
 
     # this is the most important method to get data out of the spreadsheet
