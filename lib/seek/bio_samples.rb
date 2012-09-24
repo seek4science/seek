@@ -468,7 +468,7 @@ module Seek
       assay_json = data["assay"]
 
       if assay_json
-        if assay_json["creator last name"] && assay_json["creator first name"]
+        if assay_json["creator last name"] && assay_json["creator first name"] && assay_json["creator email"]
           set_creator data["assay"]
         end
         if assay_json["investigation title"] &&
@@ -886,6 +886,11 @@ module Seek
         end
       else
         Rails.logger.warn "no assay defined for samples"
+        @file.lock!
+        unless @file.samples.include?(sample)
+          @file.samples << sample
+          @file.save!
+        end
       end
 
       sample

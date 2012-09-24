@@ -254,9 +254,9 @@ module Seek
               :parsing_direction => "vertical",
               :probing_column => :"creator.last_name",
 
-              :"investigation.title" => mapping_entry("FIXED", proc { "How to kill mice" }),
-              :"assay_type.title" => mapping_entry("FIXED", proc { "fluxomics" }),
-              :"study.title" => mapping_entry("FIXED", proc { "Determine effects of this on that" }),
+              :"investigation.title" => mapping_entry("FIXED", proc { nil }),
+              :"assay_type.title" => mapping_entry("FIXED", proc { nil }),
+              :"study.title" => mapping_entry("FIXED", proc { nil }),
 
               :"creator.email" => mapping_entry("FIXED", proc { "seddik.hammad@hengstler.de" }),
               :"creator.last_name" => mapping_entry("Experimentator", proc do |data|
