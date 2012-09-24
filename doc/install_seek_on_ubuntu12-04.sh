@@ -1,5 +1,5 @@
 #!/bin/sh
-#This script is used for setting up the SEEK application and its environment. It is tested on Ubuntu 10.4 and 10.10
+#This script is used for setting up the SEEK application and its environment. It is tested on Ubuntu 12.04
 #You might want to change the path and directory where SEEK is installed, by changing the values of the variables: SEEK_PATH, SEEK_DIRECTORY
 #You might want to specify the repository where SEEK get cloned and its version , by changing the value of variable: REPOSITORY
 #More information about each step of installation can be found at SEEK_PATH/SEEK_DIRECTORY/doc/INSTALL
@@ -19,10 +19,9 @@ sudo sed -i 's/# deb-src http:\/\/archive.canonical.com\/ubuntu/deb-src http:\/\
 echo "${txtgrn} *********************************** ${txtrst}"
 echo "${txtgrn} Installing prequisites ${txtrst}"
 sudo apt-get update
-sudo apt-get install wget mercurial ruby rdoc ri libopenssl-ruby ruby-dev mysql-server libssl-dev build-essential openssh-server 
-sudo apt-get install libmysqlclient16-dev libmagick++-dev libxml++2.6-dev sun-java6-jdk graphviz libsqlite3-dev sqlite3 libxslt1 libxslt1-dev
-sudo apt-get install curl irb
-sudo apt-get install apache2-mpm-prefork apache2-prefork-dev libapr1-dev libaprutil1-dev libcurl4-openssl-dev
+sudo apt-get install wget git mercurial ruby ri1.8 libruby1.8 ruby-dev mysql-server libssl-dev build-essential openssh-server
+sudo apt-get install libmysqlclient-dev libmagick++-dev libxslt1-dev libxml++2.6-dev openjdk-6-jdk graphviz libsqlite3-dev sqlite3
+sudo apt-get install poppler-utils tesseract-ocr openoffice.org openoffice.org-java-common
 
 echo "${txtgrn} *********************************** ${txtrst}"
 echo "${txtgrn} Installing rubygems ${txtrst}"
