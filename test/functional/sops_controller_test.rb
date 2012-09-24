@@ -660,7 +660,7 @@ class SopsControllerTest < ActionController::TestCase
 
   test 'should be able to view pdf content' do
      sop = Factory(:sop, :policy => Factory(:all_sysmo_downloadable_policy))
-     assert sop.is_downloadable_pdf?
+     assert sop.content_blob.is_content_viewable?
      get :show, :id => sop.id
      assert_response :success
      assert_select 'a', :text => /View content/, :count => 1
