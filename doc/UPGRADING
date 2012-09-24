@@ -79,7 +79,11 @@ You can check you have the correct version of rubygems by running
 
     gem -v
 
-Once Rubygems has been updated, the upgrade is the typical:
+Then you will need to install additional dependency:
+
+    sudo apt-get install git
+
+Once Rubygems has been updated and additional dependency has been installed, the upgrade is the typical:
 
     RAILS_ENV=production ./script/delayed_job stop
     bundle exec rake sunspot:solr:stop RAILS_ENV=production
@@ -124,7 +128,7 @@ There follows the commands required to upgrade. Anything after # are notes and d
 There are a few additional steps for this upgrade due to the switch from Solr to Sunspot as the search system,
 and the introduction of Delayed Job for background processing.
 
-First there is an additionaldependency you will need, which on Ubuntu 10.04 or Debian can be installed with:
+First there is an additional dependency you will need, which on Ubuntu 10.04 or Debian can be installed with:
 
     sudo apt-get install libxslt-dev
 
