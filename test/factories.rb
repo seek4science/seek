@@ -522,6 +522,11 @@ end
     f.content_type "application/rtf"
   end
 
+  Factory.define(:txt_content_blob, :parent => :content_blob) do |f|
+    f.data File.new("#{Rails.root}/test/fixtures/files/txt_test.txt", "rb").read
+    f.content_type "text/plain"
+  end
+
   Factory.define(:activity_log) do |f|
     f.action "create"
     f.association :activity_loggable, :factory => :data_file

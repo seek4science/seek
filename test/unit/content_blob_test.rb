@@ -318,6 +318,13 @@ class ContentBlobTest < ActiveSupport::TestCase
     assert rtf_content.include?('This is a rtf format')
   end
 
+  test 'convert_office should convert txt to pdf' do
+    txt_content_blob = Factory(:txt_content_blob, :uuid => 'txt_1')
+    txt_content_blob.convert_to_pdf
+    assert txt_content_blob.file_exists?(txt_content_blob.filepath)
+    assert txt_content_blob.file_exists?(txt_content_blob.filepath('pdf'))
+    assert txt_content_blob.file_exists?(txt_content_blob.filepath('txt'))
+  end
 
   test 'is_content_viewable?' do
     viewable_formats= %w[application/pdf]
