@@ -501,11 +501,6 @@ end
     f.content_type 'application/vnd.oasis.opendocument.text'
   end
 
-  Factory.define(:fodt_content_blob, :parent => :content_blob) do |f|
-    f.data File.new("#{Rails.root}/test/fixtures/files/openoffice_word_test.fodt", "rb").read
-    f.content_type "application/vnd.oasis.opendocument.text-flat-xml"
-  end
-
   Factory.define(:ppt_content_blob, :parent => :content_blob) do |f|
     f.data File.new("#{Rails.root}/test/fixtures/files/ms_ppt_test.ppt", "rb").read
     f.content_type 'application/vnd.ms-powerpoint'
@@ -517,19 +512,9 @@ end
     f.content_type "application/vnd.openxmlformats-officedocument.presentationml.presentation"
   end
 
-  Factory.define(:pps_content_blob, :parent => :content_blob) do |f|
-    f.data File.new("#{Rails.root}/test/fixtures/files/ms_ppt_test.pps", "rb").read
-    f.content_type "application/vnd.ms-powerpoint"
-  end
-
   Factory.define(:odp_content_blob, :parent => :content_blob) do |f|
     f.data File.new("#{Rails.root}/test/fixtures/files/openoffice_ppt_test.odp", "rb").read
     f.content_type 'application/vnd.oasis.opendocument.presentation'
-  end
-
-  Factory.define(:fodp_content_blob, :parent => :content_blob) do |f|
-    f.data File.new("#{Rails.root}/test/fixtures/files/openoffice_ppt_test.fodp", "rb").read
-    f.content_type "application/vnd.oasis.opendocument.presentation-flat-xml"
   end
 
   Factory.define(:rtf_content_blob, :parent => :content_blob) do |f|
