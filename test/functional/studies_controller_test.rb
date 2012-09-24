@@ -8,14 +8,16 @@ class StudiesControllerTest < ActionController::TestCase
   include RestTestCases
 
   def setup
-    login_as(:quentin)
+    login_as Factory(:admin).user
     @object=Factory :study, :policy => Factory(:public_policy)
   end
 
   test "should get index" do
+    Factory :study, :policy => Factory(:public_policy)
     get :index
     assert_response :success
     assert_not_nil assigns(:studies)
+    assert !assigns(:studies).empty?
   end
 
   test "should show draggable icon in index" do
@@ -33,7 +35,7 @@ class StudiesControllerTest < ActionController::TestCase
   end
 
   test "should get show" do
-    get :show, :id=>studies(:metabolomics_study)
+    get :show, :id=>@object
     assert_response :success
     assert_not_nil assigns(:study)
   end
@@ -243,6 +245,7 @@ class StudiesControllerTest < ActionController::TestCase
   end
 
   def test_assay_tab_doesnt_show_private_sops_or_datafiles
+    user = Factory :user
     login_as(:model_owner)
     study=studies(:study_with_assay_with_public_private_sops_and_datafile)
     get :show,:id=>study

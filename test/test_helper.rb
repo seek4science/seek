@@ -117,19 +117,28 @@ class ActiveSupport::TestCase
 
   #profiling
 
+  def with_profiling
+    start_profiling
+    yield
+    stop_profiling
+  end
+
   def start_profiling
     RubyProf.start
   end
 
   def stop_profiling prefix="profile"
     results = RubyProf.stop
-
-    File.open "#{Rails.root}/tmp/#{prefix}-graph.html", 'w' do |file|
+    html_path =  "#{Rails.root}/tmp/#{prefix}-graph.html"
+    txt_path = "#{Rails.root}/tmp/#{prefix}-flat.txt"
+    File.open html_path, 'w' do |file|
       RubyProf::GraphHtmlPrinter.new(results).print(file)
     end
-    File.open "#{Rails.root}/tmp/#{prefix}-flat.txt", 'w' do |file|
+    puts "HTML profile written to: #{html_path}"
+    File.open txt_path, 'w' do |file|
       RubyProf::FlatPrinter.new(results).print(file)
     end
+    puts "Flat profile written to: #{txt_path}"
   end
 
   ## stuff for mocking

@@ -54,7 +54,6 @@
     %>
     <% assets.each do |resource_type| -%>
       <% visible_resource_type = resource_tab_title(resource_type) -%>
-      <% visible_resource_type = "SOPs" if visible_resource_type=="Sops" %>
       <% hidden_count = 0 %>
       <% extra_count = 0 %>
       <% unless resource_hash[resource_type].nil? %>
@@ -82,12 +81,12 @@
                 <% item ||= nil
                     if item %>
                       <%= link_to_remote "View all "+(extra_count + resources.size).to_s+" items", :html => {:id => "view_#{resource_type}s_and_extra", :style => "display:block"},
-                                         :url => url_for(:controller => 'application', :action => 'view_items_in_tab'),
+                                         :url => url_for(:action => 'view_items_in_tab'),
                                          :with => "'resource_type=' + '#{resource_type}' + '&resource_ids=' + '#{(resource_hash[resource_type][:items] + resource_hash[resource_type][:extra_items]).collect(&:id).join(',')}'",
                                          :before => "show_large_ajax_loader('#{resource_type}_list_items_container')"
                       -%>
                       <%= link_to_remote "View " + resources.size.to_s + " items", :html => {:id => "view_#{resource_type}s", :style => "display:none"},
-                                         :url => url_for(:controller => 'application', :action => 'view_items_in_tab'),
+                                         :url => url_for(:action => 'view_items_in_tab'),
                                          :with => "'resource_type=' + '#{resource_type}' + '&resource_ids=' + '#{resource_hash[resource_type][:items].collect(&:id).join(',')}'",
                                          :before => "show_large_ajax_loader('#{resource_type}_list_items_container')"
                       -%>

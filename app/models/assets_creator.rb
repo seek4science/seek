@@ -14,21 +14,18 @@ class AssetsCreator < ActiveRecord::Base
     ids_to_add = recieved_creator_ids - existing_creator_ids
     ids_to_remove = existing_creator_ids - recieved_creator_ids
     
-    #changes_made = false
-    
     #Remove any creators in the database but not in the list
     ids_to_remove.each do |i|
       assets_creators = resource.assets_creators.select{|ac| ac.creator_id==i}
-      assets_creators.each{|ac| ac.destroy}
-      #changes_made = true
+      assets_creators.each do |ac|
+        ac.destroy
+        resource.creators.delete(ac.creator)
+      end
     end
     
     #Add any new creators
     ids_to_add.each do |i|
       resource.creators << Person.find_by_id(i)
-      #changes_made = true
     end
-
-    #resource.reload if changes_made
   end
 end

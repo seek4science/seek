@@ -23,6 +23,21 @@ class DataFilesControllerTest < ActionController::TestCase
     assert_select "title",:text=>/The Sysmo SEEK Data.*/, :count=>1
   end
 
+  test "view_items_in_tab" do
+    other_user = Factory :user
+    df = Factory :data_file,:title=>"a data file",:contributor=>User.current_user,:policy=>Factory(:public_policy)
+    private_df = Factory :data_file,:title=>"a private data file",:contributor=>other_user,:policy=>Factory(:private_policy)
+    xml_http_request :get, :view_items_in_tab,:resource_type=>"DataFile",:resource_ids=>[df.id,private_df.id,1000].join(",")
+    assert_response :success
+
+    assert @response.body.include?("a data file")
+    assert !@response.body.include?("a private data file")
+
+    #try with no parameters
+    xml_http_request :get, :view_items_in_tab
+    assert_response :success
+  end
+
   test "get XML when not logged in" do
     logout
     df = Factory(:data_file,:policy=>Factory(:public_policy, :access_type=>Policy::VISIBLE))
@@ -1158,6 +1173,24 @@ class DataFilesControllerTest < ActionController::TestCase
     get :show, :id => data_file, :version => 2
     assert_redirected_to root_path
     assert_not_nil flash[:error]
+  end
+
+  test "should not show private data file to logged out user" do
+    df=Factory :data_file
+    logout
+    get :show, :id=>df
+    assert_redirected_to data_files_path
+    assert_not_nil flash[:error]
+    assert_equal "You are not authorized to view this Data file, you may need to login first.",flash[:error]
+  end
+
+  test "should not show private data file to another user" do
+
+    df=Factory :data_file,:contributor=>Factory(:user)
+    get :show, :id=>df
+    assert_redirected_to data_files_path
+    assert_not_nil flash[:error]
+    assert_equal "You are not authorized to view this Data file.",flash[:error]
   end
 
   test "should show error for the user who doesn't login or is not the project member, when the user specify the version and this version is not the latest version" do

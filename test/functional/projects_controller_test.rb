@@ -168,47 +168,46 @@ class ProjectsControllerTest < ActionController::TestCase
 	end
 
 	test "links have nofollow in sop tabs" do
-		login_as(:owner_of_my_first_sop)
-		sop=sops(:my_first_sop)
-		sop.description="http://news.bbc.co.uk"
-		sop.save!
-
-		get :show,:id=>projects(:sysmo_project)
-		assert_select "div.list_item div.list_item_desc" do
-			assert_select "a[rel=?]","nofollow",:text=>/news\.bbc\.co\.uk/,:minimum=>1
-		end
+    user = Factory :user
+    project = user.person.projects.first
+    login_as(user)
+    sop = Factory :sop,:description=>"http://news.bbc.co.uk",:projects=>[project],:contributor=>user
+    get :show,:id=>project
+    assert_select "div.list_item div.list_item_desc" do
+      assert_select "a[rel=?]","nofollow",:text=>/news\.bbc\.co\.uk/,:count=>1
+    end
 	end
 
 	test "links have nofollow in data_files tabs" do
-		login_as(:owner_of_my_first_sop)
-		data_file=data_files(:picture)
-		data_file.description="http://news.bbc.co.uk"
-		data_file.save!
-
-		get :show,:id=>projects(:sysmo_project)
-		assert_select "div.list_item div.list_item_desc" do
-			assert_select "a[rel=?]","nofollow",:text=>/news\.bbc\.co\.uk/,:minimum=>1
-		end
+    user = Factory :user
+    project = user.person.projects.first
+    login_as(user)
+    df = Factory :data_file,:description=>"http://news.bbc.co.uk",:projects=>[project],:contributor=>user
+    get :show,:id=>project
+    assert_select "div.list_item div.list_item_desc" do
+      assert_select "a[rel=?]","nofollow",:text=>/news\.bbc\.co\.uk/,:count=>1
+    end
 	end
 
 	test "links have nofollow in model tabs" do
-		login_as(:owner_of_my_first_sop)
-		model=models(:teusink)
-		model.description="http://news.bbc.co.uk"
-		model.save!
-
-		get :show,:id=>projects(:sysmo_project)
-		assert_select "div.list_item div.list_item_desc" do
-			assert_select "a[rel=?]","nofollow",:text=>/news\.bbc\.co\.uk/,:minimum=>1
-		end
+    user = Factory :user
+    project = user.person.projects.first
+    login_as(user)
+    model = Factory :model,:description=>"http://news.bbc.co.uk",:projects=>[project],:contributor=>user
+    get :show,:id=>project
+    assert_select "div.list_item div.list_item_desc" do
+      assert_select "a[rel=?]","nofollow",:text=>/news\.bbc\.co\.uk/,:count=>1
+    end
 	end
 
 	test "pals displayed in show page" do
-		get :show,:id=>projects(:sysmo_project)
+    pal = Factory :pal,:first_name=>"A",:last_name=>"PAL"
+    project = pal.projects.first
+		get :show,:id=>project
 		assert_select "div.box_about_actor p.pals" do
 			assert_select "label",:text=>"SysMO-DB PALs:",:count=>1
 			assert_select "a",:count=>1
-			assert_select "a[href=?]",person_path(people(:pal)),:text=>"A PAL",:count=>1
+			assert_select "a[href=?]",person_path(pal),:text=>"A PAL",:count=>1
 		end
   end
 
@@ -345,20 +344,27 @@ class ProjectsControllerTest < ActionController::TestCase
 	end
 
 	test "non admin has no option to administer project" do
-		login_as(:pal_user)
-		get :show,:id=>projects(:sysmo_project)
+    user = Factory :user
+    assert_equal 1,user.person.projects.count
+    project = user.person.projects.first
+		login_as(user)
+		get :show,:id=>project
 		assert_select "ul.sectionIcons" do
 			assert_select "span.icon" do
-				assert_select "a[href=?]",admin_project_path(projects(:sysmo_project)),:text=>/Project administration/,:count=>0
+				assert_select "a[href=?]",admin_project_path(project),:text=>/Project administration/,:count=>0
 			end
 		end
 	end
 
 	test "admin has option to administer project" do
-		get :show,:id=>projects(:sysmo_project)
+    admin = Factory :admin
+    assert_equal 1,admin.projects.count
+    project = admin.projects.first
+    login_as(admin.user)
+		get :show,:id=>project
 		assert_select "ul.sectionIcons" do
 			assert_select "span.icon" do
-				assert_select "a[href=?]",admin_project_path(projects(:sysmo_project)),:text=>/Project administration/,:count=>1
+				assert_select "a[href=?]",admin_project_path(project),:text=>/Project administration/,:count=>1
 			end
 		end
 	end

@@ -37,29 +37,27 @@ class StudiedFactorTest < ActiveSupport::TestCase
     end
   end
 
-  test 'should list the existing FSes of the project the datafile belongs to, filtered by can_view' do
+  test 'should list the existing FSes of the project the datafile belongs to filtered by can_view' do
     user = Factory(:user)
+    other_user = Factory :user
     data_file = Factory(:data_file, :contributor => user)
+    n=2
     #create bunch of data_files and FSes which belong to the same project and the datafiles can be viewed
-    i=0
-    while i < 10  do
-      d = Factory(:data_file, :projects => [data_file.projects.first], :policy => Factory(:all_sysmo_viewable_policy))
+    (0...n).to_a.each do |i|
+      d = Factory(:data_file, :projects => [data_file.projects.first], :policy => Factory(:all_sysmo_viewable_policy), :contributor=>other_user)
       Factory(:studied_factor, :data_file => d, :start_value => i)
-      i +=1
     end
 
     #create bunch of data_files and FSes which belong to the same project and the datafiles can not be viewed
-    i=0
-    while i < 10  do
-      d = Factory(:data_file, :projects => [Factory(:project),data_file.projects.first])
+    (0...n).to_a.each do |i|
+      d = Factory(:data_file, :projects => [Factory(:project),data_file.projects.first], :contributor=>other_user)
       Factory(:studied_factor, :data_file => d, :start_value => i)
-      i +=1
     end
 
     User.with_current_user  user do
         assert data_file.can_edit?
         fses = fses_or_ecs_of_project data_file, 'studied_factors'
-        assert_equal fses.count, 10
+        assert_equal n, fses.count
         fses.each do |fs|
           assert fs.data_file.can_view?
           assert !(fs.data_file.project_ids & data_file.project_ids).empty?
@@ -71,28 +69,25 @@ class StudiedFactorTest < ActiveSupport::TestCase
     fs_array = []
     d = Factory(:data_file)
     #create bunch of FSes which are different
-    i=0
-    number_of_different_fses = 10
-    number_of_the_same_fses = 5
-    while i < number_of_different_fses  do
+
+    number_of_different_fses = 2
+    number_of_the_same_fses = 2
+    (0...number_of_different_fses).to_a.each do |i|
       fs_array.push Factory(:studied_factor, :data_file => d, :start_value => i)
-      i +=1
     end
     #create bunch of FSes which are the same based on the set (measured_item, unit, start_value, end_value, sd, substance)
     compound = Factory(:compound, :name => 'glucose')
     measured_item = Factory(:measured_item)
     unit = Factory(:unit)
-    j=0
-    while j < number_of_the_same_fses  do
+    (0...number_of_the_same_fses).to_a.each do
       studied_factor_link = Factory(:studied_factor_link, :substance => compound)
-      fs = Factory(:studied_factor, :measured_item => measured_item, :unit => unit)
+      fs = Factory(:studied_factor, :measured_item => measured_item, :unit => unit, :data_file=>d)
       fs.studied_factor_links = [studied_factor_link]
       fs_array.push fs
-      j +=1
     end
-    assert_equal fs_array.count, i+j
+    assert_equal fs_array.count, 4
     uniq_fs_array = uniq_fs_or_ec fs_array
-    assert_equal uniq_fs_array.count, i+1
+    assert_equal uniq_fs_array.count, 3
   end
 
   test "should create the factor_studied and the association has_many compounds , through studied_factor_links table" do

@@ -188,7 +188,7 @@ module AssetsHelper
     asset_version_links = []
     asset_versions.select(&:can_view?).each do |asset_version|
       asset_name = asset_version.class.name.split('::').first.underscore
-      asset_version_links << link_to(asset_version.title, eval("#{asset_name}_path(#{asset_version.send("#{asset_name}_id")})") + "?version=#{asset_version.version}", {:target => '_blank'})
+      asset_version_links << link_to(asset_version.title, eval("#{asset_name}_path(#{asset_version.send("#{asset_name}_id")})") + "?version=#{asset_version.version}")
     end
     asset_version_links
   end

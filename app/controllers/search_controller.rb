@@ -51,6 +51,7 @@ class SearchController < ApplicationController
     downcase_query.gsub!(":", "")
 
     @results=[]
+
     if (Seek::Config.solr_enabled and !downcase_query.blank?)
       if type == "all"
           sources = [Person, Project, Institution, Sop, Model, Study, DataFile, Assay, Investigation, Publication, Presentation, Event, Sample, Specimen]
@@ -75,8 +76,8 @@ class SearchController < ApplicationController
         external_results = external_search downcase_query,type
         @results |= external_results
       end
-
     end
+
   end
 
   private
