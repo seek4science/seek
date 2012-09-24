@@ -227,12 +227,10 @@ class ContentBlobTest < ActiveSupport::TestCase
     assert !content_blob.file_exists?(content_blob.filepath('txt'))
   end
 
-  test 'docsplit should convert ms word doc to pdf; and then pdf to txt' do
-    #convert ms word to pdf
-    #then convert pdf file to txt file
+  test 'covert_office should convert ms word doc to pdf; and then docslit convert pdf to txt' do
     ms_word_content_blob = Factory(:doc_content_blob)
     directory_storage_path = ms_word_content_blob.directory_storage_path
-    Docsplit.extract_pdf(ms_word_content_blob.filepath, :output => directory_storage_path)
+    ms_word_content_blob.convert_to_pdf
     Docsplit.extract_text(ms_word_content_blob.filepath('pdf'), :output => directory_storage_path)
     assert ms_word_content_blob.file_exists?(ms_word_content_blob.filepath)
     assert ms_word_content_blob.file_exists?(ms_word_content_blob.filepath('pdf'))
@@ -242,12 +240,10 @@ class ContentBlobTest < ActiveSupport::TestCase
     assert ms_word_file_content.include?('This is a ms word doc format')
   end
 
-  test 'docsplit should convert ms word docx to pdf; and then pdf to txt' do
-    #convert ms word to pdf
-    #then convert pdf file to txt file
+  test 'convert_office should convert ms word docx to pdf; and then docsplit convert pdf to txt' do
     ms_word_content_blob = Factory(:docx_content_blob)
     directory_storage_path = ms_word_content_blob.directory_storage_path
-    Docsplit.extract_pdf(ms_word_content_blob.filepath, :output => directory_storage_path)
+    ms_word_content_blob.convert_to_pdf
     Docsplit.extract_text(ms_word_content_blob.filepath('pdf'), :output => directory_storage_path)
     assert ms_word_content_blob.file_exists?(ms_word_content_blob.filepath)
     assert ms_word_content_blob.file_exists?(ms_word_content_blob.filepath('pdf'))
@@ -257,12 +253,10 @@ class ContentBlobTest < ActiveSupport::TestCase
     assert ms_word_file_content.include?('This is a ms word docx format')
   end
 
-  test 'docsplit should convert open office word odt to pdf; and then pdf to txt' do
-    #convert open office word to pdf
-    #then convert pdf file to txt file
+  test 'convert_office should convert open office word odt to pdf; and then docsplit converts pdf to txt' do
     openoffice_word_content_blob = Factory(:odt_content_blob)
     directory_storage_path = openoffice_word_content_blob.directory_storage_path
-    Docsplit.extract_pdf(openoffice_word_content_blob.filepath, :output => directory_storage_path)
+    openoffice_word_content_blob.convert_to_pdf
     Docsplit.extract_text(openoffice_word_content_blob.filepath('pdf'), :output => directory_storage_path)
     assert openoffice_word_content_blob.file_exists?(openoffice_word_content_blob.filepath)
     assert openoffice_word_content_blob.file_exists?(openoffice_word_content_blob.filepath('pdf'))
@@ -272,27 +266,10 @@ class ContentBlobTest < ActiveSupport::TestCase
     assert ms_word_file_content.include?('This is an open office word odt format')
   end
 
-  test 'docsplit should convert open office word fodt to pdf; and then pdf to txt' do
-    #convert open office word to pdf
-    #then convert pdf file to txt file
-    openoffice_word_content_blob = Factory(:fodt_content_blob)
-    directory_storage_path = openoffice_word_content_blob.directory_storage_path
-    Docsplit.extract_pdf(openoffice_word_content_blob.filepath, :output => directory_storage_path)
-    Docsplit.extract_text(openoffice_word_content_blob.filepath('pdf'), :output => directory_storage_path)
-    assert openoffice_word_content_blob.file_exists?(openoffice_word_content_blob.filepath)
-    assert openoffice_word_content_blob.file_exists?(openoffice_word_content_blob.filepath('pdf'))
-    assert openoffice_word_content_blob.file_exists?(openoffice_word_content_blob.filepath('txt'))
-
-    ms_word_file_content = File.open(openoffice_word_content_blob.filepath('txt'), 'rb').read
-    assert ms_word_file_content.include?('This is an open office word fodt format')
-  end
-
-  test 'docsplit should convert ms ppt to pdf; and then pdf to txt' do
-    #convert ms ppt to pdf
-    #then convert pdf file to txt file
+  test 'convert_office should convert ms ppt to pdf; and then docsplit converts pdf to txt' do
     ms_ppt_content_blob = Factory(:ppt_content_blob)
     directory_storage_path = ms_ppt_content_blob.directory_storage_path
-    Docsplit.extract_pdf(ms_ppt_content_blob.filepath, :output => directory_storage_path)
+    ms_ppt_content_blob.convert_to_pdf
     Docsplit.extract_text(ms_ppt_content_blob.filepath('pdf'), :output => directory_storage_path)
     assert ms_ppt_content_blob.file_exists?(ms_ppt_content_blob.filepath)
     assert ms_ppt_content_blob.file_exists?(ms_ppt_content_blob.filepath('pdf'))
@@ -302,12 +279,10 @@ class ContentBlobTest < ActiveSupport::TestCase
     assert ms_word_file_content.include?('This is a ms power point ppt format')
   end
 
-  test 'docsplit should convert ms pptx to pdf; and then pdf to txt' do
-    #convert ms ppt to pdf
-    #then convert pdf file to txt file
+  test 'convert_office should convert ms pptx to pdf; and then docsplit converts pdf to txt' do
     ms_ppt_content_blob = Factory(:pptx_content_blob)
     directory_storage_path = ms_ppt_content_blob.directory_storage_path
-    Docsplit.extract_pdf(ms_ppt_content_blob.filepath, :output => directory_storage_path)
+    ms_ppt_content_blob.convert_to_pdf
     Docsplit.extract_text(ms_ppt_content_blob.filepath('pdf'), :output => directory_storage_path)
     assert ms_ppt_content_blob.file_exists?(ms_ppt_content_blob.filepath)
     assert ms_ppt_content_blob.file_exists?(ms_ppt_content_blob.filepath('pdf'))
@@ -317,27 +292,10 @@ class ContentBlobTest < ActiveSupport::TestCase
     assert ms_word_file_content.include?('This is a ms power point pptx format')
   end
 
-  test 'docsplit should convert ms pps to pdf; and then pdf to txt' do
-    #convert ms ppt to pdf
-    #then convert pdf file to txt file
-    ms_ppt_content_blob = Factory(:pps_content_blob)
-    directory_storage_path = ms_ppt_content_blob.directory_storage_path
-    Docsplit.extract_pdf(ms_ppt_content_blob.filepath, :output => directory_storage_path)
-    Docsplit.extract_text(ms_ppt_content_blob.filepath('pdf'), :output => directory_storage_path)
-    assert ms_ppt_content_blob.file_exists?(ms_ppt_content_blob.filepath)
-    assert ms_ppt_content_blob.file_exists?(ms_ppt_content_blob.filepath('pdf'))
-    assert ms_ppt_content_blob.file_exists?(ms_ppt_content_blob.filepath('txt'))
-
-    ms_word_file_content = File.open(ms_ppt_content_blob.filepath('txt'), 'rb').read
-    assert ms_word_file_content.include?('This is a ms power point pps format')
-  end
-
-  test 'docsplit should convert open office ppt to pdf; and then pdf to txt' do
-    #convert open office ppt to pdf
-    #then convert pdf file to txt file
+  test 'convert_office should convert open office ppt to pdf; and then docsplit converts pdf to txt' do
     openoffice_ppt_content_blob = Factory(:odp_content_blob)
     directory_storage_path = openoffice_ppt_content_blob.directory_storage_path
-    Docsplit.extract_pdf(openoffice_ppt_content_blob.filepath, :output => directory_storage_path)
+    openoffice_ppt_content_blob.convert_to_pdf
     Docsplit.extract_text(openoffice_ppt_content_blob.filepath('pdf'), :output => directory_storage_path)
     assert openoffice_ppt_content_blob.file_exists?(openoffice_ppt_content_blob.filepath)
     assert openoffice_ppt_content_blob.file_exists?(openoffice_ppt_content_blob.filepath('pdf'))
@@ -347,27 +305,10 @@ class ContentBlobTest < ActiveSupport::TestCase
     assert ms_word_file_content.include?('This is an open office power point odp format')
   end
 
-  test 'docsplit should convert open office fodp to pdf; and then pdf to txt' do
-    #convert open office ppt to pdf
-    #then convert pdf file to txt file
-    openoffice_ppt_content_blob = Factory(:fodp_content_blob)
-    directory_storage_path = openoffice_ppt_content_blob.directory_storage_path
-    Docsplit.extract_pdf(openoffice_ppt_content_blob.filepath, :output => directory_storage_path)
-    Docsplit.extract_text(openoffice_ppt_content_blob.filepath('pdf'), :output => directory_storage_path)
-    assert openoffice_ppt_content_blob.file_exists?(openoffice_ppt_content_blob.filepath)
-    assert openoffice_ppt_content_blob.file_exists?(openoffice_ppt_content_blob.filepath('pdf'))
-    assert openoffice_ppt_content_blob.file_exists?(openoffice_ppt_content_blob.filepath('txt'))
-
-    ms_word_file_content = File.open(openoffice_ppt_content_blob.filepath('txt'), 'rb').read
-    assert ms_word_file_content.include?('This is an open office power point fodp format')
-  end
-
-  test 'docsplit should convert open office rtf to pdf; and then pdf to txt' do
-    #convert open office ppt to pdf
-    #then convert pdf file to txt file
+  test 'convert_office should convert open office rtf to pdf; and then docsplit converts pdf to txt' do
     openoffice_ppt_content_blob = Factory(:rtf_content_blob)
     directory_storage_path = openoffice_ppt_content_blob.directory_storage_path
-    Docsplit.extract_pdf(openoffice_ppt_content_blob.filepath, :output => directory_storage_path)
+    openoffice_ppt_content_blob.convert_to_pdf
     Docsplit.extract_text(openoffice_ppt_content_blob.filepath('pdf'), :output => directory_storage_path)
     assert openoffice_ppt_content_blob.file_exists?(openoffice_ppt_content_blob.filepath)
     assert openoffice_ppt_content_blob.file_exists?(openoffice_ppt_content_blob.filepath('pdf'))
