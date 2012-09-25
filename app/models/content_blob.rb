@@ -87,8 +87,8 @@ class ContentBlob < ActiveRecord::Base
     end
   end        
   
-  def file_exists?file_path=filepath
-    File.exist?(file_path)
+  def file_exists?
+    File.exist?(filepath)
   end
 
   def storage_filename format="dat",uuid_to_use=nil

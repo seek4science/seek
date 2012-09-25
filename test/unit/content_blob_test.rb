@@ -55,22 +55,6 @@ class ContentBlobTest < ActiveSupport::TestCase
     assert_equal data_for_test('file_picture.png'),data
   end
 
-#  def test_dumps_file_on_fetch
-#    pic=content_blobs(:picture_blob)    
-#    pic.regenerate_uuid #makes sure is not there from a previous test    
-#    assert !pic.file_exists?
-#    assert_equal data_for_test('file_picture.png'),pic.data_io_object.read
-#    assert pic.file_exists?
-#    assert_equal data_for_test('file_picture.png'),pic.data_io_object.read
-#  end
-
-#  def test_file_exists
-#    pic=content_blobs(:picture_blob)    
-#    pic.regenerate_uuid #makes sure is not there from a previous test
-#    assert !pic.file_exists?
-#    pic.save!
-#    assert pic.file_exists?
-#  end
 
   #checks that the data is assigned through the new method, stored to a file, and not written to the old data_old field
   def test_data_assignment
@@ -209,22 +193,21 @@ class ContentBlobTest < ActiveSupport::TestCase
     end
   end
 
-  test 'directory_storage_path and filepath' do
+  test 'storage_directory and filepath' do
     content_blob = Factory(:content_blob)
-    directory_storage_path = content_blob.storage_directory
-    assert_equal  "/tmp/seek_content_blobs", directory_storage_path
-    assert_equal (directory_storage_path + '/' + content_blob.uuid + '.dat'), content_blob.filepath
-    assert_equal (directory_storage_path + '/' + content_blob.uuid + '.pdf'), content_blob.filepath('pdf')
-    assert_equal (directory_storage_path + '/' + content_blob.uuid + '.txt'), content_blob.filepath('txt')
+    storage_directory = content_blob.storage_directory
+    assert_equal  "/tmp/seek_content_blobs", storage_directory
+    assert_equal (storage_directory + '/' + content_blob.uuid + '.dat'), content_blob.filepath
+    assert_equal (storage_directory + '/' + content_blob.uuid + '.pdf'), content_blob.filepath('pdf')
+    assert_equal (storage_directory + '/' + content_blob.uuid + '.txt'), content_blob.filepath('txt')
   end
 
   test 'file_exists?' do
     #specify uuid here to avoid repeating uuid of other content_blob when running the whole test file
     content_blob = Factory(:content_blob, :uuid => '1111')
     assert content_blob.file_exists?
-    assert content_blob.file_exists?(content_blob.filepath)
-    assert !content_blob.file_exists?(content_blob.filepath('pdf'))
-    assert !content_blob.file_exists?(content_blob.filepath('txt'))
+    content_blob = Factory(:content_blob, :uuid => '2222', :data=>nil)
+    assert !content_blob.file_exists?
   end
 
   test 'covert_office should doc to pdf and then docslit convert pdf to txt' do
@@ -237,8 +220,6 @@ class ContentBlobTest < ActiveSupport::TestCase
     content_blob.convert_to_pdf
 
     assert File.exists?(pdf_path), "pdf was not created during conversion"
-
-    puts pdf_path
 
     storage_directory = content_blob.storage_directory
     Docsplit.extract_text(pdf_path, :output => storage_directory)

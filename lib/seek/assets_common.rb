@@ -314,7 +314,7 @@ module Seek
           send_file dat_filepath, :filename => content_blob.original_filename, :content_type => content_blob.content_type, :disposition => 'attachment'
       else
         content_blob.convert_to_pdf
-        if content_blob.file_exists?(pdf_filepath)
+        if File.exists?(pdf_filepath)
           send_file pdf_filepath, :filename => content_blob.original_filename, :content_type => content_blob.content_type, :disposition => 'attachment'
         else
           render :text => ''
