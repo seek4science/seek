@@ -98,6 +98,8 @@ module Seek
               :"treatment.substance" => mapping_entry("Substance"),
               :"treatment.concentration" => mapping_entry("Concentration"),
               :"treatment.unit" => mapping_entry("Unit"),
+              :"treatment.incubation_time" => mapping_entry("FIXED", proc {""}),
+              :"treatment.incubation_time_unit" => mapping_entry("FIXED", proc {""}),
 
               :"samples.comments" => mapping_entry("Additional Information"),
               :"samples.title" => mapping_entry("Sample Name"),
@@ -140,6 +142,7 @@ module Seek
 
       age_regex = /(\d+-?\d*)\s*(day|week|month|year)s?/i
       treatment_regex = /(\d*\.?\d*)\s*(\w+\/\w+)\s*([\w\.\s,']*),?\s+([\w\.]*)/
+      incubation_time_regex = /(\d+\.?\d*)(\w{1})/
 
 
 
@@ -228,6 +231,26 @@ module Seek
                   ""
                 end
               end),
+              :"treatment.incubation_time" => mapping_entry("Explantation", proc do |data|
+                  if data =~ incubation_time_regex
+                    $1
+                  else
+                    ""
+                  end
+              end),
+
+              :"treatment.incubation_time_unit" => mapping_entry("Explantation", proc do |data|
+                if data =~ incubation_time_regex
+                  case $2
+                    when "d" then "day"
+                    when "h" then "hour"
+                    when "w" then "week"
+                    else ""
+                  end
+                else
+                  ""
+                end
+              end),
 
               :"samples.comments" => mapping_entry("Comments"),
               :"samples.title" => mapping_entry("Tissue specimen no."),
@@ -288,6 +311,7 @@ module Seek
       treatment_concentration_unit_regex = /(\d*[,\.]?\d*)\s*([\w\s\/]*).*$/
       treatment_protocol_regex = /.*,\s*([\w\s\.]*)$/
       genotype_modification_regex = /(WT|KO)/
+      incubation_time_regex = /(\d+\.?\d*)\s+(\w*)s/
 
       {
           :name => "dortmund_bcat_ko",
@@ -367,6 +391,21 @@ module Seek
                   ""
                 end
               end),
+              :"treatment.incubation_time" => mapping_entry("Time point", proc do |data|
+                if data =~ incubation_time_regex
+                  $1
+                else
+                  ""
+                end
+              end),
+
+              :"treatment.incubation_time_unit" => mapping_entry("Time point", proc do |data|
+                if data =~ incubation_time_regex
+                  $2
+                else
+                  ""
+                end
+              end),
 
               :"samples.comments" => mapping_entry("FIXED", proc {""}),
               :"samples.title" => mapping_entry("Sample ID"),
@@ -402,7 +441,7 @@ module Seek
                   :samples_sheet_name => "Tabelle2",
                   :add_specimens => true,
                   :add_treatments => true,
-                  :add_samples => false,
+                  :add_samples => true,
 
                   :probing_column => :"specimens.title",
 
@@ -429,16 +468,19 @@ module Seek
                     end
                   end),
                   :"treatment.unit" => mapping_entry("FIXED", proc {"µg/g KG"}),
+                  :"treatment.incubation_time" => mapping_entry("Incubation period x Std."),
+                  :"treatment.incubation_time_unit" => mapping_entry("FIXED", proc {"hour"}),
 
-                  #:"samples.comments" => mapping_entry(""),
-                  #:"samples.title" => mapping_entry(""),
-                  #:"samples.sample_type" => mapping_entry(""),
-                  #:"samples.donation_date" => mapping_entry(""),
 
-                  #:"tissue_and_cell_types.title" => mapping_entry(""),
+                  :"samples.comments" => mapping_entry("FIXED", proc {""}),
+                  :"samples.title" => mapping_entry("Animal Nr.", proc { |data| data + "_liver"}),
+                  :"samples.sample_type" => mapping_entry("FIXED", proc {"liver"}),
+                  :"samples.donation_date" => mapping_entry("Donation Date"),
 
-                  #:"sop.title" => mapping_entry(""),
-                  #:"institution.name" => mapping_entry("")
+                  :"tissue_and_cell_types.title" => mapping_entry("FIXED", proc {""}),
+
+                  :"sop.title" => mapping_entry("FIXED", proc {""}),
+                  :"institution.name" => mapping_entry("FIXED", proc {""})
               },
 
 

@@ -282,15 +282,20 @@ module Seek
         treatment_substances = hunt_for_field_values_mapped sheet, :"treatment.substance", @samples_mapping
         treatment_units = hunt_for_field_values_mapped sheet, :"treatment.unit", @samples_mapping
         treatment_protocols = hunt_for_field_values_mapped sheet, :"treatment.treatment_protocol", @samples_mapping
+        treatment_incubation_time = hunt_for_field_values_mapped sheet, :"treatment.incubation_time", @samples_mapping
+        treatment_incubation_time_unit = hunt_for_field_values_mapped sheet, :"treatment.incubation_time_unit", @samples_mapping
 
 
         Rails.logger.warn "$$$$$$$$$$$$$$ treatment_concentrations #{treatment_concentrations}"
         Rails.logger.warn "$$$$$$$$$$$$$$ treatment_substances  #{treatment_substances}"
         Rails.logger.warn "$$$$$$$$$$$$$$ treatment_units  #{treatment_units}"
         Rails.logger.warn "$$$$$$$$$$$$$$ treatment_protocols  #{treatment_protocols}"
+        Rails.logger.warn "$$$$$$$$$$$$$$ treatment_incubation_time  #{treatment_incubation_time}"
+        Rails.logger.warn "$$$$$$$$$$$$$$ treatment_incubation_time_unit  #{treatment_incubation_time_unit}"
 
-        treatment_data = treatment_protocols.zip(treatment_substances, treatment_concentrations, treatment_units).map do |protocol, substance, concentration, unit|
-          {:protocol => protocol, :substance => substance, :concentration => concentration, :unit => unit}
+        treatment_data = treatment_protocols.zip(treatment_substances, treatment_concentrations, treatment_units, treatment_incubation_time, treatment_incubation_time_unit).map do
+          |protocol, substance, concentration, unit, incubation_time, incubation_time_unit|
+            {:protocol => protocol, :substance => substance, :concentration => concentration, :unit => unit, :incubation_time => incubation_time, :incubation_time_unit => incubation_time_unit}
         end
 
 
@@ -583,6 +588,8 @@ module Seek
         substance = treatment_data[:substance][:value]
         concentration = treatment_data[:concentration][:value]
         unit = treatment_data[:unit][:value]
+        incubation_time = treatment_data[:incubation_time][:value]
+        incubation_time_unit = treatment_data[:incubation_time_unit][:value]
 
         row = treatment_data[:protocol][:row]
 
@@ -593,8 +600,8 @@ module Seek
                      "standard deviation" => nil,
                      "comments" => nil,
                      "protocol" => treatment_protocol,
-                     "incubation time" => nil,
-                     "incubation time unit" => nil,
+                     "incubation time" => incubation_time,
+                     "incubation time unit" => incubation_time_unit,
                      "compound" => substance}
 
 
@@ -632,7 +639,7 @@ module Seek
           incubation_time = treatment_json["incubation time"]
           incubation_time_unit = nil
 
-          if incubation_time
+          if incubation_time && incubation_time != ""
             incubation_time_unit = Unit.find_by_symbol treatment_json["incubation time unit"]
             incubation_time_unit = Unit.create :symbol => treatment_json["incubation time unit"], :factors_studied => false unless incubation_time_unit
           end
