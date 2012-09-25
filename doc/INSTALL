@@ -29,11 +29,11 @@ Before starting, its a good idea to get up to date:
 The following commands will install the core required packages:
 
 for Ubuntu Precise 12.04 (LTS):
-  sudo apt-get install wget mercurial ruby ri1.8 libruby1.8 ruby-dev mysql-server libssl-dev build-essential openssh-server
+  sudo apt-get install wget git mercurial ruby ri1.8 libruby1.8 ruby-dev mysql-server libssl-dev build-essential openssh-server
   sudo apt-get install libmysqlclient-dev libmagick++-dev libxslt1-dev libxml++2.6-dev openjdk-6-jdk graphviz libsqlite3-dev sqlite3
 
 for Ubuntu Lucid 10.04 (LTS):
-  sudo apt-get install wget mercurial ruby rdoc ri libopenssl-ruby ruby-dev mysql-server libssl-dev build-essential openssh-server 
+  sudo apt-get install wget git mercurial ruby rdoc ri libopenssl-ruby ruby-dev mysql-server libssl-dev build-essential openssh-server
   sudo apt-get install libmysqlclient16-dev libmagick++-dev libxslt-dev libxml++2.6-dev openjdk-6-jdk graphviz libsqlite3-dev sqlite3
   
 If setting up for production deployment using the {Passenger Phusion (modrails)}[http://www.modrails.com/] module you can save a step later by also using:
