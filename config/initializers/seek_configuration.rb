@@ -39,6 +39,7 @@ Seek::Config.default :sample_parser_enabled,false
 Seek::Config.default :external_search_enabled, true
 Seek::Config.default :project_browser_enabled,false
 Seek::Config.default :experimental_features_enabled,true
+Seek::Config.default :pdf_conversion_enabled,true
 
 #time in minutes that the feeds on the front page are cached for
 Seek::Config.default :home_feeds_cache_timeout,2

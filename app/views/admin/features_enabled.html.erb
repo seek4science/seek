@@ -28,6 +28,12 @@
     } -%>
 
     <%= render :partial=>'setting_li',:locals=>{
+            :description=>"Whether pdf conversion is enabled. It allows converting some document types to pdf format. If enabled, you need to ensure open office is running",
+            :name=>"Pdf conversion enabled",
+            :field=>check_box_tag(:pdf_conversion_enabled, 1, Seek::Config.pdf_conversion_enabled)
+    } -%>
+
+    <%= render :partial=>'setting_li',:locals=>{
             :description=>"Hides email addresses, skype and internal web addresses.",
             :name=>"Hide contact details",
             :field=>check_box_tag(:hide_details_enabled, 1, Seek::Config.hide_details_enabled)
