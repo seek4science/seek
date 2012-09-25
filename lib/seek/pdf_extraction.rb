@@ -35,11 +35,11 @@ module Seek
     end
 
     def convert_to_pdf
+      pdf_filepath = filepath('pdf')
       begin
         unless file_exists?(pdf_filepath)
           #copy dat file to original file extension in order to convert to pdf on this file
           dat_filepath = filepath
-          pdf_filepath = filepath('pdf')
           file_extension = mime_extension(content_type)
           copied_filepath = filepath(file_extension)
           FileUtils.cp dat_filepath, copied_filepath unless file_exists?(copied_filepath)
