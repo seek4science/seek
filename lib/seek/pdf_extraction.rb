@@ -42,6 +42,7 @@ module Seek
           dat_filepath = filepath
           file_extension = mime_extension(content_type)
           copied_filepath = filepath(file_extension)
+          puts copied_filepath
           FileUtils.cp dat_filepath, copied_filepath unless file_exists?(copied_filepath)
 
           ConvertOffice::ConvertOfficeFormat.new.convert(copied_filepath,pdf_filepath)
@@ -51,7 +52,7 @@ module Seek
             sleep(1)
           end
           #remove copied file
-          FileUtils.rm copied_filepath
+          FileUtils.rm copied_filepath if File.exist?(copied_filepath)
         end
       rescue Exception=> e
         Rails.logger.error("Problem with converting file of content_blob #{id} to pdf")
