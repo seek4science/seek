@@ -6,7 +6,11 @@ module Seek
     PDF_CONVERTABLE_FORMAT = %w[doc docx ppt pptx odt odp rtf txt]
 
     def is_content_viewable?
-      asset.is_downloadable_asset? && asset.can_download? && is_viewable_format? && !filesize.nil?
+      if Seek::Config.pdf_conversion_enabled
+        asset.is_downloadable_asset? && asset.can_download? && !filesize.nil? && is_viewable_format?
+      else
+        asset.is_downloadable_asset? && asset.can_download? && !filesize.nil? && (is_pdf? || file_exists?(filepath('pdf')))
+      end
     end
 
     def is_viewable_format?

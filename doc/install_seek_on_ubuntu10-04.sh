@@ -88,4 +88,17 @@ bundle exec rake db:setup RAILS_ENV=test
 bundle exec rake db:test:prepare
 
 echo "${txtgrn} *********************************** ${txtrst}"
-echo "${txtgrn} You finished setting up SEEK. You might want to go to $SEEK_PATH/$SEEK_DIRECTORY to try out SEEK. You should add 'bundle exec' before any commands to get the correct gems run. If you run SEEK on apache, you need to configurate it. The default apache installation and configuration is at /etc/apache2 ${txtrst}"
+echo "${txtgrn} Start Solr search engine"
+RAILS_ENV=production bundle exec rake sunspot:solr:start
+
+echo "${txtgrn} *********************************** ${txtrst}"
+echo "${txtgrn} Start some background jobs"
+script/delayed_job start
+nohup soffice --headless --accept="socket,host=127.0.0.1,port=8100;urp;" --nofirststartwizard > /dev/null 2>&1
+
+echo "${txtgrn} *********************************** ${txtrst}"
+echo "${txtgrn} Start SEEK server under production mode"
+RAILS_ENV=production bundle exec script/server
+
+echo "${txtgrn} *********************************** ${txtrst}"
+echo "${txtgrn} You finished setting up and starting up SEEK. You might want to try out SEEK by going to: http://localhost:3000. SEEK is installed under $SEEK_PATH/$SEEK_DIRECTORY. If you run SEEK on apache, you need to configurate it. The default apache installation and configuration is at /etc/apache2 ${txtrst}"

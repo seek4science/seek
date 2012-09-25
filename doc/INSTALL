@@ -140,6 +140,17 @@ and
 
   sudo service seek-delayed-job stop
 
+== Starting Open Office
+
+Open Office is a background service which is called by convert_office plugin, to convert some document types (ms office documents,
+open office documents, etc.) into pdf document.
+
+The command to start open office in headless mode and as the background process:
+
+    nohup soffice --headless --accept="socket,host=127.0.0.1,port=8100;urp;" --nofirststartwizard > /dev/null 2>&1
+
+The 8100 port is used by default, if you'd like to run on another port, you need also to synchronize the changed port with the default soffice_port setting for convert_office plugin in config/environment.rb
+
 == Starting the server
 
 You can now start the server with the command
