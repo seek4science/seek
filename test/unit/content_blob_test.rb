@@ -120,7 +120,7 @@ class ContentBlobTest < ActiveSupport::TestCase
   end
 
   def data_for_test filename
-    file = "#{RAILS_ROOT}/test/fixtures/files/#{filename}"
+    file = "#{Rails.root}/test/fixtures/files/#{filename}"
     return File.open(file,"rb").read
   end
   

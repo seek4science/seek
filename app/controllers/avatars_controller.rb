@@ -252,7 +252,7 @@ class AvatarsController < ApplicationController
   def cache_path(avatar, size=nil, include_local_name=false)
     
     id = avatar.kind_of?(Integer) ? avatar : avatar.id
-    rtn = "#{RAILS_ROOT}/tmp/avatars"
+    rtn = "#{Rails.root}/tmp/avatars"
     rtn = "#{rtn}/#{size}" if size
     rtn = "#{rtn}/#{id}.#{Avatar.image_storage_format}" if include_local_name
     

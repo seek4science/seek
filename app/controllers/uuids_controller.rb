@@ -20,7 +20,7 @@ class UuidsController < ApplicationController
   
   def uuid_models
     return @@uuid_models if @@uuid_models
-    models = Dir.glob("#{RAILS_ROOT}/app/models/*.rb").map { |path| File.basename(path, ".rb").camelize.constantize }
+    models = Dir.glob("#{Rails.root}/app/models/*.rb").map { |path| File.basename(path, ".rb").camelize.constantize }
     @@uuid_models = models.select{|m| m.respond_to?("find_by_uuid")}
     return @@uuid_models
   end

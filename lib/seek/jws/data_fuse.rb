@@ -67,7 +67,7 @@ module Seek
 
       #only used for testing and development purposes
       def dummy_data_fuse_response_xml
-        path="#{RAILS_ROOT}/test/data_fuse_example.xml"
+        path="#{Rails.root}/test/data_fuse_example.xml"
         File.open(path, "rb").read
       end
 
