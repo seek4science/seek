@@ -28,7 +28,7 @@ tmp/data.sql
 tmp/avatars/*
 tmp/models/*
 tmp/restart.txt
-tmp/*-graph.html
+tmp/profile-*
 *.tmp*
 *~
 

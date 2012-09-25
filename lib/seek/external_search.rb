@@ -30,7 +30,12 @@ module Seek
 
     def external_search query,type='all'
       search_adaptors(type).collect do |adaptor|
-        adaptor.search query
+        begin
+          adaptor.search query
+        rescue Exception=>e
+          Rails.logger.error("Error performing external search with #{adaptor} - #{e.class.name}:#{e.message}")
+          []
+        end
       end.flatten.uniq
     end
 

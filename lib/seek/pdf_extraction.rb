@@ -2,7 +2,7 @@ module Seek
   module PdfExtraction
     include Seek::MimeTypes
 
-    MAXIMUM_PDF_CONVERT_TIME = 10.minutes
+    MAXIMUM_PDF_CONVERT_TIME = 1.minute
     PDF_CONVERTABLE_FORMAT = %w[doc docx ppt pptx odt odp rtf txt]
 
     def is_content_viewable?
@@ -39,14 +39,15 @@ module Seek
     end
 
     def convert_to_pdf
-      dat_filepath = filepath
       pdf_filepath = filepath('pdf')
       begin
         unless file_exists?(pdf_filepath)
           #copy dat file to original file extension in order to convert to pdf on this file
+          dat_filepath = filepath
           file_extension = mime_extension(content_type)
           copied_filepath = filepath(file_extension)
-          FileUtils.cp dat_filepath, copied_filepath unless file_exists?(filepath('doc'))
+          FileUtils.cp dat_filepath, copied_filepath unless file_exists?(copied_filepath)
+
           ConvertOffice::ConvertOfficeFormat.new.convert(copied_filepath,pdf_filepath)
 
           t = Time.now
@@ -54,7 +55,7 @@ module Seek
             sleep(1)
           end
           #remove copied file
-          FileUtils.rm copied_filepath if file_exists?(filepath('doc'))
+          FileUtils.rm copied_filepath
         end
       rescue Exception=> e
         Rails.logger.error("Problem with converting file of content_blob #{id} to pdf")
