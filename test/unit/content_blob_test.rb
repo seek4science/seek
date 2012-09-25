@@ -211,7 +211,7 @@ class ContentBlobTest < ActiveSupport::TestCase
 
   test 'directory_storage_path and filepath' do
     content_blob = Factory(:content_blob)
-    directory_storage_path = content_blob.directory_storage_path
+    directory_storage_path = content_blob.storage_directory
     assert_equal  "/tmp/seek_content_blobs", directory_storage_path
     assert_equal (directory_storage_path + '/' + content_blob.uuid + '.dat'), content_blob.filepath
     assert_equal (directory_storage_path + '/' + content_blob.uuid + '.pdf'), content_blob.filepath('pdf')
@@ -227,18 +227,21 @@ class ContentBlobTest < ActiveSupport::TestCase
     assert !content_blob.file_exists?(content_blob.filepath('txt'))
   end
 
-  test 'covert_office should doc to pdf; and then docslit convert pdf to txt' do
+  test 'covert_office should doc to pdf and then docslit convert pdf to txt' do
     content_blob = Factory(:doc_content_blob, :uuid => 'doc_1')
     assert File.exists? content_blob.filepath
-    FileUtils.rm content_blob.filepath('pdf') if File.exists? content_blob.filepath('pdf')
-    assert !File.exists?(content_blob.filepath('pdf'))
+    pdf_path = content_blob.filepath('pdf')
+    FileUtils.rm pdf_path if File.exists? pdf_path
+    assert !File.exists?(pdf_path)
 
     content_blob.convert_to_pdf
 
-    assert File.exists?(content_blob.filepath('pdf')), "pdf was not created during conversion"
+    assert File.exists?(pdf_path), "pdf was not created during conversion"
 
-    directory_storage_path = content_blob.directory_storage_path
-    Docsplit.extract_text(content_blob.filepath('pdf'), :output => directory_storage_path)
+    puts pdf_path
+
+    storage_directory = content_blob.storage_directory
+    Docsplit.extract_text(pdf_path, :output => storage_directory)
 
     assert File.exists? content_blob.filepath('txt')
 
@@ -246,7 +249,7 @@ class ContentBlobTest < ActiveSupport::TestCase
     assert content.include?('This is a ms word doc format')
   end
 
-  test 'convert_office should convert docx to pdf; and then docsplit convert pdf to txt' do
+  test 'convert_office should convert docx to pdf and then docsplit convert pdf to txt' do
     content_blob = Factory(:docx_content_blob, :uuid => 'docx_1')
     assert File.exists? content_blob.filepath
     FileUtils.rm content_blob.filepath('pdf') if File.exists? content_blob.filepath('pdf')
@@ -256,8 +259,8 @@ class ContentBlobTest < ActiveSupport::TestCase
 
     assert File.exists?(content_blob.filepath('pdf')), "pdf was not created during conversion"
 
-    directory_storage_path = content_blob.directory_storage_path
-    Docsplit.extract_text(content_blob.filepath('pdf'), :output => directory_storage_path)
+    storage_directory = content_blob.storage_directory
+    Docsplit.extract_text(content_blob.filepath('pdf'), :output => storage_directory)
 
     assert File.exists? content_blob.filepath('txt')
 
@@ -265,7 +268,7 @@ class ContentBlobTest < ActiveSupport::TestCase
     assert content.include?('This is a ms word docx format')
   end
 
-  test 'convert_office should convert odt to pdf; and then docsplit converts pdf to txt' do
+  test 'convert_office should convert odt to pdf and then docsplit converts pdf to txt' do
     content_blob = Factory(:odt_content_blob, :uuid => 'odt_1')
     assert File.exists? content_blob.filepath
     FileUtils.rm content_blob.filepath('pdf') if File.exists? content_blob.filepath('pdf')
@@ -275,8 +278,8 @@ class ContentBlobTest < ActiveSupport::TestCase
 
     assert File.exists?(content_blob.filepath('pdf')), "pdf was not created during conversion"
 
-    directory_storage_path = content_blob.directory_storage_path
-    Docsplit.extract_text(content_blob.filepath('pdf'), :output => directory_storage_path)
+    storage_directory = content_blob.storage_directory
+    Docsplit.extract_text(content_blob.filepath('pdf'), :output => storage_directory)
 
     assert File.exists? content_blob.filepath('txt')
 
@@ -284,7 +287,7 @@ class ContentBlobTest < ActiveSupport::TestCase
     assert content.include?('This is an open office word odt format')
   end
 
-  test 'convert_office should convert ppt to pdf; and then docsplit converts pdf to txt' do
+  test 'convert_office should convert ppt to pdf and then docsplit converts pdf to txt' do
     content_blob = Factory(:ppt_content_blob, :uuid => 'ppt_1')
     assert File.exists? content_blob.filepath
     FileUtils.rm content_blob.filepath('pdf') if File.exists? content_blob.filepath('pdf')
@@ -294,8 +297,8 @@ class ContentBlobTest < ActiveSupport::TestCase
 
     assert File.exists?(content_blob.filepath('pdf')), "pdf was not created during conversion"
 
-    directory_storage_path = content_blob.directory_storage_path
-    Docsplit.extract_text(content_blob.filepath('pdf'), :output => directory_storage_path)
+    storage_directory = content_blob.storage_directory
+    Docsplit.extract_text(content_blob.filepath('pdf'), :output => storage_directory)
 
     assert File.exists? content_blob.filepath('txt')
 
@@ -303,7 +306,7 @@ class ContentBlobTest < ActiveSupport::TestCase
     assert content.include?('This is a ms power point ppt format')
   end
 
-  test 'convert_office should convert pptx to pdf; and then docsplit converts pdf to txt' do
+  test 'convert_office should convert pptx to pdf and then docsplit converts pdf to txt' do
     content_blob = Factory(:pptx_content_blob, :uuid => 'pptx_1')
     assert File.exists? content_blob.filepath
     FileUtils.rm content_blob.filepath('pdf') if File.exists? content_blob.filepath('pdf')
@@ -313,8 +316,8 @@ class ContentBlobTest < ActiveSupport::TestCase
 
     assert File.exists?(content_blob.filepath('pdf')), "pdf was not created during conversion"
 
-    directory_storage_path = content_blob.directory_storage_path
-    Docsplit.extract_text(content_blob.filepath('pdf'), :output => directory_storage_path)
+    storage_directory = content_blob.storage_directory
+    Docsplit.extract_text(content_blob.filepath('pdf'), :output => storage_directory)
 
     assert File.exists? content_blob.filepath('txt')
 
@@ -322,7 +325,7 @@ class ContentBlobTest < ActiveSupport::TestCase
     assert content.include?('This is a ms power point pptx format')
   end
 
-  test 'convert_office should convert odp to pdf; and then docsplit converts pdf to txt' do
+  test 'convert_office should convert odp to pdf and then docsplit converts pdf to txt' do
     content_blob = Factory(:odp_content_blob, :uuid => 'odp_1')
     assert File.exists? content_blob.filepath
     FileUtils.rm content_blob.filepath('pdf') if File.exists? content_blob.filepath('pdf')
@@ -332,8 +335,8 @@ class ContentBlobTest < ActiveSupport::TestCase
 
     assert File.exists?(content_blob.filepath('pdf')), "pdf was not created during conversion"
 
-    directory_storage_path = content_blob.directory_storage_path
-    Docsplit.extract_text(content_blob.filepath('pdf'), :output => directory_storage_path)
+    storage_directory = content_blob.storage_directory
+    Docsplit.extract_text(content_blob.filepath('pdf'), :output => storage_directory)
 
     assert File.exists? content_blob.filepath('txt')
 
@@ -341,7 +344,7 @@ class ContentBlobTest < ActiveSupport::TestCase
     assert content.include?('This is an open office power point odp format')
   end
 
-  test 'convert_office should convert rtf to pdf; and then docsplit converts pdf to txt' do
+  test 'convert_office should convert rtf to pdf and then docsplit converts pdf to txt' do
     content_blob = Factory(:rtf_content_blob, :uuid => 'rtf_1')
     assert File.exists? content_blob.filepath
     FileUtils.rm content_blob.filepath('pdf') if File.exists? content_blob.filepath('pdf')
@@ -351,8 +354,8 @@ class ContentBlobTest < ActiveSupport::TestCase
 
     assert File.exists?(content_blob.filepath('pdf')), "pdf was not created during conversion"
 
-    directory_storage_path = content_blob.directory_storage_path
-    Docsplit.extract_text(content_blob.filepath('pdf'), :output => directory_storage_path)
+    storage_directory = content_blob.storage_directory
+    Docsplit.extract_text(content_blob.filepath('pdf'), :output => storage_directory)
 
     assert File.exists? content_blob.filepath('txt')
 

@@ -91,17 +91,20 @@ class ContentBlob < ActiveRecord::Base
     File.exist?(file_path)
   end
 
-  def filepath format='dat',uuid_to_use=nil
+  def storage_filename format="dat",uuid_to_use=nil
     uuid_to_use ||= uuid
-    path = directory_storage_path
-    return "#{path}/#{uuid_to_use}.#{format}"
+    "#{uuid_to_use}.#{format}"
   end
 
-  def directory_storage_path
-    if RAILS_ENV == "test"
+  def filepath format='dat',uuid_to_use=nil
+    return "#{storage_directory}/#{storage_filename(format,uuid_to_use)}"
+  end
+
+  def storage_directory
+    if Rails.env == "test"
       path = "#{Dir::tmpdir}/seek_content_blobs"
     else
-      path = "#{RAILS_ROOT}/#{DATA_STORAGE_PATH}/#{RAILS_ENV}"
+      path = "#{RAILS_ROOT}/#{DATA_STORAGE_PATH}/#{Rails.env}"
     end
     FileUtils.mkdir_p(path)
     return path
