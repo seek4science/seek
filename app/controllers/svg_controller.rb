@@ -9,7 +9,7 @@ class SvgController < ApplicationController
 
   def show
     id = params[:id]
-    dir="#{RAILS_ROOT}/tmp/models"
+    dir="#{Rails.root}/tmp/models"
     path = "#{dir}/#{id}.svg"
     svg=open(path).read
     raise Exception.new("Not svg") unless svg.include?("<svg")

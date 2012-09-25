@@ -3,7 +3,7 @@
 # or http://www.realityforge.org/articles/2006/04/06/loading-binary-data-into-rails-fixtures
 <%
   def make_file(uuid,name)
-     fixture_file = "#{RAILS_ROOT}/test/fixtures/files/#{name}"
+     fixture_file = "#{Rails.root}/test/fixtures/files/#{name}"
      dir = "#{Dir::tmpdir}/seek_content_blobs"
      FileUtils.mkdir(dir) unless File.exists?(dir)
      destination = "#{dir}/#{uuid}.dat"

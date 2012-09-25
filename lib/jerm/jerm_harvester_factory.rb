@@ -19,7 +19,7 @@ module Jerm
         
     #find class for all the harversters found in lib/jerm
     def discover_harvesters
-      Dir.chdir(File.join(RAILS_ROOT, "lib/jerm")) do
+      Dir.chdir(File.join(Rails.root, "lib/jerm")) do
         Dir.glob("*harvester.rb").each do |f|
          ("jerm/" + f.gsub(/.rb/, '')).camelize.constantize
         end
