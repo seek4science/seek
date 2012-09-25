@@ -1478,7 +1478,7 @@ ActiveRecord::Schema.define(:version => 20120924145642) do
     t.string   "treatment_protocol"
     t.datetime "created_at"
     t.datetime "updated_at"
-    t.integer  "type"
+    t.integer  "treatment_type"
     t.float    "start_value"
     t.float    "end_value"
     t.float    "standard_deviation"

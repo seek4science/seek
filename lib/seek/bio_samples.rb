@@ -496,7 +496,7 @@ module Seek
         end
 
         if treatment_json && (specimen || sample)
-          populate_treatment treatment_json # todo add links to specimen and/or sample
+          populate_treatment treatment_json, specimen, sample
         end
 
 
@@ -588,13 +588,13 @@ module Seek
 
         treatment = {"type" => "concentration",
                      "start value" => concentration,
-                     "end value" => "",
+                     "end value" => nil,
                      "unit" => unit,
-                     "standard deviation" => "",
-                     "comments" => "",
+                     "standard deviation" => nil,
+                     "comments" => nil,
                      "protocol" => treatment_protocol,
-                     "incubation time" => "",
-                     "incubation time unit" => "",
+                     "incubation time" => nil,
+                     "incubation time unit" => nil,
                      "compound" => substance}
 
 
@@ -606,20 +606,47 @@ module Seek
     end
 
 
-    def populate_treatment treatment_json
+    def populate_treatment treatment_json, specimen=nil, sample=nil
 
-        if treatment_json["start value"]
+        start_value = treatment_json["start value"]
+        end_value = treatment_json["end value"]
+        standard_deviation = treatment_json["standard deviation"]
+        comments = treatment_json["comments"]
+        protocol = treatment_json["protocol"]
+
+        if start_value && start_value != ""
+
+          treatment_type = MeasuredItem.find_by_title(treatment_json["type"].downcase)
+          treatment_type = MeasuredItem.create :title => treatment_json["type"].downcase, :factors_studied => false unless treatment_type
+
+          compound = nil
+
+          if treatment_type.title == "concentration"
+            compound_name = treatment_json["compound"]
+            if compound_name != "" && compound_name != "none"
+              compound = Compound.find_by_name(treatment_json["compound"].downcase)
+              compound = Compound.create :name => treatment_json["compound"].downcase unless compound
+            end
+          end
+
+          incubation_time = treatment_json["incubation time"]
+          incubation_time_unit = nil
+
+          if incubation_time
+            incubation_time_unit = Unit.find_by_symbol treatment_json["incubation time unit"]
+            incubation_time_unit = Unit.create :symbol => treatment_json["incubation time unit"], :factors_studied => false unless incubation_time_unit
+          end
 
           unit = Unit.find_by_symbol treatment_json["unit"]
           unit = Unit.create :symbol => treatment_json["unit"], :factors_studied => false unless unit
 
-          #treatment = Treatment.all.detect { |t| t.treatment_protocol == treatment_protocol and
-         #     t.unit_id == unit.id and
-          #    t.substance == substance and
-          #    t.concentration.to_s == concentration }
-          treatment = Treatment.find(:first, :conditions => ["treatment_protocol = ? and unit_id = ? and substance = ? and cast(concentration as char) = ?", treatment_json["protocol"], unit.id, treatment_json["compound"], treatment_json["start value"]])
+          #treatment = Treatment.find(:first, :conditions => ["treatment_protocol = ? and unit_id = ? and substance = ? and cast(concentration as char) = ?", treatment_json["protocol"], unit.id, treatment_json["compound"], treatment_json["start value"]])
 
-          treatment = Treatment.new :substance => treatment_json["compound"], :concentration =>  treatment_json["start value"], :unit_id => unit.id, :treatment_protocol =>  treatment_json["protocol"] unless treatment
+          #treatment = Treatment.new :substance => treatment_json["compound"], :concentration =>  treatment_json["start value"], :unit_id => unit.id, :treatment_protocol =>  treatment_json["protocol"] unless treatment
+
+          treatment = Treatment.new :treatment_type => treatment_type, :start_value => start_value, :end_value => end_value, :unit => unit, :standard_deviation => standard_deviation,
+              :comments => comments, :treatment_protocol => protocol, :incubation_time => incubation_time, :incubation_time_unit => incubation_time_unit,
+              :compound => compound, :specimen => specimen, :sample => sample
 
           treatment.save!
 
