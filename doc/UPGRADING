@@ -48,7 +48,12 @@ only be necessary to a db:migrate rake task. Using seek:upgrade should still wor
 == Steps to upgrade from 0.15.x to 0.16.x
 
 First there are additional dependencies you will need, which on Ubuntu 10.04/12.04 can be installed with:
+
     sudo apt-get install poppler-utils tesseract-ocr openoffice.org openoffice.org-java-common
+
+Then running open office in the headless mode and as the background process:
+
+    nohup soffice --headless --accept="socket,host=127.0.0.1,port=8100;urp;" --nofirststartwizard > /dev/null 2>&1
 
 These are the fairly standard steps when upgrading between minor versions.
 
