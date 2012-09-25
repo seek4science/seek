@@ -46,7 +46,7 @@ module Seek
           ConvertOffice::ConvertOfficeFormat.new.convert(copied_filepath,pdf_filepath)
 
           t = Time.now
-          while !file_exists?(pdf_filepath) || (Time.now - t) > MAXIMUM_PDF_CONVERT_TIME
+          while !file_exists?(pdf_filepath) && (Time.now - t) < MAXIMUM_PDF_CONVERT_TIME
             sleep(1)
           end
           #remove copied file
@@ -55,7 +55,7 @@ module Seek
       rescue Exception=> e
         Rails.logger.error("Problem with converting file of content_blob #{id} to pdf")
       end
-  end
+    end
 
     private
 
