@@ -144,23 +144,22 @@ module Acts
       end
       
       AUTHORIZATION_ACTIONS.each do |action|
-          eval <<-END_EVAL
-            def can_#{action}? user = User.current_user
-                return true if new_record?
-                user_id = user.nil? ? 0 : user.id
-                if Seek::Config.auth_lookup_enabled
-                  lookup = self.class.lookup_for_asset("#{action}", user_id,self.id)
-                else
-                  lookup=nil
-                end
-                if lookup.nil?
-                  perform_auth(user,"#{action}")
-                else
-                  lookup
-                end
-            end
-          END_EVAL
-        end
+        eval <<-END_EVAL
+          def can_#{action}? user = User.current_user
+              return true if new_record?
+              user_id = user.nil? ? 0 : user.id
+              if Seek::Config.auth_lookup_enabled
+                lookup = self.class.lookup_for_asset("#{action}", user_id,self.id)
+              else
+                lookup=nil
+              end
+              if lookup.nil?
+                perform_auth(user,"#{action}")
+              else
+                lookup
+              end
+          end
+        END_EVAL
       end
 
       #triggers a background task to update or create the authorization lookup table records for this item
