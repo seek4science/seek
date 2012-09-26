@@ -20,15 +20,7 @@ module Acts
 
           before_validation :temporary_policy_while_waiting_for_publishing_approval, :publishing_auth unless Seek::Config.is_virtualliver
           after_save :queue_update_auth_table
-          before_save :update_timestamp_if_policy_was_saved
           after_destroy :remove_from_lookup_table
-
-          def update_timestamp_if_policy_was_saved
-            #autosaved belongs_to associations get saved before the parent, so to check if it has changed, see if it has a newer updated_at
-            update_timestamp if updated_at && policy.updated_at > updated_at
-          end
-
-
         end
       end
 
@@ -42,38 +34,25 @@ module Acts
         #anonymous user are returned. If one or more projects are provided, then only the assets linked to those projects are included.
         def all_authorized_for action, user=User.current_user, projects=nil
           projects=Array(projects) unless projects.nil?
-          if Seek::Config.auth_caching_enabled
-            assets = if projects
-                       if reflection = reflect_on_association(:projects) and reflection.macro == :has_and_belongs_to_many
-                         find(:all, :include => :projects, :conditions => ["#{reflection.options[:join_table]}.project_id IN (?)", projects.map(&:id)])
-                       else
-                         all.select { |asset| !(asset.projects & projects).empty? }
-                       end
-                     else
-                       all
-                     end
-            assets.select(&"can_#{action}?".to_sym)
-          else
-            user_id = user.nil? ? 0 : user.id
-            assets = []
-            programatic_project_filter = !projects.nil? && (!Seek::Config.auth_lookup_enabled || (self==Assay || self==Study))
-            if Seek::Config.auth_lookup_enabled
+          user_id = user.nil? ? 0 : user.id
+          assets = []
+          programatic_project_filter = !projects.nil? && (!Seek::Config.auth_lookup_enabled || (self==Assay || self==Study))
+          if Seek::Config.auth_lookup_enabled
             if (lookup_table_consistent?(user_id))
               Rails.logger.info("Lookup table #{lookup_table_name} is complete for user_id = #{user_id}")
-                assets = lookup_for_action_and_user action, user_id,projects
-              else
+              assets = lookup_for_action_and_user action, user_id,projects
+            else
               Rails.logger.info("Lookup table #{lookup_table_name} is incomplete for user_id = #{user_id} - doing things the slow way")
-                assets = all.select { |df| df.send("can_#{action}?") }
-                programatic_project_filter = !projects.nil?
-              end
-            else
               assets = all.select { |df| df.send("can_#{action}?") }
+              programatic_project_filter = !projects.nil?
             end
-            if programatic_project_filter
-              assets.select { |a| !(a.projects & projects).empty? }
-            else
-              assets
-            end
+          else
+            assets = all.select { |df| df.send("can_#{action}?") }
+          end
+          if programatic_project_filter
+            assets.select { |a| !(a.projects & projects).empty? }
+          else
+            assets
           end
         end
 
@@ -165,17 +144,6 @@ module Acts
       end
       
       AUTHORIZATION_ACTIONS.each do |action|
-        if Seek::Config.auth_caching_enabled
-          eval <<-END_EVAL
-          def can_#{action}? user = User.current_user
-            if self.new_record?
-              return true
-            else
-              Rails.cache.fetch(auth_key(user, "#{action}")) {perform_auth(user,"#{action}") ? :true : :false} == :true
-            end
-          end
-          END_EVAL
-        else
           eval <<-END_EVAL
             def can_#{action}? user = User.current_user
                 return true if new_record?
@@ -224,25 +192,6 @@ module Acts
         end
 
         ActiveRecord::Base.connection.execute(sql)
-      end
-
-      AUTHORIZATION_ACTIONS.each do |action|
-          eval <<-END_EVAL
-            def can_#{action}? user = User.current_user
-                return true if new_record?
-                user_id = user.nil? ? 0 : user.id
-                if Seek::Config.auth_lookup_enabled
-                  lookup = self.class.lookup_for_asset("#{action}", user_id,self.id)
-                else
-                  lookup=nil
-                end
-                if lookup.nil?
-                  perform_auth(user,"#{action}")
-                else
-                  lookup
-                end
-            end
-          END_EVAL
       end
 
       def contributor_credited?
