@@ -164,7 +164,7 @@ class AdminController < ApplicationController
     update_redirect_to update_flag,'biosamples_renaming'
   end
   def restart_server
-    system ("touch #{RAILS_ROOT}/tmp/restart.txt")
+    system ("touch #{Rails.root}/tmp/restart.txt")
     flash[:notice] = 'The server was restarted'
     redirect_to :action=>:show
   end

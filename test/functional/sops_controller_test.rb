@@ -718,10 +718,13 @@ class SopsControllerTest < ActionController::TestCase
 
   test 'get_pdf' do
     ms_word_sop = Factory(:doc_sop, :policy => Factory(:all_sysmo_downloadable_policy))
+    pdf_path = ms_word_sop.content_blob.filepath('pdf')
+    FileUtils.rm pdf_path if File.exists?(pdf_path)
+    assert !File.exists?(pdf_path)
     post :get_pdf, {:id => ms_word_sop.id, :version => '1'}
     assert_response :success
-    assert ms_word_sop.content_blob.file_exists?(ms_word_sop.content_blob.filepath)
-    assert ms_word_sop.content_blob.file_exists?(ms_word_sop.content_blob.filepath('pdf'))
+    assert File.exists?(ms_word_sop.content_blob.filepath)
+    assert File.exists?(pdf_path)
   end
 
   test 'duplicated logs are NOT created by uploading new version' do

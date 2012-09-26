@@ -9,7 +9,7 @@ module Seek
       if Seek::Config.pdf_conversion_enabled
         asset.is_downloadable_asset? && asset.can_download? && !filesize.nil? && is_viewable_format?
       else
-        asset.is_downloadable_asset? && asset.can_download? && !filesize.nil? && (is_pdf? || file_exists?(filepath('pdf')))
+        asset.is_downloadable_asset? && asset.can_download? && !filesize.nil? && (is_pdf? || File.exists?(filepath('pdf')))
       end
     end
 
@@ -41,37 +41,39 @@ module Seek
     def convert_to_pdf
       pdf_filepath = filepath('pdf')
       begin
-        unless file_exists?(pdf_filepath)
+        unless File.exists?(pdf_filepath)
           #copy dat file to original file extension in order to convert to pdf on this file
           dat_filepath = filepath
           file_extension = mime_extension(content_type)
-          copied_filepath = filepath(file_extension)
-          FileUtils.cp dat_filepath, copied_filepath unless file_exists?(copied_filepath)
+          tmp_file = Tempfile.new storage_filename(file_extension)
+          copied_filepath = tmp_file.path
+
+          FileUtils.cp dat_filepath, copied_filepath
 
           ConvertOffice::ConvertOfficeFormat.new.convert(copied_filepath,pdf_filepath)
 
           t = Time.now
-          while !file_exists?(pdf_filepath) && (Time.now - t) < MAXIMUM_PDF_CONVERT_TIME
+          while !File.exists?(pdf_filepath) && (Time.now - t) < MAXIMUM_PDF_CONVERT_TIME
             sleep(1)
           end
-          #remove copied file
-          FileUtils.rm copied_filepath
+
         end
       rescue Exception=> e
-        Rails.logger.error("Problem with converting file of content_blob #{id} to pdf")
+        Rails.logger.error("Problem with converting file of content_blob #{id} to pdf - #{e.class.name}:#{e.message}")
+        raise(e) if Rails.env=="test"
       end
     end
 
     private
 
     def extract_text_from_pdf
-      output_directory = directory_storage_path
+      output_directory = storage_directory
       pdf_filepath = filepath('pdf')
       txt_filepath = filepath('txt')
       content = nil
-      if file_exists?(pdf_filepath)
+      if File.exists?(pdf_filepath)
         begin
-          Docsplit.extract_text(pdf_filepath, :output => output_directory) unless file_exists?(txt_filepath)
+          Docsplit.extract_text(pdf_filepath, :output => output_directory) unless File.exists?(txt_filepath)
           content = File.open(txt_filepath).read
           unless content.blank?
             filter_text_content content

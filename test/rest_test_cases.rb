@@ -5,7 +5,7 @@ require 'pp'
 
 module RestTestCases
 
-  SCHEMA_FILE_PATH = File.join(RAILS_ROOT, 'public', '2010', 'xml', 'rest', 'schema-v1.xsd')
+  SCHEMA_FILE_PATH = File.join(Rails.root, 'public', '2010', 'xml', 'rest', 'schema-v1.xsd')
   
   def test_index_xml
     get :index, :format=>"xml"

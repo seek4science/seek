@@ -1,4 +1,11 @@
 GIT
+  remote: git://github.com/SysMO-DB/convert_office.git
+  revision: 753f2567dbd625bc89071e1150404efbb562e130
+  ref: 753f2567dbd625bc89071e1150404efbb562e130
+  specs:
+    convert_office (0.9.1)
+
+GIT
   remote: git://github.com/myGrid/search_biomodel.git
   revision: e109ac6d8b102f7ecb65140c17d263b85e066870
   specs:
@@ -153,6 +160,7 @@ DEPENDENCIES
   breadcrumbs_on_rails (= 1.0.1)
   calendar_date_select
   cancan
+  convert_office!
   daemons
   delayed_job (~> 2.0.4)
   docsplit

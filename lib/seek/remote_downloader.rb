@@ -155,7 +155,7 @@ module Seek
     end
     
     def cached_path uuid
-      path = "#{RAILS_ROOT}/tmp/cache/downloader_cache/"
+      path = "#{Rails.root}/tmp/cache/downloader_cache/"
       FileUtils.mkdir_p(path)
       return "#{path}/#{uuid}.dat"
     end
