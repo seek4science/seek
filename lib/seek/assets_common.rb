@@ -171,7 +171,6 @@ module Seek
           elsif !(params[symb][:data_url]).blank?
             make_local_copy = (params[symb][:local_copy]=="1")
             @data_url=params[symb][:data_url]
-            @external_link = (params[symb][:external_link] == "1")
             code = url_response_code @data_url
             if (code == "200")
               downloader=RemoteDownloader.new
@@ -240,7 +239,7 @@ module Seek
           if asset.contributor.nil? #A jerm generated resource
             download_jerm_asset asset
           else
-            if asset.content_blob.file_exists? && !asset.content_blob.external_link?
+            if asset.content_blob.file_exists?
               send_file asset.content_blob.filepath, :filename => asset.original_filename, :content_type => asset.content_type, :disposition => 'attachment'
             else
               download_via_url asset
