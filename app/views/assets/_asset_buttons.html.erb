@@ -1,5 +1,6 @@
 
   <%= render :partial => "subscriptions/subscribe", :locals => {:object => asset } -%>
+  <% display_asset = asset.find_version(version) %>
   <% if asset.can_manage? -%>
     <% if asset.is_downloadable? -%>
         <li><%= link_to_function image("new")+" Upload new version", visual_effect(:toggle_appear, "upload_new_version_form") -%></li>
@@ -28,7 +29,7 @@
           <li>
           <%= image_tag_for_key('download', polymorphic_path(asset,:version=>version,:action=>:download), "Download #{human_name}", nil, "Download #{human_name}") -%>
           </li>
-          <% if asset.is_a?(DataFile) && asset.is_extractable_spreadsheet? %>
+          <% if asset.is_a?(DataFile) && display_asset.is_extractable_spreadsheet? %>
               <li>
                 <%= image_tag_for_key('spreadsheet', polymorphic_path(asset, :version => version, :action => :explore), "Explore #{human_name}", nil, "Explore #{human_name}") -%>
               </li>
@@ -39,6 +40,7 @@
           </li>
       <% end -%>
   <% end -%>
+
 
 
 
