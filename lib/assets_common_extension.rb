@@ -47,6 +47,7 @@ module AssetsCommonExtension
     @tmp_io_objects_localfile = []
     @tmp_io_objects_url = []
     @data_urls = []
+    @external_link = false
     symb = c.singularize.to_sym
     object = eval("@#{c.singularize}")
     params_files = calculate_params(:content_blob)
@@ -95,7 +96,7 @@ module AssetsCommonExtension
 
           make_local_copy = (params[symb][:local_copy]=="1")
           @data_urls=params_url
-
+          @external_link = (params[symb][:external_link]=="1")
           @data_urls.each do |data_url|
 
             code = url_response_code data_url
@@ -152,6 +153,7 @@ module AssetsCommonExtension
       params[symb].delete 'data_url'
       params[symb].delete 'data'
       params[symb].delete 'local_copy'
+      params[symb].delete 'external_link'
       return true
     end
   end
@@ -186,6 +188,7 @@ module AssetsCommonExtension
         asset.content_blobs.create(:tmp_io_object => @tmp_io_objects_url[index],
                                    :url=>data_url,
                                    :original_filename=>@original_filenames[index],
+                                   :external_link => @external_link,
                                    :content_type=>@content_types[index],
                                    :asset_version=>version)
       end
@@ -209,12 +212,27 @@ module AssetsCommonExtension
           # Add the contents of the file, don't read the stuff linewise if its binary, instead use direct IO
           zos.print IO.read(content_blob.filepath)
         elsif !content_blob.url.nil?
-           downloader=Seek::RemoteDownloader.new
-           data_hash = downloader.get_remote_data content_blob.url,nil,nil,nil,true
+          if content_blob.external_link?
+            zos.put_next_entry(content_blob.original_filename + '.html')
+            zos.print <<-REDIRECT_JS
+            <html>
+              <head>
+                <script type="text/javascript">
+                <!--
+                window.location = "#{content_blob.url}"
+                //-->
+                </script>
+              </head>
+            </html>
+            REDIRECT_JS
+          else
+            downloader=Seek::RemoteDownloader.new
+            data_hash = downloader.get_remote_data content_blob.url,nil,nil,nil,true
 
-          zos.put_next_entry(content_blob.original_filename)
+            zos.put_next_entry(content_blob.original_filename)
 
-          zos.print IO.read(data_hash[:data_tmp_path])
+            zos.print IO.read(data_hash[:data_tmp_path])
+          end
         else
           flash.now[:error] = "#{content_blob.original_filename} does not exist!"
         end

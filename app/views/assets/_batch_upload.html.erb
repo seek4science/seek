@@ -6,7 +6,7 @@
    # inject the attributes data_url and local_copy in the asset type, e.g. @model. This keeps the form clean.
    resource=eval("@"+upload_field)
    class << resource
-       attr_accessor :data_url, :local_copy
+       attr_accessor :data_url, :local_copy, :external_link
    end unless resource.nil?
    resource.local_copy=1 unless resource.nil?
    asset_name = text_for_resource upload_field
@@ -76,6 +76,10 @@
                   <b>Make a copy?</b>
                   <%= check_box upload_field, :local_copy, :id=>"local_copy" -%>
                 </p>
+                <p style="clear:both;">
+                  <b>Make an external link?</b>
+                  <%= check_box upload_field, :external_link,:id=>"external_link" -%>
+                </p>
             </p>
             <p>
               <span id="test_url_result_icon"></span>
@@ -104,7 +108,6 @@
 
 
     function addToList() {
-         var url_element = $('content_blob_data_url');
         var url = parseUri(multi_selector.current_url_element.value).file;
 
         if (url != "" && url != null) {
