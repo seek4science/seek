@@ -685,7 +685,10 @@ class SopsControllerTest < ActionController::TestCase
 
   test 'should be able to view ms/open office word content' do
      ms_word_sop = Factory(:doc_sop, :policy => Factory(:all_sysmo_downloadable_policy))
-     assert ms_word_sop.content_blob.is_content_viewable?
+     content_blob = ms_word_sop.content_blob
+     pdf_filepath = content_blob.filepath('pdf')
+     FileUtils.rm pdf_filepath if File.exist?(pdf_filepath)
+     assert content_blob.is_content_viewable?
      get :show, :id => ms_word_sop.id
      assert_response :success
      assert_select 'a', :text => /View content/, :count => 1
@@ -695,6 +698,22 @@ class SopsControllerTest < ActionController::TestCase
      get :show, :id => openoffice_word_sop.id
      assert_response :success
      assert_select 'a', :text => /View content/, :count => 1
+  end
+
+  test 'should disable view content button for the document needing pdf conversion, when pdf_conversion_enabled is false' do
+    tmp = Seek::Config.pdf_conversion_enabled
+    Seek::Config.pdf_conversion_enabled = false
+
+    ms_word_sop = Factory(:doc_sop, :policy => Factory(:all_sysmo_downloadable_policy))
+    content_blob = ms_word_sop.content_blob
+    pdf_filepath = content_blob.filepath('pdf')
+    FileUtils.rm pdf_filepath if File.exist?(pdf_filepath)
+    assert !content_blob.is_content_viewable?
+    get :show, :id => ms_word_sop.id
+    assert_response :success
+    assert_select "span.disabled_icon img",:count=>1
+
+    Seek::Config.pdf_conversion_enabled = tmp
   end
 
   test 'get_pdf' do
