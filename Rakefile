@@ -10,5 +10,6 @@ require 'rake/testtask'
 
 require 'tasks/rails'
 require 'sunspot/solr/tasks'
+
 begin; require 'parallel_tests/tasks'; rescue LoadError; end
 

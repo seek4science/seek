@@ -27,7 +27,6 @@ require 'strategic_eager_loading'
 require 'seek/breadcrumbs'
 require 'string_extension'
 
-
 GLOBAL_PASSPHRASE="ohx0ipuk2baiXah" unless defined? GLOBAL_PASSPHRASE
 
 ASSET_ORDER                = ['Person', 'Project', 'Institution', 'Investigation', 'Study', 'Assay', 'Sample','Specimen','DataFile', 'Model', 'Sop', 'Publication', 'Presentation','SavedSearch', 'Organism', 'Event']
@@ -51,3 +50,12 @@ ENV['LANG'] = 'en_US.UTF-8'
 if ActiveRecord::Base.connection.table_exists? 'delayed_jobs'
   SendPeriodicEmailsJob.create_initial_jobs
 end
+
+ConvertOffice::ConvertOfficeConfig.options =
+{
+    :java_bin=>"java",
+    :soffice_port=>8100,
+    :nailgun=>false,
+    :verbose=>true,
+    :asynchronous=>true
+}

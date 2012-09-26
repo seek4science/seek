@@ -4,6 +4,13 @@ GIT
   specs:
     search_biomodel (2.2.1)
 
+GIT
+  remote: git@github.com:stuzart/convert_office.git
+  revision: 753f2567dbd625bc89071e1150404efbb562e130
+  ref: 753f2567dbd625bc89071e1150404efbb562e130
+  specs:
+    convert_office (0.9.1)
+
 GEM
   remote: http://rubygems.org/
   remote: http://gems.github.com/
@@ -153,6 +160,7 @@ DEPENDENCIES
   breadcrumbs_on_rails (= 1.0.1)
   calendar_date_select
   cancan
+  convert_office!
   daemons
   delayed_job (~> 2.0.4)
   docsplit
