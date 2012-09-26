@@ -1,15 +1,15 @@
 GIT
-  remote: git://github.com/myGrid/search_biomodel.git
-  revision: e109ac6d8b102f7ecb65140c17d263b85e066870
-  specs:
-    search_biomodel (2.2.1)
-
-GIT
-  remote: git@github.com:SysMO-DB/convert_office.git
+  remote: git://github.com/SysMO-DB/convert_office.git
   revision: 753f2567dbd625bc89071e1150404efbb562e130
   ref: 753f2567dbd625bc89071e1150404efbb562e130
   specs:
     convert_office (0.9.1)
+
+GIT
+  remote: git://github.com/myGrid/search_biomodel.git
+  revision: e109ac6d8b102f7ecb65140c17d263b85e066870
+  specs:
+    search_biomodel (2.2.1)
 
 GEM
   remote: http://rubygems.org/
