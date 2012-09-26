@@ -2,7 +2,7 @@ module Seek
   module PdfExtraction
     include Seek::MimeTypes
 
-    MAXIMUM_PDF_CONVERT_TIME = 1.minute
+    MAXIMUM_PDF_CONVERT_TIME = 30.seconds
     PDF_CONVERTABLE_FORMAT = %w[doc docx ppt pptx odt odp rtf txt]
 
     def is_content_viewable?

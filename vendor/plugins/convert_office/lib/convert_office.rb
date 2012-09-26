@@ -1,7 +1,8 @@
 require 'convert_office_config'
 module ConvertOffice
   class ConvertOfficeFormat
-    Async = RUBY_PLATFORM =~ /win32|mswin|mingw/ ? "" : " >> /dev/null 2>&1 &"
+    #Async = RUBY_PLATFORM =~ /win32|mswin|mingw/ ? "" : " >> /dev/null 2>&1 &"
+    Async=""
     JAR_PATH= File.expand_path(File.join(File.dirname(__FILE__),"java","jar","convert_office.jar"))
     TEXT_FORMAT = %w(pdf odt sxw rtf  doc txt html wiki docx)
     XL_FORMAT = %w(pdf ods sxc xls csv tsv html xlsx)
@@ -42,9 +43,12 @@ module ConvertOffice
           if nailgun
             command = "#{Nailgun::NgCommand::NGPATH} con -p #{port_no} -f #{format} #{input_file}"
           else
-            command = "#{java_bin} -Xmx512m -Djava.awt.headless=true -cp #{JAR_PATH} com.artofsolving.jodconverter.cli.ConvertDocument -p #{port_no} -f #{format} #{input_file}"
+            command = "#{java_bin} -Xmx512m -Djava.awt.headless=true -cp #{JAR_PATH} com.artofsolving.jodconverter.cli.ConvertDocument -v -p #{port_no} -f #{format} #{input_file}"
           end
-          system(command + Async)
+          result = system(command + Async)
+          if !result
+            puts "Response code was #{$?} and return value: #{result}"
+          end
         end
       elsif format.blank?
         output_format = File.extname(output_file).split(".").last
@@ -52,9 +56,12 @@ module ConvertOffice
           if nailgun
             command = "#{Nailgun::NgCommand::NGPATH} con -p #{port_no} #{input_file} #{output_file}"
           else
-            command = "#{java_bin} -Xmx512m -Djava.awt.headless=true -cp #{JAR_PATH} com.artofsolving.jodconverter.cli.ConvertDocument -p #{port_no} #{input_file} #{output_file}"
+            command = "#{java_bin} -Xmx512m -Djava.awt.headless=true -cp #{JAR_PATH} com.artofsolving.jodconverter.cli.ConvertDocument -v -p #{port_no} #{input_file} #{output_file}"
           end
-          system(command + Async)
+          result = system(command + Async)
+          if !result
+            puts "Response code was #{$?} and return value: #{result}"
+          end
         end
       end
     end
