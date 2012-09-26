@@ -53,6 +53,8 @@ class Sample < ActiveRecord::Base
   has_many :sop_masters, :through => :sample_assets, :source => :asset, :source_type => 'Sop'
   #has_many :sop_masters,:class_name => "SampleSop"
 
+  has_many :treatments
+
 
   alias_attribute :description, :comments
   validates_presence_of :title
