@@ -86,6 +86,5 @@ Rails::Initializer.run do |config|
       :assets_creator_reindexer
 
 end
-Mime::Type.register "application/x-endnote-refer", :enw
 
 
