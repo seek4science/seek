@@ -35,7 +35,7 @@
           </tr>
           <% @publication.non_seek_authors.each do |author| %>
           <tr>    
-            <td><%= author.last_name + " " + author.first_name -%></td>
+            <td><%= author.first_name + " " + author.last_name -%></td>
             <td><select name="author[<%= author.id -%>]"><option value="">None</option><%= people_by_project_options(Project.all,@author_associations[author.id],projects) -%></select></td>
           </tr>
           <% end %>
