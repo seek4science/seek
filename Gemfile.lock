@@ -5,7 +5,7 @@ GIT
     search_biomodel (2.2.1)
 
 GIT
-  remote: git@github.com:stuzart/convert_office.git
+  remote: git@github.com:SysMO-DB/convert_office.git
   revision: 753f2567dbd625bc89071e1150404efbb562e130
   ref: 753f2567dbd625bc89071e1150404efbb562e130
   specs:
