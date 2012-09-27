@@ -22,7 +22,15 @@ rvm list | grep $desired_ruby > /dev/null || rvm install $desired_ruby || exit 1
 
 # use our ruby with a custom gemset
 rvm use ${desired_ruby}@${project_name} --create
-rvm rubygems ${rubygems} || exit 1
+gem_version=`gem -v`
+
+if [ "$gem_version" != "$rubygems" ]
+    then
+        rvm rubygems ${rubygems} || exit 1
+    else
+        echo "Rubygems already version $rubygems, upgrading not required"
+fi
+
 
 remove_annoying_warning
 
