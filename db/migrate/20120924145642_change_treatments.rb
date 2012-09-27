@@ -2,7 +2,7 @@ class ChangeTreatments < ActiveRecord::Migration
   def self.up
     change_table :treatments do |t|
       t.remove :substance, :concentration
-      t.integer :treatment_type
+      t.integer :treatment_type_id
       t.float :start_value
       t.float :end_value
       t.float :standard_deviation
@@ -19,7 +19,7 @@ class ChangeTreatments < ActiveRecord::Migration
     change_table :treatments do |t|
       t.string :substance
       t.float :concentration
-      t.remove :type, :start_value, :end_value, :standard_deviation, :comments, :incubation_time, :incubation_time_unit_id
+      t.remove :treatment_type_id, :start_value, :end_value, :standard_deviation, :comments, :incubation_time, :incubation_time_unit_id
       t.remove :sample_id
       t.remove :specimen_id
       t.remove :compound_id

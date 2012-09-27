@@ -621,6 +621,8 @@ module Seek
         comments = treatment_json["comments"]
         protocol = treatment_json["protocol"]
 
+        treatment = nil
+
         if start_value && start_value != ""
 
           treatment_type = MeasuredItem.find_by_title(treatment_json["type"].downcase)
@@ -657,7 +659,17 @@ module Seek
 
           treatment.save!
 
+          if specimen
+            specimen.treatments << treatment
+          end
+
+          if sample
+            sample.treatments << treatment
+          end
+
         end
+
+        treatment
       
     end
     
