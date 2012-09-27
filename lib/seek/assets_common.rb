@@ -12,8 +12,7 @@ module Seek
         model = c.camelize.constantize                                                            
         symb  =c.to_sym                                                                           
         params[symb].delete 'data_url'                                                            
-        params[symb].delete 'data'                                                                
-        params[symb].delete 'local_copy'
+        params[symb].delete 'data'
         params[symb].delete 'external_link'
         obj=model.new params[symb]                                                                
         eval "@#{c.singularize} = obj"                                                            
@@ -89,11 +88,11 @@ module Seek
           page.replace_html "test_url_msg",msg
           page.show 'test_url_msg'
           page.visual_effect :highlight,"test_url_msg"
-          if code=="302" || code=="401"            
-            page['local_copy'].checked=false
-            page['local_copy'].disable            
+          if code=="302" || code=="401"
+            page['external_link'].checked=true
+            page['external_link'].disable
           else
-            page['local_copy'].enable
+            page['external_link'].enable
           end
         end
       end
@@ -169,7 +168,8 @@ module Seek
             params[symb][:original_filename] = (params[symb][:data]).original_filename
             @tmp_io_object = params[symb][:data]
           elsif !(params[symb][:data_url]).blank?
-            make_local_copy = (params[symb][:local_copy]=="1")
+            @external_link = (params[symb][:external_link=="1"])
+            make_local_copy = !@external_link
             @data_url=params[symb][:data_url]
             code = url_response_code @data_url
             if (code == "200")
@@ -177,7 +177,7 @@ module Seek
               data_hash = downloader.get_remote_data @data_url,nil,nil,nil,make_local_copy
               
               @tmp_io_object=File.open data_hash[:data_tmp_path],"r" if make_local_copy
-              
+
               params[symb][:content_type] = data_hash[:content_type]
               params[symb][:original_filename] = data_hash[:filename]
             elsif (["302","401"].include?(code))
@@ -221,7 +221,6 @@ module Seek
         end
         params[symb].delete 'data_url'
         params[symb].delete 'data'
-        params[symb].delete 'local_copy'
         params[symb].delete 'external_link'
         return true
       end

@@ -3,12 +3,11 @@
 <%
    # determine the asset type from the controller
    upload_field = controller_name.downcase.singularize.underscore
-   # inject the attributes data_url and local_copy in the asset type, e.g. @model. This keeps the form clean.
+   # inject the attributes data_url and external_link in the asset type, e.g. @model. This keeps the form clean.
    resource=eval("@"+upload_field)
    class << resource
-       attr_accessor :data_url, :local_copy, :external_link
+       attr_accessor :data_url, :external_link
    end unless resource.nil?
-   resource.local_copy=1 unless resource.nil?
    asset_name = text_for_resource upload_field
    @content_blob ||= ContentBlob.new
 -%>
@@ -21,12 +20,13 @@
   </p>
     <span id="more_upload_info" style="display:none;">
         <p>
-          When registering a URL you can specify that a copy of the data should be stored
+          When registering a URL normally a copy of the data will be stored
           within SEEK. This is recommended and is equivalent to uploading a file. It also means that should the data
           behind the URL the data is still available from SEEK.
         </p>
         <p>
-          If the URL results in a redirection or unauthorized response, then SEEK has no option but to store only the
+          If the URL results in a redirection or unauthorized response, or if external link is selected,
+          then SEEK will store only the URL. In this case, when another user selects to download the <%= asset_name -%>
           URL. In this case, when another user selects to download the <%= asset_name -%>
           then they will simply directed to the URL (for example, so that they can login to access the file).
         </p>
@@ -72,10 +72,6 @@
                                    :before=>"$('test_url_msg').innerHTML='';show_ajax_loader('test_url_result_icon');" -%>
 
                 <br/>
-                <p style="clear:both;">
-                  <b>Make a copy?</b>
-                  <%= check_box upload_field, :local_copy, :id=>"local_copy" -%>
-                </p>
                 <p style="clear:both;">
                   <b>Make an external link?</b>
                   <%= check_box upload_field, :external_link,:id=>"external_link" -%>

@@ -26,7 +26,8 @@
   <% if asset.is_downloadable? -%>
       <% if asset.can_download? -%>
           <li>
-          <%= image_tag_for_key('download', polymorphic_path(asset,:version=>version,:action=>:download), "Download #{human_name}", nil, "Download #{human_name}") -%>
+          <% external_link = asset.content_blob.external_link? && !(asset.respond_to?(:content_blobs) && content_blobs.count > 1) %>
+          <%= image_tag_for_key('download', polymorphic_path(asset,:version=>version,:action=>:download), (external_link ? "Link" : "Download"), {:target => 'blank'}, (external_link ? "Link" : "Download")) -%>
           </li>
           <% if asset.is_a?(DataFile) && asset.is_extractable_spreadsheet? %>
               <li>

@@ -94,9 +94,9 @@ module AssetsCommonExtension
         end
         if !params_url.blank?
 
-          make_local_copy = (params[symb][:local_copy]=="1")
           @data_urls=params_url
           @external_link = (params[symb][:external_link]=="1")
+          make_local_copy = !@external_link
           @data_urls.each do |data_url|
 
             code = url_response_code data_url
@@ -152,7 +152,6 @@ module AssetsCommonExtension
       end
       params[symb].delete 'data_url'
       params[symb].delete 'data'
-      params[symb].delete 'local_copy'
       params[symb].delete 'external_link'
       return true
     end

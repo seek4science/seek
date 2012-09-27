@@ -4,7 +4,7 @@ upload_field = controller_name.downcase.singularize.underscore
 # inject the attributes data_url and local_copy in the asset type, e.g. @model. This keeps the form clean.
 obj=eval("@"+upload_field)
 class << obj
-attr_accessor :data_url,:local_copy,:external_link
+attr_accessor :data_url,:local_copy
 end unless obj.nil?
 obj.local_copy=1 unless obj.nil?
 asset_name = text_for_resource upload_field
@@ -18,11 +18,12 @@ new_version ||= false
     </p>
     <span id="more_upload_info" style="display:none;">
         <p>
-            When registering a URL you can specify that a copy of the data should be stored
+            When registering a URL normally a copy of the data will be stored
             within SEEK. This is recommended and is equivalent to uploading a file. It also means that should the data behind the URL the data is still available from SEEK.
         </p>
         <p>
-            If the URL results in a redirection or unauthorized response, then SEEK has no option but to store only the URL. In this case, when another user selects to download the <%= asset_name -%>
+            If the URL results in a redirection or unauthorized response, or if external link is selected,
+            then SEEK will store only the URL. In this case, when another user selects to download the <%= asset_name -%>
             then they will simply directed to the URL (for example, so that they can login to access the file).
         </p>
         <p></p>
