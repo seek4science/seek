@@ -1,12 +1,11 @@
 <%
 # determine the asset type from the controller
 upload_field = controller_name.downcase.singularize.underscore
-# inject the attributes data_url and local_copy in the asset type, e.g. @model. This keeps the form clean.
+# inject the attributes data_url and external_link in the asset type, e.g. @model. This keeps the form clean.
 obj=eval("@"+upload_field)
 class << obj
 attr_accessor :data_url,:external_link
 end unless obj.nil?
-obj.local_copy=1 unless obj.nil?
 asset_name = text_for_resource upload_field
 new_version ||= false
 -%>
@@ -66,10 +65,6 @@ new_version ||= false
                     :with=>"$('#{upload_field}_data_url').serialize()",
                     :before=>"$('test_url_msg').innerHTML='';show_ajax_loader('test_url_result_icon');" -%>
                     <br/>
-                    <p style="clear:both;">
-                        <b>Make a copy?</b>
-                        <%= check_box upload_field, :local_copy,:id=>"local_copy" -%>
-                    </p>
                     <p style="clear:both;">
                       <b>Make an external link?</b>
                       <%= check_box upload_field, :external_link,:id=>"external_link" -%>
