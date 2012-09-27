@@ -34,6 +34,7 @@ class Publication < ActiveRecord::Base
   validate :check_uniqueness_of_title_within_project
   
   has_many :non_seek_authors, :class_name => 'PublicationAuthor', :dependent => :destroy
+  has_many :publication_author_orders
   
   has_many :backwards_relationships, 
     :class_name => 'Relationship',

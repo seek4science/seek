@@ -143,7 +143,7 @@ class PublicationsControllerTest < ActionController::TestCase
     assert_equal 0, p.creators.size
     
     seek_author1 = people(:modeller_person)
-    seek_author2 = people(:quentin_person)    
+    seek_author2 = people(:quentin_person)
     
     #Associate a non-seek author to a seek person
 
@@ -157,10 +157,6 @@ class PublicationsControllerTest < ActionController::TestCase
     
     assert_redirected_to publication_path(p)    
     p.reload
-    
-    #make sure that the authors are stored according to key, and that creators keeps the order
-    assert_equal [seek_author1,seek_author2],p.assets_creators.sort_by(&:id).collect(&:creator)
-    assert_equal [seek_author1,seek_author2],p.creators
   end
   
   test "should disassociate authors" do
@@ -203,5 +199,66 @@ class PublicationsControllerTest < ActionController::TestCase
     assert_no_difference('Publication.count') do
       post :create, :publication => {:doi => "10.1093/nar/gkl320" }
     end
+  end
+
+  test "should retrieve the right author order after a publication is created and after some authors are associate/disassociated with seek-profiles" do
+    assert_difference('Publication.count') do
+      post :create, :publication => {:doi => "10.1016/j.future.2011.08.004", :projects=>[projects(:sysmo_project)]}
+    end
+    publication = assigns(:publication)
+    original_authors = ["Sean Bechhofer","Iain Buchan","David De Roure","Paolo Missier","John Ainsworth","Jiten Bhagat","Philip Couch","Don Cruickshank",
+                        "Mark Delderfield","Ian Dunlop","Matthew Gamble","Danius Michaelides","Stuart Owen","David Newman","Shoaib Sufi","Carole Goble"]
+
+    authors = publication.publication_author_orders.sort_by(&:order).collect{|o| o.author.first_name + ' ' + o.author.last_name}
+    assert original_authors, authors
+
+    seek_author1 = Factory(:person, :first_name => 'Stuart', :last_name => 'Owen')
+    seek_author2 = Factory(:person, :first_name => 'Carole', :last_name => 'Goble')
+
+    #Associate a non-seek author to a seek person
+    assert_difference('PublicationAuthor.count', -2) do
+      assert_difference('AssetsCreator.count', 2) do
+        put :update, :id => publication.id, :author => {publication.non_seek_authors[12].id => seek_author1.id,publication.non_seek_authors[15].id => seek_author2.id}
+      end
+    end
+
+    publication.reload
+    authors = publication.publication_author_orders.sort_by(&:order).collect{|o| o.author.first_name + ' ' + o.author.last_name}
+    assert original_authors, authors
+
+    #Disassociate seek-authors
+    assert_difference('PublicationAuthor.count', 2) do
+      assert_difference('AssetsCreator.count', -2) do
+        post :disassociate_authors, :id => publication.id
+      end
+    end
+
+    publication.reload
+    authors = publication.publication_author_orders.sort_by(&:order).collect{|o| o.author.first_name + ' ' + o.author.last_name}
+    assert original_authors, authors
+  end
+
+  test "should display the right author order after some authors are associate with seek-profiles" do
+    assert_difference('Publication.count') do
+      post :create, :publication => {:doi => "10.1016/j.future.2011.08.004", :projects=>[projects(:sysmo_project)] } #10.1371/journal.pone.0004803.g001 10.1093/nar/gkl320
+    end
+    publication = assigns(:publication)
+    original_authors = ["Sean Bechhofer","Iain Buchan","David De Roure","Paolo Missier","John Ainsworth","Jiten Bhagat","Philip Couch","Don Cruickshank",
+                        "Mark Delderfield","Ian Dunlop","Matthew Gamble","Danius Michaelides","Stuart Owen","David Newman","Shoaib Sufi","Carole Goble"]
+
+    seek_author1 = Factory(:person, :first_name => 'Stuart', :last_name => 'Owen')
+    seek_author2 = Factory(:person, :first_name => 'Carole', :last_name => 'Goble')
+
+    #Associate a non-seek author to a seek person
+    assert_difference('PublicationAuthor.count', -2) do
+      assert_difference('AssetsCreator.count', 2) do
+        put :update, :id => publication.id, :author => {publication.non_seek_authors[12].id => seek_author1.id,publication.non_seek_authors[15].id => seek_author2.id}
+      end
+    end
+
+    publication.reload
+    joined_original_authors = original_authors.join(', ')
+    get :show, :id => publication.id
+    assert_select 'p', :text => /#{joined_original_authors}/
   end
 end

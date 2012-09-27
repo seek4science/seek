@@ -9,7 +9,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20120904133049) do
+ActiveRecord::Schema.define(:version => 20120926153416) do
 
   create_table "activity_logs", :force => true do |t|
     t.string   "action"
@@ -24,7 +24,7 @@ ActiveRecord::Schema.define(:version => 20120904133049) do
     t.datetime "updated_at"
     t.string   "http_referer"
     t.string   "user_agent"
-    t.text     "data",                   :limit => 16777215
+    t.text     "data",                   :limit => 2147483647
     t.string   "controller_name"
   end
 
@@ -984,6 +984,13 @@ ActiveRecord::Schema.define(:version => 20120904133049) do
   end
 
   add_index "publication_auth_lookup", ["user_id", "can_view"], :name => "index_publication_auth_lookup_on_user_id_and_can_view"
+
+  create_table "publication_author_orders", :force => true do |t|
+    t.integer "order"
+    t.integer "author_id"
+    t.string  "author_type"
+    t.integer "publication_id"
+  end
 
   create_table "publication_authors", :force => true do |t|
     t.string   "first_name"
