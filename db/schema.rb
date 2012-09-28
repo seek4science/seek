@@ -1406,10 +1406,10 @@ ActiveRecord::Schema.define(:version => 20120924145642) do
   end
 
   create_table "text_value_versions", :force => true do |t|
-    t.integer  "text_value_id",                          :null => false
-    t.integer  "version",                                :null => false
+    t.integer  "text_value_id",                            :null => false
+    t.integer  "version",                                  :null => false
     t.integer  "version_creator_id"
-    t.text     "text",               :limit => 16777215, :null => false
+    t.text     "text",               :limit => 2147483647, :null => false
     t.datetime "created_at"
     t.datetime "updated_at"
   end
@@ -1419,7 +1419,7 @@ ActiveRecord::Schema.define(:version => 20120924145642) do
   create_table "text_values", :force => true do |t|
     t.integer  "version"
     t.integer  "version_creator_id"
-    t.text     "text",               :limit => 16777215, :null => false
+    t.text     "text",               :limit => 2147483647, :null => false
     t.datetime "created_at"
     t.datetime "updated_at"
   end
