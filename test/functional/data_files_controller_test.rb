@@ -221,7 +221,7 @@ class DataFilesControllerTest < ActionController::TestCase
 
       assert_difference('DataFile.count') do
         assert_difference('ContentBlob.count') do
-          post :create, :data_file => valid_data_file_with_https_url, :sharing=>valid_sharing
+          post :create, :data_file => valid_data_file_with_https_url.tap {|df| df[:external_link] = "1"}, :sharing=>valid_sharing
         end
       end
 
