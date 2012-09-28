@@ -6,6 +6,7 @@ obj=eval("@"+upload_field)
 class << obj
 attr_accessor :data_url,:external_link
 end unless obj.nil?
+obj.external_link = 1 unless obj.nil?
 asset_name = text_for_resource upload_field
 new_version ||= false
 -%>
