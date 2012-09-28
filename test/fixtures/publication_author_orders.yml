@@ -4,8 +4,14 @@
 # model remove the '{}' from the fixture names and add the columns immediately
 # below each fixture, per the syntax in the comments below
 #
-one: {}
-# column: value
-#
-two: {}
-#  column: value
+order_for_unassigned_author_one:
+  order: 1
+  author: unassigned_author_one
+  author_type: PublicationAuthor
+  publication: pubmed_2
+
+order_for_unassigned_author_two:
+  order: 2
+  author: unassigned_author_two
+  author_type: PublicationAuthor
+  publication: pubmed_2
