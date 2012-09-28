@@ -223,7 +223,7 @@ class AuthLookupUpdateQueueTest < ActiveSupport::TestCase
   end
 
   test "updates for group membership" do
-    User.with_current_user Factory(:admin) do
+    User.with_current_user(Factory(:admin)) do
       person = Factory :person
       person2 = Factory :person
 
