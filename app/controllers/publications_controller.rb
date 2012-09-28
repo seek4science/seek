@@ -273,16 +273,8 @@ class PublicationsController < ApplicationController
     @publication.publication_author_orders.clear
     
     #Query pubmed article to fetch authors
-    result = nil
-    pubmed_id = @publication.pubmed_id
-    doi = @publication.doi
-    if pubmed_id
-      query = PubmedQuery.new("seek",Seek::Config.pubmed_api_email)
-      result = query.fetch(pubmed_id)
-    elsif doi
-      query = DoiQuery.new(Seek::Config.crossref_api_email)
-      result = query.fetch(doi)
-    end      
+    result = fetch_pubmed_or_doi_result @publication.pubmed_id, @publication.doi
+
     unless result.nil?
       create_non_seek_authors result.authors
     end
@@ -307,6 +299,18 @@ class PublicationsController < ApplicationController
     end
   end
 
+  def fetch_pubmed_or_doi_result pubmed_id,doi
+      result = nil
+      if pubmed_id
+        query = PubmedQuery.new("seek",Seek::Config.pubmed_api_email)
+        result = query.fetch(pubmed_id)
+      elsif doi
+        query = DoiQuery.new(Seek::Config.crossref_api_email)
+        result = query.fetch(doi)
+      end
+      result
+  end
+
   private    
 
   def get_data(publication, pubmed_id, doi=nil)
@@ -329,5 +333,5 @@ class PublicationsController < ApplicationController
         raise "Error - No publication could be found with that DOI"
       end  
     end
-    end
+  end
 end

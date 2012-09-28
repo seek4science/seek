@@ -62,16 +62,8 @@ namespace :seek do
       projects = publication.projects
       projects = publication.contributor.person.projects if projects.empty?
 
-      pubmed_id = publication.pubmed_id
-      doi = publication.doi
-      result = nil
-      if pubmed_id
-        query = PubmedQuery.new("seek",Seek::Config.pubmed_api_email)
-        result = query.fetch(pubmed_id)
-      elsif doi
-        query = DoiQuery.new(Seek::Config.crossref_api_email)
-        result = query.fetch(doi)
-      end
+      result = fetch_pubmed_or_doi_result publication.pubmed_id, publication.doi
+
       original_authors = result.try(:authors).nil? ? [] : result.authors
       authors_with_right_orders = []
       original_authors.each do |author|
