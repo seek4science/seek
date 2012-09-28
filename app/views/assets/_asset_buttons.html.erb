@@ -1,6 +1,5 @@
 
   <%= render :partial => "subscriptions/subscribe", :locals => {:object => asset } -%>
-  <% display_asset = asset.find_version(version) %>
   <% if asset.can_manage? -%>
     <% if asset.is_downloadable? -%>
         <li><%= link_to_function image("new")+" Upload new version", visual_effect(:toggle_appear, "upload_new_version_form") -%></li>
@@ -25,6 +24,7 @@
    <% end %>
 
   <% if asset.is_downloadable? -%>
+      <% display_asset = asset.find_version(version) %>
       <% if asset.can_download? -%>
           <li>
           <%= image_tag_for_key('download', polymorphic_path(asset,:version=>version,:action=>:download), "Download #{human_name}", nil, "Download #{human_name}") -%>
@@ -39,9 +39,10 @@
           <%= render :partial=>"assets/request_resource",:locals=>{:resource=>asset} %>
           </li>
       <% end -%>
+      <%= render :partial => "assets/view_content", :locals => {:asset => asset, :display_asset => display_asset, :human_name => human_name} -%>
   <% end -%>
 
-  <%= render :partial => "assets/view_content", :locals => {:asset => asset, :display_asset => display_asset, :human_name => human_name} -%>
+
 
 
 
