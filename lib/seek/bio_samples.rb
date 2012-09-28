@@ -48,6 +48,9 @@ module Seek
       @num_rows = 1000 # bittkomk: this value is used for the creation of vectors of fixed or not-mapped entries; it gets actualized with the number of rows of mapped entries during parsing
       @start_row = 1
 
+      @mock_json_import = {}
+      @assay_json = {}
+
       @institution_name = ""
       @institution_name = Institution.find(institution_id).try(:name) if institution_id
 
@@ -72,7 +75,7 @@ module Seek
             Rails.logger.warn @samples_mapping
 
 
-            extract_from_document doc, @file.original_filename
+            extract_from_document doc
           else
             Rails.logger.warn "No parser mapping found for #{file.original_filename}"
             @errors << "No parser mapping found for #{file.original_filename}"
@@ -85,7 +88,7 @@ module Seek
 
 
     private
-    def extract_from_document doc, filename
+    def extract_from_document doc
       doc.root.namespaces.default_prefix = "ss"
 
 
@@ -107,20 +110,30 @@ module Seek
 
 
       if template_sheet
-        set_creator template_sheet
-        @file.creators << @creator unless @file.creators.include?(@creator) || @creator.nil?
-        populate_assay template_sheet, filename if @to_populate
+        @assay_json = build_assay_mock_json template_sheet
+        #set_creator @assay_json
+        #@file.creators << @creator unless @file.creators.include?(@creator) || @creator.nil?
+        #populate_assay , filename if @to_populate
       #else
        # @errors << "This data file does not match the template."
        # raise  @errors ## bittkomk: this is ok, since not all templates contain information for populating assays
       end
 
       if samples_sheet
-        populate_bio_samples samples_sheet
+        build_all_bio_sample_json samples_sheet
       else
         @errors << "No samples sheet is found."
         raise @errors
       end
+
+
+      if @to_populate
+          Rails.logger.warn "MOCK JASON:"
+          Rails.logger.warn build_mock_json_import
+          Rails.logger.warn "Populate db"
+          populate_db build_mock_json_import
+      end
+
     end
 
     def find_template_sheet doc
@@ -170,10 +183,38 @@ module Seek
       end
     end
 
-    def populate_assay sheet, filename
-      investigation_title = hunt_for_horizontal_field_value_mapped sheet, :"investigation.title", @assay_mapping
-      assay_type_title = hunt_for_horizontal_field_value_mapped sheet, :"assay_type.title", @assay_mapping
-      study_title = hunt_for_horizontal_field_value_mapped sheet, :"study.title", @assay_mapping
+    def build_assay_mock_json sheet
+
+      if @assay_mapping[:parsing_direction] == "horizontal"
+        mapped_field_hunter = method(:hunt_for_horizontal_field_value_mapped)
+      else
+        mapped_field_hunter = method(:hunt_for_field_values_mapped)
+        # probing number of rows with data in sheet
+        hunt_for_field_values_mapped sheet, @assay_mapping[:probing_column], @assay_mapping, true
+      end
+
+      investigation_title =  mapped_field_hunter.call(sheet, :"investigation.title", @assay_mapping).first() ? mapped_field_hunter.call(sheet, :"investigation.title", @assay_mapping).first()[:value] : nil
+      assay_type_title = mapped_field_hunter.call( sheet, :"assay_type.title", @assay_mapping).first() ? mapped_field_hunter.call( sheet, :"assay_type.title", @assay_mapping).first()[:value] : nil
+      study_title = mapped_field_hunter.call( sheet, :"study.title", @assay_mapping).first() ? mapped_field_hunter.call( sheet, :"study.title", @assay_mapping).first()[:value] : nil
+      creator_email = mapped_field_hunter.call( sheet, :"creator.email", @assay_mapping).first() ? mapped_field_hunter.call( sheet, :"creator.email", @assay_mapping).first()[:value] : nil
+      creator_last_name = mapped_field_hunter.call( sheet, :"creator.last_name", @assay_mapping).first() ? mapped_field_hunter.call( sheet, :"creator.last_name", @assay_mapping).first()[:value] : nil
+      creator_first_name = mapped_field_hunter.call( sheet, :"creator.first_name", @assay_mapping).first() ? mapped_field_hunter.call( sheet, :"creator.first_name", @assay_mapping).first()[:value] : nil
+
+      assay = {"investigation title" => investigation_title,
+               "assay type title" => assay_type_title,
+               "study title" => study_title,
+               "creator email" => creator_email,
+               "creator last name" => creator_last_name,
+               "creator first name" => creator_first_name}
+
+
+    end
+
+    def populate_assay assay_json, filename
+
+      investigation_title = assay_json["investigation title"]
+      assay_type_title = assay_json["assay type title"]
+      study_title = assay_json["study title"]
 
       @investigation = Investigation.find_all_by_title(investigation_title).detect{|i|i.can_view? User.current_user}
 
@@ -213,6 +254,8 @@ module Seek
       @assay.study = study
       @assay.save!
       @assay.relate @file
+
+      @assay
     end
 
     # population of treatments, specimens and samples if to_populate = true
@@ -224,7 +267,7 @@ module Seek
     # ** build a nice data structure for passing to the populate_x method
     # ** call populate_x method
     # *** write data to db if it isn't already there
-    def populate_bio_samples sheet
+    def build_all_bio_sample_json sheet
 
       # population order should NOT change, DB is populated only if @to_populate is set to be true
 
@@ -239,23 +282,28 @@ module Seek
         treatment_substances = hunt_for_field_values_mapped sheet, :"treatment.substance", @samples_mapping
         treatment_units = hunt_for_field_values_mapped sheet, :"treatment.unit", @samples_mapping
         treatment_protocols = hunt_for_field_values_mapped sheet, :"treatment.treatment_protocol", @samples_mapping
+        treatment_incubation_time = hunt_for_field_values_mapped sheet, :"treatment.incubation_time", @samples_mapping
+        treatment_incubation_time_unit = hunt_for_field_values_mapped sheet, :"treatment.incubation_time_unit", @samples_mapping
 
 
         Rails.logger.warn "$$$$$$$$$$$$$$ treatment_concentrations #{treatment_concentrations}"
         Rails.logger.warn "$$$$$$$$$$$$$$ treatment_substances  #{treatment_substances}"
         Rails.logger.warn "$$$$$$$$$$$$$$ treatment_units  #{treatment_units}"
         Rails.logger.warn "$$$$$$$$$$$$$$ treatment_protocols  #{treatment_protocols}"
+        Rails.logger.warn "$$$$$$$$$$$$$$ treatment_incubation_time  #{treatment_incubation_time}"
+        Rails.logger.warn "$$$$$$$$$$$$$$ treatment_incubation_time_unit  #{treatment_incubation_time_unit}"
 
-        treatment_data = treatment_protocols.zip(treatment_substances, treatment_concentrations, treatment_units).map do |protocol, substance, concentration, unit|
-          {:protocol => protocol, :substance => substance, :concentration => concentration, :unit => unit}
+        treatment_data = treatment_protocols.zip(treatment_substances, treatment_concentrations, treatment_units, treatment_incubation_time, treatment_incubation_time_unit).map do
+          |protocol, substance, concentration, unit, incubation_time, incubation_time_unit|
+            {:protocol => protocol, :substance => substance, :concentration => concentration, :unit => unit, :incubation_time => incubation_time, :incubation_time_unit => incubation_time_unit}
         end
 
 
         Rails.logger.warn "$$$$$$$$$$$$ TREATMENT DATA (#{treatment_data.length}) #{treatment_data}"
 
-        if @to_populate
-          populate_treatment treatment_data
-        else
+        build_all_treatment_mock_json treatment_data
+
+        unless @to_populate
           treatment_data.each do |t|
             treatments_hash = {}
             t.each {|k, v| treatments_hash[k] = v[:value]} #t.map {|key, value| {key => value[:value]}}
@@ -330,9 +378,10 @@ module Seek
 
         Rails.logger.warn "$$$$$$$$$$$$ SPECIMEN DATA (#{specimen_data.length}) #{specimen_data}"
 
-        if @to_populate
-          populate_specimen specimen_data
-        else
+
+        build_all_specimen_mock_json specimen_data
+
+        unless @to_populate
           specimen_titles.each do |s|
             @specimen_names[s[:row]] = s[:value]
           end
@@ -359,9 +408,9 @@ module Seek
 
           Rails.logger.warn "$$$$$$$$$$$$ SAMPLES DATA (#{samples_data.length}) : ##{samples_data}"
 
-          if @to_populate
-            populate_sample samples_data
-          else
+          build_all_sample_mock_json samples_data
+
+          unless @to_populate
             sample_titles.each do |s|
               @sample_names[s[:row]] = s[:value]
             end
@@ -393,11 +442,80 @@ module Seek
     end
 
 
+    # creates a hash map like the one we would like to get from a google refine json export
+    def build_mock_json_import
 
-    def set_creator sheet
-      creator_email = hunt_for_horizontal_field_value_mapped sheet, :"creator.email", @assay_mapping
-      creator_last_name = hunt_for_horizontal_field_value_mapped sheet, :"creator.last_name", @assay_mapping
-      creator_first_name = hunt_for_horizontal_field_value_mapped sheet, :"creator.first_name", @assay_mapping
+      mock_json = {}
+      mock_json["assay"] = @assay_json
+      mock_json_rows = []
+
+      rows = (@start_row .. @start_row+@num_rows).to_a
+
+      rows.each do |row|
+
+        specimen = specimens[row]
+        sample = samples[row]
+        treatment = treatments[row]
+
+        mock_json_rows << {"specimen" => specimen, "sample" => sample, "treatment" => treatment}
+
+      end
+
+      mock_json["rows"] = mock_json_rows
+
+      mock_json
+    end
+
+    # takes the intermediate hash map format and populates the database with this data
+    def populate_db data
+
+      assay = nil
+      assay_json = data["assay"]
+
+      if assay_json
+        if assay_json["creator last name"] && assay_json["creator first name"] && assay_json["creator email"]
+          set_creator data["assay"]
+        end
+        if assay_json["investigation title"] &&
+           assay_json["assay type title"] &&
+           assay_json["study title"]
+            assay = populate_assay data["assay"], @file.original_filename
+        end
+      end
+
+      data["rows"].each do |data_row|
+
+        specimen_json = data_row["specimen"]
+        sample_json = data_row["sample"]
+        treatment_json = data_row["treatment"]
+
+        sample = nil
+        specimen = nil
+
+        if specimen_json
+          specimen = populate_specimen specimen_json
+        end
+
+        if sample_json && specimen
+          sample = populate_sample sample_json, specimen, assay
+        end
+
+        if treatment_json && (specimen || sample)
+          populate_treatment treatment_json, specimen, sample
+        end
+
+
+      end
+
+
+    end
+
+
+
+    def set_creator assay_json
+      creator_email = assay_json["creator email"]
+      creator_last_name = assay_json["creator last name"]
+      creator_first_name = assay_json["creator first name"]
       creator_name = "#{creator_first_name} #{creator_last_name}"
       @creator = Person.find_by_first_name_and_last_name_and_email(creator_first_name,creator_last_name,creator_email)
       unless @creator
@@ -454,70 +572,167 @@ module Seek
       @sequencing[start_row] = row_value
     end
 
-    def populate_treatment treatment_data
-      #sheet_name = sheet.attributes["name"]
-      #row = treatment_protocol.attributes["row"].to_i
-      #col = treatment_protocol.attributes["column"].to_i
-      #treatment_protocol = treatment_protocol.content.tr('""', "")
-      #substance = try_block{ sheet.find("//ss:sheet[@name='#{sheet_name}']/ss:rows/ss:row/ss:cell[@row=#{row} and @column=#{col+1}]").first.content.tr('""', "") }
-      #concentration = try_block{ sheet.find("//ss:sheet[@name='#{sheet_name}']/ss:rows/ss:row/ss:cell[@row=#{row} and @column=#{col+2}]").first.content.tr('""', "") }
-      #unit_symbol = try_block{ sheet.find("//ss:sheet[@name='#{sheet_name}']/ss:rows/ss:row/ss:cell[@row=#{row} and @column=#{col+3}]").first.content.tr('""', "")  }
 
+    def build_all_treatment_mock_json treatment_data_list
 
-      treatment_data.each do |it|
+      treatment_data_list.each do |treatment_data|
+        build_treatment_mock_json treatment_data
+      end
 
-        treatment_protocol = it[:protocol][:value]
-        substance = it[:substance][:value]
-        concentration = it[:concentration][:value]
-        unit_symbol = it[:unit][:value]
-
-        row = it[:protocol][:row]
-
-        unit = Unit.find_by_symbol unit_symbol
-        unit = Unit.create :symbol => unit_symbol, :factors_studied => false unless unit
-
-        #treatment = Treatment.all.detect { |t| t.treatment_protocol == treatment_protocol and
-       #     t.unit_id == unit.id and
-        #    t.substance == substance and
-        #    t.concentration.to_s == concentration }
-        treatment = Treatment.find(:first, :conditions => ["treatment_protocol = ? and unit_id = ? and substance = ? and cast(concentration as char) = ?", treatment_protocol, unit.id, substance, concentration])
-
-        treatment = Treatment.new :substance => substance, :concentration => concentration, :unit_id => unit.id, :treatment_protocol => treatment_protocol unless treatment
-
-        treatment.save!
-        @treatments[row] = treatment
-        @treatments_text[row] = "Treatment Protocol:#{treatment_protocol}, Unit:#{unit_symbol}, Concentration:#{concentration}, Substance:#{substance}"
-
-        Rails.logger.warn "add treatment, row = #{row} : #{treatment}"
-
-        end
     end
 
-    def populate_specimen specimen_data
+
+    def build_treatment_mock_json treatment_data
+
+        treatment_protocol = treatment_data[:protocol][:value]
+        substance = treatment_data[:substance][:value]
+        concentration = treatment_data[:concentration][:value]
+        unit = treatment_data[:unit][:value]
+        incubation_time = treatment_data[:incubation_time][:value]
+        incubation_time_unit = treatment_data[:incubation_time_unit][:value]
+
+        row = treatment_data[:protocol][:row]
+
+        treatment = {"type" => "concentration",
+                     "start value" => concentration,
+                     "end value" => nil,
+                     "unit" => unit,
+                     "standard deviation" => nil,
+                     "comments" => nil,
+                     "protocol" => treatment_protocol,
+                     "incubation time" => incubation_time,
+                     "incubation time unit" => incubation_time_unit,
+                     "compound" => substance}
 
 
-      #row = specimen_name_cell.attributes["row"].to_i
-      #col = specimen_name_cell.attributes["column"].to_i
-      #specimen_title = specimen_name_cell.try :content
-      #organism_title = try_block{ sheet.find("//ss:sheet[@name='#{sheet_name}']/ss:rows/ss:row/ss:cell[@row=#{row} and @column=#{col+1}]").first.content.tr('""', "") }
-      #strain_title = try_block{ sheet.find("//ss:sheet[@name='#{sheet_name}']/ss:rows/ss:row/ss:cell[@row=#{row} and @column=#{col+2}]").first.content.tr('""', "")  }
-      #sex = try_block{ sheet.find("//ss:sheet[@name='#{sheet_name}']/ss:rows/ss:row/ss:cell[@row=#{row} and @column=#{col+3}]").first.content.tr('""', "")   }
+        @treatments[row] = treatment
+        @treatments_text[row] = "Treatment Protocol:#{treatment_protocol}, Unit:#{unit}, Concentration:#{concentration}, Substance:#{substance}"
+        Rails.logger.warn "add treatment, row = #{row} : #{treatment}"
+      
+        treatment
+    end
 
-      specimen_data.each do |it|
 
-        specimen_title = it[:specimen_title][:value]
-        sex = it[:specimen_sex][:value]
-        organism_title = it[:organism_title][:value]
-        strain_title = it[:strain_title][:value]
-        age = it[:specimen_age][:value].to_i
-        age_unit = it[:specimen_age_unit][:value]
-        comments = it[:specimen_comment][:value]
-        genotype_title = it[:genotype_title][:value]
-        genotype_modification = it[:genotype_modification][:value]
+    def populate_treatment treatment_json, specimen=nil, sample=nil
 
-        row = it[:specimen_title][:row]
+        start_value = treatment_json["start value"]
+        end_value = treatment_json["end value"]
+        standard_deviation = treatment_json["standard deviation"]
+        comments = treatment_json["comments"]
+        protocol = treatment_json["protocol"]
 
-        case sex
+        treatment = nil
+
+        if start_value && start_value != ""
+
+          treatment_type = MeasuredItem.find_by_title(treatment_json["type"].downcase)
+          treatment_type = MeasuredItem.create :title => treatment_json["type"].downcase, :factors_studied => false unless treatment_type
+
+          compound = nil
+
+          if treatment_type.title == "concentration"
+            compound_name = treatment_json["compound"]
+            if compound_name != "" && compound_name != "none"
+              compound = Compound.find_by_name(treatment_json["compound"].downcase)
+              compound = Compound.create :name => treatment_json["compound"].downcase unless compound
+            end
+          end
+
+          incubation_time = treatment_json["incubation time"]
+          incubation_time_unit = nil
+
+          if incubation_time && incubation_time != ""
+            incubation_time_unit = Unit.find_by_symbol treatment_json["incubation time unit"]
+            incubation_time_unit = Unit.create :symbol => treatment_json["incubation time unit"], :factors_studied => false unless incubation_time_unit
+          end
+
+          unit = Unit.find_by_symbol treatment_json["unit"]
+          unit = Unit.create :symbol => treatment_json["unit"], :factors_studied => false unless unit
+
+          #treatment = Treatment.find(:first, :conditions => ["treatment_protocol = ? and unit_id = ? and substance = ? and cast(concentration as char) = ?", treatment_json["protocol"], unit.id, treatment_json["compound"], treatment_json["start value"]])
+
+          #treatment = Treatment.new :substance => treatment_json["compound"], :concentration =>  treatment_json["start value"], :unit_id => unit.id, :treatment_protocol =>  treatment_json["protocol"] unless treatment
+          def nil_or_float o
+            o.nil? ? nil : o.to_f
+          end
+
+          treatment = Treatment.find(:first, :conditions => ["unit_id <=> ? and treatment_protocol <=> ? and treatment_type_id <=> ? and cast(start_value as char) <=> ? and cast(end_value as char) <=> ? and
+              cast(standard_deviation as char) <=> ? and comments <=> ? and cast(incubation_time as char) <=> ? and incubation_time_unit_id <=> ? and compound_id <=> ? and specimen_id <=> ?",
+              unit, protocol, treatment_type, nil_or_float(start_value), nil_or_float(end_value), nil_or_float(standard_deviation), comments, nil_or_float(incubation_time), incubation_time_unit, compound, specimen])
+
+          treatment = Treatment.new :treatment_type => treatment_type, :start_value => start_value, :end_value => end_value, :unit => unit, :standard_deviation => standard_deviation,
+              :comments => comments, :treatment_protocol => protocol, :incubation_time => incubation_time, :incubation_time_unit => incubation_time_unit,
+              :compound => compound, :specimen => specimen, :sample => sample unless treatment
+
+          treatment.save!
+
+          if specimen and !specimen.treatments.include? treatment
+            specimen.treatments << treatment
+          end
+
+          if sample and !sample.treatments.include? treatment
+            sample.treatments << treatment
+          end
+
+        end
+
+        treatment
+      
+    end
+    
+    def build_all_specimen_mock_json specimen_data_list
+      specimen_data_list.each do |specimen_data|
+        build_specimen_mock_json specimen_data
+      end      
+    end
+    
+    def build_specimen_mock_json specimen_data
+
+      specimen_title = specimen_data[:specimen_title][:value]
+      sex = specimen_data[:specimen_sex][:value]
+      organism_title = specimen_data[:organism_title][:value]
+      strain_title = specimen_data[:strain_title][:value]
+      age = specimen_data[:specimen_age][:value].to_i
+      age_unit = specimen_data[:specimen_age_unit][:value]
+      comments = specimen_data[:specimen_comment][:value]
+      genotype_title = specimen_data[:genotype_title][:value]
+      genotype_modification = specimen_data[:genotype_modification][:value]
+
+      row = specimen_data[:specimen_title][:row]
+      
+      
+      specimen = {"title" => specimen_title,
+                  "organism" => organism_title,
+                  "strain" => strain_title,
+                  "sex" => sex,
+                  "age" => age,
+                  "age unit" => age_unit,
+                  "comments" => comments,
+                  "genotype title" => genotype_title,
+                  "genotype modification" =>  genotype_modification}
+
+      @specimens[row] = specimen
+      @specimen_names[row] = specimen_title
+      Rails.logger.warn "add specimen, row = #{row} : #{specimen}"
+      
+      specimen
+
+    end
+
+    def populate_specimen specimen_json
+
+      specimen_title = specimen_json["title"]
+      sex = specimen_json["sex"]
+      age = specimen_json["age"]
+      age_unit = specimen_json["age unit"]
+      organism_title = specimen_json["organism"]
+      strain_title = specimen_json["strain"]
+      comments = specimen_json["comments"]
+      genotype_title = specimen_json["genotype title"]
+      genotype_modification = specimen_json["genotype modification"]
+
+
+      case sex
           when "female"
             sex = 0
           when "male"
@@ -537,13 +752,13 @@ module Seek
         organism = Organism.find_by_title organism_title
         strain = Strain.find_by_title strain_title
 
-        culture_growth_type = CultureGrowthType.find_by_title "in vivo"
+      culture_growth_type = CultureGrowthType.find_by_title "in vivo"
         unless organism
           organism = Organism.new :title => organism_title
           organism.save!
         end
 
-        strain = Strain.new :title => strain_title unless strain
+        strain = Strain.new :title => strain_title  unless strain
         strain.organism = organism
         strain.save!
 
@@ -570,20 +785,21 @@ module Seek
               specimen.sex == sex &&
               specimen.age == age &&
               specimen.age_unit == age_unit
-              sleep(1);
+              sleep(1)
               new_sp = specimen.clone
               now = Time.now
               new_sp.title = "#{specimen_title}-#{now}"
               new_sp.contributor = User.current_user
               new_sp.projects = specimen.projects
-              new_sp.created_at = now;
+              new_sp.created_at = now
               new_sp.save!
-              @warnings << "Warning: specimen with the name '#{specimen_title}' in row #{row} is already created in SEEK.<br/>"
+              @warnings << "Warning: specimen with the name '#{specimen_title}' is already created in SEEK.<br/>"
               @warnings << "It is renamed and saved as '#{new_sp.title}'.<br/>"
               @warnings << "You may rename it and upload the file as new version!<br/>"
+              specimen = new_sp
           else
             if !specimen.can_view?(User.current_user)
-              @warnings << "Warning: specimen with the name '#{specimen_title}' in row #{row_num} is already created in SEEK.<br/>"
+              @warnings << "Warning: specimen with the name '#{specimen_title}' is already created in SEEK.<br/>"
               @warnings << "But you are not authorized to view it. You can contact '#{specimen.contributor.person.name} for authorizations'<br/>"
             end
           end
@@ -603,36 +819,59 @@ module Seek
           genotype.save!
         end
 
-        @specimens[row] = specimen
-        @specimen_names[row] = specimen_title
-        Rails.logger.warn "add specimen, row = #{row} : #{specimen}"
-      end
+
+        specimen
+
+        
+      
     end
 
-    def populate_sample sample_data
+    
+    def build_all_sample_mock_json sample_data_list
+      sample_data_list.each do |sample_data|
+        build_sample_mock_json sample_data
+      end      
+    end
+    
+    def build_sample_mock_json sample_data
+      
+      sample_title = sample_data[:sample_title][:value]
+      sample_type = sample_data[:sample_type][:value]
+      tissue_and_cell_type_title = sample_data[:tissue_and_cell_type][:value]
+      sop_title = sample_data[:sop_title][:value]
+      donation_date = sample_data[:sample_donation_date][:value]
+      institution_name = sample_data[:institution_name][:value]
+      comments = sample_data[:sample_comment][:value]
+
+      row = sample_data[:sample_title][:row]
+      
+      sample = {"title" => sample_title,
+                "type" => sample_type,
+                "tisse and cell type" => tissue_and_cell_type_title,
+                "sop" => sop_title,
+                "donation date" => donation_date.to_s,
+                "institution" => institution_name,
+                "comments" => comments}
 
 
+      @samples[row] = sample
+      @sample_names[row] = sample_title
+      Rails.logger.warn "add sample, row = #{row}"
 
-      sample_data.each do |it|
+      sample
+      
+    end   
+    
+    
+    def populate_sample sample_json, specimen, assay=nil
 
-        #sample_title = sample_name_cell.content
-        #samples.sample_type
-        #sample_type =try_block{ sheet.find("//ss:sheet[@name='#{sheet_name}']/ss:rows/ss:row/ss:cell[@row=#{row} and @column=#{col+1}]").first.content.tr('""', "")   }
-        #tissue_and_cell_type_title = try_block{ sheet.find("//ss:sheet[@name='#{sheet_name}']/ss:rows/ss:row/ss:cell[@row=#{row} and @column=#{col+3}]").first.content.tr('""', "") }
-        #sop_title = try_block{ sheet.find("//ss:sheet[@name='#{sheet_name}']/ss:rows/ss:row/ss:cell[@row=#{row} and @column=#{col+4}]").first.content.tr('""', "") }
-        #donation_date = try_block{ sheet.find("//ss:sheet[@name='#{sheet_name}']/ss:rows/ss:row/ss:cell[@row=#{row} and @column=#{col+5}]").first.content.tr('""', "")}
-        #institution_name = try_block{ sheet.find("//ss:sheet[@name='#{sheet_name}']/ss:rows/ss:row/ss:cell[@row=#{row} and @column=#{col+6}]").first.content.tr('""', "")}
-
-        sample_title = it[:sample_title][:value]
-        sample_type = it[:sample_type][:value]
-        tissue_and_cell_type_title = it[:tissue_and_cell_type][:value]
-        sop_title = it[:sop_title][:value]
-        donation_date = it[:sample_donation_date][:value]
-        institution_name = it[:institution_name][:value]
-        comments = it[:sample_comment][:value]
-
-        row = it[:sample_title][:row]
-
+        sample_title = sample_json["title"]
+        sample_type = sample_json["type"]
+        tissue_and_cell_type_title = sample_json["tissue and cell type"]
+        sop_title = sample_json["sop"]
+        donation_date = sample_json["donation date"]
+        institution_name = sample_json["institution"]
+        comments = sample_json["comments"]
 
         sop_title = nil if sop_title=="NO STORAGE"
         institution_name = @institution_name if (institution_name=="" || institution_name.nil?)
@@ -642,8 +881,8 @@ module Seek
         sop = Sop.find_by_title sop_title
         institution = Institution.find_by_name institution_name
 
-        specimen_title = @specimen_names[row]
-        specimen = Specimen.find_by_title specimen_title
+        #specimen_title = @specimen_names[row]
+        #specimen = Specimen.find_by_title specimen_title
 
         #comments = @sample_comments.detect { |comments| comments.attributes["row"].to_i == row }.try(:content)
 
@@ -657,7 +896,8 @@ module Seek
           #  treatment << k.to_s + ":" + v.to_s
           #  treatment << "," unless k == @treatments_text[row].keys.last
           #end
-          treatment = @treatments_text[row] ? @treatments_text[row] : ""
+          #treatment = @treatments_text[row] ? @treatments_text[row] : ""
+          treatment =  "" # will be linked to 0 ... n treatments anyway
 
           sample.sample_type = sample_type
           sample.donation_date = donation_date
@@ -670,7 +910,7 @@ module Seek
           sample.policy = @file.policy.deep_copy
           sample.save!
         else
-          unless sample.specimen == @specimens[row] &&
+          unless sample.specimen == specimen &&
               sample.sample_type == sample_type &&
               sample.tissue_and_cell_types.member?(tissue_and_cell_type) &&
               sample.donation_date == donation_date &&
@@ -679,12 +919,12 @@ module Seek
               sleep(1);
               sample.title =  "#{sample_title}-#{Time.now}"
               sample.save!
-            @warnings << "Warning: sample with the name '#{sample_title}' in row #{row} is already created in SEEK."
+            @warnings << "Warning: sample with the name '#{sample_title}' is already created in SEEK."
             @warnings << "It is renamed and saved as '#{sample.title}'.<br/>"
             @warnings << "You may rename it and upload the file as new version!<br/>"
           else
             if !sample.can_view?(User.current_user)
-              @warnings << "Warning: specimen with the name '#{sample_title}' in row #{row} is already created in SEEK.<br/>"
+              @warnings << "Warning: specimen with the name '#{sample_title}' is already created in SEEK.<br/>"
               @warnings << "But you are not authorized to view it. You can contact '#{sample.contributor.person.name} for authorizations'<br/>"
             end
           end
@@ -692,23 +932,21 @@ module Seek
 
       end
 
-      @samples[row] = sample
-      @sample_names[row] = sample_title
-      Rails.logger.warn "add sample, row = #{row} : #{specimen}"
-
-
-      if @assay
-        unless @assay.samples.include?(sample)
-          @assay.samples << sample
-          @assay.save!
+      if assay
+        unless assay.samples.include?(sample)
+          assay.samples << sample
+          assay.save!
         end
       else
         Rails.logger.warn "no assay defined for samples"
+        @file.lock!
+        unless @file.samples.include?(sample)
+          @file.samples << sample
+          @file.save!
+        end
       end
 
-
-      end
-
+      sample
 
     end
 
@@ -772,21 +1010,21 @@ module Seek
           end
           @start_row = start_row + 1 #that is the first row with data, cf. the condition in the xpath @row > #{start_row}
         else # if probing_num_rows == false we assume that @num_rows has been set to the correct value
-          field_values = sheet.find("//ss:sheet[@name='#{sheet_name}']/ss:rows/ss:row/ss:cell[@row > #{start_row} and @row <= #{start_row + @num_rows} and @column=#{col}]").collect {|cell| cell}
+          field_values = sheet.find("//ss:sheet[@name='#{sheet_name}']/ss:rows/ss:row/ss:cell[@row > #{start_row} and @row <= #{start_row + @num_rows} and @column=#{col}]").collect {|cell| cell }
         end
       end
       field_values
     end
 
     def hunt_for_horizontal_field_value_mapped sheet, field_name, mapping
-      mapping[field_name][:value].call((hunt_for_horizontal_field_value(sheet, mapping[field_name][:column])))
+      mapping[field_name][:value].call((hunt_for_horizontal_field_value(sheet, mapping[field_name][:column]))).map { |it| {:value => it}}
     end
 
     # this is the most important method to get data out of the spreadsheet
     # basically it's just a wrapper for hunt_for_field_values using a mapping to get the correct field name (= column header) to extract data from
     # the received data is mapped to an array of hashed containing :value and :row  -- the value assigned to :value is calculated using the block specified in the mapping for this field name
     # if there are less rows in the result than specified by @num_rows then missing rows are augmented with some default value (see augment_missing rows)
-    # if there are results returned by hunt_for_field_values then this case is handled differently for columns that are specified as FIXED in the mapping and for columns that are not
+    # if there are no results returned by hunt_for_field_values then this case is handled differently for columns that are specified as FIXED in the mapping and for columns that are not
     # in any case it is ensured that the method returns @num_rows hashes of :value and :row
     def hunt_for_field_values_mapped sheet, field_name, mapping, probing_num_rows = false
       field_values = hunt_for_field_values sheet, mapping[field_name][:column], probing_num_rows

@@ -98,6 +98,8 @@ module Seek
               :"treatment.substance" => mapping_entry("Substance"),
               :"treatment.concentration" => mapping_entry("Concentration"),
               :"treatment.unit" => mapping_entry("Unit"),
+              :"treatment.incubation_time" => mapping_entry("FIXED", proc {nil}),
+              :"treatment.incubation_time_unit" => mapping_entry("FIXED", proc {""}),
 
               :"samples.comments" => mapping_entry("Additional Information"),
               :"samples.title" => mapping_entry("Sample Name"),
@@ -115,6 +117,8 @@ module Seek
           :assay_mapping => {
 
               :assay_sheet_name => "IDF",
+              :parsing_direction => "horizontal",
+              :probing_column => "",
 
               :"investigation.title" => mapping_entry("Investigation Title"),
               :"assay_type.title" => mapping_entry("Experiment Class"),
@@ -138,6 +142,7 @@ module Seek
 
       age_regex = /(\d+-?\d*)\s*(day|week|month|year)s?/i
       treatment_regex = /(\d*\.?\d*)\s*(\w+\/\w+)\s*([\w\.\s,']*),?\s+([\w\.]*)/
+      incubation_time_regex = /(\d+\.?\d*)(\w{1})/
 
 
 
@@ -163,8 +168,8 @@ module Seek
 
 
               :"specimens.institution_id" => mapping_entry("Responsible Lab"),
-              :"specimens.title" => mapping_entry("Lab internal number"),
-              :"specimens.lab_internal_number" => mapping_entry("Lab internal number"),
+              :"specimens.title" => mapping_entry("Lab internal number", proc { |data| data.chomp(".0")}),
+              :"specimens.lab_internal_number" => mapping_entry("Lab internal number", proc { |data| data.chomp(".0")}),
               :"specimens.sex" => mapping_entry("FIXED", proc {"unknown"}),
               :"specimens.age" => mapping_entry("Age", proc do |data|
                   if data =~ age_regex
@@ -226,9 +231,29 @@ module Seek
                   ""
                 end
               end),
+              :"treatment.incubation_time" => mapping_entry("Explantation", proc do |data|
+                  if data =~ incubation_time_regex
+                    $1
+                  else
+                    ""
+                  end
+              end),
+
+              :"treatment.incubation_time_unit" => mapping_entry("Explantation", proc do |data|
+                if data =~ incubation_time_regex
+                  case $2
+                    when "d" then "day"
+                    when "h" then "hour"
+                    when "w" then "week"
+                    else ""
+                  end
+                else
+                  ""
+                end
+              end),
 
               :"samples.comments" => mapping_entry("Comments"),
-              :"samples.title" => mapping_entry("Tissue specimen no."),
+              :"samples.title" => mapping_entry("Tissue specimen no.", proc { |data| data.chomp(".0")}),
               :"samples.sample_type" => mapping_entry("FIXED", proc {""}),
               :"samples.donation_date" => mapping_entry("date of experiment"),
 
@@ -246,7 +271,30 @@ module Seek
 
       },
 
-          :assay_mapping => nil
+          :assay_mapping => {
+
+              :assay_sheet_name => "Tabelle1",
+              :parsing_direction => "vertical",
+              :probing_column => :"creator.last_name",
+
+              :"investigation.title" => mapping_entry("FIXED", proc { nil }),
+              :"assay_type.title" => mapping_entry("FIXED", proc { nil }),
+              :"study.title" => mapping_entry("FIXED", proc { nil }),
+
+              :"creator.email" => mapping_entry("FIXED", proc { "seddik.hammad@hengstler.de" }),
+              :"creator.last_name" => mapping_entry("Experimentator", proc do |data|
+                if data.split(/\s+/)
+                  data.split(/\s+/)[1]
+                end
+              end),
+              :"creator.first_name" => mapping_entry("Experimentator", proc do |data|
+                if data.split(/\s+/)
+                  data.split(/\s+/)[0]
+                end
+              end)
+
+          }
+
 
 
 
@@ -263,6 +311,7 @@ module Seek
       treatment_concentration_unit_regex = /(\d*[,\.]?\d*)\s*([\w\s\/]*).*$/
       treatment_protocol_regex = /.*,\s*([\w\s\.]*)$/
       genotype_modification_regex = /(WT|KO)/
+      incubation_time_regex = /(\d+\.?\d*)\s+(\w*)s/
 
       {
           :name => "dortmund_bcat_ko",
@@ -342,6 +391,21 @@ module Seek
                   ""
                 end
               end),
+              :"treatment.incubation_time" => mapping_entry("Time point", proc do |data|
+                if data =~ incubation_time_regex
+                  $1
+                else
+                  ""
+                end
+              end),
+
+              :"treatment.incubation_time_unit" => mapping_entry("Time point", proc do |data|
+                if data =~ incubation_time_regex
+                  $2
+                else
+                  ""
+                end
+              end),
 
               :"samples.comments" => mapping_entry("FIXED", proc {""}),
               :"samples.title" => mapping_entry("Sample ID"),
@@ -377,7 +441,7 @@ module Seek
                   :samples_sheet_name => "Tabelle2",
                   :add_specimens => true,
                   :add_treatments => true,
-                  :add_samples => false,
+                  :add_samples => true,
 
                   :probing_column => :"specimens.title",
 
@@ -398,22 +462,25 @@ module Seek
                   :"treatment.substance" => mapping_entry("FIXED", proc {"LPS"}),
                   :"treatment.concentration" => mapping_entry("LPS (µg/g KG)", proc do |data|
                     if data =~ concentration_regex
-                      $1
+                      $1.gsub(/,/, ".")
                     else
                       ""
                     end
                   end),
                   :"treatment.unit" => mapping_entry("FIXED", proc {"µg/g KG"}),
+                  :"treatment.incubation_time" => mapping_entry("Incubation period x Std."),
+                  :"treatment.incubation_time_unit" => mapping_entry("FIXED", proc {"hour"}),
 
-                  #:"samples.comments" => mapping_entry(""),
-                  #:"samples.title" => mapping_entry(""),
-                  #:"samples.sample_type" => mapping_entry(""),
-                  #:"samples.donation_date" => mapping_entry(""),
 
-                  #:"tissue_and_cell_types.title" => mapping_entry(""),
+                  :"samples.comments" => mapping_entry("FIXED", proc {""}),
+                  :"samples.title" => mapping_entry("Animal Nr.", proc { |data| data + "_liver"}),
+                  :"samples.sample_type" => mapping_entry("FIXED", proc {"liver"}),
+                  :"samples.donation_date" => mapping_entry("Donation Date"),
 
-                  #:"sop.title" => mapping_entry(""),
-                  #:"institution.name" => mapping_entry("")
+                  :"tissue_and_cell_types.title" => mapping_entry("FIXED", proc {""}),
+
+                  :"sop.title" => mapping_entry("FIXED", proc {""}),
+                  :"institution.name" => mapping_entry("FIXED", proc {""})
               },
 
 
