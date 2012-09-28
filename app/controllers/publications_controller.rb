@@ -7,7 +7,7 @@ class PublicationsController < ApplicationController
   require 'pubmed_query_tool'
   
   before_filter :find_assets, :only => [ :index ]
-  before_filter :fetch_publication, :only => [:show, :edit, :update, :destroy]
+  before_filter :find_and_auth, :only => [:show, :edit, :update, :destroy]
   before_filter :associate_authors, :only => [:edit, :update]
 
   include Seek::BreadCrumbs
@@ -308,29 +308,7 @@ class PublicationsController < ApplicationController
   end
 
   private    
-  
-  def fetch_publication
-    begin
-      publication = Publication.find(params[:id])            
-      
-      if publication.can_perform? translate_action(action_name)
-        @publication = publication
-      else
-        respond_to do |format|
-          flash[:error] = "You are not authorized to perform this action"
-          format.html { redirect_to publications_path  }
-        end
-        return false
-      end
-    rescue ActiveRecord::RecordNotFound
-      respond_to do |format|
-        flash[:error] = "Couldn't find the publication"
-        format.html { redirect_to publications_path }
-      end
-      return false
-    end
-  end
-  
+
   def get_data(publication, pubmed_id, doi=nil)
     if !pubmed_id.nil?
       query = PubmedQuery.new("sysmo-seek",Seek::Config.pubmed_api_email)
