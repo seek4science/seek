@@ -98,7 +98,7 @@ module Seek
               :"treatment.substance" => mapping_entry("Substance"),
               :"treatment.concentration" => mapping_entry("Concentration"),
               :"treatment.unit" => mapping_entry("Unit"),
-              :"treatment.incubation_time" => mapping_entry("FIXED", proc {""}),
+              :"treatment.incubation_time" => mapping_entry("FIXED", proc {nil}),
               :"treatment.incubation_time_unit" => mapping_entry("FIXED", proc {""}),
 
               :"samples.comments" => mapping_entry("Additional Information"),
@@ -168,8 +168,8 @@ module Seek
 
 
               :"specimens.institution_id" => mapping_entry("Responsible Lab"),
-              :"specimens.title" => mapping_entry("Lab internal number"),
-              :"specimens.lab_internal_number" => mapping_entry("Lab internal number"),
+              :"specimens.title" => mapping_entry("Lab internal number", proc { |data| data.chomp(".0")}),
+              :"specimens.lab_internal_number" => mapping_entry("Lab internal number", proc { |data| data.chomp(".0")}),
               :"specimens.sex" => mapping_entry("FIXED", proc {"unknown"}),
               :"specimens.age" => mapping_entry("Age", proc do |data|
                   if data =~ age_regex
@@ -253,7 +253,7 @@ module Seek
               end),
 
               :"samples.comments" => mapping_entry("Comments"),
-              :"samples.title" => mapping_entry("Tissue specimen no."),
+              :"samples.title" => mapping_entry("Tissue specimen no.", proc { |data| data.chomp(".0")}),
               :"samples.sample_type" => mapping_entry("FIXED", proc {""}),
               :"samples.donation_date" => mapping_entry("date of experiment"),
 

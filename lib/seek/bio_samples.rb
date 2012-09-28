@@ -652,18 +652,25 @@ module Seek
           #treatment = Treatment.find(:first, :conditions => ["treatment_protocol = ? and unit_id = ? and substance = ? and cast(concentration as char) = ?", treatment_json["protocol"], unit.id, treatment_json["compound"], treatment_json["start value"]])
 
           #treatment = Treatment.new :substance => treatment_json["compound"], :concentration =>  treatment_json["start value"], :unit_id => unit.id, :treatment_protocol =>  treatment_json["protocol"] unless treatment
+          def nil_or_float o
+            o.nil? ? nil : o.to_f
+          end
+
+          treatment = Treatment.find(:first, :conditions => ["unit_id <=> ? and treatment_protocol <=> ? and treatment_type_id <=> ? and cast(start_value as char) <=> ? and cast(end_value as char) <=> ? and
+              cast(standard_deviation as char) <=> ? and comments <=> ? and cast(incubation_time as char) <=> ? and incubation_time_unit_id <=> ? and compound_id <=> ? and specimen_id <=> ?",
+              unit, protocol, treatment_type, nil_or_float(start_value), nil_or_float(end_value), nil_or_float(standard_deviation), comments, nil_or_float(incubation_time), incubation_time_unit, compound, specimen])
 
           treatment = Treatment.new :treatment_type => treatment_type, :start_value => start_value, :end_value => end_value, :unit => unit, :standard_deviation => standard_deviation,
               :comments => comments, :treatment_protocol => protocol, :incubation_time => incubation_time, :incubation_time_unit => incubation_time_unit,
-              :compound => compound, :specimen => specimen, :sample => sample
+              :compound => compound, :specimen => specimen, :sample => sample unless treatment
 
           treatment.save!
 
-          if specimen
+          if specimen and !specimen.treatments.include? treatment
             specimen.treatments << treatment
           end
 
-          if sample
+          if sample and !sample.treatments.include? treatment
             sample.treatments << treatment
           end
 
@@ -1003,7 +1010,7 @@ module Seek
           end
           @start_row = start_row + 1 #that is the first row with data, cf. the condition in the xpath @row > #{start_row}
         else # if probing_num_rows == false we assume that @num_rows has been set to the correct value
-          field_values = sheet.find("//ss:sheet[@name='#{sheet_name}']/ss:rows/ss:row/ss:cell[@row > #{start_row} and @row <= #{start_row + @num_rows} and @column=#{col}]").collect {|cell| cell}
+          field_values = sheet.find("//ss:sheet[@name='#{sheet_name}']/ss:rows/ss:row/ss:cell[@row > #{start_row} and @row <= #{start_row + @num_rows} and @column=#{col}]").collect {|cell| cell }
         end
       end
       field_values
