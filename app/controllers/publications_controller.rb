@@ -63,13 +63,7 @@ class PublicationsController < ApplicationController
     assay_ids = params[:assay_ids] || []
     respond_to do |format|
       if @publication.save
-        result.authors.each do |author|
-          pa = PublicationAuthor.new()
-          pa.publication = @publication
-          pa.first_name = author.first_name
-          pa.last_name = author.last_name
-          pa.save
-        end
+        create_non_seek_authors result.authors
 
         Assay.find(assay_ids).each do |assay|
           Relationship.create_or_update_attributions(assay,[["Publication", @publication.id]], Relationship::RELATED_TO_PUBLICATION) if assay.can_edit?
@@ -120,7 +114,13 @@ class PublicationsController < ApplicationController
     respond_to do |format|
       publication_params = params[:publication]||{}
       if valid && @publication.update_attributes(publication_params)
-        to_add.each {|a| @publication.creators << a}
+        to_add.each_with_index do |a,i|
+          @publication.creators << a
+          removing_non_seek_author = to_remove[i]
+          updating_publication_author_order = PublicationAuthorOrder.find(:all, :conditions => ["publication_id=? AND author_id=? AND author_type=?", @publication.id, removing_non_seek_author.id, 'PublicationAuthor' ]).first
+          updating_publication_author_order.author = a
+          updating_publication_author_order.save
+        end
         to_remove.each {|a| a.destroy}
 
         # Update relationship
@@ -270,6 +270,7 @@ class PublicationsController < ApplicationController
     @publication = Publication.find(params[:id])
     @publication.creators.clear #get rid of author links
     @publication.non_seek_authors.clear
+    @publication.publication_author_orders.clear
     
     #Query pubmed article to fetch authors
     result = nil
@@ -283,13 +284,7 @@ class PublicationsController < ApplicationController
       result = query.fetch(doi)
     end      
     unless result.nil?
-      result.authors.each do |author|
-        pa = PublicationAuthor.new()
-        pa.publication = @publication
-        pa.first_name = author.first_name
-        pa.last_name = author.last_name
-        pa.save
-      end
+      create_non_seek_authors result.authors
     end
     respond_to do |format|
       format.html { redirect_to(edit_publication_url(@publication)) }
@@ -340,6 +335,21 @@ class PublicationsController < ApplicationController
       else 
         raise "Error - No publication could be found with that DOI"
       end  
+    end
+  end
+
+  def create_non_seek_authors authors
+    authors.each_with_index do |author,index|
+      pa = PublicationAuthor.new()
+      pa.publication = @publication
+      pa.first_name = author.first_name
+      pa.last_name = author.last_name
+      pa.save
+      pao = PublicationAuthorOrder.new()
+      pao.publication = @publication
+      pao.order = index
+      pao.author = pa
+      pao.save
     end
   end
 

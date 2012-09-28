@@ -985,6 +985,13 @@ ActiveRecord::Schema.define(:version => 20120928095812) do
 
   add_index "publication_auth_lookup", ["user_id", "can_view"], :name => "index_publication_auth_lookup_on_user_id_and_can_view"
 
+  create_table "publication_author_orders", :force => true do |t|
+    t.integer "order"
+    t.integer "author_id"
+    t.string  "author_type"
+    t.integer "publication_id"
+  end
+
   create_table "publication_authors", :force => true do |t|
     t.string   "first_name"
     t.string   "last_name"

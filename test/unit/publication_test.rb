@@ -219,5 +219,5 @@ class PublicationTest < ActiveSupport::TestCase
       p.save!
     end
   end
-  
+
 end

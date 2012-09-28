@@ -1,32 +1,23 @@
-<% is_inline_viewable = Seek::Config.experimental_features_enabled && (display_item ||=nil) && display_item.content_blob.is_content_viewable?
-   title = ''
-   resource_text = item.class.name.humanize
+<% is_inline_viewable = Seek::Config.experimental_features_enabled && (display_asset ||=nil) && display_asset.content_blob.is_content_viewable?
+   view_pdf_content_url = polymorphic_path(asset, :version => display_asset.version, :action => 'view_pdf_content')
    if is_inline_viewable
-     title = "View inline the content of this #{resource_text}"
-   elsif !display_item.can_download?
-     title = "You are not authorized to view the content of this #{resource_text}"
-   elsif !display_item.content_blob.is_viewable_format?
-     title = "This file format is not inline viewable supported"
-   end
-   view_pdf_content_url = polymorphic_path(item, :version => display_item.version, :action => 'view_pdf_content')
+     title = "View inline the content of this #{human_name}" %>
+    <li><%= image_tag_for_key "show", view_pdf_content_url, 'View content', {:title => title, :onclick => "isCanvasSupportBrowser();"}, 'View content'%></li>
+<% else
+     if !display_asset.can_download?
+       title = "You are not authorized to view the content of this #{human_name}"
+     elsif !display_asset.content_blob.is_viewable_format?
+       title = "This file format is not inline viewable supported"
+     else
+       title = "It is not possible to view this #{human_name} inline"
+     end
 %>
-<%= link_to 'View content', view_pdf_content_url, :onclick => is_inline_viewable ? "isCanvasSupportBrowser();" : "alert('#{title}');return false;", :class => is_inline_viewable ? 'link_text' : 'disabled_link_text', :title => title, :target=>"_blank"
-%>
-<br/>
-
-<style type="text/css">
-    .link_text {
-        font-size: 14px;
-        font-weight: bold;
-    }
-
-    .disabled_link_text {
-        font-size: 14px;
-        font-weight: bold;
-        color: #808080;
-        cursor: default;
-    }
-</style>
+    <li>
+         <span class='disabled_icon disabled' onclick="alert('<%=title%>')" title="<%=tooltip_title_attrib(title)%>">
+            <%= image('show', {:alt=>"View content",:class=>"disabled"}) + "View content" %>
+         </span>
+    </li>
+<% end %>
 
 <script type="text/javascript">
     function isCanvasSupportBrowser(){
