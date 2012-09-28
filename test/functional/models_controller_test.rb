@@ -181,7 +181,7 @@ class ModelsControllerTest < ActionController::TestCase
 
     assert_difference('Model.count') do
       assert_difference('ContentBlob.count') do
-        post :create, :model => valid_model_with_url,:content_blob=>{:url_0=>"http://www.sysmo-db.org/images/sysmo-db-logo-grad2.png"}, :sharing=>valid_sharing
+        post :create, :model => valid_model_with_url.tap {|model| model[:external_link] = "1"},:content_blob=>{:url_0=>"http://www.sysmo-db.org/images/sysmo-db-logo-grad2.png"}, :sharing=>valid_sharing
       end
     end
     assert_redirected_to model_path(assigns(:model))
@@ -197,7 +197,7 @@ class ModelsControllerTest < ActionController::TestCase
     WebMock.allow_net_connect!
 
     model_details=valid_model_with_url
-    model_details[:local_copy]="1"
+
     assert_difference('Model.count') do
       assert_difference('ContentBlob.count') do
         post :create, :model => model_details,:content_blob=>{:url_0=>"http://www.sysmo-db.org/images/sysmo-db-logo-grad2.png"}, :sharing=>valid_sharing
