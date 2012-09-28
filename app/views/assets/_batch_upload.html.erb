@@ -8,6 +8,7 @@
    class << resource
        attr_accessor :data_url, :external_link
    end unless resource.nil?
+   resource.external_link = 1 unless resource.nil?
    asset_name = text_for_resource upload_field
    @content_blob ||= ContentBlob.new
 -%>
