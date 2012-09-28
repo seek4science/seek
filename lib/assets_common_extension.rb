@@ -212,7 +212,7 @@ module AssetsCommonExtension
           zos.print IO.read(content_blob.filepath)
         elsif !content_blob.url.nil?
           if content_blob.external_link?
-            zos.put_next_entry(content_blob.original_filename + '.html')
+            zos.put_next_entry((content_blob.original_filename || try_block {URI.parse(content_blob.url).path} || content_blob.url) + '.html')
             zos.print <<-REDIRECT_JS
             <html>
               <head>
