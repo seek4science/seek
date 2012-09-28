@@ -185,7 +185,7 @@ class DataFilesControllerTest < ActionController::TestCase
     
     assert_difference('DataFile.count') do
       assert_difference('ContentBlob.count') do
-        post :create, :data_file => valid_data_file_with_http_url, :sharing=>valid_sharing
+        post :create, :data_file => valid_data_file_with_http_url.tap {|df|df[:external_link] = "1"}, :sharing=>valid_sharing
       end
     end
       
@@ -232,10 +232,9 @@ class DataFilesControllerTest < ActionController::TestCase
     assert_not_nil flash[:error]    
   end
   
-  test "should create data file and store with url and store flag" do
+  test "should create data file and store with url" do
     mock_http
     datafile_details = valid_data_file_with_http_url
-    datafile_details[:local_copy]="1"
 
     assert_difference('ActivityLog.count') do
       assert_difference('DataFile.count') do
