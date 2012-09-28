@@ -168,6 +168,7 @@ module Seek
             params[symb][:content_type] = (params[symb][:data]).content_type
             params[symb][:original_filename] = (params[symb][:data]).original_filename
             @tmp_io_object = params[symb][:data]
+            @external_link = (params[symb][:external_link]=="1")
           elsif !(params[symb][:data_url]).blank?
             make_local_copy = (params[symb][:local_copy]=="1")
             @data_url=params[symb][:data_url]
