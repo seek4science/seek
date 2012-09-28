@@ -22,7 +22,15 @@ rvm list | grep $desired_ruby > /dev/null || rvm install $desired_ruby || exit 1
 
 # use our ruby with a custom gemset
 rvm use ${desired_ruby}@${project_name} --create
-rvm rubygems ${rubygems} || exit 1
+gem_version=`gem -v`
+
+if [ "$gem_version" != "$rubygems" ]
+    then
+        rvm rubygems ${rubygems} || exit 1
+    else
+        echo "Rubygems already version $rubygems, upgrading not required"
+fi
+
 
 remove_annoying_warning
 
@@ -39,6 +47,9 @@ bundle check || bundle install || exit 1
 remove_annoying_warning
 
 # finally, run rake
-bundle exec rake cruise2 TESTOPTS="-v"
+bundle exec rake cruise2
+
+#comment out above and uncomment this line to get more verbose test information
+#bundle exec rake cruise2 TESTOPTS="-v"
 
 

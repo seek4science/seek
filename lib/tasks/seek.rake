@@ -19,14 +19,6 @@ namespace :seek do
     end
   end
 
-  desc 'move sample-sop relation from sample_sops to sample_assets'
-  task(:copy_old_sample_sops => :environment) do
-    SampleSop.all.each do |ss|
-      disable_authorization_checks do
-        SampleAsset.create! :sample_id => ss.sample_id,:asset_id => ss.sop_id,:asset_type => "Sop",:version => ss.sop_version
-      end
-    end
-  end
   desc 'Images for model: moving id_image data to model_image'
   #This should be run before removing the id_image in models.
   #Before id_image was used which was the id of one content blob,

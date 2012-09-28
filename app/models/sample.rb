@@ -49,8 +49,6 @@ class Sample < ActiveRecord::Base
 
   has_many :data_file_masters, :through => :sample_assets, :source => :asset, :source_type => 'DataFile'
   has_many :sop_masters, :through => :sample_assets, :source => :asset, :source_type => 'Sop'
-  #has_many :sop_masters,:class_name => "SampleSop"
-
 
   alias_attribute :description, :comments
   validates_presence_of :title
