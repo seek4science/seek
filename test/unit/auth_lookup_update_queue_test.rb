@@ -223,29 +223,30 @@ class AuthLookupUpdateQueueTest < ActiveSupport::TestCase
   end
 
   test "updates for group membership" do
-    person = Factory :person
-    person2 = Factory :person
+    User.with_current_user(Factory(:admin)) do
+      person = Factory :person
+      person2 = Factory :person
 
-    project = person.projects.first
-    assert_equal [project],person.projects
+      project = person.projects.first
+      assert_equal [project],person.projects
 
-    wg = Factory :work_group
-    AuthLookupUpdateQueue.destroy_all
-    assert_difference("AuthLookupUpdateQueue.count", 1) do
-      gm = GroupMembership.create :person=>person, :work_group=>wg
-      gm.save!
+      wg = Factory :work_group
+      AuthLookupUpdateQueue.destroy_all
+      assert_difference("AuthLookupUpdateQueue.count", 1) do
+        gm = GroupMembership.create :person=>person, :work_group=>wg
+        gm.save!
+      end
+      assert_equal person, AuthLookupUpdateQueue.last(:order=>:id).item
+
+      AuthLookupUpdateQueue.destroy_all
+      assert_difference("AuthLookupUpdateQueue.count", 2) do
+        gm = person.group_memberships.first
+        gm.person = person2
+        gm.save!
+      end
+
+      assert_equal [person2,person], AuthLookupUpdateQueue.all(:order=>:id).collect{|a| a.item}
     end
-    assert_equal person, AuthLookupUpdateQueue.last(:order=>:id).item
-
-    AuthLookupUpdateQueue.destroy_all
-    assert_difference("AuthLookupUpdateQueue.count", 2) do
-      gm = person.group_memberships.first
-      gm.person = person2
-      gm.save!
-    end
-
-    assert_equal [person2,person], AuthLookupUpdateQueue.all(:order=>:id).collect{|a| a.item}
-
   end
 
 end
