@@ -291,7 +291,22 @@ class PublicationsController < ApplicationController
       format.xml  { head :ok }
     end
   end
-  
+
+  def create_non_seek_authors authors,publication=@publication
+    authors.each_with_index do |author,index|
+      pa = PublicationAuthor.new()
+      pa.publication = publication
+      pa.first_name = author.first_name
+      pa.last_name = author.last_name
+      pa.save
+      pao = PublicationAuthorOrder.new()
+      pao.publication = publication
+      pao.order = index
+      pao.author = pa
+      pao.save
+    end
+  end
+
   private    
   
   def fetch_publication
@@ -336,21 +351,5 @@ class PublicationsController < ApplicationController
         raise "Error - No publication could be found with that DOI"
       end  
     end
-  end
-
-  def create_non_seek_authors authors
-    authors.each_with_index do |author,index|
-      pa = PublicationAuthor.new()
-      pa.publication = @publication
-      pa.first_name = author.first_name
-      pa.last_name = author.last_name
-      pa.save
-      pao = PublicationAuthorOrder.new()
-      pao.publication = @publication
-      pao.order = index
-      pao.author = pa
-      pao.save
     end
-  end
-
 end

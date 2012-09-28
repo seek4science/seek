@@ -54,4 +54,81 @@ namespace :seek do
       disable_authorization_checks{strain.save(false)}
     end
   end
+
+  task(:reordering_authors_for_existing_publications=>:environment) do
+    Publication.all.each do |publication|
+      non_seek_authors = publication.non_seek_authors
+      seek_authors = publication.seek_authors
+      projects = publication.projects
+      projects = publication.contributor.person.projects if projects.empty?
+
+      pubmed_id = publication.pubmed_id
+      doi = publication.doi
+      result = nil
+      if pubmed_id
+        query = PubmedQuery.new("seek",Seek::Config.pubmed_api_email)
+        result = query.fetch(pubmed_id)
+      elsif doi
+        query = DoiQuery.new(Seek::Config.crossref_api_email)
+        result = query.fetch(doi)
+      end
+      original_authors = result.try(:authors).nil? ? [] : result.authors
+      authors_with_right_orders = []
+      original_authors.each do |author|
+        seek_author_matches = []
+        non_seek_author_matches = []
+
+        #Get author by last name
+        seek_author_matches = seek_authors.select{|seek_author| seek_author.last_name == author.last_name}
+        non_seek_author_matches = non_seek_authors.select{|non_seek_author| non_seek_author.last_name == author.last_name}
+
+        #If no results, try searching by normalised name, taken from grouped_pagination.rb
+        if (seek_author_matches.size + non_seek_author_matches.size) < 1
+          text = author.last_name
+          #handle the characters that can't be handled through normalization
+          %w[ØO].each do |s|
+            text.gsub!(/[#{s[0..-2]}]/, s[-1..-1])
+          end
+
+          codepoints = text.mb_chars.normalize(:d).split(//u)
+          ascii=codepoints.map(&:to_s).reject{|e| e.length > 1}.join
+
+          seek_author_matches = seek_authors.select{|seek_author| seek_author.last_name == ascii}
+          non_seek_author_matches = non_seek_authors.select{|non_seek_author| non_seek_author.last_name == ascii}
+        end
+
+        #If more than one result for seek_author_matches, filter by project
+        if seek_author_matches.size > 1
+          seek_author_project_matches = seek_author_matches.select{|p| p.member_of?(projects)}
+          if seek_author_project_matches.size >= 1 #use this result unless it resulted in no matches
+            seek_author_matches = seek_author_project_matches
+          end
+        end
+
+        #If more than one result, filter by first initial
+        if (seek_author_matches.size + non_seek_author_matches.size) > 1
+          seek_author_first_and_last_name_matches = seek_author_matches.select{|p| p.first_name.at(0).upcase == author.first_name.at(0).upcase}
+          non_seek_author_first_and_last_name_matches = non_seek_author_matches.select{|p| p.first_name.at(0).upcase == author.first_name.at(0).upcase}
+          if (seek_author_first_and_last_name_matches.size + non_seek_author_first_and_last_name_matches.size) >= 1  #use this result unless it resulted in no matches
+            seek_author_matches = seek_author_first_and_last_name_matches
+            non_seek_author_matches = non_seek_author_first_and_last_name_matches
+          end
+        end
+        match = non_seek_author_matches.first
+        match = seek_author_matches.first if match.nil?
+        authors_with_right_orders << match unless match.nil?
+      end
+
+      if original_authors.size == authors_with_right_orders.size
+        authors_with_right_orders.each_with_index do |author, index|
+          publication.publication_author_orders.create(:author => author, :order => index)
+        end
+      else
+        publication.creators.clear #get rid of author links
+        publication.non_seek_authors.clear
+        publication.publication_author_orders.clear
+        PublicationsController.new().create_non_seek_authors(original_authors,publication)
+      end
+    end
+  end
 end
