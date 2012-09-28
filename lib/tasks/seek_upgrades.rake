@@ -8,7 +8,8 @@ namespace :seek do
   #these are the tasks required for this version upgrade
   task :upgrade_version_tasks=>[
             :environment,
-            :reindex_things
+            :reindex_things,
+            :reordering_authors_for_existing_publications
   ]
 
   desc("upgrades SEEK from the last released version to the latest released version")
@@ -62,7 +63,7 @@ namespace :seek do
       projects = publication.projects
       projects = publication.contributor.person.projects if projects.empty?
 
-      result = fetch_pubmed_or_doi_result publication.pubmed_id, publication.doi
+      result = PublicationsController.new().fetch_pubmed_or_doi_result publication.pubmed_id, publication.doi
 
       original_authors = result.try(:authors).nil? ? [] : result.authors
       authors_with_right_orders = []
