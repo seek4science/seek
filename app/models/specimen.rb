@@ -23,6 +23,8 @@ class Specimen < ActiveRecord::Base
   has_many :assets_creators, :dependent => :destroy, :as => :asset, :foreign_key => :asset_id
   has_many :creators, :class_name => "Person", :through => :assets_creators, :order=>'assets_creators.id', :after_add => :update_timestamp, :after_remove => :update_timestamp
 #  accepts_nested_attributes_for :creators
+  has_many :treatments
+
   belongs_to :institution
   belongs_to :culture_growth_type
   belongs_to :strain
