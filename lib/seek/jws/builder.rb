@@ -6,7 +6,7 @@ module Seek
   module JWS
 
     BASE_URL = "#{Seek::Config.jws_online_root}/webMathematica/Examples/"
-    UPLOAD_URL = "#{Seek::Config.jws_online_root}/webMathematica/upload/uploadNEW.jsp"
+    UPLOAD_URL = "#{Seek::Config.jws_online_root}/webMathematica/upload/uploadSBML.jsp"
 
     class Builder
 
@@ -54,7 +54,7 @@ module Seek
             elsif response.code == "500"
               raise Exception.new("Server error on JWS Online for url: #{upload_sbml_url}\n\nCause:\n\n#{response.body}")
             else
-              raise Exception.new("Expected a redirection from JWS Online but got #{response.code}, for url: #{upload_sbml_url}")
+              raise Exception.new("Expected a redirection from JWS Online but got #{response.code}, for url: #{upload_sbml_url}. Body:\n#{response.body}")
             end
           elsif (is_dat? model)
             response = RestClient.post(upload_dat_url, :uploadedDatFile=>tmpfile, :filename=>model.original_filename, :multipart=>true) { |response, request, result, &block |
