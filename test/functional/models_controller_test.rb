@@ -223,10 +223,13 @@ class ModelsControllerTest < ActionController::TestCase
        m=Model.find(m.id)
        assert_equal 2,m.versions.size
        assert_equal 2,m.version
-       assert_equal "little_file.txt",m.original_filename
-       assert_equal "little_file.txt",m.versions[1].original_filename
+       assert_equal 1,m.content_blobs.size
+       assert_equal 1,m.versions[1].content_blobs.size
+       assert_equal m.content_blobs,m.versions[1].content_blobs
+       assert_equal "little_file.txt",m.content_blobs.first.original_filename
+       assert_equal "little_file.txt",m.versions[1].content_blobs.first.original_filename
        assert_equal "This is a new revision",m.versions[1].revision_comments
-       assert_equal "Teusink.xml",m.versions[0].original_filename
+       assert_equal "Teusink.xml",m.versions[0].content_blobs.first.original_filename
   end
 
   test "should create model with import details" do
@@ -638,9 +641,11 @@ class ModelsControllerTest < ActionController::TestCase
     m=Model.find(m.id)
     assert_equal 2,m.versions.size
     assert_equal 2,m.version
-    assert_equal "little_file.txt",m.original_filename
-    assert_equal "little_file.txt",m.versions[1].original_filename
-    assert_equal "Teusink.xml",m.versions[0].original_filename
+    assert_equal 1,m.content_blobs.size
+    assert_equal m.content_blobs,m.versions[1].content_blobs
+    assert_equal "little_file.txt",m.content_blobs.first.original_filename
+    assert_equal "little_file.txt",m.versions[1].content_blobs.first.original_filename
+    assert_equal "Teusink.xml",m.versions[0].content_blobs.first.original_filename
     assert_equal "This is a new revision",m.versions[1].revision_comments
     
   end

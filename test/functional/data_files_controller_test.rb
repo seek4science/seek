@@ -271,8 +271,8 @@ class DataFilesControllerTest < ActionController::TestCase
     assert !assigns(:data_file).content_blob.url.blank?
     assert assigns(:data_file).content_blob.data_io_object.nil?
     assert !assigns(:data_file).content_blob.file_exists?
-    assert_equal "a-piccy.png", assigns(:data_file).original_filename
-    assert_equal "image/png", assigns(:data_file).content_type
+    assert_equal "a-piccy.png", assigns(:data_file).content_blob.original_filename
+    assert_equal "image/png", assigns(:data_file).content_blob.content_type
   end
 
   test "should create data file with https_url" do
@@ -289,8 +289,8 @@ class DataFilesControllerTest < ActionController::TestCase
       assert !assigns(:data_file).content_blob.url.blank?
       assert assigns(:data_file).content_blob.data_io_object.nil?
       assert !assigns(:data_file).content_blob.file_exists?
-      assert_equal "a-piccy.png", assigns(:data_file).original_filename
-      assert_equal "image/png", assigns(:data_file).content_type
+      assert_equal "a-piccy.png", assigns(:data_file).content_blob.original_filename
+      assert_equal "image/png", assigns(:data_file).content_blob.content_type
   end
 
   test 'asset url' do
@@ -341,8 +341,8 @@ class DataFilesControllerTest < ActionController::TestCase
     assert !assigns(:data_file).content_blob.url.blank?
     assert !assigns(:data_file).content_blob.data_io_object.read.nil?
     assert assigns(:data_file).content_blob.file_exists?
-    assert_equal "a-piccy.png", assigns(:data_file).original_filename
-    assert_equal "image/png", assigns(:data_file).content_type
+    assert_equal "a-piccy.png", assigns(:data_file).content_blob.original_filename
+    assert_equal "image/png", assigns(:data_file).content_blob.content_type
   end  
   
   test "should gracefully handle when downloading a unknown host url" do
@@ -378,8 +378,8 @@ class DataFilesControllerTest < ActionController::TestCase
     assert !assigns(:data_file).content_blob.url.blank?
     assert assigns(:data_file).content_blob.data_io_object.nil?
     assert !assigns(:data_file).content_blob.file_exists?
-    assert_equal "",assigns(:data_file).original_filename
-    assert_equal "",assigns(:data_file).content_type
+    assert_equal "",assigns(:data_file).content_blob.original_filename
+    assert_equal "",assigns(:data_file).content_blob.content_type
     
     get :download, :id => assigns(:data_file)
     assert_redirected_to "http://mocked401.com"
@@ -403,8 +403,8 @@ class DataFilesControllerTest < ActionController::TestCase
     assert !assigns(:data_file).content_blob.url.blank?
     assert assigns(:data_file).content_blob.data_io_object.nil?
     assert !assigns(:data_file).content_blob.file_exists?
-    assert_equal "",assigns(:data_file).original_filename
-    assert_equal "",assigns(:data_file).content_type
+    assert_equal "",assigns(:data_file).content_blob.original_filename
+    assert_equal "",assigns(:data_file).content_blob.content_type
     
     get :download, :id => assigns(:data_file)
     assert_redirected_to "http://mocked302.com"

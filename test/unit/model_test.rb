@@ -13,7 +13,8 @@ class ModelTest < ActiveSupport::TestCase
     assert_equal "Teusink",model.title
 
     blob=content_blobs(:teusink_blob)
-    assert_equal blob,model.content_blob
+    assert_equal 1,model.content_blobs.size
+    assert_equal blob,model.content_blobs.first
   end
 
   test "type detection" do
@@ -112,11 +113,12 @@ class ModelTest < ActiveSupport::TestCase
     model.content_blobs.build(:data=>nil,:url=>"http://mockedlocation.com/teusink.xml",
     :original_filename=>"teusink.xml")
     model.save!
-    assert !model.content_blob.file_exists?
+    assert_equal 1,model.content_blobs.size
+    assert !model.content_blobs.first.file_exists?
 
     model.cache_remote_content_blob
 
-    assert model.content_blob.file_exists?
+    assert model.content_blobs.first.file_exists?
 
   end
   
@@ -167,8 +169,9 @@ class ModelTest < ActiveSupport::TestCase
   test "make sure content blob is preserved after deletion" do
     model = models(:teusink)
     User.current_user = model.contributor
-    assert_not_nil model.content_blob,"Must have an associated content blob for this test to work"
-    cb=model.content_blob
+    assert_equal 1, model.content_blobs.size,"Must have an associated content blob for this test to work"
+    assert_not_nil model.content_blobs.first,"Must have an associated content blob for this test to work"
+    cb=model.content_blobs.first
     assert_difference("Model.count",-1) do
       assert_no_difference("ContentBlob.count") do
         model.destroy
