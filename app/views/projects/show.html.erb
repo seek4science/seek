@@ -50,20 +50,20 @@
         </p>
 
         <% if @project.people.include?(current_user.try(:person))%>
-        <p class="asset_managers">
-          <label>Asset Managers:</label>
-          <%= asset_managers_link_list @project -%>
-        </p>
+            <p class="asset_managers">
+              <label>Asset Managers:</label>
+              <%= asset_managers_link_list @project -%>
+            </p>
 
-        <p class="project_managers">
-          <label>Project Managers:</label>
-          <%= project_managers_link_list @project -%>
-        </p>
+            <p class="project_managers">
+              <label>Project Managers:</label>
+              <%= project_managers_link_list @project -%>
+            </p>
 
-        <p class="gatekeepers">
-          <label>Gatekeepers:</label>
-          <%= gatekeepers_link_list @project -%>
-        </p>
+            <p class="gatekeepers">
+              <label>Gatekeepers:</label>
+              <%= gatekeepers_link_list @project -%>
+            </p>
         <% end %>
 
 
