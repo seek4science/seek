@@ -72,14 +72,16 @@
   <div class="main_content_right_box_wider">
     <%= render :partial => "layouts/contribution_section_box_avatar", :locals => { :object => @project, :drag_id => drag_id } -%>
   </div>
-  <% if logged_in? and current_user.person.member? %>
-  <div style="clear:both;">
-      <b>Project Members(<%= link_to_function "show", visual_effect(:toggle_appear, "project_mailing_list")+"$('project_mailing_list').style.display=='none'? this.innerHTML='hide' : this.innerHTML='show';" %>):</b><br/><br/>
-      <div id="project_mailing_list" style="display: none;">
-        <%= project_mailing_list @project %>
-      </div>
-   </div>
+
+  <% if Seek::Config.is_virtualliver && logged_in_and_member? -%>
+      <div style="clear:both;">
+          <b>Project Members(<%= link_to_function "show", visual_effect(:toggle_appear, "project_mailing_list")+"$('project_mailing_list').style.display=='none'? this.innerHTML='hide' : this.innerHTML='show';" %>):</b><br/><br/>
+          <div id="project_mailing_list" style="display: none;">
+            <%= project_mailing_list @project %>
+          </div>
+       </div>
   <% end %>
+
   <div style="clear:both;">
     <p style="margin-top: 1em;">
       <b>About the project:</b>
