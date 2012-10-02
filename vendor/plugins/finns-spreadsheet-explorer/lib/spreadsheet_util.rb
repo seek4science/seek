@@ -8,23 +8,6 @@ module SpreadsheetUtil
   include SpreadsheetRepresentation
   include SysMODB::SpreadsheetExtractor
 
-  EXTRACTABLE_FILE_SIZE=1*1024*1024
-
-  #is excel and is smaller than 10Mb
-  def is_extractable_spreadsheet?
-    is_excel? && !content_blob.filesize.nil? && content_blob.filesize<=EXTRACTABLE_FILE_SIZE
-  end
-
-  def is_excel?
-    self.content_blob.content_type == "application/vnd.ms-excel" ||
-    self.content_blob.content_type == "application/vnd.excel" ||
-    self.content_blob.content_type == "application/excel" ||
-    self.content_blob.content_type == "application/x-msexcel" ||
-    self.content_blob.content_type == "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" ||
-    self.content_blob.content_type == "application/vnd.ms-excel.sheet.macroEnabled.12" ||
-    self.content_blob.content_type.try(:include?,"excel")
-  end
-
   def spreadsheet_annotations
     content_blob.worksheets.collect {|w| w.cell_ranges.collect {|c| c.annotations}}.flatten
   end
@@ -49,7 +32,7 @@ module SpreadsheetUtil
   #Return the data file's spreadsheet XML
   #If it doesn't exist yet, it gets created
   def spreadsheet_xml
-    if is_extractable_spreadsheet?
+    if content_blob.is_extractable_spreadsheet?
       Rails.cache.fetch("#{content_blob.cache_key}-ss-xml") do
         spreadsheet_to_xml(open(content_blob.filepath))
       end

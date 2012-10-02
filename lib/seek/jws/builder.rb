@@ -10,7 +10,6 @@ module Seek
 
     class Builder
 
-      include Seek::ModelTypeDetection
       include APIHandling
 
       def saved_dat_download_url savedfile
@@ -33,15 +32,15 @@ module Seek
         process_response_body(response.body)
       end
 
-      def builder_content model
-          filepath=model.content_blob.filepath
+      def builder_content content_blob
+          filepath=content_blob.filepath
 
           #this is necessary to get the correct filename and especially extension, which JWS relies on
-          tmpfile = Tempfile.new(model.original_filename)
+          tmpfile = Tempfile.new(content_blob.original_filename)
           FileUtils.cp(filepath, tmpfile.path)
 
-          if (is_sbml? model)
-            part=Multipart.new("upfile", filepath, model.original_filename)
+          if (content_blob.is_sbml?)
+            part=Multipart.new("upfile", filepath, content_blob.original_filename)
             response = part.post(upload_sbml_url)
             if response.code == "302"
               uri = URI.parse(URI.encode(response['location']))
@@ -56,8 +55,8 @@ module Seek
             else
               raise Exception.new("Expected a redirection from JWS Online but got #{response.code}, for url: #{upload_sbml_url}")
             end
-          elsif (is_dat? model)
-            response = RestClient.post(upload_dat_url, :uploadedDatFile=>tmpfile, :filename=>model.original_filename, :multipart=>true) { |response, request, result, &block |
+          elsif (content_blob.is_jws_dat?)
+            response = RestClient.post(upload_dat_url, :uploadedDatFile=>tmpfile, :filename=>content_blob.original_filename, :multipart=>true) { |response, request, result, &block |
             if [301, 302, 307].include? response.code
               response.follow_redirection(request, result, &block)
             else

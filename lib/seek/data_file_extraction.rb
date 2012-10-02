@@ -46,17 +46,11 @@ module Seek
         bio_samples.errors = "Error parsing spreadsheet: #{e.backtrace.join('<br/>')}"
         bio_samples
       end
-
-    end
-
-    #is an XLS Excel file rather than the newer XLSX format
-    def is_xls?
-      mime_extension(self.content_blob.content_type) == "xls"
     end
 
     #returns an array of all cell content within the workbook.
     def spreadsheet_contents_for_search obj=self
-      if obj.is_extractable_spreadsheet? && obj.content_blob.file_exists?
+      if obj.content_blob.is_extractable_spreadsheet?
         content = Rails.cache.fetch("#{obj.content_blob.cache_key}-ss-content-for-search") do
           begin
             xml=obj.spreadsheet_xml

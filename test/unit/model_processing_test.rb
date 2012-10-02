@@ -2,84 +2,77 @@ require 'test_helper'
 
 
 class ModelProcessingTest < ActiveSupport::TestCase
-  fixtures :all
   
   include Seek::ModelProcessing
 
-  def test_is_sbml
-    model = models(:teusink)
-    assert is_sbml?(model)
-    assert is_sbml?(model.latest_version)
-    assert !is_dat?(model)
-    assert is_sbml?(model.content_blob)
-    assert !is_dat?(model.content_blob)
+  def test_contains_sbml
+    model = Factory :teusink_model
+    assert contains_sbml?(model)
+    assert contains_sbml?(model.latest_version)
+    assert !contains_jws_dat?(model)
   end
 
-  def test_is_dat
-    model = models(:jws_model)
-    assert !is_sbml?(model)
-    assert is_dat?(model)
-    assert is_dat?(model.latest_version)
-    assert !is_sbml?(model.content_blob)
-    assert is_dat?(model.content_blob)
+  def test_contains_jws_dat
+    model = Factory :teusink_jws_model
+    assert !contains_sbml?(model)
+    assert contains_jws_dat?(model)
+    assert contains_jws_dat?(model.latest_version)
   end
 
-  test "is supported no longer relies on extension" do
-    model=models(:teusink)
+  test "contains no longer relies on extension" do
+    model=Factory :teusink_model
     model.original_filename = "teusink.txt"
-    model.content_blob.dump_data_to_file
-    assert model.is_sbml?
-    assert !model.is_dat?
+    model.content_blobs.first.dump_data_to_file
+    assert model.contains_sbml?
+    assert !model.contains_jws_dat?
     assert model.is_jws_supported?
 
-    model=models(:jws_model)
+    model = Factory :teusink_jws_model
     model.original_filename = "jws.txt"
-    model.content_blob.dump_data_to_file
-    assert !model.is_sbml?
-    assert model.is_dat?
+    model.content_blobs.first.dump_data_to_file
+    assert !model.contains_sbml?
+    assert model.contains_jws_dat?
     assert model.is_jws_supported?
   end
 
   def test_is_jws_supported
-    model = models(:jws_model)
+    model = Factory :teusink_jws_model
     assert is_jws_supported?(model)
     assert is_jws_supported?(model.latest_version)
-    assert is_jws_supported?(model.content_blob)
 
-    model = models(:teusink)
+    model = Factory :teusink_jws_model
     assert is_jws_supported?(model)
-    assert is_jws_supported?(model.content_blob)
   end
 
   def test_extract_sbml_species
-    model = models(:teusink)
-    assert is_sbml?(model)
+    model = Factory :teusink_model
+    assert contains_sbml?(model)
     species = model.species
     assert species.include?("Glyc")
     assert !species.include?("KmPYKPEP")
     assert_equal 22,species.count
 
     #should be able to gracefully handle non sbml
-    model = models(:non_sbml_xml)
+    model = Factory :non_sbml_xml_model
     assert_equal [],model.species
   end
 
   def test_sbml_parameter_extraction
-    model = models(:teusink)
-    assert is_sbml?(model)
+    model = Factory :teusink_model
+    assert contains_sbml?(model)
     params = model.parameters_and_values
     assert !params.empty?
     assert params.keys.include?("KmPYKPEP")
     assert_equal "1306.45",params["VmPGK"]
 
     #should be able to gracefully handle non sbml
-    model = models(:non_sbml_xml)
+    model = Factory :non_sbml_xml_model
     assert_equal({},model.parameters_and_values)
   end
 
   def test_extract_jwsdat_species
-    model = models(:jws_model)
-    assert is_dat?(model)
+    model = Factory :teusink_jws_model
+    assert contains_jws_dat?(model)
     species = model.species
     assert species.include?("F16P")
     assert !species.include?("KmPYKPEP")
@@ -87,8 +80,8 @@ class ModelProcessingTest < ActiveSupport::TestCase
   end
 
   def test_jwsdat_parameter_extraction
-    model = models(:jws_model)
-    assert is_dat?(model)
+    model = Factory :teusink_jws_model
+    assert contains_jws_dat?(model)
     params = model.parameters_and_values
     assert !params.empty?
     assert_equal 97,params.keys.count

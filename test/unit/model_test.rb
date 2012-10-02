@@ -18,36 +18,41 @@ class ModelTest < ActiveSupport::TestCase
   end
 
   test "type detection" do
-    model = models(:teusink)
-    assert model.is_sbml?
+    model = Factory :teusink_model
+    assert model.contains_sbml?
     assert model.is_jws_supported?
-    assert !model.is_dat?
+    assert !model.contains_jws_dat?
 
-    model = models(:jws_model)
-    assert !model.is_sbml?
+    model = Factory :teusink_jws_model
+    assert !model.contains_sbml?
     assert model.is_jws_supported?
-    assert model.is_dat?
+    assert model.contains_jws_dat?
 
-    model = models(:non_sbml_xml)
-    assert !model.is_sbml?
+    model = Factory :non_sbml_xml_model
+    assert !model.contains_sbml?
     assert !model.is_jws_supported?
-    assert !model.is_dat?
+    assert !model.contains_jws_dat?
 
     #should also be able to handle versions
     model = models(:teusink).latest_version
-    assert model.is_sbml?
+    assert model.contains_sbml?
     assert model.is_jws_supported?
-    assert !model.is_dat?
+    assert !model.contains_jws_dat?
 
-    model = models(:jws_model).latest_version
-    assert !model.is_sbml?
+    model = Factory(:teusink_jws_model).latest_version
+    assert !model.contains_sbml?
     assert model.is_jws_supported?
-    assert model.is_dat?
+    assert model.contains_jws_dat?
 
-    model = models(:non_sbml_xml).latest_version
-    assert !model.is_sbml?
+    model = Factory(:teusink_model).latest_version
+    assert model.contains_sbml?
+    assert model.is_jws_supported?
+    assert !model.contains_jws_dat?
+
+    model = Factory(:non_sbml_xml_model).latest_version
+    assert !model.contains_sbml?
     assert !model.is_jws_supported?
-    assert !model.is_dat?
+    assert !model.contains_jws_dat?
   end
 
   test "assay association" do

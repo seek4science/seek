@@ -245,7 +245,7 @@ class DataFile < ActiveRecord::Base
   #RDF Generation, will eventually be refactored out into a separate module
 
   def to_rdf
-    if (is_extractable_spreadsheet? && is_xls?)
+    if (content_blob.is_extractable_spreadsheet? && content_blob.is_xls?)
       rdf = generate_rdf_graph(self)
     else
       rdf = RDF::Graph.new

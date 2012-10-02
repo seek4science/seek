@@ -5,6 +5,7 @@ require 'tmpdir'
 
 class ContentBlob < ActiveRecord::Base
 
+  include Seek::ContentTypeDetection
   include Seek::PdfExtraction
 
   belongs_to :asset, :polymorphic => true
