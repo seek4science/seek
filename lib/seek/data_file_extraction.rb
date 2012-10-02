@@ -1,7 +1,7 @@
 module Seek
   #A mixin for DataFiles to handle aspects of data file extraction
   module DataFileExtraction
-    include SpreadsheetUtil
+    include Seek::SpreadsheetUtil
     include Seek::MimeTypes
     include SysMODB::SpreadsheetExtractor
 

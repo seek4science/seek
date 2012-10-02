@@ -1,5 +1,5 @@
 module SpreadsheetHelper
   
-  include SpreadsheetUtil
+  include Seek::SpreadsheetUtil
 
 end  
