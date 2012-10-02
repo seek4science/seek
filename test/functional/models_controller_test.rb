@@ -10,14 +10,16 @@ class ModelsControllerTest < ActionController::TestCase
   
   def setup
     login_as(:model_owner)
-    @object=models(:teusink)
+    @object=Factory :model, :policy=>Factory(:public_policy)
+    @object.content_blobs = [Factory.create(:cronwright_model_content_blob, :asset => @object,:asset_version=>@object.version),
+                             Factory.create(:teusink_model_content_blob, :asset => @object,:asset_version=>@object.version)]
   end
   
   test "should get index" do
     get :index
     assert_response :success
     assert_not_nil assigns(:models)
-  end    
+  end
   
   test "should not create model with file url" do
     file_path=File.expand_path(__FILE__) #use the current file
