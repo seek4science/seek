@@ -41,14 +41,17 @@ class ModelsController < ApplicationController
       send_file tmp_file.path, :type=>"#{type}", :disposition=>'attachment',:filename=>xgmml_file
       tmp_file.close
   end
+
   def visualise
+    raise Exception.new("This model does not support Cytoscape") unless @display_model.contains_xgmml?
      # for xgmml file
      doc = find_xgmml_doc @display_model
      # convert " to \" and newline to \n
      #e.g.  "... <att type=\"string\" name=\"canonicalName\" value=\"CHEMBL178301\"/>\n ...  "
-    @graph = %Q("#{doc.root.to_s.gsub(/"/, '\"').gsub!("\n",'\n')}")
-    render :cytoscape_web,:layout => false
+     @graph = %Q("#{doc.root.to_s.gsub(/"/, '\"').gsub!("\n",'\n')}")
+     render :cytoscape_web,:layout => false
   end
+
   def send_image
     @model = Model.find params[:id]
     @display_model = @model.find_version params[:version]
@@ -647,8 +650,8 @@ class ModelsController < ApplicationController
    end
 
     def find_xgmml_doc model
-      xgmml_file = model.is_xgmml?
-      file = open(xgmml_file.filepath)
+      xgmml_content_blob = model.xgmml_content_blobs.first
+      file = open(xgmml_content_blob.filepath)
       doc = LibXML::XML::Parser.string(file.read).parse
       doc
     end
