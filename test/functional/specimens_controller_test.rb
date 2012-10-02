@@ -8,9 +8,12 @@ class SpecimensControllerTest < ActionController::TestCase
 
   def setup
     login_as :owner_of_fully_public_policy
+  end
+
+  def rest_api_test_object
     @object = Factory(:specimen, :contributor => User.current_user,
-            :title => "test1",
-            :policy => policies(:policy_for_viewable_data_file))
+                      :title => "test1",
+                      :policy => policies(:policy_for_viewable_data_file))
   end
 
   test "index xml validates with schema" do

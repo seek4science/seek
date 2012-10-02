@@ -13,8 +13,12 @@ class DataFilesControllerTest < ActionController::TestCase
 
   def setup
     login_as(:datafile_owner)
+  end
+
+  def rest_api_test_object
     @object=data_files(:picture)
     @object.tag_with "tag1,tag2"
+    @object
   end
   
   def test_title

@@ -9,6 +9,9 @@ class StudiesControllerTest < ActionController::TestCase
 
   def setup
     login_as Factory(:admin).user
+  end
+
+  def rest_api_test_object
     @object=Factory :study, :policy => Factory(:public_policy)
   end
 

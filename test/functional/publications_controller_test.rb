@@ -10,6 +10,9 @@ class PublicationsControllerTest < ActionController::TestCase
   def setup
     WebMock.allow_net_connect!
     login_as(:quentin)
+  end
+
+  def rest_api_test_object
     @object=publications(:taverna_paper_pubmed)
   end
   

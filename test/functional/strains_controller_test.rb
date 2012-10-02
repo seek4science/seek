@@ -8,6 +8,9 @@ class StrainsControllerTest < ActionController::TestCase
 
   def setup
     login_as :owner_of_fully_public_policy
+  end
+
+  def rest_api_test_object
     @object = Factory(:strain)
   end
 

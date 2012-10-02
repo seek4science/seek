@@ -6,6 +6,9 @@ class EventsControllerTest < ActionController::TestCase
 
   def setup
     login_as(:datafile_owner)
+  end
+
+  def rest_api_test_object
     @object=events(:event_with_no_files)
   end
 

@@ -9,8 +9,12 @@ class PresentationsControllerTest < ActionController::TestCase
     WebMock.allow_net_connect!
     login_as Factory(:user)
     User.current_user.person.set_default_subscriptions
+  end
+
+  def rest_api_test_object
     @object = Factory :presentation,:contributor=>User.current_user
     @object.tag_with "tag1"
+    @object
   end
 
   test "index" do

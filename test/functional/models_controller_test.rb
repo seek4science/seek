@@ -10,9 +10,13 @@ class ModelsControllerTest < ActionController::TestCase
   
   def setup
     login_as(:model_owner)
+  end
+
+  def rest_api_test_object
     @object=Factory :model, :policy=>Factory(:public_policy)
     @object.content_blobs = [Factory.create(:cronwright_model_content_blob, :asset => @object,:asset_version=>@object.version),
                              Factory.create(:teusink_model_content_blob, :asset => @object,:asset_version=>@object.version)]
+    @object
   end
   
   test "should get index" do

@@ -7,7 +7,8 @@ module RestTestCases
 
   SCHEMA_FILE_PATH = File.join(Rails.root, 'public', '2010', 'xml', 'rest', 'schema-v1.xsd')
   
-  def test_index_xml
+  def test_index_rest_api_xml
+    @object=rest_api_test_object
     get :index, :format=>"xml"
     assert_response :success
 
@@ -16,7 +17,7 @@ module RestTestCases
     validate_xml_against_schema(@response.body)
   end
 
-  def test_get_xml object=@object
+  def test_get_rest_api_xml object=rest_api_test_object
     get :show,:id=>object, :format=>"xml"
     perform_api_checks
   end
