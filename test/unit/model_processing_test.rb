@@ -5,45 +5,6 @@ class ModelProcessingTest < ActiveSupport::TestCase
   
   include Seek::ModelProcessing
 
-  def test_contains_sbml
-    model = Factory :teusink_model
-    assert contains_sbml?(model)
-    assert contains_sbml?(model.latest_version)
-    assert !contains_jws_dat?(model)
-  end
-
-  def test_contains_jws_dat
-    model = Factory :teusink_jws_model
-    assert !contains_sbml?(model)
-    assert contains_jws_dat?(model)
-    assert contains_jws_dat?(model.latest_version)
-  end
-
-  test "contains no longer relies on extension" do
-    model=Factory :teusink_model
-    model.original_filename = "teusink.txt"
-    model.content_blobs.first.dump_data_to_file
-    assert model.contains_sbml?
-    assert !model.contains_jws_dat?
-    assert model.is_jws_supported?
-
-    model = Factory :teusink_jws_model
-    model.original_filename = "jws.txt"
-    model.content_blobs.first.dump_data_to_file
-    assert !model.contains_sbml?
-    assert model.contains_jws_dat?
-    assert model.is_jws_supported?
-  end
-
-  def test_is_jws_supported
-    model = Factory :teusink_jws_model
-    assert is_jws_supported?(model)
-    assert is_jws_supported?(model.latest_version)
-
-    model = Factory :teusink_jws_model
-    assert is_jws_supported?(model)
-  end
-
   def test_extract_sbml_species
     model = Factory :teusink_model
     assert contains_sbml?(model)

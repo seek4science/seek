@@ -894,7 +894,7 @@ class ModelsControllerTest < ActionController::TestCase
     assert_select 'p.list_item_attribute', :text => /: another creator/, :count => 1
   end
 
-  test 'should show the other creators in -uploader and creators- box' do
+  test 'should show the other creators in uploader and creators box' do
     model=models(:teusink)
     model.other_creators = 'another creator'
     model.save

@@ -50,7 +50,7 @@ module ModelsHelper
   end
 
   def cytoscapeweb_supported? model
-      model.is_xgmml?
+      model.contains_xgmml?
   end
 
   def jws_annotator_hidden_fields params_hash

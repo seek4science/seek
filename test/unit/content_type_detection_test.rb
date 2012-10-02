@@ -54,6 +54,7 @@ class ContentTypeDetectionTest < ActiveSupport::TestCase
     assert !is_jws_dat?(blob)
     assert blob.is_sbml?
     assert !blob.is_jws_dat?
+    assert !blob.is_xgmml?
   end
 
   def test_is_jws_dat
@@ -62,6 +63,13 @@ class ContentTypeDetectionTest < ActiveSupport::TestCase
     assert is_jws_dat?(blob)
     assert !blob.is_sbml?
     assert blob.is_jws_dat?
+    assert !blob.is_xgmml?
+  end
+
+  def test_is_xgmml
+    blob = Factory :xgmml_content_blob
+    assert blob.is_xgmml?
+    assert !blob.is_sbml?
   end
 
   test "is supported no longer relies on extension" do

@@ -318,6 +318,12 @@ end
     end
   end
 
+  Factory.define(:xgmml_model,:parent=>:model) do |f|
+    f.after_create do |model|
+      model.content_blobs = [Factory.create(:xgmml_content_blob, :asset=>model,:asset_version=>model.version)]
+    end
+  end
+
   Factory.define(:teusink_jws_model,:parent=>:model) do |f|
     f.after_create do |model|
       model.content_blobs = [Factory.create(:teusink_jws_model_content_blob, :asset=>model,:asset_version=>model.version)]
@@ -503,7 +509,6 @@ end
     f.data  File.new("#{Rails.root}/test/fixtures/files/lihua_column_index_error.xlsx","rb").read
   end
 
-
   Factory.define(:cronwright_model_content_blob,:parent=>:content_blob) do |f|
     f.content_type "text/xml"
     f.original_filename "cronwright.xml"
@@ -519,6 +524,11 @@ end
   Factory.define(:teusink_jws_model_content_blob,:parent=>:content_blob) do |f|
     f.data  File.new("#{Rails.root}/test/fixtures/files/Teusink2010921171725.dat","rb").read
     f.original_filename "teusink.dat"
+  end
+
+  Factory.define(:xgmml_content_blob,:parent=>:content_blob) do |f|
+    f.data  File.new("#{Rails.root}/test/fixtures/files/cytoscape.xgmml","rb").read
+    f.original_filename "cytoscape.xgmml"
   end
 
   Factory.define(:non_sbml_xml_content_blob,:parent=>:content_blob) do |f|

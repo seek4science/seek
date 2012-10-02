@@ -5,6 +5,10 @@ module Seek
     include Seek::MimeTypes
     include SysMODB::SpreadsheetExtractor
 
+    def contains_extractable_spreadsheet?
+      content_blob.is_extractable_spreadsheet?
+    end
+
     #returns an instance of Seek::Treatment, populated according to the contents of the spreadsheet if it matches a known template
     def treatments
       begin

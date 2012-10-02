@@ -387,7 +387,7 @@ end
   end  
   
   def explore
-    if @display_data_file.is_extractable_spreadsheet?
+    if @display_data_file.contains_extractable_spreadsheet?
       #Generate Ruby spreadsheet model from XML
       @spreadsheet = @display_data_file.spreadsheet
 

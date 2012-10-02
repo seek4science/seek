@@ -88,13 +88,17 @@ class ModelsController < ApplicationController
   def builder
     saved_file=params[:saved_file]
     error=nil
+    supported=false
     begin
       if saved_file
         supported=true
         @params_hash,@attribution_annotations,@saved_file,@objects_hash,@error_keys = @@model_builder.saved_file_builder_content saved_file
       else
         supported = @display_model.is_jws_supported?
-        @params_hash,@attribution_annotations,@saved_file,@objects_hash,@error_keys = @@model_builder.builder_content @display_model if supported
+        if supported
+          content_blob = @display_model.jws_supported_content_blobs.first
+          @params_hash,@attribution_annotations,@saved_file,@objects_hash,@error_keys = @@model_builder.builder_content content_blob
+        end
       end
     rescue Exception=>e
       error=e
@@ -118,7 +122,11 @@ class ModelsController < ApplicationController
   def submit_to_jws
     following_action=params.delete("following_action")    
     error=nil
-    content_blob = @model.content_blob
+
+    #FIXME: currently we have to assume that a model with multiple files only contains 1 model file that would be executed on jws online, and only the first one is chosen
+    raise Exception.new("JWS Online is not supported for this model") unless @model.is_jws_supported?
+    content_blob = @model.jws_supported_content_blobs.first
+
     begin
       if following_action == "annotate"
         @params_hash,@attribution_annotations,@species_annotations,@reaction_annotations,@search_results,@cached_annotations,@saved_file,@error_keys = Seek::JWS::Annotator.new.annotate params
@@ -177,7 +185,7 @@ class ModelsController < ApplicationController
     error=nil
     begin
       if @display_model.is_jws_supported?
-        @modelname = Seek::JWS::Simulator.new.simulate(@display_model)
+        @modelname = Seek::JWS::Simulator.new.simulate(@display_model.jws_supported_content_blobs.first)
       end
     rescue Exception=>e
       Rails.logger.error("Problem simulating model on JWS Online #{e}")

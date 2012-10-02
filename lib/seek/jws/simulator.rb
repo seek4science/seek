@@ -7,12 +7,12 @@ module Seek
       SIMULATE_BASE_URL = "#{Seek::Config.jws_online_root}/webMathematica/UItester.jsp"
 
 
-      def simulate model
-        filepath=model.content_blob.filepath
-          #this is necessary to get the correct filename and especially extension, which JWS relies on
-        tmpfile = Tempfile.new(model.original_filename)
+      def simulate content_blob
+        filepath=content_blob.filepath
+        #this is necessary to get the correct filename and especially extension, which JWS relies on
+        tmpfile = Tempfile.new(content_blob.original_filename)
         FileUtils.cp(filepath, tmpfile.path)
-        response = RestClient.post(upload_url, :upfile=>tmpfile, :uploadModel=>true,:filename=>model.original_filename, :multipart=>true) { |response, request, result, &block |
+        response = RestClient.post(upload_url, :upfile=>tmpfile, :uploadModel=>true,:filename=>content_blob.original_filename, :multipart=>true) { |response, request, result, &block |
         if [301, 302, 307].include? response.code
           response.follow_redirection(request, result, &block)
         else

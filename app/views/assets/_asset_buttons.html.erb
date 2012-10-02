@@ -29,7 +29,7 @@
           <li>
           <%= image_tag_for_key('download', polymorphic_path(asset,:version=>version,:action=>:download), "Download #{human_name}", nil, "Download #{human_name}") -%>
           </li>
-          <% if asset.is_a?(DataFile) && display_asset.is_extractable_spreadsheet? %>
+          <% if asset.is_a?(DataFile) && display_asset.contains_extractable_spreadsheet? %>
               <li>
                 <%= image_tag_for_key('spreadsheet', polymorphic_path(asset, :version => version, :action => :explore), "Explore #{human_name}", nil, "Explore #{human_name}") -%>
               </li>
