@@ -283,6 +283,10 @@ end
     f.association :content_blob,:factory=>:xlsx_content_blob
   end
 
+  Factory.define(:small_test_spreadsheet_datafile,:parent=>:data_file) do |f|
+    f.association :content_blob, :factory=>:small_test_spreadsheet_content_blob
+  end
+
   #Model
   Factory.define(:model) do |f|
     f.sequence(:title) {|n| "A Model #{n}"}
@@ -488,10 +492,17 @@ end
     f.content_type "application/excel"
   end
 
+  Factory.define(:small_test_spreadsheet_content_blob,:parent=>:content_blob) do |f|
+    f.data  File.new("#{Rails.root}/test/fixtures/files/small-test-spreadsheet.xls","rb").read
+    f.content_type "application/excel"
+    f.original_filename "small-test-spreadsheet.xls"
+  end
+
   Factory.define(:xlsx_content_blob,:parent=>:content_blob) do |f|
     f.content_type "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
     f.data  File.new("#{Rails.root}/test/fixtures/files/lihua_column_index_error.xlsx","rb").read
   end
+
 
   Factory.define(:cronwright_model_content_blob,:parent=>:content_blob) do |f|
     f.content_type "text/xml"

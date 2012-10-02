@@ -15,7 +15,7 @@ module SpreadsheetUtil
   #Return the data file's spreadsheet
   #If it doesn't exist yet, it gets created
   def spreadsheet
-    if is_extractable_spreadsheet?
+    if content_blob.is_extractable_spreadsheet?
       workbook = parse_spreadsheet_xml(spreadsheet_xml)
       if content_blob.worksheets.empty?
         workbook.sheets.each_with_index do |sheet, sheet_number|

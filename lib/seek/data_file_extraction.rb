@@ -8,7 +8,7 @@ module Seek
     #returns an instance of Seek::Treatment, populated according to the contents of the spreadsheet if it matches a known template
     def treatments
       begin
-        if is_extractable_spreadsheet?
+        if content_blob.is_extractable_spreadsheet?
 	        xml = spreadsheet_xml
           Seek::Treatments.new xml
         else
@@ -16,13 +16,14 @@ module Seek
         end
       rescue Exception=>e
         Rails.logger.error("Error reading spreadsheet #{e.message}")
+        raise(e) if Rails.env=="test"
         Seek::Treatments.new
       end
     end
 
     def bio_samples_population institution_id=nil, to_populate=true
       begin
-        if is_extractable_spreadsheet?
+        if content_blob.is_extractable_spreadsheet?
 
           bio_samples = nil
 
@@ -42,6 +43,7 @@ module Seek
         end
       rescue Exception => e
         Rails.logger.error("Error parsing spreadsheet #{e.message}")
+        raise(e) if Rails.env=="test"
         bio_samples = Seek::BioSamples.new self
         bio_samples.errors = "Error parsing spreadsheet: #{e.backtrace.join('<br/>')}"
         bio_samples
