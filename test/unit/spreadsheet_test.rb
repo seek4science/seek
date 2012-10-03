@@ -2,7 +2,7 @@ require 'test_helper'
 
 class SpreadsheetTest < ActiveSupport::TestCase
 
-  include Seek::SpreadsheetUtil
+  include Seek::Data::SpreadsheetExplorerRepresentation
 
   test "spreadsheets are spreadsheets" do
     datafile = Factory :small_test_spreadsheet_datafile

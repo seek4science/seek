@@ -5,7 +5,6 @@ class DataFilesController < ApplicationController
 
   include IndexPager
   include SysMODB::SpreadsheetExtractor
-  include Seek::SpreadsheetUtil
   include MimeTypesHelper
   include DotGenerator
   include Seek::AssetsCommon

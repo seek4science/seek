@@ -1,5 +1,5 @@
 module SpreadsheetHelper
   
-  include Seek::SpreadsheetUtil
+  include Seek::Data::SpreadsheetExplorerRepresentation
 
 end  
