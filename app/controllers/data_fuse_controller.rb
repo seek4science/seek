@@ -5,7 +5,7 @@ require 'open-uri'
 
 class DataFuseController < ApplicationController
   include Seek::MimeTypes
-  include Seek::ModelProcessing
+  include Seek::Models::ModelExtraction
   include SysMODB::SpreadsheetExtractor
   include Seek::JWS::DataFuse
   

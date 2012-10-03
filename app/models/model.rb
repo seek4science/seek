@@ -19,7 +19,7 @@ class Model < ActiveRecord::Base
   acts_as_asset
   acts_as_trashable
 
-  include Seek::ModelProcessing
+  include Seek::Models::ModelExtraction
 
   validates_presence_of :title
 
@@ -42,7 +42,7 @@ class Model < ActiveRecord::Base
 
 
   explicit_versioning(:version_column => "version") do
-    include Seek::ModelProcessing
+    include Seek::Models::ModelExtraction
     acts_as_versioned_resource
 
     belongs_to :model_image

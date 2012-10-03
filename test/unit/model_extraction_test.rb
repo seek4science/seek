@@ -1,9 +1,9 @@
 require 'test_helper'
 
 
-class ModelProcessingTest < ActiveSupport::TestCase
+class ModelExtractionTest < ActiveSupport::TestCase
   
-  include Seek::ModelProcessing
+  include Seek::Models::ModelExtraction
 
   def test_extract_sbml_species
     model = Factory :teusink_model
