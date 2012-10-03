@@ -91,7 +91,7 @@ class DataFuseController < ApplicationController
     #FIXME: temporary way of making sure it isn't exploited to get at data. Should never get here if used through the UI
     raise Exception.new("Unauthorized") unless @model.can_download?
 
-    Seek::CSVHandler.resolve_model_parameter_keys parameter_keys,csv
+    resolve_model_parameter_keys parameter_keys,csv
     
   end
 
@@ -146,6 +146,42 @@ class DataFuseController < ApplicationController
     respond_to do |format|
       format.html
     end
+  end
+
+  def resolve_model_parameter_keys parameter_keys, csv
+
+    matching_columns = {}
+    matched_keys = []
+    matching_csv = []
+
+    FasterCSV.parse(csv).each do |row|
+      matched_row = []
+      row.each_with_index do |v, i|
+        if matching_columns[i]
+          matched_row << v
+        end
+        k = matching_key? parameter_keys, v
+        if k
+          matched_row << k
+          matching_columns[i]=k
+          matched_keys << k
+        end
+      end
+      matching_csv << matched_row unless matched_row.empty?
+    end
+
+    result = FasterCSV.generate do |out|
+      matching_csv.each do |row|
+        out << row
+      end
+    end
+
+    return result, matched_keys
+
+  end
+
+  def matching_key? parameter_keys, v
+    v if parameter_keys.include?(v)
   end
 
 end
