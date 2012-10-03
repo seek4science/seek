@@ -11,14 +11,14 @@ module Seek
         begin
           if content_blob.is_extractable_spreadsheet?
             xml = spreadsheet_xml
-            Seek::Treatments.new xml
+            Seek::Data::Treatments.new xml
           else
-            Seek::Treatments.new
+            Seek::Data::Treatments.new
           end
         rescue Exception => e
           Rails.logger.error("Error reading spreadsheet #{e.message}")
           raise(e) if Rails.env=="test"
-          Seek::Treatments.new
+          Seek::Data::Treatments.new
         end
       end
     end

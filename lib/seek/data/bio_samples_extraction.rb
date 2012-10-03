@@ -11,9 +11,9 @@ module Seek
 
               ActiveRecord::Base.transaction do
                 begin
-                  bio_samples = Seek::BioSamples.new self, spreadsheet_xml, to_populate, institution_id
+                  bio_samples = Seek::Data::BioSamples.new self, spreadsheet_xml, to_populate, institution_id
                 rescue  Exception => e
-                  bio_samples = Seek::BioSamples.new self
+                  bio_samples = Seek::Data::BioSamples.new self
                   bio_samples.errors = "Error parsing spreadsheet: #{e.message}"
                   #Rails.logger.error bio_samples.errors
                   raise ActiveRecord::Rollback
@@ -26,7 +26,7 @@ module Seek
           rescue Exception => e
             Rails.logger.error("Error parsing spreadsheet #{e.message}")
             raise(e) if Rails.env=="test"
-            bio_samples = Seek::BioSamples.new self
+            bio_samples = Seek::Data::BioSamples.new self
             bio_samples.errors = "Error parsing spreadsheet: #{e.backtrace.join('<br/>')}"
             bio_samples
           end
