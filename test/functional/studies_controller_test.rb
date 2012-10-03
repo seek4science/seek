@@ -38,7 +38,8 @@ class StudiesControllerTest < ActionController::TestCase
   end
 
   test "should get show" do
-    get :show, :id=>@object
+    study = Factory(:study, :policy => Factory(:public_policy))
+    get :show, :id=>study.id
     assert_response :success
     assert_not_nil assigns(:study)
   end

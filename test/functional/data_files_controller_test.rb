@@ -68,7 +68,7 @@ class DataFilesControllerTest < ActionController::TestCase
     df = Factory(:data_file,:policy=>Factory(:public_policy, :access_type=>Policy::VISIBLE))
     Factory :tag,:annotatable=>df,:source=>p,:value=>"golf"
 
-    test_get_xml df
+    test_get_rest_api_xml df
 
   end
 
@@ -80,7 +80,7 @@ class DataFilesControllerTest < ActionController::TestCase
       Factory :tag,:annotatable=>df,:source=>p,:value=>"frog",:attribute_name=>"tool"
       Factory :tag,:annotatable=>df,:source=>p,:value=>"stuff",:attribute_name=>"expertise"
 
-      test_get_xml df
+      test_get_rest_api_xml df
 
       assert_response :success
       xml = @response.body

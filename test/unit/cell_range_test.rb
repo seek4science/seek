@@ -2,7 +2,7 @@ require 'test_helper'
 
 class CellRangeTest < ActiveSupport::TestCase
   fixtures :all
-  include SpreadsheetUtil
+  include Seek::SpreadsheetUtil
 
   test "create cell range" do
       cell = CellRange.new(:worksheet => worksheets(:worksheet_1),:cell_range => "A1:B3")

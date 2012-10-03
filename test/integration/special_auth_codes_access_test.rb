@@ -23,11 +23,11 @@ class SpecialAuthCodesAccessTest < ActionController::IntegrationTest
 
       code = CGI::escape(item.special_auth_codes.first.code)
       get "/#{type_name}/show/#{item.id}?code=#{code}"
-      assert_response :success
+      assert_response :success, "failed for asset #{type_name}"
 
       if item.is_downloadable?
         get "/#{type_name}/download/#{item.id}?code=#{code}"
-        assert_response :success
+        assert_response :success, "failed for asset #{type_name}"
       end
     end
   end

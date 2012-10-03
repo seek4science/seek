@@ -27,7 +27,7 @@ class PeopleControllerTest < ActionController::TestCase
     Factory :expertise,:value=>"fishing",:annotatable=>p
     Factory :tool,:value=>"fishing rod",:annotatable=>p
 
-    test_get_xml p
+    test_get_rest_api_xml p
 
     doc = LibXML::XML::Document.string(@response.body)
     doc.root.namespaces.default_prefix="s"
