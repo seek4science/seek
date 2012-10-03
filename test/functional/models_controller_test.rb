@@ -43,6 +43,17 @@ class ModelsControllerTest < ActionController::TestCase
     assert_equal "3024",@response.header['Content-Length']
   end
 
+  test "should download model with a single file" do
+    model = Factory :model, :title=>"this_model", :policy=>Factory(:public_policy), :contributor=>User.current_user
+    assert_difference("ActivityLog.count") do
+      get :download, :id=>model.id
+    end
+    assert_response :success
+    assert_equal "attachment; filename=\"cronwright.xml\"",@response.header['Content-Disposition']
+    assert_equal "text/xml",@response.header['Content-Type']
+    assert_equal "5933",@response.header['Content-Length']
+  end
+
   test "should not create model with file url" do
     file_path=File.expand_path(__FILE__) #use the current file
     file_url="file://"+file_path

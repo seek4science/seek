@@ -568,9 +568,12 @@ class DataFilesControllerTest < ActionController::TestCase
   
   test "should download" do
     assert_difference('ActivityLog.count') do
-      get :download, :id => data_files(:viewable_data_file)
+      get :download, :id => Factory(:small_test_spreadsheet_datafile,:policy=>Factory(:public_policy), :contributor=>User.current_user).id
     end
     assert_response :success
+    assert_equal "attachment; filename=\"small-test-spreadsheet.xls\"",@response.header['Content-Disposition']
+    assert_equal "application/excel",@response.header['Content-Type']
+    assert_equal "7168",@response.header['Content-Length']
   end
   
   test "should download from url" do

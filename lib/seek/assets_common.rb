@@ -107,12 +107,12 @@ module Seek
       resource_type = asset.class.name.split("::")[0] #need to handle versions, e.g. Sop::Version
       begin
         data_hash = downloader.get_remote_data asset.content_blob.url,project.site_username,project.site_password, resource_type
-        send_file data_hash[:data_tmp_path], :filename => data_hash[:filename] || asset.original_filename, :content_type => data_hash[:content_type] || asset.content_type, :disposition => 'attachment'
+        send_file data_hash[:data_tmp_path], :filename => data_hash[:filename] || asset.original_filename, :type => data_hash[:content_type] || asset.content_type, :disposition => 'attachment'
       rescue Seek::DownloadException=>de
         #FIXME: use proper logging
         puts "Unable to fetch from remote: #{de.message}"
         if asset.content_blob.file_exists?
-          send_file asset.content_blob.filepath, :filename => asset.original_filename, :content_type => asset.content_type, :disposition => 'attachment'
+          send_file asset.content_blob.filepath, :filename => asset.original_filename, :type => asset.content_type, :disposition => 'attachment'
         else
           raise de
         end
@@ -129,7 +129,7 @@ module Seek
       else
         downloader=RemoteDownloader.new
         data_hash = downloader.get_remote_data asset.content_blob.url
-        send_file data_hash[:data_tmp_path], :filename => data_hash[:filename] || asset.original_filename, :content_type => data_hash[:content_type] || asset.content_type, :disposition => 'attachment'              
+        send_file data_hash[:data_tmp_path], :filename => data_hash[:filename] || asset.original_filename, :type => data_hash[:content_type] || asset.content_type, :disposition => 'attachment'
       end      
     end
     
@@ -228,9 +228,10 @@ module Seek
     end  
     
     def handle_download asset
-      if asset.content_blob.url.blank?
-        if asset.content_blob.file_exists?
-          send_file asset.content_blob.filepath, :filename => asset.original_filename, :content_type => asset.content_type, :disposition => 'attachment'
+      content_blob = asset.respond_to?(:content_blobs) ? asset.content_blobs.first : asset.content_blob
+      if content_blob.url.blank?
+        if content_blob.file_exists?
+          send_file content_blob.filepath, :filename => content_blob.original_filename, :type => content_blob.content_type, :disposition => 'attachment'
         else
           redirect_on_error asset,"Unable to find a copy of the file for download, or an alternative location. Please contact an administrator of #{Seek::Config.application_name}."
         end      
@@ -239,8 +240,8 @@ module Seek
           if asset.contributor.nil? #A jerm generated resource
             download_jerm_asset asset
           else
-            if asset.content_blob.file_exists?
-              send_file asset.content_blob.filepath, :filename => asset.original_filename, :content_type => asset.content_type, :disposition => 'attachment'
+            if content_blob.file_exists?
+              send_file content_blob.filepath, :filename => content_blob.original_filename, :type => content_blob.content_type, :disposition => 'attachment'
             else
               download_via_url asset
             end
@@ -311,11 +312,11 @@ module Seek
       dat_filepath = content_blob.filepath
       pdf_filepath = content_blob.filepath('pdf')
       if display_asset.content_blob.is_pdf?
-          send_file dat_filepath, :filename => content_blob.original_filename, :content_type => content_blob.content_type, :disposition => 'attachment'
+          send_file dat_filepath, :filename => content_blob.original_filename, :type => content_blob.content_type, :disposition => 'attachment'
       else
         content_blob.convert_to_pdf
         if File.exists?(pdf_filepath)
-          send_file pdf_filepath, :filename => content_blob.original_filename, :content_type => content_blob.content_type, :disposition => 'attachment'
+          send_file pdf_filepath, :filename => content_blob.original_filename, :type => content_blob.content_type, :disposition => 'attachment'
         else
           render :text => ''
         end
