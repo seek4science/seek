@@ -2,7 +2,7 @@ require 'test_helper'
 
 class ModelTypeHandlingTest < ActiveSupport::TestCase
 
-  include Seek::ModelTypeHandling
+  include Seek::Data::ModelTypeHandling
 
   def test_contains_xgmml
     model = Factory :xgmml_model

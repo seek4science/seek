@@ -3,7 +3,7 @@ require 'libxml'
 module Seek
   module Models
     module ModelExtraction
-      include ModelTypeHandling
+      include Seek::Data::ModelTypeHandling
 
 
       #return a hash of parameters names as a key, along with their values, extracted from SBML
