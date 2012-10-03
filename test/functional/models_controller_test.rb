@@ -13,10 +13,7 @@ class ModelsControllerTest < ActionController::TestCase
   end
 
   def rest_api_test_object
-    @object=Factory :model, :policy=>Factory(:public_policy)
-    @object.content_blobs = [Factory.create(:cronwright_model_content_blob, :asset => @object,:asset_version=>@object.version),
-                             Factory.create(:teusink_model_content_blob, :asset => @object,:asset_version=>@object.version)]
-    @object
+    @object=Factory :model_2_files, :contributor=>User.current_user
   end
   
   test "should get index" do
@@ -24,7 +21,28 @@ class ModelsControllerTest < ActionController::TestCase
     assert_response :success
     assert_not_nil assigns(:models)
   end
-  
+
+  test "should not download private" do
+    model = Factory :model_2_files, :policy=>Factory(:private_policy)
+    assert !model.can_download?(User.current_user)
+    assert_no_difference("ActivityLog.count") do
+      get :download,:id=>model.id
+    end
+    assert_redirected_to model_path(model)
+    assert_not_nil flash[:error]
+  end
+
+  test "should download" do
+    model = Factory :model_2_files, :title=>"this_model", :policy=>Factory(:public_policy), :contributor=>User.current_user
+    assert_difference("ActivityLog.count") do
+      get :download, :id=>model.id
+    end
+    assert_response :success
+    assert_equal "attachment; filename=\"this_model.zip\"",@response.header['Content-Disposition']
+    assert_equal "application/zip",@response.header['Content-Type']
+    assert_equal "3024",@response.header['Content-Length']
+  end
+
   test "should not create model with file url" do
     file_path=File.expand_path(__FILE__) #use the current file
     file_url="file://"+file_path
