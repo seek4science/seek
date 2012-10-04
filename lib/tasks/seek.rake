@@ -19,34 +19,6 @@ namespace :seek do
     end
   end
 
-  desc 'Images for model: moving id_image data to model_image'
-  #This should be run before removing the id_image in models.
-  #Before id_image was used which was the id of one content blob,
-  #but now model_image(acts like avatar) is used instead.
-  #what should be done is: create model_image according to the corresponding content_blob, and then copy the file to ModelImage.IMAGE_STORAGE_PATH(/filestore/model_images)
-  task(:update_id_image_to_model_image=>:environment) do
-    if Model::Version.first.respond_to? :id_image
-      Model::Version.all.select(&:id_image).each do |mv|
-        content_blob = ContentBlob.find mv.id_image
-        model = Model.find mv.model_id
-        file = ModPorter::UploadedFile.new :path=>content_blob.filepath, :filename=>content_blob.original_filename, :content_type=>content_blob.content_type
-        model_image = ModelImage.new "image_file" => file
-        model_image.model_id = mv.model_id
-        model_image.original_content_type = content_blob.content_type
-        model_image.original_filename = content_blob.original_filename
-
-        model.model_image = model_image
-
-        disable_authorization_checks {
-          model_image.save!
-          model.save!
-          content_blob.destroy
-        }
-      end
-
-    end
-
-  end
   desc 'updates the md5sum, and makes a local cache, for existing remote assets'
   task(:cache_remote_content_blobs=>:environment) do
     resources = Sop.find(:all)
@@ -58,8 +30,6 @@ namespace :seek do
       res.cache_remote_content_blob
     end
   end
-
-
 
   desc "Create rebranded default help documents"
   task :rebrand_help_docs => :environment do

@@ -213,12 +213,15 @@ class ModelsControllerTest < ActionController::TestCase
   test "should create model with image" do
       login_as(:model_owner)
       assert_difference('Model.count') do
+        #assert_difference('ModelImage.count') do
           post :create, :model => valid_model,:content_blob=>{:file_0=>fixture_file_upload('files/little_file.txt',Mime::TEXT)}, :sharing=>valid_sharing, :model_image => {:image_file => fixture_file_upload('files/file_picture.png', 'image/png')}
+        #end
       end
 
       model = assigns(:model)
       assert_redirected_to model_path(model)
       assert_equal "file_picture.png", model.model_image.original_filename
+      assert_equal "image/png", model.model_image.content_type
   end
 
   test "should create model with image and without content_blob" do
