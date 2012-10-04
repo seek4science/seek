@@ -80,7 +80,7 @@
     jQuery.noConflict();
     var $j = jQuery;
     $j(document).ready(function () {
-        creatable_selection_table = $j('#creatable_selection_table').dataTable({
+        creatable_table = $j('#creatable_selection_table').dataTable({
             "bPaginate":false,
             "bLengthChange":false,
             "bFilter":false,
@@ -94,11 +94,20 @@
             ]
         });
         $j('#creatable_selection_table tbody tr').click(function () {
-            var data = creatable_selection_table.fnGetData(this);
+            var data = creatable_table.fnGetData(this);
             $j('#new_resource_type')[0].value = data[1];
             $j('#new_asset_button')[0].disabled=true;
             newAsset();
         });
+$j(document).click(function(e) {
+           $j('#creatable_selection_list')[0].style.display = 'none';
+         });
+         $j('#new_asset_button').click(function(e) {
+            e.stopPropagation();
+         });
+         $j('#creatable_selection_table').click(function(e) {
+            e.stopPropagation();
+});
     });
 
     function new_creatable_selection() {
