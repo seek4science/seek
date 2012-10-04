@@ -82,7 +82,7 @@
     jQuery.noConflict();
     var $j = jQuery;
     $j(document).ready(function () {
-        my_project_selection_table = $j('#my_project_selection_table').dataTable({
+        my_project_table = $j('#my_project_selection_table').dataTable({
             "bPaginate":false,
             "bLengthChange":false,
             "bFilter":false,
@@ -96,14 +96,14 @@
             ]
         });
         $j('#my_project_selection_table tbody tr').click(function () {
-            var data = my_project_selection_table.fnGetData(this);
+            var data = my_project_table.fnGetData(this);
             $j('#my_project_button')[0].disabled = true;
             location.href = '<%= projects_path%>' + '/' + data[1];
         });
     });
 
     function my_project_selection() {
-        var data = my_project_selection_table.fnGetData();
+        var data = my_project_table.fnGetData();
         /*go directly to the project if the user is the member of one project*/
         if (data.length == 1) {
             location.href = '<%= projects_path%>' + '/' + data[0][1];
