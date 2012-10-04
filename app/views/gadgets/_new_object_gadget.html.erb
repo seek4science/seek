@@ -98,12 +98,6 @@
             $j('#new_asset_button')[0].disabled=true;
             newAsset();
         });
-        $j(document).click(function(e) {
-           $j('#creatable_selection_list')[0].style.display = 'none';
-        });
-        $j('#new_asset_button').click(function(e) {
-           e.stopPropagation();
-        });
     });
 
     function new_creatable_selection() {
