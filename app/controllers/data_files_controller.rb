@@ -5,7 +5,6 @@ class DataFilesController < ApplicationController
 
   include IndexPager
   include SysMODB::SpreadsheetExtractor
-  include SpreadsheetUtil
   include MimeTypesHelper
   include DotGenerator
   include Seek::AssetsCommon
@@ -347,7 +346,7 @@ end
     sheet = params[:sheet] || 1
     trim = params[:trim]
     trim ||= false
-    if ["xls","xlsx"].include?(mime_extension(@data_file.content_type))
+    if ["xls","xlsx"].include?(mime_extension(@data_file.content_blob.content_type))
 
       respond_to do |format|
         format.html #currently complains about a missing template, but we don't want people using this for now - its purely XML
@@ -387,7 +386,7 @@ end
   end  
   
   def explore
-    if @display_data_file.is_extractable_spreadsheet?
+    if @display_data_file.contains_extractable_spreadsheet?
       #Generate Ruby spreadsheet model from XML
       @spreadsheet = @display_data_file.spreadsheet
 

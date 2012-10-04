@@ -10,9 +10,12 @@ class SamplesControllerTest < ActionController::TestCase
 
   def setup
     login_as Factory(:user,:person => Factory(:person,:roles_mask=> 0))
+  end
+
+  def rest_api_test_object
     @object = Factory(:sample,:contributor => User.current_user,
-            :title=> "test1",
-            :policy => policies(:policy_for_viewable_data_file))
+                      :title=> "test1",
+                      :policy => policies(:policy_for_viewable_data_file))
   end
 
   test "index xml validates with schema" do

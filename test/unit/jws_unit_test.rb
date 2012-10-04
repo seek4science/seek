@@ -1,7 +1,6 @@
 require 'test_helper'
 
 class JwsUnitTest < ActiveSupport::TestCase
-  fixtures :all
 
   def setup
     WebMock.allow_net_connect!
@@ -9,15 +8,15 @@ class JwsUnitTest < ActiveSupport::TestCase
   end
 
   test "jws online response handled when errors present" do
-    model=models(:invalid_sbml_xml)
-    params_hash,attributions,saved_file,objects_hash,error_keys = @builder.builder_content model.versions.first
+    blob=Factory :invalid_sbml_content_blob
+    params_hash,attributions,saved_file,objects_hash,error_keys = @builder.builder_content blob
     assert !error_keys.empty?
     assert error_keys.include?("parameters")
   end if Seek::Config.jws_enabled
 
   test "jws online response with valid SBML model" do
-    model=Factory :teusink_model
-    params_hash,attributions,saved_file,objects_hash,error_keys = @builder.builder_content model.versions.first
+    blob=Factory :teusink_model_content_blob
+    params_hash,attributions,saved_file,objects_hash,error_keys = @builder.builder_content blob
     assert error_keys.empty?
     assert !params_hash.empty?
     assert objects_hash.empty?
@@ -27,8 +26,8 @@ class JwsUnitTest < ActiveSupport::TestCase
   end if Seek::Config.jws_enabled
 
   test "jws online response with valid JWS Dat model" do
-    model=Factory :teusink_jws_model
-    params_hash,attributions,saved_file,objects_hash,error_keys = @builder.builder_content model.versions.first
+    blob=Factory :teusink_jws_model_content_blob
+    params_hash,attributions,saved_file,objects_hash,error_keys = @builder.builder_content blob
     assert error_keys.empty?
     assert !params_hash.empty?
     assert objects_hash.empty?

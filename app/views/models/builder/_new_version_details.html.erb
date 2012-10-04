@@ -13,7 +13,8 @@
         <p>
             Preferred filename:
             <br/>
-            <input type="textbox" id="new_version_filename_rb" name="new_version_filename_rb" value='<%= @display_model.original_filename -%>' style="width:100%"/>            
+          <%# FIXME: relies on there being only 1 content blob -%>
+            <input type="textbox" id="new_version_filename_rb" name="new_version_filename_rb" value='<%= @display_model.jws_supported_content_blobs.first.original_filename -%>' style="width:100%"/>
         </p>
         <p style="text-align:right;">
         	<input type="button" value="Cancel" style="width: 100px;" onclick="javascript: RedBox.close(); return(false);"/>

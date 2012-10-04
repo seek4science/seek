@@ -293,6 +293,7 @@ non_sbml_xml_blob:
   asset_version: 1
   original_filename: non_sbml_xml.xml
   content_type: text/xml
+
 invalid_sbml_xml_blob:  
   uuid: <%= init_blob('invalid_sbml_xml.xml') %>    
   asset: invalid_sbml_xml  (Model)

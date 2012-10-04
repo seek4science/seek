@@ -19,7 +19,7 @@ class Model < ActiveRecord::Base
   acts_as_asset
   acts_as_trashable
 
-  include Seek::ModelProcessing
+  include Seek::Models::ModelExtraction
 
   validates_presence_of :title
 
@@ -42,7 +42,7 @@ class Model < ActiveRecord::Base
 
 
   explicit_versioning(:version_column => "version") do
-    include Seek::ModelProcessing
+    include Seek::Models::ModelExtraction
     acts_as_versioned_resource
 
     belongs_to :model_image
@@ -55,16 +55,6 @@ class Model < ActiveRecord::Base
       ContentBlob.find(:all, :conditions => ["asset_id =? and asset_type =? and asset_version =?", self.parent.id, self.parent.class.name, self.version])
     end
 
-    def content_blob
-      result = Class.new.extend(Seek::ModelTypeDetection).is_jws_supported? self
-      result.nil?? content_blobs.first : result
-    end
-  end
-
-  def content_blob
-    # return the first content blob which is jws supported (is_dat? or is_sbml?)
-      result = Class.new.extend(Seek::ModelTypeDetection).is_jws_supported? self
-      result.nil?? content_blobs.first : result
   end
 
   # get a list of Models with their original uploaders - for autocomplete fields

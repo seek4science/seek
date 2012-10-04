@@ -7,7 +7,7 @@ class TreatmentsTest < ActiveSupport::TestCase
   test "extract normal case" do
     xml = xml_for_file("treatments-normal-case.xls")
     assert xml.include?("workbook")
-    treatment = Seek::Treatments.new xml
+    treatment = Seek::Data::Treatments.new xml
 
     assert_equal 2,treatment.values.keys.count
     assert_equal ["Dilution_rate","pH"],treatment.values.keys.sort
@@ -25,7 +25,7 @@ class TreatmentsTest < ActiveSupport::TestCase
   test "extract when blanks in sheet" do
     xml = xml_for_file("treatments-with-blanks.xls")
     assert xml.include?("workbook")
-    treatment = Seek::Treatments.new xml
+    treatment = Seek::Data::Treatments.new xml
 
     assert_equal 2,treatment.values.keys.count
     assert_equal ["Dilution_rate","pH"],treatment.values.keys.sort
@@ -42,7 +42,7 @@ class TreatmentsTest < ActiveSupport::TestCase
   test "extract samples from different column" do
     xml = xml_for_file("treatments-with-samples-different-column.xls")
     assert xml.include?("workbook")
-    treatment = Seek::Treatments.new xml
+    treatment = Seek::Data::Treatments.new xml
 
     assert_equal 2,treatment.values.keys.count
     assert_equal ["Dilution_rate","pH"],treatment.values.keys.sort
@@ -59,7 +59,7 @@ class TreatmentsTest < ActiveSupport::TestCase
   test "extract when no sample names" do
     xml = xml_for_file("treatments-with-no-sample-names.xls")
     assert xml.include?("workbook")
-    treatment = Seek::Treatments.new xml
+    treatment = Seek::Data::Treatments.new xml
 
     assert_equal 2,treatment.values.keys.count
     assert_equal ["Dilution_rate","pH"],treatment.values.keys.sort
@@ -76,7 +76,7 @@ class TreatmentsTest < ActiveSupport::TestCase
   test "extract when treatment not in first row" do
     xml = xml_for_file("treatments-not-in-first-row.xls")
     assert xml.include?("workbook")
-    treatment = Seek::Treatments.new xml
+    treatment = Seek::Data::Treatments.new xml
 
     assert_equal 2,treatment.values.keys.count
     assert_equal ["Dilution_rate","pH"],treatment.values.keys.sort
@@ -97,7 +97,7 @@ class TreatmentsTest < ActiveSupport::TestCase
   test "extract from misnamed sample sheet" do
     xml = xml_for_file("treatments-mis-named-sample-sheet.xls")
     assert xml.include?("workbook")
-    treatment = Seek::Treatments.new xml
+    treatment = Seek::Data::Treatments.new xml
 
     assert_equal 2,treatment.values.keys.count
     assert_equal ["Dilution_rate","pH"],treatment.values.keys.sort
@@ -118,7 +118,7 @@ class TreatmentsTest < ActiveSupport::TestCase
   test "extract treatments last columns" do
     xml = xml_for_file("treatments-last-column.xls")
     assert xml.include?("workbook")
-    treatment = Seek::Treatments.new xml
+    treatment = Seek::Data::Treatments.new xml
 
     assert_equal 2,treatment.values.keys.count
     assert_equal ["Dilution_rate","pH"],treatment.values.keys.sort
@@ -139,7 +139,7 @@ class TreatmentsTest < ActiveSupport::TestCase
   test "extract additional treatment columns" do
     xml = xml_for_file("treatments-extra-column.xls")
     assert xml.include?("workbook")
-    treatment = Seek::Treatments.new xml
+    treatment = Seek::Data::Treatments.new xml
 
     assert_equal 3,treatment.values.keys.count
     assert_equal ["Buffer","Dilution_rate","pH"],treatment.values.keys.sort
@@ -164,7 +164,7 @@ class TreatmentsTest < ActiveSupport::TestCase
   test "extract from katys populated problematic file" do
     xml = xml_for_file("JERM_2DGel_SEEKJERM_edited.xls")
     assert xml.include?("workbook")
-    treatment = Seek::Treatments.new xml
+    treatment = Seek::Data::Treatments.new xml
     assert_equal 1,treatment.sample_names.count
     assert_equal "",treatment.sample_names.first
     assert_equal 2, treatment.values.keys.count
@@ -178,7 +178,7 @@ class TreatmentsTest < ActiveSupport::TestCase
   test "extract from katys original problematic file" do
     xml = xml_for_file("JERM_2DGel_SEEKJERM_original.xls")
     assert xml.include?("workbook")
-    treatment = Seek::Treatments.new xml
+    treatment = Seek::Data::Treatments.new xml
     assert_equal 0,treatment.sample_names.count
     assert_equal 2, treatment.values.keys.count
     assert_equal ["e.g Growth medium","e.g temperature"],treatment.values.keys.sort
@@ -189,7 +189,7 @@ class TreatmentsTest < ActiveSupport::TestCase
   test "extract no treatments" do
     xml = xml_for_file("small-test-spreadsheet.xls")
     assert xml.include?("workbook")
-    treatment = Seek::Treatments.new xml
+    treatment = Seek::Data::Treatments.new xml
 
     assert_equal 0,treatment.values.keys.count
 
@@ -198,7 +198,7 @@ class TreatmentsTest < ActiveSupport::TestCase
   end
 
   test "extract nil xml" do
-    treatment = Seek::Treatments.new nil
+    treatment = Seek::Data::Treatments.new nil
 
     assert_equal 0,treatment.values.keys.count
 
@@ -207,7 +207,7 @@ class TreatmentsTest < ActiveSupport::TestCase
 
   test "extract invalid xml" do
     LibXML::XML::Error.set_handler(&XML::Error::QUIET_HANDLER)
-    treatment = Seek::Treatments.new "this is not xml"
+    treatment = Seek::Data::Treatments.new "this is not xml"
 
     assert_equal 0,treatment.values.keys.count
 
@@ -215,7 +215,7 @@ class TreatmentsTest < ActiveSupport::TestCase
   end
 
   test "initialize empty treatments" do
-    treatment = Seek::Treatments.new
+    treatment = Seek::Data::Treatments.new
 
     assert_equal 0,treatment.values.keys.count
 

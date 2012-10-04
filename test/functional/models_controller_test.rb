@@ -10,15 +10,50 @@ class ModelsControllerTest < ActionController::TestCase
   
   def setup
     login_as(:model_owner)
-    @object=models(:teusink)
+  end
+
+  def rest_api_test_object
+    @object=Factory :model_2_files, :contributor=>User.current_user
   end
   
   test "should get index" do
     get :index
     assert_response :success
     assert_not_nil assigns(:models)
-  end    
-  
+  end
+
+  test "should not download private" do
+    model = Factory :model_2_files, :policy=>Factory(:private_policy)
+    assert !model.can_download?(User.current_user)
+    assert_no_difference("ActivityLog.count") do
+      get :download,:id=>model.id
+    end
+    assert_redirected_to model_path(model)
+    assert_not_nil flash[:error]
+  end
+
+  test "should download" do
+    model = Factory :model_2_files, :title=>"this_model", :policy=>Factory(:public_policy), :contributor=>User.current_user
+    assert_difference("ActivityLog.count") do
+      get :download, :id=>model.id
+    end
+    assert_response :success
+    assert_equal "attachment; filename=\"this_model.zip\"",@response.header['Content-Disposition']
+    assert_equal "application/zip",@response.header['Content-Type']
+    assert_equal "3024",@response.header['Content-Length']
+  end
+
+  test "should download model with a single file" do
+    model = Factory :model, :title=>"this_model", :policy=>Factory(:public_policy), :contributor=>User.current_user
+    assert_difference("ActivityLog.count") do
+      get :download, :id=>model.id
+    end
+    assert_response :success
+    assert_equal "attachment; filename=\"cronwright.xml\"",@response.header['Content-Disposition']
+    assert_equal "text/xml",@response.header['Content-Type']
+    assert_equal "5933",@response.header['Content-Length']
+  end
+
   test "should not create model with file url" do
     file_path=File.expand_path(__FILE__) #use the current file
     file_url="file://"+file_path
@@ -223,10 +258,13 @@ class ModelsControllerTest < ActionController::TestCase
        m=Model.find(m.id)
        assert_equal 2,m.versions.size
        assert_equal 2,m.version
-       assert_equal "little_file.txt",m.original_filename
-       assert_equal "little_file.txt",m.versions[1].original_filename
+       assert_equal 1,m.content_blobs.size
+       assert_equal 1,m.versions[1].content_blobs.size
+       assert_equal m.content_blobs,m.versions[1].content_blobs
+       assert_equal "little_file.txt",m.content_blobs.first.original_filename
+       assert_equal "little_file.txt",m.versions[1].content_blobs.first.original_filename
        assert_equal "This is a new revision",m.versions[1].revision_comments
-       assert_equal "Teusink.xml",m.versions[0].original_filename
+       assert_equal "Teusink.xml",m.versions[0].content_blobs.first.original_filename
   end
 
   test "should create model with import details" do
@@ -638,9 +676,11 @@ class ModelsControllerTest < ActionController::TestCase
     m=Model.find(m.id)
     assert_equal 2,m.versions.size
     assert_equal 2,m.version
-    assert_equal "little_file.txt",m.original_filename
-    assert_equal "little_file.txt",m.versions[1].original_filename
-    assert_equal "Teusink.xml",m.versions[0].original_filename
+    assert_equal 1,m.content_blobs.size
+    assert_equal m.content_blobs,m.versions[1].content_blobs
+    assert_equal "little_file.txt",m.content_blobs.first.original_filename
+    assert_equal "little_file.txt",m.versions[1].content_blobs.first.original_filename
+    assert_equal "Teusink.xml",m.versions[0].content_blobs.first.original_filename
     assert_equal "This is a new revision",m.versions[1].revision_comments
     
   end
@@ -889,7 +929,40 @@ class ModelsControllerTest < ActionController::TestCase
     assert_select 'p.list_item_attribute', :text => /: another creator/, :count => 1
   end
 
-  test 'should show the other creators in -uploader and creators- box' do
+  test "should display cytoscape button for supported models" do
+    model = Factory :xgmml_model
+    login_as(model.contributor)
+    get :show, :id=>model.id
+    assert_response :success
+    assert_select "a[href=?]",visualise_model_path(model,:version=>model.version), :text=>"Visualise Model with Cytoscape Web"
+  end
+
+  test "should not display cytoscape button for supported models" do
+    model = Factory :teusink_jws_model
+    login_as(model.contributor)
+    get :show, :id=>model.id
+    assert_response :success
+    assert_select "a[href=?]",visualise_model_path(model,:version=>model.version), :count=>0
+  end
+
+  test "visualise with cytoscape" do
+    model = Factory :xgmml_model
+    login_as(model.contributor)
+    get :visualise, :id=>model.id,:version=>model.version
+    assert_response :success
+  end
+
+  test "should show sycamore button for sbml" do
+    with_config_value :sycamore_enabled,true do
+      model = Factory :teusink_model
+      login_as(model.contributor)
+      get :show, :id=>model.id
+      assert_response :success
+      assert_select "input[type=?]#sender","hidden"
+    end
+  end
+
+  test 'should show the other creators in uploader and creators box' do
     model=models(:teusink)
     model.other_creators = 'another creator'
     model.save

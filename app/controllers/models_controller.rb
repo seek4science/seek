@@ -41,14 +41,17 @@ class ModelsController < ApplicationController
       send_file tmp_file.path, :type=>"#{type}", :disposition=>'attachment',:filename=>xgmml_file
       tmp_file.close
   end
+
   def visualise
+    raise Exception.new("This model does not support Cytoscape") unless @display_model.contains_xgmml?
      # for xgmml file
      doc = find_xgmml_doc @display_model
      # convert " to \" and newline to \n
      #e.g.  "... <att type=\"string\" name=\"canonicalName\" value=\"CHEMBL178301\"/>\n ...  "
-    @graph = %Q("#{doc.root.to_s.gsub(/"/, '\"').gsub!("\n",'\n')}")
-    render :cytoscape_web,:layout => false
+     @graph = %Q("#{doc.root.to_s.gsub(/"/, '\"').gsub!("\n",'\n')}")
+     render :cytoscape_web,:layout => false
   end
+
   def send_image
     @model = Model.find params[:id]
     @display_model = @model.find_version params[:version]
@@ -88,13 +91,17 @@ class ModelsController < ApplicationController
   def builder
     saved_file=params[:saved_file]
     error=nil
+    supported=false
     begin
       if saved_file
         supported=true
         @params_hash,@attribution_annotations,@saved_file,@objects_hash,@error_keys = @@model_builder.saved_file_builder_content saved_file
       else
         supported = @display_model.is_jws_supported?
-        @params_hash,@attribution_annotations,@saved_file,@objects_hash,@error_keys = @@model_builder.builder_content @display_model if supported
+        if supported
+          content_blob = @display_model.jws_supported_content_blobs.first
+          @params_hash,@attribution_annotations,@saved_file,@objects_hash,@error_keys = @@model_builder.builder_content content_blob
+        end
       end
     rescue Exception=>e
       error=e
@@ -118,7 +125,11 @@ class ModelsController < ApplicationController
   def submit_to_jws
     following_action=params.delete("following_action")    
     error=nil
-    content_blob = @model.content_blob
+
+    #FIXME: currently we have to assume that a model with multiple files only contains 1 model file that would be executed on jws online, and only the first one is chosen
+    raise Exception.new("JWS Online is not supported for this model") unless @model.is_jws_supported?
+    content_blob = @model.jws_supported_content_blobs.first
+
     begin
       if following_action == "annotate"
         @params_hash,@attribution_annotations,@species_annotations,@reaction_annotations,@search_results,@cached_annotations,@saved_file,@error_keys = Seek::JWS::Annotator.new.annotate params
@@ -177,7 +188,7 @@ class ModelsController < ApplicationController
     error=nil
     begin
       if @display_model.is_jws_supported?
-        @modelname = Seek::JWS::Simulator.new.simulate(@display_model)
+        @modelname = Seek::JWS::Simulator.new.simulate(@display_model.jws_supported_content_blobs.first)
       end
     rescue Exception=>e
       Rails.logger.error("Problem simulating model on JWS Online #{e}")
@@ -466,13 +477,13 @@ class ModelsController < ApplicationController
     @model.last_used_at = Time.now
     @model.save_without_timestamping    
 
-    if @display_model.content_blobs.count==1 and @display_model.model_image.nil?
+    if @display_model.content_blobs.count==1 && @display_model.model_image.nil?
        handle_download @display_model
     else
       handle_download_zip @display_model
     end
 
-    end
+  end
 
   def download_one_file
     content_blob = ContentBlob.find params[:id]
@@ -639,8 +650,8 @@ class ModelsController < ApplicationController
    end
 
     def find_xgmml_doc model
-      xgmml_file = model.is_xgmml?
-      file = open(xgmml_file.filepath)
+      xgmml_content_blob = model.xgmml_content_blobs.first
+      file = open(xgmml_content_blob.filepath)
       doc = LibXML::XML::Parser.string(file.read).parse
       doc
     end

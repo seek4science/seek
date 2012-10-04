@@ -2,7 +2,7 @@ require 'test_helper'
 
 class CellRangeTest < ActiveSupport::TestCase
   fixtures :all
-  include SpreadsheetUtil
+
 
   test "create cell range" do
       cell = CellRange.new(:worksheet => worksheets(:worksheet_1),:cell_range => "A1:B3")
@@ -14,7 +14,6 @@ class CellRangeTest < ActiveSupport::TestCase
     cell = Factory :cell_range
     assert cell.reindexing_consequences == [cell.worksheet.content_blob.asset]
   end
-
 
   #check it doesn't save, it produces only 1 error and it produces the correct error message
   test "input invalid cell range value" do

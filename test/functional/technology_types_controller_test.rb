@@ -8,6 +8,9 @@ class TechnologyTypesControllerTest < ActionController::TestCase
   
   def setup
     login_as(:quentin)
+  end
+
+  def rest_api_test_object
     @object=technology_types(:gas_chromatography)
   end
 

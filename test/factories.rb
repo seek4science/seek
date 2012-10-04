@@ -105,7 +105,7 @@ end
   end
 
 
-#Policy
+  #Policy
   Factory.define(:policy, :class => Policy) do |f|
     f.name "test policy"
     f.sharing_scope Policy::PRIVATE
@@ -152,7 +152,7 @@ end
     f.access_type Policy::ACCESSIBLE
   end
 
-#Permission
+  #Permission
   Factory.define(:permission, :class => Permission) do |f|
     f.association :contributor, :factory => :person
     f.association :policy
@@ -169,122 +169,125 @@ end
     f.sequence(:title) {|n| "An AssayType#{n}"}
   end
 
-#Assay
-Factory.define(:assay_base, :class => Assay) do |f|
-  f.sequence(:title) {|n| "An Assay #{n}"}
-  f.sequence(:description) {|n| "Assay description #{n}"}
-  f.association :contributor, :factory => :person
-  f.association :study
-  f.association :assay_type
+  #Assay
+  Factory.define(:assay_base, :class => Assay) do |f|
+    f.sequence(:title) {|n| "An Assay #{n}"}
+    f.sequence(:description) {|n| "Assay description #{n}"}
+    f.association :contributor, :factory => :person
+    f.association :study
+    f.association :assay_type
 
-end
+  end
 
-Factory.define(:modelling_assay_class, :class => AssayClass) do |f|
-  f.title 'Modelling Assay'
-  f.key 'MODEL'
-end
+  Factory.define(:modelling_assay_class, :class => AssayClass) do |f|
+    f.title 'Modelling Assay'
+    f.key 'MODEL'
+  end
 
-Factory.define(:experimental_assay_class, :class => AssayClass) do |f|
-  f.title 'Experimental Assay'
-  f.key 'EXP'
-end
+  Factory.define(:experimental_assay_class, :class => AssayClass) do |f|
+    f.title 'Experimental Assay'
+    f.key 'EXP'
+  end
 
-Factory.define(:modelling_assay, :parent => :assay_base) do |f|
-  f.association :assay_class, :factory => :modelling_assay_class
-end
+  Factory.define(:modelling_assay, :parent => :assay_base) do |f|
+    f.association :assay_class, :factory => :modelling_assay_class
+  end
 
-Factory.define(:modelling_assay_with_organism, :parent => :modelling_assay) do |f|
-  f.after_create{|ma|Factory.build(:organism,:assay=>ma)}
+  Factory.define(:modelling_assay_with_organism, :parent => :modelling_assay) do |f|
+    f.after_create{|ma|Factory.build(:organism,:assay=>ma)}
 
-end
-Factory.define(:experimental_assay, :parent => :assay_base) do |f|
-  f.association :assay_class, :factory => :experimental_assay_class
-  f.association :technology_type
-  f.samples {[Factory.build :sample]}
-end
+  end
+  Factory.define(:experimental_assay, :parent => :assay_base) do |f|
+    f.association :assay_class, :factory => :experimental_assay_class
+    f.association :technology_type
+    f.samples {[Factory.build :sample]}
+  end
 
-  Factory.define(:assay, :parent => :modelling_assay) {}
+    Factory.define(:assay, :parent => :modelling_assay) {}
 
-#Study
-Factory.define(:study) do |f|
-  f.sequence(:title) { |n| "Study#{n}" }
-  f.association :investigation
-  f.association :contributor, :factory => :person
-end
+  #Study
+  Factory.define(:study) do |f|
+    f.sequence(:title) { |n| "Study#{n}" }
+    f.association :investigation
+    f.association :contributor, :factory => :person
+  end
 
-#Investigation
-Factory.define(:investigation) do |f|
-  f.projects {[Factory.build(:project)]}
-  f.sequence(:title) { |n| "Investigation#{n}" }
-end
+  #Investigation
+  Factory.define(:investigation) do |f|
+    f.projects {[Factory.build(:project)]}
+    f.sequence(:title) { |n| "Investigation#{n}" }
+  end
 
-#Strain
-Factory.define(:strain) do |f|
-  f.sequence(:title) { |n| "Strain#{n}" }
-  f.association :organism
-  f.projects {[Factory.build(:project)]}
-  f.association :contributor, :factory => :user
-  f.association :policy, :factory => :public_policy
-end
+  #Strain
+  Factory.define(:strain) do |f|
+    f.sequence(:title) { |n| "Strain#{n}" }
+    f.association :organism
+    f.projects {[Factory.build(:project)]}
+    f.association :contributor, :factory => :user
+    f.association :policy, :factory => :public_policy
+  end
 
-#Culture growth type
-Factory.define(:culture_growth_type) do |f|
-  f.title "a culture_growth_type"
-end
+  #Culture growth type
+  Factory.define(:culture_growth_type) do |f|
+    f.title "a culture_growth_type"
+  end
 
-#Specimen
-Factory.define(:specimen) do |f|
-  f.sequence(:title) { |n| "Specimen#{n}" }
-  f.sequence(:lab_internal_number) { |n| "Lab#{n}" }
-  f.association :contributor, :factory => :user
-  f.projects {[Factory.build(:project)]}
-  f.association :institution
-  f.association :strain
-end
+  #Specimen
+  Factory.define(:specimen) do |f|
+    f.sequence(:title) { |n| "Specimen#{n}" }
+    f.sequence(:lab_internal_number) { |n| "Lab#{n}" }
+    f.association :contributor, :factory => :user
+    f.projects {[Factory.build(:project)]}
+    f.association :institution
+    f.association :strain
+  end
 
-#Sample
-Factory.define(:sample) do |f|
-  f.sequence(:title) { |n| "Sample#{n}" }
-  f.sequence(:lab_internal_number) { |n| "Lab#{n}" }
-  f.projects {[Factory.build(:project)]}
-  f.donation_date Date.today
-  f.association :specimen
-end
+  #Sample
+  Factory.define(:sample) do |f|
+    f.sequence(:title) { |n| "Sample#{n}" }
+    f.sequence(:lab_internal_number) { |n| "Lab#{n}" }
+    f.projects {[Factory.build(:project)]}
+    f.donation_date Date.today
+    f.association :specimen
+  end
 
-
-#Data File
-Factory.define(:data_file) do |f|
-  f.sequence(:title) {|n| "A Data File_#{n}"}
-  f.projects {[Factory.build(:project)]}
-  f.association :contributor, :factory => :user
-  f.after_create do |data_file|
-    if data_file.content_blob.blank?
-      data_file.content_blob = Factory.create(:pdf_content_blob, :asset => data_file, :asset_version=>data_file.version)
-    else
-      data_file.content_blob.asset = data_file
-      data_file.content_blob.asset_version = data_file.version
-      data_file.content_blob.save
+  #Data File
+  Factory.define(:data_file) do |f|
+    f.sequence(:title) {|n| "A Data File_#{n}"}
+    f.projects {[Factory.build(:project)]}
+    f.association :contributor, :factory => :user
+    f.after_create do |data_file|
+      if data_file.content_blob.blank?
+        data_file.content_blob = Factory.create(:pdf_content_blob, :asset => data_file, :asset_version=>data_file.version)
+      else
+        data_file.content_blob.asset = data_file
+        data_file.content_blob.asset_version = data_file.version
+        data_file.content_blob.save
+      end
     end
   end
-end
 
-Factory.define(:rightfield_datafile,:parent=>:data_file) do |f|
-  f.association :content_blob,:factory=>:rightfield_content_blob
-end
+  Factory.define(:rightfield_datafile,:parent=>:data_file) do |f|
+    f.association :content_blob,:factory=>:rightfield_content_blob
+  end
 
-Factory.define(:rightfield_annotated_datafile,:parent=>:data_file) do |f|
-  f.association :content_blob,:factory=>:rightfield_annotated_content_blob
-end
+  Factory.define(:rightfield_annotated_datafile,:parent=>:data_file) do |f|
+    f.association :content_blob,:factory=>:rightfield_annotated_content_blob
+  end
 
-Factory.define(:non_spreadsheet_datafile,:parent=>:data_file) do |f|
-  f.association :content_blob,:factory=>:cronwright_model_content_blob
-end
+  Factory.define(:non_spreadsheet_datafile,:parent=>:data_file) do |f|
+    f.association :content_blob,:factory=>:cronwright_model_content_blob
+  end
 
-Factory.define(:xlsx_spreadsheet_datafile,:parent=>:data_file) do |f|
-  f.association :content_blob,:factory=>:xlsx_content_blob
-end
+  Factory.define(:xlsx_spreadsheet_datafile,:parent=>:data_file) do |f|
+    f.association :content_blob,:factory=>:xlsx_content_blob
+  end
 
-#Model
+  Factory.define(:small_test_spreadsheet_datafile,:parent=>:data_file) do |f|
+    f.association :content_blob, :factory=>:small_test_spreadsheet_content_blob
+  end
+
+  #Model
   Factory.define(:model) do |f|
     f.sequence(:title) {|n| "A Model #{n}"}
     f.projects {[Factory.build(:project)]}
@@ -315,13 +318,31 @@ end
     end
   end
 
+  Factory.define(:xgmml_model,:parent=>:model) do |f|
+    f.after_create do |model|
+      model.content_blobs = [Factory.create(:xgmml_content_blob, :asset=>model,:asset_version=>model.version)]
+    end
+  end
+
   Factory.define(:teusink_jws_model,:parent=>:model) do |f|
     f.after_create do |model|
       model.content_blobs = [Factory.create(:teusink_jws_model_content_blob, :asset=>model,:asset_version=>model.version)]
     end
   end
 
-#Publication
+  Factory.define(:non_sbml_xml_model,:parent=>:model) do |f|
+    f.after_create do |model|
+      model.content_blobs = [Factory.create(:non_sbml_xml_content_blob, :asset=>model,:asset_version=>model.version)]
+    end
+  end
+
+  Factory.define(:invalid_sbml_model,:parent=>:model) do |f|
+    f.after_create do |model|
+      model.content_blobs = [Factory.create(:invalid_sbml_content_blob, :asset=>model,:asset_version=>model.version)]
+    end
+  end
+
+  #Publication
   Factory.define(:publication) do |f|
     f.sequence(:title) {|n| "A Publication #{n}"}
     f.sequence(:pubmed_id) {|n| n}
@@ -329,7 +350,7 @@ end
     f.association :contributor, :factory => :user
   end
 
-#Presentation
+  #Presentation
   Factory.define(:presentation) do |f|
     f.sequence(:title) { |n| "A Presentation #{n}" }
     f.projects { [Factory.build :project] }
@@ -402,7 +423,7 @@ end
     end
   end
 
-#Misc
+  #Misc
   Factory.define(:group_membership) do |f|
     f.association :work_group
   end
@@ -477,6 +498,12 @@ end
     f.content_type "application/excel"
   end
 
+  Factory.define(:small_test_spreadsheet_content_blob,:parent=>:content_blob) do |f|
+    f.data  File.new("#{Rails.root}/test/fixtures/files/small-test-spreadsheet.xls","rb").read
+    f.content_type "application/excel"
+    f.original_filename "small-test-spreadsheet.xls"
+  end
+
   Factory.define(:xlsx_content_blob,:parent=>:content_blob) do |f|
     f.content_type "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
     f.data  File.new("#{Rails.root}/test/fixtures/files/lihua_column_index_error.xlsx","rb").read
@@ -497,6 +524,21 @@ end
   Factory.define(:teusink_jws_model_content_blob,:parent=>:content_blob) do |f|
     f.data  File.new("#{Rails.root}/test/fixtures/files/Teusink2010921171725.dat","rb").read
     f.original_filename "teusink.dat"
+  end
+
+  Factory.define(:xgmml_content_blob,:parent=>:content_blob) do |f|
+    f.data  File.new("#{Rails.root}/test/fixtures/files/cytoscape.xgmml","rb").read
+    f.original_filename "cytoscape.xgmml"
+  end
+
+  Factory.define(:non_sbml_xml_content_blob,:parent=>:content_blob) do |f|
+    f.data  File.new("#{Rails.root}/test/fixtures/files/non_sbml_xml.xml","rb").read
+    f.original_filename "non_sbml_xml.xml"
+  end
+
+  Factory.define(:invalid_sbml_content_blob,:parent=>:content_blob) do |f|
+    f.data  File.new("#{Rails.root}/test/fixtures/files/invalid_sbml_xml.xml","rb").read
+    f.original_filename "invalid_sbml_xml.xml"
   end
 
   Factory.define(:doc_content_blob, :parent => :content_blob) do |f|

@@ -102,21 +102,9 @@ module Acts #:nodoc:
         assays.collect{|a| a.study}.uniq
       end
 
-
       def related_people
         self.creators
       end
-      
-      # adapt for moving original_filename,content_type to content_blob
-
-      def original_filename
-        try_block {content_blob.original_filename}
-      end
-
-      def content_type
-        try_block {content_blob.content_type}
-      end
-
 
       # this method will take attributions' association and return a collection of resources,
       # to which the current resource is attributed
@@ -145,27 +133,30 @@ module Acts #:nodoc:
         self.relationships.select { |a| a.object_type == "Publication" }.collect { |a| a.object }
       end
 
-
       def cache_remote_content_blob
-        if self.content_blob && self.content_blob.url && self.projects.first
-          begin
-            p=self.projects.first
-            p.decrypt_credentials
-            downloader            =Jerm::DownloaderFactory.create p.name
-            resource_type         = self.class.name.split("::")[0] #need to handle versions, e.g. Sop::Version
-            data_hash             = downloader.get_remote_data self.content_blob.url, p.site_username, p.site_password, resource_type
-            cb = self.content_blob
-            cb.tmp_io_object = File.open data_hash[:data_tmp_path],"r"
-            cb.content_type     = data_hash[:content_type]
-            cb.original_filename = data_hash[:filename]
-            cb.save!
-            self.save!
-
-
-          rescue Exception=>e
-            puts "Error caching remote data for url=#{self.content_blob.url} #{e.message[0..50]} ..."
+        blobs = []
+        blobs << self.content_blob if self.respond_to?(:content_blob)
+        blobs = blobs | self.content_blobs if self.respond_to?(:content_blobs)
+        blobs.compact!
+        blobs.each do |blob|
+          if blob.url && self.projects.first
+            begin
+              p=self.projects.first
+              p.decrypt_credentials
+              downloader            =Jerm::DownloaderFactory.create p.name
+              resource_type         = self.class.name.split("::")[0] #need to handle versions, e.g. Sop::Version
+              data_hash             = downloader.get_remote_data blob.url, p.site_username, p.site_password, resource_type
+              blob.tmp_io_object = File.open data_hash[:data_tmp_path],"r"
+              blob.content_type     = data_hash[:content_type]
+              blob.original_filename = data_hash[:filename]
+              blob.save!
+            rescue Exception=>e
+              puts "Error caching remote data for url=#{self.content_blob.url} #{e.message[0..50]} ..."
+            end
           end
+          self.save!
         end
+
       end
 
 

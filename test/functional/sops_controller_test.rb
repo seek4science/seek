@@ -10,6 +10,9 @@ class SopsControllerTest < ActionController::TestCase
 
   def setup
     login_as(:quentin)
+  end
+
+  def rest_api_test_object
     @object=sops(:downloadable_sop)
   end
 
@@ -224,7 +227,7 @@ class SopsControllerTest < ActionController::TestCase
     assert assigns(:sop).content_blob.url.blank?
     assert !assigns(:sop).content_blob.data_io_object.read.nil?
     assert assigns(:sop).content_blob.file_exists?
-    assert_equal "file_picture.png", assigns(:sop).original_filename
+    assert_equal "file_picture.png", assigns(:sop).content_blob.original_filename
     assay.reload
     assert assay.related_asset_ids('Sop').include? assigns(:sop).id
   end
@@ -263,8 +266,8 @@ class SopsControllerTest < ActionController::TestCase
     assert !assigns(:sop).content_blob.url.blank?
     assert assigns(:sop).content_blob.data_io_object.nil?
     assert !assigns(:sop).content_blob.file_exists?
-    assert_equal "sysmo-db-logo-grad2.png", assigns(:sop).original_filename
-    assert_equal "image/png", assigns(:sop).content_type
+    assert_equal "sysmo-db-logo-grad2.png", assigns(:sop).content_blob.original_filename
+    assert_equal "image/png", assigns(:sop).content_blob.content_type
   end
 
   test "should create sop and store with url and store flag" do
@@ -280,8 +283,8 @@ class SopsControllerTest < ActionController::TestCase
     assert !assigns(:sop).content_blob.url.blank?
     assert !assigns(:sop).content_blob.data_io_object.read.nil?
     assert assigns(:sop).content_blob.file_exists?
-    assert_equal "sysmo-db-logo-grad2.png", assigns(:sop).original_filename
-    assert_equal "image/png", assigns(:sop).content_type
+    assert_equal "sysmo-db-logo-grad2.png", assigns(:sop).content_blob.original_filename
+    assert_equal "image/png", assigns(:sop).content_blob.content_type
   end
 
   test "should show sop" do
@@ -410,9 +413,9 @@ class SopsControllerTest < ActionController::TestCase
     s=Sop.find(s.id)
     assert_equal 2, s.versions.size
     assert_equal 2, s.version
-    assert_equal "file_picture.png", s.original_filename
-    assert_equal "file_picture.png", s.versions[1].original_filename
-    assert_equal "little_file.txt", s.versions[0].original_filename
+    assert_equal "file_picture.png", s.content_blob.original_filename
+    assert_equal "file_picture.png", s.versions[1].content_blob.original_filename
+    assert_equal "little_file.txt", s.versions[0].content_blob.original_filename
     assert_equal "This is a new revision", s.versions[1].revision_comments
 
   end
@@ -523,7 +526,7 @@ class SopsControllerTest < ActionController::TestCase
   test "filtering by person" do
     login_as(:owner_of_my_first_sop)
     person = people(:person_for_owner_of_my_first_sop)
-    p      =projects(:sysmo_project)
+    p = projects(:sysmo_project)
     get :index, :filter=>{:person=>person.id}, :page=>"all"
     assert_response :success
     sop  = sops(:downloadable_sop)

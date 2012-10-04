@@ -6,7 +6,8 @@ require 'title_trimmer'
 
 class DataFile < ActiveRecord::Base
 
-  include Seek::DataFileExtraction
+  include Seek::Data::DataFileExtraction
+  include Seek::Data::SpreadsheetExplorerRepresentation
   include RightField
 
   attr_accessor :parent_name
@@ -37,7 +38,8 @@ class DataFile < ActiveRecord::Base
   has_many :studied_factors, :conditions =>  'studied_factors.data_file_version = #{self.version}'
 
   explicit_versioning(:version_column => "version") do
-    include Seek::DataFileExtraction
+    include Seek::Data::DataFileExtraction
+    include Seek::Data::SpreadsheetExplorerRepresentation
     acts_as_versioned_resource
     
     has_one :content_blob,:primary_key => :data_file_id,:foreign_key => :asset_id,:conditions => 'content_blobs.asset_version= #{self.version} and content_blobs.asset_type = "#{self.parent.class.name}"'
@@ -245,7 +247,7 @@ class DataFile < ActiveRecord::Base
   #RDF Generation, will eventually be refactored out into a separate module
 
   def to_rdf
-    if (is_extractable_spreadsheet? && is_xls?)
+    if (contains_extractable_spreadsheet? && content_blob.is_xls?)
       rdf = generate_rdf_graph(self)
     else
       rdf = RDF::Graph.new

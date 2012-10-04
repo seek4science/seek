@@ -13,8 +13,12 @@ class DataFilesControllerTest < ActionController::TestCase
 
   def setup
     login_as(:datafile_owner)
+  end
+
+  def rest_api_test_object
     @object=data_files(:picture)
     @object.tag_with "tag1,tag2"
+    @object
   end
   
   def test_title
@@ -64,7 +68,7 @@ class DataFilesControllerTest < ActionController::TestCase
     df = Factory(:data_file,:policy=>Factory(:public_policy, :access_type=>Policy::VISIBLE))
     Factory :tag,:annotatable=>df,:source=>p,:value=>"golf"
 
-    test_get_xml df
+    test_get_rest_api_xml df
 
   end
 
@@ -76,7 +80,7 @@ class DataFilesControllerTest < ActionController::TestCase
       Factory :tag,:annotatable=>df,:source=>p,:value=>"frog",:attribute_name=>"tool"
       Factory :tag,:annotatable=>df,:source=>p,:value=>"stuff",:attribute_name=>"expertise"
 
-      test_get_xml df
+      test_get_rest_api_xml df
 
       assert_response :success
       xml = @response.body
@@ -271,8 +275,8 @@ class DataFilesControllerTest < ActionController::TestCase
     assert !assigns(:data_file).content_blob.url.blank?
     assert assigns(:data_file).content_blob.data_io_object.nil?
     assert !assigns(:data_file).content_blob.file_exists?
-    assert_equal "a-piccy.png", assigns(:data_file).original_filename
-    assert_equal "image/png", assigns(:data_file).content_type
+    assert_equal "a-piccy.png", assigns(:data_file).content_blob.original_filename
+    assert_equal "image/png", assigns(:data_file).content_blob.content_type
   end
 
   test "should create data file with https_url" do
@@ -289,8 +293,8 @@ class DataFilesControllerTest < ActionController::TestCase
       assert !assigns(:data_file).content_blob.url.blank?
       assert assigns(:data_file).content_blob.data_io_object.nil?
       assert !assigns(:data_file).content_blob.file_exists?
-      assert_equal "a-piccy.png", assigns(:data_file).original_filename
-      assert_equal "image/png", assigns(:data_file).content_type
+      assert_equal "a-piccy.png", assigns(:data_file).content_blob.original_filename
+      assert_equal "image/png", assigns(:data_file).content_blob.content_type
   end
 
   test 'asset url' do
@@ -341,8 +345,8 @@ class DataFilesControllerTest < ActionController::TestCase
     assert !assigns(:data_file).content_blob.url.blank?
     assert !assigns(:data_file).content_blob.data_io_object.read.nil?
     assert assigns(:data_file).content_blob.file_exists?
-    assert_equal "a-piccy.png", assigns(:data_file).original_filename
-    assert_equal "image/png", assigns(:data_file).content_type
+    assert_equal "a-piccy.png", assigns(:data_file).content_blob.original_filename
+    assert_equal "image/png", assigns(:data_file).content_blob.content_type
   end  
   
   test "should gracefully handle when downloading a unknown host url" do
@@ -378,8 +382,8 @@ class DataFilesControllerTest < ActionController::TestCase
     assert !assigns(:data_file).content_blob.url.blank?
     assert assigns(:data_file).content_blob.data_io_object.nil?
     assert !assigns(:data_file).content_blob.file_exists?
-    assert_equal "",assigns(:data_file).original_filename
-    assert_equal "",assigns(:data_file).content_type
+    assert_equal "",assigns(:data_file).content_blob.original_filename
+    assert_equal "",assigns(:data_file).content_blob.content_type
     
     get :download, :id => assigns(:data_file)
     assert_redirected_to "http://mocked401.com"
@@ -403,8 +407,8 @@ class DataFilesControllerTest < ActionController::TestCase
     assert !assigns(:data_file).content_blob.url.blank?
     assert assigns(:data_file).content_blob.data_io_object.nil?
     assert !assigns(:data_file).content_blob.file_exists?
-    assert_equal "",assigns(:data_file).original_filename
-    assert_equal "",assigns(:data_file).content_type
+    assert_equal "",assigns(:data_file).content_blob.original_filename
+    assert_equal "",assigns(:data_file).content_blob.content_type
     
     get :download, :id => assigns(:data_file)
     assert_redirected_to "http://mocked302.com"
@@ -564,9 +568,12 @@ class DataFilesControllerTest < ActionController::TestCase
   
   test "should download" do
     assert_difference('ActivityLog.count') do
-      get :download, :id => data_files(:viewable_data_file)
+      get :download, :id => Factory(:small_test_spreadsheet_datafile,:policy=>Factory(:public_policy), :contributor=>User.current_user).id
     end
     assert_response :success
+    assert_equal "attachment; filename=\"small-test-spreadsheet.xls\"",@response.header['Content-Disposition']
+    assert_equal "application/excel",@response.header['Content-Type']
+    assert_equal "7168",@response.header['Content-Length']
   end
   
   test "should download from url" do

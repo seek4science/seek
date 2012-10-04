@@ -10,7 +10,10 @@ class ProjectsControllerTest < ActionController::TestCase
 
 	def setup
 		login_as(:quentin)
-		@object=projects(:sysmo_project)
+  end
+
+  def rest_api_test_object
+    @object=projects(:sysmo_project)
   end
 
   def test_title
