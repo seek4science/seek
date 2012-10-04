@@ -10,7 +10,7 @@ class Model < ActiveRecord::Base
 
   #searchable must come before acts_as_asset call
   searchable(:auto_index=>false) do
-    text :description,:title,:organism_terms,:searchable_tags, :model_contents,:assay_type_titles,:technology_type_titles
+    text :description,:title,:organism_terms,:searchable_tags, :model_contents_for_search,:assay_type_titles,:technology_type_titles
     text :content_blobs do
        content_blobs.compact.map(&:original_filename).compact
     end
@@ -86,15 +86,6 @@ class Model < ActiveRecord::Base
   #defines that this is a user_creatable object, and appears in the "New Object" gadget
   def self.user_creatable?
     true
-  end
-
-  def model_contents
-    if content_blob.try(:file_exists?)
-      species | parameters_and_values.keys
-    else
-      Rails.logger.error("Unable to find data contents for Model #{self.id}")
-      []
-    end
   end
 
   #a simple container for handling the matching results returned from #matching_data_files

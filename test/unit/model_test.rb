@@ -17,6 +17,14 @@ class ModelTest < ActiveSupport::TestCase
     assert_equal blob,model.content_blobs.first
   end
 
+  test "model contents for search" do
+    model = Factory :teusink_model
+    contents = model.model_contents_for_search
+
+    assert contents.include?("KmPYKPEP")
+    assert contents.include?("F16P")
+  end
+
   test "type detection" do
     model = Factory :teusink_model
     assert model.contains_sbml?

@@ -5,6 +5,9 @@ module Seek
     module ModelExtraction
       include Seek::Models::ModelTypeHandling
 
+      def model_contents_for_search model=self
+        species(model) | parameters_and_values(model).keys
+      end
 
       #return a hash of parameters names as a key, along with their values, extracted from SBML
       def parameters_and_values model=self
