@@ -99,12 +99,6 @@
             $j('#my_project_button')[0].disabled = true;
             location.href = '<%= projects_path%>' + '/' + data[1];
         });
-        $j(document).click(function (e) {
-            $j('#my_project_selection_list')[0].style.display = 'none';
-        });
-        $j('#my_project_button').click(function (e) {
-            e.stopPropagation();
-        });
     });
 
     function my_project_selection() {
