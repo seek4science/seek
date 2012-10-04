@@ -193,7 +193,7 @@ and to reindex any existing data that created before search was enabled:
 If you want Sunspot SOLR to start automatically whenever you restart the machine SEEK is running on, you probably want to create an init.d/ script.
 A script we use is available at https://gist.github.com/3143434 (the APP_PATH may need changing for you)
 
-On Ubuntu or Debian, after putting the script in init.d/ you should run (assuming you called he file seek-solr)
+On Ubuntu or Debian, after putting the script in init.d/ you should run (assuming you called the file seek-solr)
 
   sudo update-rc.d seek-solr defaults
 

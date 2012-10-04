@@ -90,9 +90,10 @@ function getSelectedSpecimens() {
 }
 /*get the column number of attribute in the table*/
 function getAttributeColumn( table,attribute){
-    var th_columns =  document.evaluate('//table[@id="'+ table.fnSettings().sTableId +'"]/thead/tr/th',document, null, XPathResult.ORDERED_NODE_SNAPSHOT_TYPE, null );
-    for (var l = 0; l < th_columns.snapshotLength; l++){
-         if(th_columns.snapshotItem(l).innerHTML==attribute){
+var th_columns = $j('#'+table.fnSettings().sTableId+' thead tr th');
+    
+for (var l = 0; l < th_columns.length; l++){
+         if(th_columns[l].innerHTML==attribute){
              return l;
          }
     }
