@@ -5,6 +5,14 @@ class ModelExtractionTest < ActiveSupport::TestCase
   
   include Seek::Models::ModelExtraction
 
+  def test_model_contents_for_search
+    model = Factory :teusink_model
+    contents = model_contents_for_search(model)
+
+    assert contents.include?("KmPYKPEP")
+    assert contents.include?("F16P")
+  end
+
   def test_extract_sbml_species
     model = Factory :teusink_model
     assert contains_sbml?(model)
