@@ -45,25 +45,21 @@ module Seek
               if [301, 302, 307].include? response.code
                 response.follow_redirection(request, result, &block)
               else
+                begin
+                  response.return!(request, result, &block)
+                rescue Exception=>e
+                  raise Exception.new "Error contacting JWSOnline #{e.class.name}:#{e.message}. Code: #{response.code}\n\nCause: #{response.body}"
+                end
+              end
+            end
+          elsif (is_dat? model)
+            response = RestClient.post(upload_dat_url, :uploadedDatFile=>tmpfile, :filename=>model.original_filename, :multipart=>true) do |response, request, result, &block |
+              if [301, 302, 307].include? response.code
+                response.follow_redirection(request, result, &block)
+              else
                 response.return!(request, result, &block)
               end
             end
-
-            if response.code == 404
-              raise Exception.new("Page not found on JWS Online for url: #{upload_sbml_url}")
-            elsif response.code == 500
-              raise Exception.new("Server error on JWS Online for url: #{upload_sbml_url}\n\nCause:\n\n#{response.body}")
-            elsif response.code!=200
-              raise Exception.new("Unsuccessful response when uploading model to: #{upload_sbml_url}.\nCode: #{response.code}\n\nCause:\n\n#{response.body}")
-            end
-          elsif (is_dat? model)
-            response = RestClient.post(upload_dat_url, :uploadedDatFile=>tmpfile, :filename=>model.original_filename, :multipart=>true) { |response, request, result, &block |
-            if [301, 302, 307].include? response.code
-              response.follow_redirection(request, result, &block)
-            else
-              response.return!(request, result, &block)
-            end
-            }
           end
 
           if response.instance_of?(Net::HTTPInternalServerError)
