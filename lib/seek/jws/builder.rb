@@ -41,20 +41,20 @@ module Seek
           FileUtils.cp(filepath, tmpfile.path)
 
           if (is_sbml? model)
-            part=Multipart.new("upfile", filepath, model.original_filename)
-            response = part.post(upload_sbml_url)
-            if response.code == "302"
-              uri = URI.parse(URI.encode(response['location']))
-              req = Net::HTTP::Get.new(uri.request_uri)
-              response = Net::HTTP.start(uri.host, uri.port) { |http|
-                http.request(req)
-              }
-            elsif response.code == "404"
+            response = RestClient.post(upload_sbml_url, :upfile=>tmpfile,:SBMLFilePostedToIFC=>true, :xmloutput=>true,:loadModel=>model.original_filename, :multipart=>true) do |response, request, result, &block |
+              if [301, 302, 307].include? response.code
+                response.follow_redirection(request, result, &block)
+              else
+                response.return!(request, result, &block)
+              end
+            end
+
+            if response.code == 404
               raise Exception.new("Page not found on JWS Online for url: #{upload_sbml_url}")
-            elsif response.code == "500"
+            elsif response.code == 500
               raise Exception.new("Server error on JWS Online for url: #{upload_sbml_url}\n\nCause:\n\n#{response.body}")
-            else
-              raise Exception.new("Expected a redirection from JWS Online but got #{response.code}, for url: #{upload_sbml_url}. Body:\n#{response.body}")
+            elsif response.code!=200
+              raise Exception.new("Unsuccessful response when uploading model to: #{upload_sbml_url}.\nCode: #{response.code}\n\nCause:\n\n#{response.body}")
             end
           elsif (is_dat? model)
             response = RestClient.post(upload_dat_url, :uploadedDatFile=>tmpfile, :filename=>model.original_filename, :multipart=>true) { |response, request, result, &block |
@@ -111,7 +111,7 @@ module Seek
       end
 
       def upload_sbml_url
-        "#{Seek::JWS::UPLOAD_URL}?SBMLFilePostedToIFC=true&xmlOutput=true"
+        Seek::JWS::UPLOAD_URL
       end
 
     end
