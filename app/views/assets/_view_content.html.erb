@@ -1,9 +1,10 @@
+<%= javascript_include_tag 'detect_browser' %>
 <% if asset.kind_of?(DataFile) || asset.kind_of?(Presentation) || asset.kind_of?(Sop) %>
 <% is_inline_viewable = Seek::Config.experimental_features_enabled && (display_asset ||=nil) && display_asset.content_blob.is_content_viewable?
    view_pdf_content_url = polymorphic_path(asset, :version => display_asset.version, :action => 'view_pdf_content')
    if is_inline_viewable
      title = "View inline the content of this #{human_name}" %>
-    <li><%= image_tag_for_key "show", view_pdf_content_url, 'View content', {:title => title, :onclick => "isCanvasSupportBrowser();"}, 'View content'%></li>
+    <li><%= image_tag_for_key "show", view_pdf_content_url, 'View content', {:title => title, :onclick => "isCanvasSupportBrowser();isIEVersionSupported();"}, 'View content'%></li>
    <% else
      if !display_asset.can_download?
        title = "You are not authorized to view the content of this #{human_name}"
@@ -25,6 +26,17 @@
     function isCanvasSupportBrowser(){
         var test_canvas = document.createElement("canvas") //try and create sample canvas element
         var canvas_check=(test_canvas.getContext)? true : false //check if object supports getContext() method, a method of the canvas element
+        if (!canvas_check){
+            alert('View content is not supported in this browser version. Please upgrade your browser.');
+        }
         return canvas_check;
+    }
+    function isIEVersionSupported(){
+        var browser = detect_browser;
+        if (browser.name == 'Microsoft Internet Explorer' && browser.majorVersion < 5){
+            alert('View content is not supported in this Internet Explorer version. Please upgrade your browser.');
+            return false;
+        }else
+            return true;
     }
 </script>
