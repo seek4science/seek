@@ -18,7 +18,7 @@ class ModelImage < ActiveRecord::Base
 
 
   def original_image_format
-    original_content_type.split("/").last
+    content_type.split("/").last
   end                                                                                                                                 #
 
   def original_path
