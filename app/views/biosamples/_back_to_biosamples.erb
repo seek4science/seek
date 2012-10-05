@@ -2,6 +2,7 @@
    specimen_row = []
    new_specimen ||= false
    strain_id=nil
+   specimen_title = nil
    if object.kind_of?(Sample)
     sample_row = sample_row_data(object)
     specimen_row = specimen_row_data(object.specimen)
@@ -9,6 +10,7 @@
    elsif object.kind_of?(Specimen)
      specimen_row = specimen_row_data(object)
      strain_id = object.strain.try(:id)
+     specimen_title = object.title
    end
     %>
 
@@ -34,7 +36,7 @@
     if (action == 'create' && object_class == 'sample' && "<%=new_specimen%>" == "true" ){
         window.opener.loadNewSpecimenAfterCreation(specimen_row, '<%=strain_id%>');
     }else if (action == 'create' && object_class == 'sample' && "<%=new_specimen%>" == "false"){
-        window.opener.loadNewSampleAfterCreation(sample_row, '<%=object.specimen.title%>' );
+        window.opener.loadNewSampleAfterCreation(sample_row, '<%=specimen_title%>' );
     }else if (action == 'create' && object_class == 'specimen' ){
         window.opener.loadNewSpecimenAfterCreation(specimen_row,'<%=strain_id%>');
     }else if (action == 'update' && object_class == 'sample'){
