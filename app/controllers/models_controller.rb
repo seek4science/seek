@@ -55,9 +55,12 @@ class ModelsController < ApplicationController
   def send_image
     @model = Model.find params[:id]
     @display_model = @model.find_version params[:version]
-    image = @display_model.model_image
+    if @model.can_view?
+      image = @display_model.model_image
       send_file "#{image.file_path  }", :type=>"JPEG", :disposition=>'inline'
-
+    else
+      error("You are not authorized to see this image", 'is invalid')
+    end
   end
 
   # GET /models
