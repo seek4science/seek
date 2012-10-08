@@ -58,6 +58,8 @@ namespace :seek do
 
   task(:reordering_authors_for_existing_publications=>:environment) do
     Publication.all.each do |publication|
+      puts ("Processing publication #{publication.id}")
+
       non_seek_authors = publication.non_seek_authors
       seek_authors = publication.seek_authors
       projects = publication.projects
