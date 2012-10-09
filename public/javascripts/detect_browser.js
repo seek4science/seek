@@ -63,4 +63,5 @@ function detect_browser(){
         browser.fullVersion  = ''+parseFloat(navigator.appVersion);
         browser.majorVersion = parseInt(navigator.appVersion,10);
     }
+    return browser;
 }
