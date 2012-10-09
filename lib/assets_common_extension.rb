@@ -169,9 +169,13 @@ module AssetsCommonExtension
     sym = self.controller_name.downcase.singularize.to_sym
     version = asset.version
     if asset.respond_to?(:content_blob) and !asset.respond_to?(:content_blobs)
+      #if request is sent from a browser running on window, take the content type from the filename instead
+      if request.headers['HTTP_USER_AGENT'].include?('Win')
+        content_type = content_type_from_filename params[sym][:original_filename]
+      else
+        content_type = params[sym][:content_type]
+      end
       # create new /new version
-      content_type = params[sym][:content_type]
-      content_type = content_type_from_filename params[sym][:original_filename] if content_type.blank?
       asset.create_content_blob(:tmp_io_object => @tmp_io_object,
                                 :url=>@data_url,
                                 :original_filename=>params[sym][:original_filename],
@@ -180,9 +184,13 @@ module AssetsCommonExtension
       )
 
     elsif asset.respond_to? :content_blobs
+      #if request is sent from a browser running on window, take the content type from the filename instead
+      if request.headers['HTTP_USER_AGENT'].include?('Win')
+        content_type = content_type_from_filename @original_filenames[0]
+      else
+        content_type = @original_filenames[0]
+      end
       # create new /new version
-      content_type = @original_filenames[0]
-      content_type = content_type_from_filename @original_filenames[0] if content_type.blank?
       @tmp_io_objects_localfile.each do |tmp_io_object|
         asset.content_blobs.create(:tmp_io_object => tmp_io_object,
                                    :original_filename=>content_type,
