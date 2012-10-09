@@ -257,7 +257,7 @@ module Seek
               :"samples.sample_type" => mapping_entry("FIXED", proc {""}),
               :"samples.donation_date" => mapping_entry("date of experiment"),
 
-              :"tissue_and_cell_types.title" => mapping_entry("FIXED", proc {""}),
+              :"tissue_and_cell_types.title" => mapping_entry("FIXED", proc {"Liver"}),
 
               :"sop.title" => mapping_entry("FIXED", proc {""}),
               :"institution.name" => mapping_entry("FIXED", proc{""}),
@@ -412,7 +412,7 @@ module Seek
               :"samples.sample_type" => mapping_entry("FIXED", proc {""}),
               :"samples.donation_date" => mapping_entry("Arrival Date"),
 
-              :"tissue_and_cell_types.title" => mapping_entry("FIXED", proc {""}),
+              :"tissue_and_cell_types.title" => mapping_entry("FIXED", proc {"Liver"}),
 
               :"sop.title" => mapping_entry("FIXED", proc {""}),
               :"institution.name" => mapping_entry("FIXED", proc {""})
@@ -477,7 +477,7 @@ module Seek
                   :"samples.sample_type" => mapping_entry("FIXED", proc {"liver"}),
                   :"samples.donation_date" => mapping_entry("Donation Date"),
 
-                  :"tissue_and_cell_types.title" => mapping_entry("FIXED", proc {""}),
+                  :"tissue_and_cell_types.title" => mapping_entry("FIXED", proc {"Liver"}),
 
                   :"sop.title" => mapping_entry("FIXED", proc {""}),
                   :"institution.name" => mapping_entry("FIXED", proc {""})

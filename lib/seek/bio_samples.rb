@@ -847,7 +847,7 @@ module Seek
       
       sample = {"title" => sample_title,
                 "type" => sample_type,
-                "tisse and cell type" => tissue_and_cell_type_title,
+                "tissue and cell type" => tissue_and_cell_type_title,
                 "sop" => sop_title,
                 "donation date" => donation_date.to_s,
                 "institution" => institution_name,
@@ -876,8 +876,17 @@ module Seek
         sop_title = nil if sop_title=="NO STORAGE"
         institution_name = @institution_name if (institution_name=="" || institution_name.nil?)
 
+
+        #Rails.logger.warn "TISSUE AND CELL TYPE TITLE : #{tissue_and_cell_type_title}"
+
         tissue_and_cell_type = TissueAndCellType.find_by_title tissue_and_cell_type_title
-        tissue_and_cell_type = TissueAndCellType.create :title => tissue_and_cell_type_title if !tissue_and_cell_type && tissue_and_cell_type_title
+        unless tissue_and_cell_type
+          if tissue_and_cell_type_title && tissue_and_cell_type_title != ""
+            tissue_and_cell_type = TissueAndCellType.create :title => tissue_and_cell_type_title
+            tissue_and_cell_type.save!
+          end
+        end
+
         sop = Sop.find_by_title sop_title
         institution = Institution.find_by_name institution_name
 
@@ -912,13 +921,20 @@ module Seek
         else
           unless sample.specimen == specimen &&
               sample.sample_type == sample_type &&
-              sample.tissue_and_cell_types.member?(tissue_and_cell_type) &&
-              sample.donation_date == donation_date &&
+              (sample.tissue_and_cell_types.member?(tissue_and_cell_type) || tissue_and_cell_type_title == "") &&
+              sample.donation_date == Time.zone.parse(donation_date) &&
               sample.institution == institution &&
               sample.comments == comments
               sleep(1);
               sample.title =  "#{sample_title}-#{Time.now}"
               sample.save!
+              Rails.logger.warn "sample update-branch"
+              Rails.logger.warn "#{sample.specimen} == #{specimen} ? #{sample.specimen == specimen}"
+              Rails.logger.warn "#{sample.sample_type} == #{sample_type} ? #{sample.sample_type == sample_type}"
+              Rails.logger.warn "(sample.tissue_and_cell_types.member?(tissue_and_cell_type) || tissue_and_cell_type_title == "") ? #{(sample.tissue_and_cell_types.member?(tissue_and_cell_type) || tissue_and_cell_type_title == "")}"
+              Rails.logger.warn "#{sample.donation_date} == #{Time.zone.parse(donation_date)} ? #{sample.donation_date == Time.zone.parse(donation_date)}"
+              Rails.logger.warn "#{sample.institution} == #{institution} ? #{sample.institution == institution}"
+              Rails.logger.warn "#{sample.comments} == #{comments} ? #{sample.comments == comments}"
             @warnings << "Warning: sample with the name '#{sample_title}' is already created in SEEK."
             @warnings << "It is renamed and saved as '#{sample.title}'.<br/>"
             @warnings << "You may rename it and upload the file as new version!<br/>"
