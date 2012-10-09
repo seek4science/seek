@@ -90,11 +90,11 @@ module Seek
           page.replace_html "test_url_msg",msg
           page.show 'test_url_msg'
           page.visual_effect :highlight,"test_url_msg"
-          if code=="302" || code=="401"            
-            page['local_copy'].checked=false
-            page['local_copy'].disable            
-          else
+          if code=="200"
             page['local_copy'].enable
+          else
+            page['local_copy'].checked=false
+            page['local_copy'].disable
           end
         end
       end
