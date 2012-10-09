@@ -1,5 +1,5 @@
 module AssetsCommonExtension
-
+  include Seek::MimeTypes
 
   def show_via_url asset, content_blob=nil
     content_blob = content_blob.nil? ? asset.content_blob : content_blob
@@ -170,19 +170,22 @@ module AssetsCommonExtension
     version = asset.version
     if asset.respond_to?(:content_blob) and !asset.respond_to?(:content_blobs)
       # create new /new version
-
+      content_type = params[sym][:content_type]
+      content_type = content_type_from_filename params[sym][:original_filename] if content_type.blank?
       asset.create_content_blob(:tmp_io_object => @tmp_io_object,
                                 :url=>@data_url,
                                 :original_filename=>params[sym][:original_filename],
-                                :content_type=>params[sym][:content_type],
+                                :content_type=>content_type,
                                 :asset_version=>version
       )
 
     elsif asset.respond_to? :content_blobs
       # create new /new version
+      content_type = @original_filenames[0]
+      content_type = content_type_from_filename @original_filenames[0] if content_type.blank?
       @tmp_io_objects_localfile.each do |tmp_io_object|
         asset.content_blobs.create(:tmp_io_object => tmp_io_object,
-                                   :original_filename=>@original_filenames[0],
+                                   :original_filename=>content_type,
                                    :content_type=>@content_types[0].to_s,
                                    :asset_version=>version)
         @original_filenames.delete_at(0)
@@ -233,6 +236,11 @@ module AssetsCommonExtension
 
   end
 
+  def content_type_from_filename filename
+    file_format = filename.split('.').last.try(:strip)
+    possible_mime_types = mime_types_for_extension file_format
+    possible_mime_types.first
+  end
 end
 
 Seek::AssetsCommon.module_eval do
