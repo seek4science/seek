@@ -80,10 +80,12 @@ original_filename=nil
                     <span class="required">*</span>                    
                     <%= text_field upload_field,:data_url,:size=>55 -%>
                     <%= link_to_remote image("test",:title=>"Test",:alt=>"Test")+" Test",
-                    :url=>{:action=>:test_asset_url},
+                    {:url=>{:action=>:test_asset_url},
                     :method=>:post,
+                    :type => :synchronous,
                     :with=>"$('#{upload_field}_data_url').serialize()",
-                    :before=>"$('test_url_msg').innerHTML='';show_ajax_loader('test_url_result_icon');" -%>
+                    :before=>"$('test_url_msg').innerHTML='';show_ajax_loader('test_url_result_icon');"},
+                    {:id => 'test'} -%>
                     <br/>
                     <p style="clear:both;">
                         <b>Make a copy?</b>
@@ -107,6 +109,7 @@ original_filename=nil
   from_file_selected();
   <% else -%>
   from_url_selected();
+  clickLink($('test'));
   <% end -%>
 
 </script>
