@@ -105,6 +105,7 @@ module Seek
               :"samples.title" => mapping_entry("Sample Name"),
               :"samples.sample_type" => mapping_entry("Material Type"),
               :"samples.donation_date" => mapping_entry("Storage Date", proc  {|data| data != "" ? data : Time.now}), # the default value is certainly wrong -- but we need some donation_date
+              :"samples.organism_part"  => mapping_entry("FIXED", proc {""}),
 
               :"tissue_and_cell_types.title" => mapping_entry("Organism Part"),
 
@@ -256,6 +257,7 @@ module Seek
               :"samples.title" => mapping_entry("Tissue specimen no.", proc { |data| data.chomp(".0")}),
               :"samples.sample_type" => mapping_entry("FIXED", proc {""}),
               :"samples.donation_date" => mapping_entry("date of experiment"),
+              :"samples.organism_part"  => mapping_entry("FIXED", proc {"organ"}),
 
               :"tissue_and_cell_types.title" => mapping_entry("FIXED", proc {"Liver"}),
 
@@ -411,6 +413,7 @@ module Seek
               :"samples.title" => mapping_entry("Sample ID"),
               :"samples.sample_type" => mapping_entry("FIXED", proc {""}),
               :"samples.donation_date" => mapping_entry("Arrival Date"),
+              :"samples.organism_part"  => mapping_entry("FIXED", proc {"organ"}),
 
               :"tissue_and_cell_types.title" => mapping_entry("FIXED", proc {"Liver"}),
 
@@ -476,6 +479,7 @@ module Seek
                   :"samples.title" => mapping_entry("Animal Nr.", proc { |data| data + "_liver"}),
                   :"samples.sample_type" => mapping_entry("FIXED", proc {"liver"}),
                   :"samples.donation_date" => mapping_entry("Donation Date"),
+                  :"samples.organism_part"  => mapping_entry("FIXED", proc {"organ"}),
 
                   :"tissue_and_cell_types.title" => mapping_entry("FIXED", proc {"Liver"}),
 
@@ -543,6 +547,7 @@ module Seek
               :"samples.title" => mapping_entry(""),
               :"samples.sample_type" => mapping_entry(""),
               :"samples.donation_date" => mapping_entry(""),
+              :"samples.organism_part"  => mapping_entry(""),
 
               :"tissue_and_cell_types.title" => mapping_entry(""),
 

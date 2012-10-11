@@ -395,12 +395,14 @@ module Seek
           sample_types = hunt_for_field_values_mapped sheet,  :"samples.sample_type", @samples_mapping
           sample_donation_dates = hunt_for_field_values_mapped sheet, :"samples.donation_date", @samples_mapping
           sample_comments = hunt_for_field_values_mapped sheet, :"samples.comments", @samples_mapping
+          sample_organism_parts = hunt_for_field_values_mapped sheet, :"samples.organism_part", @samples_mapping
           tissue_and_cell_types = hunt_for_field_values_mapped sheet, :"tissue_and_cell_types.title", @samples_mapping
           sop_titles = hunt_for_field_values_mapped sheet, :"sop.title", @samples_mapping
           institution_names = hunt_for_field_values_mapped sheet, :"institution.name", @samples_mapping
 
-          samples_data = sample_titles.zip(sample_types, sample_donation_dates, sample_comments, tissue_and_cell_types, sop_titles, institution_names, specimen_titles).map do |sample_title, sample_type, sample_donation_date, sample_comment, tissue_and_cell_type, sop_title, institution_name, specimen_title|
-            {:sample_title => sample_title, :sample_type => sample_type, :sample_donation_date => sample_donation_date, :sample_comment => sample_comment,
+
+          samples_data = sample_titles.zip(sample_types, sample_donation_dates, sample_comments, sample_organism_parts, tissue_and_cell_types, sop_titles, institution_names, specimen_titles).map do |sample_title, sample_type, sample_donation_date, sample_comment, sample_organism_part, tissue_and_cell_type, sop_title, institution_name, specimen_title|
+            {:sample_title => sample_title, :sample_type => sample_type, :sample_donation_date => sample_donation_date, :sample_comment => sample_comment, :sample_organism_part => sample_organism_part,
              :tissue_and_cell_type => tissue_and_cell_type, :sop_title => sop_title, :institution_name => institution_name, :specimen_title => specimen_title}
           end
 
@@ -843,6 +845,7 @@ module Seek
       donation_date = sample_data[:sample_donation_date][:value]
       institution_name = sample_data[:institution_name][:value]
       comments = sample_data[:sample_comment][:value]
+      organism_part = sample_data[:sample_organism_part][:value]
 
       row = sample_data[:sample_title][:row]
       
@@ -852,7 +855,8 @@ module Seek
                 "sop" => sop_title,
                 "donation date" => donation_date.to_s,
                 "institution" => institution_name,
-                "comments" => comments}
+                "comments" => comments,
+                "organism part" => organism_part}
 
 
       @samples[row] = sample
@@ -873,6 +877,7 @@ module Seek
         donation_date = sample_json["donation date"]
         institution_name = sample_json["institution"]
         comments = sample_json["comments"]
+        organism_part = sample_json["organism part"]
 
         sop_title = nil if sop_title=="NO STORAGE"
         institution_name = @institution_name if (institution_name=="" || institution_name.nil?)
@@ -915,6 +920,7 @@ module Seek
           sample.tissue_and_cell_types << tissue_and_cell_type if tissue_and_cell_type.try(:id) && !sample.tissue_and_cell_types.include?(tissue_and_cell_type)
           sample.associate_sop sop if sop
           sample.specimen = specimen if specimen
+          sample.organism_part = organism_part if organism_part != ""
           sample.comments = comments
           sample.treatment = treatment
           sample.policy = @file.policy.deep_copy
