@@ -97,4 +97,16 @@ class SpecialAuthCodesAccessTest < ActionController::IntegrationTest
       end
     end
   end
+
+  test 'should be able to explore excel datafile with auth code' do
+    auth_code = Factory :special_auth_code, :expiration_date => (Time.now + 1.days), :asset => Factory(:small_test_spreadsheet_datafile, :policy => Factory(:private_policy))
+    item = auth_code.asset
+    get "/data_files/explore/#{item.id}"
+    assert_redirected_to item
+    assert_not_nil flash[:error]
+
+    code = CGI::escape(auth_code.code)
+    get "/data_files/explore/#{item.id}?code=#{code}"
+    assert_response :success
+  end
 end

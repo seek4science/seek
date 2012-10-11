@@ -31,7 +31,7 @@
           </li>
           <% if asset.is_a?(DataFile) && display_asset.contains_extractable_spreadsheet? %>
               <li>
-                <%= image_tag_for_key('spreadsheet', polymorphic_path(asset, :version => version, :action => :explore), "Explore #{human_name}", nil, "Explore #{human_name}") -%>
+                <%= image_tag_for_key('spreadsheet', polymorphic_path(asset, :version => version, :action => :explore, :code=>params[:code]), "Explore #{human_name}", nil, "Explore #{human_name}") -%>
               </li>
           <% end -%>
       <% elsif logged_in? -%>
