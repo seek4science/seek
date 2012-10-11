@@ -777,6 +777,7 @@ module Seek
           specimen.strain = strain
           specimen.culture_growth_type= culture_growth_type
           specimen.policy = @file.policy.deep_copy
+          specimen.projects = @file.projects
           specimen.comments = comments
           specimen.save!
         else
@@ -899,7 +900,7 @@ module Seek
         unless sample
           sample = Sample.new :title => sample_title,
                               :lab_internal_number => sample_title
-          sample.projects = User.current_user.person.projects
+          sample.projects = @file.projects #User.current_user.person.projects
           #treatment = ""
           #@treatments_text[row].try(:each) do |k, v|
           #  treatment << k.to_s + ":" + v.to_s

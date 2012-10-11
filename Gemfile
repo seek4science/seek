@@ -27,6 +27,8 @@ gem "delayed_job","~>2.0.4"
 gem "daemons"
 gem "cancan"
 gem "parallel_tests", :group => :development
+gem "pry", :group => :development
+gem "pry-doc", :group => :development
 
 
 

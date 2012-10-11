@@ -18,6 +18,7 @@ GEM
     builder (3.1.3)
     calendar_date_select (1.16.4)
     cancan (1.6.8)
+    coderay (1.0.8)
     crack (0.3.1)
     daemons (1.0.10)
     delayed_job (2.0.7)
@@ -30,6 +31,7 @@ GEM
     hpricot (0.8.6)
     kgio (2.7.4)
     libxml-ruby (2.2.2)
+    method_source (0.8)
     mime-types (1.19)
     mysql (2.8.1)
     nokogiri (1.5.5)
@@ -38,6 +40,13 @@ GEM
     parallel_tests (0.8.10)
       parallel
     pr_geohash (1.0.0)
+    pry (0.9.10)
+      coderay (~> 1.0.5)
+      method_source (~> 0.8)
+      slop (~> 3.3.1)
+    pry-doc (0.4.4)
+      pry (>= 0.9.9.6)
+      yard (~> 0.8.1)
     rack (1.1.3)
     rack-openid (1.1.0)
       rack (>= 0.4)
@@ -67,6 +76,7 @@ GEM
     simple-spreadsheet-extractor (0.10.0)
       libxml-ruby (= 2.2.2)
       open4 (= 1.3.0)
+    slop (3.3.3)
     sqlite3-ruby (1.2.5)
     sunspot (1.2.1)
       escape (= 0.0.4)
@@ -84,6 +94,7 @@ GEM
     webmock (1.8.10)
       addressable (>= 2.2.7)
       crack (>= 0.1.7)
+    yard (0.8.2.1)
 
 PLATFORMS
   ruby
@@ -101,6 +112,8 @@ DEPENDENCIES
   libxml-ruby (= 2.2.2)
   mysql
   parallel_tests
+  pry
+  pry-doc
   rack-openid (= 1.1.0)
   rails (= 2.3.8)
   rake (= 0.8.7)
