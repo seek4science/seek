@@ -114,7 +114,7 @@ class SpecialAuthCodesAccessTest < ActionController::IntegrationTest
     auth_code = Factory :special_auth_code, :expiration_date => (Time.now + 1.days), :asset => Factory(:pdf_sop, :policy => Factory(:private_policy))
     item = auth_code.asset
     get "/sops/#{item.id}/view_pdf_content"
-    assert_redirected_to :root
+    assert_redirected_to item
     assert_not_nil flash[:error]
 
     code = CGI::escape(auth_code.code)

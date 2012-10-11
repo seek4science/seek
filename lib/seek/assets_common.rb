@@ -282,38 +282,22 @@ module Seek
         end
     end
 
-    def self.included(base)
-      base.before_filter :view_content_auth, :only => [:get_pdf, :view_pdf_content]
-    end
-
-    def view_content_auth
-      name = self.controller_name.singularize
-      asset = name.camelize.constantize.find(params[:id])
-      display_asset = asset.find_version(params[:version]) || asset.latest_version
-      if display_asset.content_blob.is_content_viewable? && (asset.can_download? || asset.special_auth_codes.unexpired.collect(&:code).include?(params[:code]))
-        eval "@#{name} = asset"
-        eval "@display_#{name} = display_asset"
-      else
-        error("You are not authorized to view content of this  #{name.humanize} or this file format is not supported", 'is invalid')
-        return false
-      end
-    end
-
     def view_pdf_content
       asset = eval("@#{self.controller_name.singularize}")
-      display_asset = eval("@display_#{self.controller_name.singularize}")
+      display_asset = asset.find_version(params[:version]) || asset.latest_version
       #param code is used for temporary link
       get_pdf_url = polymorphic_path(asset, :version => display_asset.version, :action => 'get_pdf', :code => params[:code])
       render :partial => 'layouts/pdf_content_display', :locals => {:get_pdf_url => get_pdf_url }
     end
 
     def get_pdf
-      display_asset = eval("@display_#{self.controller_name.singularize}")
+      asset = eval("@#{self.controller_name.singularize}")
+      display_asset = asset.find_version(params[:version]) || asset.latest_version
       content_blob = display_asset.content_blob
       dat_filepath = content_blob.filepath
       pdf_filepath = content_blob.filepath('pdf')
       if display_asset.content_blob.is_pdf?
-          send_file dat_filepath, :filename => content_blob.original_filename, :type => content_blob.content_type, :disposition => 'attachment'
+         send_file dat_filepath, :filename => content_blob.original_filename, :type => content_blob.content_type, :disposition => 'attachment'
       else
         content_blob.convert_to_pdf
         if File.exists?(pdf_filepath)
