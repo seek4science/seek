@@ -1,24 +1,11 @@
 <%= javascript_include_tag 'detect_browser' %>
-<% if asset.kind_of?(DataFile) || asset.kind_of?(Presentation) || asset.kind_of?(Sop) %>
+<% if Seek::Util.inline_viewable_content_types.include?(asset.class)%>
 <% is_inline_viewable = Seek::Config.experimental_features_enabled && (display_asset ||=nil) && display_asset.content_blob.is_content_viewable?
-   view_pdf_content_url = polymorphic_path(asset, :version => display_asset.version, :action => 'view_pdf_content')
+   #param code is used for temporary link
+   view_pdf_content_url = polymorphic_path(asset, :version => display_asset.version, :action => 'view_pdf_content', :code => params[:code])
    if is_inline_viewable
      title = "View inline the content of this #{human_name}" %>
-    <li><%= image_tag_for_key "show", view_pdf_content_url, 'View content', {:title => title, :onclick => "isCanvasSupportBrowser();isIEVersionSupported();"}, 'View content'%></li>
-   <% else
-     if !display_asset.can_download?
-       title = "You are not authorized to view the content of this #{human_name}"
-     elsif !display_asset.content_blob.is_viewable_format?
-       title = "This file format is not inline viewable supported"
-     else
-       title = "It is not possible to view this #{human_name} inline"
-     end
-   %>
-    <li>
-         <span class='disabled_icon disabled' onclick="alert('<%=title%>')" title="<%=tooltip_title_attrib(title)%>">
-            <%= image('show', {:alt=>"View content",:class=>"disabled"}) + "View content" %>
-         </span>
-    </li>
+     <li><%= image_tag_for_key "show", view_pdf_content_url, 'View content', {:title => title, :onclick => "isCanvasSupportBrowser();isIEVersionSupported();"}, 'View content'%></li>
    <% end %>
 <% end %>
 

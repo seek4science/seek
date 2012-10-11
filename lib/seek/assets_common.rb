@@ -289,8 +289,8 @@ module Seek
     def view_content_auth
       name = self.controller_name.singularize
       asset = name.camelize.constantize.find(params[:id])
-      display_asset = asset.find_version(params[:version])
-      if display_asset.content_blob.is_content_viewable?
+      display_asset = asset.find_version(params[:version]) || asset.latest_version
+      if display_asset.content_blob.is_content_viewable? && (asset.can_download? || asset.special_auth_codes.unexpired.collect(&:code).include?(params[:code]))
         eval "@#{name} = asset"
         eval "@display_#{name} = display_asset"
       else
@@ -302,7 +302,8 @@ module Seek
     def view_pdf_content
       asset = eval("@#{self.controller_name.singularize}")
       display_asset = eval("@display_#{self.controller_name.singularize}")
-      get_pdf_url = polymorphic_path(asset, :version => display_asset.version, :action => 'get_pdf')
+      #param code is used for temporary link
+      get_pdf_url = polymorphic_path(asset, :version => display_asset.version, :action => 'get_pdf', :code => params[:code])
       render :partial => 'layouts/pdf_content_display', :locals => {:get_pdf_url => get_pdf_url }
     end
 

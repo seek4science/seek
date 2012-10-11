@@ -64,5 +64,8 @@ module Seek
       end
     end
 
+    def self.inline_viewable_content_types
+      [DataFile, Presentation, Sop]
+    end
   end
 end

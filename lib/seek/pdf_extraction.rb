@@ -7,9 +7,9 @@ module Seek
 
     def is_content_viewable?
       if Seek::Config.pdf_conversion_enabled
-        asset.is_downloadable_asset? && asset.can_download? && !filesize.nil? && is_viewable_format?
+        asset.is_downloadable_asset? && !filesize.nil? && is_viewable_format?
       else
-        asset.is_downloadable_asset? && asset.can_download? && !filesize.nil? && (is_pdf? || File.exists?(filepath('pdf')))
+        asset.is_downloadable_asset? && !filesize.nil? && (is_pdf? || File.exists?(filepath('pdf')))
       end
     end
 
