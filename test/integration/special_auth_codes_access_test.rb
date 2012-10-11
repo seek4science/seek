@@ -19,7 +19,6 @@ class SpecialAuthCodesAccessTest < ActionController::IntegrationTest
 
   ASSETS_WITH_AUTH_CODES.each do |type_name|
     test "anonymous visitors can use access codes to show or download #{type_name}" do
-
       item = Factory(type_name.singularize.to_sym, :policy => Factory(:private_policy))
       item.special_auth_codes << Factory(:special_auth_code, :asset => item)
 
@@ -30,6 +29,71 @@ class SpecialAuthCodesAccessTest < ActionController::IntegrationTest
       if item.is_downloadable?
         get "/#{type_name}/download/#{item.id}?code=#{code}"
         assert_response :success, "failed for asset #{type_name}"
+      end
+    end
+  end
+
+  ASSETS_WITH_AUTH_CODES.each do |type_name|
+    test "anonymous visitors can not see or download #{type_name} without code" do
+      item = Factory(type_name.singularize.to_sym, :policy => Factory(:private_policy))
+
+      get "/#{type_name}/show/#{item.id}"
+      assert_redirected_to eval "#{type_name}_path"
+      assert_not_nil flash[:error]
+
+      if item.is_downloadable?
+        get "/#{type_name}/download/#{item.id}"
+        assert_redirected_to item
+        assert_not_nil flash[:error]
+      end
+    end
+  end
+
+  ASSETS_WITH_AUTH_CODES.each do |type_name|
+    test "anonymous visitors can see or download #{type_name} with wrong code" do
+      item = Factory(type_name.singularize.to_sym, :policy => Factory(:private_policy))
+      item.special_auth_codes << Factory(:special_auth_code, :asset => item)
+
+      random_code = CGI::escape(SecureRandom.base64(30))
+      get "/#{type_name}/show/#{item.id}?code=#{random_code}"
+      assert_redirected_to eval "#{type_name}_path"
+      assert_not_nil flash[:error]
+
+      if item.is_downloadable?
+        get "/#{type_name}/download/#{item.id}?code=#{random_code}"
+        assert_redirected_to item
+        assert_not_nil flash[:error]
+      end
+    end
+  end
+
+  ASSETS_WITH_AUTH_CODES.each do |type_name|
+    test "auth codes allow access to private #{type_name} until they expire" do
+      auth_code = Factory :special_auth_code, :expiration_date => (Time.now + 1.days), :asset => Factory(type_name.singularize.to_sym, :policy => Factory(:private_policy))
+      item = auth_code.asset
+
+      assert !item.can_view?
+      assert !item.can_download?
+
+      code = CGI::escape(auth_code.code)
+      get "/#{type_name}/show/#{item.id}?code=#{code}"
+      assert_response :success, "failed for asset #{type_name}"
+
+      if item.is_downloadable?
+        get "/#{type_name}/download/#{item.id}?code=#{code}"
+        assert_response :success, "failed for asset #{type_name}"
+      end
+
+      disable_authorization_checks {auth_code.expiration_date = Time.now - 1.days; auth_code.save! }
+      item.reload
+      get "/#{type_name}/show/#{item.id}?code=#{code}"
+      assert_redirected_to eval "#{type_name}_path"
+      assert_not_nil flash[:error]
+
+      if item.is_downloadable?
+        get "/#{type_name}/download/#{item.id}?code=#{code}"
+        assert_redirected_to item
+        assert_not_nil flash[:error]
       end
     end
   end

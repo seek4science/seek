@@ -35,14 +35,6 @@ class ApplicationController < ActionController::Base
 
   before_filter :profile_for_login_required
 
-  around_filter :with_auth_code
-  def with_auth_code
-    session[:code] = params[:code] if params[:code]
-    SpecialAuthCode.with_auth_code(session[:code]) do
-      yield
-    end
-  end
-
   before_filter :project_membership_required,:only=>[:create,:new]
 
   helper :all
@@ -285,7 +277,7 @@ class ApplicationController < ActionController::Base
 
       object = name.camelize.constantize.find(params[:id])
 
-      if object.can_perform? action
+      if is_auth?(object, action)
         eval "@#{name} = object"
         params.delete :sharing unless object.can_manage?(current_user)
       else
@@ -324,7 +316,16 @@ class ApplicationController < ActionController::Base
     end
   end
 
-  # See ActionController::Base for details 
+  def is_auth? object, action
+    if object.can_perform? action
+      true
+    elsif params[:code] && (action == 'view' || action == 'download')
+      object.special_auth_codes.unexpired.collect(&:code).include?(params[:code])
+    else
+      false
+    end
+  end
+  # See ActionController::Base for details
   # Uncomment this to filter the contents of submitted sensitive data parameters
   # from your application log (in this case, all fields with names like "password"). 
   filter_parameter_logging :password

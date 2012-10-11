@@ -12,15 +12,6 @@ module Acts
 
       module ClassMethods
       end
-
-    [:view, :download].each do |action|
-        eval <<-END_EVAL
-          def can_#{action}? user = User.current_user
-            SpecialAuthCode.current_auth_code.try(:asset) == self or super
-          end
-        END_EVAL
-    end
-
     end
   end
 end

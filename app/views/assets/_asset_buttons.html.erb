@@ -25,9 +25,9 @@
 
   <% if asset.is_downloadable? -%>
       <% display_asset = asset.find_version(version) %>
-      <% if asset.can_download? -%>
+      <% if asset.can_download? || (params[:code] && asset.special_auth_codes.unexpired.collect(&:code).include?(params[:code])) -%>
           <li>
-          <%= image_tag_for_key('download', polymorphic_path(asset,:version=>version,:action=>:download), "Download #{human_name}", nil, "Download #{human_name}") -%>
+          <%= image_tag_for_key('download', polymorphic_path(asset,:version=>version,:action=>:download,:code=>params[:code]), "Download #{human_name}", nil, "Download #{human_name}") -%>
           </li>
           <% if asset.is_a?(DataFile) && display_asset.contains_extractable_spreadsheet? %>
               <li>

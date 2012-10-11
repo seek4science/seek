@@ -17,17 +17,4 @@ class SpecialAuthCode < ActiveRecord::Base
   end
 
   validates_presence_of :code, :expiration_date
-
-  @@current_auth_code = nil
-  def self.with_auth_code auth_code
-    original_value = @@current_auth_code
-    @@current_auth_code = auth_code ? unexpired.find_by_code(auth_code) : nil
-    yield
-  ensure
-    @@current_auth_code = original_value
-  end
-
-  def self.current_auth_code
-    @@current_auth_code
-  end
 end
