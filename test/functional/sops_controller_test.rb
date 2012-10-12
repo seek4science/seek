@@ -703,7 +703,7 @@ class SopsControllerTest < ActionController::TestCase
      assert_select 'a', :text => /View content/, :count => 1
   end
 
-  test 'should disable view content button for the document needing pdf conversion, when pdf_conversion_enabled is false' do
+  test 'should disappear view content button for the document needing pdf conversion, when pdf_conversion_enabled is false' do
     tmp = Seek::Config.pdf_conversion_enabled
     Seek::Config.pdf_conversion_enabled = false
 
@@ -714,7 +714,7 @@ class SopsControllerTest < ActionController::TestCase
     assert !content_blob.is_content_viewable?
     get :show, :id => ms_word_sop.id
     assert_response :success
-    assert_select "span.disabled_icon img",:count=>1
+    assert_select 'a', :text => /View content/, :count => 0
 
     Seek::Config.pdf_conversion_enabled = tmp
   end
