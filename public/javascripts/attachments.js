@@ -96,7 +96,7 @@ function MultiSelector(list_target,object_name,method) {
 
 
         var new_row_button = document.createElement('a');
-        new_row_button.title = 'Remove This Image';
+        new_row_button.title = 'Remove This File';
         new_row_button.href = '#';
         new_row_button.innerHTML = 'Remove';
         new_row.element = element;
