@@ -46,6 +46,15 @@ module AssetsCommonExtension
     return [local_set, url_set, original_filename_from_url_set]
   end
 
+  def retained_content_blob_ids
+    if params[:content_blobs] && params[:content_blobs][:id]
+      params[:content_blobs][:id].keys.collect{|id| id.to_i}
+    else
+      []
+    end
+  end
+
+
   def handle_batch_data render_action_on_error=:new
     #FIXME: too many nested if,else and rescue blocks. This method needs refactoring.
     c = self.controller_name.downcase
@@ -61,13 +70,15 @@ module AssetsCommonExtension
     params_url = params_files.second
     params_original_filename_from_ulr = params_files.third
     params_image_file = params[controller_name.singularize+'_image'].nil? ? nil : params[controller_name.singularize+'_image']['image_file']
+    #ids of selected content_blobs of previous version, when uploading new version
+    @retained_content_blob_ids = retained_content_blob_ids
 
     if render_action_on_error==:new || render_action_on_error.nil?
       params_files = params_data + params_url
     elsif render_action_on_error==:edit
       params_files = object.content_blobs
     end
-    if params_files.blank? && params_image_file.blank?
+    if params_files.blank? && params_image_file.blank? && @retained_content_blob_ids.blank?
       flash.now[:error] = "Please select at least a file/image to upload or provide a URL to the data."
       if render_action_on_error
         init_asset_for_render params
@@ -207,8 +218,22 @@ module AssetsCommonExtension
                                    :content_type=>@content_types[index],
                                    :asset_version=>version)
       end
-    end
 
+      #create content_blobs and files, based on previous version chosen content_blobs
+      previous_version_asset= asset.find_version(version - 1)
+      if previous_version_asset
+        previous_version_content_blobs = previous_version_asset.content_blobs
+        copying_content_blobs = previous_version_content_blobs.select{|cb| @retained_content_blob_ids.include?(cb.id)}
+
+        copying_content_blobs.each do |cb|
+            new_content_blob= asset.content_blobs.create(:url=>cb.url,
+                                                         :original_filename=>cb.original_filename,
+                                                         :content_type=>cb.content_type,
+                                                         :asset_version=>version)
+            FileUtils.cp(cb.filepath, new_content_blob.filepath) if File.exists?(cb.filepath)
+        end
+      end
+    end
   end
 
   def handle_download_zip asset
@@ -252,7 +277,7 @@ module AssetsCommonExtension
 end
 
 Seek::AssetsCommon.module_eval do
-      include AssetsCommonExtension
+  include AssetsCommonExtension
 end
 
 

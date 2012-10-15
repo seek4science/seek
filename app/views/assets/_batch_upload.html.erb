@@ -115,9 +115,6 @@
   </div>
 
   <table id="pending_files">
-    <% if new_version %>
-
-    <% end %>
   </table>
 </div>
 
@@ -155,6 +152,10 @@
         }
     <% end -%>
 
+    <% if new_version %>
+        listFilesOfPreviousVersion();
+    <% end %>
+
 
     function addToList() {
         var url = multi_selector.current_original_filename_url_element.value || parseUri(multi_selector.current_url_element.value).file;
@@ -180,5 +181,20 @@
         }else{
             alert("The URL cannot be parsed. The data behind the URL may not exist or be available from SEEK");
         }
+    }
+
+    function listFilesOfPreviousVersion(){
+        <% content_blobs = resource.latest_version.try(:content_blobs) %>
+        <% unless content_blobs.blank? %>
+            <% content_blobs.each do |cb| %>
+                var element = document.createElement('input');
+                element.name = "content_blobs[id][<%= cb.id%>]";
+                element.value = "<%= cb.original_filename%>";
+                element.type = 'hidden';
+                var current_element = multi_selector.current_element;
+                current_element.parentNode.insertBefore(element, current_element);
+                multi_selector.addListRow(element);
+            <% end %>
+        <% end %>
     }
 </script>

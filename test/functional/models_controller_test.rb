@@ -974,6 +974,26 @@ class ModelsControllerTest < ActionController::TestCase
     assert_select 'div', :text => /another creator/, :count => 1
   end
 
+  test "should create new model version based on content_blobs of previous version" do
+    m = Factory(:model_2_files)
+    retained_content_blob = m.content_blobs.first
+    login_as(m.contributor)
+    assert_difference("Model::Version.count", 1) do
+      post :new_version, :id=>m, :model=>{},:content_blob=>{:file_0=>fixture_file_upload('files/little_file.txt',Mime::TEXT)}, :content_blobs=> {:id => {"#{retained_content_blob.id}" => retained_content_blob.original_filename}}
+    end
+
+    assert_redirected_to model_path(m)
+    assert assigns(:model)
+
+    m=Model.find(m.id)
+    assert_equal 2,m.versions.size
+    assert_equal 2,m.version
+    content_blobs = m.content_blobs
+    assert_equal 2,content_blobs.size
+    assert !content_blobs.include?(retained_content_blob)
+    assert content_blobs.collect(&:original_filename).include?(retained_content_blob.original_filename)
+  end
+
   def valid_model
     { :title=>"Test",:projects=>[projects(:sysmo_project)]}
   end
