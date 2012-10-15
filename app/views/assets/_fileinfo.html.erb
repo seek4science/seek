@@ -12,3 +12,7 @@
   <b>Size:</b>
   <%= filesize_as_text(fileinfo) %>
 </p>
+
+<p>
+  <%= link_to image('download'), polymorphic_path(fileinfo.asset,:version=>fileinfo.asset_version,:action=>:download,:code=>params[:code],:content_blob_id => fileinfo.id), :title => 'Download this file' -%>
+</p>

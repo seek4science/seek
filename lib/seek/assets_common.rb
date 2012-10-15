@@ -227,8 +227,10 @@ module Seek
       end
     end  
     
-    def handle_download asset
-      content_blob = asset.respond_to?(:content_blobs) ? asset.content_blobs.first : asset.content_blob
+    def handle_download asset, content_blob=nil
+      if content_blob.nil?
+        content_blob = asset.respond_to?(:content_blobs) ? asset.content_blobs.first : asset.content_blob
+      end
       if content_blob.url.blank?
         if content_blob.file_exists?
           send_file content_blob.filepath, :filename => content_blob.original_filename, :type => content_blob.content_type, :disposition => 'attachment'
