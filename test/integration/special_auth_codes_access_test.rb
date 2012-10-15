@@ -134,18 +134,4 @@ class SpecialAuthCodesAccessTest < ActionController::IntegrationTest
     assert_response :success
   end
 
-  test 'a temporary test' do
-    df = Factory(:data_file, :policy => Factory(:private_policy))
-    assert !df.can_view?
-    assert !df.can_download?
-
-    auth_code = Factory :special_auth_code, :expiration_date => (Time.now + 1.days), :asset => Factory(:data_file, :policy => Factory(:private_policy))
-    item = auth_code.asset
-    assert_equal 0, item.policy.sharing_scope
-    assert_equal 0, item.policy.access_type
-    assert item.policy.permissions.blank?
-    assert User.current_user.nil?
-    assert !item.can_view?
-    assert !item.can_download?
-  end
 end
