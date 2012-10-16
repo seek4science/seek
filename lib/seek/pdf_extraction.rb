@@ -1,29 +1,6 @@
 module Seek
   module PdfExtraction
-    include Seek::MimeTypes
-
     MAXIMUM_PDF_CONVERT_TIME = 1.minute
-    PDF_CONVERTABLE_FORMAT = %w[doc docx ppt pptx odt odp rtf txt]
-
-    def is_content_viewable?
-      if Seek::Config.pdf_conversion_enabled
-        asset.is_downloadable_asset? && !filesize.nil? && is_viewable_format?
-      else
-        asset.is_downloadable_asset? && !filesize.nil? && (is_pdf? || File.exists?(filepath('pdf')))
-      end
-    end
-
-    def is_viewable_format?
-      (PDF_CONVERTABLE_FORMAT << 'pdf').include?(mime_extension(content_type))
-    end
-
-    def is_pdf_convertable?
-      PDF_CONVERTABLE_FORMAT.include?(mime_extension(content_type))
-    end
-
-    def is_pdf?
-      mime_extension(content_type) == 'pdf'
-    end
 
     def pdf_contents_for_search
       content = nil

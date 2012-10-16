@@ -4,6 +4,8 @@ module Seek
     include Seek::MimeTypes
 
     MAX_EXTRACTABLE_SPREADSHEET_SIZE=1*1024*1024
+    PDF_CONVERTABLE_FORMAT = %w[doc docx ppt pptx odt odp rtf txt]
+    IMAGE_VIEWABLE_FORMAT = %w[gif jpeg png]
 
     def is_excel? blob=self
       is_xls?(blob) || is_xlsx?(blob)
@@ -31,6 +33,26 @@ module Seek
 
     def is_xgmml? blob=self
       check_content(blob,"<graph") && check_content(blob,"<node")
+    end
+
+    def is_pdf? blob=self
+      mime_extension(blob.content_type) == 'pdf'
+    end
+
+    def is_pdf_convertable? blob=self
+      PDF_CONVERTABLE_FORMAT.include?(mime_extension(blob.content_type)) && Seek::Config.pdf_conversion_enabled
+    end
+
+    def is_viewable_format? blob=self
+      if Seek::Config.pdf_conversion_enabled
+        ((PDF_CONVERTABLE_FORMAT + IMAGE_VIEWABLE_FORMAT) << 'pdf').include?(mime_extension(blob.content_type))
+      else
+        (IMAGE_VIEWABLE_FORMAT << 'pdf').include?(mime_extension(blob.content_type))
+      end
+    end
+
+    def is_content_viewable? blob=self
+       blob.asset.is_downloadable_asset? && !blob.filesize.nil? && (blob.is_viewable_format? || File.exist?(blob.filepath('pdf')))
     end
 
     private
