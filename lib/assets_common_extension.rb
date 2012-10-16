@@ -253,8 +253,6 @@ module AssetsCommonExtension
         data_hash = downloader.get_remote_data content_blob.url, nil, nil, nil, true
         filename = check_and_rename_file files_to_download.keys, content_blob.original_filename
         files_to_download["#{filename}"] = data_hash[:data_tmp_path]
-      else
-        flash.now[:error] = "#{content_blob.original_filename} does not exist!"
       end
     end
 
