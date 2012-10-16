@@ -90,8 +90,8 @@
             <% if  @display_model.model_image
              image_width = @display_model.model_image.image_width.nil??  "100px" : @display_model.model_image.image_width
             %>
-            <a href='<%= url_for(:controller=>"models",:action=>"send_image",:id=>@model,:version=>@display_model.version) %>' rel="lightbox">
-               <img src="<%= url_for(:controller=>"models",:action=>"send_image",:id=>@model,:version=>@display_model.version) %>" width="<%= image_width %>"  style="max-width: 100%;"/>
+            <a href='<%= url_for(:controller=>"models",:action=>"send_image",:id=>@model,:version=>@display_model.version,:code => params[:code]) %>' rel="lightbox">
+               <img src="<%= url_for(:controller=>"models",:action=>"send_image",:id=>@model,:version=>@display_model.version,:code => params[:code]) %>" width="<%= image_width %>"  style="max-width: 100%;"/>
             </a>
             <% else %>
             <span class="none_text">None</span>
