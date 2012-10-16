@@ -477,12 +477,16 @@ module Seek
       if assay_json
         if assay_json["creator last name"] && assay_json["creator first name"] && assay_json["creator email"]
           set_creator data["assay"]
+        else
+          @creator = Person.find(User.current_user.person_id)
         end
         if assay_json["investigation title"] &&
            assay_json["assay type title"] &&
            assay_json["study title"]
             assay = populate_assay data["assay"], @file.original_filename
         end
+      else
+        @creator = Person.find(User.current_user.person_id)
       end
 
       data["rows"].each do |data_row|
@@ -519,10 +523,12 @@ module Seek
       creator_last_name = assay_json["creator last name"]
       creator_first_name = assay_json["creator first name"]
       creator_name = "#{creator_first_name} #{creator_last_name}"
-      @creator = Person.find_by_first_name_and_last_name_and_email(creator_first_name,creator_last_name,creator_email)
+      #@creator = Person.find_by_first_name_and_last_name_and_email(creator_first_name,creator_last_name,creator_email)
+      @creator = Person.find_by_first_name_and_last_name(creator_first_name, creator_last_name)
       unless @creator
-        @errors << "Warning: Person #{creator_name}(#{creator_email}) cannot be found. Please register in SEEK.<br/>"
-        raise @errors
+        @warnings << "Warning: Person #{creator_name}(#{creator_email}) cannot be found. Please register in SEEK. Will use uploader as creator.<br/>"
+        @creator = Person.find(User.current_user.person_id)
+        #raise @errors
       end
     end
 
@@ -735,9 +741,9 @@ module Seek
 
 
       case sex
-          when "female"
-            sex = 0
           when "male"
+            sex = 0
+          when "female"
             sex = 1
           when "hermaphrodite"
             sex = 2
@@ -781,6 +787,7 @@ module Seek
           specimen.policy = @file.policy.deep_copy
           specimen.projects = @file.projects
           specimen.comments = comments
+          specimen.creators << @creator
           specimen.save!
         else
           unless specimen.organism == organism &&
@@ -870,11 +877,12 @@ module Seek
     
     def populate_sample sample_json, specimen, assay=nil
 
+
         sample_title = sample_json["title"]
         sample_type = sample_json["type"]
         tissue_and_cell_type_title = sample_json["tissue and cell type"]
         sop_title = sample_json["sop"]
-        donation_date = sample_json["donation date"]
+        donation_date = sample_json["donation date"] + " UTC +00.00"
         institution_name = sample_json["institution"]
         comments = sample_json["comments"]
         organism_part = sample_json["organism part"]
@@ -915,7 +923,7 @@ module Seek
           treatment =  "" # will be linked to 0 ... n treatments anyway
 
           sample.sample_type = sample_type
-          sample.donation_date = donation_date
+          sample.donation_date = Time.zone.parse(donation_date).utc
           sample.institution = institution
           sample.tissue_and_cell_types << tissue_and_cell_type if tissue_and_cell_type.try(:id) && !sample.tissue_and_cell_types.include?(tissue_and_cell_type)
           sample.associate_sop sop if sop
@@ -924,12 +932,13 @@ module Seek
           sample.comments = comments
           sample.treatment = treatment
           sample.policy = @file.policy.deep_copy
+          sample.creators << @creator
           sample.save!
         else
           unless sample.specimen == specimen &&
               sample.sample_type == sample_type &&
               (sample.tissue_and_cell_types.member?(tissue_and_cell_type) || tissue_and_cell_type_title == "") &&
-              sample.donation_date == Time.zone.parse(donation_date) &&
+              sample.donation_date == Time.zone.parse(donation_date).utc &&
               sample.institution == institution &&
               sample.comments == comments
               sleep(1);
@@ -939,7 +948,7 @@ module Seek
               Rails.logger.warn "#{sample.specimen} == #{specimen} ? #{sample.specimen == specimen}"
               Rails.logger.warn "#{sample.sample_type} == #{sample_type} ? #{sample.sample_type == sample_type}"
               Rails.logger.warn "(sample.tissue_and_cell_types.member?(tissue_and_cell_type) || tissue_and_cell_type_title == "") ? #{(sample.tissue_and_cell_types.member?(tissue_and_cell_type) || tissue_and_cell_type_title == "")}"
-              Rails.logger.warn "#{sample.donation_date} == #{Time.zone.parse(donation_date)} ? #{sample.donation_date == Time.zone.parse(donation_date)}"
+              Rails.logger.warn "#{sample.donation_date} == #{Time.zone.parse(donation_date).utc} ? #{sample.donation_date == Time.zone.parse(donation_date).utc}"
               Rails.logger.warn "#{sample.institution} == #{institution} ? #{sample.institution == institution}"
               Rails.logger.warn "#{sample.comments} == #{comments} ? #{sample.comments == comments}"
             @warnings << "Warning: sample with the name '#{sample_title}' is already created in SEEK."
@@ -968,6 +977,7 @@ module Seek
           @file.save!
         end
       end
+
 
       sample
 

@@ -283,15 +283,15 @@ module Seek
               :"assay_type.title" => mapping_entry("FIXED", proc { nil }),
               :"study.title" => mapping_entry("FIXED", proc { nil }),
 
-              :"creator.email" => mapping_entry("FIXED", proc { "seddik.hammad@hengstler.de" }),
+              :"creator.email" => mapping_entry("FIXED", proc { "" }),
               :"creator.last_name" => mapping_entry("Experimentator", proc do |data|
                 if data.split(/\s+/)
-                  data.split(/\s+/)[1]
+                  data.split(/\s+/).last
                 end
               end),
               :"creator.first_name" => mapping_entry("Experimentator", proc do |data|
                 if data.split(/\s+/)
-                  data.split(/\s+/)[0]
+                  data.gsub(data.split(/\s+/).last, "").chop
                 end
               end)
 
@@ -490,15 +490,25 @@ module Seek
 
               :assay_mapping => {
 
-                  :assay_sheet_name => "",
+                  :assay_sheet_name => "Tabelle2",
+                  :parsing_direction => "vertical",
+                  :probing_column => :"creator.last_name",
 
-                  :"investigation.title" => mapping_entry(""),
-                  :"assay_type.title" => mapping_entry(""),
-                  :"study.title" => mapping_entry(""),
+                  :"investigation.title" => mapping_entry("FIXED", proc { nil }),
+                  :"assay_type.title" => mapping_entry("FIXED", proc { nil }),
+                  :"study.title" => mapping_entry("FIXED", proc { nil }),
 
-                  :"creator.email" => mapping_entry(""),
-                  :"creator.last_name" => mapping_entry(""),
-                  :"creator.first_name" => mapping_entry("")
+                  :"creator.email" => mapping_entry("FIXED", proc { "" }),
+                  :"creator.last_name" => mapping_entry("experimentator", proc do |data|
+                    if data.split(/\s+/)
+                      data.split(/\s+/).last
+                    end
+                  end),
+                  :"creator.first_name" => mapping_entry("experimentator", proc do |data|
+                    if data.split(/\s+/)
+                      data.gsub(data.split(/\s+/).last, "").chop
+                    end
+                  end)
 
               }
 
