@@ -57,7 +57,4 @@ class ModelImage < ActiveRecord::Base
     model.model_image_id && model.model_image_id.to_i == id.to_i
   end
 
-  def filepath
-    "#{original_path}/#{id}.#{original_image_format}"
-  end
 end

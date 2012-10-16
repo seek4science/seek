@@ -242,7 +242,7 @@ module AssetsCommonExtension
     if asset.respond_to?(:model_image) && asset.model_image
       model_image = asset.model_image
       filename = check_and_rename_file files_to_download.keys, model_image.original_filename
-      files_to_download["#{filename}"] = model_image.filepath
+      files_to_download["#{filename}"] = model_image.file_path
     end
     asset.content_blobs.each do |content_blob|
       if File.exists? content_blob.filepath
