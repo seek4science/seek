@@ -4,7 +4,6 @@ class PresentationsController < ApplicationController
 
   include IndexPager
   include DotGenerator
-  include Seek::AssetsCommon
   include AssetsCommonExtension
 
   #before_filter :login_required
@@ -13,7 +12,7 @@ class PresentationsController < ApplicationController
   before_filter :find_display_asset, :only=>[:show,:download]
 
   #before_filter :convert_to_swf, :only => :show
-
+  include Seek::AssetsCommon
   include Seek::Publishing
   include Seek::BreadCrumbs
 

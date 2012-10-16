@@ -5,7 +5,7 @@ module Seek
 
     MAX_EXTRACTABLE_SPREADSHEET_SIZE=1*1024*1024
     PDF_CONVERTABLE_FORMAT = %w[doc docx ppt pptx odt odp rtf txt]
-    IMAGE_VIEWABLE_FORMAT = %w[gif jpeg png]
+    IMAGE_VIEWABLE_FORMAT = %w[gif jpg jpeg png]
 
     def is_excel? blob=self
       is_xls?(blob) || is_xlsx?(blob)
@@ -37,6 +37,10 @@ module Seek
 
     def is_pdf? blob=self
       mime_extension(blob.content_type) == 'pdf'
+    end
+
+    def is_image? blob=self
+      blob.content_type.try(:split, '/').try(:first) == 'image'
     end
 
     def is_pdf_convertable? blob=self

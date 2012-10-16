@@ -7,7 +7,6 @@ class DataFilesController < ApplicationController
   include SysMODB::SpreadsheetExtractor
   include MimeTypesHelper
   include DotGenerator
-  include Seek::AssetsCommon
   include AssetsCommonExtension
   include Seek::AnnotationCommon
 
@@ -20,6 +19,7 @@ class DataFilesController < ApplicationController
   before_filter :xml_login_only, :only => [:upload_for_tool, :upload_from_email]
 
   #has to come after the other filters
+  include Seek::AssetsCommon
   include Seek::Publishing
   include Seek::BreadCrumbs
 

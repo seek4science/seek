@@ -6,7 +6,6 @@ class ModelsController < ApplicationController
   include WhiteListHelper
   include IndexPager
   include DotGenerator
-  include Seek::AssetsCommon
   include AssetsCommonExtension
 
   before_filter :pal_or_admin_required,:only=> [:create_model_metadata,:update_model_metadata,:delete_model_metadata ]
@@ -19,6 +18,7 @@ class ModelsController < ApplicationController
 
   before_filter :experimental_features, :only=>[:matching_data]
 
+  include Seek::AssetsCommon
   include Seek::Publishing
   include Seek::BreadCrumbs
 
