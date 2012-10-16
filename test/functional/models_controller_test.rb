@@ -66,6 +66,31 @@ class ModelsControllerTest < ActionController::TestCase
     assert_equal first_content_blob.filesize.to_s,@response.header['Content-Length']
   end
 
+  test "should download multiple files with the same name" do
+    #2 files with different names
+    model = Factory :model_2_files, :policy=>Factory(:public_policy), :contributor=>User.current_user
+    get :download, :id=>model.id
+    assert_response :success
+    assert_equal "application/zip", @response.header['Content-Type']
+    assert_equal "3024", @response.header['Content-Length']
+    zip_file_size1 = @response.header['Content-Length'].to_i
+
+    #3 files, 2 of them have the same name
+    first_content_blob = model.content_blobs.first
+    third_content_blob = Factory(:cronwright_model_content_blob, :asset => model,:asset_version=>model.version)
+    assert_equal first_content_blob.original_filename, third_content_blob.original_filename
+    model.content_blobs << third_content_blob
+
+    get :download, :id=>model.id
+    assert_response :success
+    assert_equal "application/zip", @response.header['Content-Type']
+    assert_equal "4023", @response.header['Content-Length']
+    zip_file_size2 = @response.header['Content-Length'].to_i
+
+    #the same name file is not overwriten, by checking the zip file size
+    assert_not_equal zip_file_size1, zip_file_size2
+  end
+
   test "should not create model with file url" do
     file_path=File.expand_path(__FILE__) #use the current file
     file_url="file://"+file_path

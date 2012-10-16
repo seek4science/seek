@@ -237,36 +237,52 @@ module AssetsCommonExtension
   end
 
   def handle_download_zip asset
-    t = Tempfile.new("#{Time.now.year}#{Time.now.month}#{Time.now.day}_#{asset.class.name.downcase}_#{asset.id}","#{RAILS_ROOT}/tmp")
-  # Give the path of the temp file to the zip outputstream, it won't try to open it as an archive.
-    Zip::ZipOutputStream.open(t.path) do |zos|
-      if asset.respond_to?(:model_image) && asset.model_image
-         model_image = asset.model_image
-        zos.put_next_entry(model_image.original_filename)
-        zos.print IO.read("#{model_image.original_path}/#{model_image.id}.#{model_image.original_image_format}")
-      end
-      asset.content_blobs.each do |content_blob|
-        if File.exists? content_blob.filepath
-          # Create a new entry with content_blob's original_filename'
-          zos.put_next_entry(content_blob.original_filename)
-          # Add the contents of the file, don't read the stuff linewise if its binary, instead use direct IO
-          zos.print IO.read(content_blob.filepath)
-        elsif !content_blob.url.nil?
-           downloader=Seek::RemoteDownloader.new
-           data_hash = downloader.get_remote_data content_blob.url,nil,nil,nil,true
-
-          zos.put_next_entry(content_blob.original_filename)
-
-          zos.print IO.read(data_hash[:data_tmp_path])
-        else
-          flash.now[:error] = "#{content_blob.original_filename} does not exist!"
-        end
+    #get the list of filename and filepath, {:filename => filepath}
+    files_to_download = {}
+    if asset.respond_to?(:model_image) && asset.model_image
+      model_image = asset.model_image
+      filename = check_and_rename_file files_to_download.keys, model_image.original_filename
+      files_to_download["#{filename}"] = model_image.filepath
+    end
+    asset.content_blobs.each do |content_blob|
+      if File.exists? content_blob.filepath
+        filename = check_and_rename_file files_to_download.keys, content_blob.original_filename
+        files_to_download["#{filename}"] = content_blob.filepath
+      elsif !content_blob.url.nil?
+        downloader=Seek::RemoteDownloader.new
+        data_hash = downloader.get_remote_data content_blob.url, nil, nil, nil, true
+        filename = check_and_rename_file files_to_download.keys, content_blob.original_filename
+        files_to_download["#{filename}"] = data_hash[:data_tmp_path]
+      else
+        flash.now[:error] = "#{content_blob.original_filename} does not exist!"
       end
     end
-    send_file t.path, :type => 'application/zip', :disposition => 'attachment', :filename => "#{asset.title}.zip"
-  # The temp file will be deleted some time...
-    t.close
 
+    #making zip file
+    t = Tempfile.new("#{Time.now.year}#{Time.now.month}#{Time.now.day}_#{asset.class.name.downcase}_#{asset.id}","#{RAILS_ROOT}/tmp")
+    # Give the path of the temp file to the zip outputstream, it won't try to open it as an archive.
+    Zip::ZipOutputStream.open(t.path) do |zos|
+      files_to_download.each do |filename,filepath|
+        zos.put_next_entry(filename)
+        zos.print IO.read(filepath)
+      end
+    end
+
+    send_file t.path, :type => 'application/zip', :disposition => 'attachment', :filename => "#{asset.title}.zip"
+    # The temp file will be deleted some time...
+    t.close
+  end
+
+  def check_and_rename_file filename_list, filename
+    file = filename.split('.')
+    file_format = file.last
+    original_name = file.take(file.size - 1).join('.')
+    i = 1
+    while filename_list.include?(filename)
+      filename = original_name + '_' + i.to_s + '.' + file_format
+      i += 1
+    end
+    filename
   end
 
   def content_type_from_filename filename
