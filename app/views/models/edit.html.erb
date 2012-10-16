@@ -52,20 +52,6 @@
             <%= render :partial => "organisms/select_organism",:locals=>{:model_class=>Model} -%>
         </p>        
 
-
-
-       <% if @model && (mine?(@model) || @model.can_edit?) -%>
-          <div class="fold">
-            <div class="foldTitle">
-              Model image
-            </div>
-            <div class="foldContent">
-              <%= render :partial => "model_images/image_selector", :locals => {:image_for_instance => @model, :form_instance => f} -%>
-            </div>
-          </div>
-      <% end -%>
-
-
         <% if current_user_authorized_to_manage -%>
 		
 		<%= render :partial=>"assets/asset_form_bottom", :locals=> { :f => f } -%>
