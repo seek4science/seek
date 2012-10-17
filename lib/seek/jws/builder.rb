@@ -25,11 +25,12 @@ module Seek
           form_data[p]=params[p] if params.has_key?(p)
         end
 
-        response = Net::HTTP.post_form(URI.parse(url), form_data)
+        response = RestClient.post(url, form_data)
 
         if response.instance_of?(Net::HTTPInternalServerError)
           raise Exception.new(response.body.gsub(/<head\>.*<\/head>/, ""))
         end
+
         process_response_body(response.body)
       end
 
