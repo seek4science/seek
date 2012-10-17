@@ -130,13 +130,13 @@ work fine.</p>
 
 <p>for Ubuntu Precise 12.04 (LTS):</p>
 
-<pre>sudo apt-get install wget mercurial ruby ri1.8 libruby1.8 ruby-dev mysql-server libssl-dev build-essential openssh-server
+<pre>sudo apt-get install wget git mercurial ruby ri1.8 libruby1.8 ruby-dev mysql-server libssl-dev build-essential openssh-server
 sudo apt-get install libmysqlclient-dev libmagick++-dev libxslt1-dev libxml++2.6-dev openjdk-6-jdk graphviz libsqlite3-dev sqlite3
 sudo apt-get install poppler-utils tesseract-ocr openoffice.org openoffice.org-java-common</pre>
 
 <p>for Ubuntu Lucid 10.04 (LTS):</p>
 
-<pre>sudo apt-get install wget mercurial ruby rdoc ri libopenssl-ruby ruby-dev mysql-server libssl-dev build-essential openssh-server 
+<pre>sudo apt-get install wget git mercurial ruby rdoc ri libopenssl-ruby ruby-dev mysql-server libssl-dev build-essential openssh-server
 sudo apt-get install libmysqlclient16-dev libmagick++-dev libxslt-dev libxml++2.6-dev openjdk-6-jdk graphviz libsqlite3-dev sqlite3
 sudo apt-get install poppler-utils tesseract-ocr openoffice.org openoffice.org-java-common</pre>
 
@@ -180,10 +180,10 @@ Repository</a>, using <a href="http://mercurial.selenic.com/">Mercurial</a>
 as the version control system.</p>
 
 <p>For a stable version, you should check out according to a stable tag. Our
-current stable tag is <em>0.14.1</em>, so to retrieve this version you
+current stable tag is <em>0.15.0</em>, so to retrieve this version you
 should use:</p>
 
-<pre>hg clone https://sysmo-db.googlecode.com/hg/ -r v0.14.1 seek</pre>
+<pre>hg clone https://sysmo-db.googlecode.com/hg/ -r v0.15.0 seek</pre>
 
 <p>This will create a <em>seek</em> directory that contains the application.</p>
 
@@ -266,6 +266,21 @@ the APP_PATH accordingly. Then run</p>
 
 <pre>sudo service seek-delayed-job stop</pre>
 
+<h2 id="label-Starting+Open+Office">Starting Open Office</h2>
+
+<p>Open Office is a background service which is called by convert_office
+plugin, to convert some document types (ms office documents, open office
+documents, etc.) into pdf document.</p>
+
+<p>The command to start open office in headless mode and as the background
+process:</p>
+
+<pre>nohup soffice --headless --accept=&quot;socket,host=127.0.0.1,port=8100;urp;&quot; --nofirststartwizard &gt; /dev/null 2&gt;&amp;1</pre>
+
+<p>The 8100 port is used by default, if you’d like to run on another port,
+you need also to synchronize the changed port with the default soffice_port
+setting for convert_office plugin in config/environment.rb</p>
+
 <h2 id="label-Starting+the+server">Starting the server</h2>
 
 <p>You can now start the server with the command</p>
@@ -320,7 +335,7 @@ href="https://gist.github.com/3143434">gist.github.com/3143434</a> (the
 APP_PATH may need changing for you)</p>
 
 <p>On Ubuntu or Debian, after putting the script in init.d/ you should run
-(assuming you called he file seek-solr)</p>
+(assuming you called the file seek-solr)</p>
 
 <pre>sudo update-rc.d seek-solr defaults</pre>
 

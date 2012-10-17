@@ -150,6 +150,11 @@ should still work, but could take a lot of unnecessary time.</p>
 
 <pre>sudo apt-get install poppler-utils tesseract-ocr openoffice.org openoffice.org-java-common</pre>
 
+<p>Then running open office in the headless mode and as the background
+process:</p>
+
+<pre>nohup soffice --headless --accept=&quot;socket,host=127.0.0.1,port=8100;urp;&quot; --nofirststartwizard &gt; /dev/null 2&gt;&amp;1</pre>
+
 <p>These are the fairly standard steps when upgrading between minor versions.</p>
 
 <pre>RAILS_ENV=production ./script/delayed_job stop
@@ -182,7 +187,12 @@ rubygems by running</p>
 
 <pre>gem -v</pre>
 
-<p>Once Rubygems has been updated, the upgrade is the typical:</p>
+<p>Then you will need to install additional dependency:</p>
+
+<pre>sudo apt-get install git</pre>
+
+<p>Once Rubygems has been updated and additional dependency has been
+installed, the upgrade is the typical:</p>
 
 <pre>RAILS_ENV=production ./script/delayed_job stop
 bundle exec rake sunspot:solr:stop RAILS_ENV=production
@@ -229,8 +239,8 @@ additional steps for this upgrade due to the switch from Solr to Sunspot as
 the search system, and the introduction of Delayed Job for background
 processing.</p>
 
-<p>First there is an additionaldependency you will need, which on Ubuntu 10.04
-or Debian can be installed with:</p>
+<p>First there is an additional dependency you will need, which on Ubuntu
+10.04 or Debian can be installed with:</p>
 
 <pre>sudo apt-get install libxslt-dev</pre>
 
