@@ -11,7 +11,7 @@ class MimeTypesHelperTest < ActionView::TestCase
   DOCX=%w{application/vnd.openxmlformats-officedocument.wordprocessingml.document}
   PPT=%w{application/vnd.ms-powerpoint}
   PDF=%w{application/pdf}
-  IMAGE=%w{image/gif image/jpeg image/png}
+  IMAGE=%w{image/gif image/jpeg image/png image/jpg image/bmp image/svg+xml}
   TEXT=%w{text/plain}
   CSV=%w{text/x-comma-separated-values}
   XML=%w{text/xml}
