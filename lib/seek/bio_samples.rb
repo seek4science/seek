@@ -824,8 +824,8 @@ module Seek
           modification = Modification.new :title => genotype_modification, :symbol => genotype_modification unless modification
           modification.save!
 
-          genotype =  Genotype.find(:first, :conditions => ["gene_id = ? and modification_id = ? and specimen_id = ? and strain_id = ?", gene.id, modification.id, specimen.id, strain.id])
-          genotype  = Genotype.new :gene_id => gene.id, :modification_id => modification.id, :specimen_id => specimen.id, :strain_id => strain.id unless genotype
+          genotype =  Genotype.find(:first, :conditions => ["gene_id = ? and modification_id = ? and specimen_id = ?", gene.id, modification.id, specimen.id])
+          genotype  = Genotype.new :gene_id => gene.id, :modification_id => modification.id, :specimen_id => specimen.id unless genotype
           genotype.save!
         end
 

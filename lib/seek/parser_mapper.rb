@@ -434,6 +434,7 @@ module Seek
     def duesseldorf_bode_mapping
 
       concentration_regex = /(\d*,?\.?\d*).*/
+      gene_modification_regex = /([\w\d]+)([\/+-]+)/
 
       {
               :name => "duesseldorf_bode",
@@ -458,8 +459,20 @@ module Seek
                   :"specimens.age" => mapping_entry("Age (Weeks)"),
                   :"specimens.age_unit" => mapping_entry("FIXED", proc {"week"}),
                   :"specimens.comments" => mapping_entry("Specials", proc {|data| data == "-" ? "" : data }),
-                  :"specimens.genotype.title" => mapping_entry("FIXED", proc {"none"}),
-                  :"specimens.genotype.modification" => mapping_entry("FIXED", proc{""}),
+                  :"specimens.genotype.title" => mapping_entry("Genotype", proc do |data|
+                       if data =~ gene_modification_regex
+                         $1
+                       else
+                         "none"
+                       end
+                  end),
+                  :"specimens.genotype.modification" => mapping_entry("Genotype", proc do |data|
+                      if data =~ gene_modification_regex
+                        $2
+                      else
+                        ""
+                      end
+                  end),
 
                   :"treatment.treatment_protocol" => mapping_entry("FIXED", proc {""}),
                   :"treatment.substance" => mapping_entry("FIXED", proc {"LPS"}),
@@ -569,6 +582,8 @@ module Seek
           :assay_mapping => {      # can be nil if no assays are mapped
 
               :assay_sheet_name => "",
+              :parsing_direction => "vertical",
+              :probing_column => :"creator.last_name",
 
               :"investigation.title" => mapping_entry(""),
               :"assay_type.title" => mapping_entry(""),
