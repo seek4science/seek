@@ -2,6 +2,7 @@ require 'test_helper'
 require 'open-uri'
 
 class JwsFunctionalTest < ActionController::TestCase
+
   tests ModelsController
 
   fixtures :all

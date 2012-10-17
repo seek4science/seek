@@ -6,7 +6,7 @@ module Seek
   module JWS
 
     BASE_URL = "#{Seek::Config.jws_online_root}/webMathematica/Examples/"
-    UPLOAD_URL = "#{Seek::Config.jws_online_root}/webMathematica/upload/uploadNEW.jsp"
+    UPLOAD_URL = "#{Seek::Config.jws_online_root}/webMathematica/upload/uploadSBML.jsp"
 
     class Builder
 
@@ -24,11 +24,12 @@ module Seek
           form_data[p]=params[p] if params.has_key?(p)
         end
 
-        response = Net::HTTP.post_form(URI.parse(url), form_data)
+        response = RestClient.post(url, form_data)
 
         if response.instance_of?(Net::HTTPInternalServerError)
           raise Exception.new(response.body.gsub(/<head\>.*<\/head>/, ""))
         end
+
         process_response_body(response.body)
       end
 
@@ -40,29 +41,25 @@ module Seek
           FileUtils.cp(filepath, tmpfile.path)
 
           if (content_blob.is_sbml?)
-            part=Multipart.new("upfile", filepath, content_blob.original_filename)
-            response = part.post(upload_sbml_url)
-            if response.code == "302"
-              uri = URI.parse(URI.encode(response['location']))
-              req = Net::HTTP::Get.new(uri.request_uri)
-              response = Net::HTTP.start(uri.host, uri.port) { |http|
-                http.request(req)
-              }
-            elsif response.code == "404"
-              raise Exception.new("Page not found on JWS Online for url: #{upload_sbml_url}")
-            elsif response.code == "500"
-              raise Exception.new("Server error on JWS Online for url: #{upload_sbml_url}\n\nCause:\n\n#{response.body}")
-            else
-              raise Exception.new("Expected a redirection from JWS Online but got #{response.code}, for url: #{upload_sbml_url}")
+            response = RestClient.post(upload_sbml_url, :upfile=>tmpfile,:SBMLFilePostedToIFC=>true, :xmloutput=>true,:loadModel=>content_blob.original_filename, :multipart=>true) do |response, request, result, &block |
+              if [301, 302, 307].include? response.code
+                response.follow_redirection(request, result, &block)
+              else
+                begin
+                  response.return!(request, result, &block)
+                rescue Exception=>e
+                  raise Exception.new "Error contacting JWSOnline #{e.class.name}:#{e.message}. Code: #{response.code}\n\nCause: #{response.body}"
+                end
+              end
             end
           elsif (content_blob.is_jws_dat?)
-            response = RestClient.post(upload_dat_url, :uploadedDatFile=>tmpfile, :filename=>content_blob.original_filename, :multipart=>true) { |response, request, result, &block |
-            if [301, 302, 307].include? response.code
-              response.follow_redirection(request, result, &block)
-            else
-              response.return!(request, result, &block)
+            response = RestClient.post(upload_dat_url, :uploadedDatFile=>tmpfile, :filename=>content_blob.original_filename, :multipart=>true) do |response, request, result, &block |
+              if [301, 302, 307].include? response.code
+                response.follow_redirection(request, result, &block)
+              else
+                response.return!(request, result, &block)
+              end
             end
-            }
           end
 
           if response.instance_of?(Net::HTTPInternalServerError)
@@ -110,7 +107,7 @@ module Seek
       end
 
       def upload_sbml_url
-        "#{Seek::JWS::UPLOAD_URL}?SBMLFilePostedToIFC=true&xmlOutput=true"
+        Seek::JWS::UPLOAD_URL
       end
 
     end
