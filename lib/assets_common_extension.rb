@@ -195,17 +195,17 @@ module AssetsCommonExtension
       )
 
     elsif asset.respond_to? :content_blobs
-      #if request is sent from a browser running on window, take the content type from the filename instead
-      if request.headers['HTTP_USER_AGENT'].include?('Win')
-        content_type = content_type_from_filename @original_filenames[0]
-      else
-        content_type = @original_filenames[0]
-      end
       # create new /new version
       @tmp_io_objects_localfile.each do |tmp_io_object|
+        #if request is sent from a browser running on window, take the content type from the filename instead
+        if request.headers['HTTP_USER_AGENT'].include?('Win')
+          content_type = content_type_from_filename @original_filenames[0]
+        else
+          content_type = @content_types[0].to_s
+        end
         asset.content_blobs.create(:tmp_io_object => tmp_io_object,
-                                   :original_filename=>content_type,
-                                   :content_type=>@content_types[0].to_s,
+                                   :original_filename=>@original_filenames[0],
+                                   :content_type=>content_type,
                                    :asset_version=>version)
         @original_filenames.delete_at(0)
         @content_types.delete_at(0)
