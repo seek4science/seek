@@ -70,7 +70,7 @@ class DataFilesController < ApplicationController
           end
           flash[:notice] = "New version uploaded - now on version #{@data_file.version}"
           if @data_file.is_with_sample?
-            bio_samples = @data_file.bio_samples_population
+            bio_samples = @data_file.bio_samples_population @data_file.samples.first.institution_id if @data_file.samples.first
             unless bio_samples.errors.blank?
               flash[:notice] << "<br/> However, Sample database population failed."
               flash[:error] = bio_samples.errors.html_safe

@@ -395,12 +395,14 @@ module Seek
           sample_types = hunt_for_field_values_mapped sheet,  :"samples.sample_type", @samples_mapping
           sample_donation_dates = hunt_for_field_values_mapped sheet, :"samples.donation_date", @samples_mapping
           sample_comments = hunt_for_field_values_mapped sheet, :"samples.comments", @samples_mapping
+          sample_organism_parts = hunt_for_field_values_mapped sheet, :"samples.organism_part", @samples_mapping
           tissue_and_cell_types = hunt_for_field_values_mapped sheet, :"tissue_and_cell_types.title", @samples_mapping
           sop_titles = hunt_for_field_values_mapped sheet, :"sop.title", @samples_mapping
           institution_names = hunt_for_field_values_mapped sheet, :"institution.name", @samples_mapping
 
-          samples_data = sample_titles.zip(sample_types, sample_donation_dates, sample_comments, tissue_and_cell_types, sop_titles, institution_names, specimen_titles).map do |sample_title, sample_type, sample_donation_date, sample_comment, tissue_and_cell_type, sop_title, institution_name, specimen_title|
-            {:sample_title => sample_title, :sample_type => sample_type, :sample_donation_date => sample_donation_date, :sample_comment => sample_comment,
+
+          samples_data = sample_titles.zip(sample_types, sample_donation_dates, sample_comments, sample_organism_parts, tissue_and_cell_types, sop_titles, institution_names, specimen_titles).map do |sample_title, sample_type, sample_donation_date, sample_comment, sample_organism_part, tissue_and_cell_type, sop_title, institution_name, specimen_title|
+            {:sample_title => sample_title, :sample_type => sample_type, :sample_donation_date => sample_donation_date, :sample_comment => sample_comment, :sample_organism_part => sample_organism_part,
              :tissue_and_cell_type => tissue_and_cell_type, :sop_title => sop_title, :institution_name => institution_name, :specimen_title => specimen_title}
           end
 
@@ -475,12 +477,16 @@ module Seek
       if assay_json
         if assay_json["creator last name"] && assay_json["creator first name"] && assay_json["creator email"]
           set_creator data["assay"]
+        else
+          @creator = Person.find(User.current_user.person_id)
         end
         if assay_json["investigation title"] &&
            assay_json["assay type title"] &&
            assay_json["study title"]
             assay = populate_assay data["assay"], @file.original_filename
         end
+      else
+        @creator = Person.find(User.current_user.person_id)
       end
 
       data["rows"].each do |data_row|
@@ -517,10 +523,12 @@ module Seek
       creator_last_name = assay_json["creator last name"]
       creator_first_name = assay_json["creator first name"]
       creator_name = "#{creator_first_name} #{creator_last_name}"
-      @creator = Person.find_by_first_name_and_last_name_and_email(creator_first_name,creator_last_name,creator_email)
+      #@creator = Person.find_by_first_name_and_last_name_and_email(creator_first_name,creator_last_name,creator_email)
+      @creator = Person.find_by_first_name_and_last_name(creator_first_name, creator_last_name)
       unless @creator
-        @errors << "Warning: Person #{creator_name}(#{creator_email}) cannot be found. Please register in SEEK.<br/>"
-        raise @errors
+        @warnings << "Warning: Person #{creator_name}(#{creator_email}) cannot be found. Please register in SEEK. Will use uploader as creator.<br/>"
+        @creator = Person.find(User.current_user.person_id)
+        #raise @errors
       end
     end
 
@@ -733,9 +741,9 @@ module Seek
 
 
       case sex
-          when "female"
-            sex = 0
           when "male"
+            sex = 0
+          when "female"
             sex = 1
           when "hermaphrodite"
             sex = 2
@@ -777,7 +785,9 @@ module Seek
           specimen.strain = strain
           specimen.culture_growth_type= culture_growth_type
           specimen.policy = @file.policy.deep_copy
+          specimen.projects = @file.projects
           specimen.comments = comments
+          specimen.creators << @creator
           specimen.save!
         else
           unless specimen.organism == organism &&
@@ -814,8 +824,8 @@ module Seek
           modification = Modification.new :title => genotype_modification, :symbol => genotype_modification unless modification
           modification.save!
 
-          genotype =  Genotype.find(:first, :conditions => ["gene_id = ? and modification_id = ? and specimen_id = ? and strain_id = ?", gene.id, modification.id, specimen.id, strain.id])
-          genotype  = Genotype.new :gene_id => gene.id, :modification_id => modification.id, :specimen_id => specimen.id, :strain_id => strain.id unless genotype
+          genotype =  Genotype.find(:first, :conditions => ["gene_id = ? and modification_id = ? and specimen_id = ?", gene.id, modification.id, specimen.id])
+          genotype  = Genotype.new :gene_id => gene.id, :modification_id => modification.id, :specimen_id => specimen.id unless genotype
           genotype.save!
         end
 
@@ -842,6 +852,7 @@ module Seek
       donation_date = sample_data[:sample_donation_date][:value]
       institution_name = sample_data[:institution_name][:value]
       comments = sample_data[:sample_comment][:value]
+      organism_part = sample_data[:sample_organism_part][:value]
 
       row = sample_data[:sample_title][:row]
       
@@ -851,7 +862,8 @@ module Seek
                 "sop" => sop_title,
                 "donation date" => donation_date.to_s,
                 "institution" => institution_name,
-                "comments" => comments}
+                "comments" => comments,
+                "organism part" => organism_part}
 
 
       @samples[row] = sample
@@ -865,13 +877,15 @@ module Seek
     
     def populate_sample sample_json, specimen, assay=nil
 
+
         sample_title = sample_json["title"]
         sample_type = sample_json["type"]
         tissue_and_cell_type_title = sample_json["tissue and cell type"]
         sop_title = sample_json["sop"]
-        donation_date = sample_json["donation date"]
+        donation_date = sample_json["donation date"] + " UTC +00.00"
         institution_name = sample_json["institution"]
         comments = sample_json["comments"]
+        organism_part = sample_json["organism part"]
 
         sop_title = nil if sop_title=="NO STORAGE"
         institution_name = @institution_name if (institution_name=="" || institution_name.nil?)
@@ -899,7 +913,7 @@ module Seek
         unless sample
           sample = Sample.new :title => sample_title,
                               :lab_internal_number => sample_title
-          sample.projects = User.current_user.person.projects
+          sample.projects = @file.projects #User.current_user.person.projects
           #treatment = ""
           #@treatments_text[row].try(:each) do |k, v|
           #  treatment << k.to_s + ":" + v.to_s
@@ -909,20 +923,22 @@ module Seek
           treatment =  "" # will be linked to 0 ... n treatments anyway
 
           sample.sample_type = sample_type
-          sample.donation_date = donation_date
+          sample.donation_date = Time.zone.parse(donation_date).utc
           sample.institution = institution
           sample.tissue_and_cell_types << tissue_and_cell_type if tissue_and_cell_type.try(:id) && !sample.tissue_and_cell_types.include?(tissue_and_cell_type)
           sample.associate_sop sop if sop
           sample.specimen = specimen if specimen
+          sample.organism_part = organism_part if organism_part != ""
           sample.comments = comments
           sample.treatment = treatment
           sample.policy = @file.policy.deep_copy
+          sample.creators << @creator
           sample.save!
         else
           unless sample.specimen == specimen &&
               sample.sample_type == sample_type &&
               (sample.tissue_and_cell_types.member?(tissue_and_cell_type) || tissue_and_cell_type_title == "") &&
-              sample.donation_date == Time.zone.parse(donation_date) &&
+              sample.donation_date == Time.zone.parse(donation_date).utc &&
               sample.institution == institution &&
               sample.comments == comments
               sleep(1);
@@ -932,7 +948,7 @@ module Seek
               Rails.logger.warn "#{sample.specimen} == #{specimen} ? #{sample.specimen == specimen}"
               Rails.logger.warn "#{sample.sample_type} == #{sample_type} ? #{sample.sample_type == sample_type}"
               Rails.logger.warn "(sample.tissue_and_cell_types.member?(tissue_and_cell_type) || tissue_and_cell_type_title == "") ? #{(sample.tissue_and_cell_types.member?(tissue_and_cell_type) || tissue_and_cell_type_title == "")}"
-              Rails.logger.warn "#{sample.donation_date} == #{Time.zone.parse(donation_date)} ? #{sample.donation_date == Time.zone.parse(donation_date)}"
+              Rails.logger.warn "#{sample.donation_date} == #{Time.zone.parse(donation_date).utc} ? #{sample.donation_date == Time.zone.parse(donation_date).utc}"
               Rails.logger.warn "#{sample.institution} == #{institution} ? #{sample.institution == institution}"
               Rails.logger.warn "#{sample.comments} == #{comments} ? #{sample.comments == comments}"
             @warnings << "Warning: sample with the name '#{sample_title}' is already created in SEEK."
@@ -961,6 +977,7 @@ module Seek
           @file.save!
         end
       end
+
 
       sample
 
