@@ -12,6 +12,7 @@ class Sample < ActiveRecord::Base
   attr_accessor :from_biosamples
 
   belongs_to :specimen
+  belongs_to :age_at_sampling_unit, :class_name => 'Unit', :foreign_key => "age_at_sampling_unit_id"
 
   accepts_nested_attributes_for :specimen
 
