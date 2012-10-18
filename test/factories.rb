@@ -306,6 +306,19 @@ end
     end
   end
 
+  Factory.define(:model_with_image,:parent=>:model) do |f|
+    f.sequence(:title) {|n| "A Model with image #{n}"}
+    f.after_create do |model|
+      model.model_image = Factory(:model_image,:model=>model)
+    end
+  end
+
+  Factory.define(:model_image) do |f|
+    f.original_filename "#{Rails.root}/test/fixtures/files/file_picture.png"
+    f.image_file File.new("#{Rails.root}/test/fixtures/files/file_picture.png","rb")
+    f.content_type "image/png"
+  end
+
   Factory.define(:cronwright_model,:parent=>:model) do |f|
     f.content_type "text/xml"
     f.association :content_blob,:factory=>:cronwright_model_content_blob

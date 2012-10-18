@@ -59,6 +59,7 @@ class ModelImagesController < ApplicationController
     if !cache_exists?(id, size) # look in file system cache before attempting db access
       # resize (keeping image side ratio), encode and cache the picture
       @model_image.operate do |image|
+        puts "resizing to #{size}"
         image.resize size
         @image_binary = image.image.to_blob
       end
@@ -130,16 +131,18 @@ class ModelImagesController < ApplicationController
       if @model_instance.can_view? current_user
         @model_images = ModelImage.find(:all,:conditions=>{:model_id=>@image_for_id})
       else
-       flash[:error] = "You can only view images that belong to you"
-       redirect_to model_path @model_instance
+       flash[:error] = "You can only view images for models you can access"
+       redirect_to root_path
       end
   end
 
 
   def find_model_image_auth
-     unless @model_instance.can_edit? current_user
-       flash[:error] = "You can only view and, possibly, manage images of models when you can edit this model."
-       redirect_to url_for @model_instance
+
+     action = translate_action(action_name)
+     unless is_auth?(@model_instance,action)
+       flash[:error] = "You can only #{action} images for models you can access"
+       redirect_to root_path
        return false
      end
 

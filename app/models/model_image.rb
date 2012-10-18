@@ -2,7 +2,7 @@ class ModelImage < ActiveRecord::Base
   Model_IMAGE_PATH = 'filestore/model_images'
   LARGE_SIZE = "1000x1000"
   belongs_to :model
-  after_create :change_filename
+  after_create :change_filename unless Rails.env=="test"
 
   acts_as_fleximage do
     image_directory Model_IMAGE_PATH
@@ -15,7 +15,6 @@ class ModelImage < ActiveRecord::Base
   end
 
   validates_presence_of :model
-
 
   def original_image_format
     content_type.split("/").last
@@ -42,7 +41,6 @@ class ModelImage < ActiveRecord::Base
   def change_filename
     File.rename "#{original_path}/#{original_filename}.#{original_image_format}", "#{original_path}/#{id}.#{original_image_format}"
   end
-
 
   def select!
     unless selected?
