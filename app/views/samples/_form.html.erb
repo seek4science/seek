@@ -11,7 +11,7 @@
 <% else %>
     <p>
       <%= f.label "Choose a specimen" %> <span class="required">*</span><br/>
-      <%= f.collection_select(:specimen_id, Specimen.all_authorized_for('view'), :id, :title,{:include_blank =>"Please Select..."},{:style=>"width:50%"}) %>
+      <%= f.collection_select(:specimen_id, Specimen.all_authorized_for('view').sort_by(&:title), :id, :title,{:include_blank =>"Please Select..."},{:style=>"width:50%"}) %>
     </p>
 <% end %>
 
