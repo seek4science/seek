@@ -41,6 +41,10 @@
         <%= text_or_not_specified @sample.sampling_date.nil? ? nil : date_as_string(@sample.sampling_date) -%>
       </p>
       <p>
+        <label>Age at sampling:</label>
+        <%= text_or_not_specified @sample.age_at_sampling_info -%>
+      </p>
+      <p>
         <label>Provider name:</label>
         <%= text_or_not_specified @sample.provider_name -%>
       </p>

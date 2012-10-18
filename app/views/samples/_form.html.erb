@@ -47,6 +47,11 @@
   </p>
 
   <p>
+    <%= f.label :age_at_sampling -%><br/>
+    <%= f.text_field :age_at_sampling, :style=>"width:350px;" -%> <%= f.select :age_at_sampling_unit_id, options_for_select(Unit.time_units.sort_by(&:order).collect{|u| [u.symbol, u.id]}, @sample.age_at_sampling_unit_id) -%>
+  </p>
+
+  <p>
     <%= f.label :provider_name -%><br/>
     <%= f.text_field :provider_name, :style=>"width:350px;" -%>
   </p>

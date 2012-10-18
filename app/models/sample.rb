@@ -123,4 +123,12 @@ class Sample < ActiveRecord::Base
   def specimen_info
     specimen.nil? ? '' : CELL_CULTURE_OR_SPECIMEN.capitalize + ' ' + specimen.title
   end
+
+  def age_at_sampling_info
+    unless age_at_sampling.blank? || age_at_sampling_unit.blank?
+      "#{age_at_sampling} (#{age_at_sampling_unit.symbol})"
+    else
+      ''
+    end
+  end
 end

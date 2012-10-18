@@ -287,9 +287,26 @@ end
     assert_response :success
     assert_select 'input#sample_specimen_attributes_title', :count => 1
   end
+
   test 'only sample form when updating sample' do
     get :edit, :id => Factory(:sample, :policy => policies(:editing_for_all_sysmo_users_policy))
     assert_response :success
     assert_select 'input#sample_specimen_attributes_title', :count => 0
+  end
+
+  test 'should have age at sampling' do
+    get :new
+    assert_response :success
+    assert_select 'input#sample_age_at_sampling', :count => 1
+
+    sample = Factory(:sample, :age_at_sampling => 4, :age_at_sampling_unit => Factory(:unit, :symbol => 's'))
+    get :show, :id => sample.id
+    assert_response :success
+    puts @response.body
+    assert_select "label", :text => /Age at sampling/
+
+    get :edit, :id => sample.id
+    assert_response :success
+    assert_select "input#sample_age_at_sampling"
   end
 end
