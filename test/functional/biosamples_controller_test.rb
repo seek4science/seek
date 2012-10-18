@@ -141,7 +141,7 @@ class BioSamplesControllerTest < ActionController::TestCase
     specimen = specimens("running mouse")
     xhr(:get, :existing_samples, {:specimen_ids => "#{specimen.id}"})
     assert_response :success
-    assert_select "table#sample_table thead tr th", :text => "Age at sampling(hours)", :count => 1
+    assert_select "table#sample_table thead tr th", :text => "Age at sampling", :count => 1
   end
 
   test "should have comment in sample table" do

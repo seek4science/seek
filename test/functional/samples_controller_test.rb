@@ -302,7 +302,6 @@ end
     sample = Factory(:sample, :age_at_sampling => 4, :age_at_sampling_unit => Factory(:unit, :symbol => 's'))
     get :show, :id => sample.id
     assert_response :success
-    puts @response.body
     assert_select "label", :text => /Age at sampling/
 
     get :edit, :id => sample.id
