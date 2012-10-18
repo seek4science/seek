@@ -56,6 +56,6 @@ ConvertOffice::ConvertOfficeConfig.options =
     :java_bin=>"java",
     :soffice_port=>8100,
     :nailgun=>false,
-    :verbose=>false,
+    :verbose=>true,
     :asynchronous=>true
 }
