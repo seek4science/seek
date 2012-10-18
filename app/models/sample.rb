@@ -28,7 +28,7 @@ class Sample < ActiveRecord::Base
   validates_presence_of :specimen,:lab_internal_number, :projects
   validates_presence_of :donation_date if Seek::Config.is_virtualliver
 
-  validates_numericality_of :age_at_sampling, :only_integer => true, :greater_than=> 0, :allow_nil=> true, :message => "is not a positive integer" if !Seek::Config.is_virtualliver
+  validates_numericality_of :age_at_sampling, :greater_than=> 0, :allow_nil=> true, :message => "is invalid value"
 
   def self.sop_sql()
   'SELECT sop_versions.* FROM sop_versions ' +
@@ -126,7 +126,7 @@ class Sample < ActiveRecord::Base
 
   def age_at_sampling_info
     unless age_at_sampling.blank? || age_at_sampling_unit.blank?
-      "#{age_at_sampling} (#{age_at_sampling_unit.symbol})"
+      "#{age_at_sampling} (#{age_at_sampling_unit.title || age_at_sampling_unit.symbol}s)"
     else
       ''
     end
