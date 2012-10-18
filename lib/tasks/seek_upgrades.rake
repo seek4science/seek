@@ -8,7 +8,8 @@ namespace :seek do
   #these are the tasks required for this version upgrade
   task :upgrade_version_tasks=>[
             :environment,
-            :reindex_things
+            :reindex_things,
+            :update_units
   ]
 
   desc("upgrades SEEK from the last released version to the latest released version")
