@@ -89,9 +89,13 @@
           <div id="thumbnail" >
             <% if  @display_model.model_image
              image_width = @display_model.model_image.image_width.nil??  "100px" : @display_model.model_image.image_width
-             #TODO zoom_width will be updated to be larger than the image_width if below a certain size
-             zoom_width = image_width
+
+             #zoom to larger image
+             zoom_width=image_width < 900 ? 900 : image_width
+
+             #show smaller image in view
              image_width=600 if image_width>600
+
             %>
             <a href='<%= model_model_image_path(@model,@display_model.model_image, :code=>params[:code],:size=>zoom_width) %>' rel="lightbox">
                <img src="<%= model_model_image_path(@model,@display_model.model_image,:code=>params[:code],:size=>image_width)  %>" style="max-width: 100%;"/>

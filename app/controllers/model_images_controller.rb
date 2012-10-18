@@ -60,7 +60,7 @@ class ModelImagesController < ApplicationController
       # resize (keeping image side ratio), encode and cache the picture
       @model_image.operate do |image|
         puts "resizing to #{size}"
-        image.resize size
+        image.resize size, :upsample=>true
         @image_binary = image.image.to_blob
       end
       # cache data
