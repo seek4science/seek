@@ -310,7 +310,7 @@ module Seek
         if File.exists?(pdf_filepath)
           send_file pdf_filepath, :filename => content_blob.original_filename, :type => content_blob.content_type, :disposition => 'attachment'
         else
-          render :text => ''
+          render :text => 'Unable to convert the file for display'
         end
       end
     end

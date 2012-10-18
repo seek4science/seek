@@ -1,6 +1,6 @@
 module Seek
   module PdfExtraction
-    MAXIMUM_PDF_CONVERT_TIME = 1.minute
+    MAXIMUM_PDF_CONVERT_TIME = 30.seconds
 
     def pdf_contents_for_search
       content = nil
@@ -17,8 +17,10 @@ module Seek
 
     def convert_to_pdf
       pdf_filepath = filepath('pdf')
+      puts "Looking for pdf at #{pdf_filepath}"
       begin
         unless File.exists?(pdf_filepath)
+          puts "pdf doesn't exist, will have to converting it.'"
           #copy dat file to original file extension in order to convert to pdf on this file
           dat_filepath = filepath
           file_extension = mime_extension(content_type)
@@ -26,18 +28,20 @@ module Seek
           copied_filepath = tmp_file.path
 
           FileUtils.cp dat_filepath, copied_filepath
+          puts "copied to #{copied_filepath} ready for conversion - copied file exists? = #{File.exists?(copied_filepath)}"
 
           ConvertOffice::ConvertOfficeFormat.new.convert(copied_filepath,pdf_filepath)
-
+          puts "should now be converted. is the file there? = #{File.exists?(pdf_filepath)}"
           t = Time.now
           while !File.exists?(pdf_filepath) && (Time.now - t) < MAXIMUM_PDF_CONVERT_TIME
             sleep(1)
+            puts "waited for a bit = #{File.exists?(pdf_filepath)}"
           end
-
+          puts "finished waiting. is the file there? = #{File.exists?(pdf_filepath)}"
         end
       rescue Exception=> e
         Rails.logger.error("Problem with converting file of content_blob #{id} to pdf - #{e.class.name}:#{e.message}")
-        raise(e) if Rails.env=="test"
+        raise(e)# if Rails.env=="test"
       end
     end
 
