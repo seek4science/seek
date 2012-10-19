@@ -11,7 +11,7 @@
 <% else %>
     <p>
       <%= f.label "Choose a specimen" %> <span class="required">*</span><br/>
-      <%= f.collection_select(:specimen_id, Specimen.all_authorized_for('view'), :id, :title,{:include_blank =>"Please Select..."},{:style=>"width:50%"}) %>
+      <%= f.collection_select(:specimen_id, Specimen.all_authorized_for('view').sort_by(&:title), :id, :title,{:include_blank =>"Please Select..."},{:style=>"width:50%"}) %>
     </p>
 <% end %>
 
@@ -44,6 +44,11 @@
   <p>
     <%= f.label :sampling_date -%><br/>
     <%= f.calendar_date_select :sampling_date, :time => "mixed", :style=>"width:350px;" -%>
+  </p>
+
+  <p>
+    <%= f.label :age_at_sampling -%><br/>
+    <%= f.text_field :age_at_sampling, :style=>"width:350px;", :onkeypress => "javascript: return onlyFloatNumbers(event);" -%> <%= f.select :age_at_sampling_unit_id, options_for_select(Unit.time_units.sort_by(&:order).collect{|u| [u.title, u.id]}, @sample.age_at_sampling_unit_id) -%>
   </p>
 
   <p>
