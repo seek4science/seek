@@ -17,7 +17,7 @@ class AssigningHourUnitToExistingSamples < ActiveRecord::Migration
   end
 
   def self.down
-    Sample.all.select{|s| !s.age_at_sampling.blank? && s.age_at_sampling_unit_id.blank?}.each do |s|
+    Sample.all.select{|s| !s.age_at_sampling.blank? && !s.age_at_sampling_unit_id.blank?}.each do |s|
       s.age_at_sampling_unit_id = nil
       disable_authorization_checks{s.save}
     end
