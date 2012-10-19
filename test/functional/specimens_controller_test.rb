@@ -191,7 +191,8 @@ fixtures :all
     sop = Factory(:sop, :policy => Factory(:public_policy))
     specimen = Factory(:specimen)
     login_as specimen.contributor
-    specimen.sop_masters << SopSpecimen.create!(:sop_id => sop.id, :sop_version => 1, :specimen_id => specimen.id)
+    sop_master = SopSpecimen.create!(:sop_id => sop.id, :sop_version => 1, :specimen_id => specimen.id)
+    specimen.sop_masters << sop_master
     associated_sops = specimen.sop_masters.collect(&:sop)
     specimen.reload
     assert_equal 1, associated_sops.size
@@ -201,6 +202,8 @@ fixtures :all
     specimen.reload
     associated_sops = specimen.sop_masters.collect(&:sop)
     assert associated_sops.empty?
+    #make sure the sop_master is deleted as well
+    assert_nil SopSpecimen.find_by_id(sop_master.id)
   end
 
   test 'should not unassociate private sops' do
