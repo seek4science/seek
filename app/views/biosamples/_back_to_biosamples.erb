@@ -7,6 +7,7 @@
     sample_row = sample_row_data(object)
     specimen_row = specimen_row_data(object.specimen)
     strain_id = object.specimen.strain.try(:id)
+    specimen_title = object.specimen.try(:title)
    elsif object.kind_of?(Specimen)
      specimen_row = specimen_row_data(object)
      strain_id = object.strain.try(:id)
