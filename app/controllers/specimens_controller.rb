@@ -83,6 +83,7 @@ class SpecimensController < ApplicationController
 
     if @specimen.save
       deliver_request_publish_approval params[:sharing], @specimen
+      #associate sops
       sop_ids.each do |sop_id|
         sop= Sop.find sop_id
         existing = @specimen.sop_masters.select { |ss| ss.sop == sop }
@@ -90,6 +91,12 @@ class SpecimensController < ApplicationController
           SopSpecimen.create!(:sop_id => sop_id, :sop_version => sop.version, :specimen_id => @specimen.id)
         end
       end
+      #unassociate sops
+      (@specimen.sop_masters.collect{|sm| sm.sop.id} - sop_ids.map(&:to_i)).each do |id|
+        sop_master = @specimen.sop_masters.detect{ |ss| ss.sop.id == id }
+        sop_master.destroy if sop_master && sop_master.sop.can_view?
+      end
+
       if @specimen.from_biosamples=='true'
         render :partial => "biosamples/back_to_biosamples", :locals => {:action => 'update', :object => @specimen}
       else
