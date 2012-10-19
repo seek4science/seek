@@ -7,32 +7,27 @@
   <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
   <title><%= @title -%></title>
 	<style type="text/css">
-		body { background-color: #fff; color: #666; text-align: center; font-family: arial, sans-serif; }
+		body { background-color: #fff; color: #666; text-align: center; font-family: arial, sans-serif; margin-top: 2em; }
 		div.dialog {
-			width: 35em;
-			padding: 0 4em;
-			margin: 4em auto 0 auto;
-			border: 1px solid #ccc;
-			border-right-color: #999;
-			border-bottom-color: #999;
-			background-color: #F5F5F5;
+
 		}
-		h1 { font-size: 100%; color: #f00; line-height: 1.5em; }
+		div.dialog h1 { font-size: 400%; color: #00d; }
+        div.dialog h2 { font-size: 250%; color: #00d; }
+        div.dialog h2.error { font-size: 250%; color: #d00; }
+        div.dialog p  { font-size: 150%; color: #555 }
 	</style>    
 
 </head>
 
 <body>
-<%= yield -%>
 
-<div class="request_feedback">
-  <p>
-      If you feel this is an error caused by a problem with <%= Seek::Config.application_name %> then please send an email to somebody listed below outlining your problem, and the steps that lead to it.
-  </p>
-  <p>
-    <%= admin_mail_to_links -%>
-  </p>
+<div style="text-align: center">
+    <%= image_tag "seek-logo.png", :width=>"200px" -%>
+    <%= yield -%>
 </div>
+
+
+
 </body>
 
 </html>
