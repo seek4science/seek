@@ -60,7 +60,7 @@ namespace :seek do
         u.save
       end
       #insert day, week, month, year
-      [['da',24],['wk',25],['mo',26],['yr',27]].each do |u|
+      [['d',24],['wk',25],['mo',26],['yr',27]].each do |u|
         Unit.create(:symbol => u[0], :order => u[1], :comment => 'time')
       end
     end

@@ -19,7 +19,7 @@ hour:
   order: 23
 
 day:
-  symbol: da
+  symbol: d
   comment: time
   order: 24
 

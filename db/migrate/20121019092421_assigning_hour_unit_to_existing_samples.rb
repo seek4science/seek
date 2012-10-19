@@ -7,7 +7,7 @@ class AssigningHourUnitToExistingSamples < ActiveRecord::Migration
 
   def self.up
     #assign hour unit to samples which have age_at_sampling
-    hour_unit_id = Unit.find_by_order(23).try(:id)
+    hour_unit_id = Unit.find_by_symbol('h').try(:id)
     unless hour_unit_id.nil?
       Sample.all.select{|s| !s.age_at_sampling.blank? && s.age_at_sampling_unit_id.blank?}.each do |s|
          s.age_at_sampling_unit_id = hour_unit_id
