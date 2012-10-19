@@ -53,7 +53,7 @@ module AssaysHelper
 
       if strain
         result += " : "
-        result += link_to h(strain.title),strain,{:class => "assay_strain_info"}
+        result += strain.title
       end
 
       if sample
@@ -79,7 +79,7 @@ module AssaysHelper
 
       if strain
         result += " : "
-        result += link_to h(strain.title),strain,{:class => "assay_strain_info"}
+        result += strain.title
       end
 
       if culture_growth_type
@@ -112,7 +112,7 @@ module AssaysHelper
 
       if strain
         result += " : "
-        result += link_to h(strain.title),strain,{:class => "assay_strain_info"}
+        result += strain.title
       end
 
       if sample
@@ -147,7 +147,7 @@ module AssaysHelper
 
         if strain
           result += " : "
-          result += link_to h(strain.title),strain,{:class => "assay_strain_info"}
+          result += strain.title
         end
        
 

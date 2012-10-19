@@ -25,7 +25,7 @@ module SpecimensHelper
 
       if strain && !strain.is_dummy?
         result += " : "
-        result += link_to h(strain.title),strain,{:class => "assay_strain_info"}
+        result += strain.title
       end
 
       if culture_growth_type
@@ -60,7 +60,7 @@ module SpecimensHelper
 
       if specimen.strain
         result += " : "
-        result += link_to h(specimen.strain.title),specimen.strain,{:class => "assay_strain_info"}
+        result += specimen.strain.title
       end
 
       if specimen.culture_growth_type
