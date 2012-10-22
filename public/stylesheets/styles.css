@@ -831,6 +831,18 @@ div.list_item_content {
     margin-left:1em;
 }
 
+div.list_item_content.noavatar {
+    width: 87%;
+}
+
+div.list_item_content.noavatar.noactions {
+    width: 97%;
+}
+
+div.list_item_content.noactions {
+    width: 85%;
+}
+
 div.list_item_avatar {
     float: left;
     width: 11%;
