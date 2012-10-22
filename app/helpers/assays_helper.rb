@@ -20,7 +20,7 @@ module AssaysHelper
     result = link_to h(assay_organism.organism.title),assay_organism.organism
     if assay_organism.strain
        result += " : "
-       result += link_to h(assay_organism.strain.title),assay_organism.organism,{:class => "assay_strain_info"}
+       result += assay_organism.strain.title
     end
     if assay_organism.culture_growth_type
       result += " (#{assay_organism.culture_growth_type.title})"
