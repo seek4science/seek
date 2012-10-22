@@ -35,12 +35,14 @@
                 <%= image_tag_for_key('spreadsheet', polymorphic_path(asset, :version => version, :action => :explore, :code=>params[:code]), "Explore #{human_name}", nil, "Explore #{human_name}") -%>
               </li>
           <% end -%>
+          <% unless Seek::Util.multi_files_asset_types.include?(asset.class) %>
+            <%= render :partial => "assets/view_content", :locals => {:content_blob => display_asset.content_blob} -%>
+          <% end %>
       <% elsif logged_in? -%>
           <li>
           <%= render :partial=>"assets/request_resource",:locals=>{:resource=>asset} %>
           </li>
       <% end -%>
-      <%= render :partial => "assets/view_content", :locals => {:asset => asset, :display_asset => display_asset, :human_name => human_name} -%>
   <% end -%>
 
 

@@ -65,7 +65,11 @@ module Seek
     end
 
     def self.inline_viewable_content_types
-      [DataFile, Presentation, Sop]
+      [DataFile, Model, Presentation, Sop]
+    end
+
+    def self.multi_files_asset_types
+      [Model]
     end
   end
 end

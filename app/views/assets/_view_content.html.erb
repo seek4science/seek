@@ -1,15 +1,21 @@
-<% if Seek::Util.inline_viewable_content_types.include?(asset.class) %>
-    <%= javascript_include_tag 'detect_browser',"zoom/lightbox" %>
-    <%= stylesheet_link_tag "lightbox" %>
-    <% is_inline_viewable = Seek::Config.experimental_features_enabled && (display_asset ||=nil) && display_asset.content_blob.is_content_viewable? %>
+<%= javascript_include_tag 'detect_browser' %>
+<% asset = content_blob.asset
+   if Seek::Util.inline_viewable_content_types.include?(asset.class) %>
+    <%# those libs have been loaded for Model %>
+    <% unless asset.is_a?(Model) %>
+        <%= javascript_include_tag "zoom/lightbox" %>
+        <%= stylesheet_link_tag "lightbox" %>
+    <% end %>
+
+    <% is_inline_viewable = Seek::Config.experimental_features_enabled && content_blob.is_content_viewable? %>
     <% if is_inline_viewable %>
-        <% if display_asset.content_blob.is_image? %>
+        <% if content_blob.is_image? %>
             <%#param code is used for temporary link %>
-            <% view_image_content_url = polymorphic_path(asset, :version => display_asset.version, :action => 'send_image', :code => params[:code]) %>
+            <% view_image_content_url = polymorphic_path(asset, :version => content_blob.asset_version, :action => 'send_image', :code => params[:code]) %>
             <li><%= image_tag_for_key "show", view_image_content_url, 'View content', {:rel => "lightbox" }, 'View content' %></li>
         <% else %>
             <%#param code is used for temporary link %>
-            <% view_pdf_content_url = polymorphic_path(asset, :version => display_asset.version, :action => 'view_pdf_content', :code => params[:code]) %>
+            <% view_pdf_content_url = polymorphic_path(asset, :version => content_blob.asset_version, :action => 'view_pdf_content', :code => params[:code]) %>
             <li><%= image_tag_for_key "show", view_pdf_content_url, 'View content', {:onclick => "isCanvasSupportBrowser();isIEVersionSupported"}, 'View content' %></li>
         <% end %>
     <% end %>

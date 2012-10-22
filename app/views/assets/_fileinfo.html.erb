@@ -13,9 +13,11 @@
   <%= filesize_as_text(fileinfo) %>
 </p>
 
+<%# This is for multiple files asset %>
 <% asset = fileinfo.asset
-   if asset.can_download? || (params[:code] && asset.special_auth_codes.unexpired.collect(&:code).include?(params[:code])) -%>
+   if asset.respond_to?(:content_blobs) && (asset.can_download? || (params[:code] && asset.special_auth_codes.unexpired.collect(&:code).include?(params[:code]))) -%>
     <p>
+      <%= render :partial => "assets/view_content", :locals => {:content_blob => fileinfo} -%>
       <%= link_to image('download'), polymorphic_path(asset,:version=>fileinfo.asset_version,:action=>:download,:code=>params[:code],:content_blob_id => fileinfo.id), :title => 'Download this file' -%>
     </p>
 <% end %>
