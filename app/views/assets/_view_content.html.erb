@@ -1,5 +1,6 @@
 <%= javascript_include_tag 'detect_browser' %>
 <% asset = content_blob.asset
+   button_style ||= false
    if Seek::Util.inline_viewable_content_types.include?(asset.class) %>
     <%# those libs have been loaded for Model %>
     <% unless asset.is_a?(Model) %>
@@ -9,15 +10,27 @@
 
     <% is_inline_viewable = Seek::Config.experimental_features_enabled && content_blob.is_content_viewable? %>
     <% if is_inline_viewable %>
+        <%
+           li_start = ""
+           li_end = ""
+           label = ""
+           if button_style
+             li_start = "<li>"
+             li_end = "</li>"
+             label = "View content"
+           end
+        %>
+        <%= li_start %>
         <% if content_blob.is_image? %>
             <%#param code is used for temporary link %>
             <% view_image_content_url = polymorphic_path(asset, :content_blob_id => content_blob.id, :action => 'send_image', :code => params[:code]) %>
-            <li><%= image_tag_for_key "show", view_image_content_url, 'View content', {:rel => "lightbox" }, 'View content' %></li>
+            <%= image_tag_for_key "show", view_image_content_url, 'View content', {:rel => "lightbox" }, label %>
         <% else %>
             <%#param code is used for temporary link %>
             <% view_pdf_content_url = polymorphic_path(asset, :content_blob_id => content_blob.id, :action => 'view_pdf_content', :code => params[:code]) %>
-            <li><%= image_tag_for_key "show", view_pdf_content_url, 'View content', {:onclick => "isCanvasSupportBrowser();isIEVersionSupported"}, 'View content' %></li>
+            <%= image_tag_for_key "show", view_pdf_content_url, 'View content', {:onclick => "isCanvasSupportBrowser();isIEVersionSupported"}, label %>
         <% end %>
+        <%= li_end %>
     <% end %>
 <% end %>
 
