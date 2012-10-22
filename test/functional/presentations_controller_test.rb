@@ -24,7 +24,7 @@ class PresentationsControllerTest < ActionController::TestCase
   end
 
   test "can create with valid url" do
-    presentation_attrs =   Factory.attributes_for(:presentation, :data => nil, :data_url => "http://www.virtual-liver.de/images/logo.png")
+    presentation_attrs =   Factory.attributes_for(:presentation, :data => nil, :data_url => "https://seek.sysmo-db.org/images/seek-logo-smaller.png")
 
     assert_difference "Presentation.count" do
       post :create,:presentation => presentation_attrs
@@ -82,7 +82,8 @@ class PresentationsControllerTest < ActionController::TestCase
   test "can upload new version with valid url" do
     presentation = Factory :presentation,:contributor=>User.current_user
    # assert_equal "http://www.virtual-liver.de/images/logo.png",presentation.content_blob.url
-    new_data_url = "http://www.virtual-liver.de/images/liver-illustration.png"
+    new_data_url = "https://seek.sysmo-db.org/images/seek-logo-smaller.png"
+    assert_not_equal new_data_url,presentation.content_blob.url
 
     assert_difference "presentation.version" do
        post :new_version,:id => presentation,:presentation=>{:data_url=>new_data_url}
