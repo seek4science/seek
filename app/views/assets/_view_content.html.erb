@@ -11,11 +11,11 @@
     <% if is_inline_viewable %>
         <% if content_blob.is_image? %>
             <%#param code is used for temporary link %>
-            <% view_image_content_url = polymorphic_path(asset, :version => content_blob.asset_version, :action => 'send_image', :code => params[:code]) %>
+            <% view_image_content_url = polymorphic_path(asset, :content_blob_id => content_blob.id, :action => 'send_image', :code => params[:code]) %>
             <li><%= image_tag_for_key "show", view_image_content_url, 'View content', {:rel => "lightbox" }, 'View content' %></li>
         <% else %>
             <%#param code is used for temporary link %>
-            <% view_pdf_content_url = polymorphic_path(asset, :version => content_blob.asset_version, :action => 'view_pdf_content', :code => params[:code]) %>
+            <% view_pdf_content_url = polymorphic_path(asset, :content_blob_id => content_blob.id, :action => 'view_pdf_content', :code => params[:code]) %>
             <li><%= image_tag_for_key "show", view_pdf_content_url, 'View content', {:onclick => "isCanvasSupportBrowser();isIEVersionSupported"}, 'View content' %></li>
         <% end %>
     <% end %>
