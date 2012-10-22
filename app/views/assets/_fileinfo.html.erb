@@ -18,6 +18,6 @@
    if Seek::Util.multi_files_asset_types.include?(asset.class) && (asset.can_download? || (params[:code] && asset.special_auth_codes.unexpired.collect(&:code).include?(params[:code]))) -%>
     <p>
       <%= render :partial => "assets/view_content", :locals => {:content_blob => fileinfo} -%>
-      <%= link_to image('download'), polymorphic_path(asset,:version=>fileinfo.asset_version,:action=>:download,:code=>params[:code],:content_blob_id => fileinfo.id), :title => 'Download this file' -%>
+      <%= image_tag_for_key('download', polymorphic_path(asset,:version=>fileinfo.asset_version,:action=>:download,:code=>params[:code],:content_blob_id => fileinfo.id), "Download", {:title => 'Download this file'}, "") -%>
     </p>
 <% end %>
