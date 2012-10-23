@@ -41,10 +41,11 @@ class ApplicationHelperTest < ActionView::TestCase
   end
 
   test "resource tab title" do
-    assert_equal "EBI Biomodels",resource_tab_title("EBI Biomodels")
-    assert_equal "Models",resource_tab_title("Model")
-    assert_equal "Data Files",resource_tab_title("DataFile")
-    assert_equal "Data Files",resource_tab_title("DataFiles")
-    assert_equal "SOPs",resource_tab_title("SOP")
+    assert_equal "EBI Biomodels",resource_tab_item_name("EBI Biomodels")
+    assert_equal "Models",resource_tab_item_name("Model")
+    assert_equal "Data Files",resource_tab_item_name("DataFile")
+    assert_equal "Data Files",resource_tab_item_name("DataFiles")
+    assert_equal "SOPs",resource_tab_item_name("SOP")
+    assert_equal "SOPs",resource_tab_item_name("Sop")
   end
 end
