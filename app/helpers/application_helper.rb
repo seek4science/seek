@@ -84,13 +84,13 @@ module ApplicationHelper
 
   #Classifies each result item into a hash with the class name as the key.
   #
-  #This is to enable the resources to be displayed in the asset tabbed listing by class
+  #This is to enable the resources to be displayed in the asset tabbed listing by class, or defined by .tab. Items not originating within SEEK are identified by is_external
   def classify_for_tabs result_collection
     results={}
 
     result_collection.each do |res|
       tab = res.respond_to?(:tab) ? res.tab : res.class.name
-      results[tab] = {:items => [], :hidden_count => 0} unless results[tab]
+      results[tab] = {:items => [], :hidden_count => 0, :is_external=>(res.respond_to?(:is_external_search_result?) && res.is_external_search_result?)} unless results[tab]
       results[tab][:items] << res
     end
 
@@ -505,13 +505,14 @@ module ApplicationHelper
     end
   end
 
-  def resource_tab_title resource_type
+  def resource_tab_item_name resource_type
     if resource_type.include?"DataFile"
       resource_type.titleize.pluralize
+    elsif resource_type == "Sop"
+      "SOPs"
     else
       resource_type.pluralize
     end
-
   end
 
   def display_people_list people

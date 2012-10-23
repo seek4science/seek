@@ -571,6 +571,10 @@ ul.tabbernav li.tabberactive a:hover
     border-bottom: 1px solid white;
 }
 
+ul.tabbernav li a.external_result {
+    background: #DCF;
+}
+
 /*--------------------------------------------------
 .tabbertab = the tab content
 Add style only after the tabber interface is set up (.tabberlive)
