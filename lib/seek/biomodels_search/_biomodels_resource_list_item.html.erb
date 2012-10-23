@@ -45,7 +45,7 @@
 <%= image_tag_for_key "import",
         {:controller => "models",
         :action => "new",
-        :model=>{:title=>resource.title,:imported_source=>resource.tab,:imported_url=>biomodel_link,:data_url=>biomodel_download_link,:original_filename=>"#{resource.model_id}.xml",:model_format_id=>ModelFormat.sbml.try(:id),:description=>description_for_import},
+        :model=>{:title=>resource.title,:imported_source=>resource.tab,:imported_url=>biomodel_link,:data_url=>biomodel_download_link,:original_filename=>"#{resource.model_id}.xml",:model_format_id=>ModelFormat.sbml.first.try(:id),:description=>description_for_import},
         },
         "import",{},
         "Import" %>
