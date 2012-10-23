@@ -3,10 +3,11 @@
 <% resource = resource_list_item %>
 <% content_partial = get_list_item_content_partial(resource) %>
 <% actions_partial = get_list_item_actions_partial(resource) %>
+
 <% avatar_partial = get_list_item_avatar_partial(resource) if avatar_partial.nil?%>
-<% box_width = 75 %>
-<% box_width += 10 if actions_partial.blank? %>
-<% box_width += 12 if avatar_partial.blank? %>
+<% other_classes="" %>
+<% other_classes << " noactions" if actions_partial.blank? %>
+<% other_classes << " noavatar" if avatar_partial.blank? %>
 <%
    access_based_css_class = "list_item " + if resource.respond_to?(:private?) && resource.private?
        "private_list_item"
@@ -16,13 +17,14 @@
      ""
    end
 %>
+
 <div class="<%= access_based_css_class%>">
   <% unless avatar_partial.blank? %>
     <div class="list_item_avatar">
       <%= render :partial=> avatar_partial,:locals=>content_locals.merge({:resource => resource}) %>
     </div>
   <% end %>
-  <div class="list_item_content" style="width:<%= box_width %>%">
+  <div class="list_item_content <%= other_classes -%>">
     <%= render :partial=> content_partial,:locals=>content_locals.merge({:resource => resource}) %>
   </div>
   <% unless actions_partial.blank? %>

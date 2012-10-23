@@ -571,6 +571,10 @@ ul.tabbernav li.tabberactive a:hover
     border-bottom: 1px solid white;
 }
 
+ul.tabbernav li a.external_result {
+    background: #DCF;
+}
+
 /*--------------------------------------------------
 .tabbertab = the tab content
 Add style only after the tabber interface is set up (.tabberlive)
@@ -829,6 +833,18 @@ div.list_item_content {
     width: 75%;
     float: left;
     margin-left:1em;
+}
+
+div.list_item_content.noavatar {
+    width: 87%;
+}
+
+div.list_item_content.noavatar.noactions {
+    width: 97%;
+}
+
+div.list_item_content.noactions {
+    width: 85%;
 }
 
 div.list_item_avatar {

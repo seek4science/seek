@@ -1,1 +1,3 @@
-<%= try_block {resource.owner.can_view?} ? favouritable_icon(resource.owner, 60) : favouritable_icon(resource, 60) -%>
+<% if resource.respond_to?(:owner) && resource.owner.nil?
+     resource.owner.can_view? ? favouritable_icon(resource.owner, 60) : favouritable_icon(resource, 60)
+end -%>

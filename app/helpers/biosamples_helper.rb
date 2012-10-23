@@ -39,7 +39,7 @@ module BiosamplesHelper
     creator_link = creator ? link_to(creator.name, person_path(creator.id)) : ""
     [(link_to strain.organism.title, organism_path(strain.organism.id)),
      (check_box_tag "selected_strain_#{strain.id}", strain.id, false, :onchange => remote_function(:url => {:controller => 'biosamples', :action => 'existing_specimens'}, :with => "'strain_ids=' + getSelectedStrains()", :before=>"show_ajax_loader('existing_specimens')") +";show_existing_specimens();hide_existing_samples();"),
-     strain.title, strain.genotype_info, strain.phenotype_info, strain.id, strain.synonym, creator_link, strain.parent_strain,
+     text_or_not_specified(strain.title), text_or_not_specified(strain.genotype_info), text_or_not_specified(strain.phenotype_info), strain.id, text_or_not_specified(strain.synonym), text_or_not_specified(creator_link), text_or_not_specified(strain.parent_strain),
      (link_to_remote image("destroy", :alt => "Delete", :title => "Delete this strain"),
                      :url => {:action => "destroy", :controller => 'biosamples', :id => strain.id, :class => 'strain', :id_column_position => 5},
                      :confirm => "Are you sure you want to delete this strain?", :method => :delete if strain.can_delete?),
@@ -65,7 +65,7 @@ module BiosamplesHelper
 
     ['Strain ' + specimen.strain.info + "(Seek ID=#{specimen.strain.id})",
      (check_box_tag "selected_specimen_#{specimen.id}", specimen.id, false, {:onchange => remote_function(:url => {:controller => 'biosamples', :action => 'existing_samples'}, :with => "'specimen_ids=' + getSelectedSpecimens()", :before=>"show_ajax_loader('existing_samples')") + ";show_existing_samples();"}),
-     link_to(specimen.title, specimen_path(specimen.id)), specimen.born_info, specimen.culture_growth_type.try(:title), creators.join(", "), specimen.id, asset_version_links(specimen.sops).join(", "), delete_icon, update_icon]
+     link_to(specimen.title, specimen_path(specimen.id)), text_or_not_specified(specimen.born_info), text_or_not_specified(specimen.culture_growth_type.try(:title)), text_or_not_specified(creators.join(", ")), specimen.id, text_or_not_specified(asset_version_links(specimen.sops).join(", ")), delete_icon, update_icon]
   end
 
   def sample_row_data sample
@@ -81,6 +81,6 @@ module BiosamplesHelper
 
     [sample.specimen_info,
      (link_to sample.title, sample_path(sample.id)),
-     sample.lab_internal_number, sample.sampling_date_info, sample.age_at_sampling_info, sample.provider_name, sample.id, sample.comments, delete_icon, update_icon]
+     text_or_not_specified(sample.lab_internal_number), text_or_not_specified(sample.sampling_date_info), text_or_not_specified(sample.age_at_sampling_info), text_or_not_specified(sample.provider_name), sample.id, text_or_not_specified(sample.comments), delete_icon, update_icon]
   end
 end
