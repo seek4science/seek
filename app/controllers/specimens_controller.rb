@@ -74,7 +74,7 @@ class SpecimensController < ApplicationController
     @specimen.attributes = params[:specimen]
     @specimen.policy.set_attributes_with_sharing params[:sharing], @specimen.projects
 
-    if @specimen.strain.nil? && !params[:organism].blank?
+    if @specimen.strain.nil? && !params[:organism].blank? && Seek::Config.is_virtualliver
         @specimen.strain = Strain.default_strain_for_organism(params[:organism])
     end
 
