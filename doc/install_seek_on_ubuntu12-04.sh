@@ -6,7 +6,7 @@
 
 SEEK_PATH="/home/$(whoami)" 
 SEEK_DIRECTORY="seek"
-REPOSITORY="https://sysmo-db.googlecode.com/hg/ -r v0.12.2"
+REPOSITORY="https://sysmo-db.googlecode.com/hg/ -r v0.15.1"
 
 txtgrn=$(tput setaf 2) # Green
 txtrst=$(tput sgr0) # Text reset
