@@ -724,7 +724,9 @@ class SopsControllerTest < ActionController::TestCase
     pdf_path = ms_word_sop.content_blob.filepath('pdf')
     FileUtils.rm pdf_path if File.exists?(pdf_path)
     assert !File.exists?(pdf_path)
-    post :get_pdf, {:id => ms_word_sop.id, :version => '1'}
+    assert ms_word_sop.can_download?
+
+    get :get_pdf, {:id => ms_word_sop.id, :content_blob_id => ms_word_sop.content_blob.id}
     assert_response :success
     assert File.exists?(ms_word_sop.content_blob.filepath)
     assert File.exists?(pdf_path)

@@ -2,6 +2,7 @@ class SopsController < ApplicationController
   
   include IndexPager
   include DotGenerator
+  include Seek::AssetsCommon
   include AssetsCommonExtension
   
   #before_filter :login_required
@@ -9,7 +10,7 @@ class SopsController < ApplicationController
   before_filter :find_and_auth, :except => [ :index, :new, :create, :request_resource,:preview, :test_asset_url, :update_annotations_ajax]
   before_filter :find_display_asset, :only=>[:show,:download]
 
-  include Seek::AssetsCommon
+  include Seek::ContentBlobCommon
   include Seek::Publishing
   include Seek::BreadCrumbs
 
