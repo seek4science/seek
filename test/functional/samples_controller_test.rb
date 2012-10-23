@@ -104,32 +104,33 @@ class SamplesControllerTest < ActionController::TestCase
   end
 
   test "should create sample and specimen with default strain if missing" do
-    assert_difference("Sample.count") do
-      assert_difference("Specimen.count") do
-        assert_difference("Strain.count") do
-          post :create,
-               :organism=>Factory(:organism),
-               :sample => {
-                   :title => "test",
-                   :contributor=>User.current_user,
-                   :projects=>[Factory(:project)],
-                   :lab_internal_number =>"Do232",
-                   :donation_date => Date.today,
-                   :specimen_attributes => {
-                       :lab_internal_number=>"Lab number",
-                       :title=>"Donor number"
-                   }
-               }
+    with_config_value :is_virtualliver,true do
+      assert_difference("Sample.count") do
+        assert_difference("Specimen.count") do
+          assert_difference("Strain.count") do
+            post :create,
+                 :organism=>Factory(:organism),
+                 :sample => {
+                     :title => "test",
+                     :contributor=>User.current_user,
+                     :projects=>[Factory(:project)],
+                     :lab_internal_number =>"Do232",
+                     :donation_date => Date.today,
+                     :specimen_attributes => {
+                         :lab_internal_number=>"Lab number",
+                         :title=>"Donor number"
+                     }
+                 }
+          end
         end
       end
+      s = assigns(:sample)
+      assert_redirected_to sample_path(s)
+      assert s.specimen.strain.is_dummy?
+      assert_equal "test",s.title
+      assert_not_nil s.specimen
+      assert_equal "Donor number",s.specimen.title
     end
-    s = assigns(:sample)
-    assert_redirected_to sample_path(s)
-    assert s.specimen.strain.is_dummy?
-    assert_equal "test",s.title
-    assert_not_nil s.specimen
-    assert_equal "Donor number",s.specimen.title
-
   end
 
   test "should get show" do

@@ -6,7 +6,7 @@
 
 SEEK_PATH="/home/$(whoami)" 
 SEEK_DIRECTORY="seek"
-REPOSITORY="https://sysmo-db.googlecode.com/hg/ -r v0.12.2"
+REPOSITORY="https://sysmo-db.googlecode.com/hg/ -r v0.15.1"
 
 txtgrn=$(tput setaf 2) # Green
 txtrst=$(tput sgr0) # Text reset
@@ -19,7 +19,7 @@ sudo sed -i 's/# deb-src http:\/\/archive.canonical.com\/ubuntu/deb-src http:\/\
 echo "${txtgrn} *********************************** ${txtrst}"
 echo "${txtgrn} Installing prequisites ${txtrst}"
 sudo apt-get update
-sudo apt-get install wget mercurial ruby rdoc ri libopenssl-ruby ruby-dev mysql-server libssl-dev build-essential openssh-server 
+sudo apt-get install wget git mercurial ruby rdoc ri libopenssl-ruby ruby-dev mysql-server libssl-dev build-essential openssh-server
 sudo apt-get install libmysqlclient16-dev libmagick++-dev libxml++2.6-dev sun-java6-jdk graphviz libsqlite3-dev sqlite3 libxslt1 libxslt1-dev
 sudo apt-get install curl irb
 sudo apt-get install apache2-mpm-prefork apache2-prefork-dev libapr1-dev libaprutil1-dev libcurl4-openssl-dev
