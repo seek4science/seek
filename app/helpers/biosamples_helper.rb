@@ -123,7 +123,7 @@ module BiosamplesHelper
                                                                                                                          :action => 'existing_samples'},
                                                                                                                         :with => "'specimen_ids=' + getSelectedSpecimens()",
                                                                                                                         :before=>"show_large_ajax_loader('existing_samples')") + ";show_existing_samples();"}),
-           link_to(specimen.title, specimen_path(specimen.id)), specimen.born_info, specimen.culture_growth_type.try(:title), specimen.genotype_info,specimen.phenotype_info,creators.join(", "), specimen.id, asset_version_links(specimen.sops).join(", "), delete_icon, update_icon]
+           link_to(specimen.title, specimen_path(specimen.id)), text_or_not_specified(specimen.born_info), text_or_not_specified(specimen.culture_growth_type.try(:title)), text_or_not_specified(specimen.genotype_info),text_or_not_specified(specimen.phenotype_info),text_or_not_specified(creators.join(", ")), specimen.id, text_or_not_specified(asset_version_links(specimen.sops).join(", ")), delete_icon, update_icon]
     end
   end
 
