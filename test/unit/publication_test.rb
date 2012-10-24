@@ -256,7 +256,6 @@ class PublicationTest < ActiveSupport::TestCase
     params[:pid] = options[:email]
     params[:noredirect] = true
     url = "http://www.crossref.org/openurl/?" + params.to_param
-    puts url
     file=options[:content_file]
     stub_request(:get,url).to_return(:body=>File.new("#{Rails.root}/test/fixtures/files/mocking/#{file}"))
 
@@ -270,7 +269,6 @@ class PublicationTest < ActiveSupport::TestCase
     params[:tool] = "seek"
     params[:email] = options[:email]
     url = "http://eutils.ncbi.nlm.nih.gov/entrez/eutils/efetch.fcgi?" + params.to_param
-    puts url
     file=options[:content_file]
     stub_request(:get,url).to_return(:body=>File.new("#{Rails.root}/test/fixtures/files/mocking/#{file}"))
   end
