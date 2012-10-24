@@ -285,7 +285,7 @@ class PublicationsController < ApplicationController
     pubmed_id = @publication.pubmed_id
     doi = @publication.doi
     if pubmed_id
-      query = PubmedQuery.new("seek",Seek::Config.pubmed_api_email)
+      query = PubmedQuery.new("sysmo-seek",Seek::Config.pubmed_api_email)
       result = query.fetch(pubmed_id)
     elsif doi
       query = DoiQuery.new(Seek::Config.crossref_api_email)
