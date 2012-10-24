@@ -28,10 +28,14 @@ class PubmedQuery
       url = FETCH_URL + "?" + params.delete_if{|k,v| k.nil?}.to_param
 
       doc = query(url)  
-      
-      return parse_article(doc.find_first("//PubmedArticle"))
-    rescue
-      raise
+      article = doc.find_first("//PubmedArticle")
+      if article.nil?
+        return PubmedRecord.new({:error=>"No publication could be found with that PubMed ID"})
+      else
+        return parse_article(article)
+      end
+    rescue Exception=>e
+      return PubmedRecord.new({:error=>e.message})
     end
   end
 
@@ -117,8 +121,8 @@ class PubmedQuery
         records << parse_article(article)
       end    
       return records
-    rescue
-      raise
+    rescue Exception=>e
+      return PubmedRecord({:error=>e.message})
     end
   end
 
@@ -156,7 +160,7 @@ class PubmedQuery
  
       return PubmedRecord.new(params)
     rescue
-      raise "Error occurred whilst extracting metadata"
+      return PubmedRecord.new({:error=>"Unable to process the pubmed metadata"})
     end
   end
   

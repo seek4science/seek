@@ -23,6 +23,9 @@ class SpecimenTest < ActiveSupport::TestCase
       specimen.institution= nil
       assert !specimen.valid? if Seek::Config.is_virtualliver
 
+      specimen.reload
+      specimen.strain = nil
+      assert !specimen.valid? unless Seek::Config.is_virtualliver
   end
 
   test "age with unit" do

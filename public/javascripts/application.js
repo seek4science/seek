@@ -183,6 +183,19 @@ function onlyNumbers(evt)
     return true;
  }
 
+//only allows float numbers to by typed
+function onlyFloatNumbers(evt)
+{
+    var charCode = (evt.which) ? evt.which : event.keyCode
+    if (charCode > 31 && (charCode < 48 || charCode > 57))
+        //this is dot charCode
+        if (charCode == 46)
+            return true;
+        else
+            return false;
+
+    return true;
+}
 //perform the click link action
 function clickLink(link) {
     var cancelled = false;

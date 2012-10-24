@@ -58,7 +58,9 @@ class PublicationsController < ApplicationController
     @publication = Publication.new(params[:publication])
     @publication.pubmed_id=nil if @publication.pubmed_id.blank?
     @publication.doi=nil if @publication.doi.blank?
-
+    pubmed_id,doi = preprocess_doi_or_pubmed @publication.pubmed_id,@publication.doi
+    @publication.doi = doi
+    @publication.pubmed_id = pubmed_id
     result = get_data(@publication, @publication.pubmed_id, @publication.doi)
     assay_ids = params[:assay_ids] || []
     respond_to do |format|
@@ -172,49 +174,48 @@ class PublicationsController < ApplicationController
       format.xml  { head :ok }
     end
   end
-  
+
   def fetch_preview
-    begin
-      #trim the PubMed or Doi Id
-      params[:key] = params[:key].strip() unless params[:key].blank?
-      params[:publication][:project_ids].reject!(&:blank?).map!{|id| id.split(',')}.flatten!
-      @publication = Publication.new(params[:publication])
-      key = params[:key]
-      protocol = params[:protocol]
-      pubmed_id = nil
-      doi = nil
-      if protocol == "pubmed"
-        pubmed_id = key
-      elsif protocol == "doi"
-        doi = key
-        if doi.start_with?("doi:")
-          doi = doi.gsub("doi:","")
-        end
-      end      
-      result = get_data(@publication, pubmed_id, doi)
-    rescue
+    #trim the PubMed or Doi Id
+    params[:key] = params[:key].strip() unless params[:key].blank?
+    params[:publication][:project_ids].reject!(&:blank?).map! { |id| id.split(',') }.flatten!
+    @publication = Publication.new(params[:publication])
+    key = params[:key]
+    protocol = params[:protocol]
+    pubmed_id = nil
+    doi = nil
+    if protocol == "pubmed"
+      pubmed_id = key
+    elsif protocol == "doi"
+      doi = key
+    end
+    pubmed_id,doi = preprocess_doi_or_pubmed pubmed_id,doi
+    result = get_data(@publication, pubmed_id, doi)
+    if !result.error.nil?
       if protocol == "pubmed"
         if key.match(/[0-9]+/).nil?
           @error_text = "Please ensure the PubMed ID is entered in the correct format, e.g. <i>16845108</i>"
         else
-          @error_text = "No publication could be found on PubMed with that ID"  
+          @error_text = "No publication could be found on PubMed with that ID"
         end
       elsif protocol == "doi"
         if key.match(/[0-9]+(\.)[0-9]+.*/).nil?
-          @error_text = "Please ensure the DOI is entered in the correct format, e.g. <i>10.1093/nar/gkl320</i>"
+          @error_text = "There was a problem with #{result.doi} - please ensure the DOI is entered in the correct format, e.g. <i>10.1093/nar/gkl320</i>"
         else
-          @error_text = "No valid publication could be found with that DOI"
+          @error_text = "There was a problem with #{result.doi} - #{result.error} ."
         end
-      end          
-      respond_to do |format|
-        format.html { render :partial => "publications/publication_error", :locals => { :publication => @publication, :error_text => @error_text}, :status => 500}
       end
+
+      respond_to do |format|
+        format.html { render :partial => "publications/publication_error", :locals => {:publication => @publication, :error_text => @error_text}, :status => 500 }
+      end
+
     else
       respond_to do |format|
-        format.html { render :partial => "publications/publication_preview", :locals => { :publication => @publication, :authors => result.authors} }
+        format.html { render :partial => "publications/publication_preview", :locals => {:publication => @publication, :authors => result.authors} }
       end
     end
-    
+
   end
   
   #Try and relate non_seek_authors to people in SEEK based on name and project
@@ -284,6 +285,8 @@ class PublicationsController < ApplicationController
     end
   end
 
+  private
+  
   def create_non_seek_authors authors,publication=@publication
     authors.each_with_index do |author,index|
       pa = PublicationAuthor.new()
@@ -311,27 +314,28 @@ class PublicationsController < ApplicationController
       result
   end
 
-  private    
+  def preprocess_doi_or_pubmed pubmed_id,doi
+    doi = doi.sub(%r{doi\.*:}i,"").strip unless doi.nil?
+    doi.strip! unless doi.nil?
+    pubmed_id.strip! unless pubmed_id.nil? || pubmed_id.is_a?(Fixnum)
+    return pubmed_id,doi
+  end
 
   def get_data(publication, pubmed_id, doi=nil)
     if !pubmed_id.nil?
       query = PubmedQuery.new("sysmo-seek",Seek::Config.pubmed_api_email)
       result = query.fetch(pubmed_id)
-      unless result.nil?
+      unless result.nil? || !result.error.nil?
         publication.extract_pubmed_metadata(result)
-        return result
-      else
-        raise "Error - No publication could be found with that PubMed ID"
-      end    
+      end
+      return result
     elsif !doi.nil?
       query = DoiQuery.new(Seek::Config.crossref_api_email)
       result = query.fetch(doi)
-      unless result.nil?
+      unless result.nil? || !result.error.nil?
         publication.extract_doi_metadata(result)
-        return result
-      else 
-        raise "Error - No publication could be found with that DOI"
-      end  
+      end
+      return result
     end
   end
 end

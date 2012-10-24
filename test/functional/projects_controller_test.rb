@@ -30,7 +30,19 @@ class ProjectsControllerTest < ActionController::TestCase
 	def test_should_get_new
 		get :new
 		assert_response :success
-	end
+  end
+
+  def test_avatar_show_in_list
+    p=Factory :project
+    get :index
+    assert_select "div.list_items_container" do
+      assert_select "div.list_item" do
+        assert_select "div.list_item_avatar" do
+          assert_select "a[href=?]",project_path(p)
+        end
+      end
+    end
+  end
 
 	def test_should_create_project
 		assert_difference('Project.count') do

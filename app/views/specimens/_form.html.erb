@@ -89,6 +89,9 @@
 
 <p>
   <%= f.label "Strain:" -%>
+              <% unless Seek::Config.is_virtualliver %>
+                <span class="required">*</span>
+              <% end %>
 <div id='strains_of_selected_organism'>
   <% strains = specimen.organism.nil? ? [] : specimen.organism.strains.without_default -%>
   <%= f.collection_select :strain_id,

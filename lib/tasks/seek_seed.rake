@@ -213,6 +213,24 @@ namespace :seek do
     end
   end
 
+  desc "assign contributor to strains which dont have one"
+  task :assign_contributor_to_strains => :environment do
+    file_path = File.join(Rails.root, "config/default_data", "strains_with_contributor.yml")
+    strains_from_yml = YAML::load(File.open(file_path)).values
+
+    strains_without_contributor = Strain.all.select{|s| s.contributor.nil? }
+    strains_from_yml.each do |strain_from_yml|
+      strain = Strain.find_by_id(strain_from_yml['id'])
+      if strains_without_contributor.include?(strain)
+         contributor = User.find_by_id(strain_from_yml['contributor_id'])
+         unless contributor.nil?
+           strain.contributor = contributor
+           disable_authorization_checks{strain.save}
+         end
+      end
+    end
+  end
+
   private
 
   #reverts to use pre-2.3.4 id generation to keep generated ID's consistent

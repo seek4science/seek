@@ -236,4 +236,58 @@ test "should update genotypes and phenotypes" do
     assert_equal 1, s.sops.length
     assert_equal sop_version_2, s.sops.first
   end
+
+  test 'should associate sops' do
+    sop = Factory(:sop, :policy => Factory(:public_policy))
+    specimen= Factory.attributes_for :specimen, :confluency => "Test", :passage => "Test", :viability => "Test", :purity => "Test"
+    specimen[:strain_id]=Factory(:strain).id
+
+    post :create, :specimen => specimen, :specimen_sop_ids => [sop.id]
+    assert specimen = assigns(:specimen)
+
+    assert_redirected_to specimen
+    associated_sops = specimen.sop_masters.collect(&:sop)
+    assert_equal 1, associated_sops.size
+    assert_equal sop, associated_sops.first
+  end
+
+  test 'should unassociate sops' do
+    sop = Factory(:sop, :policy => Factory(:public_policy))
+    specimen = Factory(:specimen)
+    login_as specimen.contributor
+    sop_master = SopSpecimen.create!(:sop_id => sop.id, :sop_version => 1, :specimen_id => specimen.id)
+    specimen.sop_masters << sop_master
+    associated_sops = specimen.sop_masters.collect(&:sop)
+    specimen.reload
+    assert_equal 1, associated_sops.size
+    assert_equal sop, associated_sops.first
+
+    put :update, :id => specimen.id, :specimen_sop_ids => []
+    specimen.reload
+    associated_sops = specimen.sop_masters.collect(&:sop)
+    assert associated_sops.empty?
+    #make sure the sop_master is deleted as well
+    assert_nil SopSpecimen.find_by_id(sop_master.id)
+  end
+
+  test 'should not unassociate private sops' do
+    sop = Factory(:sop, :policy => Factory(:public_policy))
+    specimen = Factory(:specimen)
+    login_as specimen.contributor
+    specimen.sop_masters << SopSpecimen.create!(:sop_id => sop.id, :sop_version => 1, :specimen_id => specimen.id)
+    associated_sops = specimen.sop_masters.collect(&:sop)
+    specimen.reload
+    assert_equal 1, associated_sops.size
+    assert_equal sop, associated_sops.first
+
+    disable_authorization_checks do
+      sop.policy = Factory(:private_policy)
+      sop.save
+    end
+
+    put :update, :id => specimen.id, :specimen_sop_ids => []
+    specimen.reload
+    assert_equal 1, associated_sops.size
+    assert_equal sop, associated_sops.first
+  end
 end

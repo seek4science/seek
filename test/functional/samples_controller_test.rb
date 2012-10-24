@@ -108,33 +108,34 @@ class SamplesControllerTest < ActionController::TestCase
   end
 
   test "should create sample and specimen with default strain if missing" do
-    assert_difference("Sample.count") do
-      assert_difference("Specimen.count") do
-        assert_difference("Strain.count") do
-          post :create,
-               :organism=>Factory(:organism),
-               :sample => {
-                   :title => "test",
-                   :contributor=>User.current_user,
-                   :projects=>[Factory(:project)],
-                   :lab_internal_number =>"Do232",
-                   :donation_date => Date.today,
-                   :specimen_attributes => {
-                       :lab_internal_number=>"Lab number",
+    with_config_value :is_virtualliver,true do
+      assert_difference("Sample.count") do
+        assert_difference("Specimen.count") do
+          assert_difference("Strain.count") do
+            post :create,
+                 :organism=>Factory(:organism),
+                 :sample => {
+                     :title => "test",
+                     :contributor=>User.current_user,
+                     :projects=>[Factory(:project)],
+                     :lab_internal_number =>"Do232",
+                     :donation_date => Date.today,
+                     :specimen_attributes => {
+                         :lab_internal_number=>"Lab number",
                        :institution_id =>Factory(:institution).id,
-                       :title=>"Donor number"
-                   }
-               }
+                         :title=>"Donor number"
+                     }
+                 }
+          end
         end
       end
+      s = assigns(:sample)
+      assert_redirected_to sample_path(s)
+      assert s.specimen.strain.is_dummy?
+      assert_equal "test",s.title
+      assert_not_nil s.specimen
+      assert_equal "Donor number",s.specimen.title
     end
-    s = assigns(:sample)
-    assert_redirected_to sample_path(s)
-    assert s.specimen.strain.is_dummy?
-    assert_equal "test",s.title
-    assert_not_nil s.specimen
-    assert_equal "Donor number",s.specimen.title
-
   end
 
   test "should create sample specimen with genotypes and phenotypes" do
@@ -353,6 +354,21 @@ test "should show organism and strain information of a sample if there is organi
     assert_select 'input#sample_specimen_attributes_title', :count => 0
   end
 
+  test 'should have age at sampling' do
+    get :new
+    assert_response :success
+    assert_select 'input#sample_age_at_sampling', :count => 1
+
+    sample = Factory(:sample, :age_at_sampling => 4, :age_at_sampling_unit => Factory(:unit, :symbol => 's'))
+    get :show, :id => sample.id
+    assert_response :success
+    assert_select "label", :text => /Age at sampling/
+
+    get :edit, :id => sample.id
+    assert_response :success
+    assert_select "input#sample_age_at_sampling"
+  end
+  
   test "sample-sop association when sop has multiple versions" do
     sop = Factory :sop, :contributor => User.current_user
     sop_version_2 = Factory(:sop_version, :sop => sop)

@@ -1,5 +1,5 @@
 class PubmedRecord
-  attr_accessor :authors, :title, :abstract, :journal, :pmid, :date_published
+  attr_accessor :authors, :title, :abstract, :journal, :pmid, :date_published, :error
     
   PUBMED_BASE_URL = "http://www.ncbi.nlm.nih.gov/pubmed/"
   
@@ -9,7 +9,8 @@ class PubmedRecord
     self.journal = attributes[:journal]
     self.pmid = attributes[:pmid]
     self.date_published = attributes[:pubmed_pub_date]
-    self.authors = attributes[:authors] || []    
+    self.authors = attributes[:authors] || []
+    self.error = attributes[:error] || nil
   end
   
   def pubmed_url

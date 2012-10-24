@@ -48,7 +48,17 @@ class PublicationTest < ActiveSupport::TestCase
     sleep 0.5 #the sleeps are to keep in accordance to the pubmed service requirements
     result = query.fetch(20533085)
     assert_equal Date.parse("9 June 2010"),result.date_published
+    assert_nil result.error
   end
+
+  test "unknown pubmed_id" do
+    WebMock.allow_net_connect!
+    query = PubmedQuery.new("seek","sowen@cs.man.ac.uk")
+    result = query.fetch(1111111111111)
+    assert_equal "No publication could be found with that PubMed ID",result.error
+  end
+
+
 
   test "book chapter doi" do
     WebMock.allow_net_connect!
@@ -65,7 +75,24 @@ class PublicationTest < ActiveSupport::TestCase
     assert_equal "Artificial Intelligence Applications and Innovations",result.journal
     assert_equal Date.parse("1 Jan 2010"),result.date_published
     assert_equal "10.1007/978-3-642-16239-8_8",result.doi
+    assert_nil result.error
 
+  end
+
+  test "doi with not resolvable error" do
+    WebMock.allow_net_connect!
+    query=DoiQuery.new("sowen@cs.man.ac.uk")
+    result = query.fetch("10.4230/OASIcs.GCB.2012.1")
+    assert_equal "The DOI could not be resolved",result.error
+    assert_equal "10.4230/OASIcs.GCB.2012.1",result.doi
+  end
+
+  test "malformed doi" do
+    WebMock.allow_net_connect!
+    query=DoiQuery.new("sowen@cs.man.ac.uk")
+    result = query.fetch("10.1.11.1")
+    assert_equal "Not a valid DOI",result.error
+    assert_equal "10.1.11.1",result.doi
   end
 
   test "editor should not be author" do
@@ -74,6 +101,7 @@ class PublicationTest < ActiveSupport::TestCase
     result = query.fetch("10.1371/journal.pcbi.1002352")
     assert !result.authors.collect{|auth| auth.last_name}.include?("Papin")
     assert_equal 5,result.authors.size
+    assert_nil result.error
   end
 
   test "model and datafile association" do

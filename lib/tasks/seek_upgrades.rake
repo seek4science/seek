@@ -23,6 +23,10 @@ namespace :seek do
 
     Seek::Config.solr_enabled = solr
 
+    if (solr)
+      Rake::Task["seek:reindex_all"].invoke
+    end
+
     puts "Upgrade completed successfully"
   end
 

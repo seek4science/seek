@@ -12,6 +12,7 @@ class Sample < ActiveRecord::Base
   attr_accessor :from_biosamples
 
   belongs_to :specimen
+  belongs_to :age_at_sampling_unit, :class_name => 'Unit', :foreign_key => "age_at_sampling_unit_id"
 
   accepts_nested_attributes_for :specimen
 
@@ -24,7 +25,7 @@ class Sample < ActiveRecord::Base
   has_many :creators, :class_name => "Person", :through => :assets_creators, :order=>'assets_creators.id', :after_add => :update_timestamp, :after_remove => :update_timestamp
   has_many :assets,:through => :sample_assets
   has_many :sample_assets,:dependent => :destroy
-  validates_numericality_of :age_at_sampling, :only_integer => true, :greater_than=> 0, :allow_nil=> true, :message => "is not a positive integer" if !Seek::Config.is_virtualliver
+  validates_numericality_of :age_at_sampling, :greater_than=> 0, :allow_nil=> true, :message => "is invalid value"
   validates_presence_of :projects unless Seek::Config.is_virtualliver
   def self.sop_sql()
   'SELECT sop_versions.* FROM sop_versions ' +
@@ -170,5 +171,13 @@ class Sample < ActiveRecord::Base
 
   def specimen_info
     specimen.nil? ? '' : Seek::Config.sample_parent_term.capitalize + ': ' + specimen.title
+  end
+
+  def age_at_sampling_info
+    unless age_at_sampling.blank? || age_at_sampling_unit.blank?
+      "#{age_at_sampling} (#{age_at_sampling_unit.title || age_at_sampling_unit.symbol}s)"
+    else
+      ''
+    end
  end
 end
