@@ -11,6 +11,7 @@ class PublicationsControllerTest < ActionController::TestCase
     WebMock.allow_net_connect!
     login_as(:quentin)
     @object=publications(:taverna_paper_pubmed)
+    @object=publications(:taverna_paper_pubmed)
   end
   
   def test_title
@@ -59,7 +60,33 @@ class PublicationsControllerTest < ActionController::TestCase
     end
 
     assert_redirected_to edit_publication_path(assigns(:publication))
-  end  
+  end
+
+  test "should create doi publication with doi prefix" do
+    assert_difference('Publication.count') do
+      post :create, :publication => {:doi => "DOI: 10.1371/journal.pone.0004803", :projects=>[projects(:sysmo_project)] } #10.1371/journal.pone.0004803.g001 10.1093/nar/gkl320
+    end
+
+    assert_not_nil assigns(:publication)
+    assert_redirected_to edit_publication_path(assigns(:publication))
+    publication = assigns(:publication).destroy
+
+    #formatted slightly different
+    assert_difference('Publication.count') do
+      post :create, :publication => {:doi => " doi:10.1371/journal.pone.0004803", :projects=>[projects(:sysmo_project)] } #10.1371/journal.pone.0004803.g001 10.1093/nar/gkl320
+    end
+
+    assert_not_nil assigns(:publication)
+    assert_redirected_to edit_publication_path(assigns(:publication))
+    publication = assigns(:publication).destroy
+
+    #also test with spaces around
+    assert_difference('Publication.count') do
+      post :create, :publication => {:doi => "  10.1371/journal.pone.0004803  ", :projects=>[projects(:sysmo_project)] } #10.1371/journal.pone.0004803.g001 10.1093/nar/gkl320
+    end
+
+    assert_redirected_to edit_publication_path(assigns(:publication))
+  end
 
   test "should show publication" do
     get :show, :id => publications(:one)
