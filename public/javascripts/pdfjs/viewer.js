@@ -416,10 +416,9 @@ var PDFView = {
     }
   },
 
-  open: function pdfViewOpen(url, scale, password) {
+    open: function pdfViewOpen(url, scale, password) {
     var parameters = {password: password};
     if (typeof url === 'string') { // URL
-      this.setTitleUsingUrl(url);
       parameters.url = url;
     } else if (url && 'byteLength' in url) { // ArrayBuffer
       parameters.data = url;
@@ -2106,7 +2105,6 @@ window.addEventListener('change', function webViewerChange(evt) {
 
   var file = files[0];
   fileReader.readAsArrayBuffer(file);
-  PDFView.setTitleUsingUrl(file.name);
 
   // URL does not reflect proper document location - hiding some icons.
   document.getElementById('viewBookmark').setAttribute('hidden', 'true');
