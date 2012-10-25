@@ -21,8 +21,6 @@ class DoiQuery
 
     doc = query(url)
 
-    puts doc
-
     record = parse_xml(doc)
     record.doi=id
     record
