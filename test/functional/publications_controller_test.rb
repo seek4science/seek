@@ -236,7 +236,8 @@ class PublicationsControllerTest < ActionController::TestCase
     end
   end
 
-  test "should retrieve the right author order after a publication is created and after some authors are associate/disassociated with seek-profiles" do
+  test "should retrieve the right author order after a publication is created and after some authors are associate/disassociated with seek profiles" do
+    mock_crossref(:email=>"sowen@cs.man.ac.uk",:doi=>"10.1016/j.future.2011.08.004",:content_file=>"cross_ref5.xml")
     assert_difference('Publication.count') do
       post :create, :publication => {:doi => "10.1016/j.future.2011.08.004", :projects=>[projects(:sysmo_project)]}
     end
@@ -274,6 +275,7 @@ class PublicationsControllerTest < ActionController::TestCase
   end
 
   test "should display the right author order after some authors are associate with seek-profiles" do
+    mock_crossref(:email=>"sowen@cs.man.ac.uk",:doi=>"10.1016/j.future.2011.08.004",:content_file=>"cross_ref5.xml")
     assert_difference('Publication.count') do
       post :create, :publication => {:doi => "10.1016/j.future.2011.08.004", :projects=>[projects(:sysmo_project)] } #10.1371/journal.pone.0004803.g001 10.1093/nar/gkl320
     end
