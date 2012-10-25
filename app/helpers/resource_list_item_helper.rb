@@ -14,11 +14,13 @@ module ResourceListItemHelper
   end
 
   def get_list_item_avatar_partial resource
-    avatar_partial = "layouts/avatars"
     if resource.show_contributor_avatars?
-      avatar_partial = "assets/asset_avatars"
+      "assets/asset_avatars"
+    elsif resource.class.name.downcase=="event"
+      ""
+    else
+      "layouts/avatars"
     end
-    avatar_partial
   end
 
   def list_item_title resource, options={}

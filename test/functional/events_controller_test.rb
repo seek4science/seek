@@ -24,6 +24,19 @@ class EventsControllerTest < ActionController::TestCase
     assert_not_nil assigns(:events)
   end
 
+  test "should have no avatar element in list" do
+    e = Factory :event,
+                :contributor => Factory(:user, :person => Factory(:person ,:first_name => "Dont", :last_name => "Display Person")),
+                :projects => [Factory(:project, :title => "Dont Display Project")],
+                :policy => Factory(:public_policy)
+    get :index
+    assert_select "div.list_items_container" do
+      assert_select "div.list_item" do
+        assert_select "div.list_item_avatar",:count=>0
+      end
+    end
+  end
+
   test "index should not show contributor or project" do
     e = Factory :event,
                 :contributor => Factory(:user, :person => Factory(:person ,:first_name => "Dont", :last_name => "Display Person")),

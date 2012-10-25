@@ -1,0 +1,173 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<doi_records>
+  <doi_record owner="10.1371" timestamp="2011-07-18 17:49:40">
+    <crossref>
+      <journal>
+        <journal_metadata language="en">
+          <full_title>PLoS ONE</full_title>
+          <abbrev_title>PLoS ONE</abbrev_title>
+          <issn media_type="electronic">1932-6203</issn>
+        </journal_metadata>
+        <journal_issue>
+          <publication_date media_type="online">
+            <month>3</month>
+            <day>11</day>
+            <year>2009</year>
+          </publication_date>
+          <journal_volume>
+            <volume>4</volume>
+          </journal_volume>
+          <issue>3</issue>
+        </journal_issue>
+        <journal_article publication_type="full_text">
+          <titles>
+            <title>Clickstream Data Yields High-Resolution Maps of Science</title>
+          </titles>
+          <contributors>
+            <person_name contributor_role="author" sequence="first">
+              <given_name>Johan</given_name>
+              <surname>Bollen</surname>
+            </person_name>
+            <person_name contributor_role="author" sequence="additional">
+              <given_name>Herbert</given_name>
+              <surname>Van de Sompel</surname>
+            </person_name>
+            <person_name contributor_role="author" sequence="additional">
+              <given_name>Aric</given_name>
+              <surname>Hagberg</surname>
+            </person_name>
+            <person_name contributor_role="author" sequence="additional">
+              <given_name>Luis</given_name>
+              <surname>Bettencourt</surname>
+            </person_name>
+            <person_name contributor_role="author" sequence="additional">
+              <given_name>Ryan</given_name>
+              <surname>Chute</surname>
+            </person_name>
+            <person_name contributor_role="author" sequence="additional">
+              <given_name>Marko A.</given_name>
+              <surname>Rodriguez</surname>
+            </person_name>
+            <person_name contributor_role="author" sequence="additional">
+              <given_name>Lyudmila</given_name>
+              <surname>Balakireva</surname>
+            </person_name>
+            <person_name contributor_role="editor" sequence="first">
+              <given_name>Alan</given_name>
+              <surname>Ruttenberg</surname>
+            </person_name>
+          </contributors>
+          <publication_date media_type="online">
+            <month>3</month>
+            <day>11</day>
+            <year>2009</year>
+          </publication_date>
+          <pages>
+            <first_page>e4803</first_page>
+          </pages>
+          <publisher_item>
+            <item_number>10.1371/journal.pone.0004803</item_number>
+          </publisher_item>
+          <doi_data>
+            <doi>10.1371/journal.pone.0004803</doi>
+            <timestamp>20090310085528</timestamp>
+            <resource>http://dx.plos.org/10.1371/journal.pone.0004803</resource>
+          </doi_data>
+          <component_list>
+            <component parent_relation="isPartOf">
+              <description/>
+              <doi_data>
+                <doi>10.1371/journal.pone.0004803.g001</doi>
+                <resource>http://dx.plos.org/10.1371/journal.pone.0004803.g001</resource>
+              </doi_data>
+            </component>
+            <component parent_relation="isPartOf">
+              <description/>
+              <doi_data>
+                <doi>10.1371/journal.pone.0004803.g002</doi>
+                <resource>http://dx.plos.org/10.1371/journal.pone.0004803.g002</resource>
+              </doi_data>
+            </component>
+            <component parent_relation="isPartOf">
+              <description/>
+              <doi_data>
+                <doi>10.1371/journal.pone.0004803.g003</doi>
+                <resource>http://dx.plos.org/10.1371/journal.pone.0004803.g003</resource>
+              </doi_data>
+            </component>
+            <component parent_relation="isPartOf">
+              <description/>
+              <doi_data>
+                <doi>10.1371/journal.pone.0004803.g004</doi>
+                <resource>http://dx.plos.org/10.1371/journal.pone.0004803.g004</resource>
+              </doi_data>
+            </component>
+            <component parent_relation="isPartOf">
+              <description/>
+              <doi_data>
+                <doi>10.1371/journal.pone.0004803.g005</doi>
+                <resource>http://dx.plos.org/10.1371/journal.pone.0004803.g005</resource>
+              </doi_data>
+            </component>
+            <component parent_relation="isPartOf">
+              <description/>
+              <doi_data>
+                <doi>10.1371/journal.pone.0004803.g006</doi>
+                <resource>http://dx.plos.org/10.1371/journal.pone.0004803.g006</resource>
+              </doi_data>
+            </component>
+            <component parent_relation="isPartOf">
+              <description/>
+              <doi_data>
+                <doi>10.1371/journal.pone.0004803.g007</doi>
+                <resource>http://dx.plos.org/10.1371/journal.pone.0004803.g007</resource>
+              </doi_data>
+            </component>
+            <component parent_relation="isPartOf">
+              <description/>
+              <doi_data>
+                <doi>10.1371/journal.pone.0004803.t001</doi>
+                <resource>http://dx.plos.org/10.1371/journal.pone.0004803.t001</resource>
+              </doi_data>
+            </component>
+            <component parent_relation="isPartOf">
+              <description/>
+              <doi_data>
+                <doi>10.1371/journal.pone.0004803.t002</doi>
+                <resource>http://dx.plos.org/10.1371/journal.pone.0004803.t002</resource>
+              </doi_data>
+            </component>
+            <component parent_relation="isPartOf">
+              <description/>
+              <doi_data>
+                <doi>10.1371/journal.pone.0004803.t003</doi>
+                <resource>http://dx.plos.org/10.1371/journal.pone.0004803.t003</resource>
+              </doi_data>
+            </component>
+            <component parent_relation="isPartOf">
+              <description/>
+              <doi_data>
+                <doi>10.1371/journal.pone.0004803.t004</doi>
+                <resource>http://dx.plos.org/10.1371/journal.pone.0004803.t004</resource>
+              </doi_data>
+            </component>
+            <component parent_relation="isPartOf">
+              <description/>
+              <doi_data>
+                <doi>10.1371/journal.pone.0004803.t005</doi>
+                <resource>http://dx.plos.org/10.1371/journal.pone.0004803.t005</resource>
+              </doi_data>
+            </component>
+            <component parent_relation="isPartOf">
+              <description/>
+              <doi_data>
+                <doi>10.1371/journal.pone.0004803.t006</doi>
+                <resource>http://dx.plos.org/10.1371/journal.pone.0004803.t006</resource>
+              </doi_data>
+            </component>
+          </component_list>
+        </journal_article>
+      </journal>
+    </crossref>
+  </doi_record>
+</doi_records>

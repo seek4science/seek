@@ -27,7 +27,8 @@ class PubmedQuery
       params[:email] = self.email unless params[:email]
       url = FETCH_URL + "?" + params.delete_if{|k,v| k.nil?}.to_param
 
-      doc = query(url)  
+      doc = query(url)
+
       article = doc.find_first("//PubmedArticle")
       if article.nil?
         return PubmedRecord.new({:error=>"No publication could be found with that PubMed ID"})
