@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<html>
+  <head>
+    <title>CrossRef OpenURL Resolver</title>
+  </head>
+  <body>
+    <a href="http://www.crossref.org"><img border="0" alt="CrossRef" src="http://www.crossref.org/images/crossref.gif"/></a>
+    <br/><br/>Malformed DOI [10.1.11.1]()
+  </body>
+</html>

@@ -8,7 +8,6 @@ class PublicationsControllerTest < ActionController::TestCase
   include RestTestCases
   
   def setup
-    WebMock.allow_net_connect!
     login_as(:quentin)
   end
 
@@ -34,9 +33,10 @@ class PublicationsControllerTest < ActionController::TestCase
   end
 
   test "should not relate assays thay are not authorized for edit during create publication" do
+    mock_pubmed(:email=>"",:id=>1,:content_file=>"pubmed_1.xml")
     assay=assays(:metabolomics_assay)
     assert_difference('Publication.count') do
-      post :create, :publication => {:pubmed_id => 3,:projects=>[projects(:sysmo_project)]},:assay_ids=>[assay.id.to_s]
+      post :create, :publication => {:pubmed_id => 1,:projects=>[projects(:sysmo_project)]},:assay_ids=>[assay.id.to_s]
     end
 
     assert_redirected_to edit_publication_path(assigns(:publication))
@@ -45,10 +45,11 @@ class PublicationsControllerTest < ActionController::TestCase
   end
 
   test "should create publication" do
+    mock_pubmed(:email=>"",:id=>1,:content_file=>"pubmed_1.xml")
     login_as(:model_owner) #can edit assay
     assay=assays(:metabolomics_assay)
     assert_difference('Publication.count') do
-      post :create, :publication => {:pubmed_id => 3,:projects=>[projects(:sysmo_project)] },:assay_ids=>[assay.id.to_s]
+      post :create, :publication => {:pubmed_id => 1,:projects=>[projects(:sysmo_project)] },:assay_ids=>[assay.id.to_s]
     end
 
     assert_redirected_to edit_publication_path(assigns(:publication))
@@ -58,6 +59,7 @@ class PublicationsControllerTest < ActionController::TestCase
   end
   
   test "should create doi publication" do
+    mock_crossref(:email=>"sowen@cs.man.ac.uk",:doi=>"10.1371/journal.pone.0004803",:content_file=>"cross_ref3.xml")
     assert_difference('Publication.count') do
       post :create, :publication => {:doi => "10.1371/journal.pone.0004803", :projects=>[projects(:sysmo_project)] } #10.1371/journal.pone.0004803.g001 10.1093/nar/gkl320
     end
@@ -66,6 +68,7 @@ class PublicationsControllerTest < ActionController::TestCase
   end
 
   test "should create doi publication with doi prefix" do
+    mock_crossref(:email=>"sowen@cs.man.ac.uk",:doi=>"10.1371/journal.pone.0004803",:content_file=>"cross_ref3.xml")
     assert_difference('Publication.count') do
       post :create, :publication => {:doi => "DOI: 10.1371/journal.pone.0004803", :projects=>[projects(:sysmo_project)] } #10.1371/journal.pone.0004803.g001 10.1093/nar/gkl320
     end
@@ -190,6 +193,7 @@ class PublicationsControllerTest < ActionController::TestCase
   end
   
   test "should disassociate authors" do
+    mock_pubmed(:email=>"",:id=>5,:content_file=>"pubmed_5.xml")
     p = publications(:one)
     p.creators << people(:quentin_person)
     p.creators << people(:aaron_person)
@@ -225,13 +229,15 @@ class PublicationsControllerTest < ActionController::TestCase
   end
   
   test "shouldn't add paper with non-unique title" do
+    mock_crossref(:email=>"sowen@cs.man.ac.uk",:doi=>"10.1093/nar/gkl320",:content_file=>"cross_ref4.xml")
     #PubMed version of publication already exists, so it shouldn't re-add
     assert_no_difference('Publication.count') do
       post :create, :publication => {:doi => "10.1093/nar/gkl320" }
     end
   end
 
-  test "should retrieve the right author order after a publication is created and after some authors are associate/disassociated with seek-profiles" do
+  test "should retrieve the right author order after a publication is created and after some authors are associate/disassociated with seek profiles" do
+    mock_crossref(:email=>"sowen@cs.man.ac.uk",:doi=>"10.1016/j.future.2011.08.004",:content_file=>"cross_ref5.xml")
     assert_difference('Publication.count') do
       post :create, :publication => {:doi => "10.1016/j.future.2011.08.004", :projects=>[projects(:sysmo_project)]}
     end
@@ -269,6 +275,7 @@ class PublicationsControllerTest < ActionController::TestCase
   end
 
   test "should display the right author order after some authors are associate with seek-profiles" do
+    mock_crossref(:email=>"sowen@cs.man.ac.uk",:doi=>"10.1016/j.future.2011.08.004",:content_file=>"cross_ref5.xml")
     assert_difference('Publication.count') do
       post :create, :publication => {:doi => "10.1016/j.future.2011.08.004", :projects=>[projects(:sysmo_project)] } #10.1371/journal.pone.0004803.g001 10.1093/nar/gkl320
     end
@@ -290,5 +297,30 @@ class PublicationsControllerTest < ActionController::TestCase
     joined_original_authors = original_authors.join(', ')
     get :show, :id => publication.id
     assert_select 'p', :text => /#{joined_original_authors}/
+  end
+
+  def mock_crossref options
+    url= "http://www.crossref.org/openurl/"
+    params={}
+    params[:format] = "unixref"
+    params[:id] = "doi:"+options[:doi]
+    params[:pid] = options[:email]
+    params[:noredirect] = true
+    url = "http://www.crossref.org/openurl/?" + params.to_param
+    file=options[:content_file]
+    stub_request(:get,url).to_return(:body=>File.new("#{Rails.root}/test/fixtures/files/mocking/#{file}"))
+
+  end
+
+  def mock_pubmed options
+    params={}
+    params[:db] = "pubmed" unless params[:db]
+    params[:retmode] = "xml"
+    params[:id] = options[:id]
+    params[:tool] = options[:too] || "sysmo-seek"
+    params[:email] = options[:email]
+    url = "http://eutils.ncbi.nlm.nih.gov/entrez/eutils/efetch.fcgi?" + params.to_param
+    file=options[:content_file]
+    stub_request(:get,url).to_return(:body=>File.new("#{Rails.root}/test/fixtures/files/mocking/#{file}"))
   end
 end

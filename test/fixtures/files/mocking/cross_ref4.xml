@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<doi_records>
+  <doi_record owner="10.1093" timestamp="2011-08-22 03:37:34">
+    <crossref>
+      <journal>
+        <journal_metadata language="en">
+          <full_title>Nucleic Acids Research</full_title>
+          <abbrev_title>Nucleic Acids Research</abbrev_title>
+          <issn media_type="print">0305-1048</issn>
+          <issn media_type="electronic">1362-4962</issn>
+        </journal_metadata>
+        <journal_issue>
+          <publication_date media_type="print">
+            <month>07</month>
+            <day>01</day>
+            <year>2006</year>
+          </publication_date>
+          <journal_volume>
+            <volume>34</volume>
+          </journal_volume>
+          <issue>Web Server</issue>
+        </journal_issue>
+        <journal_article publication_type="full_text">
+          <titles>
+            <title>Taverna: a tool for building and running workflows of services</title>
+          </titles>
+          <contributors>
+            <person_name sequence="first" contributor_role="author">
+              <given_name>D.</given_name>
+              <surname>Hull</surname>
+            </person_name>
+            <person_name sequence="additional" contributor_role="author">
+              <given_name>K.</given_name>
+              <surname>Wolstencroft</surname>
+            </person_name>
+            <person_name sequence="additional" contributor_role="author">
+              <given_name>R.</given_name>
+              <surname>Stevens</surname>
+            </person_name>
+            <person_name sequence="additional" contributor_role="author">
+              <given_name>C.</given_name>
+              <surname>Goble</surname>
+            </person_name>
+            <person_name sequence="additional" contributor_role="author">
+              <given_name>M. R.</given_name>
+              <surname>Pocock</surname>
+            </person_name>
+            <person_name sequence="additional" contributor_role="author">
+              <given_name>P.</given_name>
+              <surname>Li</surname>
+            </person_name>
+            <person_name sequence="additional" contributor_role="author">
+              <given_name>T.</given_name>
+              <surname>Oinn</surname>
+            </person_name>
+          </contributors>
+          <publication_date media_type="print">
+            <month>07</month>
+            <day>01</day>
+            <year>2006</year>
+          </publication_date>
+          <pages>
+            <first_page>W729</first_page>
+            <last_page>W732</last_page>
+          </pages>
+          <publisher_item>
+            <item_number item_number_type="sequence-number">34/suppl_2/W729</item_number>
+          </publisher_item>
+          <doi_data>
+            <doi>10.1093/nar/gkl320</doi>
+            <timestamp>200702161145</timestamp>
+            <resource>http://www.nar.oxfordjournals.org/cgi/doi/10.1093/nar/gkl320</resource>
+          </doi_data>
+        </journal_article>
+      </journal>
+    </crossref>
+  </doi_record>
+</doi_records>

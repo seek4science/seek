@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<doi_records>
+  <doi_record owner="10.1016" timestamp="2011-09-15 18:33:32">
+    <crossref>
+      <journal>
+        <journal_metadata language="en">
+          <full_title>Future Generation Computer Systems</full_title>
+          <abbrev_title>Future Generation Computer Systems</abbrev_title>
+          <issn media_type="print">0167739X</issn>
+        </journal_metadata>
+        <journal_issue>
+          <publication_date media_type="print">
+            <month>8</month>
+            <year>2011</year>
+          </publication_date>
+        </journal_issue>
+        <journal_article publication_type="full_text">
+          <titles>
+            <title>Why linked data is not enough for scientists</title>
+          </titles>
+          <contributors>
+            <person_name contributor_role="author" sequence="first">
+              <given_name>Sean</given_name>
+              <surname>Bechhofer</surname>
+            </person_name>
+            <person_name contributor_role="author" sequence="additional">
+              <given_name>Iain</given_name>
+              <surname>Buchan</surname>
+            </person_name>
+            <person_name contributor_role="author" sequence="additional">
+              <given_name>David</given_name>
+              <surname>De Roure</surname>
+            </person_name>
+            <person_name contributor_role="author" sequence="additional">
+              <given_name>Paolo</given_name>
+              <surname>Missier</surname>
+            </person_name>
+            <person_name contributor_role="author" sequence="additional">
+              <given_name>John</given_name>
+              <surname>Ainsworth</surname>
+            </person_name>
+            <person_name contributor_role="author" sequence="additional">
+              <given_name>Jiten</given_name>
+              <surname>Bhagat</surname>
+            </person_name>
+            <person_name contributor_role="author" sequence="additional">
+              <given_name>Philip</given_name>
+              <surname>Couch</surname>
+            </person_name>
+            <person_name contributor_role="author" sequence="additional">
+              <given_name>Don</given_name>
+              <surname>Cruickshank</surname>
+            </person_name>
+            <person_name contributor_role="author" sequence="additional">
+              <given_name>Mark</given_name>
+              <surname>Delderfield</surname>
+            </person_name>
+            <person_name contributor_role="author" sequence="additional">
+              <given_name>Ian</given_name>
+              <surname>Dunlop</surname>
+            </person_name>
+            <person_name contributor_role="author" sequence="additional">
+              <given_name>Matthew</given_name>
+              <surname>Gamble</surname>
+            </person_name>
+            <person_name contributor_role="author" sequence="additional">
+              <given_name>Danius</given_name>
+              <surname>Michaelides</surname>
+            </person_name>
+            <person_name contributor_role="author" sequence="additional">
+              <given_name>Stuart</given_name>
+              <surname>Owen</surname>
+            </person_name>
+            <person_name contributor_role="author" sequence="additional">
+              <given_name>David</given_name>
+              <surname>Newman</surname>
+            </person_name>
+            <person_name contributor_role="author" sequence="additional">
+              <given_name>Shoaib</given_name>
+              <surname>Sufi</surname>
+            </person_name>
+            <person_name contributor_role="author" sequence="additional">
+              <given_name>Carole</given_name>
+              <surname>Goble</surname>
+            </person_name>
+          </contributors>
+          <publication_date media_type="print">
+            <month>8</month>
+            <year>2011</year>
+          </publication_date>
+          <publisher_item>
+            <item_number item_number_type="sequence-number">S0167739X11001439</item_number>
+            <identifier id_type="pii">S0167739X11001439</identifier>
+          </publisher_item>
+          <doi_data>
+            <doi>10.1016/j.future.2011.08.004</doi>
+            <resource>http://linkinghub.elsevier.com/retrieve/pii/S0167739X11001439</resource>
+          </doi_data>
+        </journal_article>
+      </journal>
+    </crossref>
+  </doi_record>
+</doi_records>

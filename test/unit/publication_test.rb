@@ -36,24 +36,24 @@ class PublicationTest < ActiveSupport::TestCase
   end
 
   test "publication date from pubmed" do
-    WebMock.allow_net_connect!
-    query = PubmedQuery.new("seek","sowen@cs.man.ac.uk")
+    mock_pubmed(:email=>"fred@email.com",:id=>21533085,:content_file=>"pubmed_21533085.xml")
+    mock_pubmed(:email=>"fred@email.com",:id=>20533085,:content_file=>"pubmed_20533085.xml")
+    mock_pubmed(:email=>"fred@email.com",:id=>1,:content_file=>"pubmed_1.xml")
+    query = PubmedQuery.new("seek","fred@email.com")
     result = query.fetch(21533085)
     assert_equal Date.parse("20 April 2011"),result.date_published
 
-    sleep 0.5 #the sleeps are to keep in accordance to the pubmed service requirements
     result = query.fetch(1)
     assert_equal Date.parse("1 June 1975"),result.date_published
 
-    sleep 0.5 #the sleeps are to keep in accordance to the pubmed service requirements
     result = query.fetch(20533085)
     assert_equal Date.parse("9 June 2010"),result.date_published
     assert_nil result.error
   end
 
   test "unknown pubmed_id" do
-    WebMock.allow_net_connect!
-    query = PubmedQuery.new("seek","sowen@cs.man.ac.uk")
+    mock_pubmed(:email=>"fred@email.com",:id=>1111111111111,:content_file=>"pubmed_not_found.xml")
+    query = PubmedQuery.new("seek","fred@email.com")
     result = query.fetch(1111111111111)
     assert_equal "No publication could be found with that PubMed ID",result.error
   end
@@ -61,8 +61,8 @@ class PublicationTest < ActiveSupport::TestCase
 
 
   test "book chapter doi" do
-    WebMock.allow_net_connect!
-    query=DoiQuery.new("sowen@cs.man.ac.uk")
+    mock_crossref(:email=>"fred@email.com",:doi=>"10.1007/978-3-642-16239-8_8",:content_file=>"cross_ref1.xml")
+    query=DoiQuery.new("fred@email.com")
     result = query.fetch("10.1007/978-3-642-16239-8_8")
     assert_equal 3,result.publication_type
     assert_equal "Prediction with Confidence Based on a Random Forest Classifier",result.title
@@ -80,24 +80,24 @@ class PublicationTest < ActiveSupport::TestCase
   end
 
   test "doi with not resolvable error" do
-    WebMock.allow_net_connect!
-    query=DoiQuery.new("sowen@cs.man.ac.uk")
+    mock_crossref(:email=>"fred@email.com",:doi=>"10.4230/OASIcs.GCB.2012.1",:content_file=>"cross_ref_no_resolve.xml")
+    query=DoiQuery.new("fred@email.com")
     result = query.fetch("10.4230/OASIcs.GCB.2012.1")
     assert_equal "The DOI could not be resolved",result.error
     assert_equal "10.4230/OASIcs.GCB.2012.1",result.doi
   end
 
   test "malformed doi" do
-    WebMock.allow_net_connect!
-    query=DoiQuery.new("sowen@cs.man.ac.uk")
+    mock_crossref(:email=>"fred@email.com",:doi=>"10.1.11.1",:content_file=>"cross_ref_malformed_doi.xml")
+    query=DoiQuery.new("fred@email.com")
     result = query.fetch("10.1.11.1")
     assert_equal "Not a valid DOI",result.error
     assert_equal "10.1.11.1",result.doi
   end
 
   test "editor should not be author" do
-    WebMock.allow_net_connect!
-    query=DoiQuery.new("sowen@cs.man.ac.uk")
+    mock_crossref(:email=>"fred@email.com",:doi=>"10.1371/journal.pcbi.1002352",:content_file=>"cross_ref2.xml")
+    query=DoiQuery.new("fred@email.com")
     result = query.fetch("10.1371/journal.pcbi.1002352")
     assert !result.authors.collect{|auth| auth.last_name}.include?("Papin")
     assert_equal 5,result.authors.size
@@ -248,4 +248,29 @@ class PublicationTest < ActiveSupport::TestCase
     end
   end
 
+  def mock_crossref options
+    url= "http://www.crossref.org/openurl/"
+    params={}
+    params[:format] = "unixref"
+    params[:id] = "doi:"+options[:doi]
+    params[:pid] = options[:email]
+    params[:noredirect] = true
+    url = "http://www.crossref.org/openurl/?" + params.to_param
+    file=options[:content_file]
+    stub_request(:get,url).to_return(:body=>File.new("#{Rails.root}/test/fixtures/files/mocking/#{file}"))
+
+  end
+
+  def mock_pubmed options
+    params={}
+    params[:db] = "pubmed" unless params[:db]
+    params[:retmode] = "xml"
+    params[:id] = options[:id]
+    params[:tool] = "seek"
+    params[:email] = options[:email]
+    url = "http://eutils.ncbi.nlm.nih.gov/entrez/eutils/efetch.fcgi?" + params.to_param
+    file=options[:content_file]
+    stub_request(:get,url).to_return(:body=>File.new("#{Rails.root}/test/fixtures/files/mocking/#{file}"))
+  end
+  
 end
