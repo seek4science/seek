@@ -81,12 +81,6 @@ class SpecimensController < ApplicationController
 
     if @specimen.save
       deliver_request_publish_approval params[:sharing], @specimen
-      #associate sops
-      #unassociate sops
-      (@specimen.sop_masters.collect{|sm| sm.sop.id} - sop_ids.map(&:to_i)).each do |id|
-        sop_master = @specimen.sop_masters.detect{ |ss| ss.sop.id == id }
-        sop_master.destroy if sop_master && sop_master.sop.can_view?
-      end
 
       if @specimen.from_biosamples=='true'
         #reload to get updated nested attributes,e.g. genotypes/phenotypes

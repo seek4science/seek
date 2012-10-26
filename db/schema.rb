@@ -1101,8 +1101,9 @@ ActiveRecord::Schema.define(:version => 20121019092421) do
     t.string   "provider_name"
     t.float    "age_at_sampling"
     t.string   "uuid"
-    t.integer  "age_at_sampling_unit_id"
+    t.string   "sample_type"
     t.string   "treatment"
+    t.integer  "age_at_sampling_unit_id"
   end
 
   create_table "samples_tissue_and_cell_types", :id => false, :force => true do |t|

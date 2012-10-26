@@ -152,6 +152,7 @@ class SamplesControllerTest < ActionController::TestCase
                    :lab_internal_number => "Do232",
                    :donation_date => Date.today,
                    :specimen_attributes => {
+                       :strain_id => Factory(:strain).id,
                        :lab_internal_number => "Lab number",
                        :institution_id =>Factory(:institution).id,
                        :title => "Donor number",

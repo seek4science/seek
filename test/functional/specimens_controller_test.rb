@@ -266,8 +266,8 @@ test "should update genotypes and phenotypes" do
     specimen.reload
     associated_sops = specimen.sop_masters.collect(&:sop)
     assert associated_sops.empty?
-    #make sure the sop_master is deleted as well
-    assert_nil SopSpecimen.find_by_id(sop_master.id)
+    #sop_master can not be deleted because no specified version
+    assert_not_nil SopSpecimen.find_by_id(sop_master.id)
   end
 
   test 'should not unassociate private sops' do
