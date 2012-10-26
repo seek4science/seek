@@ -752,6 +752,24 @@ class SopsControllerTest < ActionController::TestCase
     assert_equal 'update', al2.action
   end
 
+  test 'should not create duplication sop_versions_projects when uploading new version' do
+    sop = Factory(:sop)
+    login_as(sop.contributor)
+    post :new_version, :id => sop, :sop => {:data => fixture_file_upload('files/file_picture.png')}, :revision_comment => "This is a new revision"
+
+    sop.reload
+    assert_equal 2, sop.versions.count
+    assert_equal 1, sop.latest_version.projects.count
+  end
+
+  test 'should not create duplication sop_versions_projects when uploading sop' do
+    post :create, :sop => valid_sop, :sharing => valid_sharing
+
+    sop = assigns(:sop)
+    assert_equal 1, sop.versions.count
+    assert_equal 1, sop.latest_version.projects.count
+  end
+
   private
 
   def valid_sop_with_url
