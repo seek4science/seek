@@ -43,7 +43,7 @@ module BiosamplesHelper
     creator_link = creator ? link_to(creator.name, person_path(creator.id)) : ""
     [(link_to strain.organism.title, organism_path(strain.organism.id)),
      (check_box_tag "selected_strain_#{strain.id}", strain.id, false, :onchange => strain_checkbox_onchange_function)   ,
-     text_or_not_specified(strain.title), text_or_not_specified(strain.genotype_info), text_or_not_specified(strain.phenotype_info), strain.id, text_or_not_specified(strain.synonym), text_or_not_specified(creator_link), text_or_not_specified(strain.parent_strain),
+     link_to(strain.title, strain), text_or_not_specified(strain.genotype_info), text_or_not_specified(strain.phenotype_info), strain.id, text_or_not_specified(strain.synonym), text_or_not_specified(creator_link), text_or_not_specified(strain.parent_strain),
      (if strain.can_delete?
         link_to_remote image("destroy", :alt => "Delete", :title => "Delete this strain"), :url => {:action => "destroy", :controller => 'biosamples', :id => strain.id, :class => 'strain', :id_column_position => 5},
                              :confirm => "Are you sure you want to delete this strain?", :method => :delete
