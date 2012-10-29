@@ -9,7 +9,8 @@ namespace :seek do
   task :upgrade_version_tasks=>[
             :environment,
             :reindex_things,
-            :reordering_authors_for_existing_publications
+            :reordering_authors_for_existing_publications,
+            :cleanup_asset_versions_projects_duplication
   ]
 
   desc("upgrades SEEK from the last released version to the latest released version")
@@ -129,5 +130,28 @@ namespace :seek do
         PublicationsController.new().create_non_seek_authors(original_authors,publication)
       end
     end
+  end
+
+  task(:cleanup_asset_versions_projects_duplication=>:environment) do
+     ['data_file','model','presentation','sop'].each do |asset_type|
+       asset_versions_projects_table = [asset_type + '_versions', 'projects'].sort().join('_')
+       sql1 = "SELECT * FROM #{asset_versions_projects_table} GROUP BY project_id,version_id"
+       sql2 = "SELECT count(version_id) FROM #{asset_versions_projects_table} GROUP BY project_id,version_id"
+       grouped_by_version_and_project = ActiveRecord::Base.connection.select_all(sql1)
+       counted_by_version_and_project = ActiveRecord::Base.connection.select_all(sql2).collect{|c|c['count(version_id)'].to_i}
+       counted_by_version_and_project.each_with_index do |count,index|
+         if count > 1
+           #delete all the records that meet condition
+           project_id = grouped_by_version_and_project[index]['project_id'].to_i
+           version_id = grouped_by_version_and_project[index]['version_id'].to_i
+           condition = "project_id=#{project_id} AND version_id=#{version_id}"
+           delete_sql = "DELETE FROM #{asset_versions_projects_table} WHERE #{condition}"
+           ActiveRecord::Base.connection.delete(delete_sql)
+           #insert one record
+           insert_sql = "INSERT INTO #{asset_versions_projects_table} VALUES (#{project_id}, #{version_id})"
+           ActiveRecord::Base.connection.insert(insert_sql)
+         end
+       end
+     end
   end
 end
