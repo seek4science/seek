@@ -338,8 +338,8 @@ end
     # (this will also trigger timestamp update in the corresponding Asset)
     @data_file.last_used_at = Time.now
     @data_file.save_without_timestamping    
-    
-    handle_download @display_data_file
+    disposition = params[:disposition] || 'attachment'
+    handle_download @display_data_file, disposition
   end 
   
   def data

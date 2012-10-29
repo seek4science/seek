@@ -70,8 +70,9 @@ class SopsController < ApplicationController
     # (this will also trigger timestamp update in the corresponding Asset)
     @sop.last_used_at = Time.now
     @sop.save_without_timestamping
-    
-    handle_download @display_sop
+
+    disposition = params[:disposition] || 'attachment'
+    handle_download @display_sop, disposition
   end
   
   # GET /sops/new

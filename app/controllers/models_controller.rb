@@ -468,13 +468,14 @@ class ModelsController < ApplicationController
     # update timestamp in the current Model record
     # (this will also trigger timestamp update in the corresponding Asset)
     @model.last_used_at = Time.now
-    @model.save_without_timestamping    
+    @model.save_without_timestamping
 
+    disposition = params[:disposition] || 'attachment'
     if @display_model.content_blobs.count==1 && @display_model.model_image.nil?
-       handle_download @display_model
+       handle_download @display_model, disposition
     elsif params[:content_blob_id]
       content_blob = ContentBlob.find(params[:content_blob_id].to_i)
-      handle_download @display_model, content_blob
+      handle_download @display_model, disposition, content_blob
     else
       handle_download_zip @display_model
     end

@@ -1288,6 +1288,28 @@ class DataFilesControllerTest < ActionController::TestCase
     assert_select "span#treatments",:text=>/you do not have permission to view the treatments/i
   end
 
+  test "should handle inline download when specify the inline disposition" do
+    data=File.new("#{Rails.root}/test/fixtures/files/file_picture.png","rb").read
+    df = Factory :data_file,
+                 :content_blob => Factory(:content_blob, :data => data, :content_type=>"images/png"),
+                 :policy => Factory(:downloadable_public_policy)
+
+    get :download, :id => df, :content_blob_id => df.content_blob.id, :disposition => 'inline'
+    assert_response :success
+    assert @response.header['Content-Disposition'].include?('inline')
+  end
+
+  test "should handle normal attachment download" do
+    data=File.new("#{Rails.root}/test/fixtures/files/file_picture.png","rb").read
+    df = Factory :data_file,
+                 :content_blob => Factory(:content_blob, :data => data, :content_type=>"images/png"),
+                 :policy => Factory(:downloadable_public_policy)
+
+    get :download, :id => df
+    assert_response :success
+    assert @response.header['Content-Disposition'].include?('attachment')
+  end
+
   private
 
   def mock_http

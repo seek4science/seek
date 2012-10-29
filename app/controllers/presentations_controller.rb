@@ -127,7 +127,8 @@ class PresentationsController < ApplicationController
     @presentation.last_used_at = Time.now
     @presentation.save_without_timestamping
 
-    handle_download @display_presentation
+    disposition = params[:disposition] || 'attachment'
+    handle_download @display_presentation, disposition
   end
 
   def edit
