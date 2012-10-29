@@ -1,7 +1,7 @@
 module Seek
   module ContentBlobCommon
     def self.included(base)
-      base.before_filter :set_content_blob, :only=>[:get_pdf,:send_image]
+      base.before_filter :set_content_blob, :only=>[:get_pdf]
     end
 
     def set_content_blob
@@ -32,10 +32,6 @@ module Seek
           render :text => 'Unable to convert the file for display'
         end
       end
-    end
-
-    def send_image
-      send_file "#{@content_blob.filepath}", :filename => @content_blob.original_filename, :type => @content_blob.content_type, :disposition=>'inline'
     end
   end
 end

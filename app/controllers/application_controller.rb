@@ -247,7 +247,7 @@ class ApplicationController < ActionController::Base
         'view'
 
       when 'download', 'named_download', 'launch', 'submit_job', 'data', 'execute','plot', 'explore','visualise' ,'export_as_xgmml',
-            'view_pdf_content', 'get_pdf', 'send_image'
+            'view_pdf_content', 'get_pdf'
         'download'
 
       when 'edit', 'new', 'create', 'update', 'new_version', 'create_version',
