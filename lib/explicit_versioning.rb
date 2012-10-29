@@ -54,23 +54,6 @@ module Jits
             def versions
               parent.versions
             end
-
-            #This assumes that people defining habtm relationships inside
-            #the block passed to 'explicit_versioning()' want those habtm relationships
-            #set based on a relationship of the same name on the object being versioned
-            #example:
-            #class Person
-            #  has_and_belongs_to_many :events
-            #  explicit_versioning() do
-            #    has_and_belongs_to_many :events, :join_table => 'person_versions_events'
-            #  end
-            #This will ensure that the current links to events in the people_events table is copied into the person_versions_events table
-            #when the Person::Version object is created
-            def self.has_and_belongs_to_many *args
-              name = args.first
-              after_create proc {|item| item.send("#{name}=", item.parent.send(name))}
-              super
-            end
           end
 
           versioned_class.set_table_name versioned_table_name
@@ -194,6 +177,7 @@ module Jits
             rev.version = send(self.class.version_column)
             rev.send("#{self.class.revision_comments_column}=", revision_comment)
             rev.send("#{self.class.versioned_foreign_key}=", self.id)
+            rev.projects = self.projects
             saved = rev.save
 
             if saved
