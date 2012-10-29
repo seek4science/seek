@@ -770,6 +770,20 @@ class SopsControllerTest < ActionController::TestCase
     assert_equal 1, sop.latest_version.projects.count
   end
 
+  test "should destroy all versions related when destroying sop" do
+    sop = Factory(:sop)
+    assert_equal 1, sop.versions.count
+    sop_version = sop.latest_version
+    assert_equal 1, sop_version.projects.count
+    project_sop_version = sop_version.projects.first
+
+    login_as(sop.contributor)
+    delete :destroy, :id => sop
+    assert_nil Sop::Version.find_by_id(sop_version.id)
+    sql = "select * from projects_sop_versions where project_id = #{project_sop_version.id} and version_id = #{sop_version.id}"
+    assert ActiveRecord::Base.connection.select_all(sql).empty?
+  end
+
   private
 
   def valid_sop_with_url
