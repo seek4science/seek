@@ -43,7 +43,7 @@ module Seek
 
     #check whether the file is pdf, otherwise convert to pdf
     #then return the pdf file
-    def pdf_or_convert @content_blob
+    def pdf_or_convert
       dat_filepath = @content_blob.filepath
       pdf_filepath = @content_blob.filepath('pdf')
       asset_version = @content_blob.asset.find_version(@content_blob.asset_version)
@@ -83,15 +83,26 @@ module Seek
     def download_via_url content_blob
       asset_version = content_blob.asset.find_version(content_blob.asset_version)
       code = url_response_code(content_blob.url)
-      if (["302","401"].include?(code))
-        redirect_to(content_blob.url,:target=>"_blank")
-      elsif code=="404"
-        flash[:error]="This item is referenced at a remote location, which is currently unavailable"
-        redirect_to polymorphic_path(asset_version.parent,{:version=>asset_version.version})
-      else
+      if code == "200"
         downloader=RemoteDownloader.new
-        data_hash = downloader.get_remote_data content_blob.url
-        send_file data_hash[:data_tmp_path], :filename => data_hash[:filename] || content_blob.original_filename, :type => data_hash[:content_type] || content_blob.content_type, :disposition => 'attachment'
+        begin
+          data_hash = downloader.get_remote_data content_blob.url
+          send_file data_hash[:data_tmp_path], :filename => data_hash[:filename] || content_blob.original_filename, :type => data_hash[:content_type] || content_blob.content_type, :disposition => 'attachment'
+        rescue Exception=>e
+          error_message = "There is a problem downloading this file. #{e}"
+          redirected_url = polymorphic_path(asset_version.parent,{:version=>asset_version.version})
+          return_file_or_redirect_to content_blob, redirected_url, error_message
+        end
+      elsif (["302","401"].include?(code))
+        return_file_or_redirect_to content_blob, content_blob.url
+      elsif code=="404"
+        error_message = "This item is referenced at a remote location, which is currently unavailable"
+        redirected_url = polymorphic_path(asset_version.parent,{:version=>asset_version.version})
+        return_file_or_redirect_to content_blob,  redirected_url, error_message
+      else
+        error_message = "There is a problem downloading this file."
+        redirected_url = polymorphic_path(asset_version.parent,{:version=>asset_version.version})
+        return_file_or_redirect_to content_blob,  redirected_url, error_message
       end
     end
 
@@ -120,6 +131,16 @@ module Seek
           redirect_on_error asset_version,de.message
         end
 
+      end
+    end
+
+    private
+    def return_file_or_redirect_to content_blob, redirected_url=nil, error_message = nil
+    if content_blob.file_exists?
+        send_file content_blob.filepath, :filename => content_blob.original_filename, :type => content_blob.content_type, :disposition => 'attachment'
+      else
+        flash[:error]= error_message if error_message
+        redirect_to redirected_url
       end
     end
   end
