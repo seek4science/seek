@@ -128,7 +128,7 @@ class PresentationsController < ApplicationController
     @presentation.save_without_timestamping
 
     disposition = params[:disposition] || 'attachment'
-    handle_download @display_presentation, disposition
+    handle_download @display_presentation.content_blob, disposition
   end
 
   def edit

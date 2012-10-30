@@ -72,7 +72,7 @@ class SopsController < ApplicationController
     @sop.save_without_timestamping
 
     disposition = params[:disposition] || 'attachment'
-    handle_download @display_sop, disposition
+    handle_download @display_sop.content_blob, disposition
   end
   
   # GET /sops/new

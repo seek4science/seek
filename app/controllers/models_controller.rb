@@ -472,10 +472,10 @@ class ModelsController < ApplicationController
 
     disposition = params[:disposition] || 'attachment'
     if @display_model.content_blobs.count==1 && @display_model.model_image.nil?
-       handle_download @display_model, disposition
+       handle_download @display_model.content_blob, disposition
     elsif params[:content_blob_id]
       content_blob = ContentBlob.find(params[:content_blob_id].to_i)
-      handle_download @display_model, disposition, content_blob
+       handle_download content_blob, disposition
     else
       handle_download_zip @display_model
     end

@@ -339,7 +339,7 @@ end
     @data_file.last_used_at = Time.now
     @data_file.save_without_timestamping    
     disposition = params[:disposition] || 'attachment'
-    handle_download @display_data_file, disposition
+    handle_download @display_data_file.content_blob, disposition
   end 
   
   def data

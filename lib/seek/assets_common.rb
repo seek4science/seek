@@ -100,39 +100,6 @@ module Seek
       end
     end
     
-    def download_jerm_asset asset
-      project=asset.projects.first
-      project.decrypt_credentials
-      downloader=Jerm::DownloaderFactory.create project.name
-      resource_type = asset.class.name.split("::")[0] #need to handle versions, e.g. Sop::Version
-      begin
-        data_hash = downloader.get_remote_data asset.content_blob.url,project.site_username,project.site_password, resource_type
-        send_file data_hash[:data_tmp_path], :filename => data_hash[:filename] || asset.original_filename, :type => data_hash[:content_type] || asset.content_type, :disposition => 'attachment'
-      rescue Seek::DownloadException=>de
-        #FIXME: use proper logging
-        puts "Unable to fetch from remote: #{de.message}"
-        if asset.content_blob.file_exists?
-          send_file asset.content_blob.filepath, :filename => asset.original_filename, :type => asset.content_type, :disposition => 'attachment'
-        else
-          raise de
-        end
-      end
-    end
-    
-    def download_via_url asset    
-      code = url_response_code(asset.content_blob.url)
-      if (["302","401"].include?(code))
-        redirect_to(asset.content_blob.url,:target=>"_blank")
-      elsif code=="404"
-        flash[:error]="This item is referenced at a remote location, which is currently unavailable"
-        redirect_to polymorphic_path(asset.parent,{:version=>asset.version})
-      else
-        downloader=RemoteDownloader.new
-        data_hash = downloader.get_remote_data asset.content_blob.url
-        send_file data_hash[:data_tmp_path], :filename => data_hash[:filename] || asset.original_filename, :type => data_hash[:content_type] || asset.content_type, :disposition => 'attachment'
-      end      
-    end
-    
     def handle_data render_action_on_error=:new
       #FIXME: too many nested if,else and rescue blocks. This method needs refactoring.
       c = self.controller_name.downcase    
@@ -224,36 +191,6 @@ module Seek
         params[symb].delete 'data'
         params[symb].delete 'local_copy' 
         return true
-      end
-    end  
-    
-    def handle_download asset, disposition='attachment', content_blob=nil
-      if content_blob.nil?
-        content_blob = asset.respond_to?(:content_blobs) ? asset.content_blobs.first : asset.content_blob
-      end
-      if content_blob.url.blank?
-        if content_blob.file_exists?
-          send_file content_blob.filepath, :filename => content_blob.original_filename, :type => content_blob.content_type, :disposition => disposition
-        else
-          redirect_on_error asset,"Unable to find a copy of the file for download, or an alternative location. Please contact an administrator of #{Seek::Config.application_name}."
-        end      
-      else
-        begin
-          if asset.contributor.nil? #A jerm generated resource
-            download_jerm_asset asset
-          else
-            if content_blob.file_exists?
-              send_file content_blob.filepath, :filename => content_blob.original_filename, :type => content_blob.content_type, :disposition => disposition
-            else
-              download_via_url asset
-            end
-          end
-        rescue Seek::DownloadException=>de
-          redirect_on_error asset,"There was an error accessing the remote resource, and a local copy was not available. Please try again later when the remote resource may be available again."
-        rescue Jerm::JermException=>de
-          redirect_on_error asset,de.message
-        end
-
       end
     end
 
