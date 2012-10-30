@@ -20,16 +20,42 @@ module Seek
     end
 
     def get_pdf
+      if @content_blob.url.blank?
+        if File.exists?(dat_filepath)
+          pdf_or_convert
+        else
+          redirect_on_error asset_version,"Unable to find a copy of the file for download, or an alternative location. Please contact an administrator of #{Seek::Config.application_name}."
+        end
+      else
+        begin
+          if asset_version.contributor.nil? #A jerm generated resource
+            download_jerm_asset @content_blob if @content_blob.is_pdf?
+          else
+            download_via_url @content_blob if @content_blob.is_pdf?
+          end
+        rescue Seek::DownloadException=>de
+          redirect_on_error asset_version,"There was an error accessing the remote resource, and a local copy was not available. Please try again later when the remote resource may be available again."
+        rescue Jerm::JermException=>de
+          redirect_on_error asset_version,de.message
+        end
+      end
+    end
+
+    #check whether the file is pdf, otherwise convert to pdf
+    #then return the pdf file
+    def pdf_or_convert @content_blob
       dat_filepath = @content_blob.filepath
       pdf_filepath = @content_blob.filepath('pdf')
+      asset_version = @content_blob.asset.find_version(@content_blob.asset_version)
       if @content_blob.is_pdf?
         send_file dat_filepath, :filename => @content_blob.original_filename, :type => @content_blob.content_type, :disposition => 'attachment'
       else
         @content_blob.convert_to_pdf
+
         if File.exists?(pdf_filepath)
           send_file pdf_filepath, :filename => @content_blob.original_filename, :type => @content_blob.content_type, :disposition => 'attachment'
         else
-          render :text => 'Unable to convert the file for display'
+          redirect_on_error asset_version, 'Unable to convert the file for display'
         end
       end
     end
