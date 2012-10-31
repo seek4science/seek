@@ -14,7 +14,7 @@ module Acts
       end
 
       def auth_by_code? code
-        object.special_auth_codes.unexpired.collect(&:code).include?(code)
+        special_auth_codes.unexpired.collect(&:code).include?(code)
       end
 
     end

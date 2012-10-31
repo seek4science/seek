@@ -98,7 +98,7 @@ class ContentBlobsController < ApplicationController
 
   def find_and_auth_asset
     asset = asset_object
-    if asset.can_download? || (params[:code] && auth_by_code?(params[:code]))
+    if asset.can_download? || (params[:code] && asset.auth_by_code?(params[:code]))
         @asset = asset
       else
         respond_to do |format|

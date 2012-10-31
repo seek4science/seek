@@ -321,7 +321,7 @@ class ApplicationController < ActionController::Base
     if object.can_perform? action
       true
     elsif params[:code] && (action == 'view' || action == 'download')
-      auth_by_code? params[:code]
+      object.auth_by_code? params[:code]
     else
       false
     end
