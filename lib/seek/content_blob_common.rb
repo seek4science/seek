@@ -3,6 +3,7 @@ module Seek
     def self.included(base)
       base.before_filter :set_content_blob, :only=>[:get_pdf]
       base.before_filter :set_asset_version, :only=>[:get_pdf]
+      base.before_filter :content_blob_auth, :only=>[:get_pdf]
     end
 
     def set_content_blob
@@ -19,6 +20,13 @@ module Seek
         @asset_version = @content_blob.asset.find_version(@content_blob.asset_version)
       rescue Exception=>e
         error("Unable to find asset version", "is invalid")
+        return false
+      end
+    end
+
+    def content_blob_auth
+      if @content_blob.asset.id != eval("@#{self.controller_name.singularize}").id
+        error("You are not authorized to see this content blob", "is invalid")
         return false
       end
     end
