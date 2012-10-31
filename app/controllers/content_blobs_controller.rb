@@ -1,0 +1,3 @@
+class ContentBlobsController < ApplicationController
+
+end
