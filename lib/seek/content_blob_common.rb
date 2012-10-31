@@ -84,4 +84,5 @@ module Seek
           redirect_to redirected_url
       end
     end
+  end
 end
