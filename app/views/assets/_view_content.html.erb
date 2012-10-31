@@ -23,7 +23,7 @@
         <%= li_start %>
         <% if content_blob.is_image? %>
             <%#param code is used for temporary link %>
-            <% download_url = polymorphic_path(asset, :content_blob_id => content_blob.id, :action => 'download', :disposition => 'inline', :code => params[:code]) %>
+            <% download_url = polymorphic_path([asset, content_blob], :action => 'download', :disposition => 'inline', :code => params[:code]) %>
             <%= image_tag_for_key "show", download_url, 'View content', {:rel => "lightbox"}, label %>
         <% else %>
             <%#param code is used for temporary link %>
