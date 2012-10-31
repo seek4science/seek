@@ -118,9 +118,9 @@ class ContentBlobsController < ApplicationController
         when params[:model_id] then
           Model.find(params[:model_id])
         when params[:sop_id] then
-          Model.find(params[:sop_id])
+          Sop.find(params[:sop_id])
         when params[:presentation_id] then
-          Model.find(params[:presentation_id])
+          Presentation.find(params[:presentation_id])
       end
     rescue ActiveRecord::RecordNotFound
       error("Unable to find the asset", "is invalid")

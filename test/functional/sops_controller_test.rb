@@ -719,46 +719,6 @@ class SopsControllerTest < ActionController::TestCase
     Seek::Config.pdf_conversion_enabled = tmp
   end
 
-  test 'get_pdf' do
-    ms_word_sop = Factory(:doc_sop, :policy => Factory(:all_sysmo_downloadable_policy))
-    pdf_path = ms_word_sop.content_blob.filepath('pdf')
-    FileUtils.rm pdf_path if File.exists?(pdf_path)
-    assert !File.exists?(pdf_path)
-    assert ms_word_sop.can_download?
-
-    get :get_pdf, {:id => ms_word_sop.id, :content_blob_id => ms_word_sop.content_blob.id}
-    assert_response :success
-    assert File.exists?(ms_word_sop.content_blob.filepath)
-    assert File.exists?(pdf_path)
-  end
-
-  test 'get_pdf from url' do
-    mock_remote_file "#{Rails.root}/test/fixtures/files/a_pdf_file.pdf","http://somewhere.com/piccy.pdf"
-    pdf_sop = Factory(:sop,
-                      :policy => Factory(:all_sysmo_downloadable_policy),
-                      :content_blob => Factory(:pdf_content_blob, :data => nil, :url => "http://somewhere.com/piccy.pdf"))
-
-    get :get_pdf, {:id => pdf_sop.id, :content_blob_id => pdf_sop.content_blob.id}
-
-    assert_response :success
-    #the file is fetched on fly, instead of saving locally
-    assert !File.exists?(pdf_sop.content_blob.filepath)
-    assert !File.exists?(pdf_sop.content_blob.filepath('pdf'))
-  end
-
-  test 'get_pdf of a doc file from url' do
-    mock_remote_file "#{Rails.root}/test/fixtures/files/ms_word_test.doc","http://somewhere.com/piccy.doc"
-    doc_sop = Factory(:sop,
-                      :policy => Factory(:all_sysmo_downloadable_policy),
-                      :content_blob => Factory(:doc_content_blob, :data => nil, :url => "http://somewhere.com/piccy.doc"))
-
-    get :get_pdf, {:id => doc_sop.id, :content_blob_id => doc_sop.content_blob.id}
-    assert_response :success
-    #the file is fetched on fly, instead of saving locally
-    assert !File.exists?(doc_sop.content_blob.filepath)
-    assert !File.exists?(doc_sop.content_blob.filepath('pdf'))
-  end
-
   test 'duplicated logs are NOT created by uploading new version' do
     assert_difference('ActivityLog.count', 1) do
       assert_difference('Sop.count', 1) do
