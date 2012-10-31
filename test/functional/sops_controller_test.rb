@@ -771,30 +771,6 @@ class SopsControllerTest < ActionController::TestCase
     assert ActiveRecord::Base.connection.select_all(sql).empty?
   end
 
-  test "should auth_content_blob for get_pdf" do
-    sop1 = Factory(:pdf_sop, :policy => Factory(:all_sysmo_downloadable_policy))
-    sop2 = Factory(:pdf_sop, :policy => Factory(:private_policy))
-
-    get :get_pdf, :id => sop1.id, :content_blob_id => sop1.content_blob.id
-    assert_response :success
-
-    get :get_pdf, :id => sop1.id, :content_blob_id => sop2.content_blob.id
-    assert_redirected_to :root
-    assert_not_nil flash[:error]
-  end
-
-  test "should auth_content_blob for download" do
-    sop1 = Factory(:pdf_sop, :policy => Factory(:all_sysmo_downloadable_policy))
-    sop2 = Factory(:pdf_sop, :policy => Factory(:private_policy))
-
-    get :download, :id => sop1.id, :content_blob_id => sop1.content_blob.id
-    assert_response :success
-
-    get :download, :id => sop1.id, :content_blob_id => sop2.content_blob.id
-    assert_redirected_to :root
-    assert_not_nil flash[:error]
-  end
-
   private
 
   def valid_sop_with_url

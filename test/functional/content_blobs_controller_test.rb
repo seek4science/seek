@@ -10,6 +10,54 @@ class ContentBlobsControllerTest < ActionController::TestCase
     login_as(:quentin)
   end
 
+  test "should find_and_auth_asset for get_pdf" do
+    sop1 = Factory(:pdf_sop, :policy => Factory(:all_sysmo_downloadable_policy))
+
+    get :get_pdf, :sop_id => sop1.id, :id => sop1.content_blob.id
+    assert_response :success
+
+    sop2 = Factory(:pdf_sop, :policy => Factory(:private_policy))
+    get :get_pdf, :sop_id => sop2.id, :id => sop2.content_blob.id
+    assert_redirected_to sop2
+    assert_not_nil flash[:error]
+  end
+
+  test "should find_and_auth_asset for download" do
+    sop1 = Factory(:pdf_sop, :policy => Factory(:all_sysmo_downloadable_policy))
+
+    get :download, :sop_id => sop1.id, :id => sop1.content_blob.id
+    assert_response :success
+
+    sop2 = Factory(:pdf_sop, :policy => Factory(:private_policy))
+    get :download, :sop_id => sop2.id, :id => sop2.content_blob.id
+    assert_redirected_to sop2
+    assert_not_nil flash[:error]
+  end
+
+  test "should find_and_auth_content_blob for get_pdf" do
+    sop1 = Factory(:pdf_sop, :policy => Factory(:all_sysmo_downloadable_policy))
+    sop2 = Factory(:pdf_sop, :policy => Factory(:private_policy))
+
+    get :get_pdf, :sop_id => sop1.id, :id => sop1.content_blob.id
+    assert_response :success
+
+    get :get_pdf, :sop_id => sop1.id, :id => sop2.content_blob.id
+    assert_redirected_to :root
+    assert_not_nil flash[:error]
+  end
+
+  test "should find_and_auth_content_blob for download" do
+    sop1 = Factory(:pdf_sop, :policy => Factory(:all_sysmo_downloadable_policy))
+    sop2 = Factory(:pdf_sop, :policy => Factory(:private_policy))
+
+    get :download, :id => sop1.id, :content_blob_id => sop1.content_blob.id
+    assert_response :success
+
+    get :download, :id => sop1.id, :content_blob_id => sop2.content_blob.id
+    assert_redirected_to :root
+    assert_not_nil flash[:error]
+  end
+
   test 'get_pdf' do
     ms_word_sop = Factory(:doc_sop, :policy => Factory(:all_sysmo_downloadable_policy))
     pdf_path = ms_word_sop.content_blob.filepath('pdf')
