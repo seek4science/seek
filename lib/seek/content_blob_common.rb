@@ -20,18 +20,19 @@ module Seek
     end
 
     def get_pdf
+      asset_version = @content_blob.asset.find_version(@content_blob.asset_version)
       if @content_blob.url.blank?
-        if File.exists?(dat_filepath)
+        if File.exists?(@content_blob.filepath)
           pdf_or_convert
         else
-          redirect_on_error asset_version,"Unable to find a copy of the file for download, or an alternative location. Please contact an administrator of #{Seek::Config.application_name}."
+          redirect_on_error asset_version,"Unable to find a copy of the file for viewing, or an alternative location. Please contact an administrator of #{Seek::Config.application_name}."
         end
       else
         begin
           if asset_version.contributor.nil? #A jerm generated resource
-            download_jerm_asset @content_blob if @content_blob.is_pdf?
+            get_and_process_file(false, true)  #from jerm
           else
-            download_via_url @content_blob if @content_blob.is_pdf?
+            get_and_process_file(true, false)  #from url
           end
         rescue Seek::DownloadException=>de
           redirect_on_error asset_version,"There was an error accessing the remote resource, and a local copy was not available. Please try again later when the remote resource may be available again."
@@ -43,14 +44,14 @@ module Seek
 
     #check whether the file is pdf, otherwise convert to pdf
     #then return the pdf file
-    def pdf_or_convert
-      dat_filepath = @content_blob.filepath
-      pdf_filepath = @content_blob.filepath('pdf')
+    def pdf_or_convert dat_filepath=@content_blob.filepath
+      file_path_array = dat_filepath.split('.')
+      pdf_filepath = file_path_array.take(file_path_array.length - 1).join('.') + '.pdf'
       asset_version = @content_blob.asset.find_version(@content_blob.asset_version)
       if @content_blob.is_pdf?
         send_file dat_filepath, :filename => @content_blob.original_filename, :type => @content_blob.content_type, :disposition => 'attachment'
       else
-        @content_blob.convert_to_pdf
+        @content_blob.convert_to_pdf(dat_filepath,pdf_filepath)
 
         if File.exists?(pdf_filepath)
           send_file pdf_filepath, :filename => @content_blob.original_filename, :type => @content_blob.content_type, :disposition => 'attachment'
@@ -136,11 +137,55 @@ module Seek
 
     private
     def return_file_or_redirect_to content_blob, redirected_url=nil, error_message = nil
-    if content_blob.file_exists?
-        send_file content_blob.filepath, :filename => content_blob.original_filename, :type => content_blob.content_type, :disposition => 'attachment'
+      if content_blob.file_exists?
+          send_file content_blob.filepath, :filename => content_blob.original_filename, :type => content_blob.content_type, :disposition => 'attachment'
       else
-        flash[:error]= error_message if error_message
-        redirect_to redirected_url
+          flash[:error]= error_message if error_message
+          redirect_to redirected_url
+      end
+    end
+
+    def get_and_process_file from_url=true,from_jerm=false
+      asset_version = @content_blob.asset.find_version(@content_blob.asset_version)
+      if from_url
+        data_hash = get_data_hash_from_url
+      else
+        data_hash = get_data_hash_from_jerm
+      end
+
+      if data_hash
+        pdf_or_convert data_hash[:data_tmp_path]
+      elsif File.exists?(@content_blob.filepath)
+        pdf_or_convert
+      else
+        redirect_on_error asset_version,"Unable to find a copy of the file for viewing, or an alternative location. Please contact an administrator of #{Seek::Config.application_name}."
+      end
+    end
+
+    def get_data_hash_from_url
+      code = url_response_code(@content_blob.url)
+      if code == "200"
+        downloader=RemoteDownloader.new
+        begin
+          data_hash = downloader.get_remote_data @content_blob.url
+          data_hash
+        rescue Exception=>e
+          nil
+        end
+      end
+    end
+
+    def get_data_hash_from_jerm
+      asset_version = @content_blob.asset.find_version(@content_blob.asset_version)
+      project=asset_version.projects.first
+      project.decrypt_credentials
+      downloader=Jerm::DownloaderFactory.create project.name
+      resource_type = asset_version.class.name.split("::")[0] #need to handle versions, e.g. Sop::Version
+      begin
+        data_hash = downloader.get_remote_data @content_blob.url,project.site_username,project.site_password, resource_type
+        data_hash
+      rescue Seek::DownloadException=>de
+        nil
       end
     end
   end

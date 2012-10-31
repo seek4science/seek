@@ -15,12 +15,10 @@ module Seek
       content
     end
 
-    def convert_to_pdf
-      pdf_filepath = filepath('pdf')
+    def convert_to_pdf dat_filepath=filepath, pdf_filepath=filepath('pdf')
       begin
         unless File.exists?(pdf_filepath)
           #copy dat file to original file extension in order to convert to pdf on this file
-          dat_filepath = filepath
           file_extension = mime_extension(content_type)
           tmp_file = Tempfile.new storage_filename(file_extension)
           copied_filepath = tmp_file.path
