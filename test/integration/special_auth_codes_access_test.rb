@@ -125,12 +125,12 @@ class SpecialAuthCodesAccessTest < ActionController::IntegrationTest
   test "should be able to view content of sop with auth code" do
     auth_code = Factory :special_auth_code, :expiration_date => (Time.now + 1.days), :asset => Factory(:pdf_sop, :policy => Factory(:private_policy))
     item = auth_code.asset
-    get "/sops/#{item.id}/view_pdf_content"
+    get "/sops/#{item.id}/content_blobs/#{item.content_blob.id}/view_pdf_content"
     assert_redirected_to item
     assert_not_nil flash[:error]
 
     code = CGI::escape(auth_code.code)
-    get "/sops/#{item.id}/view_pdf_content?code=#{code}"
+    get "/sops/#{item.id}/content_blobs/#{item.content_blob.id}/view_pdf_content?code=#{code}"
     assert_response :success
   end
 

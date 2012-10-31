@@ -15,12 +15,11 @@ class DataFilesController < ApplicationController
 
   before_filter :find_assets, :only => [ :index ]
   before_filter :find_and_auth, :except => [ :index, :new, :upload_for_tool, :upload_from_email, :create, :request_resource, :preview, :test_asset_url, :update_annotations_ajax]
-  before_filter :find_display_asset, :only=>[:show,:download,:explore,:matching_models]
+  before_filter :find_display_asset, :only=>[:show,:explore,:matching_models]
   skip_before_filter :verify_authenticity_token, :only => [:upload_for_tool, :upload_from_email]
   before_filter :xml_login_only, :only => [:upload_for_tool, :upload_from_email]
 
   #has to come after the other filters
-  include Seek::ContentBlobCommon
   include Seek::Publishing
   include Seek::BreadCrumbs
 
@@ -329,19 +328,8 @@ class DataFilesController < ApplicationController
         }
       end
     end
-end
+  end
 
-  
-  # GET /data_files/1/download
-  def download
-    # update timestamp in the current data file record
-    # (this will also trigger timestamp update in the corresponding Asset)
-    @data_file.last_used_at = Time.now
-    @data_file.save_without_timestamping    
-    disposition = params[:disposition] || 'attachment'
-    handle_download @display_data_file.content_blob, disposition
-  end 
-  
   def data
     @data_file =  DataFile.find(params[:id])
     sheet = params[:sheet] || 1

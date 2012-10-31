@@ -10,10 +10,9 @@ class PresentationsController < ApplicationController
   #before_filter :login_required
   before_filter :find_assets, :only => [ :index ]
   before_filter :find_and_auth, :except => [ :index, :new, :create, :preview,:update_annotations_ajax]
-  before_filter :find_display_asset, :only=>[:show,:download]
+  before_filter :find_display_asset, :only=>[:show]
 
   #before_filter :convert_to_swf, :only => :show
-  include Seek::ContentBlobCommon
   include Seek::Publishing
   include Seek::BreadCrumbs
 
@@ -118,17 +117,6 @@ class PresentationsController < ApplicationController
       format.dot { render :text=>to_dot(@presentation,params[:deep]=='true',@presentation)}
       format.png { render :text=>to_png(@presentation,params[:deep]=='true',@presentation)}
     end
-  end
-
-   # GET /presentations/1/download
-  def download
-    # update timestamp in the current Presentation record
-    # (this will also trigger timestamp update in the corresponding Asset)
-    @presentation.last_used_at = Time.now
-    @presentation.save_without_timestamping
-
-    disposition = params[:disposition] || 'attachment'
-    handle_download @display_presentation.content_blob, disposition
   end
 
   def edit

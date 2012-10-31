@@ -13,13 +13,12 @@ class ModelsController < ApplicationController
   
   before_filter :find_assets, :only => [ :index ]
   before_filter :find_and_auth, :except => [ :build,:index, :new, :create,:create_model_metadata,:update_model_metadata,:delete_model_metadata,:request_resource,:preview,:test_asset_url, :update_annotations_ajax]
-  before_filter :find_display_asset, :only=>[:show,:download,:execute,:builder,:simulate,:submit_to_jws,:matching_data,:visualise,:export_as_xgmml]
+  before_filter :find_display_asset, :only=>[:show,:execute,:builder,:simulate,:submit_to_jws,:matching_data,:visualise,:export_as_xgmml]
     
   before_filter :jws_enabled,:only=>[:builder,:simulate,:submit_to_jws]
 
   before_filter :experimental_features, :only=>[:matching_data]
 
-  include Seek::ContentBlobCommon
   include Seek::Publishing
   include Seek::BreadCrumbs
 
@@ -470,16 +469,8 @@ class ModelsController < ApplicationController
     @model.last_used_at = Time.now
     @model.save_without_timestamping
 
-    disposition = params[:disposition] || 'attachment'
-    if @display_model.content_blobs.count==1 && @display_model.model_image.nil?
-       handle_download @display_model.content_blob, disposition
-    elsif params[:content_blob_id]
-      content_blob = ContentBlob.find(params[:content_blob_id].to_i)
-       handle_download content_blob, disposition
-    else
-      handle_download_zip @display_model
+    handle_download_zip @display_model
     end
-
   end
 
   def download_one_file

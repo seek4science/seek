@@ -8,9 +8,8 @@ class SopsController < ApplicationController
   #before_filter :login_required
   before_filter :find_assets, :only => [ :index ]
   before_filter :find_and_auth, :except => [ :index, :new, :create, :request_resource,:preview, :test_asset_url, :update_annotations_ajax]
-  before_filter :find_display_asset, :only=>[:show,:download]
+  before_filter :find_display_asset, :only=>[:show]
 
-  include Seek::ContentBlobCommon
   include Seek::Publishing
   include Seek::BreadCrumbs
 
@@ -64,17 +63,6 @@ class SopsController < ApplicationController
     end
   end
 
-  # GET /sops/1/download
-  def download
-    # update timestamp in the current SOP record 
-    # (this will also trigger timestamp update in the corresponding Asset)
-    @sop.last_used_at = Time.now
-    @sop.save_without_timestamping
-
-    disposition = params[:disposition] || 'attachment'
-    handle_download @display_sop.content_blob, disposition
-  end
-  
   # GET /sops/new
   def new
     @sop=Sop.new
