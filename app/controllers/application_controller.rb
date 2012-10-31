@@ -321,7 +321,7 @@ class ApplicationController < ActionController::Base
     if object.can_perform? action
       true
     elsif params[:code] && (action == 'view' || action == 'download')
-      object.special_auth_codes.unexpired.collect(&:code).include?(params[:code])
+      auth_by_code? params[:code]
     else
       false
     end
