@@ -256,7 +256,19 @@ module AssetsCommonExtension
       end
     end
 
-    #making zip file
+    #making and sending zip file if there are more than one file
+    if files_to_download.count > 1
+      make_and_send_zip_file files_to_download, asset
+    else
+      content_type = asset.content_blobs.first.try(:content_type)
+      content_type = asset.model_image.content_type unless content_type
+      send_file files_to_download.values.first, :filename => files_to_download.keys.first, :type => content_type
+    end
+  end
+
+  private
+
+  def make_and_send_zip_file files_to_download, asset
     t = Tempfile.new("#{Time.now.year}#{Time.now.month}#{Time.now.day}_#{asset.class.name.downcase}_#{asset.id}","#{RAILS_ROOT}/tmp")
     # Give the path of the temp file to the zip outputstream, it won't try to open it as an archive.
     Zip::ZipOutputStream.open(t.path) do |zos|

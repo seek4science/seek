@@ -54,18 +54,6 @@ class ModelsControllerTest < ActionController::TestCase
     assert_equal "5933",@response.header['Content-Length']
   end
 
-  test "should download identical file from file list" do
-    model = Factory :model_2_files, :policy=>Factory(:public_policy), :contributor=>User.current_user
-    first_content_blob = model.content_blobs.first
-    assert_difference("ActivityLog.count") do
-      get :download, :id=>model.id, :content_blob_id => first_content_blob.id
-    end
-    assert_response :success
-    assert_equal "attachment; filename=\"#{first_content_blob.original_filename}\"",@response.header['Content-Disposition']
-    assert_equal first_content_blob.content_type,@response.header['Content-Type']
-    assert_equal first_content_blob.filesize.to_s,@response.header['Content-Length']
-  end
-
   test "should download multiple files with the same name" do
     #2 files with different names
     model = Factory :model_2_files, :policy=>Factory(:public_policy), :contributor=>User.current_user
