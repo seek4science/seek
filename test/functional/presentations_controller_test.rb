@@ -72,13 +72,6 @@ class PresentationsControllerTest < ActionController::TestCase
     end
   end
 
-  test "can download" do
-    p = Factory :presentation,:contributor=>User.current_user
-
-    get :download,:id=>p
-    assert_response :success
-  end
-
   test "can upload new version with valid url" do
     mock_remote_file "#{Rails.root}/test/fixtures/files/file_picture.png","http://somewhere.com/piccy.png"
     presentation = Factory :presentation,:contributor=>User.current_user
