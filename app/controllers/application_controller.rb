@@ -344,50 +344,60 @@ class ApplicationController < ActionController::Base
 
       case c
         when "sessions"
-        if ["create","destroy"].include?(a)
-          ActivityLog.create(:action => a,
-                     :culprit => current_user,
-                     :controller_name=>c,
-                     :activity_loggable => object)
-        end
-        when "investigations","studies","assays","specimens","samples"
-        if ["show","create","update","destroy"].include?(a)
-          check_log_exists(a,c,object)
-          ActivityLog.create(:action => a,
-                     :culprit => current_user,
-                     :referenced => object.projects.first,
-                     :controller_name=>c,
-                     :activity_loggable => object,
-                      :data=> object.title)
+          if ["create", "destroy"].include?(a)
+            ActivityLog.create(:action => a,
+                               :culprit => current_user,
+                               :controller_name => c,
+                               :activity_loggable => object)
+          end
+        when "investigations", "studies", "assays", "specimens", "samples"
+          if ["show", "create", "update", "destroy"].include?(a)
+            check_log_exists(a, c, object)
+            ActivityLog.create(:action => a,
+                               :culprit => current_user,
+                               :referenced => object.projects.first,
+                               :controller_name => c,
+                               :activity_loggable => object,
+                               :data => object.title)
 
-        end
-        when "data_files","models","sops","publications","presentations","events"
+          end
+        when "data_files", "models", "sops", "publications", "presentations", "events"
           a = "create" if a == "upload_for_tool"
           a = "update" if a == "new_version"
-        if ["show","create","update","destroy","download"].include?(a)
-          check_log_exists(a,c,object)
-          ActivityLog.create(:action => a,
-                     :culprit => current_user,
-                     :referenced => object.projects.first,
-                     :controller_name=>c,
-                     :activity_loggable => object,
-                      :data=> object.title)
-        end
+          if ["show", "create", "update", "destroy", "download"].include?(a)
+            check_log_exists(a, c, object)
+            ActivityLog.create(:action => a,
+                               :culprit => current_user,
+                               :referenced => object.projects.first,
+                               :controller_name => c,
+                               :activity_loggable => object,
+                               :data => object.title)
+          end
         when "people"
-        if ["show","create","update","destroy"].include?(a)
-          ActivityLog.create(:action => a,
-                     :culprit => current_user,
-                     :controller_name=>c,
-                     :activity_loggable => object,
-                      :data=> object.title)
-        end
+          if ["show", "create", "update", "destroy"].include?(a)
+            ActivityLog.create(:action => a,
+                               :culprit => current_user,
+                               :controller_name => c,
+                               :activity_loggable => object,
+                               :data => object.title)
+          end
         when "search"
-        if a=="index"
-          ActivityLog.create(:action => "index",
-                     :culprit => current_user,
-                     :controller_name=>c,
-                     :data => {:search_query=>object,:result_count=>@results.count})
-        end
+          if a=="index"
+            ActivityLog.create(:action => "index",
+                               :culprit => current_user,
+                               :controller_name => c,
+                               :data => {:search_query => object, :result_count => @results.count})
+          end
+        when "content_blobs"
+          if ["view_pdf_content", "download"].include?(a)
+            activity_loggable = object.asset
+            ActivityLog.create(:action => a,
+                               :culprit => current_user,
+                               :referenced => activity_loggable.projects.first,
+                               :controller_name => c,
+                               :activity_loggable => activity_loggable,
+                               :data => activity_loggable.title)
+          end
       end
     end
   end

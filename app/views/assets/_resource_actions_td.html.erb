@@ -1,6 +1,6 @@
 <%= image_tag_for_key "show", show_resource_path(resource), nil, nil, "View" -%>
-<% if resource.can_download?-%>
-  <%= image_tag_for_key "download", download_resource_path(resource) -%>
+<% if resource.can_download? || (params[:code] && resource.auth_by_code?(params[:code]))-%>
+  <%= image_tag_for_key "download", download_resource_path(resource, params[:code]) -%>
 <% end -%>
 <% if resource.can_manage? -%>
   <%= image_tag_for_key "manage", edit_resource_path(resource), nil, nil, "Manage" -%>

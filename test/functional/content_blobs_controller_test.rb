@@ -1,4 +1,5 @@
 require 'test_helper'
+require 'webmock/test_unit'
 
 class ContentBlobsControllerTest < ActionController::TestCase
 
@@ -50,10 +51,10 @@ class ContentBlobsControllerTest < ActionController::TestCase
     sop1 = Factory(:pdf_sop, :policy => Factory(:all_sysmo_downloadable_policy))
     sop2 = Factory(:pdf_sop, :policy => Factory(:private_policy))
 
-    get :download, :id => sop1.id, :content_blob_id => sop1.content_blob.id
+    get :download, :sop_id => sop1.id, :id => sop1.content_blob.id
     assert_response :success
 
-    get :download, :id => sop1.id, :content_blob_id => sop2.content_blob.id
+    get :download, :sop_id => sop1.id, :id => sop2.content_blob.id
     assert_redirected_to :root
     assert_not_nil flash[:error]
   end
@@ -76,6 +77,7 @@ class ContentBlobsControllerTest < ActionController::TestCase
     pdf_sop = Factory(:sop,
                       :policy => Factory(:all_sysmo_downloadable_policy),
                       :content_blob => Factory(:pdf_content_blob, :data => nil, :url => "http://somewhere.com/piccy.pdf"))
+    assert !pdf_sop.content_blob.file_exists?
 
     get :get_pdf, {:sop_id => pdf_sop.id, :id => pdf_sop.content_blob.id}
 
@@ -96,5 +98,121 @@ class ContentBlobsControllerTest < ActionController::TestCase
     #the file is fetched on fly, instead of saving locally
     assert !File.exists?(doc_sop.content_blob.filepath)
     assert !File.exists?(doc_sop.content_blob.filepath('pdf'))
+  end
+
+  test "report error when file unavailable for download" do
+    df = Factory :data_file, :policy=>Factory(:public_policy)
+    df.content_blob.dump_data_to_file
+    assert df.content_blob.file_exists?
+    FileUtils.rm df.content_blob.filepath
+    assert !df.content_blob.file_exists?
+
+    get :download,:data_file_id=>df, :id => df.content_blob
+
+    assert_redirected_to df
+    assert flash[:error].match(/Unable to find a copy of the file for download/)
+  end
+
+
+  #This test is quite fragile, because it relies on an external resource
+  test "should redirect on download for 302 url" do
+    mock_http
+    df  = Factory :data_file,
+                  :policy => Factory(:all_sysmo_downloadable_policy),
+                  :content_blob => Factory(:url_content_blob, :url=>"http://mocked302.com")
+    assert !df.content_blob.file_exists?
+
+    get :download, :data_file_id => df, :id => df.content_blob
+    assert_redirected_to "http://mocked302.com"
+  end
+
+  #This test is quite fragile, because it relies on an external resource
+  test "should redirect on download for 401 url" do
+    mock_http
+    df  = Factory :data_file,
+                  :policy => Factory(:all_sysmo_downloadable_policy),
+                  :content_blob => Factory(:url_content_blob, :url=>"http://mocked401.com")
+    assert !df.content_blob.file_exists?
+
+    get :download, :data_file_id => df, :id => df.content_blob
+    assert_redirected_to "http://mocked401.com"
+  end
+
+  test "should download" do
+    df = Factory :small_test_spreadsheet_datafile,:policy=>Factory(:public_policy), :contributor=>User.current_user
+    assert_difference('ActivityLog.count') do
+      get :download, :data_file_id => df, :id => df.content_blob
+    end
+    assert_response :success
+    assert_equal "attachment; filename=\"small-test-spreadsheet.xls\"",@response.header['Content-Disposition']
+    assert_equal "application/excel",@response.header['Content-Type']
+    assert_equal "7168",@response.header['Content-Length']
+  end
+
+  test "should download from url" do
+    mock_http
+    df  = Factory :data_file,
+                  :policy => Factory(:all_sysmo_downloadable_policy),
+                  :content_blob => Factory(:url_content_blob, :url=>"http://mockedlocation.com/a-piccy.png")
+    assert_difference('ActivityLog.count') do
+      get :download, :data_file_id => df, :id => df.content_blob
+    end
+    assert_response :success
+  end
+
+  test "should gracefully handle when downloading a unknown host url" do
+    WebMock.allow_net_connect!
+    df  = Factory :data_file,
+                  :policy => Factory(:all_sysmo_downloadable_policy),
+                  :content_blob => Factory(:url_content_blob, :url=>"http://sdkfhsdfkhskfj.com/pic.png")
+
+    get :download, :data_file_id => df, :id => df.content_blob
+
+    assert_redirected_to data_file_path(df,:version=>df.version)
+    assert_not_nil flash[:error]
+  end
+
+  test "should gracefully handle when downloading a url resulting in 404" do
+    mock_http
+    df  = Factory :data_file,
+                  :policy => Factory(:all_sysmo_downloadable_policy),
+                  :content_blob => Factory(:url_content_blob, :url=>"http://mocked404.com")
+
+    get :download, :data_file_id => df, :id => df.content_blob
+    assert_redirected_to data_file_path(df,:version=>df.version)
+    assert_not_nil flash[:error]
+  end
+
+  test "should handle inline download when specify the inline disposition" do
+    data=File.new("#{Rails.root}/test/fixtures/files/file_picture.png","rb").read
+    df = Factory :data_file,
+                 :content_blob => Factory(:content_blob, :data => data, :content_type=>"images/png"),
+                 :policy => Factory(:downloadable_public_policy)
+
+    get :download, :data_file_id => df, :id => df.content_blob, :disposition => 'inline'
+    assert_response :success
+    assert @response.header['Content-Disposition'].include?('inline')
+  end
+
+  test "should handle normal attachment download" do
+    data=File.new("#{Rails.root}/test/fixtures/files/file_picture.png","rb").read
+    df = Factory :data_file,
+                 :content_blob => Factory(:content_blob, :data => data, :content_type=>"images/png"),
+                 :policy => Factory(:downloadable_public_policy)
+
+    get :download, :data_file_id => df, :id => df.content_blob
+    assert_response :success
+    assert @response.header['Content-Disposition'].include?('attachment')
+  end
+
+  private
+  def mock_http
+    file="#{Rails.root}/test/fixtures/files/file_picture.png"
+    stub_request(:get, "http://mockedlocation.com/a-piccy.png").to_return(:body => File.new(file), :status => 200, :headers=>{'Content-Type' => 'image/png'})
+    stub_request(:head, "http://mockedlocation.com/a-piccy.png")
+
+    stub_request(:any, "http://mocked302.com").to_return(:status=>302)
+    stub_request(:any, "http://mocked401.com").to_return(:status=>401)
+    stub_request(:any, "http://mocked404.com").to_return(:status=>404)
   end
 end

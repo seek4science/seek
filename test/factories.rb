@@ -489,6 +489,11 @@ end
     f.sequence(:data) {|n| "data [#{n}]" }
   end
 
+  Factory.define(:url_content_blob, :parent => :content_blob) do |f|
+    f.url "http://www.abc.com"
+    f.data nil
+  end
+
   Factory.define(:pdf_content_blob, :parent => :content_blob) do |f|
     f.original_filename "a_pdf_file.pdf"
     f.content_type "application/pdf"

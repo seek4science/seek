@@ -542,7 +542,8 @@ end
     assert_response :success
 
     assert_select "div.list_item div.list_item_actions" do
-      path=download_sop_path(sops(:my_first_sop))
+      sop = sops(:my_first_sop)
+      path=download_sop_content_blob_path([sop,sop.content_blob])
       assert_select "a[href=?]", path, :minumum=>1
     end
   end

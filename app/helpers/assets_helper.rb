@@ -77,12 +77,16 @@ module AssetsHelper
   end
 
   #Changed these so they can cope with non-asset things such as studies, assays etc.
-  def download_resource_path(resource)
+  def download_resource_path(resource, code=nil)
     path = ""
-    if resource.class.name.include?("::Version")
-      path = polymorphic_path(resource.parent, :version=>resource.version, :action=>:download)
+    if Seek::Util.multi_files_asset_types.include?(resource.class)
+      if resource.class.name.include?("::Version")
+        path = polymorphic_path(resource.parent, :version=>resource.version, :action=>:download,:code=>params[:code])
+      else
+        path = polymorphic_path(resource, :action=>:download, :code=>params[:code])
+      end
     else
-      path = polymorphic_path(resource, :action=>:download)
+      path = polymorphic_path([resource, resource.content_blob],:action=>:download,:code=>params[:code])
     end
     return path
   end

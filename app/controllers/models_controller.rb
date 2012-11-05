@@ -470,7 +470,6 @@ class ModelsController < ApplicationController
     @model.save_without_timestamping
 
     handle_download_zip @display_model
-    end
   end
 
   def download_one_file
@@ -651,5 +650,4 @@ class ModelsController < ApplicationController
     latest_version.model_image_id = model_object.model_image_id
     latest_version.save
   end
-
 end
