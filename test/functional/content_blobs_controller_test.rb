@@ -76,7 +76,10 @@ class ContentBlobsControllerTest < ActionController::TestCase
     mock_remote_file "#{Rails.root}/test/fixtures/files/a_pdf_file.pdf","http://somewhere.com/piccy.pdf"
     pdf_sop = Factory(:sop,
                       :policy => Factory(:all_sysmo_downloadable_policy),
-                      :content_blob => Factory(:pdf_content_blob, :data => nil, :url => "http://somewhere.com/piccy.pdf"))
+                      :content_blob => Factory(:pdf_content_blob,
+                                               :data => nil,
+                                               :url => "http://somewhere.com/piccy.pdf",
+                                               :uuid => UUIDTools::UUID.random_create.to_s))
     assert !pdf_sop.content_blob.file_exists?
 
     get :get_pdf, {:sop_id => pdf_sop.id, :id => pdf_sop.content_blob.id}
@@ -91,7 +94,10 @@ class ContentBlobsControllerTest < ActionController::TestCase
     mock_remote_file "#{Rails.root}/test/fixtures/files/ms_word_test.doc","http://somewhere.com/piccy.doc"
     doc_sop = Factory(:sop,
                       :policy => Factory(:all_sysmo_downloadable_policy),
-                      :content_blob => Factory(:doc_content_blob, :data => nil, :url => "http://somewhere.com/piccy.doc"))
+                      :content_blob => Factory(:doc_content_blob,
+                                               :data => nil,
+                                               :url => "http://somewhere.com/piccy.doc",
+                                               :uuid => UUIDTools::UUID.random_create.to_s))
 
     get :get_pdf, {:sop_id => doc_sop.id, :id => doc_sop.content_blob.id}
     assert_response :success
@@ -119,7 +125,9 @@ class ContentBlobsControllerTest < ActionController::TestCase
     mock_http
     df  = Factory :data_file,
                   :policy => Factory(:all_sysmo_downloadable_policy),
-                  :content_blob => Factory(:url_content_blob, :url=>"http://mocked302.com")
+                  :content_blob => Factory(:url_content_blob,
+                                           :url=>"http://mocked302.com",
+                                           :uuid => UUIDTools::UUID.random_create.to_s)
     assert !df.content_blob.file_exists?
 
     get :download, :data_file_id => df, :id => df.content_blob
@@ -131,7 +139,9 @@ class ContentBlobsControllerTest < ActionController::TestCase
     mock_http
     df  = Factory :data_file,
                   :policy => Factory(:all_sysmo_downloadable_policy),
-                  :content_blob => Factory(:url_content_blob, :url=>"http://mocked401.com")
+                  :content_blob => Factory(:url_content_blob,
+                                           :url=>"http://mocked401.com",
+                                           :uuid => UUIDTools::UUID.random_create.to_s)
     assert !df.content_blob.file_exists?
 
     get :download, :data_file_id => df, :id => df.content_blob
@@ -153,7 +163,9 @@ class ContentBlobsControllerTest < ActionController::TestCase
     mock_http
     df  = Factory :data_file,
                   :policy => Factory(:all_sysmo_downloadable_policy),
-                  :content_blob => Factory(:url_content_blob, :url=>"http://mockedlocation.com/a-piccy.png")
+                  :content_blob => Factory(:url_content_blob,
+                                           :url=>"http://mockedlocation.com/a-piccy.png",
+                                           :uuid => UUIDTools::UUID.random_create.to_s)
     assert_difference('ActivityLog.count') do
       get :download, :data_file_id => df, :id => df.content_blob
     end
@@ -164,7 +176,9 @@ class ContentBlobsControllerTest < ActionController::TestCase
     WebMock.allow_net_connect!
     df  = Factory :data_file,
                   :policy => Factory(:all_sysmo_downloadable_policy),
-                  :content_blob => Factory(:url_content_blob, :url=>"http://sdkfhsdfkhskfj.com/pic.png")
+                  :content_blob => Factory(:url_content_blob,
+                                           :url=>"http://sdkfhsdfkhskfj.com/pic.png",
+                                           :uuid => UUIDTools::UUID.random_create.to_s)
 
     get :download, :data_file_id => df, :id => df.content_blob
 
@@ -176,7 +190,9 @@ class ContentBlobsControllerTest < ActionController::TestCase
     mock_http
     df  = Factory :data_file,
                   :policy => Factory(:all_sysmo_downloadable_policy),
-                  :content_blob => Factory(:url_content_blob, :url=>"http://mocked404.com")
+                  :content_blob => Factory(:url_content_blob,
+                                           :url=>"http://mocked404.com",
+                                           :uuid => UUIDTools::UUID.random_create.to_s)
 
     get :download, :data_file_id => df, :id => df.content_blob
     assert_redirected_to data_file_path(df,:version=>df.version)
