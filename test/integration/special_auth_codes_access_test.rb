@@ -27,8 +27,7 @@ class SpecialAuthCodesAccessTest < ActionController::IntegrationTest
       assert_response :success, "failed for asset #{type_name}"
 
       if item.is_downloadable?
-        get "/#{type_name}/#{item.id}/download?code=#{code}"
-        assert_response :success, "failed for asset #{type_name}"
+        test_passing_for item, type_name, 'download', code
       end
     end
   end
@@ -42,9 +41,7 @@ class SpecialAuthCodesAccessTest < ActionController::IntegrationTest
       assert_not_nil flash[:error]
 
       if item.is_downloadable?
-        get "/#{type_name}/#{item.id}/download"
-        assert_redirected_to item
-        assert_not_nil flash[:error]
+        test_failing_for item, type_name, 'download', nil
       end
     end
   end
@@ -60,9 +57,7 @@ class SpecialAuthCodesAccessTest < ActionController::IntegrationTest
       assert_not_nil flash[:error]
 
       if item.is_downloadable?
-        get "/#{type_name}/#{item.id}/download?code=#{random_code}"
-        assert_redirected_to item
-        assert_not_nil flash[:error]
+        test_failing_for item, type_name, 'download', random_code
       end
     end
   end
@@ -81,9 +76,7 @@ class SpecialAuthCodesAccessTest < ActionController::IntegrationTest
       assert_not_nil flash[:error]
 
       if item.is_downloadable?
-        get "/#{type_name}/#{item.id}/download"
-        assert_redirected_to item
-        assert_not_nil flash[:error]
+        test_failing_for item, type_name, 'download', nil
       end
 
 
@@ -92,8 +85,7 @@ class SpecialAuthCodesAccessTest < ActionController::IntegrationTest
       assert_response :success, "failed for asset #{type_name}"
 
       if item.is_downloadable?
-        get "/#{type_name}/#{item.id}/download?code=#{code}"
-        assert_response :success, "failed for asset #{type_name}"
+        test_passing_for item, type_name, 'download', code
       end
 
       disable_authorization_checks {auth_code.expiration_date = Time.now - 1.days; auth_code.save! }
@@ -103,9 +95,7 @@ class SpecialAuthCodesAccessTest < ActionController::IntegrationTest
       assert_not_nil flash[:error]
 
       if item.is_downloadable?
-        get "/#{type_name}/#{item.id}/download?code=#{code}"
-        assert_redirected_to item
-        assert_not_nil flash[:error]
+        test_failing_for item, type_name, 'download', code
       end
     end
   end
@@ -132,6 +122,46 @@ class SpecialAuthCodesAccessTest < ActionController::IntegrationTest
     code = CGI::escape(auth_code.code)
     get "/sops/#{item.id}/content_blobs/#{item.content_blob.id}/view_pdf_content?code=#{code}"
     assert_response :success
+  end
+
+  private
+  def test_failing_for item, type_name, action, code=nil
+    if Seek::Util.multi_files_asset_types.include?(item.class)
+      #download multiple files
+      get "/#{type_name}/#{item.id}/#{action}/?code=#{code}"
+      assert_redirected_to item
+      assert_not_nil flash[:error]
+
+      #download each file
+      item.content_blobs.each do |cb|
+        get "/#{type_name}/#{item.id}/content_blobs/#{cb.id}/#{action}?code=#{code}"
+        assert_redirected_to item
+        assert_not_nil flash[:error]
+      end
+    else
+      #download one file asset
+      get "/#{type_name}/#{item.id}/content_blobs/#{item.content_blob.id}/#{action}?code=#{code}"
+      assert_redirected_to item
+      assert_not_nil flash[:error]
+    end
+  end
+
+  def test_passing_for item, type_name, action, code=nil
+    if Seek::Util.multi_files_asset_types.include?(item.class)
+      #download multiple files
+      get "/#{type_name}/#{item.id}/#{action}/?code=#{code}"
+      assert_response :success, "failed for asset #{type_name}"
+
+      #download each file
+      item.content_blobs.each do |cb|
+        get "/#{type_name}/#{item.id}/content_blobs/#{cb.id}/#{action}?code=#{code}"
+        assert_response :success, "failed for asset #{type_name}"
+      end
+    else
+      #download one file asset
+      get "/#{type_name}/#{item.id}/content_blobs/#{item.content_blob.id}/#{action}?code=#{code}"
+      assert_response :success, "failed for asset #{type_name}"
+    end
   end
 
 end
