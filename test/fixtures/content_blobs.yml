@@ -48,6 +48,13 @@ sop_with_fully_public_policy_blob:
   content_type: "text/plain"
   asset_version: 1
 
+sop_with_project_without_gatekeeper_blob:
+  uuid: <%=  init_blob('little_file.txt') %>
+  asset: sop_with_project_without_gatekeeper (Sop)
+  original_filename: "little_file.txt"
+  content_type: "text/plain"
+  asset_version: 1
+
 private_sop_blob:
   uuid: <%=  init_blob('little_file.txt') %>
   asset: private_sop (Sop)
