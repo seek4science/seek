@@ -30,6 +30,7 @@ gem "parallel_tests", :group => :development
 gem "pry", :group => :development
 gem "pry-doc", :group => :development
 gem 'ruby18_source_location', :group => :development
+gem 'newrelic_rpm'
 
 group :development do
   gem "sqlite3-ruby","1.2.5",:require=>"sqlite3"
