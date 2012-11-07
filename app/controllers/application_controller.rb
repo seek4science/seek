@@ -42,7 +42,7 @@ class ApplicationController < ActionController::Base
   end
 
   #When I set log_level :error in production.rb it didn't seem to work
-  around_filter :silence_logging if Rails.env == 'production'
+  #around_filter :silence_logging if Rails.env == 'production'
   def silence_logging
     Rails.logger.silence do
       yield
