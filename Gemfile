@@ -18,7 +18,7 @@ gem "rmagick","2.12.2"
 gem "mysql"
 gem 'rest-client',">=1.6.1"
 gem 'calendar_date_select'
-gem 'factory_girl'
+gem 'factory_girl', "1.3.3"
 gem 'ratom',"0.6.8"
 gem 'rubyzip'
 gem 'bio'
