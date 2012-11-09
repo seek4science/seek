@@ -58,7 +58,7 @@ class SearchController < ApplicationController
           sources.delete(Specimen) if !Seek::Config.is_virtualliver
           sources.each do |source|
             search_result = source.search do |query|
-              query.keywords(downcase_query) {minimum_match 1}
+              query.keywords(downcase_query)
             end.results
             search_result = search_result.sort_by(&:published_date).reverse if source == Publication
             @results |= search_result
@@ -66,7 +66,7 @@ class SearchController < ApplicationController
       else
            object = type.singularize.camelize.constantize
            search_result = object.search do |query|
-             query.keywords(downcase_query)  {minimum_match 1}
+             query.keywords(downcase_query)
            end.results
            search_result = search_result.sort_by(&:published_date).reverse if object == Publication
            @results = search_result
