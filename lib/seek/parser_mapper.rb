@@ -519,7 +519,7 @@ module Seek
                   end),
                   :"creator.first_name" => mapping_entry("experimentator", proc do |data|
                     if data.split(/\s+/)
-                      data.gsub(data.split(/\s+/).last, "").chop
+                      data.split(/\s+/).first
                     end
                   end)
 
@@ -565,6 +565,8 @@ module Seek
               :"treatment.substance" => mapping_entry(""),
               :"treatment.concentration" => mapping_entry(""),
               :"treatment.unit" => mapping_entry(""),
+              :"treatment.incubation_time" => mapping_entry(""),
+              :"treatment.incubation_time_unit" => mapping_entry(""),
 
               :"samples.comments" => mapping_entry(""),
               :"samples.title" => mapping_entry(""),
