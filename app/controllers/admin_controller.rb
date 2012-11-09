@@ -228,7 +228,8 @@ class AdminController < ApplicationController
     collection = []
     type = nil
     title = nil
-    case params[:id]
+    @page=params[:id]
+    case @page
       when "pals"
         title = "PALs"
         collection = Person.pals
