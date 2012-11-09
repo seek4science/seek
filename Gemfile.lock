@@ -60,7 +60,7 @@ GEM
       activesupport (= 2.3.8)
       rake (>= 0.8.3)
     raindrops (0.10.0)
-    rake (0.8.7)
+    rest-client (1.6.7)
     ratom (0.6.8)
       libxml-ruby (>= 1.1.2)
     rest-client (1.6.7)
