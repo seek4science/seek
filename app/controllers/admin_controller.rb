@@ -140,6 +140,9 @@ class AdminController < ApplicationController
 
   def update_others
     update_flag = true
+    if Seek::Config.tag_threshold.to_s != params[:tag_threshold] || Seek::Config.max_visible_tags.to_s!=params[:max_visible_tags]
+      expire_annotation_fragments
+    end
     Seek::Config.site_base_host = params[:site_base_host] unless params[:site_base_host].nil?
     #check valid email
     Seek::Config.pubmed_api_email = params[:pubmed_api_email] if params[:pubmed_api_email] == '' || (check_valid_email params[:pubmed_api_email], "pubmed api email")
@@ -371,7 +374,6 @@ class AdminController < ApplicationController
   def update_redirect_to flag, action
      if flag
        flash[:notice] = RESTART_MSG
-       #expires all fragment caching
        expire_header_and_footer
        redirect_to :action=>:show
      else

@@ -56,9 +56,18 @@ class AdminControllerTest < ActionController::TestCase
     assert_equal true, Seek::Config.events_enabled
   end
 
+  test 'update visible tags and threshold' do
+    login_as(:quentin)
+    Seek::Config.max_visible_tags=2
+    Seek::Config.tag_threshold=2
+    post :update_others, :tag_threshold => '8', :max_visible_tags => '9'
+    assert_equal 8,Seek::Config.tag_threshold
+    assert_equal 9,Seek::Config.max_visible_tags
+  end
+
   test 'invalid email address' do
     login_as(:quentin)
-    post :update_others, :pubmed_api_email => 'quentin', :crossref_api_email => 'quentin@example.com', :tag_threshold => '', :max_visible_tags => '20'
+    post :update_others, :pubmed_api_email => 'quentin', :crossref_api_email => 'quentin@example.com', :tag_threshold => '1', :max_visible_tags => '20'
     assert_not_nil flash[:error]
   end
 
