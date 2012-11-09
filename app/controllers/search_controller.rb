@@ -57,13 +57,13 @@ class SearchController < ApplicationController
           sources.delete(Specimen) if !Seek::Config.is_virtualliver
           sources.each do |source|
             @results |=  source.search do |query|
-               query.keywords(downcase_query) {minimum_match 1}
+               query.keywords(downcase_query)
             end.results
           end
       else
            object = type.singularize.camelize.constantize
            @results =  object.search do |query|
-              query.keywords(downcase_query) {minimum_match 1}
+              query.keywords(downcase_query)
           end.results
       end
 
