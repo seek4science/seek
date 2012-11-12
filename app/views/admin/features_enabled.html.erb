@@ -22,7 +22,7 @@
     } -%>
 
     <%= render :partial=>'setting_li',:locals=>{
-            :description=>"Whether search is enabled. If switched on you need to ensure SOLR is running and its index is up to date. You need to restart the server after chanign this setting.",
+            :description=>"Whether search is enabled. If switched on you need to ensure SOLR is running and its index is up to date. You need to restart both the server, and the Delayed Job service, after chaning this setting.",
             :name=>"Search enabled",
             :field=>check_box_tag(:solr_enabled, 1, Seek::Config.solr_enabled, :title => 'enable search function')
     } -%>
