@@ -4,7 +4,6 @@
     delayed_jobs = Delayed::Job.all(:order=>:created_at)
 %>
 
-
 <p>
   Total delayed jobs waiting = <%= delayed_jobs.count -%>
 </p>
