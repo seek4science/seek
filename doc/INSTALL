@@ -166,8 +166,8 @@ Some of the key settings required for a new installation are described in the fo
 
 == Enabling search and starting the Sunspot SOLR server
 
-Search can be enabled in the admin setting under Admin settings, Site configuration, Enable/disable features - under "Search enabled". You will need
-to restart the server after changing this setting.
+Search can be enabled in the admin setting under Admin settings, Site configuration, Enable/disable features - under "Search enabled". <b>You will need
+to restart the server after changing this setting. You will also need to restart the Delayed Job service.</b>
 
 To start the search server you need to run:
 
