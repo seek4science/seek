@@ -4,7 +4,7 @@
 <%
   def make_file(uuid,name)
      fixture_file = "#{Rails.root}/test/fixtures/files/#{name}"
-     dir = "#{Dir::tmpdir}/seek_content_blobs"
+     dir = "#{ContentBlob.test_storage_location}"
      FileUtils.mkdir(dir) unless File.exists?(dir)
      destination = "#{dir}/#{uuid}.dat"
      FileUtils.cp(fixture_file,destination)
