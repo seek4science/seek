@@ -8,6 +8,11 @@ rm -rf tmp/model_images
 rm -rf tmp/fleximage
 rm -rf filestore/
 
+#double check current path
+
+pwd
+ls
+
 #rvm handling is based on example at http://pivotallabs.com/users/mbarinek/blog/articles/1450-rails-3-with-rvm-and-cruise-control
 
 desired_ruby=ruby-1.8.7
