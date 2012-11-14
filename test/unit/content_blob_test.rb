@@ -6,7 +6,7 @@ class ContentBlobTest < ActiveSupport::TestCase
   fixtures :content_blobs
 
   def setup
-    FileUtils.remove_dir "#{Rails.root}/tmp/test_content_blobs",true
+    FileUtils.remove_dir ContentBlob.test_storage_location,true
   end
 
   def test_md5sum_on_demand

@@ -103,12 +103,17 @@ class ContentBlob < ActiveRecord::Base
 
   def storage_directory
     if Rails.env == "test"
-      path = "#{Rails.root}/tmp/test_content_blobs"
+      path = ContentBlob.test_storage_location
     else
       path = "#{Rails.root}/#{DATA_STORAGE_PATH}/#{Rails.env}"
     end
     FileUtils.mkdir_p(path)
     return path
+  end
+
+  #The location contentblobs are stored when Rails.env='test' - this is only used for unit/functional testing purposes.
+  def self.test_storage_location
+    "#{Rails.root}/tmp/test_content_blobs"
   end
 
   def dump_data_to_file        
