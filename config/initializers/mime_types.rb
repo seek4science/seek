@@ -8,3 +8,4 @@ Mime::Type.register_alias "image/svg+xml", :svg
 Mime::Type.register_alias "text/plain", :dot
 Mime::Type.register_alias "application/rdf+xml", :rdf
 Mime::Type.register "application/x-endnote-refer", :enw
+Mime::Type.register "application/pdf", :pdf
