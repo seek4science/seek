@@ -33,7 +33,7 @@ module Seek
         end
       rescue Exception=> e
         Rails.logger.error("Problem with converting file of content_blob #{id} to pdf - #{e.class.name}:#{e.message}")
-        raise(e) if Rails.env=="test"
+        raise(e)
       end
     end
 

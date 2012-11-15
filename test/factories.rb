@@ -485,7 +485,7 @@ end
 #Content_blob
 #either url or data should be provided for assets
   Factory.define(:content_blob) do |f|
-    f.sequence(:uuid) {|n| "uuid-#{n}"}
+    f.uuid UUIDTools::UUID.random_create.to_s
     f.sequence(:data) {|n| "data [#{n}]" }
   end
 

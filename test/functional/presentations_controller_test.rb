@@ -206,4 +206,22 @@ class PresentationsControllerTest < ActionController::TestCase
     assert_response :success
     assert_select 'a', :text => /View content/, :count => 1
   end
+
+  test 'should display the file icon according to version' do
+    ms_ppt_presentation = Factory(:ppt_presentation, :policy => Factory(:all_sysmo_downloadable_policy))
+    get :show, :id => ms_ppt_presentation.id
+    assert_response :success
+    assert_select "img[src=?]", /\/images\/file_icons\/small\/ppt\.png\?.*/
+
+    #new version
+    pdf_presentation = Factory(:presentation_version, :presentation => ms_ppt_presentation)
+    content_blob = Factory(:pdf_content_blob, :asset => ms_ppt_presentation, :asset_version => 2)
+    ms_ppt_presentation.reload
+    assert_equal 2, ms_ppt_presentation.versions.count
+    assert_not_nil ms_ppt_presentation.find_version(2).content_blob
+
+    get :show, :id => ms_ppt_presentation.id, :version => 2
+    assert_response :success
+    assert_select "img[src=?]", /\/images\/file_icons\/small\/pdf\.png\?.*/
+  end
 end

@@ -31,7 +31,7 @@
              if Seek::Util.multi_files_asset_types.include?(asset.class)
                path = polymorphic_path(asset,:version=>version,:action=>:download,:code=>params[:code])
              else
-               path = polymorphic_path([asset, asset.content_blob],:action=>:download,:code=>params[:code])
+               path = polymorphic_path([asset, display_asset.content_blob],:action=>:download,:code=>params[:code])
              end
           %>
           <li>
