@@ -5,6 +5,7 @@ class ProjectsControllerTest < ActionController::TestCase
 
 	include AuthenticatedTestHelper
 	include RestTestCases
+  include RdfTestCases
 
 	fixtures :all
 

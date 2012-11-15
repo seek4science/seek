@@ -7,6 +7,7 @@ class SopsControllerTest < ActionController::TestCase
   include AuthenticatedTestHelper
   include RestTestCases
   include SharingFormTestHelper
+  include RdfTestCases
 
   def setup
     login_as(:quentin)

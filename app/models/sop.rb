@@ -6,6 +6,8 @@ require 'acts_as_versioned_resource'
 
 class Sop < ActiveRecord::Base
 
+  include Seek::Rdf::RdfGeneration
+
   #searchable must come before acts_as_asset is called
   searchable(:auto_index => false) do
     text :description, :title, :searchable_tags,:exp_conditions_search_fields,:assay_type_titles,:technology_type_titles

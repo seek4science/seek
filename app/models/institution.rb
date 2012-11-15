@@ -3,6 +3,8 @@ require 'title_trimmer'
 
 class Institution < ActiveRecord::Base
 
+  include Seek::Rdf::RdfGeneration
+
   title_trimmer
 
   acts_as_yellow_pages

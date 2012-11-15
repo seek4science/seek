@@ -2,6 +2,8 @@ require 'grouped_pagination'
 
 class Person < ActiveRecord::Base
 
+  include Seek::Rdf::RdfGeneration
+
   acts_as_yellow_pages
   default_scope :order => "last_name, first_name"
 

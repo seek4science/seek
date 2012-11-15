@@ -26,6 +26,15 @@ class PersonTest < ActiveSupport::TestCase
     assert_equal updated_at.to_s,person.updated_at.to_s
   end
 
+  test "to_rdf" do
+    object = Factory :person
+    rdf = object.to_rdf
+    RDF::Reader.for(:rdfxml).new(rdf) do |reader|
+      assert reader.statements.count > 1
+      assert_equal RDF::URI.new("http://localhost:3000/people/#{object.id}"), reader.statements.first.subject
+    end
+  end
+
   def test_active_ordered_by_updated_at_and_avatar_not_null
 
     Person.delete_all

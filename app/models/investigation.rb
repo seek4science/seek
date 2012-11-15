@@ -1,5 +1,8 @@
 
-class Investigation < ActiveRecord::Base    
+class Investigation < ActiveRecord::Base
+
+  include Seek::Rdf::RdfGeneration
+
   acts_as_isa
   acts_as_authorized
 

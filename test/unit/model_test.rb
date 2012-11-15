@@ -25,6 +25,15 @@ class ModelTest < ActiveSupport::TestCase
     assert contents.include?("F16P")
   end
 
+  test "to_rdf" do
+    object = Factory :model
+    rdf = object.to_rdf
+    RDF::Reader.for(:rdfxml).new(rdf) do |reader|
+      assert reader.statements.count > 1
+      assert_equal RDF::URI.new("http://localhost:3000/models/#{object.id}"), reader.statements.first.subject
+    end
+  end
+
   test "type detection" do
     model = Factory :teusink_model
     assert model.contains_sbml?

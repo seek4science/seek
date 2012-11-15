@@ -19,6 +19,15 @@ class ProjectTest < ActiveSupport::TestCase
     assert_same 1,wg.project_id
   end
 
+  test "to_rdf" do
+    object = Factory :project
+    rdf = object.to_rdf
+    RDF::Reader.for(:rdfxml).new(rdf) do |reader|
+      assert reader.statements.count > 1
+      assert_equal RDF::URI.new("http://localhost:3000/projects/#{object.id}"), reader.statements.first.subject
+    end
+  end
+
   def test_avatar_key
     p=projects(:sysmo_project)
     assert_nil p.avatar_key

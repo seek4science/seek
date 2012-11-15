@@ -7,6 +7,7 @@ class PeopleControllerTest < ActionController::TestCase
   include AuthenticatedTestHelper
   include RestTestCases
   include ApplicationHelper
+  include RdfTestCases
 
   def setup
     login_as(:quentin)

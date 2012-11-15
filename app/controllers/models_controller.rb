@@ -394,6 +394,7 @@ class ModelsController < ApplicationController
     respond_to do |format|
       format.html # show.html.erb
       format.xml
+      format.rdf { render :template=>'rdf/show'}
       format.svg { render :text=>to_svg(@model,params[:deep]=='true',@model)}
       format.dot { render :text=>to_dot(@model,params[:deep]=='true',@model)}
       format.png { render :text=>to_png(@model,params[:deep]=='true',@model)}

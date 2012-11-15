@@ -25,6 +25,15 @@ class SopTest < ActiveSupport::TestCase
     end
   end
 
+  test "to_rdf" do
+    object = Factory :sop
+    rdf = object.to_rdf
+    RDF::Reader.for(:rdfxml).new(rdf) do |reader|
+      assert reader.statements.count > 1
+      assert_equal RDF::URI.new("http://localhost:3000/sops/#{object.id}"), reader.statements.first.subject
+    end
+  end
+
   def test_title_trimmed 
     sop=Factory(:sop, :title => " test sop")
     assert_equal("test sop",sop.title)

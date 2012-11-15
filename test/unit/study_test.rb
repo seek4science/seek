@@ -21,6 +21,15 @@ class StudyTest < ActiveSupport::TestCase
 
   end
 
+  test "to_rdf" do
+    object = Factory :study
+    rdf = object.to_rdf
+    RDF::Reader.for(:rdfxml).new(rdf) do |reader|
+      assert reader.statements.count > 1
+      assert_equal RDF::URI.new("http://localhost:3000/studies/#{object.id}"), reader.statements.first.subject
+    end
+  end
+
   test "sort by updated_at" do
     assert_equal Study.find(:all).sort_by { |s| s.updated_at.to_i * -1 }, Study.find(:all)
   end

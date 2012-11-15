@@ -1,5 +1,8 @@
 require 'acts_as_authorized'
-class Study < ActiveRecord::Base  
+class Study < ActiveRecord::Base
+
+  include Seek::Rdf::RdfGeneration
+
   acts_as_isa
 
   attr_accessor :new_link_from_assay

@@ -23,7 +23,16 @@ class InvestigationTest < ActiveSupport::TestCase
     assert assays.include?(assays(:metabolomics_assay))
     assert assays.include?(assays(:metabolomics_assay2))
     assert assays.include?(assays(:metabolomics_assay3))
-  end  
+  end
+
+  test "to_rdf" do
+    object = Factory :investigation
+    rdf = object.to_rdf
+    RDF::Reader.for(:rdfxml).new(rdf) do |reader|
+      assert reader.statements.count > 1
+      assert_equal RDF::URI.new("http://localhost:3000/investigations/#{object.id}"), reader.statements.first.subject
+    end
+  end
   
   #the lib/sysmo/title_trimmer mixin should automatically trim the title :before_save
   test "title trimmed" do

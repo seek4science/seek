@@ -7,6 +7,7 @@ class ModelsControllerTest < ActionController::TestCase
   include AuthenticatedTestHelper
   include RestTestCases
   include SharingFormTestHelper
+  include RdfTestCases
   
   def setup
     login_as(:model_owner)

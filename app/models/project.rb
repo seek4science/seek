@@ -4,6 +4,8 @@ require 'title_trimmer'
 
 class Project < ActiveRecord::Base
 
+  include Seek::Rdf::RdfGeneration
+
   acts_as_yellow_pages 
 
   include SimpleCrypt

@@ -6,6 +6,7 @@ class StudiesControllerTest < ActionController::TestCase
 
   include AuthenticatedTestHelper
   include RestTestCases
+  include RdfTestCases
 
   def setup
     login_as Factory(:admin).user

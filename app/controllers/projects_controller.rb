@@ -34,6 +34,7 @@ class ProjectsController < ApplicationController
     @project = Project.find(params[:id])
     respond_to do |format|
       format.html # show.html.erb
+      format.rdf { render :template=>'rdf/show'}
       format.xml
     end
   end

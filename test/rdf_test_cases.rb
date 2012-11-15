@@ -9,8 +9,7 @@ module RdfTestCases
     get :show, :id=>object, :format=>"rdf"
     assert_response :success
     rdf = @response.body
-    pp rdf
-
+    assert_equal object.to_rdf, rdf
     RDF::Reader.for(:rdfxml).new(rdf) do |reader|
       assert reader.statements.count > 0
       assert_equal RDF::URI.new(expected_resource_uri), reader.statements.first.subject

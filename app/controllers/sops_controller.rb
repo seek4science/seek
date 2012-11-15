@@ -57,6 +57,7 @@ class SopsController < ApplicationController
     respond_to do |format|
       format.html
       format.xml
+      format.rdf { render :template=>'rdf/show'}
       format.svg { render :text=>to_svg(@sop,params[:deep]=='true',@sop)}
       format.dot { render :text=>to_dot(@sop,params[:deep]=='true',@sop)}
       format.png { render :text=>to_png(@sop,params[:deep]=='true',@sop)}
