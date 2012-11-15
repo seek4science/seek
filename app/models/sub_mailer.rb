@@ -1,5 +1,4 @@
-class
-SubMailer < ActionMailer::Base
+class SubMailer < ActionMailer::Base
 
 
   def send_digest_subscription person, activity_logs, frequency
