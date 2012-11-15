@@ -14,7 +14,7 @@
 
 <%= render :partial=>"assets/upload_new_version_form", :locals=>{:resource=>@data_file} -%>
 
-<%= render :partial => "layouts/item_title",:locals=>{:item=>@data_file} -%>
+<%= render :partial => "layouts/item_title",:locals=>{:item=>@data_file, :version => @display_data_file.version} -%>
 
 <%= render :partial => "layouts/usage_info", :locals => { :resource => @data_file } -%>
 

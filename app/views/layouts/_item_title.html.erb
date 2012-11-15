@@ -1,7 +1,8 @@
 <%
 
 item||=nil
-avatar = item.nil? ? nil : resource_title_draggable_avatar(item)
+version||=nil
+avatar = item.nil? ? nil : resource_title_draggable_avatar(item,version)
 title_prefix||="" 
 title_postfix||=""
 title||=h(item.title)
