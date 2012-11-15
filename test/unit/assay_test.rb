@@ -18,6 +18,15 @@ class AssayTest < ActiveSupport::TestCase
     assert assay.sops.include?(sops(:sop_with_fully_public_policy).versions.first)
   end
 
+  test "to_rdf" do
+    assay = Factory :assay
+    rdf = assay.to_rdf
+    RDF::Reader.for(:rdfxml).new(rdf) do |reader|
+      assert reader.statements.count > 1
+      assert_equal RDF::URI.new("http://localhost:3000/assays/#{assay.id}"), reader.statements.first.subject
+    end
+  end
+
   test "is_asset?" do
     assert !Assay.is_asset?
     assert !assays(:metabolomics_assay).is_asset?

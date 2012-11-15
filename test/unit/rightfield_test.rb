@@ -8,7 +8,7 @@ class RightFieldTest < ActiveSupport::TestCase
   test "rdf generation" do
     df=Factory :rightfield_annotated_datafile
     assert_not_nil(df.content_blob)
-    rdf = generate_rdf(df)
+    rdf = generate_rightfield_rdf(df)
     assert_not_nil(rdf)
 
     #just checks it is valid rdf/xml and contains some statements for now
@@ -20,7 +20,7 @@ class RightFieldTest < ActiveSupport::TestCase
 
   test "rdf graph generation" do
     df=Factory :rightfield_annotated_datafile
-    rdf = generate_rdf_graph(df)
+    rdf = generate_rightfield_rdf_graph(df)
     assert_not_nil rdf
     assert rdf.is_a?(RDF::Graph)
     assert_equal 2,rdf.statements.count

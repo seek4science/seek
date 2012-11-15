@@ -4,16 +4,21 @@ module Seek
       include RightField
 
       def to_rdf
-        if (contains_extractable_spreadsheet? && content_blob.is_xls?)
-          rdf = generate_rdf_graph(self)
-        else
-          rdf = RDF::Graph.new
-        end
+        rdf = handle_rightfield_contents self
+
         rdf = additional_rdf_statements(rdf)
         RDF::Writer.for(:rdfxml).buffer do |writer|
           rdf.each_statement do |statement|
             writer << statement
           end
+        end
+      end
+
+      def handle_rightfield_contents object
+        if (object.respond_to?(:contains_extractable_spreadsheet?) && contains_extractable_spreadsheet? && content_blob.is_xls?)
+          rdf = generate_rightfield_rdf_graph(self)
+        else
+          rdf = RDF::Graph.new
         end
       end
 
@@ -24,6 +29,13 @@ module Seek
         rdf_graph << [resource,RDF::DC.description,description.nil? ? "" : description]
         rdf_graph
       end
+
+
+      def rdf_resource_uri object
+        #FIXME: look at forcing UrlHelper inclusion here, and use that
+        Seek::Config.site_base_host+"/#{object.class.name.tableize}/#{object.id}"
+      end
+
     end
   end
 end

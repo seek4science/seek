@@ -14,7 +14,7 @@ module RightField
     Seek::Config.site_base_host+"/data_files/#{datafile.id}"
   end
 
-  def generate_rdf datafile
+  def generate_rightfield_rdf datafile
     cmd = invoke_command datafile
 
     output = ""
@@ -36,8 +36,8 @@ module RightField
     output.strip
   end
 
-  def generate_rdf_graph datafile
-    rdf = generate_rdf datafile
+  def generate_rightfield_rdf_graph datafile
+    rdf = generate_rightfield_rdf datafile
     f=Tempfile.new("rdf")
     f.write(rdf)
     f.flush

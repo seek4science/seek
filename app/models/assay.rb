@@ -1,6 +1,9 @@
 require 'acts_as_authorized'
 
 class Assay < ActiveRecord::Base
+
+  include Seek::Rdf::RdfGeneration
+
   acts_as_isa
 
   def projects
