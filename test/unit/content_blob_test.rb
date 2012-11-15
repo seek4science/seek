@@ -78,7 +78,7 @@ class ContentBlobTest < ActiveSupport::TestCase
   #simply checks that get and set data returns the same thing
   def test_data_assignment2
     pic=content_blobs(:picture_blob)
-    pic.data=data_for_test("little_file.txt")
+    pic.data = data_for_test("little_file.txt")
     pic.save!
     assert_equal data_for_test("little_file.txt"),pic.data_io_object.read
 
@@ -196,7 +196,7 @@ class ContentBlobTest < ActiveSupport::TestCase
   test 'storage_directory and filepath' do
     content_blob = Factory(:content_blob)
     storage_directory = content_blob.storage_directory
-    assert_equal  "/tmp/seek_content_blobs", storage_directory
+    assert_equal  "#{Rails.root}/tmp/test_content_blobs", storage_directory
     assert_equal (storage_directory + '/' + content_blob.uuid + '.dat'), content_blob.filepath
     assert_equal (storage_directory + '/' + content_blob.uuid + '.pdf'), content_blob.filepath('pdf')
     assert_equal (storage_directory + '/' + content_blob.uuid + '.txt'), content_blob.filepath('txt')

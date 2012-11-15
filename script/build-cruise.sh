@@ -1,6 +1,15 @@
 #!/bin/bash
 
-#based on example at http://pivotallabs.com/users/mbarinek/blog/articles/1450-rails-3-with-rvm-and-cruise-control
+#delete tmp and filestore artifacts remaining from previous tests
+echo "Deleting old artifacts in tmp/ and filestore/"
+rm -rf tmp/attachement_fu
+rm -rf tmp/cache
+rm -rf tmp/model_images
+rm -rf tmp/fleximage
+rm -rf tmp/test_content_blobs
+rm -rf filestore/
+
+#rvm handling is based on example at http://pivotallabs.com/users/mbarinek/blog/articles/1450-rails-3-with-rvm-and-cruise-control
 
 desired_ruby=ruby-1.8.7
 project_name=seek016
