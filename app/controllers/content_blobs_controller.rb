@@ -9,16 +9,16 @@ class ContentBlobsController < ApplicationController
 
   def view_pdf_content
     #param code is used for temporary link
-    get_pdf_url = polymorphic_path([@asset,@content_blob], :action => 'get_pdf', :code => params[:code])
-    render :partial => 'layouts/pdf_content_display', :locals => {:get_pdf_url => get_pdf_url }
+    get_pdf_url = polymorphic_path([@asset,@content_blob], :action => 'download', :format => 'pdf', :code => params[:code])
+    render :partial => 'layouts/pdf_content_display', :locals => {:get_pdf_url => get_pdf_url}
   end
 
   def get_pdf
     if @content_blob.url.blank?
-      if File.exists?(@content_blob.filepath)
+      begin
         pdf_or_convert
-      else
-        redirect_on_error @asset_version,"Unable to find a copy of the file for viewing, or an alternative location. Please contact an administrator of #{Seek::Config.application_name}."
+      rescue Exception=>e
+        raise ("#{e}")
       end
     else
       begin
@@ -28,9 +28,9 @@ class ContentBlobsController < ApplicationController
           get_and_process_file(true, false)  #from url
         end
       rescue Seek::DownloadException=>de
-        redirect_on_error @asset_version,"There was an error accessing the remote resource, and a local copy was not available. Please try again later when the remote resource may be available again."
+        raise ("#{de}")
       rescue Jerm::JermException=>de
-        redirect_on_error @asset_version,de.message
+        raise ("#{de}")
       end
     end
   end
@@ -41,8 +41,13 @@ class ContentBlobsController < ApplicationController
     # (this will also trigger timestamp update in the corresponding Asset)
     @asset.last_used_at = Time.now
     @asset.save_without_timestamping
+
     disposition = params[:disposition] || 'attachment'
-    handle_download disposition
+
+    respond_to do |format|
+      format.html {handle_download disposition}
+      format.pdf {get_pdf}
+    end
   end
 
   private
@@ -136,7 +141,7 @@ class ContentBlobsController < ApplicationController
       if File.exists?(pdf_filepath)
         send_file pdf_filepath, :filename => @content_blob.original_filename, :type => @content_blob.content_type, :disposition => 'attachment'
       else
-        redirect_on_error @asset_version, 'Unable to convert the file for display'
+        raise Exception.new('Unable to convert the file for display')
       end
     end
   end
