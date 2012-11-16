@@ -22,7 +22,7 @@ sudo apt-get update
 sudo apt-get install wget git mercurial ruby rdoc ri libopenssl-ruby ruby-dev mysql-server libssl-dev build-essential openssh-server
 sudo apt-get install libmysqlclient16-dev libmagick++-dev libxml++2.6-dev sun-java6-jdk graphviz libsqlite3-dev sqlite3 libxslt1 libxslt1-dev
 sudo apt-get install curl irb
-sudo apt-get install apache2-mpm-prefork apache2-prefork-dev libapr1-dev libaprutil1-dev libcurl4-openssl-dev
+sudo apt-get install libapr1-dev libaprutil1-dev libcurl4-openssl-dev
 
 echo "${txtgrn} *********************************** ${txtrst}"
 echo "${txtgrn} Installing rubygems ${txtrst}"
@@ -101,4 +101,4 @@ echo "${txtgrn} Start SEEK server under production mode"
 RAILS_ENV=production bundle exec script/server
 
 echo "${txtgrn} *********************************** ${txtrst}"
-echo "${txtgrn} You finished setting up and starting up SEEK. You might want to try out SEEK by going to: http://localhost:3000. SEEK is installed under $SEEK_PATH/$SEEK_DIRECTORY. If you run SEEK on apache, you need to configurate it. The default apache installation and configuration is at /etc/apache2 ${txtrst}"
+echo "${txtgrn} You finished setting up and starting up SEEK. You might want to try out SEEK by going to: http://localhost:3000. SEEK is installed under $SEEK_PATH/$SEEK_DIRECTORY. If you run SEEK on apache, you need to install and configurate it. The steps are described at $SEEK_PATH/$SEEK_DIRECTORY/doc/INSTALL ${txtrst}"

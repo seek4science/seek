@@ -99,4 +99,4 @@ echo "${txtgrn} Start SEEK server under production mode"
 RAILS_ENV=production bundle exec script/server
 
 echo "${txtgrn} *********************************** ${txtrst}"
-echo "${txtgrn} You finished setting up and starting up SEEK. You might want to try out SEEK by going to: http://localhost:3000. SEEK is installed under $SEEK_PATH/$SEEK_DIRECTORY. If you run SEEK on apache, you need to configurate it. The default apache installation and configuration is at /etc/apache2 ${txtrst}"
+echo "${txtgrn} You finished setting up and starting up SEEK. You might want to try out SEEK by going to: http://localhost:3000. SEEK is installed under $SEEK_PATH/$SEEK_DIRECTORY. If you run SEEK on apache, you need to install and configurate it. The steps are described at $SEEK_PATH/$SEEK_DIRECTORY/doc/INSTALL ${txtrst}"

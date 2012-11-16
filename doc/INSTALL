@@ -149,6 +149,12 @@ The command to start open office in headless mode and as the background process:
 
     nohup soffice --headless --accept="socket,host=127.0.0.1,port=8100;urp;" --nofirststartwizard > /dev/null 2>&1
 
+If you run on production server, using apache and phusion passenger, you will need to run soffice under www-data user.
+Firstly, the owner of /var/www needs to be changed to www-data, as soffice will write some information in here
+    sudo chown www-data:www-data /var/www
+Then
+    nohup sudo -H -u www-data soffice --headless --accept="socket,host=127.0.0.1,port=8100;urp;" --nofirststartwizard > /dev/null 2>&1
+
 The 8100 port is used by default, if you'd like to run on another port, you need also to synchronize the changed port with the default soffice_port setting for convert_office plugin in config/environment.rb
 
 == Starting the server
