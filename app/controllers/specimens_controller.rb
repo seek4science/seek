@@ -25,6 +25,7 @@ class SpecimensController < ApplicationController
 
   def new
     @specimen = Specimen.new
+    @specimen.from_biosamples = params[:from_biosamples]
     respond_to do |format|
 
       format.html # new.html.erb
@@ -44,17 +45,27 @@ class SpecimensController < ApplicationController
 
     #Add creators
     AssetsCreator.add_or_update_creator_list(@specimen, params[:creators])
-    respond_to do |format|
-      if @specimen.save
-        deliver_request_publish_approval params[:sharing], @specimen
-        flash[:notice] = 'Specimen was successfully created.'
-        format.html { redirect_to(@specimen) }
-        format.xml  { head :ok }
+
+    if @specimen.save
+      deliver_request_publish_approval params[:sharing], @specimen
+      if @specimen.from_biosamples=='true'
+        #reload to get updated nested attributes,e.g. genotypes/phenotypes
+        @specimen.reload
+        render :partial => "biosamples/back_to_biosamples", :locals => {:action => 'create', :object => @specimen}
       else
-       # Policy.create_or_update_policy(@specimen, current_user, params)
+        respond_to do |format|
+          flash[:notice] = 'Specimen was successfully created.'
+          format.html { redirect_to(@specimen) }
+          format.xml  { head :ok }
+        end
+      end
+    else
+     # Policy.create_or_update_policy(@specimen, current_user, params)
+      respond_to do |format|
         format.html { render :action => "new" }
       end
     end
+
   end
 
   def edit
