@@ -109,7 +109,7 @@
 <% end %>
 <br/>
 <%  if self.controller_name=="specimens" %>
-    <%= render :partial => 'projects/project_selector', :locals => {:resource => specimen, :allow_nil => true} %>
+    <%= render :partial => 'projects/project_selector', :locals => {:resource => specimen, :allow_nil => Seek::Config.is_virtualliver ? true : false} %>
 
     <% if specimen.can_manage? %>
         <p>
