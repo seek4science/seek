@@ -6,7 +6,7 @@ module Seek
       def to_rdf
         rdf = handle_rightfield_contents self
 
-        rdf = additional_rdf_statements(rdf)
+        rdf = dublin_core_rdf_statements(rdf)
         RDF::Writer.for(:rdfxml).buffer do |writer|
           rdf.each_statement do |statement|
             writer << statement
@@ -23,10 +23,10 @@ module Seek
       end
 
       #define non rightfield based rdf statements
-      def additional_rdf_statements rdf_graph
+      def dublin_core_rdf_statements rdf_graph
         resource = RDF::Resource.new(rdf_resource_uri(self))
-        rdf_graph << [resource,RDF::DC.title,title]
-        rdf_graph << [resource,RDF::DC.description,description.nil? ? "" : description]
+        rdf_graph << [resource,RDF::DC.title,title] if self.respond_to?(:title)
+        rdf_graph << [resource,RDF::DC.description,description.nil? ? "" : description] if self.respond_to?(:description)
         rdf_graph
       end
 

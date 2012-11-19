@@ -2,7 +2,7 @@
 module RdfTestCases
   def test_get_rdf
     object = rest_api_test_object
-    expected_resource_uri =  eval("#{object.class.name.underscore}_url(object)")
+    expected_resource_uri =  eval("#{object.class.name.underscore}_url(object,:host=>'localhost',:port=>'3000')")
 
     assert object.can_view?
     assert object.respond_to?(:to_rdf)
