@@ -57,5 +57,5 @@ ConvertOffice::ConvertOfficeConfig.options =
     :soffice_port=>8100,
     :nailgun=>false,
     :verbose=>false,
-    :asynchronous=>true
+    :asynchronous=>false
 }
