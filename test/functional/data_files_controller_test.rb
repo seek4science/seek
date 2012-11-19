@@ -693,6 +693,8 @@ class DataFilesControllerTest < ActionController::TestCase
     assert_response :success
     assert :success
   end
+
+
   
   test "filtering by assay" do
     assay=assays(:metabolomics_assay)

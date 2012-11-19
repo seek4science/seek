@@ -8,7 +8,7 @@
     <%= item_tags_and_tag_entry -%>
   <% end -%>
 
-  <% if resource.respond_to? :attribution_objects -%>
+  <% if resource.respond_to? :attributions_objects -%>
     <%= render :partial => "assets/resource_attributions_box",
                :locals => { :resource => resource, :attributed_to => Authorization.authorize_collection("view", resource.attributions_objects, current_user, true),
                :truncate_to => truncate_length_for_boxes } -%>
