@@ -5,11 +5,12 @@ class RightFieldTest < ActiveSupport::TestCase
 
   include RightField
 
-  test "rdf generation" do
+  test "rightfield rdf generation" do
     df=Factory :rightfield_annotated_datafile
     assert_not_nil(df.content_blob)
     rdf = generate_rightfield_rdf(df)
     assert_not_nil(rdf)
+
 
     #just checks it is valid rdf/xml and contains some statements for now
     RDF::Reader.for(:rdfxml).new(rdf) do |reader|
@@ -18,7 +19,7 @@ class RightFieldTest < ActiveSupport::TestCase
     end
   end
 
-  test "rdf graph generation" do
+  test "rightfield rdf graph generation" do
     df=Factory :rightfield_annotated_datafile
     rdf = generate_rightfield_rdf_graph(df)
     assert_not_nil rdf
@@ -32,11 +33,10 @@ class RightFieldTest < ActiveSupport::TestCase
     df=Factory :rightfield_annotated_datafile
     rdf = df.to_rdf
     assert_not_nil rdf
-
     #just checks it is valid rdf/xml and contains some statements for now
     RDF::Reader.for(:rdfxml).new(rdf) do |reader|
       assert reader.statements.count > 0
-      assert_equal 4,reader.statements.count
+      assert_equal 5,reader.statements.count
       assert_equal RDF::URI.new("http://localhost:3000/data_files/#{df.id}"), reader.statements.first.subject
     end
   end
