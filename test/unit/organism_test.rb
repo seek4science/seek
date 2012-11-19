@@ -11,6 +11,16 @@ class OrganismTest < ActiveSupport::TestCase
     assert o.assays.include?(a)
   end
 
+  test "to_rdf" do
+    object = Factory :organism
+    rdf = object.to_rdf
+
+    RDF::Reader.for(:rdfxml).new(rdf) do |reader|
+      assert reader.statements.count >= 1
+      assert_equal RDF::URI.new("http://localhost:3000/organisms/#{object.id}"), reader.statements.first.subject
+    end
+  end
+
   test "searchable_terms" do
     o=organisms(:Saccharomyces_cerevisiae)
     assert o.searchable_terms.include?("Saccharomyces cerevisiae")

@@ -18,6 +18,16 @@ class PublicationTest < ActiveSupport::TestCase
     assert_equal 1, publication.events.count
   end
 
+  test "to_rdf" do
+    object = Factory :publication
+    rdf = object.to_rdf
+
+    RDF::Reader.for(:rdfxml).new(rdf) do |reader|
+      assert reader.statements.count >= 1
+      assert_equal RDF::URI.new("http://localhost:3000/publications/#{object.id}"), reader.statements.first.subject
+    end
+  end
+
   test "assay association" do
     publication = publications(:pubmed_2)
     assay = assays(:modelling_assay_with_data_and_relationship)

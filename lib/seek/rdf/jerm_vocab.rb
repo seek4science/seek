@@ -9,7 +9,8 @@ module Seek
                 Organism=>"organism",
                 Project=>"Project",
                 Study=>"Study",
-                Investigation=>"Investigation"}
+                Investigation=>"Investigation",
+                Publication=>"Publication"}
       property :Data
 
 
