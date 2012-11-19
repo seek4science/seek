@@ -83,7 +83,7 @@
     <%= f.select :organism_part, options_for_select(organism_part_options.insert(0,'Not specified'), @sample.organism_part), :style => 'float:right;margin-right:30em' %>
   </p>
   <br/>
-  <%= render :partial => 'projects/project_selector', :locals => {:resource => @sample,:allow_nil=>true}%>
+  <%= render :partial => 'projects/project_selector', :locals => {:resource => @sample,:allow_nil=>Seek::Config.is_virtualliver ? true : false}%>
 
   <br style="clear:both"/>
 
