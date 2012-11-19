@@ -5,10 +5,6 @@ class ContentBlobTest < ActiveSupport::TestCase
 
   fixtures :content_blobs
 
-  def setup
-    FileUtils.remove_dir ContentBlob.test_storage_location,true
-  end
-
   def test_md5sum_on_demand
     blob=Factory :rightfield_content_blob
     assert_not_nil blob.md5sum
@@ -48,7 +44,6 @@ class ContentBlobTest < ActiveSupport::TestCase
 
   def test_file_dump
     pic=content_blobs(:picture_blob)
-    pic.data=data_for_test('file_picture.png')
     blob=ContentBlob.new(:data=>pic.data_io_object.read)
     blob.save!
     assert_not_nil blob.filepath
@@ -64,7 +59,6 @@ class ContentBlobTest < ActiveSupport::TestCase
   #checks that the data is assigned through the new method, stored to a file, and not written to the old data_old field
   def test_data_assignment
     pic=content_blobs(:picture_blob)
-    pic.data=data_for_test('file_picture.png')
     pic.save! #to trigger callback to save to file
     blob=ContentBlob.new(:data=>pic.data_io_object.read)
     blob.save!
@@ -84,7 +78,7 @@ class ContentBlobTest < ActiveSupport::TestCase
   #simply checks that get and set data returns the same thing
   def test_data_assignment2
     pic=content_blobs(:picture_blob)
-    pic.data=data_for_test("little_file.txt")
+    pic.data = data_for_test("little_file.txt")
     pic.save!
     assert_equal data_for_test("little_file.txt"),pic.data_io_object.read
 
@@ -95,7 +89,6 @@ class ContentBlobTest < ActiveSupport::TestCase
 #
   def test_will_overwrite_if_data_changes
     pic=content_blobs(:picture_blob)
-    pic.data=data_for_test("file_picture.png")
     pic.save!
     assert_equal data_for_test("file_picture.png"),File.open(pic.filepath,"rb").read
     pic.data=data_for_test("little_file.txt")
@@ -105,7 +98,6 @@ class ContentBlobTest < ActiveSupport::TestCase
 
   def test_uuid
     pic=content_blobs(:picture_blob)
-    pic.data=data_for_test("file_picture.png")
     blob=ContentBlob.new(:data=>pic.data_io_object.read)
     blob.save!
     assert_not_nil blob.uuid

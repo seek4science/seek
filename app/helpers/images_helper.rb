@@ -242,8 +242,10 @@ module ImagesHelper
       "project_64x64.png"
       when "institution_avatar"
       "institution_64x64.png"
-      when "organism_avatar",'strain_avatar'
+      when "organism_avatar"
       "misc_icons/cell3.png"
+      when 'strain_avatar'
+        "misc_icons/enterococcus_faecalis64-64.jpg"
       when "publication_avatar", "publication", "publications"
      "crystal_project/64x64/mimetypes/wordprocessing.png"
       when "saved_search_avatar","saved_search"

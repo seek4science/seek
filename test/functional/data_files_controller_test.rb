@@ -51,6 +51,15 @@ class DataFilesControllerTest < ActionController::TestCase
 
   end
 
+  test "data files tab should be selected" do
+    get :index
+    assert_select "ul.tabnav" do
+      assert_select "li#selected_tabnav" do
+        assert_select "a[href=?]",data_files_path,:text=>"Data files"
+      end
+    end
+  end
+
   test "XML for data file with tags" do
     p=Factory :person
     df = Factory(:data_file,:policy=>Factory(:public_policy, :access_type=>Policy::VISIBLE))
@@ -669,6 +678,8 @@ class DataFilesControllerTest < ActionController::TestCase
     assert_response :success
     assert :success
   end
+
+
   
   test "filtering by assay" do
     assay=assays(:metabolomics_assay)

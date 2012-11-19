@@ -70,4 +70,8 @@ class Presentation < ActiveRecord::Base
    # errors.add_to_base "Your file is not in PDF format!" unless content_type=="application/pdf"
 
   end
+
+  def use_mime_type_for_avatar?
+    true
+  end
 end
