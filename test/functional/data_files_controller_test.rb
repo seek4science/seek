@@ -31,6 +31,15 @@ class DataFilesControllerTest < ActionController::TestCase
 
   end
 
+  test "data files tab should be selected" do
+    get :index
+    assert_select "ul.tabnav" do
+      assert_select "li#selected_tabnav" do
+        assert_select "a[href=?]",data_files_path,:text=>"Data files"
+      end
+    end
+  end
+
   test "get as rdf" do
     df = Factory :rightfield_annotated_datafile, :contributor=>users(:datafile_owner)
     assert df.can_view?
