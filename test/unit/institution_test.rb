@@ -24,8 +24,9 @@ class InstitutionTest < ActiveSupport::TestCase
   test "to_rdf" do
     object = Factory :institution
     rdf = object.to_rdf
+
     RDF::Reader.for(:rdfxml).new(rdf) do |reader|
-      assert reader.statements.count > 1
+      assert reader.statements.count >= 1
       assert_equal RDF::URI.new("http://localhost:3000/institutions/#{object.id}"), reader.statements.first.subject
     end
   end

@@ -4,14 +4,19 @@ module Seek
       include RightField
 
       def to_rdf
-        rdf_graph = handle_rightfield_contents self
-        rdf_graph = describe_type(rdf_graph)
-        rdf_graph = dublin_core_rdf_statements(rdf_graph)
+        rdf_graph = to_rdf_graph
         RDF::Writer.for(:rdfxml).buffer(:prefixes=>ns_prefixes) do |writer|
           rdf_graph.each_statement do |statement|
             writer << statement
           end
         end
+      end
+
+      def to_rdf_graph
+        rdf_graph = handle_rightfield_contents self
+        rdf_graph = describe_type(rdf_graph)
+        rdf_graph = dublin_core_rdf_statements(rdf_graph)
+        rdf_graph
       end
 
       def handle_rightfield_contents object
