@@ -1,7 +1,15 @@
 module Seek
   module Rdf
     class JERMVocab < RDF::Vocabulary("http://www.mygrid.org.uk/ontology/JERMOntology#")
-      @types = {DataFile=>"Data",Model=>"Model",Sop=>"SOP",Assay=>"Assay"}
+      @types = {DataFile=>"Data",
+                Model=>"Model",
+                Sop=>"SOP",
+                Assay=>"Assay",
+                Person=>"Person",
+                Organism=>"organism",
+                Project=>"Project",
+                Study=>"Study",
+                Investigation=>"Investigation"}
       property :Data
 
 
@@ -12,7 +20,6 @@ module Seek
         t=self.send(t) unless t.nil?
         t
       end
-
     end
   end
 end
