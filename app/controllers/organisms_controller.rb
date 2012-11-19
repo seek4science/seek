@@ -13,6 +13,7 @@ class OrganismsController < ApplicationController
     respond_to do |format|
       format.html
       format.xml
+      format.rdf { render :template=>'rdf/show'}
     end
   end
   

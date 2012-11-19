@@ -1,4 +1,5 @@
 class Organism < ActiveRecord::Base
+  include Seek::Rdf::RdfGeneration
 
   acts_as_favouritable
 
