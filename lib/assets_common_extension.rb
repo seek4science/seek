@@ -298,7 +298,10 @@ module AssetsCommonExtension
   def content_type_from_filename filename
     file_format = filename.split('.').last.try(:strip)
     possible_mime_types = mime_types_for_extension file_format
-    possible_mime_types.first
+    type = possible_mime_types.sort.first
+    #FIXME: this is just a quick fix, until http://dev.mygrid.org.uk/issues/browse/SYSMO-1129 is fully resolved
+    type = type.gsub("image/jpg","image/jpeg") unless type.nil?
+    type
   end
 end
 
