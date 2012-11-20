@@ -391,7 +391,7 @@ class ApplicationController < ActionController::Base
         when "content_blobs"
           if ["view_pdf_content", "download"].include?(a)
             activity_loggable = object.asset
-            ActivityLog.create(:action => a,
+            ActivityLog.create(:action => 'download',
                                :culprit => current_user,
                                :referenced => activity_loggable.projects.first,
                                :controller_name => c,
