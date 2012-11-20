@@ -46,6 +46,7 @@ class ProjectSubscriptionJobTest < ActiveSupport::TestCase
 
 
   test "perform" do
+    User.current_user = Factory(:user)
     proj = Factory(:project)
     s1 = Factory(:subscribable, :projects => [Factory(:project), proj], :policy => Factory(:public_policy))
     s2 = Factory(:subscribable, :projects => [Factory(:project), proj], :policy => Factory(:public_policy))
