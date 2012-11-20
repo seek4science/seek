@@ -3,6 +3,10 @@ require 'test_helper'
 class SetSubscriptionsForItemJobTest < ActiveSupport::TestCase
   fixtures :all
 
+  def setup
+    User.current_user = Factory(:user)
+  end
+
   test "exists" do
     subscribable = Factory(:subscribable)
     project_ids = subscribable.projects.collect(&:id)
@@ -47,14 +51,19 @@ class SetSubscriptionsForItemJobTest < ActiveSupport::TestCase
     Delayed::Job.destroy_all
     person1 = Factory(:person)
     person2 = Factory(:person)
-    subscribable = Factory(:data_file)
-    project_subscription1 = ProjectSubscription.create(:person_id => person1.id, :project_id => subscribable.projects.first.id, :frequency => 'immediately')
-    project_subscription2 = ProjectSubscription.create(:person_id => person2.id, :project_id => subscribable.projects.first.id, :frequency => 'immediately')
-    ProjectSubscriptionJob.new(project_subscription1.id).perform
-    ProjectSubscriptionJob.new(project_subscription2.id).perform
+    subscribable = Factory(:data_file, :policy => Factory(:public_policy))
+    assert_equal 1, subscribable.projects.count
+    project_subscription1 = person1.project_subscriptions.create :project => subscribable.projects.first, :frequency => 'weekly'
+    project_subscription2 = person2.project_subscriptions.create :project => subscribable.projects.first, :frequency => 'weekly'
+
+    assert !subscribable.subscribed?(person1)
+    assert !subscribable.subscribed?(person2)
+    #when subscribable is created, SetSubscriptionsForItemJob is also created
+    assert SetSubscriptionsForItemJob.exists?(subscribable.class.name, subscribable.id, subscribable.projects.collect(&:id))
 
     SetSubscriptionsForItemJob.new(subscribable.class.name, subscribable.id, subscribable.projects.collect(&:id)).perform
 
+    subscribable.reload
     assert subscribable.subscribed? person1
     assert subscribable.subscribed? person2
   end
@@ -65,20 +74,17 @@ class SetSubscriptionsForItemJobTest < ActiveSupport::TestCase
     person2 = Factory(:person)
     subscribable = Factory(:assay, :policy => Factory(:public_policy))
     assert_equal 1, subscribable.projects.count
-    project_subscription1 = ProjectSubscription.create(:person_id => person1.id, :project_id => subscribable.projects.first.id, :frequency => 'immediately')
-    project_subscription2 = ProjectSubscription.create(:person_id => person2.id, :project_id => subscribable.projects.first.id, :frequency => 'immediately')
-    ProjectSubscriptionJob.new(project_subscription1.id).perform
-    ProjectSubscriptionJob.new(project_subscription2.id).perform
+    project_subscription1 = person1.project_subscriptions.create :project => subscribable.projects.first, :frequency => 'weekly'
+    project_subscription2 = person2.project_subscriptions.create :project => subscribable.projects.first, :frequency => 'weekly'
 
-    puts person1.projects.inspect
-    puts person2.projects.inspect
-
-    puts subscribable.projects.inspect
-
-    assert_equal person1.project_subscriptions.collect(&:project),subscribable.projects
+    assert !subscribable.subscribed?(person1)
+    assert !subscribable.subscribed?(person2)
+    #when subscribable is created, SetSubscriptionsForItemJob is also created
+    assert SetSubscriptionsForItemJob.exists?(subscribable.class.name, subscribable.id, subscribable.projects.collect(&:id))
 
     SetSubscriptionsForItemJob.new(subscribable.class.name, subscribable.id, subscribable.projects.collect(&:id)).perform
 
+    subscribable.reload
     assert subscribable.subscribed? person1
     assert subscribable.subscribed? person2
   end
@@ -87,13 +93,19 @@ class SetSubscriptionsForItemJobTest < ActiveSupport::TestCase
     Delayed::Job.destroy_all
     person1 = Factory(:person)
     person2 = Factory(:person)
-    subscribable = Factory(:study)
-    project_subscription1 = ProjectSubscription.create(:person_id => person1.id, :project_id => subscribable.projects.first.id, :frequency => 'immediately')
-    project_subscription2 = ProjectSubscription.create(:person_id => person2.id, :project_id => subscribable.projects.first.id, :frequency => 'immediately')
-    ProjectSubscriptionJob.new(project_subscription1.id).perform
-    ProjectSubscriptionJob.new(project_subscription2.id).perform
+    subscribable = Factory(:study, :policy => Factory(:public_policy))
+    assert_equal 1, subscribable.projects.count
+    project_subscription1 = person1.project_subscriptions.create :project => subscribable.projects.first, :frequency => 'weekly'
+    project_subscription2 = person2.project_subscriptions.create :project => subscribable.projects.first, :frequency => 'weekly'
+
+    assert !subscribable.subscribed?(person1)
+    assert !subscribable.subscribed?(person2)
+    #when subscribable is created, SetSubscriptionsForItemJob is also created
+    assert SetSubscriptionsForItemJob.exists?(subscribable.class.name, subscribable.id, subscribable.projects.collect(&:id))
+
     SetSubscriptionsForItemJob.new(subscribable.class.name, subscribable.id, subscribable.projects.collect(&:id)).perform
 
+    subscribable.reload
     assert subscribable.subscribed? person1
     assert subscribable.subscribed? person2
   end
