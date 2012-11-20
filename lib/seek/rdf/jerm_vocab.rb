@@ -11,7 +11,10 @@ module Seek
                 Study=>"Study",
                 Investigation=>"Investigation",
                 Publication=>"Publication"}
+
       property :Data
+      property :hasPart
+      property :isPartOf
 
 
       #returns the correct Class IRI accrording to the class, or instance, passed in - or nil if its not recognised

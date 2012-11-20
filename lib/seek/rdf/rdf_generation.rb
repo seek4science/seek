@@ -36,6 +36,7 @@ module Seek
 
       private
 
+
       #links investigations to studeies to assays
       def link_isa rdf_graph
         resource = self.rdf_resource
