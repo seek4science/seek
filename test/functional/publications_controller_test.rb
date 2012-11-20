@@ -193,7 +193,7 @@ class PublicationsControllerTest < ActionController::TestCase
   end
   
   test "should disassociate authors" do
-    mock_pubmed(:email=>"",:id=>5,:content_file=>"pubmed_5.xml")
+    mock_pubmed(:email=>"",:id=>5,:content_file=>"pubmed_5.xml", :tool => 'seek')
     p = publications(:one)
     p.creators << people(:quentin_person)
     p.creators << people(:aaron_person)
@@ -317,7 +317,7 @@ class PublicationsControllerTest < ActionController::TestCase
     params[:db] = "pubmed" unless params[:db]
     params[:retmode] = "xml"
     params[:id] = options[:id]
-    params[:tool] = options[:too] || "sysmo-seek"
+    params[:tool] = options[:tool] || "sysmo-seek"
     params[:email] = options[:email]
     url = "http://eutils.ncbi.nlm.nih.gov/entrez/eutils/efetch.fcgi?" + params.to_param
     file=options[:content_file]
