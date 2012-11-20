@@ -28,13 +28,18 @@ class PersonTest < ActiveSupport::TestCase
   end
 
   test "to_rdf" do
-    object = Factory :person
+    object = Factory :person, :skype_name=>"skypee"
     Factory(:study,:contributor=>object)
     Factory(:investigation,:contributor=>object)
     Factory(:assay,:contributor=>object)
     Factory(:assay,:contributor=>object)
     Factory(:assets_creator,:creator=>object)
     Factory(:assets_creator,:asset=>Factory(:sop),:creator=>object)
+    object.web_page="http://google.com"
+
+    disable_authorization_checks do
+      object.save!
+    end
 
     object.reload
     rdf = object.to_rdf

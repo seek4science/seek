@@ -66,7 +66,15 @@ module Seek
           if !transformation.blank?
             item = eval(transformation)
           end
-          o = uri_or_literal.start_with?("l") ? item : item.rdf_resource
+          o = if uri_or_literal.downcase=="u"
+                if item.respond_to?(:rdf_resource)
+                  item.rdf_resource
+                else
+                  RDF::Resource.new(item)
+                end
+          else
+            item
+          end
           rdf_graph << [resource,property_uri,o]
         end
         rdf_graph
@@ -86,7 +94,8 @@ module Seek
         {
             "jerm"=>JERMVocab.to_uri.to_s,
             "dc"=>RDF::DC.to_uri.to_s,
-            "owl"=>RDF::OWL.to_uri.to_s
+            "owl"=>RDF::OWL.to_uri.to_s,
+            "foaf"=>RDF::FOAF.to_uri.to_s
         }
       end
 
