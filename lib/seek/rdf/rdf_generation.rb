@@ -62,7 +62,8 @@ module Seek
       def generate_triples subject, method, property,uri_or_literal,transformation,rdf_graph
         resource = subject.rdf_resource
         transform = transformation.strip unless transformation.nil?
-        items = Array(subject.send(method)) #may be an array of items or a single item
+        items = subject.send(method)
+        items = [items] unless items.kind_of?(Array) #may be an array of items or a single item. Cant use Array(item) here cos it screws up timezones and strips out nils
         items.each do |item|
           property_uri = eval(property)
           if !transformation.blank?
@@ -75,7 +76,7 @@ module Seek
                   RDF::Resource.new(item)
                 end
           else
-            item
+            item.nil? ? "" : item
           end
           rdf_graph << [resource,property_uri,o]
         end
