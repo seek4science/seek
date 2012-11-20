@@ -98,7 +98,8 @@ module Seek
             "jerm"=>JERMVocab.to_uri.to_s,
             "dc"=>RDF::DC.to_uri.to_s,
             "owl"=>RDF::OWL.to_uri.to_s,
-            "foaf"=>RDF::FOAF.to_uri.to_s
+            "foaf"=>RDF::FOAF.to_uri.to_s,
+            "sioc"=>RDF::SIOC.to_uri.to_s
         }
       end
 
