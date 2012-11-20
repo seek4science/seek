@@ -15,9 +15,9 @@ module Seek
         "application/vnd.ms-powerpoint" => {:name => "PowerPoint presentation", :icon_key => "ppt_file", :extension=>"ppt"},
         "application/zip" => {:name => "Zip file", :icon_key => "zip_file", :extension=>"zip"},
         "image/gif" => {:name => "GIF image", :icon_key => "gif_file", :extension=>"gif"},
-        "image/jpeg" => {:name => "JPG image", :icon_key => "jpg_file", :extension=>"jpeg"},
+        "image/jpeg" => {:name => "JPEG image", :icon_key => "jpg_file", :extension=>"jpeg"},
         "image/png" => {:name => "PNG image", :icon_key => "png_file", :extension=>"png"},
-        "image/jpg" => {:name => "JPG image", :icon_key => "jpg_file", :extension=>"jpg"},
+        "image/jpg" => {:name => "JPEG image", :icon_key => "jpg_file", :extension=>"jpg"},
         "image/bmp" => {:name => "BMP image", :icon_key => "bmp_file", :extension=>"bmp"},
         "image/svg+xml" => {:name => "SVG image", :icon_key => "svg_file", :extension=>"svg"},
         "text/plain" => {:name => "Plain text file", :icon_key => "txt_file", :extension=>"txt"},
@@ -54,8 +54,9 @@ module Seek
 
     def mime_types_for_extension extension
       MIME_MAP.keys.select do |k|
-        MIME_MAP[k][:extension]==extension
+        MIME_MAP[k][:extension]==extension.downcase
       end
+
     end
 
     protected
