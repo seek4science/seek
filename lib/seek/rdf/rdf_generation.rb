@@ -1,7 +1,11 @@
+require 'simple-spreadsheet-extractor'
+require 'fastercsv'
+
 module Seek
   module Rdf
     module RdfGeneration
       include RightField
+      include SysMODB::SpreadsheetExtractor
 
       def to_rdf
         rdf_graph = to_rdf_graph
@@ -15,8 +19,7 @@ module Seek
       def to_rdf_graph
         rdf_graph = handle_rightfield_contents self
         rdf_graph = describe_type(rdf_graph)
-        rdf_graph = link_isa(rdf_graph) if self.is_isa?
-        rdf_graph = dublin_core_rdf_statements(rdf_graph)
+        rdf_graph = generate_from_xls_template rdf_graph
         rdf_graph
       end
 
@@ -29,33 +32,39 @@ module Seek
       end
 
       def rdf_resource
-        #FIXME: look at forcing UrlHelper inclusion here, and use that
         uri = Seek::Config.site_base_host+"/#{self.class.name.tableize}/#{self.id}"
         RDF::Resource.new(uri)
       end
 
       private
 
-
-      #links investigations to studeies to assays
-      def link_isa rdf_graph
-        resource = self.rdf_resource
-
-        if is_a? Investigation
-          studies.each do |study|
-            rdf_graph << [resource,JERMVocab.hasPart,study.rdf_resource]
+      def generate_from_xls_template rdf_graph
+        #load template
+        path_to_template=File.join(File.dirname(__FILE__), "core_rdf_template.xls")
+        csv = spreadsheet_to_csv open(path_to_template)
+        FasterCSV.parse(csv) do |row|
+          unless row[0].downcase=="class"
+            klass=row[0]
+            method=row[1]
+            property=row[2]
+            uri_or_literal=row[3].downcase
+            if (klass=="*" || self.class.name==klass) && self.respond_to?(method)
+              rdf_graph = generate_triples(self,method,property,uri_or_literal,rdf_graph)
+            end
           end
         end
+        rdf_graph
+      end
 
-        if is_a? Study
-          assays.each do |assay|
-            rdf_graph << [resource,JERMVocab.hasPart,assay.rdf_resource]
-          end
-          rdf_graph << [resource,JERMVocab.isPartOf,investigation.rdf_resource]
-        end
+      def generate_triples subject, method, property,uri_or_literal,rdf_graph
+        puts("Generating triple for #{subject}, #{method},#{property},#{uri_or_literal}")
+        resource = subject.rdf_resource
 
-        if is_a? Assay
-          rdf_graph << [resource,JERMVocab.isPartOf,study.rdf_resource]
+        items = Array(subject.send(method)) #may be an array of items or a single item
+        items.each do |item|
+          property_uri = eval(property)
+          o = uri_or_literal.start_with?("l") ? item : item.rdf_resource
+          rdf_graph << [resource,property_uri,o]
         end
         rdf_graph
       end
@@ -67,16 +76,6 @@ module Seek
          rdf_graph <<  [resource,RDF.type,it_is]
        end
        rdf_graph
-      end
-
-
-
-      #define non rightfield based rdf statements
-      def dublin_core_rdf_statements rdf_graph
-        resource = self.rdf_resource
-        rdf_graph << [resource,RDF::DC.title,title] if self.respond_to?(:title)
-        rdf_graph << [resource,RDF::DC.description,description.nil? ? "" : description] if self.respond_to?(:description)
-        rdf_graph
       end
 
       #the hash of namespace prefixes to pass to the RDF::Writer when generating the RDF
