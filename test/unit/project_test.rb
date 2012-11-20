@@ -20,9 +20,17 @@ class ProjectTest < ActiveSupport::TestCase
   end
 
   test "to_rdf" do
-    object = Factory :project
+    object = Factory :project, :web_page=>"http://www.sysmo-db.org", :organisms=>[Factory(:organism), Factory(:organism)]
+    Factory :data_file,:projects=>[object]
+    Factory :data_file,:projects=>[object]
+    Factory :model,:projects=>[object]
+    Factory :sop,:projects=>[object]
+    i = Factory :investigation, :projects=>[object]
+    s = Factory :study, :investigation=>i
+    Factory :assay, :study=>s
+    object.reload
     rdf = object.to_rdf
-
+    puts rdf
     RDF::Reader.for(:rdfxml).new(rdf) do |reader|
       assert reader.statements.count > 1
       assert_equal RDF::URI.new("http://localhost:3000/projects/#{object.id}"), reader.statements.first.subject
