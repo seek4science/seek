@@ -28,7 +28,6 @@ class InvestigationTest < ActiveSupport::TestCase
   test "to_rdf" do
     object = Factory :investigation, :description=>"Big investigation",:studies=>[Factory(:study), Factory(:study)]
     rdf = object.to_rdf
-    puts rdf
     RDF::Reader.for(:rdfxml).new(rdf) do |reader|
       assert reader.statements.count > 1
       assert_equal RDF::URI.new("http://localhost:3000/investigations/#{object.id}"), reader.statements.first.subject

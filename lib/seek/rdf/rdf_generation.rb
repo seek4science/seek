@@ -44,13 +44,15 @@ module Seek
         csv = spreadsheet_to_csv open(path_to_template)
         FasterCSV.parse(csv) do |row|
           unless row[0].downcase=="class"
-            klass=row[0]
+            klass=row[0].strip
             method=row[1]
             property=row[2]
             uri_or_literal=row[3].downcase
             transform=row[4]
             if (klass=="*" || self.class.name==klass) && self.respond_to?(method)
               rdf_graph = generate_triples(self,method,property,uri_or_literal,transform,rdf_graph)
+            elsif self.class.name==klass #matched the class but the method isnt found
+              puts "WARNING: Expected to find method #{method} for class #{klass}"
             end
           end
         end

@@ -21,7 +21,6 @@ class AssayTest < ActiveSupport::TestCase
   test "to_rdf" do
     assay = Factory :assay, :organisms=>[Factory(:organism)]
     rdf = assay.to_rdf
-    puts rdf
     RDF::Reader.for(:rdfxml).new(rdf) do |reader|
       assert reader.statements.count > 1
       assert_equal RDF::URI.new("http://localhost:3000/assays/#{assay.id}"), reader.statements.first.subject
