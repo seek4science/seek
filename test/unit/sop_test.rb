@@ -26,8 +26,11 @@ class SopTest < ActiveSupport::TestCase
   end
 
   test "to_rdf" do
-    object = Factory :sop
+    object = Factory :sop, :description=>"An excellent SOP"
+    Factory :assets_creator,:asset=>object,:creator=>Factory(:person)
+
     rdf = object.to_rdf
+    puts rdf
     RDF::Reader.for(:rdfxml).new(rdf) do |reader|
       assert reader.statements.count > 1
       assert_equal RDF::URI.new("http://localhost:3000/sops/#{object.id}"), reader.statements.first.subject

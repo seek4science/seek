@@ -48,21 +48,24 @@ module Seek
             method=row[1]
             property=row[2]
             uri_or_literal=row[3].downcase
+            transform=row[4]
             if (klass=="*" || self.class.name==klass) && self.respond_to?(method)
-              rdf_graph = generate_triples(self,method,property,uri_or_literal,rdf_graph)
+              rdf_graph = generate_triples(self,method,property,uri_or_literal,transform,rdf_graph)
             end
           end
         end
         rdf_graph
       end
 
-      def generate_triples subject, method, property,uri_or_literal,rdf_graph
-        puts("Generating triple for #{subject}, #{method},#{property},#{uri_or_literal}")
+      def generate_triples subject, method, property,uri_or_literal,transformation,rdf_graph
         resource = subject.rdf_resource
-
+        transform = transformation.strip unless transformation.nil?
         items = Array(subject.send(method)) #may be an array of items or a single item
         items.each do |item|
           property_uri = eval(property)
+          if !transformation.blank?
+            item = eval(transformation)
+          end
           o = uri_or_literal.start_with?("l") ? item : item.rdf_resource
           rdf_graph << [resource,property_uri,o]
         end

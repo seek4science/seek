@@ -21,6 +21,7 @@ class PersonTest < ActiveSupport::TestCase
   #checks the updated_at doesn't get artificially changed between created and reloading
   def test_updated_at
     person = Factory(:person, :updated_at=>1.week.ago)
+
     updated_at = person.updated_at
     person = Person.find(person.id)
     assert_equal updated_at.to_s,person.updated_at.to_s
@@ -28,7 +29,16 @@ class PersonTest < ActiveSupport::TestCase
 
   test "to_rdf" do
     object = Factory :person
+    Factory(:study,:contributor=>object)
+    Factory(:investigation,:contributor=>object)
+    Factory(:assay,:contributor=>object)
+    Factory(:assay,:contributor=>object)
+    Factory(:assets_creator,:creator=>object)
+    Factory(:assets_creator,:asset=>Factory(:sop),:creator=>object)
+
+    object.reload
     rdf = object.to_rdf
+    puts rdf
     RDF::Reader.for(:rdfxml).new(rdf) do |reader|
       assert reader.statements.count > 1
       assert_equal RDF::URI.new("http://localhost:3000/people/#{object.id}"), reader.statements.first.subject

@@ -59,8 +59,10 @@ class Person < ActiveRecord::Base
 
   has_many :work_groups, :through=>:group_memberships, :before_add => proc {|person, wg| person.project_subscriptions.build :project => wg.project unless person.project_subscriptions.detect {|ps| ps.project == wg.project}},
   :before_remove => proc {|person, wg| person.project_subscriptions.delete(person.project_subscriptions.detect {|ps| ps.project == wg.project})}
-  has_many :studies, :foreign_key => :person_responsible_id
+  has_many :studies, :foreign_key => :contributor_id
   has_many :assays,:foreign_key => :owner_id
+  has_many :investigations,:foreign_key=>:contributor_id
+
 
   has_one :user, :dependent=>:destroy
 

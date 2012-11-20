@@ -33,6 +33,7 @@ class RightFieldTest < ActiveSupport::TestCase
     df=Factory :rightfield_annotated_datafile
     rdf = df.to_rdf
     assert_not_nil rdf
+    puts rdf
     #just checks it is valid rdf/xml and contains some statements for now
     RDF::Reader.for(:rdfxml).new(rdf) do |reader|
       assert reader.statements.count > 0
