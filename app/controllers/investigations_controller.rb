@@ -31,6 +31,7 @@ class InvestigationsController < ApplicationController
     respond_to do |format|
       format.html
       format.xml
+      format.rdf { render :template=>'rdf/show' }
       format.svg { render :text=>to_svg(@investigation,params[:deep]=='true')}
       format.dot { render :text=>to_dot(@investigation,params[:deep]=='true')}
       format.png { render :text=>to_png(@investigation,params[:deep]=='true')}
