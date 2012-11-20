@@ -146,4 +146,17 @@ class EventsControllerTest < ActionController::TestCase
     assert_redirected_to e
     assert_equal 1, e.data_files.count
   end
+
+  test "should create and show event without end_date" do
+    assert_difference('Event.count', 1) do
+      post :create, :event => {:title => "Barn Raising", :start_date => DateTime.now}
+    end
+    assert_redirected_to assigns(:event)
+
+    get :show, :id => assigns(:event).id
+    assert_response :success
+
+    get :index
+    assert_response :success
+  end
 end

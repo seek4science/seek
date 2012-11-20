@@ -111,7 +111,7 @@ GEM
     rubaidh-google_analytics (1.1.4)
       actionpack
       activesupport
-    ruby-openid (2.2.0)
+    ruby-openid (2.2.2)
     ruby-prof (0.11.2)
     ruby18_source_location (0.2)
     rubyzip2 (2.0.2)
