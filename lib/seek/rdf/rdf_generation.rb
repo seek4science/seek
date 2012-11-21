@@ -4,7 +4,6 @@ module Seek
   module Rdf
     module RdfGeneration
       include RightField
-      include SysMODB::SpreadsheetExtractor
 
       def to_rdf
         rdf_graph = to_rdf_graph
