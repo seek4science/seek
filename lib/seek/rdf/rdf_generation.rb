@@ -1,4 +1,3 @@
-require 'simple-spreadsheet-extractor'
 require 'fastercsv'
 
 module Seek
