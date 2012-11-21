@@ -19,7 +19,7 @@ module Seek
       def to_rdf_graph
         rdf_graph = handle_rightfield_contents self
         rdf_graph = describe_type(rdf_graph)
-        rdf_graph = generate_from_xls_template rdf_graph
+        rdf_graph = generate_from_csv_definitions rdf_graph
         rdf_graph
       end
 
@@ -38,11 +38,11 @@ module Seek
 
       private
 
-      def generate_from_xls_template rdf_graph
+      def generate_from_csv_definitions rdf_graph
         #load template
-        path_to_template=File.join(File.dirname(__FILE__), "core_rdf_template.xls")
-        csv = spreadsheet_to_csv open(path_to_template)
-        FasterCSV.parse(csv) do |row|
+        path_to_template=File.join(File.dirname(__FILE__), "rdf_definitions.csv")
+        #csv = spreadsheet_to_csv open(path_to_template)
+        FasterCSV.read(path_to_template).each do |row|
           unless row[0].downcase=="class"
             klass=row[0].strip
             method=row[1]
