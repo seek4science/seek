@@ -12,7 +12,6 @@ class UtilTest < ActiveSupport::TestCase
 
   test "rdf capable types" do
     types = Seek::Util.rdf_capable_types
-    puts types
     assert types.include?(DataFile)
     assert !types.include?(Policy)
   end
