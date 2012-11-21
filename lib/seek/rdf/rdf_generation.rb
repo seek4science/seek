@@ -39,16 +39,19 @@ module Seek
       def generate_from_csv_definitions rdf_graph
         #load template
         path_to_template=File.join(File.dirname(__FILE__), "rdf_definitions.csv")
-        #csv = spreadsheet_to_csv open(path_to_template)
-        FasterCSV.read(path_to_template).each do |row|
+        rows = Rails.cache.fetch("rdf_definitions",:expires_in=>1.hour) do
+          FasterCSV.read(path_to_template)
+        end
+        rows.each do |row|
           unless row[0].downcase=="class"
             klass=row[0].strip
             method=row[1]
             property=row[2]
             uri_or_literal=row[3].downcase
             transform=row[4]
+            collection_transform=row[5]
             if (klass=="*" || self.class.name==klass) && self.respond_to?(method)
-              rdf_graph = generate_triples(self,method,property,uri_or_literal,transform,rdf_graph)
+              rdf_graph = generate_triples(self,method,property,uri_or_literal,transform,collection_transform,rdf_graph)
             elsif self.class.name==klass #matched the class but the method isnt found
               puts "WARNING: Expected to find method #{method} for class #{klass}"
             end
@@ -57,11 +60,15 @@ module Seek
         rdf_graph
       end
 
-      def generate_triples subject, method, property,uri_or_literal,transformation,rdf_graph
+      def generate_triples subject, method, property,uri_or_literal,transformation,collection_transform,rdf_graph
         resource = subject.rdf_resource
         transform = transformation.strip unless transformation.nil?
+        collection_transform = collection_transform.strip unless collection_transform.nil?
         items = subject.send(method)
         items = [items] unless items.kind_of?(Array) #may be an array of items or a single item. Cant use Array(item) here cos it screws up timezones and strips out nils
+        unless collection_transform.blank?
+          items = eval("items.#{collection_transform}")
+        end
         items.each do |item|
           property_uri = eval(property)
           if !transformation.blank?
@@ -94,7 +101,7 @@ module Seek
       def ns_prefixes
         {
             "jerm"=>JERMVocab.to_uri.to_s,
-            "dc"=>RDF::DC.to_uri.to_s,
+            "dcterms"=>RDF::DC.to_uri.to_s,
             "owl"=>RDF::OWL.to_uri.to_s,
             "foaf"=>RDF::FOAF.to_uri.to_s,
             "sioc"=>RDF::SIOC.to_uri.to_s

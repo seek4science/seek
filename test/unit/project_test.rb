@@ -25,6 +25,7 @@ class ProjectTest < ActiveSupport::TestCase
     Factory :data_file,:projects=>[object]
     Factory :model,:projects=>[object]
     Factory :sop,:projects=>[object]
+    Factory :presentation, :projects=>[object]
     i = Factory :investigation, :projects=>[object]
     s = Factory :study, :investigation=>i
     Factory :assay, :study=>s
