@@ -56,6 +56,14 @@ module Seek
 
     end
 
+    def self.rdf_capable_types
+      @@rdf_capable_types ||= begin
+        persistent_classes.select do |c|
+          c.included_modules.include?(Seek::Rdf::RdfGeneration)
+        end
+      end
+    end
+
     def self.breadcrumb_types
       @@breadcrumb_types ||= begin
         persistent_classes.select do |c|
