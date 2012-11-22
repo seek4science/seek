@@ -21,7 +21,7 @@
       <%= render :partial => "assets/resource_listing_tabbed_by_class",
                    :locals => {:resource_hash => resource_hash,
                                :narrow_view => true,
-                               :authorization_already_done => false, :limit => 20} -%>
+                               :authorization_already_done => false, :limit => 5} -%>
     </div>
     <% scale_titles = Scale.all.map(&:title)
        scale_titles = ['all'] + scale_titles
