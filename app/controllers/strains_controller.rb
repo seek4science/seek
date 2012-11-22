@@ -31,6 +31,13 @@ class StrainsController < ApplicationController
     end
   end
 
+  def show
+    respond_to do |format|
+      format.rdf { render :template=>'rdf/show'}
+      format.xml
+    end
+  end
+
   def update
     update_annotations @strain
     if params[:sharing]

@@ -2,12 +2,17 @@ require 'grouped_pagination'
 require 'acts_as_authorized'
 
 class Strain < ActiveRecord::Base
+  include Seek::Rdf::RdfGeneration
+
   belongs_to :organism
   has_many :genotypes, :dependent =>  :nullify
   has_many :phenotypes, :dependent =>  :nullify
   accepts_nested_attributes_for :genotypes,:allow_destroy=>true
   accepts_nested_attributes_for :phenotypes,:allow_destroy=>true
   has_many :specimens
+
+  has_many :assay_organisms
+  has_many :assays,:through=>:assay_organisms
 
   before_destroy :destroy_genotypes_phenotypes
   named_scope :by_title
@@ -51,6 +56,14 @@ class Strain < ActiveRecord::Base
 
   def is_default?
     title=="default" && is_dummy==true
+  end
+
+  def ncbi_uri
+    unless organism.bioportal_concept.nil? || organism.bioportal_concept.concept_uri.blank?
+      "http://purl.obolibrary.org/obo/"+organism.bioportal_concept.concept_uri.gsub(":","_")
+    else
+      nil
+    end
   end
 
   def is_default?

@@ -13,6 +13,7 @@ Assay,assay_type,JERMVocab.hasType,u,item.term_uri,select{|item| !item.nil? && !
 Assay,organisms,JERMVocab.investigates,u,,
 Assay,projects,JERMVocab.itemProducedBy,u,,
 Assay,study,JERMVocab.isPartOf,u,,
+Assay,strains,JERMVocab.investigates,u,,
 Assay,technology_type,JERMVocab.hasType,u,item.term_uri,select{|item| !item.nil? && !item.term_uri.blank?}
 DataFile,assays,JERMVocab.isPartOf,u,,
 DataFile,projects,JERMVocab.itemProducedBy,u,,
@@ -46,3 +47,6 @@ Study,investigation,JERMVocab.isPartOf,u,,
 Study,projects,JERMVocab.itemProducedBy,u,,
 Organism,assays,JERMVocab.is_investigated_by,u,,
 Organism,ncbi_uri,JERMVocab.NCBI_ID,u,,compact
+Strain,ncbi_uri,JERMVocab.NCBI_ID,u,,compact
+Strain,assays,JERMVocab.is_investigated_by,u,,
+Strain,provider_id,JERMVocab.External_supplier_id,l,,

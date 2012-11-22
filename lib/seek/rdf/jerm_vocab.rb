@@ -10,7 +10,8 @@ module Seek
                 Project=>"Project",
                 Study=>"Study",
                 Investigation=>"Investigation",
-                Publication=>"Publication"}
+                Publication=>"Publication",
+                Strain=>"strain"}
 
       property :Data
       property :hasPart

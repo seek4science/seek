@@ -5,13 +5,14 @@ class StrainsControllerTest < ActionController::TestCase
 
   include AuthenticatedTestHelper
   include RestTestCases
+  include RdfTestCases
 
   def setup
     login_as :owner_of_fully_public_policy
   end
 
   def rest_api_test_object
-    @object = Factory(:strain)
+    @object = Factory(:strain, :organism=>Factory(:organism, :bioportal_concept=>Factory(:bioportal_concept)))
   end
 
   test "should get index" do
