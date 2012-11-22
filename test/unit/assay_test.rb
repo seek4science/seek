@@ -1,4 +1,5 @@
 require 'test_helper'
+require 'tmpdir'
 
 class AssayTest < ActiveSupport::TestCase
   fixtures :all
@@ -16,6 +17,21 @@ class AssayTest < ActiveSupport::TestCase
     assert_equal 2,assay.sops.size
     assert assay.sops.include?(sops(:my_first_sop).versions.first)
     assert assay.sops.include?(sops(:sop_with_fully_public_policy).versions.first)
+  end
+
+  test "save rdf" do
+    assay = Factory(:assay,:uuid=>UUIDTools::UUID.random_create.to_s)
+    tmpdir= File.join(Dir.tmpdir,"seek-rdf-tests")
+    assay.save_rdf tmpdir
+    expected_rdf_file = File.join(tmpdir,"#{assay.uuid}.rdf")
+    assert File.exists?(expected_rdf_file)
+    rdf=""
+    open(expected_rdf_file) do |f|
+      rdf = f.read
+    end
+    assert_equal assay.to_rdf,rdf
+    FileUtils.rm expected_rdf_file
+    assert !File.exists?(expected_rdf_file)
   end
 
   test "to_rdf" do

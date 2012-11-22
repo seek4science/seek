@@ -34,6 +34,21 @@ module Seek
         RDF::Resource.new(uri)
       end
 
+      def save_rdf dir=File.join(Rails.root, "tmp", "rdf")
+        if !File.exists?(dir)
+          FileUtils.mkdir_p(dir)
+        end
+        rdf = self.to_rdf
+        uuid = self.respond_to?(:uuid) ? self.uuid : UUIDTools::UUID.random_create.to_s
+        filename="#{uuid}.rdf"
+        path = File.join(dir,filename)
+        File.open(path,"w") do |f|
+          f.write(rdf)
+          f.flush
+        end
+        path
+      end
+
       private
 
       def generate_from_csv_definitions rdf_graph
