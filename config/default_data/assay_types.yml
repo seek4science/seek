@@ -2,153 +2,197 @@
 assay types:
   title: assay types
   children: experimental_assay_type, modelling_analysis_type
+  term_uri: http://www.mygrid.org.uk/ontology/JERMOntology#AssayType
 
 experimental_assay_type:
   title: experimental assay type
   children: genomics,metabolomics,proteomics,single_cell,transcriptomics, fluxomics
+  term_uri: http://www.mygrid.org.uk/ontology/JERMOntology#ExperimentalAssayType
 
 fluxomics:
   title: fluxomics
+  term_uri: http://www.mygrid.org.uk/ontology/JERMOntology#fluxomics
 
 genomics:
   title: genomics
-  children: comparative_genomics,DNA_sequencing,genotyping,primer_design,SNP_detection  
+  children: comparative_genomics,DNA_sequencing,genotyping,primer_design,SNP_detection
+  term_uri: http://www.mygrid.org.uk/ontology/JERMOntology#genomics
 
 comparative_genomics:
   title: comparative genomics
+  term_uri: http://www.mygrid.org.uk/ontology/JERMOntology#comparative genomics
 
 DNA_sequencing:
   title: DNA sequencing
+  term_uri: http://www.mygrid.org.uk/ontology/JERMOntology#DNA_sequencing
 
 genotyping:
   title: genotyping
+  term_uri: http://www.mygrid.org.uk/ontology/JERMOntology#genotyping
 
 primer_design:
   title: primer design
+  term_uri: http://www.mygrid.org.uk/ontology/JERMOntology#primer_design
 
 SNP_detection:
   title: SNP detection
+  term_uri: http://www.mygrid.org.uk/ontology/JERMOntology#SNP_detection
 
 #---------------------------
 metabolomics:
   title: metabolomics
   children: cell_growth_optimisation,metabolite_profiling,metabonomics
+  term_uri: http://www.mygrid.org.uk/ontology/JERMOntology#metabolomics
 
 cell_growth_optimisation:
   title: cell growth optimisation
+  term_uri: http://www.mygrid.org.uk/ontology/JERMOntology#cell_growth_optimisation
 
 metabolite_profiling:
   title: metabolite profiling
   children: catabolic_response,glucose_pulse, flux_balance_analysis
+  term_uri: http://www.mygrid.org.uk/ontology/JERMOntology#metabolite_profiling
 
 flux_balance_analysis:
   title: flux balance analysis
+  term_uri: http://www.mygrid.org.uk/ontology/JERMOntology#flux_balance_analysis
 
 catabolic_response:
   title: catabolic response
+  term_uri: http://www.mygrid.org.uk/ontology/JERMOntology#catabolic_response
 
 glucose_pulse:
   title: glucose pulse
+  term_uri: http://www.mygrid.org.uk/ontology/JERMOntology#glucose_pulse
 
 metabonomics:
   title: metabonomics
+  term_uri: http://www.mygrid.org.uk/ontology/JERMOntology#metabonomics
 
 #-------------------------------
 
 proteomics:
   title: proteomics
   children: immune_precipitation,post-translational_modification,protein-protein_interaction,protein_expression_profiling,protein_identification,protein_structural_analysis
+  term_uri: http://www.mygrid.org.uk/ontology/JERMOntology#proteomics
 
 immune_precipitation:
   title: immune precipitation
+  term_uri: http://www.mygrid.org.uk/ontology/JERMOntology#immune_precipitation
 
 post-translational_modification:
   title: post-translational modification
+  term_uri: http://www.mygrid.org.uk/ontology/JERMOntology#post-translational_modification
 
 protein-protein_interaction:
   title: protein-protein interaction
+  term_uri: http://www.mygrid.org.uk/ontology/JERMOntology#protein-protein_interaction
 
 protein_expression_profiling:
   title: protein expression profiling
+  term_uri: http://www.mygrid.org.uk/ontology/JERMOntology#protein_expression_profiling
 
 protein_identification:
   title: protein identification
   children: protein_purification
+  term_uri: http://www.mygrid.org.uk/ontology/JERMOntology#protein_identification
 
 protein_purification:
   title: protein purification
+  term_uri: http://www.mygrid.org.uk/ontology/JERMOntology#protein_purification
 
 protein_structural_analysis:
   title: protein structural analysis
+  term_uri: http://www.mygrid.org.uk/ontology/JERMOntology#protein_structural_analysis
 
 #----------------------------------
 
 single_cell:
   title: single cell
-  children: FRAP
+  term_uri: http://www.mygrid.org.uk/ontology/JERMOntology#single_cell
 
 #-----------------------------------
 
 transcriptomics:
   title: transcriptomics
   children: Comparative_genomic_hybridization,gene_expression_profiling,methylation_profiling,microRNA_profiling,RNAi,tiling_path
+  term_uri: http://www.mygrid.org.uk/ontology/JERMOntology#transcriptomics
 
 Comparative_genomic_hybridization:
   title: Comparative genomic hybridization
+  term_uri: http://www.mygrid.org.uk/ontology/JERMOntology#Comparative_genomic_hybridization
 
 gene_expression_profiling:
   title: gene expression profiling
   children: cDNA_microarray,transcriptional_profiling,translational_profiling
+  term_uri: http://www.mygrid.org.uk/ontology/JERMOntology#gene_expression_profiling
 
-cDNA_microarray:
-  title: cDNA microarray
+#cDNA_microarray:
+#  title: cDNA microarray
+#  term_uri: http://www.mygrid.org.uk/ontology/JERMOntology#
 
 transcriptional_profiling:
   title: transcriptional profiling
+  term_uri: http://www.mygrid.org.uk/ontology/JERMOntology#transcriptional_profiling
 
 translational_profiling:
   title: translational profiling
+  term_uri: http://www.mygrid.org.uk/ontology/JERMOntology#translational_profiling
 
 methylation_profiling:
   title: methylation profiling
+  term_uri: http://www.mygrid.org.uk/ontology/JERMOntology#methylation_profiling
 
 microRNA_profiling:
   title: microRNA profiling
+  term_uri: http://www.mygrid.org.uk/ontology/JERMOntology#microRNA_profiling
 
 RNAi:
   title: RNAi
+  term_uri: http://www.mygrid.org.uk/ontology/JERMOntology#RNAi
 
 tiling_path:
   title: tiling path
+  term_uri: http://www.mygrid.org.uk/ontology/JERMOntology#tiling_path
 
 
 modelling_analysis_type:
   title: modelling analysis type
-  children: cell_cycle,enzymology,gene_expression,gene_regulatory_network,metabolic_network,metabolism,signal_transduction,translation, protein_interations
+  children: cell_cycle,enzymology,gene_expression,gene_regulatory_network,metabolic_network,metabolism,signal_transduction,translation
+  term_uri: http://www.mygrid.org.uk/ontology/JERMOntology#ModelAnalysisType
 
 cell_cycle:
   title: cell cycle
+  term_uri: http://www.mygrid.org.uk/ontology/JERMOntology#cell_cycle
 
 enzymology:
   title: enzymology
+  term_uri: http://www.mygrid.org.uk/ontology/JERMOntology#enzymology
 
 gene_expression:
   title: gene expression
+  term_uri: http://www.mygrid.org.uk/ontology/JERMOntology#gene_expression
 
 gene_regulatory_network:
   title: gene regulatory network
+  term_uri: http://www.mygrid.org.uk/ontology/JERMOntology#gene_regulatory_network
 
 metabolic_network:
   title: metabolic network
+  term_uri: http://www.mygrid.org.uk/ontology/JERMOntology#metabolic_network
 
 metabolism:
   title: metabolism
+  term_uri: http://www.mygrid.org.uk/ontology/JERMOntology#metabolism
 
 signal_transduction:
   title: signal transduction
+  term_uri: http://www.mygrid.org.uk/ontology/JERMOntology#signal_transduction
 
 translation:
   title: translation
+  term_uri: http://www.mygrid.org.uk/ontology/JERMOntology#translation
 
-protein_interations:
-  title: protein interactions
+#protein_interations:
+#  title: protein interactions
+#  term_uri: http://www.mygrid.org.uk/ontology/JERMOntology#

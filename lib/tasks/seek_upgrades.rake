@@ -9,8 +9,8 @@ namespace :seek do
   task :upgrade_version_tasks=>[
             :environment,
             :reindex_things,
-            :reordering_authors_for_existing_publications,
-            :cleanup_asset_versions_projects_duplication
+            :add_term_uris_to_assay_types,
+            :add_term_uris_to_technology_types
   ]
 
   desc("upgrades SEEK from the last released version to the latest released version")
@@ -31,6 +31,56 @@ namespace :seek do
     puts "Upgrade completed successfully"
   end
 
+  desc "adds the term uri's to assay types"
+  task :add_term_uris_to_assay_types=>:environment do
+    yamlfile=File.join(Rails.root,"config","default_data","assay_types.yml")
+    yaml=YAML.load_file(yamlfile)
+    yaml.keys.each do |k|
+      title = yaml[k]["title"]
+      uri = yaml[k]["term_uri"]
+      unless uri.nil?
+        assay_type = AssayType.find_by_title(title)
+
+        unless assay_type.nil?
+              assay_type.term_uri = uri
+              assay_type.save
+        else
+          puts "No Assay Type found for #{yaml[k]} defined in defaults"
+        end
+      else
+        puts "No uri defined for assaytype #{title} so skipping adding term"
+      end
+
+    end
+    missing = AssayType.find(:all, :conditions=>{:term_uri=>nil})
+
+    puts "#{missing.size} assay types found without terms: #{missing.collect{|m| m.title}.join(", ")}"
+  end
+
+  desc "adds the term uri's to technology types"
+  task :add_term_uris_to_technology_types=>:environment do
+    yamlfile=File.join(Rails.root,"config","default_data","technology_types.yml")
+    yaml=YAML.load_file(yamlfile)
+    yaml.keys.each do |k|
+      title = yaml[k]["title"]
+      uri = yaml[k]["term_uri"]
+      unless uri.nil?
+        tech_type = TechnologyType.find_by_title(title)
+        unless tech_type.nil?
+              tech_type.term_uri = uri
+              tech_type.save
+        else
+          puts "No Technology Type found for #{yaml[k]} defined in defaults"
+        end
+      else
+        puts "No uri defined for Technology Type #{title} so skipping adding term"
+      end
+
+    end
+    missing = TechnologyType.find(:all, :conditions=>{:term_uri=>nil})
+
+    puts "#{missing.size} technology types found without terms: #{missing.collect{|m| m.title}.join(", ")}"
+  end
 
   desc "removes the older duplicate create activity logs that were added for a short period due to a bug (this only affects versions between stable releases)"
   task(:remove_duplicate_activity_creates=>:environment) do
