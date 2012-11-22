@@ -35,6 +35,7 @@ class StrainsController < ApplicationController
     respond_to do |format|
       format.rdf { render :template=>'rdf/show'}
       format.xml
+      format.html
     end
   end
 
