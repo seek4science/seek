@@ -163,10 +163,12 @@ end
 
   Factory.define(:technology_type, :class=>TechnologyType) do |f|
     f.sequence(:title) {|n| "A TechnologyType#{n}"}
+    f.sequence(:term_uri) {|n| "http://technology_types/term##{n}"}
   end
 
   Factory.define(:assay_type) do |f|
     f.sequence(:title) {|n| "An AssayType#{n}"}
+    f.sequence(:term_uri) {|n| "http://assay_types/term##{n}"}
   end
 
   #Assay

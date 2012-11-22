@@ -26,7 +26,7 @@ class SopTest < ActiveSupport::TestCase
   end
 
   test "to_rdf" do
-    object = Factory :sop, :description=>"An excellent SOP", :projects=>[Factory(:project),Factory(:project)]
+    object = Factory :sop, :description=>"An excellent SOP", :projects=>[Factory(:project),Factory(:project)], :assay_ids=>[Factory(:assay).id]
     Factory :assets_creator,:asset=>object,:creator=>Factory(:person)
 
     rdf = object.to_rdf

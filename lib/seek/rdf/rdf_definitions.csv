@@ -38,3 +38,9 @@ Project,organisms,JERMVocab.investigates,u,,
 *,updated_at,RDF::DC.modified,l,item.to_datetime,
 *,managers,RDF::SIOC.has_owner,u,,
 *,creators,RDF::SIOC.has_creator,u,,
+Assay,assay_type,JERMVocab.hasType,u,item.term_uri,select{|item| !item.nil? && !item.term_uri.blank?}
+Assay,technology_type,JERMVocab.hasType,u,item.term_uri,select{|item| !item.nil? && !item.term_uri.blank?}
+DataFile,assays,JERMVocab.isPartOf,u,,
+Model,assays,JERMVocab.isPartOf,u,,
+Sop,assays,JERMVocab.isPartOf,u,,
+Publication,related_assays,JERMVocab.isPartOf,u,,

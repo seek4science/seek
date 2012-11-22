@@ -19,12 +19,21 @@ class AssayTest < ActiveSupport::TestCase
   end
 
   test "to_rdf" do
-    assay = Factory :assay, :organisms=>[Factory(:organism)]
+    assay = Factory :assay, :organisms=>[Factory(:organism)], :assay_type=>Factory(:assay_type), :technology_type=>Factory(:technology_type)
     rdf = assay.to_rdf
+
     RDF::Reader.for(:rdfxml).new(rdf) do |reader|
       assert reader.statements.count > 1
       assert_equal RDF::URI.new("http://localhost:3000/assays/#{assay.id}"), reader.statements.first.subject
     end
+
+    #try with assay & tech type with nil term
+    assay = Factory :assay, :organisms=>[Factory(:organism)], :assay_type=>Factory(:assay_type, :term_uri=>nil), :technology_type=>Factory(:technology_type,:term_uri=>nil)
+    rdf = assay.to_rdf
+
+    #try with no assay or tech type
+    assay = Factory :assay, :technology_type=>nil
+    rdf = assay.to_rdf
   end
 
   test "is_asset?" do

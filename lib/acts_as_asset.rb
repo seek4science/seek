@@ -171,12 +171,20 @@ module Acts #:nodoc:
         project_assays
       end
 
+      def assay_types
+        assays.collect{|a| a.assay_type}
+      end
+
+      def technology_types
+        assays.collect{|a| a.technology_type}
+      end
+
       def assay_type_titles
-        assays.collect{|a| a.assay_type.try(:title)}.compact
+        assay_types.collect{|at| at.try(:title)}.compact
       end
 
       def technology_type_titles
-        assays.collect{|a| a.technology_type.try(:title)}.compact
+        technology_types.collect{|tt| tt.try(:title)}.compact
       end
 
     end

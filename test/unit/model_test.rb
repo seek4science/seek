@@ -26,7 +26,7 @@ class ModelTest < ActiveSupport::TestCase
   end
 
   test "to_rdf" do
-    object = Factory :model
+    object = Factory :model, :assay_ids=>[Factory(:assay).id]
     rdf = object.to_rdf
     RDF::Reader.for(:rdfxml).new(rdf) do |reader|
       assert reader.statements.count > 1
