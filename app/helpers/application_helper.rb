@@ -91,6 +91,14 @@ module ApplicationHelper
       results[res.class.name] = {:items => [], :hidden_count => 0} unless results[res.class.name]
       results[res.class.name][:items] << res
     end
+    results.each do |key,res|
+      unless res[:items].empty?
+        all_authorized_items = key.constantize.all_authorized_for('view')
+        total_count = res[:items].size
+        res[:items] = res[:items] & all_authorized_items
+        res[:hidden_count] = total_count - res[:items].size
+      end
+    end
 
     return results
   end
