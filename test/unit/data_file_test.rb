@@ -234,7 +234,6 @@ class DataFileTest < ActiveSupport::TestCase
     df=Factory :data_file, :assay_ids=>[Factory(:assay,:technology_type=>Factory(:technology_type)).id,Factory(:assay).id]
     rdf = df.to_rdf
     assert_not_nil rdf
-    puts rdf
     #just checks it is valid rdf/xml and contains some statements for now
     RDF::Reader.for(:rdfxml).new(rdf) do |reader|
       assert reader.statements.count > 0
