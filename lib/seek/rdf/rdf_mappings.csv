@@ -12,8 +12,8 @@ class,method,property,uri or literal,transformation,collection transformation
 Assay,assay_type,JERMVocab.hasType,u,item.term_uri,select{|item| !item.nil? && !item.term_uri.blank?}
 Assay,organisms,JERMVocab.investigates,u,,
 Assay,projects,JERMVocab.itemProducedBy,u,,
-Assay,study,JERMVocab.isPartOf,u,,
 Assay,strains,JERMVocab.investigates,u,,
+Assay,study,JERMVocab.isPartOf,u,,
 Assay,technology_type,JERMVocab.hasType,u,item.term_uri,select{|item| !item.nil? && !item.term_uri.blank?}
 DataFile,assays,JERMVocab.isPartOf,u,,
 DataFile,projects,JERMVocab.itemProducedBy,u,,
@@ -21,6 +21,8 @@ Investigation,projects,JERMVocab.itemProducedBy,u,,
 Investigation,studies,JERMVocab.hasPart,u,,
 Model,assays,JERMVocab.isPartOf,u,,
 Model,projects,JERMVocab.itemProducedBy,u,,
+Organism,assays,JERMVocab.is_investigated_by,u,,
+Organism,ncbi_uri,JERMVocab.NCBI_ID,u,,compact
 Person,assays,JERMVocab.isContributorOf,u,,
 Person,assets,JERMVocab.isCreatorOf,u,,select{|item| !item.is_a?(Presentation)}
 Person,email,RDF::FOAF.mbox,u,'mailto:'+item,
@@ -42,11 +44,9 @@ Publication,projects,JERMVocab.itemProducedBy,u,,
 Publication,related_assays,JERMVocab.isPartOf,u,,
 Sop,assays,JERMVocab.isPartOf,u,,
 Sop,projects,JERMVocab.itemProducedBy,u,,
+Strain,assays,JERMVocab.is_investigated_by,u,,
+Strain,ncbi_uri,JERMVocab.NCBI_ID,u,,compact
+Strain,provider_id,JERMVocab.External_supplier_id,l,,
 Study,assays,JERMVocab.hasPart,u,,
 Study,investigation,JERMVocab.isPartOf,u,,
 Study,projects,JERMVocab.itemProducedBy,u,,
-Organism,assays,JERMVocab.is_investigated_by,u,,
-Organism,ncbi_uri,JERMVocab.NCBI_ID,u,,compact
-Strain,ncbi_uri,JERMVocab.NCBI_ID,u,,compact
-Strain,assays,JERMVocab.is_investigated_by,u,,
-Strain,provider_id,JERMVocab.External_supplier_id,l,,
