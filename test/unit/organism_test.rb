@@ -11,10 +11,21 @@ class OrganismTest < ActiveSupport::TestCase
     assert o.assays.include?(a)
   end
 
-  test "to_rdf" do
-    object = Factory :organism
-    rdf = object.to_rdf
+  test "ncbi_uri" do
+    org = Factory(:organism,:bioportal_concept=>Factory(:bioportal_concept))
+    assert_equal "http://purl.obolibrary.org/obo/NCBITaxon_2287",org.ncbi_uri
 
+    org = Factory(:organism)
+
+    assert_nil org.ncbi_uri
+  end
+
+  test "to_rdf" do
+    object = Factory(:assay_organism).organism
+    object.bioportal_concept = Factory(:bioportal_concept)
+    object.save
+    rdf = object.to_rdf
+    puts rdf
     RDF::Reader.for(:rdfxml).new(rdf) do |reader|
       assert reader.statements.count >= 1
       assert_equal RDF::URI.new("http://localhost:3000/organisms/#{object.id}"), reader.statements.first.subject

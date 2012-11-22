@@ -234,6 +234,13 @@ end
     f.title "a culture_growth_type"
   end
 
+  #Assay organism
+  Factory.define(:assay_organism) do |f|
+    f.association :assay
+    f.association :strain
+    f.association :organism
+  end
+
   #Specimen
   Factory.define(:specimen) do |f|
     f.sequence(:title) { |n| "Specimen#{n}" }
@@ -469,6 +476,11 @@ end
 
   Factory.define(:organism) do |f|
     f.title "An Organism"
+  end
+
+  Factory.define(:bioportal_concept) do |f|
+    f.ontology_id 1132
+    f.concept_uri "NCBITaxon:2287"
   end
 
   Factory.define(:event) do |f|
@@ -753,7 +765,6 @@ end
     f.cell_range "A1:B3"
     f.association :worksheet
   end
-
 
   Factory.define :genotype do |f|
     f.association :gene, :factory => :gene

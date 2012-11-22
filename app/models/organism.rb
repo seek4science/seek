@@ -15,6 +15,14 @@ class Organism < ActiveRecord::Base
   has_and_belongs_to_many :projects
 
   validates_presence_of :title
+
+  def ncbi_uri
+    unless bioportal_concept.nil? || bioportal_concept.concept_uri.blank?
+      "http://purl.obolibrary.org/obo/"+bioportal_concept.concept_uri.gsub(":","_")
+    else
+      nil
+    end
+  end
   
   def can_delete? *args
     models.empty? && assays.empty? && projects.empty?
