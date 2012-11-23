@@ -27,6 +27,7 @@ class ModelTest < ActiveSupport::TestCase
 
   test "to_rdf" do
     object = Factory :model, :assay_ids=>[Factory(:assay).id]
+    assert object.contains_sbml?
     pub = Factory :publication
     Factory :relationship,:subject=>object,:predicate=>Relationship::RELATED_TO_PUBLICATION,:object=>pub
     object.reload

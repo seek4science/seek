@@ -18,6 +18,7 @@ module Seek
         rdf_graph = handle_rightfield_contents self
         rdf_graph = describe_type(rdf_graph)
         rdf_graph = generate_from_csv_definitions rdf_graph
+        rdf_graph = additional_triples rdf_graph
         rdf_graph
       end
 
@@ -50,6 +51,14 @@ module Seek
       end
 
       private
+
+      #extra steps that cannot be easily handled by the csv template
+      def additional_triples rdf_graph
+        if self.is_a?(Model) && self.contains_sbml?
+          rdf_graph << [self.rdf_resource,JERMVocab.hasFormat,JERMVocab.SBML_format]
+        end
+        rdf_graph
+      end
 
       def generate_from_csv_definitions rdf_graph
         #load template
