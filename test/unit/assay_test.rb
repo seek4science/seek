@@ -37,6 +37,9 @@ class AssayTest < ActiveSupport::TestCase
   test "to_rdf" do
     assay = Factory :assay, :assay_type=>Factory(:assay_type), :technology_type=>Factory(:technology_type)
     Factory :assay_organism, :assay=>assay, :organism=>Factory(:organism)
+    pub = Factory :publication
+    Factory :relationship, :subject=>assay, :predicate=>Relationship::RELATED_TO_PUBLICATION,:object=>pub
+
     assay.reload
     rdf = assay.to_rdf
     puts rdf

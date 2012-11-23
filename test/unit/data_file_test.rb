@@ -232,6 +232,9 @@ class DataFileTest < ActiveSupport::TestCase
 
   test "to rdf" do
     df=Factory :data_file, :assay_ids=>[Factory(:assay,:technology_type=>Factory(:technology_type)).id,Factory(:assay).id]
+    pub = Factory :publication
+    Factory :relationship,:subject=>df,:predicate=>Relationship::RELATED_TO_PUBLICATION,:object=>pub
+    df.reload
     rdf = df.to_rdf
     assert_not_nil rdf
     #just checks it is valid rdf/xml and contains some statements for now

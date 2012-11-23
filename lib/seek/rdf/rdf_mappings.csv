@@ -50,3 +50,7 @@ Strain,provider_id,JERMVocab.External_supplier_id,l,,
 Study,assays,JERMVocab.hasPart,u,,
 Study,investigation,JERMVocab.isPartOf,u,,
 Study,projects,JERMVocab.itemProducedBy,u,,
+Model,relationships,JERMVocab.isContstructedFrom,u,,"select{|item| item.object_type==""Publication""}.collect{|item| item.object}"
+Model,relationships,JERMVocab.isAssociatedWith,u,,"select{|item| item.object_type==""Publication""}.collect{|item| item.object}"
+DataFile,relationships,JERMVocab.isAssociatedWith,u,,"select{|item| item.object_type==""Publication""}.collect{|item| item.object}"
+Assay,relationships,JERMVocab.isAssociatedWith,u,,"select{|item| item.object_type==""Publication""}.collect{|item| item.object}"

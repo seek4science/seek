@@ -27,7 +27,11 @@ class ModelTest < ActiveSupport::TestCase
 
   test "to_rdf" do
     object = Factory :model, :assay_ids=>[Factory(:assay).id]
+    pub = Factory :publication
+    Factory :relationship,:subject=>object,:predicate=>Relationship::RELATED_TO_PUBLICATION,:object=>pub
+    object.reload
     rdf = object.to_rdf
+    puts rdf
     RDF::Reader.for(:rdfxml).new(rdf) do |reader|
       assert reader.statements.count > 1
       assert_equal RDF::URI.new("http://localhost:3000/models/#{object.id}"), reader.statements.first.subject
