@@ -2,7 +2,20 @@
 <% actions_locals ||= {} %>
 <% resource = resource_list_item %>
 <% content_partial = get_list_item_content_partial(resource) %>
-<% actions_partial = get_list_item_actions_partial(resource) %>
+<%
+   #not showing actions_partial on VL home page tabs
+   root_path = root_url.end_with?('/') ? root_url : (root_url + '/')
+   request_uri = request.headers['REQUEST_URI']
+   request_uri = request_uri.end_with?('/') ? request_uri : (request_uri + '/')
+   if !request_uri.include?(root_path)
+     request_uri = root_path.chop + request_uri
+   end
+   if request_uri == root_path
+      actions_partial = nil
+   else
+     actions_partial = get_list_item_actions_partial(resource)
+   end
+%>
 <% avatar_partial = get_list_item_avatar_partial(resource) if avatar_partial.nil?%>
 <% box_width = 75 %>
 <% box_width += 10 if actions_partial.blank? %>
