@@ -11,7 +11,9 @@ module Seek
                 Study=>"Study",
                 Investigation=>"Investigation",
                 Publication=>"Publication",
-                Strain=>"strain"}
+                Strain=>"strain",
+                Sample=>"Sample",
+                Specimen=>"specimen"}
 
       property :Data
       property :hasPart

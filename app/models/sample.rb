@@ -4,6 +4,8 @@ require 'acts_as_authorized'
 class Sample < ActiveRecord::Base
  include Subscribable
 
+  include Seek::Rdf::RdfGeneration
+
   acts_as_authorized
   acts_as_favouritable
   acts_as_uniquely_identifiable

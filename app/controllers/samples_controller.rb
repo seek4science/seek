@@ -42,6 +42,14 @@ class SamplesController < ApplicationController
 
   end
 
+  def show
+    respond_to do |format|
+      format.xml
+      format.html
+      format.rdf { render :template=>'rdf/show'}
+    end
+  end
+
   def new
     @sample = Sample.new
     @sample.parent_name = params[:parent_name]

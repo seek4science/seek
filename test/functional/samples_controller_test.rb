@@ -4,6 +4,7 @@ class SamplesControllerTest < ActionController::TestCase
   fixtures :policies
   include AuthenticatedTestHelper
   include RestTestCases
+  include RdfTestCases
 
   # Called before every test method runs. Can be used
   # to set up fixture information.
