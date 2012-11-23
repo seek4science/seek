@@ -56,3 +56,4 @@ DataFile,relationships,JERMVocab.isAssociatedWith,u,,"select{|item| item.object_
 Assay,relationships,JERMVocab.isAssociatedWith,u,,"select{|item| item.object_type==""Publication""}.collect{|item| item.object}"
 Sample,projects,JERMVocab.itemProducedBy,u,,
 Sample,assays,JERMVocab.isPartOf,u,,
+Specimen,projects,JERMVocab.itemProducedBy,u,,

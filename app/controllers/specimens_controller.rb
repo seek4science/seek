@@ -32,6 +32,14 @@ class SpecimensController < ApplicationController
     end
   end
 
+  def show
+    respond_to do |format|
+      format.xml
+      format.html
+      format.rdf { render :template=>'rdf/show'}
+    end
+  end
+
   def create
     organism_id = params[:specimen].delete(:organism_id)
     @specimen = new_specimen

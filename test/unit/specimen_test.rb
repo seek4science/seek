@@ -2,7 +2,6 @@ require "test_helper"
 
 class SpecimenTest < ActiveSupport::TestCase
 
-
   test "validation" do
 
       specimen = Factory :specimen, :title => "DonorNumber"
@@ -26,6 +25,19 @@ class SpecimenTest < ActiveSupport::TestCase
       specimen.reload
       specimen.strain = nil
       assert !specimen.valid? unless Seek::Config.is_virtualliver
+  end
+
+  test "to rdf" do
+    object = Factory :specimen, :contributor=>Factory(:person)
+
+    object.reload
+    rdf = object.to_rdf
+    puts rdf
+    RDF::Reader.for(:rdfxml).new(rdf) do |reader|
+      assert reader.statements.count > 1
+      assert_equal RDF::URI.new("http://localhost:3000/specimens/#{object.id}"), reader.statements.first.subject
+    end
+
   end
 
   test "age with unit" do

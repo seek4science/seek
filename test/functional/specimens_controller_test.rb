@@ -5,6 +5,7 @@ class SpecimensControllerTest < ActionController::TestCase
   fixtures :all
   include AuthenticatedTestHelper
   include RestTestCases
+  include RdfTestCases
 
   def setup
     login_as :owner_of_fully_public_policy
