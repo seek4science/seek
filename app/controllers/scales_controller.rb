@@ -32,14 +32,15 @@ class ScalesController < ApplicationController
       resource_hash[res.class.name] = {:items => [], :hidden_count => 0} unless resource_hash[res.class.name]
       resource_hash[res.class.name][:items] << res
     end
-     resource_hash.each_value do |res|
-        unless res[:items].empty?
+
+    resource_hash.each do |key,res|
+      unless res[:items].empty?
+        all_authorized_items = key.constantize.all_authorized_for('view')
         total_count = res[:items].size
-        res[:items] = res[:items].select &:can_view?
+        res[:items] = res[:items] & all_authorized_items
         res[:hidden_count] = total_count - res[:items].size
       end
-     end
-
+    end
 
     render :update do |page|
       scale_title = @scale.try(:title) || 'all'
