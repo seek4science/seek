@@ -100,9 +100,11 @@ module FancyMultiselectHelper
 
       if reflection = options[:object_class].reflect_on_association(association)
         required_access = reflection.options[:required_access] || :can_view?
+        #get 'view' from :can_view?
+        access = required_access.to_s.split('_').last.gsub('?','')
         association_class = options.delete(:association_class) || reflection.klass
-        options[:project_possibilities] = authorised_assets(association_class, current_user.person.projects) if options[:other_projects_checkbox]
-        options[:possibilities] = association_class.all.select(&required_access.to_sym) unless options[:possibilities]
+        options[:project_possibilities] = authorised_assets(association_class, current_user.person.projects, access) if options[:other_projects_checkbox]
+        options[:possibilities] = authorised_assets(association_class, nil, access) unless options[:possibilities]
       end
 
       super object, association, options

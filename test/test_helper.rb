@@ -49,6 +49,13 @@ Kernel.class_eval do
     Seek::Config.is_virtualliver=vl
   end
 
+  def as_not_virtualliver
+    vl = Seek::Config.is_virtualliver
+    Seek::Config.is_virtualliver=false
+    yield
+    Seek::Config.is_virtualliver=vl
+  end
+
   def with_auth_lookup_enabled
     val = Seek::Config.auth_lookup_enabled
     Seek::Config.auth_lookup_enabled=true

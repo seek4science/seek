@@ -28,7 +28,11 @@ class ProjectSubscriptionTest < ActiveSupport::TestCase
   test 'subscribers to a project auto subscribe to new items in the project' do
     ps = current_person.project_subscriptions.create :project => @proj
     ProjectSubscriptionJob.new(ps.id).perform
-    assert Factory(:subscribable, :projects => [Factory(:project),@proj]).subscribed?
+    s = Factory(:subscribable, :projects => [Factory(:project),@proj])
+    assert SetSubscriptionsForItemJob.exists?(s.class.name, s.id, s.projects.collect(&:id))
+    SetSubscriptionsForItemJob.new(s.class.name, s.id, s.projects.collect(&:id)).perform
+
+    assert s.subscribed?
   end
 
   test 'individual subscription frequency set by project subscription frequency' do

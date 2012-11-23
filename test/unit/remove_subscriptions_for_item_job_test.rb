@@ -4,17 +4,13 @@ class RemoveSubscriptionsForItemJobTest < ActiveSupport::TestCase
   fixtures :all
 
   def setup
-    Delayed::Job.destroy_all
-  end
-
-  def teardown
-    Delayed::Job.destroy_all
+    User.current_user = Factory(:user)
   end
 
   test "exists" do
     subscribable = Factory(:subscribable)
     project_ids = subscribable.projects.collect(&:id)
-
+    Delayed::Job.destroy_all
     assert !RemoveSubscriptionsForItemJob.exists?(subscribable.class.name, subscribable.id, project_ids)
     assert_difference("Delayed::Job.count",1) do
       Delayed::Job.enqueue RemoveSubscriptionsForItemJob.new(subscribable.class.name, subscribable.id, project_ids)
@@ -56,18 +52,25 @@ class RemoveSubscriptionsForItemJobTest < ActiveSupport::TestCase
     Delayed::Job.destroy_all
     person1 = Factory(:person)
     person2 = Factory(:person)
-    subscribable = Factory(:study)
-    project_subscription1 = ProjectSubscription.create(:person_id => person1.id, :project_id => subscribable.projects.first.id, :frequency => 'immediately')
-    project_subscription2 = ProjectSubscription.create(:person_id => person2.id, :project_id => subscribable.projects.first.id, :frequency => 'immediately')
-    ProjectSubscriptionJob.new(project_subscription1.id).perform
-    ProjectSubscriptionJob.new(project_subscription2.id).perform
+    subscribable = Factory(:data_file, :policy => Factory(:public_policy))
+    assert_equal 1, subscribable.projects.count
+    project = subscribable.projects.first
+    project_subscription1 = person1.project_subscriptions.create :project => project, :frequency => 'weekly'
+    project_subscription2 = person2.project_subscriptions.create :project => project, :frequency => 'weekly'
+
     SetSubscriptionsForItemJob.new(subscribable.class.name, subscribable.id, subscribable.projects.collect(&:id)).perform
 
     assert subscribable.subscribed? person1
     assert subscribable.subscribed? person2
 
+    #when subscribable changes the projects, RemoveSubscriptionsForItemJob is also created
+    subscribable.projects = [Factory(:project)]
+    subscribable.save
+    assert RemoveSubscriptionsForItemJob.exists?(subscribable.class.name, subscribable.id, [project.id])
+
     #now remove subscriptions
-    RemoveSubscriptionsForItemJob.new(subscribable.class.name, subscribable.id, subscribable.projects.collect(&:id)).perform
+    RemoveSubscriptionsForItemJob.new(subscribable.class.name, subscribable.id, [project.id]).perform
+    subscribable.reload
     assert !subscribable.subscribed?(person1)
     assert !subscribable.subscribed?(person2)
   end
