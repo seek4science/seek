@@ -44,8 +44,8 @@ class SamplesController < ApplicationController
 
   def show
     respond_to do |format|
-      format.xml
       format.html
+      format.xml
       format.rdf { render :template=>'rdf/show'}
     end
   end
