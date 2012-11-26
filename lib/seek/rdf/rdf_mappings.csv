@@ -57,3 +57,8 @@ Assay,relationships,JERMVocab.isAssociatedWith,u,,"select{|item| item.object_typ
 Sample,projects,JERMVocab.itemProducedBy,u,,
 Sample,assays,JERMVocab.isPartOf,u,,
 Specimen,projects,JERMVocab.itemProducedBy,u,,
+Sample,provider_id,JERMVocab.External_supplier_ID,l,,
+Sample,lab_internal_number,JERMVocab.Lab_internal_ID,l,,
+Sample,sampling_date,JERMVocab.sampling_date,l,item.to_datetime,
+Sample,donation_date,JERMVocab.donation_date,l,item.to_datetime,
+Sample,specimen,JERMVocab.isPartOf,u,,

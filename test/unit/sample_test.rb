@@ -35,7 +35,8 @@ class SampleTest < ActiveSupport::TestCase
   end
 
   test "to rdf" do
-    object = Factory :sample, :contributor=>Factory(:person),:assay_ids=>[Factory(:assay).id]
+    object = Factory :sample, :contributor=>Factory(:person),:assay_ids=>[Factory(:assay).id], :provider_id=>"r2d2",
+                     :sampling_date=>1.day.ago, :donation_date=>2.days.ago, :specimen=>Factory(:specimen)
 
     object.reload
     rdf = object.to_rdf
