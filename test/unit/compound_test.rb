@@ -9,8 +9,8 @@ class CompoundTest < ActiveSupport::TestCase
 
   test "to rdf" do
     compound = Factory :compound
-    mapping1 = Mapping.new(:sabiork_id => 1, :chebi_id => 'CHEBI:1000', :kegg_id => 'C2000')
-    mapping2 = Mapping.new(:sabiork_id => 2, :chebi_id => 'CHEBI:1001', :kegg_id => 'C2001')
+    mapping1 = Mapping.new(:sabiork_id => 1, :chebi_id => '1000', :kegg_id => 'C2000')
+    mapping2 = Mapping.new(:sabiork_id => 2, :chebi_id => '1001', :kegg_id => 'C2001')
     mapping_link1 = MappingLink.new(:substance => compound, :mapping => mapping1)
     mapping_link2 = MappingLink.new(:substance => compound, :mapping => mapping2)
     compound.mapping_links = [mapping_link1, mapping_link2]
