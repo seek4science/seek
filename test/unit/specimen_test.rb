@@ -28,7 +28,8 @@ class SpecimenTest < ActiveSupport::TestCase
   end
 
   test "to rdf" do
-    object = Factory :specimen, :contributor=>Factory(:person)
+    object = Factory :specimen, :contributor=>Factory(:person), :lab_internal_number=>"Asda",:sample_ids=>[Factory(:sample).id],
+                     :strain=>Factory(:strain),:comments=>"blah blah",:culture_growth_type=>Factory(:culture_growth_type)
 
     object.reload
     rdf = object.to_rdf
