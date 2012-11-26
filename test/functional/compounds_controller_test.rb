@@ -5,9 +5,14 @@ class CompoundsControllerTest < ActionController::TestCase
   fixtures :all
 
   include AuthenticatedTestHelper
+  include RdfTestCases
 
   def setup
     login_as(:quentin)
+  end
+
+  def rest_api_test_object
+    @object=Factory(:compound)
   end
 
 

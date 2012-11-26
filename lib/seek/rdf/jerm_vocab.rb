@@ -13,7 +13,8 @@ module Seek
                 Publication=>"Publication",
                 Strain=>"strain",
                 Sample=>"Sample",
-                Specimen=>"specimen"}
+                Specimen=>"specimen",
+                Compound=>"compound"}
 
       property :Data
       property :hasPart

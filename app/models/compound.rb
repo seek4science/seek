@@ -1,16 +1,23 @@
 class Compound < ActiveRecord::Base
+  include Seek::Rdf::RdfGeneration
   has_many :studied_factor_links, :as => :substance
   has_many :experimental_condition_links,:as => :substance
   has_many :synonyms, :as => :substance
   has_many :mapping_links, :as => :substance
+  has_many :mappings, :through=>:mapping_links
+
 
   alias_attribute :title,:name
 
   validates_presence_of :name
   validates_uniqueness_of :name
-  
-  def mappings
-    mapping_links.collect{|ml| ml.mapping}
+
+  def chebi_ids
+    mappings.collect{|m| m.chebi_id}.compact
+  end
+
+  def sabiork_ids
+    mappings.collect{|m| m.sabiork_id}.compact
   end
 
   def studied_factors
