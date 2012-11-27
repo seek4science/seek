@@ -40,9 +40,9 @@ class PersonTest < ActiveSupport::TestCase
     disable_authorization_checks do
       object.save!
     end
-
     object.reload
     rdf = object.to_rdf
+    puts rdf
 
     RDF::Reader.for(:rdfxml).new(rdf) do |reader|
       assert reader.statements.count > 1
