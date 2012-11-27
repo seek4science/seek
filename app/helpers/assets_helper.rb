@@ -149,15 +149,27 @@ module AssetsHelper
     end
 
     #Authorize
-    related.each_value do |resource_hash|
-      resource_hash[:items].compact!
-      unless resource_hash[:items].empty?
-        total_count = resource_hash[:items].size
-        resource_hash[:hidden_items] = resource_hash[:items] -  resource_hash[:items].select(&:can_view?)
-        resource_hash[:items] = resource_hash[:items].select &:can_view?
-        resource_hash[:hidden_count] = total_count - resource_hash[:items].size
+    related.each do |key, res|
+      unless res[:items].empty?
+        if key == 'Project' || key == 'Institution'
+          total_count = res[:items].size
+          res[:hidden_count] = 0
+        elsif key == 'Person'
+          total_count = res[:items].size
+          if Seek::Config.is_virtualliver && current_user.nil?
+            res[:items] = []
+            res[:hidden_count] = total_count
+          else
+            res[:hidden_count] = 0
+          end
+        else
+          all_authorized_items = key.constantize.all_authorized_for('view')
+          total_count = res[:items].size
+          res[:items] = res[:items] & all_authorized_items
+          res[:hidden_count] = total_count - res[:items].size
+        end
       end
-    end    
+    end
     
     #Limit items viewable, and put the excess count in extra_count
     related.each_key do |key|
