@@ -39,8 +39,9 @@ class AssayTest < ActiveSupport::TestCase
     Factory :assay_organism, :assay=>assay, :organism=>Factory(:organism)
     pub = Factory :publication
     Factory :relationship, :subject=>assay, :predicate=>Relationship::RELATED_TO_PUBLICATION,:object=>pub
-
+    Factory :assay_asset, :assay=>assay
     assay.reload
+    assert_equal 1,assay.assets.size
     rdf = assay.to_rdf
     puts rdf
     RDF::Reader.for(:rdfxml).new(rdf) do |reader|

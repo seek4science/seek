@@ -207,6 +207,11 @@ end
 
     Factory.define(:assay, :parent => :modelling_assay) {}
 
+  Factory.define :assay_asset do |f|
+    f.association :assay
+    f.association :asset,:factory=>:data_file
+  end
+
   #Study
   Factory.define(:study) do |f|
     f.sequence(:title) { |n| "Study#{n}" }
