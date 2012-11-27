@@ -1,5 +1,6 @@
 <% authorization_for_showing_already_done ||= false -%>
 <% narrow_view ||= false -%>
+<% actions_partial_disable ||= false %>
 
 <% unless collection.empty? -%>
   <div class="list_items_container" id="<%=collection.first.class.name%>_list_items_container">
@@ -9,7 +10,7 @@
                 <% if item.respond_to?(:is_external_search_result?) -%>
                     <%= render :partial=> "external_search/external_resource_list_item",:object=>item -%>
                 <% else -%>
-				    <%= render :partial => "assets/resource_list_item",:object=>item -%>
+				    <%= render :partial => "assets/resource_list_item",:object=>item, :locals => {:actions_partial_disable => actions_partial_disable} -%>
                 <% end -%>
 			<% end -%>
 		<% end -%>
