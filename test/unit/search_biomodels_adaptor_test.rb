@@ -11,7 +11,7 @@ class SearchBiomodelsAdaptorTest < ActiveSupport::TestCase
     adaptor = Seek::BiomodelsSearch::SearchBiomodelsAdaptor.new yaml
     assert_equal false,adaptor.enabled?
     assert_equal "lib/seek/biomodels_search/_biomodels_resource_list_item.html.erb",adaptor.partial_path
-    assert_equal "Biomodels",adaptor.name
+    assert_equal "BioModels Database",adaptor.name
     assert_equal "models",adaptor.search_type
   end
 
