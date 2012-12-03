@@ -19,6 +19,7 @@
     <div id="organism_results" class="scaled_items">
       <% resource_hash = classify_for_tabs @scaled_objects
          resource_hash.each do |key,res|
+           res[:items].compact!           
            unless res[:items].empty?
              total_count = res[:items].size
              res[:items] = authorized_related_items res[:items], key
