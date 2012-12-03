@@ -121,7 +121,7 @@ class HomeControllerTest < ActionController::TestCase
     assert_response :success
 
     assert_select "div.heading", :text=>/Community News/, :count=>1
-    assert_select "div.heading", :text=>"#{Seek::Config.project_name} News", :count=>1
+    assert_select "div.heading", :text=>"#{Seek::Config.application_name} News", :count=>1
 
     #turn off
     Seek::Config.project_news_enabled=false
