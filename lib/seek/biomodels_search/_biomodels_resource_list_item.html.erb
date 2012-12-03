@@ -36,10 +36,12 @@
 </div>
 
 <div class="list_item_actions">
+
 <%
-   biomodel_download_link = "http://www.ebi.ac.uk/biomodels-main/download?mid=#{resource.model_id}"
-   description_for_import = resource.abstract
+    biomodel_download_link = "http://www.ebi.ac.uk/biomodels-main/download?mid=#{resource.model_id}"
+    description_for_import = resource.abstract
 -%>
+
 <%= image_tag_for_key "download",biomodel_download_link,"download",{},"Download" %>
 <% if logged_in? && current_user.person.can_create_new_items? %>
 <%= image_tag_for_key "import",
