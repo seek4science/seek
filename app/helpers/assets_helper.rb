@@ -134,7 +134,8 @@ module AssetsHelper
 
     #Authorize
     related.each do |key,res|
-      unless res[:items].empty?
+        res[:items].compact!      
+        unless res[:items].empty?
         if key == 'Project' || key == 'Institution'
           total_count = res[:items].size
           res[:hidden_count] = 0
