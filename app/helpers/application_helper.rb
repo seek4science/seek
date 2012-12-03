@@ -534,13 +534,13 @@ module ApplicationHelper
     end
   end
 
-  def resource_tab_item_name resource_type
+  def resource_tab_item_name resource_type,pluralize=true
     if resource_type.include?"DataFile"
-      resource_type.titleize.pluralize
+      pluralize ? resource_type.titleize.pluralize : resource_type.titleize
     elsif resource_type == "Sop"
-      "SOPs"
+      pluralize ? "SOPs" : "SOP"
     else
-      resource_type.pluralize
+      pluralize ? resource_type.pluralize : resource_type
     end
   end
   def add_return_to_search

@@ -2,7 +2,10 @@
 <% actions_locals ||= {} %>
 <% resource = resource_list_item %>
 <% content_partial = get_list_item_content_partial(resource) %>
-<% actions_partial = get_list_item_actions_partial(resource) %>
+<%
+   actions_partial_disable ||= false
+   actions_partial = actions_partial_disable ? nil : get_list_item_actions_partial(resource)
+%>
 
 <% avatar_partial = get_list_item_avatar_partial(resource) if avatar_partial.nil?%>
 <% other_classes="" %>

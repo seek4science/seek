@@ -4,7 +4,7 @@
     <div class="list_item_left_column">
 
         <%= list_item_attribute "Start Date", resource.start_date.strftime('%d/%m/%Y') %>
-        <%= list_item_attribute "End Date", resource.end_date.try(:strftime, '%d/%m/%Y') %>
+        <%= list_item_attribute "End Date", text_or_not_specified(resource.end_date.try(:strftime, '%d/%m/%Y')) %>
         <%= list_item_optional_attribute "Event Website", h(resource.url), h(resource.url) %>
     </div>
 
