@@ -5,10 +5,13 @@ module Seek
     def pdf_contents_for_search
       content = nil
       if file_exists?
-        if is_pdf_convertable?
-           convert_to_pdf
-           content = extract_text_from_pdf
+        if is_pdf?
+          #copy .dat to .pdf
+          FileUtils.cp filepath, filepath('pdf')
+        elsif is_pdf_convertable?
+          convert_to_pdf
         end
+        content = extract_text_from_pdf
       else
         Rails.logger.error("Unable to find file contents for content blob #{id}")
       end
