@@ -2,6 +2,7 @@ require 'digest/md5'
 require 'net/http'
 require 'open-uri'
 require 'tmpdir'
+require 'docsplit'
 
 class ContentBlob < ActiveRecord::Base
 

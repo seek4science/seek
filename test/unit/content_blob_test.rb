@@ -416,11 +416,17 @@ class ContentBlobTest < ActiveSupport::TestCase
     assert !filtered_content.include?('\f')
   end
 
-  test 'pdf_contents_for_search' do
+  test 'pdf_contents_for_search for a doc file' do
     ms_word_sop_content_blob = Factory(:doc_content_blob)
     assert ms_word_sop_content_blob.is_pdf_convertable?
     content = ms_word_sop_content_blob.pdf_contents_for_search
     assert_equal 'This is a ms word doc format', content
+  end
+
+  test 'pdf_contents_for_search for a pdf file' do
+    pdf_content_blob = Factory(:pdf_content_blob)
+    content = pdf_content_blob.pdf_contents_for_search
+    assert_equal 'This is a pdf format', content
   end
 
 end
