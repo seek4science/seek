@@ -2,10 +2,11 @@
 
 
 <div class="show_basic">
-  <%= render :partial => 'layouts/collapsable_div', :locals => {:title => "Tasks", :partial => 'admin/tasks'} -%>
+  <%= render :partial => 'layouts/collapsable_div', :locals => {:title => "Common tasks", :partial => 'admin/tasks'} -%>
   <%= render :partial => 'layouts/collapsable_div', :locals => {:title => "Site configuration",:partial => 'admin/site_configuration'} -%>
   <%= render :partial => 'layouts/collapsable_div', :locals => {:title => "Statistics", :partial => 'admin/stats'} -%>
   <%= render :partial => 'layouts/collapsable_div', :locals => {:title => "Manage Administrators", :partial => 'admin/admin_selection'} -%>
+  <%= render :partial => 'layouts/collapsable_div', :locals => {:title => "Register", :partial => 'admin/registration'} -%>
 
   <br/>
   <div class='box_infotext'>
