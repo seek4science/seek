@@ -32,6 +32,12 @@ class AdminController < ApplicationController
     end
     redirect_to :action=>:show
   end
+
+  def registration_form
+    respond_to do |format|
+      format.html
+    end
+  end
   
   def tags
     @tags=TextValue.all_tags.sort_by{|t| t.text}
