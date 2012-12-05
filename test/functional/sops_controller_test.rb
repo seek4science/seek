@@ -302,7 +302,7 @@ class SopsControllerTest < ActionController::TestCase
       assert_select "p > b",:text=>/Format:/
       assert_select "p",:text=>/PDF document/
       assert_select "p > b",:text=>/Size:/
-      assert_select "p",:text=>/22\.4 KB/
+      assert_select "p",:text=>/8.8 KB/
     end
   end
 
