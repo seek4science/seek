@@ -179,7 +179,12 @@ class PeopleController < ApplicationController
           format.html { redirect_to :controller => "users", :action => "activation_required" }
         else
           flash[:notice] = 'Person was successfully created.'
-          format.html { redirect_to(@person) }
+          if @person.only_first_admin_person?
+            format.html { redirect_to registration_form_path }
+          else
+            format.html { redirect_to(@person) }
+          end
+
           format.xml { render :xml => @person, :status => :created, :location => @person }
         end
 
