@@ -48,9 +48,12 @@ class PeopleControllerTest < ActionController::TestCase
   end
 
   def test_first_registered_person_is_admin
-    Person.delete_all
+
+    Person.destroy_all
     assert_equal 0, Person.count, "There should be no people in the database"
-    login_as(:part_registered)
+    user = Factory(:activated_user)
+    login_as user
+
     assert_difference('Person.count') do
       assert_difference('NotifieeInfo.count') do
         post :create, :person => {:first_name=>"test", :email=>"hghg@sdfsd.com"}
@@ -59,14 +62,18 @@ class PeopleControllerTest < ActionController::TestCase
     assert assigns(:person)
     person = Person.find(assigns(:person).id)
     assert person.is_admin?
+    assert person.only_first_admin_person?
+    assert_redirected_to registration_form_path
   end
+
 
   def test_second_registered_person_is_not_admin
       Person.delete_all
       person = Person.new(:first_name=>"fred", :email=>"fred@dddd.com")
       person.save!
       assert_equal 1, Person.count, "There should be 1 person in the database"
-      login_as(:part_registered)
+      user = Factory(:activated_user)
+      login_as user
       assert_difference('Person.count') do
         assert_difference('NotifieeInfo.count') do
           post :create, :person => {:first_name=>"test", :email=>"hghg@sdfsd.com"}
@@ -75,6 +82,8 @@ class PeopleControllerTest < ActionController::TestCase
       assert assigns(:person)
       person = Person.find(assigns(:person).id)
       assert !person.is_admin?
+      assert !person.only_first_admin_person?
+      assert_redirected_to person_path(person)
   end
 
   def test_should_create_person

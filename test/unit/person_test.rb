@@ -26,6 +26,22 @@ class PersonTest < ActiveSupport::TestCase
     assert_equal updated_at.to_s,person.updated_at.to_s
   end
 
+  test "only first admin person" do
+    Person.delete_all
+    person = Factory :admin
+    assert person.only_first_admin_person?
+
+    person.is_admin=false
+    disable_authorization_checks{person.save!}
+    assert !person.only_first_admin_person?
+    person.is_admin=true
+    disable_authorization_checks{person.save!}
+    assert person.only_first_admin_person?
+    Factory :person
+    assert !person.only_first_admin_person?
+
+  end
+
   def test_active_ordered_by_updated_at_and_avatar_not_null
 
     Person.delete_all

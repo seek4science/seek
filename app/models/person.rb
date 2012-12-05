@@ -263,6 +263,11 @@ class Person < ActiveRecord::Base
     return (firstname.gsub(/\b\w/) {|s| s.upcase} + " " + lastname.gsub(/\b\w/) {|s| s.upcase}).strip
   end
 
+  #returns true this is an admin person, and they are the only one defined - indicating they are person creating during setting up SEEK
+  def only_first_admin_person?
+    Person.count==1 && [self]==Person.all && Person.first.is_admin?
+  end
+
   #the roles defined within the project
   def project_roles
     project_roles = []
