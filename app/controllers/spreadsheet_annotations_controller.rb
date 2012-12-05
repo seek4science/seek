@@ -6,31 +6,39 @@ class SpreadsheetAnnotationsController < ApplicationController
   before_filter :auth
 
   def create
-    worksheet = @content_blob.worksheets.select {|w| w.sheet_number == params[:annotation_sheet_id].to_i}.first
+    content = params[:annotation_content].strip
+    if !content.blank?
+      worksheet = @content_blob.worksheets.select {|w| w.sheet_number == params[:annotation_sheet_id].to_i}.first
 
-    cell = CellRange.new(:worksheet => worksheet,
-                       :cell_range => params[:annotation_cell_coverage])
-    attribute_name = params[:annotation_attribute_name] || "annotation"
-    if cell.save
-      @annotation = Annotation.new(:source => current_user,
-                                   :annotatable => cell,
-                                   :attribute_name => attribute_name,
-                                   :value => params[:annotation_content])
+      cell = CellRange.new(:worksheet => worksheet,
+                           :cell_range => params[:annotation_cell_coverage])
+      attribute_name = params[:annotation_attribute_name] || "annotation"
+      if cell.save
+        @annotation = Annotation.new(:source => current_user,
+                                     :annotatable => cell,
+                                     :attribute_name => attribute_name,
+                                     :value => content)
 
-      if(@annotation.save)
-        respond_to do |format|
-          format.html { render :partial => "spreadsheets/annotations", :locals=>{ :annotations => @content_blob.spreadsheet_annotations }}
+        if(@annotation.save)
+          respond_to do |format|
+            format.html { render :partial => "spreadsheets/annotations", :locals=>{ :annotations => @content_blob.spreadsheet_annotations }}
+          end
+        else
+          respond_to do |format|
+            format.html { render :partial => "spreadsheets/spreadsheet_errors", :status => 500, :locals=>{ :verb => "adding", :errors => @annotation.errors} }
+          end
         end
       else
         respond_to do |format|
-          format.html { render :partial => "spreadsheets/spreadsheet_errors", :status => 500, :locals=>{ :verb => "adding", :errors => @annotation.errors} }
+          format.html { render :partial => "spreadsheets/spreadsheet_errors", :status => 500, :locals=>{ :verb => "adding", :errors => cell.errors} }
         end
       end
     else
       respond_to do |format|
-        format.html { render :partial => "spreadsheets/spreadsheet_errors", :status => 500, :locals=>{ :verb => "adding", :errors => cell.errors} }
+        format.html { render :partial => "spreadsheets/annotations", :locals=>{ :annotations => @content_blob.spreadsheet_annotations }}
       end
     end
+
   end
 
 

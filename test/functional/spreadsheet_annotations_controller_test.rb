@@ -30,6 +30,27 @@ class SpreadsheetAnnotationsControllerTest < ActionController::TestCase
     assert_equal "Annotation!", a.value.text
   end
 
+  test "create blank annotation" do
+    assert_no_difference("Annotation.count") do
+      xhr  :post, :create, {:annotation_content_blob_id => content_blobs(:private_spreadsheet_blob).id,
+                            :annotation_sheet_id => worksheets(:private_worksheet).sheet_number,
+                            :annotation_cell_coverage => "A1:B2",
+                            :annotation_content => ""}
+    end
+
+    assert_response :success
+
+    assert_no_difference("Annotation.count") do
+      xhr  :post, :create, {:annotation_content_blob_id => content_blobs(:private_spreadsheet_blob).id,
+                            :annotation_sheet_id => worksheets(:private_worksheet).sheet_number,
+                            :annotation_cell_coverage => "A1:B2",
+                            :annotation_content => "   "}
+    end
+
+    assert_response :success
+  end
+
+
   test "can't create new annotation on inaccessible spreadsheet" do
     login_as(:quentin)
 
