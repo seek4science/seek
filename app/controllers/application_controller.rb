@@ -66,11 +66,7 @@ class ApplicationController < ActionController::Base
     return  "http://#{base_host}"
   end
   helper_method :application_root
-  def registration_form
-    respond_to do |format|
-      format.html
-    end
-  end
+  
 
   def self.fast_auto_complete_for(object, method, options = {})
     define_method("auto_complete_for_#{object}_#{method}") do
