@@ -18,6 +18,14 @@
           </li>
       <% end -%>
   <% end -%>
+
+
+  <% if Seek::Config.experimental_features_enabled && Seek::Config.solr_enabled && @display_model.contains_sbml? -%>
+      <li>
+        <%= image_tag_for_key("search",matching_data_model_path(@model,:version=>@display_model.version),nil,nil,"Find related data") -%>
+      </li>
+  <% end -%>
+
   <% if cytoscapeweb_supported?(@display_model) %>
            <% if @model.can_download? -%>
                <li>
@@ -27,27 +35,23 @@
    <% end %>
 </ul>
 
-  <% if Seek::Config.sycamore_enabled && @display_model.contains_sbml? %>
-      <% if @model.can_download? -%>
-       <ul class="sectionIcons">
+<% if Seek::Config.sycamore_enabled && @display_model.contains_sbml? %>
+    <% if @model.can_download? -%>
+        <ul class='sectionIcons'>
         <li>
-      <span class="icon">
-        <% form_tag("http://sycamore.eml.org/sycamore/submission.jsp", :id => 'sycamore-form', :target => '_blank') do -%>
-          <%= hidden_field_tag 'sbml_model', h(IO.read(@display_model.sbml_content_blobs.first.filepath).gsub(/\n/, '')) -%>
-            <%= hidden_field_tag 'sender', 'seek' -%>
-            <%= link_to_function "#{image_tag(icon_filename_for_key 'execute')}Simulate Model on Sycamore", "$('sycamore-form').submit()" -%>
-        <% end -%>
-      </span>
-          </li>
-       </ul>
+
+          <% form_tag("http://sycamore.eml.org/sycamore/submission.jsp", :id => 'sycamore-form', :target => '_blank') do -%>
+              <%= hidden_field_tag 'sbml_model', h(IO.read(@display_model.sbml_content_blobs.first.filepath).gsub(/\n/, '')) -%>
+              <%= hidden_field_tag 'sender', 'seek' -%>
+              <%= link_to_function "#{image_tag(icon_filename_for_key 'execute')}Simulate Model on Sycamore", "$('sycamore-form').submit()" -%>
+          <% end -%>
+
+        </li>
+        </ul>
     <% end -%>
 <% end %>
 
-  <% if Seek::Config.experimental_features_enabled && Seek::Config.solr_enabled && @display_model.is_jws_supported? -%>
-      <li>
-        <%= image_tag_for_key("search",matching_data_model_path(@model,:version=>@display_model.version),nil,nil,"Find related data") -%>
-      </li>
-  <% end -%>
+
 
 
 <%= render :partial=>"assets/upload_new_version_form", :locals=>{:resource=>@model} -%>
