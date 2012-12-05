@@ -25,6 +25,14 @@ class ModelTest < ActiveSupport::TestCase
     assert contents.include?("F16P")
   end
 
+  test "content blob search terms" do
+    m = Factory :teusink_model
+    m.content_blobs << Factory.create(:doc_content_blob,:original_filename=>"word.doc",:asset=>m,:asset_version=>m.version)
+    m.reload
+
+    assert_equal ["This is a ms word doc format", "teusink.xml", "word.doc"],m.content_blob_search_terms.sort
+  end
+
   test "type detection" do
     model = Factory :teusink_model
     assert model.contains_sbml?

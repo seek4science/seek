@@ -18,6 +18,11 @@ class PublicationTest < ActiveSupport::TestCase
     assert_equal 1, publication.events.count
   end
 
+  test "content blob search terms" do
+    p = Factory :publication
+    assert_equal [],p.content_blob_search_terms
+  end
+
   test "assay association" do
     publication = publications(:pubmed_2)
     assay = assays(:modelling_assay_with_data_and_relationship)
