@@ -70,12 +70,7 @@ module Seek
 
     #filters special characters \n \f
     def filter_text_content content
-      content.gsub!(/[^0-9a-z \n]/i, '')
-      #special_characters = ['\n', '\f']
-      #special_characters.each do |sc|
-      #  content.gsub!(/#{sc}/, '')
-      #end
-      content
+      content.gsub(/[^0-9a-z \n]/i, '')
     end
   end
 end
