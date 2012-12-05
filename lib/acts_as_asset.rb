@@ -70,6 +70,9 @@ module Acts #:nodoc:
           text :creators do
             creators.compact.map(&:name)
           end
+          text :content_blob do
+            content_blob_search_terms
+          end
         end if Seek::Config.solr_enabled
 
         has_many :activity_logs, :as => :activity_loggable
@@ -177,6 +180,19 @@ module Acts #:nodoc:
 
       def technology_type_titles
         assays.collect{|a| a.technology_type.try(:title)}.compact
+      end
+
+      #the search terms coming from the content-blob(s)
+      def content_blob_search_terms
+        if self.respond_to?(:content_blob) || self.respond_to?(:content_blobs)
+          blobs = self.respond_to?(:content_blobs) ? content_blobs : [content_blob]
+          blobs.collect do |blob|
+            [blob.original_filename] | [blob.pdf_contents_for_search]
+          end.flatten.compact.uniq
+        else
+          #for assets with no content-blobs, e.g. Publication
+          []
+        end
       end
 
     end

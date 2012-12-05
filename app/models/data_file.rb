@@ -16,9 +16,6 @@ class DataFile < ActiveRecord::Base
   searchable(:auto_index=>false) do
     text :description, :title, :searchable_tags, :spreadsheet_annotation_search_fields,:fs_search_fields,
          :assay_type_titles,:technology_type_titles, :spreadsheet_contents_for_search
-    text :content_blob do
-       content_blob.original_filename
-    end
   end if Seek::Config.solr_enabled
 
   acts_as_asset

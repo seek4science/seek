@@ -3,7 +3,7 @@ module Seek
     MAXIMUM_PDF_CONVERT_TIME = 30.seconds
 
     def pdf_contents_for_search
-      content = nil
+      content = []
       if file_exists?
         if is_pdf?
           #copy .dat to .pdf
@@ -46,29 +46,35 @@ module Seek
       output_directory = storage_directory
       pdf_filepath = filepath('pdf')
       txt_filepath = filepath('txt')
-      content = nil
+
       if File.exists?(pdf_filepath)
         begin
           Docsplit.extract_text(pdf_filepath, :output => output_directory) unless File.exists?(txt_filepath)
           content = File.open(txt_filepath).read
           unless content.blank?
-            filter_text_content content
+            content = filter_text_content content
+            split_content content
           else
-            content
+            []
           end
         rescue Exception => e
           Rails.logger.error("Problem with extracting text from pdf #{id} #{e}")
-          nil
+          []
         end
       end
     end
 
+    def split_content content,delimiter="\n"
+      content.split(delimiter).select{|str| !str.blank?}
+    end
+
     #filters special characters \n \f
     def filter_text_content content
-      special_characters = ['\n', '\f']
-      special_characters.each do |sc|
-        content.gsub!(/#{sc}/, '')
-      end
+      content.gsub!(/[^0-9a-z \n]/i, '')
+      #special_characters = ['\n', '\f']
+      #special_characters.each do |sc|
+      #  content.gsub!(/#{sc}/, '')
+      #end
       content
     end
   end

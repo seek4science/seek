@@ -9,10 +9,6 @@ class Sop < ActiveRecord::Base
   #searchable must come before acts_as_asset is called
   searchable(:auto_index => false) do
     text :description, :title, :searchable_tags,:exp_conditions_search_fields,:assay_type_titles,:technology_type_titles
-    text :content_blob do
-      content_blob.pdf_contents_for_search
-      content_blob.original_filename
-    end
   end if Seek::Config.solr_enabled
 
   acts_as_asset
