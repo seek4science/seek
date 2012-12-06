@@ -15,7 +15,6 @@ class StrainTest < ActiveSupport::TestCase
     Factory :assay_organism, :strain=>object, :organism=>object.organism
 
     rdf = object.to_rdf
-    puts rdf
     RDF::Reader.for(:rdfxml).new(rdf) do |reader|
       assert reader.statements.count >= 1
       assert_equal RDF::URI.new("http://localhost:3000/strains/#{object.id}"), reader.statements.first.subject

@@ -36,7 +36,6 @@ class ProjectTest < ActiveSupport::TestCase
     object.reload
     assert !object.people.empty?
     rdf = object.to_rdf
-    puts rdf
     RDF::Reader.for(:rdfxml).new(rdf) do |reader|
       assert reader.statements.count > 1
       assert_equal RDF::URI.new("http://localhost:3000/projects/#{object.id}"), reader.statements.first.subject

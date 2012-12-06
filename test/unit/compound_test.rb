@@ -16,7 +16,6 @@ class CompoundTest < ActiveSupport::TestCase
     compound.mapping_links = [mapping_link1, mapping_link2]
     compound.reload
     rdf = compound.to_rdf
-    puts rdf
     RDF::Reader.for(:rdfxml).new(rdf) do |reader|
       assert reader.statements.count > 1
       assert_equal RDF::URI.new("http://localhost:3000/compounds/#{compound.id}"), reader.statements.first.subject
