@@ -16,6 +16,11 @@ class DataFileTest < ActiveSupport::TestCase
     assert_equal blob,datafile.content_blob
   end
 
+  test "content blob search terms" do
+    df = Factory :data_file, :content_blob=>Factory(:doc_content_blob,:original_filename=>"word.doc")
+    assert_equal ["This is a ms word doc format","word.doc"],df.content_blob_search_terms.sort
+  end
+
   test "spreadsheet contents for search" do
     df = Factory :rightfield_datafile
     

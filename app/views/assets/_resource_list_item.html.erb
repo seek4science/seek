@@ -7,7 +7,9 @@
    actions_partial = actions_partial_disable ? nil : get_list_item_actions_partial(resource)
 %>
 
-<% avatar_partial = get_list_item_avatar_partial(resource) if avatar_partial.nil?%>
+<% avatar_partial = get_list_item_avatar_partial(resource) if avatar_partial.nil? %>
+<% #dont show JERM avatar for strain without contributor, as there are strains without contributor and are not harvested
+   avatar_partial = nil if resource.kind_of?(Strain) && resource.contributor.try(:person).nil? %>
 <% other_classes="" %>
 <% other_classes << " noactions" if actions_partial.blank? %>
 <% other_classes << " noavatar" if avatar_partial.blank? %>

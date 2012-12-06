@@ -18,6 +18,20 @@ class AdminControllerTest < ActionController::TestCase
     assert_not_nil flash[:error]
   end
 
+  test "get registration form" do
+    login_as Factory(:admin).user
+    get :registration_form
+    assert_response :success
+  end
+
+  test "none admin not get registration form" do
+    login_as Factory(:person).user
+    get :registration_form
+    assert !User.current_user.person.is_admin?
+    assert_redirected_to root_path
+    assert_not_nil flash[:error]
+  end
+
   test "should show features enabled" do
     login_as(:quentin)
     get :features_enabled
