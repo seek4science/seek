@@ -1,7 +1,7 @@
 require 'test_helper'
 require 'libxml'
 
-class RightFieldTest < ActiveSupport::TestCase
+class RDFGenerationTest < ActiveSupport::TestCase
 
   include RightField
 
@@ -17,6 +17,21 @@ class RightFieldTest < ActiveSupport::TestCase
       assert_equal 2,reader.statements.count
       assert_equal RDF::URI.new("http://localhost:3000/data_files/#{df.id}"), reader.statements.first.subject
     end
+  end
+
+  test "save rdf" do
+    assay = Factory(:assay)
+    tmpdir= File.join(Dir.tmpdir,"seek-rdf-tests")
+    assay.save_rdf tmpdir
+    expected_rdf_file = File.join(tmpdir,"Assay-#{assay.id}.rdf")
+    assert File.exists?(expected_rdf_file)
+    rdf=""
+    open(expected_rdf_file) do |f|
+      rdf = f.read
+    end
+    assert_equal assay.to_rdf,rdf
+    FileUtils.rm expected_rdf_file
+    assert !File.exists?(expected_rdf_file)
   end
 
   test "rightfield rdf graph generation" do
