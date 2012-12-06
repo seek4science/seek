@@ -40,8 +40,8 @@ module Seek
           FileUtils.mkdir_p(dir)
         end
         rdf = self.to_rdf
-        uuid = self.respond_to?(:uuid) ? self.uuid : UUIDTools::UUID.random_create.to_s
-        filename="#{uuid}.rdf"
+        unique_id="#{self.class.name}-#{self.id}"
+        filename="#{unique_id}.rdf"
         path = File.join(dir,filename)
         File.open(path,"w") do |f|
           f.write(rdf)
