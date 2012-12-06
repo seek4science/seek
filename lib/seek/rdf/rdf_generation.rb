@@ -5,6 +5,10 @@ module Seek
     module RdfGeneration
       include RightField
 
+      def self.included(base)
+        base.after_save :create_rdf_generation_job
+      end
+
       def to_rdf
         rdf_graph = to_rdf_graph
         RDF::Writer.for(:rdfxml).buffer(:prefixes=>ns_prefixes) do |writer|
@@ -136,6 +140,12 @@ module Seek
             "sioc"=>RDF::SIOC.to_uri.to_s,
             "owl"=>RDF::OWL.to_uri.to_s,
         }
+      end
+
+      def create_rdf_generation_job
+        unless (self.changed - ["updated_at","last_used_at"]).empty?
+          RdfGenerationJob.create_job self
+        end
       end
 
     end
