@@ -429,10 +429,4 @@ class ContentBlobTest < ActiveSupport::TestCase
     assert_equal ['This is a pdf format'], content
   end
 
-  test 'pdf_contents_for_search for a pdf file' do
-    pdf_content_blob = Factory(:pdf_content_blob)
-    content = pdf_content_blob.pdf_contents_for_search
-    assert_equal 'This is a pdf format', content
-  end
-
 end
