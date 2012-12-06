@@ -20,16 +20,41 @@ class RDFGenerationTest < ActiveSupport::TestCase
   end
 
   test "save rdf" do
-    assay = Factory(:assay)
-    tmpdir= File.join(Dir.tmpdir,"seek-rdf-tests")
+    assay = Factory(:assay, :policy=>Factory(:public_policy))
+    assert assay.can_view?(nil)
+    tmpdir= File.join(Dir.tmpdir,"seek-rdf-tests-#{$$}")
+    expected_rdf_file = File.join(tmpdir,"public","Assay-#{assay.id}.rdf")
+    puts tmpdir
+    FileUtils.rm expected_rdf_file if File.exists?(expected_rdf_file)
+
     assay.save_rdf tmpdir
-    expected_rdf_file = File.join(tmpdir,"Assay-#{assay.id}.rdf")
+
     assert File.exists?(expected_rdf_file)
     rdf=""
     open(expected_rdf_file) do |f|
       rdf = f.read
     end
     assert_equal assay.to_rdf,rdf
+    FileUtils.rm expected_rdf_file
+    assert !File.exists?(expected_rdf_file)
+  end
+
+  test "save private rdf" do
+    sop = Factory(:sop, :policy=>Factory(:private_policy))
+    assert !sop.can_view?(nil)
+    tmpdir= File.join(Dir.tmpdir,"seek-rdf-tests-#{$$}")
+    expected_rdf_file = File.join(tmpdir,"private","Sop-#{sop.id}.rdf")
+    puts tmpdir
+    FileUtils.rm expected_rdf_file if File.exists?(expected_rdf_file)
+
+    sop.save_rdf tmpdir
+
+    assert File.exists?(expected_rdf_file)
+    rdf=""
+    open(expected_rdf_file) do |f|
+      rdf = f.read
+    end
+    assert_equal sop.to_rdf,rdf
     FileUtils.rm expected_rdf_file
     assert !File.exists?(expected_rdf_file)
   end
