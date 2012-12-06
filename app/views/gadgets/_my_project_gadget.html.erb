@@ -76,4 +76,47 @@
 
 <% end -%>
 
+<script type="text/javascript">
+    jQuery.noConflict();
+    var $j = jQuery;
+    $j(document).ready(function () {
+        creatable_table = $j('#creatable_selection_table').dataTable({
+            "bPaginate":false,
+            "bLengthChange":false,
+            "bFilter":false,
+            "bSort":false,
+            "bInfo":false,
+            "bAutoWidth":false,
+            "bRetrieve": true,
+	    "aoColumns":[
+                {"bVisible":true},
+                { "bVisible":false}
+            ]
+        });
+        $j('#creatable_selection_table tbody tr').click(function () {
+            var data = creatable_table.fnGetData(this);
+            $j('#new_resource_type')[0].value = data[1];
+            $j('#new_asset_button')[0].disabled=true;
+            newAsset();
+        });
+        $j(document).click(function (e) {
+            $j('#creatable_selection_list')[0].style.display = 'none';
+        });
+        $j('#new_asset_button').click(function (e) {
+            e.stopPropagation();
+        });
+        $j('#creatable_selection_table').click(function (e) {
+            e.stopPropagation();
+        });
+    });
+
+    function new_creatable_selection() {
+        var new_resource_list = document.getElementById('creatable_selection_list');
+        if (new_resource_list.style.display == 'none')
+            new_resource_list.style.display = 'block';
+        else
+            new_resource_list.style.display = 'none';
+    }
+</script>
+
 
