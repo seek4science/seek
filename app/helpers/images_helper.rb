@@ -78,6 +78,8 @@ module ImagesHelper
       "famfamfam_silk/zoom_in.png"
       when "zoom_out"
       "famfamfam_silk/zoom_out.png"
+      when "copy"
+        "famfamfam_silk/page_copy.png"
       when "edit"
       "famfamfam_silk/page_white_edit.png"
       when "edit-off"

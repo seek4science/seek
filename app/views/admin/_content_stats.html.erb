@@ -1,5 +1,5 @@
 <%
-  authorised_types=[Investigation,Study,Assay,DataFile,Model,Sop]
+  authorised_types=Seek::ContentStats::AUTHORISED_TYPES
   #So we don't have to run lengthy authorization a second time when calculating total stats
 
   total_visible_models = []
@@ -31,20 +31,23 @@
   total_visible_investigations = []
   total_publicly_visible_investigations = []
   total_publicly_accessible_investigations = []
+
+  total_accessible_presentations = []
+  total_visible_presentations = []
+  total_publicly_visible_presentations = []
+  total_publicly_accessible_presentations = []
 %>
 
 <h3>Content statistics</h3>
-For data, models and SOPs, the numbers are split as <em>total</em> / <em>visible</em> / <em>accessible</em> / <em>publicly visible</em> / <em>publicly accessible</em>
+For authorised assets the numbers are split as <em>total</em> / <em>visible</em> / <em>accessible</em> / <em>publicly visible</em> / <em>publicly accessible</em>
 <table>
   <tr>
     <th>Project</th>
     <th>People (Registered)</th>
-    <th>Investigations</th>
-    <th>Studies</th>
-    <th>Assays</th>
-    <th>Data Files</th>
-    <th>Models</th>
-    <th>Sops</th>
+    <% authorised_types.each do |type| %>
+        <th><%= resource_tab_item_name(type.name) -%></th>
+    <% end %>
+
     <th>Publications</th>
   </tr>
   <% stats.each do |stat| %>
