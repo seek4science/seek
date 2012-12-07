@@ -64,9 +64,9 @@ on how to setup Apache and {Passenger Phusion (modrails)}[http://www.modrails.co
 
 Our source code is stored within the {Sysmo-DB Google Code Repository}[http://code.google.com/p/sysmo-db/], using Mercurial[http://mercurial.selenic.com/] as the version control system. 
 
-For a stable version, you should check out according to a stable tag. Our current stable tag is <em>0.15.2</em>, so to retrieve this version you should use:
+For a stable version, you should check out according to a stable tag. Our current stable tag is <em>0.15.3</em>, so to retrieve this version you should use:
 
-  hg clone https://sysmo-db.googlecode.com/hg/ -r v0.15.2 seek
+  hg clone https://sysmo-db.googlecode.com/hg/ -r v0.15.3 seek
 
 This will create a <i>seek</i> directory that contains the application.
   
@@ -213,7 +213,7 @@ To be able to support adding publications using a PubMed[http://www.ncbi.nlm.nih
 * For DOI - you need to register your email address with CrossRef[http://www.crossref.org/] at http://www.crossref.org/requestaccount/ and then provide that email to SEEK under Admin->Site Configuration->Additional Settings
 
 
-== Registering SEEK ==
+== Registering SEEK
 
 Now you have installed SEEK, please take a moment to fill out our very short,optional {SEEK Registration Form}[http://www.sysmo-db.org/seek-registration]. Doing so will be very useful
 to us in the future when we try and raise funding in the future, as it provides evidence of SEEK adoption.
