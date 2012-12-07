@@ -11,8 +11,7 @@
                 <% temporary_link = url_for :action => :show, :only_path => false, :code => sub_form.object.code, :escape => false %>
                 Visitors (with no login) can access this <%= f.object.class.name.underscore.humanize %> with:
                 <br/>
-                <%= temporary_link -%>
-                <%= link_to_function (image('copy')+'Copy'), "copyToClipboard('#{temporary_link}')", :title => "copy the link to clipboard" %></li>
+                <%= text_field_tag 'temp_link', temporary_link, :size => 90 -%>
                 <br/>
                 <span class='none_text'>(If this is the first time you generate this link, the link is not valid until this page is updated)</span>
                 <%= sub_form.hidden_field :code %>
@@ -27,13 +26,16 @@
               <%= sub_form.subform_delete_link 'Revoke', {:onclick => "$('add_a_temporary_link').show()"}, :class => 'hidden_destroy_field' %>
             </fieldset>
         <% end %>
-        <%= link_to_function "Add a Temporary Link", "$('new_temporary_link_form').show();$('new_temporary_link_form').select('.hidden_destroy_field')[0].setValue('false');$(this).hide()",  :id => "add_a_temporary_link" %>
+        <%= link_to_function "Add a Temporary Link", "addTempLink()", :id => "add_a_temporary_link" %>
    <% end %>
   <%= render :partial => 'assets/folding_box', :locals => {:hidden => f.object.special_auth_codes.empty? ? true : false, :fold_id => 'temporary_links', :fold_title => title_and_help, :contents => content} %>
 <% end %>
 
 <script type="text/javascript">
-  function copyToClipboard(text){
-      window.prompt ("Copy to clipboard: Ctrl+C, Enter", text);
+  function addTempLink(){
+      $('new_temporary_link_form').show();
+      $('new_temporary_link_form').select('.hidden_destroy_field')[0].setValue('false');
+      $("add_a_temporary_link").hide();
+      $('temp_link').select();
   }
 </script>
