@@ -5,6 +5,10 @@ module Seek
     module RdfGeneration
       include RightField
 
+      def self.included(base)
+        base.after_save :create_rdf_generation_job
+      end
+
       def to_rdf
         rdf_graph = to_rdf_graph
         RDF::Writer.for(:rdfxml).buffer(:prefixes=>ns_prefixes) do |writer|
@@ -36,12 +40,17 @@ module Seek
       end
 
       def save_rdf dir=File.join(Rails.root, "tmp", "rdf")
+        #seperate public and private (to an outside user) into separate directories
+        inner_dir = self.can_view?(nil) ? "public" : "private"
+        dir = File.join(dir,inner_dir)
+
         if !File.exists?(dir)
           FileUtils.mkdir_p(dir)
         end
         rdf = self.to_rdf
-        uuid = self.respond_to?(:uuid) ? self.uuid : UUIDTools::UUID.random_create.to_s
-        filename="#{uuid}.rdf"
+        unique_id="#{self.class.name}-#{self.id}"
+        filename="#{unique_id}.rdf"
+
         path = File.join(dir,filename)
         File.open(path,"w") do |f|
           f.write(rdf)
@@ -131,6 +140,12 @@ module Seek
             "sioc"=>RDF::SIOC.to_uri.to_s,
             "owl"=>RDF::OWL.to_uri.to_s,
         }
+      end
+
+      def create_rdf_generation_job
+        unless (self.changed - ["updated_at","last_used_at"]).empty?
+          RdfGenerationJob.create_job self
+        end
       end
 
     end

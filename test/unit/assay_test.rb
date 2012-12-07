@@ -19,20 +19,7 @@ class AssayTest < ActiveSupport::TestCase
     assert assay.sops.include?(sops(:sop_with_fully_public_policy).versions.first)
   end
 
-  test "save rdf" do
-    assay = Factory(:assay,:uuid=>UUIDTools::UUID.random_create.to_s)
-    tmpdir= File.join(Dir.tmpdir,"seek-rdf-tests")
-    assay.save_rdf tmpdir
-    expected_rdf_file = File.join(tmpdir,"#{assay.uuid}.rdf")
-    assert File.exists?(expected_rdf_file)
-    rdf=""
-    open(expected_rdf_file) do |f|
-      rdf = f.read
-    end
-    assert_equal assay.to_rdf,rdf
-    FileUtils.rm expected_rdf_file
-    assert !File.exists?(expected_rdf_file)
-  end
+
 
   test "to_rdf" do
     assay = Factory :assay, :assay_type=>Factory(:assay_type), :technology_type=>Factory(:technology_type)
