@@ -77,6 +77,12 @@
   
 <h1 id="label-Upgrading+SEEK">Upgrading SEEK</h1>
 
+<p>If you have an existing SEEK installation, and you haven’t done so
+already, please take a moment to fill out our very short,optional <a
+href="http://www.sysmo-db.org/seek-registration">SEEK Registration
+Form</a>. Doing so will be very useful to us in the future when we try and
+raise further funding to develop and support SEEK and the associated tools.</p>
+
 <p><strong>Always backup your SEEK data before starting to upgrade!!</strong>
 - see the <a href="../files/doc/BACKUPS.html">Backup Guide</a>.</p>
 
@@ -128,6 +134,8 @@ listed below:</p>
 <p>0.15.1</p>
 </li><li>
 <p>0.15.2</p>
+</li><li>
+<p>0.15.3</p>
 </li></ul>
 
 <p><em>(Note there was no 0.12.x version released externally, this was an
@@ -200,7 +208,7 @@ installed, the upgrade is the typical:</p>
 
 <pre>RAILS_ENV=production ./script/delayed_job stop
 bundle exec rake sunspot:solr:stop RAILS_ENV=production
-hg pull https://sysmo-db.googlecode.com/hg/ -r v0.15.2
+hg pull https://sysmo-db.googlecode.com/hg/ -r v0.15.3
 hg update
 hg merge # only required if you've made changes since installing. If you have you may need to deal with conflicts.
 hg commit -m &quot;merged&quot; # likewise - only required if you made changes since installing

@@ -5,7 +5,7 @@ module Seek
     PERIODS={"daily"=>1.day.ago,"weekly"=>1.week.ago,"monthly"=>1.month.ago,"six_monthly"=>6.month.ago,"yearly"=>1.year.ago}
     
     #the item types to include
-    INCLUDED_TYPES=["Sop","Model","Publication","DataFile","Assay","Study","Investigation"] 
+    INCLUDED_TYPES=["Sop","Model","Publication","DataFile","Assay","Study","Investigation","Presentation"]
     
     def initialize
       create_attributes
@@ -61,9 +61,9 @@ module Seek
       ["created","downloaded"].each do |action|
         PERIODS.keys.each do |period|
           INCLUDED_TYPES.each do |type|
-            attrubute="#{period}_#{type.downcase.pluralize}_#{action}"
-            self.class.class_eval { attr_accessor attrubute.intern }
-            instance_variable_set "@#{attrubute}".intern, 0
+            attribute="#{period}_#{type.downcase.pluralize}_#{action}"
+            self.class.class_eval { attr_accessor attribute.intern }
+            instance_variable_set "@#{attribute}".intern, 0
           end
         end        
       end
