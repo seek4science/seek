@@ -61,9 +61,9 @@ module Seek
       ["created","downloaded"].each do |action|
         PERIODS.keys.each do |period|
           INCLUDED_TYPES.each do |type|
-            attrubute="#{period}_#{type.downcase.pluralize}_#{action}"
-            self.class.class_eval { attr_accessor attrubute.intern }
-            instance_variable_set "@#{attrubute}".intern, 0
+            attribute="#{period}_#{type.downcase.pluralize}_#{action}"
+            self.class.class_eval { attr_accessor attribute.intern }
+            instance_variable_set "@#{attribute}".intern, 0
           end
         end        
       end
