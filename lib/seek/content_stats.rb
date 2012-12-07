@@ -19,29 +19,24 @@ module Seek
       def models_size
         assets_size models
       end
-      
-      def visible_data_files
-        authorised_assets data_files,"view"
-      end
-      
-      def visible_sops
-        authorised_assets sops,"view"
-      end
-      
-      def visible_models
-        authorised_assets models,"view"
-      end
-      
-      def accessible_data_files
-        authorised_assets data_files,"download"
-      end
-      
-      def accessible_sops
-        authorised_assets sops,"download"
-      end
-      
-      def accessible_models
-        authorised_assets models,"download"
+
+      ["data_files","models","sops","assays","studies","investigations"].each do |type|
+        define_method "visible_#{type}" do
+          authorised_assets send(type),"view",@user
+        end
+
+        define_method "accessible_#{type}" do
+          authorised_assets send(type),"download",@user
+        end
+
+        define_method "publicly_visible_#{type}" do
+          authorised_assets send(type),"view",nil
+        end
+
+        define_method "publicly_accessible_#{type}" do
+          authorised_assets send(type),"download",nil
+        end
+
       end
       
       def registered_people
@@ -50,8 +45,8 @@ module Seek
       
       private
 
-      def authorised_assets assets,action
-        assets.select{|asset| asset.can_perform? action, @user}
+      def authorised_assets assets,action,user
+        assets.select{|asset| asset.can_perform?(action, user)}
       end
       
       def assets_size assets

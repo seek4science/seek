@@ -1,15 +1,40 @@
 <%
+  authorised_types=[Investigation,Study,Assay,DataFile,Model,Sop]
   #So we don't have to run lengthy authorization a second time when calculating total stats
-  total_visible_data_files = []
+
   total_visible_models = []
-  total_visible_sops = []
-  total_accessible_data_files = []
   total_accessible_models = []
+  total_publicly_visible_models = []
+  total_publicly_accessible_models = []
+
   total_accessible_sops = []
+  total_visible_sops = []
+  total_publicly_accessible_sops = []
+  total_publicly_visible_sops = []
+
+  total_accessible_data_files = []
+  total_visible_data_files = []
+  total_publicly_visible_data_files = []
+  total_publicly_accessible_data_files = []
+
+  total_accessible_assays = []
+  total_visible_assays = []
+  total_publicly_visible_assays = []
+  total_publicly_accessible_assays = []
+
+  total_accessible_studies = []
+  total_visible_studies = []
+  total_publicly_visible_studies = []
+  total_publicly_accessible_studies = []
+
+  total_accessible_investigations = []
+  total_visible_investigations = []
+  total_publicly_visible_investigations = []
+  total_publicly_accessible_investigations = []
 %>
 
 <h3>Content statistics</h3>
-For data, models and SOPs, the numbers are split as <em>total</em> / <em>visible</em> / <em>accessible</em>
+For data, models and SOPs, the numbers are split as <em>total</em> / <em>visible</em> / <em>accessible</em> / <em>publicly visible</em> / <em>publicly accessible</em>
 <table>
   <tr>
     <th>Project</th>
@@ -27,36 +52,38 @@ For data, models and SOPs, the numbers are split as <em>total</em> / <em>visible
     <td><%= link_to stat.project.name, stat.project -%></td>
     <% registered_people = stat.registered_people.count %>
     <td><%= stat.people.count -%> (<%= registered_people -%>)</td>
-    <td><%= stat.investigations.count -%></td>
-    <td><%= stat.studies.count -%></td>
-    <td><%= stat.assays.count -%></td>
-    <% visible_data_files = stat.visible_data_files
-       total_visible_data_files |= visible_data_files %>
-	<% accessible_data_files = stat.accessible_data_files
-       total_accessible_data_files |= accessible_data_files %>
-    <td><%= "#{stat.data_files.count}/#{visible_data_files.count}/#{accessible_data_files.count}" -%></td>
-    <% visible_models = stat.visible_models
-       total_visible_models |= visible_models %>
-	<% accessible_models = stat.accessible_models
-       total_accessible_models |= accessible_models %>
-    <td><%= "#{stat.models.count}/#{visible_models.count}/#{accessible_models.count}" -%></td>
-    <% visible_sops = stat.visible_sops
-       total_visible_sops |= visible_sops %>
-	<% accessible_sops = stat.accessible_sops
-       total_accessible_sops |= accessible_sops %>
-    <td><%= "#{stat.sops.count}/#{visible_sops.count}/#{accessible_sops.count}" -%></td>
+    <% authorised_types.each do |type| %>
+        <% type_str = type.name.underscore.pluralize
+            vis = stat.send("visible_#{type_str}")
+            acc = stat.send("accessible_#{type_str}")
+            pub_vis = stat.send("publicly_visible_#{type_str}")
+            pub_acc = stat.send("publicly_accessible_#{type_str}")
+            total = stat.send("#{type_str}").count
+            eval("total_visible_#{type_str} |= vis")
+            eval("total_accessible_#{type_str} |= acc")
+            eval("total_publicly_visible_#{type_str} |= pub_vis")
+            eval("total_publicly_accessible_#{type_str} |= pub_acc")
+        -%>
+        <td><%= "#{total}/#{vis.count}/#{acc.count}/#{pub_vis.count}/#{pub_acc.count}" -%></td>
+    <% end -%>
+
     <td><%= stat.publications.count -%> </td>
   </tr>
   <% end %>
   <tr style="background-color: #DEF">
     <td><b>Overall</b></td>
     <td><%= Person.count -%> (<%= User.count(:all,:conditions=>"person_id IS NOT NULL") -%>)<em>*</em></td>
-    <td><%= Investigation.count -%></td>
-    <td><%= Study.count -%></td>
-    <td><%= Assay.count -%></td>
-    <td><%= "#{DataFile.count}/#{total_visible_data_files.count}/#{total_accessible_data_files.count}" -%></td>
-    <td><%= "#{Model.count}/#{total_visible_models.count}/#{total_accessible_models.count}" -%></td>
-    <td><%= "#{Sop.count}/#{total_visible_sops.count}/#{total_accessible_sops.count}" -%></td>
+    <% authorised_types.each do |type| %>
+        <%  type_str = type.name.underscore.pluralize
+            total=type.count
+            total_vis = eval("total_visible_#{type_str}").count
+            total_acc = eval("total_accessible_#{type_str}").count
+            total_pub_vis = eval("total_publicly_visible_#{type_str}").count
+            total_pub_acc = eval("total_publicly_accessible_#{type_str}").count
+        %>
+        <td><%= "#{total}/#{total_vis}/#{total_acc}/#{total_pub_vis}/#{total_pub_acc}" -%></td>
+    <% end -%>
+
     <td><%= Publication.count -%></td>
   </tr>
 </table>
