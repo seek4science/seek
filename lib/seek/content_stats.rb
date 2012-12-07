@@ -1,8 +1,10 @@
 module Seek
   class ContentStats
+
+    AUTHORISED_TYPES=[Investigation,Study,Assay,DataFile,Model,Sop,Presentation]
     
     class ProjectStats
-      attr_accessor :project,:sops,:data_files,:models,:publications,:people,:assays,:studies,:investigations, :user
+      attr_accessor :project,:sops,:data_files,:models,:publications,:people,:assays,:studies,:investigations,:presentations, :user
       
       def initialize
         @user=User.first
@@ -20,21 +22,22 @@ module Seek
         assets_size models
       end
 
-      ["data_files","models","sops","assays","studies","investigations"].each do |type|
-        define_method "visible_#{type}" do
-          authorised_assets send(type),"view",@user
+      AUTHORISED_TYPES.each do |type|
+        type_str=type.name.underscore.pluralize
+        define_method "visible_#{type_str}" do
+          authorised_assets send(type_str),"view",@user
         end
 
-        define_method "accessible_#{type}" do
-          authorised_assets send(type),"download",@user
+        define_method "accessible_#{type_str}" do
+          authorised_assets send(type_str),"download",@user
         end
 
-        define_method "publicly_visible_#{type}" do
-          authorised_assets send(type),"view",nil
+        define_method "publicly_visible_#{type_str}" do
+          authorised_assets send(type_str),"view",nil
         end
 
-        define_method "publicly_accessible_#{type}" do
-          authorised_assets send(type),"download",nil
+        define_method "publicly_accessible_#{type_str}" do
+          authorised_assets send(type_str),"download",nil
         end
 
       end
@@ -63,14 +66,13 @@ module Seek
       Project.all.each do |project|
         project_stats=ProjectStats.new
         project_stats.project=project
-        project_stats.sops=project.sops
-        project_stats.models=project.models
-        project_stats.data_files=project.data_files
-        project_stats.publications=project.publications
         project_stats.people=project.people
-        project_stats.assays=project.assays
-        project_stats.studies=project.studies
-        project_stats.investigations=project.investigations
+        AUTHORISED_TYPES.each do |type|
+          type_str=type.name.underscore.pluralize
+          project_stats.send(type_str+"=",project.send(type_str))
+        end
+
+        project_stats.publications=project.publications
         result << project_stats           
       end
       return result

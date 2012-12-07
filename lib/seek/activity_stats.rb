@@ -5,7 +5,7 @@ module Seek
     PERIODS={"daily"=>1.day.ago,"weekly"=>1.week.ago,"monthly"=>1.month.ago,"six_monthly"=>6.month.ago,"yearly"=>1.year.ago}
     
     #the item types to include
-    INCLUDED_TYPES=["Sop","Model","Publication","DataFile","Assay","Study","Investigation"] 
+    INCLUDED_TYPES=["Sop","Model","Publication","DataFile","Assay","Study","Investigation","Presentation"]
     
     def initialize
       create_attributes
