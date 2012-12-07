@@ -1,6 +1,6 @@
 <% if f.object.can_manage? %>
   <% title_and_help = capture do %>
-        <%= help_icon("Here you can create temporary access links for visitors and others who would not normally be allowed to view/download this asset") %>
+        <%= help_icon("Here you can create temporary access links for reviewing this asset. The reviewers with these links can view/download this assset with no login") %>
         Temporary Access Links
   <% end %>
 
@@ -8,15 +8,21 @@
         <% f.fields_for :special_auth_codes, f.object.special_auth_codes + [SpecialAuthCode.new.tap(&:mark_for_destruction)] do |sub_form|%>
             <fieldset <%= sub_form.object.new_record? ? "id='new_temporary_link_form' style='display: none'" : ''%> >
               <p>
-                  <% temporary_link = url_for :action => :show, :only_path => false, :code => sub_form.object.code, :escape => false %>
-                  Visitors can view this <%= f.object.class.name.underscore.humanize %> with:
-                  <br/>
-                  <%= temporary_link %> <%= link_to_function image('copy'), "copyToClipboard('#{temporary_link}')", :title => "copy the link to clipboard"%>
-                  <%= sub_form.hidden_field :code %>
+                <% temporary_link = url_for :action => :show, :only_path => false, :code => sub_form.object.code, :escape => false %>
+                Visitors (with no login) can access this <%= f.object.class.name.underscore.humanize %> with:
+                <br/>
+                <%= temporary_link -%>
+                <%= link_to_function (image('copy')+'Copy'), "copyToClipboard('#{temporary_link}')", :title => "copy the link to clipboard" %></li>
+                <br/>
+                <span class='none_text'>(If this is the first time you generate this link, the link is not valid until this page is updated)</span>
+                <%= sub_form.hidden_field :code %>
               </p>
+
               <p>
                 <%= sub_form.label :expiration_date %>
                 <%= sub_form.calendar_date_select :expiration_date %>
+                <br/>
+                <span class='none_text'>(After this date, the link is not accessible anymore)</span>
               </p>
               <%= sub_form.subform_delete_link 'Revoke', {:onclick => "$('add_a_temporary_link').show()"}, :class => 'hidden_destroy_field' %>
             </fieldset>
