@@ -1,5 +1,7 @@
 = Installing SEEK
 
+If you have installed SEEK, please take a moment to fill out our very short,optional {SEEK Registration Form}[http://www.sysmo-db.org/seek-registration]
+
 SEEK is based upon the Ruby on Rails platform. Although the information on this page should provide you with everything you need to get a basic installation of
 SEEK up and running, some background reading on Ruby on Rails would be beneficial if it is new to you. Documentation and resources describing Ruby on Rails can be found
 at http://rubyonrails.org/documentation. Since SEEK uses v2.3.14 of Rails, http://guides.rubyonrails.org/v2.3.14/ and http://api.rubyonrails.org/v2.3.14 may be useful as well.
@@ -210,6 +212,11 @@ To be able to support adding publications using a PubMed[http://www.ncbi.nlm.nih
 * For PubMed you simply need to add your email address under Admin->Site Configuration->Additional Settings
 * For DOI - you need to register your email address with CrossRef[http://www.crossref.org/] at http://www.crossref.org/requestaccount/ and then provide that email to SEEK under Admin->Site Configuration->Additional Settings
 
+
+== Registering SEEK ==
+
+Now you have installed SEEK, please take a moment to fill out our very short,optional {SEEK Registration Form}[http://www.sysmo-db.org/seek-registration]. Doing so will be very useful
+to us in the future when we try and raise funding in the future, as it provides evidence of SEEK adoption.
 
 == Setting up Passenger Phusion and Apache for production servers.
 

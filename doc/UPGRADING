@@ -1,5 +1,8 @@
 = Upgrading SEEK
 
+If you have an existing SEEK installation, and you haven't done so already, please take a moment to fill out our very short,optional {SEEK Registration Form}[http://www.sysmo-db.org/seek-registration].
+Doing so will be very useful to us in the future when we try and raise further funding to develop and support SEEK and the associated tools.
+
 <b>Always backup your SEEK data before starting to upgrade!!</b> - see the {Backup Guide}[link:files/doc/BACKUPS.html].
 
 This guide assumes that SEEK has been installed following the {Installation Guide}[link:files/doc/INSTALL.html] guide. It assumes it is
