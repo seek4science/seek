@@ -80,6 +80,45 @@ class ProjectsControllerTest < ActionController::TestCase
 
   end
 
+  test "asset report button shown to project members" do
+    person = Factory :person
+    project = person.projects.first
+
+    login_as person.user
+    get :show, :id=>project.id
+    assert_response :success
+    assert_select "ul.sectionIcons" do
+      assert_select "a[href=?]",asset_report_project_path(project),:text=>"Assets report"
+    end
+  end
+
+  test "asset report button not shown to anonymous users" do
+
+    project = Factory :project
+
+    logout
+    get :show, :id=>project.id
+    assert_response :success
+    assert_select "ul.sectionIcons" do
+      assert_select "a[href=?]",asset_report_project_path(project),:text=>"Assets report",:count=>0
+    end
+  end
+
+  test "asset report button not shown to none project members" do
+    person = Factory :person
+    project = person.projects.first
+    other_person = Factory :person
+    assert !project.people.include?(other_person)
+
+    login_as other_person.user
+    get :show, :id=>project.id
+    assert_response :success
+    assert_select "ul.sectionIcons" do
+      assert_select "a[href=?]",asset_report_project_path(project),:text=>"Assets report",:count=>0
+    end
+
+  end
+
   test "should show organise link for member" do
     p=Factory :person
     login_as p.user
