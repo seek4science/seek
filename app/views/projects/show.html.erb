@@ -19,8 +19,8 @@
 
 <% end -%>
   <% if current_user.try(:person).try(:member_of?,@project) -%>
-      <% tooltip_text="This will present you with a short report about the assets that have been shared outside of your project" %>
-      <li><%= image_tag_for_key "report", asset_report_project_path(@project), "Sharing report", {:title=>tooltip_title_attrib(tooltip_text)}, "Sharing report" -%></li>
+      <% tooltip_text="This will present you with a short report about the items that have been shared outside of your project" %>
+      <li><%= image_tag_for_key "report", sharing_report_project_path(@project), "Sharing report", {:title=>tooltip_title_attrib(tooltip_text)}, "Sharing report" -%></li>
   <% end -%>
 </ul>
 

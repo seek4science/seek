@@ -80,7 +80,27 @@ class ProjectsControllerTest < ActionController::TestCase
 
   end
 
-  test "asset report button shown to project members" do
+  test "sharing report visible to project member" do
+    person = Factory :person
+    project = person.projects.first
+    login_as(person.user)
+    get :sharing_report,:id=>project.id
+    assert_response :success
+
+  end
+
+  test "sharing report not visible to non project member" do
+    person = Factory :person
+    project = person.projects.first
+    other_person = Factory :person
+    login_as(other_person.user)
+    get :sharing_report,:id=>project.id
+    assert_redirected_to project
+    assert_not_nil flash[:error]
+
+  end
+
+  test "sharing report button shown to project members" do
     person = Factory :person
     project = person.projects.first
 
@@ -88,11 +108,11 @@ class ProjectsControllerTest < ActionController::TestCase
     get :show, :id=>project.id
     assert_response :success
     assert_select "ul.sectionIcons" do
-      assert_select "a[href=?]",asset_report_project_path(project),:text=>"Assets report"
+      assert_select "a[href=?]",sharing_report_project_path(project),:text=>"Sharing report"
     end
   end
 
-  test "asset report button not shown to anonymous users" do
+  test "sharing report button not shown to anonymous users" do
 
     project = Factory :project
 
@@ -100,11 +120,11 @@ class ProjectsControllerTest < ActionController::TestCase
     get :show, :id=>project.id
     assert_response :success
     assert_select "ul.sectionIcons" do
-      assert_select "a[href=?]",asset_report_project_path(project),:text=>"Assets report",:count=>0
+      assert_select "a[href=?]",sharing_report_project_path(project),:text=>"Sharing report",:count=>0
     end
   end
 
-  test "asset report button not shown to none project members" do
+  test "sharing report button not shown to none project members" do
     person = Factory :person
     project = person.projects.first
     other_person = Factory :person
@@ -114,7 +134,7 @@ class ProjectsControllerTest < ActionController::TestCase
     get :show, :id=>project.id
     assert_response :success
     assert_select "ul.sectionIcons" do
-      assert_select "a[href=?]",asset_report_project_path(project),:text=>"Assets report",:count=>0
+      assert_select "a[href=?]",sharing_report_project_path(project),:text=>"Sharing report",:count=>0
     end
 
   end

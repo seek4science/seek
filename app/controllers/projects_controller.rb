@@ -5,11 +5,12 @@ class ProjectsController < ApplicationController
   include IndexPager
   
   before_filter :find_assets, :only=>[:index]
-  before_filter :is_user_admin_auth, :except=>[:index, :show, :edit, :update, :request_institutions, :admin]
+  before_filter :is_user_admin_auth, :except=>[:index, :show, :edit, :update, :request_institutions, :admin, :sharing_report]
   before_filter :editable_by_user, :only=>[:edit,:update]
   before_filter :administerable_by_user, :only =>[:admin]
   before_filter :auth_params,:only=>[:update]
   before_filter :auth_institution_list_for_project_manager, :only => [:update]
+  before_filter :member_of_this_project, :only=>[:sharing_report]
 
   skip_before_filter :project_membership_required
 
@@ -18,6 +19,12 @@ class ProjectsController < ApplicationController
   def auto_complete_for_organism_name
     render :json => Project.organism_counts.map(&:name).to_json
   end  
+
+  def sharing_report
+    respond_to do |format|
+      format.html
+    end
+  end
 
   def admin
     @project = Project.find(params[:id])
@@ -195,6 +202,18 @@ class ProjectsController < ApplicationController
       error("Insufficient privileges", "is invalid (insufficient_privileges)")
       return false
     end
+  end
+
+  def member_of_this_project
+    @project = Project.find(params[:id])
+    if @project.nil? || !@project.people.include?(current_user.try(:person))
+      flash[:error]="You are not a member of this project, so cannot access this page."
+      redirect_to project_path(@project)
+      false
+    else
+      true
+    end
+
   end
 
   def administerable_by_user
