@@ -206,7 +206,7 @@ class ProjectsController < ApplicationController
 
   def member_of_this_project
     @project = Project.find(params[:id])
-    if @project.nil? || !@project.people.include?(current_user.try(:person))
+    if @project.nil? || !@project.has_member?(current_user)
       flash[:error]="You are not a member of this project, so cannot access this page."
       redirect_to project_path(@project)
       false

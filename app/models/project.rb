@@ -173,6 +173,12 @@ class Project < ActiveRecord::Base
     end
   end
 
+  #indicates whether this project has a person, or associated user, as a member
+  def has_member? user_or_person
+    user_or_person = user_or_person.try(:person) if user_or_person.is_a?(User)
+    self.people.include? user_or_person
+  end
+
   def person_roles(person)
     #Get intersection of all project memberships + person's memberships to find project membership
     project_memberships = work_groups.collect{|w| w.group_memberships}.flatten
@@ -180,12 +186,12 @@ class Project < ActiveRecord::Base
     return person_project_membership.project_roles
   end
 
-  def can_be_edited_by?(subject)
-    subject == nil ? false : (subject.is_admin? || (self.people.include?(subject.person) && (subject.can_edit_projects? || subject.is_project_manager?)))
+  def can_be_edited_by?(user)
+    user == nil ? false : (user.is_admin? || (self.has_member?(user) && (user.can_edit_projects? || user.is_project_manager?)))
   end
 
-  def can_be_administered_by?(subject)
-    subject == nil ? false : (subject.is_admin? || (self.people.include?(subject.person) && (subject.is_project_manager?)))
+  def can_be_administered_by?(user)
+    user == nil ? false : (user.is_admin? || (self.has_member?(user) && (user.is_project_manager?)))
   end
 
 end
