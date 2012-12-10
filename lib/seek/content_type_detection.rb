@@ -4,7 +4,7 @@ module Seek
     include Seek::MimeTypes
 
     MAX_EXTRACTABLE_SPREADSHEET_SIZE=1*1024*1024
-    MAX_EXTRACTABLE_SMBL_SIZE=1*1024*1024
+    MAX_EXTRACTABLE_SMBL_SIZE=5*1024*1024
     PDF_CONVERTABLE_FORMAT = %w[doc docx ppt pptx odt odp rtf txt]
     IMAGE_VIEWABLE_FORMAT = %w[gif jpeg png jpg bmp svg]
 
@@ -16,6 +16,7 @@ module Seek
       within_size_limit(blob) && is_excel?(blob)
     end
 
+    #FIXME: will include the check is_sbml? to here as well
     def is_simulatable_sbml? blob=self
       !blob.filesize.nil? && blob.filesize < MAX_EXTRACTABLE_SMBL_SIZE
     end
