@@ -986,7 +986,34 @@ class ModelsControllerTest < ActionController::TestCase
       login_as(model.contributor)
       get :show, :id=>model.id
       assert_response :success
-      assert_select "input[type=?]#sender","hidden"
+      assert_select "a", :text => /Simulate Model on Sycamore/
+    end
+  end
+
+  test "should submit_to_sycamore" do
+    with_config_value :sycamore_enabled,true do
+      model = Factory :teusink_model
+      login_as(model.contributor)
+      post :submit_to_sycamore, :id=>model.id, :version => model.version
+      assert_redirected_to "http://sycamore.eml.org/sycamore/submission.jsp"
+    end
+  end
+
+  test "should not submit_to_sycamore if sycamore is disable" do
+    model = Factory :teusink_model
+    login_as(model.contributor)
+    post :submit_to_sycamore, :id => model.id, :version => model.version
+    assert_redirected_to model_path(model,:version=>model.version)
+  end
+
+  test "should not submit_to_sycamore if model is not downloadable" do
+    with_config_value :sycamore_enabled,true do
+      model = Factory :teusink_model
+      login_as(:quentin)
+      assert !model.can_download?
+
+      post :submit_to_sycamore, :id => model.id, :version => model.version
+      assert_redirected_to model
     end
   end
 
