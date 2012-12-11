@@ -13,9 +13,10 @@ class ModelsController < ApplicationController
   
   before_filter :find_assets, :only => [ :index ]
   before_filter :find_and_auth, :except => [ :build,:index, :new, :create,:create_model_metadata,:update_model_metadata,:delete_model_metadata,:request_resource,:preview,:test_asset_url, :update_annotations_ajax]
-  before_filter :find_display_asset, :only=>[:show,:download,:execute,:builder,:simulate,:submit_to_jws,:matching_data_files,:visualise,:export_as_xgmml]
+  before_filter :find_display_asset, :only=>[:show,:download,:execute,:builder,:simulate,:submit_to_jws,:submit_to_sycamore,:matching_data_files,:visualise,:export_as_xgmml]
     
   before_filter :jws_enabled,:only=>[:builder,:simulate,:submit_to_jws]
+  before_filter :sycamore_enabled,:only=>[:submit_to_sycamore]
 
   include Seek::Publishing
 
@@ -172,6 +173,13 @@ class ModelsController < ApplicationController
     end
   end
 
+  def submit_to_sycamore
+    respond_to do |format|
+      format.html { redirect_to("http://sycamore.eml.org/sycamore/submission.jsp",
+                                :sender => "seek",
+                                :sbml_model => IO.read(@display_model.sbml_content_blobs.first.filepath).gsub(/\n/, '')) }
+    end
+  end
 
   #def simulate
   #  error=nil
@@ -650,6 +658,16 @@ class ModelsController < ApplicationController
     unless Seek::Config.jws_enabled
       respond_to do |format|
         flash[:error] = "Interaction with JWS Online is currently disabled"
+        format.html { redirect_to model_path(@model,:version=>@display_model.version) }
+      end
+      return false
+    end
+  end
+
+  def sycamore_enabled
+    unless Seek::Config.sycamore_enabled
+      respond_to do |format|
+        flash[:error] = "Interaction with Sycamore is currently disabled"
         format.html { redirect_to model_path(@model,:version=>@display_model.version) }
       end
       return false
