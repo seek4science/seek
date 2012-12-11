@@ -25,7 +25,7 @@ class ProjectSubscriptionJob < Struct.new(:project_subscription_id)
     assets |= subscribed_project.assays
 
     #assay and study dont have project association table
-    subscribable_types = project_subscription.subscribable_types.reject{|t| t=='Assay' || t=='Study'}
+    subscribable_types = project_subscription.subscribable_types.collect(&:name).reject{|t| t=='Assay' || t=='Study'}
 
     assets |= subscribable_types.collect do |type|
       # e.g.: 'data_files_projects'

@@ -51,7 +51,7 @@ class ProjectSubscriptionJobTest < ActiveSupport::TestCase
     assert assets.empty?
 
     #create items for project
-    ps.subscribable_types.reject{|t| t=='Assay' || t=='Study'}.each do |type|
+    ps.subscribable_types.collect(&:name).reject{|t| t=='Assay' || t=='Study'}.each do |type|
       Factory("#{type.underscore}", :projects => [project])
     end
     project.reload
