@@ -84,7 +84,7 @@ class ProjectsControllerTest < ActionController::TestCase
     person = Factory :person
     project = person.projects.first
     login_as(person.user)
-    get :sharing_report,:id=>project.id
+    get :asset_report,:id=>project.id
     assert_response :success
 
   end
@@ -94,7 +94,7 @@ class ProjectsControllerTest < ActionController::TestCase
     project = person.projects.first
     other_person = Factory :person
     login_as(other_person.user)
-    get :sharing_report,:id=>project.id
+    get :asset_report,:id=>project.id
     assert_redirected_to project
     assert_not_nil flash[:error]
 
@@ -108,7 +108,7 @@ class ProjectsControllerTest < ActionController::TestCase
     get :show, :id=>project.id
     assert_response :success
     assert_select "ul.sectionIcons" do
-      assert_select "a[href=?]",sharing_report_project_path(project),:text=>"Sharing report"
+      assert_select "a[href=?]",asset_report_project_path(project),:text=>"Asset report"
     end
   end
 
@@ -120,7 +120,7 @@ class ProjectsControllerTest < ActionController::TestCase
     get :show, :id=>project.id
     assert_response :success
     assert_select "ul.sectionIcons" do
-      assert_select "a[href=?]",sharing_report_project_path(project),:text=>"Sharing report",:count=>0
+      assert_select "a[href=?]",asset_report_project_path(project),:text=>"Asset report",:count=>0
     end
   end
 
@@ -134,7 +134,7 @@ class ProjectsControllerTest < ActionController::TestCase
     get :show, :id=>project.id
     assert_response :success
     assert_select "ul.sectionIcons" do
-      assert_select "a[href=?]",sharing_report_project_path(project),:text=>"Sharing report",:count=>0
+      assert_select "a[href=?]",asset_report_project_path(project),:text=>"Sharing report",:count=>0
     end
 
   end

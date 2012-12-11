@@ -5,12 +5,12 @@ class ProjectsController < ApplicationController
   include IndexPager
   
   before_filter :find_assets, :only=>[:index]
-  before_filter :is_user_admin_auth, :except=>[:index, :show, :edit, :update, :request_institutions, :admin, :sharing_report]
+  before_filter :is_user_admin_auth, :except=>[:index, :show, :edit, :update, :request_institutions, :admin, :asset_report]
   before_filter :editable_by_user, :only=>[:edit,:update]
   before_filter :administerable_by_user, :only =>[:admin]
   before_filter :auth_params,:only=>[:update]
   before_filter :auth_institution_list_for_project_manager, :only => [:update]
-  before_filter :member_of_this_project, :only=>[:sharing_report]
+  before_filter :member_of_this_project, :only=>[:asset_report]
 
   skip_before_filter :project_membership_required
 
@@ -20,9 +20,9 @@ class ProjectsController < ApplicationController
     render :json => Project.organism_counts.map(&:name).to_json
   end  
 
-  def sharing_report
+  def asset_report
     respond_to do |format|
-      format.html
+      format.html {render :template=>"projects/asset_report/report"}
     end
   end
 
