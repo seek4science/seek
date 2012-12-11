@@ -133,14 +133,27 @@ module AssetsHelper
     end
 
     #Authorize
-    related.each_value do |resource_hash|
-      resource_hash[:items].compact!
-      unless resource_hash[:items].empty?
-        total_count = resource_hash[:items].size
-        resource_hash[:items] = resource_hash[:items].select &:can_view?
-        resource_hash[:hidden_count] = total_count - resource_hash[:items].size
+    related.each do |key,res|
+        res[:items].compact!      
+        unless res[:items].empty?
+        if key == 'Project' || key == 'Institution'
+          total_count = res[:items].size
+          res[:hidden_count] = 0
+        elsif key == 'Person'
+          total_count = res[:items].size
+          if Seek::Config.is_virtualliver && current_user.nil?
+            res[:items] = []
+            res[:hidden_count] = total_count
+          else
+            res[:hidden_count] = 0
+          end
+        else
+          total_count = res[:items].size
+          res[:items] = authorized_related_items res[:items],key
+          res[:hidden_count] = total_count - res[:items].size
+        end
       end
-    end    
+    end
     
     #Limit items viewable, and put the excess count in extra_count
     related.each_key do |key|
@@ -151,6 +164,22 @@ module AssetsHelper
     end
 
     return related
+    end
+
+  def authorized_related_items related_items, item_type
+    user_id = current_user.nil? ? 0 : current_user.id
+    assets = []
+    authorized_related_items = []
+    lookup_table_name = item_type.underscore + 'auth_lookup'
+    asset_class = item_type.constantize
+    if (asset_class.lookup_table_consistent?(user_id))
+      Rails.logger.info("Lookup table #{lookup_table_name} used for authorizing related items is complete for user_id = #{user_id}")
+      assets = asset_class.lookup_for_action_and_user 'view', user_id, nil
+      authorized_related_items = assets & related_items
+    else
+      authorized_related_items = related_items.select(&:can_view?)
+    end
+    authorized_related_items
   end
 
   def filter_url(resource_type, context_resource)

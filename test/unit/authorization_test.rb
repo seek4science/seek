@@ -846,7 +846,9 @@ class AuthorizationTest < ActiveSupport::TestCase
 
       User.with_current_user gatekeeper.user do
         assert !datafile.can_manage?
-        assert !datafile.can_publish?
+        as_not_virtualliver do
+          assert !datafile.can_publish?
+        end
       end
     end
 
@@ -859,7 +861,9 @@ class AuthorizationTest < ActiveSupport::TestCase
     assert ability.cannot? :publish, datafile
 
     User.with_current_user gatekeeper.user do
-      assert !datafile.can_publish?
+      as_not_virtualliver do
+        assert !datafile.can_publish?
+      end
     end
   end
 
@@ -921,7 +925,9 @@ class AuthorizationTest < ActiveSupport::TestCase
 
     User.with_current_user asset_manager.user do
       assert datafile.can_manage?
-      assert !datafile.can_publish?
+      as_not_virtualliver do
+        assert !datafile.can_publish?
+      end
 
       ability = Ability.new(asset_manager.user)
       assert asset_manager.is_asset_manager?
@@ -938,7 +944,9 @@ class AuthorizationTest < ActiveSupport::TestCase
 
      User.with_current_user person_can_manage.user do
        assert datafile.can_manage?
-       assert !datafile.can_publish?
+       as_not_virtualliver do
+        assert !datafile.can_publish?
+       end
 
        ability = Ability.new(person_can_manage.user)
        assert person_can_manage.roles.empty?
@@ -998,24 +1006,30 @@ class AuthorizationTest < ActiveSupport::TestCase
     gatekeeper = Factory(:gatekeeper)
     User.with_current_user gatekeeper.user do
       specimen = Factory.build(:specimen, :title => 'test1', :strain => strains(:yeast1), :lab_internal_number => '1234', :projects => gatekeeper.projects, :policy => Policy.new(:sharing_scope => Policy::EVERYONE, :access_type => Policy::ACCESSIBLE))
-      assert specimen.can_publish?
-      assert specimen.save
+      as_not_virtualliver do
+        assert specimen.can_publish?
+        assert specimen.save
+      end
     end
 
     #contributor can not publish if projects associated with asset have gatekeepers
     User.with_current_user Factory(:user) do
       specimen = Factory.build(:specimen, :title => 'test2', :strain => strains(:yeast1), :lab_internal_number => '1234', :projects => gatekeeper.projects, :policy => Policy.new(:sharing_scope => Policy::EVERYONE, :access_type => Policy::ACCESSIBLE))
       assert !specimen.gatekeepers.empty?
-      assert !specimen.can_publish?
-      assert specimen.save
+      as_not_virtualliver do
+        assert !specimen.can_publish?
+        assert specimen.save
+      end
     end
 
     #contributor can publish if projects associated with asset have no gatekeepers
     User.with_current_user Factory(:user) do
       specimen = Factory.build(:specimen,:title => 'test3', :strain => strains(:yeast1), :lab_internal_number => '1234', :policy => Policy.new(:sharing_scope => Policy::EVERYONE, :access_type => Policy::ACCESSIBLE))
       assert specimen.gatekeepers.empty?
-      assert specimen.can_publish?
-      assert specimen.save
+      as_not_virtualliver do
+        assert specimen.can_publish?
+        assert specimen.save
+      end
     end
   end
 
@@ -1035,16 +1049,20 @@ class AuthorizationTest < ActiveSupport::TestCase
     User.with_current_user contributor.user do
       specimen = Factory(:specimen, :projects => gatekeeper.projects, :contributor => contributor)
       specimen.policy.sharing_scope = Policy::EVERYONE
-      assert !specimen.can_publish?
-      assert specimen.save
+      as_not_virtualliver do
+        assert !specimen.can_publish?
+        assert specimen.save
+      end
     end
 
     #contributor can publish if projects associated with asset have no gatekeepers
     User.with_current_user contributor.user do
       specimen = Factory(:specimen, :contributor => contributor)
       specimen.policy.sharing_scope = Policy::EVERYONE
-      assert specimen.can_publish?
-      assert specimen.save
+      as_not_virtualliver do
+        assert specimen.can_publish?
+        assert specimen.save
+      end
     end
 
     #contributor can publish if asset was already published
@@ -1055,8 +1073,10 @@ class AuthorizationTest < ActiveSupport::TestCase
       assert !specimen.contributor.person.is_gatekeeper?
       assert_equal Policy::EVERYONE, specimen.policy.sharing_scope
       specimen.policy.sharing_scope = Policy::EVERYONE
-      assert specimen.can_publish?
-      assert specimen.save
+      as_not_virtualliver do
+        assert specimen.can_publish?
+        assert specimen.save
+      end
     end
   end
 
@@ -1081,7 +1101,9 @@ class AuthorizationTest < ActiveSupport::TestCase
     assert_equal Policy::PRIVATE, df.policy.sharing_scope
     user = Factory(:user)
     User.with_current_user user do
-      assert !df.can_publish?
+      as_not_virtualliver do
+        assert !df.can_publish?
+      end
     end
 
     disable_authorization_checks do

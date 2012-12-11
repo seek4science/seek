@@ -1,13 +1,14 @@
 <% authorization_for_showing_already_done ||= false -%>
 <% narrow_view ||= false -%>
+<% actions_partial_disable ||= false %>
 
 <% unless collection.empty? -%>
   <div class="list_items_container">
 
     <% collection.each do |item| -%>
-		  <% if authorization_for_showing_already_done || item.can_view? -%>  
-				<%= render :partial => "assets/resource_list_item",:object=>item -%>
-			<% end -%>
-		<% end -%>
-	</div>
+        <% if authorization_for_showing_already_done || item.can_view? -%>
+            <%= render :partial => "assets/resource_list_item", :object => item, :locals => {:actions_partial_disable => actions_partial_disable} -%>
+        <% end -%>
+    <% end -%>
+  </div>
 <% end -%>
