@@ -35,9 +35,8 @@ gem "in_place_editing"
 
 
 
-gem "rdf"
-gem "rdf-rdfxml"
-gem "addressable", "2.2.8"
+gem "rdf",">=0.3.8"
+gem "rdf-rdfxml",">=0.3.8"
 gem "equivalent-xml"
 gem "breadcrumbs_on_rails","1.0.1"
 gem 'docsplit'
