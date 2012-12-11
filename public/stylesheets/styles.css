@@ -1726,3 +1726,12 @@ table.asset_report_table td {
     border: 1px black solid;
 }
 
+div.report_tab_content {
+    width: 95%;
+    background-color: #F0F0F0;
+    margin-top: 6px;
+    padding: 1em;
+    border: #999 solid 1px;
+    border-collapse: collapse;
+}
+

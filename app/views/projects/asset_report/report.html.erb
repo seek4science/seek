@@ -1,7 +1,14 @@
 <div class="show_basic">
-
-  <%= render :partial=>"projects/asset_report/shared_assets" -%>
-
-  <%= render :partial=>"projects/asset_report/publication_linked_assets" -%>
-
+  <div class="tabber">
+    <div class='tabbertab' title="Shared">
+      <div class="report_tab_content">
+        <%= render :partial => "projects/asset_report/shared_assets" -%>
+      </div>
+    </div>
+    <div class="tabbertab" title="Linked">
+      <div class="report_tab_content">
+        <%= render :partial => "projects/asset_report/publication_linked_assets" -%>
+      </div>
+    </div>
+  </div>
 </div>
