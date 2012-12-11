@@ -256,7 +256,8 @@ class ApplicationController < ActionController::Base
           'tag', 'items', 'statistics', 'tag_suggestions', 'preview'
         'view'
 
-      when 'download', 'named_download', 'launch', 'submit_job', 'data', 'execute','plot', 'explore','visualise' ,'export_as_xgmml'
+      when 'download', 'named_download', 'launch', 'submit_job', 'data', 'execute','plot', 'explore','visualise' ,
+          'export_as_xgmml', 'submit_to_sycamore'
         'download'
 
       when 'edit', 'new', 'create', 'update', 'new_version', 'create_version',

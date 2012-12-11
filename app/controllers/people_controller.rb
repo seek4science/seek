@@ -383,23 +383,25 @@ class PeopleController < ApplicationController
   end
 
   def do_projects_belong_to_project_manager_projects
-    if (params[:person] and params[:person][:work_group_ids])
-      if User.project_manager_logged_in? && !User.admin_logged_in?
-        projects = []
-        params[:person][:work_group_ids].each do |id|
-          work_group = WorkGroup.find_by_id(id)
-          project = work_group.try(:project)
-          projects << project unless project.nil?
-        end
+    if !Seek::Config.is_virtualliver
+      if (params[:person] and params[:person][:work_group_ids])
+        if User.project_manager_logged_in? && !User.admin_logged_in?
+          projects = []
+          params[:person][:work_group_ids].each do |id|
+            work_group = WorkGroup.find_by_id(id)
+            project = work_group.try(:project)
+            projects << project unless project.nil?
+          end
         project_manager_projects = current_user.person.projects_and_descendants
-        flag = true
-        projects.each do |project|
-          flag = false if !project_manager_projects.include? project
+          flag = true
+          projects.each do |project|
+            flag = false if !project_manager_projects.include? project
+          end
+          if flag == false
+            error("Project manager can not assign person to the projects that they are not in", "Is invalid")
+          end
+          return flag
         end
-        if flag == false
-          error("Project manager can not assign person to the projects that they are not in","Is invalid")
-        end
-        return flag
       end
     end
   end
