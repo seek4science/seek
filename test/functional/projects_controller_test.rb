@@ -80,7 +80,7 @@ class ProjectsControllerTest < ActionController::TestCase
 
   end
 
-  test "sharing report visible to project member" do
+  test "asset report visible to project member" do
     person = Factory :person
     project = person.projects.first
     login_as(person.user)
@@ -89,7 +89,7 @@ class ProjectsControllerTest < ActionController::TestCase
 
   end
 
-  test "sharing report not visible to non project member" do
+  test "asset report not visible to non project member" do
     person = Factory :person
     project = person.projects.first
     other_person = Factory :person
@@ -100,7 +100,7 @@ class ProjectsControllerTest < ActionController::TestCase
 
   end
 
-  test "sharing report button shown to project members" do
+  test "asset report button shown to project members" do
     person = Factory :person
     project = person.projects.first
 
@@ -112,7 +112,7 @@ class ProjectsControllerTest < ActionController::TestCase
     end
   end
 
-  test "sharing report button not shown to anonymous users" do
+  test "asset report button not shown to anonymous users" do
 
     project = Factory :project
 
@@ -124,7 +124,7 @@ class ProjectsControllerTest < ActionController::TestCase
     end
   end
 
-  test "sharing report button not shown to none project members" do
+  test "asset report button not shown to none project members" do
     person = Factory :person
     project = person.projects.first
     other_person = Factory :person

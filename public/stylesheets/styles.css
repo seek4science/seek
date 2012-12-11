@@ -1709,4 +1709,20 @@ p.import_details {
     font-style: italic;
 }
 
+table.asset_report_table {
+    margin-left: 1em;
+    border: 1px black solid;
+}
+
+table.asset_report_table tr {
+    border: 1px black solid;
+}
+
+table.asset_report_table th {
+    border: 1px black solid;
+}
+
+table.asset_report_table td {
+    border: 1px black solid;
+}
 

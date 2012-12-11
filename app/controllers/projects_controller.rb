@@ -21,6 +21,22 @@ class ProjectsController < ApplicationController
   end  
 
   def asset_report
+    @types=[DataFile,Model,Sop]
+    @types.each do |type|
+      all = type.all_authorized_for "download", nil, @project
+      instance_variable_set "@public_#{type.name.underscore.pluralize}".to_sym,all
+      #to reduce the initial list - will start with all assets that can be seen by the first user fouund to be in a project
+      user = User.all.detect{|user| !user.try(:person).nil? && !user.person.projects.empty?}
+      projects_shared = user.nil? ? [] : type.all_authorized_for("download", user, @project)
+      #now select those with a policy set to downloadable to all-sysmo-users
+      projects_shared  = projects_shared.select do |item|
+        (item.policy.sharing_scope == Policy::ALL_SYSMO_USERS && item.policy.access_type == Policy::ACCESSIBLE)
+      end
+      #just those shared with sysmo but NOT shared publicly
+      projects_shared  = projects_shared  - all
+      instance_variable_set "@projects_only_#{type.name.underscore.pluralize}".to_sym,projects_shared
+    end
+
     respond_to do |format|
       format.html {render :template=>"projects/asset_report/report"}
     end
