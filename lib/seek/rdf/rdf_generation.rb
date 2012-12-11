@@ -39,7 +39,8 @@ module Seek
         RDF::Resource.new(uri)
       end
 
-      def save_rdf dir=File.join(Rails.root, "tmp", "rdf")
+      def save_rdf dir=nil
+        dir||=File.join(Rails.root, "tmp", "rdf")
         #seperate public and private (to an outside user) into separate directories
         inner_dir = self.can_view?(nil) ? "public" : "private"
         dir = File.join(dir,inner_dir)
