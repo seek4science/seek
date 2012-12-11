@@ -27,8 +27,8 @@
    <% end %>
 </ul>
 
-  <% if Seek::Config.sycamore_enabled and @display_model.is_sbml? %>
-      <% if @model.can_download? -%>
+  <% if Seek::Config.sycamore_enabled && excutable_content_blob=@display_model.is_sbml? %>
+      <% if @model.can_download? && !excutable_content_blob.filesize.nil? && excutable_content_blob.filesize < 5*1024*1024 -%>
         <ul class="sectionIcons">
           <li>
             <%= link_to image('execute') + "Simulate Model on Sycamore", submit_to_sycamore_model_path(@model, :version => @display_model.version), :target => '_blank' -%>
