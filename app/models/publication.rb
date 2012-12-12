@@ -98,6 +98,35 @@ class Publication < ActiveRecord::Base
   def related_assays
     self.backwards_relationships.select {|a| a.subject_type == "Assay"}.collect { |a| a.subject }
   end
+
+  #includes those related directly, or through an assay
+  def all_related_data_files
+    via_assay = related_assays.collect do |assay|
+      assay.data_file_masters
+    end.flatten.uniq.compact
+    via_assay | related_data_files
+  end
+
+  #includes those related directly, or through an assay
+  def all_related_models
+    via_assay = related_assays.collect do |assay|
+      assay.model_masters
+    end.flatten.uniq.compact
+    via_assay | related_models
+  end
+
+  #indicates whether the publication has data files or models linked to it (either directly or via an assay)
+  def has_assets?
+    #FIXME: requires a unit test
+    !all_related_data_files.empty? || !all_related_models.empty?
+  end
+
+  #returns a list of related organisms, related through either the assay or the model
+  def related_organisms
+    organisms = related_assays.collect{|a| a.organisms}.flatten.uniq.compact
+    organisms = organisms | related_models.collect{|m| m.organism}.uniq.compact
+    organisms
+  end
   
   def self.subscribers_are_notified_of? action
     action == 'create'

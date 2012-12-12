@@ -314,6 +314,8 @@ module ImagesHelper
         "famfamfam_silk/folder.png"
       when "search"
         "famfamfam_silk/eye.png"
+      when "report"
+        "famfamfam_silk/report.png"
       when "jws_shadow"
         "jws/shadow2.gif"
     else

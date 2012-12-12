@@ -1,0 +1,58 @@
+<% pub = linked_publication_row -%>
+<tr>
+  <td>
+    <%= pub.title -%>
+  </td>
+  <td><%= link_to polymorphic_url(pub), polymorphic_url(pub) -%></td>
+  <td>
+    <%= !pub.pubmed_id.nil? ? pub.pubmed_id : pub.doi %>
+  </td>
+  <td>
+    <% organisms=pub.related_organisms -%>
+    <%=  organisms.empty? ? "<span class='none_text'>Unknown</span>" : organisms.collect{|organism| organism.title}.join("<br/>") %>
+  </td>
+  <td>
+    <%  ncbi = organisms.collect{|org| org.ncbi_id} %>
+    <%=  ncbi.empty? ? "<span class='none_text'>Unknown</span>" : ncbi.collect{|id| id.nil? ? "<span class='none_text'>Unknown</span>" : id}.join("<br/>") %>
+  </td>
+  <td>
+    <table class='inner_linked_assets'>
+      <% pub.all_related_data_files.each do |df| -%>
+          <% cls = df.can_download?(nil) ? '' : 'notpublic' -%>
+          <tr class='<%= cls -%>'>
+            <td><%= df.can_view? ? df.title : "<span class='none_text'>Hidden</span>" -%></td>
+          </tr>
+      <% end -%>
+    </table>
+  </td>
+  <td>
+    <table class='inner_linked_assets'>
+      <% pub.all_related_data_files.each do |df| -%>
+          <% cls = df.can_download?(nil) ? '' : 'notpublic' -%>
+          <tr class='<%= cls -%>'>
+            <td><%= link_to polymorphic_url(df), polymorphic_url(df) -%></td>
+          </tr>
+      <% end -%>
+    </table>
+  </td>
+  <td>
+    <table class='inner_linked_assets'>
+      <% pub.all_related_models.each do |model| -%>
+          <% cls = model.can_download?(nil) ? '' : 'notpublic' -%>
+          <tr class='<%= cls -%>'>
+            <td><%= model.can_view? ? model.title : "<span class='none_text'>Hidden</span>" -%></td>
+          </tr>
+      <% end -%>
+    </table>
+  </td>
+  <td>
+    <table class='inner_linked_assets'>
+      <% pub.all_related_models.each do |model| -%>
+          <% cls = model.can_download?(nil) ? '' : 'notpublic' -%>
+          <tr class='<%= cls -%>'>
+            <td><%= link_to polymorphic_url(model), polymorphic_url(model) -%></td>
+          </tr>
+      <% end -%>
+    </table>
+  </td>
+</tr>
