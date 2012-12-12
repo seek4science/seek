@@ -10,10 +10,16 @@
 
 %>
 <h1>Public Stuff</h1>
+<p class='box_infotext'>
+  Some text explaining what is shown here is all public.
+</p>
 <%= render :partial=>"projects/asset_report/linked_publication_table",:object=>publications_all_public -%>
 
 
 <h1>Not Public Stuff</h1>
+<p class='box_infotext'>
+  Some text explaining what is shown here contains some none public stuff highlighted in <span style='color:red;'>RED</span>
+</p>
 <%= render :partial=>"projects/asset_report/linked_publication_table",:object=>publications_not_all_public -%>
 
 
