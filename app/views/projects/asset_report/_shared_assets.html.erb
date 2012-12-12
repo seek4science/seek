@@ -1,0 +1,46 @@
+<h1>Data, Models and SOPs that are shared publicly, including to non SEEK members</h1>
+
+<% @types.each do |type| -%>
+
+<% items = instance_variable_get("@public_#{type.name.underscore.pluralize}") -%>
+    <h2><%= resource_tab_item_name type.name %></h2>
+<% if items.empty? %>
+    <span class='none_text'>There are no <%= resource_tab_item_name type.name %> shared publicly</span>
+<% else -%>
+    <table class='asset_report_table'>
+      <thead>
+
+            <tr>
+                <th>Asset type</th><th>Asset URL</th><th>Asset title</th><th>Owners of the Asset</th>
+            </tr>
+      </thead>
+      <tbody>
+        <%=  render :partial=>"projects/asset_report/shared_asset_row",:collection=>items %>
+      </tbody>
+    </table>
+ <% end %>
+<% end -%>
+
+
+<h1>Data, Models and SOPs that are shared with all projects, but are not available publicly</h1>
+
+<% @types.each do |type| -%>
+
+<% items = instance_variable_get("@projects_only_#{type.name.underscore.pluralize}") -%>
+    <h2><%= resource_tab_item_name type.name %></h2>
+<% if items.empty? %>
+    <span class='none_text'>There are no <%= resource_tab_item_name type.name %> shared with all other projects, apart from those listed as shared publicly</span>
+<% else -%>
+    <table class='asset_report_table'>
+      <thead>
+
+            <tr>
+                <th>Asset type</th><th>Asset URL</th><th>Asset title</th><th>Owners of the Asset</th>
+            </tr>
+      </thead>
+      <tbody>
+        <%=  render :partial=>"projects/asset_report/shared_asset_row",:collection=>items %>
+      </tbody>
+    </table>
+ <% end %>
+<% end -%>

@@ -1,3 +1,4 @@
+#FIXME: need to check if the methods in this module are still used after moving the simulation buttons to each file of the model
 module Seek
   module Models
     module ModelTypeHandling
