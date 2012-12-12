@@ -1710,8 +1710,8 @@ p.import_details {
 }
 
 table.asset_report_table {
-    margin-left: 1em;
     border: 1px black solid;
+    width: 99%;
 }
 
 table.asset_report_table tr {
