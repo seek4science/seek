@@ -29,4 +29,9 @@ class Organism < ActiveRecord::Base
     terms
   end
 
+  def ncbi_id
+    return nil if self.bioportal_concept.nil? || self.bioportal_concept.concept_uri.nil?
+    self.bioportal_concept.concept_uri.gsub("NCBITaxon:","")
+  end
+
 end

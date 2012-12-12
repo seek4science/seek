@@ -9,7 +9,11 @@
   </td>
   <td>
     <% organisms=pub.related_organisms -%>
-    <%=  organisms.empty? ? "<span class='none_text'>Unknown</span>" : organisms.collect{|organism| organism.title}.join(", ") %>
+    <%=  organisms.empty? ? "<span class='none_text'>Unknown</span>" : organisms.collect{|organism| organism.title}.join("<br/>") %>
+  </td>
+  <td>
+    <%  ncbi = organisms.collect{|org| org.ncbi_id} %>
+    <%=  ncbi.empty? ? "<span class='none_text'>Unknown</span>" : ncbi.collect{|id| id.nil? ? "<span class='none_text'>Unknown</span>" : id}.join("<br/>") %>
   </td>
   <td>
     <table class='inner_linked_assets'>
