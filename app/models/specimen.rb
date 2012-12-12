@@ -40,7 +40,7 @@ class Specimen < ActiveRecord::Base
   validates_numericality_of :age, :only_integer => true, :greater_than=> 0, :allow_nil=> true, :message => "is not a positive integer"
   validates_presence_of :title,:lab_internal_number, :contributor,:strain
 
-  validates_presence_of :institution if Seek::Config.is_virtualliver
+  validates_presence_of :institution, :if => "Seek::Config.is_virtualliver"
   validates_uniqueness_of :title
 
   AGE_UNITS = ["second","minute","hour","day","week","month","year"]

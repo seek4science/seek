@@ -24,8 +24,8 @@ class Sample < ActiveRecord::Base
   has_many :creators, :class_name => "Person", :through => :assets_creators, :order=>'assets_creators.id', :after_add => :update_timestamp, :after_remove => :update_timestamp
   has_many :assets,:through => :sample_assets
   has_many :sample_assets,:dependent => :destroy
-  validates_numericality_of :age_at_sampling, :only_integer => true, :greater_than=> 0, :allow_nil=> true, :message => "is not a positive integer" if !Seek::Config.is_virtualliver
-  validates_presence_of :projects unless Seek::Config.is_virtualliver
+  validates_numericality_of :age_at_sampling, :only_integer => true, :greater_than=> 0, :allow_nil=> true, :message => "is not a positive integer", :unless => "Seek::Config.is_virtualliver"
+  validates_presence_of :projects, :unless => "Seek::Config.is_virtualliver"
   def self.sop_sql()
   'SELECT sop_versions.* FROM sop_versions ' +
   'INNER JOIN sample_sops ' +
@@ -60,7 +60,7 @@ class Sample < ActiveRecord::Base
   validates_presence_of :title
   validates_uniqueness_of :title
   validates_presence_of :specimen,:lab_internal_number
-  validates_presence_of :donation_date if Seek::Config.is_virtualliver
+  validates_presence_of :donation_date, :if => "Seek::Config.is_virtualliver"
 
   grouped_pagination :pages=>("A".."Z").to_a, :default_page => Seek::Config.default_page(self.name.underscore.pluralize)
 
