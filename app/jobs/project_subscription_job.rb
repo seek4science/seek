@@ -3,9 +3,14 @@ class ProjectSubscriptionJob < Struct.new(:project_subscription_id)
   def perform
     ps = ProjectSubscription.find_by_id(project_subscription_id)
     if ps
-      items = all_in_project(ps)
-      items.each do |item|
+      project = ps.project
+      all_in_project(project).each do |item|
         item.subscriptions << Subscription.new(:person => ps.person, :project_subscription_id => project_subscription_id) unless item.subscribed?(ps.person)
+      end
+      project.ancestors.each do |parent_project|
+        all_in_project(parent_project).each do |item|
+          item.subscriptions << Subscription.new(:person => ps.person) unless item.subscribed?(ps.person)
+        end
       end
     end
   end
@@ -18,19 +23,18 @@ class ProjectSubscriptionJob < Struct.new(:project_subscription_id)
     Delayed::Job.enqueue(ProjectSubscriptionJob.new(project_subscription_id), priority, t) unless exists? project_subscription_id
   end
 
-  def all_in_project project_subscription
-    subscribed_project = project_subscription.project
+  def all_in_project project
     assets = []
-    assets |= subscribed_project.studies
-    assets |= subscribed_project.assays
+    assets |= project.studies
+    assets |= project.assays
 
     #assay and study dont have project association table
-    subscribable_types = project_subscription.subscribable_types.collect(&:name).reject{|t| t=='Assay' || t=='Study'}
+    subscribable_types = Seek::Util.persistent_classes.select(&:subscribable?).collect(&:name).reject{|t| t=='Assay' || t=='Study'}
 
     assets |= subscribable_types.collect do |type|
       # e.g.: 'data_files_projects'
       assets_projects_table = ["#{type.underscore.pluralize}", 'projects'].sort.join('_')
-      assets_for_project subscribed_project, type, assets_projects_table
+      assets_for_project project, type, assets_projects_table
     end.flatten.uniq
     assets
   end

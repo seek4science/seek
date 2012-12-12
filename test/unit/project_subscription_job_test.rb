@@ -47,7 +47,7 @@ class ProjectSubscriptionJobTest < ActiveSupport::TestCase
   test "all_in_project" do
     project = Factory(:project)
     ps = Factory(:project_subscription, :project => project)
-    assets = ProjectSubscriptionJob.new.all_in_project ps
+    assets = ProjectSubscriptionJob.new.all_in_project project
     assert assets.empty?
 
     #create items for project
@@ -60,7 +60,7 @@ class ProjectSubscriptionJobTest < ActiveSupport::TestCase
     #assay
     Factory(:assay, :study => study)
 
-    assets = ProjectSubscriptionJob.new.all_in_project ps
+    assets = ProjectSubscriptionJob.new.all_in_project project
     assert_equal ps.subscribable_types.count, assets.count
   end
 
