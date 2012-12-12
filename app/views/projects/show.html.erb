@@ -18,6 +18,10 @@
     <% end -%>
 
 <% end -%>
+  <% if @project.try(:has_member?,current_user) -%>
+      <% tooltip_text="This will present you with a short report about the items that have been shared outside of your project" %>
+      <li><%= image_tag_for_key "report", asset_report_project_path(@project), "Asset report", {:title=>tooltip_title_attrib(tooltip_text)}, "Asset report" -%></li>
+  <% end -%>
 </ul>
 
 <%= render :partial => "layouts/item_title",:locals=>{:item=>@project} %>
@@ -49,21 +53,21 @@
           <%= pals_link_list @project -%>
         </p>
 
-        <% if @project.people.include?(current_user.try(:person))%>
-            <p class="asset_managers">
-              <label>Asset Managers:</label>
-              <%= asset_managers_link_list @project -%>
-            </p>
+        <% if @project.has_member?(current_user)%>
+        <p class="asset_managers">
+          <label>Asset Managers:</label>
+          <%= asset_managers_link_list @project -%>
+        </p>
 
-            <p class="project_managers">
-              <label>Project Managers:</label>
-              <%= project_managers_link_list @project -%>
-            </p>
+        <p class="project_managers">
+          <label>Project Managers:</label>
+          <%= project_managers_link_list @project -%>
+        </p>
 
-            <p class="gatekeepers">
-              <label>Gatekeepers:</label>
-              <%= gatekeepers_link_list @project -%>
-            </p>
+        <p class="gatekeepers">
+          <label>Gatekeepers:</label>
+          <%= gatekeepers_link_list @project -%>
+        </p>
         <% end %>
 
 

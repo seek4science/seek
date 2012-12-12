@@ -1,0 +1,42 @@
+table.asset_report_table {
+    border: 1px black solid;
+    width: 99%;
+    overflow-x: scroll;
+}
+
+table.asset_report_table tr {
+    border: 1px black solid;
+}
+
+table.asset_report_table th {
+    border: 1px black solid;
+}
+
+table.asset_report_table td {
+    border: 1px black solid;
+}
+
+div.report_tab_content {
+    width: 95%;
+    background-color: #F0F0F0;
+    margin-top: 6px;
+    padding: 1em;
+    border: #999 solid 1px;
+    border-collapse: collapse;
+}
+
+table.inner_linked_assets {
+    border: 0px
+}
+table.inner_linked_assets td {
+
+    border: 0px;
+}
+
+table.inner_linked_assets tr {
+    border: 0px;
+}
+
+table.inner_linked_assets tr.notpublic {
+    background-color: #f77;
+}

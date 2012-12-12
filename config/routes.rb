@@ -47,7 +47,7 @@ ActionController::Routing::Routes.draw do |map|
   end
 
   map.resources :models, 
-    :member => {:download => :get, :matching_data=>:get, :execute=>:post, :request_resource=>:post,:preview_publish=>:get,:publish=>:post, :builder=>:get,:visualise=>:get, :export_as_xgmml=>:post,:submit_to_jws=>:post, :simulate=>:post, :update_annotations_ajax=>:post },
+    :member => {:download => :get, :matching_data=>:get, :execute=>:post, :request_resource=>:post,:preview_publish=>:get,:publish=>:post, :builder=>:get,:visualise=>:get, :export_as_xgmml=>:post,:submit_to_jws=>:post,:submit_to_sycamore=>:get, :simulate=>:post, :update_annotations_ajax=>:post },
     :collection=>{:build=>:get} do |model|
     model.resources :model_images,:member=>{ :select=>:post },:collection => {:new => :post}
     model.resources :content_blobs, :member => {:download => :get, :view_pdf_content => :get, :get_pdf => :get}
@@ -59,7 +59,7 @@ ActionController::Routing::Routes.draw do |map|
   end
 
   map.resources :projects,
-    :collection => { :request_institutions => :get },:member=>{:admin=>:get} do |project|
+    :collection => { :request_institutions => :get },:member=>{:admin=>:get, :asset_report=>:get} do |project|
     # avatars / pictures 'owned by' project
     project.resources :avatars, :member => { :select => :post }, :collection => { :new => :post }
     project.resources :folders, :collection=>{:nuke=>:post},:member=>{:display_contents=>:post,:move_asset_to=>:post,:create_folder=>:post,:remove_asset=>:post}
