@@ -6,16 +6,18 @@
   <%= asset_buttons @model, @display_model.version -%>
 
   <% if Seek::Config.jws_enabled && @display_model.is_jws_supported? -%>
-
-      <% if @model.can_edit? -%>
-          <li>
-            <%= image_tag_for_key('jws_builder', builder_model_path(@model, :version => @display_model.version), nil, nil, "JWS One Stop") -%>
-          </li>
-      <% end -%>
-      <% if @model.can_download? -%>
-          <li>
-            <%= image_tag_for_key('execute', simulate_model_path(@model, :version => @display_model.version), nil, {:method => :post}, "Simulate Model on JWS") -%>
-          </li>
+      <% jws_supported_content_blob = @display_model.jws_supported_content_blobs.first %>
+      <% if jws_content_blob.is_in_simulatable_size_limit? %>
+          <% if @model.can_edit? -%>
+              <li>
+                <%= image_tag_for_key('jws_builder', builder_model_path(@model, :version => @display_model.version), nil, nil, "JWS One Stop") -%>
+              </li>
+          <% end -%>
+          <% if @model.can_download? -%>
+              <li>
+                <%= image_tag_for_key('execute', simulate_model_path(@model, :version => @display_model.version), nil, {:method => :post}, "Simulate Model on JWS") -%>
+              </li>
+          <% end -%>
       <% end -%>
   <% end -%>
 
