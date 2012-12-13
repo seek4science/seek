@@ -101,10 +101,12 @@ class HomeControllerTest < ActionController::TestCase
 
   test "should hide forum tab for logged in user" do
     #this test may break if we re-enable forums - which is currently under question. If it does and we have re-enabled just change :count=>1
-    login_as(:quentin)
-    get :index
-    assert_response :success
-    assert_select 'a',:text=>/Forum/,:count=>0
+    as_not_virtualliver do
+      login_as(:quentin)
+      get :index
+      assert_response :success
+      assert_select 'a', :text => /Forum/, :count => 0
+    end
   end
 
   test "should display home description" do
