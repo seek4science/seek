@@ -5,7 +5,8 @@
 <% @types.each do |type| -%>
 
 <% items = instance_variable_get("@public_#{type.name.underscore.pluralize}") -%>
-    <h2><%= resource_tab_item_name type.name %></h2>
+    <% asset_name = resource_tab_item_name type.name,false -%>
+        <h2><%= asset_name.pluralize %></h2>
 <% if items.empty? %>
     <span class='none_text'>There are no <%= resource_tab_item_name type.name %> shared publicly</span>
 <% else -%>
@@ -13,7 +14,7 @@
       <thead>
 
             <tr>
-                <th style="width:8em">Asset type</th><th style="width:30em">Asset URL</th><th>Asset title</th><th style="width:15em">Owners of the Asset</th>
+              <th style="width:30em"><%= asset_name -%> URL</th><th><%= asset_name -%> title</th><th style="width:15em">Owners of the <%= asset_name -%></th>
             </tr>
       </thead>
       <tbody>
@@ -31,7 +32,8 @@
 <% @types.each do |type| -%>
 
 <% items = instance_variable_get("@projects_only_#{type.name.underscore.pluralize}") -%>
-    <h2><%= resource_tab_item_name type.name %></h2>
+    <% asset_name = resource_tab_item_name type.name,false -%>
+    <h2><%= asset_name.pluralize %></h2>
 <% if items.empty? %>
     <span class='none_text'>There are no <%= resource_tab_item_name type.name %> shared with all other projects, apart from those listed as available publicly</span>
 <% else -%>
@@ -39,7 +41,7 @@
       <thead>
 
             <tr>
-              <th style="width:8em">Asset type</th><th style="width:30em">Asset URL</th><th>Asset title</th><th style="width:15em">Owners of the Asset</th>
+              <th style="width:30em"><%= asset_name -%> URL</th><th><%= asset_name -%> title</th><th style="width:15em">Owners of the <%= asset_name -%></th>
             </tr>
       </thead>
       <tbody>

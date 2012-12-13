@@ -1,6 +1,5 @@
 <% asset = shared_asset_row -%>
 <tr>
-  <td><%= resource_tab_item_name asset.class.name,false -%></td>
   <td><%= link_to polymorphic_url(asset),polymorphic_url(asset) -%></td>
   <td><%= asset.title %></td>
   <td><%= asset.managers.collect{|m| link_to(m.name,m)}.join(", ") %></td>
