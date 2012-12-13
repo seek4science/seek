@@ -206,6 +206,13 @@ Factory.define(:culture_growth_type) do |f|
   f.title "a culture_growth_type"
 end
 
+#Assay organism
+Factory.define(:assay_organism) do |f|
+  f.association :assay
+  f.association :strain
+  f.association :organism
+end
+
 #Specimen
 Factory.define(:specimen) do |f|
   f.sequence(:title) { |n| "Specimen#{n}" }

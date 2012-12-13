@@ -398,6 +398,31 @@ end
     assert_redirected_to assays_path
   end
 
+  test "should list correct organisms" do
+    a = Factory :assay,:policy=>Factory(:public_policy)
+    o1 = Factory(:organism,:title=>"Frog")
+
+    Factory :assay_organism, :assay=>a,:organism=>o1
+
+    get :show,:id=>a.id
+    assert_response :success
+    assert_select "p#organism" do
+      assert_select "a[href=?]",organism_path(o1),:text=>"Frog"
+    end
+
+    o2 = Factory(:organism,:title=>"Slug")
+    str = Factory :strain, :title=>"AAA111", :organism=>o2
+    Factory :assay_organism,:assay=>a,:organism=>o2,:strain=>str
+    get :show,:id=>a.id
+        assert_response :success
+        assert_select "p#organism" do
+          assert_select "a[href=?]",organism_path(o1),:text=>"Frog"
+          assert_select "a[href=?]",organism_path(o2),:text=>"Slug"
+          assert_select "span.strain_info",:text=>str.info
+        end
+
+  end
+
   test "should show edit when not logged in" do
     logout
     a = Factory :experimental_assay,:contributor=>Factory(:person),:policy=>Factory(:editing_public_policy)
