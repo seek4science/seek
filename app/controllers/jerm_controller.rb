@@ -6,8 +6,6 @@ class JermController < ApplicationController
   @@harvester_factory=Jerm::JermHarvesterFactory.new
   @@populator = Jerm::EmbeddedPopulator.new
   
-  layout "no_sidebar"
-  
   def index
     
   end 
