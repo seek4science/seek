@@ -53,7 +53,7 @@
 
   <div id="bd">
     <div id="yui-main">
-      <div class="yui-b" id="content">
+      <div <%= "class='yui-b'" unless @no_sidebar  %> id="content">
 
 <%# applying styling to error / notice messages -%>
         <% if flash[:error] %>
@@ -85,9 +85,11 @@
       </div>
       <br style="clear:both"/>
     </div>
+    <% unless @no_sidebar -%>
     <div id="myexp_sidebar" class="yui-b">
-      <%= render :partial => "layouts/sidebar" %>
+       <%= render :partial => "layouts/sidebar" %>
     </div>
+    <% end -%>
   </div>
 
   <div id="ft">

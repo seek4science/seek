@@ -9,16 +9,18 @@
    publications_not_all_public = publications - publications_all_public
 
 %>
-<h1>Public Stuff</h1>
-<p class='box_infotext'>
-  Some text explaining what is shown here is all public.
+<h1>Publications associated with publicly available assets</h1>
+<p class='box_infotext' style="width:98%;text-align:center;margin-bottom:1em;">
+  These are the publications, with associated Data and/or Models that are available to download by any visitor to the <%= Seek::Config.application_name %> site.
 </p>
 <%= render :partial=>"projects/asset_report/linked_publication_table",:object=>publications_all_public -%>
 
+<div style="height:2em">&nbsp;</div>
 
-<h1>Not Public Stuff</h1>
-<p class='box_infotext'>
-  Some text explaining what is shown here contains some none public stuff highlighted in <span style='color:red;'>RED</span>
+<h1>Publications associated with assets, where some are not available publicly</h1>
+<p class='box_infotext' style="width:98%;text-align:center;margin-bottom:1em;">
+  These are the publications that have associated Data and/or Models, however not all the associated assets are available to download by everybody visiting the <%=  Seek::Config.application_name %> site. <br/>
+  The assets that have restricted access and need sharing publicly are highlighted in Red.
 </p>
 <%= render :partial=>"projects/asset_report/linked_publication_table",:object=>publications_not_all_public -%>
 
