@@ -21,8 +21,13 @@ fixtures :all
 
       specimen.reload
       specimen.institution= nil
-      assert !specimen.valid? if Seek::Config.is_virtualliver
+      as_virtualliver do
+        assert !specimen.valid?
+      end
 
+      as_not_virtualliver do
+        assert specimen.valid?
+      end
   end
 
   test "age with unit" do

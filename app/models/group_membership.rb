@@ -1,5 +1,5 @@
 class GroupMembership < ActiveRecord::Base
-  belongs_to :person, :touch => true
+  belongs_to :person
   belongs_to :work_group
   has_one :project, :through=>:work_group
 

@@ -13,13 +13,13 @@ module Acts
 
           #checks a policy exists, and if missing resorts to using a private policy
           after_initialize :policy_or_default_if_new
-          after_initialize :assign_is_published_before_save unless Seek::Config.is_virtualliver
+          after_initialize :assign_is_published_before_save, :unless => "Seek::Config.is_virtualliver"
 
           include ProjectCompat unless method_defined? :projects
 
           belongs_to :policy, :required_access_to_owner => :manage, :autosave => true
 
-          before_validation :temporary_policy_while_waiting_for_publishing_approval, :publishing_auth unless Seek::Config.is_virtualliver
+          before_validation :temporary_policy_while_waiting_for_publishing_approval, :publishing_auth, :unless => "Seek::Config.is_virtualliver"
           after_save :queue_update_auth_table
           after_destroy :remove_from_lookup_table
         end
@@ -245,9 +245,9 @@ module Acts
       #(gatekeeper also manager) or (manager and projects have no gatekeeper) or (manager and the item was published)
       def can_publish? user=User.current_user
         if self.new_record?
-          (Ability.new(user).can? :publish, self) || (self.can_manage? && self.gatekeepers.empty?)
+          (Ability.new(user).can? :publish, self) || (self.can_manage? && self.gatekeepers.empty?) || (self.can_manage? && Seek::Config.is_virtualliver)
         else
-          (Ability.new(user).can? :publish, self) || (self.can_manage? && self.gatekeepers.empty?) || (self.can_manage? && (self.policy.sharing_scope_was == Policy::EVERYONE))
+          (Ability.new(user).can? :publish, self) || (self.can_manage? && self.gatekeepers.empty?) || (self.can_manage? && (self.policy.sharing_scope_was == Policy::EVERYONE)) || (self.can_manage? && Seek::Config.is_virtualliver)
         end
       end
 
