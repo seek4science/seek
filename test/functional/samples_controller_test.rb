@@ -292,12 +292,14 @@ fixtures :all
     assert_select 'p a[href=?]', organism_path(s.specimen.strain.organism), :count => 1
   end
 
-  test 'should have specimen comment and sex fields in the specimen/sample show page' do
-    s = Factory :sample, :contributor => User.current_user
-    get :show, :id => s.id
-    assert_response :success
-    assert_select "label", :text => /Comment/, :count => 2 #one for specimen, one for sample
-    assert_select "label", :text => /Sex/, :count => 1
+  test 'should have specimen comment and gender fields in the specimen/sample show page' do
+    as_not_virtualliver do
+      s = Factory :sample, :contributor => User.current_user
+      get :show, :id => s.id
+      assert_response :success
+      assert_select "label", :text => /Comment/, :count => 2 #one for specimen, one for sample
+      assert_select "label", :text => /Sex/, :count => 1
+    end
   end
 
   test 'should have sample organism_part in the specimen/sample show page' do
@@ -329,14 +331,16 @@ test 'should have sample comment in the sample edit page' do
 end
 
   test "should not have 'New sample based on this one' for sysmo" do
-    s = Factory :sample, :contributor => User.current_user
-    get :show, :id => s.id
-    assert_response :success
-    assert_select "a", :text => /New sample based on this one/, :count => 0
+    as_not_virtualliver do
+      s = Factory :sample, :contributor => User.current_user
+      get :show, :id => s.id
+      assert_response :success
+      assert_select "a", :text => /New sample based on this one/, :count => 0
 
-    post :new_object_based_on_existing_one, :id => s.id
-    assert_redirected_to :root
-    assert_not_nil flash[:error]
+      post :new_object_based_on_existing_one, :id => s.id
+      assert_redirected_to :root
+      assert_not_nil flash[:error]
+    end
   end
 
 test 'combined sample_specimen form when creating new sample' do
