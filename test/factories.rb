@@ -250,6 +250,12 @@ end
     f.donation_date Date.today
     f.association :specimen
   end
+#Assay organism
+Factory.define(:assay_organism) do |f|
+  f.association :assay
+  f.association :strain
+  f.association :organism
+end
 
   #Data File
   Factory.define(:data_file) do |f|
