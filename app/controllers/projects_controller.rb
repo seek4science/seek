@@ -22,6 +22,7 @@ class ProjectsController < ApplicationController
   end  
 
   def asset_report
+    @no_sidebar=true
     @types=[DataFile,Model,Sop]
     @types.each do |type|
       all = type.all_authorized_for "download", nil, @project
