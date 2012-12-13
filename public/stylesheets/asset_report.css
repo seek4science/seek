@@ -1,7 +1,6 @@
 table.asset_report_table {
     border: 1px black solid;
     width: 99%;
-    overflow-x: scroll;
 }
 
 table.asset_report_table tr {
@@ -14,6 +13,9 @@ table.asset_report_table th {
 
 table.asset_report_table td {
     border: 1px black solid;
+    padding: 0px;
+    margin: 0px;
+    height: 3em;
 }
 
 div.report_tab_content {
@@ -26,17 +28,27 @@ div.report_tab_content {
 }
 
 table.inner_linked_assets {
-    border: 0px
-}
-table.inner_linked_assets td {
-
-    border: 0px;
+    width: 100%;
+    height: 100%;
 }
 
 table.inner_linked_assets tr {
     border: 0px;
 }
 
+table.inner_linked_assets td {
+    border: 0px;
+    vertical-align: middle;
+}
+
+table.inner_linked_assets tr.bordered td {
+    border-bottom: 1px solid black;
+}
+
 table.inner_linked_assets tr.notpublic {
-    background-color: #f77;
+    background-color: #fdd;
+}
+
+span.cell_content {
+    margin: 5px 5px 5px 5px;
 }

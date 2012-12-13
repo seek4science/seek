@@ -4,21 +4,25 @@
 -%>
 <tr>
   <td>
-    <%= pub.title -%>
+    <span class='cell_content'><%= pub.title -%></span>
   </td>
-  <td><%= link_to polymorphic_url(pub), polymorphic_url(pub) -%></td>
+  <td><span class='cell_content'><%= link_to polymorphic_url(pub), polymorphic_url(pub) -%></span></td>
   <td>
-    <%= !pub.pubmed_id.nil? ? pub.pubmed_id : pub.doi %>
+    <span class='cell_content'><%= !pub.pubmed_id.nil? ? pub.pubmed_id : pub.doi %></span>
   </td>
   <td>
     <% organisms=pub.related_organisms -%>
     <% if organisms.empty? -%>
-        <span class='none_text'>Unknown</span>
+        <span class='none_text'>None defined</span>
     <% else %>
         <table class="inner_linked_assets">
           <% organisms.each do |organism| -%>
-              <tr>
-                <td><%= organism.title -%></td>
+              <%
+                 cls = ""
+                 cls << " bordered" unless organism==organisms.last
+              -%>
+              <tr class='<%= cls -%>'>
+                <td><span class='cell_content'><%= organism.title -%></span></td>
               </tr>
           <% end -%>
         </table>
@@ -26,12 +30,16 @@
   </td>
   <td>
     <% if organisms.empty? -%>
-        <span class='none_text'>Unknown</span>
+        <span class='none_text'>None defined</span>
     <% else %>
         <table class="inner_linked_assets">
           <% organisms.each do |organism| -%>
-              <tr>
-                <td><%= organism.ncbi_id.nil? ? "<span class='none_text'>Unknown</span>" : organism.ncbi_id -%></td>
+              <%
+                 cls = ""
+                 cls << " bordered" unless organism==organisms.last
+              -%>
+              <tr class='<%= cls -%>'>
+                <td><%= organism.ncbi_id.nil? ? "<span class='none_text'>Unknown</span>" : organism.ncbi_id -%></span></td>
               </tr>
           <% end -%>
         </table>
@@ -39,40 +47,69 @@
   </td>
   <td>
     <table class='inner_linked_assets'>
+      <% if data.empty? %>
+          <span class='none_text'>None defined</span>
+      <% end -%>
       <% data.each do |df| -%>
-          <% cls = df.can_download?(nil) ? '' : 'notpublic' -%>
+          <%
+             cls = df.can_download?(nil) ? '' : 'notpublic'
+             cls << " bordered" unless df==data.last
+          -%>
           <tr class='<%= cls -%>'>
-            <td><%= df.can_view? ? df.title : "<span class='none_text'>Hidden</span>" -%></td>
+            <td>
+              <span class='cell_content'><%= df.can_view? ? df.title : "<span class='none_text'>Hidden</span>" -%></span>
+            </td>
           </tr>
       <% end -%>
     </table>
   </td>
   <td>
     <table class='inner_linked_assets'>
+      <% if data.empty? %>
+          <span class='none_text'>None defined</span>
+      <% end -%>
       <% data.each do |df| -%>
-          <% cls = df.can_download?(nil) ? '' : 'notpublic' -%>
+          <%
+             cls = df.can_download?(nil) ? '' : 'notpublic'
+             cls << " bordered" unless df==data.last
+          -%>
           <tr class='<%= cls -%>'>
-            <td><%= link_to polymorphic_url(df), polymorphic_url(df) -%></td>
+            <td><span class='cell_content'><%= link_to polymorphic_url(df), polymorphic_url(df) -%></span></td>
           </tr>
       <% end -%>
     </table>
   </td>
   <td>
     <table class='inner_linked_assets'>
+      <% if models.empty? %>
+          <span class='none_text'>None defined</span>
+      <% end -%>
+
       <% models.each do |model| -%>
-          <% cls = model.can_download?(nil) ? '' : 'notpublic' -%>
+          <%
+             cls = model.can_download?(nil) ? '' : 'notpublic'
+             cls << " bordered" unless model==models.last
+          -%>
           <tr class='<%= cls -%>'>
-            <td><%= model.can_view? ? model.title : "<span class='none_text'>Hidden</span>" -%></td>
+            <td>
+              <span class='cell_content'><%= model.can_view? ? model.title : "<span class='none_text'>Hidden</span>" -%></span>
+            </td>
           </tr>
       <% end -%>
     </table>
   </td>
   <td>
     <table class='inner_linked_assets'>
+      <% if models.empty? %>
+          <span class='none_text'>None defined</span>
+      <% end -%>
       <% models.each do |model| -%>
-          <% cls = model.can_download?(nil) ? '' : 'notpublic' -%>
+          <%
+             cls = model.can_download?(nil) ? '' : 'notpublic'
+             cls << " bordered" unless model==models.last
+          -%>
           <tr class='<%= cls -%>'>
-            <td><%= link_to polymorphic_url(model), polymorphic_url(model) -%></td>
+            <td><span class='cell_content'><%= link_to polymorphic_url(model), polymorphic_url(model) -%></span></td>
           </tr>
       <% end -%>
     </table>
