@@ -1032,7 +1032,9 @@ class DataFilesControllerTest < ActionController::TestCase
     assert_not_equal Policy::EVERYONE, data_file.policy.sharing_scope
     login_as(person.user)
     assert data_file.can_manage?
-    assert !data_file.can_publish?
+    as_not_virtualliver do
+      assert !data_file.can_publish?
+    end
 
     get :edit, :id => data_file
 
