@@ -137,7 +137,10 @@ module AssetsHelper
     related_types = related.keys - [resource.class.name]
     related_types.each do |type|
       method_name = type.underscore.pluralize
-      if resource.respond_to? "related_#{method_name}"
+      #FIXME: need to fix that Publications treat #related_data_files as those directly linked, and #all_related_data_files include those that come through assays
+      if resource.respond_to? "all_related_#{method_name}"
+        related[type][:items] = resource.send "all_related_#{method_name}"
+      elsif resource.respond_to? "related_#{method_name}"
         related[type][:items] = resource.send "related_#{method_name}"
       elsif resource.respond_to? method_name
         related[type][:items] = resource.send method_name
