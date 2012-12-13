@@ -150,27 +150,33 @@ fixtures :all
   end
 
   test "should create specimen with strings for confluency passage viability and purity" do
-    attrs = [:confluency, :passage, :viability, :purity]
-    specimen= Factory.attributes_for :specimen, :confluency => "Test", :passage => "Test", :viability => "Test", :purity => "Test"
+    as_virtualliver do
+      attrs = [:confluency, :passage, :viability, :purity, :institution]
+      specimen= Factory.attributes_for :specimen, :confluency => "Test", :passage => "Test",
+                                       :viability => "Test", :purity => "Test",
+                                       :institution => Factory(:institution)
 
-    specimen[:strain_id]=Factory(:strain).id
-    post :create, :specimen => specimen
-    assert specimen = assigns(:specimen)
+      specimen[:strain_id]=Factory(:strain).id
+      post :create, :specimen => specimen
+      assert specimen = assigns(:specimen)
 
-    assert_redirected_to specimen
+      assert_redirected_to specimen
 
-    attrs.each do |attr|
-      assert_equal "Test", specimen.send(attr)
+      attrs.reject{|a| a == :institution}.each do |attr|
+        assert_equal "Test", specimen.send(attr)
+      end
     end
   end
 
   test "should show without institution" do
-    get :show, :id => Factory(:specimen,
-                              :title=>"running mouse NO2 with no institution",
-                              :policy =>policies(:editing_for_all_sysmo_users_policy),
-                              :institution=>nil)
-    assert_response :success
-    assert_not_nil assigns(:specimen)
+    as_not_virtualliver do
+      get :show, :id => Factory(:specimen,
+                                :title => "running mouse NO2 with no institution",
+                                :policy => policies(:editing_for_all_sysmo_users_policy),
+                                :institution => nil)
+      assert_response :success
+      assert_not_nil assigns(:specimen)
+    end
   end
 
 test "should update genotypes and phenotypes" do
