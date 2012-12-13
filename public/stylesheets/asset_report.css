@@ -1,6 +1,15 @@
+div.report_tab_content {
+    width: 98%;
+    background-color: #F0F0F0;
+    margin-top: 6px;
+    padding: 1em;
+    border: #999 solid 1px;
+    border-collapse: collapse;
+}
+
 table.asset_report_table {
     border: 1px black solid;
-    width: 99%;
+    width: 100%;
 }
 
 table.asset_report_table tr {
@@ -18,14 +27,7 @@ table.asset_report_table td {
     height: 3em;
 }
 
-div.report_tab_content {
-    width: 95%;
-    background-color: #F0F0F0;
-    margin-top: 6px;
-    padding: 1em;
-    border: #999 solid 1px;
-    border-collapse: collapse;
-}
+
 
 table.inner_linked_assets {
     width: 100%;
