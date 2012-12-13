@@ -152,6 +152,7 @@ class PoliciesControllerTest < ActionController::TestCase
   end
 
   test 'when creating an item, can not publish the item if associate to it the project which has gatekeeper' do
+    as_not_virtualliver do
       gatekeeper = Factory(:gatekeeper)
       a_person = Factory(:person)
       sample = Sample.new
@@ -162,6 +163,7 @@ class PoliciesControllerTest < ActionController::TestCase
 
       updated_can_publish = PoliciesController.new().updated_can_publish('sample', sample.id, gatekeeper.projects.first.id.to_s)
       assert !updated_can_publish
+    end
   end
 
   test 'when creating an item, can publish the item if associate to it the project which has no gatekeeper' do
@@ -177,33 +179,37 @@ class PoliciesControllerTest < ActionController::TestCase
     end
 
   test 'when updating an item, can not publish the item if associate to it the project which has gatekeeper' do
-    gatekeeper = Factory(:gatekeeper)
-    a_person = Factory(:person)
-    sample = Factory(:sample, :policy => Factory(:policy))
-    Factory(:permission, :contributor => a_person, :access_type => Policy::MANAGING, :policy => sample.policy)
-    sample.reload
+    as_not_virtualliver do
+      gatekeeper = Factory(:gatekeeper)
+      a_person = Factory(:person)
+      sample = Factory(:sample, :policy => Factory(:policy))
+      Factory(:permission, :contributor => a_person, :access_type => Policy::MANAGING, :policy => sample.policy)
+      sample.reload
 
-    login_as(a_person.user)
-    assert sample.can_manage?
-    assert sample.can_publish?
+      login_as(a_person.user)
+      assert sample.can_manage?
+      assert sample.can_publish?
 
-    updated_can_publish = PoliciesController.new().updated_can_publish('sample', sample.id, gatekeeper.projects.first.id.to_s)
-    assert !updated_can_publish
+      updated_can_publish = PoliciesController.new().updated_can_publish('sample', sample.id, gatekeeper.projects.first.id.to_s)
+      assert !updated_can_publish
+    end
   end
 
   test 'when updating an item, can publish the item if dissociate to it the project which has gatekeeper' do
-        gatekeeper = Factory(:gatekeeper)
-        a_person = Factory(:person)
-        sample = Factory(:sample, :policy => Factory(:policy), :projects => gatekeeper.projects)
-        Factory(:permission, :contributor => a_person, :access_type => Policy::MANAGING, :policy => sample.policy)
-        sample.reload
+    as_not_virtualliver do
+      gatekeeper = Factory(:gatekeeper)
+      a_person = Factory(:person)
+      sample = Factory(:sample, :policy => Factory(:policy), :projects => gatekeeper.projects)
+      Factory(:permission, :contributor => a_person, :access_type => Policy::MANAGING, :policy => sample.policy)
+      sample.reload
 
-        login_as(a_person.user)
-        assert sample.can_manage?
-        assert !sample.can_publish?
+      login_as(a_person.user)
+      assert sample.can_manage?
+      assert !sample.can_publish?
 
-        updated_can_publish = PoliciesController.new().updated_can_publish('sample', sample.id, Factory(:project).id.to_s)
-        assert updated_can_publish
+      updated_can_publish = PoliciesController.new().updated_can_publish('sample', sample.id, Factory(:project).id.to_s)
+      assert updated_can_publish
+    end
   end
 
   test 'can publish assay without study' do
@@ -219,17 +225,19 @@ class PoliciesControllerTest < ActionController::TestCase
   end
 
   test 'can not publish assay having project with gatekeeper' do
-    gatekeeper = Factory(:gatekeeper)
-    a_person = Factory(:person)
-    assay = Assay.new
-    assay.study = Factory(:study, :investigation => Factory(:investigation, :projects => gatekeeper.projects))
+    as_not_virtualliver do
+      gatekeeper = Factory(:gatekeeper)
+      a_person = Factory(:person)
+      assay = Assay.new
+      assay.study = Factory(:study, :investigation => Factory(:investigation, :projects => gatekeeper.projects))
 
-    login_as(a_person.user)
-    assert assay.can_manage?
-    assert !assay.can_publish?
+      login_as(a_person.user)
+      assert assay.can_manage?
+      assert !assay.can_publish?
 
-    updated_can_publish = PoliciesController.new().updated_can_publish('assay', assay.id, assay.study.id.to_s)
-    assert !updated_can_publish
+      updated_can_publish = PoliciesController.new().updated_can_publish('assay', assay.id, assay.study.id.to_s)
+      assert !updated_can_publish
+    end
   end
 
   test 'always can publish for the published item' do
