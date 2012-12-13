@@ -245,7 +245,7 @@ class PublishingTest < ActionController::TestCase
     gatekeeper = Factory(:gatekeeper)
     df = Factory(:data_file,:projects => gatekeeper.projects)
     login_as(df.contributor)
-    put :update, :id => df.id, :sharing => {:sharing_scope => Policy::EVERYONE, "access_type#{Policy::EVERYONE}" => Policy::VISIBLE}
+    put :update, :id => df.id, :sharing => {:sharing_scope => Policy::EVERYONE, "access_type_#{Policy::EVERYONE}" => Policy::VISIBLE}
 
     id = df.id
     disable_authorization_checks do
@@ -262,37 +262,39 @@ class PublishingTest < ActionController::TestCase
   end
 
   test 'gatekeeper should approve/reject publishing' do
-    gatekeeper = Factory(:gatekeeper)
-    df = Factory(:data_file,:projects => gatekeeper.projects)
-    login_as(df.contributor)
-    put :update, :id => df.id, :sharing => {:sharing_scope => Policy::EVERYONE, "access_type#{Policy::EVERYONE}" => Policy::VISIBLE}
+    as_not_virtualliver do
+      gatekeeper = Factory(:gatekeeper)
+      df = Factory(:data_file, :projects => gatekeeper.projects)
+      login_as(df.contributor)
+      put :update, :id => df.id, :sharing => {:sharing_scope => Policy::EVERYONE, "access_type_#{Policy::EVERYONE}" => Policy::VISIBLE}
 
-    logout
+      logout
 
-    login_as(gatekeeper.user)
-    get :approve_or_reject_publish, :id=>df.id
-    assert_response :success
-    assert_nil flash[:error]
+      login_as(gatekeeper.user)
+      get :approve_or_reject_publish, :id => df.id
+      assert_response :success
+      assert_nil flash[:error]
 
-    post :reject_publish, :id => df.id
-    assert_redirected_to data_file_path(df)
-    assert_nil flash[:error]
-    df.reload
-    assert_not_equal Policy::EVERYONE, df.policy.sharing_scope
+      post :reject_publish, :id => df.id
+      assert_redirected_to data_file_path(df)
+      assert_nil flash[:error]
+      df.reload
+      assert_not_equal Policy::EVERYONE, df.policy.sharing_scope
 
-    post :approve_publish, :id => df.id
-    assert_redirected_to data_file_path(df)
-    assert_nil flash[:error]
-    df.reload
-    assert_equal Policy::EVERYONE, df.policy.sharing_scope
-    assert_equal Policy::ACCESSIBLE, df.policy.access_type
+      post :approve_publish, :id => df.id
+      assert_redirected_to data_file_path(df)
+      assert_nil flash[:error]
+      df.reload
+      assert_equal Policy::EVERYONE, df.policy.sharing_scope
+      assert_equal Policy::ACCESSIBLE, df.policy.access_type
+    end
   end
 
   test 'should not allow to approve/reject publishing for gatekeeper from other projects' do
       gatekeeper = Factory(:gatekeeper)
       df = Factory(:data_file)
       login_as(df.contributor)
-      put :update, :id => df.id, :sharing => {:sharing_scope => Policy::EVERYONE, "access_type#{Policy::EVERYONE}" => Policy::VISIBLE}
+      put :update, :id => df.id, :sharing => {:sharing_scope => Policy::EVERYONE, "access_type_#{Policy::EVERYONE}" => Policy::VISIBLE}
       logout
 
       assert (df.projects&gatekeeper.projects).empty?
@@ -325,15 +327,17 @@ class PublishingTest < ActionController::TestCase
     end
 
     test 'log when creating item and request publish it' do
-      @controller = SopsController.new()
-      assert_difference ('ResourcePublishLog.count') do
-        post :create, :sop => valid_sop, :sharing => {:sharing_scope => Policy::EVERYONE, "access_type#{Policy::EVERYONE}" => Policy::VISIBLE}
+      as_not_virtualliver do
+        @controller = SopsController.new()
+        assert_difference ('ResourcePublishLog.count') do
+          post :create, :sop => valid_sop, :sharing => {:sharing_scope => Policy::EVERYONE, "access_type_#{Policy::EVERYONE}" => Policy::VISIBLE}
+        end
+        publish_log = ResourcePublishLog.find(:last)
+        assert_equal ResourcePublishLog::WAITING_FOR_APPROVAL, publish_log.publish_state.to_i
+        sop = assigns(:sop)
+        assert_equal sop, publish_log.resource
+        assert_equal sop.contributor, publish_log.culprit
       end
-      publish_log = ResourcePublishLog.find(:last)
-      assert_equal ResourcePublishLog::WAITING_FOR_APPROVAL, publish_log.publish_state.to_i
-      sop = assigns(:sop)
-      assert_equal sop, publish_log.resource
-      assert_equal sop.contributor, publish_log.culprit
     end
 
     test 'dont log when creating the non-public item' do
@@ -364,21 +368,23 @@ class PublishingTest < ActionController::TestCase
     end
 
     test 'log when sending the publish request approval during updating a non-public item' do
-      @controller = SopsController.new()
-      login_as(:owner_of_my_first_sop)
+      as_not_virtualliver do
+        @controller = SopsController.new()
+        login_as(:owner_of_my_first_sop)
 
-      sop = sops(:my_first_sop)
-      assert_not_equal Policy::EVERYONE, sop.policy.sharing_scope
-      assert !sop.can_publish?
+        sop = sops(:my_first_sop)
+        assert_not_equal Policy::EVERYONE, sop.policy.sharing_scope
+        assert !sop.can_publish?
 
-      assert_difference ('ResourcePublishLog.count') do
-        put :update, :id => sop.id, :sharing => {:sharing_scope => Policy::EVERYONE, "access_type#{Policy::EVERYONE}" => Policy::VISIBLE}
+        assert_difference ('ResourcePublishLog.count') do
+          put :update, :id => sop.id, :sharing => {:sharing_scope => Policy::EVERYONE, "access_type_#{Policy::EVERYONE}" => Policy::VISIBLE}
+        end
+        publish_log = ResourcePublishLog.find(:last)
+        assert_equal ResourcePublishLog::WAITING_FOR_APPROVAL, publish_log.publish_state.to_i
+        sop = assigns(:sop)
+        assert_equal sop, publish_log.resource
+        assert_equal sop.contributor, publish_log.culprit
       end
-      publish_log = ResourcePublishLog.find(:last)
-      assert_equal ResourcePublishLog::WAITING_FOR_APPROVAL, publish_log.publish_state.to_i
-      sop = assigns(:sop)
-      assert_equal sop, publish_log.resource
-      assert_equal sop.contributor, publish_log.culprit
     end
 
     test 'dont log when updating an item with the not-related public sharing' do
@@ -393,28 +399,31 @@ class PublishingTest < ActionController::TestCase
     end
 
     test 'log when un-publishing an item' do
-      @controller = SopsController.new()
-      login_as(:owner_of_fully_public_policy)
+      as_not_virtualliver do
+        @controller = SopsController.new()
+        login_as(:owner_of_fully_public_policy)
 
-      sop = sops(:sop_with_fully_public_policy)
-      assert_equal Policy::EVERYONE, sop.policy.sharing_scope
+        sop = sops(:sop_with_fully_public_policy)
+        assert_equal Policy::EVERYONE, sop.policy.sharing_scope
 
-      assert_difference ('ResourcePublishLog.count') do
-        put :update, :id => sop.id, :sharing => {:sharing_scope => Policy::PRIVATE, "access_type_#{Policy::PRIVATE}" => Policy::NO_ACCESS}
+        assert_difference ('ResourcePublishLog.count') do
+          put :update, :id => sop.id, :sharing => {:sharing_scope => Policy::PRIVATE, "access_type_#{Policy::PRIVATE}" => Policy::NO_ACCESS}
+        end
+        publish_log = ResourcePublishLog.find(:last)
+        assert_equal ResourcePublishLog::UNPUBLISHED, publish_log.publish_state.to_i
+        sop = assigns(:sop)
+        assert_equal sop, publish_log.resource
+        assert_equal sop.contributor, publish_log.culprit
       end
-      publish_log = ResourcePublishLog.find(:last)
-      assert_equal ResourcePublishLog::UNPUBLISHED, publish_log.publish_state.to_i
-      sop = assigns(:sop)
-      assert_equal sop, publish_log.resource
-      assert_equal sop.contributor, publish_log.culprit
     end
 
     test 'log when approving publishing an item' do
+      as_not_virtualliver do
         gatekeeper = Factory(:gatekeeper)
         df = Factory(:data_file, :projects => gatekeeper.projects)
 
         login_as(df.contributor)
-        put :update, :id => df.id, :sharing => {:sharing_scope => Policy::EVERYONE, "access_type#{Policy::EVERYONE}" => Policy::VISIBLE}
+        put :update, :id => df.id, :sharing => {:sharing_scope => Policy::EVERYONE, "access_type_#{Policy::EVERYONE}" => Policy::VISIBLE}
 
         logout
 
@@ -428,6 +437,7 @@ class PublishingTest < ActionController::TestCase
         df = assigns(:data_file)
         assert_equal df, publish_log.resource
         assert_equal gatekeeper.user, publish_log.culprit
+      end
     end
 
   test 'do not allow to approve_publish if the asset is not in waiting_for_approval state' do
@@ -442,18 +452,20 @@ class PublishingTest < ActionController::TestCase
   end
 
   test 'allow to approve_publish if the asset is in waiting_for_approval state' do
-    gatekeeper = Factory(:gatekeeper)
-    df = Factory(:data_file, :projects => gatekeeper.projects)
+    as_not_virtualliver do
+      gatekeeper = Factory(:gatekeeper)
+      df = Factory(:data_file, :projects => gatekeeper.projects)
 
-    login_as(df.contributor)
-    put :update, :id => df.id, :sharing => {:sharing_scope => Policy::EVERYONE, "access_type#{Policy::EVERYONE}" => Policy::VISIBLE}
+      login_as(df.contributor)
+      put :update, :id => df.id, :sharing => {:sharing_scope => Policy::EVERYONE, "access_type_#{Policy::EVERYONE}" => Policy::VISIBLE}
 
-    logout
+      logout
 
-    login_as(gatekeeper.user)
-    put :approve_publish, :id => df.id
+      login_as(gatekeeper.user)
+      put :approve_publish, :id => df.id
 
-    assert_nil flash[:error]
+      assert_nil flash[:error]
+    end
   end
 
 
