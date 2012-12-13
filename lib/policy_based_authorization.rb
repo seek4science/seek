@@ -297,9 +297,9 @@ module Acts
       #(gatekeeper also manager) or (manager and projects have no gatekeeper) or (manager and the item was published)
       def can_publish? user=User.current_user
         if self.new_record?
-          (Ability.new(user).can? :publish, self) || (self.can_manage? && self.gatekeepers.empty?) || Seek::Config.is_virtualliver
+          (Ability.new(user).can? :publish, self) || (self.can_manage? && self.gatekeepers.empty?) || (self.can_manage? && Seek::Config.is_virtualliver)
         else
-          (Ability.new(user).can? :publish, self) || (self.can_manage? && self.gatekeepers.empty?) || (self.can_manage? && (self.policy.sharing_scope_was == Policy::EVERYONE)) || Seek::Config.is_virtualliver
+          (Ability.new(user).can? :publish, self) || (self.can_manage? && self.gatekeepers.empty?) || (self.can_manage? && (self.policy.sharing_scope_was == Policy::EVERYONE)) || (self.can_manage? && Seek::Config.is_virtualliver)
         end
       end
 
