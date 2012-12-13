@@ -74,7 +74,7 @@
              cls << " bordered" unless df==data.last
           -%>
           <tr class='<%= cls -%>'>
-            <td><span class='cell_content'><%= link_to "http://seek.sysmo-db.org/publications/211", "http://seek.sysmo-db.org/publications/211" -%></span></td>
+            <td><span class='cell_content'><%= link_to polymorphic_url(df), polymorphic_url(df) -%></span></td>
           </tr>
       <% end -%>
     </table>
