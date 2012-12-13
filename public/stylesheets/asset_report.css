@@ -42,7 +42,7 @@ table.inner_linked_assets td {
 }
 
 table.inner_linked_assets tr.bordered td {
-    border-bottom: 1px solid black;
+    border-bottom: 1px solid #999;
 }
 
 table.inner_linked_assets tr.notpublic {
