@@ -1,15 +1,31 @@
 <%= stylesheet_link_tag "asset_report.css" %>
+
+<script type="text/javascript">
+    tabber_ids.push("report_tabs");
+</script>
+
+<div id='<%= "report_tabs_spinner" -%>'>
+  <br/>
+  <h1>Generating report, please wait ....</h1>
+
+  <div style="text-align:center;top:30%;">
+    <%= image_tag "ajax-loader-large.gif" -%>
+  </div>
+</div>
 <div class="show_basic">
-  <div class="tabber">
-    <div class='tabbertab' title="Summary of assets shared">
-      <div class="report_tab_content">
-        <%= render :partial => "projects/asset_report/shared_assets" -%>
-      </div>
-    </div>
+  <div id="report_tabs" class="tabber" style="display:none;">
+
     <div class="tabbertab" title="Summary of publications linked to assets">
       <div class="report_tab_content">
         <%= render :partial => "projects/asset_report/linked_publications" -%>
       </div>
     </div>
+
+    <div class='tabbertab' title="Summary of assets shared">
+      <div class="report_tab_content">
+        <%= render :partial => "projects/asset_report/shared_assets" -%>
+      </div>
+    </div>
+
   </div>
 </div>
