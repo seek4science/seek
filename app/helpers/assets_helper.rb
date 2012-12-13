@@ -211,8 +211,8 @@ module AssetsHelper
       when "Publication"
         related["Person"][:items] = resource.creators
         related["Project"][:items] = resource.projects
-        related["DataFile"][:items] = resource.related_data_files
-        related["Model"][:items] = resource.related_models
+        related["DataFile"][:items] = resource.all_related_data_files
+        related["Model"][:items] = resource.all_related_models
         related["Assay"][:items] = resource.related_assays
         related["Event"][:items] = resource.events
       when "Presentation"
