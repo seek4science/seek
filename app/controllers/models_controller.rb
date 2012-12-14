@@ -13,7 +13,7 @@ class ModelsController < ApplicationController
   
   before_filter :find_assets, :only => [ :index ]
   before_filter :find_and_auth, :except => [ :build,:index, :new, :create,:create_model_metadata,:update_model_metadata,:delete_model_metadata,:request_resource,:preview,:test_asset_url, :update_annotations_ajax]
-  before_filter :find_display_asset, :only=>[:show,:download,:execute,:builder,:simulate,:submit_to_jws,:submit_to_sycamore,:matching_data_files,:visualise,:export_as_xgmml]
+  before_filter :find_display_asset, :only=>[:show,:download,:execute,:builder,:simulate,:submit_to_jws,:submit_to_sycamore,:matching_data_files,:visualise,:export_as_xgmml,:send_image]
     
   before_filter :jws_enabled,:only=>[:builder,:simulate,:submit_to_jws]
   before_filter :sycamore_enabled,:only=>[:submit_to_sycamore]
@@ -48,11 +48,8 @@ class ModelsController < ApplicationController
     render :cytoscape_web,:layout => false
   end
   def send_image
-    @model = Model.find params[:id]
-    @display_model = @model.find_version params[:version]
     image = @display_model.model_image
-      send_file "#{image.file_path  }", :type=>"JPEG", :disposition=>'inline'
-
+    send_file "#{image.file_path  }", :type=>"JPEG", :disposition=>'inline'
   end
 
   # GET /models

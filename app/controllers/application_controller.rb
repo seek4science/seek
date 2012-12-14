@@ -243,7 +243,7 @@ class ApplicationController < ActionController::Base
     case action_name
       when 'show', 'index', 'view', 'search', 'favourite', 'favourite_delete',
           'comment', 'comment_delete', 'comments', 'comments_timeline', 'rate',
-          'tag', 'items', 'statistics', 'tag_suggestions', 'preview'
+          'tag', 'items', 'statistics', 'tag_suggestions', 'preview', 'send_image'
         'view'
 
       when 'download', 'named_download', 'launch', 'submit_job', 'data', 'execute','plot', 'explore','visualise' ,
