@@ -362,19 +362,33 @@ end
     assert_redirected_to assay_path(a)
   end
 
-  test "should not create modelling assay with sample" do
+  test "should not create modelling assay with sample for SysMO, but for VL" do
     #FIXME: its allows at the moment due to time constraints before pals meeting, and fixtures and factories need updating. JIRA: SYSMO-734
-    assert_no_difference("Assay.count") do
-      post :create, :assay=>{:title=>"test",
-                             :technology_type_id=>technology_types(:gas_chromatography).id,
-                             :assay_type_id=>assay_types(:metabolomics).id,
-                             :study_id=>studies(:metabolomics_study).id,
-                             :assay_class=>assay_classes(:modelling_assay_class),
-                             :owner => Factory(:person),
-                             :sample_ids=>[Factory(:sample).id, Factory(:sample).id]
-      }
+    as_not_virtualliver do
+      assert_no_difference("Assay.count") do
+        post :create, :assay => {:title => "test",
+                                 :technology_type_id => technology_types(:gas_chromatography).id,
+                                 :assay_type_id => assay_types(:metabolomics).id,
+                                 :study_id => studies(:metabolomics_study).id,
+                                 :assay_class => assay_classes(:modelling_assay_class),
+                                 :owner => Factory(:person),
+                                 :sample_ids => [Factory(:sample).id, Factory(:sample).id]
+        }
+      end
     end
-    
+
+    as_virtualliver do
+      assert_difference("Assay.count") do
+        post :create, :assay => {:title => "test",
+                                 :technology_type_id => technology_types(:gas_chromatography).id,
+                                 :assay_type_id => assay_types(:metabolomics).id,
+                                 :study_id => studies(:metabolomics_study).id,
+                                 :assay_class => assay_classes(:modelling_assay_class),
+                                 :owner => Factory(:person),
+                                 :sample_ids => [Factory(:sample).id, Factory(:sample).id]
+        }
+      end
+    end
   end
 
   test "should delete assay with study" do
