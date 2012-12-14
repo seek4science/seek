@@ -174,7 +174,7 @@ class ModelsController < ApplicationController
     respond_to do |format|
       format.html { redirect_to("http://sycamore.eml.org/sycamore/submission.jsp",
                                 :sender => "seek",
-                                :sbml_model => IO.read(@display_model.sbml_content_blobs.first.filepath).gsub(/\n/, '')) }
+                                :sbml_model => IO.read(@display_model.is_sbml?.filepath).gsub(/\n/, '')) }
     end
   end
 
