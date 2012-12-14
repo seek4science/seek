@@ -535,6 +535,7 @@ Factory.define(:presentation_version) do |f|
 
   Factory.define :topic do |f|
     f.title 'a topic'
+    f.body 'topic body'
     f.association :user, :factory => :user
     f.association :forum, :factory => :forum
   end
