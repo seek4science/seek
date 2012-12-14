@@ -113,6 +113,7 @@ class TopicsControllerTest < ActionController::TestCase
 
   test 'should destroy' do
     topic = Factory(:topic)
+    post = Factory(:post, :topic => topic)
     login_as(topic.user)
 
     delete :destroy, :id => topic.id, :forum_id => topic.forum.id
@@ -120,10 +121,12 @@ class TopicsControllerTest < ActionController::TestCase
     assert_redirected_to forum_path(topic.forum.id)
     assert_nil flash[:error]
     assert_nil Topic.find_by_id(topic.id)
+    assert_nil Post.find_by_id(post.id)
   end
 
   test 'should handle destroying  when topic owner is deleted' do
     topic = Factory(:topic)
+    post = Factory(:post, :topic => topic)
     topic.user.delete
     topic.reload
     assert_nil topic.user
@@ -134,7 +137,8 @@ class TopicsControllerTest < ActionController::TestCase
 
     assert_redirected_to forum_path(topic.forum.id)
     assert_nil flash[:error]
-    assert_nil Post.find_by_id(topic.id)
+    assert_nil Topic.find_by_id(topic.id)
+    assert_nil Post.find_by_id(post.id)
   end
 
   private
