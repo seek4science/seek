@@ -53,6 +53,13 @@ class SiteAnnouncementsControllerTest < ActionController::TestCase
       post :create,:site_announcement=>{:title=>"fred", :email_notification => true}
     end
   end
+
+  test "should handle deleted notifiee person" do
+    Person.registered.select{|p| p.notifiee_info.try :receive_notifications?}.first.delete
+    assert_emails(NotifieeInfo.find(:all, :conditions=>["receive_notifications=?",true]).count - 1) do
+      post :create,:site_announcement=>{:title=>"fred", :email_notification => true}
+    end
+  end
   
   test "should not destroy" do
     login_as(:aaron)
