@@ -76,11 +76,11 @@ class PostsControllerTest < ActionController::TestCase
     login_as(post.user)
 
     put :update, :post => {:body => 'something'}, :id => post.id, :topic_id => post.topic.id, :forum_id => post.forum.id
-    post = assigns(:post)
+    updated_post = assigns(:post)
 
-    assert_redirected_to forum_topic_path(:forum_id => post.forum.id, :id => post.topic.id, :anchor => post.dom_id, :page => '1')
+    assert_redirected_to forum_topic_path(:forum_id => updated_post.forum.id, :id => updated_post.topic.id, :anchor => updated_post.dom_id, :page => '1')
     assert_nil flash[:error]
-    assert_equal 'something', post.body
+    assert_equal 'something', updated_post.body
   end
 
   test "should handle updating post when post owner is deleted" do
@@ -93,11 +93,11 @@ class PostsControllerTest < ActionController::TestCase
     login_as(:quentin)
 
     put :update, :post => {:body => 'something'}, :id => post.id, :topic_id => post.topic.id, :forum_id => post.forum.id
-    post = assigns(:post)
+    updated_post = assigns(:post)
 
-    assert_redirected_to forum_topic_path(:forum_id => post.forum.id, :id => post.topic.id, :anchor => post.dom_id, :page => '1')
+    assert_redirected_to forum_topic_path(:forum_id => updated_post.forum.id, :id => updated_post.topic.id, :anchor => updated_post.dom_id, :page => '1')
     assert_nil flash[:error]
-    assert_equal 'something', post.body
+    assert_equal 'something', updated_post.body
   end
 
   test 'should destroy' do
