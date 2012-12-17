@@ -372,8 +372,8 @@ end
                                  :study_id => studies(:metabolomics_study).id,
                                  :assay_class => assay_classes(:modelling_assay_class),
                                  :owner => Factory(:person),
-                                 :sample_ids => [Factory(:sample).id, Factory(:sample).id]
-        }
+                                 :sample_ids => [Factory(:sample).id, Factory(:sample).id]},
+                                 :sharing => valid_sharing
       end
     end
 
@@ -385,8 +385,8 @@ end
                                  :study_id => studies(:metabolomics_study).id,
                                  :assay_class => assay_classes(:modelling_assay_class),
                                  :owner => Factory(:person),
-                                 :sample_ids => [Factory(:sample).id, Factory(:sample).id]
-        }
+                                 :sample_ids => [Factory(:sample).id, Factory(:sample).id]},
+                                 :sharing => valid_sharing
       end
     end
   end
