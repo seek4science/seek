@@ -13,7 +13,7 @@ module Acts
 
           #checks a policy exists, and if missing resorts to using a private policy
           after_initialize :policy_or_default_if_new
-          after_initialize :assign_is_published_before_save, :unless => "Seek::Config.is_virtualliver"
+          #after_initialize :assign_is_published_before_save, :unless => "Seek::Config.is_virtualliver"
 
           include ProjectCompat unless method_defined? :projects
 
