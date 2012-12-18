@@ -741,7 +741,7 @@ class PeopleControllerTest < ActionController::TestCase
     assert_equal 'blabla', a_person.first_name
   end
 
-  test "not allow project manager to edit people outside their projects" do
+  test "allow project manager to edit people outside their projects" do
     project_manager = Factory(:project_manager)
     a_person = Factory(:person)
     assert (project_manager.projects & a_person.projects).empty?
@@ -749,15 +749,13 @@ class PeopleControllerTest < ActionController::TestCase
     login_as(project_manager.user)
     get :edit, :id => a_person
 
-    assert_redirected_to :root
-    assert_not_nil flash[:error]
+    assert_response :success
 
     put :update, :id => a_person, :person => {:first_name => 'blabla'}
 
-    assert_redirected_to :root
-    assert_not_nil flash[:error]
+    assert_redirected_to a_person
     a_person.reload
-    assert_not_equal 'blabla', a_person.first_name
+    assert_equal 'blabla', a_person.first_name
   end
 
   test "project manager can not administer admin" do
