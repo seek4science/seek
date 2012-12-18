@@ -99,7 +99,7 @@
             - All visitors (including anonymous visitors with no login):
           </label>
            <%= render :partial => "assets/sharing_form_access_type_dropdown", :locals => { :access_type_selector_for_scope => Policy::EVERYONE,
-            :sharing_scope => Policy::EVERYONE, :access_type => (@sharing_mode == Policy::EVERYONE) ? @access_type : Policy::ACCESSIBLE } -%>
+            :sharing_scope => Policy::EVERYONE, :access_type => (@sharing_mode == Policy::EVERYONE) ? @access_mode : Policy::ACCESSIBLE } -%>
            <%= additional_advanced_permissions_included @resource, Policy::EVERYONE -%>
           <br/>
         </p>

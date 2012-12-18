@@ -1139,6 +1139,18 @@ class DataFilesControllerTest < ActionController::TestCase
     assert_select "span#treatments",:text=>/you do not have permission to view the treatments/i
   end
 
+  test 'should select the correct sharing access_type when updating the datafile' do
+    df = Factory(:data_file, :policy => Factory(:policy, :sharing_scope => Policy::EVERYONE, :access_type => Policy::ACCESSIBLE))
+    login_as(df.contributor)
+
+    get :edit, :id => df.id
+    assert_response :success
+
+    assert_select 'select#access_type_select_4' do
+      assert_select "option[selected='selected']", :text => /Download/
+    end
+  end
+
   private
 
   def mock_http
