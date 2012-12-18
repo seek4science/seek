@@ -1005,7 +1005,11 @@ class AuthorizationTest < ActiveSupport::TestCase
     #gatekeeper can publish
     gatekeeper = Factory(:gatekeeper)
     User.with_current_user gatekeeper.user do
-      specimen = Factory.build(:specimen, :title => 'test1', :strain => strains(:yeast1), :lab_internal_number => '1234', :projects => gatekeeper.projects, :policy => Policy.new(:sharing_scope => Policy::EVERYONE, :access_type => Policy::ACCESSIBLE))
+        specimen = Specimen.new(:title => 'test1',
+                                :strain => strains(:yeast1),
+                                :lab_internal_number => '1234',
+                                :projects => gatekeeper.projects,
+                                :policy => Policy.new(:sharing_scope => Policy::EVERYONE, :access_type => Policy::ACCESSIBLE))
       as_not_virtualliver do
         assert specimen.can_publish?
         assert specimen.save
@@ -1014,7 +1018,11 @@ class AuthorizationTest < ActiveSupport::TestCase
 
     #contributor can not publish if projects associated with asset have gatekeepers
     User.with_current_user Factory(:user) do
-      specimen = Factory.build(:specimen, :title => 'test2', :strain => strains(:yeast1), :lab_internal_number => '1234', :projects => gatekeeper.projects, :policy => Policy.new(:sharing_scope => Policy::EVERYONE, :access_type => Policy::ACCESSIBLE))
+      specimen = Specimen.new(:title => 'test2',
+                              :strain => strains(:yeast1),
+                              :lab_internal_number => '1234',
+                              :projects => gatekeeper.projects,
+                              :policy => Policy.new(:sharing_scope => Policy::EVERYONE, :access_type => Policy::ACCESSIBLE))
       assert !specimen.gatekeepers.empty?
       as_not_virtualliver do
         assert !specimen.can_publish?

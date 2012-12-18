@@ -18,7 +18,8 @@ class PresentationsControllerTest < ActionController::TestCase
   end
 
   test "can create with valid url" do
-    presentation_attrs =   Factory.attributes_for(:presentation, :data => nil, :data_url => "http://www.virtual-liver.de/images/logo.png")
+    mock_remote_file "#{Rails.root}/test/fixtures/files/file_picture.png","http://somewhere.com/piccy.png"
+    presentation_attrs =   Factory.attributes_for(:presentation, :data => nil, :data_url => "http://somewhere.com/piccy.png")
 
     assert_difference "Presentation.count" do
       post :create,:presentation => presentation_attrs, :sharing => valid_sharing
@@ -62,12 +63,11 @@ class PresentationsControllerTest < ActionController::TestCase
   end
 
   test "can upload new version with valid url" do
+    mock_remote_file "#{Rails.root}/test/fixtures/files/file_picture.png","http://somewhere.com/piccy.png"
     presentation = Factory :presentation,:contributor=>User.current_user
-   # assert_equal "http://www.virtual-liver.de/images/logo.png",presentation.content_blob.url
-    new_data_url = "http://www.virtual-liver.de/images/liver-illustration.png"
 
     assert_difference "presentation.version" do
-       post :new_version,:id => presentation,:presentation=>{:data_url=>new_data_url}
+       post :new_version,:id => presentation,:presentation=>{:data_url=>"http://somewhere.com/piccy.png"}
        presentation.reload
     end
     assert_redirected_to presentation_path(presentation)

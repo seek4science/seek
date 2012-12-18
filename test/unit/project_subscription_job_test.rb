@@ -44,6 +44,25 @@ class ProjectSubscriptionJobTest < ActiveSupport::TestCase
       assert_equal 1,Delayed::Job.count
   end
 
+  test "all_in_project" do
+    project = Factory(:project)
+    ps = Factory(:project_subscription, :project => project)
+    assets = ProjectSubscriptionJob.new.all_in_project project
+    assert assets.empty?
+
+    #create items for project
+    ps.subscribable_types.collect(&:name).reject{|t| t=='Assay' || t=='Study'}.each do |type|
+      Factory("#{type.underscore}", :projects => [project])
+    end
+    project.reload
+    #study
+    study = Factory(:study, :investigation => project.investigations.first)
+    #assay
+    Factory(:assay, :study => study)
+
+    assets = ProjectSubscriptionJob.new.all_in_project project
+    assert_equal ps.subscribable_types.count, assets.count
+  end
 
   test "perform" do
     User.current_user = Factory(:user)

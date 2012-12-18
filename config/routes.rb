@@ -44,7 +44,7 @@ ActionController::Routing::Routes.draw do |map|
   end
 
   map.resources :models, 
-    :member => { :download => :get, :execute=>:post, :request_resource=>:post,:preview_publish=>:get,:publish=>[:post, :get], :builder=>:get,:visualise=>:get, :export_as_xgmml=>:post,:submit_to_jws=>:post, :simulate=>:post, :update_annotations_ajax=>:post },
+    :member => { :download => :get, :execute=>:post, :request_resource=>:post,:preview_publish=>:get,:publish=>[:post, :get], :builder=>:get,:visualise=>:get, :export_as_xgmml=>:post,:submit_to_jws=>:post, :submit_to_sycamore=>:post, :simulate=>:post, :update_annotations_ajax=>:post },
     :collection=>{:build=>:get} do |model|
     model.resources :model_images,:member=>{ :select=>:post },:collection => {:new => :post}
   end

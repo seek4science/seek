@@ -13,7 +13,7 @@ class ModelsController < ApplicationController
   
   before_filter :find_assets, :only => [ :index ]
   before_filter :find_and_auth, :except => [ :build,:index, :new, :create,:create_model_metadata,:update_model_metadata,:delete_model_metadata,:request_resource,:preview,:test_asset_url, :update_annotations_ajax]
-  before_filter :find_display_asset, :only=>[:show,:download,:execute,:builder,:simulate,:submit_to_jws,:matching_data_files,:visualise,:export_as_xgmml]
+  before_filter :find_display_asset, :only=>[:show,:download,:execute,:builder,:simulate,:submit_to_jws,:matching_data_files,:visualise,:export_as_xgmml,:send_image]
     
   before_filter :jws_enabled,:only=>[:builder,:simulate,:submit_to_jws]
 
@@ -47,11 +47,8 @@ class ModelsController < ApplicationController
     render :cytoscape_web,:layout => false
   end
   def send_image
-    @model = Model.find params[:id]
-    @display_model = @model.find_version params[:version]
     image = @display_model.model_image
-      send_file "#{image.file_path  }", :type=>"JPEG", :disposition=>'inline'
-
+    send_file "#{image.file_path  }", :type=>"JPEG", :disposition=>'inline'
   end
 
   # GET /models
@@ -172,6 +169,24 @@ class ModelsController < ApplicationController
     end
   end
 
+  def submit_to_sycamore
+    @model = Model.find_by_id(params[:id])
+    @display_model = @model.find_version(params[:version])
+    error_message = nil
+    if !Seek::Config.sycamore_enabled
+      error_message = "Interaction with Sycamore is currently disabled"
+    elsif !@model.can_download?
+      error_message = "You are not allowed to simulate this model with Sycamore"
+    end
+    render :update do |page|
+      if error_message.blank?
+        page['sbml_model'].value = IO.read(@display_model.is_sbml?.filepath).gsub(/\n/, '')
+        page['sycamore-form'].submit()
+      else
+        page.alert(error_message)
+      end
+    end
+  end
 
   #def simulate
   #  error=nil

@@ -3,15 +3,9 @@ module Subscribable
     klass.class_eval do
       has_many :subscriptions, :required_access_to_owner => false, :as => :subscribable, :dependent => :destroy, :autosave => true, :before_add => proc {|item, sub| sub.subscribable = item}
       after_create :set_subscription_job if self.subscribable?
-      after_update :update_subscription_job if self.subscribable?
-      attr_accessor :current_project_ids
-      after_save :assign_current_project_ids
+      after_update :update_subscription_job_if_study_or_assay if self.subscribable?
       extend ClassMethods
     end
-  end
-
-  def assign_current_project_ids
-    self.current_project_ids = self.project_ids
   end
 
   def current_users_subscription
@@ -61,6 +55,15 @@ module Subscribable
         project_subscriptions.each do |ps|
           if projects.include? ps.project
             subscriptions.create(:person => person, :project_subscription_id => ps.id) if !ps.unsubscribed_types.include?(self.class.name) && !self.subscribed?(person)
+            #also build subscriptions for studies and assays associating with this investigation
+            if self.kind_of?(Investigation)
+              self.studies.each do |study|
+                study.subscriptions << Subscription.create(:person => person, :project_subscription_id => ps.id) if !study.subscribed?(person)
+              end
+              self.assays.each do |assay|
+                assay.subscriptions << Subscription.create(:person => person, :project_subscription_id => ps.id) if !assay.subscribed?(person)
+              end
+            end
           end
         end
       end
@@ -71,6 +74,13 @@ module Subscribable
     unless projects.empty?
       project_subscription_ids = projects.collect{|project| project.project_subscriptions}.flatten.collect(&:id)
       subscriptions = Subscription.find(:all, :conditions => ['subscribable_type=? AND subscribable_id=? AND project_subscription_id IN (?)', self.class.name, self.id, project_subscription_ids])
+      #remove also subcriptions for studies and assays association with this investigation
+      if self.kind_of?(Investigation)
+        study_ids = self.studies.collect(&:id)
+        assay_ids = self.assays.collect(&:id)
+        subscriptions |= Subscription.find(:all, :conditions => ['subscribable_type=? AND subscribable_id IN (?) AND project_subscription_id IN (?)', 'Study', study_ids, project_subscription_ids])
+        subscriptions |= Subscription.find(:all, :conditions => ['subscribable_type=? AND subscribable_id IN (?) AND project_subscription_id IN (?)', 'Assay', assay_ids, project_subscription_ids])
+      end
       subscriptions.each{|s| s.destroy}
     end
   end
@@ -79,8 +89,7 @@ module Subscribable
       SetSubscriptionsForItemJob.create_job(self.class.name, self.id, self.projects.collect(&:id))
   end
 
-  def update_subscription_job
-    current_project_ids = self.current_project_ids.to_a
+  def update_subscription_job_if_study_or_assay
     if self.kind_of?(Study) && self.investigation_id_changed?
       #update subscriptions for study
       old_investigation_id = self.investigation_id_was
@@ -98,19 +107,6 @@ module Subscribable
       project_ids_to_remove = old_study.nil? ? [] : old_study.projects.collect(&:id)
       project_ids_to_add = self.study.projects.collect(&:id)
       update_subscriptions_for self, project_ids_to_add, project_ids_to_remove
-    elsif (!self.kind_of?(Study) && !self.kind_of?(Assay) && !(self.projects.collect(&:id) - current_project_ids).empty?)
-      project_ids_to_add = self.projects.collect(&:id) - current_project_ids
-      project_ids_to_remove = current_project_ids - self.projects.collect(&:id)
-      update_subscriptions_for self, project_ids_to_add, project_ids_to_remove
-      #update for associated studies and assays
-      if self.kind_of?(Investigation)
-        self.studies.each do |study|
-          update_subscriptions_for study, project_ids_to_add, project_ids_to_remove
-          study.assays.each do |assay|
-            update_subscriptions_for assay, project_ids_to_add, project_ids_to_remove
-          end
-        end
-      end
     end
   end
 
