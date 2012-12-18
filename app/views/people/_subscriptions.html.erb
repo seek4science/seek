@@ -56,8 +56,8 @@
 
 <script type="text/javascript">
 
-    <% project_subscriptions_with_unsubscribed.map(&:id).each do |sub_id| %>
-      $$('#subscription<%= sub_id %> input').invoke('disable');
+    <% project_subscriptions_with_unsubscribed.map(&:project_id).each do |proj_id| %>
+      $$('#subscription<%= proj_id %> input').invoke('disable');
     <% end %>
 
     var project_subscription = "subscription";
