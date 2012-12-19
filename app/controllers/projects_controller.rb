@@ -228,24 +228,26 @@ class ProjectsController < ApplicationController
   end
 
   def auth_institution_list_for_project_manager
-     if (params[:project] and params[:project][:institution_ids])
-      if User.project_manager_logged_in? && !User.admin_logged_in?
-        institutions = []
-        params[:project][:institution_ids].each do |id|
-          institution = Institution.find_by_id(id)
-          institutions << institution unless institution.nil?
+    unless Seek::Config.is_virtualliver
+      if (params[:project] and params[:project][:institution_ids])
+        if User.project_manager_logged_in? && !User.admin_logged_in?
+          institutions = []
+          params[:project][:institution_ids].each do |id|
+            institution = Institution.find_by_id(id)
+            institutions << institution unless institution.nil?
+          end
+          institutions_of_this_project = @project.institutions
+          institutions_of_no_project = Institution.all.select { |i| i.projects.empty? }
+          allowed_institution_list = (institutions_of_this_project + institutions_of_no_project).uniq
+          flag = true
+          institutions.each do |i|
+            flag = false if !allowed_institution_list.include? i
+          end
+          if flag == false
+            error("Insufficient privileges", "is invalid (insufficient_privileges)")
+          end
+          return flag
         end
-        institutions_of_this_project = @project.institutions
-        institutions_of_no_project = Institution.all.select{|i| i.projects.empty?}
-        allowed_institution_list =  (institutions_of_this_project + institutions_of_no_project).uniq
-        flag = true
-        institutions.each do |i|
-          flag = false if !allowed_institution_list.include? i
-        end
-        if flag == false
-          error("Insufficient privileges","is invalid (insufficient_privileges)")
-        end
-        return flag
       end
     end
   end

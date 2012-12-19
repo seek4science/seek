@@ -423,22 +423,24 @@ class ProjectsControllerTest < ActionController::TestCase
   end
 
   test 'project manager can only see the new institutions (which are not yet in any projects) and the institutions this project' do
-    project_manager = Factory(:project_manager)
-    project = project_manager.projects.first
-    login_as(project_manager.user)
+    as_not_virtualliver do
+      project_manager = Factory(:project_manager)
+      project = project_manager.projects.first
+      login_as(project_manager.user)
 
-    new_institution = Institution.create(:name => 'a test institution')
-    a_project = Factory(:project)
-    a_project.institutions << Factory(:institution)
+      new_institution = Institution.create(:name => 'a test institution')
+      a_project = Factory(:project)
+      a_project.institutions << Factory(:institution)
 
-    get :admin, :id => project
-    assert_response :success
-    assert_select "select#project_institution_ids", :count => 1 do
-      (project.institutions + [new_institution]).each do |institution|
-         assert_select 'option', :text => institution.title, :count => 1
-      end
-      a_project.institutions.each do |institution|
-         assert_select 'option', :text => institution.title, :count => 0
+      get :admin, :id => project
+      assert_response :success
+      assert_select "select#project_institution_ids", :count => 1 do
+        (project.institutions + [new_institution]).each do |institution|
+          assert_select 'option', :text => institution.title, :count => 1
+        end
+        a_project.institutions.each do |institution|
+          assert_select 'option', :text => institution.title, :count => 0
+        end
       end
     end
   end
@@ -457,19 +459,21 @@ class ProjectsControllerTest < ActionController::TestCase
   end
 
   test 'project manager can not assign the institutions (which are already in the other projects) to their project' do
-    project_manager = Factory(:project_manager)
-    project = project_manager.projects.first
-    a_project = Factory(:project)
-    a_project.institutions << Factory(:institution)
+    as_not_virtualliver do
+      project_manager = Factory(:project_manager)
+      project = project_manager.projects.first
+      a_project = Factory(:project)
+      a_project.institutions << Factory(:institution)
 
-    login_as(project_manager.user)
+      login_as(project_manager.user)
 
-    put :update, :id => project, :project => {:institution_ids => (project.institutions + a_project.institutions).collect(&:id)}
-    assert_redirected_to :root
-    assert_not_nil flash[:error]
-    project.reload
-    a_project.institutions.each do |i|
-       assert !(project.institutions.include?i)
+      put :update, :id => project, :project => {:institution_ids => (project.institutions + a_project.institutions).collect(&:id)}
+      assert_redirected_to :root
+      assert_not_nil flash[:error]
+      project.reload
+      a_project.institutions.each do |i|
+        assert !(project.institutions.include? i)
+      end
     end
   end
 
@@ -508,6 +512,32 @@ class ProjectsControllerTest < ActionController::TestCase
 		assert_nil project.site_root_uri
     assert_nil project.site_username
     assert_nil project.site_password
+  end
+
+  test "unassign institution out of project" do
+    project = Factory(:project)
+    project.institutions << Factory(:institution)
+
+    login_as(:quentin)
+
+    put :update, :id => project, :project => {:institution_ids => []}
+    assert_redirected_to project
+    assert_nil flash[:error]
+    project.reload
+    assert project.institutions.empty?
+  end
+
+  test "should not unassign institution out of project if there are people in this workgroup" do
+    wg=WorkGroup.find(1)
+    assert !wg.people.empty?
+    project = wg.project
+
+    login_as(:quentin)
+    assert_raise(Exception){
+      put :update, :id => project, :project => {:institution_ids => []}
+    }
+    project.reload
+    assert !project.institutions.empty?
   end
 
 	private

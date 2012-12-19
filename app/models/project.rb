@@ -103,7 +103,11 @@ class Project < ActiveRecord::Base
   end
 
   def check_workgroup_is_empty institution
-    raise unless work_groups.find_by_institution(institution).people.empty?
+    work_groups_of_institution = work_groups.select {|wg| wg.institution == institution }
+    people = work_groups_of_institution.collect { |wg| wg.people }.flatten
+    if !people.empty?
+      raise Exception.new("Cannot delete with associated people. This WorkGroup has "+people.size.to_s+" people associated with it")
+    end
   end
 
   alias_attribute :webpage, :web_page

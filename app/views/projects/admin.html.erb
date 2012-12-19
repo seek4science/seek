@@ -26,7 +26,11 @@
          if admin_logged_in?
             institution_list |= Institution.find(:all)
          elsif project_manager_logged_in?
+           if Seek::Config.is_virtualliver
+             institution_list |= Institution.find(:all)
+           else
             institution_list |= (Institution.find(:all).select{|i| i.projects.empty?} + @project.institutions).uniq
+           end
          end
       %>
       <%= f.collection_select :institution_ids, institution_list, :id, :name, {}, {:style => "width: 85%; height: 200px;", :multiple=>true} -%>
