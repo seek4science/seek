@@ -197,8 +197,8 @@ class HomeControllerTest < ActionController::TestCase
     assert_select 'div#project_news ul>li', 5
     assert_select 'div#community_news ul>li', 7
   end
-else
-   test "ids of scales list should be the same as scales defined in Seek::Config.scales" do
+
+  test "ids of scales list should be the same as scales defined in Seek::Config.scales" do
      get :index
      assert_response :success
      scales = ["all"]
@@ -209,8 +209,6 @@ else
        end
      end
    end
-
-end
 
   test 'should show recently added and downloaded items with the filter can_view?' do
     login_as(:aaron)
