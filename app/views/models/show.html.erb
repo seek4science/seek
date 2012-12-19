@@ -7,7 +7,7 @@
 
   <% if Seek::Config.jws_enabled && @display_model.is_jws_supported? -%>
       <% jws_supported_content_blob = @display_model.is_dat? || @display_model.is_sbml? %>
-      <% if !jws_supported_content_blob.filesize.nil? && jws_supported_content_blob.filesize < 5*1024*1024 %>
+      <% if !jws_supported_content_blob.filesize.nil? && jws_supported_content_blob.filesize < 1*1024*1024 %>
           <% if @model.can_edit? -%>
               <li>
                 <%= image_tag_for_key('jws_builder', builder_model_path(@model, :version => @display_model.version), nil, nil, "JWS One Stop") -%>
@@ -30,7 +30,7 @@
 </ul>
 
   <% if Seek::Config.sycamore_enabled && excutable_content_blob=@display_model.is_sbml? %>
-      <% if @model.can_download? && !excutable_content_blob.filesize.nil? && excutable_content_blob.filesize < 5*1024*1024 -%>
+      <% if @model.can_download? && !excutable_content_blob.filesize.nil? && excutable_content_blob.filesize < 1*1024*1024 -%>
         <ul class="sectionIcons">
           <li>
         <% form_tag("http://sycamore.eml.org/sycamore/submission.jsp", :id => 'sycamore-form') do -%>
