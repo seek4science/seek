@@ -80,7 +80,7 @@
     jQuery.noConflict();
     var $j = jQuery;
     $j(document).ready(function () {
-        creatable_table = $j('#creatable_selection_table').dataTable({
+        my_project_table = $j('#my_project_selection_table').dataTable({
             "bPaginate":false,
             "bLengthChange":false,
             "bFilter":false,
@@ -88,34 +88,39 @@
             "bInfo":false,
             "bAutoWidth":false,
             "bRetrieve": true,
-	    "aoColumns":[
+            "aoColumns":[
                 {"bVisible":true},
                 { "bVisible":false}
             ]
         });
-        $j('#creatable_selection_table tbody tr').click(function () {
-            var data = creatable_table.fnGetData(this);
-            $j('#new_resource_type')[0].value = data[1];
-            $j('#new_asset_button')[0].disabled=true;
-            newAsset();
+        $j('#my_project_selection_table tbody tr').click(function () {
+            var data = my_project_table.fnGetData(this);
+            $j('#my_project_button')[0].disabled = true;
+            location.href = '<%= projects_path%>' + '/' + data[1];
         });
         $j(document).click(function (e) {
-            $j('#creatable_selection_list')[0].style.display = 'none';
+            $j('#my_project_selection_list')[0].style.display = 'none';
         });
-        $j('#new_asset_button').click(function (e) {
+        $j('#my_project_button').click(function (e) {
             e.stopPropagation();
         });
-        $j('#creatable_selection_table').click(function (e) {
+        $j('#my_project_selection_table').click(function (e) {
             e.stopPropagation();
         });
     });
 
-    function new_creatable_selection() {
-        var new_resource_list = document.getElementById('creatable_selection_list');
-        if (new_resource_list.style.display == 'none')
-            new_resource_list.style.display = 'block';
-        else
-            new_resource_list.style.display = 'none';
+    function my_project_selection() {
+        var data = my_project_table.fnGetData();
+        /*go directly to the project if the user is the member of one project*/
+        if (data.length == 1) {
+            location.href = '<%= projects_path%>' + '/' + data[0][1];
+        } else {
+            var my_project_list = document.getElementById('my_project_selection_list');
+            if (my_project_list.style.display == 'none')
+                my_project_list.style.display = 'block';
+            else
+                my_project_list.style.display = 'none';
+        }
     }
 </script>
 
