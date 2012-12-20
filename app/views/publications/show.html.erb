@@ -17,7 +17,6 @@
 <%= render :partial => "layouts/item_title",:locals=>{:item=>@publication} %>
 
 <div class="show_basic">
-  <%= render :partial => "layouts/usage_info", :locals => { :resource => @publication } -%>
   <div class="main_content_left_box_narrower">
     <div class="box_about_actor">
       <p>
@@ -73,5 +72,7 @@
   <div style="clear:both;padding-top:1em;">      
     <%= embedded_isa_svg(@publication, false, @publication) -%>
     <%= render :partial=>"layouts/items_related_to",:object => @publication %>
+    <br/>
+    <%= render :partial => "layouts/usage_info", :locals => { :resource => @publication } -%>
   </div>
 </div>

@@ -4,8 +4,6 @@
 
 <%= render :partial => "layouts/item_title",:locals=>{:item=>@event} %>
 
-<%= render :partial => "layouts/usage_info", :locals => { :resource => @event } -%>
-
 <div class="show_basic">
   <div class="main_content_left_box">
 
@@ -66,7 +64,9 @@
     </div>
     </p>
 
-  <%= render :partial=>"layouts/items_related_to",:object => @event %>
+    <%= render :partial=>"layouts/items_related_to",:object => @event %>
+    <br/>
+    <%= render :partial => "layouts/usage_info", :locals => { :resource => @event } -%>
   </div>
 
 </div>

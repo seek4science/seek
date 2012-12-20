@@ -17,8 +17,6 @@
 
 <%= render :partial => "layouts/item_title", :locals=>{:item=>@sample} %>
 
-<%= render :partial => "layouts/usage_info", :locals => { :resource => @sample } -%>
-
 <div class="show_basic">
 
   <div class="main_content_left_box_narrower">
@@ -80,6 +78,8 @@
   <div style="clear:both">
     <br/>
     <%= render :partial => "layouts/items_related_to", :object => @sample %>
+    <br/>
+    <%= render :partial => "layouts/usage_info", :locals => { :resource => @sample } -%>
   </div>
 
 </div>

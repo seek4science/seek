@@ -54,7 +54,6 @@
 
 <%= render :partial=>"assets/upload_new_version_form", :locals=>{:resource=>@model} -%>
 <%= render :partial => "layouts/item_title",:locals=>{:item=>@model} %>
-<%= render :partial => "layouts/usage_info", :locals => { :resource => @model } -%>
 
 <div class="show_basic">
 
@@ -112,7 +111,9 @@
     <%= render :partial=>"assets/resource_main_content_right",:locals => { :resource => @model } %>
 
     <div style="clear:both;padding-top:1em;">
-        <%= render :partial=>"layouts/items_related_to",:object => @model %>
+      <%= render :partial => "layouts/items_related_to", :object => @model %>
+      <br/>
+      <%= render :partial => "layouts/usage_info", :locals => { :resource => @model } -%>
     </div>
 </div>
 

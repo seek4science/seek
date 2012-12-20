@@ -8,7 +8,7 @@
 	<% unless resource.created_at == resource.updated_at -%>				
 		<b>Last updated: </b><%= resource.updated_at.strftime('%d/%m/%Y @ %H:%M:%S') -%> 
 	<% end -%>
-	<br/>
+    &nbsp;&nbsp;&nbsp;
 	<b>Views:</b> <%= count_actions(resource,"show") -%>		
 	<% if ["DataFile","Model","Sop", "Presentation"].include?(resource.class.name) -%>
 	&nbsp;&nbsp;&nbsp;

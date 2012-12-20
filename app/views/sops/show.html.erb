@@ -8,8 +8,6 @@
 
 <%= render :partial => "layouts/item_title",:locals=>{:item=>@sop, :version=>@display_sop.version} %>
 
-<%= render :partial => "layouts/usage_info", :locals => { :resource => @sop } -%>
-
 
 <div class="show_basic">
   
@@ -53,7 +51,8 @@
 
     <%# get, classify and authorize all assets for this project -%>
     <%= render :partial=>"layouts/items_related_to",:object => @sop %>
-
+    <br/>
+    <%= render :partial => "layouts/usage_info", :locals => { :resource => @sop } -%>
   </div>
 
 </div>

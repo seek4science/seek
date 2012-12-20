@@ -16,9 +16,6 @@
 
 <%= render :partial => "layouts/item_title",:locals=>{:item=>@data_file, :version => @display_data_file.version} -%>
 
-<%= render :partial => "layouts/usage_info", :locals => { :resource => @data_file } -%>
-
-
 <div class="show_basic">
 
   <div id="matching_models" style="display:none;text-align:center";></div>
@@ -131,5 +128,7 @@
   </div>
 
   <%= render :partial=>"layouts/items_related_to",:object => @data_file -%>
+  <br/>
+  <%= render :partial => "layouts/usage_info", :locals => { :resource => @data_file } -%>
 
 </div>
