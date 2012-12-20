@@ -44,8 +44,10 @@ namespace :seek do
 
   desc "seeds the database with the list of compounds and synonyms extracted from sabio-rk and stored in config/default_data/"
   task(:compounds=>:environment) do
-    SerializationHelper::Base.new(YamlDb::Helper).load("config/default_data/compounds.yml")
-    SerializationHelper::Base.new(YamlDb::Helper).load("config/default_data/synonyms.yml")
+    Fixtures.create_fixtures(File.join(Rails.root, "config/default_data"), "compounds")
+    Fixtures.create_fixtures(File.join(Rails.root, "config/default_data"), "synonyms")
+    Fixtures.create_fixtures(File.join(Rails.root, "config/default_data"), "mappings")
+    Fixtures.create_fixtures(File.join(Rails.root, "config/default_data"), "mapping_links")
   end
 
   #update the old compounds and their annotations, add the new compounds and their annotations if they dont exist
