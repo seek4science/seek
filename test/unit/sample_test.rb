@@ -23,15 +23,25 @@ class SampleTest < ActiveSupport::TestCase
     s.lab_internal_number=nil
     assert !s.valid?
 
-    if Seek::Config.is_virtualliver
+    as_virtualliver do
       s.reload
       s.donation_date=nil
       assert !s.valid?
+      #for projects, it doesnt work by doing s.projects=[]
+      assert Factory.build(:sample, :projects => []).valid?
     end
 
-    #s.reload
-    #s.strains=[]
-    #assert !s.valid?
+    as_not_virtualliver do
+      s.reload
+      s.donation_date=nil
+      assert s.valid?
+      #for projects, it doesnt work by doing s.projects=[]
+      assert !Factory.build(:sample, :projects => []).valid?
+    end
+
+    s.reload
+    s.specimen=nil
+    assert !s.valid?
   end
 
   test "sample-asset associations" do
