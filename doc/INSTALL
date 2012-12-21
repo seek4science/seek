@@ -159,6 +159,9 @@ Then
 
 The 8100 port is used by default, if you'd like to run on another port, you need also to synchronize the changed port with the default soffice_port setting for convert_office plugin in config/environment.rb
 
+Similar to the automatical way to start and stop delayed_job by init.d script, the script for open office service can be found at:
+https://gist.github.com/3787679
+
 == Starting the server
 
 You can now start the server with the command
@@ -271,8 +274,8 @@ and configured a virtual host (probably in <i>/etc/apache2/sites-enabled/default
       </Directory>
    </VirtualHost>
 
-When setting up a production server, it is recommended that init.d/ scripts are added for delayed job, and sunspot. See the
-delayed job and Sunspot sections above for instructions on how to do this.
+When setting up a production server, it is recommended that init.d/ scripts are added for delayed job, sunspot, and open office. See the
+delayed job, open office and Sunspot sections above for instructions on how to do this.
 
 == Rebranding SysMO SEEK for other projects
 
