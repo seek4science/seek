@@ -18,10 +18,10 @@ module Acts
 
           belongs_to :policy, :required_access_to_owner => :manage, :autosave => true
 
-          before_validation :temporary_policy_while_waiting_for_publishing_approval, :publishing_auth unless Seek::Config.is_virtualliver
+          before_validation :temporary_policy_while_waiting_for_publishing_approval, :publishing_auth, :unless => "Seek::Config.is_virtualliver"
           after_save :queue_update_auth_table
           after_destroy :remove_from_lookup_table
-          before_save :update_timestamp_if_policy_was_saved if Seek::Config.is_virtualliver
+          before_save :update_timestamp_if_policy_was_saved, :if => "Seek::Config.is_virtualliver"
 
           def update_timestamp_if_policy_was_saved
             #autosaved belongs_to associations get saved before the parent, so to check if it has changed, see if it has a newer updated_at
