@@ -12,9 +12,6 @@
   
 
   <div class="main_content_left_box_narrower">
-
-    <%= render :partial=>"assets/resource_version_details", :locals=>{:displayed_resource=>@display_sop, :resource=>@sop} -%>
-  
     <div class="box_about_actor">
       <%= render :partial => 'assets/fileinfo',:object=>@display_sop.content_blob -%>
 
@@ -35,7 +32,7 @@
     </div>
   </div>
 
-  <%= render :partial=>"assets/resource_main_content_right",:locals => { :resource => @sop } %>
+  <%= render :partial=>"assets/resource_main_content_right",:locals => {:displayed_resource=>@display_sop, :resource => @sop } %>
 
   <div style="clear:both;padding-top:1em;">
     <p>
