@@ -45,12 +45,7 @@
               <%= link_to h(@assay.owner.name),@assay.owner -%>
           </p>
       <% end %>
-      <p>
-          <b>Description:</b>
-          <div id="description" class="box_standout">
-              <%= text_or_not_specified(@assay.description, :description=>true,:auto_link=>true) %>
-          </div>
-      </p>
+
      <%= render :partial => 'projects/show_project_relationship', :locals => {:resource => @assay}  %>
       <p id="investigation">
           <b>Investigation: </b>
@@ -76,6 +71,13 @@
           <b>Organisms: </b>
           <%= list_organisms_and_strains( @assay.assay_organisms.collect{|ao| [ao.organism,ao.strain]} | @assay.samples.collect{|s| [s.specimen.organism,s.specimen.strain]}) -%>
       </p>
+
+     <p>
+       <b>Description:</b>
+     <div id="description" class="box_standout">
+       <%= text_or_not_specified(@assay.description, :description => true, :auto_link => true) %>
+     </div>
+     </p>
 
      <%# FIXME: should be in a css file rather than in the middle of a page -%>
       <style type="text/css">
