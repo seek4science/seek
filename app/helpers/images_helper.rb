@@ -28,6 +28,7 @@ module ImagesHelper
     img_tag = image_tag(filename, image_options)
 
     inner = img_tag;
+    label = "<b>#{label}</b>" if key.downcase == 'download'
     inner = "#{img_tag} #{label}" unless label.blank?
     
     if (url)

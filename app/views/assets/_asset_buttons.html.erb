@@ -1,5 +1,33 @@
 
-  <%= render :partial => "subscriptions/subscribe", :locals => {:object => asset } -%>
+<% if asset.is_downloadable? -%>
+    <% display_asset = asset.find_version(version) %>
+    <%# param code is used for temporary link -%>
+    <% if asset.can_download? || (params[:code] && asset.auth_by_code?(params[:code])) -%>
+        <%
+           if Seek::Util.multi_files_asset_types.include?(asset.class)
+             path = polymorphic_path(asset,:version=>version,:action=>:download,:code=>params[:code])
+           else
+             path = polymorphic_path([asset, display_asset.content_blob],:action=>:download,:code=>params[:code])
+           end
+        %>
+        <li>
+          <%= image_tag_for_key('download', path, "Download #{human_name}", nil, "Download #{human_name}") -%>
+        </li>
+        <% if asset.is_a?(DataFile) && display_asset.contains_extractable_spreadsheet? %>
+            <li>
+              <%= image_tag_for_key('spreadsheet', polymorphic_path(asset, :version => version, :action => :explore, :code=>params[:code]), "Explore #{human_name}", nil, "Explore #{human_name}") -%>
+            </li>
+        <% end -%>
+        <% unless Seek::Util.multi_files_asset_types.include?(asset.class) %>
+            <%= render :partial => "assets/view_content", :locals => {:content_blob => display_asset.content_blob, :button_style => true} -%>
+        <% end %>
+    <% elsif logged_in? -%>
+        <li>
+          <%= render :partial=>"assets/request_resource",:locals=>{:resource=>asset} %>
+        </li>
+    <% end -%>
+<% end -%>
+
   <% if asset.can_manage? -%>
     <% if asset.is_downloadable? -%>
         <li><%= link_to_function image("new")+" Upload new version", visual_effect(:toggle_appear, "upload_new_version_form") -%></li>
@@ -23,35 +51,7 @@
      </li>
    <% end %>
 
-  <% if asset.is_downloadable? -%>
-      <% display_asset = asset.find_version(version) %>
-      <%# param code is used for temporary link -%>
-      <% if asset.can_download? || (params[:code] && asset.auth_by_code?(params[:code])) -%>
-          <%
-             if Seek::Util.multi_files_asset_types.include?(asset.class)
-               path = polymorphic_path(asset,:version=>version,:action=>:download,:code=>params[:code])
-             else
-               path = polymorphic_path([asset, display_asset.content_blob],:action=>:download,:code=>params[:code])
-             end
-          %>
-          <li>
-            <%= image_tag_for_key('download', path, "Download #{human_name}", nil, "Download #{human_name}") -%>
-          </li>
-          <% if asset.is_a?(DataFile) && display_asset.contains_extractable_spreadsheet? %>
-              <li>
-                <%= image_tag_for_key('spreadsheet', polymorphic_path(asset, :version => version, :action => :explore, :code=>params[:code]), "Explore #{human_name}", nil, "Explore #{human_name}") -%>
-              </li>
-          <% end -%>
-          <% unless Seek::Util.multi_files_asset_types.include?(asset.class) %>
-            <%= render :partial => "assets/view_content", :locals => {:content_blob => display_asset.content_blob, :button_style => true} -%>
-          <% end %>
-      <% elsif logged_in? -%>
-          <li>
-          <%= render :partial=>"assets/request_resource",:locals=>{:resource=>asset} %>
-          </li>
-      <% end -%>
-  <% end -%>
-
+<%= render :partial => "subscriptions/subscribe", :locals => {:object => asset } -%>
 
 
 
