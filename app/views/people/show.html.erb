@@ -1,5 +1,7 @@
 <% drag_id=model_to_drag_id @person %>
 
+<%= render :partial => "layouts/item_title", :locals=>{:item=>@person} %>
+
 <ul class="sectionIcons">
   <% if mine?(@person) || @person.can_be_edited_by?(current_user) -%>
       <li>
@@ -24,8 +26,6 @@
   <% end -%>
 </ul>
 
-
-<%= render :partial => "layouts/item_title", :locals=>{:item=>@person} %>
 <div class="show_basic">
   <div class="main_content_left_box_narrower">
     <div class="box_about_actor">

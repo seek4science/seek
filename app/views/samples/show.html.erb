@@ -1,5 +1,7 @@
 <% truncate_length_for_boxes = 22 -%>
 
+<%= render :partial => "layouts/item_title", :locals=>{:item=>@sample} %>
+
 <ul class="sectionIcons">
   <%= render :partial => "subscriptions/subscribe", :locals => { :object => @sample } %>
   <% if @sample.can_manage? %>
@@ -14,8 +16,6 @@
       <li><%= image_tag_for_key('new', new_object_based_on_existing_one_path(:controller_name=>"samples",:id=>@sample.id), nil, nil, 'New sample based on this one') %></li>
   <% end %>
 </ul>
-
-<%= render :partial => "layouts/item_title", :locals=>{:item=>@sample} %>
 
 <div class="show_basic">
 

@@ -5,6 +5,9 @@
    sample_names = bio_samples.instance_values["sample_names"]
   end
 -%>
+
+<%= render :partial => "layouts/item_title",:locals=>{:item=>@data_file, :version => @display_data_file.version} -%>
+<br/>
 <ul class="sectionIcons">
 <%= asset_buttons @data_file,@display_data_file.version -%>
 
@@ -13,8 +16,6 @@
 </ul>
 
 <%= render :partial=>"assets/upload_new_version_form", :locals=>{:resource=>@data_file} -%>
-
-<%= render :partial => "layouts/item_title",:locals=>{:item=>@data_file, :version => @display_data_file.version} -%>
 
 <div class="show_basic">
 

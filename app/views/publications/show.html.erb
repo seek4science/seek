@@ -1,3 +1,5 @@
+<%= render :partial => "layouts/item_title",:locals=>{:item=>@publication} %>
+
 <ul class="sectionIcons">
   <% if !@publication.pubmed_id.nil? %>
     <li><%= image_tag_for_key('visit_pubmed', "http://www.ncbi.nlm.nih.gov/pubmed/#{@publication.pubmed_id}", nil, {:popup => true}, 'View Publication On PubMed') -%></li>
@@ -13,8 +15,6 @@
   <% end -%>
   <li><%= image_tag_for_key 'endnote', publication_path(:id => @publication.id, :format => 'enw'), nil, nil, 'Export to EndNote' %></li>
 </ul>
-
-<%= render :partial => "layouts/item_title",:locals=>{:item=>@publication} %>
 
 <div class="show_basic">
   <div class="main_content_left_box_narrower">
