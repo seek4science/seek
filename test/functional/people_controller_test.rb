@@ -1048,6 +1048,10 @@ class PeopleControllerTest < ActionController::TestCase
       assert_equal 1, work_groups.count
       assert a_person.project_subscriptions.collect(&:project).include?(projects.first)
 
+      s=Factory(:subscribable, :projects => projects)
+      SetSubscriptionsForItemJob.new(s.class.name, s.id, projects.collect(&:id)).perform
+      assert s.subscribed?(a_person)
+
       #unassign a person to a project
       put :administer_update, :id => a_person, :person =>{:work_group_ids => []}
 
@@ -1055,6 +1059,8 @@ class PeopleControllerTest < ActionController::TestCase
       a_person.reload
       assert a_person.work_groups.empty?
       assert !a_person.project_subscriptions.collect(&:project).include?(projects.first)
+      s.reload
+      assert !s.subscribed?(a_person)
   end
 
   test 'should show subscription list to only yourself and admin' do
