@@ -43,10 +43,14 @@
     <% excutable_content_blob =  @display_model.content_blobs.detect{|cb| cb.is_sbml?}
        if excutable_content_blob.is_in_simulatable_size_limit? && @model.can_download? -%>
         <ul class='sectionIcons'>
-        <li>
-           <%= link_to image('execute') + "Simulate Model on Sycamore", submit_to_sycamore_model_path(@model,:version=>@display_model.version), :target => '_blank' -%>
+          <li>
+            <% form_tag("http://sycamore.eml.org/sycamore/submission.jsp", :id => 'sycamore-form') do -%>
+                <%= hidden_field_tag 'sbml_model' -%>
+                <%= hidden_field_tag 'sender', 'seek' -%>
+                <%= link_to_remote image('execute') + "Simulate Model on Sycamore", :url => {:action => 'submit_to_sycamore', :id => @model.id, :version => @display_model.version} -%>
+            <% end -%>
 
-        </li>
+          </li>
         </ul>
     <% end -%>
 <% end %>
