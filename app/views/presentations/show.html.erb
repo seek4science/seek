@@ -1,24 +1,18 @@
 <%= javascript_include_tag "resource" -%>
 <% truncate_length_for_boxes = 22 -%>
 
+<%= render :partial => "layouts/item_title",:locals=>{:item=>@presentation, :version=>@display_presentation.version} %>
+
 <ul class="sectionIcons">
     <%= asset_buttons @presentation,@display_presentation.version -%>
 </ul>
-
+<br/>
 <%= render :partial=>"assets/upload_new_version_form", :locals=>{:resource=>@presentation} -%>
-
-<%= render :partial => "layouts/item_title",:locals=>{:item=>@presentation, :version=>@display_presentation.version} %>
-
-<%= render :partial => "layouts/usage_info", :locals => { :resource => @presentation } -%>
-
 
 <div class="show_basic">
 
 
   <div class="main_content_left_box_narrower">
-
-    <%= render :partial=>"assets/resource_version_details", :locals=>{:displayed_resource=>@display_presentation, :resource=>@presentation} -%>
-
     <div class="box_about_actor">
       <%= render :partial => 'assets/fileinfo',:object=>@display_presentation.content_blob -%>
       <br/>
@@ -38,7 +32,7 @@
     </div>
   </div>
 
-  <%= render :partial=>"assets/resource_main_content_right",:locals => { :resource => @presentation } %>
+  <%= render :partial=>"assets/resource_main_content_right",:locals => {:displayed_resource=>@display_presentation, :resource => @presentation } %>
 
   <div style="clear:both;padding-top:1em;">
     <p>
@@ -50,7 +44,8 @@
 
     <%# get, classify and authorize all assets for this project -%>
     <%= render :partial=>"layouts/items_related_to",:object => @presentation %>
-
+    <br/>
+    <%= render :partial => "layouts/usage_info", :locals => { :resource => @presentation } -%>
   </div>
 
 </div>

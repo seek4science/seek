@@ -7,23 +7,27 @@ title_prefix||=""
 title_postfix||=""
 title||=h(item.title)
 %>
-<% if item.respond_to?(:private?) && item.respond_to?(:public?) && item.try(:can_manage?) %>
-<div class="sharing_summary">
-  <%=
-          if item.private?
-              "This item is <span style='color: red; font-weight: bold;'>Private</span> (only you can view it)"
-          elsif item.public?
-              "This item is <span style='color: green; font-weight: bold;'>Public</span> (all visitors, even without a login, may view this item)"
-          else
-              "This item is <span style='font-weight: bold;'>Shared</span>, but not with all visitors to this site"
-          end
-  %>
-</div>
-<% end %>
 
 <div class="contribution_title">
     <% unless avatar.blank? -%>
-    <span class="contribution_title_image"><%= avatar -%></span>
+        <span class="contribution_title_image"><%= avatar -%></span>
+        <h1 width="90%"><%= title_prefix + title + title_postfix -%></h1>
+    <% else %>
+        <h1><%= title_prefix + title + title_postfix -%></h1>
     <% end -%>
-    <h1><%= title_prefix + title + title_postfix -%></h1>
+
 </div>
+
+<% if item.respond_to?(:private?) && item.respond_to?(:public?) && item.try(:can_manage?) %>
+    <div class="sharing_summary">
+      <%=
+          if item.private?
+            "This item is <span style='color: red; font-weight: bold;'>Private</span> (only you can view it)"
+          elsif item.public?
+            "This item is <span style='color: green; font-weight: bold;'>Public</span> (all visitors, even without a login, may view this item)"
+          else
+            "This item is <span style='font-weight: bold;'>Shared</span>, but not with all visitors to this site"
+          end
+      %>
+    </div>
+<% end %>

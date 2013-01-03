@@ -1004,7 +1004,11 @@ class AuthorizationTest < ActiveSupport::TestCase
 
     #contributor can not publish if projects associated with asset have gatekeepers
     User.with_current_user Factory(:user) do
-      specimen = Specimen.new(:title => 'test2', :strain => strains(:yeast1), :lab_internal_number => '1234', :projects => gatekeeper.projects, :policy => Policy.new(:sharing_scope => Policy::EVERYONE, :access_type => Policy::ACCESSIBLE))
+      specimen = Specimen.new(:title => 'test2',
+                              :strain => strains(:yeast1),
+                              :lab_internal_number => '1234',
+                              :projects => gatekeeper.projects,
+                              :policy => Policy.new(:sharing_scope => Policy::EVERYONE, :access_type => Policy::ACCESSIBLE))
       assert !specimen.gatekeepers.empty?
       assert !specimen.can_publish?
       assert specimen.save

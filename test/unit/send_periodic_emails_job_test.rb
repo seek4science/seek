@@ -71,6 +71,34 @@ class SendPeriodicEmailsJobTest < ActiveSupport::TestCase
 
   end
 
+  test 'activity_logs_since' do
+    count = 2
+    i = 0
+    activity_loggable = Factory(:data_file)
+    culprit =  activity_loggable.contributor
+    while i < count do
+      Factory(:activity_log, :action => 'create', :activity_loggable => activity_loggable, :culprit => culprit)
+      Factory(:activity_log, :action => 'update', :activity_loggable => activity_loggable, :culprit => culprit)
+      Factory(:activity_log, :action => 'show', :activity_loggable => activity_loggable, :culprit => culprit)
+      Factory(:activity_log, :action => 'destroy', :activity_loggable => activity_loggable, :culprit => culprit)
+      Factory(:activity_log, :action => 'download', :activity_loggable => activity_loggable, :culprit => culprit)
+      #session create
+      Factory(:activity_log, :action => 'create', :controller_name => 'sessions', :culprit => culprit)
+
+      i += 1
+    end
+    #only create and update actions are filtered
+    #creation of session is excluded
+    assert_equal 2*count, SendPeriodicEmailsJob.new('daily').activity_logs_since(Time.now.yesterday.utc).count
+    assert_equal 2*count, SendPeriodicEmailsJob.new('weekly').activity_logs_since(7.days.ago).count
+    assert_equal 2*count, SendPeriodicEmailsJob.new('monthly').activity_logs_since(1.month.ago).count
+
+    Factory(:activity_log, :action => 'create', :activity_loggable => activity_loggable, :culprit => culprit, :created_at => 2.days.ago)
+    assert_equal 2*count, SendPeriodicEmailsJob.new('daily').activity_logs_since(Time.now.yesterday.utc).count
+    assert_equal (2*count + 1), SendPeriodicEmailsJob.new('weekly').activity_logs_since(7.days.ago).count
+    assert_equal (2*count + 1), SendPeriodicEmailsJob.new('monthly').activity_logs_since(1.month.ago).count
+  end
+
   test "create job" do
       assert_equal 0,Delayed::Job.count
       assert_difference("Delayed::Job.count",1) do

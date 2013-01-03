@@ -1,5 +1,7 @@
 <% truncate_length_for_boxes = 22 -%>
 
+<%= render :partial => "layouts/item_title", :locals=>{:item=>@strain} %>
+
 <ul class="sectionIcons">
   <%= render :partial => "subscriptions/subscribe", :locals => {:object => @strain} %>
   <% if @strain.can_manage? %>
@@ -15,9 +17,6 @@
       <li><%= image_tag_for_key "destroy", strain_path(@strain) , "Delete Strain", {:title=>"#{tooltip_title_attrib(explanation)}", :class=>"disabled", :onclick => "alert(\"#{explanation}\")"}, "Delete Strain", :function -%></li>
   <% end %>
 </ul>
-
-<%= render :partial => "layouts/item_title", :locals=>{:item=>@strain} %>
-<%= render :partial => "layouts/usage_info", :locals => { :resource => @strain } -%>
 
 <div class="show_basic">
     <div class="main_content_left_box_narrower">
@@ -66,6 +65,8 @@
   <div style="clear:both">
     <br/>
     <%= render :partial=>"layouts/items_related_to", :object => @strain %>
+    <br/>
+    <%= render :partial => "layouts/usage_info", :locals => { :resource => @strain } -%>
   </div>
 
 </div>

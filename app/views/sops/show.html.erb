@@ -1,23 +1,17 @@
 <%= javascript_include_tag "resource" -%>
 
+<%= render :partial => "layouts/item_title",:locals=>{:item=>@sop, :version=>@display_sop.version} %>
+
 <ul class="sectionIcons">
     <%= asset_buttons @sop,@display_sop.version -%>
 </ul>
-
+<br/>
 <%= render :partial=>"assets/upload_new_version_form", :locals=>{:resource=>@sop} -%>
-
-<%= render :partial => "layouts/item_title",:locals=>{:item=>@sop, :version=>@display_sop.version} %>
-
-<%= render :partial => "layouts/usage_info", :locals => { :resource => @sop } -%>
-
 
 <div class="show_basic">
   
 
   <div class="main_content_left_box_narrower">
-
-    <%= render :partial=>"assets/resource_version_details", :locals=>{:displayed_resource=>@display_sop, :resource=>@sop} -%>
-  
     <div class="box_about_actor">
       <%= render :partial => 'assets/fileinfo',:object=>@display_sop.content_blob -%>
 
@@ -38,7 +32,7 @@
     </div>
   </div>
 
-  <%= render :partial=>"assets/resource_main_content_right",:locals => { :resource => @sop } %>
+  <%= render :partial=>"assets/resource_main_content_right",:locals => {:displayed_resource=>@display_sop, :resource => @sop } %>
 
   <div style="clear:both;padding-top:1em;">
     <p>
@@ -53,7 +47,8 @@
 
     <%# get, classify and authorize all assets for this project -%>
     <%= render :partial=>"layouts/items_related_to",:object => @sop %>
-
+    <br/>
+    <%= render :partial => "layouts/usage_info", :locals => { :resource => @sop } -%>
   </div>
 
 </div>
