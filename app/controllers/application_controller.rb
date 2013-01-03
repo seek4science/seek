@@ -247,7 +247,7 @@ class ApplicationController < ActionController::Base
         'view'
 
       when 'download', 'named_download', 'launch', 'submit_job', 'data', 'execute','plot', 'explore','visualise' ,
-          'export_as_xgmml', 'submit_to_sycamore'
+          'export_as_xgmml'
         'download'
 
       when 'edit', 'new', 'create', 'update', 'new_version', 'create_version',
