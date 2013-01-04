@@ -239,20 +239,26 @@ module AssetsCommonExtension
   def handle_download_zip asset
     #get the list of filename and filepath, {:filename => filepath}
     files_to_download = {}
+    #store content_type for the case of 1 file
+    content_type = nil
     if asset.respond_to?(:model_image) && asset.model_image
       model_image = asset.model_image
       filename = check_and_rename_file files_to_download.keys, model_image.original_filename
       files_to_download["#{filename}"] = model_image.file_path
+      content_type = model_image.content_type
     end
     asset.content_blobs.each do |content_blob|
       if File.exists? content_blob.filepath
         filename = check_and_rename_file files_to_download.keys, content_blob.original_filename
         files_to_download["#{filename}"] = content_blob.filepath
+        content_type = content_blob.content_type
       elsif !content_blob.url.nil?
         downloader=Seek::RemoteDownloader.new
         data_hash = downloader.get_remote_data content_blob.url, nil, nil, nil, true
-        filename = check_and_rename_file files_to_download.keys, content_blob.original_filename
+        original_filename = get_filename data_hash[:filename], content_blob.original_filename
+        filename = check_and_rename_file files_to_download.keys, original_filename
         files_to_download["#{filename}"] = data_hash[:data_tmp_path]
+        content_type = data_hash[:content_type] || content_blob.content_type
       end
     end
 
@@ -260,8 +266,6 @@ module AssetsCommonExtension
     if files_to_download.count > 1
       make_and_send_zip_file files_to_download, asset
     else
-      content_type = asset.content_blobs.first.try(:content_type)
-      content_type = asset.model_image.content_type unless content_type
       send_file files_to_download.values.first, :filename => files_to_download.keys.first, :type => content_type
     end
   end
@@ -302,6 +306,18 @@ module AssetsCommonExtension
     #FIXME: this is just a quick fix, until http://dev.mygrid.org.uk/issues/browse/SYSMO-1129 is fully resolved
     type = type.gsub("image/jpg","image/jpeg") unless type.nil?
     type
+  end
+
+  #prioritize filename from data_hash
+  def get_filename filename_from_data_hash, filename_from_content_blob
+    if filename_from_data_hash != 'download'
+      filename = filename_from_data_hash
+    elsif filename_from_data_hash == 'download' && !filename_from_content_blob.blank?
+      filename = filename_from_content_blob
+    else
+      filename = "download"
+    end
+    filename
   end
 end
 

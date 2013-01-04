@@ -109,7 +109,8 @@ class ContentBlobsController < ApplicationController
       downloader=Seek::RemoteDownloader.new
       begin
         data_hash = downloader.get_remote_data @content_blob.url
-        send_file data_hash[:data_tmp_path], :filename => data_hash[:filename] || @content_blob.original_filename, :type => data_hash[:content_type] || @content_blob.content_type, :disposition => 'attachment'
+        filename = get_filename data_hash[:filename], @content_blob.original_filename
+        send_file data_hash[:data_tmp_path], :filename => filename, :type => data_hash[:content_type] || @content_blob.content_type, :disposition => 'attachment'
       rescue Exception=>e
         error_message = "There is a problem downloading this file. #{e}"
         redirected_url = polymorphic_path(@asset_version.parent,{:version=>@asset_version.version})
