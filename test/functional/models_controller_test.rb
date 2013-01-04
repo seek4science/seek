@@ -995,7 +995,8 @@ class ModelsControllerTest < ActionController::TestCase
       model = Factory :teusink_model
       login_as(model.contributor)
       post :submit_to_sycamore, :id=>model.id, :version => model.version
-      assert_redirected_to "http://sycamore.eml.org/sycamore/submission.jsp"
+      assert_response :success
+      assert @response.body.include?('$("sycamore-form").submit()')
     end
   end
 
@@ -1003,7 +1004,7 @@ class ModelsControllerTest < ActionController::TestCase
     model = Factory :teusink_model
     login_as(model.contributor)
     post :submit_to_sycamore, :id => model.id, :version => model.version
-    assert_redirected_to model_path(model,:version=>model.version)
+    assert @response.body.include?('Interaction with Sycamore is currently disabled')
   end
 
   test "should not submit_to_sycamore if model is not downloadable" do
@@ -1013,7 +1014,7 @@ class ModelsControllerTest < ActionController::TestCase
       assert !model.can_download?
 
       post :submit_to_sycamore, :id => model.id, :version => model.version
-      assert_redirected_to model
+      assert @response.body.include?('You are not allowed to simulate this model with Sycamore')
     end
   end
 
