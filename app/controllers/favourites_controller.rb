@@ -13,7 +13,14 @@ class FavouritesController < ApplicationController
         end
       else
         split_id=params[:id].split("_")
-        resource = split_id[1].constantize.find_by_id(split_id[2].to_i)
+        resource_name = split_id[1]
+        resource_id = split_id[2].to_i
+        version = split_id[3].to_i
+        if version.blank?
+          resource = resource_name.constantize.find_by_id(resource_id)
+        else
+          resource = resource_name.insert(-8,'::').constantize.find_by_id(resource_id)
+        end
       end
     end
     resource ||= nil

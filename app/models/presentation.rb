@@ -20,6 +20,7 @@ class Presentation < ActiveRecord::Base
 
    explicit_versioning(:version_column => "version") do
      acts_as_versioned_resource
+     acts_as_favouritable
      has_one :content_blob,:primary_key => :presentation_id,:foreign_key => :asset_id,:conditions => 'content_blobs.asset_version= #{self.version} and content_blobs.asset_type = "#{self.parent.class.name}"'
   end
 

@@ -42,6 +42,7 @@ class Model < ActiveRecord::Base
   explicit_versioning(:version_column => "version") do
     include Seek::Models::ModelExtraction
     acts_as_versioned_resource
+    acts_as_favouritable
 
     belongs_to :model_image
     belongs_to :organism
