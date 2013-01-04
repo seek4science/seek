@@ -184,7 +184,7 @@ class FavouritesControllerTest < ActionController::TestCase
   end
   
   def test_shouldnt_add_invalid_resource
-    id="drag_DataFile_-1_25251251"
+    id="drag_DataFileVersion_-1_1_25251251"
     fav=Favourite.find_by_resource_type_and_resource_id("DataFile",-1)
     assert_nil fav
     
