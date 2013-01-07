@@ -57,15 +57,19 @@ module AssetsHelper
   def resource_title_draggable_avatar resource,version
     icon=""
     image=nil
-
     if resource.avatar_key
       image=image resource.avatar_key, {}
-    elsif resource.use_mime_type_for_avatar?
-      resource_version = resource.find_version(version)
-      image = image file_type_icon_key(resource_version), {}
     end
 
-    icon = link_to_draggable(image, show_resource_path(resource), :id=>model_to_drag_id(resource), :class=> "asset", :title=>tooltip_title_attrib(get_object_title(resource))) unless image.nil?
+    unless version.blank?
+      resource_version = resource.find_version(version)
+      if resource.use_mime_type_for_avatar?
+        image = image file_type_icon_key(resource_version), {}
+      end
+      icon = link_to_draggable(image, show_resource_path(resource_version), :id=>model_to_drag_id(resource_version), :class=> "asset", :title=>tooltip_title_attrib(get_object_title(resource))) unless image.nil?
+    else
+      icon = link_to_draggable(image, show_resource_path(resource), :id=>model_to_drag_id(resource), :class=> "asset", :title=>tooltip_title_attrib(get_object_title(resource))) unless image.nil?
+    end
     icon
   end
 

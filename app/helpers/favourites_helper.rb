@@ -1,12 +1,15 @@
 module FavouritesHelper
 
   def model_to_drag_id object
-    if object.class.name.include?("::Version")
-      object = object.parent
-    end
+    version = nil
     model_name=object.class.to_s
+    if object.class.name.include?("::Version")
+      version = object.version
+      model_name = model_name.gsub('::', '')
+    end
+
     uuid=UUIDTools::UUID.random_create.to_s.split("-")[0..2].join
-    return "drag_#{model_name}_#{object.id.to_s}_#{uuid}"
+    return "drag_#{model_name}_#{object.id.to_s}_#{version}_#{uuid}"
   end
 
   def fav_line_tag favourite

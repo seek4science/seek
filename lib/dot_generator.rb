@@ -238,6 +238,11 @@ module DotGenerator
     parser = LibXML::XML::Parser.string(svg)
     document = parser.parse
     document.root.namespaces.default_prefix = 'svg'
+
+    #only display svg if number of node > 1
+    number_of_node = document.find("svg:g//svg:g").collect.count
+    return "" if number_of_node <= 1
+
     document.find("svg:g//svg:g").each do |node|
       title = node.find_first("svg:title").content
       unless title.include?("--")
