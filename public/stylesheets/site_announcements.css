@@ -74,7 +74,7 @@ li.announcement .announcement_attributes {
 
 ul.feed_announcement_list {
     padding: 0em;
-    font-size: x-small;
+    font-size: smaller;
     margin: 0 0 0 0;
     padding: 0 0 0 0;
 }
@@ -93,14 +93,12 @@ li.feed_announcement .announcement_title {
 li.feed_announcement .announcement_date {
     margin: 0 0 0 0;
     padding: 0 0 0 0;
-    font-size: smaller;
     color: #666;
 }
 
 li.feed_announcement .announcement_announcer {
     margin: 0 0 0 0;
     padding: 0 0 0 0;
-    font-size: smaller;
     color: #666;
 }
 
