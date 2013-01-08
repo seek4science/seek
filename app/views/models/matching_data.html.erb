@@ -5,12 +5,21 @@
 
 <%= stylesheet_link_tag "match_making" -%>
 
+<%
+   data_files = @matching_data_files.collect do |mdf|
+     DataFile.find(mdf.primary_key)
+   end
+   authorized_data_file_ids = authorized_related_items(data_files, 'DataFile').collect(&:id)
+   authorized_matching_data_files =  @matching_data_files.select{|mdf| authorized_data_file_ids.include?(mdf.primary_key.to_i)}
+%>
+
 <div class="contribution_title">
   <h1>Data that may be of interest to <%= link_to h(@model.title),@model -%></h1>
 </div>
 
 <div class="show_basic">
-    <ul class="matching_data_items" >
-      <%= render :partial=>"matching_data_item",:collection=>@matching_data_files -%>
+  There are totally <span style="font-weight:bold"><%= @matching_data_files.count-%></span> data files matched, <span style="font-weight:bold"><%= @matching_data_files.count - authorized_matching_data_files.count %></span> are hidden
+  <ul class="matching_data_items" >
+      <%= render :partial=>"matching_data_item",:collection=>authorized_matching_data_files -%>
     </ul>
 </div>
