@@ -11,7 +11,7 @@
            end
         %>
         <li>
-          <%= image_tag_for_key('download', path, "Download #{human_name}", {:style=>"font-size:larger;font-weight:bold"}, "Download #{human_name}") -%>
+          <%= image_tag_for_key('download', path, "Download #{human_name}", nil, "Download #{human_name}") -%>
         </li>
         <% if asset.is_a?(DataFile) && display_asset.contains_extractable_spreadsheet? %>
             <li>
