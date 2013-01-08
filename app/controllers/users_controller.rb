@@ -169,6 +169,7 @@ class UsersController < ApplicationController
       current_user.save
     end
     render :update do |page|
+       cookies[:hide_guide_box]={:value=>'true',:expires=>10.years.from_now}
        page.visual_effect :fade, 'guide_box', :duration => 0.25
     end
   end
