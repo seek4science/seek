@@ -193,7 +193,7 @@ module AssetsHelper
     user_id = current_user.nil? ? 0 : current_user.id
     assets = []
     authorized_related_items = []
-    lookup_table_name = item_type.underscore + 'auth_lookup'
+    lookup_table_name = item_type.underscore + '_auth_lookup'
     asset_class = item_type.constantize
     if (asset_class.lookup_table_consistent?(user_id))
       Rails.logger.info("Lookup table #{lookup_table_name} used for authorizing related items is complete for user_id = #{user_id}")
