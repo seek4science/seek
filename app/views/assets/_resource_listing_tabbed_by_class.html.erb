@@ -12,10 +12,11 @@
 <% unless authorization_already_done
        resource_hash.each_value do |res|
            unless res[:items].empty?
-               total_count = res[:items].size
-               res[:hidden_items] = res[:items] - res[:items].select(&:can_view?)
-               res[:items] = res[:items].select &:can_view?
-               res[:hidden_count] = total_count - res[:items].size
+             total_count = res[:items].size
+             total = res[:items]
+             res[:items] = res[:items].select &:can_view?
+             res[:hidden_items] = total - res[:items]
+             res[:hidden_count] = total_count - res[:items].size
            end
        end
    end
