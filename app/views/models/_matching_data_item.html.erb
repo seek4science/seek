@@ -19,7 +19,11 @@
             <%= text_or_not_specified(data_file.description, :description => true, :length => 500) -%>
           </div>
           <div class="explore">
-            <%= link_to "Explore", polymorphic_path(data_file, :action => :explore), :target => "blank" -%>
+            <% if data_file.can_download? || (params[:code] && data_file.auth_by_code?(params[:code])) -%>
+                <% if data_file.contains_extractable_spreadsheet? %>
+                    <%= link_to "Explore", polymorphic_path(data_file, :action => :explore, :code=>params[:code]), :target => "blank" -%>
+                <% end %>
+            <% end %>
           </div>
 
           <div>
