@@ -10,6 +10,7 @@ li.matching_data_item {
     padding-left: 1em;
     margin-top: 1em;
     width: 100%;
+    padding-top: 0.5em;
     padding-bottom: 0.75em;
 }
 

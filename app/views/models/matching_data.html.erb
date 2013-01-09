@@ -9,17 +9,42 @@
    data_files = @matching_data_files.collect do |mdf|
      DataFile.find(mdf.primary_key)
    end
-   authorized_data_file_ids = authorized_partial_asset_collection(data_files, 'DataFile').collect(&:id)
-   authorized_matching_data_files =  @matching_data_files.select{|mdf| authorized_data_file_ids.include?(mdf.primary_key.to_i)}
+   authorized_data_file_ids = DataFile.authorized_partial_asset_collection(data_files, 'view', current_user).collect(&:id)
+   authorized_matching_data_files = @matching_data_files.select { |mdf| authorized_data_file_ids.include?(mdf.primary_key.to_i) }
+   limit ||= 4
+   limit_matching_data_files = authorized_matching_data_files[0..limit]
+   extra_count = authorized_matching_data_files.size - limit
 %>
 
 <div class="contribution_title">
-  <h1>Data that may be of interest to <%= link_to h(@model.title),@model -%></h1>
+  <h1>Data that may be of interest to <%= link_to h(@model.title), @model -%></h1>
 </div>
 
 <div class="show_basic">
-  There are totally <span style="font-weight:bold"><%= @matching_data_files.count-%></span> data files matched, <span style="font-weight:bold"><%= @matching_data_files.count - authorized_matching_data_files.count %></span> are hidden
-  <ul class="matching_data_items" >
-      <%= render :partial=>"matching_data_item",:collection=>authorized_matching_data_files -%>
-    </ul>
+  There are totally <span style="font-weight:bold"><%= @matching_data_files.count -%></span> data files matched,
+  <span style="font-weight:bold"><%= @matching_data_files.count - authorized_matching_data_files.count %></span> are
+  hidden
+
+  <%= render :partial => "matching_data_item", :locals => {:matching_data_items => limit_matching_data_files} -%>
+
+  <% unless extra_count < 1 %>
+      <ul class="matching_data_items">
+        <li class="matching_data_item">
+          <%= link_to_remote "View all "+(authorized_matching_data_files.size).to_s+" matched data files", :html => {:id => "view_matched_data_files_and_extra", :style => "display:block"},
+                             :url => url_for(:controller => 'models', :action => 'view_matched_data_files'),
+                             :with => "'primary_keys=' + '#{authorized_matching_data_files.collect(&:primary_key).join(",")}'
+                                    + '&scores=' + '#{authorized_matching_data_files.collect(&:score).join(",")}'
+                                    + '&search_terms=' + '#{authorized_matching_data_files.collect(&:search_terms).collect { |t| t.join('*') }.join(',')}'",
+                             :before => "show_large_ajax_loader('matching_data_ajax_loader')"
+          -%>
+          <%= link_to_remote "View " + limit_matching_data_files.size.to_s + " matched data files", :html => {:id => "view_matched_data_files", :style => "display:none"},
+                             :url => url_for(:controller => 'models', :action => 'view_matched_data_files'),
+                             :with => "'primary_keys=' + '#{limit_matching_data_files.collect(&:primary_key).join(",")}'
+                         + '&scores=' + '#{limit_matching_data_files.collect(&:score).join(",")}'
+                         + '&search_terms=' + '#{limit_matching_data_files.collect(&:search_terms).collect { |t| t.join('*') }.join(',')}'",
+                             :before => "show_large_ajax_loader('matching_data_ajax_loader')"
+          -%>
+        </li>
+      </ul>
+  <% end %>
 </div>
