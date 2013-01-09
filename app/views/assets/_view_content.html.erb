@@ -8,7 +8,7 @@
         <%= stylesheet_link_tag "lightbox" %>
     <% end %>
 
-    <% is_inline_viewable = Seek::Config.experimental_features_enabled && content_blob.is_content_viewable? %>
+    <% is_inline_viewable = content_blob.is_content_viewable? %>
     <% if is_inline_viewable %>
         <%
            li_start = ""
