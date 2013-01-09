@@ -12,8 +12,6 @@
    authorized_data_files = DataFile.authorized_partial_asset_collection(data_files, 'view', current_user)
    authorized_data_file_ids = authorized_data_files.collect(&:id)
    authorized_matching_data_files = @matching_data_files.select { |mdf| authorized_data_file_ids.include?(mdf.primary_key.to_i) }
-   hidden_items = data_files - authorized_data_files
-   hidden_count = hidden_items.count
 
    limit ||= 19
    limit_matching_data_files = authorized_matching_data_files[0..limit]
@@ -26,7 +24,7 @@
 
 <div class="show_basic">
   There are totally <span style="font-weight:bold"><%= @matching_data_files.count -%></span> data files matched,
-  <span style="font-weight:bold"><%= hidden_count %></span> are
+  <span style="font-weight:bold"><%= @matching_data_files.count - authorized_matching_data_files.count %></span> are
   hidden
 
   <%= render :partial => "matching_data_item", :locals => {:matching_data_items => limit_matching_data_files} -%>
@@ -48,12 +46,6 @@
                          + '&search_terms=' + '#{limit_matching_data_files.collect(&:search_terms).collect { |t| t.join('*') }.join(',')}'",
                              :before => "show_large_ajax_loader('matching_data_ajax_loader')"
           -%>
-        </li>
-    <% end %>
-
-    <% unless hidden_count < 1 %>
-        <li class="matching_data_item">
-           <%= render :partial => "assets/hidden_items", :object => hidden_items -%>
         </li>
     <% end %>
   </ul>
