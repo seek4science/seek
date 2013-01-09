@@ -159,11 +159,10 @@ module AssetsHelper
     related.each do |key, res|
       res[:items].compact!
       unless res[:items].empty?
+        total_count = res[:items].size
         if key == 'Project' || key == 'Institution'
-          total_count = res[:items].size
           res[:hidden_count] = 0
         elsif key == 'Person'
-          total_count = res[:items].size
           if Seek::Config.is_virtualliver && current_user.nil?
             res[:items] = []
             res[:hidden_count] = total_count
@@ -171,9 +170,10 @@ module AssetsHelper
             res[:hidden_count] = 0
           end
         else
-          total_count = res[:items].size
+          total = res[:items]
           res[:items] = key.constantize.authorized_partial_asset_collection res[:items],'view',current_user
           res[:hidden_count] = total_count - res[:items].size
+          res[:hidden_items] = total - res[:items]
         end
       end
     end
