@@ -38,6 +38,7 @@ The released versions are listed below:
 * 0.15.1
 * 0.15.2
 * 0.15.3
+* 0.15.4
 
 <em>(Note there was no 0.12.x version released externally, this was an internal release)</em>
 
@@ -67,7 +68,7 @@ Once Rubygems has been updated, the upgrade is the typical:
 
     RAILS_ENV=production ./script/delayed_job stop
     bundle exec rake sunspot:solr:stop RAILS_ENV=production
-    hg pull https://sysmo-db.googlecode.com/hg/ -r v0.15.3
+    hg pull https://sysmo-db.googlecode.com/hg/ -r v0.15.4
     hg update
     hg merge # only required if you've made changes since installing. If you have you may need to deal with conflicts.
     hg commit -m "merged" # likewise - only required if you made changes since installing

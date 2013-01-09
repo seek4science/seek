@@ -4,7 +4,7 @@ If you have installed SEEK, please take a moment to fill out our very short,opti
 
 SEEK is based upon the Ruby on Rails platform. Although the information on this page should provide you with everything you need to get a basic installation of
 SEEK up and running, some background reading on Ruby on Rails would be beneficial if it is new to you. Documentation and resources describing Ruby on Rails can be found
-at http://rubyonrails.org/documentation. Since SEEK uses v2.3.14 of Rails, http://guides.rubyonrails.org/v2.3.14/ and http://api.rubyonrails.org/v2.3.14 may be useful as well.
+at http://rubyonrails.org/documentation. Since SEEK uses v2.3.15 of Rails, http://guides.rubyonrails.org/v2.3.11/ and http://api.rubyonrails.org/v2.3.11 may be useful as well.
 
 We recommend that you run SEEK on a Linux system. All of the examples here describe installing on an Ubuntu (10.04 LTS) or Debian system, but should be easily transferrable to other Linux systems such as Fedora. There is a script for CentOS that was contributed to us by Mark Woodbridge (Imperial College, London) available at https://gist.github.com/2127663
 
@@ -64,9 +64,9 @@ on how to setup Apache and {Passenger Phusion (modrails)}[http://www.modrails.co
 
 Our source code is stored within the {Sysmo-DB Google Code Repository}[http://code.google.com/p/sysmo-db/], using Mercurial[http://mercurial.selenic.com/] as the version control system. 
 
-For a stable version, you should check out according to a stable tag. Our current stable tag is <em>0.15.3</em>, so to retrieve this version you should use:
+For a stable version, you should check out according to a stable tag. Our current stable tag is <em>0.15.4</em>, so to retrieve this version you should use:
 
-  hg clone https://sysmo-db.googlecode.com/hg/ -r v0.15.3 seek
+  hg clone https://sysmo-db.googlecode.com/hg/ -r v0.15.4 seek
 
 This will create a <i>seek</i> directory that contains the application.
   
