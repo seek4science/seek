@@ -619,8 +619,7 @@ class ModelsController < ApplicationController
     end
     authorized_data_file_ids = DataFile.authorized_partial_asset_collection(data_files, 'view', current_user).collect(&:id)
     authorized_matching_data_files =  matched_data_files.select{|mdf| authorized_data_file_ids.include?(mdf.primary_key.to_i)}
-    #change matching_data_item partial
-    #hidden items
+
     render :update do |page|
       page.replace_html "matching_data_ajax_loader", :partial => "models/matching_data_item", :locals=>{:matching_data_items => authorized_matching_data_files}
       page.visual_effect :toggle_blind, "view_matched_data_files", :duration => 0.05
