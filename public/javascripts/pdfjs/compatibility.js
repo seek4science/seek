@@ -94,11 +94,16 @@
 // Object.defineProperty() ?
 (function checkObjectDefinePropertyCompatibility() {
   if (typeof Object.defineProperty !== 'undefined') {
-    // some browsers (e.g. safari) cannot use defineProperty() on DOM objects
-    // and thus the native version is not sufficient
     var definePropertyPossible = true;
     try {
+      // some browsers (e.g. safari) cannot use defineProperty() on DOM objects
+      // and thus the native version is not sufficient
       Object.defineProperty(new Image(), 'id', { value: 'test' });
+      // ... another test for android gb browser for non-DOM objects
+      var Test = function Test() {};
+      Test.prototype = { get id() { } };
+      Object.defineProperty(new Test(), 'id',
+        { value: '', configurable: true, enumerable: true, writable: false });
     } catch (e) {
       definePropertyPossible = false;
     }
@@ -376,7 +381,18 @@
 // Check console compatability
 (function checkConsoleCompatibility() {
   if (typeof console == 'undefined') {
-    console = {log: function() {}};
+    console = {
+      log: function() {},
+      error: function() {}
+    };
+  } else if (!('bind' in console.log)) {
+    // native functions in IE9 might not have bind
+    console.log = (function(fn) {
+      return function(msg) { return fn(msg); }
+    })(console.log);
+    console.error = (function(fn) {
+      return function(msg) { return fn(msg); }
+    })(console.error);
   }
 })();
 

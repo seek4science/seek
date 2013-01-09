@@ -1,7 +1,7 @@
 source :gemcutter
 source 'http://gems.github.com'
 
-gem "rails", "2.3.14"
+gem "rails", "2.3.15"
 gem "rdoc"
 
 gem 'rubaidh-google_analytics', "~>1.1.4",:require => 'rubaidh/google_analytics'

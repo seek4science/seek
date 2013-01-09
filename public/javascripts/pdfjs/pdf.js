@@ -16,13 +16,12 @@
  */
 
 var PDFJS = {};
+PDFJS.version = '0.7.55';
+PDFJS.build = '2ccad4c';
 
 (function pdfjsWrapper() {
   // Use strict in our context only - users might not want it
   'use strict';
-
-  PDFJS.build =
-'bd0e422';
 
 /* -*- Mode: Java; tab-width: 2; indent-tabs-mode: nil; c-basic-offset: 2 -*- */
 /* vim: set shiftwidth=2 tabstop=2 autoindent cindent expandtab: */
@@ -69,7 +68,11 @@ function getPdf(arg, callback) {
   var params = arg;
   if (typeof arg === 'string')
     params = { url: arg };
+//#if !B2G
   var xhr = new XMLHttpRequest();
+//#else
+//var xhr = new XMLHttpRequest({mozSystem: true});
+//#endif
   xhr.open('GET', params.url);
 
   var headers = params.headers;
@@ -119,8 +122,8 @@ globalScope.PDFJS.getPdf = getPdf;
 globalScope.PDFJS.pdfBug = false;
 
 var Page = (function PageClosure() {
-  function Page(xref, pageNumber, pageDict, ref) {
-    this.pageNumber = pageNumber;
+  function Page(xref, pageIndex, pageDict, ref) {
+    this.pageIndex = pageIndex;
     this.pageDict = pageDict;
     this.xref = xref;
     this.ref = ref;
@@ -189,14 +192,11 @@ var Page = (function PageClosure() {
       }
       return shadow(this, 'rotate', rotate);
     },
-
-    getOperatorList: function Page_getOperatorList(handler, dependency) {
-      var xref = this.xref;
+    getContentStream: function Page_getContentStream() {
       var content = this.content;
-      var resources = this.resources;
       if (isArray(content)) {
         // fetching items
-        var streams = [];
+        var xref = this.xref;
         var i, n = content.length;
         var streams = [];
         for (i = 0; i < n; ++i)
@@ -206,13 +206,21 @@ var Page = (function PageClosure() {
         content.reset();
       } else if (!content) {
         // replacing non-existent page content with empty one
-        content = new Stream(new Uint8Array(0));
+        content = new NullStream();
       }
-
+      return content;
+    },
+    getOperatorList: function Page_getOperatorList(handler, dependency) {
+      var xref = this.xref;
+      var contentStream = this.getContentStream();
+      var resources = this.resources;
       var pe = this.pe = new PartialEvaluator(
-                                xref, handler, 'p' + this.pageNumber + '_');
+                                xref, handler, this.pageIndex,
+                                'p' + this.pageIndex + '_');
 
-      return pe.getOperatorList(content, resources, dependency);
+      var list = pe.getOperatorList(contentStream, resources, dependency);
+      pe.optimizeQueue(list);
+      return list;
     },
     extractTextContent: function Page_extractTextContent() {
       var handler = {
@@ -221,44 +229,17 @@ var Page = (function PageClosure() {
       };
 
       var xref = this.xref;
-      var content = xref.fetchIfRef(this.content);
+      var contentStream = this.getContentStream();
       var resources = xref.fetchIfRef(this.resources);
-      if (isArray(content)) {
-        // fetching items
-        var i, n = content.length;
-        var streams = [];
-        for (i = 0; i < n; ++i)
-          streams.push(xref.fetchIfRef(content[i]));
-        content = new StreamsSequenceStream(streams);
-      } else if (isStream(content)) {
-        content.reset();
-      }
 
       var pe = new PartialEvaluator(
-                     xref, handler, 'p' + this.pageNumber + '_');
-      return pe.getTextContent(content, resources);
-    },
-
-    ensureFonts: function Page_ensureFonts(fonts, callback) {
-      this.stats.time('Font Loading');
-      // Convert the font names to the corresponding font obj.
-      for (var i = 0, ii = fonts.length; i < ii; i++) {
-        fonts[i] = this.objs.objs[fonts[i]].data;
-      }
-
-      // Load all the fonts
-      FontLoader.bind(
-        fonts,
-        function pageEnsureFontsFontObjs(fontObjs) {
-          this.stats.timeEnd('Font Loading');
-
-          callback.call(this);
-        }.bind(this)
-      );
+                     xref, handler, this.pageIndex,
+                     'p' + this.pageIndex + '_');
+      return pe.getTextContent(contentStream, resources);
     },
     getLinks: function Page_getLinks() {
       var links = [];
-      var annotations = pageGetAnnotations();
+      var annotations = this.getAnnotations();
       var i, n = annotations.length;
       for (i = 0; i < n; ++i) {
         if (annotations[i].type != 'Link')
@@ -328,8 +309,23 @@ var Page = (function PageClosure() {
                 case 'GoTo':
                   item.dest = a.get('D');
                   break;
+                case 'GoToR':
+                  var url = a.get('F');
+                  if (isDict(url)) {
+                    // We assume that the 'url' is a Filspec dictionary
+                    // and fetch the url without checking any further
+                    url = url.get('F') || '';
+                  }
+
+                  // TODO: pdf reference says that GoToR
+                  // can also have 'NewWindow' attribute
+                  if (!isValidUrl(url))
+                    url = '';
+                  item.url = url;
+                  item.dest = a.get('D');
+                  break;
                 default:
-                  TODO('other link types');
+                  TODO('unrecognized link type: ' + a.get('S').name);
               }
             } else if (annotation.has('Dest')) {
               // simple destination link
@@ -471,6 +467,7 @@ var PDFDocument = (function PDFDocumentClosure() {
         } catch (err) {
           warn('The linearization data is not available ' +
                'or unreadable pdf data is found');
+          linearization = false;
         }
       }
       // shadow the prototype getter with a data property
@@ -531,6 +528,17 @@ var PDFDocument = (function PDFDocumentClosure() {
       if (find(stream, '%PDF-', 1024)) {
         // Found the header, trim off any garbage before it.
         stream.moveStart();
+        // Reading file format version
+        var MAX_VERSION_LENGTH = 12;
+        var version = '', ch;
+        while ((ch = stream.getChar()) > ' ') {
+          if (version.length >= MAX_VERSION_LENGTH) {
+            break;
+          }
+          version += ch;
+        }
+        // removing "%PDF-"-prefix
+        this.pdfFormatVersion = version.substring(5);
         return;
       }
       // May not be a PDF file, continue anyway.
@@ -551,11 +559,12 @@ var PDFDocument = (function PDFDocumentClosure() {
       return shadow(this, 'numPages', num);
     },
     getDocumentInfo: function PDFDocument_getDocumentInfo() {
-      var docInfo;
+      var docInfo = {
+        PDFFormatVersion: this.pdfFormatVersion
+      };
       if (this.xref.trailer.has('Info')) {
         var infoDict = this.xref.trailer.get('Info');
 
-        docInfo = {};
         var validEntries = DocumentInfoValidators.entries;
         // Only fill the document info with valid entries from the spec.
         for (var key in validEntries) {
@@ -606,12 +615,14 @@ var PDFDocument = (function PDFDocumentClosure() {
 
 // Use only for debugging purposes. This should not be used in any code that is
 // in mozilla master.
-function log(msg) {
-  if (console && console.log)
-    console.log(msg);
-  else if (print)
-    print(msg);
-}
+var log = (function() {
+  if ('console' in globalScope && 'log' in globalScope['console']) {
+    return globalScope['console']['log'].bind(globalScope['console']);
+  } else {
+    return function nop() {
+    };
+  }
+})();
 
 // A notice for devs that will not trigger the fallback UI.  These are good
 // for things that are helpful to devs, such as warning that Workers were
@@ -634,7 +645,16 @@ function warn(msg) {
 // Fatal errors that should trigger the fallback UI and halt execution by
 // throwing an exception.
 function error(msg) {
-  log('Error: ' + msg);
+  // If multiple arguments were passed, pass them all to the log function.
+  if (arguments.length > 1) {
+    var logArguments = ['Error:'];
+    logArguments.push.apply(logArguments, arguments);
+    log.apply(null, logArguments);
+    // Join the arguments into a single string for the lines below.
+    msg = [].join.call(arguments, ' ');
+  } else {
+    log('Error: ' + msg);
+  }
   log(backtrace());
   PDFJS.LogManager.notify('error', msg);
   throw new Error(msg);
@@ -661,6 +681,8 @@ function assert(cond, msg) {
 // Combines two URLs. The baseUrl shall be absolute URL. If the url is an
 // absolute URL, it will be returned as is.
 function combineUrl(baseUrl, url) {
+  if (!url)
+    return baseUrl;
   if (url.indexOf(':') >= 0)
     return url;
   if (url.charAt(0) == '/') {
@@ -724,6 +746,31 @@ var PasswordException = (function PasswordExceptionClosure() {
   return PasswordException;
 })();
 
+var UnknownErrorException = (function UnknownErrorExceptionClosure() {
+  function UnknownErrorException(msg, details) {
+    this.name = 'UnknownErrorException';
+    this.message = msg;
+    this.details = details;
+  }
+
+  UnknownErrorException.prototype = new Error();
+  UnknownErrorException.constructor = UnknownErrorException;
+
+  return UnknownErrorException;
+})();
+
+var InvalidPDFException = (function InvalidPDFExceptionClosure() {
+  function InvalidPDFException(msg) {
+    this.name = 'InvalidPDFException';
+    this.message = msg;
+  }
+
+  InvalidPDFException.prototype = new Error();
+  InvalidPDFException.constructor = InvalidPDFException;
+
+  return InvalidPDFException;
+})();
+
 function bytesToString(bytes) {
   var str = '';
   var length = bytes.length;
@@ -745,15 +792,17 @@ var IDENTITY_MATRIX = [1, 0, 0, 1, 0, 0];
 var Util = PDFJS.Util = (function UtilClosure() {
   function Util() {}
 
-  Util.makeCssRgb = function Util_makeCssRgb(r, g, b) {
-    var ri = (255 * r) | 0, gi = (255 * g) | 0, bi = (255 * b) | 0;
-    return 'rgb(' + ri + ',' + gi + ',' + bi + ')';
+  Util.makeCssRgb = function Util_makeCssRgb(rgb) {
+    return 'rgb(' + rgb[0] + ',' + rgb[1] + ',' + rgb[2] + ')';
   };
 
-  Util.makeCssCmyk = function Util_makeCssCmyk(c, m, y, k) {
-    c = (new DeviceCmykCS()).getRgb([c, m, y, k]);
-    var ri = (255 * c[0]) | 0, gi = (255 * c[1]) | 0, bi = (255 * c[2]) | 0;
-    return 'rgb(' + ri + ',' + gi + ',' + bi + ')';
+  Util.makeCssCmyk = function Util_makeCssCmyk(cmyk) {
+    var cs = new DeviceCmykCS();
+    Util.makeCssCmyk = function makeCssCmyk(cmyk) {
+      var rgb = cs.getRgb(cmyk, 0);
+      return Util.makeCssRgb(rgb);
+    };
+    return Util.makeCssCmyk(cmyk);
   };
 
   // For 2d affine transforms
@@ -860,7 +909,7 @@ var PageViewport = PDFJS.PageViewport = (function PageViewportClosure() {
     var centerX = (viewBox[2] + viewBox[0]) / 2;
     var centerY = (viewBox[3] + viewBox[1]) / 2;
     var rotateA, rotateB, rotateC, rotateD;
-    switch (rotate) {
+    switch (rotate % 360) {
       case -180:
       case 180:
         rotateA = -1; rotateB = 0; rotateC = 0; rotateD = 1;
@@ -1237,6 +1286,15 @@ var StatTimer = (function StatTimerClosure() {
   return StatTimer;
 })();
 
+PDFJS.createBlob = function createBlob(data, contentType) {
+  if (typeof Blob === 'function')
+    return new Blob([data], { type: contentType });
+  // Blob builder is deprecated in FF14 and removed in FF18.
+  var bb = new MozBlobBuilder();
+  bb.append(data);
+  return bb.getBlob(contentType);
+};
+
 
 /**
  * This is the main entry point for loading a PDF and interacting with it.
@@ -1310,6 +1368,13 @@ var PDFDocumentProxy = (function PDFDocumentProxyClosure() {
      */
     get fingerprint() {
       return this.pdfInfo.fingerprint;
+    },
+    /**
+     * @return {boolean} true if embedded document fonts are in use. Will be
+     * set during rendering of the pages.
+     */
+    get embeddedFontsUsed() {
+      return this.transport.embeddedFontsUsed;
     },
     /**
      * @param {number} The page number to get. The first page is 1.
@@ -1393,8 +1458,10 @@ var PDFPageProxy = (function PDFPageProxyClosure() {
     this.transport = transport;
     this.stats = new StatTimer();
     this.stats.enabled = !!globalScope.PDFJS.enableStats;
-    this.objs = transport.objs;
+    this.commonObjs = transport.commonObjs;
+    this.objs = new PDFObjects();
     this.renderInProgress = false;
+    this.cleanupAfterRender = false;
   }
   PDFPageProxy.prototype = {
     /**
@@ -1484,9 +1551,10 @@ var PDFPageProxy = (function PDFPageProxyClosure() {
       var self = this;
       function complete(error) {
         self.renderInProgress = false;
-        if (self.destroyed) {
-          delete self.operatorList;
+        if (self.destroyed || self.cleanupAfterRender) {
           delete self.displayReadyPromise;
+          delete self.operatorList;
+          self.objs.clear();
         }
 
         if (error)
@@ -1504,7 +1572,7 @@ var PDFPageProxy = (function PDFPageProxyClosure() {
             return;
           }
 
-          var gfx = new CanvasGraphics(params.canvasContext,
+          var gfx = new CanvasGraphics(params.canvasContext, this.commonObjs,
             this.objs, params.textLayer);
           try {
             this.display(gfx, params.viewport, complete, continueCallback);
@@ -1550,10 +1618,13 @@ var PDFPageProxy = (function PDFPageProxyClosure() {
       // Convert the font names to the corresponding font obj.
       var fontObjs = [];
       for (var i = 0, ii = fonts.length; i < ii; i++) {
-        var obj = this.objs.objs[fonts[i]].data;
+        var obj = this.commonObjs.getData(fonts[i]);
         if (obj.error) {
           warn('Error during font loading: ' + obj.error);
           continue;
+        }
+        if (!obj.coded) {
+          this.transport.embeddedFontsUsed = true;
         }
         fontObjs.push(obj);
       }
@@ -1582,8 +1653,9 @@ var PDFPageProxy = (function PDFPageProxyClosure() {
       var length = this.operatorList.fnArray.length;
       var operatorList = this.operatorList;
       var stepper = null;
-      if (PDFJS.pdfBug && StepperManager.enabled) {
-        stepper = StepperManager.create(this.pageNumber - 1);
+      if (PDFJS.pdfBug && 'StepperManager' in globalScope &&
+          globalScope['StepperManager'].enabled) {
+        stepper = globalScope['StepperManager'].create(this.pageNumber - 1);
         stepper.init(operatorList);
         stepper.nextBreakPoint = stepper.getNextBreakPoint();
       }
@@ -1643,6 +1715,7 @@ var PDFPageProxy = (function PDFPageProxyClosure() {
       if (!this.renderInProgress) {
         delete this.operatorList;
         delete this.displayReadyPromise;
+        this.objs.clear();
       }
     }
   };
@@ -1654,11 +1727,11 @@ var PDFPageProxy = (function PDFPageProxyClosure() {
 var WorkerTransport = (function WorkerTransportClosure() {
   function WorkerTransport(workerInitializedPromise, workerReadyPromise) {
     this.workerReadyPromise = workerReadyPromise;
-    this.objs = new PDFObjects();
+    this.commonObjs = new PDFObjects();
 
     this.pageCache = [];
     this.pagePromises = [];
-    this.fontsLoading = {};
+    this.embeddedFontsUsed = false;
 
     // If worker support isn't disabled explicit and the browser has worker
     // support, create a new web worker and test if it/the browser fullfills
@@ -1672,10 +1745,9 @@ var WorkerTransport = (function WorkerTransportClosure() {
       }
 
       try {
-        var worker;
         // Some versions of FF can't create a worker on localhost, see:
         // https://bugzilla.mozilla.org/show_bug.cgi?id=683280
-        worker = new Worker(workerSrc);
+        var worker = new Worker(workerSrc);
         var messageHandler = new MessageHandler('main', worker);
         this.messageHandler = messageHandler;
 
@@ -1714,6 +1786,7 @@ var WorkerTransport = (function WorkerTransportClosure() {
       this.pagePromises = [];
     },
     setupFakeWorker: function WorkerTransport_setupFakeWorker() {
+      warn('Setting up fake worker.');
       // If we don't use a worker, just post/sendMessage to the main thread.
       var fakeWorker = {
         postMessage: function WorkerTransport_postMessage(obj) {
@@ -1749,6 +1822,14 @@ var WorkerTransport = (function WorkerTransportClosure() {
         this.workerReadyPromise.reject(data.exception.message, data.exception);
       }, this);
 
+      messageHandler.on('InvalidPDF', function transportInvalidPDF(data) {
+        this.workerReadyPromise.reject(data.exception.name, data.exception);
+      }, this);
+
+      messageHandler.on('UnknownError', function transportUnknownError(data) {
+        this.workerReadyPromise.reject(data.exception.message, data.exception);
+      }, this);
+
       messageHandler.on('GetPage', function transportPage(data) {
         var pageInfo = data.pageInfo;
         var page = new PDFPageProxy(pageInfo, this);
@@ -1771,44 +1852,56 @@ var WorkerTransport = (function WorkerTransportClosure() {
         page.startRenderingFromOperatorList(data.operatorList, depFonts);
       }, this);
 
-      messageHandler.on('obj', function transportObj(data) {
+      messageHandler.on('commonobj', function transportObj(data) {
         var id = data[0];
         var type = data[1];
-        if (this.objs.hasData(id))
+        if (this.commonObjs.hasData(id))
           return;
 
         switch (type) {
-          case 'JpegStream':
-            var imageData = data[2];
-            loadJpegStream(id, imageData, this.objs);
-            break;
-          case 'Image':
-            var imageData = data[2];
-            this.objs.resolve(id, imageData);
-            break;
           case 'Font':
-            var name = data[2];
-            var file = data[3];
-            var properties = data[4];
-
-            if (file) {
-              // Rewrap the ArrayBuffer in a stream.
-              var fontFileDict = new Dict();
-              file = new Stream(file, 0, file.length, fontFileDict);
-            }
+            var exportedData = data[2];
 
             // At this point, only the font object is created but the font is
             // not yet attached to the DOM. This is done in `FontLoader.bind`.
             var font;
-            try {
-              font = new Font(name, file, properties);
-            } catch (e) {
-              font = new ErrorFont(e);
-            }
-            this.objs.resolve(id, font);
+            if ('error' in exportedData)
+              font = new ErrorFont(exportedData.error);
+            else
+              font = new Font(exportedData);
+            this.commonObjs.resolve(id, font);
             break;
           default:
-            error('Got unkown object type ' + type);
+            error('Got unknown common object type ' + type);
+        }
+      }, this);
+
+      messageHandler.on('obj', function transportObj(data) {
+        var id = data[0];
+        var pageIndex = data[1];
+        var type = data[2];
+        var pageProxy = this.pageCache[pageIndex];
+        if (pageProxy.objs.hasData(id))
+          return;
+
+        switch (type) {
+          case 'JpegStream':
+            var imageData = data[3];
+            loadJpegStream(id, imageData, pageProxy.objs);
+            break;
+          case 'Image':
+            var imageData = data[3];
+            pageProxy.objs.resolve(id, imageData);
+
+            // heuristics that will allow not to store large data
+            var MAX_IMAGE_SIZE_TO_STORE = 8000000;
+            if ('data' in imageData &&
+                imageData.data.length > MAX_IMAGE_SIZE_TO_STORE) {
+              pageProxy.cleanupAfterRender = true;
+            }
+            break;
+          default:
+            error('Got unknown object type ' + type);
         }
       }, this);
 
@@ -1908,7 +2001,8 @@ var TextRenderingMode = {
   FILL_ADD_TO_PATH: 4,
   STROKE_ADD_TO_PATH: 5,
   FILL_STROKE_ADD_TO_PATH: 6,
-  ADD_TO_PATH: 7
+  ADD_TO_PATH: 7,
+  ADD_TO_PATH_FLAG: 4
 };
 
 // Minimal font size that would be used during canvas fillText operations.
@@ -2038,7 +2132,7 @@ var CanvasExtraState = (function CanvasExtraStateClosure() {
     this.fontSize = 0;
     this.fontSizeScale = 1;
     this.textMatrix = IDENTITY_MATRIX;
-    this.fontMatrix = IDENTITY_MATRIX;
+    this.fontMatrix = FONT_IDENTITY_MATRIX;
     this.leading = 0;
     // Current point (in user coordinates)
     this.x = 0;
@@ -2066,6 +2160,7 @@ var CanvasExtraState = (function CanvasExtraStateClosure() {
     this.fillAlpha = 1;
     this.strokeAlpha = 1;
     this.lineWidth = 1;
+    this.paintFormXObjectDepth = 0;
 
     this.old = old;
   }
@@ -2085,20 +2180,148 @@ var CanvasExtraState = (function CanvasExtraStateClosure() {
 var CanvasGraphics = (function CanvasGraphicsClosure() {
   // Defines the time the executeOperatorList is going to be executing
   // before it stops and shedules a continue of execution.
-  var kExecutionTime = 15;
+  var EXECUTION_TIME = 15;
 
-  function CanvasGraphics(canvasCtx, objs, textLayer) {
+  function CanvasGraphics(canvasCtx, commonObjs, objs, textLayer) {
     this.ctx = canvasCtx;
     this.current = new CanvasExtraState();
     this.stateStack = [];
     this.pendingClip = null;
     this.res = null;
     this.xobjs = null;
+    this.commonObjs = commonObjs;
     this.objs = objs;
     this.textLayer = textLayer;
     if (canvasCtx) {
       addContextCurrentTransform(canvasCtx);
     }
+  }
+
+  function applyStencilMask(imgArray, width, height, inverseDecode, buffer) {
+    var imgArrayPos = 0;
+    var i, j, mask, buf;
+    // removing making non-masked pixels transparent
+    var bufferPos = 3; // alpha component offset
+    for (i = 0; i < height; i++) {
+      mask = 0;
+      for (j = 0; j < width; j++) {
+        if (!mask) {
+          buf = imgArray[imgArrayPos++];
+          mask = 128;
+        }
+        if (!(buf & mask) == inverseDecode) {
+          buffer[bufferPos] = 0;
+        }
+        bufferPos += 4;
+        mask >>= 1;
+      }
+    }
+  }
+
+  function putBinaryImageData(ctx, data, w, h) {
+    var tmpImgData = 'createImageData' in ctx ? ctx.createImageData(w, h) :
+      ctx.getImageData(0, 0, w, h);
+
+    var tmpImgDataPixels = tmpImgData.data;
+    if ('set' in tmpImgDataPixels)
+      tmpImgDataPixels.set(data);
+    else {
+      // Copy over the imageData pixel by pixel.
+      for (var i = 0, ii = tmpImgDataPixels.length; i < ii; i++)
+        tmpImgDataPixels[i] = data[i];
+    }
+
+    ctx.putImageData(tmpImgData, 0, 0);
+  }
+
+  function prescaleImage(pixels, width, height, widthScale, heightScale) {
+    pixels = new Uint8Array(pixels); // creating a copy
+    while (widthScale > 2 || heightScale > 2) {
+      if (heightScale > 2) {
+        // scaling image twice vertically
+        var rowSize = width * 4;
+        var k = 0, l = 0;
+        for (var i = 0; i < height - 1; i += 2) {
+          for (var j = 0; j < width; j++) {
+            var alpha1 = pixels[k + 3], alpha2 = pixels[k + 3 + rowSize];
+            if (alpha1 === alpha2) {
+              pixels[l] = (pixels[k] + pixels[k + rowSize]) >> 1;
+              pixels[l + 1] = (pixels[k + 1] + pixels[k + 1 + rowSize]) >> 1;
+              pixels[l + 2] = (pixels[k + 2] + pixels[k + 2 + rowSize]) >> 1;
+              pixels[l + 3] = alpha1;
+            } else if (alpha1 < alpha2) {
+              var d = 256 - alpha2 + alpha1;
+              pixels[l] = (pixels[k] * d + (pixels[k + rowSize] << 8)) >> 9;
+              pixels[l + 1] = (pixels[k + 1] * d +
+                              (pixels[k + 1 + rowSize] << 8)) >> 9;
+              pixels[l + 2] = (pixels[k + 2] * d +
+                              (pixels[k + 2 + rowSize] << 8)) >> 9;
+              pixels[l + 3] = alpha2;
+            } else {
+              var d = 256 - alpha1 + alpha2;
+              pixels[l] = ((pixels[k] << 8) + pixels[k + rowSize] * d) >> 9;
+              pixels[l + 1] = ((pixels[k + 1] << 8) +
+                              pixels[k + 1 + rowSize] * d) >> 9;
+              pixels[l + 2] = ((pixels[k + 2] << 8) +
+                              pixels[k + 2 + rowSize] * d) >> 9;
+              pixels[l + 3] = alpha1;
+            }
+            k += 4; l += 4;
+          }
+          k += rowSize;
+        }
+        if (height & 1) {
+          for (var i = 0; i < rowSize; i++) {
+            pixels[l++] = pixels[k++];
+          }
+        }
+        height = (height + 1) >> 1;
+        heightScale /= 2;
+      }
+      if (widthScale > 2) {
+        // scaling image twice horizontally
+        var k = 0, l = 0;
+        for (var i = 0; i < height; i++) {
+          for (var j = 0; j < width - 1; j += 2) {
+            var alpha1 = pixels[k + 3], alpha2 = pixels[k + 7];
+            if (alpha1 === alpha2) {
+              pixels[l] = (pixels[k] + pixels[k + 4]) >> 1;
+              pixels[l + 1] = (pixels[k + 1] + pixels[k + 5]) >> 1;
+              pixels[l + 2] = (pixels[k + 2] + pixels[k + 6]) >> 1;
+              pixels[l + 3] = alpha1;
+            } else if (alpha1 < alpha2) {
+              var d = 256 - alpha2 + alpha1;
+              pixels[l] = (pixels[k] * d + (pixels[k + 4] << 8)) >> 9;
+              pixels[l + 1] = (pixels[k + 1] * d + (pixels[k + 5] << 8)) >> 9;
+              pixels[l + 2] = (pixels[k + 2] * d + (pixels[k + 6] << 8)) >> 9;
+              pixels[l + 3] = alpha2;
+            } else {
+              var d = 256 - alpha1 + alpha2;
+              pixels[l] = ((pixels[k] << 8) + pixels[k + 4] * d) >> 9;
+              pixels[l + 1] = ((pixels[k + 1] << 8) + pixels[k + 5] * d) >> 9;
+              pixels[l + 2] = ((pixels[k + 2] << 8) + pixels[k + 6] * d) >> 9;
+              pixels[l + 3] = alpha1;
+            }
+            k += 8; l += 4;
+          }
+          if (width & 1) {
+            pixels[l++] = pixels[k++];
+            pixels[l++] = pixels[k++];
+            pixels[l++] = pixels[k++];
+            pixels[l++] = pixels[k++];
+          }
+        }
+        width = (width + 1) >> 1;
+        widthScale /= 2;
+      }
+    }
+
+    var tmpCanvas = createScratchCanvas(width, height);
+    var tmpCtx = tmpCanvas.getContext('2d');
+    putBinaryImageData(tmpCtx, pixels.subarray(0, width * height * 4),
+                               width, height);
+
+    return tmpCanvas;
   }
 
   var LINE_CAP_STYLES = ['butt', 'round', 'square'];
@@ -2132,7 +2355,10 @@ var CanvasGraphics = (function CanvasGraphicsClosure() {
       'setFillCMYKColor': true,
       'paintJpegXObject': true,
       'paintImageXObject': true,
+      'paintInlineImageXObject': true,
+      'paintInlineImageXObjectGroup': true,
       'paintImageMaskXObject': true,
+      'paintImageMaskXObjectGroup': true,
       'shadingFill': true
     },
 
@@ -2160,8 +2386,9 @@ var CanvasGraphics = (function CanvasGraphicsClosure() {
       }
 
       var executionEndIdx;
-      var endTime = Date.now() + kExecutionTime;
+      var endTime = Date.now() + EXECUTION_TIME;
 
+      var commonObjs = this.commonObjs;
       var objs = this.objs;
       var fnName;
       var slowCommands = this.slowCommands;
@@ -2180,11 +2407,16 @@ var CanvasGraphics = (function CanvasGraphicsClosure() {
           var deps = argsArray[i];
           for (var n = 0, nn = deps.length; n < nn; n++) {
             var depObjId = deps[n];
+            var common = depObjId.substring(0, 2) == 'g_';
 
             // If the promise isn't resolved yet, add the continueCallback
             // to the promise and bail out.
-            if (!objs.isResolved(depObjId)) {
+            if (!common && !objs.isResolved(depObjId)) {
               objs.get(depObjId, continueCallback);
+              return i;
+            }
+            if (common && !commonObjs.isResolved(depObjId)) {
+              commonObjs.get(depObjId, continueCallback);
               return i;
             }
           }
@@ -2232,10 +2464,14 @@ var CanvasGraphics = (function CanvasGraphicsClosure() {
       this.ctx.miterLimit = limit;
     },
     setDash: function CanvasGraphics_setDash(dashArray, dashPhase) {
-      this.ctx.mozDash = dashArray;
-      this.ctx.mozDashOffset = dashPhase;
-      this.ctx.webkitLineDash = dashArray;
-      this.ctx.webkitLineDashOffset = dashPhase;
+      var ctx = this.ctx;
+      if ('setLineDash' in ctx) {
+        ctx.setLineDash(dashArray);
+        ctx.lineDashOffset = dashPhase;
+      } else {
+        ctx.mozDash = dashArray;
+        ctx.mozDashOffset = dashPhase;
+      }
     },
     setRenderingIntent: function CanvasGraphics_setRenderingIntent(intent) {
       // Maybe if we one day fully support color spaces this will be important
@@ -2294,6 +2530,10 @@ var CanvasGraphics = (function CanvasGraphicsClosure() {
       this.current = old.clone();
     },
     restore: function CanvasGraphics_restore() {
+      if ('textClipLayers' in this) {
+        this.completeTextClipping();
+      }
+
       var prev = this.stateStack.pop();
       if (prev) {
         this.current = prev;
@@ -2423,6 +2663,64 @@ var CanvasGraphics = (function CanvasGraphicsClosure() {
       this.current.y = this.current.lineY = 0;
     },
     endText: function CanvasGraphics_endText() {
+      if ('textClipLayers' in this) {
+        this.swapImageForTextClipping();
+      }
+    },
+    getCurrentTextClipping: function CanvasGraphics_getCurrentTextClipping() {
+      var ctx = this.ctx;
+      var transform = ctx.mozCurrentTransform;
+      if ('textClipLayers' in this) {
+        // we need to reset only font and transform
+        var maskCtx = this.textClipLayers.maskCtx;
+        maskCtx.setTransform.apply(maskCtx, transform);
+        maskCtx.font = ctx.font;
+        return maskCtx;
+      }
+
+      var canvasWidth = ctx.canvas.width;
+      var canvasHeight = ctx.canvas.height;
+      // keeping track of the text clipping of the separate canvas
+      var maskCanvas = createScratchCanvas(canvasWidth, canvasHeight);
+      var maskCtx = maskCanvas.getContext('2d');
+      maskCtx.setTransform.apply(maskCtx, transform);
+      maskCtx.font = ctx.font;
+      var textClipLayers = {
+        maskCanvas: maskCanvas,
+        maskCtx: maskCtx
+      };
+      this.textClipLayers = textClipLayers;
+      return maskCtx;
+    },
+    swapImageForTextClipping:
+      function CanvasGraphics_swapImageForTextClipping() {
+      var ctx = this.ctx;
+      var canvasWidth = ctx.canvas.width;
+      var canvasHeight = ctx.canvas.height;
+      // saving current image content and clearing whole canvas
+      ctx.save();
+      ctx.setTransform(1, 0, 0, 1, 0, 0);
+      var data = ctx.getImageData(0, 0, canvasWidth, canvasHeight);
+      this.textClipLayers.imageData = data;
+      ctx.clearRect(0, 0, canvasWidth, canvasHeight);
+      ctx.restore();
+    },
+    completeTextClipping: function CanvasGraphics_completeTextClipping() {
+      var ctx = this.ctx;
+      // applying mask to the image (result is saved in maskCanvas)
+      var maskCtx = this.textClipLayers.maskCtx;
+      maskCtx.setTransform(1, 0, 0, 1, 0, 0);
+      maskCtx.globalCompositeOperation = 'source-in';
+      maskCtx.drawImage(ctx.canvas, 0, 0);
+
+      // restoring image data and applying the result of masked drawing
+      ctx.save();
+      ctx.setTransform(1, 0, 0, 1, 0, 0);
+      ctx.putImageData(this.textClipLayers.imageData, 0, 0);
+      ctx.drawImage(this.textClipLayers.maskCanvas, 0, 0);
+      ctx.restore();
+
+      delete this.textClipLayers;
     },
     setCharSpacing: function CanvasGraphics_setCharSpacing(spacing) {
       this.current.charSpacing = spacing;
@@ -2437,17 +2735,14 @@ var CanvasGraphics = (function CanvasGraphicsClosure() {
       this.current.leading = -leading;
     },
     setFont: function CanvasGraphics_setFont(fontRefName, size) {
-      var fontObj = this.objs.get(fontRefName);
+      var fontObj = this.commonObjs.get(fontRefName);
       var current = this.current;
 
       if (!fontObj)
         error('Can\'t find font for ' + fontRefName);
 
-      // Slice-clone matrix so we can manipulate it without affecting original
-      if (fontObj.fontMatrix)
-        current.fontMatrix = fontObj.fontMatrix.slice(0);
-      else
-        current.fontMatrix = IDENTITY_MATRIX.slice(0);
+      current.fontMatrix = fontObj.fontMatrix ? fontObj.fontMatrix :
+                                                FONT_IDENTITY_MATRIX;
 
       // A valid matrix needs all main diagonal elements to be non-zero
       // This also ensures we bypass FF bugzilla bug #719844.
@@ -2458,11 +2753,11 @@ var CanvasGraphics = (function CanvasGraphicsClosure() {
 
       // The spec for Tf (setFont) says that 'size' specifies the font 'scale',
       // and in some docs this can be negative (inverted x-y axes).
-      // We implement this condition with fontMatrix.
       if (size < 0) {
         size = -size;
-        current.fontMatrix[0] *= -1;
-        current.fontMatrix[3] *= -1;
+        current.fontDirection = -1;
+      } else {
+        current.fontDirection = 1;
       }
 
       this.current.font = fontObj;
@@ -2476,8 +2771,7 @@ var CanvasGraphics = (function CanvasGraphicsClosure() {
                                  (fontObj.bold ? 'bold' : 'normal');
 
       var italic = fontObj.italic ? 'italic' : 'normal';
-      var serif = fontObj.isSerifFont ? 'serif' : 'sans-serif';
-      var typeface = '"' + name + '", ' + serif;
+      var typeface = '"' + name + '", ' + fontObj.fallbackName;
 
       // Some font backends cannot handle fonts below certain size.
       // Keeping the font at minimal size and using the fontSizeScale to change
@@ -2491,8 +2785,6 @@ var CanvasGraphics = (function CanvasGraphicsClosure() {
       this.ctx.font = rule;
     },
     setTextRenderingMode: function CanvasGraphics_setTextRenderingMode(mode) {
-      if (mode >= TextRenderingMode.FILL_ADD_TO_PATH)
-        TODO('unsupported text rendering mode: ' + mode);
       this.current.textRenderingMode = mode;
     },
     setTextRise: function CanvasGraphics_setTextRise(rise) {
@@ -2518,16 +2810,15 @@ var CanvasGraphics = (function CanvasGraphicsClosure() {
     applyTextTransforms: function CanvasGraphics_applyTextTransforms() {
       var ctx = this.ctx;
       var current = this.current;
-      var textHScale = current.textHScale;
-      var fontMatrix = current.fontMatrix || IDENTITY_MATRIX;
-
       ctx.transform.apply(ctx, current.textMatrix);
-      ctx.scale(1, -1);
-      ctx.translate(current.x, -current.y - current.textRise);
-      ctx.transform.apply(ctx, fontMatrix);
-      ctx.scale(textHScale, 1);
+      ctx.translate(current.x, current.y + current.textRise);
+      if (current.fontDirection > 0) {
+        ctx.scale(current.textHScale, -1);
+      } else {
+        ctx.scale(-current.textHScale, 1);
+      }
     },
-    getTextGeometry: function CanvasGraphics_getTextGeometry() {
+    createTextGeometry: function CanvasGraphics_createTextGeometry() {
       var geometry = {};
       var ctx = this.ctx;
       var font = this.current.font;
@@ -2541,6 +2832,9 @@ var CanvasGraphics = (function CanvasGraphicsClosure() {
         geometry.vScale = tr[1] - bl[1];
       }
       geometry.spaceWidth = font.spaceWidth;
+      geometry.fontName = font.loadedName;
+      geometry.fontFamily = font.fallbackName;
+      geometry.fontSize = this.current.fontSize;
       return geometry;
     },
 
@@ -2553,14 +2847,14 @@ var CanvasGraphics = (function CanvasGraphicsClosure() {
       var fontSizeScale = current.fontSizeScale;
       var charSpacing = current.charSpacing;
       var wordSpacing = current.wordSpacing;
-      var textHScale = current.textHScale;
-      var fontMatrix = current.fontMatrix || IDENTITY_MATRIX;
-      var textHScale2 = textHScale * fontMatrix[0];
+      var textHScale = current.textHScale * current.fontDirection;
+      var fontMatrix = current.fontMatrix || FONT_IDENTITY_MATRIX;
       var glyphsLength = glyphs.length;
       var textLayer = this.textLayer;
-      var text = {str: '', length: 0, canvasWidth: 0, geom: {}};
+      var geom;
       var textSelection = textLayer && !skipTextSelection ? true : false;
       var textRenderingMode = current.textRenderingMode;
+      var canvasWidth = 0.0;
 
       // Type3 fonts - each glyph is a "mini-PDF"
       if (font.coded) {
@@ -2573,7 +2867,7 @@ var CanvasGraphics = (function CanvasGraphicsClosure() {
         if (textSelection) {
           this.save();
           ctx.scale(1, -1);
-          text.geom = this.getTextGeometry();
+          geom = this.createTextGeometry();
           this.restore();
         }
         for (var i = 0; i < glyphsLength; ++i) {
@@ -2582,6 +2876,7 @@ var CanvasGraphics = (function CanvasGraphicsClosure() {
           if (glyph === null) {
             // word break
             this.ctx.translate(wordSpacing, 0);
+            current.x += wordSpacing * textHScale;
             continue;
           }
 
@@ -2592,15 +2887,13 @@ var CanvasGraphics = (function CanvasGraphicsClosure() {
           this.restore();
 
           var transformed = Util.applyTransform([glyph.width, 0], fontMatrix);
-          var width = transformed[0] * fontSize +
-              Util.sign(current.fontMatrix[0]) * charSpacing;
+          var width = (transformed[0] * fontSize + charSpacing) *
+                      current.fontDirection;
 
           ctx.translate(width, 0);
           current.x += width * textHScale;
 
-          text.str += glyph.unicode;
-          text.length++;
-          text.canvasWidth += width;
+          canvasWidth += width;
         }
         ctx.restore();
       } else {
@@ -2608,14 +2901,15 @@ var CanvasGraphics = (function CanvasGraphicsClosure() {
         this.applyTextTransforms();
 
         var lineWidth = current.lineWidth;
-        var scale = Math.abs(current.textMatrix[0] * fontMatrix[0]);
+        var a1 = current.textMatrix[0], b1 = current.textMatrix[1];
+        var scale = Math.sqrt(a1 * a1 + b1 * b1);
         if (scale == 0 || lineWidth == 0)
           lineWidth = this.getSinglePixelWidth();
         else
           lineWidth /= scale;
 
         if (textSelection)
-          text.geom = this.getTextGeometry();
+          geom = this.createTextGeometry();
 
         if (fontSizeScale != 1.0) {
           ctx.scale(fontSizeScale, fontSizeScale);
@@ -2629,13 +2923,13 @@ var CanvasGraphics = (function CanvasGraphicsClosure() {
           var glyph = glyphs[i];
           if (glyph === null) {
             // word break
-            x += Util.sign(current.fontMatrix[0]) * wordSpacing;
+            x += current.fontDirection * wordSpacing;
             continue;
           }
 
           var character = glyph.fontChar;
-          var charWidth = glyph.width * fontSize * 0.001 +
-              Util.sign(current.fontMatrix[0]) * charSpacing;
+          var charWidth = glyph.width * fontSize * current.fontMatrix[0] +
+                          charSpacing * current.fontDirection;
 
           if (!glyph.disabled) {
             var scaledX = x / fontSizeScale;
@@ -2655,96 +2949,73 @@ var CanvasGraphics = (function CanvasGraphicsClosure() {
                 ctx.strokeText(character, scaledX, 0);
                 break;
               case TextRenderingMode.INVISIBLE:
+              case TextRenderingMode.ADD_TO_PATH:
                 break;
+            }
+            if (textRenderingMode & TextRenderingMode.ADD_TO_PATH_FLAG) {
+              var clipCtx = this.getCurrentTextClipping();
+              clipCtx.fillText(character, scaledX, 0);
             }
           }
 
           x += charWidth;
 
-          var glyphUnicode = glyph.unicode === ' ' ? '\u00A0' : glyph.unicode;
-          var glyphUnicodeLength = glyphUnicode.length;
-          //reverse an arabic ligature
-          if (glyphUnicodeLength > 1 &&
-              isRTLRangeFor(glyphUnicode.charCodeAt(0))) {
-            for (var ii = glyphUnicodeLength - 1; ii >= 0; ii--)
-              text.str += glyphUnicode[ii];
-          } else
-            text.str += glyphUnicode;
-          text.length += glyphUnicodeLength;
-          text.canvasWidth += charWidth;
+          canvasWidth += charWidth;
         }
-        current.x += x * textHScale2;
+        current.x += x * textHScale;
         ctx.restore();
       }
 
-      if (textSelection)
-        this.textLayer.appendText(text, font.loadedName, fontSize);
+      if (textSelection) {
+        geom.canvasWidth = canvasWidth;
+        this.textLayer.appendText(geom);
+      }
 
-      return text;
+      return canvasWidth;
     },
     showSpacedText: function CanvasGraphics_showSpacedText(arr) {
       var ctx = this.ctx;
       var current = this.current;
       var font = current.font;
       var fontSize = current.fontSize;
-      var textHScale = current.textHScale;
-      if (!font.coded)
-        textHScale *= (current.fontMatrix || IDENTITY_MATRIX)[0];
+      var textHScale = current.textHScale * (current.fontMatrix && !font.coded ?
+        current.fontMatrix[0] : FONT_IDENTITY_MATRIX[0]) *
+        current.fontDirection;
       var arrLength = arr.length;
       var textLayer = this.textLayer;
-      var text = {str: '', length: 0, canvasWidth: 0, geom: {}};
+      var geom;
+      var canvasWidth = 0.0;
       var textSelection = textLayer ? true : false;
 
       if (textSelection) {
         ctx.save();
-        // Type3 fonts - each glyph is a "mini-PDF" (see also showText)
-        if (font.coded) {
-          ctx.transform.apply(ctx, current.textMatrix);
-          ctx.scale(1, -1);
-          ctx.translate(current.x, -1 * current.y);
-          ctx.scale(textHScale, 1);
-        } else
-          this.applyTextTransforms();
-        text.geom = this.getTextGeometry();
+        this.applyTextTransforms();
+        geom = this.createTextGeometry();
         ctx.restore();
       }
 
       for (var i = 0; i < arrLength; ++i) {
         var e = arr[i];
         if (isNum(e)) {
-          var spacingLength = -e * 0.001 * fontSize * textHScale;
+          var spacingLength = -e * fontSize * textHScale;
           current.x += spacingLength;
 
-          if (textSelection) {
-            // Emulate precise spacing via HTML spaces
-            text.canvasWidth += spacingLength;
-            if (e < 0 && text.geom.spaceWidth > 0) { // avoid div by zero
-              var numFakeSpaces = Math.round(-e / text.geom.spaceWidth);
-              if (numFakeSpaces > 0) {
-                text.str += '\u00A0';
-                text.length++;
-              }
-            }
-          }
+          if (textSelection)
+            canvasWidth += spacingLength;
         } else if (isString(e)) {
-          var shownText = this.showText(e, true);
+          var shownCanvasWidth = this.showText(e, true);
 
-          if (textSelection) {
-            if (shownText.str === ' ') {
-              text.str += '\u00A0';
-            } else {
-              text.str += shownText.str;
-            }
-            text.canvasWidth += shownText.canvasWidth;
-            text.length += shownText.length;
-          }
+          if (textSelection)
+            canvasWidth += shownCanvasWidth;
         } else {
           error('TJ array element ' + e + ' is not string or num');
         }
       }
 
-      if (textSelection)
-        this.textLayer.appendText(text, font.loadedName, fontSize);
+      if (textSelection) {
+        geom.canvasWidth = canvasWidth;
+        this.textLayer.appendText(geom);
+      }
     },
     nextLineShowText: function CanvasGraphics_nextLineShowText(text) {
       this.nextLine();
@@ -2786,8 +3057,8 @@ var CanvasGraphics = (function CanvasGraphicsClosure() {
     },
     setStrokeColor: function CanvasGraphics_setStrokeColor(/*...*/) {
       var cs = this.current.strokeColorSpace;
-      var rgbColor = cs.getRgb(arguments);
-      var color = Util.makeCssRgb(rgbColor[0], rgbColor[1], rgbColor[2]);
+      var rgbColor = cs.getRgb(arguments, 0);
+      var color = Util.makeCssRgb(rgbColor);
       this.ctx.strokeStyle = color;
       this.current.strokeColor = color;
     },
@@ -2799,11 +3070,7 @@ var CanvasGraphics = (function CanvasGraphicsClosure() {
         if (base) {
           var baseComps = base.numComps;
 
-          color = [];
-          for (var i = 0; i < baseComps; ++i)
-            color.push(args[i]);
-
-          color = base.getRgb(color);
+          color = base.getRgb(args, 0);
         }
         var pattern = new TilingPattern(IR, color, this.ctx, this.objs);
       } else if (IR[0] == 'RadialAxial' || IR[0] == 'Dummy') {
@@ -2824,8 +3091,8 @@ var CanvasGraphics = (function CanvasGraphicsClosure() {
     },
     setFillColor: function CanvasGraphics_setFillColor(/*...*/) {
       var cs = this.current.fillColorSpace;
-      var rgbColor = cs.getRgb(arguments);
-      var color = Util.makeCssRgb(rgbColor[0], rgbColor[1], rgbColor[2]);
+      var rgbColor = cs.getRgb(arguments, 0);
+      var color = Util.makeCssRgb(rgbColor);
       this.ctx.fillStyle = color;
       this.current.fillColor = color;
     },
@@ -2842,7 +3109,8 @@ var CanvasGraphics = (function CanvasGraphicsClosure() {
       if (!(this.current.strokeColorSpace instanceof DeviceGrayCS))
         this.current.strokeColorSpace = new DeviceGrayCS();
 
-      var color = Util.makeCssRgb(gray, gray, gray);
+      var rgbColor = this.current.strokeColorSpace.getRgb(arguments, 0);
+      var color = Util.makeCssRgb(rgbColor);
       this.ctx.strokeStyle = color;
       this.current.strokeColor = color;
     },
@@ -2850,7 +3118,8 @@ var CanvasGraphics = (function CanvasGraphicsClosure() {
       if (!(this.current.fillColorSpace instanceof DeviceGrayCS))
         this.current.fillColorSpace = new DeviceGrayCS();
 
-      var color = Util.makeCssRgb(gray, gray, gray);
+      var rgbColor = this.current.fillColorSpace.getRgb(arguments, 0);
+      var color = Util.makeCssRgb(rgbColor);
       this.ctx.fillStyle = color;
       this.current.fillColor = color;
     },
@@ -2858,7 +3127,8 @@ var CanvasGraphics = (function CanvasGraphicsClosure() {
       if (!(this.current.strokeColorSpace instanceof DeviceRgbCS))
         this.current.strokeColorSpace = new DeviceRgbCS();
 
-      var color = Util.makeCssRgb(r, g, b);
+      var rgbColor = this.current.strokeColorSpace.getRgb(arguments, 0);
+      var color = Util.makeCssRgb(rgbColor);
       this.ctx.strokeStyle = color;
       this.current.strokeColor = color;
     },
@@ -2866,7 +3136,8 @@ var CanvasGraphics = (function CanvasGraphicsClosure() {
       if (!(this.current.fillColorSpace instanceof DeviceRgbCS))
         this.current.fillColorSpace = new DeviceRgbCS();
 
-      var color = Util.makeCssRgb(r, g, b);
+      var rgbColor = this.current.fillColorSpace.getRgb(arguments, 0);
+      var color = Util.makeCssRgb(rgbColor);
       this.ctx.fillStyle = color;
       this.current.fillColor = color;
     },
@@ -2874,7 +3145,7 @@ var CanvasGraphics = (function CanvasGraphicsClosure() {
       if (!(this.current.strokeColorSpace instanceof DeviceCmykCS))
         this.current.strokeColorSpace = new DeviceCmykCS();
 
-      var color = Util.makeCssCmyk(c, m, y, k);
+      var color = Util.makeCssCmyk(arguments);
       this.ctx.strokeStyle = color;
       this.current.strokeColor = color;
     },
@@ -2882,7 +3153,7 @@ var CanvasGraphics = (function CanvasGraphicsClosure() {
       if (!(this.current.fillColorSpace instanceof DeviceCmykCS))
         this.current.fillColorSpace = new DeviceCmykCS();
 
-      var color = Util.makeCssCmyk(c, m, y, k);
+      var color = Util.makeCssCmyk(arguments);
       this.ctx.fillStyle = color;
       this.current.fillColor = color;
     },
@@ -2935,6 +3206,7 @@ var CanvasGraphics = (function CanvasGraphicsClosure() {
     paintFormXObjectBegin: function CanvasGraphics_paintFormXObjectBegin(matrix,
                                                                         bbox) {
       this.save();
+      this.current.paintFormXObjectDepth++;
 
       if (matrix && isArray(matrix) && 6 == matrix.length)
         this.transform.apply(this, matrix);
@@ -2949,7 +3221,12 @@ var CanvasGraphics = (function CanvasGraphicsClosure() {
     },
 
     paintFormXObjectEnd: function CanvasGraphics_paintFormXObjectEnd() {
-      this.restore();
+      var depth = this.current.paintFormXObjectDepth;
+      do {
+        this.restore();
+        // some pdf don't close all restores inside object
+        // closing those for them
+      } while (this.current.paintFormXObjectDepth >= depth);
     },
 
     paintJpegXObject: function CanvasGraphics_paintJpegXObject(objId, w, h) {
@@ -2972,96 +3249,58 @@ var CanvasGraphics = (function CanvasGraphicsClosure() {
 
     paintImageMaskXObject: function CanvasGraphics_paintImageMaskXObject(
                              imgArray, inverseDecode, width, height) {
-      function applyStencilMask(buffer, inverseDecode) {
-        var imgArrayPos = 0;
-        var i, j, mask, buf;
-        // removing making non-masked pixels transparent
-        var bufferPos = 3; // alpha component offset
-        for (i = 0; i < height; i++) {
-          mask = 0;
-          for (j = 0; j < width; j++) {
-            if (!mask) {
-              buf = imgArray[imgArrayPos++];
-              mask = 128;
-            }
-            if (!(buf & mask) == inverseDecode) {
-              buffer[bufferPos] = 0;
-            }
-            bufferPos += 4;
-            mask >>= 1;
-          }
-        }
-      }
-      function rescaleImage(pixels, widthScale, heightScale) {
-        var scaledWidth = Math.ceil(width / widthScale);
-        var scaledHeight = Math.ceil(height / heightScale);
-
-        var itemsSum = new Uint32Array(scaledWidth * scaledHeight * 4);
-        var itemsCount = new Uint32Array(scaledWidth * scaledHeight);
-        for (var i = 0, position = 0; i < height; i++) {
-          var lineOffset = (0 | (i / heightScale)) * scaledWidth;
-          for (var j = 0; j < width; j++) {
-            var countOffset = lineOffset + (0 | (j / widthScale));
-            var sumOffset = countOffset << 2;
-            itemsSum[sumOffset] += pixels[position];
-            itemsSum[sumOffset + 1] += pixels[position + 1];
-            itemsSum[sumOffset + 2] += pixels[position + 2];
-            itemsSum[sumOffset + 3] += pixels[position + 3];
-            itemsCount[countOffset]++;
-            position += 4;
-          }
-        }
-        var tmpCanvas = createScratchCanvas(scaledWidth, scaledHeight);
-        var tmpCtx = tmpCanvas.getContext('2d');
-        var imgData = tmpCtx.getImageData(0, 0, scaledWidth, scaledHeight);
-        pixels = imgData.data;
-        for (var i = 0, j = 0, ii = scaledWidth * scaledHeight; i < ii; i++) {
-          var count = itemsCount[i];
-          pixels[j] = itemsSum[j] / count;
-          pixels[j + 1] = itemsSum[j + 1] / count;
-          pixels[j + 2] = itemsSum[j + 2] / count;
-          pixels[j + 3] = itemsSum[j + 3] / count;
-          j += 4;
-        }
-        tmpCtx.putImageData(imgData, 0, 0);
-        return tmpCanvas;
-      }
-
-      this.save();
-
       var ctx = this.ctx;
-      var w = width, h = height;
-      // scale the image to the unit square
-      ctx.scale(1 / w, -1 / h);
-
-      var tmpCanvas = createScratchCanvas(w, h);
+      var tmpCanvas = createScratchCanvas(width, height);
       var tmpCtx = tmpCanvas.getContext('2d');
 
       var fillColor = this.current.fillColor;
       tmpCtx.fillStyle = (fillColor && fillColor.hasOwnProperty('type') &&
                           fillColor.type === 'Pattern') ?
                           fillColor.getPattern(tmpCtx) : fillColor;
-      tmpCtx.fillRect(0, 0, w, h);
+      tmpCtx.fillRect(0, 0, width, height);
 
-      var imgData = tmpCtx.getImageData(0, 0, w, h);
+      var imgData = tmpCtx.getImageData(0, 0, width, height);
       var pixels = imgData.data;
 
-      applyStencilMask(pixels, inverseDecode);
+      applyStencilMask(imgArray, width, height, inverseDecode, pixels);
 
-      var currentTransform = ctx.mozCurrentTransformInverse;
-      var widthScale = Math.max(Math.abs(currentTransform[0]), 1);
-      var heightScale = Math.max(Math.abs(currentTransform[3]), 1);
-      if (widthScale >= 2 || heightScale >= 2) {
-        // canvas does not resize well large images to small -- using simple
-        // algorithm to perform pre-scaling
-        tmpCanvas = rescaleImage(imgData.data, widthScale, heightScale);
-        ctx.scale(widthScale, heightScale);
-        ctx.drawImage(tmpCanvas, 0, -h / heightScale);
-      } else {
+      this.paintInlineImageXObject(imgData);
+    },
+
+    paintImageMaskXObjectGroup:
+      function CanvasGraphics_paintImageMaskXObjectGroup(images) {
+      var ctx = this.ctx;
+      var tmpCanvasWidth = 0, tmpCanvasHeight = 0, tmpCanvas, tmpCtx;
+      for (var i = 0, ii = images.length; i < ii; i++) {
+        var image = images[i];
+        var w = image.width, h = image.height;
+        if (w > tmpCanvasWidth || h > tmpCanvasHeight) {
+          tmpCanvasWidth = Math.max(w, tmpCanvasWidth);
+          tmpCanvasHeight = Math.max(h, tmpCanvasHeight);
+          tmpCanvas = createScratchCanvas(tmpCanvasWidth, tmpCanvasHeight);
+          tmpCtx = tmpCanvas.getContext('2d');
+
+          var fillColor = this.current.fillColor;
+          tmpCtx.fillStyle = (fillColor && fillColor.hasOwnProperty('type') &&
+                              fillColor.type === 'Pattern') ?
+                              fillColor.getPattern(tmpCtx) : fillColor;
+        }
+        tmpCtx.fillRect(0, 0, w, h);
+
+        var imgData = tmpCtx.getImageData(0, 0, w, h);
+        var pixels = imgData.data;
+
+        applyStencilMask(image.data, w, h, image.inverseDecode, pixels);
+
         tmpCtx.putImageData(imgData, 0, 0);
-        ctx.drawImage(tmpCanvas, 0, -h);
+
+        ctx.save();
+        ctx.transform.apply(ctx, image.transform);
+        ctx.scale(1, -1);
+        ctx.drawImage(tmpCanvas, 0, 0, w, h,
+                      0, -1, 1, 1);
+        ctx.restore();
       }
-      this.restore();
     },
 
     paintImageXObject: function CanvasGraphics_paintImageXObject(objId) {
@@ -3069,23 +3308,62 @@ var CanvasGraphics = (function CanvasGraphicsClosure() {
       if (!imgData)
         error('Dependent image isn\'t ready yet');
 
-      this.save();
+      this.paintInlineImageXObject(imgData);
+    },
+
+    paintInlineImageXObject:
+      function CanvasGraphics_paintInlineImageXObject(imgData) {
+      var width = imgData.width;
+      var height = imgData.height;
       var ctx = this.ctx;
-      var w = imgData.width;
-      var h = imgData.height;
+      this.save();
       // scale the image to the unit square
-      ctx.scale(1 / w, -1 / h);
+      ctx.scale(1 / width, -1 / height);
 
-      var tmpCanvas = createScratchCanvas(w, h);
+      var currentTransform = ctx.mozCurrentTransformInverse;
+      var widthScale = Math.max(Math.abs(currentTransform[0]), 1);
+      var heightScale = Math.max(Math.abs(currentTransform[3]), 1);
+      var tmpCanvas = createScratchCanvas(width, height);
       var tmpCtx = tmpCanvas.getContext('2d');
-      this.putBinaryImageData(tmpCtx, imgData, w, h);
 
-      ctx.drawImage(tmpCanvas, 0, -h);
+      if (widthScale > 2 || heightScale > 2) {
+        // canvas does not resize well large images to small -- using simple
+        // algorithm to perform pre-scaling
+        tmpCanvas = prescaleImage(imgData.data,
+                                 width, height,
+                                 widthScale, heightScale);
+        ctx.drawImage(tmpCanvas, 0, 0, tmpCanvas.width, tmpCanvas.height,
+                                 0, -height, width, height);
+      } else {
+        if (typeof ImageData !== 'undefined' && imgData instanceof ImageData) {
+          tmpCtx.putImageData(imgData, 0, 0);
+        } else {
+          putBinaryImageData(tmpCtx, imgData.data, width, height);
+        }
+        ctx.drawImage(tmpCanvas, 0, -height);
+      }
       this.restore();
     },
 
-    putBinaryImageData: function CanvasGraphics_putBinaryImageData() {
-      //
+    paintInlineImageXObjectGroup:
+      function CanvasGraphics_paintInlineImageXObjectGroup(imgData, map) {
+      var ctx = this.ctx;
+      var w = imgData.width;
+      var h = imgData.height;
+
+      var tmpCanvas = createScratchCanvas(w, h);
+      var tmpCtx = tmpCanvas.getContext('2d');
+      putBinaryImageData(tmpCtx, imgData.data, w, h);
+
+      for (var i = 0, ii = map.length; i < ii; i++) {
+        var entry = map[i];
+        ctx.save();
+        ctx.transform.apply(ctx, entry.transform);
+        ctx.scale(1, -1);
+        ctx.drawImage(tmpCanvas, entry.x, entry.y, entry.w, entry.h,
+                      0, -1, 1, 1);
+        ctx.restore();
+      }
     },
 
     // Marked content
@@ -3145,54 +3423,16 @@ var CanvasGraphics = (function CanvasGraphicsClosure() {
     },
     getSinglePixelWidth: function CanvasGraphics_getSinglePixelWidth(scale) {
       var inverse = this.ctx.mozCurrentTransformInverse;
-      return Math.abs(inverse[0] + inverse[2]);
+      // max of the current horizontal and vertical scale
+      return Math.sqrt(Math.max(
+        (inverse[0] * inverse[0] + inverse[1] * inverse[1]),
+        (inverse[2] * inverse[2] + inverse[3] * inverse[3])));
     }
   };
 
   return CanvasGraphics;
 })();
 
-function checkPutBinaryImageDataCompatibility() {
-  // Feature detection if the browser can use an Uint8Array directly as imgData.
-  var canvas = document.createElement('canvas');
-  canvas.width = 1;
-  canvas.height = 1;
-  var ctx = canvas.getContext('2d');
-
-  try {
-    ctx.putImageData({
-      width: 1,
-      height: 1,
-      data: new Uint8Array(4)
-    }, 0, 0);
-
-    CanvasGraphics.prototype.putBinaryImageData =
-      function CanvasGraphicsPutBinaryImageDataNative(ctx, imgData) {
-        ctx.putImageData(imgData, 0, 0);
-      };
-  } catch (e) {
-    CanvasGraphics.prototype.putBinaryImageData =
-      function CanvasGraphicsPutBinaryImageDataShim(ctx, imgData, w, h) {
-        var tmpImgData = 'createImageData' in ctx ? ctx.createImageData(w, h) :
-          ctx.getImageData(0, 0, w, h);
-
-        var tmpImgDataPixels = tmpImgData.data;
-        var data = imgData.data;
-        if ('set' in tmpImgDataPixels)
-          tmpImgDataPixels.set(data);
-        else {
-          // Copy over the imageData pixel by pixel.
-          for (var i = 0, ii = tmpImgDataPixels.length; i < ii; i++)
-            tmpImgDataPixels[i] = data[i];
-        }
-
-        ctx.putImageData(tmpImgData, 0, 0);
-      };
-  }
-}
-if (!isWorker) {
-  checkPutBinaryImageDataCompatibility();
-}
 
 
 var Name = (function NameClosure() {
@@ -3485,8 +3725,10 @@ var Catalog = (function CatalogClosure() {
             continue;
           }
           var names = obj.get('Names');
-          for (i = 0, n = names.length; i < n; i += 2) {
-            dests[names[i]] = fetchDestination(xref.fetchIfRef(names[i + 1]));
+          if (names) {
+            for (i = 0, n = names.length; i < n; i += 2) {
+              dests[names[i]] = fetchDestination(xref.fetchIfRef(names[i + 1]));
+            }
           }
         }
       }
@@ -3752,7 +3994,8 @@ var XRef = (function XRefClosure() {
       if (dict)
         return dict;
       // nothing helps
-      error('Invalid PDF structure');
+      // calling error() would reject worker with an UnknownErrorException.
+      throw new InvalidPDFException('Invalid PDF structure');
     },
     readXRef: function XRef_readXRef(startXRef, recoveryMode) {
       var stream = this.stream;
@@ -3878,7 +4121,8 @@ var XRef = (function XRefClosure() {
       }
 
       // compressed entry
-      stream = this.fetch(new Ref(e.offset, 0));
+      var tableOffset = e.offset;
+      stream = this.fetch(new Ref(tableOffset, 0));
       if (!isStream(stream))
         error('bad ObjStm stream');
       var first = stream.parameters.get('First');
@@ -3887,6 +4131,7 @@ var XRef = (function XRefClosure() {
         error('invalid first and n parameters for ObjStm stream');
       }
       parser = new Parser(new Lexer(stream), false, this);
+      parser.allowStreams = true;
       var i, entries = [], nums = [];
       // read the object numbers to populate cache
       for (i = 0; i < n; ++i) {
@@ -3903,7 +4148,11 @@ var XRef = (function XRefClosure() {
       // read stream objects for cache
       for (i = 0; i < n; ++i) {
         entries.push(parser.getObj());
-        this.cache[nums[i]] = entries[i];
+        num = nums[i];
+        var entry = this.entries[num];
+        if (entry && entry.offset === tableOffset && entry.gen === i) {
+          this.cache[num] = entries[i];
+        }
       }
       e = entries[e.gen];
       if (!e) {
@@ -3931,8 +4180,6 @@ var PDFObjects = (function PDFObjectsClosure() {
   }
 
   PDFObjects.prototype = {
-    objs: null,
-
     /**
      * Internal function.
      * Ensures there is an object defined for `objId`. Stores `data` on the
@@ -4010,12 +4257,28 @@ var PDFObjects = (function PDFObjectsClosure() {
     },
 
     /**
+     * Returns the data of `objId` if object exists, null otherwise.
+     */
+    getData: function PDFObjects_getData(objId) {
+      var objs = this.objs;
+      if (!objs[objId] || !objs[objId].hasData) {
+        return null;
+      } else {
+        return objs[objId].data;
+      }
+    },
+
+    /**
      * Sets the data of an object but *doesn't* resolve it.
      */
     setData: function PDFObjects_setData(objId, data) {
       // Watchout! If you call `this.ensureObj(objId, data)` you're going to
       // create a *resolved* promise which shouldn't be the case!
       this.ensureObj(objId).data = data;
+    },
+
+    clear: function PDFObjects_clear() {
+      this.objs = {};
     }
   };
   return PDFObjects;
@@ -4173,7 +4436,7 @@ var PDFFunction = (function PDFFunctionClosure() {
         var range = IR[9];
 
         if (m != args.length)
-          error('Incorrect number of arguments: ' + inputSize + ' != ' +
+          error('Incorrect number of arguments: ' + m + ' != ' +
                 args.length);
 
         var x = args;
@@ -4708,8 +4971,8 @@ var PostScriptParser = (function PostScriptParserClosure() {
   function PostScriptParser(lexer) {
     this.lexer = lexer;
     this.operators = [];
-    this.token;
-    this.prev;
+    this.token = null;
+    this.prev = null;
   }
   PostScriptParser.prototype = {
     nextToken: function PostScriptParser_nextToken() {
@@ -11937,15 +12200,58 @@ var ColorSpace = (function ColorSpaceClosure() {
   }
 
   ColorSpace.prototype = {
-    // Input: array of size numComps representing color component values
-    // Output: array of rgb values, each value ranging from [0.1]
-    getRgb: function ColorSpace_getRgb(color) {
-      error('Should not call ColorSpace.getRgb: ' + color);
+    /**
+     * Converts the color value to the RGB color. The color components are
+     * located in the src array starting from the srcOffset. Returns the array
+     * of the rgb components, each value ranging from [0,255].
+     */
+    getRgb: function ColorSpace_getRgb(src, srcOffset) {
+      error('Should not call ColorSpace.getRgb');
     },
-    // Input: Uint8Array of component values, each value scaled to [0,255]
-    // Output: Uint8Array of rgb values, each value scaled to [0,255]
-    getRgbBuffer: function ColorSpace_getRgbBuffer(input) {
-      error('Should not call ColorSpace.getRgbBuffer: ' + input);
+    /**
+     * Converts the color value to the RGB color, similar to the getRgb method.
+     * The result placed into the dest array starting from the destOffset.
+     */
+    getRgbItem: function ColorSpace_getRgb(src, srcOffset, dest, destOffset) {
+      error('Should not call ColorSpace.getRgbItem');
+    },
+    /**
+     * Converts the specified number of the color values to the RGB colors.
+     * The colors are located in the src array starting from the srcOffset.
+     * The result is placed into the dest array starting from the destOffset.
+     * The src array items shall be in [0,2^bits) range, the dest array items
+     * will be in [0,255] range.
+     */
+    getRgbBuffer: function ColorSpace_getRgbBuffer(src, srcOffset, count,
+                                                   dest, destOffset, bits) {
+      error('Should not call ColorSpace.getRgbBuffer');
+    },
+    /**
+     * Determines amount of the bytes is required to store the reslut of the
+     * conversion that done by the getRgbBuffer method.
+     */
+    getOutputLength: function ColorSpace_getOutputLength(inputLength) {
+      error('Should not call ColorSpace.getOutputLength');
+    },
+    /**
+     * Returns true if source data will be equal the result/output data.
+     */
+    isPassthrough: function ColorSpace_isPassthrough(bits) {
+      return false;
+    },
+    /**
+     * Creates the output buffer and converts the specified number of the color
+     * values to the RGB colors, similar to the getRgbBuffer.
+     */
+    createRgbBuffer: function ColorSpace_createRgbBuffer(src, srcOffset,
+                                                         count, bits) {
+      if (this.isPassthrough(bits)) {
+        return src.subarray(srcOffset);
+      }
+      var destLength = this.getOutputLength(count * this.numComps);
+      var dest = new Uint8Array(destLength);
+      this.getRgbBuffer(src, srcOffset, count, dest, 0, bits);
+      return dest;
     }
   };
 
@@ -12106,7 +12412,7 @@ var ColorSpace = (function ColorSpaceClosure() {
       return true;
 
     if (n * 2 !== decode.length) {
-      warning('The decode map is not the correct length');
+      warn('The decode map is not the correct length');
       return true;
     }
     for (var i = 0, ii = decode.length; i < ii; i += 2) {
@@ -12129,39 +12435,66 @@ var AlternateCS = (function AlternateCSClosure() {
   function AlternateCS(numComps, base, tintFn) {
     this.name = 'Alternate';
     this.numComps = numComps;
-    this.defaultColor = [];
-    for (var i = 0; i < numComps; ++i)
-      this.defaultColor.push(1);
+    this.defaultColor = new Float32Array(numComps);
+    for (var i = 0; i < numComps; ++i) {
+      this.defaultColor[i] = 1;
+    }
     this.base = base;
     this.tintFn = tintFn;
   }
 
   AlternateCS.prototype = {
-    getRgb: function AlternateCS_getRgb(color) {
-      var tinted = this.tintFn(color);
-      return this.base.getRgb(tinted);
+    getRgb: function AlternateCS_getRgb(src, srcOffset) {
+      var rgb = new Uint8Array(3);
+      this.getRgbItem(src, srcOffset, rgb, 0);
+      return rgb;
     },
-    getRgbBuffer: function AlternateCS_getRgbBuffer(input, bits) {
+    getRgbItem: function AlternateCS_getRgbItem(src, srcOffset,
+                                                dest, destOffset) {
+      var baseNumComps = this.base.numComps;
+      var input = 'subarray' in src ?
+        src.subarray(srcOffset, srcOffset + this.numComps) :
+        Array.prototype.slice.call(src, srcOffset, srcOffset + this.numComps);
+      var tinted = this.tintFn(input);
+      this.base.getRgbItem(tinted, 0, dest, destOffset);
+    },
+    getRgbBuffer: function AlternateCS_getRgbBuffer(src, srcOffset, count,
+                                                    dest, destOffset, bits) {
       var tintFn = this.tintFn;
       var base = this.base;
       var scale = 1 / ((1 << bits) - 1);
-      var length = input.length;
-      var pos = 0;
       var baseNumComps = base.numComps;
-      var baseBuf = new Uint8Array(baseNumComps * length);
+      var isGetRgbBufferSupported = 'getRgbBuffer' in base;
+      var isPassthrough = base.isPassthrough(8) || !isGetRgbBufferSupported;
+      var pos = isPassthrough ? destOffset : 0;
+      var baseBuf = isPassthrough ? dest : new Uint8Array(baseNumComps * count);
       var numComps = this.numComps;
-      var scaled = [];
 
-      for (var i = 0; i < length; i += numComps) {
-        for (var z = 0; z < numComps; ++z)
-          scaled[z] = input[i + z] * scale;
-
+      var scaled = new Float32Array(numComps);
+      for (var i = 0; i < count; i++) {
+        for (var j = 0; j < numComps; j++) {
+          scaled[j] = src[srcOffset++] * scale;
+        }
         var tinted = tintFn(scaled);
-        for (var j = 0; j < baseNumComps; ++j)
-          baseBuf[pos++] = 255 * tinted[j];
+        if (isGetRgbBufferSupported) {
+          for (var j = 0; j < baseNumComps; j++) {
+            baseBuf[pos++] = tinted[j] * 255;
+          }
+        } else {
+          base.getRgbItem(tinted, 0, baseBuf, pos);
+          pos += baseNumComps;
+        }
       }
-      return base.getRgbBuffer(baseBuf, 8);
+      if (!isPassthrough) {
+        base.getRgbBuffer(baseBuf, 0, count, dest, destOffset, 8);
+      }
     },
+    getOutputLength: function AlternateCS_getOutputLength(inputLength) {
+      return this.base.getOutputLength(inputLength *
+                                       this.base.numComps / this.numComps);
+    },
+    isPassthrough: ColorSpace.prototype.isPassthrough,
+    createRgbBuffer: ColorSpace.prototype.createRgbBuffer,
     isDefaultDecode: function AlternateCS_isDefaultDecode(decodeMap) {
       return ColorSpace.isDefaultDecode(decodeMap, this.numComps);
     }
@@ -12184,7 +12517,7 @@ var IndexedCS = (function IndexedCSClosure() {
   function IndexedCS(base, highVal, lookup) {
     this.name = 'Indexed';
     this.numComps = 1;
-    this.defaultColor = [0];
+    this.defaultColor = new Uint8Array([0]);
     this.base = base;
     this.highVal = highVal;
 
@@ -12209,33 +12542,35 @@ var IndexedCS = (function IndexedCSClosure() {
   }
 
   IndexedCS.prototype = {
-    getRgb: function IndexedCS_getRgb(color) {
+    getRgb: function IndexedCS_getRgb(src, srcOffset) {
       var numComps = this.base.numComps;
-      var start = color[0] * numComps;
-      var c = [];
-
-      for (var i = start, ii = start + numComps; i < ii; ++i)
-        c.push(this.lookup[i]);
-
-      return this.base.getRgb(c);
+      var start = src[srcOffset] * numComps;
+      return this.base.getRgb(this.lookup, start);
     },
-    getRgbBuffer: function IndexedCS_getRgbBuffer(input) {
+    getRgbItem: function IndexedCS_getRgbItem(src, srcOffset,
+                                              dest, destOffset) {
+      var numComps = this.base.numComps;
+      var start = src[srcOffset] * numComps;
+      this.base.getRgbItem(this.lookup, start, dest, destOffset);
+    },
+    getRgbBuffer: function IndexedCS_getRgbBuffer(src, srcOffset, count,
+                                                  dest, destOffset) {
       var base = this.base;
       var numComps = base.numComps;
+      var outputDelta = base.getOutputLength(numComps);
       var lookup = this.lookup;
-      var length = input.length;
-      var baseBuf = new Uint8Array(length * numComps);
-      var baseBufPos = 0;
 
-      for (var i = 0; i < length; ++i) {
-        var lookupPos = input[i] * numComps;
-        for (var j = 0; j < numComps; ++j) {
-          baseBuf[baseBufPos++] = lookup[lookupPos + j];
-        }
+      for (var i = 0; i < count; ++i) {
+        var lookupPos = src[srcOffset++] * numComps;
+        base.getRgbBuffer(lookup, lookupPos, 1, dest, destOffset, 8);
+        destOffset += outputDelta;
       }
-
-      return base.getRgbBuffer(baseBuf, 8);
     },
+    getOutputLength: function IndexedCS_getOutputLength(inputLength) {
+      return this.base.getOutputLength(inputLength * this.base.numComps);
+    },
+    isPassthrough: ColorSpace.prototype.isPassthrough,
+    createRgbBuffer: ColorSpace.prototype.createRgbBuffer,
     isDefaultDecode: function IndexedCS_isDefaultDecode(decodeMap) {
       // indexed color maps shouldn't be changed
       return true;
@@ -12248,26 +12583,37 @@ var DeviceGrayCS = (function DeviceGrayCSClosure() {
   function DeviceGrayCS() {
     this.name = 'DeviceGray';
     this.numComps = 1;
-    this.defaultColor = [0];
+    this.defaultColor = new Float32Array([0]);
   }
 
   DeviceGrayCS.prototype = {
-    getRgb: function DeviceGrayCS_getRgb(color) {
-      var c = color[0];
-      return [c, c, c];
+    getRgb: function DeviceGrayCS_getRgb(src, srcOffset) {
+      var rgb = new Uint8Array(3);
+      this.getRgbItem(src, srcOffset, rgb, 0);
+      return rgb;
     },
-    getRgbBuffer: function DeviceGrayCS_getRgbBuffer(input, bits) {
+    getRgbItem: function DeviceGrayCS_getRgbItem(src, srcOffset,
+                                                 dest, destOffset) {
+      var c = (src[srcOffset] * 255) | 0;
+      c = c < 0 ? 0 : c > 255 ? 255 : c;
+      dest[destOffset] = dest[destOffset + 1] = dest[destOffset + 2] = c;
+    },
+    getRgbBuffer: function DeviceGrayCS_getRgbBuffer(src, srcOffset, count,
+                                                     dest, destOffset, bits) {
       var scale = 255 / ((1 << bits) - 1);
-      var length = input.length;
-      var rgbBuf = new Uint8Array(length * 3);
-      for (var i = 0, j = 0; i < length; ++i) {
-        var c = (scale * input[i]) | 0;
-        rgbBuf[j++] = c;
-        rgbBuf[j++] = c;
-        rgbBuf[j++] = c;
+      var j = srcOffset, q = destOffset;
+      for (var i = 0; i < count; ++i) {
+        var c = (scale * src[j++]) | 0;
+        dest[q++] = c;
+        dest[q++] = c;
+        dest[q++] = c;
       }
-      return rgbBuf;
     },
+    getOutputLength: function DeviceGrayCS_getOutputLength(inputLength) {
+      return inputLength * 3;
+    },
+    isPassthrough: ColorSpace.prototype.isPassthrough,
+    createRgbBuffer: ColorSpace.prototype.createRgbBuffer,
     isDefaultDecode: function DeviceGrayCS_isDefaultDecode(decodeMap) {
       return ColorSpace.isDefaultDecode(decodeMap, this.numComps);
     }
@@ -12279,22 +12625,43 @@ var DeviceRgbCS = (function DeviceRgbCSClosure() {
   function DeviceRgbCS() {
     this.name = 'DeviceRGB';
     this.numComps = 3;
-    this.defaultColor = [0, 0, 0];
+    this.defaultColor = new Float32Array([0, 0, 0]);
   }
   DeviceRgbCS.prototype = {
-    getRgb: function DeviceRgbCS_getRgb(color) {
-      return color;
+    getRgb: function DeviceRgbCS_getRgb(src, srcOffset) {
+      var rgb = new Uint8Array(3);
+      this.getRgbItem(src, srcOffset, rgb, 0);
+      return rgb;
     },
-    getRgbBuffer: function DeviceRgbCS_getRgbBuffer(input, bits) {
-      if (bits == 8)
-        return input;
+    getRgbItem: function DeviceRgbCS_getRgbItem(src, srcOffset,
+                                                dest, destOffset) {
+      var r = src[srcOffset] * 255;
+      var g = src[srcOffset + 1] * 255;
+      var b = src[srcOffset + 2] * 255;
+      dest[destOffset] = r < 0 ? 0 : r > 255 ? 255 : r;
+      dest[destOffset + 1] = g < 0 ? 0 : g > 255 ? 255 : g;
+      dest[destOffset + 2] = b < 0 ? 0 : b > 255 ? 255 : b;
+    },
+    getRgbBuffer: function DeviceRgbCS_getRgbBuffer(src, srcOffset, count,
+                                                    dest, destOffset, bits) {
+      var length = count * 3;
+      if (bits == 8) {
+        dest.set(src.subarray(srcOffset, srcOffset + length), destOffset);
+        return;
+      }
       var scale = 255 / ((1 << bits) - 1);
-      var i, length = input.length;
-      var rgbBuf = new Uint8Array(length);
-      for (i = 0; i < length; ++i)
-        rgbBuf[i] = (scale * input[i]) | 0;
-      return rgbBuf;
+      var j = srcOffset, q = destOffset;
+      for (var i = 0; i < length; ++i) {
+        dest[q++] = (scale * input[j++]) | 0;
+      }
     },
+    getOutputLength: function DeviceRgbCS_getOutputLength(inputLength) {
+      return inputLength;
+    },
+    isPassthrough: function DeviceRgbCS_isPassthrough(bits) {
+      return bits == 8;
+    },
+    createRgbBuffer: ColorSpace.prototype.createRgbBuffer,
     isDefaultDecode: function DeviceRgbCS_isDefaultDecode(decodeMap) {
       return ColorSpace.isDefaultDecode(decodeMap, this.numComps);
     }
@@ -12303,46 +12670,747 @@ var DeviceRgbCS = (function DeviceRgbCSClosure() {
 })();
 
 var DeviceCmykCS = (function DeviceCmykCSClosure() {
+  // Sampled RGB colors from CMYK US Web Coated (SWOP) colorspace
+  var lut = new Uint8Array([
+    255, 255, 254, 221, 222, 223, 191, 193, 195, 161, 163, 166, 133, 136, 138,
+    105, 107, 109, 75, 75, 77, 35, 31, 32, 255, 252, 224, 226, 220, 198, 195,
+    191, 173, 164, 162, 147, 136, 134, 122, 107, 106, 96, 75, 74, 66, 33, 29,
+    24, 255, 249, 197, 229, 218, 174, 198, 190, 153, 166, 160, 129, 138, 133,
+    107, 108, 104, 83, 76, 73, 56, 33, 28, 15, 255, 247, 168, 232, 216, 149,
+    200, 188, 130, 168, 158, 110, 139, 131, 90, 110, 103, 70, 77, 72, 45, 32,
+    27, 4, 255, 245, 140, 234, 214, 124, 202, 186, 108, 170, 157, 91, 140, 130,
+    74, 110, 102, 56, 77, 71, 33, 31, 27, 0, 255, 243, 107, 235, 212, 95, 203,
+    184, 83, 171, 155, 69, 141, 129, 55, 111, 101, 40, 77, 70, 19, 29, 26, 0,
+    255, 241, 64, 237, 211, 59, 204, 183, 52, 171, 154, 42, 142, 128, 31, 111,
+    100, 16, 77, 69, 0, 27, 26, 0, 255, 240, 0, 238, 209, 0, 205, 182, 3, 172,
+    153, 0, 142, 127, 0, 112, 100, 0, 77, 69, 0, 26, 25, 0, 251, 225, 236, 218,
+    196, 207, 189, 171, 181, 160, 144, 154, 133, 120, 128, 105, 94, 101, 74, 64,
+    70, 35, 21, 25, 255, 222, 208, 222, 195, 184, 192, 169, 161, 162, 143, 136,
+    135, 118, 113, 106, 92, 88, 75, 63, 60, 34, 20, 17, 255, 220, 184, 225, 193,
+    162, 195, 168, 142, 164, 142, 120, 136, 117, 99, 107, 91, 77, 75, 62, 50,
+    33, 20, 8, 255, 218, 157, 227, 191, 139, 197, 166, 121, 165, 140, 102, 137,
+    116, 84, 108, 90, 64, 76, 61, 40, 32, 19, 0, 255, 216, 132, 229, 189, 116,
+    198, 165, 101, 167, 139, 85, 138, 115, 69, 109, 89, 51, 76, 61, 28, 31, 18,
+    0, 255, 214, 102, 230, 188, 90, 199, 163, 78, 167, 138, 65, 139, 114, 51,
+    109, 89, 35, 76, 60, 14, 29, 18, 0, 255, 213, 65, 232, 186, 58, 200, 162,
+    50, 168, 136, 39, 139, 113, 28, 110, 88, 12, 76, 60, 0, 27, 18, 0, 255, 212,
+    8, 232, 185, 13, 201, 161, 11, 169, 136, 3, 139, 112, 0, 110, 87, 0, 76, 59,
+    0, 26, 18, 0, 248, 197, 219, 216, 172, 192, 187, 150, 168, 158, 126, 143,
+    132, 104, 119, 104, 81, 93, 74, 54, 64, 35, 10, 19, 251, 195, 193, 219, 171,
+    171, 190, 149, 150, 161, 125, 127, 133, 103, 105, 106, 80, 81, 75, 53, 54,
+    34, 10, 10, 254, 193, 171, 221, 169, 151, 192, 148, 132, 162, 124, 112, 134,
+    102, 92, 106, 79, 70, 75, 52, 45, 34, 9, 1, 255, 191, 147, 223, 168, 130,
+    193, 146, 113, 163, 123, 95, 135, 101, 77, 107, 78, 58, 75, 52, 35, 32, 9,
+    0, 255, 190, 124, 225, 166, 109, 195, 145, 95, 164, 122, 79, 136, 100, 63,
+    107, 77, 46, 76, 51, 24, 31, 9, 0, 255, 188, 97, 226, 165, 85, 196, 143, 74,
+    165, 121, 60, 137, 99, 47, 108, 77, 31, 75, 51, 10, 29, 9, 0, 255, 187, 64,
+    227, 164, 56, 196, 142, 48, 165, 120, 37, 137, 98, 25, 108, 76, 9, 75, 50,
+    0, 28, 9, 0, 255, 186, 23, 228, 163, 21, 197, 142, 15, 166, 119, 5, 137, 98,
+    0, 108, 76, 0, 75, 50, 0, 27, 8, 0, 245, 168, 201, 214, 147, 177, 186, 128,
+    155, 157, 107, 131, 131, 88, 109, 104, 67, 85, 74, 42, 57, 35, 0, 12, 248,
+    166, 178, 216, 146, 157, 188, 127, 138, 159, 107, 116, 132, 87, 96, 105, 66,
+    74, 74, 41, 48, 35, 0, 3, 250, 165, 158, 218, 145, 139, 189, 126, 122, 160,
+    106, 103, 133, 86, 84, 105, 66, 64, 75, 41, 39, 33, 0, 0, 252, 164, 136,
+    220, 144, 120, 190, 125, 104, 161, 105, 87, 134, 86, 71, 106, 65, 52, 75,
+    41, 29, 32, 0, 0, 253, 162, 115, 221, 142, 101, 191, 124, 88, 161, 104, 72,
+    134, 85, 58, 106, 64, 41, 75, 40, 19, 31, 0, 0, 254, 161, 91, 222, 141, 80,
+    192, 123, 68, 162, 103, 55, 134, 84, 42, 106, 64, 26, 75, 40, 6, 29, 0, 0,
+    255, 160, 62, 223, 140, 54, 193, 122, 45, 162, 102, 34, 135, 83, 22, 106,
+    63, 5, 74, 40, 0, 28, 0, 0, 255, 159, 29, 223, 140, 25, 193, 121, 18, 163,
+    101, 7, 135, 83, 0, 107, 63, 0, 74, 40, 0, 28, 0, 0, 243, 142, 185, 212,
+    123, 163, 184, 107, 142, 156, 89, 120, 130, 72, 100, 104, 53, 77, 74, 29,
+    51, 35, 0, 4, 245, 140, 164, 214, 123, 145, 186, 106, 127, 157, 89, 107,
+    131, 72, 88, 104, 53, 67, 74, 29, 42, 34, 0, 0, 247, 139, 146, 215, 122,
+    129, 187, 106, 112, 158, 88, 94, 132, 71, 77, 104, 53, 57, 74, 29, 33, 33,
+    0, 0, 248, 138, 126, 217, 121, 111, 188, 105, 96, 159, 87, 80, 132, 70, 64,
+    105, 52, 47, 74, 29, 24, 31, 0, 0, 249, 137, 107, 218, 120, 94, 189, 104,
+    81, 159, 86, 66, 132, 70, 52, 105, 52, 36, 74, 29, 15, 30, 0, 0, 250, 136,
+    85, 218, 119, 74, 189, 103, 63, 160, 86, 51, 133, 69, 38, 105, 51, 22, 74,
+    29, 2, 29, 0, 0, 251, 135, 59, 219, 118, 51, 190, 102, 42, 160, 85, 31, 133,
+    69, 19, 105, 51, 3, 74, 29, 0, 29, 0, 0, 252, 134, 31, 219, 118, 26, 190,
+    102, 19, 160, 85, 7, 133, 69, 0, 105, 51, 0, 73, 29, 0, 28, 0, 0, 240, 113,
+    169, 210, 98, 149, 183, 84, 130, 155, 69, 110, 129, 54, 90, 103, 37, 70, 74,
+    11, 44, 32, 0, 1, 242, 111, 150, 212, 97, 132, 184, 84, 116, 156, 69, 97,
+    130, 54, 79, 103, 37, 60, 74, 12, 36, 31, 0, 0, 244, 111, 134, 213, 97, 118,
+    185, 83, 102, 157, 68, 86, 130, 54, 69, 104, 37, 51, 74, 13, 28, 30, 0, 0,
+    245, 110, 116, 214, 96, 102, 186, 83, 88, 157, 68, 73, 131, 53, 58, 104, 37,
+    41, 74, 14, 19, 29, 0, 0, 246, 110, 98, 215, 96, 86, 186, 82, 74, 157, 67,
+    60, 131, 53, 46, 104, 37, 30, 73, 14, 10, 28, 0, 0, 247, 109, 79, 215, 95,
+    69, 187, 82, 58, 158, 67, 46, 131, 53, 33, 104, 37, 18, 73, 15, 1, 28, 0, 0,
+    247, 108, 56, 216, 95, 48, 187, 82, 40, 158, 67, 29, 131, 53, 16, 104, 37,
+    0, 73, 15, 0, 27, 0, 0, 248, 108, 32, 216, 94, 27, 187, 81, 20, 158, 67, 8,
+    131, 53, 0, 104, 37, 0, 72, 16, 0, 27, 0, 0, 238, 78, 154, 208, 66, 135,
+    181, 55, 118, 154, 43, 99, 129, 30, 81, 103, 12, 62, 74, 0, 38, 27, 0, 0,
+    240, 77, 136, 210, 66, 120, 183, 56, 105, 155, 43, 88, 129, 30, 71, 103, 13,
+    53, 73, 0, 29, 26, 0, 0, 241, 77, 122, 211, 66, 107, 183, 56, 93, 155, 44,
+    77, 129, 31, 62, 103, 14, 44, 73, 0, 23, 26, 0, 0, 242, 77, 106, 211, 66,
+    92, 184, 56, 80, 155, 44, 65, 129, 31, 51, 103, 15, 35, 73, 0, 14, 25, 0, 0,
+    243, 77, 90, 212, 66, 79, 184, 56, 67, 156, 44, 54, 129, 32, 41, 103, 16,
+    25, 73, 0, 6, 25, 0, 0, 243, 77, 73, 213, 66, 63, 184, 56, 53, 156, 44, 41,
+    130, 32, 28, 103, 17, 13, 72, 0, 0, 25, 0, 0, 244, 77, 53, 213, 67, 45, 185,
+    56, 37, 156, 45, 26, 130, 33, 13, 103, 18, 0, 72, 0, 0, 25, 0, 0, 244, 77,
+    33, 213, 67, 28, 185, 57, 21, 156, 45, 9, 130, 33, 0, 103, 19, 0, 72, 0, 0,
+    24, 0, 0, 237, 13, 138, 207, 4, 122, 180, 0, 106, 153, 0, 89, 128, 0, 72,
+    102, 0, 54, 73, 0, 31, 21, 0, 0, 238, 16, 123, 208, 6, 108, 181, 0, 94, 154,
+    0, 78, 128, 0, 63, 102, 0, 46, 72, 0, 24, 21, 0, 0, 239, 20, 110, 209, 11,
+    96, 181, 1, 83, 154, 0, 69, 128, 0, 54, 102, 0, 38, 72, 0, 17, 22, 0, 0,
+    239, 23, 96, 209, 15, 84, 182, 5, 72, 154, 0, 58, 128, 0, 45, 102, 0, 29,
+    72, 0, 9, 22, 0, 0, 240, 26, 82, 210, 19, 71, 182, 10, 60, 154, 0, 48, 128,
+    0, 35, 102, 0, 20, 72, 0, 3, 22, 0, 0, 241, 27, 67, 210, 21, 58, 182, 14,
+    48, 154, 3, 37, 128, 0, 24, 102, 0, 8, 71, 0, 0, 22, 0, 0, 241, 29, 50, 210,
+    23, 42, 183, 17, 34, 154, 6, 23, 129, 0, 10, 102, 0, 0, 71, 0, 0, 22, 0, 0,
+    241, 30, 34, 211, 25, 28, 183, 19, 21, 155, 9, 10, 129, 0, 0, 102, 0, 0, 71,
+    0, 0, 22, 0, 0, 211, 239, 252, 184, 210, 221, 160, 183, 194, 135, 155, 164,
+    111, 128, 137, 87, 101, 109, 59, 70, 76, 22, 28, 32, 218, 237, 223, 190,
+    208, 196, 165, 181, 172, 139, 153, 146, 114, 127, 121, 89, 100, 95, 61, 69,
+    66, 21, 27, 25, 223, 235, 196, 195, 206, 174, 169, 179, 152, 142, 151, 129,
+    117, 126, 107, 91, 99, 83, 62, 68, 56, 20, 26, 17, 227, 232, 168, 198, 204,
+    149, 171, 177, 130, 144, 150, 110, 119, 124, 91, 93, 98, 70, 63, 68, 46, 20,
+    25, 6, 231, 230, 142, 201, 202, 125, 174, 176, 109, 146, 148, 92, 120, 123,
+    75, 94, 97, 57, 63, 67, 35, 19, 25, 0, 234, 229, 112, 203, 200, 98, 176,
+    174, 86, 147, 147, 71, 121, 122, 57, 94, 96, 42, 64, 66, 21, 17, 24, 0, 236,
+    227, 75, 205, 199, 66, 177, 173, 57, 148, 146, 47, 122, 121, 35, 95, 95, 21,
+    64, 65, 2, 14, 24, 0, 238, 226, 32, 207, 198, 30, 178, 172, 25, 149, 145,
+    17, 123, 120, 6, 95, 94, 0, 64, 65, 0, 11, 24, 0, 211, 211, 233, 184, 186,
+    206, 160, 162, 180, 135, 137, 153, 112, 113, 127, 88, 89, 100, 61, 60, 70,
+    23, 18, 26, 217, 209, 207, 190, 184, 183, 165, 161, 160, 139, 136, 136, 115,
+    112, 113, 90, 88, 88, 62, 59, 60, 23, 17, 19, 221, 208, 183, 193, 183, 162,
+    167, 159, 142, 141, 134, 120, 116, 111, 99, 91, 87, 77, 62, 59, 51, 22, 17,
+    10, 224, 206, 158, 196, 181, 139, 170, 157, 122, 143, 133, 103, 118, 110,
+    84, 92, 86, 64, 63, 58, 40, 22, 16, 0, 227, 204, 133, 198, 179, 118, 172,
+    156, 102, 144, 132, 86, 119, 109, 70, 93, 85, 52, 64, 57, 30, 20, 16, 0,
+    230, 203, 106, 200, 178, 93, 173, 155, 81, 145, 130, 67, 120, 108, 53, 94,
+    84, 37, 64, 57, 17, 17, 16, 0, 232, 201, 73, 202, 177, 64, 175, 154, 55,
+    146, 129, 44, 121, 107, 33, 94, 83, 18, 64, 56, 0, 15, 16, 0, 233, 201, 38,
+    203, 176, 32, 175, 153, 27, 147, 129, 18, 121, 106, 6, 94, 83, 0, 64, 56, 0,
+    13, 16, 0, 210, 186, 216, 184, 163, 191, 160, 143, 167, 136, 120, 142, 112,
+    99, 118, 88, 77, 93, 61, 50, 64, 24, 6, 21, 215, 184, 192, 189, 162, 170,
+    164, 141, 149, 138, 119, 126, 115, 98, 104, 90, 76, 81, 62, 50, 54, 24, 6,
+    12, 219, 183, 171, 192, 161, 151, 166, 140, 132, 140, 118, 112, 116, 97, 92,
+    91, 75, 71, 63, 49, 46, 23, 6, 3, 222, 181, 148, 194, 159, 130, 168, 139,
+    114, 142, 117, 95, 117, 96, 78, 92, 74, 59, 63, 49, 36, 22, 6, 0, 224, 180,
+    125, 196, 158, 110, 170, 138, 96, 143, 116, 80, 118, 95, 64, 92, 74, 47, 64,
+    48, 25, 20, 6, 0, 226, 178, 100, 197, 157, 88, 171, 136, 76, 144, 115, 62,
+    119, 94, 49, 93, 73, 33, 64, 48, 13, 18, 6, 0, 228, 177, 71, 199, 156, 62,
+    172, 135, 52, 144, 114, 41, 119, 94, 30, 93, 72, 14, 64, 47, 0, 16, 6, 0,
+    229, 177, 40, 200, 155, 34, 173, 135, 27, 145, 113, 18, 120, 93, 5, 93, 72,
+    0, 63, 47, 0, 15, 6, 0, 210, 159, 199, 184, 140, 176, 160, 122, 154, 136,
+    102, 131, 113, 84, 108, 89, 64, 85, 62, 39, 57, 25, 0, 14, 214, 158, 177,
+    188, 139, 157, 163, 121, 137, 138, 102, 116, 114, 83, 96, 90, 63, 74, 63,
+    38, 48, 25, 0, 5, 217, 157, 158, 190, 138, 139, 165, 120, 122, 139, 101,
+    103, 115, 82, 84, 91, 62, 64, 63, 38, 40, 23, 0, 0, 219, 156, 137, 192, 137,
+    120, 167, 119, 105, 140, 100, 88, 116, 82, 71, 91, 62, 53, 63, 38, 30, 22,
+    0, 0, 221, 155, 116, 193, 136, 102, 168, 118, 89, 141, 99, 73, 117, 81, 59,
+    92, 61, 42, 63, 38, 21, 20, 0, 0, 223, 153, 94, 195, 135, 82, 169, 117, 70,
+    142, 98, 57, 117, 80, 44, 92, 61, 29, 63, 37, 8, 18, 0, 0, 224, 153, 68,
+    196, 134, 58, 170, 116, 49, 143, 97, 38, 118, 80, 26, 92, 60, 11, 63, 37, 0,
+    17, 0, 0, 225, 152, 41, 197, 133, 34, 170, 116, 27, 143, 97, 17, 118, 79, 4,
+    92, 60, 0, 63, 37, 0, 16, 0, 0, 209, 134, 183, 183, 118, 162, 160, 102, 142,
+    136, 85, 120, 113, 69, 100, 89, 50, 77, 62, 26, 51, 23, 0, 6, 213, 133, 163,
+    187, 117, 144, 163, 102, 126, 137, 85, 107, 114, 68, 88, 90, 50, 67, 63, 26,
+    43, 22, 0, 1, 215, 133, 146, 188, 116, 129, 164, 101, 112, 139, 84, 94, 115,
+    68, 77, 91, 50, 58, 63, 27, 34, 20, 0, 0, 217, 132, 127, 190, 116, 111, 165,
+    100, 97, 139, 84, 81, 116, 67, 65, 91, 49, 48, 63, 27, 25, 19, 0, 0, 219,
+    131, 108, 191, 115, 95, 166, 100, 82, 140, 83, 68, 116, 67, 53, 91, 49, 37,
+    63, 27, 17, 17, 0, 0, 220, 130, 88, 192, 114, 76, 167, 99, 65, 141, 82, 53,
+    116, 66, 40, 91, 49, 24, 63, 27, 5, 16, 0, 0, 221, 129, 64, 193, 113, 55,
+    168, 98, 46, 141, 82, 35, 117, 66, 23, 91, 49, 7, 63, 27, 0, 14, 0, 0, 222,
+    129, 41, 194, 113, 34, 168, 98, 26, 141, 81, 16, 117, 66, 3, 92, 48, 0, 62,
+    27, 0, 13, 0, 0, 209, 108, 168, 183, 94, 148, 160, 81, 130, 135, 66, 110,
+    113, 51, 91, 89, 35, 70, 63, 8, 45, 18, 0, 1, 212, 107, 150, 186, 94, 132,
+    162, 81, 116, 137, 66, 97, 114, 52, 80, 90, 35, 60, 63, 9, 37, 16, 0, 0,
+    214, 107, 134, 187, 93, 118, 163, 80, 103, 138, 66, 86, 114, 51, 70, 90, 35,
+    52, 63, 10, 29, 15, 0, 0, 215, 106, 117, 188, 93, 103, 164, 80, 89, 138, 66,
+    74, 115, 51, 59, 90, 35, 42, 63, 11, 21, 13, 0, 0, 216, 106, 100, 189, 92,
+    88, 164, 79, 75, 139, 65, 62, 115, 51, 48, 91, 35, 32, 63, 12, 12, 12, 0, 0,
+    217, 105, 82, 190, 92, 71, 165, 79, 60, 139, 65, 48, 115, 51, 35, 91, 35,
+    20, 62, 13, 3, 11, 0, 0, 218, 105, 61, 191, 92, 52, 166, 79, 43, 140, 65,
+    32, 116, 51, 20, 91, 35, 3, 62, 14, 0, 10, 0, 0, 219, 104, 41, 192, 91, 34,
+    166, 78, 26, 140, 65, 15, 116, 51, 2, 91, 35, 0, 62, 14, 0, 10, 0, 0, 208,
+    76, 153, 183, 65, 135, 159, 54, 118, 135, 42, 99, 113, 29, 82, 89, 10, 62,
+    62, 0, 38, 10, 0, 0, 211, 76, 137, 185, 65, 121, 161, 55, 105, 136, 43, 88,
+    114, 30, 72, 90, 12, 54, 63, 0, 31, 9, 0, 0, 212, 76, 122, 186, 66, 108,
+    162, 55, 94, 137, 43, 78, 114, 30, 63, 90, 13, 45, 62, 0, 24, 9, 0, 0, 213,
+    76, 107, 187, 66, 94, 162, 55, 81, 137, 43, 67, 114, 31, 52, 90, 15, 36, 62,
+    0, 16, 8, 0, 0, 214, 76, 92, 188, 66, 80, 163, 55, 69, 138, 44, 56, 114, 31,
+    42, 90, 16, 27, 62, 0, 8, 8, 0, 0, 215, 76, 76, 188, 66, 65, 164, 55, 55,
+    138, 44, 43, 114, 32, 31, 90, 16, 16, 62, 0, 1, 7, 0, 0, 216, 76, 57, 189,
+    66, 49, 164, 56, 40, 138, 44, 29, 115, 32, 16, 90, 17, 1, 61, 0, 0, 7, 0, 0,
+    217, 76, 40, 190, 66, 33, 164, 56, 25, 138, 44, 14, 114, 33, 1, 90, 18, 0,
+    61, 0, 0, 7, 0, 0, 207, 26, 139, 182, 16, 122, 159, 3, 106, 135, 0, 89, 113,
+    0, 73, 89, 0, 55, 62, 0, 32, 4, 0, 0, 210, 27, 124, 184, 18, 109, 160, 7,
+    95, 136, 0, 79, 113, 0, 64, 90, 0, 47, 62, 0, 25, 4, 0, 0, 211, 30, 111,
+    185, 21, 98, 161, 11, 84, 136, 0, 70, 113, 0, 55, 90, 0, 39, 62, 0, 18, 4,
+    0, 0, 212, 32, 98, 185, 24, 85, 161, 15, 73, 136, 2, 60, 113, 0, 46, 90, 0,
+    30, 61, 0, 11, 4, 0, 0, 213, 34, 85, 186, 26, 73, 162, 17, 62, 137, 5, 50,
+    113, 0, 37, 89, 0, 22, 61, 0, 5, 4, 0, 0, 213, 35, 70, 187, 27, 60, 162, 19,
+    50, 137, 8, 39, 114, 0, 26, 89, 0, 11, 61, 0, 0, 4, 0, 0, 214, 35, 54, 187,
+    29, 45, 163, 21, 37, 137, 11, 26, 114, 0, 13, 89, 0, 0, 60, 0, 0, 4, 0, 0,
+    214, 35, 40, 188, 29, 32, 163, 22, 24, 137, 12, 13, 114, 0, 0, 89, 0, 0, 60,
+    0, 0, 4, 0, 0, 169, 226, 249, 148, 199, 219, 129, 173, 192, 108, 147, 163,
+    88, 122, 136, 68, 96, 108, 43, 66, 76, 4, 25, 33, 178, 224, 221, 156, 197,
+    195, 136, 172, 171, 114, 145, 145, 93, 121, 120, 71, 95, 95, 46, 65, 66, 4,
+    24, 25, 185, 222, 196, 162, 195, 173, 140, 170, 151, 117, 144, 128, 96, 119,
+    106, 74, 94, 83, 47, 65, 57, 4, 24, 18, 190, 220, 169, 166, 193, 149, 144,
+    168, 130, 120, 142, 110, 99, 118, 91, 76, 93, 70, 49, 64, 46, 3, 23, 8, 195,
+    218, 143, 170, 191, 126, 147, 167, 110, 123, 141, 93, 100, 117, 76, 77, 92,
+    58, 50, 63, 36, 3, 23, 0, 199, 216, 115, 173, 190, 101, 149, 165, 88, 125,
+    140, 74, 102, 116, 59, 78, 91, 43, 51, 63, 23, 0, 23, 0, 202, 215, 83, 176,
+    189, 72, 152, 164, 62, 126, 138, 51, 103, 115, 39, 79, 90, 25, 51, 62, 6, 0,
+    22, 0, 204, 214, 50, 178, 188, 43, 153, 163, 37, 127, 138, 28, 104, 114, 18,
+    80, 89, 3, 51, 62, 0, 0, 22, 0, 172, 200, 231, 152, 176, 204, 132, 154, 178,
+    111, 130, 152, 91, 108, 126, 70, 84, 100, 46, 57, 70, 9, 15, 27, 180, 198,
+    205, 158, 175, 182, 138, 153, 159, 116, 129, 135, 95, 107, 112, 73, 83, 88,
+    48, 56, 60, 8, 15, 20, 186, 197, 182, 163, 173, 161, 141, 151, 141, 119,
+    128, 119, 97, 106, 99, 75, 82, 77, 49, 55, 51, 8, 14, 11, 190, 195, 158,
+    166, 172, 139, 144, 150, 122, 121, 127, 103, 99, 105, 84, 77, 81, 65, 50,
+    55, 41, 8, 14, 2, 194, 193, 135, 169, 170, 119, 147, 148, 103, 123, 125, 87,
+    101, 104, 70, 78, 81, 53, 51, 54, 31, 5, 14, 0, 197, 192, 109, 172, 169, 96,
+    149, 147, 83, 124, 124, 69, 102, 103, 55, 79, 80, 39, 51, 54, 19, 2, 14, 0,
+    200, 191, 80, 174, 168, 69, 150, 146, 59, 126, 123, 48, 103, 102, 36, 79,
+    79, 22, 52, 53, 2, 0, 14, 0, 202, 190, 51, 176, 167, 43, 152, 145, 36, 127,
+    123, 27, 103, 101, 16, 80, 79, 1, 52, 53, 0, 0, 14, 0, 175, 176, 215, 154,
+    156, 190, 134, 136, 166, 113, 115, 141, 93, 94, 118, 72, 73, 93, 48, 47, 64,
+    12, 2, 22, 182, 175, 191, 160, 154, 169, 139, 135, 148, 117, 114, 126, 96,
+    94, 104, 75, 72, 81, 50, 47, 55, 12, 3, 14, 186, 174, 170, 163, 153, 151,
+    142, 134, 132, 119, 113, 111, 98, 93, 92, 76, 71, 71, 51, 46, 46, 11, 3, 5,
+    190, 172, 148, 166, 152, 130, 144, 132, 114, 121, 112, 96, 100, 92, 78, 77,
+    71, 59, 51, 46, 36, 9, 4, 0, 192, 171, 127, 169, 151, 111, 146, 131, 97,
+    123, 111, 81, 101, 91, 65, 78, 70, 48, 52, 45, 26, 6, 4, 0, 195, 170, 103,
+    171, 150, 90, 148, 130, 78, 124, 110, 64, 102, 90, 51, 79, 70, 35, 52, 45,
+    15, 3, 5, 0, 198, 169, 76, 173, 149, 66, 149, 129, 56, 125, 109, 45, 103,
+    89, 33, 79, 69, 18, 52, 45, 0, 1, 5, 0, 199, 168, 51, 174, 148, 43, 150,
+    129, 35, 126, 108, 26, 103, 89, 14, 80, 69, 0, 52, 45, 0, 0, 5, 0, 177, 151,
+    198, 156, 134, 175, 136, 117, 153, 115, 98, 130, 95, 80, 108, 74, 60, 85,
+    50, 36, 58, 11, 0, 15, 183, 150, 176, 161, 133, 156, 140, 116, 137, 118, 97,
+    116, 97, 79, 96, 76, 60, 74, 51, 36, 49, 11, 0, 6, 186, 150, 158, 163, 132,
+    139, 142, 115, 122, 120, 97, 103, 99, 79, 84, 77, 59, 64, 52, 36, 41, 9, 0,
+    1, 189, 148, 137, 166, 131, 121, 144, 114, 105, 121, 96, 88, 100, 78, 72,
+    78, 59, 54, 52, 36, 31, 7, 0, 0, 191, 147, 118, 168, 130, 103, 145, 113, 90,
+    122, 95, 75, 101, 77, 60, 78, 59, 43, 52, 35, 22, 5, 0, 0, 193, 147, 97,
+    169, 129, 84, 147, 112, 72, 123, 94, 59, 101, 77, 46, 79, 58, 31, 52, 35,
+    11, 4, 0, 0, 195, 146, 73, 171, 128, 62, 148, 111, 53, 124, 93, 41, 102, 76,
+    30, 79, 58, 15, 52, 35, 0, 3, 0, 0, 197, 145, 50, 172, 128, 42, 149, 111,
+    34, 125, 93, 24, 102, 76, 12, 79, 57, 0, 52, 35, 0, 2, 0, 0, 179, 128, 183,
+    157, 113, 162, 137, 98, 142, 116, 82, 120, 96, 66, 100, 75, 48, 78, 51, 24,
+    52, 5, 0, 8, 183, 128, 163, 161, 113, 144, 140, 98, 126, 119, 81, 107, 98,
+    65, 88, 76, 48, 68, 52, 24, 43, 6, 0, 1, 186, 127, 146, 163, 112, 129, 142,
+    97, 112, 120, 81, 95, 99, 65, 77, 77, 47, 58, 52, 24, 35, 4, 0, 0, 188, 126,
+    128, 165, 111, 112, 144, 96, 97, 121, 80, 81, 100, 65, 66, 78, 47, 48, 53,
+    24, 26, 3, 0, 0, 190, 126, 110, 167, 110, 96, 145, 96, 83, 122, 80, 69, 101,
+    64, 54, 78, 47, 38, 52, 25, 18, 2, 0, 0, 192, 125, 90, 168, 110, 79, 146,
+    95, 67, 123, 79, 54, 101, 64, 42, 79, 47, 26, 52, 25, 7, 2, 0, 0, 194, 124,
+    69, 170, 109, 59, 147, 95, 49, 123, 79, 38, 101, 63, 26, 79, 47, 11, 52, 25,
+    0, 1, 0, 0, 195, 124, 49, 171, 109, 40, 148, 94, 32, 124, 78, 22, 102, 63,
+    9, 79, 46, 0, 52, 25, 0, 1, 0, 0, 180, 104, 168, 158, 91, 148, 138, 78, 130,
+    117, 64, 110, 97, 49, 91, 76, 33, 70, 52, 7, 46, 2, 0, 1, 184, 103, 150,
+    162, 91, 133, 141, 78, 116, 119, 64, 98, 99, 50, 80, 77, 33, 61, 52, 8, 37,
+    2, 0, 0, 186, 103, 135, 163, 90, 119, 142, 78, 103, 120, 64, 87, 99, 50, 70,
+    78, 33, 52, 52, 10, 30, 1, 0, 0, 188, 103, 118, 165, 90, 103, 143, 77, 90,
+    121, 63, 75, 100, 49, 60, 78, 33, 43, 52, 11, 22, 1, 0, 0, 189, 102, 102,
+    166, 89, 89, 144, 77, 76, 121, 63, 63, 100, 49, 49, 78, 34, 33, 52, 12, 14,
+    0, 0, 0, 191, 102, 84, 167, 89, 73, 145, 77, 62, 122, 63, 50, 101, 49, 37,
+    78, 34, 22, 52, 13, 4, 0, 0, 0, 192, 101, 65, 168, 89, 55, 146, 76, 46, 123,
+    63, 35, 101, 49, 23, 78, 34, 7, 51, 13, 0, 0, 0, 0, 193, 101, 48, 169, 88,
+    39, 146, 76, 31, 123, 63, 20, 101, 49, 8, 78, 34, 0, 51, 14, 0, 0, 0, 0,
+    181, 75, 154, 159, 64, 136, 139, 54, 118, 118, 41, 100, 98, 28, 82, 77, 8,
+    63, 51, 0, 39, 0, 0, 0, 184, 75, 137, 162, 65, 121, 141, 54, 106, 119, 42,
+    89, 99, 29, 72, 77, 11, 54, 52, 0, 32, 0, 0, 0, 186, 75, 123, 163, 65, 109,
+    142, 54, 94, 120, 43, 79, 99, 30, 63, 78, 12, 46, 52, 0, 25, 0, 0, 0, 187,
+    76, 108, 164, 65, 95, 143, 55, 82, 121, 43, 68, 100, 31, 54, 78, 14, 37, 52,
+    0, 17, 0, 0, 0, 188, 76, 94, 165, 65, 82, 144, 55, 70, 121, 43, 57, 100, 31,
+    44, 78, 15, 28, 51, 0, 9, 0, 0, 0, 189, 75, 78, 166, 65, 68, 144, 55, 57,
+    121, 43, 45, 100, 31, 33, 78, 16, 18, 51, 0, 2, 0, 0, 0, 190, 75, 61, 167,
+    65, 52, 145, 55, 42, 122, 44, 31, 100, 32, 19, 78, 16, 4, 51, 0, 0, 0, 0, 0,
+    191, 75, 46, 168, 65, 37, 145, 55, 29, 122, 44, 18, 100, 32, 5, 78, 17, 0,
+    50, 0, 0, 0, 0, 0, 181, 35, 140, 160, 24, 123, 140, 12, 107, 118, 0, 90, 98,
+    0, 74, 77, 0, 56, 51, 0, 33, 0, 0, 0, 184, 34, 125, 162, 26, 110, 141, 15,
+    96, 120, 1, 80, 99, 0, 65, 78, 0, 48, 51, 0, 26, 0, 0, 0, 186, 36, 113, 163,
+    27, 99, 142, 18, 86, 120, 5, 71, 99, 0, 57, 78, 0, 40, 51, 0, 20, 0, 0, 0,
+    187, 38, 99, 164, 30, 87, 142, 21, 74, 120, 8, 61, 99, 0, 48, 78, 0, 32, 51,
+    0, 12, 0, 0, 0, 187, 39, 87, 164, 31, 75, 143, 22, 64, 120, 11, 51, 100, 0,
+    39, 78, 0, 24, 51, 0, 6, 0, 0, 0, 188, 40, 73, 165, 32, 62, 143, 24, 52,
+    121, 13, 40, 100, 0, 28, 78, 0, 14, 51, 0, 0, 0, 0, 0, 189, 40, 58, 166, 33,
+    48, 144, 25, 39, 121, 15, 28, 100, 1, 16, 78, 0, 2, 50, 0, 0, 0, 0, 0, 190,
+    40, 45, 166, 34, 36, 144, 26, 27, 121, 16, 17, 100, 3, 3, 77, 0, 0, 49, 0,
+    0, 0, 0, 0, 120, 213, 247, 106, 188, 217, 92, 164, 190, 76, 139, 162, 60,
+    115, 135, 43, 91, 107, 21, 62, 76, 0, 22, 34, 134, 211, 219, 118, 186, 193,
+    102, 162, 169, 84, 138, 144, 67, 114, 120, 49, 90, 95, 26, 62, 66, 0, 22,
+    26, 143, 209, 195, 125, 184, 172, 108, 161, 151, 90, 136, 128, 72, 113, 106,
+    53, 89, 83, 29, 61, 57, 0, 22, 19, 150, 207, 169, 131, 182, 149, 113, 159,
+    130, 94, 135, 110, 76, 112, 91, 56, 88, 71, 31, 60, 47, 0, 21, 9, 156, 205,
+    145, 136, 181, 127, 117, 158, 111, 97, 133, 94, 78, 111, 77, 58, 87, 59, 33,
+    60, 37, 0, 21, 0, 161, 204, 118, 141, 179, 104, 121, 156, 90, 100, 132, 75,
+    81, 110, 61, 60, 86, 45, 35, 59, 25, 0, 21, 0, 165, 203, 89, 144, 178, 77,
+    124, 155, 67, 102, 131, 55, 82, 109, 43, 62, 85, 29, 36, 59, 10, 0, 21, 0,
+    169, 202, 62, 147, 178, 53, 126, 155, 45, 104, 131, 36, 84, 108, 25, 62, 85,
+    11, 36, 58, 0, 0, 21, 0, 129, 189, 229, 114, 167, 202, 99, 146, 177, 83,
+    124, 151, 67, 102, 126, 49, 79, 99, 28, 53, 70, 0, 12, 28, 140, 188, 204,
+    124, 166, 180, 107, 145, 158, 89, 123, 134, 72, 101, 111, 54, 79, 88, 31,
+    53, 60, 0, 12, 21, 148, 186, 182, 130, 164, 161, 112, 144, 141, 93, 121,
+    119, 76, 100, 99, 56, 78, 77, 33, 52, 51, 0, 12, 13, 153, 184, 158, 134,
+    163, 140, 116, 142, 122, 97, 120, 103, 78, 99, 85, 59, 77, 65, 35, 52, 42,
+    0, 12, 3, 158, 183, 136, 138, 161, 120, 119, 141, 104, 99, 119, 87, 80, 98,
+    71, 60, 77, 54, 36, 51, 32, 0, 12, 0, 162, 182, 112, 142, 160, 98, 122, 140,
+    85, 102, 118, 70, 82, 97, 56, 62, 76, 41, 37, 51, 21, 0, 11, 0, 166, 181,
+    85, 145, 159, 74, 125, 139, 63, 103, 117, 51, 84, 97, 39, 63, 75, 25, 37,
+    51, 6, 0, 11, 0, 168, 180, 60, 147, 158, 51, 126, 138, 43, 105, 116, 34, 85,
+    96, 23, 64, 75, 8, 38, 50, 0, 0, 11, 0, 136, 167, 213, 120, 148, 188, 105,
+    129, 165, 88, 109, 140, 71, 90, 117, 54, 69, 92, 32, 44, 64, 0, 2, 23, 145,
+    166, 190, 128, 147, 168, 111, 128, 147, 93, 108, 125, 75, 89, 104, 57, 68,
+    81, 34, 44, 55, 0, 2, 15, 151, 165, 170, 133, 146, 150, 115, 127, 131, 96,
+    107, 111, 78, 88, 92, 59, 68, 71, 36, 43, 46, 0, 2, 6, 155, 163, 148, 136,
+    144, 131, 118, 126, 114, 99, 106, 96, 80, 87, 79, 61, 67, 60, 37, 43, 37, 0,
+    2, 0, 159, 162, 128, 140, 143, 112, 121, 125, 97, 101, 105, 82, 82, 87, 66,
+    62, 67, 49, 38, 43, 27, 0, 2, 0, 163, 161, 105, 142, 142, 92, 123, 124, 80,
+    103, 104, 66, 83, 86, 52, 63, 66, 37, 39, 43, 17, 0, 2, 0, 166, 160, 81,
+    145, 141, 70, 125, 123, 59, 104, 104, 48, 84, 85, 36, 64, 66, 21, 39, 42, 2,
+    0, 1, 0, 168, 160, 59, 147, 141, 50, 126, 122, 41, 105, 103, 32, 85, 85, 20,
+    64, 65, 6, 39, 42, 0, 0, 1, 0, 142, 144, 197, 125, 128, 174, 109, 111, 153,
+    92, 93, 130, 75, 76, 108, 57, 57, 85, 36, 33, 58, 0, 0, 16, 149, 143, 176,
+    131, 127, 156, 114, 110, 136, 96, 93, 116, 78, 75, 96, 60, 57, 74, 37, 33,
+    49, 0, 0, 7, 153, 142, 157, 135, 126, 139, 117, 110, 122, 98, 92, 103, 80,
+    75, 84, 61, 56, 65, 38, 33, 41, 0, 0, 1, 157, 142, 138, 138, 125, 121, 120,
+    109, 106, 100, 91, 89, 82, 74, 72, 62, 56, 54, 39, 33, 32, 0, 0, 0, 160,
+    141, 119, 140, 124, 105, 122, 108, 91, 102, 91, 76, 83, 74, 61, 63, 56, 44,
+    40, 33, 23, 0, 0, 0, 163, 140, 99, 143, 123, 86, 124, 107, 74, 103, 90, 61,
+    84, 73, 48, 64, 55, 32, 40, 33, 13, 0, 0, 0, 165, 139, 77, 145, 122, 66,
+    125, 107, 56, 104, 89, 44, 85, 73, 33, 65, 55, 18, 40, 33, 1, 0, 0, 0, 167,
+    139, 57, 146, 122, 48, 126, 106, 39, 105, 89, 29, 86, 72, 18, 65, 55, 3, 40,
+    33, 0, 0, 0, 0, 146, 123, 182, 129, 108, 161, 113, 94, 141, 95, 78, 120, 78,
+    62, 99, 60, 45, 78, 38, 21, 52, 0, 0, 9, 152, 122, 163, 134, 108, 144, 117,
+    94, 126, 98, 78, 107, 80, 62, 88, 61, 45, 68, 39, 22, 44, 0, 0, 1, 156, 122,
+    146, 137, 107, 129, 119, 93, 113, 100, 77, 95, 82, 62, 78, 63, 45, 59, 40,
+    22, 36, 0, 0, 0, 158, 121, 128, 139, 107, 113, 121, 92, 98, 101, 77, 82, 83,
+    62, 66, 64, 45, 49, 40, 23, 27, 0, 0, 0, 161, 120, 111, 141, 106, 97, 122,
+    92, 84, 103, 77, 70, 84, 62, 56, 64, 45, 40, 40, 23, 19, 0, 0, 0, 163, 120,
+    93, 143, 105, 81, 124, 91, 69, 104, 76, 56, 85, 61, 43, 65, 45, 28, 40, 24,
+    9, 0, 0, 0, 165, 119, 73, 145, 105, 62, 125, 91, 52, 105, 76, 41, 85, 61,
+    29, 65, 44, 15, 40, 24, 0, 0, 0, 0, 166, 119, 55, 146, 104, 46, 126, 90, 37,
+    105, 75, 27, 86, 61, 15, 65, 44, 0, 40, 24, 0, 0, 0, 0, 150, 100, 168, 132,
+    88, 148, 115, 75, 130, 97, 61, 110, 80, 47, 91, 62, 30, 71, 39, 7, 46, 0, 0,
+    2, 154, 100, 150, 136, 88, 133, 119, 75, 116, 100, 61, 98, 82, 47, 81, 63,
+    31, 62, 40, 9, 38, 0, 0, 0, 157, 100, 135, 138, 87, 119, 120, 75, 104, 101,
+    61, 87, 83, 48, 71, 64, 31, 53, 40, 10, 31, 0, 0, 0, 159, 99, 119, 140, 87,
+    104, 122, 75, 91, 102, 61, 75, 84, 48, 61, 64, 32, 44, 40, 11, 23, 0, 0, 0,
+    161, 99, 104, 141, 87, 90, 123, 74, 78, 103, 61, 64, 84, 48, 50, 65, 32, 35,
+    40, 12, 15, 0, 0, 0, 163, 99, 87, 143, 86, 75, 124, 74, 64, 104, 61, 52, 85,
+    47, 39, 65, 32, 24, 40, 13, 6, 0, 0, 0, 164, 98, 69, 144, 86, 58, 125, 74,
+    49, 104, 61, 38, 85, 47, 26, 65, 32, 11, 40, 13, 0, 0, 0, 0, 166, 98, 53,
+    145, 86, 44, 126, 74, 35, 105, 60, 25, 86, 47, 13, 65, 32, 0, 40, 14, 0, 0,
+    0, 0, 152, 75, 154, 134, 64, 136, 117, 53, 119, 99, 41, 101, 82, 27, 83, 63,
+    7, 64, 39, 0, 40, 0, 0, 0, 156, 74, 138, 138, 64, 122, 120, 53, 106, 101,
+    41, 90, 83, 28, 73, 64, 10, 55, 40, 0, 33, 0, 0, 0, 158, 74, 124, 139, 64,
+    110, 121, 54, 95, 102, 42, 80, 84, 29, 64, 65, 12, 47, 41, 0, 26, 0, 0, 0,
+    160, 75, 110, 140, 64, 96, 122, 54, 83, 103, 42, 69, 84, 30, 55, 65, 13, 39,
+    41, 0, 18, 0, 0, 0, 161, 75, 96, 142, 64, 83, 123, 54, 71, 103, 43, 58, 85,
+    30, 45, 65, 14, 30, 41, 0, 11, 0, 0, 0, 163, 75, 81, 143, 64, 70, 124, 54,
+    59, 104, 43, 47, 85, 31, 35, 65, 15, 20, 41, 0, 3, 0, 0, 0, 164, 74, 65,
+    144, 64, 55, 125, 54, 45, 104, 43, 34, 85, 31, 22, 66, 16, 7, 41, 0, 0, 0,
+    0, 0, 165, 74, 51, 145, 64, 42, 125, 54, 33, 105, 43, 22, 86, 32, 10, 65,
+    17, 0, 40, 0, 0, 0, 0, 0, 154, 41, 142, 136, 30, 124, 119, 19, 108, 101, 3,
+    91, 83, 0, 75, 64, 0, 57, 39, 0, 34, 0, 0, 0, 158, 40, 127, 139, 31, 112,
+    121, 21, 97, 102, 7, 81, 84, 0, 66, 65, 0, 49, 40, 0, 27, 0, 0, 0, 159, 41,
+    114, 140, 32, 100, 122, 23, 87, 103, 10, 72, 85, 0, 58, 65, 0, 42, 40, 0,
+    21, 0, 0, 0, 160, 43, 101, 141, 34, 88, 123, 25, 76, 103, 13, 62, 85, 0, 49,
+    65, 0, 33, 41, 0, 14, 0, 0, 0, 161, 44, 89, 142, 35, 77, 123, 26, 65, 103,
+    15, 53, 85, 1, 40, 65, 0, 25, 41, 0, 7, 0, 0, 0, 162, 44, 75, 143, 36, 64,
+    124, 28, 54, 104, 17, 42, 85, 3, 30, 65, 0, 16, 40, 0, 1, 0, 0, 0, 164, 45,
+    61, 144, 37, 51, 124, 29, 42, 104, 18, 31, 85, 4, 19, 65, 0, 4, 40, 0, 0, 0,
+    0, 0, 164, 45, 49, 144, 37, 40, 125, 29, 31, 105, 19, 20, 86, 6, 7, 65, 0,
+    0, 39, 0, 0, 0, 0, 0, 49, 202, 244, 45, 178, 215, 38, 156, 188, 28, 132,
+    160, 14, 110, 134, 0, 86, 107, 0, 59, 76, 0, 20, 34, 80, 200, 217, 70, 176,
+    192, 60, 154, 168, 47, 131, 143, 34, 109, 119, 16, 85, 94, 0, 58, 66, 0, 20,
+    27, 95, 198, 194, 84, 175, 171, 71, 153, 150, 57, 130, 127, 42, 108, 106,
+    25, 84, 83, 0, 58, 57, 0, 20, 19, 107, 196, 169, 93, 173, 149, 79, 151, 130,
+    64, 128, 110, 49, 106, 91, 32, 84, 71, 3, 57, 47, 0, 19, 10, 115, 195, 145,
+    100, 171, 128, 86, 150, 112, 69, 127, 94, 53, 105, 78, 36, 83, 59, 8, 57,
+    37, 0, 19, 1, 122, 193, 120, 107, 170, 106, 91, 149, 92, 74, 126, 77, 57,
+    104, 62, 39, 82, 46, 13, 56, 26, 0, 18, 0, 128, 192, 93, 112, 169, 81, 95,
+    148, 70, 77, 125, 58, 60, 104, 46, 42, 81, 31, 15, 56, 13, 0, 17, 0, 132,
+    191, 69, 115, 168, 60, 98, 147, 51, 79, 124, 41, 62, 103, 30, 43, 81, 17,
+    16, 56, 0, 0, 17, 0, 77, 180, 227, 69, 159, 200, 60, 139, 176, 48, 118, 150,
+    35, 97, 125, 20, 75, 99, 0, 50, 70, 0, 9, 29, 96, 178, 203, 85, 158, 179,
+    73, 138, 157, 59, 117, 133, 45, 96, 111, 29, 75, 87, 3, 50, 60, 0, 9, 21,
+    107, 177, 181, 94, 156, 160, 80, 137, 140, 65, 116, 119, 51, 96, 98, 34, 74,
+    77, 9, 49, 52, 0, 8, 14, 115, 175, 158, 101, 155, 140, 86, 135, 122, 71,
+    114, 103, 55, 95, 85, 38, 73, 65, 14, 49, 42, 0, 7, 4, 121, 174, 137, 106,
+    153, 120, 91, 134, 105, 74, 113, 88, 58, 94, 72, 41, 73, 54, 17, 49, 33, 0,
+    6, 0, 127, 173, 114, 111, 152, 100, 95, 133, 86, 78, 112, 72, 61, 93, 58,
+    43, 72, 42, 19, 48, 22, 0, 6, 0, 132, 172, 88, 115, 151, 77, 98, 132, 66,
+    80, 112, 54, 63, 92, 42, 45, 72, 28, 20, 48, 9, 0, 5, 0, 135, 171, 67, 118,
+    151, 57, 100, 131, 49, 82, 111, 39, 65, 92, 28, 46, 71, 13, 21, 48, 0, 0, 5,
+    0, 93, 159, 211, 83, 141, 187, 72, 123, 164, 59, 104, 140, 46, 85, 116, 31,
+    65, 92, 8, 41, 64, 0, 1, 23, 106, 158, 189, 94, 140, 167, 81, 122, 147, 67,
+    103, 124, 52, 85, 103, 36, 65, 81, 14, 41, 55, 0, 0, 15, 114, 157, 169, 100,
+    139, 150, 87, 121, 131, 71, 102, 111, 56, 84, 92, 40, 64, 71, 17, 41, 47, 0,
+    0, 7, 121, 156, 148, 106, 138, 131, 91, 120, 114, 75, 101, 96, 60, 83, 79,
+    43, 64, 60, 20, 40, 37, 0, 0, 1, 126, 155, 129, 110, 136, 113, 95, 119, 98,
+    78, 101, 82, 62, 83, 67, 45, 63, 50, 22, 40, 28, 0, 0, 0, 130, 154, 107,
+    114, 135, 94, 98, 118, 81, 81, 100, 67, 64, 82, 54, 46, 63, 38, 23, 40, 18,
+    0, 0, 0, 134, 153, 84, 117, 135, 73, 101, 117, 62, 83, 99, 51, 66, 81, 39,
+    48, 62, 24, 24, 40, 5, 0, 0, 0, 137, 152, 65, 119, 134, 55, 102, 117, 46,
+    84, 99, 36, 67, 81, 25, 48, 62, 11, 24, 40, 0, 0, 0, 0, 105, 138, 196, 93,
+    122, 173, 81, 106, 152, 67, 89, 129, 53, 72, 107, 38, 54, 84, 17, 30, 58, 0,
+    0, 17, 115, 137, 175, 101, 121, 155, 88, 106, 136, 73, 89, 115, 58, 72, 95,
+    42, 54, 74, 21, 31, 49, 0, 0, 8, 120, 136, 157, 106, 120, 139, 92, 105, 121,
+    76, 88, 103, 61, 71, 84, 44, 53, 65, 23, 31, 41, 0, 0, 1, 125, 135, 138,
+    110, 119, 122, 95, 104, 106, 79, 87, 89, 63, 71, 73, 46, 53, 55, 25, 31, 33,
+    0, 0, 0, 129, 134, 120, 113, 119, 105, 98, 103, 91, 81, 87, 76, 65, 71, 61,
+    48, 53, 45, 26, 31, 24, 0, 0, 0, 133, 134, 101, 116, 118, 88, 100, 103, 76,
+    83, 86, 62, 67, 70, 49, 49, 53, 34, 27, 31, 14, 0, 0, 0, 136, 133, 80, 119,
+    117, 69, 102, 102, 58, 85, 86, 47, 68, 70, 35, 50, 52, 20, 27, 31, 3, 0, 0,
+    0, 138, 133, 62, 121, 117, 52, 104, 102, 43, 86, 85, 33, 69, 69, 22, 50, 52,
+    7, 27, 31, 0, 0, 0, 0, 114, 118, 182, 100, 104, 161, 87, 90, 141, 73, 75,
+    120, 59, 59, 99, 43, 42, 78, 22, 20, 52, 0, 0, 10, 121, 117, 163, 106, 104,
+    144, 92, 90, 126, 77, 75, 107, 62, 59, 88, 46, 42, 68, 24, 21, 44, 0, 0, 2,
+    125, 117, 146, 110, 103, 129, 95, 89, 113, 79, 74, 95, 64, 59, 78, 47, 42,
+    59, 26, 21, 36, 0, 0, 0, 129, 116, 129, 113, 102, 113, 98, 89, 99, 82, 74,
+    83, 66, 59, 67, 49, 42, 50, 27, 22, 28, 0, 0, 0, 132, 116, 112, 116, 102,
+    98, 100, 88, 85, 83, 73, 71, 67, 59, 57, 50, 43, 41, 28, 22, 20, 0, 0, 0,
+    134, 115, 95, 118, 101, 82, 102, 88, 71, 85, 73, 58, 68, 59, 45, 51, 43, 30,
+    29, 22, 11, 0, 0, 0, 137, 115, 76, 120, 101, 65, 104, 87, 55, 86, 73, 44,
+    69, 58, 32, 51, 42, 18, 29, 22, 1, 0, 0, 0, 139, 114, 60, 122, 100, 50, 105,
+    87, 41, 87, 72, 31, 70, 58, 19, 51, 42, 4, 29, 22, 0, 0, 0, 0, 120, 97, 168,
+    106, 85, 149, 92, 73, 130, 77, 59, 110, 63, 45, 91, 47, 28, 71, 25, 6, 47,
+    0, 0, 3, 126, 97, 151, 111, 85, 133, 96, 73, 117, 80, 59, 98, 65, 46, 81,
+    48, 29, 62, 27, 7, 39, 0, 0, 0, 129, 97, 136, 113, 85, 120, 98, 73, 104, 82,
+    59, 88, 67, 46, 72, 50, 30, 54, 29, 8, 32, 0, 0, 0, 132, 96, 120, 116, 84,
+    105, 100, 72, 91, 84, 59, 76, 68, 46, 61, 51, 30, 45, 29, 9, 24, 0, 0, 0,
+    134, 96, 105, 117, 84, 92, 102, 72, 79, 85, 59, 65, 69, 46, 52, 51, 30, 36,
+    30, 10, 16, 0, 0, 0, 136, 96, 89, 119, 84, 77, 103, 72, 66, 86, 59, 53, 69,
+    46, 41, 52, 31, 26, 30, 11, 7, 0, 0, 0, 138, 95, 71, 121, 83, 61, 105, 72,
+    51, 87, 59, 40, 70, 46, 28, 52, 31, 14, 30, 11, 0, 0, 0, 0, 139, 95, 57,
+    122, 83, 47, 106, 71, 38, 88, 59, 28, 71, 46, 17, 52, 31, 2, 29, 12, 0, 0,
+    0, 0, 125, 74, 155, 110, 63, 137, 96, 52, 120, 81, 40, 101, 66, 27, 83, 49,
+    7, 64, 27, 0, 41, 0, 0, 0, 129, 73, 139, 114, 63, 123, 99, 53, 107, 83, 41,
+    90, 68, 28, 74, 51, 10, 56, 29, 0, 33, 0, 0, 0, 132, 74, 125, 116, 63, 110,
+    101, 53, 96, 84, 41, 80, 69, 29, 65, 51, 12, 48, 30, 0, 27, 0, 0, 0, 134,
+    74, 111, 118, 64, 97, 102, 53, 84, 85, 42, 70, 69, 29, 56, 52, 13, 40, 30,
+    0, 19, 0, 0, 0, 136, 74, 97, 119, 64, 85, 103, 53, 73, 86, 42, 60, 70, 30,
+    47, 52, 14, 31, 30, 0, 12, 0, 0, 0, 137, 74, 83, 121, 64, 71, 104, 54, 61,
+    87, 42, 49, 71, 30, 36, 53, 15, 22, 30, 0, 5, 0, 0, 0, 139, 74, 67, 122, 64,
+    57, 105, 54, 47, 88, 42, 36, 71, 31, 25, 53, 16, 9, 30, 0, 0, 0, 0, 0, 140,
+    73, 54, 123, 64, 45, 106, 54, 36, 88, 43, 26, 71, 31, 14, 53, 17, 1, 29, 0,
+    0, 0, 0, 0, 129, 44, 143, 114, 34, 126, 99, 24, 110, 84, 9, 92, 68, 0, 76,
+    51, 0, 58, 28, 0, 35, 0, 0, 0, 132, 44, 128, 117, 35, 113, 102, 25, 98, 85,
+    12, 82, 69, 0, 67, 52, 0, 50, 29, 0, 28, 0, 0, 0, 134, 45, 116, 118, 36,
+    102, 103, 27, 88, 86, 14, 73, 70, 0, 59, 52, 0, 43, 29, 0, 22, 0, 0, 0, 136,
+    46, 103, 119, 37, 90, 103, 28, 77, 87, 17, 64, 71, 1, 50, 53, 0, 35, 30, 0,
+    15, 0, 0, 0, 137, 47, 90, 120, 38, 78, 104, 29, 67, 87, 18, 54, 71, 3, 42,
+    53, 0, 27, 29, 0, 8, 0, 0, 0, 138, 47, 77, 121, 39, 66, 105, 30, 56, 88, 19,
+    44, 71, 5, 32, 53, 0, 18, 29, 0, 2, 0, 0, 0, 139, 48, 63, 122, 39, 53, 106,
+    31, 44, 88, 20, 33, 71, 7, 21, 53, 0, 6, 28, 0, 0, 0, 0, 0, 140, 48, 52,
+    123, 40, 42, 107, 31, 33, 89, 21, 23, 72, 8, 10, 53, 0, 0, 27, 0, 0, 0, 0,
+    0, 0, 192, 242, 0, 169, 213, 0, 148, 187, 0, 125, 159, 0, 104, 133, 0, 82,
+    106, 0, 56, 76, 0, 18, 34, 0, 189, 216, 0, 167, 190, 0, 147, 167, 0, 124,
+    142, 0, 103, 119, 0, 81, 94, 0, 55, 66, 0, 16, 27, 0, 188, 193, 0, 166, 170,
+    0, 145, 149, 0, 123, 127, 0, 102, 105, 0, 80, 83, 0, 55, 57, 0, 15, 20, 32,
+    186, 168, 27, 164, 149, 17, 144, 130, 0, 122, 110, 0, 101, 91, 0, 79, 71, 0,
+    55, 47, 0, 14, 11, 56, 184, 146, 47, 163, 129, 37, 142, 113, 23, 121, 95, 5,
+    100, 78, 0, 79, 60, 0, 54, 38, 0, 14, 2, 70, 183, 122, 60, 161, 107, 49,
+    141, 94, 35, 120, 79, 20, 100, 64, 0, 78, 48, 0, 54, 27, 0, 13, 0, 80, 182,
+    96, 69, 160, 84, 57, 140, 73, 43, 119, 61, 28, 99, 48, 6, 78, 34, 0, 53, 15,
+    0, 13, 0, 87, 181, 74, 75, 160, 65, 62, 140, 56, 47, 119, 46, 32, 98, 35,
+    12, 77, 21, 0, 53, 2, 0, 13, 0, 0, 171, 225, 0, 151, 199, 0, 132, 174, 0,
+    112, 149, 0, 92, 124, 0, 71, 98, 0, 47, 69, 0, 4, 29, 0, 169, 201, 0, 150,
+    178, 0, 131, 156, 0, 111, 133, 0, 92, 111, 0, 71, 87, 0, 47, 60, 0, 3, 22,
+    41, 168, 180, 36, 148, 159, 28, 130, 140, 15, 110, 118, 0, 91, 98, 0, 70,
+    77, 0, 46, 52, 0, 2, 14, 61, 166, 158, 53, 147, 139, 43, 129, 122, 31, 109,
+    103, 17, 90, 85, 0, 70, 66, 0, 46, 43, 0, 2, 5, 73, 165, 137, 64, 146, 121,
+    53, 128, 106, 40, 108, 89, 26, 89, 73, 6, 69, 55, 0, 46, 33, 0, 1, 0, 83,
+    164, 115, 72, 145, 101, 60, 127, 88, 46, 107, 73, 32, 89, 59, 14, 69, 43, 0,
+    46, 23, 0, 1, 0, 90, 163, 91, 78, 144, 80, 65, 126, 69, 51, 106, 57, 37, 88,
+    44, 19, 68, 30, 0, 45, 11, 0, 1, 0, 95, 163, 72, 82, 143, 62, 69, 125, 53,
+    54, 106, 43, 39, 88, 32, 22, 68, 18, 0, 45, 0, 0, 1, 0, 0, 152, 210, 0, 134,
+    186, 0, 117, 163, 0, 99, 139, 0, 81, 116, 0, 62, 92, 0, 38, 64, 0, 1, 24,
+    47, 151, 188, 42, 133, 167, 35, 117, 146, 24, 98, 124, 10, 81, 103, 0, 61,
+    81, 0, 38, 55, 0, 0, 16, 65, 150, 169, 57, 132, 149, 47, 116, 131, 36, 98,
+    111, 23, 80, 92, 4, 61, 71, 0, 38, 47, 0, 0, 7, 76, 148, 148, 67, 131, 131,
+    56, 115, 114, 44, 97, 96, 31, 79, 79, 14, 61, 61, 0, 38, 38, 0, 0, 1, 84,
+    147, 129, 74, 130, 114, 62, 114, 99, 49, 96, 83, 35, 79, 68, 19, 60, 50, 0,
+    37, 29, 0, 0, 0, 91, 146, 109, 80, 129, 95, 67, 113, 83, 53, 95, 69, 39, 78,
+    55, 23, 60, 39, 1, 37, 20, 0, 0, 0, 97, 146, 87, 84, 128, 76, 71, 112, 65,
+    57, 95, 53, 42, 78, 41, 26, 60, 26, 4, 37, 7, 0, 0, 0, 101, 145, 69, 88,
+    128, 59, 74, 112, 50, 59, 94, 40, 44, 77, 29, 27, 59, 15, 4, 37, 0, 0, 0, 0,
+    52, 132, 195, 47, 117, 172, 40, 102, 151, 30, 85, 129, 19, 69, 107, 2, 51,
+    84, 0, 28, 58, 0, 0, 18, 70, 131, 175, 61, 116, 155, 52, 101, 135, 41, 85,
+    115, 29, 68, 95, 13, 51, 74, 0, 28, 49, 0, 0, 9, 80, 130, 157, 70, 115, 139,
+    59, 100, 121, 47, 84, 103, 35, 68, 85, 19, 51, 65, 0, 28, 42, 0, 0, 1, 87,
+    130, 138, 76, 114, 122, 65, 100, 106, 52, 84, 89, 39, 68, 73, 24, 50, 55, 4,
+    28, 33, 0, 0, 0, 93, 129, 121, 81, 114, 106, 69, 99, 92, 56, 83, 77, 42, 67,
+    62, 27, 50, 46, 7, 29, 25, 0, 0, 0, 98, 128, 102, 86, 113, 89, 73, 98, 77,
+    59, 82, 64, 45, 67, 50, 29, 50, 35, 9, 29, 16, 0, 0, 0, 102, 127, 82, 89,
+    112, 71, 76, 98, 61, 61, 82, 49, 47, 66, 37, 31, 50, 23, 11, 29, 4, 0, 0, 0,
+    105, 127, 66, 92, 112, 56, 78, 97, 47, 63, 82, 37, 48, 66, 25, 32, 50, 11,
+    10, 29, 0, 0, 0, 0, 72, 114, 181, 63, 100, 160, 54, 87, 140, 44, 72, 119,
+    32, 57, 99, 18, 39, 78, 0, 18, 52, 0, 0, 11, 83, 113, 163, 73, 100, 144, 62,
+    86, 126, 50, 71, 107, 38, 57, 88, 24, 40, 68, 3, 19, 44, 0, 0, 3, 89, 113,
+    147, 78, 99, 129, 67, 86, 113, 55, 71, 95, 42, 57, 78, 27, 40, 60, 8, 19,
+    37, 0, 0, 0, 95, 112, 129, 83, 98, 114, 71, 85, 99, 58, 71, 83, 45, 56, 67,
+    30, 40, 50, 11, 20, 29, 0, 0, 0, 99, 111, 113, 86, 98, 99, 74, 85, 86, 60,
+    70, 72, 47, 56, 57, 31, 40, 41, 12, 20, 21, 0, 0, 0, 103, 111, 96, 90, 97,
+    84, 77, 84, 72, 63, 70, 59, 49, 56, 46, 33, 40, 31, 13, 21, 12, 0, 0, 0,
+    106, 110, 78, 93, 97, 67, 79, 84, 57, 64, 70, 46, 50, 56, 34, 34, 40, 19,
+    13, 21, 2, 0, 0, 0, 108, 110, 63, 95, 97, 53, 81, 84, 44, 66, 69, 34, 51,
+    56, 22, 35, 40, 7, 13, 21, 0, 0, 0, 0, 85, 94, 168, 74, 82, 149, 64, 70,
+    130, 53, 57, 110, 41, 43, 91, 27, 26, 71, 5, 5, 47, 0, 0, 4, 92, 94, 151,
+    81, 82, 134, 70, 70, 117, 57, 57, 99, 45, 44, 81, 30, 27, 62, 10, 7, 39, 0,
+    0, 0, 97, 94, 136, 85, 82, 120, 73, 70, 105, 60, 57, 88, 47, 44, 72, 32, 28,
+    54, 13, 8, 32, 0, 0, 0, 101, 94, 121, 88, 82, 106, 76, 70, 92, 62, 57, 77,
+    49, 44, 62, 34, 28, 45, 14, 9, 25, 0, 0, 0, 104, 93, 106, 91, 81, 93, 78,
+    70, 80, 64, 57, 66, 50, 44, 52, 35, 29, 37, 14, 10, 17, 0, 0, 0, 106, 93,
+    90, 93, 81, 78, 80, 69, 67, 66, 57, 55, 52, 44, 42, 36, 29, 27, 15, 11, 8,
+    0, 0, 0, 109, 92, 74, 96, 81, 63, 82, 69, 53, 67, 57, 42, 53, 44, 30, 36,
+    29, 16, 15, 11, 1, 0, 0, 0, 111, 92, 60, 97, 80, 50, 83, 69, 41, 68, 57, 31,
+    53, 44, 20, 37, 30, 5, 15, 11, 0, 0, 0, 0, 94, 73, 155, 82, 63, 137, 72, 52,
+    120, 59, 40, 102, 47, 26, 84, 32, 8, 65, 9, 0, 42, 0, 0, 0, 99, 73, 140, 87,
+    63, 124, 76, 52, 108, 62, 40, 91, 49, 27, 75, 34, 11, 57, 12, 0, 34, 0, 0,
+    0, 103, 73, 126, 90, 63, 111, 78, 53, 97, 64, 41, 81, 51, 28, 66, 35, 13,
+    49, 13, 0, 27, 0, 0, 0, 105, 73, 112, 92, 63, 98, 80, 53, 85, 66, 41, 71,
+    52, 29, 57, 36, 14, 41, 15, 0, 20, 0, 0, 0, 107, 73, 99, 94, 63, 86, 81, 53,
+    74, 67, 41, 61, 53, 29, 48, 37, 15, 32, 16, 0, 13, 0, 0, 0, 110, 73, 85, 96,
+    63, 73, 83, 53, 62, 68, 42, 50, 54, 30, 38, 38, 16, 23, 16, 1, 5, 0, 0, 0,
+    112, 73, 69, 98, 63, 59, 84, 53, 49, 69, 42, 38, 55, 30, 27, 38, 16, 12, 17,
+    1, 0, 0, 0, 0, 113, 73, 57, 99, 63, 47, 85, 53, 38, 70, 42, 28, 55, 30, 17,
+    38, 17, 3, 16, 2, 0, 0, 0, 0, 101, 47, 144, 88, 38, 127, 77, 27, 111, 64,
+    14, 94, 51, 0, 77, 35, 0, 59, 9, 0, 36, 0, 0, 0, 105, 47, 129, 92, 38, 114,
+    80, 28, 99, 66, 16, 83, 53, 0, 68, 37, 0, 51, 13, 0, 29, 0, 0, 0, 107, 48,
+    117, 94, 39, 103, 81, 29, 89, 67, 18, 74, 54, 2, 60, 38, 0, 44, 15, 0, 23,
+    0, 0, 0, 109, 49, 104, 95, 40, 91, 82, 31, 79, 68, 19, 65, 54, 5, 51, 39, 0,
+    36, 17, 0, 16, 0, 0, 0, 110, 50, 92, 97, 40, 80, 84, 31, 68, 69, 20, 56, 55,
+    7, 43, 39, 0, 28, 17, 0, 9, 0, 0, 0, 112, 50, 79, 98, 41, 68, 85, 32, 57,
+    70, 21, 46, 56, 8, 34, 40, 0, 20, 18, 0, 3, 0, 0, 0, 113, 50, 65, 100, 41,
+    55, 86, 33, 46, 71, 22, 35, 56, 10, 23, 40, 0, 8, 17, 0, 0, 0, 0, 0, 115,
+    50, 54, 101, 41, 44, 87, 33, 36, 71, 23, 25, 56, 11, 14, 40, 0, 1, 16, 0, 0,
+    0, 0, 0, 0, 182, 240, 0, 161, 212, 0, 141, 185, 0, 120, 158, 0, 99, 132, 0,
+    78, 106, 0, 53, 75, 0, 12, 35, 0, 180, 214, 0, 159, 189, 0, 140, 166, 0,
+    119, 141, 0, 99, 118, 0, 77, 94, 0, 53, 66, 0, 11, 28, 0, 179, 192, 0, 158,
+    169, 0, 138, 149, 0, 118, 126, 0, 98, 105, 0, 77, 83, 0, 52, 57, 0, 10, 21,
+    0, 177, 168, 0, 156, 149, 0, 137, 130, 0, 116, 110, 0, 97, 91, 0, 76, 71, 0,
+    52, 48, 0, 9, 12, 0, 175, 146, 0, 155, 129, 0, 136, 113, 0, 115, 96, 0, 96,
+    79, 0, 75, 60, 0, 51, 39, 0, 9, 3, 0, 174, 123, 0, 154, 109, 0, 135, 95, 0,
+    115, 80, 0, 95, 65, 0, 75, 49, 0, 51, 28, 0, 8, 0, 0, 173, 98, 0, 153, 87,
+    0, 134, 76, 0, 114, 63, 0, 95, 50, 0, 74, 35, 0, 51, 17, 0, 8, 0, 0, 172,
+    78, 0, 152, 70, 0, 134, 60, 0, 114, 49, 0, 94, 38, 0, 74, 24, 0, 51, 5, 0,
+    8, 0, 0, 163, 224, 0, 144, 198, 0, 126, 173, 0, 107, 148, 0, 88, 123, 0, 68,
+    98, 0, 44, 69, 0, 1, 29, 0, 162, 200, 0, 143, 177, 0, 125, 155, 0, 106, 132,
+    0, 88, 110, 0, 68, 87, 0, 44, 60, 0, 1, 22, 0, 160, 180, 0, 142, 159, 0,
+    124, 139, 0, 105, 118, 0, 87, 98, 0, 67, 77, 0, 44, 52, 0, 0, 15, 0, 159,
+    158, 0, 140, 139, 0, 123, 122, 0, 104, 103, 0, 86, 85, 0, 67, 66, 0, 43, 43,
+    0, 0, 5, 0, 157, 138, 0, 139, 121, 0, 122, 106, 0, 103, 89, 0, 85, 73, 0,
+    66, 56, 0, 43, 34, 0, 0, 0, 0, 156, 116, 0, 138, 102, 0, 121, 89, 0, 103,
+    75, 0, 85, 60, 0, 66, 44, 0, 43, 24, 0, 0, 0, 6, 155, 94, 2, 137, 82, 0,
+    120, 71, 0, 102, 59, 0, 84, 46, 0, 65, 32, 0, 43, 13, 0, 0, 0, 30, 155, 75,
+    23, 137, 66, 11, 120, 57, 0, 102, 46, 0, 84, 35, 0, 65, 20, 0, 43, 2, 0, 0,
+    0, 0, 145, 209, 0, 129, 185, 0, 112, 162, 0, 95, 138, 0, 77, 115, 0, 59, 91,
+    0, 35, 64, 0, 1, 24, 0, 144, 188, 0, 128, 166, 0, 112, 145, 0, 94, 124, 0,
+    77, 103, 0, 58, 81, 0, 35, 55, 0, 0, 16, 0, 143, 168, 0, 127, 149, 0, 111,
+    130, 0, 93, 111, 0, 77, 92, 0, 58, 71, 0, 35, 47, 0, 0, 8, 0, 142, 148, 0,
+    126, 131, 0, 110, 114, 0, 93, 97, 0, 76, 79, 0, 58, 61, 0, 35, 38, 0, 0, 1,
+    0, 141, 130, 0, 125, 114, 0, 109, 100, 0, 92, 84, 0, 75, 68, 0, 58, 51, 0,
+    35, 30, 0, 0, 0, 27, 140, 110, 22, 124, 97, 12, 108, 84, 0, 91, 70, 0, 75,
+    56, 0, 57, 40, 0, 35, 21, 0, 0, 0, 43, 139, 89, 36, 123, 78, 26, 108, 67,
+    12, 91, 55, 0, 74, 43, 0, 57, 28, 0, 35, 9, 0, 0, 0, 51, 139, 72, 43, 123,
+    63, 33, 107, 53, 20, 90, 43, 3, 74, 31, 0, 57, 18, 0, 35, 1, 0, 0, 0, 0,
+    127, 194, 0, 112, 172, 0, 98, 151, 0, 81, 128, 0, 66, 107, 0, 48, 84, 0, 26,
+    58, 0, 0, 18, 0, 126, 174, 0, 111, 154, 0, 97, 135, 0, 81, 115, 0, 65, 95,
+    0, 48, 74, 0, 26, 50, 0, 0, 9, 0, 125, 157, 0, 111, 139, 0, 96, 121, 0, 81,
+    103, 0, 65, 85, 0, 48, 65, 0, 27, 42, 0, 0, 2, 20, 125, 139, 17, 110, 122,
+    9, 96, 107, 0, 80, 90, 0, 65, 73, 0, 48, 56, 0, 27, 34, 0, 0, 0, 39, 124,
+    122, 33, 109, 107, 25, 95, 93, 13, 80, 78, 0, 65, 63, 0, 48, 46, 0, 27, 26,
+    0, 0, 0, 51, 123, 103, 43, 108, 90, 34, 94, 78, 23, 79, 65, 8, 64, 51, 0,
+    48, 36, 0, 27, 17, 0, 0, 0, 59, 122, 84, 51, 108, 73, 41, 94, 63, 29, 79,
+    51, 15, 64, 39, 0, 47, 24, 0, 27, 6, 0, 0, 0, 64, 122, 69, 55, 107, 59, 45,
+    94, 50, 32, 78, 39, 19, 64, 28, 0, 47, 14, 0, 27, 0, 0, 0, 0, 0, 110, 181,
+    0, 97, 160, 0, 83, 140, 0, 69, 119, 0, 54, 99, 0, 37, 78, 0, 16, 53, 0, 0,
+    12, 7, 109, 163, 8, 96, 144, 3, 83, 126, 0, 69, 107, 0, 54, 88, 0, 38, 68,
+    0, 17, 45, 0, 0, 3, 34, 109, 147, 30, 96, 129, 23, 83, 113, 13, 69, 95, 0,
+    54, 78, 0, 38, 60, 0, 18, 37, 0, 0, 0, 48, 108, 130, 41, 95, 114, 33, 82,
+    99, 23, 68, 84, 10, 54, 68, 0, 38, 51, 0, 18, 29, 0, 0, 0, 56, 108, 114, 49,
+    94, 100, 40, 82, 87, 29, 68, 72, 16, 54, 58, 0, 38, 42, 0, 18, 22, 0, 0, 0,
+    63, 107, 97, 55, 94, 85, 45, 81, 73, 34, 68, 60, 21, 54, 47, 5, 38, 32, 0,
+    18, 13, 0, 0, 0, 68, 106, 80, 59, 93, 69, 49, 81, 59, 37, 67, 47, 25, 54,
+    35, 9, 38, 21, 0, 18, 4, 0, 0, 0, 72, 106, 66, 63, 93, 56, 52, 81, 47, 40,
+    67, 36, 27, 53, 25, 11, 38, 11, 0, 18, 0, 0, 0, 0, 28, 92, 168, 24, 80, 149,
+    19, 68, 130, 11, 55, 111, 0, 41, 92, 0, 25, 71, 0, 6, 47, 0, 0, 5, 46, 92,
+    151, 40, 80, 134, 33, 68, 117, 24, 55, 99, 12, 42, 81, 0, 26, 63, 0, 7, 40,
+    0, 0, 0, 55, 91, 137, 48, 80, 121, 40, 68, 105, 30, 55, 89, 18, 42, 72, 2,
+    27, 55, 0, 8, 32, 0, 0, 0, 62, 91, 121, 54, 79, 107, 45, 68, 93, 34, 55, 77,
+    23, 42, 62, 7, 27, 46, 0, 8, 25, 0, 0, 0, 67, 91, 107, 58, 79, 93, 49, 68,
+    81, 38, 55, 67, 26, 42, 53, 12, 27, 37, 0, 8, 18, 0, 0, 0, 72, 90, 91, 62,
+    79, 79, 52, 67, 68, 41, 55, 56, 29, 42, 43, 15, 28, 28, 1, 9, 9, 0, 0, 0,
+    76, 90, 75, 66, 78, 65, 56, 67, 55, 43, 55, 44, 31, 42, 32, 17, 28, 18, 2,
+    9, 2, 0, 0, 0, 78, 90, 62, 68, 78, 52, 58, 67, 43, 45, 55, 33, 32, 42, 22,
+    19, 28, 7, 2, 9, 0, 0, 0, 0, 53, 72, 156, 46, 62, 138, 39, 51, 121, 30, 39,
+    102, 20, 25, 84, 2, 9, 65, 0, 0, 42, 0, 0, 0, 62, 72, 140, 55, 62, 124, 46,
+    52, 108, 36, 40, 91, 25, 27, 75, 9, 11, 57, 0, 0, 34, 0, 0, 0, 68, 72, 127,
+    59, 62, 112, 50, 52, 97, 39, 40, 82, 28, 27, 66, 13, 12, 49, 0, 0, 28, 0, 0,
+    0, 72, 73, 113, 63, 62, 99, 53, 52, 86, 42, 40, 71, 30, 28, 57, 17, 13, 41,
+    0, 0, 21, 0, 0, 0, 76, 72, 100, 66, 62, 87, 56, 52, 75, 44, 41, 62, 32, 29,
+    48, 19, 14, 33, 3, 0, 13, 0, 0, 0, 79, 72, 86, 69, 62, 74, 58, 52, 63, 46,
+    41, 51, 34, 29, 39, 21, 15, 24, 4, 1, 6, 0, 0, 0, 81, 72, 71, 71, 62, 61,
+    60, 52, 51, 48, 41, 40, 35, 29, 28, 22, 15, 13, 5, 1, 0, 0, 0, 0, 83, 72,
+    59, 73, 62, 49, 62, 52, 41, 49, 41, 31, 36, 30, 20, 22, 16, 5, 4, 2, 0, 0,
+    0, 0, 67, 49, 144, 59, 40, 128, 50, 30, 112, 40, 18, 95, 29, 2, 78, 13, 0,
+    60, 0, 0, 37, 0, 0, 0, 73, 50, 130, 64, 40, 115, 55, 31, 100, 44, 19, 84,
+    32, 4, 69, 18, 0, 52, 0, 0, 30, 0, 0, 0, 76, 50, 118, 67, 41, 104, 57, 32,
+    90, 46, 20, 75, 34, 7, 61, 20, 0, 45, 0, 0, 24, 0, 0, 0, 79, 51, 105, 69,
+    42, 92, 59, 33, 80, 47, 21, 66, 35, 9, 52, 22, 0, 37, 1, 0, 16, 0, 0, 0, 81,
+    52, 93, 71, 42, 81, 61, 33, 70, 49, 22, 57, 36, 11, 44, 23, 0, 29, 2, 0, 9,
+    0, 0, 0, 83, 52, 80, 73, 43, 69, 62, 34, 59, 50, 23, 47, 37, 12, 35, 23, 0,
+    21, 3, 0, 3, 0, 0, 0, 85, 52, 67, 75, 43, 57, 64, 34, 47, 51, 24, 36, 38,
+    13, 25, 24, 0, 10, 3, 0, 0, 0, 0, 0, 87, 52, 56, 76, 43, 46, 65, 34, 37, 52,
+    24, 27, 39, 14, 16, 24, 0, 2, 2, 0, 0, 0, 0, 0, 0, 174, 238, 0, 154, 210, 0,
+    135, 184, 0, 115, 157, 0, 95, 132, 0, 75, 105, 0, 50, 75, 0, 6, 35, 0, 172,
+    213, 0, 153, 188, 0, 134, 165, 0, 114, 141, 0, 94, 118, 0, 74, 93, 0, 50,
+    66, 0, 5, 28, 0, 171, 191, 0, 151, 169, 0, 133, 148, 0, 113, 126, 0, 94,
+    105, 0, 73, 83, 0, 50, 57, 0, 5, 21, 0, 169, 168, 0, 150, 148, 0, 131, 130,
+    0, 112, 110, 0, 93, 92, 0, 73, 71, 0, 49, 48, 0, 5, 13, 0, 167, 146, 0, 148,
+    130, 0, 130, 113, 0, 111, 96, 0, 92, 79, 0, 72, 61, 0, 49, 39, 0, 4, 3, 0,
+    166, 124, 0, 147, 110, 0, 129, 96, 0, 110, 81, 0, 92, 66, 0, 72, 49, 0, 49,
+    29, 0, 4, 0, 0, 165, 100, 0, 146, 89, 0, 129, 78, 0, 110, 65, 0, 91, 52, 0,
+    72, 37, 0, 49, 18, 0, 4, 0, 0, 164, 82, 0, 146, 73, 0, 128, 64, 0, 109, 52,
+    0, 91, 41, 0, 72, 26, 0, 49, 8, 0, 4, 0, 0, 157, 223, 0, 138, 197, 0, 121,
+    172, 0, 102, 147, 0, 84, 123, 0, 65, 98, 0, 41, 69, 0, 1, 30, 0, 155, 199,
+    0, 137, 176, 0, 120, 155, 0, 102, 132, 0, 84, 110, 0, 65, 87, 0, 41, 60, 0,
+    1, 22, 0, 154, 179, 0, 136, 158, 0, 119, 139, 0, 101, 118, 0, 83, 98, 0, 64,
+    77, 0, 41, 52, 0, 0, 15, 0, 152, 158, 0, 135, 139, 0, 118, 122, 0, 100, 103,
+    0, 83, 85, 0, 64, 66, 0, 41, 43, 0, 0, 6, 0, 151, 138, 0, 133, 122, 0, 117,
+    106, 0, 99, 90, 0, 82, 74, 0, 64, 56, 0, 41, 35, 0, 0, 0, 0, 150, 117, 0,
+    133, 103, 0, 116, 90, 0, 99, 76, 0, 82, 61, 0, 63, 45, 0, 41, 25, 0, 0, 0,
+    0, 149, 95, 0, 132, 84, 0, 116, 73, 0, 98, 61, 0, 81, 48, 0, 63, 33, 0, 41,
+    15, 0, 0, 0, 0, 148, 78, 0, 131, 69, 0, 115, 59, 0, 98, 49, 0, 81, 37, 0,
+    63, 23, 0, 40, 4, 0, 0, 0, 0, 140, 208, 0, 124, 184, 0, 108, 161, 0, 91,
+    137, 0, 74, 115, 0, 56, 91, 0, 33, 64, 0, 1, 24, 0, 139, 187, 0, 123, 165,
+    0, 107, 145, 0, 90, 123, 0, 74, 102, 0, 56, 80, 0, 33, 55, 0, 0, 17, 0, 138,
+    168, 0, 122, 149, 0, 106, 130, 0, 90, 110, 0, 73, 91, 0, 56, 71, 0, 33, 47,
+    0, 0, 8, 0, 136, 148, 0, 121, 131, 0, 105, 115, 0, 89, 97, 0, 73, 80, 0, 55,
+    61, 0, 33, 39, 0, 0, 1, 0, 135, 130, 0, 120, 115, 0, 105, 100, 0, 88, 84, 0,
+    72, 69, 0, 55, 52, 0, 33, 30, 0, 0, 0, 0, 135, 111, 0, 119, 98, 0, 104, 85,
+    0, 88, 71, 0, 72, 57, 0, 55, 41, 0, 33, 22, 0, 0, 0, 0, 134, 91, 0, 118, 80,
+    0, 103, 69, 0, 87, 57, 0, 72, 44, 0, 54, 30, 0, 33, 11, 0, 0, 0, 0, 133, 75,
+    0, 118, 65, 0, 103, 56, 0, 87, 45, 0, 71, 34, 0, 54, 20, 0, 33, 2, 0, 0, 0,
+    0, 123, 194, 0, 108, 171, 0, 94, 150, 0, 78, 128, 0, 63, 106, 0, 46, 84, 0,
+    24, 58, 0, 0, 19, 0, 122, 174, 0, 107, 154, 0, 93, 135, 0, 78, 114, 0, 63,
+    95, 0, 46, 74, 0, 25, 50, 0, 0, 10, 0, 121, 157, 0, 107, 139, 0, 93, 121, 0,
+    78, 103, 0, 63, 85, 0, 46, 65, 0, 25, 42, 0, 0, 2, 0, 120, 139, 0, 106, 122,
+    0, 92, 107, 0, 77, 90, 0, 62, 74, 0, 46, 56, 0, 25, 34, 0, 0, 0, 0, 119,
+    122, 0, 105, 107, 0, 91, 93, 0, 77, 78, 0, 62, 63, 0, 45, 47, 0, 25, 26, 0,
+    0, 0, 0, 119, 104, 0, 104, 91, 0, 91, 79, 0, 76, 66, 0, 62, 52, 0, 45, 37,
+    0, 25, 18, 0, 0, 0, 0, 118, 86, 0, 104, 75, 0, 90, 64, 0, 76, 52, 0, 61, 40,
+    0, 45, 26, 0, 25, 7, 0, 0, 0, 0, 118, 71, 0, 104, 61, 0, 90, 52, 0, 75, 42,
+    0, 61, 30, 0, 45, 17, 0, 24, 1, 0, 0, 0, 0, 107, 181, 0, 94, 160, 0, 81,
+    140, 0, 66, 119, 0, 52, 99, 0, 35, 78, 0, 15, 53, 0, 0, 13, 0, 106, 163, 0,
+    93, 144, 0, 80, 126, 0, 66, 107, 0, 52, 88, 0, 36, 68, 0, 15, 45, 0, 0, 4,
+    0, 106, 147, 0, 93, 130, 0, 80, 113, 0, 66, 96, 0, 52, 79, 0, 36, 60, 0, 16,
+    37, 0, 0, 0, 0, 105, 130, 0, 92, 115, 0, 79, 100, 0, 66, 84, 0, 52, 68, 0,
+    36, 51, 0, 16, 30, 0, 0, 0, 0, 104, 115, 0, 91, 101, 0, 79, 87, 0, 65, 73,
+    0, 52, 59, 0, 36, 43, 0, 16, 22, 0, 0, 0, 0, 104, 98, 0, 91, 86, 0, 79, 74,
+    0, 65, 61, 0, 52, 48, 0, 36, 33, 0, 16, 14, 0, 0, 0, 0, 103, 81, 0, 90, 70,
+    0, 78, 60, 0, 65, 49, 0, 52, 37, 0, 36, 22, 0, 16, 5, 0, 0, 0, 0, 103, 68,
+    0, 90, 58, 0, 78, 49, 0, 65, 38, 0, 51, 27, 0, 36, 13, 0, 16, 0, 0, 0, 0, 0,
+    90, 168, 0, 78, 149, 0, 67, 130, 0, 54, 111, 0, 40, 92, 0, 24, 72, 0, 6, 47,
+    0, 0, 6, 0, 90, 152, 0, 78, 134, 0, 67, 117, 0, 54, 99, 0, 40, 82, 0, 25,
+    63, 0, 6, 40, 0, 0, 0, 0, 89, 137, 0, 78, 121, 0, 66, 106, 0, 54, 89, 0, 41,
+    73, 0, 26, 55, 0, 7, 33, 0, 0, 0, 0, 89, 122, 0, 77, 107, 0, 66, 93, 0, 54,
+    78, 0, 41, 63, 0, 26, 46, 0, 7, 25, 0, 0, 0, 0, 89, 108, 0, 77, 94, 0, 66,
+    81, 0, 53, 68, 0, 41, 54, 0, 26, 38, 0, 8, 18, 0, 0, 0, 7, 88, 92, 4, 77,
+    80, 0, 66, 69, 0, 53, 57, 0, 41, 44, 0, 27, 29, 0, 8, 10, 0, 0, 0, 23, 88,
+    77, 19, 76, 66, 11, 65, 56, 0, 53, 45, 0, 41, 33, 0, 27, 19, 0, 8, 3, 0, 0,
+    0, 30, 88, 64, 26, 76, 54, 18, 65, 45, 4, 53, 35, 0, 41, 24, 0, 27, 9, 0, 8,
+    0, 0, 0, 0, 0, 72, 156, 0, 62, 138, 0, 51, 121, 0, 39, 103, 0, 26, 85, 0, 9,
+    66, 0, 0, 42, 0, 0, 0, 0, 72, 141, 0, 62, 125, 0, 51, 109, 0, 39, 92, 0, 27,
+    75, 0, 11, 57, 0, 0, 35, 0, 0, 0, 0, 72, 128, 0, 62, 113, 0, 51, 98, 0, 40,
+    82, 0, 27, 67, 0, 12, 50, 0, 1, 28, 0, 0, 0, 17, 72, 114, 13, 62, 100, 6,
+    51, 87, 0, 40, 72, 0, 28, 58, 0, 13, 42, 0, 1, 21, 0, 0, 0, 28, 72, 101, 23,
+    61, 88, 16, 51, 76, 4, 40, 62, 0, 28, 49, 0, 14, 34, 0, 1, 14, 0, 0, 0, 36,
+    72, 87, 30, 61, 75, 23, 51, 64, 12, 40, 52, 1, 28, 40, 0, 14, 25, 0, 1, 7,
+    0, 0, 0, 41, 71, 72, 35, 61, 62, 28, 51, 52, 17, 40, 41, 5, 28, 29, 0, 14,
+    15, 0, 0, 0, 0, 0, 0, 45, 71, 60, 39, 61, 51, 31, 51, 42, 20, 40, 32, 8, 29,
+    21, 0, 15, 6, 0, 0, 0, 0, 0, 0, 0, 51, 145, 0, 42, 129, 0, 33, 113, 0, 20,
+    96, 0, 5, 79, 0, 0, 60, 0, 0, 37, 0, 0, 0, 24, 52, 131, 21, 42, 116, 15, 33,
+    101, 5, 21, 85, 0, 7, 69, 0, 0, 52, 0, 1, 30, 0, 0, 0, 34, 52, 119, 29, 43,
+    105, 22, 33, 91, 12, 22, 76, 0, 8, 61, 0, 0, 45, 0, 1, 24, 0, 0, 0, 40, 53,
+    106, 34, 43, 93, 27, 34, 80, 17, 23, 67, 5, 9, 53, 0, 0, 37, 0, 0, 16, 0, 0,
+    0, 45, 53, 94, 38, 44, 82, 31, 34, 70, 20, 24, 58, 10, 11, 45, 0, 0, 29, 0,
+    0, 9, 0, 0, 0, 48, 53, 81, 42, 44, 70, 34, 35, 60, 24, 24, 48, 13, 12, 36,
+    0, 0, 21, 0, 0, 3, 0, 0, 0, 51, 53, 68, 45, 44, 58, 37, 35, 48, 26, 25, 37,
+    15, 13, 26, 2, 1, 11, 0, 0, 0, 0, 0, 0, 54, 54, 57, 47, 44, 47, 39, 35, 39,
+    28, 25, 29, 17, 13, 17, 4, 1, 3, 0, 0, 0, 0, 0, 0]);
+
+  function convertToRgb(src, srcOffset, srcScale, dest, destOffset) {
+    // using lut as in spline interpolation (see function.js)
+    var cubeVertices = 16; // 1 << number of colors
+    var cubeN = new Float32Array(cubeVertices);
+    var cubeVertex = new Uint32Array(cubeVertices);
+    for (var j = 0; j < cubeVertices; j++)
+      cubeN[j] = 1;
+
+    var k = 3, pos = 1;
+    var lutDomain = 7, lutStep = 8;
+    for (var i = 3; i >= 0; i--) {
+      var e = src[srcOffset + i] * srcScale * lutDomain;
+
+      var e0 = e < lutDomain ? Math.floor(e) : e - 1; // e1 = e0 + 1;
+      var n0 = e0 + 1 - e; // (e1 - e) / (e1 - e0);
+      var n1 = e - e0; // (e - e0) / (e1 - e0);
+      var offset0 = e0 * k;
+      var offset1 = offset0 + k; // e1 * k
+      for (var j = 0; j < cubeVertices; j++) {
+        if (j & pos) {
+          cubeN[j] *= n1;
+          cubeVertex[j] += offset1;
+        } else {
+          cubeN[j] *= n0;
+          cubeVertex[j] += offset0;
+        }
+      }
+
+      k *= lutStep;
+      pos <<= 1;
+    }
+    var y0 = 0, y1 = 0, y2 = 0;
+    for (var i = 0; i < cubeVertices; i++)
+      y0 += lut[cubeVertex[i]] * cubeN[i];
+    for (var i = 0; i < cubeVertices; i++)
+      y1 += lut[cubeVertex[i] + 1] * cubeN[i];
+    for (var i = 0; i < cubeVertices; i++)
+      y2 += lut[cubeVertex[i] + 2] * cubeN[i];
+    dest[destOffset] = y0 > 255 ? 255 : y0;
+    dest[destOffset + 1] = y1 > 255 ? 255 : y1;
+    dest[destOffset + 2] = y2 > 255 ? 255 : y2;
+  }
+
   function DeviceCmykCS() {
     this.name = 'DeviceCMYK';
     this.numComps = 4;
-    this.defaultColor = [0, 0, 0, 1];
+    this.defaultColor = new Float32Array([0, 0, 0, 1]);
   }
   DeviceCmykCS.prototype = {
-    getRgb: function DeviceCmykCS_getRgb(color) {
-      var c = color[0], m = color[1], y = color[2], k = color[3];
-
-      // CMYK -> CMY: http://www.easyrgb.com/index.php?X=MATH&H=14#text14
-      c = (c * (1 - k) + k);
-      m = (m * (1 - k) + k);
-      y = (y * (1 - k) + k);
-
-      // CMY -> RGB: http://www.easyrgb.com/index.php?X=MATH&H=12#text12
-      var r = (1 - c);
-      var g = (1 - m);
-      var b = (1 - y);
-
-      return [r, g, b];
+    getRgb: function DeviceCmykCS_getRgb(src, srcOffset) {
+      var rgb = new Uint8Array(3);
+      convertToRgb(src, srcOffset, 1, rgb, 0);
+      return rgb;
     },
-    getRgbBuffer: function DeviceCmykCS_getRgbBuffer(colorBuf, bits) {
+    getRgbItem: function DeviceCmykCS_getRgbItem(src, srcOffset,
+                                                 dest, destOffset) {
+      convertToRgb(src, srcOffset, 1, dest, destOffset);
+    },
+    getRgbBuffer: function DeviceCmykCS_getRgbBuffer(src, srcOffset, count,
+                                                     dest, destOffset, bits) {
       var scale = 1 / ((1 << bits) - 1);
-      var length = colorBuf.length / 4;
-      var rgbBuf = new Uint8Array(length * 3);
-      var rgbBufPos = 0;
-      var colorBufPos = 0;
-
-      for (var i = 0; i < length; i++) {
-        var cmyk = [];
-        for (var j = 0; j < 4; ++j)
-          cmyk.push(scale * colorBuf[colorBufPos++]);
-
-        var rgb = this.getRgb(cmyk);
-        for (var j = 0; j < 3; ++j)
-          rgbBuf[rgbBufPos++] = Math.round(rgb[j] * 255);
+      for (var i = 0; i < count; i++) {
+        convertToRgb(src, srcOffset, scale, dest, destOffset);
+        srcOffset += 4;
+        destOffset += 3;
       }
-
-      return rgbBuf;
     },
+    getOutputLength: function DeviceCmykCS_getOutputLength(inputLength) {
+      return (inputLength >> 2) * 3;
+    },
+    isPassthrough: ColorSpace.prototype.isPassthrough,
+    createRgbBuffer: ColorSpace.prototype.createRgbBuffer,
     isDefaultDecode: function DeviceCmykCS_isDefaultDecode(decodeMap) {
       return ColorSpace.isDefaultDecode(decodeMap, this.numComps);
     }
@@ -12358,7 +13426,7 @@ var LabCS = (function LabCSClosure() {
   function LabCS(whitePoint, blackPoint, range) {
     this.name = 'Lab';
     this.numComps = 3;
-    this.defaultColor = [0, 0, 0];
+    this.defaultColor = new Float32Array([0, 0, 0]);
 
     if (!whitePoint)
       error('WhitePoint missing - required for color space Lab');
@@ -12399,58 +13467,66 @@ var LabCS = (function LabCSClosure() {
   };
 
   // Function g(x) from spec
-  function g(x) {
+  function fn_g(x) {
     if (x >= 6 / 29)
       return x * x * x;
     else
       return (108 / 841) * (x - 4 / 29);
   }
 
+  function convertToRgb(cs, src, srcOffset, dest, destOffset) {
+    // Ls,as,bs <---> L*,a*,b* in the spec
+    var Ls = src[srcOffset];
+    var as = src[srcOffset + 1];
+    var bs = src[srcOffset + 2];
+
+    // Adjust limits of 'as' and 'bs'
+    as = as > cs.amax ? cs.amax : as < cs.amin ? cs.amin : as;
+    bs = bs > cs.bmax ? cs.bmax : bs < cs.bmin ? cs.bmin : bs;
+
+    // Computes intermediate variables X,Y,Z as per spec
+    var M = (Ls + 16) / 116;
+    var L = M + (as / 500);
+    var N = M - (bs / 200);
+
+    var X = cs.XW * fn_g(L);
+    var Y = cs.YW * fn_g(M);
+    var Z = cs.ZW * fn_g(N);
+
+    var r, g, b;
+    // Using different conversions for D50 and D65 white points,
+    // per http://www.color.org/srgb.pdf
+    if (cs.ZW < 1) {
+      // Assuming D50 (X=0.9642, Y=1.00, Z=0.8249)
+      r = X * 3.1339 + Y * -1.6170 + Z * -0.4906;
+      g = X * -0.9785 + Y * 1.9160 + Z * 0.0333;
+      b = X * 0.0720 + Y * -0.2290 + Z * 1.4057;
+    } else {
+      // Assuming D65 (X=0.9505, Y=1.00, Z=1.0888)
+      r = X * 3.2406 + Y * -1.5372 + Z * -0.4986;
+      g = X * -0.9689 + Y * 1.8758 + Z * 0.0415;
+      b = X * 0.0557 + Y * -0.2040 + Z * 1.0570;
+    }
+
+    // clamp color values to [0,255] range
+    dest[destOffset] = r < 0 ? 0 : r > 1 ? 255 : r * 255;
+    dest[destOffset + 1] = g < 0 ? 0 : g > 1 ? 255 : g * 255;
+    dest[destOffset + 2] = b < 0 ? 0 : b > 1 ? 255 : b * 255;
+  }
+
   LabCS.prototype = {
-    getRgb: function LabCS_getRgb(color) {
-      // Ls,as,bs <---> L*,a*,b* in the spec
-      var Ls = color[0], as = color[1], bs = color[2];
-
-      // Adjust limits of 'as' and 'bs'
-      as = as > this.amax ? this.amax : as;
-      as = as < this.amin ? this.amin : as;
-      bs = bs > this.bmax ? this.bmax : bs;
-      bs = bs < this.bmin ? this.bmin : bs;
-
-      // Computes intermediate variables X,Y,Z as per spec
-      var M = (Ls + 16) / 116;
-      var L = M + (as / 500);
-      var N = M - (bs / 200);
-      var X = this.XW * g(L);
-      var Y = this.YW * g(M);
-      var Z = this.ZW * g(N);
-
-      // XYZ to RGB 3x3 matrix, from:
-      // http://www.poynton.com/notes/colour_and_gamma/ColorFAQ.html#RTFToC18
-      var XYZtoRGB = [3.240479, -1.537150, -0.498535,
-                      -0.969256, 1.875992, 0.041556,
-                      0.055648, -0.204043, 1.057311];
-
-      return Util.apply3dTransform(XYZtoRGB, [X, Y, Z]);
+    getRgb: function LabCS_getRgb(src, srcOffset) {
+      var rgb = new Uint8Array(3);
+      convertToRgb(this, src, srcOffset, rgb, 0);
+      return rgb;
     },
-    getRgbBuffer: function LabCS_getRgbBuffer(input, bits) {
-      if (bits == 8)
-        return input;
-      var scale = 255 / ((1 << bits) - 1);
-      var i, length = input.length / 3;
-      var rgbBuf = new Uint8Array(length);
-
-      var j = 0;
-      for (i = 0; i < length; ++i) {
-        // Convert L*, a*, s* into RGB
-        var rgb = this.getRgb([input[i], input[i + 1], input[i + 2]]);
-        rgbBuf[j++] = rgb[0];
-        rgbBuf[j++] = rgb[1];
-        rgbBuf[j++] = rgb[2];
-      }
-
-      return rgbBuf;
+    getRgbItem: function LabCS_getRgbItem(src, srcOffset, dest, destOffset) {
+      convertToRgb(this, src, srcOffset, dest, destOffset);
     },
+    getOutputLength: function LabCS_getOutputLength(inputLength) {
+      return inputLength;
+    },
+    isPassthrough: ColorSpace.prototype.isPassthrough,
     isDefaultDecode: function LabCS_isDefaultDecode(decodeMap) {
       // From Table 90 in Adobe's:
       // "Document management - Portable document format", 1st ed, 2008
@@ -13114,14 +14190,16 @@ var CipherTransformFactory = (function CipherTransformFactoryClosure() {
 
 
 var PartialEvaluator = (function PartialEvaluatorClosure() {
-  function PartialEvaluator(xref, handler, uniquePrefix) {
+  function PartialEvaluator(xref, handler, pageIndex, uniquePrefix) {
     this.state = new EvalState();
     this.stateStack = [];
 
     this.xref = xref;
     this.handler = handler;
+    this.pageIndex = pageIndex;
     this.uniquePrefix = uniquePrefix;
     this.objIdCounter = 0;
+    this.fontIdCounter = 0;
   }
 
   var OP_MAP = {
@@ -13234,6 +14312,56 @@ var PartialEvaluator = (function PartialEvaluatorClosure() {
   };
 
   PartialEvaluator.prototype = {
+    loadFont: function PartialEvaluator_loadFont(fontName, font, xref,
+                                                 resources, dependency) {
+      var fontRes = resources.get('Font');
+
+      assert(fontRes, 'fontRes not available');
+
+      ++this.fontIdCounter;
+
+      font = xref.fetchIfRef(font) || fontRes.get(fontName);
+      if (!isDict(font)) {
+        return {
+          translated: new ErrorFont('Font ' + fontName + ' is not available'),
+          loadedName: 'g_font_' + this.uniquePrefix + this.fontIdCounter
+        };
+      }
+
+      var loadedName = font.loadedName;
+      if (!loadedName) {
+        // keep track of each font we translated so the caller can
+        // load them asynchronously before calling display on a page
+        loadedName = 'g_font_' + this.uniquePrefix + this.fontIdCounter;
+        font.loadedName = loadedName;
+
+        var translated;
+        try {
+          translated = this.translateFont(font, xref, resources,
+                                          dependency);
+        } catch (e) {
+          translated = new ErrorFont(e instanceof Error ? e.message : e);
+        }
+        font.translated = translated;
+
+        var data = translated;
+        if (data.loadCharProcs) {
+          delete data.loadCharProcs;
+
+          var charProcs = font.get('CharProcs').getAll();
+          var fontResources = font.get('Resources') || resources;
+          var charProcOperatorList = {};
+          for (var key in charProcs) {
+            var glyphStream = charProcs[key];
+            charProcOperatorList[key] =
+              this.getOperatorList(glyphStream, fontResources, dependency);
+          }
+          data.charProcOperatorList = charProcOperatorList;
+        }
+      }
+      return font;
+    },
+
     getOperatorList: function PartialEvaluator_getOperatorList(stream,
                                                                resources,
                                                                dependency,
@@ -13242,6 +14370,7 @@ var PartialEvaluator = (function PartialEvaluatorClosure() {
       var self = this;
       var xref = this.xref;
       var handler = this.handler;
+      var pageIndex = this.pageIndex;
       var uniquePrefix = this.uniquePrefix || '';
 
       function insertDependency(depList) {
@@ -13256,46 +14385,19 @@ var PartialEvaluator = (function PartialEvaluatorClosure() {
       }
 
       function handleSetFont(fontName, font) {
-        var loadedName = null;
+        font = self.loadFont(fontName, font, xref, resources, dependency);
 
-        var fontRes = resources.get('Font');
+        var loadedName = font.loadedName;
+        if (!font.sent) {
+          var data = font.translated.exportData();
 
-        assert(fontRes, 'fontRes not available');
-
-        font = xref.fetchIfRef(font) || fontRes.get(fontName);
-        assertWellFormed(isDict(font));
-
-        ++self.objIdCounter;
-        if (!font.loadedName) {
-          font.translated = self.translateFont(font, xref, resources,
-                                               dependency);
-          if (font.translated) {
-            // keep track of each font we translated so the caller can
-            // load them asynchronously before calling display on a page
-            loadedName = 'font_' + uniquePrefix + self.objIdCounter;
-            font.translated.properties.loadedName = loadedName;
-            font.loadedName = loadedName;
-
-            var translated = font.translated;
-            // Convert the file to an ArrayBuffer which will be turned back into
-            // a Stream in the main thread.
-            if (translated.file)
-              translated.file = translated.file.getBytes();
-            if (translated.properties.file) {
-              translated.properties.file =
-                  translated.properties.file.getBytes();
-            }
-
-            handler.send('obj', [
-                loadedName,
-                'Font',
-                translated.name,
-                translated.file,
-                translated.properties
-            ]);
-          }
+          handler.send('commonobj', [
+              loadedName,
+              'Font',
+              data
+          ]);
+          font.sent = true;
         }
-        loadedName = loadedName || font.loadedName;
 
         // Ensure the font is ready before the font is set
         // and later on used for drawing.
@@ -13330,36 +14432,41 @@ var PartialEvaluator = (function PartialEvaluatorClosure() {
           return;
         }
 
+        var softMask = dict.get('SMask', 'SM') || false;
+        var mask = dict.get('Mask') || false;
+
+        var SMALL_IMAGE_DIMENSIONS = 200;
+        // Inlining small images into the queue as RGB data
+        if (inline && !softMask && !mask &&
+            !(image instanceof JpegStream) &&
+            (w + h) < SMALL_IMAGE_DIMENSIONS) {
+          var imageObj = new PDFImage(xref, resources, image,
+                                      inline, null, null);
+          var imgData = imageObj.getImageData();
+          fn = 'paintInlineImageXObject';
+          args = [imgData];
+          return;
+        }
+
         // If there is no imageMask, create the PDFImage and a lot
         // of image processing can be done here.
         var objId = 'img_' + uniquePrefix + (++self.objIdCounter);
         insertDependency([objId]);
         args = [objId, w, h];
 
-        var softMask = dict.get('SMask', 'SM') || false;
-        var mask = dict.get('Mask') || false;
-
         if (!softMask && !mask && image instanceof JpegStream &&
             image.isNativelySupported(xref, resources)) {
           // These JPEGs don't need any more processing so we can just send it.
           fn = 'paintJpegXObject';
-          handler.send('obj', [objId, 'JpegStream', image.getIR()]);
+          handler.send('obj', [objId, pageIndex, 'JpegStream', image.getIR()]);
           return;
         }
 
         fn = 'paintImageXObject';
 
         PDFImage.buildImage(function(imageObj) {
-            var drawWidth = imageObj.drawWidth;
-            var drawHeight = imageObj.drawHeight;
-            var imgData = {
-              width: drawWidth,
-              height: drawHeight,
-              data: new Uint8Array(drawWidth * drawHeight * 4)
-            };
-            var pixels = imgData.data;
-            imageObj.fillRgbaBuffer(pixels, drawWidth, drawHeight);
-            handler.send('obj', [objId, 'Image', imgData]);
+            var imgData = imageObj.getImageData();
+            handler.send('obj', [objId, pageIndex, 'Image', imgData]);
           }, handler, xref, resources, image, inline);
       }
 
@@ -13582,68 +14689,247 @@ var PartialEvaluator = (function PartialEvaluatorClosure() {
       return queue;
     },
 
-    getTextContent: function partialEvaluatorGetIRQueue(stream, resources) {
+    optimizeQueue: function PartialEvaluator_optimizeQueue(queue) {
+      var fnArray = queue.fnArray, argsArray = queue.argsArray;
+      // grouping paintInlineImageXObject's into paintInlineImageXObjectGroup
+      // searching for (save, transform, paintInlineImageXObject, restore)+
+      var MIN_IMAGES_IN_INLINE_IMAGES_BLOCK = 10;
+      var MAX_IMAGES_IN_INLINE_IMAGES_BLOCK = 200;
+      var MAX_WIDTH = 1000;
+      var IMAGE_PADDING = 1;
+      for (var i = 0, ii = fnArray.length; i < ii; i++) {
+        if (fnArray[i] === 'paintInlineImageXObject' &&
+            fnArray[i - 2] === 'save' && fnArray[i - 1] === 'transform' &&
+            fnArray[i + 1] === 'restore') {
+          var j = i - 2;
+          for (i += 2; i < ii && fnArray[i - 4] === fnArray[i]; i++) {
+          }
+          var count = Math.min((i - j) >> 2,
+                               MAX_IMAGES_IN_INLINE_IMAGES_BLOCK);
+          if (count < MIN_IMAGES_IN_INLINE_IMAGES_BLOCK) {
+            continue;
+          }
+          // assuming that heights of those image is too small (~1 pixel)
+          // packing as much as possible by lines
+          var maxX = 0;
+          var map = [], maxLineHeight = 0;
+          var currentX = IMAGE_PADDING, currentY = IMAGE_PADDING;
+          for (var q = 0; q < count; q++) {
+            var transform = argsArray[j + (q << 2) + 1];
+            var img = argsArray[j + (q << 2) + 2][0];
+            if (currentX + img.width > MAX_WIDTH) {
+              // starting new line
+              maxX = Math.max(maxX, currentX);
+              currentY += maxLineHeight + 2 * IMAGE_PADDING;
+              currentX = 0;
+              maxLineHeight = 0;
+            }
+            map.push({
+              transform: transform,
+              x: currentX, y: currentY,
+              w: img.width, h: img.height
+            });
+            currentX += img.width + 2 * IMAGE_PADDING;
+            maxLineHeight = Math.max(maxLineHeight, img.height);
+          }
+          var imgWidth = Math.max(maxX, currentX) + IMAGE_PADDING;
+          var imgHeight = currentY + maxLineHeight + IMAGE_PADDING;
+          var imgData = new Uint8Array(imgWidth * imgHeight * 4);
+          var imgRowSize = imgWidth << 2;
+          for (var q = 0; q < count; q++) {
+            var data = argsArray[j + (q << 2) + 2][0].data;
+            // copy image by lines and extends pixels into padding
+            var rowSize = map[q].w << 2;
+            var dataOffset = 0;
+            var offset = (map[q].x + map[q].y * imgWidth) << 2;
+            imgData.set(
+              data.subarray(0, rowSize), offset - imgRowSize);
+            for (var k = 0, kk = map[q].h; k < kk; k++) {
+              imgData.set(
+                data.subarray(dataOffset, dataOffset + rowSize), offset);
+              dataOffset += rowSize;
+              offset += imgRowSize;
+            }
+            imgData.set(
+              data.subarray(dataOffset - rowSize, dataOffset), offset);
+            while (offset >= 0) {
+              data[offset - 4] = data[offset];
+              data[offset - 3] = data[offset + 1];
+              data[offset - 2] = data[offset + 2];
+              data[offset - 1] = data[offset + 3];
+              data[offset + rowSize] = data[offset + rowSize - 4];
+              data[offset + rowSize + 1] = data[offset + rowSize - 3];
+              data[offset + rowSize + 2] = data[offset + rowSize - 2];
+              data[offset + rowSize + 3] = data[offset + rowSize - 1];
+              offset -= imgRowSize;
+            }
+          }
+          // replacing queue items
+          fnArray.splice(j, count * 4, ['paintInlineImageXObjectGroup']);
+          argsArray.splice(j, count * 4,
+            [{width: imgWidth, height: imgHeight, data: imgData}, map]);
+          i = j;
+          ii = fnArray.length;
+        }
+      }
+      // grouping paintImageMaskXObject's into paintImageMaskXObjectGroup
+      // searching for (save, transform, paintImageMaskXObject, restore)+
+      var MIN_IMAGES_IN_MASKS_BLOCK = 10;
+      var MAX_IMAGES_IN_MASKS_BLOCK = 100;
+      for (var i = 0, ii = fnArray.length; i < ii; i++) {
+        if (fnArray[i] === 'paintImageMaskXObject' &&
+            fnArray[i - 2] === 'save' && fnArray[i - 1] === 'transform' &&
+            fnArray[i + 1] === 'restore') {
+          var j = i - 2;
+          for (i += 2; i < ii && fnArray[i - 4] === fnArray[i]; i++) {
+          }
+          var count = Math.min((i - j) >> 2,
+                               MAX_IMAGES_IN_MASKS_BLOCK);
+          if (count < MIN_IMAGES_IN_MASKS_BLOCK) {
+            continue;
+          }
+          var images = [];
+          for (var q = 0; q < count; q++) {
+            var transform = argsArray[j + (q << 2) + 1];
+            var maskParams = argsArray[j + (q << 2) + 2];
+            images.push({data: maskParams[0], width: maskParams[2],
+              height: maskParams[3], transform: transform,
+              inverseDecode: maskParams[1]});
+          }
+          // replacing queue items
+          fnArray.splice(j, count * 4, ['paintImageMaskXObjectGroup']);
+          argsArray.splice(j, count * 4, [images]);
+          i = j;
+          ii = fnArray.length;
+        }
+      }
+    },
+
+    getTextContent: function PartialEvaluator_getTextContent(
+                                                    stream, resources, state) {
+      var bidiTexts;
+      var SPACE_FACTOR = 0.35;
+      var MULTI_SPACE_FACTOR = 1.5;
+
+      if (!state) {
+        bidiTexts = [];
+        state = {
+          bidiTexts: bidiTexts
+        };
+      } else {
+        bidiTexts = state.bidiTexts;
+      }
 
       var self = this;
       var xref = this.xref;
 
       function handleSetFont(fontName, fontRef) {
-        var fontRes = resources.get('Font');
-
-        // TODO: TOASK: Is it possible to get here? If so, what does
-        // args[0].name should be like???
-        assert(fontRes, 'fontRes not available');
-
-        fontRes = xref.fetchIfRef(fontRes);
-        fontRef = fontRef || fontRes.get(fontName);
-        var font = xref.fetchIfRef(fontRef), tra;
-        assertWellFormed(isDict(font));
-        if (!font.translated) {
-          font.translated = self.translateFont(font, xref, resources);
-        }
-        return font;
+        return self.loadFont(fontName, fontRef, xref, resources, null);
       }
 
       resources = xref.fetchIfRef(resources) || new Dict();
+      // The xobj is parsed iff it's needed, e.g. if there is a `DO` cmd.
+      var xobjs = null;
 
       var parser = new Parser(new Lexer(stream), false);
       var res = resources;
       var args = [], obj;
 
-      var text = '';
       var chunk = '';
       var font = null;
       while (!isEOF(obj = parser.getObj())) {
         if (isCmd(obj)) {
           var cmd = obj.cmd;
           switch (cmd) {
+            // TODO: Add support for SAVE/RESTORE and XFORM here.
             case 'Tf':
-              font = handleSetFont(args[0].name);
+              font = handleSetFont(args[0].name).translated;
               break;
             case 'TJ':
               var items = args[0];
               for (var j = 0, jj = items.length; j < jj; j++) {
                 if (typeof items[j] === 'string') {
-                  chunk += items[j];
-                } else if (items[j] < 0) {
-                  // making all negative offsets a space - better to have
-                  // a space in incorrect place than not have them at all
-                  chunk += ' ';
+                  chunk += fontCharsToUnicode(items[j], font);
+                } else if (items[j] < 0 && font.spaceWidth > 0) {
+                  var fakeSpaces = -items[j] / font.spaceWidth;
+                  if (fakeSpaces > MULTI_SPACE_FACTOR) {
+                    fakeSpaces = Math.round(fakeSpaces);
+                    while (fakeSpaces--) {
+                      chunk += ' ';
+                    }
+                  } else if (fakeSpaces > SPACE_FACTOR) {
+                    chunk += ' ';
+                  }
                 }
               }
               break;
             case 'Tj':
-              chunk += args[0];
+              chunk += fontCharsToUnicode(args[0], font);
               break;
             case "'":
-              chunk += args[0] + ' ';
+              // For search, adding a extra white space for line breaks would be
+              // better here, but that causes too much spaces in the
+              // text-selection divs.
+              chunk += fontCharsToUnicode(args[0], font);
               break;
             case '"':
-              chunk += args[2] + ' ';
+              // Note comment in "'"
+              chunk += fontCharsToUnicode(args[2], font);
+              break;
+            case 'Do':
+              // Set the chunk such that the following if won't add something
+              // to the state.
+              chunk = '';
+
+              if (args[0].code) {
+                break;
+              }
+
+              if (!xobjs) {
+                xobjs = resources.get('XObject') || new Dict();
+              }
+
+              var name = args[0].name;
+              var xobj = xobjs.get(name);
+              if (!xobj)
+                break;
+              assertWellFormed(isStream(xobj), 'XObject should be a stream');
+
+              var type = xobj.dict.get('Subtype');
+              assertWellFormed(
+                isName(type),
+                'XObject should have a Name subtype'
+              );
+
+              if ('Form' !== type.name)
+                break;
+
+              state = this.getTextContent(
+                xobj,
+                xobj.dict.get('Resources') || resources,
+                state
+              );
+              break;
+            case 'gs':
+              var dictName = args[0];
+              var extGState = resources.get('ExtGState');
+
+              if (!isDict(extGState) || !extGState.has(dictName.name))
+                break;
+
+              var gsState = extGState.get(dictName.name);
+
+              for (var i = 0; i < gsState.length; i++) {
+                if (gsState[i] === 'Font') {
+                  font = handleSetFont(args[0].name).translated;
+                }
+              }
               break;
           } // switch
+
           if (chunk !== '') {
-            text += fontCharsToUnicode(chunk, font.translated.properties);
+            bidiTexts.push(PDFJS.bidi(chunk, -1));
+
             chunk = '';
           }
 
@@ -13652,9 +14938,9 @@ var PartialEvaluator = (function PartialEvaluatorClosure() {
           assertWellFormed(args.length <= 33, 'Too many arguments');
           args.push(obj);
         }
-      }
+      } // while
 
-      return text;
+      return state;
     },
 
     extractDataStructures: function
@@ -13915,21 +15201,41 @@ var PartialEvaluator = (function PartialEvaluatorClosure() {
         }
       }
 
+      // Heuristic: detection of monospace font by checking all non-zero widths
+      var isMonospace = true, firstWidth = defaultWidth;
+      for (var glyph in glyphsWidths) {
+        var glyphWidth = glyphsWidths[glyph];
+        if (!glyphWidth)
+          continue;
+        if (!firstWidth) {
+          firstWidth = glyphWidth;
+          continue;
+        }
+        if (firstWidth != glyphWidth) {
+          isMonospace = false;
+          break;
+        }
+      }
+      if (isMonospace)
+        properties.flags |= FontFlags.FixedPitch;
+
       properties.defaultWidth = defaultWidth;
       properties.widths = glyphsWidths;
     },
 
     getBaseFontMetrics: function PartialEvaluator_getBaseFontMetrics(name) {
-      var defaultWidth = 0, widths = [];
+      var defaultWidth = 0, widths = [], monospace = false;
       var glyphWidths = Metrics[stdFontMap[name] || name];
       if (isNum(glyphWidths)) {
         defaultWidth = glyphWidths;
+        monospace = true;
       } else {
         widths = glyphWidths;
       }
 
       return {
         defaultWidth: defaultWidth,
+        monospace: monospace,
         widths: widths
       };
     },
@@ -13950,7 +15256,7 @@ var PartialEvaluator = (function PartialEvaluatorClosure() {
         //  - get the FontDescriptor from the descendant font
         var df = dict.get('DescendantFonts');
         if (!df)
-          return null;
+          error('Descendant fonts are not specified');
 
         dict = isArray(df) ? xref.fetchIfRef(df[0]) : df;
 
@@ -13973,7 +15279,7 @@ var PartialEvaluator = (function PartialEvaluatorClosure() {
           // This case is here for compatibility.
           var baseFontName = dict.get('BaseFont');
           if (!isName(baseFontName))
-            return null;
+            error('Base font is not specified');
 
           // Using base font name as a font name.
           baseFontName = baseFontName.name.replace(/[,_]/g, '-');
@@ -13983,6 +15289,7 @@ var PartialEvaluator = (function PartialEvaluatorClosure() {
           var fontNameWoStyle = baseFontName.split('-')[0];
           var flags = (serifFonts[fontNameWoStyle] ||
             (fontNameWoStyle.search(/serif/gi) != -1) ? FontFlags.Serif : 0) |
+            (metrics.monospace ? FontFlags.FixedPitch : 0) |
             (symbolsFonts[fontNameWoStyle] ? FontFlags.Symbolic :
             FontFlags.Nonsymbolic);
 
@@ -13996,11 +15303,7 @@ var PartialEvaluator = (function PartialEvaluatorClosure() {
           };
           this.extractDataStructures(dict, dict, xref, properties);
 
-          return {
-            name: baseFontName,
-            dict: baseDict,
-            properties: properties
-          };
+          return new Font(baseFontName, null, properties);
         }
       }
 
@@ -14036,10 +15339,11 @@ var PartialEvaluator = (function PartialEvaluatorClosure() {
         file: fontFile,
         length1: length1,
         length2: length2,
+        loadedName: baseDict.loadedName,
         composite: composite,
         wideChars: composite,
         fixedPitch: false,
-        fontMatrix: dict.get('FontMatrix') || IDENTITY_MATRIX,
+        fontMatrix: dict.get('FontMatrix') || FONT_IDENTITY_MATRIX,
         firstChar: firstChar || 0,
         lastChar: lastChar || maxCharIndex,
         bbox: descriptor.get('FontBBox'),
@@ -14056,22 +15360,9 @@ var PartialEvaluator = (function PartialEvaluatorClosure() {
 
       if (type.name === 'Type3') {
         properties.coded = true;
-        var charProcs = dict.get('CharProcs').getAll();
-        var fontResources = dict.get('Resources') || resources;
-        properties.charProcOperatorList = {};
-        for (var key in charProcs) {
-          var glyphStream = charProcs[key];
-          properties.charProcOperatorList[key] =
-            this.getOperatorList(glyphStream, fontResources, dependency);
-        }
       }
 
-      return {
-        name: fontName.name,
-        dict: baseDict,
-        file: fontFile,
-        properties: properties
-      };
+      return new Font(fontName.name, fontFile, properties);
     }
   };
 
@@ -14103,22 +15394,19 @@ var EvalState = (function EvalStateClosure() {
 
 
 
-/**
- * Maximum time to wait for a font to be loaded by font-face rules.
- */
-var kMaxWaitForFontFace = 1000;
-
 // Unicode Private Use Area
-var kCmapGlyphOffset = 0xE000;
-var kSizeOfGlyphArea = 0x1900;
-var kSymbolicFontGlyphOffset = 0xF000;
+var CMAP_GLYPH_OFFSET = 0xE000;
+var GLYPH_AREA_SIZE = 0x1900;
+var SYMBOLIC_FONT_GLYPH_OFFSET = 0xF000;
 
 // PDF Glyph Space Units are one Thousandth of a TextSpace Unit
 // except for Type 3 fonts
-var kPDFGlyphSpaceUnits = 1000;
+var PDF_GLYPH_SPACE_UNITS = 1000;
 
 // Until hinting is fully supported this constant can be used
-var kHintingEnabled = false;
+var HINTING_ENABLED = false;
+
+var FONT_IDENTITY_MATRIX = [0.001, 0, 0, 0.001, 0, 0];
 
 var FontFlags = {
   FixedPitch: 1,
@@ -14504,10 +15792,25 @@ function mapPrivateUseChars(code) {
 }
 
 var FontLoader = {
+//#if !(MOZCENTRAL)
   loadingContext: {
     requests: [],
     nextRequestId: 0
   },
+
+  isSyncFontLoadingSupported: (function detectSyncFontLoadingSupport() {
+    if (isWorker)
+      return false;
+
+    // User agent string sniffing is bad, but there is no reliable way to tell
+    // if font is fully loaded and ready to be used with canvas.
+    var userAgent = window.navigator.userAgent;
+    var m = /Mozilla\/5.0.*?rv:(\d+).*? Gecko/.exec(userAgent);
+    if (m && m[1] >= 14)
+      return true;
+    // TODO other browsers
+    return false;
+  })(),
 
   bind: function fontLoaderBind(fonts, callback) {
     assert(!isWorker, 'bind() shall be called from main thread');
@@ -14523,23 +15826,15 @@ var FontLoader = {
       }
       font.attached = true;
 
-      var str = '';
-      var data = font.data;
-      if (data) {
-        var length = data.length;
-        for (var j = 0; j < length; j++)
-          str += String.fromCharCode(data[j]);
-
-        var rule = font.bindDOM(str);
-        if (rule) {
-          rules.push(rule);
-          fontsToLoad.push(font);
-        }
+      var rule = font.bindDOM();
+      if (rule) {
+        rules.push(rule);
+        fontsToLoad.push(font);
       }
     }
 
     var request = FontLoader.queueLoadingCallback(callback);
-    if (rules.length > 0) {
+    if (rules.length > 0 && !this.isSyncFontLoadingSupported) {
       FontLoader.prepareFontLoadEvent(rules, fontsToLoad, request);
     } else {
       request.complete();
@@ -14681,6 +15976,22 @@ var FontLoader = {
       document.body.appendChild(frame);
       /** Hack end */
   }
+//#else
+//bind: function fontLoaderBind(fonts, callback) {
+//  assert(!isWorker, 'bind() shall be called from main thread');
+//
+//  for (var i = 0, ii = fonts.length; i < ii; i++) {
+//    var font = fonts[i];
+//    if (font.attached)
+//      continue;
+//
+//    font.attached = true;
+//    font.bindDOM()
+//  }
+//
+//  setTimeout(callback);
+//}
+//#endif
 };
 
 var UnicodeRanges = [
@@ -14867,9 +16178,9 @@ function isRTLRangeFor(value) {
 }
 
 function isSpecialUnicode(unicode) {
-  return (unicode <= 0x1F || (unicode >= 127 && unicode < kSizeOfGlyphArea)) ||
-    (unicode >= kCmapGlyphOffset &&
-    unicode < kCmapGlyphOffset + kSizeOfGlyphArea);
+  return (unicode <= 0x1F || (unicode >= 127 && unicode < GLYPH_AREA_SIZE)) ||
+    (unicode >= CMAP_GLYPH_OFFSET &&
+    unicode < CMAP_GLYPH_OFFSET + GLYPH_AREA_SIZE);
 }
 
 // The normalization table is obtained by filtering the Unicode characters
@@ -15541,65 +16852,758 @@ var NormalizedUnicodes = {
   '\uFB16': '\u057E\u0576',
   '\uFB17': '\u0574\u056D',
   '\uFB4F': '\u05D0\u05DC',
+  '\uFB50': '\u0671',
+  '\uFB51': '\u0671',
+  '\uFB52': '\u067B',
+  '\uFB53': '\u067B',
+  '\uFB54': '\u067B',
+  '\uFB55': '\u067B',
+  '\uFB56': '\u067E',
+  '\uFB57': '\u067E',
+  '\uFB58': '\u067E',
+  '\uFB59': '\u067E',
+  '\uFB5A': '\u0680',
+  '\uFB5B': '\u0680',
+  '\uFB5C': '\u0680',
+  '\uFB5D': '\u0680',
+  '\uFB5E': '\u067A',
+  '\uFB5F': '\u067A',
+  '\uFB60': '\u067A',
+  '\uFB61': '\u067A',
+  '\uFB62': '\u067F',
+  '\uFB63': '\u067F',
+  '\uFB64': '\u067F',
+  '\uFB65': '\u067F',
+  '\uFB66': '\u0679',
+  '\uFB67': '\u0679',
+  '\uFB68': '\u0679',
+  '\uFB69': '\u0679',
+  '\uFB6A': '\u06A4',
+  '\uFB6B': '\u06A4',
+  '\uFB6C': '\u06A4',
+  '\uFB6D': '\u06A4',
+  '\uFB6E': '\u06A6',
+  '\uFB6F': '\u06A6',
+  '\uFB70': '\u06A6',
+  '\uFB71': '\u06A6',
+  '\uFB72': '\u0684',
+  '\uFB73': '\u0684',
+  '\uFB74': '\u0684',
+  '\uFB75': '\u0684',
+  '\uFB76': '\u0683',
+  '\uFB77': '\u0683',
+  '\uFB78': '\u0683',
+  '\uFB79': '\u0683',
+  '\uFB7A': '\u0686',
+  '\uFB7B': '\u0686',
+  '\uFB7C': '\u0686',
+  '\uFB7D': '\u0686',
+  '\uFB7E': '\u0687',
+  '\uFB7F': '\u0687',
+  '\uFB80': '\u0687',
+  '\uFB81': '\u0687',
+  '\uFB82': '\u068D',
+  '\uFB83': '\u068D',
+  '\uFB84': '\u068C',
+  '\uFB85': '\u068C',
+  '\uFB86': '\u068E',
+  '\uFB87': '\u068E',
+  '\uFB88': '\u0688',
+  '\uFB89': '\u0688',
+  '\uFB8A': '\u0698',
+  '\uFB8B': '\u0698',
+  '\uFB8C': '\u0691',
+  '\uFB8D': '\u0691',
+  '\uFB8E': '\u06A9',
+  '\uFB8F': '\u06A9',
+  '\uFB90': '\u06A9',
+  '\uFB91': '\u06A9',
+  '\uFB92': '\u06AF',
+  '\uFB93': '\u06AF',
+  '\uFB94': '\u06AF',
+  '\uFB95': '\u06AF',
+  '\uFB96': '\u06B3',
+  '\uFB97': '\u06B3',
+  '\uFB98': '\u06B3',
+  '\uFB99': '\u06B3',
+  '\uFB9A': '\u06B1',
+  '\uFB9B': '\u06B1',
+  '\uFB9C': '\u06B1',
+  '\uFB9D': '\u06B1',
+  '\uFB9E': '\u06BA',
+  '\uFB9F': '\u06BA',
+  '\uFBA0': '\u06BB',
+  '\uFBA1': '\u06BB',
+  '\uFBA2': '\u06BB',
+  '\uFBA3': '\u06BB',
+  '\uFBA4': '\u06C0',
+  '\uFBA5': '\u06C0',
+  '\uFBA6': '\u06C1',
+  '\uFBA7': '\u06C1',
+  '\uFBA8': '\u06C1',
+  '\uFBA9': '\u06C1',
+  '\uFBAA': '\u06BE',
+  '\uFBAB': '\u06BE',
+  '\uFBAC': '\u06BE',
+  '\uFBAD': '\u06BE',
+  '\uFBAE': '\u06D2',
+  '\uFBAF': '\u06D2',
+  '\uFBB0': '\u06D3',
+  '\uFBB1': '\u06D3',
+  '\uFBD3': '\u06AD',
+  '\uFBD4': '\u06AD',
+  '\uFBD5': '\u06AD',
+  '\uFBD6': '\u06AD',
+  '\uFBD7': '\u06C7',
+  '\uFBD8': '\u06C7',
+  '\uFBD9': '\u06C6',
+  '\uFBDA': '\u06C6',
+  '\uFBDB': '\u06C8',
+  '\uFBDC': '\u06C8',
+  '\uFBDD': '\u0677',
+  '\uFBDE': '\u06CB',
+  '\uFBDF': '\u06CB',
+  '\uFBE0': '\u06C5',
+  '\uFBE1': '\u06C5',
+  '\uFBE2': '\u06C9',
+  '\uFBE3': '\u06C9',
+  '\uFBE4': '\u06D0',
+  '\uFBE5': '\u06D0',
+  '\uFBE6': '\u06D0',
+  '\uFBE7': '\u06D0',
+  '\uFBE8': '\u0649',
+  '\uFBE9': '\u0649',
+  '\uFBEA': '\u0626\u0627',
+  '\uFBEB': '\u0626\u0627',
+  '\uFBEC': '\u0626\u06D5',
+  '\uFBED': '\u0626\u06D5',
+  '\uFBEE': '\u0626\u0648',
+  '\uFBEF': '\u0626\u0648',
+  '\uFBF0': '\u0626\u06C7',
+  '\uFBF1': '\u0626\u06C7',
+  '\uFBF2': '\u0626\u06C6',
+  '\uFBF3': '\u0626\u06C6',
+  '\uFBF4': '\u0626\u06C8',
+  '\uFBF5': '\u0626\u06C8',
+  '\uFBF6': '\u0626\u06D0',
+  '\uFBF7': '\u0626\u06D0',
+  '\uFBF8': '\u0626\u06D0',
+  '\uFBF9': '\u0626\u0649',
+  '\uFBFA': '\u0626\u0649',
+  '\uFBFB': '\u0626\u0649',
+  '\uFBFC': '\u06CC',
+  '\uFBFD': '\u06CC',
+  '\uFBFE': '\u06CC',
+  '\uFBFF': '\u06CC',
+  '\uFC00': '\u0626\u062C',
+  '\uFC01': '\u0626\u062D',
+  '\uFC02': '\u0626\u0645',
+  '\uFC03': '\u0626\u0649',
+  '\uFC04': '\u0626\u064A',
+  '\uFC05': '\u0628\u062C',
+  '\uFC06': '\u0628\u062D',
+  '\uFC07': '\u0628\u062E',
+  '\uFC08': '\u0628\u0645',
+  '\uFC09': '\u0628\u0649',
+  '\uFC0A': '\u0628\u064A',
+  '\uFC0B': '\u062A\u062C',
+  '\uFC0C': '\u062A\u062D',
+  '\uFC0D': '\u062A\u062E',
+  '\uFC0E': '\u062A\u0645',
+  '\uFC0F': '\u062A\u0649',
+  '\uFC10': '\u062A\u064A',
+  '\uFC11': '\u062B\u062C',
+  '\uFC12': '\u062B\u0645',
+  '\uFC13': '\u062B\u0649',
+  '\uFC14': '\u062B\u064A',
+  '\uFC15': '\u062C\u062D',
+  '\uFC16': '\u062C\u0645',
+  '\uFC17': '\u062D\u062C',
+  '\uFC18': '\u062D\u0645',
+  '\uFC19': '\u062E\u062C',
+  '\uFC1A': '\u062E\u062D',
+  '\uFC1B': '\u062E\u0645',
+  '\uFC1C': '\u0633\u062C',
+  '\uFC1D': '\u0633\u062D',
+  '\uFC1E': '\u0633\u062E',
+  '\uFC1F': '\u0633\u0645',
+  '\uFC20': '\u0635\u062D',
+  '\uFC21': '\u0635\u0645',
+  '\uFC22': '\u0636\u062C',
+  '\uFC23': '\u0636\u062D',
+  '\uFC24': '\u0636\u062E',
+  '\uFC25': '\u0636\u0645',
+  '\uFC26': '\u0637\u062D',
+  '\uFC27': '\u0637\u0645',
+  '\uFC28': '\u0638\u0645',
+  '\uFC29': '\u0639\u062C',
+  '\uFC2A': '\u0639\u0645',
+  '\uFC2B': '\u063A\u062C',
+  '\uFC2C': '\u063A\u0645',
+  '\uFC2D': '\u0641\u062C',
+  '\uFC2E': '\u0641\u062D',
+  '\uFC2F': '\u0641\u062E',
+  '\uFC30': '\u0641\u0645',
+  '\uFC31': '\u0641\u0649',
+  '\uFC32': '\u0641\u064A',
+  '\uFC33': '\u0642\u062D',
+  '\uFC34': '\u0642\u0645',
+  '\uFC35': '\u0642\u0649',
+  '\uFC36': '\u0642\u064A',
+  '\uFC37': '\u0643\u0627',
+  '\uFC38': '\u0643\u062C',
+  '\uFC39': '\u0643\u062D',
+  '\uFC3A': '\u0643\u062E',
+  '\uFC3B': '\u0643\u0644',
+  '\uFC3C': '\u0643\u0645',
+  '\uFC3D': '\u0643\u0649',
+  '\uFC3E': '\u0643\u064A',
+  '\uFC3F': '\u0644\u062C',
+  '\uFC40': '\u0644\u062D',
+  '\uFC41': '\u0644\u062E',
+  '\uFC42': '\u0644\u0645',
+  '\uFC43': '\u0644\u0649',
+  '\uFC44': '\u0644\u064A',
+  '\uFC45': '\u0645\u062C',
+  '\uFC46': '\u0645\u062D',
+  '\uFC47': '\u0645\u062E',
+  '\uFC48': '\u0645\u0645',
+  '\uFC49': '\u0645\u0649',
+  '\uFC4A': '\u0645\u064A',
+  '\uFC4B': '\u0646\u062C',
+  '\uFC4C': '\u0646\u062D',
+  '\uFC4D': '\u0646\u062E',
+  '\uFC4E': '\u0646\u0645',
+  '\uFC4F': '\u0646\u0649',
+  '\uFC50': '\u0646\u064A',
+  '\uFC51': '\u0647\u062C',
+  '\uFC52': '\u0647\u0645',
+  '\uFC53': '\u0647\u0649',
+  '\uFC54': '\u0647\u064A',
+  '\uFC55': '\u064A\u062C',
+  '\uFC56': '\u064A\u062D',
+  '\uFC57': '\u064A\u062E',
+  '\uFC58': '\u064A\u0645',
+  '\uFC59': '\u064A\u0649',
+  '\uFC5A': '\u064A\u064A',
+  '\uFC5B': '\u0630\u0670',
+  '\uFC5C': '\u0631\u0670',
+  '\uFC5D': '\u0649\u0670',
+  '\uFC5E': '\u0020\u064C\u0651',
+  '\uFC5F': '\u0020\u064D\u0651',
+  '\uFC60': '\u0020\u064E\u0651',
+  '\uFC61': '\u0020\u064F\u0651',
+  '\uFC62': '\u0020\u0650\u0651',
+  '\uFC63': '\u0020\u0651\u0670',
+  '\uFC64': '\u0626\u0631',
+  '\uFC65': '\u0626\u0632',
+  '\uFC66': '\u0626\u0645',
+  '\uFC67': '\u0626\u0646',
+  '\uFC68': '\u0626\u0649',
+  '\uFC69': '\u0626\u064A',
+  '\uFC6A': '\u0628\u0631',
+  '\uFC6B': '\u0628\u0632',
+  '\uFC6C': '\u0628\u0645',
+  '\uFC6D': '\u0628\u0646',
+  '\uFC6E': '\u0628\u0649',
+  '\uFC6F': '\u0628\u064A',
+  '\uFC70': '\u062A\u0631',
+  '\uFC71': '\u062A\u0632',
+  '\uFC72': '\u062A\u0645',
+  '\uFC73': '\u062A\u0646',
+  '\uFC74': '\u062A\u0649',
+  '\uFC75': '\u062A\u064A',
+  '\uFC76': '\u062B\u0631',
+  '\uFC77': '\u062B\u0632',
+  '\uFC78': '\u062B\u0645',
+  '\uFC79': '\u062B\u0646',
+  '\uFC7A': '\u062B\u0649',
+  '\uFC7B': '\u062B\u064A',
+  '\uFC7C': '\u0641\u0649',
+  '\uFC7D': '\u0641\u064A',
+  '\uFC7E': '\u0642\u0649',
+  '\uFC7F': '\u0642\u064A',
+  '\uFC80': '\u0643\u0627',
+  '\uFC81': '\u0643\u0644',
+  '\uFC82': '\u0643\u0645',
+  '\uFC83': '\u0643\u0649',
+  '\uFC84': '\u0643\u064A',
+  '\uFC85': '\u0644\u0645',
+  '\uFC86': '\u0644\u0649',
+  '\uFC87': '\u0644\u064A',
+  '\uFC88': '\u0645\u0627',
+  '\uFC89': '\u0645\u0645',
+  '\uFC8A': '\u0646\u0631',
+  '\uFC8B': '\u0646\u0632',
+  '\uFC8C': '\u0646\u0645',
+  '\uFC8D': '\u0646\u0646',
+  '\uFC8E': '\u0646\u0649',
+  '\uFC8F': '\u0646\u064A',
+  '\uFC90': '\u0649\u0670',
+  '\uFC91': '\u064A\u0631',
+  '\uFC92': '\u064A\u0632',
+  '\uFC93': '\u064A\u0645',
+  '\uFC94': '\u064A\u0646',
+  '\uFC95': '\u064A\u0649',
+  '\uFC96': '\u064A\u064A',
+  '\uFC97': '\u0626\u062C',
+  '\uFC98': '\u0626\u062D',
+  '\uFC99': '\u0626\u062E',
+  '\uFC9A': '\u0626\u0645',
+  '\uFC9B': '\u0626\u0647',
+  '\uFC9C': '\u0628\u062C',
+  '\uFC9D': '\u0628\u062D',
+  '\uFC9E': '\u0628\u062E',
+  '\uFC9F': '\u0628\u0645',
+  '\uFCA0': '\u0628\u0647',
+  '\uFCA1': '\u062A\u062C',
+  '\uFCA2': '\u062A\u062D',
+  '\uFCA3': '\u062A\u062E',
+  '\uFCA4': '\u062A\u0645',
+  '\uFCA5': '\u062A\u0647',
+  '\uFCA6': '\u062B\u0645',
+  '\uFCA7': '\u062C\u062D',
+  '\uFCA8': '\u062C\u0645',
+  '\uFCA9': '\u062D\u062C',
+  '\uFCAA': '\u062D\u0645',
+  '\uFCAB': '\u062E\u062C',
+  '\uFCAC': '\u062E\u0645',
+  '\uFCAD': '\u0633\u062C',
+  '\uFCAE': '\u0633\u062D',
+  '\uFCAF': '\u0633\u062E',
+  '\uFCB0': '\u0633\u0645',
+  '\uFCB1': '\u0635\u062D',
+  '\uFCB2': '\u0635\u062E',
+  '\uFCB3': '\u0635\u0645',
+  '\uFCB4': '\u0636\u062C',
+  '\uFCB5': '\u0636\u062D',
+  '\uFCB6': '\u0636\u062E',
+  '\uFCB7': '\u0636\u0645',
+  '\uFCB8': '\u0637\u062D',
+  '\uFCB9': '\u0638\u0645',
+  '\uFCBA': '\u0639\u062C',
+  '\uFCBB': '\u0639\u0645',
+  '\uFCBC': '\u063A\u062C',
+  '\uFCBD': '\u063A\u0645',
+  '\uFCBE': '\u0641\u062C',
+  '\uFCBF': '\u0641\u062D',
+  '\uFCC0': '\u0641\u062E',
+  '\uFCC1': '\u0641\u0645',
+  '\uFCC2': '\u0642\u062D',
+  '\uFCC3': '\u0642\u0645',
+  '\uFCC4': '\u0643\u062C',
+  '\uFCC5': '\u0643\u062D',
+  '\uFCC6': '\u0643\u062E',
+  '\uFCC7': '\u0643\u0644',
+  '\uFCC8': '\u0643\u0645',
+  '\uFCC9': '\u0644\u062C',
+  '\uFCCA': '\u0644\u062D',
+  '\uFCCB': '\u0644\u062E',
+  '\uFCCC': '\u0644\u0645',
+  '\uFCCD': '\u0644\u0647',
+  '\uFCCE': '\u0645\u062C',
+  '\uFCCF': '\u0645\u062D',
+  '\uFCD0': '\u0645\u062E',
+  '\uFCD1': '\u0645\u0645',
+  '\uFCD2': '\u0646\u062C',
+  '\uFCD3': '\u0646\u062D',
+  '\uFCD4': '\u0646\u062E',
+  '\uFCD5': '\u0646\u0645',
+  '\uFCD6': '\u0646\u0647',
+  '\uFCD7': '\u0647\u062C',
+  '\uFCD8': '\u0647\u0645',
+  '\uFCD9': '\u0647\u0670',
+  '\uFCDA': '\u064A\u062C',
+  '\uFCDB': '\u064A\u062D',
+  '\uFCDC': '\u064A\u062E',
+  '\uFCDD': '\u064A\u0645',
+  '\uFCDE': '\u064A\u0647',
+  '\uFCDF': '\u0626\u0645',
+  '\uFCE0': '\u0626\u0647',
+  '\uFCE1': '\u0628\u0645',
+  '\uFCE2': '\u0628\u0647',
+  '\uFCE3': '\u062A\u0645',
+  '\uFCE4': '\u062A\u0647',
+  '\uFCE5': '\u062B\u0645',
+  '\uFCE6': '\u062B\u0647',
+  '\uFCE7': '\u0633\u0645',
+  '\uFCE8': '\u0633\u0647',
+  '\uFCE9': '\u0634\u0645',
+  '\uFCEA': '\u0634\u0647',
+  '\uFCEB': '\u0643\u0644',
+  '\uFCEC': '\u0643\u0645',
+  '\uFCED': '\u0644\u0645',
+  '\uFCEE': '\u0646\u0645',
+  '\uFCEF': '\u0646\u0647',
+  '\uFCF0': '\u064A\u0645',
+  '\uFCF1': '\u064A\u0647',
+  '\uFCF2': '\u0640\u064E\u0651',
+  '\uFCF3': '\u0640\u064F\u0651',
+  '\uFCF4': '\u0640\u0650\u0651',
+  '\uFCF5': '\u0637\u0649',
+  '\uFCF6': '\u0637\u064A',
+  '\uFCF7': '\u0639\u0649',
+  '\uFCF8': '\u0639\u064A',
+  '\uFCF9': '\u063A\u0649',
+  '\uFCFA': '\u063A\u064A',
+  '\uFCFB': '\u0633\u0649',
+  '\uFCFC': '\u0633\u064A',
+  '\uFCFD': '\u0634\u0649',
+  '\uFCFE': '\u0634\u064A',
+  '\uFCFF': '\u062D\u0649',
+  '\uFD00': '\u062D\u064A',
+  '\uFD01': '\u062C\u0649',
+  '\uFD02': '\u062C\u064A',
+  '\uFD03': '\u062E\u0649',
+  '\uFD04': '\u062E\u064A',
+  '\uFD05': '\u0635\u0649',
+  '\uFD06': '\u0635\u064A',
+  '\uFD07': '\u0636\u0649',
+  '\uFD08': '\u0636\u064A',
+  '\uFD09': '\u0634\u062C',
+  '\uFD0A': '\u0634\u062D',
+  '\uFD0B': '\u0634\u062E',
+  '\uFD0C': '\u0634\u0645',
+  '\uFD0D': '\u0634\u0631',
+  '\uFD0E': '\u0633\u0631',
+  '\uFD0F': '\u0635\u0631',
+  '\uFD10': '\u0636\u0631',
+  '\uFD11': '\u0637\u0649',
+  '\uFD12': '\u0637\u064A',
+  '\uFD13': '\u0639\u0649',
+  '\uFD14': '\u0639\u064A',
+  '\uFD15': '\u063A\u0649',
+  '\uFD16': '\u063A\u064A',
+  '\uFD17': '\u0633\u0649',
+  '\uFD18': '\u0633\u064A',
+  '\uFD19': '\u0634\u0649',
+  '\uFD1A': '\u0634\u064A',
+  '\uFD1B': '\u062D\u0649',
+  '\uFD1C': '\u062D\u064A',
+  '\uFD1D': '\u062C\u0649',
+  '\uFD1E': '\u062C\u064A',
+  '\uFD1F': '\u062E\u0649',
+  '\uFD20': '\u062E\u064A',
+  '\uFD21': '\u0635\u0649',
+  '\uFD22': '\u0635\u064A',
+  '\uFD23': '\u0636\u0649',
+  '\uFD24': '\u0636\u064A',
+  '\uFD25': '\u0634\u062C',
+  '\uFD26': '\u0634\u062D',
+  '\uFD27': '\u0634\u062E',
+  '\uFD28': '\u0634\u0645',
+  '\uFD29': '\u0634\u0631',
+  '\uFD2A': '\u0633\u0631',
+  '\uFD2B': '\u0635\u0631',
+  '\uFD2C': '\u0636\u0631',
+  '\uFD2D': '\u0634\u062C',
+  '\uFD2E': '\u0634\u062D',
+  '\uFD2F': '\u0634\u062E',
+  '\uFD30': '\u0634\u0645',
+  '\uFD31': '\u0633\u0647',
+  '\uFD32': '\u0634\u0647',
+  '\uFD33': '\u0637\u0645',
+  '\uFD34': '\u0633\u062C',
+  '\uFD35': '\u0633\u062D',
+  '\uFD36': '\u0633\u062E',
+  '\uFD37': '\u0634\u062C',
+  '\uFD38': '\u0634\u062D',
+  '\uFD39': '\u0634\u062E',
+  '\uFD3A': '\u0637\u0645',
+  '\uFD3B': '\u0638\u0645',
+  '\uFD3C': '\u0627\u064B',
+  '\uFD3D': '\u0627\u064B',
+  '\uFD50': '\u062A\u062C\u0645',
+  '\uFD51': '\u062A\u062D\u062C',
+  '\uFD52': '\u062A\u062D\u062C',
+  '\uFD53': '\u062A\u062D\u0645',
+  '\uFD54': '\u062A\u062E\u0645',
+  '\uFD55': '\u062A\u0645\u062C',
+  '\uFD56': '\u062A\u0645\u062D',
+  '\uFD57': '\u062A\u0645\u062E',
+  '\uFD58': '\u062C\u0645\u062D',
+  '\uFD59': '\u062C\u0645\u062D',
+  '\uFD5A': '\u062D\u0645\u064A',
+  '\uFD5B': '\u062D\u0645\u0649',
+  '\uFD5C': '\u0633\u062D\u062C',
+  '\uFD5D': '\u0633\u062C\u062D',
+  '\uFD5E': '\u0633\u062C\u0649',
+  '\uFD5F': '\u0633\u0645\u062D',
+  '\uFD60': '\u0633\u0645\u062D',
+  '\uFD61': '\u0633\u0645\u062C',
+  '\uFD62': '\u0633\u0645\u0645',
+  '\uFD63': '\u0633\u0645\u0645',
+  '\uFD64': '\u0635\u062D\u062D',
+  '\uFD65': '\u0635\u062D\u062D',
+  '\uFD66': '\u0635\u0645\u0645',
+  '\uFD67': '\u0634\u062D\u0645',
+  '\uFD68': '\u0634\u062D\u0645',
+  '\uFD69': '\u0634\u062C\u064A',
+  '\uFD6A': '\u0634\u0645\u062E',
+  '\uFD6B': '\u0634\u0645\u062E',
+  '\uFD6C': '\u0634\u0645\u0645',
+  '\uFD6D': '\u0634\u0645\u0645',
+  '\uFD6E': '\u0636\u062D\u0649',
+  '\uFD6F': '\u0636\u062E\u0645',
+  '\uFD70': '\u0636\u062E\u0645',
+  '\uFD71': '\u0637\u0645\u062D',
+  '\uFD72': '\u0637\u0645\u062D',
+  '\uFD73': '\u0637\u0645\u0645',
+  '\uFD74': '\u0637\u0645\u064A',
+  '\uFD75': '\u0639\u062C\u0645',
+  '\uFD76': '\u0639\u0645\u0645',
+  '\uFD77': '\u0639\u0645\u0645',
+  '\uFD78': '\u0639\u0645\u0649',
+  '\uFD79': '\u063A\u0645\u0645',
+  '\uFD7A': '\u063A\u0645\u064A',
+  '\uFD7B': '\u063A\u0645\u0649',
+  '\uFD7C': '\u0641\u062E\u0645',
+  '\uFD7D': '\u0641\u062E\u0645',
+  '\uFD7E': '\u0642\u0645\u062D',
+  '\uFD7F': '\u0642\u0645\u0645',
+  '\uFD80': '\u0644\u062D\u0645',
+  '\uFD81': '\u0644\u062D\u064A',
+  '\uFD82': '\u0644\u062D\u0649',
+  '\uFD83': '\u0644\u062C\u062C',
+  '\uFD84': '\u0644\u062C\u062C',
+  '\uFD85': '\u0644\u062E\u0645',
+  '\uFD86': '\u0644\u062E\u0645',
+  '\uFD87': '\u0644\u0645\u062D',
+  '\uFD88': '\u0644\u0645\u062D',
+  '\uFD89': '\u0645\u062D\u062C',
+  '\uFD8A': '\u0645\u062D\u0645',
+  '\uFD8B': '\u0645\u062D\u064A',
+  '\uFD8C': '\u0645\u062C\u062D',
+  '\uFD8D': '\u0645\u062C\u0645',
+  '\uFD8E': '\u0645\u062E\u062C',
+  '\uFD8F': '\u0645\u062E\u0645',
+  '\uFD92': '\u0645\u062C\u062E',
+  '\uFD93': '\u0647\u0645\u062C',
+  '\uFD94': '\u0647\u0645\u0645',
+  '\uFD95': '\u0646\u062D\u0645',
+  '\uFD96': '\u0646\u062D\u0649',
+  '\uFD97': '\u0646\u062C\u0645',
+  '\uFD98': '\u0646\u062C\u0645',
+  '\uFD99': '\u0646\u062C\u0649',
+  '\uFD9A': '\u0646\u0645\u064A',
+  '\uFD9B': '\u0646\u0645\u0649',
+  '\uFD9C': '\u064A\u0645\u0645',
+  '\uFD9D': '\u064A\u0645\u0645',
+  '\uFD9E': '\u0628\u062E\u064A',
+  '\uFD9F': '\u062A\u062C\u064A',
+  '\uFDA0': '\u062A\u062C\u0649',
+  '\uFDA1': '\u062A\u062E\u064A',
+  '\uFDA2': '\u062A\u062E\u0649',
+  '\uFDA3': '\u062A\u0645\u064A',
+  '\uFDA4': '\u062A\u0645\u0649',
+  '\uFDA5': '\u062C\u0645\u064A',
+  '\uFDA6': '\u062C\u062D\u0649',
+  '\uFDA7': '\u062C\u0645\u0649',
+  '\uFDA8': '\u0633\u062E\u0649',
+  '\uFDA9': '\u0635\u062D\u064A',
+  '\uFDAA': '\u0634\u062D\u064A',
+  '\uFDAB': '\u0636\u062D\u064A',
+  '\uFDAC': '\u0644\u062C\u064A',
+  '\uFDAD': '\u0644\u0645\u064A',
+  '\uFDAE': '\u064A\u062D\u064A',
+  '\uFDAF': '\u064A\u062C\u064A',
+  '\uFDB0': '\u064A\u0645\u064A',
+  '\uFDB1': '\u0645\u0645\u064A',
+  '\uFDB2': '\u0642\u0645\u064A',
+  '\uFDB3': '\u0646\u062D\u064A',
+  '\uFDB4': '\u0642\u0645\u062D',
+  '\uFDB5': '\u0644\u062D\u0645',
+  '\uFDB6': '\u0639\u0645\u064A',
+  '\uFDB7': '\u0643\u0645\u064A',
+  '\uFDB8': '\u0646\u062C\u062D',
+  '\uFDB9': '\u0645\u062E\u064A',
+  '\uFDBA': '\u0644\u062C\u0645',
+  '\uFDBB': '\u0643\u0645\u0645',
+  '\uFDBC': '\u0644\u062C\u0645',
+  '\uFDBD': '\u0646\u062C\u062D',
+  '\uFDBE': '\u062C\u062D\u064A',
+  '\uFDBF': '\u062D\u062C\u064A',
+  '\uFDC0': '\u0645\u062C\u064A',
+  '\uFDC1': '\u0641\u0645\u064A',
+  '\uFDC2': '\u0628\u062D\u064A',
+  '\uFDC3': '\u0643\u0645\u0645',
+  '\uFDC4': '\u0639\u062C\u0645',
+  '\uFDC5': '\u0635\u0645\u0645',
+  '\uFDC6': '\u0633\u062E\u064A',
+  '\uFDC7': '\u0646\u062C\u064A',
   '\uFE49': '\u203E',
   '\uFE4A': '\u203E',
   '\uFE4B': '\u203E',
   '\uFE4C': '\u203E',
   '\uFE4D': '\u005F',
   '\uFE4E': '\u005F',
-  '\uFE4F': '\u005F'
+  '\uFE4F': '\u005F',
+  '\uFE80': '\u0621',
+  '\uFE81': '\u0622',
+  '\uFE82': '\u0622',
+  '\uFE83': '\u0623',
+  '\uFE84': '\u0623',
+  '\uFE85': '\u0624',
+  '\uFE86': '\u0624',
+  '\uFE87': '\u0625',
+  '\uFE88': '\u0625',
+  '\uFE89': '\u0626',
+  '\uFE8A': '\u0626',
+  '\uFE8B': '\u0626',
+  '\uFE8C': '\u0626',
+  '\uFE8D': '\u0627',
+  '\uFE8E': '\u0627',
+  '\uFE8F': '\u0628',
+  '\uFE90': '\u0628',
+  '\uFE91': '\u0628',
+  '\uFE92': '\u0628',
+  '\uFE93': '\u0629',
+  '\uFE94': '\u0629',
+  '\uFE95': '\u062A',
+  '\uFE96': '\u062A',
+  '\uFE97': '\u062A',
+  '\uFE98': '\u062A',
+  '\uFE99': '\u062B',
+  '\uFE9A': '\u062B',
+  '\uFE9B': '\u062B',
+  '\uFE9C': '\u062B',
+  '\uFE9D': '\u062C',
+  '\uFE9E': '\u062C',
+  '\uFE9F': '\u062C',
+  '\uFEA0': '\u062C',
+  '\uFEA1': '\u062D',
+  '\uFEA2': '\u062D',
+  '\uFEA3': '\u062D',
+  '\uFEA4': '\u062D',
+  '\uFEA5': '\u062E',
+  '\uFEA6': '\u062E',
+  '\uFEA7': '\u062E',
+  '\uFEA8': '\u062E',
+  '\uFEA9': '\u062F',
+  '\uFEAA': '\u062F',
+  '\uFEAB': '\u0630',
+  '\uFEAC': '\u0630',
+  '\uFEAD': '\u0631',
+  '\uFEAE': '\u0631',
+  '\uFEAF': '\u0632',
+  '\uFEB0': '\u0632',
+  '\uFEB1': '\u0633',
+  '\uFEB2': '\u0633',
+  '\uFEB3': '\u0633',
+  '\uFEB4': '\u0633',
+  '\uFEB5': '\u0634',
+  '\uFEB6': '\u0634',
+  '\uFEB7': '\u0634',
+  '\uFEB8': '\u0634',
+  '\uFEB9': '\u0635',
+  '\uFEBA': '\u0635',
+  '\uFEBB': '\u0635',
+  '\uFEBC': '\u0635',
+  '\uFEBD': '\u0636',
+  '\uFEBE': '\u0636',
+  '\uFEBF': '\u0636',
+  '\uFEC0': '\u0636',
+  '\uFEC1': '\u0637',
+  '\uFEC2': '\u0637',
+  '\uFEC3': '\u0637',
+  '\uFEC4': '\u0637',
+  '\uFEC5': '\u0638',
+  '\uFEC6': '\u0638',
+  '\uFEC7': '\u0638',
+  '\uFEC8': '\u0638',
+  '\uFEC9': '\u0639',
+  '\uFECA': '\u0639',
+  '\uFECB': '\u0639',
+  '\uFECC': '\u0639',
+  '\uFECD': '\u063A',
+  '\uFECE': '\u063A',
+  '\uFECF': '\u063A',
+  '\uFED0': '\u063A',
+  '\uFED1': '\u0641',
+  '\uFED2': '\u0641',
+  '\uFED3': '\u0641',
+  '\uFED4': '\u0641',
+  '\uFED5': '\u0642',
+  '\uFED6': '\u0642',
+  '\uFED7': '\u0642',
+  '\uFED8': '\u0642',
+  '\uFED9': '\u0643',
+  '\uFEDA': '\u0643',
+  '\uFEDB': '\u0643',
+  '\uFEDC': '\u0643',
+  '\uFEDD': '\u0644',
+  '\uFEDE': '\u0644',
+  '\uFEDF': '\u0644',
+  '\uFEE0': '\u0644',
+  '\uFEE1': '\u0645',
+  '\uFEE2': '\u0645',
+  '\uFEE3': '\u0645',
+  '\uFEE4': '\u0645',
+  '\uFEE5': '\u0646',
+  '\uFEE6': '\u0646',
+  '\uFEE7': '\u0646',
+  '\uFEE8': '\u0646',
+  '\uFEE9': '\u0647',
+  '\uFEEA': '\u0647',
+  '\uFEEB': '\u0647',
+  '\uFEEC': '\u0647',
+  '\uFEED': '\u0648',
+  '\uFEEE': '\u0648',
+  '\uFEEF': '\u0649',
+  '\uFEF0': '\u0649',
+  '\uFEF1': '\u064A',
+  '\uFEF2': '\u064A',
+  '\uFEF3': '\u064A',
+  '\uFEF4': '\u064A',
+  '\uFEF5': '\u0644\u0622',
+  '\uFEF6': '\u0644\u0622',
+  '\uFEF7': '\u0644\u0623',
+  '\uFEF8': '\u0644\u0623',
+  '\uFEF9': '\u0644\u0625',
+  '\uFEFA': '\u0644\u0625',
+  '\uFEFB': '\u0644\u0627',
+  '\uFEFC': '\u0644\u0627'
 };
 
-function fontCharsToUnicode(charCodes, fontProperties) {
-  var toUnicode = fontProperties.toUnicode;
-  var composite = fontProperties.composite;
-  var encoding, differences, cidToUnicode;
-  var result = '';
-  if (composite) {
-    cidToUnicode = fontProperties.cidToUnicode;
-    for (var i = 0, ii = charCodes.length; i < ii; i += 2) {
-      var charCode = (charCodes.charCodeAt(i) << 8) |
-        charCodes.charCodeAt(i + 1);
-      if (toUnicode && charCode in toUnicode) {
-        var unicode = toUnicode[charCode];
-        result += typeof unicode !== 'number' ? unicode :
-          String.fromCharCode(unicode);
-        continue;
-      }
-      result += String.fromCharCode(!cidToUnicode ? charCode :
-        cidToUnicode[charCode] || charCode);
-    }
-  } else {
-    differences = fontProperties.differences;
-    encoding = fontProperties.baseEncoding;
-    for (var i = 0, ii = charCodes.length; i < ii; i++) {
-      var charCode = charCodes.charCodeAt(i);
-      var unicode;
-      if (toUnicode && charCode in toUnicode) {
-        var unicode = toUnicode[charCode];
-        result += typeof unicode !== 'number' ? unicode :
-          String.fromCharCode(unicode);
-        continue;
-      }
+function reverseIfRtl(chars) {
+  var charsLength = chars.length;
+  //reverse an arabic ligature
+  if (charsLength <= 1 || !isRTLRangeFor(chars.charCodeAt(0)))
+    return chars;
 
-      var glyphName = charCode in differences ? differences[charCode] :
-        encoding[charCode];
-      if (glyphName in GlyphsUnicode) {
-        result += String.fromCharCode(GlyphsUnicode[glyphName]);
-        continue;
-      }
-      result += String.fromCharCode(charCode);
-    }
-  }
-  // normalizing the unicode characters
-  for (var i = 0, ii = result.length; i < ii; i++) {
-    if (!(result[i] in NormalizedUnicodes))
+  var s = '';
+  for (var ii = charsLength - 1; ii >= 0; ii--)
+    s += chars[ii];
+  return s;
+}
+
+function fontCharsToUnicode(charCodes, font) {
+  var glyphs = font.charsToGlyphs(charCodes);
+  var result = '';
+  for (var i = 0, ii = glyphs.length; i < ii; i++) {
+    var glyph = glyphs[i];
+    if (!glyph)
       continue;
-    result = result.substring(0, i) + NormalizedUnicodes[result[i]] +
-      result.substring(i + 1);
-    ii = result.length;
+
+    var glyphUnicode = glyph.unicode;
+    if (glyphUnicode in NormalizedUnicodes)
+      glyphUnicode = NormalizedUnicodes[glyphUnicode];
+    result += reverseIfRtl(glyphUnicode);
   }
   return result;
+}
+
+function adjustWidths(properties) {
+  if (properties.fontMatrix[0] === FONT_IDENTITY_MATRIX[0]) {
+    return;
+  }
+  // adjusting width to fontMatrix scale
+  var scale = 0.001 / properties.fontMatrix[0];
+  var glyphsWidths = properties.widths;
+  for (var glyph in glyphsWidths) {
+    glyphsWidths[glyph] *= scale;
+  }
+  properties.defaultWidth *= scale;
 }
 
 /**
@@ -15612,9 +17616,19 @@ function fontCharsToUnicode(charCodes, fontProperties) {
  */
 var Font = (function FontClosure() {
   function Font(name, file, properties) {
+    if (arguments.length === 1) {
+      // importing translated data
+      var data = arguments[0];
+      for (var i in data) {
+        this[i] = data[i];
+      }
+      return;
+    }
+
     this.name = name;
+    this.loadedName = properties.loadedName;
     this.coded = properties.coded;
-    this.charProcOperatorList = properties.charProcOperatorList;
+    this.loadCharProcs = properties.coded;
     this.sizes = [];
 
     var names = name.split('+');
@@ -15622,17 +17636,13 @@ var Font = (function FontClosure() {
     names = names.split(/[-,_]/g)[0];
     this.isSerifFont = !!(properties.flags & FontFlags.Serif);
     this.isSymbolicFont = !!(properties.flags & FontFlags.Symbolic);
+    this.isMonospace = !!(properties.flags & FontFlags.FixedPitch);
 
     var type = properties.type;
     this.type = type;
 
-    // If the font is to be ignored, register it like an already loaded font
-    // to avoid the cost of waiting for it be be loaded by the platform.
-    if (properties.ignore) {
-      this.loadedName = this.isSerifFont ? 'serif' : 'sans-serif';
-      this.loading = false;
-      return;
-    }
+    this.fallbackName = this.isMonospace ? 'monospace' :
+                        this.isSerifFont ? 'serif' : 'sans-serif';
 
     this.differences = properties.differences;
     this.widths = properties.widths;
@@ -15642,7 +17652,6 @@ var Font = (function FontClosure() {
     this.hasEncoding = properties.hasEncoding;
 
     this.fontMatrix = properties.fontMatrix;
-    this.widthMultiplier = 1.0;
     if (properties.type == 'Type3') {
       this.encoding = properties.baseEncoding;
       return;
@@ -15685,6 +17694,11 @@ var Font = (function FontClosure() {
       type = 'Type1';
     if (subtype == 'CIDFontType0C' && type != 'CIDFontType0')
       type = 'CIDFontType0';
+    // XXX: Temporarily change the type for open type so we trigger a warning.
+    // This should be removed when we add support for open type.
+    if (subtype === 'OpenType') {
+      type = 'OpenType';
+    }
 
     var data;
     switch (type) {
@@ -15694,6 +17708,8 @@ var Font = (function FontClosure() {
 
         var cff = (subtype == 'Type1C' || subtype == 'CIDFontType0C') ?
           new CFFFont(file, properties) : new Type1Font(name, file, properties);
+
+        adjustWidths(properties);
 
         // Wrap the CFF data inside an OTF font file
         data = this.convert(name, cff, properties);
@@ -15709,16 +17725,18 @@ var Font = (function FontClosure() {
         break;
 
       default:
-        warn('Font ' + properties.type + ' is not supported');
+        warn('Font ' + type + ' is not supported');
         break;
     }
 
     this.data = data;
+
+    // Transfer some properties again that could change during font conversion
     this.fontMatrix = properties.fontMatrix;
-    this.widthMultiplier = !properties.fontMatrix ? 1.0 :
-      1.0 / properties.fontMatrix[0];
+    this.widths = properties.widths;
+    this.defaultWidth = properties.defaultWidth;
     this.encoding = properties.baseEncoding;
-    this.loadedName = properties.loadedName;
+
     this.loading = true;
   };
 
@@ -15876,7 +17894,8 @@ var Font = (function FontClosure() {
                '\x00\x01' + // encodingID
                string32(4 + numTables * 8); // start of the table record
 
-    var segCount = ranges.length + 1;
+    var trailingRangesCount = ranges[ranges.length - 1][1] < 0xFFFF ? 1 : 0;
+    var segCount = ranges.length + trailingRangesCount;
     var segCount2 = segCount * 2;
     var searchRange = getMaxPower2(segCount) * 2;
     var searchEntry = Math.log(segCount) / Math.log(2);
@@ -15891,7 +17910,7 @@ var Font = (function FontClosure() {
     var bias = 0;
 
     if (deltas) {
-      for (var i = 0; i < segCount - 1; i++) {
+      for (var i = 0, ii = ranges.length; i < ii; i++) {
         var range = ranges[i];
         var start = range[0];
         var end = range[1];
@@ -15908,7 +17927,7 @@ var Font = (function FontClosure() {
           glyphsIds += string16(deltas[codes[j]]);
       }
     } else {
-      for (var i = 0; i < segCount - 1; i++) {
+      for (var i = 0, ii = ranges.length; i < ii; i++) {
         var range = ranges[i];
         var start = range[0];
         var end = range[1];
@@ -15921,10 +17940,12 @@ var Font = (function FontClosure() {
       }
     }
 
-    endCount += '\xFF\xFF';
-    startCount += '\xFF\xFF';
-    idDeltas += '\x00\x01';
-    idRangeOffsets += '\x00\x00';
+    if (trailingRangesCount > 0) {
+      endCount += '\xFF\xFF';
+      startCount += '\xFF\xFF';
+      idDeltas += '\x00\x01';
+      idRangeOffsets += '\x00\x00';
+    }
 
     var format314 = '\x00\x00' + // language
                     string16(segCount2) +
@@ -15939,6 +17960,24 @@ var Font = (function FontClosure() {
                          string16(format314.length + 4) + // length
                          format314);
   };
+
+  function validateOS2Table(os2) {
+    var stream = new Stream(os2.data);
+    var version = int16(stream.getBytes(2));
+    // TODO verify all OS/2 tables fields, but currently we validate only those
+    // that give us issues
+    stream.getBytes(60); // skipping type, misc sizes, panose, unicode ranges
+    var selection = int16(stream.getBytes(2));
+    if (version < 4 && (selection & 0x0300)) {
+      return false;
+    }
+    var firstChar = int16(stream.getBytes(2));
+    var lastChar = int16(stream.getBytes(2));
+    if (firstChar > lastChar) {
+      return false;
+    }
+    return true;
+  }
 
   function createOS2Table(properties, charstrings, override) {
     override = override || {
@@ -15984,23 +18023,24 @@ var Font = (function FontClosure() {
       lastCharIndex = 255;
     }
 
-    var unitsPerEm = override.unitsPerEm || kPDFGlyphSpaceUnits;
-    var typoAscent = override.ascent || properties.ascent;
-    var typoDescent = override.descent || properties.descent;
+    var bbox = properties.bbox || [0, 0, 0, 0];
+    var unitsPerEm = override.unitsPerEm ||
+      1 / (properties.fontMatrix || FONT_IDENTITY_MATRIX)[0];
+
+    // if the font units differ to the PDF glyph space units
+    // then scale up the values
+    var scale = properties.ascentScaled ? 1.0 :
+      unitsPerEm / PDF_GLYPH_SPACE_UNITS;
+
+    var typoAscent = override.ascent || Math.round(scale *
+      (properties.ascent || bbox[3]));
+    var typoDescent = override.descent || Math.round(scale *
+      (properties.descent || bbox[1]));
+    if (typoDescent > 0 && properties.descent > 0 && bbox[1] < 0) {
+      typoDescent = -typoDescent; // fixing incorrect descent
+    }
     var winAscent = override.yMax || typoAscent;
     var winDescent = -override.yMin || -typoDescent;
-
-    // if there is a units per em value but no other override
-    // then scale the calculated ascent
-    if (unitsPerEm != kPDFGlyphSpaceUnits &&
-        'undefined' == typeof(override.ascent)) {
-      // if the font units differ to the PDF glyph space units
-      // then scale up the values
-      typoAscent = Math.round(typoAscent * unitsPerEm / kPDFGlyphSpaceUnits);
-      typoDescent = Math.round(typoDescent * unitsPerEm / kPDFGlyphSpaceUnits);
-      winAscent = typoAscent;
-      winDescent = -typoDescent;
-    }
 
     return '\x00\x03' + // version
            '\x02\x24' + // xAvgCharWidth
@@ -16057,25 +18097,29 @@ var Font = (function FontClosure() {
            '\x00\x00\x00\x00';  // maxMemType1
   };
 
-  function createNameTable(name) {
+  function createNameTable(name, proto) {
+    if (!proto) {
+      proto = [[], []]; // no strings and unicode strings
+    }
+
     var strings = [
-      'Original licence',  // 0.Copyright
-      name,                // 1.Font family
-      'Unknown',           // 2.Font subfamily (font weight)
-      'uniqueID',          // 3.Unique ID
-      name,                // 4.Full font name
-      'Version 0.11',      // 5.Version
-      '',                  // 6.Postscript name
-      'Unknown',           // 7.Trademark
-      'Unknown',           // 8.Manufacturer
-      'Unknown'            // 9.Designer
+      proto[0][0] || 'Original licence',  // 0.Copyright
+      proto[0][1] || name,                // 1.Font family
+      proto[0][2] || 'Unknown',           // 2.Font subfamily (font weight)
+      proto[0][3] || 'uniqueID',          // 3.Unique ID
+      proto[0][4] || name,                // 4.Full font name
+      proto[0][5] || 'Version 0.11',      // 5.Version
+      proto[0][6] || '',                  // 6.Postscript name
+      proto[0][7] || 'Unknown',           // 7.Trademark
+      proto[0][8] || 'Unknown',           // 8.Manufacturer
+      proto[0][9] || 'Unknown'            // 9.Designer
     ];
 
     // Mac want 1-byte per character strings while Windows want
     // 2-bytes per character, so duplicate the names table
     var stringsUnicode = [];
     for (var i = 0, ii = strings.length; i < ii; i++) {
-      var str = strings[i];
+      var str = proto[1][i] || strings[i];
 
       var strUnicode = '';
       for (var j = 0, jj = str.length; j < jj; j++)
@@ -16121,6 +18165,15 @@ var Font = (function FontClosure() {
     font: null,
     mimetype: null,
     encoding: null,
+
+    exportData: function Font_exportData() {
+      var data = {};
+      for (var i in this) {
+        if (this.hasOwnProperty(i))
+          data[i] = this[i];
+      }
+      return data;
+    },
 
     checkAndRepair: function Font_checkAndRepair(name, font, properties) {
       function readTableEntry(file) {
@@ -16362,17 +18415,10 @@ var Font = (function FontClosure() {
       };
 
       function sanitizeMetrics(font, header, metrics, numGlyphs) {
-        if (!header && !metrics)
-          return;
-
-        // The vhea/vmtx tables are not required, so it happens that
-        // some fonts embed a vmtx table without a vhea table. In this
-        // situation the sanitizer assume numOfLongVerMetrics = 1. As
-        // a result it tries to read numGlyphs - 1 SHORT from the vmtx
-        // table, and if it is not possible, the font is rejected.
-        // So remove the vmtx table if there is no vhea table.
-        if (!header && metrics) {
-          metrics.data = null;
+        if (!header) {
+          if (metrics) {
+            metrics.data = null;
+          }
           return;
         }
 
@@ -16536,7 +18582,7 @@ var Font = (function FontClosure() {
         }
       }
 
-      function readGlyphNameMap(post, properties) {
+      function readPostScriptTable(post, properties, maxpNumGlyphs) {
         var start = (font.start ? font.start : 0) + post.offset;
         font.pos = start;
 
@@ -16546,15 +18592,29 @@ var Font = (function FontClosure() {
         font.getBytes(28);
 
         var glyphNames;
+        var valid = true;
         switch (version) {
           case 0x00010000:
             glyphNames = MacStandardGlyphOrdering;
             break;
           case 0x00020000:
             var numGlyphs = int16(font.getBytes(2));
+            if (numGlyphs != maxpNumGlyphs) {
+              valid = false;
+              break;
+            }
             var glyphNameIndexes = [];
-            for (var i = 0; i < numGlyphs; ++i)
-              glyphNameIndexes.push(int16(font.getBytes(2)));
+            for (var i = 0; i < numGlyphs; ++i) {
+              var index = int16(font.getBytes(2));
+              if (index >= 32768) {
+                valid = false;
+                break;
+              }
+              glyphNameIndexes.push(index);
+            }
+            if (!valid) {
+              break;
+            }
             var customNames = [];
             while (font.pos < end) {
               var stringLength = font.getByte();
@@ -16577,9 +18637,66 @@ var Font = (function FontClosure() {
             break;
           default:
             warn('Unknown/unsupported post table version ' + version);
+            valid = false;
             break;
         }
         properties.glyphNames = glyphNames;
+        return valid;
+      }
+
+      function readNameTable(nameTable) {
+        var start = (font.start ? font.start : 0) + nameTable.offset;
+        font.pos = start;
+
+        var names = [[], []];
+        var length = nameTable.length, end = start + length;
+        var format = int16(font.getBytes(2));
+        var FORMAT_0_HEADER_LENGTH = 6;
+        if (format !== 0 || length < FORMAT_0_HEADER_LENGTH) {
+          // unsupported name table format or table "too" small
+          return names;
+        }
+        var numRecords = int16(font.getBytes(2));
+        var stringsStart = int16(font.getBytes(2));
+        var records = [];
+        var NAME_RECORD_LENGTH = 12;
+        for (var i = 0; i < numRecords &&
+                        font.pos + NAME_RECORD_LENGTH <= end; i++) {
+          var r = {
+            platform: int16(font.getBytes(2)),
+            encoding: int16(font.getBytes(2)),
+            language: int16(font.getBytes(2)),
+            name: int16(font.getBytes(2)),
+            length: int16(font.getBytes(2)),
+            offset: int16(font.getBytes(2))
+          };
+          // using only Macintosh and Windows platform/encoding names
+          if ((r.platform == 1 && r.encoding == 0 && r.language == 0) ||
+              (r.platform == 3 && r.encoding == 1 && r.language == 0x409)) {
+            records.push(r);
+          }
+        }
+        for (var i = 0, ii = records.length; i < ii; i++) {
+          var record = records[i];
+          var pos = start + stringsStart + record.offset;
+          if (pos + record.length > end) {
+            continue; // outside of name table, ignoring
+          }
+          font.pos = pos;
+          var nameIndex = record.name;
+          var encoding = record.encoding ? 1 : 0;
+          if (record.encoding) {
+            // unicode
+            var str = '';
+            for (var j = 0, jj = record.length; j < jj; j += 2) {
+              str += String.fromCharCode(int16(font.getBytes(2)));
+            }
+            names[1][nameIndex] = str;
+          } else {
+            names[0][nameIndex] = bytesToString(font.getBytes(record.length));
+          }
+        }
+        return names;
       }
 
       function isOS2Valid(os2Table) {
@@ -16592,6 +18709,139 @@ var Font = (function FontClosure() {
         return true;
       }
 
+      var TTOpsStackDeltas = [
+        0, 0, 0, 0, 0, 0, 0, 0, -2, -2, -2, -2, 0, 0, -2, -5,
+        -1, -1, -1, -1, -1, -1, -1, -1, 0, 0, -1, 0, -1, -1, -1, -1,
+        1, -1, -999, 0, 1, 0, 0, -2, 0, -1, -2, -1, -999, -999, -1, -1,
+        0, 0, -999, -999, -1, -1, -1, -1, -2, -999, -2, -2, -2, 0, -2, -2,
+        0, 0, -2, 0, -2, 0, 0, 0, -2, -1, -1, 1, 1, 0, 0, -1,
+        -1, -1, -1, -1, -1, -1, 0, 0, -1, 0, -1, -1, 0, -999, -1, -1,
+        -1, -1, -1, -1, 0, 0, 0, 0, -1, -1, 0, 0, 0, 0, 0, 0,
+        -2, -999, -999, -999, -999, -999, -1, -1, -2, -2, 0, 0, 0, 0, -1, -1,
+        -999, -2, -2, 0, 0, -1, -2, -2, 0, -999, 0, 0, 0, -1, -2];
+        // 0xC0-DF == -1 and 0xE0-FF == -2
+
+      function sanitizeTTProgram(table, ttContext) {
+        var data = table.data;
+        var i = 0, n, lastEndf = 0, lastDeff = 0;
+        var stack = [];
+        var tooComplexToFollowFunctions =
+          ttContext.tooComplexToFollowFunctions;
+        for (var ii = data.length; i < ii;) {
+          var op = data[i++];
+          // The TrueType instruction set docs can be found at
+          // https://developer.apple.com/fonts/TTRefMan/RM05/Chap5.html
+          if (op === 0x40) { // NPUSHB - pushes n bytes
+            n = data[i++];
+            for (var j = 0; j < n; j++) {
+              stack.push(data[i++]);
+            }
+          } else if (op === 0x41) { // NPUSHW - pushes n words
+            n = data[i++];
+            for (var j = 0; j < n; j++) {
+              var b = data[i++];
+              stack.push((b << 8) | data[i++]);
+            }
+          } else if ((op & 0xF8) === 0xB0) { // PUSHB - pushes bytes
+            n = op - 0xB0 + 1;
+            for (var j = 0; j < n; j++) {
+              stack.push(data[i++]);
+            }
+          } else if ((op & 0xF8) === 0xB8) { // PUSHW - pushes words
+            n = op - 0xB8 + 1;
+            for (var j = 0; j < n; j++) {
+              var b = data[i++];
+              stack.push((b << 8) | data[i++]);
+            }
+          } else if (op === 0x2B && !tooComplexToFollowFunctions) { // CALL
+            // collecting inforamtion about which functions are used
+            var funcId = stack[stack.length - 1];
+            ttContext.functionsUsed[funcId] = true;
+            if (i >= 2 && data[i - 2] === 0x2B) {
+              // all data in stack, calls are performed in sequence
+              tooComplexToFollowFunctions = true;
+            }
+          } else if (op === 0x2C && !tooComplexToFollowFunctions) { // FDEF
+            // collecting inforamtion about which functions are defined
+            lastDeff = i;
+            var funcId = stack[stack.length - 1];
+            ttContext.functionsDefined[funcId] = true;
+            if (i >= 2 && data[i - 2] === 0x2D) {
+              // all function ids in stack, FDEF/ENDF perfomed in sequence
+              tooComplexToFollowFunctions = true;
+            }
+          } else if (op === 0x2D) { // ENDF - end of function
+            lastEndf = i;
+          } else if (op === 0x89) { // IDEF - instruction definition
+            // recording it as a function to track ENDF
+            lastDeff = i;
+          }
+          // Adjusting stack not extactly, but just enough to get function id
+          var stackDelta = op <= 0x8E ? TTOpsStackDeltas[op] :
+            op >= 0xC0 && op <= 0xDF ? -1 : op >= 0xE0 ? -2 : 0;
+          while (stackDelta < 0 && stack.length > 0) {
+            stack.pop();
+            stackDelta++;
+          }
+          while (stackDelta > 0) {
+            stack.push(NaN); // pushing any number into stack
+            stackDelta--;
+          }
+        }
+        ttContext.tooComplexToFollowFunctions = tooComplexToFollowFunctions;
+        var content = [data];
+        if (i > data.length) {
+          content.push(new Uint8Array(i - data.length));
+        }
+        if (lastDeff > lastEndf) {
+          // new function definition started, but not finished
+          // complete function by [CLEAR, ENDF]
+          content.push(new Uint8Array([0x22, 0x2D]));
+        }
+        if (ttContext.defineMissingFunctions && !tooComplexToFollowFunctions) {
+          for (var j = 0, jj = ttContext.functionsUsed.length; j < jj; j++) {
+            if (!ttContext.functionsUsed[j] || ttContext.functionsDefined[j]) {
+              continue;
+            }
+            // function is used, but not defined
+            // creating empty one [PUSHB, function-id, FDEF, ENDF]
+            content.push(new Uint8Array([0xB0, j, 0x2C, 0x2D]));
+          }
+        }
+        if (content.length > 1) {
+          // concatenating the content items
+          var newLength = 0;
+          for (var j = 0, jj = content.length; j < jj; j++) {
+            newLength += content[j].length;
+          }
+          newLength = (newLength + 3) & ~3;
+          var result = new Uint8Array(newLength);
+          var pos = 0;
+          for (var j = 0, jj = content.length; j < jj; j++) {
+            result.set(content[j], pos);
+            pos += content[j].length;
+          }
+          table.data = result;
+          table.length = newLength;
+        }
+      }
+
+      function sanitizeTTPrograms(fpgm, prep) {
+        var ttContext = {
+          functionsDefined: [],
+          functionsUsed: [],
+          tooComplexToFollowFunctions: false
+        };
+        if (prep) {
+          // collecting prep functions info first
+          sanitizeTTProgram(prep, ttContext);
+        }
+        if (fpgm) {
+          ttContext.defineMissingFunctions = true;
+          sanitizeTTProgram(fpgm, ttContext);
+        }
+      }
+
       // Check that required tables are present
       var requiredTables = ['OS/2', 'cmap', 'head', 'hhea',
                              'hmtx', 'maxp', 'name', 'post'];
@@ -16599,7 +18849,8 @@ var Font = (function FontClosure() {
       var header = readOpenTypeHeader(font);
       var numTables = header.numTables;
 
-      var cmap, post, maxp, hhea, hmtx, vhea, vmtx, head, loca, glyf, os2;
+      var cmap, post, maxp, hhea, hmtx, head, os2;
+      var glyf, fpgm, loca, prep, cvt;
       var tables = [];
       for (var i = 0; i < numTables; i++) {
         var table = readTableEntry(font);
@@ -16622,14 +18873,18 @@ var Font = (function FontClosure() {
 
           requiredTables.splice(index, 1);
         } else {
-          if (table.tag == 'vmtx')
-            vmtx = table;
-          else if (table.tag == 'vhea')
-            vhea = table;
-          else if (table.tag == 'loca')
+          if (table.tag == 'loca')
             loca = table;
           else if (table.tag == 'glyf')
             glyf = table;
+          else if (table.tag == 'fpgm')
+            fpgm = table;
+          else if (table.tag == 'prep')
+            prep = table;
+          else if (table.tag == 'cvt ')
+            cvt = table;
+          else // skipping table if it's not a required or optional table
+            continue;
         }
         tables.push(table);
       }
@@ -16654,14 +18909,15 @@ var Font = (function FontClosure() {
         os2 = null;
       }
 
-      // Ensure the [h/v]mtx tables contains the advance width and
+      // Ensure the hmtx table contains the advance width and
       // sidebearings information for numGlyphs in the maxp table
       font.pos = (font.start || 0) + maxp.offset;
       var version = int16(font.getBytes(4));
       var numGlyphs = int16(font.getBytes(2));
 
       sanitizeMetrics(font, hhea, hmtx, numGlyphs);
-      sanitizeMetrics(font, vhea, vmtx, numGlyphs);
+
+      sanitizeTTPrograms(fpgm, prep);
 
       var isGlyphLocationsLong = int16([head.data[50], head.data[51]]);
       if (head && loca && glyf) {
@@ -16681,7 +18937,11 @@ var Font = (function FontClosure() {
 
       // The 'post' table has glyphs names.
       if (post) {
-        readGlyphNameMap(post, properties);
+        var valid = readPostScriptTable(post, properties, numGlyphs);
+        if (!valid) {
+          tables.splice(tables.indexOf(post), 1);
+          post = null;
+        }
       }
 
       var glyphs, ids;
@@ -16737,13 +18997,13 @@ var Font = (function FontClosure() {
         }
         // trying to fit as many unassigned symbols as we can
         // in the range allocated for the user defined symbols
-        var unusedUnicode = kCmapGlyphOffset;
+        var unusedUnicode = CMAP_GLYPH_OFFSET;
         for (var j = 0, jj = unassignedUnicodeItems.length; j < jj; j++) {
           var i = unassignedUnicodeItems[j];
           var cid = gidToCidMap[i] || i;
           while (unusedUnicode in usedUnicodes)
             unusedUnicode++;
-          if (unusedUnicode >= kCmapGlyphOffset + kSizeOfGlyphArea)
+          if (unusedUnicode >= CMAP_GLYPH_OFFSET + GLYPH_AREA_SIZE)
             break;
           var unicode = unusedUnicode++;
           this.toFontChar[cid] = unicode;
@@ -16767,7 +19027,7 @@ var Font = (function FontClosure() {
             ids[i] = i;
         }
 
-        var unusedUnicode = kCmapGlyphOffset;
+        var unusedUnicode = CMAP_GLYPH_OFFSET;
         var glyphNames = properties.glyphNames || [];
         var encoding = properties.baseEncoding;
         var differences = properties.differences;
@@ -16831,9 +19091,9 @@ var Font = (function FontClosure() {
             this.isSymbolicFont = false;
         }
 
-        // heuristics: if removed more than 10 glyphs encoding WinAnsiEncoding
+        // heuristics: if removed more than 5 glyphs encoding WinAnsiEncoding
         // does not set properly (broken PDFs have about 100 removed glyphs)
-        if (glyphsRemoved > 10) {
+        if (glyphsRemoved > 5) {
           warn('Switching TrueType encoding to MacRomanEncoding for ' +
                this.name + ' font');
           encoding = Encodings.MacRomanEncoding;
@@ -16848,7 +19108,7 @@ var Font = (function FontClosure() {
           for (var i = 0, ii = glyphs.length; i < ii; i++) {
             var code = glyphs[i].unicode;
             var gid = ids[i];
-            glyphs[i].unicode += kCmapGlyphOffset;
+            glyphs[i].unicode += CMAP_GLYPH_OFFSET;
             toFontChar[code] = glyphs[i].unicode;
 
             var glyphName = glyphNames[gid] || encoding[code];
@@ -16916,7 +19176,7 @@ var Font = (function FontClosure() {
         if (this.isSymbolicFont) {
           for (var i = 0, ii = glyphs.length; i < ii; i++) {
             var code = glyphs[i].unicode & 0xFF;
-            var fontCharCode = kSymbolicFontGlyphOffset | code;
+            var fontCharCode = SYMBOLIC_FONT_GLYPH_OFFSET | code;
             glyphs[i].unicode = toFontChar[code] = fontCharCode;
           }
           this.useToFontChar = true;
@@ -16926,6 +19186,12 @@ var Font = (function FontClosure() {
         this.glyphNameMap = properties.glyphNameMap;
       }
 
+      if (glyphs.length === 0) {
+        // defines at least one glyph
+        glyphs.push({ unicode: 0xF000, code: 0xF000, glyph: '.notdef' });
+        ids.push(0);
+      }
+
       // Converting glyphs and ids into font's cmap table
       cmap.data = createCMapTable(glyphs, ids);
       var unicodeIsEnabled = [];
@@ -16933,6 +19199,11 @@ var Font = (function FontClosure() {
         unicodeIsEnabled[glyphs[i].unicode] = true;
       }
       this.unicodeIsEnabled = unicodeIsEnabled;
+
+      if (os2 && !validateOS2Table(os2)) {
+        tables.splice(tables.indexOf(os2), 1);
+        os2 = null;
+      }
 
       if (!os2) {
         // extract some more font properties from the OpenType head and
@@ -16952,19 +19223,29 @@ var Font = (function FontClosure() {
       }
 
       // Rewrite the 'post' table if needed
-      if (requiredTables.indexOf('post') != -1) {
+      if (!post) {
         tables.push({
           tag: 'post',
           data: stringToArray(createPostTable(properties))
         });
       }
 
-      // Rewrite the 'name' table if needed
+      // Re-creating 'name' table
       if (requiredTables.indexOf('name') != -1) {
         tables.push({
           tag: 'name',
           data: stringToArray(createNameTable(this.name))
         });
+      } else {
+        // ... using existing 'name' table as prototype
+        for (var i = 0, ii = tables.length; i < ii; i++) {
+          var table = tables[i];
+          if (table.tag === 'name') {
+            var namePrototype = readNameTable(table);
+            table.data = stringToArray(createNameTable(name, namePrototype));
+            break;
+          }
+        }
       }
 
       // Tables needs to be written by ascendant alphabetic order
@@ -17010,7 +19291,7 @@ var Font = (function FontClosure() {
       // to write the table entry information about a table and another offset
       // representing the offset where to draw the actual data of a particular
       // table
-      var kRequiredTablesCount = 9;
+      var REQ_TABLES_CNT = 9;
 
       var otf = {
         file: '',
@@ -17046,7 +19327,7 @@ var Font = (function FontClosure() {
         }
         this.toFontChar = toFontChar;
       }
-      var unitsPerEm = properties.unitsPerEm || 1000; // defaulting to 1000
+      var unitsPerEm = 1 / (properties.fontMatrix || FONT_IDENTITY_MATRIX)[0];
 
       var fields = {
         // PostScript Font Program
@@ -17142,7 +19423,7 @@ var Font = (function FontClosure() {
 
     buildToFontChar: function Font_buildToFontChar(toUnicode) {
       var result = [];
-      var unusedUnicode = kCmapGlyphOffset;
+      var unusedUnicode = CMAP_GLYPH_OFFSET;
       for (var i = 0, ii = toUnicode.length; i < ii; i++) {
         var unicode = toUnicode[i];
         var fontCharCode = typeof unicode === 'object' ? unusedUnicode++ :
@@ -17224,7 +19505,11 @@ var Font = (function FontClosure() {
       }
     },
 
-    bindDOM: function Font_bindDOM(data) {
+    bindDOM: function Font_bindDOM() {
+      if (!this.data)
+        return null;
+
+      var data = bytesToString(this.data);
       var fontName = this.loadedName;
 
       // Add the font-face rule to the document
@@ -17243,13 +19528,18 @@ var Font = (function FontClosure() {
       var styleSheet = styleElement.sheet;
       styleSheet.insertRule(rule, styleSheet.cssRules.length);
 
-      if (PDFJS.pdfBug && FontInspector.enabled)
-        FontInspector.fontAdded(this, url);
+      if (PDFJS.pdfBug && 'FontInspector' in globalScope &&
+          globalScope['FontInspector'].enabled)
+        globalScope['FontInspector'].fontAdded(this, url);
 
       return rule;
     },
 
     get spaceWidth() {
+      if ('_shadowWidth' in this) {
+        return this._shadowWidth;
+      }
+
       // trying to estimate space character width
       var possibleSpaceReplacements = ['space', 'minus', 'one', 'i'];
       var width;
@@ -17276,8 +19566,11 @@ var Font = (function FontClosure() {
         if (width)
           break; // the non-zero width found
       }
-      width = (width || this.defaultWidth) * this.widthMultiplier;
-      return shadow(this, 'spaceWidth', width);
+      width = width || this.defaultWidth;
+      // Do not shadow the property here. See discussion:
+      // https://github.com/mozilla/pdf.js/pull/2127#discussion_r1662280
+      this._shadowWidth = width;
+      return width;
     },
 
     charToGlyph: function Font_charToGlyph(charcode) {
@@ -17354,7 +19647,7 @@ var Font = (function FontClosure() {
       if (typeof unicodeChars === 'number')
         unicodeChars = String.fromCharCode(unicodeChars);
 
-      width = (isNum(width) ? width : this.defaultWidth) * this.widthMultiplier;
+      width = isNum(width) ? width : this.defaultWidth;
       disabled = this.unicodeIsEnabled ?
         !this.unicodeIsEnabled[fontCharCode] : false;
 
@@ -17426,6 +19719,9 @@ var ErrorFont = (function ErrorFontClosure() {
   ErrorFont.prototype = {
     charsToGlyphs: function ErrorFont_charsToGlyphs() {
       return [];
+    },
+    exportData: function ErrorFont_exportData() {
+      return {error: this.error};
     }
   };
 
@@ -17451,8 +19747,8 @@ var Type1Parser = function type1Parser() {
    * of Plaintext Bytes. The function took a key as a parameter which can be
    * for decrypting the eexec block of for decoding charStrings.
    */
-  var kEexecEncryptionKey = 55665;
-  var kCharStringsEncryptionKey = 4330;
+  var EEXEC_ENCRYPT_KEY = 55665;
+  var CHAR_STRS_ENCRYPT_KEY = 4330;
 
   function decrypt(stream, key, discardNumber) {
     var r = key, c1 = 52845, c2 = 22719;
@@ -17543,6 +19839,7 @@ var Type1Parser = function type1Parser() {
       // Type1 only command with command not (yet) built-in ,throw an error
       '7': -1, // sbw
 
+      '10': 'add',
       '11': 'sub',
       '12': 'div',
 
@@ -17568,7 +19865,7 @@ var Type1Parser = function type1Parser() {
     '31': 'hvcurveto'
   };
 
-  var kEscapeCommand = 12;
+  var ESCAPE_CMD = 12;
 
   // Breaks up the stack by arguments and also calculates the value.
   function breakUpArgs(stack, numArgs) {
@@ -17611,7 +19908,7 @@ var Type1Parser = function type1Parser() {
     var charstring = [];
     var lsb = 0;
     var width = 0;
-    var flexState = 0;
+    var flexing = false;
 
     var value = '';
     var count = array.length;
@@ -17620,7 +19917,7 @@ var Type1Parser = function type1Parser() {
 
       if (value < 32) {
         var command = null;
-        if (value == kEscapeCommand) {
+        if (value == ESCAPE_CMD) {
           var escape = array[++i];
 
           // TODO Clean this code
@@ -17649,6 +19946,21 @@ var Type1Parser = function type1Parser() {
             assert(argc == 0, 'callothersubr with arguments is not supported');
             charstring.push(new CallothersubrCmd(index));
             continue;
+          } else if (escape == 7) { // sbw
+            var args = breakUpArgs(charstring, 4);
+            var arg0 = args[0];
+            var arg1 = args[1];
+            var arg2 = args[2];
+            lsb = arg0.value;
+            width = arg2.value;
+            // To convert to type2 we have to move the width value to the first
+            // part of the charstring and then use rmoveto with (dx, dy).
+            // The height argument will not be used for vmtx and vhea tables
+            // reconstruction -- ignoring it.
+            charstring = arg2.arg;
+            charstring = charstring.concat(arg0.arg, arg1.arg);
+            charstring.push('rmoveto');
+            continue;
           } else if (escape == 17 || escape == 33) {
             // pop or setcurrentpoint commands can be ignored
             // since we are not doing callothersubr
@@ -17659,7 +19971,7 @@ var Type1Parser = function type1Parser() {
             var args = breakUpArgs(charstring, 5);
             var arg0 = args[0];
             charstring.splice(arg0.offset, arg0.arg.length);
-          } else if (!kHintingEnabled && (escape == 1 || escape == 2)) {
+          } else if (!HINTING_ENABLED && (escape == 1 || escape == 2)) {
             charstring.push('drop', 'drop', 'drop', 'drop', 'drop', 'drop');
             continue;
           }
@@ -17680,28 +19992,63 @@ var Type1Parser = function type1Parser() {
             continue;
           } else if (value == 10) { // callsubr
             if (charstring[charstring.length - 1] < 3) { // subr #0..2
+              // XXX: According to the spec if flex or hinting is not used then
+              // subroutines 0-3 can actually be anything defined by the font,
+              // so we really shouldn't be doing flex here but when
+              // callothersubr 0-2 is used. There hasn't been a real world
+              // example of this yet so we'll keep doing it here.
               var subrNumber = charstring.pop();
               switch (subrNumber) {
                 case 1:
-                  flexState = 1; // prepare for flex coordinates
-                  break;
-                case 2:
-                  flexState = 2; // flex in progress
+                  flexing = true; // prepare for flex coordinates
                   break;
                 case 0:
-                  // type2 flex command does not need final coords
-                  charstring.push('exch', 'drop', 'exch', 'drop');
-                  charstring.push('flex');
-                  flexState = 0;
+                  var flexArgs = breakUpArgs(charstring, 17);
+
+                  // removing all flex arguments from the stack
+                  charstring.splice(flexArgs[0].offset,
+                                    charstring.length - flexArgs[0].offset);
+
+                  charstring = charstring.concat(
+                    flexArgs[0].arg, // bcp1x +
+                    flexArgs[2].arg, // rpx
+                    ['add'],
+                    flexArgs[1].arg, // bcp1y +
+                    flexArgs[3].arg, // rpy
+                    ['add'],
+                    flexArgs[4].arg, // bcp2x
+                    flexArgs[5].arg, // bcp2y
+                    flexArgs[6].arg, // p2x
+                    flexArgs[7].arg, // p2y
+                    flexArgs[8].arg, // bcp3x
+                    flexArgs[9].arg, // bcp3y
+                    flexArgs[10].arg, // bcp4x
+                    flexArgs[11].arg, // bcp4y
+                    flexArgs[12].arg, // p3x
+                    flexArgs[13].arg, // p3y
+                    flexArgs[14].arg, // flexDepth
+                    // 15 = finalx unused by flex
+                    // 16 = finaly unused by flex
+                    ['flex']
+                  );
+
+                  flexing = false;
                   break;
               }
               continue;
             }
-          } else if (value == 21 && flexState > 0) {
-            if (flexState > 1)
-              continue; // ignoring rmoveto
-            value = 5; // first segment replacing with rlineto
-          } else if (!kHintingEnabled && (value == 1 || value == 3)) {
+          } else if (value == 21 && flexing) { // rmoveto
+            continue; // ignoring rmoveto
+          } else if (value == 22 && flexing) { // hmoveto
+            // Add the dy for flex.
+            charstring.push(0);
+            continue; // ignoring hmoveto
+          } else if (value == 4 && flexing) { // vmoveto
+            // Insert the dx for flex before dy.
+            var flexArgs = breakUpArgs(charstring, 1);
+            charstring.splice(flexArgs[0].offset, 0, 0);
+            continue; // ignoring vmoveto
+          } else if (!HINTING_ENABLED && (value == 1 || value == 3)) {
             charstring.push('drop', 'drop');
             continue;
           }
@@ -17788,12 +20135,29 @@ var Type1Parser = function type1Parser() {
     return parseFloat(str.substr(start, count) || 0);
   }
 
+  function readBoolean(str, index) {
+    while (str[index] == ' ')
+      index++;
+
+    var start = index;
+
+    var count = 0;
+    var length = str.length;
+    while (index < length && str[index++] != ' ') {
+      count++;
+    }
+
+    // Use 1 and 0 since that's what type2 charstrings use.
+    return str.substr(start, count) === 'true' ? 1 : 0;
+  }
+
+
   function isSeparator(c) {
     return c == ' ' || c == '\n' || c == '\x0d';
   }
 
   this.extractFontProgram = function Type1Parser_extractFontProgram(stream) {
-    var eexec = decrypt(stream, kEexecEncryptionKey, 4);
+    var eexec = decrypt(stream, EEXEC_ENCRYPT_KEY, 4);
     var eexecStr = '';
     for (var i = 0, ii = eexec.length; i < ii; i++)
       eexecStr += String.fromCharCode(eexec[i]);
@@ -17833,7 +20197,7 @@ var Type1Parser = function type1Parser() {
         i++;
         var data = eexec.slice(i, i + length);
         var lenIV = program.properties.privateData['lenIV'];
-        var encoded = decrypt(data, kCharStringsEncryptionKey, lenIV);
+        var encoded = decrypt(data, CHAR_STRS_ENCRYPT_KEY, lenIV);
         var str = decodeCharString(encoded);
 
         if (glyphsSection) {
@@ -17849,7 +20213,9 @@ var Type1Parser = function type1Parser() {
         i += length;
         token = '';
       } else if (isSeparator(c)) {
-        length = parseInt(token, 10);
+        // Use '| 0' to prevent setting a double into length such as the double
+        // does not flow into the loop variable.
+        length = parseInt(token, 10) | 0;
         token = '';
       } else {
         token += c;
@@ -17873,7 +20239,7 @@ var Type1Parser = function type1Parser() {
                 getToken(); // read in 'RD'
                 var data = eexec.slice(i + 1, i + 1 + length);
                 var lenIV = program.properties.privateData['lenIV'];
-                var encoded = decrypt(data, kCharStringsEncryptionKey, lenIV);
+                var encoded = decrypt(data, CHAR_STRS_ENCRYPT_KEY, lenIV);
                 var str = decodeCharString(encoded);
                 i = i + 1 + length;
                 t = getToken(); // read in 'NP'
@@ -17887,8 +20253,12 @@ var Type1Parser = function type1Parser() {
             case '/FamilyBlues':
             case '/FamilyOtherBlues':
               var blueArray = readNumberArray(eexecStr, i + 1);
-              if (blueArray.length > 0 && (blueArray.length % 2) == 0)
+              // *Blue* values may contain invalid data: disables reading of
+              // those values when hinting is disabled.
+              if (blueArray.length > 0 && (blueArray.length % 2) == 0 &&
+                  HINTING_ENABLED) {
                 program.properties.privateData[token.substring(1)] = blueArray;
+              }
               break;
             case '/StemSnapH':
             case '/StemSnapV':
@@ -17898,7 +20268,7 @@ var Type1Parser = function type1Parser() {
             case '/StdHW':
             case '/StdVW':
               program.properties.privateData[token.substring(1)] =
-                readNumberArray(eexecStr, i + 2)[0];
+                readNumberArray(eexecStr, i + 1)[0];
               break;
             case '/BlueShift':
             case '/lenIV':
@@ -17908,6 +20278,10 @@ var Type1Parser = function type1Parser() {
             case '/ExpansionFactor':
               program.properties.privateData[token.substring(1)] =
                 readNumber(eexecStr, i + 1);
+              break;
+            case '/ForceBold':
+              program.properties.privateData[token.substring(1)] =
+                readBoolean(eexecStr, i + 1);
               break;
           }
         } else if (c == '/') {
@@ -17949,14 +20323,6 @@ var Type1Parser = function type1Parser() {
         switch (token) {
           case '/FontMatrix':
             var matrix = readNumberArray(headerString, i + 1);
-
-            // The FontMatrix is in unitPerEm, so make it pixels
-            for (var j = 0, jj = matrix.length; j < jj; j++)
-              matrix[j] *= 1000;
-
-            // Make the angle into the right direction
-            matrix[2] *= -1;
-
             properties.fontMatrix = matrix;
             break;
           case '/Encoding':
@@ -18090,66 +20456,11 @@ var Type1Font = function Type1Font(name, file, properties) {
 };
 
 Type1Font.prototype = {
-  createCFFIndexHeader: function Type1Font_createCFFIndexHeader(objects,
-                                                                isByte) {
-    // First 2 bytes contains the number of objects contained into this index
-    var count = objects.length;
-
-    // If there is no object, just create an array saying that with another
-    // offset byte.
-    if (count == 0)
-      return '\x00\x00\x00';
-
-    var data = String.fromCharCode((count >> 8) & 0xFF, count & 0xff);
-
-    // Next byte contains the offset size use to reference object in the file
-    // Actually we're using 0x04 to be sure to be able to store everything
-    // without thinking of it while coding.
-    data += '\x04';
-
-    // Add another offset after this one because we need a new offset
-    var relativeOffset = 1;
-    for (var i = 0; i < count + 1; i++) {
-      data += String.fromCharCode((relativeOffset >>> 24) & 0xFF,
-                                  (relativeOffset >> 16) & 0xFF,
-                                  (relativeOffset >> 8) & 0xFF,
-                                  relativeOffset & 0xFF);
-
-      if (objects[i])
-        relativeOffset += objects[i].length;
-    }
-
-    for (var i = 0; i < count; i++) {
-      for (var j = 0, jj = objects[i].length; j < jj; j++)
-        data += isByte ? String.fromCharCode(objects[i][j] & 0xFF) :
-                objects[i][j];
-    }
-    return data;
-  },
-
-  encodeNumber: function Type1Font_encodeNumber(value) {
-    // some of the fonts has ouf-of-range values
-    // they are just arithmetic overflows
-    // make sanitizer happy
-    value |= 0;
-    if (value >= -32768 && value <= 32767) {
-      return '\x1c' +
-             String.fromCharCode((value >> 8) & 0xFF) +
-             String.fromCharCode(value & 0xFF);
-    } else {
-      return '\x1d' +
-             String.fromCharCode((value >> 24) & 0xFF) +
-             String.fromCharCode((value >> 16) & 0xFF) +
-             String.fromCharCode((value >> 8) & 0xFF) +
-             String.fromCharCode(value & 0xFF);
-    }
-  },
-
   getOrderedCharStrings: function Type1Font_getOrderedCharStrings(glyphs,
                                                             properties) {
     var charstrings = [];
     var i, length, glyphName;
-    var unusedUnicode = kCmapGlyphOffset;
+    var unusedUnicode = CMAP_GLYPH_OFFSET;
     for (i = 0, length = glyphs.length; i < length; i++) {
       var item = glyphs[i];
       var glyphName = item.glyph;
@@ -18219,6 +20530,7 @@ Type1Font.prototype = {
     'rrcurveto': 8,
     'callsubr': 10,
     'return': 11,
+    'add': [12, 10],
     'sub': [12, 11],
     'div': [12, 12],
     'exch': [12, 28],
@@ -18263,9 +20575,9 @@ Type1Font.prototype = {
         if (command > 32000) {
           var divisor = charstring[i + 1];
           command /= divisor;
-          charstring.splice(i, 3, 28, command >> 8, command & 0xff);
+          charstring.splice(i, 3, 28, (command >> 8) & 0xff, command & 0xff);
         } else {
-          charstring.splice(i, 1, 28, command >> 8, command & 0xff);
+          charstring.splice(i, 1, 28, (command >> 8) & 0xff, command & 0xff);
         }
         i += 2;
       }
@@ -18274,140 +20586,91 @@ Type1Font.prototype = {
   },
 
   wrap: function Type1Font_wrap(name, glyphs, charstrings, subrs, properties) {
-    var fields = {
-      // major version, minor version, header size, offset size
-      'header': '\x01\x00\x04\x04',
+    var cff = new CFF();
+    cff.header = new CFFHeader(1, 0, 4, 4);
 
-      'names': this.createCFFIndexHeader([name]),
+    cff.names = [name];
 
-      'topDict': (function topDict(self) {
-        return function cffWrapTopDict() {
-          var header = '\x00\x01\x01\x01';
-          var dict =
-              '\xf8\x1b\x00' + // version
-              '\xf8\x1c\x01' + // Notice
-              '\xf8\x1d\x02' + // FullName
-              '\xf8\x1e\x03' + // FamilyName
-              '\xf8\x1f\x04' +  // Weight
-              '\x1c\x00\x00\x10'; // Encoding
+    var topDict = new CFFTopDict();
+    topDict.setByName('version', 0);
+    topDict.setByName('Notice', 1);
+    topDict.setByName('FullName', 2);
+    topDict.setByName('FamilyName', 3);
+    topDict.setByName('Weight', 4);
+    topDict.setByName('Encoding', null); // placeholder
+    topDict.setByName('FontMatrix', properties.fontMatrix);
+    topDict.setByName('FontBBox', properties.bbox);
+    topDict.setByName('charset', null); // placeholder
+    topDict.setByName('CharStrings', null); // placeholder
+    topDict.setByName('Private', null); // placeholder
+    cff.topDict = topDict;
 
-          var boundingBox = properties.bbox;
-          for (var i = 0, ii = boundingBox.length; i < ii; i++)
-            dict += self.encodeNumber(boundingBox[i]);
-          dict += '\x05'; // FontBBox;
+    var strings = new CFFStrings();
+    strings.add('Version 0.11'); // Version
+    strings.add('See original notice'); // Notice
+    strings.add(name); // FullName
+    strings.add(name); // FamilyName
+    strings.add('Medium'); // Weight
+    cff.strings = strings;
 
-          var offset = fields.header.length +
-                       fields.names.length +
-                       (header.length + 1) +
-                       (dict.length + (4 + 4)) +
-                       fields.strings.length +
-                       fields.globalSubrs.length;
+    cff.globalSubrIndex = new CFFIndex();
 
-          // If the offset if over 32767, encodeNumber is going to return
-          // 5 bytes to encode the position instead of 3.
-          if ((offset + fields.charstrings.length) > 32767) {
-            offset += 9;
-          } else {
-            offset += 7;
-          }
+    var count = glyphs.length;
+    var charsetArray = [0];
+    for (var i = 0; i < count; i++) {
+      var index = CFFStandardStrings.indexOf(charstrings[i].glyph);
+      // Some characters like asterikmath && circlecopyrt are
+      // missing from the original strings, for the moment let's
+      // map them to .notdef and see later if it cause any
+      // problems
+      if (index == -1)
+        index = 0;
 
-          dict += self.encodeNumber(offset) + '\x0f'; // Charset
-
-          offset = offset + (glyphs.length * 2) + 1;
-          dict += self.encodeNumber(offset) + '\x11'; // Charstrings
-
-          offset = offset + fields.charstrings.length;
-          dict += self.encodeNumber(fields.privateData.length);
-          dict += self.encodeNumber(offset) + '\x12'; // Private
-
-          return header + String.fromCharCode(dict.length + 1) + dict;
-        };
-      })(this),
-
-      'strings': (function strings(self) {
-        var strings = [
-          'Version 0.11',         // Version
-          'See original notice',  // Notice
-          name,                   // FullName
-          name,                   // FamilyName
-          'Medium'                // Weight
-        ];
-        return self.createCFFIndexHeader(strings);
-      })(this),
-
-      'globalSubrs': this.createCFFIndexHeader([]),
-
-      'charset': (function charset(self) {
-        var charsetString = '\x00'; // Encoding
-
-        var count = glyphs.length;
-        for (var i = 0; i < count; i++) {
-          var index = CFFStandardStrings.indexOf(charstrings[i].glyph);
-          // Some characters like asterikmath && circlecopyrt are
-          // missing from the original strings, for the moment let's
-          // map them to .notdef and see later if it cause any
-          // problems
-          if (index == -1)
-            index = 0;
-
-          charsetString += String.fromCharCode(index >> 8, index & 0xff);
-        }
-        return charsetString;
-      })(this),
-
-      'charstrings': this.createCFFIndexHeader([[0x8B, 0x0E]].concat(glyphs),
-                                               true),
-
-      'privateData': (function cffWrapPrivate(self) {
-        var data =
-            '\x8b\x14' + // defaultWidth
-            '\x8b\x15';  // nominalWidth
-        var fieldMap = {
-          BlueValues: '\x06',
-          OtherBlues: '\x07',
-          FamilyBlues: '\x08',
-          FamilyOtherBlues: '\x09',
-          StemSnapH: '\x0c\x0c',
-          StemSnapV: '\x0c\x0d',
-          BlueShift: '\x0c\x0a',
-          BlueFuzz: '\x0c\x0b',
-          BlueScale: '\x0c\x09',
-          LanguageGroup: '\x0c\x11',
-          ExpansionFactor: '\x0c\x18'
-        };
-        for (var field in fieldMap) {
-          if (!properties.privateData.hasOwnProperty(field))
-            continue;
-          var value = properties.privateData[field];
-
-          if (isArray(value)) {
-            data += self.encodeNumber(value[0]);
-            for (var i = 1, ii = value.length; i < ii; i++)
-              data += self.encodeNumber(value[i] - value[i - 1]);
-          } else {
-            data += self.encodeNumber(value);
-          }
-          data += fieldMap[field];
-        }
-
-        data += self.encodeNumber(data.length + 4) + '\x13'; // Subrs offset
-
-        return data;
-      })(this),
-
-      'localSubrs': this.createCFFIndexHeader(subrs, true)
-    };
-    fields.topDict = fields.topDict();
-
-
-    var cff = [];
-    for (var index in fields) {
-      var field = fields[index];
-      for (var i = 0, ii = field.length; i < ii; i++)
-        cff.push(field.charCodeAt(i));
+      charsetArray.push((index >> 8) & 0xff, index & 0xff);
     }
+    cff.charset = new CFFCharset(false, 0, [], charsetArray);
 
-    return cff;
+    var charStringsIndex = new CFFIndex();
+    charStringsIndex.add([0x8B, 0x0E]); // .notdef
+    for (var i = 0; i < count; i++) {
+      charStringsIndex.add(glyphs[i]);
+    }
+    cff.charStrings = charStringsIndex;
+
+    var privateDict = new CFFPrivateDict();
+    privateDict.setByName('Subrs', null); // placeholder
+    var fields = [
+      'BlueValues',
+      'OtherBlues',
+      'FamilyBlues',
+      'FamilyOtherBlues',
+      'StemSnapH',
+      'StemSnapV',
+      'BlueShift',
+      'BlueFuzz',
+      'BlueScale',
+      'LanguageGroup',
+      'ExpansionFactor',
+      'ForceBold',
+      'StdHW',
+      'StdVW'
+    ];
+    for (var i = 0, ii = fields.length; i < ii; i++) {
+      var field = fields[i];
+      if (!properties.privateData.hasOwnProperty(field))
+        continue;
+      privateDict.setByName(field, properties.privateData[field]);
+    }
+    cff.topDict.privateDict = privateDict;
+
+    var subrIndex = new CFFIndex();
+    for (var i = 0, ii = subrs.length; i < ii; i++) {
+      subrIndex.add(subrs[i]);
+    }
+    privateDict.subrsIndex = subrIndex;
+
+    var compiler = new CFFCompiler(cff);
+    return compiler.compile();
   }
 };
 
@@ -18456,10 +20719,9 @@ var CFFFont = (function CFFFontClosure() {
           inverseEncoding[encoding[charcode]] = charcode | 0;
       else
         inverseEncoding = charsets;
-      for (var i = 0, ii = charsets.length; i < ii; i++) {
+      var i = charsets[0] == '.notdef' ? 1 : 0;
+      for (var ii = charsets.length; i < ii; i++) {
         var glyph = charsets[i];
-        if (glyph == '.notdef')
-          continue;
 
         var code = inverseEncoding[i];
         if (!code || isSpecialUnicode(code)) {
@@ -18475,7 +20737,7 @@ var CFFFont = (function CFFFontClosure() {
         unicodeUsed[code] = true;
       }
 
-      var nextUnusedUnicode = kCmapGlyphOffset;
+      var nextUnusedUnicode = CMAP_GLYPH_OFFSET;
       for (var j = 0, jj = unassignedUnicodeItems.length; j < jj; ++j) {
         var i = unassignedUnicodeItems[j];
         // giving unicode value anyway
@@ -18502,6 +20764,81 @@ var CFFFont = (function CFFFontClosure() {
 })();
 
 var CFFParser = (function CFFParserClosure() {
+  var CharstringValidationData = [
+    null,
+    { id: 'hstem', min: 2, resetStack: true },
+    null,
+    { id: 'vstem', min: 2, resetStack: true },
+    { id: 'vmoveto', min: 1, resetStack: true },
+    { id: 'rlineto', min: 2, resetStack: true },
+    { id: 'hlineto', min: 1, resetStack: true },
+    { id: 'vlineto', min: 1, resetStack: true },
+    { id: 'rrcurveto', min: 6, resetStack: true },
+    null,
+    { id: 'callsubr', min: 1, undefStack: true },
+    { id: 'return', min: 0, resetStack: true },
+    null, // 12
+    null,
+    null, // endchar
+    null,
+    null,
+    null,
+    { id: 'hstemhm', min: 2, resetStack: true },
+    null, // hintmask
+    null, // cntrmask
+    { id: 'rmoveto', min: 2, resetStack: true },
+    { id: 'hmoveto', min: 1, resetStack: true },
+    { id: 'vstemhm', min: 2, resetStack: true },
+    { id: 'rcurveline', min: 8, resetStack: true },
+    { id: 'rlinecurve', min: 8, resetStack: true },
+    { id: 'vvcurveto', min: 4, resetStack: true },
+    { id: 'hhcurveto', min: 4, resetStack: true },
+    null, // shortint
+    { id: 'callgsubr', min: 1, undefStack: true },
+    { id: 'vhcurveto', min: 4, resetStack: true },
+    { id: 'hvcurveto', min: 4, resetStack: true }
+  ];
+  var CharstringValidationData12 = [
+    null,
+    null,
+    null,
+    { id: 'and', min: 2, stackDelta: -1 },
+    { id: 'or', min: 2, stackDelta: -1 },
+    { id: 'not', min: 2, stackDelta: -1 },
+    null,
+    null,
+    null,
+    { id: 'abs', min: 1, stackDelta: 0 },
+    { id: 'add', min: 2, stackDelta: -1 },
+    { id: 'sub', min: 2, stackDelta: -1 },
+    { id: 'div', min: 2, stackDelta: -1 },
+    null,
+    { id: 'neg', min: 1, stackDelta: 0 },
+    { id: 'eq', min: 2, stackDelta: -1 },
+    null,
+    null,
+    { id: 'drop', min: 1, stackDelta: -1 },
+    null,
+    { id: 'put', min: 2, stackDelta: -2 },
+    { id: 'get', min: 1, stackDelta: 0 },
+    { id: 'ifelse', min: 4, stackDelta: -3 },
+    { id: 'random', min: 0, stackDelta: 1 },
+    { id: 'mul', min: 2, stackDelta: -1 },
+    null,
+    { id: 'sqrt', min: 1, stackDelta: 0 },
+    { id: 'dup', min: 1, stackDelta: 1 },
+    { id: 'exch', min: 2, stackDelta: 0 },
+    { id: 'index', min: 2, stackDelta: 0 },
+    { id: 'roll', min: 3, stackDelta: -2 },
+    null,
+    null,
+    null,
+    { id: 'hflex', min: 7, resetStack: true },
+    { id: 'flex', min: 13, resetStack: true },
+    { id: 'hflex1', min: 9, resetStack: true },
+    { id: 'flex1', min: 11, resetStack: true }
+  ];
+
   function CFFParser(file, properties) {
     this.bytes = file.getBytes();
     this.properties = properties;
@@ -18538,8 +20875,7 @@ var CFFParser = (function CFFParserClosure() {
 
       var fontMatrix = topDict.getByName('FontMatrix');
       if (fontMatrix) {
-        // estimating unitsPerEM for the font
-        properties.unitsPerEm = 1 / fontMatrix[0];
+        properties.fontMatrix = fontMatrix;
       }
 
       var fontBBox = topDict.getByName('FontBBox');
@@ -18547,6 +20883,7 @@ var CFFParser = (function CFFParserClosure() {
         // adjusting ascent/descent
         properties.ascent = fontBBox[3];
         properties.descent = fontBBox[1];
+        properties.ascentScaled = true;
       }
 
       var charset, encoding;
@@ -18586,7 +20923,14 @@ var CFFParser = (function CFFParserClosure() {
       }
 
       var fontDict = cff.fdArray[0];
+      // Make the sanitizer happy and remove anything that is only for CID
+      // fonts.
       fontDict.setByKey(17, topDict.getByName('CharStrings'));
+      fontDict.removeByName('CIDFontVersion');
+      fontDict.removeByName('CIDFontRevision');
+      fontDict.removeByName('CIDFontType');
+      fontDict.removeByName('CIDCount');
+      fontDict.removeByName('UIDBase');
       cff.topDict = fontDict;
       cff.isCIDFont = false;
       delete cff.fdArray;
@@ -18762,29 +21106,82 @@ var CFFParser = (function CFFParserClosure() {
     },
     parseCharStrings: function CFFParser_parseCharStrings(charStringOffset) {
       var charStrings = this.parseIndex(charStringOffset).obj;
-      // The CFF specification state that the 'dotsection' command
-      // (12, 0) is deprecated and treated as a no-op, but all Type2
-      // charstrings processors should support them. Unfortunately
-      // the font sanitizer don't. As a workaround the sequence (12, 0)
-      // is replaced by a useless (0, hmoveto).
       var count = charStrings.count;
       for (var i = 0; i < count; i++) {
         var charstring = charStrings.get(i);
 
+        var stackSize = 0;
+        var undefStack = true;
+        var hints = 0;
+        var valid = true;
         var data = charstring;
         var length = data.length;
-        for (var j = 0; j <= length; j) {
+        for (var j = 0; j < length;) {
           var value = data[j++];
-          if (value == 12 && data[j++] == 0) {
+          var validationCommand = null;
+          if (value == 12) {
+            var q = data[j++];
+            if (q == 0) {
+              // The CFF specification state that the 'dotsection' command
+              // (12, 0) is deprecated and treated as a no-op, but all Type2
+              // charstrings processors should support them. Unfortunately
+              // the font sanitizer don't. As a workaround the sequence (12, 0)
+              // is replaced by a useless (0, hmoveto).
               data[j - 2] = 139;
               data[j - 1] = 22;
-          } else if (value === 28) {
+              stackSize = 0;
+            } else {
+              validationCommand = CharstringValidationData12[q];
+            }
+          } else if (value === 28) { // number (16 bit)
             j += 2;
-          } else if (value >= 247 && value <= 254) {
+            stackSize++;
+          } else if (value == 14) {
+            if (stackSize >= 4) {
+              stackSize -= 4;
+            }
+          } else if (value >= 32 && value <= 246) {  // number
+            stackSize++;
+          } else if (value >= 247 && value <= 254) {  // number (+1 bytes)
             j++;
-          } else if (value == 255) {
+            stackSize++;
+          } else if (value == 255) {  // number (32 bit)
             j += 4;
+            stackSize++;
+          } else if (value == 18 || value == 23) {
+            hints += stackSize >> 1;
+            validationCommand = CharstringValidationData[value];
+          } else if (value == 19 || value == 20) {
+            hints += stackSize >> 1;
+            j += (hints + 7) >> 3; // skipping right amount of hints flag data
+            stackSize = 0;
+          } else {
+            validationCommand = CharstringValidationData[value];
           }
+          if (validationCommand) {
+            if ('min' in validationCommand) {
+              if (!undefStack && stackSize < validationCommand.min) {
+                warn('Not enough parameters for ' + validationCommand.id +
+                     '; actual: ' + stackSize +
+                     ', expected: ' + validationCommand.min);
+                valid = false;
+                break;
+              }
+            }
+            if ('stackDelta' in validationCommand) {
+              stackSize += validationCommand.stackDelta;
+            } else if (validationCommand.resetStack) {
+              stackSize = 0;
+              undefStack = false;
+            } else if (validationCommand.undefStack) {
+              stackSize = 0;
+              undefStack = true;
+            }
+          }
+        }
+        if (!valid) {
+          // resetting invalid charstring to single 'endchar'
+          charStrings.set(i, new Uint8Array([14]));
         }
       }
       return charStrings;
@@ -18902,13 +21299,13 @@ var CFFParser = (function CFFParserClosure() {
       if (pos == 0 || pos == 1) {
         predefined = true;
         format = pos;
-        var gid = 1;
         var baseEncoding = pos ? Encodings.ExpertEncoding :
                                  Encodings.StandardEncoding;
         for (var i = 0, ii = charset.length; i < ii; i++) {
           var index = baseEncoding.indexOf(charset[i]);
-          if (index != -1)
-            encoding[index] = gid++;
+          if (index != -1) {
+            encoding[index] = i;
+          }
         }
       } else {
         var dataStart = pos;
@@ -19050,6 +21447,10 @@ var CFFIndex = (function CFFIndexClosure() {
       this.length += data.length;
       this.objects.push(data);
     },
+    set: function CFFIndex_set(index, data) {
+      this.length += data.length - this.objects[index].length;
+      this.objects[index] = data;
+    },
     get: function CFFIndex_get(index) {
       return this.objects[index];
     },
@@ -19085,6 +21486,12 @@ var CFFDict = (function CFFDictClosure() {
         value = value[0];
       this.values[key] = value;
       return true;
+    },
+    setByName: function CFFDict_setByName(name, value) {
+      if (!(name in this.nameToKeyMap)) {
+        error('Invalid dictionary name "' + name + '"');
+      }
+      this.values[this.nameToKeyMap[name]] = value;
     },
     hasName: function CFFDict_hasName(name) {
       return this.nameToKeyMap[name] in this.values;
@@ -19394,37 +21801,26 @@ var CFFCompiler = (function CFFCompilerClosure() {
       else
         return this.encodeFloat(value);
     },
-    encodeFloat: function CFFCompiler_encodeFloat(value) {
-      value = value.toString();
-      // Strip off the any leading zeros.
-      if (value.substr(0, 2) === '0.')
-        value = value.substr(1);
-      else if (value.substr(0, 3) === '-0.')
-        value = '-' + value.substr(2);
-      var nibbles = [];
+    encodeFloat: function CFFCompiler_encodeFloat(num) {
+      var value = num.toString();
+      var nibbles = '';
       for (var i = 0, ii = value.length; i < ii; ++i) {
-        var a = value.charAt(i), b = value.charAt(i + 1);
-        var nibble;
-        if (a === 'e' && b === '-') {
-          nibble = 0xc;
-          ++i;
+        var a = value[i];
+        if (a === 'e') {
+          nibbles += value[++i] === '-' ? 'c' : 'b';
         } else if (a === '.') {
-          nibble = 0xa;
-        } else if (a === 'E') {
-          nibble = 0xb;
+          nibbles += 'a';
         } else if (a === '-') {
-          nibble = 0xe;
+          nibbles += 'e';
         } else {
-          nibble = a;
+          nibbles += a;
         }
-        nibbles.push(nibble);
       }
-      nibbles.push(0xf);
-      if (nibbles.length % 2)
-        nibbles.push(0xf);
+      nibbles += (nibbles.length & 1) ? 'f' : 'ff';
       var out = [30];
-      for (var i = 0, ii = nibbles.length; i < ii; i += 2)
-        out.push(nibbles[i] << 4 | nibbles[i + 1]);
+      for (var i = 0, ii = nibbles.length; i < ii; i += 2) {
+        out.push(parseInt(nibbles.substr(i, 2), 16));
+      }
       return out;
     },
     encodeInteger: function CFFCompiler_encodeInteger(value) {
@@ -19650,6 +22046,14 @@ var CFFCompiler = (function CFFCompilerClosure() {
   return CFFCompiler;
 })();
 
+// Workaround for Private Use Area characters in Chrome on Windows
+// http://code.google.com/p/chromium/issues/detail?id=122465
+// https://github.com/mozilla/pdf.js/issues/1689
+(function checkChromeWindows() {
+  if (/Windows.*Chrome/.test(navigator.userAgent)) {
+    SYMBOLIC_FONT_GLYPH_OFFSET = 0xF100;
+  }
+})();
 
 
 var GlyphsUnicode = {
@@ -24240,8 +26644,8 @@ var PDFImage = (function PDFImageClosure() {
       var actualHeight = 0 | (imgArray.length / rowBytes *
                          height / originalHeight);
 
-      var comps = this.colorSpace.getRgbBuffer(
-        this.getComponents(imgArray), bpc);
+      var comps = this.colorSpace.createRgbBuffer(this.getComponents(imgArray),
+        0, originalWidth * originalHeight, bpc);
       if (originalWidth != width || originalHeight != height)
         comps = PDFImage.resize(comps, this.bpc, 3, originalWidth,
                                 originalHeight, width, height);
@@ -24276,6 +26680,18 @@ var PDFImage = (function PDFImageClosure() {
       var scale = 255 / ((1 << bpc) - 1);
       for (var i = 0; i < length; ++i)
         buffer[i] = (scale * comps[i]) | 0;
+    },
+    getImageData: function PDFImage_getImageData() {
+      var drawWidth = this.drawWidth;
+      var drawHeight = this.drawHeight;
+      var imgData = {
+        width: drawWidth,
+        height: drawHeight,
+        data: new Uint8Array(drawWidth * drawHeight * 4)
+      };
+      var pixels = imgData.data;
+      this.fillRgbaBuffer(pixels, drawWidth, drawHeight);
+      return imgData;
     },
     getImageBytes: function PDFImage_getImageBytes(length) {
       this.image.reset();
@@ -27250,7 +29666,6 @@ var Parser = (function ParserClosure() {
     this.lexer = lexer;
     this.allowStreams = allowStreams;
     this.xref = xref;
-    this.inlineImg = 0;
     this.refill();
   }
 
@@ -27375,15 +29790,6 @@ var Parser = (function ParserClosure() {
         }
       }
 
-      // TODO improve the small images performance to remove the limit
-      var inlineImgLimit = 500;
-      if (++this.inlineImg >= inlineImgLimit) {
-        if (this.inlineImg === inlineImgLimit)
-          warn('Too many inline images');
-        this.shift();
-        return null;
-      }
-
       var length = (stream.pos - 4) - startPos;
       var imageStream = stream.makeSubStream(startPos, length, dict);
       if (cipherTransform)
@@ -27452,6 +29858,9 @@ var Parser = (function ParserClosure() {
       return stream;
     },
     makeFilter: function Parser_makeFilter(stream, name, length, params) {
+      if (stream.dict.get('Length') === 0) {
+        return new NullStream(stream);
+      }
       if (name == 'FlateDecode' || name == 'Fl') {
         if (params) {
           return new PredictorStream(new FlateStream(stream), params);
@@ -27552,8 +29961,7 @@ var Lexer = (function LexerClosure() {
       var floating = false;
       var str = ch;
       var stream = this.stream;
-      for (;;) {
-        ch = stream.lookChar();
+      while ((ch = stream.lookChar())) {
         if (ch == '.' && !floating) {
           str += ch;
           floating = true;
@@ -27690,28 +30098,34 @@ var Lexer = (function LexerClosure() {
     getHexString: function Lexer_getHexString(ch) {
       var str = '';
       var stream = this.stream;
-      for (;;) {
+      var isFirstHex = true;
+      var firstDigit;
+      var secondDigit;
+      while (true) {
         ch = stream.getChar();
-        if (ch == '>') {
-          break;
-        }
         if (!ch) {
           warn('Unterminated hex string');
           break;
-        }
-        if (specialChars[ch.charCodeAt(0)] != 1) {
-          var x, x2;
-          if ((x = toHexDigit(ch)) == -1)
-            error('Illegal character in hex string: ' + ch);
-
-          ch = stream.getChar();
-          while (specialChars[ch.charCodeAt(0)] == 1)
-            ch = stream.getChar();
-
-          if ((x2 = toHexDigit(ch)) == -1)
-            error('Illegal character in hex string: ' + ch);
-
-          str += String.fromCharCode((x << 4) | x2);
+        } else if (ch === '>') {
+          break;
+        } else if (specialChars[ch.charCodeAt(0)] === 1) {
+          continue;
+        } else {
+          if (isFirstHex) {
+            firstDigit = toHexDigit(ch);
+            if (firstDigit === -1) {
+              warn("Ignoring invalid character '" + ch + "' in hex string");
+              continue;
+            }
+          } else {
+            secondDigit = toHexDigit(ch);
+            if (secondDigit === -1) {
+              warn("Ignoring invalid character '" + ch + "' in hex string");
+              continue;
+            }
+            str += String.fromCharCode((firstDigit << 4) | secondDigit);
+          }
+          isFirstHex = !isFirstHex;
         }
       }
       return str;
@@ -27937,6 +30351,12 @@ var Pattern = (function PatternClosure() {
 
 var Shadings = {};
 
+// A small number to offset the first/last color stops so we can insert ones to
+// support extend.  Number.MIN_VALUE appears to be too small and breaks the
+// extend. 1e-7 works in FF but chrome seems to use an even smaller sized number
+// internally so we have to go bigger.
+Shadings.SMALL_NUMBER = 1e-2;
+
 // Radial and axial shading have very similar implementations
 // If needed, the implementations can be broken into two classes
 Shadings.RadialAxial = (function RadialAxialClosure() {
@@ -27945,7 +30365,6 @@ Shadings.RadialAxial = (function RadialAxialClosure() {
     this.coordsArr = dict.get('Coords');
     this.shadingType = dict.get('ShadingType');
     this.type = 'Pattern';
-
     this.ctx = ctx;
     var cs = dict.get('ColorSpace', 'CS');
     cs = ColorSpace.parse(cs, xref, res);
@@ -27963,30 +30382,91 @@ Shadings.RadialAxial = (function RadialAxialClosure() {
       var extendArr = dict.get('Extend');
       extendStart = extendArr[0];
       extendEnd = extendArr[1];
-      TODO('Support extend');
+    }
+
+    if (this.shadingType === PatternType.RADIAL &&
+       (!extendStart || !extendEnd)) {
+      // Radial gradient only currently works if either circle is fully within
+      // the other circle.
+      var x1 = this.coordsArr[0];
+      var y1 = this.coordsArr[1];
+      var r1 = this.coordsArr[2];
+      var x2 = this.coordsArr[3];
+      var y2 = this.coordsArr[4];
+      var r2 = this.coordsArr[5];
+      var distance = Math.sqrt((x1 - x2) * (x1 - x2) + (y1 - y2) * (y1 - y2));
+      if (r1 <= r2 + distance &&
+          r2 <= r1 + distance) {
+        warn('Unsupported radial gradient.');
+      }
     }
 
     this.extendStart = extendStart;
     this.extendEnd = extendEnd;
 
     var fnObj = dict.get('Function');
-    if (isArray(fnObj))
-      error('No support for array of functions');
-    if (!isPDFFunction(fnObj))
-      error('Invalid function');
-    var fn = PDFFunction.parse(xref, fnObj);
+    var fn;
+    if (isArray(fnObj)) {
+      var fnArray = [];
+      for (var j = 0, jj = fnObj.length; j < jj; j++) {
+        var obj = xref.fetchIfRef(fnObj[j]);
+        if (!isPDFFunction(obj)) {
+          error('Invalid function');
+        }
+        fnArray.push(PDFFunction.parse(xref, obj));
+      }
+      fn = function radialAxialColorFunction(arg) {
+        var out = [];
+        for (var i = 0, ii = fnArray.length; i < ii; i++) {
+          out.push(fnArray[i](arg)[0]);
+        }
+        return out;
+      };
+    } else {
+      if (!isPDFFunction(fnObj)) {
+        error('Invalid function');
+      }
+      fn = PDFFunction.parse(xref, fnObj);
+    }
 
     // 10 samples seems good enough for now, but probably won't work
     // if there are sharp color changes. Ideally, we would implement
     // the spec faithfully and add lossless optimizations.
-    var step = (t1 - t0) / 10;
     var diff = t1 - t0;
+    var step = diff / 10;
 
-    var colorStops = [];
+    var colorStops = this.colorStops = [];
+
+    // Protect against bad domains so we don't end up in an infinte loop below.
+    if (t0 >= t1 || step <= 0) {
+      // Acrobat doesn't seem to handle these cases so we'll ignore for
+      // now.
+      info('Bad shading domain.');
+      return;
+    }
+
     for (var i = t0; i <= t1; i += step) {
-      var rgbColor = cs.getRgb(fn([i]));
-      var cssColor = Util.makeCssRgb(rgbColor[0], rgbColor[1], rgbColor[2]);
+      var rgbColor = cs.getRgb(fn([i]), 0);
+      var cssColor = Util.makeCssRgb(rgbColor);
       colorStops.push([(i - t0) / diff, cssColor]);
+    }
+
+    var background = 'transparent';
+    if (dict.has('Background')) {
+      var rgbColor = cs.getRgb(dict.get('Background'), 0);
+      background = Util.makeCssRgb(rgbColor);
+    }
+
+    if (!extendStart) {
+      // Insert a color stop at the front and offset the first real color stop
+      // so it doesn't conflict with the one we insert.
+      colorStops.unshift([0, background]);
+      colorStops[1][0] += Shadings.SMALL_NUMBER;
+    }
+    if (!extendEnd) {
+      // Same idea as above in extendStart but for the end.
+      colorStops[colorStops.length - 1][0] -= Shadings.SMALL_NUMBER;
+      colorStops.push([1, background]);
     }
 
     this.colorStops = colorStops;
@@ -28114,7 +30594,7 @@ var TilingPattern = (function TilingPatternClosure() {
 
     // set the new canvas element context as the graphics context
     var tmpCtx = tmpCanvas.getContext('2d');
-    var graphics = new CanvasGraphics(tmpCtx, objs);
+    var graphics = new CanvasGraphics(tmpCtx, null, objs);
 
     switch (paintType) {
       case PaintType.COLORED:
@@ -28122,7 +30602,8 @@ var TilingPattern = (function TilingPatternClosure() {
         tmpCtx.strokeStyle = ctx.strokeStyle;
         break;
       case PaintType.UNCOLORED:
-        var cssColor = Util.makeCssRgb(this, color[0], color[1], color[2]);
+        var rgbColor = new DeviceRgbCS().getRgb(color, 0);
+        var cssColor = Util.makeCssRgb(rgbColor);
         tmpCtx.fillStyle = cssColor;
         tmpCtx.strokeStyle = cssColor;
         break;
@@ -28192,7 +30673,8 @@ var TilingPattern = (function TilingPatternClosure() {
 
 var Stream = (function StreamClosure() {
   function Stream(arrayBuffer, start, length, dict) {
-    this.bytes = new Uint8Array(arrayBuffer);
+    this.bytes = arrayBuffer instanceof Uint8Array ? arrayBuffer :
+      new Uint8Array(arrayBuffer);
     this.start = start || 0;
     this.pos = this.start;
     this.end = (start + length) || this.bytes.length;
@@ -30523,6 +33005,15 @@ var LZWStream = (function LZWStreamClosure() {
   return LZWStream;
 })();
 
+var NullStream = (function NullStreamClosure() {
+  function NullStream() {
+    Stream.call(this, new Uint8Array(0));
+  }
+
+  NullStream.prototype = Stream.prototype;
+
+  return NullStream;
+})();
 
 
 function MessageHandler(name, comObj) {
@@ -30533,11 +33024,19 @@ function MessageHandler(name, comObj) {
   var ah = this.actionHandler = {};
 
   ah['console_log'] = [function ahConsoleLog(data) {
-    console.log.apply(console, data);
+    log.apply(null, data);
   }];
-  ah['console_error'] = [function ahConsoleError(data) {
-    console.error.apply(console, data);
-  }];
+  // If there's no console available, console_error in the
+  // action handler will do nothing.
+  if ('console' in globalScope) {
+    ah['console_error'] = [function ahConsoleError(data) {
+      globalScope['console'].error.apply(null, data);
+    }];
+  } else {
+    ah['console_error'] = [function ahConsoleError(data) {
+      log.apply(null, data);
+    }];
+  }
   ah['_warn'] = [function ah_Warn(data) {
     warn(data);
   }];
@@ -30625,8 +33124,18 @@ var WorkerMessageHandler = {
           }
 
           return;
+        } else if (e instanceof InvalidPDFException) {
+          handler.send('InvalidPDF', {
+            exception: e
+          });
+
+          return;
         } else {
-          throw e;
+          handler.send('UnknownError', {
+            exception: new UnknownErrorException(e.message, e.toString())
+          });
+
+          return;
         }
       }
       var doc = {
@@ -30642,7 +33151,19 @@ var WorkerMessageHandler = {
     }
 
     handler.on('test', function wphSetupTest(data) {
-      handler.send('test', data instanceof Uint8Array);
+      // check if Uint8Array can be sent to worker
+      if (!(data instanceof Uint8Array)) {
+        handler.send('test', false);
+        return;
+      }
+      // check if the response property is supported by xhr
+      var xhr = new XMLHttpRequest();
+      if (!('response' in xhr || 'mozResponse' in xhr ||
+          'responseArrayBuffer' in xhr || 'mozResponseArrayBuffer' in xhr)) {
+        handler.send('test', false);
+        return;
+      }
+      handler.send('test', true);
     });
 
     handler.on('GetDocRequest', function wphSetupDoc(data) {
@@ -30742,14 +33263,14 @@ var WorkerMessageHandler = {
         return;
       }
 
-      console.log('page=%d - getOperatorList: time=%dms, len=%d', pageNum,
+      log('page=%d - getOperatorList: time=%dms, len=%d', pageNum,
                               Date.now() - start, operatorList.fnArray.length);
 
       // Filter the dependecies for fonts.
       var fonts = {};
       for (var i = 0, ii = dependency.length; i < ii; i++) {
         var dep = dependency[i];
-        if (dep.indexOf('font_') == 0) {
+        if (dep.indexOf('g_font_') == 0) {
           fonts[dep] = true;
         }
       }
@@ -30774,7 +33295,7 @@ var WorkerMessageHandler = {
         promise.reject(e);
       }
 
-      console.log('text indexing: page=%d - time=%dms',
+      log('text indexing: page=%d - time=%dms',
                       pageNum, Date.now() - start);
     });
   }
@@ -30785,7 +33306,7 @@ var consoleTimer = {};
 var workerConsole = {
   log: function log() {
     var args = Array.prototype.slice.call(arguments);
-    postMessage({
+    globalScope.postMessage({
       action: 'console_log',
       data: args
     });
@@ -30793,7 +33314,7 @@ var workerConsole = {
 
   error: function error() {
     var args = Array.prototype.slice.call(arguments);
-    postMessage({
+    globalScope.postMessage({
       action: 'console_error',
       data: args
     });
@@ -30821,7 +33342,7 @@ if (typeof window === 'undefined') {
   // throw an exception which will be forwarded on automatically.
   PDFJS.LogManager.addLogger({
     warn: function(msg) {
-      postMessage({
+      globalScope.postMessage({
         action: '_warn',
         data: msg
       });
@@ -30831,7 +33352,6 @@ if (typeof window === 'undefined') {
   var handler = new MessageHandler('worker_processor', this);
   WorkerMessageHandler.setup(handler);
 }
-
 
 
 var JpxImage = (function JpxImageClosure() {
@@ -31086,7 +33606,8 @@ var JpxImage = (function JpxImageClosure() {
                   cod.resetContextProbabilities ||
                   cod.terminationOnEachCodingPass ||
                   cod.verticalyStripe || cod.predictableTermination)
-                throw 'Unsupported COD options: ' + uneval(cod);
+                throw 'Unsupported COD options: ' +
+                  globalScope.JSON.stringify(cod);
 
               if (context.mainHeader)
                 context.COD = cod;
@@ -33884,11 +36405,16 @@ var bidi = PDFJS.bidi = (function bidiClosure() {
     }
   }
 
-  function bidi(text, startLevel) {
-    var str = text.str;
+  function BidiResult(str, isLTR) {
+    this.str = str;
+    this.ltr = isLTR;
+  }
+
+  function bidi(str, startLevel) {
+    var isLTR = true;
     var strLength = str.length;
     if (strLength == 0)
-      return str;
+      return new BidiResult(str, ltr);
 
     // get types, fill arrays
 
@@ -33922,16 +36448,16 @@ var bidi = PDFJS.bidi = (function bidiClosure() {
     //  if less than 30% chars are rtl then string is primarily ltr
     //  if more than 30% chars are rtl then string is primarily rtl
     if (numBidi == 0) {
-      text.direction = 'ltr';
-      return str;
+      isLTR = true;
+      return new BidiResult(str, isLTR);
     }
 
     if (startLevel == -1) {
       if ((strLength / numBidi) < 0.3) {
-        text.direction = 'ltr';
+        isLTR = true;
         startLevel = 0;
       } else {
-        text.direction = 'rtl';
+        isLTR = false;
         startLevel = 1;
       }
     }
@@ -34184,7 +36710,8 @@ var bidi = PDFJS.bidi = (function bidiClosure() {
       if (ch != '<' && ch != '>')
         result += ch;
     }
-    return result;
+
+    return new BidiResult(result, isLTR);
   }
 
   return bidi;
@@ -34241,23 +36768,19 @@ var Metadata = PDFJS.Metadata = (function MetadataClosure() {
       if (!rdf || nodeName !== 'rdf:rdf' || !rdf.hasChildNodes())
         return;
 
-      var childNodes = rdf.childNodes, desc, namespace, entries, entry;
+      var children = rdf.childNodes, desc, entry, name, i, ii, length, iLength;
 
-      for (var i = 0, length = childNodes.length; i < length; i++) {
-        desc = childNodes[i];
+      for (i = 0, length = children.length; i < length; i++) {
+        desc = children[i];
         if (desc.nodeName.toLowerCase() !== 'rdf:description')
           continue;
 
-        entries = [];
-        for (var ii = 0, iLength = desc.childNodes.length; ii < iLength; ii++) {
-          if (desc.childNodes[ii].nodeName.toLowerCase() !== '#text')
-            entries.push(desc.childNodes[ii]);
-        }
-
-        for (ii = 0, iLength = entries.length; ii < iLength; ii++) {
-          var entry = entries[ii];
-          var name = entry.nodeName.toLowerCase();
-          this.metadata[name] = entry.textContent.trim();
+        for (ii = 0, iLength = desc.childNodes.length; ii < iLength; ii++) {
+          if (desc.childNodes[ii].nodeName.toLowerCase() !== '#text') {
+            entry = desc.childNodes[ii];
+            name = entry.nodeName.toLowerCase();
+            this.metadata[name] = entry.textContent.trim();
+          }
         }
       }
     },
@@ -34791,6 +37314,10 @@ var JpegImage = (function jpegImage() {
     return lines;
   }
 
+  function clampTo8bit(a) {
+    return a < 0 ? 0 : a > 255 ? 255 : a;
+  }
+
   constructor.prototype = {
     load: function load(path) {
       var xhr = new XMLHttpRequest();
@@ -35041,9 +37568,6 @@ var JpegImage = (function jpegImage() {
       }
     },
     getData: function getData(width, height) {
-      function clampTo8bit(a) {
-        return a < 0 ? 0 : a > 255 ? 255 : a;
-      }
       var scaleX = this.width / width, scaleY = this.height / height;
 
       var component1, component2, component3, component4;
@@ -35212,6 +37736,6 @@ var JpegImage = (function jpegImage() {
   return constructor;
 })();
 
-}).call((typeof window === 'undefined') ? this : window);
 
+}).call((typeof window === 'undefined') ? this : window);
 
