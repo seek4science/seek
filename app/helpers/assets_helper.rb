@@ -172,7 +172,7 @@ module AssetsHelper
           end
         else
           total_count = res[:items].size
-          res[:items] = authorized_partial_asset_collection res[:items],key
+          res[:items] = key.constantize.authorized_partial_asset_collection res[:items],'view',current_user
           res[:hidden_count] = total_count - res[:items].size
         end
       end
@@ -188,22 +188,6 @@ module AssetsHelper
 
     return related
     end
-
-  def authorized_partial_asset_collection partial_asset_collection, asset_type
-    user_id = current_user.nil? ? 0 : current_user.id
-    authorized_assets = []
-    authorized_partial_asset_collection = []
-    lookup_table_name = asset_type.underscore + '_auth_lookup'
-    asset_class = asset_type.constantize
-    if (asset_class.lookup_table_consistent?(user_id))
-      Rails.logger.info("Lookup table #{lookup_table_name} used for authorizing related items is complete for user_id = #{user_id}")
-      authorized_assets = asset_class.lookup_for_action_and_user 'view', user_id, nil
-      authorized_partial_asset_collection = authorized_assets & partial_asset_collection
-    else
-      authorized_partial_asset_collection = partial_asset_collection.select(&:can_view?)
-    end
-    authorized_partial_asset_collection
-  end
 
   def filter_url(resource_type, context_resource)
     #For example, if context_resource is a project with an id of 1, filter text is "(:filter => {:project => 1}, :page=>'all')"
