@@ -44,6 +44,7 @@ group :development do
   gem "sqlite3-ruby","1.2.5",:require=>"sqlite3"
   gem "unicorn"
   gem "parallel_tests"
+  gem "mongrel"
 end
 
 group :test do

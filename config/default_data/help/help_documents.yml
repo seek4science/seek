@@ -41,6 +41,7 @@ help_documents:
       h2. Guidelines for Data and Model Annotation in SEEK
       
       [metadata-guidelines]
+      [isa-guide]
       [isa-best-practice]
       [transcriptomics-guidelines]
       [proteomics-guidelines]
@@ -57,7 +58,7 @@ help_documents:
       
       [faq]
     - 2010-05-12 09:28:37
-    - 2010-09-01 09:00:13
+    - 2012-09-26 14:59:15
   - - "8"
     - metadata-guidelines
     - Metadata Guidelines
@@ -123,7 +124,7 @@ help_documents:
       *Title* \xE2\x80\x93 as described above\r\n\
       *Description* \xE2\x80\x93 free text to describe what the data is showing\r\n\
       *File Format* \xE2\x80\x93 how the data is stored, for example excel spreadsheet\r\n\
-      *Factors Studied* \xE2\x80\x93 what were the measurements in this experiment (e.g. concentration, pH or gene expression). If you are uploading directly through SEEK, you can chose from a drop-down list\r\n\
+      *Factors Studied* \xE2\x80\x93 what experimental parameters did you alter in order to study the effects in the organism (e.g. changing the pH from 5 to 7)\r\n\
       *Measured Item* \xE2\x80\x93 what was measured in this data, e.g. concentration of glucose. Measured items should be named using controlled vocabulary terms wherever possible, for example, glucose has chEBI name glucose and chEBI ID CHEBI:17234\r\n\
       *Units* \xE2\x80\x93 how the measurements were taken, e.g. concentration in mmol, or mass in grams.\r\n\
       \r\n\
@@ -154,7 +155,7 @@ help_documents:
       \r\n\
       *Attribution* \xE2\x80\x93 Some assets are based on others, for example, a model may use data from an experimental assay, or a SOP may be a modified version of another. The attribution section allows you to specify when this is the case\r\n"
     - 2010-05-20 08:37:01
-    - 2011-07-26 09:21:21
+    - 2011-08-17 09:03:44
   - - "9"
     - transcriptomics-guidelines
     - Transcriptomics Guidelines
@@ -307,7 +308,7 @@ help_documents:
     - controlled-vocabularies
     - Controlled Vocabularies and Ontologies
     - |
-      SysMO-DB recommends using the following controlled vocabularies and data resources for data annotation
+      SysMO-DB recommends that consortium members use identifiers from public databases and terms from community ontologies wherever possible when describing and annotating data and models. The following table shows the resources available for annotation by biological object category. These are the resources recommended by SysMO-DB and also represent the most commonly used in the SysMO consortium.
       
       
       |_. Entity |_. Resource |_. Example ID |_. Database URL |_. MIRIAM URN |
@@ -322,18 +323,94 @@ help_documents:
       | Cellular Location | Gene Ontology | "GO:0016020":http://amigo.geneontology.org/cgi-bin/amigo/term-details.cgi?term=GO:0016020| "http://www.geneontology.org/":http://www.geneontology.org/ | urn:miriam:obo.go |
       | Molecular Function | Gene Ontology | "GO:0004857":http://amigo.geneontology.org/cgi-bin/amigo/term-details.cgi?term=GO:0004857| "http://www.geneontology.org/":http://www.geneontology.org/ | urn:miriam:obo.go |
       | Biological Process | Gene Ontology | "GO:0071581":http://amigo.geneontology.org/cgi-bin/amigo/term-details.cgi?term=GO:0071581| "http://www.geneontology.org/":http://www.geneontology.org/ | urn:miriam:obo.go |
-      | Literature | PubMed | PMID:19112082|"http://www.ncbi.nlm.nih.gov/pubmed/":http://www.ncbi.nlm.nih.gov/pubmed/ | urn:miriam:pubmed |
+      | Literature | PubMed | "PMID:19112082":http://www.ncbi.nlm.nih.gov/pubmed/19112082| "http://www.ncbi.nlm.nih.gov/pubmed/":http://www.ncbi.nlm.nih.gov/pubmed/ | urn:miriam:pubmed |
+      | Model Descriptions | Systems Biology Ontology | "SBO:0000244":http://www.ebi.ac.uk/sbo/main/browse.jsp?nodeId=245| "http://www.ebi.ac.uk/sbo/":http://www.ebi.ac.uk/sbo/ | urn:miriam:biomodels.sbo |
+      
+      
+      h2. Assistance with Data and Models Annotation
+      
+      Accessing and navigating these resources can be difficult and time-consuming for large data sets. SysMO-DB provide tools to make data and model annotation easier.
+      
+      h3. RightField
+      
+      RightField (http://www.rightfield.org.uk) allows the easy annotation of excel spreadsheet data with terms from community ontologies. Relevant ranges of ontology terms can be embedded into spreadsheets in specific cells as simple drop-down lists. This allows consistent and standards-compliant annotation without the need to browse or navigate the ontologies. 
+      Multiple ontologies can be used in the same spreadsheet, and the sources of each term and the version of each ontology is automatically collected and recorded. 
+      A collection of SysMO templates have already been RightField-enabled. These templates are available for download from the templates page and from the SysMO-DB project in the SEEK.
+      
+      h3. JWS OneStop
+      
+      OneStop assists with model annotation and publishing. It is a one-stop-shop for producing a MIRIAM-compliant, annotated model in SBML. OneStop extracts the names used for species and reactions in an uploaded model and uses these names to search public databases for the official terms and MIRIAM identifiers. It uses the Semantic SBML web service (http://semanticsbml.org/) for searching and returns a list of possible matches that the modellers can select from. This ensures the accuracy of each annotation whilst providing an easy mechanism for identifying possible matches. 
+      In addition to annotations, OneStop also provides editing and validation functionality as well as automatically exporting models in SBGN.
+      
 
     - 2010-05-27 10:44:44
-    - 2010-06-14 15:40:32
+    - 2011-09-28 10:30:10
   - - "13"
     - templates
     - JERM Templates
     - |
       SysMO-DB, the SysMO-PALs and other members of the SysMO consortium have been developing a collection of JERM templates to facilitate standard formats for sharing the same kinds of data through the consortium. This page lists the current templates available. 
+      
+      h4. SOPs
+      
+      * "Nature Protocols Format for SOPs":/help/templates/attachments/3/download
+      
+      h4. Data
+      
+      * "Master Template":/help/templates/attachments/10/download
+      
+      This is the general format for all SEEK templates. Each spreadsheet has multiple sheets, defining experimental metadata, organims/samples, data and optional sheets for instrument descriptions and results.
+      This template can be refined and/or extended to cater more specifically for different data types. 
+      
+      h5. Metabolomics
+      
+      * "Master Metabolomics Template":/help/templates/attachments/10/download
+      
+      This is a JERM compliant template for general use in metabolomics experiments
+      
+      h5. Proteomics
+      
+      * "Mass Spec JERM":/help/templates/attachments/11/download
+      
+      This MIAPE template was adapted from a template offered by the "PRIDE database":http://www.ebi.ac.uk/pride/ to conform to the SEEK JERM format. For proteomics data, the "Instrument" sheet is mandatory. 
+      
+      * "Gel Electrophoresis":/help/templates/attachments/12/download
+      
+      This is a MIAPE-GE template for use with 2D gel data
+      
+      h5. Transcriptomics
+      
+      
+      h6. General Transcriptomics Templates
+      
+      * "Gene Expression ArrayExpress":/help/templates/attachments/19/download
+      A JERM compliant template based on the MAGE-TAB ArrayExpress format (metadata only)
+      
+      * "General Chip-chip Array":/help/templates/attachments/20/download
+      A JERM compliant template based on a template taken from "GEO":http://www.ncbi.nlm.nih.gov/geo/
+      
+      * "RT-PCR":/help/templates/attachments/21/download
+      A JERM compliant template based on a template taken from "GEO":http://www.ncbi.nlm.nih.gov/geo/
+      
+      
+      h6. Affymetrix
+      
+      * "3' or Whole Gene Expression array":/help/templates/attachments/22/download
+      A JERM compliant template based on a template taken from "GEO":http://www.ncbi.nlm.nih.gov/geo/
+      
+      
+      * "Chip-chip Array":/help/templates/attachments/23/download
+      A JERM compliant template for Chip-chip data based on a template taken from "GEO":http://www.ncbi.nlm.nih.gov/geo/
+      
+      
+      h6. Nimblegen
+      
+      * "Gene Expression":/help/templates/attachments/24/download
+      A JERM compliant template based on a template taken from "GEO":http://www.ncbi.nlm.nih.gov/geo/
+      
 
     - 2010-05-28 09:14:54
-    - 2011-01-20 12:32:01
+    - 2012-06-01 08:38:16
   - - "14"
     - isa-best-practice
     - ISA Best Practice
@@ -399,3 +476,67 @@ help_documents:
       *SOP Titles* \xE2\x80\x93 the title of one or many SOPs used to execute this assay\r\n"
     - 2010-09-01 08:59:29
     - 2010-09-01 09:04:59
+  - - "15"
+    - isa-guide
+    - A Quick Guide to Using the ISA Structure
+    - |
+      h1. A Quick Guide to Using ISA in SEEK
+      
+      ISA stands for Investigations, Studies and Assays. It is the structure developed by the ISA-TAB community (http://isacommons.org/) and adopted by the SEEK to help you describe your data, experiments and models.
+      In SEEK, you can upload or link to any data, models or protocols from your projects, but they don't normally exist in isolation. ISA provides a framework for expressing how the work in your projects fits together. For example, you may have transcriptomics, proteomics and metabolomics data which was all created to address the same biological problem. 
+      ISA also allows you to associate your data to the SOPs that were used to create them. For models, it allows linkage to construction or validation data sets. This makes it easier for others to interpret your results, or to repeat or validate your results when required. 
+      The aim of using the ISA structure is to ensure a complete record of the experiment and associated assets is available and accessible to other project members in a standard format.
+      
+      h2. Investigations, Studies and Assays Defined
+      
+      The following describes the purpose of each 'layer' in the structure, using examples from SysMO, and also from the public BioInvestigation Index database(BII http://www.ebi.ac.uk/bioinvindex/), which also uses the ISA structure for managing data
+      
+      * *Investigation:* a high level description of the overall area of research. In SysMO, this may be the overall aims of the project, as stated on the sysmo.net website. If your project has several subprojects that do not share any data, you should define an investigation for each.
+      
+      * BII Example: Growth control of the eukaryote cell: a systems biology study in yeast
+      * SysMO Example: Analysis of Central Carbon Metabolism of Sulfolobus solfataricus under varying temperatures
+      
+      * *Study:* a particular biological hypothesis, which you are planning to test in various ways, using various techniques, which could be experimental, informatics, modelling, or a mixture
+      * BII Example: Study of the impact of changes in flux on the transcriptome, proteome, endometabolome and exometabolome of the yeast Saccharomyces cerevisiae under different nutrient limitations
+      * SysMO Example: Comparison of S. solfataricus grown at 70 and 80 degrees
+      
+      * *Assay:* specific, individual experiments, measurements, or modelling tasks
+      In SysMO, this may be a microarray experiment, or a flux balance analysis, for example
+      * BII Example: 
+      Transcriptional profiling
+      DNA Microarray
+      * SysMO Example: 
+      Comparison of transcriptome 70 and 80c (Cdna microarray)
+      Comparison of proteome at 70 and 80c (Protein expression profiling)
+      Intracellular metabolomics of s. solfataricus at 70 and 80c (Metabolomics)
+      
+      h2. Viewing Associations Between SEEK Assets
+      
+      In SEEK, the ISA structure is displayed graphically, so you can see at a glance what items are associated with one another 
+       
+      !/help_images/0000/0001/ISAUpperLevel.png!
+      
+      The figure above shows the Investigation Glycerol Synthesis in Saccharomyces cerevisiae has one study, which in turn contains three different assays. If we zoom in on one particular assay, the Glycerol Synthesis Model Construction, we can see the SEEK downloadable assets it is associated with.
+      
+      !/help_images/0000/0003/ISADataModel.png!
+       
+      In this case, the Assay is not a laboratory experiment, but a modelling task. Referring to it as an assay is therefore confusing, so we call these Modelling Analyses instead of Assays. This modelling analysis has a publication and a model associated with it, as well as a data file that was used for model validation. The data file is also associated with another assay (Intracellular Metabolites). This assay describes how the validation data was originally produced. As you can see, it is possible to associate data files, models, and other SEEK assets with more than one assay if necessary. 
+      
+      h2. Using ISA when Uploading SEEK Assets
+      
+      You can link assets to ISA descriptions, or vice versa, so it doesn't matter which you do first. Many projects prefer to have a higher level structure of Investigations and Studies defined from the beginning, so that new experiments can be linked up with little work for the uploader.
+      
+      h2. Starting with your Data
+      
+      We recommend using a JERM template to describe your data wherever available. We have a list of templates available here: https://seek.sysmo-db.org/help/templates 
+      If there is not a specific template for your type of data, consider using the general JERM master template. This template contains all the required JERM metadata elements, but not necessarily any technology-specific extensions. If you use and extend the JERM master for a particular type of experiment, please consider contributing those changes back to the consortium. Other people may wish to use your new template.
+      If you have your data in any other format, you can still upload it to SEEK, but indexing will be limited, so subsequent searches will also be limited.
+      
+      When uploading your data, you will be asked wish assay(s) it is associated with. If you have already described the assay in the SEEK, you can find it from the drop-down list and link it, if you have not yet described your assay, you can leave this step out for the time-being. If your data is JERM compliant, many of the metadata elements in the upload form are the same as those in the first JERM metadata sheet. Soon, these elements will be automatically populated from your file, but for now, you will be asked to specify them in the web interface.
+      Once you have uploaded your data, you can create a new assay if necessary and link it back to your data. New assays can be associated with pre-existing Studies and Investigations, or new ones can be created as required. 
+      If you upload data without linking it to the ISA structure, you won't be able to link it to models or SOPs. You will receive a warning email for these orphan  data files after they remain unlinked for more than 3 months.
+      
+      
+
+    - 2012-09-26 14:53:01
+    - 2012-09-26 14:58:15
