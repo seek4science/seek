@@ -34,14 +34,14 @@
   <ul class="matching_data_items">
     <% unless extra_count < 1 %>
         <li class="matching_data_item">
-          <%= link_to_remote "View all "+(authorized_matching_data_files.size).to_s+" matched data files", :html => {:id => "view_matched_data_files_and_extra", :style => "display:block"},
+          <%= link_to_remote "View all "+(authorized_matching_data_files.size).to_s+" matched items", :html => {:id => "view_matched_data_files_and_extra", :style => "display:block"},
                              :url => url_for(:controller => 'models', :action => 'view_matched_data_files'),
                              :with => "'primary_keys=' + '#{authorized_matching_data_files.collect(&:primary_key).join(",")}'
                                     + '&scores=' + '#{authorized_matching_data_files.collect(&:score).join(",")}'
                                     + '&search_terms=' + '#{authorized_matching_data_files.collect(&:search_terms).collect { |t| t.join('*') }.join(',')}'",
                              :before => "show_large_ajax_loader('matching_data_ajax_loader')"
           -%>
-          <%= link_to_remote "View " + limit_matching_data_files.size.to_s + " matched data files", :html => {:id => "view_matched_data_files", :style => "display:none"},
+          <%= link_to_remote "View " + limit_matching_data_files.size.to_s + " matched items", :html => {:id => "view_matched_data_files", :style => "display:none"},
                              :url => url_for(:controller => 'models', :action => 'view_matched_data_files'),
                              :with => "'primary_keys=' + '#{limit_matching_data_files.collect(&:primary_key).join(",")}'
                          + '&scores=' + '#{limit_matching_data_files.collect(&:score).join(",")}'
