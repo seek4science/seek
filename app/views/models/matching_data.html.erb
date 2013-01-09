@@ -13,7 +13,7 @@
    authorized_data_file_ids = authorized_data_files.collect(&:id)
    authorized_matching_data_files = @matching_data_files.select { |mdf| authorized_data_file_ids.include?(mdf.primary_key.to_i) }
    hidden_items = data_files - authorized_data_files
-   hidden_count = @matching_data_files.count - authorized_matching_data_files.count
+   hidden_count = hidden_items.count
 
    limit ||= 4
    limit_matching_data_files = authorized_matching_data_files[0..limit]
@@ -53,13 +53,7 @@
 
     <% unless hidden_count < 1 %>
         <li class="matching_data_item">
-          <%= hidden_count -%> hidden <%= hidden_count > 1 ? "items" : "item" %>
-          <%
-             contributor_links = hidden_item_contributor_links(hidden_items)
-          %>
-          <% if !contributor_links.empty? %>
-              <span class="none_text">(Please contact: <%= contributor_links.join(', ') %>)</span>
-          <% end %>
+           <%= render :partial => "assets/hidden_items", :object => hidden_items -%>
         </li>
     <% end %>
   </ul>
