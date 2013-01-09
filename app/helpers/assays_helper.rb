@@ -9,13 +9,6 @@ module AssaysHelper
     Assay.find(:all,:conditions=>['study_id IS NULL'])
   end
 
-  #only data files authorised for show, and belonging to projects matching current_user
-  def data_files_for_assay_association
-    data_files=DataFile.find(:all,:include=>:asset)
-    data_files=data_files.select{|df| current_user.person.member_of?(df.projects)}
-    Authorization.authorize_collection("view",data_files,current_user)
-  end
-
   def assay_organism_list_item assay_organism
     result = link_to h(assay_organism.organism.title),assay_organism.organism
     if assay_organism.strain

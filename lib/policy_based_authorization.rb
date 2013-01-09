@@ -64,6 +64,23 @@ module Acts
           end
         end
 
+        #returns the authorised items from the array of the same class items for a given action and optionally a user. If user is nil, the items authorised for an
+        #anonymous user are returned.
+        def authorized_partial_asset_collection partial_asset_collection, action, user=User.current_user
+          user_id = user.nil? ? 0 : user.id
+          authorized_assets = []
+          authorized_partial_asset_collection = []
+          lookup_table_name = self.name.underscore.pluralize + '_auth_lookup'
+          if (self.lookup_table_consistent?(user_id))
+            Rails.logger.info("Lookup table #{lookup_table_name} used for authorizing related items is complete for user_id = #{user_id}")
+            authorized_assets = self.lookup_for_action_and_user action, user_id, nil
+            authorized_partial_asset_collection = authorized_assets & partial_asset_collection
+          else
+            authorized_partial_asset_collection = partial_asset_collection.select{|a| a.send("can_#{action}?")}
+          end
+          authorized_partial_asset_collection
+        end
+
         #determines whether the lookup table records are consistent with the number of asset items in the database and the last id of the item added
         def lookup_table_consistent? user_id
           unless user_id.is_a?(Numeric)

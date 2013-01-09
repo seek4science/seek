@@ -51,7 +51,7 @@ class EventsControllerTest < ActionController::TestCase
     login_as(:aaron)
     get :index, :page => "all"
     assert_response :success
-    assert_equal assigns(:events).sort_by(&:id), Authorization.authorize_collection("view", assigns(:events), users(:aaron)).sort_by(&:id), "events haven't been authorized properly"
+    assert_equal assigns(:events).sort_by(&:id), Event.authorized_partial_asset_collection(assigns(:events), "view",  users(:aaron)).sort_by(&:id), "events haven't been authorized properly"
     assert assigns(:events).count < Event.find(:all).count #fails if all events are assigned to @events
   end
 

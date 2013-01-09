@@ -112,25 +112,6 @@ module Authorization
     return is_authorized    
   end
 
-
-  # convenience method which iterates through an array of items performing authorization on
-  # each for given user instance and action name;
-  # - keep_nil_records - will keep placeholders for not authorized items; can be useful, for example, for attributions
-  #                      to show that entry exists, but gives no information on what is hiding behind it
-  def self.authorize_collection(action_name, item_array, user, keep_nil_records=false)
-    # otherwise perform authorization for every item
-    authorized_items = item_array.collect do |item|
-     item.can_perform?(action_name, user) ? item : nil
-    end
-    
-    # not authorized items have been turned into NILs - remove these
-    unless keep_nil_records
-      authorized_items.compact!
-    end
-    
-    return authorized_items
-  end
-  
   private
 
   # checks if a person belongs to a blacklist of a particular user
