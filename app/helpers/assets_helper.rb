@@ -195,7 +195,7 @@ module AssetsHelper
     eval("#{resource_type.underscore.pluralize}_path" + filter_text)
   end
 
-  #provides a list of assets, according to the class, that are authorized acording the 'action' which defaults to view
+  #provides a list of assets, according to the class, that are authorized according the 'action' which defaults to view
   #if projects is provided, only authorizes the assets for that project
   def authorised_assets asset_class,projects=nil, action="view"
     asset_class.all_authorized_for action, User.current_user, projects

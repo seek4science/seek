@@ -26,7 +26,7 @@
         <b>by:</b>
         <span><%= contributor displayed_resource.contributor %></span>
         <% unless displayed_resource.version == 1 -%>
-            <br/>
+            <span>&nbsp;&nbsp;|&nbsp;&nbsp;</span>
             <span>
               <%= link_to_function "revision comments "+image("expand"),  :id => 'revision_comments_expand_image' do |page|
                 page.visual_effect(:toggle_appear, "revision_comments", :duration => 0.5)

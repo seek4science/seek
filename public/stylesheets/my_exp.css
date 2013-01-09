@@ -788,7 +788,7 @@ table.contributable:hover {
 
 .sectionIcons {
 	margin: 1em 0 0.5em 0;
-	font-size: 75%;
+	font-size: smaller;
 	text-align: center;
 }
 
@@ -906,7 +906,7 @@ a.button_slim * {
 
 .contribution_version_box {
 	border: 1px dotted #999999;
-	margin-bottom: 0.5em;
+	margin-bottom: 1em;
 	background-color: #F7F7F7;
 }
 
@@ -918,6 +918,7 @@ a.button_slim * {
 
 .contribution_version_selector_box {
 	padding: 0.6em 0.5em 0.4em 0.5em;
+	border: 0px dotted #999999;
 	border-width: 0 0 1px 0;
 	background-image: url('../images/box-bg1.png');
 	background-position: top;

@@ -61,6 +61,8 @@
 <div class="show_basic">
 
     <div class="main_content_left_box_narrower">
+
+        <%= render :partial=>"assets/resource_version_details", :locals=>{:displayed_resource=>@display_model, :resource=>@model} -%>
         <div class="box_about_actor">
             <%= render :partial=>"assets/multiple_fileinfo", :object=>@display_model -%>
 
@@ -109,7 +111,7 @@
 
     </div>
 
-    <%= render :partial=>"assets/resource_main_content_right",:locals => { :displayed_resource=>@display_model, :resource => @model } %>
+    <%= render :partial=>"assets/resource_main_content_right",:locals => { :resource => @model } %>
 
     <div style="clear:both;padding-top:1em;">
       <%= render :partial => "layouts/items_related_to", :object => @model %>

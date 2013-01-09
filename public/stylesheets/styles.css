@@ -1731,4 +1731,18 @@ ul.fileinfo_list li.fileinfo {
     margin-bottom: 1em;
 }
 
+div#guide_box {
+    min-height: 4em;
+}
+
+div#guide_box p {
+    text-align: center;
+}
+
+div#guide_box span#guide_box_close {
+    float: right;
+    margin-right: 0.5em;
+    margin-top: 0.5em;
+}
+
 
