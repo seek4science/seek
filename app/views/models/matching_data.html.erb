@@ -9,8 +9,12 @@
    data_files = @matching_data_files.collect do |mdf|
      DataFile.find(mdf.primary_key)
    end
-   authorized_data_file_ids = DataFile.authorized_partial_asset_collection(data_files, 'view', current_user).collect(&:id)
+   authorized_data_files = DataFile.authorized_partial_asset_collection(data_files, 'view', current_user)
+   authorized_data_file_ids = authorized_data_files.collect(&:id)
    authorized_matching_data_files = @matching_data_files.select { |mdf| authorized_data_file_ids.include?(mdf.primary_key.to_i) }
+   hidden_items = data_files - authorized_data_files
+   hidden_count = @matching_data_files.count - authorized_matching_data_files.count
+
    limit ||= 4
    limit_matching_data_files = authorized_matching_data_files[0..limit]
    extra_count = authorized_matching_data_files.size - limit
@@ -22,13 +26,13 @@
 
 <div class="show_basic">
   There are totally <span style="font-weight:bold"><%= @matching_data_files.count -%></span> data files matched,
-  <span style="font-weight:bold"><%= @matching_data_files.count - authorized_matching_data_files.count %></span> are
+  <span style="font-weight:bold"><%= hidden_count %></span> are
   hidden
 
   <%= render :partial => "matching_data_item", :locals => {:matching_data_items => limit_matching_data_files} -%>
 
-  <% unless extra_count < 1 %>
-      <ul class="matching_data_items">
+  <ul class="matching_data_items">
+    <% unless extra_count < 1 %>
         <li class="matching_data_item">
           <%= link_to_remote "View all "+(authorized_matching_data_files.size).to_s+" matched data files", :html => {:id => "view_matched_data_files_and_extra", :style => "display:block"},
                              :url => url_for(:controller => 'models', :action => 'view_matched_data_files'),
@@ -45,6 +49,18 @@
                              :before => "show_large_ajax_loader('matching_data_ajax_loader')"
           -%>
         </li>
-      </ul>
-  <% end %>
+    <% end %>
+
+    <% unless hidden_count < 1 %>
+        <li class="matching_data_item">
+          <%= hidden_count -%> hidden <%= hidden_count > 1 ? "items" : "item" %>
+          <%
+             contributor_links = hidden_item_contributor_links(hidden_items)
+          %>
+          <% if !contributor_links.empty? %>
+              <span class="none_text">(Please contact: <%= contributor_links.join(', ') %>)</span>
+          <% end %>
+        </li>
+    <% end %>
+  </ul>
 </div>
