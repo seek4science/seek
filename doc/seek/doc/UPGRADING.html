@@ -136,6 +136,8 @@ listed below:</p>
 <p>0.15.2</p>
 </li><li>
 <p>0.15.3</p>
+</li><li>
+<p>0.15.4</p>
 </li></ul>
 
 <p><em>(Note there was no 0.12.x version released externally, this was an
@@ -163,9 +165,14 @@ should still work, but could take a lot of unnecessary time.</p>
 <pre>sudo apt-get install poppler-utils tesseract-ocr openoffice.org openoffice.org-java-common</pre>
 
 <p>Then running open office in the headless mode and as the background
-process:</p>
+process: Firstly, the owner of /var/www needs to be changed to www-data, as
+soffice will read/write some information in there</p>
 
-<pre>nohup soffice --headless --accept=&quot;socket,host=127.0.0.1,port=8100;urp;&quot; --nofirststartwizard &gt; /dev/null 2&gt;&amp;1</pre>
+<pre>sudo chown www-data:www-data /var/www</pre>
+
+<p>Then</p>
+
+<pre>nohup sudo -H -u www-data soffice --headless --accept=&quot;socket,host=127.0.0.1,port=8100;urp;&quot; --nofirststartwizard &gt; /dev/null 2&gt;&amp;1</pre>
 
 <p>These are the fairly standard steps when upgrading between minor versions.</p>
 
@@ -208,7 +215,7 @@ installed, the upgrade is the typical:</p>
 
 <pre>RAILS_ENV=production ./script/delayed_job stop
 bundle exec rake sunspot:solr:stop RAILS_ENV=production
-hg pull https://sysmo-db.googlecode.com/hg/ -r v0.15.3
+hg pull https://sysmo-db.googlecode.com/hg/ -r v0.15.4
 hg update
 hg merge # only required if you've made changes since installing. If you have you may need to deal with conflicts.
 hg commit -m &quot;merged&quot; # likewise - only required if you made changes since installing
