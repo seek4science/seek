@@ -5,6 +5,7 @@ module Seek
     end
 
     def add_breadcrumbs
+      #Home
       add_breadcrumb "Home", :root_path
       #process for nested attributes
       if controller_name == 'studied_factors'
@@ -26,6 +27,7 @@ module Seek
         add_edit_breadcrumb @model_instance
       end
 
+      #Index
       controller_name == 'studied_factors' ? add_index_breadcrumb(controller_name, 'Factors studied Index') : add_index_breadcrumb(controller_name)
       resource = eval("@"+controller_name.singularize) || try_block{controller_name.singularize.camelize.constantize.find_by_id(params[:id])}
       add_show_breadcrumb resource if (resource && resource.respond_to?(:new_record?) && !resource.new_record?)
