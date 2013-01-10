@@ -108,7 +108,7 @@ class SendPeriodicEmailsJobTest < ActiveSupport::TestCase
       assert_equal 1,Delayed::Job.count
 
       job = Delayed::Job.first
-      assert_equal 1,job.priority
+      assert_equal 3,job.priority
 
       assert_no_difference("Delayed::Job.count") do
         SendPeriodicEmailsJob.create_job('daily', Time.now)
