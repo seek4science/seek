@@ -10,6 +10,8 @@ ul.dynamic_menu {
 }
 ul.dynamic_menu>li {
     list-style: none;
+    text-align: left;
+    padding-left: 0.5em;
 }
 ul.dynamic_menu>li:hover {
     background-color: #307af5;

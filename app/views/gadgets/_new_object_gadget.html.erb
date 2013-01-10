@@ -1,12 +1,8 @@
-
-
-
-
-
-<%= new_creatable_javascript -%>
-<%= hidden_field_tag :new_resource_type %>
 <% if current_user.person.can_create_new_items? -%>
+
     <% cache "new_object_gadget" do -%>
+        <%= new_creatable_javascript -%>
+        <%= hidden_field_tag :new_resource_type %>
 
         <div id="new_asset" class="sysmo_gadget">
 
@@ -17,30 +13,31 @@
           <div class="contents">
             <div style="text-align: center;">
 
-                  <input type=button id="new_asset_button" class="gadget_button" value="CREATE" onclick="javascript:toggleDynamicMenu('new_asset_menu');"/>
+              <input type=button id="new_asset_button" class="gadget_button" value="CREATE" onclick="javascript:toggleDynamicMenu('new_asset_menu');"/>
 
-                    <ul id="new_asset_menu" class='dynamic_menu' style="display:none;">
+              <ul id="new_asset_menu" class='dynamic_menu' style="display:none;">
 
-                      <% new_creatable_selection_list.each do |item| -%>
-                        <li onclick="javascript:newAssetSelected('<%= item[1] -%>');"><%= item[0] -%></li>
-                      <% end -%>
-
-                    </ul>
+                <% new_creatable_selection_list.each do |item| -%>
+                    <li class='dynamic_menu_li' onclick="javascript:newAssetSelected('<%= item[1] -%>');"><%= item[0] -%></li>
+                <% end -%>
 
               </ul>
+
             </div>
           </div>
 
         </div>
+        <script type="text/javascript">
+
+            function newAssetSelected(item) {
+                $('new_resource_type').value = item;
+                newAsset();
+            }
+
+        </script>
     <% end -%>
+
 <% end -%>
 
-<script type="text/javascript">
 
-  function newAssetSelected(item) {
-      $('new_resource_type').value=item;
-      newAsset();
-  }
-
-</script>
 
