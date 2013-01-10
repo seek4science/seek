@@ -1,4 +1,6 @@
 class BiosamplesController < ApplicationController
+  include Seek::BreadCrumbs
+
   def existing_strains
       strains_of_organisms = []
       organisms = []
