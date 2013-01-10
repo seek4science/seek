@@ -24,7 +24,7 @@ gem 'bio'
 gem 'sunspot_rails','1.3.3'
 gem 'sunspot_solr','1.3.3'
 gem 'search_biomodel', "2.2.1",:git=>"git://github.com/myGrid/search_biomodel.git"
-gem 'savon'
+gem 'savon',"1.1.0"
 
 gem 'convert_office',:git=>"git://github.com/SysMO-DB/convert_office.git", :ref=>"753f2567dbd625bc89071e1150404efbb562e130"
 

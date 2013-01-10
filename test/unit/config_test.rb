@@ -226,7 +226,7 @@ class ConfigTest < ActiveSupport::TestCase
   end
 
   test "home_description" do
-    assert_equal "Some (configurable) information about the project and what we do goes here.", Seek::Config.home_description
+    assert_equal "You can configure the text that goes here within the Admin pages: Site Configuration->Home page settings.", Seek::Config.home_description
     Seek::Config.home_description = "A new description"
     assert_equal "A new description", Seek::Config.home_description
   end
