@@ -35,15 +35,16 @@ class SendImmediateEmailsJobTest < ActiveSupport::TestCase
   end
 
   test "create job" do
-      assert_equal 0,Delayed::Job.count
-      SendImmediateEmailsJob.create_job(1)
-      assert_equal 1,Delayed::Job.count
+      assert_difference("Delayed::Job.count",1) do
+        SendImmediateEmailsJob.create_job(1)
+      end
 
       job = Delayed::Job.first
-      assert_equal 1,job.priority
+      assert_equal 3,job.priority
 
-      SendImmediateEmailsJob.create_job(1)
-      assert_equal 1,Delayed::Job.count
+      assert_no_difference("Delayed::Job.count") do
+        SendImmediateEmailsJob.create_job(1)
+      end
   end
 
 
