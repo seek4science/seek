@@ -36,7 +36,9 @@
 
                   <li id="<%= div_id -%>" class="plot"></li>
                   <script type="text/javascript">
-                      $(function () {
+                      jQuery.noConflict();
+                      var $j = jQuery;
+                      $j(function () {
                           var json_data = <%= data -%>;
 
                           var options = { series:{
@@ -46,7 +48,7 @@
                           }
                           };
 
-                          $.plot($("#<%= div_id -%>"), json_data, options);
+                          $j.plot($j("#<%= div_id -%>"), json_data, options);
                       });
                   </script>
               <% end -%>
