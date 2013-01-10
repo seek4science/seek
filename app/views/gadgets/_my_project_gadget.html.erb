@@ -1,50 +1,5 @@
 
 
-<style type="text/css">
-    div.my_project_gadget {
-        padding: 0.5em;
-        margin-bottom: 0.5em;
-        background-color: white;
-        text-align: center;
-        vertical-align: middle;
-    }
-
-    div#my_project_selection_list {
-        position: absolute;
-        z-index: 1
-    }
-
-    input.my_project_button {
-        background-color: #307af5;
-        font-weight: bolder;
-        width: 6em;
-        height: 2em;
-        border: thin #dcdcdc;
-        border-radius: 3px;
-        color: white;
-
-    }
-
-    table#my_project_selection_table tbody tr.even:hover, #my_project_selection_table tbody tr.even td.highlighted {
-        background-color: #307af5;
-    }
-
-    table#my_project_selection_table tbody tr.odd:hover, #my_project_selection_table tbody tr.odd td.highlighted {
-        background-color: #307af5;
-    }
-
-    table#my_project_selection_table tr.even:hover {
-        background-color: #307af5;
-    }
-
-    table#my_project_selection_table tr.odd:hover {
-        background-color: #307af5;
-    }
-
-    table#my_project_selection_table tr.row_color {
-        background-color: white;
-    }
-</style>
 
 <% if current_user.try(:person).try(:member?) -%>
     <div class="sysmo_gadget">
@@ -53,75 +8,20 @@
         Browse to my project
       </div>
       <div class="contents">
-        <div style="text-align: center; padding-left: 0.5em;">
-          <ul class="gadget_list">
-            <input type=button id="my_project_button" class="my_project_button" value="My Project" onclick="my_project_selection()"/>
+        <div style="text-align: center">
 
-            <div id='my_project_selection_list' style="display: none;">
-              <table cellpadding="0" cellspacing="0" id="my_project_selection_table" class="display" style="width: 15em; margin-top: -0.5em; margin-left: 3em;">
-                <tbody>
-                <% current_user.person.projects.collect{|p| [p.name, p.id]}.each do |p| %>
-                    <tr class="row_color">
-                      <td style="text-align: left"><%= p.first %></td>
-                      <td><%= p.last %></td>
-                    </tr>
+            <input type=button id="my_project_button" class="gadget_button" value="My Project" onclick="javascript:toggleDynamicMenu('my_project_menu');"/>
+
+            <ul id="my_project_menu" class='dynamic_menu' style="display:none;">
+
+                <% current_user.person.projects.each do |p| %>
+                    <li onclick="javascript:location.href='<%= project_path(p.id) -%>';"><%= p.name %></li>
                 <% end %>
-                </tbody>
-              </table>
-            </div>
-          </ul>
+            </ul>
+
         </div>
       </div>
     </div>
 
 <% end -%>
-
-<script type="text/javascript">
-    jQuery.noConflict();
-    var $j = jQuery;
-    $j(document).ready(function () {
-        my_project_table = $j('#my_project_selection_table').dataTable({
-            "bPaginate":false,
-            "bLengthChange":false,
-            "bFilter":false,
-            "bSort":false,
-            "bInfo":false,
-            "bAutoWidth":false,
-            "bRetrieve": true,
-            "aoColumns":[
-                {"bVisible":true},
-                { "bVisible":false}
-            ]
-        });
-        $j('#my_project_selection_table tbody tr').click(function () {
-            var data = my_project_table.fnGetData(this);
-            $j('#my_project_button')[0].disabled = true;
-            location.href = '<%= projects_path%>' + '/' + data[1];
-        });
-        $j(document).click(function (e) {
-            $j('#my_project_selection_list')[0].style.display = 'none';
-        });
-        $j('#my_project_button').click(function (e) {
-            e.stopPropagation();
-        });
-        $j('#my_project_selection_table').click(function (e) {
-            e.stopPropagation();
-        });
-    });
-
-    function my_project_selection() {
-        var data = my_project_table.fnGetData();
-        /*go directly to the project if the user is the member of one project*/
-        if (data.length == 1) {
-            location.href = '<%= projects_path%>' + '/' + data[0][1];
-        } else {
-            var my_project_list = document.getElementById('my_project_selection_list');
-            if (my_project_list.style.display == 'none')
-                my_project_list.style.display = 'block';
-            else
-                my_project_list.style.display = 'none';
-        }
-    }
-</script>
-
 

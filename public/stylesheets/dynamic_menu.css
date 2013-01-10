@@ -1,0 +1,16 @@
+ul.dynamic_menu {
+    position: absolute;
+    z-index: 2;
+    background-color: white;
+    list-style-type:none;
+    left: 1em;
+    width: 10em;
+    margin-top: -0.4em;
+    border: solid #AAA 1px;
+}
+ul.dynamic_menu>li {
+    list-style: none;
+}
+ul.dynamic_menu>li:hover {
+    background-color: #307af5;
+}

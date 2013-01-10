@@ -1,48 +1,12 @@
 
 
 
-<style type="text/css">
-    div#creatable_selection_list {
-        position: absolute;
-        z-index: 2
-    }
 
-    input.new_asset_button {
-        background-color: #307af5;
-        font-weight: bolder;
-        width: 6em;
-        height: 2em;
-        border: thin #dcdcdc;
-        border-radius: 3px;
-        color: white;
 
-    }
-
-    table#creatable_selection_table tbody tr.even:hover, #creatable_selection_table tbody tr.even td.highlighted {
-        background-color: #307af5;
-    }
-
-    table#creatable_selection_table tbody tr.odd:hover, #creatable_selection_table tbody tr.odd td.highlighted {
-        background-color: #307af5;
-    }
-
-    table#creatable_selection_table tr.even:hover {
-        background-color: #307af5;
-    }
-
-    table#creatable_selection_table tr.odd:hover {
-        background-color: #307af5;
-    }
-
-    table#creatable_selection_table tr.row_color {
-        background-color: white;
-    }
-</style>
-
+<%= new_creatable_javascript -%>
+<%= hidden_field_tag :new_resource_type %>
 <% if current_user.person.can_create_new_items? -%>
     <% cache "new_object_gadget" do -%>
-
-        <%= new_creatable_javascript -%>
 
         <div id="new_asset" class="sysmo_gadget">
 
@@ -51,22 +15,18 @@
           </div>
 
           <div class="contents">
-            <div style="text-align: center; padding-left: 0.5em;">
-              <ul class="gadget_list">
-                  <input type=button id="new_asset_button" class="new_asset_button" value="CREATE" onclick="new_creatable_selection()"/>
-                  <div id='creatable_selection_list' style="display: none;">
-                    <table cellpadding="0" cellspacing="0" id="creatable_selection_table" class="display" style="width: 12em; margin-top: -0.5em; margin-left: 3em;">
-                      <tbody>
-                      <% new_creatable_selection_list.each do |c| %>
-                          <tr class="row_color">
-                            <td style="text-align: left"><%= c.first %></td>
-                            <td><%= c.last %></td>
-                          </tr>
-                      <% end %>
-                      </tbody>
-                    </table>
-                  </div>
-                  <%= hidden_field_tag :new_resource_type %>
+            <div style="text-align: center;">
+
+                  <input type=button id="new_asset_button" class="gadget_button" value="CREATE" onclick="javascript:toggleDynamicMenu('new_asset_menu');"/>
+
+                    <ul id="new_asset_menu" class='dynamic_menu' style="display:none;">
+
+                      <% new_creatable_selection_list.each do |item| -%>
+                        <li onclick="javascript:newAssetSelected('<%= item[1] -%>');"><%= item[0] -%></li>
+                      <% end -%>
+
+                    </ul>
+
               </ul>
             </div>
           </div>
@@ -76,44 +36,11 @@
 <% end -%>
 
 <script type="text/javascript">
-    jQuery.noConflict();
-    var $j = jQuery;
-    $j(document).ready(function () {
-        creatable_table = $j('#creatable_selection_table').dataTable({
-            "bPaginate":false,
-            "bLengthChange":false,
-            "bFilter":false,
-            "bSort":false,
-            "bInfo":false,
-            "bAutoWidth":false,
-            "bRetrieve": true,
-	    "aoColumns":[
-                {"bVisible":true},
-                { "bVisible":false}
-            ]
-        });
-        $j('#creatable_selection_table tbody tr').click(function () {
-            var data = creatable_table.fnGetData(this);
-            $j('#new_resource_type')[0].value = data[1];
-            $j('#new_asset_button')[0].disabled=true;
-            newAsset();
-        });
-        $j(document).click(function (e) {
-            $j('#creatable_selection_list')[0].style.display = 'none';
-        });
-        $j('#new_asset_button').click(function (e) {
-            e.stopPropagation();
-        });
-        $j('#creatable_selection_table').click(function (e) {
-            e.stopPropagation();
-        });
-    });
 
-    function new_creatable_selection() {
-        var new_resource_list = document.getElementById('creatable_selection_list');
-        if (new_resource_list.style.display == 'none')
-            new_resource_list.style.display = 'block';
-        else
-            new_resource_list.style.display = 'none';
-    }
+  function newAssetSelected(item) {
+      $('new_resource_type').value=item;
+      newAsset();
+  }
+
 </script>
+
