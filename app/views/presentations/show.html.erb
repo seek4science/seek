@@ -20,6 +20,8 @@
       <%= render :partial => 'assets/fileinfo',:object=>@display_presentation.content_blob -%>
       <br/>
 
+      <%= render :partial => "assets/special_auth_code_display", :locals => {:resource => @presentation} %>
+
       <p>
         <b>Description:</b>
         <% unless @display_presentation.description.blank? -%>

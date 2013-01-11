@@ -130,4 +130,5 @@
   <label>Organism and strain:</label>
   <%= organism_and_strain( specimen.strain) -%>
 </p>
+<%= render :partial => "assets/special_auth_code_display", :locals => {:resource => specimen} %>
 <% end %>

@@ -90,6 +90,9 @@
             <%= render :partial=>"model_visualisation" -%>
 
             <br/>
+
+            <%= render :partial => "assets/special_auth_code_display", :locals => {:resource => @model} %>
+
             <p>
                 <b>Description:</b>
                 <% unless @display_model.description.blank? -%>

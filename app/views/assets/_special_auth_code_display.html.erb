@@ -1,0 +1,9 @@
+<% special_auth_code = resource.special_auth_codes.first %>
+<% if !special_auth_code.nil? && resource.can_manage? %>
+    <% temporary_link = url_for :action => :show, :only_path => false,  :code => special_auth_code.code %>
+    <p>
+      <b>Temporary access link:</b> <%= temporary_link %>
+      <br/>
+      <b>Expiration date:</b> <%= date_as_string(special_auth_code.expiration_date) -%>
+    </p>
+<% end %>
