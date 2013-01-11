@@ -6,18 +6,6 @@
     <% form_for(@model ,:html => {:multipart => true, :method => :put}) do |f| %>
     <div class="asset_form">
         <%= f.error_messages %>
-      <p>
-        <% if @model && (mine?(@model) || @model.can_edit?) -%>
-          <div class="fold">
-            <div class="foldTitle">
-              Model image
-            </div>
-            <div class="foldContent">
-              <%= render :partial => "model_images/image_selector", :locals => {:image_for_instance => @model, :form_instance => f} -%>
-            </div>
-          </div>
-        <% end -%>
-      </p>
         <%= render :partial => "form_import_details" -%>
         <p>
             <b>Title:</b>
