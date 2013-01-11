@@ -21,10 +21,6 @@ module Seek
         add_index_breadcrumb @avatar_for.pluralize
         add_show_breadcrumb @avatar_owner_instance
         add_edit_breadcrumb @avatar_owner_instance
-      elsif controller_name == 'model_images'
-        add_index_breadcrumb 'models'
-        add_show_breadcrumb @model_instance
-        add_edit_breadcrumb @model_instance
       end
 
       #Index
