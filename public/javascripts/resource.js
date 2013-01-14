@@ -69,7 +69,7 @@ function validateUploadFormFields(respond_to_content_blobs, resource_name) {
         if ($('pending_files').children.length == 0 && $(resource_name + "_image_image_file") == null) {
             alert("Please specify at least a file to upload or provide a URL.");
             return (false);
-        } else if ($('pending_files').children.length == 0 && $(resource_name + "_image_image_file") != null && $(resource_name + "_image_image_file").value == '') {
+        } else if ($('pending_files').children.length == 0 && $(resource_name + "_image_image_file") != null && $(resource_name + "_image_image_file").value == '' && $('previous_version_image') == null) {
             alert("Please specify at least a file/image to upload or provide a URL.");
             return (false);
         }

@@ -70,6 +70,7 @@ module AssetsCommonExtension
     params_url = params_files.second
     params_original_filename_from_ulr = params_files.third
     params_image_file = params[controller_name.singularize+'_image'].nil? ? nil : params[controller_name.singularize+'_image']['image_file']
+    params_previous_image = params[:previous_version_image]
     #ids of selected content_blobs of previous version, when uploading new version
     @retained_content_blob_ids = retained_content_blob_ids
 
@@ -78,7 +79,7 @@ module AssetsCommonExtension
     elsif render_action_on_error==:edit
       params_files = object.content_blobs
     end
-    if params_files.blank? && params_image_file.blank? && @retained_content_blob_ids.blank?
+    if params_files.blank? && params_image_file.blank? && @retained_content_blob_ids.blank? && params_previous_image.blank?
       flash.now[:error] = "Please select at least a file/image to upload or provide a URL to the data."
       if render_action_on_error
         init_asset_for_render params
