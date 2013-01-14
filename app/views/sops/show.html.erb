@@ -20,6 +20,8 @@
 
       <br/>
 
+      <%= render :partial => "assets/special_auth_code_display", :locals => {:resource => @sop} %>
+
       <p>
         <b>Description:</b>
         <% unless @display_sop.description.blank? -%>

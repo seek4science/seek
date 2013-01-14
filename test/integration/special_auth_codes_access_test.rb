@@ -124,6 +124,33 @@ class SpecialAuthCodesAccessTest < ActionController::IntegrationTest
     assert_response :success
   end
 
+  ASSETS_WITH_AUTH_CODES.each do |type_name|
+    test "should display unexpired temporary link of #{type_name} for manager" do
+      item = Factory(type_name.singularize.to_sym, :policy => Factory(:private_policy), :contributor => Factory(:user))
+      item.special_auth_codes << Factory(:special_auth_code, :asset => item)
+
+      post '/sessions/create', :login => item.contributor.login, :password => item.contributor.password
+      get "/#{type_name}/#{item.id}"
+
+      assert_response :success, "failed for asset #{type_name}"
+      assert_select "p", :text => /Temporary access link/
+    end
+  end
+
+  ASSETS_WITH_AUTH_CODES.each do |type_name|
+    test "should not display unexpired temporary link of #{type_name} for non-manager" do
+      item = Factory(type_name.singularize.to_sym, :policy => Factory(:publicly_viewable_policy), :contributor => Factory(:user))
+      item.special_auth_codes << Factory(:special_auth_code, :asset => item)
+      user = Factory(:user)
+
+      post '/sessions/create', :login => user.login, :password => user.password
+      get "/#{type_name}/#{item.id}"
+
+      assert_response :success, "failed for asset #{type_name}"
+      assert_select "p", :text => /Temporary access link/, :count => 0
+    end
+  end
+
   private
   def test_failing_for item, type_name, action, code=nil
     if Seek::Util.multi_files_asset_types.include?(item.class)

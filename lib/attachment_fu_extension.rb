@@ -9,7 +9,7 @@ Technoweenie::AttachmentFu::InstanceMethods.module_eval do
   end
 
   def uploaded_data_with_extension=(file_data)
-    unless self.class == ForumAttachment #FIXME: This check is an indication that this extension is applied too broadly, I think.
+    unless self.class == ForumAttachment || self.class == HelpAttachment  #FIXME: This check is an indication that this extension is applied too broadly, I think.
       upload_results = self.uploaded_data_without_extension=file_data
       self.original_filename = file_data.original_filename
 
@@ -26,7 +26,7 @@ Technoweenie::AttachmentFu::InstanceMethods.module_eval do
         self.temp_paths.unshift write_to_temp_file(@uploaded_image.to_blob { self.format = 'JPEG' })
       end
 
-      return upload_result
+      return upload_results
     else
       self.uploaded_data_without_extension=(file_data)
     end

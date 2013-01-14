@@ -27,7 +27,7 @@
       <%= render :partial => 'assets/fileinfo',:object=>@display_data_file.content_blob -%>
 
       <br/>
-
+      <%= render :partial => "assets/special_auth_code_display", :locals => {:resource => @data_file} %>
       <p>
         <b>Description:</b>
         <% unless @display_data_file.description.blank? -%>

@@ -318,6 +318,8 @@ module ImagesHelper
         "famfamfam_silk/report.png"
       when "jws_shadow"
         "jws/shadow2.gif"
+      when "home"
+        "famfamfam_silk/house.png"
     else
       return nil
     end
