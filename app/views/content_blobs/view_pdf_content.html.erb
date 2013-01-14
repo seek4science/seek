@@ -99,7 +99,7 @@ limitations under the License.
             <input type="number" id="pageNumber" class="toolbarField pageNumber" value="1" size="4" min="1" tabindex="7">
             </input>
             <span id="numPages" class="toolbarLabel"></span>
-            <button class="toolbarButton findPrevious" style="margin-left:3em;" id="back" title="Back to Item" onclick="window.history.back();">
+            <button class="toolbarButton findPrevious" style="margin-left:3em;" id="back" title="Back to Item" onclick="backToItem();">
             </button>
           </div>
           <div id="toolbarViewerRight">
@@ -203,6 +203,12 @@ limitations under the License.
 <script type="text/javascript">
     window.onload = function() {
         document.title="<%= page_title(controller.controller_name, controller.action_name)+": Viewing #{@content_blob.original_filename}" -%>";
+    }
+
+    function backToItem(){
+        var current_url = location.href;
+            back_url = current_url.split('content_blobs')[0];
+            location.href = back_url;
     }
 </script>
 
