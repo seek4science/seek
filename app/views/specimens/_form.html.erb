@@ -144,7 +144,10 @@
     </p>
 <% end %>
 <script type="text/javascript">
-    if ('<%= action.to_s%>' == 'new' && <%= f.error_messages.blank?%>) {
+    <%# Load the strain list of default organism ONLY when creating a new specimen
+      # Dont when updating/getting the new form back because of errors/new_object_based_on_existing_one
+     -%>
+    if ('<%= action.to_s%>' == 'new' && <%= f.error_messages.blank?%> && <%= specimen.organism.nil? %>) {
         show_ajax_loader('strains_of_selected_organism');
         strains_of_selected_organism($F('organism'), '<%= strain_selection_box_id%>', '<%= strain_selection_box_name%>');
     }
