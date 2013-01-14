@@ -217,4 +217,8 @@ module AssetsHelper
     asset_version_links
   end
 
+  #code is for authorization of temporary link
+  def can_download_asset? asset, code
+    asset.can_download? || (code && asset.auth_by_code?(code))
+  end
 end

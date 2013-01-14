@@ -15,7 +15,7 @@
 
 <%# This is for multiple files asset %>
 <% asset = fileinfo.asset
-   if Seek::Util.multi_files_asset_types.include?(asset.class) && (asset.can_download? || (params[:code] && asset.auth_by_code?(params[:code]))) -%>
+   if Seek::Util.multi_files_asset_types.include?(asset.class) && (can_download_asset?(asset, params[:code])) -%>
     <p>
       <%= render :partial => "assets/view_content", :locals => {:content_blob => fileinfo} -%>
       <%= image_tag_for_key('download', polymorphic_path([asset, fileinfo], :action=>:download,:code=>params[:code]), "Download", {:title => 'Download this file'}, "") -%>
