@@ -218,7 +218,7 @@ module AssetsHelper
   end
 
   #code is for authorization of temporary link
-  def can_download_asset? asset, code
+  def can_download_asset? asset, code=params[:code]
     asset.can_download? || (code && asset.auth_by_code?(code))
   end
 end
