@@ -157,6 +157,7 @@ module AssetsHelper
 
     #Authorize
     related.each do |key, res|
+      res[:items].uniq!
       res[:items].compact!
       unless res[:items].empty?
         total_count = res[:items].size
