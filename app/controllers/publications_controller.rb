@@ -112,6 +112,7 @@ class PublicationsController < ApplicationController
     update_annotations @publication
 
     assay_ids = params[:assay_ids] || []
+    data_file_ids = params[:data_file_ids] || []
 
     respond_to do |format|
       publication_params = params[:publication]||{}
@@ -126,19 +127,36 @@ class PublicationsController < ApplicationController
         to_remove.each {|a| a.destroy}
 
         # Update relationship
-        Assay.find(assay_ids).each do |assay|
-          if assay.can_edit?
-            Relationship.create_or_update_attributions(assay,[["Publication", @publication.id]], Relationship::RELATED_TO_PUBLICATION)
+          assay_ids.each do |id|
+            assay = Assay.find_by_id(id)
+            if assay && assay.can_edit?
+              Relationship.create_or_update_attributions(assay,[["Publication", @publication.id]], Relationship::RELATED_TO_PUBLICATION)
+            end
           end
-        end
-        #Destroy Assay relationship that aren't needed
-        associate_relationships = Relationship.find(:all,:conditions=>["object_id = ? and subject_type = ?",@publication.id,"Assay"])
-        associate_relationships.each do |associate_relationship|
-          assay = associate_relationship.subject
-          if assay.can_edit? && !assay_ids.include?(assay.id.to_s)
-            associate_relationship.destroy
+          #Destroy Assay relationship that aren't needed
+          associate_relationships = Relationship.find(:all,:conditions=>["object_id = ? and subject_type = ?",@publication.id,"Assay"])
+          associate_relationships.each do |associate_relationship|
+            assay = associate_relationship.subject
+            if assay.can_edit? && !assay_ids.include?(assay.id.to_s)
+              associate_relationship.destroy
+            end
           end
-        end
+
+         data_file_ids = data_file_ids.collect{|data_file_id| data_file_id.split(',').first}
+         data_file_ids.each do |id|
+            df = DataFile.find_by_id(id)
+            if df && df.can_view?
+              Relationship.create_or_update_attributions(df,[["Publication", @publication.id]], Relationship::RELATED_TO_PUBLICATION)
+            end
+          end
+          #Destroy Datafile relationship that aren't needed
+          associate_relationships = Relationship.find(:all,:conditions=>["object_id = ? and subject_type = ?",@publication.id,"DataFile"])
+          associate_relationships.each do |associate_relationship|
+            data_file = associate_relationship.subject
+            if data_file.can_view? && !data_file_ids.include?(data_file.id.to_s)
+              associate_relationship.destroy
+            end
+          end
 
         #Create policy if not present (should be)
         if @publication.policy.nil?

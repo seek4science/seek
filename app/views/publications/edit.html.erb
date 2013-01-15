@@ -71,6 +71,10 @@
       <p>
         <%= render :partial => "assays/associate_assays", :locals=>{:resource => @publication, :show_relationships => false} -%>
       </p>
+      <p>
+        <%= render :partial => "assets/associate_data_file", :locals=>{:resource => @publication, :show_relationships => false} -%>
+      </p>
+
     <p style="text-align: center;">
       <%= submit_tag 'Update',:disable_with=>"Updating..." %>
     </p>

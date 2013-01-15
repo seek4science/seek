@@ -131,6 +131,36 @@ class PublicationsControllerTest < ActionController::TestCase
 
   end
 
+  test "associates data files" do
+    p = Factory(:publication)
+    df = Factory(:data_file, :policy => Factory(:all_sysmo_viewable_policy))
+    assert !p.related_data_files.include?(df)
+    assert !df.related_publications.include?(p)
+
+    login_as(p.contributor)
+    #add association
+    put :update, :id => p,:author=>{},:data_file_ids=>["#{df.id.to_s},None"]
+
+    assert_redirected_to publication_path(p)
+    p.reload
+    df.reload
+
+    assert_equal 1, p.related_data_files.count
+
+    assert p.related_data_files.include?(df)
+    assert df.related_publications.include?(p)
+
+    #remove association
+    put :update, :id => p,:author=>{},:data_file_ids=>[]
+
+    assert_redirected_to publication_path(p)
+    p.reload
+    df.reload
+
+    assert_equal 0, p.related_data_files.count
+    assert_equal 0, p.related_publications.count
+  end
+
   test "do not associate assays unauthorized for edit" do
     p = publications(:taverna_paper_pubmed)
     original_assay = assays(:assay_with_a_publication)
