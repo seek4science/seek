@@ -67,9 +67,7 @@ class PublicationsController < ApplicationController
       if @publication.save
         create_non_seek_authors result.authors
 
-        Assay.find(assay_ids).each do |assay|
-          Relationship.create_or_update_attributions(assay,[["Publication", @publication.id]], Relationship::RELATED_TO_PUBLICATION) if assay.can_edit?
-        end
+        create_or_update_associations assay_ids, "Assay", "edit"
 
         flash[:notice] = 'Publication was successfully created.'
         format.html { redirect_to(edit_publication_url(@publication)) }
@@ -127,52 +125,13 @@ class PublicationsController < ApplicationController
         end
         to_remove.each {|a| a.destroy}
 
-        # Update relationship
-          assay_ids.each do |id|
-            assay = Assay.find_by_id(id)
-            if assay && assay.can_edit?
-              Relationship.create_or_update_attributions(assay,[["Publication", @publication.id]], Relationship::RELATED_TO_PUBLICATION)
-            end
-          end
-          #Destroy Assay relationship that aren't needed
-          associate_relationships = Relationship.find(:all,:conditions=>["object_id = ? and subject_type = ?",@publication.id,"Assay"])
-          associate_relationships.each do |associate_relationship|
-            assay = associate_relationship.subject
-            if assay.can_edit? && !assay_ids.include?(assay.id.to_s)
-              associate_relationship.destroy
-            end
-          end
+        # Update association
+        create_or_update_associations assay_ids, "Assay", "edit"
 
-         data_file_ids = data_file_ids.collect{|data_file_id| data_file_id.split(',').first}
-         data_file_ids.each do |id|
-            df = DataFile.find_by_id(id)
-            if df && df.can_view?
-              Relationship.create_or_update_attributions(df,[["Publication", @publication.id]], Relationship::RELATED_TO_PUBLICATION)
-            end
-          end
-          #Destroy Datafile relationship that aren't needed
-          associate_relationships = Relationship.find(:all,:conditions=>["object_id = ? and subject_type = ?",@publication.id,"DataFile"])
-          associate_relationships.each do |associate_relationship|
-            data_file = associate_relationship.subject
-            if data_file.can_view? && !data_file_ids.include?(data_file.id.to_s)
-              associate_relationship.destroy
-            end
-          end
+        data_file_ids = data_file_ids.collect{|data_file_id| data_file_id.split(',').first}
+        create_or_update_associations data_file_ids, "DataFile", "view"
 
-        model_ids.each do |id|
-          model = Model.find_by_id(id)
-          if model && model.can_view?
-            Relationship.create_or_update_attributions(model,[["Publication", @publication.id]], Relationship::RELATED_TO_PUBLICATION)
-          end
-        end
-          #Destroy model relationship that aren't needed
-        associate_relationships = Relationship.find(:all,:conditions=>["object_id = ? and subject_type = ?",@publication.id,"Model"])
-        associate_relationships.each do |associate_relationship|
-          model = associate_relationship.subject
-          if model.can_view? && !model_ids.include?(model.id.to_s)
-            associate_relationship.destroy
-          end
-        end
+        create_or_update_associations model_ids, "Model", "view"
 
         #Create policy if not present (should be)
         if @publication.policy.nil?
@@ -370,6 +329,25 @@ class PublicationsController < ApplicationController
         publication.extract_doi_metadata(result)
       end
       return result
+    end
+  end
+
+  def create_or_update_associations asset_ids, asset_type, required_action
+    asset_ids.each do |id|
+      asset = asset_type.constantize.find_by_id(id)
+      if asset && asset.send("can_#{required_action}?")
+        unless Relationship.find(:first, :conditions => { :subject_type => asset_type, :subject_id => asset.id, :predicate => Relationship::RELATED_TO_PUBLICATION, :object_type => "Publication", :object_id => @publication.id })
+          Relationship.create(:subject_type => asset_type, :subject_id => asset.id, :predicate => Relationship::RELATED_TO_PUBLICATION, :object_type => "Publication", :object_id => @publication.id)
+        end
+      end
+    end
+    #Destroy asset relationship that aren't needed
+    associate_relationships = Relationship.find(:all,:conditions=>["object_id = ? and subject_type = ?",@publication.id,asset_type])
+    associate_relationships.each do |associate_relationship|
+      asset = associate_relationship.subject
+      if asset.send("can_#{required_action}?") && !asset_ids.include?(asset.id.to_s)
+        associate_relationship.destroy
+      end
     end
   end
 end
