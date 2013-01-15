@@ -113,6 +113,7 @@ class PublicationsController < ApplicationController
 
     assay_ids = params[:assay_ids] || []
     data_file_ids = params[:data_file_ids] || []
+    model_ids = params[:model_ids] || []
 
     respond_to do |format|
       publication_params = params[:publication]||{}
@@ -157,6 +158,21 @@ class PublicationsController < ApplicationController
               associate_relationship.destroy
             end
           end
+
+        model_ids.each do |id|
+          model = Model.find_by_id(id)
+          if model && model.can_view?
+            Relationship.create_or_update_attributions(model,[["Publication", @publication.id]], Relationship::RELATED_TO_PUBLICATION)
+          end
+        end
+          #Destroy model relationship that aren't needed
+        associate_relationships = Relationship.find(:all,:conditions=>["object_id = ? and subject_type = ?",@publication.id,"Model"])
+        associate_relationships.each do |associate_relationship|
+          model = associate_relationship.subject
+          if model.can_view? && !model_ids.include?(model.id.to_s)
+            associate_relationship.destroy
+          end
+        end
 
         #Create policy if not present (should be)
         if @publication.policy.nil?

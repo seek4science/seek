@@ -31,7 +31,7 @@
             )+";check_show_add_model();return(false);"
           } -%>
 
-          <%= select_tag :assay_model_ids, options_from_collection_for_select([], :id, :title), {:multiple=>true, :style=>"display:none;"} -%>
+          <%= select_tag :model_ids, options_from_collection_for_select([], :id, :title), {:multiple=>true, :style=>"display:none;"} -%>
 
           <br/>
 
@@ -46,16 +46,17 @@
 
 <script type="text/javascript">
 
-<% @assay.model_masters.each do |s| -%>
-  <% if s.can_view? -%>
-      model_id = '<%= s.id -%>';
-      model_title = '<%= escape_javascript(s.title) -%>';
+<% models = resource.is_a?(Publication) ? resource.related_models : resource.model_masters %>
+<% models.each do |model| -%>
+  <% if model.can_view? -%>
+      model_id = '<%= model.id -%>';
+      model_title = '<%= escape_javascript(model.title) -%>';
       addModel(model_title, model_id);
   <% end -%>
 <% end -%>
 
-<% if params[:assay_model_ids] %>
-  <% params[:assay_model_ids].each do |id| -%>
+<% if params[:model_ids] %>
+  <% params[:model_ids].each do |id| -%>
     <% model = Model.find(id) %>
     <% if model.can_view?-%>
         model_id = '<%= model.id -%>';

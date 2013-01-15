@@ -161,6 +161,37 @@ class PublicationsControllerTest < ActionController::TestCase
     assert_equal 0, p.related_publications.count
   end
 
+  test "associates models" do
+    p = Factory(:publication)
+    model = Factory(:model, :policy => Factory(:all_sysmo_viewable_policy))
+    assert !p.related_models.include?(model)
+    assert !model.related_publications.include?(p)
+
+    login_as(p.contributor)
+    #add association
+    put :update, :id => p,:author=>{},:model_ids=>[model.id.to_s]
+
+    assert_redirected_to publication_path(p)
+    p.reload
+    model.reload
+
+    assert_equal 1, p.related_models.count
+    assert_equal 1, model.related_publications.count
+
+    assert p.related_models.include?(model)
+    assert model.related_publications.include?(p)
+
+    #remove association
+    put :update, :id => p,:author=>{},:model_ids=>[]
+
+    assert_redirected_to publication_path(p)
+    p.reload
+    model.reload
+
+    assert_equal 0, p.related_models.count
+    assert_equal 0, p.related_publications.count
+  end
+
   test "do not associate assays unauthorized for edit" do
     p = publications(:taverna_paper_pubmed)
     original_assay = assays(:assay_with_a_publication)
@@ -189,7 +220,9 @@ class PublicationsControllerTest < ActionController::TestCase
 
   test "should keep model and data associations after update" do
     p = publications(:pubmed_2)
-    put :update, :id => p,:author=>{},:assay_ids=>[]
+    put :update, :id => p,:author=>{},:assay_ids=>[],
+        :data_file_ids => p.related_data_files.collect{|df| "#{df.id},None"},
+        :model_ids => p.related_models.collect{|m| m.id.to_s}
 
     assert_redirected_to publication_path(p)
     p.reload
