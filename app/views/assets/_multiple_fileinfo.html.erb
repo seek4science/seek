@@ -1,8 +1,19 @@
 <%
    n = multiple_fileinfo.content_blobs.count
 %>
+
+<%
+   model_image = ""
+   if multiple_fileinfo.respond_to? :model_image
+     if  multiple_fileinfo.model_image.nil?
+       model_image = "and 0 image"
+     else
+       model_image = "and 1 image"
+     end
+   end
+%>
 <p>
-  <strong> <%= pluralize(n, 'file') -%>:</strong>
+  <strong> <%= pluralize(n, 'file') -%> <%= model_image -%>:</strong>
 <ul class='fileinfo_list'>
 
   <% multiple_fileinfo.content_blobs.each do |blob| -%>

@@ -181,7 +181,7 @@ class ModelsController < ApplicationController
     error_message = nil
     if !Seek::Config.sycamore_enabled
       error_message = "Interaction with Sycamore is currently disabled"
-    elsif !@model.can_download?
+    elsif !@model.can_download? && (params[:code].nil? || (params[:code] && !@model.auth_by_code?(params[:code])))
       error_message = "You are not allowed to simulate this model with Sycamore"
     end
 

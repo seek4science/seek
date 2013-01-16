@@ -60,7 +60,7 @@
       </div>
 
       <div class="foldContent" style="display:none;" >
-        <% if @data_file.can_download? -%>
+        <% if can_download_asset?(@data_file, params[:code]) -%>
                 <% if Seek::Config.is_virtualliver &&  @data_file.is_with_sample?
 
                      treatments = bio_samples.instance_values["treatments_text"]
@@ -95,7 +95,7 @@
                 RNA Extractions
               </div>
               <div class="foldContent" style="display:none;">
-                <% if @data_file.can_download? -%>
+                <% if can_download_asset?(@data_file, params[:code]) -%>
                     <%= render :partial => "extractions_table", :locals => {:extractions => rna_extractions, :sample_names => sample_names} -%>
                 <% else -%>
                     <span id="rna_extractions" class="none_text">You do not have permission to view the RNA extractions for this file.</span>
@@ -112,7 +112,7 @@
                 Sequencing
               </div>
               <div class="foldContent" style="display:none;">
-                <% if @data_file.can_download? -%>
+                <% if can_download_asset?(@data_file, params[:code]) -%>
 
                     <%= render :partial => "extractions_table", :locals => {:extractions => sequencing, :sample_names => sample_names} -%>
 

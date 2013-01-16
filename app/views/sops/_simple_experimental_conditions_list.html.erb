@@ -1,4 +1,4 @@
-<% if @sop.can_view? -%>
+<% if can_view_asset?(@sop, params[:code]) -%>
 
   <% if @sop.can_edit? -%>
     <ul class="sectionIcons">

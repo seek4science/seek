@@ -255,9 +255,9 @@ function updateModels() {
         $('model_to_list').innerHTML = model_text;
     }
 
-    clearList('assay_model_ids');
+    clearList('model_ids');
 
-    select=$('assay_model_ids');
+    select=$('model_ids');
     for (i=0;i<model_ids.length;i++) {
         id=model_ids[i];
         o=document.createElement('option');

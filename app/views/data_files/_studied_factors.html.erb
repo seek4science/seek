@@ -1,4 +1,4 @@
-<% if @data_file.can_view? -%>
+<% if can_view_asset?(@data_file, params[:code]) -%>
 
   <% if @data_file.can_edit? -%>
     <ul class="sectionIcons">
