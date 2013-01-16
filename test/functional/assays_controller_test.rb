@@ -176,7 +176,7 @@ class AssaysControllerTest < ActionController::TestCase
     assert !assay.models.include?(model.latest_version)
     sleep(1)
     assert_difference('ActivityLog.count') do
-      put :update, :id=>assay, :assay_model_ids=>[model.id], :assay=>{}, :assay_sample_ids=>[Factory(:sample).id]
+      put :update, :id=>assay, :model_ids=>[model.id], :assay=>{}, :assay_sample_ids=>[Factory(:sample).id]
     end
 
     assert_redirected_to assay_path(assay)
@@ -732,7 +732,7 @@ end
               :assay_class=>assay_classes(:modelling_assay_class)
           },
                :assay_sop_ids=>["#{sop.id}"],
-               :assay_model_ids=>["#{model.id}"],
+               :model_ids=>["#{model.id}"],
                :data_file_ids=>["#{datafile.id},#{rel.title}"]
         end
       end
@@ -776,7 +776,7 @@ end
           #title is blank, so should fail validation
           put :update, :id=>assay, :assay=>{:title=>"", :assay_class=>assay_classes(:modelling_assay_class)},
               :assay_sop_ids=>["#{sop.id}"],
-              :assay_model_ids=>["#{model.id}"],
+              :model_ids=>["#{model.id}"],
               :data_file_ids=>["#{datafile.id},#{rel.title}"]
         end
       end
