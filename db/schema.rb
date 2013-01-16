@@ -132,7 +132,6 @@ ActiveRecord::Schema.define(:version => 20120924145642) do
     t.integer  "strain_id"
     t.datetime "created_at"
     t.datetime "updated_at"
-    t.integer  "tissue_and_cell_type_id"
   end
 
   add_index "assay_organisms", ["assay_id"], :name => "index_assay_organisms_on_assay_id"
@@ -328,7 +327,7 @@ ActiveRecord::Schema.define(:version => 20120924145642) do
     t.datetime "last_used_at"
     t.datetime "created_at"
     t.datetime "updated_at"
-    t.integer  "version"
+    t.integer  "version",                       :default => 1
     t.string   "first_letter",     :limit => 1
     t.text     "other_creators"
     t.string   "uuid"
@@ -697,7 +696,7 @@ ActiveRecord::Schema.define(:version => 20120924145642) do
     t.integer  "organism_id"
     t.integer  "model_type_id"
     t.integer  "model_format_id"
-    t.integer  "version"
+    t.integer  "version",                                 :default => 1
     t.string   "first_letter",               :limit => 1
     t.text     "other_creators"
     t.string   "uuid"
@@ -939,6 +938,7 @@ ActiveRecord::Schema.define(:version => 20120924145642) do
     t.string   "site_root_uri"
     t.datetime "last_jerm_run"
     t.string   "uuid"
+    t.integer  "parent_id"
   end
 
   create_table "projects_publications", :id => false, :force => true do |t|
@@ -1218,7 +1218,7 @@ ActiveRecord::Schema.define(:version => 20120924145642) do
     t.datetime "created_at"
     t.datetime "updated_at"
     t.datetime "last_used_at"
-    t.integer  "version"
+    t.integer  "version",                       :default => 1
     t.string   "first_letter",     :limit => 1
     t.text     "other_creators"
     t.string   "uuid"
@@ -1441,8 +1441,6 @@ ActiveRecord::Schema.define(:version => 20120924145642) do
     t.datetime "created_at"
     t.datetime "updated_at"
   end
-
-  add_index "tissue_and_cell_types", ["title"], :name => "title", :unique => true
 
   create_table "topics", :force => true do |t|
     t.integer  "forum_id"
