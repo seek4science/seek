@@ -56,7 +56,7 @@ only be necessary to a db:migrate rake task. Using seek:upgrade should still wor
 
 SEEK 0.15 upgraded Rails to the latest 2 version,2.3.14. This requires an update of Rubygems to 1.6.2. You can update rubygems directly by running
 
-    gem update --system -v 1.6.2
+    gem update --system 1.6.2
 
 or install from scratch by reading the INSTALL guide. You can also use RVM[https://rvm.io/]. SEEK 0.15 also runs fine on the latest Rubygems (currently 1.8.24) but
 you will get some deprecation warnings.
