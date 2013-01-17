@@ -120,6 +120,7 @@ namespace :seek do
       end
 
       if original_authors.size == authors_with_right_orders.size
+        publication.publication_author_orders.clear
         authors_with_right_orders.each_with_index do |author, index|
           publication.publication_author_orders.create(:author => author, :order => index)
         end
