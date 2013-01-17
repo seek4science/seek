@@ -290,8 +290,6 @@ class PublicationsController < ApplicationController
     result
   end
 
-  private
-  
   def create_non_seek_authors authors,publication=@publication
     authors.each_with_index do |author,index|
       pa = PublicationAuthor.new()
@@ -306,6 +304,8 @@ class PublicationsController < ApplicationController
       pao.save
     end
   end
+
+  private
 
   def preprocess_doi_or_pubmed pubmed_id,doi
     doi = doi.sub(%r{doi\.*:}i,"").strip unless doi.nil?
