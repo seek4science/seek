@@ -278,6 +278,18 @@ class PublicationsController < ApplicationController
     end
   end
 
+  def fetch_pubmed_or_doi_result pubmed_id,doi
+    result = nil
+    if pubmed_id
+      query = PubmedQuery.new("seek",Seek::Config.pubmed_api_email)
+      result = query.fetch(pubmed_id)
+    elsif doi
+      query = DoiQuery.new(Seek::Config.crossref_api_email)
+      result = query.fetch(doi)
+    end
+    result
+  end
+
   private
   
   def create_non_seek_authors authors,publication=@publication
@@ -293,18 +305,6 @@ class PublicationsController < ApplicationController
       pao.author = pa
       pao.save
     end
-  end
-
-  def fetch_pubmed_or_doi_result pubmed_id,doi
-      result = nil
-      if pubmed_id
-        query = PubmedQuery.new("seek",Seek::Config.pubmed_api_email)
-        result = query.fetch(pubmed_id)
-      elsif doi
-        query = DoiQuery.new(Seek::Config.crossref_api_email)
-        result = query.fetch(doi)
-      end
-      result
   end
 
   def preprocess_doi_or_pubmed pubmed_id,doi
