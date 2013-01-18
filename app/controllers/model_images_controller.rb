@@ -3,8 +3,6 @@ class ModelImagesController < ApplicationController
   before_filter :find_model_images, :only=>[:index]
   before_filter :find_model_image_auth,:only=>[:show,:select,:edit,:update,:destroy]
 
-  include Seek::BreadCrumbs
-
   def new
     @model_image = ModelImage.new
   end

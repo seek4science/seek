@@ -132,6 +132,7 @@
       <% if new_version && previous_version_image_file = resource.latest_version.model_image.try(:original_filename) -%>
           <p>
             The image file of previous version <span style="font-weight: bold;"><%= previous_version_image_file %> </span> will be used if you dont specify model image file
+            <%= hidden_field_tag 'previous_version_image', previous_version_image_file %>
           </p>
       <% end -%>
 <% end -%>

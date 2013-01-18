@@ -157,6 +157,7 @@ module AssetsHelper
 
     #Authorize
     related.each do |key, res|
+      res[:items].uniq!
       res[:items].compact!
       unless res[:items].empty?
         total_count = res[:items].size
@@ -217,4 +218,13 @@ module AssetsHelper
     asset_version_links
   end
 
+  #code is for authorization of temporary link
+  def can_download_asset? asset, code=params[:code]
+    asset.can_download? || (code && asset.auth_by_code?(code))
+  end
+
+  #code is for authorization of temporary link
+  def can_view_asset? asset, code=params[:code]
+    asset.can_view? || (code && asset.auth_by_code?(code))
+  end
 end

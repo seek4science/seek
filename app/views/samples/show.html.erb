@@ -57,7 +57,8 @@
       <p>
           <label>Comment:</label>
           <%= text_or_not_specified @sample.comments -%>
-        </p>
+      </p>
+      <%= render :partial => "assets/special_auth_code_display", :locals => {:resource => @sample} %>
     </div>
 
   </div>

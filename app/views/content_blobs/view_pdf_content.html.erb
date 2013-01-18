@@ -99,6 +99,8 @@ limitations under the License.
             <input type="number" id="pageNumber" class="toolbarField pageNumber" value="1" size="4" min="1" tabindex="7">
             </input>
             <span id="numPages" class="toolbarLabel"></span>
+            <button class="toolbarButton findPrevious" style="margin-left:3em;" id="back" title="Back to Item" onclick="backToItem();">
+            </button>
           </div>
           <div id="toolbarViewerRight">
             <input id="fileInput" class="fileInput" type="file" oncontextmenu="return false;" style="visibility: hidden; position: fixed; right: 0; top: 0" />
@@ -108,11 +110,11 @@ limitations under the License.
               <span data-l10n-id="presentation_mode_label">Presentation Mode</span>
             </button>
 
-            <button id="openFile" class="toolbarButton openFile" title="Open File" tabindex="12" data-l10n-id="open_file">
+            <button id="openFile" class="toolbarButton openFile" hidden="true" title="Open File" tabindex="12" data-l10n-id="open_file">
               <span data-l10n-id="open_file_label">Open</span>
             </button>
 
-            <button id="print" class="toolbarButton print" title="Print" tabindex="13" data-l10n-id="print">
+            <button id="print" class="toolbarButton print" hidden="true" title="Print" tabindex="13" data-l10n-id="print">
               <span data-l10n-id="print_label">Print</span>
             </button>
 
@@ -190,7 +192,7 @@ limitations under the License.
         </button>
       </div>
       <div class="clearBoth"></div>
-      <textarea id="errorMoreInfo" hidden='true' readonly="readonly"></textarea>
+      <textarea id="errorMoreInfo" hidden='true' style="height: 10em;" readonly="readonly"></textarea>
     </div>
   </div> <!-- mainContainer -->
 
@@ -201,6 +203,12 @@ limitations under the License.
 <script type="text/javascript">
     window.onload = function() {
         document.title="<%= page_title(controller.controller_name, controller.action_name)+": Viewing #{@content_blob.original_filename}" -%>";
+    }
+
+    function backToItem(){
+        var current_url = location.href;
+            back_url = current_url.split('content_blobs')[0];
+            location.href = back_url;
     }
 </script>
 
