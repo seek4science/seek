@@ -8,6 +8,7 @@ class ContentBlob < ActiveRecord::Base
 
   include Seek::ContentTypeDetection
   include Seek::PdfExtraction
+  include Seek::MimeTypes
 
   belongs_to :asset, :polymorphic => true
 
@@ -43,6 +44,10 @@ class ContentBlob < ActiveRecord::Base
     else
       nil
     end
+  end
+
+  def human_content_type
+    mime_nice_name(content_type)
   end
   
   def check_version
