@@ -595,6 +595,21 @@ class ProjectsControllerTest < ActionController::TestCase
     assert_nil project.site_password
   end
 
+  test "should view_items_in_tab in project page for non-admin" do
+    project = Factory(:project)
+    df = Factory :data_file,
+                 :title=>"a data file",
+                 :contributor=>User.current_user,
+                 :policy=>Factory(:public_policy),
+                 :projects => [project]
+
+    login_as(Factory(:user))
+    get :view_items_in_tab,{:resource_type=>"DataFile",:resource_ids=>[df.id].join(",")}
+
+    assert_response :success
+    assert @response.body.include?("a data file")
+  end
+
 	private
 
 	def valid_project
