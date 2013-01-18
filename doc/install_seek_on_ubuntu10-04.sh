@@ -27,11 +27,12 @@ sudo apt-get install libapr1-dev libaprutil1-dev libcurl4-openssl-dev
 echo "${txtgrn} *********************************** ${txtrst}"
 echo "${txtgrn} Installing rubygems ${txtrst}"
 cd /tmp
-wget http://production.cf.rubygems.org/rubygems/rubygems-1.3.7.tgz
-tar zfxv rubygems-1.3.7.tgz
-cd rubygems-1.3.7/
+wget http://production.cf.rubygems.org/rubygems/rubygems-1.6.2.tgz
+tar zfxv rubygems-1.6.2.tgz
+cd rubygems-1.6.2/
 sudo ruby ./setup.rb
 cd /usr/bin/
+
 symboliclink="gem"
 if [ -L "$symboliclink" ]; then
     sudo rm "$symboliclink"
