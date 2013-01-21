@@ -406,7 +406,7 @@ class ModelsControllerTest < ActionController::TestCase
     assert_response :success
 
     assert_select "div.box_about_actor" do
-      assert_select "p > strong",:text=>"1 file and 0 image:"
+      assert_select "p > strong",:text=>"1 file and 0 images:"
       assert_select "ul.fileinfo_list" do
         assert_select "li.fileinfo" do
             assert_select "p > b",:text=>/Filename:/
@@ -432,7 +432,7 @@ class ModelsControllerTest < ActionController::TestCase
     assert_response :success
 
     assert_select "div.box_about_actor" do
-      assert_select "p > strong",:text=>"2 files and 0 image:"
+      assert_select "p > strong",:text=>"2 files and 0 images:"
       assert_select "ul.fileinfo_list" do
         assert_select "li.fileinfo",:count=>2 do
           assert_select "p > b",:text=>/Filename:/,:count=>2
