@@ -59,6 +59,18 @@ class ContentBlobsControllerTest < ActionController::TestCase
     assert_not_nil flash[:error]
   end
 
+  test "should download without type information" do
+    model = Factory :typeless_model, :policy=>Factory(:public_policy)
+
+    assert_difference("ActivityLog.count") do
+      get :download, :model_id=>model.id,:id=>model.content_blobs.first.id
+    end
+    assert_response :success
+    assert_equal "attachment; filename=\"file_with_no_extension\"",@response.header['Content-Disposition']
+    assert_equal "application/octet-stream",@response.header['Content-Type']
+    assert_equal "31",@response.header['Content-Length']
+  end
+
   test 'get_pdf' do
     ms_word_sop = Factory(:doc_sop, :policy => Factory(:all_sysmo_downloadable_policy))
     pdf_path = ms_word_sop.content_blob.filepath('pdf')

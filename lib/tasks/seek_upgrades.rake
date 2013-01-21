@@ -48,7 +48,7 @@ namespace :seek do
       filename = cb.original_filename
       file_format = filename.split('.').last.try(:strip)
       possible_mime_types = cb.mime_types_for_extension file_format
-      type = possible_mime_types.sort.first
+      type = possible_mime_types.sort.first || "application/octet-stream"
       type = type.gsub("image/jpg","image/jpeg") unless type.nil?
       if type != "Unknown file type"
         cb.content_type = type

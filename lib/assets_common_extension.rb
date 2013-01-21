@@ -263,6 +263,8 @@ module AssetsCommonExtension
       end
     end
 
+    content_type ||= "application/octet-stream"
+
     #making and sending zip file if there are more than one file
     if files_to_download.count > 1
       make_and_send_zip_file files_to_download, asset
@@ -303,7 +305,7 @@ module AssetsCommonExtension
   def content_type_from_filename filename
     file_format = filename.split('.').last.try(:strip)
     possible_mime_types = mime_types_for_extension file_format
-    type = possible_mime_types.sort.first
+    type = possible_mime_types.sort.first || "application/octet-stream"
     #FIXME: this is just a quick fix, until http://dev.mygrid.org.uk/issues/browse/SYSMO-1129 is fully resolved
     type = type.gsub("image/jpg","image/jpeg") unless type.nil?
     type

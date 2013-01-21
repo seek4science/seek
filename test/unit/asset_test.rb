@@ -81,7 +81,7 @@ class AssetTest < ActiveSupport::TestCase
         {:f=>"test.Doc",:t=>"application/msword"},
         {:f=>"test.XLSX",:t=>"application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"},
         {:f=>"test.dOCx",:t=>"application/vnd.openxmlformats-officedocument.wordprocessingml.document"},
-        {:f=>"unknown.xxx",:t=>nil}
+        {:f=>"unknown.xxx",:t=>"application/octet-stream"}
     ]
     checks.each do |check|
       assert_equal check[:t],ttt.content_type_for_test(check[:f]),"Expected #{check[:t]} for #{check[:f]}"
