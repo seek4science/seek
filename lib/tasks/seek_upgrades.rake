@@ -3,14 +3,15 @@ require 'rake'
 require 'active_record/fixtures'
 require 'uuidtools'
 
+
 namespace :seek do
-  
+
   #these are the tasks required for this version upgrade
   task :upgrade_version_tasks=>[
             :environment,
-            :reindex_things,
             :add_term_uris_to_assay_types,
-            :add_term_uris_to_technology_types
+            :add_term_uris_to_technology_types,
+            :repopulate_auth_lookup_tables
   ]
 
   desc("upgrades SEEK from the last released version to the latest released version")
@@ -87,22 +88,23 @@ namespace :seek do
     ActivityLog.remove_duplicate_creates
   end
 
-  task :reindex_things => :environment do
-    #reindex_all task doesn't seem to work as part of the upgrade, because it doesn't successfully discover searchable types (possibly due to classes being in memory before the migration)
-    ReindexingJob.add_items_to_queue DataFile.all, 5.seconds.from_now,2
-    ReindexingJob.add_items_to_queue Model.all, 5.seconds.from_now,2
-    ReindexingJob.add_items_to_queue Sop.all, 5.seconds.from_now,2
-    ReindexingJob.add_items_to_queue Publication.all, 5.seconds.from_now,2
-    ReindexingJob.add_items_to_queue Presentation.all, 5.seconds.from_now,2
+  task(:update_missing_content_types => :environment) do
+    unknown = ContentBlob.all.select do |cb|
+      !cb.asset.nil? && cb.human_content_type == "Unknown file type"
+    end
 
-    ReindexingJob.add_items_to_queue Assay.all, 5.seconds.from_now,2
-    ReindexingJob.add_items_to_queue Study.all, 5.seconds.from_now,2
-    ReindexingJob.add_items_to_queue Investigation.all, 5.seconds.from_now,2
+    unknown.each do |cb|
+      filename = cb.original_filename
+      file_format = filename.split('.').last.try(:strip)
+      possible_mime_types = cb.mime_types_for_extension file_format
+      type = possible_mime_types.sort.first || "application/octet-stream"
+      type = type.gsub("image/jpg","image/jpeg") unless type.nil?
+      if type != "Unknown file type"
+        cb.content_type = type
+        cb.save
+      end
+    end
 
-    ReindexingJob.add_items_to_queue Person.all, 5.seconds.from_now,2
-    ReindexingJob.add_items_to_queue Project.all, 5.seconds.from_now,2
-    ReindexingJob.add_items_to_queue Specimen.all, 5.seconds.from_now,2
-    ReindexingJob.add_items_to_queue Sample.all, 5.seconds.from_now,2
   end
 
   task(:update_first_letter_for_strain => :environment) do
@@ -170,7 +172,6 @@ namespace :seek do
       end
 
       if original_authors.size == authors_with_right_orders.size
-        publication.publication_author_orders.clear
         authors_with_right_orders.each_with_index do |author, index|
           publication.publication_author_orders.create(:author => author, :order => index)
         end

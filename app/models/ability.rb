@@ -41,15 +41,7 @@ class Ability
   def asset_manager asset_manager
      can [:manage_asset, :delete, :edit, :download, :view], :all do |item|
         if ((item.respond_to?(:projects) && asset_manager.try(:projects)) and !(item.projects & asset_manager.projects).empty?) && item.respond_to?(:policy)
-            policy = item.policy
-            if policy.access_type > Policy::NO_ACCESS
-              true
-            else
-              creators = item.is_downloadable? ? item.creators : []
-              contributor = item.contributor.kind_of?(Person) ? item.contributor : item.contributor.try(:person)
-              grouped_people_by_access_type = policy.summarize_permissions creators, [], contributor
-              !policy.is_entirely_private? grouped_people_by_access_type, contributor
-            end
+          true
         else
           false
         end
