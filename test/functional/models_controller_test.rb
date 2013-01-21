@@ -32,6 +32,18 @@ class ModelsControllerTest < ActionController::TestCase
     assert_not_nil flash[:error]
   end
 
+  test "should download without type information" do
+    model = Factory :typeless_model, :policy=>Factory(:public_policy)
+    assert model.can_download?
+    assert_difference("ActivityLog.count") do
+      get :download, :id=>model.id
+    end
+    assert_response :success
+    assert_equal "attachment; filename=\"file_with_no_extension\"",@response.header['Content-Disposition']
+    assert_equal "application/octet-stream",@response.header['Content-Type']
+    assert_equal "31",@response.header['Content-Length']
+  end
+
   test "should download" do
     model = Factory :model_2_files, :title=>"this_model", :policy=>Factory(:public_policy), :contributor=>User.current_user
     assert_difference("ActivityLog.count") do
@@ -394,7 +406,7 @@ class ModelsControllerTest < ActionController::TestCase
     assert_response :success
 
     assert_select "div.box_about_actor" do
-      assert_select "p > strong",:text=>"1 file and 0 image:"
+      assert_select "p > strong",:text=>"1 file and 0 images:"
       assert_select "ul.fileinfo_list" do
         assert_select "li.fileinfo" do
             assert_select "p > b",:text=>/Filename:/
@@ -420,7 +432,7 @@ class ModelsControllerTest < ActionController::TestCase
     assert_response :success
 
     assert_select "div.box_about_actor" do
-      assert_select "p > strong",:text=>"2 files and 0 image:"
+      assert_select "p > strong",:text=>"2 files and 0 images:"
       assert_select "ul.fileinfo_list" do
         assert_select "li.fileinfo",:count=>2 do
           assert_select "p > b",:text=>/Filename:/,:count=>2

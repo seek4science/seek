@@ -361,6 +361,12 @@ end
     end
   end
 
+  Factory.define(:typeless_model, :parent=>:model) do |f|
+    f.after_create do |model|
+      model.content_blobs = [Factory.create(:typeless_content_blob, :asset=>model,:asset_version=>model.version)]
+    end
+  end
+
   #Publication
   Factory.define(:publication) do |f|
     f.sequence(:title) {|n| "A Publication #{n}"}
@@ -604,6 +610,12 @@ end
   Factory.define(:txt_content_blob, :parent => :content_blob) do |f|
     f.data File.new("#{Rails.root}/test/fixtures/files/txt_test.txt", "rb").read
     f.content_type "text/plain"
+  end
+
+  Factory.define(:typeless_content_blob, :parent=>:content_blob) do |f|
+    f.data File.new("#{Rails.root}/test/fixtures/files/file_with_no_extension", "rb").read
+    f.content_type nil
+    f.original_filename "file_with_no_extension"
   end
 
   Factory.define(:activity_log) do |f|

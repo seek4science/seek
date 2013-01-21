@@ -3,13 +3,15 @@ require 'rake'
 require 'active_record/fixtures'
 require 'uuidtools'
 
+
 namespace :seek do
-  
+
   #these are the tasks required for this version upgrade
   task :upgrade_version_tasks=>[
             :environment,
             :reordering_authors_for_existing_publications,
             :cleanup_asset_versions_projects_duplication,
+            :update_missing_content_types,
             :repopulate_auth_lookup_tables
   ]
 
@@ -35,6 +37,25 @@ namespace :seek do
   desc "removes the older duplicate create activity logs that were added for a short period due to a bug (this only affects versions between stable releases)"
   task(:remove_duplicate_activity_creates=>:environment) do
     ActivityLog.remove_duplicate_creates
+  end
+
+  task(:update_missing_content_types => :environment) do
+    unknown = ContentBlob.all.select do |cb|
+      !cb.asset.nil? && cb.human_content_type == "Unknown file type"
+    end
+
+    unknown.each do |cb|
+      filename = cb.original_filename
+      file_format = filename.split('.').last.try(:strip)
+      possible_mime_types = cb.mime_types_for_extension file_format
+      type = possible_mime_types.sort.first || "application/octet-stream"
+      type = type.gsub("image/jpg","image/jpeg") unless type.nil?
+      if type != "Unknown file type"
+        cb.content_type = type
+        cb.save
+      end
+    end
+
   end
 
   task(:update_first_letter_for_strain => :environment) do

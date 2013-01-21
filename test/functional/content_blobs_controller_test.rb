@@ -59,6 +59,18 @@ class ContentBlobsControllerTest < ActionController::TestCase
     assert_not_nil flash[:error]
   end
 
+  test "should download without type information" do
+    model = Factory :typeless_model, :policy=>Factory(:public_policy)
+
+    assert_difference("ActivityLog.count") do
+      get :download, :model_id=>model.id,:id=>model.content_blobs.first.id
+    end
+    assert_response :success
+    assert_equal "attachment; filename=\"file_with_no_extension\"",@response.header['Content-Disposition']
+    assert_equal "application/octet-stream",@response.header['Content-Type']
+    assert_equal "31",@response.header['Content-Length']
+  end
+
   test 'get_pdf' do
     ms_word_sop = Factory(:doc_sop, :policy => Factory(:all_sysmo_downloadable_policy))
     pdf_path = ms_word_sop.content_blob.filepath('pdf')
@@ -219,6 +231,20 @@ class ContentBlobsControllerTest < ActionController::TestCase
     get :download, :data_file_id => df, :id => df.content_blob
     assert_response :success
     assert @response.header['Content-Disposition'].include?('attachment')
+  end
+
+  test "activity correctly logged" do
+    model = Factory :model_2_files, :policy=>Factory(:public_policy), :contributor=>User.current_user
+    first_content_blob = model.content_blobs.first
+    assert_difference("ActivityLog.count") do
+      get :download, :model_id=>model.id, :id => first_content_blob.id
+    end
+    assert_response :success
+    al = ActivityLog.last
+    assert_equal model,al.activity_loggable
+    assert_equal "download",al.action
+    assert_equal User.current_user,al.culprit
+    assert_equal "content_blobs",al.controller_name
   end
 
   test "should download identical file from file list" do
