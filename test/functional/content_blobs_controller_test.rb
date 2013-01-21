@@ -233,6 +233,20 @@ class ContentBlobsControllerTest < ActionController::TestCase
     assert @response.header['Content-Disposition'].include?('attachment')
   end
 
+  test "activity correctly logged" do
+    model = Factory :model_2_files, :policy=>Factory(:public_policy), :contributor=>User.current_user
+    first_content_blob = model.content_blobs.first
+    assert_difference("ActivityLog.count") do
+      get :download, :model_id=>model.id, :id => first_content_blob.id
+    end
+    assert_response :success
+    al = ActivityLog.last
+    assert_equal model,al.activity_loggable
+    assert_equal "download",al.action
+    assert_equal User.current_user,al.culprit
+    assert_equal "content_blobs",al.controller_name
+  end
+
   test "should download identical file from file list" do
     model = Factory :model_2_files, :policy=>Factory(:public_policy), :contributor=>User.current_user
     first_content_blob = model.content_blobs.first
