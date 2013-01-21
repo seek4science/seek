@@ -19,10 +19,10 @@ sudo sed -i 's/# deb-src http:\/\/archive.canonical.com\/ubuntu/deb-src http:\/\
 echo "${txtgrn} *********************************** ${txtrst}"
 echo "${txtgrn} Installing prequisites ${txtrst}"
 sudo apt-get update
-sudo apt-get install wget git mercurial ruby rdoc ri libopenssl-ruby ruby-dev mysql-server libssl-dev build-essential openssh-server
-sudo apt-get install libmysqlclient16-dev libmagick++-dev libxml++2.6-dev sun-java6-jdk graphviz libsqlite3-dev sqlite3 libxslt1 libxslt1-dev
-sudo apt-get install curl irb
-sudo apt-get install libapr1-dev libaprutil1-dev libcurl4-openssl-dev
+
+sudo apt-get install wget git-core mercurial ruby rdoc ri libopenssl-ruby ruby-dev mysql-server libssl-dev build-essential openssh-server
+sudo apt-get install libmysqlclient16-dev libmagick++-dev libxslt-dev libxml++2.6-dev openjdk-6-jdk graphviz libsqlite3-dev sqlite3
+sudo apt-get install poppler-utils tesseract-ocr openoffice.org openoffice.org-java-common
 
 echo "${txtgrn} *********************************** ${txtrst}"
 echo "${txtgrn} Installing rubygems ${txtrst}"
@@ -89,17 +89,12 @@ bundle exec rake db:setup RAILS_ENV=test
 bundle exec rake db:test:prepare
 
 echo "${txtgrn} *********************************** ${txtrst}"
-echo "${txtgrn} Start Solr search engine"
-RAILS_ENV=production bundle exec rake sunspot:solr:start
+echo "${txtgrn} You finished setting up.${txtrst}"
+echo "${txtgrn} SEEK is installed under $SEEK_PATH/$SEEK_DIRECTORY. If you run SEEK on apache, you need to install and configurate it. The steps are described at $SEEK_PATH/$SEEK_DIRECTORY/doc/INSTALL ${txtrst}"
+echo "${txtgrn} You might want to start solr search engine, open office and some delayed jobs. Please read about those services and how to start at $SEEK_PATH/$SEEK_DIRECTORY/doc/INSTALL ${txtrst}"
 
 echo "${txtgrn} *********************************** ${txtrst}"
-echo "${txtgrn} Start some background jobs"
-script/delayed_job start
-nohup soffice --headless --accept="socket,host=127.0.0.1,port=8100;urp;" --nofirststartwizard > /dev/null 2>&1
-
-echo "${txtgrn} *********************************** ${txtrst}"
-echo "${txtgrn} Start SEEK server under production mode"
+echo "${txtgrn} Now start SEEK server under production mode ${txtrst}"
+echo "${txtgrn} You might want to try out SEEK by going to: http://localhost:3000. ${txtrst}"
 RAILS_ENV=production bundle exec script/server
 
-echo "${txtgrn} *********************************** ${txtrst}"
-echo "${txtgrn} You finished setting up and starting up SEEK. You might want to try out SEEK by going to: http://localhost:3000. SEEK is installed under $SEEK_PATH/$SEEK_DIRECTORY. If you run SEEK on apache, you need to install and configurate it. The steps are described at $SEEK_PATH/$SEEK_DIRECTORY/doc/INSTALL ${txtrst}"
