@@ -279,7 +279,7 @@ plugin, to convert some document types (ms office documents, open office
 documents, etc.) into pdf document.</p>
 
 <p>The command to start open office in headless mode and as the background
-process:</p>
+process for ubuntu 12.04:</p>
 
 <pre>nohup soffice --headless --accept=&quot;socket,host=127.0.0.1,port=8100;urp;&quot; --nofirststartwizard &gt; /dev/null 2&gt;&amp;1</pre>
 
@@ -301,6 +301,10 @@ to what they were originally.</p>
 <p>The 8100 port is used by default, if you’d like to run on another port,
 you need also to synchronize the changed port with the default soffice_port
 setting for convert_office plugin in config/environment.rb</p>
+
+<p>For ubuntu 10.04, you should use single minus for options, e.g.</p>
+
+<pre>nohup soffice -headless -accept=&quot;socket,host=127.0.0.1,port=8100;urp;&quot; -nofirststartwizard &gt; /dev/null 2&gt;&amp;1</pre>
 
 <p>We recommend the OpenOffice service is setup using an init.d script,
 following the same procedures for delayed job using the script found at: <a
