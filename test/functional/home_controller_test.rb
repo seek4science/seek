@@ -265,9 +265,7 @@ class HomeControllerTest < ActionController::TestCase
 
     get :index
     assert_response :success
-    assert_select "p.headline_announcement" do
-
-    end
+    assert_select "div.headline_announcement", :count=>1
 
     #now expire it
     ann.expires_at=1.day.ago
