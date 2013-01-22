@@ -9,7 +9,7 @@ Seek::Config.default :sycamore_enabled,false
 Seek::Config.default :events_enabled,true
 Seek::Config.default :jerm_enabled,true
 Seek::Config.default :email_enabled,false
-Seek::Config.default :smtp, {:address => '', :port => '25', :domain => '', :authentication => :plain, :user_name => '', :password => ''}
+Seek::Config.default :smtp, {:address => '', :port => '25', :domain => '', :authentication => :plain, :user_name => '', :password => '', :enable_starttls_auto=>false}
 Seek::Config.default :noreply_sender, 'no-reply@sysmo-db.org'
 Seek::Config.default :solr_enabled,false
 Seek::Config.default :jws_enabled, true

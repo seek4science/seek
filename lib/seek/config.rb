@@ -53,6 +53,7 @@ module Seek
       smtp_hash = self.smtp
       password =  self.smtp_settings 'password'
       smtp_hash.merge! :password => password
+
       ActionMailer::Base.smtp_settings = smtp_hash
     end
 
