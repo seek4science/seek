@@ -312,13 +312,17 @@ href="https://gist.github.com/3787679">gist.github.com/3787679</a></p>
 
 <h2 id="label-Starting+the+server">Starting the server</h2>
 
-<p>You can now start the server with the command</p>
+<p>To test you have things setup you can now start the server with the
+command:</p>
 
 <pre>./script/server</pre>
 
 <p>If running in production mode, you should start the server with</p>
 
 <pre>./script/server -e production</pre>
+
+<p>However, we recommend you follow the instructions lower down for setting up
+SEEK to run together with Apache (or Nginx) using Passenger Phusion.</p>
 
 <h2 id="label-Creating+the+Admin+user">Creating the Admin user</h2>
 
@@ -331,6 +335,14 @@ information about your profile (you can always come back and modify the
 profile information and your password. You cannot modify your login name).</p>
 
 <p>Once created this user will become the admin user of the system.</p>
+
+<h2 id="label-Registering+SEEK">Registering SEEK</h2>
+
+<p>Now you have installed SEEK, and if you didn’t during the installation
+process, please take a moment to fill out our very short,optional <a
+href="http://www.sysmo-db.org/seek-registration">SEEK Registration
+Form</a>. Doing so will be very useful to us in the future when we try and
+raise funding in the future, as it provides evidence of SEEK adoption.</p>
 
 <h2 id="label-Administering+the+system">Administering the system</h2>
 
@@ -412,13 +424,40 @@ and then provide that email to SEEK under Admin-&gt;Site
 Configuration-&gt;Additional Settings</p>
 </li></ul>
 
-<h2 id="label-Registering+SEEK">Registering SEEK</h2>
+<h2 id="label-Configuring+Email">Configuring Email</h2>
 
-<p>Now you have installed SEEK, please take a moment to fill out our very
-short,optional <a href="http://www.sysmo-db.org/seek-registration">SEEK
-Registration Form</a>. Doing so will be very useful to us in the future
-when we try and raise funding in the future, as it provides evidence of
-SEEK adoption.</p>
+<p>By default email is disabled, but if you are able to you can configure it
+to enable SEEK to send emails - such are emails about changes within your
+project, notification emails, feedback emails and notifications about
+errors. You can configure email under Admin-&gt;Site
+configuration-&gt;Enable/disable features. Part way down that page there is
+a checkbox “Email enabled” that you should select. This reveals some
+SMTP settings that you need to fill out. Any that are not needed can be
+left blank. The meaning of the settings are:</p>
+<ul><li>
+<p>Address - the address (name or IP address) of the SMTP server used to
+deliver outgoing mail</p>
+</li><li>
+<p>Port - the port that your mail server receives mail</p>
+</li><li>
+<p>Domain - if you need to specify a HELO domain, you can do it here.</p>
+</li><li>
+<p>Authentication - if your mail server requires authentication, you need to
+specify the authentication type here. This can be <em>plain</em> (will send
+the password in the clear), <em>login</em> (will send password Base64
+encoded) or in rare cases <em>cram_md5</em></p>
+</li><li>
+<p>User name -  if your mail server requires authentication, set the username
+in this setting.</p>
+</li><li>
+<p>Password - if your mail server requires authentication, set the password in
+this setting</p>
+</li></ul>
+
+<p>There is a box beneath here that you can use to test your settings. Also,
+if you wish to receive emails about errors that occur - then you can check
+the box for Exception notification enabled, and supply a list of email
+addresses below (comma or space seperated).</p>
 
 <h2 id="label-Setting+up+Passenger+Phusion+and+Apache+for+production+servers.">Setting up Passenger Phusion and Apache for production servers.</h2>
 
