@@ -22,7 +22,8 @@ The ImageMagick libraries need to be installed, as these are required by the rma
 
 You will need a minimal build environment, as some of the ruby gems require compilation. The Ubuntu/Debian package <em>build-essentials</em> should be sufficient
 
-SEEK uses Lucene as its search engine, and this requires that java is installed. Sun Java is no longer available for Ubuntu, but OpenJDK should work fine.
+SEEK uses Lucene as its search engine, and this requires that java is installed. Sun/Oracle Java is no longer available as a standard package Ubuntu, but OpenJDK should work fine. You can also download and install
+from {Oracle}[http://www.oracle.com/technetwork/java/javase/overview/index.html].
 
 Before starting, its a good idea to get up to date:
 
@@ -66,9 +67,9 @@ on how to setup Apache and {Passenger Phusion (modrails)}[http://www.modrails.co
 
 Our source code is stored within the {Sysmo-DB Google Code Repository}[http://code.google.com/p/sysmo-db/], using Mercurial[http://mercurial.selenic.com/] as the version control system. 
 
-For a stable version, you should check out according to a stable tag. Our current stable tag is <em>0.15.4</em>, so to retrieve this version you should use:
+For a stable version, you should check out according to a stable tag. Our current stable tag is <em>0.16.0</em>, so to retrieve this version you should use:
 
-  hg clone https://sysmo-db.googlecode.com/hg/ -r v0.15.4 seek
+  hg clone https://sysmo-db.googlecode.com/hg/ -r v0.16.0 seek
 
 This will create a <i>seek</i> directory that contains the application.
   
@@ -147,30 +148,41 @@ and
 Open Office is a background service which is called by convert_office plugin, to convert some document types (ms office documents,
 open office documents, etc.) into pdf document.
 
-The command to start open office in headless mode and as the background process:
+The command to start open office in headless mode and as the background process for ubuntu 12.04:
 
     nohup soffice --headless --accept="socket,host=127.0.0.1,port=8100;urp;" --nofirststartwizard > /dev/null 2>&1
 
-If you run on production server, using apache and phusion passenger, you will need to run soffice under www-data user.
-Firstly, the owner of /var/www needs to be changed to www-data, as soffice will read/write some information in there
+If you run on production server, using apache and phusion passenger, you will need to run the Open Office service under www-data user.
+To do this it will need to create a working directory in /var/www. The name of the directory
+changes between versions, but will be called something similar to libreoffice or .openoffice.org2. The easiest way to create this directory
+is to make a note of the permissions for /var/www, then make it writable to www-data, start the service, and then put the permissions on /var/www back to
+what they were originally.
+
     sudo chown www-data:www-data /var/www
-Then
+
+Then to start the service manually you use:
+
     nohup sudo -H -u www-data soffice --headless --accept="socket,host=127.0.0.1,port=8100;urp;" --nofirststartwizard > /dev/null 2>&1
 
 The 8100 port is used by default, if you'd like to run on another port, you need also to synchronize the changed port with the default soffice_port setting for convert_office plugin in config/environment.rb
 
-Similar to the automatical way to start and stop delayed_job by init.d script, the script for open office service can be found at:
+For ubuntu 10.04, you should use single minus for options, e.g.
+    nohup soffice -headless -accept="socket,host=127.0.0.1,port=8100;urp;" -nofirststartwizard > /dev/null 2>&1
+
+We recommend the OpenOffice service is setup using an init.d script, following the same procedures for delayed job using the script found at:
 https://gist.github.com/3787679
 
 == Starting the server
 
-You can now start the server with the command
+To test you have things setup you can now start the server with the command:
 
   ./script/server
 
 If running in production mode, you should start the server with
 
   ./script/server -e production
+
+However, we recommend you follow the instructions lower down for setting up SEEK to run together with Apache (or Nginx) using Passenger Phusion.
 
 == Creating the Admin user
 
@@ -180,6 +192,11 @@ If there are no users present in the system (and there should not be at this sta
 (you can always come back and modify the profile information and your password. You cannot modify your login name).
 
 Once created this user will become the admin user of the system.
+
+== Registering SEEK
+
+Now you have installed SEEK, and if you didn't during the installation process, please take a moment to fill out our very short,optional {SEEK Registration Form}[http://www.sysmo-db.org/seek-registration]. Doing so will be very useful
+to us in the future when we try and raise funding in the future, as it provides evidence of SEEK adoption.
 
 == Administering the system
 
@@ -234,11 +251,23 @@ To be able to support adding publications using a PubMed[http://www.ncbi.nlm.nih
 * For PubMed you simply need to add your email address under Admin->Site Configuration->Additional Settings
 * For DOI - you need to register your email address with CrossRef[http://www.crossref.org/] at http://www.crossref.org/requestaccount/ and then provide that email to SEEK under Admin->Site Configuration->Additional Settings
 
+== Configuring Email
 
-== Registering SEEK
+By default email is disabled, but if you are able to you can configure it to enable SEEK to send emails - such are emails about changes within your project, notification emails, feedback emails and notifications about errors.
+You can configure email under Admin->Site configuration->Enable/disable features.
+Part way down that page there is a checkbox "Email enabled" that you should select. This reveals some SMTP settings that you need to fill out. Any that are not needed can be left blank.
+The meaning of the settings are:
 
-Now you have installed SEEK, please take a moment to fill out our very short,optional {SEEK Registration Form}[http://www.sysmo-db.org/seek-registration]. Doing so will be very useful
-to us in the future when we try and raise funding in the future, as it provides evidence of SEEK adoption.
+* Address - the address (name or IP address) of the SMTP server used to deliver outgoing mail
+* Port - the port that your mail server receives mail
+* Domain - if you need to specify a HELO domain, you can do it here.
+* Authentication - if your mail server requires authentication, you need to specify the authentication type here. This can be <em>plain</em> (will send the password in the clear), <em>login</em> (will send password Base64 encoded) or in rare cases <em>cram_md5</em>
+* User name -  if your mail server requires authentication, set the username in this setting.
+* Password - if your mail server requires authentication, set the password in this setting
+
+There is a box beneath here that you can use to test your settings.
+Also, if you wish to receive emails about errors that occur - then you can check the box for Exception notification enabled, and supply a list of email addresses below (comma or space seperated).
+
 
 == Setting up Passenger Phusion and Apache for production servers.
 

@@ -58,13 +58,31 @@ First there are additional dependencies you will need, which on Ubuntu 10.04/12.
 
     sudo apt-get install poppler-utils tesseract-ocr openoffice.org openoffice.org-java-common
 
-Then running open office in the headless mode and as the background process:
-Firstly, the owner of /var/www needs to be changed to www-data, as soffice will read/write some information in there
+Open Office is a background service which is called by convert_office plugin, to convert some document types (ms office documents,
+open office documents, etc.) into pdf document.
+
+The command to start open office in headless mode and as the background process:
+
+    nohup soffice --headless --accept="socket,host=127.0.0.1,port=8100;urp;" --nofirststartwizard > /dev/null 2>&1
+
+If you run on production server, using apache and phusion passenger, you will need to run the Open Office service under www-data user.
+To do this it will need to create a working directory in /var/www. The name of the directory
+changes between versions, but will be called something similar to libreoffice or .openoffice.org2. The easiest way to create this directory
+is to make a note of the permissions for /var/www, then make it writable to www-data, start the service, and then put the permissions on /var/www back to
+what they were originally.
+
     sudo chown www-data:www-data /var/www
-Then
+
+Then to start the service manually you use:
+
     nohup sudo -H -u www-data soffice --headless --accept="socket,host=127.0.0.1,port=8100;urp;" --nofirststartwizard > /dev/null 2>&1
 
-These are the fairly standard steps when upgrading between minor versions.
+The 8100 port is used by default, if you'd like to run on another port, you need also to synchronize the changed port with the default soffice_port setting for convert_office plugin in config/environment.rb
+
+We recommend the OpenOffice service is setup using an init.d script, following the same procedures for delayed job using the script found at:
+https://gist.github.com/3787679
+
+Other than this, the remaining steps are the same standard steps are previous versions:
 
     RAILS_ENV=production ./script/delayed_job stop
     bundle exec rake sunspot:solr:stop RAILS_ENV=production
