@@ -127,7 +127,7 @@ class AdminControllerTest < ActionController::TestCase
     smtp_hash = ActionMailer::Base.smtp_settings
     raise_delivery_errors_setting = ActionMailer::Base.raise_delivery_errors
     xml_http_request :post, :test_email_configuration,{:address=>"127.0.0.1", :port => '25', :domain => 'test.com',
-    :authentication => 'plain', :testing_email => 'test@test.com'}
+    :authentication => 'plain',:enable_starttls_auto=>"1", :testing_email => 'test@test.com'}
     assert_response :success
     assert_equal smtp_hash, ActionMailer::Base.smtp_settings
     assert_equal raise_delivery_errors_setting, ActionMailer::Base.raise_delivery_errors
