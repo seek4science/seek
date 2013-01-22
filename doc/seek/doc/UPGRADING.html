@@ -164,17 +164,40 @@ should still work, but could take a lot of unnecessary time.</p>
 
 <pre>sudo apt-get install poppler-utils tesseract-ocr openoffice.org openoffice.org-java-common</pre>
 
-<p>Then running open office in the headless mode and as the background
-process: Firstly, the owner of /var/www needs to be changed to www-data, as
-soffice will read/write some information in there</p>
+<p>Open Office is a background service which is called by convert_office
+plugin, to convert some document types (ms office documents, open office
+documents, etc.) into pdf document.</p>
+
+<p>The command to start open office in headless mode and as the background
+process:</p>
+
+<pre>nohup soffice --headless --accept=&quot;socket,host=127.0.0.1,port=8100;urp;&quot; --nofirststartwizard &gt; /dev/null 2&gt;&amp;1</pre>
+
+<p>If you run on production server, using apache and phusion passenger, you
+will need to run the Open Office service under www-data user. To do this it
+will need to create a working directory in /var/www. The name of the
+directory changes between versions, but will be called something similar to
+libreoffice or .openoffice.org2. The easiest way to create this directory
+is to make a note of the permissions for /var/www, then make it writable to
+www-data, start the service, and then put the permissions on /var/www back
+to what they were originally.</p>
 
 <pre>sudo chown www-data:www-data /var/www</pre>
 
-<p>Then</p>
+<p>Then to start the service manually you use:</p>
 
 <pre>nohup sudo -H -u www-data soffice --headless --accept=&quot;socket,host=127.0.0.1,port=8100;urp;&quot; --nofirststartwizard &gt; /dev/null 2&gt;&amp;1</pre>
 
-<p>These are the fairly standard steps when upgrading between minor versions.</p>
+<p>The 8100 port is used by default, if you’d like to run on another port,
+you need also to synchronize the changed port with the default soffice_port
+setting for convert_office plugin in config/environment.rb</p>
+
+<p>We recommend the OpenOffice service is setup using an init.d script,
+following the same procedures for delayed job using the script found at: <a
+href="https://gist.github.com/3787679">gist.github.com/3787679</a></p>
+
+<p>Other than this, the remaining steps are the same standard steps are
+previous versions:</p>
 
 <pre>RAILS_ENV=production ./script/delayed_job stop
 bundle exec rake sunspot:solr:stop RAILS_ENV=production
@@ -196,7 +219,7 @@ touch tmp/restart.txt</pre>
 <p>SEEK 0.15 upgraded Rails to the latest 2 version,2.3.14. This requires an
 update of Rubygems to 1.6.2. You can update rubygems directly by running</p>
 
-<pre>gem update --system -v 1.6.2</pre>
+<pre>gem update --system 1.6.2</pre>
 
 <p>or install from scratch by reading the <a href="INSTALL.html">INSTALL</a>
 guide. You can also use <a href="https://rvm.io/">RVM</a>. SEEK 0.15 also

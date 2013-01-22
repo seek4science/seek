@@ -22,7 +22,8 @@ The ImageMagick libraries need to be installed, as these are required by the rma
 
 You will need a minimal build environment, as some of the ruby gems require compilation. The Ubuntu/Debian package <em>build-essentials</em> should be sufficient
 
-SEEK uses Lucene as its search engine, and this requires that java is installed. Sun Java is no longer available for Ubuntu, but OpenJDK should work fine.
+SEEK uses Lucene as its search engine, and this requires that java is installed. Sun/Oracle Java is no longer available as a standard package Ubuntu, but OpenJDK should work fine. You can also download and install
+from {Oracle}[http://www.oracle.com/technetwork/java/javase/overview/index.html].
 
 Before starting, its a good idea to get up to date:
 
@@ -66,9 +67,9 @@ on how to setup Apache and {Passenger Phusion (modrails)}[http://www.modrails.co
 
 Our source code is stored within the {Sysmo-DB Google Code Repository}[http://code.google.com/p/sysmo-db/], using Mercurial[http://mercurial.selenic.com/] as the version control system. 
 
-For a stable version, you should check out according to a stable tag. Our current stable tag is <em>0.15.4</em>, so to retrieve this version you should use:
+For a stable version, you should check out according to a stable tag. Our current stable tag is <em>0.16.0</em>, so to retrieve this version you should use:
 
-  hg clone https://sysmo-db.googlecode.com/hg/ -r v0.15.4 seek
+  hg clone https://sysmo-db.googlecode.com/hg/ -r v0.16.0 seek
 
 This will create a <i>seek</i> directory that contains the application.
   
@@ -151,10 +152,16 @@ The command to start open office in headless mode and as the background process 
 
     nohup soffice --headless --accept="socket,host=127.0.0.1,port=8100;urp;" --nofirststartwizard > /dev/null 2>&1
 
-If you run on production server, using apache and phusion passenger, you will need to run soffice under www-data user.
-Firstly, the owner of /var/www needs to be changed to www-data, as soffice will read/write some information in there
+If you run on production server, using apache and phusion passenger, you will need to run the Open Office service under www-data user.
+To do this it will need to create a working directory in /var/www. The name of the directory
+changes between versions, but will be called something similar to libreoffice or .openoffice.org2. The easiest way to create this directory
+is to make a note of the permissions for /var/www, then make it writable to www-data, start the service, and then put the permissions on /var/www back to
+what they were originally.
+
     sudo chown www-data:www-data /var/www
-Then
+
+Then to start the service manually you use:
+
     nohup sudo -H -u www-data soffice --headless --accept="socket,host=127.0.0.1,port=8100;urp;" --nofirststartwizard > /dev/null 2>&1
 
 The 8100 port is used by default, if you'd like to run on another port, you need also to synchronize the changed port with the default soffice_port setting for convert_office plugin in config/environment.rb
@@ -162,7 +169,7 @@ The 8100 port is used by default, if you'd like to run on another port, you need
 For ubuntu 10.04, you should use single minus for options, e.g.
     nohup soffice -headless -accept="socket,host=127.0.0.1,port=8100;urp;" -nofirststartwizard > /dev/null 2>&1
 
-Similar to the automatical way to start and stop delayed_job by init.d script, the script for open office service can be found at:
+We recommend the OpenOffice service is setup using an init.d script, following the same procedures for delayed job using the script found at:
 https://gist.github.com/3787679
 
 == Starting the server

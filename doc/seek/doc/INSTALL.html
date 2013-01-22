@@ -123,8 +123,10 @@ compilation. The Ubuntu/Debian package <em>build-essentials</em> should be
 sufficient</p>
 
 <p>SEEK uses Lucene as its search engine, and this requires that java is
-installed. Sun Java is no longer available for Ubuntu, but OpenJDK should
-work fine.</p>
+installed. Sun/Oracle Java is no longer available as a standard package
+Ubuntu, but OpenJDK should work fine. You can also download and install
+from <a
+href="http://www.oracle.com/technetwork/java/javase/overview/index.html">Oracle</a>.</p>
 
 <p>Before starting, its a good idea to get up to date:</p>
 
@@ -184,10 +186,10 @@ Repository</a>, using <a href="http://mercurial.selenic.com/">Mercurial</a>
 as the version control system.</p>
 
 <p>For a stable version, you should check out according to a stable tag. Our
-current stable tag is <em>0.15.4</em>, so to retrieve this version you
+current stable tag is <em>0.16.0</em>, so to retrieve this version you
 should use:</p>
 
-<pre>hg clone https://sysmo-db.googlecode.com/hg/ -r v0.15.4 seek</pre>
+<pre>hg clone https://sysmo-db.googlecode.com/hg/ -r v0.16.0 seek</pre>
 
 <p>This will create a <em>seek</em> directory that contains the application.</p>
 
@@ -282,13 +284,17 @@ process:</p>
 <pre>nohup soffice --headless --accept=&quot;socket,host=127.0.0.1,port=8100;urp;&quot; --nofirststartwizard &gt; /dev/null 2&gt;&amp;1</pre>
 
 <p>If you run on production server, using apache and phusion passenger, you
-will need to run soffice under www-data user. Firstly, the owner of
-/var/www needs to be changed to www-data, as soffice will read/write some
-information in there</p>
+will need to run the Open Office service under www-data user. To do this it
+will need to create a working directory in /var/www. The name of the
+directory changes between versions, but will be called something similar to
+libreoffice or .openoffice.org2. The easiest way to create this directory
+is to make a note of the permissions for /var/www, then make it writable to
+www-data, start the service, and then put the permissions on /var/www back
+to what they were originally.</p>
 
 <pre>sudo chown www-data:www-data /var/www</pre>
 
-<p>Then</p>
+<p>Then to start the service manually you use:</p>
 
 <pre>nohup sudo -H -u www-data soffice --headless --accept=&quot;socket,host=127.0.0.1,port=8100;urp;&quot; --nofirststartwizard &gt; /dev/null 2&gt;&amp;1</pre>
 
@@ -296,8 +302,8 @@ information in there</p>
 you need also to synchronize the changed port with the default soffice_port
 setting for convert_office plugin in config/environment.rb</p>
 
-<p>Similar to the automatical way to start and stop delayed_job by init.d
-script, the script for open office service can be found at: <a
+<p>We recommend the OpenOffice service is setup using an init.d script,
+following the same procedures for delayed job using the script found at: <a
 href="https://gist.github.com/3787679">gist.github.com/3787679</a></p>
 
 <h2 id="label-Starting+the+server">Starting the server</h2>
