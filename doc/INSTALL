@@ -148,13 +148,18 @@ and
 Open Office is a background service which is called by convert_office plugin, to convert some document types (ms office documents,
 open office documents, etc.) into pdf document.
 
-The command to start open office in headless mode and as the background process for ubuntu 12.04:
+If you are just running SEEK as your current user, rather than setup as a production server, you can start the Open Office service with:
 
-    nohup soffice --headless --accept="socket,host=127.0.0.1,port=8100;urp;" --nofirststartwizard > /dev/null 2>&1
+    soffice --headless --accept="socket,host=127.0.0.1,port=8100;urp;" --nofirststartwizard > /dev/null 2>&1
 
-If you run on production server, using apache and phusion passenger, you will need to run the Open Office service under www-data user.
-To do this it will need to create a working directory in /var/www. The name of the directory
-changes between versions, but will be called something similar to libreoffice or .openoffice.org2. The easiest way to create this directory
+Note that Ubuntu 10.04 uses single hyphen for the options:
+
+    soffice -headless -accept="socket,host=127.0.0.1,port=8100;urp;" --nofirststartwizard > /dev/null 2>&1
+
+The 8100 port is used by default, if you'd like to run on another port, you need also to synchronize the changed port with the default soffice_port setting for convert_office plugin in config/environment.rb
+
+If you run on production server, using Apache and Passenger Phusion, you will need to run the Open Office service under www-data user.
+To do this it will need to create a working directory in /var/www. The name of the directory changes between versions, but will be called something similar to libreoffice or .openoffice.org2. The easiest way to create this directory
 is to make a note of the permissions for /var/www, then make it writable to www-data, start the service, and then put the permissions on /var/www back to
 what they were originally.
 
@@ -164,10 +169,7 @@ Then to start the service manually you use:
 
     nohup sudo -H -u www-data soffice --headless --accept="socket,host=127.0.0.1,port=8100;urp;" --nofirststartwizard > /dev/null 2>&1
 
-The 8100 port is used by default, if you'd like to run on another port, you need also to synchronize the changed port with the default soffice_port setting for convert_office plugin in config/environment.rb
-
-For ubuntu 10.04, you should use single minus for options, e.g.
-    nohup soffice -headless -accept="socket,host=127.0.0.1,port=8100;urp;" -nofirststartwizard > /dev/null 2>&1
+remember on Ubuntu 10.04 only single hyphens are used for the options.
 
 We recommend the OpenOffice service is setup using an init.d script, following the same procedures for delayed job using the script found at:
 https://gist.github.com/3787679
