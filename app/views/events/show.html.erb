@@ -1,11 +1,14 @@
 <%= render :partial => "layouts/item_title",:locals=>{:item=>@event} %>
-
-<ul class="sectionIcons">
-<%= asset_buttons @event,nil,"This deletes the Event listing. Are you sure?'" -%>
-</ul>
+<br/>
 
 <div class="show_basic">
-  <div class="main_content_left_box">
+  <div class="main_content_button_box">
+    <ul class="sectionIcons">
+      <%= asset_buttons @event,nil,"This deletes the Event listing. Are you sure?'" -%>
+    </ul>
+  </div>
+
+  <div class="main_content_left_box_narrower">
 
       <%= render :partial => 'projects/show_project_relationship', :locals => {:resource => @event}%>
       <% unless @event.contributor.nil? then %>

@@ -3,14 +3,15 @@
 
 <%= render :partial => "layouts/item_title",:locals=>{:item=>@presentation, :version=>@display_presentation.version} %>
 
-<ul class="sectionIcons">
-    <%= asset_buttons @presentation,@display_presentation.version -%>
-</ul>
 <br/>
 <%= render :partial=>"assets/upload_new_version_form", :locals=>{:resource=>@presentation} -%>
 
 <div class="show_basic">
-
+  <div class="main_content_button_box">
+      <ul class="sectionIcons">
+        <%= asset_buttons @presentation,@display_presentation.version -%>
+      </ul>
+  </div>
 
   <div class="main_content_left_box_narrower">
 

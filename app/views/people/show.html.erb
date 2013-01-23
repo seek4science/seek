@@ -2,31 +2,32 @@
 
 <%= render :partial => "layouts/item_title", :locals=>{:item=>@person} %>
 
-<ul class="sectionIcons">
-  <% if mine?(@person) || @person.can_be_edited_by?(current_user) -%>
-      <li>
-        <%= image_tag_for_key('edit', edit_person_path(@person), "Edit Person Profile", nil, 'Edit Profile') -%>
-      </li>
-      <% if mine?(@person) -%>
-          <li>
-            <%= image_tag_for_key "lock", url_for({:controller=>:users, :action=>:edit, :id=>@person.user}), "Manage Account", nil, "Manage Account" -%>
-          </li>
-      <% end -%>
-      <% if admin_logged_in? -%>
-          <li>
-            <%= image_tag_for_key "destroy", person_path(@person), "Delete Person", {:confirm => 'Are you sure?', :method => :delete}, "Delete Person" -%>
-          </li>
-      <% end -%>
-  <% end %>
-
-  <% if @person.can_be_administered_by?(current_user)-%>
-      <li>
-        <%= image_tag_for_key "admin", admin_person_path(@person), "Administer", nil, "Person Administration" -%>
-      </li>
-  <% end -%>
-</ul>
-
 <div class="show_basic">
+  <div class="main_content_button_box">
+    <ul class="sectionIcons">
+      <% if mine?(@person) || @person.can_be_edited_by?(current_user) -%>
+          <li>
+            <%= image_tag_for_key('edit', edit_person_path(@person), "Edit Person Profile", {:style => "display:block;width:90%;"}, 'Edit Profile') -%>
+          </li>
+          <% if mine?(@person) -%>
+              <li>
+                <%= image_tag_for_key "lock", url_for({:controller=>:users, :action=>:edit, :id=>@person.user}), "Manage Account", {:style => "display:block;width:90%;"}, "Manage Account" -%>
+              </li>
+          <% end -%>
+          <% if admin_logged_in? -%>
+              <li>
+                <%= image_tag_for_key "destroy", person_path(@person), "Delete Person", {:confirm => 'Are you sure?', :method => :delete, :style => "display:block;width:90%;"}, "Delete Person" -%>
+              </li>
+          <% end -%>
+      <% end %>
+
+      <% if @person.can_be_administered_by?(current_user)-%>
+          <li>
+            <%= image_tag_for_key "admin", admin_person_path(@person), "Administer", {:style => "display:block;width:90%;"}, "Person Administration" -%>
+          </li>
+      <% end -%>
+    </ul>
+  </div>
   <div class="main_content_left_box_narrower">
     <div class="box_about_actor">
       <%= render :partial=>"profile_information" -%>
