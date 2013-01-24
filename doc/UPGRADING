@@ -26,7 +26,7 @@ looks something like:
 
 <b>If upgrading from a version earlier than v0.11.x please contact our GoogleGroup at http://groups.google.com/group/seek-development</b>
 
-When upgrading between versions greater than v0.11.x you need to upgrade to each released minor version in order incrementally (i.e. 0.13.2->0.14.0, you can skip patch versions such as 0.13.3).
+When upgrading between versions greater than v0.11.x you need to upgrade to each released minor version in order incrementally (i.e. 0.13.x -> 0.14.x -> 0.15.x -> 0.16.x, you can skip patch versions such as 0.13.3).
 The released versions are listed below:
 
 * 0.11.x
