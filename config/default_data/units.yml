@@ -4,36 +4,43 @@ dimensionless:
   order: 40
 
 seconds:
+  title: second
   symbol: s
   comment: time
   order: 21
 
 minutes:
+  title: minute
   symbol: min
   comment: time
   order: 22
 
 hour:
+  title: hour
   symbol: h
   comment: time
   order: 23
 
 day:
+  title: day
   symbol: d
   comment: time
   order: 24
 
 week:
+  title: week
   symbol: wk
   comment: time
   order: 25
 
 month:
+  title: month
   symbol: mo
   comment: time
   order: 26
 
 year:
+  title: year
   symbol: yr
   comment: time
   order: 27
