@@ -3,29 +3,29 @@
 <br/>
 
 <div class="show_basic">
-  <div class="main_content_button_box">
-    <ul class="sectionIcons">
+  <div id="main_content_button_box" class="main_content_button_box">
+    <ul class="mainButtons">
       <%= render :partial => "subscriptions/subscribe", :locals => {:object => @investigation} %>
       <% if @investigation.can_manage? -%>
-          <li><%= image_tag_for_key('manage', edit_investigation_path, nil, {:style => "display:block;width:90%;"}, 'Manage investigation') -%></li>
+          <li><%= image_tag_for_main_button('manage', edit_investigation_path, nil, nil, 'Manage investigation') -%></li>
       <% elsif @investigation.can_edit?-%>
-          <li><%= image_tag_for_key('edit', edit_investigation_path, "Edit investigation", {:style => "display:block;width:90%;"}, 'Edit investigation') -%></li>
+          <li><%= image_tag_for_main_button('edit', edit_investigation_path, "Edit investigation", nil, 'Edit investigation') -%></li>
       <% end -%>
 
       <% if @investigation.can_edit? -%>
           <li>
-            <%= image_tag_for_key('new', new_study_path(:investigation_id=>@investigation,:create_from_asset=>@investigation.create_from_asset), "Add a study", {:style => "display:block;width:90%;"}, "Add a study") -%>
+            <%= image_tag_for_main_button('new', new_study_path(:investigation_id=>@investigation,:create_from_asset=>@investigation.create_from_asset), "Add a study", nil, "Add a study") -%>
           </li>
       <% end -%>
 
       <%= delete_ISA_icon @investigation,current_user -%>
       <% if logged_in? and current_user.person.member? %>
-          <li><%= image_tag_for_key('new', new_object_based_on_existing_one_path(:controller_name=>"investigations",:id=>@investigation.id), nil, {:style => "display:block;width:90%;"}, 'New investigation based on this one') %></li>
+          <li><%= image_tag_for_main_button('new', new_object_based_on_existing_one_path(:controller_name=>"investigations",:id=>@investigation.id), nil, nil, 'New investigation based on this one') %></li>
       <% end %>
     </ul>
   </div>
 
-  <div class="main_content_left_box_narrower">
+  <div id="main_content_left_box_narrower" class="main_content_left_box_narrower">
     <p class="id">
         <label>
             ID: 
@@ -54,3 +54,7 @@
   <br/>
   <%= render :partial => "layouts/usage_info", :locals => { :resource => @investigation } -%>
 </div>
+
+<script type="text/javascript">
+    showOrHideButtonBox();
+</script>

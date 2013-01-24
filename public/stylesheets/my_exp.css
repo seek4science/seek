@@ -797,7 +797,10 @@ table.contributable:hover {
 }
 
 .sectionIcons li {
-    padding-bottom: 1em;
+    display: inline;
+    vertical-align: middle;
+    margin: 0;
+    margin-left: 8px;
 	/*border: 2px solid #F5F5F5;*/
 }
 

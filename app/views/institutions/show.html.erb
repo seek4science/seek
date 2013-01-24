@@ -3,22 +3,23 @@
 <% truncate_length_for_boxes = 22 -%>
 
 <%= render :partial => "layouts/item_title",:locals=>{:item=>@institution} -%>
+<br/>
 
 <div class="show_basic">
-  <div class="main_content_button_box">
+  <div id="main_content_button_box" class="main_content_button_box">
     <% if mine?(@institution) || @institution.try(:can_be_edited_by?, current_user) -%>
-        <ul class="sectionIcons">
-          <li><%= image_tag_for_key('edit', edit_institution_path(@institution), "Edit Institution Details", {:style => "display:block;width:90%;"}, 'Edit Institution Details') -%></li>
+        <ul class="mainButtons">
+          <li><%= image_tag_for_main_button('edit', edit_institution_path(@institution), "Edit Institution Details", nil, 'Edit Institution Details') -%></li>
           <% if admin_logged_in? -%>
               <li>
-                <%= image_tag_for_key "destroy", institution_path(@institution), "Delete Institution", { :confirm => 'Are you sure?', :method => :delete, :style => "display:block;width:90%;" }, "Delete Institution" -%>
+                <%= image_tag_for_main_button "destroy", institution_path(@institution), "Delete Institution", { :confirm => 'Are you sure?', :method => :delete }, "Delete Institution" -%>
               </li>
           <% end -%>
         </ul>
     <% end %>
   </div>
 
-  <div class="main_content_left_box_narrower">
+  <div id="main_content_left_box_narrower" class="main_content_left_box_narrower">
 
     <div class="box_about_actor">
       <p class="web_page">
@@ -50,3 +51,7 @@
     <%= render :partial=>"layouts/items_related_to",:object => @institution %>
   </div>
 </div>
+
+<script type="text/javascript">
+    showOrHideButtonBox();
+</script>

@@ -24,11 +24,11 @@
         <% if content_blob.is_image? %>
             <%#param code is used for temporary link %>
             <% download_url = polymorphic_path([asset, content_blob], :action => 'download', :disposition => 'inline', :code => params[:code]) %>
-            <%= image_tag_for_key "show", download_url, 'View content', {:rel => "lightbox", :style => "display:block;width:90%;"}, label %>
+            <%= image_tag_for_main_button "show", download_url, 'View content', {:rel => "lightbox"}, label %>
         <% else %>
             <%#param code is used for temporary link %>
             <% view_pdf_content_url = polymorphic_path([asset, content_blob], :action => 'view_pdf_content', :code => params[:code]) %>
-            <%= image_tag_for_key "show", view_pdf_content_url, 'View content', {:onclick => "isCanvasSupportBrowser();isIEVersionSupported", :title => 'View inline content this file', :style => "display:block;width:90%;"}, label %>
+            <%= image_tag_for_main_button "show", view_pdf_content_url, 'View content', {:onclick => "isCanvasSupportBrowser();isIEVersionSupported", :title => 'View inline content this file'}, label %>
         <% end %>
         <%= li_end %>
     <% end %>

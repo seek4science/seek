@@ -267,7 +267,6 @@ table.list_item .tags {
 }
 
 span.disabled_icon {
-    width: 100%;
     padding: 0.5em 0.5em;
     *padding: 0.2em 0.5em;
     line-height: 1.0;
@@ -345,21 +344,20 @@ span.disabled_icon {
 
 .main_content_left_box_narrower {
     float: left;
-    width: 60%;
-    margin-left: 2.5%;
+    width: 66%;
+    margin-right: 2%;
 }
 
 .main_content_button_box {
     float: left;
     width: 10%;
     text-align: center;
-    margin-bottom: 0.6em;
-
+    margin-right: 2%;
 }
 
 .main_content_right_box_wider {
     float: right;
-    width: 25%;
+    width: 20%;
 }
 
 .contribution_section_box {

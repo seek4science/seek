@@ -9,8 +9,8 @@
 <%= render :partial=>"assets/upload_new_version_form", :locals=>{:resource=>@model} -%>
 
 <div class="show_basic">
-    <div class="main_content_button_box">
-      <ul class="sectionIcons">
+    <div id="main_content_button_box" class="main_content_button_box">
+      <ul class="mainButtons">
         <%= asset_buttons @model, @display_model.version -%>
 
         <% if Seek::Config.jws_enabled && @display_model.is_jws_supported? -%>
@@ -18,12 +18,12 @@
             <% if jws_supported_content_blob.is_in_simulatable_size_limit? %>
                 <% if @model.can_edit? -%>
                     <li>
-                      <%= image_tag_for_key('jws_builder', builder_model_path(@model, :version => @display_model.version), nil, {:style => "display:block;width:90%;"}, "JWS One Stop") -%>
+                      <%= image_tag_for_main_button('jws_builder', builder_model_path(@model, :version => @display_model.version), nil, nil, "JWS One Stop") -%>
                     </li>
                 <% end -%>
                 <% if can_download_asset?(@model, params[:code]) -%>
                     <li>
-                      <%= image_tag_for_key('execute', simulate_model_path(@model, :version => @display_model.version, :code => params[:code]), nil, {:method => :post,:style => "display:block;width:90%;"}, "Simulate Model on JWS") -%>
+                      <%= image_tag_for_main_button('execute', simulate_model_path(@model, :version => @display_model.version, :code => params[:code]), nil, {:method => :post}, "Simulate Model on JWS") -%>
                     </li>
                 <% end -%>
             <% end -%>
@@ -32,14 +32,14 @@
 
         <% if Seek::Config.experimental_features_enabled && Seek::Config.solr_enabled && @display_model.contains_sbml? -%>
             <li>
-              <%= image_tag_for_key("search",matching_data_model_path(@model,:version=>@display_model.version),nil,{:style => "display:block;width:90%;"},"Find related data") -%>
+              <%= image_tag_for_main_button("search",matching_data_model_path(@model,:version=>@display_model.version),nil,nil,"Find related data") -%>
             </li>
         <% end -%>
 
         <% if cytoscapeweb_supported?(@display_model) %>
             <% if can_download_asset?(@model, params[:code]) -%>
                 <li>
-                  <%= image_tag_for_key('cytoscape_web', visualise_model_path(@model, :version => @display_model.version, :code => params[:code]), nil, {:target => "_blank",:style => "display:block;width:90%;"}, "Visualise Model with Cytoscape Web") -%>
+                  <%= image_tag_for_main_button('cytoscape_web', visualise_model_path(@model, :version => @display_model.version, :code => params[:code]), nil, {:target => "_blank"}, "Visualise Model with Cytoscape Web") -%>
                 </li>
             <% end -%>
         <% end %>
@@ -51,7 +51,7 @@
                     <% form_tag("http://sycamore.eml.org/sycamore/submission.jsp", :id => 'sycamore-form') do -%>
                         <%= hidden_field_tag 'sbml_model' -%>
                         <%= hidden_field_tag 'sender', 'seek' -%>
-                        <%= link_to_remote image('execute') + "Simulate Model on Sycamore", {:url => {:action => 'submit_to_sycamore', :id => @model.id, :version => @display_model.version }},:style => "display:block;width:90%;" -%>
+                        <%= link_to_remote image('execute') + "Simulate Model on Sycamore", {:url => {:action => 'submit_to_sycamore', :id => @model.id, :version => @display_model.version }} -%>
                     <% end -%>
                   </li>
             <% end -%>
@@ -61,7 +61,7 @@
       </ul>
     </div>
 
-    <div class="main_content_left_box_narrower">
+    <div id="main_content_left_box_narrower" class="main_content_left_box_narrower">
 
         <%= render :partial=>"assets/resource_version_details", :locals=>{:displayed_resource=>@display_model, :resource=>@model} -%>
         <div class="box_about_actor">
@@ -123,5 +123,9 @@
       <%= render :partial => "layouts/usage_info", :locals => { :resource => @model } -%>
     </div>
 </div>
+
+<script type="text/javascript">
+    showOrHideButtonBox();
+</script>
 
 
