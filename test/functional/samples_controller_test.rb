@@ -45,6 +45,19 @@ class SamplesControllerTest < ActionController::TestCase
     assert_not_nil assigns(:samples)
   end
 
+  test "related specimen tab title" do
+    s = Factory :sample,:policy=>Factory(:public_policy),:specimen=>Factory(:specimen,:policy=>Factory(:public_policy))
+    assert !s.specimen.nil?
+    assert s.specimen.can_view?
+
+    get :show, :id=>s
+    assert_response :success
+
+    assert_select "div#specimens" do
+      assert_select "h3", :text=>/Cell cultures/
+    end
+  end
+
   test "should get new" do
     get :new
     assert_response :success

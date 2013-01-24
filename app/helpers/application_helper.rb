@@ -537,6 +537,8 @@ module ApplicationHelper
       pluralize ? resource_type.titleize.pluralize : resource_type.titleize
     elsif resource_type == "Sop"
       pluralize ? "SOPs" : "SOP"
+    elsif resource_type == "Specimen"
+      pluralize ? Seek::Config.sample_parent_term.capitalize.pluralize : Seek::Config.sample_parent_term.capitalize
     else
       pluralize ? resource_type.pluralize : resource_type
     end
