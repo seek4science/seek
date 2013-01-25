@@ -131,6 +131,25 @@ class ContentBlobsControllerTest < ActionController::TestCase
     assert flash[:error].match(/Unable to find a copy of the file for download/)
   end
 
+  test "get view pdf content" do
+    sop = Factory(:pdf_sop, :policy => Factory(:all_sysmo_downloadable_policy))
+
+    assert_difference("ActivityLog.count") do
+      get :view_pdf_content, :sop_id => sop.id, :id => sop.content_blob.id
+    end
+
+    assert_response :success
+
+    download_path = download_sop_content_blob_path(sop,sop.content_blob.id,:format=>:pdf,:intent=>:inline_view)
+    assert @response.body.include?("DEFAULT_URL = '#{download_path}'")
+
+    al = ActivityLog.last
+    assert_equal "inline_view",al.action
+    assert_equal sop,al.activity_loggable
+    assert_equal User.current_user,al.culprit
+    assert_equal "content_blobs",al.controller_name
+  end
+
 
   #This test is quite fragile, because it relies on an external resource
   test "should redirect on download for 302 url" do
@@ -169,6 +188,14 @@ class ContentBlobsControllerTest < ActionController::TestCase
     assert_equal "attachment; filename=\"small-test-spreadsheet.xls\"",@response.header['Content-Disposition']
     assert_equal "application/excel",@response.header['Content-Type']
     assert_equal "7168",@response.header['Content-Length']
+  end
+
+  test "should not log download for inline view intent" do
+    df = Factory :small_test_spreadsheet_datafile,:policy=>Factory(:public_policy), :contributor=>User.current_user
+    assert_no_difference('ActivityLog.count') do
+      get :download, :data_file_id => df, :id => df.content_blob,:intent=>:inline_view
+    end
+    assert_response :success
   end
 
   test "should download from url" do
