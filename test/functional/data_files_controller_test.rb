@@ -971,8 +971,22 @@ class DataFilesControllerTest < ActionController::TestCase
     assert !assigns(:presentation).attributions_objects.empty?
   end
 
+  test "explore logged as inline view" do
+    data = Factory :small_test_spreadsheet_datafile,:policy=>Factory(:public_policy)
+    assert_difference("ActivityLog.count") do
+      get :explore,:id=>data
+    end
+    assert_response :success
+    al = ActivityLog.last
+    assert_equal data,al.activity_loggable
+    assert_equal User.current_user,al.culprit
+    assert_equal "inline_view",al.action
+    assert_equal "data_files",al.controller_name
+  end
+
   test "explore latest version" do
-    get :explore,:id=>data_files(:downloadable_spreadsheet_data_file)
+    data = Factory :small_test_spreadsheet_datafile,:policy=>Factory(:public_policy)
+    get :explore,:id=>data
     assert_response :success
   end
 

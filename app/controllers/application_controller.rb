@@ -366,7 +366,8 @@ class ApplicationController < ActionController::Base
         when "data_files", "models", "sops", "publications", "presentations", "events"
           a = "create" if a == "upload_for_tool"
           a = "update" if a == "new_version"
-          if ["show", "create", "update", "destroy", "download"].include?(a)
+          a = "inline_view" if a == "explore"
+          if ["show", "create", "update", "destroy", "download","inline_view"].include?(a)
             check_log_exists(a, c, object)
             ActivityLog.create(:action => a,
                                :culprit => current_user,
