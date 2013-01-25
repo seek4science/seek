@@ -367,7 +367,8 @@ class ApplicationController < ActionController::Base
         when "data_files", "models", "sops", "publications", "presentations", "events"
           a = "create" if a == "upload_for_tool"
           a = "update" if a == "new_version"
-          if ["show", "create", "update", "destroy", "download"].include?(a)
+          a = "inline_view" if a == "explore"
+          if ["show", "create", "update", "destroy", "download","inline_view"].include?(a)
             check_log_exists(a, c, object)
             ActivityLog.create(:action => a,
                                :culprit => current_user,
@@ -392,11 +393,12 @@ class ApplicationController < ActionController::Base
                                :data => {:search_query => object, :result_count => @results.count})
           end
         when "content_blobs"
-          if ["view_pdf_content", "download"].include?(a)
+          a = "inline_view" if a=="view_pdf_content"
+          if a=="inline_view" || (a=="download" && params['intent'].to_s != 'inline_view')
             activity_loggable = object.asset
-            ActivityLog.create(:action => 'download',
+            ActivityLog.create(:action => a,
                                :culprit => current_user,
-                               :referenced => activity_loggable.projects.first,
+                               :referenced => object,
                                :controller_name => c,
                                :activity_loggable => activity_loggable,
                                :data => activity_loggable.title)
