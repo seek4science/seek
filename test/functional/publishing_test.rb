@@ -399,6 +399,9 @@ class PublishingTest < ActionController::TestCase
       sop = sops(:sop_with_fully_public_policy)
       assert_equal Policy::EVERYONE, sop.policy.sharing_scope
 
+      #create a published log for the published sop
+      ResourcePublishLog.create(:resource => sop, :culprit => User.current_user, :publish_state => ResourcePublishLog::PUBLISHED)
+
       assert_difference ('ResourcePublishLog.count') do
         put :update, :id => sop.id, :sharing => {:sharing_scope => Policy::PRIVATE, "access_type_#{Policy::PRIVATE}" => Policy::NO_ACCESS}
       end

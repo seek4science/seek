@@ -113,6 +113,8 @@ module Seek
             #don't log if the object is not valid or has not been saved, as this will a validation error on update or create
             return if object.nil? || (object.respond_to?("new_record?") && object.new_record?) || (object.respond_to?("errors") && !object.errors.empty?)
 
+            latest_publish_log = ResourcePublishLog.last(:conditions => ["resource_type=? and resource_id=?",object.class.name,object.id])
+
             #waiting for approval
             if params[:sharing] && params[:sharing][:sharing_scope].to_i == Policy::EVERYONE && !object.can_publish?
                 ResourcePublishLog.create(
@@ -120,14 +122,14 @@ module Seek
                            :resource=>object,
                            :publish_state=>ResourcePublishLog::WAITING_FOR_APPROVAL)
             #publish
-            elsif object.policy.sharing_scope == Policy::EVERYONE && !object.is_published_before_save
+            elsif object.policy.sharing_scope == Policy::EVERYONE && latest_publish_log.try(:publish_state) != ResourcePublishLog::PUBLISHED
                 ResourcePublishLog.create(
                                          :culprit => current_user,
                                          :resource=>object,
                                          :publish_state=>ResourcePublishLog::PUBLISHED)
             #unpublish
-            elsif object.policy.sharing_scope != Policy::EVERYONE && object.is_published_before_save
-                            ResourcePublishLog.create(
+            elsif object.policy.sharing_scope != Policy::EVERYONE && latest_publish_log.try(:publish_state) == ResourcePublishLog::PUBLISHED
+              ResourcePublishLog.create(
                                          :culprit => current_user,
                                          :resource=>object,
                                          :publish_state=>ResourcePublishLog::UNPUBLISHED)
