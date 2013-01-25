@@ -9,7 +9,7 @@ class ContentBlobsController < ApplicationController
 
   def view_pdf_content
     #param code is used for temporary link
-    @pdf_url = polymorphic_path([@asset,@content_blob], :action => 'download', :format => 'pdf', :code => params[:code])
+    @pdf_url = polymorphic_path([@asset,@content_blob], :action => 'download',:intent=>:inline_view, :format => 'pdf', :code => params[:code])
     respond_to do |format|
       format.html { render :layout=>false }
     end
