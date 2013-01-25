@@ -145,6 +145,7 @@ class ContentBlobsControllerTest < ActionController::TestCase
 
     al = ActivityLog.last
     assert_equal "inline_view",al.action
+    assert_equal sop.content_blob,al.referenced
     assert_equal sop,al.activity_loggable
     assert_equal User.current_user,al.culprit
     assert_equal "content_blobs",al.controller_name
@@ -270,6 +271,7 @@ class ContentBlobsControllerTest < ActionController::TestCase
     al = ActivityLog.last
     assert_equal model,al.activity_loggable
     assert_equal "download",al.action
+    assert_equal first_content_blob,al.referenced
     assert_equal User.current_user,al.culprit
     assert_equal "content_blobs",al.controller_name
   end

@@ -397,7 +397,7 @@ class ApplicationController < ActionController::Base
             activity_loggable = object.asset
             ActivityLog.create(:action => a,
                                :culprit => current_user,
-                               :referenced => activity_loggable.projects.first,
+                               :referenced => object,
                                :controller_name => c,
                                :activity_loggable => activity_loggable,
                                :data => activity_loggable.title)
