@@ -55,6 +55,7 @@ class AdminController < ApplicationController
     Seek::Config.set_smtp_settings 'authentication', params[:authentication]
     Seek::Config.set_smtp_settings 'user_name', params[:user_name]
     Seek::Config.set_smtp_settings 'password', params[:password]
+    Seek::Config.set_smtp_settings 'enable_starttls_auto',params[:enable_starttls_auto]=="1"
 
     Seek::Config.solr_enabled= string_to_boolean params[:solr_enabled]
     Seek::Config.jws_enabled= string_to_boolean params[:jws_enabled]
@@ -306,7 +307,7 @@ class AdminController < ApplicationController
 
   def test_email_configuration
     smtp_hash_old = ActionMailer::Base.smtp_settings
-    smtp_hash_new = {:address => params[:address], :domain => params[:domain], :authentication => params[:authentication], :user_name => (params[:user_name].blank? ? nil : params[:user_name]), :password => (params[:password].blank? ? nil : params[:password])}
+    smtp_hash_new = {:address => params[:address], :enable_starttls_auto => params[:enable_starttls_auto]=="1", :domain => params[:domain], :authentication => params[:authentication], :user_name => (params[:user_name].blank? ? nil : params[:user_name]), :password => (params[:password].blank? ? nil : params[:password])}
     smtp_hash_new[:port] = params[:port] if only_integer params[:port], 'port'
     ActionMailer::Base.smtp_settings = smtp_hash_new
     raise_delivery_errors_setting = ActionMailer::Base.raise_delivery_errors
