@@ -1014,10 +1014,12 @@ class ModelsControllerTest < ActionController::TestCase
   end
 
   test "should not submit_to_sycamore if sycamore is disable" do
-    model = Factory :teusink_model
-    login_as(model.contributor)
-    post :submit_to_sycamore, :id => model.id, :version => model.version
-    assert @response.body.include?('Interaction with Sycamore is currently disabled')
+    with_config_value :sycamore_enabled, false do
+      model = Factory :teusink_model
+      login_as(model.contributor)
+      post :submit_to_sycamore, :id => model.id, :version => model.version
+      assert @response.body.include?('Interaction with Sycamore is currently disabled')
+    end
   end
 
   test "should not submit_to_sycamore if model is not downloadable" do
