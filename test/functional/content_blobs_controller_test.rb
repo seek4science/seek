@@ -85,7 +85,7 @@ class ContentBlobsControllerTest < ActionController::TestCase
   end
 
   test 'get_pdf from url' do
-    mock_remote_file "#{Rails.root}/test/fixtures/files/a_pdf_file.pdf","http://somewhere.com/piccy.pdf"
+    mock_remote_file "#{Rails.root}/test/fixtures/files/a_pdf_file.pdf","http://somewhere.com/piccy.pdf",{'Content-Type' => "application/pdf"}
     pdf_sop = Factory(:sop,
                       :policy => Factory(:all_sysmo_downloadable_policy),
                       :content_blob => Factory(:pdf_content_blob,
@@ -103,7 +103,7 @@ class ContentBlobsControllerTest < ActionController::TestCase
   end
 
   test 'get_pdf of a doc file from url' do
-    mock_remote_file "#{Rails.root}/test/fixtures/files/ms_word_test.doc","http://somewhere.com/piccy.doc"
+    mock_remote_file "#{Rails.root}/test/fixtures/files/ms_word_test.doc","http://somewhere.com/piccy.doc",{'Content-Type' => "application/pdf"}
     doc_sop = Factory(:sop,
                       :policy => Factory(:all_sysmo_downloadable_policy),
                       :content_blob => Factory(:doc_content_blob,

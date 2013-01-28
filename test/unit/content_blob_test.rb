@@ -11,6 +11,26 @@ class ContentBlobTest < ActiveSupport::TestCase
     assert_equal "01788bca93265d80e8127ca0039bb69b",blob.md5sum
   end
 
+  test "detects it is a webpage" do
+    mock_remote_file "#{Rails.root}/test/fixtures/files/html_file.html","http://webpage.com",{'Content-Type' => 'text/html'}
+    blob = ContentBlob.create :url=>"http://webpage.com",:original_filename=>nil,:content_type=>nil
+    assert blob.is_webpage?
+    assert_equal "text/html",blob.content_type
+  end
+
+  test "detects it isn't a webpage" do
+    mock_remote_file "#{Rails.root}/test/fixtures/files/file_picture.png","http://webpage.com/piccy.png",{'Content-Type' => 'image/png'}
+    blob = ContentBlob.create :url=>"http://webpage.com/piccy.png",:original_filename=>nil,:content_type=>nil
+    assert !blob.is_webpage?
+    assert_equal "image/png",blob.content_type
+  end
+
+  test "handles an unavailable url when checking for a webpage" do
+    mock_remote_file "#{Rails.root}/test/fixtures/files/file_picture.png","http://webpage.com/piccy.png",{'Content-Type' => 'image/png'},500
+    blob = ContentBlob.create :url=>"http://webpage.com/piccy.png",:original_filename=>nil,:content_type=>nil
+    assert !blob.is_webpage?
+  end
+
   def test_cache_key
     blob=Factory :rightfield_content_blob
     assert_equal "content_blobs/#{blob.id}-01788bca93265d80e8127ca0039bb69b",blob.cache_key
@@ -164,7 +184,8 @@ class ContentBlobTest < ActiveSupport::TestCase
     io_object.rewind
     assert_equal io_object.read,blob.data_io_object.read
 
-    blob=ContentBlob.new(:url=>"http://www.sysmo-db.org/images/sysmo-db-logo-grad2.png")
+    mock_remote_file "#{Rails.root}/test/fixtures/files/file_picture.png","http://www.webpage.com/image.png"
+    blob=ContentBlob.new(:url=>"http://www.webpage.com/image.png")
     blob.save!
     blob.reload
     assert_nil blob.data_io_object

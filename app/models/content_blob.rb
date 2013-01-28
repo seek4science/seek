@@ -31,6 +31,9 @@ class ContentBlob < ActiveRecord::Base
   before_save :calculate_md5
 
   before_save :check_version
+
+  before_save :check_url_content_type
+
   has_many :worksheets, :dependent => :destroy
 
   def spreadsheet_annotations
@@ -133,6 +136,22 @@ class ContentBlob < ActiveRecord::Base
   end
 
   private
+
+  def check_url_content_type
+    unless url.nil?
+      begin
+        response = RestClient.head url
+        self.content_type = response.headers[:content_type]
+
+        if self.content_type == "text/html"
+          self.is_webpage = true
+        end
+      rescue Exception=>e
+        self.is_webpage = false
+        Rails.logger.warn("There was a problem reading the headers for the URL of the content blob = #{self.url}")
+      end
+    end
+  end
   
   def dump_data_object_to_file
     data_to_save = @data

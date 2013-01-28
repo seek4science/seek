@@ -149,10 +149,10 @@ class ActiveSupport::TestCase
   end
 
   ## stuff for mocking
-
-  def mock_remote_file path,route
-    stub_request(:get, route).to_return(:body => File.new(path), :status => 200, :headers=>{'Content-Type' => 'image/png'})
-    stub_request(:head, route)
+  def mock_remote_file path,route,headers={},status=200
+    headers = {'Content-Type' => 'image/png'}.merge headers
+    stub_request(:get, route).to_return(:body => File.new(path), :status => status, :headers=>headers)
+    stub_request(:head, route).to_return(:status=>status,:headers=>headers)
   end
 
   #mocks the contents of a http response with contents stored in a file
