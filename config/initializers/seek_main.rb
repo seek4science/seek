@@ -45,9 +45,20 @@ Annotations::Config.versioning_enabled = false
 CELL_CULTURE_OR_SPECIMEN = Seek::Config.is_virtualliver ? 'specimen' : 'cell culture'
 ENV['LANG'] = 'en_US.UTF-8'
 
+
 if ActiveRecord::Base.connection.table_exists? 'delayed_jobs'
   SendPeriodicEmailsJob.create_initial_jobs
 end
 
+#disable xml parameter parsing to avoid rail vulnarability
+#ActionController::Base.param_parsers.delete(Mime::XML) 
 
-ENV['LANG'] = 'en_US.UTF-8'
+#can not disable xml parameter parsing, it is used in email upload tool authorization
+#so disable the conversions
+ActiveSupport::CoreExtensions::Hash::Conversions::XML_PARSING.delete('symbol') 
+ActiveSupport::CoreExtensions::Hash::Conversions::XML_PARSING.delete('yaml') 
+
+#reduce entity_expansion_limit to limit entity explosion attacks, the default 
+#value is 10000
+REXML::Document.entity_expansion_limit = 1000
+
