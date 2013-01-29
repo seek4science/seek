@@ -141,11 +141,14 @@ class ContentBlob < ActiveRecord::Base
     unless url.nil?
       begin
         response = RestClient.head url
-        self.content_type = response.headers[:content_type]
+        type = response.headers[:content_type]
 
-        if self.content_type == "text/html"
+        if type == "text/html"
           self.is_webpage = true
+          self.content_type = type
         end
+
+        self.content_type = type if self.human_content_type == "Unknown file type"
       rescue Exception=>e
         self.is_webpage = false
         Rails.logger.warn("There was a problem reading the headers for the URL of the content blob = #{self.url}")
