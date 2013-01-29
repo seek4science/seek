@@ -95,17 +95,19 @@ class PublicationsController < ApplicationController
   # PUT /publications/1.xml
   def update
     valid = true
-    person_ids = params[:author].values.reject {|id_string| id_string == ""}
-    if person_ids.uniq.size == person_ids.size
-      params[:author].keys.sort.each do |author_id|
-        author_assoc = params[:author][author_id]
-        unless author_assoc.blank?
-          @publication.publication_authors.detect{|pa| pa.id == author_id.to_i}.person = Person.find(author_assoc)
+    unless params[:author].blank?
+      person_ids = params[:author].values.reject {|id_string| id_string == ""}
+      if person_ids.uniq.size == person_ids.size
+        params[:author].keys.sort.each do |author_id|
+          author_assoc = params[:author][author_id]
+          unless author_assoc.blank?
+            @publication.publication_authors.detect{|pa| pa.id == author_id.to_i}.person = Person.find(author_assoc)
+          end
         end
+      else
+        @publication.errors.add_to_base("Multiple authors cannot be associated with the same SEEK person.")
+        valid = false
       end
-    else
-      @publication.errors.add_to_base("Multiple authors cannot be associated with the same SEEK person.")
-      valid = false
     end
 
     update_annotations @publication
