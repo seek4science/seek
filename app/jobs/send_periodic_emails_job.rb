@@ -2,17 +2,19 @@ class SendPeriodicEmailsJob < Struct.new(:frequency)
 
   def perform
     next_run_at = Time.new
+    logs = []
     begin
       if frequency == 'daily'
         next_run_at += 1.day
-        send_subscription_mails ActivityLog.scoped(:include => :activity_loggable, :conditions => ['created_at>=?', Time.now.yesterday.utc]), 'daily'
+        logs = activity_logs_since Time.now.yesterday.utc
       elsif frequency == 'weekly'
         next_run_at += 1.week
-        send_subscription_mails ActivityLog.scoped(:include => :activity_loggable, :conditions => ['created_at>=?', 7.days.ago]), 'weekly'
+        logs = activity_logs_since 7.days.ago
       elsif frequency == 'monthly'
         next_run_at += 1.month
-        send_subscription_mails ActivityLog.scoped(:include => :activity_loggable, :conditions => ['created_at>=?', 1.month.ago]), 'monthly'
+        logs = activity_logs_since 1.month.ago
       end
+      send_subscription_mails logs, frequency
       #add job for next period
       SendPeriodicEmailsJob.create_job(frequency, next_run_at, 1, true)
     rescue Exception=>e
@@ -47,7 +49,7 @@ class SendPeriodicEmailsJob < Struct.new(:frequency)
     if Seek::Config.email_enabled
       #strip the logs down to those that are relevant
       logs.reject! do |log|
-        log.activity_loggable.nil? || !(log.activity_loggable.subscribable? && log.activity_loggable.subscribers_are_notified_of?(log.action))
+        log.activity_loggable.nil? || !log.activity_loggable.subscribable?
       end
 
       #limit to only the people subscribed to the items logged, and those that are set to receive notifications
@@ -78,6 +80,10 @@ class SendPeriodicEmailsJob < Struct.new(:frequency)
       subscriptions = Subscription.find_all_by_subscribable_type_and_subscribable_id(item.class.name,item.id)
       subscriptions.collect{|sub| sub.person}
     end.flatten.compact.uniq
+  end
+
+  def activity_logs_since time_point
+    ActivityLog.find(:all, :conditions => ['created_at>=? and action in (?) and controller_name!=?', time_point, ['create', 'update'], 'sessions'])
   end
 
   # puts the initial jobs on the queue for each period - daily, weekly, monthly - if they do not exist already
