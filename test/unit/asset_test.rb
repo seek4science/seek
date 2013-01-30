@@ -34,6 +34,50 @@ class AssetTest < ActiveSupport::TestCase
 
   end
 
+  test "is_webpage_only?" do
+    mock_remote_file "#{Rails.root}/test/fixtures/files/html_file.html","http://webpage.com",{'Content-Type' => 'text/html'}
+    mock_remote_file "#{Rails.root}/test/fixtures/files/html_file.html","http://webpage2.com",{'Content-Type' => 'text/html'}
+
+    df = Factory :data_file
+    assert !df.is_webpage_only?
+    assert !df.latest_version.is_webpage_only?
+
+    df = Factory :data_file,:content_blob=>Factory(:content_blob,:url=>"http://webpage.com")
+    assert df.is_webpage_only?
+    assert df.latest_version.is_webpage_only?
+
+    Factory.define(:model_with_urls,:parent=>:model) do |f|
+      f.after_create do |model|
+        model.content_blobs = [
+            Factory.create(:content_blob, :url=>"http://webpage.com", :asset => model,:asset_version=>model.version),
+            Factory.create(:content_blob, :url=>"http://webpage2.com", :asset => model,:asset_version=>model.version)
+        ]
+      end
+    end
+
+    model = Factory :model_with_urls
+    assert model.is_webpage_only?
+    assert model.latest_version.is_webpage_only?
+
+    model = Factory :teusink_model
+    assert !model.is_webpage_only?
+    assert !model.latest_version.is_webpage_only?
+
+    Factory.define(:model_with_urls_and_files,:parent=>:model) do |f|
+      f.after_create do |model|
+        model.content_blobs = [
+            Factory.create(:content_blob, :url=>"http://webpage.com", :asset => model,:asset_version=>model.version),
+            Factory.create(:cronwright_model_content_blob, :asset => model,:asset_version=>model.version)
+        ]
+      end
+    end
+
+    model = Factory :model_with_urls_and_files
+    assert !model.is_webpage_only?
+    assert !model.latest_version.is_webpage_only?
+
+  end
+
   test "tech type titles" do
     df = Factory :data_file
     assay = Factory :experimental_assay,:technology_type=>Factory(:technology_type,:title=>"aaa")

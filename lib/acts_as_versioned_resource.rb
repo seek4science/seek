@@ -63,6 +63,10 @@ module Acts #:nodoc:
           self.parent.tag_counts
       end
 
+      def is_webpage_only?
+        self.parent.is_webpage_only?
+      end
+
       #returns a list of the people that can manage this file
       #which will be the contributor, and those that have manage permissions
       def managers

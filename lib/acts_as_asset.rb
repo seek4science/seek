@@ -101,6 +101,13 @@ module Acts #:nodoc:
 
     module InstanceMethods
 
+      def is_webpage_only?
+        blobs = []
+        blobs << self.content_blob if self.respond_to?(:content_blob)
+        blobs = blobs | self.content_blobs if self.respond_to?(:content_blobs)
+        blobs.select{|blob| !blob.is_webpage?}.empty?
+      end
+
       def studies
         assays.collect{|a| a.study}.uniq
       end
