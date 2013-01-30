@@ -31,7 +31,8 @@ module Seek
         "application/vnd.oasis.opendocument.text" => {:name => "Word document", :icon_key => "doc_file", :extension=>"odt"},
         "application/vnd.oasis.opendocument.text-flat-xml" => {:name => "Word document", :icon_key => "doc_file", :extension=>"fodt"},
         "application/vnd.oasis.opendocument.spreadsheet" => {:name => "Spreadsheet", :icon_key => "xls_file", :extension=>"ods"},
-        "application/rtf" => {:name => "Document file", :icon_key => "rtf_file", :extension=>"rtf"}
+        "application/rtf" => {:name => "Document file", :icon_key => "rtf_file", :extension=>"rtf"},
+        "text/html" => {:name=>"Website",:icon_key=>"html_file",:extension=>"html"}
     }
 
     #Get a nice, human readable name for the MIME type

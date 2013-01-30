@@ -255,12 +255,19 @@ class ContentBlobTest < ActiveSupport::TestCase
   test "human content type" do
     content_blob = Factory(:docx_content_blob)
     assert_equal "Word document",content_blob.human_content_type
+
     content_blob.content_type = "application/msexcel"
     assert_equal "Spreadsheet",content_blob.human_content_type
+
+    content_blob.content_type = "text/html"
+    assert_equal "Website",content_blob.human_content_type
+
     content_blob.content_type = "application/x-download"
     assert_equal "Unknown file type",content_blob.human_content_type
+
     content_blob.content_type = ""
     assert_equal "Unknown file type",content_blob.human_content_type
+
     content_blob.content_type = nil
     assert_equal "Unknown file type",content_blob.human_content_type
   end

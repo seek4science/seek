@@ -226,7 +226,9 @@ module ImagesHelper
       "file_icons/small/txt.png"
       when "rtf_file"
       "file_icons/small/rtf.png"
-      when "investigation_avatar", 'investigation', 'investigations'
+      when "html_file"
+        "file_icons/small/html.png"
+      when "investigation_avatar", "investigation", "investigations"
       "crystal_project/64x64/apps/mydocuments.png"
       when "study_avatar"
       "crystal_project/64x64/apps/package_editors.png"
