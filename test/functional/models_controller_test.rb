@@ -144,7 +144,7 @@ class ModelsControllerTest < ActionController::TestCase
 
   end
 
-  test "should show only modelling assays in associate assay form" do
+  test "should show only modelling assays in associate modelling analysis form" do
     login_as(:model_owner)
     get :new
     assert_response :success
@@ -153,6 +153,27 @@ class ModelsControllerTest < ActionController::TestCase
       assert_select "option", :text=>/Modelling Assay/,:count=>1
       assert_select "option", :text=>/Metabolomics Assay/,:count=>0
     end
+  end
+
+  test "correct title and text for associating a modelling analysis for new" do
+    login_as(Factory(:user))
+    get :new
+    assert_response :success
+
+    assert_select 'div.foldTitle',:text=>/Modelling Analyses/
+    assert_select 'div#associate_assay_fold_content p',:text=>/The following Modelling Analyses are associated with this Model:/
+    assert_select 'div.association_step p',:text=>/You may select an existing editable Modelling Analysis to associate with this Model./
+  end
+
+  test "correct title and text for associating a modelling analysis for edit" do
+    model = Factory :model
+    login_as(model.contributor.user)
+    get :edit, :id=>model.id
+    assert_response :success
+
+    assert_select 'div.foldTitle',:text=>/Modelling Analyses/
+    assert_select 'div#associate_assay_fold_content p',:text=>/The following Modelling Analyses are associated with this Model:/
+    assert_select 'div.association_step p',:text=>/You may select an existing editable Modelling Analysis to associate with this Model./
   end
 
   test "fail gracefullly when trying to access a missing model" do

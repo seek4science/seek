@@ -27,6 +27,27 @@ class DataFilesControllerTest < ActionController::TestCase
     assert_select "title",:text=>/The Sysmo SEEK Data.*/, :count=>1
   end
 
+  test "correct title and text for associating an assay for new" do
+    login_as(Factory(:user))
+    get :new
+    assert_response :success
+
+    assert_select 'div.foldTitle',:text=>/Experimental Assays and Modelling Analyses/
+    assert_select 'div#associate_assay_fold_content p',:text=>/The following Experimental Assays and Modelling Analyses are associated with this Data file:/
+    assert_select 'div.association_step p',:text=>/You may select an existing editable Experimental Assay or Modelling Analysis to associate with this Data file./
+  end
+
+  test "correct title and text for associating an assay for edit" do
+    df = Factory :data_file
+    login_as(df.contributor.user)
+    get :edit, :id=>df.id
+    assert_response :success
+
+    assert_select 'div.foldTitle',:text=>/Experimental Assays and Modelling Analyses/
+    assert_select 'div#associate_assay_fold_content p',:text=>/The following Experimental Assays and Modelling Analyses are associated with this Data file:/
+    assert_select 'div.association_step p',:text=>/You may select an existing editable Experimental Assay or Modelling Analysis to associate with this Data file./
+  end
+
   test "view_items_in_tab" do
     other_user = Factory :user
     df = Factory :data_file,:title=>"a data file",:contributor=>User.current_user,:policy=>Factory(:public_policy)
