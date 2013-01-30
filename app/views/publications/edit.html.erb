@@ -69,7 +69,7 @@
           </p>
     <% end -%>
       <p>
-        <%= render :partial => "assays/associate_assays", :locals=>{:resource => @publication, :show_relationships => false} -%>
+        <%= render :partial => "assays/associate_assays", :locals=>{:resource => @publication} -%>
       </p>
       <p>
         <%= render :partial => "assets/associate_data_file", :locals=>{:resource => @publication, :show_relationships => false} -%>

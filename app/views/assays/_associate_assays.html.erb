@@ -1,4 +1,5 @@
 <%
+    show_relationships = resource.is_a?(DataFile)
     resource_text ||= text_for_resource(resource)
     all_assays=authorised_assays.sort_by &:title
     all_assays = authorised_assays.select do |assay|
@@ -53,7 +54,7 @@
               <%= select_tag :assay_ids,'',{:multiple=>true,:style=>"display:none;"} -%>
               <br/>
               <div id="relationship" style="display:none;">
-                <%= label_tag "Relationship between the data and the model" %><br/>
+                <%= label_tag "How is the data used in this Modelling Analysis" %><br/>
                 <%= select_tag :assay_relationship_type, options_for_select([["None",0]] + RelationshipType.all.collect{|r| [r.title,r.id]}) %>
               </div>
               <br/>
