@@ -98,6 +98,10 @@ module Acts #:nodoc:
         self.parent.assets_creators
       end
 
+      def contributing_user
+        self.parent.try(:contributing_user)
+      end
+
       def is_asset?
         self.parent.is_asset?
       end
