@@ -53,7 +53,7 @@
             <% end -%>
         </p>
         <p>
-            <%= render :partial => "assays/associate_assays", :locals=>{:resource => @data_file, :show_relationships=>true} -%>
+            <%= render :partial => "assays/associate_assays", :locals=>{:resource => @data_file} -%>
         </p>
 
         <%= fields_for(@data_file) {|f| f.fancy_multiselect :samples, {:hidden=> @data_file.samples.blank?  ? true : false, :other_projects_checkbox => true}}  -%>

@@ -32,6 +32,8 @@ module AssetsHelper
       text = resource_or_text
     elsif resource_or_text.kind_of?(Specimen)
       text = Seek::Config.sample_parent_term
+    elsif resource_or_text.is_a?(Assay)
+      text = resource_or_text.is_modelling? ? "Modelling Analysis" : "Assay"
     else
       text = resource_or_text.class.name
     end
