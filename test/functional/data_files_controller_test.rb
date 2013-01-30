@@ -500,6 +500,22 @@ class DataFilesControllerTest < ActionController::TestCase
 
   end
 
+  test "should show wepage as a link" do
+    mock_remote_file "#{Rails.root}/test/fixtures/files/html_file.html","http://webpage.com",{'Content-Type' => 'text/html'}
+    df = Factory :data_file,:content_blob=>Factory(:content_blob,:url=>"http://webpage.com")
+    assert df.content_blob.is_webpage?
+    login_as(df.contributor.user)
+    get :show,:id=>df
+    assert_response :success
+
+    assert_select "div.box_about_actor" do
+      assert_select "p > b",:text=>/Website:/
+      assert_select "a[href=?][target=_blank]","http://webpage.com",:text=>"http://webpage.com"
+      assert_select "p > b",:text=>/Format:/,:count=>0
+      assert_select "p > b",:text=>/Size:/,:count=>0
+    end
+  end
+
 
 
   test "svg handles quotes in title" do
