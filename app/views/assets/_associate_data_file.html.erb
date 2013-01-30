@@ -40,7 +40,7 @@
         
         <% if show_relationships -%>
           <br/>
-          <%= label_tag "Relationship between the data and the model" %><br/>
+          <%= label_tag "How was the data used in this #{resource_text}" %><br/>
           <%= select_tag :data_file_relationship_type, options_for_select([["None",0]] + RelationshipType.all.collect{|r| [r.title,r.id]}) %>
         <% end -%>
         
