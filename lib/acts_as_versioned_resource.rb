@@ -63,6 +63,10 @@ module Acts #:nodoc:
           self.parent.tag_counts
       end
 
+      def contains_downloadable_items?
+        self.parent.contains_downloadable_items?
+      end
+
       #returns a list of the people that can manage this file
       #which will be the contributor, and those that have manage permissions
       def managers
@@ -92,6 +96,10 @@ module Acts #:nodoc:
 
       def assets_creators
         self.parent.assets_creators
+      end
+
+      def contributing_user
+        self.parent.try(:contributing_user)
       end
 
       def is_asset?

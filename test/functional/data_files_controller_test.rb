@@ -488,6 +488,22 @@ class DataFilesControllerTest < ActionController::TestCase
 
   end
 
+  test "should show wepage as a link" do
+    mock_remote_file "#{Rails.root}/test/fixtures/files/html_file.html","http://webpage.com",{'Content-Type' => 'text/html'}
+    df = Factory :data_file,:content_blob=>Factory(:content_blob,:url=>"http://webpage.com")
+    assert df.content_blob.is_webpage?
+    login_as(df.contributor.user)
+    get :show,:id=>df
+    assert_response :success
+
+    assert_select "div.box_about_actor" do
+      assert_select "p > b",:text=>/Website:/
+      assert_select "a[href=?][target=_blank]","http://webpage.com",:text=>"http://webpage.com"
+      assert_select "p > b",:text=>/Format:/,:count=>0
+      assert_select "p > b",:text=>/Size:/,:count=>0
+    end
+  end
+
 
 
   test "svg handles quotes in title" do
@@ -519,6 +535,39 @@ class DataFilesControllerTest < ActionController::TestCase
     assert_select "div#publications_fold_content",true
   end
 
+  test "dont show download button or count for website data file" do
+    mock_remote_file "#{Rails.root}/test/fixtures/files/html_file.html","http://webpage.com",{'Content-Type' => 'text/html'}
+    df = Factory :data_file,:content_blob=>Factory(:content_blob,:url=>"http://webpage.com")
+    assert df.content_blob.is_webpage?
+    login_as(df.contributor.user)
+    get :show,:id=>df
+    assert_response :success
+    assert_select "ul.sectionIcons > li > span.icon" do
+      assert_select "a[href=?]",download_data_file_content_blob_path(df,df.content_blob.id),:count=>0
+      assert_select "a",:text=>/Download/,:count=>0
+    end
+
+    assert_select "div.contribution_aftertitle" do
+      assert_select "b",:text=>/Downloads/,:count=>0
+    end
+
+  end
+
+  test "show download button for non website data file" do
+    df = Factory :data_file
+    login_as(df.contributor.user)
+    get :show,:id=>df
+    assert_response :success
+    assert_select "ul.sectionIcons > li > span.icon" do
+      assert_select "a[href=?]",download_data_file_content_blob_path(df,df.content_blob.id),:count=>1
+      assert_select "a",:text=>/Download Data file/,:count=>1
+    end
+
+    assert_select "div.contribution_aftertitle" do
+      assert_select "b",:text=>/Downloads/,:count=>1
+    end
+
+  end
   
 
   

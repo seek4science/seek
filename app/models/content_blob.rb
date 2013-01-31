@@ -3,6 +3,7 @@ require 'net/http'
 require 'open-uri'
 require 'tmpdir'
 require 'docsplit'
+require 'rest-client'
 
 class ContentBlob < ActiveRecord::Base
 
@@ -134,6 +135,8 @@ class ContentBlob < ActiveRecord::Base
       dump_data_object_to_file
     end    
   end
+
+
 
   private
 

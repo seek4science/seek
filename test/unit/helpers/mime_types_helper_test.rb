@@ -20,10 +20,11 @@ class MimeTypesHelperTest < ActionView::TestCase
   ODT=%w{application/vnd.oasis.opendocument.text}
   FODT=%w{application/vnd.oasis.opendocument.text-flat-xml}
   RTF=%w{application/rtf}
+  HTML=%w{text/html}
 
   
   def test_recognised
-    supported_types=MISC+EXCEL+EXCELX+DOC+DOCX+PPT+PDF+IMAGE+TEXT+CSV+XML+ODP+FODP+ODT+FODT+RTF
+    supported_types=MISC+EXCEL+EXCELX+DOC+DOCX+PPT+PDF+IMAGE+TEXT+CSV+XML+ODP+FODP+ODT+FODT+RTF+HTML
     supported_types.each do |type|
       assert_not_equal "Unknown file type", mime_nice_name(type),"Didn't recognise mime type #{type}"
     end
@@ -125,6 +126,12 @@ class MimeTypesHelperTest < ActionView::TestCase
       assert_equal "rtf", mime_extension(type)
       assert_equal "Document file", mime_nice_name(type)
       assert_equal icon_filename_for_key("rtf_file"), mime_icon_url(type)
+    end
+
+    HTML.each do |type|
+      assert_equal "html", mime_extension(type)
+      assert_equal "Website", mime_nice_name(type)
+      assert_equal icon_filename_for_key("html_file"), mime_icon_url(type)
     end
   end
 

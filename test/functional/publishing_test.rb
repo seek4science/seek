@@ -196,7 +196,7 @@ class PublishingTest < ActionController::TestCase
       post :publish,params.merge(:id=>df3)
     end
     assert_response :success
-
+    record_body
     assert_select "ul#published" do
       assert_select "li",:text=>/Investigation: #{inv.title}/,:count=>1
       assert_select "li",:text=>/Study: #{study.title}/,:count=>0
@@ -211,7 +211,7 @@ class PublishingTest < ActionController::TestCase
 
     assert_select "ul#notified" do
       assert_select "li",:text=>/Study: #{study.title}/,:count=>1
-      assert_select "li",:text=>/Assay: #{assay.title}/,:count=>1
+      assert_select "li",:text=>/Modelling analysis: #{assay.title}/,:count=>1
       assert_select "li",:text=>/Data file: #{df1.title}/,:count=>1
       
       assert_select "li > a[href=?]",person_path(personB),:text=>/#{personB.name}/,:count=>3

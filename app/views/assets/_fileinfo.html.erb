@@ -1,23 +1,31 @@
-<p>
-  <b>Filename:</b>
-  <%=h fileinfo.original_filename -%>
-</p>
-
-<p>
-  <b>Format:</b>
-  <%=h fileinfo.human_content_type -%>
-</p>
-
-<p>
-  <b>Size:</b>
-  <%= filesize_as_text(fileinfo) %>
-</p>
-
-<%# This is for multiple files asset %>
-<% asset = fileinfo.asset
-   if Seek::Util.multi_files_asset_types.include?(asset.class) && (can_download_asset?(asset, params[:code])) -%>
+<% if fileinfo.is_webpage? -%>
     <p>
-      <%= render :partial => "assets/view_content", :locals => {:content_blob => fileinfo} -%>
-      <%= image_tag_for_key('download', polymorphic_path([asset, fileinfo], :action=>:download,:code=>params[:code]), "Download", {:title => 'Download this file'}, "") -%>
+      <b>Website:</b>
+      <%= link_to fileinfo.url, fileinfo.url, :target=>"_blank" -%>
     </p>
-<% end %>
+
+<% else %>
+    <p>
+      <b>Filename:</b>
+      <%=h fileinfo.original_filename -%>
+    </p>
+
+    <p>
+      <b>Format:</b>
+      <%=h fileinfo.human_content_type -%>
+    </p>
+
+    <p>
+      <b>Size:</b>
+      <%= filesize_as_text(fileinfo) %>
+    </p>
+
+    <%# This is for multiple files asset %>
+    <% asset = fileinfo.asset
+       if Seek::Util.multi_files_asset_types.include?(asset.class) && (can_download_asset?(asset, params[:code])) -%>
+        <p>
+          <%= render :partial => "assets/view_content", :locals => {:content_blob => fileinfo} -%>
+          <%= image_tag_for_key('download', polymorphic_path([asset, fileinfo], :action=>:download,:code=>params[:code]), "Download", {:title => 'Download this file'}, "") -%>
+        </p>
+    <% end %>
+<% end -%>

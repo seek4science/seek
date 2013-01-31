@@ -11,6 +11,7 @@ namespace :seek do
             :environment,
             :add_term_uris_to_assay_types,
             :add_term_uris_to_technology_types,
+	    :detect_web_page_content_blobs,
             :repopulate_auth_lookup_tables
   ]
 
@@ -81,6 +82,23 @@ namespace :seek do
     missing = TechnologyType.find(:all, :conditions=>{:term_uri=>nil})
 
     puts "#{missing.size} technology types found without terms: #{missing.collect{|m| m.title}.join(", ")}"
+  end
+
+  task(:detect_web_page_content_blobs=>:environment) do
+
+    blobs = ContentBlob.find(:all,:conditions=>"url IS NOT NULL")
+    blobs.each do |blob|
+
+      #to open up access to private method
+      class << blob
+        def detect_webpage
+          check_url_content_type
+        end
+      end
+
+      blob.detect_webpage
+      blob.save
+    end
   end
 
   desc "removes the older duplicate create activity logs that were added for a short period due to a bug (this only affects versions between stable releases)"
