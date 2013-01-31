@@ -7,9 +7,10 @@
   </div>
   
 
-  <div id="plot_data" style="width:500px;height:300px;">
+  <div id="plot_data">
 
   </div>
+  <div>&nbsp;</div>
 
   <% form_remote_tag(:url=>{:controller=>"spreadsheet_annotations", :action=>"create"},
                    :update => { :success => "annotations", :failure => "spreadsheet_errors"},
@@ -27,7 +28,7 @@
       <%= text_area_tag :annotation_content,nil,:class=>"annotation_content_class" %>
       <%= hidden_field_tag :annotation_attribute_name, "plot_data" %>
     </div>
-    <%= submit_tag 'Store as annotation',:id=>"fetch_button" %>
+    <%= submit_tag 'Store as annotation',:id=>"fetch_button" %> <span style="font-weight:bolder">X:<span id="plot_data_xval"></span> &nbsp; Y:<span id="plot_data_yval"></span></span>
   <% end %>
   <%= image_tag "ajax-loader.gif", :id => 'spinner_plot', :style => 'display:none;' -%>
 

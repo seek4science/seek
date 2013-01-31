@@ -76,9 +76,16 @@ function plot_cells(target_element,width,height)
     var options = { series: {
         curvedLines: {
             active: true
-        }
-    }
+        },
+        points: { show:true }
+    },
+        grid: { hoverable: true, autoHighlight:true }
     };
 
     $j.plot(element,json_data,options);
+
+    element.bind("plothover",function(event,pos,item) {
+       $j("#"+target_element+"_xval").text(pos.x.toFixed(4));
+       $j("#"+target_element+"_yval").text(pos.y.toFixed(4));
+    });
 }
