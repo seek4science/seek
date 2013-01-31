@@ -101,11 +101,11 @@ module Acts #:nodoc:
 
     module InstanceMethods
 
-      def is_webpage_only?
+      def contains_downloadable_items?
         blobs = []
         blobs << self.content_blob if self.respond_to?(:content_blob)
         blobs = blobs | self.content_blobs if self.respond_to?(:content_blobs)
-        blobs.compact.select{|blob| !blob.is_webpage?}.empty?
+        !blobs.compact.select{|blob| !blob.is_webpage?}.empty?
       end
 
       def studies

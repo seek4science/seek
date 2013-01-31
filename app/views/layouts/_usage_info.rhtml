@@ -10,7 +10,7 @@
 	<% end -%>
     &nbsp;&nbsp;&nbsp;
 	<b>Views:</b> <%= count_actions(resource,"show") -%>		
-	<% if ["DataFile","Model","Sop", "Presentation"].include?(resource.class.name) && !resource.is_webpage_only? -%>
+	<% if ["DataFile","Model","Sop", "Presentation"].include?(resource.class.name) && resource.contains_downloadable_items? -%>
 	&nbsp;&nbsp;&nbsp;
 		<b>Downloads:</b> <%= count_actions(resource,"download") -%>
 	<% end -%>

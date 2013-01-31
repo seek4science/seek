@@ -2,7 +2,7 @@
 <% if asset.is_downloadable? -%>
     <% display_asset = asset.find_version(version) %>
     <%# param code is used for temporary link -%>
-    <% if !display_asset.is_webpage_only? && can_download_asset?(asset, params[:code]) -%>
+    <% if display_asset.contains_downloadable_items? && can_download_asset?(asset, params[:code]) -%>
         <%
            if Seek::Util.multi_files_asset_types.include?(asset.class)
              path = polymorphic_path(asset,:version=>version,:action=>:download,:code=>params[:code])

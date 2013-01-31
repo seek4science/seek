@@ -63,8 +63,8 @@ module Acts #:nodoc:
           self.parent.tag_counts
       end
 
-      def is_webpage_only?
-        self.parent.is_webpage_only?
+      def contains_downloadable_items?
+        self.parent.contains_downloadable_items?
       end
 
       #returns a list of the people that can manage this file
