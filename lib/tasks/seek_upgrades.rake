@@ -36,9 +36,18 @@ namespace :seek do
 
 
   task(:detect_web_page_content_blobs=>:environment) do
+
     blobs = ContentBlob.find(:all,:conditions=>"url IS NOT NULL")
     blobs.each do |blob|
-      blob.check_url_content_type
+
+      #to open up access to private method
+      class << blob
+        def detect_webpage
+          check_url_content_type
+        end
+      end
+
+      blob.detect_webpage
       blob.save
     end
   end
