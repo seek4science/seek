@@ -48,6 +48,7 @@ namespace :seek do
       end
 
       blob.detect_webpage
+      puts "Checked #{blob.url} - is a webpage:#{blob.is_webpage?}"
       blob.save
     end
   end
