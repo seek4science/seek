@@ -6,7 +6,7 @@ obj=eval("@"+upload_field)
 class << obj
 attr_accessor :data_url,:local_copy
 end unless obj.nil?
-obj.local_copy=1 unless obj.nil?
+obj.local_copy=0 unless obj.nil?
 asset_name = text_for_resource upload_field
 new_version ||= false
 original_filename=nil
@@ -22,7 +22,7 @@ original_filename=nil
 <div class="box_infotext">
 
     <p>
-        You can register a <%= asset_name -%> by either directly uploading a file, or registering a URL. Please test the URL before submitting.
+        You can register a <%= asset_name -%> by either directly uploading a file, or registering a URL to either another page or remote file. Please test the URL before submitting.
       <%= link_to_function "More info "+image("expand"), :id => 'more_info_expand_image' do |page|
         page.visual_effect(:toggle_appear, "more_upload_info", :duration => 0.3)
         page["more_info_expand_image"].toggle
@@ -38,12 +38,16 @@ original_filename=nil
     </p>
     <span id="more_upload_info" style="display:none;">
         <p>
-            When registering a URL you can specify that a copy of the data should be stored
-            within SEEK. This is recommended and is equivalent to uploading a file. It also means that should the data behind the URL become unavailable, the data is still available from SEEK.
+            If the URL points to another webpage - for example a collection of datasets in another repostiory - then the link will be shown for this asset, and there will be no download option.
         </p>
         <p>
-            If the URL results in a redirection or unauthorized response, then SEEK has no option but to store only the URL. In this case, when another user selects to download the <%= asset_name -%>
+            If the URL points to a remote file, then it will appear just like an uploaded asset in SEEK. If accessing the file requires authorization, then SEEK has no option but to store only the URL. In this case, when another user selects to download the <%= asset_name -%>
             then they will simply directed to the URL (for example, so that they can login to access the file).
+        </p>
+        <p>
+          When registering a URL to a file, you can specify that a copy of the data should be stored
+          within SEEK. This is recommended and is equivalent to uploading a file. It also means that should the data behind the URL become unavailable, the data is still available from SEEK. However, you should
+          be sure that the copyright on the file allows you to do this.
         </p>
         <p></p>
     </span>

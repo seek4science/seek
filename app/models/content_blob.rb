@@ -144,8 +144,10 @@ class ContentBlob < ActiveRecord::Base
     unless url.nil?
       begin
         response = RestClient.head url
-        type = response.headers[:content_type]
+        type = response.headers[:content_type] || ""
 
+        #strip out the charset, e.g for content-type  "text/html; charset=utf-8"
+        type = type.gsub(/;.*/,"").strip
         if type == "text/html"
           self.is_webpage = true
           self.content_type = type
