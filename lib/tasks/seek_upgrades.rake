@@ -12,7 +12,8 @@ namespace :seek do
             :reordering_authors_for_existing_publications,
             :cleanup_asset_versions_projects_duplication,
             :update_missing_content_types,
-            :repopulate_auth_lookup_tables
+            :repopulate_auth_lookup_tables,
+            :detect_web_page_content_blobs
   ]
 
   desc("upgrades SEEK from the last released version to the latest released version")
@@ -33,6 +34,14 @@ namespace :seek do
     puts "Upgrade completed successfully"
   end
 
+
+  task(:detect_web_page_content_blobs=>:environment) do
+    blobs = ContentBlob.find(:all,:conditions=>"url IS NOT NULL")
+    blobs.each do |blob|
+      blob.check_url_content_type
+      blob.save
+    end
+  end
 
   desc "removes the older duplicate create activity logs that were added for a short period due to a bug (this only affects versions between stable releases)"
   task(:remove_duplicate_activity_creates=>:environment) do

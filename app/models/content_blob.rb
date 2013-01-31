@@ -135,8 +135,6 @@ class ContentBlob < ActiveRecord::Base
     end    
   end
 
-  private
-
   def check_url_content_type
     unless url.nil?
       begin
@@ -155,6 +153,9 @@ class ContentBlob < ActiveRecord::Base
       end
     end
   end
+
+  private
+
   
   def dump_data_object_to_file
     data_to_save = @data

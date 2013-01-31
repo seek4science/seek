@@ -77,7 +77,7 @@ module ActiveRecordExtensions
   end
 
   def is_downloadable?
-    (respond_to?(:content_blob) || respond_to?(:content_blobs)) && !is_webpage_only?
+    (respond_to?(:content_blob) || respond_to?(:content_blobs))
   end
 
   def is_publishable?

@@ -35,6 +35,7 @@ class AssetTest < ActiveSupport::TestCase
   end
 
   test "is_webpage_only?" do
+
     mock_remote_file "#{Rails.root}/test/fixtures/files/html_file.html","http://webpage.com",{'Content-Type' => 'text/html'}
     mock_remote_file "#{Rails.root}/test/fixtures/files/html_file.html","http://webpage2.com",{'Content-Type' => 'text/html'}
 
@@ -75,6 +76,13 @@ class AssetTest < ActiveSupport::TestCase
     model = Factory :model_with_urls_and_files
     assert !model.is_webpage_only?
     assert !model.latest_version.is_webpage_only?
+
+    #FIXME: this implies that is_webpage_only is not a suitable method name, contains_downloadable_items? would be better
+    df = DataFile.new
+    assert df.is_webpage_only?
+
+    model = Model.new
+    assert model.is_webpage_only?
 
   end
 
