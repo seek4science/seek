@@ -1,9 +1,10 @@
 <% if fileinfo.is_webpage? -%>
-    <p>
-      <b>Website:</b>
-      <%= link_to fileinfo.url, fileinfo.url, :target=>"_blank" -%>
-    </p>
-
+    <% if fileinfo.asset.can_download? %>
+        <p>
+          <b>Website:</b>
+          <%= link_to fileinfo.url, fileinfo.url, :target=>"_blank" -%>
+        </p>
+    <% end -%>
 <% else %>
     <p>
       <b>Filename:</b>
