@@ -1,7 +1,7 @@
 <% if fileinfo.is_webpage? -%>
     <% if fileinfo.asset.can_download? %>
         <p>
-          <b>Website:</b>
+          <b>Link:</b>
           <%= link_to fileinfo.url, fileinfo.url, :target=>"_blank" -%>
         </p>
     <% end -%>
