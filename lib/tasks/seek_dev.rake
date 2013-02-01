@@ -54,6 +54,21 @@ namespace :seek_dev do
     end
   end
 
+  task(:refresh_content_types => :environment) do
+
+    ContentBlob.all.each do |cb|
+      filename = cb.original_filename
+      file_format = filename.split('.').last.try(:strip)
+      possible_mime_types = cb.mime_types_for_extension file_format
+      type = possible_mime_types.sort.first || "application/octet-stream"
+      type = type.gsub("image/jpg","image/jpeg") unless type.nil?
+
+      cb.content_type = type
+      cb.save
+    end
+
+  end
+
   desc "Generate an XMI db/schema.xml file describing the current DB as seen by AR. Produces XMI 1.1 for UML 1.3 Rose Extended, viewable e.g. by StarUML"
   task :xmi => :environment do
     require 'lib/uml_dumper.rb'
