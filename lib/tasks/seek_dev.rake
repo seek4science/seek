@@ -58,13 +58,15 @@ namespace :seek_dev do
 
     ContentBlob.all.each do |cb|
       filename = cb.original_filename
-      file_format = filename.split('.').last.try(:strip)
-      possible_mime_types = cb.mime_types_for_extension file_format
-      type = possible_mime_types.sort.first || "application/octet-stream"
-      type = type.gsub("image/jpg","image/jpeg") unless type.nil?
+      unless filename.nil?
+        file_format = filename.split('.').last.try(:strip)
+        possible_mime_types = cb.mime_types_for_extension file_format
+        type = possible_mime_types.sort.first || "application/octet-stream"
+        type = type.gsub("image/jpg","image/jpeg") unless type.nil?
 
-      cb.content_type = type
-      cb.save
+        cb.content_type = type
+        cb.save
+      end
     end
 
   end
