@@ -38,6 +38,10 @@ namespace :seek do
   task(:detect_web_page_content_blobs=>:environment) do
 
     blobs = ContentBlob.find(:all,:conditions=>"url IS NOT NULL")
+
+    #skip JERM added assets (to avoid a problem with translucent pointing at a defunt repository that returns a html page)
+    blobs = blobs.select{|blob| !blob.asset.nil? && !blob.asset.contributor.nil?}
+
     blobs.each do |blob|
 
       #to open up access to private method
