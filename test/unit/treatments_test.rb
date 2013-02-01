@@ -89,8 +89,8 @@ class TreatmentsTest < ActiveSupport::TestCase
     assert_equal "0.15",treatment.values["Dilution_rate"].last
 
     assert_equal 19, treatment.sample_names.count
-    assert_equal "1.0",treatment.sample_names.first
-    assert_equal "17.0",treatment.sample_names.last
+    assert_equal "1",treatment.sample_names.first
+    assert_equal "17",treatment.sample_names.last
 
   end
 
@@ -110,8 +110,8 @@ class TreatmentsTest < ActiveSupport::TestCase
     assert_equal "0.15",treatment.values["Dilution_rate"].last
 
     assert_equal 19, treatment.sample_names.count
-    assert_equal "1.0",treatment.sample_names.first
-    assert_equal "17.0",treatment.sample_names.last
+    assert_equal "1",treatment.sample_names.first
+    assert_equal "17",treatment.sample_names.last
 
   end
 
@@ -131,8 +131,8 @@ class TreatmentsTest < ActiveSupport::TestCase
     assert_equal "0.15",treatment.values["Dilution_rate"].last
 
     assert_equal 19, treatment.sample_names.count
-    assert_equal "1.0",treatment.sample_names.first
-    assert_equal "17.0",treatment.sample_names.last
+    assert_equal "1",treatment.sample_names.first
+    assert_equal "17",treatment.sample_names.last
 
   end
 
@@ -152,12 +152,12 @@ class TreatmentsTest < ActiveSupport::TestCase
     assert_equal "0.25",treatment.values["Dilution_rate"].first
     assert_equal "0.15",treatment.values["Dilution_rate"].last
 
-    assert_equal "1.0",treatment.values["Buffer"].first
-    assert_equal "5.0",treatment.values["Buffer"].last
+    assert_equal "1",treatment.values["Buffer"].first
+    assert_equal "5",treatment.values["Buffer"].last
 
     assert_equal 19, treatment.sample_names.count
-    assert_equal "1.0",treatment.sample_names.first
-    assert_equal "17.0",treatment.sample_names.last
+    assert_equal "1",treatment.sample_names.first
+    assert_equal "17",treatment.sample_names.last
 
   end
 
@@ -171,7 +171,7 @@ class TreatmentsTest < ActiveSupport::TestCase
     assert_equal ["activity","growth_medium"],treatment.values.keys.sort
     assert_equal 1,treatment.values["activity"].count
     assert_equal 1,treatment.values["growth_medium"].count
-    assert_equal "25.0",treatment.values["activity"].first
+    assert_equal "25",treatment.values["activity"].first
     assert_equal "raspberry jam",treatment.values["growth_medium"].first
   end
 

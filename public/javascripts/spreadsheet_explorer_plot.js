@@ -85,7 +85,33 @@ function plot_cells(target_element,width,height)
     $j.plot(element,json_data,options);
 
     element.bind("plothover",function(event,pos,item) {
-       $j("#"+target_element+"_xval").text(pos.x.toFixed(4));
-       $j("#"+target_element+"_yval").text(pos.y.toFixed(4));
+        if (item) {
+            $j("#"+target_element+"_tooltip").remove();
+            x = item.datapoint[0];
+            y = item.datapoint[1];
+            showDataTooltip(target_element,item.pageX,item.pageY,x,y);
+        }
+        else {
+            $j("#"+target_element+"_tooltip").remove();
+        }
+
+
     });
+}
+
+function showDataTooltip(prefix,pagex,pagey,valuex,valuey) {
+    var el_name= prefix+"_tooltip";
+    var contents = "X: "+valuex+"   Y: "+valuey;
+    $j('<div id="'+el_name+'">' + contents + '</div>').css( {
+        position: 'absolute',
+        display: 'none',
+        top: pagey - 20,
+        left: pagex + 20,
+        'font-size': 'larger',
+        border: '1px solid #fdd',
+        padding: '5px',
+        'background-color': '#eef',
+        'z-index': 30,
+        opacity: 0.90
+    }).appendTo("body").fadeIn(100);
 }
