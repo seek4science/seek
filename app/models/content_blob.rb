@@ -33,7 +33,7 @@ class ContentBlob < ActiveRecord::Base
 
   before_save :check_version
 
-  #before_save :check_url_content_type
+  before_create :check_url_content_type
 
   has_many :worksheets, :dependent => :destroy
 
