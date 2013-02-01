@@ -55,7 +55,7 @@ module Seek
 
     def mime_types_for_extension extension
       MIME_MAP.keys.select do |k|
-        MIME_MAP[k][:extension]==extension.downcase
+        MIME_MAP[k][:extension]==extension.try(:downcase)
       end
 
     end
