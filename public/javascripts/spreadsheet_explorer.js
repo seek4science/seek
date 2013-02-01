@@ -402,7 +402,7 @@ function show_annotation(id,x,y) {
   annotation_container.show();
   annotation.show();
   if ($j("#"+plot_element_id).length>0) {
-    plot_cells(plot_element_id,'620','400');
+    plot_cells(plot_element_id,'650','450');
   }
 
 }
