@@ -9,6 +9,7 @@ namespace :seek_stats do
   task(:activity=>:environment) do
     actions = ["download","create"]
     types = [nil,"Model","Sop","Presentation","DataFile","Publication","Investigation","Study","Assay"]
+
     actions.each do |action|
       types.each do |type|
         activity_for_action action,type
@@ -64,7 +65,7 @@ namespace :seek_stats do
     filename="#{Rails.root}/tmp/activity-#{action}-#{type || "all"}.csv"
     logs = ActivityLog.find(:all,:conditions=>conditions,:order=>:created_at)
     File.open(filename, "w") do |file|
-      file << "date,month,type,id,controller,action,project_id,project_name,person_id,person_projects_ids"
+      file << "date,month,type,id,controller,action,project_id,project_name,culprit_project_matches"
       logs.each do |log|
         file << %!"#{log.created_at}"!
         file << ","
@@ -87,13 +88,12 @@ namespace :seek_stats do
         else
           file <<%!"",""!
         end
+        file << ","
         culprit = log.culprit
         if culprit && culprit.person
-          file << culprit.person.id
-          file << ","
-          file << %!"#{culprit.person.projects.collect{|p| p.id}.join(",")}"!
+          file << culprit.person.projects.include?(project)
         else
-          file << "anonymous,na"
+          file << "false"
         end
 
         file << "\n"
