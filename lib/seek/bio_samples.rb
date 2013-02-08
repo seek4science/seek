@@ -284,6 +284,8 @@ module Seek
         treatment_protocols = hunt_for_field_values_mapped sheet, :"treatment.treatment_protocol", @samples_mapping
         treatment_incubation_time = hunt_for_field_values_mapped sheet, :"treatment.incubation_time", @samples_mapping
         treatment_incubation_time_unit = hunt_for_field_values_mapped sheet, :"treatment.incubation_time_unit", @samples_mapping
+        treatment_type = hunt_for_field_values_mapped sheet, :"treatment.type", @samples_mapping
+        treatment_comments = hunt_for_field_values_mapped sheet, :"treatment.comments", @samples_mapping
 
 
         Rails.logger.warn "$$$$$$$$$$$$$$ treatment_concentrations #{treatment_concentrations}"
@@ -292,10 +294,14 @@ module Seek
         Rails.logger.warn "$$$$$$$$$$$$$$ treatment_protocols  #{treatment_protocols}"
         Rails.logger.warn "$$$$$$$$$$$$$$ treatment_incubation_time  #{treatment_incubation_time}"
         Rails.logger.warn "$$$$$$$$$$$$$$ treatment_incubation_time_unit  #{treatment_incubation_time_unit}"
+        Rails.logger.warn "$$$$$$$$$$$$$$ treatment_type #{treatment_type}"
+        Rails.logger.warn "$$$$$$$$$$$$$$ treatment_comments #{treatment_comments}"
 
-        treatment_data = treatment_protocols.zip(treatment_substances, treatment_concentrations, treatment_units, treatment_incubation_time, treatment_incubation_time_unit).map do
-          |protocol, substance, concentration, unit, incubation_time, incubation_time_unit|
-            {:protocol => protocol, :substance => substance, :concentration => concentration, :unit => unit, :incubation_time => incubation_time, :incubation_time_unit => incubation_time_unit}
+        treatment_data = treatment_protocols.zip(treatment_substances, treatment_concentrations, treatment_units, treatment_incubation_time, treatment_incubation_time_unit,
+                          treatment_type, treatment_comments).map do
+          |protocol, substance, concentration, unit, incubation_time, incubation_time_unit, type, comments|
+            {:protocol => protocol, :substance => substance, :concentration => concentration, :unit => unit, :incubation_time => incubation_time, :incubation_time_unit => incubation_time_unit,
+             :type => type, :comments => comments}
         end
 
 
@@ -461,9 +467,12 @@ module Seek
 
         mock_json_rows << {"specimen" => specimen, "sample" => sample, "treatment" => treatment}
 
+
       end
 
       mock_json["rows"] = mock_json_rows
+
+      Rails.logger.warn "$$$$$$$$$$$$$$$$$$$$ JSON: #{mock_json}"
 
       mock_json
     end
@@ -475,7 +484,7 @@ module Seek
       assay_json = data["assay"]
 
       if assay_json
-        if assay_json["creator last name"] && assay_json["creator first name"] && assay_json["creator email"]
+        if assay_json["creator last name"] && assay_json["creator first name"] #&& assay_json["creator email"]
           set_creator data["assay"]
         else
           @creator = Person.find(User.current_user.person_id)
@@ -598,15 +607,17 @@ module Seek
         unit = treatment_data[:unit][:value]
         incubation_time = treatment_data[:incubation_time][:value]
         incubation_time_unit = treatment_data[:incubation_time_unit][:value]
+        type = treatment_data[:type][:value]
+        comments = treatment_data[:comments][:value]
 
         row = treatment_data[:protocol][:row]
 
-        treatment = {"type" => "concentration",
+        treatment = {"type" => type,
                      "start value" => concentration,
                      "end value" => nil,
                      "unit" => unit,
                      "standard deviation" => nil,
-                     "comments" => nil,
+                     "comments" => comments,
                      "protocol" => treatment_protocol,
                      "incubation time" => incubation_time,
                      "incubation time unit" => incubation_time_unit,
@@ -631,7 +642,7 @@ module Seek
 
         treatment = nil
 
-        if start_value && start_value != ""
+        #if start_value && start_value != ""
 
           treatment_type = MeasuredItem.find_by_title(treatment_json["type"].downcase)
           treatment_type = MeasuredItem.create :title => treatment_json["type"].downcase, :factors_studied => false unless treatment_type
@@ -682,7 +693,7 @@ module Seek
             sample.treatments << treatment
           end
 
-        end
+        #end
 
         treatment
       
@@ -806,6 +817,7 @@ module Seek
               @warnings << "Warning: specimen with the name '#{specimen_title}' is already created in SEEK.<br/>"
               @warnings << "It is renamed and saved as '#{new_sp.title}'.<br/>"
               @warnings << "You may rename it and upload the file as new version!<br/>"
+              Rails.logger.warn @warnings
               specimen = new_sp
           else
             if !specimen.can_view?(User.current_user)
