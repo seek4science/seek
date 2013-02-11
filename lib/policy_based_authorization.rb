@@ -66,16 +66,13 @@ module Acts
         #returns the authorised items from the array of the same class items for a given action and optionally a user. If user is nil, the items authorised for an
         #anonymous user are returned.
         def authorized_partial_asset_collection partial_asset_collection, action, user=User.current_user
-          #FIXME: just a quick fix - needs more careful analysis of the ratio between the current collection and the total
-          size_for_intersection_with_all = 50
           user_id = user.nil? ? 0 : user.id
-          authorized_assets = []
-          authorized_partial_asset_collection = []
-          lookup_table_name = self.name.underscore.pluralize + '_auth_lookup'
-          if (partial_asset_collection.size>=size_for_intersection_with_all && self.lookup_table_consistent?(user_id))
-            Rails.logger.info("Lookup table #{lookup_table_name} used for authorizing related items is complete for user_id = #{user_id}")
-            authorized_assets = self.lookup_for_action_and_user action, user_id, nil
-            authorized_partial_asset_collection = authorized_assets & partial_asset_collection
+          if Seek::Config.auth_lookup_enabled && self.lookup_table_consistent?(user_id)
+            ids=partial_asset_collection.collect{|asset| asset.id}
+            clause = "asset_id IN (#{ids.join(',')})"
+            sql =  "SELECT asset_id from #{lookup_table_name} WHERE user_id = #{user_id} AND (#{clause}) AND can_#{action}=#{ActiveRecord::Base.connection.quoted_true}"
+            ids = ActiveRecord::Base.connection.select_all(sql).collect{|k| k["asset_id"]}
+            authorized_partial_asset_collection = find_all_by_id(ids)
           else
             authorized_partial_asset_collection = partial_asset_collection.select{|a| a.send("can_#{action}?")}
           end
