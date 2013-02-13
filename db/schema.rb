@@ -9,7 +9,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20130213144443) do
+ActiveRecord::Schema.define(:version => 20130213145755) do
 
   create_table "activity_logs", :force => true do |t|
     t.string   "action"
@@ -262,6 +262,8 @@ ActiveRecord::Schema.define(:version => 20130213144443) do
     t.integer "asset_version"
     t.boolean "is_webpage",                              :default => false
   end
+
+  add_index "content_blobs", ["asset_id", "asset_type"], :name => "index_content_blobs_on_asset_id_and_asset_type"
 
   create_table "culture_growth_types", :force => true do |t|
     t.string   "title"
