@@ -1,5 +1,4 @@
-<% content_locals ||= {} %>
-<% actions_locals ||= {} %>
+
 <% resource = resource_list_item %>
 <% content_partial = get_list_item_content_partial(resource) %>
 <%
@@ -26,15 +25,15 @@
 <div class="<%= access_based_css_class%>">
   <% unless avatar_partial.blank? %>
     <div class="list_item_avatar">
-      <%= render :partial=> avatar_partial,:locals=>content_locals.merge({:resource => resource}) %>
+      <%= render :partial=> avatar_partial,:locals=>{:resource => resource} %>
     </div>
   <% end %>
   <div class="list_item_content <%= other_classes -%>">
-    <%= render :partial=> content_partial,:locals=>content_locals.merge({:resource => resource}) %>
+    <%= render :partial=> content_partial,:locals=>{:resource => resource} %>
   </div>
   <% unless actions_partial.blank? %>
     <div class="list_item_actions">
-      <%= render :partial=> actions_partial, :locals=>actions_locals.merge({:resource => resource}) %>
+      <%= render :partial=> actions_partial, :locals=>{:resource => resource} %>
     </div>
   <% end %>
 </div>
