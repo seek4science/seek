@@ -50,11 +50,11 @@ module Acts
               assets = lookup_for_action_and_user action, user_id, projects
             else
               Rails.logger.info("Lookup table #{lookup_table_name} is incomplete for user_id = #{user_id} - doing things the slow way")
-              assets = all.select { |df| df.send("can_#{action}?") }
+              assets = all.select { |df| df.send("can_#{action}?",user) }
               programatic_project_filter = !projects.nil?
             end
           else
-            assets = all.select { |df| df.send("can_#{action}?") }
+            assets = all.select { |df| df.send("can_#{action}?",user) }
           end
           if programatic_project_filter
             assets.select { |a| !(a.projects & projects).empty? }
@@ -74,7 +74,7 @@ module Acts
             ids = ActiveRecord::Base.connection.select_all(sql).collect{|k| k["asset_id"]}
             authorized_partial_asset_collection = partial_asset_collection.select{|asset| ids.include?(asset.id.to_s)}
           else
-            authorized_partial_asset_collection = partial_asset_collection.select{|a| a.send("can_#{action}?")}
+            authorized_partial_asset_collection = partial_asset_collection.select{|a| a.send("can_#{action}?",user)}
           end
           authorized_partial_asset_collection
         end
