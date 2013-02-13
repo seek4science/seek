@@ -7,12 +7,11 @@ module Acts
         klass.extend ClassMethods
         klass.extend AuthLookupClassMethods
         klass.class_eval do
-          attr_accessor :is_published_before_save #this is for logging purpose, to store the publish status of an item before it is updated
           belongs_to :contributor, :polymorphic => true unless method_defined? :contributor
           after_initialize :contributor_or_default_if_new
 
           #checks a policy exists, and if missing resorts to using a private policy
-          after_initialize :policy_or_default_if_new, :assign_is_published_before_save
+          after_initialize :policy_or_default_if_new
 
           include ProjectCompat unless method_defined? :projects
 
@@ -338,14 +337,6 @@ module Acts
               errors.add_to_base("You are not permitted to publish this #{self.class.name.underscore.humanize}")
               return false
             end
-        end
-      end
-
-      def assign_is_published_before_save
-        if self.policy.try(:sharing_scope_was) == Policy::EVERYONE
-          self.is_published_before_save=true
-        else
-          self.is_published_before_save=false
         end
       end
 
