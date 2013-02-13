@@ -9,7 +9,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20130128164658) do
+ActiveRecord::Schema.define(:version => 20130213144443) do
 
   create_table "activity_logs", :force => true do |t|
     t.string   "action"
@@ -115,6 +115,7 @@ ActiveRecord::Schema.define(:version => 20130128164658) do
     t.boolean "can_delete",   :default => false
   end
 
+  add_index "assay_auth_lookup", ["user_id", "asset_id"], :name => "index_assay_auth_lookup_on_user_id_and_asset_id"
   add_index "assay_auth_lookup", ["user_id", "can_view"], :name => "index_assay_auth_lookup_on_user_id_and_can_view"
 
   create_table "assay_classes", :force => true do |t|
@@ -288,6 +289,7 @@ ActiveRecord::Schema.define(:version => 20130128164658) do
     t.boolean "can_delete",   :default => false
   end
 
+  add_index "data_file_auth_lookup", ["user_id", "asset_id"], :name => "index_data_file_auth_lookup_on_user_id_and_asset_id"
   add_index "data_file_auth_lookup", ["user_id", "can_view"], :name => "index_data_file_auth_lookup_on_user_id_and_can_view"
 
   create_table "data_file_versions", :force => true do |t|
@@ -390,6 +392,7 @@ ActiveRecord::Schema.define(:version => 20130128164658) do
     t.boolean "can_delete",   :default => false
   end
 
+  add_index "event_auth_lookup", ["user_id", "asset_id"], :name => "index_event_auth_lookup_on_user_id_and_asset_id"
   add_index "event_auth_lookup", ["user_id", "can_view"], :name => "index_event_auth_lookup_on_user_id_and_can_view"
 
   create_table "events", :force => true do |t|
@@ -576,6 +579,7 @@ ActiveRecord::Schema.define(:version => 20130128164658) do
     t.boolean "can_delete",   :default => false
   end
 
+  add_index "investigation_auth_lookup", ["user_id", "asset_id"], :name => "index_investigation_auth_lookup_on_user_id_and_asset_id"
   add_index "investigation_auth_lookup", ["user_id", "can_view"], :name => "index_investigation_auth_lookup_on_user_id_and_can_view"
 
   create_table "investigations", :force => true do |t|
@@ -628,6 +632,7 @@ ActiveRecord::Schema.define(:version => 20130128164658) do
     t.boolean "can_delete",   :default => false
   end
 
+  add_index "model_auth_lookup", ["user_id", "asset_id"], :name => "index_model_auth_lookup_on_user_id_and_asset_id"
   add_index "model_auth_lookup", ["user_id", "can_view"], :name => "index_model_auth_lookup_on_user_id_and_can_view"
 
   create_table "model_formats", :force => true do |t|
@@ -849,6 +854,7 @@ ActiveRecord::Schema.define(:version => 20130128164658) do
     t.boolean "can_delete",   :default => false
   end
 
+  add_index "presentation_auth_lookup", ["user_id", "asset_id"], :name => "index_presentation_auth_lookup_on_user_id_and_asset_id"
   add_index "presentation_auth_lookup", ["user_id", "can_view"], :name => "index_presentation_auth_lookup_on_user_id_and_can_view"
 
   create_table "presentation_versions", :force => true do |t|
@@ -984,6 +990,7 @@ ActiveRecord::Schema.define(:version => 20130128164658) do
     t.boolean "can_delete",   :default => false
   end
 
+  add_index "publication_auth_lookup", ["user_id", "asset_id"], :name => "index_publication_auth_lookup_on_user_id_and_asset_id"
   add_index "publication_auth_lookup", ["user_id", "can_view"], :name => "index_publication_auth_lookup_on_user_id_and_can_view"
 
   create_table "publication_author_orders", :force => true do |t|
@@ -1173,6 +1180,7 @@ ActiveRecord::Schema.define(:version => 20130128164658) do
     t.boolean "can_delete",   :default => false
   end
 
+  add_index "sop_auth_lookup", ["user_id", "asset_id"], :name => "index_sop_auth_lookup_on_user_id_and_asset_id"
   add_index "sop_auth_lookup", ["user_id", "can_view"], :name => "index_sop_auth_lookup_on_user_id_and_can_view"
 
   create_table "sop_specimens", :force => true do |t|
@@ -1359,6 +1367,7 @@ ActiveRecord::Schema.define(:version => 20130128164658) do
     t.boolean "can_delete",   :default => false
   end
 
+  add_index "study_auth_lookup", ["user_id", "asset_id"], :name => "index_study_auth_lookup_on_user_id_and_asset_id"
   add_index "study_auth_lookup", ["user_id", "can_view"], :name => "index_study_auth_lookup_on_user_id_and_can_view"
 
   create_table "subscriptions", :force => true do |t|
