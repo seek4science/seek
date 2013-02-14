@@ -9,7 +9,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20130214114348) do
+ActiveRecord::Schema.define(:version => 20130214115312) do
 
   create_table "activity_logs", :force => true do |t|
     t.string   "action"
@@ -528,6 +528,8 @@ ActiveRecord::Schema.define(:version => 20130214114348) do
   end
 
   add_index "group_memberships", ["person_id"], :name => "index_group_memberships_on_person_id"
+  add_index "group_memberships", ["work_group_id", "person_id"], :name => "index_group_memberships_on_work_group_id_and_person_id"
+  add_index "group_memberships", ["work_group_id"], :name => "index_group_memberships_on_work_group_id"
 
   create_table "group_memberships_project_roles", :id => false, :force => true do |t|
     t.integer "group_membership_id"
