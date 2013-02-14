@@ -420,10 +420,16 @@ class ApplicationController < ActionController::Base
   end
 
   def expire_activity_fragment_cache(controller,action)
-    if action=="download"
-      expire_fragment "download_activity"
-    elsif action=="create" and controller!="sessions"
-      expire_fragment "create_activity"
+    if action!="show"
+      @@auth_types ||=  Seek::Util.authorized_types.collect{|t| t.name.underscore.pluralize}
+      if action=="download"
+        expire_download_activity
+      elsif action=="create" && controller!="sessions"
+        expire_create_activity
+      elsif action=="update" && @@auth_types.include?(controller) #may have had is permission changed
+        expire_create_activity
+        expire_download_activity
+      end
     end
   end
 

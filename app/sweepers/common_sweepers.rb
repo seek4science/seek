@@ -21,6 +21,14 @@ module CommonSweepers
     expire_fragment "footer"
   end
 
+  def expire_download_activity
+    expire_fragment(/download_activity.*/)
+  end
+
+  def expire_create_activity
+    expire_fragment(/create_activity.*/)
+  end
+
   def expire_annotation_fragments name=nil
     expire_fragment "sidebar_tag_cloud"
     expire_fragment "super_tag_cloud"

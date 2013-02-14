@@ -1,5 +1,8 @@
+<%
+   user_id = current_user_id
+-%>
 <div class="yui-g home_panel_pair">
-  <% cache("create_activity") do -%>
+  <% cache("create_activity_#{user_id}") do -%>
       <div class="yui-u first home_panel">
          <div class="heading">Recently added</div>
         <div id="recently_added" class="homepanel_list">
@@ -13,7 +16,7 @@
       </div>
   <% end -%>
 
-  <% cache("download_activity") do -%>
+  <% cache("download_activity_#{user_id}") do -%>
       <div class="yui-u home_panel">
         <div class="heading">Recently downloaded</div>
         <div id="recently_downloaded" class="homepanel_list">
