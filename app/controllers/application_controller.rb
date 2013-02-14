@@ -414,8 +414,19 @@ class ApplicationController < ActionController::Base
                                :data => activity_loggable.title)
           end
       end
+      expire_activity_fragment_cache(c,a)
+    end
+
+  end
+
+  def expire_activity_fragment_cache(controller,action)
+    if action=="download"
+      expire_fragment "download_activity"
+    elsif action=="create" and controller!="sessions"
+      expire_fragment "create_activity"
     end
   end
+
 
   def check_log_exists action,controllername,object
     if action=="create"
