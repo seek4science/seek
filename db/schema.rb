@@ -9,7 +9,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20130214115312) do
+ActiveRecord::Schema.define(:version => 20130214135530) do
 
   create_table "activity_logs", :force => true do |t|
     t.string   "action"
@@ -225,6 +225,8 @@ ActiveRecord::Schema.define(:version => 20130214115312) do
     t.datetime "created_at"
     t.datetime "updated_at"
   end
+
+  add_index "avatars", ["owner_type", "owner_id"], :name => "index_avatars_on_owner_type_and_owner_id"
 
   create_table "bioportal_concepts", :force => true do |t|
     t.integer "ontology_id"
