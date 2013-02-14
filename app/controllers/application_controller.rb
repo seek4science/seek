@@ -152,7 +152,7 @@ class ApplicationController < ActionController::Base
                           :locals => {:collection => resources,
                           :narrow_view => true,
                           :authorization_for_showing_already_done => true,
-                          :actions_partial_disable=>true}
+                          :actions_partial_disable=>false}
         page.visual_effect :toggle_blind, "view_#{resource_type}s", :duration => 0.05
         page.visual_effect :toggle_blind, "view_#{resource_type}s_and_extra", :duration => 0.05
       end
