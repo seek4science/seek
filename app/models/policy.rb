@@ -262,7 +262,7 @@ class Policy < ActiveRecord::Base
   end
 
   def private?
-    sharing_scope == Policy::PRIVATE and permissions.empty?
+    sharing_scope == Policy::PRIVATE && permissions.empty?
   end
 
   def public?

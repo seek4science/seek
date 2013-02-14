@@ -13,16 +13,16 @@
 <% other_classes << " noactions" if actions_partial.blank? %>
 <% other_classes << " noavatar" if avatar_partial.blank? %>
 <%
-   access_based_css_class = "list_item " + if resource.respond_to?(:private?) && resource.private?
-       "private_list_item"
-   elsif resource.respond_to?(:public?) && resource.public?
-     "public_list_item"
-   else
-     ""
-   end
+   #access_based_css_class = "list_item " + if resource.respond_to?(:private?) && resource.private?
+   #    "private_list_item"
+   #elsif resource.respond_to?(:public?) && resource.public?
+   #  "public_list_item"
+   #else
+   #  ""
+   #end
 %>
 
-<div class="<%= access_based_css_class%>">
+<div>
   <% unless avatar_partial.blank? %>
     <div class="list_item_avatar">
       <%= render :partial=> avatar_partial,:locals=>{:resource => resource} %>
