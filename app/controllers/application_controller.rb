@@ -139,9 +139,20 @@ class ApplicationController < ActionController::Base
     resource_ids = (params[:resource_ids] || []).split(',')
     render :update do |page|
       if !resource_type.blank?
-        resources = resource_type.constantize.find_all_by_id(resource_ids).select { |r| r.can_view? }
+        clazz = resource_type.constantize
+        resources = clazz.find_all_by_id(resource_ids)
+        if clazz.respond_to?(:authorized_partial_asset_collection)
+          resources = clazz.authorized_partial_asset_collection(resources,"view")
+        else
+          resources = resources.select &:can_view?
+        end
 
-        page.replace_html "#{resource_type}_list_items_container", :partial => "assets/resource_list", :locals => {:collection => resources, :narrow_view => true, :authorization_for_showing_already_done => true}
+        page.replace_html "#{resource_type}_list_items_container",
+                          :partial => "assets/resource_list",
+                          :locals => {:collection => resources,
+                          :narrow_view => true,
+                          :authorization_for_showing_already_done => true,
+                          :actions_partial_disable=>true}
         page.visual_effect :toggle_blind, "view_#{resource_type}s", :duration => 0.05
         page.visual_effect :toggle_blind, "view_#{resource_type}s_and_extra", :duration => 0.05
       end
