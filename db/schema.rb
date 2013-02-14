@@ -9,7 +9,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20130213145755) do
+ActiveRecord::Schema.define(:version => 20130214114348) do
 
   create_table "activity_logs", :force => true do |t|
     t.string   "action"
@@ -188,6 +188,8 @@ ActiveRecord::Schema.define(:version => 20130213145755) do
     t.datetime "updated_at"
   end
 
+  add_index "assets_creators", ["asset_id", "asset_type"], :name => "index_assets_creators_on_asset_id_and_asset_type"
+
   create_table "attachments", :force => true do |t|
     t.integer  "size"
     t.integer  "height"
@@ -352,6 +354,9 @@ ActiveRecord::Schema.define(:version => 20130213145755) do
     t.integer "data_file_id"
   end
 
+  add_index "data_files_projects", ["data_file_id", "project_id"], :name => "index_data_files_projects_on_data_file_id_and_project_id"
+  add_index "data_files_projects", ["project_id"], :name => "index_data_files_projects_on_project_id"
+
   create_table "db_files", :force => true do |t|
     t.binary "data", :limit => 2147483647
   end
@@ -424,6 +429,9 @@ ActiveRecord::Schema.define(:version => 20130213145755) do
     t.integer "project_id"
     t.integer "event_id"
   end
+
+  add_index "events_projects", ["event_id", "project_id"], :name => "index_events_projects_on_event_id_and_project_id"
+  add_index "events_projects", ["project_id"], :name => "index_events_projects_on_project_id"
 
   create_table "events_publications", :id => false, :force => true do |t|
     t.integer "publication_id"
@@ -600,6 +608,9 @@ ActiveRecord::Schema.define(:version => 20130213145755) do
     t.integer "investigation_id"
   end
 
+  add_index "investigations_projects", ["investigation_id", "project_id"], :name => "index_investigations_projects_on_investigation_id_and_project_id"
+  add_index "investigations_projects", ["project_id"], :name => "index_investigations_projects_on_project_id"
+
   create_table "mapping_links", :force => true do |t|
     t.string   "substance_type"
     t.integer  "substance_id"
@@ -721,6 +732,9 @@ ActiveRecord::Schema.define(:version => 20130213145755) do
     t.integer "model_id"
   end
 
+  add_index "models_projects", ["model_id", "project_id"], :name => "index_models_projects_on_model_id_and_project_id"
+  add_index "models_projects", ["project_id"], :name => "index_models_projects_on_project_id"
+
   create_table "moderatorships", :force => true do |t|
     t.integer "forum_id"
     t.integer "user_id"
@@ -781,6 +795,9 @@ ActiveRecord::Schema.define(:version => 20130213145755) do
     t.integer "organism_id"
     t.integer "project_id"
   end
+
+  add_index "organisms_projects", ["organism_id", "project_id"], :name => "index_organisms_projects_on_organism_id_and_project_id"
+  add_index "organisms_projects", ["project_id"], :name => "index_organisms_projects_on_project_id"
 
   create_table "people", :force => true do |t|
     t.datetime "created_at"
@@ -899,6 +916,9 @@ ActiveRecord::Schema.define(:version => 20130213145755) do
     t.integer "presentation_id"
   end
 
+  add_index "presentations_projects", ["presentation_id", "project_id"], :name => "index_presentations_projects_on_presentation_id_and_project_id"
+  add_index "presentations_projects", ["project_id"], :name => "index_presentations_projects_on_project_id"
+
   create_table "project_folder_assets", :force => true do |t|
     t.integer  "asset_id"
     t.string   "asset_type"
@@ -954,6 +974,9 @@ ActiveRecord::Schema.define(:version => 20130213145755) do
     t.integer "project_id"
     t.integer "publication_id"
   end
+
+  add_index "projects_publications", ["project_id"], :name => "index_projects_publications_on_project_id"
+  add_index "projects_publications", ["publication_id", "project_id"], :name => "index_projects_publications_on_publication_id_and_project_id"
 
   create_table "projects_samples", :id => false, :force => true do |t|
     t.integer "project_id"
