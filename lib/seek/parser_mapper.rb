@@ -40,6 +40,7 @@ module Seek
         when /^do_hengstler.*/i then "dortmund_hengstler"
         when /^do_bcat_ko.*/i then "dortmund_bcat_ko"
         when /^due_bode.*/i then "duesseldorf_bode"
+        when /^due_bode_surgical.*/i then "duesseldorf_bode_surgical"
         else "unknown"
       end
     end
@@ -95,6 +96,8 @@ module Seek
               :"specimens.genotype.modification" => mapping_entry("FIXED", proc{""}),
 
               :"treatment.treatment_protocol" => mapping_entry("Treatment Protocol"),
+              :"treatment.type" => mapping_entry("FIXED", proc {"concentration"}),
+              :"treatment.comments" => mapping_entry("FIXED", proc {""}),
               :"treatment.substance" => mapping_entry("Substance"),
               :"treatment.concentration" => mapping_entry("Concentration"),
               :"treatment.unit" => mapping_entry("Unit"),
@@ -232,6 +235,8 @@ module Seek
                   ""
                 end
               end),
+              :"treatment.type" => mapping_entry("FIXED", proc {"concentration"}),
+              :"treatment.comments" => mapping_entry("FIXED", proc {""}),
               :"treatment.incubation_time" => mapping_entry("Explantation", proc do |data|
                   if data =~ incubation_time_regex
                     $1
@@ -372,6 +377,8 @@ module Seek
                   ""
                 end
               end),
+              :"treatment.type" => mapping_entry("FIXED", proc {"concentration"}),
+              :"treatment.comments" => mapping_entry("FIXED", proc {""}),
               :"treatment.substance" => mapping_entry("Genotype", proc do |data|
                 if data =~ treatment_substance_regex
                   $2 ? $2 : ""
@@ -475,6 +482,8 @@ module Seek
                   end),
 
                   :"treatment.treatment_protocol" => mapping_entry("FIXED", proc {""}),
+                  :"treatment.type" => mapping_entry("FIXED", proc {"concentration"}),
+                  :"treatment.comments" => mapping_entry("FIXED", proc {""}),
                   :"treatment.substance" => mapping_entry("FIXED", proc {"LPS"}),
                   :"treatment.concentration" => mapping_entry("LPS (µg/g KG)", proc do |data|
                     if data =~ concentration_regex
@@ -529,6 +538,101 @@ module Seek
 
     end
 
+    # mapping for duesseldorf excel sheet with surgical procedure
+    # example file: due_bode_Tierbestandsliste G96 parsing format.xls
+    def duesseldorf_bode_surgical_mapping
+
+      gene_modification_regex = /([\w\d]+)([\/+-]+)/
+
+      {
+          :name => "duesseldorf_bode",
+          :data_row_offset => 3,
+
+
+          :samples_mapping => {
+              :samples_sheet_name => "Tabelle1",
+              :add_specimens => true,
+              :add_treatments => true,
+              :add_samples => true,
+
+              :probing_column => :"specimens.title",
+
+              :"organisms.title" => mapping_entry("species"),
+
+              :"strains.title" => mapping_entry("strain"),
+
+              :"specimens.sex" => mapping_entry("sex"),
+              :"specimens.title" => mapping_entry("Animal Nr."),
+              :"specimens.lab_internal_number" => mapping_entry("Animal Nr."),
+              :"specimens.age" => mapping_entry("Age (Weeks)"),
+              :"specimens.age_unit" => mapping_entry("FIXED", proc {"week"}),
+              :"specimens.comments" => mapping_entry("Specials", proc {|data| data == "-" ? "" : data }),
+              :"specimens.genotype.title" => mapping_entry("Genotype", proc do |data|
+                if data =~ gene_modification_regex
+                  $1
+                else
+                  "none"
+                end
+              end),
+              :"specimens.genotype.modification" => mapping_entry("Genotype", proc do |data|
+                if data =~ gene_modification_regex
+                  $2
+                else
+                  ""
+                end
+              end),
+
+              :"treatment.treatment_protocol" => mapping_entry("FIXED", proc {""}),
+              :"treatment.type" => mapping_entry("FIXED", proc {"surgical procedure"}),
+              :"treatment.comments" => mapping_entry("Treatment"),
+              :"treatment.substance" => mapping_entry("FIXED", proc {""}),
+              :"treatment.concentration" => mapping_entry("FIXED", proc {""}),
+              :"treatment.unit" => mapping_entry("FIXED", proc {""}),
+              :"treatment.incubation_time" => mapping_entry("Incubation period (hours)"),
+              :"treatment.incubation_time_unit" => mapping_entry("FIXED", proc {"hour"}),
+
+
+              :"samples.comments" => mapping_entry("FIXED", proc {""}),
+              :"samples.title" => mapping_entry("Animal Nr.", proc { |data| data + "_liver"}),
+              :"samples.sample_type" => mapping_entry("FIXED", proc {"liver"}),
+              :"samples.donation_date" => mapping_entry("Donation Date"),
+              :"samples.organism_part"  => mapping_entry("FIXED", proc {"organ"}),
+
+              :"tissue_and_cell_types.title" => mapping_entry("FIXED", proc {"Liver"}),
+
+              :"sop.title" => mapping_entry("FIXED", proc {""}),
+              :"institution.name" => mapping_entry("FIXED", proc {""})
+          },
+
+
+          :assay_mapping => {
+
+              :assay_sheet_name => "Tabelle1",
+              :parsing_direction => "vertical",
+              :probing_column => :"creator.last_name",
+
+              :"investigation.title" => mapping_entry("FIXED", proc { nil }),
+              :"assay_type.title" => mapping_entry("FIXED", proc { nil }),
+              :"study.title" => mapping_entry("FIXED", proc { nil }),
+
+              :"creator.email" => mapping_entry("FIXED", proc { "" }),
+              :"creator.last_name" => mapping_entry("experimentator", proc do |data|
+                if data.split(/\s+/)
+                  data.split(/\s+/).last
+                end
+              end),
+              :"creator.first_name" => mapping_entry("experimentator", proc do |data|
+                if data.split(/\s+/)
+                  data.split(/\s+/).first
+                end
+              end)
+
+          }
+
+      }
+
+    end
+
     def unknown_mapping
       nil
     end
@@ -562,6 +666,8 @@ module Seek
               :"specimens.genotype.modification" => mapping_entry("FIXED", proc {""}),
 
               :"treatment.treatment_protocol" => mapping_entry(""),
+              :"treatment.type" => mapping_entry("FIXED", proc {"concentration"}),
+              :"treatment.comments" => mapping_entry("FIXED", proc {""}),
               :"treatment.substance" => mapping_entry(""),
               :"treatment.concentration" => mapping_entry(""),
               :"treatment.unit" => mapping_entry(""),
