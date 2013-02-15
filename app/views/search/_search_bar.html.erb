@@ -17,6 +17,7 @@
 
   <% form_tag '/search/' do -%>
     <div id="search_box">
+      <font size="2" color="white"><b> <%= "Search" %> </b></font>
       <%= text_field_tag :search_query, @search_query -%>
       <%= select_tag :search_type, options_for_select(search_type_options,@search_type)  %>
       <%= select_tag :scale, (options_for_select({"All" => 'all'}, :selected => (params[:scale] ? nil : 'all')) + options_from_collection_for_select(Scale.all, :title, :display_title, params[:scale])) %>

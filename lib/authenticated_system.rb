@@ -17,7 +17,7 @@ module AuthenticatedSystem
     session[:user_id] = new_user ? new_user.id : nil
     @current_user = new_user || false
   end
-  
+
   # Check if the user is authorized
   #
   # Override this method in your controllers if you want to restrict access
