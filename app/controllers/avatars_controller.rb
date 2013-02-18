@@ -81,22 +81,22 @@ class AvatarsController < ApplicationController
     
     if !cache_exists?(id, size) # look in file system cache before attempting db access      
       # resize (keeping image side ratio), encode and cache the picture
-      begin
-        resize_image size
-      rescue Fleximage::Model::MasterImageNotFound
+      #begin
+      resize_image size
+      #rescue Fleximage::Model::MasterImageNotFound
         #required after switching from jpg to png, for existing images that have yet to be converted
-        convert_jpg_to_png
-        resize_image size
-      end
+      #  convert_jpg_to_png
+      #  resize_image size
+      #end
     end
     
     respond_to do |format|
       format.html do
-        send_file(full_cache_path(id, size), :type => 'image/jpeg', :disposition => 'inline')
+        send_file(full_cache_path(id, size), :type => 'image/jpg', :disposition => 'inline')
       end
       format.xml do        
         @cache_file=full_cache_path(id, size)
-        @type='image/jpeg'
+        @type='image/jpg'
       end
     end
     
