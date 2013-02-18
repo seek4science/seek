@@ -81,12 +81,13 @@ class AvatarsController < ApplicationController
     
     if !cache_exists?(id, size) # look in file system cache before attempting db access      
       # resize (keeping image side ratio), encode and cache the picture
-      @avatar.operate do |image|
-        image.resize size
-        @image_binary = image.image.to_blob
-      end      
-      # cache data
-      cache_data!(@avatar, @image_binary, size)            
+      begin
+        resize_image size
+      rescue Fleximage::Model::MasterImageNotFound
+        #required after switching from jpg to png, for existing images that have yet to be converted
+        convert_jpg_to_png
+        resize_image size
+      end
     end
     
     respond_to do |format|
@@ -99,6 +100,25 @@ class AvatarsController < ApplicationController
       end
     end
     
+  end
+
+  #required when first running after switching avatars from .jpg format rather than .png (for lower bandwidth and page load time)
+  def convert_jpg_to_png
+    png_path = @avatar.file_path
+    jpg_path = @avatar.file_path.gsub(/\.png$/, '.jpg')
+    image = Magick::Image.read(jpg_path).first
+    image.format = "PNG"
+    image.write(png_path)
+    Rails.logger.info("Converted #{jpg_path} to #{png_path}")
+  end
+
+  def resize_image size
+    @avatar.operate do |image|
+      image.resize size
+      @image_binary = image.image.to_blob
+    end
+    # cache data
+    cache_data!(@avatar, @image_binary, size)
   end
   
   
