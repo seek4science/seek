@@ -188,6 +188,8 @@ ActiveRecord::Schema.define(:version => 20120924145642) do
     t.datetime "updated_at"
   end
 
+  add_index "assets_creators", ["asset_id", "asset_type"], :name => "assets_creators_indx"
+
   create_table "attachments", :force => true do |t|
     t.integer  "size"
     t.integer  "height"
@@ -263,6 +265,8 @@ ActiveRecord::Schema.define(:version => 20120924145642) do
     t.boolean "external_link"
   end
 
+  add_index "content_blobs", ["asset_id", "asset_type", "asset_version"], :name => "content_blobs_idx"
+
   create_table "culture_growth_types", :force => true do |t|
     t.string   "title"
     t.datetime "created_at"
@@ -289,7 +293,7 @@ ActiveRecord::Schema.define(:version => 20120924145642) do
     t.boolean "can_delete",   :default => false
   end
 
-  add_index "data_file_auth_lookup", ["user_id", "can_view"], :name => "index_data_file_auth_lookup_on_user_id_and_can_view"
+  add_index "data_file_auth_lookup", ["user_id", "asset_id", "can_view"], :name => "data_file_auth_lookup_idx"
 
   create_table "data_file_versions", :force => true do |t|
     t.integer  "data_file_id"
@@ -508,6 +512,8 @@ ActiveRecord::Schema.define(:version => 20120924145642) do
     t.integer  "specimen_id"
   end
 
+  add_index "genotypes", ["strain_id"], :name => "genotypes_idx"
+
   create_table "group_memberships", :force => true do |t|
     t.integer  "person_id"
     t.integer  "work_group_id"
@@ -626,10 +632,10 @@ ActiveRecord::Schema.define(:version => 20120924145642) do
     t.boolean "can_manage",   :default => false
     t.boolean "can_edit",     :default => false
     t.boolean "can_download", :default => false
-    t.boolean  "can_delete",   :default => false
+    t.boolean "can_delete",   :default => false
   end
 
-  add_index "model_auth_lookup", ["user_id", "can_view"], :name => "index_model_auth_lookup_on_user_id_and_can_view"
+  add_index "model_auth_lookup", ["user_id", "asset_id", "can_view"], :name => "model_auth_lookup_idx"
 
   create_table "model_formats", :force => true do |t|
     t.string   "title"
@@ -846,7 +852,7 @@ ActiveRecord::Schema.define(:version => 20120924145642) do
     t.boolean "can_delete",   :default => false
   end
 
-  add_index "presentation_auth_lookup", ["user_id", "can_view"], :name => "index_presentation_auth_lookup_on_user_id_and_can_view"
+  add_index "presentation_auth_lookup", ["user_id", "asset_id", "can_view"], :name => "presentation_auth_lookup_idx"
 
   create_table "presentation_versions", :force => true do |t|
     t.integer  "presentation_id"
