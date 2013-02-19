@@ -431,6 +431,7 @@ class ApplicationController < ActionController::Base
       elsif action=="update" && @@auth_types.include?(controller) #may have had is permission changed
         expire_create_activity
         expire_download_activity
+        expire_resource_list_item_action_partial
       end
     end
   end

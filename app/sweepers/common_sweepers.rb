@@ -10,6 +10,9 @@ module CommonSweepers
     expire_organism_gadget
     expire_header_and_footer
     expire_new_object_gadget
+    expire_download_activity
+    expire_create_activity
+    expire_resource_list_item_action_partial
   end
 
   def expire_new_object_gadget
@@ -27,6 +30,10 @@ module CommonSweepers
 
   def expire_create_activity
     expire_fragment(/create_activity.*/)
+  end
+
+  def expire_resource_list_item_action_partial
+    expire_fragment(/rli_actions.*/)
   end
 
   def expire_annotation_fragments name=nil
