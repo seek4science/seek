@@ -22,30 +22,41 @@ module ApplicationHelper
 
   def authorized_list all_items, attribute, sort=true, max_length=75, count_hidden_items=false
     items = all_items.select &:can_view?
-    title_only_items = (all_items - items).select &:title_is_public?
-    hidden_items = []
-    hidden_items |= (all_items - items - title_only_items)
-    html  = "<b>#{(items.size > 1 ? attribute.pluralize : attribute)}:</b> "
+    if Seek::Config.is_virtualliver
+      title_only_items = (all_items - items).select &:title_is_public?
+    else
+      title_only_items = []
+    end
+
+    if count_hidden_items
+      original_size = all_items.size
+      hidden_items = []
+      hidden_items |= (all_items - items - title_only_items)
+    else
+      hidden_items = []
+    end
+
+    html = "<b>#{(items.size > 1 ? attribute.pluralize : attribute)}:</b> "
     if items.empty? && title_only_items.empty? && hidden_items.empty?
       html << "<span class='none_text'>No #{attribute}</span>"
     else
-      original_size     = all_items.size
-      hidden_item_count = original_size - (items.size + title_only_items.size)
 
       items = items.sort_by { |i| get_object_title(i) } if sort
-      title_only_items = title_only_items.sort_by{|i| get_object_title(i)} if sort
+      title_only_items = title_only_items.sort_by { |i| get_object_title(i) } if sort
 
-      list = items.collect {|i| link_to h(truncate(i.title, :length=>max_length)), show_resource_path(i), :title=>get_object_title(i)}
-      list = list + title_only_items.collect {|i| h(truncate(i.title, :length => max_length))}
+      list = items.collect { |i| link_to h(truncate(i.title, :length => max_length)), show_resource_path(i), :title => get_object_title(i) }
+      list = list + title_only_items.collect { |i| h(truncate(i.title, :length => max_length)) }
       html << list.join(', ')
 
-      if count_hidden_items && hidden_item_count>0
-        html << "<span class=\"none_text\">#{items.size > 0 ? " and " : ""}#{hidden_item_count} hidden #{hidden_item_count > 1 ? "items" :"item"}</span>"
-        contributor_links = hidden_item_contributor_links hidden_items
-        if !contributor_links.empty?
-          html << "<span class=\"none_text\">(Please contact: #{contributor_links.join(', ')})</span>"
+
+        if count_hidden_items && !hidden_items.empty?
+          html << "<span class=\"none_text\">#{items.size > 0 ? " and " : ""}#{hidden_items.size} hidden #{hidden_items.size > 1 ? "items" :"item"}</span>"
+          contributor_links = hidden_item_contributor_links hidden_items
+          if !contributor_links.empty?
+            html << "<span class=\"none_text\">(Please contact: #{contributor_links.join(', ')})</span>"
+          end
         end
-      end
+
     end
     html
   end

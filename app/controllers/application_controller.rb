@@ -7,6 +7,8 @@ class ApplicationController < ActionController::Base
 
   self.mod_porter_secret = PORTER_SECRET
 
+  include CommonSweepers
+
   include ExceptionNotifiable
   self.error_layout="errors"
   self.silent_exceptions = []
@@ -139,9 +141,20 @@ class ApplicationController < ActionController::Base
     resource_ids = (params[:resource_ids] || []).split(',')
     render :update do |page|
       if !resource_type.blank?
-        resources = resource_type.constantize.find_all_by_id(resource_ids).select { |r| r.can_view? }
+        clazz = resource_type.constantize
+        resources = clazz.find_all_by_id(resource_ids)
+        if clazz.respond_to?(:authorized_partial_asset_collection)
+          resources = clazz.authorized_partial_asset_collection(resources,"view")
+        else
+          resources = resources.select &:can_view?
+        end
 
-        page.replace_html "#{resource_type}_list_items_container", :partial => "assets/resource_list", :locals => {:collection => resources, :narrow_view => true, :authorization_for_showing_already_done => true}
+        page.replace_html "#{resource_type}_list_items_container",
+                          :partial => "assets/resource_list",
+                          :locals => {:collection => resources,
+                          :narrow_view => true,
+                          :authorization_for_showing_already_done => true,
+                          :actions_partial_disable=>false}
         page.visual_effect :toggle_blind, "view_#{resource_type}s", :duration => 0.05
         page.visual_effect :toggle_blind, "view_#{resource_type}s_and_extra", :duration => 0.05
       end
@@ -404,8 +417,29 @@ class ApplicationController < ActionController::Base
                                :data => activity_loggable.title)
           end
       end
+      expire_activity_fragment_cache(c,a)
+    end
+
+  end
+
+  def expire_activity_fragment_cache(controller,action)
+    if action!="show"
+      @@auth_types ||=  Seek::Util.authorized_types.collect{|t| t.name.underscore.pluralize}
+      if action=="download"
+        expire_download_activity
+      elsif action=="create" && controller!="sessions"
+        expire_create_activity
+      elsif action=="destroy"
+        expire_create_activity
+        expire_download_activity
+      elsif action=="update" && @@auth_types.include?(controller) #may have had is permission changed
+        expire_create_activity
+        expire_download_activity
+        expire_resource_list_item_action_partial
+      end
     end
   end
+
 
   def check_log_exists action,controllername,object
     if action=="create"

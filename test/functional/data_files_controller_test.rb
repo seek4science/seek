@@ -515,7 +515,7 @@ class DataFilesControllerTest < ActionController::TestCase
     assert_response :success
 
     assert_select "div.box_about_actor" do
-      assert_select "p > b",:text=>/Link:/,:count=>0
+      assert_select "p > b",:text=>/Link/,:count=>0
       assert_select "a[href=?][target=_blank]","http://webpage.com",:text=>"http://webpage.com",:count=>0
     end
   end

@@ -166,7 +166,7 @@ module AssetsHelper
         if key == 'Project' || key == 'Institution'
           res[:hidden_count] = 0
         elsif key == 'Person'
-          if Seek::Config.is_virtualliver && current_user.nil?
+          if Seek::Config.is_virtualliver && User.current_user.nil?
             res[:items] = []
             res[:hidden_count] = total_count
           else
@@ -174,7 +174,7 @@ module AssetsHelper
           end
         else
           total = res[:items]
-          res[:items] = key.constantize.authorized_partial_asset_collection res[:items],'view',current_user
+          res[:items] = key.constantize.authorized_partial_asset_collection res[:items],'view',User.current_user
           res[:hidden_count] = total_count - res[:items].size
           res[:hidden_items] = total - res[:items]
         end
@@ -221,12 +221,12 @@ module AssetsHelper
   end
 
   #code is for authorization of temporary link
-  def can_download_asset? asset, code=params[:code]
-    asset.can_download? || (code && asset.auth_by_code?(code))
+  def can_download_asset? asset, code=params[:code],can_download=asset.can_download?
+    can_download || (code && asset.auth_by_code?(code))
   end
 
   #code is for authorization of temporary link
-  def can_view_asset? asset, code=params[:code]
-    asset.can_view? || (code && asset.auth_by_code?(code))
+  def can_view_asset? asset, code=params[:code],can_view=asset.can_view?
+    can_view || (code && asset.auth_by_code?(code))
   end
 end

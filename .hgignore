@@ -33,6 +33,7 @@ tmp/restart.txt
 tmp/profile-*
 tmp/test_content_blobs/*
 tmp/rdf/
+tmp/*.csv
 *.tmp*
 *~
 

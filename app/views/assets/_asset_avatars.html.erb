@@ -6,8 +6,11 @@ contributor = contributor.person if contributor.respond_to? :person
 creators << contributor if resource.contributor_credited? and contributor
 creators = creators.uniq
 creators = creators.select &:can_view?
+cache_key = creators.collect{|c| c.cache_key}.join("")
+cache_key = Digest::SHA2.hexdigest(cache_key)
 %>
 
+<% cache cache_key do -%>
 <div style="text-align: center">
 
   <% unless creators.empty? -%>
@@ -37,3 +40,4 @@ creators = creators.select &:can_view?
     <% end -%>
   <% end %>
 </div>
+<% end -%>
