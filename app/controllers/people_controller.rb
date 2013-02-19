@@ -217,7 +217,7 @@ class PeopleController < ApplicationController
     respond_to do |format|
       if @person.update_attributes(params[:person]) && set_group_membership_project_role_ids(@person,params)
         @person.save #this seems to be required to get the tags to be set correctly - update_attributes alone doesn't [SYSMO-158]
-         
+        @person.touch #this makes sure any caches based on the cache key are invalided where the person would not normally be updated, such as changing disciplines or tags
         flash[:notice] = 'Person was successfully updated.'
         format.html { redirect_to(@person) }
         format.xml  { head :ok }
