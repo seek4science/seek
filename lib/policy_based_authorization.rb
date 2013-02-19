@@ -2,6 +2,11 @@ require 'project_compat'
 module Acts
   module Authorized
     module PolicyBasedAuthorization
+
+      class AuthPermissions < Struct.new :can_view,:can_download,:can_edit,:can_manage,:can_delete
+
+      end
+
       def self.included klass
         attr_accessor :permission_for
         klass.extend ClassMethods
@@ -184,6 +189,33 @@ module Acts
             end
         END_EVAL
 
+      end
+
+      #allows access to each permission in a single database call (rather than calling can_download? can_edit? etc individually)
+      def authorization_permissions user=User.current_user
+        @@expected_true_value ||= ActiveRecord::Base.connection.quoted_true.gsub("'","")
+        permissions = AuthPermissions.new
+        user_id = user.nil? ? 0 : user.id
+        if Seek::Config.auth_lookup_enabled && self.class.lookup_table_consistent?(user_id)
+          sql = "SELECT can_view,can_edit,can_download,can_manage,can_delete FROM #{self.class.lookup_table_name} WHERE user_id=#{user_id} AND asset_id=#{self.id}"
+          res = ActiveRecord::Base.connection.select_one(sql)
+          unless res.nil?
+            permissions.can_view = res["can_view"]==@@expected_true_value
+            permissions.can_download = res["can_download"]==@@expected_true_value
+            permissions.can_edit = res["can_edit"]==@@expected_true_value
+            permissions.can_manage = res["can_manage"]==@@expected_true_value
+            permissions.can_delete = res["can_delete"]==@@expected_true_value
+          else
+            raise "Expected to find record in auth lookup table"
+          end
+        else
+          permissions.can_view = self.can_view?
+          permissions.can_download = self.can_download?
+          permissions.can_edit = self.can_edit?
+          permissions.can_manage = self.can_manage?
+          permissions.can_delete = self.can_delete?
+        end
+        permissions
       end
 
       #triggers a background task to update or create the authorization lookup table records for this item
