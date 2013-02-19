@@ -11,11 +11,11 @@
 </p>
 
 <% if logged_in? %>
-    <% _cacheName = "footer"  %>
-    <% _linkToContentStatistics = ' link_to "Content Statistics", "/statistics" '  %>
+     <% _cacheName = "footer"  %>
+     <% _linkToContentStatistics = ' link_to "Content Statistics", "/statistics" '  %>
 <% else %>
-    <% _cacheName = "footer1"  %>
-    <% _linkToContentStatistics = '' %>
+     <% _cacheName = "footer1"  %>
+     <% _linkToContentStatistics = '' %>
 <% end %>
 
 <% cache _cacheName do -%>
