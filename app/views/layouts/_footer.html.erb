@@ -10,15 +10,21 @@
   <%end%>
 </p>
 
-<% cache "footer" do -%>
+<% if logged_in? %>
+    <% _cacheName = "footer"  %>
+    <% _linkToContentStatistics = ' link_to "Content Statistics", "/statistics" '  %>
+<% else %>
+    <% _cacheName = "footer1"  %>
+    <% _linkToContentStatistics = '' %>
+<% end %>
+
+<% cache _cacheName do -%>
 <div>
   <table>
     <tr>
       <td class="left">
         <p><%= link_to "Front Page", "/" %></p>
-        <% if logged_in? %>
-            <p><%= link_to "Content Statistics", "/statistics" %></p>
-        <% end %>
+        <p><%= _linkToContentStatistics %></p>
         <%if Seek::Config.dm_project_link != Seek::Config.project_link %><p><%= link_to "About #{Seek::Config.dm_project_name}", Seek::Config.dm_project_link, :target => '_blank' %></p><%end%>
         <p><%= link_to Seek::Config.project_title, Seek::Config.project_link %> </p>
         <p class="none_text"><%= version_text -%></p>
@@ -53,4 +59,3 @@
   </table>
 </div>
 <% end -%>
-
