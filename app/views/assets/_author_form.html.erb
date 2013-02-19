@@ -9,7 +9,7 @@
 <%# this hidden input will submit all permission data with the form -%>
 <%= hidden_field_tag "creators", "" -%>
 
-<% resource_type_attributed_to_types = "Creators" -%>
+<% resource_type_attributed_to_types = "Contributors" -%>
 
 <% original_resource_type = resource_type -%>
 <% resource_type = Seek::Config.sample_parent_term if resource_type == 'Specimen' %>
@@ -20,7 +20,7 @@
 
   <div class="foldTitle">
     <%= help_icon("Here you attribute this #{resource_type} to other people.") -%>
-    Creators
+    Contributors
   </div>
 
   <div id="creator_fold_content" class="foldContent" style="display:<%= existing_creators.blank? ? 'none' : 'block' -%>">

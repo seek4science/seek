@@ -1,6 +1,6 @@
 <%
 item = options_for
-checkbox_title = item.can_manage? ? "Publish" : "Notify owner"
+checkbox_title = item.can_manage? ? "Publish" : "Notify contributor"
 checkbox_class = item.can_manage? ? "owned" : "protected"
 checkbox_class = "none_text" if item.is_published?
 -%>

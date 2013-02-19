@@ -3,9 +3,9 @@
 <div class="list_item_left_column">
 <%= list_item_contributor resource -%>
 
-<%= list_item_authorized_list resource.creators, "Creator" -%>
+<%= list_item_authorized_list resource.creators, "Contributor" -%>
 
-<%= list_item_optional_attribute "Other creator", resource.other_creators, nil -%>
+<%= list_item_optional_attribute "Other contributor", resource.other_creators, nil -%>
 
 <%= @assay ? (list_item_optional_attribute "Relationship type", resource.relationship_type(@assay).try(:title)) : "" -%>  
 </div>

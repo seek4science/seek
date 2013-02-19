@@ -42,7 +42,7 @@
 
     <div>
       <p>
-        <label>Person responsible:</label>
+        <label>Contributor:</label>
         <% if @study.person_responsible.try :can_view? -%>
           <%= link_to h(@study.person_responsible.name),@study.person_responsible %>
         <% else -%>

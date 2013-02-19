@@ -72,7 +72,7 @@
 
   </div>
 
-  <%= render :partial => "assets/resource_main_content_right", :locals => {:resource => @sample, :title => 'Owner'} %>
+  <%= render :partial => "assets/resource_main_content_right", :locals => {:resource => @sample, :title => 'Contributor'} %>
 
   <div style="clear:both">
     <br/>
@@ -82,7 +82,7 @@
       <%= render :partial => "sample_specimen_details", :object => @sample.specimen %>
     </div>
     <br/>
-    <%= render :partial => "assets/resource_main_content_right", :locals => {:resource => @sample.specimen, :title => 'Owner and creators'} %>
+    <%= render :partial => "assets/resource_main_content_right", :locals => {:resource => @sample.specimen, :title => 'Contributor and creators'} %>
   </div>
 
   <div style="clear:both">

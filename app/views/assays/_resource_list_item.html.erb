@@ -21,7 +21,7 @@
 </div>
 
 <div class="list_item_right_column">
-  <%= list_item_authorized_attribute "Owner", resource.owner %>
+  <%= list_item_authorized_attribute "Contributor", resource.owner %>
 
   <%= render :partial => 'projects/show_project_relationship', :locals => {:resource => resource, :list_item => true}%>
 
