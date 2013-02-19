@@ -1,6 +1,6 @@
 <% person = resource %>
 
-<% cache "rli_#{person.cache_key}" do -%>
+<% cache "rli_#{person.cache_key}_#{hide_contact_details?}" do -%>
     <%= list_item_title person, :title=>person.name %>
 
     <div class="list_item_left_column">
