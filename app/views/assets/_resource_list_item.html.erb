@@ -19,12 +19,24 @@
      ""
    end
 %>
+
+<%
+   creators ||= nil
+   if resource.respond_to?(:contributor) and resource.contributor_credited? and !creators
+     creators = (resource.try(:creators) || []) | [resource.contributor.nil? ? nil : resource.contributor.person]
+   else
+     creators ||= resource.creators.dup
+   end
+%>
+
 <div class="<%= access_based_css_class%>">
-  <% unless avatar_partial.blank? %>
-    <div class="list_item_avatar">
-      <%= render :partial=> avatar_partial,:locals=>content_locals.merge({:resource => resource}) %>
-    </div>
-  <% end %>
+  <div class="list_item_avatar">
+    <% creators.shift(5).each do |creator| %>
+      <% if creator.nil? or creator.can_view? %>
+        <span class="author_avatar"><%= creator.nil? ? the_jerm : favouritable_icon(creator, 50) -%></span>
+      <% end %>
+    <% end %>
+  </div>
   <div class="list_item_content" style="width:<%= box_width %>%">
     <%= render :partial=> content_partial,:locals=>content_locals.merge({:resource => resource}) %>
   </div>
