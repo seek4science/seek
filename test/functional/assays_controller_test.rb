@@ -558,7 +558,7 @@ end
     end
   end
 
-  test "download link for sop in tab has version" do
+  test "download link for sop in tab" do
     login_as(:owner_of_my_first_sop)
     assert_difference('ActivityLog.count') do
       get :show, :id=>assays(:metabolomics_assay)
@@ -568,12 +568,12 @@ end
 
     assert_select "div.list_item div.list_item_actions" do
       sop = sops(:my_first_sop)
-      path=download_sop_content_blob_path(sop,sop.content_blob)
+      path=download_sop_path(sop)
       assert_select "a[href=?]", path, :minumum=>1
     end
   end
 
-  test "show link for sop in tab has version" do
+  test "show link for sop in tab" do
     login_as(:owner_of_my_first_sop)
     assert_difference('ActivityLog.count') do
       get :show, :id=>assays(:metabolomics_assay)
@@ -611,7 +611,7 @@ end
 
     assert_select "div.list_item div.list_item_actions" do
       df = data_files(:picture)
-      path=download_data_file_content_blob_path(df,df.content_blob)
+      path=download_data_file_path(df)
       assert_select "a[href=?]", path, :minumum=>1
     end
   end
