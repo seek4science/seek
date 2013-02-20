@@ -481,17 +481,6 @@ class ModelsController < ApplicationController
     
   end
 
-
-
-  def download_one_file
-    content_blob = ContentBlob.find params[:id]
-    if File.file? content_blob.filepath
-      send_file content_blob.filepath, :type=>content_blob.content_type, :disposition => 'attachment'
-    else
-      download_via_url @display_model
-    end
-  end
-
   # PUT /models/1
   # PUT /models/1.xml
   def update
