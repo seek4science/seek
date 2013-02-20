@@ -664,14 +664,6 @@ p#assay_types label {
     width: 20em;
 }
 
-#header_text {
-    font-size:larger;
-    text-align:center;   
-    padding-top: 1.5em;
-    padding-bottom: 1.5em;
-    margin: 1em 0em 1em 3em;
-    width: 90%;
-}
 
 #header_text_main {
     font-size:larger;
