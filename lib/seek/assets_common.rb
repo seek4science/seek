@@ -6,7 +6,7 @@ module Seek
     #required to get the icon_filename_for_key
     include ImagesHelper
 
-#this is required to initialise the @<model> (e.g. @sop), before re-rendering the :new page 
+    #this is required to initialise the @<model> (e.g. @sop), before re-rendering the :new page
     def init_asset_for_render params                                                            
         c     = self.controller_name.singularize                                                  
         model = c.camelize.constantize                                                            
@@ -17,7 +17,6 @@ module Seek
         obj=model.new params[symb]                                                                
         eval "@#{c.singularize} = obj"                                                            
     end
-
     
     def url_response_code asset_url
       url = URI.parse(URI.encode(asset_url.strip))

@@ -1,5 +1,41 @@
 module AssetsCommonExtension
   include Seek::MimeTypes
+  include Seek::ContentBlobCommon
+
+  def download
+    if self.controller_name=="models"
+      download_model
+    else
+      download_single
+    end
+  end
+
+  #current model is the only type with multiple content-blobs, this may change in the future
+  def download_model
+    # update timestamp in the current Model record
+    # (this will also trigger timestamp update in the corresponding Asset)
+    @model.last_used_at = Time.now
+    @model.save_without_timestamping
+
+    handle_download_zip @display_model
+  end
+
+  #for data files, SOPs and presentations, that only have a single content-blob
+  def download_single
+    name = self.controller_name.singularize
+    @asset = eval("@#{name}")
+
+    @asset_version = eval("@display_#{name}")
+    @content_blob = @asset_version.content_blob
+    @asset.last_used_at = Time.now
+    @asset.save_without_timestamping
+
+    disposition = params[:disposition] || 'attachment'
+
+    respond_to do |format|
+      format.html {handle_download disposition}
+    end
+  end
 
   def show_via_url asset, content_blob=nil
     content_blob = content_blob.nil? ? asset.content_blob : content_blob

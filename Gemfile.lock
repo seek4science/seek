@@ -11,17 +11,6 @@ GIT
   specs:
     search_biomodel (2.2.1)
 
-GIT
-  remote: git://github.com/myGrid/simple-spreadsheet-extractor-gem.git
-  revision: 442b1196cf23aaf801f763de6837929e5f58d1e3
-  ref: 442b1196cf23aaf801f763de6837929e5f58d1e3
-  specs:
-    simple-spreadsheet-extractor (0.12.1)
-      libxml-ruby (= 2.2.2)
-      libxml-ruby (= 2.2.2)
-      open4 (= 1.3.0)
-      open4 (= 1.3.0)
-
 GEM
   remote: http://rubygems.org/
   remote: http://gems.github.com/
@@ -139,6 +128,9 @@ GEM
       nokogiri (>= 1.4.0)
       nori (~> 1.1.0)
       wasabi (~> 2.5.0)
+    simple-spreadsheet-extractor (0.12.1)
+      libxml-ruby (= 2.2.2)
+      open4 (= 1.3.0)
     slop (3.4.3)
     sqlite3-ruby (1.2.5)
     sunspot (1.3.3)
@@ -202,7 +194,7 @@ DEPENDENCIES
   rubyzip2
   savon (= 1.1.0)
   search_biomodel (= 2.2.1)!
-  simple-spreadsheet-extractor!
+  simple-spreadsheet-extractor (= 0.12.1)
   sqlite3-ruby (= 1.2.5)
   sunspot_rails (= 1.3.3)
   sunspot_solr (= 1.3.3)

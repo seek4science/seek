@@ -83,19 +83,12 @@ module AssetsHelper
     class_name
   end
 
-  #Changed these so they can cope with non-asset things such as studies, assays etc.
   def download_resource_path(resource, code=nil)
-    path = ""
-    if Seek::Util.multi_files_asset_types.include?(resource.class)
-      if resource.class.name.include?("::Version")
-        path = polymorphic_path(resource.parent, :version=>resource.version, :action=>:download,:code=>params[:code])
-      else
-        path = polymorphic_path(resource, :action=>:download, :code=>params[:code])
-      end
+    if resource.class.name.include?("::Version")
+      polymorphic_path(resource.parent, :version=>resource.version, :action=>:download,:code=>params[:code])
     else
-      path = polymorphic_path([resource, resource.content_blob],:action=>:download,:code=>params[:code])
+      polymorphic_path(resource, :action=>:download, :code=>params[:code])
     end
-    return path
   end
 
   #returns true if this permission should not be able to be removed from custom permissions

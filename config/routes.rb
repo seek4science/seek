@@ -1,6 +1,6 @@
 ActionController::Routing::Routes.draw do |map|
   map.resources :attachments
-  map.resources :presentations,:member => {:new_version=>:post, :preview_publish=>:get,:publish=>[:post, :get],:request_resource=>:post, :update_annotations_ajax=>:post } do |presentation|
+  map.resources :presentations,:member => {:download=>:get,:new_version=>:post, :preview_publish=>:get,:publish=>[:post, :get],:request_resource=>:post, :update_annotations_ajax=>:post } do |presentation|
     presentation.resources :content_blobs, :member => {:download => :get, :view_pdf_content => :get, :get_pdf => :get}
   end
   map.resources :subscriptions
@@ -31,7 +31,7 @@ ActionController::Routing::Routes.draw do |map|
 
   map.resources :biosamples, :collection=>{:existing_strains=>:get, :existing_specimens=>:get, :existing_samples=>:get, :strain_form => :get, :create_strain => :post, :update_strain => :put,  :create_specimen_sample => :post, :strains_of_selected_organism => :get}
 
-  map.resources :data_files, :collection=>{:test_asset_url=>:post},:member => {:plot=>:get, :data => :get,:preview_publish=>:get,:publish=>[:post, :get], :request_resource=>:post, :update_annotations_ajax=>:post, :explore=>:get, :convert_to_presentation => :post},:new=>{:upload_for_tool => :post, :upload_from_email => :post}  do |data_file|
+  map.resources :data_files, :collection=>{:test_asset_url=>:post},:member => {:download=>:get,:plot=>:get, :data => :get,:preview_publish=>:get,:publish=>[:post, :get], :request_resource=>:post, :update_annotations_ajax=>:post, :explore=>:get, :convert_to_presentation => :post},:new=>{:upload_for_tool => :post, :upload_from_email => :post}  do |data_file|
     data_file.resources :studied_factors, :collection =>{:create_from_existing=>:post}
     data_file.resources :content_blobs, :member => {:download => :get, :view_pdf_content => :get, :get_pdf => :get}
   end
@@ -65,7 +65,7 @@ ActionController::Routing::Routes.draw do |map|
     project.resources :folders, :collection=>{:nuke=>:post},:member=>{:display_contents=>:post,:move_asset_to=>:post,:create_folder=>:post,:remove_asset=>:post}
   end
 
-  map.resources :sops, :member => {:new_version=>:post, :preview_publish=>:get,:publish=>:post,:request_resource=>:post, :update_annotations_ajax=>:post } do |sop|
+  map.resources :sops, :member => {:download=>:get,:new_version=>:post, :preview_publish=>:get,:publish=>:post,:request_resource=>:post, :update_annotations_ajax=>:post } do |sop|
     sop.resources :experimental_conditions, :collection =>{:create_from_existing=>:post}
     sop.resources :content_blobs, :member => {:download => :get, :view_pdf_content => :get, :get_pdf => :get}
   end
