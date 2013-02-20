@@ -11,7 +11,7 @@ module ApplicationHelper
       str="<span class='none_text'>No date defined</span>"
     else
       str = date.localtime.strftime("#{date.day.ordinalize} %B %Y")
-      str = date.localtime.strftime("#{str} @ %H:%M:%S") if show_time_of_day
+      str = date.localtime.strftime("#{str} at %H:%M") if show_time_of_day
     end
     str
   end
