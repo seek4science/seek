@@ -573,6 +573,7 @@ end
 
   Factory.define(:doc_content_blob, :parent => :content_blob) do |f|
     f.data File.new("#{Rails.root}/test/fixtures/files/ms_word_test.doc", "rb").read
+    f.original_filename 'ms_word_test.doc'
     f.content_type 'application/msword'
   end
 

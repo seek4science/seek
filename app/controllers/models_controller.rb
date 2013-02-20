@@ -481,15 +481,7 @@ class ModelsController < ApplicationController
     
   end
 
-  # GET /models/1/download
-  def download
-    # update timestamp in the current Model record
-    # (this will also trigger timestamp update in the corresponding Asset)
-    @model.last_used_at = Time.now
-    @model.save_without_timestamping
 
-    handle_download_zip @display_model
-  end
 
   def download_one_file
     content_blob = ContentBlob.find params[:id]

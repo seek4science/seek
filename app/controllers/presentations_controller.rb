@@ -4,15 +4,14 @@ class PresentationsController < ApplicationController
 
   include IndexPager
   include DotGenerator
+
   include Seek::AssetsCommon
   include AssetsCommonExtension
 
-  #before_filter :login_required
   before_filter :find_assets, :only => [ :index ]
   before_filter :find_and_auth, :except => [ :index, :new, :create, :preview,:update_annotations_ajax]
-  before_filter :find_display_asset, :only=>[:show]
+  before_filter :find_display_asset, :only=>[:show, :download]
 
-  #before_filter :convert_to_swf, :only => :show
   include Seek::Publishing
   include Seek::BreadCrumbs
 
@@ -97,6 +96,8 @@ class PresentationsController < ApplicationController
     end
 
   end
+
+
 
 
   # GET /presentations/1

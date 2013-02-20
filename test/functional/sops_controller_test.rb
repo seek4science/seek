@@ -398,6 +398,21 @@ class SopsControllerTest < ActionController::TestCase
 
   end
 
+  test "should download SOP from standard route" do
+    sop = Factory :doc_sop, :policy=>Factory(:public_policy)
+    login_as(sop.contributor.user)
+    assert_difference("ActivityLog.count") do
+      get :download, :id=>sop.id
+    end
+    assert_response :success
+    al=ActivityLog.last
+    assert_equal "download",al.action
+    assert_equal sop,al.activity_loggable
+    assert_equal "attachment; filename=\"ms_word_test.doc\"",@response.header['Content-Disposition']
+    assert_equal "application/msword",@response.header['Content-Type']
+    assert_equal "9216",@response.header['Content-Length']
+  end
+
   def test_should_create_new_version
     s=sops(:editable_sop)
 

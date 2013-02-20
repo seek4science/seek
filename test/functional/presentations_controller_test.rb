@@ -171,6 +171,21 @@ class PresentationsControllerTest < ActionController::TestCase
 
   end
 
+  test "should download Presentation from standard route" do
+    pres = Factory :ppt_presentation, :policy=>Factory(:public_policy)
+    login_as(pres.contributor.user)
+    assert_difference("ActivityLog.count") do
+      get :download, :id=>pres.id
+    end
+    assert_response :success
+    al=ActivityLog.last
+    assert_equal "download",al.action
+    assert_equal pres,al.activity_loggable
+    assert_equal "attachment; filename=\"ppt_presentation.ppt\"",@response.header['Content-Disposition']
+    assert_equal "application/vnd.ms-powerpoint",@response.header['Content-Type']
+    assert_equal "82432",@response.header['Content-Length']
+  end
+
   test "should set the other creators " do
     user = Factory(:user)
     presentation = Factory(:presentation, :contributor => user)
