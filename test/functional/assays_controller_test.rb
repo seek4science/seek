@@ -264,6 +264,7 @@ class AssaysControllerTest < ActionController::TestCase
     assert_equal s, assigns(:assay).study
   end
 
+
 test "should create experimental assay with or without sample" do
     #THIS TEST MAY BECOME INVALID ONCE IT IS DECIDED HOW ASSAYS LINK TO SAMPLES OR ORGANISMS
     assert_difference('ActivityLog.count') do
@@ -751,6 +752,47 @@ end
     assert_select "script", :text=>/addDataFile/, :count=>1
     assert_select "script", :text=>/addSop/, :count=>1
     assert_select "script", :text=>/addModel/, :count=>1
+  end
+
+  test "should create with associated model sop data file and publication" do
+    user = Factory :user
+    login_as(user)
+    sop=Factory :sop,:policy=>Factory(:public_policy),:contributor=>user
+    model=Factory :model,:policy=>Factory(:public_policy),:contributor=>user
+    df=Factory :data_file,:policy=>Factory(:public_policy),:contributor=>user
+    pub=Factory :publication,:contributor=>user
+    study=Factory :study, :policy=>Factory(:public_policy),:contributor=>user
+    rel=RelationshipType.first
+
+    assert_difference('ActivityLog.count') do
+      assert_difference("Assay.count") do
+        assert_difference("AssayAsset.count", 3) do
+          assert_difference("Relationship.count") do
+
+          post :create, :assay=>{
+              :title=>"fish",
+              :technology_type_id=>technology_types(:gas_chromatography).id,
+              :assay_type_id=>assay_types(:metabolomics).id,
+              :study_id=>study.id,
+              :assay_class=>assay_classes(:modelling_assay_class)
+          },
+               :assay_sop_ids=>["#{sop.id}"],
+               :model_ids=>["#{model.id}"],
+               :data_file_ids=>["#{df.id},#{rel.title}"],
+               :related_publication_ids=>["#{pub.id}"]
+          end
+        end
+      end
+    end
+
+    assert_not_nil assigns(:assay)
+    assay = assigns(:assay)
+    assay.reload #necessary to pickup the relationships for publications
+    assert_equal [sop], assay.sop_masters
+    assert_equal [df], assay.data_file_masters
+    assert_equal [model],assay.model_masters
+    assert_equal [pub], assay.related_publications
+
   end
 
   test "associated assets aren't lost on failed validation on update" do
