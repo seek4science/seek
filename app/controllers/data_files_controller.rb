@@ -7,15 +7,18 @@ class DataFilesController < ApplicationController
   include SysMODB::SpreadsheetExtractor
   include MimeTypesHelper
   include DotGenerator
+
   include Seek::AssetsCommon
   include AssetsCommonExtension
+  include Seek::ContentBlobCommon
+
   include Seek::AnnotationCommon
 
   #before_filter :login_required
 
   before_filter :find_assets, :only => [ :index ]
   before_filter :find_and_auth, :except => [ :index, :new, :upload_for_tool, :upload_from_email, :create, :request_resource, :preview, :test_asset_url, :update_annotations_ajax]
-  before_filter :find_display_asset, :only=>[:show,:explore,:matching_models]
+  before_filter :find_display_asset, :only=>[:show,:explore,:download,:matching_models]
   skip_before_filter :verify_authenticity_token, :only => [:upload_for_tool, :upload_from_email]
   before_filter :xml_login_only, :only => [:upload_for_tool, :upload_from_email]
 
@@ -46,6 +49,22 @@ class DataFilesController < ApplicationController
           redirect_to data_file_path @data_file
         }
       end
+    end
+  end
+
+  def download
+    @asset = @data_file
+
+    @asset_version = @display_data_file
+    @content_blob = @asset_version.content_blob
+    @asset.last_used_at = Time.now
+    @asset.save_without_timestamping
+
+    disposition = params[:disposition] || 'attachment'
+
+    respond_to do |format|
+      format.html {handle_download disposition}
+      format.pdf {get_pdf}
     end
   end
 

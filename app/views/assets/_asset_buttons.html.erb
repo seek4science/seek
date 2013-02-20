@@ -4,11 +4,7 @@
     <%# param code is used for temporary link -%>
     <% if display_asset.contains_downloadable_items? && can_download_asset?(asset, params[:code]) -%>
         <%
-           if Seek::Util.multi_files_asset_types.include?(asset.class)
-             path = polymorphic_path(asset,:version=>version,:action=>:download,:code=>params[:code])
-           else
-             path = polymorphic_path([asset, display_asset.content_blob],:action=>:download,:code=>params[:code])
-           end
+           path = polymorphic_path(asset,:version=>version,:action=>:download,:code=>params[:code])
         %>
         <li>
           <%= image_tag_for_key('download', path, "Download #{human_name}", nil, "Download #{human_name}") -%>

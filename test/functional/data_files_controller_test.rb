@@ -571,7 +571,7 @@ class DataFilesControllerTest < ActionController::TestCase
     get :show,:id=>df
     assert_response :success
     assert_select "ul.sectionIcons > li > span.icon" do
-      assert_select "a[href=?]",download_data_file_content_blob_path(df,df.content_blob.id),:count=>0
+      assert_select "a[href=?]",download_data_file_path(df,:version=>df.version),:count=>0
       assert_select "a",:text=>/Download/,:count=>0
     end
 
@@ -587,7 +587,7 @@ class DataFilesControllerTest < ActionController::TestCase
     get :show,:id=>df
     assert_response :success
     assert_select "ul.sectionIcons > li > span.icon" do
-      assert_select "a[href=?]",download_data_file_content_blob_path(df,df.content_blob.id),:count=>1
+      assert_select "a[href=?]",download_data_file_path(df,:version=>df.version),:count=>1
       assert_select "a",:text=>/Download Data file/,:count=>1
     end
 
@@ -596,8 +596,139 @@ class DataFilesControllerTest < ActionController::TestCase
     end
 
   end
-  
 
+  test "should download datafile from standard route" do
+    df = Factory :rightfield_datafile, :policy=>Factory(:public_policy)
+    login_as(df.contributor.user)
+    assert_difference("ActivityLog.count") do
+      get :download, :id=>df.id
+    end
+    assert_response :success
+    al=ActivityLog.last
+    assert_equal "download",al.action
+    assert_equal df,al.activity_loggable
+    assert_equal "attachment; filename=\"rightfield.xls\"",@response.header['Content-Disposition']
+    assert_equal "application/excel",@response.header['Content-Type']
+    assert_equal "9216",@response.header['Content-Length']
+  end
+
+  test "should download" do
+    assert_difference('ActivityLog.count') do
+      get :download, :id => Factory(:small_test_spreadsheet_datafile,:policy=>Factory(:public_policy), :contributor=>User.current_user).id
+    end
+    assert_response :success
+    assert_equal "attachment; filename=\"small-test-spreadsheet.xls\"",@response.header['Content-Disposition']
+    assert_equal "application/excel",@response.header['Content-Type']
+    assert_equal "7168",@response.header['Content-Length']
+  end
+
+  test "should download from url" do
+    mock_http
+    assert_difference('ActivityLog.count') do
+      get :download, :id => data_files(:url_based_data_file)
+    end
+    assert_response :success
+  end
+
+  test "should gracefully handle when downloading a unknown host url" do
+    WebMock.allow_net_connect!
+    df=data_files(:url_no_host_data_file)
+    get :download,:id=>df
+    assert_redirected_to data_file_path(df,:version=>df.version)
+    assert_not_nil flash[:error]
+  end
+
+  test "should gracefully handle when downloading a url resulting in 404" do
+    mock_http
+    df=data_files(:url_not_found_data_file)
+    get :download,:id=>df
+    assert_redirected_to data_file_path(df,:version=>df.version)
+    assert_not_nil flash[:error]
+  end
+
+  #This test is quite fragile, because it relies on an external resource
+  test "should create and redirect on download for 401 url" do
+    mock_http
+    df = {:title=>"401",:data_url=>"http://mocked401.com",:projects=>[projects(:sysmo_project)]}
+    assert_difference('ActivityLog.count') do
+      assert_difference('DataFile.count') do
+        assert_difference('ContentBlob.count') do
+          post :create, :data_file => df, :sharing=>valid_sharing
+        end
+      end
+    end
+
+    assert_redirected_to data_file_path(assigns(:data_file))
+    assert_equal users(:datafile_owner),assigns(:data_file).contributor
+    assert !assigns(:data_file).content_blob.url.blank?
+    assert assigns(:data_file).content_blob.data_io_object.nil?
+    assert !assigns(:data_file).content_blob.file_exists?
+    assert_equal "",assigns(:data_file).content_blob.original_filename
+    assert_equal "",assigns(:data_file).content_blob.content_type
+
+    get :download, :id => assigns(:data_file)
+    assert_redirected_to "http://mocked401.com"
+  end
+
+
+  #This test is quite fragile, because it relies on an external resource
+  test "should create and redirect on download for 302 url" do
+    mock_http
+    df = {:title=>"302",:data_url=>"http://mocked302.com",:projects=>[projects(:sysmo_project)]}
+    assert_difference('ActivityLog.count') do
+      assert_difference('DataFile.count') do
+        assert_difference('ContentBlob.count') do
+          post :create, :data_file => df, :sharing=>valid_sharing
+        end
+      end
+    end
+
+    assert_redirected_to data_file_path(assigns(:data_file))
+    assert_equal users(:datafile_owner),assigns(:data_file).contributor
+    assert !assigns(:data_file).content_blob.url.blank?
+    assert assigns(:data_file).content_blob.data_io_object.nil?
+    assert !assigns(:data_file).content_blob.file_exists?
+    assert_equal "",assigns(:data_file).content_blob.original_filename
+    assert_equal "",assigns(:data_file).content_blob.content_type
+
+    get :download, :id => assigns(:data_file)
+    assert_redirected_to "http://mocked302.com"
+  end
+
+  test "report error when file unavailable for download" do
+    df = Factory :data_file, :policy=>Factory(:public_policy)
+    df.content_blob.dump_data_to_file
+    assert df.content_blob.file_exists?
+    FileUtils.rm df.content_blob.filepath
+    assert !df.content_blob.file_exists?
+
+    get :download,:id=>df
+
+    assert_redirected_to df
+    assert flash[:error].match(/Unable to find a copy of the file for download/)
+  end
+
+  test "should handle inline download when specify the inline disposition" do
+    data=File.new("#{Rails.root}/test/fixtures/files/file_picture.png","rb").read
+    df = Factory :data_file,
+                 :content_blob => Factory(:content_blob, :data => data, :content_type=>"images/png"),
+                 :policy => Factory(:downloadable_public_policy)
+
+    get :download, :id => df, :disposition => 'inline'
+    assert_response :success
+    assert @response.header['Content-Disposition'].include?('inline')
+  end
+
+  test "should handle normal attachment download" do
+    data=File.new("#{Rails.root}/test/fixtures/files/file_picture.png","rb").read
+    df = Factory :data_file,
+                 :content_blob => Factory(:content_blob, :data => data, :content_type=>"images/png"),
+                 :policy => Factory(:downloadable_public_policy)
+
+    get :download, :id => df
+    assert_response :success
+    assert @response.header['Content-Disposition'].include?('attachment')
+  end
   
   test "shouldn't download" do
     login_as(:aaron)
