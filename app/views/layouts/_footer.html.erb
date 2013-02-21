@@ -10,16 +10,7 @@
   <%end%>
 </p>
 
-<% _logged_in = 0 %>
-<% if logged_in? %>
-     <% _cacheName = "footer"  %>
-     <% _linkToContentStatistics = '<%= link_to "Content Statistics2", "/statistics" %%>'  %>
-     <% _logged_in = 1 %>
-<% else %>
-     <% _cacheName = "footer1"  %>
-     <% _linkToContentStatistics = '' %>
-     <% _logged_in = 0 %>
-<% end %>
+<% logged_in?? _cacheName = "footer" : _cacheName = "footer1" %>
 
 <% cache _cacheName do -%>
 <div>
@@ -28,7 +19,7 @@
       <td class="left">
         <p><%= link_to "Front Page", "/" %></p>
         <p>
-          <% if _logged_in == 1 %>
+          <% if logged_in? %>
             <%= link_to "Content Statistics", "/statistics" %>
           <% end %>
         </p>
