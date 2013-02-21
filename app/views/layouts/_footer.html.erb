@@ -10,9 +10,9 @@
   <%end%>
 </p>
 
-<% logged_in?? _cacheName = "footer" : _cacheName = "footer1" %>
+<% logged_in?? cache_name = "footer" : cache_name = "footer1" %>
 
-<% cache _cacheName do -%>
+<% cache cache_name do -%>
 <div>
   <table>
     <tr>
