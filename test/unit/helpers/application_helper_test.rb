@@ -22,7 +22,7 @@ class ApplicationHelperTest < ActionView::TestCase
     assert !local_created_at.utc?
     assert !local_created_at.gmt?
 
-    assert date_as_string(created_at, true).include?(local_created_at.strftime('%H:%M:%S'))
+    assert date_as_string(created_at, true).include?(local_created_at.strftime('%H:%M'))
   end
 
   test "date_as_string with Date or DateTime" do

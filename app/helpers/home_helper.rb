@@ -1,5 +1,6 @@
 
 module HomeHelper
+  include UsersHelper
 
   RECENT_SIZE=5
 

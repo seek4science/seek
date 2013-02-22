@@ -141,9 +141,9 @@ class AdminControllerTest < ActionController::TestCase
     assert_response :success
     assert_select "p",:text=>"Total delayed jobs waiting = 1"
     assert_select "tr" do
-      assert_select "td",:text=>/11th September 2010 \@/,:count=>1
-      assert_select "td",:text=>/12th September 2010 \@/,:count=>1
-      assert_select "td",:text=>/13th September 2010 \@/,:count=>1
+      assert_select "td",:text=>/11th September 2010 at/,:count=>1
+      assert_select "td",:text=>/12th September 2010 at/,:count=>1
+      assert_select "td",:text=>/13th September 2010 at/,:count=>1
       assert_select "td > span[class='none_text']",:text=>/No date defined/,:count=>1
     end
 

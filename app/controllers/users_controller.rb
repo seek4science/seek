@@ -33,8 +33,6 @@ class UsersController < ApplicationController
           flash[:notice] = "OpenID successfully set"
           redirect_to(@user.person)
         else
-          puts @user.errors.full_messages.to_sentence
-          puts @user.openid
           redirect_to(edit_user_path(@user))
         end
       else
