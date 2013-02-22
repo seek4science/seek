@@ -27,7 +27,7 @@ and creating the database (assuming it no longer exists), connecting to it, and 
   >\r seek_production
   >\. ./seek_production.sql
 
-The files can be restored simply by copying the <em>filestore/<em> directory back into the SEEK root directory.
+The files can be restored simply by copying the <em>filestore/</em> directory back into the SEEK root directory.
 
 
 == Incremental Backups
