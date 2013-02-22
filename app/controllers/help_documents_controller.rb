@@ -91,6 +91,6 @@ class HelpDocumentsController < ApplicationController
   private
   
   def find_document
-    @help_document = HelpDocument.find_by_identifier(params[:id])
+    @help_document = HelpDocument.find_by_identifier(params[:id]) || raise(ActiveRecord::RecordNotFound)
   end
 end
