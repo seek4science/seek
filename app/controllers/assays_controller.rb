@@ -83,7 +83,7 @@ class AssaysController < ApplicationController
     organisms     = params[:assay_organism_ids] || []
     sop_ids       = params[:assay_sop_ids] || []
     data_file_ids = params[:data_file_ids] || []
-    model_ids     = params[:assay_model_ids] || []
+    model_ids     = params[:model_ids] || []
 
 
      organisms.each do |text|

@@ -110,9 +110,9 @@ module ResourceListItemHelper
   end
 
   def list_item_timestamp resource
-    html = "<p class=\"list_item_attribute none_text\" style=\"text-align:center;\"><b>Created:</b> " + resource.created_at.strftime('%d/%m/%Y @ %H:%M:%S')
+    html = "<p class=\"list_item_attribute none_text\" style=\"text-align:center;\"><b>Created:</b> " + date_as_string(resource.created_at,true)
     unless resource.created_at == resource.updated_at
-      html << " <b>Last updated:</b> " + resource.updated_at.strftime('%d/%m/%Y @ %H:%M:%S')
+      html << "&nbsp;&nbsp;&nbsp<b>Last updated:</b> " + date_as_string(resource.updated_at,true)
     end
     html << "</p>"
     return html

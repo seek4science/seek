@@ -69,7 +69,7 @@ min-width:
 }
 
 #header {
-    padding-top: 1em;
+    padding-top: 0.5em;
     text-align:right;
 }
 
@@ -671,22 +671,13 @@ p#assay_types label {
     width: 20em;
 }
 
-#header_text {
-    font-size:larger;
-    text-align:center;   
-    padding-top: 1.5em;
-    padding-bottom: 1.5em;
-    margin: 1em 0em 1em 3em;
-    width: 90%;
-}
 
 #header_text_main {
     font-size:larger;
     text-align:center;
     padding-top: 0.5em;
     padding-bottom: 0.5em;
-    margin: 0.5em 0em 0.5em 1.5em;
-    width: 90%;
+    margin: 0em 2.5em 0em 2.5em;
 }
 
 div#more_info {
