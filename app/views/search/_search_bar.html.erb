@@ -1,5 +1,12 @@
 <% @search_query="" unless @search_query %>
-<% @search_type="All" unless @search_type %>
+
+<% search_type_options.each do |s|
+     if s == "People" || s == "Projects" || s == "Institutions"
+       current_page?("/"+s.downcase)? @search_type=s : @search_type=@search_type
+     else
+       current_page?("/"+s[1].to_s)? @search_type=s[1].to_s : @search_type=@search_type
+     end
+end %>
 
 <% if !Person.admins.empty? -%>
   <% if Seek::Config.email_enabled %>
