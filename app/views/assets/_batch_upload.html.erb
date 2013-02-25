@@ -65,7 +65,7 @@
 </div>
 
 <div class="yui-g">
-  <div class="yui-u first" style="width: <%= with_image_file ? '42%' : '100%'%>; margin-left: 2em; margin-top: 1em; margin-bottom: 1em;">
+  <div class="yui-u first">
 
   <div id="upload_type_selection">
     <ul id="switch_upload_buttons">
@@ -80,9 +80,6 @@
           <p>
             <b>File to upload:</b>
             <br/>
-            <%#= file_field upload_field, :data -%>
-
-
                 <% fields_for @content_blob do |content_blob| -%>
                     <input id="content_blob_data" type="file">
                 <% end %>
@@ -91,22 +88,22 @@
         </div>
         <div id="upload_from_url" style="display:none;">
           <p>
-            <b>URL:</b>You can register a
+            <b>URL:</b>
             <span class="required">*</span>
 
 
-            <%= text_field_tag "content_blob[data_url]", resource.data_url, :size => 55 %>
+            <%= text_field_tag "content_blob[data_url]", resource.data_url, :size => 45 %>
+                <span style="display:inline-block;">
+                    <%= link_to_function (image("new") + "Add"), "addToList()" %>
+                    <%= link_to_remote image("test", :title=>"Test", :alt=>"Test")+" Test",
+                                       {:url=>{:action=>:test_asset_url, :symb=>"content_blob"},
+                                       :method=>:post,
+                                       :type => :synchronous,
+                                       :with=>"multi_selector.current_url_element.serialize()",
+                                       :before=>"$('test_url_msg').innerHTML='';show_ajax_loader('test_url_result_icon');"},
+                                        {:id => 'test'}-%>
+                </span>
 
-                <%= link_to_function (image("new") + "Add"), "addToList()" %>
-                <%= link_to_remote image("test", :title=>"Test", :alt=>"Test")+" Test",
-                                   {:url=>{:action=>:test_asset_url, :symb=>"content_blob"},
-                                   :method=>:post,
-                                   :type => :synchronous,
-                                   :with=>"multi_selector.current_url_element.serialize()",
-                                   :before=>"$('test_url_msg').innerHTML='';show_ajax_loader('test_url_result_icon');"},
-                                    {:id => 'test'}-%>
-
-                <br/>
                 <p style="clear:both;">
                   <b>Make a copy?</b>
                   <%= check_box upload_field, :local_copy, :id=>"local_copy" -%>
@@ -129,12 +126,14 @@
   </table>
 </div>
 
-<div class="yui-u" style="width: <%= with_image_file ? '42%' : '0%'%>;margin-right: 2em; margin-top: 1em; margin-bottom: 1em;">
+
 <% if with_image_file -%>
-    <%resource_name = resource.class.name.underscore%>
+      <div class="yui-u" id="image_file_box">
+    <% resource_name = resource.class.name.underscore %>
     <%= hidden_field_tag("#{resource_name}_id", resource.id) -%>
       <p>
         <b>Image file: </b>
+        <br/>
         <%= file_field "#{resource_name}_image", :image_file, :onchange => "detectFileFormat('#{resource_name}_image_image_file')" %>
       </p>
       <% if new_version && previous_version_image_file = resource.latest_version.model_image.try(:original_filename) -%>
@@ -143,8 +142,9 @@
             <%= hidden_field_tag 'previous_version_image', previous_version_image_file %>
           </p>
       <% end -%>
+      </div>
 <% end -%>
-</div>
+
 </div>
 
 <script type="text/javascript">

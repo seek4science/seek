@@ -83,14 +83,16 @@ original_filename=nil
                     <b>URL:</b>
                     <span class="required">*</span>                    
                     <%= text_field upload_field,:data_url,:size=>55 -%>
-                    <%= link_to_remote image("test",:title=>"Test",:alt=>"Test")+" Test",
-                    {:url=>{:action=>:test_asset_url},
-                    :method=>:post,
-                    :type => :synchronous,
-                    :with=>"$('#{upload_field}_data_url').serialize()",
-                    :before=>"$('test_url_msg').innerHTML='';show_ajax_loader('test_url_result_icon');"},
-                    {:id => 'test'} -%>
-                    <br/>
+                    <span style="display:inline-block;">
+                        <%= link_to_remote image("test",:title=>"Test",:alt=>"Test")+" Test",
+                        {:url=>{:action=>:test_asset_url},
+                        :method=>:post,
+                        :type => :synchronous,
+                        :with=>"$('#{upload_field}_data_url').serialize()",
+                        :before=>"$('test_url_msg').innerHTML='';show_ajax_loader('test_url_result_icon');"},
+                        {:id => 'test'} -%>
+                    </span>
+
                     <p style="clear:both;">
                         <b>Make a copy?</b>
                         <%= check_box upload_field, :local_copy,:id=>"local_copy" -%>
