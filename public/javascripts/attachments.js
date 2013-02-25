@@ -10,12 +10,7 @@ function MultiSelector(list_target,object_name,method) {
     this.id_url = 0;
     this.object_name = object_name;
     this.method = method;
-//    if (max) {
-//        this.max = max;
-//    } else {
-//        this.max = -1;
-//    }
-    ;
+
     this.addElement = function(element) {
         if (element.tagName == 'INPUT' && element.type == 'file') {
             element.name = 'content_blob[file_' + (this.id_file++) + ']';
@@ -29,12 +24,7 @@ function MultiSelector(list_target,object_name,method) {
                 this.style.position = 'absolute';
                 this.style.left = '-1000px';
             };
-//            if (this.max != -1 && this.count > this.max) {
-//                element.disabled = true;
-//                document.getElementsByName('content_blob[url_' + (this.id_url-1) + ']')[0].disabled = true;
-//            }
-//            ;
-//            this.count++;
+
             this.current_file_element = element;
             this.current_element  = element;
         } else{
@@ -43,13 +33,6 @@ function MultiSelector(list_target,object_name,method) {
                 var original_filename_element = document.getElementsByName('content_blob[original_filename_' + (this.id_url -1) + ']')[0];
                 element.multi_selector = this;
 
-
-//                if (this.max != -1 && this.count > this.max) {
-//                    element.disabled = true;
-//                    document.getElementsByName('content_blob[file_' + (this.id_file-1) + ']')[0].disabled = true;
-//                }
-//                ;
-//                this.count++;
                 this.current_url_element = element;
                 this.current_original_filename_url_element = original_filename_element;
                 this.current_element  = element;
@@ -59,7 +42,6 @@ function MultiSelector(list_target,object_name,method) {
 
 
         }
-        ;
     };
     this.addListRow = function(element,object_name,method) {
         var to_add_radio;
@@ -103,9 +85,6 @@ function MultiSelector(list_target,object_name,method) {
         new_row_button.onclick = function() {
             this.parentNode.parentNode.element.parentNode.removeChild(this.parentNode.parentNode.element);
             this.parentNode.parentNode.parentNode.removeChild(this.parentNode.parentNode);
-//            this.parentNode.parentNode.element.multi_selector.count--;
-//            this.parentNode.parentNode.element.multi_selector.current_file_element.disabled = false;
-//            this.parentNode.parentNode.element.multi_selector.current_url_element.disabled = false;
             return false;
         };
         new_col4.appendChild(new_row_button);
@@ -114,7 +93,7 @@ function MultiSelector(list_target,object_name,method) {
         new_col2.innerHTML = '<img src="/images/file_icons/small/genericGray.png">';
         if (element.type =='text'){
            var original_filename =document.getElementsByName('content_blob[original_filename_' + (this.id_url - 2) + ']')[0].value;
-           new_col3.innerHTML = (original_filename || parseUri( element.value).file);
+           new_col3.innerHTML = (original_filename || element.value);
         }else
             new_col3.innerHTML =  element.value.split(/\\/)[element.value.split(/\\/).length - 1];
         new_col3.style.textAlign = "left";

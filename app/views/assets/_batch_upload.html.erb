@@ -8,7 +8,7 @@
    class << resource
        attr_accessor :data_url, :local_copy
    end unless resource.nil?
-   resource.local_copy=1 unless resource.nil?
+   resource.local_copy=0 unless resource.nil?
    asset_name = text_for_resource upload_field
    @content_blob ||= ContentBlob.new
    with_image_file = resource && resource.kind_of?(Model) && (mine?(resource) || resource.can_edit?)
@@ -161,10 +161,9 @@
         listFilesOfPreviousVersion();
     <% end %>
 
-
     function addToList() {
-        var url = multi_selector.current_original_filename_url_element.value || parseUri(multi_selector.current_url_element.value).file;
-
+        var url = multi_selector.current_original_filename_url_element.value || multi_selector.current_url_element.value;
+        error=false;
         if (url != "" && url != null) {
             var new_element = document.createElement('input');
             new_element.type = 'text';
@@ -173,17 +172,21 @@
             var original_filename_element = document.createElement('input');
             original_filename_element.type = 'hidden';
             original_filename_element.name = 'content_blob[original_filename_' + (multi_selector.id_url) + ']';
+
             $('upload_from_url').appendChild(original_filename_element);
             if (old_element.value != "") {
                 old_element.parentNode.insertBefore(new_element, old_element);
                 old_element.multi_selector.addElement(new_element);
-                old_element.multi_selector.addListRow(old_element, old_element.multi_selector.object_name, old_element.multi_selector.method);
+                old_element.multi_selector.addListRow(old_element);
                 old_element.type = 'hidden';
             } else {
                 old_element.focus();
             }
 
         }else{
+            error=true;
+        }
+        if (error) {
             alert("The URL cannot be parsed. The data behind the URL may not exist or be available from SEEK");
         }
     }
@@ -194,7 +197,7 @@
             <% content_blobs.each do |cb| %>
                 var element = document.createElement('input');
                 element.name = "content_blobs[id][<%= cb.id%>]";
-                element.value = "<%= cb.original_filename%>";
+                element.value = "<%= cb.url || cb.original_filename %>";
                 element.type = 'hidden';
                 var current_element = multi_selector.current_element;
                 current_element.parentNode.insertBefore(element, current_element);
