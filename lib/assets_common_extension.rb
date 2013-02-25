@@ -216,7 +216,7 @@ module AssetsCommonExtension
     asset = eval "@#{self.controller_name.downcase.singularize}"
     sym = self.controller_name.downcase.singularize.to_sym
     version = asset.version
-    if asset.respond_to?(:content_blob) and !asset.respond_to?(:content_blobs)
+    if asset.respond_to?(:content_blob) && !asset.respond_to?(:content_blobs)
       #if request is sent from a browser running on window, take the content type from the filename instead
       if request.headers['HTTP_USER_AGENT'].include?('Win')
         content_type = content_type_from_filename params[sym][:original_filename]

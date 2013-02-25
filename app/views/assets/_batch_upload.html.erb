@@ -1,4 +1,5 @@
-<%= javascript_include_tag 'attachments', 'models' %>
+<%= javascript_include_tag 'batch_upload', 'models', 'parseuri' %>
+<%= stylesheet_link_tag 'batch_upload' %>
 
 <%
    # determine the asset type from the controller
@@ -8,7 +9,7 @@
    class << resource
        attr_accessor :data_url, :local_copy
    end unless resource.nil?
-   resource.local_copy=1 unless resource.nil?
+   resource.local_copy=0 unless resource.nil?
    asset_name = text_for_resource upload_field
    @content_blob ||= ContentBlob.new
    with_image_file = resource && resource.kind_of?(Model) && (mine?(resource) || resource.can_edit?)
@@ -24,9 +25,8 @@
 
 <div class="box_infotext">
   <p>
-    You can register a <%= asset_name.pluralize -%> by either directly uploading one/multiple files, or registering one/multiple URLs or uploading a image file. Please test the URLs
-    before
-    submitting.
+    You can register a <%= asset_name -%> by either directly uploading files, or registering URLs to either another page or remote file. Please test each URL before submitting.
+    You can register multiple items for this <%= asset_name -%>.
     <%= link_to_function "More info "+image("expand"), :id => 'more_info_expand_image' do |page|
       page.visual_effect(:toggle_appear, "more_upload_info", :duration => 0.3)
       page["more_info_expand_image"].toggle
@@ -42,22 +42,30 @@
   </p>
     <span id="more_upload_info" style="display:none;">
         <p>
-          When registering a URL you can specify that a copy of the data should be stored
-          within SEEK. This is recommended and is equivalent to uploading a file. It also means that should the data
-          behind the URL the data is still available from SEEK.
+          If the URL points to another webpage - for example a collection of datasets in another repostiory - then the link will be shown for this asset, and there will be no download option.
         </p>
+        <p>
+          If the URL points to a remote file, then it will appear just like an uploaded asset in SEEK. If accessing the file requires authorization, then SEEK has no option but to store only the URL. In this case, when another user selects to download the <%= asset_name -%>
+          then they will simply directed to the URL (for example, so that they can login to access the file).
+        </p>
+        <p>
+          When registering a URL to a file, you can specify that a copy of the data should be stored
+          within SEEK. This is recommended and is equivalent to uploading a file. It also means that should the data behind the URL become unavailable, the data is still available from SEEK. However, you should
+          be sure that the copyright on the file allows you to do this.
+        </p>
+        <p></p>
     </span>
   <% if new_version -%>
       <p>
-        You are about to upload a new version of this <%= resource.class.name.humanize -%>. You should only upload a new version if you have made minor modifications, such as tidying up or fixing errors, that do not change the original purpose
-        of the file. If you think this new version changes the original purpose or meaning of the <%= resource.class.name.humanize -%>, then you should <span style="text-decoration: underline"><%= link_to "upload it as a new item",polymorphic_path(resource,:action=>:new) -%> </span>
-        rather than create a new version. The files/urls from previous version are retained by default, you can remove them from the below list.
+        You are about to upload a new version of this <%= asset_name -%>. You should only upload a new version if you have made minor modifications, such as tidying up or fixing errors, that do not change the original purpose
+        of the file. If you think this new version changes the original purpose or meaning of the <%= asset_name -%>, then you should <span style="text-decoration: underline"><%= link_to "upload it as a new item",polymorphic_path(obj,:action=>:new) -%></span>
+        rather than create a new version.
       </p>
   <% end -%>
 </div>
 
 <div class="yui-g">
-  <div class="yui-u first" style="width: <%= with_image_file ? '42%' : '100%'%>; margin-left: 2em; margin-top: 1em; margin-bottom: 1em;">
+  <div class="yui-u first">
 
   <div id="upload_type_selection">
     <ul id="switch_upload_buttons">
@@ -72,9 +80,6 @@
           <p>
             <b>File to upload:</b>
             <br/>
-            <%#= file_field upload_field, :data -%>
-
-
                 <% fields_for @content_blob do |content_blob| -%>
                     <input id="content_blob_data" type="file">
                 <% end %>
@@ -83,22 +88,22 @@
         </div>
         <div id="upload_from_url" style="display:none;">
           <p>
-            <b>URL:</b>You can register a
+            <b>URL:</b>
             <span class="required">*</span>
 
 
-            <%= text_field_tag "content_blob[data_url]", resource.data_url, :size => 55 %>
+            <%= text_field_tag "content_blob[data_url]", resource.data_url, :size => 45 %>
+                <span style="display:inline-block;">
+                    <%= link_to_function (image("new") + "Add"), "addToList()" %>
+                    <%= link_to_remote image("test", :title=>"Test", :alt=>"Test")+" Test",
+                                       {:url=>{:action=>:test_asset_url, :symb=>"content_blob"},
+                                       :method=>:post,
+                                       :type => :synchronous,
+                                       :with=>"multi_selector.current_url_element.serialize()",
+                                       :before=>"$('test_url_msg').innerHTML='';show_ajax_loader('test_url_result_icon');"},
+                                        {:id => 'test'}-%>
+                </span>
 
-                <%= link_to_function (image("new") + "Add"), "addToList()" %>
-                <%= link_to_remote image("test", :title=>"Test", :alt=>"Test")+" Test",
-                                   {:url=>{:action=>:test_asset_url, :symb=>"content_blob"},
-                                   :method=>:post,
-                                   :type => :synchronous,
-                                   :with=>"multi_selector.current_url_element.serialize()",
-                                   :before=>"$('test_url_msg').innerHTML='';show_ajax_loader('test_url_result_icon');"},
-                                    {:id => 'test'}-%>
-
-                <br/>
                 <p style="clear:both;">
                   <b>Make a copy?</b>
                   <%= check_box upload_field, :local_copy, :id=>"local_copy" -%>
@@ -121,12 +126,14 @@
   </table>
 </div>
 
-<div class="yui-u" style="width: <%= with_image_file ? '42%' : '0%'%>;margin-right: 2em; margin-top: 1em; margin-bottom: 1em;">
+
 <% if with_image_file -%>
-    <%resource_name = resource.class.name.underscore%>
+      <div class="yui-u" id="image_file_box">
+    <% resource_name = resource.class.name.underscore %>
     <%= hidden_field_tag("#{resource_name}_id", resource.id) -%>
       <p>
         <b>Image file: </b>
+        <br/>
         <%= file_field "#{resource_name}_image", :image_file, :onchange => "detectFileFormat('#{resource_name}_image_image_file')" %>
       </p>
       <% if new_version && previous_version_image_file = resource.latest_version.model_image.try(:original_filename) -%>
@@ -135,8 +142,9 @@
             <%= hidden_field_tag 'previous_version_image', previous_version_image_file %>
           </p>
       <% end -%>
+      </div>
 <% end -%>
-</div>
+
 </div>
 
 <script type="text/javascript">
@@ -161,10 +169,9 @@
         listFilesOfPreviousVersion();
     <% end %>
 
-
     function addToList() {
-        var url = multi_selector.current_original_filename_url_element.value || parseUri(multi_selector.current_url_element.value).file;
-
+        var url = multi_selector.current_original_filename_url_element.value || multi_selector.current_url_element.value;
+        error=false;
         if (url != "" && url != null) {
             var new_element = document.createElement('input');
             new_element.type = 'text';
@@ -173,17 +180,21 @@
             var original_filename_element = document.createElement('input');
             original_filename_element.type = 'hidden';
             original_filename_element.name = 'content_blob[original_filename_' + (multi_selector.id_url) + ']';
+
             $('upload_from_url').appendChild(original_filename_element);
             if (old_element.value != "") {
                 old_element.parentNode.insertBefore(new_element, old_element);
                 old_element.multi_selector.addElement(new_element);
-                old_element.multi_selector.addListRow(old_element, old_element.multi_selector.object_name, old_element.multi_selector.method);
+                old_element.multi_selector.addListRow(old_element);
                 old_element.type = 'hidden';
             } else {
                 old_element.focus();
             }
 
         }else{
+            error=true;
+        }
+        if (error) {
             alert("The URL cannot be parsed. The data behind the URL may not exist or be available from SEEK");
         }
     }
@@ -194,7 +205,7 @@
             <% content_blobs.each do |cb| %>
                 var element = document.createElement('input');
                 element.name = "content_blobs[id][<%= cb.id%>]";
-                element.value = "<%= cb.original_filename%>";
+                element.value = "<%= cb.url || cb.original_filename %>";
                 element.type = 'hidden';
                 var current_element = multi_selector.current_element;
                 current_element.parentNode.insertBefore(element, current_element);
