@@ -25,9 +25,8 @@
 
 <div class="box_infotext">
   <p>
-    You can register a <%= asset_name.pluralize -%> by either directly uploading one/multiple files, or registering one/multiple URLs or uploading a image file. Please test the URLs
-    before
-    submitting.
+    You can register a <%= asset_name -%> by either directly uploading files, or registering URLs to either another page or remote file. Please test each URL before submitting.
+    You can register multiple items for this <%= asset_name -%>.
     <%= link_to_function "More info "+image("expand"), :id => 'more_info_expand_image' do |page|
       page.visual_effect(:toggle_appear, "more_upload_info", :duration => 0.3)
       page["more_info_expand_image"].toggle
@@ -43,16 +42,24 @@
   </p>
     <span id="more_upload_info" style="display:none;">
         <p>
-          When registering a URL you can specify that a copy of the data should be stored
-          within SEEK. This is recommended and is equivalent to uploading a file. It also means that should the data
-          behind the URL the data is still available from SEEK.
+          If the URL points to another webpage - for example a collection of datasets in another repostiory - then the link will be shown for this asset, and there will be no download option.
         </p>
+        <p>
+          If the URL points to a remote file, then it will appear just like an uploaded asset in SEEK. If accessing the file requires authorization, then SEEK has no option but to store only the URL. In this case, when another user selects to download the <%= asset_name -%>
+          then they will simply directed to the URL (for example, so that they can login to access the file).
+        </p>
+        <p>
+          When registering a URL to a file, you can specify that a copy of the data should be stored
+          within SEEK. This is recommended and is equivalent to uploading a file. It also means that should the data behind the URL become unavailable, the data is still available from SEEK. However, you should
+          be sure that the copyright on the file allows you to do this.
+        </p>
+        <p></p>
     </span>
   <% if new_version -%>
       <p>
-        You are about to upload a new version of this <%= resource.class.name.humanize -%>. You should only upload a new version if you have made minor modifications, such as tidying up or fixing errors, that do not change the original purpose
-        of the file. If you think this new version changes the original purpose or meaning of the <%= resource.class.name.humanize -%>, then you should <span style="text-decoration: underline"><%= link_to "upload it as a new item",polymorphic_path(resource,:action=>:new) -%> </span>
-        rather than create a new version. The files/urls from previous version are retained by default, you can remove them from the below list.
+        You are about to upload a new version of this <%= asset_name -%>. You should only upload a new version if you have made minor modifications, such as tidying up or fixing errors, that do not change the original purpose
+        of the file. If you think this new version changes the original purpose or meaning of the <%= asset_name -%>, then you should <span style="text-decoration: underline"><%= link_to "upload it as a new item",polymorphic_path(obj,:action=>:new) -%></span>
+        rather than create a new version.
       </p>
   <% end -%>
 </div>
