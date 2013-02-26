@@ -40,7 +40,7 @@ module AssetsCommonExtension
   def show_via_url asset, content_blob=nil
     content_blob = content_blob.nil? ? asset.content_blob : content_blob
     code = url_response_code(content_blob.url)
-    if (["302", "401"].include?(code))
+    if (["301","302", "401"].include?(code))
       redirect_to(content_blob.url, :target=>"_blank")
     elsif code=="404"
       flash[:error]="This item is referenced at a remote location, which is currently unavailable"
@@ -163,7 +163,7 @@ module AssetsCommonExtension
 
               @content_types << data_hash[:content_type]
               @original_filenames << (params_original_filename_from_ulr[index] || data_hash[:filename])
-            elsif (["302", "401"].include?(code))
+            elsif (["301","302", "401"].include?(code))
               @tmp_io_objects_url << ""
               @content_types << ""
               @original_filenames << ""
@@ -249,8 +249,7 @@ module AssetsCommonExtension
       end
 
       @data_urls.each_with_index do |data_url, index|
-        asset.content_blobs.create(:tmp_io_object => @tmp_io_objects_url[index],
-                                   :url=>data_url,
+        asset.content_blobs.create(:url=>data_url,
                                    :original_filename=>@original_filenames[index],
                                    :content_type=>@content_types[index],
                                    :asset_version=>version)
