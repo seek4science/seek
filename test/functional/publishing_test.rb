@@ -196,7 +196,7 @@ class PublishingTest < ActionController::TestCase
       post :publish,params.merge(:id=>df3)
     end
     assert_response :success
-    record_body
+
     assert_select "ul#published" do
       assert_select "li",:text=>/Investigation: #{inv.title}/,:count=>1
       assert_select "li",:text=>/Study: #{study.title}/,:count=>0
