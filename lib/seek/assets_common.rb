@@ -65,9 +65,9 @@ module Seek
         if code == "200"
           icon_filename=icon_filename_for_key("tick")
           msg="The URL was accessed successfully"
-        elsif code == "302"
+        elsif code == "302" || code == "301"
           icon_filename=icon_filename_for_key("warn")
-          msg="The url responded with a <b>redirect</b>. It can still be used, but content type and filename may not be recorded.<br/>You will also not be able to make a copy. When a user downloads this file, they will be redirected to the URL."
+          msg="The url responded with a <b>redirect</b>. It can still be used, but if adding a url to a resource, the content type and filename may not be recorded.<br/>You will also not be able to make a copy. When a user downloads this file, they will be redirected to the URL."
         elsif code == "401"
           icon_filename=icon_filename_for_key("warn")
           msg="The url responded with <b>unauthorized</b>.<br/> It can still be used, but content type and filename will not be recorded.<br/>You will also not be able to make a copy. When a user downloads this file, they will be redirected to the URL."
@@ -147,7 +147,7 @@ module Seek
               
               params[symb][:content_type] = data_hash[:content_type]
               params[symb][:original_filename] = data_hash[:filename] if params[symb][:original_filename].blank?
-            elsif (["302","401"].include?(code))
+            elsif (["301","302","401"].include?(code))
               params[symb][:content_type] = ""
               params[symb][:original_filename] = ""
             else

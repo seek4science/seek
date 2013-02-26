@@ -646,7 +646,7 @@ class DataFilesControllerTest < ActionController::TestCase
     assert_not_nil flash[:error]
   end
 
-  #This test is quite fragile, because it relies on an external resource
+
   test "should create and redirect on download for 401 url" do
     mock_http
     df = {:title=>"401",:data_url=>"http://mocked401.com",:projects=>[projects(:sysmo_project)]}
@@ -671,7 +671,7 @@ class DataFilesControllerTest < ActionController::TestCase
   end
 
 
-  #This test is quite fragile, because it relies on an external resource
+
   test "should create and redirect on download for 302 url" do
     mock_http
     df = {:title=>"302",:data_url=>"http://mocked302.com",:projects=>[projects(:sysmo_project)]}
@@ -693,6 +693,29 @@ class DataFilesControllerTest < ActionController::TestCase
 
     get :download, :id => assigns(:data_file)
     assert_redirected_to "http://mocked302.com"
+  end
+
+  test "should create and redirect on download for 301 url" do
+    mock_http
+    df = {:title=>"301",:data_url=>"http://mocked301.com",:projects=>[projects(:sysmo_project)]}
+    assert_difference('ActivityLog.count') do
+      assert_difference('DataFile.count') do
+        assert_difference('ContentBlob.count') do
+          post :create, :data_file => df, :sharing=>valid_sharing
+        end
+      end
+    end
+
+    assert_redirected_to data_file_path(assigns(:data_file))
+    assert_equal users(:datafile_owner),assigns(:data_file).contributor
+    assert !assigns(:data_file).content_blob.url.blank?
+    assert assigns(:data_file).content_blob.data_io_object.nil?
+    assert !assigns(:data_file).content_blob.file_exists?
+    assert_equal "",assigns(:data_file).content_blob.original_filename
+    assert_equal "",assigns(:data_file).content_blob.content_type
+
+    get :download, :id => assigns(:data_file)
+    assert_redirected_to "http://mocked301.com"
   end
 
   test "report error when file unavailable for download" do
@@ -1437,45 +1460,7 @@ class DataFilesControllerTest < ActionController::TestCase
     assert_select "span#treatments",:text=>/you do not have permission to view the treatments/i
   end
 
-  test "should create datafile for 302 url" do
-    mock_http
-    df = {:title=>"302",:data_url=>"http://mocked302.com",:projects=>[projects(:sysmo_project)]}
-    assert_difference('ActivityLog.count') do
-      assert_difference('DataFile.count') do
-        assert_difference('ContentBlob.count') do
-          post :create, :data_file => df, :sharing=>valid_sharing
-        end
-      end
-    end
 
-    assert_redirected_to data_file_path(assigns(:data_file))
-    assert_equal users(:datafile_owner),assigns(:data_file).contributor
-    assert !assigns(:data_file).content_blob.url.blank?
-    assert assigns(:data_file).content_blob.data_io_object.nil?
-    assert !assigns(:data_file).content_blob.file_exists?
-    assert_equal "",assigns(:data_file).content_blob.original_filename
-    assert_equal "",assigns(:data_file).content_blob.content_type
-  end
-
-  test "should create datafile for 401 url" do
-    mock_http
-    df = {:title=>"401",:data_url=>"http://mocked401.com",:projects=>[projects(:sysmo_project)]}
-    assert_difference('ActivityLog.count') do
-      assert_difference('DataFile.count') do
-        assert_difference('ContentBlob.count') do
-          post :create, :data_file => df, :sharing=>valid_sharing
-        end
-      end
-    end
-
-    assert_redirected_to data_file_path(assigns(:data_file))
-    assert_equal users(:datafile_owner),assigns(:data_file).contributor
-    assert !assigns(:data_file).content_blob.url.blank?
-    assert assigns(:data_file).content_blob.data_io_object.nil?
-    assert !assigns(:data_file).content_blob.file_exists?
-    assert_equal "",assigns(:data_file).content_blob.original_filename
-    assert_equal "",assigns(:data_file).content_blob.content_type
-  end
 
   private
 
@@ -1484,6 +1469,7 @@ class DataFilesControllerTest < ActionController::TestCase
     stub_request(:get, "http://mockedlocation.com/a-piccy.png").to_return(:body => File.new(file), :status => 200, :headers=>{'Content-Type' => 'image/png'})
     stub_request(:head, "http://mockedlocation.com/a-piccy.png")
 
+    stub_request(:any, "http://mocked301.com").to_return(:status=>301)
     stub_request(:any, "http://mocked302.com").to_return(:status=>302)
     stub_request(:any, "http://mocked401.com").to_return(:status=>401)
     stub_request(:any, "http://mocked404.com").to_return(:status=>404)
@@ -1494,6 +1480,7 @@ class DataFilesControllerTest < ActionController::TestCase
     stub_request(:get, "https://mockedlocation.com/a-piccy.png").to_return(:body => File.new(file), :status => 200, :headers=>{'Content-Type' => 'image/png'})
     stub_request(:head, "https://mockedlocation.com/a-piccy.png")
 
+    stub_request(:any, "https://mocked301.com").to_return(:status=>301)
     stub_request(:any, "https://mocked302.com").to_return(:status=>302)
     stub_request(:any, "https://mocked401.com").to_return(:status=>401)
     stub_request(:any, "https://mocked404.com").to_return(:status=>404)
