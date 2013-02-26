@@ -58,7 +58,7 @@
   <% if new_version -%>
       <p>
         You are about to upload a new version of this <%= asset_name -%>. You should only upload a new version if you have made minor modifications, such as tidying up or fixing errors, that do not change the original purpose
-        of the file. If you think this new version changes the original purpose or meaning of the <%= asset_name -%>, then you should <span style="text-decoration: underline"><%= link_to "upload it as a new item",polymorphic_path(obj,:action=>:new) -%></span>
+        of the file. If you think this new version changes the original purpose or meaning of the <%= asset_name -%>, then you should <span style="text-decoration: underline"><%= link_to "upload it as a new item",polymorphic_path(resource,:action=>:new) -%></span>
         rather than create a new version.
       </p>
   <% end -%>
