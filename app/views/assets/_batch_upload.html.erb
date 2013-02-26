@@ -92,7 +92,7 @@
             <span class="required">*</span>
 
 
-            <%= text_field_tag "content_blob[data_url]", resource.data_url, :size => 45 %>
+            <%= text_field_tag "content_blob[data_url]", resource.data_url, :size => 35 %>
                 <span style="display:inline-block;">
                     <%= link_to_function (image("new") + "Add"), "addToList()" %>
                     <%= link_to_remote image("test", :title=>"Test", :alt=>"Test")+" Test",
@@ -175,8 +175,8 @@
         if (url != "" && url != null) {
             var new_element = document.createElement('input');
             new_element.type = 'text';
-            new_element.size = '55';
             var old_element = document.getElementsByName('content_blob[url_' + (multi_selector.id_url - 1) + ']')[0];
+            new_element.size = old_element.size
             var original_filename_element = document.createElement('input');
             original_filename_element.type = 'hidden';
             original_filename_element.name = 'content_blob[original_filename_' + (multi_selector.id_url) + ']';
