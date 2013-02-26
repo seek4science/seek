@@ -249,8 +249,7 @@ module AssetsCommonExtension
       end
 
       @data_urls.each_with_index do |data_url, index|
-        asset.content_blobs.create(:tmp_io_object => @tmp_io_objects_url[index],
-                                   :url=>data_url,
+        asset.content_blobs.create(:url=>data_url,
                                    :original_filename=>@original_filenames[index],
                                    :content_type=>@content_types[index],
                                    :asset_version=>version)
