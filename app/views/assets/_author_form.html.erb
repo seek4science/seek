@@ -26,20 +26,20 @@
   <div id="creator_fold_content" class="foldContent" style="display:<%= existing_creators.blank? ? 'none' : 'block' -%>">
 
     <p>
-      If this <%= resource_type %> was created by, or together with, other <%= Seek::Config.project_name %> members, please list their names below. <br/>
-      The creators you specify will have the right to 'view and edit summary and contents' of this <%= resource_type %>.
+      If this <%= resource_type %> was contributed by, or together with, other <%= Seek::Config.project_name %> members, please list their names below. <br/>
+      The contributors you specify will have the right to 'view and edit summary and contents' of this <%= resource_type %>.
     </p>
 
     <div class="box_editing">
       <p style="color: #666666;">
-        So far you have specified the following creators:
+        So far you have specified the following contributors:
       </p>
       <p id="creators_list" class="box_editing_inner">
         <span class="none_text" id="creators_text">Loading...</span>
       </p>      
       <p>
-        Please type creators into the box below - suggestions will be displayed as you type.
-        Select creators that you want to include and click "Add" to add them to the list.
+        Please type contributors into the box below - suggestions will be displayed as you type.
+        Select contributors that you want to include and click "Add" to add them to the list.
       </p>
 
       <table id="facebook" class="clearfix">
@@ -58,7 +58,7 @@
           </td>
         </tr>
 		<tr>
-			<td><%= link_to_function (image("new") + " Add creator"), "addCreators(); return(false);", :id=>"add_creator", :class=>"block_link" %></td>
+			<td><%= link_to_function (image("new") + " Add contributor"), "addCreators(); return(false);", :id=>"add_creator", :class=>"block_link" %></td>
 		</tr>
       </table>
 
@@ -86,7 +86,7 @@
     <br/>
     <div>
       <p>
-        If anyone not registered with SEEK assisted with the creation of this <%= resource_type %>, you can specify them below.
+        If anyone not registered with SEEK assisted with the contribution of this <%= resource_type %>, you can specify them below.
       </p>
       <%= text_field_tag original_resource_type.underscore+"[other_creators]", other_creators, :size=>90 %>
     </div>
