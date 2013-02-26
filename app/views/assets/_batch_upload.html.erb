@@ -171,8 +171,13 @@
 
     function addToList() {
         var url = multi_selector.current_original_filename_url_element.value || multi_selector.current_url_element.value;
-        error=false;
-        if (url != "" && url != null) {
+        var error=false;
+        var parsed = parseUri(url);
+
+        if (!parsed.protocol || !parsed.host || parsed.host=="null") {
+            error=true;
+        }
+        else {
             var new_element = document.createElement('input');
             new_element.type = 'text';
             var old_element = document.getElementsByName('content_blob[url_' + (multi_selector.id_url - 1) + ']')[0];
@@ -191,11 +196,10 @@
                 old_element.focus();
             }
 
-        }else{
-            error=true;
         }
+
         if (error) {
-            alert("The URL cannot be parsed. The data behind the URL may not exist or be available from SEEK");
+            alert("In invalid URL was provided");
         }
     }
 
