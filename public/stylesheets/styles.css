@@ -1713,14 +1713,22 @@ p.import_details {
 }
 
 ul.fileinfo_list {
-    margin-left: 2em;
+    margin-left: 0.5em;
 }
 
 ul.fileinfo_list li.fileinfo {
     float: left;
-    padding-right: 1.5em;
-    margin-bottom: 1em;
 }
+
+li.fileinfo div.fileinfo2 {
+    background-color: white;
+    border: 1px dotted black;
+    padding: 0.75em;
+    margin: 0.25em;
+    min-height: 8.1em;
+    max-width: 22em;
+}
+
 
 div#guide_box {
     min-height: 4em;
