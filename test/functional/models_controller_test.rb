@@ -363,7 +363,7 @@ class ModelsControllerTest < ActionController::TestCase
     assert_equal private_policy.use_blacklist,model.policy.use_blacklist
     assert model.policy.permissions.empty?
     
-    #check it doesn't create an error when retreiving the index
+    #check it doesn't create an error when retrieving the index
     get :index
     assert_response :success    
   end

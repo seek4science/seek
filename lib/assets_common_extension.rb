@@ -159,7 +159,7 @@ module AssetsCommonExtension
               downloader=Seek::RemoteDownloader.new
               data_hash = downloader.get_remote_data data_url, nil, nil, nil, make_local_copy
 
-              @tmp_io_objects_url << File.open(data_hash[:data_tmp_path], "r")
+              @tmp_io_objects_url << File.open(data_hash[:data_tmp_path], "r") if make_local_copy
 
               @content_types << data_hash[:content_type]
               @original_filenames << (params_original_filename_from_ulr[index] || data_hash[:filename])
