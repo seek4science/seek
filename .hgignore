@@ -1,9 +1,3 @@
-app/controllers/data_files_controller_copy.rb
-lib/seek/bio_samples_copy.rb
-lib/seek/data_file_extraction_copy.rb
-bench.sh
-perftest*
-
 syntax: glob
 .redcar/
 .idea/
@@ -22,8 +16,6 @@ filestore*/
 
 debug.log
 .project
-
-seek_test.sql
 
 tmp/pids/*
 tmp/cache/*
@@ -52,7 +44,6 @@ public/javascripts/pdfjs/*
 
 .bundle/config
 
-config/default_data/Specimen_example_Quyen1.xls
 new_version
 server
 svg
