@@ -312,7 +312,7 @@ module AssetsCommonExtension
   private
 
   def make_and_send_zip_file files_to_download, asset
-    zip_path= File.join(tmp_zip_file_dir,"#{Time.now.year}#{Time.now.month}#{Time.now.day}_#{asset.uuid}.zip")
+    zip_path= File.join(tmp_zip_file_dir,"#{Time.now.to_f}_#{asset.uuid}.zip")
 
     t = File.new(zip_path,"w+")
     # Give the path of the temp file to the zip outputstream, it won't try to open it as an archive.
