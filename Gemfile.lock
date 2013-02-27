@@ -119,7 +119,7 @@ GEM
     ruby-openid (2.2.2)
     ruby-prof (0.12.2)
     ruby18_source_location (0.2)
-    rubyzip2 (2.0.2)
+    rubyzip (0.9.9)
     savon (1.1.0)
       akami (~> 1.2.0)
       builder (>= 2.1.2)
@@ -191,7 +191,7 @@ DEPENDENCIES
   ruby-openid
   ruby-prof
   ruby18_source_location
-  rubyzip2
+  rubyzip
   savon (= 1.1.0)
   search_biomodel (= 2.2.1)!
   simple-spreadsheet-extractor (= 0.12.1)

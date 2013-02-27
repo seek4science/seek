@@ -159,12 +159,12 @@ module AssetsCommonExtension
               downloader=Seek::RemoteDownloader.new
               data_hash = downloader.get_remote_data data_url, nil, nil, nil, make_local_copy
 
-              @tmp_io_objects_url << File.open(data_hash[:data_tmp_path], "r") if make_local_copy
+              @tmp_io_objects_url << File.open(data_hash[:data_tmp_path], "r")
 
               @content_types << data_hash[:content_type]
               @original_filenames << (params_original_filename_from_ulr[index] || data_hash[:filename])
             elsif (["301","302", "401"].include?(code))
-              @tmp_io_objects_url << ""
+              @tmp_io_objects_url << nil
               @content_types << ""
               @original_filenames << ""
             else
@@ -249,7 +249,8 @@ module AssetsCommonExtension
       end
 
       @data_urls.each_with_index do |data_url, index|
-        asset.content_blobs.create(:url=>data_url,
+        asset.content_blobs.create(:tmp_io_object => @tmp_io_objects_url[index],
+                                   :url=>data_url,
                                    :original_filename=>@original_filenames[index],
                                    :content_type=>@content_types[index],
                                    :asset_version=>version)
@@ -311,7 +312,9 @@ module AssetsCommonExtension
   private
 
   def make_and_send_zip_file files_to_download, asset
-    t = Tempfile.new("#{Time.now.year}#{Time.now.month}#{Time.now.day}_#{asset.class.name.downcase}_#{asset.id}","#{RAILS_ROOT}/tmp")
+    zip_path= File.join(tmp_zip_file_dir,"#{Time.now.year}#{Time.now.month}#{Time.now.day}_#{asset.uuid}.zip")
+
+    t = File.new(zip_path,"w+")
     # Give the path of the temp file to the zip outputstream, it won't try to open it as an archive.
     Zip::ZipOutputStream.open(t.path) do |zos|
       files_to_download.each do |filename,filepath|
@@ -323,6 +326,16 @@ module AssetsCommonExtension
     send_file t.path, :type => 'application/zip', :disposition => 'attachment', :filename => "#{asset.title}.zip"
     # The temp file will be deleted some time...
     t.close
+  end
+
+  def tmp_zip_file_dir
+    if Rails.env=="test"
+      dir = File.join(Dir.tmpdir,"seek-tmp","zip-files")
+    else
+      dir = File.join(Rails.root,"tmp","zip-files")
+    end
+    FileUtils.mkdir_p dir if !File.exists?(dir)
+    dir
   end
 
   def check_and_rename_file filename_list, filename

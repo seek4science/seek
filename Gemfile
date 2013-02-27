@@ -19,7 +19,7 @@ gem 'rest-client',">=1.6.1"
 gem 'calendar_date_select'
 gem 'factory_girl',"2.6.4"
 gem 'ratom',"0.6.9"
-gem 'rubyzip2'
+gem 'rubyzip'
 gem 'bio'
 gem 'sunspot_rails','1.3.3'
 gem 'sunspot_solr','1.3.3'
