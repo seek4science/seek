@@ -345,16 +345,7 @@ span.disabled_icon {
 
 .main_content_left_box_narrower {
     float: left;
-    width: 60%;
-    margin-left: 2.5%;
-}
-
-.main_content_button_box {
-    float: left;
-    width: 10%;
-    text-align: center;
-    margin-bottom: 0.6em;
-
+    width: 74%;
 }
 
 .main_content_right_box_wider {

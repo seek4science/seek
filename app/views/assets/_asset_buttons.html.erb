@@ -7,11 +7,11 @@
            path = polymorphic_path(asset,:version=>version,:action=>:download,:code=>params[:code])
         %>
         <li>
-          <%= image_tag_for_key('download', path, "Download #{human_name}", {:style => "display:block;width:90%;"}, "Download #{human_name}") -%>
+          <%= image_tag_for_key('download', path, "Download #{human_name}", nil, "Download #{human_name}") -%>
         </li>
         <% if asset.is_a?(DataFile) && display_asset.contains_extractable_spreadsheet? %>
             <li>
-              <%= image_tag_for_key('spreadsheet', polymorphic_path(asset, :version => version, :action => :explore, :code=>params[:code]), "Explore #{human_name}", {:style => "display:block;width:90%;"}, "Explore #{human_name}") -%>
+              <%= image_tag_for_key('spreadsheet', polymorphic_path(asset, :version => version, :action => :explore, :code=>params[:code]), "Explore #{human_name}", nil, "Explore #{human_name}") -%>
             </li>
         <% end -%>
         <% unless Seek::Util.multi_files_asset_types.include?(asset.class) %>
@@ -26,24 +26,24 @@
 
   <% if asset.can_manage? -%>
     <% if asset.is_downloadable? -%>
-        <li><%= link_to_function image("new")+" Upload new version", visual_effect(:toggle_appear, "upload_new_version_form"), :style => "display:block;width:90%;" -%></li>
+        <li><%= link_to_function image("new")+" Upload new version", visual_effect(:toggle_appear, "upload_new_version_form") -%></li>
     <% end -%>
-    <li><%= image_tag_for_key('manage', polymorphic_path(asset,:action=>:edit), nil, {:style => "display:block;width:90%;"}, "Manage #{human_name}") -%></li>
+    <li><%= image_tag_for_key('manage', polymorphic_path(asset,:action=>:edit), nil, nil, "Manage #{human_name}") -%></li>
     <% if asset.is_publishable? -%>
-        <li><%= image_tag_for_key('publish', polymorphic_path(asset,:action=>:preview_publish), nil, {:style => "display:block;width:90%;"}, "Publish #{human_name}") -%></li>
+        <li><%= image_tag_for_key('publish', polymorphic_path(asset,:action=>:preview_publish), nil, nil, "Publish #{human_name}") -%></li>
     <% end -%>
   <% elsif asset.can_edit? -%>
     <%# this is not owner, but current user can edit -%>
-    <li><%= image_tag_for_key('edit', polymorphic_path(asset,:action=>:edit), nil, {:style => "display:block;width:90%;"}, "Edit #{human_name}") -%></li>
+    <li><%= image_tag_for_key('edit', polymorphic_path(asset,:action=>:edit), nil, nil, "Edit #{human_name}") -%></li>
   <% end -%>
 
   <% if asset.can_delete? -%>
-    <li><%= image_tag_for_key('destroy', polymorphic_path(asset), nil, { :confirm => delete_confirm_message, :method => :delete, :style => "display:block;width:90%;" }, "Delete #{human_name}") -%></li>
+    <li><%= image_tag_for_key('destroy', polymorphic_path(asset), nil, { :confirm => delete_confirm_message, :method => :delete }, "Delete #{human_name}") -%></li>
   <% end -%>
 
   <% if (asset.can_delete? or current_user.try(:admin?)) and asset.respond_to? :to_presentation %>
       <li>
-        <%= image_tag_for_key "arrow_right", convert_to_presentation_data_file_path(asset.id), nil, {:style => "display:block;width:90%;", :title => "click to move this data file to presentations",:confirm => "Are you sure you wish to move this data file to presentations? Doing so is irreversible!", :method => :post}, 'Move to presentations'%>
+        <%= image_tag_for_key "arrow_right", convert_to_presentation_data_file_path(asset.id), nil, {:title => "click to move this data file to presentations",:confirm => "Are you sure you wish to move this data file to presentations? Doing so is irreversible!", :method => :post}, 'Move to presentations'%>
      </li>
    <% end %>
 
