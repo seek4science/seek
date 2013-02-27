@@ -35,6 +35,7 @@ tmp/restart.txt
 tmp/profile-*
 tmp/test_content_blobs/*
 tmp/*.csv
+tmp/zip-files
 *.tmp*
 *~
 
