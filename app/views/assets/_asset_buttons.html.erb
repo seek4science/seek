@@ -19,9 +19,7 @@
         <% end %>
     <% elsif logged_in? -%>
         <li>
-          <span id="request_resource_button">
-            <%= link_to_function request_request_label(asset), "requestResourceForm();"-%>
-          </span>
+          <%= render :partial=>"assets/request_resource",:locals=>{:resource=>asset} %>
         </li>
     <% end -%>
 <% end -%>
