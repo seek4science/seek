@@ -61,53 +61,49 @@ original_filename=nil
 </div>
 
 <div>
-    <div id="upload_type_selection">
-        <ul id="switch_upload_buttons">
-            <li>
-                <%= link_to_function image("file_large"),"from_file_selected(); return (false);",:class=>"block_link_active",:id=>"upload_from_file_button",:title=>tooltip_title_attrib('Add from a local file') -%> 
-            </li>
-            <li>
-                <%= link_to_function image("internet_large"),"from_url_selected(); return (false);",:class=>"block_link",:id=>"upload_from_url_button",:title=>tooltip_title_attrib('Add from a remote URL') -%>
-            </li>
-            <li id="upload_options">
-                <div id="upload_from_file">
-                    <p>
-                        <b>File to upload:</b>
-                        <span class="required">*</span>
-                        <br/>
-                        <%= file_field upload_field, :data -%>
-                    </p>
-                </div>
-                <div id="upload_from_url" style="display:none;">
-                <p>
-                    <b>URL:</b>
-                    <span class="required">*</span>                    
-                    <%= text_field upload_field,:data_url,:size=>55 -%>
-                    <span style="display:inline-block;">
-                        <%= link_to_remote image("test",:title=>"Test",:alt=>"Test")+" Test",
-                        {:url=>{:action=>:test_asset_url},
-                        :method=>:post,
-                        :type => :synchronous,
-                        :with=>"$('#{upload_field}_data_url').serialize()",
-                        :before=>"$('test_url_msg').innerHTML='';show_ajax_loader('test_url_result_icon');"},
-                        {:id => 'test'} -%>
+  <div id="upload_type_selection">
+    <ul id="switch_upload_buttons">
+      <li>
+        <%= link_to_function image("file_large"), "from_file_selected(); return (false);", :class => "block_link_active", :id => "upload_from_file_button", :title => tooltip_title_attrib('Add from a local file') -%>
+      </li>
+      <li>
+        <%= link_to_function image("internet_large"), "from_url_selected(); return (false);", :class => "block_link", :id => "upload_from_url_button", :title => tooltip_title_attrib('Add from a remote URL') -%>
+      </li>
+      <li id="upload_options">
+        <div id="upload_from_file">
+          <b>File to upload:</b>
+          <span class="required">*</span>
+          <br/>
+          <%= file_field upload_field, :data -%>
+        </div>
+        <div id="upload_from_url" style="display:none;">
+
+          <b>URL:</b>
+          <span class="required">*</span>
+          <%= text_field upload_field, :data_url, :size => 55 -%>
+          <span style="display:inline-block;">
+                        <%= link_to_remote image("test", :title => "Test", :alt => "Test")+" Test",
+                                           {:url => {:action => :test_asset_url},
+                                            :method => :post,
+                                            :type => :synchronous,
+                                            :with => "$('#{upload_field}_data_url').serialize()",
+                                            :before => "$('test_url_msg').innerHTML='';show_ajax_loader('test_url_result_icon');"},
+                                           {:id => 'test'} -%>
                     </span>
 
-                    <p style="clear:both;">
-                        <b>Make a copy?</b>
-                        <%= check_box upload_field, :local_copy,:id=>"local_copy" -%>
-                    </p>
-                    <%= hidden_field_tag "#{upload_field}[original_filename]", original_filename -%>
-                </p>
-                <p>
-                    <span id="test_url_result_icon"></span>
-                    <span id="test_url_msg" style="display:none;"></span>
-                </p>
-                
-            </div>
-            </li>
-        </ul>
-    </div>
+          <p style="clear:both;">
+            <b>Make a copy?</b>
+            <%= check_box upload_field, :local_copy, :id => "local_copy" -%>
+          </p>
+          <p>
+            <span id="test_url_result_icon"></span>
+            <span id="test_url_msg" style="display:none;"></span>
+          </p>
+          <%= hidden_field_tag "#{upload_field}[original_filename]", original_filename -%>
+        </div>
+      </li>
+    </ul>
+  </div>
 </div>
 
 <script type="text/javascript">
