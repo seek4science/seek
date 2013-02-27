@@ -404,7 +404,30 @@ class ModelsControllerTest < ActionController::TestCase
     assert model.content_blobs.first.file_exists?
     assert_equal "sysmo-db-logo-grad2.png", model.content_blobs.first.original_filename
     assert_equal "image/png", model.content_blobs.first.content_type
-  end  
+  end
+
+
+
+  test "should add webpage with a 301 redirect" do
+    #you need to stub out both the redirecting url and the forwarded location url
+    stub_request(:head, "http://news.bbc.co.uk").to_return(:status=>301,:headers=>{'Location'=>'http://bbc.co.uk/news'})
+    stub_request(:head, "http://bbc.co.uk/news").to_return(:status=>200,:headers=>{'Content-Type' => 'text/html'})
+
+    model_details=valid_model_with_url
+    model_details[:local_copy]="0"
+    assert_difference('Model.count') do
+      assert_difference('ContentBlob.count') do
+        post :create, :model => model_details,:content_blob=>{:url_0=>"http://news.bbc.co.uk"}, :sharing=>valid_sharing
+      end
+    end
+    model = assigns(:model)
+    assert_redirected_to model_path(model)
+    assert_equal users(:model_owner),model.contributor
+    assert_equal 1,model.content_blobs.count
+    assert_equal "http://news.bbc.co.uk",model.content_blobs.first.url
+    assert model.content_blobs.first.is_webpage?
+
+  end
   
   test "should create with preferred environment" do
     assert_difference('Model.count') do
