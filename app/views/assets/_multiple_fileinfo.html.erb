@@ -11,12 +11,12 @@
      if image_count==0
        model_image_text = ""
      else
-       model_image_text = "(and an image) "
+       model_image_text = " (and an image)"
      end
    end
 %>
 <p>
-  <strong> <%= pluralize(n, 'item') -%> <%= model_image_text -%> <%= (n==1 && image_count==0) ? "is" : "are" %> associated with this <%= resource_text %>:</strong>
+  <strong> <%= pluralize(n, 'item') -%><%= model_image_text -%> <%= (n==1 && image_count==0) ? "is" : "are" %> associated with this <%= resource_text %>:</strong>
 <ul class='fileinfo_list'>
 
   <% multiple_fileinfo.content_blobs.each do |blob| -%>
