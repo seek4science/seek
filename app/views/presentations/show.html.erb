@@ -7,13 +7,13 @@
 <%= render :partial=>"assets/upload_new_version_form", :locals=>{:resource=>@presentation} -%>
 
 <div class="show_basic">
-  <div id="main_content_button_box" class="main_content_button_box">
-      <ul class="mainButtons">
+  <div class="main_content_button_box">
+      <ul class="sectionIcons">
         <%= asset_buttons @presentation,@display_presentation.version -%>
       </ul>
   </div>
 
-  <div id="main_content_left_box_narrower" class="main_content_left_box_narrower">
+  <div class="main_content_left_box_narrower">
 
     <%= render :partial=>"assets/resource_version_details", :locals=>{:displayed_resource=>@display_presentation, :resource=>@presentation} -%>
 
@@ -76,6 +76,4 @@
       }
 
   }
-
-  showOrHideButtonBox();
-</script>
+  </script>

@@ -1,41 +1,41 @@
 <% drag_id=model_to_drag_id @person %>
 
 <%= render :partial => "layouts/item_title", :locals=>{:item=>@person} %>
-<br/>
 
 <div class="show_basic">
-  <div id="main_content_button_box" class="main_content_button_box">
-    <ul class="mainButtons">
+  <div class="main_content_button_box">
+    <ul class="sectionIcons">
       <% if mine?(@person) || @person.can_be_edited_by?(current_user) -%>
           <li>
-            <%= image_tag_for_main_button('edit', edit_person_path(@person), "Edit Person Profile", nil, 'Edit Profile') -%>
+            <%= image_tag_for_key('edit', edit_person_path(@person), "Edit Person Profile", {:style => "display:block;width:90%;"}, 'Edit Profile') -%>
           </li>
           <% if mine?(@person) -%>
               <li>
-                <%= image_tag_for_main_button "lock", url_for({:controller=>:users, :action=>:edit, :id=>@person.user}), "Manage Account", nil, "Manage Account" -%>
+                <%= image_tag_for_key "lock", url_for({:controller=>:users, :action=>:edit, :id=>@person.user}), "Manage Account", {:style => "display:block;width:90%;"}, "Manage Account" -%>
               </li>
           <% end -%>
           <% if admin_logged_in? -%>
               <li>
-                <%= image_tag_for_main_button "destroy", person_path(@person), "Delete Person", {:confirm => 'Are you sure?', :method => :delete}, "Delete Person" -%>
+                <%= image_tag_for_key "destroy", person_path(@person), "Delete Person", {:confirm => 'Are you sure?', :method => :delete, :style => "display:block;width:90%;"}, "Delete Person" -%>
               </li>
           <% end -%>
       <% end %>
 
       <% if @person.can_be_administered_by?(current_user)-%>
           <li>
-            <%= image_tag_for_main_button "admin", admin_person_path(@person), "Administer", nil, "Person Administration" -%>
+            <%= image_tag_for_key "admin", admin_person_path(@person), "Administer", {:style => "display:block;width:90%;"}, "Person Administration" -%>
           </li>
       <% end -%>
     </ul>
   </div>
-
-  <div id="main_content_left_box_narrower" class="main_content_left_box_narrower">
+  <div class="main_content_left_box_narrower">
     <div class="box_about_actor">
       <%= render :partial=>"profile_information" -%>
+
+
+
     </div>
   </div>
-
   <div class="main_content_right_box_wider">
     <%= render :partial => "layouts/contribution_section_box_avatar", :locals => {:object => @person, :drag_id => drag_id} -%>
     <%= render :partial=>"personal_tags", :locals=>{:person=>@person} %>
@@ -73,7 +73,3 @@
     <% end -%>
   </div>
 </div>
-
-<script type="text/javascript">
-    showOrHideButtonBox();
-</script>

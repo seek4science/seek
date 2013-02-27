@@ -7,31 +7,31 @@
 <br/>
 
 <div class="show_basic">
-  <div id="main_content_button_box" class="main_content_button_box">
-    <ul class="mainButtons">
+  <div class="main_content_button_box">
+    <ul class="sectionIcons">
       <% if Seek::Config.project_browser_enabled && logged_in_and_registered? && current_user.person.member_of?(@project) -%>
-          <li><%= image_tag_for_main_button('organise', project_folders_path(@project), "Organise", nil, "Organise") -%></li>
+          <li><%= image_tag_for_key('organise', project_folders_path(@project), "Organise", {:style => "display:block;width:90%;"}, "Organise") -%></li>
       <% end -%>
       <% if mine?(@project) || @project.try(:can_be_edited_by?, current_user) -%>
 
-          <li><%= image_tag_for_main_button('edit', edit_project_path(@project), "Edit Project Details", nil, 'Edit Project Details') -%></li>
+          <li><%= image_tag_for_key('edit', edit_project_path(@project), "Edit Project Details", {:style => "display:block;width:90%;"}, 'Edit Project Details') -%></li>
 
           <% if @project.try(:can_be_administered_by?, current_user) -%>
-              <li><%= image_tag_for_main_button "admin", admin_project_path(@project), "Administer", nil, "Project administration" -%></li>
+              <li><%= image_tag_for_key "admin", admin_project_path(@project), "Administer", {:style => "display:block;width:90%;"}, "Project administration" -%></li>
           <% end -%>
           <% if admin_logged_in? -%>
-              <li><%= image_tag_for_main_button "destroy", project_path(@project), "Delete Project", { :confirm => 'Are you sure?', :method => :delete}, "Delete Project" -%></li>
+              <li><%= image_tag_for_key "destroy", project_path(@project), "Delete Project", { :confirm => 'Are you sure?', :method => :delete, :style => "display:block;width:90%;" }, "Delete Project" -%></li>
           <% end -%>
 
       <% end -%>
       <% if @project.try(:has_member?,current_user) -%>
           <% tooltip_text="This will present you with a short report about the items that have been shared outside of your project" %>
-          <li><%= image_tag_for_main_button "report", asset_report_project_path(@project), "Asset report", {:title=>tooltip_title_attrib(tooltip_text)}, "Asset report" -%></li>
+          <li><%= image_tag_for_key "report", asset_report_project_path(@project), "Asset report", {:title=>tooltip_title_attrib(tooltip_text),:style => "display:block;width:90%;"}, "Asset report" -%></li>
       <% end -%>
     </ul>
   </div>
 
-  <div id="main_content_left_box_narrower" class="main_content_left_box_narrower">
+  <div class="main_content_left_box_narrower">
 
     <div class="box_about_actor">      
         <p>
@@ -103,7 +103,3 @@
   </div>
   
 </div>
-
-<script type="text/javascript">
-    showOrHideButtonBox();
-</script>

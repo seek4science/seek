@@ -43,13 +43,6 @@ module ImagesHelper
     return '<span class="icon">' + inner + '</span>';
   end
 
-  def image_tag_for_main_button(key, url=nil, alt=nil, url_options={}, label=key.humanize, remote=false, size=nil)
-    html = image_tag_for_key(key, url, alt, url_options, label, remote, size)
-    #remove span element containing class icon for aligning the children middle vertical
-    #so that the children element can scale inside the parent when resizing the browser window
-    html.gsub('<span class="icon">','').gsub('</span>','')
-  end
-
   def resource_avatar resource,html_options={}
 
     if resource.avatar_key

@@ -2,13 +2,13 @@
 <br/>
 
 <div class="show_basic">
-  <div id="main_content_button_box" class="main_content_button_box">
-    <ul class="mainButtons">
+  <div class="main_content_button_box">
+    <ul class="sectionIcons">
       <%= asset_buttons @event,nil,"This deletes the Event listing. Are you sure?'" -%>
     </ul>
   </div>
 
-  <div id="main_content_left_box_narrower" class="main_content_left_box_narrower">
+  <div class="main_content_left_box_narrower">
 
       <%= render :partial => 'projects/show_project_relationship', :locals => {:resource => @event}%>
       <% unless @event.contributor.nil? then %>
@@ -57,25 +57,20 @@
       <p class="country">
         <label>Country: </label><%= text_or_not_specified @event.country, :link_as_country => true -%>
       </p>
-
-      <%= render :partial => "assets/special_auth_code_display", :locals => {:resource => @event}%>
-
-      <p>
-          <b>Description:</b>
-          <div class="box_standout" id="description">
-            <%= text_or_not_specified(@event.description, :description=>true, :auto_link=>true) %>
-          </div>
-      </p>
   </div>
 
   <div style="clear:both;">
+    <%= render :partial => "assets/special_auth_code_display", :locals => {:resource => @event}%>
+    <p>
+      <b>Description:</b>
+    <div class="box_standout" id="description">
+      <%= text_or_not_specified(@event.description, :description=>true, :auto_link=>true) %>
+    </div>
+    </p>
+
     <%= render :partial=>"layouts/items_related_to",:object => @event %>
     <br/>
     <%= render :partial => "layouts/usage_info", :locals => { :resource => @event } -%>
   </div>
 
 </div>
-
-<script type="text/javascript">
-    showOrHideButtonBox();
-</script>
