@@ -111,18 +111,19 @@ class ProjectsControllerTest < ActionController::TestCase
     login_as person.user
     get :show, :id=>project.id
     assert_response :success
-    assert_select "ul.mainButtons" do
+    assert_select "ul.sectionIcons" do
       assert_select "a[href=?]",asset_report_project_path(project),:text=>"Asset report"
     end
   end
 
   test "asset report button not shown to anonymous users" do
+
     project = Factory :project
 
     logout
     get :show, :id=>project.id
     assert_response :success
-    assert_select "ul.mainButtons" do
+    assert_select "ul.sectionIcons" do
       assert_select "a[href=?]",asset_report_project_path(project),:text=>"Asset report",:count=>0
     end
   end
@@ -136,7 +137,7 @@ class ProjectsControllerTest < ActionController::TestCase
     login_as other_person.user
     get :show, :id=>project.id
     assert_response :success
-    assert_select "ul.mainButtons" do
+    assert_select "ul.sectionIcons" do
       assert_select "a[href=?]",asset_report_project_path(project),:text=>"Sharing report",:count=>0
     end
 
@@ -423,8 +424,10 @@ class ProjectsControllerTest < ActionController::TestCase
     project = user.person.projects.first
 		login_as(user)
 		get :show,:id=>project
-		assert_select "ul.mainButtons" do
+		assert_select "ul.sectionIcons" do
+			assert_select "span.icon" do
 				assert_select "a[href=?]",admin_project_path(project),:text=>/Project administration/,:count=>0
+			end
 		end
 	end
 
@@ -434,8 +437,10 @@ class ProjectsControllerTest < ActionController::TestCase
     project = admin.projects.first
     login_as(admin.user)
 		get :show,:id=>project
-		assert_select "ul.mainButtons" do
-			assert_select "a[href=?]",admin_project_path(project),:text=>/Project administration/,:count=>1
+		assert_select "ul.sectionIcons" do
+			assert_select "span.icon" do
+				assert_select "a[href=?]",admin_project_path(project),:text=>/Project administration/,:count=>1
+			end
 		end
 	end
 
