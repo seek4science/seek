@@ -40,11 +40,16 @@ gem "rdf-rdfxml"
 gem "equivalent-xml"
 gem "breadcrumbs_on_rails","1.0.1"
 gem 'docsplit'
+
 group :development do
   gem "sqlite3-ruby","1.2.5",:require=>"sqlite3"
   gem "unicorn"
   gem "parallel_tests"
   gem "mongrel"
+  gem "pry"
+  gem "pry-doc"
+  gem 'ruby18_source_location'
+  gem "pry-remote"
 end
 
 group :test do
@@ -54,7 +59,4 @@ group :test do
   gem "webmock"
 end
 
-gem "pry", :group => :development
-gem "pry-doc", :group => :development
-gem 'ruby18_source_location', :group => :development
-gem "pry-remote", :group => :development
+
