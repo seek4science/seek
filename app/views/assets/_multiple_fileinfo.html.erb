@@ -1,19 +1,22 @@
 <%
    n = multiple_fileinfo.content_blobs.count
+   resource_text = text_for_resource(multiple_fileinfo.parent)
 %>
 
 <%
-   model_image = ""
+   model_image_text = ""
+   image_count = 0
    if multiple_fileinfo.respond_to? :model_image
-     if  multiple_fileinfo.model_image.nil?
-       model_image = "and 0 images"
+     image_count = multiple_fileinfo.model_image.nil? ? 0 : 1
+     if image_count==0
+       model_image_text = ""
      else
-       model_image = "and 1 image"
+       model_image_text = "(and an image) "
      end
    end
 %>
 <p>
-  <strong> <%= pluralize(n, 'file') -%> <%= model_image -%>:</strong>
+  <strong> <%= pluralize(n, 'item') -%> <%= model_image_text -%> <%= (n==1 && image_count==0) ? "is" : "are" %> associated with this <%= resource_text %>:</strong>
 <ul class='fileinfo_list'>
 
   <% multiple_fileinfo.content_blobs.each do |blob| -%>
