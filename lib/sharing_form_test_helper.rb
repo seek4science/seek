@@ -5,7 +5,7 @@ module SharingFormTestHelper
           :user_blacklist=>"0",
           :sharing_scope =>Policy::ALL_SYSMO_USERS,
           "access_type_#{Policy::ALL_SYSMO_USERS}".to_sym => Policy::VISIBLE,
-          :permissions   =>{:contributor_types=>ActiveSupport::JSON.encode("Person"), :values=>ActiveSupport::JSON.encode({})}
+          :permissions   =>{:contributor_types=>ActiveSupport::JSON.encode(["\"Person\""]), :values=>ActiveSupport::JSON.encode({})}
       }
   end
 end

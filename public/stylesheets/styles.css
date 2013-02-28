@@ -935,6 +935,8 @@ ul.related_asset_list li{
 
 .contribution_title_image {
     float: left;
+    position: absolute;
+
     margin-left: 1em;
     margin-right: 0.5em;
     margin-top: -0.2em;
@@ -1423,9 +1425,9 @@ ul#switch_upload_buttons {
 
 ul#switch_upload_buttons li {
 	list-style: none;
-    float: left;
     padding-right: 0.75em;
     padding-top: 10px;
+    float: left;
 }
 
 ul#switch_upload_buttons a {
