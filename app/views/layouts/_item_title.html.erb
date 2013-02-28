@@ -11,11 +11,8 @@ title||=h(item.title)
 <div class="contribution_title">
     <% unless avatar.blank? -%>
         <span class="contribution_title_image"><%= avatar -%></span>
-        <h1 width="90%"><%= title_prefix + title + title_postfix -%></h1>
-    <% else %>
-        <h1><%= title_prefix + title + title_postfix -%></h1>
-    <% end -%>
-
+    <% end %>
+    <h1><%= title_prefix + title + title_postfix -%></h1>
 </div>
 
 <% if item.respond_to?(:private?) && item.respond_to?(:public?) && item.try(:can_manage?) %>
