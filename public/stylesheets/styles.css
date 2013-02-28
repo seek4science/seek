@@ -1422,10 +1422,10 @@ ul#switch_upload_buttons {
 }
 
 ul#switch_upload_buttons li {
-    float: left;
 	list-style: none;
     padding-right: 0.75em;
     padding-top: 10px;
+    float: left;
 }
 
 ul#switch_upload_buttons a {
