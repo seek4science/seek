@@ -21,11 +21,11 @@ module Seek
     end
 
     def is_xlsx? blob=self
-      mime_extension(blob.content_type) == "xlsx"
+      mime_extensions(blob.content_type).include?("xlsx")
     end
 
     def is_xls? blob=self
-      mime_extension(blob.content_type) == "xls"
+      mime_extensions(blob.content_type).include?("xls")
     end
 
     def is_jws_dat? blob=self
@@ -41,7 +41,7 @@ module Seek
     end
 
     def is_pdf? blob=self
-      mime_extension(blob.content_type) == 'pdf'
+      mime_extensions(blob.content_type).include?('pdf')
     end
 
     def is_image? blob=self
@@ -49,14 +49,14 @@ module Seek
     end
 
     def is_pdf_convertable? blob=self
-      PDF_CONVERTABLE_FORMAT.include?(mime_extension(blob.content_type)) && Seek::Config.pdf_conversion_enabled
+      !(PDF_CONVERTABLE_FORMAT & mime_extensions(blob.content_type)).empty? && Seek::Config.pdf_conversion_enabled
     end
 
     def is_viewable_format? blob=self
       if Seek::Config.pdf_conversion_enabled
-        ((PDF_CONVERTABLE_FORMAT + IMAGE_VIEWABLE_FORMAT) << 'pdf').include?(mime_extension(blob.content_type))
+        !(((PDF_CONVERTABLE_FORMAT + IMAGE_VIEWABLE_FORMAT) << 'pdf') & mime_extensions(blob.content_type)).empty?
       else
-        (IMAGE_VIEWABLE_FORMAT << 'pdf').include?(mime_extension(blob.content_type))
+        !((IMAGE_VIEWABLE_FORMAT << 'pdf') & (mime_extensions(blob.content_type))).empty?
       end
     end
 
