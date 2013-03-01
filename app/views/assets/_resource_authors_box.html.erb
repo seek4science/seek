@@ -23,7 +23,7 @@ end
         <% if creator.nil? or creator.can_view? %>
             <span class="author_avatar"><%= creator.nil? ? the_jerm : favouritable_icon(creator, 50) -%></span>
         <% elsif creator.title_is_public? %>
-            [<%= creator.name %>]
+            [<%= h(creator.name) %>]
         <% end %>
     <% end %>
     <span id='unexpanded'><br \><%= link_to_function "Expand", "$('unexpanded').hide();$('expanded').show();" unless creators.empty? %></span>
@@ -33,7 +33,7 @@ end
           <% if creator.nil? or creator.can_view? %>
               <span class="author_avatar"><%= creator.nil? ? the_jerm : favouritable_icon(creator, 50) -%></span>
           <% elsif creator.title_is_public? %>
-              [<%= creator.name %>]
+              [<%= h(creator.name) %>]
           <% end %>
       <% end %>
       <br \><%= link_to_function "Unexpand", "$('expanded').hide();$('unexpanded').show();"%>
@@ -47,7 +47,7 @@ end
     Other Creators        
   </p>
   <div style="border: 1px dashed #BBB; margin: 0.5em;padding: 3px;text-align:left">
-    <%= resource.other_creators%>
+    <%= h(resource.other_creators) %>
   </div>
   <% end -%>
 

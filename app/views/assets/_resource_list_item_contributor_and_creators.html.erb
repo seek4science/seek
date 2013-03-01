@@ -1,0 +1,9 @@
+<%
+    resource = resource_list_item_contributor_and_creators
+ -%>
+
+<%= list_item_contributor resource -%>
+
+<%= list_item_authorized_list resource.creators, "Creator" %>
+
+<%= list_item_optional_attribute "Other creators", h(resource.other_creators), nil -%>
