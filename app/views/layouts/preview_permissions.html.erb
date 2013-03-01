@@ -44,7 +44,7 @@
           <h2>Additional fine-grained sharing permissions:</h2>
           <% permissions.each do |p|
             contributor = p.contributor
-            group_name = (p.contributor_type == 'WorkGroup') ? (contributor.project.name + ' @ ' + contributor.institution.name) : contributor.name
+            group_name = (p.contributor_type == 'WorkGroup') ? (h(contributor.project.name) + ' @ ' + h(contributor.institution.name)) : h(contributor.name)
             prefix_text = (p.contributor_type == 'Person') ? '' : ('Members of ' + p.contributor_type.underscore.humanize + ' ')
           %>
 
