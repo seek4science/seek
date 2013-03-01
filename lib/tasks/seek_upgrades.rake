@@ -11,8 +11,9 @@ namespace :seek do
             :environment,
             :add_term_uris_to_assay_types,
             :add_term_uris_to_technology_types,
-	    :detect_web_page_content_blobs,
-            :repopulate_auth_lookup_tables
+	          :detect_web_page_content_blobs,
+            :repopulate_auth_lookup_tables,
+            :correct_content_type_for_jpg
   ]
 
   desc("upgrades SEEK from the last released version to the latest released version")
@@ -228,5 +229,14 @@ namespace :seek do
          end
        end
      end
+  end
+
+  desc "content type of jpg is image/jpeg, instead of image/jpg"
+  task(:correct_content_type_for_jpg=>:environment) do
+    content_blobs = ContentBlob.find(:all, :conditions => ['content_type=?', 'image/jpg'])
+    content_blobs.each do |cb|
+      cb.content_type = 'image/jpeg'
+      cb.save
+    end
   end
 end
