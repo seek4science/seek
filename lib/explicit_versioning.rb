@@ -191,7 +191,7 @@ module Jits
 
           def update_timestamps(from, to)
             begin
-              self.timestamp_columns.each do |key|
+              ["updated_at"].each do |key|
                 if to.has_attribute?(key)
                   logger.debug("explicit_versioning - update_timestamps method - setting timestamp_column '#{key}'")
                   if eval("from.#{key}.nil?")
