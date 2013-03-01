@@ -4,8 +4,8 @@ module Seek
     class ProjectStats
       attr_accessor :project,:sops,:data_files,:models,:publications,:people,:assays,:studies,:investigations, :user
       
-      def initialize
-        @user=User.first
+      def initialize user
+        @user=user
       end
       
       def data_files_size
@@ -20,28 +20,28 @@ module Seek
         assets_size models
       end
       
-      def visible_data_files
-        authorised_assets data_files,"view"
+      def visible_data_files projects
+        authorised_assets 'DataFile',"view", projects
       end
       
-      def visible_sops
-        authorised_assets sops,"view"
+      def visible_sops projects
+        authorised_assets 'Sop',"view", projects
       end
       
-      def visible_models
-        authorised_assets models,"view"
+      def visible_models projects
+        authorised_assets 'Model',"view", projects
       end
       
-      def accessible_data_files
-        authorised_assets data_files,"download"
+      def accessible_data_files projects
+        authorised_assets 'DataFile',"download", projects
       end
       
-      def accessible_sops
-        authorised_assets sops,"download"
+      def accessible_sops projects
+        authorised_assets 'Sop',"download", projects
       end
       
-      def accessible_models
-        authorised_assets models,"download"
+      def accessible_models projects
+        authorised_assets 'Model',"download", projects
       end
       
       def registered_people
@@ -50,8 +50,8 @@ module Seek
       
       private
 
-      def authorised_assets assets,action
-        assets.select{|asset| asset.can_perform? action, @user}
+      def authorised_assets asset_type,action, projects
+        asset_type.constantize.all_authorized_for(action, @user,projects)
       end
       
       def assets_size assets
@@ -61,12 +61,12 @@ module Seek
         end
         return size
       end
-    end  
+    end
 
-    def self.generate    
-      result=[]    
+    def self.generate user
+      result=[]
       Project.all.each do |project|
-        project_stats=ProjectStats.new
+        project_stats=ProjectStats.new(user)
         project_stats.project=project
         project_stats.sops=project.sops
         project_stats.models=project.models
@@ -76,7 +76,7 @@ module Seek
         project_stats.assays=project.assays
         project_stats.studies=project.studies
         project_stats.investigations=project.investigations
-        result << project_stats           
+        result << project_stats
       end
       return result
     end

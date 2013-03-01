@@ -278,7 +278,7 @@ class AdminController < ApplicationController
         when "users"
           format.html { render :partial => "admin/user_stats_list", :locals => { :title => title, :collection => collection} }
         when "content_stats"
-          format.html { render :partial => "admin/content_stats", :locals => {:stats => Seek::ContentStats.generate} }
+          format.html { render :partial => "admin/content_stats", :locals => {:stats => Seek::ContentStats.generate(User.first)} }
         when "activity_stats"
           format.html { render :partial => "admin/activity_stats", :locals => {:stats => Seek::ActivityStats.new} }
         when "search_stats"
