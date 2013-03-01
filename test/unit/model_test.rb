@@ -18,19 +18,19 @@ class ModelTest < ActiveSupport::TestCase
   end
 
   test "exception when model created_at changes" do
-    User.current_user = Factory(:user)
-    m=Model.Factory(:model,:contributor=>User.current_user)
-    m.save!
-    m.title="sdfkhsdfkhsdfkhsdf222"
-    m.save!
-    m.created_at=2.minutes.ago
-    begin
+    disable_authorization_checks do
+      m=Model.Factory(:model,:contributor=>User.current_user)
       m.save!
-      fail("Exception expected")
-    rescue
+      m.title="sdfkhsdfkhsdfkhsdf222"
+      m.save!
+      m.created_at=2.minutes.ago
+      begin
+        m.save!
+        fail("Exception expected")
+      rescue
 
+      end
     end
-
   end
 
   test "model contents for search" do
