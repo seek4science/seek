@@ -333,8 +333,7 @@ class DataFilesController < ApplicationController
     sheet = params[:sheet] || 1
     trim = params[:trim]
     trim ||= false
-    extensions = mime_extensions(@data_file.content_blob.content_type)
-    if !extensions.nil? && !(["xls","xlsx"] & extensions).empty?
+    if !(["xls","xlsx"] & (mime_extensions(@data_file.content_blob.content_type))).empty?
 
       respond_to do |format|
         format.html #currently complains about a missing template, but we don't want people using this for now - its purely XML

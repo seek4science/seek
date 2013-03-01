@@ -49,7 +49,7 @@ module Seek
     end
 
     def mime_extensions(mime)
-      mime_find(mime)[:extensions]
+      mime_find(mime)[:extensions] || []
     end
 
     def mime_types_for_extension extension
