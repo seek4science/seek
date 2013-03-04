@@ -49,8 +49,18 @@ class SiteAnnouncementsControllerTest < ActionController::TestCase
   end
 
   test "should email registered users" do
+    NotifieeInfo.delete_all
+    i=0
+    while i < 5
+      Factory(:notifiee_info, :id => (i+1))
+      i+=1
+    end
+
     assert_emails(Person.registered.select {|p| p.notifiee_info.try :receive_notifications?}.count) do
       post :create,:site_announcement=>{:title=>"fred", :email_notification => true}
+      site_announcement = assigns(:site_announcement)
+      assert SendAnnouncementEmailsJob.exists?(site_announcement.id,1)
+      SendAnnouncementEmailsJob.new(site_announcement.id, 1).perform
     end
   end
   

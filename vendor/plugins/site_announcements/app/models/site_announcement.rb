@@ -9,6 +9,8 @@ class SiteAnnouncement < ActiveRecord::Base
   belongs_to :site_announcement_category
   belongs_to :announcer,:polymorphic=>true
 
+  after_create :send_announcement_emails
+
   named_scope :headline_announcements,:conditions=>(["is_headline = ? and expires_at > ? ",true,Time.now]),:order=>"created_at DESC",:limit=>1
   
   validates_presence_of :title
@@ -26,6 +28,11 @@ class SiteAnnouncement < ActiveRecord::Base
     helper.auto_link(simple_format(h(body)))
   end
 
+  def send_announcement_emails
+    if self.email_notification?
+      SendAnnouncementEmailsJob.create_job(self.id, 1)
+    end
+  end
 
   private
 

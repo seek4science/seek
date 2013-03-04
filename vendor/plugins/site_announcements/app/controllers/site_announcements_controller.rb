@@ -67,9 +67,6 @@ class SiteAnnouncementsController < ApplicationController
 
     respond_to do |format|
       if @site_announcement.save
-        if (@site_announcement.email_notification?)
-          send_announcement_emails(@site_announcement)
-        end
         flash[:notice] = 'The Announcement was successfully announced.'
         format.html { redirect_to(@site_announcement) }
         format.xml  { render :xml => @site_announcement, :status => :created, :location => @site_announcement }
@@ -77,20 +74,6 @@ class SiteAnnouncementsController < ApplicationController
         format.html { render :action => "new" }
         format.xml  { render :xml => @site_announcement.errors, :status => :unprocessable_entity }
       end
-    end
-  end
-  
-  def send_announcement_emails site_announcement
-    if email_enabled?
-      NotifieeInfo.find(:all,:conditions=>["receive_notifications=?",true]).each do |notifiee_info|
-        begin
-          Mailer.deliver_announcement_notification(site_announcement, notifiee_info,base_host)
-        rescue Exception=>e
-          if defined? RAILS_DEFAULT_LOGGER
-            RAILS_DEFAULT_LOGGER.error "There was a problem sending an announcement email to #{notifiee_info.notifiee.email} - #{e.message}."
-          end
-        end
-      end  
     end
   end
   
