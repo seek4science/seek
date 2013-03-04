@@ -2,6 +2,12 @@
 module RdfTestCases
   def test_get_rdf
     object = rest_api_test_object
+
+    #this strange bit of code forces the model to be reloaded from the database after being created by FactoryGirl.
+    #this is to (possibly) avoid a variation in the updated_at timestamps. It means the comparison is always against what
+    #in the in the database, rather than between that created in memory and that in the database.
+    object = object.class.find(object.id)
+
     expected_resource_uri =  eval("#{object.class.name.underscore}_url(object,:host=>'localhost',:port=>'3000')")
 
     assert object.can_view?
