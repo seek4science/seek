@@ -25,7 +25,7 @@ class SendAnnouncementEmailsJob < Struct.new(:site_announcement_id, :from_notifi
     if Seek::Config.email_enabled
       NotifieeInfo.find(:all, :conditions=>["id IN (?) AND receive_notifications=?", (from_notifiee_id .. (from_notifiee_id + BATCHSIZE)), true]).each do |notifiee_info|
         begin
-          Mailer.deliver_announcement_notification(site_announcement, notifiee_info, Seek::Config.site_base_host)
+          Mailer.deliver_announcement_notification(site_announcement, notifiee_info, Seek::Config.site_base_host.gsub(/https?:\/\//,''))
         rescue Exception=>e
           if defined? RAILS_DEFAULT_LOGGER
             RAILS_DEFAULT_LOGGER.error "There was a problem sending an announcement email to #{notifiee_info.notifiee.email} - #{e.message}."
