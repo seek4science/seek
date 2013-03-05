@@ -110,7 +110,10 @@ class SopsController < ApplicationController
               assay.relate(@sop)
             end
           end
-          deliver_request_publish_approval params[:sharing], @sop
+          #send publishing request
+          if !@sop.can_publish? && params[:sharing] && (params[:sharing][:sharing_scope].to_i == Policy::EVERYONE)
+            deliver_request_publish_approval @sop
+          end
         else
           format.html { 
             render :action => "new" 
@@ -167,7 +170,10 @@ class SopsController < ApplicationController
             AssayAsset.destroy(assay_asset.id)
           end
         end
-        deliver_request_publish_approval params[:sharing], @sop
+        #send publishing request
+        if !@sop.can_publish? && params[:sharing] && (params[:sharing][:sharing_scope].to_i == Policy::EVERYONE)
+          deliver_request_publish_approval @sop
+        end
       else
         format.html { 
           render :action => "edit" 

@@ -43,7 +43,10 @@ class InvestigationsController < ApplicationController
     @investigation.policy.set_attributes_with_sharing params[:sharing], @investigation.projects
 
     if @investigation.save
-      deliver_request_publish_approval params[:sharing], @investigation
+      #send publishing request
+      if !@investigation.can_publish? && params[:sharing] && (params[:sharing][:sharing_scope].to_i == Policy::EVERYONE)
+        deliver_request_publish_approval @investigation
+      end
        if @investigation.new_link_from_study=="true"
           render :partial => "assets/back_to_singleselect_parent",:locals => {:child=>@investigation,:parent=>"study"}
        else
@@ -98,7 +101,10 @@ class InvestigationsController < ApplicationController
 
     respond_to do |format|
       if @investigation.save
-        deliver_request_publish_approval params[:sharing], @investigation
+        #send publishing request
+        if !@investigation.can_publish? && params[:sharing] && (params[:sharing][:sharing_scope].to_i == Policy::EVERYONE)
+          deliver_request_publish_approval @investigation
+        end
         flash[:notice] = 'Investigation was successfully updated.'
         format.html { redirect_to(@investigation) }
         format.xml  { head :ok }

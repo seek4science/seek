@@ -10,6 +10,14 @@
     <% end -%>
   </ul>
 
+  <h2>Items for which request to publish were sent to the gatekeepers</h2>
+  <ul id="publish_requested">
+    <% if @waiting_for_publish_items.empty? -%><li class="none_text">No items</li><% end -%>
+    <% @waiting_for_publish_items.each do |item| -%>
+        <li style="font-weight:bolder;"><%= text_for_resource item -%>: <%= link_to item.title, item -%></li>
+    <% end -%>
+  </ul>
+
   <h2>Items for which notifications to publish were sent the owners</h2>
   <ul id="notified">
     <% if @notified_items.empty? -%><li class="none_text">No items</li><% end -%>

@@ -1,7 +1,17 @@
 <%
 item = options_for
-checkbox_title = item.can_manage? ? "Publish" : "Notify owner"
-checkbox_class = item.can_manage? ? "owned" : "protected"
+checkbox_title = ""
+if item.can_publish?
+  checkbox_title = "Publish"
+  checkbox_class = "published"
+elsif item.can_manage?
+  checkbox_title = "Summit publishing request"
+  checkbox_class = "owned"
+else
+  checkbox_title = "Notify owner"
+  checkbox_class = 'protected'
+end
+
 checkbox_class = "none_text" if item.is_published?
 -%>
 <li>

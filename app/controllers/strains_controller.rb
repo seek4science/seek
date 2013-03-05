@@ -17,7 +17,10 @@ class StrainsController < ApplicationController
     @strain.policy.set_attributes_with_sharing params[:sharing], @strain.projects
     update_annotations @strain
     if @strain.save
-      deliver_request_publish_approval params[:sharing], @strain
+      #send publishing request
+      if !@strain.can_publish? && params[:sharing] && (params[:sharing][:sharing_scope].to_i == Policy::EVERYONE)
+        deliver_request_publish_approval @strain
+      end
       respond_to do |format|
         flash[:notice] = 'Strain was successfully created.'
         format.html { redirect_to(@strain) }
@@ -46,7 +49,10 @@ class StrainsController < ApplicationController
     end
     @strain.attributes = params[:strain]
     if @strain.save
-      deliver_request_publish_approval params[:sharing], @strain
+      #send publishing request
+      if !@strain.can_publish? && params[:sharing] && (params[:sharing][:sharing_scope].to_i == Policy::EVERYONE)
+        deliver_request_publish_approval @strain
+      end
       respond_to do |format|
         flash[:notice] = 'Strain was successfully updated.'
         format.html { redirect_to(@strain) }

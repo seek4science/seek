@@ -53,12 +53,17 @@ module Seek
         items_for_publishing = resolve_publish_params params[:publish]
         items_for_publishing << @asset unless items_for_publishing.include? @asset
         @notified_items = items_for_publishing.select{|i| !i.can_manage?}
-        @published_items = items_for_publishing - @notified_items
+        @waiting_for_publish_items = items_for_publishing.select{|i| i.can_manage? && !i.can_publish?}
+        @published_items = items_for_publishing - @waiting_for_publish_items - @notified_items
 
         @problematic_items = @published_items.select{|item| !item.publish!}
 
         if Seek::Config.email_enabled && !@notified_items.empty?
           deliver_publishing_notifications @notified_items
+        end
+
+        @waiting_for_publish_items.each do |item|
+          deliver_request_publish_approval item
         end
 
         @published_items = @published_items - @problematic_items
@@ -139,8 +144,8 @@ module Seek
 
     private
 
-    def deliver_request_publish_approval sharing, item
-      if (Seek::Config.email_enabled && !item.gatekeepers.empty? && !item.can_publish? && sharing && (sharing[:sharing_scope].to_i == Policy::EVERYONE))
+    def deliver_request_publish_approval item
+      if (Seek::Config.email_enabled)
         Mailer.deliver_request_publish_approval item.gatekeepers, User.current_user,item,base_host
       end
     end

@@ -37,7 +37,7 @@ module Acts #:nodoc:
       end
 
       def publish!
-        if can_manage?
+        if can_publish?
           policy.access_type=Policy::ACCESSIBLE
           policy.sharing_scope=Policy::EVERYONE
           policy.save
