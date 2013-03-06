@@ -51,7 +51,6 @@ module Seek
     def publish
       if request.post?
         items_for_publishing = resolve_publish_params params[:publish]
-        items_for_publishing << @asset unless items_for_publishing.include? @asset
         @notified_items = items_for_publishing.select{|i| !i.can_manage?}
         @waiting_for_publish_items = items_for_publishing.select{|i| i.can_manage? && !i.can_publish?}
         @published_items = items_for_publishing - @waiting_for_publish_items - @notified_items
