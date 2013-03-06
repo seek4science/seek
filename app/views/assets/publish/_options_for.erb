@@ -16,8 +16,15 @@ checkbox_class = "none_text" if item.is_published?
 -%>
 <li>
     <ul class="<%= html_classes -%>">
-        <li class="type_and_title"><%= text_for_resource item -%>:&nbsp;<%= link_to item.title,item,:target=>"_blank" -%></li>
-        <li class="secondary">Owners <%= item.managers.empty? ? "<span class='none_text'>None</span>" : item.managers.collect{|m| link_to(m.title,m)}.join(", ")  -%></li>
+        <% if item.can_view? %>
+            <li class="type_and_title"><%= text_for_resource item -%>:&nbsp;<%= link_to item.title,item,:target=>"_blank" -%></li>
+            <li class="secondary">Owners <%= item.managers.empty? ? "<span class='none_text'>None</span>" : item.managers.collect{|m| link_to(m.title,m)}.join(", ")  -%></li>
+        <% else %>
+          <li class="type_and_title"><%= text_for_resource item -%>:&nbsp;This item is hidden to you</li>
+          <% if current_user.try(:person) && item.can_see_hidden_item?(current_user.person) %>
+            <li class="secondary">Owners <%= item.managers.empty? ? "<span class='none_text'>None</span>" : item.managers.collect{|m| link_to(m.title,m)}.join(", ")  -%></li>
+          <% end %>
+        <% end %>
         <li class="secondary <%= checkbox_class -%>">
           <% if item.is_published? -%>
             This item is already published.
