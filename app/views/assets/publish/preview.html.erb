@@ -59,11 +59,14 @@ investigations = studies.collect(&:investigation).uniq
       <ul>
         <% if @asset.assays.empty? -%>
             <span class="none_text">There are no Assays related to this <%= asset_type_name -%>.</span>
+            <div style="padding-left: 2em;">
+              <%= render :partial=>"assets/publish/options_for", :collection=>[@asset], :locals=>{:html_classes=>"publishing_options"} -%>
+            </div>
         <% else -%>
             <% @asset.assays.each do |assay| -%>
                 <%= render :partial=>"assets/publish/options_for", :object=>assay, :locals=>{:html_classes=>"publishing_options"} -%>
                 <div style="padding-left: 2em;">
-                    <%= render :partial=>"assets/publish/options_for", :collection=>(assay.asset_masters - [@asset]), :locals=>{:html_classes=>"publishing_options"} -%>
+                    <%= render :partial=>"assets/publish/options_for", :collection=>assay.asset_masters, :locals=>{:html_classes=>"publishing_options"} -%>
                 </div>
             <% end -%>
 
