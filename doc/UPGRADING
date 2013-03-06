@@ -1,5 +1,8 @@
 = Upgrading SEEK
 
+If you have an existing SEEK installation, and you haven't done so already, please take a moment to fill out our very short,optional {SEEK Registration Form}[http://www.sysmo-db.org/seek-registration].
+Doing so will be very useful to us in the future when we try and raise further funding to develop and support SEEK and the associated tools.
+
 <b>Always backup your SEEK data before starting to upgrade!!</b> - see the {Backup Guide}[link:files/doc/BACKUPS.html].
 
 This guide assumes that SEEK has been installed following the {Installation Guide}[link:files/doc/INSTALL.html] guide. It assumes it is
@@ -23,13 +26,22 @@ looks something like:
 
 <b>If upgrading from a version earlier than v0.11.x please contact our GoogleGroup at http://groups.google.com/group/seek-development</b>
 
-When upgrading between versions greater than v0.11.x you need to upgrade to each released minor version in order incrementally (i.e. 0.13.2->0.14.0, you can skip patch versions such as 0.13.3).
+When upgrading between versions greater than v0.11.x you need to upgrade to each released minor version in order incrementally (i.e. 0.13.x -> 0.14.x -> 0.15.x -> 0.16.x, you can skip patch versions such as 0.13.3).
 The released versions are listed below:
 
 * 0.11.x
 * 0.13.2
 * 0.13.3
 * 0.14.0
+* 0.14.1
+* 0.15.0
+* 0.15.1
+* 0.15.2
+* 0.15.3
+* 0.15.4
+* 0.16.0
+* 0.16.1
+* 0.16.2
 
 <em>(Note there was no 0.12.x version released externally, this was an internal release)</em>
 
@@ -43,6 +55,87 @@ same pattern.
 When upgrading between patch versions (i.e between 0.13.0 and 0.13.2) it should
 only be necessary to a db:migrate rake task. Using seek:upgrade should still work, but could take a lot of unnecessary time.
 
+== Steps to upgrade from 0.15.x to 0.16.x
+
+First there are additional dependencies you will need, which on Ubuntu 10.04/12.04 can be installed with:
+
+    sudo apt-get install poppler-utils tesseract-ocr openoffice.org openoffice.org-java-common
+
+Open Office is a background service which is called by convert_office plugin, to convert some document types (ms office documents,
+open office documents, etc.) into pdf document.
+
+The command to start open office in headless mode and as the background process:
+
+    nohup soffice --headless --accept="socket,host=127.0.0.1,port=8100;urp;" --nofirststartwizard > /dev/null 2>&1
+
+If you run on production server, using apache and phusion passenger, you will need to run the Open Office service under www-data user.
+To do this it will need to create a working directory in /var/www. The name of the directory
+changes between versions, but will be called something similar to libreoffice or .openoffice.org2. The easiest way to create this directory
+is to make a note of the permissions for /var/www, then make it writable to www-data, start the service, and then put the permissions on /var/www back to
+what they were originally.
+
+    sudo chown www-data:www-data /var/www
+
+Then to start the service manually you use:
+
+    nohup sudo -H -u www-data soffice --headless --accept="socket,host=127.0.0.1,port=8100;urp;" --nofirststartwizard > /dev/null 2>&1
+
+The 8100 port is used by default, if you'd like to run on another port, you need also to synchronize the changed port with the default soffice_port setting for convert_office plugin in config/environment.rb
+
+We recommend the OpenOffice service is setup using an init.d script, following the same procedures for delayed job using the script found at:
+https://gist.github.com/3787679
+
+Other than this, the remaining steps are the same standard steps are previous versions:
+
+    RAILS_ENV=production ./script/delayed_job stop
+    bundle exec rake sunspot:solr:stop RAILS_ENV=production
+    hg pull https://sysmo-db.googlecode.com/hg/ -r v0.16.2
+    hg update
+    hg merge # only required if you've made changes since installing. If you have you may need to deal with conflicts.
+    hg commit -m "merged" # likewise - only required if you made changes since installing
+    bundle install --deployment
+    bundle exec rake seek:upgrade RAILS_ENV=production
+    bundle exec rake tmp:assets:clear RAILS_ENV=production
+    bundle exec rake tmp:clear RAILS_ENV=production
+
+    bundle exec rake sunspot:solr:start RAILS_ENV=production # to restart the search server
+    RAILS_ENV=production ./script/delayed_job start
+    touch tmp/restart.txt
+
+== Steps to upgrade from 0.14.x to 0.15.x
+
+SEEK 0.15 upgraded Rails to the latest 2 version,2.3.14. This requires an update of Rubygems to 1.6.2. You can update rubygems directly by running
+
+    gem update --system 1.6.2
+
+or install from scratch by reading the INSTALL guide. You can also use RVM[https://rvm.io/]. SEEK 0.15 also runs fine on the latest Rubygems (currently 1.8.24) but
+you will get some deprecation warnings.
+You can check you have the correct version of rubygems by running
+
+    gem -v
+
+Then you will need to install additional dependency:
+
+    sudo apt-get install git
+
+Once Rubygems has been updated and additional dependency has been installed, the upgrade is the typical:
+
+    RAILS_ENV=production ./script/delayed_job stop
+    bundle exec rake sunspot:solr:stop RAILS_ENV=production
+    hg pull https://sysmo-db.googlecode.com/hg/ -r v0.15.4
+    hg update
+    hg merge # only required if you've made changes since installing. If you have you may need to deal with conflicts.
+    hg commit -m "merged" # likewise - only required if you made changes since installing
+    bundle install --deployment
+    bundle exec rake seek:upgrade RAILS_ENV=production
+    bundle exec rake tmp:assets:clear RAILS_ENV=production
+    bundle exec rake tmp:clear RAILS_ENV=production
+
+    bundle exec rake sunspot:solr:start RAILS_ENV=production # to restart the search server
+    RAILS_ENV=production ./script/delayed_job start
+    touch tmp/restart.txt
+
+
 == Steps to upgrade from 0.13.x to 0.14.x
 
 These are the fairly standard steps when upgrading between minor versions. Note, the seek:upgrade task can take a while
@@ -51,7 +144,7 @@ email notifications).
 
     RAILS_ENV=production ./script/delayed_job stop
     bundle exec rake sunspot:solr:stop RAILS_ENV=production
-    hg pull https://sysmo-db.googlecode.com/hg/ -r v0.14.0
+    hg pull https://sysmo-db.googlecode.com/hg/ -r v0.14.1
     hg update
     hg merge # only required if you've made changes since installing. If you have you may need to deal with conflicts.
     hg commit -m "merged" # likewise - only required if you made changes since installing
@@ -70,7 +163,7 @@ There follows the commands required to upgrade. Anything after # are notes and d
 There are a few additional steps for this upgrade due to the switch from Solr to Sunspot as the search system,
 and the introduction of Delayed Job for background processing.
 
-First there is an additionaldependency you will need, which on Ubuntu 10.04 or Debian can be installed with:
+First there is an additional dependency you will need, which on Ubuntu 10.04 or Debian can be installed with:
 
     sudo apt-get install libxslt-dev
 
@@ -105,12 +198,12 @@ this is simply a case of:
 If you auto start solr with an init.d/ script - this will need updating to reflect the change to sunspot:solr:start. The
 updated script should look something like: https://gist.github.com/3143434
 
-== Steps to upgrade between patches (e.g. between 0.13.2 and 0.13.3)
+== Steps to upgrade between patches (e.g. between 0.16.0 to 0.16.2)
 
-This should remain the same for all upgrades for minor bugfix patches, unless we state otherwise.
-This example uses v0.13.3 as an example.
+This example shows upgrading from v0.16.0, or v0.16.1, to v0.16.2 as an example, but the process is the same for upgrading between patch versions unless
+otherwise stated. You can upgrade directly from one patch version to another, skipping the intermediate versions (so you can upgrade directly 0.16.0 to 0.16.2 without first having to upgrade to 0.16.1)
 
-  hg pull https://sysmo-db.googlecode.com/hg/ -r v0.13.3
+  hg pull https://sysmo-db.googlecode.com/hg/ -r v0.16.2
   hg update
   hg merge # if necessary
   hg commit -m "merged" # if necessary

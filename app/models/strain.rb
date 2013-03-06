@@ -1,11 +1,15 @@
+require 'grouped_pagination'
+require 'acts_as_authorized'
+
 class Strain < ActiveRecord::Base
   belongs_to :organism
-  has_many :genotypes, :dependent => :destroy
-  has_many :phenotypes, :dependent => :destroy
+  has_many :genotypes, :dependent =>  :nullify
+  has_many :phenotypes, :dependent =>  :nullify
   accepts_nested_attributes_for :genotypes,:allow_destroy=>true
   accepts_nested_attributes_for :phenotypes,:allow_destroy=>true
   has_many :specimens
 
+  before_destroy :destroy_genotypes_phenotypes
   named_scope :by_title
 
   validates_presence_of :title, :organism
@@ -13,8 +17,41 @@ class Strain < ActiveRecord::Base
   named_scope :without_default,:conditions=>{:is_dummy=>false}
 
   include ActsAsCachedTree
+  include Subscribable
   acts_as_authorized
   acts_as_uniquely_identifiable
+  acts_as_favouritable
+  acts_as_annotatable :name_field=>:title
+  include Seek::Taggable
+
+  validates_presence_of :projects, :unless => Proc.new{|s| s.is_dummy? || Seek::Config.is_virtualliver}
+
+  grouped_pagination :pages=>("A".."Z").to_a, :default_page => Seek::Config.default_page(self.name.underscore.pluralize)
+
+  searchable(:ignore_attribute_changes_of=>[:updated_at]) do
+      text :searchable_terms
+  end if Seek::Config.solr_enabled
+
+  def searchable_terms
+      text=[]
+      text << title
+      text << synonym
+      text << comment
+      text << provider_name
+      text << provider_id
+      text << searchable_tags
+      genotypes.compact.each do |g|
+        text << g.gene.try(:title)
+      end
+      phenotypes.compact.each do |p|
+        text << p.description
+      end
+      text
+  end
+
+  def is_default?
+    title=="default" && is_dummy==true
+  end
 
   def is_default?
     title=="default" && is_dummy==true
@@ -62,6 +99,26 @@ class Strain < ActiveRecord::Base
 
   def can_delete? *args
     super && (specimens.empty? || ((specimens.count == 1) && specimens.first.is_dummy? && specimens.first.samples.empty?))
+  end
+
+  def destroy_genotypes_phenotypes
+    genotypes = self.genotypes
+    phenotypes = self.phenotypes
+    genotypes.each do |g|
+      if g.specimen.nil?
+        g.destroy
+      end
+    end
+    phenotypes.each do |p|
+      if p.specimen.nil?
+        p.destroy
+      end
+    end
+  end
+
+  #defines that this is a user_creatable object, and appears in the "New Object" gadget
+  def self.user_creatable?
+    true
   end
 
   def default_policy

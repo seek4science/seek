@@ -1,11 +1,15 @@
 require 'test_helper'
+require 'open-uri'
 
 class JwsFunctionalTest < ActionController::TestCase
+
   tests ModelsController
 
   fixtures :all
 
   include AuthenticatedTestHelper
+
+  #FIXME: some of these tests would be better suited as integration tests using capybara - https://github.com/jnicklas/capybara
 
   def setup
     WebMock.allow_net_connect!
@@ -16,7 +20,7 @@ class JwsFunctionalTest < ActionController::TestCase
 
     test "show builder with versioned sbml format" do
       m=models(:teusink)
-      m.content_blob.dump_data_to_file #required for the form post to work, as it uses the stored file
+      m.content_blobs.first.dump_data_to_file #required for the form post to work, as it uses the stored file
       get :builder, :id=>m, :version=>2
       assert_response :success
       assert assigns(:model)
@@ -26,7 +30,7 @@ class JwsFunctionalTest < ActionController::TestCase
 
     test "show builder with space in filename" do
       m=models(:teusink_with_space)
-      m.content_blob.dump_data_to_file #required for the form post to work, as it uses the stored file
+      m.content_blobs.first.dump_data_to_file #required for the form post to work, as it uses the stored file
       get :builder, :id=>m
       assert_response :success
       assert assigns(:model)
@@ -36,7 +40,7 @@ class JwsFunctionalTest < ActionController::TestCase
 
     test "show builder with sbml format" do
       m=models(:teusink)
-      m.content_blob.dump_data_to_file #required for the form post to work, as it uses the stored file
+      m.content_blobs.first.dump_data_to_file #required for the form post to work, as it uses the stored file
       get :builder, :id=>m
       assert_response :success
       assert assigns(:model)
@@ -46,7 +50,7 @@ class JwsFunctionalTest < ActionController::TestCase
 
     test "show builder with jws format" do
       m=models(:jws_model)
-      m.content_blob.dump_data_to_file #required for the form post to work, as it uses the stored file
+      m.content_blobs.first.dump_data_to_file #required for the form post to work, as it uses the stored file
       get :builder, :id=>m
       assert_response :success
       assert assigns(:model)
@@ -57,7 +61,7 @@ class JwsFunctionalTest < ActionController::TestCase
     test "save new dat version with jws builder" do
       m=models(:jws_model)
       current_version=m.version
-      m.content_blob.dump_data_to_file
+      m.content_blobs.first.dump_data_to_file
       assert_difference("Model::Version.count", 1) do
         post :submit_to_jws, :id=>m,
              "following_action"=>"save_new_version",
@@ -75,13 +79,13 @@ class JwsFunctionalTest < ActionController::TestCase
       assert assigns(:model)
       assert_not_nil flash[:notice]
       assert_nil flash[:error]
-      assert_equal "text/plain", m.content_type
+      assert_equal "text/plain", m.content_blobs.first.content_type
     end
 
     test "save new sbml version with jws builder" do
       m=models(:jws_model)
       current_version=m.version
-      m.content_blob.dump_data_to_file
+      m.content_blobs.first.dump_data_to_file
       assert_difference("Model::Version.count", 1) do
         post :submit_to_jws, :id=>m,
              "following_action"=>"save_new_version",
@@ -100,7 +104,8 @@ class JwsFunctionalTest < ActionController::TestCase
       assert assigns(:model)
       assert_not_nil flash[:notice]
       assert_nil flash[:error]
-      assert_equal "text/xml", m.content_type
+      assert_equal 1,m.content_blobs.size
+      assert_equal "text/xml", m.content_blobs.first.content_type
     end
 
     test "show eqs graph" do
@@ -119,16 +124,15 @@ class JwsFunctionalTest < ActionController::TestCase
 
     def test_simulate_model
       m=models(:teusink)
-      m.content_blob.dump_data_to_file
+      m.content_blobs.first.dump_data_to_file
       post :simulate, :id=>m, :version=>m.version
       assert_response :success
-      #assert_select "iframe",:count=>1
-      assert_select "object[type='application/x-java-applet']", :count=>1
+      assert_select "iframe",:count=>1
     end
 
     test "changing model with jws builder" do
       m=models(:jws_model)
-      m.content_blob.dump_data_to_file
+      m.content_blobs.first.dump_data_to_file
 
       post :submit_to_jws,simple_model_params(:id=>m)
 
@@ -137,22 +141,32 @@ class JwsFunctionalTest < ActionController::TestCase
       assert_select "script", :text=>/VmGLT = 99.999/, :count=>1 #check that one of the parameter sets has been recognized from the uploaded file
     end
 
-    test "simulate model through builder" do
+    def test_simulate_model_through_builder
       #submits to jws, but passes the following_action param as 'simulate'
       m=models(:jws_model)
-      m.content_blob.dump_data_to_file
+      m.content_blobs.first.dump_data_to_file
 
       params = simple_model_params("following_action"=>"simulate",:id=>m)
 
       post :submit_to_jws,params
       assert_response :success
-      #assert_select "iframe",:count=>1
-      assert_select "object[type='application/x-java-applet']", :count=>1
+      assert assigns(:modelname)
+      expected_url = Seek::JWS::Simulator.simulator_frame_url(assigns(:modelname))
+      assert_select "div#jws_simulator_wrapper > iframe[src=?]",expected_url,:count=>1
+      simulator_frame_content = open(expected_url).read
+      assert_not_nil simulator_frame_content
+      assert simulator_frame_content.length > 1
+
+      #Franco informs me for a successful result the content should not contain the following
+      assert_nil simulator_frame_content =~ /JWSparam\[\[1\]\]/
+
+      #should contain one of the parameters passed
+      assert_not_nil simulator_frame_content =~ /KeqGLT/
     end
 
     test "annotate" do
       m=models(:teusink)
-      m.content_blob.dump_data_to_file
+      m.content_blobs.first.dump_data_to_file
       params=simple_model_params("following_action"=>"annotate",:id=>m,"authors"=>"Bob,Monkhouse,bob@email.com,BBC\n","TOD"=>"some terms")
       post :submit_to_jws,params
       assert_response :success

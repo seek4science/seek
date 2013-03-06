@@ -1,0 +1,131 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<doi_records>
+  <doi_record owner="10.1371" timestamp="2012-01-19 16:55:20">
+    <crossref>
+      <journal>
+        <journal_metadata language="en">
+          <full_title>PLoS Computational Biology</full_title>
+          <abbrev_title>PLoS Comput Biol</abbrev_title>
+          <issn media_type="electronic">1553-7358</issn>
+        </journal_metadata>
+        <journal_issue>
+          <publication_date media_type="online">
+            <month>1</month>
+            <day>19</day>
+            <year>2012</year>
+          </publication_date>
+          <journal_volume>
+            <volume>8</volume>
+          </journal_volume>
+          <issue>1</issue>
+        </journal_issue>
+        <journal_article publication_type="full_text">
+          <titles>
+            <title>Dynamic Modelling under Uncertainty: The Case of Trypanosoma brucei Energy Metabolism</title>
+          </titles>
+          <contributors>
+            <person_name contributor_role="author" sequence="first">
+              <given_name>Fiona</given_name>
+              <surname>Achcar</surname>
+            </person_name>
+            <person_name contributor_role="author" sequence="additional">
+              <given_name>Eduard J.</given_name>
+              <surname>Kerkhoven</surname>
+            </person_name>
+            <organization contributor_role="author" sequence="additional">The SilicoTryp Consortium</organization>
+            <person_name contributor_role="author" sequence="additional">
+              <given_name>Barbara M.</given_name>
+              <surname>Bakker</surname>
+            </person_name>
+            <person_name contributor_role="author" sequence="additional">
+              <given_name>Michael P.</given_name>
+              <surname>Barrett</surname>
+            </person_name>
+            <person_name contributor_role="author" sequence="additional">
+              <given_name>Rainer</given_name>
+              <surname>Breitling</surname>
+            </person_name>
+            <person_name contributor_role="editor" sequence="first">
+              <given_name>Jason A.</given_name>
+              <surname>Papin</surname>
+            </person_name>
+          </contributors>
+          <publication_date media_type="online">
+            <month>1</month>
+            <day>19</day>
+            <year>2012</year>
+          </publication_date>
+          <pages>
+            <first_page>e1002352</first_page>
+          </pages>
+          <publisher_item>
+            <item_number>10.1371/journal.pcbi.1002352</item_number>
+          </publisher_item>
+          <doi_data>
+            <doi>10.1371/journal.pcbi.1002352</doi>
+            <timestamp>20120119121806</timestamp>
+            <resource>http://dx.plos.org/10.1371/journal.pcbi.1002352</resource>
+          </doi_data>
+          <component_list>
+            <component parent_relation="isPartOf">
+              <description/>
+              <doi_data>
+                <doi>10.1371/journal.pcbi.1002352.g001</doi>
+                <resource>http://dx.plos.org/10.1371/journal.pcbi.1002352.g001</resource>
+              </doi_data>
+            </component>
+            <component parent_relation="isPartOf">
+              <description/>
+              <doi_data>
+                <doi>10.1371/journal.pcbi.1002352.g002</doi>
+                <resource>http://dx.plos.org/10.1371/journal.pcbi.1002352.g002</resource>
+              </doi_data>
+            </component>
+            <component parent_relation="isPartOf">
+              <description/>
+              <doi_data>
+                <doi>10.1371/journal.pcbi.1002352.g003</doi>
+                <resource>http://dx.plos.org/10.1371/journal.pcbi.1002352.g003</resource>
+              </doi_data>
+            </component>
+            <component parent_relation="isPartOf">
+              <description/>
+              <doi_data>
+                <doi>10.1371/journal.pcbi.1002352.g004</doi>
+                <resource>http://dx.plos.org/10.1371/journal.pcbi.1002352.g004</resource>
+              </doi_data>
+            </component>
+            <component parent_relation="isPartOf">
+              <description/>
+              <doi_data>
+                <doi>10.1371/journal.pcbi.1002352.g005</doi>
+                <resource>http://dx.plos.org/10.1371/journal.pcbi.1002352.g005</resource>
+              </doi_data>
+            </component>
+            <component parent_relation="isPartOf">
+              <description/>
+              <doi_data>
+                <doi>10.1371/journal.pcbi.1002352.g006</doi>
+                <resource>http://dx.plos.org/10.1371/journal.pcbi.1002352.g006</resource>
+              </doi_data>
+            </component>
+            <component parent_relation="isPartOf">
+              <description/>
+              <doi_data>
+                <doi>10.1371/journal.pcbi.1002352.g007</doi>
+                <resource>http://dx.plos.org/10.1371/journal.pcbi.1002352.g007</resource>
+              </doi_data>
+            </component>
+            <component parent_relation="isPartOf">
+              <description/>
+              <doi_data>
+                <doi>10.1371/journal.pcbi.1002352.g008</doi>
+                <resource>http://dx.plos.org/10.1371/journal.pcbi.1002352.g008</resource>
+              </doi_data>
+            </component>
+          </component_list>
+        </journal_article>
+      </journal>
+    </crossref>
+  </doi_record>
+</doi_records>

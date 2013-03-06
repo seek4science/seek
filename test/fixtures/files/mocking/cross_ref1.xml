@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<doi_records>
+  <doi_record owner="10.1007" timestamp="2010-09-30 23:16:36">
+    <crossref>
+      <book book_type="other">
+        <book_series_metadata>
+          <series_metadata>
+            <titles>
+              <title>IFIP Advances in Information and Communication Technology</title>
+            </titles>
+            <issn media_type="print">1868-4238</issn>
+            <issn media_type="electronic">1861-2288</issn>
+          </series_metadata>
+          <contributors>
+            <person_name contributor_role="editor" sequence="first">
+              <given_name>Harris</given_name>
+              <surname>Papadopoulos</surname>
+            </person_name>
+            <person_name contributor_role="editor" sequence="additional">
+              <given_name>Andreas S.</given_name>
+              <surname>Andreou</surname>
+            </person_name>
+            <person_name contributor_role="editor" sequence="additional">
+              <given_name>Max</given_name>
+              <surname>Bramer</surname>
+            </person_name>
+          </contributors>
+          <titles>
+            <title>Artificial Intelligence Applications and Innovations</title>
+          </titles>
+          <volume>339</volume>
+          <publication_date media_type="print">
+            <year>2010</year>
+          </publication_date>
+          <isbn media_type="print">978-3-642-16238-1</isbn>
+          <isbn media_type="electronic">978-3-642-16239-8</isbn>
+          <publisher>
+            <publisher_name>Springer Berlin Heidelberg</publisher_name>
+            <publisher_place>Berlin, Heidelberg</publisher_place>
+          </publisher>
+          <doi_data>
+            <doi>10.1007/978-3-642-16239-8</doi>
+            <resource>http://www.springerlink.com/index/10.1007/978-3-642-16239-8</resource>
+            <collection property="crawler-based" setbyID="springer">
+              <item crawler="iParadigms">
+                <resource>http://www.springerlink.com/index/pdf/10.1007/978-3-642-16239-8</resource>
+              </item>
+            </collection>
+          </doi_data>
+        </book_series_metadata>
+        <content_item component_type="chapter" level_sequence_number="1" publication_type="full_text">
+          <contributors>
+            <person_name contributor_role="author" sequence="first">
+              <given_name>Dmitry</given_name>
+              <surname>Devetyarov</surname>
+            </person_name>
+            <person_name contributor_role="author" sequence="additional">
+              <given_name>Ilia</given_name>
+              <surname>Nouretdinov</surname>
+            </person_name>
+          </contributors>
+          <titles>
+            <title>Prediction with Confidence Based on a Random Forest Classifier</title>
+          </titles>
+          <component_number>Chapter 8</component_number>
+          <publication_date media_type="print">
+            <year>2010</year>
+          </publication_date>
+          <pages>
+            <first_page>37</first_page>
+            <last_page>44</last_page>
+          </pages>
+          <doi_data>
+            <doi>10.1007/978-3-642-16239-8_8</doi>
+            <resource>http://www.springerlink.com/index/10.1007/978-3-642-16239-8_8</resource>
+            <collection property="crawler-based" setbyID="springer">
+              <item crawler="iParadigms">
+                <resource>http://www.springerlink.com/index/pdf/10.1007/978-3-642-16239-8_8</resource>
+              </item>
+            </collection>
+          </doi_data>
+        </content_item>
+      </book>
+    </crossref>
+  </doi_record>
+</doi_records>

@@ -24,7 +24,10 @@ class PresentationTest < ActiveSupport::TestCase
     presentation = Factory :presentation
     old_attrs = presentation.attributes
 
-    User.with_current_user(presentation.contributor) {presentation.save_as_new_version("new version")}
+    disable_authorization_checks do
+      presentation.save_as_new_version("new version")
+    end
+
     assert_equal 1,old_attrs["version"]
     assert_equal 2, presentation.version
 
@@ -49,7 +52,6 @@ class PresentationTest < ActiveSupport::TestCase
     assert_difference "presentation.events.count" do
          presentation.events << Factory(:event)
     end
-
   end
 
   test "has uuid" do

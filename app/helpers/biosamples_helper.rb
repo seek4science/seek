@@ -40,10 +40,10 @@ module BiosamplesHelper
 
   def strain_row_data strain
     creator = strain.contributor.try(:person)
-    creator_link = creator ? link_to(creator.name, person_path(creator.id), {:target => '_blank'}) : ""
-    [(link_to strain.organism.title, organism_path(strain.organism.id), {:target => '_blank'}),
+    creator_link = creator ? link_to(creator.name, person_path(creator.id)) : ""
+    [(link_to strain.organism.title, organism_path(strain.organism.id)),
      (check_box_tag "selected_strain_#{strain.id}", strain.id, false, :onchange => strain_checkbox_onchange_function)   ,
-     strain.title, strain.genotype_info, strain.phenotype_info, strain.id, strain.synonym, creator_link, strain.parent_strain,
+     link_to(strain.title, strain), text_or_not_specified(strain.genotype_info), text_or_not_specified(strain.phenotype_info), strain.id, text_or_not_specified(strain.synonym), text_or_not_specified(creator_link), text_or_not_specified(strain.parent_strain),
      (if strain.can_delete?
         link_to_remote image("destroy", :alt => "Delete", :title => "Delete this strain"), :url => {:action => "destroy", :controller => 'biosamples', :id => strain.id, :class => 'strain', :id_column_position => 5},
                              :confirm => "Are you sure you want to delete this strain?", :method => :delete
@@ -57,11 +57,11 @@ module BiosamplesHelper
   def organism_selection_onchange_function
      function =  remote_function(:url=>{:action=>"existing_strains", :controller=>"biosamples"},
                                                       :with=>"'organism_ids='+$F('strain_organism_ids')",
-                                                      :before=>"show_ajax_loader('existing_strains')")+ ";"
+                                                      :before=>"show_large_ajax_loader('existing_strains')")+ ";"
      function += remote_function(:url => {:controller => 'biosamples',
                                           :action => 'existing_specimens'},
                                           :with => "'strain_ids=' + getSelectedStrains() + '&organism_ids='+$F('strain_organism_ids')",
-                                          :before=>"show_ajax_loader('existing_specimens')") + ";"  if Seek::Config.is_virtualliver
+                                          :before=>"show_large_ajax_loader('existing_specimens')") + ";"  if Seek::Config.is_virtualliver
      function +=  "check_show_existing_items('strain_organism_ids', 'existing_strains', '');"
      if Seek::Config.is_virtualliver
        function +=  "check_show_existing_items('strain_organism_ids', 'existing_specimens', '');"
@@ -76,7 +76,7 @@ module BiosamplesHelper
         function = remote_function(:url => {:controller => 'biosamples',
                                             :action => 'existing_specimens'},
                                             :with => "'strain_ids=' + getSelectedStrains()+'&organism_ids='+$F('strain_organism_ids')",
-                                            :before=>"show_ajax_loader('existing_specimens')")+ ";"
+                                            :before=>"show_large_ajax_loader('existing_specimens')")+ ";"
         function += "show_existing_specimens();hide_existing_samples();" unless Seek::Config.is_virtualliver
         function += "return(false);"
         function
@@ -86,7 +86,7 @@ module BiosamplesHelper
     id_column = Seek::Config.is_virtualliver ? 8 : 6
     creators = []
     specimen.creators.each do |creator|
-      creators << link_to(creator.name, person_path(creator.id), {:target => '_blank'})
+      creators << link_to(creator.name, person_path(creator.id))
     end
     creators << specimen.other_creators unless specimen.other_creators.blank?
 
@@ -107,14 +107,24 @@ module BiosamplesHelper
       update_icon = image('edit', {:alt=>"Edit",:class=>"disabled",:onclick=>"javascript:alert(\"#{explanation}\")",:title=>"#{tooltip_title_attrib(explanation)}"})
     end
     strain = specimen.strain
-    strain_info = 'Strain ' + strain.info + "(Seek ID=#{strain.id})"
+    strain_info = 'Strain' + ": "+ strain.info + "(Seek ID=#{strain.id})"
 
-    [strain_info,
-     (check_box_tag "selected_specimen_#{specimen.id}", specimen.id, false, {:onchange => remote_function(:url => {:controller => 'biosamples',
-                                                                                                                   :action => 'existing_samples'},
-                                                                                                                  :with => "'specimen_ids=' + getSelectedSpecimens()",
-                                                                                                                  :before=>"show_ajax_loader('existing_samples')") + ";show_existing_samples();"}),
-     link_to(specimen.title, specimen_path(specimen.id), {:target => '_blank'}), specimen.born_info, specimen.culture_growth_type.try(:title), specimen.genotype_info,specimen.phenotype_info,creators.join(", "), specimen.id, asset_version_links(specimen.sops).join(", "), delete_icon, update_icon]
+    unless Seek::Config.is_virtualliver
+      [strain_info,
+       (check_box_tag "selected_specimen_#{specimen.id}", specimen.id, false, {:onchange => remote_function(:url => {:controller => 'biosamples',
+                                                                                                                     :action => 'existing_samples'},
+                                                                                                                    :with => "'specimen_ids=' + getSelectedSpecimens()",
+                                                                                                                    :before=>"show_large_ajax_loader('existing_samples')") + ";show_existing_samples();"}),
+       link_to(specimen.title, specimen_path(specimen.id)), text_or_not_specified(specimen.born_info), text_or_not_specified(specimen.culture_growth_type.try(:title)), text_or_not_specified(creators.join(", ")), specimen.id, text_or_not_specified(asset_version_links(specimen.sops).join(", ")), delete_icon, update_icon]
+
+    else
+      [strain_info,
+           (check_box_tag "selected_specimen_#{specimen.id}", specimen.id, false, {:onchange => remote_function(:url => {:controller => 'biosamples',
+                                                                                                                         :action => 'existing_samples'},
+                                                                                                                        :with => "'specimen_ids=' + getSelectedSpecimens()",
+                                                                                                                        :before=>"show_large_ajax_loader('existing_samples')") + ";show_existing_samples();"}),
+           link_to(specimen.title, specimen_path(specimen.id)), text_or_not_specified(specimen.born_info), text_or_not_specified(specimen.culture_growth_type.try(:title)), text_or_not_specified(specimen.genotype_info),text_or_not_specified(specimen.phenotype_info),text_or_not_specified(creators.join(", ")), specimen.id, text_or_not_specified(asset_version_links(specimen.sops).join(", ")), delete_icon, update_icon]
+    end
   end
 
   def sample_row_data sample
@@ -136,7 +146,7 @@ module BiosamplesHelper
     end
 
     [sample.specimen_info,
-     (link_to sample.title, sample_path(sample.id), {:target => '_blank'}),
-     sample.lab_internal_number, sample.sampling_date_info, sample.age_at_sampling, sample.provider_name, sample.id, sample.comments, delete_icon, update_icon]
+     (link_to sample.title, sample_path(sample.id)),
+     text_or_not_specified(sample.lab_internal_number), text_or_not_specified(sample.sampling_date_info), text_or_not_specified(sample.age_at_sampling_info), text_or_not_specified(sample.provider_name), sample.id, text_or_not_specified(sample.comments), delete_icon, update_icon]
   end
 end

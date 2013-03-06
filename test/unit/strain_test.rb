@@ -1,6 +1,10 @@
 require 'test_helper'
 
 class StrainTest < ActiveSupport::TestCase
+  fixtures :all
+  def setup
+    User.current_user = Factory(:user)
+  end
 
   def setup
     User.current_user = Factory(:user)
@@ -9,7 +13,7 @@ class StrainTest < ActiveSupport::TestCase
   test "without default" do
     Strain.destroy_all
     org = Factory :organism
-    Strain.create :title=>"fred",:is_dummy=>false, :organism=>org
+    Strain.create :title=>"fred",:is_dummy=>false, :organism=>org, :projects => [Factory(:project)]
     Strain.create :title=>"default",:is_dummy=>true, :organism=>org
     strains=org.strains.without_default
     assert_equal 1,strains.count
@@ -76,5 +80,52 @@ class StrainTest < ActiveSupport::TestCase
     assert !strain.specimens.empty?
     assert strain.specimens.first.samples.empty?
     assert strain.can_delete?
+  end
+
+  test "validation" do
+    strain=Strain.new :title => "strain", :projects => [projects(:sysmo_project)], :organism => organisms(:yeast)
+    assert strain.valid?
+
+    strain=Strain.new :title => "strain", :projects => [projects(:sysmo_project)]
+    assert !strain.valid?
+
+    strain=Strain.new :title => "strain", :organism => organisms(:yeast)
+    unless Seek::Config.is_virtualliver
+      assert !strain.valid?
+    else
+      assert strain.valid?
+    end
+
+    strain = Strain.new :organism => organisms(:yeast), :projects => [projects(:sysmo_project)]
+    assert !strain.valid?
+
+    #dummy strain
+    strain = Strain.new :title => 'strain', :organism => organisms(:yeast), :is_dummy => true
+    assert strain.valid?
+  end
+
+  test 'destroy strain' do
+    genotype = Factory(:genotype, :specimen => nil, :strain => nil)
+    phenotype = Factory(:phenotype, :specimen => nil, :strain => nil)
+    strain = Factory(:strain, :genotypes => [genotype], :phenotypes => [phenotype])
+    disable_authorization_checks{strain.destroy}
+    assert_equal nil, Strain.find_by_id(strain.id)
+    assert_equal nil, Genotype.find_by_id(genotype.id)
+    assert_equal nil, Phenotype.find_by_id(phenotype.id)
+  end
+
+  test 'when destroying strain, should not destroy genotypes/phenotypes that are linked to specimen' do
+      genotype1 = Factory(:genotype, :specimen => nil, :strain => nil)
+      genotype2 = Factory(:genotype, :specimen => nil, :strain => nil)
+      phenotype1 = Factory(:phenotype, :specimen => nil, :strain => nil)
+      phenotype2 = Factory(:phenotype, :specimen => nil, :strain => nil)
+      strain = Factory(:strain, :genotypes => [genotype1,genotype2], :phenotypes => [phenotype1,phenotype2])
+      specimen = Factory(:specimen,:genotypes => [genotype1], :phenotypes => [phenotype1])
+      disable_authorization_checks{strain.destroy}
+      assert_equal nil, Strain.find_by_id(strain.id)
+      assert_equal nil, Genotype.find_by_id(genotype2.id)
+      assert_equal nil, Phenotype.find_by_id(phenotype2.id)
+      assert_not_nil Genotype.find_by_id(genotype1.id)
+      assert_not_nil Phenotype.find_by_id(phenotype1.id)
   end
 end

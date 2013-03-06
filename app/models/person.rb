@@ -230,6 +230,10 @@ class Person < ActiveRecord::Base
     return  res
   end
 
+  def can_create_new_items?
+    member?
+  end
+
   def institutions
     work_groups.collect {|wg| wg.institution }.uniq
   end
@@ -253,7 +257,7 @@ class Person < ActiveRecord::Base
   end
 
   def member_of?(item_or_array)
-    array = [item_or_array].flatten
+    array = Array(item_or_array)
     array.detect {|item|Rails.cache.fetch([:member_of?, self.cache_key, item.cache_key]) { (item.is_a?(Project) && projects.include?(item)) || item.people.include?(self)}}
   end
 
@@ -280,6 +284,11 @@ class Person < ActiveRecord::Base
     #capitalize, including double barrelled names
     #TODO: why not just store them like this rather than processing each time? Will need to reprocess exiting entries if we do this.
     return (firstname.gsub(/\b\w/) {|s| s.upcase} + " " + lastname.gsub(/\b\w/) {|s| s.upcase}).strip
+  end
+
+  #returns true this is an admin person, and they are the only one defined - indicating they are person creating during setting up SEEK
+  def only_first_admin_person?
+    Person.count==1 && [self]==Person.all && Person.first.is_admin?
   end
 
   #the roles defined within the project

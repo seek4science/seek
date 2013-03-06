@@ -8,6 +8,7 @@ class EventsController < ApplicationController
 
   include IndexPager
   include Seek::Publishing
+  include Seek::BreadCrumbs
   
   def show
     

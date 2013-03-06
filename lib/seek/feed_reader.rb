@@ -1,3 +1,5 @@
+require 'atom'
+
 module Seek
   class FeedReader
 
@@ -45,7 +47,8 @@ module Seek
     end
 
     def self.cache_timeout
-      2.minutes.ago
+      t = Seek::Config.home_feeds_cache_timeout
+      t.minutes.ago
     end
   
     private

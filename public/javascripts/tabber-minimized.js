@@ -1,6 +1,7 @@
 /* Copyright (c) 2006 Patrick Fitzgerald */
 
 /* Modified on 2009-02-04 by Jits, based on: http://groups.google.com/group/barelyfitz/browse_thread/thread/03e8b0672238391a */
+/* Modified on 2012-10-23 by Stuart Owen, to transfer classname from the title to the tab element (e.g. from <h3 class='x'> to <a class='tabbertab x> */
 
 function tabberObj(argsObj)
 { if ( window.location.hash && window.location.hash.match( /^#/ ) ) { var el = document.getElementById(window.location.hash.substr(2)); if (el) { el.className = "tabbertab tabbertabdefault" } }
@@ -21,7 +22,7 @@ this.tabs.length=0;childNodes=e.childNodes;for(i=0;i<childNodes.length;i++){if(c
     t=this.tabs[i];
    t.headingText=t.div.title;
    if(this.removeTitle){t.div.title='';}
-   if(!t.headingText){for(i2=0;i2<this.titleElements.length;i2++){headingElement=t.div.getElementsByTagName(this.titleElements[i2])[0];if(headingElement){t.headingText=headingElement.innerHTML;if(this.titleElementsStripHTML){t.headingText.replace(/<br>/gi," ");t.headingText=t.headingText.replace(/<[^>]+>/g,"");}
+   if(!t.headingText){for(i2=0;i2<this.titleElements.length;i2++){headingElement=t.div.getElementsByTagName(this.titleElements[i2])[0];if(headingElement){t.className=headingElement.className;t.headingText=headingElement.innerHTML;if(this.titleElementsStripHTML){t.headingText.replace(/<br>/gi," ");t.headingText=t.headingText.replace(/<[^>]+>/g,"");}
 break;}}}
    if(!t.headingText){t.headingText=i+1;}
    DOM_li=document.createElement("li");
@@ -30,6 +31,7 @@ break;}}}
    DOM_a.appendChild(document.createTextNode(t.headingText));
    DOM_a.href="javascript:void(null);";
    DOM_a.title=t.headingText;
+   DOM_a.className += " " + t.className;
    DOM_a.onclick=this.navClick;
    DOM_a.tabber=this;
    DOM_a.tabberIndex=i;

@@ -1,36 +1,42 @@
-<% content_locals ||= {} %>
-<% actions_locals ||= {} %>
+
 <% resource = resource_list_item %>
 <% content_partial = get_list_item_content_partial(resource) %>
 <%
    actions_partial_disable ||= false
    actions_partial = actions_partial_disable ? nil : get_list_item_actions_partial(resource)
 %>
-<% avatar_partial = get_list_item_avatar_partial(resource) if avatar_partial.nil?%>
-<% box_width = 75 %>
-<% box_width += 10 if actions_partial.blank? %>
-<% box_width += 12 if avatar_partial.blank? %>
+
+<% avatar_partial = get_list_item_avatar_partial(resource) if avatar_partial.nil? %>
+<% #dont show JERM avatar for strain without contributor, as there are strains without contributor and are not harvested
+   avatar_partial = nil if resource.kind_of?(Strain) && resource.contributor.try(:person).nil? %>
+<% other_classes="" %>
+<% other_classes << " noactions" if actions_partial.blank? %>
+<% other_classes << " noavatar" if avatar_partial.blank? %>
 <%
-   access_based_css_class = "list_item " + if resource.respond_to?(:private?) && resource.private?
-       "private_list_item"
-   elsif resource.respond_to?(:public?) && resource.public?
-     "public_list_item"
-   else
-     ""
+   access_based_css_class = "list_item"
+   if Seek::Config.is_virtualliver
+     access_based_css_class += if resource.respond_to?(:private?) && resource.private?
+                                               " private_list_item"
+                                             elsif resource.respond_to?(:public?) && resource.public?
+                                               " public_list_item"
+                                             else
+                                               ""
+                                             end
    end
 %>
+
 <div class="<%= access_based_css_class%>">
   <% unless avatar_partial.blank? %>
     <div class="list_item_avatar">
-      <%= render :partial=> avatar_partial,:locals=>content_locals.merge({:resource => resource}) %>
+      <%= render :partial=> avatar_partial,:locals=>{:resource => resource} %>
     </div>
   <% end %>
-  <div class="list_item_content" style="width:<%= box_width %>%">
-    <%= render :partial=> content_partial,:locals=>content_locals.merge({:resource => resource}) %>
+  <div class="list_item_content <%= other_classes -%>">
+    <%= render :partial=> content_partial,:locals=>{:resource => resource} %>
   </div>
   <% unless actions_partial.blank? %>
     <div class="list_item_actions">
-      <%= render :partial=> actions_partial, :locals=>actions_locals.merge({:resource => resource}) %>
+      <%= render :partial=> actions_partial, :locals=>{:resource => resource} %>
     </div>
   <% end %>
 </div>

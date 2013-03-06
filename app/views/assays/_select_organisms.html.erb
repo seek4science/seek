@@ -39,7 +39,8 @@
         <div class="association_step">
           <b>Step 3</b> - <span class="assay_strain_info">  Specify a strain (optional)</span><br/>
           <div id="existing_strains_for_assay_organism"></div>
-          <%= text_field_tag :strain %>
+          <%= text_field_tag :strain, nil, :disabled => true %>
+          <%= link_to_function image("destroy", :alt => "Remove", :title => "Remove this strain", :id => 'destroy_image', :style => 'display:none;'), "removeStrain()" %>
           <br/>
             </div>
 
@@ -62,10 +63,15 @@
 </div>
 
 <script type="text/javascript">
-
-  function setStrainTextField(strain){
+    function setStrainTextField(strain){
       $('strain').value = strain;
       new Effect.Highlight('strain');
+      $('destroy_image').style['display']='block';
+  }
+
+  function removeStrain(){
+      $('strain').value = '';
+      $('destroy_image').style['display']='none';
   }
 
   <% @assay.assay_organisms.each do |o| -%>

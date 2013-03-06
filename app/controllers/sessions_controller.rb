@@ -36,7 +36,11 @@ class SessionsController < ApplicationController
     flash[:notice] = "You have been logged out."
 
     begin
-      redirect_back
+      if request.env['HTTP_REFERER'].try(:normalize_trailing_slash) == search_url.normalize_trailing_slash
+        redirect_to :root
+      else
+        redirect_back
+      end
     rescue RedirectBackError
       redirect :controller => :home, :action => :index
     end
@@ -104,7 +108,7 @@ class SessionsController < ApplicationController
         end
       end
       
-      format.html { return_to_url.nil? || (return_to_url && URI.parse(return_to_url).path == root_url) ? redirect_to(root_url) : redirect_to(return_to_url) }
+      format.html { return_to_url.nil? || (return_to_url && URI.parse(return_to_url).path == root_url || return_to_url.normalize_trailing_slash == search_url.normalize_trailing_slash) ? redirect_to(root_url) : redirect_to(return_to_url) }
       format.xml {session[:xml_login] = true; head :ok }
     end
   end

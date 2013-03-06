@@ -8,6 +8,9 @@ class AssayTypesControllerTest < ActionController::TestCase
   
   def setup
     login_as(:aaron)
+  end
+
+  def rest_api_test_object
     @object=assay_types(:metabolomics)
   end
 

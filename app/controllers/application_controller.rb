@@ -7,6 +7,8 @@ class ApplicationController < ActionController::Base
 
   self.mod_porter_secret = PORTER_SECRET
 
+  include CommonSweepers
+
   include ExceptionNotifiable
   self.error_layout="errors"
   self.silent_exceptions = []
@@ -25,6 +27,7 @@ class ApplicationController < ActionController::Base
   after_filter :log_event
 
   include AuthenticatedSystem
+
   around_filter :with_current_user
   def with_current_user
     User.with_current_user current_user do
@@ -33,15 +36,6 @@ class ApplicationController < ActionController::Base
   end
 
   before_filter :profile_for_login_required
-  around_filter :with_auth_code
-  def with_auth_code
-    session[:code] = params[:code] if params[:code]
-    SpecialAuthCode.with_auth_code(session[:code]) do
-      yield
-    end
-  end
-
-  #When I set log_level :error in production.rb it didn't seem to work
   #around_filter :silence_logging if Rails.env == 'production'
   def silence_logging
     Rails.logger.silence do
@@ -81,6 +75,7 @@ class ApplicationController < ActionController::Base
     return  "http://#{base_host}"
   end
   helper_method :application_root
+  
 
   def self.fast_auto_complete_for(object, method, options = {})
     define_method("auto_complete_for_#{object}_#{method}") do
@@ -149,6 +144,32 @@ class ApplicationController < ActionController::Base
     reset_session
     flash[:error] = error
     flash[:notice] = notice
+  end
+
+  #called via ajax to provide the full list of resources for the tabs
+  def view_items_in_tab
+    resource_type = params[:resource_type]
+    resource_ids = (params[:resource_ids] || []).split(',')
+    render :update do |page|
+      if !resource_type.blank?
+        clazz = resource_type.constantize
+        resources = clazz.find_all_by_id(resource_ids)
+        if clazz.respond_to?(:authorized_partial_asset_collection)
+          resources = clazz.authorized_partial_asset_collection(resources,"view")
+        else
+          resources = resources.select &:can_view?
+        end
+
+        page.replace_html "#{resource_type}_list_items_container",
+                          :partial => "assets/resource_list",
+                          :locals => {:collection => resources,
+                          :narrow_view => true,
+                          :authorization_for_showing_already_done => true,
+                          :actions_partial_disable=>false}
+        page.visual_effect :toggle_blind, "view_#{resource_type}s", :duration => 0.05
+        page.visual_effect :toggle_blind, "view_#{resource_type}s_and_extra", :duration => 0.05
+      end
+    end
   end
 
   private
@@ -288,16 +309,16 @@ class ApplicationController < ActionController::Base
 
       object = name.camelize.constantize.find(params[:id])
 
-      if object.can_perform? action
+      if is_auth?(object, action)
         eval "@#{name} = object"
         params.delete :sharing unless object.can_manage?(current_user)
       else
         respond_to do |format|
           #TODO: can_*? methods should report _why_ you can't do what you want. Perhaps something similar to how active_record_object.save stores 'why' in active_record_object.errors
           if User.current_user.nil?
-            flash[:error] = "You may not #{action} #{name}:#{params[:id]} , please log in first"
+            flash[:error] = "You are not authorized to #{action} this #{name.humanize}, you may need to login first."
           else
-            flash[:error] = "You are not authorized to #{action} this  #{name.humanize}"
+            flash[:error] = "You are not authorized to #{action} this #{name.humanize}."
           end
 
           format.html do
@@ -327,7 +348,16 @@ class ApplicationController < ActionController::Base
     end
   end
 
-  # See ActionController::Base for details 
+  def is_auth? object, action
+    if object.can_perform? action
+      true
+    elsif params[:code] && (action == 'view' || action == 'download')
+      object.auth_by_code? params[:code]
+    else
+      false
+    end
+  end
+  # See ActionController::Base for details
   # Uncomment this to filter the contents of submitted sensitive data parameters
   # from your application log (in this case, all fields with names like "password"). 
   filter_parameter_logging :password
@@ -346,53 +376,86 @@ class ApplicationController < ActionController::Base
 
       case c
         when "sessions"
-        if ["create","destroy"].include?(a)
-          ActivityLog.create(:action => a,
-                     :culprit => current_user,
-                     :controller_name=>c,
-                     :activity_loggable => object)
-        end
-        when "investigations","studies","assays","specimens","samples"
-        if ["show","create","update","destroy"].include?(a)
-          check_log_exists(a,c,object)
-          ActivityLog.create(:action => a,
-                     :culprit => current_user,
-                     :referenced => object.projects.first,
-                     :controller_name=>c,
-                     :activity_loggable => object,
-                      :data=> object.title)
+          if ["create", "destroy"].include?(a)
+            ActivityLog.create(:action => a,
+                               :culprit => current_user,
+                               :controller_name => c,
+                               :activity_loggable => object)
+          end
+        when "investigations", "studies", "assays", "specimens", "samples"
+          if ["show", "create", "update", "destroy"].include?(a)
+            check_log_exists(a, c, object)
+            ActivityLog.create(:action => a,
+                               :culprit => current_user,
+                               :referenced => object.projects.first,
+                               :controller_name => c,
+                               :activity_loggable => object,
+                               :data => object.title)
 
-        end
-        when "data_files","models","sops","publications","presentations","events"
+          end
+        when "data_files", "models", "sops", "publications", "presentations", "events"
           a = "create" if a == "upload_for_tool"
           a = "update" if a == "new_version"
-        if ["show","create","update","destroy","download"].include?(a)
-          check_log_exists(a,c,object)
-          ActivityLog.create(:action => a,
-                     :culprit => current_user,
-                     :referenced => object.projects.first,
-                     :controller_name=>c,
-                     :activity_loggable => object,
-                      :data=> object.title)
-        end
+          a = "inline_view" if a == "explore"
+          if ["show", "create", "update", "destroy", "download","inline_view"].include?(a)
+            check_log_exists(a, c, object)
+            ActivityLog.create(:action => a,
+                               :culprit => current_user,
+                               :referenced => object.projects.first,
+                               :controller_name => c,
+                               :activity_loggable => object,
+                               :data => object.title)
+          end
         when "people"
-        if ["show","create","update","destroy"].include?(a)
-          ActivityLog.create(:action => a,
-                     :culprit => current_user,
-                     :controller_name=>c,
-                     :activity_loggable => object,
-                      :data=> object.title)
-        end
+          if ["show", "create", "update", "destroy"].include?(a)
+            ActivityLog.create(:action => a,
+                               :culprit => current_user,
+                               :controller_name => c,
+                               :activity_loggable => object,
+                               :data => object.title)
+          end
         when "search"
-        if a=="index"
-          ActivityLog.create(:action => "index",
-                     :culprit => current_user,
-                     :controller_name=>c,
-                     :data => {:search_query=>object,:result_count=>@results.count})
-        end
+          if a=="index"
+            ActivityLog.create(:action => "index",
+                               :culprit => current_user,
+                               :controller_name => c,
+                               :data => {:search_query => object, :result_count => @results.count})
+          end
+        when "content_blobs"
+          a = "inline_view" if a=="view_pdf_content"
+          if a=="inline_view" || (a=="download" && params['intent'].to_s != 'inline_view')
+            activity_loggable = object.asset
+            ActivityLog.create(:action => a,
+                               :culprit => current_user,
+                               :referenced => object,
+                               :controller_name => c,
+                               :activity_loggable => activity_loggable,
+                               :data => activity_loggable.title)
+          end
+      end
+      expire_activity_fragment_cache(c,a)
+    end
+
+  end
+
+  def expire_activity_fragment_cache(controller,action)
+    if action!="show"
+      @@auth_types ||=  Seek::Util.authorized_types.collect{|t| t.name.underscore.pluralize}
+      if action=="download"
+        expire_download_activity
+      elsif action=="create" && controller!="sessions"
+        expire_create_activity
+      elsif action=="destroy"
+        expire_create_activity
+        expire_download_activity
+      elsif action=="update" && @@auth_types.include?(controller) #may have had is permission changed
+        expire_create_activity
+        expire_download_activity
+        expire_resource_list_item_action_partial
       end
     end
   end
+
 
   def check_log_exists action,controllername,object
     if action=="create"

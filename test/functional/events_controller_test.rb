@@ -7,6 +7,9 @@ class EventsControllerTest < ActionController::TestCase
 
   def setup
     login_as(:datafile_owner)
+  end
+
+  def rest_api_test_object
     @object=events(:event_with_no_files)
   end
 
@@ -20,6 +23,19 @@ class EventsControllerTest < ActionController::TestCase
     get :index
     assert_response :success
     assert_not_nil assigns(:events)
+  end
+
+  test "should have no avatar element in list" do
+    e = Factory :event,
+                :contributor => Factory(:user, :person => Factory(:person ,:first_name => "Dont", :last_name => "Display Person")),
+                :projects => [Factory(:project, :title => "Dont Display Project")],
+                :policy => Factory(:public_policy)
+    get :index
+    assert_select "div.list_items_container" do
+      assert_select "div.list_item" do
+        assert_select "div.list_item_avatar",:count=>0
+      end
+    end
   end
 
   test "index should not show contributor or project" do
@@ -36,7 +52,7 @@ class EventsControllerTest < ActionController::TestCase
     login_as(:aaron)
     get :index, :page => "all"
     assert_response :success
-    assert_equal assigns(:events).sort_by(&:id), Authorization.authorize_collection("view", assigns(:events), users(:aaron)).sort_by(&:id), "events haven't been authorized properly"
+    assert_equal assigns(:events).sort_by(&:id), Event.authorized_partial_asset_collection(assigns(:events), "view",  users(:aaron)).sort_by(&:id), "events haven't been authorized properly"
     assert assigns(:events).count < Event.find(:all).count #fails if all events are assigned to @events
   end
 
@@ -125,5 +141,18 @@ class EventsControllerTest < ActionController::TestCase
 
     assert_redirected_to e
     assert_equal 1, e.data_files.count
+  end
+
+  test "should create and show event without end_date" do
+    assert_difference('Event.count', 1) do
+      post :create, :event => {:title => "Barn Raising", :start_date => DateTime.now}
+    end
+    assert_redirected_to assigns(:event)
+
+    get :show, :id => assigns(:event).id
+    assert_response :success
+
+    get :index
+    assert_response :success
   end
 end

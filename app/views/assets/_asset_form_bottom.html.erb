@@ -50,6 +50,6 @@
                                                                              :related_publications => related_publications} -%>
     </p>
 <% end -%>
-<% if try_block{f.object.is_a?(Acts::Authorized::CodeBasedAuthorization)} %>
+<% if f.try(:object).try(:is_a?, (Acts::Authorized::CodeBasedAuthorization)) && !f.try(:object).try(:new_record?) %>
     <%= render :partial => 'assets/special_auth_code_form', :locals => {:f => f}%>
 <% end %>

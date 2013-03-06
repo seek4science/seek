@@ -16,6 +16,11 @@ class DataFileTest < ActiveSupport::TestCase
     assert_equal blob,datafile.content_blob
   end
 
+  test "content blob search terms" do
+    df = Factory :data_file, :content_blob=>Factory(:doc_content_blob,:original_filename=>"word.doc")
+    assert_equal ["This is a ms word doc format","word.doc"],df.content_blob_search_terms.sort
+  end
+
   test "spreadsheet contents for search" do
     df = Factory :rightfield_datafile
     
@@ -242,7 +247,7 @@ class DataFileTest < ActiveSupport::TestCase
       Factory :attribution,:subject=>data_file,:object=>attribution_df
       Factory :relationship,:subject=>data_file,:object=>Factory(:publication),:predicate=>Relationship::RELATED_TO_PUBLICATION
       data_file.creators = [Factory(:person),Factory(:person)]
-      Factory :annotation,:attribute_name=>"tags",:annotatable=> data_file,:attribute_id => AnnotationAttribute.create(:name=>"tags").id
+      Factory :annotation,:attribute_name=>"tag",:annotatable=> data_file,:attribute_id => AnnotationAttribute.create(:name=>"tag").id
       data_file.events = [Factory(:event)]
       Factory :scaling, :person=> Factory(:person),:scalable=>data_file, :scale => Factory(:scale)
       data_file.save!
@@ -257,7 +262,7 @@ class DataFileTest < ActiveSupport::TestCase
 
       presentation = Factory.build :presentation,:contributor=>user
 
-      data_file_converted = data_file.to_presentation!
+      data_file_converted = data_file.to_presentation
       data_file_converted = data_file_converted.reload
 
 
@@ -291,6 +296,24 @@ class DataFileTest < ActiveSupport::TestCase
     }
   end
 
+  test "convert to presentation when linked to project folder" do
+    user = Factory :user
+    project = user.person.projects.first
+    User.with_current_user(user) do
+      project_folder = Factory :project_folder,:project=>project
+      data_file = Factory :data_file,:contributor=>user, :projects=>[project]
+      pfa=ProjectFolderAsset.create :asset=>data_file,:project_folder=>project_folder
+
+      data_file.reload
+      assert_equal [project_folder],data_file.folders
+      presentation = Factory.build :presentation,:contributor=>user
+      data_file_converted = data_file.to_presentation
+
+      data_file_converted.save!
+      assert_equal [project_folder],data_file_converted.folders
+    end
+  end
+
   test 'should convert tag from datafile to presentation' do
       user = Factory :user
       User.with_current_user(user) {
@@ -301,7 +324,32 @@ class DataFileTest < ActiveSupport::TestCase
         assert_equal 0, data_file.annotations.first.versions.count
         assert 'fish', data_file.annotations.first.value.text
 
-        data_file_converted = data_file.to_presentation!
+        data_file_converted = data_file.to_presentation
+        data_file_converted.reload
+        data_file.reload
+
+        assert [], data_file.annotations
+        assert [], Annotation::Version.find(:all, :conditions => ['annotatable_type=? and annotatable_id=?', 'DataFile', data_file.id])
+        assert_equal 1, data_file_converted.annotations.count
+        assert_equal 0, data_file_converted.annotations.first.versions.count
+        assert 'fish', data_file_converted.annotations.first.value.text
+      }
+  end
+
+  test 'should not convert other annotation types but tag from datafile to presentation' do
+      user = Factory :user
+      User.with_current_user(user) {
+        data_file = Factory :data_file,:contributor=>user
+        Factory :tag,:annotatable=>data_file,:source=>user,:value=>"fish"
+        Factory :annotation, :annotatable => data_file, :source=>user,:value=>"cat"
+
+        assert_equal 2, data_file.annotations.count
+        assert_equal 0, data_file.annotations.first.versions.count
+        assert_equal 0, data_file.annotations.last.versions.count
+        assert data_file.annotations.collect(&:value).collect(&:text).include?('fish')
+        assert data_file.annotations.collect(&:value).collect(&:text).include?('cat')
+
+        data_file_converted = data_file.to_presentation
         data_file_converted.reload
         data_file.reload
 
@@ -366,8 +414,6 @@ class DataFileTest < ActiveSupport::TestCase
         data=File.new("#{Rails.root}/test/fixtures/files/treatments-normal-case.xls","rb").read
         df = Factory :data_file,:contributor=>user,:content_blob=>Factory(:content_blob,:data=>data,:content_type=>"application/excel")
         assert_not_nil df.spreadsheet_xml
-        assert df.is_excel?
-        assert df.is_extractable_spreadsheet?
         assert_not_nil df.treatments
         assert_equal 2,df.treatments.values.keys.count
         assert_equal ["Dilution_rate","pH"],df.treatments.values.keys.sort
@@ -377,6 +423,20 @@ class DataFileTest < ActiveSupport::TestCase
         assert_not_nil df.treatments
         assert_equal 0,df.treatments.values.keys.count
       end
+  end
+ test "cache_remote_content" do
+    mock_remote_file "#{Rails.root}/test/fixtures/files/file_picture.png","http://mockedlocation.com/picture.png"
+
+    data_file = Factory :data_file, :content_blob=>ContentBlob.new(:url=>"http://mockedlocation.com/picture.png",:original_filename=>"picture.png")
+
+    data_file.save!
+
+    assert !data_file.content_blob.file_exists?
+
+    data_file.cache_remote_content_blob
+
+    assert data_file.content_blob.file_exists?
+
   end
 
 =begin

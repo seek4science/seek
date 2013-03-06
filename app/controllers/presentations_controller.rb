@@ -4,17 +4,16 @@ class PresentationsController < ApplicationController
 
   include IndexPager
   include DotGenerator
+
   include Seek::AssetsCommon
   include AssetsCommonExtension
 
-  #before_filter :login_required
   before_filter :find_assets, :only => [ :index ]
   before_filter :find_and_auth, :except => [ :index, :new, :create, :preview,:update_annotations_ajax]
-  before_filter :find_display_asset, :only=>[:show,:download]
-
-  #before_filter :convert_to_swf, :only => :show
+  before_filter :find_display_asset, :only=>[:show, :download]
 
   include Seek::Publishing
+  include Seek::BreadCrumbs
 
   def new_version
     if (handle_data nil)
@@ -105,36 +104,9 @@ class PresentationsController < ApplicationController
 
   end
 
-#  def convert_to_swf
-#      file_type = nil
-#      if @presentation
-#        case @presentation.content_type
-#          when "application/pdf"
-#             file_type = "pdf"
-#          when "application/text"
-#            file_type = "text"
-#          else
-#
-#        end
-#
-#        begin
-#          FlashTool::FlashObject.new("#{ContentBlob::DATA_STORAGE_PATH}#{RAILS_ENV}/#{@presentation.content_blob.uuid}.dat", file_type) do |f|
-#            f.output("public/swf/presentations/#{@presentation.title}.swf")
-#            f.fonts
-#            f.flashversion("9")
-#            f.stop
-#            f.set('param="storeallcharacters"')
-#            f.flatten
-#            f.save()
-#          end
-#        rescue Exception=>e
-#
-#          flash[:error]=e.message#[0..50]
-#
-#        end
-#      end
-#
-#  end
+
+
+
   # GET /presentations/1
   # GET /presentations/1.xml
   def show
@@ -153,16 +125,6 @@ class PresentationsController < ApplicationController
       format.dot { render :text=>to_dot(@presentation,params[:deep]=='true',@presentation)}
       format.png { render :text=>to_png(@presentation,params[:deep]=='true',@presentation)}
     end
-  end
-
-   # GET /presentations/1/download
-  def download
-    # update timestamp in the current Presentation record
-    # (this will also trigger timestamp update in the corresponding Asset)
-    @presentation.last_used_at = Time.now
-    @presentation.save_without_timestamping
-
-    handle_download @display_presentation
   end
 
   def edit

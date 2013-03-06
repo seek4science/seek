@@ -6,15 +6,21 @@ class PublicationTest < ActiveSupport::TestCase
   fixtures :all
 
   test "event association" do
-    publication = publications(:one)
+    publication = Factory :publication
     assert publication.events.empty?
     event = events(:event_with_no_files)
     User.with_current_user(publication.contributor) do
       publication.events << event
       assert publication.valid?
-      assert publication.save
+      publication.save!
     end
+    publication = Publication.find(publication.id)
     assert_equal 1, publication.events.count
+  end
+
+  test "content blob search terms" do
+    p = Factory :publication
+    assert_equal [],p.content_blob_search_terms
   end
 
   test "assay association" do
@@ -35,23 +41,33 @@ class PublicationTest < ActiveSupport::TestCase
   end
 
   test "publication date from pubmed" do
-    WebMock.allow_net_connect!
-    query = PubmedQuery.new("seek","sowen@cs.man.ac.uk")
+    mock_pubmed(:email=>"fred@email.com",:id=>21533085,:content_file=>"pubmed_21533085.xml")
+    mock_pubmed(:email=>"fred@email.com",:id=>20533085,:content_file=>"pubmed_20533085.xml")
+    mock_pubmed(:email=>"fred@email.com",:id=>1,:content_file=>"pubmed_1.xml")
+    query = PubmedQuery.new("seek","fred@email.com")
     result = query.fetch(21533085)
     assert_equal Date.parse("20 April 2011"),result.date_published
 
-    sleep 0.5 #the sleeps are to keep in accordance to the pubmed service requirements
     result = query.fetch(1)
     assert_equal Date.parse("1 June 1975"),result.date_published
 
-    sleep 0.5 #the sleeps are to keep in accordance to the pubmed service requirements
     result = query.fetch(20533085)
     assert_equal Date.parse("9 June 2010"),result.date_published
+    assert_nil result.error
   end
 
+  test "unknown pubmed_id" do
+    mock_pubmed(:email=>"fred@email.com",:id=>1111111111111,:content_file=>"pubmed_not_found.xml")
+    query = PubmedQuery.new("seek","fred@email.com")
+    result = query.fetch(1111111111111)
+    assert_equal "No publication could be found with that PubMed ID",result.error
+  end
+
+
+
   test "book chapter doi" do
-    WebMock.allow_net_connect!
-    query=DoiQuery.new("sowen@cs.man.ac.uk")
+    mock_crossref(:email=>"fred@email.com",:doi=>"10.1007/978-3-642-16239-8_8",:content_file=>"cross_ref1.xml")
+    query=DoiQuery.new("fred@email.com")
     result = query.fetch("10.1007/978-3-642-16239-8_8")
     assert_equal 3,result.publication_type
     assert_equal "Prediction with Confidence Based on a Random Forest Classifier",result.title
@@ -64,15 +80,33 @@ class PublicationTest < ActiveSupport::TestCase
     assert_equal "Artificial Intelligence Applications and Innovations",result.journal
     assert_equal Date.parse("1 Jan 2010"),result.date_published
     assert_equal "10.1007/978-3-642-16239-8_8",result.doi
+    assert_nil result.error
 
   end
 
+  test "doi with not resolvable error" do
+    mock_crossref(:email=>"fred@email.com",:doi=>"10.4230/OASIcs.GCB.2012.1",:content_file=>"cross_ref_no_resolve.xml")
+    query=DoiQuery.new("fred@email.com")
+    result = query.fetch("10.4230/OASIcs.GCB.2012.1")
+    assert_equal "The DOI could not be resolved",result.error
+    assert_equal "10.4230/OASIcs.GCB.2012.1",result.doi
+  end
+
+  test "malformed doi" do
+    mock_crossref(:email=>"fred@email.com",:doi=>"10.1.11.1",:content_file=>"cross_ref_malformed_doi.xml")
+    query=DoiQuery.new("fred@email.com")
+    result = query.fetch("10.1.11.1")
+    assert_equal "Not a valid DOI",result.error
+    assert_equal "10.1.11.1",result.doi
+  end
+
   test "editor should not be author" do
-    WebMock.allow_net_connect!
-    query=DoiQuery.new("sowen@cs.man.ac.uk")
+    mock_crossref(:email=>"fred@email.com",:doi=>"10.1371/journal.pcbi.1002352",:content_file=>"cross_ref2.xml")
+    query=DoiQuery.new("fred@email.com")
     result = query.fetch("10.1371/journal.pcbi.1002352")
     assert !result.authors.collect{|auth| auth.last_name}.include?("Papin")
     assert_equal 5,result.authors.size
+    assert_nil result.error
   end
 
   test "model and datafile association" do
@@ -98,19 +132,28 @@ class PublicationTest < ActiveSupport::TestCase
   end
 
   test "validation" do
-    asset=Publication.new :title=>"fred",:projects=>[projects(:sysmo_project)],:doi=>"111"
+    project = Factory :project
+    asset=Publication.new :title=>"fred",:projects=>[project],:doi=>"111"
     assert asset.valid?
 
-    asset=Publication.new :title=>"fred",:projects=>[projects(:sysmo_project)],:pubmed_id=>"111"
+    asset=Publication.new :title=>"fred",:projects=>[project],:pubmed_id=>"111"
     assert asset.valid?
 
-    asset=Publication.new :title=>"fred",:projects=>[projects(:sysmo_project)]
+    asset=Publication.new :title=>"fred",:projects=>[project]
     assert !asset.valid?
 
-    asset=Publication.new :projects=>[projects(:sysmo_project)],:doi=>"111"
+    asset=Publication.new :projects=>[project],:doi=>"111"
     assert !asset.valid?
 
     asset=Publication.new :title=>"fred",:doi=>"111"
+    assert asset.valid?
+
+    #cant have both a pubmed and doi
+    asset = Publication.new :title=>"bob",:doi=>"777",:projects=>[project]
+    assert asset.valid?
+    asset.pubmed_id="999"
+    assert !asset.valid?
+    asset.doi=nil
     assert asset.valid?
   end
   
@@ -125,6 +168,90 @@ class PublicationTest < ActiveSupport::TestCase
   def test_project_not_required
     p=Publication.new(:title=>"blah blah blah",:pubmed_id=>"123")
     assert p.valid?
+  end
+
+  test 'validate uniqueness of pubmed_id and doi within project only' do
+    project1=Factory :project
+    pub=Publication.new(:title=>"test1",:pubmed_id=>"1234", :projects => [project1])
+    assert pub.valid?
+    assert pub.save
+    pub=Publication.new(:title=>"test2",:pubmed_id=>"1234", :projects => [project1])
+    assert !pub.valid?
+
+    pub=Publication.new(:title=>"test3",:doi=>"1234", :projects => [project1])
+    assert pub.valid?
+    assert pub.save
+    pub=Publication.new(:title=>"test4",:doi=>"1234", :projects => [project1])
+    assert !pub.valid?
+
+    #should be allowed for another project, but only that project on its own
+    project2=Factory :project
+    pub=Publication.new(:title=>"test5",:pubmed_id=>"1234", :projects => [project2])
+    assert pub.valid?
+    pub=Publication.new(:title=>"test5",:pubmed_id=>"1234", :projects => [project1,project2])
+    assert !pub.valid?
+
+    pub=Publication.new(:title=>"test5",:doi=>"1234", :projects => [project2])
+    assert pub.valid?
+    pub=Publication.new(:title=>"test5",:doi=>"1234", :projects => [project1,project2])
+    assert !pub.valid?
+
+    #make sure you can edit yourself!
+    p=Factory :publication
+    User.with_current_user p.contributor do
+      p.save!
+      p.abstract="an abstract"
+      assert p.valid?
+      p.save!
+    end
+
+  end
+
+  test "validate uniqueness of title in project only" do
+    project1=Factory :project
+    pub=Publication.new(:title=>"test1",:pubmed_id=>"1234", :projects => [project1])
+    assert pub.valid?
+    assert pub.save
+    pub=Publication.new(:title=>"test1",:pubmed_id=>"33343", :projects => [project1])
+    assert !pub.valid?
+
+    project2=Factory :project
+    pub=Publication.new(:title=>"test1",:pubmed_id=>"234", :projects => [project2])
+    assert pub.valid?
+
+    #make sure you can edit yourself!
+    p=Factory :publication
+    User.with_current_user p.contributor do
+      p.save!
+      p.abstract="an abstract"
+      assert p.valid?
+      p.save!
+    end
+  end
+
+  def mock_crossref options
+    url= "http://www.crossref.org/openurl/"
+    params={}
+    params[:format] = "unixref"
+    params[:id] = "doi:"+options[:doi]
+    params[:pid] = options[:email]
+    params[:noredirect] = true
+    url = "http://www.crossref.org/openurl/?" + params.to_param
+    file=options[:content_file]
+    stub_request(:get,url).to_return(:body=>File.new("#{Rails.root}/test/fixtures/files/mocking/#{file}"))
+
+  end
+
+  def mock_pubmed options
+    params={}
+    params[:db] = "pubmed" unless params[:db]
+    params[:retmode] = "xml"
+    params[:id] = options[:id]
+    params[:tool] = "seek"
+    params[:email] = options[:email]
+    url = "http://eutils.ncbi.nlm.nih.gov/entrez/eutils/efetch.fcgi?" + params.to_param
+    file=options[:content_file]
+    stub_request(:get,url).to_return(:body=>File.new("#{Rails.root}/test/fixtures/files/mocking/#{file}"))
   end
   
 end

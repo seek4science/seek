@@ -2,30 +2,29 @@
 require 'simple-spreadsheet-extractor'
 
 class DataFilesController < ApplicationController
-  
+
   include IndexPager
   include SysMODB::SpreadsheetExtractor
-  include SpreadsheetUtil
-  include MimeTypesHelper  
-  include DotGenerator  
+  include MimeTypesHelper
+  include DotGenerator
+
   include Seek::AssetsCommon
   include AssetsCommonExtension
-  include Seek::AnnotationCommon
 
-  #before_filter :login_required
-  
   before_filter :find_assets, :only => [ :index ]
   before_filter :find_and_auth, :except => [ :index, :new, :upload_for_tool, :upload_from_email, :create, :request_resource, :preview, :test_asset_url, :update_annotations_ajax]
-  before_filter :find_display_asset, :only=>[:show,:download,:explore]
+  before_filter :find_display_asset, :only=>[:show,:explore,:download,:matching_models]
   skip_before_filter :verify_authenticity_token, :only => [:upload_for_tool, :upload_from_email]
   before_filter :xml_login_only, :only => [:upload_from_email]
 
   #has to come after the other filters
   include Seek::Publishing
+  include Seek::BreadCrumbs
+
 
   def convert_to_presentation
     @data_file = DataFile.find params[:id]
-    @presentation = @data_file.to_presentation!
+    @presentation = @data_file.to_presentation
 
     respond_to do |format|
 
@@ -35,6 +34,8 @@ class DataFilesController < ApplicationController
           @data_file.reload
           @data_file.destroy
         end
+
+        ActivityLog.create :action=>"create",:culprit=>User.current_user,:activity_loggable=>@presentation,:controller_name=>controller_name.downcase
         flash[:notice]="Data File '#{@presentation.title}' is successfully converted to Presentation"
         format.html { redirect_to presentation_path(@presentation) }
       else
@@ -162,10 +163,10 @@ class DataFilesController < ApplicationController
       render :text => "This user is not permitted to act on behalf of other users", :status => :forbidden
     end
   end
-  
+
   def create
     if handle_data
-      
+
       @data_file = DataFile.new params[:data_file]
       #@data_file.content_blob = ContentBlob.new :tmp_io_object => @tmp_io_object, :url=>@data_url
 
@@ -175,63 +176,64 @@ class DataFilesController < ApplicationController
       assay_ids = params[:assay_ids] || []
 
 
-        if @data_file.save
-          update_annotations @data_file
+      if @data_file.save
+        update_annotations @data_file
 
-          create_content_blobs
+        create_content_blobs
 
-          # update attributions
-          Relationship.create_or_update_attributions(@data_file, params[:attributions])
+        # update attributions
+        Relationship.create_or_update_attributions(@data_file, params[:attributions])
 
-          # update related publications
-          Relationship.create_or_update_attributions(@data_file, params[:related_publication_ids].collect { |i| ["Publication", i.split(",").first] }, Relationship::RELATED_TO_PUBLICATION) unless params[:related_publication_ids].nil?
+        # update related publications
+        Relationship.create_or_update_attributions(@data_file, params[:related_publication_ids].collect { |i| ["Publication", i.split(",").first] }, Relationship::RELATED_TO_PUBLICATION) unless params[:related_publication_ids].nil?
 
-          #Add creators
-          AssetsCreator.add_or_update_creator_list(@data_file, params[:creators])
+        #Add creators
+        AssetsCreator.add_or_update_creator_list(@data_file, params[:creators])
           if !@data_file.parent_name.blank?
-            render :partial=>"assets/back_to_fancy_parent", :locals=>{:child=>@data_file, :parent_name=>@data_file.parent_name,:is_not_fancy=>true}
-          else
-            respond_to do |format|
-              flash[:notice] = 'Data file was successfully uploaded and saved.' if flash.now[:notice].nil?
-              #parse the data file if it is with sample data
-              if @data_file.is_with_sample
-                bio_samples = @data_file.bio_samples_population params[:institution_id]
-                #@bio_samples = bio_samples
-                #Rails.logger.warn "BIO SAMPLES ::: " + @bio_samples.treatments_text
-                unless  bio_samples.errors.blank?
-                  flash[:notice] << "<br/> However, Sample database population failed."
-                  flash[:error] = bio_samples.errors.html_safe
-                  #respond_to do |format|
-                  #  format.html{
-                  #    render :action => "new"
-                  #  }
-                 # end
-                end
-              end
-              assay_ids.each do |text|
-                a_id, r_type = text.split(",")
-                @assay = Assay.find(a_id)
-                if @assay.can_edit?
-                  @assay.relate(@data_file, RelationshipType.find_by_title(r_type))
-                end
-              end
-
-                format.html { redirect_to data_file_path(@data_file) }
-
-            end
-          end
-
-          deliver_request_publish_approval params[:sharing], @data_file
-
+          render :partial => "assets/back_to_fancy_parent", :locals => {:child => @data_file, :parent_name => @data_file.parent_name, :is_not_fancy => true}
         else
           respond_to do |format|
+            flash[:notice] = 'Data file was successfully uploaded and saved.' if flash.now[:notice].nil?
+            #parse the data file if it is with sample data
+            if @data_file.is_with_sample
+              bio_samples = @data_file.bio_samples_population params[:institution_id]
+              #@bio_samples = bio_samples
+              #Rails.logger.warn "BIO SAMPLES ::: " + @bio_samples.treatments_text
+              unless  bio_samples.errors.blank?
+                flash[:notice] << "<br/> However, Sample database population failed."
+                flash[:error] = bio_samples.errors.html_safe
+                #respond_to do |format|
+                #  format.html{
+                #    render :action => "new"
+                #  }
+                # end
+              end
+            end
+            assay_ids.each do |text|
+              a_id, r_type = text.split(",")
+              @assay = Assay.find(a_id)
+              if @assay.can_edit?
+                @assay.relate(@data_file, RelationshipType.find_by_title(r_type))
+              end
+            end
+            format.html { redirect_to data_file_path(@data_file) }
+          end
+        end
+        deliver_request_publish_approval params[:sharing], @data_file
+
+      else
+        respond_to do |format|
           format.html {
             render :action => "new"
           }
-          end
         end
+
+      end
     end
   end
+
+
+
   
   def show
     # store timestamp of the previous last usage
@@ -247,6 +249,7 @@ class DataFilesController < ApplicationController
     respond_to do |format|
       format.html #{render :locals => {:template => params[:parsing_template]}}# show.html.erb
       format.xml
+      format.rdf { render :text=>@data_file.to_rdf }
       format.svg { render :text=>to_svg(@data_file,params[:deep]=='true',@data_file)}
       format.dot { render :text=>to_dot(@data_file,params[:deep]=='true',@data_file)}
       format.png { render :text=>to_png(@data_file,params[:deep]=='true',@data_file)}
@@ -323,25 +326,14 @@ class DataFilesController < ApplicationController
         }
       end
     end
-end
+  end
 
-  
-  # GET /data_files/1/download
-  def download
-    # update timestamp in the current data file record
-    # (this will also trigger timestamp update in the corresponding Asset)
-    @data_file.last_used_at = Time.now
-    @data_file.save_without_timestamping    
-    
-    handle_download @display_data_file
-  end 
-  
   def data
     @data_file =  DataFile.find(params[:id])
     sheet = params[:sheet] || 1
     trim = params[:trim]
     trim ||= false
-    if ["xls","xlsx"].include?(mime_extension(@data_file.content_type))
+    if ["xls","xlsx"].include?(mime_extension(@data_file.content_blob.content_type))
 
       respond_to do |format|
         format.html #currently complains about a missing template, but we don't want people using this for now - its purely XML
@@ -381,7 +373,7 @@ end
   end  
   
   def explore
-    if @display_data_file.is_extractable_spreadsheet?
+    if @display_data_file.contains_extractable_spreadsheet?
       #Generate Ruby spreadsheet model from XML
       @spreadsheet = @display_data_file.spreadsheet
 
@@ -396,14 +388,44 @@ end
         format.html { redirect_to data_file_path(@data_file,:version=>@display_data_file.version) }
       end
     end
-  end 
+  end
+
+  def clear_population bio_samples
+      specimens = Specimen.find_all_by_title bio_samples.instance_values["specimen_names"].values
+      samples = Sample.find_all_by_title bio_samples.instance_values["sample_names"].values
+      samples.each do |s|
+        s.assays.clear
+        s.destroy
+      end
+      specimens.each &:destroy
+  end
   
+  def matching_models
+    #FIXME: should use the correct version
+    matching_models = @data_file.matching_models
 
-
+    render :update do |page|
+      page.visual_effect :toggle_blind,"matching_models"
+      page.visual_effect :toggle_blind,'matching_results'
+      html = ""
+      matching_models.each do |match|
+        model = Model.find(match.primary_key)
+        if (model.can_view?)
+          html << "<div>"
+          html << "<div class='matchmake_result'>Matched with <b>#{match.search_terms.join(', ')}</b></div>"
+          html << render(:partial=>"layouts/resource_list_item", :object=>model)
+          html << "</div>"
+        end
+      end
+      page.replace_html "matching_results",:text=>html
+    end
+  end
+  
   protected
 
   def translate_action action
     action="download" if action=="data"
+    action="view" if ["matching_models"].include?(action)
     super action
   end
 

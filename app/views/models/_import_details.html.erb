@@ -1,0 +1,5 @@
+<% if !import_details.imported_source.blank? && !import_details.imported_url.blank? -%>
+<p class='import_details' xmlns="http://www.w3.org/1999/html">
+  This <%=  text_for_resource(controller_name.downcase.singularize.underscore) -%> was originally imported from the <strong><%= import_details.imported_source -%></strong>: <%=  link_to import_details.imported_url,import_details.imported_url,:target=>"_blank" -%>.
+</p>
+<% end -%>

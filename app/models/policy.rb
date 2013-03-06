@@ -26,8 +26,6 @@ class Policy < ActiveRecord::Base
 
   alias_attribute :title, :name
 
-  default_scope :include=>:permissions
-
   after_save :queue_update_auth_table
 
   def queue_update_auth_table
@@ -268,7 +266,7 @@ class Policy < ActiveRecord::Base
   end
 
   def private?
-    sharing_scope == Policy::PRIVATE and permissions.empty?
+    sharing_scope == Policy::PRIVATE && permissions.empty?
   end
 
   def public?

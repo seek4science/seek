@@ -132,6 +132,14 @@ class Mailer < ActionMailer::Base
     body :site_announcement=>site_announcement, :notifiee_info=>notifiee_info,:host=>base_host
   end
 
+  def test_email testing_email
+    subject "Test email"
+    recipients testing_email
+    from Seek::Config.noreply_sender
+    sent_on Time.now
+    body
+  end
+
   private
   
   def admin_emails

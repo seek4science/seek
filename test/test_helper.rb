@@ -7,28 +7,12 @@ require 'ruby-prof'
 require 'factory_girl'
 require 'webmock/test_unit'
 require 'action_view/test_case'
+require 'tmpdir'
 
-Rails.cache.class.class_eval do
-  #Doesn't do any good if the cache is being used directly via read/write
-  def fetch_with_paranoid_double_checking key
-    if block_given?
-      calculated_result = yield
-      fetch_result = fetch_without_paranoid_double_checking(key) {calculated_result}
-      if calculated_result != fetch_result
-        raise "fetch result (#{fetch_result}) for key (#{key}) does not match calculated result(#{calculated_result})"
-      end
-      calculated_result
-    else
-      fetch_without_paranoid_double_checking(key)
-    end
-  end
 
-  alias_method_chain :fetch, :paranoid_double_checking
-end
+FactoryGirl.find_definitions #It looks like requiring factory_girl _should_ do this automatically, but it doesn't seem to work
 
-Factory.find_definitions #It looks like requiring factory_girl _should_ do this automatically, but it doesn't seem to work
-
-Factory.class_eval do
+FactoryGirl.class_eval do
   def self.create_with_privileged_mode *args
     disable_authorization_checks {create_without_privileged_mode *args}
   end
@@ -68,6 +52,13 @@ Kernel.class_eval do
     Seek::Config.auth_lookup_enabled=false
     yield
     Seek::Config.auth_lookup_enabled=val
+  end
+
+  def with_config_value config,value
+    oldval = Seek::Config.send(config)
+    Seek::Config.send("#{config.to_s}=",value)
+    yield
+    Seek::Config.send("#{config.to_s}=",oldval)
   end
 end
 
@@ -115,26 +106,35 @@ class ActiveSupport::TestCase
 
   #profiling
 
+  def with_profiling
+    start_profiling
+    yield
+    stop_profiling
+  end
+
   def start_profiling
     RubyProf.start
   end
 
   def stop_profiling prefix="profile"
     results = RubyProf.stop
-
-    File.open "#{Rails.root}/tmp/#{prefix}-graph.html", 'w' do |file|
+    html_path =  "#{Rails.root}/tmp/#{prefix}-graph.html"
+    txt_path = "#{Rails.root}/tmp/#{prefix}-flat.txt"
+    File.open html_path, 'w' do |file|
       RubyProf::GraphHtmlPrinter.new(results).print(file)
     end
-    File.open "#{Rails.root}/tmp/#{prefix}-flat.txt", 'w' do |file|
+    puts "HTML profile written to: #{html_path}"
+    File.open txt_path, 'w' do |file|
       RubyProf::FlatPrinter.new(results).print(file)
     end
+    puts "Flat profile written to: #{txt_path}"
   end
 
   ## stuff for mocking
-
-  def mock_remote_file path,route
-    stub_request(:get, route).to_return(:body => File.new(path), :status => 200, :headers=>{'Content-Type' => 'image/png'})
-    stub_request(:head, route)
+  def mock_remote_file path,route,headers={},status=200
+    headers = {'Content-Type' => 'image/png'}.merge headers
+    stub_request(:get, route).to_return(:body => File.new(path), :status => status, :headers=>headers)
+    stub_request(:head, route).to_return(:status=>status,:headers=>headers)
   end
 
   #mocks the contents of a http response with contents stored in a file
@@ -145,6 +145,19 @@ class ActiveSupport::TestCase
     xml=File.open(contents_path,"r").read
     stub_request(:get,path).to_return(:status=>200,:body=>xml)
     path
+  end
+
+  #debugging
+
+  #saves the @response.body to a temp file, and prints out the file path
+  def record_body
+      dir=Dir.mktmpdir("seek")
+      f=File.new("#{dir}/body.html","w+")
+      f.write(@response.body)
+      f.flush
+      f.close
+      puts "Written @response.body to #{f.path}"
+
   end
   
 end

@@ -9,14 +9,19 @@ class StudiesControllerTest < ActionController::TestCase
   include SharingFormTestHelper
 
   def setup
-    login_as(:quentin)
+    login_as Factory(:admin).user
+  end
+
+  def rest_api_test_object
     @object=Factory :study, :policy => Factory(:public_policy)
   end
 
   test "should get index" do
+    Factory :study, :policy => Factory(:public_policy)
     get :index
     assert_response :success
     assert_not_nil assigns(:studies)
+    assert !assigns(:studies).empty?
   end
 
   test "should show draggable icon in index" do
@@ -34,7 +39,8 @@ class StudiesControllerTest < ActionController::TestCase
   end
 
   test "should get show" do
-    get :show, :id=>studies(:metabolomics_study)
+    study = Factory(:study, :policy => Factory(:public_policy))
+    get :show, :id=>study.id
     assert_response :success
     assert_not_nil assigns(:study)
   end
@@ -244,6 +250,7 @@ class StudiesControllerTest < ActionController::TestCase
   end
 
   def test_assay_tab_doesnt_show_private_sops_or_datafiles
+    user = Factory :user
     login_as(:model_owner)
     study=studies(:study_with_assay_with_public_private_sops_and_datafile)
     as_not_virtualliver do

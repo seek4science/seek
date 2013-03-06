@@ -1,16 +1,15 @@
 require 'test_helper'
 
 class SendPeriodicEmailsJobTest < ActiveSupport::TestCase
-  fixtures :all
 
   def setup
     @val = Seek::Config.email_enabled
     Seek::Config.email_enabled=true
-    Delayed::Job.destroy_all
+    Delayed::Job.delete_all
   end
 
   def teardown
-    Delayed::Job.destroy_all
+    Delayed::Job.delete_all
     Seek::Config.email_enabled=@val
   end
 
@@ -109,7 +108,7 @@ class SendPeriodicEmailsJobTest < ActiveSupport::TestCase
       assert_equal 1,Delayed::Job.count
 
       job = Delayed::Job.first
-      assert_equal 1,job.priority
+      assert_equal 3,job.priority
 
       assert_no_difference("Delayed::Job.count") do
         SendPeriodicEmailsJob.create_job('daily', Time.now)
@@ -137,7 +136,7 @@ class SendPeriodicEmailsJobTest < ActiveSupport::TestCase
 
   test "creation of follow on job after perform" do
     #checks that a new job is created when perform is comples despite the current one being locked
-    Delayed::Job.destroy_all
+
     person1 = Factory(:person)
     job = nil
     assert_difference("Delayed::Job.count",1) do
@@ -152,7 +151,7 @@ class SendPeriodicEmailsJobTest < ActiveSupport::TestCase
 
 
   test "perform" do
-    Delayed::Job.destroy_all
+    Delayed::Job.delete_all
     person1 = Factory(:person)
     person2 = Factory(:person)
     person3 = Factory(:person)
@@ -188,7 +187,7 @@ class SendPeriodicEmailsJobTest < ActiveSupport::TestCase
   end
 
   test "perform ignores unwanted actions" do
-    Delayed::Job.destroy_all
+    Delayed::Job.delete_all
     person1 = Factory(:person)
     person2 = Factory(:person)
     person3 = Factory(:person)
@@ -205,11 +204,12 @@ class SendPeriodicEmailsJobTest < ActiveSupport::TestCase
     SendPeriodicEmailsJob.create_job('weekly', 15.minutes.from_now)
     SendPeriodicEmailsJob.create_job('monthly', 15.minutes.from_now)
 
-    assert_emails 0 do
+    user = Factory :user
 
-      Factory :activity_log,:activity_loggable => sop, :culprit => Factory(:user), :action => 'show'
-      Factory :activity_log,:activity_loggable => sop, :culprit => Factory(:user), :action => 'download'
-      Factory :activity_log,:activity_loggable => sop, :culprit => Factory(:user), :action => 'destroy'
+    assert_emails 0 do
+      Factory :activity_log,:activity_loggable => sop, :culprit => user, :action => 'show'
+      Factory :activity_log,:activity_loggable => sop, :culprit => user, :action => 'download'
+      Factory :activity_log,:activity_loggable => sop, :culprit => user, :action => 'destroy'
 
       SendPeriodicEmailsJob.new('daily').perform
       SendPeriodicEmailsJob.new('weekly').perform
@@ -218,7 +218,7 @@ class SendPeriodicEmailsJobTest < ActiveSupport::TestCase
   end
 
   test "perform2" do
-    Delayed::Job.destroy_all
+    Delayed::Job.delete_all
 
     person1 = Factory :person
     person2 = Factory :person
@@ -250,11 +250,12 @@ class SendPeriodicEmailsJobTest < ActiveSupport::TestCase
 
     ps.each {|p| ProjectSubscriptionJob.new(p.id).perform}
 
+    user = Factory :user
     disable_authorization_checks do
-      Factory :activity_log, :activity_loggable=>sop, :culprit=>Factory(:user),:action=>"update"
-      Factory :activity_log, :activity_loggable=>model, :culprit=>Factory(:user),:action=>"update"
-      Factory :activity_log, :activity_loggable=>data_file, :culprit=>Factory(:user),:action=>"update"
-      Factory :activity_log, :activity_loggable=>data_file2, :culprit=>Factory(:user),:action=>"update"
+      Factory :activity_log, :activity_loggable=>sop, :culprit=>user,:action=>"update"
+      Factory :activity_log, :activity_loggable=>model, :culprit=>user,:action=>"update"
+      Factory :activity_log, :activity_loggable=>data_file, :culprit=>user,:action=>"update"
+      Factory :activity_log, :activity_loggable=>data_file2, :culprit=>user,:action=>"update"
     end
 
     assert_emails 1 do

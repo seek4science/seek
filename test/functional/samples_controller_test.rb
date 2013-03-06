@@ -1,7 +1,7 @@
 require "test_helper"
 
 class SamplesControllerTest < ActionController::TestCase
-fixtures :all
+  fixtures :policies
   include AuthenticatedTestHelper
   include RestTestCases
   include SharingFormTestHelper
@@ -10,9 +10,12 @@ fixtures :all
 
   def setup
     login_as Factory(:user,:person => Factory(:person,:roles_mask=> 0))
+  end
+
+  def rest_api_test_object
     @object = Factory(:sample,:contributor => User.current_user,
-            :title=> "test1",
-            :policy => policies(:policy_for_viewable_data_file))
+                      :title=> "test1",
+                      :policy => policies(:policy_for_viewable_data_file))
   end
 
   test "index xml validates with schema" do
@@ -40,6 +43,19 @@ fixtures :all
     get :index
     assert_response :success
     assert_not_nil assigns(:samples)
+  end
+
+  test "related specimen tab title" do
+    s = Factory :sample,:policy=>Factory(:public_policy),:specimen=>Factory(:specimen,:policy=>Factory(:public_policy))
+    assert !s.specimen.nil?
+    assert s.specimen.can_view?
+
+    get :show, :id=>s
+    assert_response :success
+
+    assert_select "div#specimens" do
+      assert_select "h3", :text=>/Cell cultures/
+    end
   end
 
   test "should get new" do
@@ -107,34 +123,35 @@ fixtures :all
   end
 
   test "should create sample and specimen with default strain if missing" do
-    assert_difference("Sample.count") do
-      assert_difference("Specimen.count") do
-        assert_difference("Strain.count") do
-          post :create,
-               :organism=>Factory(:organism),
+    with_config_value :is_virtualliver,true do
+      assert_difference("Sample.count") do
+        assert_difference("Specimen.count") do
+          assert_difference("Strain.count") do
+            post :create,
+                 :organism=>Factory(:organism),
                :sharing => valid_sharing,
-               :sample => {
-                   :title => "test",
-                   :contributor=>User.current_user,
-                   :projects=>[Factory(:project)],
-                   :lab_internal_number =>"Do232",
-                   :donation_date => Date.today,
-                   :specimen_attributes => {
-                       :lab_internal_number=>"Lab number",
+                 :sample => {
+                     :title => "test",
+                     :contributor=>User.current_user,
+                     :projects=>[Factory(:project)],
+                     :lab_internal_number =>"Do232",
+                     :donation_date => Date.today,
+                     :specimen_attributes => {
+                         :lab_internal_number=>"Lab number",
                        :institution_id =>Factory(:institution).id,
-                       :title=>"Donor number"
-                   }
-               }
+                         :title=>"Donor number"
+                     }
+                 }
+          end
         end
       end
+      s = assigns(:sample)
+      assert_redirected_to sample_path(s)
+      assert s.specimen.strain.is_dummy?
+      assert_equal "test",s.title
+      assert_not_nil s.specimen
+      assert_equal "Donor number",s.specimen.title
     end
-    s = assigns(:sample)
-    assert_redirected_to sample_path(s)
-    assert s.specimen.strain.is_dummy?
-    assert_equal "test",s.title
-    assert_not_nil s.specimen
-    assert_equal "Donor number",s.specimen.title
-
   end
 
   test "should create sample specimen with genotypes and phenotypes" do
@@ -151,6 +168,7 @@ fixtures :all
                    :lab_internal_number => "Do232",
                    :donation_date => Date.today,
                    :specimen_attributes => {
+                       :strain_id => Factory(:strain).id,
                        :lab_internal_number => "Lab number",
                        :institution_id =>Factory(:institution).id,
                        :title => "Donor number",
@@ -288,7 +306,8 @@ fixtures :all
     assert_equal "testSop", s.sops.first.title
   end
 
-  test "should show organism and strain information of a sample if there is organism" do
+
+test "should show organism and strain information of a sample if there is organism" do
     s = Factory :sample, :contributor => User.current_user
     get :show, :id => s.id
 
@@ -303,7 +322,7 @@ fixtures :all
       get :show, :id => s.id
       assert_response :success
       assert_select "label", :text => /Comment/, :count => 2 #one for specimen, one for sample
-      assert_select "label", :text => /Sex/, :count => 1
+    assert_select "label", :text => /Gender/, :count => 1
     end
   end
 
@@ -321,19 +340,19 @@ fixtures :all
     assert_select "select#sample_organism_part", :count => 1
   end
 
-test 'should have sample Comment in the specimen/sample show page' do
-    s = Factory :sample, :contributor => User.current_user
-    get :show, :id => s.id
-    assert_response :success
-    assert_select "label", :text => /Comment/, :count => 2 #one for specimen, one for sample
-end
+  test 'should have sample Comment in the specimen/sample show page' do
+      s = Factory :sample, :contributor => User.current_user
+      get :show, :id => s.id
+      assert_response :success
+      assert_select "label", :text => /Comment/, :count => 2 #one for specimen, one for sample
+  end
 
-test 'should have sample comment in the sample edit page' do
-  s = Factory :sample, :contributor => User.current_user
-  get :edit, :id => s.id
-  assert_response :success
-  assert_select "input#sample_comments", :count => 1
-end
+  test 'should have sample comment in the sample edit page' do
+    s = Factory :sample, :contributor => User.current_user
+    get :edit, :id => s.id
+    assert_response :success
+    assert_select "input#sample_comments", :count => 1
+  end
 
   test "should not have 'New sample based on this one' for sysmo" do
     as_not_virtualliver do
@@ -348,16 +367,56 @@ end
     end
   end
 
-test 'combined sample_specimen form when creating new sample' do
-  get :new
-  assert_response :success
-  assert_select 'input#sample_specimen_attributes_title', :count => 1
-end
+  test 'combined sample_specimen form when creating new sample' do
+    get :new
+    assert_response :success
+    assert_select 'input#sample_specimen_attributes_title', :count => 1
+  end
 
-test 'only sample form when updating sample' do
-  get :edit, :id => Factory(:sample, :policy => policies(:editing_for_all_sysmo_users_policy))
-  assert_response :success
-  assert_select 'input#sample_specimen_attributes_title', :count => 0
-end
+  test 'only sample form when updating sample' do
+    get :edit, :id => Factory(:sample, :policy => policies(:editing_for_all_sysmo_users_policy))
+    assert_response :success
+    assert_select 'input#sample_specimen_attributes_title', :count => 0
+  end
 
+  test 'should have age at sampling' do
+    get :new
+    assert_response :success
+    assert_select 'input#sample_age_at_sampling', :count => 1
+
+    sample = Factory(:sample, :age_at_sampling => 4, :age_at_sampling_unit => Factory(:unit, :symbol => 's'))
+    get :show, :id => sample.id
+    assert_response :success
+    assert_select "label", :text => /Age at sampling/
+
+    get :edit, :id => sample.id
+    assert_response :success
+    assert_select "input#sample_age_at_sampling"
+  end
+  
+  test "sample-sop association when sop has multiple versions" do
+    sop = Factory :sop, :contributor => User.current_user
+    sop_version_2 = Factory(:sop_version, :sop => sop)
+    assert 2, sop.versions.count
+    assert_equal sop.latest_version, sop_version_2
+
+    assert_difference("Sample.count") do
+      post :create, :sample => {:title => "test",
+                                :lab_internal_number => "Do232",
+                                :donation_date => Date.today,
+                                :project_ids => [Factory(:project).id],
+                                :specimen => Factory(:specimen, :contributor => User.current_user)},
+           :sample_sop_ids => [sop.id]
+
+
+    end
+    s = assigns(:sample)
+    assert_redirected_to sample_path(s)
+    assert_nil flash[:error]
+    assert_equal "test", s.title
+    assert_equal 1, s.sop_masters.length
+    assert_equal sop, s.sop_masters.first
+    assert_equal 1, s.sops.length
+    assert_equal sop_version_2, s.sops.first
+  end
 end

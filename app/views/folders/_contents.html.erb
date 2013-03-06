@@ -1,0 +1,13 @@
+
+
+<% if @folder.respond_to?(:assay) -%>
+    <%= render :partial=>"assay_folder_details" -%>
+<% else -%>
+    <%= render :partial=>"folder_details",:object=>folder -%>
+<% end -%>
+
+
+<ul class="asset_cards">
+
+    <%= render :partial=>"asset",:collection=>folder.authorized_assets,:locals=>{:folder=>folder} -%>
+</ul>

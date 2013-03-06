@@ -2,18 +2,21 @@ require 'project_compat'
 module Acts
   module Authorized
     module PolicyBasedAuthorization
+
+      class AuthPermissions < Struct.new :can_view,:can_download,:can_edit,:can_manage,:can_delete
+
+      end
+
       def self.included klass
         attr_accessor :permission_for
         klass.extend ClassMethods
         klass.extend AuthLookupClassMethods
         klass.class_eval do
-          attr_accessor :is_published_before_save #this is for logging purpose, to store the publish status of an item before it is updated
           belongs_to :contributor, :polymorphic => true unless method_defined? :contributor
           after_initialize :contributor_or_default_if_new
 
           #checks a policy exists, and if missing resorts to using a private policy
           after_initialize :policy_or_default_if_new
-          #after_initialize :assign_is_published_before_save, :unless => "Seek::Config.is_virtualliver"
 
           include ProjectCompat unless method_defined? :projects
 
@@ -44,17 +47,33 @@ module Acts
               assets = lookup_for_action_and_user action, user_id,projects
             else
               Rails.logger.info("Lookup table #{lookup_table_name} is incomplete for user_id = #{user_id} - doing things the slow way")
-              assets = all.select { |df| df.send("can_#{action}?") }
+              assets = all.select { |df| df.send("can_#{action}?",user) }
               programatic_project_filter = !projects.nil?
             end
           else
-            assets = all.select { |df| df.send("can_#{action}?") }
+            assets = all.select { |df| df.send("can_#{action}?",user) }
           end
           if programatic_project_filter
             assets.select { |a| !(a.projects & projects).empty? }
           else
             assets
           end
+        end
+
+        #returns the authorised items from the array of the same class items for a given action and optionally a user. If user is nil, the items authorised for an
+        #anonymous user are returned.
+        def authorized_partial_asset_collection partial_asset_collection, action, user=User.current_user
+          user_id = user.nil? ? 0 : user.id
+          if Seek::Config.auth_lookup_enabled && self.lookup_table_consistent?(user_id)
+            ids=partial_asset_collection.collect{|asset| asset.id}
+            clause = "asset_id IN (#{ids.join(',')})"
+            sql =  "SELECT asset_id from #{lookup_table_name} WHERE user_id = #{user_id} AND (#{clause}) AND can_#{action}=#{ActiveRecord::Base.connection.quoted_true}"
+            ids = ActiveRecord::Base.connection.select_all(sql).collect{|k| k["asset_id"]}
+            authorized_partial_asset_collection = partial_asset_collection.select{|asset| ids.include?(asset.id.to_s)}
+          else
+            authorized_partial_asset_collection = partial_asset_collection.select{|a| a.send("can_#{action}?",user)}
+          end
+          authorized_partial_asset_collection
         end
 
         #determines whether the lookup table records are consistent with the number of asset items in the database and the last id of the item added
@@ -143,7 +162,7 @@ module Acts
         id=self.id
         ActiveRecord::Base.connection.execute("delete from #{self.class.lookup_table_name} where asset_id=#{id}")
       end
-      
+
       AUTHORIZATION_ACTIONS.each do |action|
         eval <<-END_EVAL
           def can_#{action}? user = User.current_user
@@ -161,6 +180,34 @@ module Acts
               end
           end
         END_EVAL
+
+      end
+
+      #allows access to each permission in a single database call (rather than calling can_download? can_edit? etc individually)
+      def authorization_permissions user=User.current_user
+        @@expected_true_value ||= ActiveRecord::Base.connection.quoted_true.gsub("'","")
+        permissions = AuthPermissions.new
+        user_id = user.nil? ? 0 : user.id
+        if Seek::Config.auth_lookup_enabled && self.class.lookup_table_consistent?(user_id)
+          sql = "SELECT can_view,can_edit,can_download,can_manage,can_delete FROM #{self.class.lookup_table_name} WHERE user_id=#{user_id} AND asset_id=#{self.id}"
+          res = ActiveRecord::Base.connection.select_one(sql)
+          unless res.nil?
+            permissions.can_view = res["can_view"]==@@expected_true_value
+            permissions.can_download = res["can_download"]==@@expected_true_value
+            permissions.can_edit = res["can_edit"]==@@expected_true_value
+            permissions.can_manage = res["can_manage"]==@@expected_true_value
+            permissions.can_delete = res["can_delete"]==@@expected_true_value
+          else
+            raise "Expected to find record in auth lookup table"
+          end
+        else
+          permissions.can_view = self.can_view?
+          permissions.can_download = self.can_download?
+          permissions.can_edit = self.can_edit?
+          permissions.can_manage = self.can_manage?
+          permissions.can_delete = self.can_delete?
+      end
+        permissions
       end
 
       #triggers a background task to update or create the authorization lookup table records for this item
@@ -192,6 +239,7 @@ module Acts
         end
 
         ActiveRecord::Base.connection.execute(sql)
+
       end
 
       def contributor_credited?
@@ -313,14 +361,6 @@ module Acts
         end
       end
 
-      def assign_is_published_before_save
-        if self.policy.try(:sharing_scope_was) == Policy::EVERYONE
-          self.is_published_before_save=true
-        else
-          self.is_published_before_save=false
-        end
-      end
-
       #while item is waiting for publishing approval,set the policy of the item to:
       #new item: sysmo_and_project_policy
       #updated item: keep the policy as before
@@ -331,6 +371,11 @@ module Acts
         elsif !self.new_record? && self.policy.sharing_scope == Policy::EVERYONE && !self.kind_of?(Publication) && !self.can_publish?
           self.policy = Policy.find_by_id(self.policy.id)
         end
+      end
+
+      #members of project can see some information of hidden items of their project
+      def can_see_hidden_item?(person)
+        person.member_of?(self.projects)
       end
     end
   end

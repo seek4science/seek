@@ -24,7 +24,8 @@
     :accept=>"search",
     :url=>{:controller=>'favourites', :action=>'add',
            :search_query => params[:search_query],
-           :search_type => params[:search_type]},
+           :search_type => params[:search_type],
+           :include_external_search => params[:include_external_search]},
     :before => "Element.show('fav_ajax-loader')",
     :complete => "Element.hide('fav_ajax-loader');")
   %>

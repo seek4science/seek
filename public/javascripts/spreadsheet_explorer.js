@@ -347,6 +347,7 @@ function createAnnotationStub(ann)
 {
     var type_class;
     var content;
+
     if (ann.type=="plot_data") {
         type_class="plot_data_type";
         content = "Graph data";
@@ -362,6 +363,7 @@ function createAnnotationStub(ann)
       .append($j("<td>"+ann.dateCreated+"</td>"))
       .click( function (){
         jumpToAnnotation(ann.id, ann.sheetNumber, ann.cellRange);
+        $j('#annotation_overview').hide();
       });
 
   return stub;
@@ -399,8 +401,8 @@ function show_annotation(id,x,y) {
   annotation_container.css('top',y-20);
   annotation_container.show();
   annotation.show();
-  if ($j(plot_element_id)) {
-    plot_cells(plot_element_id,'500','300');
+  if ($j("#"+plot_element_id).length>0) {
+    plot_cells(plot_element_id,'650','450');
   }
 
 }

@@ -10,6 +10,10 @@ class StudiedFactorsControllerTest < ActionController::TestCase
     login_as(:quentin)
   end
 
+  test "routes" do
+    assert_generates "/data_files/1/studied_factors", {:controller=>"studied_factors",:action=>"index",:data_file_id=>"1"}
+  end
+
   test "can only go to factors studied if the user can edit the data file" do
     df=data_files(:editable_data_file)
     df.save
@@ -268,6 +272,18 @@ class StudiedFactorsControllerTest < ActionController::TestCase
     assert fs.valid?
     assert_equal measured_items(:growth_medium), fs.measured_item
     assert_equal 'update value', fs.annotations_with_attribute('description').first.value.text
+  end
+
+  test 'breadcrumb for factors studied' do
+    df=data_files(:editable_data_file)
+    assert df.can_edit?
+    get :index, {:data_file_id => df.id, :version => df.version}
+    assert_response :success
+    assert_select "div.breadcrumbs", :text => /Home > Data files Index > #{df.title} > Factors studied Index/, :count => 1 do
+      assert_select "a[href=?]", root_path, :count => 1
+      assert_select "a[href=?]", data_files_url, :count => 1
+      assert_select "a[href=?]", data_file_url(df)
+    end
   end
 end
 

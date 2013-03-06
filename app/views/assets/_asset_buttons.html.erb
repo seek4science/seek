@@ -1,5 +1,31 @@
 
-  <%= render :partial => "subscriptions/subscribe", :locals => {:object => asset } -%>
+<% if asset.is_downloadable? -%>
+    <% display_asset = asset.find_version(version) %>
+    <%# param code is used for temporary link -%>
+    <% if display_asset.contains_downloadable_items? && can_download_asset?(asset, params[:code]) -%>
+        <%
+           path = polymorphic_path(asset,:version=>version,:action=>:download,:code=>params[:code])
+        %>
+        <li>
+           <% external_link = asset.content_blob.external_link? && !(asset.respond_to?(:content_blobs) && asset.content_blobs.count > 1) %>
+          <%= image_tag_for_key('download', polymorphic_path(asset,:version=>version,:action=>:download), (external_link ? "Link" : "Download"), {:target => 'blank'}, (external_link ? "Link" : "Download")) -%>
+
+        </li>
+        <% if asset.is_a?(DataFile) && display_asset.contains_extractable_spreadsheet? %>
+            <li>
+              <%= image_tag_for_key('spreadsheet', polymorphic_path(asset, :version => version, :action => :explore, :code=>params[:code]), "Explore #{human_name}", nil, "Explore #{human_name}") -%>
+            </li>
+        <% end -%>
+        <% unless Seek::Util.multi_files_asset_types.include?(asset.class) %>
+            <%= render :partial => "assets/view_content", :locals => {:content_blob => display_asset.content_blob, :button_style => true} -%>
+        <% end %>
+    <% elsif logged_in? -%>
+        <li>
+          <%= render :partial=>"assets/request_resource",:locals=>{:resource=>asset} %>
+        </li>
+    <% end -%>
+<% end -%>
+
   <% if asset.can_manage? -%>
     <% if asset.is_downloadable? -%>
         <li><%= link_to_function image("new")+" Upload new version", visual_effect(:toggle_appear, "upload_new_version_form") -%></li>
@@ -19,27 +45,12 @@
 
   <% if (asset.can_delete? or current_user.try(:admin?)) and asset.respond_to? :to_presentation %>
       <li>
-        <%= image_tag_for_key "arrow_right", {:controller=>"data_files",:action => "convert_to_presentation",:id=>asset.id}, nil, {:title => "click to move this data file to presentations",:confirm => "Are you sure you wish to move this data file to presentations? Doing so is irreversible!"}, 'Move to presentations'%>
+        <%= image_tag_for_key "arrow_right", convert_to_presentation_data_file_path(asset.id), nil, {:title => "click to move this data file to presentations",:confirm => "Are you sure you wish to move this data file to presentations? Doing so is irreversible!", :method => :post}, 'Move to presentations'%>
      </li>
    <% end %>
 
-  <% if asset.is_downloadable? -%>
-      <% if asset.can_download? -%>
-          <li>
-          <% external_link = asset.content_blob.external_link? && !(asset.respond_to?(:content_blobs) && asset.content_blobs.count > 1) %>
-          <%= image_tag_for_key('download', polymorphic_path(asset,:version=>version,:action=>:download), (external_link ? "Link" : "Download"), {:target => 'blank'}, (external_link ? "Link" : "Download")) -%>
-          </li>
-          <% if asset.is_a?(DataFile) && asset.is_extractable_spreadsheet? %>
-              <li>
-                <%= image_tag_for_key('spreadsheet', polymorphic_path(asset, :version => version, :action => :explore), "Explore #{human_name}", nil, "Explore #{human_name}") -%>
-              </li>
-          <% end -%>
-      <% elsif logged_in? -%>
-          <li>
-          <%= render :partial=>"assets/request_resource",:locals=>{:resource=>asset} %>
-          </li>
-      <% end -%>
-  <% end -%>
+<%= render :partial => "subscriptions/subscribe", :locals => {:object => asset } -%>
+
 
 
 

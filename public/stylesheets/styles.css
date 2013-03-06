@@ -69,7 +69,7 @@ min-width:
 }
 
 #header {
-    padding-top: 1em;
+    padding-top: 0.5em;
     text-align:right;
 }
 
@@ -571,6 +571,10 @@ ul.tabbernav li.tabberactive a:hover
     border-bottom: 1px solid white;
 }
 
+ul.tabbernav li a.external_result {
+    background: #DCF;
+}
+
 /*--------------------------------------------------
 .tabbertab = the tab content
 Add style only after the tabber interface is set up (.tabberlive)
@@ -660,22 +664,13 @@ p#assay_types label {
     width: 20em;
 }
 
-#header_text {
-    font-size:larger;
-    text-align:center;   
-    padding-top: 1.5em;
-    padding-bottom: 1.5em;
-    margin: 1em 0em 1em 3em;
-    width: 90%;
-}
 
 #header_text_main {
     font-size:larger;
     text-align:center;
     padding-top: 0.5em;
     padding-bottom: 0.5em;
-    margin: 0.5em 0em 0.5em 1.5em;
-    width: 90%;
+    margin: 0em 2.5em 0em 2.5em;
 }
 
 div#more_info {
@@ -831,6 +826,18 @@ div.list_item_content {
     margin-left:1em;
 }
 
+div.list_item_content.noavatar {
+    width: 87%;
+}
+
+div.list_item_content.noavatar.noactions {
+    width: 97%;
+}
+
+div.list_item_content.noactions {
+    width: 85%;
+}
+
 div.list_item_avatar {
     float: left;
     width: 11%;
@@ -928,6 +935,7 @@ ul.related_asset_list li{
 
 .contribution_title_image {
     float: left;
+    position: absolute;
     margin-left: 1em;
     margin-right: 0.5em;
     margin-top: -0.2em;
@@ -942,10 +950,6 @@ ul.related_asset_list li{
 .contribution_title_image img {        
     width: 27px;
     vertical-align: middle;	
-}
-
-.contribution_title h1 {    
-    width: 90%;
 }
 
 .contribution_aftertitle {
@@ -1420,9 +1424,9 @@ ul#switch_upload_buttons {
 
 ul#switch_upload_buttons li {
 	list-style: none;
-    float: left;
     padding-right: 0.75em;
     padding-top: 10px;
+    float: left;
 }
 
 ul#switch_upload_buttons a {
@@ -1680,8 +1684,72 @@ ul.modification_row li {
     min-height: 2em;
 }
 
+div.matchmake_result {
+    padding-top:0.25em;
+    padding-bottom:0.25em;
+}
+
 div.sharing_summary {
     text-align: center;
 }
+
+div.breadcrumbs{
+    margin-left: 1em;
+    margin-top: 0.5em;
+    font-size: 14px;
+}
+
+div.breadcrumbs a:link{
+   text-decoration: underline;
+}
+
+div.return_to_search {
+    float: right;
+    margin-right: 1em;
+    margin-top: -1em;
+    font-size: 14px;
+}
+p.import_details {
+    font-style: italic;
+}
+
+ul.fileinfo_list {
+    margin-left: 0.5em;
+}
+
+ul.fileinfo_list li.fileinfo {
+    float: left;
+}
+
+li.fileinfo div.fileinfo2 {
+    background-color: white;
+    border: 1px dotted black;
+    padding: 0.75em;
+    margin: 0.25em;
+    min-height: 8.1em;
+    max-width: 22em;
+}
+
+
+div#guide_box {
+    min-height: 4em;
+}
+
+div#guide_box p {
+    text-align: center;
+}
+
+div#guide_box span#guide_box_close {
+    float: right;
+    margin-right: 0.5em;
+    margin-top: 0.5em;
+}
+
+div#image_file_box {
+    width: 30%;
+    margin-top: 0.5em;
+}
+
+
 
 

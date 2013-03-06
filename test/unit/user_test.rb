@@ -26,7 +26,17 @@ class UserTest < ActiveSupport::TestCase
     assert without_profile.include?(users(:part_registered))
     assert without_profile.include?(users(:aaron))
   end  
-  
+
+  def test_activate
+    user = Factory :brand_new_user
+
+    assert !user.active?
+
+    user.activate
+    user.reload
+    assert user.active?
+  end
+
   def test_not_activated
     not_activated=User.not_activated
     not_activated.each do |u|
@@ -160,6 +170,15 @@ class UserTest < ActiveSupport::TestCase
     uuid = x.attributes["uuid"]
     x.save
     assert_equal x.uuid, uuid
+  end
+
+  test 'test show_guide_box' do
+    x = users(:aaron)
+    assert x.show_guide_box?
+    x.show_guide_box = false
+    x.save
+    x.reload
+    assert !x.show_guide_box?
   end
 
 protected

@@ -2,6 +2,7 @@ require 'test_helper'
 
 
 class AssaysControllerTest < ActionController::TestCase
+
   fixtures :all
 
   include AuthenticatedTestHelper
@@ -10,6 +11,9 @@ class AssaysControllerTest < ActionController::TestCase
 
   def setup
     login_as(:quentin)
+  end
+
+  def rest_api_test_object
     @object=Factory(:experimental_assay, :policy => Factory(:public_policy))
   end
 
@@ -61,7 +65,7 @@ class AssaysControllerTest < ActionController::TestCase
     hidden = Factory(:experimental_assay, :policy => Factory(:private_policy)) #ensure at least one hidden assay exists
     get :index, :page=>"all", :format=>"xml"
     assert_response :success
-    assert_equal assigns(:assays).sort_by(&:id), Authorization.authorize_collection("view", assigns(:assays), users(:aaron)).sort_by(&:id), "assays haven't been authorized"
+    assert_equal assigns(:assays).sort_by(&:id), Assay.authorized_partial_asset_collection(assigns(:assays), "view", users(:aaron)).sort_by(&:id), "assays haven't been authorized"
     assert !assigns(:assays).include?(hidden)
   end
 
@@ -173,7 +177,7 @@ class AssaysControllerTest < ActionController::TestCase
     assert !assay.models.include?(model.latest_version)
     sleep(1)
     assert_difference('ActivityLog.count') do
-      put :update, :id=>assay, :assay_model_ids=>[model.id], :assay=>{}, :assay_sample_ids=>[Factory(:sample).id]
+      put :update, :id=>assay, :model_ids=>[model.id], :assay=>{}, :assay_sample_ids=>[Factory(:sample).id]
     end
 
     assert_redirected_to assay_path(assay)
@@ -189,6 +193,7 @@ class AssaysControllerTest < ActionController::TestCase
     end
 
     assert_response :success
+
     assert_not_nil assigns(:assay)
 
     assert_select "p#assay_type", :text=>/Metabalomics/, :count=>1
@@ -259,6 +264,7 @@ class AssaysControllerTest < ActionController::TestCase
     assert_not_nil assigns(:assay).study
     assert_equal s, assigns(:assay).study
   end
+
 
 test "should create experimental assay with or without sample" do
     #THIS TEST MAY BECOME INVALID ONCE IT IS DECIDED HOW ASSAYS LINK TO SAMPLES OR ORGANISMS
@@ -363,7 +369,7 @@ end
   end
 
   test "should not create modelling assay with sample for SysMO, but for VL" do
-    #FIXME: its allows at the moment due to time constraints before pals meeting, and fixtures and factories need updating. JIRA: SYSMO-734
+    person = Factory(:person)
     as_not_virtualliver do
       assert_no_difference("Assay.count") do
         post :create, :assay => {:title => "test",
@@ -371,7 +377,7 @@ end
                                  :assay_type_id => assay_types(:metabolomics).id,
                                  :study_id => studies(:metabolomics_study).id,
                                  :assay_class => assay_classes(:modelling_assay_class),
-                                 :owner => Factory(:person),
+                             :owner => person,
                                  :sample_ids => [Factory(:sample).id, Factory(:sample).id]},
                                  :sharing => valid_sharing
       end
@@ -384,7 +390,7 @@ end
                                  :assay_type_id => assay_types(:metabolomics).id,
                                  :study_id => studies(:metabolomics_study).id,
                                  :assay_class => assay_classes(:modelling_assay_class),
-                                 :owner => Factory(:person),
+                                 :owner => person,
                                  :sample_ids => [Factory(:sample).id, Factory(:sample).id]},
                                  :sharing => valid_sharing
       end
@@ -427,6 +433,31 @@ end
 
     assert flash[:error]
     assert_redirected_to assays_path
+  end
+
+  test "should list correct organisms" do
+    a = Factory :assay,:policy=>Factory(:public_policy)
+    o1 = Factory(:organism,:title=>"Frog")
+
+    Factory :assay_organism, :assay=>a,:organism=>o1
+
+    get :show,:id=>a.id
+    assert_response :success
+    assert_select "p#organism" do
+      assert_select "a[href=?]",organism_path(o1),:text=>"Frog"
+    end
+
+    o2 = Factory(:organism,:title=>"Slug")
+    str = Factory :strain, :title=>"AAA111", :organism=>o2
+    Factory :assay_organism,:assay=>a,:organism=>o2,:strain=>str
+    get :show,:id=>a.id
+        assert_response :success
+        assert_select "p#organism" do
+          assert_select "a[href=?]",organism_path(o1),:text=>"Frog"
+          assert_select "a[href=?]",organism_path(o2),:text=>"Slug"
+          assert_select "span.strain_info",:text=>str.info
+        end
+
   end
 
   test "should show edit when not logged in" do
@@ -823,7 +854,7 @@ end
               :assay_class=>assay_classes(:modelling_assay_class)
           },
                :assay_sop_ids=>["#{sop.id}"],
-               :assay_model_ids=>["#{model.id}"],
+               :model_ids=>["#{model.id}"],
                :data_file_ids=>["#{datafile.id},#{rel.title}"]
         end
       end
@@ -842,6 +873,47 @@ end
     assert_select "script", :text=>/addDataFile/, :count=>1
     assert_select "script", :text=>/addSop/, :count=>1
     assert_select "script", :text=>/addModel/, :count=>1
+  end
+
+  test "should create with associated model sop data file and publication" do
+    user = Factory :user
+    login_as(user)
+    sop=Factory :sop,:policy=>Factory(:public_policy),:contributor=>user
+    model=Factory :model,:policy=>Factory(:public_policy),:contributor=>user
+    df=Factory :data_file,:policy=>Factory(:public_policy),:contributor=>user
+    pub=Factory :publication,:contributor=>user
+    study=Factory :study, :policy=>Factory(:public_policy),:contributor=>user
+    rel=RelationshipType.first
+
+    assert_difference('ActivityLog.count') do
+      assert_difference("Assay.count") do
+        assert_difference("AssayAsset.count", 3) do
+          assert_difference("Relationship.count") do
+
+          post :create, :assay=>{
+              :title=>"fish",
+              :technology_type_id=>technology_types(:gas_chromatography).id,
+              :assay_type_id=>assay_types(:metabolomics).id,
+              :study_id=>study.id,
+              :assay_class=>assay_classes(:modelling_assay_class)
+          },
+               :assay_sop_ids=>["#{sop.id}"],
+               :model_ids=>["#{model.id}"],
+               :data_file_ids=>["#{df.id},#{rel.title}"],
+               :related_publication_ids=>["#{pub.id}"]
+          end
+        end
+      end
+    end
+
+    assert_not_nil assigns(:assay)
+    assay = assigns(:assay)
+    assay.reload #necessary to pickup the relationships for publications
+    assert_equal [sop], assay.sop_masters
+    assert_equal [df], assay.data_file_masters
+    assert_equal [model],assay.model_masters
+    assert_equal [pub], assay.related_publications
+
   end
 
   test "associated assets aren't lost on failed validation on update" do
@@ -867,7 +939,7 @@ end
           #title is blank, so should fail validation
           put :update, :id=>assay, :assay=>{:title=>"", :assay_class=>assay_classes(:modelling_assay_class)},
               :assay_sop_ids=>["#{sop.id}"],
-              :assay_model_ids=>["#{model.id}"],
+              :model_ids=>["#{model.id}"],
               :data_file_ids=>["#{datafile.id},#{rel.title}"]
         end
       end
@@ -1000,4 +1072,60 @@ end
       assert_equal update_permission.access_type, Policy::EDITING
     end
   end
+
+  test 'should have associated datafiles, models, on modelling assay show page' do
+    df = Factory(:data_file,:contributor => User.current_user)
+    model = Factory(:model,:contributor => User.current_user)
+    assay= Factory(:assay,:contributor => User.current_user.person,
+                            :study => (Factory(:study, :investigation => (Factory(:investigation)))))
+    assay.data_file_masters << df
+    assay.model_masters << model
+    assert assay.save
+    assert assay.is_modelling?
+
+    get :show, :id => assay
+    assert_response :success
+    assert_select "a[href=?]", data_file_path(df), :text => df.title
+    assert_select "a[href=?]", model_path(model), :text => model.title
+  end
+
+  test 'should have associated datafiles, models and sops on assay index page for modelling assays' do
+      Assay.delete_all
+      df = Factory(:data_file,:contributor => User.current_user)
+      model = Factory(:model,:contributor => User.current_user)
+      sop = Factory(:sop,:contributor => User.current_user)
+      assay= Factory(:modelling_assay,:contributor => User.current_user.person,
+                              :study => (Factory(:study, :investigation => (Factory(:investigation)))))
+      assay.data_file_masters << df
+      assay.model_masters << model
+      assay.sop_masters << sop
+      assert assay.save
+      assert assay.is_modelling?
+
+      get :index
+      assert_response :success
+      assert_select "a[href=?]", data_file_path(df), :text => df.title
+      assert_select "a[href=?]", model_path(model), :text => model.title
+      assert_select "a[href=?]", sop_path(sop), :text => sop.title
+  end
+
+  test 'should have only associated datafiles and sops on assay index page for experimental assays' do
+        Assay.delete_all
+        df = Factory(:data_file,:contributor => User.current_user)
+        model = Factory(:model,:contributor => User.current_user)
+        sop = Factory(:sop,:contributor => User.current_user)
+        assay= Factory(:experimental_assay,:contributor => User.current_user.person,
+                                :study => (Factory(:study, :investigation => (Factory(:investigation)))))
+        assay.data_file_masters << df
+        assay.model_masters << model
+        assay.sop_masters << sop
+        assert assay.save
+        assert assay.is_experimental?
+
+        get :index
+        assert_response :success
+        assert_select "a[href=?]", data_file_path(df), :text => df.title
+        assert_select "a[href=?]", model_path(model), :text => model.title, :count => 0
+        assert_select "a[href=?]", sop_path(sop), :text => sop.title
+   end
 end

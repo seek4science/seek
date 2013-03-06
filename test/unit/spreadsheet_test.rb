@@ -2,18 +2,16 @@ require 'test_helper'
 
 class SpreadsheetTest < ActiveSupport::TestCase
 
-  include SpreadsheetUtil
-
-  fixtures :all
+  include Seek::Data::SpreadsheetExplorerRepresentation
 
   test "spreadsheets are spreadsheets" do
-    datafile = data_files(:downloadable_data_file)
-    assert datafile.is_excel?
-    assert datafile.is_extractable_spreadsheet?
+    datafile = Factory :small_test_spreadsheet_datafile
+    assert datafile.content_blob.is_excel?
+    assert datafile.content_blob.is_extractable_spreadsheet?
   end
 
   test "spreadsheet is properly parsed" do
-    datafile = data_files(:downloadable_data_file)
+    datafile = Factory :small_test_spreadsheet_datafile
 
     spreadsheet = datafile.spreadsheet
 
@@ -31,7 +29,7 @@ class SpreadsheetTest < ActiveSupport::TestCase
   end
 
   test "spreadsheet xml is cached" do
-    datafile = data_files(:downloadable_data_file)
+    datafile = Factory :small_test_spreadsheet_datafile
     Rails.cache.clear
     assert_nil Rails.cache.fetch("#{datafile.content_blob.cache_key}-ss-xml")
 

@@ -14,10 +14,7 @@ config.whiny_nils = true
 # Show full error reports and disable caching
 config.action_controller.consider_all_requests_local = true
 config.action_view.debug_rjs                         = true
-#config.action_controller.perform_caching             = false
-
-config.action_controller.perform_caching             = true
-config.action_controller.cache_store = [:file_store, "#{RAILS_ROOT}/tmp/cache"]
+config.action_controller.perform_caching             = false
 
 # Don't care if the mailer can't send
 config.action_mailer.raise_delivery_errors = false
@@ -25,4 +22,4 @@ config.action_mailer.raise_delivery_errors = false
 config.middleware.use "Rack::Bug",
   :secret_key => "CaeTyLU8Spfo1PiXNZ4cANaWeO4Y3ptYFjVRLbPo34gbAkV4wNLTDH2hHT8YAKV"
 
-config.cache_store = :mem_cache_store, {:timeout => 30}
+config.cache_store = [:file_store, "#{RAILS_ROOT}/tmp/cache"]

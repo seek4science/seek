@@ -6,6 +6,16 @@ module AssetsHelper
     image_tag(icon_filename,:alt=>"Request",:title=>"Request") + " Request #{resource_type}"
   end
 
+  def filesize_as_text content_blob
+    size=content_blob.nil? ? 0 : content_blob.filesize
+    if size.nil?
+      "<span class='none_text'>Unknown</span>"
+    else
+      size = size/1000.0
+      "%.1f KB" % size
+    end
+  end
+
   #returns all the classes for models that return true for is_asset?
   def asset_model_classes
     @@asset_model_classes ||= Seek::Util.persistent_classes.select do |c|
@@ -21,7 +31,9 @@ module AssetsHelper
     if resource_or_text.is_a?(String)
       text = resource_or_text
     elsif resource_or_text.kind_of?(Specimen)
-      text = CELL_CULTURE_OR_SPECIMEN
+      text = Seek::Config.sample_parent_term
+    elsif resource_or_text.is_a?(Assay)
+      text = resource_or_text.is_modelling? ? "Modelling Analysis" : "Assay"
     else
       text = resource_or_text.class.name
     end
@@ -44,17 +56,22 @@ module AssetsHelper
     ) + "<form id='show_version_form' onsubmit='showResourceVersion(this); return false;'></form>".html_safe
   end
 
-  def resource_title_draggable_avatar resource
+  def resource_title_draggable_avatar resource,version
     icon=""
     image=nil
-
     if resource.avatar_key
       image=image resource.avatar_key, {}
-    elsif resource.use_mime_type_for_avatar?
-      image = image file_type_icon_key(resource), {}
     end
 
-    icon = link_to_draggable(image, show_resource_path(resource), :id=>model_to_drag_id(resource), :class=> "asset", :title=>tooltip_title_attrib(get_object_title(resource))) unless image.nil?
+    unless version.blank?
+      resource_version = resource.find_version(version)
+      if resource.use_mime_type_for_avatar?
+        image = image file_type_icon_key(resource_version), {}
+      end
+      icon = link_to_draggable(image, show_resource_path(resource_version), :id=>model_to_drag_id(resource_version), :class=> "asset", :title=>tooltip_title_attrib(get_object_title(resource))) unless image.nil?
+    else
+      icon = link_to_draggable(image, show_resource_path(resource), :id=>model_to_drag_id(resource), :class=> "asset", :title=>tooltip_title_attrib(get_object_title(resource))) unless image.nil?
+    end
     icon
   end
 
@@ -66,15 +83,12 @@ module AssetsHelper
     class_name
   end
 
-  #Changed these so they can cope with non-asset things such as studies, assays etc.
-  def download_resource_path(resource)
-    path = ""
+  def download_resource_path(resource, code=nil)
     if resource.class.name.include?("::Version")
-      path = polymorphic_path(resource.parent, :version=>resource.version, :action=>:download)
+      polymorphic_path(resource.parent, :version=>resource.version, :action=>:download,:code=>params[:code])
     else
-      path = polymorphic_path(resource, :action=>:download)
+      polymorphic_path(resource, :action=>:download, :code=>params[:code])
     end
-    return path
   end
 
   #returns true if this permission should not be able to be removed from custom permissions
@@ -113,6 +127,7 @@ module AssetsHelper
 
     related.each_key do |key|
       related[key][:items] = []
+      related[key][:hidden_items] = []
       related[key][:hidden_count] = 0
       related[key][:extra_count] = 0
     end
@@ -121,7 +136,10 @@ module AssetsHelper
     related_types = related.keys - [resource.class.name]
     related_types.each do |type|
       method_name = type.underscore.pluralize
-      if resource.respond_to? "related_#{method_name}"
+      #FIXME: need to fix that Publications treat #related_data_files as those directly linked, and #all_related_data_files include those that come through assays
+      if resource.respond_to? "all_related_#{method_name}"
+        related[type][:items] = resource.send "all_related_#{method_name}"
+      elsif resource.respond_to? "related_#{method_name}"
         related[type][:items] = resource.send "related_#{method_name}"
       elsif resource.respond_to? method_name
         related[type][:items] = resource.send method_name
@@ -133,24 +151,25 @@ module AssetsHelper
     end
 
     #Authorize
-    related.each do |key,res|
-        res[:items].compact!      
-        unless res[:items].empty?
+    related.each do |key, res|
+      res[:items].uniq!
+      res[:items].compact!
+      unless res[:items].empty?
+        total_count = res[:items].size
         if key == 'Project' || key == 'Institution'
-          total_count = res[:items].size
           res[:hidden_count] = 0
         elsif key == 'Person'
-          total_count = res[:items].size
-          if Seek::Config.is_virtualliver && current_user.nil?
+          if Seek::Config.is_virtualliver && User.current_user.nil?
             res[:items] = []
             res[:hidden_count] = total_count
           else
             res[:hidden_count] = 0
           end
         else
-          total_count = res[:items].size
-          res[:items] = authorized_related_items res[:items],key
+          total = res[:items]
+          res[:items] = key.constantize.authorized_partial_asset_collection res[:items],'view',User.current_user
           res[:hidden_count] = total_count - res[:items].size
+          res[:hidden_items] = total - res[:items]
         end
       end
     end
@@ -166,29 +185,13 @@ module AssetsHelper
     return related
     end
 
-  def authorized_related_items related_items, item_type
-    user_id = current_user.nil? ? 0 : current_user.id
-    assets = []
-    authorized_related_items = []
-    lookup_table_name = item_type.underscore + 'auth_lookup'
-    asset_class = item_type.constantize
-    if (asset_class.lookup_table_consistent?(user_id))
-      Rails.logger.info("Lookup table #{lookup_table_name} used for authorizing related items is complete for user_id = #{user_id}")
-      assets = asset_class.lookup_for_action_and_user 'view', user_id, nil
-      authorized_related_items = assets & related_items
-    else
-      authorized_related_items = related_items.select(&:can_view?)
-    end
-    authorized_related_items
-  end
-
   def filter_url(resource_type, context_resource)
     #For example, if context_resource is a project with an id of 1, filter text is "(:filter => {:project => 1}, :page=>'all')"
     filter_text = "(:filter => {:#{context_resource.class.name.downcase} => #{context_resource.id}},:page=>'all')"
     eval("#{resource_type.underscore.pluralize}_path" + filter_text)
   end
 
-  #provides a list of assets, according to the class, that are authorized acording the 'action' which defaults to view
+  #provides a list of assets, according to the class, that are authorized according the 'action' which defaults to view
   #if projects is provided, only authorizes the assets for that project
   def authorised_assets asset_class,projects=nil, action="view"
     asset_class.all_authorized_for action, User.current_user, projects
@@ -205,9 +208,18 @@ module AssetsHelper
     asset_version_links = []
     asset_versions.select(&:can_view?).each do |asset_version|
       asset_name = asset_version.class.name.split('::').first.underscore
-      asset_version_links << link_to(asset_version.title, eval("#{asset_name}_path(#{asset_version.send("#{asset_name}_id")})") + "?version=#{asset_version.version}", {:target => '_blank'})
+      asset_version_links << link_to(asset_version.title, eval("#{asset_name}_path(#{asset_version.send("#{asset_name}_id")})") + "?version=#{asset_version.version}")
     end
     asset_version_links
   end
 
+  #code is for authorization of temporary link
+  def can_download_asset? asset, code=params[:code],can_download=asset.can_download?
+    can_download || (code && asset.auth_by_code?(code))
+  end
+
+  #code is for authorization of temporary link
+  def can_view_asset? asset, code=params[:code],can_view=asset.can_view?
+    can_view || (code && asset.auth_by_code?(code))
+  end
 end

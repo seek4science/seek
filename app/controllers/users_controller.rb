@@ -33,8 +33,6 @@ class UsersController < ApplicationController
           flash[:notice] = "OpenID successfully set"
           redirect_to(@user.person)
         else
-          puts @user.errors.full_messages.to_sentence
-          puts @user.openid
           redirect_to(edit_user_path(@user))
         end
       else
@@ -162,7 +160,19 @@ class UsersController < ApplicationController
     
     redirect_to :controller => 'home', :action => 'index'
   end
-  
+
+  def hide_guide_box
+    if current_user
+      current_user.show_guide_box = false
+      current_user.save
+    end
+    render :update do |page|
+      if current_user.nil?
+        cookies[:hide_guide_box]={:value=>'true',:expires=>10.years.from_now}
+      end
+       page.visual_effect :fade, 'guide_box', :duration => 0.25
+    end
+  end
   protected
   
   def open_id_authentication(identity_url)

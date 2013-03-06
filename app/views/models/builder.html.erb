@@ -73,7 +73,7 @@
                                :help_button=>{
                                        :title=>"Examples for model names are: model1, westerhoff2010",
                                        :text=>"Model name help",
-                                       :link_url=>"http://jjj.mib.ac.uk/webMathematica//Examples/JWSconstructor_panels/text/helpName.html",
+                                       :link_url=>"#{Seek::Config.jws_online_root}/webMathematica//Examples/JWSconstructor_panels/text/helpName.html",
                                        :link_title=>"model name help window"
                                }
                        } -%>
@@ -101,7 +101,7 @@
                             rtreaction.SetMaxHeight(800);
                         </script>
                         <p>
-                            <button title="Examples of model reactions:<br> v[1] {1}$sink + {1.5}b = {1}c + {1}d <br> vGLK {1}glc + {1}ATP = {1}g6p + {1}ADP" onclick="window.open('http://jjj.mib.ac.uk/webMathematica//Examples/JWSconstructor_panels/text/helpReactions.html','model reactions help window', 'width=400,height=600,toolbar=0'); return false;">
+                            <button title="Examples of model reactions:<br> v[1] {1}$sink + {1.5}b = {1}c + {1}d <br> vGLK {1}glc + {1}ATP = {1}g6p + {1}ADP" onclick="window.open('<%= Seek::Config.jws_online_root -%>/webMathematica//Examples/JWSconstructor_panels/text/helpReactions.html','model reactions help window', 'width=400,height=600,toolbar=0'); return false;">
                                 Reactions help
                             </button>
                             <input value="Show schema" type="button" onclick="create_panel_cookies();$('plotGraphPanel').value='on';this.form.submit();" alt="Evaluate" width="175" />&nbsp;<input value="Hide schema" type="button" onclick="create_panel_cookies();$('plotGraphPanel').value='off';this.form.submit();" alt="Evaluate" width="175" /><!-- resizable? script -->
@@ -141,7 +141,7 @@
                         <p>
                         </p>
                         <p>
-                            <button title="Examples of rate equations:<br> v[1] = k1*sink*a[t]/(a[t]+Kma)-k2*c[t]*d[t]<br> vGLK = Vm*glc[t]/(KmGLKglc+glc[t])" onclick="window.open('http://jjj.mib.ac.uk/webMathematica//Examples/JWSconstructor_panels/text/helpRateEquations.html','model rate equations help window', 'width=400,height=600,toolbar=0'); return false;">
+                            <button title="Examples of rate equations:<br> v[1] = k1*sink*a[t]/(a[t]+Kma)-k2*c[t]*d[t]<br> vGLK = Vm*glc[t]/(KmGLKglc+glc[t])" onclick="window.open('<%= Seek::Config.jws_online_root -%>/webMathematica//Examples/JWSconstructor_panels/text/helpRateEquations.html','model rate equations help window', 'width=400,height=600,toolbar=0'); return false;">
                                 Rate equations help
                             </button>
                             <input value="Show eqs graph" type="button" onclick="create_panel_cookies();$('plotKineticsPanel').value='on';this.form.submit();" alt="Evaluate" width="175" />&nbsp;<input value="Hide eqs graph" type="button" onclick="create_panel_cookies();$('plotKineticsPanel').value='off';this.form.submit();" alt="Evaluate" width="175" /><!-- resizable_2 script -->
@@ -163,7 +163,7 @@
                                :help_button=>{
                                        :title=>"Example of variable initialisations:<br> x[0] = 1<br> g6p[0] = 1.4 ",
                                        :text=>"Inital values help",
-                                       :link_url=>"http://jjj.mib.ac.uk/webMathematica//Examples/JWSconstructor_panels/text/helpInitVals.html",
+                                       :link_url=>"#{Seek::Config.jws_online_root}/webMathematica//Examples/JWSconstructor_panels/text/helpInitVals.html",
                                        :link_title=>"model parameter values help window"
                                }
                        } -%>
@@ -174,7 +174,7 @@
                                :help_button=>{
                                        :title=>"Example of parameter initialisations:<br> k1 = 1<br> k2 = 3 ",
                                        :text=>"Parameters help",
-                                       :link_url=>"http://jjj.mib.ac.uk/webMathematica//Examples/JWSconstructor_panels/text/helpParameters.html",
+                                       :link_url=>"#{Seek::Config.jws_online_root}/webMathematica//Examples/JWSconstructor_panels/text/helpParameters.html",
                                        :link_title=>"model parameter values help window"
                                }
                        } -%>
@@ -185,7 +185,7 @@
                                :help_button=>{
                                        :title=>"Examples of assignment rules are:<br>totalP := P1[t]+P2[t]<br> a := a[t]+Sin[t] ",
                                        :text=>"Assignment rules help",
-                                       :link_url=>"http://jjj.mib.ac.uk/webMathematica//Examples/JWSconstructor_panels/text/helpAssignmentRules.html",
+                                       :link_url=>"#{Seek::Config.jws_online_root}/webMathematica//Examples/JWSconstructor_panels/text/helpAssignmentRules.html",
                                        :link_title=>"model assignments rules help window"
                                }
                        } -%>
@@ -196,7 +196,7 @@
                                :help_button=>{
                                        :title=>"Examples of functions are:<br> mmKin[vm_,s_,kms_] := vm*s/(s+kms)<br>aFree[tot_]:=tot-a[t]",
                                        :text=>"Functions help",
-                                       :link_url=>"http://jjj.mib.ac.uk/webMathematica//Examples/JWSconstructor_panels/text/helpFunctions.html",
+                                       :link_url=>"#{Seek::Config.jws_online_root}/webMathematica//Examples/JWSconstructor_panels/text/helpFunctions.html",
                                        :link_title=>"model functions help window"
                                }
                        } -%>
@@ -207,7 +207,7 @@
                                :help_button=>{
                                        :title=>"Examples of events are:<br> ?",
                                        :text=>"Events help",
-                                       :link_url=>"http://jjj.mib.ac.uk/webMathematica//Examples/JWSconstructor_panels/text/helpEvents.html",
+                                       :link_url=>"#{Seek::Config.jws_online_root}/webMathematica//Examples/JWSconstructor_panels/text/helpEvents.html",
                                        :link_title=>"model events help window"
                                }
                        } -%>

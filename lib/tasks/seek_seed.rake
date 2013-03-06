@@ -44,8 +44,10 @@ namespace :seek do
 
   desc "seeds the database with the list of compounds and synonyms extracted from sabio-rk and stored in config/default_data/"
   task(:compounds=>:environment) do
-    SerializationHelper::Base.new(YamlDb::Helper).load("config/default_data/compounds.yml")
-    SerializationHelper::Base.new(YamlDb::Helper).load("config/default_data/synonyms.yml")
+    Fixtures.create_fixtures(File.join(Rails.root, "config/default_data"), "compounds")
+    Fixtures.create_fixtures(File.join(Rails.root, "config/default_data"), "synonyms")
+    Fixtures.create_fixtures(File.join(Rails.root, "config/default_data"), "mappings")
+    Fixtures.create_fixtures(File.join(Rails.root, "config/default_data"), "mapping_links")
   end
 
   #update the old compounds and their annotations, add the new compounds and their annotations if they dont exist
@@ -90,50 +92,50 @@ namespace :seek do
   task(:culture_growth_types=>:environment) do
     revert_fixtures_identify
     CultureGrowthType.delete_all
-    Fixtures.create_fixtures(File.join(RAILS_ROOT, "config/default_data"), "culture_growth_types")
+    Fixtures.create_fixtures(File.join(Rails.root, "config/default_data"), "culture_growth_types")
   end
 
   task(:relationship_types=>:environment) do
     revert_fixtures_identify
     RelationshipType.delete_all
-    Fixtures.create_fixtures(File.join(RAILS_ROOT, "config/default_data"), "relationship_types")
+    Fixtures.create_fixtures(File.join(Rails.root, "config/default_data"), "relationship_types")
   end
 
   task(:model_types=>:environment) do
     revert_fixtures_identify
     ModelType.delete_all
-    Fixtures.create_fixtures(File.join(RAILS_ROOT, "config/default_data"), "model_types")
+    Fixtures.create_fixtures(File.join(Rails.root, "config/default_data"), "model_types")
   end
 
   task(:model_formats=>:environment) do
     revert_fixtures_identify
     ModelFormat.delete_all
-    Fixtures.create_fixtures(File.join(RAILS_ROOT, "config/default_data"), "model_formats")
+    Fixtures.create_fixtures(File.join(Rails.root, "config/default_data"), "model_formats")
   end
 
   task(:assay_types=>:environment) do
     revert_fixtures_identify
     AssayType.delete_all
-    Fixtures.create_fixtures(File.join(RAILS_ROOT, "config/default_data"), "assay_types")
+    Fixtures.create_fixtures(File.join(Rails.root, "config/default_data"), "assay_types")
   end
 
   task(:disciplines=>:environment) do
     revert_fixtures_identify
     Discipline.delete_all
-    Fixtures.create_fixtures(File.join(RAILS_ROOT, "config/default_data"), "disciplines")
+    Fixtures.create_fixtures(File.join(Rails.root, "config/default_data"), "disciplines")
   end
 
   task(:organisms=>:environment) do
     revert_fixtures_identify
     Organism.delete_all
-    Fixtures.create_fixtures(File.join(RAILS_ROOT, "config/default_data"), "organisms")
+    Fixtures.create_fixtures(File.join(Rails.root, "config/default_data"), "organisms")
 
     BioportalConcept.delete_all
-    Fixtures.create_fixtures(File.join(RAILS_ROOT, "config/default_data"), "bioportal_concepts")
+    Fixtures.create_fixtures(File.join(Rails.root, "config/default_data"), "bioportal_concepts")
 
     revert_fixtures_identify
     Strain.delete_all
-    Fixtures.create_fixtures(File.join(RAILS_ROOT, "config/default_data"), "strains")
+    Fixtures.create_fixtures(File.join(Rails.root, "config/default_data"), "strains")
     disable_authorization_checks do
       #create policy for strains
       Strain.all.each do |strain|
@@ -151,37 +153,37 @@ namespace :seek do
   task(:technology_types=>:environment) do
     revert_fixtures_identify
     TechnologyType.delete_all
-    Fixtures.create_fixtures(File.join(RAILS_ROOT, "config/default_data"), "technology_types")
+    Fixtures.create_fixtures(File.join(Rails.root, "config/default_data"), "technology_types")
   end
 
   task(:recommended_model_environments=>:environment) do
     revert_fixtures_identify
     RecommendedModelEnvironment.delete_all
-    Fixtures.create_fixtures(File.join(RAILS_ROOT, "config/default_data"), "recommended_model_environments")
+    Fixtures.create_fixtures(File.join(Rails.root, "config/default_data"), "recommended_model_environments")
   end
 
   task(:measured_items=>:environment) do
     revert_fixtures_identify
     MeasuredItem.delete_all
-    Fixtures.create_fixtures(File.join(RAILS_ROOT, "config/default_data"), "measured_items")
+    Fixtures.create_fixtures(File.join(Rails.root, "config/default_data"), "measured_items")
   end
 
   task(:units=>:environment) do
     revert_fixtures_identify
     Unit.delete_all
-    Fixtures.create_fixtures(File.join(RAILS_ROOT, "config/default_data"), "units")
+    Fixtures.create_fixtures(File.join(Rails.root, "config/default_data"), "units")
   end
 
   task(:project_roles=>:environment) do
     revert_fixtures_identify
     ProjectRole.delete_all
-    Fixtures.create_fixtures(File.join(RAILS_ROOT, "config/default_data"), "project_roles")
+    Fixtures.create_fixtures(File.join(Rails.root, "config/default_data"), "project_roles")
   end
 
   task(:assay_classes=>:environment) do
     revert_fixtures_identify
     AssayClass.delete_all
-    Fixtures.create_fixtures(File.join(RAILS_ROOT, "config/default_data"), "assay_classes")
+    Fixtures.create_fixtures(File.join(Rails.root, "config/default_data"), "assay_classes")
   end
 
   desc "Loads help documents and attachments/images"
@@ -210,6 +212,24 @@ namespace :seek do
       (DbFile.all - HelpAttachment.all.collect { |h| h.db_file }).each { |d| d.destroy }
     else
       puts "Aborted - Couldn't find any help documents in /config/default_data/help/"
+    end
+  end
+
+  desc "assign contributor to strains which dont have one"
+  task :assign_contributor_to_strains => :environment do
+    file_path = File.join(Rails.root, "config/default_data", "strains_with_contributor.yml")
+    strains_from_yml = YAML::load(File.open(file_path)).values
+
+    strains_without_contributor = Strain.all.select{|s| s.contributor.nil? }
+    strains_from_yml.each do |strain_from_yml|
+      strain = Strain.find_by_id(strain_from_yml['id'])
+      if strains_without_contributor.include?(strain)
+         contributor = User.find_by_id(strain_from_yml['contributor_id'])
+         unless contributor.nil?
+           strain.contributor = contributor
+           disable_authorization_checks{strain.save}
+         end
+      end
     end
   end
 

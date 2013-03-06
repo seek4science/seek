@@ -5,19 +5,44 @@ class ProjectsController < ApplicationController
   include IndexPager
   
   before_filter :find_assets, :only=>[:index]
-  before_filter :is_user_admin_auth, :except=>[:index, :show, :edit, :update, :request_institutions, :admin]
+  before_filter :is_user_admin_auth, :except=>[:index, :show, :edit, :update, :request_institutions, :admin, :asset_report, :view_items_in_tab]
   before_filter :editable_by_user, :only=>[:edit,:update]
-  before_filter :is_user_admin_auth,:only=>[:manage]
   before_filter :administerable_by_user, :only =>[:admin]
   before_filter :auth_params,:only=>[:update]
   before_filter :auth_institution_list_for_project_manager, :only => [:update]
-  skip_before_filter :project_membership_required, :only => [:create, :new]
+  before_filter :member_of_this_project, :only=>[:asset_report]
+
+  skip_before_filter :project_membership_required
 
   cache_sweeper :projects_sweeper,:only=>[:update,:create,:destroy]
+  include Seek::BreadCrumbs
 
   def auto_complete_for_organism_name
     render :json => Project.organism_counts.map(&:name).to_json
   end  
+
+  def asset_report
+    @no_sidebar=true
+    @types=[DataFile,Model,Sop]
+    @types.each do |type|
+      all = type.all_authorized_for "download", nil, @project
+      instance_variable_set "@public_#{type.name.underscore.pluralize}".to_sym,all
+      #to reduce the initial list - will start with all assets that can be seen by the first user fouund to be in a project
+      user = User.all.detect{|user| !user.try(:person).nil? && !user.person.projects.empty?}
+      projects_shared = user.nil? ? [] : type.all_authorized_for("download", user, @project)
+      #now select those with a policy set to downloadable to all-sysmo-users
+      projects_shared  = projects_shared.select do |item|
+        (item.policy.sharing_scope == Policy::ALL_SYSMO_USERS && item.policy.access_type == Policy::ACCESSIBLE)
+      end
+      #just those shared with sysmo but NOT shared publicly
+      projects_shared  = projects_shared  - all
+      instance_variable_set "@projects_only_#{type.name.underscore.pluralize}".to_sym,projects_shared
+    end
+
+    respond_to do |format|
+      format.html {render :template=>"projects/asset_report/report"}
+    end
+  end
 
   def admin
     @project = Project.find(params[:id])
@@ -205,6 +230,18 @@ class ProjectsController < ApplicationController
       error("Insufficient privileges", "is invalid (insufficient_privileges)")
       return false
     end
+  end
+
+  def member_of_this_project
+    @project = Project.find(params[:id])
+    if @project.nil? || !@project.has_member?(current_user)
+      flash[:error]="You are not a member of this project, so cannot access this page."
+      redirect_to project_path(@project)
+      false
+    else
+      true
+    end
+
   end
 
   def administerable_by_user

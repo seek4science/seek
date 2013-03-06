@@ -1,0 +1,76 @@
+<%
+   @folder = folder_details
+-%>
+
+<ul id="folder_details">
+  <li class="title_and_description">
+    <% if @folder.editable? -%>
+
+        <p>
+          <span id="title_label"><b>Title: </b></span>
+          <%= in_place_editor_field :folder, 'title', {}, {
+                  :external_control=>:title_label,
+                  :url=>url_for(:project_id=>@project.id, :action=>:set_project_folder_title, :id=>@folder.id)
+          } %>
+        </p>
+
+        <p>
+          <span id="description_label"><b>Description: </b></span>
+          <%= in_place_editor_field :folder, 'description', {}, {
+                  :rows=>1,
+                  :cols=>50,
+                  :external_control=>"description_label",
+                  :url=>url_for(:project_id=>@project.id, :action=>:set_project_folder_description, :id=>@folder.id)} -%>
+        </p>
+    <% else -%>
+        <p>
+            <b>Title: </b><%= h(@folder.title) -%>
+        </p>
+        <p>
+            <b>Description: </b><%= h(@folder.description) -%>
+        </p>
+    <% end -%>
+  </li>
+
+  <li class="actions">
+    <% if @folder.deletable? -%>
+        <% unsorted_folder = ProjectFolder.new_items_folder(@project).try(:title) -%>
+        <div>
+        <%= image_tag_for_key "destroy", project_folder_path(@project, @folder),
+                              "Delete this folder",
+                              {:confirm => "Deleting this folder will remove all subfolders, and move any files to the #{unsorted_folder}. It is not reversible. Are you sure you want to delete?",
+                               :method => :delete},
+                              "Delete this folder"
+        -%>
+        </div>
+    <% end -%>
+
+    <% if @folder.editable? %>
+        <div>
+        <%= image_tag_for_key "add", "javascript:Effect.Appear('new_child');new Effect.Highlight('new_child');",
+                              "Add subfolder",
+                              {},
+                              "Add a sub-folder",
+                              :function
+        -%>
+        </div>
+    <% end -%>
+
+  </li>
+
+</ul>
+
+<div style='clear:both;'>&nbsp;</div>
+
+<% if @folder.editable? -%>
+    <div id='new_child' style='display:none;'>
+      <% form_remote_tag :url=>{:action=>:create_folder, :id=>@folder.id}, :html=>{:id=>:create_child_form} do -%>
+              <%= label_tag "Create a new sub-folder:" -%>
+              <%= hidden_field_tag :project_id, @folder.project.id -%>
+              <%= text_field_tag :title -%>
+              <%= submit_tag(:create, :onclick=>"javascript: create_child();") -%>
+          <% end -%>
+
+        </div>
+<% end -%>
+

@@ -1,7 +1,7 @@
 require 'test_helper'
 
 class PersonTest < ActiveSupport::TestCase
-  fixtures :all
+  fixtures :users, :people
   
   # Replace this with your real tests.
   def test_work_groups
@@ -26,9 +26,25 @@ class PersonTest < ActiveSupport::TestCase
     assert_equal updated_at.to_s,person.updated_at.to_s
   end
 
+  test "only first admin person" do
+    Person.delete_all
+    person = Factory :admin
+    assert person.only_first_admin_person?
+
+    person.is_admin=false
+    disable_authorization_checks{person.save!}
+    assert !person.only_first_admin_person?
+    person.is_admin=true
+    disable_authorization_checks{person.save!}
+    assert person.only_first_admin_person?
+    Factory :person
+    assert !person.only_first_admin_person?
+
+  end
+
   def test_active_ordered_by_updated_at_and_avatar_not_null
 
-    Person.destroy_all
+    Person.delete_all
 
     avatar = Factory :avatar
 
@@ -71,6 +87,14 @@ class PersonTest < ActiveSupport::TestCase
     assert !people(:quentin_person).is_downloadable_asset?
   end
 
+  def test_member_of
+    p=Factory :person
+    proj = Factory :project
+    assert !p.projects.empty?
+    assert p.member_of?(p.projects.first)
+    assert !p.member_of?(proj)
+  end
+
   def test_avatar_key
     p=people(:quentin_person)
     assert_nil p.avatar_key
@@ -83,7 +107,7 @@ class PersonTest < ActiveSupport::TestCase
     p.save!
     assert !p.is_admin?, "Should not automatically be admin, since people already exist"
 
-    Person.destroy_all
+    Person.delete_all
 
     assert_equal 0,Person.count #no people should exist
     p=Person.new(:first_name=>"XXX",:email=>"xxx@email.com")
@@ -149,98 +173,101 @@ class PersonTest < ActiveSupport::TestCase
 
   def test_assign_expertise
     p=Factory :person
-    User.current_user = p.user
-    assert_equal 0,p.expertise.size
-    assert_difference("Annotation.count",2) do
-      assert_difference("TextValue.count",2) do
-        p.expertise = ["golf","fishing"]
+    User.with_current_user p.user do
+      assert_equal 0,p.expertise.size
+      assert_difference("Annotation.count",2) do
+        assert_difference("TextValue.count",2) do
+          p.expertise = ["golf","fishing"]
+        end
+      end
+
+      assert_equal 2,p.expertise.size
+      assert p.expertise.collect{|e| e.text}.include?("golf")
+      assert p.expertise.collect{|e| e.text}.include?("fishing")
+
+      assert_difference("Annotation.count",-1) do
+        assert_no_difference("TextValue.count") do
+          p.expertise = ["golf"]
+        end
+      end
+
+      assert_equal 1,p.expertise.size
+      assert_equal "golf",p.expertise[0].text
+
+      p2=Factory :person
+      assert_difference("Annotation.count") do
+        assert_no_difference("TextValue.count") do
+          p2.expertise = ["golf"]
+        end
       end
     end
-
-    assert_equal 2,p.expertise.size
-    assert p.expertise.collect{|e| e.text}.include?("golf")
-    assert p.expertise.collect{|e| e.text}.include?("fishing")
-
-    assert_difference("Annotation.count",-1) do
-      assert_no_difference("TextValue.count") do
-        p.expertise = ["golf"]
-      end
-    end
-
-    assert_equal 1,p.expertise.size
-    assert_equal "golf",p.expertise[0].text
-
-    p2=Factory :person
-    assert_difference("Annotation.count") do
-      assert_no_difference("TextValue.count") do
-        p2.expertise = ["golf"]
-      end
-    end
-
-
   end
 
   def test_assigns_tools
     p=Factory :person
-    User.current_user = p.user
-    assert_equal 0,p.tools.size
-    assert_difference("Annotation.count",2) do
-      assert_difference("TextValue.count",2) do
-        p.tools = ["golf","fishing"]
+    User.with_current_user p.user do
+      assert_equal 0,p.tools.size
+      assert_difference("Annotation.count",2) do
+        assert_difference("TextValue.count",2) do
+          p.tools = ["golf","fishing"]
+        end
+      end
+
+      assert_equal 2,p.tools.size
+      assert p.tools.collect{|e| e.text}.include?("golf")
+      assert p.tools.collect{|e| e.text}.include?("fishing")
+
+      assert_difference("Annotation.count",-1) do
+        assert_no_difference("TextValue.count") do
+          p.tools = ["golf"]
+        end
+      end
+
+      assert_equal 1,p.tools.size
+      assert_equal "golf",p.tools[0].text
+
+      p2=Factory :person
+      assert_difference("Annotation.count") do
+        assert_no_difference("TextValue.count") do
+          p2.tools = ["golf"]
+        end
       end
     end
 
-    assert_equal 2,p.tools.size
-    assert p.tools.collect{|e| e.text}.include?("golf")
-    assert p.tools.collect{|e| e.text}.include?("fishing")
-
-    assert_difference("Annotation.count",-1) do
-      assert_no_difference("TextValue.count") do
-        p.tools = ["golf"]
-      end
-    end
-
-    assert_equal 1,p.tools.size
-    assert_equal "golf",p.tools[0].text
-
-    p2=Factory :person
-    assert_difference("Annotation.count") do
-      assert_no_difference("TextValue.count") do
-        p2.tools = ["golf"]
-      end
-    end
   end
 
   def test_removes_previously_assigned
     p=Factory :person
-    User.current_user = p.user
-    p.tools = ["one","two"]
-    assert_equal 2,p.tools.size
-    p.tools = ["three"]
-    assert_equal 1,p.tools.size
-    assert_equal "three",p.tools[0].text
-    
-    p=Factory :person
-    p.expertise = ["aaa","bbb"]
-    assert_equal 2,p.expertise.size
-    p.expertise = ["ccc"]
-    assert_equal 1,p.expertise.size
-    assert_equal "ccc",p.expertise[0].text
+    User.with_current_user p.user do
+      p.tools = ["one","two"]
+      assert_equal 2,p.tools.size
+      p.tools = ["three"]
+      assert_equal 1,p.tools.size
+      assert_equal "three",p.tools[0].text
+
+      p=Factory :person
+      p.expertise = ["aaa","bbb"]
+      assert_equal 2,p.expertise.size
+      p.expertise = ["ccc"]
+      assert_equal 1,p.expertise.size
+      assert_equal "ccc",p.expertise[0].text
+    end
+
   end
 
   def test_expertise_and_tools_with_same_name
     p=Factory :person
-    User.current_user = p.user
-
-    assert_difference("Annotation.count",2) do
-      assert_difference("TextValue.count",2) do
-        p.tools = ["golf","fishing"]
+    User.with_current_user p.user do
+      assert_difference("Annotation.count",2) do
+        assert_difference("TextValue.count",2) do
+          p.tools = ["golf","fishing"]
+        end
       end
-    end
 
-    assert_difference("Annotation.count",2) do
-      assert_no_difference("TextValue.count") do
-        p.expertise = ["golf","fishing"]
+      assert_difference("Annotation.count",2) do
+        assert_no_difference("TextValue.count") do
+          p.expertise = ["golf","fishing"]
+        end
       end
     end
   end
@@ -376,17 +403,20 @@ class PersonTest < ActiveSupport::TestCase
   end
   
   def test_disciplines
-    p=people(:modeller_person)
+    p = Factory :person,:disciplines=>[Factory(:discipline,:title=>"A"),Factory(:discipline, :title=>"B")]
+    p.reload
     assert_equal 2,p.disciplines.size
-    assert p.disciplines.include?(disciplines(:modeller))
-    assert p.disciplines.include?(disciplines(:experimentalist))
+    assert_equal "A",p.disciplines[0].title
+    assert_equal "B",p.disciplines[1].title
+
   end
   
   def test_roles_association
-    p=people(:person_for_model_owner)
-    assert_equal 2, p.project_roles.size
-    assert p.project_roles.include?(project_roles(:member))
-    assert p.project_roles.include?(project_roles(:postdoc))
+    role = Factory(:project_role)
+    p=Factory :person
+    p.group_memberships.first.project_roles << role
+    assert_equal 1, p.project_roles.size
+    assert p.project_roles.include?(role)
   end
   
   def test_update_first_letter
@@ -503,18 +533,20 @@ class PersonTest < ActiveSupport::TestCase
   test "related resource" do
     user = Factory :user
     person = user.person
-    AssetsCreator.create :asset=>Factory(:data_file),:creator=> person
-    AssetsCreator.create :asset=>Factory(:model),:creator=> person
-    AssetsCreator.create :asset=>Factory(:sop),:creator=> person
-    Factory :event,:contributor=>user
-    AssetsCreator.create :asset=>Factory(:presentation),:creator=> person
-    AssetsCreator.create :asset=>Factory(:publication),:creator=>person
-    assert_equal person.created_data_files, person.related_data_files
-    assert_equal person.created_models, person.related_models
-    assert_equal person.created_sops,  person.related_sops
-    assert_equal user.events, person.related_events
-    assert_equal person.created_presentations, person.related_presentations
-    assert_equal person.created_publications, person.related_publications
+    User.with_current_user(user) do
+      AssetsCreator.create :asset=>Factory(:data_file),:creator=> person
+      AssetsCreator.create :asset=>Factory(:model),:creator=> person
+      AssetsCreator.create :asset=>Factory(:sop),:creator=> person
+      Factory :event,:contributor=>user
+      AssetsCreator.create :asset=>Factory(:presentation),:creator=> person
+      AssetsCreator.create :asset=>Factory(:publication),:creator=>person
+      assert_equal person.created_data_files, person.related_data_files
+      assert_equal person.created_models, person.related_models
+      assert_equal person.created_sops,  person.related_sops
+      assert_equal user.events, person.related_events
+      assert_equal person.created_presentations, person.related_presentations
+      assert_equal person.created_publications, person.related_publications
+    end
   end
   
   test 'assign admin role for a person' do
@@ -607,7 +639,7 @@ class PersonTest < ActiveSupport::TestCase
     end
   end
 
-  test 'is_gatekeeperr?' do
+  test 'is_gatekeeper?' do
      User.with_current_user Factory(:admin).user do
       person = Factory(:person)
       person.is_gatekeeper= true
@@ -630,6 +662,20 @@ class PersonTest < ActiveSupport::TestCase
     pals = Person.pals
     assert_equal 1, pals.count
     assert pals.include?(people(:pal))
+  end
+
+  test "can_create_new_items" do
+    p=Factory :person
+    assert p.can_create_new_items?
+    assert p.member?
+
+    p.group_memberships.destroy_all
+
+    #this is necessary because Person caches the projects in the instance variable @known_projects
+    p = Person.find(p.id)
+    assert !p.member?
+    assert !p.can_create_new_items?
+
   end
 
 end

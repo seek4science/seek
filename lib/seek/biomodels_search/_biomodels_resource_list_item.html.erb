@@ -1,0 +1,57 @@
+<%
+    biomodel_link = "http://www.ebi.ac.uk/biomodels-main/#{resource.model_id}"
+%>
+<div class="list_item_content noavatar">
+    <div class="list_item_title">
+     <%= "<p> #{resource.title}</p>" %>
+    </div>
+
+    <div class="list_item_left_column">
+
+
+        <p class='list_item_attribute'>
+
+        <%= "<b> Original Authors: </b> " + resource.authors.join(", ") %>
+        </p>
+    </div>
+
+    <div class="list_item_right_column">
+        <p class='list_item_attribute'>
+            <%= "<b> Publication Date: </b> " + date_as_string(resource.date_published) %>
+        </p>
+        <p class='list_item_attribute'>
+          <%= "<b> Last Modified: </b>" + date_as_string(resource.last_modification_date, true) %>
+        </p>
+    </div>
+
+
+    <div class="list_item_whole_width">
+      <p class='list_item_attribute'>
+        <%= "<b> URL of Original: </b> " + link_to(biomodel_link, "http://www.ebi.ac.uk/biomodels-main/#{resource.model_id}",:target=>"_blank") %>
+      </p>
+      <p class='list_item_attribute'>
+        <%= "<b> Abstract: </b> " + list_item_description(resource.abstract,true,1000) %>
+      </p>
+    </div>
+</div>
+
+<div class="list_item_actions">
+
+<%
+    biomodel_download_link = "http://www.ebi.ac.uk/biomodels-main/download?mid=#{resource.model_id}"
+    description_for_import = resource.abstract
+-%>
+
+<%= image_tag_for_key "download",biomodel_download_link,"download",{},"Download" %>
+<% if logged_in? && current_user.person.can_create_new_items? %>
+<%= image_tag_for_key "import",
+        {:controller => "models",
+        :action => "new",
+        :model=>{:title=>resource.title,:imported_source=>resource.tab,:imported_url=>biomodel_link,:data_url=>biomodel_download_link,:original_filename=>"#{resource.model_id}.xml",:model_format_id=>ModelFormat.sbml.first.try(:id),:description=>description_for_import},
+        },
+        "import",{},
+        "Import" %>
+<% end %>
+
+</div>
+

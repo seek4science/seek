@@ -1,3 +1,5 @@
+<%= render :partial => "layouts/item_title",:locals=>{:item=>@study} %>
+
 <ul class="sectionIcons">
     <%= render :partial => "subscriptions/subscribe", :locals => {:object => @study} %>
     <% if @study.can_manage? -%>
@@ -18,12 +20,8 @@
     <% end %>
 </ul>
 
-<%= render :partial => "layouts/item_title",:locals=>{:item=>@study} %>
-
 <div class="show_basic">
   <div class="main_content_left_box_narrower">
-  <%= render :partial => "layouts/usage_info", :locals => { :resource => @study } -%>
-  
   <p class="id">
     <label>ID: </label>
     <%= @study.id -%>
@@ -75,6 +73,8 @@
     <%= embedded_isa_svg(@study.investigation,false,@study) -%>
   </div>
 
-    <%= render :partial=>"layouts/items_related_to", :object => @study %>
+  <%= render :partial=>"layouts/items_related_to", :object => @study %>
+  <br/>
+  <%= render :partial => "layouts/usage_info", :locals => { :resource => @study } -%>
 
 </div>

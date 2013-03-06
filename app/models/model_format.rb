@@ -3,4 +3,8 @@ class ModelFormat < ActiveRecord::Base
   validates_presence_of :title
 
   has_many :models
+
+  named_scope :sbml,:conditions=>{:title=>"SBML"}
+
+
 end

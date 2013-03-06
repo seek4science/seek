@@ -3,6 +3,7 @@ class ReindexingJob
   @@my_yaml = ReindexingJob.new.to_yaml
 
   BATCHSIZE=10
+  DEFAULT_PRIORITY=2
 
   def perform
     todo = ReindexingQueue.all(:limit => BATCHSIZE, :order => :id).collect do |queued|
@@ -20,11 +21,11 @@ class ReindexingJob
       end
     end
     if ReindexingQueue.count>0 && !ReindexingJob.exists?
-      Delayed::Job.enqueue(ReindexingJob.new, 1, 1.seconds.from_now)
+      Delayed::Job.enqueue(ReindexingJob.new, DEFAULT_PRIORITY, 1.seconds.from_now)
     end
   end
 
-  def self.add_items_to_queue items, t=1.seconds.from_now, priority=1
+  def self.add_items_to_queue items, t=1.seconds.from_now, priority=DEFAULT_PRIORITY
     items = Array(items)
 
     disable_authorization_checks do

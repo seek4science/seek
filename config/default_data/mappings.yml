@@ -1,0 +1,1261 @@
+--- 
+mapping_00057: 
+  chebi_id: "15945"
+  kegg_id: C02669
+  id: 57
+  sabiork_id: 2484
+  updated_at: 2011-08-25 16:29:23 Z
+  created_at: 2011-08-25 16:29:23 Z
+mapping_00134: 
+  chebi_id: "14321"
+  kegg_id: C00302
+  id: 134
+  sabiork_id: 2010
+  updated_at: 2011-11-01 13:45:04 Z
+  created_at: 2011-11-01 13:45:04 Z
+mapping_00063: 
+  chebi_id: "4170"
+  kegg_id: C00092
+  id: 63
+  sabiork_id: 1405
+  updated_at: 2011-08-25 16:29:23 Z
+  created_at: 2011-08-25 16:29:23 Z
+mapping_00140: 
+  chebi_id: "15428"
+  kegg_id: C00037
+  id: 140
+  sabiork_id: 66
+  updated_at: 2011-11-01 13:45:06 Z
+  created_at: 2011-11-01 13:45:06 Z
+mapping_00128: 
+  chebi_id: "44215"
+  kegg_id: C00003
+  id: 128
+  sabiork_id: 37
+  updated_at: 2011-11-01 13:45:00 Z
+  created_at: 2011-11-01 13:45:00 Z
+mapping_00054: 
+  chebi_id: "18105"
+  kegg_id: C01094
+  id: 54
+  sabiork_id: 1351
+  updated_at: 2011-08-25 16:29:23 Z
+  created_at: 2011-08-25 16:29:23 Z
+mapping_00131: 
+  chebi_id: 
+  kegg_id: 
+  id: 131
+  sabiork_id: 21267
+  updated_at: 2011-11-01 13:45:02 Z
+  created_at: 2011-11-01 13:45:02 Z
+mapping_00119: 
+  chebi_id: "46217"
+  kegg_id: C01401
+  id: 119
+  sabiork_id: 2280
+  updated_at: 2011-11-01 13:44:51 Z
+  created_at: 2011-11-01 13:44:51 Z
+mapping_00060: 
+  chebi_id: "16217"
+  kegg_id: C00198
+  id: 60
+  sabiork_id: 1971
+  updated_at: 2011-08-25 16:29:23 Z
+  created_at: 2011-08-25 16:29:23 Z
+mapping_00048: 
+  chebi_id: "16897"
+  kegg_id: C00279
+  id: 48
+  sabiork_id: 1324
+  updated_at: 2011-08-25 16:29:23 Z
+  created_at: 2011-08-25 16:29:23 Z
+mapping_00125: 
+  chebi_id: "44215"
+  kegg_id: C00004
+  id: 125
+  sabiork_id: 37
+  updated_at: 2011-11-01 13:45:00 Z
+  created_at: 2011-11-01 13:45:00 Z
+mapping_00051: 
+  chebi_id: "37736"
+  kegg_id: C00354
+  id: 51
+  sabiork_id: 1465
+  updated_at: 2011-08-25 16:29:23 Z
+  created_at: 2011-08-25 16:29:23 Z
+mapping_00039: 
+  chebi_id: "16084"
+  kegg_id: C05345
+  id: 39
+  sabiork_id: 25
+  updated_at: 2011-08-25 16:29:22 Z
+  created_at: 2011-08-25 16:29:22 Z
+mapping_00116: 
+  chebi_id: 
+  kegg_id: 
+  id: 116
+  sabiork_id: 29
+  updated_at: 2011-11-01 13:44:43 Z
+  created_at: 2011-11-01 13:44:43 Z
+mapping_00045: 
+  chebi_id: "37563"
+  kegg_id: C00063
+  id: 45
+  sabiork_id: 1286
+  updated_at: 2011-08-25 16:29:23 Z
+  created_at: 2011-08-25 16:29:23 Z
+mapping_00122: 
+  chebi_id: "16526"
+  kegg_id: C00011
+  id: 122
+  sabiork_id: 1266
+  updated_at: 2011-11-01 13:44:55 Z
+  created_at: 2011-11-01 13:44:55 Z
+mapping_00036: 
+  chebi_id: "17665"
+  kegg_id: C00668
+  id: 36
+  sabiork_id: 24
+  updated_at: 2011-08-25 16:29:22 Z
+  created_at: 2011-08-25 16:29:22 Z
+mapping_00113: 
+  chebi_id: "16001"
+  kegg_id: C00236
+  id: 113
+  sabiork_id: 21215
+  updated_at: 2011-09-12 14:07:33 Z
+  created_at: 2011-09-12 14:07:33 Z
+mapping_00042: 
+  chebi_id: "17239"
+  kegg_id: C00112
+  id: 42
+  sabiork_id: 1302
+  updated_at: 2011-08-25 16:29:22 Z
+  created_at: 2011-08-25 16:29:22 Z
+mapping_00107: 
+  chebi_id: "25523"
+  kegg_id: C11037
+  id: 107
+  sabiork_id: 1263
+  updated_at: 2011-09-09 09:27:51 Z
+  created_at: 2011-09-09 09:27:51 Z
+mapping_00110: 
+  chebi_id: "25523"
+  kegg_id: C00006
+  id: 110
+  sabiork_id: 1263
+  updated_at: 2011-09-09 09:27:51 Z
+  created_at: 2011-09-09 09:27:51 Z
+mapping_00027: 
+  chebi_id: "15688"
+  kegg_id: C00466
+  id: 27
+  sabiork_id: 2054
+  updated_at: 2011-08-25 16:29:22 Z
+  created_at: 2011-08-25 16:29:22 Z
+mapping_00104: 
+  chebi_id: "15713"
+  kegg_id: C00075
+  id: 104
+  sabiork_id: 1288
+  updated_at: 2011-08-25 16:29:26 Z
+  created_at: 2011-08-25 16:29:26 Z
+mapping_00033: 
+  chebi_id: "30616"
+  kegg_id: C00002
+  id: 33
+  sabiork_id: 34
+  updated_at: 2011-08-25 16:29:22 Z
+  created_at: 2011-08-25 16:29:22 Z
+mapping_00024: 
+  chebi_id: "16938"
+  kegg_id: C01236
+  id: 24
+  sabiork_id: 1366
+  updated_at: 2011-08-25 16:29:22 Z
+  created_at: 2011-08-25 16:29:22 Z
+mapping_00101: 
+  chebi_id: "27082"
+  kegg_id: C01083
+  id: 101
+  sabiork_id: 91
+  updated_at: 2011-08-25 16:29:25 Z
+  created_at: 2011-08-25 16:29:25 Z
+mapping_00030: 
+  chebi_id: "22191"
+  kegg_id: C00227
+  id: 30
+  sabiork_id: 1316
+  updated_at: 2011-08-25 16:29:22 Z
+  created_at: 2011-08-25 16:29:22 Z
+mapping_00018: 
+  chebi_id: "18021"
+  kegg_id: C00074
+  id: 18
+  sabiork_id: 32
+  updated_at: 2011-08-25 16:29:21 Z
+  created_at: 2011-08-25 16:29:21 Z
+mapping_00021: 
+  chebi_id: "17794"
+  kegg_id: C00197
+  id: 21
+  sabiork_id: 21216
+  updated_at: 2011-08-25 16:29:21 Z
+  created_at: 2011-08-25 16:29:21 Z
+mapping_00177: 
+  chebi_id: "18257"
+  kegg_id: C01602
+  id: 177
+  sabiork_id: 2300
+  updated_at: 2012-12-20 12:53:03 Z
+  created_at: 2012-12-20 12:53:03 Z
+mapping_00009: 
+  chebi_id: "15741"
+  kegg_id: C00042
+  id: 9
+  sabiork_id: 1924
+  updated_at: 2011-08-25 16:29:17 Z
+  created_at: 2011-08-25 16:29:17 Z
+mapping_00015: 
+  chebi_id: "17835"
+  kegg_id: C00631
+  id: 15
+  sabiork_id: 31
+  updated_at: 2011-08-25 16:29:21 Z
+  created_at: 2011-08-25 16:29:21 Z
+mapping_00180: 
+  chebi_id: 
+  kegg_id: 
+  id: 180
+  sabiork_id: 27463
+  updated_at: 2012-12-20 12:53:08 Z
+  created_at: 2012-12-20 12:53:08 Z
+mapping_00097: 
+  chebi_id: "16452"
+  kegg_id: C00036
+  id: 97
+  sabiork_id: 1915
+  updated_at: 2011-08-25 16:29:25 Z
+  created_at: 2011-08-25 16:29:25 Z
+mapping_00174: 
+  chebi_id: 
+  kegg_id: 
+  id: 174
+  sabiork_id: 21267
+  updated_at: 2012-12-20 12:52:56 Z
+  created_at: 2012-12-20 12:52:56 Z
+mapping_00006: 
+  chebi_id: "24996"
+  kegg_id: C01432
+  id: 6
+  sabiork_id: 2284
+  updated_at: 2011-08-25 16:29:11 Z
+  created_at: 2011-08-25 16:29:11 Z
+mapping_00012: 
+  chebi_id: "16284"
+  kegg_id: C00131
+  id: 12
+  sabiork_id: 1307
+  updated_at: 2011-08-25 16:29:21 Z
+  created_at: 2011-08-25 16:29:21 Z
+mapping_00168: 
+  chebi_id: "16414"
+  kegg_id: C16436
+  id: 168
+  sabiork_id: 23113
+  updated_at: 2011-11-01 13:45:25 Z
+  created_at: 2011-11-01 13:45:25 Z
+mapping_00094: 
+  chebi_id: "18367"
+  kegg_id: C00009
+  id: 94
+  sabiork_id: 36
+  updated_at: 2011-08-25 16:29:25 Z
+  created_at: 2011-08-25 16:29:25 Z
+mapping_00171: 
+  chebi_id: "15925"
+  kegg_id: C04442
+  id: 171
+  sabiork_id: 1812
+  updated_at: 2012-12-20 12:52:44 Z
+  created_at: 2012-12-20 12:52:44 Z
+mapping_00003: 
+  chebi_id: "30089"
+  kegg_id: C00033
+  id: 3
+  sabiork_id: 1278
+  updated_at: 2011-08-25 16:28:56 Z
+  created_at: 2011-08-25 16:28:56 Z
+mapping_00159: 
+  chebi_id: "17115"
+  kegg_id: C00716
+  id: 159
+  sabiork_id: 2140
+  updated_at: 2011-11-01 13:45:21 Z
+  created_at: 2011-11-01 13:45:21 Z
+mapping_00088: 
+  chebi_id: "15589"
+  kegg_id: C00149
+  id: 88
+  sabiork_id: 1918
+  updated_at: 2011-08-25 16:29:25 Z
+  created_at: 2011-08-25 16:29:25 Z
+mapping_00165: 
+  chebi_id: "17895"
+  kegg_id: C01536
+  id: 165
+  sabiork_id: 2291
+  updated_at: 2011-11-01 13:45:24 Z
+  created_at: 2011-11-01 13:45:24 Z
+mapping_00156: 
+  chebi_id: "28044"
+  kegg_id: C02057
+  id: 156
+  sabiork_id: 2365
+  updated_at: 2011-11-01 13:45:18 Z
+  created_at: 2011-11-01 13:45:18 Z
+mapping_00085: 
+  chebi_id: "30887"
+  kegg_id: C00311
+  id: 85
+  sabiork_id: 2013
+  updated_at: 2011-08-25 16:29:25 Z
+  created_at: 2011-08-25 16:29:25 Z
+mapping_00162: 
+  chebi_id: 
+  kegg_id: 
+  id: 162
+  sabiork_id: 27463
+  updated_at: 2011-11-01 13:45:22 Z
+  created_at: 2011-11-01 13:45:22 Z
+mapping_00091: 
+  chebi_id: "6650"
+  kegg_id: C00149
+  id: 91
+  sabiork_id: 2138
+  updated_at: 2011-08-25 16:29:25 Z
+  created_at: 2011-08-25 16:29:25 Z
+mapping_00079: 
+  chebi_id: "37565"
+  kegg_id: C00044
+  id: 79
+  sabiork_id: 1282
+  updated_at: 2011-08-25 16:29:24 Z
+  created_at: 2011-08-25 16:29:24 Z
+mapping_00082: 
+  chebi_id: "17808"
+  kegg_id: C00104
+  id: 82
+  sabiork_id: 1299
+  updated_at: 2011-08-25 16:29:24 Z
+  created_at: 2011-08-25 16:29:24 Z
+mapping_00147: 
+  chebi_id: "16643"
+  kegg_id: C01733
+  id: 147
+  sabiork_id: 2315
+  updated_at: 2011-11-01 13:45:11 Z
+  created_at: 2011-11-01 13:45:11 Z
+mapping_00076: 
+  chebi_id: "17552"
+  kegg_id: C00035
+  id: 76
+  sabiork_id: 1280
+  updated_at: 2011-08-25 16:29:24 Z
+  created_at: 2011-08-25 16:29:24 Z
+mapping_00153: 
+  chebi_id: "25805"
+  kegg_id: C00704
+  id: 153
+  sabiork_id: 1264
+  updated_at: 2011-11-01 13:45:17 Z
+  created_at: 2011-11-01 13:45:17 Z
+mapping_00067: 
+  chebi_id: "16908"
+  kegg_id: C00004
+  id: 67
+  sabiork_id: 38
+  updated_at: 2011-08-25 16:29:24 Z
+  created_at: 2011-08-25 16:29:24 Z
+mapping_00144: 
+  chebi_id: "25017"
+  kegg_id: C16439
+  id: 144
+  sabiork_id: 21059
+  updated_at: 2011-11-01 13:45:11 Z
+  created_at: 2011-11-01 13:45:11 Z
+mapping_00073: 
+  chebi_id: "30751"
+  kegg_id: C00058
+  id: 73
+  sabiork_id: 1285
+  updated_at: 2011-08-25 16:29:24 Z
+  created_at: 2011-08-25 16:29:24 Z
+mapping_00150: 
+  chebi_id: "16134"
+  kegg_id: C00014
+  id: 150
+  sabiork_id: 1268
+  updated_at: 2011-11-01 13:45:16 Z
+  created_at: 2011-11-01 13:45:16 Z
+mapping_00138: 
+  chebi_id: 
+  kegg_id: 
+  id: 138
+  sabiork_id: 29
+  updated_at: 2011-11-01 13:45:05 Z
+  created_at: 2011-11-01 13:45:05 Z
+mapping_00064: 
+  chebi_id: "17378"
+  kegg_id: C00577
+  id: 64
+  sabiork_id: 1409
+  updated_at: 2011-08-25 16:29:23 Z
+  created_at: 2011-08-25 16:29:23 Z
+mapping_00141: 
+  chebi_id: "27570"
+  kegg_id: C00768
+  id: 141
+  sabiork_id: 2151
+  updated_at: 2011-11-01 13:45:08 Z
+  created_at: 2011-11-01 13:45:08 Z
+mapping_00129: 
+  chebi_id: "13389"
+  kegg_id: C00003
+  id: 129
+  sabiork_id: 37
+  updated_at: 2011-11-01 13:45:00 Z
+  created_at: 2011-11-01 13:45:00 Z
+mapping_00070: 
+  chebi_id: 
+  kegg_id: 
+  id: 70
+  sabiork_id: 21267
+  updated_at: 2011-08-25 16:29:24 Z
+  created_at: 2011-08-25 16:29:24 Z
+mapping_00058: 
+  chebi_id: "12936"
+  kegg_id: C00124
+  id: 58
+  sabiork_id: 1661
+  updated_at: 2011-08-25 16:29:23 Z
+  created_at: 2011-08-25 16:29:23 Z
+mapping_00135: 
+  chebi_id: "29987"
+  kegg_id: C00025
+  id: 135
+  sabiork_id: 2010
+  updated_at: 2011-11-01 13:45:04 Z
+  created_at: 2011-11-01 13:45:04 Z
+mapping_00061: 
+  chebi_id: "14314"
+  kegg_id: C00092
+  id: 61
+  sabiork_id: 1405
+  updated_at: 2011-08-25 16:29:23 Z
+  created_at: 2011-08-25 16:29:23 Z
+mapping_00049: 
+  chebi_id: "4167"
+  kegg_id: C00031
+  id: 49
+  sabiork_id: 1407
+  updated_at: 2011-08-25 16:29:23 Z
+  created_at: 2011-08-25 16:29:23 Z
+mapping_00126: 
+  chebi_id: "13389"
+  kegg_id: C00004
+  id: 126
+  sabiork_id: 37
+  updated_at: 2011-11-01 13:45:00 Z
+  created_at: 2011-11-01 13:45:00 Z
+mapping_00055: 
+  chebi_id: "15946"
+  kegg_id: C00085
+  id: 55
+  sabiork_id: 1374
+  updated_at: 2011-08-25 16:29:23 Z
+  created_at: 2011-08-25 16:29:23 Z
+mapping_00132: 
+  chebi_id: "29987"
+  kegg_id: C00302
+  id: 132
+  sabiork_id: 2010
+  updated_at: 2011-11-01 13:45:04 Z
+  created_at: 2011-11-01 13:45:04 Z
+mapping_00046: 
+  chebi_id: "17677"
+  kegg_id: C00063
+  id: 46
+  sabiork_id: 1286
+  updated_at: 2011-08-25 16:29:23 Z
+  created_at: 2011-08-25 16:29:23 Z
+mapping_00123: 
+  chebi_id: "17561"
+  kegg_id: C00736
+  id: 123
+  sabiork_id: 2142
+  updated_at: 2011-11-01 13:44:55 Z
+  created_at: 2011-11-01 13:44:55 Z
+mapping_00052: 
+  chebi_id: "16905"
+  kegg_id: C00354
+  id: 52
+  sabiork_id: 1465
+  updated_at: 2011-08-25 16:29:23 Z
+  created_at: 2011-08-25 16:29:23 Z
+mapping_00117: 
+  chebi_id: 
+  kegg_id: 
+  id: 117
+  sabiork_id: 22801
+  updated_at: 2011-11-01 13:44:47 Z
+  created_at: 2011-11-01 13:44:47 Z
+mapping_00108: 
+  chebi_id: "18009"
+  kegg_id: C00006
+  id: 108
+  sabiork_id: 1263
+  updated_at: 2011-09-09 09:27:51 Z
+  created_at: 2011-09-09 09:27:51 Z
+mapping_00037: 
+  chebi_id: "16027"
+  kegg_id: C00020
+  id: 37
+  sabiork_id: 1273
+  updated_at: 2011-08-25 16:29:22 Z
+  created_at: 2011-08-25 16:29:22 Z
+mapping_00114: 
+  chebi_id: "15378"
+  kegg_id: C00080
+  id: 114
+  sabiork_id: 39
+  updated_at: 2011-09-12 14:24:00 Z
+  created_at: 2011-09-12 14:24:00 Z
+mapping_00043: 
+  chebi_id: "16947"
+  kegg_id: C00158
+  id: 43
+  sabiork_id: 1952
+  updated_at: 2011-08-25 16:29:22 Z
+  created_at: 2011-08-25 16:29:22 Z
+mapping_00120: 
+  chebi_id: "16977"
+  kegg_id: C01401
+  id: 120
+  sabiork_id: 2280
+  updated_at: 2011-11-01 13:44:51 Z
+  created_at: 2011-11-01 13:44:51 Z
+mapping_00034: 
+  chebi_id: "15422"
+  kegg_id: C00002
+  id: 34
+  sabiork_id: 34
+  updated_at: 2011-08-25 16:29:22 Z
+  created_at: 2011-08-25 16:29:22 Z
+mapping_00111: 
+  chebi_id: "17234"
+  kegg_id: C00293
+  id: 111
+  sabiork_id: 1406
+  updated_at: 2011-09-09 09:30:39 Z
+  created_at: 2011-09-09 09:30:39 Z
+mapping_00040: 
+  chebi_id: "15903"
+  kegg_id: C00221
+  id: 40
+  sabiork_id: 1378
+  updated_at: 2011-08-25 16:29:22 Z
+  created_at: 2011-08-25 16:29:22 Z
+mapping_00028: 
+  chebi_id: "15350"
+  kegg_id: C00227
+  id: 28
+  sabiork_id: 1316
+  updated_at: 2011-08-25 16:29:22 Z
+  created_at: 2011-08-25 16:29:22 Z
+mapping_00105: 
+  chebi_id: "18009"
+  kegg_id: C11037
+  id: 105
+  sabiork_id: 1263
+  updated_at: 2011-09-09 09:27:51 Z
+  created_at: 2011-09-09 09:27:51 Z
+mapping_00031: 
+  chebi_id: "15351"
+  kegg_id: C00024
+  id: 31
+  sabiork_id: 1276
+  updated_at: 2011-08-25 16:29:22 Z
+  created_at: 2011-08-25 16:29:22 Z
+mapping_00019: 
+  chebi_id: "17050"
+  kegg_id: C00597
+  id: 19
+  sabiork_id: 30
+  updated_at: 2011-08-25 16:29:21 Z
+  created_at: 2011-08-25 16:29:21 Z
+mapping_00025: 
+  chebi_id: 
+  kegg_id: 
+  id: 25
+  sabiork_id: 22801
+  updated_at: 2011-08-25 16:29:22 Z
+  created_at: 2011-08-25 16:29:22 Z
+mapping_00102: 
+  chebi_id: "17659"
+  kegg_id: C00015
+  id: 102
+  sabiork_id: 1269
+  updated_at: 2011-08-25 16:29:26 Z
+  created_at: 2011-08-25 16:29:26 Z
+mapping_00016: 
+  chebi_id: "24344"
+  kegg_id: C00631
+  id: 16
+  sabiork_id: 31
+  updated_at: 2011-08-25 16:29:21 Z
+  created_at: 2011-08-25 16:29:21 Z
+mapping_00178: 
+  chebi_id: "44667"
+  kegg_id: C01602
+  id: 178
+  sabiork_id: 2300
+  updated_at: 2012-12-20 12:53:03 Z
+  created_at: 2012-12-20 12:53:03 Z
+mapping_00022: 
+  chebi_id: "16863"
+  kegg_id: C00345
+  id: 22
+  sabiork_id: 2024
+  updated_at: 2011-08-25 16:29:21 Z
+  created_at: 2011-08-25 16:29:21 Z
+mapping_00169: 
+  chebi_id: 
+  kegg_id: 
+  id: 169
+  sabiork_id: 29
+  updated_at: 2012-12-20 12:52:44 Z
+  created_at: 2012-12-20 12:52:44 Z
+mapping_00013: 
+  chebi_id: "16810"
+  kegg_id: C00026
+  id: 13
+  sabiork_id: 1922
+  updated_at: 2011-08-25 16:29:21 Z
+  created_at: 2011-08-25 16:29:21 Z
+mapping_00098: 
+  chebi_id: "30744"
+  kegg_id: C00036
+  id: 98
+  sabiork_id: 1915
+  updated_at: 2011-08-25 16:29:25 Z
+  created_at: 2011-08-25 16:29:25 Z
+mapping_00175: 
+  chebi_id: 
+  kegg_id: 
+  id: 175
+  sabiork_id: 29
+  updated_at: 2012-12-20 12:52:57 Z
+  created_at: 2012-12-20 12:52:57 Z
+mapping_00007: 
+  chebi_id: "28358"
+  kegg_id: C01432
+  id: 7
+  sabiork_id: 2284
+  updated_at: 2011-08-25 16:29:11 Z
+  created_at: 2011-08-25 16:29:11 Z
+mapping_00095: 
+  chebi_id: "35780"
+  kegg_id: C00009
+  id: 95
+  sabiork_id: 36
+  updated_at: 2011-08-25 16:29:25 Z
+  created_at: 2011-08-25 16:29:25 Z
+mapping_00172: 
+  chebi_id: 
+  kegg_id: 
+  id: 172
+  sabiork_id: 22801
+  updated_at: 2012-12-20 12:52:47 Z
+  created_at: 2012-12-20 12:52:47 Z
+mapping_00004: 
+  chebi_id: "15366"
+  kegg_id: C00033
+  id: 4
+  sabiork_id: 1278
+  updated_at: 2011-08-25 16:28:56 Z
+  created_at: 2011-08-25 16:28:56 Z
+mapping_00089: 
+  chebi_id: "6650"
+  kegg_id: C00711
+  id: 89
+  sabiork_id: 2138
+  updated_at: 2011-08-25 16:29:25 Z
+  created_at: 2011-08-25 16:29:25 Z
+mapping_00166: 
+  chebi_id: "18186"
+  kegg_id: C01536
+  id: 166
+  sabiork_id: 2291
+  updated_at: 2011-11-01 13:45:24 Z
+  created_at: 2011-11-01 13:45:24 Z
+mapping_00010: 
+  chebi_id: 
+  kegg_id: 
+  id: 10
+  sabiork_id: 29
+  updated_at: 2011-08-25 16:29:21 Z
+  created_at: 2011-08-25 16:29:21 Z
+mapping_00092: 
+  chebi_id: "15595"
+  kegg_id: C00149
+  id: 92
+  sabiork_id: 2138
+  updated_at: 2011-08-25 16:29:25 Z
+  created_at: 2011-08-25 16:29:25 Z
+mapping_00157: 
+  chebi_id: "17203"
+  kegg_id: C16435
+  id: 157
+  sabiork_id: 25536
+  updated_at: 2011-11-01 13:45:20 Z
+  created_at: 2011-11-01 13:45:20 Z
+mapping_00001: 
+  chebi_id: "32816"
+  kegg_id: C00022
+  id: 1
+  sabiork_id: 33
+  updated_at: 2011-08-25 16:28:53 Z
+  created_at: 2011-08-25 16:28:53 Z
+mapping_00086: 
+  chebi_id: "151"
+  kegg_id: C00311
+  id: 86
+  sabiork_id: 2013
+  updated_at: 2011-08-25 16:29:25 Z
+  created_at: 2011-08-25 16:29:25 Z
+mapping_00163: 
+  chebi_id: "17895"
+  kegg_id: C00082
+  id: 163
+  sabiork_id: 2291
+  updated_at: 2011-11-01 13:45:24 Z
+  created_at: 2011-11-01 13:45:24 Z
+mapping_00077: 
+  chebi_id: "4170"
+  kegg_id: C00092
+  id: 77
+  sabiork_id: 1404
+  updated_at: 2011-08-25 16:29:24 Z
+  created_at: 2011-08-25 16:29:24 Z
+mapping_00154: 
+  chebi_id: "15379"
+  kegg_id: C00704
+  id: 154
+  sabiork_id: 1264
+  updated_at: 2011-11-01 13:45:17 Z
+  created_at: 2011-11-01 13:45:17 Z
+mapping_00083: 
+  chebi_id: "16039"
+  kegg_id: C00081
+  id: 83
+  sabiork_id: 1291
+  updated_at: 2011-08-25 16:29:24 Z
+  created_at: 2011-08-25 16:29:24 Z
+mapping_00160: 
+  chebi_id: "17822"
+  kegg_id: C00065
+  id: 160
+  sabiork_id: 2140
+  updated_at: 2011-11-01 13:45:21 Z
+  created_at: 2011-11-01 13:45:21 Z
+mapping_00148: 
+  chebi_id: "16811"
+  kegg_id: C00073
+  id: 148
+  sabiork_id: 2315
+  updated_at: 2011-11-01 13:45:11 Z
+  created_at: 2011-11-01 13:45:11 Z
+mapping_00145: 
+  chebi_id: "25094"
+  kegg_id: C16440
+  id: 145
+  sabiork_id: 22945
+  updated_at: 2011-11-01 13:45:11 Z
+  created_at: 2011-11-01 13:45:11 Z
+mapping_00139: 
+  chebi_id: "29947"
+  kegg_id: C00037
+  id: 139
+  sabiork_id: 66
+  updated_at: 2011-11-01 13:45:06 Z
+  created_at: 2011-11-01 13:45:06 Z
+mapping_00074: 
+  chebi_id: "18012"
+  kegg_id: C00122
+  id: 74
+  sabiork_id: 1910
+  updated_at: 2011-08-25 16:29:24 Z
+  created_at: 2011-08-25 16:29:24 Z
+mapping_00151: 
+  chebi_id: "25805"
+  kegg_id: C00007
+  id: 151
+  sabiork_id: 1264
+  updated_at: 2011-11-01 13:45:17 Z
+  created_at: 2011-11-01 13:45:17 Z
+mapping_00080: 
+  chebi_id: "15996"
+  kegg_id: C00044
+  id: 80
+  sabiork_id: 1282
+  updated_at: 2011-08-25 16:29:24 Z
+  created_at: 2011-08-25 16:29:24 Z
+mapping_00068: 
+  chebi_id: "15867"
+  kegg_id: C02266
+  id: 68
+  sabiork_id: 6102
+  updated_at: 2011-08-25 16:29:24 Z
+  created_at: 2011-08-25 16:29:24 Z
+mapping_00142: 
+  chebi_id: "15971"
+  kegg_id: C00768
+  id: 142
+  sabiork_id: 2151
+  updated_at: 2011-11-01 13:45:08 Z
+  created_at: 2011-11-01 13:45:08 Z
+mapping_00136: 
+  chebi_id: "18237"
+  kegg_id: C00025
+  id: 136
+  sabiork_id: 2010
+  updated_at: 2011-11-01 13:45:04 Z
+  created_at: 2011-11-01 13:45:04 Z
+mapping_00071: 
+  chebi_id: "16236"
+  kegg_id: C00469
+  id: 71
+  sabiork_id: 56
+  updated_at: 2011-08-25 16:29:24 Z
+  created_at: 2011-08-25 16:29:24 Z
+mapping_00059: 
+  chebi_id: "4139"
+  kegg_id: C00124
+  id: 59
+  sabiork_id: 1661
+  updated_at: 2011-08-25 16:29:23 Z
+  created_at: 2011-08-25 16:29:23 Z
+mapping_00065: 
+  chebi_id: "29052"
+  kegg_id: C00118
+  id: 65
+  sabiork_id: 27
+  updated_at: 2011-08-25 16:29:23 Z
+  created_at: 2011-08-25 16:29:23 Z
+mapping_00056: 
+  chebi_id: "15945"
+  kegg_id: C15483
+  id: 56
+  sabiork_id: 2484
+  updated_at: 2011-08-25 16:29:23 Z
+  created_at: 2011-08-25 16:29:23 Z
+mapping_00062: 
+  chebi_id: "15954"
+  kegg_id: C00092
+  id: 62
+  sabiork_id: 1405
+  updated_at: 2011-08-25 16:29:23 Z
+  created_at: 2011-08-25 16:29:23 Z
+mapping_00133: 
+  chebi_id: "18237"
+  kegg_id: C00302
+  id: 133
+  sabiork_id: 2010
+  updated_at: 2011-11-01 13:45:04 Z
+  created_at: 2011-11-01 13:45:04 Z
+mapping_00127: 
+  chebi_id: "15846"
+  kegg_id: C00004
+  id: 127
+  sabiork_id: 37
+  updated_at: 2011-11-01 13:45:00 Z
+  created_at: 2011-11-01 13:45:00 Z
+mapping_00130: 
+  chebi_id: "15846"
+  kegg_id: C00003
+  id: 130
+  sabiork_id: 37
+  updated_at: 2011-11-01 13:45:00 Z
+  created_at: 2011-11-01 13:45:00 Z
+mapping_00053: 
+  chebi_id: "37515"
+  kegg_id: C01094
+  id: 53
+  sabiork_id: 1351
+  updated_at: 2011-08-25 16:29:23 Z
+  created_at: 2011-08-25 16:29:23 Z
+mapping_00047: 
+  chebi_id: "48153"
+  kegg_id: C00279
+  id: 47
+  sabiork_id: 1324
+  updated_at: 2011-08-25 16:29:23 Z
+  created_at: 2011-08-25 16:29:23 Z
+mapping_00124: 
+  chebi_id: "15356"
+  kegg_id: C00736
+  id: 124
+  sabiork_id: 2142
+  updated_at: 2011-11-01 13:44:55 Z
+  created_at: 2011-11-01 13:44:55 Z
+mapping_00118: 
+  chebi_id: "16449"
+  kegg_id: C01401
+  id: 118
+  sabiork_id: 2280
+  updated_at: 2011-11-01 13:44:51 Z
+  created_at: 2011-11-01 13:44:51 Z
+mapping_00115: 
+  chebi_id: 
+  kegg_id: 
+  id: 115
+  sabiork_id: 29
+  updated_at: 2011-11-01 13:44:43 Z
+  created_at: 2011-11-01 13:44:43 Z
+mapping_00109: 
+  chebi_id: "44409"
+  kegg_id: C00006
+  id: 109
+  sabiork_id: 1263
+  updated_at: 2011-09-09 09:27:51 Z
+  created_at: 2011-09-09 09:27:51 Z
+mapping_00044: 
+  chebi_id: "30769"
+  kegg_id: C00158
+  id: 44
+  sabiork_id: 1952
+  updated_at: 2011-08-25 16:29:22 Z
+  created_at: 2011-08-25 16:29:22 Z
+mapping_00121: 
+  chebi_id: "29016"
+  kegg_id: C02385
+  id: 121
+  sabiork_id: 2410
+  updated_at: 2011-11-01 13:44:52 Z
+  created_at: 2011-11-01 13:44:52 Z
+mapping_00050: 
+  chebi_id: "17634"
+  kegg_id: C00031
+  id: 50
+  sabiork_id: 1407
+  updated_at: 2011-08-25 16:29:23 Z
+  created_at: 2011-08-25 16:29:23 Z
+mapping_00038: 
+  chebi_id: "28013"
+  kegg_id: C05378
+  id: 38
+  sabiork_id: 26
+  updated_at: 2011-08-25 16:29:22 Z
+  created_at: 2011-08-25 16:29:22 Z
+mapping_00035: 
+  chebi_id: "17925"
+  kegg_id: C00267
+  id: 35
+  sabiork_id: 1364
+  updated_at: 2011-08-25 16:29:22 Z
+  created_at: 2011-08-25 16:29:22 Z
+mapping_00106: 
+  chebi_id: "44409"
+  kegg_id: C11037
+  id: 106
+  sabiork_id: 1263
+  updated_at: 2011-09-09 09:27:51 Z
+  created_at: 2011-09-09 09:27:51 Z
+mapping_00041: 
+  chebi_id: "3611"
+  kegg_id: C00112
+  id: 41
+  sabiork_id: 1302
+  updated_at: 2011-08-25 16:29:22 Z
+  created_at: 2011-08-25 16:29:22 Z
+mapping_00029: 
+  chebi_id: "13711"
+  kegg_id: C00227
+  id: 29
+  sabiork_id: 1316
+  updated_at: 2011-08-25 16:29:22 Z
+  created_at: 2011-08-25 16:29:22 Z
+mapping_00112: 
+  chebi_id: "17234"
+  kegg_id: C00031
+  id: 112
+  sabiork_id: 1406
+  updated_at: 2011-09-09 09:30:39 Z
+  created_at: 2011-09-09 09:30:39 Z
+mapping_00103: 
+  chebi_id: "46398"
+  kegg_id: C00075
+  id: 103
+  sabiork_id: 1288
+  updated_at: 2011-08-25 16:29:26 Z
+  created_at: 2011-08-25 16:29:26 Z
+mapping_00026: 
+  chebi_id: "15343"
+  kegg_id: C00084
+  id: 26
+  sabiork_id: 1292
+  updated_at: 2011-08-25 16:29:22 Z
+  created_at: 2011-08-25 16:29:22 Z
+mapping_00032: 
+  chebi_id: "16761"
+  kegg_id: C00008
+  id: 32
+  sabiork_id: 35
+  updated_at: 2011-08-25 16:29:22 Z
+  created_at: 2011-08-25 16:29:22 Z
+mapping_00017: 
+  chebi_id: "44897"
+  kegg_id: C00074
+  id: 17
+  sabiork_id: 32
+  updated_at: 2011-08-25 16:29:21 Z
+  created_at: 2011-08-25 16:29:21 Z
+mapping_00023: 
+  chebi_id: "48928"
+  kegg_id: C00345
+  id: 23
+  sabiork_id: 2024
+  updated_at: 2011-08-25 16:29:21 Z
+  created_at: 2011-08-25 16:29:21 Z
+mapping_00100: 
+  chebi_id: "16551"
+  kegg_id: C01083
+  id: 100
+  sabiork_id: 91
+  updated_at: 2011-08-25 16:29:25 Z
+  created_at: 2011-08-25 16:29:25 Z
+mapping_00179: 
+  chebi_id: "32964"
+  kegg_id: C01602
+  id: 179
+  sabiork_id: 2300
+  updated_at: 2012-12-20 12:53:03 Z
+  created_at: 2012-12-20 12:53:03 Z
+mapping_00176: 
+  chebi_id: "17202"
+  kegg_id: C00130
+  id: 176
+  sabiork_id: 1306
+  updated_at: 2012-12-20 12:52:59 Z
+  created_at: 2012-12-20 12:52:59 Z
+mapping_00008: 
+  chebi_id: "30031"
+  kegg_id: C00042
+  id: 8
+  sabiork_id: 1924
+  updated_at: 2011-08-25 16:29:17 Z
+  created_at: 2011-08-25 16:29:17 Z
+mapping_00014: 
+  chebi_id: "30915"
+  kegg_id: C00026
+  id: 14
+  sabiork_id: 1922
+  updated_at: 2011-08-25 16:29:21 Z
+  created_at: 2011-08-25 16:29:21 Z
+mapping_00099: 
+  chebi_id: "15380"
+  kegg_id: C00091
+  id: 99
+  sabiork_id: 1931
+  updated_at: 2011-08-25 16:29:25 Z
+  created_at: 2011-08-25 16:29:25 Z
+mapping_00020: 
+  chebi_id: "17050"
+  kegg_id: C00197
+  id: 20
+  sabiork_id: 30
+  updated_at: 2011-08-25 16:29:21 Z
+  created_at: 2011-08-25 16:29:21 Z
+mapping_00096: 
+  chebi_id: "26078"
+  kegg_id: C00009
+  id: 96
+  sabiork_id: 36
+  updated_at: 2011-08-25 16:29:25 Z
+  created_at: 2011-08-25 16:29:25 Z
+mapping_00011: 
+  chebi_id: "16174"
+  kegg_id: C00206
+  id: 11
+  sabiork_id: 1314
+  updated_at: 2011-08-25 16:29:21 Z
+  created_at: 2011-08-25 16:29:21 Z
+mapping_00005: 
+  chebi_id: "42111"
+  kegg_id: C01432
+  id: 5
+  sabiork_id: 2284
+  updated_at: 2011-08-25 16:29:11 Z
+  created_at: 2011-08-25 16:29:11 Z
+mapping_00167: 
+  chebi_id: "27266"
+  kegg_id: C16436
+  id: 167
+  sabiork_id: 23113
+  updated_at: 2011-11-01 13:45:25 Z
+  created_at: 2011-11-01 13:45:25 Z
+mapping_00173: 
+  chebi_id: "18189"
+  kegg_id: C03736
+  id: 173
+  sabiork_id: 1473
+  updated_at: 2012-12-20 12:52:49 Z
+  created_at: 2012-12-20 12:52:49 Z
+mapping_00170: 
+  chebi_id: 
+  kegg_id: 
+  id: 170
+  sabiork_id: 29
+  updated_at: 2012-12-20 12:52:44 Z
+  created_at: 2012-12-20 12:52:44 Z
+mapping_00164: 
+  chebi_id: "18186"
+  kegg_id: C00082
+  id: 164
+  sabiork_id: 2291
+  updated_at: 2011-11-01 13:45:24 Z
+  created_at: 2011-11-01 13:45:24 Z
+mapping_00158: 
+  chebi_id: "17822"
+  kegg_id: C00716
+  id: 158
+  sabiork_id: 2140
+  updated_at: 2011-11-01 13:45:21 Z
+  created_at: 2011-11-01 13:45:21 Z
+mapping_00002: 
+  chebi_id: "15361"
+  kegg_id: C00022
+  id: 2
+  sabiork_id: 33
+  updated_at: 2011-08-25 16:28:53 Z
+  created_at: 2011-08-25 16:28:53 Z
+mapping_00087: 
+  chebi_id: "30797"
+  kegg_id: C00149
+  id: 87
+  sabiork_id: 1918
+  updated_at: 2011-08-25 16:29:25 Z
+  created_at: 2011-08-25 16:29:25 Z
+mapping_00093: 
+  chebi_id: "16474"
+  kegg_id: C00005
+  id: 93
+  sabiork_id: 1262
+  updated_at: 2011-08-25 16:29:25 Z
+  created_at: 2011-08-25 16:29:25 Z
+mapping_00090: 
+  chebi_id: "15595"
+  kegg_id: C00711
+  id: 90
+  sabiork_id: 2138
+  updated_at: 2011-08-25 16:29:25 Z
+  created_at: 2011-08-25 16:29:25 Z
+mapping_00084: 
+  chebi_id: "16087"
+  kegg_id: C00311
+  id: 84
+  sabiork_id: 2013
+  updated_at: 2011-08-25 16:29:25 Z
+  created_at: 2011-08-25 16:29:25 Z
+mapping_00078: 
+  chebi_id: "17754"
+  kegg_id: C00116
+  id: 78
+  sabiork_id: 1303
+  updated_at: 2011-08-25 16:29:24 Z
+  created_at: 2011-08-25 16:29:24 Z
+mapping_00149: 
+  chebi_id: "16643"
+  kegg_id: C00073
+  id: 149
+  sabiork_id: 2315
+  updated_at: 2011-11-01 13:45:11 Z
+  created_at: 2011-11-01 13:45:11 Z
+mapping_00155: 
+  chebi_id: "17295"
+  kegg_id: C02057
+  id: 155
+  sabiork_id: 2365
+  updated_at: 2011-11-01 13:45:18 Z
+  created_at: 2011-11-01 13:45:18 Z
+mapping_00161: 
+  chebi_id: "17115"
+  kegg_id: C00065
+  id: 161
+  sabiork_id: 2140
+  updated_at: 2011-11-01 13:45:21 Z
+  created_at: 2011-11-01 13:45:21 Z
+mapping_00152: 
+  chebi_id: "15379"
+  kegg_id: C00007
+  id: 152
+  sabiork_id: 1264
+  updated_at: 2011-11-01 13:45:17 Z
+  created_at: 2011-11-01 13:45:17 Z
+mapping_00146: 
+  chebi_id: "16811"
+  kegg_id: C01733
+  id: 146
+  sabiork_id: 2315
+  updated_at: 2011-11-01 13:45:11 Z
+  created_at: 2011-11-01 13:45:11 Z
+mapping_00081: 
+  chebi_id: "15377"
+  kegg_id: C00001
+  id: 81
+  sabiork_id: 40
+  updated_at: 2011-08-25 16:29:24 Z
+  created_at: 2011-08-25 16:29:24 Z
+mapping_00069: 
+  chebi_id: "15936"
+  kegg_id: C00181
+  id: 69
+  sabiork_id: 1659
+  updated_at: 2011-08-25 16:29:24 Z
+  created_at: 2011-08-25 16:29:24 Z
+mapping_00075: 
+  chebi_id: "29806"
+  kegg_id: C00122
+  id: 75
+  sabiork_id: 1910
+  updated_at: 2011-08-25 16:29:24 Z
+  created_at: 2011-08-25 16:29:24 Z
+mapping_00066: 
+  chebi_id: "16108"
+  kegg_id: C00111
+  id: 66
+  sabiork_id: 28
+  updated_at: 2011-08-25 16:29:23 Z
+  created_at: 2011-08-25 16:29:23 Z
+mapping_00072: 
+  chebi_id: "15740"
+  kegg_id: C00058
+  id: 72
+  sabiork_id: 1285
+  updated_at: 2011-08-25 16:29:24 Z
+  created_at: 2011-08-25 16:29:24 Z
+mapping_00137: 
+  chebi_id: "14321"
+  kegg_id: C00025
+  id: 137
+  sabiork_id: 2010
+  updated_at: 2011-11-01 13:45:04 Z
+  created_at: 2011-11-01 13:45:04 Z
+mapping_00143: 
+  chebi_id: "15603"
+  kegg_id: C16439
+  id: 143
+  sabiork_id: 21059
+  updated_at: 2011-11-01 13:45:11 Z
+  created_at: 2011-11-01 13:45:11 Z

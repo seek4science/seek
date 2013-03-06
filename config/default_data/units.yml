@@ -1,40 +1,68 @@
 dimensionless:
   symbol: dimensionless
   comment: dimensionless
-  order: 36
+  order: 40
 
 seconds:
+  title: second
   symbol: s
   comment: time
   order: 21
 
 minutes:
+  title: minute
   symbol: min
   comment: time
   order: 22
 
 hour:
+  title: hour
   symbol: h
   comment: time
   order: 23
+
+day:
+  title: day
+  symbol: d
+  comment: time
+  order: 24
+
+week:
+  title: week
+  symbol: wk
+  comment: time
+  order: 25
+
+month:
+  title: month
+  symbol: mo
+  comment: time
+  order: 26
+
+year:
+  title: year
+  symbol: yr
+  comment: time
+  order: 27
+
 
 hour-1:
   symbol: h-1
   comment: rate
   factors_studied: false
-  order: 24
+  order: 28
 
 min-1:
   symbol: min-1
   comment: rate
   factors_studied: false
-  order: 25
+  order: 29
 
 sec-1:
   symbol: sec-1
   comment: rate
   factors_studied: false
-  order: 26
+  order: 30
 
 litre:
   symbol: L
@@ -54,28 +82,28 @@ microlitre:
 bar:
   symbol: bar
   comment: headspace pressure
-  order: 32
+  order: 36
 
 rpm:
   symbol: rpm
   comment: revolutions per minute
-  order: 33
+  order: 37
 
 L/min:
   symbol: L/min
   comment: flow rate
-  order: 27
+  order: 31
 
 mL/min:
   symbol: mL/min
   comment: flow rate
-  order: 28
+  order: 32
 
 metre:
   symbol: m
   comment: metre
   factors_studied: false
-  order: 29
+  order: 33
 
 gram:
   symbol: g
@@ -100,7 +128,7 @@ mpicogram:
 celcius:
   symbol: °C
   comment: Celcius
-  order: 31
+  order: 35
 
 mol:
   symbol: mol
@@ -177,15 +205,15 @@ mmol/L_CV:
 µm:
   symbol: µm
   comment: micrometer
-  order: 30
+  order: 34
 
 a.u.:
   symbol: a.u.
   comment: arbitrary units
-  order: 35
+  order: 39
 
 percent:
   symbol: %
   comment: percentage
-  order: 34
+  order: 38
 

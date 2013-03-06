@@ -94,9 +94,6 @@ class Assay < ActiveRecord::Base
     text :technology_type do
         technology_type.try :title
     end
-    text :organisms do
-        organisms.compact.map{|o| o.title}
-    end
     text :strains do
         strains.compact.map{|s| s.title}
     end
@@ -120,7 +117,8 @@ class Assay < ActiveRecord::Base
   #returns true if this is an experimental class of assay
   def is_experimental?
     return !assay_class.nil? && assay_class.key=="EXP"
-  end    
+  end
+
   
   #Create or update relationship of this assay to an asset, with a specific relationship type and version  
   def relate(asset, r_type=nil)
@@ -153,12 +151,8 @@ class Assay < ActiveRecord::Base
     assay_organism.assay = self
     assay_organism.organism = organism
     strain=nil
-    if (strain_title && !strain_title.empty?)
+    if (!strain_title.blank?)
       strain=organism.strains.find_by_title(strain_title)
-      if strain.nil?
-        strain=Strain.new(:title=>strain_title,:organism_id=>organism.id)
-        strain.save!
-      end
     end
     assay_organism.culture_growth_type = culture_growth_type unless culture_growth_type.nil?
     assay_organism.strain=strain
@@ -178,7 +172,7 @@ class Assay < ActiveRecord::Base
 
     existing = AssayOrganism.all.select{|ao|ao.organism==organism and ao.assay == self and ao.strain==strain and ao.culture_growth_type==culture_growth_type and ao.tissue_and_cell_type==tissue_and_cell_type}
     if existing.blank?
-    self.assay_organisms << assay_organism
+      self.assay_organisms << assay_organism
     end
 
   end

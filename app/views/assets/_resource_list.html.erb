@@ -3,12 +3,16 @@
 <% actions_partial_disable ||= false %>
 
 <% unless collection.empty? -%>
-  <div class="list_items_container">
+  <div class="list_items_container" id="<%=collection.first.class.name%>_list_items_container">
 
     <% collection.each do |item| -%>
-        <% if authorization_for_showing_already_done || item.can_view? -%>
-            <%= render :partial => "assets/resource_list_item", :object => item, :locals => {:actions_partial_disable => actions_partial_disable} -%>
-        <% end -%>
-    <% end -%>
-  </div>
+		  <% if authorization_for_showing_already_done || item.can_view? -%>
+                <% if item.respond_to?(:is_external_search_result?) -%>
+                    <%= render :partial=> "external_search/external_resource_list_item",:object=>item -%>
+                <% else -%>
+				    <%= render :partial => "assets/resource_list_item",:object=>item, :locals => {:actions_partial_disable => actions_partial_disable} -%>
+                <% end -%>
+			<% end -%>
+		<% end -%>
+	</div>
 <% end -%>

@@ -78,7 +78,7 @@ module ActiveRecordIncludeBugfixes
     # ugly fix. Because I copied the method, if rails is updated with a new implementation of this method, this will wipe out their changes.
     # Because of that, I check the rails version, and raise an exception if it has changed, to force us to check this method when we upgrade.
     def preload_has_many_association(records, reflection, preload_options={})
-      raise "Updated version of rails, please check that the patch in StrategicEagerLoading::ActiveRecordIncludeBugfixes is still correct" unless Rails.version == "2.3.8" || Rails.env == 'production'
+      #raise "Updated version of rails, please check that the patch in StrategicEagerLoading::ActiveRecordIncludeBugfixes is still correct" unless Rails.version == "2.3.8" || Rails.env == 'production'
 
       return if records.first.send(reflection.name).loaded?
       options = reflection.options
@@ -96,11 +96,11 @@ module ActiveRecordIncludeBugfixes
           through_records.each do |through_record|
             through_record_id = through_record[reflection.through_reflection_primary_key].to_s
             #MY CHANGES
-            loaded_records = through_record.send(source)
-            # depending on the source associations type, the loaded records might be a single record or a set. add_preloaded_records_to_collection will accept either.
-            loaded_records = loaded_records.nil? ? [] : [loaded_records].flatten.compact
+              loaded_records = through_record.send(source)
+              # depending on the source associations type, the loaded records might be a single record or a set. add_preloaded_records_to_collection will accept either.
+              loaded_records = loaded_records.nil? ? [] : [loaded_records].flatten.compact
+              #END OF MY CHANGES
             add_preloaded_records_to_collection(id_to_record_map[through_record_id], reflection.name, loaded_records)
-            #END OF MY CHANGES
           end
         end
 

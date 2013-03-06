@@ -6,7 +6,7 @@ module Seek
     #required to get the icon_filename_for_key
     include ImagesHelper
 
-#this is required to initialise the @<model> (e.g. @sop), before re-rendering the :new page 
+    #this is required to initialise the @<model> (e.g. @sop), before re-rendering the :new page
     def init_asset_for_render params                                                            
         c     = self.controller_name.singularize                                                  
         model = c.camelize.constantize                                                            
@@ -17,10 +17,9 @@ module Seek
         obj=model.new params[symb]                                                                
         eval "@#{c.singularize} = obj"                                                            
     end
-
     
     def url_response_code asset_url
-      url = URI.parse(asset_url)
+      url = URI.parse(URI.encode(asset_url.strip))
       code=""
       begin
         if (["http","https"].include?(url.scheme))
@@ -66,9 +65,9 @@ module Seek
         if code == "200"
           icon_filename=icon_filename_for_key("tick")
           msg="The URL was accessed successfully"
-        elsif code == "302"
+        elsif code == "302" || code == "301"
           icon_filename=icon_filename_for_key("warn")
-          msg="The url responded with a <b>redirect</b>. It can still be used, but content type and filename may not be recorded.<br/>You will also not be able to make a copy. When a user downloads this file, they will be redirected to the URL."
+          msg="The url responded with a <b>redirect</b>. It can still be used, but if adding a url to a resource, the content type and filename may not be recorded.<br/>You will also not be able to make a copy. When a user downloads this file, they will be redirected to the URL."
         elsif code == "401"
           icon_filename=icon_filename_for_key("warn")
           msg="The url responded with <b>unauthorized</b>.<br/> It can still be used, but content type and filename will not be recorded.<br/>You will also not be able to make a copy. When a user downloads this file, they will be redirected to the URL."
@@ -90,47 +89,14 @@ module Seek
           page.replace_html "test_url_msg",msg
           page.show 'test_url_msg'
           page.visual_effect :highlight,"test_url_msg"
-          if code=="302" || code=="401"
+          if code=="200"
+              page['external_link'].enable
+          else
             page['external_link'].checked=true
             page['external_link'].disable
-          else
-            page['external_link'].enable
           end
         end
       end
-    end
-    
-    def download_jerm_asset asset
-      project=asset.projects.first
-      project.decrypt_credentials
-      downloader=Jerm::DownloaderFactory.create project.name
-      resource_type = asset.class.name.split("::")[0] #need to handle versions, e.g. Sop::Version
-      begin
-        data_hash = downloader.get_remote_data asset.content_blob.url,project.site_username,project.site_password, resource_type
-        send_file data_hash[:data_tmp_path], :filename => data_hash[:filename] || asset.original_filename, :content_type => data_hash[:content_type] || asset.content_type, :disposition => 'attachment'
-      rescue Seek::DownloadException=>de
-        #FIXME: use proper logging
-        puts "Unable to fetch from remote: #{de.message}"
-        if asset.content_blob.file_exists?
-          send_file asset.content_blob.filepath, :filename => asset.original_filename, :content_type => asset.content_type, :disposition => 'attachment'
-        else
-          raise de
-        end
-      end
-    end
-    
-    def download_via_url asset    
-      code = url_response_code(asset.content_blob.url)
-      if (["302","401"].include?(code)) || asset.content_blob.external_link?
-        redirect_to(asset.content_blob.url,:target=>"_blank")
-      elsif code=="404"
-        flash[:error]="This item is referenced at a remote location, which is currently unavailable"
-        redirect_to polymorphic_path(asset.parent,{:version=>asset.version})
-      else
-        downloader=RemoteDownloader.new
-        data_hash = downloader.get_remote_data asset.content_blob.url
-        send_file data_hash[:data_tmp_path], :filename => data_hash[:filename] || asset.original_filename, :content_type => data_hash[:content_type] || asset.content_type, :disposition => 'attachment'              
-      end      
     end
     
     def handle_data render_action_on_error=:new
@@ -167,7 +133,7 @@ module Seek
             # store properties and contents of the file temporarily and remove the latter from params[],
             # so that when saving main object params[] wouldn't contain the binary data anymore
             params[symb][:content_type] = (params[symb][:data]).content_type
-            params[symb][:original_filename] = (params[symb][:data]).original_filename
+            params[symb][:original_filename] = (params[symb][:data]).original_filename if params[symb][:original_filename].blank?
             @tmp_io_object = params[symb][:data]
           elsif !(params[symb][:data_url]).blank?
             @external_link = (params[symb][:external_link]=="1")
@@ -181,8 +147,8 @@ module Seek
               @tmp_io_object=File.open data_hash[:data_tmp_path],"r" if make_local_copy
 
               params[symb][:content_type] = data_hash[:content_type]
-              params[symb][:original_filename] = data_hash[:filename]
-            elsif (["302","401"].include?(code))
+              params[symb][:original_filename] = data_hash[:filename] if params[symb][:original_filename].blank?
+            elsif (["301","302","401"].include?(code))
               params[symb][:content_type] = ""
               params[symb][:original_filename] = ""
             else
@@ -226,33 +192,6 @@ module Seek
         params[symb].delete 'external_link'
         return true
       end
-    end  
-    
-    def handle_download asset
-      if asset.content_blob.url.blank?
-        if asset.content_blob.file_exists?
-          send_file asset.content_blob.filepath, :filename => asset.original_filename, :content_type => asset.content_type, :disposition => 'attachment'
-        else
-          redirect_on_error asset,"Unable to find a copy of the file for download, or an alternative location. Please contact an administrator of #{Seek::Config.application_name}."
-        end      
-      else
-        begin
-          if asset.contributor.nil? #A jerm generated resource
-            download_jerm_asset asset
-          else
-            if asset.content_blob.file_exists?
-              send_file asset.content_blob.filepath, :filename => asset.original_filename, :content_type => asset.content_type, :disposition => 'attachment'
-            else
-              download_via_url asset
-            end
-          end
-        rescue Seek::DownloadException=>de
-          redirect_on_error asset,"There was an error accessing the remote resource, and a local copy was not available. Please try again later when the remote resource may be available again."
-        rescue Jerm::JermException=>de
-          redirect_on_error asset,de.message
-        end
-
-      end
     end
 
     def redirect_on_error asset,msg=nil
@@ -282,5 +221,4 @@ module Seek
         end
     end
   end
-
 end

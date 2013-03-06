@@ -1,17 +1,19 @@
-class SopsController < ApplicationController  
+class SopsController < ApplicationController
   
   include IndexPager
   include DotGenerator
+
   include Seek::AssetsCommon
   include AssetsCommonExtension
   
   #before_filter :login_required
   before_filter :find_assets, :only => [ :index ]
   before_filter :find_and_auth, :except => [ :index, :new, :create, :request_resource,:preview, :test_asset_url, :update_annotations_ajax]
-  before_filter :find_display_asset, :only=>[:show,:download]
+  before_filter :find_display_asset, :only=>[:show, :download]
 
   include Seek::Publishing
-  
+  include Seek::BreadCrumbs
+
   def new_version
     if (handle_data nil)      
       comments=params[:revision_comment]
@@ -40,7 +42,7 @@ class SopsController < ApplicationController
     end
     
   end
-  
+
   # GET /sops/1
   def show
     # store timestamp of the previous last usage
@@ -61,17 +63,7 @@ class SopsController < ApplicationController
       format.png { render :text=>to_png(@sop,params[:deep]=='true',@sop)}
     end
   end
-  
-  # GET /sops/1/download
-  def download
-    # update timestamp in the current SOP record 
-    # (this will also trigger timestamp update in the corresponding Asset)
-    @sop.last_used_at = Time.now
-    @sop.save_without_timestamping
-    
-    handle_download @display_sop
-  end
-  
+
   # GET /sops/new
   def new
     @sop=Sop.new
@@ -89,7 +81,7 @@ class SopsController < ApplicationController
   def edit
     
   end
-  
+
   # POST /sops
   def create    
 
@@ -217,5 +209,4 @@ class SopsController < ApplicationController
       page[:requesting_resource_status].replace_html "An email has been sent on your behalf to <b>#{resource.managers.collect{|m| m.name}.join(", ")}</b> requesting the file <b>#{h(resource.title)}</b>."
     end
   end
-
 end

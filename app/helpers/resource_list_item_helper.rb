@@ -5,7 +5,7 @@ module ResourceListItemHelper
   end
 
   def get_list_item_actions_partial resource
-    if try_block{resource.authorization_supported? && resource.is_downloadable_asset? }
+    if resource.authorization_supported? && resource.is_downloadable_asset?
       actions_partial = "assets/resource_actions_td"
     else
       actions_partial = nil
@@ -14,42 +14,50 @@ module ResourceListItemHelper
   end
 
   def get_list_item_avatar_partial resource
-    avatar_partial = "layouts/avatars"
     if resource.show_contributor_avatars?
-      avatar_partial = "assets/asset_avatars"
+      "assets/asset_avatars"
+    elsif resource.class.name.downcase=="event"
+      ""
+    else
+      "layouts/avatars"
     end
-    avatar_partial
   end
 
   def list_item_title resource, options={}
-    title=options[:title]
-    url=options[:url]
-    include_avatar=options[:include_avatar]
-    include_avatar=true if include_avatar.nil?
+    cache_key = "rli_title_#{resource.cache_key}_#{resource.authorization_supported? && resource.can_manage?}"
+    result = Rails.cache.fetch(cache_key) do
+      title=options[:title]
+      url=options[:url]
+      include_avatar=options[:include_avatar]
+      include_avatar=true if include_avatar.nil?
 
-    if title.nil?
-      title = get_object_title(resource)
-    end
-
-    html = "<div class=\"list_item_title\">"
-
-    if resource.class.name.split("::")[0] == "Person"
-      icons = seek_role_icons(resource)
-      html << "<p>#{link_to title, (url.nil? ? show_resource_path(resource) : url)} #{icons}</p>"
-    else
-      if include_avatar && (resource.avatar_key || resource.use_mime_type_for_avatar?)
-        image=resource_avatar resource,:style=>"width: 24px; height: 24px; vertical-align: middle"
-
-        icon  = link_to_draggable(image, show_resource_path(resource), :id=>model_to_drag_id(resource), :class=> "asset", :title=>tooltip_title_attrib(get_object_title(resource)))
-
-        html << "<p style=\"float:left;width:95%;\">#{icon} #{link_to title, (url.nil? ? show_resource_path(resource) : url)}</p>"
-        html << list_item_visibility(resource.policy) if resource.authorization_supported? && resource.can_manage?
-        html << "<br style=\"clear:both\"/>"
-      else
-        html << "<p>#{link_to title, (url.nil? ? show_resource_path(resource) : url)}</p>"
+      if title.nil?
+        title = get_object_title(resource)
       end
+
+      html = "<div class=\"list_item_title\">"
+
+      if resource.class.name.split("::")[0] == "Person"
+        icons = seek_role_icons(resource)
+        html << "<p>#{link_to title, (url.nil? ? show_resource_path(resource) : url)} #{icons}</p>"
+      else
+        if include_avatar && (resource.avatar_key || resource.use_mime_type_for_avatar?)
+          image=resource_avatar resource,:style=>"width: 24px; height: 24px; vertical-align: middle"
+
+          icon  = link_to_draggable(image, show_resource_path(resource), :id=>model_to_drag_id(resource), :class=> "asset", :title=>tooltip_title_attrib(get_object_title(resource)))
+
+          html << "<p style=\"float:left;width:95%;\">#{icon} #{link_to title, (url.nil? ? show_resource_path(resource) : url)}</p>"
+          html << "#item_visibility"
+          html << "<br style=\"clear:both\"/>"
+        else
+          html << "<p>#{link_to title, (url.nil? ? show_resource_path(resource) : url)}</p>"
+        end
+      end
+      html << "</div>"
     end
-    html << "</div>"
+    visibility = resource.authorization_supported? && resource.can_manage? ? list_item_visibility(resource.policy) : ""
+    result = result.gsub("#item_visibility",visibility)
+    result
   end
 
   def list_item_tag_list resource
@@ -107,9 +115,9 @@ module ResourceListItemHelper
   end
 
   def list_item_timestamp resource
-    html = "<p class=\"list_item_attribute none_text\" style=\"text-align:center;\"><b>Created:</b> " + resource.created_at.strftime('%d/%m/%Y @ %H:%M:%S')
+    html = "<p class=\"list_item_attribute none_text\" style=\"text-align:center;\"><b>Created:</b> " + date_as_string(resource.created_at,true)
     unless resource.created_at == resource.updated_at
-      html << " <b>Last updated:</b> " + resource.updated_at.strftime('%d/%m/%Y @ %H:%M:%S')
+      html << "&nbsp;&nbsp;&nbsp<b>Last updated:</b> " + date_as_string(resource.updated_at,true)
     end
     html << "</p>"
     return html

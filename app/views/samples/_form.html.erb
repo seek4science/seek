@@ -13,7 +13,7 @@
 <% else %>
     <p>
        <%= f.label "Choose a #{Seek::Config.sample_parent_term}" %> <span class="required">*</span><br/>
-       <%= f.collection_select(:specimen_id, Specimen.all_authorized_for('view'), :id, :title,{:include_blank =>"Please Select..."},{:style=>"width:50%"}) %>
+      <%= f.collection_select(:specimen_id, Specimen.all_authorized_for('view').sort_by(&:title), :id, :title,{:include_blank =>"Please Select..."},{:style=>"width:50%"}) %>
       </p>
 <% end %>
 <h2>Sample Details</h2>
@@ -26,6 +26,11 @@
   </p>
 
   <% if Seek::Config.is_virtualliver %>
+
+      <p>
+          <%= f.label :description -%><br/>
+          <%= f.text_area :comments, :style => "width: 85%;", :rows => 5 -%>
+      </p>
 
       <p>
         <%= f.label "Explantation time" -%><br/>
@@ -49,6 +54,11 @@
   </p>
 
   <p>
+    <%= f.label :age_at_sampling -%><br/>
+    <%= f.text_field :age_at_sampling, :style=>"width:350px;", :onkeypress => "javascript: return onlyFloatNumbers(event);" -%> <%= f.select :age_at_sampling_unit_id, options_for_select(Unit.time_units.sort_by(&:order).collect{|u| [u.title, u.id]}, @sample.age_at_sampling_unit_id) -%>
+  </p>
+
+  <p>
     <%= f.label :provider_name -%><br/>
     <%= f.text_field :provider_name, :style=>"width:350px;" -%>
   </p>
@@ -69,7 +79,7 @@
     <%= f.select :organism_part, options_for_select(organism_part_options.insert(0,'Not specified'), @sample.organism_part), :style => 'float:right;margin-right:30em' %>
   </p>
   <br/>
-  <%= render :partial => 'projects/project_selector', :locals => {:resource => @sample,:allow_nil=>true}%>
+  <%= render :partial => 'projects/project_selector', :locals => {:resource => @sample,:allow_nil=>Seek::Config.is_virtualliver ? true : false}%>
 
   <%= render :partial => "samples/select_tissue_and_cell_types", :locals=>{:resource => @sample}-%>
 
@@ -83,12 +93,11 @@
           <%= render :partial => "assets/sharing_form" -%>
       </p>
       
-   <%= render :partial => 'assets/special_auth_code_form', :locals => {:f => f}%>
+   <%= render :partial => 'assets/special_auth_code_form', :locals => {:f => f} if !@sample.try(:new_record?)%>
   <% end %>      
 
-  <%= fancy_multiselect @sample, :data_files, :name => 'sample_data_file_ids', :association_class => DataFile,:selected => (params[:sample_data_file_ids] || []).map(&:to_i) | @sample.data_file_masters.map(&:id) %>
-  <%= fancy_multiselect @sample, :models, :name => 'sample_model_ids', :association_class => Model,:selected => (params[:sample_model_ids] || []).map(&:to_i) | @sample.model_masters.map(&:id) %>
-  <%= fancy_multiselect @sample, :sops, :name => 'sample_sop_ids', :association_class => Sop,:selected => (params[:sample_sop_ids] || []).map(&:to_i) | @sample.sop_masters.map(&:id) %>
+  <%= fancy_multiselect @sample, :data_files,  {:name => 'sample_data_file_ids', :association_class => DataFile,:selected => (params[:sample_data_file_ids] || []).map(&:to_i) | @sample.data_file_masters.map(&:id), :hidden=> @sample.data_file_masters.blank? ? true : false, :other_projects_checkbox => true} %>
+  <%= fancy_multiselect @sample, :sops,  {:name => 'sample_sop_ids', :association_class => Sop,:selected => (params[:sample_sop_ids] || []).map(&:to_i) | @sample.sop_masters.map(&:id), :hidden=> @sample.sop_masters.blank?  ? true : false, :other_projects_checkbox => true} %>
 </div>
 
 <%= f.hidden_field :parent_name %>
@@ -101,7 +110,7 @@
   %>
   <% if @sample.can_manage? %>
       <%= preview_permission_popup_link(@sample)-%>
-      <%= f.submit button_text, :id => "sample_submit_btn", :onclick => "javascript: if($F('organism')=='' || $F('organism')=='0' ){alert('Please select organism');return false;};clickLink($('preview_permission'));return(false);" -%>
+      <%= f.submit button_text, :id => "sample_submit_btn", :onclick => "javascript: if(($('organism')!=null && ($F('organism')=='' || $F('organism')=='0'))){alert('Please select organism');return false;};clickLink($('preview_permission'));return(false);" -%>
 
   <% else %>
       <%= f.submit button_text, :id => "sample_submit_btn", :disable_with=>disabled_text-%>

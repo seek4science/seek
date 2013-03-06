@@ -10,6 +10,9 @@ module CommonSweepers
     expire_organism_gadget
     expire_header_and_footer
     expire_new_object_gadget
+    expire_download_activity
+    expire_create_activity
+    expire_resource_list_item_action_partial
   end
 
   def expire_new_object_gadget
@@ -18,8 +21,26 @@ module CommonSweepers
 
   def expire_header_and_footer
     expire_fragment "header"
-    expire_fragment "header_main"
     expire_fragment "footer"
+  end
+
+  def expire_download_activity
+    ActionController::Base.new.expire_fragment(/download_activity.*/)
+  end
+
+  def expire_create_activity
+    ActionController::Base.new.expire_fragment(/create_activity.*/)
+  end
+
+  def expire_resource_list_item_action_partial
+    ActionController::Base.new.expire_fragment(/rli_actions.*/)
+  end
+
+  #fragments that should change due to authorization changes
+  def expire_auth_related_fragments
+    expire_download_activity
+    expire_create_activity
+    expire_resource_list_item_action_partial
   end
 
   def expire_annotation_fragments name=nil

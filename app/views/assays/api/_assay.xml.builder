@@ -27,7 +27,7 @@ core_xlink(assay).merge(is_root ? xml_root_attributes : {}) do
     if assay.is_modelling? 
       assay_data_relationships_xml parent_xml,assay
     end
-    
+
     associated_resources_xml parent_xml,assay
     
   end

@@ -1,21 +1,24 @@
-<%= image_tag_for_key "show", show_resource_path(resource), nil, nil, "View" -%>
-<% if resource.can_download?-%>
-  <%= image_tag_for_key "download", download_resource_path(resource) -%>
+<%
+   user_id = current_user_id
+-%>
+<% cache "rli_actions_#{resource.cache_key}_#{user_id}" do -%>
+    <%
+       permissions = resource.authorization_permissions
+    -%>
+
+    <%= image_tag_for_key "show", show_resource_path(resource), nil, nil, "View" -%>
+
+    <% if resource.contains_downloadable_items? && can_download_asset?(resource, params[:code],permissions.can_download)-%>
+      <%= image_tag_for_key "download", download_resource_path(resource, params[:code]) -%>
+    <% end -%>
+    <% if permissions.can_manage -%>
+      <%= image_tag_for_key "manage", edit_resource_path(resource), nil, nil, "Manage" -%>
+    <% elsif permissions.can_edit -%>
+      <%= image_tag_for_key "edit", edit_resource_path(resource), nil, nil, "Edit" -%>
+    <% end -%>
+
+
+    <% if permissions.can_delete %>
+        <%= image_tag_for_key('destroy', polymorphic_path(resource), nil, { :confirm => "This deletes the #{resource.class.name}. Are you sure?", :method => :delete }, "Delete") -%>
+    <% end %>
 <% end -%>
-<% if resource.can_manage? -%>
-  <%= image_tag_for_key "manage", edit_resource_path(resource), nil, nil, "Manage" -%>
-<% elsif resource.can_edit? -%>
-  <%= image_tag_for_key "edit", edit_resource_path(resource), nil, nil, "Edit" -%>
-<% end -%>
-
-
-<% if resource.can_delete? %>
-    <%= image_tag_for_key('destroy', polymorphic_path(resource), nil, { :confirm => "This deletes the #{resource.class.name}. Are you sure?", :method => :delete }, "Delete") -%>
-<% end %>
-
-<!---
-<%= link_to_remote image_tag_for_key("favourite"), :url=>{:controller => "favourites", :action => "add", :id => model_to_drag_id(resource)},
-    :before => "Element.show('fav_ajax-loader');Element.show('fav_ajax-loader#{model_to_drag_id(resource)}')",
-    :complete => "Element.hide('fav_ajax-loader');Element.hide('fav_ajax-loader#{model_to_drag_id(resource)}');" -%>
-  <%= image_tag("ajax-loader.gif", :style => "display:none;", :alt=>"loading...",:title=>"loading...",:id=>"fav_ajax-loader#{model_to_drag_id(resource)}") %>
----> 

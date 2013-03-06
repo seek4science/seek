@@ -1,4 +1,5 @@
 <%
+    show_relationships = resource.is_a?(DataFile)
     resource_text ||= text_for_resource(resource)
     all_assays=authorised_assays.sort_by &:title
     all_assays = authorised_assays.select do |assay|
@@ -9,31 +10,39 @@
     project_assays=project_assays.select{|a| a.is_modelling?} if resource.is_a?(Model)
     select_truncate_length=120
     associated_assays = resource.is_a?(Publication) ? resource.related_assays : resource.assays
+
+    if resource.is_a? Model
+      assay_class_text = "Modelling Analyses"
+      single_assay_class_text = "Modelling Analysis"
+    else
+      assay_class_text = "Experimental Assays and Modelling Analyses"
+      single_assay_class_text = "Experimental Assay or Modelling Analysis"
+    end
 %>
 
 <div class="fold">
 
   <div class="foldTitle">
-    <%= help_icon("Here you can associate Assays in SEEK to this #{resource_text}. You can only associate Assays you are authorized to edit.") -%>
-    Assays
+    <%= help_icon("Here you can associate #{assay_class_text} in SEEK to this #{resource_text}. You can only associate #{assay_class_text} you are authorized to edit.") -%>
+    <%= assay_class_text -%>
   </div>
 
   <div id="associate_assay_fold_content" class="foldContent" style="display:<%= associated_assays.blank? ? 'none' : 'block' -%>">
     <div class="yui-u first" style="width:66%; float:left">
 
       <p style="color: #666666;">
-        The following Assays are involved in this <%= resource_text -%>:
+        The following <%= assay_class_text -%> are associated with this <%= resource_text -%>:
       </p>
       <div id="assay_to_list" class="box_editing_inner" style="line-height: 1.5">
         <span class="none_text" id="assay_files">Loading...</span>
       </div>
       <div class="association_step">
         <p style="color: #666666;">
-             You may select an existing Assay or <%= link_to h("create a new Assay here"), new_assay_path(:create_from_asset=>:true),:popup => true%>  for the <%= resource_text -%>.
+             You may select an existing editable <%= single_assay_class_text -%> to associate with this <%= resource_text -%>.
         </p>
         <% if show_relationships -%>
             <%= select_tag :possible_assays,
-              options_for_select([["Select Assay ...",0]]|project_assays.collect{|s| [truncate(h(s.title),:length=>select_truncate_length),s.id]}),
+              options_for_select([["Select #{single_assay_class_text} ...",0]]|project_assays.collect{|s| [truncate(h(s.title),:length=>select_truncate_length),s.id]}),
               {:style=>"width:90%",:onchange=>remote_function(
                 :url=>{:action=>"preview",:controller=>"assays",:element=>"assay_preview"},
                 :with=>"'id='+this.value",
@@ -43,7 +52,7 @@
               <%= select_tag :assay_ids,'',{:multiple=>true,:style=>"display:none;"} -%>
               <br/>
               <div id="relationship" style="display:none;">
-                <%= label_tag "Relationship between the data and the model" %><br/>
+                <%= label_tag "How is the data used in this Modelling Analysis" %><br/>
                 <%= select_tag :assay_relationship_type, options_for_select([["None",0]] + RelationshipType.all.collect{|r| [r.title,r.id]}) %>
               </div>
               <br/>
@@ -65,7 +74,7 @@
 	  <br/>
       <%= link_to_function (image("new") + " Associate with this #{resource_text}"), "addSelectedAssay(); return(false);", :id=>"add_assay_link", :class=>"block_link" %>
 
-      <%= check_box_tag :include_other_project_assays, nil, false, {:onchange=>"toggle_assay_list();",:style=>"margin-top:0.5em;"} -%> Associate Assays from other projects?
+      <%= check_box_tag :include_other_project_assays, nil, false, {:onchange=>"toggle_assay_list();",:style=>"margin-top:0.5em;"} -%> Associate <%= assay_class_text -%> from other projects?
     </div>
   
     <%= render :partial => 'assets/preview_box', :locals => {:preview_name => 'assay'}%>

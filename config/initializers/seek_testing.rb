@@ -15,5 +15,8 @@ if Rails.env.test?
     Settings.defaults[:email_enabled] = true
     Settings.defaults[:publish_button_enabled] = true
     Settings.defaults[:auth_lookup_enabled] = false
+    Settings.defaults[:sample_parser_enabled] = true
+    Settings.defaults[:project_browser_enabled] = true
+    Settings.defaults[:experimental_features_enabled] = true
   end
 end

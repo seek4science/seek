@@ -4,11 +4,17 @@ class PresentationsControllerTest < ActionController::TestCase
 
   include AuthenticatedTestHelper
   include SharingFormTestHelper
+  include RestTestCases
 
   def setup
-    WebMock.allow_net_connect!
     login_as Factory(:user)
     User.current_user.person.set_default_subscriptions
+  end
+
+  def rest_api_test_object
+    @object = Factory :presentation,:contributor=>User.current_user
+    @object.tag_with "tag1"
+    @object
   end
 
   test "index" do
@@ -50,16 +56,21 @@ class PresentationsControllerTest < ActionController::TestCase
   end
 
   test "can show" do
-    presentation = Factory :presentation,:contributor=>User.current_user
-    get :show,:id=>presentation
-    assert_response :success
-  end
+    presentation = Factory :ppt_presentation,:contributor=>User.current_user
+    assert_difference "ActivityLog.count" do
+      get :show,:id=>presentation
+    end
 
-  test "can download" do
-    p = Factory :presentation,:contributor=>User.current_user
-
-    get :download,:id=>p
     assert_response :success
+
+    assert_select "div.box_about_actor" do
+      assert_select "p > b",:text=>/Filename:/
+      assert_select "p",:text=>/ppt_presentation\.ppt/
+      assert_select "p > b",:text=>/Format:/
+      assert_select "p",:text=>/PowerPoint presentation/
+      assert_select "p > b",:text=>/Size:/
+      assert_select "p",:text=>/82\.4 KB/
+    end
   end
 
   test "can upload new version with valid url" do
@@ -161,6 +172,21 @@ class PresentationsControllerTest < ActionController::TestCase
 
   end
 
+  test "should download Presentation from standard route" do
+    pres = Factory :ppt_presentation, :policy=>Factory(:public_policy)
+    login_as(pres.contributor.user)
+    assert_difference("ActivityLog.count") do
+      get :download, :id=>pres.id
+    end
+    assert_response :success
+    al=ActivityLog.last
+    assert_equal "download",al.action
+    assert_equal pres,al.activity_loggable
+    assert_equal "attachment; filename=\"ppt_presentation.ppt\"",@response.header['Content-Disposition']
+    assert_equal "application/vnd.ms-powerpoint",@response.header['Content-Type']
+    assert_equal "82432",@response.header['Content-Length']
+  end
+
   test "should set the other creators " do
     user = Factory(:user)
     presentation = Factory(:presentation, :contributor => user)
@@ -183,4 +209,35 @@ class PresentationsControllerTest < ActionController::TestCase
     assert_select 'div', :text => /another creator/, :count => 1
   end
 
+  test 'should be able to view ms/open office ppt content' do
+    ms_ppt_presentation = Factory(:ppt_presentation, :policy => Factory(:all_sysmo_downloadable_policy))
+    assert ms_ppt_presentation.content_blob.is_content_viewable?
+    get :show, :id => ms_ppt_presentation.id
+    assert_response :success
+    assert_select 'a', :text => /View content/, :count => 1
+
+    openoffice_ppt_presentation = Factory(:odp_presentation, :policy => Factory(:all_sysmo_downloadable_policy))
+    assert openoffice_ppt_presentation.content_blob.is_content_viewable?
+    get :show, :id => openoffice_ppt_presentation.id
+    assert_response :success
+    assert_select 'a', :text => /View content/, :count => 1
+  end
+
+  test 'should display the file icon according to version' do
+    ms_ppt_presentation = Factory(:ppt_presentation, :policy => Factory(:all_sysmo_downloadable_policy))
+    get :show, :id => ms_ppt_presentation.id
+    assert_response :success
+    assert_select "img[src=?]", /\/images\/file_icons\/small\/ppt\.png\?.*/
+
+    #new version
+    pdf_presentation = Factory(:presentation_version, :presentation => ms_ppt_presentation)
+    content_blob = Factory(:pdf_content_blob, :asset => ms_ppt_presentation, :asset_version => 2)
+    ms_ppt_presentation.reload
+    assert_equal 2, ms_ppt_presentation.versions.count
+    assert_not_nil ms_ppt_presentation.find_version(2).content_blob
+
+    get :show, :id => ms_ppt_presentation.id, :version => 2
+    assert_response :success
+    assert_select "img[src=?]", /\/images\/file_icons\/small\/pdf\.png\?.*/
+  end
 end

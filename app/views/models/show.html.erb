@@ -2,68 +2,71 @@
 <%= javascript_include_tag "resource" ,"zoom/lightbox"-%>
 <%= stylesheet_link_tag "lightbox" %>
 
+<%= render :partial => "layouts/item_title",:locals=>{:item=>@model, :version => @display_model.version} %>
+
 <ul class="sectionIcons">
   <%= asset_buttons @model, @display_model.version -%>
 
   <% if Seek::Config.jws_enabled && @display_model.is_jws_supported? -%>
-      <% jws_supported_content_blob = @display_model.is_dat? || @display_model.is_sbml? %>
-      <% if !jws_supported_content_blob.filesize.nil? && jws_supported_content_blob.filesize < 1*1024*1024 %>
+      <% jws_supported_content_blob = @display_model.jws_supported_content_blobs.first %>
+      <% if jws_supported_content_blob.is_in_simulatable_size_limit? %>
           <% if @model.can_edit? -%>
               <li>
                 <%= image_tag_for_key('jws_builder', builder_model_path(@model, :version => @display_model.version), nil, nil, "JWS One Stop") -%>
               </li>
           <% end -%>
-          <% if @model.can_download? -%>
+          <% if can_download_asset?(@model, params[:code]) -%>
               <li>
-                <%= image_tag_for_key('execute', simulate_model_path(@model, :version => @display_model.version), nil, {:method => :post}, "Simulate Model on JWS") -%>
+                <%= image_tag_for_key('execute', simulate_model_path(@model, :version => @display_model.version, :code => params[:code]), nil, {:method => :post}, "Simulate Model on JWS") -%>
               </li>
           <% end -%>
       <% end -%>
   <% end -%>
+
+
+  <% if Seek::Config.experimental_features_enabled && Seek::Config.solr_enabled && @display_model.contains_sbml? -%>
+      <li>
+        <%= image_tag_for_key("search",matching_data_model_path(@model,:version=>@display_model.version),nil,nil,"Find related data") -%>
+      </li>
+  <% end -%>
+
   <% if cytoscapeweb_supported?(@display_model) %>
-           <% if @model.can_download? -%>
+           <% if can_download_asset?(@model, params[:code]) -%>
                <li>
-                 <%= image_tag_for_key('cytoscape_web', visualise_model_path(@model, :version => @display_model.version), nil, {:target => "_blank"}, "Visualise Model with Cytoscape Web") -%>
+                 <%= image_tag_for_key('cytoscape_web', visualise_model_path(@model, :version => @display_model.version, :code => params[:code]), nil, {:target => "_blank"}, "Visualise Model with Cytoscape Web") -%>
                </li>
            <% end -%>
    <% end %>
 </ul>
 
-  <% if Seek::Config.sycamore_enabled && excutable_content_blob=@display_model.is_sbml? %>
-      <% if @model.can_download? && !excutable_content_blob.filesize.nil? && excutable_content_blob.filesize < 1*1024*1024 -%>
-        <ul class="sectionIcons">
+<% if Seek::Config.sycamore_enabled && @display_model.contains_sbml? %>
+    <% excutable_content_blob =  @display_model.content_blobs.detect{|cb| cb.is_sbml?}
+       if excutable_content_blob.is_in_simulatable_size_limit? && can_download_asset?(@model, params[:code]) -%>
+        <ul class='sectionIcons'>
           <li>
-        <% form_tag("http://sycamore.eml.org/sycamore/submission.jsp", :id => 'sycamore-form') do -%>
-          <%= hidden_field_tag 'sbml_model' -%>
-            <%= hidden_field_tag 'sender', 'seek' -%>
-            <%= link_to_remote image('execute') + "Simulate Model on Sycamore", :url => {:action => 'submit_to_sycamore', :id => @model.id, :version => @display_model.version} -%>
-        <% end -%>
+            <% form_tag("http://sycamore.eml.org/sycamore/submission.jsp", :id => 'sycamore-form') do -%>
+                <%= hidden_field_tag 'sbml_model' -%>
+                <%= hidden_field_tag 'sender', 'seek' -%>
+                <%= link_to_remote image('execute') + "Simulate Model on Sycamore", :url => {:action => 'submit_to_sycamore', :id => @model.id, :version => @display_model.version} -%>
+            <% end -%>
+
           </li>
         </ul>
     <% end -%>
 <% end %>
+<br/>
 
-
-<%= render :partial=>"assets/upload_new_version_form", :locals=>{:resource=>@model} -%>
-<%= render :partial => "layouts/item_title",:locals=>{:item=>@model} %>
-<%= render :partial => "layouts/usage_info", :locals => { :resource => @model } -%>
 
 <div class="show_basic">
+
+  <%= render :partial=>"assets/upload_new_version_form", :locals=>{:resource=>@model} -%>
+
     <div class="main_content_left_box_narrower">
+
         <%= render :partial=>"assets/resource_version_details", :locals=>{:displayed_resource=>@display_model, :resource=>@model} -%>
         <div class="box_about_actor">
-            <p>
-                <b>Title:</b>
-                <span class="title"><%=h @display_model.title -%></span>
-            </p>
-            <p>
-              <% files = @display_model.content_blobs %>
-                <b>All Files</b> (<span style="font-style: italic;"><%= files.count %> in total</span>):<br/>
-              <% files.each do |content_blob|%>
-               <%= h(content_blob.original_filename) -%> (<%=h mime_nice_name(content_blob.content_type) -%>)
-               <br/>
-              <% end %>
-            </p>
+            <%= render :partial=>"assets/multiple_fileinfo", :object=>@display_model -%>
+
             <p>
                 <b>Organism:</b>
                 <% if @display_model.organism -%>
@@ -84,23 +87,13 @@
                 <b>Execution or visualisation environment:</b>
                 <%= model_environment_text @display_model %>
             </p>
-          <p>
-          <b>Model visualization</b>(<span style="font-style:italic;">click it to zoom</span>)<br/>
-          <!--  Rescale the image according to the proportion.
-               Max.width is the width of its container(div#main_content_left_box_narrower?)-->
-          <div id="thumbnail" >
-            <% if  @display_model.model_image
-             image_width = @display_model.model_image.image_width.nil??  "100px" : @display_model.model_image.image_width
-            %>
-            <a href='<%= url_for(:controller=>"models",:action=>"send_image",:id=>@model,:version=>@display_model.version) %>' rel="lightbox">
-               <img src="<%= url_for(:controller=>"models",:action=>"send_image",:id=>@model,:version=>@display_model.version) %>" width="<%= image_width %>"  style="max-width: 100%;"/>
-            </a>
-            <% else %>
-            <span class="none_text">None</span>
-            <% end %>
-           </div>
-         </p>
+
+            <%= render :partial=>"model_visualisation" -%>
+
             <br/>
+
+            <%= render :partial => "assets/special_auth_code_display", :locals => {:resource => @model} %>
+
             <p>
                 <b>Description:</b>
                 <% unless @display_model.description.blank? -%>
@@ -113,7 +106,7 @@
                 </p>
                 <% end -%>
             </p>
-
+            <%= render :partial=>"import_details", :object=>@display_model %>
             <p>
                 <%= embedded_isa_svg(@model, true, @model) -%>
             </p>
@@ -125,7 +118,9 @@
     <%= render :partial=>"assets/resource_main_content_right",:locals => { :resource => @model } %>
 
     <div style="clear:both;padding-top:1em;">
-        <%= render :partial=>"layouts/items_related_to",:object => @model %>
+      <%= render :partial => "layouts/items_related_to", :object => @model %>
+      <br/>
+      <%= render :partial => "layouts/usage_info", :locals => { :resource => @model } -%>
     </div>
 </div>
 

@@ -8,11 +8,11 @@ class SubscriptionTest < ActiveSupport::TestCase
     User.current_user = Factory(:user)
     @val = Seek::Config.email_enabled
     Seek::Config.email_enabled=true
-    Delayed::Job.destroy_all
+    Delayed::Job.delete_all
   end
 
   def teardown
-      Delayed::Job.destroy_all
+      Delayed::Job.delete_all
       Seek::Config.email_enabled=@val
   end
 

@@ -12,18 +12,21 @@
 <% unless authorization_already_done
        resource_hash.each_value do |res|
            unless res[:items].empty?
-               total_count = res[:items].size
-               res[:items] = res[:items].select &:can_view?
-               res[:hidden_count] = total_count - res[:items].size
+             total_count = res[:items].size
+             total = res[:items]
+             res[:items] = res[:items].select &:can_view?
+             res[:hidden_items] = total - res[:items]
+             res[:hidden_count] = total_count - res[:items].size
            end
        end
    end
 %>
 <% limit ||= nil
    if limit
-       resource_hash.each_key do |key|
+     resource_hash.each_key do |key|
       if limit && resource_hash[key][:items].size > limit
         resource_hash[key][:extra_count] = resource_hash[key][:items].size - limit
+        resource_hash[key][:extra_items] = resource_hash[key][:items][limit...(resource_hash[key][:items].size)]
         resource_hash[key][:items] = resource_hash[key][:items][0...limit]
       end
     end
@@ -48,52 +51,68 @@
   </div>
   <div <%= "id='#{tabs_id}'" if tabs_id -%> class="tabber" style="display:none;">
     <% assets = resource_hash.keys.sort_by do |asset|
-        ASSET_ORDER.index(asset) || 10000000 #Anything not specified in asset_order shows up at the end
+        ASSET_ORDER.index(asset) || (resource_hash[asset][:is_external] ? 10000 : 1000)
        end
     %>
     <% assets.each do |resource_type| -%>
-      <% visible_resource_type = resource_type.titleize.pluralize -%>
-      <% visible_resource_type = "SOPs" if visible_resource_type=="Sops" %>
+
       <% hidden_count = 0 %>
       <% extra_count = 0 %>
+      <% is_external = false -%>
       <% unless resource_hash[resource_type].nil? %>
         <% if resource_hash.class == Hash %>
           <% hidden_count = resource_hash[resource_type][:hidden_count] %>
           <% resources = resource_hash[resource_type][:items] %>
           <% extra_count = resource_hash[resource_type][:extra_count] || 0 %>
+          <% is_external = resource_hash[resource_type][:is_external] -%>
         <% else %>
           <% resources = resource_hash %>
         <% end %>
       <% else %>
         <% resources = {} %>
       <% end%>
+      <% visible_resource_type = resource_tab_item_name(resource_type,!is_external) -%>
+      <% tab_title = "#{visible_resource_type} (#{resources.length+extra_count}#{"+"+hidden_count.to_s if hidden_count > 0})" -%>
+      <% title_class = is_external ? "external_result" : "" %>
       <% unless (resources.empty? && hidden_count < 1) %>
-        <div id="<%= resource_type.downcase.pluralize -%>" class="tabbertab"> 
+        <div id="<%= resource_type.downcase.pluralize -%>" class="tabbertab">
           <% unless resources.empty? && extra_count < 1 %>
-            <h3><%= "#{visible_resource_type} (#{resources.length+extra_count}#{"+"+hidden_count.to_s if hidden_count > 0})" -%></h3>
-            <%= render :partial => "assets/resource_list", :locals => { :collection => resources, :narrow_view => narrow_view,
-                                                                        :authorization_for_showing_already_done => true,
-                                                                        :actions_partial_disable => actions_partial_disable} -%>
+            <h3 class='<%= title_class -%>'><%= tab_title -%></h3>
+                <%= render :partial => "assets/resource_list", :locals => { :collection => resources,
+                                                                            :narrow_view => narrow_view,
+                                                                            :authorization_for_showing_already_done => true,
+                                                                            :actions_partial_disable => actions_partial_disable} -%>
           <% else %>
             <h3><%= "#{visible_resource_type} (0+#{hidden_count})" -%></h3>
           <% end %>
           <% unless extra_count < 1 %>
             <div class="list_items_container">
-              <div class="hidden_list_item" style="color:#000">
-                <%= item ||= nil
-                    if item
-                        link_to "View all "+(extra_count + resources.size).to_s+" items", filter_url(resource_type, item)
-                    else
+              <div class="hidden_list_item" id ="view_list_items" style="color:#000">
+                <% item ||= nil
+                    if item %>
+                      <%= link_to_remote "View all "+(extra_count + resources.size).to_s+" items", :html => {:id => "view_#{resource_type}s_and_extra", :style => "display:block"},
+                                         :url => url_for(:action => 'view_items_in_tab'),
+                                         :with => "'resource_type=' + '#{resource_type}' + '&resource_ids=' + '#{(resource_hash[resource_type][:items] + resource_hash[resource_type][:extra_items]).collect(&:id).join(',')}'",
+                                         :before => "show_large_ajax_loader('#{resource_type}_list_items_container')"
+                      -%>
+                      <%= link_to_remote "View " + resources.size.to_s + " items", :html => {:id => "view_#{resource_type}s", :style => "display:none"},
+                                         :url => url_for(:action => 'view_items_in_tab'),
+                                         :with => "'resource_type=' + '#{resource_type}' + '&resource_ids=' + '#{resource_hash[resource_type][:items].collect(&:id).join(',')}'",
+                                         :before => "show_large_ajax_loader('#{resource_type}_list_items_container')"
+                      -%>
+                    <% else
                         link_to "View all items", eval("#{resource_type.pluralize.underscore}_path")
                     end
-                        %>
+                -%>
               </div>
               <br style="clear:both"/>
             </div>
           <% end %>
           <% unless hidden_count < 1 %>
             <div class="list_items_container">
-              <div class="hidden_list_item"><%= hidden_count -%> hidden <%= hidden_count > 1 ? "items" : "item" %></div>
+              <div class="hidden_list_item">
+                <%= render :partial => "assets/hidden_items", :object => resource_hash[resource_type][:hidden_items] -%>
+              </div>
               <br style="clear:both"/>
             </div>
           <% end %>

@@ -6,11 +6,12 @@ module ApplicationHelper
 
 
   def date_as_string date,show_time_of_day=false
+    date = Time.parse(date.to_s) unless date.is_a?(Time) || date.blank?
     if date.blank?
       str="<span class='none_text'>No date defined</span>"
     else
       str = date.localtime.strftime("#{date.day.ordinalize} %B %Y")
-      str = date.localtime.strftime("#{str} @ %H:%M:%S") if show_time_of_day
+      str = date.localtime.strftime("#{str} at %H:%M") if show_time_of_day
     end
     str
   end
@@ -21,26 +22,58 @@ module ApplicationHelper
 
   def authorized_list all_items, attribute, sort=true, max_length=75, count_hidden_items=false
     items = all_items.select &:can_view?
-    title_only_items = (all_items - items).select &:title_is_public?
-    html  = "<b>#{(items.size > 1 ? attribute.pluralize : attribute)}:</b> "
-    if items.empty? and title_only_items.empty?
+    if Seek::Config.is_virtualliver
+      title_only_items = (all_items - items).select &:title_is_public?
+    else
+      title_only_items = []
+    end
+
+    if count_hidden_items
+      original_size = all_items.size
+      hidden_items = []
+      hidden_items |= (all_items - items - title_only_items)
+    else
+      hidden_items = []
+    end
+
+    html = "<b>#{(items.size > 1 ? attribute.pluralize : attribute)}:</b> "
+    if items.empty? && title_only_items.empty? && hidden_items.empty?
       html << "<span class='none_text'>No #{attribute}</span>"
     else
-      original_size     = all_items.size
-      hidden_item_count = original_size - (items.size + title_only_items.size)
 
       items = items.sort_by { |i| get_object_title(i) } if sort
-      title_only_items = title_only_items.sort_by{|i| get_object_title(i)} if sort
+      title_only_items = title_only_items.sort_by { |i| get_object_title(i) } if sort
 
-      list = items.collect {|i| link_to h(truncate(i.title, :length=>max_length)), show_resource_path(i), :title=>get_object_title(i)}
-      list = list + title_only_items.collect {|i| h(truncate(i.title, :length => max_length))}
+      list = items.collect { |i| link_to h(truncate(i.title, :length => max_length)), show_resource_path(i), :title => get_object_title(i) }
+      list = list + title_only_items.collect { |i| h(truncate(i.title, :length => max_length)) }
       html << list.join(', ')
 
-      if count_hidden_items && hidden_item_count>0
-        html << "<span class=\"none_text\">#{items.size > 0 ? " and " : ""}#{hidden_item_count} hidden #{hidden_item_count > 1 ? "items" :"item"}</span>"
-      end
+
+        if count_hidden_items && !hidden_items.empty?
+          html << "<span class=\"none_text\">#{items.size > 0 ? " and " : ""}#{hidden_items.size} hidden #{hidden_items.size > 1 ? "items" :"item"}</span>"
+          contributor_links = hidden_item_contributor_links hidden_items
+          if !contributor_links.empty?
+            html << "<span class=\"none_text\">(Please contact: #{contributor_links.join(', ')})</span>"
+          end
+        end
+
     end
     html
+  end
+
+  def hidden_item_contributor_links hidden_items
+    contributor_links = []
+    hidden_items = hidden_items.select { |hi| !hi.contributing_user.try(:person).nil? }
+    hidden_items.sort! { |a, b| a.contributing_user.person.name <=> b.contributing_user.person.name }
+    hidden_items.each do |hi|
+      contributor_person = hi.contributing_user.person
+      if current_user.try(:person) && hi.can_see_hidden_item?(current_user.person) && contributor_person.can_view?
+        contributor_name = contributor_person.name
+        contributor_link = link_to(contributor_name, person_path(contributor_person))
+        contributor_links << contributor_link if contributor_link && !contributor_links.include?(contributor_link)
+      end
+    end
+    contributor_links
   end
 
   def tabbar
@@ -83,13 +116,14 @@ module ApplicationHelper
 
   #Classifies each result item into a hash with the class name as the key.
   #
-  #This is to enable the resources to be displayed in the asset tabbed listing by class
+  #This is to enable the resources to be displayed in the asset tabbed listing by class, or defined by .tab. Items not originating within SEEK are identified by is_external
   def classify_for_tabs result_collection
     results={}
 
     result_collection.each do |res|
-      results[res.class.name] = {:items => [], :hidden_count => 0} unless results[res.class.name]
-      results[res.class.name][:items] << res
+      tab = res.respond_to?(:tab) ? res.tab : res.class.name
+      results[tab] = {:items => [], :hidden_count => 0, :is_external=>(res.respond_to?(:is_external_search_result?) && res.is_external_search_result?)} unless results[tab]
+      results[tab][:items] << res
     end
 
     return results
@@ -119,14 +153,12 @@ module ApplicationHelper
   end
 
   #selection of assets for new asset gadget
-  def new_creatable_selection
-    creatable_options = Seek::Util.user_creatable_types.collect { |c| [(c.name.underscore.humanize == "Sop" ? "SOP" : c.name.underscore.humanize), c.name.underscore] }
-    creatable_options << ["Data file & sample", "data_file_with_sample"]
-    select_tag :new_resource_type, options_for_select(creatable_options)
-
-    #select_tag :new_resource_type, options_for_select(Seek::Util.user_creatable_types.collect{|c| [(c.name.underscore.humanize == "Sop" ? "SOP" : c.name.underscore.humanize),c.name.underscore] })
+  def new_creatable_selection_list
+    creatable_options = Seek::Util.user_creatable_types.collect { |c| [c.name.underscore.humanize, c.name.underscore] }
+    creatable_options << ["Data file with sample", "data_file_with_sample"] if Seek::Config.sample_parser_enabled
+    creatable_options
   end
-  
+
   def is_nil_or_empty? thing
     thing.nil? or thing.empty?
   end
@@ -144,7 +176,7 @@ module ApplicationHelper
     text=text.to_s if text.kind_of?(Numeric)
     if text.nil? or text.chomp.empty?
       not_specified_text=options[:none_text] || "Not specified"
-      not_specified_text="No description set" if options[:description]==true
+      not_specified_text="No description specified" if options[:description]==true
       res = "<span class='none_text'>#{not_specified_text}</span>"
     else      
       text.capitalize! if options[:capitalize]            
@@ -270,7 +302,7 @@ module ApplicationHelper
   def page_title controller_name, action_name
     name=PAGE_TITLES[controller_name]
     name ||=""
-    name += " (Development)" if RAILS_ENV=="development"
+    name += " (Development)" if Rails.env=="development"
     return "#{Seek::Config.application_title} "+name
   end
 
@@ -516,12 +548,38 @@ module ApplicationHelper
     end
   end
 
-  def display_people_list people
-    html = "<ul class='people_list'>"
-    people.each do |person|
-       html<< "<li><a href='#{person_path(person[0])}' target='_blank'>#{person[1]}</a></li>"
+  def resource_tab_item_name resource_type,pluralize=true
+    if resource_type.include?"DataFile"
+      pluralize ? resource_type.titleize.pluralize : resource_type.titleize
+    elsif resource_type == "Sop"
+      pluralize ? "SOPs" : "SOP"
+    elsif resource_type == "Specimen"
+      pluralize ? Seek::Config.sample_parent_term.capitalize.pluralize : Seek::Config.sample_parent_term.capitalize
+    else
+      pluralize ? resource_type.pluralize : resource_type
     end
-    html << '</ul>'
+  end
+  def add_return_to_search
+    referer = request.headers["Referer"].try(:normalize_trailing_slash)
+    search_path = search_url.normalize_trailing_slash
+    root_path = root_url.normalize_trailing_slash
+    request_uri = request.headers['REQUEST_URI'].try(:normalize_trailing_slash)
+    if !request_uri.include?(root_path)
+      request_uri = root_path.chop + request_uri
+    end
+    if referer == search_path && referer != request_uri && request_uri != root_path
+      javascript_tag "
+        if (window.history.length > 1){
+          var a = document.createElement('a');
+          a.onclick = function(){ window.history.back(); };
+          a.onmouseover = function(){ this.style.cursor='pointer'; }
+          a.appendChild(document.createTextNode('Return to search'));
+          a.style.textDecoration='underline';
+          document.getElementById('return_to_search').appendChild(a);
+        }
+      "
+      #link_to_function 'Return to search', "window.history.back();"
+    end
   end
   private  
   PAGE_TITLES={"home"=>"Home", "projects"=>"Projects","institutions"=>"Institutions", "people"=>"People", "sessions"=>"Login","users"=>"Signup","search"=>"Search","assays"=>"Assays","sops"=>"SOPs","models"=>"Models","data_files"=>"Data","publications"=>"Publications","investigations"=>"Investigations","studies"=>"Studies","specimens"=>"Specimens","samples"=>"Samples","presentations"=>"Presentations"}

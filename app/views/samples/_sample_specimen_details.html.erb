@@ -103,7 +103,11 @@
   <%= text_or_not_specified specimen.culture_growth_type.try(:title) -%>
 </p>
 <p>
-  <label>Sex:</label>
+  <label>Ploidy:</label>
+  <%= text_or_not_specified specimen.ploidy -%>
+</p>
+<p>
+  <label>Gender:</label>
   <%
      sex = sex_list_for_selection.select{|s| s[1] == specimen.sex}.collect{|s| s[0]}.first
   %>
@@ -127,4 +131,5 @@
   <label>Organism and strain:</label>
   <%= organism_and_strain( specimen.strain) -%>
 </p>
+<%= render :partial => "assets/special_auth_code_display", :locals => {:resource => specimen} %>
 <% end %>

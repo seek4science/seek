@@ -8,7 +8,7 @@ resource_type = text_for_resource(resource)
     <span id="request_resource_button" class="icon">
         <%= link_to_function request_request_label(resource),"Effect.Appear('request_resource_form');Effect.Fade('request_resource_button');" -%>
     </span>
-    <center>
+
 
           <div id="request_resource_form" style="display:none;width:100%">
             <% form_remote_tag :url=>polymorphic_url(resource, :action => :request_resource),
@@ -28,7 +28,7 @@ resource_type = text_for_resource(resource)
 
           </div>
 
-    </center>
+
     <div id="requesting_resource_status" style="display:none;">About to request access to the <%= resource_type -%> <%= resource.title %> from <%= h(resource.managers.collect{|p| p.name}.join(", ")) %> ...</div>
 
 

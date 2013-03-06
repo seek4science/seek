@@ -10,15 +10,87 @@ class ModelsControllerTest < ActionController::TestCase
   
   def setup
     login_as(:model_owner)
-    @object=models(:teusink)
+  end
+
+  def rest_api_test_object
+    @object=Factory :model_2_files, :contributor=>User.current_user
   end
   
   test "should get index" do
     get :index
     assert_response :success
     assert_not_nil assigns(:models)
-  end    
-  
+  end
+
+  test "should not download private" do
+    model = Factory :model_2_files, :policy=>Factory(:private_policy)
+    assert !model.can_download?(User.current_user)
+    assert_no_difference("ActivityLog.count") do
+      get :download,:id=>model.id
+    end
+    assert_redirected_to model_path(model)
+    assert_not_nil flash[:error]
+  end
+
+  test "should download without type information" do
+    model = Factory :typeless_model, :policy=>Factory(:public_policy)
+    assert model.can_download?
+    assert_difference("ActivityLog.count") do
+      get :download, :id=>model.id
+    end
+    assert_response :success
+    assert_equal "attachment; filename=\"file_with_no_extension\"",@response.header['Content-Disposition']
+    assert_equal "application/octet-stream",@response.header['Content-Type']
+    assert_equal "31",@response.header['Content-Length']
+  end
+
+  test "should download" do
+    model = Factory :model_2_files, :title=>"this_model", :policy=>Factory(:public_policy), :contributor=>User.current_user
+    assert_difference("ActivityLog.count") do
+      get :download, :id=>model.id
+    end
+    assert_response :success
+    assert_equal "attachment; filename=\"this_model.zip\"",@response.header['Content-Disposition']
+    assert_equal "application/zip",@response.header['Content-Type']
+    assert_equal "3024",@response.header['Content-Length']
+  end
+
+  test "should download model with a single file" do
+    model = Factory :model, :title=>"this_model", :policy=>Factory(:public_policy), :contributor=>User.current_user
+    assert_difference("ActivityLog.count") do
+      get :download, :id=>model.id
+    end
+    assert_response :success
+    assert_equal "attachment; filename=\"cronwright.xml\"",@response.header['Content-Disposition']
+    assert_equal "text/xml",@response.header['Content-Type']
+    assert_equal "5933",@response.header['Content-Length']
+  end
+
+  test "should download multiple files with the same name" do
+    #2 files with different names
+    model = Factory :model_2_files, :policy=>Factory(:public_policy), :contributor=>User.current_user
+    get :download, :id=>model.id
+    assert_response :success
+    assert_equal "application/zip", @response.header['Content-Type']
+    assert_equal "3024", @response.header['Content-Length']
+    zip_file_size1 = @response.header['Content-Length'].to_i
+
+    #3 files, 2 of them have the same name
+    first_content_blob = model.content_blobs.first
+    third_content_blob = Factory(:cronwright_model_content_blob, :asset => model,:asset_version=>model.version)
+    assert_equal first_content_blob.original_filename, third_content_blob.original_filename
+    model.content_blobs << third_content_blob
+
+    get :download, :id=>model.id
+    assert_response :success
+    assert_equal "application/zip", @response.header['Content-Type']
+    assert_equal "4023", @response.header['Content-Length']
+    zip_file_size2 = @response.header['Content-Length'].to_i
+
+    #the same name file is not overwriten, by checking the zip file size
+    assert_not_equal zip_file_size1, zip_file_size2
+  end
+
   test "should not create model with file url" do
     file_path=File.expand_path(__FILE__) #use the current file
     file_url="file://"+file_path
@@ -52,12 +124,13 @@ class ModelsControllerTest < ActionController::TestCase
       assert_select ["a[href=?]", person_path(p1)], 0
     end
   end
+
   
   test "shouldn't show hidden items in index" do
     login_as(:aaron)
     get :index, :page => "all"
     assert_response :success
-    assert_equal assigns(:models).sort_by(&:id), Authorization.authorize_collection("view", assigns(:models), users(:aaron)).sort_by(&:id), "models haven't been authorized properly"
+    assert_equal assigns(:models).sort_by(&:id), Model.authorized_partial_asset_collection(assigns(:models), "view", users(:aaron)).sort_by(&:id), "models haven't been authorized properly"
   end
 
   test "should contain only model assays " do
@@ -69,7 +142,7 @@ class ModelsControllerTest < ActionController::TestCase
 
   end
 
-  test "should show only modelling assays in associate assay form" do
+  test "should show only modelling assays in associate modelling analysis form" do
     login_as(:model_owner)
     get :new
     assert_response :success
@@ -78,6 +151,27 @@ class ModelsControllerTest < ActionController::TestCase
       assert_select "option", :text=>/Modelling Assay/,:count=>1
       assert_select "option", :text=>/Metabolomics Assay/,:count=>0
     end
+  end
+
+  test "correct title and text for associating a modelling analysis for new" do
+    login_as(Factory(:user))
+    get :new
+    assert_response :success
+
+    assert_select 'div.foldTitle',:text=>/Modelling Analyses/
+    assert_select 'div#associate_assay_fold_content p',:text=>/The following Modelling Analyses are associated with this Model:/
+    assert_select 'div.association_step p',:text=>/You may select an existing editable Modelling Analysis to associate with this Model./
+  end
+
+  test "correct title and text for associating a modelling analysis for edit" do
+    model = Factory :model
+    login_as(model.contributor.user)
+    get :edit, :id=>model.id
+    assert_response :success
+
+    assert_select 'div.foldTitle',:text=>/Modelling Analyses/
+    assert_select 'div#associate_assay_fold_content p',:text=>/The following Modelling Analyses are associated with this Model:/
+    assert_select 'div.association_step p',:text=>/You may select an existing editable Modelling Analysis to associate with this Model./
   end
 
   test "fail gracefullly when trying to access a missing model" do
@@ -90,7 +184,18 @@ class ModelsControllerTest < ActionController::TestCase
     get :new    
     assert_response :success
     assert_select "h1",:text=>"New Model"
-  end    
+  end
+
+  test "should get new populated from params" do
+    get :new, :model=>{:title=>"the title",:description=>"the description", :data_url=>"wibblebibble", :original_filename => "afile.xml"}
+    assert_response :success
+    assert_select "textarea#model_title",:text=>"the title"
+    assert_select "textarea#model_description",:text=>"the description"
+    assert_select "input#content_blob_data_url",:value=>"wibblebibble"
+    assert_select "input#content_blob_original_filename_0[type='hidden']",:value=>"afile.xml"
+    assert_select "input#model_imported_source[type='hidden']",:value=>"BioModels"
+    assert_select "input#model_imported_url[type='hidden']",:value=>"http://biomodels/model.xml"
+  end
   
   test "should correctly handle bad data url" do
     model={:title=>"Test",:data_url=>"http://sdfsdfkh.com/sdfsd.png",:projects=>[projects(:sysmo_project)]}
@@ -111,7 +216,8 @@ class ModelsControllerTest < ActionController::TestCase
     end
     assert_not_nil flash.now[:error]
   end
-    test "associates assay" do
+
+  test "associates assay" do
     login_as(:model_owner) #can edit assay_can_edit_by_my_first_sop_owner
     m = models(:teusink)
     original_assay = assays(:assay_with_a_model)
@@ -159,7 +265,7 @@ class ModelsControllerTest < ActionController::TestCase
     assay.reload
     assert assay.related_asset_ids('Model').include? assigns(:model).id
   end
-  
+
   def test_missing_sharing_should_default_to_blank
     assert_no_difference('Model.count') do
       assert_no_difference('ContentBlob.count') do
@@ -176,41 +282,160 @@ class ModelsControllerTest < ActionController::TestCase
 
   end
   
+
+  test "should create model with image" do
+      login_as(:model_owner)
+      assert_difference('Model.count') do
+        #assert_difference('ModelImage.count') do
+          post :create, :model => valid_model,:content_blob=>{:file_0=>fixture_file_upload('files/little_file.txt',Mime::TEXT)}, :sharing=>valid_sharing, :model_image => {:image_file => fixture_file_upload('files/file_picture.png', 'image/png')}
+        #end
+      end
+
+      model = assigns(:model)
+      assert_redirected_to model_path(model)
+      assert_equal "file_picture.png", model.model_image.original_filename
+      assert_equal "image/png", model.model_image.content_type
+  end
+
+  test "should create model with image and without content_blob" do
+      login_as(:model_owner)
+      assert_difference('Model.count') do
+        #TODO: the model image is not created because the file created by fixture_file_upload doesn't respond_to(:read), so the image file can't be created
+        #need a way to create a file that is the same as the file sent from browser.
+        #assert_difference('ModelImage.count') do
+          post :create, :model => valid_model, :sharing=>valid_sharing, :model_image => {:image_file => fixture_file_upload('files/file_picture.png', 'image/png')}
+        #end
+      end
+
+      model = assigns(:model)
+      assert_redirected_to model_path(model)
+      assert_equal 'Test', model.title
+  end
+
+  test "should not create model without image and without content_blob" do
+      login_as(:model_owner)
+      assert_no_difference('Model.count') do
+          post :create, :model => valid_model, :sharing=>valid_sharing
+      end
+      assert_not_nil flash[:error]
+  end
+
+  test "should create model version with image" do
+       m=models(:model_with_format_and_type)
+       assert_difference("Model::Version.count", 1) do
+         #assert_difference('ModelImage.count') do
+          post :new_version, :id=>m, :model=>{},:content_blob=>{:file_0=>fixture_file_upload('files/little_file.txt',Mime::TEXT)}, :revision_comment=>"This is a new revision", :model_image => {:image_file => fixture_file_upload('files/file_picture.png', 'image/png')}
+         #end
+       end
+
+       assert_redirected_to model_path(m)
+       assert assigns(:model)
+
+       m=Model.find(m.id)
+       assert_equal 2,m.versions.size
+       assert_equal 2,m.version
+       assert_equal 1,m.content_blobs.size
+       assert_equal 1,m.versions[1].content_blobs.size
+       assert_equal m.content_blobs,m.versions[1].content_blobs
+       assert_equal "little_file.txt",m.content_blobs.first.original_filename
+       assert_equal "little_file.txt",m.versions[1].content_blobs.first.original_filename
+       assert_equal "This is a new revision",m.versions[1].revision_comments
+       assert_equal "Teusink.xml",m.versions[0].content_blobs.first.original_filename
+  end
+
+  test "should create model with import details" do
+    user = Factory :user
+    login_as(user)
+    model_details = valid_model
+    model_details[:imported_source]="BioModels"
+    model_details[:imported_url]="http://biomodels/model.xml"
+
+    assert_difference('Model.count') do
+      post :create, :model => model_details, :sharing=>valid_sharing,:content_blob=>{:file_0=>fixture_file_upload('files/little_file.txt',Mime::TEXT)}, :sharing=>valid_sharing, :model_image => {:image_file => fixture_file_upload('files/file_picture.png', 'image/png')}
+    end
+    model = assigns(:model)
+    assert_redirected_to model_path(model)
+    assert_equal "BioModels",model.imported_source
+    assert_equal "http://biomodels/model.xml",model.imported_url
+    assert_equal user, model.contributor
+  end
+  
+  def test_missing_sharing_should_default_to_private
+    assert_difference('Model.count') do
+      assert_difference('ContentBlob.count') do
+        post :create, :model => valid_model,:content_blob=>{:file_0=>fixture_file_upload('files/little_file.txt',Mime::TEXT)}
+      end
+    end
+
+    m = assigns(:model)
+    assert !m.valid?
+    assert !m.policy.valid?
+    assert_blank m.policy.sharing_scope
+    assert_blank m.policy.access_type
+    assert_blank m.policy.permissions
+
+  end
+  
   test "should create model with url" do
-    WebMock.allow_net_connect!
+    mock_remote_file "#{Rails.root}/test/fixtures/files/file_picture.png","http://www.sysmo-db.org/images/sysmo-db-logo-grad2.png"
 
     assert_difference('Model.count') do
       assert_difference('ContentBlob.count') do
         post :create, :model => valid_model_with_url.tap {|model| model[:external_link] = "1"},:content_blob=>{:url_0=>"http://www.sysmo-db.org/images/sysmo-db-logo-grad2.png"}, :sharing=>valid_sharing
       end
     end
-    assert_redirected_to model_path(assigns(:model))
-    assert_equal users(:model_owner),assigns(:model).contributor   
-    assert !assigns(:model).content_blob.url.blank?
-    assert assigns(:model).content_blob.data_io_object.nil?
-    assert !assigns(:model).content_blob.file_exists?
-    assert_equal "sysmo-db-logo-grad2.png", assigns(:model).original_filename
-    assert_equal "image/png", assigns(:model).content_type
+    model = assigns(:model)
+    assert_redirected_to model_path(model)
+    assert_equal users(:model_owner),model.contributor
+    assert_equal 1,model.content_blobs.count
+    assert !model.content_blobs.first.url.blank?
+    assert model.content_blobs.first.data_io_object.nil?
+    assert !model.content_blobs.first.file_exists?
+    assert_equal "sysmo-db-logo-grad2.png", model.content_blobs.first.original_filename
+    assert_equal "image/png", model.content_blobs.first.content_type
   end
   
   test "should create model and store with url and store flag" do
-    WebMock.allow_net_connect!
-
     model_details=valid_model_with_url
-
+    model_details[:local_copy]="1"
     assert_difference('Model.count') do
       assert_difference('ContentBlob.count') do
         post :create, :model => model_details,:content_blob=>{:url_0=>"http://www.sysmo-db.org/images/sysmo-db-logo-grad2.png"}, :sharing=>valid_sharing
       end
     end
-    assert_redirected_to model_path(assigns(:model))
-    assert_equal users(:model_owner),assigns(:model).contributor
-    assert !assigns(:model).content_blob.url.blank?
-    assert !assigns(:model).content_blob.data_io_object.read.nil?
-    assert assigns(:model).content_blob.file_exists?
-    assert_equal "sysmo-db-logo-grad2.png", assigns(:model).original_filename
-    assert_equal "image/png", assigns(:model).content_type
-  end  
+    model = assigns(:model)
+    assert_redirected_to model_path(model)
+    assert_equal users(:model_owner),model.contributor
+    assert_equal 1,model.content_blobs.count
+    assert !model.content_blobs.first.url.blank?
+    assert !model.content_blobs.first.data_io_object.read.nil?
+    assert model.content_blobs.first.file_exists?
+    assert_equal "sysmo-db-logo-grad2.png", model.content_blobs.first.original_filename
+    assert_equal "image/png", model.content_blobs.first.content_type
+  end
+
+
+
+  test "should add webpage with a 301 redirect" do
+    #you need to stub out both the redirecting url and the forwarded location url
+    stub_request(:head, "http://news.bbc.co.uk").to_return(:status=>301,:headers=>{'Location'=>'http://bbc.co.uk/news'})
+    stub_request(:head, "http://bbc.co.uk/news").to_return(:status=>200,:headers=>{'Content-Type' => 'text/html'})
+
+    model_details=valid_model_with_url
+    model_details[:local_copy]="0"
+    assert_difference('Model.count') do
+      assert_difference('ContentBlob.count') do
+        post :create, :model => model_details,:content_blob=>{:url_0=>"http://news.bbc.co.uk"}, :sharing=>valid_sharing
+      end
+    end
+    model = assigns(:model)
+    assert_redirected_to model_path(model)
+    assert_equal users(:model_owner),model.contributor
+    assert_equal 1,model.content_blobs.count
+    assert_equal "http://news.bbc.co.uk",model.content_blobs.first.url
+    assert model.content_blobs.first.is_webpage?
+
+  end
   
   test "should create with preferred environment" do
     assert_difference('Model.count') do
@@ -225,11 +450,71 @@ class ModelsControllerTest < ActionController::TestCase
   end
   
   test "should show model" do
-    m = models(:teusink)
-    m.save
-    get :show, :id => m
+    m = Factory :model,:policy=>Factory(:public_policy)
+    assert_difference('ActivityLog.count') do
+      get :show, :id => m
+    end
+
     assert_response :success
+
+    assert_select "div.box_about_actor" do
+      assert_select "p > strong",:text=>"1 item is associated with this Model:"
+      assert_select "ul.fileinfo_list" do
+        assert_select "li.fileinfo" do
+            assert_select "p > b",:text=>/Filename:/
+            assert_select "p",:text=>/cronwright\.xml/
+            assert_select "p > b",:text=>/Format:/
+            assert_select "p",:text=>/XML document/
+            assert_select "p > b",:text=>/Size:/
+            assert_select "p",:text=>/5\.9 KB/
+        end
+      end
+    end
+
+    assert_select "p.import_details",:count=>0
   end
+
+  test "should show model with multiple files" do
+    m = Factory :model_2_files,:policy=>Factory(:public_policy)
+
+    assert_difference('ActivityLog.count') do
+      get :show, :id => m
+    end
+
+    assert_response :success
+
+    assert_select "div.box_about_actor" do
+      assert_select "p > strong",:text=>"2 items are associated with this Model:"
+      assert_select "ul.fileinfo_list" do
+        assert_select "li.fileinfo",:count=>2 do
+          assert_select "p > b",:text=>/Filename:/,:count=>2
+          assert_select "p",:text=>/cronwright\.xml/
+          assert_select "p",:text=>/rightfield\.xls/
+          assert_select "p > b",:text=>/Format:/,:count=>2
+          assert_select "p",:text=>/XML document/
+          assert_select "p",:text=>/Spreadsheet/
+          assert_select "p > b",:text=>/Size:/,:count=>2
+          assert_select "p",:text=>/5\.9 KB/
+          assert_select "p",:text=>/9\.2 KB/
+        end
+      end
+    end
+  end
+
+  test "should show model with import details" do
+    m = Factory :model,:policy=>Factory(:public_policy), :imported_source=>"Some place",:imported_url=>"http://somewhere/model.xml"
+    assert_difference('ActivityLog.count') do
+      get :show, :id => m
+    end
+
+    assert_response :success
+    assert_select "p.import_details",:text=>/This Model was originally imported from/ do
+      assert_select "strong",:text=>"Some place"
+      assert_select "a[href=?][target='_blank']","http://somewhere/model.xml",:text=>"http://somewhere/model.xml"
+    end
+
+  end
+
   
   test "should show model with format and type" do
     m = models(:model_with_format_and_type)
@@ -480,13 +765,14 @@ class ModelsControllerTest < ActionController::TestCase
     assert_not_nil flash[:notice]
     assert_nil flash[:error]
     
-    
     m=Model.find(m.id)
     assert_equal 2,m.versions.size
     assert_equal 2,m.version
-    assert_equal "little_file.txt",m.original_filename
-    assert_equal "little_file.txt",m.versions[1].original_filename
-    assert_equal "Teusink.xml",m.versions[0].original_filename
+    assert_equal 1,m.content_blobs.size
+    assert_equal m.content_blobs,m.versions[1].content_blobs
+    assert_equal "little_file.txt",m.content_blobs.first.original_filename
+    assert_equal "little_file.txt",m.versions[1].content_blobs.first.original_filename
+    assert_equal "Teusink.xml",m.versions[0].content_blobs.first.original_filename
     assert_equal "This is a new revision",m.versions[1].revision_comments
     
   end
@@ -735,13 +1021,94 @@ class ModelsControllerTest < ActionController::TestCase
     assert_select 'p.list_item_attribute', :text => /: another creator/, :count => 1
   end
 
-  test 'should show the other creators in -uploader and creators- box' do
+  test "should display cytoscape button for supported models" do
+    model = Factory :xgmml_model
+    login_as(model.contributor)
+    get :show, :id=>model.id
+    assert_response :success
+    assert_select "a[href=?]",visualise_model_path(model,:version=>model.version), :text=>"Visualise Model with Cytoscape Web"
+  end
+
+  test "should not display cytoscape button for supported models" do
+    model = Factory :teusink_jws_model
+    login_as(model.contributor)
+    get :show, :id=>model.id
+    assert_response :success
+    assert_select "a[href=?]",visualise_model_path(model,:version=>model.version), :count=>0
+  end
+
+  test "visualise with cytoscape" do
+    model = Factory :xgmml_model
+    login_as(model.contributor)
+    get :visualise, :id=>model.id,:version=>model.version
+    assert_response :success
+  end
+
+  test "should show sycamore button for sbml" do
+    with_config_value :sycamore_enabled,true do
+      model = Factory :teusink_model
+      login_as(model.contributor)
+      get :show, :id=>model.id
+      assert_response :success
+      assert_select "a", :text => /Simulate Model on Sycamore/
+    end
+  end
+
+  test "should submit_to_sycamore" do
+    with_config_value :sycamore_enabled,true do
+      model = Factory :teusink_model
+      login_as(model.contributor)
+      post :submit_to_sycamore, :id=>model.id, :version => model.version
+      assert_response :success
+      assert @response.body.include?('$("sycamore-form").submit()')
+    end
+  end
+
+  test "should not submit_to_sycamore if sycamore is disable" do
+    model = Factory :teusink_model
+    login_as(model.contributor)
+    post :submit_to_sycamore, :id => model.id, :version => model.version
+    assert @response.body.include?('Interaction with Sycamore is currently disabled')
+  end
+
+  test "should not submit_to_sycamore if model is not downloadable" do
+    with_config_value :sycamore_enabled,true do
+      model = Factory :teusink_model
+      login_as(:quentin)
+      assert !model.can_download?
+
+      post :submit_to_sycamore, :id => model.id, :version => model.version
+      assert @response.body.include?('You are not allowed to simulate this model with Sycamore')
+    end
+  end
+
+  test 'should show the other creators in uploader and creators box' do
     model=models(:teusink)
     model.other_creators = 'another creator'
     model.save
     get :show, :id => model
 
     assert_select 'div', :text => /another creator/, :count => 1
+  end
+
+  test "should create new model version based on content_blobs of previous version" do
+    m = Factory(:model_2_files)
+    retained_content_blob = m.content_blobs.first
+    login_as(m.contributor)
+    assert_difference("Model::Version.count", 1) do
+      post :new_version, :id=>m, :model=>{},:content_blob=>{:file_0=>fixture_file_upload('files/little_file.txt',Mime::TEXT)}, :content_blobs=> {:id => {"#{retained_content_blob.id}" => retained_content_blob.original_filename}}
+    end
+
+    assert_redirected_to model_path(m)
+    assert assigns(:model)
+
+    m=Model.find(m.id)
+    assert_equal 2,m.versions.size
+    assert_equal 2,m.version
+    content_blobs = m.content_blobs
+    assert_equal 2,content_blobs.size
+    assert !content_blobs.include?(retained_content_blob)
+    assert content_blobs.collect(&:original_filename).include?(retained_content_blob.original_filename)
   end
 
   def valid_model

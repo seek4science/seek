@@ -9,6 +9,7 @@ class StudiesController < ApplicationController
   before_filter :check_assays_are_not_already_associated_with_another_study,:only=>[:create,:update]
 
   include Seek::Publishing
+  include Seek::BreadCrumbs
 
   def new_object_based_on_existing_one
     @existing_study =  Study.find(params[:id])

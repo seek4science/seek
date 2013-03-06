@@ -40,7 +40,7 @@
         
         <% if show_relationships -%>
           <br/>
-          <%= label_tag "Relationship between the data and the model" %><br/>
+          <%= label_tag "How was the data used in this #{resource_text}" %><br/>
           <%= select_tag :data_file_relationship_type, options_for_select([["None",0]] + RelationshipType.all.collect{|r| [r.title,r.id]}) %>
         <% end -%>
         
@@ -94,7 +94,8 @@
         selection_box.onchange();
       }
 
-<% resource.data_file_masters.each do |data_file| -%>
+<% data_files = resource.is_a?(Publication) ? resource.related_data_files : resource.data_file_masters %>
+<% data_files.each do |data_file| -%>
   <% if data_file.can_view? -%>
       data_file_id = '<%= data_file.id -%>';
       data_title = '<%= escape_javascript(data_file.title) -%>';

@@ -121,6 +121,32 @@ class SessionsControllerTest < ActionController::TestCase
     assert_redirected_to select_people_path
   end
 
+  test 'should redirect to root after logging out from the search result page' do
+      login_as :quentin
+      @request.env['HTTP_REFERER']= "http://test.host/search/"
+      get :destroy
+      assert_redirected_to :root
+  end
+
+  test 'should redirect to back after logging out from the page excepting search result page' do
+      login_as :quentin
+      @request.env['HTTP_REFERER']= "http://test.host/data_files/"
+      get :destroy
+      assert_redirected_to :back
+  end
+
+  test 'should redirect to root after logging in from the search result page' do
+      @request.env['HTTP_REFERER']= "http://test.host/search"
+      post :create, :login => 'quentin', :password => 'test'
+      assert_redirected_to :root
+  end
+
+  test 'should redirect to back after logging in from the page excepting search result page' do
+      @request.env['HTTP_REFERER']= "http://test.host/data_files/"
+      post :create, :login => 'quentin', :password => 'test'
+      assert_redirected_to :back
+  end
+
   protected
     def auth_token(token)
       CGI::Cookie.new('name' => 'auth_token', 'value' => token)

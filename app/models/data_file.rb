@@ -6,14 +6,16 @@ require 'title_trimmer'
 
 class DataFile < ActiveRecord::Base
 
-  include Seek::DataFileExtraction
+  include Seek::Data::DataFileExtraction
+  include Seek::Data::SpreadsheetExplorerRepresentation
+  include RightField
 
 
 
   #searchable must come before acts_as_asset call
   searchable(:auto_index=>false) do
-    text :description, :title, :original_filename, :searchable_tags, :spreadsheet_annotation_search_fields,:fs_search_fields, :spreadsheet_contents_for_search,
-         :assay_type_titles,:technology_type_titles
+    text :description, :title, :searchable_tags, :spreadsheet_annotation_search_fields,:fs_search_fields,
+         :assay_type_titles,:technology_type_titles, :spreadsheet_contents_for_search
   end if Seek::Config.solr_enabled
 
   acts_as_asset
@@ -34,8 +36,10 @@ class DataFile < ActiveRecord::Base
   has_many :studied_factors, :conditions =>  'studied_factors.data_file_version = #{self.version}'
 
   explicit_versioning(:version_column => "version") do
-    include Seek::DataFileExtraction
+    include Seek::Data::DataFileExtraction
+    include Seek::Data::SpreadsheetExplorerRepresentation
     acts_as_versioned_resource
+    acts_as_favouritable
     
     has_one :content_blob,:primary_key => :data_file_id,:foreign_key => :asset_id,:conditions => 'content_blobs.asset_version= #{self.version} and content_blobs.asset_type = "#{self.parent.class.name}"'
     
@@ -46,7 +50,7 @@ class DataFile < ActiveRecord::Base
     end
 
     def to_presentation_version
-      returning Presentation::Version.new do |presentation_version|
+      Presentation::Version.new.tap do |presentation_version|
         presentation_version.attributes.keys.each do |attr|
           presentation_version.send("#{attr}=", send("#{attr}")) if respond_to? attr and attr!="id"
         end
@@ -108,8 +112,6 @@ class DataFile < ActiveRecord::Base
      end
    end
 
-
-
   has_many :sample_assets,:dependent=>:destroy,:as => :asset
   has_many :samples, :through => :sample_assets
 
@@ -161,37 +163,10 @@ class DataFile < ActiveRecord::Base
     flds.flatten.uniq
   end
 
-  def to_presentation!
-    returning self.to_presentation do |presentation|
-      class << presentation
-        #disabling versioning, since I have manually copied the versions of the data file over
-        def save_version_on_create
-        end
-
-        def set_new_version
-          self.version = DataFile.find(self.orig_data_file_id).version
-        end
-      end
-
-      #TODO: should we throw an exception if the user isn't authorized to make these changes?
-      if User.current_user.admin? or self.can_delete?
-        disable_authorization_checks {
-          presentation.save!
-          #TODO: perhaps the deletion of the data file should also be here? We are already throwing an exception if save fails for some reason
-        }
-      end
-
-      #copying annotations has to be done after saving the presentation due to limitations of the annotation plugin
-      disable_authorization_checks do #disabling because annotations should be copied over even if the user would normally lack permission to do so
-        presentation.annotations = self.annotations
-      end
-    end
-  end
-
   def to_presentation
     presentation_attrs = attributes.delete_if { |k, v| !Presentation.new.attributes.include? k}
 
-    returning Presentation.new(presentation_attrs) do |presentation|
+    Presentation.new(presentation_attrs).tap do |presentation|
       DataFile.reflect_on_all_associations.select { |a| [:has_many, :has_and_belongs_to_many, :has_one].include?(a.macro) && !a.through_reflection }.each do |a|
         #disabled, because even if the user doing the conversion would not normally
         #be able to associate an item with his data_file/presentation, the pre-existing
@@ -206,7 +181,90 @@ class DataFile < ActiveRecord::Base
       disable_authorization_checks { presentation.versions = versions.map(&:to_presentation_version) }
       presentation.policy = policy.deep_copy
       presentation.orig_data_file_id = id
+
+      class << presentation
+        #disabling versioning, since I have manually copied the versions of the data file over
+        def save_version_on_create
+        end
+
+        def set_new_version
+          self.version = DataFile.find(self.orig_data_file_id).version
+        end
+      end
+
+      #TODO: should we throw an exception if the user isn't authorized to make these changes?
+      if User.current_user.admin? || self.can_delete?
+        disable_authorization_checks {
+          presentation.save!
+          #TODO: perhaps the deletion of the data file should also be here? We are already throwing an exception if save fails for some reason
+        }
+      end
+
+      #copying annotations has to be done after saving the presentation due to limitations of the annotation plugin
+      disable_authorization_checks do #disabling because annotations should be copied over even if the user would normally lack permission to do so
+        presentation.annotations = self.annotations.select{|a| a.attribute_name == 'tag'}
+      end
     end
   end
 
+
+
+  #a simple container for handling the matching results returned from #matching_data_files
+  class ModelMatchResult < Struct.new(:search_terms,:score,:primary_key); end
+
+  #return a an array of ModelMatchResult where the model id is the key, and the matching terms/values are the values
+  def matching_models
+
+    results = {}
+
+    if Seek::Config.solr_enabled && is_extractable_spreadsheet?
+      search_terms = spreadsheet_annotation_search_fields | spreadsheet_contents_for_search | fs_search_fields | searchable_tags
+      #make the array uniq! case-insensistive whilst mainting the original case
+      dc = []
+      search_terms = search_terms.inject([]) do |r,v|
+        unless dc.include?(v.downcase)
+          r << v
+          dc << v.downcase
+        end
+        r
+      end
+      search_terms.each do |key|
+        Model.search do |query|
+          query.keywords key, :fields=>[:model_contents, :description, :searchable_tags]
+        end.hits.each do |hit|
+          results[hit.primary_key]||=ModelMatchResult.new([],0,hit.primary_key)
+          results[hit.primary_key].search_terms << key
+          results[hit.primary_key].score += hit.score unless hit.score.nil?
+        end
+      end
+    end
+
+    results.values.sort_by{|a| -a.score}
+  end
+
+
+  #RDF Generation, will eventually be refactored out into a separate module
+
+  def to_rdf
+    if (contains_extractable_spreadsheet? && content_blob.is_xls?)
+      rdf = generate_rdf_graph(self)
+    else
+      rdf = RDF::Graph.new
+    end
+    rdf = additional_rdf_statements(rdf)
+    RDF::Writer.for(:rdfxml).buffer do |writer|
+      rdf.each_statement do |statement|
+        writer << statement
+      end
+    end
+  end
+
+  #define non rightfield based rdf statements
+  def additional_rdf_statements rdf_graph
+    resource = RDF::Resource.new(rdf_resource_uri(self))
+    rdf_graph << [resource,RDF::DC.title,title]
+    rdf_graph << [resource,RDF::DC.description,description.nil? ? "" : description]
+    rdf_graph
+  end
+  
 end

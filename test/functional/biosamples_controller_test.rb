@@ -71,9 +71,9 @@ class BioSamplesControllerTest < ActionController::TestCase
     get :existing_specimens, :strain_ids => strain_ids
     assert_response :success
     assert_select "table#specimen_table tbody" do
-      assert_select 'tr td', :text => "Strain " + strain1.info + "(Seek ID=#{strain1.id})", :count => specimens_of_strain1.length
-      assert_select 'tr td', :text => "Strain " + strain2.info + "(Seek ID=#{strain2.id})", :count => specimens_of_strain2.length
-      assert_select 'tr td', :text => "Strain " + strain3.info + "(Seek ID=#{strain3.id})", :count => specimens_of_strain3.length
+      assert_select 'tr td', :text => "Strain: " + strain1.info + "(Seek ID=#{strain1.id})", :count => specimens_of_strain1.length
+      assert_select 'tr td', :text => "Strain: " + strain2.info + "(Seek ID=#{strain2.id})", :count => specimens_of_strain2.length
+      assert_select 'tr td', :text => "Strain: " + strain3.info + "(Seek ID=#{strain3.id})", :count => specimens_of_strain3.length
       specimens.each do |specimen|
         assert_select 'tr td', :text => specimen.id, :count => 1
       end
@@ -103,7 +103,7 @@ class BioSamplesControllerTest < ActionController::TestCase
 
   test 'should create strain with name and organism' do
     organism = organisms(:yeast)
-    strain = {:title => 'test', :organism => organism}
+    strain = {:title => 'test', :organism => organism, :project_ids => [Factory(:project).id]}
     assert_difference ('Strain.count') do
       post :create_strain, :strain => strain
     end
@@ -142,7 +142,7 @@ class BioSamplesControllerTest < ActionController::TestCase
     specimen = specimens("running mouse")
     xhr(:get, :existing_samples, {:specimen_ids => "#{specimen.id}"})
     assert_response :success
-    assert_select "table#sample_table thead tr th", :text => "Age at sampling(hours)", :count => 1
+    assert_select "table#sample_table thead tr th", :text => "Age at sampling", :count => 1
   end
 
   test "should have comment in sample table" do

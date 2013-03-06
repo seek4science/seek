@@ -1,13 +1,15 @@
 ActionController::Routing::Routes.draw do |map|
   map.resources :attachments
-  map.resources :presentations,:member => { :download => :get, :new_version=>:post, :preview_publish=>:get,:publish=>[:post, :get],:request_resource=>:post, :update_annotations_ajax=>:post }
+  map.resources :presentations,:member => {:download=>:get,:new_version=>:post, :preview_publish=>:get,:publish=>[:post, :get],:request_resource=>:post, :update_annotations_ajax=>:post } do |presentation|
+    presentation.resources :content_blobs, :member => {:download => :get, :view_pdf_content => :get, :get_pdf => :get}
+  end
   map.resources :subscriptions
   map.resources :specimens
   map.resources :samples
 
   map.resources :events
   map.resources :tissue_and_cell_types
-  map.resources :strains, :collection=>{:existing_strains=>:get, :existing_strains_for_create=>:get, :show_existing_strain=>:get, :new_strain_form => :get}
+  map.resources :strains, :member => {:update_annotations_ajax=>:post}
 
   map.resources :publications,:collection=>{:fetch_preview=>:post},:member=>{:disassociate_authors=>:post,:update_annotations_ajax=>:post}
 
@@ -29,8 +31,9 @@ ActionController::Routing::Routes.draw do |map|
 
   map.resources :biosamples, :collection=>{:existing_strains=>:get, :existing_specimens=>:get, :existing_samples=>:get, :strain_form => :get, :create_strain => :post, :update_strain => :put,  :create_specimen_sample => :post, :strains_of_selected_organism => :get}
 
-  map.resources :data_files, :collection=>{:test_asset_url=>:post},:member => {:download => :get,:plot=>:get, :data => :get,:preview_publish=>:get,:publish=>[:post, :get], :request_resource=>:post, :update_annotations_ajax=>:post, :explore=>:get},:new=>{:upload_for_tool => :post, :upload_from_email => :post}  do |data_file|
+  map.resources :data_files, :collection=>{:test_asset_url=>:post},:member => {:download=>:get,:plot=>:get, :data => :get,:preview_publish=>:get,:publish=>[:post, :get], :request_resource=>:post, :update_annotations_ajax=>:post, :explore=>:get, :convert_to_presentation => :post},:new=>{:upload_for_tool => :post, :upload_from_email => :post}  do |data_file|
     data_file.resources :studied_factors, :collection =>{:create_from_existing=>:post}
+    data_file.resources :content_blobs, :member => {:download => :get, :view_pdf_content => :get, :get_pdf => :get}
   end
   
   map.resources :spreadsheet_annotations, :only => [:create, :destroy, :update]
@@ -44,9 +47,10 @@ ActionController::Routing::Routes.draw do |map|
   end
 
   map.resources :models, 
-    :member => { :download => :get, :execute=>:post, :request_resource=>:post,:preview_publish=>:get,:publish=>[:post, :get], :builder=>:get,:visualise=>:get, :export_as_xgmml=>:post,:submit_to_jws=>:post, :submit_to_sycamore=>:post, :simulate=>:post, :update_annotations_ajax=>:post },
+    :member => {:download => :get, :matching_data=>:get, :execute=>:post, :request_resource=>:post,:preview_publish=>:get,:publish=>:post, :builder=>:get,:visualise=>:get, :export_as_xgmml=>:post,:submit_to_jws=>:post,:submit_to_sycamore=>:post, :simulate=>:post, :update_annotations_ajax=>:post },
     :collection=>{:build=>:get} do |model|
     model.resources :model_images,:member=>{ :select=>:post },:collection => {:new => :post}
+    model.resources :content_blobs, :member => {:download => :get, :view_pdf_content => :get, :get_pdf => :get}
   end
 
   map.resources :people, :collection=>{:select=>:get,:get_work_group =>:get}, :member=>{:admin=>:get}  do |person|
@@ -55,16 +59,18 @@ ActionController::Routing::Routes.draw do |map|
   end
 
   map.resources :projects,
-    :collection => { :request_institutions => :get,:manage=>:get },:member=>{:admin=>:get} do |project|
+    :collection => { :request_institutions => :get,:manage=>:get },:member=>{:admin=>:get,:asset_report=>:get} do |project|
     # avatars / pictures 'owned by' project
     project.resources :avatars, :member => { :select => :post }, :collection => { :new => :post }
+    project.resources :folders, :collection=>{:nuke=>:post},:member=>{:display_contents=>:post,:move_asset_to=>:post,:create_folder=>:post,:remove_asset=>:post}
   end
 
-  map.resources :sops, :member => { :download => :get, :new_version=>:post, :preview_publish=>:get,:publish=>[:post, :get],:request_resource=>:post, :update_annotations_ajax=>:post } do |sop|
+  map.resources :sops, :member => {:download=>:get,:new_version=>:post, :preview_publish=>:get,:publish=>:post,:request_resource=>:post, :update_annotations_ajax=>:post } do |sop|
     sop.resources :experimental_conditions, :collection =>{:create_from_existing=>:post}
+    sop.resources :content_blobs, :member => {:download => :get, :view_pdf_content => :get, :get_pdf => :get}
   end
 
-  map.resources :users, :collection=>{:impersonate => :post, :activation_required=>:get,:forgot_password=>[:get,:post],:reset_password=>:get},
+  map.resources :users, :collection=>{:impersonate => :post, :activation_required=>:get,:forgot_password=>[:get,:post],:reset_password=>:get, :hide_guide_box => :post},
                         :member => {:set_openid => :put}
 
   map.resource :session, :collection=>{:auto_openid=>:get,:show=>:get,:index=>:get},:member=>{:show=>:get}
@@ -81,6 +87,9 @@ ActionController::Routing::Routes.draw do |map|
   map.resources :forum_attachments, :member => {:download => :get}, :only => [:create, :destroy]
 
   map.resources :compounds
+
+
+
   
   # search and saved searches
   map.search '/search/',:controller=>'search',:action=>'index'
@@ -112,6 +121,7 @@ ActionController::Routing::Routes.draw do |map|
 
   # page for admin tasks
   map.admin '/admin/', :controller=>'admin',:action=>'show'
+  map.registration_form '/admin/registration_form', :controller=>'admin',:action=>'registration_form'
 
   #temporary location for the data/models simulation prototyping
   map.data_fuse '/data_fuse/',:controller=>'data_fuse',:action=>'show'

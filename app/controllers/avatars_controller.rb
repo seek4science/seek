@@ -10,6 +10,8 @@ class AvatarsController < ApplicationController
   cache_sweeper :avatars_sweeper,:only=>[:destroy,:select,:create]
   
   protect_from_forgery :except => [ :new ]
+
+  include Seek::BreadCrumbs
   
   # GET /people/1/avatars/new
   # GET /people/new
@@ -79,24 +81,44 @@ class AvatarsController < ApplicationController
     
     if !cache_exists?(id, size) # look in file system cache before attempting db access      
       # resize (keeping image side ratio), encode and cache the picture
-      @avatar.operate do |image|
-        image.resize size
-        @image_binary = image.image.to_blob
-      end      
-      # cache data
-      cache_data!(@avatar, @image_binary, size)            
+      #begin
+      resize_image size
+      #rescue Fleximage::Model::MasterImageNotFound
+        #required after switching from jpg to png, for existing images that have yet to be converted
+      #  convert_jpg_to_png
+      #  resize_image size
+      #end
     end
     
     respond_to do |format|
       format.html do
-        send_file(full_cache_path(id, size), :type => 'image/jpeg', :disposition => 'inline')
+        send_file(full_cache_path(id, size), :type => 'image/jpg', :disposition => 'inline')
       end
       format.xml do        
         @cache_file=full_cache_path(id, size)
-        @type='image/jpeg'
+        @type='image/jpg'
       end
     end
     
+  end
+
+  #required when first running after switching avatars from .jpg format rather than .png (for lower bandwidth and page load time)
+  def convert_jpg_to_png
+    png_path = @avatar.file_path
+    jpg_path = @avatar.file_path.gsub(/\.png$/, '.jpg')
+    image = Magick::Image.read(jpg_path).first
+    image.format = "PNG"
+    image.write(png_path)
+    Rails.logger.info("Converted #{jpg_path} to #{png_path}")
+  end
+
+  def resize_image size
+    @avatar.operate do |image|
+      image.resize size
+      @image_binary = image.image.to_blob
+    end
+    # cache data
+    cache_data!(@avatar, @image_binary, size)
   end
   
   
@@ -252,7 +274,7 @@ class AvatarsController < ApplicationController
   def cache_path(avatar, size=nil, include_local_name=false)
     
     id = avatar.kind_of?(Integer) ? avatar : avatar.id
-    rtn = "#{RAILS_ROOT}/tmp/avatars"
+    rtn = "#{Rails.root}/tmp/avatars"
     rtn = "#{rtn}/#{size}" if size
     rtn = "#{rtn}/#{id}.#{Avatar.image_storage_format}" if include_local_name
     

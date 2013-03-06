@@ -5,7 +5,6 @@ parent_xml.tag! "presentation",
 
   render :partial=>"api/standard_elements",:locals=>{:parent_xml => parent_xml,:is_root=>is_root,:object=>presentation}
   if (is_root)
-    parent_xml.tag! 'filename', presentation.original_filename
     associated_resources_xml parent_xml,presentation
   end
 end

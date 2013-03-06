@@ -65,8 +65,8 @@ class HomeControllerTest < ActionController::TestCase
   test "SOP upload option should be capitalized" do
     login_as(:quentin)
     get :index
-    assert_select "select#new_resource_type",:count=>1 do
-      assert_select "option[value=?]","sop",:text=>"SOP"
+    assert_select "ul#new_asset_menu",:count=>1 do
+      assert_select "li.dynamic_menu_li", :text=>"SOP", :count => 1
     end
   end
 
@@ -130,7 +130,7 @@ class HomeControllerTest < ActionController::TestCase
     assert_response :success
 
     assert_select "div.heading", :text=>/Community News/, :count=>1
-    assert_select "div.heading", :text=>"#{Seek::Config.project_name} News", :count=>1
+    assert_select "div.heading", :text=>"#{Seek::Config.application_name} News", :count=>1
 
     #turn off
     Seek::Config.project_news_enabled=false
@@ -254,9 +254,7 @@ class HomeControllerTest < ActionController::TestCase
 
     get :index
     assert_response :success
-    assert_select "p.headline_announcement" do
-
-    end
+    assert_select "div.headline_announcement", :count=>1
 
     #now expire it
     ann.expires_at=1.day.ago
@@ -264,6 +262,38 @@ class HomeControllerTest < ActionController::TestCase
     get :index
     assert_response :success
     assert_select "p.headline_announcement",:count=>0
+  end
+
+  test "should show external search when not logged in" do
+    with_config_value :solr_enabled,true do
+      with_config_value :external_search_enabled, true do
+        get :index
+        assert_response :success
+        assert_select "div#search_box input#include_external_search",:count=>1
+      end
+    end
+  end
+
+  test "should show external search when logged in" do
+    login_as Factory(:user)
+    with_config_value :solr_enabled,true do
+      with_config_value :external_search_enabled, true do
+        get :index
+        assert_response :success
+        assert_select "div#search_box input#include_external_search",:count=>1
+      end
+    end
+  end
+
+  test "should not show external search when disabled" do
+    login_as Factory(:user)
+    with_config_value :solr_enabled,true do
+      with_config_value :external_search_enabled, false do
+        get :index
+        assert_response :success
+        assert_select "div#search_box input#include_external_search",:count=>0
+      end
+    end
   end
   
 end

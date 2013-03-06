@@ -10,27 +10,11 @@ module Acts
         end
       end
 
-      ACTIONS_AUTHORIZED_BY_TEMP_LINK = [:view, :download]
-
-      ACTIONS_AUTHORIZED_BY_TEMP_LINK.each do |action|
-        eval <<-END_EVAL
-          def can_#{action}? user = User.current_user
-            SpecialAuthCode.current_auth_code.try(:asset) == self or super
-          end
-        END_EVAL
+      module ClassMethods
       end
 
-      module ClassMethods
-        def all_authorized_for action, user=User.current_user, projects=nil
-         authorized_asset = SpecialAuthCode.current_auth_code.try(:asset)
-         super_authed_items = super action, user, projects
-
-         if ACTIONS_AUTHORIZED_BY_TEMP_LINK.include?(action) && authorized_asset && items.include?(authorized_asset) && (projects.blank? || (asset.projects.include? & projects).any?)
-           super_authed_items << authorized_asset unless super_authed_items.include?(authorized_asset)
-         end
-
-         super_authed_items
-        end
+      def auth_by_code? code
+        special_auth_codes.unexpired.collect(&:code).include?(code)
       end
 
     end

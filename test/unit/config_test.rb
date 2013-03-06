@@ -31,9 +31,29 @@ class ConfigTest < ActiveSupport::TestCase
     assert_equal "http://www.youtube.com/user/elinawetschHITS?feature=mhee#p/u", Seek::Config.seek_video_link
   end
 
+  test "external search" do
+    with_config_value :external_search_enabled,true do
+      assert Seek::Config.external_search_enabled
+    end
+
+    with_config_value :external_search_enabled,false do
+      assert !Seek::Config.external_search_enabled
+    end
+
+  end
+
   test "email_enabled" do
     #NOTE: this is the value in seek_testing.rb, the actual default is 'false'
     assert_equal true ,Seek::Config.email_enabled
+  end
+
+  test "pdf_conversion_enabled" do
+    assert_equal true ,Seek::Config.pdf_conversion_enabled
+  end
+
+  test "sample_parser_enabled" do
+    #NOTE: this is the value in seek_testing.rb, the actual default is 'false'
+    assert_equal true ,Seek::Config.sample_parser_enabled
   end
 
   test "smtp_settings port" do
@@ -214,7 +234,7 @@ class ConfigTest < ActiveSupport::TestCase
   end
 
   test "home_description" do
-    assert_equal "Some (configurable) information about the project and what we do goes here.", Seek::Config.home_description
+    assert_equal "You can configure the text that goes here within the Admin pages: Site Configuration->Home page settings.", Seek::Config.home_description
     Seek::Config.home_description = "A new description"
     assert_equal "A new description", Seek::Config.home_description
   end

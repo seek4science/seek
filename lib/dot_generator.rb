@@ -216,6 +216,7 @@ module DotGenerator
     file = File.new(tmpfile.path, 'w')
     file.puts to_dot(root_item, deep, current_item)
     file.close
+
     post_process_svg(`dot -Tsvg #{tmpfile.path}`)
   end
 
@@ -237,6 +238,11 @@ module DotGenerator
     parser = LibXML::XML::Parser.string(svg)
     document = parser.parse
     document.root.namespaces.default_prefix = 'svg'
+
+    #only display svg if number of node > 1
+    number_of_node = document.find("svg:g//svg:g").collect.count
+    return "" if number_of_node <= 1
+
     document.find("svg:g//svg:g").each do |node|
       title = node.find_first("svg:title").content
       unless title.include?("--")
@@ -261,6 +267,11 @@ module DotGenerator
             image_node = LibXML::XML::Node.new("image width=\"14\" height=\"14\" x=\"#{x2.to_f + 5}\" y=\"#{y2.to_f + 5}\" xlink:href=\"#{av_url}\"")
             a<<(rect_node)
             a<<(image_node)
+            a.find(".//svg:text").collect do |node|
+              text_position_x =node.attributes['x'].to_i
+              text_position_x +=10
+              node.attributes['x'] = text_position_x.to_s
+            end
           end
 
         end
@@ -270,6 +281,13 @@ module DotGenerator
     svg_el = document.find_first("//svg:svg")
     svg_el.attributes["width"]="500pt"
     svg = document.to_s
+
+    if (Rails.env == 'test')
+      #strip out the <?xml ..?> as the test parser doesn't like this and spits out millions of warnings
+      svg = svg.gsub(/<\?xml.*\?>/,"")
+    end
+
+    svg
   end
 end
 

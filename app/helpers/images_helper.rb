@@ -74,6 +74,12 @@ module ImagesHelper
       "redmond_studio/arrow-down_16.png"
       when "show"
       "famfamfam_silk/zoom.png"
+      when "zoom_in"
+      "famfamfam_silk/zoom_in.png"
+      when "zoom_out"
+      "famfamfam_silk/zoom_out.png"
+      when "copy"
+        "famfamfam_silk/page_copy.png"
       when "edit"
       "famfamfam_silk/page_white_edit.png"
       when "edit-off"
@@ -210,9 +216,19 @@ module ImagesHelper
       "file_icons/small/gif.png"
       when "png_file"
       "file_icons/small/png.png"
+      when "jpg_file"
+      "file_icons/small/jpg.png"
+      when "bmp_file"
+      "file_icons/small/bmp.png"
+      when "svg_file"
+      "file_icons/small/svg.png"
       when "txt_file"
       "file_icons/small/txt.png"
-      when "investigation_avatar", 'investigation', 'investigations'
+      when "rtf_file"
+      "file_icons/small/rtf.png"
+      when "html_file"
+        "file_icons/small/html.png"
+      when "investigation_avatar", "investigation", "investigations"
       "crystal_project/64x64/apps/mydocuments.png"
       when "study_avatar"
       "crystal_project/64x64/apps/package_editors.png"
@@ -232,6 +248,8 @@ module ImagesHelper
       "institution_64x64.png"
       when "organism_avatar"
       "misc_icons/cell3.png"
+      when 'strain_avatar'
+        "misc_icons/enterococcus_faecalis64-64.jpg"
       when "publication_avatar", "publication", "publications"
      "crystal_project/64x64/mimetypes/wordprocessing.png"
       when "saved_search_avatar","saved_search"
@@ -290,21 +308,35 @@ module ImagesHelper
         "famfamfam_silk/chart_line.png"
       when "graph"
         "famfamfam_silk/chart_line.png"
+      when "import"
+        "famfamfam_silk/page_add.png  "
       when "project_manager"
         "famfamfam_silk/medal_gold_1.png"
       when "asset_manager"
         "famfamfam_silk/medal_bronze_3.png"
       when "gatekeeper"
         "famfamfam_silk/medal_silver_2.png"
+      when "organise"
+        "famfamfam_silk/folder.png"
+      when "search"
+        "famfamfam_silk/eye.png"
+      when "report"
+        "famfamfam_silk/report.png"
       when "jws_shadow"
         "jws/shadow2.gif"
+      when "home"
+        "famfamfam_silk/house.png"
     else
       return nil
     end
   end
+
+  def image key,options={}
+    image_tag(icon_filename_for_key(key),options)
+  end
   
   def help_icon(text, delay=200, extra_style="")
-    image_tag icon_filename_for_key("info"), :alt=>"help", :title=>tooltip_title_attrib(text,delay), :style => "vertical-align: middle;#{extra_style}"
+    image("info", :alt=>"help", :title=>tooltip_title_attrib(text,delay), :style => "vertical-align: middle;#{extra_style}")
   end
   
   def flag_icon(country, text=country, margin_right='0.3em')
@@ -421,11 +453,11 @@ module ImagesHelper
   end
 
   def file_type_icon_key(item)
-    mime_icon_key item.content_type
+    mime_icon_key item.content_blob.try :content_type
   end
 
   def file_type_icon_url(item)
-    mime_icon_url item.content_type
+    mime_icon_url item.content_blob.try :content_type
   end
   
   def expand_image(margin_left="0.3em")
@@ -443,8 +475,6 @@ module ImagesHelper
     image_tag icon_filename_for_key("collapse_minus"),:size=>size,:alt => 'Collapse', :title=>tooltip_title_attrib("Collapse the details")
   end
 
-  def image key,options={}
-    image_tag(icon_filename_for_key(key),options)
-  end
+
   
 end

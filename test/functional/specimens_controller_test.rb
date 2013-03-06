@@ -2,16 +2,19 @@ require "test_helper"
 
 class SpecimensControllerTest < ActionController::TestCase
 
-fixtures :all
+  fixtures :all
   include AuthenticatedTestHelper
   include RestTestCases
   include SharingFormTestHelper
 
   def setup
     login_as :owner_of_fully_public_policy
+  end
+
+  def rest_api_test_object
     @object = Factory(:specimen, :contributor => User.current_user,
-            :title => "test1",
-            :policy => policies(:policy_for_viewable_data_file))
+                      :title => "test1",
+                      :policy => policies(:policy_for_viewable_data_file))
   end
 
   test "index xml validates with schema" do
@@ -215,4 +218,85 @@ test "should update genotypes and phenotypes" do
          updated_phenotypes = [phenotype2, new_phenotype].sort_by(&:id)
          assert_equal updated_phenotypes, updated_specimen.phenotypes.sort_by(&:id)
    end
+
+  test "specimen-sop association when sop has multiple versions" do
+    sop = Factory :sop, :contributor => User.current_user
+    sop_version_2 = Factory(:sop_version, :sop => sop)
+    assert 2, sop.versions.count
+    assert_equal sop.latest_version, sop_version_2
+
+    assert_difference("Specimen.count") do
+      post :create, :specimen => {:title => "running mouse NO.1",
+                                  :organism_id => Factory(:organism).id,
+                                  :lab_internal_number => "Do232",
+                                  :contributor => User.current_user,
+                                  :institution => Factory(:institution),
+                                  :strain => Factory(:strain),
+                                  :project_ids => [Factory(:project).id]},
+                    :specimen_sop_ids => [sop.id]
+
+    end
+    s = assigns(:specimen)
+    assert_redirected_to specimen_path(s)
+    assert_nil flash[:error]
+    assert_equal "running mouse NO.1", s.title
+    assert_equal 1, s.sop_masters.length
+    assert_equal sop, s.sop_masters.map(&:sop).first
+    assert_equal 1, s.sops.length
+    assert_equal sop_version_2, s.sops.first
+  end
+
+  test 'should associate sops' do
+    sop = Factory(:sop, :policy => Factory(:public_policy))
+    specimen= Factory.attributes_for :specimen, :confluency => "Test", :passage => "Test", :viability => "Test", :purity => "Test"
+    specimen[:strain_id]=Factory(:strain).id
+
+    post :create, :specimen => specimen, :specimen_sop_ids => [sop.id]
+    assert specimen = assigns(:specimen)
+
+    assert_redirected_to specimen
+    associated_sops = specimen.sop_masters.collect(&:sop)
+    assert_equal 1, associated_sops.size
+    assert_equal sop, associated_sops.first
+  end
+
+  test 'should unassociate sops' do
+    sop = Factory(:sop, :policy => Factory(:public_policy))
+    specimen = Factory(:specimen)
+    login_as specimen.contributor
+    sop_master = SopSpecimen.create!(:sop_id => sop.id, :sop_version => 1, :specimen_id => specimen.id)
+    specimen.sop_masters << sop_master
+    associated_sops = specimen.sop_masters.collect(&:sop)
+    specimen.reload
+    assert_equal 1, associated_sops.size
+    assert_equal sop, associated_sops.first
+
+    put :update, :id => specimen.id, :specimen_sop_ids => []
+    specimen.reload
+    associated_sops = specimen.sop_masters.collect(&:sop)
+    assert associated_sops.empty?
+    #sop_master can not be deleted because no specified version
+    assert_not_nil SopSpecimen.find_by_id(sop_master.id)
+  end
+
+  test 'should not unassociate private sops' do
+    sop = Factory(:sop, :policy => Factory(:public_policy))
+    specimen = Factory(:specimen)
+    login_as specimen.contributor
+    specimen.sop_masters << SopSpecimen.create!(:sop_id => sop.id, :sop_version => 1, :specimen_id => specimen.id)
+    associated_sops = specimen.sop_masters.collect(&:sop)
+    specimen.reload
+    assert_equal 1, associated_sops.size
+    assert_equal sop, associated_sops.first
+
+    disable_authorization_checks do
+      sop.policy = Factory(:private_policy)
+      sop.save
+    end
+
+    put :update, :id => specimen.id, :specimen_sop_ids => []
+    specimen.reload
+    assert_equal 1, associated_sops.size
+    assert_equal sop, associated_sops.first
+  end
 end

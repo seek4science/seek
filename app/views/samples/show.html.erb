@@ -1,5 +1,7 @@
 <% truncate_length_for_boxes = 22 -%>
 
+<%= render :partial => "layouts/item_title", :locals=>{:item=>@sample} %>
+
 <ul class="sectionIcons">
   <%= render :partial => "subscriptions/subscribe", :locals => { :object => @sample } %>
   <% if @sample.can_manage? %>
@@ -14,10 +16,6 @@
       <li><%= image_tag_for_key('new', new_object_based_on_existing_one_path(:controller_name=>"samples",:id=>@sample.id), nil, nil, 'New sample based on this one') %></li>
   <% end %>
 </ul>
-
-<%= render :partial => "layouts/item_title", :locals=>{:item=>@sample} %>
-
-<%= render :partial => "layouts/usage_info", :locals => { :resource => @sample } -%>
 
 <div class="show_basic">
 
@@ -53,6 +51,10 @@
           </p>
       <% end %>
       <p>
+        <label>Age at sampling:</label>
+        <%= text_or_not_specified @sample.age_at_sampling_info -%>
+      </p>
+      <p>
         <label>Provider name:</label>
         <%= text_or_not_specified @sample.provider_name -%>
       </p>
@@ -67,7 +69,8 @@
       <p>
           <label>Comment:</label>
           <%= text_or_not_specified @sample.comments -%>
-        </p>
+      </p>
+      <%= render :partial => "assets/special_auth_code_display", :locals => {:resource => @sample} %>
     </div>
 
   </div>
@@ -77,7 +80,7 @@
   <div style="clear:both">
     <br/>
     <h2><%= Seek::Config.sample_parent_term.capitalize -%> details</h2>
-
+    <%= render :partial => "layouts/usage_info", :locals => { :resource => @sample.specimen } -%>
     <div class="main_content_left_box_narrower">
       <%= render :partial => "sample_specimen_details", :object => @sample.specimen %>
     </div>
@@ -88,6 +91,8 @@
   <div style="clear:both">
     <br/>
     <%= render :partial => "layouts/items_related_to", :object => @sample %>
+    <br/>
+    <%= render :partial => "layouts/usage_info", :locals => { :resource => @sample } -%>
   </div>
 
 </div>

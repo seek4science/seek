@@ -5,9 +5,9 @@ require 'open-uri'
 
 class DataFuseController < ApplicationController
   include Seek::MimeTypes
-  include Seek::ModelProcessing
+  include Seek::Models::ModelExtraction
   include SysMODB::SpreadsheetExtractor
-  include Seek::DataFuse
+  include Seek::JWS::DataFuse
   
   before_filter :login_required
   before_filter :is_user_admin_auth
@@ -32,14 +32,36 @@ class DataFuseController < ApplicationController
 
   end
 
-  def show
-    xls_types = mime_types_for_extension("xls")
-
-    @data_files=Authorization.authorize_collection("download", DataFile.all, current_user).select do |df|
-      xls_types.include?(df.content_type)
+  def preview_model
+    element=params[:element]
+    model = Model.find_by_id(params[:id])
+    render :update do |page|
+      page.replace_html element, :partial=>"models/resource_list_item", :locals=>{:resource=>model}
     end
+  end
 
-    @models=Authorization.authorize_collection("download", Model.all, current_user).select { |m| @@model_builder.is_sbml?(m) }
+  def preview_data_file
+    element=params[:element]
+    df = DataFile.find_by_id(params[:id])
+    render :update do |page|
+      page.replace_html element, :partial=>"data_files/resource_list_item", :locals=>{:resource=>df}
+    end
+  end
+
+
+
+  def matching_data_files
+    element=params[:element]
+    model = Model.find_by_id(params[:id])
+
+    @matching_data_files = model.matching_data_files(true)
+    render :update do |page|
+      page.replace_html element, :partial=>"matching_data_select"
+    end
+  end
+
+  def show
+    @models=Model.all.select{|m| m.can_download? && m.is_jws_supported?}
     respond_to do |format|
       format.html
     end
@@ -69,7 +91,7 @@ class DataFuseController < ApplicationController
     #FIXME: temporary way of making sure it isn't exploited to get at data. Should never get here if used through the UI
     raise Exception.new("Unauthorized") unless @model.can_download?
 
-    Seek::CSVHandler.resolve_model_parameter_keys parameter_keys,csv
+    resolve_model_parameter_keys parameter_keys,csv
     
   end
 
@@ -124,6 +146,42 @@ class DataFuseController < ApplicationController
     respond_to do |format|
       format.html
     end
+  end
+
+  def resolve_model_parameter_keys parameter_keys, csv
+
+    matching_columns = {}
+    matched_keys = []
+    matching_csv = []
+
+    FasterCSV.parse(csv).each do |row|
+      matched_row = []
+      row.each_with_index do |v, i|
+        if matching_columns[i]
+          matched_row << v
+        end
+        k = matching_key? parameter_keys, v
+        if k
+          matched_row << k
+          matching_columns[i]=k
+          matched_keys << k
+        end
+      end
+      matching_csv << matched_row unless matched_row.empty?
+    end
+
+    result = FasterCSV.generate do |out|
+      matching_csv.each do |row|
+        out << row
+      end
+    end
+
+    return result, matched_keys
+
+  end
+
+  def matching_key? parameter_keys, v
+    v if parameter_keys.include?(v)
   end
 
 end

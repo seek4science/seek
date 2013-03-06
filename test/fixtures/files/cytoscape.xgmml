@@ -1,0 +1,552 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<graph label="Cytoscape Web" directed="1" Graphic="1" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:cy="http://www.cytoscape.org" xmlns="http://www.cs.rpi.edu/XGMML">
+  <att name="documentVersion" value="0.1"/>
+  <att type="string" name="backgroundColor" value="#ffffff"/>
+  <att type="real" name="GRAPH_VIEW_ZOOM" value="1"/>
+  <att type="real" name="GRAPH_VIEW_CENTER_X" value="450.55"/>
+  <att type="real" name="GRAPH_VIEW_CENTER_Y" value="306.1"/>
+  <node name="" label="CHEMBL568574" id="-32">
+    <att name="Smiles" type="string" value="'O"/>
+    <att name="canonicalName" type="string" value="CHEMBL568574"/>
+    <att name="Type" type="string" value="Inactive"/>
+    <graphics x="205" y="422.8" h="40" labelanchor="c" type="ELLIPSE" cy:nodeLabelFont="SansSerif-0-12" w="40" width="0" outline="#666666" fill="#deb887" cy:nodeTransparency="0.392156862745098"/>
+  </node>
+  <node name="" label="CHEMBL300015" id="-31">
+    <att name="Smiles" type="string" value="'O"/>
+    <att name="canonicalName" type="string" value="CHEMBL300015"/>
+    <att name="Type" type="string" value="Inactive"/>
+    <graphics x="339.1" y="579.5" h="40" labelanchor="c" type="ELLIPSE" cy:nodeLabelFont="SansSerif-0-12" w="39.99993896484375" width="0" outline="#666666" fill="#deb887" cy:nodeTransparency="0.392156862745098"/>
+  </node>
+  <node name="" label="MTOR" id="-13">
+    <att name="canonicalName" type="string" value="MTOR"/>
+    <att name="Uniprot" type="string" value="P42345"/>
+    <att name="Type" type="string" value="Off-Target_Protein"/>
+    <graphics x="724.0999999999999" y="178.54999999999998" h="40" labelanchor="c" type="ELLIPSE" cy:nodeLabelFont="SansSerif-0-12" w="39.999969482421875" width="0" outline="#666666" fill="#0198e1" cy:nodeTransparency="0.392156862745098"/>
+  </node>
+  <node name="" label="Pik3ca" id="-16">
+    <att name="canonicalName" type="string" value="Pik3ca"/>
+    <att name="Uniprot" type="string" value="P42337"/>
+    <att name="Type" type="string" value="Off-Target_Protein"/>
+    <graphics x="396.5" y="187.79999999999998" h="40" labelanchor="c" type="ELLIPSE" cy:nodeLabelFont="SansSerif-0-12" w="40" width="0" outline="#666666" fill="#0198e1" cy:nodeTransparency="0.392156862745098"/>
+  </node>
+  <node name="" label="PDE3B" id="-37">
+    <att name="canonicalName" type="string" value="PDE3B"/>
+    <att name="Uniprot" type="string" value="Q13370"/>
+    <att name="Type" type="string" value="Non-binder"/>
+    <graphics x="358.85" y="123.94999999999999" h="40.00001525878906" labelanchor="c" type="ELLIPSE" cy:nodeLabelFont="SansSerif-0-12" w="39.999908447265625" width="0" outline="#666666" fill="#adadad" cy:nodeTransparency="0.392156862745098"/>
+  </node>
+  <node name="" label="GSK3B" id="-10">
+    <att name="canonicalName" type="string" value="GSK3B"/>
+    <att name="Uniprot" type="string" value="P49841"/>
+    <att name="Type" type="string" value="Off-Target_Protein"/>
+    <graphics x="697.4000000000001" y="306.3" h="40" labelanchor="c" type="ELLIPSE" cy:nodeLabelFont="SansSerif-0-12" w="40.000030517578125" width="0" outline="#666666" fill="#0198e1" cy:nodeTransparency="0.392156862745098"/>
+  </node>
+  <node name="" label="CHEMBL52450" id="-30">
+    <att name="Smiles" type="string" value="'O"/>
+    <att name="canonicalName" type="string" value="CHEMBL52450"/>
+    <att name="Type" type="string" value="Inactive"/>
+    <graphics x="282.20000000000005" y="299.8" h="40.000030517578125" labelanchor="c" type="ELLIPSE" cy:nodeLabelFont="SansSerif-0-12" w="40" width="0" outline="#666666" fill="#deb887" cy:nodeTransparency="0.392156862745098"/>
+  </node>
+  <node name="" label="CHEMBL98350" id="-17">
+    <att name="Smiles" type="string" value="'O"/>
+    <att name="canonicalName" type="string" value="CHEMBL98350"/>
+    <att name="Type" type="string" value="Active"/>
+    <graphics x="46.5" y="22" h="40" labelanchor="c" type="ELLIPSE" cy:nodeLabelFont="SansSerif-0-12" w="40" width="0" outline="#666666" fill="#00cd66" cy:nodeTransparency="0.392156862745098"/>
+  </node>
+  <node name="" label="CHEMBL565432" id="-29">
+    <att name="Smiles" type="string" value="'O"/>
+    <att name="canonicalName" type="string" value="CHEMBL565432"/>
+    <att name="Type" type="string" value="Inactive"/>
+    <graphics x="339" y="516.75" h="40" labelanchor="c" type="ELLIPSE" cy:nodeLabelFont="SansSerif-0-12" w="40" width="0" outline="#666666" fill="#deb887" cy:nodeTransparency="0.392156862745098"/>
+  </node>
+  <node name="" label="CHEMBL577499" id="-28">
+    <att name="Smiles" type="string" value="'O"/>
+    <att name="canonicalName" type="string" value="CHEMBL577499"/>
+    <att name="Type" type="string" value="Inactive"/>
+    <graphics x="415.4" y="564.2" h="40" labelanchor="c" type="ELLIPSE" cy:nodeLabelFont="SansSerif-0-12" w="40" width="0" outline="#666666" fill="#deb887" cy:nodeTransparency="0.392156862745098"/>
+  </node>
+  <node name="" label="PIK3C2B" id="-12">
+    <att name="canonicalName" type="string" value="PIK3C2B"/>
+    <att name="Uniprot" type="string" value="O00750"/>
+    <att name="Type" type="string" value="Off-Target_Protein"/>
+    <graphics x="661.25" y="77" h="40" labelanchor="c" type="ELLIPSE" cy:nodeLabelFont="SansSerif-0-12" w="40" width="0" outline="#666666" fill="#0198e1" cy:nodeTransparency="0.392156862745098"/>
+  </node>
+  <node name="" label="CHEMBL566046" id="-11">
+    <att name="Smiles" type="string" value="'O"/>
+    <att name="canonicalName" type="string" value="CHEMBL566046"/>
+    <att name="Type" type="string" value="Active"/>
+    <graphics x="411.95000000000005" y="315.85" h="40" labelanchor="c" type="ELLIPSE" cy:nodeLabelFont="SansSerif-0-12" w="40" width="0" outline="#666666" fill="#00cd66" cy:nodeTransparency="0.392156862745098"/>
+  </node>
+  <node name="" label="CHEMBL265376" id="-27">
+    <att name="Smiles" type="string" value="'O"/>
+    <att name="canonicalName" type="string" value="CHEMBL265376"/>
+    <att name="Type" type="string" value="Inactive"/>
+    <graphics x="484.7" y="509.5" h="40" labelanchor="c" type="ELLIPSE" cy:nodeLabelFont="SansSerif-0-12" w="40" width="0" outline="#666666" fill="#deb887" cy:nodeTransparency="0.392156862745098"/>
+  </node>
+  <node name="" label="P42337" id="-5">
+    <att name="canonicalName" type="string" value="P42337"/>
+    <att name="Uniprot" type="string" value="P42337"/>
+    <att name="Type" type="string" value="QueryProtein"/>
+    <graphics x="387.65" y="435.3" h="40" labelanchor="c" type="ELLIPSE" cy:nodeLabelFont="SansSerif-0-12" w="40.00001525878906" width="0" outline="#666666" fill="#23238e" cy:nodeTransparency="0.392156862745098"/>
+  </node>
+  <node name="" label="PIM1" id="-3">
+    <att name="canonicalName" type="string" value="PIM1"/>
+    <att name="Uniprot" type="string" value="P11309"/>
+    <att name="Type" type="string" value="Off-Target_Protein"/>
+    <graphics x="664.6" y="217.65" h="40" labelanchor="c" type="ELLIPSE" cy:nodeLabelFont="SansSerif-0-12" w="40" width="0" outline="#666666" fill="#0198e1" cy:nodeTransparency="0.392156862745098"/>
+  </node>
+  <node name="" label="PIM3" id="-2">
+    <att name="canonicalName" type="string" value="PIM3"/>
+    <att name="Uniprot" type="string" value="Q86V86"/>
+    <att name="Type" type="string" value="Off-Target_Protein"/>
+    <graphics x="573.6500000000001" y="88.7" h="40" labelanchor="c" type="ELLIPSE" cy:nodeLabelFont="SansSerif-0-12" w="40" width="0" outline="#666666" fill="#0198e1" cy:nodeTransparency="0.392156862745098"/>
+  </node>
+  <node name="" label="PIK3R1" id="-8">
+    <att name="canonicalName" type="string" value="PIK3R1"/>
+    <att name="Uniprot" type="string" value="P27986"/>
+    <att name="Type" type="string" value="Off-Target_Protein"/>
+    <graphics x="428.20000000000005" y="90.94999999999999" h="40" labelanchor="c" type="ELLIPSE" cy:nodeLabelFont="SansSerif-0-12" w="40.00001525878906" width="0" outline="#666666" fill="#0198e1" cy:nodeTransparency="0.392156862745098"/>
+  </node>
+  <node name="" label="CHEMBL52389" id="-26">
+    <att name="Smiles" type="string" value="'O"/>
+    <att name="canonicalName" type="string" value="CHEMBL52389"/>
+    <att name="Type" type="string" value="Inactive"/>
+    <graphics x="264.45" y="373.85" h="40" labelanchor="c" type="ELLIPSE" cy:nodeLabelFont="SansSerif-0-12" w="40" width="0" outline="#666666" fill="#deb887" cy:nodeTransparency="0.392156862745098"/>
+  </node>
+  <node name="" label="CHEMBL101903" id="-25">
+    <att name="Smiles" type="string" value="'O"/>
+    <att name="canonicalName" type="string" value="CHEMBL101903"/>
+    <att name="Type" type="string" value="Inactive"/>
+    <graphics x="422.65" y="496.05" h="40" labelanchor="c" type="ELLIPSE" cy:nodeLabelFont="SansSerif-0-12" w="40" width="0" outline="#666666" fill="#deb887" cy:nodeTransparency="0.392156862745098"/>
+  </node>
+  <node name="" label="PIK3CD" id="-7">
+    <att name="canonicalName" type="string" value="PIK3CD"/>
+    <att name="Uniprot" type="string" value="O00329"/>
+    <att name="Type" type="string" value="Off-Target_Protein"/>
+    <graphics x="448.35" y="218.9" h="40" labelanchor="c" type="ELLIPSE" cy:nodeLabelFont="SansSerif-0-12" w="40" width="0" outline="#666666" fill="#0198e1" cy:nodeTransparency="0.392156862745098"/>
+  </node>
+  <node name="" label="PIK3CB" id="-6">
+    <att name="canonicalName" type="string" value="PIK3CB"/>
+    <att name="Uniprot" type="string" value="P42338"/>
+    <att name="Type" type="string" value="Off-Target_Protein"/>
+    <graphics x="485.40000000000003" y="255.85" h="39.999969482421875" labelanchor="c" type="ELLIPSE" cy:nodeLabelFont="SansSerif-0-12" w="40" width="0" outline="#666666" fill="#0198e1" cy:nodeTransparency="0.392156862745098"/>
+  </node>
+  <node name="" label="PIK3CA" id="-14">
+    <att name="canonicalName" type="string" value="PIK3CA"/>
+    <att name="Uniprot" type="string" value="P32871"/>
+    <att name="Type" type="string" value="Off-Target_Protein"/>
+    <graphics x="621.45" y="280.2" h="40" labelanchor="c" type="ELLIPSE" cy:nodeLabelFont="SansSerif-0-12" w="40" width="0" outline="#666666" fill="#0198e1" cy:nodeTransparency="0.392156862745098"/>
+  </node>
+  <node name="" label="CHEMBL567914" id="-24">
+    <att name="Smiles" type="string" value="'O"/>
+    <att name="canonicalName" type="string" value="CHEMBL567914"/>
+    <att name="Type" type="string" value="Inactive"/>
+    <graphics x="268.8" y="545.0500000000001" h="40" labelanchor="c" type="ELLIPSE" cy:nodeLabelFont="SansSerif-0-12" w="40" width="0" outline="#666666" fill="#deb887" cy:nodeTransparency="0.392156862745098"/>
+  </node>
+  <node name="" label="CHEMBL437770" id="-1">
+    <att name="Smiles" type="string" value="'O"/>
+    <att name="canonicalName" type="string" value="CHEMBL437770"/>
+    <att name="Type" type="string" value="Active"/>
+    <graphics x="360.25" y="275.75" h="40.000030517578125" labelanchor="c" type="ELLIPSE" cy:nodeLabelFont="SansSerif-0-12" w="40" width="0" outline="#666666" fill="#00cd66" cy:nodeTransparency="0.392156862745098"/>
+  </node>
+  <node name="" label="CHEMBL102074" id="-23">
+    <att name="Smiles" type="string" value="'O"/>
+    <att name="canonicalName" type="string" value="CHEMBL102074"/>
+    <att name="Type" type="string" value="Inactive"/>
+    <graphics x="211.10000000000002" y="491.15000000000003" h="40" labelanchor="c" type="ELLIPSE" cy:nodeLabelFont="SansSerif-0-12" w="40" width="0" outline="#666666" fill="#deb887" cy:nodeTransparency="0.392156862745098"/>
+  </node>
+  <node name="" label="PIK3CG" id="-15">
+    <att name="canonicalName" type="string" value="PIK3CG"/>
+    <att name="Uniprot" type="string" value="P48736"/>
+    <att name="Type" type="string" value="Off-Target_Protein"/>
+    <graphics x="687.6500000000001" y="146.2" h="39.99994659423828" labelanchor="c" type="ELLIPSE" cy:nodeLabelFont="SansSerif-0-12" w="39.99993896484375" width="0" outline="#666666" fill="#0198e1" cy:nodeTransparency="0.392156862745098"/>
+  </node>
+  <node name="" label="CHEMBL579219" id="-22">
+    <att name="Smiles" type="string" value="'O"/>
+    <att name="canonicalName" type="string" value="CHEMBL579219"/>
+    <att name="Type" type="string" value="Inactive"/>
+    <graphics x="207.65" y="347.85" h="40" labelanchor="c" type="ELLIPSE" cy:nodeLabelFont="SansSerif-0-12" w="40" width="0" outline="#666666" fill="#deb887" cy:nodeTransparency="0.392156862745098"/>
+  </node>
+  <node name="" label="ATR" id="-36">
+    <att name="canonicalName" type="string" value="ATR"/>
+    <att name="Uniprot" type="string" value="Q13535"/>
+    <att name="Type" type="string" value="Non-binder"/>
+    <graphics x="539.4000000000001" y="32.7" h="40" labelanchor="c" type="ELLIPSE" cy:nodeLabelFont="SansSerif-0-12" w="40" width="0" outline="#666666" fill="#adadad" cy:nodeTransparency="0.392156862745098"/>
+  </node>
+  <node name="" label="CHEMBL323313" id="-21">
+    <att name="Smiles" type="string" value="'O"/>
+    <att name="canonicalName" type="string" value="CHEMBL323313"/>
+    <att name="Type" type="string" value="Inactive"/>
+    <graphics x="272.9" y="470.3" h="40" labelanchor="c" type="ELLIPSE" cy:nodeLabelFont="SansSerif-0-12" w="40" width="0" outline="#666666" fill="#deb887" cy:nodeTransparency="0.392156862745098"/>
+  </node>
+  <node name="" label="PRKDC" id="-18">
+    <att name="canonicalName" type="string" value="PRKDC"/>
+    <att name="Uniprot" type="string" value="P78527"/>
+    <att name="Type" type="string" value="Off-Target_Protein"/>
+    <graphics x="492.1" y="37.1" h="40" labelanchor="c" type="ELLIPSE" cy:nodeLabelFont="SansSerif-0-12" w="40" width="0" outline="#666666" fill="#0198e1" cy:nodeTransparency="0.392156862745098"/>
+  </node>
+  <node name="" label="Unspecified" id="-9">
+    <att name="canonicalName" type="string" value="Unspecified"/>
+    <att name="Uniprot" type="string" value="Unspecified"/>
+    <att name="Type" type="string" value="Off-Target_Protein"/>
+    <graphics x="541.6" y="315.3" h="40" labelanchor="c" type="ELLIPSE" cy:nodeLabelFont="SansSerif-0-12" w="40" width="0" outline="#666666" fill="#0198e1" cy:nodeTransparency="0.392156862745098"/>
+  </node>
+  <node name="" label="ATM" id="-35">
+    <att name="canonicalName" type="string" value="ATM"/>
+    <att name="Uniprot" type="string" value="Q13315"/>
+    <att name="Type" type="string" value="Non-binder"/>
+    <graphics x="620.8" y="33.7" h="40" labelanchor="c" type="ELLIPSE" cy:nodeLabelFont="SansSerif-0-12" w="40" width="0" outline="#666666" fill="#adadad" cy:nodeTransparency="0.392156862745098"/>
+  </node>
+  <node name="" label="PLK3" id="-19">
+    <att name="canonicalName" type="string" value="PLK3"/>
+    <att name="Uniprot" type="string" value="Q9H4B4"/>
+    <att name="Type" type="string" value="Off-Target_Protein"/>
+    <graphics x="490.6" y="110.19999999999999" h="40.00001525878906" labelanchor="c" type="ELLIPSE" cy:nodeLabelFont="SansSerif-0-12" w="40" width="0" outline="#666666" fill="#0198e1" cy:nodeTransparency="0.392156862745098"/>
+  </node>
+  <node name="" label="PDE3A" id="-34">
+    <att name="canonicalName" type="string" value="PDE3A"/>
+    <att name="Uniprot" type="string" value="Q14432"/>
+    <att name="Type" type="string" value="Non-binder"/>
+    <graphics x="716.3" y="252.5" h="40" labelanchor="c" type="ELLIPSE" cy:nodeLabelFont="SansSerif-0-12" w="39.999969482421875" width="0" outline="#666666" fill="#adadad" cy:nodeTransparency="0.392156862745098"/>
+  </node>
+  <node name="" label="PLK1" id="-4">
+    <att name="canonicalName" type="string" value="PLK1"/>
+    <att name="Uniprot" type="string" value="P53350"/>
+    <att name="Type" type="string" value="Off-Target_Protein"/>
+    <graphics x="696.55" y="101.1" h="39.99996566772461" labelanchor="c" type="ELLIPSE" cy:nodeLabelFont="SansSerif-0-12" w="39.99993896484375" width="0" outline="#666666" fill="#0198e1" cy:nodeTransparency="0.392156862745098"/>
+  </node>
+  <node name="" label="PDE2A" id="-33">
+    <att name="canonicalName" type="string" value="PDE2A"/>
+    <att name="Uniprot" type="string" value="O00408"/>
+    <att name="Type" type="string" value="Non-binder"/>
+    <graphics x="594" y="339.15000000000003" h="40" labelanchor="c" type="ELLIPSE" cy:nodeLabelFont="SansSerif-0-12" w="40" width="0" outline="#666666" fill="#adadad" cy:nodeTransparency="0.392156862745098"/>
+  </node>
+  <node name="" label="CHEMBL268039" id="-20">
+    <att name="Smiles" type="string" value="'O"/>
+    <att name="canonicalName" type="string" value="CHEMBL268039"/>
+    <att name="Type" type="string" value="Inactive"/>
+    <graphics x="479.6" y="430.65000000000003" h="40" labelanchor="c" type="ELLIPSE" cy:nodeLabelFont="SansSerif-0-12" w="40" width="0" outline="#666666" fill="#deb887" cy:nodeTransparency="0.392156862745098"/>
+  </node>
+  <edge directed="true" label="CHEMBL98350 (ni) Unspecified" id="1" source="-17" target="-9">
+    <att name="BindingAffinity(IC50) (class=Double)" type="integer" value="37000"/>
+    <att name="canonicalName" type="string" value="CHEMBL98350 (ni) Unspecified"/>
+    <att name="EvidenceType" type="string" value="IC50"/>
+    <att name="interaction" type="string" value="ni"/>
+    <graphics cy:edgeLineType="SOLID" width="1" cy:targetArrowColor="#000000" cy:sourceArrow="0" fill="#adadad" cy:targetArrow="0" cy:sourceArrowColor="#000000"/>
+  </edge>
+  <edge directed="true" label="CHEMBL98350 (ni) PDE3A" id="2" source="-17" target="-34">
+    <att name="BindingAffinity(IC50) (class=Double)" type="integer" value="100000"/>
+    <att name="canonicalName" type="string" value="CHEMBL98350 (ni) PDE3A"/>
+    <att name="EvidenceType" type="string" value="IC50"/>
+    <att name="interaction" type="string" value="ni"/>
+    <graphics cy:edgeLineType="SOLID" width="1" cy:targetArrowColor="#000000" cy:sourceArrow="0" fill="#adadad" cy:targetArrow="0" cy:sourceArrowColor="#000000"/>
+  </edge>
+  <edge directed="true" label="CHEMBL98350 (ni) PLK3" id="3" source="-17" target="-19">
+    <att name="BindingAffinity(IC50) (class=Double)" type="integer" value="88000"/>
+    <att name="canonicalName" type="string" value="CHEMBL98350 (ni) PLK3"/>
+    <att name="EvidenceType" type="string" value="IC50"/>
+    <att name="interaction" type="string" value="ni"/>
+    <graphics cy:edgeLineType="SOLID" width="1" cy:targetArrowColor="#000000" cy:sourceArrow="0" fill="#adadad" cy:targetArrow="0" cy:sourceArrowColor="#000000"/>
+  </edge>
+  <edge directed="true" label="CHEMBL98350 (ni) ATM" id="4" source="-17" target="-35">
+    <att name="BindingAffinity(IC50) (class=Double)" type="integer" value="100000"/>
+    <att name="canonicalName" type="string" value="CHEMBL98350 (ni) ATM"/>
+    <att name="EvidenceType" type="string" value="IC50"/>
+    <att name="interaction" type="string" value="ni"/>
+    <graphics cy:edgeLineType="SOLID" width="1" cy:targetArrowColor="#000000" cy:sourceArrow="0" fill="#adadad" cy:targetArrow="0" cy:sourceArrowColor="#000000"/>
+  </edge>
+  <edge directed="true" label="CHEMBL98350 (ni) PDE3B" id="5" source="-17" target="-37">
+    <att name="BindingAffinity(IC50) (class=Double)" type="integer" value="100000"/>
+    <att name="canonicalName" type="string" value="CHEMBL98350 (ni) PDE3B"/>
+    <att name="EvidenceType" type="string" value="IC50"/>
+    <att name="interaction" type="string" value="ni"/>
+    <graphics cy:edgeLineType="SOLID" width="1" cy:targetArrowColor="#000000" cy:sourceArrow="0" fill="#adadad" cy:targetArrow="0" cy:sourceArrowColor="#000000"/>
+  </edge>
+  <edge directed="true" label="CHEMBL98350 (ni) PDE2A" id="6" source="-17" target="-33">
+    <att name="BindingAffinity(IC50) (class=Double)" type="integer" value="40000"/>
+    <att name="canonicalName" type="string" value="CHEMBL98350 (ni) PDE2A"/>
+    <att name="EvidenceType" type="string" value="IC50"/>
+    <att name="interaction" type="string" value="ni"/>
+    <graphics cy:edgeLineType="SOLID" width="1" cy:targetArrowColor="#000000" cy:sourceArrow="0" fill="#adadad" cy:targetArrow="0" cy:sourceArrowColor="#000000"/>
+  </edge>
+  <edge directed="true" label="CHEMBL98350 (ni) ATR" id="7" source="-17" target="-36">
+    <att name="BindingAffinity(IC50) (class=Double)" type="integer" value="100000"/>
+    <att name="canonicalName" type="string" value="CHEMBL98350 (ni) ATR"/>
+    <att name="EvidenceType" type="string" value="IC50"/>
+    <att name="interaction" type="string" value="ni"/>
+    <graphics cy:edgeLineType="SOLID" width="1" cy:targetArrowColor="#000000" cy:sourceArrow="0" fill="#adadad" cy:targetArrow="0" cy:sourceArrowColor="#000000"/>
+  </edge>
+  <edge directed="true" label="CHEMBL98350 (mp) PIK3C2B" id="8" source="-17" target="-12">
+    <att name="BindingAffinity(IC50) (class=Double)" type="integer" value="2100"/>
+    <att name="canonicalName" type="string" value="CHEMBL98350 (mp) PIK3C2B"/>
+    <att name="EvidenceType" type="string" value="IC50"/>
+    <att name="interaction" type="string" value="mp"/>
+    <graphics cy:edgeLineType="SOLID" width="6" cy:targetArrowColor="#000000" cy:sourceArrow="0" fill="#0198e1" cy:targetArrow="0" cy:sourceArrowColor="#000000"/>
+  </edge>
+  <edge directed="true" label="CHEMBL98350 (mp) PIK3CG" id="9" source="-17" target="-15">
+    <att name="BindingAffinity(IC50) (class=Double)" type="integer" value="1200"/>
+    <att name="canonicalName" type="string" value="CHEMBL98350 (mp) PIK3CG"/>
+    <att name="EvidenceType" type="string" value="IC50"/>
+    <att name="interaction" type="string" value="mp"/>
+    <graphics cy:edgeLineType="SOLID" width="6" cy:targetArrowColor="#000000" cy:sourceArrow="0" fill="#0198e1" cy:targetArrow="0" cy:sourceArrowColor="#000000"/>
+  </edge>
+  <edge directed="true" label="CHEMBL98350 (mp) PIM3" id="10" source="-17" target="-2">
+    <att name="BindingAffinity(IC50) (class=Double)" type="integer" value="1400"/>
+    <att name="canonicalName" type="string" value="CHEMBL98350 (mp) PIM3"/>
+    <att name="EvidenceType" type="string" value="IC50"/>
+    <att name="interaction" type="string" value="mp"/>
+    <graphics cy:edgeLineType="SOLID" width="6" cy:targetArrowColor="#000000" cy:sourceArrow="0" fill="#0198e1" cy:targetArrow="0" cy:sourceArrowColor="#000000"/>
+  </edge>
+  <edge directed="true" label="CHEMBL98350 (mp) PIK3CD" id="11" source="-17" target="-7">
+    <att name="BindingAffinity(IC50) (class=Double)" type="integer" value="1400"/>
+    <att name="canonicalName" type="string" value="CHEMBL98350 (mp) PIK3CD"/>
+    <att name="EvidenceType" type="string" value="IC50"/>
+    <att name="interaction" type="string" value="mp"/>
+    <graphics cy:edgeLineType="SOLID" width="6" cy:targetArrowColor="#000000" cy:sourceArrow="0" fill="#0198e1" cy:targetArrow="0" cy:sourceArrowColor="#000000"/>
+  </edge>
+  <edge directed="true" label="CHEMBL98350 (mp) PLK1" id="12" source="-17" target="-4">
+    <att name="BindingAffinity(IC50) (class=Double)" type="integer" value="2100"/>
+    <att name="canonicalName" type="string" value="CHEMBL98350 (mp) PLK1"/>
+    <att name="EvidenceType" type="string" value="IC50"/>
+    <att name="interaction" type="string" value="mp"/>
+    <graphics cy:edgeLineType="SOLID" width="6" cy:targetArrowColor="#000000" cy:sourceArrow="0" fill="#0198e1" cy:targetArrow="0" cy:sourceArrowColor="#000000"/>
+  </edge>
+  <edge directed="true" label="CHEMBL98350 (mp) MTOR" id="13" source="-17" target="-13">
+    <att name="BindingAffinity(IC50) (class=Double)" type="integer" value="3018"/>
+    <att name="canonicalName" type="string" value="CHEMBL98350 (mp) MTOR"/>
+    <att name="EvidenceType" type="string" value="IC50"/>
+    <att name="interaction" type="string" value="mp"/>
+    <graphics cy:edgeLineType="SOLID" width="5" cy:targetArrowColor="#000000" cy:sourceArrow="0" fill="#0198e1" cy:targetArrow="0" cy:sourceArrowColor="#000000"/>
+  </edge>
+  <edge directed="true" label="CHEMBL98350 (mp) PIK3R1" id="14" source="-17" target="-8">
+    <att name="BindingAffinity(IC50) (class=Double)" type="integer" value="1400"/>
+    <att name="canonicalName" type="string" value="CHEMBL98350 (mp) PIK3R1"/>
+    <att name="EvidenceType" type="string" value="IC50"/>
+    <att name="interaction" type="string" value="mp"/>
+    <graphics cy:edgeLineType="SOLID" width="6" cy:targetArrowColor="#000000" cy:sourceArrow="0" fill="#0198e1" cy:targetArrow="0" cy:sourceArrowColor="#000000"/>
+  </edge>
+  <edge directed="true" label="CHEMBL98350 (mp) PRKDC" id="15" source="-17" target="-18">
+    <att name="BindingAffinity(IC50) (class=Double)" type="integer" value="1600"/>
+    <att name="canonicalName" type="string" value="CHEMBL98350 (mp) PRKDC"/>
+    <att name="EvidenceType" type="string" value="IC50"/>
+    <att name="interaction" type="string" value="mp"/>
+    <graphics cy:edgeLineType="SOLID" width="6" cy:targetArrowColor="#000000" cy:sourceArrow="0" fill="#0198e1" cy:targetArrow="0" cy:sourceArrowColor="#000000"/>
+  </edge>
+  <edge directed="true" label="CHEMBL98350 (mp) Pik3ca" id="16" source="-17" target="-16">
+    <att name="BindingAffinity(IC50) (class=Double)" type="integer" value="500"/>
+    <att name="canonicalName" type="string" value="CHEMBL98350 (mp) Pik3ca"/>
+    <att name="EvidenceType" type="string" value="IC50"/>
+    <att name="interaction" type="string" value="mp"/>
+    <graphics cy:edgeLineType="SOLID" width="7" cy:targetArrowColor="#000000" cy:sourceArrow="0" fill="#0198e1" cy:targetArrow="0" cy:sourceArrowColor="#000000"/>
+  </edge>
+  <edge directed="true" label="CHEMBL98350 (mp) PIK3CB" id="17" source="-17" target="-6">
+    <att name="BindingAffinity(IC50) (class=Double)" type="integer" value="1400"/>
+    <att name="canonicalName" type="string" value="CHEMBL98350 (mp) PIK3CB"/>
+    <att name="EvidenceType" type="string" value="IC50"/>
+    <att name="interaction" type="string" value="mp"/>
+    <graphics cy:edgeLineType="SOLID" width="6" cy:targetArrowColor="#000000" cy:sourceArrow="0" fill="#0198e1" cy:targetArrow="0" cy:sourceArrowColor="#000000"/>
+  </edge>
+  <edge directed="true" label="CHEMBL98350 (mp) PLK3" id="18" source="-17" target="-19">
+    <att name="BindingAffinity(IC50) (class=Double)" type="integer" value="3000"/>
+    <att name="canonicalName" type="string" value="CHEMBL98350 (mp) PLK3"/>
+    <att name="EvidenceType" type="string" value="IC50"/>
+    <att name="interaction" type="string" value="mp"/>
+    <graphics cy:edgeLineType="SOLID" width="5" cy:targetArrowColor="#000000" cy:sourceArrow="0" fill="#0198e1" cy:targetArrow="0" cy:sourceArrowColor="#000000"/>
+  </edge>
+  <edge directed="true" label="CHEMBL98350 (mp) GSK3B" id="19" source="-17" target="-10">
+    <att name="BindingAffinity(IC50) (class=Double)" type="integer" value="8100"/>
+    <att name="canonicalName" type="string" value="CHEMBL98350 (mp) GSK3B"/>
+    <att name="EvidenceType" type="string" value="IC50"/>
+    <att name="interaction" type="string" value="mp"/>
+    <graphics cy:edgeLineType="SOLID" width="3" cy:targetArrowColor="#000000" cy:sourceArrow="0" fill="#0198e1" cy:targetArrow="0" cy:sourceArrowColor="#000000"/>
+  </edge>
+  <edge directed="true" label="CHEMBL98350 (mp) PIM1" id="20" source="-17" target="-3">
+    <att name="BindingAffinity(IC50) (class=Double)" type="integer" value="4000"/>
+    <att name="canonicalName" type="string" value="CHEMBL98350 (mp) PIM1"/>
+    <att name="EvidenceType" type="string" value="IC50"/>
+    <att name="interaction" type="string" value="mp"/>
+    <graphics cy:edgeLineType="SOLID" width="5" cy:targetArrowColor="#000000" cy:sourceArrow="0" fill="#0198e1" cy:targetArrow="0" cy:sourceArrowColor="#000000"/>
+  </edge>
+  <edge directed="true" label="CHEMBL98350 (mp) PIK3CA" id="21" source="-17" target="-14">
+    <att name="BindingAffinity(IC50) (class=Double)" type="integer" value="630"/>
+    <att name="canonicalName" type="string" value="CHEMBL98350 (mp) PIK3CA"/>
+    <att name="EvidenceType" type="string" value="IC50"/>
+    <att name="interaction" type="string" value="mp"/>
+    <graphics cy:edgeLineType="SOLID" width="7" cy:targetArrowColor="#000000" cy:sourceArrow="0" fill="#0198e1" cy:targetArrow="0" cy:sourceArrowColor="#000000"/>
+  </edge>
+  <edge directed="true" label="CHEMBL98350 (mp) Unspecified" id="22" source="-17" target="-9">
+    <att name="BindingAffinity(IC50) (class=Double)" type="integer" value="8400"/>
+    <att name="canonicalName" type="string" value="CHEMBL98350 (mp) Unspecified"/>
+    <att name="EvidenceType" type="string" value="IC50"/>
+    <att name="interaction" type="string" value="mp"/>
+    <graphics cy:edgeLineType="SOLID" width="2" cy:targetArrowColor="#000000" cy:sourceArrow="0" fill="#0198e1" cy:targetArrow="0" cy:sourceArrowColor="#000000"/>
+  </edge>
+  <edge directed="true" label="CHEMBL566046 (mp) Pik3ca" id="23" source="-11" target="-16">
+    <att name="BindingAffinity(IC50) (class=Double)" type="integer" value="900"/>
+    <att name="canonicalName" type="string" value="CHEMBL566046 (mp) Pik3ca"/>
+    <att name="EvidenceType" type="string" value="IC50"/>
+    <att name="interaction" type="string" value="mp"/>
+    <graphics cy:edgeLineType="SOLID" width="7" cy:targetArrowColor="#000000" cy:sourceArrow="0" fill="#0198e1" cy:targetArrow="0" cy:sourceArrowColor="#000000"/>
+  </edge>
+  <edge directed="true" label="CHEMBL566046 (mp) PIK3CB" id="24" source="-11" target="-6">
+    <att name="BindingAffinity(IC50) (class=Double)" type="integer" value="3000"/>
+    <att name="canonicalName" type="string" value="CHEMBL566046 (mp) PIK3CB"/>
+    <att name="EvidenceType" type="string" value="IC50"/>
+    <att name="interaction" type="string" value="mp"/>
+    <graphics cy:edgeLineType="SOLID" width="5" cy:targetArrowColor="#000000" cy:sourceArrow="0" fill="#0198e1" cy:targetArrow="0" cy:sourceArrowColor="#000000"/>
+  </edge>
+  <edge directed="true" label="CHEMBL566046 (mp) PIK3CD" id="25" source="-11" target="-7">
+    <att name="BindingAffinity(IC50) (class=Double)" type="integer" value="900"/>
+    <att name="canonicalName" type="string" value="CHEMBL566046 (mp) PIK3CD"/>
+    <att name="EvidenceType" type="string" value="IC50"/>
+    <att name="interaction" type="string" value="mp"/>
+    <graphics cy:edgeLineType="SOLID" width="7" cy:targetArrowColor="#000000" cy:sourceArrow="0" fill="#0198e1" cy:targetArrow="0" cy:sourceArrowColor="#000000"/>
+  </edge>
+  <edge directed="true" label="CHEMBL566046 (mp) Unspecified" id="26" source="-11" target="-9">
+    <att name="BindingAffinity(IC50) (class=Double)" type="integer" value="4000"/>
+    <att name="canonicalName" type="string" value="CHEMBL566046 (mp) Unspecified"/>
+    <att name="EvidenceType" type="string" value="IC50"/>
+    <att name="interaction" type="string" value="mp"/>
+    <graphics cy:edgeLineType="SOLID" width="5" cy:targetArrowColor="#000000" cy:sourceArrow="0" fill="#0198e1" cy:targetArrow="0" cy:sourceArrowColor="#000000"/>
+  </edge>
+  <edge directed="true" label="P42337 (in) CHEMBL102074" id="27" source="-5" target="-23">
+    <att name="BindingAffinity(IC50) (class=Double)" type="integer" value="15500"/>
+    <att name="canonicalName" type="string" value="P42337 (in) CHEMBL102074"/>
+    <att name="EvidenceType" type="string" value="IC50"/>
+    <att name="interaction" type="string" value="in"/>
+    <graphics cy:edgeLineType="SOLID" width="1" cy:targetArrowColor="#000000" cy:sourceArrow="0" fill="#deb887" cy:targetArrow="0" cy:sourceArrowColor="#000000"/>
+  </edge>
+  <edge directed="true" label="P42337 (in) CHEMBL568574" id="28" source="-5" target="-32">
+    <att name="BindingAffinity(IC50) (class=Double)" type="integer" value="38000"/>
+    <att name="canonicalName" type="string" value="P42337 (in) CHEMBL568574"/>
+    <att name="EvidenceType" type="string" value="IC50"/>
+    <att name="interaction" type="string" value="in"/>
+    <graphics cy:edgeLineType="SOLID" width="1" cy:targetArrowColor="#000000" cy:sourceArrow="0" fill="#deb887" cy:targetArrow="0" cy:sourceArrowColor="#000000"/>
+  </edge>
+  <edge directed="true" label="P42337 (in) CHEMBL300015" id="29" source="-5" target="-31">
+    <att name="BindingAffinity(IC50) (class=Double)" type="integer" value="14800"/>
+    <att name="canonicalName" type="string" value="P42337 (in) CHEMBL300015"/>
+    <att name="EvidenceType" type="string" value="IC50"/>
+    <att name="interaction" type="string" value="in"/>
+    <graphics cy:edgeLineType="SOLID" width="1" cy:targetArrowColor="#000000" cy:sourceArrow="0" fill="#deb887" cy:targetArrow="0" cy:sourceArrowColor="#000000"/>
+  </edge>
+  <edge directed="true" label="P42337 (in) CHEMBL579219" id="30" source="-5" target="-22">
+    <att name="BindingAffinity(IC50) (class=Double)" type="integer" value="100000"/>
+    <att name="canonicalName" type="string" value="P42337 (in) CHEMBL579219"/>
+    <att name="EvidenceType" type="string" value="IC50"/>
+    <att name="interaction" type="string" value="in"/>
+    <graphics cy:edgeLineType="SOLID" width="1" cy:targetArrowColor="#000000" cy:sourceArrow="0" fill="#deb887" cy:targetArrow="0" cy:sourceArrowColor="#000000"/>
+  </edge>
+  <edge directed="true" label="P42337 (in) CHEMBL565432" id="31" source="-5" target="-29">
+    <att name="BindingAffinity(IC50) (class=Double)" type="integer" value="78000"/>
+    <att name="canonicalName" type="string" value="P42337 (in) CHEMBL565432"/>
+    <att name="EvidenceType" type="string" value="IC50"/>
+    <att name="interaction" type="string" value="in"/>
+    <graphics cy:edgeLineType="SOLID" width="1" cy:targetArrowColor="#000000" cy:sourceArrow="0" fill="#deb887" cy:targetArrow="0" cy:sourceArrowColor="#000000"/>
+  </edge>
+  <edge directed="true" label="P42337 (in) CHEMBL577499" id="32" source="-5" target="-28">
+    <att name="BindingAffinity(IC50) (class=Double)" type="integer" value="19000"/>
+    <att name="canonicalName" type="string" value="P42337 (in) CHEMBL577499"/>
+    <att name="EvidenceType" type="string" value="IC50"/>
+    <att name="interaction" type="string" value="in"/>
+    <graphics cy:edgeLineType="SOLID" width="1" cy:targetArrowColor="#000000" cy:sourceArrow="0" fill="#deb887" cy:targetArrow="0" cy:sourceArrowColor="#000000"/>
+  </edge>
+  <edge directed="true" label="P42337 (in) CHEMBL52389" id="33" source="-5" target="-26">
+    <att name="BindingAffinity(IC50) (class=Double)" type="integer" value="18500"/>
+    <att name="canonicalName" type="string" value="P42337 (in) CHEMBL52389"/>
+    <att name="EvidenceType" type="string" value="IC50"/>
+    <att name="interaction" type="string" value="in"/>
+    <graphics cy:edgeLineType="SOLID" width="1" cy:targetArrowColor="#000000" cy:sourceArrow="0" fill="#deb887" cy:targetArrow="0" cy:sourceArrowColor="#000000"/>
+  </edge>
+  <edge directed="true" label="P42337 (in) CHEMBL323313" id="34" source="-5" target="-21">
+    <att name="BindingAffinity(IC50) (class=Double)" type="integer" value="31000"/>
+    <att name="canonicalName" type="string" value="P42337 (in) CHEMBL323313"/>
+    <att name="EvidenceType" type="string" value="IC50"/>
+    <att name="interaction" type="string" value="in"/>
+    <graphics cy:edgeLineType="SOLID" width="1" cy:targetArrowColor="#000000" cy:sourceArrow="0" fill="#deb887" cy:targetArrow="0" cy:sourceArrowColor="#000000"/>
+  </edge>
+  <edge directed="true" label="P42337 (in) CHEMBL101903" id="35" source="-5" target="-25">
+    <att name="BindingAffinity(IC50) (class=Double)" type="integer" value="83000"/>
+    <att name="canonicalName" type="string" value="P42337 (in) CHEMBL101903"/>
+    <att name="EvidenceType" type="string" value="IC50"/>
+    <att name="interaction" type="string" value="in"/>
+    <graphics cy:edgeLineType="SOLID" width="1" cy:targetArrowColor="#000000" cy:sourceArrow="0" fill="#deb887" cy:targetArrow="0" cy:sourceArrowColor="#000000"/>
+  </edge>
+  <edge directed="true" label="P42337 (in) CHEMBL265376" id="36" source="-5" target="-27">
+    <att name="BindingAffinity(IC50) (class=Double)" type="integer" value="30000"/>
+    <att name="canonicalName" type="string" value="P42337 (in) CHEMBL265376"/>
+    <att name="EvidenceType" type="string" value="IC50"/>
+    <att name="interaction" type="string" value="in"/>
+    <graphics cy:edgeLineType="SOLID" width="1" cy:targetArrowColor="#000000" cy:sourceArrow="0" fill="#deb887" cy:targetArrow="0" cy:sourceArrowColor="#000000"/>
+  </edge>
+  <edge directed="true" label="P42337 (in) CHEMBL567914" id="37" source="-5" target="-24">
+    <att name="BindingAffinity(IC50) (class=Double)" type="integer" value="100000"/>
+    <att name="canonicalName" type="string" value="P42337 (in) CHEMBL567914"/>
+    <att name="EvidenceType" type="string" value="IC50"/>
+    <att name="interaction" type="string" value="in"/>
+    <graphics cy:edgeLineType="SOLID" width="1" cy:targetArrowColor="#000000" cy:sourceArrow="0" fill="#deb887" cy:targetArrow="0" cy:sourceArrowColor="#000000"/>
+  </edge>
+  <edge directed="true" label="P42337 (in) CHEMBL268039" id="38" source="-5" target="-20">
+    <att name="BindingAffinity(IC50) (class=Double)" type="integer" value="1000000000"/>
+    <att name="canonicalName" type="string" value="P42337 (in) CHEMBL268039"/>
+    <att name="EvidenceType" type="string" value="IC50"/>
+    <att name="interaction" type="string" value="in"/>
+    <graphics cy:edgeLineType="SOLID" width="1" cy:targetArrowColor="#000000" cy:sourceArrow="0" fill="#deb887" cy:targetArrow="0" cy:sourceArrowColor="#000000"/>
+  </edge>
+  <edge directed="true" label="P42337 (in) CHEMBL52450" id="39" source="-5" target="-30">
+    <att name="BindingAffinity(IC50) (class=Double)" type="integer" value="21300"/>
+    <att name="canonicalName" type="string" value="P42337 (in) CHEMBL52450"/>
+    <att name="EvidenceType" type="string" value="IC50"/>
+    <att name="interaction" type="string" value="in"/>
+    <graphics cy:edgeLineType="SOLID" width="1" cy:targetArrowColor="#000000" cy:sourceArrow="0" fill="#deb887" cy:targetArrow="0" cy:sourceArrowColor="#000000"/>
+  </edge>
+  <edge directed="true" label="P42337 (pm) CHEMBL98350" id="40" source="-5" target="-17">
+    <att name="BindingAffinity(IC50) (class=Double)" type="integer" value="500"/>
+    <att name="canonicalName" type="string" value="P42337 (pm) CHEMBL98350"/>
+    <att name="EvidenceType" type="string" value="IC50"/>
+    <att name="interaction" type="string" value="pm"/>
+    <graphics cy:edgeLineType="SOLID" width="7" cy:targetArrowColor="#000000" cy:sourceArrow="0" fill="#00cd66" cy:targetArrow="0" cy:sourceArrowColor="#000000"/>
+  </edge>
+  <edge directed="true" label="P42337 (pm) CHEMBL437770" id="41" source="-5" target="-1">
+    <att name="BindingAffinity(IC50) (class=Double)" type="integer" value="3000"/>
+    <att name="canonicalName" type="string" value="P42337 (pm) CHEMBL437770"/>
+    <att name="EvidenceType" type="string" value="IC50"/>
+    <att name="interaction" type="string" value="pm"/>
+    <graphics cy:edgeLineType="SOLID" width="5" cy:targetArrowColor="#000000" cy:sourceArrow="0" fill="#00cd66" cy:targetArrow="0" cy:sourceArrowColor="#000000"/>
+  </edge>
+  <edge directed="true" label="P42337 (pm) CHEMBL566046" id="42" source="-5" target="-11">
+    <att name="BindingAffinity(IC50) (class=Double)" type="integer" value="900"/>
+    <att name="canonicalName" type="string" value="P42337 (pm) CHEMBL566046"/>
+    <att name="EvidenceType" type="string" value="IC50"/>
+    <att name="interaction" type="string" value="pm"/>
+    <graphics cy:edgeLineType="SOLID" width="7" cy:targetArrowColor="#000000" cy:sourceArrow="0" fill="#00cd66" cy:targetArrow="0" cy:sourceArrowColor="#000000"/>
+  </edge>
+  <edge directed="true" label="CHEMBL437770 (ni) PIK3CB" id="43" source="-1" target="-6">
+    <att name="BindingAffinity(IC50) (class=Double)" type="integer" value="14000"/>
+    <att name="canonicalName" type="string" value="CHEMBL437770 (ni) PIK3CB"/>
+    <att name="EvidenceType" type="string" value="IC50"/>
+    <att name="interaction" type="string" value="ni"/>
+    <graphics cy:edgeLineType="SOLID" width="1" cy:targetArrowColor="#000000" cy:sourceArrow="0" fill="#adadad" cy:targetArrow="0" cy:sourceArrowColor="#000000"/>
+  </edge>
+  <edge directed="true" label="CHEMBL437770 (ni) Unspecified" id="44" source="-1" target="-9">
+    <att name="BindingAffinity(IC50) (class=Double)" type="integer" value="12000"/>
+    <att name="canonicalName" type="string" value="CHEMBL437770 (ni) Unspecified"/>
+    <att name="EvidenceType" type="string" value="IC50"/>
+    <att name="interaction" type="string" value="ni"/>
+    <graphics cy:edgeLineType="SOLID" width="1" cy:targetArrowColor="#000000" cy:sourceArrow="0" fill="#adadad" cy:targetArrow="0" cy:sourceArrowColor="#000000"/>
+  </edge>
+  <edge directed="true" label="CHEMBL437770 (mp) Pik3ca" id="45" source="-1" target="-16">
+    <att name="BindingAffinity(IC50) (class=Double)" type="integer" value="3000"/>
+    <att name="canonicalName" type="string" value="CHEMBL437770 (mp) Pik3ca"/>
+    <att name="EvidenceType" type="string" value="IC50"/>
+    <att name="interaction" type="string" value="mp"/>
+    <graphics cy:edgeLineType="SOLID" width="5" cy:targetArrowColor="#000000" cy:sourceArrow="0" fill="#0198e1" cy:targetArrow="0" cy:sourceArrowColor="#000000"/>
+  </edge>
+  <edge directed="true" label="CHEMBL437770 (mp) PIK3CD" id="46" source="-1" target="-7">
+    <att name="BindingAffinity(IC50) (class=Double)" type="integer" value="4000"/>
+    <att name="canonicalName" type="string" value="CHEMBL437770 (mp) PIK3CD"/>
+    <att name="EvidenceType" type="string" value="IC50"/>
+    <att name="interaction" type="string" value="mp"/>
+    <graphics cy:edgeLineType="SOLID" width="5" cy:targetArrowColor="#000000" cy:sourceArrow="0" fill="#0198e1" cy:targetArrow="0" cy:sourceArrowColor="#000000"/>
+  </edge>
+</graph>

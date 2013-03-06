@@ -84,11 +84,14 @@
   <%= f.label "Organism:" -%><span class="required">*</span> <br/>
   <%= select_tag :organism,
                  options_for_select([["Not specified", ""]] + Organism.all(:order => :title).collect { |o| [o.title, o.id] }, specimen.organism.try(:id) || current_user.try(:person).try(:projects).try(:first).try(:organism_ids).try(:first)),
-                 :onchange => "show_ajax_loader('strains_of_selected_organism');strains_of_selected_organism(this.value, 'specimen_strain_id', 'specimen[strain_id]');" -%>
+                 :onchange => "show_ajax_loader('strains_of_selected_organism');strains_of_selected_organism(this.value, '#{strain_selection_box_id}', '#{strain_selection_box_name}');" -%>
 </p>
 
 <p>
   <%= f.label "Strain:" -%>
+              <% unless Seek::Config.is_virtualliver %>
+                <span class="required">*</span>
+              <% end %>
 <div id='strains_of_selected_organism'>
   <% strains = specimen.organism.nil? ? [] : specimen.organism.strains.without_default -%>
   <%= f.collection_select :strain_id,
@@ -100,24 +103,24 @@
 <% if Seek::Config.is_virtualliver %>
     <div class="yui-g" style="width:700px;">
       <%= f.label "Genotypes and Phenotypes:" -%>
-      <%= render :partial => "biosamples/genotype_form", :locals => {:item => specimen, :f => f, :parent_name => parent_name, :action => action.to_s} %>
-      <%= render :partial => "biosamples/phenotype_form", :locals => {:item => specimen, :f => f, :parent_name => parent_name, :action => action.to_s} %>
+      <%= render :partial => "strains/genotype_form", :locals => {:item => specimen, :f => f, :parent_name => parent_name, :action => action.to_s} %>
+      <%= render :partial => "strains/phenotype_form", :locals => {:item => specimen, :f => f, :parent_name => parent_name, :action => action.to_s} %>
     </div>
 
 <% end %>
 <br/>
 <%  if self.controller_name=="specimens" %>
-    <%= render :partial => 'projects/project_selector', :locals => {:resource => specimen, :allow_nil => true} %>
+    <%= render :partial => 'projects/project_selector', :locals => {:resource => specimen, :allow_nil => Seek::Config.is_virtualliver ? true : false} %>
 
     <% if specimen.can_manage? %>
         <p>
           <%= render :partial => "assets/sharing_form" ,:locals=>{:object=>specimen}-%>
         </p>
 
-        <%= render :partial => 'assets/special_auth_code_form', :locals => {:f => f} %>
+        <%= render :partial => 'assets/special_auth_code_form', :locals => {:f => f} if !@specimen.try(:new_record?) %>
     <% end %>
 <% end %>
-<%= fancy_multiselect specimen, :sops, :name => 'specimen_sop_ids', :association_class => Sop, :selected => (params[:specimen_sop_ids] || []).map(&:to_i) | specimen.sop_masters.map(&:sop_id), :hidden => specimen.sops.blank? ? true : false, :other_projects_checkbox => true %>
+<%= fancy_multiselect specimen, :sops, :name => 'specimen_sop_ids', :association_class => Sop, :selected => (params[:specimen_sop_ids] || []).map(&:to_i) | specimen.sop_masters.map(&:sop_id), :hidden => specimen.sop_masters.map(&:sop).blank? ? true : false, :other_projects_checkbox => true %>
 
 <p>
   <%= render :partial => "assets/author_form", :locals => {:resource_type => 'Specimen',
@@ -142,7 +145,10 @@
     </p>
 <% end %>
 <script type="text/javascript">
-    if ('<%= action.to_s%>' == 'new' && <%= f.error_messages.blank?%>) {
+    <%# Load the strain list of default organism ONLY when creating a new specimen
+      # Dont when updating/getting the new form back because of errors/new_object_based_on_existing_one
+     -%>
+    if ('<%= action.to_s%>' == 'new' && <%= f.error_messages.blank?%> && <%= specimen.organism.nil? %>) {
         show_ajax_loader('strains_of_selected_organism');
         strains_of_selected_organism($F('organism'), '<%= strain_selection_box_id%>', '<%= strain_selection_box_name%>');
     }

@@ -13,9 +13,10 @@
   }
   #preview_permissions p.private {
       color: red;
-      font-size: medium;
       font-weight: bold;
-      margin-left: 3em;
+  }
+  #preview_permissions p.shared {
+      font-weight: bold;
   }
   #preview_permissions p.public{
       color: #0000ff;
@@ -25,48 +26,48 @@
 
 <div class="redbox_contents" id="preview_permissions" style="width:500px;">
     <div class="body">
-    <% unless flash[:error] %>
-        <h1>You will share this item with:</h1>
-    <% end %>
-    <%unless grouped_people_by_access_type.blank?
-      grouped_people_by_access_type.each do |key, value|
-      case key
-        when Policy::NO_ACCESS %>
-            <h2 style="color: red">People who have no access:</h2>
-            <%= display_people_list value-%>
-        <%when Policy::VISIBLE %>
-            <h2>People who can view the summary:</h2>
-            <%= display_people_list value-%>
-        <%when Policy::ACCESSIBLE %>
-            <h2>People who can view the summary and get contents:</h2>
-            <%= display_people_list value-%>
-        <%when Policy::EDITING %>
-            <h2>People who can view and edit the summary and contents:</h2>
-            <%= display_people_list value-%>
-        <%when Policy::MANAGING %>
-            <%if (grouped_people_by_access_type.count == 1) && (value.count == 1 and value.first[0] == try_block{current_user.person.id})%>
-               <p class='private'>You keep this item private (only visible to you)</p>
-            <%else%>
-               <h2>People who can manage:</h2>
-               <%= display_people_list value-%>
-            <%end%>
-        <%when Policy::DETERMINED_BY_GROUP %>
-            <p class='public'>All visitors (including anonymous visitors with no login) can <span style="color: #475f30;"><%= Policy.get_access_type_wording(value, try_block{resource_name.camelize.constantize.new()}).downcase -%> </span>  </p>
-            <% if !updated_can_publish %>
-                <span style="color: red;">(An email will be sent to the Gatekeepers of the projects associated with this <%= resource_name.humanize %> to ask for publishing approval. This <%= resource_name.humanize %> will not be published until one of the Gatekeepers has granted approval)</span>
-            <% end %>
-       <%end%>
-      <%end%>
-    <%else %>
-      <% if flash[:error]%>
-        <p class="private"><%= flash[:error] %></p>
+    <h2>You will share this <%= resource_name.humanize %> with:</h2>
+
+          <% if policy.sharing_scope == Policy::PRIVATE %>
+              <p class="private">You keep this <%= resource_name.humanize %> private (only visible to you)</p>
+          <% elsif policy.sharing_scope == Policy::ALL_SYSMO_USERS %>
+              <p class="shared">All the project members within the network <%= ((policy.access_type == Policy::NO_ACCESS) ? 'have ' : 'can ') + Policy.get_access_type_wording(policy.access_type, try_block{resource_name.camelize.constantize.new()}).downcase -%></p>
+          <% elsif policy.sharing_scope == Policy::EVERYONE  %>
+              <p class='public'>All visitors (including anonymous visitors with no login) can <%= Policy.get_access_type_wording(policy.access_type, try_block{resource_name.camelize.constantize.new()}).downcase -%></p>
+              <% if !updated_can_publish %>
+              <span style="color: red;">(An email will be sent to the Gatekeepers of the projects associated with this <%= resource_name.humanize %> to ask for publishing approval. This <%= resource_name.humanize %> will not be published until one of the Gatekeepers has granted approval)</span>
+              <% end %>
+          <% end %>
+
+      <% permissions = policy.permissions%>
+      <% if !permissions.empty? %>
+          <h2>Additional fine-grained sharing permissions:</h2>
+          <% permissions.each do |p|
+            contributor = p.contributor
+            group_name = (p.contributor_type == 'WorkGroup') ? (contributor.project.name + ' @ ' + contributor.institution.name) : contributor.name
+            prefix_text = (p.contributor_type == 'Person') ? '' : ('Members of ' + p.contributor_type.underscore.humanize + ' ')
+          %>
+
+              <p><%=  prefix_text + group_name %> <%=  (((p.access_type == Policy::NO_ACCESS) || (p.access_type == Policy::DETERMINED_BY_GROUP)) ? 'have ' : 'can ') + Policy.get_access_type_wording(p.access_type, try_block{resource_name.camelize.constantize.new()}).downcase -%> </p>
+          <% end %>
       <% end %>
-    <% end %>
+      <% if !privileged_people.blank? %>
+          <h2>Privileged people:</h2>
+          <% privileged_people.each do |key, value|
+            value.each do |v| %>
+                  <% if key == 'contributor' %>
+                      <p><%= v.name %> can <%= Policy.get_access_type_wording(Policy::MANAGING, try_block{resource_name.camelize.constantize.new()}).downcase -%> as an uploader </p>
+                  <% elsif key == 'creators' %>
+                      <p><%= v.name %> can <%= Policy.get_access_type_wording(Policy::EDITING, try_block{resource_name.camelize.constantize.new()}).downcase -%> as a creator </p>
+                  <% elsif key == 'asset_managers'%>
+                      <p><%= v.name %> can <%= Policy.get_access_type_wording(Policy::MANAGING, try_block{resource_name.camelize.constantize.new()}).downcase -%> as an asset manager </p>
+                  <% end %>
+              <% end %>
+          <% end %>
+      <% end %>
 
     <div align="center" style="margin-top: 1em">
-      <% unless flash[:error] %>
-          <input type=button value='OK' style="width: 5em" onclick="createOrUpdateResource('<%= is_new_file -%>', '<%= resource_name -%>')">
-      <% end %>
+      <input type=button value='OK' style="width: 5em" onclick="createOrUpdateResource('<%= is_new_file -%>', '<%= resource_name -%>')">
       <input type=button value='Cancel' onclick="RedBox.close()">
     </div>
   </div>

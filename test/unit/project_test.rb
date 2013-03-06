@@ -25,6 +25,17 @@ class ProjectTest < ActiveSupport::TestCase
     assert p.defines_own_avatar?
   end
 
+  test "has_member" do
+    person = Factory :person
+    project = person.projects.first
+    other_person = Factory :person
+    assert project.has_member?(person)
+    assert project.has_member?(person.user)
+    assert !project.has_member?(other_person)
+    assert !project.has_member?(other_person.user)
+    assert !project.has_member?(nil)
+  end
+
   def test_ordered_by_name
     assert Project.find(:all).sort_by {|p| p.name.downcase} == Project.find(:all) || Project.all.sort_by {|p| p.name} == Project.all
   end

@@ -1,0 +1,34 @@
+<%
+    default_folder = initial_folder(@project)
+    help_icon = image_tag(icon_filename_for_key("help"), :alt=>"help", :title=>tooltip_title_attrib("Click to toggle information on how to use the project asset browser",1))
+    help_button = link_to_function help_icon, visual_effect(:toggle_blind, "folders_help", :duration => 0.3)
+%>
+<%= render :partial=>"yui_css_and_js" -%>
+
+<%= render :partial => "layouts/item_title",:locals=>{:title=>"Project item browser for the project '#{link_to h(@project.title),@project}'&nbsp;#{help_button}"} -%>
+<%=  -%>
+
+
+
+<div class="show_basic">
+    <%= render :partial=>"folders_help" -%>
+
+    <div class="yui-gf">
+        <div id="folder_column" class="yui-u first yui-skin-sam">
+          <div id="folders">
+            <%= render :partial=>"folders" -%>
+          </div>
+        </div>
+        <div class="yui-u">
+            <div id="folder_contents">
+                <%= render :partial=>"contents",:locals=>{:folder=>default_folder} if default_folder -%>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div>
+  <h3>Dev tools</h3>
+  <%= link_to "Nuke",nuke_project_folders_path(@project),:method=>:post %>
+</div>
+

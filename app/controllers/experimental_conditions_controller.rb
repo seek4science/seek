@@ -8,6 +8,8 @@ class ExperimentalConditionsController < ApplicationController
   before_filter :create_new_condition, :only=>[:index]
   before_filter :no_comma_for_decimal, :only=>[:create, :update]
 
+  include Seek::BreadCrumbs
+
   def index
     respond_to do |format|
       format.html

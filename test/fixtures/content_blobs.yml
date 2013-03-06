@@ -3,8 +3,8 @@
 # or http://www.realityforge.org/articles/2006/04/06/loading-binary-data-into-rails-fixtures
 <%
   def make_file(uuid,name)
-     fixture_file = "#{RAILS_ROOT}/test/fixtures/files/#{name}"
-     dir = "#{Dir::tmpdir}/seek_content_blobs"
+     fixture_file = "#{Rails.root}/test/fixtures/files/#{name}"
+     dir = "#{ContentBlob.test_storage_location}"
      FileUtils.mkdir(dir) unless File.exists?(dir)
      destination = "#{dir}/#{uuid}.dat"
      FileUtils.cp(fixture_file,destination)
@@ -44,6 +44,13 @@ editable_sop_blob:
 sop_with_fully_public_policy_blob:
   uuid: <%=  init_blob('little_file.txt') %>
   asset: sop_with_fully_public_policy (Sop)
+  original_filename: "little_file.txt"
+  content_type: "text/plain"
+  asset_version: 1
+
+sop_with_project_without_gatekeeper_blob:
+  uuid: <%=  init_blob('little_file.txt') %>
+  asset: sop_with_project_without_gatekeeper (Sop)
   original_filename: "little_file.txt"
   content_type: "text/plain"
   asset_version: 1
@@ -293,6 +300,7 @@ non_sbml_xml_blob:
   asset_version: 1
   original_filename: non_sbml_xml.xml
   content_type: text/xml
+
 invalid_sbml_xml_blob:  
   uuid: <%= init_blob('invalid_sbml_xml.xml') %>    
   asset: invalid_sbml_xml  (Model)

@@ -65,6 +65,10 @@ module Acts #:nodoc:
 
       def scales
         self.parent.scales
+
+      end 
+      def contains_downloadable_items?
+        self.parent.contains_downloadable_items?
       end
 
       #returns a list of the people that can manage this file
@@ -98,6 +102,10 @@ module Acts #:nodoc:
         self.parent.assets_creators
       end
 
+      def contributing_user
+        self.parent.try(:contributing_user)
+      end
+
       def is_asset?
         self.parent.is_asset?
       end
@@ -125,6 +133,7 @@ module Acts #:nodoc:
       def annotations
         parent.annotations if parent.respond_to? :annotations
       end
+
     end
   end
 end

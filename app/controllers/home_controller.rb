@@ -34,8 +34,6 @@ class HomeController < ApplicationController
     
     anon=anon=="true"
 
-    puts "Anon = #{anon}"
-
     if subject.nil? or details.nil?
       flash[:error]="You must provide a Subject and details"
       render :action=>:feedback

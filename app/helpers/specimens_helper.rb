@@ -104,7 +104,7 @@ module SpecimensHelper
 
       if specimen.strain
         result += " : "
-        result += link_to h(specimen.strain.title),specimen.strain,{:class => "assay_strain_info"}
+        result += specimen.strain.title
       end
 
       if specimen.culture_growth_type

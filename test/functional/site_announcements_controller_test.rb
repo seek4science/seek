@@ -125,5 +125,11 @@ class SiteAnnouncementsControllerTest < ActionController::TestCase
     get :feed,:format=>"atom"
     assert_response :success
   end
-  
+
+  test 'should not get the headline announcements on the index page' do
+    assert !SiteAnnouncement.all.select(&:is_headline).empty?
+    get :index
+    assert_response :success
+    assert_select "ul.announcement_list li.announcement span.announcement_title", :text => /a headline announcement/, :count => 0
+  end
 end

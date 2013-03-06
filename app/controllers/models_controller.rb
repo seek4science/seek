@@ -13,11 +13,14 @@ class ModelsController < ApplicationController
   
   before_filter :find_assets, :only => [ :index ]
   before_filter :find_and_auth, :except => [ :build,:index, :new, :create,:create_model_metadata,:update_model_metadata,:delete_model_metadata,:request_resource,:preview,:test_asset_url, :update_annotations_ajax]
-  before_filter :find_display_asset, :only=>[:show,:download,:execute,:builder,:simulate,:submit_to_jws,:matching_data_files,:visualise,:export_as_xgmml,:send_image]
+  before_filter :find_display_asset, :only=>[:show,:download,:execute,:builder,:simulate,:submit_to_jws,:matching_data,:visualise,:export_as_xgmml]
     
   before_filter :jws_enabled,:only=>[:builder,:simulate,:submit_to_jws]
 
+  before_filter :experimental_features, :only=>[:matching_data]
+
   include Seek::Publishing
+  include Seek::BreadCrumbs
 
   @@model_builder = Seek::JWS::Builder.new
 
@@ -38,17 +41,15 @@ class ModelsController < ApplicationController
       send_file tmp_file.path, :type=>"#{type}", :disposition=>'attachment',:filename=>xgmml_file
       tmp_file.close
   end
+
   def visualise
+    raise Exception.new("This model does not support Cytoscape") unless @display_model.contains_xgmml?
      # for xgmml file
      doc = find_xgmml_doc @display_model
      # convert " to \" and newline to \n
      #e.g.  "... <att type=\"string\" name=\"canonicalName\" value=\"CHEMBL178301\"/>\n ...  "
-    @graph = %Q("#{doc.root.to_s.gsub(/"/, '\"').gsub!("\n",'\n')}")
-    render :cytoscape_web,:layout => false
-  end
-  def send_image
-    image = @display_model.model_image
-    send_file "#{image.file_path  }", :type=>"JPEG", :disposition=>'inline'
+     @graph = %Q("#{doc.root.to_s.gsub(/"/, '\"').gsub!("\n",'\n')}")
+     render :cytoscape_web,:layout => false
   end
 
   # GET /models
@@ -56,12 +57,12 @@ class ModelsController < ApplicationController
   
   def new_version
     if (handle_batch_data nil)
-      
       comments = params[:revision_comment]
 
       respond_to do |format|
         create_new_version  comments
         create_content_blobs
+        create_model_image @model,params[:model_image]
         format.html {redirect_to @model }
       end
     else
@@ -82,13 +83,17 @@ class ModelsController < ApplicationController
   def builder
     saved_file=params[:saved_file]
     error=nil
+    supported=false
     begin
       if saved_file
         supported=true
         @params_hash,@attribution_annotations,@saved_file,@objects_hash,@error_keys = @@model_builder.saved_file_builder_content saved_file
       else
         supported = @display_model.is_jws_supported?
-        @params_hash,@attribution_annotations,@saved_file,@objects_hash,@error_keys = @@model_builder.builder_content @display_model if supported
+        if supported
+          content_blob = @display_model.jws_supported_content_blobs.first
+          @params_hash,@attribution_annotations,@saved_file,@objects_hash,@error_keys = @@model_builder.builder_content content_blob
+        end
       end
     rescue Exception=>e
       error=e
@@ -112,7 +117,11 @@ class ModelsController < ApplicationController
   def submit_to_jws
     following_action=params.delete("following_action")    
     error=nil
-    content_blob = @model.content_blob
+
+    #FIXME: currently we have to assume that a model with multiple files only contains 1 model file that would be executed on jws online, and only the first one is chosen
+    raise Exception.new("JWS Online is not supported for this model") unless @model.is_jws_supported?
+    content_blob = @model.jws_supported_content_blobs.first
+
     begin
       if following_action == "annotate"
         @params_hash,@attribution_annotations,@species_annotations,@reaction_annotations,@search_results,@cached_annotations,@saved_file,@error_keys = Seek::JWS::Annotator.new.annotate params
@@ -125,9 +134,7 @@ class ModelsController < ApplicationController
     end
 
     if (!error && @error_keys.empty?)
-      if following_action == "simulate"
-        @applet = Seek::JWS::SimulatorApplet.new.simulate(@saved_file)
-      elsif following_action == "save_new_version"
+      if following_action == "save_new_version"
         model_format=params.delete("saved_model_format") #only used for saving as a new version
         new_version_filename=params.delete("new_version_filename")
         new_version_comments=params.delete("new_version_comments")
@@ -148,14 +155,13 @@ class ModelsController < ApplicationController
       end
     end
 
-
     respond_to do |format|
       if error
         flash[:error]="JWS Online encountered a problem processing this model."
         format.html { render :action=>"builder" }
       elsif @error_keys.empty? && following_action == "simulate"
         @modelname=@saved_file
-        format.html {render :action=>"simulate_applet"}
+        format.html {render :simulate,:layout=>"jws_simulate"}
       elsif @error_keys.empty? && following_action == "annotate"
         format.html {render :action=>"annotator"}
       elsif @error_keys.empty? && following_action == "save_new_version"
@@ -175,7 +181,7 @@ class ModelsController < ApplicationController
     error_message = nil
     if !Seek::Config.sycamore_enabled
       error_message = "Interaction with Sycamore is currently disabled"
-    elsif !@model.can_download?
+    elsif !@model.can_download? && (params[:code].nil? || (params[:code] && !@model.auth_by_code?(params[:code])))
       error_message = "You are not allowed to simulate this model with Sycamore"
     end
     render :update do |page|
@@ -188,36 +194,21 @@ class ModelsController < ApplicationController
     end
   end
 
-  #def simulate
-  #  error=nil
-  #  begin
-  #    if @display_model.is_jws_supported?
-  #      @modelname = Seek::JWS::Simulator.new.simulate(@display_model)
-  #    end
-  #  rescue Exception=>e
-  #    Rails.logger.error("Problem simulating model on JWS Online #{e}")
-  #    raise e unless Rails.env=="production"
-  #    error=e
-  #  end
-  #
-  #  respond_to do |format|
-  #    if error
-  #      flash[:error]="JWS Online encountered a problem processing this model."
-  #      format.html { redirect_to(@model, :version=>@display_model.version) }
-  #    elsif !@display_model.is_jws_supported?
-  #      flash[:error]="This model is of neither SBML or JWS Online (Dat) format so cannot be used with JWS Online"
-  #      format.html { redirect_to(@model, :version=>@display_model.version) }
-  #    else
-  #       format.html { render :simulate,:layout=>"jws_simulate" }
-  #    end
-  #  end
-  #end
+    render :update do |page|
+      if error_message.blank?
+        page['sbml_model'].value = IO.read(@display_model.sbml_content_blobs.first.filepath).gsub(/\n/, '')
+        page['sycamore-form'].submit()
+      else
+        page.alert(error_message)
+      end
+    end
+  end
 
-  def simulate
+ def simulate
     error=nil
     begin
       if @display_model.is_jws_supported?
-        @applet = Seek::JWS::SimulatorApplet.new.simulate(@display_model)
+        @modelname = Seek::JWS::Simulator.new.simulate(@display_model.jws_supported_content_blobs.first)
       end
     rescue Exception=>e
       Rails.logger.error("Problem simulating model on JWS Online #{e}")
@@ -233,11 +224,10 @@ class ModelsController < ApplicationController
         flash[:error]="This model is of neither SBML or JWS Online (Dat) format so cannot be used with JWS Online"
         format.html { redirect_to(@model, :version=>@display_model.version) }
       else
-         format.html { render :simulate_applet }
+         format.html { render :simulate,:layout=>"jws_simulate" }
       end
     end
   end
-
   
   def update_model_metadata
     attribute=params[:attribute]
@@ -500,29 +490,6 @@ class ModelsController < ApplicationController
     
   end
 
-  # GET /models/1/download
-  def download
-    # update timestamp in the current Model record
-    # (this will also trigger timestamp update in the corresponding Asset)
-    @model.last_used_at = Time.now
-    @model.save_without_timestamping    
-
-    if @display_model.content_blobs.count==1 and @display_model.model_image.nil?
-       handle_download @display_model
-    else
-      handle_download_zip @display_model
-    end
-
-  end
-
-  def download_one_file
-    content_blob = ContentBlob.find params[:id]
-    if File.file? content_blob.filepath
-      send_file content_blob.filepath, :type=>content_blob.content_type, :disposition => 'attachment'
-    else
-      download_via_url @display_model
-    end
-  end
   # PUT /models/1
   # PUT /models/1.xml
   def update
@@ -619,28 +586,45 @@ class ModelsController < ApplicationController
     end
   end
 
-  def matching_data_files
+  def matching_data
     #FIXME: should use the correct version
-    matching_files = @model.matching_data_files
-
-    render :update do |page|
-      page.visual_effect :fade,"matching_data_files"
-      page.visual_effect :appear,'matching_results'
-      html = ""
-      matching_files.each do |match|
-        data_file = DataFile.find(match.primary_key)
-        if (data_file.can_view?)
-          html << "<div>"
-          html << "<div style='padding-top:0.5em;padding-bottom:0.2em;'>Matched with #{match.search_terms.join(', ')} - [#{match.score}]</div>"
-          html << render(:partial=>"assets/resource_list_item", :object=>data_file)
-          html << "</div>"
-        end
-      end
-      page.replace_html "matching_results",:text=>html
+    @matching_data_files = @model.matching_data_files
+    respond_to do |format|
+      format.html
     end
   end
-  
+
+  def view_matched_data_files
+    primary_keys = params[:primary_keys].split(',')
+    scores = params[:scores].split(',')
+    search_terms_collection = params[:search_terms].split(',')
+    matched_data_files = []
+    primary_keys.each_with_index do |primary_key, index|
+      search_terms = search_terms_collection[index].split("*")
+      matched_data_files << Model::DataFileMatchResult.new(search_terms,scores[index].to_i,primary_key.to_i)
+    end
+    #authorize
+    data_files = matched_data_files.collect do |mdf|
+      DataFile.find(mdf.primary_key)
+    end
+    authorized_data_file_ids = DataFile.authorized_partial_asset_collection(data_files, 'view', current_user).collect(&:id)
+    authorized_matching_data_files =  matched_data_files.select{|mdf| authorized_data_file_ids.include?(mdf.primary_key.to_i)}
+
+    render :update do |page|
+      page.replace_html "matching_data_ajax_loader", :partial => "models/matching_data_item", :locals=>{:matching_data_items => authorized_matching_data_files}
+      page.visual_effect :toggle_blind, "view_matched_data_files", :duration => 0.05
+      page.visual_effect :toggle_blind, "view_matched_data_files_and_extra", :duration => 0.05
+    end
+  end
+
   protected
+
+  def experimental_features
+    if !Seek::Config.experimental_features_enabled
+      flash[:error]="Not available"
+      redirect_to @model
+    end
+  end
   
   def create_new_version comments
     if @model.save_as_new_version(comments)
@@ -657,7 +641,7 @@ class ModelsController < ApplicationController
   def translate_action action
     action="download" if action == "simulate"
     action="edit" if ["submit_to_jws","builder"].include?(action)
-    action="view" if ["matching_data_files"].include?(action)
+    action="view" if ["matching_data"].include?(action)
     super action
   end
   
@@ -677,7 +661,7 @@ class ModelsController < ApplicationController
       # the creation of the new Avatar instance needs to have only one parameter - therefore, the rest should be set separately
       @model_image = ModelImage.new(params_model_image)
       @model_image.model_id = model_object.id
-      @model_image.original_content_type = params_model_image[:image_file].content_type
+      @model_image.content_type = params_model_image[:image_file].content_type
       @model_image.original_filename = params_model_image[:image_file].original_filename
       model_object.model_image = @model_image
     end
@@ -685,10 +669,17 @@ class ModelsController < ApplicationController
    end
 
     def find_xgmml_doc model
-      xgmml_file = model.is_xgmml?
-      file = open(xgmml_file.filepath)
+      xgmml_content_blob = model.xgmml_content_blobs.first
+      file = open(xgmml_content_blob.filepath)
       doc = LibXML::XML::Parser.string(file.read).parse
       doc
     end
 
+  def create_model_image model_object, params_model_image
+    build_model_image model_object, params_model_image
+    model_object.save(false)
+    latest_version = model_object.latest_version
+    latest_version.model_image_id = model_object.model_image_id
+    latest_version.save
+  end
 end

@@ -28,9 +28,32 @@ class DoiQuery
 
   #Parses the XML returned from the DOI query, and creates an object
   def parse_xml(doc)
-    begin
-      params = {}
 
+    if doc.find_first("//error") || doc.to_s.include?("Malformed DOI")
+      process_error(doc)
+    else
+      process_content(doc)
+    end
+  end
+
+  private
+
+  def process_error doc
+    params={}
+    if doc.to_s.include?("Malformed DOI")
+      params[:error]="Not a valid DOI"
+    else
+      error=doc.find_first("//error")
+      params[:error]=error.content
+      params[:error]="The DOI could not be resolved" if params[:error].include?("not found in CrossRef")
+    end
+
+    DoiRecord.new(params)
+  end
+
+  def process_content doc
+    params = {}
+    begin
       article = doc.find_first("//journal")
       params[:type]=DoiRecord::PUBLICATION_TYPES[:journal] unless article.nil?
       article ||= doc.find_first("//conference")
@@ -64,13 +87,11 @@ class DoiQuery
       date = article.find_first('//publication_date')
       params[:pub_date] = date.nil? ? nil : parse_date(date)
 
-      return DoiRecord.new(params)
     rescue Exception => ex
-      raise "Unknown document structure\n#{ex.backtrace.join("\n")}"
+      params={:error=>"Unable to process the metadata for that DOI"}
     end
+    DoiRecord.new(params)
   end
-
-  private
 
   def query(url)
     begin

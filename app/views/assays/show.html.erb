@@ -1,3 +1,5 @@
+<%= render :partial => "layouts/item_title",:locals=>{:item=>@assay} %>
+
 <%
 @assay_word=@assay.is_modelling? ? "Analysis" : "Assay" %>
 <ul class="sectionIcons">
@@ -12,10 +14,9 @@
       <li><%= image_tag_for_key('new', new_object_based_on_existing_one_path(:controller_name=>"assays", :id=>@assay.id), nil, nil, 'New Assay based on this one') %></li>
     <% end %>
 </ul>
-<%= render :partial => "layouts/item_title",:locals=>{:item=>@assay} %>
+
 <div class="show_basic">
    <div class="main_content_left_box_narrower">
-      <%= render :partial => "layouts/usage_info", :locals => { :resource => @assay } -%>
       <% if @assay.study.nil? -%>
       <div class="warning">
           <%= image("warning") %><b style="color:red">WARNING</b>
@@ -44,12 +45,7 @@
               <%= link_to h(@assay.owner.name),@assay.owner -%>
           </p>
       <% end %>
-      <p>
-          <b>Description:</b>
-          <div id="description" class="box_standout">
-              <%= text_or_not_specified(@assay.description, :description=>true,:auto_link=>true) %>
-          </div>
-      </p>
+
      <%= render :partial => 'projects/show_project_relationship', :locals => {:resource => @assay}  %>
       <p id="investigation">
           <b>Investigation: </b>
@@ -75,6 +71,13 @@
         <b>Organisms:</b>
           <%= list_organisms_and_strains( @assay.assay_organisms.collect{|ao| [ao.organism,ao.strain]} | @assay.samples.collect{|s| [s.specimen.organism,s.specimen.strain]}) -%>
       </p>
+
+     <p>
+       <b>Description:</b>
+     <div id="description" class="box_standout">
+       <%= text_or_not_specified(@assay.description, :description => true, :auto_link => true) %>
+     </div>
+     </p>
 
      <%# FIXME: should be in a css file rather than in the middle of a page -%>
       <style type="text/css">
@@ -135,5 +138,7 @@
     <div style="clear:both">
         <%= embedded_isa_svg(@assay.study, true, @assay) -%>
         <%= render :partial=>"layouts/items_related_to",:object => @assay %>
+        <br/>
+        <%= render :partial => "layouts/usage_info", :locals => { :resource => @assay } -%>
     </div>
 </div>

@@ -4,6 +4,7 @@ syntax: glob
 
 db/*.sqlite3
 config/database.yml
+config/database2.yml
 config/initializers/seek_local.rb
 config/environment_local.rb
 
@@ -16,15 +17,17 @@ filestore*/
 debug.log
 .project
 
-seek_test.sql
-
 tmp/pids/*
 tmp/cache/*
 tmp/data.sql
 tmp/avatars/*
 tmp/models/*
+tmp/model_images/*
 tmp/restart.txt
-tmp/*-graph.html
+tmp/profile-*
+tmp/test_content_blobs/*
+tmp/*.csv
+tmp/zip-files
 *.tmp*
 *~
 
@@ -32,14 +35,15 @@ solr/production/
 solr/development/
 solr/test/
 solr/data/
+solr/pids/
 
 public/help_images/*
-public/javascripts/js_cached.js
-public/stylesheets/css_cached.css
+public/javascripts/*_cached.js
+public/stylesheets/*_cached.css
+public/javascripts/pdfjs/*
 
 .bundle/config
 
-config/default_data/Specimen_example_Quyen1.xls
 new_version
 server
 svg

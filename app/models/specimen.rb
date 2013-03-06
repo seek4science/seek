@@ -13,10 +13,12 @@ class Specimen < ActiveRecord::Base
   before_save  :clear_garbage
   attr_accessor :from_biosamples
 
-  has_many :genotypes,:dependent => :destroy
-  has_many :phenotypes,:dependent => :destroy
+  has_many :genotypes,:dependent => :nullify
+  has_many :phenotypes,:dependent => :nullify
   accepts_nested_attributes_for :genotypes, :allow_destroy => true
   accepts_nested_attributes_for :phenotypes, :allow_destroy => true
+
+  before_destroy :destroy_genotypes_phenotypes
 
   has_many :samples
   has_many :activity_logs, :as => :activity_loggable
@@ -43,6 +45,7 @@ class Specimen < ActiveRecord::Base
   validates_presence_of :title,:lab_internal_number, :contributor,:strain
 
   validates_presence_of :institution, :if => "Seek::Config.is_virtualliver"
+  validates_presence_of :projects, :unless => Proc.new{|s| s.is_dummy? || Seek::Config.is_virtualliver}
   validates_uniqueness_of :title
 
   AGE_UNITS = ["second","minute","hour","day","week","month","year"]
@@ -88,16 +91,21 @@ class Specimen < ActiveRecord::Base
 
   def related_people
     creators
-  end  
+  end
+
+  def related_sops
+    sop_masters.collect(&:sop)
+  end
   
-  searchable do
-    text :description,:title,:lab_internal_number
+  searchable(:ignore_attribute_changes_of=>[:updated_at]) do
+    text :searchable_terms
     text :culture_growth_type do
       culture_growth_type.try :title
     end
-    
+
     text :strain do
       strain.try :title
+      strain.try(:organism).try(:title).to_s
     end
     
     text :institution do
@@ -108,6 +116,18 @@ class Specimen < ActiveRecord::Base
       creators.compact.map(&:name).join(' ')
     end
   end if Seek::Config.solr_enabled
+
+  def searchable_terms
+      text=[]
+      text << title
+      text << description
+      text << lab_internal_number
+      if (strain)
+        text << strain.info
+        text << strain.try(:organism).try(:title).to_s
+      end
+      text
+  end
 
   def age_with_unit
       age.nil? ? "" : "#{age}(#{age_unit}s)"
@@ -137,7 +157,6 @@ class Specimen < ActiveRecord::Base
       self.born=nil
       self.age=nil
     end
-
   end
 
   def strain_title
@@ -184,5 +203,20 @@ class Specimen < ActiveRecord::Base
 
   def organism
     strain.try(:organism)
+  end
+
+  def destroy_genotypes_phenotypes
+    genotypes = self.genotypes
+    phenotypes = self.phenotypes
+    genotypes.each do |g|
+      if g.strain.nil?
+        g.destroy
+      end
+    end
+    phenotypes.each do |p|
+      if p.strain.nil?
+        p.destroy
+      end
+    end
   end
 end

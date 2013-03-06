@@ -1,6 +1,6 @@
-require 'atom'
 
 module HomeHelper
+  include UsersHelper
 
   RECENT_SIZE=5
 
@@ -61,37 +61,40 @@ module HomeHelper
   end
 
   def recently_downloaded_item_logs time=1.month.ago, number_of_item=10
-    activity_logs = ActivityLog.find(:all, :include => "activity_loggable", :order => "created_at DESC", :conditions => ["action = ? AND created_at > ?", 'download', time])
-    selected_activity_logs = []
-    selected_items = []
-    count = 0
-    activity_logs.each do |activity_log|
-       item = activity_log.activity_loggable
-       if !item.nil? and item.can_view? and !selected_items.include? item
-         selected_items.push item
-         selected_activity_logs.push activity_log
-         count += 1
-       end
-       break if count == number_of_item
+    Rails.cache.fetch("download_activity_#{current_user_id}") do
+      activity_logs = ActivityLog.find(:all, :include => "activity_loggable", :order => "created_at DESC", :conditions => ["action = ? AND created_at > ?", 'download', time])
+      selected_activity_logs = []
+      selected_items = []
+      count = 0
+      activity_logs.each do |activity_log|
+         item = activity_log.activity_loggable
+         if !item.nil? && !selected_items.include?(item) && item.can_view?
+           selected_items.push item
+           selected_activity_logs.push activity_log
+           count += 1
+         end
+         break if count == number_of_item
+      end
+      selected_activity_logs
     end
-    #filter by can_view?
-    selected_activity_logs
   end
 
   def recently_added_item_logs time=1.month.ago, number_of_item=10
-    item_types = Seek::Util.user_creatable_types.collect{|type| type.name}
-    activity_logs = ActivityLog.find(:all, :include => "activity_loggable", :order => "created_at DESC", :conditions => ["action = ? AND created_at > ? AND activity_loggable_type in (?)", 'create', time, item_types])
-    selected_activity_logs = []
-    count = 0
-    activity_logs.each do |activity_log|
-       item = activity_log.activity_loggable
-       if !item.nil? and item.can_view? and item_types.include?(activity_log.activity_loggable_type)
-         selected_activity_logs.push activity_log
-         count += 1
-       end
-       break if count == number_of_item
+    Rails.cache.fetch("create_activity_#{current_user_id}") do
+      item_types = Seek::Util.user_creatable_types.collect{|type| type.name}
+      activity_logs = ActivityLog.find(:all, :include => "activity_loggable", :order => "created_at DESC", :conditions => ["action = ? AND created_at > ? AND activity_loggable_type in (?)", 'create', time, item_types])
+      selected_activity_logs = []
+      count = 0
+      activity_logs.each do |activity_log|
+        item = activity_log.activity_loggable
+        if !item.nil? && item_types.include?(activity_log.activity_loggable_type) && item.can_view?
+          selected_activity_logs.push activity_log
+          count += 1
+        end
+        break if count == number_of_item
+      end
+      selected_activity_logs
     end
-    selected_activity_logs
   end
 
   # get multiple feeds from multiple sites

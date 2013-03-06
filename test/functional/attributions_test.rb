@@ -139,4 +139,35 @@ class AttributionsTest < ActionController::TestCase
     assert (!new_attr.nil?), "new attribution should't be nil - nil means that it wasn't created"
   end
 
+  test "should display attributions" do
+    u = Factory :user
+    login_as(u)
+    sop1 = Factory :sop,:policy=>(Factory :public_policy),:contributor=>u
+    sop2 = Factory :sop,:policy=>(Factory :public_policy),:contributor=>u
+    sop3 = Factory :sop,:policy=>(Factory :public_policy),:contributor=>u
+    Relationship.create :subject=>sop1,:object=>sop2,:predicate=>Relationship::ATTRIBUTED_TO
+    sop1.reload
+    sop2.reload
+    assert_equal [sop2],sop1.attributions.collect{|r| r.object}
+    assert_equal [sop2],sop1.attributions_objects
+
+    get :show,:id=>sop1
+    assert_response :success
+    assert_select "div.contribution_section_box" do
+      assert_select "p.heading",:text=>/Attributions/
+      assert_select "ul.list" do
+        assert_select "li" do
+          assert_select "a[href=?]",sop_path(sop2),:text=>/#{sop2.title}/
+        end
+      end
+    end
+
+    get :show,:id=>sop3
+    assert_response :success
+    assert_select "div.contribution_section_box" do
+      assert_select "p.heading",:text=>/Attributions/
+      assert_select "p.none_text",:text=>"None"
+    end
+  end
+
 end

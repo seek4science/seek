@@ -6,6 +6,7 @@ class SpecimensController < ApplicationController
 
   include IndexPager
   include Seek::Publishing
+  include Seek::BreadCrumbs
 
   def new_object_based_on_existing_one
     @existing_specimen =  Specimen.find(params[:id])
@@ -38,7 +39,7 @@ class SpecimensController < ApplicationController
     @specimen.build_sop_masters sop_ids
     @specimen.policy.set_attributes_with_sharing params[:sharing], @specimen.projects
 
-    if @specimen.strain.nil? && !params[:organism].blank?
+    if @specimen.strain.nil? && !params[:organism].blank? && Seek::Config.is_virtualliver
       @specimen.strain = Strain.default_strain_for_organism(params[:organism])
     end
 
@@ -82,7 +83,7 @@ class SpecimensController < ApplicationController
     @specimen.attributes = params[:specimen]
     @specimen.policy.set_attributes_with_sharing params[:sharing], @specimen.projects
 
-    if @specimen.strain.nil? && !params[:organism].blank?
+    if @specimen.strain.nil? && !params[:organism].blank? && Seek::Config.is_virtualliver
         @specimen.strain = Strain.default_strain_for_organism(params[:organism])
     end
 
@@ -91,6 +92,7 @@ class SpecimensController < ApplicationController
 
     if @specimen.save
       deliver_request_publish_approval params[:sharing], @specimen
+
       if @specimen.from_biosamples=='true'
         #reload to get updated nested attributes,e.g. genotypes/phenotypes
         @specimen.reload

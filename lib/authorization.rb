@@ -67,16 +67,25 @@ module Authorization
       # 3. Check if there is a permission for their project
       # 4. Check the action is allowed by the access_type of the permission
       person = user.person
-      thing.permission_for ||= {}
-      permission = if p = thing.permission_for[person]
-        p == :nil ? nil : p
+      thing.permission_for ||= {}   # if thing.permission_for is defined,
+                                    # nothing happens, otherwise empty hash
+      p = thing.permission_for[person]
+      permission = if p
+        p == :nil ? nil : p  # distinguish empty hash item from item with value :nil
       else
+        # sort permissions by precedence
         permissions = Permission.sort_for(person, policy.permissions)
+        # find the first permission, which actually overrides the permission
+        # later in that same list. E.g. a person permission will override
+        # a project permission
         permission = permissions.detect { |p| p.controls_access_for? user.person }
+        # turn nil into :nil, so that caching is possible
         permission ? thing.permission_for[person] = permission : thing.permission_for[person] = :nil
+        # return the resulting value
         permission
       end
 
+      # now find out if the resulting permissions suffice
       is_authorized = permission.allows_action? action, user.person if permission
       # == END CUSTOM PERMISSIONS
     end
@@ -103,25 +112,6 @@ module Authorization
     return is_authorized    
   end
 
-
-  # convenience method which iterates through an array of items performing authorization on
-  # each for given user instance and action name;
-  # - keep_nil_records - will keep placeholders for not authorized items; can be useful, for example, for attributions
-  #                      to show that entry exists, but gives no information on what is hiding behind it
-  def self.authorize_collection(action_name, item_array, user, keep_nil_records=false)
-    # otherwise perform authorization for every item
-    authorized_items = item_array.collect do |item|
-     item.can_perform?(action_name, user) ? item : nil
-    end
-    
-    # not authorized items have been turned into NILs - remove these
-    unless keep_nil_records
-      authorized_items.compact!
-    end
-    
-    return authorized_items
-  end
-  
   private
 
   # checks if a person belongs to a blacklist of a particular user

@@ -116,7 +116,7 @@ class Project < ActiveRecord::Base
   has_and_belongs_to_many :organisms
   has_many :project_subscriptions,:dependent => :destroy
   
-  searchable do
+  searchable(:ignore_attribute_changes_of=>[:updated_at]) do
     text :name , :description, :locations
   end if Seek::Config.solr_enabled
 
@@ -124,9 +124,13 @@ class Project < ActiveRecord::Base
 
   before_save :set_credentials
 
+  def assets
+    data_files | sops | models | publications | presentations
+  end
   def project_coordinators
     coordinator_role = ProjectRole.project_coordinator_role
     ([self] + descendants).map {|proj| proj.people.select{|p| p.project_roles_of_project(proj).include?(coordinator_role)}}.flatten.uniq
+  
   end
 
   #this is the intersection of project role and seek role
@@ -171,7 +175,8 @@ class Project < ActiveRecord::Base
 
   def people
     #TODO: look into doing this with a named_scope or direct query
-    ([self] + descendants).collect {|proj| proj.work_groups.collect(&:people)}.flatten.uniq.compact
+   res =  ([self] + descendants).collect {|proj| proj.work_groups.collect(&:people)}.flatten.uniq.compact
+   res.sort_by{|a| (a.last_name.blank? ? a.name : a.last_name)}
   end
 
   # provides a list of people that are said to be members of this project, but are not associated with any user
@@ -218,7 +223,13 @@ class Project < ActiveRecord::Base
       
     end
   end
-  
+
+  #indicates whether this project has a person, or associated user, as a member
+  def has_member? user_or_person
+    user_or_person = user_or_person.try(:person) if user_or_person.is_a?(User)
+    self.people.include? user_or_person
+  end
+
   def person_roles(person)
     #Get intersection of all project memberships + person's memberships to find project membership
     project_memberships = work_groups.collect{|w| w.group_memberships}.flatten
@@ -226,12 +237,12 @@ class Project < ActiveRecord::Base
     return person_project_membership.project_roles
   end
 
-  def can_be_edited_by?(subject)
-    subject == nil ? false : (subject.is_admin? || (self.people.include?(subject.person) && (subject.can_edit_projects? || subject.is_project_manager?)))
+  def can_be_edited_by?(user)
+    user == nil ? false : (user.is_admin? || (self.has_member?(user) && (user.can_edit_projects? || user.is_project_manager?)))
   end
 
-  def can_be_administered_by?(subject)
-    subject == nil ? false : (subject.is_admin? || (self.people.include?(subject.person) && (subject.is_project_manager?)))
+  def can_be_administered_by?(user)
+    user == nil ? false : (user.is_admin? || (self.has_member?(user) && (user.is_project_manager?)))
   end
 
 end

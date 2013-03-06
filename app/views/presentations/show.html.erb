@@ -1,46 +1,26 @@
 <%= javascript_include_tag "resource" -%>
 <% truncate_length_for_boxes = 22 -%>
 
+<%= render :partial => "layouts/item_title",:locals=>{:item=>@presentation, :version=>@display_presentation.version} %>
+
 <ul class="sectionIcons">
     <%= asset_buttons @presentation,@display_presentation.version -%>
 </ul>
-
-<%= render :partial=>"assets/upload_new_version_form", :locals=>{:resource=>@presentation} -%>
-
-<%= render :partial => "layouts/item_title",:locals=>{:item=>@presentation} %>
-
-<%= render :partial => "layouts/usage_info", :locals => { :resource => @presentation } -%>
-
+<br/>
 
 <div class="show_basic">
 
+  <%= render :partial=>"assets/upload_new_version_form", :locals=>{:resource=>@presentation} -%>
 
   <div class="main_content_left_box_narrower">
 
     <%= render :partial=>"assets/resource_version_details", :locals=>{:displayed_resource=>@display_presentation, :resource=>@presentation} -%>
 
     <div class="box_about_actor">
-      <p>
-        <b>Title:</b>
-        <span class="title"><%= h @display_presentation.title -%></span>
-      </p>
-
-
-      <p>
-        <b>File name:</b>
-        <%= h @display_presentation.original_filename -%>
-
-
-      </p>
-      <div id="div_for_viewerPlaceHolder" style="width:600px;height:480px;display:none">
-          <a id="viewerPlaceHolder" style="width:595px;height:480px;display:block"></a>
-      </div>
-      <p>
-        <b>Format:</b>
-        <%= h mime_nice_name(@display_presentation.content_type) -%>
-      </p>
-
+      <%= render :partial => 'assets/fileinfo',:object=>@display_presentation.content_blob -%>
       <br/>
+
+      <%= render :partial => "assets/special_auth_code_display", :locals => {:resource => @presentation} %>
 
       <p>
         <b>Description:</b>
@@ -54,7 +34,6 @@
           </p>
       <% end -%>
       </p>
-
     </div>
   </div>
 
@@ -70,7 +49,8 @@
 
     <%# get, classify and authorize all assets for this project -%>
     <%= render :partial=>"layouts/items_related_to",:object => @presentation %>
-
+    <br/>
+    <%= render :partial => "layouts/usage_info", :locals => { :resource => @presentation } -%>
   </div>
 
 </div>

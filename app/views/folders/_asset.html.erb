@@ -1,0 +1,19 @@
+<%
+    li_class=asset.class.name.underscore
+    drag_id="#{asset.class.name}_#{asset.id}_#{folder.id}"
+    image=resource_avatar(asset,:class=>"asset_card_avatar")
+    max_title_length=85
+    drag_classes = folder.respond_to?(:assay) ? "draggable_assay_folder_item" : "draggable_folder_item"
+    # FIXME: the accepted types shouldn't be defined in this view class
+    drag_classes << " exp_assay_accepted_item" if ([DataFile,Publication,Sop].include?(asset.class))
+%>
+
+<li class="asset_card_item <%= drag_classes -%> <%= li_class -%>" title="<%= folder_asset_item_tooltip asset -%>" id="<%= drag_id -%>">
+
+  <p class="asset_card_title" >
+    <%= image -%>
+    <%= link_to h(truncate(asset.title,:length=>max_title_length)),asset -%><br/>
+  </p>
+</li>
+
+<%= draggable_element drag_id,:revert=>true, :ghosting=>false -%>

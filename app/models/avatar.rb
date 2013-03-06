@@ -17,9 +17,7 @@ class Avatar < ActiveRecord::Base
     missing_image_message     'is required'
     invalid_image_message     'was not a readable image'
   end
-  
-  # UNCOMMENTING NEXT LINE CAUSES STACK OVERFLOW - NEEDS FURTHER INVESTIGATION
-  #validates_associated :owner
+
   validates_presence_of :owner
   
   belongs_to :owner,

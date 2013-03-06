@@ -14,7 +14,7 @@ module Seek
 
     def self.ensure_models_loaded
       @@models_loaded ||= begin
-        Dir.glob(RAILS_ROOT + '/app/models/*.rb').each do |file|
+        Dir.glob("#{Rails.root}/app/models/*.rb").each do |file|
           model_name = file.gsub(".rb", "").split(File::SEPARATOR).last
           model_name.camelize.constantize
         end
@@ -56,5 +56,20 @@ module Seek
 
     end
 
+    def self.breadcrumb_types
+      @@breadcrumb_types ||= begin
+        persistent_classes.select do |c|
+          c.is_isa? || c.is_asset? || c.is_yellow_pages? || c.name == 'Event'
+        end.sort_by(&:name)
+      end
+    end
+
+    def self.inline_viewable_content_types
+      [DataFile, Model, Presentation, Sop]
+    end
+
+    def self.multi_files_asset_types
+      [Model]
+    end
   end
 end

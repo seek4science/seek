@@ -1,0 +1,9 @@
+<% resource = external_resource_list_item %>
+<% resource_type = resource.tab.downcase  %>
+
+<% content_partial = "#{Rails.root}/#{resource.partial_path}" -%>
+
+<div class="list_item">
+  <%= render :file=> content_partial, :locals=>{:resource => resource, :resource_origin => resource_type} %>
+</div>
+<br style="clear:both"/>

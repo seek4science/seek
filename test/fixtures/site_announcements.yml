@@ -9,3 +9,9 @@ mail:
     email_notification: true
     announcer: pal (Person)  
     body: this is a mail announcement
+
+headline:
+    title: a headline announcement
+    is_headline: true
+    announcer: pal (Person)
+    body: this is a headline announcement

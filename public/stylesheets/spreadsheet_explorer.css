@@ -61,7 +61,6 @@ td.annotated_cell {
 }
 
 
-
 a.sheet_tab {
   display: inline-block;
   background: #AAA;
@@ -174,7 +173,12 @@ div#annotation_controls
 div#annotation_container
 {
   position: absolute;
-  z-index: 10;
+  z-index: 20;
+}
+
+div.annotation_plot_data {
+    min-width: 650px;
+    min-height: 450px;
 }
 
 span.cell_coverage, span.sheet_location
@@ -183,7 +187,8 @@ span.cell_coverage, span.sheet_location
 
 div.spreadsheet_popup
 {
-  min-width: 18em;
+  min-width: 650px;
+  min-height: 450px;
   border: 1px solid #CCC;
   padding: 0.5em;
   margin: 0.5em;

@@ -1,41 +1,26 @@
 <%= javascript_include_tag "resource" -%>
 
+<%= render :partial => "layouts/item_title",:locals=>{:item=>@sop, :version=>@display_sop.version} %>
+
 <ul class="sectionIcons">
     <%= asset_buttons @sop,@display_sop.version -%>
 </ul>
-
-<%= render :partial=>"assets/upload_new_version_form", :locals=>{:resource=>@sop} -%>
-
-<%= render :partial => "layouts/item_title",:locals=>{:item=>@sop} %>
-
-<%= render :partial => "layouts/usage_info", :locals => { :resource => @sop } -%>
-
+<br/>
 
 <div class="show_basic">
-  
+
+  <%= render :partial=>"assets/upload_new_version_form", :locals=>{:resource=>@sop} -%>
 
   <div class="main_content_left_box_narrower">
 
     <%= render :partial=>"assets/resource_version_details", :locals=>{:displayed_resource=>@display_sop, :resource=>@sop} -%>
   
     <div class="box_about_actor">
-      <p>
-        <b>Title:</b>
-        <span class="title"><%= h @display_sop.title -%></span>
-      </p>
-
-
-      <p>
-        <b>File name:</b>
-        <%= h @display_sop.original_filename -%>
-      </p>
-
-      <p>
-        <b>Format:</b>
-        <%= h mime_nice_name(@display_sop.content_type) -%>
-      </p>
+      <%= render :partial => 'assets/fileinfo',:object=>@display_sop.content_blob -%>
 
       <br/>
+
+      <%= render :partial => "assets/special_auth_code_display", :locals => {:resource => @sop} %>
 
       <p>
         <b>Description:</b>
@@ -49,7 +34,6 @@
           </p>
       <% end -%>
       </p>
-
     </div>
   </div>
 
@@ -68,7 +52,8 @@
 
     <%# get, classify and authorize all assets for this project -%>
     <%= render :partial=>"layouts/items_related_to",:object => @sop %>
-
+    <br/>
+    <%= render :partial => "layouts/usage_info", :locals => { :resource => @sop } -%>
   </div>
 
 </div>

@@ -13,6 +13,7 @@ class Sample < ActiveRecord::Base
   attr_accessor :from_biosamples
 
   belongs_to :specimen
+  belongs_to :age_at_sampling_unit, :class_name => 'Unit', :foreign_key => "age_at_sampling_unit_id"
 
   accepts_nested_attributes_for :specimen
 
@@ -25,8 +26,9 @@ class Sample < ActiveRecord::Base
   has_many :creators, :class_name => "Person", :through => :assets_creators, :order=>'assets_creators.id', :after_add => :update_timestamp, :after_remove => :update_timestamp
   has_many :assets,:through => :sample_assets
   has_many :sample_assets,:dependent => :destroy
-  validates_numericality_of :age_at_sampling, :only_integer => true, :greater_than=> 0, :allow_nil=> true, :message => "is not a positive integer", :unless => "Seek::Config.is_virtualliver"
-  validates_presence_of :projects, :unless => "Seek::Config.is_virtualliver"
+ 
+   validates_numericality_of :age_at_sampling, :only_integer => true, :greater_than=> 0, :allow_nil=> true, :message => "is not a positive integer"
+   validates_presence_of :projects, :unless => "Seek::Config.is_virtualliver"
 
 
   has_and_belongs_to_many :tissue_and_cell_types
@@ -56,8 +58,6 @@ class Sample < ActiveRecord::Base
   has_many :data_file_masters, :through => :sample_assets, :source => :asset, :source_type => 'DataFile'
   has_many :model_masters, :through => :sample_assets, :source => :asset, :source_type => 'Model'
   has_many :sop_masters, :through => :sample_assets, :source => :asset, :source_type => 'Sop'
-  #has_many :sop_masters,:class_name => "SampleSop"
-
   has_many :treatments
 
 
@@ -67,17 +67,26 @@ class Sample < ActiveRecord::Base
   validates_presence_of :specimen,:lab_internal_number
   validates_presence_of :donation_date, :if => "Seek::Config.is_virtualliver"
 
+
   grouped_pagination :pages=>("A".."Z").to_a, :default_page => Seek::Config.default_page(self.name.underscore.pluralize)
 
   HUMANIZED_COLUMNS = {:title => "Sample name", :lab_internal_number=> "Sample lab internal identifier", :provider_id => "Provider's sample identifier"}
 
-  searchable do
+  ["data_file","sop","model"].each do |type|
+     eval <<-END_EVAL
+       #related items hash will use data_file_masters instead of data_files, etc. (sops, models)
+       def related_#{type.pluralize}
+         #{type}_masters
+       end
+     END_EVAL
+  end
+
+  searchable(:ignore_attribute_changes_of=>[:updated_at]) do
     text :searchable_terms
     text :creators do
       creators.compact.map(&:name).join(' ')
     end
   end if Seek::Config.solr_enabled
-
 
   def searchable_terms
     text=[]
@@ -200,5 +209,13 @@ class Sample < ActiveRecord::Base
 
   def specimen_info
     specimen.nil? ? '' : Seek::Config.sample_parent_term.capitalize + ': ' + specimen.title
+  end
+
+  def age_at_sampling_info
+    unless age_at_sampling.blank? || age_at_sampling_unit.blank?
+      "#{age_at_sampling} (#{age_at_sampling_unit.title || age_at_sampling_unit.symbol}s)"
+    else
+      ''
+    end
  end
 end

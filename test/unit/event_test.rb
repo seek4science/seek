@@ -67,4 +67,14 @@ class EventTest < ActiveSupport::TestCase
     assert !@event.valid?
     assert !@event.save
   end
+
+  test "presentations association" do
+      event = Factory :event
+      assert event.presentations.empty?
+
+      User.current_user = event.contributor
+      assert_difference "event.presentations.count" do
+         event.presentations << [Factory(:presentation, :policy => Factory(:public_policy))]
+      end
+  end
 end

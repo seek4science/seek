@@ -9,6 +9,7 @@ class AssaysController < ApplicationController
   before_filter :find_and_auth, :only=>[:edit, :update, :destroy, :show]
 
   include Seek::Publishing
+  include Seek::BreadCrumbs
 
    def new_object_based_on_existing_one
     @existing_assay =  Assay.find(params[:id])
@@ -83,7 +84,7 @@ class AssaysController < ApplicationController
     organisms     = params[:assay_organism_ids] || []
     sop_ids       = params[:assay_sop_ids] || []
     data_file_ids = params[:data_file_ids] || []
-    model_ids     = params[:assay_model_ids] || []
+    model_ids     = params[:model_ids] || []
 
 
 #    organism_ids= organisms.collect{|o|o.split(",").first}.to_a
@@ -153,7 +154,7 @@ class AssaysController < ApplicationController
     organisms             = params[:assay_organism_ids] || []
     sop_ids               = params[:assay_sop_ids] || []
     data_file_ids         = params[:data_file_ids] || []
-    model_ids             = params[:assay_model_ids] || []
+    model_ids             = params[:model_ids] || []
     publication_params    = params[:related_publication_ids].nil?? [] : params[:related_publication_ids].collect { |i| ["Publication", i.split(",").first]}
 
     @assay.assay_organisms = []

@@ -32,6 +32,12 @@ class AdminController < ApplicationController
     end
     redirect_to :action=>:show
   end
+
+  def registration_form
+    respond_to do |format|
+      format.html
+    end
+  end
   
   def tags
     @tags=TextValue.all_tags.sort_by{|t| t.text}
@@ -42,12 +48,14 @@ class AdminController < ApplicationController
     Seek::Config.events_enabled= string_to_boolean params[:events_enabled]
     Seek::Config.jerm_enabled= string_to_boolean params[:jerm_enabled]
     Seek::Config.email_enabled= string_to_boolean params[:email_enabled]
+    Seek::Config.pdf_conversion_enabled= string_to_boolean params[:pdf_conversion_enabled]
 
     Seek::Config.set_smtp_settings 'address', params[:address]
     Seek::Config.set_smtp_settings 'domain', params[:domain]
     Seek::Config.set_smtp_settings 'authentication', params[:authentication]
     Seek::Config.set_smtp_settings 'user_name', params[:user_name]
     Seek::Config.set_smtp_settings 'password', params[:password]
+    Seek::Config.set_smtp_settings 'enable_starttls_auto',params[:enable_starttls_auto]=="1"
 
     Seek::Config.solr_enabled= string_to_boolean params[:solr_enabled]
     Seek::Config.jws_enabled= string_to_boolean params[:jws_enabled]
@@ -141,6 +149,9 @@ class AdminController < ApplicationController
 
   def update_others
     update_flag = true
+    if Seek::Config.tag_threshold.to_s != params[:tag_threshold] || Seek::Config.max_visible_tags.to_s!=params[:max_visible_tags]
+      expire_annotation_fragments
+    end
     Seek::Config.site_base_host = params[:site_base_host] unless params[:site_base_host].nil?
     #check valid email
     Seek::Config.pubmed_api_email = params[:pubmed_api_email] if params[:pubmed_api_email] == '' || (check_valid_email params[:pubmed_api_email], "pubmed api email")
@@ -163,7 +174,7 @@ class AdminController < ApplicationController
     update_redirect_to update_flag,'biosamples_renaming'
   end
   def restart_server
-    system ("touch #{RAILS_ROOT}/tmp/restart.txt")
+    system ("touch #{Rails.root}/tmp/restart.txt")
     flash[:notice] = 'The server was restarted'
     redirect_to :action=>:show
   end
@@ -234,7 +245,8 @@ class AdminController < ApplicationController
     collection = []
     type = nil
     title = nil
-    case params[:id]
+    @page=params[:id]
+    case @page
       when "pals"
         title = "PALs"
         collection = Person.pals
@@ -291,6 +303,30 @@ class AdminController < ApplicationController
           format.html { render :text=>"" }
       end
     end
+  end
+
+  def test_email_configuration
+    smtp_hash_old = ActionMailer::Base.smtp_settings
+    smtp_hash_new = {:address => params[:address], :enable_starttls_auto => params[:enable_starttls_auto]=="1", :domain => params[:domain], :authentication => params[:authentication], :user_name => (params[:user_name].blank? ? nil : params[:user_name]), :password => (params[:password].blank? ? nil : params[:password])}
+    smtp_hash_new[:port] = params[:port] if only_integer params[:port], 'port'
+    ActionMailer::Base.smtp_settings = smtp_hash_new
+    raise_delivery_errors_setting = ActionMailer::Base.raise_delivery_errors
+    ActionMailer::Base.raise_delivery_errors = true
+        begin
+          Mailer.deliver_test_email params[:testing_email]
+          render :update do |page|
+            page.replace_html "ajax_loader_position", "<div id='ajax_loader_position'></div>"
+            page.alert("test email is sent successfully to #{params[:testing_email]}")
+          end
+        rescue Exception => e
+          render :update do |page|
+            page.replace_html "ajax_loader_position", "<div id='ajax_loader_position'></div>"
+            page.alert("Fail to send test email, #{e.message}")
+          end
+        ensure
+          ActionMailer::Base.smtp_settings = smtp_hash_old
+          ActionMailer::Base.raise_delivery_errors = raise_delivery_errors_setting
+        end
   end
 
   private
@@ -356,7 +392,6 @@ class AdminController < ApplicationController
   def update_redirect_to flag, action
      if flag
        flash[:notice] = RESTART_MSG
-       #expires all fragment caching
        expire_header_and_footer
        redirect_to :action=>:show
      else

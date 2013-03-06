@@ -35,6 +35,19 @@ class ProjectSubscriptionTest < ActiveSupport::TestCase
     assert s.subscribed?
   end
 
+  test 'unsubscribers to a project auto unsubscribe to subscribable items in the project' do
+    #subscribe
+    ps = current_person.project_subscriptions.create :project => @proj
+    ProjectSubscriptionJob.new(ps.id).perform
+    assert @subscribables_in_proj.all?(&:subscribed?)
+
+    #unsubscribe
+    ps.destroy
+    assert_nil ProjectSubscription.find_by_id(ps.id)
+    @subscribables_in_proj.each{|s| s.reload}
+    assert !@subscribables_in_proj.all?(&:subscribed?)
+  end
+
   test 'individual subscription frequency set by project subscription frequency' do
     ps = current_person.project_subscriptions.create :project => @proj, :frequency => 'daily'
     ProjectSubscriptionJob.new(ps.id).perform

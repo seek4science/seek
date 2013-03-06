@@ -43,13 +43,12 @@ module OrganismsHelper
   def list_organisms_and_strains organism_and_strains, none_text="Not specified"
     result=""
     result="<span class='none_text'>#{none_text}</span>" if organism_and_strains.empty?
-    result += "<br/>"
     organism_and_strains.each do |os|
       organism=os[0]
       strain=os[1]
       unless strain.nil? && organism.nil?
-        result = organism_and_strain strain,organism
-        result += ",<br/>" unless os==organism_and_strains.last
+        result += organism_and_strain strain,organism
+        result += ", " unless os==organism_and_strains.last
       end
     end
     result
@@ -60,7 +59,7 @@ module OrganismsHelper
     if organism
       result << link_to(h(organism.title), organism)
       if strain && !strain.is_dummy?
-        result << " : #{h(strain.info)}"
+        result << " : <span class='strain_info'>#{h(strain.info)}</span>"
       end
     end
     result.empty? ? "<span class='none_text'>#{none_text}</span>" : result

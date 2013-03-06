@@ -13,40 +13,62 @@ class ModelTest < ActiveSupport::TestCase
     assert_equal "Teusink",model.title
 
     blob=content_blobs(:teusink_blob)
-    assert_equal blob,model.content_blob
+    assert_equal 1,model.content_blobs.size
+    assert_equal blob,model.content_blobs.first
+  end
+
+  test "model contents for search" do
+    model = Factory :teusink_model
+    contents = model.model_contents_for_search
+
+    assert contents.include?("KmPYKPEP")
+    assert contents.include?("F16P")
+  end
+
+  test "content blob search terms" do
+    m = Factory :teusink_model
+    m.content_blobs << Factory.create(:doc_content_blob,:original_filename=>"word.doc",:asset=>m,:asset_version=>m.version)
+    m.reload
+
+    assert_equal ["This is a ms word doc format", "teusink.xml", "word.doc"],m.content_blob_search_terms.sort
   end
 
   test "type detection" do
-    model = models(:teusink)
-    assert model.is_sbml?
+    model = Factory :teusink_model
+    assert model.contains_sbml?
     assert model.is_jws_supported?
-    assert !model.is_dat?
+    assert !model.contains_jws_dat?
 
-    model = models(:jws_model)
-    assert !model.is_sbml?
+    model = Factory :teusink_jws_model
+    assert !model.contains_sbml?
     assert model.is_jws_supported?
-    assert model.is_dat?
+    assert model.contains_jws_dat?
 
-    model = models(:non_sbml_xml)
-    assert !model.is_sbml?
+    model = Factory :non_sbml_xml_model
+    assert !model.contains_sbml?
     assert !model.is_jws_supported?
-    assert !model.is_dat?
+    assert !model.contains_jws_dat?
 
     #should also be able to handle versions
     model = models(:teusink).latest_version
-    assert model.is_sbml?
+    assert model.contains_sbml?
     assert model.is_jws_supported?
-    assert !model.is_dat?
+    assert !model.contains_jws_dat?
 
-    model = models(:jws_model).latest_version
-    assert !model.is_sbml?
+    model = Factory(:teusink_jws_model).latest_version
+    assert !model.contains_sbml?
     assert model.is_jws_supported?
-    assert model.is_dat?
+    assert model.contains_jws_dat?
 
-    model = models(:non_sbml_xml).latest_version
-    assert !model.is_sbml?
+    model = Factory(:teusink_model).latest_version
+    assert model.contains_sbml?
+    assert model.is_jws_supported?
+    assert !model.contains_jws_dat?
+
+    model = Factory(:non_sbml_xml_model).latest_version
+    assert !model.contains_sbml?
     assert !model.is_jws_supported?
-    assert !model.is_dat?
+    assert !model.contains_jws_dat?
   end
 
   test "assay association" do
@@ -113,11 +135,12 @@ class ModelTest < ActiveSupport::TestCase
     model.content_blobs.build(:data=>nil,:url=>"http://mockedlocation.com/teusink.xml",
     :original_filename=>"teusink.xml")
     model.save!
-    assert !model.content_blob.file_exists?
+    assert_equal 1,model.content_blobs.size
+    assert !model.content_blobs.first.file_exists?
 
     model.cache_remote_content_blob
 
-    assert model.content_blob.file_exists?
+    assert model.content_blobs.first.file_exists?
 
   end
   
@@ -167,8 +190,9 @@ class ModelTest < ActiveSupport::TestCase
   test "make sure content blob is preserved after deletion" do
     model = models(:teusink)
     User.current_user = model.contributor
-    assert_not_nil model.content_blob,"Must have an associated content blob for this test to work"
-    cb=model.content_blob
+    assert_equal 1, model.content_blobs.size,"Must have an associated content blob for this test to work"
+    assert_not_nil model.content_blobs.first,"Must have an associated content blob for this test to work"
+    cb=model.content_blobs.first
     assert_difference("Model.count",-1) do
       assert_no_difference("ContentBlob.count") do
         model.destroy

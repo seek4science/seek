@@ -34,6 +34,57 @@ class AssetTest < ActiveSupport::TestCase
 
   end
 
+  test "contains_downloadable_items?" do
+
+    mock_remote_file "#{Rails.root}/test/fixtures/files/html_file.html","http://webpage.com",{'Content-Type' => 'text/html'}
+    mock_remote_file "#{Rails.root}/test/fixtures/files/html_file.html","http://webpage2.com",{'Content-Type' => 'text/html'}
+
+    df = Factory :data_file
+    assert df.contains_downloadable_items?
+    assert df.latest_version.contains_downloadable_items?
+
+    df = Factory :data_file,:content_blob=>Factory(:content_blob,:url=>"http://webpage.com")
+    assert !df.contains_downloadable_items?
+    assert !df.latest_version.contains_downloadable_items?
+
+    Factory.define(:model_with_urls,:parent=>:model) do |f|
+      f.after_create do |model|
+        model.content_blobs = [
+            Factory.create(:content_blob, :url=>"http://webpage.com", :asset => model,:asset_version=>model.version),
+            Factory.create(:content_blob, :url=>"http://webpage2.com", :asset => model,:asset_version=>model.version)
+        ]
+      end
+    end
+
+    model = Factory :model_with_urls
+    assert !model.contains_downloadable_items?
+    assert !model.latest_version.contains_downloadable_items?
+
+    model = Factory :teusink_model
+    assert model.contains_downloadable_items?
+    assert model.latest_version.contains_downloadable_items?
+
+    Factory.define(:model_with_urls_and_files,:parent=>:model) do |f|
+      f.after_create do |model|
+        model.content_blobs = [
+            Factory.create(:content_blob, :url=>"http://webpage.com", :asset => model,:asset_version=>model.version),
+            Factory.create(:cronwright_model_content_blob, :asset => model,:asset_version=>model.version)
+        ]
+      end
+    end
+
+    model = Factory :model_with_urls_and_files
+    assert model.contains_downloadable_items?
+    assert model.latest_version.contains_downloadable_items?
+
+    df = DataFile.new
+    assert !df.contains_downloadable_items?
+
+    model = Model.new
+    assert !model.contains_downloadable_items?
+
+  end
+
   test "tech type titles" do
     df = Factory :data_file
     assay = Factory :experimental_assay,:technology_type=>Factory(:technology_type,:title=>"aaa")
@@ -52,6 +103,40 @@ class AssetTest < ActiveSupport::TestCase
     assert_equal ["aaa","bbb"],df.technology_type_titles.sort
     m=Factory :model
     assert_equal [],m.technology_type_titles
+
+  end
+
+  test "content type from filename" do
+    #to allow us to test the private method in isolation
+    class TTT
+      include AssetsCommonExtension
+      def content_type_for_test filename
+        content_type_from_filename filename
+      end
+    end
+
+    ttt=TTT.new
+    type = ttt.content_type_for_test "test.jpg"
+    checks = [
+        {:f=>"test.jpg",:t=>"image/jpeg"},
+        {:f=>"test.JPG",:t=>"image/jpeg"},
+        {:f=>"test.png",:t=>"image/png"},
+        {:f=>"test.PNG",:t=>"image/png"},
+        {:f=>"test.jpeg",:t=>"image/jpeg"},
+        {:f=>"test.JPEG",:t=>"image/jpeg"},
+        {:f=>"test.xls",:t=>"application/excel"},
+        {:f=>"test.doc",:t=>"application/msword"},
+        {:f=>"test.xlsx",:t=>"application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"},
+        {:f=>"test.docx",:t=>"application/vnd.openxmlformats-officedocument.wordprocessingml.document"},
+        {:f=>"test.XLs",:t=>"application/excel"},
+        {:f=>"test.Doc",:t=>"application/msword"},
+        {:f=>"test.XLSX",:t=>"application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"},
+        {:f=>"test.dOCx",:t=>"application/vnd.openxmlformats-officedocument.wordprocessingml.document"},
+        {:f=>"unknown.xxx",:t=>"application/octet-stream"}
+    ]
+    checks.each do |check|
+      assert_equal check[:t],ttt.content_type_for_test(check[:f]),"Expected #{check[:t]} for #{check[:f]}"
+    end
 
   end
 

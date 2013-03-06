@@ -1,3 +1,5 @@
+<%= render :partial => "layouts/item_title",:locals=>{:item=>@publication} %>
+
 <ul class="sectionIcons">
   <% if !@publication.pubmed_id.nil? %>
     <li><%= image_tag_for_key('visit_pubmed', "http://www.ncbi.nlm.nih.gov/pubmed/#{@publication.pubmed_id}", nil, {:popup => true}, 'View Publication On PubMed') -%></li>
@@ -11,13 +13,10 @@
   <% if @publication.can_delete? -%>
       <li><%= image_tag_for_key('destroy', publication_path(@publication), nil, { :confirm => 'This will unregister this publication with SEEK. Are you sure wish to do this?', :method => :delete }, 'Unregister') -%></li>
   <% end -%>
-  <li><%= image_tag_for_key 'endnote', formatted_publication_path(:id => @publication.id, :format => 'enw'), nil, nil, 'Export to EndNote' %></li>
+  <li><%= image_tag_for_key 'endnote', publication_path(:id => @publication.id, :format => 'enw'), nil, nil, 'Export to EndNote' %></li>
 </ul>
 
-<%= render :partial => "layouts/item_title",:locals=>{:item=>@publication} %>
-
 <div class="show_basic">
-  <%= render :partial => "layouts/usage_info", :locals => { :resource => @publication } -%>
   <div class="main_content_left_box_narrower">
     <div class="box_about_actor">
       <p>
@@ -83,5 +82,7 @@
   <div style="clear:both;padding-top:1em;">      
     <%= embedded_isa_svg(@publication, false, @publication) -%>
     <%= render :partial=>"layouts/items_related_to",:object => @publication %>
+    <br/>
+    <%= render :partial => "layouts/usage_info", :locals => { :resource => @publication } -%>
   </div>
 </div>

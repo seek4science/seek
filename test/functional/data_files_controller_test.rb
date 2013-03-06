@@ -13,13 +13,54 @@ class DataFilesControllerTest < ActionController::TestCase
 
   def setup
     login_as(:datafile_owner)
+  end
+
+  def rest_api_test_object
     @object=data_files(:picture)
+    @object.tag_with "tag1,tag2"
+    @object
   end
   
   def test_title
     get :index
     assert_response :success
     assert_select "title",:text=>/The Sysmo SEEK Data.*/, :count=>1
+  end
+
+  test "correct title and text for associating an assay for new" do
+    login_as(Factory(:user))
+    get :new
+    assert_response :success
+
+    assert_select 'div.foldTitle',:text=>/Experimental Assays and Modelling Analyses/
+    assert_select 'div#associate_assay_fold_content p',:text=>/The following Experimental Assays and Modelling Analyses are associated with this Data file:/
+    assert_select 'div.association_step p',:text=>/You may select an existing editable Experimental Assay or Modelling Analysis to associate with this Data file./
+  end
+
+  test "correct title and text for associating an assay for edit" do
+    df = Factory :data_file
+    login_as(df.contributor.user)
+    get :edit, :id=>df.id
+    assert_response :success
+
+    assert_select 'div.foldTitle',:text=>/Experimental Assays and Modelling Analyses/
+    assert_select 'div#associate_assay_fold_content p',:text=>/The following Experimental Assays and Modelling Analyses are associated with this Data file:/
+    assert_select 'div.association_step p',:text=>/You may select an existing editable Experimental Assay or Modelling Analysis to associate with this Data file./
+  end
+
+  test "view_items_in_tab" do
+    other_user = Factory :user
+    df = Factory :data_file,:title=>"a data file",:contributor=>User.current_user,:policy=>Factory(:public_policy)
+    private_df = Factory :data_file,:title=>"a private data file",:contributor=>other_user,:policy=>Factory(:private_policy)
+    xml_http_request :get, :view_items_in_tab,:resource_type=>"DataFile",:resource_ids=>[df.id,private_df.id,1000].join(",")
+    assert_response :success
+
+    assert @response.body.include?("a data file")
+    assert !@response.body.include?("a private data file")
+
+    #try with no parameters
+    xml_http_request :get, :view_items_in_tab
+    assert_response :success
   end
 
   test "get XML when not logged in" do
@@ -30,12 +71,54 @@ class DataFilesControllerTest < ActionController::TestCase
 
   end
 
+  test "data files tab should be selected" do
+    get :index
+    assert_select "ul.tabnav" do
+      assert_select "li#selected_tabnav" do
+        assert_select "a[href=?]",data_files_path,:text=>"Data files"
+      end
+    end
+  end
+
+  test "get as rdf" do
+    df = Factory :rightfield_annotated_datafile, :contributor=>users(:datafile_owner)
+    assert df.can_view?
+    get :show, :id=>df, :format=>"rdf"
+    assert_response :success
+    rdf = @response.body
+    RDF::Reader.for(:rdfxml).new(rdf) do |reader|
+      assert reader.statements.count > 0
+      assert_equal RDF::URI.new("http://localhost:3000/data_files/#{df.id}"), reader.statements.first.subject
+    end
+
+  end
+
   test "XML for data file with tags" do
     p=Factory :person
     df = Factory(:data_file,:policy=>Factory(:public_policy, :access_type=>Policy::VISIBLE))
     Factory :tag,:annotatable=>df,:source=>p,:value=>"golf"
 
-    test_get_xml df
+    test_get_rest_api_xml df
+
+  end
+
+  test "should include tags in XML" do
+      p=Factory :person
+      df = Factory(:data_file,:policy=>Factory(:public_policy, :access_type=>Policy::VISIBLE))
+      Factory :tag,:annotatable=>df,:source=>p,:value=>"golf"
+      Factory :tag,:annotatable=>df,:source=>p,:value=>"<fish>"
+      Factory :tag,:annotatable=>df,:source=>p,:value=>"frog",:attribute_name=>"tool"
+      Factory :tag,:annotatable=>df,:source=>p,:value=>"stuff",:attribute_name=>"expertise"
+
+      test_get_rest_api_xml df
+
+      assert_response :success
+      xml = @response.body
+      assert xml.include?('<tags>')
+      assert xml.include?('<tag context="tag">golf')
+      assert xml.include?('<tag context="tag">&lt;fish&gt;')
+      assert xml.include?('<tag context="tool">frog')
+      assert xml.include?('<tag context="expertise">stuff')
 
   end
   
@@ -131,7 +214,7 @@ class DataFilesControllerTest < ActionController::TestCase
     login_as(:aaron)
     get :index, :page => "all"
     assert_response :success
-    assert_equal assigns(:data_files).sort_by(&:id), Authorization.authorize_collection("view", assigns(:data_files), users(:aaron)).sort_by(&:id), "data files haven't been authorized properly"
+    assert_equal assigns(:data_files).sort_by(&:id), DataFile.authorized_partial_asset_collection(assigns(:data_files), "view", users(:aaron)).sort_by(&:id), "data files haven't been authorized properly"
   end
 
   test "should get new" do
@@ -194,8 +277,8 @@ class DataFilesControllerTest < ActionController::TestCase
     assert !assigns(:data_file).content_blob.url.blank?
     assert assigns(:data_file).content_blob.data_io_object.nil?
     assert !assigns(:data_file).content_blob.file_exists?
-    assert_equal "a-piccy.png", assigns(:data_file).original_filename
-    assert_equal "image/png", assigns(:data_file).content_type
+    assert_equal "a-piccy.png", assigns(:data_file).content_blob.original_filename
+    assert_equal "image/png", assigns(:data_file).content_blob.content_type
   end
   
   test "should create data file with ftp_url" do
@@ -279,75 +362,24 @@ class DataFilesControllerTest < ActionController::TestCase
     assert !assigns(:data_file).content_blob.url.blank?
     assert !assigns(:data_file).content_blob.data_io_object.read.nil?
     assert assigns(:data_file).content_blob.file_exists?
-    assert_equal "a-piccy.png", assigns(:data_file).original_filename
-    assert_equal "image/png", assigns(:data_file).content_type
-  end  
-  
-  test "should gracefully handle when downloading a unknown host url" do
-    WebMock.allow_net_connect!
-    df=data_files(:url_no_host_data_file)
-    get :download,:id=>df
-    assert_redirected_to data_file_path(df,:version=>df.version)
-    assert_not_nil flash[:error]
+    assert_equal "a-piccy.png", assigns(:data_file).content_blob.original_filename
+    assert_equal "image/png", assigns(:data_file).content_blob.content_type
   end
-  
-  test "should gracefully handle when downloading a url resulting in 404" do
+
+  test "should correctly handle 404 url" do
     mock_http
-    df=data_files(:url_not_found_data_file)
-    get :download,:id=>df
-    assert_redirected_to data_file_path(df,:version=>df.version)
-    assert_not_nil flash[:error]
-  end
-  
-  #This test is quite fragile, because it relies on an external resource
-  test "should create and redirect on download for 401 url" do
-    mock_http
-    df = {:title=>"401",:data_url=>"http://mocked401.com",:projects=>[projects(:sysmo_project)]}
-    assert_difference('ActivityLog.count') do
-      assert_difference('DataFile.count') do
-        assert_difference('ContentBlob.count') do
-          post :create, :data_file => df, :sharing=>valid_sharing
-        end
-      end
-    end
-    
-    assert_redirected_to data_file_path(assigns(:data_file))
-    assert_equal users(:datafile_owner),assigns(:data_file).contributor
-    assert !assigns(:data_file).content_blob.url.blank?
-    assert assigns(:data_file).content_blob.data_io_object.nil?
-    assert !assigns(:data_file).content_blob.file_exists?
-    assert_equal "",assigns(:data_file).original_filename
-    assert_equal "",assigns(:data_file).content_type
-    
-    get :download, :id => assigns(:data_file)
-    assert_redirected_to "http://mocked401.com"
-  end
-  
-  
-  #This test is quite fragile, because it relies on an external resource
-  test "should create and redirect on download for 302 url" do
-    mock_http
-    df = {:title=>"302",:data_url=>"http://mocked302.com",:projects=>[projects(:sysmo_project)]}
-    assert_difference('ActivityLog.count') do
-      assert_difference('DataFile.count') do
-        assert_difference('ContentBlob.count') do
+    df={:title=>"Test",:data_url=>"http://mocked404.com"}
+    assert_no_difference('ActivityLog.count') do
+      assert_no_difference('DataFile.count') do
+        assert_no_difference('ContentBlob.count') do
           post :create, :data_file => df, :sharing=>valid_sharing
         end
       end
     end
 
-    assert_redirected_to data_file_path(assigns(:data_file))
-    assert_equal users(:datafile_owner),assigns(:data_file).contributor
-    assert !assigns(:data_file).content_blob.url.blank?
-    assert assigns(:data_file).content_blob.data_io_object.nil?
-    assert !assigns(:data_file).content_blob.file_exists?
-    assert_equal "",assigns(:data_file).original_filename
-    assert_equal "",assigns(:data_file).content_type
-    
-    get :download, :id => assigns(:data_file)
-    assert_redirected_to "http://mocked302.com"
+    assert_not_nil flash.now[:error]
   end
-  
+
   test "should create data file" do
     login_as(:datafile_owner) #can edit assay
     assay=assays(:assay_can_edit_by_datafile_owner)
@@ -444,18 +476,60 @@ class DataFilesControllerTest < ActionController::TestCase
   end
   
   test "should show data file" do
-    d = data_files(:picture)
+    d = Factory :rightfield_datafile,:policy=>Factory(:public_policy)
     assert_difference('ActivityLog.count') do
       get :show, :id => d
     end
-
     assert_response :success
+
+    assert_select "div.box_about_actor" do
+      assert_select "p > b",:text=>/Filename:/
+      assert_select "p",:text=>/rightfield\.xls/
+      assert_select "p > b",:text=>/Format:/
+      assert_select "p",:text=>/Spreadsheet/
+      assert_select "p > b",:text=>/Size:/
+      assert_select "p",:text=>/9\.2 KB/
+    end
+
   end
 
+  test "should show wepage as a link" do
+    mock_remote_file "#{Rails.root}/test/fixtures/files/html_file.html","http://webpage.com",{'Content-Type' => 'text/html'}
+    df = Factory :data_file,:content_blob=>Factory(:content_blob,:url=>"http://webpage.com")
+    assert df.content_blob.is_webpage?
+    login_as(df.contributor.user)
+    get :show,:id=>df
+    assert_response :success
+
+    assert_select "div.box_about_actor" do
+      assert_select "p > b",:text=>/Link:/
+      assert_select "a[href=?][target=_blank]","http://webpage.com",:text=>"http://webpage.com"
+      assert_select "p > b",:text=>/Format:/,:count=>0
+      assert_select "p > b",:text=>/Size:/,:count=>0
+    end
+  end
+
+  test "should not show website link for viewable but inaccessible data" do
+    mock_remote_file "#{Rails.root}/test/fixtures/files/html_file.html","http://webpage.com",{'Content-Type' => 'text/html'}
+    df = Factory :data_file,:content_blob=>Factory(:content_blob,:url=>"http://webpage.com"),:policy=>Factory(:all_sysmo_viewable_policy)
+    user = Factory :user
+    assert df.can_view?(user)
+    assert !df.can_download?(user)
+    login_as(user)
+    get :show,:id=>df
+    assert_response :success
+
+    assert_select "div.box_about_actor" do
+      assert_select "p > b",:text=>/Link/,:count=>0
+      assert_select "a[href=?][target=_blank]","http://webpage.com",:text=>"http://webpage.com",:count=>0
+    end
+  end
+
+
+
   test "svg handles quotes in title" do
-    d = data_files(:picture)
-    d.title="\"Title with quote"
-    d.save!
+    d = Factory :rightfield_datafile, :title=>"\"Title with quote",:policy=>Factory(:public_policy)
+
     assert_difference('ActivityLog.count') do
       get :show, :id => d
     end
@@ -481,20 +555,195 @@ class DataFilesControllerTest < ActionController::TestCase
     assert_response :success
     assert_select "div#publications_fold_content",true
   end
-  
-  test "should download" do
-    assert_difference('ActivityLog.count') do
-      get :download, :id => data_files(:viewable_data_file)
+
+  test "dont show download button or count for website data file" do
+    mock_remote_file "#{Rails.root}/test/fixtures/files/html_file.html","http://webpage.com",{'Content-Type' => 'text/html'}
+    df = Factory :data_file,:content_blob=>Factory(:content_blob,:url=>"http://webpage.com")
+    assert df.content_blob.is_webpage?
+    login_as(df.contributor.user)
+    get :show,:id=>df
+    assert_response :success
+    assert_select "ul.sectionIcons > li > span.icon" do
+      assert_select "a[href=?]",download_data_file_path(df,:version=>df.version),:count=>0
+      assert_select "a",:text=>/Download/,:count=>0
+    end
+
+    assert_select "div.contribution_aftertitle" do
+      assert_select "b",:text=>/Downloads/,:count=>0
+    end
+
+  end
+
+  test "show download button for non website data file" do
+    df = Factory :data_file
+    login_as(df.contributor.user)
+    get :show,:id=>df
+    assert_response :success
+    assert_select "ul.sectionIcons > li > span.icon" do
+      assert_select "a[href=?]",download_data_file_path(df,:version=>df.version),:count=>1
+      assert_select "a",:text=>/Download Data file/,:count=>1
+    end
+
+    assert_select "div.contribution_aftertitle" do
+      assert_select "b",:text=>/Downloads/,:count=>1
+    end
+
+  end
+
+  test "should download datafile from standard route" do
+    df = Factory :rightfield_datafile, :policy=>Factory(:public_policy)
+    login_as(df.contributor.user)
+    assert_difference("ActivityLog.count") do
+      get :download, :id=>df.id
     end
     assert_response :success
+    al=ActivityLog.last
+    assert_equal "download",al.action
+    assert_equal df,al.activity_loggable
+    assert_equal "attachment; filename=\"rightfield.xls\"",@response.header['Content-Disposition']
+    assert_equal "application/excel",@response.header['Content-Type']
+    assert_equal "9216",@response.header['Content-Length']
   end
-  
+
+  test "should download" do
+    assert_difference('ActivityLog.count') do
+      get :download, :id => Factory(:small_test_spreadsheet_datafile,:policy=>Factory(:public_policy), :contributor=>User.current_user).id
+    end
+    assert_response :success
+    assert_equal "attachment; filename=\"small-test-spreadsheet.xls\"",@response.header['Content-Disposition']
+    assert_equal "application/excel",@response.header['Content-Type']
+    assert_equal "7168",@response.header['Content-Length']
+  end
+
   test "should download from url" do
     mock_http
     assert_difference('ActivityLog.count') do
       get :download, :id => data_files(:url_based_data_file)
     end
     assert_response :success
+  end
+
+  test "should gracefully handle when downloading a unknown host url" do
+    WebMock.allow_net_connect!
+    df=data_files(:url_no_host_data_file)
+    get :download,:id=>df
+    assert_redirected_to data_file_path(df,:version=>df.version)
+    assert_not_nil flash[:error]
+  end
+
+  test "should gracefully handle when downloading a url resulting in 404" do
+    mock_http
+    df=data_files(:url_not_found_data_file)
+    get :download,:id=>df
+    assert_redirected_to data_file_path(df,:version=>df.version)
+    assert_not_nil flash[:error]
+  end
+
+
+  test "should create and redirect on download for 401 url" do
+    mock_http
+    df = {:title=>"401",:data_url=>"http://mocked401.com",:projects=>[projects(:sysmo_project)]}
+    assert_difference('ActivityLog.count') do
+      assert_difference('DataFile.count') do
+        assert_difference('ContentBlob.count') do
+          post :create, :data_file => df, :sharing=>valid_sharing
+        end
+      end
+    end
+
+    assert_redirected_to data_file_path(assigns(:data_file))
+    assert_equal users(:datafile_owner),assigns(:data_file).contributor
+    assert !assigns(:data_file).content_blob.url.blank?
+    assert assigns(:data_file).content_blob.data_io_object.nil?
+    assert !assigns(:data_file).content_blob.file_exists?
+    assert_equal "",assigns(:data_file).content_blob.original_filename
+    assert_equal "",assigns(:data_file).content_blob.content_type
+
+    get :download, :id => assigns(:data_file)
+    assert_redirected_to "http://mocked401.com"
+  end
+
+
+
+  test "should create and redirect on download for 302 url" do
+    mock_http
+    df = {:title=>"302",:data_url=>"http://mocked302.com",:projects=>[projects(:sysmo_project)]}
+    assert_difference('ActivityLog.count') do
+      assert_difference('DataFile.count') do
+        assert_difference('ContentBlob.count') do
+          post :create, :data_file => df, :sharing=>valid_sharing
+        end
+      end
+    end
+
+    assert_redirected_to data_file_path(assigns(:data_file))
+    assert_equal users(:datafile_owner),assigns(:data_file).contributor
+    assert !assigns(:data_file).content_blob.url.blank?
+    assert assigns(:data_file).content_blob.data_io_object.nil?
+    assert !assigns(:data_file).content_blob.file_exists?
+    assert_equal "",assigns(:data_file).content_blob.original_filename
+    assert_equal "",assigns(:data_file).content_blob.content_type
+
+    get :download, :id => assigns(:data_file)
+    assert_redirected_to "http://mocked302.com"
+  end
+
+  test "should create and redirect on download for 301 url" do
+    mock_http
+    df = {:title=>"301",:data_url=>"http://mocked301.com",:projects=>[projects(:sysmo_project)]}
+    assert_difference('ActivityLog.count') do
+      assert_difference('DataFile.count') do
+        assert_difference('ContentBlob.count') do
+          post :create, :data_file => df, :sharing=>valid_sharing
+        end
+      end
+    end
+
+    assert_redirected_to data_file_path(assigns(:data_file))
+    assert_equal users(:datafile_owner),assigns(:data_file).contributor
+    assert !assigns(:data_file).content_blob.url.blank?
+    assert assigns(:data_file).content_blob.data_io_object.nil?
+    assert !assigns(:data_file).content_blob.file_exists?
+    assert_equal "",assigns(:data_file).content_blob.original_filename
+    assert_equal "",assigns(:data_file).content_blob.content_type
+
+    get :download, :id => assigns(:data_file)
+    assert_redirected_to "http://mocked301.com"
+  end
+
+  test "report error when file unavailable for download" do
+    df = Factory :data_file, :policy=>Factory(:public_policy)
+    df.content_blob.dump_data_to_file
+    assert df.content_blob.file_exists?
+    FileUtils.rm df.content_blob.filepath
+    assert !df.content_blob.file_exists?
+
+    get :download,:id=>df
+
+    assert_redirected_to df
+    assert flash[:error].match(/Unable to find a copy of the file for download/)
+  end
+
+  test "should handle inline download when specify the inline disposition" do
+    data=File.new("#{Rails.root}/test/fixtures/files/file_picture.png","rb").read
+    df = Factory :data_file,
+                 :content_blob => Factory(:content_blob, :data => data, :content_type=>"images/png"),
+                 :policy => Factory(:downloadable_public_policy)
+
+    get :download, :id => df, :disposition => 'inline'
+    assert_response :success
+    assert @response.header['Content-Disposition'].include?('inline')
+  end
+
+  test "should handle normal attachment download" do
+    data=File.new("#{Rails.root}/test/fixtures/files/file_picture.png","rb").read
+    df = Factory :data_file,
+                 :content_blob => Factory(:content_blob, :data => data, :content_type=>"images/png"),
+                 :policy => Factory(:downloadable_public_policy)
+
+    get :download, :id => df
+    assert_response :success
+    assert @response.header['Content-Disposition'].include?('attachment')
   end
   
   test "shouldn't download" do
@@ -509,7 +758,7 @@ class DataFilesControllerTest < ActionController::TestCase
     get :data, :id => data_files(:downloadable_data_file),:format=>"xml"
     assert_response :success
     xml=@response.body
-    schema_path=File.join(RAILS_ROOT, 'public', '2010', 'xml', 'rest', 'spreadsheet.xsd')
+    schema_path=File.join(Rails.root, 'public', '2010', 'xml', 'rest', 'spreadsheet.xsd')
     validate_xml_against_schema(xml,schema_path)     
   end
 
@@ -523,7 +772,7 @@ class DataFilesControllerTest < ActionController::TestCase
     get :data, :id => data_files(:downloadable_data_file),:format=>"csv",:trim=>true,:sheet=>"2"
     assert_response :success
     csv=@response.body
-    assert csv.include?(%!"a",1.0,TRUE,,FALSE!)
+    assert csv.include?(%!"a",1,TRUE,,FALSE!)
   end
   
   test "should not expose non downloadable spreadsheet" do
@@ -674,6 +923,8 @@ class DataFilesControllerTest < ActionController::TestCase
     assert_response :success
     assert :success
   end
+
+
   
   test "filtering by assay" do
     assay=assays(:metabolomics_assay)
@@ -913,12 +1164,30 @@ class DataFilesControllerTest < ActionController::TestCase
 
 
   test "can move to presentations" do
-    data_file = Factory :data_file,:contributor=>User.current_user
+    data_file = Factory :data_file, :contributor => User.current_user
     assert_difference("DataFile.count", -1) do
       assert_difference("Presentation.count") do
-        post :convert_to_presentation, :id=>data_file
+        post :convert_to_presentation, :id => data_file
       end
     end
+    assert assigns(:presentation)
+    assert_redirected_to assigns(:presentation)
+  end
+
+  test "converting to presentation logs creation activity" do
+    data_file = Factory :data_file,:contributor=>User.current_user
+    assert_difference("ActivityLog.count") do
+          post :convert_to_presentation, :id=>data_file
+    end
+    assert assigns(:presentation)
+    presentation = assigns(:presentation)
+
+    #needs to mimic the logging of a presentation being created
+    al = ActivityLog.last
+    assert_equal "create",al.action
+    assert_equal User.current_user,al.culprit
+    assert_equal presentation,al.activity_loggable
+    assert_equal "data_files",al.controller_name
   end
 
   test "converted presentations have correct attributions" do
@@ -935,6 +1204,18 @@ class DataFilesControllerTest < ActionController::TestCase
     assert !assigns(:presentation).attributions_objects.empty?
   end
 
+  test "explore logged as inline view" do
+    data = Factory :small_test_spreadsheet_datafile,:policy=>Factory(:public_policy)
+    assert_difference("ActivityLog.count") do
+      get :explore,:id=>data
+    end
+    assert_response :success
+    al = ActivityLog.last
+    assert_equal data,al.activity_loggable
+    assert_equal User.current_user,al.culprit
+    assert_equal "inline_view",al.action
+    assert_equal "data_files",al.controller_name
+  end
   test "report error when file unavailable for download" do
     df = Factory :data_file, :policy=>Factory(:public_policy)
     df.content_blob.dump_data_to_file
@@ -949,7 +1230,8 @@ class DataFilesControllerTest < ActionController::TestCase
   end
 
   test "explore latest version" do
-    get :explore,:id=>data_files(:downloadable_spreadsheet_data_file)
+    data = Factory :small_test_spreadsheet_datafile,:policy=>Factory(:public_policy)
+    get :explore,:id=>data
     assert_response :success
   end
 
@@ -1079,6 +1361,24 @@ class DataFilesControllerTest < ActionController::TestCase
     assert_not_nil flash[:error]
   end
 
+  test "should not show private data file to logged out user" do
+    df=Factory :data_file
+    logout
+    get :show, :id=>df
+    assert_redirected_to data_files_path
+    assert_not_nil flash[:error]
+    assert_equal "You are not authorized to view this Data file, you may need to login first.",flash[:error]
+  end
+
+  test "should not show private data file to another user" do
+
+    df=Factory :data_file,:contributor=>Factory(:user)
+    get :show, :id=>df
+    assert_redirected_to data_files_path
+    assert_not_nil flash[:error]
+    assert_equal "You are not authorized to view this Data file.",flash[:error]
+  end
+
   test "should set the other creators " do
     data_file=data_files(:picture)
     assert data_file.can_manage?,"The data file must be manageable for this test to succeed"
@@ -1158,6 +1458,7 @@ class DataFilesControllerTest < ActionController::TestCase
     stub_request(:get, "http://mockedlocation.com/a-piccy.png").to_return(:body => File.new(file), :status => 200, :headers=>{'Content-Type' => 'image/png'})
     stub_request(:head, "http://mockedlocation.com/a-piccy.png")
 
+    stub_request(:any, "http://mocked301.com").to_return(:status=>301)
     stub_request(:any, "http://mocked302.com").to_return(:status=>302)
     stub_request(:any, "http://mocked401.com").to_return(:status=>401)
     stub_request(:any, "http://mocked404.com").to_return(:status=>404)
@@ -1168,6 +1469,7 @@ class DataFilesControllerTest < ActionController::TestCase
     stub_request(:get, "https://mockedlocation.com/a-piccy.png").to_return(:body => File.new(file), :status => 200, :headers=>{'Content-Type' => 'image/png'})
     stub_request(:head, "https://mockedlocation.com/a-piccy.png")
 
+    stub_request(:any, "https://mocked301.com").to_return(:status=>301)
     stub_request(:any, "https://mocked302.com").to_return(:status=>302)
     stub_request(:any, "https://mocked401.com").to_return(:status=>401)
     stub_request(:any, "https://mocked404.com").to_return(:status=>404)
@@ -1184,9 +1486,13 @@ class DataFilesControllerTest < ActionController::TestCase
   def valid_data_file_with_https_url
     { :title=>"Test HTTPS",:data_url=>"https://mockedlocation.com/a-piccy.png",:projects=>[projects(:sysmo_project)]}
   end
+
+  def valid_data_file_with_https_url
+    { :title=>"Test HTTPS",:data_url=>"https://mockedlocation.com/a-piccy.png",:projects=>[projects(:sysmo_project)]}
+  end
   
   def valid_data_file_with_ftp_url
-      { :title=>"Test FTP",:data_url=>"ftp://ftp.mirrorservice.org/sites/amd64.debian.net/robots.txt",:projects=>[projects(:sysmo_project)]}
+      { :title=>"Test FTP",:data_url=>"ftp://mockedlocation.com/file.txt",:projects=>[projects(:sysmo_project)]}
   end
   
 end

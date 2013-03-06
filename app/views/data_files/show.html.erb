@@ -6,33 +6,28 @@
   end
 -%>
 
+<%= render :partial => "layouts/item_title",:locals=>{:item=>@data_file, :version => @display_data_file.version} -%>
+
 <ul class="sectionIcons">
 <%= asset_buttons @data_file,@display_data_file.version -%>
 </ul>
-
-<%= render :partial=>"assets/upload_new_version_form", :locals=>{:resource=>@data_file} -%>
-
-<%= render :partial => "layouts/item_title",:locals=>{:item=>@data_file} -%>
-
-<%= render :partial => "layouts/usage_info", :locals => { :resource => @data_file } -%>
-
+<br/>
 
 <div class="show_basic">
+
+  <%= render :partial=>"assets/upload_new_version_form", :locals=>{:resource=>@data_file} -%>
+
+  <div id="matching_models" style="display:none;text-align:center";></div>
+  <div id="matching_results" style="display:none;height:55em;overflow-y: scroll;"></div>
+
   <div class="main_content_left_box_narrower">
     <%= render :partial=>"assets/resource_version_details", :locals=>{:displayed_resource=>@display_data_file, :resource=>@data_file} -%>
     <div class="box_about_actor">
-      <%= render :partial => 'projects/show_project_relationship', :locals => {:resource => @data_file}  -%>
-      <p>
-        <label>File name:</label>
-        <%=h @display_data_file.original_filename -%>
-      </p>
 
-      <p>
-        <label>Format:</label>
-        <%=h mime_nice_name(@display_data_file.content_type) -%>
-      </p>
+      <%= render :partial => 'assets/fileinfo',:object=>@display_data_file.content_blob -%>
+
       <br/>
-
+      <%= render :partial => "assets/special_auth_code_display", :locals => {:resource => @data_file} %>
       <p>
         <b>Description:</b>
         <% unless @display_data_file.description.blank? -%>
@@ -45,7 +40,6 @@
           </p>
         <% end -%>
       </p>
-
     </div>
   </div>
   <%= render :partial=>"assets/resource_main_content_right",:locals => { :resource => @data_file } -%>
@@ -66,7 +60,7 @@
       </div>
 
       <div class="foldContent" style="display:none;" >
-        <% if @data_file.can_download? -%>
+        <% if can_download_asset?(@data_file, params[:code]) -%>
                 <% if Seek::Config.is_virtualliver &&  @data_file.is_with_sample?
 
                      treatments = bio_samples.instance_values["treatments_text"]
@@ -101,7 +95,7 @@
                 RNA Extractions
               </div>
               <div class="foldContent" style="display:none;">
-                <% if @data_file.can_download? -%>
+                <% if can_download_asset?(@data_file, params[:code]) -%>
                     <%= render :partial => "extractions_table", :locals => {:extractions => rna_extractions, :sample_names => sample_names} -%>
                 <% else -%>
                     <span id="rna_extractions" class="none_text">You do not have permission to view the RNA extractions for this file.</span>
@@ -118,7 +112,7 @@
                 Sequencing
               </div>
               <div class="foldContent" style="display:none;">
-                <% if @data_file.can_download? -%>
+                <% if can_download_asset?(@data_file, params[:code]) -%>
 
                     <%= render :partial => "extractions_table", :locals => {:extractions => sequencing, :sample_names => sample_names} -%>
 
@@ -132,5 +126,7 @@
   <% end -%>
   </div>
   <%= render :partial=>"layouts/items_related_to",:object => @data_file -%>
+  <br/>
+  <%= render :partial => "layouts/usage_info", :locals => { :resource => @data_file } -%>
 
 </div>

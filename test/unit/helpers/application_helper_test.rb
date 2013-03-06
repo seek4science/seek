@@ -22,6 +22,33 @@ class ApplicationHelperTest < ActionView::TestCase
     assert !local_created_at.utc?
     assert !local_created_at.gmt?
 
-    assert date_as_string(created_at, true).include?(local_created_at.strftime('%H:%M:%S'))
+    assert date_as_string(created_at, true).include?(local_created_at.strftime('%H:%M'))
+  end
+
+  test "date_as_string with Date or DateTime" do
+    date = DateTime.parse("2011-10-28")
+    assert_equal "28th October 2011",date_as_string(date)
+
+    date = Date.new(2011,10,28)
+    assert_equal "28th October 2011",date_as_string(date)
+
+    date = Time.parse("2011-10-28")
+    assert_equal "28th October 2011",date_as_string(date)
+  end
+
+  test "date_as_string with nil date" do
+    assert_equal "<span class='none_text'>No date defined</span>",date_as_string(nil)
+  end
+
+  test "resource tab title" do
+    assert_equal "EBI Biomodels",resource_tab_item_name("EBI Biomodels",false)
+    assert_equal "Database",resource_tab_item_name("Database",false)
+    assert_equal "Models",resource_tab_item_name("Model")
+    assert_equal "Data Files",resource_tab_item_name("DataFile")
+    assert_equal "Data Files",resource_tab_item_name("DataFiles")
+    assert_equal "Data File",resource_tab_item_name("DataFile",false)
+    assert_equal "SOPs",resource_tab_item_name("SOP")
+    assert_equal "SOPs",resource_tab_item_name("Sop")
+    assert_equal "SOP",resource_tab_item_name("Sop",false)
   end
 end

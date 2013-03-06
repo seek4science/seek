@@ -8,9 +8,15 @@ myExperiment - http://www.myexperiment.org
 
 BioCatalogue - http://www.biocatalogue.org
 
-BioPortal - http://bioportal.bioontology.org
-
 MethodBox - https://www.methodbox.org/
+
+== External Services we use
+
+Sabio-RK - http://sabio.villa-bosch.de
+
+CytoScape - http://cytoscapeweb.cytoscape.org
+
+BioPortal - http://bioportal.bioontology.org
 
 == Javascript tools
 
@@ -33,5 +39,6 @@ Organism Icon from IconIcon - http://iconicon.net/?page_id=79
 Zoom images - http://www.lokeshdhakar.com/projects/lightbox2/
 Presentation icon(LGPL) - http://www.mricons.com/icon/785/128/presentation-slides-icon
 
+Strain image - http://en.wikipedia.org/wiki/File:Enterococcus_faecalis20023-300.jpg
 expand plus icon (Creative Commons Attribution (by)) - http://findicons.com/icon/439241/toggle_expand?id=439541
 collapse minus icon (Creative Commons Attribution (by)) - http://findicons.com/icon/439180/toggle_collapse?id=439440

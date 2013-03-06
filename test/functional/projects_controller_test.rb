@@ -10,7 +10,10 @@ class ProjectsControllerTest < ActionController::TestCase
 
 	def setup
 		login_as(:quentin)
-		@object=projects(:sysmo_project)
+  end
+
+  def rest_api_test_object
+    @object=projects(:sysmo_project)
   end
 
   def test_title
@@ -27,7 +30,19 @@ class ProjectsControllerTest < ActionController::TestCase
 	def test_should_get_new
 		get :new
 		assert_response :success
-	end
+  end
+
+  def test_avatar_show_in_list
+    p=Factory :project
+    get :index
+    assert_select "div.list_items_container" do
+      assert_select "div.list_item" do
+        assert_select "div.list_item_avatar" do
+          assert_select "a[href=?]",project_path(p)
+        end
+      end
+    end
+  end
 
 	def test_should_create_project
     parent_id = Factory(:project,:title=>"Test Parent").id
@@ -73,15 +88,91 @@ class ProjectsControllerTest < ActionController::TestCase
 			delete :destroy, :id => Factory(:project)
 		end
 
-	end
-
-  def test_non_admin_should_not_manage_projects
+  end
+  
+ def test_non_admin_should_not_manage_projects
 		login_as(:aaron)
 		get :manage,:id=> Factory(:project)
     assert_not_nil flash[:error]
   end
+  
+  test "asset report visible to project member" do
+    person = Factory :person
+    project = person.projects.first
+    login_as(person.user)
+    get :asset_report,:id=>project.id
+    assert_response :success
 
-	test 'should not get index for non-project member, should for non-login user' do
+  end
+
+  test "asset report not visible to non project member" do
+    person = Factory :person
+    project = person.projects.first
+    other_person = Factory :person
+    login_as(other_person.user)
+    get :asset_report,:id=>project.id
+    assert_redirected_to project
+    assert_not_nil flash[:error]
+
+  end
+
+  test "asset report button shown to project members" do
+    person = Factory :person
+    project = person.projects.first
+
+    login_as person.user
+    get :show, :id=>project.id
+    assert_response :success
+    assert_select "ul.sectionIcons" do
+      assert_select "a[href=?]",asset_report_project_path(project),:text=>"Asset report"
+    end
+  end
+
+  test "asset report button not shown to anonymous users" do
+
+    project = Factory :project
+
+    logout
+    get :show, :id=>project.id
+    assert_response :success
+    assert_select "ul.sectionIcons" do
+      assert_select "a[href=?]",asset_report_project_path(project),:text=>"Asset report",:count=>0
+    end
+  end
+
+  test "asset report button not shown to none project members" do
+    person = Factory :person
+    project = person.projects.first
+    other_person = Factory :person
+    assert !project.people.include?(other_person)
+
+    login_as other_person.user
+    get :show, :id=>project.id
+    assert_response :success
+    assert_select "ul.sectionIcons" do
+      assert_select "a[href=?]",asset_report_project_path(project),:text=>"Sharing report",:count=>0
+    end
+
+  end
+
+  test "should show organise link for member" do
+    p=Factory :person
+    login_as p.user
+    get :show,:id=>p.projects.first
+    assert_response :success
+    assert_select "a[href=?]",project_folders_path(p.projects.first)
+  end
+
+  test "should not show organise link for non member" do
+    p=Factory :person
+    proj = Factory :project
+    login_as p.user
+    get :show,:id=>proj
+    assert_response :success
+    assert_select "a[href=?]",project_folders_path(p.projects.first), :count=>0
+  end
+
+test 'should not get index for non-project member, should for non-login user' do
 		login_as(:registered_user_with_no_projects)
 		get :index
 		assert_response :redirect
@@ -92,10 +183,12 @@ class ProjectsControllerTest < ActionController::TestCase
 		assert_not_nil assigns(:projects)
 	end
 
+
+
 	test 'should show project for non-project member and non-login user' do
 		login_as(:registered_user_with_no_projects)
 		get :show, :id=>projects(:three)
-		assert_response :redirect
+		assert_response :success
 
 		logout
 		get :show, :id=>projects(:three)
@@ -105,7 +198,8 @@ class ProjectsControllerTest < ActionController::TestCase
 	test 'non-project member and non-login user can not edit project' do
 		login_as(:registered_user_with_no_projects)
 		get :show, :id=>projects(:three)
-		assert_response :redirect
+		assert_response :success
+		assert_select "a",:text=>/Edit Project/,:count=>0
 
 		logout
 		get :show, :id=>projects(:three)
@@ -162,47 +256,46 @@ class ProjectsControllerTest < ActionController::TestCase
 	end
 
 	test "links have nofollow in sop tabs" do
-		login_as(:owner_of_my_first_sop)
-		sop=sops(:my_first_sop)
-		sop.description="http://news.bbc.co.uk"
-		sop.save!
-
-		get :show,:id=>projects(:sysmo_project)
-		assert_select "div.list_item div.list_item_desc" do
-			assert_select "a[rel=?]","nofollow",:text=>/news\.bbc\.co\.uk/,:minimum=>1
-		end
+    user = Factory :user
+    project = user.person.projects.first
+    login_as(user)
+    sop = Factory :sop,:description=>"http://news.bbc.co.uk",:projects=>[project],:contributor=>user
+    get :show,:id=>project
+    assert_select "div.list_item div.list_item_desc" do
+      assert_select "a[rel=?]","nofollow",:text=>/news\.bbc\.co\.uk/,:count=>1
+    end
 	end
 
 	test "links have nofollow in data_files tabs" do
-		login_as(:owner_of_my_first_sop)
-		data_file=data_files(:picture)
-		data_file.description="http://news.bbc.co.uk"
-		data_file.save!
-
-		get :show,:id=>projects(:sysmo_project)
-		assert_select "div.list_item div.list_item_desc" do
-			assert_select "a[rel=?]","nofollow",:text=>/news\.bbc\.co\.uk/,:minimum=>1
-		end
+    user = Factory :user
+    project = user.person.projects.first
+    login_as(user)
+    df = Factory :data_file,:description=>"http://news.bbc.co.uk",:projects=>[project],:contributor=>user
+    get :show,:id=>project
+    assert_select "div.list_item div.list_item_desc" do
+      assert_select "a[rel=?]","nofollow",:text=>/news\.bbc\.co\.uk/,:count=>1
+    end
 	end
 
 	test "links have nofollow in model tabs" do
-		login_as(:owner_of_my_first_sop)
-		model=models(:teusink)
-		model.description="http://news.bbc.co.uk"
-		model.save!
-
-		get :show,:id=>projects(:sysmo_project)
-		assert_select "div.list_item div.list_item_desc" do
-			assert_select "a[rel=?]","nofollow",:text=>/news\.bbc\.co\.uk/,:minimum=>1
-		end
+    user = Factory :user
+    project = user.person.projects.first
+    login_as(user)
+    model = Factory :model,:description=>"http://news.bbc.co.uk",:projects=>[project],:contributor=>user
+    get :show,:id=>project
+    assert_select "div.list_item div.list_item_desc" do
+      assert_select "a[rel=?]","nofollow",:text=>/news\.bbc\.co\.uk/,:count=>1
+    end
 	end
 
 	test "pals displayed in show page" do
-		get :show,:id=>projects(:sysmo_project)
+    pal = Factory :pal,:first_name=>"A",:last_name=>"PAL"
+    project = pal.projects.first
+		get :show,:id=>project
 		assert_select "div.box_about_actor p.pals" do
 			assert_select "label",:text=>"SysMO-DB PALs:",:count=>1
 			assert_select "a",:count=>1
-			assert_select "a[href=?]",person_path(people(:pal)),:text=>"A PAL",:count=>1
+			assert_select "a[href=?]",person_path(pal),:text=>"A PAL",:count=>1
 		end
   end
 
@@ -340,20 +433,27 @@ class ProjectsControllerTest < ActionController::TestCase
 	end
 
 	test "non admin has no option to administer project" do
-		login_as(:pal_user)
-		get :show,:id=>projects(:sysmo_project)
+    user = Factory :user
+    assert_equal 1,user.person.projects.count
+    project = user.person.projects.first
+		login_as(user)
+		get :show,:id=>project
 		assert_select "ul.sectionIcons" do
 			assert_select "span.icon" do
-				assert_select "a[href=?]",admin_project_path(projects(:sysmo_project)),:text=>/Project administration/,:count=>0
+				assert_select "a[href=?]",admin_project_path(project),:text=>/Project administration/,:count=>0
 			end
 		end
 	end
 
 	test "admin has option to administer project" do
-		get :show,:id=>projects(:sysmo_project)
+    admin = Factory :admin
+    assert_equal 1,admin.projects.count
+    project = admin.projects.first
+    login_as(admin.user)
+		get :show,:id=>project
 		assert_select "ul.sectionIcons" do
 			assert_select "span.icon" do
-				assert_select "a[href=?]",admin_project_path(projects(:sysmo_project)),:text=>/Project administration/,:count=>1
+				assert_select "a[href=?]",admin_project_path(project),:text=>/Project administration/,:count=>1
 			end
 		end
 	end
@@ -538,6 +638,21 @@ class ProjectsControllerTest < ActionController::TestCase
     }
     project.reload
     assert !project.institutions.empty?
+  end
+  
+ test "should view_items_in_tab in project page for non-admin" do
+    project = Factory(:project)
+    df = Factory :data_file,
+                 :title=>"a data file",
+                 :contributor=>User.current_user,
+                 :policy=>Factory(:public_policy),
+                 :projects => [project]
+
+    login_as(Factory(:user))
+    get :view_items_in_tab,{:resource_type=>"DataFile",:resource_ids=>[df.id].join(",")}
+
+    assert_response :success
+    assert @response.body.include?("a data file")
   end
 
 	private

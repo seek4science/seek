@@ -10,14 +10,14 @@ class Model < ActiveRecord::Base
 
   #searchable must come before acts_as_asset call
   searchable(:auto_index=>false) do
-    text :description,:title,:original_filename,:organism_terms,:searchable_tags, :model_contents,:assay_type_titles,:technology_type_titles
+    text :description,:title,:organism_terms,:searchable_tags, :model_contents_for_search,:assay_type_titles,:technology_type_titles
   end if Seek::Config.solr_enabled
 
   acts_as_asset
   acts_as_trashable
 
-  include Seek::ModelProcessing
-  
+  include Seek::Models::ModelExtraction
+
   validates_presence_of :title
 
   after_save :queue_background_reindexing if Seek::Config.solr_enabled
@@ -27,6 +27,7 @@ class Model < ActiveRecord::Base
   has_many :sample_assets,:dependent=>:destroy,:as => :asset
   has_many :samples, :through => :sample_assets
 
+  #FIXME: model_images seems to be to keep persistence of old images, wheras model_image is just the current_image
   has_many :model_images
   belongs_to :model_image
 
@@ -39,8 +40,9 @@ class Model < ActiveRecord::Base
 
 
   explicit_versioning(:version_column => "version") do
-    include Seek::ModelProcessing
+    include Seek::Models::ModelExtraction
     acts_as_versioned_resource
+    acts_as_favouritable
 
     belongs_to :model_image
     belongs_to :organism
@@ -52,16 +54,6 @@ class Model < ActiveRecord::Base
       ContentBlob.find(:all, :conditions => ["asset_id =? and asset_type =? and asset_version =?", self.parent.id, self.parent.class.name, self.version])
     end
 
-    def content_blob
-      result = Class.new.extend(Seek::ModelTypeDetection).is_jws_supported? self
-      result.nil?? content_blobs.first : result
-    end
-  end
-
-  def content_blob
-    # return the first content blob which is jws supported (is_dat? or is_sbml?)
-      result = Class.new.extend(Seek::ModelTypeDetection).is_jws_supported? self
-      result.nil?? content_blobs.first : result
   end
 
   # get a list of Models with their original uploaders - for autocomplete fields
@@ -96,34 +88,39 @@ class Model < ActiveRecord::Base
   end
 
   #a simple container for handling the matching results returned from #matching_data_files
-  class ModelMatchResult < Struct.new(:search_terms,:score,:primary_key)
+  class DataFileMatchResult < Struct.new(:search_terms,:score,:primary_key);end
 
-  end
-
-  def model_contents
-    if content_blob.file_exists?
-      species | parameters_and_values.keys
-    else
-      Rails.logger.error("Unable to find data contents for Model #{self.id}")
-      []
-    end
-  end
-
-  #return a an array of ModelMatchResult where the data file id is the key, and the matching terms/values are the values
-  def matching_data_files
+  #return a an array of DataFileMatchResult where the data file id is the key, and the matching terms/values are the values
+  def matching_data_files params_only=false
     
     results = {}
 
     if Seek::Config.solr_enabled && is_jws_supported?
-      search_terms = species | parameters_and_values.keys
-      puts search_terms
+      search_terms = parameters_and_values.keys
+      unless params_only
+        search_terms = search_terms | species | searchable_tags | organism_terms
+      end
+      #make the array uniq! case-insensistive whilst mainting the original case
+      dc = []
+      search_terms = search_terms.inject([]) do |r,v|
+        unless dc.include?(v.downcase)
+          r << v
+          dc << v.downcase
+        end
+        r
+      end
+
+      fields = [:fs_search_fields, :spreadsheet_contents_for_search,:spreadsheet_annotation_search_fields, :searchable_tags]
+
       search_terms.each do |key|
         DataFile.search do |query|
-          query.keywords key, :fields=>[:fs_search_fields, :spreadsheet_contents_for_search,:spreadsheet_annotation_search_fields]
+          query.keywords key, :fields=>fields
         end.hits.each do |hit|
-          results[hit.primary_key]||=ModelMatchResult.new([],0,hit.primary_key)
-          results[hit.primary_key].search_terms << key
-          results[hit.primary_key].score += hit.score unless hit.score.nil?
+          unless hit.score.nil?
+            results[hit.primary_key]||=DataFileMatchResult.new([],0,hit.primary_key)
+            results[hit.primary_key].search_terms << key
+            results[hit.primary_key].score += (0.75 + hit.score)
+          end
         end
       end
     end

@@ -10,6 +10,9 @@ class SopsControllerTest < ActionController::TestCase
 
   def setup
     login_as(:quentin)
+  end
+
+  def rest_api_test_object
     @object=sops(:downloadable_sop)
   end
 
@@ -112,7 +115,24 @@ class SopsControllerTest < ActionController::TestCase
     login_as(:aaron)
     get :index, :page => "all"
     assert_response :success
-    assert_equal assigns(:sops).sort_by(&:id), Authorization.authorize_collection("view", assigns(:sops), users(:aaron)).sort_by(&:id), "sops haven't been authorized properly"
+    assert_equal assigns(:sops).sort_by(&:id), Sop.authorized_partial_asset_collection(assigns(:sops), "view", users(:aaron)).sort_by(&:id), "sops haven't been authorized properly"
+  end
+
+  test "should not show private sop to logged out user" do
+    sop=Factory :sop
+    logout
+    get :show, :id=>sop
+    assert_redirected_to sops_path
+    assert_not_nil flash[:error]
+    assert_equal "You are not authorized to view this SOP, you may need to login first.",flash[:error]
+  end
+
+  test "should not show private sop to another user" do
+    sop=Factory :sop,:contributor=>Factory(:user)
+    get :show, :id=>sop
+    assert_redirected_to sops_path
+    assert_not_nil flash[:error]
+    assert_equal "You are not authorized to view this SOP.",flash[:error]
   end
 
   test "should get new" do
@@ -208,7 +228,7 @@ class SopsControllerTest < ActionController::TestCase
     assert assigns(:sop).content_blob.url.blank?
     assert !assigns(:sop).content_blob.data_io_object.read.nil?
     assert assigns(:sop).content_blob.file_exists?
-    assert_equal "file_picture.png", assigns(:sop).original_filename
+    assert_equal "file_picture.png", assigns(:sop).content_blob.original_filename
     assay.reload
     assert assay.related_asset_ids('Sop').include? assigns(:sop).id
   end
@@ -237,8 +257,8 @@ class SopsControllerTest < ActionController::TestCase
     assert !assigns(:sop).content_blob.url.blank?
     assert assigns(:sop).content_blob.data_io_object.nil?
     assert !assigns(:sop).content_blob.file_exists?
-    assert_equal "sysmo-db-logo-grad2.png", assigns(:sop).original_filename
-    assert_equal "image/png", assigns(:sop).content_type
+    assert_equal "sysmo-db-logo-grad2.png", assigns(:sop).content_blob.original_filename
+    assert_equal "image/png", assigns(:sop).content_blob.content_type
   end
 
   test "should create sop and store with url and store flag" do
@@ -254,15 +274,27 @@ class SopsControllerTest < ActionController::TestCase
     assert !assigns(:sop).content_blob.url.blank?
     assert !assigns(:sop).content_blob.data_io_object.read.nil?
     assert assigns(:sop).content_blob.file_exists?
-    assert_equal "sysmo-db-logo-grad2.png", assigns(:sop).original_filename
-    assert_equal "image/png", assigns(:sop).content_type
+    assert_equal "sysmo-db-logo-grad2.png", assigns(:sop).content_blob.original_filename
+    assert_equal "image/png", assigns(:sop).content_blob.content_type
   end
 
   test "should show sop" do
     login_as(:owner_of_my_first_sop)
-    s=sops(:my_first_sop)
-    get :show, :id => s.id
+    s=Factory :pdf_sop,:policy=>Factory(:public_policy)
+
+    assert_difference('ActivityLog.count') do
+      get :show, :id => s.id
+    end
+
     assert_response :success
+    assert_select "div.box_about_actor" do
+      assert_select "p > b",:text=>/Filename:/
+      assert_select "p",:text=>/a_pdf_file\.pdf/
+      assert_select "p > b",:text=>/Format:/
+      assert_select "p",:text=>/PDF document/
+      assert_select "p > b",:text=>/Size:/
+      assert_select "p",:text=>/8.8 KB/
+    end
   end
 
   test "should get edit" do
@@ -274,8 +306,6 @@ class SopsControllerTest < ActionController::TestCase
     #this is to check the SOP is all upper case in the sharing form
     assert_select "label",:text=>/Keep this SOP private/
   end
-
-  
 
   test "publications excluded in form for sops" do
     login_as(:owner_of_my_first_sop)
@@ -359,6 +389,21 @@ class SopsControllerTest < ActionController::TestCase
 
   end
 
+  test "should download SOP from standard route" do
+    sop = Factory :doc_sop, :policy=>Factory(:public_policy)
+    login_as(sop.contributor.user)
+    assert_difference("ActivityLog.count") do
+      get :download, :id=>sop.id
+    end
+    assert_response :success
+    al=ActivityLog.last
+    assert_equal "download",al.action
+    assert_equal sop,al.activity_loggable
+    assert_equal "attachment; filename=\"ms_word_test.doc\"",@response.header['Content-Disposition']
+    assert_equal "application/msword",@response.header['Content-Type']
+    assert_equal "9216",@response.header['Content-Length']
+  end
+
   def test_should_create_new_version
     s=sops(:editable_sop)
 
@@ -374,9 +419,9 @@ class SopsControllerTest < ActionController::TestCase
     s=Sop.find(s.id)
     assert_equal 2, s.versions.size
     assert_equal 2, s.version
-    assert_equal "file_picture.png", s.original_filename
-    assert_equal "file_picture.png", s.versions[1].original_filename
-    assert_equal "little_file.txt", s.versions[0].original_filename
+    assert_equal "file_picture.png", s.content_blob.original_filename
+    assert_equal "file_picture.png", s.versions[1].content_blob.original_filename
+    assert_equal "little_file.txt", s.versions[0].content_blob.original_filename
     assert_equal "This is a new revision", s.versions[1].revision_comments
 
   end
@@ -487,7 +532,7 @@ class SopsControllerTest < ActionController::TestCase
   test "filtering by person" do
     login_as(:owner_of_my_first_sop)
     person = people(:person_for_owner_of_my_first_sop)
-    p      =projects(:sysmo_project)
+    p = projects(:sysmo_project)
     get :index, :filter=>{:person=>person.id}, :page=>"all"
     assert_response :success
     sop  = sops(:downloadable_sop)
@@ -571,6 +616,45 @@ class SopsControllerTest < ActionController::TestCase
     assert_select 'p.list_item_attribute', :text => /Other creator: Not specified/, :count => no_other_creator_sops.count
   end
 
+  test 'breadcrumb for sop index' do
+    get :index
+    assert_response :success
+    assert_select "div.breadcrumbs", :text => /Home > SOPs Index/, :count => 1 do
+      assert_select "a[href=?]", root_path, :count => 1
+    end
+  end
+
+  test 'breadcrumb for showing sop' do
+    sop = sops(:sop_with_fully_public_policy)
+    get :show, :id => sop
+    assert_response :success
+    assert_select "div.breadcrumbs", :text => /Home > SOPs Index > #{sop.title}/, :count => 1 do
+      assert_select "a[href=?]", root_path, :count => 1
+       assert_select "a[href=?]", sops_url, :count => 1
+    end
+  end
+
+  test 'breadcrumb for editing sop' do
+    sop = sops(:sop_with_all_sysmo_users_policy)
+    assert sop.can_edit?
+    get :edit, :id => sop
+    assert_response :success
+    assert_select "div.breadcrumbs", :text => /Home > SOPs Index > #{sop.title} > Edit/, :count => 1 do
+      assert_select "a[href=?]", root_path, :count => 1
+      assert_select "a[href=?]", sops_url, :count => 1
+      assert_select "a[href=?]", sop_url(sop), :count => 1
+    end
+  end
+
+  test 'breadcrumb for creating new sop' do
+    get :new
+    assert_response :success
+    assert_select "div.breadcrumbs", :text => /Home > SOPs Index > New/, :count => 1 do
+      assert_select "a[href=?]", root_path, :count => 1
+      assert_select "a[href=?]", sops_url, :count => 1
+    end
+  end
+
   test "should set the policy to sysmo_and_projects if the item is requested to be published, when creating new sop" do
     as_not_virtualliver do
       gatekeeper = Factory(:gatekeeper)
@@ -599,6 +683,100 @@ class SopsControllerTest < ActionController::TestCase
       assert_equal policy, updated_policy
       assert_equal policy.permissions, updated_policy.permissions
   end
+
+  test 'should be able to view pdf content' do
+     sop = Factory(:sop, :policy => Factory(:all_sysmo_downloadable_policy))
+     assert sop.content_blob.is_content_viewable?
+     get :show, :id => sop.id
+     assert_response :success
+     assert_select 'a', :text => /View content/, :count => 1
+  end
+
+  test 'should be able to view ms/open office word content' do
+     ms_word_sop = Factory(:doc_sop, :policy => Factory(:all_sysmo_downloadable_policy))
+     content_blob = ms_word_sop.content_blob
+     pdf_filepath = content_blob.filepath('pdf')
+     FileUtils.rm pdf_filepath if File.exist?(pdf_filepath)
+     assert content_blob.is_content_viewable?
+     get :show, :id => ms_word_sop.id
+     assert_response :success
+     assert_select 'a', :text => /View content/, :count => 1
+
+     openoffice_word_sop = Factory(:odt_sop, :policy => Factory(:all_sysmo_downloadable_policy))
+     assert openoffice_word_sop.content_blob.is_content_viewable?
+     get :show, :id => openoffice_word_sop.id
+     assert_response :success
+     assert_select 'a', :text => /View content/, :count => 1
+  end
+
+  test 'should disappear view content button for the document needing pdf conversion, when pdf_conversion_enabled is false' do
+    tmp = Seek::Config.pdf_conversion_enabled
+    Seek::Config.pdf_conversion_enabled = false
+
+    ms_word_sop = Factory(:doc_sop, :policy => Factory(:all_sysmo_downloadable_policy))
+    content_blob = ms_word_sop.content_blob
+    pdf_filepath = content_blob.filepath('pdf')
+    FileUtils.rm pdf_filepath if File.exist?(pdf_filepath)
+    assert !content_blob.is_content_viewable?
+    get :show, :id => ms_word_sop.id
+    assert_response :success
+    assert_select 'a', :text => /View content/, :count => 0
+
+    Seek::Config.pdf_conversion_enabled = tmp
+  end
+
+  test 'duplicated logs are NOT created by uploading new version' do
+    assert_difference('ActivityLog.count', 1) do
+      assert_difference('Sop.count', 1) do
+        post :create, :sop => valid_sop, :sharing => valid_sharing
+      end
+    end
+    al1= ActivityLog.last
+    s=assigns(:sop)
+    assert_difference('ActivityLog.count', 1) do
+      assert_difference("Sop::Version.count", 1) do
+        post :new_version, :id => s, :sop => {:data => fixture_file_upload('files/file_picture.png')}, :revision_comment => "This is a new revision"
+      end
+    end
+    al2=ActivityLog.last
+    assert_equal al1.activity_loggable, al2.activity_loggable
+    assert_equal al1.culprit, al2.culprit
+    assert_equal 'create', al1.action
+    assert_equal 'update', al2.action
+  end
+
+  test 'should not create duplication sop_versions_projects when uploading new version' do
+    sop = Factory(:sop)
+    login_as(sop.contributor)
+    post :new_version, :id => sop, :sop => {:data => fixture_file_upload('files/file_picture.png')}, :revision_comment => "This is a new revision"
+
+    sop.reload
+    assert_equal 2, sop.versions.count
+    assert_equal 1, sop.latest_version.projects.count
+  end
+
+  test 'should not create duplication sop_versions_projects when uploading sop' do
+    post :create, :sop => valid_sop, :sharing => valid_sharing
+
+    sop = assigns(:sop)
+    assert_equal 1, sop.versions.count
+    assert_equal 1, sop.latest_version.projects.count
+  end
+
+  test "should destroy all versions related when destroying sop" do
+    sop = Factory(:sop)
+    assert_equal 1, sop.versions.count
+    sop_version = sop.latest_version
+    assert_equal 1, sop_version.projects.count
+    project_sop_version = sop_version.projects.first
+
+    login_as(sop.contributor)
+    delete :destroy, :id => sop
+    assert_nil Sop::Version.find_by_id(sop_version.id)
+    sql = "select * from projects_sop_versions where project_id = #{project_sop_version.id} and version_id = #{sop_version.id}"
+    assert ActiveRecord::Base.connection.select_all(sql).empty?
+  end
+
   private
 
   def valid_sop_with_url

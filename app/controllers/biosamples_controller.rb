@@ -1,4 +1,6 @@
 class BiosamplesController < ApplicationController
+  include Seek::BreadCrumbs
+
   def existing_strains
       strains_of_organisms = []
       organisms = []
@@ -154,7 +156,7 @@ class BiosamplesController < ApplicationController
   def create_strain
       #No need to process if current_user is not a project member, because they cant go here from UI
       if current_user.try(:person).try(:member?)
-        strain = new_strain
+        strain = new_strain(params[:strain])
         strain.policy.set_attributes_with_sharing params[:sharing], strain.projects
         render :update do |page|
           if strain.save
@@ -167,41 +169,38 @@ class BiosamplesController < ApplicationController
       end
   end
 
-  def new_strain
+  def new_strain strain_params
       strain = Strain.new
       # to delete id hash which is saved in the hidden id field (automatically generated in form with fields_for)
-     # try_block {
-        #delete id hashes of genotypes/phenotypes
-        params[:strain][:genotypes_attributes].try(:delete, "id")
-        params[:strain][:phenotypes_attributes].try(:delete, "id")
-        #delete id hashes of gene_attributes/modification_attributes
-        params[:strain][:genotypes_attributes].try(:each) do |genotype_key,genotype_value|
+      # try_block {
+      #delete id hashes of genotypes/phenotypes
+      strain_params[:genotypes_attributes].try(:delete, "id")
+      strain_params[:phenotypes_attributes].try(:delete, "id")
+      #delete id hashes of gene_attributes/modification_attributes
+      strain_params[:genotypes_attributes].try(:each) do |genotype_key, genotype_value|
 
-          genotype_value.delete_if { |k, v| k=="id" }
-          #delete if,e.g. "0"=>{"_destroy"=>0} for genotypes
-          params[:strain][:genotypes_attributes].delete(genotype_key) if genotype_value.keys == ["_destroy"]
+        genotype_value.delete_if { |k, v| k=="id" }
+        #delete if,e.g. "0"=>{"_destroy"=>0} for genotypes
+        strain_params[:genotypes_attributes].delete(genotype_key) if genotype_value.keys == ["_destroy"]
 
-          genotype_value[:gene_attributes].try(:delete_if) { |k, v| k=="id"}
-          genotype_value[:modification_attributes].try(:delete_if) { |k, v| k=="id"}
+        genotype_value[:gene_attributes].try(:delete_if) { |k, v| k=="id" }
+        genotype_value[:modification_attributes].try(:delete_if) { |k, v| k=="id" }
 
-          #delete if,e.g. "0"=>{"_destroy"=>0}  for gene_attributes/modification_attributes (which means new genes/modifications with empty title), this must be done after the id hashes are deleted!!!
-          genotype_value.delete("gene_attributes") if genotype_value[:gene_attributes].try(:keys) == ["_destroy"]
-          genotype_value.delete("modification_attributes") if genotype_value[:modification_attributes].try(:keys) == ["_destroy"]
+        #delete if,e.g. "0"=>{"_destroy"=>0}  for gene_attributes/modification_attributes (which means new genes/modifications with empty title), this must be done after the id hashes are deleted!!!
+        genotype_value.delete("gene_attributes") if genotype_value[:gene_attributes].try(:keys) == ["_destroy"]
+        genotype_value.delete("modification_attributes") if genotype_value[:modification_attributes].try(:keys) == ["_destroy"]
+      end
+      strain_params[:phenotypes_attributes].try(:each) do |key, value|
+        value.delete_if { |k, v| k=="id" }
+        #delete if ,e.g. "0"=>{"_destroy"=>0} for phenotypes
+        strain_params[:phenotypes_attributes].delete(key) if value.keys== ["_destroy"]
         end
-        params[:strain][:phenotypes_attributes].try(:each) do |key, value|
-          value.delete_if { |k, v| k=="id" }
-          #delete if ,e.g. "0"=>{"_destroy"=>0} for phenotypes
-          params[:strain][:phenotypes_attributes].delete(key) if value.keys== ["_destroy"]
-        end
-     # }
+      # }
 
-
-
-      strain.attributes = params[:strain]
-
-
+      strain.attributes = strain_params
       strain
   end
+
 
   def check_auth_strain
     if params[:specimen] and params[:specimen][:strain_id] and params[:specimen][:strain_id] != "0"

@@ -1,4 +1,4 @@
-class Annotation < ActiveRecord::Base
+  class Annotation < ActiveRecord::Base
   include AnnotationsVersionFu
   
   belongs_to :annotatable, 

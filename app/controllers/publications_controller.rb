@@ -9,7 +9,9 @@ class PublicationsController < ApplicationController
   before_filter :find_assets, :only => [ :index ]
   before_filter :fetch_publication, :only => [:show, :edit, :update, :destroy]
   before_filter :associate_authors, :only => [:edit, :update]
-  
+
+  include Seek::BreadCrumbs
+
   def preview
     element=params[:element]
     @publication = Publication.find_by_id(params[:id])
@@ -57,7 +59,9 @@ class PublicationsController < ApplicationController
     @publication = Publication.new(params[:publication])
     @publication.pubmed_id=nil if @publication.pubmed_id.blank?
     @publication.doi=nil if @publication.doi.blank?
-
+    pubmed_id,doi = preprocess_doi_or_pubmed @publication.pubmed_id,@publication.doi
+    @publication.doi = doi
+    @publication.pubmed_id = pubmed_id
     result = get_data(@publication, @publication.pubmed_id, @publication.doi)
     assay_ids = params[:assay_ids] || []
 
@@ -71,9 +75,7 @@ class PublicationsController < ApplicationController
           pa.save
         end
 
-        Assay.find(assay_ids).each do |assay|
-          Relationship.create_or_update_attributions(assay,[["Publication", @publication.id]], Relationship::RELATED_TO_PUBLICATION) if assay.can_edit?
-        end
+        create_or_update_associations assay_ids, "Assay", "edit"
         if !@publication.parent_name.blank?
           render :partial=>"assets/back_to_fancy_parent", :locals=>{:child=>@publication, :parent_name=>@publication.parent_name}
         else
@@ -113,27 +115,35 @@ class PublicationsController < ApplicationController
     update_annotations @publication
 
     assay_ids = params[:assay_ids] || []
+    data_file_ids = params[:data_file_ids] || []
+    model_ids = params[:model_ids] || []
 
     respond_to do |format|
       publication_params = params[:publication]||{}
       if valid && @publication.update_attributes(publication_params)
 
-        # Update relationship
-        Assay.find(assay_ids).each do |assay|
-          if assay.can_edit?
-            Relationship.create_or_update_attributions(assay,[["Publication", @publication.id]], Relationship::RELATED_TO_PUBLICATION)
-          end
-        end
-        #Destroy Assay relationship that aren't needed
-        associate_relationships = Relationship.find(:all,:conditions=>["object_id = ? and subject_type = ?",@publication.id,"Assay"])
-        associate_relationships.each do |associate_relationship|
-          assay = associate_relationship.subject
-          if assay.can_edit? && !assay_ids.include?(assay.id.to_s)
-            associate_relationship.destroy
-          end
-        end
+        # Update association
+        create_or_update_associations assay_ids, "Assay", "edit"
 
+        data_file_ids = data_file_ids.collect{|data_file_id| data_file_id.split(',').first}
+        create_or_update_associations data_file_ids, "DataFile", "view"
 
+        create_or_update_associations model_ids, "Model", "view"
+
+        #Create policy if not present (should be)
+        if @publication.policy.nil?
+          @publication.policy = Policy.create(:name => "publication_policy", :sharing_scope => Policy::EVERYONE, :access_type => Policy::VISIBLE)
+          @publication.save
+        end
+        
+        #Update policy so current authors have manage permissions
+        @publication.creators.each do |author|
+          @publication.policy.permissions.clear
+          @publication.policy.permissions << Permission.create(:contributor => author, :policy => @publication.policy, :access_type => Policy::MANAGING)
+        end      
+        #Add contributor
+        @publication.policy.permissions << Permission.create(:contributor => @publication.contributor.person, :policy => @publication.policy, :access_type => Policy::MANAGING)
+        
         flash[:notice] = 'Publication was successfully updated.'
         format.html { redirect_to(@publication) }
         format.xml  { head :ok }
@@ -154,49 +164,48 @@ class PublicationsController < ApplicationController
       format.xml  { head :ok }
     end
   end
-  
+
   def fetch_preview
-    begin
-      #trim the PubMed or Doi Id
-      params[:key] = params[:key].strip() unless params[:key].blank?
-      params[:publication][:project_ids].reject!(&:blank?).map!{|id| id.split(',')}.flatten!
-      @publication = Publication.new(params[:publication])
-      key = params[:key]
-      protocol = params[:protocol]
-      pubmed_id = nil
-      doi = nil
-      if protocol == "pubmed"
-        pubmed_id = key
-      elsif protocol == "doi"
-        doi = key
-        if doi.start_with?("doi:")
-          doi = doi.gsub("doi:","")
-        end
-      end      
-      result = get_data(@publication, pubmed_id, doi)
-    rescue
+    #trim the PubMed or Doi Id
+    params[:key] = params[:key].strip() unless params[:key].blank?
+    params[:publication][:project_ids].reject!(&:blank?).map! { |id| id.split(',') }.flatten!
+    @publication = Publication.new(params[:publication])
+    key = params[:key]
+    protocol = params[:protocol]
+    pubmed_id = nil
+    doi = nil
+    if protocol == "pubmed"
+      pubmed_id = key
+    elsif protocol == "doi"
+      doi = key
+    end
+    pubmed_id,doi = preprocess_doi_or_pubmed pubmed_id,doi
+    result = get_data(@publication, pubmed_id, doi)
+    if !result.error.nil?
       if protocol == "pubmed"
         if key.match(/[0-9]+/).nil?
           @error_text = "Please ensure the PubMed ID is entered in the correct format, e.g. <i>16845108</i>"
         else
-          @error_text = "No publication could be found on PubMed with that ID"  
+          @error_text = "No publication could be found on PubMed with that ID"
         end
       elsif protocol == "doi"
         if key.match(/[0-9]+(\.)[0-9]+.*/).nil?
-          @error_text = "Please ensure the DOI is entered in the correct format, e.g. <i>10.1093/nar/gkl320</i>"
+          @error_text = "There was a problem with #{result.doi} - please ensure the DOI is entered in the correct format, e.g. <i>10.1093/nar/gkl320</i>"
         else
-          @error_text = "No valid publication could be found with that DOI"
+          @error_text = "There was a problem with #{result.doi} - #{result.error} ."
         end
-      end          
-      respond_to do |format|
-        format.html { render :partial => "publications/publication_error", :locals => { :publication => @publication, :error_text => @error_text}, :status => 500}
       end
+
+      respond_to do |format|
+        format.html { render :partial => "publications/publication_error", :locals => {:publication => @publication, :error_text => @error_text}, :status => 500 }
+      end
+
     else
       respond_to do |format|
-        format.html { render :partial => "publications/publication_preview", :locals => { :publication => @publication, :authors => result.authors} }
+        format.html { render :partial => "publications/publication_preview", :locals => {:publication => @publication, :authors => result.authors} }
       end
     end
-    
+
   end
   
   #Try and relate non_seek_authors to people in SEEK based on name and project
@@ -258,16 +267,8 @@ class PublicationsController < ApplicationController
     @publication.publication_authors.clear
     
     #Query pubmed article to fetch authors
-    result = nil
-    pubmed_id = @publication.pubmed_id
-    doi = @publication.doi
-    if pubmed_id
-      query = PubmedQuery.new("seek",Seek::Config.pubmed_api_email)
-      result = query.fetch(pubmed_id)
-    elsif doi
-      query = DoiQuery.new(Seek::Config.crossref_api_email)
-      result = query.fetch(doi)
-    end      
+    result = fetch_pubmed_or_doi_result @publication.pubmed_id, @publication.doi
+
     unless result.nil?
       result.authors.each_with_index do |author, index|
         pa = PublicationAuthor.new()
@@ -283,51 +284,65 @@ class PublicationsController < ApplicationController
       format.xml  { head :ok }
     end
   end
-  
-  private    
-  
-  def fetch_publication
-    begin
-      publication = Publication.find(params[:id])            
-      
-      if publication.can_perform? translate_action(action_name)
-        @publication = publication
-      else
-        respond_to do |format|
-          flash[:error] = "You are not authorized to perform this action"
-          format.html { redirect_to publications_path  }
-        end
-        return false
-      end
-    rescue ActiveRecord::RecordNotFound
-      respond_to do |format|
-        flash[:error] = "Couldn't find the publication"
-        format.html { redirect_to publications_path }
-      end
-      return false
+
+
+
+  def fetch_pubmed_or_doi_result pubmed_id,doi
+    result = nil
+    if pubmed_id
+      query = PubmedQuery.new("seek",Seek::Config.pubmed_api_email)
+      result = query.fetch(pubmed_id)
+    elsif doi
+      query = DoiQuery.new(Seek::Config.crossref_api_email)
+      result = query.fetch(doi)
     end
+    result
   end
-  
+        
+
+  private
+
+  def preprocess_doi_or_pubmed pubmed_id,doi
+    doi = doi.sub(%r{doi\.*:}i,"").strip unless doi.nil?
+    doi.strip! unless doi.nil?
+    pubmed_id.strip! unless pubmed_id.nil? || pubmed_id.is_a?(Fixnum)
+    return pubmed_id,doi
+  end
+
   def get_data(publication, pubmed_id, doi=nil)
     if !pubmed_id.nil?
       query = PubmedQuery.new("sysmo-seek",Seek::Config.pubmed_api_email)
       result = query.fetch(pubmed_id)
-      unless result.nil?
+      unless result.nil? || !result.error.nil?
         publication.extract_pubmed_metadata(result)
-        return result
-      else
-        raise "Error - No publication could be found with that PubMed ID"
-      end    
+      end
+      return result
     elsif !doi.nil?
       query = DoiQuery.new(Seek::Config.crossref_api_email)
       result = query.fetch(doi)
-      unless result.nil?
+      unless result.nil? || !result.error.nil?
         publication.extract_doi_metadata(result)
-        return result
-      else 
-        raise "Error - No publication could be found with that DOI"
-      end  
+      end
+      return result
     end
   end
 
+  def create_or_update_associations asset_ids, asset_type, required_action
+    asset_ids.each do |id|
+      asset = asset_type.constantize.find_by_id(id)
+      if asset && asset.send("can_#{required_action}?")
+        unless Relationship.find(:first, :conditions => { :subject_type => asset_type, :subject_id => asset.id, :predicate => Relationship::RELATED_TO_PUBLICATION, :object_type => "Publication", :object_id => @publication.id })
+          Relationship.create(:subject_type => asset_type, :subject_id => asset.id, :predicate => Relationship::RELATED_TO_PUBLICATION, :object_type => "Publication", :object_id => @publication.id)
+        end
+      end
+    end
+    #Destroy asset relationship that aren't needed
+    associate_relationships = Relationship.find(:all,:conditions=>["object_id = ? and subject_type = ?",@publication.id,asset_type])
+    associate_relationships.each do |associate_relationship|
+      asset = associate_relationship.subject
+      if asset.send("can_#{required_action}?") && !asset_ids.include?(asset.id.to_s)
+        associate_relationship.destroy
+      end
+    end
+  end
 end

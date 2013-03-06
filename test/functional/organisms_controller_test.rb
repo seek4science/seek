@@ -8,6 +8,9 @@ class OrganismsControllerTest < ActionController::TestCase
   
   def setup
     login_as(:aaron)
+  end
+
+  def rest_api_test_object
     @object=organisms(:yeast)
   end
   
@@ -145,6 +148,27 @@ class OrganismsControllerTest < ActionController::TestCase
     assert_no_difference('Organism.count') do
       delete :destroy, :id => o
     end    
+  end
+
+  test "should list strains" do
+    user = Factory :user
+    login_as(user)
+    organism = Factory :organism
+    strain_a=Factory :strain,:title=>"strainA",:organism=>organism
+    parent_strain=Factory :strain
+    strain_b=Factory :strain,:title=>"strainB",:parent=>parent_strain,:organism=>organism
+
+
+    get :show,:id=>organism
+    assert_response :success
+    assert_select "table.strain_list" do
+      assert_select "tr",:count=>2 do
+        assert_select "td > a[href=?]",strain_path(strain_a),:text=>strain_a.title
+        assert_select "td > a[href=?]",strain_path(strain_b),:text=>strain_b.title
+        assert_select "td > a[href=?]",strain_path(parent_strain),:text=>parent_strain.title
+      end
+    end
+
   end
   
 end

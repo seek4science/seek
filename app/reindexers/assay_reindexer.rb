@@ -1,4 +1,4 @@
-class AssayReindexer < ReindexerObserver
+  class AssayReindexer < ReindexerObserver
 
   observe :assay
 

@@ -1,5 +1,7 @@
 class ProjectSubscriptionJob < Struct.new(:project_subscription_id)
 
+  DEFAULT_PRIORITY=2
+
   def perform
     ps = ProjectSubscription.find_by_id(project_subscription_id)
     if ps
@@ -19,7 +21,7 @@ class ProjectSubscriptionJob < Struct.new(:project_subscription_id)
     Delayed::Job.find(:first, :conditions => ['handler = ? AND locked_at IS ? AND failed_at IS ?', ProjectSubscriptionJob.new(project_subscription_id).to_yaml, nil, nil]) != nil
   end
 
-  def self.create_job project_subscription_id, t=15.seconds.from_now, priority=0
+  def self.create_job project_subscription_id, t=15.seconds.from_now, priority=DEFAULT_PRIORITY
     Delayed::Job.enqueue(ProjectSubscriptionJob.new(project_subscription_id), priority, t) unless exists? project_subscription_id
   end
 
@@ -36,6 +38,7 @@ class ProjectSubscriptionJob < Struct.new(:project_subscription_id)
       assets_projects_table = ["#{type.underscore.pluralize}", 'projects'].sort.join('_')
       assets_for_project project, type, assets_projects_table
     end.flatten.uniq
+    assets
     assets
   end
 

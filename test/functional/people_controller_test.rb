@@ -2,7 +2,7 @@ require 'test_helper'
 
 class PeopleControllerTest < ActionController::TestCase
 
-  fixtures :all
+  fixtures :people,:users, :projects, :work_groups, :group_memberships, :project_roles
 
   include AuthenticatedTestHelper
   include RestTestCases
@@ -10,6 +10,9 @@ class PeopleControllerTest < ActionController::TestCase
 
   def setup
     login_as(:quentin)
+  end
+
+  def rest_api_test_object
     @object=people(:quentin_person)
   end
 
@@ -24,7 +27,7 @@ class PeopleControllerTest < ActionController::TestCase
     Factory :expertise,:value=>"fishing",:annotatable=>p
     Factory :tool,:value=>"fishing rod",:annotatable=>p
 
-    test_get_xml p
+    test_get_rest_api_xml p
 
     doc = LibXML::XML::Document.string(@response.body)
     doc.root.namespaces.default_prefix="s"
@@ -45,9 +48,12 @@ class PeopleControllerTest < ActionController::TestCase
   end
 
   def test_first_registered_person_is_admin
+
     Person.destroy_all
     assert_equal 0, Person.count, "There should be no people in the database"
-    login_as(:part_registered)
+    user = Factory(:activated_user)
+    login_as user
+
     assert_difference('Person.count') do
       assert_difference('NotifieeInfo.count') do
         post :create, :person => {:first_name=>"test", :email=>"hghg@sdfsd.com"}
@@ -56,22 +62,28 @@ class PeopleControllerTest < ActionController::TestCase
     assert assigns(:person)
     person = Person.find(assigns(:person).id)
     assert person.is_admin?
+    assert person.only_first_admin_person?
+    assert_redirected_to registration_form_path(:during_setup=>"true")
   end
 
+
   def test_second_registered_person_is_not_admin
-    Person.destroy_all
-    person = Person.new(:first_name=>"fred", :email=>"fred@dddd.com")
-    person.save!
-    assert_equal 1, Person.count, "There should be 1 person in the database"
-    login_as(:part_registered)
-    assert_difference('Person.count') do
-      assert_difference('NotifieeInfo.count') do
-        post :create, :person => {:first_name=>"test", :email=>"hghg@sdfsd.com"}
+      Person.delete_all
+      person = Person.new(:first_name=>"fred", :email=>"fred@dddd.com")
+      person.save!
+      assert_equal 1, Person.count, "There should be 1 person in the database"
+      user = Factory(:activated_user)
+      login_as user
+      assert_difference('Person.count') do
+        assert_difference('NotifieeInfo.count') do
+          post :create, :person => {:first_name=>"test", :email=>"hghg@sdfsd.com"}
+        end
       end
-    end
-    assert assigns(:person)
-    person = Person.find(assigns(:person).id)
-    assert !person.is_admin?
+      assert assigns(:person)
+      person = Person.find(assigns(:person).id)
+      assert !person.is_admin?
+      assert !person.only_first_admin_person?
+      assert_redirected_to person_path(person)
   end
 
   def test_should_create_person
@@ -777,23 +789,6 @@ class PeopleControllerTest < ActionController::TestCase
     assert_not_nil flash[:error]
   end
 
-  test 'admin can not administer other admin' do
-    admin = Factory(:admin)
-
-    get :show, :id => admin
-    assert_select "a", :text => /Person Administration/, :count => 0
-
-    get :admin, :id => admin
-
-    assert_redirected_to :root
-    assert_not_nil flash[:error]
-
-    put :administer_update, :id => admin, :person => {}
-
-    assert_redirected_to :root
-    assert_not_nil flash[:error]
-  end
-
   test "project manager can not edit admin" do
     project_manager = Factory(:project_manager)
     admin = Factory(:admin)
@@ -813,23 +808,36 @@ class PeopleControllerTest < ActionController::TestCase
     assert_not_nil flash[:error]
   end
 
-  test 'admin can not edit other admin' do
+  test 'admin can administer other admin' do
+    admin = Factory(:admin)
+
+    get :show, :id => admin
+    assert_select "a", :text => /Person Administration/, :count => 1
+
+    get :admin, :id => admin
+    assert_response :success
+
+    assert !admin.is_gatekeeper?
+    put :administer_update, :id => admin, :person => {}, :roles => {:gatekeeper => true}
+    assert_redirected_to person_path(admin)
+    assert assigns(:person).is_gatekeeper?
+  end
+
+  test 'admin can edit other admin' do
     admin = Factory(:admin)
     assert_not_nil admin.user
     assert_not_equal User.current_user, admin.user
 
     get :show, :id => admin
-    assert_select "a", :text => /Edit Profile/, :count => 0
+    assert_select "a", :text => /Edit Profile/, :count => 1
 
     get :edit, :id => admin
+    assert_response :success
 
-    assert_redirected_to :root
-    assert_not_nil flash[:error]
-
-    put :update, :id => admin, :person => {}
-
-    assert_redirected_to :root
-    assert_not_nil flash[:error]
+    assert_not_equal 'test', admin.title
+    put :update, :id => admin, :person => {:first_name => 'test'}
+    assert_redirected_to person_path(admin)
+    assert_equal 'test', assigns(:person).first_name
   end
 
   test "can edit themself" do
@@ -1070,6 +1078,10 @@ class PeopleControllerTest < ActionController::TestCase
       assert_equal 1, work_groups.count
       assert a_person.project_subscriptions.collect(&:project).include?(projects.first)
 
+      s=Factory(:subscribable, :projects => projects)
+      SetSubscriptionsForItemJob.new(s.class.name, s.id, projects.collect(&:id)).perform
+      assert s.subscribed?(a_person)
+
       #unassign a person to a project
       put :administer_update, :id => a_person, :person =>{:work_group_ids => []}
 
@@ -1077,6 +1089,8 @@ class PeopleControllerTest < ActionController::TestCase
       a_person.reload
       assert a_person.work_groups.empty?
       assert !a_person.project_subscriptions.collect(&:project).include?(projects.first)
+      s.reload
+      assert !s.subscribed?(a_person)
   end
 
   test 'should show subscription list to only yourself and admin' do

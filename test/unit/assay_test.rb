@@ -122,7 +122,7 @@ class AssayTest < ActiveSupport::TestCase
       #an modelling assay can be valid without a technology type, sample or organism
       assay.assay_class=assay_classes(:modelling_assay_class)
       assay.technology_type=nil
-      assay.samples = []
+    assay.samples = []
       assert assay.valid?
 
     #an experimental assay can be invalid without a sample
@@ -274,25 +274,25 @@ class AssayTest < ActiveSupport::TestCase
     assay=assays(:metabolomics_assay2)
     User.current_user = assay.owner.user
     organism=organisms(:Streptomyces_coelicolor)
+    strain=strains(:strain_for_streptomyces_coelicolor)
     assert_equal 0,assay.assay_organisms.count,"This test relies on this assay having no organisms"
-    assert_equal 0,organism.strains.count, "This test relies on this organism having no strains"
 
     assert_difference("AssayOrganism.count") do
-      assert_difference("Strain.count") do
-        assay.associate_organism(organism,"FFFF")
+      assert_no_difference("Strain.count") do
+        disable_authorization_checks{assay.associate_organism(organism,strain.title)}
       end
     end
 
     assert_no_difference("AssayOrganism.count") do
       assert_no_difference("Strain.count") do
-        assay.associate_organism(organism,"FFFF")
+        disable_authorization_checks{assay.associate_organism(organism,strain.title)}
       end
     end
 
     organism=organisms(:yeast)
     assert_difference("AssayOrganism.count") do
-      assert_difference("Strain.count") do
-        assay.associate_organism(organism,"FFFF")
+      assert_no_difference("Strain.count") do
+        disable_authorization_checks{assay.associate_organism(organism,strain.title)}
       end
     end
 

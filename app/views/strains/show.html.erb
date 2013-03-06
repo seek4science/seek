@@ -1,0 +1,72 @@
+<% truncate_length_for_boxes = 22 -%>
+
+<%= render :partial => "layouts/item_title", :locals=>{:item=>@strain} %>
+
+<ul class="sectionIcons">
+  <%= render :partial => "subscriptions/subscribe", :locals => {:object => @strain} %>
+  <% if @strain.can_manage? %>
+  <li><%= image_tag_for_key('manage', edit_strain_path, "Manage Strain", nil, 'Manage Strain') %></li>
+  <% elsif @strain.can_edit? %>
+      <li><%= image_tag_for_key('edit', edit_strain_path(@strain), "Edit Strain", nil, 'Edit Strain') %></li>
+  <% end %>
+  <% if @strain.can_delete? %>
+      <li><%= image_tag_for_key "destroy", strain_path(@strain), "Delete Strain", {:confirm => 'Are you sure?', :method => :delete}, "Delete Strain" -%></li>
+  <!--show disabled delete button if current_user can manage but can not delete-->
+  <% elsif !@strain.can_delete? && @strain.can_manage? %>
+      <% explanation=unable_to_delete_text @strain %>
+      <li><%= image_tag_for_key "destroy", strain_path(@strain) , "Delete Strain", {:title=>"#{tooltip_title_attrib(explanation)}", :class=>"disabled", :onclick => "alert(\"#{explanation}\")"}, "Delete Strain", :function -%></li>
+  <% end %>
+</ul>
+
+<div class="show_basic">
+    <div class="main_content_left_box_narrower">
+      <p>
+        <label>Name:</label>
+        <%= @strain.title %>
+      </p>
+      <p>
+        <label>Provider's strain ID:</label>
+        <%= text_or_not_specified(@strain.provider_id) %>
+      </p>
+      <p>
+        <label>Provider Name:</label>
+        <%= text_or_not_specified(@strain.provider_name) %>
+      </p>
+      <p>
+        <label>Synonym:</label>
+        <%= text_or_not_specified(@strain.synonym) %>
+      </p>
+      <p>
+        <label>Comment:</label>
+        <%= text_or_not_specified(@strain.comment) %>
+      </p>
+      <p>
+        <label>Genotypes</label>
+        <%= text_or_not_specified(@strain.genotype_info) %>
+      </p>
+      <p>
+        <label>Phenotypes:</label>
+        <%= text_or_not_specified(@strain.phenotype_info) %>
+      </p>
+
+      <p id="organism">
+        <label>Organism: </label>
+        <%= strain_organism_list @strain.organism %>
+      </p>
+
+    </div>
+    <div class="main_content_right_box_wider">
+      <% #dont show creator box with JERM avatar for strain without contributor, as there are strains without contributor and are not harvested %>
+      <%= render :partial => "assets/resource_authors_box", :locals => { :resource => @strain, :creators => [@strain.contributor.try(:person)]} unless @strain.contributor.try(:person).nil? -%>
+      <%= item_tags_and_tag_entry -%>
+    </div>
+    <br/>
+
+  <div style="clear:both">
+    <br/>
+    <%= render :partial=>"layouts/items_related_to", :object => @strain %>
+    <br/>
+    <%= render :partial => "layouts/usage_info", :locals => { :resource => @strain } -%>
+  </div>
+
+</div>
