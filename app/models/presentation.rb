@@ -71,4 +71,8 @@ class Presentation < ActiveRecord::Base
   def use_mime_type_for_avatar?
     true
   end
+
+  def is_publishable?
+    false
+  end
 end
