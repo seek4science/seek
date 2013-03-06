@@ -66,8 +66,6 @@ module Acts #:nodoc:
 
         has_many :project_folder_assets, :as=>:asset, :dependent=>:destroy
 
-        before_save :detect_changed_created_at if Rails.env=="test"
-
         searchable do
           text :creators do
             creators.compact.map(&:name)
@@ -102,12 +100,6 @@ module Acts #:nodoc:
     end
 
     module InstanceMethods
-
-      def detect_changed_created_at
-        if !new_record? && changed.include?("created_at")
-          raise "Boo!"
-        end
-      end
 
       def contains_downloadable_items?
         blobs = []
