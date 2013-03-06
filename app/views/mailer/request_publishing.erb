@@ -1,3 +1,18 @@
 Hi <%= @owner.name -%>,
 
+    The <%= Seek::Config.application_name %> user <%= @publisher.name -%>, <%= person_url(@publisher,:host=>@host) -%>, has requested you to publish your following items in seek:
+<% @resources.each do |resource| %>
+    <% controller=resource.class.name.underscore.pluralize -%>
+    <%= resource.title -%> <%= url_for(:action=>:show,:controller=>controller,:id=>resource,:host=>@host) -%>
+<% end %>
+
+    You can publish your items by changing the sharing setting:
+        - Go to the item
+        - Click the 'Manage' button
+        - In the 'Sharing' session, choose the option 'All visitors (including anonymous visitors with no login)'
+
+    You can also reply to <%= @publisher.first_name.capitalize -%> by replying to this email.
+
+    This is an automated email.
+
 - <%= Seek::Config.dm_project_name %> Team
