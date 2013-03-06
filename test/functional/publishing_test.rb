@@ -16,17 +16,17 @@ class PublishingTest < ActionController::TestCase
   test "do publish" do
     df=data_file_for_publishing
 
-    assert df.can_manage?,"The datafile must be manageable for this test to succeed"
+    assert df.can_publish?,"The datafile must be publishable for this test to succeed"
     post :publish,:id=>df
     assert_response :success
     assert_nil flash[:error]
     assert_not_nil flash[:notice]
   end
 
-  test "do not publish if not can_manage?" do
+  test "do not publish if not can_publish?" do
     login_as(:quentin)
     df=data_file_for_publishing
-    assert !df.can_manage?,"The datafile must not be manageable for this test to succeed"
+    assert !df.can_publish?,"The datafile must not be publishable for this test to succeed"
     post :publish,:id=>df
     assert_redirected_to data_file_path(df)
     assert_not_nil flash[:error]
@@ -45,10 +45,18 @@ class PublishingTest < ActionController::TestCase
     assay=df.assays.first
     study=assay.study
     investigation=study.investigation
-    
-    other_df=assay.data_file_masters.reject{|d|d==df}.first
+
+    notifying_df=assay.data_file_masters.reject{|d|d==df}.first
+    request_publishing_df = Factory(:data_file,
+                                    :projects => Factory(:gatekeeper).projects,
+                                    :contributor => users(:datafile_owner),
+                                    :assays => [assay])
+
     assert_not_nil assay,"There should be an assay associated"
-    assert df.can_manage?,"The datafile must be manageable for this test to succeed"
+    assert df.can_publish?,"The datafile must be publishable for this test to succeed"
+    assert !request_publishing_df.can_publish?,"The datafile must not be publishable for this test to succeed"
+    assert request_publishing_df.can_manage?,"The datafile must be manageable for this test to succeed"
+    assert !notifying_df.can_manage?,"The datafile must not be manageable for this test to succeed"
 
     get :preview_publish, :id=>df
     assert_response :success
@@ -62,11 +70,19 @@ class PublishingTest < ActionController::TestCase
     end
 
 
-    assert_select "li.type_and_title",:text=>/Data file/,:count=>1 do
-      assert_select "a[href=?]",data_file_path(other_df),:text=>/#{other_df.title}/
+    assert_select "li.type_and_title",:text=>/Data file/,:count=>3 do
+      assert_select "a[href=?]",data_file_path(df),:text=>/#{df.title}/
+      assert_select "a[href=?]",data_file_path(request_publishing_df),:text=>/#{request_publishing_df.title}/
+      assert_select "a[href=?]",data_file_path(notifying_df),:text=>/#{notifying_df.title}/
+    end
+    assert_select "li.secondary",:text=>/Publish/ do
+      assert_select "input[checked='checked'][type='checkbox'][id=?]","publish_DataFile_#{df.id}"
+    end
+    assert_select "li.secondary",:text=>/Summit publishing request/ do
+      assert_select "input[checked='checked'][type='checkbox'][id=?]","publish_DataFile_#{request_publishing_df.id}"
     end
     assert_select "li.secondary",:text=>/Notify owner/ do
-      assert_select "input[checked='checked'][type='checkbox'][id=?]","publish_DataFile_#{other_df.id}"
+      assert_select "input[checked='checked'][type='checkbox'][id=?]","publish_DataFile_#{notifying_df.id}"
     end
 
     assert_select "li.type_and_title",:text=>/Study/,:count=>1 do
@@ -132,7 +148,7 @@ class PublishingTest < ActionController::TestCase
 
   test "do publish some" do
     df=data_with_isa
-    
+
     assays=df.assays
 
     params={:publish=>{}}
@@ -176,6 +192,29 @@ class PublishingTest < ActionController::TestCase
 
   end
 
+  test "handle request publishing for manageable but not publishable item" do
+    df=data_with_isa
+    request_publishing_df = Factory(:data_file,
+                                    :projects => Factory(:gatekeeper).projects,
+                                    :contributor => users(:datafile_owner),
+                                    :assays => df.assays)
+
+    params={:publish=>{}}
+
+    assert !request_publishing_df.is_published?,"This data file should not be public for the test to work"
+    params[:publish][request_publishing_df.class.name]||={}
+    params[:publish][request_publishing_df.class.name][request_publishing_df.id.to_s]="1"
+
+    assert_emails 1 do
+      post :publish,params.merge(:id=>df)
+    end
+
+    assert_response :success
+
+    request_publishing_df.reload
+    assert !request_publishing_df.is_published?, "This Datafile should not be published yet, but the publishing request was sent to the gatekeepers"
+  end
+
   test "cannot get preview_publish when not manageable" do
     login_as(:quentin)
     df=data_file_for_publishing
@@ -183,6 +222,25 @@ class PublishingTest < ActionController::TestCase
     get :preview_publish, :id=>df
     assert_redirected_to data_file_path(df)
     assert flash[:error]
+  end
+
+  test "can get preview_publish when manageable but not neccessarily publishable" do
+    #define gatekeeper to make asset not publishable
+    gatekeeper = Factory(:gatekeeper)
+    df=Factory :data_file, :contributor=>users(:datafile_owner), :projects=>gatekeeper.projects
+    assert df.can_manage?,"The datafile must be manageable for this test to succeed"
+    assert !df.can_publish?,"The datafile must not be publishable for this test to succeed"
+    get :preview_publish, :id=>df
+    assert_response :success
+    assert_nil flash[:error]
+  end
+
+  test "can get preview_publish when publishable, coz publishable includes manageable" do
+    df=data_file_for_publishing
+    assert df.can_publish?,"The datafile must be publishable for this test to succeed"
+    get :preview_publish, :id=>df
+    assert_response :success
+    assert_nil flash[:error]
   end
 
   test "notification email delivery count and response with complex ownerships" do
