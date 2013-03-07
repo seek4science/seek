@@ -47,7 +47,7 @@ ActionController::Routing::Routes.draw do |map|
   end
 
   map.resources :models, 
-    :member => {:download => :get, :matching_data=>:get, :execute=>:post, :request_resource=>:post,:preview_publish=>:get,:publish=>:post, :builder=>:get,:visualise=>:get, :export_as_xgmml=>:post,:submit_to_jws=>:post,:submit_to_sycamore=>:post, :simulate=>:post, :update_annotations_ajax=>:post },
+    :member => {:download => :get, :matching_data=>:get, :execute=>:post, :request_resource=>:post,:preview_publish=>:get,:publish=>[:post, :get], :builder=>:get,:visualise=>:get, :export_as_xgmml=>:post,:submit_to_jws=>:post,:submit_to_sycamore=>:post, :simulate=>:post, :update_annotations_ajax=>:post },
     :collection=>{:build=>:get} do |model|
     model.resources :model_images,:member=>{ :select=>:post },:collection => {:new => :post}
     model.resources :content_blobs, :member => {:download => :get, :view_pdf_content => :get, :get_pdf => :get}
@@ -65,7 +65,7 @@ ActionController::Routing::Routes.draw do |map|
     project.resources :folders, :collection=>{:nuke=>:post},:member=>{:display_contents=>:post,:move_asset_to=>:post,:create_folder=>:post,:remove_asset=>:post}
   end
 
-  map.resources :sops, :member => {:download=>:get,:new_version=>:post, :preview_publish=>:get,:publish=>:post,:request_resource=>:post, :update_annotations_ajax=>:post } do |sop|
+  map.resources :sops, :member => {:download=>:get,:new_version=>:post, :preview_publish=>:get,:publish=>[:post, :get],:request_resource=>:post, :update_annotations_ajax=>:post } do |sop|
     sop.resources :experimental_conditions, :collection =>{:create_from_existing=>:post}
     sop.resources :content_blobs, :member => {:download => :get, :view_pdf_content => :get, :get_pdf => :get}
   end
