@@ -6,7 +6,7 @@ Hi <%= @owner.name -%>,
     <%= resource.title -%> <%= url_for(:action=>:show,:controller=>controller,:id=>resource,:host=>@host) -%>
 <% end %>
 
-    You can publish your items by changing the sharing setting:
+    If you would like to publish the item, please change the sharing setting of the item in seek:
         - Go to the item
         - Click the 'Manage' button
         - In the 'Sharing' session, choose the option 'All visitors (including anonymous visitors with no login)'
@@ -15,4 +15,4 @@ Hi <%= @owner.name -%>,
 
     This is an automated email.
 
-- <%= Seek::Config.dm_project_name %> Team
+- <%= Seek::Config.dm_project_name %> Team.
