@@ -491,6 +491,39 @@ class PublishingTest < ActionController::TestCase
         assert_equal gatekeeper.user, publish_log.culprit
     end
 
+  test 'log when using publish button' do
+    df=data_with_isa
+    assay=df.assays.first
+
+    request_publishing_df = Factory(:data_file,
+                                    :projects => Factory(:gatekeeper).projects,
+                                    :contributor => users(:datafile_owner),
+                                    :assays => [assay])
+
+    assert !df.is_published? ,"The datafile must be not be published for this test to succeed"
+    assert df.can_publish?,"The datafile must be publishable for this test to succeed"
+    assert !request_publishing_df.is_published?,"The datafile must be not be published for this test to succeed"
+    assert !request_publishing_df.can_publish?,"The datafile must not be publishable for this test to succeed"
+    assert request_publishing_df.can_manage?,"The datafile must be manageable for this test to succeed"
+
+    params={:publish=>{}}
+    params[:publish][df.class.name]||={}
+    params[:publish][df.class.name][df.id.to_s]="1"
+    params[:publish][request_publishing_df.class.name]||={}
+    params[:publish][request_publishing_df.class.name][request_publishing_df.id.to_s]="1"
+
+    assert_difference("ResourcePublishLog.count", 2) do
+      post :publish,params.merge(:id=>df)
+      a=1
+    end
+    assert_response :success
+
+    log_for_df = ResourcePublishLog.last(:conditions => ["resource_type=? AND resource_id=?", "DataFile", df.id])
+    assert_equal ResourcePublishLog::PUBLISHED, log_for_df.publish_state
+    log_for_request_publishing_df = ResourcePublishLog.last(:conditions => ["resource_type=? AND resource_id=?", "DataFile", request_publishing_df.id])
+    assert_equal ResourcePublishLog::WAITING_FOR_APPROVAL, log_for_request_publishing_df.publish_state
+  end
+
   test 'do not allow to approve_publish if the asset is not in waiting_for_approval state' do
     gatekeeper = Factory(:gatekeeper)
     df = Factory(:data_file, :projects => gatekeeper.projects)
