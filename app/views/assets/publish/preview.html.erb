@@ -54,7 +54,6 @@ investigations = studies.collect(&:investigation).uniq
   </p>
 
   <% form_tag :action=>:publish do -%>
-      <%= hidden_field_tag publishing_item_param(@asset),1 -%>
       <h2>Assays related to this <%= asset_type_name -%> and their assets.</h2>
       <ul>
         <% if @asset.assays.empty? -%>
