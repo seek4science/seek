@@ -68,6 +68,13 @@ module Seek
 
         @published_items = @published_items - @problematic_items
 
+        @published_items.each do |item|
+          latest_publish_log = ResourcePublishLog.last(:conditions => ["resource_type=? and resource_id=?",item.class.name,item.id])
+          if item.policy.sharing_scope == Policy::EVERYONE && latest_publish_log.try(:publish_state) != ResourcePublishLog::PUBLISHED
+            ResourcePublishLog.add_publish_log ResourcePublishLog::PUBLISHED, item
+          end
+        end
+
         respond_to do |format|
           flash.now[:notice]="Publishing complete"
           format.html { render :template=>"assets/publish/published" }
@@ -107,6 +114,8 @@ module Seek
       end
     end
 
+    private
+
     def log_publishing
       User.with_current_user current_user do
             c = self.controller_name.downcase
@@ -132,8 +141,6 @@ module Seek
             end
       end
     end
-
-    private
 
     def deliver_request_publish_approval item
       if (Seek::Config.email_enabled)
