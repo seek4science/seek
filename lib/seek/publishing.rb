@@ -4,7 +4,8 @@ module Seek
     def self.included(base)
       base.before_filter :set_asset, :only=>[:preview_publish,:publish,:approve_or_reject_publish,:approve_publish,:reject_publish]
       base.before_filter :publish_auth, :only=>[:preview_publish,:publish]
-      base.before_filter :gatekeeper_auth, :waiting_for_approval_auth, :only => [:approve_or_reject_publish, :approve_publish, :reject_publish]
+      base.before_filter :gatekeeper_auth, :only => [:approve_or_reject_publish, :approve_publish, :reject_publish]
+      base.before_filter :waiting_for_approval_auth, :only => [:approve_publish, :reject_publish]
       base.after_filter :log_publishing, :only => [:create, :update, :approve_publish]
     end
 
@@ -109,7 +110,7 @@ module Seek
     def waiting_for_approval_auth
       latest_publish_state = ResourcePublishLog.find(:last, :conditions => ["resource_type=? AND resource_id=?", @asset.class.name, @asset.id])
       unless latest_publish_state.try(:publish_state).to_i == ResourcePublishLog::WAITING_FOR_APPROVAL
-              error("You are not authorized to approve/reject the publishing of this item, or this item is already published", "is invalid (insufficient_privileges)")
+              error("This item is already published or you are not authorized to approve/reject the publishing of this item", "is invalid (insufficient_privileges)")
               return false
       end
     end
