@@ -234,6 +234,10 @@ class Person < ActiveRecord::Base
     work_groups.collect {|wg| wg.institution }.uniq
   end
 
+  def investigations
+    user.investigations.uniq
+  end
+  
   def direct_projects
     #updating workgroups doesn't change groupmemberships until you save. And vice versa.
     work_groups.collect {|wg| wg.project }.uniq | group_memberships.collect{|gm| gm.work_group.project}

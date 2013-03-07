@@ -83,6 +83,7 @@
         <% if @event.can_manage? %>
             <%= preview_permission_popup_link(@event)-%>
             <%= f.submit button_text, :id => "event_submit_btn", :onclick => "javascript: clickLink($('preview_permission'));;return(false);" -%>
+            or <%= link_to 'Cancel', events_path -%>
         <% else %>
             <%= f.submit button_text, :disable_with=>disabled_text, :id => "event_submit_btn", :onclick => "javascript: $('event_submit_btn').form.submit();return(false);" -%>
         <% end %>
