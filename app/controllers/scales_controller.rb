@@ -37,7 +37,7 @@ class ScalesController < ApplicationController
       res[:items].compact!      
       unless res[:items].empty?
         total_count = res[:items].size
-        res[:items] = authorized_related_items res[:items], key
+        res[:items] = key.constantize.authorized_partial_asset_collection res[:items], "view", User.current_user
         res[:hidden_count] = total_count - res[:items].size
       end
     end
@@ -54,22 +54,6 @@ class ScalesController < ApplicationController
 
    end
 
-  #FIXME: refractor this method with the method in assets_helper
-  def authorized_related_items related_items, item_type
-    user_id = current_user.nil? ? 0 : current_user.id
-    assets = []
-    authorized_related_items = []
-    lookup_table_name = item_type.underscore + 'auth_lookup'
-    asset_class = item_type.constantize
-    if (asset_class.lookup_table_consistent?(user_id))
-      Rails.logger.info("Lookup table #{lookup_table_name} used for authorizing related items is complete for user_id = #{user_id}")
-      assets = asset_class.lookup_for_action_and_user 'view', user_id, nil
-      authorized_related_items = assets & related_items
-    else
-      authorized_related_items = related_items.select(&:can_view?)
-    end
-    authorized_related_items
-  end
 
   private
 

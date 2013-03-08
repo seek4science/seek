@@ -22,7 +22,7 @@
            res[:items].compact!           
            unless res[:items].empty?
              total_count = res[:items].size
-             res[:items] = authorized_related_items res[:items], key
+             res[:items] = key.constantize.authorized_partial_asset_collection res[:items], "view", User.current_user
              res[:hidden_count] = total_count - res[:items].size
            end
          end
