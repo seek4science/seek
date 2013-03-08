@@ -43,6 +43,32 @@ class Mailer < ActionMailer::Base
       body :gatekeepers=>gatekeepers,:requester=>user.person,:resource=>resource,:host=>base_host
   end
 
+  def gatekeeper_approval_feedback requester, gatekeeper, resource, base_host
+
+    subject "A #{Seek::Config.application_name} gatekeeper approved your request to publish: #{resource.title}"
+    recipients requester.email_with_name
+    from Seek::Config.noreply_sender
+    sent_on Time.now
+
+    body :gatekeeper=>gatekeeper,:requester=>requester,:resource=>resource,:host=>base_host
+  end
+
+  def gatekeeper_reject_feedback requester, gatekeeper, resource, extra_comment, base_host
+
+  subject "A #{Seek::Config.application_name} gatekeeper rejected your request to publish: #{resource.title}"
+    recipients requester.email_with_name
+    from Seek::Config.noreply_sender
+    reply_to gatekeeper.email_with_name
+    sent_on Time.now
+
+    if extra_comment.blank?
+      extra_comment = gatekeeper.name + " did not leave any reasons/comments"
+    else
+      extra_comment = gatekeeper.name + " left reasons/comments: " + extra_comment
+    end
+    body :gatekeeper=>gatekeeper,:requester=>requester,:resource=>resource,:extra_comment=>extra_comment,:host=>base_host
+  end
+
   def request_resource(user,resource,details,base_host)
 
     subject "A #{Seek::Config.application_name} member requested a protected file: #{resource.title}"

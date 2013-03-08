@@ -283,18 +283,14 @@ class PublishingTest < ActionController::TestCase
     end
   end
 
-  test 'should not allow to approve/reject publishing for non-gatekeeper' do
+  test 'should not allow to decide publishing for non-gatekeeper' do
     login_as(:quentin)
     df = Factory(:data_file,:projects => people(:quentin_person).projects)
     get :approve_or_reject_publish, :id=>df.id
     assert_redirected_to :root
     assert_not_nil flash[:error]
 
-    get :approve_publish, :id => df.id
-    assert_redirected_to :root
-    assert_not_nil flash[:error]
-
-    get :reject_publish, :id => df.id
+    post :gatekeeper_decide, :id => df.id, :gatekeeper_decision => 1
     assert_redirected_to :root
     assert_not_nil flash[:error]
   end
@@ -319,7 +315,7 @@ class PublishingTest < ActionController::TestCase
     assert_equal "This Data file no longer exists, and may have been deleted since the request to publish was made.",flash[:error]
   end
 
-  test 'gatekeeper should approve/reject publishing' do
+  test 'gatekeeper should be able to decide publishing' do
     gatekeeper = Factory(:gatekeeper)
     df = Factory(:data_file,:projects => gatekeeper.projects)
     login_as(df.contributor)
@@ -332,13 +328,13 @@ class PublishingTest < ActionController::TestCase
     assert_response :success
     assert_nil flash[:error]
 
-    post :reject_publish, :id => df.id
+    post :gatekeeper_decide, :id => df.id, :gatekeeper_decision => 0
     assert_redirected_to data_file_path(df)
     assert_nil flash[:error]
     df.reload
     assert_not_equal Policy::EVERYONE, df.policy.sharing_scope
 
-    post :approve_publish, :id => df.id
+    post :gatekeeper_decide, :id => df.id, :gatekeeper_decision => 1
     assert_redirected_to data_file_path(df)
     assert_nil flash[:error]
     df.reload
@@ -346,7 +342,7 @@ class PublishingTest < ActionController::TestCase
     assert_equal Policy::ACCESSIBLE, df.policy.access_type
   end
 
-  test 'should not allow to approve/reject publishing for gatekeeper from other projects' do
+  test 'should not allow to decide publishing for gatekeeper from other projects' do
       gatekeeper = Factory(:gatekeeper)
       df = Factory(:data_file)
       login_as(df.contributor)
@@ -359,11 +355,7 @@ class PublishingTest < ActionController::TestCase
       assert_redirected_to :root
       assert_not_nil flash[:error]
 
-      get :approve_publish, :id => df.id
-      assert_redirected_to :root
-      assert_not_nil flash[:error]
-
-      get :reject_publish, :id => df.id
+      post :gatekeeper_decide, :id => df.id, :gatekeeper_decision => 1
       assert_redirected_to :root
       assert_not_nil flash[:error]
   end
@@ -481,7 +473,7 @@ class PublishingTest < ActionController::TestCase
 
         login_as(gatekeeper.user)
         assert_difference ('ResourcePublishLog.count') do
-          put :approve_publish, :id => df.id
+          post :gatekeeper_decide, :id => df.id, :gatekeeper_decision => 1
         end
 
         publish_log = ResourcePublishLog.find(:last)
@@ -524,18 +516,18 @@ class PublishingTest < ActionController::TestCase
     assert_equal ResourcePublishLog::WAITING_FOR_APPROVAL, log_for_request_publishing_df.publish_state
   end
 
-  test 'do not allow to approve_publish if the asset is not in waiting_for_approval state' do
+  test 'do not allow to decide publishing if the asset is not in waiting_for_approval state' do
     gatekeeper = Factory(:gatekeeper)
     df = Factory(:data_file, :projects => gatekeeper.projects)
 
     login_as(gatekeeper.user)
-    put :approve_publish, :id => df.id
+    post :gatekeeper_decide, :id => df.id, :gatekeeper_decision => 1
 
     assert_redirected_to :root
     assert_not_nil flash[:error]
   end
 
-  test 'allow to approve_publish if the asset is in waiting_for_approval state' do
+  test 'allow to decide publishing if the asset is in waiting_for_approval state' do
     gatekeeper = Factory(:gatekeeper)
     df = Factory(:data_file, :projects => gatekeeper.projects)
 
@@ -545,7 +537,7 @@ class PublishingTest < ActionController::TestCase
     logout
 
     login_as(gatekeeper.user)
-    put :approve_publish, :id => df.id
+    post :gatekeeper_decide, :id => df.id, :gatekeeper_decision => 1
 
     assert_nil flash[:error]
   end

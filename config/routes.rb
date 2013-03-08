@@ -3,7 +3,7 @@ ActionController::Routing::Routes.draw do |map|
   map.resources :presentations,
                 :member => {:download=>:get,:new_version=>:post, :preview_publish=>:get,:publish=>[:post, :get],
                             :request_resource=>:post, :update_annotations_ajax=>:post, :approve_or_reject_publish=>:get,
-                            :approve_publish=>:post, :reject_publish=>:post } do |presentation|
+                            :gatekeeper_decide=>:post } do |presentation|
     presentation.resources :content_blobs, :member => {:download => :get, :view_pdf_content => :get, :get_pdf => :get}
   end
   map.resources :subscriptions
@@ -38,7 +38,7 @@ ActionController::Routing::Routes.draw do |map|
                 :collection=>{:test_asset_url=>:post},
                 :member => {:download=>:get,:plot=>:get, :data => :get,:preview_publish=>:get,:publish=>[:post, :get],
                             :request_resource=>:post, :update_annotations_ajax=>:post, :explore=>:get, :convert_to_presentation => :post,
-                            :approve_or_reject_publish=>:get, :approve_publish=>:post, :reject_publish=>:post},
+                            :approve_or_reject_publish=>:get, :gatekeeper_decide=>:post},
                 :new=>{:upload_for_tool => :post, :upload_from_email => :post}  do |data_file|
     data_file.resources :studied_factors, :collection =>{:create_from_existing=>:post}
     data_file.resources :content_blobs, :member => {:download => :get, :view_pdf_content => :get, :get_pdf => :get}
@@ -56,7 +56,7 @@ ActionController::Routing::Routes.draw do |map|
 
   map.resources :models, 
     :member => {:download => :get, :matching_data=>:get, :execute=>:post, :request_resource=>:post,:preview_publish=>:get,:publish=>[:post, :get],
-                :approve_or_reject_publish=>:get, :approve_publish=>:post, :reject_publish=>:post,
+                :approve_or_reject_publish=>:get, :gatekeeper_decide=>:post,
                 :builder=>:get,:visualise=>:get, :export_as_xgmml=>:post,:submit_to_jws=>:post,:submit_to_sycamore=>:post, :simulate=>:post, :update_annotations_ajax=>:post },
     :collection=>{:build=>:get} do |model|
     model.resources :model_images,:member=>{ :select=>:post },:collection => {:new => :post}
@@ -77,7 +77,7 @@ ActionController::Routing::Routes.draw do |map|
 
   map.resources :sops,
                 :member => {:download=>:get,:new_version=>:post, :preview_publish=>:get,:publish=>[:post, :get],
-                            :approve_or_reject_publish=>:get, :approve_publish=>:post, :reject_publish=>:post,
+                            :approve_or_reject_publish=>:get, :gatekeeper_decide=>:post,
                             :request_resource=>:post, :update_annotations_ajax=>:post } do |sop|
     sop.resources :experimental_conditions, :collection =>{:create_from_existing=>:post}
     sop.resources :content_blobs, :member => {:download => :get, :view_pdf_content => :get, :get_pdf => :get}

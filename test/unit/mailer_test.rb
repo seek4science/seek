@@ -107,6 +107,41 @@ class MailerTest < ActionMailer::TestCase
     end
   end
 
+  test "gatekeeper approval feedback" do
+    resource = data_files(:picture)
+    gatekeeper = people(:gatekeeper_person)
+    requester = people(:aaron_person)
+    @expected.subject = "A SEEK gatekeeper approved your request to publish: #{resource.title}"
+    #TODO: hardcoding the formating rather than passing an array was require for rails 2.3.8 upgrade
+    @expected.to = requester.email_with_name
+    @expected.from = "no-reply@sysmo-db.org"
+    @expected.date = Time.now
+
+    @expected.body = read_fixture('gatekeeper_approval_feedback')
+
+    pretend_now_is(@expected.date) do
+      assert_equal @expected.encoded,Mailer.create_gatekeeper_approval_feedback(requester, gatekeeper, resource,"localhost").encoded
+    end
+  end
+
+  test "gatekeeper reject feedback" do
+    resource = data_files(:picture)
+    gatekeeper = people(:gatekeeper_person)
+    requester = people(:aaron_person)
+    @expected.subject = "A SEEK gatekeeper rejected your request to publish: #{resource.title}"
+    #TODO: hardcoding the formating rather than passing an array was require for rails 2.3.8 upgrade
+    @expected.to = requester.email_with_name
+    @expected.from = "no-reply@sysmo-db.org"
+    @expected.reply_to = gatekeeper.email_with_name
+    @expected.date = Time.now
+
+    @expected.body = read_fixture('gatekeeper_reject_feedback')
+    extra_comment = 'Not ready'
+    pretend_now_is(@expected.date) do
+      assert_equal @expected.encoded,Mailer.create_gatekeeper_reject_feedback(requester, gatekeeper, resource, extra_comment, "localhost").encoded
+    end
+  end
+
   test "request publishing" do
 
     @expected.subject = "A SEEK member requests you make some items public"

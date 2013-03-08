@@ -2,11 +2,11 @@ module Seek
   module Publishing
 
     def self.included(base)
-      base.before_filter :set_asset, :only=>[:preview_publish,:publish,:approve_or_reject_publish,:approve_publish,:reject_publish]
+      base.before_filter :set_asset, :only=>[:preview_publish,:publish,:approve_or_reject_publish,:gatekeeper_decide]
       base.before_filter :publish_auth, :only=>[:preview_publish,:publish]
-      base.before_filter :gatekeeper_auth, :only => [:approve_or_reject_publish, :approve_publish, :reject_publish]
-      base.before_filter :waiting_for_approval_auth, :only => [:approve_publish, :reject_publish]
-      base.after_filter :log_publishing, :only => [:create, :update, :approve_publish]
+      base.before_filter :gatekeeper_auth, :only => [:approve_or_reject_publish, :gatekeeper_decide]
+      base.before_filter :waiting_for_approval_auth, :only => [:gatekeeper_decide]
+      base.after_filter :log_publishing, :only => [:create, :update, :gatekeeper_decide]
     end
 
     def approve_or_reject_publish
@@ -17,30 +17,33 @@ module Seek
       end
     end
 
-    def approve_publish
-      policy = @asset.policy
-      policy.access_type=Policy::ACCESSIBLE
-      policy.sharing_scope=Policy::EVERYONE
-      if @asset.kind_of?(Strain)
-        policy.permissions = []
-      end
-      respond_to do |format|
-         if policy.save
-           flash[:notice]="Publishing complete"
-           format.html{redirect_to @asset.kind_of?(Strain) ? biosamples_path : @asset}
-         else
-           flash[:error] = "There is a problem in making this item published"
-         end
+    def gatekeeper_decide
+      gatekeeper_decision = params[:gatekeeper_decision].to_i
+      #approve
+      if gatekeeper_decision == 1
+        policy = @asset.policy
+        policy.access_type=Policy::ACCESSIBLE
+        policy.sharing_scope=Policy::EVERYONE
+        respond_to do |format|
+          if policy.save
+            process_gatekeeper_feedback 'approve'
+            flash[:notice]="Publishing complete"
+            format.html{redirect_to @asset}
+          else
+            flash[:error] = "There is a problem in making this item published"
+          end
+        end
+      #reject
+      elsif gatekeeper_decision == 0
+        extra_comment = params[:extra_comment]
+        process_gatekeeper_feedback 'reject', extra_comment
+        respond_to do |format|
+          flash[:notice]="You rejected to publish this item"
+          format.html{redirect_to @asset}
+        end
       end
     end
-
-    def reject_publish
-      respond_to do |format|
-         flash[:notice]="You rejected to publish this item"
-         format.html{redirect_to @asset.kind_of?(Strain) ? biosamples_path : @asset}
-      end
-    end
-
+   
     def preview_publish
       asset_type_name = @template.text_for_resource @asset
 
@@ -123,7 +126,7 @@ module Seek
             a = self.action_name.downcase
 
             object = eval("@"+c.singularize)
-            object = @asset if a == 'approve_publish'
+            object = @asset if a == 'gatekeeper_decide'
 
             #don't log if the object is not valid or has not been saved, as this will a validation error on update or create
             return if object.nil? || (object.respond_to?("new_record?") && object.new_record?) || (object.respond_to?("errors") && !object.errors.empty?)
@@ -140,6 +143,49 @@ module Seek
             elsif object.policy.sharing_scope != Policy::EVERYONE && latest_publish_log.try(:publish_state) == ResourcePublishLog::PUBLISHED
               ResourcePublishLog.add_publish_log(ResourcePublishLog::UNPUBLISHED,object)
             end
+      end
+    end
+
+    def process_gatekeeper_feedback result, extra_comment=nil
+      latest_unpublished_log =  ResourcePublishLog.last(:conditions => ["resource_type=? AND resource_id=? AND publish_state=?",
+                                                                        @asset.class.name, @asset.id, ResourcePublishLog::UNPUBLISHED])
+      if latest_unpublished_log.nil?
+        requesters = ResourcePublishLog.find(:all, :conditions => ["resource_type=? AND resource_id=? AND publish_state=?",
+                                                                   @asset.class.name, @asset.id, ResourcePublishLog::WAITING_FOR_APPROVAL]).collect(&:culprit)
+      else
+        requesters = ResourcePublishLog.find(:all, :conditions => ["resource_type=? AND resource_id=? AND publish_state=? AND created_at >?",
+                                                                   @asset.class.name, @asset.id, ResourcePublishLog::WAITING_FOR_APPROVAL,latest_unpublished_log.created_at ]).collect(&:culprit)
+      end
+      requesters.compact.each do |requester|
+        if !requester.kind_of?(Person) && requester.respond_to?(:person)
+          requester = requester.person
+        end
+
+        if result == "approve"
+          deliver_gatekeeper_approval_feedback requester
+        elsif result == "reject"
+          deliver_gatekeeper_reject_feedback requester, extra_comment
+        end
+      end
+    end
+
+    def deliver_gatekeeper_approval_feedback requester
+      if (Seek::Config.email_enabled)
+        begin
+          Mailer.deliver_gatekeeper_approval_feedback requester, current_user.person , @asset, base_host
+        rescue Exception => e
+          Rails.logger.error("Error sending gatekeeper approval feedback email to the requester #{requester.name}- #{e.message}")
+        end
+      end
+    end
+
+    def deliver_gatekeeper_reject_feedback requester, extra_comment
+      if (Seek::Config.email_enabled)
+        begin
+          Mailer.deliver_gatekeeper_reject_feedback requester, current_user.person , @asset, extra_comment, base_host
+        rescue Exception => e
+          Rails.logger.error("Error sending gatekeeper reject feedback email to the requester #{requester.name}- #{e.message}")
+        end
       end
     end
 
