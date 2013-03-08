@@ -244,7 +244,7 @@ namespace :seek do
   end
 
   desc "dump policy authorization caching"
-  task :dump_policy_authorization_caching, :filename, :needs => :environment do |t, args|
+  task :dump_policy_authorization_caching, [:filename] => :environment do |t, args|
     filename = args[:filename] ? args[:filename].to_s : 'cache_dump.yaml'
 
     klasses = Seek::Util.persistent_classes.select { |klass| klass.reflect_on_association(:policy) }.reject { |klass| klass.name == 'Permission' || klass.name.match(/::Version$/) }
@@ -262,7 +262,7 @@ namespace :seek do
 
 
   desc "load policy authorization caching"
-  task :load_policy_authorization_caching,:filename,:needs => :environment do |t,args|
+  task :load_policy_authorization_caching,[:filename] => :environment do |t,args|
     filename = args[:filename] ? args[:filename].to_s : 'cache_dump.yaml'
     YAML.load(File.read(filename.to_s)).each_pair {|k,v| Rails.cache.write(k,v)}
   end
