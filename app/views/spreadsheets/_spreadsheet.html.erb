@@ -32,7 +32,7 @@
               <!--- Columns --->
               <colgroup>
                 <% sheet.columns.each do |col| -%>
-                  <col style="<%= (("width:" + (col.width.to_f/31).to_i.to_s) + "px") unless col.width.nil? -%>" width="<%= (((col.width.to_f/31).to_i.to_s) + "px") unless col.width.nil? -%>">
+                  <col style="<%= (("width:" + (col.width.to_f/31).to_i.to_s) + "px") unless col.width.nil?  -%>">
                 <% end -%>
               </colgroup>
 
