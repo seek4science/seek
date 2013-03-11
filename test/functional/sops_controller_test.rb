@@ -304,6 +304,12 @@ class SopsControllerTest < ActionController::TestCase
       assert_select "p > b",:text=>/Size:/
       assert_select "p",:text=>/8.8 KB/
     end
+
+    al = ActivityLog.last
+    assert_equal "show",al.action
+    assert_equal User.current_user,al.culprit
+    assert_equal s,al.activity_loggable
+    assert_equal "Rails Testing",al.user_agent
   end
 
   test "should get edit" do
