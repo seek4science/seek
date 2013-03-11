@@ -5,7 +5,10 @@ class SamplesController < ApplicationController
   before_filter :find_and_auth, :only => [:show, :edit, :update, :destroy]
   before_filter :virtualliver_only, :only => [:new_object_based_on_existing_one]
 
-  include Seek::Publishing
+  include Seek::Publishing::GatekeeperPublish
+  include Seek::Publishing::BatchPublishing
+  include Seek::Publishing::LogPublishing
+
   include Seek::BreadCrumbs
 
   def new_object_based_on_existing_one

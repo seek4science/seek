@@ -5,7 +5,11 @@ class StrainsController < ApplicationController
   before_filter :find_and_auth, :only => [:show, :edit, :update, :destroy]
 
   before_filter :get_strains_for_organism,:only=>[:existing_strains_for_assay_organism]
-  include Seek::Publishing
+
+  include Seek::Publishing::GatekeeperPublish
+  include Seek::Publishing::BatchPublishing
+  include Seek::Publishing::LogPublishing
+
   include Seek::BreadCrumbs
 
   def new

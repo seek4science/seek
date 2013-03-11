@@ -12,7 +12,10 @@ class PresentationsController < ApplicationController
   before_filter :find_and_auth, :except => [ :index, :new, :create, :preview,:update_annotations_ajax]
   before_filter :find_display_asset, :only=>[:show, :download]
 
-  include Seek::Publishing
+  include Seek::Publishing::GatekeeperPublish
+  include Seek::Publishing::BatchPublishing
+  include Seek::Publishing::LogPublishing
+
   include Seek::BreadCrumbs
 
   def new_version

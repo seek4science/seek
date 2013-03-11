@@ -7,7 +7,11 @@ class EventsController < ApplicationController
   before_filter :check_events_enabled
 
   include IndexPager
-  include Seek::Publishing
+
+  include Seek::Publishing::GatekeeperPublish
+  include Seek::Publishing::BatchPublishing
+  include Seek::Publishing::LogPublishing
+
   include Seek::BreadCrumbs
   
   def show

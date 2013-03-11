@@ -19,7 +19,11 @@ class ModelsController < ApplicationController
 
   before_filter :experimental_features, :only=>[:matching_data]
 
-  include Seek::Publishing
+  include Seek::Publishing::IsaPublishing
+  include Seek::Publishing::GatekeeperPublish
+  include Seek::Publishing::BatchPublishing
+  include Seek::Publishing::LogPublishing
+
   include Seek::BreadCrumbs
 
   @@model_builder = Seek::JWS::Builder.new

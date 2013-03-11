@@ -7,7 +7,10 @@ class AssaysController < ApplicationController
   before_filter :find_assets, :only=>[:index]
   before_filter :find_and_auth, :only=>[:edit, :update, :destroy, :show]
 
-  include Seek::Publishing
+  include Seek::Publishing::GatekeeperPublish
+  include Seek::Publishing::BatchPublishing
+  include Seek::Publishing::LogPublishing
+
   include Seek::BreadCrumbs
 
    def new_object_based_on_existing_one

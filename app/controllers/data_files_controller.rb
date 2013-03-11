@@ -18,7 +18,11 @@ class DataFilesController < ApplicationController
   before_filter :xml_login_only, :only => [:upload_for_tool, :upload_from_email]
 
   #has to come after the other filters
-  include Seek::Publishing
+  include Seek::Publishing::IsaPublishing
+  include Seek::Publishing::GatekeeperPublish
+  include Seek::Publishing::BatchPublishing
+  include Seek::Publishing::LogPublishing
+
   include Seek::BreadCrumbs
 
 

@@ -8,40 +8,36 @@
     }
 </style>
 
-<% content_partial = get_list_item_content_partial(@asset) %>
-
-  <h1>You are requested to approve or reject to publish <%= asset_type_name -%> '<%= @asset.title -%>'. </h1>
-<div class="list_items_container" id="<%=@asset.class.name%>_list_items_container">
-    <%= render :partial => "assets/resource_list_item",:object=>@asset, :locals => {:actions_partial_disable => true} -%>
-
-
-  <div style="clear: both;">
-    <br/>
-    <br/>
-    <% if @asset.policy.sharing_scope < Policy::EVERYONE %>
-        <% form_tag :action => :gatekeeper_decide do %>
-            <div class="radio_buttons">
-              Please select your decision:
-              <br/>
-              <input type="radio" name="gatekeeper_decision" checked="checked" value="1" onclick="Effect.Fade('extra_comment_session', { duration: 0.25 });"/> Approve
-              <br/>
-              <input type="radio" name="gatekeeper_decision" value="0" onclick="Effect.Appear('extra_comment_session', { duration: 0.25 });"/> Reject
-            </div>
-            <div id="extra_comment_session" style=" margin-left:1em;display:none;">
-                    If you are going to reject this request, please input the reasons/comments here so that the requesters are
-                    informed.
-                <br/>
-                <%= text_area_tag "extra_comment", nil, :size => "50x8" -%>
-            </div>
+<h1>You are requested to approve or reject to publish <%= asset_type_name -%> '<%= @resource.title -%>'. </h1>
+<div class="list_items_container" id="<%= @resource.class.name %>_list_items_container">
+  <%= render :partial => "assets/resource_list_item", :object => @resource, :locals => {:actions_partial_disable => true} -%>
+  <br/>
+  <br/>
+  <% if @resource.policy.sharing_scope < Policy::EVERYONE %>
+      <% form_tag :action => :gatekeeper_decide do %>
+          <div class="radio_buttons">
+            Please select your decision:
             <br/>
-            <%= submit_tag "Submit", :disable_with => "Submitting ..." -%>
-            Or
-            <%= link_to "Cancel", url_for(:action => "index") -%>
-        <% end %>
-    <% else %>
-        <span class="published"> This <%= asset_type_name -%> is already published!</span>
-    <% end %>
-  </div>
+            <input type="radio" name="gatekeeper_decision" checked="checked" value="1" onclick="Effect.Fade('extra_comment_session', { duration: 0.25 });"/>
+            Approve
+            <br/>
+            <input type="radio" name="gatekeeper_decision" value="0" onclick="Effect.Appear('extra_comment_session', { duration: 0.25 });"/>
+            Reject
+          </div>
+          <div id="extra_comment_session" style=" margin-left:1em;display:none;">
+            If you are going to reject this request, please input the reasons/comments here so that the requesters are
+            informed.
+            <br/>
+            <%= text_area_tag "extra_comment", nil, :size => "50x8" -%>
+          </div>
+          <br/>
+          <%= submit_tag "Submit", :disable_with => "Submitting ..." -%>
+          Or
+          <%= link_to "Cancel", url_for(:action => "index") -%>
+      <% end %>
+  <% else %>
+      <span class="published"> This <%= asset_type_name -%> is already published!</span>
+  <% end %>
 </div>
 
 
