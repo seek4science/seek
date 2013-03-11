@@ -35,7 +35,7 @@ Seek::Config.default :home_description, 'You can configure the text that goes he
 Seek::Config.default :publish_button_enabled,false
 Seek::Config.default :strategic_eager_loading, false
 Seek::Config.default :auth_lookup_enabled,true
-Seek::Config.default :sample_parser_enabled,false
+Seek::Config.default :sample_parser_enabled,true
 Seek::Config.default :external_search_enabled, true
 Seek::Config.default :project_browser_enabled,false
 Seek::Config.default :experimental_features_enabled,false
