@@ -68,7 +68,7 @@ class ProjectSubscriptionTest < ActiveSupport::TestCase
   test 'subscribers to a project auto subscribe to new items in its ancestors' do
     child_project = Factory :project, :parent => @proj
     @proj.reload
-    current_person.project_subscriptions.create(:project => child_project).id
+    current_person.project_subscriptions.create(:project => child_project)
     assert Factory(:subscribable, :projects => [@proj], :title => "ancestor autosub test").subscribed?
   end
 

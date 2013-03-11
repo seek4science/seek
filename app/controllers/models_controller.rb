@@ -194,16 +194,6 @@ class ModelsController < ApplicationController
     end
   end
 
-    render :update do |page|
-      if error_message.blank?
-        page['sbml_model'].value = IO.read(@display_model.sbml_content_blobs.first.filepath).gsub(/\n/, '')
-        page['sycamore-form'].submit()
-      else
-        page.alert(error_message)
-      end
-    end
-  end
-
  def simulate
     error=nil
     begin
@@ -655,18 +645,18 @@ class ModelsController < ApplicationController
     end
   end
 
-   def build_model_image model_object, params_model_image
-      unless params_model_image.blank? || params_model_image[:image_file].blank?
+ def build_model_image model_object, params_model_image
+   unless params_model_image.blank? || params_model_image[:image_file].blank?
 
-      # the creation of the new Avatar instance needs to have only one parameter - therefore, the rest should be set separately
-      @model_image = ModelImage.new(params_model_image)
-      @model_image.model_id = model_object.id
-      @model_image.content_type = params_model_image[:image_file].content_type
-      @model_image.original_filename = params_model_image[:image_file].original_filename
-      model_object.model_image = @model_image
-    end
-
+     # the creation of the new Avatar instance needs to have only one parameter - therefore, the rest should be set separately
+     @model_image = ModelImage.new(params_model_image)
+     @model_image.model_id = model_object.id
+     @model_image.content_type = params_model_image[:image_file].content_type
+     @model_image.original_filename = params_model_image[:image_file].original_filename
+     model_object.model_image = @model_image
    end
+
+ end
 
     def find_xgmml_doc model
       xgmml_content_blob = model.xgmml_content_blobs.first
@@ -675,11 +665,12 @@ class ModelsController < ApplicationController
       doc
     end
 
-  def create_model_image model_object, params_model_image
-    build_model_image model_object, params_model_image
-    model_object.save(false)
-    latest_version = model_object.latest_version
-    latest_version.model_image_id = model_object.model_image_id
-    latest_version.save
-  end
+ def create_model_image model_object, params_model_image
+   build_model_image model_object, params_model_image
+   model_object.save(false)
+   latest_version = model_object.latest_version
+   latest_version.model_image_id = model_object.model_image_id
+   latest_version.save
+ end
+
 end

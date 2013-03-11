@@ -33,8 +33,6 @@ gem "daemons"
 gem "cancan"
 gem "in_place_editing"
 
-gem "pry-doc", :group => :development
-gem 'ruby18_source_location', :group => :development
 gem 'newrelic_rpm'
 gem "rdf"
 gem "rdf-rdfxml"

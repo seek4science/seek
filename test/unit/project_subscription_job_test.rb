@@ -38,7 +38,7 @@ class ProjectSubscriptionJobTest < ActiveSupport::TestCase
       assert_equal 1,Delayed::Job.count
 
       job = Delayed::Job.first
-      assert_equal 0,job.priority
+      assert_equal 2,job.priority
 
       ProjectSubscriptionJob.create_job(1)
       assert_equal 1,Delayed::Job.count

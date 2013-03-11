@@ -7,7 +7,7 @@ class PublicationsController < ApplicationController
   require 'pubmed_query_tool'
   
   before_filter :find_assets, :only => [ :index ]
-  before_filter :fetch_publication, :only => [:show, :edit, :update, :destroy]
+  before_filter :find_and_auth, :only => [:show, :edit, :update, :destroy]
   before_filter :associate_authors, :only => [:edit, :update]
 
   include Seek::BreadCrumbs
