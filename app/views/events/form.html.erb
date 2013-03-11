@@ -85,6 +85,7 @@
         <% else %>
             <%= f.submit button_text, :disable_with=>disabled_text, :id => "event_submit_btn", :onclick => "javascript: $('event_submit_btn').form.submit();return(false);" -%>
         <% end %>
+        or <%= link_to 'Cancel', (@event.id ? event_path(@event.id) : events_path) -%>
       </p>
   <% end %>
 </div>
