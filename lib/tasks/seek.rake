@@ -117,12 +117,14 @@ namespace :seek do
       end
     end
     #show cases
-    ["HGF and Regeneration", "LPS and Inflammation", "Steatosis"].each do |name|
+    ["Showcase HGF and Regeneration", "Showcase LPS and Inflammation", "Showcase Steatosis", "Showcase LIAM (Liver Image Analysis Based Model)"].each do |name|
       proj = Project.find_by_name name
       if proj and show_case
         proj.parent = show_case
         puts "#{proj.name} |has parent| #{show_case.name}"
         proj.save!
+      else
+        puts "Project #{name} or #{show_case.name} not found!"
       end
     end
     #project management
@@ -135,6 +137,8 @@ namespace :seek do
         proj.parent = project_mt
         puts "#{proj.name} |has parent| #{project_mt.name}"
         proj.save!
+      else
+        puts "Project #{name} or #{project_mt.name} not found!"
       end
     end
     #set parents for children of A-G,e.g.A,A1,A1.1
