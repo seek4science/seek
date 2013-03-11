@@ -13,7 +13,8 @@
     }
 
     function insertFancyListItem(multiselect, displaylist, option) {
-        var title_span = '<span title="' + option.text + '">' + option.text.truncate(100) + '</span>';
+        var text = option.text;
+        var title_span = '<span title="' + text.escapeHTML() + '">' + text.truncate(100).escapeHTML() + '</span>';
         var remove_link = '<a href="" onclick="javascript:removeFromFancy(';
         remove_link += "'" + $(multiselect).id + "','";
         remove_link += option.value + "'";

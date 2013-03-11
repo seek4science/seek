@@ -100,7 +100,7 @@ function updateCustomSharingSettings() {
             $('sharing_permissions_values').value += "\"" + contributor_type + "\"" + ": {"
 	    
             for(var i = 0; i < permission_settings[contributor_type].length; i++) {
-                $('sharing_permissions_values').value += permission_settings[contributor_type][i][1] + ": {\"access_type\": " + permission_settings[contributor_type][i][2] + "}, ";
+                $('sharing_permissions_values').value += "\"" + permission_settings[contributor_type][i][1] + "\"" + ": {\"access_type\": " + permission_settings[contributor_type][i][2] + "}, ";
             }
 	    
             // "-2" in slice() required to remove the last joining comma and space from hash

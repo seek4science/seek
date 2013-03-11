@@ -1,11 +1,7 @@
 <%= list_item_title resource %>
 
 <div class="list_item_left_column">
-<%= list_item_contributor resource -%>
-
-<%= list_item_authorized_list resource.creators, "Contributor" -%>
-
-<%= list_item_optional_attribute "Other contributor", resource.other_creators, nil -%>
+  <%= render :partial=>"assets/resource_list_item_contributor_and_creators",:object=>resource -%>
 
 <%= @assay ? (list_item_optional_attribute "Relationship type", resource.relationship_type(@assay).try(:title)) : "" -%>  
 </div>
