@@ -27,6 +27,14 @@
         margin-left:2em;
     }
 
+    ul span.no_unpublished_asset {
+        font-size: 20px;
+        font-weight: bold;
+        color: green;
+        float: left;
+        margin-top:2em;
+    }
+
 </style>
 <div class="show_basic">
 
@@ -42,18 +50,20 @@
 
   <% form_tag :action=>:batch_publish do -%>
       <ul>
-        <% @assets.sort_by { |k, v| [v.first.is_asset? ? -1 : 1, v.first.is_isa? ? -1 : 1, v.first.class.name] }.each do |type, items| %>
-            <h2><%= text_for_resource items.first %>(s)</h2>
-            <% items.each do |item| %>
-                <div style="padding-left: 2em;">
-                  <%= render :partial => "assets/publishing/options_for_batch_publishing", :object => item, :locals => {:html_classes => "publishing_options"} -%>
-                </div>
+        <% if @assets.empty? %>
+            <span class="no_unpublished_asset">All your assets are published or you have no assets in <%= Seek::Config.project_name %></span>
+        <% else %>
+            <% @assets.sort_by { |k, v| [v.first.is_asset? ? -1 : 1, v.first.is_isa? ? -1 : 1, v.first.class.name] }.each do |type, items| %>
+                <h2><%= text_for_resource items.first %>(s)</h2>
+                <% items.each do |item| %>
+                    <div style="padding-left: 2em;">
+                      <%= render :partial => "assets/publishing/options_for_batch_publishing", :object => item, :locals => {:html_classes => "publishing_options"} -%>
+                    </div>
+                <% end %>
             <% end %>
+            <%= submit_tag "Submit",:disable_with=>"Submitting ..." -%>
         <% end -%>
       </ul>
-
-      <%= submit_tag "Submit",:disable_with=>"Submitting ..." -%>
-
   <% end -%>
 
 </div>
