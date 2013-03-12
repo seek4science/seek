@@ -1,0 +1,22 @@
+<%
+   item = options_for_batch_publishing
+   checkbox_title = ""
+   if item.can_publish?
+     checkbox_title = "Publish"
+     checkbox_class = "published"
+   elsif item.can_manage?
+     checkbox_title = "Summit publishing request"
+     checkbox_class = "owned"
+   end
+-%>
+<li>
+  <ul class="<%= html_classes -%>">
+    <li class="type_and_title"> <%= link_to item.title,item,:target=>"_blank" -%><%=list_item_visibility(item.policy,"icon_visibility")-%></li>
+    <li class="secondary">Owners <%= item.managers.collect{|m| link_to(m.title,m)}.join(", ")  -%></li>
+
+    <li class="secondary <%= checkbox_class -%>">
+      <%= checkbox_title -%>&nbsp;<%= check_box_tag publishing_item_param(item),1,true -%>
+    </li>
+  </ul>
+</li>
+<li style="clear:both;">&nbsp;</li>
