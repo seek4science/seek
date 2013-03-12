@@ -1,7 +1,7 @@
 ActionController::Routing::Routes.draw do |map|
   map.resources :attachments
   map.resources :presentations,
-                :member => {:download=>:get,:new_version=>:post, :preview_publish=>:get,:publish=>[:post, :get],
+                :member => {:download=>:get,:new_version=>:post, :isa_publishing_preview=>:get,:isa_publish=>[:post, :get],
                             :request_resource=>:post, :update_annotations_ajax=>:post, :approve_or_reject_publish=>:get,
                             :gatekeeper_decide=>:post } do |presentation|
     presentation.resources :content_blobs, :member => {:download => :get, :view_pdf_content => :get, :get_pdf => :get}
@@ -35,8 +35,8 @@ ActionController::Routing::Routes.draw do |map|
   map.resources :biosamples, :collection=>{:existing_strains=>:get, :existing_specimens=>:get, :existing_samples=>:get, :strain_form => :get, :create_strain => :post, :update_strain => :put,  :create_specimen_sample => :post, :strains_of_selected_organism => :get}
 
   map.resources :data_files,
-                :collection=>{:test_asset_url=>:post},
-                :member => {:download=>:get,:plot=>:get, :data => :get,:preview_publish=>:get,:publish=>[:post, :get],
+                :collection=>{:test_asset_url=>:post,:batch_publishing_preview=>:get, :batch_publish=>[:post,:get]},
+                :member => {:download=>:get,:plot=>:get, :data => :get,:isa_publishing_preview=>:get,:isa_publish=>[:post, :get],
                             :request_resource=>:post, :update_annotations_ajax=>:post, :explore=>:get, :convert_to_presentation => :post,
                             :approve_or_reject_publish=>:get, :gatekeeper_decide=>:post},
                 :new=>{:upload_for_tool => :post, :upload_from_email => :post}  do |data_file|
@@ -55,7 +55,7 @@ ActionController::Routing::Routes.draw do |map|
   end
 
   map.resources :models, 
-    :member => {:download => :get, :matching_data=>:get, :execute=>:post, :request_resource=>:post,:preview_publish=>:get,:publish=>[:post, :get],
+    :member => {:download => :get, :matching_data=>:get, :execute=>:post, :request_resource=>:post,:isa_publishing_preview=>:get,:isa_publish=>[:post, :get],
                 :approve_or_reject_publish=>:get, :gatekeeper_decide=>:post,
                 :builder=>:get,:visualise=>:get, :export_as_xgmml=>:post,:submit_to_jws=>:post,:submit_to_sycamore=>:post, :simulate=>:post, :update_annotations_ajax=>:post },
     :collection=>{:build=>:get} do |model|
@@ -63,7 +63,8 @@ ActionController::Routing::Routes.draw do |map|
     model.resources :content_blobs, :member => {:download => :get, :view_pdf_content => :get, :get_pdf => :get}
   end
 
-  map.resources :people, :collection=>{:select=>:get,:get_work_group =>:get}, :member=>{:admin=>:get}  do |person|
+  map.resources :people,
+                :collection=>{:select=>:get,:get_work_group =>:get}, :member=>{:admin=>:get}  do |person|
     # avatars / pictures 'owned by' person
     person.resources :avatars, :member => { :select => :post }, :collection => { :new => :post }
   end
@@ -76,7 +77,7 @@ ActionController::Routing::Routes.draw do |map|
   end
 
   map.resources :sops,
-                :member => {:download=>:get,:new_version=>:post, :preview_publish=>:get,:publish=>[:post, :get],
+                :member => {:download=>:get,:new_version=>:post, :isa_publishing_preview=>:get,:isa_publish=>[:post, :get],
                             :approve_or_reject_publish=>:get, :gatekeeper_decide=>:post,
                             :request_resource=>:post, :update_annotations_ajax=>:post } do |sop|
     sop.resources :experimental_conditions, :collection =>{:create_from_existing=>:post}
