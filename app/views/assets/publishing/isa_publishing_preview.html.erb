@@ -37,20 +37,20 @@ investigations = studies.collect(&:investigation).uniq
 </style>
 <div class="show_basic">
 
-  <h1>Publishing preview for the <%= asset_type_name -%> '<%= @asset.title -%>' and related items. </h1>
+  <h1>Publishing preview for the <%= asset_type_name -%> '<%= @asset.title -%>' and related assets. </h1>
 
   <p class="box_standout">
     Publishing automates the process of publically releasing your Assets (Data files, SOPs or Models) along with any associated
     Investigations, Studies or Assays.<br/>
     To secure publishing process, each project has an option to define the gatekeepers, who give the approval or reject of publishing request. <br/>
     However it is optional, so if a project doesn't define any gatekeepers, the project assets can be made published immediately.<br/>
-    Having the permission to manage an asset, you can publish or submit the publishing request immediately, otherwise a notification email can be sent to the owner of the item.<br/>
-    If there is an item you do not wish to make public, then you can uncheck the checkbox beside that item and it will remain unaffected.<br/>
+    Having the permission to manage an asset, you can immediately publish the asset or submit the publishing request to the gatekeepers if defined, otherwise a notification email can be sent to the owner of the asset.<br/>
+    If there is an asset you do not wish to make public, then you can uncheck the checkbox beside that asset and it will remain unaffected.<br/>
   </p>
 
   <p>
     You are about to process publishing for the <%= "#{asset_type_name} '#{link_to @asset.title,@asset}'" -%>. <br/>
-    Below are the other entries in SEEK related to this item.
+    Below are the other entries in SEEK related to this asset.
   </p>
 
   <% form_tag :action=>:isa_publish do -%>
