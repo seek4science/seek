@@ -3,19 +3,19 @@ module Seek
     module IsaPublishing
 
       def self.included(base)
-        base.before_filter :set_asset, :only=>[:preview_publish,:publish]
-        base.before_filter :publish_auth, :only=>[:preview_publish,:publish]
+        base.before_filter :set_asset, :only=>[:isa_publishing_preview,:isa_publish]
+        base.before_filter :publish_auth, :only=>[:isa_publishing_preview,:isa_publish]
       end
 
-      def preview_publish
+      def isa_publishing_preview
         asset_type_name = @template.text_for_resource @asset
 
         respond_to do |format|
-          format.html { render :template=>"assets/publish/preview",:locals=>{:asset_type_name=>asset_type_name} }
+          format.html { render :template=>"assets/publishing/isa_publishing_preview",:locals=>{:asset_type_name=>asset_type_name} }
         end
       end
 
-      def publish
+      def isa_publish
         if request.post?
           items_for_publishing = resolve_publish_params params[:publish]
           @notified_items = items_for_publishing.select{|i| !i.can_manage?}
@@ -44,7 +44,7 @@ module Seek
 
           respond_to do |format|
             flash.now[:notice]="Publishing complete"
-            format.html { render :template=>"assets/publish/published" }
+            format.html { render :template=>"assets/publishing/isa_published" }
           end
         else
           redirect_to @asset

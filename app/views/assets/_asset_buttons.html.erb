@@ -30,7 +30,7 @@
     <% end -%>
     <li><%= image_tag_for_key('manage', polymorphic_path(asset,:action=>:edit), nil, nil, "Manage #{human_name}") -%></li>
     <% if asset.is_publishable? -%>
-        <li><%= image_tag_for_key('publish', polymorphic_path(asset,:action=>:preview_publish), nil, nil, "Publish #{human_name}") -%></li>
+        <li><%= image_tag_for_key('publish', polymorphic_path(asset,:action=>:isa_publishing_preview), nil, nil, "Publish #{human_name}") -%></li>
     <% end -%>
   <% elsif asset.can_edit? -%>
     <%# this is not owner, but current user can edit -%>
