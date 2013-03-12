@@ -159,25 +159,29 @@ module ResourceListItemHelper
     end
   end
 
-  def list_item_visibility policy
+  def list_item_visibility policy,css_class="visibility_icon"
     title = ""
     html  = ""
     case policy.sharing_scope
       when 0
-        title = "Private"
-        html << image('lock', :title=>title, :class => "visibility_icon")
-      when 1
-        title = "Custom Policy"
-        html << image('manage', :title=>title, :class => "visibility_icon")
+        if policy.permissions.empty?
+          title = "Private"
+          html << image('lock', :title=>title, :class => css_class)
+        else
+          title = "Custom policy"
+          html << image('manage', :title=>title, :class => css_class)
+        end
       when 2
-        title = "Visible to all #{Seek::Config.project_name} projects"
-        html << image('open', :title=>title, :class => "visibility_icon")
-      when 3
-        title = "Visible to all registered users"
-        html << image('open', :title=>title, :class => "visibility_icon")
+        if policy.access_type > 0
+          title = "Visible to all #{Seek::Config.project_name} projects"
+          html << image('open', :title=>title, :class => css_class)
+        else
+          title = "Visible to the projects associated with this item"
+          html << image('open', :title=>title, :class => css_class)
+        end
       when 4
         title = "Visible to everyone"
-        html << image('world', :title=>title, :class => "visibility_icon")
+        html << image('world', :title=>title, :class => css_class)
     end
     html << ""
     html
