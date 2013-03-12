@@ -48,7 +48,7 @@ module Acts #:nodoc:
       end
 
       def is_published?
-        can_download? nil
+        can_view? nil
       end
 
       module ClassMethods
