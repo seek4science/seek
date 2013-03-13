@@ -4,7 +4,6 @@ module Seek
 
       def self.included(base)
         base.before_filter :set_asset, :only=>[:isa_publishing_preview,:isa_publish]
-        base.before_filter :publish_auth, :only=>[:isa_publishing_preview,:isa_publish]
       end
 
       def isa_publishing_preview
@@ -53,13 +52,6 @@ module Seek
 
       def set_asset
         @asset = self.controller_name.classify.constantize.find_by_id(params[:id])
-      end
-
-      def publish_auth
-        unless Seek::Config.publish_button_enabled
-          error("This feature is is not yet currently available","invalid route")
-          return false
-        end
       end
 
       private
