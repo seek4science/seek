@@ -110,17 +110,6 @@ module Seek
           end
         end
       end
-
-      def deliver_request_publish_approval item
-        if (Seek::Config.email_enabled)
-          begin
-            Mailer.deliver_request_publish_approval item.gatekeepers, User.current_user,item,base_host
-          rescue Exception => e
-            Rails.logger.error("Error sending request publish email to a gatekeeper - #{e.message}")
-          end
-        end
-      end
-
     end
   end
 end

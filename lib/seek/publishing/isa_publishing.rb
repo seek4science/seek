@@ -70,21 +70,6 @@ module Seek
         end
       end
 
-      #returns an enumeration of assets, or ISA elements, for publishing based upon the parameters passed
-
-      def resolve_publish_params param
-        return [] if param.nil?
-
-        assets = []
-
-        param.keys.each do |asset_class|
-          param[asset_class].keys.each do |id|
-            assets << eval("#{asset_class}.find_by_id(#{id})")
-          end
-        end
-        assets.compact.uniq
-      end
-
     end
   end
 end

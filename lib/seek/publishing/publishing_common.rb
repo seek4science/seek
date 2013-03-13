@@ -1,6 +1,6 @@
 module Seek
   module Publishing
-    module LogPublishing
+    module PublishingCommon
       def self.included(base)
         base.after_filter :log_publishing, :only=>[:create,:update]
       end
@@ -29,6 +29,31 @@ module Seek
         end
       end
 
+      def deliver_request_publish_approval item
+        if (Seek::Config.email_enabled)
+          begin
+            Mailer.deliver_request_publish_approval item.gatekeepers, User.current_user,item,base_host
+          rescue Exception => e
+            Rails.logger.error("Error sending request publish email to a gatekeeper - #{e.message}")
+          end
+        end
+      end
+
+      private
+
+      #returns an enumeration of assets for publishing based upon the parameters passed
+      def resolve_publish_params param
+        return [] if param.nil?
+
+        assets = []
+
+        param.keys.each do |asset_class|
+          param[asset_class].keys.each do |id|
+            assets << eval("#{asset_class}.find_by_id(#{id})")
+          end
+        end
+        assets.compact.uniq
+      end
     end
   end
 end
