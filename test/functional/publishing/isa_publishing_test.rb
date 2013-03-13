@@ -13,34 +13,34 @@ class IsaPublishingTest < ActionController::TestCase
     @object=data_files(:picture)
   end
 
-  test "do publish" do
+  test "do isa_publish" do
     df=data_file_for_publishing
 
     assert df.can_publish?,"The datafile must be publishable for this test to succeed"
-    post :publish,:id=>df
+    post :isa_publish,:id=>df
     assert_response :success
     assert_nil flash[:error]
     assert_not_nil flash[:notice]
   end
 
-  test "do not publish if not can_publish?" do
+  test "do not isa_publish if not can_manage?" do
     login_as(:quentin)
     df=data_file_for_publishing
-    assert !df.can_publish?,"The datafile must not be publishable for this test to succeed"
-    post :publish,:id=>df
+    assert !df.can_publish?,"The datafile must not be manageable for this test to succeed"
+    post :isa_publish,:id=>df
     assert_redirected_to data_file_path(df)
     assert_not_nil flash[:error]
     assert_nil flash[:notice]
   end
 
-  test "get publish redirects to show" do
+  test "get isa_publish redirects to show" do
     #This is useful because if you logout it redirects back to the current page.
     #If you just published something, that will do a get request to *Controller#publish
-    get :publish
+    get :isa_publish
     assert_response :redirect
   end
 
-  test "get preview_publish" do
+  test "get isa_publishing_preview" do
     df=data_with_isa
     assay=df.assays.first
     study=assay.study
@@ -58,7 +58,7 @@ class IsaPublishingTest < ActionController::TestCase
     assert request_publishing_df.can_manage?,"The datafile must be manageable for this test to succeed"
     assert !notifying_df.can_manage?,"The datafile must not be manageable for this test to succeed"
 
-    get :preview_publish, :id=>df
+    get :isa_publishing_preview, :id=>df
     assert_response :success
 
     assert_select "p > a[href=?]",data_file_path(df),:text=>/#{df.title}/,:count=>1
@@ -101,7 +101,7 @@ class IsaPublishingTest < ActionController::TestCase
 
   end
 
-  test "do publish all" do
+  test "do isa_publish all" do
     df=data_with_isa
     assays=df.assays
     params={:publish=>{}}
@@ -129,7 +129,7 @@ class IsaPublishingTest < ActionController::TestCase
     assert !non_owned_assets.empty?, "There should be non manageable assets included in this test"
 
     assert_emails 1 do
-      post :publish,params.merge(:id=>df)
+      post :isa_publish,params.merge(:id=>df)
     end
 
     assert_response :success
@@ -146,7 +146,7 @@ class IsaPublishingTest < ActionController::TestCase
 
   end
 
-  test "do publish some" do
+  test "do isa_publish some" do
     df=data_with_isa
 
     assays=df.assays
@@ -175,7 +175,7 @@ class IsaPublishingTest < ActionController::TestCase
     assert !non_owned_assets.empty?, "There should be non manageable assets included in this test"
 
     assert_emails 0 do
-      post :publish,params.merge(:id=>df)
+      post :isa_publish,params.merge(:id=>df)
     end
 
     assert_response :success
@@ -206,7 +206,7 @@ class IsaPublishingTest < ActionController::TestCase
     params[:publish][request_publishing_df.class.name][request_publishing_df.id.to_s]="1"
 
     assert_emails 1 do
-      post :publish,params.merge(:id=>df)
+      post :isa_publish,params.merge(:id=>df)
     end
 
     assert_response :success
@@ -216,30 +216,30 @@ class IsaPublishingTest < ActionController::TestCase
   end
 
 
-  test "cannot get preview_publish when not manageable" do
+  test "cannot get isa_publishing_preview when not manageable" do
     login_as(:quentin)
     df=data_file_for_publishing
     assert !df.can_manage?,"The datafile must not be manageable for this test to succeed"
-    get :preview_publish, :id=>df
+    get :isa_publishing_preview, :id=>df
     assert_redirected_to data_file_path(df)
     assert flash[:error]
   end
 
-  test "can get preview_publish when manageable but not neccessarily publishable" do
+  test "can get isa_publishing_preview when manageable but not neccessarily publishable" do
     #define gatekeeper to make asset not publishable
     gatekeeper = Factory(:gatekeeper)
     df=Factory :data_file, :contributor=>users(:datafile_owner), :projects=>gatekeeper.projects
     assert df.can_manage?,"The datafile must be manageable for this test to succeed"
     assert !df.can_publish?,"The datafile must not be publishable for this test to succeed"
-    get :preview_publish, :id=>df
+    get :isa_publishing_preview, :id=>df
     assert_response :success
     assert_nil flash[:error]
   end
 
-  test "can get preview_publish when publishable, coz publishable includes manageable" do
+  test "can get isa_publishing_preview when publishable, coz publishable includes manageable" do
     df=data_file_for_publishing
     assert df.can_publish?,"The datafile must be publishable for this test to succeed"
-    get :preview_publish, :id=>df
+    get :isa_publishing_preview, :id=>df
     assert_response :success
     assert_nil flash[:error]
   end
@@ -252,7 +252,7 @@ class IsaPublishingTest < ActionController::TestCase
       params[:publish][r.class.name][r.id.to_s]="1"
     end
     assert_emails 2 do
-      post :publish,params.merge(:id=>df3)
+      post :isa_publish,params.merge(:id=>df3)
     end
     assert_response :success
 

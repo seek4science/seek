@@ -136,7 +136,7 @@ class LogPublishingTest < ActionController::TestCase
     assert_equal gatekeeper.user, publish_log.culprit
   end
 
-  test 'log when using publish button' do
+  test 'log when publish isa' do
     df=Factory :data_file,
                :contributor=>users(:datafile_owner),
                :assays => [Factory(:assay)]
@@ -161,7 +161,7 @@ class LogPublishingTest < ActionController::TestCase
     params[:publish][request_publishing_df.class.name][request_publishing_df.id.to_s]="1"
 
     assert_difference("ResourcePublishLog.count", 2) do
-      post :publish,params.merge(:id=>df)
+      post :isa_publish,params.merge(:id=>df)
       a=1
     end
     assert_response :success
