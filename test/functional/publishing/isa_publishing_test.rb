@@ -361,7 +361,7 @@ class IsaPublishingTest < ActionController::TestCase
     df = data_file_for_publishing
     other_user = users(:quentin)
     assay = Factory :experimental_assay, :contributor=>df.contributor.person, :study=>Factory(:study,:contributor=>df.contributor.person)
-    other_persons_data_file = Factory :data_file, :contributor=>other_user, :projects=>other_user.person.projects,:policy=>Factory(:policy, :sharing_scope => Policy::EVERYONE, :access_type => Policy::VISIBLE)
+    other_persons_data_file = Factory :data_file, :contributor=>other_user, :projects=>other_user.person.projects,:policy=>Factory(:policy, :sharing_scope => Policy::ALL_SYSMO_USERS, :access_type => Policy::VISIBLE)
     assay.relate(df)
     assay.relate(other_persons_data_file)
     assert !other_persons_data_file.can_manage?
