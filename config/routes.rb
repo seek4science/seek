@@ -35,7 +35,7 @@ ActionController::Routing::Routes.draw do |map|
   map.resources :biosamples, :collection=>{:existing_strains=>:get, :existing_specimens=>:get, :existing_samples=>:get, :strain_form => :get, :create_strain => :post, :update_strain => :put,  :create_specimen_sample => :post, :strains_of_selected_organism => :get}
 
   map.resources :data_files,
-                :collection=>{:test_asset_url=>:post,:batch_publishing_preview=>:get, :batch_publish=>[:post,:get]},
+                :collection=>{:test_asset_url=>:post},
                 :member => {:download=>:get,:plot=>:get, :data => :get,:isa_publishing_preview=>:get,:isa_publish=>[:post, :get],
                             :request_resource=>:post, :update_annotations_ajax=>:post, :explore=>:get, :convert_to_presentation => :post,
                             :approve_or_reject_publish=>:get, :gatekeeper_decide=>:post,:single_publish=>:post},
@@ -64,7 +64,8 @@ ActionController::Routing::Routes.draw do |map|
   end
 
   map.resources :people,
-                :collection=>{:select=>:get,:get_work_group =>:get}, :member=>{:admin=>:get}  do |person|
+                :member=>{:admin=>:get,:batch_publishing_preview=>:get,:batch_publish=>[:post,:get]},
+                :collection=>{:select=>:get,:get_work_group =>:get}  do |person|
     # avatars / pictures 'owned by' person
     person.resources :avatars, :member => { :select => :post }, :collection => { :new => :post }
   end

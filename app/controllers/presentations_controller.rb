@@ -13,7 +13,6 @@ class PresentationsController < ApplicationController
   before_filter :find_display_asset, :only=>[:show, :download]
 
   include Seek::Publishing::GatekeeperPublish
-  include Seek::Publishing::BatchPublishing
   include Seek::Publishing::SinglePublishing
   include Seek::Publishing::PublishingCommon
 

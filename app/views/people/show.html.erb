@@ -24,6 +24,12 @@
         <%= image_tag_for_key "admin", admin_person_path(@person), "Administer", nil, "Person Administration" -%>
       </li>
   <% end -%>
+
+  <% if mine?(@person) -%>
+      <li>
+        <%= image_tag_for_key "publish", batch_publishing_preview_person_path(@person), "Publish your all assets", {:title => "Publish all of your owned assets in one click. A preview will be given before publishing"}, "Publish your all assets" -%>
+      </li>
+  <% end %>
 </ul>
 
 <div class="show_basic">
