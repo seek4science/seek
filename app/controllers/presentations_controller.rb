@@ -14,6 +14,7 @@ class PresentationsController < ApplicationController
 
   include Seek::Publishing::GatekeeperPublish
   include Seek::Publishing::BatchPublishing
+  include Seek::Publishing::SinglePublishing
   include Seek::Publishing::LogPublishing
 
   include Seek::BreadCrumbs

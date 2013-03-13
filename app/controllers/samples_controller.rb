@@ -6,7 +6,6 @@ class SamplesController < ApplicationController
   before_filter :virtualliver_only, :only => [:new_object_based_on_existing_one]
 
   include Seek::Publishing::GatekeeperPublish
-  include Seek::Publishing::BatchPublishing
   include Seek::Publishing::LogPublishing
 
   include Seek::BreadCrumbs

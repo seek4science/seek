@@ -51,6 +51,10 @@ module Acts #:nodoc:
         can_view? nil
       end
 
+      def publish_authorized?
+         can_publish? || (can_manage? && ResourcePublishLog.last_waiting_approval_log(self).nil?)
+      end
+
       module ClassMethods
         def acts_as_authorized
           include Acts::Authorized::PolicyBasedAuthorization

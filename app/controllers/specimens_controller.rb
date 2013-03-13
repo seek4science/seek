@@ -7,7 +7,6 @@ class SpecimensController < ApplicationController
   include IndexPager
 
   include Seek::Publishing::GatekeeperPublish
-  include Seek::Publishing::BatchPublishing
   include Seek::Publishing::LogPublishing
 
   include Seek::BreadCrumbs

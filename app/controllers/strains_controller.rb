@@ -7,7 +7,6 @@ class StrainsController < ApplicationController
   before_filter :get_strains_for_organism,:only=>[:existing_strains_for_assay_organism]
 
   include Seek::Publishing::GatekeeperPublish
-  include Seek::Publishing::BatchPublishing
   include Seek::Publishing::LogPublishing
 
   include Seek::BreadCrumbs

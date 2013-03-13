@@ -30,7 +30,16 @@
     <% end -%>
     <li><%= image_tag_for_key('manage', polymorphic_path(asset,:action=>:edit), nil, nil, "Manage #{human_name}") -%></li>
     <% if asset.is_publishable? -%>
-        <li><%= image_tag_for_key('publish', polymorphic_path(asset,:action=>:isa_publishing_preview), nil, nil, "Publish #{human_name}") -%></li>
+        <% if !asset.is_published? && asset.publish_authorized? %>
+            <% if asset.can_publish?
+                 confirm_message = "After publishing, all visitors, even without a login, can access this #{human_name}.\nAre you sure you want to publish this #{human_name}?"
+               else
+                 confirm_message = "An email will be sent to the Gatekeepers of the projects associated with this #{human_name} to ask for publishing approval. This #{human_name} will not be published until one of the Gatekeepers has granted approval.\nAre you sure you want to process?"
+               end
+            %>
+            <li><%= image_tag_for_key('publish', polymorphic_path(asset,:action=>:single_publish), nil, { :confirm => confirm_message, :title => "After publishing, all visitors, even without a login, can access this #{human_name}", :method => :post }, "Publish #{human_name}") -%></li>
+        <% end %>
+        <li><%= image_tag_for_key('publish', polymorphic_path(asset,:action=>:isa_publishing_preview), nil, nil, "Publish whole ISA") -%></li>
     <% end -%>
   <% elsif asset.can_edit? -%>
     <%# this is not owner, but current user can edit -%>
