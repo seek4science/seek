@@ -55,6 +55,12 @@ module Acts #:nodoc:
          can_publish? || (can_manage? && ResourcePublishLog.last_waiting_approval_log(self).nil?)
       end
 
+      #the asset that can be published together with publishing the whole ISA
+      def is_in_isa_publishable?
+        #currently based upon the naive assumption that downloadable items are publishable, which is currently the case but may change.
+        is_downloadable?
+      end
+
       module ClassMethods
         def acts_as_authorized
           include Acts::Authorized::PolicyBasedAuthorization
