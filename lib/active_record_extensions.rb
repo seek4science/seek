@@ -80,9 +80,10 @@ module ActiveRecordExtensions
     (respond_to?(:content_blob) || respond_to?(:content_blobs))
   end
 
-  def is_publishable?
+  #the asset that can be published together with publishing the whole ISA
+  def is_in_isa_publishable?
     #currently based upon the naive assumption that downloadable items are publishable, which is currently the case but may change.
-    (is_downloadable? || is_isa?) && Seek::Config.publish_button_enabled
+    is_downloadable?
   end
 
   def is_versioned?

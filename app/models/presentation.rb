@@ -72,7 +72,7 @@ class Presentation < ActiveRecord::Base
     true
   end
 
-  def is_publishable?
+  def is_in_isa_publishable?
     false
   end
 end
