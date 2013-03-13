@@ -39,7 +39,7 @@
             %>
             <li><%= image_tag_for_key('publish', polymorphic_path(asset,:action=>:single_publish), nil, { :confirm => confirm_message, :title => "After publishing, all visitors, even without a login, can access this #{human_name}", :method => :post }, "Publish #{human_name}") -%></li>
         <% end %>
-        <li><%= image_tag_for_key('publish', polymorphic_path(asset,:action=>:isa_publishing_preview), nil, nil, "Publish whole ISA") -%></li>
+        <li><%= image_tag_for_key('publish', polymorphic_path(asset,:action=>:isa_publishing_preview), nil, {:title => "Publish this #{human_name} and its ISA. A preview will be given before publishing"}, "Publish whole ISA") -%></li>
     <% end -%>
   <% elsif asset.can_edit? -%>
     <%# this is not owner, but current user can edit -%>
