@@ -279,7 +279,7 @@ module ImagesHelper
       when "specimen", "specimens"
         "misc_icons/green_virus-64x64.png"
       when "publish"
-       "crystal_project/22x22/actions/up.png"
+        "famfamfam_silk/world_add.png"
       when "spreadsheet"
       "famfamfam_silk/table.png"
       when "spreadsheet_annotation"
