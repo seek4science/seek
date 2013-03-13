@@ -277,11 +277,6 @@ class IsaPublishingTest < ActionController::TestCase
       assert_select "li > a[href=?]",person_path(personC),:text=>/#{personC.name}/,:count=>2
       assert_select "li > a[href=?]",person_path(personA),:text=>/#{personA.name}/,:count=>0
     end
-
-    assert_select "ul#problematic" do
-      assert_select "li",1
-      assert_select "li",:text=>/No items/,:count=>1
-    end
   end
   private
 

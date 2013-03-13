@@ -18,12 +18,4 @@
     <% end -%>
   </ul>
 
-  <h2>Items that were not published due to an unforseen problem</h2>
-  <ul id="problematic">
-    <% if @problematic_items.empty? -%><li class="none_text">No items</li><% end -%>
-    <% @problematic_items.each do |item| -%>
-        <li style="font-weight:bolder;"><%= text_for_resource item -%>: <%= link_to item.title, item -%></li>
-    <% end -%>
-  </ul>
-
 </div>

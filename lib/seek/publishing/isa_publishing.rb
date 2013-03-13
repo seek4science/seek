@@ -17,28 +17,24 @@ module Seek
       def isa_publish
         if request.post?
           items_for_publishing = resolve_publish_params params[:publish]
+          items_for_publishing = items_for_publishing.select{|i| !i.is_published?}
           @notified_items = items_for_publishing.select{|i| !i.can_manage?}
-          @waiting_for_publish_items = items_for_publishing.select{|i| i.can_manage? && !i.can_publish?}
-          @published_items = items_for_publishing - @waiting_for_publish_items - @notified_items
-
-          @problematic_items = @published_items.select{|item| !item.publish!}
+          publish_authorized_items = (items_for_publishing - @notified_items).select(&:publish_authorized?)
+          @published_items = publish_authorized_items.select(&:can_publish?)
+          @waiting_for_publish_items = publish_authorized_items - @published_items
 
           if Seek::Config.email_enabled && !@notified_items.empty?
             deliver_publishing_notifications @notified_items
           end
 
+          @published_items.each do |item|
+            item.publish!
+            ResourcePublishLog.add_publish_log ResourcePublishLog::PUBLISHED, item
+          end
+
           @waiting_for_publish_items.each do |item|
             ResourcePublishLog.add_publish_log ResourcePublishLog::WAITING_FOR_APPROVAL, item
             deliver_request_publish_approval item
-          end
-
-          @published_items = @published_items - @problematic_items
-
-          @published_items.each do |item|
-            latest_publish_log = ResourcePublishLog.last(:conditions => ["resource_type=? and resource_id=?",item.class.name,item.id])
-            if item.policy.sharing_scope == Policy::EVERYONE && latest_publish_log.try(:publish_state) != ResourcePublishLog::PUBLISHED
-              ResourcePublishLog.add_publish_log ResourcePublishLog::PUBLISHED, item
-            end
           end
 
           respond_to do |format|

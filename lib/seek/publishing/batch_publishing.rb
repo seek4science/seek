@@ -17,17 +17,15 @@ module Seek
           items_for_publishing = items_for_publishing.select{|i| !i.is_published? && i.publish_authorized?}
           @published_items = items_for_publishing.select(&:can_publish?)
           @waiting_for_publish_items = items_for_publishing - @published_items
-          @problematic_items = @published_items.select{|item| !item.publish!}
+
+          @published_items.each do |item|
+            item.publish!
+            ResourcePublishLog.add_publish_log ResourcePublishLog::PUBLISHED, item
+          end
 
           @waiting_for_publish_items.each do |item|
             ResourcePublishLog.add_publish_log ResourcePublishLog::WAITING_FOR_APPROVAL, item
             deliver_request_publish_approval item
-          end
-
-          @published_items = @published_items - @problematic_items
-
-          @published_items.each do |item|
-             ResourcePublishLog.add_publish_log ResourcePublishLog::PUBLISHED, item
           end
 
           respond_to do |format|
