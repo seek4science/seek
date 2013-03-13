@@ -24,6 +24,7 @@ module Seek
           policy.sharing_scope=Policy::EVERYONE
           respond_to do |format|
             if policy.save
+              ResourcePublishLog.add_publish_log(ResourcePublishLog::PUBLISHED,@resource)
               process_gatekeeper_feedback 'approve'
               flash[:notice]="Publishing complete"
               format.html{redirect_to @resource}

@@ -2,7 +2,7 @@ module Seek
   module Publishing
     module LogPublishing
       def self.included(base)
-        base.after_filter :log_publishing, :only=>[:create,:update,:gatekeeper_decide]
+        base.after_filter :log_publishing, :only=>[:create,:update]
       end
 
       def log_publishing
@@ -11,7 +11,6 @@ module Seek
           a = self.action_name.downcase
 
           object = eval("@"+c.singularize)
-          object = @resource if a == 'gatekeeper_decide'
           #don't log if the object is not valid or has not been saved, as this will a validation error on update or create
           return if object.nil? || (object.respond_to?("new_record?") && object.new_record?) || (object.respond_to?("errors") && !object.errors.empty?)
 
