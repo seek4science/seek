@@ -273,12 +273,8 @@ class ApplicationController < ActionController::Base
       when 'destroy', 'destroy_item'
         'delete'
 
-      when 'manage', 'isa_publishing_preview'
+      when 'manage', 'isa_publishing_preview', 'isa_publish'
           'manage'
-
-      when 'isa_publish'
-        'publish'
-
       else
         nil
     end
