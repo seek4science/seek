@@ -2,7 +2,6 @@ module Seek
   module Publishing
     module BatchPublishing
       def self.included(base)
-        base.before_filter :login_required, :only=>[:batch_publishing_preview,:batch_publish]
         base.before_filter :set_assets, :only=>[:batch_publishing_preview]
       end
 
@@ -15,8 +14,9 @@ module Seek
       def batch_publish
         if request.post?
           items_for_publishing = resolve_publish_params params[:publish]
-          @waiting_for_publish_items = items_for_publishing.select{|i| i.can_manage? && !i.can_publish?}
-          @published_items = items_for_publishing - @waiting_for_publish_items
+          items_for_publishing = items_for_publishing.select{|i| !i.is_published? && i.publish_authorized?}
+          @published_items = items_for_publishing.select(&:can_publish?)
+          @waiting_for_publish_items = items_for_publishing - @published_items
           @problematic_items = @published_items.select{|item| !item.publish!}
 
           @waiting_for_publish_items.each do |item|
@@ -27,10 +27,7 @@ module Seek
           @published_items = @published_items - @problematic_items
 
           @published_items.each do |item|
-            latest_publish_log = ResourcePublishLog.last(:conditions => ["resource_type=? and resource_id=?",item.class.name,item.id])
-            if item.policy.sharing_scope == Policy::EVERYONE && latest_publish_log.try(:publish_state) != ResourcePublishLog::PUBLISHED
-              ResourcePublishLog.add_publish_log ResourcePublishLog::PUBLISHED, item
-            end
+             ResourcePublishLog.add_publish_log ResourcePublishLog::PUBLISHED, item
           end
 
           respond_to do |format|
@@ -43,14 +40,13 @@ module Seek
       end
 
       def set_assets
-        #get the assets that current_user can manage  + filture out the one that were aready published or the one that publish request was sent
+        #get the assets that current_user can manage, then take the one that (is not yet published and is publish_authorized)
         @assets = {}
 
         publishable_types = Seek::Util.authorized_types.select { |c| c.first.try(:is_publishable?) }
         publishable_types.each do |klass|
           can_manage_assets = klass.all_authorized_for "manage", current_user
-          can_manage_assets = can_manage_assets.select{|a| !a.is_published?}
-          can_manage_assets = can_manage_assets.select{|a| ResourcePublishLog.last_waiting_approval_log(a).nil?}
+          can_manage_assets = can_manage_assets.select{|a| !a.is_published? && a.publish_authorized?}
           unless can_manage_assets.empty?
             @assets[klass.name] = can_manage_assets
           end
