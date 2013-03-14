@@ -116,4 +116,47 @@ class GatekeeperPublishTest < ActionController::TestCase
 
     assert_nil flash[:error]
   end
+
+  test 'gatekeeper approves' do
+    gatekeeper = Factory(:gatekeeper)
+    df = Factory(:data_file, :projects => gatekeeper.projects)
+
+    #request publish
+    login_as(df.contributor)
+    put :update, :id => df.id, :sharing => {:sharing_scope => Policy::EVERYONE, "access_type#{Policy::EVERYONE}" => Policy::VISIBLE}
+
+    logout
+
+    login_as(gatekeeper.user)
+    #send feedback email to requester
+    assert_emails 1 do
+      post :gatekeeper_decide, :id => df.id, :gatekeeper_decision => 1
+    end
+
+    assert_redirected_to df
+    df.reload
+    assert df.can_download?(nil)
+  end
+
+  test 'gatekeeper reject' do
+    gatekeeper = Factory(:gatekeeper)
+    df = Factory(:data_file, :projects => gatekeeper.projects)
+    policy = df.policy
+    #request publish
+    login_as(df.contributor)
+    put :update, :id => df.id, :sharing => {:sharing_scope => Policy::EVERYONE, "access_type#{Policy::EVERYONE}" => Policy::VISIBLE}
+
+    logout
+
+    login_as(gatekeeper.user)
+    #send feedback email to requester
+    assert_emails 1 do
+      post :gatekeeper_decide, :id => df.id, :gatekeeper_decision => 0
+    end
+
+    assert_redirected_to df
+    df.reload
+    assert !df.can_download?(nil)
+    assert_equal policy, df.policy
+  end
 end
