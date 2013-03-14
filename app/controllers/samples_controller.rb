@@ -99,11 +99,7 @@ class SamplesController < ApplicationController
     sop_ids = (params[:sample_sop_ids].nil?? [] : params[:sample_sop_ids].reject(&:blank?)) || []
 
     if @sample.save
-      #send publishing request
-      if !@sample.can_publish? && params[:sharing] && (params[:sharing][:sharing_scope].to_i == Policy::EVERYONE)
-        deliver_request_publish_approval @sample
-      end
-      #send publishing request
+      #send publishing request for specimen
       if !@sample.specimen.can_publish? && params[:sharing] && (params[:sharing][:sharing_scope].to_i == Policy::EVERYONE)
         deliver_request_publish_approval @sample.specimen
       end
@@ -145,10 +141,6 @@ class SamplesController < ApplicationController
 
 
       if @sample.save
-        #send publishing request
-        if !@sample.can_publish? && params[:sharing] && (params[:sharing][:sharing_scope].to_i == Policy::EVERYONE)
-          deliver_request_publish_approval @sample
-        end
           @sample.create_or_update_assets data_file_ids,"DataFile"
           @sample.create_or_update_assets model_ids,"Model"
           @sample.create_or_update_assets sop_ids,"Sop"

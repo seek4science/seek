@@ -58,10 +58,6 @@ class SpecimensController < ApplicationController
     AssetsCreator.add_or_update_creator_list(@specimen, params[:creators])
 
     if @specimen.save
-      #send publishing request
-      if !@specimen.can_publish? && params[:sharing] && (params[:sharing][:sharing_scope].to_i == Policy::EVERYONE)
-        deliver_request_publish_approval @specimen
-      end
       if @specimen.from_biosamples=='true'
         #reload to get updated nested attributes,e.g. genotypes/phenotypes
         @specimen.reload
@@ -105,11 +101,6 @@ class SpecimensController < ApplicationController
     AssetsCreator.add_or_update_creator_list(@specimen, params[:creators])
 
     if @specimen.save
-      #send publishing request
-      if !@specimen.can_publish? && params[:sharing] && (params[:sharing][:sharing_scope].to_i == Policy::EVERYONE)
-        deliver_request_publish_approval @specimen
-      end
-
       if @specimen.from_biosamples=='true'
         #reload to get updated nested attributes,e.g. genotypes/phenotypes
         @specimen.reload

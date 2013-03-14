@@ -223,11 +223,6 @@ class DataFilesController < ApplicationController
             format.html { redirect_to data_file_path(@data_file) }
           end
         end
-        #send publishing request
-        if !@data_file.can_publish? && params[:sharing] && (params[:sharing][:sharing_scope].to_i == Policy::EVERYONE)
-          deliver_request_publish_approval @data_file
-        end
-
       else
         respond_to do |format|
           format.html {
@@ -325,11 +320,6 @@ class DataFilesController < ApplicationController
             AssayAsset.destroy(assay_asset.id)
           end
         end
-        #send publishing request
-        if !@data_file.can_publish? && params[:sharing] && (params[:sharing][:sharing_scope].to_i == Policy::EVERYONE)
-          deliver_request_publish_approval @data_file
-        end
-
       else
         format.html {
           render :action => "edit"

@@ -793,6 +793,47 @@ class SopsControllerTest < ActionController::TestCase
     assert ActiveRecord::Base.connection.select_all(sql).empty?
   end
 
+  test 'send publish approval request' do
+    gatekeeper = Factory(:gatekeeper)
+    sop = Factory(:sop, :projects => gatekeeper.projects)
+
+    #request publish
+    login_as(sop.contributor)
+    assert !sop.can_publish?
+    assert_emails 1 do
+      put :update, :id => sop.id, :sharing => {:sharing_scope => Policy::EVERYONE, "access_type#{Policy::EVERYONE}" => Policy::VISIBLE}
+    end
+  end
+
+  test 'dont send publish approval request if can_publish' do
+    gatekeeper = Factory(:gatekeeper)
+    sop = Factory(:sop, :contributor => gatekeeper.user, :projects => gatekeeper.projects)
+
+    #request publish
+    login_as(sop.contributor)
+    assert sop.can_publish?
+    assert_emails 0 do
+      put :update, :id => sop.id, :sharing => {:sharing_scope => Policy::EVERYONE, "access_type#{Policy::EVERYONE}" => Policy::VISIBLE}
+    end
+  end
+
+  test 'dont send publish approval request again if it was already sent by this person' do
+    gatekeeper = Factory(:gatekeeper)
+    sop = Factory(:sop, :projects => gatekeeper.projects)
+
+    #request publish
+    login_as(sop.contributor)
+    assert !sop.can_publish?
+    #send the first time
+    assert_emails 1 do
+      put :update, :id => sop.id, :sharing => {:sharing_scope => Policy::EVERYONE, "access_type#{Policy::EVERYONE}" => Policy::VISIBLE}
+    end
+    #dont send again
+    assert_emails 0 do
+      put :update, :id => sop.id, :sharing => {:sharing_scope => Policy::EVERYONE, "access_type#{Policy::EVERYONE}" => Policy::VISIBLE}
+    end
+  end
+
   private
 
   def valid_sop_with_url

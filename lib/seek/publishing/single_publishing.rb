@@ -3,7 +3,7 @@ module Seek
     module SinglePublishing
       def self.included(base)
         base.before_filter :set_item, :only => [:single_publish]
-        base.before_filter :single_publish_auth, :only=>[:single_publish]        
+        base.before_filter :single_publish_auth, :only=>[:single_publish]
       end
 
       def single_publish

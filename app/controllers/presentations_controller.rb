@@ -88,10 +88,6 @@ class PresentationsController < ApplicationController
               assay.relate(@presentation)
             end
           end
-          #send publishing request
-          if !@presentation.can_publish? && params[:sharing] && (params[:sharing][:sharing_scope].to_i == Policy::EVERYONE)
-            deliver_request_publish_approval @presentation
-          end
         else
           format.html {
             render :action => "new"
@@ -181,10 +177,6 @@ class PresentationsController < ApplicationController
           if assay_asset.assay.can_edit? and !assay_ids.include?(assay_asset.assay_id.to_s)
             AssayAsset.destroy(assay_asset.id)
           end
-        end
-        #send publishing request
-        if !@presentation.can_publish? && params[:sharing] && (params[:sharing][:sharing_scope].to_i == Policy::EVERYONE)
-          deliver_request_publish_approval @presentation
         end
       else
         format.html {

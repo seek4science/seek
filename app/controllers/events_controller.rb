@@ -54,10 +54,6 @@ class EventsController < ApplicationController
 
     respond_to do | format |
       if @event.save
-        #send publishing request
-        if !@event.can_publish? && params[:sharing] && (params[:sharing][:sharing_scope].to_i == Policy::EVERYONE)
-          deliver_request_publish_approval @event
-        end
         flash.now[:notice] = 'Event was successfully saved.' if flash.now[:notice].nil?
         format.html { redirect_to @event }
       else
@@ -89,10 +85,6 @@ class EventsController < ApplicationController
 
     respond_to do | format |
       if @event.save
-        #send publishing request
-        if !@event.can_publish? && params[:sharing] && (params[:sharing][:sharing_scope].to_i == Policy::EVERYONE)
-          deliver_request_publish_approval @event
-        end
         flash.now[:notice] = 'Event was updated successfully.' if flash.now[:notice].nil?
         format.html { redirect_to @event }
       else
