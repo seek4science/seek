@@ -946,29 +946,29 @@ class ModelsControllerTest < ActionController::TestCase
 
   end
 
-  test "do publish" do
+  test "do isa_publish" do
     model=models(:teusink_with_project_without_gatekeeper)
     assert model.can_manage?,"The sop must be manageable for this test to succeed"
-    post :publish,:id=>model
+    post :isa_publish,:id=>model
     assert_response :success
     assert_nil flash[:error]
     assert_not_nil flash[:notice]
   end
 
-  test "do not publish if not can_manage?" do
+  test "do not isa_publish if not can_manage?" do
     login_as(:quentin)
     model=models(:teusink_with_project_without_gatekeeper)
     assert !model.can_manage?,"The sop must not be manageable for this test to succeed"
-    post :publish,:id=>model
+    post :isa_publish,:id=>model
     assert_redirected_to model
     assert_not_nil flash[:error]
     assert_nil flash[:notice]
   end
 
-  test "get preview_publish" do
+  test "get isa_publishing_preview" do
     model=models(:teusink_with_project_without_gatekeeper)
     assert model.can_manage?,"The sop must be manageable for this test to succeed"
-    get :preview_publish, :id=>model
+    get :isa_publishing_preview, :id=>model
     assert_response :success
   end
 
@@ -988,11 +988,11 @@ class ModelsControllerTest < ActionController::TestCase
     assert model.relationships.empty?
   end
 
-  test "cannot get preview_publish when not manageable" do
+  test "cannot get isa_publishing_preview when not manageable" do
     login_as(:quentin)
     model=models(:teusink_with_project_without_gatekeeper)
     assert !model.can_manage?,"The sop must not be manageable for this test to succeed"
-    get :preview_publish, :id=>model
+    get :isa_publishing_preview, :id=>model
     assert_redirected_to model
     assert flash[:error]
   end
