@@ -23,21 +23,22 @@ module Seek
       end
 
       AUTHORISED_TYPES.each do |type|
-        type_str=type.name.underscore.pluralize
-        define_method "visible_#{type_str} projects" do
-          authorised_assets type,"view",projects, @user
+        type_class_name = type.name
+        type_str=type_class_name.underscore.pluralize
+        define_method "visible_#{type_str}" do |projects|
+          authorised_assets type_class_name,"view",projects, @user
         end
 
-        define_method "accessible_#{type_str} projects" do
-          authorised_assets type,"download",projects, @user
+        define_method "accessible_#{type_str}" do |projects|
+          authorised_assets type_class_name,"download",projects, @user
         end
 
-        define_method "publicly_visible_#{type_str} projects" do
-          authorised_assets type,"view",projects, nil
+        define_method "publicly_visible_#{type_str}" do |projects|
+          authorised_assets type_class_name,"view",projects, nil
         end
 
-        define_method "publicly_accessible_#{type_str} projects" do
-          authorised_assets type,"download",projects, nil
+        define_method "publicly_accessible_#{type_str}" do |projects|
+          authorised_assets type_class_name,"download",projects, nil
         end
 
       end
