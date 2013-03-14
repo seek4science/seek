@@ -15,6 +15,7 @@ class PeopleController < ApplicationController
 
   skip_before_filter :project_membership_required
   skip_before_filter :profile_for_login_required,:only=>[:select,:userless_project_selected_ajax,:create]
+  skip_after_filter :request_publish_approval,:log_publishing, :only => [:create,:update]
 
   cache_sweeper :people_sweeper,:only=>[:update,:create,:destroy]
   include Seek::BreadCrumbs

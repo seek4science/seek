@@ -29,7 +29,7 @@
         <li><%= link_to_function image("new")+" Upload new version", visual_effect(:toggle_appear, "upload_new_version_form") -%></li>
     <% end -%>
     <li><%= image_tag_for_key('manage', polymorphic_path(asset, :action => :edit), nil, nil, "Manage #{human_name}") -%></li>
-    <% if !asset.is_published? && asset.publish_authorized? %>
+    <% if asset.is_in_isa_publishable? && !asset.is_published? && asset.publish_authorized?  %>
         <% if asset.can_publish?
              confirm_message = "After publishing, all visitors, even without a login, can access this #{human_name}.\nAre you sure you want to publish this #{human_name}?"
            else
