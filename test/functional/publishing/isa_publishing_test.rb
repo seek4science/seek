@@ -78,7 +78,7 @@ class IsaPublishingTest < ActionController::TestCase
     assert_select "li.secondary",:text=>/Publish/ do
       assert_select "input[checked='checked'][type='checkbox'][id=?]","publish_DataFile_#{df.id}"
     end
-    assert_select "li.secondary",:text=>/Summit publishing request/ do
+    assert_select "li.secondary",:text=>/Submit publishing request/ do
       assert_select "input[checked='checked'][type='checkbox'][id=?]","publish_DataFile_#{request_publishing_df.id}"
     end
     assert_select "li.secondary",:text=>/Notify owner/ do
@@ -119,6 +119,31 @@ class IsaPublishingTest < ActionController::TestCase
       assert_select "a[href=?]",data_file_path(published_df),:text=>/#{published_df.title}/
     end
     assert_select "li.secondary",:text=>/This item is already published/
+  end
+
+  test "get isa_publishing_preview for the items that the publishing request was sent" do
+    df=data_with_isa
+    assay=df.assays.first
+
+    waiting_for_approval_df = Factory(:data_file,
+                           :policy => Factory(:all_sysmo_viewable_policy),
+                           :projects => Factory(:gatekeeper).projects,
+                           :contributor => users(:datafile_owner),
+                           :assays => [assay])
+    ResourcePublishLog.add_publish_log(ResourcePublishLog::WAITING_FOR_APPROVAL, waiting_for_approval_df)
+
+    assert !waiting_for_approval_df.is_published?,"The datafile must not be published for this test to succeed"
+    assert !waiting_for_approval_df.can_publish?,"The datafile must not be publishable for this test to succeed"
+    assert waiting_for_approval_df.can_manage?,"The datafile must manageable for this test to succeed"
+    assert !ResourcePublishLog.last_waiting_approval_log(waiting_for_approval_df).nil?,"The datafile must not be in the waiting_for_approval state for this test to succeed"
+
+    get :isa_publishing_preview, :id=>df
+    assert_response :success
+
+    assert_select "li.type_and_title",:text=>/Data file/ do
+      assert_select "a[href=?]",data_file_path(waiting_for_approval_df),:text=>/#{waiting_for_approval_df.title}/
+    end
+    assert_select "li.secondary",:text=>/You already submitted the publishing request for this item./
   end
 
   test "do isa_publish all" do

@@ -5,34 +5,39 @@ if item.can_publish?
   checkbox_title = "Publish"
   checkbox_class = "published"
 elsif item.can_manage?
-  checkbox_title = "Summit publishing request"
+  checkbox_title = "Submit publishing request"
   checkbox_class = "owned"
 else
   checkbox_title = "Notify owner"
   checkbox_class = 'protected'
 end
-
-checkbox_class = "none_text" if item.is_published?
 -%>
 <li>
-    <ul class="<%= html_classes -%>">
-        <% if item.can_view? %>
-            <li class="type_and_title"><%= text_for_resource item -%>:&nbsp;<%= link_to item.title,item,:target=>"_blank" -%></li>
-            <li class="secondary">Owners <%= item.managers.empty? ? "<span class='none_text'>None</span>" : item.managers.collect{|m| link_to(m.title,m)}.join(", ")  -%></li>
-        <% else %>
-          <li class="type_and_title"><%= text_for_resource item -%>:&nbsp;This item is hidden to you</li>
-          <% if current_user.try(:person) && item.can_see_hidden_item?(current_user.person) %>
-            <li class="secondary">Owners <%= item.managers.empty? ? "<span class='none_text'>None</span>" : item.managers.collect{|m| link_to(m.title,m)}.join(", ")  -%></li>
-          <% end %>
+  <ul class="<%= html_classes -%>">
+    <% if item.can_view? %>
+        <li class="type_and_title"><%= text_for_resource item -%>
+          :&nbsp;<%= link_to item.title, item, :target => "_blank" -%></li>
+        <li class="secondary">Owners <%= item.managers.empty? ? "<span class='none_text'>None</span>" : item.managers.collect { |m| link_to(m.title, m) }.join(", ") -%></li>
+    <% else %>
+        <li class="type_and_title"><%= text_for_resource item -%>:&nbsp;This item is hidden to you</li>
+        <% if current_user.try(:person) && item.can_see_hidden_item?(current_user.person) %>
+            <li class="secondary">Owners <%= item.managers.empty? ? "<span class='none_text'>None</span>" : item.managers.collect { |m| link_to(m.title, m) }.join(", ") -%></li>
         <% end %>
-        <li class="secondary <%= checkbox_class -%>">
-          <% if item.is_published? -%>
-            This item is already published.
-          <% else -%>
-            <%= checkbox_title -%>&nbsp;<%= check_box_tag publishing_item_param(item),1,true -%>
-          <% end -%>
+    <% end %>
 
+    <% if item.is_published? -%>
+        <li class="secondary">
+          This item is already published.
         </li>
-    </ul>
+    <% elsif !item.can_publish? && item.can_manage? && !ResourcePublishLog.last_waiting_approval_log(item).nil? -%>
+        <li class="secondary">
+          You already submitted the publishing request for this item.
+        </li>
+    <% else %>
+        <li class="secondary <%= checkbox_class -%>">
+            <%= checkbox_title -%>&nbsp;<%= check_box_tag publishing_item_param(item), 1, true -%>
+        </li>
+    <% end -%>
+  </ul>
 </li>
 <li style="clear:both;">&nbsp;</li>
