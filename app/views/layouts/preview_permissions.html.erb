@@ -55,6 +55,7 @@
               <p><%=  prefix_text + group_name %> <%=  (((p.access_type == Policy::NO_ACCESS) || (p.access_type == Policy::DETERMINED_BY_GROUP)) ? 'have ' : 'can ') + Policy.get_access_type_wording(p.access_type, try_block{resource_name.camelize.constantize.new()}).downcase -%> </p>
           <% end %>
       <% end %>
+
       <% if !privileged_people.blank? %>
           <h2>Privileged people:</h2>
           <% privileged_people.each do |key, value|

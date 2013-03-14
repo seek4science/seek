@@ -101,6 +101,26 @@ class IsaPublishingTest < ActionController::TestCase
 
   end
 
+  test "get isa_publishing_preview for already published items" do
+    df=data_with_isa
+    assay=df.assays.first
+
+    published_df = Factory(:data_file,
+                                    :policy => Factory(:public_policy),
+                                    :contributor => users(:datafile_owner),
+                                    :assays => [assay])
+
+    assert published_df.is_published?,"The datafile must be already published for this test to succeed"
+
+    get :isa_publishing_preview, :id=>df
+    assert_response :success
+
+    assert_select "li.type_and_title",:text=>/Data file/ do
+      assert_select "a[href=?]",data_file_path(published_df),:text=>/#{published_df.title}/
+    end
+    assert_select "li.secondary",:text=>/This item is already published/
+  end
+
   test "do isa_publish all" do
     df=data_with_isa
     assays=df.assays
