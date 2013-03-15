@@ -35,7 +35,7 @@ class IsaPublishingTest < ActionController::TestCase
 
   test "get isa_publish redirects to show" do
     #This is useful because if you logout it redirects back to the current page.
-    #If you just published something, that will do a get request to *Controller#publish
+    #If you just published something, that will do a get request to *Controller#isa_publish
     get :isa_publish
     assert_response :redirect
   end
