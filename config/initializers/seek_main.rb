@@ -15,6 +15,7 @@ require 'seek/acts_as_uniquely_identifiable'
 require 'acts_as_favouritable'
 require 'acts_as_asset'
 require 'send_subscriptions_when_activity_logged'
+require 'send_notification_emails_when_announcement_created'
 require 'modporter_extensions'
 require "attachment_fu_extension"
 require 'seek/taggable'

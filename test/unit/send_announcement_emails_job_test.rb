@@ -57,8 +57,7 @@ class SendAnnouncementEmailsJobTest < ActiveSupport::TestCase
     from_notifiee_id = 1
     notifiee1 = Factory(:notifiee_info, :id => 10)
     notifiee2 = Factory(:notifiee_info, :id => 60)
-    site_announcement = Factory(:site_announcement, :email_notification => true)
-
+    site_announcement = SiteAnnouncement.create(:title => 'test announcement', :body => 'test', :email_notification => true)
     assert SendAnnouncementEmailsJob.exists?(site_announcement.id,1)
     assert_emails 1 do
       SendAnnouncementEmailsJob.new(site_announcement.id, 1).perform
