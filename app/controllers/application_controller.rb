@@ -380,7 +380,8 @@ class ApplicationController < ActionController::Base
             ActivityLog.create(:action => a,
                                :culprit => current_user,
                                :controller_name => c,
-                               :activity_loggable => object)
+                               :activity_loggable => object,
+                               :user_agent => request.env["HTTP_USER_AGENT"])
           end
         when "investigations", "studies", "assays", "specimens", "samples"
           if ["show", "create", "update", "destroy"].include?(a)
@@ -390,7 +391,8 @@ class ApplicationController < ActionController::Base
                                :referenced => object.projects.first,
                                :controller_name => c,
                                :activity_loggable => object,
-                               :data => object.title)
+                               :data => object.title,
+                               :user_agent => request.env["HTTP_USER_AGENT"])
 
           end
         when "data_files", "models", "sops", "publications", "presentations", "events"
@@ -404,7 +406,8 @@ class ApplicationController < ActionController::Base
                                :referenced => object.projects.first,
                                :controller_name => c,
                                :activity_loggable => object,
-                               :data => object.title)
+                               :data => object.title,
+                               :user_agent => request.env["HTTP_USER_AGENT"])
           end
         when "people"
           if ["show", "create", "update", "destroy"].include?(a)
@@ -412,13 +415,15 @@ class ApplicationController < ActionController::Base
                                :culprit => current_user,
                                :controller_name => c,
                                :activity_loggable => object,
-                               :data => object.title)
+                               :data => object.title,
+                               :user_agent => request.env["HTTP_USER_AGENT"])
           end
         when "search"
           if a=="index"
             ActivityLog.create(:action => "index",
                                :culprit => current_user,
                                :controller_name => c,
+                               :user_agent => request.env["HTTP_USER_AGENT"],
                                :data => {:search_query => object, :result_count => @results.count})
           end
         when "content_blobs"
@@ -430,6 +435,7 @@ class ApplicationController < ActionController::Base
                                :referenced => object,
                                :controller_name => c,
                                :activity_loggable => activity_loggable,
+                               :user_agent => request.env["HTTP_USER_AGENT"],
                                :data => activity_loggable.title)
           end
       end
