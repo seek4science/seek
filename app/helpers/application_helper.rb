@@ -578,6 +578,28 @@ module ApplicationHelper
     end
   end
 
+  NO_DELETE_EXPLANTIONS={Assay=>"You cannot delete this Assay. It might be published or it has items associated with it.",
+                         Study=>"You cannot delete this Study. It might be published or it has Assays associated with it.",
+                         Investigation=>"You cannot delete this Investigation. It might be published or it has Studies associated with it." ,
+                         Specimen=>"You cannot delete a #{Seek::Config.sample_parent_term}. It might be published or it has Samples associated with it.",
+                         Sample=>"You cannot delete a Sample. It might be published or it has Assays associated with it."
+  }
+
+  def delete_icon model_item, user
+    item_name = text_for_resource model_item
+    if model_item.can_delete?(user)
+      return "<li>"+image_tag_for_key('destroy',url_for(model_item),"Delete #{item_name}", {:confirm=>"Are you sure?",:method=>:delete },"Delete #{item_name}") + "</li>"
+    elsif !model_item.can_delete?(user) && model_item.can_manage?(user)
+      explanation=unable_to_delete_text model_item
+      return "<li><span class='disabled_icon disabled' onclick='javascript:alert(\"#{explanation}\")' title='#{tooltip_title_attrib(explanation)}' >"+image('destroy', {:alt=>"Delete",:class=>"disabled"}) + " Delete #{item_name} </span></li>"
+    end
+  end
+
+  def unable_to_delete_text model_item
+    text=NO_DELETE_EXPLANTIONS[model_item.class] || "You are unable to delete this #{model_item.class.name}. It might be published"
+    return text
+  end
+
   private  
   PAGE_TITLES={"home"=>"Home", "projects"=>"Projects","institutions"=>"Institutions", "people"=>"People", "sessions"=>"Login","users"=>"Signup","search"=>"Search","assays"=>"Assays","sops"=>"SOPs","models"=>"Models","data_files"=>"Data","publications"=>"Publications","investigations"=>"Investigations","studies"=>"Studies","specimens"=>"Specimens","samples"=>"Samples","presentations"=>"Presentations"}
 end

@@ -46,9 +46,7 @@
     <li><%= image_tag_for_key('edit', polymorphic_path(asset,:action=>:edit), nil, nil, "Edit #{human_name}") -%></li>
   <% end -%>
 
-  <% if asset.can_delete? -%>
-    <li><%= image_tag_for_key('destroy', polymorphic_path(asset), nil, { :confirm => delete_confirm_message, :method => :delete }, "Delete #{human_name}") -%></li>
-  <% end -%>
+  <%= delete_icon(asset, current_user)%>
 
   <% if (asset.can_delete? or current_user.try(:admin?)) and asset.respond_to? :to_presentation %>
       <li>

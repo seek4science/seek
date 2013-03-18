@@ -9,9 +9,7 @@
   <% elsif @specimen.can_edit? %>
       <li><%= image_tag_for_key('edit', edit_specimen_path(@specimen), "Edit Specimen", nil, 'Edit Specimen') %></li>
   <% end %>
-  <% if @specimen.can_delete? %>
-      <li><%= image_tag_for_key "destroy", specimen_path(@specimen), "Delete Specimen", {:confirm => 'Are you sure?', :method => :delete}, "Delete Specimen" -%></li>
-  <% end %>
+  <%= delete_icon(@specimen, current_user)-%>
 
   <% if logged_in? and current_user.person.member? %>
       <li><%= image_tag_for_key('new', new_object_based_on_existing_one_path(:controller_name=>"specimens",:id=>@specimen.id), nil, nil, 'New specimen based on this one') %></li>
