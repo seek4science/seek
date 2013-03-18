@@ -307,6 +307,7 @@ class ApplicationController < ActionController::Base
               when 'manage'   then redirect_to object
               when 'edit'     then redirect_to object
               when 'download' then redirect_to object
+              when 'delete' then redirect_to object
               else                 redirect_to eval "#{self.controller_name}_path"
             end
           end
