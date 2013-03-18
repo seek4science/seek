@@ -252,7 +252,7 @@ class AssaysController < ApplicationController
 
     render :update do |page|
       if assay.try :can_view?
-        page.replace_html element, :partial=>"assays/associate_resource_list_item", :locals=>{:resource=>assay}
+        page.replace_html element, :partial=>"assays/preview_for_associate", :locals=>{:resource=>assay}
       else
         page.replace_html element, :text=>"Nothing is selected to preview."
       end

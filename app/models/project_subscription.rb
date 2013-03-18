@@ -48,8 +48,6 @@ class ProjectSubscription < ActiveRecord::Base
   after_create :subscribe_to_all_in_project
 
   def subscribe_to_all_in_project
-    ([id] + project.ancestors.collect(&:id)).uniq.each do |id|
       ProjectSubscriptionJob.create_job id
-    end
   end
 end
