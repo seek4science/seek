@@ -50,8 +50,8 @@ class Presentation < ActiveRecord::Base
     with_contributors = all.collect{ |d|
         contributor = d.contributor;
         { "id" => d.id,
-          "title" => d.title,
-          "contributor" => contributor.nil? ? "" : "by " + contributor.person.name,
+          "title" => h(d.title),
+          "contributor" => contributor.nil? ? "" : "by " + h(contributor.person.name),
           "type" => self.name
         }
     }
