@@ -1157,4 +1157,6 @@ module Seek
       return table_names[index+1].content
     end
   end
+
+  end
 end
