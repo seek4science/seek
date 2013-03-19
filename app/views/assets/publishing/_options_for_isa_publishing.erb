@@ -26,11 +26,11 @@ end
     <% end %>
 
     <% if item.is_published? -%>
-        <li class="secondary">
+        <li class="secondary status">
           This item is already published.
         </li>
     <% elsif !item.can_publish? && item.can_manage? && !ResourcePublishLog.last_waiting_approval_log(item).nil? -%>
-        <li class="secondary">
+        <li class="secondary status">
           You already submitted the publishing request for this item.
         </li>
     <% else %>

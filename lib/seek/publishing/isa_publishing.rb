@@ -1,6 +1,7 @@
 module Seek
   module Publishing
     module IsaPublishing
+=begin
 
       def self.included(base)
         base.before_filter :set_asset, :only=>[:isa_publishing_preview,:isa_publish]
@@ -69,6 +70,7 @@ module Seek
           end
         end
       end
+=end
 
     end
   end
