@@ -58,7 +58,7 @@
                   <% if key == 'contributor' %>
                       <p><%= v.name %> can <%= Policy.get_access_type_wording(Policy::MANAGING, try_block{resource_name.camelize.constantize.new()}).downcase -%> as an uploader </p>
                   <% elsif key == 'creators' %>
-                      <p><%= v.name %> can <%= Policy.get_access_type_wording(Policy::EDITING, try_block{resource_name.camelize.constantize.new()}).downcase -%> as a creator </p>
+                      <p><%= v.name %> can <%= Policy.get_access_type_wording(Policy::EDITING, try_block{resource_name.camelize.constantize.new()}).downcase -%> as a contributor </p>
                   <% elsif key == 'asset_managers'%>
                       <p><%= v.name %> can <%= Policy.get_access_type_wording(Policy::MANAGING, try_block{resource_name.camelize.constantize.new()}).downcase -%> as an asset manager </p>
                   <% end %>

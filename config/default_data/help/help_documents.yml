@@ -93,7 +93,7 @@ help_documents:
       \r\n\
       *Title* \xE2\x80\x93 as described above. All assets should have a title\r\n\
       *Description* \xE2\x80\x93 free text describing the purpose of the study\r\n\
-      *Person Responsible* \xE2\x80\x93 the creator of the study description\r\n\
+      *Person Responsible* \xE2\x80\x93 the contributor of the study description\r\n\
       *Experimentalists* \xE2\x80\x93 other scientists involved in any of the work in the study. If they are in SysMO, please give their SEEK ID, so we can link to their profiles in SEEK. If they are not in SEEK, their names will still be displayed, but not linked. People\xE2\x80\x99s involvement can also be inferred from anyone named in included assays.\r\n\
       *Project* \xE2\x80\x93 as described above. All assets should be associated with a project\r\n\
       *Investigation title* \xE2\x80\x93 The name of the investigation the study belongs to. \r\n\
@@ -452,7 +452,7 @@ help_documents:
       \r\n\
       *Title* \xE2\x80\x93 The name of the Study. All assets should have a title\r\n\
       *Description* \xE2\x80\x93 free text describing the purpose of the study\r\n\
-      *Person Responsible* \xE2\x80\x93 the creator of the study description\r\n\
+      *Person Responsible* \xE2\x80\x93 the contributor of the study description\r\n\
       *Experimentalists* \xE2\x80\x93 other scientists involved in any of the work in the study. If they are in SysMO, please give their SEEK ID, so we can link to their profiles in SEEK. If they are not in SEEK, their names will still be displayed, but not linked. People\xE2\x80\x99s involvement can also be inferred from anyone named in included assays.\r\n\
       *Project* \xE2\x80\x93 The project that the study belongs to. All assets should be associated with a project\r\n\
       *Investigation title* \xE2\x80\x93 The name of the investigation the study belongs to. \r\n\
