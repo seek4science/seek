@@ -1,0 +1,43 @@
+<style>
+ul li.info_list {
+    list-style-type: circle;
+}
+</style>
+
+<div class="box_infotext">
+  <p>
+    Publishing guide line
+    <%= link_to_function "More "+ expand_image,  :id => 'info_expand_image' do |page|
+      page.visual_effect(:toggle_appear, "more_publishing_info", :duration => 0.5)
+      page["info_expand_image"].toggle
+      page["info_collapse_image"].toggle
+    end
+    -%>
+    <%= link_to_function "Less "+collapse_image, :id => 'info_collapse_image', :style => "display:none" do |page|
+      page.visual_effect(:toggle_appear, "more_publishing_info", :duration => 0.5)
+      page["info_expand_image"].toggle
+      page["info_collapse_image"].toggle
+    end
+    -%>
+  </p>
+
+  <div id="more_publishing_info" style="display: none;">
+    <ul style="padding-left:1em;">
+      <li class="info_list"><b>Gatekeeper:</b> to secure publishing process, each project has an option to define the gatekeepers, who give the approval or
+        reject of publishing request. However it is optional, so if a project doesn't define any gatekeepers, the project assets can be made
+        published immediately.
+      </li>
+      <li class="info_list">
+        Having the permission to manage an asset, you can immediately <span class="published"><b>Publish</b></span> the asset
+        or <span class="owned"><b>Submit publishing request</b></span> to the gatekeepers if defined,
+        otherwise <span class="protected"><b>Notify owner</b></span> which a notification email will be sent to the owners of the asset.
+      </li>
+      <li class="info_list">
+        In addition, you can <b>Publish related items</b> of the asset, which are the ISA the asset is linked to and their assets.
+      </li>
+      <li class="info_list">
+        If there is an asset you do not wish to make public, then you can <b>uncheck</b> the checkbox beside that asset and it will remain unaffected.
+      </li>
+    </ul>
+  </div>
+</div>

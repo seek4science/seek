@@ -1,41 +1,11 @@
 <%= stylesheet_link_tag "publishing" %>
 
 <div class="show_basic">
-  <h1>Preview publishing.</h1>
+  <h1>Publishing preview.</h1>
 
-  <div class="box_infotext">
-    <p>
-      Publishing guide line
-      <%= link_to_function "More "+ expand_image,  :id => 'info_expand_image' do |page|
-        page.visual_effect(:toggle_appear, "more_publishing_info", :duration => 0.5)
-        page["info_expand_image"].toggle
-        page["info_collapse_image"].toggle
-      end
-      -%>
-      <%= link_to_function "Less "+collapse_image, :id => 'info_collapse_image', :style => "display:none" do |page|
-        page.visual_effect(:toggle_appear, "more_publishing_info", :duration => 0.5)
-        page["info_expand_image"].toggle
-        page["info_collapse_image"].toggle
-      end
-      -%>
-    </p>
-
-    <div id="more_publishing_info" style="display: none;">
-      <ul style="padding-left:1em;">
-        <li><b>Gatekeeper:</b> to secure publishing process, each project has an option to define the gatekeepers, who give the approval or
-          reject of publishing request. However it is optional, so if a project doesn't define any gatekeepers, the project assets can be made
-          published immediately.
-        </li>
-        <li>
-          Having the permission to manage an asset, you can immediately <span class="published">Publish</span> the asset or <span class="owned">Submit publishing request</span> to the gatekeepers if defined, otherwise <span class="protected">Notify owner</span> which a notification email will be sent to the owners of the asset.
-        </li>
-        <li>
-          If there is an asset you do not wish to make public, then you can <span class="status">uncheck</span> the checkbox beside that asset and it will remain unaffected.
-        </li>
-      </ul>
-    </div>
-  </div>
+  <%= render :partial => "assets/publishing/publishing_guide" -%>
   <br/>
+
   <% form_tag :action => :publish do -%>
       <%= render :partial => "assets/publishing/asset_and_related", :object => @asset%>
       <br/>
