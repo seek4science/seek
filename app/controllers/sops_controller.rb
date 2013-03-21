@@ -11,9 +11,7 @@ class SopsController < ApplicationController
   before_filter :find_and_auth, :except => [ :index, :new, :create, :request_resource,:preview, :test_asset_url, :update_annotations_ajax]
   before_filter :find_display_asset, :only=>[:show, :download]
 
-  include Seek::Publishing::IsaPublishing
   include Seek::Publishing::GatekeeperPublish
-  include Seek::Publishing::SinglePublishing
   include Seek::Publishing::PublishingCommon
 
   include Seek::BreadCrumbs

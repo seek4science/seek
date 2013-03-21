@@ -7,7 +7,6 @@ class InvestigationsController < ApplicationController
   before_filter :find_and_auth,:only=>[:edit, :update, :destroy]
 
   include Seek::Publishing::GatekeeperPublish
-  include Seek::Publishing::SinglePublishing
   include Seek::Publishing::PublishingCommon
 
   include Seek::BreadCrumbs

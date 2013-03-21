@@ -9,7 +9,6 @@ class StudiesController < ApplicationController
   before_filter :check_assays_are_not_already_associated_with_another_study,:only=>[:create,:update]
 
   include Seek::Publishing::GatekeeperPublish
-  include Seek::Publishing::SinglePublishing
   include Seek::Publishing::PublishingCommon
 
   include Seek::BreadCrumbs

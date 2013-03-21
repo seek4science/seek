@@ -19,9 +19,7 @@ class ModelsController < ApplicationController
 
   before_filter :experimental_features, :only=>[:matching_data]
 
-  include Seek::Publishing::IsaPublishing
   include Seek::Publishing::GatekeeperPublish
-  include Seek::Publishing::SinglePublishing
   include Seek::Publishing::PublishingCommon
 
   include Seek::BreadCrumbs

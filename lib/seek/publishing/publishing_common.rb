@@ -2,9 +2,22 @@ module Seek
   module Publishing
     module PublishingCommon
       def self.included(base)
-        #has to be before log_publishing, coz relying on log
-        base.after_filter :request_publish_approval, :only=>[:create,:update]
-        base.after_filter :log_publishing, :only=>[:create,:update]
+        base.before_filter :set_asset, :only=>[:single_publishing_preview]
+        base.before_filter :set_assets, :only=>[:batch_publishing_preview]
+        #request_publish_approval has to be before log_publishing, coz relying on log
+        base.after_filter :request_publish_approval,:log_publishing, :only=>[:create,:update]
+      end
+
+      def single_publishing_preview
+        respond_to do |format|
+          format.html { render :template=>"assets/publishing/single_publishing_preview" }
+        end
+      end
+
+      def batch_publishing_preview
+        respond_to do |format|
+          format.html { render :template=>"assets/publishing/batch_publishing_preview" }
+        end
       end
 
       def isa_publishing_preview
@@ -37,6 +50,27 @@ module Seek
       end
 
       private
+
+      def set_asset
+        begin
+          @asset = self.controller_name.classify.constantize.find_by_id(params[:id])
+        rescue ActiveRecord::RecordNotFound
+          error("This resource is not found","not found resource")
+        end
+      end
+
+      def set_assets
+        #get the assets that current_user can manage, then take the one that (is not yet published and is publish_authorized)
+        @assets = {}
+        publishable_types = Seek::Util.authorized_types.select {|c| c.first.try(:is_in_isa_publishable?)}
+        publishable_types.each do |klass|
+          can_manage_assets = klass.all_authorized_for "manage", current_user
+          can_manage_assets = can_manage_assets.select{|a| !a.is_published? && a.publish_authorized?}
+          unless can_manage_assets.empty?
+            @assets[klass.name] = can_manage_assets
+          end
+        end
+      end
 
       def do_publish
         items_for_publishing = resolve_publish_params params[:publish]
