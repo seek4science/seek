@@ -1,15 +1,20 @@
-<%item = asset_and_related%>
-<li>
-  <%= render :partial => "assets/publishing/options_for_publishing", :object => item, :locals => {:html_classes => "publishing_options"} -%>
-
+<% item = asset_and_related %>
+<%= render :partial => "assets/publishing/options_for_publishing", :object => item, :locals => {:html_classes => "publishing_options"} -%>
+<ul class="publishing_options">
   <% unless item.assays.empty? %>
-      <span class="secondary related_items">Publish also related items?</span>
-      <%= check_box_tag "#{item.class.name}_#{item.id}_related_items", nil, false, {:onclick => remote_function(:url => {:action => "isa_publishing_preview"},
-                                                                                             :with => "'#{item.class.name}_#{item.id}_related_items_checked=' + $('#{item.class.name}_#{item.id}_related_items').checked +
-                                                                                                       '&item_id='+#{item.id} + '&item_type='+'#{item.class.name}'",
-                                                                                             :before => "show_ajax_loader('#{item.class.name}_#{item.id}_isa_preview');")} -%>
-      <div id="<%=item.class.name%>_<%=item.id%>_isa_preview"></div>
+      <li class="secondary related_items">
+        Publish related items?
+        <%= check_box_tag "#{item.class.name}_#{item.id}_related_items", nil, false, {:onclick => remote_function(:url => {:action => "isa_publishing_preview"},
+                                                                                                                  :with => "'#{item.class.name}_#{item.id}_related_items_checked=' + $('#{item.class.name}_#{item.id}_related_items').checked +
+                                                                                                               '&item_id='+#{item.id} + '&item_type='+'#{item.class.name}'",
+                                                                                                                  :before => "show_ajax_loader('#{item.class.name}_#{item.id}_isa_preview');")} -%>
+        <div id="<%= item.class.name %>_<%= item.id %>_isa_preview"></div>
+      </li>
   <% else %>
-      <span class="secondary status">No related items</span>
+      <li class="secondary status">
+        No related items
+      </li>
   <% end %>
-</li>
+</ul>
+<br/>
+

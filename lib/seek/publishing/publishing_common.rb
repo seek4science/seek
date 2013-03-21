@@ -25,14 +25,12 @@ module Seek
         publish_related_items = params["#{item.class.name}_#{item.id}_related_items_checked"]
         if publish_related_items == 'true'
           render :update do |page|
-            page.replace_html "#{item.class.name}_#{item.id}_isa_preview", :partial => "assets/publishing/isa_publishing_preview" ,
-                              :object => item
+            page.replace_html "#{item.class.name}_#{item.id}_isa_preview", :partial => "assets/publishing/isa_publishing_preview", :object => item
 
           end
         else
           render :update do |page|
-            page.replace_html "#{item.class.name}_#{item.id}_isa_preview", "<div id='#{item.class.name}_#{item.id}_isa_preview'></div>"
-
+            page.replace_html "#{item.class.name}_#{item.id}_isa_preview", ""
           end
         end
       end

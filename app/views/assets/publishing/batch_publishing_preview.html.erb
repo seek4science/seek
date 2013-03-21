@@ -2,7 +2,7 @@
 
 <div class="show_basic">
 
-  <h1>Batch publishing preview. </h1>
+  <h1>Batch publishing preview.</h1>
 
   <div class="box_infotext">
     <p>
@@ -32,28 +32,24 @@
           Having the permission to manage an asset, you can immediately <span class="published">Publish</span> the asset or <span class="owned">Submit publishing request</span> to the gatekeepers if defined.
         </li>
         <li>
-          If there is an asset you do not wish to make public, then you can <span class="status">uncheck</span> the checkbox beside that asset and it will remain unaffected.
+          If there is an asset you do not wish to make public, then you can <b>uncheck</b> the checkbox beside that asset and it will remain unaffected.
         </li>
       </ul>
     </div>
   </div>
 
-  <% form_tag :action=>:publish do -%>
-      <ul>
-        <% if @assets.empty? %>
-            <span class="no_unpublished_asset">All your assets are published or you have no assets in <%= Seek::Config.project_name %></span>
-        <% else %>
-            <% @assets.sort_by { |k, v| [v.first.is_asset? ? -1 : 1, v.first.is_isa? ? -1 : 1, v.first.class.name] }.each do |type, items| %>
+  <% form_tag :action => :publish do -%>
+      <% if @assets.empty? %>
+          <span class="no_unpublished_asset">All your assets are published or you have no assets in <%= Seek::Config.project_name %></span>
+      <% else %>
+          <% @assets.sort_by { |k, v| v.first.class.name }.each do |type, items| %>
                 <h2><%= text_for_resource items.first %>(s)</h2>
                 <% items.each do |item| %>
-                    <div style="padding-left: 2em;">
-                      <%= render :partial => "assets/publishing/asset_and_related", :object => item -%>
-                    </div>
+                   <%= render :partial => "assets/publishing/asset_and_related", :object => item -%>
                 <% end %>
-            <% end %>
-            <%= submit_tag "Submit",:disable_with=>"Submitting ..." -%>
-        <% end -%>
-      </ul>
+          <% end %>
+          <%= submit_tag "Submit", :disable_with => "Submitting ..." -%>
+      <% end -%>
   <% end -%>
 
 </div>

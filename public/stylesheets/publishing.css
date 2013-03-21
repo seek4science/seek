@@ -6,39 +6,39 @@ ul.publishing_options li.type_and_title {
     font-weight:bolder;
 }
 
-ul.publishing_options li.title {
-    font-weight:bolder;
+ul.publishing_options li.type_and_title img.icon_visibility {
+    margin-left:2em;
 }
 
-.secondary {
+ul.publishing_options li.secondary {
     padding-left: 1em;
 }
 
-.status  {
-    font-weight:bolder;
+ul.publishing_options li.related_items {
+
+}
+
+ul.publishing_options li.status {
     font-style:italic;
     color:gray;
 }
 
 .published {
     color: green;
-    font-weight:bolder;
 }
 
 .owned {
     color: orange;
-    font-weight:bolder;
 }
 
 .protected {
     color: red;
-    font-weight:bolder;
 }
 
-ul.publishing_options li.type_and_title img.icon_visibility {
-    margin-left:2em;
-}
-
-span.related_items {
+span.no_unpublished_asset {
+    font-size: 20px;
     font-weight: bold;
+    color: green;
+    float: left;
+    margin-top:2em;
 }
