@@ -40,15 +40,41 @@
 
   <h1>Batch publishing preview. </h1>
 
-  <p class="box_standout">
-    Batch publishing automates the process of publically releasing your own assets.<br/>
-    To secure publishing process, each project has an option to define the gatekeepers, who give the approval or reject of publishing request. <br/>
-    However it is optional, so if a project doesn't define any gatekeepers, the project assets can be made published immediately.<br/>
-    Having the permission to manage an asset, you can immediately publish the asset or submit the publishing request to the gatekeepers if defined.<br/>
-    If there is an asset you do not wish to make public, then you can uncheck the checkbox beside that asset and it will remain unaffected.<br/>
-  </p>
+  <div class="box_infotext">
+    <p>
+      Publishing guide line
+      <%= link_to_function "More "+ expand_image,  :id => 'info_expand_image' do |page|
+        page.visual_effect(:toggle_appear, "more_publishing_info", :duration => 0.5)
+        page["info_expand_image"].toggle
+        page["info_collapse_image"].toggle
+      end
+      -%>
+      <%= link_to_function "Less "+collapse_image, :id => 'info_collapse_image', :style => "display:none" do |page|
+        page.visual_effect(:toggle_appear, "more_publishing_info", :duration => 0.5)
+        page["info_expand_image"].toggle
+        page["info_collapse_image"].toggle
+      end
+      -%>
+    </p>
 
-  <% form_tag :action=>:batch_publish do -%>
+    <div id="more_publishing_info" style="display: none;">
+      <ul style="padding-left:1em;">
+        <li>Batch publishing automates the process of publically releasing your own assets.</li>
+        <li><b>Gatekeeper:</b> to secure publishing process, each project has an option to define the gatekeepers, who give the approval or
+          reject of publishing request. However it is optional, so if a project doesn't define any gatekeepers, the project assets can be made
+          published immediately.
+        </li>
+        <li>
+          Having the permission to manage an asset, you can immediately <span class="published">Publish</span> the asset or <span class="owned">Submit publishing request</span> to the gatekeepers if defined.
+        </li>
+        <li>
+          If there is an asset you do not wish to make public, then you can <span class="status">uncheck</span> the checkbox beside that asset and it will remain unaffected.
+        </li>
+      </ul>
+    </div>
+  </div>
+
+  <% form_tag :action=>:publish do -%>
       <ul>
         <% if @assets.empty? %>
             <span class="no_unpublished_asset">All your assets are published or you have no assets in <%= Seek::Config.project_name %></span>
@@ -57,7 +83,7 @@
                 <h2><%= text_for_resource items.first %>(s)</h2>
                 <% items.each do |item| %>
                     <div style="padding-left: 2em;">
-                      <%= render :partial => "assets/publishing/options_for_batch_publishing", :object => item, :locals => {:html_classes => "publishing_options"} -%>
+                      <%= render :partial => "assets/publishing/asset_and_related", :object => item -%>
                     </div>
                 <% end %>
             <% end %>

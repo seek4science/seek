@@ -4,19 +4,21 @@
     }
 
     ul.publishing_options li.type_and_title {
-
+        font-weight:bolder;
     }
 
     ul.publishing_options li.title {
 
     }
 
-    ul.publishing_options li.secondary {
+    .secondary {
         padding-left: 1em;
     }
 
     .status  {
         font-weight:bolder;
+        font-style:italic;
+        color:gray;
     }
 
     .published {
@@ -37,10 +39,7 @@
     span.related_items {
         font-weight: bold;
     }
-    span.no_related_items {
-        font-weight: bold;
-        color: gray;
-    }
+
 </style>
 
 <div class="show_basic">
@@ -79,21 +78,8 @@
     </div>
   </div>
   <br/>
-  <% form_tag :action => :single_publish do -%>
-      <div>
-        <%= render :partial => "assets/publishing/options_for_isa_publishing", :object => @asset, :locals => {:html_classes => "publishing_options"} -%>
-      </div>
-
-      <% unless @asset.assays.empty? %>
-          <span class="related_items">Publish also related items?</span>
-          <%= check_box_tag "related_items", nil, false, {:onclick => remote_function(:url => {:action => "isa_publishing_preview"},
-                                                                                      :with => "'related_items_checked=' + $('related_items').checked + '&id='+#{@asset.id}",
-                                                                                      :before => "show_ajax_loader('isa_preview');")} -%>
-          <div id="isa_preview"></div>
-      <% else %>
-          <span class="no_related_items">No related items</span>
-      <% end %>
-
+  <% form_tag :action => :publish do -%>
+      <%= render :partial => "assets/publishing/asset_and_related", :object => @asset%>
       <br/>
       <br/>
       <%= submit_tag "Submit",:disable_with=>"Submitting ..." -%>

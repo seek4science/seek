@@ -24,6 +24,8 @@ FLOT plotting library - http://code.google.com/p/flot/
 
 Curved Lines plugin for FLOT - https://github.com/MichaelZinsmaier/CurvedLines
 
+Pdf rendering library - https://github.com/mozilla/pdf.js
+
 == Icons and themes
 
 FamFamFam icon set (flags and silk) - http://www.famfamfam.com/lab/icons/silk/
