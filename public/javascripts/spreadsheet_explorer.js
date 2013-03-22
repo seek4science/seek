@@ -250,13 +250,9 @@ function adjust_container_dimensions() {
         }
         var sheet_container_width = spreadsheet_container_width + 14;
         var sheet_width = spreadsheet_container_width - 39;
-        $j(".sheet").width(sheet_width);
-        $j(".sheet_container").width(sheet_container_width);
+    $j(".sheet_container").width(sheet_container_width);
+    $j(".sheet").width(sheet_width);
 
-//    var spreadsheet_container_height = $j("div.spreadsheet_container").height();
-//    var sheet_height = spreadsheet_container_height - 20;
-//    $j(".sheet").height(sheet_height);
-//    $j(".sheet_container").height(spreadsheet_container_height);
 }
 
 //Convert a numeric column index to an alphabetic one
@@ -505,7 +501,8 @@ function activateSheet(sheet, sheetTab) {
   if(sheetTab == null)
     sheetTab = $j("a.sheet_tab:eq(" + sheet +")");
 
-  var sheetIndex = sheetTab.attr("index")
+  var sheetIndex = sheetTab.attr("index");
+
 
   //Clean up
   //Hide annotations
@@ -550,7 +547,9 @@ function activateSheet(sheet, sheetTab) {
       endRow = 0,
       endCol = 0;
 
-  adjust_container_dimensions();
+    //FIXME: for some reason, calling this twice solves a problem where the column and column header widths are mis-aligned
+    adjust_container_dimensions();
+    adjust_container_dimensions();
   return false;
 }
 
