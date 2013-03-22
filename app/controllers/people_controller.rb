@@ -1,7 +1,6 @@
 class PeopleController < ApplicationController
 
   include Seek::AnnotationCommon
-  include Seek::Publishing::BatchPublishing
   include Seek::Publishing::PublishingCommon
 
   before_filter :find_and_auth, :only => [:show, :edit, :update, :destroy]
