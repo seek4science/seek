@@ -12,14 +12,24 @@ class BatchPublishingTest < ActionController::TestCase
     login_as(:aaron)
   end
 
-  test "should have the -Publish your all assets- only one your own profile" do
+  test "should have the -Publish all your assets- only one your own profile" do
     get :show, :id => User.current_user.person
     assert_response :success
-    assert_select "a[href=?]", batch_publishing_preview_person_path, :text => /Publish your all assets/
+    assert_select "a[href=?]", batch_publishing_preview_person_path, :text => /Publish all your assets/
 
-    get :show, :id => Factory(:person)
+    get :batch_publishing_preview, :id => User.current_user.person.id
     assert_response :success
-    assert_select "a", :text => /Publish your all assets/, :count => 0
+    assert_nil flash[:error]
+
+    #not yourself
+    a_person = Factory(:person)
+    get :show, :id => a_person
+    assert_response :success
+    assert_select "a", :text => /Publish all your assets/, :count => 0
+
+    get :batch_publishing_preview, :id => a_person.id
+    assert_redirected_to :root
+    assert_not_nil flash[:error]
   end
 
   test "get batch_publishing_preview" do
@@ -36,7 +46,7 @@ class BatchPublishingTest < ActionController::TestCase
     end
     total_asset_count = (publish_immediately_assets + send_request_assets).count
 
-    get :batch_publishing_preview
+    get :batch_publishing_preview, :id => User.current_user.person.id
     assert_response :success
 
     assert_select "li.type_and_title", :count=>total_asset_count do
@@ -68,7 +78,7 @@ class BatchPublishingTest < ActionController::TestCase
     assert published_item.is_published?, "This data file must be published for the test to succeed"
     assert published_item.publish_authorized?, "This data file must be publish_authorized for the test to be meaningful"
 
-    get :batch_publishing_preview
+    get :batch_publishing_preview, :id => User.current_user.person.id
     assert_response :success
 
     assert_select "input[checked='checked'][type='checkbox'][id=?]", "publish_#{published_item.class.name}_#{published_item.id}",
@@ -80,7 +90,7 @@ class BatchPublishingTest < ActionController::TestCase
     assert !item.publish_authorized?, "This data file must not be publish_authorized for the test to succeed"
     assert !item.is_published?, "This data file must not be published for the test to be meaningful"
 
-    get :batch_publishing_preview
+    get :batch_publishing_preview, :id => User.current_user.person.id
     assert_response :success
 
     assert_select "input[checked='checked'][type='checkbox'][id=?]", "publish_#{item.class.name}_#{item.id}",
@@ -92,14 +102,14 @@ class BatchPublishingTest < ActionController::TestCase
     assert item.publish_authorized?, "This data file must be publish_authorized for the test to be meaningful"
     assert !item.is_published?, "This data file must not be published for the test to be meaningful"
 
-    get :batch_publishing_preview
+    get :batch_publishing_preview, :id => User.current_user.person.id
     assert_response :success
 
     assert_select "input[checked='checked'][type='checkbox'][id=?]", "publish_#{item.class.name}_#{item.id}",
                   :count => 0
   end
 
-  test "do batch_publish" do
+  test "do publish" do
     #bundle of assets that can publish immediately
     publish_immediately_assets = can_publish_immediately_assets
     publish_immediately_assets.each do |a|
@@ -124,7 +134,7 @@ class BatchPublishingTest < ActionController::TestCase
 
     assert_difference("ResourcePublishLog.count", total_assets.count) do
       assert_emails send_request_assets.count do
-        post :batch_publish, params
+        post :publish, params.merge(:id=> User.current_user.person.id)
       end
     end
     assert_response :success
@@ -141,7 +151,7 @@ class BatchPublishingTest < ActionController::TestCase
     end
   end
 
-  test "do not batch_publish for already published items" do
+  test "do not publish for already published items" do
     published_item = Factory(:data_file,
                              :contributor=> User.current_user,
                              :policy => Factory(:public_policy))
@@ -155,41 +165,19 @@ class BatchPublishingTest < ActionController::TestCase
 
     assert_no_difference("ResourcePublishLog.count") do
       assert_emails 0 do
-        post :batch_publish, params
+        post :publish, params.merge(:id=> User.current_user.person.id)
       end
     end
     assert_response :success
     assert_nil flash[:error]
     assert_not_nil flash[:notice]
-  end
-
-  test "do not batch_publish for not_publish_authorized items" do
-    item = Factory(:data_file, :policy => Factory(:all_sysmo_viewable_policy))
-    assert !item.publish_authorized?, "This data file must not be publish_authorized for the test to succeed"
-    assert !item.is_published?, "This data file must not be published for the test to be meaningful"
-
-    params={:publish=>{}}
-    params[:publish][item.class.name]||={}
-    params[:publish][item.class.name][item.id.to_s]="1"
-
-    assert_no_difference("ResourcePublishLog.count") do
-      assert_emails 0 do
-        post :batch_publish, params
-      end
-    end
-    assert_response :success
-    assert_nil flash[:error]
-    assert_not_nil flash[:notice]
-
-    item.reload
-    assert !item.is_published?
   end
 
   test "get batch_publish redirects to show" do
     #This is useful because if you logout it redirects to root.
     #If you just published something, that will do a get request to *Controller#batch_publish
-    get :batch_publish
-    assert_redirected_to :root
+    get :publish, :id=> User.current_user.person.id
+    assert_response :redirect
   end
 
   private
