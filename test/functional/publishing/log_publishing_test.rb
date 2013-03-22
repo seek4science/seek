@@ -161,7 +161,7 @@ class LogPublishingTest < ActionController::TestCase
     params[:publish][request_publishing_df.class.name][request_publishing_df.id.to_s]="1"
 
     assert_difference("ResourcePublishLog.count", 2) do
-      post :isa_publish,params.merge(:id=>df)
+      post :publish,params.merge(:id=>df)
       a=1
     end
     assert_response :success
