@@ -2,7 +2,7 @@ module Seek
   module Publishing
     module PublishingCommon
       def self.included(base)
-        base.before_filter :set_asset, :only=>[:single_publishing_preview]
+        base.before_filter :set_asset, :only=>[:single_publishing_preview,:publish]
         base.before_filter :set_assets, :only=>[:batch_publishing_preview]
         base.before_filter :single_publish_auth, :only=>[:single_publishing_preview,:publish]
         base.before_filter :batch_publish_auth, :only=>[:batch_publishing_preview,:publish]
@@ -71,7 +71,9 @@ module Seek
 
       def set_asset
         begin
-          @asset = self.controller_name.classify.constantize.find_by_id(params[:id])
+          if !(self.controller_name=='people')
+            @asset = self.controller_name.classify.constantize.find_by_id(params[:id])
+          end
         rescue ActiveRecord::RecordNotFound
           error("This resource is not found","not found resource")
         end

@@ -173,9 +173,9 @@ class BatchPublishingTest < ActionController::TestCase
     assert_not_nil flash[:notice]
   end
 
-  test "get batch_publish redirects to show" do
+  test "get publish redirected" do
     #This is useful because if you logout it redirects to root.
-    #If you just published something, that will do a get request to *Controller#batch_publish
+    #If you just published something, that will do a get request to *Controller#publish
     get :publish, :id=> User.current_user.person.id
     assert_response :redirect
   end
