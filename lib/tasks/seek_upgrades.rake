@@ -11,7 +11,6 @@ namespace :seek do
             :environment,
             :add_term_uris_to_assay_types,
             :add_term_uris_to_technology_types,
-	          :detect_web_page_content_blobs,
             :repopulate_auth_lookup_tables,
             :correct_content_type_for_jpg
   ]
