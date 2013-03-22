@@ -26,7 +26,6 @@ Investigation,projects,JERMVocab.itemProducedBy,u,,
 Investigation,studies,JERMVocab.hasPart,u,,
 Model,assays,JERMVocab.isPartOf,u,,
 Model,projects,JERMVocab.itemProducedBy,u,,
-Model,relationships,JERMVocab.isContstructedFrom,u,,"select{|item| item.object_type==""Publication""}.collect{|item| item.object}"
 Model,relationships,JERMVocab.isAssociatedWith,u,,"select{|item| item.object_type==""Publication""}.collect{|item| item.object}"
 Organism,assays,JERMVocab.is_investigated_by,u,,
 Organism,ncbi_uri,JERMVocab.NCBI_ID,u,,compact
@@ -47,8 +46,8 @@ Project,investigations,JERMVocab.hasItem,u,,
 Project,organisms,JERMVocab.investigates,u,,
 Project,studies,JERMVocab.hasItem,u,,
 Project,web_page,RDF::FOAF.homepage,u,,
-Publication,projects,JERMVocab.itemProducedBy,u,,
-Publication,related_assays,JERMVocab.isPartOf,u,,
+Publication,projects,JERMVocab.isAssociatedWith,u,,
+Publication,related_assays,JERMVocab.isAssociatedWith,u,,
 Sample,assays,JERMVocab.isPartOf,u,,
 Sample,donation_date,JERMVocab.donation_date,l,item.to_datetime,compact
 Sample,lab_internal_number,JERMVocab.Lab_internal_ID,l,,
