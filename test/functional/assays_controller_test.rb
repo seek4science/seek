@@ -404,7 +404,7 @@ end
     end
 
     assert flash[:error]
-    assert_redirected_to assays_path
+    assert_redirected_to a
   end
 
   test "should not delete assay when not project pal" do
@@ -417,7 +417,7 @@ end
     end
 
     assert flash[:error]
-    assert_redirected_to assays_path
+    assert_redirected_to a
   end
 
   test "should list correct organisms" do
@@ -481,7 +481,7 @@ end
       end
     end
     assert flash[:error]
-    assert_redirected_to assays_path
+    assert_redirected_to a
   end
 
   test "should not delete assay with model" do
@@ -494,7 +494,7 @@ end
     end
 
     assert flash[:error]
-    assert_redirected_to assays_path
+    assert_redirected_to a
   end
 
   test "should not delete assay with publication" do
@@ -507,7 +507,7 @@ end
     end
 
     assert flash[:error]
-    assert_redirected_to assays_path
+    assert_redirected_to a
   end
 
   test "should not delete assay with sops" do
@@ -520,7 +520,7 @@ end
     end
 
     assert flash[:error]
-    assert_redirected_to assays_path
+    assert_redirected_to a
   end
 
   test "get new presents options for class" do

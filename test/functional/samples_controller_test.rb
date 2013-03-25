@@ -248,7 +248,7 @@ class SamplesControllerTest < ActionController::TestCase
       delete :destroy, :id => s.id
     end
     assert flash[:error]
-    assert_redirected_to samples_path
+    assert_redirected_to s
   end
 
   test "only current user can delete sample" do
@@ -261,7 +261,7 @@ class SamplesControllerTest < ActionController::TestCase
       delete :destroy, :id => s.id
     end
     assert flash[:error]
-    assert_redirected_to samples_path
+    assert_redirected_to s
   end
 
   test "should not destroy sample related to an existing assay" do
@@ -270,7 +270,7 @@ class SamplesControllerTest < ActionController::TestCase
       delete :destroy, :id => s.id
     end
     assert flash[:error]
-    assert_redirected_to samples_path
+    assert_redirected_to s
   end
 
   test "should not show organism and strain information of a sample if there is no organism" do

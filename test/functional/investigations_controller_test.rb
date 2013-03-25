@@ -178,15 +178,16 @@ class InvestigationsControllerTest < ActionController::TestCase
       delete :destroy, :id => i.id
     end
     assert flash[:error]
-    assert_redirected_to investigations_path    
+    assert_redirected_to i
   end
 
   test "should not destroy investigation with a study" do
+    investigation = investigations(:metabolomics_investigation)
     assert_no_difference("Investigation.count") do
-      delete :destroy, :id => investigations(:metabolomics_investigation).id
+      delete :destroy, :id => investigation.id
     end
     assert flash[:error]
-    assert_redirected_to investigations_path    
+    assert_redirected_to investigation
   end
 
   test "option to delete investigation without study" do    
