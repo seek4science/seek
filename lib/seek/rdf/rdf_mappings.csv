@@ -26,7 +26,7 @@ Investigation,studies,JERMVocab.hasPart,u,,
 Model,assays,JERMVocab.isPartOf,u,,
 Model,projects,JERMVocab.itemProducedBy,u,,
 Organism,assays,JERMVocab.is_investigated_by,u,,
-Organism,ncbi_uri,JERMVocab.NCBI_ID,u,,compact
+Organism,ncbi_uri,JERMVocab.NCBI_ID,u,,
 Person,assays,JERMVocab.isContributorOf,u,,
 Person,assets,JERMVocab.isCreatorOf,u,,select{|item| !item.is_a?(Presentation)}
 Person,email_uri,RDF::FOAF.mbox_sha1sum,l,Digest::SHA1.hexdigest(item),
