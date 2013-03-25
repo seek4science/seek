@@ -298,6 +298,7 @@ module Acts
           self.contributor = default_contributor
         end
       end
+
       #(gatekeeper also manager) or (manager and projects have no gatekeeper) or (manager and the item was published)
       def can_publish? user=User.current_user
         if self.new_record?
@@ -318,12 +319,7 @@ module Acts
       end
 
       def perform_auth user,action
-        result = (Authorization.is_authorized? action, nil, self, user) || (Ability.new(user).can? action.to_sym, self) || (Ability.new(user).can? "#{action}_asset".to_sym, self)
-        if action == "delete" && !self.kind_of?(Publication)
-          result && !self.is_published?
-        else
-          result
-        end
+        (Authorization.is_authorized? action, nil, self, user) || (Ability.new(user).can? action.to_sym, self) || (Ability.new(user).can? "#{action}_asset".to_sym, self)
       end
 
       #returns a list of the people that can manage this file

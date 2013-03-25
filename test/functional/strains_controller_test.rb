@@ -102,7 +102,7 @@ class StrainsControllerTest < ActionController::TestCase
       delete :destroy, :id => s.id
     end
     assert flash[:error]
-    assert_redirected_to strains_path
+    assert_redirected_to s
   end
 
   test "contributor can delete strain" do
@@ -116,7 +116,7 @@ class StrainsControllerTest < ActionController::TestCase
       delete :destroy, :id => s.id
     end
     assert flash[:error]
-    assert_redirected_to strains_path
+    assert_redirected_to s
   end
 
   test "should not destroy strain related to an existing specimen" do
@@ -127,7 +127,7 @@ class StrainsControllerTest < ActionController::TestCase
       delete :destroy, :id => strain.id
     end
     assert flash[:error]
-    assert_redirected_to strains_path
+    assert_redirected_to strain
   end
 
   test "should update genotypes and phenotypes" do

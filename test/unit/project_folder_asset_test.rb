@@ -22,14 +22,12 @@ class ProjectFolderAssetTest < ActiveSupport::TestCase
 
   test "dependents destroyed" do
     pf = Factory :project_folder
-    sop = Factory :sop,:policy=>Factory(:all_sysmo_viewable_policy),:projects=>[pf.project]
+    sop = Factory :sop,:policy=>Factory(:public_policy),:projects=>[pf.project]
+    pfa = ProjectFolderAsset.create :asset=>sop,:project_folder=>pf
 
-    User.with_current_user sop.contributor do
-      pfa = ProjectFolderAsset.create :asset=>sop,:project_folder=>pf
-      assert_difference("ProjectFolderAsset.count", -1) do
-        sop.destroy
-        assert_nil ProjectFolderAsset.find_by_id(pfa.id)
-      end
+    assert_difference("ProjectFolderAsset.count",-1) do
+      sop.destroy
+      assert_nil ProjectFolderAsset.find_by_id(pfa.id)
     end
 
     pf = Factory :project_folder

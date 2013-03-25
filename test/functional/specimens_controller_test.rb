@@ -125,7 +125,7 @@ class SpecimensControllerTest < ActionController::TestCase
       delete :destroy, :id => s.id
     end
     assert flash[:error]
-    assert_redirected_to specimens_path
+    assert_redirected_to s
   end
 
   test "only current user can delete specimen" do
@@ -140,7 +140,7 @@ class SpecimensControllerTest < ActionController::TestCase
       delete :destroy, :id => s.id
     end
     assert flash[:error]
-    assert_redirected_to specimens_path
+    assert_redirected_to s
   end
   test "should not destroy specimen related to an existing sample" do
     sample = Factory :sample
@@ -150,7 +150,7 @@ class SpecimensControllerTest < ActionController::TestCase
       delete :destroy, :id => specimen.id
     end
     assert flash[:error]
-    assert_redirected_to specimens_path
+    assert_redirected_to specimen
   end
 
   test "should create specimen with strings for confluency passage viability and purity" do
