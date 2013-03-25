@@ -171,14 +171,16 @@ class AssetTest < ActiveSupport::TestCase
   test "is_published?" do
     User.with_current_user Factory(:user) do
       public_sop=Factory(:sop,:policy=>Factory(:public_policy,:access_type=>Policy::ACCESSIBLE))
-      private_model=Factory(:model,:policy=>Factory(:private_policy))
+      not_public_model=Factory(:model,:policy=>Factory(:public_policy, :access_type=>Policy::VISIBLE))
       public_datafile=Factory(:data_file,:policy=>Factory(:public_policy))
-      registered_only_assay=Factory(:assay,:policy=>Factory(:public_policy, :sharing_scope=>Policy::ALL_SYSMO_USERS))
+      public_assay=Factory(:assay,:policy=>Factory(:public_policy, :access_type=>Policy::VISIBLE))
+      not_public_sample=Factory(:sample,:policy=>Factory(:all_sysmo_viewable_policy))
 
       assert public_sop.is_published?
-      assert !private_model.is_published?
+      assert !not_public_model.is_published?
       assert public_datafile.is_published?
-      assert !registered_only_assay.is_published?
+      assert public_assay.is_published?
+      assert !not_public_sample.is_published?
     end
   end
 

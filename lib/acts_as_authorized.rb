@@ -48,7 +48,11 @@ module Acts #:nodoc:
       end
 
       def is_published?
-        can_view? nil
+        if self.is_downloadable?
+          can_download? nil
+        else
+          can_view? nil
+        end
       end
 
       def can_send_publishing_request?(user=User.current_user)
