@@ -87,25 +87,25 @@ class StrainTest < ActiveSupport::TestCase
   end
 
   test 'should only allow to delete strain which has no specimen' do
-    strain = Factory(:strain, :policy => Factory(:all_sysmo_viewable_policy))
+    strain = Factory(:strain)
     assert strain.specimens.empty?
-    assert strain.can_delete?(strain.contributor)
+    assert strain.can_delete?
 
     Factory :specimen, :strain_id => strain.id
 
     strain.reload
     assert !strain.specimens.empty?
-    assert !strain.can_delete?(strain.contributor)
+    assert !strain.can_delete?
   end
 
   test 'should allow to delete strain which has dummy specimen and no sample attach to this specimen' do
-    strain = Factory(:strain, :policy => Factory(:all_sysmo_viewable_policy))
+    strain = Factory(:strain)
     Factory :specimen, :strain_id => strain.id, :is_dummy => true
     strain.reload
 
     assert !strain.specimens.empty?
     assert strain.specimens.first.samples.empty?
-    assert strain.can_delete?(strain.contributor)
+    assert strain.can_delete?
   end
 
   test "validation" do
