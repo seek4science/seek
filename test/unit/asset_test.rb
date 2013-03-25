@@ -294,15 +294,4 @@ class AssetTest < ActiveSupport::TestCase
     assert_equal publication.creators,publication.related_people
   end
 
-  #chang the behavior for can_delete? so it also depends on the publish status of an item
-  test "can_delete?" do
-    df = Factory :data_file
-    assert !df.is_published?
-    assert df.can_delete?(df.contributor)
-    df.policy = Factory :public_policy
-    df.save
-    assert df.is_published?
-    assert !df.can_delete?(df.contributor)
-  end
-
 end
