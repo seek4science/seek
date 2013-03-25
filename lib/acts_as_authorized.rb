@@ -51,8 +51,8 @@ module Acts #:nodoc:
         can_view? nil
       end
 
-      def publish_authorized?(user=User.current_user)
-         can_publish?(user) || (can_manage?(user) && ResourcePublishLog.last_waiting_approval_log(self,user).nil?)
+      def can_send_publishing_request?(user=User.current_user)
+        can_manage?(user) && ResourcePublishLog.last_waiting_approval_log(self,user).nil?
       end
 
       #the asset that can be published together with publishing the whole ISA

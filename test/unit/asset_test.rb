@@ -206,15 +206,11 @@ class AssetTest < ActiveSupport::TestCase
     assert !Factory(:publication).is_in_isa_publishable?
   end
 
-  test "publish_authorized?" do
+  test "can_send_publishing_request?" do
     assay = Factory(:assay)
     user = assay.owner.user
 
-    #publish_authoried? if can_publish?
-    assay.can_publish?(user)
-    assay.publish_authorized?(user)
-
-    #publilsh authorized? if there is gatekeeper and can_manage? and the publishing request has not been sent
+    #can_send_publishing_request? if there is gatekeeper and can_manage? and the publishing request has not been sent
     gatekeeper = Factory(:gatekeeper)
     assay.projects << gatekeeper.projects.first
     assert assay.save
@@ -222,17 +218,17 @@ class AssetTest < ActiveSupport::TestCase
     assert !assay.can_publish?(user)
     assert assay.can_manage?(user)
     assert ResourcePublishLog.last_waiting_approval_log(assay,user).nil?
-    assert assay.publish_authorized?(user)
+    assert assay.can_send_publishing_request?(user)
 
-    #not publilsh authorized? if there is gatekeeper and can_manage? and the publishing request was sent
+    #not can_send_publishing_request? if there is gatekeeper and can_manage? and the publishing request was sent
     ResourcePublishLog.add_publish_log(ResourcePublishLog::WAITING_FOR_APPROVAL,assay,user)
     assert !ResourcePublishLog.last_waiting_approval_log(assay,user).nil?
-    assert !assay.publish_authorized?(user)
+    assert !assay.can_send_publishing_request?(user)
 
-    #not publilsh authorized? if can not manage
+    #not can_send_publishing_request? if can not manage
     other_user = Factory(:user)
     assert !assay.can_manage?(other_user)
-    assert !assay.publish_authorized?(other_user)
+    assert !assay.can_send_publishing_request?(other_user)
   end
 
   test "managers" do

@@ -209,7 +209,7 @@ class SinglePublishingTest < ActionController::TestCase
   test "do publish" do
     df=data_file_for_publishing
     assert !df.is_published?,"The data file must not be already published for this test to succeed"
-    assert df.publish_authorized?,"The data file must be publishable for this test to succeed"
+    assert df.can_publish?,"The data file must be publishable for this test to succeed"
 
     params={:publish=>{}}
     params[:publish][df.class.name]||={}

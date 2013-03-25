@@ -42,7 +42,7 @@ class BatchPublishingTest < ActionController::TestCase
     send_request_assets = can_send_request_assets
     send_request_assets.each do |a|
       assert !a.can_publish?,"The asset must not be publishable immediately for this test to succeed"
-      assert a.publish_authorized?,"The publish request for this asset must be able to be sent for this test to succeed"
+      assert a.can_send_publishing_request?,"The publish request for this asset must be able to be sent for this test to succeed"
     end
     total_asset_count = (publish_immediately_assets + send_request_assets).count
 
@@ -76,7 +76,7 @@ class BatchPublishingTest < ActionController::TestCase
                              :contributor=> User.current_user,
                              :policy => Factory(:public_policy))
     assert published_item.is_published?, "This data file must be published for the test to succeed"
-    assert published_item.publish_authorized?, "This data file must be publish_authorized for the test to be meaningful"
+    assert published_item.can_publish?, "This data file must be publishable for the test to be meaningful"
 
     get :batch_publishing_preview, :id => User.current_user.person.id
     assert_response :success
@@ -87,7 +87,8 @@ class BatchPublishingTest < ActionController::TestCase
 
   test "do not have not_publish_authorized items in batch_publishing_preview" do
     item = Factory(:data_file, :policy => Factory(:all_sysmo_viewable_policy))
-    assert !item.publish_authorized?, "This data file must not be publish_authorized for the test to succeed"
+    assert !item.can_publish?, "This data file must not be publishable for the test to succeed"
+    assert !item.can_send_publishing_request?, "The publishing request must not be able to send for the test to succeed"
     assert !item.is_published?, "This data file must not be published for the test to be meaningful"
 
     get :batch_publishing_preview, :id => User.current_user.person.id
@@ -99,7 +100,7 @@ class BatchPublishingTest < ActionController::TestCase
 
   test "do not have not_publishable_type item in batch_publishing_preview" do
     item = Factory(:sample, :contributor => User.current_user)
-    assert item.publish_authorized?, "This data file must be publish_authorized for the test to be meaningful"
+    assert item.can_publish?, "This data file must be publishable for the test to be meaningful"
     assert !item.is_published?, "This data file must not be published for the test to be meaningful"
 
     get :batch_publishing_preview, :id => User.current_user.person.id
@@ -120,7 +121,7 @@ class BatchPublishingTest < ActionController::TestCase
     send_request_assets = can_send_request_assets
     send_request_assets.each do |a|
       assert !a.can_publish?,"The asset must not be publishable immediately for this test to succeed"
-      assert a.publish_authorized?,"The publish request for this asset must be able to be sent for this test to succeed"
+      assert a.can_send_publishing_request?,"The publish request for this asset must be able to be sent for this test to succeed"
     end
 
     total_assets = publish_immediately_assets + send_request_assets
@@ -156,7 +157,7 @@ class BatchPublishingTest < ActionController::TestCase
                              :contributor=> User.current_user,
                              :policy => Factory(:public_policy))
     assert published_item.is_published?, "This data file must be published for the test to succeed"
-    assert published_item.publish_authorized?, "This data file must be publish_authorized for the test to be meaningful"
+    assert published_item.can_publish?, "This data file must be publishable for the test to be meaningful"
 
     params={:publish=>{}}
     params[:publish][published_item.class.name]||={}

@@ -80,12 +80,13 @@ module Seek
       end
 
       def set_assets
-        #get the assets that current_user can manage, then take the one that (is not yet published and is publish_authorized)
+        #get the assets that current_user can manage, then take the one that (is not yet published and is publishable)
         @assets = {}
         publishable_types = Seek::Util.authorized_types.select {|c| c.first.try(:is_in_isa_publishable?)}
         publishable_types.each do |klass|
           can_manage_assets = klass.all_authorized_for "manage", current_user
-          can_manage_assets = can_manage_assets.select{|a| !a.is_published? && a.publish_authorized?}
+          can_manage_assets = can_manage_assets.select{|a| !a.is_published?}
+          can_manage_assets = can_manage_assets.select{|a| a.can_publish? || a.can_send_publishing_request?}
           unless can_manage_assets.empty?
             @assets[klass.name] = can_manage_assets
           end
@@ -96,9 +97,8 @@ module Seek
         items_for_publishing = resolve_publish_params params[:publish]
         items_for_publishing = items_for_publishing.select{|i| !i.is_published?}
         @notified_items = items_for_publishing.select{|i| !i.can_manage?}
-        publish_authorized_items = (items_for_publishing - @notified_items).select(&:publish_authorized?)
-        @published_items = publish_authorized_items.select(&:can_publish?)
-        @waiting_for_publish_items = publish_authorized_items - @published_items
+        @published_items = items_for_publishing.select(&:can_publish?)
+        @waiting_for_publish_items = items_for_publishing - @published_items - @notified_items
 
         if Seek::Config.email_enabled && !@notified_items.empty?
           deliver_publishing_notifications @notified_items
