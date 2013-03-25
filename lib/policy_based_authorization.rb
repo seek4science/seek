@@ -191,10 +191,6 @@ module Acts
 
       end
 
-      def can_delete? user=User.current_user
-        !self.is_published? && super
-      end
-
       #allows access to each permission in a single database call (rather than calling can_download? can_edit? etc individually)
       def authorization_permissions user=User.current_user
         @@expected_true_value ||= ActiveRecord::Base.connection.quoted_true.gsub("'","")
@@ -302,6 +298,7 @@ module Acts
           self.contributor = default_contributor
         end
       end
+
       #(gatekeeper also manager) or (manager and projects have no gatekeeper) or (manager and the item was published)
       def can_publish? user=User.current_user
         if self.new_record?
