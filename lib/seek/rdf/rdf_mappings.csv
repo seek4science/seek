@@ -29,7 +29,8 @@ Organism,assays,JERMVocab.is_investigated_by,u,,
 Organism,ncbi_uri,JERMVocab.NCBI_ID,u,,compact
 Person,assays,JERMVocab.isContributorOf,u,,
 Person,assets,JERMVocab.isCreatorOf,u,,select{|item| !item.is_a?(Presentation)}
-Person,email,RDF::FOAF.mbox,u,'mailto:'+item,
+Person,email_uri,RDF::FOAF.mbox_sha1sum,l,Digest::SHA1.hexdigest(item),
+Person,email_uri,RDF::FOAF.mbox,u,,
 Person,first_name,RDF::FOAF.firstName,l,,
 Person,investigations,JERMVocab.isContributorOf,u,,
 Person,last_name,RDF::FOAF.familyName,l,,
