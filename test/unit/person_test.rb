@@ -28,7 +28,7 @@ class PersonTest < ActiveSupport::TestCase
   end
 
   test "to_rdf" do
-    object = Factory :person, :skype_name=>"skypee"
+    object = Factory :person, :skype_name=>"skypee",:email=>"sdkfhsd22fkhfsd@sdkfsdkhfkhsdf.com"
     Factory(:study,:contributor=>object)
     Factory(:investigation,:contributor=>object)
     Factory(:assay,:contributor=>object)
@@ -46,8 +46,15 @@ class PersonTest < ActiveSupport::TestCase
     RDF::Reader.for(:rdfxml).new(rdf) do |reader|
       assert reader.statements.count > 1
       assert_equal RDF::URI.new("http://localhost:3000/people/#{object.id}"), reader.statements.first.subject
+      assert reader.has_triple? ["http://localhost:3000/people/#{object.id}",RDF::FOAF.mbox_sha1sum,"b507549e01d249ee5ed98bd40e4d86d1470a13b8"]
     end
   end
+
+  test "email uri" do
+    p = Factory :person, :email=>"sfkh^sd@weoruweoru.com"
+    assert_equal "mailto:sfkh%5Esd@weoruweoru.com",p.email_uri
+  end
+
 
   test "only first admin person" do
     Person.delete_all

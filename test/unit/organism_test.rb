@@ -25,9 +25,11 @@ class OrganismTest < ActiveSupport::TestCase
     object.bioportal_concept = Factory(:bioportal_concept)
     object.save
     rdf = object.to_rdf
+
     RDF::Reader.for(:rdfxml).new(rdf) do |reader|
       assert reader.statements.count >= 1
       assert_equal RDF::URI.new("http://localhost:3000/organisms/#{object.id}"), reader.statements.first.subject
+      assert reader.has_triple? ["http://localhost:3000/organisms/#{object.id}",Seek::Rdf::JERMVocab.NCBI_ID,"http://purl.obolibrary.org/obo/NCBITaxon_2287"]
     end
   end
 

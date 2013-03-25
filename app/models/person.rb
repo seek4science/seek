@@ -38,6 +38,10 @@ class Person < ActiveRecord::Base
     self
   end
 
+  def email_uri
+    URI.escape("mailto:"+email)
+  end
+
   #grouped_pagination :pages=>("A".."Z").to_a #shouldn't need "Other" tab for people
   #load the configuration for the pagination
   grouped_pagination :pages=>("A".."Z").to_a, :default_page => Seek::Config.default_page(self.name.underscore.pluralize)

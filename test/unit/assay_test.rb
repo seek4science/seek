@@ -19,8 +19,6 @@ class AssayTest < ActiveSupport::TestCase
     assert assay.sops.include?(sops(:sop_with_fully_public_policy).versions.first)
   end
 
-
-
   test "to_rdf" do
     assay = Factory :assay, :assay_type=>Factory(:assay_type), :technology_type=>Factory(:technology_type)
     Factory :assay_organism, :assay=>assay, :organism=>Factory(:organism)
