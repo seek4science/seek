@@ -191,10 +191,6 @@ module Acts
 
       end
 
-      def can_delete? user=User.current_user
-        !self.is_published? && super
-      end
-
       #allows access to each permission in a single database call (rather than calling can_download? can_edit? etc individually)
       def authorization_permissions user=User.current_user
         @@expected_true_value ||= ActiveRecord::Base.connection.quoted_true.gsub("'","")
@@ -322,7 +318,12 @@ module Acts
       end
 
       def perform_auth user,action
-        (Authorization.is_authorized? action, nil, self, user) || (Ability.new(user).can? action.to_sym, self) || (Ability.new(user).can? "#{action}_asset".to_sym, self)
+        result = (Authorization.is_authorized? action, nil, self, user) || (Ability.new(user).can? action.to_sym, self) || (Ability.new(user).can? "#{action}_asset".to_sym, self)
+        if action == "delete"
+          result && !self.is_published?
+        else
+          result
+        end
       end
 
       #returns a list of the people that can manage this file
