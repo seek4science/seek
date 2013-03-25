@@ -28,7 +28,7 @@ class PersonTest < ActiveSupport::TestCase
   end
 
   test "to_rdf" do
-    object = Factory :person, :skype_name=>"skypee"
+    object = Factory :person, :skype_name=>"skypee",:email=>"sdkfhsd22fkhfsd@sdkfsdkhfkhsdf.com"
     Factory(:study,:contributor=>object)
     Factory(:investigation,:contributor=>object)
     Factory(:assay,:contributor=>object)
@@ -46,7 +46,7 @@ class PersonTest < ActiveSupport::TestCase
     RDF::Reader.for(:rdfxml).new(rdf) do |reader|
       assert reader.statements.count > 1
       assert_equal RDF::URI.new("http://localhost:3000/people/#{object.id}"), reader.statements.first.subject
-      assert reader.has_triple? ["http://localhost:3000/people/#{object.id}",RDF::FOAF.mbox_sha1sum,"2d5b84432d5ecb904e6ad83246578700254c4df7"]
+      assert reader.has_triple? ["http://localhost:3000/people/#{object.id}",RDF::FOAF.mbox_sha1sum,"b507549e01d249ee5ed98bd40e4d86d1470a13b8"]
     end
   end
 
