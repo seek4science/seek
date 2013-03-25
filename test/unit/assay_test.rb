@@ -19,8 +19,6 @@ class AssayTest < ActiveSupport::TestCase
     assert assay.sops.include?(sops(:sop_with_fully_public_policy).versions.first)
   end
 
-
-
   test "to_rdf" do
     assay = Factory :assay, :assay_type=>Factory(:assay_type), :technology_type=>Factory(:technology_type)
     Factory :assay_organism, :assay=>assay, :organism=>Factory(:organism)
@@ -30,7 +28,7 @@ class AssayTest < ActiveSupport::TestCase
     assay.reload
     assert_equal 1,assay.assets.size
     rdf = assay.to_rdf
-
+    puts rdf
     RDF::Reader.for(:rdfxml).new(rdf) do |reader|
       assert reader.statements.count > 1
       assert_equal RDF::URI.new("http://localhost:3000/assays/#{assay.id}"), reader.statements.first.subject

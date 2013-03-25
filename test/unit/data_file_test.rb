@@ -241,6 +241,7 @@ class DataFileTest < ActiveSupport::TestCase
     Factory :relationship,:subject=>df,:predicate=>Relationship::RELATED_TO_PUBLICATION,:object=>pub
     df.reload
     rdf = df.to_rdf
+    puts rdf
     assert_not_nil rdf
     #just checks it is valid rdf/xml and contains some statements for now
     RDF::Reader.for(:rdfxml).new(rdf) do |reader|
