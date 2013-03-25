@@ -221,19 +221,21 @@ class StudiesControllerTest < ActionController::TestCase
 
   test "study non project member cannot delete even if no assays" do
     login_as(:aaron)
+    study = studies(:study_with_no_assays)
     assert_no_difference('Study.count') do
-      delete :destroy, :id => studies(:study_with_no_assays).id
+      delete :destroy, :id => study.id
     end
     assert flash[:error]
-    assert_redirected_to studies_path
+    assert_redirected_to study
   end
   
-  test "study project member cannot delete if assays associated" do    
+  test "study project member cannot delete if assays associated" do
+    study = studies(:metabolomics_study)
     assert_no_difference('Study.count') do
-      delete :destroy, :id => studies(:metabolomics_study).id
+      delete :destroy, :id => study.id
     end
     assert flash[:error]
-    assert_redirected_to studies_path
+    assert_redirected_to study
   end
   
   def test_should_add_nofollow_to_links_in_show_page
