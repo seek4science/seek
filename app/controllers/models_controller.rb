@@ -599,7 +599,7 @@ class ModelsController < ApplicationController
     data_files = matched_data_files.collect do |mdf|
       DataFile.find(mdf.primary_key)
     end
-    authorized_data_file_ids = DataFile.authorized_partial_asset_collection(data_files, 'view', current_user).collect(&:id)
+    authorized_data_file_ids = DataFile.authorize_asset_collection(data_files, 'view', current_user).collect(&:id)
     authorized_matching_data_files =  matched_data_files.select{|mdf| authorized_data_file_ids.include?(mdf.primary_key.to_i)}
 
     render :update do |page|

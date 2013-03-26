@@ -167,7 +167,7 @@ module AssetsHelper
           end
         else
           total = res[:items]
-          res[:items] = key.constantize.authorized_partial_asset_collection res[:items],'view',User.current_user
+          res[:items] = key.constantize.authorize_asset_collection res[:items],'view',User.current_user
           res[:hidden_count] = total_count - res[:items].size
           res[:hidden_items] = total - res[:items]
         end

@@ -9,7 +9,6 @@ module Seek
 
       def self.included klass
         attr_accessor :permission_for
-        klass.extend ClassMethods
         klass.extend AuthLookupClassMethods
         klass.class_eval do
           belongs_to :contributor, :polymorphic => true unless method_defined? :contributor
@@ -34,15 +33,44 @@ module Seek
         end
       end
 
-      module ClassMethods
+      #the can_#{action}? methods are split into 2 parts, to differentiate between pure authorization and additional permissions based upon the state of the object or other objects it depends upon)
+      #for example, an assay may not be deleted if it is linked to assets, even though the authorization of the user wishing to do so allows it - meaning the authorization passes, but its current state does not
+      #therefore the can_#{action} depends upon 2 pairs of methods returning true:
+      # - authorized_for_#{action}? - to check that the user specified is actually authorized to carry out that action on the item
+      # - state_allows_#{action} - to chekc that the state of the object allows that action to proceed
+      #
+      #by default state_allows_#{action} always returns true, but can be overridden in the particular model type to tune its behaviour
+      AUTHORIZATION_ACTIONS.each do |action|
+        eval <<-END_EVAL
+            def can_#{action}? user = User.current_user
+              authorized_for_#{action}?(user) && state_allows_#{action}?(user)
+            end
 
+            def authorized_for_#{action}? user = User.current_user
+                return true if new_record?
+                user_id = user.nil? ? 0 : user.id
+                if Seek::Config.auth_lookup_enabled
+                  lookup = self.class.lookup_for_asset("#{action}", user_id,self.id)
+                else
+                  lookup=nil
+                end
+                if lookup.nil?
+                  authorized_for_action(user,"#{action}")
+                else
+                  lookup
+                end
+            end
+        END_EVAL
       end
+
+
 
       module AuthLookupClassMethods
 
         #returns all the authorised items for a given action and optionally a user and set of projects. If user is nil, the items authorised for an
         #anonymous user are returned. If one or more projects are provided, then only the assets linked to those projects are included.
-        def all_authorized_for action, user=User.current_user, projects=nil
+        # if filter_by_permissions is true, then as well as the authorization the state based permissions will also be applied
+        def all_authorized_for action, user=User.current_user, projects=nil, filter_by_permissions=true
           projects=Array(projects) unless projects.nil?
           user_id = user.nil? ? 0 : user.id
           assets = []
@@ -53,12 +81,17 @@ module Seek
               assets = lookup_for_action_and_user action, user_id, projects
             else
               Rails.logger.info("Lookup table #{lookup_table_name} is incomplete for user_id = #{user_id} - doing things the slow way")
-              assets = all.select { |df| df.send("can_#{action}?",user) }
+              assets = all.select { |df| df.send("authorized_for_#{action}?",user) }
               programatic_project_filter = !projects.nil?
             end
           else
-            assets = all.select { |df| df.send("can_#{action}?",user) }
+            assets = all.select { |df| df.send("authorized_for_#{action}?",user) }
           end
+
+          if filter_by_permissions
+            assets = assets.select{|a| a.send("state_allows_#{action}?",user)}
+          end
+
           if programatic_project_filter
             assets.select { |a| !(a.projects & projects).empty? }
           else
@@ -67,19 +100,23 @@ module Seek
         end
 
         #returns the authorised items from the array of the same class items for a given action and optionally a user. If user is nil, the items authorised for an
-        #anonymous user are returned.
-        def authorized_partial_asset_collection partial_asset_collection, action, user=User.current_user
+        #anonymous user are returned. All assets must be of the same type and match the asset class this method was called on
+        # if filter_by_permissions is true, then as well as the authorization the state based permissions will also be applied
+        def authorize_asset_collection assets, action, user=User.current_user,filter_by_permissions=true
           user_id = user.nil? ? 0 : user.id
           if Seek::Config.auth_lookup_enabled && self.lookup_table_consistent?(user_id)
-            ids=partial_asset_collection.collect{|asset| asset.id}
+            ids=assets.collect{|asset| asset.id}
             clause = "asset_id IN (#{ids.join(',')})"
             sql =  "SELECT asset_id from #{lookup_table_name} WHERE user_id = #{user_id} AND (#{clause}) AND can_#{action}=#{ActiveRecord::Base.connection.quoted_true}"
             ids = ActiveRecord::Base.connection.select_all(sql).collect{|k| k["asset_id"]}
-            authorized_partial_asset_collection = partial_asset_collection.select{|asset| ids.include?(asset.id.to_s)}
+            assets = assets.select{|asset| ids.include?(asset.id.to_s)}
           else
-            authorized_partial_asset_collection = partial_asset_collection.select{|a| a.send("can_#{action}?",user)}
+            assets = assets.select{|a| a.send("authorized_for_#{action}?",user)}
           end
-          authorized_partial_asset_collection
+          if filter_by_permissions
+            assets = assets.select{|a| a.send("state_allows_#{action}?",user)}
+          end
+          assets
         end
 
         #determines whether the lookup table records are consistent with the number of asset items in the database and the last id of the item added
@@ -167,30 +204,6 @@ module Seek
       def remove_from_lookup_table
         id=self.id
         ActiveRecord::Base.connection.execute("delete from #{self.class.lookup_table_name} where asset_id=#{id}")
-      end
-
-      AUTHORIZATION_ACTIONS.each do |action|
-        eval <<-END_EVAL
-            def can_#{action}? user = User.current_user
-              authorized_for_#{action}?(user) && state_allows_#{action}?(user)
-            end
-
-            def authorized_for_#{action}? user = User.current_user
-                return true if new_record?
-                user_id = user.nil? ? 0 : user.id
-                if Seek::Config.auth_lookup_enabled
-                  lookup = self.class.lookup_for_asset("#{action}", user_id,self.id)
-                else
-                  lookup=nil
-                end
-                if lookup.nil?
-                  authorized_for_action(user,"#{action}")
-                else
-                  lookup
-                end
-            end
-        END_EVAL
-
       end
 
       #allows access to each permission in a single database call (rather than calling can_download? can_edit? etc individually)
