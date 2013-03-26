@@ -107,8 +107,8 @@ class Assay < ActiveRecord::Base
     "#{title} (#{type})"
   end
 
-  def can_delete? *args
-    super && assets.empty? && related_publications.empty?
+  def state_allows_delete? *args
+    assets.empty? && related_publications.empty? && super
   end
 
   #returns true if this is a modelling class of assay

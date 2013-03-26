@@ -48,7 +48,7 @@ class Study < ActiveRecord::Base
     END_EVAL
   end
 
-  def can_delete? *args
+  def state_allows_delete? *args
     assays.empty? && super
   end
 

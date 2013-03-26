@@ -131,7 +131,7 @@ class Specimen < ActiveRecord::Base
       age.nil? ? "" : "#{age}(#{age_unit}s)"
   end
 
-  def can_delete? user=User.current_user
+  def state_allows_delete? user=User.current_user
     samples.empty? && super
   end
 

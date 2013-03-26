@@ -101,7 +101,7 @@ class Sample < ActiveRecord::Base
     text
   end
 
- def can_delete? *args
+ def state_allows_delete? *args
    assays.empty? && super
  end
 

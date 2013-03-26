@@ -24,8 +24,8 @@ class Organism < ActiveRecord::Base
     end
   end
   
-  def can_delete? *args
-    models.empty? && assays.empty? && projects.empty?
+  def state_allows_delete? *args
+    models.empty? && assays.empty? && projects.empty? && super
   end
 
   def searchable_terms

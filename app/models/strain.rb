@@ -109,8 +109,8 @@ class Strain < ActiveRecord::Base
     parent_strain.nil? ? '' : (parent_strain.title + "(Seek ID=#{parent_strain.id})")
   end
 
-  def can_delete? *args
-    super && (specimens.empty? || ((specimens.count == 1) && specimens.first.is_dummy? && specimens.first.samples.empty?))
+  def state_allows_delete? *args
+    (specimens.empty? || ((specimens.count == 1) && specimens.first.is_dummy? && specimens.first.samples.empty?)) && super
   end
 
   def destroy_genotypes_phenotypes

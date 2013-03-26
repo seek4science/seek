@@ -21,7 +21,7 @@ class Investigation < ActiveRecord::Base
     text :description,:title
   end if Seek::Config.solr_enabled
 
-  def can_delete? *args
+  def state_allows_delete? *args
     studies.empty? && super
   end
   
