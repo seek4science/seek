@@ -1,4 +1,4 @@
-require 'acts_as_authorized'
+
 require 'grouped_pagination'
 require 'only_writes_unique'
 

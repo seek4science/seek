@@ -1,4 +1,4 @@
-require 'acts_as_authorized'
+
 class Study < ActiveRecord::Base
 
   include Seek::Rdf::RdfGeneration

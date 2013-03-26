@@ -1,6 +1,6 @@
 require 'project_compat'
-module Acts
-  module Authorized
+module Seek
+  module Permissions
     module PolicyBasedAuthorization
 
       class AuthPermissions < Struct.new :can_view,:can_download,:can_edit,:can_manage,:can_delete

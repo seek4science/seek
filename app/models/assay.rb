@@ -1,4 +1,4 @@
-require 'acts_as_authorized'
+
 
 class Assay < ActiveRecord::Base
 

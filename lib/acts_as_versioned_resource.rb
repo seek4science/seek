@@ -50,7 +50,7 @@ module Acts #:nodoc:
         self.parent.attributions.collect { |a| a.object }
       end
 
-      Acts::Authorized::AUTHORIZATION_ACTIONS.each do |action|
+      Seek::Permissions::AUTHORIZATION_ACTIONS.each do |action|
         eval <<-END_EVAL
           def can_#{action}? user = User.current_user
             self.parent.can_perform? '#{action}', user

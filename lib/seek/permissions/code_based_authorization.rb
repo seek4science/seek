@@ -1,6 +1,6 @@
 #allows the current
-module Acts
-  module Authorized
+module Seek
+  module Permissions
     module CodeBasedAuthorization
       def self.included klass
         klass.extend ClassMethods

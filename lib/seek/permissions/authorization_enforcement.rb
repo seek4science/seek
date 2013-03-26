@@ -15,8 +15,8 @@
 #       Attempting to set @data_file.events = [@event] can be partially successful, removing/adding events which do
 #       return true for can_view? while ignoring the rest.
 
-module Acts
-  module Authorized
+module Seek
+  module Permissions
     module AuthorizationEnforcement
       def self.included ar
         ar.const_get(:Base).class_eval { include BaseExtensions }

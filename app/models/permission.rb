@@ -48,7 +48,7 @@ class Permission < ActiveRecord::Base
 
 
   def allows_action? action, person
-    Authorization.access_type_allows_action? action, access_type_for(person)
+    Seek::Permissions::Authorization.access_type_allows_action? action, access_type_for(person)
   end
 
   def access_type_for person

@@ -1,5 +1,5 @@
 require 'grouped_pagination'
-require 'acts_as_authorized'
+
 
 class Sample < ActiveRecord::Base
  include Subscribable

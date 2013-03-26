@@ -1,6 +1,7 @@
 require 'test_helper'
 
 class AuthorizationTest < ActiveSupport::TestCase
+  include Seek::Permissions
   fixtures :all
   
   # ************************************************************************

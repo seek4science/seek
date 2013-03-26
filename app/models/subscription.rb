@@ -1,4 +1,4 @@
-require 'acts_as_authorized'
+
 class Subscription < ActiveRecord::Base
   belongs_to :person, :required_access => false
   belongs_to :subscribable, :required_access => false, :polymorphic => true

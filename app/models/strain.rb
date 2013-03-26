@@ -1,5 +1,4 @@
 require 'grouped_pagination'
-require 'acts_as_authorized'
 
 class Strain < ActiveRecord::Base
   include Seek::Rdf::RdfGeneration

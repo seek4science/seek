@@ -6,7 +6,6 @@ module Seek
         base.before_filter :set_assets, :only=>[:batch_publishing_preview]
         base.before_filter :single_publish_auth, :only=>[:single_publishing_preview,:publish]
         base.before_filter :batch_publish_auth, :only=>[:batch_publishing_preview,:publish]
-        #request_publish_approval has to be before log_publishing, coz relying on log
         base.after_filter :request_publish_approval,:log_publishing, :only=>[:create,:update]
       end
 

@@ -1,5 +1,5 @@
-module Acts
-  module Authorized
+module Seek
+  module Permissions
     module StateBasedPermissions
       def self.included klass
         AUTHORIZATION_ACTIONS.each do |action|

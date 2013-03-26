@@ -1,6 +1,6 @@
 require 'grouped_pagination'
-require 'acts_as_authorized'
 require 'subscribable'
+
 class Specimen < ActiveRecord::Base
   include Subscribable
 
