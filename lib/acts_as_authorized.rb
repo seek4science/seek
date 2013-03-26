@@ -65,6 +65,7 @@ module Acts #:nodoc:
         def acts_as_authorized
           include Acts::Authorized::PolicyBasedAuthorization
           include Acts::Authorized::CodeBasedAuthorization
+          include Acts::Authorized::StateBasedPermissions
         end
 
         def authorization_supported?
@@ -78,6 +79,7 @@ end
 require 'authorization_enforcement'
 require 'policy_based_authorization'
 require 'code_based_authorization'
+require 'state_based_permissions'
 
 ActiveRecord.module_eval do
   include Acts::Authorized

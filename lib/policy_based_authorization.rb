@@ -31,8 +31,6 @@ module Acts
             #autosaved belongs_to associations get saved before the parent, so to check if it has changed, see if it has a newer updated_at
             update_timestamp if updated_at && policy.updated_at > updated_at
           end
-
-
         end
       end
 
@@ -174,6 +172,10 @@ module Acts
       AUTHORIZATION_ACTIONS.each do |action|
         eval <<-END_EVAL
             def can_#{action}? user = User.current_user
+              authorized_for_#{action}?(user) && state_allows_#{action}?(user)
+            end
+
+            def authorized_for_#{action}? user = User.current_user
                 return true if new_record?
                 user_id = user.nil? ? 0 : user.id
                 if Seek::Config.auth_lookup_enabled
@@ -182,7 +184,7 @@ module Acts
                   lookup=nil
                 end
                 if lookup.nil?
-                  perform_auth(user,"#{action}")
+                  authorized_for_action(user,"#{action}")
                 else
                   lookup
                 end
@@ -230,11 +232,11 @@ module Acts
       def update_lookup_table user=nil
         user_id = user.nil? ? 0 : user.id
 
-        can_view = ActiveRecord::Base.connection.quote perform_auth(user,"view")
-        can_edit = ActiveRecord::Base.connection.quote perform_auth(user,"edit")
-        can_download = ActiveRecord::Base.connection.quote perform_auth(user,"download")
-        can_manage = ActiveRecord::Base.connection.quote perform_auth(user,"manage")
-        can_delete = ActiveRecord::Base.connection.quote perform_auth(user,"delete")
+        can_view = ActiveRecord::Base.connection.quote authorized_for_action(user,"view")
+        can_edit = ActiveRecord::Base.connection.quote authorized_for_action(user,"edit")
+        can_download = ActiveRecord::Base.connection.quote authorized_for_action(user,"download")
+        can_manage = ActiveRecord::Base.connection.quote authorized_for_action(user,"manage")
+        can_delete = ActiveRecord::Base.connection.quote authorized_for_action(user,"delete")
 
         #check to see if an insert of update is needed, action used is arbitary
         lookup = self.class.lookup_for_asset("view",user_id,self.id)
@@ -318,7 +320,7 @@ module Acts
         grouped_people_by_access_type[Policy::MANAGING]
       end
 
-      def perform_auth user,action
+      def authorized_for_action user,action
         (Authorization.is_authorized? action, nil, self, user) || (Ability.new(user).can? action.to_sym, self) || (Ability.new(user).can? "#{action}_asset".to_sym, self)
       end
 

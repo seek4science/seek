@@ -85,17 +85,17 @@ class AuthLookupJobTest  < ActiveSupport::TestCase
     #+1 to User count to include anonymous user
     assert_equal User.count+1, c
 
-    assert_equal sop.perform_auth(user,"view"),sop.can_view?(user)
-    assert_equal sop.perform_auth(user,"edit"),sop.can_edit?(user)
-    assert_equal sop.perform_auth(user,"manage"),sop.can_manage?(user)
-    assert_equal sop.perform_auth(user,"download"),sop.can_download?(user)
-    assert_equal sop.perform_auth(user,"delete"),sop.can_delete?(user)
+    assert_equal sop.authorized_for_action(user,"view"),sop.can_view?(user)
+    assert_equal sop.authorized_for_action(user,"edit"),sop.can_edit?(user)
+    assert_equal sop.authorized_for_action(user,"manage"),sop.can_manage?(user)
+    assert_equal sop.authorized_for_action(user,"download"),sop.can_download?(user)
+    assert_equal sop.authorized_for_action(user,"delete"),sop.can_delete?(user)
 
-    assert_equal sop.perform_auth(other_user,"view"),sop.can_view?(other_user)
-    assert_equal sop.perform_auth(other_user,"edit"),sop.can_edit?(other_user)
-    assert_equal sop.perform_auth(other_user,"manage"),sop.can_manage?(other_user)
-    assert_equal sop.perform_auth(other_user,"download"),sop.can_download?(other_user)
-    assert_equal sop.perform_auth(other_user,"delete"),sop.can_delete?(other_user)
+    assert_equal sop.authorized_for_action(other_user,"view"),sop.can_view?(other_user)
+    assert_equal sop.authorized_for_action(other_user,"edit"),sop.can_edit?(other_user)
+    assert_equal sop.authorized_for_action(other_user,"manage"),sop.can_manage?(other_user)
+    assert_equal sop.authorized_for_action(other_user,"download"),sop.can_download?(other_user)
+    assert_equal sop.authorized_for_action(other_user,"delete"),sop.can_delete?(other_user)
   end
 
   test "lookup table counts" do
