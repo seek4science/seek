@@ -592,11 +592,11 @@ class SopsControllerTest < ActionController::TestCase
     assert_equal Policy::NO_ACCESS, sop.policy.access_type, "policy should have been updated"
   end
 
-  test "do isa_publish" do
+  test "do publish" do
     login_as(:owner_of_my_first_sop)
     sop=sops(:sop_with_project_without_gatekeeper)
     assert sop.can_manage?,"The sop must be manageable for this test to succeed"
-    post :isa_publish,:id=>sop
+    post :publish,:id=>sop
     assert_response :success
     assert_nil flash[:error]
     assert_not_nil flash[:notice]
@@ -605,8 +605,8 @@ class SopsControllerTest < ActionController::TestCase
   test "do not isa_publish if not can_manage?" do
     sop=sops(:sop_with_project_without_gatekeeper)
     assert !sop.can_manage?,"The sop must not be manageable for this test to succeed"
-    post :isa_publish,:id=>sop
-    assert_redirected_to sop
+    post :publish,:id=>sop
+    assert_redirected_to :root
     assert_not_nil flash[:error]
     assert_nil flash[:notice]
   end
@@ -615,15 +615,15 @@ class SopsControllerTest < ActionController::TestCase
     login_as(:owner_of_my_first_sop)
     sop=sops(:sop_with_project_without_gatekeeper)
     assert sop.can_manage?,"The sop must be manageable for this test to succeed"
-    get :isa_publishing_preview, :id=>sop
+    get :single_publishing_preview, :id=>sop
     assert_response :success
   end
 
-  test "cannot get isa_publishing_preview when not manageable" do
+  test "cannot get publishing_preview when not manageable" do
     sop=sops(:my_first_sop)
     assert !sop.can_manage?,"The sop must not be manageable for this test to succeed"
-    get :isa_publishing_preview, :id=>sop
-    assert_redirected_to sop
+    get :single_publishing_preview, :id=>sop
+    assert_redirected_to :root
     assert flash[:error]
   end
 

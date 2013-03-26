@@ -98,7 +98,7 @@ module Seek
         items_for_publishing = items_for_publishing.select{|i| !i.is_published?}
         @notified_items = items_for_publishing.select{|i| !i.can_manage?}
         @published_items = items_for_publishing.select(&:can_publish?)
-        @waiting_for_publish_items = items_for_publishing - @published_items - @notified_items
+        @waiting_for_publish_items = (items_for_publishing - @published_items).select(&:can_send_publishing_request?)
 
         if Seek::Config.email_enabled && !@notified_items.empty?
           deliver_publishing_notifications @notified_items

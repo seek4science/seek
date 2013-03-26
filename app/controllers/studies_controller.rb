@@ -83,10 +83,6 @@ class StudiesController < ApplicationController
 
     respond_to do |format|
       if @study.save
-        #send publishing request
-        if !@study.can_publish? && params[:sharing] && (params[:sharing][:sharing_scope].to_i == Policy::EVERYONE)
-          deliver_request_publish_approval @study
-        end
         flash[:notice] = 'Study was successfully updated.'
         format.html { redirect_to(@study) }
         format.xml  { head :ok }
@@ -118,10 +114,6 @@ class StudiesController < ApplicationController
 
 
   if @study.save
-    #send publishing request
-    if !@study.can_publish? && params[:sharing] && (params[:sharing][:sharing_scope].to_i == Policy::EVERYONE)
-      deliver_request_publish_approval @study
-    end
     if @study.new_link_from_assay=="true"
       render :partial => "assets/back_to_singleselect_parent",:locals => {:child=>@study,:parent=>"assay"}
     else
