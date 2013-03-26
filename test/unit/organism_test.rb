@@ -70,12 +70,15 @@ class OrganismTest < ActiveSupport::TestCase
   end
   
   test "can_delete?" do
+    admin = Factory(:admin)
+    non_admin=Factory(:user)
     o=organisms(:yeast)
-    assert !o.can_delete?
+    assert !o.can_delete?(admin)
     o=organisms(:human)
-    assert o.can_delete?
+    assert o.can_delete?(admin)
+    assert !o.can_delete?(non_admin)
     o=organisms(:organism_linked_project_only)
-    assert !o.can_delete?
+    assert !o.can_delete?(admin)
   end
 
 #  test "get concept" do
