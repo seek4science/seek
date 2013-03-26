@@ -21,8 +21,6 @@ class JwsUnitTest < ActiveSupport::TestCase
     assert !params_hash.empty?
     assert objects_hash.empty?
     assert_not_nil attributions
-    puts saved_file
-    puts attributions.model_name
     #skipping this assertion whilst waiting for a fix from JWS online
     assert_equal "teusink",attributions.model_name
     assert_not_nil saved_file
