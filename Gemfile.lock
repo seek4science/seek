@@ -49,6 +49,7 @@ GEM
       activesupport (>= 2.3.9)
     fastercsv (1.5.1)
     fastthread (1.0.7)
+    fssm (0.2.10)
     gem_plugin (0.2.3)
     gyoku (0.4.6)
       builder (>= 2.1.2)
@@ -170,6 +171,7 @@ DEPENDENCIES
   equivalent-xml
   factory_girl (= 2.6.4)
   fastercsv (= 1.5.1)
+  fssm
   hpricot (~> 0.8.2)
   in_place_editing
   libxml-ruby (= 2.2.2)
