@@ -143,8 +143,8 @@ class ApplicationController < ActionController::Base
       if !resource_type.blank?
         clazz = resource_type.constantize
         resources = clazz.find_all_by_id(resource_ids)
-        if clazz.respond_to?(:authorized_partial_asset_collection)
-          resources = clazz.authorized_partial_asset_collection(resources,"view")
+        if clazz.respond_to?(:authorize_asset_collection)
+          resources = clazz.authorize_asset_collection(resources,"view")
         else
           resources = resources.select &:can_view?
         end

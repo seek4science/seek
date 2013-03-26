@@ -133,7 +133,7 @@ class ModelsControllerTest < ActionController::TestCase
     login_as(:aaron)
     get :index, :page => "all"
     assert_response :success
-    assert_equal assigns(:models).sort_by(&:id), Model.authorized_partial_asset_collection(assigns(:models), "view", users(:aaron)).sort_by(&:id), "models haven't been authorized properly"
+    assert_equal assigns(:models).sort_by(&:id), Model.authorize_asset_collection(assigns(:models), "view", users(:aaron)).sort_by(&:id), "models haven't been authorized properly"
   end
 
   test "should contain only model assays " do
