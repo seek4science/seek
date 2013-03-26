@@ -62,11 +62,13 @@ class OrganismTest < ActiveSupport::TestCase
   end
 
   test "dependent destroyed" do
-    o=organisms(:yeast_with_bioportal_concept)
-    concept=o.bioportal_concept
-    assert_not_nil BioportalConcept.find_by_id(concept.id)
-    o.destroy
-    assert_nil BioportalConcept.find_by_id(concept.id)
+    User.with_current_user Factory(:admin) do
+      o=organisms(:yeast_with_bioportal_concept)
+      concept=o.bioportal_concept
+      assert_not_nil BioportalConcept.find_by_id(concept.id)
+      o.destroy
+      assert_nil BioportalConcept.find_by_id(concept.id)
+    end
   end
   
   test "can_delete?" do

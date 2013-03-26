@@ -11,7 +11,6 @@ class Organism < ActiveRecord::Base
   has_many :strains, :dependent=>:destroy
   has_many :specimens, :through=>:strains
 
-
   has_and_belongs_to_many :projects
 
   validates_presence_of :title
@@ -25,7 +24,7 @@ class Organism < ActiveRecord::Base
   end
   
   def can_delete? user=User.current_user
-    user.is_admin? && models.empty? && assays.empty? && projects.empty?
+    !user.nil? && user.is_admin? && models.empty? && assays.empty? && projects.empty?
   end
 
   def searchable_terms
