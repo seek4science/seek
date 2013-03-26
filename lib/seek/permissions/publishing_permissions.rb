@@ -8,12 +8,18 @@ module Seek
         end
       end
 
-      #(gatekeeper also manager) or (manager and projects have no gatekeeper) or (manager and the item was published)
       def can_publish? user=User.current_user
+        (Ability.new(user).can? :publish, self) || (can_manage?(user) && state_allows_publish?(user))
+      end
+
+      #(manager and projects have no gatekeeper) or (manager and the item was published)
+      def state_allows_publish? user=User.current_user
+        #FIXME: it should be possible to publish if there are gatekeepers, however the gatekeepers will need to approve the final step
         if self.new_record?
-          (Ability.new(user).can? :publish, self) || (self.can_manage? && self.gatekeepers.empty?) || (self.can_manage? && Seek::Config.is_virtualliver)
+          self.gatekeepers.empty?
         else
-          (Ability.new(user).can? :publish, self) || (self.can_manage? && self.gatekeepers.empty?) || (self.can_manage? && (self.policy.sharing_scope_was == Policy::EVERYONE)) || (self.can_manage? && Seek::Config.is_virtualliver)
+          #FIXME:shouldn't be possible to publish something that is already published!
+          self.gatekeepers.empty? || self.policy.sharing_scope_was == Policy::EVERYONE
         end
       end
 
