@@ -36,6 +36,8 @@ module Seek
         elsif gatekeeper_decision == 0
           extra_comment = params[:extra_comment]
           process_gatekeeper_feedback 'reject', extra_comment
+          ResourcePublishLog.add_publish_log(ResourcePublishLog::REJECTED,@resource,extra_comment)
+
           respond_to do |format|
             flash[:notice]="You rejected to publish this item"
             format.html{redirect_to @resource}

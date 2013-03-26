@@ -6,12 +6,15 @@ class ResourcePublishLog < ActiveRecord::Base
   WAITING_FOR_APPROVAL = 1
   PUBLISHED = 2
   UNPUBLISHED = 3
+  REJECTED=4
 
-  def self.add_publish_log publish_state, resource, user=User.current_user
+
+  def self.add_publish_log publish_state, resource, comment="", user=User.current_user
     ResourcePublishLog.create(
         :culprit => user,
         :resource=>resource,
-        :publish_state=>publish_state)
+        :publish_state=>publish_state,
+        :comment=>comment)
   end
 
   def self.last_waiting_approval_log resource, user=User.current_user

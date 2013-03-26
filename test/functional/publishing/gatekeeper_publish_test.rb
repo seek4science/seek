@@ -150,13 +150,19 @@ class GatekeeperPublishTest < ActionController::TestCase
 
     login_as(gatekeeper.user)
     #send feedback email to requester
-    assert_emails 1 do
-      post :gatekeeper_decide, :id => df.id, :gatekeeper_decision => 0
+    assert_difference("ResourcePublishLog.count",1) do
+      assert_emails 1 do
+        post :gatekeeper_decide, :id => df.id, :gatekeeper_decision => 0, :extra_comment => 'not ready'
+      end
     end
 
     assert_redirected_to df
     df.reload
     assert !df.can_download?(nil)
     assert_equal policy, df.policy
+
+    log= ResourcePublishLog.last
+    assert_equal ResourcePublishLog::REJECTED, log.publish_state
+    assert_equal 'not ready', log.comment
   end
 end
