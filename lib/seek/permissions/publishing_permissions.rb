@@ -42,8 +42,9 @@ module Seek
         end
       end
 
-      def can_send_publishing_request?(user=User.current_user)
-        can_manage?(user) && ResourcePublishLog.last_waiting_approval_log(self,user).nil?
+      def is_rejected? time=3.months.ago
+        !ResourcePublishLog.find(:all, :conditions => ["resource_type=? AND resource_id=? AND publish_state=? AND created_at >?",
+                                                self.class.name,self.id,ResourcePublishLog::REJECTED, time]).empty?
       end
 
       #the asset that can be published together with publishing the whole ISA

@@ -3,6 +3,18 @@ require 'test_helper'
 class PublishingPermissionsTest < ActiveSupport::TestCase
   fixtures :specimens
 
+  test 'is_rejected' do
+    df = Factory(:data_file)
+    assert !df.is_rejected?
+
+    log = ResourcePublishLog.add_log(ResourcePublishLog::REJECTED, df)
+    assert df.is_rejected?
+
+    log.created_at=4.months.ago
+    assert log.save
+    assert !df.is_rejected?
+  end
+
   test "is_published?" do
     User.with_current_user Factory(:user) do
       public_sop=Factory(:sop,:policy=>Factory(:public_policy,:access_type=>Policy::ACCESSIBLE))
