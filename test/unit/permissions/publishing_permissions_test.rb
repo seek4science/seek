@@ -177,8 +177,9 @@ class PublishingPermissionsTest < ActiveSupport::TestCase
       assert ability.can? :publish, datafile
 
       User.with_current_user gatekeeper.user do
-        assert datafile.can_manage?
-        assert datafile.can_publish?
+        assert datafile.gatekeepers.include?(gatekeeper),'The gatekeeper must be the gatekeeper of datafile for the test to succeed'
+        assert datafile.can_manage?,'The datafile must be manageable for the test to succeed'
+        assert datafile.can_publish?,'This datafile should be publishable'
       end
     end
 
@@ -190,8 +191,9 @@ class PublishingPermissionsTest < ActiveSupport::TestCase
       assert ability.cannot? :publish, datafile
 
       User.with_current_user gatekeeper.user do
-        assert !datafile.can_manage?
-        assert !datafile.can_publish?
+        assert datafile.gatekeepers.include?(gatekeeper),'The gatekeeper must be the gatekeeper of datafile for the test to be meaningful'
+        assert !datafile.can_manage?,'The datafile must not be manageable for the test to succeed'
+        assert !datafile.can_publish?,'This datafile should not be publishable'
       end
     end
 
@@ -203,7 +205,9 @@ class PublishingPermissionsTest < ActiveSupport::TestCase
       assert ability.cannot? :publish, datafile
 
       User.with_current_user gatekeeper.user do
-        assert !datafile.can_publish?
+        assert !datafile.gatekeepers.include?(gatekeeper),'The gatekeeper must not be the gatekeeper of datafile for the test to be succeed'
+        assert datafile.can_manage?,'The datafile must be manageable for the test to be meaningful'
+        assert !datafile.can_publish?,'This datafile should not be publishable'
       end
     end
 
