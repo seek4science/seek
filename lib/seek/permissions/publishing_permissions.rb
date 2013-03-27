@@ -13,14 +13,14 @@ module Seek
         (Ability.new(user).can? :publish, self) || (can_manage?(user) && state_allows_publish?(user))
       end
 
-      #(manager and projects have no gatekeeper) or (manager and the item was published)
       def state_allows_publish? user=User.current_user
-        #FIXME: it should be possible to publish if there are gatekeepers, however the gatekeepers will need to approve the final step
         if self.new_record?
-          self.gatekeepers.empty?
+          return true if !self.gatekeeper_required?
+          !self.is_waiting_approval? && !self.is_rejected?
         else
-          #FIXME:shouldn't be possible to publish something that is already published!
-          self.gatekeepers.empty? || self.policy.sharing_scope_was == Policy::EVERYONE
+          return false if self.is_published?
+          return true if !self.gatekeeper_required?
+          !self.is_waiting_approval? && !self.is_rejected?
         end
       end
 
