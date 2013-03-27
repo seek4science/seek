@@ -161,8 +161,8 @@ class PublishingPermissionsTest < ActiveSupport::TestCase
     end
   end
 
-  test "gatekeeper can publish items inside their project, only if they can manage it as well" do
-      gatekeeper = Factory(:person, :roles => ['gatekeeper'])
+  test "gatekeeper of asset can publish if they can manage it as well" do
+      gatekeeper = Factory(:gatekeeper)
       datafile = Factory(:data_file, :projects => gatekeeper.projects)
 
       #adding manage right for gatekeeper
@@ -173,45 +173,64 @@ class PublishingPermissionsTest < ActiveSupport::TestCase
         datafile.save
       end
 
-      ability = Ability.new(gatekeeper.user)
-      assert ability.can? :publish, datafile
-
       User.with_current_user gatekeeper.user do
-        assert datafile.gatekeepers.include?(gatekeeper),'The gatekeeper must be the gatekeeper of datafile for the test to succeed'
+        ability = Ability.new(User.current_user)
+        assert gatekeeper.is_gatekeeper_of?(datafile),'The gatekeeper must be the gatekeeper of the datafile for the test to succeed'
         assert datafile.can_manage?,'The datafile must be manageable for the test to succeed'
+
+        assert ability.can? :publish, datafile
         assert datafile.can_publish?,'This datafile should be publishable'
       end
+  end
+
+  test "gatekeeper of asset can publish, if the asset is waiting for his approval" do
+    gatekeeper = Factory(:gatekeeper)
+    datafile = Factory(:data_file, :projects => gatekeeper.projects)
+    datafile.resource_publish_logs.create(:publish_state=>ResourcePublishLog::WAITING_FOR_APPROVAL,:culprit=>datafile.contributor)
+
+    User.with_current_user gatekeeper.user do
+      ability = Ability.new(User.current_user)
+      assert gatekeeper.is_gatekeeper_of?(datafile),'The gatekeeper must be the gatekeeper of datafile for the test to succeed'
+      assert !datafile.can_manage?,'The datafile must be manageable for the test to be meaningful'
+      assert datafile.is_waiting_approval?,'The datafile must be waiting for approval for the test to succeed'
+
+      assert ability.can? :publish, datafile
+      assert datafile.can_publish?,'This datafile should be publishable'
     end
+  end
 
-    test "gatekeeper can not publish items inside their project, if they can not manage it" do
-      gatekeeper = Factory(:person, :roles => ['gatekeeper'])
-      datafile = Factory(:data_file, :projects => gatekeeper.projects)
+  test "gatekeeper can not publish asset which he is not the gatekeeper of" do
+    gatekeeper = Factory(:gatekeeper)
+    datafile = Factory(:data_file)
+    datafile.resource_publish_logs.create(:publish_state=>ResourcePublishLog::WAITING_FOR_APPROVAL,:culprit=>datafile.contributor)
 
-      ability = Ability.new(gatekeeper.user)
+    User.with_current_user gatekeeper.user do
+      ability = Ability.new(User.current_user)
+
+      assert !gatekeeper.is_gatekeeper_of?(datafile),'The gatekeeper must not be the gatekeeper of datafile for the test to be succeed'
+      assert datafile.is_waiting_approval?,'The datafile must be waiting for approval for the test to be meaningful'
+
       assert ability.cannot? :publish, datafile
-
-      User.with_current_user gatekeeper.user do
-        assert datafile.gatekeepers.include?(gatekeeper),'The gatekeeper must be the gatekeeper of datafile for the test to be meaningful'
-        assert !datafile.can_manage?,'The datafile must not be manageable for the test to succeed'
-        assert !datafile.can_publish?,'This datafile should not be publishable'
-      end
+      assert !datafile.can_publish?,'This datafile should not be publishable'
     end
+  end
 
-    test "gatekeeper can not publish items outside their project" do
-      gatekeeper = Factory(:person, :roles => ['gatekeeper'])
-      datafile = Factory(:data_file)
+  test "gatekeeper of asset can not publish, if they can not manage and the asset is not waiting for his approval" do
+    gatekeeper = Factory(:gatekeeper)
+    datafile = Factory(:data_file, :projects => gatekeeper.projects)
 
+    User.with_current_user gatekeeper.user do
       ability = Ability.new(gatekeeper.user)
+      assert gatekeeper.is_gatekeeper_of?(datafile), 'The gatekeeper must be the gatekeeper of datafile for the test to be meaningful'
+      assert !datafile.can_manage?, 'The datafile must not be manageable for the test to succeed'
+      assert !datafile.is_waiting_approval?,'The datafile must be waiting for approval for the test to succeed'
+
       assert ability.cannot? :publish, datafile
-
-      User.with_current_user gatekeeper.user do
-        assert !datafile.gatekeepers.include?(gatekeeper),'The gatekeeper must not be the gatekeeper of datafile for the test to be succeed'
-        assert datafile.can_manage?,'The datafile must be manageable for the test to be meaningful'
-        assert !datafile.can_publish?,'This datafile should not be publishable'
-      end
+      assert !datafile.can_publish?, 'This datafile should not be publishable'
     end
+  end
 
-    test 'disable authorization check for publishing_auth' do
+  test 'disable authorization check for publishing_auth' do
       df = Factory(:data_file)
       assert_equal Policy::PRIVATE, df.policy.sharing_scope
       user = Factory(:user)
