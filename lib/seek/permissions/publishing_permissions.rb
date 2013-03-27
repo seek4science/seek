@@ -47,6 +47,11 @@ module Seek
                                                 self.class.name,self.id,ResourcePublishLog::REJECTED, time]).empty?
       end
 
+      def is_waiting_approval? time=3.months.ago,user=User.current_user
+        !ResourcePublishLog.find(:all, :conditions => ["resource_type=? AND resource_id=? AND culprit_type=? AND culprit_id=? AND publish_state=? AND created_at >?",
+                                                      self.class.name,self.id, user.class.name, user.id,ResourcePublishLog::WAITING_FOR_APPROVAL,time]).empty?
+      end
+
       #the asset that can be published together with publishing the whole ISA
       def is_in_isa_publishable?
         #currently based upon the naive assumption that downloadable items are publishable, which is currently the case but may change.

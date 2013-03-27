@@ -15,6 +15,20 @@ class PublishingPermissionsTest < ActiveSupport::TestCase
     assert !df.is_rejected?
   end
 
+  test 'is_waiting_approval?' do
+    User.with_current_user Factory(:user) do
+      df = Factory(:data_file)
+      assert !df.is_waiting_approval?
+
+      log = ResourcePublishLog.add_log(ResourcePublishLog::WAITING_FOR_APPROVAL, df)
+      assert df.is_waiting_approval?
+
+      log.created_at=4.months.ago
+      assert log.save
+      assert !df.is_waiting_approval?
+    end
+  end
+
   test "is_published?" do
     User.with_current_user Factory(:user) do
       public_sop=Factory(:sop,:policy=>Factory(:public_policy,:access_type=>Policy::ACCESSIBLE))

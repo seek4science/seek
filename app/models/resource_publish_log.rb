@@ -16,17 +16,4 @@ class ResourcePublishLog < ActiveRecord::Base
         :publish_state=>publish_state,
         :comment=>comment)
   end
-
-  def self.last_waiting_approval_log resource, user=User.current_user
-    latest_unpublished_log =  ResourcePublishLog.last(:conditions => ["resource_type=? AND resource_id=? AND publish_state=?",
-                                                                      resource.class.name, resource.id, ResourcePublishLog::UNPUBLISHED])
-    if latest_unpublished_log.nil?
-      ResourcePublishLog.last(:conditions => ["resource_type=? AND resource_id=? AND culprit_type=? AND culprit_id=? AND publish_state=?",
-                                              resource.class.name,resource.id, user.class.name, user.id, WAITING_FOR_APPROVAL])
-    else
-      ResourcePublishLog.last(:conditions => ["resource_type=? AND resource_id=? AND culprit_type=? AND culprit_id=? AND publish_state=? AND created_at >?",
-                                              resource.class.name,resource.id, user.class.name, user.id, WAITING_FOR_APPROVAL, latest_unpublished_log.created_at])
-    end
-  end
-
 end

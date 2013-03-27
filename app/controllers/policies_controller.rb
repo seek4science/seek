@@ -94,7 +94,7 @@ class PoliciesController < ApplicationController
         format.html { render :template=>"layouts/preview_permissions",
                              :locals => {:policy => policy, :privileged_people => privileged_people,
                                          :updated_can_publish => updated_can_publish(resource),
-                                         :send_request_publish_approval => ResourcePublishLog.last_waiting_approval_log(resource).nil? }}
+                                         :send_request_publish_approval => !resource.is_waiting_approval?}}
       end
   end
 
