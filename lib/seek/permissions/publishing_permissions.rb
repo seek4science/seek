@@ -4,7 +4,8 @@ module Seek
 
       def self.included klass
         klass.class_eval do
-          before_validation :temporary_policy_while_waiting_for_publishing_approval, :publishing_auth, :unless => "Seek::Config.is_virtualliver"
+          before_validation :temporary_policy_while_waiting_for_publishing_approval, :publishing_auth
+          has_many :resource_publish_logs, :as => :resource
         end
       end
 
