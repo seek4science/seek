@@ -1,5 +1,15 @@
 #!/usr/bin/env ruby
 
+require 'rubygems'
+require 'daemons'
 require File.expand_path(File.join(File.dirname(__FILE__), '..', 'config', 'environment'))
-require 'delayed/command'
-Seek::Rdf::RdfWatcher.new(ARGV).daemonize
+
+#this should be changed to the specific watcher implmentation for your rdf triple store
+#see Seek::Rdf::RdfWatcher for more details
+
+WATCHER_CLASS = Seek::Rdf::RdfWatcher
+
+
+Daemons.run_proc("watch_rdf") do
+    WATCHER_CLASS.new(ARGV).start
+end

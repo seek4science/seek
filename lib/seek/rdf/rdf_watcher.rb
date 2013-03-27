@@ -1,5 +1,6 @@
 #watches for changed files in the rdf file path locations.
 #this class needs to be extended with a subclass to push to the rdf to the appropriate RDF store
+#in the subclass the methods that need implementing are updated, created, deleted
 
 require 'fssm'
 
@@ -12,19 +13,31 @@ module Seek
         @args = args
       end
 
+      #triggered when an rdf file has been updated, this should be overridden in the subclass
+      #the is_private flag indicates that the rdf is in the private subfolder, and is rdf for an entity that is not publicly visible
       def updated path,is_private
         puts "Someone changed the file '#{path}' - is_private=#{is_private}"
       end
 
+      #triggered when an rdf file has been created, this should be overridden in the subclass
+      #the is_private flag indicates that the rdf is in the private subfolder, and is rdf for an entity that is not publicly visible
       def created path,is_private
         puts "Someone created the file '#{path}' - is_private=#{is_private}"
       end
 
+      #triggered when an rdf file has been deleted, this should be overridden in the subclass
+      #the is_private flag indicates that the rdf is in the private subfolder, and is rdf for an entity that is not publicly visible
       def deleted path,is_private
         puts "Someone deleted the file '#{path}' - is_private=#{is_private}"
       end
 
-      def daemonize
+      def start
+        start_up
+      end
+
+      private
+
+      def start_up
         path = rdf_filestore_path
         puts "Starting to watch #{path}"
         FSSM.monitor(path,"**/*.rdf") do |path|
@@ -43,8 +56,6 @@ module Seek
 
         end
       end
-
-      private
 
       def is_private? relative_path
         #play safe and say its private unless the root folder is public (rather than the less safe checking the root folder is 'private')
