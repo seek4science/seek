@@ -45,7 +45,7 @@ module Seek
         at_exit do
           @logger.info "Stopped watching *.rdf files in #{path}"
         end
-        @logger.info "Starting to watch *.rdf files in #{path}"
+        @logger.info "Started to watching *.rdf files in #{path}"
 
         FSSM.monitor(path,"**/*.rdf") do |path|
 
