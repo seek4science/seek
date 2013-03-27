@@ -95,7 +95,7 @@ class PoliciesControllerTest < ActionController::TestCase
     gatekeeper = Factory(:gatekeeper)
     sop = Factory(:sop)
     login_as(sop.contributor)
-    ResourcePublishLog.add_publish_log ResourcePublishLog::WAITING_FOR_APPROVAL, sop
+    ResourcePublishLog.add_log ResourcePublishLog::WAITING_FOR_APPROVAL, sop
     post :preview_permissions, :sharing_scope => Policy::EVERYONE, :access_type => Policy::VISIBLE, :is_new_file => "false", :resource_name => 'sop', :resource_id => sop.id,:project_ids => gatekeeper.projects.first.id.to_s
 
     assert_select "span",:text=>"(You requested the publishing approval from the Gatekeepers of the projects associated with this SOP, and it is waiting for the decision. This SOP will not be published until one of the Gatekeepers has granted approval)", :count=>1

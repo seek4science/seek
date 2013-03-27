@@ -127,7 +127,7 @@ class SinglePublishingTest < ActionController::TestCase
                                       :policy => Factory(:all_sysmo_viewable_policy),
                                       :projects => Factory(:gatekeeper).projects,
                                       :contributor => users(:datafile_owner))
-    ResourcePublishLog.add_publish_log(ResourcePublishLog::WAITING_FOR_APPROVAL, waiting_for_approval_df)
+    ResourcePublishLog.add_log(ResourcePublishLog::WAITING_FOR_APPROVAL, waiting_for_approval_df)
 
     assert !waiting_for_approval_df.is_published?,"The datafile must not be published for this test to succeed"
     assert !waiting_for_approval_df.can_publish?,"The datafile must not be publishable for this test to succeed"
@@ -278,7 +278,7 @@ class SinglePublishingTest < ActionController::TestCase
                                       :policy => Factory(:all_sysmo_viewable_policy),
                                       :projects => Factory(:gatekeeper).projects,
                                       :contributor => users(:datafile_owner))
-    ResourcePublishLog.add_publish_log(ResourcePublishLog::WAITING_FOR_APPROVAL, waiting_for_approval_df)
+    ResourcePublishLog.add_log(ResourcePublishLog::WAITING_FOR_APPROVAL, waiting_for_approval_df)
 
     assert !waiting_for_approval_df.is_published?,"The datafile must not be published for this test to succeed"
     assert !waiting_for_approval_df.can_publish?,"The datafile must not be publishable for this test to succeed"

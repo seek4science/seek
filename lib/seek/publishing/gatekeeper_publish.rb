@@ -24,7 +24,7 @@ module Seek
           policy.sharing_scope=Policy::EVERYONE
           respond_to do |format|
             if policy.save
-              ResourcePublishLog.add_publish_log(ResourcePublishLog::PUBLISHED,@resource)
+              ResourcePublishLog.add_log(ResourcePublishLog::PUBLISHED,@resource)
               process_gatekeeper_feedback 'approve'
               flash[:notice]="Publishing complete"
               format.html{redirect_to @resource}
@@ -36,7 +36,7 @@ module Seek
         elsif gatekeeper_decision == 0
           extra_comment = params[:extra_comment]
           process_gatekeeper_feedback 'reject', extra_comment
-          ResourcePublishLog.add_publish_log(ResourcePublishLog::REJECTED,@resource,extra_comment)
+          ResourcePublishLog.add_log(ResourcePublishLog::REJECTED,@resource,extra_comment)
 
           respond_to do |format|
             flash[:notice]="You rejected to publish this item"

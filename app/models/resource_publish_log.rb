@@ -9,7 +9,7 @@ class ResourcePublishLog < ActiveRecord::Base
   REJECTED=4
 
 
-  def self.add_publish_log publish_state, resource, comment="", user=User.current_user
+  def self.add_log publish_state, resource, comment="", user=User.current_user
     ResourcePublishLog.create(
         :culprit => user,
         :resource=>resource,

@@ -105,11 +105,11 @@ module Seek
 
         @published_items.each do |item|
           item.publish!
-          ResourcePublishLog.add_publish_log ResourcePublishLog::PUBLISHED, item
+          ResourcePublishLog.add_log ResourcePublishLog::PUBLISHED, item
         end
 
         @waiting_for_publish_items.each do |item|
-          ResourcePublishLog.add_publish_log ResourcePublishLog::WAITING_FOR_APPROVAL, item
+          ResourcePublishLog.add_log ResourcePublishLog::WAITING_FOR_APPROVAL, item
           deliver_request_publish_approval item
         end
       end
@@ -127,13 +127,13 @@ module Seek
 
           #waiting for approval
           if params[:sharing] && params[:sharing][:sharing_scope].to_i == Policy::EVERYONE && !object.can_publish?
-            ResourcePublishLog.add_publish_log(ResourcePublishLog::WAITING_FOR_APPROVAL,object)
+            ResourcePublishLog.add_log(ResourcePublishLog::WAITING_FOR_APPROVAL,object)
             #publish
           elsif object.policy.sharing_scope == Policy::EVERYONE && latest_publish_log.try(:publish_state) != ResourcePublishLog::PUBLISHED
-            ResourcePublishLog.add_publish_log(ResourcePublishLog::PUBLISHED,object)
+            ResourcePublishLog.add_log(ResourcePublishLog::PUBLISHED,object)
             #unpublish
           elsif object.policy.sharing_scope != Policy::EVERYONE && latest_publish_log.try(:publish_state) == ResourcePublishLog::PUBLISHED
-            ResourcePublishLog.add_publish_log(ResourcePublishLog::UNPUBLISHED,object)
+            ResourcePublishLog.add_log(ResourcePublishLog::UNPUBLISHED,object)
           end
         end
       end
