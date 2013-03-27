@@ -48,7 +48,7 @@ class Ability
   def gatekeeper gatekeeper
     can :publish, :all do |item|
       if gatekeeper.is_gatekeeper_of?(item)
-       item.can_manage?(gatekeeper.user) || item.is_waiting_approval?
+       item.can_manage?(gatekeeper.user) || item.is_waiting_approval?(nil,1.year.ago)
       else
         false
       end
