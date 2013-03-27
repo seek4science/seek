@@ -11,24 +11,25 @@ module Seek
 
       def initialize *args
         @args = args
+        setup_logger
       end
 
       #triggered when an rdf file has been updated, this should be overridden in the subclass
       #the is_private flag indicates that the rdf is in the private subfolder, and is rdf for an entity that is not publicly visible
       def updated path,is_private
-        puts "Someone changed the file '#{path}' - is_private=#{is_private}"
+        @logger.info "Something changed the file '#{path}' - is_private=#{is_private}"
       end
 
       #triggered when an rdf file has been created, this should be overridden in the subclass
       #the is_private flag indicates that the rdf is in the private subfolder, and is rdf for an entity that is not publicly visible
       def created path,is_private
-        puts "Someone created the file '#{path}' - is_private=#{is_private}"
+        @logger.info "Something created the file '#{path}' - is_private=#{is_private}"
       end
 
       #triggered when an rdf file has been deleted, this should be overridden in the subclass
       #the is_private flag indicates that the rdf is in the private subfolder, and is rdf for an entity that is not publicly visible
       def deleted path,is_private
-        puts "Someone deleted the file '#{path}' - is_private=#{is_private}"
+        @logger.info "Something deleted the file '#{path}' - is_private=#{is_private}"
       end
 
       def start
@@ -38,8 +39,14 @@ module Seek
       private
 
       def start_up
+
         path = rdf_filestore_path
-        puts "Starting to watch #{path}"
+
+        at_exit do
+          @logger.info "Stopped watching *.rdf files in #{path}"
+        end
+        @logger.info "Starting to watch *.rdf files in #{path}"
+
         FSSM.monitor(path,"**/*.rdf") do |path|
 
           path.update do |base, relative|
@@ -53,8 +60,8 @@ module Seek
           path.delete do |base, relative|
             deleted File.join(base,relative),is_private?(relative)
           end
-
         end
+
       end
 
       def is_private? relative_path
@@ -68,6 +75,10 @@ module Seek
           FileUtils.mkdir_p(path)
         end
         path
+      end
+
+      def setup_logger
+        @logger = Logger.new File.join(Rails.root,"log","watch_rdf.log")
       end
 
     end
