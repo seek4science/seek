@@ -684,6 +684,39 @@ class PersonTest < ActiveSupport::TestCase
     end
   end
 
+  test 'is_asset_manager?' do
+    User.with_current_user Factory(:admin).user do
+      person = Factory(:person)
+      person.is_asset_manager = true
+      person.save!
+
+      assert person.is_asset_manager?
+
+      person.is_asset_manager=false
+      person.save!
+
+      assert !person.is_asset_manager?
+    end
+  end
+
+  test 'is_asset_manager_of?' do
+    asset_manager = Factory(:asset_manager)
+    sop = Factory(:sop)
+    assert !asset_manager.is_asset_manager_of?(sop)
+
+    disable_authorization_checks{sop.projects = asset_manager.projects}
+    assert asset_manager.is_asset_manager_of?(sop)
+  end
+
+  test 'is_gatekeeper_of?' do
+    gatekeeper = Factory(:gatekeeper)
+    sop = Factory(:sop)
+    assert !gatekeeper.is_gatekeeper_of?(sop)
+
+    disable_authorization_checks{sop.projects = gatekeeper.projects}
+    assert gatekeeper.is_gatekeeper_of?(sop)
+  end
+
   test 'replace admins, pals named_scope by a static function' do
     admins = Person.admins
     assert_equal 1, admins.count

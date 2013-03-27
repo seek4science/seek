@@ -419,6 +419,14 @@ class Person < ActiveRecord::Base
     end
   end
 
+  def is_gatekeeper_of? item
+    is_gatekeeper? && !(item.projects & projects).empty?
+  end
+
+  def is_asset_manager_of? item
+    is_asset_manager? && !(item.projects & projects).empty?
+  end
+
   private
 
   #a before_save trigger, that checks if the person is the first one created, and if so defines it as admin
