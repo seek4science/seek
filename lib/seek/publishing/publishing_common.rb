@@ -147,7 +147,7 @@ module Seek
           #don't process if the object is not valid or has not been saved, as this will a validation error on update or create
           return if object.nil? || (object.respond_to?("new_record?") && object.new_record?) || (object.respond_to?("errors") && !object.errors.empty?)
 
-          if params[:sharing] && params[:sharing][:sharing_scope].to_i == Policy::EVERYONE && !object.can_publish? && !objec.is_waiting_approval?
+          if params[:sharing] && params[:sharing][:sharing_scope].to_i == Policy::EVERYONE && !object.can_publish? && !objec.is_waiting_approval?(current_user)
             deliver_request_publish_approval object
           end
         end

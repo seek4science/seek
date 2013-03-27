@@ -29,7 +29,7 @@
       <li class="secondary status">
         This item is already published.
       </li>
-  <% elsif !item.can_publish? && item.can_manage? && item.is_waiting_approval? -%>
+  <% elsif !item.can_publish? && item.can_manage? && item.is_waiting_approval?(current_user) -%>
       <li class="secondary status">
         You already submitted the publishing request for this item.
       </li>

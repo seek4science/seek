@@ -16,11 +16,11 @@ module Seek
       def state_allows_publish? user=User.current_user
         if self.new_record?
           return true if !self.gatekeeper_required?
-          !self.is_waiting_approval? && !self.is_rejected?
+          !self.is_waiting_approval?(user) && !self.is_rejected?
         else
           return false if self.is_published?
           return true if !self.gatekeeper_required?
-          !self.is_waiting_approval? && !self.is_rejected?
+          !self.is_waiting_approval?(user) && !self.is_rejected?
         end
       end
 
@@ -48,9 +48,14 @@ module Seek
                                                 self.class.name,self.id,ResourcePublishLog::REJECTED, time]).empty?
       end
 
-      def is_waiting_approval? time=3.months.ago,user=User.current_user
-        !ResourcePublishLog.find(:all, :conditions => ["resource_type=? AND resource_id=? AND culprit_type=? AND culprit_id=? AND publish_state=? AND created_at >?",
+      def is_waiting_approval? user=nil,time=3.months.ago
+        if user
+          !ResourcePublishLog.find(:all, :conditions => ["resource_type=? AND resource_id=? AND culprit_type=? AND culprit_id=? AND publish_state=? AND created_at >?",
                                                       self.class.name,self.id, user.class.name, user.id,ResourcePublishLog::WAITING_FOR_APPROVAL,time]).empty?
+        else
+          !ResourcePublishLog.find(:all, :conditions => ["resource_type=? AND resource_id=? AND publish_state=? AND created_at >?",
+                                                         self.class.name,self.id,ResourcePublishLog::WAITING_FOR_APPROVAL,time]).empty?
+        end
       end
 
       def gatekeeper_required?

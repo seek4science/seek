@@ -132,7 +132,7 @@ class SinglePublishingTest < ActionController::TestCase
     assert !waiting_for_approval_df.is_published?,"The datafile must not be published for this test to succeed"
     assert !waiting_for_approval_df.can_publish?,"The datafile must not be publishable for this test to succeed"
     assert waiting_for_approval_df.can_manage?,"The datafile must manageable for this test to succeed"
-    assert waiting_for_approval_df.is_waiting_approval?,"The datafile must not be in the waiting_for_approval state for this test to succeed"
+    assert waiting_for_approval_df.is_waiting_approval?(User.current_user),"The datafile must not be in the waiting_for_approval state for this test to succeed"
 
     get :single_publishing_preview, :id=>waiting_for_approval_df
     assert_response :success
@@ -231,7 +231,7 @@ class SinglePublishingTest < ActionController::TestCase
     df=Factory(:data_file, :contributor => User.current_user, :projects => Factory(:gatekeeper).projects)
     assert !df.can_publish?,"The data file can not be published immediately for this test to succeed"
     assert df.can_manage?,"The data file must be manageable for this test to succeed"
-    assert  !df.is_waiting_approval?,"The publishing request for this data file must not be sent for this test to succeed"
+    assert  !df.is_waiting_approval?(User.current_user),"The publishing request for this data file must not be sent for this test to succeed"
 
     params={:publish=>{}}
     params[:publish][df.class.name]||={}
@@ -249,7 +249,7 @@ class SinglePublishingTest < ActionController::TestCase
 
     df.reload
     assert !df.is_published?,"The data file should not be published after sending publishing request"
-    assert df.is_waiting_approval?,"The publishing request for this data file should be sent after requesting"
+    assert df.is_waiting_approval?(User.current_user),"The publishing request for this data file should be sent after requesting"
   end
 
   test "do not do publish if the item is already published" do
@@ -283,7 +283,7 @@ class SinglePublishingTest < ActionController::TestCase
     assert !waiting_for_approval_df.is_published?,"The datafile must not be published for this test to succeed"
     assert !waiting_for_approval_df.can_publish?,"The datafile must not be publishable for this test to succeed"
     assert waiting_for_approval_df.can_manage?,"The datafile must manageable for this test to succeed"
-    assert waiting_for_approval_df.is_waiting_approval?,"The datafile must not be in the waiting_for_approval state for this test to succeed"
+    assert waiting_for_approval_df.is_waiting_approval?(User.current_user),"The datafile must not be in the waiting_for_approval state for this test to succeed"
 
     params={:publish=>{}}
     params[:publish][waiting_for_approval_df.class.name]||={}
