@@ -363,10 +363,6 @@ module Seek
         end
       end
 
-      def gatekeepers
-         self.projects.collect(&:gatekeepers).flatten
-      end
-
       #members of project can see some information of hidden items of their project
       def can_see_hidden_item?(person)
         person.member_of?(self.projects)

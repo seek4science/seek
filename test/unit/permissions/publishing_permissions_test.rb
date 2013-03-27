@@ -3,7 +3,7 @@ require 'test_helper'
 class PublishingPermissionsTest < ActiveSupport::TestCase
   fixtures :specimens
 
-  test 'is_rejected' do
+  test 'is_rejected?' do
     df = Factory(:data_file)
     assert !df.is_rejected?
 
@@ -27,6 +27,18 @@ class PublishingPermissionsTest < ActiveSupport::TestCase
       assert log.save
       assert !df.is_waiting_approval?
     end
+  end
+
+  test 'gatekeeper_required?' do
+    df = Factory(:data_file)
+    assert !df.gatekeeper_required?
+
+    gatekeeper = Factory(:gatekeeper)
+    assert !df.gatekeeper_required?
+
+    disable_authorization_checks { df.projects = gatekeeper.projects }
+    df.reload
+    assert df.gatekeeper_required?
   end
 
   test "is_published?" do

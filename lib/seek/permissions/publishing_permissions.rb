@@ -53,6 +53,14 @@ module Seek
                                                       self.class.name,self.id, user.class.name, user.id,ResourcePublishLog::WAITING_FOR_APPROVAL,time]).empty?
       end
 
+      def gatekeeper_required?
+        !self.gatekeepers.empty?
+      end
+
+      def gatekeepers
+        self.projects.collect(&:gatekeepers).flatten
+      end
+
       #the asset that can be published together with publishing the whole ISA
       def is_in_isa_publishable?
         #currently based upon the naive assumption that downloadable items are publishable, which is currently the case but may change.
