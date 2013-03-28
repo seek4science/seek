@@ -1,7 +1,7 @@
 source 'https://rubygems.org'
 source 'http://gems.github.com'
 
-gem "rails", "2.3.17"
+gem "rails", "2.3.18"
 gem "rdoc"
 
 gem 'rubaidh-google_analytics', "~>1.1.4",:require => 'rubaidh/google_analytics'
@@ -34,12 +34,13 @@ gem "cancan"
 gem "in_place_editing"
 
 
-
 gem "rdf",">=0.3.8"
 gem "rdf-rdfxml",">=0.3.8"
 gem "equivalent-xml"
 gem "breadcrumbs_on_rails","1.0.1"
 gem 'docsplit'
+
+gem "fssm"
 
 group :development do
   gem "sqlite3-ruby","1.2.5",:require=>"sqlite3"

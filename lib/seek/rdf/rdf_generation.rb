@@ -9,6 +9,11 @@ module Seek
         base.after_save :create_rdf_generation_job
       end
 
+      def self.rdf_filestore_path
+        File.join(Rails.root, "tmp", "rdf")
+      end
+
+
       def to_rdf
         rdf_graph = to_rdf_graph
         RDF::Writer.for(:rdfxml).buffer(:prefixes=>ns_prefixes) do |writer|
@@ -40,7 +45,7 @@ module Seek
       end
 
       def save_rdf dir=nil
-        dir||=File.join(Rails.root, "tmp", "rdf")
+        dir||=RdfGeneration.rdf_filestore_path
         #seperate public and private (to an outside user) into separate directories
         inner_dir = self.can_view?(nil) ? "public" : "private"
         dir = File.join(dir,inner_dir)
