@@ -61,7 +61,7 @@ module Seek
 
       def single_publish_auth
         if !(self.controller_name=='people')
-          if !@asset.can_manage?
+          if !@asset.can_publish?
             error("You are not permitted to perform this action", "is invalid")
             return false
           end
@@ -79,13 +79,12 @@ module Seek
       end
 
       def set_assets
-        #get the assets that current_user can manage, then take the one that (is not yet published and is publishable)
+        #get the assets that current_user can manage, then take the one that can_publish?
         @assets = {}
         publishable_types = Seek::Util.authorized_types.select {|c| c.first.try(:is_in_isa_publishable?)}
         publishable_types.each do |klass|
           can_manage_assets = klass.all_authorized_for "manage", current_user
-          can_manage_assets = can_manage_assets.select{|a| !a.is_published?}
-          can_manage_assets = can_manage_assets.select{|a| a.can_publish? || a.can_send_publishing_request?}
+          can_manage_assets = can_manage_assets.select{|a| a.can_publish?}
           unless can_manage_assets.empty?
             @assets[klass.name] = can_manage_assets
           end
@@ -94,18 +93,12 @@ module Seek
 
       def do_publish
         items_for_publishing = resolve_publish_params params[:publish]
-        items_for_publishing = items_for_publishing.select{|i| !i.is_published?}
-        @notified_items = items_for_publishing.select{|i| !i.can_manage?}
-        @published_items = items_for_publishing.select(&:can_publish?)
-        @waiting_for_publish_items = (items_for_publishing - @published_items).select(&:can_send_publishing_request?)
+        @published_items = items_for_publishing.select(&:publish!)
+        @waiting_for_publish_items = (items_for_publishing - @published_items).select(&:can_publish?)
+        @notified_items = items_for_publishing - @published_items - @waiting_for_publish_items
 
         if Seek::Config.email_enabled && !@notified_items.empty?
           deliver_publishing_notifications @notified_items
-        end
-
-        @published_items.each do |item|
-          item.publish!
-          ResourcePublishLog.add_log ResourcePublishLog::PUBLISHED, item
         end
 
         @waiting_for_publish_items.each do |item|

@@ -1,15 +1,10 @@
 <%
    item = options_for_publishing
-   checkbox_title = ""
+   checkbox_title = "Publish"
    if item.can_publish?
-     checkbox_title = "Publish"
      checkbox_class = "published"
-   elsif item.can_manage?
-     checkbox_title = "Submit publishing request"
-     checkbox_class = "owned"
    else
-     checkbox_title = "Notify owner"
-     checkbox_class = 'protected'
+     checkbox_class = "disabled"
    end
 -%>
 <ul class="<%= html_classes -%>">
@@ -17,26 +12,16 @@
       <li class="type_and_title"><%= text_for_resource item -%>:&nbsp;<%= link_to item.title, item, :target => "_blank" -%>
         <%=list_item_visibility(item.policy,"icon_visibility")-%>
       </li>
-      <li class="secondary">Owners <%= item.managers.empty? ? "<span class='none_text'>None</span>" : item.managers.collect { |m| link_to(m.title, m) }.join(", ") -%></li>
+      <li class="secondary">Manageable by <%= item.managers.empty? ? "<span class='none_text'>None</span>" : item.managers.collect { |m| link_to(m.title, m) }.join(", ") -%></li>
   <% else %>
       <li class="type_and_title"><%= text_for_resource item -%>:&nbsp;This item is hidden to you</li>
       <% if current_user.try(:person) && item.can_see_hidden_item?(current_user.person) %>
-          <li class="secondary">Owners <%= item.managers.empty? ? "<span class='none_text'>None</span>" : item.managers.collect { |m| link_to(m.title, m) }.join(", ") -%></li>
+          <li class="secondary">Manageable by <%= item.managers.empty? ? "<span class='none_text'>None</span>" : item.managers.collect { |m| link_to(m.title, m) }.join(", ") -%></li>
       <% end %>
   <% end %>
 
-  <% if item.is_published? -%>
-      <li class="secondary status">
-        This item is already published.
-      </li>
-  <% elsif !item.can_publish? && item.can_manage? && item.is_waiting_approval?(current_user) -%>
-      <li class="secondary status">
-        You already submitted the publishing request for this item.
-      </li>
-  <% else %>
-      <li class="secondary <%= checkbox_class -%>">
-        <%= checkbox_title -%>&nbsp;<%= check_box_tag publishing_item_param(item), 1, true -%>
-      </li>
-  <% end -%>
+  <li class="secondary <%= checkbox_class -%>">
+    <%= checkbox_title -%>&nbsp;<%= check_box_tag publishing_item_param(item), 1, true -%>
+  </li>
 </ul>
 
