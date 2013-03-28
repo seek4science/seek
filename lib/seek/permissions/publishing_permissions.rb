@@ -26,10 +26,14 @@ module Seek
 
       def publish!
         if can_publish?
-          policy.access_type=Policy::ACCESSIBLE
-          policy.sharing_scope=Policy::EVERYONE
-          policy.save
-          touch
+          if gatekeeper_required? && !User.current_user.person.is_gatekeeper_of?(self)
+            false
+          else
+            policy.access_type=Policy::ACCESSIBLE
+            policy.sharing_scope=Policy::EVERYONE
+            policy.save
+            touch
+          end
         else
           false
         end
