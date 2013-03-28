@@ -4,7 +4,6 @@ module Seek
       def self.included(base)
         base.before_filter :set_resource, :only=>[:approve_or_reject_publish,:gatekeeper_decide]
         base.before_filter :gatekeeper_auth, :only => [:approve_or_reject_publish, :gatekeeper_decide]
-        base.before_filter :waiting_for_approval_auth, :only => [:gatekeeper_decide]
       end
 
       def approve_or_reject_publish
@@ -19,12 +18,8 @@ module Seek
         gatekeeper_decision = params[:gatekeeper_decision].to_i
         #approve
         if gatekeeper_decision == 1
-          policy = @resource.policy
-          policy.access_type=Policy::ACCESSIBLE
-          policy.sharing_scope=Policy::EVERYONE
           respond_to do |format|
-            if policy.save
-              ResourcePublishLog.add_log(ResourcePublishLog::PUBLISHED,@resource)
+            if @resource.publish!
               process_gatekeeper_feedback 'approve'
               flash[:notice]="Publishing complete"
               format.html{redirect_to @resource}
@@ -36,7 +31,7 @@ module Seek
         elsif gatekeeper_decision == 0
           extra_comment = params[:extra_comment]
           process_gatekeeper_feedback 'reject', extra_comment
-          ResourcePublishLog.add_log(ResourcePublishLog::REJECTED,@resource,extra_comment)
+          @resource.resource_publish_logs.create(:publish_state=>ResourcePublishLog::REJECTED,:culprit=>current_user,:comment=>extra_comment)
 
           respond_to do |format|
             flash[:notice]="You rejected to publish this item"
@@ -46,24 +41,16 @@ module Seek
       end
 
       def set_resource
-        @resource = self.controller_name.classify.constantize.find_by_id(params[:id])
+        begin
+          @resource = self.controller_name.classify.constantize.find_by_id(params[:id])
+        rescue ActiveRecord::RecordNotFound
+          error("This resource is not found","not found resource")
+        end
       end
 
       def gatekeeper_auth
-        if @resource.nil?
-          error("This #{self.controller_name.humanize.singularize} no longer exists, and may have been deleted since the request to publish was made.", "asset missing")
-          return false
-        end
-        unless @resource.gatekeepers.include?(current_user.try(:person))
-          error("You have to login as a gatekeeper to perform this action", "is invalid (insufficient_privileges)")
-          return false
-        end
-      end
-
-      def waiting_for_approval_auth
-        latest_publish_state = ResourcePublishLog.find(:last, :conditions => ["resource_type=? AND resource_id=?", @resource.class.name, @resource.id])
-        unless latest_publish_state.try(:publish_state).to_i == ResourcePublishLog::WAITING_FOR_APPROVAL
-          error("This item is already published or you are not authorized to approve/reject the publishing of this item", "is invalid (insufficient_privileges)")
+        unless @resource.gatekeepers.include?(current_user.try(:person)) && @resource.is_waiting_approval?
+          error("You are not authorized to approve/reject the publishing of this item. You might login as a gatekeeper.", "is invalid (insufficient_privileges)")
           return false
         end
       end
