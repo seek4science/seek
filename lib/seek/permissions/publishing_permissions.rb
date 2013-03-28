@@ -32,6 +32,7 @@ module Seek
             policy.access_type=Policy::ACCESSIBLE
             policy.sharing_scope=Policy::EVERYONE
             policy.save
+            self.resource_publish_logs.create(:publish_state=>ResourcePublishLog::PUBLISHED,:culprit=>User.current_user)
             touch
           end
         else
