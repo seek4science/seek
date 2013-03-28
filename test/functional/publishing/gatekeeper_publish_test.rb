@@ -28,31 +28,18 @@ class GatekeeperPublishTest < ActionController::TestCase
 
   test "gracefully handle approve_or_reject for deleted items" do
     gatekeeper = Factory(:gatekeeper)
-    df = Factory(:data_file,:projects => gatekeeper.projects)
-    login_as(df.contributor)
-    put :update, :id => df.id, :sharing => {:sharing_scope => Policy::EVERYONE, "access_type#{Policy::EVERYONE}" => Policy::VISIBLE}
 
-    id = df.id
-    disable_authorization_checks do
-      df.destroy
-      assert_nil(DataFile.find_by_id(df.id))
-    end
-
-    logout
     login_as(gatekeeper.user)
     get :approve_or_reject_publish, :id=>0
     assert_redirected_to :root
     assert_not_nil flash[:error]
-    assert_equal "This Data file no longer exists, and may have been deleted since the request to publish was made.",flash[:error]
+    assert_equal "This resource is not found",flash[:error]
   end
 
   test 'gatekeeper should be able to decide publishing' do
     gatekeeper = Factory(:gatekeeper)
     df = Factory(:data_file,:projects => gatekeeper.projects)
-    login_as(df.contributor)
-    put :update, :id => df.id, :sharing => {:sharing_scope => Policy::EVERYONE, "access_type#{Policy::EVERYONE}" => Policy::VISIBLE}
-
-    logout
+    df.resource_publish_logs.create(:publish_state=>ResourcePublishLog::WAITING_FOR_APPROVAL)
 
     login_as(gatekeeper.user)
     get :approve_or_reject_publish, :id=>df.id
@@ -76,9 +63,7 @@ class GatekeeperPublishTest < ActionController::TestCase
   test 'should not allow to decide publishing for gatekeeper from other projects' do
     gatekeeper = Factory(:gatekeeper)
     df = Factory(:data_file)
-    login_as(df.contributor)
-    put :update, :id => df.id, :sharing => {:sharing_scope => Policy::EVERYONE, "access_type#{Policy::EVERYONE}" => Policy::VISIBLE}
-    logout
+    df.resource_publish_logs.create(:publish_state=>ResourcePublishLog::WAITING_FOR_APPROVAL)
 
     assert (df.projects&gatekeeper.projects).empty?
     login_as(gatekeeper.user)
@@ -105,11 +90,7 @@ class GatekeeperPublishTest < ActionController::TestCase
   test 'allow to decide publishing if the asset is in waiting_for_approval state' do
     gatekeeper = Factory(:gatekeeper)
     df = Factory(:data_file, :projects => gatekeeper.projects)
-
-    login_as(df.contributor)
-    put :update, :id => df.id, :sharing => {:sharing_scope => Policy::EVERYONE, "access_type#{Policy::EVERYONE}" => Policy::VISIBLE}
-
-    logout
+    df.resource_publish_logs.create(:publish_state=>ResourcePublishLog::WAITING_FOR_APPROVAL)
 
     login_as(gatekeeper.user)
     post :gatekeeper_decide, :id => df.id, :gatekeeper_decision => 1
@@ -120,12 +101,7 @@ class GatekeeperPublishTest < ActionController::TestCase
   test 'gatekeeper approves' do
     gatekeeper = Factory(:gatekeeper)
     df = Factory(:data_file, :projects => gatekeeper.projects)
-
-    #request publish
-    login_as(df.contributor)
-    put :update, :id => df.id, :sharing => {:sharing_scope => Policy::EVERYONE, "access_type#{Policy::EVERYONE}" => Policy::VISIBLE}
-
-    logout
+    df.resource_publish_logs.create(:publish_state=>ResourcePublishLog::WAITING_FOR_APPROVAL,:culprit=>df.contributor)
 
     login_as(gatekeeper.user)
     #send feedback email to requester
@@ -142,11 +118,7 @@ class GatekeeperPublishTest < ActionController::TestCase
     gatekeeper = Factory(:gatekeeper)
     df = Factory(:data_file, :projects => gatekeeper.projects)
     policy = df.policy
-    #request publish
-    login_as(df.contributor)
-    put :update, :id => df.id, :sharing => {:sharing_scope => Policy::EVERYONE, "access_type#{Policy::EVERYONE}" => Policy::VISIBLE}
-
-    logout
+    df.resource_publish_logs.create(:publish_state=>ResourcePublishLog::WAITING_FOR_APPROVAL,:culprit=>df.contributor)
 
     login_as(gatekeeper.user)
     #send feedback email to requester

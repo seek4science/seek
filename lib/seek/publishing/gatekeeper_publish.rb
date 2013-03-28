@@ -42,9 +42,10 @@ module Seek
 
       def set_resource
         begin
-          @resource = self.controller_name.classify.constantize.find_by_id(params[:id])
+          @resource = self.controller_name.classify.constantize.find(params[:id])
         rescue ActiveRecord::RecordNotFound
           error("This resource is not found","not found resource")
+          return false
         end
       end
 
