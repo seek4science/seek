@@ -1,38 +1,10 @@
-<style>
-ul li.info_list {
-    list-style-type: circle;
-}
-</style>
-
 <div class="box_infotext">
-  <p>
-    Publishing guide line
-    <%= link_to_function "More "+ expand_image,  :id => 'info_expand_image' do |page|
-      page.visual_effect(:toggle_appear, "more_publishing_info", :duration => 0.5)
-      page["info_expand_image"].toggle
-      page["info_collapse_image"].toggle
-    end
-    -%>
-    <%= link_to_function "Less "+collapse_image, :id => 'info_collapse_image', :style => "display:none" do |page|
-      page.visual_effect(:toggle_appear, "more_publishing_info", :duration => 0.5)
-      page["info_expand_image"].toggle
-      page["info_collapse_image"].toggle
-    end
-    -%>
-  </p>
-
-  <div id="more_publishing_info" style="display: none;">
     <ul style="padding-left:1em;">
-      <li class="info_list">
-        Having the permission to manage an asset, you can <span class="published"><b>Publish</b></span> the asset,
-        otherwise <span class="protected"><b>Notify owner</b></span> which a notification email will be sent to the owners of the asset.
+      <li>
+        Having the permission to publish an asset, you can publish it by <b>checking</b> the <span class="published"><b>Publish</b></span> checkbox beside that asset.
       </li>
-      <li class="info_list">
+      <li>
         In addition, you can <b>Publish related items</b> of the asset, which are the ISA the asset is linked to and their assets.
       </li>
-      <li class="info_list">
-        If there is an asset you do not wish to make public, then you can <b>uncheck</b> the checkbox beside that asset and it will remain unaffected.
-      </li>
     </ul>
-  </div>
 </div>
