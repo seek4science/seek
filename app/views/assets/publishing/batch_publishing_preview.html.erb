@@ -16,11 +16,42 @@
                    <%= render :partial => "assets/publishing/asset_and_related", :object => item -%>
                 <% end %>
           <% end %>
-          <br/>
-          <%= submit_tag "Submit", :disable_with => "Submitting ..." -%>
+          <br/>          
+          <%= submit_tag "Submit", :id=>'submit_publishing', :onclick => "clickLink($('waiting_approval_list'));", :disable_with => "Submitting ..." -%>
           Or
           <%= link_to "Cancel", person_path(params[:id].to_i)-%>
+          <%= link_to_remote_redbox("waiting approval list",
+                                    {:url => "/people/waiting_approval_list", :failure => "alert('Sorry, an error has occurred.'); RedBox.close();",
+                                     :with => "'publish=' + getPublishParams()"},
+                                    {:id => "waiting_approval_list", :style => "display:block"})-%>
       <% end -%>
   <% end -%>
 
 </div>
+
+<script type="text/javascript">
+  function getPublishParams(){
+     var checkbox_elements = document.getElementsByClassName('checkbox_element');
+     var checked_elements= [];
+
+     for (var i=0;i<checkbox_elements.length;i++){
+        if (checkbox_elements[i].checked){
+            var checked_element_id = checkbox_elements[i].id
+            var asset_type = checked_element_id.split("_")[1];
+            var asset_id = checked_element_id.split("_")[2];
+            checked_elements.push([asset_type,asset_id]);
+        }
+     }
+      json={}
+     for (var i=0;i<checked_elements.length;i++){
+          if (json[checked_elements[i][0]] != null){
+             json[checked_elements[i][0]][checked_elements[i][1]] = 1;
+          }else{
+              json[checked_elements[i][0]] = {};
+              json[checked_elements[i][0]][checked_elements[i][1]] = 1;
+          }
+
+          }
+      return JSON.stringify(json);
+  }
+</script>

@@ -1,0 +1,21 @@
+<div class="redbox_contents" style="width:500px;">
+  <div class="body">
+    <div class="box_infotext">
+        About Gatekeepers
+    </div>  
+    <h2>The following items need gatekeeper's approval:</h2>
+    <ul>
+        <% @waiting_for_publish_items.each do |item| %>
+            <li>
+              <%= link_to item.title, item -%>
+              Approve by: <%= item.gatekeepers.collect { |m| link_to(m.title, m) }.join(", ") -%>
+            </li>
+        <% end %>
+    </ul>
+ 
+    <div align="center" style="margin-top: 1em">
+      <input type=button value='OK' style="width: 5em" onclick="$('submit_publishing').form.submit();">
+      <input type=button value='Cancel' onclick="RedBox.close()">
+    </div>
+  </div>
+</div>

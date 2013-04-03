@@ -21,7 +21,7 @@
   <% end %>
 
   <li class="secondary <%= checkbox_class -%>">
-    <%= checkbox_title -%>&nbsp;<%= check_box_tag publishing_item_param(item), 1, false, {:disabled=>(checkbox_class=='disabled') ? true :false} -%>
+    <%= checkbox_title -%>&nbsp;<%= check_box_tag publishing_item_param(item), 1, false, {:class=>"checkbox_element",:disabled=>(checkbox_class=='disabled') ? true :false} -%>
   </li>
 </ul>
 

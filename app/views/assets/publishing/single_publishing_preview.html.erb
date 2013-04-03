@@ -10,7 +10,7 @@
       <%= render :partial => "assets/publishing/asset_and_related", :object => @asset%>
       <br/>
       <br/>
-      <%= submit_tag "Submit",:disable_with=>"Submitting ..." -%>
+      <%= submit_tag "Submit", :id=>'submit_publishing', :disable_with=>"Submitting ..." -%>
       Or
       <%= link_to "Cancel", @asset-%>
   <% end %>
