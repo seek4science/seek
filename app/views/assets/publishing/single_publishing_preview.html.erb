@@ -1,5 +1,6 @@
 <%= stylesheet_link_tag "publishing" %>
 <%= javascript_include_tag "publishing" %>
+<% gatekeeper_required = @asset.gatekeeper_required? ? true : false %>
 
 <div class="show_basic">
   <h1>Publishing preview.</h1>
@@ -11,12 +12,47 @@
       <%= render :partial => "assets/publishing/asset_and_related", :object => @asset%>
       <br/>
       <br/>
-      <%= submit_tag "Submit", :id=>'submit_publishing', :onclick => "clickLink($('waiting_approval_list'));return(false);" -%>
+      <%= submit_tag "Submit", :id=>'submit_publishing', :onclick => "checkGatekeeperRequired();return false;" -%>
       Or
       <%= link_to "Cancel", @asset-%>
       <%= link_to_remote_redbox("waiting approval list",
                                 {:url => url_for(:action => "waiting_approval_list"), :failure => "alert('Sorry, an error has occurred.'); RedBox.close();",
-                                 :with => "'publish=' + getPublishParams()"},
+                                 :with => "'publish=' + getJsonPublishParams()"},
                                 {:id => "waiting_approval_list", :style => "display:none"})-%>
   <% end %>
 </div>
+
+<script type="text/javascript">
+    function checkGatekeeperRequired() {
+        var gatekeeper_required = 'false';
+        var publishing_items = getPublishingItems();
+        <%
+            assays = @asset.assays
+            if assays.empty?
+                total_items = [@asset]
+            else
+                studies =  assays.collect(&:study)
+                total_items = ([@asset] + assays + studies + studies.collect(&:investigation) + assays.collect(&:asset_masters).flatten).uniq
+            end
+        %>
+
+        for (var i = 0; i < publishing_items.length; i++) {
+            var asset_type = publishing_items[i][0];
+            var asset_id = publishing_items[i][1];
+            <% total_items.each do |item| %>
+                if (asset_type == '<%=item.class.name%>' && asset_id == '<%=item.id%>') {
+                    gatekeeper_required = '<%=item.gatekeeper_required?%>';
+                    break;
+                }
+            <% end %>
+        }
+
+        if (gatekeeper_required == 'true'){
+            clickLink($('waiting_approval_list'));
+        }
+        else{
+            $('submit_publishing').disable_with = 'Submitting ...';
+            $('submit_publishing').form.submit();
+        }
+    }
+</script>

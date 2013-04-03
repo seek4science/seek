@@ -37,26 +37,17 @@ module Seek
 
       def waiting_approval_list
         items_for_publishing = params[:publish].blank? ? [] : resolve_publish_params(ActiveSupport::JSON.decode(params[:publish])).select(&:can_publish?)
-        @waiting_for_publish_items = items_for_publishing.select{|item| item.gatekeeper_required? && !User.current_user.person.is_gatekeeper_of?(item)}
-        unless @waiting_for_publish_items.empty?
-          set_no_layout
-          respond_to do |format|
-            format.html { render :template=>"assets/publishing/waiting_approval_list"}
-          end
-          self.class.layout "main"
-        else
-          do_publish items_for_publishing
-          respond_to do |format|
-            flash.now[:notice]="Publishing complete"
-            format.html { render :template=>"assets/publishing/published" }
-          end
+        @waiting_for_publish_items = items_for_publishing.select { |item| item.gatekeeper_required? && !User.current_user.person.is_gatekeeper_of?(item) }
+        set_no_layout
+        respond_to do |format|
+          format.html { render :template => "assets/publishing/waiting_approval_list" }
         end
+        self.class.layout 'main'
       end
 
       def publish
         if request.post?
-          items_for_publishing = resolve_publish_params(params[:publish]).select(&:can_publish?)
-          do_publish items_for_publishing
+          do_publish
           respond_to do |format|
             flash.now[:notice]="Publishing complete"
             format.html { render :template=>"assets/publishing/published" }
@@ -100,7 +91,8 @@ module Seek
         end
       end
 
-      def do_publish items_for_publishing
+      def do_publish
+        items_for_publishing = resolve_publish_params(params[:publish]).select(&:can_publish?)
         @published_items = items_for_publishing.select(&:publish!)
         @notified_items = (items_for_publishing - @published_items).select{|item| !item.can_manage?}
         @waiting_for_publish_items = items_for_publishing - @published_items - @notified_items
