@@ -4,7 +4,7 @@ module Seek
 
       def self.included klass
         klass.class_eval do
-          before_validation :temporary_policy_while_waiting_for_publishing_approval, :publishing_auth
+          before_validation :temporary_policy_while_waiting_for_publishing_approval
           has_many :resource_publish_logs, :as => :resource
         end
       end
@@ -77,26 +77,14 @@ module Seek
         is_downloadable?
       end
 
-
-      def publishing_auth
-        return true if $authorization_checks_disabled
-        #only check if doing publishing
-        if self.policy.sharing_scope == Policy::EVERYONE && !self.kind_of?(Publication)
-          unless self.can_publish?
-            errors.add_to_base("You are not permitted to publish this #{self.class.name.underscore.humanize}")
-            return false
-          end
-        end
-      end
-
       #while item is waiting for publishing approval,set the policy of the item to:
       #new item: sysmo_and_project_policy
       #updated item: keep the policy as before
       def temporary_policy_while_waiting_for_publishing_approval
         return true if $authorization_checks_disabled
-        if self.new_record? && self.policy.sharing_scope == Policy::EVERYONE && !self.kind_of?(Publication) && !self.can_publish?
+        if self.new_record? && self.policy.sharing_scope == Policy::EVERYONE && !self.kind_of?(Publication) && self.gatekeeper_required? && !User.current_user.person.is_gatekeeper_of?(self)
           self.policy = Policy.sysmo_and_projects_policy self.projects
-        elsif !self.new_record? && self.policy.sharing_scope == Policy::EVERYONE && !self.kind_of?(Publication) && !self.can_publish?
+        elsif !self.new_record? && self.policy.sharing_scope == Policy::EVERYONE && !self.kind_of?(Publication) && self.gatekeeper_required? && !User.current_user.person.is_gatekeeper_of?(self)
           self.policy = Policy.find_by_id(self.policy.id)
         end
       end

@@ -129,7 +129,7 @@ module Seek
           latest_publish_log = ResourcePublishLog.last(:conditions => ["resource_type=? and resource_id=?",object.class.name,object.id])
 
           #waiting for approval
-          if params[:sharing] && params[:sharing][:sharing_scope].to_i == Policy::EVERYONE && !object.can_publish?
+          if params[:sharing] && params[:sharing][:sharing_scope].to_i == Policy::EVERYONE && object.gatekeeper_required? && !User.current_user.person.is_gatekeeper_of?(object)
             ResourcePublishLog.add_log(ResourcePublishLog::WAITING_FOR_APPROVAL,object)
             #publish
           elsif object.policy.sharing_scope == Policy::EVERYONE && latest_publish_log.try(:publish_state) != ResourcePublishLog::PUBLISHED
@@ -150,7 +150,7 @@ module Seek
           #don't process if the object is not valid or has not been saved, as this will a validation error on update or create
           return if object.nil? || (object.respond_to?("new_record?") && object.new_record?) || (object.respond_to?("errors") && !object.errors.empty?)
 
-          if params[:sharing] && params[:sharing][:sharing_scope].to_i == Policy::EVERYONE && !object.can_publish? && !objec.is_waiting_approval?(current_user)
+          if params[:sharing] && params[:sharing][:sharing_scope].to_i == Policy::EVERYONE && object.gatekeeper_required? && !User.current_user.person.is_gatekeeper_of?(object) && !object.is_waiting_approval?(current_user)
             deliver_request_publish_approval object
           end
         end

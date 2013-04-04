@@ -799,7 +799,7 @@ class SopsControllerTest < ActionController::TestCase
 
     #request publish
     login_as(sop.contributor)
-    assert !sop.can_publish?
+    assert sop.can_publish?
     assert_emails 1 do
       put :update, :id => sop.id, :sharing => {:sharing_scope => Policy::EVERYONE, "access_type#{Policy::EVERYONE}" => Policy::VISIBLE}
     end
@@ -823,7 +823,7 @@ class SopsControllerTest < ActionController::TestCase
 
     #request publish
     login_as(sop.contributor)
-    assert !sop.can_publish?
+    assert sop.can_publish?
     #send the first time
     assert_emails 1 do
       put :update, :id => sop.id, :sharing => {:sharing_scope => Policy::EVERYONE, "access_type#{Policy::EVERYONE}" => Policy::VISIBLE}

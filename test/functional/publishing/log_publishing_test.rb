@@ -72,7 +72,7 @@ class LogPublishingTest < ActionController::TestCase
 
     sop = sops(:my_first_sop)
     assert_not_equal Policy::EVERYONE, sop.policy.sharing_scope
-    assert !sop.can_publish?
+    assert sop.can_publish?
 
     assert_difference ('ResourcePublishLog.count') do
       put :update, :id => sop.id, :sharing => {:sharing_scope => Policy::EVERYONE, "access_type#{Policy::EVERYONE}" => Policy::VISIBLE}
@@ -151,8 +151,7 @@ class LogPublishingTest < ActionController::TestCase
     assert !df.is_published? ,"The datafile must be not be published for this test to succeed"
     assert df.can_publish?,"The datafile must be publishable for this test to succeed"
     assert !request_publishing_df.is_published?,"The datafile must be not be published for this test to succeed"
-    assert !request_publishing_df.can_publish?,"The datafile must not be publishable for this test to succeed"
-    assert request_publishing_df.can_manage?,"The datafile must be manageable for this test to succeed"
+    assert request_publishing_df.can_publish?,"The datafile must be publishable for this test to succeed"
 
     params={:publish=>{}}
     params[:publish][df.class.name]||={}

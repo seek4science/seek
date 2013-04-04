@@ -114,10 +114,9 @@ class PoliciesControllerTest < ActionController::TestCase
 
       login_as(a_person.user)
       assert sample.can_manage?
-      assert sample.can_publish?
 
-      updated_can_publish = PoliciesController.new().updated_can_publish(sample, gatekeeper.projects.first.id.to_s)
-      assert !updated_can_publish
+      updated_can_publish_immediately = PoliciesController.new().updated_can_publish_immediately(sample, gatekeeper.projects.first.id.to_s)
+      assert !updated_can_publish_immediately
   end
 
   test 'when creating an item, can publish the item if associate to it the project which has no gatekeeper' do
@@ -126,10 +125,9 @@ class PoliciesControllerTest < ActionController::TestCase
 
         login_as(a_person.user)
         assert sample.can_manage?
-        assert sample.can_publish?
 
-        updated_can_publish = PoliciesController.new().updated_can_publish(sample, Factory(:project).id.to_s)
-        assert updated_can_publish
+        updated_can_publish_immediately = PoliciesController.new().updated_can_publish_immediately(sample, Factory(:project).id.to_s)
+        assert updated_can_publish_immediately
     end
 
   test 'when updating an item, can not publish the item if associate to it the project which has gatekeeper' do
@@ -141,10 +139,9 @@ class PoliciesControllerTest < ActionController::TestCase
 
     login_as(a_person.user)
     assert sample.can_manage?
-    assert sample.can_publish?
 
-    updated_can_publish = PoliciesController.new().updated_can_publish(sample, gatekeeper.projects.first.id.to_s)
-    assert !updated_can_publish
+    updated_can_publish_immediately = PoliciesController.new().updated_can_publish_immediately(sample, gatekeeper.projects.first.id.to_s)
+    assert !updated_can_publish_immediately
   end
 
   test 'when updating an item, can publish the item if dissociate to it the project which has gatekeeper' do
@@ -156,10 +153,9 @@ class PoliciesControllerTest < ActionController::TestCase
 
         login_as(a_person.user)
         assert sample.can_manage?
-        assert !sample.can_publish?
 
-        updated_can_publish = PoliciesController.new().updated_can_publish(sample, Factory(:project).id.to_s)
-        assert updated_can_publish
+        updated_can_publish_immediately = PoliciesController.new().updated_can_publish_immediately(sample, Factory(:project).id.to_s)
+        assert updated_can_publish_immediately
   end
 
   test 'can publish assay without study' do
@@ -168,10 +164,9 @@ class PoliciesControllerTest < ActionController::TestCase
 
     login_as(a_person.user)
     assert assay.can_manage?
-    assert assay.can_publish?
 
-    updated_can_publish = PoliciesController.new().updated_can_publish(assay, '')
-    assert updated_can_publish
+    updated_can_publish_immediately = PoliciesController.new().updated_can_publish_immediately(assay, '')
+    assert updated_can_publish_immediately
   end
 
   test 'can not publish assay having project with gatekeeper' do
@@ -182,10 +177,9 @@ class PoliciesControllerTest < ActionController::TestCase
 
     login_as(a_person.user)
     assert assay.can_manage?
-    assert !assay.can_publish?
 
-    updated_can_publish = PoliciesController.new().updated_can_publish(assay, assay.study.id.to_s)
-    assert !updated_can_publish
+    updated_can_publish_immediately = PoliciesController.new().updated_can_publish_immediately(assay, assay.study.id.to_s)
+    assert !updated_can_publish_immediately
   end
 
   test 'always can publish for the published item' do
@@ -198,10 +192,9 @@ class PoliciesControllerTest < ActionController::TestCase
 
           login_as(a_person.user)
           assert sample.can_manage?
-          assert sample.can_publish?
 
-          updated_can_publish = PoliciesController.new().updated_can_publish(sample, gatekeeper.projects.first.id.to_s)
-          assert updated_can_publish
+          updated_can_publish_immediately = PoliciesController.new().updated_can_publish_immediately(sample, gatekeeper.projects.first.id.to_s)
+          assert updated_can_publish_immediately
   end
 
   test 'should show the preview permission for resource without projects' do

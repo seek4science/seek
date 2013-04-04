@@ -93,22 +93,24 @@ class PoliciesController < ApplicationController
       respond_to do |format|
         format.html { render :template=>"layouts/preview_permissions",
                              :locals => {:policy => policy, :privileged_people => privileged_people,
-                                         :updated_can_publish => updated_can_publish(resource),
+                                         :updated_can_publish_immediately => updated_can_publish_immediately(resource),
                                          :send_request_publish_approval => !resource.is_waiting_approval?(current_user)}}
       end
   end
 
-  #To check where the can_publish? changes when changing the projects associated with the resource
-  def updated_can_publish resource, project_ids=params[:project_ids]
+  #To check wherether you can publish immediately or need to go through gatekeeper's approval when changing the projects associated with the resource
+  def updated_can_publish_immediately resource, project_ids=params[:project_ids]
     cloned_resource = resource.clone
     cloned_resource.policy = resource.policy.deep_copy
     cloned_resource = resource_with_assigned_projects cloned_resource,project_ids
     if !resource.new_record? && resource.policy.sharing_scope == Policy::EVERYONE
-      updated_can_publish = true
+      updated_can_publish_immediately = true
+    elsif cloned_resource.gatekeeper_required? && !User.current_user.person.is_gatekeeper_of?(cloned_resource)
+      updated_can_publish_immediately = false
     else
-      updated_can_publish = cloned_resource.can_publish?
+      updated_can_publish_immediately = true
     end
-    updated_can_publish
+    updated_can_publish_immediately
   end
 
   protected
