@@ -8,7 +8,6 @@ class PresentationsControllerTest < ActionController::TestCase
 
   def setup
     login_as Factory(:user)
-    User.current_user.person.set_default_subscriptions
   end
 
   def rest_api_test_object

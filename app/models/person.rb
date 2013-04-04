@@ -100,7 +100,6 @@ class Person < ActiveRecord::Base
   accepts_nested_attributes_for :project_subscriptions, :allow_destroy => true
 
   has_many :subscriptions,:dependent => :destroy
-  before_create :set_default_subscriptions
 
   ROLES = %w[admin pal project_manager asset_manager gatekeeper]
   ROLES_MASK_FOR_ADMIN = 2**ROLES.index('admin')
@@ -152,11 +151,7 @@ class Person < ActiveRecord::Base
     self.roles_mask = self.roles_mask.to_i - ((remove_roles & ROLES).map { |r| 2**ROLES.index(r) }.sum)
   end
 
-  def set_default_subscriptions
-    projects.each do |proj|
-      project_subscriptions.build :project => proj
-    end
-  end
+
 
   RELATED_RESOURCE_TYPES = [:data_files,:models,:sops,:presentations,:events,:publications, :investigations]
   RELATED_RESOURCE_TYPES.each do |type|
