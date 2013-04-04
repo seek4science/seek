@@ -19,7 +19,7 @@
       </ul>
   <% end -%>
 
-  <% if @notified_items.empty? -%>
+  <% if !@notified_items.empty? -%>
       <h2>Items for which notifications to publish were sent the owners</h2>
       <ul id="notified">
         <% @notified_items.each do |item| -%>
