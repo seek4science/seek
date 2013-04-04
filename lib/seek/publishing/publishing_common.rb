@@ -2,7 +2,8 @@ module Seek
   module Publishing
     module PublishingCommon
       def self.included(base)
-        base.before_filter :set_asset, :only=>[:single_publishing_preview]
+        base.before_filter :set_asset, :only=>[:single_publishing_preview,:publish]
+        base.before_filter :single_publish_auth, :only=>[:single_publishing_preview,:publish]
         base.before_filter :set_assets, :only=>[:batch_publishing_preview]
         base.before_filter :batch_publish_auth, :only=>[:batch_publishing_preview,:publish]
         base.after_filter :request_publish_approval,:log_publishing, :only=>[:create,:update]
@@ -63,6 +64,15 @@ module Seek
         if self.controller_name=='people'
           if !(User.logged_in_and_registered? && current_user.person.id == params[:id].to_i)
             error("You are not permitted to perform this action", "is invalid (not yourself)")
+            return false
+          end
+        end
+      end
+
+      def single_publish_auth
+        if !(self.controller_name=='people')
+          if !@asset.can_publish?
+            error("You are not permitted to perform this action", "is invalid")
             return false
           end
         end

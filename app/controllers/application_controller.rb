@@ -275,8 +275,6 @@ class ApplicationController < ActionController::Base
 
       when 'manage'
           'manage'
-      when 'single_publishing_preview'
-          'publish'
       else
         nil
     end
