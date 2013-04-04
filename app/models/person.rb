@@ -59,10 +59,23 @@ class Person < ActiveRecord::Base
   :before_remove => [:unsubscribe_to_work_group_project, :touch_work_group_project]
 
   def subscribe_to_work_group_project wg
+
+    #subscribe direct project
     project_subscriptions.build :project => wg.project unless project_subscriptions.detect {|ps| ps.project == wg.project}
+
+    #subscribe to ancestor projects
+    if Project.is_hierarchical?
+       wg.project.ancestors.each do |ancestor_proj|
+         project_subscriptions.build :project => ancestor_proj unless project_subscriptions.detect {|ps| ps.project == ancestor_proj}
+       end
+    end
+
   end
 
   def unsubscribe_to_work_group_project wg
+
+    #FIXME: ONLY direct project subscriptions are deleted, the related parent projects subscriptions remains there.
+    # people have to manually unsubscribe them on profle_edit_page
     if ps = project_subscriptions.detect {|ps| ps.project == wg.project}
       project_subscriptions.delete ps
     end
@@ -96,7 +109,7 @@ class Person < ActiveRecord::Base
 
   alias_attribute :webpage,:web_page
 
-  has_many :project_subscriptions, :before_add => proc {|person, ps| ps.person = person},:dependent => :destroy
+  has_many :project_subscriptions, :before_add => proc {|person, ps| ps.person = person},:uniq=> true, :dependent => :destroy
   accepts_nested_attributes_for :project_subscriptions, :allow_destroy => true
 
   has_many :subscriptions,:dependent => :destroy

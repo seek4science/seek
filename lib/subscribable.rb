@@ -86,7 +86,8 @@ module Subscribable
   end
 
   def set_subscription_job
-      SetSubscriptionsForItemJob.create_job(self.class.name, self.id, self.projects.collect(&:id))
+      project_ids = Project.is_hierarchical?? self.projects.collect(&:id) : self.projects_and_descendants.map(&:id)
+      SetSubscriptionsForItemJob.create_job(self.class.name, self.id, project_ids)
   end
 
   def update_subscription_job_if_study_or_assay

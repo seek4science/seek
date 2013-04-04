@@ -10,6 +10,11 @@ module ProjectCompat
       def projects_and_ancestors
           self.projects.collect { |proj| [proj]+proj.ancestors }.flatten.uniq
       end
+
+      def projects_and_descendants
+          self.projects.collect { |proj| [proj]+proj.descendants }.flatten.uniq
+      end
+
     end
   end
 end
