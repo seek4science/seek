@@ -41,10 +41,11 @@ module Seek
       end
 
       def is_published?
+        policy = self.policy
         if self.is_downloadable?
-          can_download? nil
+           policy.public? && policy.access_type >= Policy::ACCESSIBLE
         else
-          can_view? nil
+          policy.public?
         end
       end
 
