@@ -24,11 +24,11 @@ ActionController::Routing::Routes.draw do |map|
 
   map.resources :measured_items
 
-  map.resources :investigations,:member=>{:single_publish=>:post}
+  map.resources :investigations
 
-  map.resources :studies,:member=>{:single_publish=>:post}
+  map.resources :studies
 
-  map.resources :assays,:member=>{:update_annotations_ajax=>:post,:single_publish=>:post}
+  map.resources :assays,:member=>{:update_annotations_ajax=>:post}
 
   map.resources :saved_searches
 
@@ -78,7 +78,7 @@ ActionController::Routing::Routes.draw do |map|
   end
 
   map.resources :sops,
-                :member => {:download=>:get,:new_version=>:post,:single_publishing_preview=>:get,:single_publish=>[:post,:get],
+                :member => {:download=>:get,:new_version=>:post,:single_publishing_preview=>:get,:publish=>[:post,:get],
                             :approve_or_reject_publish=>:get,:gatekeeper_decide=>:post,
                             :request_resource=>:post, :update_annotations_ajax=>:post } do |sop|
     sop.resources :experimental_conditions, :collection =>{:create_from_existing=>:post}
