@@ -24,11 +24,11 @@ ActionController::Routing::Routes.draw do |map|
 
   map.resources :measured_items
 
-  map.resources :investigations
+  map.resources :investigations,:member=>{:approve_or_reject_publish=>:get,:gatekeeper_decide=>:post}
 
-  map.resources :studies
+  map.resources :studies,:member=>{:approve_or_reject_publish=>:get,:gatekeeper_decide=>:post}
 
-  map.resources :assays,:member=>{:update_annotations_ajax=>:post}
+  map.resources :assays,:member=>{:update_annotations_ajax=>:post,:approve_or_reject_publish=>:get,:gatekeeper_decide=>:post}
 
   map.resources :saved_searches
 
