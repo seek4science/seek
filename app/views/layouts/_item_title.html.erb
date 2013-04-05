@@ -29,8 +29,10 @@ extra_image_style = make_image_relative ? "style='position:relative;'" : ""
       <%=
           if item.private?
             "This item is <span style='color: red; font-weight: bold;'>Private</span> (only you can view it)"
+          elsif item.is_published?
+            "This item is <span style='color: green; font-weight: bold;'>Published</span> (all visitors, even without a login, may view/access this item)"
           elsif item.public?
-            "This item is <span style='color: green; font-weight: bold;'>Public</span> (all visitors, even without a login, may view this item)"
+            "This item is <span style='color: green; font-weight: bold;'>Public</span> visible (all visitors, even without a login, may view this item)"
           else
             "This item is <span style='font-weight: bold;'>Shared</span>, but not with all visitors to this site"
           end
