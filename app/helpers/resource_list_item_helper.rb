@@ -55,7 +55,7 @@ module ResourceListItemHelper
       end
       html << "</div>"
     end
-    visibility = resource.authorization_supported? && resource.can_manage? ? list_item_visibility(resource.policy) : ""
+    visibility = resource.authorization_supported? && resource.can_manage? ? list_item_visibility(resource) : ""
     result = result.gsub("#item_visibility",visibility)
     result
   end
@@ -159,11 +159,13 @@ module ResourceListItemHelper
     end
   end
 
-  def list_item_visibility policy,css_class="visibility_icon"
+  def list_item_visibility item,css_class="visibility_icon"
     title = ""
     html  = ""
+    policy = item.policy
+
     case policy.sharing_scope
-      when 0
+      when Policy::PRIVATE
         if policy.permissions.empty?
           title = "Private"
           html << image('lock', :title=>title, :class => css_class)
@@ -171,7 +173,7 @@ module ResourceListItemHelper
           title = "Custom policy"
           html << image('manage', :title=>title, :class => css_class)
         end
-      when 2
+      when Policy::ALL_SYSMO_USERS
         if policy.access_type > 0
           title = "Visible to all #{Seek::Config.project_name} projects"
           html << image('open', :title=>title, :class => css_class)
@@ -179,9 +181,14 @@ module ResourceListItemHelper
           title = "Visible to the projects associated with this item"
           html << image('open', :title=>title, :class => css_class)
         end
-      when 4
-        title = "Visible to everyone"
-        html << image('world', :title=>title, :class => css_class)
+      when Policy::EVERYONE
+        if !item.is_downloadable? || (item.is_downloadable? && policy.access_type >= Policy::ACCESSIBLE)
+          title = "Was published"
+          html << image('world', :title=>title, :class => css_class)
+        else
+          title = "Visible to everyone, but not accessible"
+          html << image('partial_world', :title=>title, :class => css_class)
+        end
     end
     html << ""
     html

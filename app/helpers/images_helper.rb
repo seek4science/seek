@@ -262,6 +262,8 @@ module ImagesHelper
       "misc_icons/feed_icon.png"
       when "impersonate"
       "famfamfam_silk/group_go.png"
+      when "partial_world"
+        "misc_icons/partial_world.png"
       when "world"
       "famfamfam_silk/world.png"
       when "file_large"
