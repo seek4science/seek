@@ -6,7 +6,7 @@
   end
 -%>
 
-<%= render :partial => "layouts/item_title",:locals=>{:item=>@data_file, :version => @display_data_file.version} -%>
+<%= render :partial => "layouts/item_title",:locals=>{:item=>@data_file } -%>
 
 <ul class="sectionIcons">
 <%= asset_buttons @data_file,@display_data_file.version -%>
