@@ -18,7 +18,7 @@
             <%= render :partial => "assets/view_content", :locals => {:content_blob => display_asset.content_blob, :button_style => true} -%>
         <% end %>
     <% end -%>
-    <% if !can_download_asset?(asset, params[:code]) %>
+    <% if logged_in? && !can_download_asset?(asset, params[:code]) %>
         <li>
           <%= render :partial=>"assets/request_resource",:locals=>{:resource=>asset} %>
         </li>
