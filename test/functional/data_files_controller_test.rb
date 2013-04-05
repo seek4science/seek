@@ -555,7 +555,7 @@ class DataFilesControllerTest < ActionController::TestCase
     end
   end
 
-  test "should not show website link for viewable but inaccessible data" do
+  test "should not show website link for viewable but inaccessible data but should show request button" do
     mock_remote_file "#{Rails.root}/test/fixtures/files/html_file.html","http://webpage.com",{'Content-Type' => 'text/html'}
     df = Factory :data_file,:content_blob=>Factory(:content_blob,:url=>"http://webpage.com"),:policy=>Factory(:all_sysmo_viewable_policy)
     user = Factory :user
@@ -569,6 +569,11 @@ class DataFilesControllerTest < ActionController::TestCase
       assert_select "p > b",:text=>/Link/,:count=>0
       assert_select "a[href=?][target=_blank]","http://webpage.com",:text=>"http://webpage.com",:count=>0
     end
+
+    assert_select "ul.sectionIcons > li > span.icon" do
+      assert_select "a",:text=>/Request/,:count=>1
+    end
+
   end
 
 
@@ -607,16 +612,20 @@ class DataFilesControllerTest < ActionController::TestCase
     df = Factory :data_file,:content_blob=>Factory(:content_blob,:url=>"http://webpage.com")
     assert df.content_blob.is_webpage?
     login_as(df.contributor.user)
+    assert df.can_download?(df.contributor.user)
     get :show,:id=>df
     assert_response :success
     assert_select "ul.sectionIcons > li > span.icon" do
       assert_select "a[href=?]",download_data_file_path(df,:version=>df.version),:count=>0
       assert_select "a",:text=>/Download/,:count=>0
+      assert_select "a",:text=>/Request/,:count=>0
     end
 
     assert_select "div.contribution_aftertitle" do
       assert_select "b",:text=>/Downloads/,:count=>0
     end
+
+
 
   end
 
