@@ -202,6 +202,20 @@ class PublishingPermissionsTest < ActiveSupport::TestCase
     end
   end
 
+  test "gatekeeper can not publish if the asset is already published" do
+    gatekeeper = Factory(:gatekeeper)
+    datafile = Factory(:data_file,:projects => gatekeeper.projects,
+                       :policy => Factory(:public_policy),:contributor=>gatekeeper.user)
+
+    User.with_current_user gatekeeper.user do
+      assert datafile.is_published?,"This datafile must be already published for the test to succeed"
+      assert gatekeeper.is_gatekeeper_of?(datafile), 'The gatekeeper must be the gatekeeper of datafile for the test to be meaningful'
+      assert datafile.can_manage?, 'The datafile must not be manageable for the test to succeed'
+
+      assert !datafile.can_publish?, 'This datafile should not be publishable'
+    end
+  end
+
   test "publish! only when can_publish?" do
     user = Factory(:user)
     df = Factory(:data_file, :contributor => user)
