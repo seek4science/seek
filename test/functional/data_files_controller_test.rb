@@ -500,6 +500,45 @@ class DataFilesControllerTest < ActionController::TestCase
 
   end
 
+  test "should add link to a webpage" do
+    mock_remote_file "#{Rails.root}/test/fixtures/files/html_file.html","http://webpage.com",{'Content-Type' => 'text/html'}
+    assert_difference('DataFile.count') do
+      assert_difference('ContentBlob.count') do
+        post :create, :data_file => { :title=>"Test HTTP",:data_url=>"http://webpage.com",:projects=>[projects(:sysmo_project)]}, :sharing=>valid_sharing
+      end
+    end
+
+    assert_redirected_to data_file_path(assigns(:data_file))
+    assert_equal users(:datafile_owner),assigns(:data_file).contributor
+    assert !assigns(:data_file).content_blob.url.blank?
+    assert assigns(:data_file).content_blob.data_io_object.nil?
+    assert !assigns(:data_file).content_blob.file_exists?
+    assert_equal nil, assigns(:data_file).content_blob.original_filename
+    assert assigns(:data_file).content_blob.is_webpage?
+    assert_equal "http://webpage.com", assigns(:data_file).content_blob.url
+    assert_equal "text/html", assigns(:data_file).content_blob.content_type
+  end
+
+  test "should add link to a webpage from windows browser" do
+    mock_remote_file "#{Rails.root}/test/fixtures/files/html_file.html","http://webpage.com",{'Content-Type' => 'text/html'}
+    assert_difference('DataFile.count') do
+      assert_difference('ContentBlob.count') do
+        @request.env['HTTP_USER_AGENT']="Windows"
+        post :create, :data_file => { :title=>"Test HTTP",:data_url=>"http://webpage.com",:projects=>[projects(:sysmo_project)]}, :sharing=>valid_sharing
+      end
+    end
+
+    assert_redirected_to data_file_path(assigns(:data_file))
+    assert_equal users(:datafile_owner),assigns(:data_file).contributor
+    assert !assigns(:data_file).content_blob.url.blank?
+    assert assigns(:data_file).content_blob.data_io_object.nil?
+    assert !assigns(:data_file).content_blob.file_exists?
+    assert_equal nil, assigns(:data_file).content_blob.original_filename
+    assert assigns(:data_file).content_blob.is_webpage?
+    assert_equal "http://webpage.com", assigns(:data_file).content_blob.url
+    assert_equal "text/html", assigns(:data_file).content_blob.content_type
+  end
+
   test "should show wepage as a link" do
     mock_remote_file "#{Rails.root}/test/fixtures/files/html_file.html","http://webpage.com",{'Content-Type' => 'text/html'}
     df = Factory :data_file,:content_blob=>Factory(:content_blob,:url=>"http://webpage.com")
