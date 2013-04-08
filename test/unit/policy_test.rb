@@ -133,12 +133,12 @@ class PolicyTest < ActiveSupport::TestCase
     assert_equal (people_with_access_type.count + whitelist_added.count), filtered_people.count
   end
 
-  test 'should not have asset managers in the summarize_permissions if the asset is entirely private' do
+  test 'should have asset managers in the summarize_permissions if the asset is entirely private' do
     asset_manager = Factory(:asset_manager)
     policy = Factory(:private_policy)
     User.with_current_user Factory(:user) do
       people_in_group = policy.summarize_permissions [], [asset_manager]
-      assert !people_in_group[Policy::MANAGING].include?([asset_manager.id, asset_manager.name,Policy::MANAGING])
+      assert people_in_group[Policy::MANAGING].include?([asset_manager.id, asset_manager.name+' (asset manager)',Policy::MANAGING])
     end
   end
 

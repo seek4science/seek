@@ -310,13 +310,11 @@ class Policy < ActiveRecord::Base
         #group people by access_type
         grouped_people_by_access_type.merge!(filtered_people.group_by{|person| person[2]})
 
-        if !is_entirely_private? grouped_people_by_access_type, contributor
-          asset_manager_array = asset_managers.collect{|am| [am.id, "#{am.name}", Policy::MANAGING] unless am.blank?}
-          if grouped_people_by_access_type[Policy::MANAGING].blank?
-            grouped_people_by_access_type[Policy::MANAGING] = asset_manager_array
-          else
-            grouped_people_by_access_type[Policy::MANAGING] |= asset_manager_array
-          end
+        asset_manager_array = asset_managers.collect { |am| [am.id, "#{am.name}", Policy::MANAGING] unless am.blank? }
+        if grouped_people_by_access_type[Policy::MANAGING].blank?
+          grouped_people_by_access_type[Policy::MANAGING] = asset_manager_array
+        else
+          grouped_people_by_access_type[Policy::MANAGING] |= asset_manager_array
         end
 
         #concat the roles to a person name
