@@ -801,7 +801,7 @@ class SopsControllerTest < ActionController::TestCase
     login_as(sop.contributor)
     assert sop.can_publish?
     assert_emails 1 do
-      put :update, :id => sop.id, :sharing => {:sharing_scope => Policy::EVERYONE, "access_type#{Policy::EVERYONE}" => Policy::VISIBLE}
+      put :update, :id => sop.id, :sharing => {:sharing_scope => Policy::EVERYONE, "access_type_#{Policy::EVERYONE}" => Policy::VISIBLE}
     end
   end
 
@@ -811,9 +811,10 @@ class SopsControllerTest < ActionController::TestCase
 
     #request publish
     login_as(sop.contributor)
+    assert !sop.is_published?
     assert sop.can_publish?
     assert_emails 0 do
-      put :update, :id => sop.id, :sharing => {:sharing_scope => Policy::EVERYONE, "access_type#{Policy::EVERYONE}" => Policy::VISIBLE}
+      put :update, :id => sop.id, :sharing => {:sharing_scope => Policy::EVERYONE, "access_type_#{Policy::EVERYONE}" => Policy::VISIBLE}
     end
   end
 
@@ -826,11 +827,11 @@ class SopsControllerTest < ActionController::TestCase
     assert sop.can_publish?
     #send the first time
     assert_emails 1 do
-      put :update, :id => sop.id, :sharing => {:sharing_scope => Policy::EVERYONE, "access_type#{Policy::EVERYONE}" => Policy::VISIBLE}
+      put :update, :id => sop.id, :sharing => {:sharing_scope => Policy::EVERYONE, "access_type_#{Policy::EVERYONE}" => Policy::VISIBLE}
     end
     #dont send again
     assert_emails 0 do
-      put :update, :id => sop.id, :sharing => {:sharing_scope => Policy::EVERYONE, "access_type#{Policy::EVERYONE}" => Policy::VISIBLE}
+      put :update, :id => sop.id, :sharing => {:sharing_scope => Policy::EVERYONE, "access_type_#{Policy::EVERYONE}" => Policy::VISIBLE}
     end
   end
 

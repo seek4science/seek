@@ -30,7 +30,7 @@ class LogPublishingTest < ActionController::TestCase
   test 'log when creating item and request publish it' do
     @controller = SopsController.new()
     assert_difference ('ResourcePublishLog.count') do
-      post :create, :sop => valid_sop, :sharing => {:sharing_scope => Policy::EVERYONE, "access_type#{Policy::EVERYONE}" => Policy::VISIBLE}
+      post :create, :sop => valid_sop, :sharing => {:sharing_scope => Policy::EVERYONE, "access_type_#{Policy::EVERYONE}" => Policy::VISIBLE}
     end
     publish_log = ResourcePublishLog.find(:last)
     assert_equal ResourcePublishLog::WAITING_FOR_APPROVAL, publish_log.publish_state.to_i
@@ -75,7 +75,7 @@ class LogPublishingTest < ActionController::TestCase
     assert sop.can_publish?
 
     assert_difference ('ResourcePublishLog.count') do
-      put :update, :id => sop.id, :sharing => {:sharing_scope => Policy::EVERYONE, "access_type#{Policy::EVERYONE}" => Policy::VISIBLE}
+      put :update, :id => sop.id, :sharing => {:sharing_scope => Policy::EVERYONE, "access_type_#{Policy::EVERYONE}" => Policy::VISIBLE}
     end
     publish_log = ResourcePublishLog.find(:last)
     assert_equal ResourcePublishLog::WAITING_FOR_APPROVAL, publish_log.publish_state.to_i
@@ -120,7 +120,7 @@ class LogPublishingTest < ActionController::TestCase
     df = Factory(:data_file, :projects => gatekeeper.projects)
 
     login_as(df.contributor)
-    put :update, :id => df.id, :sharing => {:sharing_scope => Policy::EVERYONE, "access_type#{Policy::EVERYONE}" => Policy::VISIBLE}
+    put :update, :id => df.id, :sharing => {:sharing_scope => Policy::EVERYONE, "access_type_#{Policy::EVERYONE}" => Policy::VISIBLE}
 
     logout
 
