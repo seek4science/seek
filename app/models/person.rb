@@ -316,9 +316,13 @@ class Person < ActiveRecord::Base
     self.first_letter=first_letter
   end
 
-  def project_roles_of_project(project)
+  def project_roles_of_project(projects_or_project)
     #Get intersection of all project memberships + person's memberships to find project membership
-    memberships = group_memberships.select{|g| g.work_group.project == project}
+    if projects_or_project.is_a? Array
+      memberships = group_memberships.select{|g| projects_or_project.include? g.work_group.project}
+    else
+      memberships = group_memberships.select{|g| g.work_group.project == projects_or_project}
+    end
     return memberships.collect{|m| m.project_roles}.flatten
   end
 
