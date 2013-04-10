@@ -493,6 +493,45 @@ class DataFilesControllerTest < ActionController::TestCase
 
   end
 
+  test "should add link to a webpage" do
+    mock_remote_file "#{Rails.root}/test/fixtures/files/html_file.html","http://webpage.com",{'Content-Type' => 'text/html'}
+    assert_difference('DataFile.count') do
+      assert_difference('ContentBlob.count') do
+        post :create, :data_file => { :title=>"Test HTTP",:data_url=>"http://webpage.com",:projects=>[projects(:sysmo_project)]}, :sharing=>valid_sharing
+      end
+    end
+
+    assert_redirected_to data_file_path(assigns(:data_file))
+    assert_equal users(:datafile_owner),assigns(:data_file).contributor
+    assert !assigns(:data_file).content_blob.url.blank?
+    assert assigns(:data_file).content_blob.data_io_object.nil?
+    assert !assigns(:data_file).content_blob.file_exists?
+    assert_equal nil, assigns(:data_file).content_blob.original_filename
+    assert assigns(:data_file).content_blob.is_webpage?
+    assert_equal "http://webpage.com", assigns(:data_file).content_blob.url
+    assert_equal "text/html", assigns(:data_file).content_blob.content_type
+  end
+
+  test "should add link to a webpage from windows browser" do
+    mock_remote_file "#{Rails.root}/test/fixtures/files/html_file.html","http://webpage.com",{'Content-Type' => 'text/html'}
+    assert_difference('DataFile.count') do
+      assert_difference('ContentBlob.count') do
+        @request.env['HTTP_USER_AGENT']="Windows"
+        post :create, :data_file => { :title=>"Test HTTP",:data_url=>"http://webpage.com",:projects=>[projects(:sysmo_project)]}, :sharing=>valid_sharing
+      end
+    end
+
+    assert_redirected_to data_file_path(assigns(:data_file))
+    assert_equal users(:datafile_owner),assigns(:data_file).contributor
+    assert !assigns(:data_file).content_blob.url.blank?
+    assert assigns(:data_file).content_blob.data_io_object.nil?
+    assert !assigns(:data_file).content_blob.file_exists?
+    assert_equal nil, assigns(:data_file).content_blob.original_filename
+    assert assigns(:data_file).content_blob.is_webpage?
+    assert_equal "http://webpage.com", assigns(:data_file).content_blob.url
+    assert_equal "text/html", assigns(:data_file).content_blob.content_type
+  end
+
   test "should show wepage as a link" do
     mock_remote_file "#{Rails.root}/test/fixtures/files/html_file.html","http://webpage.com",{'Content-Type' => 'text/html'}
     df = Factory :data_file,:content_blob=>Factory(:content_blob,:url=>"http://webpage.com")
@@ -509,7 +548,7 @@ class DataFilesControllerTest < ActionController::TestCase
     end
   end
 
-  test "should not show website link for viewable but inaccessible data" do
+  test "should not show website link for viewable but inaccessible data but should show request button" do
     mock_remote_file "#{Rails.root}/test/fixtures/files/html_file.html","http://webpage.com",{'Content-Type' => 'text/html'}
     df = Factory :data_file,:content_blob=>Factory(:content_blob,:url=>"http://webpage.com"),:policy=>Factory(:all_sysmo_viewable_policy)
     user = Factory :user
@@ -523,6 +562,11 @@ class DataFilesControllerTest < ActionController::TestCase
       assert_select "p > b",:text=>/Link/,:count=>0
       assert_select "a[href=?][target=_blank]","http://webpage.com",:text=>"http://webpage.com",:count=>0
     end
+
+    assert_select "ul.sectionIcons > li > span.icon" do
+      assert_select "a",:text=>/Request/,:count=>1
+    end
+
   end
 
 
@@ -561,16 +605,20 @@ class DataFilesControllerTest < ActionController::TestCase
     df = Factory :data_file,:content_blob=>Factory(:content_blob,:url=>"http://webpage.com")
     assert df.content_blob.is_webpage?
     login_as(df.contributor.user)
+    assert df.can_download?(df.contributor.user)
     get :show,:id=>df
     assert_response :success
     assert_select "ul.sectionIcons > li > span.icon" do
       assert_select "a[href=?]",download_data_file_path(df,:version=>df.version),:count=>0
       assert_select "a",:text=>/Download/,:count=>0
+      assert_select "a",:text=>/Request/,:count=>0
     end
 
     assert_select "div.contribution_aftertitle" do
       assert_select "b",:text=>/Downloads/,:count=>0
     end
+
+
 
   end
 

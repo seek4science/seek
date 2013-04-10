@@ -219,7 +219,7 @@ module AssetsCommonExtension
     version = asset.version
     if asset.respond_to?(:content_blob) && !asset.respond_to?(:content_blobs)
       #if request is sent from a browser running on window, take the content type from the filename instead
-      if request.headers['HTTP_USER_AGENT'].include?('Win')
+      if request.headers['HTTP_USER_AGENT'].include?('Win') || params[sym][:content_type].nil?
         content_type = content_type_from_filename params[sym][:original_filename]
       else
         content_type = params[sym][:content_type]
@@ -237,7 +237,7 @@ module AssetsCommonExtension
       # create new /new version
       @tmp_io_objects_localfile.each do |tmp_io_object|
         #if request is sent from a browser running on window, take the content type from the filename instead
-        if request.headers['HTTP_USER_AGENT'].include?('Win')
+        if request.headers['HTTP_USER_AGENT'].include?('Win') || @content_types[0].nil?
           content_type = content_type_from_filename @original_filenames[0]
         else
           content_type = @content_types[0].to_s
@@ -369,12 +369,17 @@ module AssetsCommonExtension
   end
 
   def content_type_from_filename filename
-    file_format = filename.split('.').last.try(:strip)
-    possible_mime_types = mime_types_for_extension file_format
-    type = possible_mime_types.sort.first || "application/octet-stream"
-    #FIXME: this is just a quick fix, until http://dev.mygrid.org.uk/issues/browse/SYSMO-1129 is fully resolved
-    type = type.gsub("image/jpg","image/jpeg") unless type.nil?
-    type
+    if filename.nil?
+      "text/html" #assume it points to a webpage if there is no filename
+    else
+      file_format = filename.split('.').last.try(:strip)
+      possible_mime_types = mime_types_for_extension file_format
+      type = possible_mime_types.sort.first || "application/octet-stream"
+      #FIXME: this is just a quick fix, until http://dev.mygrid.org.uk/issues/browse/SYSMO-1129 is fully resolved
+      type = type.gsub("image/jpg","image/jpeg") unless type.nil?
+      type
+    end
+
   end
 
   #prioritize filename from data_hash
