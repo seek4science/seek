@@ -64,7 +64,7 @@ ActionController::Routing::Routes.draw do |map|
   end
 
   map.resources :people,
-                :member=>{:admin=>:get,:batch_publishing_preview=>:get,:publish=>[:post,:get]},
+                :member=>{:admin=>:get,:batch_publishing_preview=>:get,:publish=>[:post,:get],:publish_related_items=>:get},
                 :collection=>{:select=>:get,:get_work_group =>:get}  do |person|
     # avatars / pictures 'owned by' person
     person.resources :avatars, :member => { :select => :post }, :collection => { :new => :post }

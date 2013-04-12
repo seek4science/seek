@@ -18,7 +18,7 @@
                 <% end %>
           <% end %>
           <br/>          
-          <%= submit_tag "Submit", :id=>'submit_publishing', :onclick => "checkGatekeeperRequired();return(false);" -%>
+          <%= submit_tag "Submit", :id=>'submit_publishing', :onclick => "checkRelatedItems();return(false);" -%>
           Or
           <%= link_to "Cancel", person_path(params[:id].to_i)-%>
           <%= link_to_remote_redbox("waiting approval list",
@@ -31,6 +31,21 @@
 </div>
 
 <script type="text/javascript">
+    function checkRelatedItems(){
+        if ('<%= !@assets.values.flatten.collect(&:assays).empty? %>' == 'true'){
+            //confirmation if you wish to publish related items?
+            if (confirm("There are items related to the selected assets. They are ISA items and their assets. Would you like to process publishing them as well?")){
+                var submit_button = $('submit_publishing');
+                submit_button.disable_with = 'Submitting ...';
+                submit_button.form.action = 'publish_related_items';
+                submit_button.form.method = 'get';
+                $('submit_publishing').form.submit();
+            }else
+                checkGatekeeperRequired();
+        }else
+            checkGatekeeperRequired();
+    }
+
     function checkGatekeeperRequired() {
         var gatekeeper_required = 'false';
         var publishing_items = getPublishingItems();
@@ -55,7 +70,8 @@
             <% total_items.each do |item| %>
                 if (asset_type == '<%=item.class.name%>' && asset_id == '<%=item.id%>') {
                     gatekeeper_required = '<%=item.gatekeeper_required? && !current_user.person.is_gatekeeper_of?(item)%>';
-                    break;
+                    if (gatekeeper_required == 'true')
+                        break;
                 }
             <% end %>
         }

@@ -10,9 +10,13 @@
 <% form_tag :action => :publish do %>
     <div style="clear:both;">
       <% investigations.each do |investigation| %>
-          <div style="clear:both;">
             <%= embedded_isa_svg_for_publishing(investigation, true, selected_items) -%>
-          </div>
+      <% end %>
+
+      <% selected_items.each do |item| %>
+          <% if item.assays.empty? %>
+            <%= embedded_isa_svg_for_publishing(item, true, selected_items) -%>
+          <% end %>
       <% end %>
     </div>
     <% all_items_in_svg.each do |item| %>
@@ -59,10 +63,11 @@
         for (var i = 0; i < publishing_items.length; i++) {
             var asset_type = publishing_items[i][0];
             var asset_id = publishing_items[i][1];
-            <% all_items_in_svg.each do |item| %>
+            <% (all_items_in_svg + selected_items).uniq.each do |item| %>
                 if (asset_type == '<%=item.class.name%>' && asset_id == '<%=item.id%>') {
                     gatekeeper_required = '<%=item.gatekeeper_required? && !current_user.person.is_gatekeeper_of?(item)%>';
-                    break;
+                    if (gatekeeper_required == 'true')
+                        break;
                 }
             <% end %>
         }
