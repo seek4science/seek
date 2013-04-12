@@ -4,7 +4,13 @@
 <div class="show_basic">
   <h1>Batch publishing preview.</h1>
 
-  <%= render :partial => "assets/publishing/publishing_guide" -%>
+  <div class="box_infotext">
+    <ul style="padding-left:1em;">
+      <li>
+        Having the permission to publish an asset, you can publish it by <b>checking</b> the <span class="published"><b>Publish</b></span> checkbox beside that asset.
+      </li>
+    </ul>
+  </div>
   <br/>
 
   <% form_tag({:action => :publish}, :id => "publishing_form") do -%>
