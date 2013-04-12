@@ -7,7 +7,7 @@
    all_items_in_svg |= assays
    all_items_in_svg |= assays.collect(&:asset_masters).flatten.uniq
 %>
-<% form_tag :action => :publish do %>
+<% form_tag({:action => :publish}, :id => "publishing_form") do %>
     <div style="clear:both;">
       <% investigations.each do |investigation| %>
             <%= embedded_isa_svg_for_publishing(investigation, true, selected_items) -%>
@@ -25,7 +25,7 @@
       <% end %>
     </div>
 
-    <%= submit_tag "Submit", :id => 'submit_publishing', :onclick => "checkCheckboxes();return false;"-%>
+    <%= submit_tag "Submit", :onclick => "checkCheckboxes();return false;"-%>
     <%= link_to_remote_redbox("waiting approval list",
                               {:url => url_for(:action => "waiting_approval_list"), :failure => "alert('Sorry, an error has occurred.'); RedBox.close();",
                                :with => "'publish=' + getJsonPublishParams()"},

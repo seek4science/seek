@@ -7,7 +7,7 @@
   <%= render :partial => "assets/publishing/publishing_guide" -%>
   <br/>
 
-  <% form_tag :action => :publish do -%>
+  <% form_tag({:action => :publish}, :id => "publishing_form") do -%>
       <% if @assets.empty? %>
           <span class="no_unpublished_asset">All your assets are published or you have no assets in <%= Seek::Config.project_name %></span>
       <% else %>
@@ -18,7 +18,7 @@
                 <% end %>
           <% end %>
           <br/>          
-          <%= submit_tag "Submit", :id=>'submit_publishing', :onclick => "checkRelatedItems(all_items);return(false);" -%>
+          <%= submit_tag "Submit", :onclick => "checkRelatedItems(all_items);return(false);" -%>
           Or
           <%= link_to "Cancel", person_path(params[:id].to_i)-%>
           <%= link_to_remote_redbox("waiting approval list",

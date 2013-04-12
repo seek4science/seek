@@ -49,8 +49,7 @@ function checkGatekeeperRequired(all_items) {
         clickLink($('waiting_approval_list'));
     }
     else {
-        $('submit_publishing').disable_with = 'Submitting ...';
-        $('submit_publishing').form.submit();
+        $('publishing_form').submit();
     }
 }
 
@@ -72,11 +71,15 @@ function checkRelatedItems(all_items) {
     //confirmation if you wish to publish related items?
     if (contain_related_items == 'true'){
         if (confirm("There are items related to this asset. They are ISA items and their assets. Would you like to process publishing them as well?")) {
-            var submit_button = $('submit_publishing');
-            submit_button.disable_with = 'Submitting ...';
-            submit_button.form.action = 'publish_related_items';
-            submit_button.form.method = 'get';
-            $('submit_publishing').form.submit();
+            var publishing_form = $('publishing_form');
+            var base_URI = publishing_form.baseURI;
+            if (base_URI.match('people') != null)
+                publishing_form.action = 'publish_related_items';
+            else{
+                publishing_form.action = base_URI + '/publish_related_items';
+            }
+            publishing_form.method = 'get';
+            publishing_form.submit();
         } else
             checkGatekeeperRequired(all_items);
     }else

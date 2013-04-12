@@ -39,8 +39,7 @@
 
 
   <% if asset.is_in_isa_publishable? && asset.can_publish? -%>
-    <% tooltip_text = "Publish this #{human_name} and its related items. A preview will be given before publishing" %>
-    <li><%= image_tag_for_key('publish', polymorphic_path(asset, :action => :single_publishing_preview), nil, {:title => tooltip_title_attrib(tooltip_text)}, "Publish #{human_name}") -%></li>
+    <li><%= render :partial => "assets/publishing/single_publishing", :locals => {:asset => asset } -%></li>
   <% end -%>
 
   <%= delete_icon(asset, current_user)%>
