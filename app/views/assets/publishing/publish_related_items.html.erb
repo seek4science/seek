@@ -24,8 +24,11 @@
           <% end %>
       <% end %>
     </div>
-
-    <%= submit_tag "Submit", :onclick => "checkCheckboxes();return false;"-%>
+    <center>
+        <%= submit_tag "Submit", :onclick => "checkCheckboxes();return false;"-%>
+        Or
+      <%= link_to 'Cancel', :back %>
+    </center>
     <%= link_to_remote_redbox("waiting approval list",
                               {:url => url_for(:action => "waiting_approval_list"), :failure => "alert('Sorry, an error has occurred.'); RedBox.close();",
                                :with => "'publish=' + getJsonPublishParams()"},
