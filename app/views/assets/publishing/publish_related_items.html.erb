@@ -13,15 +13,17 @@
             <%= embedded_isa_svg_for_publishing(investigation, true, selected_items) -%>
       <% end %>
 
+      <% all_items_in_svg.each do |item| %>
+          <%= check_box_tag publishing_item_param(item),1,false,{:style=>'display:none;',:class=>"checkbox_element"} %>
+      <% end %>
+
       <% selected_items.each do |item| %>
           <% if item.assays.empty? %>
             <%= embedded_isa_svg_for_publishing(item, true, selected_items) -%>
+            <%= check_box_tag publishing_item_param(item),1,false,{:style=>'display:none;',:class=>"checkbox_element"} %>
           <% end %>
       <% end %>
     </div>
-    <% all_items_in_svg.each do |item| %>
-        <%= check_box_tag publishing_item_param(item),1,false,{:style=>'display:none;',:class=>"checkbox_element"} %>
-    <% end %>
 
     <%= submit_tag "Submit", :id => 'submit_publishing', :onclick => "checkCheckboxes();return false;"-%>
     <%= link_to_remote_redbox("waiting approval list",
@@ -53,32 +55,11 @@
                 checbox_element.checked = true;
             }
         }
-        checkGatekeeperRequired1();
-    }
-
-    function checkGatekeeperRequired1() {
-        var gatekeeper_required = 'false';
-        var publishing_items = getPublishingItems();
-
-        for (var i = 0; i < publishing_items.length; i++) {
-            var asset_type = publishing_items[i][0];
-            var asset_id = publishing_items[i][1];
-            <% (all_items_in_svg + selected_items).uniq.each do |item| %>
-                if (asset_type == '<%=item.class.name%>' && asset_id == '<%=item.id%>') {
-                    gatekeeper_required = '<%=item.gatekeeper_required? && !current_user.person.is_gatekeeper_of?(item)%>';
-                    if (gatekeeper_required == 'true')
-                        break;
-                }
-            <% end %>
-        }
-
-        if (gatekeeper_required == 'true'){
-            clickLink($('waiting_approval_list'));
-        }
-        else{
-            $('submit_publishing').disable_with = 'Submitting ...';
-            $('submit_publishing').form.submit();
-        }
+        var all_items = [];
+        <% (all_items_in_svg + selected_items).uniq.each do |item|%>
+            all_items.push(['<%= item.class.name%>','<%= item.id%>','','<%= item.gatekeeper_required? && !current_user.person.is_gatekeeper_of?(item)%>'])
+        <% end %>
+        checkGatekeeperRequired(all_items);
     }
 </script>
 
