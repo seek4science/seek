@@ -11,6 +11,8 @@
     <div style="clear:both;">
       <% investigations.each do |investigation| %>
             <%= embedded_isa_svg_for_publishing(investigation, true, selected_items) -%>
+          <br/>
+          <br/>
       <% end %>
 
       <% all_items_in_svg.each do |item| %>
@@ -21,6 +23,8 @@
           <% if item.assays.empty? %>
             <%= embedded_isa_svg_for_publishing(item, true, selected_items) -%>
             <%= check_box_tag publishing_item_param(item),1,false,{:style=>'display:none;',:class=>"checkbox_element"} %>
+              <br/>
+              <br/>
           <% end %>
       <% end %>
     </div>

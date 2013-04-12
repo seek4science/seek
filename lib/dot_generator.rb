@@ -367,7 +367,6 @@ module DotGenerator
     end
 
     svg_el = document.find_first("//svg:svg")
-    svg_el.attributes["width"]="500pt"
     svg = document.to_s
 
     if (Rails.env == 'test')
