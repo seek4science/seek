@@ -12,7 +12,7 @@
       <%= render :partial => "assets/publishing/asset_and_related", :object => @asset%>
       <br/>
       <br/>
-      <%= submit_tag "Submit", :id=>'submit_publishing', :onclick => "checkGatekeeperRequired();return false;" -%>
+      <%= submit_tag "Submit", :id=>'submit_publishing', :onclick => "checkRelatedItems();return false;" -%>
       Or
       <%= link_to "Cancel", @asset-%>
       <%= link_to_remote_redbox("waiting approval list",
@@ -23,6 +23,20 @@
 </div>
 
 <script type="text/javascript">
+    function checkRelatedItems(){
+        if ('<%= !@asset.assays.empty? %>' == 'true'){
+           //confirmation if you wish to publish related items?
+            if (confirm("There are items related to this asset. They are ISA items and their assets. Would you like to process publishing them as well?")){
+                var submit_button = $('submit_publishing');
+                submit_button.disable_with = 'Submitting ...';
+                submit_button.form.action = 'publish_related_items';
+                submit_button.form.method = 'get';
+                $('submit_publishing').form.submit();
+            }
+        }
+        checkGatekeeperRequired();
+    }
+
     function checkGatekeeperRequired() {
         var gatekeeper_required = 'false';
         var publishing_items = getPublishingItems();

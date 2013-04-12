@@ -46,6 +46,16 @@ module Seek
         self.class.layout 'main'
       end
 
+      def publish_related_items
+        items_for_publishing = resolve_publish_params(params[:publish]).select(&:can_publish?)
+        investigations = items_for_publishing.collect(&:assays).flatten.collect(&:study).collect(&:investigation).compact.uniq
+
+        respond_to do |format|
+          format.html { render :template => "assets/publishing/publish_related_items", :locals =>{:selected_items=>items_for_publishing,:investigations=>investigations} }
+        end
+
+      end
+
       def publish
         if request.post?
           do_publish

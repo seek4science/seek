@@ -1,0 +1,80 @@
+<%= javascript_include_tag "publishing" %>
+<%
+   all_items_in_svg = investigations
+   studies = investigations.collect(&:studies).flatten.uniq
+   all_items_in_svg |= studies
+   assays = studies.collect(&:assays).flatten.uniq
+   all_items_in_svg |= assays
+   all_items_in_svg |= assays.collect(&:asset_masters).flatten.uniq
+%>
+<% form_tag :action => :publish do %>
+    <div style="clear:both;">
+      <% investigations.each do |investigation| %>
+          <div style="clear:both;">
+            <%= embedded_isa_svg_for_publishing(investigation, true, selected_items) -%>
+          </div>
+      <% end %>
+    </div>
+    <% all_items_in_svg.each do |item| %>
+        <%= check_box_tag publishing_item_param(item),1,false,{:style=>'display:none;',:class=>"checkbox_element"} %>
+    <% end %>
+
+    <%= submit_tag "Submit", :id => 'submit_publishing', :onclick => "checkCheckboxes();return false;"-%>
+    <%= link_to_remote_redbox("waiting approval list",
+                              {:url => url_for(:action => "waiting_approval_list"), :failure => "alert('Sorry, an error has occurred.'); RedBox.close();",
+                               :with => "'publish=' + getJsonPublishParams()"},
+                              {:id => "waiting_approval_list", :style => "display:none"})-%>
+<% end %>
+
+<script type="text/javascript">
+    function switchColor(rect_element) {
+        if (rect_element.style['fill'] == '#ffffff') {
+            rect_element.style['fill'] = '#006400';
+            //check the checkbox
+            $('publish_' + rect_element.id).checked = true;
+        } else if (rect_element.style['fill'] == '#006400') {
+            rect_element.style['fill'] = '#ffffff';
+            //uncheck the checkbox
+            $('publish_' + rect_element.id).checked = false;
+        } else if (rect_element.style['fill'] == '#808080') {
+            alert("You are not allowed to process publishing this item, or it was already published");
+        }
+    }
+
+    function checkCheckboxes(){
+        var rect_elements = document.getElementsByTagName('rect');
+        for(var i=0;i<rect_elements.length;i++){
+            if (rect_elements[i].style['fill'] == '#006400'){
+                var checbox_element = $("publish_" + rect_elements[i].id);
+                checbox_element.checked = true;
+            }
+        }
+        checkGatekeeperRequired1();
+    }
+
+    function checkGatekeeperRequired1() {
+        var gatekeeper_required = 'false';
+        var publishing_items = getPublishingItems();
+
+        for (var i = 0; i < publishing_items.length; i++) {
+            var asset_type = publishing_items[i][0];
+            var asset_id = publishing_items[i][1];
+            <% all_items_in_svg.each do |item| %>
+                if (asset_type == '<%=item.class.name%>' && asset_id == '<%=item.id%>') {
+                    gatekeeper_required = '<%=item.gatekeeper_required? && !current_user.person.is_gatekeeper_of?(item)%>';
+                    break;
+                }
+            <% end %>
+        }
+
+        if (gatekeeper_required == 'true'){
+            clickLink($('waiting_approval_list'));
+        }
+        else{
+            $('submit_publishing').disable_with = 'Submitting ...';
+            $('submit_publishing').form.submit();
+        }
+    }
+</script>
+
+
