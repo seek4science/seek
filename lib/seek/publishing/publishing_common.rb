@@ -2,17 +2,11 @@ module Seek
   module Publishing
     module PublishingCommon
       def self.included(base)
-        base.before_filter :set_asset, :only=>[:single_publishing_preview,:publish]
-        base.before_filter :single_publish_auth, :only=>[:single_publishing_preview,:publish]
+        base.before_filter :set_asset, :only=>[:publish]
+        base.before_filter :single_publish_auth, :only=>[:publish]
         base.before_filter :set_assets, :only=>[:batch_publishing_preview]
         base.before_filter :batch_publish_auth, :only=>[:batch_publishing_preview,:publish]
         base.after_filter :request_publish_approval,:log_publishing, :only=>[:create,:update]
-      end
-
-      def single_publishing_preview
-        respond_to do |format|
-          format.html { render :template=>"assets/publishing/single_publishing_preview" }
-        end
       end
 
       def batch_publishing_preview

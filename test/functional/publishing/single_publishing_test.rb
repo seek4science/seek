@@ -18,11 +18,7 @@ class SinglePublishingTest < ActionController::TestCase
 
     get :show,:id=>df
     assert_response :success
-    assert_select "a[href=?]",single_publishing_preview_data_file_path, :text => /Publish Data file/
-
-    get :single_publishing_preview,:id=>df
-    assert_response :success
-    assert_nil flash[:error]
+    assert_select "a", :text => /Publish Data file/
 
     post :publish,:id=>df
     assert_response :success
@@ -36,11 +32,7 @@ class SinglePublishingTest < ActionController::TestCase
 
     get :show,:id=>df
     assert_response :success
-    assert_select "a[href=?]",single_publishing_preview_data_file_path, :text => /Publish Data file/, :count => 0
-
-    get :single_publishing_preview,:id=>df
-    assert_redirected_to :root
-    assert flash[:error]
+    assert_select "a", :text => /Publish Data file/, :count => 0
 
     post :publish,:id=>df
     assert_redirected_to :root
@@ -53,20 +45,6 @@ class SinglePublishingTest < ActionController::TestCase
     df=data_file_for_publishing
     get :publish, :id => df.id
     assert_response :redirect
-  end
-
-  test "get single_publishing_preview" do
-    df=data_with_isa
-    get :single_publishing_preview, :id => df.id
-    assert_response :success
-
-    assert_select "li.type_and_title",:text=>/Data file/ do
-      assert_select "a[href=?]",data_file_path(df),:text=>/#{df.title}/
-    end
-    assert_select "li.secondary",:text=>/Publish/ do
-      assert_select "input[type='checkbox'][id=?]","publish_DataFile_#{df.id}"
-    end
-    assert_select "li.secondary",:text=>/Publish related item?/
   end
 
   test "get isa_publishing_preview" do
