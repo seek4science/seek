@@ -20,7 +20,8 @@
           <% @assets.sort_by { |k, v| v.first.class.name }.each do |type, items| %>
                 <h2><%= text_for_resource items.first %>(s)</h2>
                 <% items.each do |item| %>
-                   <%= render :partial => "assets/publishing/asset_and_related", :object => item -%>
+                  <%= render :partial => "assets/publishing/options_for_publishing", :object => item, :locals => {:html_classes => "publishing_options"} -%>
+                  <br/>
                 <% end %>
           <% end %>
           <br/>          
