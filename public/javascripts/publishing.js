@@ -74,9 +74,16 @@ function checkRelatedItems(all_items) {
 
     //confirmation if you wish to publish related items?
     if (contain_related_items == 'true'){
-        if (confirm("There are items related to this asset. They are ISA items and their assets. Would you like to process publishing them as well?")) {
-            var publishing_form = $('publishing_form');
-            var base_URI = publishing_form.baseURI;
+        var confirm_message = "";
+        var publishing_form = $('publishing_form');
+        var base_URI = publishing_form.baseURI;
+        if (base_URI.match('people') != null)
+            confirm_message =  confirm_message + "There are items related to the selected asset(s). They are ISA items and their assets. Would you like to process publishing them as well? (A preview will be given)"
+        else{
+            confirm_message = confirm_message + "There are items related to this asset. They are ISA items and their assets. Would you like to process publishing them as well? (A preview will be given)"
+        }
+        if (confirm(confirm_message)) {
+
             if (base_URI.match('people') != null)
                 publishing_form.action = 'publish_related_items';
             else{
