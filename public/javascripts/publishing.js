@@ -39,8 +39,10 @@ function checkGatekeeperRequired(all_items) {
         for (var j = 0; j < all_items.length; j++) {
             if (asset_type == all_items[j][0] && asset_id == all_items[j][1]) {
                 gatekeeper_required = all_items[j][3];
-                if (gatekeeper_required == 'true')
+                if (gatekeeper_required == 'true'){
                     break;
+                    break;
+                }
             }
         }
     }
@@ -62,8 +64,10 @@ function checkRelatedItems(all_items) {
         for (var j = 0; j < all_items.length; j++) {
             if (asset_type == all_items[j][0] && asset_id == all_items[j][1]) {
                 contain_related_items = all_items[j][2];
-                if (contain_related_items == 'true')
+                if (contain_related_items == 'true'){
                     break;
+                    break;
+                }
             }
         }
     }
