@@ -11,13 +11,17 @@
 <div class="box_infotext" style="margin-top:2em;margin-left:2em">
   <ul style="padding-left:1em;">
     <li>
-      <%= image_tag("misc_icons/darkgreen_box.png")%> - this item will be published
+      <%= image_tag("misc_icons/darkgreen_box.png")%> - this item will be published.
     </li>
     <li>
-      <%= image_tag("misc_icons/white_box.png")%> - this item stays the same as before
+      <%= image_tag("misc_icons/white_box.png")%> - this item stays the same as before.
     </li>
     <li>
-      <%= image_tag("misc_icons/dimgray_box.png")%> - you dont have the right to publish this item or the item is already published
+      <%= image_tag("misc_icons/dimgray_box.png")%> - you dont have the right to publish this item or the item is already published.
+    </li>
+    <br/>
+    <li>
+      If you wish to publish the assets, please change the color of the small boxes accordingly by clicking on them.
     </li>
     <br/>
     <li>
@@ -25,7 +29,7 @@
     </li>
   </ul>
 </div>
-<h1>Please click on the small boxes to change the color</h1>
+<h1>Please click on the small boxes to change the color.</h1>
 <% form_tag({:action => :publish}, :id => "publishing_form") do %>
     <div style="clear:both;">
       <% investigations.each do |investigation| %>
