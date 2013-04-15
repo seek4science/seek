@@ -611,22 +611,6 @@ class SopsControllerTest < ActionController::TestCase
     assert_nil flash[:notice]
   end
 
-  test "get isa_publishing_preview" do
-    login_as(:owner_of_my_first_sop)
-    sop=sops(:sop_with_project_without_gatekeeper)
-    assert sop.can_manage?,"The sop must be manageable for this test to succeed"
-    get :single_publishing_preview, :id=>sop
-    assert_response :success
-  end
-
-  test "cannot get publishing_preview when not manageable" do
-    sop=sops(:my_first_sop)
-    assert !sop.can_manage?,"The sop must not be manageable for this test to succeed"
-    get :single_publishing_preview, :id=>sop
-    assert_redirected_to :root
-    assert flash[:error]
-  end
-
   test 'should show <Not specified> for  other creators if no other creators' do
     get :index
     assert_response :success
