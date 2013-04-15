@@ -2,6 +2,7 @@
 # Likewise, all the methods added will be available for all controllers.
 class ApplicationController < ActionController::Base
   require_dependency File.join(Rails.root, 'vendor', 'plugins', 'annotations', 'lib', 'app', 'controllers', 'application_controller')
+  include Recaptcha::Verify
 
   skip_after_filter :add_piwik_analytics_tracking if Seek::Config.piwik_analytics_enabled == false
 

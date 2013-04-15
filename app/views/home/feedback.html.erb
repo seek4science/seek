@@ -1,4 +1,10 @@
 <h1>Feedback</h1>
+<script type="text/javascript">
+//customize theme of recaptcha widget, see https://developers.google.com/recaptcha/docs/customization
+var RecaptchaOptions = {
+   theme : 'white'
+};
+</script>
 
 
 <div id="feedback_form">
@@ -18,13 +24,13 @@
 
     <p>
       <%= label_tag :subject  -%><br/>
-      <%= text_field_tag :subject,"",:size=>60 -%><br/>
+      <%= text_field_tag :subject,@subject,:size=>60 -%><br/>
     </p>
 
     <p>
       <%= label_tag :send_anonymously -%><br/>
       <% if current_user.try(:person) %>
-        <%= check_box_tag :anon,true,false, :onclick=>visual_effect(:toggle_blind,'anon_notes',:duration=>0.5)  -%>
+        <%= check_box_tag :anon,true,@anon, :onclick=>visual_effect(:toggle_blind,'anon_notes',:duration=>0.5)  -%>
       <% else %>
         <%= check_box_tag :anon,true,true, :disabled => true -%>
       <% end %>
@@ -42,9 +48,13 @@
 
     <p>
       <%= label_tag :details -%><br/>
-      <%= text_area_tag :details,"",:cols=>60,:rows=>15 -%>
+      <%= text_area_tag :details,@details,:cols=>60,:rows=>15 -%>
     </p>
 
+    <div>
+      <%= label_tag :verification -%>
+      <p><%= recaptcha_tags -%></p>
+    </div>
 
     <%= submit_tag "Send feedback",:onclick=>"return check_form();" -%>
 
@@ -55,6 +65,12 @@
 </div>
 
 <script type="text/javascript">
+  // set padding-left style of recaptcha widget in order to keep align with other elements in the feedback form
+    var widget = document.getElementById('recaptcha_widget_div');
+    if(widget){
+        widget.style.marginLeft = "2em" ;
+    }
+
   function check_form() {
     if ($('subject').value.length<1) {
       alert("You must provide a Subject");
