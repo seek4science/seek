@@ -54,8 +54,13 @@ module Seek
         if request.post?
           do_publish
           respond_to do |format|
-            flash.now[:notice]="Publishing complete"
-            format.html { render :template=>"assets/publishing/published" }
+            if @asset && request.env['HTTP_REFERER'].try(:normalize_trailing_slash) == polymorphic_url(@asset).normalize_trailing_slash
+              flash[:notice]="Publishing complete"
+              format.html { redirect_to @asset }
+            else
+              flash.now[:notice]="Publishing complete"
+              format.html { render :template=>"assets/publishing/published" }
+            end
           end
         else
           redirect_to :action=>:show
