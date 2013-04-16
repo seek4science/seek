@@ -333,19 +333,7 @@ module DotGenerator
             x2, y2 = points[4].split(",")
           end
 
-          if !polygon.attributes['style'].blank?
-            style = polygon.attributes['style']
-            filled_color = style.split(';').select{|fc| fc.match('fill:')}.first
-            polygon.attributes['style']=filled_color
-          end
-          if @selected_items.include?(object)
-            polygon.attributes['stroke'] = 'darkgreen'
-            polygon.attributes['stroke-width'] = "3"
-            rect_node_background_color = 'darkgreen'
-          else
-            polygon.attributes['stroke'] = 'black'
-            polygon.attributes['stroke-width'] = "1"
-          end
+          process_polygon_frame_color(polygon,object)
 
           rect_node_background_color ||= object.can_publish? ? 'white' : 'gray'
           rect_node = LibXML::XML::Node.new("rect onclick=\"switchColor(this.id)\" id=\"#{object_class}_#{object_id}\" class=\"#{object_class}_#{object_id}\" width=\"18\" height=\"18\" x=\"#{x2.to_f + 3}\" y=\"#{y2.to_f + 3}\" style=\"fill: #{rect_node_background_color};stroke:rgb(120,120,120);\"")
@@ -380,6 +368,22 @@ module DotGenerator
     end
 
     svg
+  end
+
+  def process_polygon_frame_color(polygon,object)
+    if !polygon.attributes['style'].blank?
+      style = polygon.attributes['style']
+      filled_color = style.split(';').select{|fc| fc.match('fill:')}.first
+      polygon.attributes['style']=filled_color
+    end
+    if @selected_items.include?(object)
+      polygon.attributes['stroke'] = 'darkgreen'
+      polygon.attributes['stroke-width'] = "3"
+      rect_node_background_color = 'darkgreen'
+    else
+      polygon.attributes['stroke'] = 'black'
+      polygon.attributes['stroke-width'] = "1"
+    end
   end
 end
 
