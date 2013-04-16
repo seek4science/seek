@@ -103,6 +103,26 @@ module Seek
         end
 
       end
+
+      #override/add methods to Person
+      Person.class_eval do
+        def direct_projects
+          #updating workgroups doesn't change groupmemberships until you save. And vice versa.
+          work_groups.collect { |wg| wg.project }.uniq | group_memberships.collect { |gm| gm.work_group.project }
+        end
+
+        def projects
+          @known_projects ||= direct_projects.collect { |proj| [proj] + proj.ancestors }.flatten.uniq
+          @known_projects
+        end
+
+
+        def projects_and_descendants
+          @project_and_descendants ||= direct_projects.collect { |proj| [proj] + proj.descendants }.flatten.uniq
+          @project_and_descendants
+        end
+      end
+
     end
 
 

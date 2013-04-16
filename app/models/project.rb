@@ -77,11 +77,13 @@ class Project < ActiveRecord::Base
   def assets
     data_files | sops | models | publications | presentations
   end
+  #OVERRIDDEN in Seek::ProjectHierarchies if Project.is_hierarchical?
   def project_coordinators
     coordinator_role = ProjectRole.project_coordinator_role
     people.select{|p| p.project_roles_of_project(self).include?(coordinator_role)}
   end
 
+  #OVERRIDDEN in Seek::ProjectHierarchies if Project.is_hierarchical?
   #this is the intersection of project role and seek role
     def pals
       pal_role=ProjectRole.pal_role
@@ -89,7 +91,7 @@ class Project < ActiveRecord::Base
         possible_pal.project_roles_of_project(self).include?(pal_role)
       end
     end
-
+   #OVERRIDDEN in Seek::ProjectHierarchies if Project.is_hierarchical?
     #this is project role
     def pis
       pi_role = ProjectRole.find_by_name('PI')
@@ -122,6 +124,7 @@ class Project < ActiveRecord::Base
     return locations
   end
 
+  #OVERRIDDEN in Seek::ProjectHierarchies if Project.is_hierarchical?
   def people
       #TODO: look into doing this with a named_scope or direct query
       res = work_groups.collect(&:people).flatten.uniq.compact

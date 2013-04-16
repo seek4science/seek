@@ -390,7 +390,6 @@ class PeopleController < ApplicationController
   end
 
   def do_projects_belong_to_project_manager_projects
-    if !Seek::Config.is_virtualliver
       if (params[:person] and params[:person][:work_group_ids])
         if User.project_manager_logged_in? && !User.admin_logged_in?
           projects = []
@@ -399,7 +398,7 @@ class PeopleController < ApplicationController
             project = work_group.try(:project)
             projects << project unless project.nil?
           end
-        project_manager_projects = current_user.person.projects_and_descendants
+        project_manager_projects = Project.is_hierarchical?? current_user.person.projects_and_descendants : current_user.person.projects
           flag = true
           projects.each do |project|
             flag = false if !project_manager_projects.include? project
@@ -409,7 +408,6 @@ class PeopleController < ApplicationController
           end
           return flag
         end
-      end
     end
   end
 

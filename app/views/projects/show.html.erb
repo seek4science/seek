@@ -80,7 +80,7 @@
     <%= render :partial => "layouts/contribution_section_box_avatar", :locals => { :object => @project, :drag_id => drag_id } -%>
   </div>
 
-  <% if Seek::Config.is_virtualliver && logged_in_and_member? -%>
+  <% if Project.is_hierarchical? && logged_in_and_member? -%>
   <br/>
   <div style="clear:both;">
     <b>Project Hierarchies

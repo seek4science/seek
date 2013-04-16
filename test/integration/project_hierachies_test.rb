@@ -1,5 +1,7 @@
 require 'test_helper'
 class ProjectHierarchiesTest < ActiveSupport::TestCase
+  fixtures :projects, :institutions, :work_groups, :group_memberships, :people, :users, :taggings, :tags, :publications, :assets, :organisms
+
   def setup
     User.current_user = Factory(:user)
     @proj = Factory(:project)
@@ -23,10 +25,10 @@ class ProjectHierarchiesTest < ActiveSupport::TestCase
       #when created with a project
       person = Factory(:brand_new_person)
 
-      assert_equal person.project_subscriptions.map(&:project),[]
+      assert_equal person.project_subscriptions.map(&:project), []
 
       #when joining a project
-      project = Factory :project, :parent =>  @proj
+      project = Factory :project, :parent => @proj
       person.work_groups.create :project => project, :institution => Factory(:institution)
       disable_authorization_checks do
         #save person in order to save built project subscriptions
@@ -54,7 +56,7 @@ class ProjectHierarchiesTest < ActiveSupport::TestCase
       ProjectSubscriptionJob.new(ps.id).perform
 
       s = Factory(:subscribable, :projects => [@proj], :title => "ancestor autosub test")
-      assert SetSubscriptionsForItemJob.exists?(s.class.name, s.id, s.projects.collect(&:id))
+      assert SetSubscriptionsForItemJob.exists?(s.class.name, s.id, s.projects_and_descendants.map(&:id))
 
       SetSubscriptionsForItemJob.new(s.class.name, s.id, s.projects_and_descendants.collect(&:id)).perform
 
@@ -75,8 +77,47 @@ class ProjectHierarchiesTest < ActiveSupport::TestCase
       assert @subscribables_in_proj.all?(&:subscribed?)
     end
 
+    test "set parent" do
+      parent_proj = Factory(:project, :title => "test parent")
+      proj = Factory(:project, :parent_id => parent_proj.id)
+      assert_equal proj.parent, parent_proj
+      assert true, parent_proj.descendants.include?(proj)
+      parent_proj_changed = Factory(:project, :title => "changed test parent")
+      proj.parent = parent_proj_changed
+      proj.save!
+
+      assert_equal "changed test parent", proj.parent.name
+
+    end
+
+    test "parent project have institutions of children" do
+      institutions = [Factory(:institution), Factory(:institution)]
+      parent_proj = Factory :project, :name => "parent proj"
+      project = Factory :project, :parent => parent_proj
+      project.institutions = institutions
+      project.save!
+
+      institutions.each do |ins|
+        assert true, parent_proj.institutions.include?(ins)
+      end
+    end
+
+    test "related resource to parent project" do
+      parent_proj = Factory :project
+      proj = Factory :project, :parent => parent_proj
+
+      Project::RELATED_RESOURCE_TYPES.each do |type|
+        proj.send "#{type.underscore.pluralize}=".to_sym, [Factory type.underscore.to_sym] unless ["Study", "Assay"].include?(type)
+
+        proj.send("#{type.underscore.pluralize}".to_sym).each do |resource|
+          assert true, parent_proj.send("related_#{type.underscore.pluralize}".to_sym).include?(resource)
+        end
+      end
+    end
+
 
   end
+
 
   private
 

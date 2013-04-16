@@ -36,8 +36,3 @@ module ActsAsCachedTree
   end
 end
 
-ActiveRecord::Base.class_eval do
-  def self.is_hierarchical?
-      include? ActsAsCachedTree
-  end
-end
