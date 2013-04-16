@@ -94,7 +94,7 @@
     <%= render :partial=>"assays/select_organisms" -%>
 </div>
  <p>
-      <%= f.fancy_multiselect :scales,{:object_type_text=>@assay_text,:possibilities=>sort_scales(Scale.all)} -%>
+      <%= f.fancy_multiselect :scales,{:object_type_text=>@assay_text,:possibilities=>sort_scales(Scale.all)} if @assay.is_scalable?-%>
  </p>
 
 <br style="clear:both"/>

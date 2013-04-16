@@ -15,7 +15,7 @@ module Acts #:nodoc:
       def acts_as_isa
         acts_as_favouritable
 
-        acts_as_scalable
+        acts_as_scalable if Seek::Config.is_virtualliver
 
         default_scope :order => "#{self.table_name}.updated_at DESC"
 

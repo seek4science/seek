@@ -61,7 +61,7 @@
     <br style="clear: both"/>
     <div>
      <p>
-        <%= fancy_multiselect @publication,:scales, {:possibilities=>sort_scales(Scale.all)} -%>
+        <%= fancy_multiselect @publication,:scales, {:possibilities=>sort_scales(Scale.all)} if @publication.is_scalable? -%>
     </p>
     <p>
         <%= render :partial=>"assets/select_tags" -%>

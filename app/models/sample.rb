@@ -4,7 +4,8 @@ require "acts_as_scalable"
 class Sample < ActiveRecord::Base
  include Subscribable
 
-  acts_as_scalable
+  acts_as_scalable if Seek::Config.is_virtualliver
+
   acts_as_authorized
   acts_as_favouritable
   acts_as_uniquely_identifiable

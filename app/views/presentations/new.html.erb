@@ -19,10 +19,9 @@
             <%= text_area_tag "presentation[description]", presentation_description_value, :style => "width: 100%;", :rows => 10 -%>
         </p>
         <%= render :partial => "projects/project_selector", :locals => { :resource => @presentation, :allow_nil => true} -%>
-        <p>
-        <%= fancy_multiselect @presentation,:scales, {:possibilities=>sort_scales(Scale.all)} -%>
-       </p>
-
+          <p>
+            <%= fancy_multiselect @presentation, :scales, {:possibilities => sort_scales(Scale.all)} if @presentation.is_scalable? -%>
+          </p>
 		<%= fields_for(@presentation) {|f|  f.hidden_field :parent_name } -%>
   	<%= fields_for(@presentation) {|f| render :partial=>"assets/asset_form_bottom", :locals=> {:f => f}} -%>
        

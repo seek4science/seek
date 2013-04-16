@@ -49,7 +49,7 @@
 
   </div>
   <p>
-      <%= f.fancy_multiselect :scales,{:possibilities=>sort_scales(Scale.all)}-%>
+      <%= f.fancy_multiselect :scales,{:possibilities=>sort_scales(Scale.all)} if @study.is_scalable?-%>
    </p>
   <p>
     <%= render :partial=>"assets/sharing_form" if @study.can_manage? -%>

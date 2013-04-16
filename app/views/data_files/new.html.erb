@@ -44,11 +44,9 @@
             <%= text_area_tag 'data_file[description]', data_file_description_value, :style => "width: 100%;", :rows => 10 -%>
         </p>
         <%= render :partial => "projects/project_selector", :locals => { :resource => @data_file,:allow_nil=>true } -%>
-
       <p>
-        <%= fancy_multiselect @data_file,:scales, {:possibilities=>sort_scales(Scale.all)} -%>
+        <%= fancy_multiselect @data_file,:scales, {:possibilities=>sort_scales(Scale.all)} if @data_file.is_scalable? -%>
       </p>
-
       <%= fields_for(@data_file) {|f|render :partial=>"assets/asset_form_bottom", :locals=> {:f => f}} -%>
       
         <p>

@@ -20,9 +20,8 @@
         </p>
         <%= render :partial => "projects/project_selector", :locals => { :resource => @sop,:allow_nil=> true} -%>
         <p>
-        <%= fancy_multiselect @sop,:scales, {:possibilities=>sort_scales(Scale.all)} -%>
+        <%= fancy_multiselect @sop,:scales, {:possibilities=>sort_scales(Scale.all)} if @sop.is_scalable? -%>
        </p>
-
        <%= fields_for(@sop) { |f| render :partial=>"assets/asset_form_bottom", :locals=> {:show_publications=>false, :f => f} }-%>
 		<%= render :partial => "assays/associate_assays", :locals=>{:resource => @sop} -%>
         <%= fields_for(@sop) { |f|  f.fancy_multiselect :samples, {:hidden=> @sop.samples.blank?  ? true : false, :other_projects_checkbox => true}} -%>

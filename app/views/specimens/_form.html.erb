@@ -99,7 +99,7 @@
 </div>
 </p>
 
-        <%= f.fancy_multiselect :scales,:name => "#{parent_name}[scale_ids]", :possibilities=>sort_scales(Scale.all) -%>
+        <%= f.fancy_multiselect :scales,:name => "#{parent_name}[scale_ids]", :possibilities=>sort_scales(Scale.all) if Specimen.is_scalable? -%>
 <% if Seek::Config.is_virtualliver %>
     <div class="yui-g" style="width:700px;">
       <%= f.label "Genotypes and Phenotypes:" -%>

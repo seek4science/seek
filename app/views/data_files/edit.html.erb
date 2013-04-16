@@ -21,11 +21,9 @@
     <% if current_user_authorized_to_manage -%>
           
 	<%= render :partial => "projects/project_selector", :locals => { :resource => @data_file,:allow_nil=>true } %>
-
       <p>
-        <%= fancy_multiselect @data_file, :scales, {:possibilities=>sort_scales(Scale.all)} -%>
+        <%= fancy_multiselect @data_file, :scales, {:possibilities=>sort_scales(Scale.all)} if @data_file.is_scalable? -%>
       </p>
-
       <%= render :partial=>"assets/asset_form_bottom", :locals=> { :f => f } -%>
       
         <p>
