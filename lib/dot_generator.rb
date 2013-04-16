@@ -343,7 +343,7 @@ module DotGenerator
           end
 
           rect_node_background_color ||= object.can_publish? ? 'white' : 'gray'
-          rect_node = LibXML::XML::Node.new("rect onclick=\"switchColor(this)\" id=\"#{object_class}_#{object_id}\" width=\"18\" height=\"18\" x=\"#{x2.to_f + 3}\" y=\"#{y2.to_f + 3}\" style=\"fill: #{rect_node_background_color};stroke:rgb(120,120,120);\"")
+          rect_node = LibXML::XML::Node.new("rect onclick=\"switchColor(this.id)\" id=\"#{object_class}_#{object_id}\" class=\"#{object_class}_#{object_id}\" width=\"18\" height=\"18\" x=\"#{x2.to_f + 3}\" y=\"#{y2.to_f + 3}\" style=\"fill: #{rect_node_background_color};stroke:rgb(120,120,120);\"")
           graphic_object<<(rect_node)
 
           a.find(".//svg:text").collect do |node|
