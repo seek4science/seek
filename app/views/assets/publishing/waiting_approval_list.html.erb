@@ -9,9 +9,9 @@
     <ul>
         <% @waiting_for_publish_items.each do |item| %>
             <li>
-              <b><%= text_for_resource item -%>: </b> <%= link_to item.title, item -%>
+              <b><%= text_for_resource item -%>: </b> <%= link_to h(item.title), item -%>
               <br/>
-              Approve by: <%= item.gatekeepers.collect { |m| link_to(m.title, m) }.join(" or ") -%>
+              Approve by: <%= item.gatekeepers.collect { |m| link_to(h(m.title), m) }.join(" or ") -%>
             </li>
         <% end %>
     </ul>
