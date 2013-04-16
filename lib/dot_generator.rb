@@ -333,6 +333,7 @@ module DotGenerator
             x2, y2 = points[4].split(",")
           end
 
+          polygon.attributes['style'] = ''
           if @selected_items.include?(object)
             polygon.attributes['stroke'] = 'darkgreen'
             polygon.attributes['stroke-width'] = "3"
