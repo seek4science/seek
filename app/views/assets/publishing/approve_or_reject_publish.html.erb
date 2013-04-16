@@ -2,6 +2,7 @@
     span.published {
         font-size: 18px;
         font-weight: bold;
+        color: green;
     }
     div.radio_buttons {
         font-size: 16px;
@@ -13,7 +14,7 @@
   <%= render :partial => "assets/resource_list_item", :object => @resource, :locals => {:actions_partial_disable => true} -%>
   <br/>
   <br/>
-  <% if @resource.policy.sharing_scope < Policy::EVERYONE %>
+  <% if @resource.is_published? %>
       <% form_tag :action => :gatekeeper_decide do %>
           <div class="radio_buttons">
             Please select your decision:
