@@ -197,5 +197,5 @@ class Project < ActiveRecord::Base
 
    #should put below at the bottom in order to override methods for hierarchies,
    #Try to find a better way for overriding methods regardless where to include the module
-    include Seek::ProjectHierarchies
+    include Seek::ProjectHierarchies if Seek::Config.is_virtualliver
 end
