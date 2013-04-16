@@ -14,7 +14,7 @@
   <%= render :partial => "assets/resource_list_item", :object => @resource, :locals => {:actions_partial_disable => true} -%>
   <br/>
   <br/>
-  <% if @resource.is_published? %>
+  <% unless @resource.is_published? %>
       <% form_tag :action => :gatekeeper_decide do %>
           <div class="radio_buttons">
             Please select your decision:
