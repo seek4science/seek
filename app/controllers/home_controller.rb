@@ -39,7 +39,6 @@ class HomeController < ApplicationController
       render :action=>:feedback
     else
       if verify_recaptcha && Seek::Config.email_enabled
-        # So far,this action is rendered only if Seek::Config.email_enable = true, so no need to check
         Mailer.deliver_feedback(current_user,@subject,@details,@anon,base_host)
         flash[:notice]="Your feedback has been delivered. Thank You."
         redirect_to root_path
