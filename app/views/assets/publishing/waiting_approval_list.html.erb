@@ -1,33 +1,36 @@
-<div class="box_infotext">
-  <b>Gatekeeper:</b> to secure publishing process, each project has an option to define the gatekeepers, who give the
-  approval or
-  reject of publishing request. However it is optional, so if a project doesn't define any gatekeepers, the project
-  assets can be made
-  published immediately.
-</div>
-<h2>The following items need gatekeeper's approval:</h2>
-<ul>
-  <% @waiting_for_publish_items.each do |item| %>
-      <li>
-        <b><%= text_for_resource item -%>: </b> <%= link_to h(item.title), item -%>
-        <br/>
-        Approve by: <%= item.gatekeepers.collect { |m| link_to(h(m.title), m) }.join(" or ") -%>
-      </li>
-  <% end %>
-</ul>
-
-<% form_tag :action => :publish do %>
-    <div style="display:none">
-      <% @items_for_publishing.each do |item| %>
-          <%= render :partial => "assets/publishing/options_for_publishing", :object => item, :locals => {:html_classes => "publishing_options", :checked => true} -%>
+<div class='show_basic'>
+  <br/>
+  <div class="box_infotext">
+    <b>Gatekeeper:</b> to secure publishing process, each project has an option to define the gatekeepers, who give the
+    approval or
+    reject of publishing request. However it is optional, so if a project doesn't define any gatekeepers, the project
+    assets can be made
+    published immediately.
+  </div>
+  <h2>The following items need gatekeeper's approval:</h2>
+  <ul>
+    <% @waiting_for_publish_items.each do |item| %>
+        <li>
+          <b><%= text_for_resource item -%>: </b> <%= link_to h(item.title), item -%>
           <br/>
-      <% end %>
-    </div>
+          Approve by: <%= item.gatekeepers.collect { |m| link_to(h(m.title), m) }.join(" or ") -%>
+        </li>
+    <% end %>
+  </ul>
 
-    <center>
-      <% resource = (controller_name == 'people') ? current_user.person : @asset %>
-      <%= submit_tag "Submit" -%>
-      Or
-      <%= link_to 'Cancel', resource %>
-    </center>
-<% end %>
+  <% form_tag :action => :publish do %>
+      <div style="display:none">
+        <% @items_for_publishing.each do |item| %>
+            <%= render :partial => "assets/publishing/options_for_publishing", :object => item, :locals => {:html_classes => "publishing_options", :checked => true} -%>
+            <br/>
+        <% end %>
+      </div>
+
+      <center>
+        <% resource = (controller_name == 'people') ? current_user.person : @asset %>
+        <%= submit_tag "Submit" -%>
+        Or
+        <%= link_to 'Cancel', resource %>
+      </center>
+  <% end %>
+</div>
