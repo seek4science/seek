@@ -1,19 +1,31 @@
-Here explain
-    -what are the related items and what will happen next
-    -what items from the previous step will be affected
+<div class="show_basic">
+  <br>
+  <div class="box_infotext">
+    <ul style="padding-left:1em;">
+      <li>
+        Here explain
+        -what are the related items and what will happen next
+        -what items from the previous step will be affected
+      </li>
+    </ul>
 
-<% form_tag :action => :publish_related_items do %>
-    <div style="display:none">
-      <% @items_for_publishing.each do |item| %>
-          <%= render :partial => "assets/publishing/options_for_publishing", :object => item, :locals => {:html_classes => "publishing_options", :checked => true} -%>
-          <br/>
-      <% end %>
-    </div>
-    <%
-       resource = (controller_name == 'people') ? current_user.person : @asset
-    %>
-    <%= submit_tag "OK" -%>
-    <%= submit_tag  "Skip", :onclick => "this.form.action='check_gatekeeper_required'" -%>
-    <%= link_to "Cancel", polymorphic_path(resource) -%>
-<% end %>
+  </div>
+  <% form_tag :action => :publish_related_items do %>
+      <div style="display:none">
+        <% @items_for_publishing.each do |item| %>
+            <%= render :partial => "assets/publishing/options_for_publishing", :object => item, :locals => {:html_classes => "publishing_options", :checked => true} -%>
+            <br/>
+        <% end %>
+      </div>
+      <%
+         resource = (controller_name == 'people') ? current_user.person : @asset
+      %>
+      <br/>
+      <center>
+          <%= submit_tag "OK" -%>
+          <%= submit_tag "Skip", :onclick => "this.form.action='check_gatekeeper_required'" -%>
+          <%= link_to "Cancel", polymorphic_path(resource) -%>
+      </center>
+  <% end %>
+</div>
 

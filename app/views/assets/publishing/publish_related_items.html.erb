@@ -1,18 +1,24 @@
-<div class="box_infotext" style="margin-top:2em;margin-left:2em">
-  <ul style="padding-left:1em;">
-    <li>
-      Some explaination or legend
-    </li>
-  </ul>
+<div class="show_basic">
+  <br/>
+  <div class="box_infotext">
+    <ul style="padding-left:1em;">
+      <li>
+        Some explaination or legend
+      </li>
+    </ul>
+  </div>
+
+  <% form_tag :action => :check_gatekeeper_required do %>
+      related items in list view
+
+      <%
+         resource = (controller_name == 'people') ? current_user.person : @asset
+      %>
+      <br/>
+      <center>
+          <%= submit_tag "Submit" -%>
+          Or
+          <%= link_to 'Cancel', resource %>
+      </center>
+  <% end %>
 </div>
-
-<% form_tag :action => :check_gatekeeper_required do %>
-    related items in list view
-
-    <%
-       resource = (controller_name == 'people') ? current_user.person : @asset
-    %>
-    <%= submit_tag "Submit" -%>
-    Or
-    <%= link_to 'Cancel', resource %>
-<% end %>
