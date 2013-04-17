@@ -2,10 +2,10 @@ module Seek
   module Publishing
     module PublishingCommon
       def self.included(base)
-        base.before_filter :set_asset, :only=>[:contain_related_items?,:gatekeeper_approval_required?,:publish]
+        base.before_filter :set_asset, :only=>[:check_related_items,:publish_related_items,:check_gatekeeper_required,:publish]
         base.before_filter :set_assets, :only=>[:batch_publishing_preview]
-        base.before_filter :set_items_for_publishing, :only => [:contain_related_items?,:gatekeeper_approval_required?,:publish]
-        base.before_filter :publish_auth, :only=>[:batch_publishing_preview,:contain_related_items?,:gatekeeper_approval_required?,:publish]
+        base.before_filter :set_items_for_publishing, :only => [:check_related_items,:publish_related_items,:check_gatekeeper_required,:publish]
+        base.before_filter :publish_auth, :only=>[:batch_publishing_preview,:check_related_items,:publish_related_items,:check_gatekeeper_required,:publish]
         base.after_filter :request_publish_approval,:log_publishing, :only=>[:create,:update]
       end
 
@@ -15,15 +15,15 @@ module Seek
         end
       end
 
-      def contain_related_items?
-        contain_related_items = !items_for_publishing.collect(&:assays).empty?
+      def check_related_items
+        contain_related_items = !@items_for_publishing.collect(&:assays).flatten.empty?
         @waiting_for_publish_items = @items_for_publishing.select { |item| item.gatekeeper_required? && !User.current_user.person.is_gatekeeper_of?(item) }
         if contain_related_items
           respond_to do |format|
             format.html { render :template => "assets/publishing/publish_related_items_confirm"}
           end
         else
-          gatekeeper_approval_required?
+          check_gatekeeper_required
         end
       end
 
@@ -33,7 +33,7 @@ module Seek
         end
       end
 
-      def gatekeeper_approval_required?
+      def check_gatekeeper_required
         @waiting_for_publish_items = @items_for_publishing.select { |item| item.gatekeeper_required? && !User.current_user.person.is_gatekeeper_of?(item) }
         if !@waiting_for_publish_items.empty?
           respond_to do |format|
