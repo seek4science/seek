@@ -15,29 +15,12 @@ module Seek
         end
       end
 
-      def isa_publishing_preview
-        item = params[:item_type].constantize.find_by_id(params[:item_id])
-        publish_related_items = params["#{item.class.name}_#{item.id}_related_items_checked"]
-        if publish_related_items == 'true'
-          render :update do |page|
-            page.replace_html "#{item.class.name}_#{item.id}_isa_preview", :partial => "assets/publishing/isa_publishing_preview", :object => item
-
-          end
-        else
-          render :update do |page|
-            page.replace_html "#{item.class.name}_#{item.id}_isa_preview", ""
-          end
-        end
-      end
-
       def waiting_approval_list
         items_for_publishing = params[:publish].blank? ? [] : resolve_publish_params(ActiveSupport::JSON.decode(params[:publish])).select(&:can_publish?)
         @waiting_for_publish_items = items_for_publishing.select { |item| item.gatekeeper_required? && !User.current_user.person.is_gatekeeper_of?(item) }
-        set_no_layout
         respond_to do |format|
-          format.html { render :template => "assets/publishing/waiting_approval_list" }
+          format.html { render :partial => "assets/publishing/waiting_approval_list" }
         end
-        self.class.layout 'main'
       end
 
       def publish_related_items
