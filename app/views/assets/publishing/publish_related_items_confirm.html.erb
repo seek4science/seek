@@ -1,0 +1,17 @@
+Here explain
+    -what are the related items and what will happen next
+    -what items from the previous step will be affected
+
+<div style="display:none">
+  <% @items_for_publishing.each do |item| %>
+      <%= render :partial => "assets/publishing/options_for_publishing", :object => item, :locals => {:html_classes => "publishing_options", :checked => true} -%>
+      <br/>
+  <% end %>
+</div>
+
+<%
+   resource = (controller_name == 'people') ? current_user.person : @asset
+%>
+<%= button_to "OK", polymorphic_path(resource,:action=>"publish_related_items") -%>
+<%= button_to "Skip", polymorphic_path(resource,:action=>"waiting_approval_list") -%>
+<%= button_to "Cancel", polymorphic_path(resource) -%>

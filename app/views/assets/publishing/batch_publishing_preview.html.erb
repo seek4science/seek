@@ -1,5 +1,4 @@
 <%= stylesheet_link_tag "publishing" %>
-<%= javascript_include_tag "publishing" %>
 
 <div class="show_basic">
   <h1>Batch publishing preview.</h1>
@@ -13,7 +12,7 @@
   </div>
   <br/>
 
-  <% form_tag({:action => :publish}, :id => "publishing_form") do -%>
+  <% form_tag :action => :contain_related_items?  do -%>
       <% if @assets.empty? %>
           <span class="no_unpublished_asset">All your assets are published or you have no assets in <%= Seek::Config.project_name %></span>
       <% else %>
@@ -25,22 +24,10 @@
                 <% end %>
           <% end %>
           <br/>          
-          <%= submit_tag "Submit", :onclick => "checkRelatedItems(all_items);return(false);" -%>
+          <%= submit_tag "Submit"-%>
           Or
           <%= link_to "Cancel", person_path(params[:id].to_i)-%>
-          <%= link_to_remote_redbox("waiting approval list",
-                                    {:url => url_for(:action => "waiting_approval_list"), :failure => "alert('Sorry, an error has occurred.'); RedBox.close();",
-                                     :with => "'publish=' + getJsonPublishParams()"},
-                                    {:id => "waiting_approval_list", :style => "display:none"})-%>
       <% end -%>
   <% end -%>
 
 </div>
-
-<script type="text/javascript">
-    var all_items = [];
-    <% @assets.values.flatten.each do |item| %>
-        all_items.push(['<%= item.class.name%>','<%= item.id%>','<%= !item.assays.empty? %>','<%= item.gatekeeper_required? && !current_user.person.is_gatekeeper_of?(item)%>'])
-    <% end %>
-</script>
-
