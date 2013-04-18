@@ -1,3 +1,5 @@
+<%= javascript_include_tag 'publishing' %>
+<%= stylesheet_link_tag "publishing" %>
 <div class="show_basic">
   <br/>
   <div class="box_infotext">
@@ -7,13 +9,17 @@
       </li>
     </ul>
   </div>
-
+  <br/>
   <% form_tag :action => :check_gatekeeper_required do %>
-      related items in list view
+      <% @items_for_publishing.each do |item| %>
+        <% if !item.assays.empty? %>
+              <%= render :partial => "assets/publishing/isa_publishing_preview", :object => item %>
+        <% else %>
+              <%= check_box_tag publishing_item_param(item),1,true,{:style=>'display:none;'} %>
+        <% end %>
+      <% end %>
 
-      <%
-         resource = (controller_name == 'people') ? current_user.person : @asset
-      %>
+      <% resource = (controller_name == 'people') ? current_user.person : @asset %>
       <br/>
       <center>
           <%= submit_tag "Submit" -%>

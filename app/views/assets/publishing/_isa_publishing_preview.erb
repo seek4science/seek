@@ -1,53 +1,33 @@
 <%
    item = isa_publishing_preview
-   item_type_name = text_for_resource item
-   studies = item.assays.collect(&:study).uniq
-   investigations = studies.collect(&:investigation).uniq
+   investigations = item.assays.collect(&:study).collect(&:investigation).uniq
 
 -%>
 
-<div class="box_simple">
-  <span>The ISA and their assets related to this <%= item_type_name -%>:</span>
-      <h2>Assays related to this <%= item_type_name -%> and their assets.</h2>
+<% investigations.each do |investigation| %>
+    <div class="box_simple">
+      <%= render :partial => "assets/publishing/options_for_publishing", :object => investigation, :locals => {:html_classes => "publishing_options"} -%>
 
-        <% if item.assays.empty? -%>
-            <span class="none_text">There are no Assays related to this <%= item_type_name -%>.</span>
-        <% else -%>
-            <% item.assays.each do |assay| -%>
-                <%= render :partial=>"assets/publishing/options_for_publishing", :object=>assay, :locals=>{:html_classes=>"publishing_options"} -%>
-                <br/>
-                <div style="padding-left: 2em;">
-                  <% assay.asset_masters.reject{|a| a == item}.each do |asset| %>
-                    <%= render :partial=>"assets/publishing/options_for_publishing", :object=>asset, :locals=>{:html_classes=>"publishing_options"} -%>
-                    <br/>
-                  <% end %>
-                </div>
-            <% end -%>
-        <% end -%>
+      <div style="padding-left: 3em;">
+        <% investigation.studies.each do |study| %>
+            <%= render :partial => "assets/publishing/options_for_publishing", :object => study, :locals => {:html_classes => "publishing_options"} -%>
+            <div style="padding-left: 3em;">
+              <% study.assays.each do |assay| %>
+                  <%= render :partial => "assets/publishing/options_for_publishing", :object => assay, :locals => {:html_classes => "publishing_options"} -%>
 
-      <h2>Studies related to this <%= item_type_name -%>.</h2>
+                  <div style="padding-left: 3em;">
+                    <% assay.asset_masters.each do |asset| %>
+                        <%= render :partial => "assets/publishing/options_for_publishing", :object => asset, :locals => {:html_classes => "publishing_options"} -%>
 
-        <% if studies.empty? -%>
-            <span class="none_text">There are no Studies related to this <%= item_type_name -%>.</span>
-        <% else -%>
-            <% studies.each do |study| %>
-                <%= render :partial=>"assets/publishing/options_for_publishing", :object=>study, :locals=>{:html_classes=>"publishing_options"} -%>
-                <br/>
-            <% end %>
-        <% end -%>
-      
-      <h2>Investigations related to this <%= item_type_name -%>.</h2>
-
-        <% if investigations.empty? -%>
-            <span class="none_text">There are no Investigations related to this <%= item_type_name -%>.</span>
-        <% else -%>
-            <% investigations.each do |investigation| %>
-                <%= render :partial=>"assets/publishing/options_for_publishing", :object=>investigation, :locals=>{:html_classes=>"publishing_options"} -%>
-                <br/>
-            <% end %>
-        <% end -%>
-
-</div>
+                    <% end %>
+                  </div>
+              <% end %>
+            </div>
+        <% end %>
+      </div>
+    </div>
+    <br/>
+<% end %>
 
 
 
