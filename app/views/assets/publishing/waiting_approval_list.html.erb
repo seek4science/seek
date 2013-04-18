@@ -1,36 +1,39 @@
 <%= stylesheet_link_tag "publishing" %>
 <div class='show_basic'>
   <br/>
+
   <div class="box_infotext">
     <ul style="padding-left:1em;">
       <li>
-        <b>Gatekeeper:</b> to secure publishing process, each project has an option to define the gatekeepers, who give the approval or reject of publishing request.
+        <b>Gatekeeper:</b> to secure publishing process, each project has an option to define the gatekeepers, who give
+        the approval or reject of publishing request.
       </li>
       <li>
-        However it is optional, so if a project doesn't define any gatekeepers, the project assets can be made published immediately.
+        However it is optional, so if a project doesn't define any gatekeepers, the project assets can be made published
+        immediately.
       </li>
     </ul>
   </div>
   <h2>The following items need gatekeeper's approval:</h2>
   <ul class="publishing_options">
     <% @waiting_for_publish_items.each do |item| %>
-        <li class="type_and_title"><%= text_for_resource item -%>:&nbsp;<%= link_to h(item.title), item, :target => "_blank" -%></li>
-        <li class="secondary"'>Approve by: <%= item.gatekeepers.collect { |m| link_to(h(m.title), m) }.join(" or ") -%></li>
+        <li class="type_and_title"><%= text_for_resource item -%>
+          :&nbsp;<%= link_to h(item.title), item, :target => "_blank" -%></li>
+        <li class="secondary"
+        '>Approve by: <%= item.gatekeepers.collect { |m| link_to(h(m.title), m) }.join(" or ") -%></li>
         <br/>
     <% end %>
   </ul>
 
   <% form_tag :action => :publish do %>
-        <% @items_for_publishing.each do |item| %>
-            <%= check_box_tag publishing_item_param(item),1,true,{:style=>'display:none;'} %>
-            <br/>
-        <% end %>
+      <% @items_for_publishing.each do |item| %>
+          <%= check_box_tag publishing_item_param(item), 1, true, {:style => 'display:none;'} %>
+          <br/>
+      <% end %>
 
-      <center>
-        <% resource = (controller_name == 'people') ? current_user.person : @asset %>
-        <%= submit_tag "Submit" -%>
-        Or
-        <%= link_to 'Cancel', resource %>
-      </center>
+      <% resource = (controller_name == 'people') ? current_user.person : @asset %>
+      <%= submit_tag "Submit" -%>
+      Or
+      <%= link_to 'Cancel', resource %>
   <% end %>
 </div>
