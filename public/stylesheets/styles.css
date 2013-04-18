@@ -945,7 +945,7 @@ ul.related_asset_list li{
     
 	min-width :2.3em;
     min-height: 2.3em;
-    z-index: 11;
+    z-index: 20;
 }
 
 .contribution_title_image img {        
