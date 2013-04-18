@@ -18,7 +18,13 @@
                   <div style="padding-left: 3em;">
                     <% assay.asset_masters.each do |asset| %>
                         <% checked = (asset == item) ? true : false %>
-                        <%= render :partial => "assets/publishing/options_for_publishing", :object => asset, :locals => {:checked => checked, :html_classes => "publishing_options"} -%>
+                        <% if checked %>
+                            <div class="box_simple">
+                                <%= render :partial => "assets/publishing/options_for_publishing", :object => asset, :locals => {:checked => checked, :html_classes => "publishing_options"} -%>
+                            </div>
+                        <% else %>
+                            <%= render :partial => "assets/publishing/options_for_publishing", :object => asset, :locals => {:html_classes => "publishing_options"} -%>
+                        <% end %>
 
                     <% end %>
                   </div>
