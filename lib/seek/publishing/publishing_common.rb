@@ -39,22 +39,13 @@ module Seek
             format.html { render :template => "assets/publishing/waiting_approval_list" }
           end
         else
-          publish
+          do_publish
         end
       end
 
       def publish
         if request.post?
           do_publish
-          respond_to do |format|
-            if @asset && request.env['HTTP_REFERER'].try(:normalize_trailing_slash) == polymorphic_url(@asset).normalize_trailing_slash
-              flash[:notice]="Publishing complete"
-              format.html { redirect_to @asset }
-            else
-              flash.now[:notice]="Publishing complete"
-              format.html { render :template=>"assets/publishing/published" }
-            end
-          end
         else
           redirect_to :action=>:show
         end
@@ -115,6 +106,15 @@ module Seek
         @waiting_for_publish_items.each do |item|
           ResourcePublishLog.add_log ResourcePublishLog::WAITING_FOR_APPROVAL, item
           deliver_request_publish_approval item
+        end
+        respond_to do |format|
+          if @asset && request.env['HTTP_REFERER'].try(:normalize_trailing_slash) == polymorphic_url(@asset).normalize_trailing_slash
+            flash[:notice]="Publishing complete"
+            format.html { redirect_to @asset }
+          else
+            flash.now[:notice]="Publishing complete"
+            format.html { render :template=>"assets/publishing/published" }
+          end
         end
       end
 
