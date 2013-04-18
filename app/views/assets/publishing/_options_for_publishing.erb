@@ -1,5 +1,6 @@
 <%
    item = options_for_publishing
+   checked ||= false
    checkbox_title = "Publish"
    if item.can_publish?
      checkbox_class = "published"
@@ -21,7 +22,7 @@
   <% end %>
 
   <li class="secondary <%= checkbox_class -%>">
-    <%= checkbox_title -%>&nbsp;<%= check_box_tag publishing_item_param(item), 1, false,
+    <%= checkbox_title -%>&nbsp;<%= check_box_tag publishing_item_param(item), 1, checked,
                                                   {:disabled=>(checkbox_class=='disabled') ? true :false,
                                                    :class=>"#{item.class.name}_#{item.id}",
                                                    :onclick=>"checkRepeatedItems(this)"} -%>
