@@ -293,27 +293,12 @@ module AssetsCommonExtension
         files_to_download["#{filename}"] = content_blob.filepath
         content_type = content_blob.content_type
       elsif !content_blob.url.nil?
-        if content_blob.external_link?
-          zos.put_next_entry((content_blob.original_filename || content_blob.url.gsub(/\/|\\/, "") + '.html'))
-          zos.print <<-REDIRECT_JS
-                        <html>
-                          <head>
-                            <script type="text/javascript">
-                            <!--
-                            window.location = "#{content_blob.url}"
-                            //-->
-                            </script>
-                          </head>
-                        </html>
-          REDIRECT_JS
-        else
           downloader=Seek::RemoteDownloader.new
           data_hash = downloader.get_remote_data content_blob.url, nil, nil, nil, true
           original_filename = get_filename data_hash[:filename], content_blob.original_filename
           filename = check_and_rename_file files_to_download.keys, original_filename
           files_to_download["#{filename}"] = data_hash[:data_tmp_path]
           content_type = data_hash[:content_type] || content_blob.content_type
-        end
       end
     end
 

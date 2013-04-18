@@ -186,7 +186,7 @@ class ModelsController < ApplicationController
     end
     render :update do |page|
       if error_message.blank?
-        page['sbml_model'].value = IO.read(@display_model.is_sbml?.filepath).gsub(/\n/, '')
+        page['sbml_model'].value = IO.read(@display_model.sbml_content_blobs.first.filepath).gsub(/\n/, '')
         page['sycamore-form'].submit()
       else
         page.alert(error_message)
