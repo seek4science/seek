@@ -67,25 +67,14 @@ class SinglePublishingTest < ActionController::TestCase
     assert request_publishing_df.can_publish?,"The datafile must not be publishable for this test to succeed"
     assert !notifying_df.can_publish?,"The datafile must not be publishable for this test to succeed"
 
-    get :isa_publishing_preview, :item_type=>df.class.name, :item_id => df.id, "#{df.class.name}_#{df.id}_related_items_checked" => "true"
+    post :publish_related_items, :id=>df.id
     assert_response :success
 
-    assert_select "li.type_and_title",:text=>/Assay/,:count=>1 do
-      assert_select "a[href=?]",assay_path(assay),:text=>/#{assay.title}/
+    assert_select "li.type_and_title",:text=>/Investigation/,:count=>1 do
+      assert_select "a[href=?]",investigation_path(investigation),:text=>/#{investigation.title}/
     end
     assert_select "li.secondary",:text=>/Publish/ do
-      assert_select "input[type='checkbox'][id=?]","publish_Assay_#{assay.id}"
-    end
-
-    assert_select "li.type_and_title",:text=>/Data file/,:count=>3 do
-      assert_select "a[href=?]",data_file_path(publishing_df),:text=>/#{publishing_df.title}/
-      assert_select "a[href=?]",data_file_path(request_publishing_df),:text=>/#{request_publishing_df.title}/
-      assert_select "a[href=?]",data_file_path(notifying_df),:text=>/#{notifying_df.title}/
-    end
-    assert_select "li.secondary",:text=>/Publish/ do
-      assert_select "input[type='checkbox'][id=?]","publish_DataFile_#{publishing_df.id}"
-      assert_select "input[type='checkbox'][id=?]","publish_DataFile_#{request_publishing_df.id}"
-      assert_select "input[disabled='disabled'][type='checkbox'][id=?]","publish_DataFile_#{notifying_df.id}"
+      assert_select "input[type='checkbox'][id=?]","publish_Investigation_#{investigation.id}"
     end
 
     assert_select "li.type_and_title",:text=>/Study/,:count=>1 do
@@ -95,13 +84,24 @@ class SinglePublishingTest < ActionController::TestCase
       assert_select "input[type='checkbox'][id=?]","publish_Study_#{study.id}"
     end
 
-    assert_select "li.type_and_title",:text=>/Investigation/,:count=>1 do
-      assert_select "a[href=?]",investigation_path(investigation),:text=>/#{investigation.title}/
+    assert_select "li.type_and_title",:text=>/Assay/,:count=>1 do
+      assert_select "a[href=?]",assay_path(assay),:text=>/#{assay.title}/
     end
     assert_select "li.secondary",:text=>/Publish/ do
-      assert_select "input[type='checkbox'][id=?]","publish_Investigation_#{investigation.id}"
+      assert_select "input[type='checkbox'][id=?]","publish_Assay_#{assay.id}"
     end
 
+    assert_select "li.type_and_title",:text=>/Data file/,:count=>4 do
+      assert_select "a[href=?]",data_file_path(df),:text=>/#{df.title}/
+      assert_select "a[href=?]",data_file_path(publishing_df),:text=>/#{publishing_df.title}/
+      assert_select "a[href=?]",data_file_path(request_publishing_df),:text=>/#{request_publishing_df.title}/
+      assert_select "a[href=?]",data_file_path(notifying_df),:text=>/#{notifying_df.title}/
+    end
+    assert_select "li.secondary",:text=>/Publish/ do
+      assert_select "input[type='checkbox'][id=?]","publish_DataFile_#{publishing_df.id}"
+      assert_select "input[type='checkbox'][id=?]","publish_DataFile_#{request_publishing_df.id}"
+      assert_select "input[disabled='disabled'][type='checkbox'][id=?]","publish_DataFile_#{notifying_df.id}"
+    end
   end
 
   test "waiting_approval_list" do
@@ -113,9 +113,13 @@ class SinglePublishingTest < ActionController::TestCase
     assert model.gatekeeper_required?,"This model must require gatekeeper's approval for the test to succeed"
     assert !sop.gatekeeper_required?,"This sop must not require gatekeeper's approval for the test to succeed"
 
-    params = {'DataFile'=>{df.id=>1},'Model'=>{model.id=>1},'Sop'=>{sop.id=>1}}
+    params={:publish=>{}}
+    [df,model,sop].each do |asset|
+      params[:publish][asset.class.name]||={}
+      params[:publish][asset.class.name][asset.id.to_s]="1"
+    end
 
-    get :waiting_approval_list, :publish=>ActiveSupport::JSON.encode(params)
+    post :check_gatekeeper_required, params.merge(:id=> df.id)
     assert_response :success
 
     assert_select "a[href=?]", data_file_path(df), :text => /#{df.title}/, :count => 1
