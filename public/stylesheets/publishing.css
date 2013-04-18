@@ -14,31 +14,7 @@ ul.publishing_options li.secondary {
 
 }
 
-ul.publishing_options li.related_items {
-
-}
-
-ul.publishing_options li.status {
-    font-style:italic;
-    color:gray;
-}
-
 .published {
     color: limegreen;
 }
 
-.owned {
-    color: orange;
-}
-
-.protected {
-    color: red;
-}
-
-span.no_unpublished_asset {
-    font-size: 20px;
-    font-weight: bold;
-    color: green;
-    float: left;
-    margin-top:2em;
-}
