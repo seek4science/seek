@@ -17,7 +17,6 @@ module Seek
 
       def check_related_items
         contain_related_items = !@items_for_publishing.collect(&:assays).flatten.empty?
-        @waiting_for_publish_items = @items_for_publishing.select { |item| item.gatekeeper_required? && !User.current_user.person.is_gatekeeper_of?(item) }
         if contain_related_items
           respond_to do |format|
             format.html { render :template => "assets/publishing/publish_related_items_confirm"}

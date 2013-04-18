@@ -21,7 +21,8 @@
       <% end %>
   <% end %>
 
-  <li class="secondary <%= checkbox_class -%>">
+  <% tooltip_text = (checkbox_class=='disabled') ? 'You are not allowed to process publishing this item, or it was already published' : '' %>
+  <li class="secondary <%= checkbox_class -%>" title="<%= tooltip_title_attrib(tooltip_text) %>">
     <%= checkbox_title -%>&nbsp;<%= check_box_tag publishing_item_param(item), 1, checked,
                                                   {:disabled=>(checkbox_class=='disabled') ? true :false,
                                                    :class=>"#{item.class.name}_#{item.id}",
