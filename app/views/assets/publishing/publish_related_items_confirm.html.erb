@@ -1,29 +1,46 @@
 <div class="show_basic">
   <br>
+
   <div class="box_infotext">
     <ul style="padding-left:1em;">
-      <li>
-        Here explain
-        -what are the related items and what will happen next
-        -what items from the previous step will be affected
+      <li>The items you selected to publish in previous step are linked to ISA. You can publish together with them their
+        related items in ISA as well.
       </li>
+      <li>The preview of all the items in ISA will be given, so you can choose which items to be published.</li>
+      <li>The selected items which don't link to ISA will be kept to make publish.</li>
     </ul>
-
   </div>
-  <% form_tag :action => :publish_related_items do %>
-        <% @items_for_publishing.each do |item| %>
-            <%= check_box_tag publishing_item_param(item),1,true,{:style=>'display:none;'} %>
-            <br/>
+
+  <br/>
+
+  <h2>The following items are linked to ISA:</h2>
+  <ul style="padding-left:1em;">
+
+    <% @items_for_publishing.each do |item| %>
+        <% if !item.assays.empty? %>
+            <li>
+              <%= text_for_resource item -%>:&nbsp;<%= link_to h(item.title), item, :target => "_blank" -%>
+            </li>
         <% end %>
+    <% end %>
+  </ul>
+  <br/>
+
+  <span style="font-size: 15px;font-weight:bolder;">
+    Would you like to publish also the related items in ISA?
+  </span>
+
+  <% form_tag :action => :publish_related_items do %>
+      <% @items_for_publishing.each do |item| %>
+          <%= check_box_tag publishing_item_param(item), 1, true, {:style => 'display:none;'} %>
+          <br/>
+      <% end %>
       <%
          resource = (controller_name == 'people') ? current_user.person : @asset
       %>
-      <br/>
-      <center>
-          <%= submit_tag "OK" -%>
-          <%= submit_tag "Skip", :onclick => "this.form.action='check_gatekeeper_required'" -%>
-          <%= link_to "Cancel", polymorphic_path(resource) -%>
-      </center>
+      <%= submit_tag "OK" -%>
+      <%= submit_tag "Skip", :onclick => "this.form.action='check_gatekeeper_required'" -%>
+      <%= link_to "Cancel", polymorphic_path(resource) -%>
   <% end %>
 </div>
 
