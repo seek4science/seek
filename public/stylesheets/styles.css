@@ -1723,6 +1723,7 @@ li.fileinfo_container div.fileinfo {
     margin: 0.25em;
     min-height: 8.1em;
     max-width: 30em;
+    word-wrap: break-word;
 }
 
 
