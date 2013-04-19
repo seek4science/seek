@@ -1,8 +1,9 @@
 <div class="contribution_section_box">
 
-    <% if resource.can_download? && versioned_resource.contains_downloadable_items? %>
+    <% if resource.is_downloadable? && versioned_resource.contains_downloadable_items? && can_download_asset?(resource, params[:code])%>
       <div class="big_download_button">
-        <%= link_to simple_image_tag_for_key("big_download"),download_data_file_path(resource,:version=>versioned_resource.version) %>
+        <% path = polymorphic_path(resource,:version=>versioned_resource.version,:action=>:download,:code=>params[:code]) %>
+        <%= link_to simple_image_tag_for_key("big_download"),path %>
       </div>
     <% end -%>
 
