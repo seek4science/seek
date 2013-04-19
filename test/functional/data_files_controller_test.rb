@@ -609,12 +609,9 @@ class DataFilesControllerTest < ActionController::TestCase
       assert_select "a",:text=>/Request/,:count=>0
     end
 
-    assert_select "div.contribution_aftertitle" do
+    assert_select "div.contribution_section_box > p.usage_info" do
       assert_select "b",:text=>/Downloads/,:count=>0
     end
-
-
-
   end
 
   test "show download button for non website data file" do
@@ -627,7 +624,7 @@ class DataFilesControllerTest < ActionController::TestCase
       assert_select "a",:text=>/Download Data file/,:count=>1
     end
 
-    assert_select "div.contribution_aftertitle" do
+    assert_select "div.contribution_section_box > p.usage_info" do
       assert_select "b",:text=>/Downloads/,:count=>1
     end
 
