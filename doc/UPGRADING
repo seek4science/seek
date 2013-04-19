@@ -42,6 +42,7 @@ The released versions are listed below:
 * 0.16.0
 * 0.16.1
 * 0.16.2
+* 0.16.3
 
 <em>(Note there was no 0.12.x version released externally, this was an internal release)</em>
 
@@ -89,7 +90,7 @@ Other than this, the remaining steps are the same standard steps are previous ve
 
     RAILS_ENV=production ./script/delayed_job stop
     bundle exec rake sunspot:solr:stop RAILS_ENV=production
-    hg pull https://sysmo-db.googlecode.com/hg/ -r v0.16.2
+    hg pull https://sysmo-db.googlecode.com/hg/ -r v0.16.3
     hg update
     hg merge # only required if you've made changes since installing. If you have you may need to deal with conflicts.
     hg commit -m "merged" # likewise - only required if you made changes since installing
@@ -198,12 +199,12 @@ this is simply a case of:
 If you auto start solr with an init.d/ script - this will need updating to reflect the change to sunspot:solr:start. The
 updated script should look something like: https://gist.github.com/3143434
 
-== Steps to upgrade between patches (e.g. between 0.16.0 to 0.16.2)
+== Steps to upgrade between patches (e.g. between 0.16.0 to 0.16.3)
 
-This example shows upgrading from v0.16.0, or v0.16.1, to v0.16.2 as an example, but the process is the same for upgrading between patch versions unless
-otherwise stated. You can upgrade directly from one patch version to another, skipping the intermediate versions (so you can upgrade directly 0.16.0 to 0.16.2 without first having to upgrade to 0.16.1)
+This example shows upgrading from v0.16.0, v0.16.1, or v0.16.2 to v0.16.3 as an example, but the process is the same for upgrading between patch versions unless
+otherwise stated. You can upgrade directly from one patch version to another, skipping the intermediate versions (so you can upgrade directly 0.16.0 to 0.16.3 without first having to upgrade to 0.16.1)
 
-  hg pull https://sysmo-db.googlecode.com/hg/ -r v0.16.2
+  hg pull https://sysmo-db.googlecode.com/hg/ -r v0.16.3
   hg update
   hg merge # if necessary
   hg commit -m "merged" # if necessary

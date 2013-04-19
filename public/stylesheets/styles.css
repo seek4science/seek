@@ -934,8 +934,6 @@ ul.related_asset_list li{
 }
 
 .contribution_title_image {
-    position:absolute;
-
     margin-left: 1em;
     margin-right: 0.5em;
     margin-top: -0.2em;
@@ -945,7 +943,10 @@ ul.related_asset_list li{
     
 	min-width :2.3em;
     min-height: 2.3em;
-    z-index: 20;
+    max-width: 2.3em;
+
+    z-index:1;
+
 }
 
 .contribution_title_image img {        
