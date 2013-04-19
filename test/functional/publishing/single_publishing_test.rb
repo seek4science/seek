@@ -21,7 +21,7 @@ class SinglePublishingTest < ActionController::TestCase
     assert_select "a", :text => /Publish Data file/
 
     post :publish,:id=>df
-    assert_response :success
+    assert_response :redirect
     assert_nil flash[:error]
   end
 
@@ -141,7 +141,7 @@ class SinglePublishingTest < ActionController::TestCase
       post :publish,params.merge(:id=> df.id)
     end
 
-    assert_response :success
+    assert_response :redirect
     assert_nil flash[:error]
     assert_not_nil flash[:notice]
 
@@ -165,7 +165,7 @@ class SinglePublishingTest < ActionController::TestCase
       end
     end
 
-    assert_response :success
+    assert_response :redirect
     assert_nil flash[:error]
     assert_not_nil flash[:notice]
 
@@ -205,7 +205,7 @@ class SinglePublishingTest < ActionController::TestCase
       post :publish,params.merge(:id=>df)
     end
 
-    assert_response :success
+    assert_response :redirect
 
     df.reload
 
@@ -251,7 +251,7 @@ class SinglePublishingTest < ActionController::TestCase
       post :publish,params.merge(:id=>df)
     end
 
-    assert_response :success
+    assert_response :redirect
 
     df.reload
 
@@ -283,7 +283,7 @@ class SinglePublishingTest < ActionController::TestCase
     end
 
     post :publish,params.merge(:id=>df)
-    assert_response :success
+    assert_response :redirect
 
     assert_select "ul#published" do
       assert_select "li",:text=>/Investigation: #{assay.study.investigation.title}/,:count=>0

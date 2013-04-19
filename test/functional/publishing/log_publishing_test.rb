@@ -163,7 +163,7 @@ class LogPublishingTest < ActionController::TestCase
       post :publish,params.merge(:id=>df)
       a=1
     end
-    assert_response :success
+    assert_response :redirect
 
     log_for_df = ResourcePublishLog.last(:conditions => ["resource_type=? AND resource_id=?", "DataFile", df.id])
     assert_equal ResourcePublishLog::PUBLISHED, log_for_df.publish_state

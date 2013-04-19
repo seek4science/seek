@@ -120,7 +120,7 @@ class BatchPublishingTest < ActionController::TestCase
         post :publish, params.merge(:id=> User.current_user.person.id)
       end
     end
-    assert_response :success
+    assert_response :redirect
     assert_nil flash[:error]
     assert_not_nil flash[:notice]
 
