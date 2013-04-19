@@ -21,7 +21,7 @@
 </ul>
 
 <div class="show_basic">
-  <div class="main_content_left_box_narrower">
+  <div class="main_content_left_box">
     <p class="id">
         <label>
             ID: 
@@ -37,16 +37,13 @@
     </p>	
     <br/>
   </div>
-
-  <div class="main_content_right_box_wider">
-    <%= render :partial=>"assets/resource_authors_box",:locals => {:resource => @investigation, :creators => [@investigation.contributing_user.try(:person)] } %>
-  </div>
+  <%= render :partial=>"assets/resource_main_content_right",:locals => { :resource => @investigation, :creators => [@investigation.contributing_user.try(:person)] } %>
 
   <div style="clear:both;">
 	<%= embedded_isa_svg(@investigation,false) -%>
   </div>
 
     <%= render :partial=>"layouts/items_related_to",:object => @investigation %>
-  <br/>
-  <%= render :partial => "layouts/usage_info", :locals => { :resource => @investigation } -%>
+
+
 </div>
