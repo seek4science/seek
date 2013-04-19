@@ -335,22 +335,14 @@ span.disabled_icon {
 
 .main_content_left_box {
     float: left;
-    width: 84%;
+    width: 79%;
+
 }
 
 .main_content_right_box {
     float: right;
-    width: 15%;
-}
+    width: 20%;
 
-.main_content_left_box_narrower {
-    float: left;
-    width: 74%;
-}
-
-.main_content_right_box_wider {
-    float: right;
-    width: 25%;
 }
 
 .contribution_section_box {
@@ -1712,17 +1704,18 @@ ul.fileinfo_list {
     margin-left: 0.5em;
 }
 
-ul.fileinfo_list li.fileinfo {
+ul.fileinfo_list li.fileinfo_container {
     float: left;
 }
 
-li.fileinfo div.fileinfo2 {
+li.fileinfo_container div.fileinfo {
     background-color: white;
     border: 1px dotted black;
     padding: 0.75em;
     margin: 0.25em;
     min-height: 8.1em;
-    max-width: 22em;
+    max-width: 30em;
+    word-wrap: break-word;
 }
 
 

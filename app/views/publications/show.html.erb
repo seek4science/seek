@@ -17,7 +17,7 @@
 </ul>
 
 <div class="show_basic">
-  <div class="main_content_left_box_narrower">
+  <div class="main_content_left_box">
     <div class="box_about_actor">
       <p>
         <% unless @publication.pubmed_id.nil? %>
@@ -61,7 +61,7 @@
     </div>
   </div>
   
-  <div class="main_content_right_box_wider">
+  <div class="main_content_right_box">
 	<%= render :partial => "assets/resource_authors_box", :locals => { :resource => @publication, :truncate_to => 20, :title=>"Authors" } -%>
     <%= render :partial => "assets/resource_original_uploader_box", :locals => { :resource => @publication, :title=>"Registered by" } -%>
 
