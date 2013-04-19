@@ -2,7 +2,7 @@
 <% versioned_resource ||= resource -%>
 <% creators ||= nil %>
 
-<div class="main_content_right_box_wider">
+<div class="main_content_right_box">
   <% if !creators.nil? || resource.respond_to?("creators") %>
     <%= render :partial => "assets/resource_authors_box", :locals => { :resource => resource, :truncate_to => truncate_length_for_boxes,:creators=>creators } -%>
   <% end -%>

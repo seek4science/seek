@@ -335,22 +335,14 @@ span.disabled_icon {
 
 .main_content_left_box {
     float: left;
-    width: 84%;
+    width: 79%;
+
 }
 
 .main_content_right_box {
     float: right;
-    width: 15%;
-}
+    width: 20%;
 
-.main_content_left_box_narrower {
-    float: left;
-    width: 74%;
-}
-
-.main_content_right_box_wider {
-    float: right;
-    width: 25%;
 }
 
 .contribution_section_box {
