@@ -37,7 +37,7 @@
     </div>
   </div>
 
-  <%= render :partial=>"assets/resource_main_content_right",:locals => { :resource => @presentation } %>
+  <%= render :partial=>"assets/resource_main_content_right",:locals => { :resource => @presentation, :versioned_resource=>@display_presentation } %>
 
   <div style="clear:both;padding-top:1em;">
     <p>
@@ -47,10 +47,8 @@
 
     <br/>
 
-    <%# get, classify and authorize all assets for this project -%>
     <%= render :partial=>"layouts/items_related_to",:object => @presentation %>
-    <br/>
-    <%= render :partial => "layouts/usage_info", :locals => { :resource => @presentation } -%>
+
   </div>
 
 </div>

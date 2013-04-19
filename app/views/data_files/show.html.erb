@@ -43,7 +43,7 @@
     </div>
   </div>
 
-  <%= render :partial=>"assets/resource_main_content_right",:locals => { :resource => @data_file } -%>
+  <%= render :partial=>"assets/resource_main_content_right",:locals => { :resource => @data_file, :versioned_resource=>@display_data_file } -%>
   
   <div style="clear:both;">
     <p>
@@ -128,7 +128,5 @@
   </div>
 
   <%= render :partial=>"layouts/items_related_to",:object => @data_file -%>
-  <br/>
-  <%= render :partial => "layouts/usage_info", :locals => { :resource => @data_file } -%>
 
 </div>

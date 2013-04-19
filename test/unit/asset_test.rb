@@ -83,6 +83,21 @@ class AssetTest < ActiveSupport::TestCase
     model = Model.new
     assert !model.contains_downloadable_items?
 
+    #test for versions
+    model = Factory :teusink_model
+
+    disable_authorization_checks do
+      model.save_as_new_version
+      model.reload
+      model.content_blobs=[Factory.create(:content_blob, :url=>"http://webpage.com",:asset => model,:asset_version=>model.version)]
+      model.save!
+      model.reload
+    end
+
+    assert_equal(2,model.versions.count)
+    assert model.find_version(1).contains_downloadable_items?
+    assert !model.find_version(2).contains_downloadable_items?
+
   end
 
   test "tech type titles" do

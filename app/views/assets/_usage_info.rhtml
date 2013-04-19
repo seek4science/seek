@@ -1,0 +1,37 @@
+<div class="contribution_section_box">
+
+    <% if resource.can_download? && versioned_resource.contains_downloadable_items? %>
+      <div class="big_download_button">
+        <%= link_to simple_image_tag_for_key("big_download"),download_data_file_path(resource,:version=>versioned_resource.version) %>
+      </div>
+    <% end -%>
+
+
+    <div class="usage_info">
+      <div class="usage_count">
+        <b>Views:</b> <%= count_actions(resource,"show") -%>
+        <% if ["DataFile","Model","Sop", "Presentation"].include?(resource.class.name) && versioned_resource.contains_downloadable_items? -%>
+                &nbsp;&nbsp;
+                <b>Downloads:</b> <%= count_actions(resource,"download") -%>
+          <% end -%>
+      </div>
+
+      <ul class="usage_times_list">
+        <li>
+          <b>Created</b>: <%= date_as_string(resource.created_at,true) -%>
+        </li>
+
+        <% unless resource.created_at == resource.updated_at -%>
+            <li>
+                <b>Last updated</b>: <%= date_as_string(resource.updated_at,true) -%>
+            </li>
+        <% end -%>
+        <% unless @last_used_before_now.blank? -%>
+            <li>
+                <b>Last used</b>: <%= date_as_string(@last_used_before_now,true) -%>
+            </li>
+        <% end -%>
+      </ul>
+    </div>
+
+</div>

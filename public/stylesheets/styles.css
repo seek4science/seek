@@ -954,13 +954,6 @@ ul.related_asset_list li{
     vertical-align: middle;	
 }
 
-.contribution_aftertitle {
-	color: #666;
-	font-size: 85%; 
-	text-align: center; 	
-	margin-bottom: 0.6em;
-	line-height: 1.5;
-}
 
 table.jerm_results {
     font-size: x-small;
@@ -1750,6 +1743,30 @@ div#guide_box span#guide_box_close {
 div#image_file_box {
     width: 30%;
     margin-top: 0.5em;
+}
+
+.usage_info {
+    text-align: center;
+}
+
+ul.usage_times_list {
+    color: #555;
+    font-size: smaller;
+    text-align: center;
+    margin-bottom: 0.6em;
+    line-height: 1.5;
+}
+
+.usage_count {
+    margin-bottom: 0.5em;
+}
+
+.big_download_button {
+    float:left;
+    padding-left: 0.5em;
+    padding-top: 0.5em;
+    height: 5em;
+    text-align: center;
 }
 
 
