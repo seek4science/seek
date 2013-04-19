@@ -1757,6 +1757,18 @@ ul.usage_times_list {
     line-height: 1.5;
 }
 
+.usage_count {
+    margin-bottom: 0.5em;
+}
+
+.big_download_button {
+    float:left;
+    padding-left: 0.5em;
+    padding-top: 0.5em;
+    height: 5em;
+    text-align: center;
+}
+
 
 
 

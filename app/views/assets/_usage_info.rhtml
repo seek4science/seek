@@ -1,12 +1,20 @@
 <div class="contribution_section_box">
 
-    <p class="usage_info">
-
-    <b>Views:</b> <%= count_actions(resource,"show") -%>
-    <% if ["DataFile","Model","Sop", "Presentation"].include?(resource.class.name) && versioned_resource.contains_downloadable_items? -%>
-        &nbsp;&nbsp;
-        <b>Downloads:</b> <%= count_actions(resource,"download") -%>
+    <% if resource.can_download? && versioned_resource.contains_downloadable_items? %>
+      <div class="big_download_button">
+        <%= link_to simple_image_tag_for_key("big_download"),download_data_file_path(resource,:version=>versioned_resource.version) %>
+      </div>
     <% end -%>
+
+
+    <div class="usage_info">
+      <div class="usage_count">
+        <b>Views:</b> <%= count_actions(resource,"show") -%>
+        <% if ["DataFile","Model","Sop", "Presentation"].include?(resource.class.name) && versioned_resource.contains_downloadable_items? -%>
+                &nbsp;&nbsp;
+                <b>Downloads:</b> <%= count_actions(resource,"download") -%>
+          <% end -%>
+      </div>
 
       <ul class="usage_times_list">
         <li>
@@ -24,6 +32,6 @@
             </li>
         <% end -%>
       </ul>
-    </p>
+    </div>
 
 </div>
