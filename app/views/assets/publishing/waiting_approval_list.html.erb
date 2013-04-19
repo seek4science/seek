@@ -26,10 +26,13 @@
   </ul>
 
   <% form_tag :action => :publish do %>
-      <% @items_for_publishing.each do |item| %>
-          <%= check_box_tag publishing_item_param(item), 1, true, {:style => 'display:none;'} %>
-          <br/>
-      <% end %>
+      <div style="display:none;">
+          <% @items_for_publishing.each do |item| %>
+              <%= check_box_tag publishing_item_param(item), 1, true %>
+              <br/>
+          <% end %>
+      </div>
+      <br/>
 
       <% resource = (controller_name == 'people') ? current_user.person : @asset %>
       <%= submit_tag "Submit" -%>
