@@ -1,29 +1,54 @@
+<%= stylesheet_link_tag "publishing" %>
+<%
+   published_items = []
+   waiting_for_publish_items = []
+   notified_items = []
+   if params[:published_items]
+     published_items |= params[:published_items].collect do |param|
+       item_class,item_id = param.split(',')
+       item_class.constantize.find_by_id(item_id)
+     end.compact
+   end
+   if params[:waiting_for_publish_items]
+     waiting_for_publish_items |= params[:waiting_for_publish_items].collect do |param|
+       item_class,item_id = param.split(',')
+       item_class.constantize.find_by_id(item_id)
+     end.compact
+   end
+   if params[:notified_items]
+     notified_items |= params[:notified_items].collect do |param|
+       item_class,item_id = param.split(',')
+       item_class.constantize.find_by_id(item_id)
+     end.compact
+   end
+
+%>
 <div class="show_basic">
 
   <h1>Publishing results</h1>
 
   <h2>Items that were successfully published</h2>
-  <ul id="published">
-    <% if @published_items.empty? -%><li class="none_text">No items</li><% end -%>
-    <% @published_items.each do |item| -%>
-        <li style="font-weight:bolder;"><%= text_for_resource item -%>: <%= link_to item.title, item -%></li>
+  <ul class="publishing_options" id="published">
+    <% if published_items.empty? -%><li class="none_text">No items</li><% end -%>
+    <% published_items.each do |item| -%>
+        <li class="type_and_title"><%= text_for_resource item -%>: <%= link_to item.title, item -%></li>
     <% end -%>
   </ul>
 
-  <% if !@waiting_for_publish_items.empty? -%>
+  <% if !waiting_for_publish_items.empty? -%>
       <h2>Items for which request to publish were sent to the gatekeepers</h2>
-      <ul id="publish_requested">
-        <% @waiting_for_publish_items.each do |item| -%>
-            <li style="font-weight:bolder;"><%= text_for_resource item -%>: <%= link_to item.title, item -%></li>
+      <ul class="publishing_options" id="publish_requested">
+        <% waiting_for_publish_items.each do |item| -%>
+            <li class="type_and_title"><%= text_for_resource item -%>: <%= link_to item.title, item -%></li>
         <% end -%>
       </ul>
   <% end -%>
 
-  <% if !@notified_items.empty? -%>
+  <% if !notified_items.empty? -%>
       <h2>Items for which notifications to publish were sent the owners</h2>
-      <ul id="notified">
-        <% @notified_items.each do |item| -%>
-            <li style="font-weight:bolder;"><%= text_for_resource item -%>: <%= link_to item.title, item -%></li>
+      <ul class="publishing_options" id="notified">
+        <% notified_items.each do |item| -%>
+            <li class="type_and_title"><%= text_for_resource item -%>: <%= link_to item.title, item -%></li>
             <% if Seek::Config.email_enabled %>
                 <li style="padding-left:2em;">Notification has been sent to: <%= item.managers.collect { |m| link_to(m.title, m) }.join(", ") -%></li>
             <% else %>

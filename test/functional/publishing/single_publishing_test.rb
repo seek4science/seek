@@ -67,7 +67,7 @@ class SinglePublishingTest < ActionController::TestCase
     assert request_publishing_df.can_publish?,"The datafile must not be publishable for this test to succeed"
     assert !notifying_df.can_publish?,"The datafile must not be publishable for this test to succeed"
 
-    post :publish_related_items, :id=>df.id
+    get :publish_related_items, :id=>df.id
     assert_response :success
 
     assert_select "li.type_and_title",:text=>/Investigation/,:count=>1 do
@@ -119,7 +119,7 @@ class SinglePublishingTest < ActionController::TestCase
       params[:publish][asset.class.name][asset.id.to_s]="1"
     end
 
-    post :check_gatekeeper_required, params.merge(:id=> df.id)
+    get :check_gatekeeper_required, params.merge(:id=> df.id)
     assert_response :success
 
     assert_select "a[href=?]", data_file_path(df), :text => /#{df.title}/, :count => 1
