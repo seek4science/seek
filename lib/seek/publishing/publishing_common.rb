@@ -22,7 +22,7 @@ module Seek
             format.html { render :template => "assets/publishing/publish_related_items_confirm"}
           end
         else
-          check_gatekeeper_required
+          redirect_to :action=>:check_gatekeeper_required, :publish => params[:publish]
         end
       end
 
@@ -39,15 +39,43 @@ module Seek
             format.html { render :template => "assets/publishing/waiting_approval_list" }
           end
         else
-          do_publish
+          publish
         end
       end
 
       def publish
-        if request.post?
-          do_publish
-        else
-          redirect_to :action=>:show
+        @published_items = @items_for_publishing.select(&:publish!)
+        @notified_items = (@items_for_publishing - @published_items).select{|item| !item.can_manage?}
+        @waiting_for_publish_items = @items_for_publishing - @published_items - @notified_items
+
+        if Seek::Config.email_enabled && !@notified_items.empty?
+          deliver_publishing_notifications @notified_items
+        end
+
+        @waiting_for_publish_items.each do |item|
+          ResourcePublishLog.add_log ResourcePublishLog::WAITING_FOR_APPROVAL, item
+          deliver_request_publish_approval item
+        end
+
+        respond_to do |format|
+          if @asset && request.env['HTTP_REFERER'].try(:normalize_trailing_slash) == polymorphic_url(@asset).normalize_trailing_slash
+            flash[:notice]="Publishing complete"
+            format.html { redirect_to @asset }
+          else
+            flash[:notice]="Publishing complete"
+            format.html { redirect_to :action => :published,
+                                      :published_items => @published_items.collect{|item| "#{item.class.name},#{item.id}"},
+                                      :notified_items => @notified_items.collect{|item| "#{item.class.name},#{item.id}"},
+                                      :waiting_for_publish_items => @waiting_for_publish_items.collect{|item| "#{item.class.name},#{item.id}"} }
+          end
+        end
+      end
+
+      def published
+        respond_to do |format|
+          format.html { render :template => "assets/publishing/published", :local =>{:published_items => params[:published_items],
+                                                                                     :waiting_for_publish_items => params[:waiting_for_publish_items],
+                                                                                     :notified_items => params[:notified_items]}}
         end
       end
 
@@ -92,30 +120,6 @@ module Seek
 
       def set_items_for_publishing
         @items_for_publishing = resolve_publish_params(params[:publish]).select(&:can_publish?)
-      end
-
-      def do_publish
-        @published_items = @items_for_publishing.select(&:publish!)
-        @notified_items = (@items_for_publishing - @published_items).select{|item| !item.can_manage?}
-        @waiting_for_publish_items = @items_for_publishing - @published_items - @notified_items
-
-        if Seek::Config.email_enabled && !@notified_items.empty?
-          deliver_publishing_notifications @notified_items
-        end
-
-        @waiting_for_publish_items.each do |item|
-          ResourcePublishLog.add_log ResourcePublishLog::WAITING_FOR_APPROVAL, item
-          deliver_request_publish_approval item
-        end
-        respond_to do |format|
-          if @asset && request.env['HTTP_REFERER'].try(:normalize_trailing_slash) == polymorphic_url(@asset).normalize_trailing_slash
-            flash[:notice]="Publishing complete"
-            format.html { redirect_to @asset }
-          else
-            flash.now[:notice]="Publishing complete"
-            format.html { render :template=>"assets/publishing/published" }
-          end
-        end
       end
 
       def log_publishing
