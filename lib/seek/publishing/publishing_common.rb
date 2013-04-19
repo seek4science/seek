@@ -5,7 +5,7 @@ module Seek
         base.before_filter :set_asset, :only=>[:check_related_items,:publish_related_items,:check_gatekeeper_required,:publish]
         base.before_filter :set_assets, :only=>[:batch_publishing_preview]
         base.before_filter :set_items_for_publishing, :only => [:check_related_items,:publish_related_items,:check_gatekeeper_required,:publish]
-        base.before_filter :publish_auth, :only=>[:batch_publishing_preview,:check_related_items,:publish_related_items,:check_gatekeeper_required,:publish]
+        base.before_filter :publish_auth, :only=>[:batch_publishing_preview,:check_related_items,:publish_related_items,:check_gatekeeper_required,:publish,:published]
         base.after_filter :request_publish_approval,:log_publishing, :only=>[:create,:update]
       end
 

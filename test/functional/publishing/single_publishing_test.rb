@@ -23,6 +23,9 @@ class SinglePublishingTest < ActionController::TestCase
     post :publish,:id=>df
     assert_response :redirect
     assert_nil flash[:error]
+
+    get :published,:id=>df
+    assert_response :success
   end
 
   test "should not be able to do publish when not publishable" do
@@ -37,14 +40,10 @@ class SinglePublishingTest < ActionController::TestCase
     post :publish,:id=>df
     assert_redirected_to :root
     assert flash[:error]
-  end
 
-  test "get publish redirected" do
-    #This is useful because if you logout it redirects back to the current page.
-    #If you just published something, that will do a get request to *Controller#isa_publish
-    df=data_file_for_publishing
-    get :publish, :id => df.id
-    assert_response :redirect
+    get :published,:id=>df
+    assert_redirected_to :root
+    assert flash[:error]
   end
 
   test "get isa_publishing_preview" do
