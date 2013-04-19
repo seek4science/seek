@@ -115,12 +115,10 @@
 
     </div>
 
-    <%= render :partial=>"assets/resource_main_content_right",:locals => { :resource => @model } %>
+    <%= render :partial=>"assets/resource_main_content_right",:locals => { :resource => @model,:versioned_resource=>@display_model } %>
 
     <div style="clear:both;padding-top:1em;">
       <%= render :partial => "layouts/items_related_to", :object => @model %>
-      <br/>
-      <%= render :partial => "layouts/usage_info", :locals => { :resource => @model } -%>
     </div>
 </div>
 
