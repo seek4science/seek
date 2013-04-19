@@ -453,7 +453,7 @@ class ModelsControllerTest < ActionController::TestCase
     assert_select "div.box_about_actor" do
       assert_select "p > strong",:text=>"1 item is associated with this Model:"
       assert_select "ul.fileinfo_list" do
-        assert_select "li.fileinfo" do
+        assert_select "li.fileinfo_container" do
             assert_select "p > b",:text=>/Filename:/
             assert_select "p",:text=>/cronwright\.xml/
             assert_select "p > b",:text=>/Format:/
@@ -479,7 +479,7 @@ class ModelsControllerTest < ActionController::TestCase
     assert_select "div.box_about_actor" do
       assert_select "p > strong",:text=>"2 items are associated with this Model:"
       assert_select "ul.fileinfo_list" do
-        assert_select "li.fileinfo",:count=>2 do
+        assert_select "li.fileinfo_container",:count=>2 do
           assert_select "p > b",:text=>/Filename:/,:count=>2
           assert_select "p",:text=>/cronwright\.xml/
           assert_select "p",:text=>/rightfield\.xls/
