@@ -946,11 +946,11 @@ class ModelsControllerTest < ActionController::TestCase
 
   end
 
-  test "do isa_publish" do
+  test "do publish" do
     model=models(:teusink_with_project_without_gatekeeper)
     assert model.can_manage?,"The sop must be manageable for this test to succeed"
     post :publish,:id=>model
-    assert_response :success
+    assert_response :redirect
     assert_nil flash[:error]
     assert_not_nil flash[:notice]
   end

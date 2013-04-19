@@ -73,9 +73,7 @@ module Seek
 
       def published
         respond_to do |format|
-          format.html { render :template => "assets/publishing/published", :local =>{:published_items => params[:published_items],
-                                                                                     :waiting_for_publish_items => params[:waiting_for_publish_items],
-                                                                                     :notified_items => params[:notified_items]}}
+          format.html { render :template => "assets/publishing/published"}
         end
       end
 

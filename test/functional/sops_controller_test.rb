@@ -597,7 +597,7 @@ class SopsControllerTest < ActionController::TestCase
     sop=sops(:sop_with_project_without_gatekeeper)
     assert sop.can_manage?,"The sop must be manageable for this test to succeed"
     post :publish,:id=>sop
-    assert_response :success
+    assert_response :redirect
     assert_nil flash[:error]
     assert_not_nil flash[:notice]
   end
