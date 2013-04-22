@@ -17,8 +17,6 @@ class ModelsController < ApplicationController
     
   before_filter :jws_enabled,:only=>[:builder,:simulate,:submit_to_jws]
 
-  before_filter :experimental_features, :only=>[:matching_data]
-
   include Seek::Publishing
   include Seek::BreadCrumbs
 
@@ -610,13 +608,6 @@ class ModelsController < ApplicationController
   end
 
   protected
-
-  def experimental_features
-    if !Seek::Config.experimental_features_enabled
-      flash[:error]="Not available"
-      redirect_to @model
-    end
-  end
   
   def create_new_version comments
     if @model.save_as_new_version(comments)
