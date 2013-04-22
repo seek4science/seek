@@ -1,29 +1,23 @@
-<div id='matching_data_ajax_loader'>
-  <ul class="matching_data_items">
+<div class="matching_data_items">
+
     <% matching_data_items.each do |matching_data_item| %>
         <%
            data_file = DataFile.find(matching_data_item.primary_key)
            plots = data_file.latest_version.spreadsheet_annotations.select { |a| a.attribute.name=="plot_data" }
         %>
-        <li class="matching_data_item">
-          <div class="title">
+        <div class="list_item_content matching_data_item">
+
             <%= list_item_title data_file -%>
             <span class="score">
-     - matched by <b><%= matching_data_item.search_terms.join(", ") -%></b>
-        ( <%= matching_data_item.score -%> )
-    </span>
-          </div>
+                - matched by <b><%= matching_data_item.search_terms.join(", ") -%></b>
+            <%= "( #{matching_data_item.score} )" if Rails.env=="development" %>
+
+            </span>
+
           <%= list_item_contributor data_file -%>
 
-          <div class="box_standout description">
+          <div class="box_standout">
             <%= text_or_not_specified(data_file.description, :description => true, :length => 500) -%>
-          </div>
-          <div class="explore">
-            <% if can_download_asset?(data_file, params[:code]) -%>
-                <% if data_file.contains_extractable_spreadsheet? %>
-                    <%= link_to "Explore", polymorphic_path(data_file, :action => :explore, :code=>params[:code]), :target => "blank" -%>
-                <% end %>
-            <% end %>
           </div>
 
           <div>
@@ -52,10 +46,10 @@
                       });
                   </script>
               <% end -%>
-              <li style="clear:both;">&nbsp;</li>
+
             </ul>
           </div>
-        </li>
-        <% end %>
-        </ul>
         </div>
+    <% end %>
+
+</div>
