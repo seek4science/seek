@@ -1729,8 +1729,19 @@ li.fileinfo div.fileinfo2 {
     margin: 0.25em;
     min-height: 8.1em;
     max-width: 22em;
+    word-wrap: break-word;
 }
 
+table.fileinfo th {
+    font-style:  italic;
+
+
+}
+table.fileinfo th,td {
+    text-align: left;
+    height: 5px;
+    padding-bottom: 1px;
+}
 
 div#guide_box {
     min-height: 4em;
