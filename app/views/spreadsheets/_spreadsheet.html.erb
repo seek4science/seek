@@ -44,7 +44,7 @@
                   <% 1.upto(sheet.last_col) do |c| %>
                     <% if sheet[r] && sheet[r][c] -%>
                       <% cell = sheet[r][c] -%>
-                      <td row="<%= r -%>" col="<%= c -%>" id="cell_<%= to_alpha(c) + r.to_s -%>" title="<%= ("=" + cell.formula unless cell.formula.nil?) || "" -%>" class="cell <%= cell.style || ""-%>"><%= cell.value -%></td>
+                      <td row="<%= r -%>" col="<%= c -%>" id="cell_<%= to_alpha(c) + r.to_s -%>" title="<%= ("=" + cell.formula unless cell.formula.nil?) || "" -%>" class="cell <%= cell.style || ""-%>"><%= auto_link(h(cell.value),:html=>{:target=>"_blank"}) -%></td>
                     <% else -%>
                       <td row="<%= r -%>" col="<%= c -%>" id="cell_<%= to_alpha(c) + r.to_s -%>" class="cell"></td>
                     <% end -%>
