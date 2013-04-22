@@ -347,18 +347,18 @@ class ApplicationController < ActionController::Base
   filter_parameter_logging :password
 
   def log_event
+    User.with_current_user current_user do
+      c = self.controller_name.downcase
+      a = self.action_name.downcase
 
-    c = self.controller_name.downcase
-    a = self.action_name.downcase
+      object = eval("@"+c.singularize)
 
-    object = eval("@"+c.singularize)
+      object=current_user if c=="sessions" #logging in and out is a special case
 
-    object=current_user if c=="sessions" #logging in and out is a special case
+      #don't log if the object is not valid or has not been saved, as this will a validation error on update or create
+      return if object.nil? || (object.respond_to?("new_record?") && object.new_record?) || (object.respond_to?("errors") && !object.errors.empty?)
 
-    #don't log if the object is not valid or has not been saved, as this will a validation error on update or create
-    return if object.nil? || (object.respond_to?("new_record?") && object.new_record?) || (object.respond_to?("errors") && !object.errors.empty?)
 
-    disable_authorization_checks do
       case c
         when "sessions"
           if ["create", "destroy"].include?(a)
@@ -424,9 +424,9 @@ class ApplicationController < ActionController::Base
                                :data => activity_loggable.title)
           end
       end
-    end
 
-    expire_activity_fragment_cache(c, a)
+      expire_activity_fragment_cache(c, a)
+    end
   end
 
   def expire_activity_fragment_cache(controller,action)
