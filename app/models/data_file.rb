@@ -206,8 +206,6 @@ class DataFile < ActiveRecord::Base
     end
   end
 
-
-
   #a simple container for handling the matching results returned from #matching_data_files
   class ModelMatchResult < Struct.new(:search_terms,:score,:primary_key); end
 
@@ -216,7 +214,7 @@ class DataFile < ActiveRecord::Base
 
     results = {}
 
-    if Seek::Config.solr_enabled && is_extractable_spreadsheet?
+    if Seek::Config.solr_enabled && contains_extractable_spreadsheet?
       search_terms = spreadsheet_annotation_search_fields | spreadsheet_contents_for_search | fs_search_fields | searchable_tags
       #make the array uniq! case-insensistive whilst mainting the original case
       dc = []
@@ -229,7 +227,7 @@ class DataFile < ActiveRecord::Base
       end
       search_terms.each do |key|
         Model.search do |query|
-          query.keywords key, :fields=>[:model_contents, :description, :searchable_tags]
+          query.keywords key, :fields=>[:model_contents_for_search, :description, :searchable_tags]
         end.hits.each do |hit|
           results[hit.primary_key]||=ModelMatchResult.new([],0,hit.primary_key)
           results[hit.primary_key].search_terms << key
@@ -241,7 +239,4 @@ class DataFile < ActiveRecord::Base
     results.values.sort_by{|a| -a.score}
   end
 
-
-
-  
 end

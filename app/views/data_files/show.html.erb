@@ -10,15 +10,17 @@
 
 <ul class="sectionIcons">
 <%= asset_buttons @data_file,@display_data_file.version -%>
+  <% if Seek::Config.solr_enabled -%>
+      <li>
+        <%= image_tag_for_key("search",matching_models_data_file_path(@data_file,:version=>@display_data_file.version),nil,nil,"Find related models") -%>
+      </li>
+  <% end -%>
 </ul>
 <br/>
 
 <div class="show_basic">
 
   <%= render :partial=>"assets/upload_new_version_form", :locals=>{:resource=>@data_file} -%>
-
-  <div id="matching_models" style="display:none;text-align:center";></div>
-  <div id="matching_results" style="display:none;height:55em;overflow-y: scroll;"></div>
 
   <div class="main_content_left_box">
     <%= render :partial=>"assets/resource_version_details", :locals=>{:displayed_resource=>@display_data_file, :resource=>@data_file} -%>
