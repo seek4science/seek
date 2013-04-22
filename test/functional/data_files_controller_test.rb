@@ -1283,6 +1283,17 @@ class DataFilesControllerTest < ActionController::TestCase
     assert flash[:error]
   end
 
+  test "correctly displays links in spreadsheet explorer" do
+    df = Factory(:data_file,
+                 :policy=>Factory(:public_policy),
+                 :content_blob=>Factory(:small_test_spreadsheet_content_blob,:data=>File.new("#{Rails.root}/test/fixtures/files/spreadsheet_with_a_link.xls","rb").read))
+    assert df.can_download?
+    get :explore, :id=>df
+    assert_response :success
+    assert_select "td",:text=>"A link to BBC",:count=>1
+    assert_select "td a[href=?][target=_blank]","http://bbc.co.uk/news",:count=>1
+  end
+
   test "uploader can publish the item when projects associated with the item have no gatekeeper" do
     uploader = Factory(:user)
     data_file = Factory(:data_file, :contributor => uploader)
