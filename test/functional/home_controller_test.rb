@@ -234,6 +234,45 @@ class HomeControllerTest < ActionController::TestCase
     assert_select 'div#recently_downloaded ul>li', recently_downloaded_item_logs.count
   end
 
+  test 'should expire recently added items' do
+    login_as(:aaron)
+    df1 = Factory :data_file, :title=>"A new data file", :contributor=>User.current_user.person
+    assert_difference "ActivityLog.count" do
+      log = Factory :activity_log, :activity_loggable=>df1, :action => 'download', :controller_name=>"data_files"
+    end
+    recently_downloaded_item_logs =  recently_downloaded_item_logs(1.year.ago, 10)
+    assert_equal 1,recently_downloaded_item_logs.count
+
+    #add another datafile, should expire the cache
+    df2 = Factory :data_file, :title=>"A new data file 2", :contributor=>User.current_user.person
+    assert_difference "ActivityLog.count" do
+      log = Factory :activity_log, :activity_loggable=>df2, :action => 'download', :controller_name=>"data_files"
+    end
+
+    recently_downloaded_item_logs =  recently_downloaded_item_logs(1.year.ago, 10)
+    assert_equal 2,recently_downloaded_item_logs.count
+  end
+
+
+  test 'should expire recently downloaded items' do
+    login_as(:aaron)
+    df1 = Factory :data_file, :title=>"A new data file", :contributor=>User.current_user.person
+    assert_difference "ActivityLog.count" do
+      log = Factory :activity_log, :activity_loggable=>df1, :controller_name=>"data_files", :culprit=>User.current_user
+    end
+    recently_added_item_logs =  recently_added_item_logs(1.year.ago, 10)
+    assert_equal 1,recently_added_item_logs.count
+
+    #add another datafile, should expire the cache
+    df2 = Factory :data_file, :title=>"A new data file 2", :contributor=>User.current_user.person
+    assert_difference "ActivityLog.count" do
+      log = Factory :activity_log, :activity_loggable=>df2, :controller_name=>"data_files", :culprit=>User.current_user
+    end
+
+    recently_added_item_logs =  recently_added_item_logs(1.year.ago, 10)
+    assert_equal 2,recently_added_item_logs.count
+  end
+
   test "recently added should include data_file" do
     login_as(:aaron)
 
