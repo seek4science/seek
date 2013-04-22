@@ -358,70 +358,72 @@ class ApplicationController < ActionController::Base
     #don't log if the object is not valid or has not been saved, as this will a validation error on update or create
     return if object.nil? || (object.respond_to?("new_record?") && object.new_record?) || (object.respond_to?("errors") && !object.errors.empty?)
 
-    case c
-      when "sessions"
-        if ["create", "destroy"].include?(a)
-          ActivityLog.create(:action => a,
-                             :culprit => current_user,
-                             :controller_name => c,
-                             :activity_loggable => object,
-                             :user_agent => request.env["HTTP_USER_AGENT"])
-        end
-      when "investigations", "studies", "assays", "specimens", "samples"
-        if ["show", "create", "update", "destroy"].include?(a)
-          check_log_exists(a, c, object)
-          ActivityLog.create(:action => a,
-                             :culprit => current_user,
-                             :referenced => object.projects.first,
-                             :controller_name => c,
-                             :activity_loggable => object,
-                             :data => object.title,
-                             :user_agent => request.env["HTTP_USER_AGENT"])
+    disable_authorization_checks do
+      case c
+        when "sessions"
+          if ["create", "destroy"].include?(a)
+            ActivityLog.create(:action => a,
+                               :culprit => current_user,
+                               :controller_name => c,
+                               :activity_loggable => object,
+                               :user_agent => request.env["HTTP_USER_AGENT"])
+          end
+        when "investigations", "studies", "assays", "specimens", "samples"
+          if ["show", "create", "update", "destroy"].include?(a)
+            check_log_exists(a, c, object)
+            ActivityLog.create(:action => a,
+                               :culprit => current_user,
+                               :referenced => object.projects.first,
+                               :controller_name => c,
+                               :activity_loggable => object,
+                               :data => object.title,
+                               :user_agent => request.env["HTTP_USER_AGENT"])
 
-        end
-      when "data_files", "models", "sops", "publications", "presentations", "events"
-        a = "create" if a == "upload_for_tool"
-        a = "update" if a == "new_version"
-        a = "inline_view" if a == "explore"
-        if ["show", "create", "update", "destroy", "download", "inline_view"].include?(a)
-          check_log_exists(a, c, object)
-          ActivityLog.create(:action => a,
-                             :culprit => current_user,
-                             :referenced => object.projects.first,
-                             :controller_name => c,
-                             :activity_loggable => object,
-                             :data => object.title,
-                             :user_agent => request.env["HTTP_USER_AGENT"])
-        end
-      when "people"
-        if ["show", "create", "update", "destroy"].include?(a)
-          ActivityLog.create(:action => a,
-                             :culprit => current_user,
-                             :controller_name => c,
-                             :activity_loggable => object,
-                             :data => object.title,
-                             :user_agent => request.env["HTTP_USER_AGENT"])
-        end
-      when "search"
-        if a=="index"
-          ActivityLog.create(:action => "index",
-                             :culprit => current_user,
-                             :controller_name => c,
-                             :user_agent => request.env["HTTP_USER_AGENT"],
-                             :data => {:search_query => object, :result_count => @results.count})
-        end
-      when "content_blobs"
-        a = "inline_view" if a=="view_pdf_content"
-        if a=="inline_view" || (a=="download" && params['intent'].to_s != 'inline_view')
-          activity_loggable = object.asset
-          ActivityLog.create(:action => a,
-                             :culprit => current_user,
-                             :referenced => object,
-                             :controller_name => c,
-                             :activity_loggable => activity_loggable,
-                             :user_agent => request.env["HTTP_USER_AGENT"],
-                             :data => activity_loggable.title)
-        end
+          end
+        when "data_files", "models", "sops", "publications", "presentations", "events"
+          a = "create" if a == "upload_for_tool"
+          a = "update" if a == "new_version"
+          a = "inline_view" if a == "explore"
+          if ["show", "create", "update", "destroy", "download", "inline_view"].include?(a)
+            check_log_exists(a, c, object)
+            ActivityLog.create(:action => a,
+                               :culprit => current_user,
+                               :referenced => object.projects.first,
+                               :controller_name => c,
+                               :activity_loggable => object,
+                               :data => object.title,
+                               :user_agent => request.env["HTTP_USER_AGENT"])
+          end
+        when "people"
+          if ["show", "create", "update", "destroy"].include?(a)
+            ActivityLog.create(:action => a,
+                               :culprit => current_user,
+                               :controller_name => c,
+                               :activity_loggable => object,
+                               :data => object.title,
+                               :user_agent => request.env["HTTP_USER_AGENT"])
+          end
+        when "search"
+          if a=="index"
+            ActivityLog.create(:action => "index",
+                               :culprit => current_user,
+                               :controller_name => c,
+                               :user_agent => request.env["HTTP_USER_AGENT"],
+                               :data => {:search_query => object, :result_count => @results.count})
+          end
+        when "content_blobs"
+          a = "inline_view" if a=="view_pdf_content"
+          if a=="inline_view" || (a=="download" && params['intent'].to_s != 'inline_view')
+            activity_loggable = object.asset
+            ActivityLog.create(:action => a,
+                               :culprit => current_user,
+                               :referenced => object,
+                               :controller_name => c,
+                               :activity_loggable => activity_loggable,
+                               :user_agent => request.env["HTTP_USER_AGENT"],
+                               :data => activity_loggable.title)
+          end
+      end
     end
 
     expire_activity_fragment_cache(c, a)

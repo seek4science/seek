@@ -61,8 +61,7 @@ module HomeHelper
   end
 
   def recently_downloaded_item_logs time=1.month.ago, number_of_item=10
-    latest_activity_log = ActivityLog.find(:last, :conditions => ["action = ? AND created_at > ?", 'download', time])
-    Rails.cache.fetch("download_activity_#{current_user_id}_#{latest_activity_log.try(:id)}") do
+    Rails.cache.fetch("download_activity_#{current_user_id}") do
       activity_logs = ActivityLog.find(:all, :include => "activity_loggable", :order => "created_at DESC", :conditions => ["action = ? AND created_at > ?", 'download', time])
       selected_activity_logs = []
       selected_items = []
@@ -81,9 +80,8 @@ module HomeHelper
   end
 
   def recently_added_item_logs time=1.month.ago, number_of_item=10
-    item_types = Seek::Util.user_creatable_types.collect{|type| type.name}
-    latest_activity_log = ActivityLog.find(:last, :conditions => ["action = ? AND created_at > ? AND activity_loggable_type in (?)", 'create', time, item_types])
-    Rails.cache.fetch("create_activity_#{current_user_id}_#{latest_activity_log.try(:id)}") do
+    Rails.cache.fetch("create_activity_#{current_user_id}") do
+      item_types = Seek::Util.user_creatable_types.collect{|type| type.name}
       activity_logs = ActivityLog.find(:all, :include => "activity_loggable", :order => "created_at DESC", :conditions => ["action = ? AND created_at > ? AND activity_loggable_type in (?)", 'create', time, item_types])
       selected_activity_logs = []
       count = 0
