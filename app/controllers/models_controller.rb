@@ -594,11 +594,10 @@ class ModelsController < ApplicationController
       matched_data_files << Model::DataFileMatchResult.new(search_terms,scores[index].to_i,primary_key.to_i)
     end
     #authorize
-    data_files = matched_data_files.collect do |mdf|
-      DataFile.find(mdf.primary_key)
-    end
-    authorized_data_file_ids = DataFile.authorized_partial_asset_collection(data_files, 'view', current_user).collect(&:id)
-    authorized_matching_data_files =  matched_data_files.select{|mdf| authorized_data_file_ids.include?(mdf.primary_key.to_i)}
+    ids = matched_data_files.collect(&:primary_key)
+    data_files = DataFile.find_all_by_id(ids)
+    authorized_matching_data_files = DataFile.authorized_partial_asset_collection(data_files, 'view', current_user)
+
 
     render :update do |page|
       page.replace_html "matching_data_ajax_loader", :partial => "models/matching_data_item", :locals=>{:matching_data_items => authorized_matching_data_files}

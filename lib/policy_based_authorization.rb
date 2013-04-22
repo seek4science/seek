@@ -71,6 +71,7 @@ module Acts
         #returns the authorised items from the array of the same class items for a given action and optionally a user. If user is nil, the items authorised for an
         #anonymous user are returned.
         def authorized_partial_asset_collection partial_asset_collection, action, user=User.current_user
+          return partial_asset_collection if partial_asset_collection.empty?
           user_id = user.nil? ? 0 : user.id
           if Seek::Config.auth_lookup_enabled && self.lookup_table_consistent?(user_id)
             ids=partial_asset_collection.collect{|asset| asset.id}
