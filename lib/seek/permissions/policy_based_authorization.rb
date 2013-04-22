@@ -103,6 +103,7 @@ module Seek
         #anonymous user are returned. All assets must be of the same type and match the asset class this method was called on
         # if filter_by_permissions is true, then as well as the authorization the state based permissions will also be applied
         def authorize_asset_collection assets, action, user=User.current_user,filter_by_permissions=true
+          return assets if assets.empty?
           user_id = user.nil? ? 0 : user.id
           if Seek::Config.auth_lookup_enabled && self.lookup_table_consistent?(user_id)
             ids=assets.collect{|asset| asset.id}
