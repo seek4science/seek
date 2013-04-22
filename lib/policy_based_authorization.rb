@@ -77,7 +77,6 @@ module Acts
             ids=partial_asset_collection.collect{|asset| asset.id}
             clause = "asset_id IN (#{ids.join(',')})"
             sql =  "SELECT asset_id from #{lookup_table_name} WHERE user_id = #{user_id} AND (#{clause}) AND can_#{action}=#{ActiveRecord::Base.connection.quoted_true}"
-            puts "XXX - #{sql}"
             ids = ActiveRecord::Base.connection.select_all(sql).collect{|k| k["asset_id"]}
             authorized_partial_asset_collection = partial_asset_collection.select{|asset| ids.include?(asset.id.to_s)}
           else

@@ -578,33 +578,21 @@ class ModelsController < ApplicationController
 
   def matching_data
     #FIXME: should use the correct version
-    @matching_data_files = @model.matching_data_files
+    @matching_data_items = @model.matching_data_files
+
+    #filter authorization
+    ids = @matching_data_items.collect &:primary_key
+    data_files = DataFile.find_all_by_id(ids)
+    authorised_ids = DataFile.authorized_partial_asset_collection(data_files,"view").collect &:id
+    @matching_data_items = @matching_data_items.select{|mdf| authorised_ids.include?(mdf.primary_key.to_i)}
+
+    flash.now[:notice]="#{@matching_data_items.count} Data files found that may be relevant to this Model"
     respond_to do |format|
       format.html
     end
   end
 
-  def view_matched_data_files
-    primary_keys = params[:primary_keys].split(',')
-    scores = params[:scores].split(',')
-    search_terms_collection = params[:search_terms].split(',')
-    matched_data_files = []
-    primary_keys.each_with_index do |primary_key, index|
-      search_terms = search_terms_collection[index].split("*")
-      matched_data_files << Model::DataFileMatchResult.new(search_terms,scores[index].to_i,primary_key.to_i)
-    end
-    #authorize
-    ids = matched_data_files.collect(&:primary_key)
-    data_files = DataFile.find_all_by_id(ids)
-    authorized_matching_data_files = DataFile.authorized_partial_asset_collection(data_files, 'view', current_user)
 
-
-    render :update do |page|
-      page.replace_html "matching_data_ajax_loader", :partial => "models/matching_data_item", :locals=>{:matching_data_items => authorized_matching_data_files}
-      page.visual_effect :toggle_blind, "view_matched_data_files", :duration => 0.05
-      page.visual_effect :toggle_blind, "view_matched_data_files_and_extra", :duration => 0.05
-    end
-  end
 
   protected
   
