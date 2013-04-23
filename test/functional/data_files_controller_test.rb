@@ -36,6 +36,8 @@ class DataFilesControllerTest < ActionController::TestCase
     assert_difference("ActivityLog.count") do
       get :show,:id=>df
     end
+    assert_response :success
+
     al = ActivityLog.last(:order=>:id)
     assert_equal "show",al.action
     assert_equal df,al.activity_loggable
@@ -43,11 +45,12 @@ class DataFilesControllerTest < ActionController::TestCase
     assert_difference("ActivityLog.count") do
       get :download,:id=>df
     end
+    assert_response :success
+
     al = ActivityLog.last(:order=>:id)
     assert_equal "download",al.action
     assert_equal df,al.activity_loggable
 
-    assert_response :success
   end
 
 
