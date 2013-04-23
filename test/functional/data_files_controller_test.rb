@@ -28,6 +28,32 @@ class DataFilesControllerTest < ActionController::TestCase
     assert_select "title",:text=>/The Sysmo SEEK Data.*/, :count=>1
   end
 
+  #because the activity logging is currently an after_filter, the AuthorizationEnforcement can silently prevent
+  #the log being saved, unless it is public, since it has passed out of the around filter and User.current_user is nil
+  test "download and view activity logging for private items" do
+    df = Factory :data_file,:policy=>Factory(:private_policy)
+    @request.session[:user_id] = df.contributor.user.id
+    assert_difference("ActivityLog.count") do
+      get :show,:id=>df
+    end
+    assert_response :success
+
+    al = ActivityLog.last(:order=>:id)
+    assert_equal "show",al.action
+    assert_equal df,al.activity_loggable
+
+    assert_difference("ActivityLog.count") do
+      get :download,:id=>df
+    end
+    assert_response :success
+
+    al = ActivityLog.last(:order=>:id)
+    assert_equal "download",al.action
+    assert_equal df,al.activity_loggable
+
+  end
+
+
   test "correct title and text for associating an assay for new" do
     login_as(Factory(:user))
     get :new

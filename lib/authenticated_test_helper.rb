@@ -4,7 +4,7 @@ module AuthenticatedTestHelper
   def login_as(user)
     user = users(user) unless user.class == User
     @request.session[:user_id] = user.try(:id)
-    User.current_user = user
+    #User.current_user = user
   end
 
   def logout
