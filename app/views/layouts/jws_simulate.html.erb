@@ -27,7 +27,7 @@
         <%= image_tag_for_key "home", root_path, "Home", {}, "Home" -%>
         <% if logged_in? %>
         <div id="logged_in_as">
-          Logged in as  
+          <span style="float:left;padding-top: 2px;">Logged in as</span>
           <%= image_tag_for_key "user", current_user.person, current_user.person.name, {}, current_user.person.name -%>
           | <%= image_tag_for_key "logout", logout_path, "Logout", {}, "Logout" -%>
         </div>
