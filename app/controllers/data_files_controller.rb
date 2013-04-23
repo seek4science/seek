@@ -404,7 +404,7 @@ class DataFilesController < ApplicationController
     #filter authorization
     ids = @matching_model_items.collect &:primary_key
     models = Model.find_all_by_id(ids)
-    authorised_ids = Model.authorized_partial_asset_collection(models,"view").collect &:id
+    authorised_ids = Model.authorize_asset_collection(models,"view").collect &:id
     @matching_model_items = @matching_model_items.select{|mdf| authorised_ids.include?(mdf.primary_key.to_i)}
 
     flash.now[:notice]="#{@matching_model_items.count} Models were found that may be relevant to this Data file"
