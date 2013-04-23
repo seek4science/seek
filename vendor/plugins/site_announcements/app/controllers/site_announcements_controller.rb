@@ -49,7 +49,7 @@ class SiteAnnouncementsController < ApplicationController
     respond_to do |format|
       if @info.nil?
         flash[:error]="Invalid Key"
-        redirect_to root_url
+        format.html{ redirect_to root_url }
       else
         format.html
       end
