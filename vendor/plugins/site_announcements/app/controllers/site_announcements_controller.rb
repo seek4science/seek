@@ -44,6 +44,7 @@ class SiteAnnouncementsController < ApplicationController
   end
   
   def notification_settings
+
     @info=NotifieeInfo.find_by_unique_key(params[:key])
     
     respond_to do |format|
