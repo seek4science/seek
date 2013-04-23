@@ -10,9 +10,9 @@
 
 <ul class="sectionIcons">
 <%= asset_buttons @data_file,@display_data_file.version -%>
-  <% if Seek::Config.solr_enabled -%>
+  <% if Seek::Config.solr_enabled && @display_data_file.latest_version? && @data_file.contains_extractable_spreadsheet? -%>
       <li>
-        <%= image_tag_for_key("search",matching_models_data_file_path(@data_file,:version=>@display_data_file.version),nil,nil,"Find related models") -%>
+        <%= image_tag_for_key("search",matching_models_data_file_path(@data_file),nil,nil,"Find related models") -%>
       </li>
   <% end -%>
 </ul>

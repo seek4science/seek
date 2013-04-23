@@ -88,7 +88,7 @@ class PoliciesControllerTest < ActionController::TestCase
       login_as(sop.contributor)
       post :preview_permissions, :sharing_scope => Policy::EVERYONE, :access_type => Policy::VISIBLE, :is_new_file => "false", :resource_name => 'sop', :resource_id => sop.id,:project_ids => gatekeeper.projects.first.id.to_s
 
-      assert_select "span",:text=>"(An email will be sent to the Gatekeepers of the projects associated with this SOP to ask for publishing approval. This SOP will not be published until one of the Gatekeepers has granted approval)", :count=>1
+      assert_select "p",:text=>"(An email will be sent to the Gatekeepers of the projects associated with this SOP to ask for publishing approval. This SOP will not be published until one of the Gatekeepers has granted approval)", :count=>1
   end
 
   test 'should show notice message when an item is requested to be published and the request was alread sent by this user' do
@@ -104,7 +104,7 @@ class PoliciesControllerTest < ActionController::TestCase
   test 'should not show notice message when an item can be published right away' do
       post :preview_permissions, :sharing_scope => Policy::EVERYONE, :access_type => Policy::VISIBLE, :is_new_file => "true", :resource_name => 'sop', :project_ids => Factory(:project).id.to_s
 
-      assert_select "span",:text=>"(An email will be sent to the Gatekeepers of the projects associated with this SOP to ask for publishing approval. This SOP will not be published until one of the Gatekeepers has granted approval)", :count=>0
+      assert_select "p",:text=>"(An email will be sent to the Gatekeepers of the projects associated with this SOP to ask for publishing approval. This SOP will not be published until one of the Gatekeepers has granted approval)", :count=>0
   end
 
   test 'when creating an item, can not publish the item if associate to it the project which has gatekeeper' do
@@ -206,5 +206,29 @@ class PoliciesControllerTest < ActionController::TestCase
 
     post :preview_permissions, :sharing_scope => 2, :access_type => Policy::VISIBLE, :project_access_type => Policy::ACCESSIBLE, :project_ids => '0', :resource_name => 'sop'
     assert_response :success
+  end
+
+  test 'additional permissions and privilege text for preview permission' do
+    #no additional text
+    post :preview_permissions, :sharing_scope => Policy::PRIVATE, :access_type => Policy::NO_ACCESS, :is_new_file => "true", :resource_name => 'assay'
+    assert_select "p.additional_text", :text=>"", :count=>1
+
+    #with additional text for permissions
+    project = Factory(:project)
+    post :preview_permissions, :sharing_scope => Policy::ALL_SYSMO_USERS, :access_type => Policy::VISIBLE, :resource_name => 'data_file',
+                               :project_ids => project.id, :project_access_type => Policy::ACCESSIBLE
+    assert_select "p.additional_text", :text=>"(with/except additional fine-grained sharing permissions below)", :count=>1
+
+    #with additional text for privileged people
+    asset_manager = Factory(:asset_manager)
+    post :preview_permissions, :sharing_scope => Policy::PRIVATE, :access_type => Policy::NO_ACCESS, :resource_name => 'data_file',
+                               :project_ids => asset_manager.projects.first.id
+    assert_select "p.additional_text", :text=>"(with/except additional privileged people below)", :count=>1
+
+    #with additional text for both permissions and privileged people
+    asset_manager = Factory(:asset_manager)
+    post :preview_permissions, :sharing_scope => Policy::ALL_SYSMO_USERS, :access_type => Policy::VISIBLE, :resource_name => 'data_file',
+                               :project_ids => asset_manager.projects.first.id, :project_access_type => Policy::ACCESSIBLE
+    assert_select "p.additional_text", :text=>"(with/except additional fine-grained sharing permissions and privileged people below)", :count=>1
   end
 end

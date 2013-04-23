@@ -1539,6 +1539,49 @@ class DataFilesControllerTest < ActionController::TestCase
     assert_select "span#treatments",:text=>/you do not have permission to view the treatments/i
   end
 
+  test "should display find matching model button for spreadsheet" do
+    with_config_value :solr_enabled,true do
+      d = Factory(:xlsx_spreadsheet_datafile)
+      login_as(d.contributor.user)
+      get :show,:id=>d
+      assert_response :success
+      assert_select "ul.sectionIcons span.icon > a[href=?]",matching_models_data_file_path(d),:text=>/Find related models/
+    end
+  end
+
+  test "should not display find matching model button for non spreadsheet" do
+    with_config_value :solr_enabled,true do
+      d = Factory(:non_spreadsheet_datafile)
+      login_as(d.contributor.user)
+      get :show,:id=>d
+      assert_response :success
+      assert_select "ul.sectionIcons span.icon > a[href=?]",matching_models_data_file_path(d),:count=>0
+      assert_select "ul.sectionIcons span.icon > a",:text=>/Find related models/,:count=>0
+    end
+  end
+
+  test "only show the matching model button for the latest version" do
+    d = Factory(:xlsx_spreadsheet_datafile, :policy => Factory(:public_policy))
+
+    d.save_as_new_version
+    Factory(:xlsx_content_blob, :asset => d, :asset_version => d.version)
+    d.reload
+    login_as(d.contributor.user)
+    assert_equal 2,d.version
+    with_config_value :solr_enabled,true do
+      get :show,:id=>d,:version=>2
+      assert_response :success
+      assert_select "ul.sectionIcons span.icon > a",:text=>/Find related models/,:count=>1
+      assert_select "ul.sectionIcons span.icon > a[href=?]",matching_models_data_file_path(d),:text=>/Find related models/
+
+      get :show,:id=>d,:version=>1
+      assert_response :success
+      assert_select "ul.sectionIcons span.icon > a[href=?]",matching_models_data_file_path(d),:count=>0
+      assert_select "ul.sectionIcons span.icon > a",:text=>/Find related models/,:count=>0
+    end
+  end
+
+
 
 
   private
