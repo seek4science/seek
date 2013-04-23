@@ -54,6 +54,10 @@ module Jits
             def versions
               parent.versions
             end
+
+            def latest_version?
+              parent.latest_version == self
+            end
           end
 
           versioned_class.set_table_name versioned_table_name

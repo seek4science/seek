@@ -1112,7 +1112,7 @@ class ModelsControllerTest < ActionController::TestCase
       login_as(m.contributor.user)
       get :show,:id=>m
       assert_response :success
-      assert_select "ul.sectionIcons span.icon > a[href=?]",matching_data_model_path(m,:version=>m.version),:text=>/Find related data/
+      assert_select "ul.sectionIcons span.icon > a[href=?]",matching_data_model_path(m),:text=>/Find related data/
     end
   end
 
@@ -1122,7 +1122,7 @@ class ModelsControllerTest < ActionController::TestCase
       login_as(m.contributor.user)
       get :show,:id=>m
       assert_response :success
-      assert_select "ul.sectionIcons span.icon > a[href=?]",matching_data_model_path(m,:version=>m.version),:text=>/Find related data/
+      assert_select "ul.sectionIcons span.icon > a[href=?]",matching_data_model_path(m),:text=>/Find related data/
     end
   end
 
@@ -1132,7 +1132,28 @@ class ModelsControllerTest < ActionController::TestCase
       login_as(m.contributor.user)
       get :show,:id=>m
       assert_response :success
-      assert_select "ul.sectionIcons span.icon > a[href=?]",matching_data_model_path(m,:version=>m.version),:count=>0
+      assert_select "ul.sectionIcons span.icon > a[href=?]",matching_data_model_path(m),:count=>0
+      assert_select "ul.sectionIcons span.icon > a",:text=>/Find related data/,:count=>0
+    end
+  end
+
+  test "only show the matching data button for the latest version" do
+    m = Factory(:teusink_jws_model, :policy => Factory(:public_policy))
+
+    m.save_as_new_version
+    Factory(:teusink_jws_model_content_blob, :asset => m, :asset_version => m.version)
+    m.reload
+    login_as(m.contributor.user)
+    assert_equal 2,m.version
+    with_config_value :solr_enabled,true do
+      get :show,:id=>m,:version=>2
+      assert_response :success
+      assert_select "ul.sectionIcons span.icon > a",:text=>/Find related data/
+      assert_select "ul.sectionIcons span.icon > a[href=?]",matching_data_model_path(m),:text=>/Find related data/
+
+      get :show,:id=>m,:version=>1
+      assert_response :success
+      assert_select "ul.sectionIcons span.icon > a[href=?]",matching_data_model_path(m),:count=>0
       assert_select "ul.sectionIcons span.icon > a",:text=>/Find related data/,:count=>0
     end
   end
