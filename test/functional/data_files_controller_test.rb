@@ -1538,6 +1538,27 @@ class DataFilesControllerTest < ActionController::TestCase
     assert_select "span#treatments",:text=>/you do not have permission to view the treatments/i
   end
 
+  test "should display find matching model button for spreadsheet" do
+    with_config_value :solr_enabled,true do
+      d = Factory(:xlsx_spreadsheet_datafile)
+      login_as(d.contributor.user)
+      get :show,:id=>d
+      assert_response :success
+      assert_select "ul.sectionIcons span.icon > a[href=?]",matching_models_data_file_path(d,:version=>d.version),:text=>/Find related models/
+    end
+  end
+
+  test "should not display find matching model button for non spreadsheet" do
+    with_config_value :solr_enabled,true do
+      d = Factory(:non_spreadsheet_datafile)
+      login_as(d.contributor.user)
+      get :show,:id=>d
+      assert_response :success
+      assert_select "ul.sectionIcons span.icon > a[href=?]",matching_models_data_file_path(d,:version=>d.version),:count=>0
+      assert_select "ul.sectionIcons span.icon > a",:text=>/Find related models/,:count=>0
+    end
+  end
+
 
 
   private

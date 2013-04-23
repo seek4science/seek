@@ -1106,6 +1106,37 @@ class ModelsControllerTest < ActionController::TestCase
     assert content_blobs.collect(&:original_filename).include?(retained_content_blob.original_filename)
   end
 
+  test "should display find matching data button for sbml model" do
+    with_config_value :solr_enabled,true do
+      m = Factory(:teusink_model)
+      login_as(m.contributor.user)
+      get :show,:id=>m
+      assert_response :success
+      assert_select "ul.sectionIcons span.icon > a[href=?]",matching_data_model_path(m,:version=>m.version),:text=>/Find related data/
+    end
+  end
+
+  test "should display find matching data button for jws dat model" do
+    with_config_value :solr_enabled,true do
+      m = Factory(:teusink_jws_model)
+      login_as(m.contributor.user)
+      get :show,:id=>m
+      assert_response :success
+      assert_select "ul.sectionIcons span.icon > a[href=?]",matching_data_model_path(m,:version=>m.version),:text=>/Find related data/
+    end
+  end
+
+  test "should not display find matching data button for non smbml or dat model" do
+    with_config_value :solr_enabled,true do
+      m = Factory(:non_sbml_xml_model)
+      login_as(m.contributor.user)
+      get :show,:id=>m
+      assert_response :success
+      assert_select "ul.sectionIcons span.icon > a[href=?]",matching_data_model_path(m,:version=>m.version),:count=>0
+      assert_select "ul.sectionIcons span.icon > a",:text=>/Find related data/,:count=>0
+    end
+  end
+
   def valid_model
     { :title=>"Test",:projects=>[projects(:sysmo_project)]}
   end
