@@ -24,9 +24,9 @@
   <% end -%>
 
 
-  <% if Seek::Config.solr_enabled && @display_model.contains_sbml? -%>
+  <% if Seek::Config.solr_enabled && @display_model.latest_version? && (@model.contains_sbml? || @model.contains_jws_dat?) -%>
       <li>
-        <%= image_tag_for_key("search",matching_data_model_path(@model,:version=>@display_model.version),nil,nil,"Find related data") -%>
+        <%= image_tag_for_key("search",matching_data_model_path(@model),nil,nil,"Find related data") -%>
       </li>
   <% end -%>
 
