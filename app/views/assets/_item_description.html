@@ -1,12 +1,10 @@
+<%
+label ||= "description"
+-%>
+
 <p>
-    <b>Description:</b>
-    <% unless item_description.blank? -%>
-<div class="box_standout" id="description">
-    <%= simple_format(auto_link(white_list(item_description),:all,:rel=>'nofollow')) -%>
-</div>
-<% else -%>
-<p class="none_text">
-    No description.
-</p>
-<% end -%>
+    <b><%= label -%></b>
+    <div id="description" class="box_standout">
+        <%= text_or_not_specified(item_description, :description=>true,:auto_link=>true) %>
+    </div>
 </p>
