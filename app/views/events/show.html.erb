@@ -58,12 +58,7 @@
 
   <div style="clear:both;">
     <%= render :partial => "assets/special_auth_code_display", :locals => {:resource => @event}%>
-    <p>
-      <b>Description:</b>
-    <div class="box_standout" id="description">
-      <%= text_or_not_specified(@event.description, :description=>true, :auto_link=>true) %>
-    </div>
-    </p>
+    <%= item_description @event.description -%>
 
     <%= render :partial=>"layouts/items_related_to",:object => @event %>
 
