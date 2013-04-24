@@ -1,10 +1,12 @@
 <%
-label ||= "description"
+label ||= "Description"
+none_text||=nil
+
 -%>
 
 <p>
-    <b><%= label -%></b>
+    <b><%= label -%>:</b>
     <div id="description" class="box_standout">
-        <%= text_or_not_specified(item_description, :description=>true,:auto_link=>true) %>
+        <%= text_or_not_specified(item_description, :description=>true,:auto_link=>true, :none_text=>none_text) %>
     </div>
 </p>
