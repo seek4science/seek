@@ -1,4 +1,4 @@
-require_dependency File.join(Rails.root, 'vendor', 'plugins', 'acts_as_activity_logged', 'lib', 'activity_log')
+require_dependency File.join(Gem.loaded_specs['acts_as_activity_logged'].full_gem_path, 'lib', 'activity_log')
 
 class ActivityLog  < ActiveRecord::Base
 

@@ -1,4 +1,10 @@
 GIT
+  remote: git://github.com/SysMO-DB/acts_as_activity_logged.git
+  revision: 2ece6fa449c80c2f8cb9ed601c0643461338c99d
+  specs:
+    acts_as_activity_logged (0.3.3)
+
+GIT
   remote: git://github.com/SysMO-DB/convert_office.git
   revision: 753f2567dbd625bc89071e1150404efbb562e130
   ref: 753f2567dbd625bc89071e1150404efbb562e130
@@ -169,6 +175,7 @@ PLATFORMS
 DEPENDENCIES
   RedCloth (= 4.2.9)
   acts-as-taggable-on
+  acts_as_activity_logged!
   annotations!
   bio
   breadcrumbs_on_rails (= 1.0.1)
