@@ -1,5 +1,0 @@
-= Authors
-
-== Original Author
-
-Jiten Bhagat (mailto:mail@jits.co.uk), as part of the BioCatalogue project.
