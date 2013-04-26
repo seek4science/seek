@@ -42,6 +42,7 @@ gem 'docsplit'
 
 gem "fssm"
 gem 'annotations', :git => "git://github.com/quyen/annotations.git"
+gem 'acts-as-taggable-on'
 
 group :development do
   gem "sqlite3-ruby","1.2.5",:require=>"sqlite3"

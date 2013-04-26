@@ -32,6 +32,8 @@ GEM
     activeresource (2.3.18)
       activesupport (= 2.3.18)
     activesupport (2.3.18)
+    acts-as-taggable-on (2.1.1)
+      rails
     addressable (2.3.2)
     akami (1.2.0)
       gyoku (>= 0.4.0)
@@ -166,6 +168,7 @@ PLATFORMS
 
 DEPENDENCIES
   RedCloth (= 4.2.9)
+  acts-as-taggable-on
   annotations!
   bio
   breadcrumbs_on_rails (= 1.0.1)
