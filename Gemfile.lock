@@ -11,6 +11,12 @@ GIT
   specs:
     search_biomodel (2.2.1)
 
+GIT
+  remote: git://github.com/quyen/annotations.git
+  revision: 9b698c50a9f61e0c1a06b40d1414e49a3dea858f
+  specs:
+    annotations (0.4.1)
+
 GEM
   remote: https://rubygems.org/
   remote: http://gems.github.com/
@@ -160,6 +166,7 @@ PLATFORMS
 
 DEPENDENCIES
   RedCloth (= 4.2.9)
+  annotations!
   bio
   breadcrumbs_on_rails (= 1.0.1)
   calendar_date_select

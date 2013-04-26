@@ -41,6 +41,7 @@ gem "breadcrumbs_on_rails","1.0.1"
 gem 'docsplit'
 
 gem "fssm"
+gem 'annotations', :git => "git://github.com/quyen/annotations.git"
 
 group :development do
   gem "sqlite3-ruby","1.2.5",:require=>"sqlite3"

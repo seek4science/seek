@@ -1,8 +1,8 @@
 # app/controllers/annotations_controller.rb
 #
-# This extends the AnnotationsController controller defined in the Annotations plugin.
+# This extends the AnnotationsController controller defined in the Annotations gem.
 
-require_dependency File.join(Rails.root, 'vendor', 'plugins', 'annotations', 'lib', 'app', 'controllers', 'annotations_controller')
+require_dependency File.join(Gem.loaded_specs['annotations'].full_gem_path,'lib','app','controllers','annotations_controller')
 
 class AnnotationsController < ApplicationController
   include Annotations

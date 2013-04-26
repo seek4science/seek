@@ -1,5 +1,6 @@
 # Methods added to this helper will be available to all templates in the application.
-require_dependency File.join(Rails.root, 'vendor', 'plugins', 'annotations', 'lib', 'app', 'helpers', 'application_helper')
+require_dependency File.join(Gem.loaded_specs['annotations'].full_gem_path,'lib','app','helpers','application_helper')
+
 module ApplicationHelper  
   include SavageBeast::ApplicationHelper
   include FancyMultiselectHelper
