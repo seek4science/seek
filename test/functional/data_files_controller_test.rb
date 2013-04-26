@@ -28,6 +28,32 @@ class DataFilesControllerTest < ActionController::TestCase
     assert_select "title",:text=>/The Sysmo SEEK Data.*/, :count=>1
   end
 
+  #because the activity logging is currently an after_filter, the AuthorizationEnforcement can silently prevent
+  #the log being saved, unless it is public, since it has passed out of the around filter and User.current_user is nil
+  test "download and view activity logging for private items" do
+    df = Factory :data_file,:policy=>Factory(:private_policy)
+    @request.session[:user_id] = df.contributor.user.id
+    assert_difference("ActivityLog.count") do
+      get :show,:id=>df
+    end
+    assert_response :success
+
+    al = ActivityLog.last(:order=>:id)
+    assert_equal "show",al.action
+    assert_equal df,al.activity_loggable
+
+    assert_difference("ActivityLog.count") do
+      get :download,:id=>df
+    end
+    assert_response :success
+
+    al = ActivityLog.last(:order=>:id)
+    assert_equal "download",al.action
+    assert_equal df,al.activity_loggable
+
+  end
+
+
   test "correct title and text for associating an assay for new" do
     login_as(Factory(:user))
     get :new
@@ -1283,6 +1309,17 @@ class DataFilesControllerTest < ActionController::TestCase
     assert flash[:error]
   end
 
+  test "correctly displays links in spreadsheet explorer" do
+    df = Factory(:data_file,
+                 :policy=>Factory(:public_policy),
+                 :content_blob=>Factory(:small_test_spreadsheet_content_blob,:data=>File.new("#{Rails.root}/test/fixtures/files/spreadsheet_with_a_link.xls","rb").read))
+    assert df.can_download?
+    get :explore, :id=>df
+    assert_response :success
+    assert_select "td",:text=>"A link to BBC",:count=>1
+    assert_select "td a[href=?][target=_blank]","http://bbc.co.uk/news",:count=>1
+  end
+
   test "uploader can publish the item when projects associated with the item have no gatekeeper" do
     uploader = Factory(:user)
     data_file = Factory(:data_file, :contributor => uploader)
@@ -1501,6 +1538,49 @@ class DataFilesControllerTest < ActionController::TestCase
     assert_select "table#treatments", :count=>0
     assert_select "span#treatments",:text=>/you do not have permission to view the treatments/i
   end
+
+  test "should display find matching model button for spreadsheet" do
+    with_config_value :solr_enabled,true do
+      d = Factory(:xlsx_spreadsheet_datafile)
+      login_as(d.contributor.user)
+      get :show,:id=>d
+      assert_response :success
+      assert_select "ul.sectionIcons span.icon > a[href=?]",matching_models_data_file_path(d),:text=>/Find related models/
+    end
+  end
+
+  test "should not display find matching model button for non spreadsheet" do
+    with_config_value :solr_enabled,true do
+      d = Factory(:non_spreadsheet_datafile)
+      login_as(d.contributor.user)
+      get :show,:id=>d
+      assert_response :success
+      assert_select "ul.sectionIcons span.icon > a[href=?]",matching_models_data_file_path(d),:count=>0
+      assert_select "ul.sectionIcons span.icon > a",:text=>/Find related models/,:count=>0
+    end
+  end
+
+  test "only show the matching model button for the latest version" do
+    d = Factory(:xlsx_spreadsheet_datafile, :policy => Factory(:public_policy))
+
+    d.save_as_new_version
+    Factory(:xlsx_content_blob, :asset => d, :asset_version => d.version)
+    d.reload
+    login_as(d.contributor.user)
+    assert_equal 2,d.version
+    with_config_value :solr_enabled,true do
+      get :show,:id=>d,:version=>2
+      assert_response :success
+      assert_select "ul.sectionIcons span.icon > a",:text=>/Find related models/,:count=>1
+      assert_select "ul.sectionIcons span.icon > a[href=?]",matching_models_data_file_path(d),:text=>/Find related models/
+
+      get :show,:id=>d,:version=>1
+      assert_response :success
+      assert_select "ul.sectionIcons span.icon > a[href=?]",matching_models_data_file_path(d),:count=>0
+      assert_select "ul.sectionIcons span.icon > a",:text=>/Find related models/,:count=>0
+    end
+  end
+
 
 
 

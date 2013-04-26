@@ -24,9 +24,9 @@
   <% end -%>
 
 
-  <% if Seek::Config.experimental_features_enabled && Seek::Config.solr_enabled && @display_model.contains_sbml? -%>
+  <% if Seek::Config.solr_enabled && @display_model.latest_version? && (@model.contains_sbml? || @model.contains_jws_dat?) -%>
       <li>
-        <%= image_tag_for_key("search",matching_data_model_path(@model,:version=>@display_model.version),nil,nil,"Find related data") -%>
+        <%= image_tag_for_key("search",matching_data_model_path(@model),nil,nil,"Find related data") -%>
       </li>
   <% end -%>
 
@@ -94,18 +94,8 @@
 
             <%= render :partial => "assets/special_auth_code_display", :locals => {:resource => @model} %>
 
-            <p>
-                <b>Description:</b>
-                <% unless @display_model.description.blank? -%>
-                <div class="box_standout" id="description">
-                    <%= simple_format(auto_link(white_list(@display_model.description),:all,:rel=>'nofollow')) -%>
-                </div>
-                <% else -%>
-                <p class="none_text">
-                    No description.
-                </p>
-                <% end -%>
-            </p>
+            <%= item_description @display_model.description -%>
+
             <%= render :partial=>"import_details", :object=>@display_model %>
             <p>
                 <%= embedded_isa_svg(@model, true, @model) -%>

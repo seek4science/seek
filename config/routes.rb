@@ -37,7 +37,7 @@ ActionController::Routing::Routes.draw do |map|
 
   map.resources :data_files,
                 :collection=>{:test_asset_url=>:post},
-                :member => {:download=>:get,:plot=>:get, :data => :get,:publish=>:post,:published=>:get,:publish_related_items=>:get,
+                :member => {:download=>:get,:matching_models=>:get,:plot=>:get, :data => :get,:publish=>:post,:published=>:get,:publish_related_items=>:get,
                             :check_related_items=>:get,:check_gatekeeper_required=>:get,
                             :request_resource=>:post, :update_annotations_ajax=>:post, :explore=>:get, :convert_to_presentation => :post,
                             :approve_or_reject_publish=>:get, :gatekeeper_decide=>:post},

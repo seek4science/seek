@@ -12,7 +12,8 @@ namespace :seek do
             :add_term_uris_to_assay_types,
             :add_term_uris_to_technology_types,
             :repopulate_auth_lookup_tables,
-            :correct_content_type_for_jpg
+            :correct_content_type_for_jpg,
+            :update_jws_online_root
   ]
 
   desc("upgrades SEEK from the last released version to the latest released version")
@@ -237,5 +238,10 @@ namespace :seek do
       cb.content_type = 'image/jpeg'
       cb.save
     end
+  end
+
+  desc "update jws online root to point to http://jjj.mib.ac.uk/"
+  task(:update_jws_online_root => :environment) do
+     Seek::Config.jws_online_root = 'http://jjj.mib.ac.uk/'
   end
 end

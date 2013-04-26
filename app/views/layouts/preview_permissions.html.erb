@@ -19,40 +19,65 @@
       font-weight: bold;
   }
   #preview_permissions p.public{
-      color: #0000ff;
+      color: green;
       font-weight: bold;
   }
-</style>
+  #preview_permissions p.additional_text{
+      font-style:italic;
+      color:gray;
+  }
 
-<div class="redbox_contents" id="preview_permissions" style="width:500px;">
+  #preview_permissions p.gatekeeper_notice{
+      color:red;
+  }
+</style>
+<%
+   permissions = policy.permissions
+   privileged_people_array = privileged_people.blank? ? [] : privileged_people.values.flatten.uniq
+   #Dont show the additional fine-grained sharing permissions for a person if this person belongs to privileged people, coz this person will be showed in privileged people part
+   permissions = permissions.select{|p| !privileged_people_array.include?(p.contributor)}
+   additional_permissions_and_privilege_text = ""
+   if !permissions.empty? && !privileged_people_array.empty?
+     additional_permissions_and_privilege_text << '(with/except additional fine-grained sharing permissions and privileged people below)'
+   elsif !permissions.empty?
+     additional_permissions_and_privilege_text << '(with/except additional fine-grained sharing permissions below)'
+   elsif !privileged_people_array.empty?
+     additional_permissions_and_privilege_text << '(with/except additional privileged people below)'
+   end
+%>
+
+<div class="redbox_contents" id="preview_permissions" style="width:600px;">
     <div class="body">
     <h2>You will share this <%= resource_name.humanize %> with:</h2>
 
           <% if policy.sharing_scope == Policy::PRIVATE %>
               <p class="private">You keep this <%= resource_name.humanize %> private (only visible to you)</p>
+              <p class='additional_text'><%= additional_permissions_and_privilege_text %></p>
           <% elsif policy.sharing_scope == Policy::ALL_SYSMO_USERS %>
               <p class="shared">All the project members within the network <%= ((policy.access_type == Policy::NO_ACCESS) ? 'have ' : 'can ') + Policy.get_access_type_wording(policy.access_type, try_block{resource_name.camelize.constantize.new()}).downcase -%></p>
+              <p class='additional_text'><%= additional_permissions_and_privilege_text %></p>
           <% elsif policy.sharing_scope == Policy::EVERYONE  %>
               <p class='public'>All visitors (including anonymous visitors with no login) can <%= Policy.get_access_type_wording(policy.access_type, try_block{resource_name.camelize.constantize.new()}).downcase -%></p>
               <% if !updated_can_publish_immediately %>
                   <% if send_request_publish_approval %>
-                    <span style="color: red;">(An email will be sent to the Gatekeepers of the projects associated with this <%= resource_name.humanize %> to ask for publishing approval. This <%= resource_name.humanize %> will not be published until one of the Gatekeepers has granted approval)</span>
+                    <p class="gatekeeper_notice">(An email will be sent to the Gatekeepers of the projects associated with this <%= resource_name.humanize %> to ask for publishing approval. This <%= resource_name.humanize %> will not be published until one of the Gatekeepers has granted approval)</p>
                   <% else %>
-                    <span style="color: red;">(You requested the publishing approval from the Gatekeepers of the projects associated with this <%= resource_name.humanize %>, and it is waiting for the decision. This <%= resource_name.humanize %> will not be published until one of the Gatekeepers has granted approval)</span>
+                    <p class="gatekeeper_notice">(You requested the publishing approval from the Gatekeepers of the projects associated with this <%= resource_name.humanize %>, and it is waiting for the decision. This <%= resource_name.humanize %> will not be published until one of the Gatekeepers has granted approval)</p>
                   <% end %>
               <% end %>
           <% end %>
 
-      <% permissions = policy.permissions%>
+
       <% if !permissions.empty? %>
           <h2>Additional fine-grained sharing permissions:</h2>
-          <% permissions.each do |p|
-            contributor = p.contributor
-            group_name = (p.contributor_type == 'WorkGroup') ? (h(contributor.project.name) + ' @ ' + h(contributor.institution.name)) : h(contributor.name)
-            prefix_text = (p.contributor_type == 'Person') ? '' : ('Members of ' + p.contributor_type.underscore.humanize + ' ')
-          %>
+          <% permissions.each do |p| %>
+            <%
+                contributor = p.contributor
+                group_name = (p.contributor_type == 'WorkGroup') ? (h(contributor.project.name) + ' @ ' + h(contributor.institution.name)) : h(contributor.name)
+                prefix_text = (p.contributor_type == 'Person') ? '' : ('Members of ' + p.contributor_type.underscore.humanize + ' ')
+            %>
 
-              <p><%=  prefix_text + group_name %> <%=  (((p.access_type == Policy::NO_ACCESS) || (p.access_type == Policy::DETERMINED_BY_GROUP)) ? 'have ' : 'can ') + Policy.get_access_type_wording(p.access_type, try_block{resource_name.camelize.constantize.new()}).downcase -%> </p>
+            <p><%=  prefix_text + group_name %> <%=  (((p.access_type == Policy::NO_ACCESS) || (p.access_type == Policy::DETERMINED_BY_GROUP)) ? 'have ' : 'can ') + Policy.get_access_type_wording(p.access_type, try_block{resource_name.camelize.constantize.new()}).downcase -%> </p>
           <% end %>
       <% end %>
 

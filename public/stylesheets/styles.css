@@ -283,7 +283,7 @@ span.disabled_icon {
 }
 
 .show_basic {
-    padding-left: 2em;
+    padding-left: 1em;
 }
 
 .show_basic #tool_list {
@@ -296,7 +296,7 @@ span.disabled_icon {
 
 .show_basic #edit_person_left {
     width:87%;
-    padding-left: 2em;
+    padding-left: 1em;
     border-right: dotted 1px black;
 }
 

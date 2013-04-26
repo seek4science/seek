@@ -44,12 +44,13 @@ class SiteAnnouncementsController < ApplicationController
   end
   
   def notification_settings
+
     @info=NotifieeInfo.find_by_unique_key(params[:key])
     
     respond_to do |format|
       if @info.nil?
         flash[:error]="Invalid Key"
-        redirect_to root_url
+        format.html{ redirect_to root_url }
       else
         format.html
       end

@@ -15,6 +15,18 @@ class AssetTest < ActiveSupport::TestCase
     assert_equal nil,model.contributor
   end
 
+  test "latest version?" do
+    d = Factory(:xlsx_spreadsheet_datafile, :policy => Factory(:public_policy))
+
+    d.save_as_new_version
+    Factory(:xlsx_content_blob, :asset => d, :asset_version => d.version)
+    d.reload
+    assert_equal 2,d.version
+    assert_equal 2,d.versions.size
+    assert !d.versions[0].latest_version?
+    assert d.versions[1].latest_version?
+  end
+
   test "assay type titles" do
     df = Factory :data_file
     assay = Factory :experimental_assay,:assay_type=>Factory(:assay_type,:title=>"aaa")

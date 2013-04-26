@@ -16,6 +16,10 @@ module AssetsHelper
     end
   end
 
+  def item_description item_description,options={}
+    render :partial=>"assets/item_description",:object=>item_description,:locals=>options
+  end
+
   #returns all the classes for models that return true for is_asset?
   def asset_model_classes
     @@asset_model_classes ||= Seek::Util.persistent_classes.select do |c|

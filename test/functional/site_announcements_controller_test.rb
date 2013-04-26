@@ -2,7 +2,7 @@ require 'test_helper'
 
 class SiteAnnouncementsControllerTest < ActionController::TestCase
   
-  fixtures :users,:people,:site_announcements
+  fixtures :users,:people,:site_announcements,:notifiee_infos
 
   include AuthenticatedTestHelper
 
@@ -134,5 +134,20 @@ class SiteAnnouncementsControllerTest < ActionController::TestCase
     get :index
     assert_response :success
     assert_select "ul.announcement_list li.announcement span.announcement_title", :text => /a headline announcement/, :count => 0
+  end
+
+  test 'handle notification_settings' do
+    #valid key
+    key = notifiee_infos(:fred_info).unique_key
+    get :notification_settings, :key => key
+    assert_response :success
+    assert_nil flash[:error]
+    assert_select "input[checked=checked][id=receive_notifications]"
+
+    #invalid key
+    key = 'random'
+    get :notification_settings, :key => key
+    assert_redirected_to :root
+    assert_not_nil flash[:error]
   end
 end
