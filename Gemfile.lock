@@ -5,6 +5,12 @@ GIT
     acts_as_activity_logged (0.3.3)
 
 GIT
+  remote: git://github.com/SysMO-DB/app_version.git
+  revision: ac7586ae577cd9c0ee97cfe3ac78eea6fdeb18e6
+  specs:
+    app_version (1.0.0)
+
+GIT
   remote: git://github.com/SysMO-DB/convert_office.git
   revision: 753f2567dbd625bc89071e1150404efbb562e130
   ref: 753f2567dbd625bc89071e1150404efbb562e130
@@ -184,6 +190,7 @@ DEPENDENCIES
   acts_as_trashable
   acts_as_tree
   annotations!
+  app_version!
   bio
   breadcrumbs_on_rails (= 1.0.1)
   calendar_date_select

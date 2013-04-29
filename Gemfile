@@ -47,6 +47,7 @@ gem 'acts_as_activity_logged', :git => "git://github.com/SysMO-DB/acts_as_activi
 gem 'acts_as_list'
 gem 'acts_as_trashable'
 gem 'acts_as_tree'
+gem "app_version", :git => "git://github.com/SysMO-DB/app_version.git"
 
 
 group :development do
