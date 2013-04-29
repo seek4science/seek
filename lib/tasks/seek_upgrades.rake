@@ -36,28 +36,30 @@ namespace :seek do
 
   desc "adds the term uri's to assay types"
   task :add_term_uris_to_assay_types=>:environment do
+    #fix spelling error in earlier seed data
+    type = AssayType.find_by_title("flux balanace analysis")
+    unless type.nil?
+      type.title = "flux balance analysis"
+      type.save
+    end
+
     yamlfile=File.join(Rails.root,"config","default_data","assay_types.yml")
     yaml=YAML.load_file(yamlfile)
     yaml.keys.each do |k|
       title = yaml[k]["title"]
       uri = yaml[k]["term_uri"]
       unless uri.nil?
-        assay_type = AssayType.find_by_title(title)
+        assay_type = AssayType.find(:first,:conditions=>["lower(title)=?",title.downcase])
 
         unless assay_type.nil?
               assay_type.term_uri = uri
               assay_type.save
-        else
-          puts "No Assay Type found for #{yaml[k]} defined in defaults"
         end
       else
         puts "No uri defined for assaytype #{title} so skipping adding term"
       end
 
     end
-    missing = AssayType.find(:all, :conditions=>{:term_uri=>nil})
-
-    puts "#{missing.size} assay types found without terms: #{missing.collect{|m| m.title}.join(", ")}"
   end
 
   desc "adds the term uri's to technology types"
@@ -68,21 +70,16 @@ namespace :seek do
       title = yaml[k]["title"]
       uri = yaml[k]["term_uri"]
       unless uri.nil?
-        tech_type = TechnologyType.find_by_title(title)
+        tech_type = TechnologyType.find(:first,:conditions=>["lower(title)=?",title.downcase])
         unless tech_type.nil?
               tech_type.term_uri = uri
               tech_type.save
-        else
-          puts "No Technology Type found for #{yaml[k]} defined in defaults"
         end
       else
         puts "No uri defined for Technology Type #{title} so skipping adding term"
       end
 
     end
-    missing = TechnologyType.find(:all, :conditions=>{:term_uri=>nil})
-
-    puts "#{missing.size} technology types found without terms: #{missing.collect{|m| m.title}.join(", ")}"
   end
 
   task(:detect_web_page_content_blobs=>:environment) do

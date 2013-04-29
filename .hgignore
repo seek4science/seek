@@ -2,6 +2,8 @@ syntax: glob
 .redcar/
 .idea/
 
+data.sql
+
 db/*.sqlite3
 config/database.yml
 config/initializers/seek_local.rb
