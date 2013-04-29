@@ -2,6 +2,7 @@ class HomeController < ApplicationController
   
 
   before_filter :redirect_to_sign_up_when_no_user
+  before_filter :login_required, :only=>[:feedback,:send_feedback]
 
 
   def index

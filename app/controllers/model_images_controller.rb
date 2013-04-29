@@ -96,7 +96,6 @@ class ModelImagesController < ApplicationController
       else
         return "900"
       end
-
     end
 
   end
