@@ -1,7 +1,29 @@
 technology:
   title: technology
-  children: binding,chromatography, culture_growth,electrophoresis,imaging,Mass_Spectrometry,microarray,PCR,structural_methods
+  children: binding,chemostat_measurements,chromatography, culture_growth,electrophoresis,enzymatic_activity_measurements,flow_cytometry,imaging,mathematical_model_type,Mass_Spectrometry,microarray,molecule_labelling,PCR,sequencing,structural_methods
   term_uri: http://www.mygrid.org.uk/ontology/JERMOntology#TechnologyType
+
+enzymatic_activity_measurements:
+  title: enzymatic activity measurements
+  children: initial_rate_experiment, progressive_curve_experiment
+  term_uri: http://www.mygrid.org.uk/ontology/JERMOntology#Enzymatic_activity_measurements
+
+flow_cytometry:
+  title: flow cytometry
+  children: FACS
+  term_uri: http://www.mygrid.org.uk/ontology/JERMOntology#Flow_cytometry
+
+FACS:
+  title: FACS
+  term_uri: http://www.mygrid.org.uk/ontology/JERMOntology#FACS
+
+intial_rate_experiment:
+  title: initial rate experiment
+  term_uri: http://www.mygrid.org.uk/ontology/JERMOntology#Initial_rate_experiment
+
+progressive_curve_experiment:
+  title: progressive curve experiment
+  term_uri: http://www.mygrid.org.uk/ontology/JERMOntology#Progressive_curve_experiment
 
 binding:
   title: binding
@@ -16,14 +38,27 @@ surface_plasmon_resonance:
   title: surface plasmon resonance
   term_uri: http://www.mygrid.org.uk/ontology/JERMOntology#surface_plasmon_resonance
 
+chemostat_measurements:
+  title: chemostat measurements
+  term_uri: http://www.mygrid.org.uk/ontology/JERMOntology#Chemostat_measurements
+
 chromatography:
   title: chromatography
-  children: gas_chromatography,HPLC,UPLC
+  children: gas_chromatography,gel_filtration, affinity_chromatography, HPLC,UPLC
   term_uri: http://www.mygrid.org.uk/ontology/JERMOntology#chromatography
 
 gas_chromatography:
   title: gas chromatography
   term_uri: http://www.mygrid.org.uk/ontology/JERMOntology#gas_chromatography
+
+affinity_chromatography:
+  title: affinity chromatography
+  term_uri: http://www.mygrid.org.uk/ontology/JERMOntology#Affinity_chromatography
+
+gel_filtration:
+  title: gel filtration
+  term_uri: http://www.mygrid.org.uk/ontology/JERMOntology#Gel_filtration
+
 
 HPLC:
   title: HPLC
@@ -63,6 +98,27 @@ imaging:
 FRAP:
   title: FRAP
   term_uri: http://www.mygrid.org.uk/ontology/JERMOntology#FRAP
+
+mathematical_model_type:
+  title: mathematical model type
+  children: algebraic_equation, linear_equation, ordinary_differential_equation, partial_differential_equation
+  term_uri: http://www.mygrid.org.uk/ontology/JERMOntology#Mathematical_model_type
+
+algebraic_equation:
+  title: algebraic equation
+  term_uri: http://www.mygrid.org.uk/ontology/JERMOntology#Algebraic_equation
+
+linear_equation:
+  title: Linear equation
+  term_uri: http://www.mygrid.org.uk/ontology/JERMOntology#Linear equation
+
+ordinary_differential_equation:
+  title: ordinary differential equation
+  term_uri: http://www.mygrid.org.uk/ontology/JERMOntology#Ordinary_differential_equation
+
+partial_differential_equation:
+  title: partial differential equation
+  term_uri: http://www.mygrid.org.uk/ontology/JERMOntology#Partial_differential_equation
 
 Mass_Spectrometry:
   title: mass spectrometry
@@ -112,8 +168,12 @@ Tandem_Mass_Spectrometry:
 
 microarray:
   title: microarray
-  children: ChIP-on-chip,custom_Array,DNA_Methylation,miRNA_microarray
+  children: ChIP-on-chip,custom_Array,DNA_Methylation,exon_array,snp_array,tiling_array,miRNA_microarray,small_molecule_microarray
   term_uri: http://www.mygrid.org.uk/ontology/JERMOntology#microarray
+
+small_molecule_microarray:
+  title: small molecule microarray
+  term_uri: http://www.mygrid.org.uk/ontology/JERMOntology#Small_molecule_microarray
 
 #cDNA_microarray:
 #  title: cDNA microarray
@@ -131,9 +191,39 @@ DNA_Methylation:
   title: DNA methylation
   term_uri: http://www.mygrid.org.uk/ontology/JERMOntology#DNA_Methylation
 
+exon_array:
+  title: Exon array
+  term_uri: http://www.mygrid.org.uk/ontology/JERMOntology#Exon_array
+
+snp_array:
+  title: SNP array
+  term_uri: http://www.mygrid.org.uk/ontology/JERMOntology#SNP_array
+
+tiling_array:
+  title: tiling array
+  term_uri: http://www.mygrid.org.uk/ontology/JERMOntology#Tiling_array
+
 miRNA_microarray:
   title: miRNA microarray
   term_uri: http://www.mygrid.org.uk/ontology/JERMOntology#miRNA_microarray
+
+molecule_labelling:
+  title: molecule labelling
+  children: bait_protein_tagging,radioactive_labelling
+  term_uri: http://www.mygrid.org.uk/ontology/JERMOntology#Molecule_labelling
+
+bait_protein_tagging:
+  title: bait protein tagging
+  term_uri: http://www.mygrid.org.uk/ontology/JERMOntology#Bait_protein_tagging
+
+radioactive_labelling:
+  title: radioactive labelling
+  children: 13c_radiolabelling
+  term_uri: http://www.mygrid.org.uk/ontology/JERMOntology#Radioactive_labelling
+
+13c_radiolabelling:
+  title: 13c radiolabelling
+  term_uri: http://www.mygrid.org.uk/ontology/JERMOntology#13c_radiolabelling
 
 PCR:
   title: PCR
@@ -148,6 +238,22 @@ qRT-PCR:
   title: qRT-PCR
   term_uri: http://www.mygrid.org.uk/ontology/JERMOntology#qRT-PCR
 
+sequencing:
+  title: sequencing
+  children: chip_seq, next_generation_sequencing,rna_seq
+  term_uri: http://www.mygrid.org.uk/ontology/JERMOntology#Sequencing
+
+chip_seq:
+  title: chip-seq
+  term_uri: http://www.mygrid.org.uk/ontology/JERMOntology#Chip-Seq
+
+rna_seq:
+  title: RNA-seq
+  term_uri: http://www.mygrid.org.uk/ontology/JERMOntology#RNA-Seq
+
+next_generation_sequencing:
+  title: next generation sequencing
+  term_uri: http://www.mygrid.org.uk/ontology/JERMOntology#Next_generation_sequencing
 
 structural_methods:
   title: structural methods
