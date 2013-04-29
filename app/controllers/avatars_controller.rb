@@ -76,18 +76,15 @@ class AvatarsController < ApplicationController
       size = params[:size]
     end
     size = size[0..-($1.length.to_i + 2)] if size =~ /[0-9]+x[0-9]+\.([a-z0-9]+)/ # trim file extension
-    
+
+    size = filter_size size
+
     id = params[:id].to_i
     
     if !cache_exists?(id, size) # look in file system cache before attempting db access      
-      # resize (keeping image side ratio), encode and cache the picture
-      #begin
+
       resize_image size
-      #rescue Fleximage::Model::MasterImageNotFound
-        #required after switching from jpg to png, for existing images that have yet to be converted
-      #  convert_jpg_to_png
-      #  resize_image size
-      #end
+
     end
     
     respond_to do |format|
@@ -100,6 +97,21 @@ class AvatarsController < ApplicationController
       end
     end
     
+  end
+
+  def filter_size size
+    max_size=500
+    matches = size.match /([0-9]+)x([0-9]+).*/
+    if matches
+      width = matches[1].to_i
+      height = matches[2].to_i
+      width = max_size if width>max_size
+      height = max_size if height>max_size
+      return "#{width}x#{height}"
+    else
+      return "100x100"
+    end
+
   end
 
   #required when first running after switching avatars from .jpg format rather than .png (for lower bandwidth and page load time)
