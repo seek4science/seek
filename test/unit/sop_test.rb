@@ -198,12 +198,12 @@ class SopTest < ActiveSupport::TestCase
     assert_not_nil Sop.find_by_title 'is it restorable?'
   end
 
-  test 'failing to delete due to can_delete does not create trash' do
+  test 'failing to delete due to can_delete still creates trash' do
     sop = Factory :sop, :policy => Factory(:private_policy)
     assert_no_difference("Sop.count") do
       sop.destroy
     end
-    assert_nil Sop.restore_trash(sop.id)
+    assert_not_nil Sop.restore_trash(sop.id)
   end
 
   test "test uuid generated" do

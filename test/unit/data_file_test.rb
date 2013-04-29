@@ -178,13 +178,13 @@ class DataFileTest < ActiveSupport::TestCase
     assert_not_nil DataFile.find_by_title 'is it restorable?'
   end
 
-  test 'failing to delete due to can_delete does not create trash' do
+  test 'failing to delete (due to can_not_delete) still creates trash' do
     df = Factory :data_file, :policy => Factory(:private_policy), :contributor => Factory(:user)
     User.with_current_user Factory(:user) do
       assert_no_difference("DataFile.count") do
         df.destroy
       end
-      assert_nil DataFile.restore_trash(df.id)
+      assert_not_nil DataFile.restore_trash(df.id)
     end
   end
 

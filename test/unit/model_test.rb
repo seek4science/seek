@@ -228,12 +228,12 @@ class ModelTest < ActiveSupport::TestCase
   end
 
 
-  test 'failing to delete due to can_delete does not create trash' do
+  test 'failing to delete due to can_delete still creates trash' do
     model = Factory :model, :policy => Factory(:private_policy)
     assert_no_difference("Model.count") do
       model.destroy
     end
-    assert_nil Model.restore_trash(model.id)
+    assert_not_nil Model.restore_trash(model.id)
   end
   
   test "test uuid generated" do
