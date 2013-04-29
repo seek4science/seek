@@ -42,13 +42,13 @@ namespace :seek do
       title = yaml[k]["title"]
       uri = yaml[k]["term_uri"]
       unless uri.nil?
-        assay_type = AssayType.find_by_title(title)
+        assay_type = AssayType.find(:first,:conditions=>["lower(title)=?",title.downcase])
 
         unless assay_type.nil?
               assay_type.term_uri = uri
               assay_type.save
         else
-          puts "No Assay Type found for #{yaml[k]} defined in defaults"
+          puts "No Assay Type found for #{yaml[k]["title"]} - #{yaml[k]["term_uri"]} defined in defaults"
         end
       else
         puts "No uri defined for assaytype #{title} so skipping adding term"
@@ -57,7 +57,7 @@ namespace :seek do
     end
     missing = AssayType.find(:all, :conditions=>{:term_uri=>nil})
 
-    puts "#{missing.size} assay types found without terms: #{missing.collect{|m| m.title}.join(", ")}"
+    puts "#{missing.size} assay types found without terms:\n#{missing.collect{|m| "\t'"+m.title+"'"}.join(",\n")}"
   end
 
   desc "adds the term uri's to technology types"
@@ -73,7 +73,7 @@ namespace :seek do
               tech_type.term_uri = uri
               tech_type.save
         else
-          puts "No Technology Type found for #{yaml[k]} defined in defaults"
+          puts "No Technology Type found for #{yaml[k]["title"]} - #{yaml[k]["term_uri"]} defined in defaults"
         end
       else
         puts "No uri defined for Technology Type #{title} so skipping adding term"
@@ -82,7 +82,7 @@ namespace :seek do
     end
     missing = TechnologyType.find(:all, :conditions=>{:term_uri=>nil})
 
-    puts "#{missing.size} technology types found without terms: #{missing.collect{|m| m.title}.join(", ")}"
+    puts "#{missing.size} technology types found without terms: #{missing.collect{|m| "\t'"+m.title+"'"}.join(",\n")}"
   end
 
   task(:detect_web_page_content_blobs=>:environment) do

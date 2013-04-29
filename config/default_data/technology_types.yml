@@ -112,8 +112,12 @@ Tandem_Mass_Spectrometry:
 
 microarray:
   title: microarray
-  children: ChIP-on-chip,custom_Array,DNA_Methylation,miRNA_microarray
+  children: ChIP-on-chip,custom_Array,DNA_Methylation,miRNA_microarray,small_molecule_microarray
   term_uri: http://www.mygrid.org.uk/ontology/JERMOntology#microarray
+
+small_molecule_microarray:
+  title: small molecule microarray
+  term_uri: http://www.mygrid.org.uk/ontology/JERMOntology#Small_molecule_microarray
 
 #cDNA_microarray:
 #  title: cDNA microarray
