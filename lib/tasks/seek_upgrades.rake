@@ -68,7 +68,7 @@ namespace :seek do
       title = yaml[k]["title"]
       uri = yaml[k]["term_uri"]
       unless uri.nil?
-        tech_type = TechnologyType.find_by_title(title)
+        tech_type = TechnologyType.find(:first,:conditions=>["lower(title)=?",title.downcase])
         unless tech_type.nil?
               tech_type.term_uri = uri
               tech_type.save
@@ -82,7 +82,7 @@ namespace :seek do
     end
     missing = TechnologyType.find(:all, :conditions=>{:term_uri=>nil})
 
-    puts "#{missing.size} technology types found without terms: #{missing.collect{|m| "\t'"+m.title+"'"}.join(",\n")}"
+    puts "#{missing.size} technology types found without terms:\n#{missing.collect{|m| "\t'"+m.title+"'"}.join(",\n")}"
   end
 
   task(:detect_web_page_content_blobs=>:environment) do
