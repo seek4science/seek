@@ -24,15 +24,33 @@ class HomeControllerTest < ActionController::TestCase
     end
   end
 
+  test "shouldn't display feedback link as non logged in" do
+    get :index
+    assert_response :success
+    assert_select "div#topbar a",:text=>/Provide Feedback/,:count=>0
+  end
+
+  test "should display feedback link as logged in" do
+    login_as(Factory(:user))
+    get :index
+    assert_response :success
+    assert_select "div#topbar a",:text=>/Provide Feedback/
+  end
+
   test "should get feedback form" do
     login_as(:quentin)
     get :feedback
     assert_response :success
   end
 
+  test "should not get feedback form as anonymous user" do
+    get :feedback
+    assert_response :redirect
+  end
+
   test "should send feedback for anonymous user" do
     logout
-    assert_emails(1) do
+    assert_emails(0) do
       post :send_feedback, :anon => false, :details => 'test feedback', :subject => 'test feedback'
     end
   end

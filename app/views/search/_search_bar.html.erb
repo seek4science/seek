@@ -1,7 +1,7 @@
 <% @search_query="" unless @search_query %>
 <% @search_type="All" unless @search_type %>
 
-<% if !Person.admins.empty? -%>
+<% if logged_in? && !Person.admins.empty? -%>
   <% if Seek::Config.email_enabled %>
     <%= image_tag_for_key("feedback",feedback_path,"Feedback",{:id=>"feedback"},"Provide Feedback") %>
   <% else %>
