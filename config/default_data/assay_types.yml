@@ -218,7 +218,7 @@ tiling_path:
 
 modelling_analysis_type:
   title: modelling analysis type
-  children: cell_cycle,enzymology,gene_expression,gene_regulatory_network,metabolic_network,metabolism,signal_transduction,translation, protein_interactions, genome_scale
+  children: cell_cycle,enzymology,gene_expression,gene_regulatory_network,metabolic_network,metabolism,signal_transduction,translation, genome_scale
   term_uri: http://www.mygrid.org.uk/ontology/JERMOntology#ModelAnalysisType
 
 cell_cycle:
@@ -252,10 +252,6 @@ signal_transduction:
 translation:
   title: translation
   term_uri: http://www.mygrid.org.uk/ontology/JERMOntology#translation
-
-protein_interations:
-  title: protein interactions
-  term_uri: http://www.mygrid.org.uk/ontology/JERMOntology#protein_interactions
 
 genome_scale:
   title: genome scale
