@@ -348,7 +348,7 @@
               <% if p.contributor_type == "Person" -%>
                 <%
                 contributor_name = (p.contributor.first_name + " " + p.contributor.last_name)
-                allow_removal = !prevent_manager_removal(@resource,p) if p.access_type==Policy::MANAGING
+                allow_removal = !prevent_manager_removal(@resource,p) if p.access_type==Policy::MANAGING && @resource_type != "Project"
                 -%>
               <% elsif p.contributor_type == "WorkGroup" -%>
                 <% contributor_name = p.contributor.project.name + " @ " + p.contributor.institution.name -%>
