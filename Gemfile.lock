@@ -40,6 +40,7 @@ GEM
     activesupport (2.3.18)
     acts-as-taggable-on (2.1.1)
       rails
+    acts_as_list (0.1.9)
     addressable (2.3.2)
     akami (1.2.0)
       gyoku (>= 0.4.0)
@@ -176,6 +177,7 @@ DEPENDENCIES
   RedCloth (= 4.2.9)
   acts-as-taggable-on
   acts_as_activity_logged!
+  acts_as_list
   annotations!
   bio
   breadcrumbs_on_rails (= 1.0.1)
