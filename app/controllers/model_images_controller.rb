@@ -88,7 +88,15 @@ class ModelImagesController < ApplicationController
       height = max_size if height>max_size
       return "#{width}x#{height}"
     else
-      return "100x100"
+      matches = size.match /([0-9]+)/
+      if matches
+        width=matches[1].to_i
+        width = max_size if width>max_size
+        return "#{width}"
+      else
+        return "900"
+      end
+
     end
 
   end
