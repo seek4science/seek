@@ -27,6 +27,7 @@ require 'strategic_eager_loading'
 require 'seek/breadcrumbs'
 require 'string_extension'
 require 'acts_as_list'
+require 'acts_as_trashable'
 
 GLOBAL_PASSPHRASE="ohx0ipuk2baiXah" unless defined? GLOBAL_PASSPHRASE
 
