@@ -46,6 +46,8 @@ gem 'acts-as-taggable-on'
 gem 'acts_as_activity_logged', :git => "git://github.com/SysMO-DB/acts_as_activity_logged.git"
 gem 'acts_as_list'
 gem 'acts_as_trashable'
+gem 'acts_as_tree'
+
 
 group :development do
   gem "sqlite3-ruby","1.2.5",:require=>"sqlite3"
