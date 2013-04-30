@@ -16,7 +16,6 @@ require 'acts_as_asset'
 require 'send_subscriptions_when_activity_logged'
 require 'send_notification_emails_when_announcement_created'
 require 'modporter_extensions'
-require "pothoven-attachment_fu"
 require "attachment_fu_extension"
 require 'seek/taggable'
 require "bio"

@@ -35,12 +35,6 @@ GIT
   specs:
     annotations (0.4.1)
 
-GIT
-  remote: git://github.com/quyen/pothoven-attachment_fu.git
-  revision: bc06e09c06c39dafc9c1f053902901e6b8ec7011
-  specs:
-    pothoven-attachment_fu (3.2.8)
-
 GEM
   remote: https://rubygems.org/
   remote: http://gems.github.com/
@@ -222,7 +216,6 @@ DEPENDENCIES
   mongrel
   mysql
   parallel_tests
-  pothoven-attachment_fu!
   pry
   pry-doc
   pry-remote
