@@ -60,6 +60,10 @@ GEM
     akami (1.2.0)
       gyoku (>= 0.4.0)
       nokogiri (>= 1.4.0)
+    aws-s3 (0.6.3)
+      builder
+      mime-types
+      xml-simple
     bio (1.4.3)
     breadcrumbs_on_rails (1.0.1)
     builder (3.1.4)
@@ -79,6 +83,9 @@ GEM
       activesupport (>= 2.3.9)
     fastercsv (1.5.1)
     fastthread (1.0.7)
+    fleximage (1.0.4)
+      aws-s3
+      rmagick
     fssm (0.2.10)
     gem_plugin (0.2.3)
     gyoku (0.4.6)
@@ -183,6 +190,7 @@ GEM
     webmock (1.9.0)
       addressable (>= 2.2.7)
       crack (>= 0.1.7)
+    xml-simple (1.1.2)
     yard (0.8.3)
 
 PLATFORMS
@@ -209,6 +217,7 @@ DEPENDENCIES
   equivalent-xml
   factory_girl (= 2.6.4)
   fastercsv (= 1.5.1)
+  fleximage
   fssm
   hpricot (~> 0.8.2)
   in_place_editing
