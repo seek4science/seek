@@ -18,6 +18,12 @@ GIT
     convert_office (0.9.1)
 
 GIT
+  remote: git://github.com/SysMO-DB/doi_query_tool.git
+  revision: 331a629113720d56bee052e954962cc7a06f3e68
+  specs:
+    doi_query_tool (0.0.0)
+
+GIT
   remote: git://github.com/myGrid/search_biomodel.git
   revision: e109ac6d8b102f7ecb65140c17d263b85e066870
   specs:
@@ -205,6 +211,7 @@ DEPENDENCIES
   daemons
   delayed_job (~> 2.0.4)
   docsplit
+  doi_query_tool!
   equivalent-xml
   factory_girl (= 2.6.4)
   fastercsv (= 1.5.1)
