@@ -71,6 +71,7 @@ GEM
     cancan (1.6.8)
     cgi_multipart_eof_fix (2.5.0)
     coderay (1.0.8)
+    country-select (1.1.1)
     crack (0.3.2)
     daemons (1.0.10)
     delayed_job (2.0.7)
@@ -210,6 +211,7 @@ DEPENDENCIES
   calendar_date_select
   cancan
   convert_office!
+  country-select
   daemons
   delayed_job (~> 2.0.4)
   docsplit

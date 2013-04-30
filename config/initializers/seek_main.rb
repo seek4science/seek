@@ -30,6 +30,7 @@ require 'acts_as_list'
 require 'acts_as_trashable'
 require 'acts_as_tree'
 require 'fleximage'
+require 'country-select'
 
 GLOBAL_PASSPHRASE="ohx0ipuk2baiXah" unless defined? GLOBAL_PASSPHRASE
 
