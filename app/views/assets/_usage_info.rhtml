@@ -1,13 +1,5 @@
 <div class="contribution_section_box">
 
-    <% if resource.is_downloadable? && versioned_resource.contains_downloadable_items? && can_download_asset?(resource, params[:code])%>
-      <div class="big_download_button">
-        <% path = polymorphic_path(resource,:version=>versioned_resource.version,:action=>:download,:code=>params[:code]) %>
-        <%= link_to simple_image_tag_for_key("big_download"),path %>
-      </div>
-    <% end -%>
-
-
     <div class="usage_info">
       <div class="usage_count">
         <b>Views:</b> <%= count_actions(resource,"show") -%>
