@@ -10,9 +10,9 @@ div.top_home_panel {
 }
 
 div.home_panel {
-    background-color: #EEE;
     border: 1px solid #d3d3d3;
-    height: 25em;
+    background-color: #EEE;
+    height: 26em;
     float: left;
 }
 
@@ -24,8 +24,8 @@ div.home_panel_pair {
 
 div.home_panel .homepanel_list {
     padding-bottom: 0.5em;
-    height: 25em;
     margin-left: 0.5em;
+    max-height: 23.5em;
     overflow-y: auto;
 }
 
