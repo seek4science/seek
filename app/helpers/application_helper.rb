@@ -177,7 +177,7 @@ module ApplicationHelper
     if text.nil? or text.chomp.empty?
       not_specified_text||=options[:none_text]
       not_specified_text||="No description specified" if options[:description]==true
-      not_specified_text|| "Not specified"
+      not_specified_text||="Not specified"
       res = "<span class='none_text'>#{not_specified_text}</span>"
     else      
       text.capitalize! if options[:capitalize]            
