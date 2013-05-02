@@ -2,7 +2,7 @@
 #
 # This extends the AnnotationsController controller defined in the Annotations gem.
 
-require_dependency File.join(Gem.loaded_specs['annotations'].full_gem_path,'lib','app','controllers','annotations_controller')
+#require_dependency File.join(Gem.loaded_specs['my_annotations'].full_gem_path,'lib','app','controllers','annotations_controller')
 
 class AnnotationsController < ApplicationController
   include Annotations

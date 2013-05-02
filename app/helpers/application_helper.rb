@@ -1,5 +1,5 @@
 # Methods added to this helper will be available to all templates in the application.
-require_dependency File.join(Gem.loaded_specs['annotations'].full_gem_path,'lib','app','helpers','application_helper')
+#require_dependency File.join(Gem.loaded_specs['my_annotations'].full_gem_path,'lib','app','helpers','application_helper')
 
 module ApplicationHelper  
   include SavageBeast::ApplicationHelper
@@ -178,7 +178,7 @@ module ApplicationHelper
     if text.nil? or text.chomp.empty?
       not_specified_text||=options[:none_text]
       not_specified_text||="No description specified" if options[:description]==true
-      not_specified_text|| "Not specified"
+      not_specified_text||="Not specified"
       res = "<span class='none_text'>#{not_specified_text}</span>"
     else      
       text.capitalize! if options[:capitalize]            

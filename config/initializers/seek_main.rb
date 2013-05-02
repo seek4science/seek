@@ -46,6 +46,7 @@ ActiveSupport::Inflector.inflections do |inflect|
   inflect.human 'specimen', Seek::Config.sample_parent_term.capitalize  unless Seek::Config.sample_parent_term.blank?
 end
 
+
 Annotations::Config.attribute_names_to_allow_duplicates.concat(["tag"])
 Annotations::Config.versioning_enabled = false
 
