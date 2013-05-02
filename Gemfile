@@ -41,7 +41,7 @@ gem "breadcrumbs_on_rails","1.0.1"
 gem 'docsplit'
 
 gem "fssm"
-gem 'annotations', :git => "git://github.com/quyen/annotations.git"
+gem 'my_annotations', "0.5.1"
 gem 'acts-as-taggable-on'
 gem 'acts_as_activity_logged', :git => "git://github.com/SysMO-DB/acts_as_activity_logged.git"
 gem 'acts_as_list'

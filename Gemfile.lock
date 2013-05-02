@@ -23,12 +23,6 @@ GIT
   specs:
     search_biomodel (2.2.1)
 
-GIT
-  remote: git://github.com/quyen/annotations.git
-  revision: e6b2595eb5449260c150e8202d94fb47cbe9a58b
-  specs:
-    annotations (0.4.1)
-
 GEM
   remote: https://rubygems.org/
   remote: http://gems.github.com/
@@ -91,6 +85,7 @@ GEM
       daemons (>= 1.0.3)
       fastthread (>= 1.0.1)
       gem_plugin (>= 0.2.3)
+    my_annotations (0.5.1)
     mysql (2.9.0)
     nokogiri (1.5.6)
     nori (1.1.4)
@@ -189,7 +184,6 @@ DEPENDENCIES
   acts_as_list
   acts_as_trashable
   acts_as_tree
-  annotations!
   app_version!
   bio
   breadcrumbs_on_rails (= 1.0.1)
@@ -207,6 +201,7 @@ DEPENDENCIES
   in_place_editing
   libxml-ruby (= 2.2.2)
   mongrel
+  my_annotations (= 0.5.1)
   mysql
   parallel_tests
   pry
