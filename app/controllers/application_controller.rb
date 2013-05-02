@@ -69,13 +69,6 @@ class ApplicationController < ActionController::Base
   end
   helper_method :application_root
   
-
-  def self.fast_auto_complete_for(object, method, options = {})
-    define_method("auto_complete_for_#{object}_#{method}") do
-      render :json => object.to_s.camelize.constantize.find(:all).map(&method).to_json
-    end
-  end
-
   #Overridden from restful_authentication
   #Does a second check that there is a profile assigned to the user, and if not goes to the profile
   #selection page (GET people/select)

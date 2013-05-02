@@ -48,6 +48,9 @@ gem 'acts_as_list'
 gem 'acts_as_trashable'
 gem 'acts_as_tree'
 gem "app_version", :git => "git://github.com/SysMO-DB/app_version.git"
+gem 'doi_query_tool', :git => "git://github.com/SysMO-DB/doi_query_tool.git"
+gem 'fleximage'
+gem 'country-select'
 
 
 group :development do
