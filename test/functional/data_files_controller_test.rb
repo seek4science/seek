@@ -635,8 +635,6 @@ class DataFilesControllerTest < ActionController::TestCase
       assert_select "a",:text=>/Request/,:count=>0
     end
 
-    assert_select "div.contribution_section_box div.big_download_button", :count=>0
-
     assert_select "div.contribution_section_box > div.usage_info" do
       assert_select "b",:text=>/Downloads/,:count=>0
     end
@@ -650,10 +648,6 @@ class DataFilesControllerTest < ActionController::TestCase
     assert_select "ul.sectionIcons > li > span.icon" do
       assert_select "a[href=?]",download_data_file_path(df,:version=>df.version),:count=>1
       assert_select "a",:text=>/Download Data file/,:count=>1
-    end
-
-    assert_select "div.contribution_section_box div.big_download_button" do
-      assert_select "a[href=?]",download_data_file_path(df,:version=>df.version)
     end
 
     assert_select "div.contribution_section_box > div.usage_info" do
