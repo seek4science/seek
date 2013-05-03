@@ -1,10 +1,10 @@
-<div class="matching_data_items">
+<div class="matching_items">
 
   <% matching_model_items.each do |matching_model| %>
       <%
          model = Model.find(matching_model.primary_key)
       %>
-      <div class="list_item_content matching_data_item">
+      <div class="matching_item">
 
         <%= list_item_title model -%>
         <span class="score">
