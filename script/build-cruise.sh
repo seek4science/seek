@@ -15,7 +15,7 @@ rm -rf filestore/
 
 desired_ruby=ruby-1.8.7
 project_name=seek_rails3
-rubygems=2.0.3
+rubygems=1.8.25
 
 # remove annoying "warning: Insecure world writable dir"
 function remove_annoying_warning() {
