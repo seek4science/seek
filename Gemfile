@@ -7,7 +7,7 @@ gem "rdoc"
 gem 'rubaidh-google_analytics', "~>1.1.4",:require => 'rubaidh/google_analytics'
 gem 'hpricot',"~>0.8.2"
 gem 'ruby-openid'
-gem 'rack-openid',"1.1.0"
+gem 'rack-openid'
 gem 'fastercsv', "1.5.1"
 gem 'libxml-ruby',"2.2.2",:require=>"libxml"
 gem 'uuidtools',"2.1.1"
