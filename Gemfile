@@ -54,6 +54,7 @@ gem 'country-select'
 gem 'modporter-plugin'
 gem 'will_paginate',"~> 2.3.16"
 gem 'savage-beast'
+gem 'gibberish', :git => "git://github.com/SysMO-DB/gibberish.git"
 
 
 group :development do
