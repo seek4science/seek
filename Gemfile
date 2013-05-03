@@ -52,6 +52,7 @@ gem 'doi_query_tool', :git => "git://github.com/SysMO-DB/doi_query_tool.git"
 gem 'fleximage'
 gem 'country-select'
 gem 'modporter-plugin'
+gem 'will_paginate',"~> 2.3.16"
 
 
 group :development do
