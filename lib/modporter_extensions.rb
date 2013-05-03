@@ -1,4 +1,8 @@
+require 'mod_porter.rb'
 module ModPorter
+  class ActionController::Base
+    include ModPorter::Filter
+  end
   class UploadedFile
     def method_missing(method_name, *args, &block) #:nodoc:
       @tempfile = to_tempfile unless @tempfile
