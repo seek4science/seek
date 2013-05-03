@@ -51,6 +51,7 @@ gem "app_version", :git => "git://github.com/SysMO-DB/app_version.git"
 gem 'doi_query_tool', :git => "git://github.com/SysMO-DB/doi_query_tool.git"
 gem 'fleximage'
 gem 'country-select'
+gem 'modporter-plugin'
 
 
 group :development do
