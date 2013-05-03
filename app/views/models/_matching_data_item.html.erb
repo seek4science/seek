@@ -1,11 +1,11 @@
-<div class="matching_data_items">
+<div class="matching_items">
 
   <% matching_data_items.each do |matching_data_item| %>
       <%
          data_file = DataFile.find(matching_data_item.primary_key)
          plots = data_file.latest_version.spreadsheet_annotations.select { |a| a.attribute.name=="plot_data" }
       %>
-      <div class="list_item_content matching_data_item">
+      <div class="matching_item">
 
         <%= list_item_title data_file -%>
         <span class="score">
@@ -47,7 +47,7 @@
           <% end -%>
 
         </ul>
-
+        <div style="clear:both">&nbsp;</div>
       </div>
   <% end %>
 

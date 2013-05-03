@@ -229,9 +229,11 @@ class DataFile < ActiveRecord::Base
         Model.search do |query|
           query.keywords key, :fields=>[:model_contents_for_search, :description, :searchable_tags]
         end.hits.each do |hit|
-          results[hit.primary_key]||=ModelMatchResult.new([],0,hit.primary_key)
-          results[hit.primary_key].search_terms << key
-          results[hit.primary_key].score += hit.score unless hit.score.nil?
+          unless hit.score.nil?
+            results[hit.primary_key]||=ModelMatchResult.new([],0,hit.primary_key)
+            results[hit.primary_key].search_terms << key
+            results[hit.primary_key].score += hit.score
+          end
         end
       end
     end
