@@ -85,6 +85,8 @@ Rails::Initializer.run do |config|
       :person_reindexer,
       :assets_creator_reindexer
 
+  config.gem 'savage-beast', :lib => 'beast', :source => 'http://gemcutter.org'
+
 end
 
 

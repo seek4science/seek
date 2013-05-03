@@ -1,6 +1,6 @@
 GIT
   remote: git://github.com/SysMO-DB/acts_as_activity_logged.git
-  revision: ebe3cbc8dbce6daa86d11c31daf078302edd89bc
+  revision: da0b6d8e4ccabfa231c39aa89522c8ba73f03c0e
   specs:
     acts_as_activity_logged (0.3.3)
 
@@ -156,6 +156,7 @@ GEM
     ruby-prof (0.13.0)
     ruby18_source_location (0.2)
     rubyzip (0.9.9)
+    savage-beast (0.1.0)
     savon (1.1.0)
       akami (~> 1.2.0)
       builder (>= 2.1.2)
@@ -244,6 +245,7 @@ DEPENDENCIES
   ruby-prof
   ruby18_source_location
   rubyzip
+  savage-beast
   savon (= 1.1.0)
   search_biomodel (= 2.2.1)!
   simple-spreadsheet-extractor (= 0.12.1)

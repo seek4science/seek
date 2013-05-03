@@ -53,6 +53,7 @@ gem 'fleximage'
 gem 'country-select'
 gem 'modporter-plugin'
 gem 'will_paginate',"~> 2.3.16"
+gem 'savage-beast'
 
 
 group :development do
