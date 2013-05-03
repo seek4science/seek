@@ -52,7 +52,8 @@
       <% if logged_in? %>
         <span style="display:none;" id="topic_mod">
           <% if @topic.editable_by?(current_user) -%>
-
+            <%= link_to('edit'[], edit_forum_topic_path(@forum, @topic), :class => "utility") %> |
+            <%= link_to('delete'[], forum_topic_path(@forum, @topic), :class => "utility", :method => :delete, :confirm => 'Delete this topic forever?'[:delete_topic_conf]) %>
           <% end -%>
         </span>
       <% end %>
@@ -61,7 +62,8 @@
 
   <p class="subtitle">
     <%= feed_icon_tag @topic.title, forum_topic_path(@forum, @topic, :format => :rss) %>
-
+    <%= '{count} post(s)'[(count=@topic.posts.size)==1 ? :post_count : :posts_count, number_with_delimiter(count)] %>,
+    <%= '{count} voice(s)'[(count=@topic.voices.size)==1 ? :voice_count : :voices_count, number_with_delimiter(count)] %>
   </p>
 
   <%= will_paginate @posts %>
@@ -70,7 +72,7 @@
 
   <table border="0" cellspacing="0" cellpadding="0" class="posts wide">
     <% for post in @posts do %>
-        
+
         <tr class="post hentry" id="<%= dom_id post %>-row">
           <td class="author vcard">
             <div class="date">
@@ -90,13 +92,17 @@
                 <% end %>
               </span>
             <% end %>
-
+            <span class="posts"><%= '{count} post(s)'[(count=post.user.posts.size)==1 ? :post_count : :posts_count, number_with_delimiter(count)] %></span>
 
 
             <% if logged_in? && post.editable_by?(current_user) -%>
               <p>
                 <span class="edit">
                   <%= ajax_spinner_for "edit-post-#{post.id}", "spinner_bounce.gif" %>
+                  <%= link_to_remote('Edit post'[],
+                    {:url => edit_post_path(:forum_id => @forum, :topic_id => @topic, :id => post), :method => :get,
+                      :before => "EditForm.init(#{post.id});", :condition => "!EditForm.isEditing(#{post.id})" },
+                    {:href => edit_post_path(:forum_id => @forum, :topic_id => @topic, :id => post, :page => params[:page]), :class => "utility"}) %>
                 </span>
               </p>
             <% end -%>
@@ -107,9 +113,9 @@
             <!--
             <%= link_to_function image_tag('clearbits/comment.gif', :class => 'icon reply'), "$('reply').toggle()" if logged_in? %>
             -->
-            <%= render :partial => 'posts/post', :object => post %>   
+            <%= render :partial => 'posts/post', :object => post %>
           </td>
-        </tr>     
+        </tr>
       <% end %>
     </table>
 
@@ -125,7 +131,7 @@
         </p>
       <% else %>
 
-
+        <p><%= link_to_function 'Reply to topic'[], "ReplyForm.init()", :class => "utility" %></p>
 
         <div id="reply" class="editbox">
           <div class="container">
@@ -135,7 +141,7 @@
                 <tr>
                   <td rowspan="2" width="70%">
                     <%= f.text_area :body, :rows => 8 %>
-                    <p>      
+                    <p>
                       <%= label_tag "Attachment" %><br/>
                       (Additional attachments may be added after submitting the post)<br/>
                       <%= file_field_tag "forum_attachment[uploaded_data]" %>
@@ -144,7 +150,7 @@
                   <td valign="top">
 
 
-
+                    <h5><%= 'Formatting Help'[] %></h5>
 
                     <ul class="help">
                       <li><%= '*bold*'[:formatting_bold] %>
@@ -154,12 +160,12 @@
                         <%= 'bq. <span>(quotes)</span>'[:formatting_blockquote] %></li>
                       <li>"IBM":http://www.ibm.com</li>
                       <li><%= '* or # <span>(lists)</span>'[:formatting_list] %></li>
-                    </ul> 
+                    </ul>
                   </td>
                 </tr>
-                <tr>                  
+                <tr>
                   <td valign="bottom" style="padding-bottom:15px;">
-
+                    <%= submit_tag "Save Reply"[] %><span class="button_or">or <%= link_to_function 'cancel'[], "$('reply').hide()" %></span>
                   </td>
                 </tr>
               </table>
