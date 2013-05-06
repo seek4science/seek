@@ -35,6 +35,12 @@ GIT
   specs:
     search_biomodel (2.2.1)
 
+GIT
+  remote: git://github.com/quyen/my_savage_beast
+  revision: b3613ae914e5ae8801f0a27d88489c87fd418a3f
+  specs:
+    my_savage_beast (2.3)
+
 GEM
   remote: https://rubygems.org/
   remote: http://gems.github.com/
@@ -162,7 +168,6 @@ GEM
     ruby-prof (0.13.0)
     ruby18_source_location (0.2)
     rubyzip (0.9.9)
-    savage-beast (0.1.0)
     savon (1.1.0)
       akami (~> 1.2.0)
       builder (>= 2.1.2)
@@ -234,6 +239,7 @@ DEPENDENCIES
   modporter-plugin
   mongrel
   my_annotations (= 0.5.1)
+  my_savage_beast!
   mysql
   parallel_tests
   pry
@@ -252,7 +258,6 @@ DEPENDENCIES
   ruby-prof
   ruby18_source_location
   rubyzip
-  savage-beast
   savon (= 1.1.0)
   search_biomodel (= 2.2.1)!
   simple-spreadsheet-extractor (= 0.12.1)

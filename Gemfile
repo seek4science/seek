@@ -53,7 +53,7 @@ gem 'fleximage'
 gem 'country-select'
 gem 'modporter-plugin'
 gem 'will_paginate',"~> 2.3.16"
-gem 'savage-beast'
+gem 'my_savage_beast', :git => 'git://github.com/quyen/my_savage_beast'
 gem 'gibberish', :git => "git://github.com/SysMO-DB/gibberish.git"
 
 
