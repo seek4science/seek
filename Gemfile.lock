@@ -41,6 +41,18 @@ GIT
   specs:
     my_savage_beast (2.3)
 
+GIT
+  remote: git://github.com/quyen/white_list.git
+  revision: b7d4ff0a87d1e5ea4fee5c43f7191b1a2d68e056
+  specs:
+    white_list (1.0.0)
+
+GIT
+  remote: git://github.com/quyen/white_list_formatted_content.git
+  revision: 64ca3d51cd96e37f0530f91f2fda7042da8c9236
+  specs:
+    white_list_formatted_content (1.0.0)
+
 GEM
   remote: https://rubygems.org/
   remote: http://gems.github.com/
@@ -268,4 +280,6 @@ DEPENDENCIES
   unicorn
   uuidtools (= 2.1.1)
   webmock
+  white_list!
+  white_list_formatted_content!
   will_paginate (~> 2.3.16)
