@@ -42,6 +42,12 @@ GIT
     my_savage_beast (2.3)
 
 GIT
+  remote: git://github.com/quyen/pubmed_query_tool.git
+  revision: ea5bc1af8a0200c197de312d8f3d1482771c83e2
+  specs:
+    pubmed_query_tool (1.0.0)
+
+GIT
   remote: git://github.com/quyen/white_list.git
   revision: b7d4ff0a87d1e5ea4fee5c43f7191b1a2d68e056
   specs:
@@ -258,6 +264,7 @@ DEPENDENCIES
   pry
   pry-doc
   pry-remote
+  pubmed_query_tool!
   rack-openid
   rails (= 2.3.18)
   rails-settings
