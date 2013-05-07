@@ -42,6 +42,12 @@ GIT
     my_rails_settings (1.0.0)
 
 GIT
+  remote: git://github.com/quyen/my_responds_to_parent.git
+  revision: 383a017f16c418a1f47cab33eb37b1f42b29ca77
+  specs:
+    my_responds_to_parent (1.0.0)
+
+GIT
   remote: git://github.com/quyen/my_savage_beast
   revision: b3613ae914e5ae8801f0a27d88489c87fd418a3f
   specs:
@@ -270,6 +276,7 @@ DEPENDENCIES
   mongrel
   my_annotations (= 0.5.1)
   my_rails_settings!
+  my_responds_to_parent!
   my_savage_beast!
   mysql
   parallel_tests

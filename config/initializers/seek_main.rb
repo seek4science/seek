@@ -34,6 +34,7 @@ require 'country-select'
 require 'will_paginate'
 require 'piwik_analytics'
 require 'rack/bug'
+require 'responds_to_parent'
 
 GLOBAL_PASSPHRASE="ohx0ipuk2baiXah" unless defined? GLOBAL_PASSPHRASE
 

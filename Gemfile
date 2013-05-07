@@ -62,6 +62,7 @@ gem 'my_rails_settings', :git => "git://github.com/quyen/my_rails_settings.git"
 gem 'piwik_analytics'
 gem 'rack-bug'
 gem 'redbox',"~> 1.0.4"
+gem "my_responds_to_parent", :git => "git://github.com/quyen/my_responds_to_parent.git"
 
 
 group :development do
