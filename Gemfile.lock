@@ -36,6 +36,12 @@ GIT
     search_biomodel (2.2.1)
 
 GIT
+  remote: git://github.com/quyen/bioportal.git
+  revision: 7a41485cfb1dbd827ca702c1b57c89aecd13704c
+  specs:
+    bioportal (1.0.0)
+
+GIT
   remote: git://github.com/quyen/my_rails_settings.git
   revision: 771e1e12264cec529bbc3bec767aa52674c22d59
   specs:
@@ -261,6 +267,7 @@ DEPENDENCIES
   acts_as_tree
   app_version!
   bio
+  bioportal!
   breadcrumbs_on_rails (= 1.0.1)
   calendar_date_select
   cancan
