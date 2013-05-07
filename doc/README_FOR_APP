@@ -2,7 +2,7 @@
 
 = SYSMO-SEEK
 
-Please visit the {Sysmo-DB Website}[http://www.sysmo-db.org] for more information about SEEK and Sysmo-DB in general.
+Please visit the {SEEK}[http://www.seek4science.org] for more information about SEEK and Sysmo-DB in general.
 
 == Installation
 
@@ -22,5 +22,5 @@ Please read the CREDITS[link:files/doc/CREDITS.html] document.
 
 
 Author::    Stuart Owen  (mailto:stuart.owen@manchester.ac.uk)
-Copyright:: Copyright (c) 2011 The University of Manchester UK &  HITS gGmbH
+Copyright:: Copyright (c) 2013 The University of Manchester UK &  HITS gGmbH
 License::   New BSD Licence[http://www.opensource.org/licenses/bsd-license.php]
