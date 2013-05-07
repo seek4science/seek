@@ -145,10 +145,13 @@ class PeopleControllerTest < ActionController::TestCase
     assert_response :success
   end
 
-  test 'anonymous user cannot view people' do
-    logout
-    get :show, :id => people(:quentin_person)
-    assert_present flash[:error]
+  as_virtualliver do
+    test 'anonymous user cannot view people' do
+      logout
+      get :show, :id => people(:quentin_person)
+      puts @response.body
+      assert_not_nil flash[:error]
+    end
   end
 
   test 'anonymous user doesnt see people in index' do
