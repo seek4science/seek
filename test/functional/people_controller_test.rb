@@ -149,7 +149,6 @@ class PeopleControllerTest < ActionController::TestCase
     test 'anonymous user cannot view people' do
       logout
       get :show, :id => people(:quentin_person)
-      puts @response.body
       assert_not_nil flash[:error]
     end
   end
