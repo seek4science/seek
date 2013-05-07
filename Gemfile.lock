@@ -36,10 +36,22 @@ GIT
     search_biomodel (2.2.1)
 
 GIT
+  remote: git://github.com/quyen/my_rails_settings.git
+  revision: 771e1e12264cec529bbc3bec767aa52674c22d59
+  specs:
+    my_rails_settings (1.0.0)
+
+GIT
   remote: git://github.com/quyen/my_savage_beast
   revision: b3613ae914e5ae8801f0a27d88489c87fd418a3f
   specs:
     my_savage_beast (2.3)
+
+GIT
+  remote: git://github.com/quyen/pubmed_query_tool.git
+  revision: ea5bc1af8a0200c197de312d8f3d1482771c83e2
+  specs:
+    pubmed_query_tool (1.0.0)
 
 GIT
   remote: git://github.com/quyen/white_list.git
@@ -251,12 +263,14 @@ DEPENDENCIES
   modporter-plugin
   mongrel
   my_annotations (= 0.5.1)
+  my_rails_settings!
   my_savage_beast!
   mysql
   parallel_tests
   pry
   pry-doc
   pry-remote
+  pubmed_query_tool!
   rack-openid
   rails (= 2.3.18)
   ratom (= 0.6.9)
