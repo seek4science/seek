@@ -145,7 +145,7 @@ class EventsControllerTest < ActionController::TestCase
 
   test "should create and show event without end_date" do
     assert_difference('Event.count', 1) do
-      post :create, :event => {:title => "Barn Raising", :start_date => DateTime.now}
+      post :create, :event => {:title => "Barn Raising", :start_date => DateTime.now},:sharing => valid_sharing
     end
     assert_redirected_to assigns(:event)
 
