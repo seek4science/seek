@@ -83,9 +83,13 @@ class ProjectsControllerTest < ActionController::TestCase
   end
 
 	def test_non_admin_should_not_destroy_project
-		login_as Factory(:user,:person=>Factory(:person))
+    user = Factory(:user,:person=>Factory(:person))
+    proj = Factory(:project)
+    assert !user.person.is_admin?
+		login_as user
+
 		assert_no_difference('Project.count') do
-			delete :destroy, :id => Factory(:project)
+			delete :destroy, :id => proj
 		end
 
   end
@@ -172,10 +176,11 @@ class ProjectsControllerTest < ActionController::TestCase
     assert_select "a[href=?]",project_folders_path(p.projects.first), :count=>0
   end
 
-test 'should not get index for non-project member, should for non-login user' do
-		login_as(:registered_user_with_no_projects)
+test 'should get index for non-project member, should for non-login user' do
+    registered_user_with_no_projects = Factory :user, :person=> Factory(:brand_new_person)
+		login_as registered_user_with_no_projects
 		get :index
-		assert_response :redirect
+		assert_response :success
 
 		logout
 		get :index

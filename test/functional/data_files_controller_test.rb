@@ -73,10 +73,15 @@ class DataFilesControllerTest < ActionController::TestCase
 
   test "data files tab should be selected" do
     get :index
+    if !Seek::Config.is_virtualliver
+     #VLN uses drop-down menu, while SysMO uses tabs
     assert_select "ul.tabnav" do
       assert_select "li#selected_tabnav" do
         assert_select "a[href=?]",data_files_path,:text=>"Data files"
       end
+    end
+    else
+      assert_select "div.breadcrumbs", :text => "Home > Data files Index"
     end
   end
 
@@ -222,21 +227,8 @@ class DataFilesControllerTest < ActionController::TestCase
     assert_response :success
     assert_select "h1",:text=>"New Data file"
   end
-  
-  test "should correctly handle 404 url" do
-    mock_http
-    df={:title=>"Test",:data_url=>"http://mocked404.com"}
-    assert_no_difference('ActivityLog.count') do
-      assert_no_difference('DataFile.count') do
-        assert_no_difference('ContentBlob.count') do
-          post :create, :data_file => df, :sharing=>valid_sharing
-        end
-      end
-    end
-      
-    assert_not_nil flash.now[:error]
-  end
-  
+
+
   test "should correctly handle bad data url" do
     df={:title=>"Test",:data_url=>"http:/sdfsdfds.com/sdf.png",:projects=>[projects(:sysmo_project)]}
     assert_no_difference('ActivityLog.count') do
@@ -313,8 +305,8 @@ class DataFilesControllerTest < ActionController::TestCase
       assert !assigns(:data_file).content_blob.url.blank?
       assert assigns(:data_file).content_blob.data_io_object.nil?
       assert !assigns(:data_file).content_blob.file_exists?
-      assert_equal "a-piccy.png", assigns(:data_file).original_filename
-      assert_equal "image/png", assigns(:data_file).content_type
+      assert_equal "a-piccy.png", assigns(:data_file).content_blob.original_filename
+      assert_equal "image/png", assigns(:data_file).content_blob.content_type
   end
 
   test 'test_asset_url' do
@@ -1264,18 +1256,7 @@ class DataFilesControllerTest < ActionController::TestCase
     assert_equal "inline_view",al.action
     assert_equal "data_files",al.controller_name
   end
-  test "report error when file unavailable for download" do
-    df = Factory :data_file, :policy=>Factory(:public_policy)
-    df.content_blob.dump_data_to_file
-    assert df.content_blob.file_exists?
-    FileUtils.rm df.content_blob.filepath
-    assert !df.content_blob.file_exists?
 
-    get :download,:id=>df
-
-    assert_redirected_to df
-    assert flash[:error].match(/Unable to find a copy of the file for download/)
-  end
 
   test "explore latest version" do
     data = Factory :small_test_spreadsheet_datafile,:policy=>Factory(:public_policy)

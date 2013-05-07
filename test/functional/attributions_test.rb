@@ -45,7 +45,7 @@ class AttributionsTest < ActionController::TestCase
     # update the SOP, but supply no data about attributions - these should be removed
     assert_no_difference('Sop.count') do
       assert_difference('Relationship.count', -1) do
-        put :update, :id => assigns(:sop).id, :sop => {:title => "edited_title",:projects=>[projects(:myexperiment_project)]}, :sharing => valid_sharing,:attributions=>nil # NB! no attributions supplied - should remove if any existed for the sop
+        put :update, :id => assigns(:sop).id, :sop => {:title => "edited_title",:projects=>[projects(:myexperiment_project)]}, :sharing => valid_sharing,:attributions=>[] # NB! no attributions supplied - should remove if any existed for the sop
       end
     end
     assert_redirected_to sop_path(assigns(:sop))

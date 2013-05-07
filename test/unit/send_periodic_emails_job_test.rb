@@ -3,6 +3,7 @@ require 'test_helper'
 class SendPeriodicEmailsJobTest < ActiveSupport::TestCase
 
   def setup
+    User.current_user = Factory(:user)
     @val = Seek::Config.email_enabled
     Seek::Config.email_enabled=true
     Delayed::Job.delete_all
@@ -222,8 +223,8 @@ class SendPeriodicEmailsJobTest < ActiveSupport::TestCase
 
     person1 = Factory :person
     person2 = Factory :person
-    person3 = Factory :person, :group_memberships=>person2.group_memberships
-    person4 = Factory :person, :group_memberships=>person2.group_memberships
+    person3 = Factory :person, :work_groups=>person2.work_groups
+    person4 = Factory :person, :work_groups=>person2.work_groups
     person4.notifiee_info.receive_notifications=false
     person4.notifiee_info.save!
     project1 = person1.projects.first

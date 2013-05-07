@@ -13,7 +13,7 @@ class ProjectHierarchiesTest < ActiveSupport::TestCase
     test "person's projects include direct projects and parent projects" do
       parent_proj = Factory :project
       proj = Factory :project, :parent_id => parent_proj.id
-      p = Factory(:person, :group_memberships => [Factory(:group_membership, :work_group => Factory(:work_group, :project => proj))])
+      p = Factory(:person, :work_groups => [Factory(:work_group, :project => proj)])
       assert_equal [parent_proj, proj].map(&:id).sort, p.projects.map(&:id).sort
     end
 
