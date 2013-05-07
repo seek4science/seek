@@ -63,6 +63,7 @@ gem 'piwik_analytics'
 gem 'rack-bug'
 gem 'redbox',"~> 1.0.4"
 gem "my_responds_to_parent", :git => "git://github.com/quyen/my_responds_to_parent.git"
+gem 'site_announcements', :git => 'git://github.com/quyen/site_announcements.git'
 
 
 group :development do
