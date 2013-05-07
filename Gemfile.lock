@@ -246,6 +246,7 @@ GEM
       crack (>= 0.3.2)
     will_paginate (2.3.16)
     xml-simple (1.1.2)
+    yaml_db (0.2.3)
     yard (0.8.6.1)
 
 PLATFORMS
@@ -320,3 +321,4 @@ DEPENDENCIES
   white_list!
   white_list_formatted_content!
   will_paginate (~> 2.3.16)
+  yaml_db (~> 0.2.3)
