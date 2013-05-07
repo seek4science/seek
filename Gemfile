@@ -59,6 +59,7 @@ gem 'white_list', :git => "git://github.com/quyen/white_list.git"
 gem 'white_list_formatted_content', :git => "git://github.com/quyen/white_list_formatted_content.git"
 gem 'pubmed_query_tool', :git => "git://github.com/quyen/pubmed_query_tool.git"
 gem 'my_rails_settings', :git => "git://github.com/quyen/my_rails_settings.git"
+gem 'piwik_analytics'
 
 
 group :development do

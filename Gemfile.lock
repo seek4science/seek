@@ -144,6 +144,9 @@ GEM
     parallel (0.6.4)
     parallel_tests (0.11.3)
       parallel
+    piwik_analytics (0.9.1)
+      actionpack
+      activesupport
     pr_geohash (1.0.0)
     pry (0.9.12.1)
       coderay (~> 1.0.5)
@@ -267,6 +270,7 @@ DEPENDENCIES
   my_savage_beast!
   mysql
   parallel_tests
+  piwik_analytics
   pry
   pry-doc
   pry-remote

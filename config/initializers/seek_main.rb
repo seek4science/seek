@@ -32,6 +32,7 @@ require 'acts_as_tree'
 require 'fleximage'
 require 'country-select'
 require 'will_paginate'
+require 'piwik_analytics'
 
 GLOBAL_PASSPHRASE="ohx0ipuk2baiXah" unless defined? GLOBAL_PASSPHRASE
 
