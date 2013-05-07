@@ -10,7 +10,7 @@
   end
 
   Factory.define(:person_in_project, :parent => :brand_new_person) do |f|
-    f.group_memberships {[Factory.build :group_membership]}
+    f.work_groups {[Factory.build :work_group]}
   end
 
   Factory.define(:person, :parent => :person_in_project) do |f|
@@ -54,7 +54,8 @@
 
   #activated_user mainly exists for :person to use in its association
   Factory.define(:activated_user, :parent => :brand_new_user) do |f|
-    f.after_create { |user| user.activate }
+    f.after_create { |user| user.activate
+    }
   end
 
   Factory.define(:user_not_in_project,:parent => :activated_user) do |f|
