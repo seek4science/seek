@@ -65,8 +65,12 @@ module ResourceListItemHelper
   end
 
   def list_item_scale_list resource
-    ordered_scales = sort_scales resource.scales
-    list_item_simple_list(ordered_scales, "Scales") {|i| link_for_scale(i)}
+    if resource.is_scalable?
+      ordered_scales = sort_scales resource.scales
+      list_item_simple_list(ordered_scales, "Scales") {|i| link_for_scale(i)}
+    else
+      nil
+    end
   end
 
   def list_item_simple_list items, attribute
