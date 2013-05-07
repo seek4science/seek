@@ -1,9 +1,9 @@
 <div id="home">
 
   <% if SiteAnnouncement.headline_announcement and !current_user.nil? -%>
-    <p class="box_standout headline_announcement">
+    <div class="box_standout headline_announcement">
       <%= site_annoucements_headline %>
-    </p>
+    </div>
   <% end -%>
 
   <%= render :partial=>"alternative_home_vl" -%>
