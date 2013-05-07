@@ -96,7 +96,7 @@ class SamplesController < ApplicationController
         tissue_and_cell_types.each do |t|
           t_id, t_title = t.split(",")
           @sample.associate_tissue_and_cell_type(t_id, t_title)
-        end
+        end if @sample.respond_to?(:tissue_and_cell_types)
       @sample.create_or_update_assets data_file_ids, "DataFile"
       @sample.create_or_update_assets model_ids, "Model"
       @sample.create_or_update_assets sop_ids, "Sop"
