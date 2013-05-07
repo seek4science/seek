@@ -499,8 +499,8 @@ class ApplicationController < ActionController::Base
         when (filter == 'person' and res.class.is_asset?)    then (res.creators.include?(value) or res.contributor.try(:person) == value)
         when (filter == 'person' and res.respond_to? :owner) then res.send(:owner) == value
         when (filter == 'project' and res.respond_to? :projects_and_ancestors) then res.projects_and_ancestors.include? value
-        when (filter == 'project' and res.class.name == "Assay") then res.study.investigation.projects_and_ancestors.include? value
-        when (filter == 'project' and res.class.name == "Study") then res.investigation.projects_and_ancestors.include? value
+        when (filter == 'project' and res.class.name == "Assay") then Project.is_hierarchical? ? res.study.investigation.projects_and_ancestors.include?(value) : res.study.investigation.projects.include?(value)
+        when (filter == 'project' and res.class.name == "Study") then Project.is_hierarchical? ? res.investigation.projects_and_ancestors.include?(value) : res.investigation.projects.include?(value)
         #then the general case
         when res.respond_to?(filter)                         then res.send(filter) == value
         when res.respond_to?(filter.pluralize)               then res.send(filter.pluralize).include? value

@@ -2,6 +2,6 @@
 
 <div class="show_basic">
   <div>
-    <ul><%= Rails.cache.fetch([:projects_tree_manage]){tree_editor_display Project, true, true, nil,"Person"}%></ul>
+    <ul><%= Rails.cache.fetch([:projects_tree_manage]){tree_editor_display Project, true, true, nil,"Person"} if Project.is_hierarchical?%></ul>
   </div>
 </div>

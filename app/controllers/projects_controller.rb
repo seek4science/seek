@@ -181,7 +181,7 @@ class ProjectsController < ApplicationController
   def destroy
     @project = Project.find(params[:id])
     respond_to do |format|
-      if @project.children.empty?
+      if (Project.is_hierarchical? && @project.children.empty?) || !Project.is_hierarchical?
         @project.destroy
         format.html { redirect_to(projects_path) }
         format.xml { head :ok }
