@@ -145,21 +145,22 @@ class PeopleControllerTest < ActionController::TestCase
     assert_response :success
   end
 
-  as_virtualliver do
+  if Seek::Config.is_virtualliver
     test 'anonymous user cannot view people' do
+        logout
+        get :show, :id => people(:quentin_person)
+        assert_not_nil flash[:error]
+      end
+
+
+    test 'anonymous user doesnt see people in index' do
+      Factory :person, :first_name => 'Invisible', :last_name => ''
       logout
-      get :show, :id => people(:quentin_person)
-      assert_not_nil flash[:error]
+      get :index
+      assert_select 'a', :text => /Invisible/, :count => 0
     end
   end
 
-  test 'anonymous user doesnt see people in index' do
-    Factory :person, :first_name => 'Invisible', :last_name => ''
-    logout
-    get :index
-    assert_select 'a', :text => /Invisible/, :count => 0
-  end
-  
   def test_should_get_edit
     get :edit, :id => people(:quentin_person)
     assert_response :success
