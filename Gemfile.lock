@@ -1,6 +1,6 @@
 GIT
   remote: git://github.com/SysMO-DB/acts_as_activity_logged.git
-  revision: 2ece6fa449c80c2f8cb9ed601c0643461338c99d
+  revision: da0b6d8e4ccabfa231c39aa89522c8ba73f03c0e
   specs:
     acts_as_activity_logged (0.3.3)
 
@@ -24,10 +24,34 @@ GIT
     doi_query_tool (0.0.0)
 
 GIT
+  remote: git://github.com/SysMO-DB/gibberish.git
+  revision: 77cba59e97d4ab8d577fd5689ec3eddf0abf1fee
+  specs:
+    gibberish (1.0.0)
+
+GIT
   remote: git://github.com/myGrid/search_biomodel.git
   revision: e109ac6d8b102f7ecb65140c17d263b85e066870
   specs:
     search_biomodel (2.2.1)
+
+GIT
+  remote: git://github.com/quyen/my_savage_beast
+  revision: b3613ae914e5ae8801f0a27d88489c87fd418a3f
+  specs:
+    my_savage_beast (2.3)
+
+GIT
+  remote: git://github.com/quyen/white_list.git
+  revision: b7d4ff0a87d1e5ea4fee5c43f7191b1a2d68e056
+  specs:
+    white_list (1.0.0)
+
+GIT
+  remote: git://github.com/quyen/white_list_formatted_content.git
+  revision: 64ca3d51cd96e37f0530f91f2fda7042da8c9236
+  specs:
+    white_list_formatted_content (1.0.0)
 
 GEM
   remote: https://rubygems.org/
@@ -50,7 +74,7 @@ GEM
     acts_as_trashable (1.0.6)
       activerecord (>= 2.2)
     acts_as_tree (0.2.0)
-    addressable (2.3.2)
+    addressable (2.3.4)
     akami (1.2.0)
       gyoku (>= 0.4.0)
       nokogiri (>= 1.4.0)
@@ -60,18 +84,18 @@ GEM
       xml-simple
     bio (1.4.3)
     breadcrumbs_on_rails (1.0.1)
-    builder (3.1.4)
+    builder (3.2.0)
     calendar_date_select (1.16.4)
-    cancan (1.6.8)
+    cancan (1.6.9)
     cgi_multipart_eof_fix (2.5.0)
-    coderay (1.0.8)
+    coderay (1.0.9)
     country-select (1.1.1)
     crack (0.3.2)
     daemons (1.0.10)
     delayed_job (2.0.7)
       activesupport (~> 2.0)
       daemons (= 1.0.10)
-    docsplit (0.6.4)
+    docsplit (0.7.2)
     equivalent-xml (0.3.0)
       nokogiri (>= 1.4.3)
     factory_girl (2.6.4)
@@ -89,11 +113,11 @@ GEM
     httpi (1.1.1)
       rack
     in_place_editing (1.2.0)
-    json (1.7.6)
-    kgio (2.7.4)
+    json (1.7.7)
+    kgio (2.8.0)
     libxml-ruby (2.2.2)
     method_source (0.8.1)
-    mime-types (1.19)
+    mime-types (1.23)
     modporter-plugin (0.1.0)
     mongrel (1.1.5)
       cgi_multipart_eof_fix (>= 2.4)
@@ -101,28 +125,28 @@ GEM
       fastthread (>= 1.0.1)
       gem_plugin (>= 0.2.3)
     my_annotations (0.5.1)
-    mysql (2.9.0)
-    nokogiri (1.5.6)
-    nori (1.1.4)
+    mysql (2.9.1)
+    nokogiri (1.5.9)
+    nori (1.1.5)
     open4 (1.3.0)
-    parallel (0.6.1)
-    parallel_tests (0.9.2)
+    parallel (0.6.4)
+    parallel_tests (0.11.3)
       parallel
     pr_geohash (1.0.0)
-    pry (0.9.11.2)
+    pry (0.9.12.1)
       coderay (~> 1.0.5)
       method_source (~> 0.8)
       slop (~> 3.4)
-    pry-doc (0.4.4)
-      pry (>= 0.9.9.6)
-      yard (~> 0.8.1)
-    pry-remote (0.1.6)
+    pry-doc (0.4.5)
+      pry (>= 0.9)
+      yard (>= 0.8)
+    pry-remote (0.1.7)
       pry (~> 0.9)
       slop (~> 3.0)
     rack (1.1.6)
-    rack-openid (1.1.0)
-      rack (>= 0.4)
-      ruby-openid (>= 2.0.3)
+    rack-openid (1.3.1)
+      rack (>= 1.1.0)
+      ruby-openid (>= 2.1.8)
     rails (2.3.18)
       actionmailer (= 2.3.18)
       actionpack (= 2.3.18)
@@ -130,29 +154,30 @@ GEM
       activeresource (= 2.3.18)
       activesupport (= 2.3.18)
       rake (>= 0.8.3)
-    raindrops (0.10.0)
+    raindrops (0.11.0)
     rake (10.0.4)
     ratom (0.6.9)
       libxml-ruby (>= 1.1.2)
-    rdf (0.3.11.1)
-      addressable (>= 2.2.6)
-    rdf-rdfxml (0.3.9)
-      rdf (>= 0.3.11)
-      rdf-xsd (>= 0.3.8)
-    rdf-xsd (0.3.8)
+    rdf (1.0.6)
+      addressable (>= 2.2)
+    rdf-rdfxml (1.0.1)
+      rdf (>= 1.0)
+      rdf-xsd (>= 1.0)
+    rdf-xsd (1.0.2.1)
+      nokogiri (>= 1.5.0)
       rdf (>= 0.3.4)
-    rdoc (3.12)
+    rdoc (4.0.1)
       json (~> 1.4)
     rest-client (1.6.7)
       mime-types (>= 1.16)
     rmagick (2.12.2)
-    rsolr (1.0.8)
+    rsolr (1.0.9)
       builder (>= 2.1.2)
     rubaidh-google_analytics (1.1.4)
       actionpack
       activesupport
-    ruby-openid (2.2.2)
-    ruby-prof (0.12.2)
+    ruby-openid (2.2.3)
+    ruby-prof (0.13.0)
     ruby18_source_location (0.2)
     rubyzip (0.9.9)
     savon (1.1.0)
@@ -165,8 +190,10 @@ GEM
       wasabi (~> 2.5.0)
     simple-spreadsheet-extractor (0.12.1)
       libxml-ruby (= 2.2.2)
+      libxml-ruby (= 2.2.2)
       open4 (= 1.3.0)
-    slop (3.4.3)
+      open4 (= 1.3.0)
+    slop (3.4.4)
     sqlite3-ruby (1.2.5)
     sunspot (1.3.3)
       pr_geohash (~> 1.0)
@@ -176,7 +203,7 @@ GEM
       sunspot (= 1.3.3)
     sunspot_solr (1.3.3)
     timocratic-test_benchmark (0.4.3)
-    unicorn (4.5.0)
+    unicorn (4.6.2)
       kgio (~> 2.6)
       rack
       raindrops (~> 0.7)
@@ -184,12 +211,12 @@ GEM
     wasabi (2.5.1)
       httpi (~> 1.0)
       nokogiri (>= 1.4.0)
-    webmock (1.9.0)
+    webmock (1.11.0)
       addressable (>= 2.2.7)
-      crack (>= 0.1.7)
+      crack (>= 0.3.2)
     will_paginate (2.3.16)
     xml-simple (1.1.2)
-    yard (0.8.3)
+    yard (0.8.6.1)
 
 PLATFORMS
   ruby
@@ -217,18 +244,20 @@ DEPENDENCIES
   fastercsv (= 1.5.1)
   fleximage
   fssm
+  gibberish!
   hpricot (~> 0.8.2)
   in_place_editing
   libxml-ruby (= 2.2.2)
   modporter-plugin
   mongrel
   my_annotations (= 0.5.1)
+  my_savage_beast!
   mysql
   parallel_tests
   pry
   pry-doc
   pry-remote
-  rack-openid (= 1.1.0)
+  rack-openid
   rails (= 2.3.18)
   ratom (= 0.6.9)
   rdf (>= 0.3.8)
@@ -251,4 +280,6 @@ DEPENDENCIES
   unicorn
   uuidtools (= 2.1.1)
   webmock
+  white_list!
+  white_list_formatted_content!
   will_paginate (~> 2.3.16)
