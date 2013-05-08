@@ -343,7 +343,7 @@ DEPENDENCIES
   rdf (>= 0.3.8)
   rdf-rdfxml (>= 0.3.8)
   rdoc
-  redbox (~> 1.0.4)
+  redbox
   rest-client (>= 1.6.1)
   rmagick (= 2.12.2)
   rubaidh-google_analytics (~> 1.1.4)
@@ -363,4 +363,4 @@ DEPENDENCIES
   uuidtools (= 2.1.1)
   webmock
   white_list!
-  yaml_db (~> 0.2.3)
+  yaml_db
