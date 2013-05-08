@@ -40,6 +40,7 @@ gem "equivalent-xml"
 gem "breadcrumbs_on_rails","1.0.1"
 gem 'docsplit'
 gem "pothoven-attachment_fu"
+gem "exception_notification"
 
 gem "fssm"
 gem 'my_annotations', "0.5.1"
