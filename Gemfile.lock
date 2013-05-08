@@ -27,8 +27,13 @@ GIT
   remote: git://github.com/SysMO-DB/gibberish.git
   revision: d24c42b9608f39f82e37e757f530d8199049c557
   specs:
-  specs:
     gibberish (1.0.0)
+
+GIT
+  remote: git://github.com/SysMO-DB/site_announcements.git
+  revision: 02b574ac8396534c4917d3fd29ceb7496c27060e
+  specs:
+    site_announcements (1.0.0)
 
 GIT
   remote: git://github.com/myGrid/search_biomodel.git
