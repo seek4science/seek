@@ -1,230 +1,413 @@
-ActionController::Routing::Routes.draw do |map|
-  map.resources :attachments
-  map.resources :presentations,
-                :member => {:download=>:get,:new_version=>:post,:publish=>:post,:published=>:get,:publish_related_items=>:get,
-                            :check_related_items=>:get,:check_gatekeeper_required=>:get,
-                            :request_resource=>:post, :update_annotations_ajax=>:post, :approve_or_reject_publish=>:get,
-                            :gatekeeper_decide=>:post} do |presentation|
-    presentation.resources :content_blobs, :member => {:download => :get, :view_pdf_content => :get, :get_pdf => :get}
-  end
-  map.resources :subscriptions
-  map.resources :specimens
-  map.resources :samples
+SEEK::Application.routes.draw do
+  resources :attachments
+  resources :presentations do
 
-  map.resources :events
+    member do
+      get :check_related_items
+      get :check_gatekeeper_required
+      post :publish
+      post :request_resource
+      get :download
+      post :update_annotations_ajax
+      get :published
+      get :approve_or_reject_publish
+      get :publish_related_items
+      post :gatekeeper_decide
+      post :new_version
+    end
+    resources :content_blobs do
 
-  map.resources :strains, :member => {:update_annotations_ajax=>:post}
+      member do
+        get :view_pdf_content
+        get :get_pdf
+        get :download
+      end
 
-  map.resources :publications,:collection=>{:fetch_preview=>:post},:member=>{:disassociate_authors=>:post,:update_annotations_ajax=>:post}
-
-  map.resources :assay_types, :collection=>{:manage=>:get}
-
-  map.resources :organisms, :member=>{:visualise=>:get}
-
-  map.resources :technology_types, :collection=>{:manage=>:get}
-
-  map.resources :measured_items
-
-  map.resources :investigations,:member=>{:approve_or_reject_publish=>:get,:gatekeeper_decide=>:post}
-
-  map.resources :studies,:member=>{:approve_or_reject_publish=>:get,:gatekeeper_decide=>:post}
-
-  map.resources :assays,:member=>{:update_annotations_ajax=>:post,:approve_or_reject_publish=>:get,:gatekeeper_decide=>:post}
-
-  map.resources :saved_searches
-
-  map.resources :biosamples, :collection=>{:existing_strains=>:get, :existing_specimens=>:get, :existing_samples=>:get, :strain_form => :get, :create_strain => :post, :update_strain => :put,  :create_specimen_sample => :post, :strains_of_selected_organism => :get}
-
-  map.resources :data_files,
-                :collection=>{:test_asset_url=>:post},
-                :member => {:download=>:get,:matching_models=>:get,:plot=>:get, :data => :get,:publish=>:post,:published=>:get,:publish_related_items=>:get,
-                            :check_related_items=>:get,:check_gatekeeper_required=>:get,
-                            :request_resource=>:post, :update_annotations_ajax=>:post, :explore=>:get, :convert_to_presentation => :post,
-                            :approve_or_reject_publish=>:get, :gatekeeper_decide=>:post},
-                :new=>{:upload_for_tool => :post, :upload_from_email => :post}  do |data_file|
-    data_file.resources :studied_factors, :collection =>{:create_from_existing=>:post}
-    data_file.resources :content_blobs, :member => {:download => :get, :view_pdf_content => :get, :get_pdf => :get}
-  end
-  
-  map.resources :spreadsheet_annotations, :only => [:create, :destroy, :update]
-  
-  map.resources :uuids
-
-  map.resources :institutions,
-    :collection => { :request_all => :get } do |institution|
-    # avatars / pictures 'owned by' institution
-    institution.resources :avatars, :member => { :select => :post }, :collection => { :new => :post }
+    end
   end
 
-  map.resources :models, 
-    :member => {:download => :get, :matching_data=>:get, :execute=>:post, :request_resource=>:post,:publish=>:post,:published=>:get,
-                :publish_related_items=>:get,:check_related_items=>:get,:check_gatekeeper_required=>:get,
-                :approve_or_reject_publish=>:get, :gatekeeper_decide=>:post,
-                :builder=>:get,:visualise=>:get, :export_as_xgmml=>:post,:submit_to_jws=>:post,:submit_to_sycamore=>:post, :simulate=>:post, :update_annotations_ajax=>:post },
-    :collection=>{:build=>:get} do |model|
-    model.resources :model_images,:member=>{ :select=>:post },:collection => {:new => :post}
-    model.resources :content_blobs, :member => {:download => :get, :view_pdf_content => :get, :get_pdf => :get}
+  resources :subscriptions
+  resources :specimens
+  resources :samples
+  resources :events
+  resources :strains do
+
+    member do
+      post :update_annotations_ajax
+    end
+
   end
 
-  map.resources :people,
-                :member=>{:admin=>:get,:batch_publishing_preview=>:get,:publish=>:post,:published=>:get,:publish_related_items=>:get,
-                          :check_related_items=>:get,:check_gatekeeper_required=>:get},
-                :collection=>{:select=>:get,:get_work_group =>:get}  do |person|
-    # avatars / pictures 'owned by' person
-    person.resources :avatars, :member => { :select => :post }, :collection => { :new => :post }
+  resources :publications do
+    collection do
+      post :fetch_preview
+    end
+    member do
+      post :update_annotations_ajax
+      post :disassociate_authors
+    end
+
   end
 
-  map.resources :projects,
-    :collection => { :request_institutions => :get },:member=>{:admin=>:get, :asset_report=>:get} do |project|
-    # avatars / pictures 'owned by' project
-    project.resources :avatars, :member => { :select => :post }, :collection => { :new => :post }
-    project.resources :folders, :collection=>{:nuke=>:post},:member=>{:display_contents=>:post,:move_asset_to=>:post,:create_folder=>:post,:remove_asset=>:post}
+  resources :assay_types do
+    collection do
+      get :manage
+    end
+
+
   end
 
-  map.resources :sops,
-                :member => {:download=>:get,:new_version=>:post,
-                            :publish=>:post,:published=>:get,:publish_related_items=>:get,
-                            :check_related_items=>:get,:check_gatekeeper_required=>:get,
-                            :approve_or_reject_publish=>:get,:gatekeeper_decide=>:post,
-                            :request_resource=>:post, :update_annotations_ajax=>:post } do |sop|
-    sop.resources :experimental_conditions, :collection =>{:create_from_existing=>:post}
-    sop.resources :content_blobs, :member => {:download => :get, :view_pdf_content => :get, :get_pdf => :get}
+  resources :organisms do
+
+    member do
+      get :visualise
+    end
+
   end
 
-  map.resources :users, :collection=>{:impersonate => :post, :activation_required=>:get,:forgot_password=>[:get,:post],:reset_password=>:get, :hide_guide_box => :post},
-                        :member => {:set_openid => :put}
+  resources :technology_types do
+    collection do
+      get :manage
+    end
 
-  map.resource :session, :collection=>{:auto_openid=>:get,:show=>:get,:index=>:get},:member=>{:show=>:get}
 
-  map.resource :favourites, :member=>{:delete=>:delete},:collection=>{:add=>:post}
-  
-  #help pages
-  map.resources :help_documents, :as => :help do |h|
-    h.resources :help_attachments, :as => :attachments, :member => {:download => :get}, :only => [:create, :destroy]
-    h.resources :help_images, :as => :images, :only => [:create, :destroy]
   end
-  
-  #forum attachments
-  map.resources :forum_attachments, :member => {:download => :get}, :only => [:create, :destroy]
 
-  map.resources :compounds
+  resources :measured_items
+  resources :investigations do
 
+    member do
+      get :approve_or_reject_publish
+      post :gatekeeper_decide
+    end
 
+  end
 
-  
-  # search and saved searches
-  map.search '/search/',:controller=>'search',:action=>'index'
-  map.save_search '/search/save',:controller=>'search',:action=>'save'
-  map.delete_search '/search/delete',:controller=>'search',:action=>'delete'
-  #map.saved_search '/search/:id',:controller=>'search',:action=>'show'
+  resources :studies do
 
-  map.svg 'svg/:id.:format',:controller=>'svg',:action=>'show'
+    member do
+      get :approve_or_reject_publish
+      post :gatekeeper_decide
+    end
 
-  #tags
-  map.all_tags '/tags',:controller=>'tags',:action=>'index'
-  map.show_tag '/tags/:id',:controller=>'tags',:action=>'show'
+  end
 
-  #annotations
-  map.all_anns '/tags',:controller=>'tags',:action=>'index'
-  map.show_ann '/tags/:id',:controller=>'tags',:action=>'show'
+  resources :assays do
 
+    member do
+      post :update_annotations_ajax
+      get :approve_or_reject_publish
+      post :gatekeeper_decide
+    end
 
-  map.jerm '/jerm/',:controller=>'jerm',:action=>'index'
-  
-  # browsing by countries
-  map.country '/countries/:country_name', :controller => 'countries', :action => 'show'
+  end
 
-  # page for admin tasks
-  map.admin '/admin/', :controller=>'admin',:action=>'show'
-  map.registration_form '/admin/registration_form', :controller=>'admin',:action=>'registration_form'
-
-  #temporary location for the data/models simulation prototyping
-  map.data_fuse '/data_fuse/',:controller=>'data_fuse',:action=>'show'
-
-  #feedback form
-  map.feedback '/home/feedback',:controller=>'home',:action=>'feedback',:method=>:get
-  map.send_feedback '/home/send_feedback',:controller=>'home',:action=>'send_feedback',:method=>:post
-
-  #link to youtube
-  map.seek_intro_demo 'home/seek_intro_demo',:controller=>'home',:action=>'seek_intro_demo',:method=>:get
+  resources :saved_searches
+  resources :biosamples do
+    collection do
+      put :update_strain
+      get :existing_strains
+      post :create_specimen_sample
+      get :existing_specimens
+      get :strains_of_selected_organism
+      get :existing_samples
+      get :strain_form
+      post :create_strain
+    end
 
 
-  # favourite groups
-  map.new_favourite_group '/favourite_groups/new', :controller => 'favourite_groups', :action => 'new', :conditions => { :method => :post }
-  map.create_favourite_group '/favourite_groups/create', :controller => 'favourite_groups', :action => 'create', :conditions => { :method => :post }
-  map.edit_favourite_group '/favourite_groups/edit', :controller => 'favourite_groups', :action => 'edit', :conditions => { :method => :post }
-  map.update_favourite_group '/favourite_groups/update', :controller => 'favourite_groups', :action => 'update', :conditions => { :method => :post }
-  map.delete_favourite_group '/favourite_groups/:id', :controller => 'favourite_groups', :action => 'destroy', :conditions => { :method => :delete }
+  end
 
-  map.new_investigation_redbox 'studies/new_investigation_redbox',:controller=>"studies",:action=>'new_investigation_redbox',:conditions=> {:method=>:post}
-  map.create_investigation 'experiments/create_investigation',:controller=>"studies",:action=>'create_investigation',:conditions=> {:method=>:post}
-  
-  
-  # review members of workgroup (also of a project / institution) popup
-  map.review_work_group '/work_groups/review/:type/:id/:access_type', :controller => 'work_groups', :action => 'review_popup', :conditions => { :method => :post }  
-  
-  #create new specimen based existing one
-  #map.new_specimen_based_on_existing_one '/specimens/new_specimen_based_on_existing_one/:id',:controller=>'specimens',:action=>'new_specimen_based_on_existing_one', :conditions => { :method => :post }
-  map.new_object_based_on_existing_one ':controller_name/new_object_based_on_existing_one/:id',:controller=>'#{controller_name}',:action=>'new_object_based_on_existing_one', :conditions => { :method => :post }
-  #map.preview_permissions ':controller_name/preview_permissions', :controller=>'controller_name', :action=>'preview_permissions', :conditions => { :method => :post }
+  resources :data_files do
+    collection do
+      post :test_asset_url
+    end
+    member do
+      get :check_related_items
+      get :matching_models
+      get :data
+      get :check_gatekeeper_required
+      post :publish
+      get :plot
+      get :explore
+      post :request_resource
+      get :download
+      post :convert_to_presentation
+      post :update_annotations_ajax
+      get :published
+      get :approve_or_reject_publish
+      get :publish_related_items
+      post :gatekeeper_decide
+    end
+    resources :studied_factors do
+      collection do
+        post :create_from_existing
+      end
 
-  # The priority is based upon order of creation: first created -> highest priority.
 
-  # Sample of regular route:
-  #   map.connect 'products/:id', :controller => 'catalog', :action => 'view'
-  # Keep in mind you can assign values other than :controller and :action
+    end
 
-  # Sample of named route:
-  #   map.purchase 'products/:id/purchase', :controller => 'catalog', :action => 'purchase'
-  # This route can be invoked with purchase_url(:id => product.id)
+    resources :content_blobs do
 
-  # Sample resource route (maps HTTP verbs to controller actions automatically):
-  #   map.resources :products
+      member do
+        get :view_pdf_content
+        get :get_pdf
+        get :download
+      end
 
-  # Sample resource route with options:
-  #   map.resources :products, :member => { :short => :get, :toggle => :post }, :collection => { :sold => :get }
+    end
+  end
 
-  # Sample resource route with sub-resources:
-  #   map.resources :products, :has_many => [ :comments, :sales ], :has_one => :seller
-  
-  # Sample resource route with more complex sub-resources
-  #   map.resources :products do |products|
-  #     products.resources :comments
-  #     products.resources :sales, :collection => { :recent => :get }
-  #   end
+  resources :spreadsheet_annotations, :only => [:create, :destroy, :update]
+  resources :uuids
+  resources :institutions do
+    collection do
+      get :request_all
+    end
 
-  # Sample resource route within a namespace:
-  #   map.namespace :admin do |admin|
-  #     # Directs /admin/products/* to Admin::ProductsController (app/controllers/admin/products_controller.rb)
-  #     admin.resources :products
-  #   end
+    resources :avatars do
+      collection do
+        post :new
+      end
+      member do
+        post :select
+      end
 
-  # You can have the root of your site routed with map.root -- just remember to delete public/index.html.
-  # map.root :controller => "welcome"
-  
-  #
+    end
+  end
 
-  map.tool_list_autocomplete '/tool_list_autocomplete', :controller=>'people', :action=>'auto_complete_for_tools_name'
-  map.expertise_list_autocomplete '/expertise_list_autocomplete', :controller=>'people', :action=>'auto_complete_for_expertise_name'
-  map.organism_list_autocomplete '/organism_list_autocomplete',:controller=>'projects',:action=>'auto_complete_for_organism_name'
+  resources :models do
+    collection do
+      get :build
+    end
+    member do
+      get :builder
+      get :check_related_items
+      post :submit_to_sycamore
+      get :visualise
+      get :check_gatekeeper_required
+      post :publish
+      post :execute
+      post :request_resource
+      get :download
+      post :update_annotations_ajax
+      post :simulate
+      get :matching_data
+      get :published
+      post :export_as_xgmml
+      get :approve_or_reject_publish
+      get :publish_related_items
+      post :submit_to_jws
+      post :gatekeeper_decide
+    end
+    resources :model_images do
+      collection do
+        post :new
+      end
+      member do
+        post :select
+      end
 
-  map.root :controller=>"home"
-  map.match "index.html",:controller=>"home"
-  map.match "index",:controller=>"home"
+    end
 
-  map.signup  '/signup', :controller => 'users',   :action => 'new' 
-  map.login  '/login',  :controller => 'home'
-  map.logout '/logout', :controller => 'sessions', :action => 'destroy'  
-  
-  map.activate '/activate/:activation_code', :controller => 'users', :action => 'activate', :activation_code => nil
-  map.forgot_password '/forgot_password',:controller=>'users',:action=>'forgot_password'
-  
-  # used by the "sharing" form to get settings from an existing policy 
-  map.request_policy_settings '/policies/request_settings', :controller => 'policies', :action => 'send_policy_data'
+    resources :content_blobs do
 
-  # See how all your routes lay out with "rake routes"
+      member do
+        get :view_pdf_content
+        get :get_pdf
+        get :download
+      end
 
-  # Install the default routes as the lowest priority.
-  map.connect ':controller/:action/:id'
-  map.connect ':controller/:action/:id.:format'
+    end
+  end
+
+  resources :people do
+    collection do
+      get :select
+      get :get_work_group
+    end
+    member do
+      get :check_related_items
+      get :check_gatekeeper_required
+      post :publish
+      get :admin
+      get :published
+      get :batch_publishing_preview
+      get :publish_related_items
+    end
+    resources :avatars do
+      collection do
+        post :new
+      end
+      member do
+        post :select
+      end
+
+    end
+  end
+
+  resources :projects do
+    collection do
+      get :request_institutions
+    end
+    member do
+      get :asset_report
+      get :admin
+    end
+    resources :avatars do
+      collection do
+        post :new
+      end
+      member do
+        post :select
+      end
+
+    end
+
+    resources :folders do
+      collection do
+        post :nuke
+      end
+      member do
+        post :remove_asset
+        post :display_contents
+        post :move_asset_to
+        post :create_folder
+      end
+
+    end
+  end
+
+  resources :sops do
+
+    member do
+      get :check_related_items
+      get :check_gatekeeper_required
+      post :publish
+      post :request_resource
+      get :download
+      post :update_annotations_ajax
+      get :published
+      get :approve_or_reject_publish
+      get :publish_related_items
+      post :gatekeeper_decide
+      post :new_version
+    end
+    resources :experimental_conditions do
+      collection do
+        post :create_from_existing
+      end
+
+
+    end
+
+    resources :content_blobs do
+
+      member do
+        get :view_pdf_content
+        get :get_pdf
+        get :download
+      end
+
+    end
+  end
+
+  resources :users do
+    collection do
+      get :activation_required
+      get :forgot_password
+      post :forgot_password
+      get :reset_password
+      post :hide_guide_box
+      post :impersonate
+    end
+    member do
+      put :set_openid
+    end
+
+  end
+
+  resource :session do
+    collection do
+      get :index
+      get :show
+      get :auto_openid
+    end
+    member do
+      get :show
+    end
+
+  end
+
+  resource :favourites do
+    collection do
+      post :add
+    end
+    member do
+      delete :delete
+    end
+
+  end
+
+  resources :help_documents do
+
+
+    resources :help_attachments, :only => [:create, :destroy] do
+
+      member do
+        get :download
+      end
+
+    end
+
+    resources :help_images, :only => [:create, :destroy]
+  end
+
+  resources :forum_attachments, :only => [:create, :destroy] do
+
+    member do
+      get :download
+    end
+
+  end
+
+  resources :compounds
+  match '/search/' => 'search#index', :as => :search
+  match '/search/save' => 'search#save', :as => :save_search
+  match '/search/delete' => 'search#delete', :as => :delete_search
+  match 'svg/:id.:format' => 'svg#show', :as => :svg
+  match '/tags' => 'tags#index', :as => :all_tags
+  match '/tags/:id' => 'tags#show', :as => :show_tag
+  match '/tags' => 'tags#index', :as => :all_anns
+  match '/tags/:id' => 'tags#show', :as => :show_ann
+  match '/jerm/' => 'jerm#index', :as => :jerm
+  match '/countries/:country_name' => 'countries#show', :as => :country
+  match '/admin/' => 'admin#show', :as => :admin
+  match '/admin/registration_form' => 'admin#registration_form', :as => :registration_form
+  match '/data_fuse/' => 'data_fuse#show', :as => :data_fuse
+  match '/home/feedback' => 'home#feedback', :as => :feedback, :method => :get
+  match '/home/send_feedback' => 'home#send_feedback', :as => :send_feedback, :method => :post
+  match 'home/seek_intro_demo' => 'home#seek_intro_demo', :as => :seek_intro_demo, :method => :get
+  match '/favourite_groups/new' => 'favourite_groups#new', :as => :new_favourite_group, :via => :post
+  match '/favourite_groups/create' => 'favourite_groups#create', :as => :create_favourite_group, :via => :post
+  match '/favourite_groups/edit' => 'favourite_groups#edit', :as => :edit_favourite_group, :via => :post
+  match '/favourite_groups/update' => 'favourite_groups#update', :as => :update_favourite_group, :via => :post
+  match '/favourite_groups/:id' => 'favourite_groups#destroy', :as => :delete_favourite_group, :via => :delete
+  match 'studies/new_investigation_redbox' => 'studies#new_investigation_redbox', :as => :new_investigation_redbox, :via => :post
+  match 'experiments/create_investigation' => 'studies#create_investigation', :as => :create_investigation, :via => :post
+  match '/work_groups/review/:type/:id/:access_type' => 'work_groups#review_popup', :as => :review_work_group, :via => :post
+  #match ':controller_name/new_object_based_on_existing_one/:id' => '#{controller_name}#new_object_based_on_existing_one', :as => :new_object_based_on_existing_one, :via => :post
+  match '/tool_list_autocomplete' => 'people#auto_complete_for_tools_name', :as => :tool_list_autocomplete
+  match '/expertise_list_autocomplete' => 'people#auto_complete_for_expertise_name', :as => :expertise_list_autocomplete
+  match '/organism_list_autocomplete' => 'projects#auto_complete_for_organism_name', :as => :organism_list_autocomplete
+  match '/' => 'home#index'
+  match 'index.html' => 'home#index', :as => :match
+  match 'index' => 'home#index', :as => :match
+  match '/signup' => 'users#new', :as => :signup
+  match '/login' => 'home#index', :as => :login
+  match '/logout' => 'sessions#destroy', :as => :logout
+  match '/activate/:activation_code' => 'users#activate', :activation_code => nil, :as => :activate
+  match '/forgot_password' => 'users#forgot_password', :as => :forgot_password
+  match '/policies/request_settings' => 'policies#send_policy_data', :as => :request_policy_settings
+  match '/:controller(/:action(/:id))'
 end
