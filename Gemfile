@@ -28,7 +28,7 @@ gem 'savon',"1.1.0"
 
 gem 'convert_office',:git=>"git://github.com/SysMO-DB/convert_office.git", :ref=>"753f2567dbd625bc89071e1150404efbb562e130"
 
-gem "delayed_job","~>2.0.4"
+gem "delayed_job_active_record"
 gem "daemons"
 gem "cancan"
 gem "in_place_editing"
