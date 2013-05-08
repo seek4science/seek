@@ -27,6 +27,7 @@ GIT
   remote: git://github.com/SysMO-DB/gibberish.git
   revision: d24c42b9608f39f82e37e757f530d8199049c557
   specs:
+  specs:
     gibberish (1.0.0)
 
 GIT
@@ -64,12 +65,6 @@ GIT
   revision: ea5bc1af8a0200c197de312d8f3d1482771c83e2
   specs:
     pubmed_query_tool (1.0.0)
-
-GIT
-  remote: git://github.com/quyen/site_announcements.git
-  revision: 0116ee995a191b119b88c3200d9972e55caec824
-  specs:
-    site_announcements (1.0.0)
 
 GIT
   remote: git://github.com/quyen/white_list.git

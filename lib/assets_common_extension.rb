@@ -1,3 +1,8 @@
+require 'seek/mime_types'
+require 'seek/content_blob_common'
+require 'seek/assets_common'
+
+
 module AssetsCommonExtension
   include Seek::MimeTypes
   include Seek::ContentBlobCommon
