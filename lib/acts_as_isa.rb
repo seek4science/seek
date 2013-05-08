@@ -1,6 +1,7 @@
 require 'title_trimmer'
 require 'grouped_pagination'
 
+
 module Acts #:nodoc:
   module Isa #:nodoc:
     def self.included(mod)

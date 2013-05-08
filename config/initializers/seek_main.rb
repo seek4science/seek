@@ -33,9 +33,13 @@ require 'acts_as_tree'
 require 'country-select'
 require 'will_paginate'
 require 'piwik_analytics'
-
 require 'responds_to_parent'
 require 'pothoven-attachment_fu'
+
+require 'rightfield/rightfield'
+require 'seek/rdf/rdf_generation'
+require 'background_reindexing'
+require 'subscribable'
 
 SEEK::Application.configure do
   GLOBAL_PASSPHRASE="ohx0ipuk2baiXah" unless defined? GLOBAL_PASSPHRASE

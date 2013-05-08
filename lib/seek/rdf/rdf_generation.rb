@@ -1,5 +1,6 @@
 require 'fastercsv'
 
+
 module Seek
   module Rdf
     module RdfGeneration
