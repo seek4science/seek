@@ -8,7 +8,7 @@ class Person < ActiveRecord::Base
   default_scope :order => "last_name, first_name"
 
   #those that have updated time stamps and avatars appear first. A future enhancement could be to judge activity by last asset updated timestamp
-  named_scope :active, :order=> "avatar_id is null, updated_at DESC"
+  scope :active, :order=> "avatar_id is null, updated_at DESC"
 
   before_save :first_person_admin
   before_destroy :clean_up_and_assign_permissions
@@ -84,8 +84,8 @@ class Person < ActiveRecord::Base
     end
   end if Seek::Config.solr_enabled
 
-  named_scope :without_group, :include=>:group_memberships, :conditions=>"group_memberships.person_id IS NULL"
-  named_scope :registered,:include=>:user,:conditions=>"users.person_id != 0"
+  scope :without_group, :include=>:group_memberships, :conditions=>"group_memberships.person_id IS NULL"
+  scope :registered,:include=>:user,:conditions=>"users.person_id != 0"
 
   alias_attribute :webpage,:web_page
 
@@ -161,7 +161,7 @@ class Person < ActiveRecord::Base
     end
   end
   #FIXME: change userless_people to use this scope - unit tests
-  named_scope :not_registered,:include=>:user,:conditions=>"users.person_id IS NULL"
+  scope :not_registered,:include=>:user,:conditions=>"users.person_id IS NULL"
 
   def self.userless_people
     p=Person.find(:all)

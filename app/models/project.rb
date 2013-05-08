@@ -124,7 +124,7 @@ class Project < ActiveRecord::Base
   end
 
   def people
-    #TODO: look into doing this with a named_scope or direct query
+    #TODO: look into doing this with a scope or direct query
     res = work_groups.collect(&:people).flatten.uniq.compact
     #TODO: write a test to check they are ordered
     res.sort_by{|a| (a.last_name.blank? ? a.name : a.last_name)}

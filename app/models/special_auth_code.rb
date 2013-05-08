@@ -4,7 +4,7 @@ class SpecialAuthCode < ActiveRecord::Base
 
   after_initialize :defaults
 
-  named_scope :unexpired, :conditions => ['expiration_date > ?', Time.now]
+  scope :unexpired, :conditions => ['expiration_date > ?', Time.now]
 
   def can_edit?(u=User.current_user)
     asset.can_manage?(u)

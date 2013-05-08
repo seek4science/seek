@@ -3,7 +3,7 @@ require_dependency File.join(Gem.loaded_specs['acts_as_activity_logged'].full_ge
 class ActivityLog  < ActiveRecord::Base
 
   #returns items that have duplicates for a given action - NOTE that the result does not contain all the actual duplicates.
-  named_scope :duplicates, lambda {|action|
+  scope :duplicates, lambda {|action|
     {
     :select=>"id,created_at,activity_loggable_type,activity_loggable_id,action,count(activity_loggable_id+activity_loggable_type) as dup_count",
     :conditions=>"action='#{action}' and controller_name!='sessions'",

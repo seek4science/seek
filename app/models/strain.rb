@@ -14,11 +14,11 @@ class Strain < ActiveRecord::Base
   has_many :assays,:through=>:assay_organisms
 
   before_destroy :destroy_genotypes_phenotypes
-  named_scope :by_title
+  scope :by_title
 
   validates_presence_of :title, :organism
 
-  named_scope :without_default,:conditions=>{:is_dummy=>false}
+  scope :without_default,:conditions=>{:is_dummy=>false}
 
   include ActsAsCachedTree
   include Subscribable

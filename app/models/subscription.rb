@@ -7,7 +7,7 @@ class Subscription < ActiveRecord::Base
   validates_presence_of :person
   validates_presence_of :subscribable
 
-  named_scope :for_subscribable, lambda {|item|
+  scope :for_subscribable, lambda {|item|
     {
         :conditions=>["subscribable_id=? and subscribable_type=?",item.id,item.class.name]
     }
