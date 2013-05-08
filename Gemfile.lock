@@ -290,6 +290,7 @@ GEM
     webmock (1.11.0)
       addressable (>= 2.2.7)
       crack (>= 0.3.2)
+    will_paginate (3.0.4)
     yaml_db (0.2.3)
     yard (0.8.6.1)
 
@@ -363,4 +364,5 @@ DEPENDENCIES
   uuidtools (= 2.1.1)
   webmock
   white_list!
+  will_paginate (~> 3.0.4)
   yaml_db

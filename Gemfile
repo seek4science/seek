@@ -54,7 +54,7 @@ gem 'doi_query_tool', :git => "git://github.com/SysMO-DB/doi_query_tool.git"
 #disabled - doesn't like rails 3 - gem 'fleximage'
 gem 'country-select'
 gem 'modporter-plugin'
-#disabled - doesn't like rails 3 - gem 'will_paginate',"~> 2.3.16"
+gem "will_paginate", "~> 3.0.4"
 gem 'my_savage_beast', :git => 'git://github.com/quyen/my_savage_beast'
 #disabled - doesn't like rails 3 - gem 'gibberish', :git => "git://github.com/SysMO-DB/gibberish.git"
 gem 'white_list', :git => "git://github.com/quyen/white_list.git"
