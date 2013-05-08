@@ -33,7 +33,7 @@ require 'acts_as_tree'
 require 'country-select'
 require 'will_paginate'
 require 'piwik_analytics'
-require 'rack/bug'
+
 require 'responds_to_parent'
 require 'pothoven-attachment_fu'
 
