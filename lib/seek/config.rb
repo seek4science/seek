@@ -83,13 +83,16 @@ module Seek
 
     def exception_notification_enabled_propagate
       if self.exception_notification_enabled
-        ExceptionNotifier.render_only            = false
-        ExceptionNotifier.send_email_error_codes = %W( 400 406 403 405 410 500 501 503 )
-        ExceptionNotifier.sender_address         = [self.noreply_sender]
-        ExceptionNotifier.email_prefix           = "[ #{self.application_title} ERROR ] "
-        ExceptionNotifier.exception_recipients   = self.exception_notification_recipients.split %r([, ])
+        SEEK::Application.config.middleware.use ExceptionNotifier,
+
+        :render_only            => false,
+        :send_email_error_codes => %W( 400 406 403 405 410 500 501 503 ),
+        :sender_address         => [self.noreply_sender],
+        :email_prefix           => "[ #{self.application_title} ERROR ] ",
+        :exception_recipients   => self.exception_notification_recipients.split(%r([, ]))
       else
-        ExceptionNotifier.render_only = true
+        SEEK::Application.config.middleware.use ExceptionNotifier,
+          :render_only => true
       end
     end
 
