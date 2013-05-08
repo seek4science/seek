@@ -36,37 +36,40 @@ require 'piwik_analytics'
 require 'rack/bug'
 require 'responds_to_parent'
 
+SEEK::Application.configure do
+  GLOBAL_PASSPHRASE="ohx0ipuk2baiXah" unless defined? GLOBAL_PASSPHRASE
 
-GLOBAL_PASSPHRASE="ohx0ipuk2baiXah" unless defined? GLOBAL_PASSPHRASE
+  ASSET_ORDER                = ['Person', 'Project', 'Institution', 'Investigation', 'Study', 'Assay', 'Sample','Specimen','Strain', 'DataFile', 'Model', 'Sop', 'Publication', 'Presentation','SavedSearch', 'Organism', 'Event']
 
-ASSET_ORDER                = ['Person', 'Project', 'Institution', 'Investigation', 'Study', 'Assay', 'Sample','Specimen','Strain', 'DataFile', 'Model', 'Sop', 'Publication', 'Presentation','SavedSearch', 'Organism', 'Event']
+  PORTER_SECRET = "" unless defined? PORTER_SECRET
 
-PORTER_SECRET = "" unless defined? PORTER_SECRET
-
-Seek::Config.propagate_all
+  Seek::Config.propagate_all
 
 #these inflections are put here, because the config variables are just loaded after the propagation
-ActiveSupport::Inflector.inflections do |inflect|
-  inflect.human 'Specimen', Seek::Config.sample_parent_term.capitalize  unless Seek::Config.sample_parent_term.blank?
-  inflect.human 'specimen', Seek::Config.sample_parent_term.capitalize  unless Seek::Config.sample_parent_term.blank?
+  ActiveSupport::Inflector.inflections do |inflect|
+    inflect.human 'Specimen', Seek::Config.sample_parent_term.capitalize  unless Seek::Config.sample_parent_term.blank?
+    inflect.human 'specimen', Seek::Config.sample_parent_term.capitalize  unless Seek::Config.sample_parent_term.blank?
+  end
+
+
+  Annotations::Config.attribute_names_to_allow_duplicates.concat(["tag"])
+  Annotations::Config.versioning_enabled = false
+
+  ENV['LANG'] = 'en_US.UTF-8'
+
+
+  if ActiveRecord::Base.connection.table_exists? 'delayed_jobs'
+    SendPeriodicEmailsJob.create_initial_jobs
+  end
+
+  ConvertOffice::ConvertOfficeConfig.options =
+      {
+          :java_bin=>"java",
+          :soffice_port=>8100,
+          :nailgun=>false,
+          :verbose=>false,
+          :asynchronous=>false
+      }
 end
 
 
-Annotations::Config.attribute_names_to_allow_duplicates.concat(["tag"])
-Annotations::Config.versioning_enabled = false
-
-ENV['LANG'] = 'en_US.UTF-8'
-
-
-if ActiveRecord::Base.connection.table_exists? 'delayed_jobs'
-  SendPeriodicEmailsJob.create_initial_jobs
-end
-
-ConvertOffice::ConvertOfficeConfig.options =
-{
-    :java_bin=>"java",
-    :soffice_port=>8100,
-    :nailgun=>false,
-    :verbose=>false,
-    :asynchronous=>false
-}
