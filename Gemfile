@@ -51,7 +51,7 @@ gem 'acts_as_trashable'
 gem 'acts_as_tree'
 gem "app_version", :git => "git://github.com/SysMO-DB/app_version.git"
 gem 'doi_query_tool', :git => "git://github.com/SysMO-DB/doi_query_tool.git"
-#disabled - doesn't like rails 3 - gem 'fleximage'
+#gem 'fleximage'
 gem 'country-select'
 gem 'modporter-plugin'
 gem "will_paginate", "~> 3.0.4"
