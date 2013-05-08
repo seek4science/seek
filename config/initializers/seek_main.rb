@@ -35,6 +35,7 @@ require 'will_paginate'
 require 'piwik_analytics'
 require 'rack/bug'
 require 'responds_to_parent'
+require 'pothoven-attachment_fu'
 
 SEEK::Application.configure do
   GLOBAL_PASSPHRASE="ohx0ipuk2baiXah" unless defined? GLOBAL_PASSPHRASE

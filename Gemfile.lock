@@ -177,6 +177,7 @@ GEM
       activesupport
       rails (>= 3.0.0)
     polyglot (0.3.3)
+    pothoven-attachment_fu (3.2.8)
     pr_geohash (1.0.0)
     pry (0.9.12.1)
       coderay (~> 1.0.5)
@@ -327,6 +328,7 @@ DEPENDENCIES
   mysql
   parallel_tests
   piwik_analytics
+  pothoven-attachment_fu
   pry
   pry-doc
   pry-remote
