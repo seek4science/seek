@@ -1,4 +1,4 @@
-class CreateExperiments < ActiveRecord::Migration
+class CreateExperimentsTwo < ActiveRecord::Migration
   def self.up
     create_table :experiments do |t|
       t.string :title
