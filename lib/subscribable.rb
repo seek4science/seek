@@ -1,7 +1,7 @@
 module Subscribable
   def self.included klass
     klass.class_eval do
-      has_many :subscriptions, :required_access_to_owner => false, :as => :subscribable, :dependent => :destroy, :autosave => true, :before_add => proc {|item, sub| sub.subscribable = item}
+      has_many :subscriptions, :as => :subscribable, :dependent => :destroy, :autosave => true, :before_add => proc {|item, sub| sub.subscribable = item} #,:required_access_to_owner => false,
       after_create :set_subscription_job if self.subscribable?
       after_update :update_subscription_job_if_study_or_assay if self.subscribable?
       extend ClassMethods

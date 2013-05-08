@@ -19,7 +19,7 @@ module Seek
 
           include ProjectCompat unless method_defined? :projects
 
-          belongs_to :policy, :required_access_to_owner => :manage, :autosave => true
+          belongs_to :policy, :autosave => true #, :required_access_to_owner => :manage
 
 
           after_save :queue_update_auth_table
