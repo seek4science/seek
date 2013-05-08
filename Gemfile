@@ -46,17 +46,17 @@ gem 'acts-as-taggable-on'
 gem 'acts_as_activity_logged', :git => "git://github.com/SysMO-DB/acts_as_activity_logged.git"
 gem 'acts_as_list'
 gem 'acts_as_trashable'
-gem 'acts_as_tree'
+#disabled - doesn't like rails 3 - gem 'acts_as_tree'
 gem "app_version", :git => "git://github.com/SysMO-DB/app_version.git"
 gem 'doi_query_tool', :git => "git://github.com/SysMO-DB/doi_query_tool.git"
-gem 'fleximage'
+#disabled - doesn't like rails 3 - gem 'fleximage'
 gem 'country-select'
 gem 'modporter-plugin'
-gem 'will_paginate',"~> 2.3.16"
+#disabled - doesn't like rails 3 - gem 'will_paginate',"~> 2.3.16"
 gem 'my_savage_beast', :git => 'git://github.com/quyen/my_savage_beast'
-gem 'gibberish', :git => "git://github.com/SysMO-DB/gibberish.git"
+#disabled - doesn't like rails 3 - gem 'gibberish', :git => "git://github.com/SysMO-DB/gibberish.git"
 gem 'white_list', :git => "git://github.com/quyen/white_list.git"
-gem 'white_list_formatted_content', :git => "git://github.com/quyen/white_list_formatted_content.git"
+#disabled - doesn't like rails 3 - gem 'white_list_formatted_content', :git => "git://github.com/quyen/white_list_formatted_content.git"
 gem 'pubmed_query_tool', :git => "git://github.com/quyen/pubmed_query_tool.git"
 gem 'my_rails_settings', :git => "git://github.com/quyen/my_rails_settings.git"
 gem 'piwik_analytics'
