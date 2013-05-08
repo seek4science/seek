@@ -11,7 +11,7 @@ SEEK::Application.configure do
   config.action_controller.consider_all_requests_local = false
 
   config.action_controller.perform_caching             = true
-  config.action_controller.cache_store = [:file_store, "#{RAILS_ROOT}/tmp/cache"]
+  config.action_controller.cache_store = [:file_store, "#{Rails.root}/tmp/cache"]
   config.cache_store = [:file_store, "#{Rails.root}/tmp/cache"]
   #config.action_view.cache_template_loading            = true
 
