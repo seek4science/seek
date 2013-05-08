@@ -1,5 +1,8 @@
 # Filters added to this controller apply to all controllers in the application.
 # Likewise, all the methods added will be available for all controllers.
+
+require 'authenticated_system'
+
 class ApplicationController < ActionController::Base
   #require_dependency File.join(Gem.loaded_specs['my_annotations'].full_gem_path,'lib','app','controllers','application_controller')
 
@@ -9,14 +12,14 @@ class ApplicationController < ActionController::Base
 
   include CommonSweepers
 
-  include ExceptionNotifiable
+  include ExceptionNotification::Notifiable
   self.error_layout="errors"
   self.silent_exceptions = []
   self.rails_error_classes = {
   ActiveRecord::RecordNotFound => "404",
   ::ActionController::UnknownController => "404",
   ::ActionController::UnknownAction => "404",
-  ::ActionController::RoutingError => "404",  
+  ::ActionController::RoutingError => "404",
   ::ActionView::MissingTemplate => "406",
   ::ActionView::TemplateError => "500"
   }

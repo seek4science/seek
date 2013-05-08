@@ -1,4 +1,5 @@
 require 'grouped_pagination'
+require 'acts_as_cached_tree'
 
 class Strain < ActiveRecord::Base
   include Seek::Rdf::RdfGeneration

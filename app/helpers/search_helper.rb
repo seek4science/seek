@@ -1,3 +1,5 @@
+require 'seek/external_search'
+
 module SearchHelper
   include Seek::ExternalSearch
   def search_type_options

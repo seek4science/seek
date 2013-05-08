@@ -1,4 +1,5 @@
 require 'tempfile'
+require 'dot_generator'
 
 module ISAHelper
 
