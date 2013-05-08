@@ -85,8 +85,6 @@ Rails::Initializer.run do |config|
       :person_reindexer,
       :assets_creator_reindexer
 
-  config.gem 'yaml_db'
-
 end
 
 
