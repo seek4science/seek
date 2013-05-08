@@ -59,6 +59,13 @@ gem 'white_list', :git => "git://github.com/quyen/white_list.git"
 gem 'white_list_formatted_content', :git => "git://github.com/quyen/white_list_formatted_content.git"
 gem 'pubmed_query_tool', :git => "git://github.com/quyen/pubmed_query_tool.git"
 gem 'my_rails_settings', :git => "git://github.com/quyen/my_rails_settings.git"
+gem 'piwik_analytics'
+gem 'rack-bug'
+gem 'redbox',"~> 1.0.4"
+gem "my_responds_to_parent", :git => "git://github.com/quyen/my_responds_to_parent.git"
+gem 'site_announcements', :git => 'git://github.com/quyen/site_announcements.git'
+gem "yaml_db", "~> 0.2.3"
+gem 'bioportal', :git => 'git://github.com/quyen/bioportal.git'
 
 
 group :development do
