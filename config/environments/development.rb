@@ -23,3 +23,12 @@ config.middleware.use "Rack::Bug",
   :secret_key => "CaeTyLU8Spfo1PiXNZ4cANaWeO4Y3ptYFjVRLbPo34gbAkV4wNLTDH2hHT8YAKV"
 
 config.cache_store = [:file_store, "#{RAILS_ROOT}/tmp/cache"]
+
+# Raise exception on mass assignment protection for Active Record models
+config.active_record.mass_assignment_sanitizer = :strict
+
+# Log the query plan for queries taking more than this (works
+# with SQLite, MySQL, and PostgreSQL)
+config.active_record.auto_explain_threshold_in_seconds = 0.5
+
+
