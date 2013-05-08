@@ -71,7 +71,7 @@ gem 'bioportal', :git => 'git://github.com/quyen/bioportal.git'
 
 
 group :development do
-  gem "sqlite3","1.3.4"
+  gem "sqlite3","1.3.7"
   gem "unicorn"
   gem "parallel_tests"
   gem "mongrel"
@@ -82,7 +82,7 @@ group :development do
 end
 
 group :test do
-  gem "sqlite3","1.3.4"
+  gem "sqlite3","1.3.7"
   gem "timocratic-test_benchmark"
   gem "ruby-prof"
   gem "webmock"
