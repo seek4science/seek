@@ -24,6 +24,12 @@ GIT
     doi_query_tool (0.0.0)
 
 GIT
+  remote: git://github.com/SysMO-DB/gibberish.git
+  revision: d24c42b9608f39f82e37e757f530d8199049c557
+  specs:
+    gibberish (1.0.0)
+
+GIT
   remote: git://github.com/myGrid/search_biomodel.git
   revision: e109ac6d8b102f7ecb65140c17d263b85e066870
   specs:
@@ -322,6 +328,7 @@ DEPENDENCIES
   factory_girl (= 2.6.4)
   fastercsv (= 1.5.1)
   fssm
+  gibberish!
   hpricot (~> 0.8.2)
   in_place_editing
   libxml-ruby (= 2.2.2)
