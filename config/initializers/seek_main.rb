@@ -40,6 +40,7 @@ require 'rightfield/rightfield'
 require 'seek/rdf/rdf_generation'
 require 'background_reindexing'
 require 'subscribable'
+require 'seek/permissions/publishing_permissions'
 
 SEEK::Application.configure do
   GLOBAL_PASSPHRASE="ohx0ipuk2baiXah" unless defined? GLOBAL_PASSPHRASE
@@ -75,6 +76,9 @@ SEEK::Application.configure do
           :verbose=>false,
           :asynchronous=>false
       }
+
+  #FIXME: having to do this suggests the gem init.rb isn't being invoked
+  ActiveRecord::Base.send(:include,SiteAnnouncements::Acts)
 end
 
 

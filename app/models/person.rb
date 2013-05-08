@@ -1,4 +1,5 @@
 require 'grouped_pagination'
+require 'site_announcements'
 
 class Person < ActiveRecord::Base
 
