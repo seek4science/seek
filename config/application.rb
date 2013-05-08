@@ -32,10 +32,8 @@ module SEEK
     # Run "rake -D time" for a list of tasks for finding time zone names. Uncomment to use default local time.
     config.time_zone = 'UTC'
 
-    # Use the database for sessions instead of the cookie-based default,
-    # which shouldn't be used to store highly confidential information
-    # (create the session table with "rake db:sessions:create")
-    #config.action_controller.session_store = :active_record_store
+    # Configure sensitive parameters which will be filtered from the log file.
+    config.filter_parameters += [:password]
 
     # Activate observers that should always be running
     config.active_record.observers = :annotation_reindexer,

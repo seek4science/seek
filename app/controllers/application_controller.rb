@@ -54,8 +54,6 @@ class ApplicationController < ActionController::Base
 
   layout "main"
 
-  protect_from_forgery
-
   def set_no_layout
     self.class.layout nil
   end
@@ -331,10 +329,6 @@ class ApplicationController < ActionController::Base
       false
     end
   end
-  # See ActionController::Base for details
-  # Uncomment this to filter the contents of submitted sensitive data parameters
-  # from your application log (in this case, all fields with names like "password"). 
-  filter_parameter_logging :password
 
   def log_event
     User.with_current_user current_user do
