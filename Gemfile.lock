@@ -109,6 +109,7 @@ GEM
       activerecord (>= 3.0)
     acts_as_trashable (1.0.6)
       activerecord (>= 2.2)
+    acts_as_tree (0.2.0)
     addressable (2.3.4)
     akami (1.2.0)
       gyoku (>= 0.4.0)
@@ -303,6 +304,7 @@ DEPENDENCIES
   acts_as_activity_logged!
   acts_as_list
   acts_as_trashable
+  acts_as_tree
   app_version!
   bio
   bioportal!

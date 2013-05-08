@@ -48,7 +48,7 @@ gem 'acts-as-taggable-on'
 gem 'acts_as_activity_logged', :git => "git://github.com/SysMO-DB/acts_as_activity_logged.git"
 gem 'acts_as_list'
 gem 'acts_as_trashable'
-#disabled - doesn't like rails 3 - gem 'acts_as_tree'
+gem 'acts_as_tree'
 gem "app_version", :git => "git://github.com/SysMO-DB/app_version.git"
 gem 'doi_query_tool', :git => "git://github.com/SysMO-DB/doi_query_tool.git"
 #disabled - doesn't like rails 3 - gem 'fleximage'
