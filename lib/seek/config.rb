@@ -1,3 +1,5 @@
+require 'simple_crypt'
+
 module Seek
 
   # Fallback attribute, which if defined will be the result if the stored/default value for a setting is nil

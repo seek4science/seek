@@ -60,7 +60,7 @@ gem 'my_savage_beast', :git => 'git://github.com/quyen/my_savage_beast'
 gem 'white_list', :git => "git://github.com/quyen/white_list.git"
 #disabled - doesn't like rails 3 - gem 'white_list_formatted_content', :git => "git://github.com/quyen/white_list_formatted_content.git"
 gem 'pubmed_query_tool', :git => "git://github.com/quyen/pubmed_query_tool.git"
-gem 'my_rails_settings', :git => "git://github.com/quyen/my_rails_settings.git"
+gem 'my_rails_settings', :git => "git://github.com/quyen/my_rails_settings.git", :require=>"settings"
 gem 'piwik_analytics'
 gem 'rack-bug'
 gem 'redbox',"~> 1.0.4"
