@@ -12,20 +12,9 @@ class ApplicationController < ActionController::Base
 
   include CommonSweepers
 
-  include ExceptionNotification::Notifiable
-  self.error_layout="errors"
-  self.silent_exceptions = []
-  self.rails_error_classes = {
-  ActiveRecord::RecordNotFound => "404",
-  ::ActionController::UnknownController => "404",
-  ::ActionController::UnknownAction => "404",
-  ::ActionController::RoutingError => "404",
-  ::ActionView::MissingTemplate => "406",
-  ::ActionView::TemplateError => "500"
-  }
-  local_addresses.clear
 
-  exception_data :additional_exception_notifier_data
+
+  before_filter :log_extra_exception_data
 
   after_filter :log_event
 
@@ -479,10 +468,10 @@ class ApplicationController < ActionController::Base
     end
   end
 
-  def additional_exception_notifier_data
-    {
-        :current_logged_in_user=>current_user
-    }
+  def log_extra_exception_data
+      request.env["exception_notifier.exception_data"] = {
+          :current_logged_in_user=>current_user
+      }
   end
 
 end
