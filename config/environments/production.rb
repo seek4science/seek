@@ -7,8 +7,6 @@ SEEK::Application.configure do
 # Use a different logger for distributed setups
 # config.logger = SyslogLogger.new
 
-# Full error reports are disabled and caching is turned on
-  config.action_controller.consider_all_requests_local = false
 
   config.action_controller.perform_caching             = true
   config.action_controller.cache_store = [:file_store, "#{Rails.root}/tmp/cache"]
