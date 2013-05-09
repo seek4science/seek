@@ -1,3 +1,5 @@
+
+
 class Organism < ActiveRecord::Base
   include Seek::Rdf::RdfGeneration
 
