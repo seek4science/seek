@@ -42,6 +42,12 @@ GIT
     site_announcements (1.0.0)
 
 GIT
+  remote: git://github.com/myGrid/annotations.git
+  revision: 34f543bd114058eb700261db0839cddbb5a0675d
+  specs:
+    my_annotations (0.6.0)
+
+GIT
   remote: git://github.com/myGrid/search_biomodel.git
   revision: e109ac6d8b102f7ecb65140c17d263b85e066870
   specs:
@@ -179,7 +185,6 @@ GEM
       fastthread (>= 1.0.1)
       gem_plugin (>= 0.2.3)
     multi_json (1.7.3)
-    my_annotations (0.6.0)
     mysql2 (0.3.11)
     nokogiri (1.5.9)
     nori (1.1.5)
@@ -340,7 +345,7 @@ DEPENDENCIES
   libxml-ruby (= 2.2.2)
   modporter-plugin
   mongrel
-  my_annotations (= 0.6.0)
+  my_annotations!
   my_rails_settings!
   my_responds_to_parent!
   my_savage_beast!
