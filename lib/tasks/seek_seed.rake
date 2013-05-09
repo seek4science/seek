@@ -144,7 +144,7 @@ namespace :seek do
           policy = Policy.public_policy
           policy.save
           strain.policy_id = policy.id
-          strain.send(:update_without_callbacks)
+          strain.update_column(:policy_id,policy.id)
         end
       end
     end
