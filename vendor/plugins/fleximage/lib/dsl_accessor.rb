@@ -30,10 +30,11 @@ class Class
 
     self.class.class_eval do
       define_method("#{name}=") do |value|
-        writer = read_inheritable_attribute(:"#{name}_writer")
+        writer = self.send(:"#{name}_writer")
         value  = writer.call(value) if writer
         class_attribute :"#{name}"
-        self.send :"#{name}", value
+        self.send :"#{name}=", value
+
       end
 
       define_method(name) do |*values|
@@ -41,11 +42,11 @@ class Class
           # getter method
           key = :"#{name}"
           if !inheritable_attributes.has_key?(key)
-            default = read_inheritable_attribute(:"#{name}_default")
+            default = self.send(:"#{name}_default")
             value   = default ? default.call(self) : nil
             __send__("#{name}=", value)
           end
-          read_inheritable_attribute(key)
+          self.send(key)
         else
           # setter method
           __send__("#{name}=", *values)
