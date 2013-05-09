@@ -1,5 +1,5 @@
 require 'digest/sha1'
-
+require 'savage_beast/user_init'
 
 class User < ActiveRecord::Base
   acts_as_annotation_source

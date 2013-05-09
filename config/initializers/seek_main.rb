@@ -77,8 +77,6 @@ SEEK::Application.configure do
           :asynchronous=>false
       }
 
-  #FIXME: having to do this suggests the gem init.rb isn't being invoked
-  ActiveRecord::Base.send(:include,SiteAnnouncements::Acts)
 end
 
 

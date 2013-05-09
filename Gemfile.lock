@@ -30,6 +30,12 @@ GIT
     gibberish (1.0.0)
 
 GIT
+  remote: git://github.com/SysMO-DB/my_savage_beast
+  revision: 8a69e1d76c1e384a2945bcb1c7fccf7fa11b9c78
+  specs:
+    my_savage_beast (2.3)
+
+GIT
   remote: git://github.com/SysMO-DB/site_announcements.git
   revision: 02b574ac8396534c4917d3fd29ceb7496c27060e
   specs:
@@ -58,12 +64,6 @@ GIT
   revision: 383a017f16c418a1f47cab33eb37b1f42b29ca77
   specs:
     my_responds_to_parent (1.0.0)
-
-GIT
-  remote: git://github.com/quyen/my_savage_beast
-  revision: b3613ae914e5ae8801f0a27d88489c87fd418a3f
-  specs:
-    my_savage_beast (2.3)
 
 GIT
   remote: git://github.com/quyen/pubmed_query_tool.git
