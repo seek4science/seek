@@ -222,6 +222,8 @@ GEM
       activesupport (= 3.2.13)
       bundler (~> 1.0)
       railties (= 3.2.13)
+    rails_autolink (1.1.0)
+      rails (> 3.1)
     railties (3.2.13)
       actionpack (= 3.2.13)
       activesupport (= 3.2.13)
@@ -352,6 +354,7 @@ DEPENDENCIES
   pubmed_query_tool!
   rack-openid
   rails (= 3.2.13)
+  rails_autolink
   ratom (= 0.6.9)
   rdf (>= 0.3.8)
   rdf-rdfxml (>= 0.3.8)

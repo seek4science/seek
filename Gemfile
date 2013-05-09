@@ -69,6 +69,8 @@ gem 'site_announcements', :git => 'git://github.com/SysMO-DB/site_announcements.
 gem "yaml_db"
 gem 'bioportal', :git => 'git://github.com/quyen/bioportal.git'
 
+gem 'rails_autolink'
+
 
 group :development do
   gem "sqlite3","1.3.7"
