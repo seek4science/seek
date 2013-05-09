@@ -49,31 +49,31 @@ GIT
 
 GIT
   remote: git://github.com/quyen/bioportal.git
-  revision: 7a41485cfb1dbd827ca702c1b57c89aecd13704c
+  revision: 285f58adbeb922ce1c362846a40763672f54ab96
   specs:
     bioportal (1.0.0)
 
 GIT
   remote: git://github.com/quyen/my_rails_settings.git
-  revision: 771e1e12264cec529bbc3bec767aa52674c22d59
+  revision: e3f7fe9625ea27fea42b02c95e30cb4f1341655b
   specs:
     my_rails_settings (1.0.0)
 
 GIT
   remote: git://github.com/quyen/my_responds_to_parent.git
-  revision: 383a017f16c418a1f47cab33eb37b1f42b29ca77
+  revision: cb8f7fc4aa41023f96f34c6e90e67a154d4ea977
   specs:
     my_responds_to_parent (1.0.0)
 
 GIT
   remote: git://github.com/quyen/pubmed_query_tool.git
-  revision: ea5bc1af8a0200c197de312d8f3d1482771c83e2
+  revision: d2154fe9d56f628dd984220cb6bf01a51ad1bbe0
   specs:
     pubmed_query_tool (1.0.0)
 
 GIT
   remote: git://github.com/quyen/white_list.git
-  revision: b7d4ff0a87d1e5ea4fee5c43f7191b1a2d68e056
+  revision: 20b0e09d6a795f3a1dbda2aa6abe3aaa8f8ca8b4
   specs:
     white_list (1.0.0)
 
@@ -88,32 +88,33 @@ GEM
   remote: http://gems.github.com/
   specs:
     RedCloth (4.2.9)
-    actionmailer (3.2.13)
-      actionpack (= 3.2.13)
-      mail (~> 2.5.3)
-    actionpack (3.2.13)
-      activemodel (= 3.2.13)
-      activesupport (= 3.2.13)
+    actionmailer (3.1.12)
+      actionpack (= 3.1.12)
+      mail (~> 2.4.4)
+    actionpack (3.1.12)
+      activemodel (= 3.1.12)
+      activesupport (= 3.1.12)
       builder (~> 3.0.0)
       erubis (~> 2.7.0)
-      journey (~> 1.0.4)
-      rack (~> 1.4.5)
+      i18n (~> 0.6)
+      rack (~> 1.3.6)
       rack-cache (~> 1.2)
+      rack-mount (~> 0.8.2)
       rack-test (~> 0.6.1)
-      sprockets (~> 2.2.1)
-    activemodel (3.2.13)
-      activesupport (= 3.2.13)
+      sprockets (~> 2.0.4)
+    activemodel (3.1.12)
+      activesupport (= 3.1.12)
       builder (~> 3.0.0)
-    activerecord (3.2.13)
-      activemodel (= 3.2.13)
-      activesupport (= 3.2.13)
-      arel (~> 3.0.2)
+      i18n (~> 0.6)
+    activerecord (3.1.12)
+      activemodel (= 3.1.12)
+      activesupport (= 3.1.12)
+      arel (~> 2.2.3)
       tzinfo (~> 0.3.29)
-    activeresource (3.2.13)
-      activemodel (= 3.2.13)
-      activesupport (= 3.2.13)
-    activesupport (3.2.13)
-      i18n (= 0.6.1)
+    activeresource (3.1.12)
+      activemodel (= 3.1.12)
+      activesupport (= 3.1.12)
+    activesupport (3.1.12)
       multi_json (~> 1.0)
     acts-as-taggable-on (2.4.1)
       rails (>= 3, < 5)
@@ -126,7 +127,7 @@ GEM
     akami (1.2.0)
       gyoku (>= 0.4.0)
       nokogiri (>= 1.4.0)
-    arel (3.0.2)
+    arel (2.2.3)
     bio (1.4.3)
     breadcrumbs_on_rails (1.0.1)
     builder (3.0.4)
@@ -160,13 +161,12 @@ GEM
     hpricot (0.8.6)
     httpi (1.1.1)
       rack
-    i18n (0.6.1)
+    i18n (0.6.4)
     in_place_editing (1.2.0)
-    journey (1.0.4)
     json (1.7.7)
     kgio (2.8.0)
     libxml-ruby (2.2.2)
-    mail (2.5.3)
+    mail (2.4.4)
       i18n (>= 0.4.0)
       mime-types (~> 1.16)
       treetop (~> 1.4.8)
@@ -185,7 +185,7 @@ GEM
     nori (1.1.5)
     open4 (1.3.0)
     parallel (0.6.4)
-    parallel_tests (0.12.2)
+    parallel_tests (0.12.3)
       parallel
     piwik_analytics (1.0.2)
       actionpack
@@ -204,9 +204,11 @@ GEM
     pry-remote (0.1.7)
       pry (~> 0.9)
       slop (~> 3.0)
-    rack (1.4.5)
+    rack (1.3.10)
     rack-cache (1.2)
       rack (>= 0.4)
+    rack-mount (0.8.3)
+      rack (>= 1.0.0)
     rack-openid (1.3.1)
       rack (>= 1.1.0)
       ruby-openid (>= 2.1.8)
@@ -214,23 +216,23 @@ GEM
       rack
     rack-test (0.6.2)
       rack (>= 1.0)
-    rails (3.2.13)
-      actionmailer (= 3.2.13)
-      actionpack (= 3.2.13)
-      activerecord (= 3.2.13)
-      activeresource (= 3.2.13)
-      activesupport (= 3.2.13)
+    rails (3.1.12)
+      actionmailer (= 3.1.12)
+      actionpack (= 3.1.12)
+      activerecord (= 3.1.12)
+      activeresource (= 3.1.12)
+      activesupport (= 3.1.12)
       bundler (~> 1.0)
-      railties (= 3.2.13)
+      railties (= 3.1.12)
     rails_autolink (1.1.0)
       rails (> 3.1)
-    railties (3.2.13)
-      actionpack (= 3.2.13)
-      activesupport (= 3.2.13)
+    railties (3.1.12)
+      actionpack (= 3.1.12)
+      activesupport (= 3.1.12)
       rack-ssl (~> 1.3.2)
       rake (>= 0.8.7)
       rdoc (~> 3.4)
-      thor (>= 0.14.6, < 2.0)
+      thor (~> 0.14.6)
     raindrops (0.11.0)
     rake (10.0.4)
     ratom (0.6.9)
@@ -272,9 +274,8 @@ GEM
       open4 (= 1.3.0)
       open4 (= 1.3.0)
     slop (3.4.4)
-    sprockets (2.2.2)
+    sprockets (2.0.4)
       hike (~> 1.2)
-      multi_json (~> 1.0)
       rack (~> 1.0)
       tilt (~> 1.1, != 1.3.0)
     sqlite3 (1.3.7)
@@ -285,8 +286,8 @@ GEM
       nokogiri
       sunspot (= 1.3.3)
     sunspot_solr (1.3.3)
-    thor (0.18.1)
-    tilt (1.4.0)
+    thor (0.14.6)
+    tilt (1.4.1)
     timocratic-test_benchmark (0.4.3)
     treetop (1.4.12)
       polyglot
@@ -316,7 +317,7 @@ DEPENDENCIES
   acts_as_activity_logged!
   acts_as_list
   acts_as_trashable
-  acts_as_tree
+  acts_as_tree (= 0.2.0)
   app_version!
   bio
   bioportal!
@@ -353,7 +354,7 @@ DEPENDENCIES
   pry-remote
   pubmed_query_tool!
   rack-openid
-  rails (= 3.2.13)
+  rails (= 3.1.12)
   rails_autolink
   ratom (= 0.6.9)
   rdf (>= 0.3.8)

@@ -1,7 +1,7 @@
 source 'https://rubygems.org'
 source 'http://gems.github.com'
 
-gem "rails", "3.2.13"
+gem "rails", "3.1.12"
 gem "rdoc"
 
 gem 'rubaidh-google_analytics', "~>1.1.4",:require => 'rubaidh/google_analytics'
@@ -48,7 +48,7 @@ gem 'acts-as-taggable-on'
 gem 'acts_as_activity_logged', :git => "git://github.com/SysMO-DB/acts_as_activity_logged.git"
 gem 'acts_as_list'
 gem 'acts_as_trashable'
-gem 'acts_as_tree'
+gem 'acts_as_tree',"0.2.0"
 gem "app_version", :git => "git://github.com/SysMO-DB/app_version.git"
 gem 'doi_query_tool', :git => "git://github.com/SysMO-DB/doi_query_tool.git"
 #disabled - doesn't like rails 3 - gem 'fleximage'
