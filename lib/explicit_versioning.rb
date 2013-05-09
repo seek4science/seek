@@ -60,7 +60,7 @@ module Jits
             end
           end
 
-          versioned_class.set_table_name versioned_table_name
+          versioned_class.table_name = versioned_table_name
           versioned_class.belongs_to self.to_s.demodulize.underscore.to_sym,
             :class_name  => "::#{self.to_s}",
             :foreign_key => versioned_foreign_key
