@@ -21,5 +21,6 @@ SEEK::Application.configure do
   # config.action_mailer.raise_delivery_errors = false
   #
   #
+  config.active_support.deprecation = :notify
 end
 
