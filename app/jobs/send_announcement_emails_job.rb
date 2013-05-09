@@ -18,7 +18,9 @@ class SendAnnouncementEmailsJob < Struct.new(:site_announcement_id, :from_notifi
   end
 
   def self.create_job site_announcement_id, from_notifiee_id, t=30.seconds.from_now, priority=DEFAULT_PRIORITY
-    Delayed::Job.enqueue(SendAnnouncementEmailsJob.new(site_announcement_id, from_notifiee_id), priority, t) unless exists?(site_announcement_id, from_notifiee_id)
+    unless exists?(site_announcement_id, from_notifiee_id)
+      Delayed::Job.enqueue(SendAnnouncementEmailsJob.new(site_announcement_id, from_notifiee_id), :priority=>priority, :run_at=>t)
+    end
   end
 
   def send_announcement_emails site_announcement, from_notifiee_id

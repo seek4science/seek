@@ -12,6 +12,9 @@ class RemoveSubscriptionsForItemJob < Struct.new(:subscribable_type,:subscribabl
   end
 
   def self.create_job subscribable_type, subscribable_id, old_project_ids, t=5.seconds.from_now, priority=1
-    Delayed::Job.enqueue(RemoveSubscriptionsForItemJob.new(subscribable_type, subscribable_id, old_project_ids), priority, t) unless exists?(subscribable_type, subscribable_id, old_project_ids)
+    unless exists?(subscribable_type, subscribable_id, old_project_ids)
+      Delayed::Job.enqueue(RemoveSubscriptionsForItemJob.new(subscribable_type, subscribable_id, old_project_ids), :priority=>priority, :run_at=>t)
+    end
+
   end
 end

@@ -83,7 +83,7 @@ class AuthLookupUpdateJob
           # for users some additional simple code is required.
           AuthLookupUpdateQueue.create(:item=>item, :priority=>queuepriority) unless AuthLookupUpdateQueue.exists?(item)
         end
-        Delayed::Job.enqueue(AuthLookupUpdateJob.new, priority, t) unless AuthLookupUpdateJob.count>10
+        Delayed::Job.enqueue(AuthLookupUpdateJob.new, :priority=>priority, :run_at=>t) unless AuthLookupUpdateJob.count>10
       end
     end
   end

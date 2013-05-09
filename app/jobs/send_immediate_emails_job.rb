@@ -14,6 +14,6 @@ class SendImmediateEmailsJob < Struct.new(:activity_log_id)
   end
 
   def self.create_job activity_log_id, t=30.seconds.from_now, priority=DEFAULT_PRIORITY
-    Delayed::Job.enqueue(SendImmediateEmailsJob.new(activity_log_id), priority, t) unless exists? activity_log_id
+    Delayed::Job.enqueue(SendImmediateEmailsJob.new(activity_log_id), :priority=>priority, :run_at=>t) unless exists? activity_log_id
   end
 end
