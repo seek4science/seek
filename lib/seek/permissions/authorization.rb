@@ -14,8 +14,6 @@ module Seek
 
     module Authorization
 
-      @@logger = RAILS_DEFAULT_LOGGER
-
       def self.authorization_supported? thing
         !thing.nil? && thing.authorization_supported?
       end

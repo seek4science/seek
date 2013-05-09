@@ -29,8 +29,8 @@ class SendAnnouncementEmailsJob < Struct.new(:site_announcement_id, :from_notifi
             Mailer.deliver_announcement_notification(site_announcement, notifiee_info, Seek::Config.site_base_host.gsub(/https?:\/\//,''))
           end
         rescue Exception=>e
-          if defined? RAILS_DEFAULT_LOGGER
-            RAILS_DEFAULT_LOGGER.error "There was a problem sending an announcement email to #{notifiee_info.notifiee.try(:email)} - #{e.message}."
+          if defined? Rails.logger
+            Rails.logger.error "There was a problem sending an announcement email to #{notifiee_info.notifiee.try(:email)} - #{e.message}."
           end
         end
       end

@@ -33,7 +33,7 @@ class ModelsController < ApplicationController
       xgmml_doc = head + body
 
       xgmml_file =  "model_#{@model.id}_version_#{@display_model.version}_export.xgmml"
-      tmp_file= Tempfile.new("#{xgmml_file}","#{RAILS_ROOT}/tmp/")
+      tmp_file= Tempfile.new("#{xgmml_file}","#{Rails.root}/tmp/")
       File.open(tmp_file.path,"w") do |tmp|
         tmp.write xgmml_doc
       end

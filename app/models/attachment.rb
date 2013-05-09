@@ -30,7 +30,7 @@ class Attachment < ActiveRecord::Base
   end
 
   def filepath
-      "#{RAILS_ROOT}/public/#{public_filename}"
+      "#{Rails.root}/public/#{public_filename}"
   end
 
 end

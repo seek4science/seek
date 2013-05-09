@@ -186,7 +186,7 @@ class ModelImagesController < ApplicationController
   def cache_path(image, size=nil, include_local_name=false)
 
     id = image.kind_of?(Integer) ? image : image.id
-    rtn = "#{RAILS_ROOT}/tmp/model_images"
+    rtn = "#{Rails.root}/tmp/model_images"
     rtn = "#{rtn}/#{size}" if size
     rtn = "#{rtn}/#{id}.#{ModelImage.image_storage_format}" if include_local_name
 
