@@ -14,7 +14,7 @@ gem 'uuidtools',"2.1.1"
 gem "RedCloth","4.2.9"
 gem 'simple-spreadsheet-extractor',"0.12.1"
 gem "rmagick","2.12.2"
-gem "mysql"
+gem "mysql2"
 gem 'rest-client',">=1.6.1"
 gem 'calendar_date_select'
 gem 'factory_girl',"2.6.4"

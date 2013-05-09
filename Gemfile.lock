@@ -180,7 +180,7 @@ GEM
       gem_plugin (>= 0.2.3)
     multi_json (1.7.3)
     my_annotations (0.6.0)
-    mysql (2.9.1)
+    mysql2 (0.3.11)
     nokogiri (1.5.9)
     nori (1.1.5)
     open4 (1.3.0)
@@ -345,7 +345,7 @@ DEPENDENCIES
   my_rails_settings!
   my_responds_to_parent!
   my_savage_beast!
-  mysql
+  mysql2
   parallel_tests
   piwik_analytics
   pothoven-attachment_fu
