@@ -1,4 +1,4 @@
-class ChangeSexFromBooleanToInteger < ActiveRecord::Migration
+class ChangeSpecSexFromBooleanToInteger < ActiveRecord::Migration
   def self.up
     change_column :specimens, :sex, :integer
   end
