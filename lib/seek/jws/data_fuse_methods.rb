@@ -3,9 +3,7 @@ require 'libxml'
 
 module Seek
   module JWS
-    module DataFuse
-
-      MOCKED_RESPONSE=false
+    module DataFuseMethods
 
       class DataFuseResult
         attr_accessor :graph_url, :csv_url, :id, :name
@@ -16,8 +14,6 @@ module Seek
       end
 
       def submit_parameter_values_to_jws_online model, matching_keys, parameter_values_csv
-
-        return process_data_fuse_response(dummy_data_fuse_response_xml) if MOCKED_RESPONSE
 
         filepath=model.content_blob.filepath
 
