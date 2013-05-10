@@ -46,7 +46,7 @@ class Assay < ActiveRecord::Base
     'ON assay_assets.asset_id = ' + asset_class_underscored + '_id ' + 
     'AND assay_assets.asset_type = \'' + asset_class + '\' ' + 
     'WHERE (assay_assets.version = ' + asset_class_underscored + '_versions.version ' +
-    'AND assay_assets.assay_id = #{self.id})' 
+    "AND assay_assets.assay_id = #{self.id})"
   end
 
   #FIXME: These should be reversed, with the concrete version becoming the primary case, and versioned assets becoming secondary
