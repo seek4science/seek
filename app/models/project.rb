@@ -11,7 +11,8 @@ class Project < ActiveRecord::Base
   include SimpleCrypt
 
   title_trimmer
-  
+
+  default_scope :order => :name
   validates_uniqueness_of :name
 
   grouped_pagination :pages=>("A".."Z").to_a, :default_page => Seek::Config.default_page(self.name.underscore.pluralize) #shouldn't need "Other" tab for project

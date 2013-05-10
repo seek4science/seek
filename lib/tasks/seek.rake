@@ -83,7 +83,7 @@ namespace :seek do
   task :create_default_subscriptions => :environment do
     People.each do |p|
       p.set_default_subscriptions
-      disable_authorization_checks {p.save(false)}
+      disable_authorization_checks {p.save(:validate=>false)}
     end
   end
   

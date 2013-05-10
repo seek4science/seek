@@ -68,7 +68,6 @@ class Person < ActiveRecord::Base
   has_many :assays,:foreign_key => :owner_id
   has_many :investigations,:foreign_key=>:contributor_id
 
-
   has_one :user, :dependent=>:destroy
 
   has_many :assets_creators, :dependent => :destroy, :foreign_key => "creator_id"
@@ -87,6 +86,9 @@ class Person < ActiveRecord::Base
 
   scope :without_group, :include=>:group_memberships, :conditions=>"group_memberships.person_id IS NULL"
   scope :registered,:include=>:user,:conditions=>"users.person_id != 0"
+
+  #FIXME: change userless_people to use this scope - unit tests
+  scope :not_registered,:include=>:user,:conditions=>"users.person_id IS NULL"
 
   alias_attribute :webpage,:web_page
 
@@ -161,8 +163,7 @@ class Person < ActiveRecord::Base
       user_items
     end
   end
-  #FIXME: change userless_people to use this scope - unit tests
-  scope :not_registered,:include=>:user,:conditions=>"users.person_id IS NULL"
+
 
   def self.userless_people
     p=Person.find(:all)

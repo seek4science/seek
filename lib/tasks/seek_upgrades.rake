@@ -130,7 +130,7 @@ namespace :seek do
 
   task(:update_first_letter_for_strain => :environment) do
     Strain.all.each do |strain|
-      disable_authorization_checks{strain.save(false)}
+      disable_authorization_checks{strain.save(:validate=>false)}
     end
   end
 
