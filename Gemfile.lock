@@ -36,6 +36,24 @@ GIT
     site_announcements (1.0.0)
 
 GIT
+  remote: git://github.com/SysMO-DB/my_savage_beast
+  revision: 8a69e1d76c1e384a2945bcb1c7fccf7fa11b9c78
+  specs:
+    my_savage_beast (2.3)
+
+GIT
+  remote: git://github.com/SysMO-DB/site_announcements.git
+  revision: 02b574ac8396534c4917d3fd29ceb7496c27060e
+  specs:
+    site_announcements (1.0.0)
+
+GIT
+  remote: git://github.com/myGrid/annotations.git
+  revision: 34f543bd114058eb700261db0839cddbb5a0675d
+  specs:
+    my_annotations (0.6.0)
+
+GIT
   remote: git://github.com/myGrid/search_biomodel.git
   revision: e109ac6d8b102f7ecb65140c17d263b85e066870
   specs:
@@ -43,37 +61,31 @@ GIT
 
 GIT
   remote: git://github.com/quyen/bioportal.git
-  revision: 7a41485cfb1dbd827ca702c1b57c89aecd13704c
+  revision: 285f58adbeb922ce1c362846a40763672f54ab96
   specs:
     bioportal (1.0.0)
 
 GIT
   remote: git://github.com/quyen/my_rails_settings.git
-  revision: 771e1e12264cec529bbc3bec767aa52674c22d59
+  revision: e3f7fe9625ea27fea42b02c95e30cb4f1341655b
   specs:
     my_rails_settings (1.0.0)
 
 GIT
   remote: git://github.com/quyen/my_responds_to_parent.git
-  revision: 383a017f16c418a1f47cab33eb37b1f42b29ca77
+  revision: cb8f7fc4aa41023f96f34c6e90e67a154d4ea977
   specs:
     my_responds_to_parent (1.0.0)
 
 GIT
-  remote: git://github.com/quyen/my_savage_beast
-  revision: b3613ae914e5ae8801f0a27d88489c87fd418a3f
-  specs:
-    my_savage_beast (2.3)
-
-GIT
   remote: git://github.com/quyen/pubmed_query_tool.git
-  revision: ea5bc1af8a0200c197de312d8f3d1482771c83e2
+  revision: d2154fe9d56f628dd984220cb6bf01a51ad1bbe0
   specs:
     pubmed_query_tool (1.0.0)
 
 GIT
   remote: git://github.com/quyen/white_list.git
-  revision: b7d4ff0a87d1e5ea4fee5c43f7191b1a2d68e056
+  revision: 20b0e09d6a795f3a1dbda2aa6abe3aaa8f8ca8b4
   specs:
     white_list (1.0.0)
 
@@ -179,13 +191,12 @@ GEM
       fastthread (>= 1.0.1)
       gem_plugin (>= 0.2.3)
     multi_json (1.7.3)
-    my_annotations (0.5.1)
-    mysql (2.9.1)
+    mysql2 (0.3.11)
     nokogiri (1.5.9)
     nori (1.1.5)
     open4 (1.3.0)
     parallel (0.6.4)
-    parallel_tests (0.12.2)
+    parallel_tests (0.12.3)
       parallel
     piwik_analytics (1.0.2)
       actionpack
@@ -205,8 +216,6 @@ GEM
       pry (~> 0.9)
       slop (~> 3.0)
     rack (1.4.5)
-    rack-bug (0.3.0)
-      rack (>= 1.0)
     rack-cache (1.2)
       rack (>= 0.4)
     rack-openid (1.3.1)
@@ -224,6 +233,8 @@ GEM
       activesupport (= 3.2.13)
       bundler (~> 1.0)
       railties (= 3.2.13)
+    rails_autolink (1.1.0)
+      rails (> 3.1)
     railties (3.2.13)
       actionpack (= 3.2.13)
       activesupport (= 3.2.13)
@@ -277,7 +288,7 @@ GEM
       multi_json (~> 1.0)
       rack (~> 1.0)
       tilt (~> 1.1, != 1.3.0)
-    sqlite3 (1.3.4)
+    sqlite3 (1.3.7)
     sunspot (1.3.3)
       pr_geohash (~> 1.0)
       rsolr (~> 1.0.7)
@@ -286,7 +297,7 @@ GEM
       sunspot (= 1.3.3)
     sunspot_solr (1.3.3)
     thor (0.18.1)
-    tilt (1.4.0)
+    tilt (1.4.1)
     timocratic-test_benchmark (0.4.3)
     treetop (1.4.12)
       polyglot
@@ -316,7 +327,7 @@ DEPENDENCIES
   acts_as_activity_logged!
   acts_as_list
   acts_as_trashable
-  acts_as_tree
+  acts_as_tree (= 0.2.0)
   app_version!
   bio
   bioportal!
@@ -340,11 +351,11 @@ DEPENDENCIES
   libxml-ruby (= 2.2.2)
   modporter-plugin
   mongrel
-  my_annotations (= 0.5.1)
+  my_annotations!
   my_rails_settings!
   my_responds_to_parent!
   my_savage_beast!
-  mysql
+  mysql2
   parallel_tests
   piwik_analytics
   pothoven-attachment_fu
@@ -352,9 +363,9 @@ DEPENDENCIES
   pry-doc
   pry-remote
   pubmed_query_tool!
-  rack-bug
   rack-openid
   rails (= 3.2.13)
+  rails_autolink
   ratom (= 0.6.9)
   rdf (>= 0.3.8)
   rdf-rdfxml (>= 0.3.8)
@@ -371,7 +382,7 @@ DEPENDENCIES
   search_biomodel (= 2.2.1)!
   simple-spreadsheet-extractor (= 0.12.1)
   site_announcements!
-  sqlite3 (= 1.3.4)
+  sqlite3 (= 1.3.7)
   sunspot_rails (= 1.3.3)
   sunspot_solr (= 1.3.3)
   timocratic-test_benchmark

@@ -14,7 +14,7 @@ gem 'uuidtools',"2.1.1"
 gem "RedCloth","4.2.9"
 gem 'simple-spreadsheet-extractor',"0.12.1"
 gem "rmagick","2.12.2"
-gem "mysql"
+gem "mysql2"
 gem 'rest-client',">=1.6.1"
 gem 'calendar_date_select'
 gem 'factory_girl',"2.6.4"
@@ -43,35 +43,37 @@ gem "pothoven-attachment_fu"
 gem "exception_notification"
 
 gem "fssm"
-gem 'my_annotations', "0.5.1"
+gem 'my_annotations', :git=>"git://github.com/myGrid/annotations.git"
 gem 'acts-as-taggable-on'
 gem 'acts_as_activity_logged', :git => "git://github.com/SysMO-DB/acts_as_activity_logged.git"
 gem 'acts_as_list'
 gem 'acts_as_trashable'
-gem 'acts_as_tree'
+gem 'acts_as_tree',"0.2.0"
 gem "app_version", :git => "git://github.com/SysMO-DB/app_version.git"
 gem 'doi_query_tool', :git => "git://github.com/SysMO-DB/doi_query_tool.git"
 #gem 'fleximage'
 gem 'country-select'
 gem 'modporter-plugin'
 gem "will_paginate", "~> 3.0.4"
-gem 'my_savage_beast', :git => 'git://github.com/quyen/my_savage_beast'
+gem 'my_savage_beast', :git => 'git://github.com/SysMO-DB/my_savage_beast'
 gem 'gibberish', :git => "git://github.com/SysMO-DB/gibberish.git"
 gem 'white_list', :git => "git://github.com/quyen/white_list.git"
 gem 'white_list_formatted_content', :git => "git://github.com/quyen/white_list_formatted_content.git"
 gem 'pubmed_query_tool', :git => "git://github.com/quyen/pubmed_query_tool.git"
 gem 'my_rails_settings', :git => "git://github.com/quyen/my_rails_settings.git", :require=>"settings"
 gem 'piwik_analytics'
-gem 'rack-bug'
+
 gem 'redbox'
 gem "my_responds_to_parent", :git => "git://github.com/quyen/my_responds_to_parent.git"
 gem 'site_announcements', :git => 'git://github.com/SysMO-DB/site_announcements.git'
 gem "yaml_db"
 gem 'bioportal', :git => 'git://github.com/quyen/bioportal.git'
 
+gem 'rails_autolink'
+
 
 group :development do
-  gem "sqlite3","1.3.4"
+  gem "sqlite3","1.3.7"
   gem "unicorn"
   gem "parallel_tests"
   gem "mongrel"
@@ -82,7 +84,7 @@ group :development do
 end
 
 group :test do
-  gem "sqlite3","1.3.4"
+  gem "sqlite3","1.3.7"
   gem "timocratic-test_benchmark"
   gem "ruby-prof"
   gem "webmock"

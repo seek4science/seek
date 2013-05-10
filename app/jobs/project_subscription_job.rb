@@ -17,7 +17,7 @@ class ProjectSubscriptionJob < Struct.new(:project_subscription_id)
   end
 
   def self.create_job project_subscription_id, t=15.seconds.from_now, priority=DEFAULT_PRIORITY
-    Delayed::Job.enqueue(ProjectSubscriptionJob.new(project_subscription_id), priority, t) unless exists? project_subscription_id
+    Delayed::Job.enqueue(ProjectSubscriptionJob.new(project_subscription_id), :priority=>priority, :run_at=>t) unless exists? project_subscription_id
   end
 
   def all_in_project project_subscription

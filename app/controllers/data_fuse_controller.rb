@@ -7,8 +7,8 @@ class DataFuseController < ApplicationController
   include Seek::MimeTypes
   include Seek::Models::ModelExtraction
   include SysMODB::SpreadsheetExtractor
-  include Seek::JWS::DataFuse
-  
+  include Seek::JWS::DataFuseMethods
+
   before_filter :login_required
   before_filter :is_user_admin_auth
 
@@ -92,7 +92,7 @@ class DataFuseController < ApplicationController
     raise Exception.new("Unauthorized") unless @model.can_download?
 
     resolve_model_parameter_keys parameter_keys,csv
-    
+
   end
 
   def submit

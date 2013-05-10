@@ -25,7 +25,7 @@ module Seek
     def self.persistent_classes
       @@persistent_classes ||= begin
         ensure_models_loaded
-        Object.subclasses_of(ActiveRecord::Base)
+        ActiveRecord::Base.descendants
       end
     end
 

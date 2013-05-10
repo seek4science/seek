@@ -7,7 +7,7 @@ class RdfGenerationJob < Struct.new(:item_type_name,:item_id,:destination_dir)
   end
 
   def self.create_job item,destination_dir=nil,t=Time.now, priority=DEFAULT_PRIORITY
-    Delayed::Job.enqueue RdfGenerationJob.new(item.class.name,item.id,destination_dir),priority,t
+    Delayed::Job.enqueue RdfGenerationJob.new(item.class.name,item.id,destination_dir),:priority=>priority,:run_at=>t
   end
 
 end

@@ -18,6 +18,11 @@ class Object
      end
   end
 
+  def disable_authorization_checks
+    Rails.logger.info "in disable authorization checks"
+    yield
+  end
+
 end
 
 Module.module_eval do

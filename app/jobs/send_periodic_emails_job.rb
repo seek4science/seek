@@ -43,7 +43,7 @@ class SendPeriodicEmailsJob < Struct.new(:frequency)
 
 
   def self.create_job frequency,t, priority=DEFAULT_PRIORITY, ignore_locked=false
-      Delayed::Job.enqueue(SendPeriodicEmailsJob.new(frequency),priority,t) unless exists?(frequency,ignore_locked)
+      Delayed::Job.enqueue(SendPeriodicEmailsJob.new(frequency),:priority=>priority,:run_at=>t) unless exists?(frequency,ignore_locked)
   end
 
   def send_subscription_mails logs, frequency

@@ -21,7 +21,7 @@ class ModelImage < ActiveRecord::Base
   end                                                                                                                                 #
 
   def original_path
-    "#{RAILS_ROOT}/#{Model_IMAGE_PATH}/original"
+    "#{Rails.root}/#{Model_IMAGE_PATH}/original"
   end
 
   def image_file= file

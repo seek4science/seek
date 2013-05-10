@@ -172,7 +172,7 @@ class Mailer < ActionMailer::Base
     begin      
       admins.map { |p| p.email_with_name }
     rescue
-      @@logger.error("Error determining admin email addresses")
+      Rails.logger.error("Error determining admin email addresses")
       ["sowen@cs.man.ac.uk"]
     end
   end
@@ -181,7 +181,7 @@ class Mailer < ActionMailer::Base
     begin
       project_manager.email_with_name
     rescue
-      @@logger.error("Error determining project manager #{project_manager.name} email addresses")
+      Rails.logger.error("Error determining project manager #{project_manager.name} email addresses")
       ["sowen@cs.man.ac.uk"]
     end
   end

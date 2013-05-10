@@ -5,31 +5,30 @@ SEEK::Application.configure do
   # since you don't have to restart the webserver when you make code changes.
   config.cache_classes = false
 
-#Got an error 'can't dup NilClass' and the internet told me this should fix it
+  #Got an error 'can't dup NilClass' and the internet told me this should fix it
   config.reload_plugins = true
 
-# Log error messages when you accidentally call methods on nil.
+  # Log error messages when you accidentally call methods on nil.
   config.whiny_nils = true
 
-# Show full error reports and disable caching
+  # Show full error reports and disable caching
   #config.action_controller.consider_all_requests_local = true
 
   config.action_controller.perform_caching = false
 
-# Don't care if the mailer can't send
+  # Don't care if the mailer can't send
   config.action_mailer.raise_delivery_errors = false
-
-  config.middleware.use "Rack::Bug",
-                        :secret_key => "CaeTyLU8Spfo1PiXNZ4cANaWeO4Y3ptYFjVRLbPo34gbAkV4wNLTDH2hHT8YAKV"
 
   config.cache_store = [:file_store, "#{Rails.root}/tmp/cache"]
 
-# Raise exception on mass assignment protection for Active Record models
+  # Raise exception on mass assignment protection for Active Record models
   config.active_record.mass_assignment_sanitizer = :strict
 
 # Log the query plan for queries taking more than this (works
 # with SQLite, MySQL, and PostgreSQL)
   config.active_record.auto_explain_threshold_in_seconds = 0.5
+
+  config.active_support.deprecation = :log
 end
 
 

@@ -21,7 +21,7 @@ class ReindexingJob
       end
     end
     if ReindexingQueue.count>0 && !ReindexingJob.exists?
-      Delayed::Job.enqueue(ReindexingJob.new, DEFAULT_PRIORITY, 1.seconds.from_now)
+      Delayed::Job.enqueue(ReindexingJob.new, :priority=>DEFAULT_PRIORITY, :run_at=>1.seconds.from_now)
     end
   end
 

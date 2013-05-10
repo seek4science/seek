@@ -1,4 +1,5 @@
 require 'grouped_pagination'
+require 'rfc822'
 
 class Person < ActiveRecord::Base
 
@@ -323,8 +324,8 @@ class Person < ActiveRecord::Base
     new_record? or user && (user.is_admin? || user.is_project_manager? || user == self.user)
   end
 
-  does_not_require_can_edit :roles_mask
-  requires_can_manage :roles_mask
+  #does_not_require_can_edit :roles_mask
+  #requires_can_manage :roles_mask
 
   def can_manage? user = User.current_user
     try_block{user.is_admin?}

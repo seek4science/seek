@@ -33,9 +33,14 @@ require 'acts_as_tree'
 require 'country-select'
 require 'will_paginate'
 require 'piwik_analytics'
-require 'rack/bug'
 require 'responds_to_parent'
 require 'pothoven-attachment_fu'
+
+require 'rightfield/rightfield'
+require 'seek/rdf/rdf_generation'
+require 'background_reindexing'
+require 'subscribable'
+require 'seek/permissions/publishing_permissions'
 
 SEEK::Application.configure do
   GLOBAL_PASSPHRASE="ohx0ipuk2baiXah" unless defined? GLOBAL_PASSPHRASE
@@ -59,9 +64,9 @@ SEEK::Application.configure do
   ENV['LANG'] = 'en_US.UTF-8'
 
 
-  if ActiveRecord::Base.connection.table_exists? 'delayed_jobs'
-    SendPeriodicEmailsJob.create_initial_jobs
-  end
+  #if ActiveRecord::Base.connection.table_exists? 'delayed_jobs'
+  #  SendPeriodicEmailsJob.create_initial_jobs
+  #end
 
   ConvertOffice::ConvertOfficeConfig.options =
       {
@@ -71,6 +76,7 @@ SEEK::Application.configure do
           :verbose=>false,
           :asynchronous=>false
       }
+
 end
 
 

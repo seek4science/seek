@@ -1,5 +1,8 @@
 # Filters added to this controller apply to all controllers in the application.
 # Likewise, all the methods added will be available for all controllers.
+
+require 'authenticated_system'
+
 class ApplicationController < ActionController::Base
   #require_dependency File.join(Gem.loaded_specs['my_annotations'].full_gem_path,'lib','app','controllers','application_controller')
 
@@ -9,20 +12,9 @@ class ApplicationController < ActionController::Base
 
   include CommonSweepers
 
-  include ExceptionNotifiable
-  self.error_layout="errors"
-  self.silent_exceptions = []
-  self.rails_error_classes = {
-  ActiveRecord::RecordNotFound => "404",
-  ::ActionController::UnknownController => "404",
-  ::ActionController::UnknownAction => "404",
-  ::ActionController::RoutingError => "404",  
-  ::ActionView::MissingTemplate => "406",
-  ::ActionView::TemplateError => "500"
-  }
-  local_addresses.clear
 
-  exception_data :additional_exception_notifier_data
+
+  before_filter :log_extra_exception_data
 
   after_filter :log_event
 
@@ -53,8 +45,6 @@ class ApplicationController < ActionController::Base
   end
 
   layout "main"
-
-  protect_from_forgery
 
   def set_no_layout
     self.class.layout nil
@@ -331,10 +321,6 @@ class ApplicationController < ActionController::Base
       false
     end
   end
-  # See ActionController::Base for details
-  # Uncomment this to filter the contents of submitted sensitive data parameters
-  # from your application log (in this case, all fields with names like "password"). 
-  filter_parameter_logging :password
 
   def log_event
     User.with_current_user current_user do
@@ -482,10 +468,10 @@ class ApplicationController < ActionController::Base
     end
   end
 
-  def additional_exception_notifier_data
-    {
-        :current_logged_in_user=>current_user
-    }
+  def log_extra_exception_data
+      request.env["exception_notifier.exception_data"] = {
+          :current_logged_in_user=>current_user
+      }
   end
 
 end

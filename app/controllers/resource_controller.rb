@@ -1,5 +1,0 @@
-class ResourceController < ApplicationController
-  
-  
-  
-end
