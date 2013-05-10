@@ -6,12 +6,9 @@ require 'authenticated_system'
 class ApplicationController < ActionController::Base
   #require_dependency File.join(Gem.loaded_specs['my_annotations'].full_gem_path,'lib','app','controllers','application_controller')
 
-  skip_after_filter :add_piwik_analytics_tracking if Seek::Config.piwik_analytics_enabled == false
-
   self.mod_porter_secret = PORTER_SECRET
 
   include CommonSweepers
-
 
 
   before_filter :log_extra_exception_data

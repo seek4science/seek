@@ -2,7 +2,7 @@ require 'test_helper'
 
 class InvestigationTest < ActiveSupport::TestCase
   
-  fixtures :all
+  fixtures :investigations,:projects,:studies,:assays,:assay_assets, :permissions,:policies
 
   test "associations" do
     inv=investigations(:metabolomics_investigation)
