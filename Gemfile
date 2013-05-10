@@ -25,6 +25,7 @@ gem 'sunspot_rails','1.3.3'
 gem 'sunspot_solr','1.3.3'
 gem 'search_biomodel', "2.2.1",:git=>"git://github.com/myGrid/search_biomodel.git"
 gem 'savon',"1.1.0"
+gem "dynamic_form"
 
 gem 'convert_office',:git=>"git://github.com/SysMO-DB/convert_office.git", :ref=>"753f2567dbd625bc89071e1150404efbb562e130"
 
@@ -37,7 +38,7 @@ gem "in_place_editing"
 gem "rdf",">=0.3.8"
 gem "rdf-rdfxml",">=0.3.8"
 gem "equivalent-xml"
-gem "breadcrumbs_on_rails","1.0.1"
+gem "breadcrumbs_on_rails"
 gem 'docsplit'
 gem "pothoven-attachment_fu"
 gem "exception_notification"

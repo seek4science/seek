@@ -134,7 +134,7 @@ GEM
       nokogiri (>= 1.4.0)
     arel (3.0.2)
     bio (1.4.3)
-    breadcrumbs_on_rails (1.0.1)
+    breadcrumbs_on_rails (2.3.0)
     builder (3.0.4)
     calendar_date_select (1.16.4)
     cancan (1.6.10)
@@ -149,6 +149,7 @@ GEM
       activerecord (>= 2.1.0, < 4)
       delayed_job (~> 3.0)
     docsplit (0.7.2)
+    dynamic_form (1.1.4)
     equivalent-xml (0.3.0)
       nokogiri (>= 1.4.3)
     erubis (2.7.0)
@@ -325,7 +326,7 @@ DEPENDENCIES
   app_version!
   bio
   bioportal!
-  breadcrumbs_on_rails (= 1.0.1)
+  breadcrumbs_on_rails
   calendar_date_select
   cancan
   convert_office!
@@ -334,6 +335,7 @@ DEPENDENCIES
   delayed_job_active_record
   docsplit
   doi_query_tool!
+  dynamic_form
   equivalent-xml
   exception_notification
   factory_girl (= 2.6.4)
