@@ -36,6 +36,15 @@ GIT
     my_savage_beast (2.3)
 
 GIT
+  remote: git://github.com/SysMO-DB/piwik-ruby-tracking.git
+  revision: 06fa67ba4b2bd66878d745e9de5d6d6c8015bc92
+  specs:
+    piwik_analytics (1.0.1)
+      actionpack
+      activesupport
+      rails (>= 3.0.0)
+
+GIT
   remote: git://github.com/SysMO-DB/site_announcements.git
   revision: 02b574ac8396534c4917d3fd29ceb7496c27060e
   specs:
@@ -88,15 +97,6 @@ GIT
   revision: c02bea47e477c1ac59e45a2a8a51aaa2c8e6b72f
   specs:
     white_list_formatted_content (1.0.0)
-
-GIT
-  remote: git@github.com:SysMO-DB/piwik-ruby-tracking.git
-  revision: 06fa67ba4b2bd66878d745e9de5d6d6c8015bc92
-  specs:
-    piwik_analytics (1.0.1)
-      actionpack
-      activesupport
-      rails (>= 3.0.0)
 
 GEM
   remote: https://rubygems.org/
