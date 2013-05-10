@@ -8,7 +8,6 @@ class User < ActiveRecord::Base
   acts_as_tagger
     
   belongs_to :person
-  #validates_associated :person
 
   has_many :sops, :as=>:contributor
   has_many :data_files, :as=>:contributor
@@ -22,10 +21,7 @@ class User < ActiveRecord::Base
 
   #restful_authentication plugin generated code ...
   # Virtual attribute for the unencrypted password
-  attr_accessor :password
-
-  #validates_presence_of     :login, :email - removed requirement on email
-  #validates_length_of       :email,    :within => 3..100
+  attr_accessor :password, :password_confirmation
   
   validates_presence_of     :login,                      :unless => :using_openid?
   validates_presence_of     :password,                   :if => :password_required?, :unless => :using_openid?
@@ -33,15 +29,16 @@ class User < ActiveRecord::Base
   validates_length_of       :password, :within => 4..40, :if => :password_required?, :unless => :using_openid?
   validates_confirmation_of :password,                   :if => :password_required?, :unless => :using_openid?
   validates_length_of       :login,    :within => 3..40, :unless => :using_openid?
-  
   validates_uniqueness_of   :login, :case_sensitive => false
   validates_uniqueness_of   :openid, :case_sensitive => false, :allow_nil => true
   
   before_save :encrypt_password
-  before_create :make_activation_code 
+  before_create :make_activation_code
+
   # prevents a user from submitting a crafted form that bypasses activation
   # anything else you want your user to change should be added here.
   attr_accessible :login, :email, :password, :password_confirmation, :openid
+
     
   has_many :favourite_groups, :dependent => :destroy
   
@@ -126,7 +123,7 @@ class User < ActiveRecord::Base
     @activated = true
     self.activated_at = Time.now.utc
     self.activation_code = nil
-    save(false)
+    save(:validate=>false)
   end
 
   def assets
@@ -174,13 +171,13 @@ class User < ActiveRecord::Base
   def remember_me_until(time)
     self.remember_token_expires_at = time
     self.remember_token            = encrypt("#{email}--#{remember_token_expires_at}")
-    save(false)
+    save(:validate=>false)
   end
 
   def forget_me
     self.remember_token_expires_at = nil
     self.remember_token            = nil
-    save(false)
+    save(:validate=>false)
   end
 
   # Returns true if the user has just been activated.

@@ -647,7 +647,7 @@ class ModelsController < ApplicationController
 
   def create_model_image model_object, params_model_image
     build_model_image model_object, params_model_image
-    model_object.save(false)
+    model_object.save(:validate=>false)
     latest_version = model_object.latest_version
     latest_version.model_image_id = model_object.model_image_id
     latest_version.save
