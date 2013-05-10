@@ -1,5 +1,6 @@
 require 'simple_crypt'
 
+
 module Seek
 
   # Fallback attribute, which if defined will be the result if the stored/default value for a setting is nil
@@ -75,9 +76,12 @@ module Seek
 
     def piwik_analytics_enabled_propagate
       if self.piwik_analytics_enabled
-          PiwikAnalytics::Config.id_site = self.piwik_analytics_id_site
-          PiwikAnalytics::Config.url = self.piwik_analytics_url
-          PiwikAnalytics::Config.use_async = true
+          PiwikAnalytics::configuration.id_site = self.piwik_analytics_id_site
+          PiwikAnalytics::configuration.url = self.piwik_analytics_url
+          PiwikAnalytics::configuration.use_async = true
+          PiwikAnalytics::configuration.disabled=false
+      else
+        PiwikAnalytics::configuration.disabled=true
       end
     end
 

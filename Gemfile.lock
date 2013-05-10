@@ -89,6 +89,15 @@ GIT
   specs:
     white_list_formatted_content (1.0.0)
 
+GIT
+  remote: git@github.com:SysMO-DB/piwik-ruby-tracking.git
+  revision: 06fa67ba4b2bd66878d745e9de5d6d6c8015bc92
+  specs:
+    piwik_analytics (1.0.1)
+      actionpack
+      activesupport
+      rails (>= 3.0.0)
+
 GEM
   remote: https://rubygems.org/
   remote: http://gems.github.com/
@@ -193,10 +202,6 @@ GEM
     parallel (0.6.4)
     parallel_tests (0.12.3)
       parallel
-    piwik_analytics (1.0.2)
-      actionpack
-      activesupport
-      rails (>= 3.0.0)
     polyglot (0.3.3)
     pothoven-attachment_fu (3.2.8)
     pr_geohash (1.0.0)
@@ -353,7 +358,7 @@ DEPENDENCIES
   my_savage_beast!
   mysql2
   parallel_tests
-  piwik_analytics
+  piwik_analytics!
   pothoven-attachment_fu
   pry
   pry-doc
