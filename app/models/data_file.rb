@@ -30,9 +30,9 @@ class DataFile < ActiveRecord::Base
   # allow same titles, but only if these belong to different users
   # validates_uniqueness_of :title, :scope => [ :contributor_id, :contributor_type ], :message => "error - you already have a Data file with such title."
 
-    has_one :content_blob, :as => :asset, :foreign_key => :asset_id ,:conditions => 'asset_version= #{self.version}'
+    has_one :content_blob, :as => :asset, :foreign_key => :asset_id ,:conditions => Proc.new{["content_blobs.asset_version =?", version]}
 
-  has_many :studied_factors, :conditions =>  'studied_factors.data_file_version = #{self.version}'
+  has_many :studied_factors, :conditions => Proc.new{["studied_factors.data_file_version =?", version]}
 
   explicit_versioning(:version_column => "version") do
     include Seek::Data::DataFileExtraction
@@ -40,9 +40,9 @@ class DataFile < ActiveRecord::Base
     acts_as_versioned_resource
     acts_as_favouritable
     
-    has_one :content_blob,:primary_key => :data_file_id,:foreign_key => :asset_id,:conditions => 'content_blobs.asset_version= #{self.version} and content_blobs.asset_type = "#{self.parent.class.name}"'
+    has_one :content_blob,:primary_key => :data_file_id,:foreign_key => :asset_id,:conditions => Proc.new{["content_blobs.asset_version =? AND content_blobs.asset_type =?", version,parent.class.name]}
     
-    has_many :studied_factors, :primary_key => "data_file_id", :foreign_key => "data_file_id", :conditions =>  'studied_factors.data_file_version = #{self.version}'
+    has_many :studied_factors, :primary_key => "data_file_id", :foreign_key => "data_file_id", :conditions => Proc.new{["studied_factors.data_file_version =?", version]}
     
     def relationship_type(assay)
       parent.relationship_type(assay)

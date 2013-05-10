@@ -29,9 +29,9 @@ class Sop < ActiveRecord::Base
   has_many :samples, :through => :sample_assets
 
   #don't add a dependent=>:destroy, as the content_blob needs to remain to detect future duplicates
-  has_one :content_blob, :as => :asset, :foreign_key => :asset_id ,:conditions => 'asset_version= #{self.version}'
+  has_one :content_blob, :as => :asset, :foreign_key => :asset_id ,:conditions => Proc.new{["content_blobs.asset_version =?", version]}
 
-  has_many :experimental_conditions, :conditions =>  'experimental_conditions.sop_version = #{self.version}'
+  has_many :experimental_conditions, :conditions =>  Proc.new{["experimental_conditions.sop_version =?", version]}
 
   has_many :sop_specimens
   has_many :specimens,:through=>:sop_specimens
@@ -39,8 +39,8 @@ class Sop < ActiveRecord::Base
   explicit_versioning(:version_column => "version") do
     acts_as_versioned_resource
     acts_as_favouritable
-    has_one :content_blob,:primary_key => :sop_id,:foreign_key => :asset_id,:conditions => 'content_blobs.asset_version= #{self.version} and content_blobs.asset_type = "#{self.parent.class.name}"'
-    has_many :experimental_conditions, :primary_key => "sop_id", :foreign_key => "sop_id", :conditions =>  'experimental_conditions.sop_version = #{self.version}'
+    has_one :content_blob,:primary_key => :sop_id,:foreign_key => :asset_id,:conditions => Proc.new{["content_blobs.asset_version =? AND content_blobs.asset_type =?", version,parent.class.name]}
+    has_many :experimental_conditions, :primary_key => "sop_id", :foreign_key => "sop_id", :conditions =>  Proc.new{["experimental_conditions.sop_version =?",version]}
     
   end
 
