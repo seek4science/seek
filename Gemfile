@@ -38,7 +38,7 @@ gem "in_place_editing"
 gem "rdf",">=0.3.8"
 gem "rdf-rdfxml",">=0.3.8"
 gem "equivalent-xml"
-gem "breadcrumbs_on_rails","1.0.1"
+gem "breadcrumbs_on_rails"
 gem 'docsplit'
 gem "pothoven-attachment_fu"
 gem "exception_notification"
