@@ -1,6 +1,7 @@
 # Methods added to this helper will be available to all templates in the application.
 #require_dependency File.join(Gem.loaded_specs['my_annotations'].full_gem_path,'lib','app','helpers','application_helper')
 require 'savage_beast/application_helper'
+require 'app_version'
 
 module ApplicationHelper  
   include SavageBeast::ApplicationHelper
@@ -19,7 +20,7 @@ module ApplicationHelper
   end
 
   def version_text
-    "(v.#{APP_VERSION.to_s})"
+    "(v.#{SEEK::Application::APP_VERSION.to_s})"
   end
 
   def authorized_list all_items, attribute, sort=true, max_length=75, count_hidden_items=false

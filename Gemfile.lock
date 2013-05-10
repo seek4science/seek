@@ -6,7 +6,7 @@ GIT
 
 GIT
   remote: git://github.com/SysMO-DB/app_version.git
-  revision: 0b64b44ccde69844cc245dff4ec353b9e39eee82
+  revision: 773b6ae72d9cba038fce1a3502feb5de2f2b75a3
   specs:
     app_version (1.0.0)
 
