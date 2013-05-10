@@ -290,11 +290,11 @@ module Jits
             end
 
             # Set version column accordingly.
-            if orig_model.is_a?(self.class.versioned_class)
-              new_model[new_model.class.inheritance_column] = orig_model[self.class.versioned_inheritance_column]
-            elsif new_model.is_a?(self.class.versioned_class)
-              new_model[self.class.versioned_inheritance_column] = orig_model[orig_model.class.inheritance_column]
-            end
+            #if orig_model.is_a?(self.class.versioned_class)
+            #  new_model[new_model.class.inheritance_column] = orig_model[self.class.versioned_inheritance_column]
+            #elsif new_model.is_a?(self.class.versioned_class)
+            #  new_model[self.class.versioned_inheritance_column] = orig_model[orig_model.class.inheritance_column]
+            #end
           end
 
           # Gets the next available version for the current record, or 1 for a new record
