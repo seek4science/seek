@@ -6,6 +6,7 @@ class AssayTest < ActiveSupport::TestCase
 
 
   test "shouldnt edit the assay" do
+    ActiveRecord::Fixtures
     non_admin = Factory :user,:person=> Factory(:person,:is_admin=>false)
     user = non_admin #users(:aaron)
     assay = assays(:modelling_assay_with_data_and_relationship)
