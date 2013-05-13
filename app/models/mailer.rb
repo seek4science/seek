@@ -55,19 +55,18 @@ class Mailer < ActionMailer::Base
   end
 
   def gatekeeper_reject_feedback requester, gatekeeper, resource, extra_comment, base_host
-
-  subject "A #{Seek::Config.application_name} gatekeeper rejected your request to publish: #{resource.title}"
-    recipients requester.email_with_name
-    from Seek::Config.noreply_sender
-    reply_to gatekeeper.email_with_name
-    sent_on Time.now
-
+    @gatekeeper = gatekeeper
+    @requester=requester
+    @resource=resource
+    @host=base_host
     if extra_comment.blank?
       extra_comment = gatekeeper.name + " did not leave any reasons/comments"
     else
       extra_comment = gatekeeper.name + " left reasons/comments: " + extra_comment
     end
-    body :gatekeeper=>gatekeeper,:requester=>requester,:resource=>resource,:extra_comment=>extra_comment,:host=>base_host
+    @extra_comment=extra_comment
+    mail(:to => requester.email_with_name, :subject => "A #{Seek::Config.application_name} gatekeeper rejected your request to publish: #{resource.title}", :reply_to => gatekeeper.email_with_name)
+
   end
 
   def request_resource(user,resource,details,base_host)
