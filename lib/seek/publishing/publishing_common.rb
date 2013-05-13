@@ -162,7 +162,7 @@ module Seek
       def deliver_request_publish_approval item
         if (Seek::Config.email_enabled)
           begin
-            Mailer.deliver_request_publish_approval item.gatekeepers, User.current_user,item,base_host
+            Mailer.request_publish_approval(item.gatekeepers, User.current_user,item,base_host).deliver
           rescue Exception => e
             Rails.logger.error("Error sending request publish email to a gatekeeper - #{e.message}")
           end
@@ -180,7 +180,7 @@ module Seek
 
         owners_items.keys.each do |owner|
           begin
-            Mailer.deliver_request_publishing User.current_user.person,owner,owners_items[owner],base_host
+            Mailer.request_publishing(User.current_user.person,owner,owners_items[owner],base_host).deliver
           rescue Exception => e
             Rails.logger.error("Error sending notification email to the owner #{owner.name} - #{e.message}")
           end

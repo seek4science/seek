@@ -130,7 +130,7 @@ class DataFilesController < ApplicationController
         @data_file.creators = [current_user.person]
         create_content_blobs
         #send email to the file uploader and receiver
-        Mailer.deliver_file_uploaded(current_user,Person.find(params[:recipient_id]),@data_file,base_host)
+        Mailer.file_uploaded(current_user,Person.find(params[:recipient_id]),@data_file,base_host).deliver
 
         flash.now[:notice] ="Data file was successfully uploaded and saved." if flash.now[:notice].nil?
         render :text => flash.now[:notice]
@@ -363,7 +363,7 @@ class DataFilesController < ApplicationController
     resource = DataFile.find(params[:id])
     details = params[:details]
     
-    Mailer.deliver_request_resource(current_user,resource,details,base_host)
+    Mailer.request_resource(current_user,resource,details,base_host).deliver
     
     render :update do |page|
       page[:requesting_resource_status].replace_html "An email has been sent on your behalf to <b>#{resource.managers.collect{|m| m.name}.join(", ")}</b> requesting the file <b>#{h(resource.title)}</b>."

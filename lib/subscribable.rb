@@ -37,7 +37,7 @@ module Subscribable
     if Seek::Config.email_enabled && subscribers_are_notified_of?(activity_log.action)
       subscriptions.each do |subscription|
         if !subscription.person.user.nil? && subscription.person.receive_notifications? && subscription.immediately? && can_view?(subscription.person.user)
-          SubMailer.deliver_send_immediate_subscription subscription.person, activity_log
+          SubMailer.send_immediate_subscription(subscription.person, activity_log).deliver
         end
       end
     end

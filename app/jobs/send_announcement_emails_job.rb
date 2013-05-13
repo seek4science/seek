@@ -28,7 +28,7 @@ class SendAnnouncementEmailsJob < Struct.new(:site_announcement_id, :from_notifi
       NotifieeInfo.find(:all, :conditions=>["id IN (?) AND receive_notifications=?", (from_notifiee_id .. (from_notifiee_id + BATCHSIZE)), true]).each do |notifiee_info|
         begin
           unless notifiee_info.notifiee.nil?
-            Mailer.deliver_announcement_notification(site_announcement, notifiee_info, Seek::Config.site_base_host.gsub(/https?:\/\//,''))
+            Mailer.announcement_notification(site_announcement, notifiee_info, Seek::Config.site_base_host.gsub(/https?:\/\//,'')).deliver
           end
         rescue Exception=>e
           if defined? Rails.logger

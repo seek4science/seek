@@ -35,7 +35,7 @@ class HomeController < ApplicationController
       render :action=>:feedback
     else
       if (Seek::Config.email_enabled)
-        Mailer.deliver_feedback(current_user,subject,details,anon,base_host)
+        Mailer.feedback(current_user,subject,details,anon,base_host).deliver
       end
       flash[:notice]="Your feedback has been delivered. Thank You."
       redirect_to root_path

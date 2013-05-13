@@ -569,7 +569,7 @@ class ModelsController < ApplicationController
     resource = Model.find(params[:id])
     details = params[:details]
     
-    Mailer.deliver_request_resource(current_user,resource,details,base_host)
+    Mailer.request_resource(current_user,resource,details,base_host).deliver
     
     render :update do |page|
       page[:requesting_resource_status].replace_html "An email has been sent on your behalf to <b>#{resource.managers.collect{|m| m.name}.join(", ")}</b> requesting the file <b>#{h(resource.title)}</b>."
