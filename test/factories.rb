@@ -762,8 +762,8 @@ end
   end
 
   Factory.define :annotation_attribute do |f|
-    f.name "tag"
-    f.identifier "http://www.example.org/attribute#tag"
+    f.name "annotation"
+    f.identifier "http://www.example.org/attribute#annotation"
   end
 
   Factory.define :tag_attribute,:parent=>:annotation_attribute do |f|
