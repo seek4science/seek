@@ -78,7 +78,7 @@ module GroupedPagination
       conditions << optional_conditions if optional_conditions
       conditions=merge_conditions(*conditions)
       return conditions
-    end    
+    end
     
     def paginate(*args)
       options=args.pop unless args.nil?
@@ -121,6 +121,20 @@ module GroupedPagination
       end
       
       result
+    end
+
+    private
+    def merge_conditions(*conditions)
+      segments = []
+
+      conditions.each do |condition|
+        unless condition.blank?
+          sql = sanitize_sql(condition)
+          segments << sql unless sql.blank?
+        end
+      end
+
+      "(#{segments.join(') AND (')})" unless segments.empty?
     end
     
   end
