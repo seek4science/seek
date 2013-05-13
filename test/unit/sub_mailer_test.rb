@@ -14,11 +14,11 @@ class SubMailerTest < ActionMailer::TestCase
     now = Time.now
 
     pretend_now_is(now) do
-      email = SubMailer.create_send_digest_subscription p, [log], 'daily'
+      email = SubMailer.send_digest_subscription p, [log], 'daily'
     end
 
-    assert_equal "text/html",email.content_type
-    assert_equal "utf-8", email.charset
+    assert_equal "text/html; charset=UTF-8",email.content_type
+    assert_equal "UTF-8", email.charset
     assert_equal ["no-reply@sysmo-db.org"], email.from
     assert_equal [p.email], email.to
     assert_equal 'The Sysmo SEEK Subscription Report', email.subject
