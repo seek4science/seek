@@ -46,13 +46,12 @@ class Mailer < ActionMailer::Base
   end
 
   def gatekeeper_approval_feedback requester, gatekeeper, resource, base_host
+    @gatekeeper = gatekeeper
+    @requester=requester
+    @resource=resource
+    @host=base_host
+    mail(:to=>requester.email_with_name,:subject=>"A #{Seek::Config.application_name} gatekeeper approved your request to publish: #{resource.title}")
 
-    subject "A #{Seek::Config.application_name} gatekeeper approved your request to publish: #{resource.title}"
-    recipients requester.email_with_name
-    from Seek::Config.noreply_sender
-    sent_on Time.now
-
-    body :gatekeeper=>gatekeeper,:requester=>requester,:resource=>resource,:host=>base_host
   end
 
   def gatekeeper_reject_feedback requester, gatekeeper, resource, extra_comment, base_host

@@ -110,13 +110,13 @@ class MailerTest < ActionMailer::TestCase
     #TODO: hardcoding the formating rather than passing an array was require for rails 2.3.8 upgrade
     @expected.to = requester.email_with_name
     @expected.from = "no-reply@sysmo-db.org"
-    @expected.date = Time.now
+
 
     @expected.body = read_fixture('gatekeeper_approval_feedback')
 
-    pretend_now_is(@expected.date) do
-      assert_equal @expected.encoded,Mailer.create_gatekeeper_approval_feedback(requester, gatekeeper, resource,"localhost").encoded
-    end
+
+    assert_equal encode_mail(@expected),encode_mail(Mailer.gatekeeper_approval_feedback(requester, gatekeeper, resource,"localhost"))
+
   end
 
   test "gatekeeper reject feedback" do
