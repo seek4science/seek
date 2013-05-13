@@ -13,8 +13,6 @@ class MailerTest < ActionMailer::TestCase
     
 
     assert_equal encode_mail(@expected), encode_mail(Mailer.signup(users(:aaron),"localhost"))
-
-    
   end
   
   test "signup_open_id" do
@@ -22,9 +20,7 @@ class MailerTest < ActionMailer::TestCase
     @expected.to = "Aaron Openid Spiggle <aaron_openid@email.com>"
     @expected.from    = "no-reply@sysmo-db.org"
 
-
     @expected.body    = read_fixture('signup_openid')
-    
 
     assert_equal encode_mail(@expected), encode_mail(Mailer.signup(users(:aaron_openid),"localhost"))
     
@@ -85,6 +81,24 @@ class MailerTest < ActionMailer::TestCase
 
   end
 
+  test "request resource no details" do
+    @expected.subject = "A SEEK member requested a protected file: Picture"
+    #TODO: hardcoding the formating rather than passing an array was require for rails 2.3.8 upgrade
+    @expected.to = "Datafile Owner <data_file_owner@email.com>,\r\n\t OwnerOf MyFirstSop <owner@sop.com>"
+    @expected.from = "no-reply@sysmo-db.org"
+    @expected.reply_to = "Aaron Spiggle <aaron@email.com>"
+
+
+    @expected.body = read_fixture('request_resource_no_details')
+
+    resource=data_files(:picture)
+    user=users(:aaron)
+    details=""
+
+    assert_equal encode_mail(@expected),encode_mail(Mailer.request_resource(user,resource,details,"localhost"))
+
+  end
+
   test "request publish approval" do
     resource = data_files(:picture)
     gatekeeper = people(:gatekeeper_person)
@@ -102,12 +116,30 @@ class MailerTest < ActionMailer::TestCase
 
   end
 
+  test "request publishing" do
+
+    @expected.subject = "A SEEK member requests you make some items public"
+    @expected.to = "Datafile Owner <data_file_owner@email.com>"
+    @expected.from = "no-reply@sysmo-db.org"
+    @expected.reply_to = "Aaron Spiggle <aaron@email.com>"
+
+    @expected.body = read_fixture('request_publishing')
+
+    publisher = people(:aaron_person)
+    owner = people(:person_for_datafile_owner)
+
+    resources=[assays(:metabolomics_assay),data_files(:picture),models(:teusink),assays(:metabolomics_assay2),data_files(:sysmo_data_file)]
+
+    assert_equal encode_mail(@expected),encode_mail(Mailer.request_publishing(publisher,owner,resources,"localhost"))
+
+  end
+
   test "gatekeeper approval feedback" do
     resource = data_files(:picture)
     gatekeeper = people(:gatekeeper_person)
     requester = people(:aaron_person)
     @expected.subject = "A SEEK gatekeeper approved your request to publish: #{resource.title}"
-    #TODO: hardcoding the formating rather than passing an array was require for rails 2.3.8 upgrade
+
     @expected.to = requester.email_with_name
     @expected.from = "no-reply@sysmo-db.org"
 
@@ -124,55 +156,19 @@ class MailerTest < ActionMailer::TestCase
     gatekeeper = people(:gatekeeper_person)
     requester = people(:aaron_person)
     @expected.subject = "A SEEK gatekeeper rejected your request to publish: #{resource.title}"
-    #TODO: hardcoding the formating rather than passing an array was require for rails 2.3.8 upgrade
+
     @expected.to = requester.email_with_name
     @expected.from = "no-reply@sysmo-db.org"
     @expected.reply_to = gatekeeper.email_with_name
-    @expected.date = Time.now
+
 
     @expected.body = read_fixture('gatekeeper_reject_feedback')
     extra_comment = 'Not ready'
-    pretend_now_is(@expected.date) do
-      assert_equal @expected.encoded,Mailer.create_gatekeeper_reject_feedback(requester, gatekeeper, resource, extra_comment, "localhost").encoded
-    end
+
+    assert_equal encode_mail(@expected),encode_mail(Mailer.gatekeeper_reject_feedback(requester, gatekeeper, resource, extra_comment, "localhost"))
+
   end
 
-  test "request publishing" do
-
-    @expected.subject = "A SEEK member requests you make some items public"
-    @expected.to = "Datafile Owner <data_file_owner@email.com>"
-    @expected.from = "no-reply@sysmo-db.org"
-    @expected.reply_to = "Aaron Spiggle <aaron@email.com>"
-    @expected.date = Time.now
-    @expected.body = read_fixture('request_publishing')
-
-    publisher = people(:aaron_person)
-    owner = people(:person_for_datafile_owner)
-
-    resources=[assays(:metabolomics_assay),data_files(:picture),models(:teusink),assays(:metabolomics_assay2),data_files(:sysmo_data_file)]
-
-    force_now_is(@expected.date) do
-      assert_equal @expected.encoded,Mailer.create_request_publishing(publisher,owner,resources,"localhost").encoded
-    end
-  end
-
-  test "request resource no details" do
-    @expected.subject = "A SEEK member requested a protected file: Picture"
-    #TODO: hardcoding the formating rather than passing an array was require for rails 2.3.8 upgrade
-    @expected.to = "Datafile Owner <data_file_owner@email.com>,\r\n\t OwnerOf MyFirstSop <owner@sop.com>"
-    @expected.from = "no-reply@sysmo-db.org"
-    @expected.reply_to = "Aaron Spiggle <aaron@email.com>"
-    @expected.date = Time.now
-
-    @expected.body = read_fixture('request_resource_no_details')
-
-    resource=data_files(:picture)
-    user=users(:aaron)
-    details=""
-    force_now_is(@expected.date) do
-      assert_equal @expected.encoded,Mailer.create_request_resource(user,resource,details,"localhost").encoded
-    end
-  end
 
   test "forgot_password" do
     @expected.subject = 'SEEK - Password reset'
@@ -194,33 +190,28 @@ class MailerTest < ActionMailer::TestCase
   test "contact_admin_new_user_no_profile" do
     @expected.subject = 'SEEK member signed up'
     @expected.to = "Quentin Jones <quentin@email.com>"
-    @expected.from    = "no-reply@sysmo-db.org"
+    @expected.from = "no-reply@sysmo-db.org"
     @expected.reply_to = "Aaron Spiggle <aaron@email.com>"
-    @expected.date    = Time.now
 
-    @expected.body    = read_fixture('contact_admin_new_user_no_profile')
-    
-    force_now_is(@expected.date) do
-      assert_equal @expected.encoded, 
-        Mailer.create_contact_admin_new_user_no_profile("test message",users(:aaron),"localhost").encoded
-    end
-    
+    @expected.body = read_fixture('contact_admin_new_user_no_profile')
+
+    assert_equal encode_mail(@expected),
+                 encode_mail(Mailer.contact_admin_new_user_no_profile("test message", users(:aaron), "localhost"))
   end
 
   test "contact_project_manager_new_user_no_profile" do
     project_manager = Factory(:project_manager)
     @expected.subject = 'SEEK member signed up, please assign this person to the projects which you are project manager'
     @expected.to = project_manager.email_with_name
-    @expected.from    = "no-reply@sysmo-db.org"
+    @expected.from = "no-reply@sysmo-db.org"
     @expected.reply_to = "Aaron Spiggle <aaron@email.com>"
-    @expected.date    = Time.now
 
-    @expected.body    = read_fixture('contact_project_manager_new_user_no_profile')
 
-    force_now_is(@expected.date) do
-      assert_equal @expected.encoded,
-        Mailer.create_contact_project_manager_new_user_no_profile(project_manager,"test message",users(:aaron),"localhost").encoded
-    end
+    @expected.body = read_fixture('contact_project_manager_new_user_no_profile')
+
+    assert_equal encode_mail(@expected),
+                 encode_mail(Mailer.contact_project_manager_new_user_no_profile(project_manager, "test message", users(:aaron), "localhost"))
+
 
   end
 
@@ -228,13 +219,11 @@ class MailerTest < ActionMailer::TestCase
     @expected.subject = 'Welcome to SEEK'
     @expected.to = "Quentin Jones <quentin@email.com>"
     @expected.from    = "no-reply@sysmo-db.org"
-    @expected.date = Time.now
     
     @expected.body = read_fixture('welcome')
-    
-    force_now_is(@expected.date) do
-      assert_equal @expected.encoded, Mailer.create_welcome(users(:quentin),"localhost").encoded
-    end
+
+    assert_equal encode_mail(@expected), encode_mail(Mailer.welcome(users(:quentin),"localhost"))
+
   end
 
   private

@@ -84,7 +84,7 @@ module Seek
       def deliver_gatekeeper_approval_feedback requester
         if (Seek::Config.email_enabled)
           begin
-            Mailer.deliver_gatekeeper_approval_feedback requester, current_user.person , @resource, base_host
+            Mailer.gatekeeper_approval_feedback(requester, current_user.person , @resource, base_host).deliver
           rescue Exception => e
             Rails.logger.error("Error sending gatekeeper approval feedback email to the requester #{requester.name}- #{e.message}")
           end
@@ -94,7 +94,7 @@ module Seek
       def deliver_gatekeeper_reject_feedback requester, extra_comment
         if (Seek::Config.email_enabled)
           begin
-            Mailer.deliver_gatekeeper_reject_feedback requester, current_user.person , @resource, extra_comment, base_host
+            Mailer.gatekeeper_reject_feedback(requester, current_user.person , @resource, extra_comment, base_host).deliver
           rescue Exception => e
             Rails.logger.error("Error sending gatekeeper reject feedback email to the requester #{requester.name}- #{e.message}")
           end

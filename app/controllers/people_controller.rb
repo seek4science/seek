@@ -168,16 +168,16 @@ class PeopleController < ApplicationController
         #send notification email to admin and project managers, if a new member is registering as a new person
         if Seek::Config.email_enabled && registration && is_sysmo_member
           #send mail to admin
-          Mailer.deliver_contact_admin_new_user_no_profile(member_details, current_user, base_host)
+          Mailer.contact_admin_new_user_no_profile(member_details, current_user, base_host).deliver
 
           #send mail to project managers
           project_managers = project_managers_of_selected_projects params[:projects]
           project_managers.each do |project_manager|
-            Mailer.deliver_contact_project_manager_new_user_no_profile(project_manager, member_details, current_user, base_host)
+            Mailer.contact_project_manager_new_user_no_profile(project_manager, member_details, current_user, base_host).deliver
           end
         end
         if (!current_user.active?)
-          Mailer.deliver_signup(current_user, base_host)
+          Mailer.signup(current_user, base_host).deliver
           flash[:notice]="An email has been sent to you to confirm your email address. You need to respond to this email before you can login"
           logout_user
           format.html { redirect_to :controller => "users", :action => "activation_required" }

@@ -1,9 +1,11 @@
 Hi <%= @owner.name -%>,
 
     The <%= Seek::Config.application_name %> user <%= @publisher.name -%>, <%= person_url(@publisher,:host=>@host) -%>, has requested you to publish your following items in seek:
+
 <% @resources.each do |resource| %>
     <% controller=resource.class.name.underscore.pluralize -%>
     <%= resource.title -%> <%= url_for(:action=>:show,:controller=>controller,:id=>resource,:host=>@host) -%>
+
 <% end %>
 
     If you would like to publish the item, please change the sharing setting of the item in seek:

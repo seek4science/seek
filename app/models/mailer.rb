@@ -16,24 +16,21 @@ class Mailer < ActionMailer::Base
   end
 
   def file_uploaded uploader,receiver,file,base_host
-    subject "#{Seek::Config.application_name} - File Upload"
-    recipients [uploader.person.email_with_name,receiver.email_with_name]
-    from     Seek::Config.noreply_sender
-    reply_to uploader.person.email_with_name
-    sent_on Time.now
-
-    body :host=>base_host,:uploader=>uploader.person, :receiver => receiver,:data_file => file
+    @host=base_host
+    @uploader=uploader.person
+    @receiver=receiver
+    @data_file=file
+    mail(:to=>[uploader.person.email_with_name,receiver.email_with_name],:subject=>"#{Seek::Config.application_name} - File Upload",
+         :reply_to=>uploader.person.email_with_name)
   end
 
   def request_publishing(publisher,owner,resources,base_host)
-
-    subject "A #{Seek::Config.application_name} member requests you make some items public"
-    recipients owner.email_with_name
-    from       Seek::Config.noreply_sender
-    reply_to   publisher.email_with_name
-    sent_on Time.now
-
-    body :host=>base_host,:owner=>owner, :publisher=>publisher,:resources=>resources
+    @owner=owner
+    @publisher=publisher
+    @resources=resources
+    @host=base_host
+    mail(:to=>owner.email_with_name,:reply_to=>publisher.email_with_name,
+         :subject=>"A #{Seek::Config.application_name} member requests you make some items public")
   end
 
   def request_publish_approval(gatekeepers,user,resource,base_host)
@@ -55,19 +52,18 @@ class Mailer < ActionMailer::Base
   end
 
   def gatekeeper_reject_feedback requester, gatekeeper, resource, extra_comment, base_host
-
-  subject "A #{Seek::Config.application_name} gatekeeper rejected your request to publish: #{resource.title}"
-    recipients requester.email_with_name
-    from Seek::Config.noreply_sender
-    reply_to gatekeeper.email_with_name
-    sent_on Time.now
-
+    @gatekeeper = gatekeeper
+    @requester=requester
+    @resource=resource
+    @host=base_host
     if extra_comment.blank?
       extra_comment = gatekeeper.name + " did not leave any reasons/comments"
     else
       extra_comment = gatekeeper.name + " left reasons/comments: " + extra_comment
     end
-    body :gatekeeper=>gatekeeper,:requester=>requester,:resource=>resource,:extra_comment=>extra_comment,:host=>base_host
+    @extra_comment=extra_comment
+    mail(:to => requester.email_with_name, :subject => "A #{Seek::Config.application_name} gatekeeper rejected your request to publish: #{resource.title}", :reply_to => gatekeeper.email_with_name)
+
   end
 
   def request_resource(user,resource,details,base_host)
@@ -99,52 +95,45 @@ class Mailer < ActionMailer::Base
   end
 
   def welcome(user,base_host)
-    subject    "Welcome to #{Seek::Config.application_name}"
-    recipients user.person.email_with_name
-    from       Seek::Config.noreply_sender
-    sent_on    Time.now
-    
-    body       :name=>user.person.name,:person=>user.person, :host=>base_host
+    @name = user.person.name
+    @person = user.person
+    @host = base_host
+    mail(:to=>user.person.email_with_name,:subject=>"Welcome to #{Seek::Config.application_name}")
   end
   
   def welcome_no_projects(user,base_host)
-    subject    "Welcome to #{Seek::Config.application_name}"
-    recipients user.person.email_with_name
-    from       Seek::Config.noreply_sender
-    sent_on    Time.now
-    
-    body       :name=>user.person.name,:person=>user.person, :host=>base_host
+    @name = user.person.name
+    @person = user.person
+    @host = base_host
+    mail(:to=>user.person.email_with_name,:subject=>"Welcome to #{Seek::Config.application_name}")
   end
 
   def contact_admin_new_user_no_profile(details,user,base_host)
+    @details = details
+    @person = user.person
+    @user = user
+    @host = base_host
+    mail(:to=>admin_emails,:reply_to=>user.person.email_with_name,
+      :subject=>"#{Seek::Config.application_name} member signed up")
 
-    subject    "#{Seek::Config.application_name} member signed up"
-    recipients admin_emails
-    from       Seek::Config.noreply_sender
-    reply_to   user.person.email_with_name
-    sent_on    Time.now
-
-    body       :details=>details, :person=>user.person, :user=>user, :host=>base_host
   end
 
   def contact_project_manager_new_user_no_profile(project_manager,details,user,base_host)
-    subject    "#{Seek::Config.application_name} member signed up, please assign this person to the projects which you are project manager"
-    recipients project_manager_email(project_manager)
-    from       Seek::Config.noreply_sender
-    reply_to   user.person.email_with_name
-    sent_on    Time.now
 
-    body       :details=>details, :person=>user.person, :user=>user, :host=>base_host
+    @details = details
+    @person = user.person
+    @user = user
+    @host = base_host
+    mail(:to=>project_manager_email(project_manager),:reply_to=>user.person.email_with_name,
+         :subject=>"#{Seek::Config.application_name} member signed up, please assign this person to the projects which you are project manager")
   end
 
   def resources_harvested(harvester_responses,user,base_host)
+    @resources = harvester_resources
+    @person = user.person
+    @host = base_host
     subject_text = (harvester_responses.size > 1) ? 'New resources registered with SEEK' : 'New resource registered with SEEK'
-    subject    subject_text
-    recipients user.person.email_with_name
-    from       Seek::Config.noreply_sender
-    sent_on    Time.now
-    
-    body       :resources => harvester_responses, :person=>user.person, :host=>base_host
+    mail(:to=>user.person.email_with_name,:subject=>subject_text)
   end
   
   def announcement_notification(site_announcement, notifiee_info,base_host)
@@ -156,11 +145,7 @@ class Mailer < ActionMailer::Base
   end
 
   def test_email testing_email
-    subject "Test email"
-    recipients testing_email
-    from Seek::Config.noreply_sender
-    sent_on Time.now
-    body
+    mail(:to=>testing_email,:subject=>"Test email")
   end
 
   private

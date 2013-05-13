@@ -66,7 +66,7 @@ class SendPeriodicEmailsJob < Struct.new(:frequency)
           activity_logs = logs_for_visible_items.select do |log|
             !person.subscriptions.for_subscribable(log.activity_loggable).select{ |s| s.frequency == frequency }.empty?
           end
-          SubMailer.deliver_send_digest_subscription person, activity_logs, frequency unless activity_logs.blank?
+          SubMailer.send_digest_subscription(person, activity_logs, frequency).deliver unless activity_logs.blank?
         rescue Exception => e
           Delayed::Job.logger.error("Error sending subscription emails to person #{person.id} - #{e.message}")
         end
