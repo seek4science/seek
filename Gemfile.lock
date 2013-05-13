@@ -51,16 +51,16 @@ GIT
     site_announcements (1.0.0)
 
 GIT
-  remote: git://github.com/myGrid/annotations.git
-  revision: 34f543bd114058eb700261db0839cddbb5a0675d
-  specs:
-    my_annotations (0.6.0)
-
-GIT
   remote: git://github.com/myGrid/search_biomodel.git
   revision: e109ac6d8b102f7ecb65140c17d263b85e066870
   specs:
     search_biomodel (2.2.1)
+
+GIT
+  remote: git://github.com/quyen/annotations.git
+  revision: f0017e2c892de10b41f124f46fb48d38f1d86d31
+  specs:
+    my_annotations (0.6.0)
 
 GIT
   remote: git://github.com/quyen/bioportal.git
