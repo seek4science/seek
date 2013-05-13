@@ -102,6 +102,24 @@ class MailerTest < ActionMailer::TestCase
 
   end
 
+  test "request publishing" do
+
+    @expected.subject = "A SEEK member requests you make some items public"
+    @expected.to = "Datafile Owner <data_file_owner@email.com>"
+    @expected.from = "no-reply@sysmo-db.org"
+    @expected.reply_to = "Aaron Spiggle <aaron@email.com>"
+
+    @expected.body = read_fixture('request_publishing')
+
+    publisher = people(:aaron_person)
+    owner = people(:person_for_datafile_owner)
+
+    resources=[assays(:metabolomics_assay),data_files(:picture),models(:teusink),assays(:metabolomics_assay2),data_files(:sysmo_data_file)]
+
+    assert_equal encode_mail(@expected),encode_mail(Mailer.request_publishing(publisher,owner,resources,"localhost"))
+
+  end
+
   test "gatekeeper approval feedback" do
     resource = data_files(:picture)
     gatekeeper = people(:gatekeeper_person)
@@ -137,24 +155,7 @@ class MailerTest < ActionMailer::TestCase
 
   end
 
-  test "request publishing" do
 
-    @expected.subject = "A SEEK member requests you make some items public"
-    @expected.to = "Datafile Owner <data_file_owner@email.com>"
-    @expected.from = "no-reply@sysmo-db.org"
-    @expected.reply_to = "Aaron Spiggle <aaron@email.com>"
-    @expected.date = Time.now
-    @expected.body = read_fixture('request_publishing')
-
-    publisher = people(:aaron_person)
-    owner = people(:person_for_datafile_owner)
-
-    resources=[assays(:metabolomics_assay),data_files(:picture),models(:teusink),assays(:metabolomics_assay2),data_files(:sysmo_data_file)]
-
-    force_now_is(@expected.date) do
-      assert_equal @expected.encoded,Mailer.create_request_publishing(publisher,owner,resources,"localhost").encoded
-    end
-  end
 
   test "request resource no details" do
     @expected.subject = "A SEEK member requested a protected file: Picture"

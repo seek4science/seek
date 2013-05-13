@@ -26,14 +26,12 @@ class Mailer < ActionMailer::Base
   end
 
   def request_publishing(publisher,owner,resources,base_host)
-
-    subject "A #{Seek::Config.application_name} member requests you make some items public"
-    recipients owner.email_with_name
-    from       Seek::Config.noreply_sender
-    reply_to   publisher.email_with_name
-    sent_on Time.now
-
-    body :host=>base_host,:owner=>owner, :publisher=>publisher,:resources=>resources
+    @owner=owner
+    @publisher=publisher
+    @resources=resources
+    @host=base_host
+    mail(:to=>owner.email_with_name,:reply_to=>publisher.email_with_name,
+         :subject=>"A #{Seek::Config.application_name} member requests you make some items public")
   end
 
   def request_publish_approval(gatekeepers,user,resource,base_host)
