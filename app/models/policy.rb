@@ -20,7 +20,7 @@ class Policy < ActiveRecord::Base
     begin
       Kernel.Float(raw_value)
     rescue ArgumentError, TypeError
-      record.errors.add_to_base "Sharing policy is invalid" unless value.is_a? Integer
+      record.errors[:base] << "Sharing policy is invalid" unless value.is_a? Integer
     end
   end
   

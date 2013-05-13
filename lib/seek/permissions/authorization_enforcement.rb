@@ -47,7 +47,7 @@ module Seek
           if $authorization_checks_disabled or can_delete?
             true
           else
-            errors.add_to_base "Deleting #{self.class.name.underscore.humanize}-#{id} is not permitted"
+            errors[:base] << "Deleting #{self.class.name.underscore.humanize}-#{id} is not permitted"
             false
           end
         end
@@ -65,11 +65,11 @@ module Seek
           #changed includes the foreign keys of belongs_to associations. Since those are implemented by a different method, I filter them out here.
           changed_attrs = changed - self.class.reflect_on_all_associations(:belongs_to).map(&:primary_key_name).map(&:to_s)
           unless (changed_attrs - (attributes_not_requiring_can_edit || []).map(&:to_s)).empty? || can_edit?
-            errors.add_to_base "You are not permitted to edit #{self.class.name.underscore.humanize}-#{id}"
+            errors[:base] << "You are not permitted to edit #{self.class.name.underscore.humanize}-#{id}"
             return true
           end
           unless (changed_attrs & (attributes_requiring_can_manage || []).map(&:to_s)).empty? || can_manage?
-            errors.add_to_base "You are not permitted to manage #{self.class.name.underscore.humanize}-#{id}"
+            errors[:base] << "You are not permitted to manage #{self.class.name.underscore.humanize}-#{id}"
             return true
           end
           false
@@ -81,7 +81,7 @@ module Seek
             options = reflection.options.reverse_merge :required_access => :view, :required_access_to_owner => :edit
             if changed.include? reflection.primary_key_name.to_s
               unless !options[:required_access_to_owner] or can_perform? options[:required_access_to_owner]
-                errors.add_to_base "You are not permitted to #{options[:required_access_to_owner]} #{self.class.name.underscore.humanize}-#{id}"
+                errors[:base] << "You are not permitted to #{options[:required_access_to_owner]} #{self.class.name.underscore.humanize}-#{id}"
                 return true
               end
               unless !send(reflection.name) or !options[:required_access] or send(reflection.name).can_perform? options[:required_access]
@@ -104,7 +104,7 @@ module Seek
               targets = [targets] unless reflection.collection?
               if targets.detect { |record| record.changed_for_autosave? }
                 if options[:required_access_to_owner] and !can_perform?(options[:required_access_to_owner])
-                  errors.add_to_base "You are not permitted to #{options[:required_access_to_owner]} #{self.class.name.underscore.humanize}-#{id}"
+                  errors[:base] << "You are not permitted to #{options[:required_access_to_owner]} #{self.class.name.underscore.humanize}-#{id}"
                   return true
                 end
               end

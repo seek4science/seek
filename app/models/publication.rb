@@ -151,12 +151,12 @@ class Publication < ActiveRecord::Base
   
   def check_identifier_present
     if doi.blank? && pubmed_id.blank?
-      self.errors.add_to_base("Please specify either a PubMed ID or DOI")
+      self.errors[:base] << "Please specify either a PubMed ID or DOI"
       return false
     end
 
     if !doi.blank? && !pubmed_id.blank?
-      self.errors.add_to_base("Can't have both a PubMed ID and a DOI")
+      self.errors[:base] << "Can't have both a PubMed ID and a DOI"
       return false
     end
 
@@ -170,7 +170,7 @@ class Publication < ActiveRecord::Base
       if !existing.empty?
         matching_projects = existing.collect(&:projects).flatten.uniq & projects
         if !matching_projects.empty?
-          self.errors.add_to_base("You cannot register the same DOI within the same project")
+          self.errors[:base] << "You cannot register the same DOI within the same project"
           return false
         end
       end
@@ -180,7 +180,7 @@ class Publication < ActiveRecord::Base
       if !existing.empty?
         matching_projects = existing.collect(&:projects).flatten.uniq & projects
         if !matching_projects.empty?
-          self.errors.add_to_base("You cannot register the same PubMed ID within the same project")
+          self.errors[:base] << "You cannot register the same PubMed ID within the same project"
           return false
         end
       end
@@ -193,7 +193,7 @@ class Publication < ActiveRecord::Base
     if !existing.empty?
       matching_projects = existing.collect(&:projects).flatten.uniq & projects
       if !matching_projects.empty?
-        self.errors.add_to_base("You cannot register the same Title within the same project")
+        self.errors[:base] << "You cannot register the same Title within the same project"
         return false
       end
     end

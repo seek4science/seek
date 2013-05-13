@@ -20,8 +20,10 @@ class CellRangeTest < ActiveSupport::TestCase
     cell = CellRange.new(:worksheet => worksheets(:worksheet_1),:cell_range => "A1:AB3")
     assert !cell.save
     res = ""
-    assert cell.errors.length == 1
-    cell.errors.each_full {|e| res = e}
+    assert cell.errors.size == 1
+    cell.errors.each do |attribute, errors_array|
+      res = errors_array
+    end
 
     assert res == "One or more cells between <b>A1</b> and <b>AB3</b> are outside the worksheets range. Please select cells between <b>A1</b> and <b>J10</b>"
   end
@@ -31,8 +33,10 @@ class CellRangeTest < ActiveSupport::TestCase
     cell = CellRange.new(:worksheet => worksheets(:worksheet_1),:cell_range => "A1A2")
     assert !cell.save
     res = ""
-    assert cell.errors.length == 1
-    cell.errors.each_full {|e| res = e}
+    assert cell.errors.size == 1
+    cell.errors.each do |attribute, errors_array|
+      res = errors_array
+    end
 
     assert res == "Invalid cell range entered. Must be in the format of <b>A1</b> or <b>A1:B1</b>"
   end
