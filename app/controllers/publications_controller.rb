@@ -93,7 +93,7 @@ class PublicationsController < ApplicationController
           to_remove << PublicationAuthor.find_by_id(author_id)
           p = Person.find(author_assoc)
           if @publication.creators.include?(p)
-            @publication.errors.add_to_base("Multiple authors cannot be associated with the same SEEK person.")
+            @publication.errors[:base] << "Multiple authors cannot be associated with the same SEEK person."
             valid = false
           else
             to_add << p
@@ -104,7 +104,7 @@ class PublicationsController < ApplicationController
     
     #Check for duplicate authors
     if valid && (to_add.uniq.size != to_add.size)
-      @publication.errors.add_to_base("Multiple authors cannot be associated with the same SEEK person.")
+      @publication.errors[:base] << "Multiple authors cannot be associated with the same SEEK person."
       valid = false
     end
 

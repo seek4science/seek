@@ -64,7 +64,7 @@ class PostsController < ApplicationController
     if params[:forum_attachment]
       params[:forum_attachment][:post_id] = @post.id  
       unless ForumAttachment.create(params[:forum_attachment])
-        @post.errors.add_to_base("Attachment could not be uploaded.")
+        @post.errors[:base] << "Attachment could not be uploaded."
         raise ActiveRecord::RecordInvalid
       end
     end
