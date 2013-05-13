@@ -71,9 +71,10 @@ class Policy < ActiveRecord::Base
   
   #makes a copy of the policy, and its associated permissions.
   def deep_copy
-    copy=self.clone
-    self.permissions.each {|p| copy.permissions << p.clone}
-    return copy
+    copy=self.dup
+    copied_permissions = self.permissions.collect {|p| p.dup}
+    copied_permissions.each {|p| copy.permissions << p}
+    copy
   end
 
   #checks that there are permissions for the provided contributor, for the access_type (or higher)
