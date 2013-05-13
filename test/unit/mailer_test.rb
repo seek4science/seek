@@ -8,13 +8,12 @@ class MailerTest < ActionMailer::TestCase
     @expected.subject = 'SEEK account activation'
     @expected.to = "Aaron Spiggle <aaron@email.com>"
     @expected.from    = "no-reply@sysmo-db.org"
-    @expected.date    = Time.now
 
     @expected.body    = read_fixture('signup')
     
-    force_now_is(@expected.date) do
-      assert_equal @expected.encoded, Mailer.create_signup(users(:aaron),"localhost").encoded
-    end
+
+    assert_equal encode_mail(@expected), encode_mail(Mailer.signup(users(:aaron),"localhost"))
+
     
   end
   
@@ -22,13 +21,12 @@ class MailerTest < ActionMailer::TestCase
     @expected.subject = 'SEEK account activation'
     @expected.to = "Aaron Openid Spiggle <aaron_openid@email.com>"
     @expected.from    = "no-reply@sysmo-db.org"
-    @expected.date    = Time.now
+
 
     @expected.body    = read_fixture('signup_openid')
     
-    force_now_is(@expected.date) do
-      assert_equal @expected.encoded, Mailer.create_signup(users(:aaron_openid),"localhost").encoded
-    end
+
+    assert_equal encode_mail(@expected), encode_mail(Mailer.signup(users(:aaron_openid),"localhost"))
     
   end
   

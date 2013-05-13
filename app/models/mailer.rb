@@ -83,12 +83,13 @@ class Mailer < ActionMailer::Base
   end
 
   def signup(user,base_host)
-    subject     "#{Seek::Config.application_name} account activation"
-    recipients  user.person.email_with_name
-    from        Seek::Config.noreply_sender
-    sent_on     Time.now
-
-    body        :username=>user.login,:openid=>user.openid, :name=>user.person.name, :admins=>admins, :activation_code=>user.activation_code, :host=>base_host
+    @username=user.login
+    @openid=user.openid
+    @name=user.person.name
+    @admins=admins
+    @activation_code=user.activation_code
+    @host=base_host
+    mail(:to=>user.person.email_with_name,:subject=>"#{Seek::Config.application_name} account activation")
   end
 
   def forgot_password(user,base_host)
