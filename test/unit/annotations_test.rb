@@ -8,7 +8,7 @@ class AnnotationsTest < ActiveSupport::TestCase
     User.with_current_user df.contributor do
       a=Annotation.new(:source => df.contributor,
                        :annotatable => df,
-                       :attribute_name => "tag",
+                       :attribute => Factory(:tag_attribute),
                        :value => "fred")
       assert_difference("Annotation.count", 1) do
         assert_no_difference("TextValue::Version.count") do
