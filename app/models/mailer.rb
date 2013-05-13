@@ -37,14 +37,12 @@ class Mailer < ActionMailer::Base
   end
 
   def request_publish_approval(gatekeepers,user,resource,base_host)
-
-      subject "A #{Seek::Config.application_name} member requested your approval to publish: #{resource.title}"
-      recipients gatekeepers.collect{|m| m.email_with_name}
-      from Seek::Config.noreply_sender
-      reply_to user.person.email_with_name
-      sent_on Time.now
-
-      body :gatekeepers=>gatekeepers,:requester=>user.person,:resource=>resource,:host=>base_host
+    @gatekeepers = gatekeepers
+    @requester=user.person
+    @resource=resource
+    @host=base_host
+    mail(:to=>gatekeepers.collect{|m| m.email_with_name},:reply_to=>user.person.email_with_name,
+         :subject=>"A #{Seek::Config.application_name} member requested your approval to publish: #{resource.title}")
   end
 
   def gatekeeper_approval_feedback requester, gatekeeper, resource, base_host
@@ -74,14 +72,13 @@ class Mailer < ActionMailer::Base
   end
 
   def request_resource(user,resource,details,base_host)
-
-    subject "A #{Seek::Config.application_name} member requested a protected file: #{resource.title}"
-    recipients resource.managers.collect{|m| m.email_with_name}
-    from Seek::Config.noreply_sender
-    reply_to user.person.email_with_name
-    sent_on Time.now
-    
-    body :owners=>resource.managers,:requester=>user.person,:resource=>resource,:details=>details,:host=>base_host
+    @owners = resource.managers
+    @requester=user.person
+    @resource=resource
+    @details=details
+    @host=base_host
+    mail(:to=>resource.managers.collect{|m| m.email_with_name},:reply_to=>user.person.email_with_name,
+         :subject=>"A #{Seek::Config.application_name} member requested a protected file: #{resource.title}")
   end
 
   def signup(user,base_host)
