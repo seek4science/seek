@@ -49,12 +49,12 @@ class MailerTest < ActionMailer::TestCase
     @expected.subject = 'SEEK Feedback provided - This is a test feedback'
     @expected.to = "Quentin Jones <quentin@email.com>"
     @expected.from    = "no-reply@sysmo-db.org"    
-    @expected.date    = Time.now
+
 
     @expected.body    = read_fixture('feedback_anon')
-    force_now_is(@expected.date) do
-      assert_equal @expected.encoded,Mailer.create_feedback(users(:aaron),"This is a test feedback","testing the feedback message",true,"localhost").encoded
-    end
+
+    assert_equal encode_mail(@expected),encode_mail(Mailer.feedback(users(:aaron),"This is a test feedback","testing the feedback message",true,"localhost"))
+
   end
 
   test "feedback non anonymously" do
@@ -62,12 +62,11 @@ class MailerTest < ActionMailer::TestCase
     @expected.to = "Quentin Jones <quentin@email.com>"
     @expected.from    = "no-reply@sysmo-db.org"
     @expected.reply_to = "Aaron Spiggle <aaron@email.com>"
-    @expected.date    = Time.now
 
     @expected.body    = read_fixture('feedback_non_anon')
-    force_now_is(@expected.date) do
-      assert_equal @expected.encoded,Mailer.create_feedback(users(:aaron),"This is a test feedback","testing the feedback message",false,"localhost").encoded
-    end
+
+    assert_equal encode_mail(@expected),encode_mail(Mailer.feedback(users(:aaron),"This is a test feedback","testing the feedback message",false,"localhost"))
+
   end
 
   test "request resource" do
