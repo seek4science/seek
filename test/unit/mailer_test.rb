@@ -183,7 +183,7 @@ class MailerTest < ActionMailer::TestCase
     @expected.subject = 'SEEK - Password reset'
     @expected.to = "Aaron Spiggle <aaron@email.com>"
     @expected.from    = "no-reply@sysmo-db.org"
-    @expected.date    = Time.now
+
 
     @expected.body    = read_fixture('forgot_password')
     
@@ -191,9 +191,9 @@ class MailerTest < ActionMailer::TestCase
     u.reset_password_code_until = 1.day.from_now
     u.reset_password_code="fred"
     
-    force_now_is(@expected.date) do
-      assert_equal @expected.encoded, Mailer.create_forgot_password(users(:aaron),"localhost").encoded
-    end    
+
+    assert_equal encode_mail(@expected), encode_mail(Mailer.forgot_password(users(:aaron),"localhost"))
+
   end
 
   test "contact_admin_new_user_no_profile" do
@@ -241,5 +241,12 @@ class MailerTest < ActionMailer::TestCase
       assert_equal @expected.encoded, Mailer.create_welcome(users(:quentin),"localhost").encoded
     end
   end
+
+  private
+
+  def encode_mail message
+    message.encoded.gsub(/Message-ID: <.+>/, '').gsub(/Date: .+/, '')
+  end
+
 
 end
