@@ -558,11 +558,12 @@ module ApplicationHelper
       pluralize ? resource_type.pluralize : resource_type
     end
   end
+
   def add_return_to_search
     referer = request.headers["Referer"].try(:normalize_trailing_slash)
     search_path = search_url.normalize_trailing_slash
     root_path = root_url.normalize_trailing_slash
-    request_uri = request.headers['REQUEST_URI'].try(:normalize_trailing_slash)
+    request_uri = request.fullpath.try(:normalize_trailing_slash)
     if !request_uri.include?(root_path)
       request_uri = root_path.chop + request_uri
     end

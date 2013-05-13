@@ -3,7 +3,7 @@
     <% tool_tip_text = tooltip_title_attrib("You may delete this box so it is no longer shown in the future.") %>
     <div id='guide_box' class='top_home_panel' >
       <span id="guide_box_close">
-          <%= link_to_remote(image('destroy',:method => :post, :title => tool_tip_text), {:url => hide_guide_box_users_path()})%>
+          <%= link_to(image('destroy',:method => :post, :title => tool_tip_text), {:url => hide_guide_box_users_path()},:remote=>true) -%>
         </span>
       <p>
         To find out more information about using <%= Seek::Config.application_name -%>, some of our Guidelines and our Frequently Asked Questions please visit our <%= link_to 'Help', help_documents_path %> section.
