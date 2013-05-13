@@ -116,12 +116,6 @@ module Acts #:nodoc:
         self.creators
       end
 
-      # this method will take attributions' association and return a collection of resources,
-      # to which the current resource is attributed
-      def attributions
-        self.relationships.select { |a| a.predicate == Relationship::ATTRIBUTED_TO }
-      end
-
       def add_new_to_folder
         projects.each do |project|
           pf = ProjectFolder.new_items_folder project
