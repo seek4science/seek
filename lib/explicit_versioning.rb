@@ -300,7 +300,7 @@ module Jits
           # Gets the next available version for the current record, or 1 for a new record
           def next_version
             return 1 if new_record? || versions.empty?
-            (versions.calculate(:max, :version) || 0) + 1
+            (versions.maximum(:version) || 0) + 1
           end
 
           # Returns an array of attribute keys that are versioned.  See non_versioned_columns
