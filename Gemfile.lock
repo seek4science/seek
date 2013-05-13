@@ -58,7 +58,7 @@ GIT
 
 GIT
   remote: git://github.com/quyen/annotations.git
-  revision: f0017e2c892de10b41f124f46fb48d38f1d86d31
+  revision: 505c71d58e96763825c0ccefe7675b370f1a458e
   specs:
     my_annotations (0.6.0)
 
