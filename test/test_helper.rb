@@ -149,6 +149,12 @@ class ActiveSupport::TestCase
     path
   end
 
+  def assert_emails n
+    assert_difference "ActionMailer::Base.deliveries.size", n do
+      yield
+    end
+  end
+
   #debugging
 
   #saves the @response.body to a temp file, and prints out the file path
@@ -159,7 +165,6 @@ class ActiveSupport::TestCase
       f.flush
       f.close
       puts "Written @response.body to #{f.path}"
-
   end
   
 end

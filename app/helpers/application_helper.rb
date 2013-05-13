@@ -7,6 +7,14 @@ module ApplicationHelper
   include SavageBeast::ApplicationHelper
   include FancyMultiselectHelper
 
+  def draggable_element *arg
+    ""
+  end
+
+  def drop_receiving_element *arg
+    ""
+  end
+
 
   def date_as_string date,show_time_of_day=false
     date = Time.parse(date.to_s) unless date.is_a?(Time) || date.blank?
@@ -296,7 +304,7 @@ module ApplicationHelper
       :title => link_options[:title] || "",
       :onclick => "if (!#{can_click_var}) {#{can_click_var}=true;return(false);} else {return true;}",
       :onMouseUp => "setTimeout('#{can_click_var} = true;', 200);")
-    html << draggable_element(link_options[:id],
+      html << draggable_element(link_options[:id],
       :revert => drag_options[:revert] || true,
       :ghosting => drag_options[:ghosting] || false,
       :change => "function(element){#{can_click_var} = false;}")
