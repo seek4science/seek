@@ -35,14 +35,14 @@ class MailerTest < ActionMailer::TestCase
     @expected.subject = "SEEK Announcement: #{announcement.title}"
     @expected.to = "Fred Blogs <fred@email.com>"
     @expected.from    = "no-reply@sysmo-db.org"
-    @expected.date    = Time.now
+
 
     @expected.body    = read_fixture('announcement_notification')
     
     person=people(:fred)
-    force_now_is(@expected.date) do
-      assert_equal @expected.encoded, Mailer.create_announcement_notification(announcement,person.notifiee_info,"localhost").encoded
-    end    
+
+    assert_equal encode_mail(@expected), encode_mail(Mailer.announcement_notification(announcement,person.notifiee_info,"localhost"))
+
   end
 
   test "feedback anonymously" do

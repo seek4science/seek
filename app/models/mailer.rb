@@ -150,14 +150,11 @@ class Mailer < ActionMailer::Base
   end
   
   def announcement_notification(site_announcement, notifiee_info,base_host)
-    subject "#{Seek::Config.application_name} Announcement: #{site_announcement.title}"
-    recipients notifiee_info.notifiee.email_with_name    
-    from       Seek::Config.noreply_sender
-    sent_on    Time.now
-    
-    sent_on Time.now
-
-    body :site_announcement=>site_announcement, :notifiee_info=>notifiee_info,:host=>base_host
+    #FIXME: this should really be part of the site_annoucements plugin
+    @site_announcement  = site_announcement
+    @notifiee_info = notifiee_info
+    @host = base_host
+    mail(:to=>notifiee_info.notifiee.email_with_name,:subject=>"#{Seek::Config.application_name} Announcement: #{site_announcement.title}")
   end
 
   def test_email testing_email
