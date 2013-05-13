@@ -155,6 +155,11 @@ class ActiveSupport::TestCase
     end
   end
 
+  def assert_no_emails
+    assert_no_difference "ActionMailer::Base.deliveries.size" do
+      yield
+    end
+  end
   #debugging
 
   #saves the @response.body to a temp file, and prints out the file path
