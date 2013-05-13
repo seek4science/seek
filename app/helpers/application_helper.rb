@@ -117,7 +117,7 @@ module ApplicationHelper
     attributes += " class='tab_gap_before'" if options[:gap_before]
 
     link=link_to options[:title], options[:path]
-    "<li #{attributes}>#{link}</li>"
+    "<li #{attributes}>#{link}</li>".html_safe
   end
 
   #returns true if the current user is associated with a profile that is marked as a PAL
