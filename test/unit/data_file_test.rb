@@ -259,7 +259,8 @@ class DataFileTest < ActiveSupport::TestCase
       Factory :attribution,:subject=>data_file,:object=>attribution_df
       Factory :relationship,:subject=>data_file,:object=>Factory(:publication),:predicate=>Relationship::RELATED_TO_PUBLICATION
       data_file.creators = [Factory(:person),Factory(:person)]
-      Factory :annotation,:attribute_name=>"tag",:annotatable=> data_file,:attribute_id => AnnotationAttribute.create(:name=>"tag").id
+      a= Factory :tag,:annotatable=> data_file
+
       data_file.events = [Factory(:event)]
       data_file.save!
 
@@ -351,7 +352,8 @@ class DataFileTest < ActiveSupport::TestCase
       User.with_current_user(user) {
         data_file = Factory :data_file,:contributor=>user
         Factory :tag,:annotatable=>data_file,:source=>user,:value=>"fish"
-        Factory :annotation, :annotatable => data_file, :source=>user,:value=>"cat"
+        Factory :annotation, :annotatable => data_file, :source=>user,:value=>"cat",
+                             :attribute => Factory(:annotation_attribute, :name => 'test', :identifier => "http://www.example.org/attribute#test")
 
         assert_equal 2, data_file.annotations.count
         assert_equal 0, data_file.annotations.first.versions.count

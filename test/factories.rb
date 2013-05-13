@@ -746,18 +746,39 @@ end
     f.sequence(:value) {|n| "anno #{n}"}
     f.association :source, :factory=>:person
     f.attribute_name "annotation"
+    f.association :attribute, :factory=>:annotation_attribute
   end
 
   Factory.define :tag,:parent=>:annotation do |f|
-    f.attribute_name "tag"
+    f.association :attribute, :factory=>:tag_attribute
   end
 
   Factory.define :expertise,:parent=>:annotation do |f|
-    f.attribute_name "expertise"
+    f.association :attribute, :factory=>:expertise_attribute
   end
 
   Factory.define :tool,:parent=>:annotation do |f|
-    f.attribute_name "tool"
+    f.association :attribute, :factory=>:tool_attribute
+  end
+
+  Factory.define :annotation_attribute do |f|
+    f.name "tag"
+    f.identifier "http://www.example.org/attribute#tag"
+  end
+
+  Factory.define :tag_attribute,:parent=>:annotation_attribute do |f|
+    f.name "tag"
+    f.identifier "http://www.example.org/attribute#tag"
+  end
+
+  Factory.define :tool_attribute,:parent=>:annotation_attribute do |f|
+    f.name "tool"
+    f.identifier "http://www.example.org/attribute#tool"
+  end
+
+  Factory.define :expertise_attribute,:parent=>:annotation_attribute do |f|
+    f.name "expertise"
+    f.identifier "http://www.example.org/attribute#expertise"
   end
 
   Factory.define :text_value do |f|
