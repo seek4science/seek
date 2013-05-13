@@ -85,6 +85,24 @@ class MailerTest < ActionMailer::TestCase
 
   end
 
+  test "request resource no details" do
+    @expected.subject = "A SEEK member requested a protected file: Picture"
+    #TODO: hardcoding the formating rather than passing an array was require for rails 2.3.8 upgrade
+    @expected.to = "Datafile Owner <data_file_owner@email.com>,\r\n\t OwnerOf MyFirstSop <owner@sop.com>"
+    @expected.from = "no-reply@sysmo-db.org"
+    @expected.reply_to = "Aaron Spiggle <aaron@email.com>"
+
+
+    @expected.body = read_fixture('request_resource_no_details')
+
+    resource=data_files(:picture)
+    user=users(:aaron)
+    details=""
+
+    assert_equal encode_mail(@expected),encode_mail(Mailer.request_resource(user,resource,details,"localhost"))
+
+  end
+
   test "request publish approval" do
     resource = data_files(:picture)
     gatekeeper = people(:gatekeeper_person)
@@ -155,25 +173,6 @@ class MailerTest < ActionMailer::TestCase
 
   end
 
-
-
-  test "request resource no details" do
-    @expected.subject = "A SEEK member requested a protected file: Picture"
-    #TODO: hardcoding the formating rather than passing an array was require for rails 2.3.8 upgrade
-    @expected.to = "Datafile Owner <data_file_owner@email.com>,\r\n\t OwnerOf MyFirstSop <owner@sop.com>"
-    @expected.from = "no-reply@sysmo-db.org"
-    @expected.reply_to = "Aaron Spiggle <aaron@email.com>"
-    @expected.date = Time.now
-
-    @expected.body = read_fixture('request_resource_no_details')
-
-    resource=data_files(:picture)
-    user=users(:aaron)
-    details=""
-    force_now_is(@expected.date) do
-      assert_equal @expected.encoded,Mailer.create_request_resource(user,resource,details,"localhost").encoded
-    end
-  end
 
   test "forgot_password" do
     @expected.subject = 'SEEK - Password reset'
