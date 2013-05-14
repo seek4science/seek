@@ -59,7 +59,7 @@
         <h3 class="admin_warning" style="margin-top: 2.5em;">Access Rights Information - Only Visible to Admins</h3>
         <ul>
 
-          <%= "<li>This person is a <b>#{Seek::Config.dm_project_name} PAL</b></li>" if @person.is_pal? %>
+          <%= "<li>This person is a <b>#{Seek::Config.dm_project_name} PAL</b></li>".html_safe if @person.is_pal? %>
 
 
           <%= "<li>This person is a <b>project manager</b></li>" if @person.is_project_manager? %>
@@ -69,11 +69,11 @@
 
           <li>
             Editing <b>projects</b>, where this person is
-            involved: <%= @person.can_edit_projects? ? "<span class='allowed_text'>allowed</span>" : "<span class='denied_text'>denied</span>" -%>
+            involved: <%= (@person.can_edit_projects? ? "<span class='allowed_text'>allowed</span>" : "<span class='denied_text'>denied</span>").html_safe -%>
           </li>
           <li>
             Editing <b>institutions</b>, where this person works
-            with: <%= @person.can_edit_institutions? ? "<span class='allowed_text'>allowed</span>" : "<span class='denied_text'>denied</span>" -%>
+            with: <%= (@person.can_edit_institutions? ? "<span class='allowed_text'>allowed</span>" : "<span class='denied_text'>denied</span>").html_safe -%>
           </li>
         </ul>
     <% end -%>

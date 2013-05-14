@@ -7,6 +7,7 @@ module ApplicationHelper
   include SavageBeast::ApplicationHelper
   include FancyMultiselectHelper
 
+
   def draggable_element *arg
     ""
   end
@@ -161,6 +162,7 @@ module ApplicationHelper
     end
     script << "}\n"
     script << "</script>"
+    script.html_safe
   end
 
   #selection of assets for new asset gadget

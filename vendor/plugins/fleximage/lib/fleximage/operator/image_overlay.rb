@@ -7,7 +7,7 @@ module Fleximage
     # 
     #   image.resize(image_overlay_path, options = {})
     # 
-    # +image_overlay_path+ is the path, relative to +RAILS_ROOT+ where the image you want superimposed
+    # +image_overlay_path+ is the path, relative to +Rails.root+ where the image you want superimposed
     # can be found.
     # 
     # Use the following keys in the +options+ hash:

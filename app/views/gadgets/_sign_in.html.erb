@@ -6,7 +6,7 @@
         </p>
     </div>
     <div class="contents">
-        <% form_tag session_path do %>
+        <%= form_tag session_path do %>
         <%= hidden_field_tag "called_from[controller]", controller.controller_name -%>
         <%= hidden_field_tag "called_from[action]", controller.action_name -%>
         <%= hidden_field_tag "called_from[id]", params[:id] -%>
