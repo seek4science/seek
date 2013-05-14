@@ -48,7 +48,7 @@ module FavouritesHelper
 
     html = link_to_draggable(html, show_resource_path(item), :id=>model_to_drag_id(item), :class=> "asset", :title=>tooltip_title_attrib(get_object_title(item)))
     html = "<div class='favouritable_icon'>#{html}</div>"
-    return html
+    html.html_safe
   end 
   
   private
