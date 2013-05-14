@@ -23,7 +23,7 @@ module Seek
         unless File.exists?(pdf_filepath)
           #copy dat file to original file extension in order to convert to pdf on this file
           file_extension = mime_extensions(content_type).first
-          tmp_file = Tempfile.new storage_filename(file_extension)
+          tmp_file = Tempfile.new(['','.'+ file_extension])
           copied_filepath = tmp_file.path
 
           FileUtils.cp dat_filepath, copied_filepath
