@@ -7,6 +7,7 @@ module ApplicationHelper
   include SavageBeast::ApplicationHelper
   include FancyMultiselectHelper
 
+
   def draggable_element *arg
     ""
   end
