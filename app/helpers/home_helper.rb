@@ -61,7 +61,7 @@ module HomeHelper
   end
 
   def recently_downloaded_item_logs time=1.month.ago, number_of_item=10
-    Rails.cache.fetch("download_activity_#{current_user_id}") do
+    #Rails.cache.fetch("download_activity_#{current_user_id}") do
       activity_logs = ActivityLog.find(:all, :include => "activity_loggable", :order => "created_at DESC", :conditions => ["action = ? AND created_at > ?", 'download', time])
       selected_activity_logs = []
       selected_items = []
@@ -75,12 +75,12 @@ module HomeHelper
          end
          break if count == number_of_item
       end
-      return selected_activity_logs
-    end
+      selected_activity_logs
+    #end
   end
 
   def recently_added_item_logs time=1.month.ago, number_of_item=10
-    Rails.cache.fetch("create_activity_#{current_user_id}") do
+    #Rails.cache.fetch("create_activity_#{current_user_id}") do
       item_types = Seek::Util.user_creatable_types.collect{|type| type.name}
       activity_logs = ActivityLog.find(:all, :include => "activity_loggable", :order => "created_at DESC", :conditions => ["action = ? AND created_at > ? AND activity_loggable_type in (?)", 'create', time, item_types])
       selected_activity_logs = []
@@ -93,8 +93,8 @@ module HomeHelper
         end
         break if count == number_of_item
       end
-      return selected_activity_logs
-    end
+      selected_activity_logs
+    #end
   end
 
   # get multiple feeds from multiple sites
