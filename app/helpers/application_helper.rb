@@ -162,6 +162,7 @@ module ApplicationHelper
     end
     script << "}\n"
     script << "</script>"
+    script.html_safe
   end
 
   #selection of assets for new asset gadget
