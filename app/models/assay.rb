@@ -39,7 +39,7 @@ class Assay < ActiveRecord::Base
 
   after_save :queue_background_reindexing if Seek::Config.solr_enabled
   
-  def self.asset_sql(asset_class)
+  def asset_sql(asset_class)
     asset_class_underscored = asset_class.underscore
     'SELECT '+ asset_class_underscored +'_versions.* FROM ' + asset_class_underscored + '_versions ' +
     'INNER JOIN assay_assets ' + 
@@ -51,9 +51,9 @@ class Assay < ActiveRecord::Base
 
   #FIXME: These should be reversed, with the concrete version becoming the primary case, and versioned assets becoming secondary
   # i.e. - so data_files returnes [DataFile], and data_file_masters is replaced with versioned_data_files, returning [DataFile::Version]
-  has_many :data_files, :class_name => "DataFile::Version", :finder_sql => self.asset_sql("DataFile")
-  has_many :sops, :class_name => "Sop::Version", :finder_sql => self.asset_sql("Sop")
-  has_many :models, :class_name => "Model::Version", :finder_sql => self.asset_sql("Model")
+  has_many :data_files, :class_name => "DataFile::Version", :finder_sql => Proc.new{self.asset_sql("DataFile")}
+  has_many :sops, :class_name => "Sop::Version", :finder_sql => Proc.new{self.asset_sql("Sop")}
+  has_many :models, :class_name => "Model::Version", :finder_sql => Proc.new{self.asset_sql("Model")}
   
   has_many :data_file_masters, :through => :assay_assets, :source => :asset, :source_type => "DataFile"
   has_many :sop_masters, :through => :assay_assets, :source => :asset, :source_type => "Sop"

@@ -48,14 +48,14 @@ class Specimen < ActiveRecord::Base
 
   AGE_UNITS = ["second","minute","hour","day","week","month","year"]
 
-  def self.sop_sql()
+  def sop_sql()
   'SELECT sop_versions.* FROM sop_versions ' + 'INNER JOIN sop_specimens ' +
   'ON sop_specimens.sop_id = sop_versions.sop_id ' +
   'WHERE (sop_specimens.sop_version = sop_versions.version ' +
   "AND sop_specimens.specimen_id = #{self.id})"
   end
 
-  has_many :sops,:class_name => "Sop::Version",:finder_sql => self.sop_sql()
+  has_many :sops,:class_name => "Sop::Version",:finder_sql => Proc.new{self.sop_sql()}
   has_many :sop_masters,:class_name => "SopSpecimen"
   grouped_pagination :pages=>("A".."Z").to_a, :default_page => Seek::Config.default_page(self.name.underscore.pluralize)
 
