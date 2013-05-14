@@ -19,7 +19,7 @@ module OrganismsHelper
       link_list << organism_link_to(o)
       link_list << ", " unless o==organisms.last   
     end
-    return link_list    
+    link_list.html_safe
   end
   
   def link_to_ncbi_taxonomy_browser organism,text,html_options={}

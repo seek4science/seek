@@ -20,41 +20,46 @@ module ProjectsHelper
 
   def pals_link_list project
     if project.pals.empty?
-      "<span class='none_text'>No PALs for this project</span>";
+      html = "<span class='none_text'>No PALs for this project</span>";
     else
-      project.pals.select(&:can_view?).collect { |p| link_to(h(p.name), p) }.join(", ")
+      html = project.pals.select(&:can_view?).collect { |p| link_to(h(p.name), p) }.join(", ")
     end
+    html.html_safe
   end
 
   def asset_managers_link_list project
     if project.asset_managers.empty?
-      "<span class='none_text'>No Asset Managers for this project</span>";
+      html = "<span class='none_text'>No Asset Managers for this project</span>";
     else
-      project.asset_managers.select(&:can_view?).collect { |p| link_to(h(p.name), p) }.join(", ")
+      html = project.asset_managers.select(&:can_view?).collect { |p| link_to(h(p.name), p) }.join(", ")
     end
+    html.html_safe
   end
 
   def project_managers_link_list project
     if project.project_managers.empty?
-      "<span class='none_text'>No Project Managers for this project</span>";
+      html = "<span class='none_text'>No Project Managers for this project</span>";
     else
-      project.project_managers.select(&:can_view?).collect { |p| link_to(h(p.name), p) }.join(", ")
+      html = project.project_managers.select(&:can_view?).collect { |p| link_to(h(p.name), p) }.join(", ")
     end
+    html.html_safe
   end
 
   def gatekeepers_link_list project
     if project.gatekeepers.empty?
-      "<span class='none_text'>No Gatekeepers for this project</span>";
+      html = "<span class='none_text'>No Gatekeepers for this project</span>";
     else
-      project.gatekeepers.select(&:can_view?).collect { |p| link_to(h(p.name), p) }.join(", ")
+      html = project.gatekeepers.select(&:can_view?).collect { |p| link_to(h(p.name), p) }.join(", ")
     end
+    html.html_safe
   end
 
   def project_mailing_list project
-      if project.people.empty?
-        "<span class='none_text'>No people in this project</span>";
-      else
-        "<span>" + project.people.sort_by(&:last_name).select(&:can_view?).map{|p|link_to(h(p.name), p) + " (" + p.email + ")"}.join(";<br/>") + "</span>";
-      end
+    if project.people.empty?
+      html = "<span class='none_text'>No people in this project</span>";
+    else
+      html = "<span>" + project.people.sort_by(&:last_name).select(&:can_view?).map{|p|link_to(h(p.name), p) + " (" + p.email + ")"}.join(";<br/>") + "</span>";
+    end
+    html.html_safe
   end
 end
