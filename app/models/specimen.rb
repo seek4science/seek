@@ -52,7 +52,7 @@ class Specimen < ActiveRecord::Base
   'SELECT sop_versions.* FROM sop_versions ' + 'INNER JOIN sop_specimens ' +
   'ON sop_specimens.sop_id = sop_versions.sop_id ' +
   'WHERE (sop_specimens.sop_version = sop_versions.version ' +
-  'AND sop_specimens.specimen_id = #{self.id})'
+  "AND sop_specimens.specimen_id = #{self.id})"
   end
 
   has_many :sops,:class_name => "Sop::Version",:finder_sql => self.sop_sql()
