@@ -17,9 +17,7 @@ module ImagesHelper
 
   def image_tag_for_key(key, url=nil, alt=nil, url_options={}, label=key.humanize, remote=false, size=nil)
 
-    if (label == 'Destroy')
-      label = 'Delete';
-    end
+    label = 'Delete' if label == 'Destroy'
     
     return nil unless (filename = icon_filename_for_key(key.downcase))
 
@@ -28,7 +26,7 @@ module ImagesHelper
     img_tag = image_tag(filename, image_options)
 
     inner = img_tag;
-    inner = "#{img_tag} #{label}" unless label.blank?
+    inner = "#{img_tag} #{label}".html_safe unless label.blank?
     
     if (url)
       if (remote==:function)
@@ -40,7 +38,8 @@ module ImagesHelper
       end
     end
     
-    return '<span class="icon">' + inner + '</span>';
+    tag = '<span class="icon">' + inner + '</span>'
+    tag.html_safe
   end
 
   def resource_avatar resource,html_options={}
