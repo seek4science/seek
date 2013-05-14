@@ -34,7 +34,7 @@ class Sample < ActiveRecord::Base
   'INNER JOIN sample_sops ' +
   'ON sample_sops.sop_id = sop_versions.sop_id ' +
   'WHERE (sample_sops.sop_version = sop_versions.version ' +
-  'AND sample_sops.sample_id = #{self.id})'
+  "AND sample_sops.sample_id = #{self.id})"
   end
 
   def self.asset_sql(asset_class)
@@ -44,7 +44,7 @@ class Sample < ActiveRecord::Base
     'ON sample_assets.asset_id= '+ asset_class_underscored + '_id ' +
     'AND sample_assets.asset_type=\'' + asset_class + '\' ' +
     'WHERE (sample_assets.version= ' + asset_class_underscored + '_versions.version ' +
-    'AND sample_assets.sample_id= #{self.id})'
+    "AND sample_assets.sample_id= #{self.id})"
   end
 
   has_many :data_files, :class_name => "DataFile::Version", :finder_sql => self.asset_sql("DataFile")
