@@ -50,4 +50,5 @@ task :cruise2 do |t,args|
   Rake::Task["db:test:prepare"].invoke
   Rake::Task["seek:seed_testing"].invoke
   Rake::Task["test:units"].invoke
+  Rake::Task["test:functional"].invoke
 end
