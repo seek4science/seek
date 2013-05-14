@@ -29,7 +29,7 @@ module PeopleHelper
     else
       text="<span class='none_text'>None specified</span>"
     end
-    return text
+    return text.html_safe
   end
 
   def project_role_list person

@@ -37,7 +37,7 @@ module TagsHelper
     tags.map do |t|
       divider=tags.last==t ? "" : "<span class='spacer'>,</span> ".html_safe
       link_for_ann(t,options)+divider
-    end
+    end.join("").html_safe
   end
 
   #defines the tag box, with AJAX tag entry and removal
