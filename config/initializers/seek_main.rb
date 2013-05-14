@@ -44,7 +44,7 @@ require 'seek/permissions/publishing_permissions'
 SEEK::Application.configure do
   GLOBAL_PASSPHRASE="ohx0ipuk2baiXah" unless defined? GLOBAL_PASSPHRASE
 
-  ASSET_ORDER                = ['Person', 'Project', 'Institution', 'Investigation', 'Study', 'Assay', 'Sample','Specimen','Strain', 'DataFile', 'Model', 'Sop', 'Publication', 'Presentation','SavedSearch', 'Organism', 'Event']
+  ASSET_ORDER = ['Person', 'Project', 'Institution', 'Investigation', 'Study', 'Assay', 'Sample','Specimen','Strain', 'DataFile', 'Model', 'Sop', 'Publication', 'Presentation','SavedSearch', 'Organism', 'Event']
 
   PORTER_SECRET = "" unless defined? PORTER_SECRET
 
@@ -61,7 +61,6 @@ SEEK::Application.configure do
   Annotations::Config.versioning_enabled = false
 
   ENV['LANG'] = 'en_US.UTF-8'
-
 
   if ActiveRecord::Base.connection.table_exists? 'delayed_jobs'
     SendPeriodicEmailsJob.create_initial_jobs
