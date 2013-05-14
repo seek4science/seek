@@ -63,9 +63,9 @@ SEEK::Application.configure do
   ENV['LANG'] = 'en_US.UTF-8'
 
 
-  #if ActiveRecord::Base.connection.table_exists? 'delayed_jobs'
-  #  SendPeriodicEmailsJob.create_initial_jobs
-  #end
+  if ActiveRecord::Base.connection.table_exists? 'delayed_jobs'
+    SendPeriodicEmailsJob.create_initial_jobs
+  end
 
   ConvertOffice::ConvertOfficeConfig.options =
       {
