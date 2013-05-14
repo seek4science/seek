@@ -49,7 +49,7 @@ class HomeHelperTest < ActionView::TestCase
 
     #test the lasted recenly_downloaded_log is taken
     recently_downloaded_item_logs = recently_downloaded_item_logs.select{|log| log.activity_loggable == item}
-    assert_equal recently_downloaded_item_logs.count, 1
+    assert_equal 1, recently_downloaded_item_logs.count
     assert_equal recently_downloaded_item_logs.first, download_logs.first
   end
 end

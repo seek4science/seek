@@ -75,7 +75,7 @@ module HomeHelper
          end
          break if count == number_of_item
       end
-      selected_activity_logs
+      return selected_activity_logs
     end
   end
 
@@ -93,7 +93,7 @@ module HomeHelper
         end
         break if count == number_of_item
       end
-      selected_activity_logs
+      return selected_activity_logs
     end
   end
 
