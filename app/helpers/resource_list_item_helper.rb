@@ -57,7 +57,7 @@ module ResourceListItemHelper
     end
     visibility = resource.authorization_supported? && resource.can_manage? ? list_item_visibility(resource) : ""
     result = result.gsub("#item_visibility",visibility)
-    result
+    result.html_safe
   end
 
   def list_item_tag_list resource
@@ -78,7 +78,8 @@ module ResourceListItemHelper
         html << value + (i == items.last ? "" : ", ")
       end
     end
-    return html + "</p>"
+    html = html + "</p>"
+    html.html_safe
   end
 
   def list_item_authorized_list *args
@@ -106,7 +107,8 @@ module ResourceListItemHelper
         value = link_to value, url
       end
     end
-    return missing_value_text.nil? ? "" : "<p class=\"list_item_attribute\"><b>#{attribute}</b>: #{value}</p>"
+    html = missing_value_text.nil? ? "" : "<p class=\"list_item_attribute\"><b>#{attribute}</b>: #{value}</p>"
+    html.html_safe
   end
 
   def list_item_timestamp resource
@@ -128,7 +130,7 @@ module ResourceListItemHelper
     html = "<div class=\"list_item_desc\">"
     html << text_or_not_specified(text, :description => true, :auto_link=>auto_link, :length=>length)
     html << "</div>"
-    return html
+    html.html_safe
   end
 
   def list_item_contributor resource
