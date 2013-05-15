@@ -32,7 +32,7 @@ module ImagesHelper
       if (remote==:function)
         inner = link_to_function inner, url, html_options
       elsif (remote)
-        inner = link_to_remote(inner, url, html_options);
+        inner = link_to(inner, url, html_options..merge(:remote => true));
       else
         inner = link_to(inner, url, html_options)
       end

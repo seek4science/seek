@@ -95,13 +95,13 @@
             <%= text_field_tag "content_blob[data_url]", resource.data_url, :size => 35 %>
                 <span style="display:inline-block;">
                     <%= link_to_function (image("new") + "Add"), "addToList()" %>
-                    <%= link_to_remote image("test", :title=>"Test", :alt=>"Test")+" Test",
+                    <%= link_to image("test", :title=>"Test", :alt=>"Test")+" Test",
                                        {:url=>{:action=>:test_asset_url, :symb=>"content_blob"},
                                        :method=>:post,
                                        :type => :synchronous,
                                        :with=>"multi_selector.current_url_element.serialize()",
                                        :before=>"$('test_url_msg').innerHTML='';show_ajax_loader('test_url_result_icon');"},
-                                        {:id => 'test'}-%>
+                                        {:id => 'test', :remote => true}-%>
                 </span>
 
                 <p style="clear:both;">

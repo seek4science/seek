@@ -99,10 +99,10 @@
               <p>
                 <span class="edit">
                   <%= ajax_spinner_for "edit-post-#{post.id}", "spinner_bounce.gif" %>
-                  <%= link_to_remote('Edit post'[],
+                  <%= link_to('Edit post'[],
                     {:url => edit_post_path(:forum_id => @forum, :topic_id => @topic, :id => post), :method => :get,
                       :before => "EditForm.init(#{post.id});", :condition => "!EditForm.isEditing(#{post.id})" },
-                    {:href => edit_post_path(:forum_id => @forum, :topic_id => @topic, :id => post, :page => params[:page]), :class => "utility"}) %>
+                    {:href => edit_post_path(:forum_id => @forum, :topic_id => @topic, :id => post, :page => params[:page]), :class => "utility", :remote => true}) %>
                 </span>
               </p>
             <% end -%>

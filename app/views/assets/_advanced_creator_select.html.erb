@@ -39,7 +39,7 @@
         <%= select_tag("adv_institution_id", "<option value=\"0\">N/A</option>", :id => "adv_creator_select_institutions",:style=>"display:none;") %>
         <br/>
         <% add_html = image('new', :style => "vertical-align: middle")+" Add" %>
-        <%= link_to_remote add_html, :html =>{:class=>"block_link",:id => "adv_creator_select_add", :style => "display:none;"},
+        <%= link_to add_html, :html =>{:class=>"block_link",:id => "adv_creator_select_add", :style => "display:none;", :remote => true},
         :url => get_work_group_people_url,
         :with => "'project_id='+$('adv_creator_select_projects').options[$('adv_creator_select_projects').selectedIndex].value+"+
         "'&institution_id='+$('adv_creator_select_institutions').options[$('adv_creator_select_institutions').selectedIndex].value",

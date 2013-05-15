@@ -81,13 +81,13 @@ original_filename=nil
           <span class="required">*</span>
           <%= text_field upload_field, :data_url, :size => 55 -%>
           <span style="display:inline-block;">
-                        <%= link_to_remote image("test", :title => "Test", :alt => "Test")+" Test",
+                        <%= link_to image("test", :title => "Test", :alt => "Test")+" Test",
                                            {:url => {:action => :test_asset_url},
                                             :method => :post,
                                             :type => :synchronous,
                                             :with => "$('#{upload_field}_data_url').serialize()",
                                             :before => "$('test_url_msg').innerHTML='';show_ajax_loader('test_url_result_icon');"},
-                                           {:id => 'test'} -%>
+                                           {:id => 'test', :remote => true} -%>
                     </span>
 
           <p style="clear:both;">

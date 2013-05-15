@@ -45,8 +45,8 @@ module BiosamplesHelper
      (check_box_tag "selected_strain_#{strain.id}", strain.id, false, :onchange => strain_checkbox_onchange_function)   ,
      link_to(strain.title, strain), text_or_not_specified(strain.genotype_info), text_or_not_specified(strain.phenotype_info), strain.id, text_or_not_specified(strain.synonym), text_or_not_specified(creator_link), text_or_not_specified(strain.parent_strain),
      (if strain.can_delete?
-        link_to_remote image("destroy", :alt => "Delete", :title => "Delete this strain"), :url => {:action => "destroy", :controller => 'biosamples', :id => strain.id, :class => 'strain', :id_column_position => 5},
-                             :confirm => "Are you sure you want to delete this strain?", :method => :delete
+        link_to image("destroy", :alt => "Delete", :title => "Delete this strain"), :url => {:action => "destroy", :controller => 'biosamples', :id => strain.id, :class => 'strain', :id_column_position => 5},
+                             :confirm => "Are you sure you want to delete this strain?", :method => :delete, :remote => true
       else
         explanation=unable_to_delete_text strain
         image('destroy', {:alt=>"Delete",:class=>"disabled",:onclick=>"javascript:alert(\"#{explanation}\")",:title=>"#{tooltip_title_attrib(explanation)}"})
@@ -94,9 +94,9 @@ module BiosamplesHelper
     explanation += unable_to_delete_text specimen  unless specimen.samples.blank?
     disabled_delete_icon = image('destroy', {:alt=>"Delete",:class=>"disabled",:onclick=>"javascript:alert(\"#{explanation}\")",:title=>"#{tooltip_title_attrib(explanation)}"})
 
-    delete_icon = specimen.can_delete? ? (link_to_remote image("destroy", :alt => "Delete", :title => "Delete this #{Seek::Config.sample_parent_term}"),
+    delete_icon = specimen.can_delete? ? (link_to image("destroy", :alt => "Delete", :title => "Delete this #{Seek::Config.sample_parent_term}"),
                          :url => {:action => "destroy", :controller => 'biosamples', :id => specimen.id, :class => 'specimen', :id_column_position => id_column},
-                         :confirm => "Are you sure you want to delete this #{Seek::Config.sample_parent_term}?", :method => :delete) : disabled_delete_icon
+                         :confirm => "Are you sure you want to delete this #{Seek::Config.sample_parent_term}?", :method => :delete, :remote => true) : disabled_delete_icon
     update_icon = nil
     if specimen.can_manage?
       update_icon = link_to image("manage"), edit_specimen_path(specimen) + "?from_biosamples=true", {:title => "Manage this #{Seek::Config.sample_parent_term}", :target => '_blank'}
@@ -132,9 +132,9 @@ module BiosamplesHelper
     explanation += unable_to_delete_text sample  unless sample.assays.blank?
     disabled_delete_icon =  image('destroy', {:alt=>"Delete",:class=>"disabled",:onclick=>"javascript:alert(\"#{explanation}\")",:title=>"#{tooltip_title_attrib(explanation)}"})
 
-    delete_icon = sample.can_delete? ? (link_to_remote image("destroy", :alt => "Delete", :title => "Delete this sample"),
+    delete_icon = sample.can_delete? ? (link_to image("destroy", :alt => "Delete", :title => "Delete this sample"),
                              :url => {:action => "destroy", :controller => 'biosamples', :id => sample.id, :class => 'sample', :id_column_position => 6},
-                             :confirm => "Are you sure you want to delete this sample?", :method => :delete) : disabled_delete_icon
+                             :confirm => "Are you sure you want to delete this sample?", :method => :delete, :remote => true) : disabled_delete_icon
     update_icon = nil
     if sample.can_manage?
       update_icon = link_to image("manage"), edit_sample_path(sample) + "?from_biosamples=true", {:title => "Manage this sample", :target => '_blank'}

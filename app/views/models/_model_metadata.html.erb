@@ -21,11 +21,12 @@
     </span>
     <span id="delete_model_type_icon" style="display:none;">
       <%= hidden_field_tag :selected_model_type_id %>
-      <%= link_to_remote image("destroy"),
+      <%= link_to image("destroy"),
         :url=>{:action=>:delete_model_metadata,:attribute=>"model_type"},
         :confirm=>"Are you sure you wish to delete this model type?",
         :with=>"$('selected_model_type_id').serialize()",
-        :before=>"show_ajax_loader('model_type_selection');$('edit_model_type_icon').hide();$('delete_model_type_icon').hide();"
+        :before=>"show_ajax_loader('model_type_selection');$('edit_model_type_icon').hide();$('delete_model_type_icon').hide();",
+        :remote => true
       -%>
     </span>
   
@@ -81,11 +82,12 @@
     </span>
     <span id="delete_model_format_icon" style="display:none;">
       <%= hidden_field_tag :selected_model_format_id %>
-      <%= link_to_remote image("destroy"),
+      <%= link_to image("destroy"),
         :url=>{:action=>:delete_model_metadata,:attribute=>"model_format"},
         :confirm=>"Are you sure you wish to delete this model format?",
         :with=>"$('selected_model_format_id').serialize()",
-        :before=>"show_ajax_loader('model_format_selection');$('edit_model_format_icon').hide();$('delete_model_format_icon').hide();"
+        :before=>"show_ajax_loader('model_format_selection');$('edit_model_format_icon').hide();$('delete_model_format_icon').hide();",
+        :remote => true
       -%>
     </span>
 
