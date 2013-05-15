@@ -205,7 +205,7 @@ module ApplicationHelper
       res=res+"&nbsp;"+flag_icon(text) if options[:flag]==true
       res = "&nbsp;" + flag_icon(text) + link_to(res,country_path(res)) if options[:link_as_country]==true 
     end
-    return res
+    res.html_safe
   end
 
   def tooltip_title_attrib(text, delay=200)

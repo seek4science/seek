@@ -88,9 +88,10 @@ module ResourceListItemHelper
 
   def list_item_attribute attribute, value, url=nil, url_options={}
     unless url.nil?
-      value = link_to value, url, url_options
+      value = link_to h(value), url, url_options
     end
-    return "<p class=\"list_item_attribute\"><b>#{attribute}</b>: #{value}</p>"
+    html = "<p class=\"list_item_attribute\"><b>#{attribute}</b>: #{value}</p>"
+    html.html_safe
   end
 
   def list_item_authorized_attribute attribute, object, url='undefined', method = :title
