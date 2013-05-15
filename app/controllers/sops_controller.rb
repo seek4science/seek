@@ -53,7 +53,6 @@ class SopsController < ApplicationController
     # update timestamp in the current SOP record 
     # (this will also trigger timestamp update in the corresponding Asset)
     if @sop.instance_of?(Sop)
-      @sop.last_used_at = Time.now
       @sop.save_without_timestamping
     end  
     

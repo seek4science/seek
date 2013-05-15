@@ -42,7 +42,6 @@ class ContentBlobsController < ApplicationController
   def download
     # update timestamp in the current asset record
     # (this will also trigger timestamp update in the corresponding Asset)
-    @asset.last_used_at = Time.now
     @asset.save_without_timestamping
 
     disposition = params[:disposition] || 'attachment'

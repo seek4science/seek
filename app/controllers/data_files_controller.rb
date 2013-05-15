@@ -241,7 +241,6 @@ class DataFilesController < ApplicationController
     
     # update timestamp in the current Data file record
     # (this will also trigger timestamp update in the corresponding Asset)
-    @data_file.last_used_at = Time.now
     @data_file.save_without_timestamping
 
     #Rails.logger.warn "template in data_files_controller/show : #{params[:parsing_template]}"

@@ -109,7 +109,6 @@ class PresentationsController < ApplicationController
 
     # update timestamp in the current Presentation record
     # (this will also trigger timestamp update in the corresponding Asset)
-    @presentation.last_used_at = Time.now
     @presentation.save_without_timestamping
 
     respond_to do |format|

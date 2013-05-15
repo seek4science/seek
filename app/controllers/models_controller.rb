@@ -407,7 +407,6 @@ class ModelsController < ApplicationController
 
     # update timestamp in the current Model record
     # (this will also trigger timestamp update in the corresponding Asset)
-    @model.last_used_at = Time.now
     @model.save_without_timestamping
     
     respond_to do |format|

@@ -19,7 +19,6 @@ module AssetsCommonExtension
   def download_model
     # update timestamp in the current Model record
     # (this will also trigger timestamp update in the corresponding Asset)
-    @model.last_used_at = Time.now
     @model.save_without_timestamping
 
     handle_download_zip @display_model
@@ -32,7 +31,6 @@ module AssetsCommonExtension
 
     @asset_version = eval("@display_#{name}")
     @content_blob = @asset_version.content_blob
-    @asset.last_used_at = Time.now
     @asset.save_without_timestamping
 
     disposition = params[:disposition] || 'attachment'
