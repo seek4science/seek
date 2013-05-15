@@ -5,7 +5,7 @@
 
 <h1>Editing Presentation: <%= link_to(h(@presentation.title), edit_presentation_path) -%></h1>
 <div class="show_basic">
-    <% form_for(@presentation) do |f| %>
+    <%= form_for(@presentation) do |f| %>
     <div class="asset_form">
         <%= f.error_messages %>
         <p>

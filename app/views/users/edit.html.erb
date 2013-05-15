@@ -15,7 +15,7 @@
         <b><%= @user.login %></b>
     </p>
     <h2>Change password</h2>
-    <% form_for @user do |f| -%>
+    <%= form_for @user do |f| -%>
     <%= f.error_messages %>
     <p>
         <label>

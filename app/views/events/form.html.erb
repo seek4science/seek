@@ -6,7 +6,7 @@
 
 <h1><%= @new ? 'New Event' : ('Editing Event: ' + link_to(h(@event.title), event_path(@event))) -%></h1>
 <div class="show_basic">
-  <% form_for @event do |f| %>
+  <%= form_for @event do |f| %>
       <div class="asset_form">
         <%= f.error_messages %>
         <h2>Event Information</h2>

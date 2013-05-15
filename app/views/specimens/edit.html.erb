@@ -1,7 +1,7 @@
 <h1><%= "Edit #{Seek::Config.sample_parent_term}: "%><%= link_to h(@specimen.title), specimen_path(@specimen) -%></h1>
 
 <div class="show_basic">
-  <% form_for(@specimen) do |f| %>
+  <%= form_for(@specimen) do |f| %>
     <%= render :partial => "form", :locals => { :f => f, :action=>:edit} -%>
   <% end %>
 </div>

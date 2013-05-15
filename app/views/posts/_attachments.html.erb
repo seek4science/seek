@@ -2,7 +2,7 @@
   <div id="attachment_list">
     <%= render :partial => 'attachment_list', :locals => {:attachments => @post.attachments} %>
   </div>
-  <% form_for(:forum_attachment, :url => {:controller => :forum_attachments, :action => :create}, :html => { :multipart => true, :target => "attachment_upload"}) do |f| %>
+  <%= form_for(:forum_attachment, :url => {:controller => :forum_attachments, :action => :create}, :html => { :multipart => true, :target => "attachment_upload"}) do |f| %>
     <p>      
       <%= label_tag "Attachment" %><br/>
       <%= f.file_field :uploaded_data %>

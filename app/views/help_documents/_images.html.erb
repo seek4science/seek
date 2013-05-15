@@ -2,7 +2,7 @@
   <div id="image_list">
     <%= render :partial => 'image_list', :locals => {:images => @help_document.images} %>
   </div>
-  <% form_for(:help_image, :url => {:controller => :help_images, :action => :create}, :html => { :multipart => true, :target => "image_upload"}) do |f| %>
+  <%= form_for(:help_image, :url => {:controller => :help_images, :action => :create}, :html => { :multipart => true, :target => "image_upload"}) do |f| %>
     <p>      
       <%= label_tag "Image" %><br/>
       <%= f.file_field :uploaded_data %>

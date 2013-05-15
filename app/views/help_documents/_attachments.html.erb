@@ -2,7 +2,7 @@
   <div id="attachment_list">
     <%= render :partial => 'attachment_list', :locals => {:attachments => @help_document.attachments} %>
   </div>
-  <% form_for(:help_attachment, :url => {:controller => :help_attachments, :action => :create}, :html => { :multipart => true, :target => "attachment_upload"}) do |f| %>
+  <%= form_for(:help_attachment, :url => {:controller => :help_attachments, :action => :create}, :html => { :multipart => true, :target => "attachment_upload"}) do |f| %>
     <p>      
       <%= f.label :title %><br/>
       <%= f.text_field :title %>

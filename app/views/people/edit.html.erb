@@ -1,7 +1,7 @@
 <h1>Edit profile: <%= link_to(h(@person.name), person_path(@person)) -%></h1>
 
 <div class="show_basic">
-	<% form_for @person do |f| %>
+	<%= form_for @person do |f| %>
 	  <%= render :partial => "form", :locals => { :f => f, :person => @person } -%>
 	<% end -%>
 </div>

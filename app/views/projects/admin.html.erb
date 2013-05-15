@@ -2,7 +2,7 @@
 <h1>Administer Project: <%= link_to h(@project.name), project_path(@project) -%></h1>
 
 <div class="show_basic">
-  <% form_for(@project) do |f| -%>
+  <%= form_for(@project) do |f| -%>
 
     <%= javascript_include_tag "projects.js" %>
   
