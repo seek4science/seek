@@ -4,7 +4,7 @@
 <script type="text/javascript">
     strain_form("<%=strain.try(:id)-%>", "<%=strain.try(:organism_id)-%>", 'create', '<%=url_for(:controller => 'biosamples', :action => 'strain_form')-%>');
 </script>
-<% remote_form_for 'biosamples', :url => url_for(:controller => 'biosamples', :action => 'create_strain'),
+<%= form_for 'biosamples', :url => url_for(:controller => 'biosamples', :action => 'create_strain', :remote => true),
   :condition=>"validateStrainFields('create')",
   :html=>{:method=>:post} do -%>
 <div id="redbox_contents_div" class="redbox_contents" style="width:800px;">

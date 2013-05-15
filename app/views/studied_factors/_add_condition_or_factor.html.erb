@@ -17,11 +17,12 @@
    end
 %>
 
-<% remote_form_for entity, object,
+<%= form_for entity, object,
   :url=> path_to_object,
   :before=>"$('#{entity}_submit').disabled=true;",
   :loaded=>"$('#{entity}_submit').disabled=false;",
-  :html=>{:method=>:post, :id => "add_condition_or_factor_form"} do |f| -%>
+  :html=>{:method=>:post, :id => "add_condition_or_factor_form"},
+  :remote => true do |f| -%>
 
 
   <div class="conditions_or_factors" >

@@ -12,11 +12,12 @@
      path_to_object = sop_path(@sop).concat("/#{controller_name}/#{object.id}")
    end
 %>
-<% remote_form_for entity, object,
+<%= form_for entity, object,
   :url=> path_to_object,
   :before=>"$('update_#{object.id}').disabled=true;",
   :loaded=>"$('update_#{object.id}').disabled=false;",
-  :html=>{:method=>:put, :id => "edit_condition_or_factor_#{object.id}_form", :style => "display:none"} do |f| -%>
+  :html=>{:method=>:put, :id => "edit_condition_or_factor_#{object.id}_form", :style => "display:none"},
+  :remote => true do |f| -%>
 
 
   <div class="conditions_or_factors" >
