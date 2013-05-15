@@ -15,9 +15,10 @@
             <li class="box_simple" style="width: 40em;">Test email configuration: Here you can input an email for a testing message to be sent to.
                 <br/>
                 Testing email: <%= text_field_tag :testing_email %>
-                <%= link_to_remote image("test",:title=>"Send testing email",:alt=>"Test")+" Test",
+                <%= link_to image("test",:title=>"Send testing email",:alt=>"Test")+" Test",
                             :url=>{:action=>'test_email_configuration'},
                             :method=>:post,
+                            :remote=>true,
                             :with=>"'address=' + $F('address') + '&port=' + $F('port') + '&domain=' + $F('domain') + '&authentication=' + $F('authentication')
                              + '&enable_starttls_auto='+$F('enable_starttls_auto') + '&user_name=' + $F('user_name') + '&password=' + $F('password') + '&testing_email=' + $F('testing_email')",
                             :before => "show_ajax_loader('ajax_loader_position');"-%>
