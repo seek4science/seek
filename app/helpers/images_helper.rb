@@ -15,7 +15,7 @@ module ImagesHelper
     image_tag filename,options
   end
 
-  def image_tag_for_key(key, url=nil, alt=nil, url_options={}, label=key.humanize, remote=false, size=nil)
+  def image_tag_for_key(key, url=nil, alt=nil, html_options={}, label=key.humanize, remote=false, size=nil)
 
     label = 'Delete' if label == 'Destroy'
     
@@ -30,11 +30,11 @@ module ImagesHelper
     
     if (url)
       if (remote==:function)
-        inner = link_to_function inner, url, url_options
+        inner = link_to_function inner, url, html_options
       elsif (remote)
-        inner = link_to_remote(inner, url, url_options);
+        inner = link_to_remote(inner, url, html_options);
       else
-        inner = link_to(inner, url, url_options)
+        inner = link_to(inner, url, html_options)
       end
     end
     
