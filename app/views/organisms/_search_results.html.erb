@@ -1,5 +1,5 @@
-<% form_remote_tag :url   =>url_for(:action=>:search_ajax, :controller=>:organisms),
-                   :before=>"show_ajax_loader('search_results');" do -%>
+<%= form_tag :url=>url_for(:action=>:search_ajax, :controller=>:organisms),
+             :before=>"show_ajax_loader('search_results');", :remote => true do -%>
     <%= hidden_field_tag :pagenum, 1 -%>
     <p>
       <label>Search for:</label><br/>

@@ -28,9 +28,10 @@
 
 <div id="create_a_tag" style="display:none;">
 
-  <% form_remote_tag :url =>{:action=>:update_annotations_ajax},
+  <%= form_tag :url =>{:action=>:update_annotations_ajax},
                      :method =>:post,
-                     :loading =>"$('tags_submit_button').value='Updating...';$('tags_submit_button').disabled=true;show_ajax_loader('tag_cloud');" do
+                     :loading =>"$('tags_submit_button').value='Updating...';$('tags_submit_button').disabled=true;show_ajax_loader('tag_cloud');",
+                     :remote => true do
   %>
       <p>
         <%= hidden_field_tag "prefix", name -%>

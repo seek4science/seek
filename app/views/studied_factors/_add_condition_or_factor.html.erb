@@ -74,7 +74,7 @@
  </div>
 <% end -%>
 
-<% form_remote_tag :url => path_to_create_from_existing do -%>
+<%= form_tag :url => path_to_create_from_existing, :remote => true do -%>
    <% fses_or_ecs = fses_or_ecs_of_project asset_object, controller_name
       unless fses_or_ecs.blank? %>
          <div class="conditions_or_factors" >

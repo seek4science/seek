@@ -64,7 +64,7 @@
 
 <% if @folder.editable? -%>
     <div id='new_child' style='display:none;'>
-      <% form_remote_tag :url=>{:action=>:create_folder, :id=>@folder.id}, :html=>{:id=>:create_child_form} do -%>
+      <%= form_tag :url=>{:action=>:create_folder, :id=>@folder.id}, :html=>{:id=>:create_child_form}, :remote=>true do -%>
               <%= label_tag "Create a new sub-folder:" -%>
               <%= hidden_field_tag :project_id, @folder.project.id -%>
               <%= text_field_tag :title -%>
