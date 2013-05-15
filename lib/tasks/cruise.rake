@@ -49,5 +49,5 @@ task :cruise2 do |t,args|
   Rake::Task["db:test:load"].invoke
   Rake::Task["db:test:prepare"].invoke
   Rake::Task["seek:seed_testing"].invoke
-  Rake::Task["test"].invoke
+  Rake::Task["test:functionals"].invoke
 end
