@@ -9,10 +9,11 @@ class DataFileTest < ActiveSupport::TestCase
     datafile=Factory :data_file,:policy => Factory(:all_sysmo_viewable_policy),:contributor=> datafile_owner
     assert_equal datafile_owner,datafile.contributor
     unless datafile.content_blob.nil?
-      datafile.content_blob = nil
+      datafile.content_blob.destroy
     end
 
     blob=Factory.create(:content_blob,:original_filename=>"df.ppt", :content_type=>"application/ppt",:asset => datafile,:asset_version=>datafile.version)#content_blobs(:picture_blob)
+    datafile.reload
     assert_equal blob,datafile.content_blob
   end
 
@@ -278,7 +279,7 @@ class DataFileTest < ActiveSupport::TestCase
 
 
       assert_equal presentation.class.name, data_file_converted.class.name
-      assert_equal presentation.attributes.keys.sort!, data_file_converted.attributes.keys.reject{|k|k=='id'}.sort! #???
+      assert_equal presentation.attributes.keys.sort!, data_file_converted.attributes.keys.sort! #???
 
       #data_file.reload
       #data file still has some associations that are assigned to data_file_converted, as it is NOT reloaded
