@@ -22,8 +22,11 @@
         <b>Step 1</b> - Choose an organism<br/><br/>
         <%= select_tag :possible_organisms,
         options_for_select([["Select Organism ...", 0]]|all_organisms.collect{|o| [truncate(h(o.title), :length=>select_truncate_length), o.id]}),
-         {:style=>"width:90%"
-         } -%>
+         {:style=>"width:90%",
+          :onchange=>remote_function(:url=>{:action=>"existing_strains_for_assay_organism", :controller=>"strains"},
+          :with=>"'organism_id='+this.value",
+          :before=>"show_ajax_loader('existing_strains_for_assay_organism')")+
+          ";check_show_add_organism();$('strain').clear();return(false);"} -%>
         <%= select_tag :assay_organism_ids, options_from_collection_for_select([], :id, :title), {:multiple=>true, :style=>"display:none;"} -%>
       </div>
       <div id="extra_organism_details" style="display:none;">
@@ -82,17 +85,4 @@
     }
   
     check_show_add_organism();
-
-    $(function($) {
-        $("#possible_organisms").change(function() {
-            $.ajax({url: '<%= url_for :action=>"existing_strains_for_assay_organism", :controller=>"strains" %>',
-                data: 'organism_id='+this.value",
-                dataType: 'script',
-                beforeSend: function ( xhr ) {
-                    show_ajax_loader('existing_strains_for_assay_organism');
-                    check_show_add_organism();
-                    $('strain').clear();}
-            })
-        });
-    });
 </script>
