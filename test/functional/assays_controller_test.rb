@@ -274,7 +274,7 @@ test "should create experimental assay with or without sample" do
                                :technology_type_id=>technology_types(:gas_chromatography).id,
                                :assay_type_id=>assay_types(:metabolomics).id,
                                :study_id=>studies(:metabolomics_study).id,
-                               :assay_class=>assay_classes(:experimental_assay_class),
+                               :assay_class_id=>assay_classes(:experimental_assay_class).id,
                                :owner => Factory(:person)}
       end
     end
@@ -289,7 +289,7 @@ test "should create experimental assay with or without sample" do
                                :technology_type_id=>technology_types(:gas_chromatography).id,
                                :assay_type_id=>assay_types(:metabolomics).id,
                                :study_id=>studies(:metabolomics_study).id,
-                               :assay_class=>assay_classes(:experimental_assay_class),
+                               :assay_class_id=>assay_classes(:experimental_assay_class).id,
                                :owner => Factory(:person),
                                :sample_ids=>[sample.id]
         }
@@ -311,7 +311,7 @@ end
                              :technology_type_id=>technology_types(:gas_chromatography).id,
                              :assay_type_id=>assay_types(:metabolomics).id,
                              :study_id=>studies(:metabolomics_study).id,
-                             :assay_class=>assay_classes(:experimental_assay_class),
+                             :assay_class_id=>assay_classes(:experimental_assay_class).id,
                              :owner => Factory(:person),
                              :samples => [Factory(:sample)]}
     end
@@ -321,7 +321,7 @@ end
                              :technology_type_id=>technology_types(:gas_chromatography).id,
                              :assay_type_id=>assay_types(:metabolomics).id,
                              :study_id=>studies(:metabolomics_study).id,
-                             :assay_class=>assay_classes(:experimental_assay_class),
+                             :assay_class_id=>assay_classes(:experimental_assay_class).id,
                              :owner => Factory(:person),
                              :samples => [Factory(:sample)]},
            :assay_organism_ids => [Factory(:organism).id, Factory(:strain).title, Factory(:culture_growth_type).title].to_s
@@ -336,7 +336,7 @@ end
       post :create, :assay=>{:title=>"test",
                              :assay_type_id=>assay_types(:metabolomics).id,
                              :study_id=>studies(:metabolomics_study).id,
-                             :assay_class=>assay_classes(:modelling_assay_class),
+                             :assay_class_id=>assay_classes(:modelling_assay_class).id,
                              :owner => Factory(:person)}
     end
 
@@ -344,7 +344,7 @@ end
       post :create, :assay=>{:title=>"test",
                              :assay_type_id=>assay_types(:metabolomics).id,
                              :study_id=>studies(:metabolomics_study).id,
-                             :assay_class=>assay_classes(:modelling_assay_class),
+                             :assay_class_id=>assay_classes(:modelling_assay_class).id,
                              :owner => Factory(:person)},
            :assay_organism_ids => [Factory(:organism).id, Factory(:strain).title, Factory(:culture_growth_type).title].to_s
     end
@@ -357,7 +357,7 @@ end
         :technology_type_id=>technology_types(:gas_chromatography).id,
         :assay_type_id=>assay_types(:metabolomics).id,
         :study_id=>studies(:metabolomics_study).id,
-        :assay_class=>assay_classes(:experimental_assay_class),
+        :assay_class_id=>assay_classes(:experimental_assay_class).id,
         :owner => Factory(:person),
         :sample_ids=>[Factory(:sample).id]
       },:assay_organism_ids=>[Factory(:organism).id.to_s,"",""].join(",").to_a
@@ -374,7 +374,7 @@ end
                              :technology_type_id=>technology_types(:gas_chromatography).id,
                              :assay_type_id=>assay_types(:metabolomics).id,
                              :study_id=>studies(:metabolomics_study).id,
-                             :assay_class=>assay_classes(:modelling_assay_class),
+                             :assay_class_id=>assay_classes(:modelling_assay_class).id,
                              :owner => person,
                              :sample_ids=>[Factory(:sample).id, Factory(:sample).id]
       }
@@ -731,7 +731,7 @@ end
               :technology_type_id=>technology_types(:gas_chromatography).id,
               :assay_type_id=>assay_types(:metabolomics).id,
               :study_id=>studies(:metabolomics_study).id,
-              :assay_class=>assay_classes(:modelling_assay_class)
+              :assay_class_id=>assay_classes(:modelling_assay_class).id
           },
                :assay_sop_ids=>["#{sop.id}"],
                :model_ids=>["#{model.id}"],
@@ -775,7 +775,7 @@ end
               :technology_type_id=>technology_types(:gas_chromatography).id,
               :assay_type_id=>assay_types(:metabolomics).id,
               :study_id=>study.id,
-              :assay_class=>assay_classes(:modelling_assay_class)
+              :assay_class_id=>assay_classes(:modelling_assay_class).id
           },
                :assay_sop_ids=>["#{sop.id}"],
                :model_ids=>["#{model.id}"],
@@ -817,7 +817,7 @@ end
       assert_no_difference("Assay.count", "Should not have added assay because the title is blank") do
         assert_no_difference("AssayAsset.count", "Should not have added assay assets because the assay validation failed") do
           #title is blank, so should fail validation
-          put :update, :id=>assay, :assay=>{:title=>"", :assay_class=>assay_classes(:modelling_assay_class)},
+          put :update, :id=>assay, :assay=>{:title=>"", :assay_class_id=>assay_classes(:modelling_assay_class).id},
               :assay_sop_ids=>["#{sop.id}"],
               :model_ids=>["#{model.id}"],
               :data_file_ids=>["#{datafile.id},#{rel.title}"]
@@ -901,7 +901,7 @@ end
   test "should create sharing permissions 'with your project and with all SysMO members'" do
     login_as(:quentin)
     a = {:title=>"test", :technology_type_id=>technology_types(:gas_chromatography).id, :assay_type_id=>assay_types(:metabolomics).id,
-         :study_id=>studies(:metabolomics_study).id, :assay_class=>assay_classes(:experimental_assay_class), :sample_ids=>[Factory(:sample).id]}
+         :study_id=>studies(:metabolomics_study).id, :assay_class_id=>assay_classes(:experimental_assay_class).id, :sample_ids=>[Factory(:sample).id]}
     assert_difference('ActivityLog.count') do
       assert_difference('Assay.count') do
         post :create, :assay => a, :sharing=>{"access_type_#{Policy::ALL_SYSMO_USERS}"=>Policy::VISIBLE, :sharing_scope=>Policy::ALL_SYSMO_USERS, :your_proj_access_type => Policy::ACCESSIBLE}
