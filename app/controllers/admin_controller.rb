@@ -11,7 +11,6 @@ class AdminController < ApplicationController
 
 
   def show
-    @no_sidebar=true
     respond_to do |format|
       format.html
     end
