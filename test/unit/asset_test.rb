@@ -1,4 +1,5 @@
 require 'test_helper'
+require 'time_test_helper'
 
 class AssetTest < ActiveSupport::TestCase
   fixtures :all
@@ -25,6 +26,17 @@ class AssetTest < ActiveSupport::TestCase
     assert_equal 2,d.versions.size
     assert !d.versions[0].latest_version?
     assert d.versions[1].latest_version?
+  end
+
+  test "just used" do
+    model = Factory :model
+    t = 1.day.ago
+    assert_not_equal t.to_s,model.last_used_at.to_s
+    pretend_now_is(t) do
+      model.just_used
+    end
+    assert_equal t.to_s,model.last_used_at.to_s
+
   end
 
   test "assay type titles" do

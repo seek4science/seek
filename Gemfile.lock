@@ -205,6 +205,8 @@ GEM
     polyglot (0.3.3)
     pothoven-attachment_fu (3.2.8)
     pr_geohash (1.0.0)
+    prototype-rails (3.2.1)
+      rails (~> 3.2)
     pry (0.9.12.1)
       coderay (~> 1.0.5)
       method_source (~> 0.8)
@@ -360,6 +362,7 @@ DEPENDENCIES
   parallel_tests
   piwik_analytics!
   pothoven-attachment_fu
+  prototype-rails
   pry
   pry-doc
   pry-remote

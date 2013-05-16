@@ -2,7 +2,6 @@
 #TO MODIFY THE DEFAULT SETTINGS, COPY seek_local.rb.pre to seek_local.rb AND EDIT THAT FILE INSTEAD
 
 require 'object'
-require 'save_without_timestamping'
 require 'asset'
 require 'calendar_date_select'
 require 'object'

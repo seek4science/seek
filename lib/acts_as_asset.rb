@@ -125,6 +125,11 @@ module Acts #:nodoc:
         end
       end
 
+      #sets the last_used_at time to the current time
+      def just_used
+        update_column(:last_used_at, Time.now)
+      end
+
       def folders
         project_folder_assets.collect{|pfa| pfa.project_folder}
       end
