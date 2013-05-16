@@ -45,6 +45,12 @@ GIT
       rails (>= 3.0.0)
 
 GIT
+  remote: git://github.com/SysMO-DB/redbox.git
+  revision: c2cf9d4d95b6d79496b3bbefacffa920692429d4
+  specs:
+    redbox (1.0.4)
+
+GIT
   remote: git://github.com/SysMO-DB/site_announcements.git
   revision: cfb4ef820a42accf182acfb1408ab13e4aa11221
   specs:
@@ -258,7 +264,6 @@ GEM
       rdf (>= 0.3.4)
     rdoc (3.12.2)
       json (~> 1.4)
-    redbox (1.0.4)
     rest-client (1.6.7)
       mime-types (>= 1.16)
     rmagick (2.12.2)
@@ -374,7 +379,7 @@ DEPENDENCIES
   rdf (>= 0.3.8)
   rdf-rdfxml (>= 0.3.8)
   rdoc
-  redbox
+  redbox!
   rest-client (>= 1.6.1)
   rmagick (= 2.12.2)
   rubaidh-google_analytics (~> 1.1.4)
