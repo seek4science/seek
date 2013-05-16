@@ -63,6 +63,12 @@ GIT
     search_biomodel (2.2.1)
 
 GIT
+  remote: git://github.com/paneq/calendar_date_select.git
+  revision: 977048211b94599fe0f08eb37a481f3d69df48f6
+  specs:
+    calendar_date_select (1.16.2)
+
+GIT
   remote: git://github.com/quyen/annotations.git
   revision: 505c71d58e96763825c0ccefe7675b370f1a458e
   specs:
@@ -151,7 +157,6 @@ GEM
     bio (1.4.3)
     breadcrumbs_on_rails (2.3.0)
     builder (3.0.4)
-    calendar_date_select (1.16.4)
     cancan (1.6.10)
     cgi_multipart_eof_fix (2.5.0)
     coderay (1.0.9)
@@ -339,7 +344,7 @@ DEPENDENCIES
   bio
   bioportal!
   breadcrumbs_on_rails
-  calendar_date_select
+  calendar_date_select!
   cancan
   convert_office!
   country-select

@@ -3,7 +3,6 @@
 
 require 'object'
 require 'asset'
-require 'calendar_date_select'
 require 'object'
 require 'active_record_extensions'
 require 'acts_as_taggable_extensions'
