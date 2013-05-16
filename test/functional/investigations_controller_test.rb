@@ -86,7 +86,7 @@ class InvestigationsControllerTest < ActionController::TestCase
   test "should create" do
     login_as(Factory :user)
     assert_difference("Investigation.count") do
-      put :create, :investigation=> Factory.attributes_for(:investigation, :projects => [User.current_user.person.projects.first])
+      put :create, :investigation=> Factory.attributes_for(:investigation, :project_ids => [User.current_user.person.projects.first])
     end
     assert assigns(:investigation)
     assert !assigns(:investigation).new_record?
@@ -96,7 +96,7 @@ class InvestigationsControllerTest < ActionController::TestCase
     login_as(Factory :user)
 
     assert_no_difference("Investigation.count") do
-      put :create, :investigation=> {:projects => [User.current_user.person.projects.first]}
+      put :create, :investigation=> {:project_ids => [User.current_user.person.projects.first]}
     end
     assert_template :new
     

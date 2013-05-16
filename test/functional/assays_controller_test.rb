@@ -35,8 +35,8 @@ class AssaysControllerTest < ActionController::TestCase
     user = Factory :user
     project=user.person.projects.first
     login_as user
-    sop = Factory :sop, :contributor=>user.person,:projects=>[project]
-    data_file = Factory :data_file, :contributor=>user.person,:projects=>[project]
+    sop = Factory :sop, :contributor=>user.person,:project_ids=>[project]
+    data_file = Factory :data_file, :contributor=>user.person,:project_ids=>[project]
     get :new, :class=>"experimental"
     assert_response :success
 
@@ -256,7 +256,7 @@ class AssaysControllerTest < ActionController::TestCase
     a=assays(:assay_with_no_study_or_files)
     s=studies(:metabolomics_study)
     assert_difference('ActivityLog.count') do
-      put :update, :id=>a, :assay=>{:study=>s}, :assay_sample_ids=>[Factory(:sample).id]
+      put :update, :id=>a, :assay=>{:study_id=>s}, :assay_sample_ids=>[Factory(:sample).id]
     end
 
     assert_redirected_to assay_path(a)
@@ -275,7 +275,7 @@ test "should create experimental assay with or without sample" do
                                :assay_type_id=>assay_types(:metabolomics).id,
                                :study_id=>studies(:metabolomics_study).id,
                                :assay_class_id=>assay_classes(:experimental_assay_class).id,
-                               :owner => Factory(:person)}
+                               :owner_id => Factory(:person)}
       end
     end
     a=assigns(:assay)
@@ -290,7 +290,7 @@ test "should create experimental assay with or without sample" do
                                :assay_type_id=>assay_types(:metabolomics).id,
                                :study_id=>studies(:metabolomics_study).id,
                                :assay_class_id=>assay_classes(:experimental_assay_class).id,
-                               :owner => Factory(:person),
+                               :owner_id => Factory(:person),
                                :sample_ids=>[sample.id]
         }
 
@@ -312,8 +312,8 @@ end
                              :assay_type_id=>assay_types(:metabolomics).id,
                              :study_id=>studies(:metabolomics_study).id,
                              :assay_class_id=>assay_classes(:experimental_assay_class).id,
-                             :owner => Factory(:person),
-                             :samples => [Factory(:sample)]}
+                             :owner_id => Factory(:person),
+                             :sample_ids => [Factory(:sample)]}
     end
 
     assert_difference("Assay.count") do
@@ -322,8 +322,8 @@ end
                              :assay_type_id=>assay_types(:metabolomics).id,
                              :study_id=>studies(:metabolomics_study).id,
                              :assay_class_id=>assay_classes(:experimental_assay_class).id,
-                             :owner => Factory(:person),
-                             :samples => [Factory(:sample)]},
+                             :owner_id => Factory(:person),
+                             :sample_ids => [Factory(:sample)]},
            :assay_organism_ids => [Factory(:organism).id, Factory(:strain).title, Factory(:culture_growth_type).title].to_s
     end
     a=assigns(:assay)
@@ -337,7 +337,7 @@ end
                              :assay_type_id=>assay_types(:metabolomics).id,
                              :study_id=>studies(:metabolomics_study).id,
                              :assay_class_id=>assay_classes(:modelling_assay_class).id,
-                             :owner => Factory(:person)}
+                             :owner_id => Factory(:person)}
     end
 
     assert_difference("Assay.count") do
@@ -345,7 +345,7 @@ end
                              :assay_type_id=>assay_types(:metabolomics).id,
                              :study_id=>studies(:metabolomics_study).id,
                              :assay_class_id=>assay_classes(:modelling_assay_class).id,
-                             :owner => Factory(:person)},
+                             :owner_id => Factory(:person)},
            :assay_organism_ids => [Factory(:organism).id, Factory(:strain).title, Factory(:culture_growth_type).title].to_s
     end
     a=assigns(:assay)
@@ -358,7 +358,7 @@ end
         :assay_type_id=>assay_types(:metabolomics).id,
         :study_id=>studies(:metabolomics_study).id,
         :assay_class_id=>assay_classes(:experimental_assay_class).id,
-        :owner => Factory(:person),
+        :owner_id => Factory(:person),
         :sample_ids=>[Factory(:sample).id]
       },:assay_organism_ids=>[Factory(:organism).id.to_s,"",""].join(",").to_a
     end
@@ -375,7 +375,7 @@ end
                              :assay_type_id=>assay_types(:metabolomics).id,
                              :study_id=>studies(:metabolomics_study).id,
                              :assay_class_id=>assay_classes(:modelling_assay_class).id,
-                             :owner => person,
+                             :owner_id => person,
                              :sample_ids=>[Factory(:sample).id, Factory(:sample).id]
       }
     end
@@ -890,7 +890,7 @@ end
   test 'edit assay with selected projects scope policy' do
     proj = User.current_user.person.projects.first
     assay = Factory(:assay, :contributor => User.current_user.person,
-                    :study => Factory(:study, :investigation => Factory(:investigation, :projects => [proj])),
+                    :study => Factory(:study, :investigation => Factory(:investigation, :project_ids => [proj])),
                     :policy => Factory(:policy,
                                        :sharing_scope => Policy::ALL_SYSMO_USERS,
                                        :access_type => Policy::NO_ACCESS,
@@ -928,7 +928,7 @@ end
                    :policy => Factory(:private_policy),
                    :contributor => User.current_user.person,
                    :study => (Factory(:study, :investigation => (Factory(:investigation,
-                                                                         :projects => [Factory(:project), Factory(:project)])))))
+                                                                         :project_ids => [Factory(:project), Factory(:project)])))))
 
     assert assay.can_manage?
     assert_equal Policy::PRIVATE, assay.policy.sharing_scope

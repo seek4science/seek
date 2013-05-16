@@ -395,7 +395,7 @@ class PeopleControllerTest < ActionController::TestCase
     person = Factory(:person_in_project, :group_memberships => [Factory(:group_membership, :work_group => work_group)])
     user = Factory(:user, :person => person)
     #create a datafile that this person is the contributor
-    data_file = Factory(:data_file, :contributor => user, :projects => [project])
+    data_file = Factory(:data_file, :contributor => user, :project_ids => [project])
     #create pi
     role = ProjectRole.find_by_name('PI')
     pi = Factory(:person_in_project, :group_memberships => [Factory(:group_membership, :work_group => work_group)])
@@ -425,7 +425,7 @@ class PeopleControllerTest < ActionController::TestCase
     person = Factory(:person_in_project, :group_memberships => [Factory(:group_membership, :work_group => work_group)])
     user = Factory(:user, :person => person)
     #create a datafile that this person is the contributor and with the same project
-    data_file = Factory(:data_file, :contributor => user, :projects => [project])
+    data_file = Factory(:data_file, :contributor => user, :project_ids => [project])
     #create pal
     role = ProjectRole.find_by_name('Sysmo-DB Pal')
     pal = Factory(:person_in_project, :group_memberships => [Factory(:group_membership, :work_group => work_group)])
@@ -986,8 +986,8 @@ class PeopleControllerTest < ActionController::TestCase
     Seek::Config.email_enabled=true
 
     proj = Factory(:project)
-    sop = Factory(:sop, :projects => [proj], :policy => Factory(:public_policy))
-    df = Factory(:data_file, :projects => [proj], :policy => Factory(:public_policy))
+    sop = Factory(:sop, :project_ids => [proj], :policy => Factory(:public_policy))
+    df = Factory(:data_file, :project_ids => [proj], :policy => Factory(:public_policy))
 
     #subscribe to project
     current_person=User.current_user.person
@@ -1049,7 +1049,7 @@ class PeopleControllerTest < ActionController::TestCase
       assert_equal 1, work_groups.count
       assert a_person.project_subscriptions.collect(&:project).include?(projects.first)
 
-      s=Factory(:subscribable, :projects => projects)
+      s=Factory(:subscribable, :project_ids => projects)
       SetSubscriptionsForItemJob.new(s.class.name, s.id, projects.collect(&:id)).perform
       assert s.subscribed?(a_person)
 
