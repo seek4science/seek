@@ -256,7 +256,7 @@ class AssaysControllerTest < ActionController::TestCase
     a=assays(:assay_with_no_study_or_files)
     s=studies(:metabolomics_study)
     assert_difference('ActivityLog.count') do
-      put :update, :id=>a, :assay=>{:study=>s}, :assay_sample_ids=>[Factory(:sample).id]
+      put :update, :id=>a, :assay=>{:study_id=>s}, :assay_sample_ids=>[Factory(:sample).id]
     end
 
     assert_redirected_to assay_path(a)
@@ -275,7 +275,7 @@ test "should create experimental assay with or without sample" do
                                :assay_type_id=>assay_types(:metabolomics).id,
                                :study_id=>studies(:metabolomics_study).id,
                                :assay_class_id=>assay_classes(:experimental_assay_class).id,
-                               :owner => Factory(:person)}
+                               :owner_id => Factory(:person)}
       end
     end
     a=assigns(:assay)
@@ -290,7 +290,7 @@ test "should create experimental assay with or without sample" do
                                :assay_type_id=>assay_types(:metabolomics).id,
                                :study_id=>studies(:metabolomics_study).id,
                                :assay_class_id=>assay_classes(:experimental_assay_class).id,
-                               :owner => Factory(:person),
+                               :owner_id => Factory(:person),
                                :sample_ids=>[sample.id]
         }
 
@@ -312,8 +312,8 @@ end
                              :assay_type_id=>assay_types(:metabolomics).id,
                              :study_id=>studies(:metabolomics_study).id,
                              :assay_class_id=>assay_classes(:experimental_assay_class).id,
-                             :owner => Factory(:person),
-                             :samples => [Factory(:sample)]}
+                             :owner_id => Factory(:person),
+                             :sample_ids => [Factory(:sample)]}
     end
 
     assert_difference("Assay.count") do
@@ -322,8 +322,8 @@ end
                              :assay_type_id=>assay_types(:metabolomics).id,
                              :study_id=>studies(:metabolomics_study).id,
                              :assay_class_id=>assay_classes(:experimental_assay_class).id,
-                             :owner => Factory(:person),
-                             :samples => [Factory(:sample)]},
+                             :owner_id => Factory(:person),
+                             :sample_ids => [Factory(:sample)]},
            :assay_organism_ids => [Factory(:organism).id, Factory(:strain).title, Factory(:culture_growth_type).title].to_s
     end
     a=assigns(:assay)
@@ -337,7 +337,7 @@ end
                              :assay_type_id=>assay_types(:metabolomics).id,
                              :study_id=>studies(:metabolomics_study).id,
                              :assay_class_id=>assay_classes(:modelling_assay_class).id,
-                             :owner => Factory(:person)}
+                             :owner_id => Factory(:person)}
     end
 
     assert_difference("Assay.count") do
@@ -345,7 +345,7 @@ end
                              :assay_type_id=>assay_types(:metabolomics).id,
                              :study_id=>studies(:metabolomics_study).id,
                              :assay_class_id=>assay_classes(:modelling_assay_class).id,
-                             :owner => Factory(:person)},
+                             :owner_id => Factory(:person)},
            :assay_organism_ids => [Factory(:organism).id, Factory(:strain).title, Factory(:culture_growth_type).title].to_s
     end
     a=assigns(:assay)
@@ -358,7 +358,7 @@ end
         :assay_type_id=>assay_types(:metabolomics).id,
         :study_id=>studies(:metabolomics_study).id,
         :assay_class_id=>assay_classes(:experimental_assay_class).id,
-        :owner => Factory(:person),
+        :owner_id => Factory(:person),
         :sample_ids=>[Factory(:sample).id]
       },:assay_organism_ids=>[Factory(:organism).id.to_s,"",""].join(",").to_a
     end
@@ -375,7 +375,7 @@ end
                              :assay_type_id=>assay_types(:metabolomics).id,
                              :study_id=>studies(:metabolomics_study).id,
                              :assay_class_id=>assay_classes(:modelling_assay_class).id,
-                             :owner => person,
+                             :owner_id => person,
                              :sample_ids=>[Factory(:sample).id, Factory(:sample).id]
       }
     end
