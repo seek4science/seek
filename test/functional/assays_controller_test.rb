@@ -268,14 +268,14 @@ class AssaysControllerTest < ActionController::TestCase
 
 test "should create experimental assay with or without sample" do
     #THIS TEST MAY BECOME INVALID ONCE IT IS DECIDED HOW ASSAYS LINK TO SAMPLES OR ORGANISMS
+
     assert_difference('ActivityLog.count') do
       assert_difference("Assay.count") do
         post :create, :assay=>{:title=>"test",
                                :technology_type_id=>technology_types(:gas_chromatography).id,
                                :assay_type_id=>assay_types(:metabolomics).id,
                                :study_id=>studies(:metabolomics_study).id,
-                               :assay_class_id=>assay_classes(:experimental_assay_class).id,
-                               :owner_id => Factory(:person)}
+                               :assay_class_id=>assay_classes(:experimental_assay_class).id}
       end
     end
     a=assigns(:assay)
@@ -290,13 +290,13 @@ test "should create experimental assay with or without sample" do
                                :assay_type_id=>assay_types(:metabolomics).id,
                                :study_id=>studies(:metabolomics_study).id,
                                :assay_class_id=>assay_classes(:experimental_assay_class).id,
-                               :owner_id => Factory(:person),
                                :sample_ids=>[sample.id]
         }
 
       end
     end
     a=assigns(:assay)
+    assert_equal User.current_user.person,a.owner
     assert_redirected_to assay_path(a)
     assert_equal [sample],a.samples
     #assert_equal organisms(:yeast),a.organism
@@ -312,7 +312,6 @@ end
                              :assay_type_id=>assay_types(:metabolomics).id,
                              :study_id=>studies(:metabolomics_study).id,
                              :assay_class_id=>assay_classes(:experimental_assay_class).id,
-                             :owner_id => Factory(:person),
                              :sample_ids => [Factory(:sample)]}
     end
 
@@ -322,7 +321,6 @@ end
                              :assay_type_id=>assay_types(:metabolomics).id,
                              :study_id=>studies(:metabolomics_study).id,
                              :assay_class_id=>assay_classes(:experimental_assay_class).id,
-                             :owner_id => Factory(:person),
                              :sample_ids => [Factory(:sample)]},
            :assay_organism_ids => [Factory(:organism).id, Factory(:strain).title, Factory(:culture_growth_type).title].to_s
     end
@@ -336,16 +334,14 @@ end
       post :create, :assay=>{:title=>"test",
                              :assay_type_id=>assay_types(:metabolomics).id,
                              :study_id=>studies(:metabolomics_study).id,
-                             :assay_class_id=>assay_classes(:modelling_assay_class).id,
-                             :owner_id => Factory(:person)}
+                             :assay_class_id=>assay_classes(:modelling_assay_class).id}
     end
 
     assert_difference("Assay.count") do
       post :create, :assay=>{:title=>"test",
                              :assay_type_id=>assay_types(:metabolomics).id,
                              :study_id=>studies(:metabolomics_study).id,
-                             :assay_class_id=>assay_classes(:modelling_assay_class).id,
-                             :owner_id => Factory(:person)},
+                             :assay_class_id=>assay_classes(:modelling_assay_class).id},
            :assay_organism_ids => [Factory(:organism).id, Factory(:strain).title, Factory(:culture_growth_type).title].to_s
     end
     a=assigns(:assay)
@@ -358,7 +354,6 @@ end
         :assay_type_id=>assay_types(:metabolomics).id,
         :study_id=>studies(:metabolomics_study).id,
         :assay_class_id=>assay_classes(:experimental_assay_class).id,
-        :owner_id => Factory(:person),
         :sample_ids=>[Factory(:sample).id]
       },:assay_organism_ids=>[Factory(:organism).id.to_s,"",""].join(",").to_a
     end
@@ -368,14 +363,12 @@ end
   end
 
   test "should not create modelling assay with sample" do
-    person = Factory(:person)
     assert_no_difference("Assay.count") do
       post :create, :assay=>{:title=>"test",
                              :technology_type_id=>technology_types(:gas_chromatography).id,
                              :assay_type_id=>assay_types(:metabolomics).id,
                              :study_id=>studies(:metabolomics_study).id,
                              :assay_class_id=>assay_classes(:modelling_assay_class).id,
-                             :owner_id => person,
                              :sample_ids=>[Factory(:sample).id, Factory(:sample).id]
       }
     end

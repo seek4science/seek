@@ -33,7 +33,7 @@ class ReindexingJob
         ReindexingQueue.create :item => item
       end
     end
-    Delayed::Job.enqueue(ReindexingJob.new, priority, t) unless ReindexingJob.exists?
+    Delayed::Job.enqueue(ReindexingJob.new, :priority=>priority, :run_at=>t) unless ReindexingJob.exists?
 
   end
 
