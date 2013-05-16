@@ -405,9 +405,7 @@ class ModelsController < ApplicationController
     @last_used_before_now = @model.last_used_at
 
 
-    # update timestamp in the current Model record
-    # (this will also trigger timestamp update in the corresponding Asset)
-    @model.save_without_timestamping
+    @model.just_used
     
     respond_to do |format|
       format.html # show.html.erb

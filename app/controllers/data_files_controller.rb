@@ -238,10 +238,8 @@ class DataFilesController < ApplicationController
   def show
     # store timestamp of the previous last usage
     @last_used_before_now = @data_file.last_used_at
-    
-    # update timestamp in the current Data file record
-    # (this will also trigger timestamp update in the corresponding Asset)
-    @data_file.save_without_timestamping
+
+    @data_file.just_used
 
     #Rails.logger.warn "template in data_files_controller/show : #{params[:parsing_template]}"
 

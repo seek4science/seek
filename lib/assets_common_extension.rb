@@ -17,9 +17,8 @@ module AssetsCommonExtension
 
   #current model is the only type with multiple content-blobs, this may change in the future
   def download_model
-    # update timestamp in the current Model record
-    # (this will also trigger timestamp update in the corresponding Asset)
-    @model.save_without_timestamping
+
+    @model.just_used
 
     handle_download_zip @display_model
   end
@@ -31,7 +30,7 @@ module AssetsCommonExtension
 
     @asset_version = eval("@display_#{name}")
     @content_blob = @asset_version.content_blob
-    @asset.save_without_timestamping
+    @asset.just_used
 
     disposition = params[:disposition] || 'attachment'
 

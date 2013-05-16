@@ -107,9 +107,7 @@ class PresentationsController < ApplicationController
     # store timestamp of the previous last usage
     @last_used_before_now = @presentation.last_used_at
 
-    # update timestamp in the current Presentation record
-    # (this will also trigger timestamp update in the corresponding Asset)
-    @presentation.save_without_timestamping
+    @presentation.just_used
 
     respond_to do |format|
       format.html # show.html.erb
