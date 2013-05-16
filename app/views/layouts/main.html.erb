@@ -52,7 +52,7 @@
 
   <div id="bd">
     <div id="yui-main">
-      <div <%= "class='yui-b'" unless @no_sidebar  %> id="content">
+      <div <%= "class='yui-b'".html_safe unless @no_sidebar %> id="content">
         <div class="breadcrumbs">
           <%= render_breadcrumbs :separator => ' > ' %>
         </div>
