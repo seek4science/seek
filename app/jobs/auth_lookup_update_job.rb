@@ -10,7 +10,7 @@ class AuthLookupUpdateJob
     process_queue
 
     if AuthLookupUpdateQueue.count>0 && !AuthLookupUpdateJob.exists?
-      Delayed::Job.enqueue(AuthLookupUpdateJob.new,0,1.seconds.from_now)
+      Delayed::Job.enqueue(AuthLookupUpdateJob.new, :priority=>0, :run_at=>1.seconds.from_now)
     end
   end
 
