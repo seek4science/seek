@@ -2,6 +2,7 @@
 #these are items that will need revisiting
 require 'bioportal'
 require 'pubmed_record'
+require 'redbox_helper'
 
 SEEK::Application.configure do
 
@@ -17,4 +18,6 @@ SEEK::Application.configure do
   require_dependency File.join(Gem.loaded_specs['bioportal'].full_gem_path,'app','models',"bioportal_concept")
   #ActionView::Base.send(:include, BioPortal::BioPortalHelper)
   ActiveRecord::Base.send(:include,BioPortal::Acts)
+
+  ActionView::Base.send(:include, RedboxHelper)
 end
