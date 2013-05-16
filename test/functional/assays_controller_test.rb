@@ -35,8 +35,8 @@ class AssaysControllerTest < ActionController::TestCase
     user = Factory :user
     project=user.person.projects.first
     login_as user
-    sop = Factory :sop, :contributor=>user.person,:projects=>[project]
-    data_file = Factory :data_file, :contributor=>user.person,:projects=>[project]
+    sop = Factory :sop, :contributor=>user.person,:project_ids=>[project]
+    data_file = Factory :data_file, :contributor=>user.person,:project_ids=>[project]
     get :new, :class=>"experimental"
     assert_response :success
 
@@ -890,7 +890,7 @@ end
   test 'edit assay with selected projects scope policy' do
     proj = User.current_user.person.projects.first
     assay = Factory(:assay, :contributor => User.current_user.person,
-                    :study => Factory(:study, :investigation => Factory(:investigation, :projects => [proj])),
+                    :study => Factory(:study, :investigation => Factory(:investigation, :project_ids => [proj])),
                     :policy => Factory(:policy,
                                        :sharing_scope => Policy::ALL_SYSMO_USERS,
                                        :access_type => Policy::NO_ACCESS,
@@ -928,7 +928,7 @@ end
                    :policy => Factory(:private_policy),
                    :contributor => User.current_user.person,
                    :study => (Factory(:study, :investigation => (Factory(:investigation,
-                                                                         :projects => [Factory(:project), Factory(:project)])))))
+                                                                         :project_ids => [Factory(:project), Factory(:project)])))))
 
     assert assay.can_manage?
     assert_equal Policy::PRIVATE, assay.policy.sharing_scope

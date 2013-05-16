@@ -37,7 +37,7 @@ class PublicationsControllerTest < ActionController::TestCase
     mock_pubmed(:email=>"",:id=>1,:content_file=>"pubmed_1.xml")
     assay=assays(:metabolomics_assay)
     assert_difference('Publication.count') do
-      post :create, :publication => {:pubmed_id => 1,:projects=>[projects(:sysmo_project)]},:assay_ids=>[assay.id.to_s]
+      post :create, :publication => {:pubmed_id => 1,:project_ids=>[projects(:sysmo_project)]},:assay_ids=>[assay.id.to_s]
     end
 
     assert_redirected_to edit_publication_path(assigns(:publication))
@@ -50,7 +50,7 @@ class PublicationsControllerTest < ActionController::TestCase
     login_as(:model_owner) #can edit assay
     assay=assays(:metabolomics_assay)
     assert_difference('Publication.count') do
-      post :create, :publication => {:pubmed_id => 1,:projects=>[projects(:sysmo_project)] },:assay_ids=>[assay.id.to_s]
+      post :create, :publication => {:pubmed_id => 1,:project_ids=>[projects(:sysmo_project)] },:assay_ids=>[assay.id.to_s]
     end
 
     assert_redirected_to edit_publication_path(assigns(:publication))
@@ -62,7 +62,7 @@ class PublicationsControllerTest < ActionController::TestCase
   test "should create doi publication" do
     mock_crossref(:email=>"sowen@cs.man.ac.uk",:doi=>"10.1371/journal.pone.0004803",:content_file=>"cross_ref3.xml")
     assert_difference('Publication.count') do
-      post :create, :publication => {:doi => "10.1371/journal.pone.0004803", :projects=>[projects(:sysmo_project)] } #10.1371/journal.pone.0004803.g001 10.1093/nar/gkl320
+      post :create, :publication => {:doi => "10.1371/journal.pone.0004803", :project_ids=>[projects(:sysmo_project)] } #10.1371/journal.pone.0004803.g001 10.1093/nar/gkl320
     end
 
     assert_redirected_to edit_publication_path(assigns(:publication))
@@ -71,7 +71,7 @@ class PublicationsControllerTest < ActionController::TestCase
   test "should create doi publication with doi prefix" do
     mock_crossref(:email=>"sowen@cs.man.ac.uk",:doi=>"10.1371/journal.pone.0004803",:content_file=>"cross_ref3.xml")
     assert_difference('Publication.count') do
-      post :create, :publication => {:doi => "DOI: 10.1371/journal.pone.0004803", :projects=>[projects(:sysmo_project)] } #10.1371/journal.pone.0004803.g001 10.1093/nar/gkl320
+      post :create, :publication => {:doi => "DOI: 10.1371/journal.pone.0004803", :project_ids=>[projects(:sysmo_project)] } #10.1371/journal.pone.0004803.g001 10.1093/nar/gkl320
     end
 
     assert_not_nil assigns(:publication)
@@ -80,7 +80,7 @@ class PublicationsControllerTest < ActionController::TestCase
 
     #formatted slightly different
     assert_difference('Publication.count') do
-      post :create, :publication => {:doi => " doi:10.1371/journal.pone.0004803", :projects=>[projects(:sysmo_project)] } #10.1371/journal.pone.0004803.g001 10.1093/nar/gkl320
+      post :create, :publication => {:doi => " doi:10.1371/journal.pone.0004803", :project_ids=>[projects(:sysmo_project)] } #10.1371/journal.pone.0004803.g001 10.1093/nar/gkl320
     end
 
     assert_not_nil assigns(:publication)
@@ -89,7 +89,7 @@ class PublicationsControllerTest < ActionController::TestCase
 
     #also test with spaces around
     assert_difference('Publication.count') do
-      post :create, :publication => {:doi => "  10.1371/journal.pone.0004803  ", :projects=>[projects(:sysmo_project)] } #10.1371/journal.pone.0004803.g001 10.1093/nar/gkl320
+      post :create, :publication => {:doi => "  10.1371/journal.pone.0004803  ", :project_ids=>[projects(:sysmo_project)] } #10.1371/journal.pone.0004803.g001 10.1093/nar/gkl320
     end
 
     assert_redirected_to edit_publication_path(assigns(:publication))
@@ -303,7 +303,7 @@ class PublicationsControllerTest < ActionController::TestCase
   test "should retrieve the right author order after a publication is created and after some authors are associate/disassociated with seek profiles" do
     mock_crossref(:email=>"sowen@cs.man.ac.uk",:doi=>"10.1016/j.future.2011.08.004",:content_file=>"cross_ref5.xml")
     assert_difference('Publication.count') do
-      post :create, :publication => {:doi => "10.1016/j.future.2011.08.004", :projects=>[projects(:sysmo_project)]}
+      post :create, :publication => {:doi => "10.1016/j.future.2011.08.004", :project_ids=>[projects(:sysmo_project)]}
     end
     publication = assigns(:publication)
     original_authors = ["Sean Bechhofer","Iain Buchan","David De Roure","Paolo Missier","John Ainsworth","Jiten Bhagat","Philip Couch","Don Cruickshank",
@@ -341,7 +341,7 @@ class PublicationsControllerTest < ActionController::TestCase
   test "should display the right author order after some authors are associate with seek-profiles" do
     mock_crossref(:email=>"sowen@cs.man.ac.uk",:doi=>"10.1016/j.future.2011.08.004",:content_file=>"cross_ref5.xml")
     assert_difference('Publication.count') do
-      post :create, :publication => {:doi => "10.1016/j.future.2011.08.004", :projects=>[projects(:sysmo_project)] } #10.1371/journal.pone.0004803.g001 10.1093/nar/gkl320
+      post :create, :publication => {:doi => "10.1016/j.future.2011.08.004", :project_ids=>[projects(:sysmo_project)] } #10.1371/journal.pone.0004803.g001 10.1093/nar/gkl320
     end
     publication = assigns(:publication)
     original_authors = ["Sean Bechhofer","Iain Buchan","David De Roure","Paolo Missier","John Ainsworth","Jiten Bhagat","Philip Couch","Don Cruickshank",

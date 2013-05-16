@@ -145,7 +145,7 @@ class SopsControllerTest < ActionController::TestCase
   end
 
   test "should correctly handle bad data url" do
-    sop={:title=>"Test", :data_url=>"http:/sdfsdfds.com/sdf.png",:projects=>[projects(:sysmo_project)]}
+    sop={:title=>"Test", :data_url=>"http:/sdfsdfds.com/sdf.png",:project_ids=>[projects(:sysmo_project)]}
     assert_no_difference('Sop.count') do
       assert_no_difference('ContentBlob.count') do
         post :create, :sop => sop, :sharing=>valid_sharing
@@ -154,7 +154,7 @@ class SopsControllerTest < ActionController::TestCase
     assert_not_nil flash.now[:error]
 
     #not even a valid url
-    sop={:title=>"Test", :data_url=>"s  df::sd:dfds.com/sdf.png",:projects=>[projects(:sysmo_project)]}
+    sop={:title=>"Test", :data_url=>"s  df::sd:dfds.com/sdf.png",:project_ids=>[projects(:sysmo_project)]}
     assert_no_difference('Sop.count') do
       assert_no_difference('ContentBlob.count') do
         post :create, :sop => sop, :sharing=>valid_sharing
@@ -164,7 +164,7 @@ class SopsControllerTest < ActionController::TestCase
   end
 
   test "should not create invalid sop" do
-    sop={:title=>"Test",:projects=>[projects(:sysmo_project)]}
+    sop={:title=>"Test",:project_ids=>[projects(:sysmo_project)]}
     assert_no_difference('Sop.count') do
       assert_no_difference('ContentBlob.count') do
         post :create, :sop => sop, :sharing=>valid_sharing
@@ -659,7 +659,7 @@ class SopsControllerTest < ActionController::TestCase
 
   test "should set the policy to sysmo_and_projects if the item is requested to be published, when creating new sop" do
     gatekeeper = Factory(:gatekeeper)
-    post :create, :sop => {:title => 'test', :projects => gatekeeper.projects, :data => fixture_file_upload('files/file_picture.png')}, :sharing => {:sharing_scope => Policy::EVERYONE, "access_type_#{Policy::EVERYONE}" => Policy::VISIBLE}
+    post :create, :sop => {:title => 'test', :project_ids => gatekeeper.projects, :data => fixture_file_upload('files/file_picture.png')}, :sharing => {:sharing_scope => Policy::EVERYONE, "access_type_#{Policy::EVERYONE}" => Policy::VISIBLE}
     sop = assigns(:sop)
     assert_redirected_to (sop)
     policy = sop.policy
@@ -673,7 +673,7 @@ class SopsControllerTest < ActionController::TestCase
   test "should not change the policy if the item is requested to be published, when managing sop" do
       gatekeeper = Factory(:gatekeeper)
       policy = Factory(:policy, :sharing_scope => Policy::PRIVATE, :permissions => [Factory(:permission)])
-      sop = Factory(:sop, :projects => gatekeeper.projects, :policy => policy)
+      sop = Factory(:sop, :project_ids => gatekeeper.projects, :policy => policy)
       login_as(sop.contributor)
       assert sop.can_manage?
       put :update, :id => sop.id, :sop =>{}, :sharing => {:sharing_scope => Policy::EVERYONE, "access_type_#{Policy::EVERYONE}" => Policy::VISIBLE}
@@ -779,7 +779,7 @@ class SopsControllerTest < ActionController::TestCase
 
   test 'send publish approval request' do
     gatekeeper = Factory(:gatekeeper)
-    sop = Factory(:sop, :projects => gatekeeper.projects)
+    sop = Factory(:sop, :project_ids => gatekeeper.projects)
 
     #request publish
     login_as(sop.contributor)
@@ -791,7 +791,7 @@ class SopsControllerTest < ActionController::TestCase
 
   test 'dont send publish approval request if can_publish' do
     gatekeeper = Factory(:gatekeeper)
-    sop = Factory(:sop, :contributor => gatekeeper.user, :projects => gatekeeper.projects)
+    sop = Factory(:sop, :contributor => gatekeeper.user, :project_ids => gatekeeper.projects)
 
     #request publish
     login_as(sop.contributor)
@@ -804,7 +804,7 @@ class SopsControllerTest < ActionController::TestCase
 
   test 'dont send publish approval request again if it was already sent by this person' do
     gatekeeper = Factory(:gatekeeper)
-    sop = Factory(:sop, :projects => gatekeeper.projects)
+    sop = Factory(:sop, :project_ids => gatekeeper.projects)
 
     #request publish
     login_as(sop.contributor)
@@ -823,11 +823,11 @@ class SopsControllerTest < ActionController::TestCase
 
   def valid_sop_with_url
     mock_remote_file "#{Rails.root}/test/fixtures/files/file_picture.png","http://www.sysmo-db.org/images/sysmo-db-logo-grad2.png"
-    {:title=>"Test", :data_url=>"http://www.sysmo-db.org/images/sysmo-db-logo-grad2.png",:projects=>[projects(:sysmo_project)]}
+    {:title=>"Test", :data_url=>"http://www.sysmo-db.org/images/sysmo-db-logo-grad2.png",:project_ids=>[projects(:sysmo_project)]}
   end
 
   def valid_sop
-    {:title=>"Test", :data=>fixture_file_upload('files/file_picture.png'),:projects=>[projects(:sysmo_project)]}
+    {:title=>"Test", :data=>fixture_file_upload('files/file_picture.png'),:project_ids=>[projects(:sysmo_project)]}
   end
 
 end

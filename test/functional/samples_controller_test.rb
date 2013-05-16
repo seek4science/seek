@@ -69,7 +69,7 @@ class SamplesControllerTest < ActionController::TestCase
     specimen = Factory(:specimen, :contributor => User.current_user)
     assert_difference("Sample.count") do
       post :create, :sample => {:title => "test",
-                                :projects=>[Factory(:project)],
+                                :project_ids=>[Factory(:project)],
                                 :lab_internal_number =>"Do232",
                                 :donation_date => Date.today,
                                 :specimen_id => specimen.id }
@@ -95,7 +95,7 @@ class SamplesControllerTest < ActionController::TestCase
             :sample => {
             :title => "test",
             :contributor=>User.current_user,
-            :projects=>[proj1,proj2],
+            :project_ids=>[proj1,proj2],
             :lab_internal_number =>"Do232",
             :donation_date => Date.today,
             :specimen_attributes => {:strain_id => Factory(:strain).id,
@@ -131,7 +131,7 @@ class SamplesControllerTest < ActionController::TestCase
                  :sample => {
                      :title => "test",
                      :contributor=>User.current_user,
-                     :projects=>[Factory(:project)],
+                     :project_ids=>[Factory(:project)],
                      :lab_internal_number =>"Do232",
                      :donation_date => Date.today,
                      :specimen_attributes => {
@@ -162,7 +162,7 @@ class SamplesControllerTest < ActionController::TestCase
                :sample => {
                    :title => "test",
                    :contributor => User.current_user,
-                   :projects => [Factory(:project)],
+                   :project_ids => [Factory(:project)],
                    :lab_internal_number => "Do232",
                    :donation_date => Date.today,
                    :specimen_attributes => {

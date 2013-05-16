@@ -174,7 +174,7 @@ class BioSamplesControllerTest < ActionController::TestCase
     assert_no_difference("Sample.count") do
       assert_no_difference("Specimen.count") do
         post :create_specimen_sample, :sample => {:title => "test",
-                                                  :projects => [Factory(:project)],
+                                                  :project_ids => [Factory(:project)],
                                                   :lab_internal_number => "Do232"},
              :specimen => {:title => 'test',
                            :lab_internal_number => 'lab123',
@@ -187,7 +187,7 @@ class BioSamplesControllerTest < ActionController::TestCase
   test 'should not allow to create sample which associates with the un-viewable specimen' do
       assert_no_difference("Sample.count") do
         post :create_specimen_sample, :sample => {:title => "test",
-                                                  :projects => [Factory(:project)],
+                                                  :project_ids => [Factory(:project)],
                                                   :lab_internal_number => "Do232"},
              :specimen => Factory(:specimen, :policy => Factory(:private_policy))
 
