@@ -16,7 +16,6 @@ gem 'simple-spreadsheet-extractor',"0.12.1"
 gem "rmagick","2.12.2"
 gem "mysql2"
 gem 'rest-client',">=1.6.1"
-gem 'calendar_date_select'
 gem 'factory_girl',"2.6.4"
 gem 'ratom',"0.6.9"
 gem 'rubyzip'
@@ -64,6 +63,7 @@ gem 'white_list_formatted_content', :git => "git://github.com/quyen/white_list_f
 gem 'pubmed_query_tool', :git => "git://github.com/quyen/pubmed_query_tool.git"
 gem 'my_rails_settings', :git => "git://github.com/quyen/my_rails_settings.git", :require=>"settings"
 gem 'piwik_analytics',:git=>"git://github.com/SysMO-DB/piwik-ruby-tracking.git"
+gem 'calendar_date_select', :git => 'git://github.com/paneq/calendar_date_select.git'
 
 #gem 'redbox'
 gem 'redbox', :git=>"git://github.com/SysMO-DB/redbox.git"
