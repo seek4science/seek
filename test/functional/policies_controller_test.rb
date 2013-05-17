@@ -147,7 +147,7 @@ class PoliciesControllerTest < ActionController::TestCase
   test 'when updating an item, can publish the item if dissociate to it the project which has gatekeeper' do
         gatekeeper = Factory(:gatekeeper)
         a_person = Factory(:person)
-        sample = Factory(:sample, :policy => Factory(:policy), :project_ids => gatekeeper.projects)
+        sample = Factory(:sample, :policy => Factory(:policy), :project_ids => gatekeeper.projects.collect(&:id))
         Factory(:permission, :contributor => a_person, :access_type => Policy::MANAGING, :policy => sample.policy)
         sample.reload
 
@@ -173,7 +173,7 @@ class PoliciesControllerTest < ActionController::TestCase
     gatekeeper = Factory(:gatekeeper)
     a_person = Factory(:person)
     assay = Assay.new
-    assay.study = Factory(:study, :investigation => Factory(:investigation, :project_ids => gatekeeper.projects))
+    assay.study = Factory(:study, :investigation => Factory(:investigation, :project_ids => gatekeeper.projects.collect(&:id)))
 
     login_as(a_person.user)
     assert assay.can_manage?
@@ -186,7 +186,7 @@ class PoliciesControllerTest < ActionController::TestCase
           gatekeeper = Factory(:gatekeeper)
           a_person = Factory(:person)
           login_as(gatekeeper.user)
-          sample = Factory(:sample, :contributor => gatekeeper.user, :policy => Factory(:public_policy), :project_ids => gatekeeper.projects)
+          sample = Factory(:sample, :contributor => gatekeeper.user, :policy => Factory(:public_policy), :project_ids => gatekeeper.projects.collect(&:id))
           Factory(:permission, :contributor => a_person, :access_type => Policy::MANAGING, :policy => sample.policy)
           sample.reload
 

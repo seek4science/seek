@@ -266,7 +266,7 @@ class DataFilesControllerTest < ActionController::TestCase
   end
   
   test "should correctly handle bad data url" do
-    df={:title=>"Test",:data_url=>"http:/sdfsdfds.com/sdf.png",:project_ids=>[projects(:sysmo_project)]}
+    df={:title=>"Test",:data_url=>"http:/sdfsdfds.com/sdf.png",:project_ids=>[projects(:sysmo_project).id]}
     assert_no_difference('ActivityLog.count') do
       assert_no_difference('DataFile.count') do
         assert_no_difference('ContentBlob.count') do
@@ -518,7 +518,7 @@ class DataFilesControllerTest < ActionController::TestCase
     mock_remote_file "#{Rails.root}/test/fixtures/files/html_file.html","http://webpage.com",{'Content-Type' => 'text/html'}
     assert_difference('DataFile.count') do
       assert_difference('ContentBlob.count') do
-        post :create, :data_file => { :title=>"Test HTTP",:data_url=>"http://webpage.com",:project_ids=>[projects(:sysmo_project)]}, :sharing=>valid_sharing
+        post :create, :data_file => { :title=>"Test HTTP",:data_url=>"http://webpage.com",:project_ids=>[projects(:sysmo_project).id]}, :sharing=>valid_sharing
       end
     end
 
@@ -538,7 +538,7 @@ class DataFilesControllerTest < ActionController::TestCase
     assert_difference('DataFile.count') do
       assert_difference('ContentBlob.count') do
         @request.env['HTTP_USER_AGENT']="Windows"
-        post :create, :data_file => { :title=>"Test HTTP",:data_url=>"http://webpage.com",:project_ids=>[projects(:sysmo_project)]}, :sharing=>valid_sharing
+        post :create, :data_file => { :title=>"Test HTTP",:data_url=>"http://webpage.com",:project_ids=>[projects(:sysmo_project).id]}, :sharing=>valid_sharing
       end
     end
 
@@ -710,7 +710,7 @@ class DataFilesControllerTest < ActionController::TestCase
 
   test "should create and redirect on download for 401 url" do
     mock_http
-    df = {:title=>"401",:data_url=>"http://mocked401.com",:project_ids=>[projects(:sysmo_project)]}
+    df = {:title=>"401",:data_url=>"http://mocked401.com",:project_ids=>[projects(:sysmo_project).id]}
     assert_difference('ActivityLog.count') do
       assert_difference('DataFile.count') do
         assert_difference('ContentBlob.count') do
@@ -735,7 +735,7 @@ class DataFilesControllerTest < ActionController::TestCase
 
   test "should create and redirect on download for 302 url" do
     mock_http
-    df = {:title=>"302",:data_url=>"http://mocked302.com",:project_ids=>[projects(:sysmo_project)]}
+    df = {:title=>"302",:data_url=>"http://mocked302.com",:project_ids=>[projects(:sysmo_project).id]}
     assert_difference('ActivityLog.count') do
       assert_difference('DataFile.count') do
         assert_difference('ContentBlob.count') do
@@ -758,7 +758,7 @@ class DataFilesControllerTest < ActionController::TestCase
 
   test "should create and redirect on download for 301 url" do
     mock_http
-    df = {:title=>"301",:data_url=>"http://mocked301.com",:project_ids=>[projects(:sysmo_project)]}
+    df = {:title=>"301",:data_url=>"http://mocked301.com",:project_ids=>[projects(:sysmo_project).id]}
     assert_difference('ActivityLog.count') do
       assert_difference('DataFile.count') do
         assert_difference('ContentBlob.count') do
@@ -1603,19 +1603,19 @@ class DataFilesControllerTest < ActionController::TestCase
   end
 
   def valid_data_file
-    { :title=>"Test",:data=>fixture_file_upload('files/file_picture.png'),:project_ids=>[projects(:sysmo_project)]}
+    { :title=>"Test",:data=>fixture_file_upload('files/file_picture.png'),:project_ids=>[projects(:sysmo_project).id]}
   end
   
   def valid_data_file_with_http_url
-    { :title=>"Test HTTP",:data_url=>"http://mockedlocation.com/a-piccy.png",:project_ids=>[projects(:sysmo_project)]}
+    { :title=>"Test HTTP",:data_url=>"http://mockedlocation.com/a-piccy.png",:project_ids=>[projects(:sysmo_project).id]}
   end
 
   def valid_data_file_with_https_url
-    { :title=>"Test HTTPS",:data_url=>"https://mockedlocation.com/a-piccy.png",:project_ids=>[projects(:sysmo_project)]}
+    { :title=>"Test HTTPS",:data_url=>"https://mockedlocation.com/a-piccy.png",:project_ids=>[projects(:sysmo_project).id]}
   end
   
   def valid_data_file_with_ftp_url
-      { :title=>"Test FTP",:data_url=>"ftp://mockedlocation.com/file.txt",:project_ids=>[projects(:sysmo_project)]}
+      { :title=>"Test FTP",:data_url=>"ftp://mockedlocation.com/file.txt",:project_ids=>[projects(:sysmo_project).id]}
   end
   
 end

@@ -35,8 +35,8 @@ class AssaysControllerTest < ActionController::TestCase
     user = Factory :user
     project=user.person.projects.first
     login_as user
-    sop = Factory :sop, :contributor=>user.person,:project_ids=>[project]
-    data_file = Factory :data_file, :contributor=>user.person,:project_ids=>[project]
+    sop = Factory :sop, :contributor=>user.person,:project_ids=>[project.id]
+    data_file = Factory :data_file, :contributor=>user.person,:project_ids=>[project.id]
     get :new, :class=>"experimental"
     assert_response :success
 
@@ -921,7 +921,7 @@ end
                    :policy => Factory(:private_policy),
                    :contributor => User.current_user.person,
                    :study => (Factory(:study, :investigation => (Factory(:investigation,
-                                                                         :project_ids => [Factory(:project), Factory(:project)])))))
+                                                                         :project_ids => [Factory(:project).id, Factory(:project).id])))))
 
     assert assay.can_manage?
     assert_equal Policy::PRIVATE, assay.policy.sharing_scope

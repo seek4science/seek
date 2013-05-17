@@ -86,7 +86,7 @@ class SinglePublishingTest < ActionController::TestCase
 
     notifying_df=assay.data_file_masters.reject{|d|d==df}.first
     request_publishing_df = Factory(:data_file,
-                                    :project_ids => Factory(:gatekeeper).projects,
+                                    :project_ids => Factory(:gatekeeper).projects.collect(&:id),
                                     :contributor => users(:datafile_owner),
                                     :assays => [assay])
     publishing_df = Factory(:data_file,
@@ -137,8 +137,8 @@ class SinglePublishingTest < ActionController::TestCase
 
   test "get check_gatekeeper_required" do
     gatekeeper = Factory(:gatekeeper)
-    df = Factory(:data_file,:project_ids=>gatekeeper.projects,:contributor=>User.current_user)
-    model = Factory(:model,:project_ids=>gatekeeper.projects,:contributor=>User.current_user)
+    df = Factory(:data_file,:project_ids=>gatekeeper.projects.collect(&:id),:contributor=>User.current_user)
+    model = Factory(:model,:project_ids=>gatekeeper.projects.collect(&:id),:contributor=>User.current_user)
     sop = Factory(:sop,:contributor=>User.current_user)
     assert df.gatekeeper_required?,"This datafile must require gatekeeper's approval for the test to succeed"
     assert model.gatekeeper_required?,"This model must require gatekeeper's approval for the test to succeed"
@@ -212,7 +212,7 @@ class SinglePublishingTest < ActionController::TestCase
   end
 
   test "sending publishing request when doing publish for asset that need gatekeeper's approval" do
-    df=Factory(:data_file, :contributor => User.current_user, :project_ids => Factory(:gatekeeper).projects)
+    df=Factory(:data_file, :contributor => User.current_user, :project_ids => Factory(:gatekeeper).projects.collect(&:id))
     assert df.can_publish?,"The data file must be publishable for this test to succeed"
     assert df.gatekeeper_required?,"This datafile must need gatekeeper's approval for the test to succeed'"
     assert  !df.is_waiting_approval?(User.current_user),"The publishing request for this data file must not be sent for this test to succeed"
@@ -358,14 +358,14 @@ class SinglePublishingTest < ActionController::TestCase
   private
 
   def data_file_for_publishing(owner=users(:datafile_owner))
-    Factory :data_file, :contributor=>owner, :project_ids=>[projects(:moses_project)]
+    Factory :data_file, :contributor=>owner, :project_ids=>[projects(:moses_project).id]
   end
 
   def data_with_isa
     df = data_file_for_publishing
     other_user = users(:quentin)
     assay = Factory :experimental_assay, :contributor=>df.contributor.person, :study=>Factory(:study,:contributor=>df.contributor.person)
-    other_persons_data_file = Factory :data_file, :contributor=>other_user, :project_ids=>other_user.person.projects,:policy=>Factory(:policy, :sharing_scope => Policy::ALL_SYSMO_USERS, :access_type => Policy::VISIBLE)
+    other_persons_data_file = Factory :data_file, :contributor=>other_user, :project_ids=>other_user.person.projects.collect(&:id),:policy=>Factory(:policy, :sharing_scope => Policy::ALL_SYSMO_USERS, :access_type => Policy::VISIBLE)
     assay.relate(df)
     assay.relate(other_persons_data_file)
     assert !other_persons_data_file.can_manage?

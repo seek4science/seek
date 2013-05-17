@@ -153,7 +153,7 @@ class BatchPublishingTest < ActionController::TestCase
   def create_gatekeeper_required_assets
     publishable_types = Seek::Util.authorized_types.select {|c| c.first.try(:is_in_isa_publishable?)}
     publishable_types.collect do |klass|
-      Factory(klass.name.underscore.to_sym, :contributor => User.current_user, :project_ids => Factory(:gatekeeper).projects)
+      Factory(klass.name.underscore.to_sym, :contributor => User.current_user, :project_ids => Factory(:gatekeeper).projects.collect(&:id))
     end
   end
 end

@@ -117,7 +117,7 @@ class LogPublishingTest < ActionController::TestCase
 
   test 'log when approving publishing an item' do
     gatekeeper = Factory(:gatekeeper)
-    df = Factory(:data_file, :project_ids => gatekeeper.projects)
+    df = Factory(:data_file, :project_ids => gatekeeper.projects.collect(&:id))
 
     login_as(df.contributor)
     put :update, :id => df.id, :sharing => {:sharing_scope => Policy::EVERYONE, "access_type_#{Policy::EVERYONE}" => Policy::VISIBLE}
@@ -144,7 +144,7 @@ class LogPublishingTest < ActionController::TestCase
     assay=df.assays.first
 
     request_publishing_df = Factory(:data_file,
-                                    :project_ids => Factory(:gatekeeper).projects,
+                                    :project_ids => Factory(:gatekeeper).projects.collect(&:id),
                                     :contributor => users(:datafile_owner),
                                     :assays => [assay])
 
@@ -174,7 +174,7 @@ class LogPublishingTest < ActionController::TestCase
   private
 
   def valid_sop
-    {:title => "Test", :data => fixture_file_upload('files/file_picture.png'), :project_ids => [projects(:sysmo_project)]}
+    {:title => "Test", :data => fixture_file_upload('files/file_picture.png'), :project_ids => [projects(:sysmo_project).id]}
   end
 
   def public_sharing

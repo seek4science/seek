@@ -314,7 +314,7 @@ class StudiesControllerTest < ActionController::TestCase
   test 'edit study with selected projects scope policy' do
     proj = User.current_user.person.projects.first
     study = Factory(:study, :contributor => User.current_user.person,
-                    :investigation => Factory(:investigation, :project_ids => [proj]),
+                    :investigation => Factory(:investigation, :project_ids => [proj.id]),
                     :policy => Factory(:policy,
                                        :sharing_scope => Policy::ALL_SYSMO_USERS,
                                        :access_type => Policy::NO_ACCESS,

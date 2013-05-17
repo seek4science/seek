@@ -27,7 +27,7 @@ class EventsControllerTest < ActionController::TestCase
   test "should have no avatar element in list" do
     e = Factory :event,
                 :contributor => Factory(:user, :person => Factory(:person ,:first_name => "Dont", :last_name => "Display Person")),
-                :project_ids => [Factory(:project, :title => "Dont Display Project")],
+                :project_ids => [Factory(:project, :title => "Dont Display Project").id],
                 :policy => Factory(:public_policy)
     get :index
     assert_select "div.list_items_container" do
@@ -40,7 +40,7 @@ class EventsControllerTest < ActionController::TestCase
   test "index should not show contributor or project" do
     e = Factory :event,
                 :contributor => Factory(:user, :person => Factory(:person ,:first_name => "Dont", :last_name => "Display Person")),
-                :project_ids => [Factory(:project, :title => "Dont Display Project")],
+                :project_ids => [Factory(:project, :title => "Dont Display Project").id],
                 :policy => Factory(:public_policy)
     get :index
     assert !(/Dont Display Person/ =~ @response.body)

@@ -16,7 +16,7 @@ class GatekeeperPublishTest < ActionController::TestCase
 
   test 'should not allow to decide publishing for non-gatekeeper' do
     login_as(:quentin)
-    df = Factory(:data_file,:project_ids => people(:quentin_person).projects)
+    df = Factory(:data_file,:project_ids => people(:quentin_person).projects.collect(&:id))
     get :approve_or_reject_publish, :id=>df.id
     assert_redirected_to :root
     assert_not_nil flash[:error]
@@ -38,7 +38,7 @@ class GatekeeperPublishTest < ActionController::TestCase
 
   test 'gatekeeper should be able to decide publishing' do
     gatekeeper = Factory(:gatekeeper)
-    df = Factory(:data_file,:project_ids => gatekeeper.projects)
+    df = Factory(:data_file,:project_ids => gatekeeper.projects.collect(&:id))
     df.resource_publish_logs.create(:publish_state=>ResourcePublishLog::WAITING_FOR_APPROVAL)
 
     login_as(gatekeeper.user)
@@ -78,7 +78,7 @@ class GatekeeperPublishTest < ActionController::TestCase
 
   test 'do not allow to decide publishing if the asset is not in waiting_for_approval state' do
     gatekeeper = Factory(:gatekeeper)
-    df = Factory(:data_file, :project_ids => gatekeeper.projects)
+    df = Factory(:data_file, :project_ids => gatekeeper.projects.collect(&:id))
 
     login_as(gatekeeper.user)
     post :gatekeeper_decide, :id => df.id, :gatekeeper_decision => 1
@@ -89,7 +89,7 @@ class GatekeeperPublishTest < ActionController::TestCase
 
   test 'allow to decide publishing if the asset is in waiting_for_approval state' do
     gatekeeper = Factory(:gatekeeper)
-    df = Factory(:data_file, :project_ids => gatekeeper.projects)
+    df = Factory(:data_file, :project_ids => gatekeeper.projects.collect(&:id))
     df.resource_publish_logs.create(:publish_state=>ResourcePublishLog::WAITING_FOR_APPROVAL)
 
     login_as(gatekeeper.user)
@@ -100,7 +100,7 @@ class GatekeeperPublishTest < ActionController::TestCase
 
   test 'gatekeeper approves' do
     gatekeeper = Factory(:gatekeeper)
-    df = Factory(:data_file, :project_ids => gatekeeper.projects)
+    df = Factory(:data_file, :project_ids => gatekeeper.projects.collect(&:id))
     df.resource_publish_logs.create(:publish_state=>ResourcePublishLog::WAITING_FOR_APPROVAL,:culprit=>df.contributor)
 
     login_as(gatekeeper.user)
@@ -116,7 +116,7 @@ class GatekeeperPublishTest < ActionController::TestCase
 
   test 'gatekeeper reject' do
     gatekeeper = Factory(:gatekeeper)
-    df = Factory(:data_file, :project_ids => gatekeeper.projects)
+    df = Factory(:data_file, :project_ids => gatekeeper.projects.collect(&:id))
     policy = df.policy
     df.resource_publish_logs.create(:publish_state=>ResourcePublishLog::WAITING_FOR_APPROVAL,:culprit=>df.contributor)
 

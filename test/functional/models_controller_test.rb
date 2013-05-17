@@ -201,7 +201,7 @@ class ModelsControllerTest < ActionController::TestCase
   end
   
   test "should correctly handle bad data url" do
-    model={:title=>"Test",:data_url=>"http://sdfsdfkh.com/sdfsd.png",:project_ids=>[projects(:sysmo_project)]}
+    model={:title=>"Test",:data_url=>"http://sdfsdfkh.com/sdfsd.png",:project_ids=>[projects(:sysmo_project).id]}
     assert_no_difference('Model.count') do
       assert_no_difference('ContentBlob.count') do
         post :create, :model => model, :sharing=>valid_sharing
@@ -855,7 +855,7 @@ class ModelsControllerTest < ActionController::TestCase
   end
 
   test "owner should be able to choose policy 'share with everyone' when creating a model" do
-    model={ :title=>"Test",:data=>fixture_file_upload('files/little_file.txt'),:project_ids=>[projects(:moses_project)]}
+    model={ :title=>"Test",:data=>fixture_file_upload('files/little_file.txt'),:project_ids=>[projects(:moses_project).id]}
     post :create, :model => model,:content_blob=>{:file_0=>fixture_file_upload('files/little_file.txt',Mime::TEXT)}, :sharing=>{:use_whitelist=>"0", :user_blacklist=>"0", :sharing_scope =>Policy::EVERYONE, "access_type_#{Policy::EVERYONE}"=>Policy::VISIBLE}
     assert_redirected_to model_path(assigns(:model))
     assert_equal users(:model_owner),assigns(:model).contributor
@@ -1143,12 +1143,12 @@ class ModelsControllerTest < ActionController::TestCase
   end
 
   def valid_model
-    { :title=>"Test",:project_ids=>[projects(:sysmo_project)]}
+    { :title=>"Test",:project_ids=>[projects(:sysmo_project).id]}
   end
 
   def valid_model_with_url
     mock_remote_file "#{Rails.root}/test/fixtures/files/file_picture.png","http://www.sysmo-db.org/images/sysmo-db-logo-grad2.png"
-    { :title=>"Test",:data_url=>"http://www.sysmo-db.org/images/sysmo-db-logo-grad2.png",:project_ids=>[projects(:sysmo_project)]}
+    { :title=>"Test",:data_url=>"http://www.sysmo-db.org/images/sysmo-db-logo-grad2.png",:project_ids=>[projects(:sysmo_project).id]}
   end
   
 end

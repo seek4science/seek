@@ -134,7 +134,7 @@ class PresentationsControllerTest < ActionController::TestCase
   end
 
   test "can subscribe" do
-     presentation = Factory :presentation,:project_ids=>[Factory(:project)],:contributor=>User.current_user
+     presentation = Factory :presentation,:project_ids=>[Factory(:project).id],:contributor=>User.current_user
      assert_difference "presentation.subscriptions.count" do
         presentation.subscribed = true
         presentation.save
