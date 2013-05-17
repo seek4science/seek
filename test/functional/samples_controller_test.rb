@@ -94,7 +94,6 @@ class SamplesControllerTest < ActionController::TestCase
             :specimen=>{:other_creators=>"jesus jones"},
             :sample => {
             :title => "test",
-            :contributor=>User.current_user,
             :project_ids=>[proj1.id,proj2.id],
             :lab_internal_number =>"Do232",
             :donation_date => Date.today,
@@ -130,7 +129,6 @@ class SamplesControllerTest < ActionController::TestCase
                  :organism_id=>Factory(:organism).id,
                  :sample => {
                      :title => "test",
-                     :contributor=>User.current_user,
                      :project_ids=>[Factory(:project).id],
                      :lab_internal_number =>"Do232",
                      :donation_date => Date.today,
@@ -161,7 +159,6 @@ class SamplesControllerTest < ActionController::TestCase
                :organism_id => Factory(:organism).id,
                :sample => {
                    :title => "test",
-                   :contributor => User.current_user,
                    :project_ids => [Factory(:project).id],
                    :lab_internal_number => "Do232",
                    :donation_date => Date.today,
