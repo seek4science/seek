@@ -150,7 +150,7 @@ class Sample < ActiveRecord::Base
    return new_object
   end
 
-  def self.human_attribute_name(attribute)
+  def self.human_attribute_name(attribute, options = {})
     HUMANIZED_COLUMNS[attribute.to_sym] || super
   end
 

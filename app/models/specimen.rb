@@ -182,7 +182,7 @@ class Specimen < ActiveRecord::Base
   end
 
 
-  def self.human_attribute_name(attribute)
+  def self.human_attribute_name(attribute, options = {})
     HUMANIZED_COLUMNS[attribute.to_sym] || super
   end
 
