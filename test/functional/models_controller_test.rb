@@ -726,7 +726,7 @@ class ModelsControllerTest < ActionController::TestCase
 
     #create new version
     post :new_version, :id=>m, :model=>{},:content_blob=>{:file_0=>fixture_file_upload('files/little_file.txt',Mime::TEXT)}
-    assert_redirected_to model_path(assigns(:m))
+    assert_redirected_to model_path(assigns(:model))
     m = Model.find(m.id)
     assert_equal 2, m.versions.size
     assert_equal 2, m.version

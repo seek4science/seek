@@ -1370,7 +1370,7 @@ class DataFilesControllerTest < ActionController::TestCase
     work_group = Factory(:work_group, :project => project)
     gatekeeper = Factory(:gatekeeper, :group_memberships => [Factory(:group_membership, :work_group => work_group)])
 
-    data_file = Factory(:data_file, :policy => policy, :project_ids => [project])
+    data_file = Factory(:data_file, :policy => policy, :project_ids => [project.id])
     assert_not_equal Policy::EVERYONE, data_file.policy.sharing_scope
     login_as(person.user)
     assert data_file.can_manage?

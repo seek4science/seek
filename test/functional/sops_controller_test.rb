@@ -383,7 +383,7 @@ class SopsControllerTest < ActionController::TestCase
 
     #create new version
     post :new_version, :id=>s, :sop=>{:data=>fixture_file_upload('files/little_file_v2.txt',Mime::TEXT)}
-    assert_redirected_to sop_path(assigns(:s))
+    assert_redirected_to sop_path(assigns(:sop))
 
     s=Sop.find(s.id)
     assert_equal 2, s.versions.size
