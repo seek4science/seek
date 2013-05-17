@@ -32,7 +32,7 @@ class StudiedFactorsControllerTest < ActionController::TestCase
     df=data_files(:editable_data_file)
     mi = measured_items(:concentration)
     unit = units(:gram)
-    fs = {:measured_item_id => mi.id, :start_value => 1, :end_value => 10, :unit => unit}
+    fs = {:measured_item_id => mi.id, :start_value => 1, :end_value => 10, :unit_id => unit.id}
     compound_name = 'CTP'
     compound_annotation = Seek::SabiorkWebservices.new().get_compound_annotation(compound_name)
 
@@ -63,7 +63,7 @@ class StudiedFactorsControllerTest < ActionController::TestCase
     data_file=data_files(:editable_data_file)
     mi = measured_items(:time)
     unit = units(:gram)
-    fs = {:measured_item_id => mi.id, :start_value => 1, :end_value => 10, :unit => unit}
+    fs = {:measured_item_id => mi.id, :start_value => 1, :end_value => 10, :unit_id => unit.id}
     post :create, :studied_factor => fs, :data_file_id => data_file.id, :version => data_file.version
     fs = assigns(:studied_factor)
     assert_not_nil fs
@@ -75,7 +75,7 @@ class StudiedFactorsControllerTest < ActionController::TestCase
     df=data_files(:editable_data_file)
     mi = measured_items(:concentration)
     unit = units(:gram)
-    fs = {:measured_item_id => mi.id, :start_value => 1, :end_value => 10, :unit => unit}
+    fs = {:measured_item_id => mi.id, :start_value => 1, :end_value => 10, :unit_id => unit.id}
     post :create, :studied_factor => fs, :data_file_id => df.id, :version => df.version
     fs = assigns(:studied_factor)
     assert_not_nil fs
@@ -87,7 +87,7 @@ class StudiedFactorsControllerTest < ActionController::TestCase
     mi = measured_items(:concentration)
     cp = compounds(:compound_glucose)
     unit = units(:gram)
-    fs = {:measured_item_id => mi.id, :start_value => 1, :end_value => 10, :unit => unit}
+    fs = {:measured_item_id => mi.id, :start_value => 1, :end_value => 10, :unit_id => unit.id}
     post :create, :studied_factor => fs, :data_file_id => df.id, :version => df.version, :substance_autocompleter_selected_ids => ["#{cp.id.to_s},Compound"]
     fs = assigns(:studied_factor)
     assert_not_nil fs
@@ -101,7 +101,7 @@ class StudiedFactorsControllerTest < ActionController::TestCase
     mi = measured_items(:concentration)
     syn = synonyms(:glucose_synonym)
     unit = units(:gram)
-    fs = {:measured_item_id => mi.id, :start_value => 1, :end_value => 10, :unit => unit}
+    fs = {:measured_item_id => mi.id, :start_value => 1, :end_value => 10, :unit_id => unit.id}
     post :create, :studied_factor => fs, :data_file_id => df.id, :version => df.version, :substance_autocompleter_selected_ids => ["#{syn.id.to_s},Synonym"]
     fs = assigns(:studied_factor)
     assert_not_nil fs
@@ -189,7 +189,7 @@ class StudiedFactorsControllerTest < ActionController::TestCase
     data_file=data_files(:editable_data_file)
     mi = measured_items(:time)
     unit = units(:gram)
-    fs = {:measured_item_id => mi.id, :start_value => "1,5" , :end_value => 10, :unit => unit}
+    fs = {:measured_item_id => mi.id, :start_value => "1,5" , :end_value => 10, :unit_id => unit.id}
     post :create, :studied_factor => fs, :data_file_id => data_file.id, :version => data_file.version
     fs = assigns(:studied_factor)
     assert_nil fs
