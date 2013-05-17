@@ -12,7 +12,7 @@ class StrainsControllerTest < ActionController::TestCase
   end
 
   def rest_api_test_object
-    @object = Factory(:strain, :organism=>Factory(:organism, :bioportal_concept=>Factory(:bioportal_concept)))
+    @object = Factory(:strain, :organism_id=>Factory(:organism, :bioportal_concept=>Factory(:bioportal_concept)).id)
   end
 
   test "should get index" do

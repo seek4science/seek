@@ -102,7 +102,7 @@ class BioSamplesControllerTest < ActionController::TestCase
 
   test 'should create strain with name and organism' do
     organism = organisms(:yeast)
-    strain = {:title => 'test', :organism => organism, :project_ids => [Factory(:project).id]}
+    strain = {:title => 'test', :organism_id => organism.id, :project_ids => [Factory(:project).id]}
     assert_difference ('Strain.count') do
       post :create_strain, :strain => strain
     end
@@ -112,7 +112,7 @@ class BioSamplesControllerTest < ActionController::TestCase
   test 'should not be able to create strain without login' do
     logout
     organism = organisms(:yeast)
-    strain = {:title => 'test', :organism => organism}
+    strain = {:title => 'test', :organism_id => organism.id}
     assert_no_difference ('Strain.count') do
       post :create_strain, :strain => strain
     end

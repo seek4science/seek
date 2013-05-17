@@ -89,7 +89,7 @@ class SamplesControllerTest < ActionController::TestCase
       assert_difference("Specimen.count") do
         post :create,
             :specimen_sop_ids=>[sop.id],
-            :organism=>Factory(:organism),
+            :organism_id=>Factory(:organism).id,
             :creators=>[[creator.name,creator.id]].to_json,
             :specimen=>{:other_creators=>"jesus jones"},
             :sample => {
@@ -127,7 +127,7 @@ class SamplesControllerTest < ActionController::TestCase
         assert_difference("Specimen.count") do
           assert_difference("Strain.count") do
             post :create,
-                 :organism=>Factory(:organism),
+                 :organism_id=>Factory(:organism).id,
                  :sample => {
                      :title => "test",
                      :contributor=>User.current_user,
@@ -158,7 +158,7 @@ class SamplesControllerTest < ActionController::TestCase
     new_phenotype_description = "new phenotype"
     assert_difference(["Sample.count","Specimen.count"]) do
           post :create,
-               :organism => Factory(:organism),
+               :organism_id => Factory(:organism).id,
                :sample => {
                    :title => "test",
                    :contributor => User.current_user,
