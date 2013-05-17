@@ -51,6 +51,10 @@ class ConfigTest < ActiveSupport::TestCase
     assert_equal true ,Seek::Config.pdf_conversion_enabled
   end
 
+  test "delete asset version enabled" do
+      assert_equal false ,Seek::Config.delete_asset_version_enabled
+  end
+
   test "sample_parser_enabled" do
     #NOTE: this is the value in seek_testing.rb, the actual default is 'false'
     assert_equal true ,Seek::Config.sample_parser_enabled

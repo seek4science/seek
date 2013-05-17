@@ -142,7 +142,7 @@ module Jits
               end
 
               # Then... delete the version
-              if success
+              if success || Seek::Config.delete_asset_version_enabled
                 return ver.destroy
               else
                 return false
