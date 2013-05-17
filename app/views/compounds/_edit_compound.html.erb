@@ -22,7 +22,7 @@
    end
 %>
 <div class="compounds" id='edit_compound_<%= compound.id %>' style="display: none" >
-    <%= form_for 'compound', compound,
+    <%= form_for compound,
       :url=> compound_path(compound.id),
       :before=>"$('update_#{compound.id}').disabled=true;",
       :loaded=>"$('update_#{compound.id}').disabled=false;",
@@ -57,12 +57,14 @@
       </table>
 
     <% end -%>
-    <%= button_to_remote "Search in SabioRK",
+    <%= button_to "Search in SabioRK",
                      {:url => {:controller => 'compounds', :action => "search_in_sabiork"},
                       :with => "'compound_name=' + escape($F('#{compound.id}_title')) + '&id=' + '#{compound.id}'",
                      :before=>"$('search_in_sabiork_#{compound.id}').disabled=true;",
                      :loaded=>"$('search_in_sabiork_#{compound.id}').disabled=false;",},
-                     {:style => "font-weight:bold; margin: 1em 20em 1em", :id => "search_in_sabiork_#{compound.id}"} %>
+                     {:style => "font-weight:bold; margin: 1em 20em 1em",
+                      :id => "search_in_sabiork_#{compound.id}",
+                      :remote => true} %>
 </div>
 
 
