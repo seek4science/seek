@@ -57,7 +57,7 @@ class SpecimensControllerTest < ActionController::TestCase
                                   :organism_id=>Factory(:organism).id,
                                   :lab_internal_number =>"Do232",
                                   :contributor => Factory(:user),
-                                  :institution => Factory(:institution),
+                                  :institution_id => Factory(:institution).id,
                                   :strain => Factory(:strain),
                                   :project_ids => [Factory(:project).id]}
 
@@ -175,7 +175,7 @@ class SpecimensControllerTest < ActionController::TestCase
     get :show, :id => Factory(:specimen,
                               :title=>"running mouse NO2 with no institution",
                               :policy =>policies(:editing_for_all_sysmo_users_policy),
-                              :institution=>nil)
+                              :institution_id=>nil)
     assert_response :success
     assert_not_nil assigns(:specimen)
   end
@@ -225,7 +225,7 @@ test "should update genotypes and phenotypes" do
                                   :organism_id => Factory(:organism).id,
                                   :lab_internal_number => "Do232",
                                   :contributor => User.current_user,
-                                  :institution => Factory(:institution),
+                                  :institution_id => Factory(:institution).id,
                                   :strain => Factory(:strain),
                                   :project_ids => [Factory(:project).id]},
                     :specimen_sop_ids => [sop.id]
