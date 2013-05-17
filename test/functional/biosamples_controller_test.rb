@@ -170,30 +170,6 @@ class BioSamplesControllerTest < ActionController::TestCase
     assert_select "table#strain_table tbody tr td", :text => 'ZX81', :count => 1
   end
 
-  test 'should not allow to create specimen_sample which associates with the un-viewable strain' do
-    assert_no_difference("Sample.count") do
-      assert_no_difference("Specimen.count") do
-        post :create_specimen_sample, :sample => {:title => "test",
-                                                  :project_ids => [Factory(:project)],
-                                                  :lab_internal_number => "Do232"},
-             :specimen => {:title => 'test',
-                           :lab_internal_number => 'lab123',
-                           :strain => Factory(:strain, :policy => Factory(:private_policy))
-             }
-      end
-    end
-  end
-
-  test 'should not allow to create sample which associates with the un-viewable specimen' do
-      assert_no_difference("Sample.count") do
-        post :create_specimen_sample, :sample => {:title => "test",
-                                                  :project_ids => [Factory(:project)],
-                                                  :lab_internal_number => "Do232"},
-             :specimen => Factory(:specimen, :policy => Factory(:private_policy))
-
-      end
-  end
-
   test "should update strain" do
     strain = Factory(:strain)
     login_as(strain.contributor)
