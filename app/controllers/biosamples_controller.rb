@@ -166,6 +166,10 @@ class BiosamplesController < ApplicationController
             page.alert("Fail to create new strain. #{strain.errors.full_messages}")
           end
         end
+      else
+        render :update do |page|
+          page.alert("You are not allowed to create a new strain, you may login first")
+        end
       end
   end
 
