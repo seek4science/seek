@@ -143,7 +143,7 @@ module Jits
 
               # Then... delete the version
               if success
-                retrn ver.destroy
+                return ver.destroy
               else
                 return false
               end
