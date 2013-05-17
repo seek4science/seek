@@ -155,7 +155,10 @@ class SpecimensControllerTest < ActionController::TestCase
 
   test "should create specimen with strings for confluency passage viability and purity" do
     attrs = [:confluency, :passage, :viability, :purity]
-    specimen= Factory.attributes_for :specimen, :confluency => "Test", :passage => "Test", :viability => "Test", :purity => "Test"
+    specimen= Factory.attributes_for :specimen,
+                                     :confluency => "Test", :passage => "Test",
+                                     :viability => "Test", :purity => "Test",
+                                     :project_ids => [Factory(:project).id]
 
     specimen[:strain_id]=Factory(:strain).id
     post :create, :specimen => specimen
@@ -240,7 +243,10 @@ test "should update genotypes and phenotypes" do
 
   test 'should associate sops' do
     sop = Factory(:sop, :policy => Factory(:public_policy))
-    specimen= Factory.attributes_for :specimen, :confluency => "Test", :passage => "Test", :viability => "Test", :purity => "Test"
+    specimen= Factory.attributes_for :specimen,
+                                     :confluency => "Test", :passage => "Test",
+                                     :viability => "Test", :purity => "Test",
+                                     :project_ids => [Factory(:project).id]
     specimen[:strain_id]=Factory(:strain).id
 
     post :create, :specimen => specimen, :specimen_sop_ids => [sop.id]
