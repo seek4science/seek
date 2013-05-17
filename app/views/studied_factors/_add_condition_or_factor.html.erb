@@ -17,7 +17,7 @@
    end
 %>
 
-<%= form_for entity, object,
+<%= form_for object,
   :url=> path_to_object,
   :before=>"$('#{entity}_submit').disabled=true;",
   :loaded=>"$('#{entity}_submit').disabled=false;",

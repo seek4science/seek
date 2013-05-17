@@ -12,7 +12,7 @@
      path_to_object = sop_path(@sop).concat("/#{controller_name}/#{object.id}")
    end
 %>
-<%= form_for entity, object,
+<%= form_for object,
   :url=> path_to_object,
   :before=>"$('update_#{object.id}').disabled=true;",
   :loaded=>"$('update_#{object.id}').disabled=false;",
