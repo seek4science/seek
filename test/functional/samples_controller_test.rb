@@ -290,7 +290,7 @@ class SamplesControllerTest < ActionController::TestCase
                                 :lab_internal_number =>"Do232",
                                 :donation_date => Date.today,
                                  :project_ids =>[Factory(:project).id],
-                                :specimen => Factory(:specimen, :contributor => User.current_user)},
+                                :specimen_id => Factory(:specimen, :contributor => User.current_user).id},
              :sample_data_file_ids => [Factory(:data_file,:title=>"testDF",:contributor=>User.current_user).id],
              :sample_sop_ids => [Factory(:sop,:title=>"testSop",:contributor=>User.current_user).id]
 
@@ -395,7 +395,7 @@ test "should show organism and strain information of a sample if there is organi
                                 :lab_internal_number => "Do232",
                                 :donation_date => Date.today,
                                 :project_ids => [Factory(:project).id],
-                                :specimen => Factory(:specimen, :contributor => User.current_user)},
+                                :specimen_id => Factory(:specimen, :contributor => User.current_user).id},
            :sample_sop_ids => [sop.id]
 
 
