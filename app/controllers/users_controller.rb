@@ -121,10 +121,14 @@ class UsersController < ApplicationController
   
   def update    
     @user = User.find(params[:id])
-    
-    person=Person.find(params[:user][:person_id]) unless (params[:user][:person_id]).nil?        
-    
+    person=Person.find(params[:user][:person_id]) unless (params[:user][:person_id]).nil?
     @user.person=person if !person.nil?
+
+    if params[:user]
+      [:id, :person_id].each do |column_name|
+        params[:user].delete(column_name)
+      end
+    end
     
     @user.attributes=params[:user]    
 
