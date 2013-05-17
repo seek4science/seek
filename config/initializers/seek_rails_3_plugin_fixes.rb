@@ -2,6 +2,7 @@
 #these are items that will need revisiting
 require 'bioportal'
 require 'pubmed_record'
+require 'pubmed_query'
 require 'redbox_helper'
 
 SEEK::Application.configure do
