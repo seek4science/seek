@@ -1049,7 +1049,7 @@ class PeopleControllerTest < ActionController::TestCase
       assert_equal 1, work_groups.count
       assert a_person.project_subscriptions.collect(&:project).include?(projects.first)
 
-      s=Factory(:subscribable, :project_ids => projects.id)
+      s=Factory(:subscribable, :project_ids => projects.collect(&:id))
       SetSubscriptionsForItemJob.new(s.class.name, s.id, projects.collect(&:id)).perform
       assert s.subscribed?(a_person)
 
