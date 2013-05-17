@@ -6,7 +6,7 @@ class Person < ActiveRecord::Base
   include Seek::Rdf::RdfGeneration
 
   acts_as_yellow_pages
-  default_scope :order => "last_name, first_name"
+  default_scope order("#{table_name}.last_name, #{table_name}.first_name")
 
   #those that have updated time stamps and avatars appear first. A future enhancement could be to judge activity by last asset updated timestamp
   scope :active, :order=> "avatar_id is null, updated_at DESC"

@@ -9,7 +9,7 @@ class Institution < ActiveRecord::Base
 
   acts_as_yellow_pages
 
-  default_scope :order => :name
+  default_scope order("#{table_name}.name")
 
   #load the configuration for the pagination
   grouped_pagination :default_page => Seek::Config.default_page(self.name.underscore.pluralize)
