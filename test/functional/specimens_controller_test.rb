@@ -58,7 +58,7 @@ class SpecimensControllerTest < ActionController::TestCase
                                   :lab_internal_number =>"Do232",
                                   :contributor => Factory(:user),
                                   :institution_id => Factory(:institution).id,
-                                  :strain => Factory(:strain),
+                                  :strain_id => Factory(:strain).id,
                                   :project_ids => [Factory(:project).id]}
 
     end
@@ -226,7 +226,7 @@ test "should update genotypes and phenotypes" do
                                   :lab_internal_number => "Do232",
                                   :contributor => User.current_user,
                                   :institution_id => Factory(:institution).id,
-                                  :strain => Factory(:strain),
+                                  :strain_id => Factory(:strain).id,
                                   :project_ids => [Factory(:project).id]},
                     :specimen_sop_ids => [sop.id]
 
