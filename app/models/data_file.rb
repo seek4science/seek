@@ -226,19 +226,34 @@ class DataFile < ActiveRecord::Base
         r
       end
       search_terms.each do |key|
-        Model.search do |query|
-          query.keywords key, :fields=>[:model_contents_for_search, :description, :searchable_tags]
-        end.hits.each do |hit|
-          unless hit.score.nil?
-            results[hit.primary_key]||=ModelMatchResult.new([],0,hit.primary_key)
-            results[hit.primary_key].search_terms << key
-            results[hit.primary_key].score += hit.score
+        key = filter_query(key)
+        unless invalid_search_query?(key)
+
+          Model.search do |query|
+            query.keywords key, :fields=>[:model_contents_for_search, :description, :searchable_tags]
+          end.hits.each do |hit|
+            unless hit.score.nil?
+              results[hit.primary_key]||=ModelMatchResult.new([],0,hit.primary_key)
+              results[hit.primary_key].search_terms << key
+              results[hit.primary_key].score += hit.score
+            end
           end
         end
       end
     end
 
     results.values.sort_by{|a| -a.score}
+  end
+
+  def invalid_search_query?(query)
+    query.empty? || query.strip=="-"
+  end
+
+  def filter_query query
+    query = query.gsub("*", "")
+    query = query.gsub("?", "")
+    query.chop! if query.end_with?(":")
+    query
   end
 
 end

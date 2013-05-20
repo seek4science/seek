@@ -14,9 +14,9 @@ class ModelsControllerTest < ActionController::TestCase
   end
 
   def rest_api_test_object
-    @object=Factory :model_2_files, :contributor=>User.current_user
+    @object=Factory :model_2_files, :contributor=>User.current_user, :organism=>Factory(:organism)
   end
-  
+
   test "should get index" do
     get :index
     assert_response :success
