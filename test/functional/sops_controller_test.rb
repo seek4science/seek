@@ -673,7 +673,7 @@ class SopsControllerTest < ActionController::TestCase
   test "should not change the policy if the item is requested to be published, when managing sop" do
       gatekeeper = Factory(:gatekeeper)
       policy = Factory(:policy, :sharing_scope => Policy::PRIVATE, :permissions => [Factory(:permission)])
-      sop = Factory(:sop, :project_ids => gatekeeper.projects, :policy => policy)
+      sop = Factory(:sop, :project_ids => gatekeeper.projects.collect(&:id), :policy => policy)
       login_as(sop.contributor)
       assert sop.can_manage?
       put :update, :id => sop.id, :sop =>{}, :sharing => {:sharing_scope => Policy::EVERYONE, "access_type_#{Policy::EVERYONE}" => Policy::VISIBLE}
