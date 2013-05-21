@@ -16,7 +16,7 @@ class LogPublishingTest < ActionController::TestCase
   test 'log when creating the public item' do
     @controller = SopsController.new()
     sop_params = valid_sop
-    sop_params[:projects] = [projects(:three)] #this project has no gatekeeper
+    sop_params[:project_ids] = [projects(:three).id] #this project has no gatekeeper
     assert_difference ('ResourcePublishLog.count') do
       post :create, :sop => sop_params, :sharing => public_sharing
     end
