@@ -45,6 +45,12 @@ GIT
       rails (>= 3.0.0)
 
 GIT
+  remote: git://github.com/SysMO-DB/pubmed_query_tool.git
+  revision: 931788ea92ca898882e1d4f6a8bf494cde89be23
+  specs:
+    pubmed_query_tool (1.0.0)
+
+GIT
   remote: git://github.com/SysMO-DB/redbox.git
   revision: c2cf9d4d95b6d79496b3bbefacffa920692429d4
   specs:
@@ -91,12 +97,6 @@ GIT
   revision: cb8f7fc4aa41023f96f34c6e90e67a154d4ea977
   specs:
     my_responds_to_parent (1.0.0)
-
-GIT
-  remote: git://github.com/quyen/pubmed_query_tool.git
-  revision: d2154fe9d56f628dd984220cb6bf01a51ad1bbe0
-  specs:
-    pubmed_query_tool (1.0.0)
 
 GIT
   remote: git://github.com/quyen/white_list.git

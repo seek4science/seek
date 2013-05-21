@@ -1,8 +1,7 @@
 #A placeholder for little hacks required to get various plugins working during the upgrade to rails 3
 #these are items that will need revisiting
 require 'bioportal'
-require 'pubmed_record'
-require 'pubmed_query'
+
 require 'redbox_helper'
 
 SEEK::Application.configure do
