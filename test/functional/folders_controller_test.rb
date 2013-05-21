@@ -83,7 +83,7 @@ class FoldersControllerTest < ActionController::TestCase
   end
 
   test "defaults created and old items assigned" do
-    sop = Factory :sop, :project_ids=>[@projec.id],:policy=>Factory(:public_policy)
+    sop = Factory :sop, :project_ids=>[@project.id],:policy=>Factory(:public_policy)
     private_sop  = Factory :sop, :project_ids=>[@project.id],:policy=>Factory(:private_policy)
     sop2 = Factory :sop, :project_ids=>[Factory(:project).id],:policy=>Factory(:public_policy)
     assert ProjectFolder.root_folders(@project).empty?
