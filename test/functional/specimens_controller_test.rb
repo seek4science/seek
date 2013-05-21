@@ -56,7 +56,6 @@ class SpecimensControllerTest < ActionController::TestCase
       post :create, :specimen => {:title => "running mouse NO.1",
                                   :organism_id=>Factory(:organism).id,
                                   :lab_internal_number =>"Do232",
-                                  :contributor => Factory(:user),
                                   :institution_id => Factory(:institution).id,
                                   :strain_id => Factory(:strain).id,
                                   :project_ids => [Factory(:project).id]}
@@ -224,7 +223,6 @@ test "should update genotypes and phenotypes" do
       post :create, :specimen => {:title => "running mouse NO.1",
                                   :organism_id => Factory(:organism).id,
                                   :lab_internal_number => "Do232",
-                                  :contributor => User.current_user,
                                   :institution_id => Factory(:institution).id,
                                   :strain_id => Factory(:strain).id,
                                   :project_ids => [Factory(:project).id]},
