@@ -31,7 +31,6 @@ class StrainsControllerTest < ActionController::TestCase
     assert_difference("Strain.count") do
       post :create, :strain => {:title => "strain 1",
                                 :organism_id => Factory(:organism).id,
-                                :contributor => Factory(:user),
                                 :project_ids => [Factory(:project).id]}
 
     end
