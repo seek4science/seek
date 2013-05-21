@@ -41,7 +41,7 @@ class Class
         if values.empty?
           # getter method
           key = :"#{name}"
-          if !inheritable_attributes.has_key?(key)
+          if self.respond_to?(key)
             default = self.send(:"#{name}_default")
             value   = default ? default.call(self) : nil
             __send__("#{name}=", value)

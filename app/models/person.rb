@@ -8,9 +8,6 @@ class Person < ActiveRecord::Base
   acts_as_yellow_pages
   default_scope order("#{table_name}.last_name, #{table_name}.first_name")
 
-  #those that have updated time stamps and avatars appear first. A future enhancement could be to judge activity by last asset updated timestamp
-  scope :active, :order=> "avatar_id is null, updated_at DESC"
-
   before_save :first_person_admin
   before_destroy :clean_up_and_assign_permissions
 
@@ -23,6 +20,11 @@ class Person < ActiveRecord::Base
     if changes.include?("roles_mask")
       AuthLookupUpdateJob.add_items_to_queue self
     end
+  end
+
+  #those that have updated time stamps and avatars appear first. A future enhancement could be to judge activity by last asset updated timestamp
+  def self.active
+    Person.unscoped.order("avatar_id is null, updated_at DESC")
   end
 
   include Seek::Taggable

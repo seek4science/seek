@@ -128,7 +128,7 @@ module Seek
           #cannot rely purely on the count, since an item could have been deleted and a new one added
           c = lookup_count_for_user user_id
           last_stored_asset_id = last_asset_id_for_user user_id
-          last_asset_id = self.last(:order=>:id).try(:id)
+          last_asset_id = self.unscoped.last(:order=>:id).try(:id)
 
           #trigger off a full update for that user if the count is zero and items should exist for that type
           if (c==0 && !last_asset_id.nil?)
@@ -152,7 +152,8 @@ module Seek
           unless user_id.is_a?(Numeric)
             user_id = user_id.nil? ? 0 : user_id.id
           end
-          ActiveRecord::Base.connection.select_one("select count(*) from #{lookup_table_name} where user_id = #{user_id}").values[0].to_i
+          sql = "select count(*) from #{lookup_table_name} where user_id = #{user_id}"
+          ActiveRecord::Base.connection.select_one(sql).values[0].to_i
         end
 
         def lookup_for_action_and_user action,user_id,projects
