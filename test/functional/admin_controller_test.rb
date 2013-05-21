@@ -136,7 +136,10 @@ class AdminControllerTest < ActionController::TestCase
   test "job statistics stats" do
     login_as(:quentin)
     Delayed::Job.destroy_all
-    Delayed::Job.create(:run_at=>"2010 September 12",:locked_at=>"2010 September 13",:failed_at=>nil,:created_at=>"2010 September 11")
+    dj = Delayed::Job.create(:run_at=>"2010 September 12",:locked_at=>"2010 September 13",:failed_at=>nil)
+    dj.created_at = "2010 September 11"
+    assert dj.save
+
     xml_http_request :get,:get_stats,{:id=>"job_queue"}
     assert_response :success
     assert_select "p",:text=>"Total delayed jobs waiting = 1"
