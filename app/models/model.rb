@@ -115,13 +115,16 @@ class Model < ActiveRecord::Base
       fields = [:fs_search_fields, :spreadsheet_contents_for_search,:spreadsheet_annotation_search_fields, :searchable_tags]
 
       search_terms.each do |key|
-        DataFile.search do |query|
-          query.keywords key, :fields=>fields
-        end.hits.each do |hit|
-          unless hit.score.nil?
-            results[hit.primary_key]||=DataFileMatchResult.new([],0,hit.primary_key)
-            results[hit.primary_key].search_terms << key
-            results[hit.primary_key].score += (0.75 + hit.score)
+        key = Seek::Search::SearchTermFilter.filter(key)
+        unless key.blank?
+          DataFile.search do |query|
+            query.keywords key, :fields=>fields
+          end.hits.each do |hit|
+            unless hit.score.nil?
+              results[hit.primary_key]||=DataFileMatchResult.new([],0,hit.primary_key)
+              results[hit.primary_key].search_terms << key
+              results[hit.primary_key].score += (0.75 + hit.score)
+            end
           end
         end
       end

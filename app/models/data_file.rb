@@ -226,9 +226,8 @@ class DataFile < ActiveRecord::Base
         r
       end
       search_terms.each do |key|
-        key = filter_query(key)
-        unless invalid_search_query?(key)
-
+        key = Seek::Search::SearchTermFilter.filter(key)
+        unless key.blank?
           Model.search do |query|
             query.keywords key, :fields=>[:model_contents_for_search, :description, :searchable_tags]
           end.hits.each do |hit|
@@ -243,17 +242,6 @@ class DataFile < ActiveRecord::Base
     end
 
     results.values.sort_by{|a| -a.score}
-  end
-
-  def invalid_search_query?(query)
-    query.empty? || query.strip=="-"
-  end
-
-  def filter_query query
-    query = query.gsub("*", "")
-    query = query.gsub("?", "")
-    query.chop! if query.end_with?(":")
-    query
   end
 
 end
