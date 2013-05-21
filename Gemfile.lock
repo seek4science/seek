@@ -70,13 +70,13 @@ GIT
 
 GIT
   remote: git://github.com/quyen/annotations.git
-  revision: 505c71d58e96763825c0ccefe7675b370f1a458e
+  revision: 19606e3ae55019d4ba88539e14defe1919368e17
   specs:
     my_annotations (0.6.0)
 
 GIT
   remote: git://github.com/quyen/bioportal.git
-  revision: 285f58adbeb922ce1c362846a40763672f54ab96
+  revision: b10ef8b0ad8f1bf4a0eb0c7c702476cf45919157
   specs:
     bioportal (1.0.0)
 
