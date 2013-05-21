@@ -883,7 +883,7 @@ end
   test 'edit assay with selected projects scope policy' do
     proj = User.current_user.person.projects.first
     assay = Factory(:assay, :contributor => User.current_user.person,
-                    :study => Factory(:study, :investigation => Factory(:investigation, :project_ids => [proj])),
+                    :study => Factory(:study, :investigation => Factory(:investigation, :project_ids => [proj.id])),
                     :policy => Factory(:policy,
                                        :sharing_scope => Policy::ALL_SYSMO_USERS,
                                        :access_type => Policy::NO_ACCESS,
