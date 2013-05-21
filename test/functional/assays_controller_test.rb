@@ -442,7 +442,6 @@ end
           assert_select "a[href=?]",organism_path(o2),:text=>"Slug"
           assert_select "span.strain_info",:text=>str.info
         end
-
   end
 
   test "should show edit when not logged in" do
@@ -454,6 +453,54 @@ end
     a = Factory :modelling_assay,:contributor=>Factory(:person),:policy=>Factory(:editing_public_policy)
     get :edit,:id=>a
     assert_response :success
+  end
+
+  test "should not show delete button if not authorized to delete but can edit" do
+    person = Factory :person
+    a = Factory :assay,:contributor=>person,:policy=>Factory(:public_policy,:access_type=>Policy::EDITING)
+    assert !a.can_manage?
+    assert a.can_view?
+    get :show,:id=>a.id
+    assert_response :success
+    assert_select "ul.sectionIcons" do
+      assert_select "li" do
+        assert_select "span",:text=>/Delete/,:count=>0
+      end
+    end
+  end
+
+  test "should show delete button in disable state if authorized to delete but has associated items" do
+    person = Factory :person
+    a = Factory :assay,:contributor=>person,:policy=>Factory(:public_policy)
+    df = Factory :data_file, :contributor=>person,:policy=>Factory(:public_policy)
+    Factory :assay_asset,:assay=>a,:asset=>df
+    a.reload
+    assert a.can_manage?
+    assert_equal 1,a.assets.count
+    assert !a.can_delete?
+    get :show,:id=>a.id
+    assert_response :success
+    assert_select "ul.sectionIcons" do
+      assert_select "li" do
+        assert_select "span.disabled_icon",:text=>/Delete/,:count=>1
+      end
+    end
+  end
+
+  test "should show delete button in enabled state if authorized delete and has no associated items" do
+    person = Factory :person
+    a = Factory :assay,:contributor=>person,:policy=>Factory(:public_policy)
+
+    assert a.can_manage?
+    assert a.can_delete?
+    get :show,:id=>a.id
+    assert_response :success
+    assert_select "ul.sectionIcons" do
+      assert_select "li" do
+        assert_select "span",:text=>/Delete/,:count=>1
+        assert_select "span.disabled_icon",:text=>/Delete/,:count=>0
+      end
+    end
   end
 
   test "should not edit assay when not project pal" do
