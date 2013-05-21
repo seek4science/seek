@@ -100,7 +100,7 @@ class SessionsControllerTest < ActionController::TestCase
 
   def test_should_fail_cookie_login
     users(:quentin).remember_me
-    @request.cookies["auth_token"] = auth_token('invalid_auth_token')
+    @request.cookies["auth_token"] = 'invalid_auth_token'
     get :new
     assert !@controller.send(:logged_in?)
   end
@@ -148,11 +148,8 @@ class SessionsControllerTest < ActionController::TestCase
   end
 
   protected
-    def auth_token(token)
-      CGI::Cookie.new('name' => 'auth_token', 'value' => token)
-    end
-    
+
     def cookie_for(user)
-      auth_token users(user).remember_token
+      users(user).remember_token
     end
 end
