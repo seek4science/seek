@@ -9,6 +9,8 @@
     }
 </style>
 
+<% asset_type_name = text_for_resource @resource %>
+
 <h1>You are requested to approve or reject to publish <%= asset_type_name -%> '<%= h(@resource.title) -%>'. </h1>
 <div class="list_items_container" id="<%= @resource.class.name %>_list_items_container">
   <%= render :partial => "assets/resource_list_item", :object => @resource, :locals => {:actions_partial_disable => true} -%>

@@ -7,10 +7,8 @@ module Seek
       end
 
       def approve_or_reject_publish
-        asset_type_name = @template.text_for_resource @resource
-
         respond_to do |format|
-          format.html { render :template=>"assets/publishing/approve_or_reject_publish",:locals=>{:asset_type_name=>asset_type_name} }
+          format.html { render :template=>"assets/publishing/approve_or_reject_publish" }
         end
       end
 
