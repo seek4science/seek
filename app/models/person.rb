@@ -4,6 +4,7 @@ require 'rfc822'
 class Person < ActiveRecord::Base
 
   include Seek::Rdf::RdfGeneration
+  include Seek::Taggable
 
   acts_as_yellow_pages
   default_scope order("#{table_name}.last_name, #{table_name}.first_name")
@@ -16,34 +17,6 @@ class Person < ActiveRecord::Base
 
   after_save :queue_update_auth_table
 
-  def queue_update_auth_table
-    if changes.include?("roles_mask")
-      AuthLookupUpdateJob.add_items_to_queue self
-    end
-  end
-
-  #those that have updated time stamps and avatars appear first. A future enhancement could be to judge activity by last asset updated timestamp
-  def self.active
-    Person.unscoped.order("avatar_id is null, updated_at DESC")
-  end
-
-  include Seek::Taggable
-
-  def receive_notifications
-    registered? and super
-  end
-  
-  def registered?
-    !user.nil?
-  end
-
-  def person
-    self
-  end
-
-  def email_uri
-    URI.escape("mailto:"+email)
-  end
 
   #grouped_pagination :pages=>("A".."Z").to_a #shouldn't need "Other" tab for people
   #load the configuration for the pagination
@@ -100,6 +73,8 @@ class Person < ActiveRecord::Base
   has_many :subscriptions,:dependent => :destroy
   before_create :set_default_subscriptions
 
+  requires_can_manage :roles_mask
+
   ROLES = %w[admin pal project_manager asset_manager gatekeeper]
   ROLES_MASK_FOR_ADMIN = 2**ROLES.index('admin')
   ROLES_MASK_FOR_PAL = 2**ROLES.index('pal')
@@ -132,6 +107,33 @@ class Person < ActiveRecord::Base
    #the roles defined within SEEK
   def roles=(roles)
     self.roles_mask = (roles & ROLES).map { |r| 2**ROLES.index(r) }.sum
+  end
+
+  def queue_update_auth_table
+    if changes.include?("roles_mask")
+      AuthLookupUpdateJob.add_items_to_queue self
+    end
+  end
+
+  #those that have updated time stamps and avatars appear first. A future enhancement could be to judge activity by last asset updated timestamp
+  def self.active
+    Person.unscoped.order("avatar_id is null, updated_at DESC")
+  end
+
+  def receive_notifications
+    registered? and super
+  end
+
+  def registered?
+    !user.nil?
+  end
+
+  def person
+    self
+  end
+
+  def email_uri
+    URI.escape("mailto:"+email)
   end
 
   def roles
@@ -327,8 +329,7 @@ class Person < ActiveRecord::Base
     new_record? or user && (user.is_admin? || user.is_project_manager? || user == self.user)
   end
 
-  #does_not_require_can_edit :roles_mask
-  #requires_can_manage :roles_mask
+
 
   def can_manage? user = User.current_user
     try_block{user.is_admin?}

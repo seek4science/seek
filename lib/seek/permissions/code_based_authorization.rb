@@ -5,7 +5,7 @@ module Seek
       def self.included klass
         klass.extend ClassMethods
         klass.class_eval do
-          has_many :special_auth_codes, :as => :asset#, :required_access_to_owner => :manage
+          has_many :special_auth_codes, :as => :asset, :before_add=>:check_owner_can_manage, :before_remove=>:check_owner_can_manage
           accepts_nested_attributes_for :special_auth_codes, :allow_destroy => true
         end
       end
@@ -15,6 +15,13 @@ module Seek
 
       def auth_by_code? code
         special_auth_codes.unexpired.collect(&:code).include?(code)
+      end
+
+      def check_owner_can_manage(code)
+        unless $authorization_checks_disabled
+          raise "You cannot change the items" unless can_manage?
+        end
+
       end
 
     end
