@@ -60,7 +60,7 @@ module ApplicationHelper
         end
 
     end
-    html
+    html.html_safe
   end
 
   def hidden_item_contributor_links hidden_items
