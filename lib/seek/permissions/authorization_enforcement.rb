@@ -27,6 +27,8 @@ module Seek
         def self.included base
           base.extend ClassMethods
           base.class_attribute :attributes_requiring_can_manage
+          base.class_attribute :attributes_not_requiring_edit
+          base.attributes_not_requiring_edit = []
           base.attributes_requiring_can_manage = []
           base.before_save :changes_authorized?
           base.before_destroy :destroy_authorized?
@@ -73,18 +75,26 @@ module Seek
 
         def authorized_to_edit?
           result = true
-          unless can_edit?
+          unless safe_to_edit?
             result = false
-            errors.add(:base,"You are not authorized to destroy #{self.class.name.underscore.humanize}-#{id}")
+            errors.add(:base,"You are not authorized to edit #{self.class.name.underscore.humanize}-#{id}")
           end
           result
+        end
+
+        def safe_to_edit?
+          can_edit? || (changed - attributes_not_requiring_edit).empty?
         end
 
       end
 
       module ClassMethods
         def requires_can_manage *attrs
-          self.attributes_requiring_can_manage = attrs.map(&:to_s)
+          self.attributes_requiring_can_manage = self.attributes_requiring_can_manage | attrs.map(&:to_s)
+        end
+
+        def does_not_require_can_edit *attrs
+          self.attributes_not_requiring_edit = self.attributes_not_requiring_edit | attrs.map(&:to_s)
         end
       end
 

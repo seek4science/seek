@@ -35,7 +35,7 @@ module Acts #:nodoc:
         acts_as_favouritable
 
         attr_writer :original_filename,:content_type
-        #does_not_require_can_edit :last_used_at
+        does_not_require_can_edit :last_used_at
 
         default_scope :order => "#{self.table_name}.updated_at DESC"
 

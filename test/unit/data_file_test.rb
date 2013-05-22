@@ -437,17 +437,21 @@ class DataFileTest < ActiveSupport::TestCase
   end
 
   test "cache_remote_content" do
-    mock_remote_file "#{Rails.root}/test/fixtures/files/file_picture.png","http://mockedlocation.com/picture.png"
+    user = Factory :user
+    User.with_current_user(user) do
+      mock_remote_file "#{Rails.root}/test/fixtures/files/file_picture.png","http://mockedlocation.com/picture.png"
 
-    data_file = Factory :data_file, :content_blob=>ContentBlob.new(:url=>"http://mockedlocation.com/picture.png",:original_filename=>"picture.png")
+      data_file = Factory :data_file, :content_blob=>ContentBlob.new(:url=>"http://mockedlocation.com/picture.png",:original_filename=>"picture.png")
 
-    data_file.save!
+      data_file.save!
 
-    assert !data_file.content_blob.file_exists?
+      assert !data_file.content_blob.file_exists?
 
-    data_file.cache_remote_content_blob
+      data_file.cache_remote_content_blob
 
-    assert data_file.content_blob.file_exists?
+      assert data_file.content_blob.file_exists?
+    end
+
 
   end
 
