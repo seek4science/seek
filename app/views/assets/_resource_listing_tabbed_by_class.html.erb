@@ -44,12 +44,12 @@
   <% total_count += count %>
 <% end %>
 <% unless total_count == 0-%>
-  <div id='<%= "#{tabs_id}_spinner" -%>'>
+  <div id='<%= "#{tabs_id}_spinner".html_safe -%>'>
     <center>
       <%= image_tag "ajax-loader-large.gif" -%>
     </center>
   </div>
-  <div <%= "id='#{tabs_id}'" if tabs_id -%> class="tabber" style="display:none;">
+  <div <%= "id='#{tabs_id}'".html_safe if tabs_id -%> class="tabber" style="display:none;">
     <% assets = resource_hash.keys.sort_by do |asset|
         ASSET_ORDER.index(asset) || (resource_hash[asset][:is_external] ? 10000 : 1000)
        end
@@ -75,7 +75,7 @@
       <% tab_title = "#{visible_resource_type} (#{resources.length+extra_count}#{"+"+hidden_count.to_s if hidden_count > 0})" -%>
       <% title_class = is_external ? "external_result" : "" %>
       <% unless (resources.empty? && hidden_count < 1) %>
-        <div id="<%= resource_type.downcase.pluralize -%>" class="tabbertab">
+        <div id="<%= resource_type.downcase.pluralize.html_safe -%>" class="tabbertab">
           <% unless resources.empty? && extra_count < 1 %>
             <h3 class='<%= title_class -%>'><%= tab_title -%></h3>
                 <%= render :partial => "assets/resource_list", :locals => { :collection => resources,
@@ -83,7 +83,7 @@
                                                                             :authorization_for_showing_already_done => true,
                                                                             :actions_partial_disable => actions_partial_disable} -%>
           <% else %>
-            <h3><%= "#{visible_resource_type} (0+#{hidden_count})" -%></h3>
+            <h3><%= "#{visible_resource_type} (0+#{hidden_count})".html_safe -%></h3>
           <% end %>
           <% unless extra_count < 1 %>
             <div class="list_items_container">

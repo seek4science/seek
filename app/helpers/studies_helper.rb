@@ -26,7 +26,7 @@ module StudiesHelper
     project_link=link_to project_title, project_url, :alt=>project_title
 
 
-    return image_tag + "<p style='margin: 0; text-align: center;'>#{project_link}</p>"
+    return (image_tag + "<p style='margin: 0; text-align: center;'>#{project_link}</p>").html_safe
   end
 
   def sorted_measured_items
@@ -45,7 +45,7 @@ module StudiesHelper
       result += link_to h(study.title.capitalize),study
       result += " | " unless studies.last==study
     end
-    return result
+    return result.html_safe
   end
 
 end

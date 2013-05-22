@@ -83,7 +83,7 @@ module ResourceListItemHelper
   end
 
   def list_item_authorized_list *args
-   "<p class=\"list_item_attribute\">#{authorized_list *args}</p>"
+   "<p class=\"list_item_attribute\">#{authorized_list *args}</p>".html_safe
   end
 
   def list_item_attribute attribute, value, url=nil, url_options={}
@@ -118,13 +118,13 @@ module ResourceListItemHelper
       html << "&nbsp;&nbsp;&nbsp<b>Last updated:</b> " + date_as_string(resource.updated_at,true)
     end
     html << "</p>"
-    return html
+    return html.html_safe
   end
 
   def list_profile_registered_timestamp resource
     html = "<p class=\"list_item_attribute none_text\" style=\"text-align:center;\"><b>Registered:</b> <label>" + (resource.try(:user).try(:created_at).nil? ? "Not yet registered" : date_as_string(resource.try(:user).try(:created_at)))
     html << "</label></p>"
-    return html
+    return html.html_safe
   end
 
   def list_item_description text, auto_link=true, length=500
@@ -135,7 +135,7 @@ module ResourceListItemHelper
   end
 
   def list_item_contributor resource
-    return "<p class=\"list_item_attribute\"><b>Uploader</b>: #{jerm_harvester_name}</p>" if resource.contributor.nil?
+    return "<p class=\"list_item_attribute\"><b>Uploader</b>: #{jerm_harvester_name}</p>".html_safe if resource.contributor.nil?
     list_item_authorized_attribute 'Uploader', resource.contributor.person
   end
 
@@ -194,7 +194,7 @@ module ResourceListItemHelper
         end
     end
     html << ""
-    html
+    html.html_safe
   end
 
 end

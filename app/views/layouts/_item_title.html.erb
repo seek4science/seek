@@ -28,14 +28,15 @@ image_style_for_title_length = title.length > 89 ? "float:left" : "position:abso
     <div class="sharing_summary">
       <%=
           if item.private?
-            "This item is <span style='color: red; font-weight: bold;'>Private</span> (only you can view it)"
+            sharing_text = "This item is <span style='color: red; font-weight: bold;'>Private</span> (only you can view it)"
           elsif item.is_published?
-            "This item is <span style='color: green; font-weight: bold;'>Published</span> (all visitors, even without a login, may view/access this item)"
+            sharing_text = "This item is <span style='color: green; font-weight: bold;'>Published</span> (all visitors, even without a login, may view/access this item)"
           elsif item.public?
-            "This item is <span style='color: green; font-weight: bold;'>Public</span> visible (all visitors, even without a login, may view this item)"
+            sharing_text = "This item is <span style='color: green; font-weight: bold;'>Public</span> visible (all visitors, even without a login, may view this item)"
           else
-            "This item is <span style='font-weight: bold;'>Shared</span>, but not with all visitors to this site"
+            sharing_text = "This item is <span style='font-weight: bold;'>Shared</span>, but not with all visitors to this site"
           end
+          sharing_text.html_safe
       %>
     </div>
 <% end %>
