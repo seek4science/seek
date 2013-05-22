@@ -14,9 +14,9 @@ module ISAHelper
       unless  svg.blank?
         html << "<div id='isa_svg'><script type=\'image/svg+xml'>#{svg}</script></div>"
       end
-      html
+      html.html_safe
     rescue Exception=>e
-      "<div id='isa_svg' class='none_text'>Currently unable to display the graph for this item</div>"
+      "<div id='isa_svg' class='none_text'>Currently unable to display the graph for this item</div>".html_safe
     end
 
   end
@@ -30,9 +30,9 @@ module ISAHelper
       unless  svg.blank?
         html << "<div id='isa_svg'><script type=\'image/svg+xml'>#{svg}</script></div>"
       end
-      html
+      html.html_safe
     rescue Exception=>e
-      "<div id='isa_svg' class='none_text'>Currently unable to display the graph for this item</div>"
+      "<div id='isa_svg' class='none_text'>Currently unable to display the graph for this item</div>".html_safe
     end
 
   end
