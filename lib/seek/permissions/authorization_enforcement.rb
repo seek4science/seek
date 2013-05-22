@@ -29,6 +29,7 @@ module Seek
           base.class_attribute :attributes_requiring_can_manage
           base.attributes_requiring_can_manage = []
           base.before_save :changes_authorized?
+          base.before_destroy :destroy_authorized?
         end
 
         private
@@ -37,6 +38,17 @@ module Seek
           result = true
           unless $authorization_checks_disabled
             result = authorized_changes_to_attributes?
+          end
+          result
+        end
+
+        def destroy_authorized?
+          result = true
+          unless $authorization_checks_disabled
+            unless can_delete?
+              result = false
+              errors.add(:base, "You are not authorized to destroy #{self.class.name.underscore.humanize}-#{id}")
+            end
           end
           result
         end
