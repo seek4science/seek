@@ -6,10 +6,6 @@ module OrganismsHelper
     if model_or_tag.instance_of?(Organism)
       link_to h(model_or_tag.title.capitalize),model_or_tag
     end
-
-
-
-
   end
   
   def organisms_link_list organisms
@@ -51,7 +47,7 @@ module OrganismsHelper
         result += ", " unless os==organism_and_strains.last
       end
     end
-    result
+    result.html_safe
   end
 
   def organism_and_strain strain,organism=strain.organism, none_text="Not specified"
@@ -62,7 +58,7 @@ module OrganismsHelper
         result << " : <span class='strain_info'>#{h(strain.info)}</span>"
       end
     end
-    result.empty? ? "<span class='none_text'>#{none_text}</span>" : result
+    result.empty? ? "<span class='none_text'>#{none_text}</span>".html_safe : result.html_safe
   end
   
   
