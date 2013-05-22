@@ -18,7 +18,7 @@ module AssaysHelper
     if assay_organism.culture_growth_type
       result += " (#{assay_organism.culture_growth_type.title})"
     end
-    return result
+    return result.html_safe
   end
 
 
@@ -82,7 +82,7 @@ module AssaysHelper
     end
     result += "</p>"
 
-    return result
+    return result.html_safe
   end
 
   def list_assay_samples attribute,assay_samples, none_text="Not Specified"
@@ -121,7 +121,7 @@ module AssaysHelper
     end
 
     result += "</p>"
-    return result
+    return result.html_safe
   end
 
   def list_assay_organisms attribute,assay_organisms,none_text="Not specified"
@@ -151,7 +151,7 @@ module AssaysHelper
       end
 
     result += "</p>"
-    return result
+    return result.html_safe
   end
 
 end
