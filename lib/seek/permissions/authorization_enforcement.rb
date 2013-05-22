@@ -29,21 +29,24 @@ module Seek
           base.class_attribute :attributes_requiring_can_manage
           base.class_attribute :attributes_not_requiring_edit
           base.class_attribute :associations_and_actions_to_be_enforced
+          base.class_attribute :associations_requiring_access_for_owner
           base.associations_and_actions_to_be_enforced = {}
+          base.associations_requiring_access_for_owner = {}
           base.attributes_not_requiring_edit = []
           base.attributes_requiring_can_manage = []
           base.before_save :changes_authorized?
           base.before_destroy :destroy_authorized?
         end
 
-
-
         private
 
         def changes_authorized?
           result = true
           unless $authorization_checks_disabled
-            result = authorized_changes_to_attributes? && authorized_to_edit? && authorized_associations_for_action?
+            result = authorized_changes_to_attributes? &&
+                authorized_to_edit? &&
+                authorized_associations_for_action? &&
+                authorized_required_access_for_owner?
           end
           result
         end
@@ -94,6 +97,27 @@ module Seek
           result
         end
 
+        def authorized_required_access_for_owner?
+          result = true
+          enforced_associations = associations_requiring_access_for_owner.keys
+          unless enforced_associations.empty?
+
+            autosave_associations = self.class.reflect_on_all_autosave_associations.select do |ass|
+              enforced_associations.include?(ass.name.to_s)
+            end
+            autosave_associations.each do |ass|
+              action = associations_requiring_access_for_owner[ass.name.to_s]
+              action_method = "can_#{action}?"
+              if self.respond_to?(action_method) && !self.send(action_method)
+                result = false
+                errors.add(:base,"You are not permitted to change #{ass.name} on #{self.class.name.underscore.humanize}-#{id} without #{action} rights")
+                break
+              end
+            end
+          end
+          result
+        end
+
         def authorized_changes_requiring_manage?
           offending_attributes = changed & attributes_requiring_can_manage
           unless offending_attributes.empty?
@@ -101,10 +125,6 @@ module Seek
           end
           offending_attributes.empty?
         end
-
-
-
-
 
         def safe_to_edit?
           can_edit? || (changed - attributes_not_requiring_edit).empty?
@@ -121,8 +141,12 @@ module Seek
           self.attributes_not_requiring_edit = self.attributes_not_requiring_edit | attrs.map(&:to_s)
         end
 
-        def enforce_authorization_on_association assocation,action
-          associations_and_actions_to_be_enforced[assocation.to_s]=action.to_s
+        def enforce_authorization_on_association association,action
+          associations_and_actions_to_be_enforced[association.to_s]=action.to_s
+        end
+
+        def enforce_required_access_for_owner association,action
+          associations_requiring_access_for_owner[association.to_s]=action.to_s
         end
       end
 
