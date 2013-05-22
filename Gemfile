@@ -60,7 +60,7 @@ gem 'my_savage_beast', :git => 'git://github.com/quyen/my_savage_beast'
 gem 'gibberish', :git => "git://github.com/SysMO-DB/gibberish.git"
 gem 'white_list', :git => "git://github.com/quyen/white_list.git"
 gem 'white_list_formatted_content', :git => "git://github.com/quyen/white_list_formatted_content.git"
-gem 'pubmed_query_tool', :git => "git://github.com/quyen/pubmed_query_tool.git"
+gem 'pubmed_query_tool', :git => "git://github.com/SysMO-DB/pubmed_query_tool.git"
 gem 'my_rails_settings', :git => "git://github.com/quyen/my_rails_settings.git", :require=>"settings"
 gem 'piwik_analytics',:git=>"git://github.com/SysMO-DB/piwik-ruby-tracking.git"
 gem 'calendar_date_select', :git => 'git://github.com/paneq/calendar_date_select.git'

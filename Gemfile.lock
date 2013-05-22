@@ -19,7 +19,7 @@ GIT
 
 GIT
   remote: git://github.com/SysMO-DB/doi_query_tool.git
-  revision: 069facd5bf352d78cacf9a596c62989512085218
+  revision: e4b50f50258ec2e5cfc3e9da159b63b656d7cecd
   specs:
     doi_query_tool (0.0.0)
 
@@ -37,6 +37,12 @@ GIT
       actionpack
       activesupport
       rails (>= 3.0.0)
+
+GIT
+  remote: git://github.com/SysMO-DB/pubmed_query_tool.git
+  revision: 931788ea92ca898882e1d4f6a8bf494cde89be23
+  specs:
+    pubmed_query_tool (1.0.0)
 
 GIT
   remote: git://github.com/SysMO-DB/redbox.git
@@ -91,12 +97,6 @@ GIT
   revision: 4fab6395c687ef279a5be4d405d31b51a07322f5
   specs:
     my_savage_beast (2.3)
-
-GIT
-  remote: git://github.com/quyen/pubmed_query_tool.git
-  revision: d2154fe9d56f628dd984220cb6bf01a51ad1bbe0
-  specs:
-    pubmed_query_tool (1.0.0)
 
 GIT
   remote: git://github.com/quyen/white_list.git

@@ -59,6 +59,7 @@ class PublicationTest < ActiveSupport::TestCase
     mock_pubmed(:email=>"fred@email.com",:id=>1,:content_file=>"pubmed_1.xml")
     query = PubmedQuery.new("seek","fred@email.com")
     result = query.fetch(21533085)
+
     assert_equal Date.parse("20 April 2011"),result.date_published
 
     result = query.fetch(1)
