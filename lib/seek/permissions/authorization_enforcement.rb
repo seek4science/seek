@@ -27,12 +27,8 @@ module Seek
         def self.included base
           base.extend ClassMethods
           base.class_attribute :attributes_requiring_can_manage
-          base.class_attribute :attributes_not_requiring_edit
-          base.class_attribute :associations_and_actions_to_be_enforced
-          base.class_attribute :associations_requiring_access_for_owner
-          base.associations_and_actions_to_be_enforced = {}
-          base.associations_requiring_access_for_owner = {}
-          base.attributes_not_requiring_edit = []
+
+
           base.attributes_requiring_can_manage = []
           base.before_save :changes_authorized?
           base.before_destroy :destroy_authorized?
@@ -81,40 +77,52 @@ module Seek
 
         def authorized_associations_for_action?
           result = true
-          associations_and_actions_to_be_enforced.keys.each do |association|
-            if self.respond_to?(association)
-              action = associations_and_actions_to_be_enforced[association]
-              auth_method = "can_#{associations_and_actions_to_be_enforced[association]}?"
-              Array(self.send(association)).each do |item|
-                if item.respond_to?(auth_method) && !item.send(auth_method)
-                  result = false
-                  errors.add(:base,"You do not have permission to #{action} #{item.class.name.underscore.humanize}-#{item.id}")
-                  break
+          if self.class.respond_to?(:associations_and_actions_to_be_enforced)
+            self.class.associations_and_actions_to_be_enforced.keys.each do |association|
+              if self.respond_to?(association)
+                action = self.class.associations_and_actions_to_be_enforced[association]
+                auth_method = "can_#{self.class.associations_and_actions_to_be_enforced[association]}?"
+                Array(self.send(association)).each do |item|
+                  if item.respond_to?(auth_method) && !item.send(auth_method)
+                    result = false
+                    errors.add(:base,"You do not have permission to #{action} #{item.class.name.underscore.humanize}-#{item.id}")
+                    break
+                  end
                 end
               end
             end
           end
+
+
           result
         end
 
         def authorized_required_access_for_owner?
           result = true
-          enforced_associations = associations_requiring_access_for_owner.keys
-          unless enforced_associations.empty?
+          if self.class.respond_to?(:associations_requiring_access_for_owner)
+            enforced_associations = self.class.associations_requiring_access_for_owner.keys
+            unless enforced_associations.empty?
 
-            autosave_associations = self.class.reflect_on_all_autosave_associations.select do |ass|
-              enforced_associations.include?(ass.name.to_s)
-            end
-            autosave_associations.each do |ass|
-              action = associations_requiring_access_for_owner[ass.name.to_s]
-              action_method = "can_#{action}?"
-              if self.respond_to?(action_method) && !self.send(action_method)
-                result = false
-                errors.add(:base,"You are not permitted to change #{ass.name} on #{self.class.name.underscore.humanize}-#{id} without #{action} rights")
-                break
+              autosave_associations = self.class.reflect_on_all_autosave_associations.select do |reflection|
+                enforced_associations.include?(reflection.name.to_s)
+              end
+              autosave_associations.each do |reflection|
+                if associations = association_instance_get(reflection.name)
+                  associations = Array(associations)
+                  if associations.detect {|association| association.target.changed_for_autosave?}
+                    action = self.class.associations_requiring_access_for_owner[reflection.name.to_s]
+                    action_method = "can_#{action}?"
+                    if self.respond_to?(action_method) && !self.send(action_method)
+                      result = false
+                      errors.add(:base,"You are not permitted to change #{reflection.name} on #{self.class.name.underscore.humanize}-#{id} without #{action} rights")
+                      break
+                    end
+                  end
+                end
               end
             end
           end
+
           result
         end
 
@@ -127,7 +135,8 @@ module Seek
         end
 
         def safe_to_edit?
-          can_edit? || (changed - attributes_not_requiring_edit).empty?
+          not_requiring_edit = self.class.respond_to?(:attributes_not_requiring_edit) ? self.class.attributes_not_requiring_edit : []
+          can_edit? || (changed - not_requiring_edit).empty?
         end
 
       end
@@ -138,15 +147,21 @@ module Seek
         end
 
         def does_not_require_can_edit *attrs
+          self.class_attribute :attributes_not_requiring_edit unless self.respond_to?(:attributes_not_requiring_edit)
+          self.attributes_not_requiring_edit ||= []
           self.attributes_not_requiring_edit = self.attributes_not_requiring_edit | attrs.map(&:to_s)
         end
 
         def enforce_authorization_on_association association,action
-          associations_and_actions_to_be_enforced[association.to_s]=action.to_s
+          self.class_attribute :associations_and_actions_to_be_enforced unless self.respond_to?(:associations_and_actions_to_be_enforced)
+          self.associations_and_actions_to_be_enforced ||= {}
+          self.associations_and_actions_to_be_enforced[association.to_s]=action.to_s
         end
 
         def enforce_required_access_for_owner association,action
-          associations_requiring_access_for_owner[association.to_s]=action.to_s
+          self.class_attribute :associations_requiring_access_for_owner unless self.respond_to?(:associations_requiring_access_for_owner)
+          self.associations_requiring_access_for_owner ||= {}
+          self.associations_requiring_access_for_owner[association.to_s]=action.to_s
         end
       end
 
