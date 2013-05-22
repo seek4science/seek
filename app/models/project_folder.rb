@@ -1,12 +1,13 @@
 class ProjectFolder < ActiveRecord::Base
   before_destroy :deletable?
+  before_destroy :unsort_assets_and_remove_children
 
   belongs_to :project
   belongs_to :parent,:class_name=>"ProjectFolder",:foreign_key=>:parent_id
   has_many :children,:class_name=>"ProjectFolder",:foreign_key=>:parent_id, :order=>:title, :after_add=>:update_child
   has_many :project_folder_assets, :dependent=>:destroy
 
-  before_destroy :unsort_assets_and_remove_children
+
 
   scope :root_folders, lambda { |project| {
     :conditions=>{:project_id=>project.id,:parent_id=>nil},:order=>"LOWER(title)"
@@ -35,7 +36,7 @@ class ProjectFolder < ActiveRecord::Base
   end
 
   def self.new_items_folder project
-    ProjectFolder.find(:first,:conditions=>{:project_id=>project.id,:incoming=>true})
+    ProjectFolder.first(:conditions=>{:project_id=>project.id,:incoming=>true})
   end
 
   #constucts the default project folders for a given project from a yaml file, by default using Rails.root/config/default_data/default_project_folders.yml
@@ -96,7 +97,7 @@ class ProjectFolder < ActiveRecord::Base
     assets=Array(assets)
     if (project_id == source_folder.project_id)
       assets.each do |asset|
-        link = ProjectFolderAsset.find(:first,:conditions=>{:asset_id=>asset.id,:asset_type=>asset.class.name,:project_folder_id=>source_folder.id})
+        link = ProjectFolderAsset.first(:conditions=>{:asset_id=>asset.id,:asset_type=>asset.class.name,:project_folder_id=>source_folder.id})
         link.project_folder=self
         link.save!
       end
@@ -105,7 +106,7 @@ class ProjectFolder < ActiveRecord::Base
 
   #temporary method to destroy folders for a project, useful whilst developing
   def self.nuke project
-    folders = ProjectFolder.find(:all,:conditions=>{:project_id=>project.id})
+    folders = ProjectFolder.all(:conditions=>{:project_id=>project.id})
     folder_assets = ProjectFolderAsset.all.select{|pfa| pfa.project_folder.nil? || pfa.project_folder.try(:project_id)==project.id}
     folder_assets.each {|a| a.destroy}
     folders.each {|f| f.deletable=true ; f.destroy}
