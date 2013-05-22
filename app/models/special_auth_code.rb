@@ -6,10 +6,13 @@ class SpecialAuthCode < ActiveRecord::Base
 
   scope :unexpired, :conditions => ['expiration_date > ?', Time.now]
 
-  def can_edit?(u=User.current_user)
+  def can_manage?(u=User.current_user)
     asset.can_manage?(u)
   end
-  alias_method :can_manage?, :can_edit?
+
+  def can_edit?(u=User.current_user)
+    can_manage?(u)
+  end
 
   def defaults
     self.code = SecureRandom.base64(30) if code.blank?

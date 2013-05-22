@@ -32,6 +32,8 @@ module Seek
           base.before_destroy :destroy_authorized?
         end
 
+
+
         private
 
         def changes_authorized?
