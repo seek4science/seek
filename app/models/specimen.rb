@@ -13,8 +13,8 @@ class Specimen < ActiveRecord::Base
   before_save  :clear_garbage
   attr_accessor :from_biosamples
 
-  has_many :genotypes,:dependent => :nullify
-  has_many :phenotypes,:dependent => :nullify
+  has_many :genotypes
+  has_many :phenotypes
   accepts_nested_attributes_for :genotypes, :allow_destroy => true
   accepts_nested_attributes_for :phenotypes, :allow_destroy => true
 
@@ -208,11 +208,17 @@ class Specimen < ActiveRecord::Base
     genotypes.each do |g|
       if g.strain.nil?
         g.destroy
+      else
+        g.specimen_id = nil
+        g.save
       end
     end
     phenotypes.each do |p|
       if p.strain.nil?
         p.destroy
+      else
+        p.specimen_id = nil
+        p.save
       end
     end
   end

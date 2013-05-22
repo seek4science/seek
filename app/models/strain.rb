@@ -5,8 +5,8 @@ class Strain < ActiveRecord::Base
   include Seek::Rdf::RdfGeneration
 
   belongs_to :organism
-  has_many :genotypes, :dependent =>  :nullify
-  has_many :phenotypes, :dependent =>  :nullify
+  has_many :genotypes
+  has_many :phenotypes
   accepts_nested_attributes_for :genotypes,:allow_destroy=>true
   accepts_nested_attributes_for :phenotypes,:allow_destroy=>true
   has_many :specimens
@@ -120,11 +120,17 @@ class Strain < ActiveRecord::Base
     genotypes.each do |g|
       if g.specimen.nil?
         g.destroy
+      else
+        g.strain_id = nil
+        g.save
       end
     end
     phenotypes.each do |p|
       if p.specimen.nil?
         p.destroy
+      else
+        p.strain_id = nil
+        p.save
       end
     end
   end

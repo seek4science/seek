@@ -121,10 +121,10 @@ class SpecimenTest < ActiveSupport::TestCase
       genotype2 = Factory(:genotype, :specimen => nil, :strain => nil)
       phenotype1 = Factory(:phenotype, :specimen => nil, :strain => nil)
       phenotype2 = Factory(:phenotype, :specimen => nil, :strain => nil)
-      strain = Factory(:strain, :genotypes => [genotype1,genotype2], :phenotypes => [phenotype1,phenotype2])
-      specimen = Factory(:specimen,:genotypes => [genotype1], :phenotypes => [phenotype1])
-      disable_authorization_checks{strain.destroy}
-      assert_equal nil, Strain.find_by_id(strain.id)
+      strain = Factory(:strain, :genotypes => [genotype1], :phenotypes => [phenotype1] )
+      specimen = Factory(:specimen, :genotypes => [genotype1,genotype2], :phenotypes => [phenotype1,phenotype2])
+      disable_authorization_checks{specimen.destroy}
+      assert_equal nil, Specimen.find_by_id(specimen.id)
       assert_equal nil, Genotype.find_by_id(genotype2.id)
       assert_equal nil, Phenotype.find_by_id(phenotype2.id)
       assert_not_nil Genotype.find_by_id(genotype1.id)
