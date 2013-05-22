@@ -37,7 +37,7 @@ module Seek
         def changes_authorized?
           result = true
           unless $authorization_checks_disabled
-            result = authorized_changes_to_attributes?
+            result = authorized_changes_to_attributes? && authorized_to_edit?
           end
           result
         end
@@ -67,6 +67,15 @@ module Seek
             errors.add(:base,"You are not permitted to change #{offending_attributes.join(",")} attributes on #{self.class.name.underscore.humanize}-#{id} without manage rights")
           end
           offending_attributes.empty?
+        end
+
+        def authorized_to_edit?
+          result = true
+          unless can_edit?
+            result = false
+            errors.add(:base,"You are not authorized to destroy #{self.class.name.underscore.humanize}-#{id}")
+          end
+          result
         end
 
       end
