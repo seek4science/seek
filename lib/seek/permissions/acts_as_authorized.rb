@@ -6,7 +6,7 @@ module Seek #:nodoc:
     module ActsAsAuthorized
       def self.included(ar)
         ar.const_get(:Base).class_eval { include BaseExtensions }
-        #ar.module_eval { include AuthorizationEnforcement }
+        ar.module_eval { include AuthorizationEnforcement }
         #ar.const_get(:Base).class_eval { does_not_require_can_edit :uuid, :first_letter }
       end
 

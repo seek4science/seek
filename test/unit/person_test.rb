@@ -619,6 +619,7 @@ class PersonTest < ActiveSupport::TestCase
       person = Factory(:person)
       person.roles = ['admin', 'pal']
       person.save
+      assert !person.errors.empty?
       person.reload
       assert_equal [], person.roles
     end
