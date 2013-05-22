@@ -2,4 +2,4 @@
 
 User-Agent: *
 Disallow: /*download$
-Disallow: /*download?*
+Disallow: /*download*
