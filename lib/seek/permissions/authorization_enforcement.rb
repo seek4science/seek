@@ -28,6 +28,8 @@ module Seek
           base.extend ClassMethods
           base.class_attribute :attributes_requiring_can_manage
           base.class_attribute :attributes_not_requiring_edit
+          base.class_attribute :associations_and_actions_to_be_enforced
+          base.associations_and_actions_to_be_enforced = {}
           base.attributes_not_requiring_edit = []
           base.attributes_requiring_can_manage = []
           base.before_save :changes_authorized?
@@ -41,7 +43,7 @@ module Seek
         def changes_authorized?
           result = true
           unless $authorization_checks_disabled
-            result = authorized_changes_to_attributes? && authorized_to_edit?
+            result = authorized_changes_to_attributes? && authorized_to_edit? && authorized_associations_for_action?
           end
           result
         end
@@ -65,14 +67,6 @@ module Seek
           end
         end
 
-        def authorized_changes_requiring_manage?
-          offending_attributes = changed & attributes_requiring_can_manage
-          unless offending_attributes.empty?
-            errors.add(:base,"You are not permitted to change #{offending_attributes.join(",")} attributes on #{self.class.name.underscore.humanize}-#{id} without manage rights")
-          end
-          offending_attributes.empty?
-        end
-
         def authorized_to_edit?
           result = true
           unless safe_to_edit?
@@ -81,6 +75,36 @@ module Seek
           end
           result
         end
+
+        def authorized_associations_for_action?
+          result = true
+          associations_and_actions_to_be_enforced.keys.each do |association|
+            if self.respond_to?(association)
+              action = associations_and_actions_to_be_enforced[association]
+              auth_method = "can_#{associations_and_actions_to_be_enforced[association]}?"
+              Array(self.send(association)).each do |item|
+                if item.respond_to?(auth_method) && !item.send(auth_method)
+                  result = false
+                  errors.add(:base,"You do not have permission to #{action} #{item.class.name.underscore.humanize}-#{item.id}")
+                  break
+                end
+              end
+            end
+          end
+          result
+        end
+
+        def authorized_changes_requiring_manage?
+          offending_attributes = changed & attributes_requiring_can_manage
+          unless offending_attributes.empty?
+            errors.add(:base,"You are not permitted to change #{offending_attributes.join(",")} attributes on #{self.class.name.underscore.humanize}-#{id} without manage rights")
+          end
+          offending_attributes.empty?
+        end
+
+
+
+
 
         def safe_to_edit?
           can_edit? || (changed - attributes_not_requiring_edit).empty?
@@ -95,6 +119,10 @@ module Seek
 
         def does_not_require_can_edit *attrs
           self.attributes_not_requiring_edit = self.attributes_not_requiring_edit | attrs.map(&:to_s)
+        end
+
+        def enforce_authorization_on_association assocation,action
+          associations_and_actions_to_be_enforced[assocation.to_s]=action.to_s
         end
       end
 
