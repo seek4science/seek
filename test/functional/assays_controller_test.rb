@@ -421,6 +421,7 @@ end
 
     get :show,:id=>a.id
     assert_response :success
+    puts @response.body
     assert_select "p#organism" do
       assert_select "a[href=?]",organism_path(o1),:text=>"Frog"
     end
