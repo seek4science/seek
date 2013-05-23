@@ -10,8 +10,8 @@ module AssayTypesHelper
     end
     
     list.collect do |item|
-      item + "\n"
-    end.html_safe
+      (item + "\n").html_safe
+    end
 
   end
   
@@ -22,16 +22,16 @@ module AssayTypesHelper
     
     unless parent.children.empty?
       parent.children.sort{|a,b| a.title.downcase <=> b.title.downcase}.each do |child|
-        result << "<li style=\"margin-left:#{12*depth}px;#{child.id == selected_id ? "background-color: lightblue;" : ""}\">"+ (depth>0 ? "└ " : " ") + (link_to child.title, child) + " " +
+        result << ("<li style=\"margin-left:#{12*depth}px;#{child.id == selected_id ? "background-color: lightblue;" : ""}\">"+ (depth>0 ? "└ " : " ") + (link_to child.title, child) + " " +
                     (show_edit ? link_to(image("edit"), edit_polymorphic_path(child), {:style=>"vertical-align:middle"}) : "") + " " +
-                    (show_delete ? (child.assays.size == 0 ? link_to(image("destroy"),child, :confirm => 
+                    (show_delete ? (child.assays.size == 0 ? link_to(image("destroy"),child, :confirm =>
                       "Are you sure you want to remove this #{child.class.name}?  This cannot be undone.",
                       :method => :delete, :style=>"vertical-align:middle") : "<span style=\"color: #666666;\">(#{child.assays.size} assays)</span>") : "") +
-                    "</li>"
+                    "</li>").html_safe
         result = result + indented_child_options(child,depth+1,show_edit,show_delete,selected_id) if child.has_children?
       end
     end
-    return result.html_safe
+    return result
   end
   
   #Displays a combobox to be used in a form where multiple items from an ontology can be selected.

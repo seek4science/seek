@@ -7,7 +7,7 @@
 <%= f.error_messages %>
 
 <% if @sample.new_record? && @sample.specimen.try(:new_record?)%>
-    <% f.fields_for :specimen do |specimen_f| %>
+    <%= f.fields_for :specimen do |specimen_f| %>
         <%= render :partial => "specimens/form", :locals => {:f => specimen_f, :specimen => @sample.specimen, :action => action}%>
     <% end %>
 <% else %>

@@ -9,7 +9,7 @@ action ||=nil
 
     <table id='phenotype_table'>
       <% item.phenotypes.each_with_index do |phenotype,index| %>
-          <% f.fields_for :phenotypes, phenotype do |phenotype_form| %>
+          <%= f.fields_for :phenotypes, phenotype do |phenotype_form| %>
           <tr id='phenotype_row_<%= index %>'>
             <td>
               <%= phenotype_form.text_field :description, :size=>25 %>
