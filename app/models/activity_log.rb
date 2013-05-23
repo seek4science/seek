@@ -2,6 +2,8 @@ require_dependency File.join(Gem.loaded_specs['acts_as_activity_logged'].full_ge
 
 class ActivityLog  < ActiveRecord::Base
 
+  enforce_authorization_on_association :activity_loggable,:view
+
   #returns items that have duplicates for a given action - NOTE that the result does not contain all the actual duplicates.
   scope :duplicates, lambda {|action|
     {
@@ -19,6 +21,15 @@ class ActivityLog  < ActiveRecord::Base
         matches[index].destroy
       end
     end
+  end
+
+  def check_loggable_is_viewable
+    result = true
+    if activity_loggable && !activity_loggable.can_view?
+      errors.add(:base,"the asset is not viewable")
+      result = false
+    end
+    result
   end
 
 end

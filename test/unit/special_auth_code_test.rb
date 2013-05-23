@@ -32,14 +32,9 @@ class SpecialAuthCodeTest < ActiveSupport::TestCase
     code.expiration_date = Time.now
     df = code.asset
 
-    assert !code.can_manage?
-    assert !code.can_edit?
     assert !code.save
     User.current_user = df.contributor
-    puts df.contributor
 
-    assert code.can_manage?
-    assert code.can_edit?
     assert code.save!
   end
 end

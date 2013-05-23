@@ -58,7 +58,7 @@ class ActivityLogTest < ActiveSupport::TestCase
     
   end
 
-  test "should be able to create activity log for none-published item" do
+  test "should only create activity log for viewable item" do
     user = Factory(:user)
     df = Factory(:data_file, :contributor => user)
     assert !df.can_view?(nil)

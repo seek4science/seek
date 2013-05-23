@@ -886,12 +886,14 @@ class AuthorizationTest < ActiveSupport::TestCase
     assert Policy::PRIVATE, df.policy.sharing_scope
     df.policy.sharing_scope = Policy::ALL_SYSMO_USERS
     assert !df.save
+    assert !df.errors.empty?
     df.reload
     assert_equal Policy::PRIVATE, df.policy.sharing_scope
 
     disable_authorization_checks do
       df.policy.sharing_scope = Policy::ALL_SYSMO_USERS
       assert df.save
+      assert df.errors.empty?
       df.reload
       assert_equal Policy::ALL_SYSMO_USERS, df.policy.sharing_scope
     end
