@@ -141,7 +141,7 @@ class JwsFunctionalTest < ActionController::TestCase
       assert_select "script", :text=>/VmGLT = 99.999/, :count=>1 #check that one of the parameter sets has been recognized from the uploaded file
     end
 
-    def test_simulate_model_through_builder
+    test "simulate_model_through_builder" do
       #submits to jws, but passes the following_action param as 'simulate'
       m=models(:jws_model)
       m.content_blobs.first.dump_data_to_file
@@ -151,7 +151,9 @@ class JwsFunctionalTest < ActionController::TestCase
       post :submit_to_jws,params
       assert_response :success
       assert assigns(:modelname)
+
       expected_url = Seek::JWS::Simulator.simulator_frame_url(assigns(:modelname))
+
       assert_select "div#jws_simulator_wrapper > iframe[src=?]",expected_url,:count=>1
       simulator_frame_content = open(expected_url).read
       assert_not_nil simulator_frame_content
