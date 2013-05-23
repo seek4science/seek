@@ -615,10 +615,12 @@ class PersonTest < ActiveSupport::TestCase
   end
 
   test 'non-admin can not change the roles of a person' do
-    User.with_current_user Factory(:person).user do
-      person = Factory(:person)
+    person = Factory(:person)
+    User.with_current_user person.user do
+
       person.roles = ['admin', 'pal']
-      person.save
+      assert person.can_edit?
+      assert !person.save
       assert !person.errors.empty?
       person.reload
       assert_equal [], person.roles
