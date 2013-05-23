@@ -1,5 +1,3 @@
-require 'white_list_helper'
-
 class WorkGroupsController < ApplicationController
   include WhiteListHelper
   
