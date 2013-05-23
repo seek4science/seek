@@ -1153,7 +1153,7 @@ class DataFilesControllerTest < ActionController::TestCase
 
   test "correct response to unknown action" do
     df=data_files(:picture)
-    assert_raises ActionController::UnknownAction do
+    assert_raises AbstractController::ActionNotFound do
       get :sdkfjshdfkhsdf, :id=>df
     end
   end
