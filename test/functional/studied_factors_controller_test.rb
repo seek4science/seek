@@ -217,7 +217,10 @@ class StudiedFactorsControllerTest < ActionController::TestCase
       i +=1
     end
 
-    post :create_from_existing, :data_file_id => d.id, :version => d.latest_version, "checkbox_#{fs_array.first.id}" => fs_array.first.id, "checkbox_#{fs_array[1].id}" => fs_array[1].id, "checkbox_#{fs_array[2].id}" => fs_array[2].id
+    assert d.can_manage?
+
+    post :create_from_existing, :data_file_id => d.id, :version => d.latest_version.version, "checkbox_#{fs_array.first.id}" => fs_array.first.id, "checkbox_#{fs_array[1].id}" => fs_array[1].id, "checkbox_#{fs_array[2].id}" => fs_array[2].id
+    assert_response :success
 
     d.reload
     assert_equal d.studied_factors.count, 3

@@ -50,9 +50,7 @@ class DataFilesControllerTest < ActionController::TestCase
     al = ActivityLog.last(:order=>:id)
     assert_equal "download",al.action
     assert_equal df,al.activity_loggable
-
   end
-
 
   test "correct title and text for associating an assay for new" do
     login_as(Factory(:user))
