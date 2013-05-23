@@ -23,11 +23,11 @@ module FancyMultiselectHelper
           :with=>"'id='+this.value",
           :before=>"show_ajax_loader('#{association}_preview')") + ';'
 
-      options[:possibilities_options][:onchange] = onchange
-      options = options.reverse_merge :html_options => "style='float:left; width:66%' "
+      options[:possibilities_options][:onchange] = onchange.html_safe
+      options = options.reverse_merge :html_options => "style='float:left; width:66%' ".html_safe
 
       #after rendering the multiselect, throw in a preview box.
-      super(object, association, options) + "\n" + render(:partial => 'assets/preview_box', :locals => {:preview_name => association.to_s.underscore})
+      super(object, association, options) + "\n".html_safe + render(:partial => 'assets/preview_box', :locals => {:preview_name => association.to_s.underscore})
     end
   end
 
@@ -38,10 +38,10 @@ module FancyMultiselectHelper
       collection_id = options[:name].to_s.gsub(']','').gsub(/[^-a-zA-Z0-9:.]/, "_")
       possibilities_id = "possible_#{collection_id}"
       button_id = "add_to_#{collection_id}_link"
-      hide_add_link_when_default_is_selected_js = "($F('#{possibilities_id}') == 0) ? $('#{button_id}').hide() : $('#{button_id}').show();"
+      hide_add_link_when_default_is_selected_js = "($F('#{possibilities_id}') == 0) ? $('#{button_id}').hide() : $('#{button_id}').show();".html_safe
       onchange += hide_add_link_when_default_is_selected_js
-      options[:possibilities_options][:onchange] = onchange
-      super(object, association, options) + "\n<script type='text/javascript'>#{hide_add_link_when_default_is_selected_js}</script>\n"
+      options[:possibilities_options][:onchange] = onchange.html_safe
+      super(object, association, options) + "\n<script type='text/javascript'>#{hide_add_link_when_default_is_selected_js}</script>\n".html_safe
     end
   end
 
@@ -49,19 +49,24 @@ module FancyMultiselectHelper
     def fancy_multiselect object, association, options = {}
       if options[:project_possibilities]
         type = object.class.name.underscore
-        check_box_and_alternative_list = <<-HTML
-          <br/>
-          #{check_box_tag "include_other_project_#{association}", nil, false, {:onchange => "swapSelectListContents('possible_#{type}_#{association.to_s.singularize}_ids','alternative_#{association.to_s.singularize}_ids');", :style => "margin-top:0.5em;"}} Associate #{association.to_s.humanize} from other projects?
-          #{select_tag "alternative_#{association.to_s.singularize}_ids", options_for_select([["Select #{association.to_s.singularize.humanize} ...", 0]]|options[:project_possibilities].collect { |o| [truncate(h(o.title), :length => 120), o.id] }), {:style => 'display:none;'}}
-        HTML
+
+        check_box_and_alternative_list = "".html_safe
+        check_box_and_alternative_list << "<br/>".html_safe
+        check_box_and_alternative_list << check_box_tag("include_other_project_#{association}", nil, false,
+                                                {:onchange => "swapSelectListContents('possible_#{type}_#{association.to_s.singularize}_ids','alternative_#{association.to_s.singularize}_ids');".html_safe,
+                                                :style => "margin-top:0.5em;"}).html_safe
+        check_box_and_alternative_list <<  "Associate #{association.to_s.humanize} from other projects?".html_safe
+        check_box_and_alternative_list << select_tag("alternative_#{association.to_s.singularize}_ids",
+                                              options_for_select([["Select #{association.to_s.singularize.humanize} ...", 0]]|options[:project_possibilities].collect { |o| [truncate(h(o.title), :length => 120), o.id] }), {:style => 'display:none;'}).html_safe
 
         options[:association_step_content] = '' unless options[:association_step_content]
-        options[:association_step_content] = options[:association_step_content] + check_box_and_alternative_list
-        swap_project_possibilities_into_dropdown_js = <<-JS
-          <script type="text/javascript">
-              swapSelectListContents('possible_#{type}_#{association.to_s.singularize}_ids','alternative_#{association.to_s.singularize}_ids');
-          </script>
-        JS
+        options[:association_step_content] = (options[:association_step_content] + check_box_and_alternative_list).html_safe
+
+        swap_project_possibilities_into_dropdown_js = "".html_safe
+        swap_project_possibilities_into_dropdown_js << "<script type='text/javascript'>".html_safe
+        swap_project_possibilities_into_dropdown_js << "swapSelectListContents('possible_#{type}_#{association.to_s.singularize}_ids','alternative_#{association.to_s.singularize}_ids');".html_safe
+        swap_project_possibilities_into_dropdown_js << "</script>".html_safe
+
         super + swap_project_possibilities_into_dropdown_js
       else
         super
