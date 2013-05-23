@@ -1,5 +1,3 @@
-require 'white_list_helper'
-
 class ProjectsController < ApplicationController
   include WhiteListHelper
   include IndexPager

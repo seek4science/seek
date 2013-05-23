@@ -19,7 +19,7 @@ class HomeControllerTest < ActionController::TestCase
 
   test "correct response to unknown action" do
     login_as(:quentin)
-    assert_raises ActionController::UnknownAction do
+    assert_raises AbstractController::ActionNotFound do
       get :sdjgsdfjg
     end
   end

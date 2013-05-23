@@ -1,5 +1,3 @@
-require 'white_list_helper'
-
 class PoliciesController < ApplicationController
   include WhiteListHelper
   

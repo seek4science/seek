@@ -1,7 +1,6 @@
 module Seek
   module ContentBlobCommon
     def handle_download disposition='attachment'
-      puts @content_blob.filepath
       if @content_blob.url.blank?
         if @content_blob.file_exists?
           send_file @content_blob.filepath, :filename => @content_blob.original_filename, :type => @content_blob.content_type || "application/octet-stream", :disposition => disposition
