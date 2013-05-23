@@ -26,10 +26,6 @@ module Seek
       module BaseExtensions
         def self.included base
           base.extend ClassMethods
-          base.class_attribute :attributes_requiring_can_manage
-
-
-          base.attributes_requiring_can_manage = []
           base.before_save :changes_authorized?
           base.before_destroy :destroy_authorized?
         end
@@ -59,7 +55,7 @@ module Seek
         end
 
         def authorized_changes_to_attributes?
-          if !can_manage? && !attributes_requiring_can_manage.empty?
+          if self.class.respond_to?(:attributes_requiring_can_manage) && !self.class.attributes_requiring_can_manage.empty? && !can_manage?
             authorized_changes_requiring_manage?
           else
             true
@@ -127,7 +123,7 @@ module Seek
         end
 
         def authorized_changes_requiring_manage?
-          offending_attributes = changed & attributes_requiring_can_manage
+          offending_attributes = changed & self.class.attributes_requiring_can_manage
           unless offending_attributes.empty?
             errors.add(:base,"You are not permitted to change #{offending_attributes.join(",")} attributes on #{self.class.name.underscore.humanize}-#{id} without manage rights")
           end
@@ -143,6 +139,8 @@ module Seek
 
       module ClassMethods
         def requires_can_manage *attrs
+          self.class_attribute :attributes_requiring_can_manage unless self.respond_to?(:attributes_requiring_can_manage)
+          self.attributes_requiring_can_manage ||= []
           self.attributes_requiring_can_manage = self.attributes_requiring_can_manage | attrs.map(&:to_s)
         end
 
