@@ -62,10 +62,10 @@
           <%= "<li>This person is a <b>#{Seek::Config.dm_project_name} PAL</b></li>".html_safe if @person.is_pal? %>
 
 
-          <%= "<li>This person is a <b>project manager</b></li>" if @person.is_project_manager? %>
+          <%= "<li>This person is a <b>project manager</b></li>".html_safe if @person.is_project_manager? %>
 
-          <%= "<li>This person is an <b>asset manager</b></li>" if @person.is_asset_manager? %>
-          <%= "<li>This person is a <b>gatekeeper</b></li>" if @person.is_gatekeeper? %>
+          <%= "<li>This person is an <b>asset manager</b></li>".html_safe if @person.is_asset_manager? %>
+          <%= "<li>This person is a <b>gatekeeper</b></li>".html_safe if @person.is_gatekeeper? %>
 
           <li>
             Editing <b>projects</b>, where this person is
