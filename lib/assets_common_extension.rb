@@ -311,7 +311,9 @@ module AssetsCommonExtension
     if files_to_download.count > 1
       make_and_send_zip_file files_to_download, asset
     else
-      send_file files_to_download.values.first, :filename => files_to_download.keys.first, :type => content_type
+      filepath = files_to_download.values.first
+      send_file filepath, :filename => files_to_download.keys.first, :type => content_type
+      headers["Content-Length"]=File.size(filepath).to_s
     end
   end
 
@@ -328,10 +330,12 @@ module AssetsCommonExtension
         zos.print IO.read(filepath)
       end
     end
+    t.close
 
     send_file t.path, :type => 'application/zip', :disposition => 'attachment', :filename => "#{asset.title}.zip"
-    # The temp file will be deleted some time...
-    t.close
+    headers["Content-Length"]=File.size(t.path).to_s
+
+
   end
 
   def tmp_zip_file_dir
