@@ -2,7 +2,7 @@
 
 <% if logged_in? && current_user.person.member? -%>
 <div id="upload_new_version_form" style="display:none">
-    <% form_tag({:action=>"new_version", :id=>resource}, :multipart => true) do -%>
+    <%= form_tag({:action=>"new_version", :id=>resource}, :multipart => true) do -%>
 
            <% locals = resource.respond_to?(:content_blobs) ? {:resource=>resource, :new_version=>true} : {:new_version=>true}  %>
            <%= render :partial=>"assets/upload_box" ,:locals=>locals-%>

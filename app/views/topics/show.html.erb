@@ -14,7 +14,7 @@
 
   <% if logged_in? && false %>
   <%# disabled by added false above -%>
-    <% form_tag forum_topic_monitorship_path(@forum, @topic), :style => 'margin-top:0em; float:right;' do -%>
+    <%= form_tag forum_topic_monitorship_path(@forum, @topic), :style => 'margin-top:0em; float:right;' do -%>
       <div>
         <input id="monitor_checkbox" type="checkbox" <%= "checked='checked'" if @monitoring %>
                onclick="if (this.checked) {<%= remote_function :url => forum_topic_monitorship_path(@forum, @topic) %>} else {<%= remote_function :url => forum_topic_monitorship_path(@forum, @topic), :method => :delete %>}" />

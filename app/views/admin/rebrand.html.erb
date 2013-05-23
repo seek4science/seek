@@ -3,7 +3,7 @@
 <h1>Site branding</h1>
 
 <div class="show_basic">
-<% form_tag :action=>"update_rebrand" do -%>
+<%= form_tag :action=>"update_rebrand" do -%>
    <ul class="settings">
         <%= render :partial=>'setting_li',:locals=>{
             :description=>"A name for you project, this is the text that is used in sentences. Example Sysmo_DB, Virtual Liver",

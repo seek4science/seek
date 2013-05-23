@@ -24,7 +24,7 @@
     </ul>
   </div>
   <br/>
-  <% form_tag({:action => :check_gatekeeper_required},:method=>:get) do %>
+  <%= form_tag({:action => :check_gatekeeper_required},:method=>:get) do %>
       <% @items_for_publishing.each do |item| %>
           <% if !item.assays.empty? %>
               <%= render :partial => "assets/publishing/isa_publishing_preview", :object => item %>

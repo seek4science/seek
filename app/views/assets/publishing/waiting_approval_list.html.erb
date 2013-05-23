@@ -24,7 +24,7 @@
     <% end %>
   </ul>
 
-  <% form_tag :action => :publish do %>
+  <%= form_tag :action => :publish do %>
       <div style="display:none;">
           <% @items_for_publishing.each do |item| %>
               <%= check_box_tag publishing_item_param(item), 1, true %>

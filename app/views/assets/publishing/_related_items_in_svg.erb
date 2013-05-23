@@ -32,7 +32,7 @@
   </ul>
 </div>
 <h1>Please click on the small boxes to change the color.</h1>
-<% form_tag({:action => :publish}, :id => "publishing_form") do %>
+<%= form_tag({:action => :publish}, :id => "publishing_form") do %>
     <div style="clear:both;">
       <% investigations.each do |investigation| %>
           <%= embedded_isa_svg_for_publishing(investigation, true, selected_items) -%>
