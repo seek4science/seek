@@ -58,7 +58,6 @@ class DataFilesControllerTest < ActionController::TestCase
     login_as(Factory(:user))
     get :new
     assert_response :success
-    puts @response.body
 
     assert_select 'div.foldTitle',:text=>/Experimental Assays and Modelling Analyses/
     assert_select 'div#associate_assay_fold_content p',:text=>/The following Experimental Assays and Modelling Analyses are associated with this Data file:/
