@@ -902,18 +902,29 @@ class DataFilesControllerTest < ActionController::TestCase
   end
   
   def test_should_duplicate_factors_studied_for_new_version
-    d=data_files(:editable_data_file)
+    StudiedFactor.destroy_all
+    d= Factory(:data_file,:contributor=>User.current_user)
     d.save! #v1
     sf = StudiedFactor.create(:unit_id => units(:gram).id,:measured_item => measured_items(:weight),
                               :start_value => 1, :end_value => 2, :data_file_id => d.id, :data_file_version => d.version)
+
+    d.reload
+    assert_equal 1,d.studied_factors.count
+
+    assert d.can_manage?
     assert_difference("DataFile::Version.count", 1) do
-      post :new_version, :id=>d, :data_file=>{:data=>fixture_file_upload('files/file_picture.png')}, :revision_comment=>"This is a new revision" #v2
+      assert_difference("StudiedFactor.count",1) do
+        post :new_version, :id=>d.id, :data_file=>{:data=>fixture_file_upload('files/file_picture.png')}, :revision_comment=>"This is a new revision" #v2
+      end
     end
-    
-    assert_not_equal 0, d.find_version(1).studied_factors.count
-    assert_not_equal 0, d.find_version(2).studied_factors.count
+
+    assert_redirected_to d
+    d.reload
+
+    assert_equal 1, d.find_version(1).studied_factors.count
+    assert_equal 1, d.find_version(2).studied_factors.count
     assert_not_equal d.find_version(1).studied_factors, d.find_version(2).studied_factors
-    assert_equal d.find_version(1).studied_factors.count, d.find_version(2).studied_factors.count
+
   end
   
   test "should destroy DataFile" do
@@ -933,7 +944,9 @@ class DataFilesControllerTest < ActionController::TestCase
     sf = StudiedFactor.create(:unit_id => units(:gram).id,:measured_item => measured_items(:weight),
                               :start_value => 1, :end_value => 2, :data_file_id => d.id, :data_file_version => d.version)
     assert_difference("DataFile::Version.count", 1) do
-      post :new_version, :id=>d, :data_file=>{:data=>fixture_file_upload('files/file_picture.png')}, :revision_comment=>"This is a new revision" #v2
+      assert_difference("StudiedFactor.count",1) do
+        post :new_version, :id=>d, :data_file=>{:data=>fixture_file_upload('files/file_picture.png')}, :revision_comment=>"This is a new revision" #v2
+      end
     end
     
     d.find_version(2).studied_factors.each {|e| e.destroy}
