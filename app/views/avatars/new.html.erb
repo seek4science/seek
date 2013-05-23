@@ -3,7 +3,7 @@
 
 <%= error_messages_for :avatar -%>
 
-<% form_tag({:action => :create}, :multipart => true) do %>
+<%= form_tag({:action => :create}, :multipart => true) do %>
 
   <%= hidden_field_tag(:owner_type, @avatar_for ) -%>
   <%= hidden_field_tag(:owner_id, @avatar_for_id ) -%>

@@ -14,7 +14,7 @@
 <h1>Data Fuse Prototype</h1>
 
 <div class="show_basic">
-  <% form_tag({:action=>:assets_selected},:method=>:post) do -%>
+  <%= form_tag({:action=>:assets_selected},:method=>:post) do -%>
   <h2>Model (SBML)</h2>
 
   <%= select_tag :model_id,

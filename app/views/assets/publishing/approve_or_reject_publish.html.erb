@@ -17,7 +17,7 @@
   <br/>
   <br/>
   <% unless @resource.is_published? %>
-      <% form_tag :action => :gatekeeper_decide do %>
+      <%= form_tag :action => :gatekeeper_decide do %>
           <div class="radio_buttons">
             Please select your decision:
             <br/>

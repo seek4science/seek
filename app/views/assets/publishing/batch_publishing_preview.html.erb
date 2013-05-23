@@ -13,7 +13,7 @@
   </div>
   <br/>
 
-  <% form_tag({:action => :check_related_items},:method=>:get)  do -%>
+  <%= form_tag({:action => :check_related_items},:method=>:get)  do -%>
       <% if @assets.empty? %>
           <span class="no_unpublished_asset">All your assets are published or you have no assets in <%= Seek::Config.project_name %></span>
       <% else %>

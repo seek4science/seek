@@ -42,7 +42,7 @@
         <%= error_messages_for :user %>
     </p>
     <% end -%>
-    <% form_tag set_openid_user_path(@user), :method => :put do -%>
+    <%= form_tag set_openid_user_path(@user), :method => :put do -%>
     <p>
         <label>
             <%= image_tag "openid-16x16.gif" %>OpenID: 

@@ -62,7 +62,7 @@
 	        </script>
         <% end -%>
         
-        <% form_tag submit_to_jws_model_path(@model,:version=>@display_model.version),:name=>"form",:id=>"form" do -%>
+        <%= form_tag submit_to_jws_model_path(@model,:version=>@display_model.version),:name=>"form",:id=>"form" do -%>
         <input type="hidden" name="new_version_comments" id="new_version_comments" value=""/><input type="hidden" name="new_version_filename" id="new_version_filename" value=""/><input type="hidden" name="following_action" id="following_action" value=""/><input type="hidden" name="saved_model_format" id="saved_model_format" value=""/><input type="hidden" name="steadystateanalysis" id="steadystateanalysis"/>
         <br/>
         <br/>
