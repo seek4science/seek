@@ -46,6 +46,7 @@ class AvatarsControllerTest < ActionController::TestCase
     person = Factory(:person)
     get :index,:person_id => person.id
     assert_response :success
+
     assert_select 'div.breadcrumbs', :text => /Home > People Index > #{person.title} > Edit > Avatars Index/, :count => 1 do
       assert_select "a[href=?]", root_path, :count => 1
       assert_select "a[href=?]", people_url, :count => 1

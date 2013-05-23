@@ -543,7 +543,7 @@ class PeopleControllerTest < ActionController::TestCase
   test 'should show that the person is asset manager for admin' do
     person = Factory(:person)
     person.is_asset_manager = true
-    person.save
+    person.save!
     get :show, :id => person
     assert_select "li", :text => /This person is an asset manager/, :count => 1
   end

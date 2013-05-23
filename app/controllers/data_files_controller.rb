@@ -61,13 +61,13 @@ class DataFilesController < ApplicationController
     if (handle_data nil)          
       comments=params[:revision_comment]
 
-      factors = @data_file.studied_factors
       respond_to do |format|
         if @data_file.save_as_new_version(comments)
           create_content_blobs
           #Duplicate studied factors
+          factors = @data_file.find_version(@data_file.version-1).studied_factors
           factors.each do |f|
-            new_f = f.clone
+            new_f = f.dup
             new_f.data_file_version = @data_file.version
             new_f.save
           end

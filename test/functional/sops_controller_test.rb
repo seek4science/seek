@@ -461,15 +461,20 @@ class SopsControllerTest < ActionController::TestCase
   end
 
   def test_should_duplicate_conditions_for_new_version
-    s=sops(:editable_sop)
-    condition1 = ExperimentalCondition.create(:unit_id => units(:gram).id, :measured_item => measured_items(:weight),
+    s=Factory :sop,:contributor=>User.current_user
+    condition1 = ExperimentalCondition.create(:unit_id => units(:gram).id, :measured_item_id => measured_items(:weight).id,
                                               :start_value => 1, :sop_id => s.id, :sop_version => s.version)
+    condition1.save!
+    s.reload
+    assert_equal 1,s.experimental_conditions.count
     assert_difference("Sop::Version.count", 1) do
-      post :new_version, :id=>s, :sop=>{:data=>fixture_file_upload('files/file_picture.png')}, :revision_comment=>"This is a new revision" #v2
+     assert_difference("ExperimentalCondition.count",1) do
+        post :new_version, :id=>s, :sop=>{:data=>fixture_file_upload('files/file_picture.png')}, :revision_comment=>"This is a new revision" #v2
+     end
     end
 
-    assert_not_equal 0, s.find_version(1).experimental_conditions.count
-    assert_not_equal 0, s.find_version(2).experimental_conditions.count
+    assert_equal 1, s.find_version(1).experimental_conditions.count
+    assert_equal 1, s.find_version(2).experimental_conditions.count
     assert_not_equal s.find_version(1).experimental_conditions, s.find_version(2).experimental_conditions
   end
 
@@ -478,7 +483,9 @@ class SopsControllerTest < ActionController::TestCase
     condition1 = ExperimentalCondition.create(:unit_id => units(:gram).id, :measured_item => measured_items(:weight),
                                               :start_value => 1, :sop_id => s.id, :sop_version => s.version)
     assert_difference("Sop::Version.count", 1) do
-      post :new_version, :id=>s, :sop=>{:data=>fixture_file_upload('files/file_picture.png')}, :revision_comment=>"This is a new revision" #v2
+      assert_difference("ExperimentalCondition.count",1) do
+        post :new_version, :id=>s, :sop=>{:data=>fixture_file_upload('files/file_picture.png')}, :revision_comment=>"This is a new revision" #v2
+      end
     end
 
     s.find_version(2).experimental_conditions.each { |e| e.destroy }
