@@ -147,7 +147,7 @@ module HomeHelper
             html << "</li>"
           end
       end
-      html
+      html.html_safe
   end
 
 
@@ -168,7 +168,7 @@ module HomeHelper
           html << "</div>"
           html << "</li>"
       end
-      html
+      html.html_safe
   end
 
 end

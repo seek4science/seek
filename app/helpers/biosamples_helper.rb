@@ -69,7 +69,7 @@ module BiosamplesHelper
        function += "hide_existing_specimens();"
      end
      function += "hide_existing_samples();return(false);"
-     function
+     function.html_safe
    end
 
   def strain_checkbox_onchange_function
@@ -79,7 +79,7 @@ module BiosamplesHelper
                                             :before=>"show_large_ajax_loader('existing_specimens')")+ ";"
         function += "show_existing_specimens();hide_existing_samples();" unless Seek::Config.is_virtualliver
         function += "return(false);"
-        function
+        function.html_safe
   end   
 
   def specimen_row_data specimen

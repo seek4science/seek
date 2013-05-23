@@ -11,7 +11,7 @@ module AssayTypesHelper
     
     list.collect do |item|
       item + "\n"
-    end
+    end.html_safe
 
   end
   
@@ -31,7 +31,7 @@ module AssayTypesHelper
         result = result + indented_child_options(child,depth+1,show_edit,show_delete,selected_id) if child.has_children?
       end
     end
-    return result
+    return result.html_safe
   end
   
   #Displays a combobox to be used in a form where multiple items from an ontology can be selected.

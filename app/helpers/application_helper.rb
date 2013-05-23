@@ -15,7 +15,7 @@ module ApplicationHelper
       str = date.localtime.strftime("#{date.day.ordinalize} %B %Y")
       str = date.localtime.strftime("#{str} at %H:%M") if show_time_of_day
     end
-    str
+    str.html_safe
   end
 
   def version_text
@@ -167,7 +167,7 @@ module ApplicationHelper
   end
   
   def empty_list_li_text list
-    return "<li><div class='none_text'> None specified</div></li>" if is_nil_or_empty?(list)
+    return "<li><div class='none_text'> None specified</div></li>".html_safe if is_nil_or_empty?(list)
   end  
 
   def model_title_or_not_specified model
@@ -199,7 +199,7 @@ module ApplicationHelper
   end
 
   def tooltip_title_attrib(text, delay=200)
-    return "header=[] body=[#{text}] cssheader=[boxoverTooltipHeader] cssbody=[boxoverTooltipBody] delay=[#{delay}]"
+    return "header=[] body=[#{text}] cssheader=[boxoverTooltipHeader] cssbody=[boxoverTooltipBody] delay=[#{delay}]".html_safe
   end
       
   # text in "caption" will be used to display the item next to the image_tag_for_key;
@@ -217,7 +217,7 @@ module ApplicationHelper
     list_item += link_to truncate(item_caption, :length=>truncate_to), url_for(item), :title => tooltip_title_attrib(custom_tooltip.blank? ? item_caption : custom_tooltip)
     list_item += "</li>"
     
-    return list_item
+    return list_item.html_safe
   end
   
   
@@ -235,9 +235,9 @@ module ApplicationHelper
       if avatar
         result = avatar(contributor_person, size, false, contributor_url, contributor_name, false)
         result += "<p style='margin: 0; text-align: center;'>#{contributor_name_link}#{you_string}</p>"
-        return result
+        return result.html_safe
       else
-        return (contributor_name_link + you_string)
+        return (contributor_name_link + you_string).html_safe
       end
       # other types might be supported
       # elsif contributortype.to_s == "Network"
@@ -300,7 +300,7 @@ module ApplicationHelper
       :revert => drag_options[:revert] || true,
       :ghosting => drag_options[:ghosting] || false,
       :change => "function(element){#{can_click_var} = false;}")
-    return html
+    return html.html_safe
   end
 
   def page_title controller_name, action_name
@@ -334,7 +334,7 @@ module ApplicationHelper
 
     # Print end page if anchors are enabled
     html << yield(pagingEnum.last_page) if always_show_anchors and not last == pagingEnum.last_page
-    html
+    html.html_safe
   end
 
   def favourite_group_popup_link_action_new resource_type=nil
@@ -447,7 +447,8 @@ module ApplicationHelper
       truncated_result += "\n"
     end    
     #Need some kind of whitespace before elipses or auto-link breaks
-    truncated_result.strip + (truncated ? "\n..." : "")
+    html = truncated_result.strip + (truncated ? "\n..." : "")
+    html.html_safe
   end    
   
   def get_object_title(item)
@@ -466,11 +467,12 @@ module ApplicationHelper
   end
 
   def show_or_hide_block visible=true
-    "display:" + (visible ? 'block' : 'none')
+    html = "display:" + (visible ? 'block' : 'none')
+    html.html_safe
   end
 
   def toggle_appear_javascript block_id
-    "Effect.toggle('#{block_id}','slide',{duration:0.5})"
+    "Effect.toggle('#{block_id}','slide',{duration:0.5})".html_safe
   end
 
   def count_actions(object, actions=nil)
@@ -605,7 +607,7 @@ module ApplicationHelper
 
   def unable_to_delete_text model_item
     text=NO_DELETE_EXPLANTIONS[model_item.class] || "You are unable to delete this #{model_item.class.name}. It might be published"
-    return text
+    return text.html_safe
   end
 
   private  

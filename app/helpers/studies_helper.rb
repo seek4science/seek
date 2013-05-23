@@ -37,7 +37,7 @@ module StudiesHelper
   def studies_link_list studies,sorted=true
     #FIXME: make more generic and share with other model link list helper methods
     studies=studies.select{|s| !s.nil?} #remove nil items
-    return "<span class='none_text'>Not associated with any Studies</span>" if studies.empty?
+    return "<span class='none_text'>Not associated with any Studies</span>".html_safe if studies.empty?
 
     result=""
     studies=studies.sort{|a,b| a.title<=>b.title} if sorted

@@ -9,11 +9,12 @@ module AssetsHelper
   def filesize_as_text content_blob
     size=content_blob.nil? ? 0 : content_blob.filesize
     if size.nil?
-      "<span class='none_text'>Unknown</span>"
+      html = "<span class='none_text'>Unknown</span>"
     else
       size = size/1000.0
-      "%.1f KB" % size
+      html = "%.1f KB" % size
     end
+    html.html_safe
   end
 
   def item_description item_description,options={}
@@ -85,7 +86,7 @@ module AssetsHelper
       end
       icon = link_to_draggable(image, show_resource_path(resource), :id=>model_to_drag_id(resource), :class=> "asset", :title=>tooltip_title_attrib(get_object_title(resource))) unless image.nil?
     end
-    icon
+    icon.html_safe
   end
 
   def get_original_model_name(model)
