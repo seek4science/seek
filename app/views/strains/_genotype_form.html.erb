@@ -13,16 +13,16 @@
       </tr>
       <% item.genotypes.each_with_index do |genotype, index| %>
 
-            <% f.fields_for :genotypes, genotype do |genotype_form| %>
+            <%= f.fields_for :genotypes, genotype do |genotype_form| %>
               <tr id='genotype_row_<%= index %>'>
                 <td>
-                  <% genotype_form.fields_for :gene, genotype.gene do |gene_form| %>
+                  <%= genotype_form.fields_for :gene, genotype.gene do |gene_form| %>
                       <%= gene_form.text_field :title, :size => 10 %>
 
                   <% end %>
                 </td>
                 <td>
-                  <% genotype_form.fields_for :modification, genotype.modification do |modification_form| %>
+                  <%= genotype_form.fields_for :modification, genotype.modification do |modification_form| %>
                       <%= modification_form.text_field :title, :size => 10 %>
                   <% end %>
                 </td>

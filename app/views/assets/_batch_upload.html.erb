@@ -80,7 +80,7 @@
           <p>
             <b>File to upload:</b>
             <br/>
-                <% fields_for @content_blob do |content_blob| -%>
+                <%= fields_for @content_blob do |content_blob| -%>
                     <input id="content_blob_data" type="file">
                 <% end %>
           </p>

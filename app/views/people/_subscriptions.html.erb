@@ -31,7 +31,7 @@
     <% project_subscriptions_with_unsubscribed = projects.map do |proj|
         @person.project_subscriptions.detect { |ps| ps.project == proj } || ProjectSubscription.new(:project => proj, :person => @person).tap(&:mark_for_destruction)
     end %>
-    <% f.fields_for :project_subscriptions, project_subscriptions_with_unsubscribed do |sub_form| %>
+    <%= f.fields_for :project_subscriptions, project_subscriptions_with_unsubscribed do |sub_form| %>
         <% project_subscription = sub_form.object %>
         <div id="subscription<%= project_subscription.project_id %>" style="display:none;">
           <fieldset>

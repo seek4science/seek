@@ -5,7 +5,7 @@
   <% end %>
 
   <% content = capture do %>
-        <% f.fields_for :special_auth_codes, f.object.special_auth_codes + [SpecialAuthCode.new.tap(&:mark_for_destruction)] do |sub_form|%>
+        <%= f.fields_for :special_auth_codes, f.object.special_auth_codes + [SpecialAuthCode.new.tap(&:mark_for_destruction)] do |sub_form|%>
             <fieldset <%= sub_form.object.new_record? ? "id='new_temporary_link_form' style='display: none'" : ''%> >
               <p>
                 <% temporary_link = url_for :action => :show, :only_path => false, :code => sub_form.object.code, :escape => false %>
