@@ -7,7 +7,7 @@ module ProjectsHelper
 
   def projects_link_list projects,sorted=true
     projects=projects.select{|p| !p.nil?} #remove nil items
-    return "<span class='none_text'>Not defined</span>" if projects.empty?
+    return "<span class='none_text'>Not defined</span>".html_safe if projects.empty?
 
     result=""
     projects=projects.sort{|a,b| a.title<=>b.title} if sorted
@@ -15,7 +15,7 @@ module ProjectsHelper
       result += link_to h(proj.title),proj
       result += " | " unless projects.last==proj
     end
-    return result
+    return result.html_safe
   end
 
   def pals_link_list project

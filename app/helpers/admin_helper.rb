@@ -12,14 +12,14 @@ module AdminHelper
       result << mail_to(person.email,person.name)
       result << ", " unless admins.last==person
     end
-    return result    
+    return result.html_safe
   end
   
   #takes the terms and scores received from SearchStats, and generates a string
   def search_terms_summary terms_and_scores    
-    return "<span class='none_text'>No search queries during this period</span>" if terms_and_scores.empty?
+    return "<span class='none_text'>No search queries during this period</span>".html_safe if terms_and_scores.empty?
     words=terms_and_scores.collect{|ts| "#{ts[0]}(#{ts[1]})" }
-    words.join(", ")
+    words.join(", ").html_safe
   end
 
 

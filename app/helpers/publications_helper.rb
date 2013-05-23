@@ -18,7 +18,7 @@ module PublicationsHelper
       project_options << "</optgroup>"
       options += project_options unless project.people.empty?
     end   
-    return options
+    return options.html_safe
   end
 
   def publication_type_text type
@@ -37,7 +37,7 @@ module PublicationsHelper
 
   def author_display_list publication
     if publication.publication_author_orders.empty?
-       "<span class='none_text'>Not specified</span>"
+       "<span class='none_text'>Not specified</span>".html_safe
     else
       author_list = []
       publication.publication_author_orders.sort_by(&:order).collect(&:author).each do |author|
@@ -47,7 +47,7 @@ module PublicationsHelper
           author_list << author.first_name + " " + author.last_name
         end
       end
-      author_list.join(', ')
+      author_list.join(', ').html_safe
     end
   end
 end

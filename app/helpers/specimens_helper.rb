@@ -19,7 +19,7 @@ module SpecimensHelper
 
   def specimen_organism_list organism,strain,culture_growth_type=nil,none_text="Not Specified"
     result=""
-    result ="<span class='none_text'>#{none_text}</span>" if organism.nil?
+    result ="<span class='none_text'>#{none_text}</span>".html_safe if organism.nil?
     if organism
       result = link_to h(organism.title),organism,{:class => "assay_organism_info"}
 
@@ -32,11 +32,11 @@ module SpecimensHelper
         result += " (#{culture_growth_type.title})"
       end
     end
-    return result
+    return result.html_safe
   end
 
   def list_item_organism attribute,organism,strain,culture_growth_type
-      "<p class=\"list_item_attribute\"><b>#{attribute}</b>: #{specimen_organism_list(organism,strain,culture_growth_type)}</p>"
+      "<p class=\"list_item_attribute\"><b>#{attribute}</b>: #{specimen_organism_list(organism,strain,culture_growth_type)}</p>".html_safe
   end
 
 
@@ -44,7 +44,7 @@ module SpecimensHelper
   def specimens_link_list specimens,sorted=true
     #FIXME: make more generic and share with other model link list helper methods
     specimens=specimens.select{|s| !s.nil?} #remove nil items
-    return "<span class='none_text'>Not associated with any Specimens</span>" if specimens.empty?
+    return "<span class='none_text'>Not associated with any Specimens</span>".html_safe if specimens.empty?
 
     result=""
     specimens=specimens.sort{|a,b| a.title<=>b.title} if sorted
@@ -72,7 +72,7 @@ module SpecimensHelper
       result += "</td></tr>"
     end
     result += "</table>"
-    return result
+    return result.html_safe
   end
 
   def sex_list_for_selection

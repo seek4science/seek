@@ -46,7 +46,7 @@ module TagsHelper
     return unless current_user
     %!<div id="tags_box" class="contribution_section_box">
       #{render :partial=>"assets/tags_box", :no_tags_message=>"Add tags (comma separated) ..."}
-    </div>!
+    </div>!.html_safe
   end
 
 end

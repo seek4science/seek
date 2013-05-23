@@ -159,6 +159,7 @@ module ResourceListItemHelper
       html << trunc_text
       html << "</div>"
       html << "</div>"
+      html.html_safe
     end
   end
 

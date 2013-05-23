@@ -9,11 +9,11 @@ module FavouritesHelper
     end
 
     uuid=UUIDTools::UUID.random_create.to_s.split("-")[0..2].join
-    return "drag_#{model_name}_#{object.id.to_s}_#{version}_#{uuid}"
+    return "drag_#{model_name}_#{object.id.to_s}_#{version}_#{uuid}".html_safe
   end
 
   def fav_line_tag favourite
-    fav_image_tag(favourite) + "<span class='fav_title'>#{h(favourite.resource.title)}</span>"
+    fav_image_tag(favourite) + "<span class='fav_title'>#{h(favourite.resource.title)}</span>".html_safe
   end
   
   def fav_image_tag favourite

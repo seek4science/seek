@@ -20,8 +20,6 @@ module SearchHelper
     text << search_adaptor_names.collect{|name| "<b>#{name}</b>"}.join(",")
     text << "<br/>"
     text << "This means the search will take longer, but will include results from other sites"
+    text.html_safe
   end
-
-
-  
 end

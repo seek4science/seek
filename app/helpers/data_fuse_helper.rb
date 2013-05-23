@@ -22,7 +22,7 @@ module DataFuseHelper
       end
 
     end
-    res
+    res.html_safe
   end
 
   def tsv_to_flot_data tsv
