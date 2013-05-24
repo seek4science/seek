@@ -27,13 +27,13 @@
   <p>
     You can register a <%= asset_name -%> by either directly uploading files, or registering URLs to either another page or remote file. Please test each URL before submitting.
     You can register multiple items for this <%= asset_name -%>.
-    <%= link_to_function "More info "+image("expand"), :id => 'more_info_expand_image' do |page|
+    <%= link_to_function ("More info "+image("expand")).html_safe, :id => 'more_info_expand_image' do |page|
       page.visual_effect(:toggle_appear, "more_upload_info", :duration => 0.3)
       page["more_info_expand_image"].toggle
       page["more_info_collapse_image"].toggle
     end
     -%>
-    <%= link_to_function "More info "+image("collapse"), :id => 'more_info_collapse_image', :style => "display:none" do |page|
+    <%= link_to_function ("More info "+image("collapse")).html_safe, :id => 'more_info_collapse_image', :style => "display:none" do |page|
       page.visual_effect(:toggle_appear, "more_upload_info", :duration => 0.3)
       page["more_info_expand_image"].toggle
       page["more_info_collapse_image"].toggle
