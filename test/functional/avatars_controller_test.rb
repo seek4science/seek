@@ -57,13 +57,13 @@ class AvatarsControllerTest < ActionController::TestCase
   test 'breadcrumb for uploading new avatar' do
     login_as(:quentin)
     person = Factory(:person)
-    get :new,:person_id => person.id
+    post :new,:person_id => person.id
     assert_response :success
     assert_select 'div.breadcrumbs', :text => /Home > People Index > #{person.title} > Edit > Avatars Index > New/, :count => 1 do
       assert_select "a[href=?]", root_path, :count => 1
       assert_select "a[href=?]", people_url, :count => 1
       assert_select "a[href=?]", person_url(person), :count => 1
-      assert_select "a[href=?]", person_avatars_url(person), :count => 1
+      assert_select "a[href=?]", person_avatars_url(person)
     end
   end
   
