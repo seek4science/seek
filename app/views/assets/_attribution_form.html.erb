@@ -71,7 +71,7 @@
 	  
 
       <script type="text/javascript">
-        var suggestion_list = <%= attribution_suggestions -%>;
+        var suggestion_list = <%= attribution_suggestions.html_safe  -%>;
         var prepopulate_with = [];
 
         var attributions_autocompleter = new Autocompleter.LocalAdvanced(

@@ -301,7 +301,7 @@
 
 
                 <script type="text/javascript">
-                    var people_list = <%= @all_people_as_json -%>;
+                    var people_list = <%= @all_people_as_json.html_safe -%>;
                     var prepopulate_with = [];
 
                     var individual_people_autocompleter = new Autocompleter.LocalAdvanced(

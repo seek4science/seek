@@ -63,7 +63,7 @@
       </table>
 
       <script type="text/javascript">
-        var suggestion_list = <%= Person.get_all_as_json -%>;
+        var suggestion_list = <%= Person.get_all_as_json.html_safe  -%>;
         var prepopulate_with = [];
 
         var creator_autocompleter = new Autocompleter.LocalAdvanced(
@@ -71,7 +71,7 @@
           frequency: 0.1,
           updateElement: addAction,
           search_field: "name",
-          <%= "hint_field: \"email\"," unless hide_contact_details? -%>
+          <%= "hint_field: \"email\",".html_safe  unless hide_contact_details? -%>
           id_field: "id",
           validation_type: "only_suggested"
         });
