@@ -39,10 +39,11 @@
   <span id="add_model_type_form" style="display:none;">
     <p>
       <%= text_field_tag :model_type -%>
-      <%= button_to_remote "Add",
-        :url=>{:action=>:create_model_metadata, :attribute=>"model_type"},
+      <%= button_to "Add",
+        {:url=>{:action=>:create_model_metadata, :attribute=>"model_type"},
         :with=>"$('model_type').serialize()",
-        :before=>"show_ajax_loader('model_type_selection');$('add_model_type_form').hide();"
+        :before=>"show_ajax_loader('model_type_selection');$('add_model_type_form').hide();"},
+        {:remote=>true}
       -%>
     </p>
   </span>
@@ -51,11 +52,11 @@
     <p>
       <%= hidden_field_tag :updated_model_type_id -%>
       <%= text_field_tag :updated_model_type -%>
-      <%= button_to_remote "Update",
+      <%= button_to "Update",
         {:url=>{:action=>:update_model_metadata, :attribute=>"model_type"},
         :with=>"$('updated_model_type').serialize() + '&' + $('updated_model_type_id').serialize()",
         :before=>"show_ajax_loader('model_type_selection');$('edit_model_type_form').hide();"},
-        {:id=>"update_model_type_button"}
+        {:id=>"update_model_type_button",:remote=>true}
       -%>
     </p>
   </span>
@@ -99,10 +100,11 @@
   <span id="add_model_format_form" style="display:none;">
     <p>
       <%= text_field_tag :model_format -%>
-      <%= button_to_remote "Add",
-        :url=>{:action=>:create_model_metadata, :attribute=>"model_format"},
+      <%= button_to "Add",
+        {:url=>{:action=>:create_model_metadata, :attribute=>"model_format"},
         :with=>"$('model_format').serialize()",
-        :before=>"show_ajax_loader('model_format_selection');$('add_model_format_form').hide();"
+        :before=>"show_ajax_loader('model_format_selection');$('add_model_format_form').hide();"},
+        {:remote=>true}
       -%>
     </p>
   </span>
@@ -111,11 +113,11 @@
     <p>
       <%= hidden_field_tag :updated_model_format_id -%>
       <%= text_field_tag :updated_model_format -%>
-      <%= button_to_remote "Update",
+      <%= button_to "Update",
         {:url=>{:action=>:update_model_metadata, :attribute=>"model_format"},
         :with=>"$('updated_model_format').serialize() + '&' + $('updated_model_format_id').serialize()",
         :before=>"show_ajax_loader('model_format_selection');$('edit_model_format_form').hide();"},
-        {:id=>"update_model_format_button"}
+        {:id=>"update_model_format_button",:remote=>true}
       -%>
     </p>
   </span>

@@ -59,8 +59,11 @@
         <%= fields_for(@data_file) {|f| f.fancy_multiselect :samples, {:hidden=> @data_file.samples.blank?  ? true : false, :other_projects_checkbox => true}}  -%>
 
         <p>
-          <%= preview_permission_popup_link(@data_file)-%>
-          <%= submit_tag "Upload and Save", :id => "data_file_submit_btn", :onclick => "javascript: validateResourceFields(true,'data_file',true); return(false);" -%> or <%= link_to 'Cancel', data_files_path -%>
+
+          <%#= preview_permission_popup_link(@data_file)-%>
+          <%#= submit_tag "Upload and Save", :id => "data_file_submit_btn", :onclick => "javascript: validateResourceFields(true,'data_file',true); return(false);" -%> or <%#= link_to 'Cancel', data_files_path -%>
+          <%= submit_tag "Upload and Save", :id => "data_file_submit_btn" -%> or <%= link_to 'Cancel', data_files_path -%>
+
         </p>
     </div>
     <% end -%>
