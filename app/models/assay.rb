@@ -79,6 +79,7 @@ class Assay < ActiveRecord::Base
   validates_presence_of :study, :message=>" must be selected"
   validates_presence_of :owner
   validates_presence_of :assay_class
+  validate :no_sample_for_modelling_assay
 
   #a temporary store of added assets - see AssayReindexer
   attr_reader :pending_related_assets
@@ -187,7 +188,7 @@ class Assay < ActiveRecord::Base
   end
 
   def clone_with_associations
-    new_object= self.clone
+    new_object= self.dup
     new_object.policy = self.policy.deep_copy
     new_object.sop_masters = self.try(:sop_masters)
 
@@ -198,9 +199,9 @@ class Assay < ActiveRecord::Base
     return new_object
   end
 
-  def validate
+  def no_sample_for_modelling_assay
     #FIXME: allows at the moment until fixtures and factories are updated: JIRA: SYSMO-734
-    errors[:base] << "You cannot associate a modelling analysis with a sample" if is_modelling? && !samples.empty?
+    errors[:base] << "You cannot associate a modelling analysis with a sample" if is_modelling? && !samples.empty? && !Seek::Config.is_virtualliver
   end
 
   def organism_terms
