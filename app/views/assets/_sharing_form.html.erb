@@ -28,7 +28,7 @@
     <div class="box_infotext">
       <p>
         Here you can specify who can <b>view</b> the summary of<% if @resource.is_downloadable? %>, <b>get</b> access to the content of,<% end %> and <b>edit</b> the <%= @resource_type -%>.
-        <%= link_to_function "More info " + expand_image, visual_effect(:toggle_blind, "more_sharing_info", :duration => 0.3) -%>
+        <%= link_to_function(("More info " + expand_image).html_safe, visual_effect(:toggle_blind, "more_sharing_info", :duration => 0.3)) -%>
       </p>
       <div id="more_sharing_info" class="box_simple" style="display: none;">        
           You may:
@@ -115,13 +115,13 @@
     <% end -%>
 
     <% if !disable_advanced_view %>
-      <%= link_to_function "Advanced permissions " + expand_image, :class => 'advanced_sharing_link', :style => "display:" + (show_advanced_permissions ? 'none;' : 'block;'), :id =>'advanced_sharing_expand_image' do |page|
+      <%= link_to_function ("Advanced permissions " + expand_image).html_safe, :class => 'advanced_sharing_link', :style => "display:" + (show_advanced_permissions ? 'none;' : 'block;'), :id =>'advanced_sharing_expand_image' do |page|
           page.visual_effect :toggle_blind, "advanced sharing", :duration => 0.5
           page["advanced_sharing_expand_image"].toggle
           page["advanced_sharing_collapse_image"].toggle
       end
       -%>
-      <%= link_to_function "Advanced permissions " + collapse_image, :class => 'advanced_sharing_link', :style => "display:" + (show_advanced_permissions ? 'block;' : 'none;'), :id =>'advanced_sharing_collapse_image' do |page|
+      <%= link_to_function ("Advanced permissions " + collapse_image).html_safe, :class => 'advanced_sharing_link', :style => "display:" + (show_advanced_permissions ? 'block;' : 'none;'), :id =>'advanced_sharing_collapse_image' do |page|
           page.visual_effect :toggle_blind, "advanced sharing", :duration => 0.5
           page["advanced_sharing_expand_image"].toggle
           page["advanced_sharing_collapse_image"].toggle
