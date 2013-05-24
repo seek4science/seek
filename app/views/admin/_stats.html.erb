@@ -22,15 +22,14 @@
      }
 -%>
 
-<%= link_to image('refresh'),
-                   {:url=>{:action=>"get_stats",:controller=>"admin",:element=>"stats_list"},
-                                                   :with=>"'id='+encodeURIComponent($F('stats_query'))",
-                                                   :update => {:success => 'stats_list'},
-                                                   :success => "Element.show('stats_list'); new Effect.Highlight('stats_list', { duration: 1.0 });",
-                                                   :loading => "Element.show('spinner');Element.hide('stats_list');Element.hide('refresh_button');",
-                                                   :complete => "Element.hide('spinner');Element.show('stats_list');Element.show('refresh_button');"},
-                                                   {:id=>'refresh_button', :style=>'display:none;', :remote => true}
-%>
+
+<%= link_to image('refresh'),"#",:id=>'refresh_button', :style=>'display:none;', :remote => true,
+             :onclick=> remote_function(:url=>{:action=>"get_stats",:controller=>"admin",:element=>"stats_list"},
+                                        :with=>"'id='+encodeURIComponent($F('stats_query'))",
+                                        :update => {:success => 'stats_list'},
+                                        :success => "Element.show('stats_list'); new Effect.Highlight('stats_list', { duration: 1.0 });",
+                                        :loading => "Element.show('spinner');Element.hide('stats_list');Element.hide('refresh_button');",
+                                        :complete => "Element.hide('spinner');Element.show('stats_list');Element.show('refresh_button');") %>
 
 <%= image_tag "ajax-loader.gif", :id => 'spinner', :style => 'display:none;' -%><br/>
 <div id="stats_list">

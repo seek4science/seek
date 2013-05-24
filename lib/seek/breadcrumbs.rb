@@ -18,7 +18,7 @@ module Seek
         add_index_breadcrumb "projects"
         add_show_breadcrumb @project
       elsif controller_name == 'avatars'
-        add_index_breadcrumb @avatar_for.pluralize
+        add_index_breadcrumb @avatar_for.pluralize.downcase
         add_show_breadcrumb @avatar_owner_instance
         add_edit_breadcrumb @avatar_owner_instance
       end

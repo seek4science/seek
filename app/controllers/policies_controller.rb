@@ -71,7 +71,7 @@ class PoliciesController < ApplicationController
 
       resource_class = params[:resource_name].camelize.constantize
       resource = resource_class.find_by_id(params[:resource_id]) || resource_class.new
-      cloned_resource = resource.clone
+      cloned_resource = resource.dup
       cloned_resource= resource_with_assigned_projects cloned_resource,params[:project_ids]
       cloned_resource.policy = policy
       cloned_resource.creators = creators if cloned_resource.respond_to?:creators
@@ -98,7 +98,7 @@ class PoliciesController < ApplicationController
 
   #To check wherether you can publish immediately or need to go through gatekeeper's approval when changing the projects associated with the resource
   def updated_can_publish_immediately resource, project_ids=params[:project_ids]
-    cloned_resource = resource.clone
+    cloned_resource = resource.dup
     cloned_resource.policy = resource.policy.deep_copy
     cloned_resource = resource_with_assigned_projects cloned_resource,project_ids
     if !resource.new_record? && resource.policy.sharing_scope == Policy::EVERYONE
