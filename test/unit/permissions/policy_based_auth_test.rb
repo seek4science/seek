@@ -39,60 +39,6 @@ class PolicyBasedAuthTest < ActiveSupport::TestCase
     assert assay.has_advanced_permissions?
   end
 
-  test "should invalidate the cache when changing creators of an item" do
-    test_user = Factory(:user)
-    datafile = Factory(:data_file, :projects => test_user.person.projects, :creators => [test_user.person])
-    assert datafile.can_edit?test_user
-
-    sleep(2)
-
-    User.with_current_user datafile.contributor do
-      #update the datafile creators
-      datafile.creators=[]
-      datafile.save
-      datafile.reload
-    end
-
-    assert !datafile.can_edit?(test_user)
-  end
-
-  test "should invalidate the cache when changing the person roles" do
-    admin = Factory(:admin)
-    asset_manager = Factory(:asset_manager)
-    datafile = Factory(:data_file, :projects => asset_manager.projects, :policy => Factory(:public_policy, :access_type => Policy::VISIBLE))
-
-    assert datafile.can_manage?asset_manager.user
-
-    sleep(2)
-
-    User.with_current_user admin.user do
-      asset_manager.is_asset_manager = false
-      asset_manager.save
-      asset_manager.reload
-      assert !asset_manager.is_asset_manager?
-    end
-
-    assert !datafile.can_manage?(asset_manager.user)
-  end
-
-  test "should invalidate the cache when updating policy of an asset" do
-    test_user = Factory(:user)
-    datafile = Factory(:data_file, :projects => test_user.person.projects, :policy => Factory(:public_policy))
-    assert datafile.can_view?test_user
-
-    sleep(2)
-
-    User.with_current_user datafile.contributor do
-      #update the policy
-      datafile.policy.sharing_scope = Policy::PRIVATE
-      datafile.policy.access_type = Policy::NO_ACCESS
-      datafile.save
-      datafile.reload
-    end
-
-    assert !datafile.can_view?(test_user)
-  end
-
   test "people within the same project can_see_hidden_item" do
     test_user = Factory(:user)
     datafile = Factory(:data_file, :projects => test_user.person.projects, :policy => Factory(:private_policy))
@@ -105,5 +51,87 @@ class PolicyBasedAuthTest < ActiveSupport::TestCase
     datafile = Factory(:data_file, :policy => Factory(:private_policy))
     assert !datafile.can_view?(test_user)
     assert !datafile.can_see_hidden_item?(test_user.person)
+  end
+
+  test "authorization_permissions" do
+    with_config_value :auth_lookup_enabled,true do
+      Sop.delete_all
+      user = Factory(:person).user
+      other_user = Factory :user
+      sop = Factory :sop, :contributor=>user, :policy=>Factory(:editing_public_policy)
+      Sop.clear_lookup_table
+
+      sop.update_lookup_table(user)
+      sop.update_lookup_table(other_user)
+
+      permissions = sop.authorization_permissions user
+      assert_equal true,permissions.can_view
+      assert_equal true,permissions.can_download
+      assert_equal true,permissions.can_edit
+      assert_equal true,permissions.can_manage
+      assert_equal true,permissions.can_delete
+
+      permissions = sop.authorization_permissions other_user
+      assert_equal true,permissions.can_view
+      assert_equal true,permissions.can_download
+      assert_equal true,permissions.can_edit
+      assert_equal false,permissions.can_manage
+      assert_equal false,permissions.can_delete
     end
+
+  end
+
+  test "update lookup table" do
+    with_config_value :auth_lookup_enabled,true do
+      user = Factory :user
+      other_user = Factory :user
+      sop = Factory :sop, :contributor=>user, :policy=>Factory(:editing_public_policy)
+      Sop.clear_lookup_table
+      #check using the standard
+      assert_equal true,sop.authorized_for_view?(user)
+      assert_equal true,sop.authorized_for_download?(user)
+      assert_equal true,sop.authorized_for_edit?(user)
+      assert_equal true,sop.authorized_for_manage?(user)
+      assert_equal true,sop.authorized_for_delete?(user)
+
+      assert_equal true,sop.authorized_for_view?(other_user)
+      assert_equal true,sop.authorized_for_download?(other_user)
+      assert_equal true,sop.authorized_for_edit?(other_user)
+      assert_equal false,sop.authorized_for_manage?(other_user)
+      assert_equal false,sop.authorized_for_delete?(other_user)
+
+      sop.update_lookup_table(user)
+      sop.update_lookup_table(other_user)
+
+      assert_equal true,sop.authorized_for_view?(user)
+      assert_equal true,sop.authorized_for_download?(user)
+      assert_equal true,sop.authorized_for_edit?(user)
+      assert_equal true,sop.authorized_for_manage?(user)
+      assert_equal true,sop.authorized_for_delete?(user)
+
+      assert_equal true,sop.authorized_for_view?(other_user)
+      assert_equal true,sop.authorized_for_download?(other_user)
+      assert_equal true,sop.authorized_for_edit?(other_user)
+      assert_equal false,sop.authorized_for_manage?(other_user)
+      assert_equal false,sop.authorized_for_delete?(other_user)
+    end
+
+  end
+
+  test "lookup table counts" do
+    with_config_value :auth_lookup_enabled,true do
+      user = Factory :user
+      disable_authorization_checks do
+        Sop.clear_lookup_table
+        assert_equal 0,Sop.lookup_count_for_user(user.id)
+        sop = Factory :sop
+        assert_equal 0,Sop.lookup_count_for_user(user.id)
+        sop.update_lookup_table(user)
+        assert_equal 1,Sop.lookup_count_for_user(user.id)
+        assert sop.destroy
+        assert_equal 0,Sop.lookup_count_for_user(user.id)
+      end
+    end
+
+  end
 end
