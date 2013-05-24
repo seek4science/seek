@@ -194,7 +194,7 @@ module Seek
           if res.nil?
             nil
           else
-            res[attribute]==@@expected_true_value
+            res[attribute].to_s==@@expected_true_value
           end
         end
       end
@@ -218,11 +218,11 @@ module Seek
           sql = "SELECT can_view,can_edit,can_download,can_manage,can_delete FROM #{self.class.lookup_table_name} WHERE user_id=#{user_id} AND asset_id=#{self.id}"
           res = ActiveRecord::Base.connection.select_one(sql)
           unless res.nil?
-            permissions.can_view = res["can_view"]==@@expected_true_value
-            permissions.can_download = res["can_download"]==@@expected_true_value
-            permissions.can_edit = res["can_edit"]==@@expected_true_value
-            permissions.can_manage = res["can_manage"]==@@expected_true_value
-            permissions.can_delete = res["can_delete"]==@@expected_true_value
+            permissions.can_view = res["can_view"].to_s==@@expected_true_value && state_allows_manage?(user)
+            permissions.can_download = res["can_download"].to_s==@@expected_true_value && state_allows_manage?(user)
+            permissions.can_edit = res["can_edit"].to_s==@@expected_true_value && state_allows_manage?(user)
+            permissions.can_manage = res["can_manage"].to_s==@@expected_true_value && state_allows_manage?(user)
+            permissions.can_delete = res["can_delete"].to_s==@@expected_true_value && state_allows_manage?(user)
           else
             raise "Expected to find record in auth lookup table"
           end
