@@ -126,7 +126,7 @@ class SamplesControllerTest < ActionController::TestCase
         assert_difference("Specimen.count") do
           assert_difference("Strain.count") do
             post :create,
-                 :organism_id=>Factory(:organism).id,
+                 :organism=>Factory(:organism),
                  :sample => {
                      :title => "test",
                      :project_ids=>[Factory(:project).id],
