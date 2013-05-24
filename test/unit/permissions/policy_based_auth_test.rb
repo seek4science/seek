@@ -120,6 +120,7 @@ class PolicyBasedAuthTest < ActiveSupport::TestCase
 
   test "lookup table counts" do
     with_config_value :auth_lookup_enabled,true do
+      User.current_user = nil
       user = Factory :user
       disable_authorization_checks do
         Sop.clear_lookup_table
