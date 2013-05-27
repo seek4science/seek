@@ -129,23 +129,23 @@ class EventsControllerTest < ActionController::TestCase
     assert_equal after.title, valid_event[:title]
   end
 
-  test "should not add invisible data_file" do
-    e = Factory :event, :contributor => User.current_user
-    df = Factory :data_file, :contributor => Factory(:user), :policy => Factory(:private_policy)
-    put :update, :id => e.id, :data_file_ids => ["#{df.id}"], :event => {}
-
-    assert_redirected_to e
-    assert_equal 0, e.data_files.count
-  end
-
-  test "should not lose invisible data_files when updating" do
-    e = Factory :event, :contributor => User.current_user,
-                :data_files => [Factory(:data_file, :contributor => Factory(:user), :policy => Factory(:private_policy))]
-    put :update, :id => e.id, :data_file_ids => []
-
-    assert_redirected_to e
-    assert_equal 1, e.data_files.count
-  end
+  #test "should not add invisible data_file" do
+  #  e = Factory :event, :contributor => User.current_user
+  #  df = Factory :data_file, :contributor => Factory(:user), :policy => Factory(:private_policy)
+  #  put :update, :id => e.id, :data_file_ids => ["#{df.id}"], :event => {}
+  #
+  #  assert_redirected_to e
+  #  assert_equal 0, e.data_files.count
+  #end
+  #
+  #test "should not lose invisible data_files when updating" do
+  #  e = Factory :event, :contributor => User.current_user,
+  #              :data_files => [Factory(:data_file, :contributor => Factory(:user), :policy => Factory(:private_policy))]
+  #  put :update, :id => e.id, :data_file_ids => []
+  #
+  #  assert_redirected_to e
+  #  assert_equal 1, e.data_files.count
+  #end
 
   test "should create and show event without end_date" do
     assert_difference('Event.count', 1) do

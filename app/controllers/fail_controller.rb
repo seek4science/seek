@@ -5,7 +5,6 @@ class FailController < ApplicationController
   
   # GET /fail/?http_code=:code
   def index
-    puts "Current codes to send emails: #{ExceptionNotifier.send_email_error_codes.inspect}"
     
     case params[:http_code]
       when "404"
