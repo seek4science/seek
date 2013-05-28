@@ -5,6 +5,13 @@ GIT
     acts_as_activity_logged (0.3.3)
 
 GIT
+  remote: git://github.com/SysMO-DB/acts_as_trashable.git
+  revision: ff5dcddece0d03014a8ffde526da59a151501cd7
+  specs:
+    acts_as_trashable (1.0.6)
+      activerecord (>= 2.2)
+
+GIT
   remote: git://github.com/SysMO-DB/app_version.git
   revision: 773b6ae72d9cba038fce1a3502feb5de2f2b75a3
   specs:
@@ -146,8 +153,6 @@ GEM
       rails (>= 3, < 5)
     acts_as_list (0.2.0)
       activerecord (>= 3.0)
-    acts_as_trashable (1.0.6)
-      activerecord (>= 2.2)
     acts_as_tree (0.2.0)
     addressable (2.3.4)
     akami (1.2.0)
@@ -205,7 +210,7 @@ GEM
       daemons (>= 1.0.3)
       fastthread (>= 1.0.1)
       gem_plugin (>= 0.2.3)
-    multi_json (1.7.3)
+    multi_json (1.7.4)
     mysql2 (0.3.11)
     nokogiri (1.5.9)
     nori (1.1.5)
@@ -338,7 +343,7 @@ DEPENDENCIES
   acts-as-taggable-on
   acts_as_activity_logged!
   acts_as_list
-  acts_as_trashable
+  acts_as_trashable!
   acts_as_tree (= 0.2.0)
   app_version!
   bio

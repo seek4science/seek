@@ -48,7 +48,7 @@ gem 'my_annotations', :git=>"git://github.com/myGrid/annotations.git"
 gem 'acts-as-taggable-on'
 gem 'acts_as_activity_logged', :git => "git://github.com/SysMO-DB/acts_as_activity_logged.git"
 gem 'acts_as_list'
-gem 'acts_as_trashable'
+gem 'acts_as_trashable',:git=> "git://github.com/SysMO-DB/acts_as_trashable.git"
 gem 'acts_as_tree',"0.2.0"
 gem "app_version", :git => "git://github.com/SysMO-DB/app_version.git"
 gem 'doi_query_tool', :git => "git://github.com/SysMO-DB/doi_query_tool.git"
