@@ -147,6 +147,7 @@ module ResourceListItemHelper
       html = (attribute ? "<p class=\"list_item_attribute\"><b>#{attribute}</b>:</p>" : "") + "<div class=\"list_item_desc\">"
       html << trunc_text
       html << "</div>"
+      html.html_safe
     else
       html = "<script type=\"text/javascript\">\n"
       html << "fullResourceListItemExpandableText[#{text.object_id}] = '#{escape_javascript(full_text)}';\n"

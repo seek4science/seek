@@ -22,7 +22,7 @@
                var dataValidation = {};
                window.onload = function() {
                 // convert xgmml file content to a string
-                var network_xgmml = <%= @graph %> ;
+                var network_xgmml = <%= @graph.html_safe %> ;
                 // initialization options
 
                 // callback when Cytoscape Web has finished drawing
