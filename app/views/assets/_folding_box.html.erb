@@ -6,7 +6,7 @@
     <%= fold_title %>
   </div>
 
-  <div id="<%= fold_id %>_fold_content" class="foldContent" <%=hidden ? 'style="display: none;"': 'style="display: block;"'%>>
+  <div id="<%= fold_id %>_fold_content" class="foldContent" style="display:<%=hidden ? "none" : "block;" %>">
       <%= contents || yield %>
   </div>
  </div>
