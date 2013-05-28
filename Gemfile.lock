@@ -64,7 +64,7 @@ GIT
 
 GIT
   remote: git://github.com/myGrid/annotations.git
-  revision: 19606e3ae55019d4ba88539e14defe1919368e17
+  revision: d33e78993ee957fa12d71cbe9f03100dd9b0ad15
   specs:
     my_annotations (0.6.0)
 
