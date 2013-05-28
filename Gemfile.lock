@@ -63,6 +63,12 @@ GIT
     white_list (1.0.0)
 
 GIT
+  remote: git://github.com/myGrid/annotations.git
+  revision: 19606e3ae55019d4ba88539e14defe1919368e17
+  specs:
+    my_annotations (0.6.0)
+
+GIT
   remote: git://github.com/myGrid/search_biomodel.git
   revision: e109ac6d8b102f7ecb65140c17d263b85e066870
   specs:
@@ -73,12 +79,6 @@ GIT
   revision: 977048211b94599fe0f08eb37a481f3d69df48f6
   specs:
     calendar_date_select (1.16.2)
-
-GIT
-  remote: git://github.com/quyen/annotations.git
-  revision: 19606e3ae55019d4ba88539e14defe1919368e17
-  specs:
-    my_annotations (0.6.0)
 
 GIT
   remote: git://github.com/quyen/bioportal.git
