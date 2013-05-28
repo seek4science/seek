@@ -182,7 +182,6 @@ SEEK::Application.routes.draw do
     member do
       get :builder
       get :check_related_items
-      post :submit_to_sycamore
       get :visualise
       get :check_gatekeeper_required
       post :publish
