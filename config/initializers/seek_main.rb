@@ -29,6 +29,8 @@ require 'strategic_eager_loading'
 require 'seek/breadcrumbs'
 require 'string_extension'
 require 'seek/project_hierarchies'
+require 'recaptcha'
+
 GLOBAL_PASSPHRASE="ohx0ipuk2baiXah" unless defined? GLOBAL_PASSPHRASE
 
 ASSET_ORDER                = ['Person', 'Project', 'Institution', 'Investigation', 'Study', 'Assay', 'Sample','Specimen','Strain', 'DataFile', 'Model', 'Sop', 'Publication', 'Presentation','SavedSearch', 'Organism', 'Event']
