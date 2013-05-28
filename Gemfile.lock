@@ -114,7 +114,7 @@ GIT
 
 GIT
   remote: git://github.com/quyen/my_savage_beast
-  revision: 4fab6395c687ef279a5be4d405d31b51a07322f5
+  revision: dc377c821730e3b13fec4d73811850293785af80
   specs:
     my_savage_beast (2.3)
 
