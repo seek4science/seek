@@ -14,7 +14,7 @@
   <div <%= tag_options header_options %> href="#" onclick="toggle_collapsable_div('<%= unique_id -%>'); return false;">
     <%= title -%> <img id="collapsable_div_img_<%= unique_id -%>" style="float:right" src="/images/folds/<%= (start_open ? "fold.png" : "unfold.png") %>"/>
   </div>
-  <div class="collapsable_div_contents" id="collapsable_div_<%= unique_id -%>" <%= start_open ? "" : "style=\"display: none\""%> >
+  <div class="collapsable_div_contents" id="collapsable_div_<%= unique_id -%>" <%= start_open ? "" : "style=\"display: none\"".html_safe %> >
     <%= render :partial => partial, :object => object, :locals => locals %>
   </div>
 </div>
