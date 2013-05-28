@@ -2,7 +2,7 @@
 
 <div class="show_basic">
     <h1>
-      <%= "Factors studied for '#{link_to h(@data_file.title),data_file_path(@data_file, :version => @display_data_file.version)}' version #{@display_data_file.version}" %>
+      <%= "Factors studied for #{link_to h(@data_file.title),data_file_path(@data_file, :version => @display_data_file.version)} version #{@display_data_file.version}".html_safe %>
     </h1>
 
     <p class="box_standout">

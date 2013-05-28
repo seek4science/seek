@@ -43,9 +43,9 @@
     <% end %>
     <% if show_delete %>
         <li id="delete_<%= object.id -%>" class="destroy_condition_or_factor">
-           <%=  link_to image("destroy",:alt=>"Delete",:title=>"Delete this entry"),
-             :url => { :action => "destroy", :id => object.id, "#{asset}_id"=>asset_object.id},
-             :confirm=>"Are you sure?", :method=>:delete, :remote => true
+           <%=  link_to(image("destroy",:alt=>"Delete",:title=>"Delete this entry"),
+             {:action => "destroy", :id => object.id, "#{asset}_id"=>asset_object.id},
+             :confirm=>"Are you sure?", :remote => true, :method=>:delete)
            -%>
         </li>
 
