@@ -401,5 +401,5 @@ SEEK::Application.routes.draw do
   match '/activate/:activation_code' => 'users#activate', :activation_code => nil, :as => :activate
   match '/forgot_password' => 'users#forgot_password', :as => :forgot_password
   match '/policies/request_settings' => 'policies#send_policy_data', :as => :request_policy_settings
-  #match '/:controller(/:action(/:id))'
+  match '/:controller(/:action(/:id))'
 end
