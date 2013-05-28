@@ -60,7 +60,7 @@ module AssetsHelper
       options << "> #{v.version.to_s} #{versioned_resource.describe_version(v.version)} </option>"
     end
     select_tag(:resource_versions,
-               options,
+               options.html_safe,
                :disabled=>disabled,
                :onchange=>"showResourceVersion($('show_version_form'));"
     ) + "<form id='show_version_form' onsubmit='showResourceVersion(this); return false;'></form>".html_safe
