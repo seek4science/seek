@@ -168,9 +168,6 @@ SEEK::Application.routes.draw do
     end
 
     resources :avatars do
-      collection do
-        post :new
-      end
       member do
         post :select
       end
@@ -238,9 +235,6 @@ SEEK::Application.routes.draw do
       get :publish_related_items
     end
     resources :avatars do
-      collection do
-        post :new
-      end
       member do
         post :select
       end
@@ -257,9 +251,6 @@ SEEK::Application.routes.draw do
       get :admin
     end
     resources :avatars do
-      collection do
-        post :new
-      end
       member do
         post :select
       end
