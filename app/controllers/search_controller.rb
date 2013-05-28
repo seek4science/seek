@@ -15,9 +15,9 @@ class SearchController < ApplicationController
 
     @results = select_authorised @results
     if @results.empty?
-      flash.now[:notice]="No matches found for '<b>#{@search_query}</b>'."
+      flash.now[:notice]="No matches found for '<b>#{@search_query}</b>'.".html_safe
     else
-      flash.now[:notice]="#{@results.size} #{@results.size==1 ? 'item' : 'items'} matched '<b>#{@search_query}</b>' within their title or content."
+      flash.now[:notice]="#{@results.size} #{@results.size==1 ? 'item' : 'items'} matched '<b>#{@search_query}</b>' within their title or content.".html_safe
     end
 
     @include_external_search = params[:include_external_search]=="1"
