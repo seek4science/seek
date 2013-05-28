@@ -25,7 +25,7 @@ module ModelsHelper
   }
 
   def model_environment_text model
-    model.recommended_environment ? h(model.recommended_environment.title) : "<span class='none_text'>Not specified</span>"
+    model.recommended_environment ? h(model.recommended_environment.title) : "<span class='none_text'>Not specified</span>".html_safe
   end
 
 

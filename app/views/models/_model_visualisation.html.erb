@@ -1,6 +1,6 @@
 <% image = @display_model.model_image -%>
 <p>
-  <b>Model image: </b> <%= "<span class='none_text'>No image specified</span>" if image.nil? -%>
+  <b>Model image: </b> <%= "<span class='none_text'>No image specified</span>".html_safe if image.nil? -%>
 
       <% if  image
            image_width = @display_model.model_image.image_width.nil??  "600" : @display_model.model_image.image_width
