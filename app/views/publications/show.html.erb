@@ -4,7 +4,7 @@
   <% if !@publication.pubmed_id.nil? %>
     <li><%= image_tag_for_key('visit_pubmed', "http://www.ncbi.nlm.nih.gov/pubmed/#{@publication.pubmed_id}", nil, {:popup => true}, 'View Publication On PubMed') -%></li>
   <% elsif !@publication.doi.nil? %>
-    <li><%= image_tag_for_key('visit_pubmed', "http://dx.doi.org/#{@publication.doi}", nil, {:popup => true}, 'View Publication') -%></li>
+    <li><%= image_tag_for_key('visit_pubmed', "http://dx.doi.org/#{@publication.doi}", nil, {:popup => true, :target => "_blank"}, 'View Publication') -%></li>
   <% end -%>
   <% if @publication.can_edit? -%>
       <li><%= image_tag_for_key('manage', edit_publication_path(@publication), nil, nil, 'Manage Publication') -%></li>
