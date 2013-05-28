@@ -70,6 +70,7 @@ gem 'redbox', :git=>"git://github.com/SysMO-DB/redbox.git"
 
 gem "my_responds_to_parent", :git => "git://github.com/quyen/my_responds_to_parent.git"
 gem 'site_announcements', :git => 'git://github.com/SysMO-DB/site_announcements.git'
+gem 'open_id_authentication', :git => 'git://github.com/SysMO-DB/open_id_authentication.git'
 
 
 gem "yaml_db"
