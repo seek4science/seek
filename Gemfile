@@ -44,7 +44,7 @@ gem "pothoven-attachment_fu"
 gem "exception_notification"
 
 gem "fssm"
-gem 'my_annotations', :git=>"git://github.com/quyen/annotations.git"
+gem 'my_annotations', :git=>"git://github.com/myGrid/annotations.git"
 gem 'acts-as-taggable-on'
 gem 'acts_as_activity_logged', :git => "git://github.com/SysMO-DB/acts_as_activity_logged.git"
 gem 'acts_as_list'
