@@ -164,6 +164,8 @@ SEEK::Application.routes.draw do
     end
   end
 
+  resources :avatars
+
   resources :sops do
     collection do
       get :preview
