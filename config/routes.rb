@@ -1,5 +1,5 @@
 SEEK::Application.routes.draw do
-  root :to=>"home#index"
+  root :to=>"homes#index"
 
   resource :admin do
     member do
@@ -24,6 +24,17 @@ SEEK::Application.routes.draw do
       post :update_pagination
     end
   end
+
+  resource :home do
+    member do
+      get :index
+      get :feedback
+      post :send_feedback
+    end
+  end
+
+  match 'index.html' => 'homes#index', :as => :match
+  match 'index' => 'homes#index', :as => :match
 
   resources :attachments
   resources :presentations do
@@ -400,9 +411,6 @@ SEEK::Application.routes.draw do
   match '/countries/:country_name' => 'countries#show', :as => :country
 
   match '/data_fuse/' => 'data_fuse#show', :as => :data_fuse
-  match '/home/feedback' => 'home#feedback', :as => :feedback, :method => :get
-  match '/home/send_feedback' => 'home#send_feedback', :as => :send_feedback, :method => :post
-  match 'home/seek_intro_demo' => 'home#seek_intro_demo', :as => :seek_intro_demo, :method => :get
   match '/favourite_groups/new' => 'favourite_groups#new', :as => :new_favourite_group, :via => :post
   match '/favourite_groups/create' => 'favourite_groups#create', :as => :create_favourite_group, :via => :post
   match '/favourite_groups/edit' => 'favourite_groups#edit', :as => :edit_favourite_group, :via => :post
@@ -415,11 +423,10 @@ SEEK::Application.routes.draw do
   match '/tool_list_autocomplete' => 'people#auto_complete_for_tools_name', :as => :tool_list_autocomplete
   match '/expertise_list_autocomplete' => 'people#auto_complete_for_expertise_name', :as => :expertise_list_autocomplete
   match '/organism_list_autocomplete' => 'projects#auto_complete_for_organism_name', :as => :organism_list_autocomplete
-  match '/' => 'home#index'
-  match 'index.html' => 'home#index', :as => :match
-  match 'index' => 'home#index', :as => :match
+
+
   match '/signup' => 'users#new', :as => :signup
-  match '/login' => 'home#index', :as => :login
+
   match '/logout' => 'sessions#destroy', :as => :logout
   match '/activate/:activation_code' => 'users#activate', :activation_code => nil, :as => :activate
   match '/forgot_password' => 'users#forgot_password', :as => :forgot_password

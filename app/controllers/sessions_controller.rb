@@ -42,7 +42,7 @@ class SessionsController < ApplicationController
         redirect_back
       end
     rescue RedirectBackError
-      redirect :controller => :home, :action => :index
+      redirect :controller => :homes, :action => :index
     end
   end
 

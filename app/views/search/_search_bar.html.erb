@@ -3,7 +3,7 @@
 
 <% if logged_in? && !Person.admins.empty? -%>
   <% if Seek::Config.email_enabled %>
-    <%= image_tag_for_key("feedback",feedback_path,"Feedback",{:id=>"feedback"},"Provide Feedback") %>
+    <%= image_tag_for_key("feedback",feedback_home_path,"Feedback",{:id=>"feedback"},"Provide Feedback") %>
   <% else %>
     <span class="icon"><%= mail_to Person.admins.first.email, (image("feedback") + "Provide Feedback"), :cc => Person.admins[1..-1].collect{|a| a.email}.join(",") , :subject => "#{Seek::Config.application_name} feedback", :id => "feedback" %></span>
   <% end %>
