@@ -12,10 +12,16 @@ class AdminsControllerTest < ActionController::TestCase
     assert_response :success
   end
 
-  test "only admin can restart the server" do
-    login_as(:aaron)
+  test "non admin cannot restart the server" do
+    login_as(Factory(:user))
     post :restart_server
     assert_not_nil flash[:error]
+  end
+
+  test "admin can restart the server" do
+    login_as(Factory(:admin).user)
+    post :restart_server
+    assert_nil flash[:error]
   end
 
   test "get registration form" do
