@@ -16,11 +16,11 @@ class SessionsController < ApplicationController
   end
 
   def index    
-    redirect_to login_url
+    redirect_to root_path
   end
 
   def show
-    redirect_to login_url
+    redirect_to root_path
   end
 
   def create   
