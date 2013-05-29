@@ -23,13 +23,13 @@
     <% end %>
     <br/>
     <%= link_to(image('new', :title => "Insert image", :alt => "Insert image"), "#", :onclick => "insertAtCursor('help_document_body',\"!#{i.public_filename}!\"); return false;") %>
-    <%= link_to(image('destroy', :title => "Delete image", :alt => "Delete image"),
-                       :update => "images_list", 
+    <%= link_to_with_callbacks(image('destroy', :title => "Delete image", :alt => "Delete image"),
+                      {:update => "images_list",
                        :url => help_document_help_image_path(@help_document, i),
                        :confirm => 'Are you sure you wish to delete this image?', 
                        :method => :delete,
-                       :loading => "Element.show('image_spinner_#{i.id}')",
-                       :remote => true) %>
+                       :loading => "Element.show('image_spinner_#{i.id}')"},
+                      {:remote => true}) %>
     <%= image_tag "ajax-loader.gif", :id => "image_spinner_#{i.id}", :style => 'display:none;' -%>
   </div>
 <% end %>

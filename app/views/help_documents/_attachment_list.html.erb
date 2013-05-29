@@ -19,13 +19,13 @@
       <li>
         <%= link_to "#{a.filename} - #{a.title} (#{number_to_human_size(a.size)})", download_help_document_help_attachment_path(@help_document,a) -%>
         <%= link_to(image('new', :title => "Insert link to attachment", :alt => "Insert link to attachment"), "#", :onclick => "insertAtCursor('help_document_body',\"\\\"#{a.title || a.filename}\\\":#{download_help_document_help_attachment_path(@help_document, a)}\"); return false;") %>
-        <%= link_to(image('destroy', :title => "Delete attachment", :alt => "Delete attachment"),
-                           :update => "attachments_list", 
+        <%= link_to_with_callbacks(image('destroy', :title => "Delete attachment", :alt => "Delete attachment"),
+                          {:update => "attachments_list",
                            :url => help_document_help_attachment_path(@help_document, a),
                            :confirm => 'Are you sure you wish to delete this attachment?', 
                            :method => :delete,
-                           :loading => "Element.show('attachment_spinner_#{a.id}')",
-                           :remote => true) %>
+                           :loading => "Element.show('attachment_spinner_#{a.id}')"},
+                          {:remote => true}) %>
         <%= image_tag "ajax-loader.gif", :id => "attachment_spinner_#{a.id}", :style => 'display:none;' -%>
       </li>
     <% end %>
