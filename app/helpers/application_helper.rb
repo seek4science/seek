@@ -610,8 +610,10 @@ module ApplicationHelper
     return text.html_safe
   end
 
-  def link_to_with_callbacks name, options, html_options
-    link_to name, "#", html_options.merge(:onclick=> remote_function(options))
+  def link_to_with_callbacks name, options={}, html_options={}
+    html_options = html_options.merge(:onclick=> remote_function(options))
+    html_options = html_options.merge(:remote => true) if html_options[:remote].nil?
+    link_to name, "#", html_options
   end
 
   private  
