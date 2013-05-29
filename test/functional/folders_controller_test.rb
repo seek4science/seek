@@ -122,7 +122,7 @@ class FoldersControllerTest < ActionController::TestCase
   test "should not show when logged out" do
     logout
     get :index,:project_id=>@project.id
-    assert_redirected_to login_path
+    assert_redirected_to root_path
   end
 
   test "ajax request for folder contents" do

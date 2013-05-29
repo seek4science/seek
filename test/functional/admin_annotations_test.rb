@@ -6,7 +6,7 @@ class AdminAnnotationsTest < ActionController::TestCase
 
   include AuthenticatedTestHelper
 
-  tests AdminController
+  tests AdminsController
 
   test "editing tags visible to admin" do
     login_as(:quentin)

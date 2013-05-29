@@ -19,12 +19,12 @@ class SessionsControllerTest < ActionController::TestCase
 
   test "sessions#index redirects to session#new" do
     get :index
-    assert_redirected_to login_url
+    assert_redirected_to root_path
   end
 
-  test "session#show redirects to session#new" do
+  test "session#show redirects to root page" do
     get :show
-    assert_redirected_to login_url
+    assert_redirected_to root_path
   end
 
   def test_index_not_logged_in

@@ -1,9 +1,94 @@
 SEEK::Application.routes.draw do
-  root :to=>"home#index"
+  root :to=>"homes#index"
 
-  resources :attachments
+  resource :admin do
+    member do
+      get :show
+      get :tags
+      get :features_enabled
+      get :rebrand
+      get :home_settings
+      get :pagination
+      get :biosamples_renaming
+      get :others
+      get :get_stats
+      get :registration_form
+      get :restart_server
+      get :update_home_settings
+      post :get_stats
+      post :update_admins
+      post :update_rebrand
+      post :test_email_configuration
+      post :update_others
+      post :update_features_enabled
+      post :update_pagination
+      post :delete_tag
+      post :edit_tag
+    end
+  end
+
+  resource :home do
+    member do
+      get :index
+      get :feedback
+      post :send_feedback
+    end
+  end
+
+  match 'index.html' => 'homes#index', :as => :match
+  match 'index' => 'homes#index', :as => :match
+
+  resources :data_files do
+    collection do
+      post :test_asset_url
+      post :upload_for_tool
+      post :upload_from_email
+      get :preview
+      get :view_items_in_tab
+    end
+    member do
+      get :check_related_items
+      get :matching_models
+      get :data
+      get :check_gatekeeper_required
+      post :publish
+      get :plot
+      get :explore
+      post :request_resource
+      get :download
+      post :convert_to_presentation
+      post :update_annotations_ajax
+      get :published
+      get :approve_or_reject_publish
+      get :publish_related_items
+      post :gatekeeper_decide
+      post :new_version
+    end
+    resources :studied_factors do
+      collection do
+        post :create_from_existing
+      end
+
+
+    end
+
+    resources :content_blobs do
+
+      member do
+        get :view_pdf_content
+        get :get_pdf
+        get :download
+      end
+
+    end
+  end
+
   resources :presentations do
-
+    collection do
+      post :test_asset_url
+      get :preview
+      get :view_items_in_tab
+    end
     member do
       get :check_related_items
       get :check_gatekeeper_required
@@ -28,14 +113,120 @@ SEEK::Application.routes.draw do
     end
   end
 
+  resources :models do
+    collection do
+      get :build
+      get :preview
+      post :test_asset_url
+      get :view_items_in_tab
+      post :update_model_metadata
+      post :create_model_metadata
+    end
+    member do
+      get :builder
+      get :check_related_items
+      get :visualise
+      get :check_gatekeeper_required
+      post :publish
+      post :execute
+      post :request_resource
+      get :download
+      post :update_annotations_ajax
+      post :simulate
+      get :matching_data
+      get :published
+      post :export_as_xgmml
+      get :approve_or_reject_publish
+      get :publish_related_items
+      post :submit_to_jws
+      post :gatekeeper_decide
+      post :new_version
+      post :submit_to_sycamore
+    end
+    resources :model_images do
+      collection do
+        post :new
+      end
+      member do
+        post :select
+      end
+
+    end
+
+    resources :content_blobs do
+
+      member do
+        get :view_pdf_content
+        get :get_pdf
+        get :download
+      end
+
+    end
+  end
+
+  resources :avatars
+
+  resources :sops do
+    collection do
+      get :preview
+      post :test_asset_url
+      get :view_items_in_tab
+    end
+
+    member do
+      get :check_related_items
+      get :check_gatekeeper_required
+      post :publish
+      post :request_resource
+      get :download
+      post :update_annotations_ajax
+      get :published
+      get :approve_or_reject_publish
+      get :publish_related_items
+      post :gatekeeper_decide
+      post :new_version
+    end
+    resources :experimental_conditions do
+      collection do
+        post :create_from_existing
+      end
+    end
+
+    resources :content_blobs do
+      member do
+        get :view_pdf_content
+        get :get_pdf
+        get :download
+      end
+
+    end
+  end
+
+  resources :attachments
+
+
+
+  resource :policies do
+    member do
+      get :preview_permissions
+    end
+  end
+
   resources :subscriptions
   resources :specimens
   resources :samples
-  resources :events
+  resources :events do
+    collection do
+      get :preview
+    end
+  end
   resources :strains do
 
     member do
       post :update_annotations_ajax
+    end
+    collection do
+      get :existing_strains_for_assay_organism
     end
 
   end
@@ -43,6 +234,7 @@ SEEK::Application.routes.draw do
   resources :publications do
     collection do
       post :fetch_preview
+      get :preview
     end
     member do
       post :update_annotations_ajax
@@ -63,6 +255,9 @@ SEEK::Application.routes.draw do
 
     member do
       get :visualise
+    end
+    collection do
+      post :search_ajax
     end
 
   end
@@ -91,11 +286,16 @@ SEEK::Application.routes.draw do
       get :approve_or_reject_publish
       post :gatekeeper_decide
     end
+    collection do
+      post :investigation_selected_ajax
+    end
 
   end
 
   resources :assays do
-
+    collection do
+      get :preview
+    end
     member do
       post :update_annotations_ajax
       get :approve_or_reject_publish
@@ -115,50 +315,14 @@ SEEK::Application.routes.draw do
       get :existing_samples
       get :strain_form
       post :create_strain
+      post :create_strain_popup
+      post :edit_strain_popup
     end
 
 
   end
 
-  resources :data_files do
-    collection do
-      post :test_asset_url
-    end
-    member do
-      get :check_related_items
-      get :matching_models
-      get :data
-      get :check_gatekeeper_required
-      post :publish
-      get :plot
-      get :explore
-      post :request_resource
-      get :download
-      post :convert_to_presentation
-      post :update_annotations_ajax
-      get :published
-      get :approve_or_reject_publish
-      get :publish_related_items
-      post :gatekeeper_decide
-    end
-    resources :studied_factors do
-      collection do
-        post :create_from_existing
-      end
 
-
-    end
-
-    resources :content_blobs do
-
-      member do
-        get :view_pdf_content
-        get :get_pdf
-        get :download
-      end
-
-    end
-  end
 
   resources :spreadsheet_annotations, :only => [:create, :destroy, :update]
   resources :uuids
@@ -175,49 +339,7 @@ SEEK::Application.routes.draw do
     end
   end
 
-  resources :models do
-    collection do
-      get :build
-    end
-    member do
-      get :builder
-      get :check_related_items
-      get :visualise
-      get :check_gatekeeper_required
-      post :publish
-      post :execute
-      post :request_resource
-      get :download
-      post :update_annotations_ajax
-      post :simulate
-      get :matching_data
-      get :published
-      post :export_as_xgmml
-      get :approve_or_reject_publish
-      get :publish_related_items
-      post :submit_to_jws
-      post :gatekeeper_decide
-    end
-    resources :model_images do
-      collection do
-        post :new
-      end
-      member do
-        post :select
-      end
 
-    end
-
-    resources :content_blobs do
-
-      member do
-        get :view_pdf_content
-        get :get_pdf
-        get :download
-      end
-
-    end
-  end
 
   resources :people do
     collection do
@@ -232,6 +354,7 @@ SEEK::Application.routes.draw do
       get :published
       get :batch_publishing_preview
       get :publish_related_items
+      put :administer_update
     end
     resources :avatars do
       member do
@@ -244,6 +367,7 @@ SEEK::Application.routes.draw do
   resources :projects do
     collection do
       get :request_institutions
+      get :view_items_in_tab
     end
     member do
       get :asset_report
@@ -265,44 +389,14 @@ SEEK::Application.routes.draw do
         post :display_contents
         post :move_asset_to
         post :create_folder
+        post :set_project_folder_title
+        post :set_project_folder_description
       end
 
     end
   end
 
-  resources :sops do
 
-    member do
-      get :check_related_items
-      get :check_gatekeeper_required
-      post :publish
-      post :request_resource
-      get :download
-      post :update_annotations_ajax
-      get :published
-      get :approve_or_reject_publish
-      get :publish_related_items
-      post :gatekeeper_decide
-      post :new_version
-    end
-    resources :experimental_conditions do
-      collection do
-        post :create_from_existing
-      end
-
-
-    end
-
-    resources :content_blobs do
-
-      member do
-        get :view_pdf_content
-        get :get_pdf
-        get :download
-      end
-
-    end
-  end
 
   resources :users do
     collection do
@@ -374,12 +468,8 @@ SEEK::Application.routes.draw do
   match '/tags/:id' => 'tags#show', :as => :show_ann
   match '/jerm/' => 'jerm#index', :as => :jerm
   match '/countries/:country_name' => 'countries#show', :as => :country
-  match '/admin/' => 'admin#show', :as => :admin
-  match '/admin/registration_form' => 'admin#registration_form', :as => :registration_form
+
   match '/data_fuse/' => 'data_fuse#show', :as => :data_fuse
-  match '/home/feedback' => 'home#feedback', :as => :feedback, :method => :get
-  match '/home/send_feedback' => 'home#send_feedback', :as => :send_feedback, :method => :post
-  match 'home/seek_intro_demo' => 'home#seek_intro_demo', :as => :seek_intro_demo, :method => :get
   match '/favourite_groups/new' => 'favourite_groups#new', :as => :new_favourite_group, :via => :post
   match '/favourite_groups/create' => 'favourite_groups#create', :as => :create_favourite_group, :via => :post
   match '/favourite_groups/edit' => 'favourite_groups#edit', :as => :edit_favourite_group, :via => :post
@@ -392,14 +482,16 @@ SEEK::Application.routes.draw do
   match '/tool_list_autocomplete' => 'people#auto_complete_for_tools_name', :as => :tool_list_autocomplete
   match '/expertise_list_autocomplete' => 'people#auto_complete_for_expertise_name', :as => :expertise_list_autocomplete
   match '/organism_list_autocomplete' => 'projects#auto_complete_for_organism_name', :as => :organism_list_autocomplete
-  match '/' => 'home#index'
-  match 'index.html' => 'home#index', :as => :match
-  match 'index' => 'home#index', :as => :match
+
+
   match '/signup' => 'users#new', :as => :signup
-  match '/login' => 'home#index', :as => :login
+
   match '/logout' => 'sessions#destroy', :as => :logout
   match '/activate/:activation_code' => 'users#activate', :activation_code => nil, :as => :activate
   match '/forgot_password' => 'users#forgot_password', :as => :forgot_password
   match '/policies/request_settings' => 'policies#send_policy_data', :as => :request_policy_settings
-  match '/:controller(/:action(/:id))'
+
+  # This is a legacy wild controller route that's not recommended for RESTful applications.
+  # Note: This route will make all actions in every controller accessible via GET requests.
+  # match ':controller(/:action(/:id))(.:format)'
 end

@@ -1,4 +1,4 @@
-class AdminController < ApplicationController
+class AdminsController < ApplicationController
   include CommonSweepers
 
   RESTART_MSG = "You settings have been updated. If you enabled search you need to restart your server.
@@ -286,19 +286,19 @@ class AdminController < ApplicationController
     respond_to do |format|
       case type
         when "invalid_users"
-          format.html { render :partial => "admin/invalid_user_stats_list", :locals => { :collection => collection} }          
+          format.html { render :partial => "admins/invalid_user_stats_list", :locals => { :collection => collection} }
         when "users"
-          format.html { render :partial => "admin/user_stats_list", :locals => { :title => title, :collection => collection} }
+          format.html { render :partial => "admins/user_stats_list", :locals => { :title => title, :collection => collection} }
         when "content_stats"
-          format.html { render :partial => "admin/content_stats", :locals => {:stats => Seek::ContentStats.generate} }
+          format.html { render :partial => "admins/content_stats", :locals => {:stats => Seek::ContentStats.generate} }
         when "activity_stats"
-          format.html { render :partial => "admin/activity_stats", :locals => {:stats => Seek::ActivityStats.new} }
+          format.html { render :partial => "admins/activity_stats", :locals => {:stats => Seek::ActivityStats.new} }
         when "search_stats"
-          format.html { render :partial => "admin/search_stats", :locals => {:stats => Seek::SearchStats.new} }
+          format.html { render :partial => "admins/search_stats", :locals => {:stats => Seek::SearchStats.new} }
         when "job_queue"
-          format.html { render :partial => "admin/job_queue" }
+          format.html { render :partial => "admins/job_queue" }
         when "auth_consistency"
-          format.html { render :partial => "admin/auth_consistency" }
+          format.html { render :partial => "admins/auth_consistency" }
         when "none"
           format.html { render :text=>"" }
       end

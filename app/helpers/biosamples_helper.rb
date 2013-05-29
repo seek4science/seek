@@ -1,7 +1,7 @@
 module BiosamplesHelper
   def create_strain_popup_link
      return link_to_remote_redbox(image_tag("famfamfam_silk/add.png") + 'Create new strain',
-      { :url => url_for(:controller => 'biosamples', :action => 'create_strain_popup') ,
+      { :url => create_strain_popup_biosamples_path ,
         :failure => "alert('Sorry, an error has occurred.'); RedBox.close();",
         :with => "'strain_id=' + getSelectedStrains()+'&organism_ids='+$F('strain_organism_ids')",
         :condition => "checkSelectOneStrain()"
@@ -20,14 +20,14 @@ module BiosamplesHelper
   def edit_strain_popup_link strain
     if strain.can_manage?
       return link_to_remote_redbox(image_tag("famfamfam_silk/wrench.png"),
-                                   {:url => url_for(:controller => 'biosamples', :action => 'edit_strain_popup'),
+                                   {:url => edit_strain_popup_biosamples_path,
                                     :failure => "alert('Sorry, an error has occurred.'); RedBox.close();",
                                     :with => "'strain_id=' + #{strain.id}"
                                    },
                                    :title => "Manage this strain")
     elsif strain.can_edit?
       return link_to_remote_redbox(image_tag("famfamfam_silk/page_white_edit.png"),
-                                   {:url => url_for(:controller => 'biosamples', :action => 'edit_strain_popup'),
+                                   {:url => edit_strain_popup_biosamples_path,
                                     :failure => "alert('Sorry, an error has occurred.'); RedBox.close();",
                                     :with => "'strain_id=' + #{strain.id}"
                                    },

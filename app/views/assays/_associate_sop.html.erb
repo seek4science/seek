@@ -26,7 +26,7 @@
         <%= select_tag :possible_sops,
                        options_for_select([["Select SOP ...", 0]]|project_sops.collect{|s| [truncate(h(s.title), :length=>select_truncate_length), s.id]}),
                        {:style=>"width:90%",:onchange=>remote_function(
-                               :url=>{:action=>"preview", :controller=>"sops",:element=>"sop_preview"},
+                               :url=>preview_sops_path(:element=>"sop_preview"),
                                :with=>"'id='+this.value",
                                :before=>"show_ajax_loader('sop_preview')"
                        )+";check_show_add_sop();return(false);"

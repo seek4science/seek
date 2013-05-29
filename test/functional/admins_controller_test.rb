@@ -1,6 +1,6 @@
 require 'test_helper'
 
-class AdminControllerTest < ActionController::TestCase
+class AdminsControllerTest < ActionController::TestCase
 
   fixtures :all
 

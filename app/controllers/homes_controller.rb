@@ -1,4 +1,4 @@
-class HomeController < ApplicationController
+class HomesController < ApplicationController
   
 
   before_filter :redirect_to_sign_up_when_no_user

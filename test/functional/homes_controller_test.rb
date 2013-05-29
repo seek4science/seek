@@ -1,10 +1,10 @@
 require 'test_helper'
 
-class HomeControllerTest < ActionController::TestCase
+class HomesControllerTest < ActionController::TestCase
   fixtures :all
 
   include AuthenticatedTestHelper
-  include HomeHelper
+  include HomesHelper
 
   test "test should be accessible to seek even if not logged in" do
     get :index
@@ -19,7 +19,7 @@ class HomeControllerTest < ActionController::TestCase
 
   test "correct response to unknown action" do
     login_as(:quentin)
-    assert_raises AbstractController::ActionNotFound do
+    assert_raises ActionController::RoutingError do
       get :sdjgsdfjg
     end
   end
@@ -180,9 +180,9 @@ class HomeControllerTest < ActionController::TestCase
   end
 
   test "should handle index html" do
-    assert_routing("/",{:controller=>"home",:action=>"index"})
-    assert_recognizes({:controller=>"home",:action=>"index"},"/index.html")
-    assert_recognizes({:controller=>"home",:action=>"index"},"/index")
+    assert_routing("/",{:controller=>"homes",:action=>"index"})
+    assert_recognizes({:controller=>"homes",:action=>"index"},"/index.html")
+    assert_recognizes({:controller=>"homes",:action=>"index"},"/index")
   end
 
   test "should show the content of project news and community news with the configurable number of entries" do
