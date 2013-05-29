@@ -1,5 +1,8 @@
 SEEK::Application.routes.draw do
-  root :to=>"homes#index"
+
+  ### GENERAL PAGES ###
+
+  root :to => "homes#index"
 
   resource :admin do
     member do
@@ -38,308 +41,67 @@ SEEK::Application.routes.draw do
   match 'index.html' => 'homes#index', :as => :match
   match 'index' => 'homes#index', :as => :match
 
-  resources :data_files do
+  resource :favourites do
     collection do
-      post :test_asset_url
-      post :upload_for_tool
-      post :upload_from_email
-      get :preview
-      get :view_items_in_tab
+      post :add
     end
     member do
-      get :check_related_items
-      get :matching_models
-      get :data
-      get :check_gatekeeper_required
-      post :publish
-      get :plot
-      get :explore
-      post :request_resource
-      get :download
-      post :convert_to_presentation
-      post :update_annotations_ajax
-      get :published
-      get :approve_or_reject_publish
-      get :publish_related_items
-      post :gatekeeper_decide
-      post :new_version
-    end
-    resources :studied_factors do
-      collection do
-        post :create_from_existing
-      end
-
-
-    end
-
-    resources :content_blobs do
-
-      member do
-        get :view_pdf_content
-        get :get_pdf
-        get :download
-      end
-
+      delete :delete
     end
   end
 
-  resources :presentations do
-    collection do
-      post :test_asset_url
-      get :preview
-      get :view_items_in_tab
-    end
-    member do
-      get :check_related_items
-      get :check_gatekeeper_required
-      post :publish
-      post :request_resource
-      get :download
-      post :update_annotations_ajax
-      get :published
-      get :approve_or_reject_publish
-      get :publish_related_items
-      post :gatekeeper_decide
-      post :new_version
-    end
-    resources :content_blobs do
-
+  resources :help_documents do
+    resources :help_attachments, :only => [:create, :destroy] do
       member do
-        get :view_pdf_content
-        get :get_pdf
         get :download
       end
-
     end
+    resources :help_images, :only => [:create, :destroy]
   end
 
-  resources :models do
-    collection do
-      get :build
-      get :preview
-      post :test_asset_url
-      get :view_items_in_tab
-      post :update_model_metadata
-      post :create_model_metadata
-    end
+  resources :forum_attachments, :only => [:create, :destroy] do
     member do
-      get :builder
-      get :check_related_items
-      get :visualise
-      get :check_gatekeeper_required
-      post :publish
-      post :execute
-      post :request_resource
       get :download
-      post :update_annotations_ajax
-      post :simulate
-      get :matching_data
-      get :published
-      post :export_as_xgmml
-      get :approve_or_reject_publish
-      get :publish_related_items
-      post :submit_to_jws
-      post :gatekeeper_decide
-      post :new_version
-      post :submit_to_sycamore
-    end
-    resources :model_images do
-      collection do
-        post :new
-      end
-      member do
-        post :select
-      end
-
-    end
-
-    resources :content_blobs do
-
-      member do
-        get :view_pdf_content
-        get :get_pdf
-        get :download
-      end
-
     end
   end
 
   resources :avatars
-
-  resources :sops do
-    collection do
-      get :preview
-      post :test_asset_url
-      get :view_items_in_tab
-    end
-
-    member do
-      get :check_related_items
-      get :check_gatekeeper_required
-      post :publish
-      post :request_resource
-      get :download
-      post :update_annotations_ajax
-      get :published
-      get :approve_or_reject_publish
-      get :publish_related_items
-      post :gatekeeper_decide
-      post :new_version
-    end
-    resources :experimental_conditions do
-      collection do
-        post :create_from_existing
-      end
-    end
-
-    resources :content_blobs do
-      member do
-        get :view_pdf_content
-        get :get_pdf
-        get :download
-      end
-
-    end
-  end
-
   resources :attachments
-
-
-
-  resource :policies do
-    member do
-      get :preview_permissions
-    end
-  end
-
   resources :subscriptions
-  resources :specimens
-  resources :samples
-  resources :events do
-    collection do
-      get :preview
-    end
-  end
-  resources :strains do
-
-    member do
-      post :update_annotations_ajax
-    end
-    collection do
-      get :existing_strains_for_assay_organism
-    end
-
-  end
-
-  resources :publications do
-    collection do
-      post :fetch_preview
-      get :preview
-    end
-    member do
-      post :update_annotations_ajax
-      post :disassociate_authors
-    end
-
-  end
-
-  resources :assay_types do
-    collection do
-      get :manage
-    end
-
-
-  end
-
-  resources :organisms do
-
-    member do
-      get :visualise
-    end
-    collection do
-      post :search_ajax
-    end
-
-  end
-
-  resources :technology_types do
-    collection do
-      get :manage
-    end
-
-
-  end
-
   resources :measured_items
-  resources :investigations do
-
-    member do
-      get :approve_or_reject_publish
-      post :gatekeeper_decide
-    end
-
-  end
-
-  resources :studies do
-
-    member do
-      get :approve_or_reject_publish
-      post :gatekeeper_decide
-    end
-    collection do
-      post :investigation_selected_ajax
-    end
-
-  end
-
-  resources :assays do
-    collection do
-      get :preview
-    end
-    member do
-      post :update_annotations_ajax
-      get :approve_or_reject_publish
-      post :gatekeeper_decide
-    end
-
-  end
-
   resources :saved_searches
-  resources :biosamples do
-    collection do
-      put :update_strain
-      get :existing_strains
-      post :create_specimen_sample
-      get :existing_specimens
-      get :strains_of_selected_organism
-      get :existing_samples
-      get :strain_form
-      post :create_strain
-      post :create_strain_popup
-      post :edit_strain_popup
-    end
-
-
-  end
-
-
-
-  resources :spreadsheet_annotations, :only => [:create, :destroy, :update]
   resources :uuids
-  resources :institutions do
+  resources :compounds
+
+  ### USERS AND SESSIONS ###
+
+  resources :users do
     collection do
-      get :request_all
+      get :activation_required
+      get :forgot_password
+      get :reset_password
+      post :forgot_password
+      post :hide_guide_box
+      post :impersonate
     end
-
-    resources :avatars do
-      member do
-        post :select
-      end
-
+    member do
+      put :set_openid
     end
   end
 
+  resource :session do
+    collection do
+      get :index
+      get :show
+      get :auto_openid
+    end
+    member do
+      get :show
+    end
 
+  end
+
+  ### YELLOW PAGES ###
 
   resources :people do
     collection do
@@ -349,18 +111,17 @@ SEEK::Application.routes.draw do
     member do
       get :check_related_items
       get :check_gatekeeper_required
-      post :publish
       get :admin
       get :published
       get :batch_publishing_preview
       get :publish_related_items
       put :administer_update
+      post :publish
     end
     resources :avatars do
       member do
         post :select
       end
-
     end
   end
 
@@ -379,7 +140,6 @@ SEEK::Application.routes.draw do
       end
 
     end
-
     resources :folders do
       collection do
         post :nuke
@@ -392,72 +152,279 @@ SEEK::Application.routes.draw do
         post :set_project_folder_title
         post :set_project_folder_description
       end
-
     end
   end
 
-
-
-  resources :users do
+  resources :institutions do
     collection do
-      get :activation_required
-      get :forgot_password
-      post :forgot_password
-      get :reset_password
-      post :hide_guide_box
-      post :impersonate
+      get :request_all
     end
-    member do
-      put :set_openid
-    end
-
-  end
-
-  resource :session do
-    collection do
-      get :index
-      get :show
-      get :auto_openid
-    end
-    member do
-      get :show
-    end
-
-  end
-
-  resource :favourites do
-    collection do
-      post :add
-    end
-    member do
-      delete :delete
-    end
-
-  end
-
-  resources :help_documents do
-
-
-    resources :help_attachments, :only => [:create, :destroy] do
-
+    resources :avatars do
       member do
+        post :select
+      end
+    end
+  end
+
+  ### ISA ###
+
+  resources :investigations do
+    member do
+      get :approve_or_reject_publish
+      post :gatekeeper_decide
+    end
+  end
+
+  resources :studies do
+    member do
+      get :approve_or_reject_publish
+      post :gatekeeper_decide
+    end
+    collection do
+      post :investigation_selected_ajax
+    end
+  end
+
+  resources :assays do
+    collection do
+      get :preview
+    end
+    member do
+      get :approve_or_reject_publish
+      post :gatekeeper_decide
+      post :update_annotations_ajax
+    end
+  end
+
+  resources :assay_types do
+    collection do
+      get :manage
+    end
+  end
+
+  resources :technology_types do
+    collection do
+      get :manage
+    end
+  end
+
+  ### ASSETS ###
+
+  resources :data_files do
+    collection do
+      get :preview
+      get :view_items_in_tab
+      post :test_asset_url
+      post :upload_for_tool
+      post :upload_from_email
+    end
+    member do
+      get :check_related_items
+      get :matching_models
+      get :data
+      get :check_gatekeeper_required
+      get :plot
+      get :explore
+      get :download
+      get :published
+      get :approve_or_reject_publish
+      get :publish_related_items
+      post :publish
+      post :request_resource
+      post :convert_to_presentation
+      post :update_annotations_ajax
+      post :gatekeeper_decide
+      post :new_version
+    end
+    resources :studied_factors do
+      collection do
+        post :create_from_existing
+      end
+    end
+    resources :content_blobs do
+      member do
+        get :view_pdf_content
+        get :get_pdf
         get :download
       end
-
     end
-
-    resources :help_images, :only => [:create, :destroy]
   end
 
-  resources :forum_attachments, :only => [:create, :destroy] do
-
+  resources :presentations do
+    collection do
+      get :preview
+      get :view_items_in_tab
+      post :test_asset_url
+    end
     member do
+      get :check_related_items
+      get :check_gatekeeper_required
       get :download
+      get :published
+      get :approve_or_reject_publish
+      get :publish_related_items
+      post :publish
+      post :request_resource
+      post :update_annotations_ajax
+      post :gatekeeper_decide
+      post :new_version
+    end
+    resources :content_blobs do
+      member do
+        get :view_pdf_content
+        get :get_pdf
+        get :download
+      end
+    end
+  end
+
+  resources :models do
+    collection do
+      get :build
+      get :preview
+      get :view_items_in_tab
+      post :update_model_metadata
+      post :create_model_metadata
+      post :test_asset_url
+    end
+    member do
+      get :builder
+      get :check_related_items
+      get :visualise
+      get :check_gatekeeper_required
+      get :download
+      get :matching_data
+      get :published
+      get :approve_or_reject_publish
+      get :publish_related_items
+      post :submit_to_jws
+      post :gatekeeper_decide
+      post :new_version
+      post :submit_to_sycamore
+      post :export_as_xgmml
+      post :update_annotations_ajax
+      post :simulate
+      post :publish
+      post :execute
+      post :request_resource
+    end
+    resources :model_images do
+      collection do
+        post :new
+      end
+      member do
+        post :select
+      end
+    end
+    resources :content_blobs do
+      member do
+        get :view_pdf_content
+        get :get_pdf
+        get :download
+      end
+    end
+  end
+
+  resources :sops do
+    collection do
+      get :preview
+      get :view_items_in_tab
+      post :test_asset_url
+    end
+    member do
+      get :check_related_items
+      get :check_gatekeeper_required
+      get :download
+      get :published
+      get :approve_or_reject_publish
+      get :publish_related_items
+      post :publish
+      post :request_resource
+      post :update_annotations_ajax
+      post :gatekeeper_decide
+      post :new_version
+    end
+    resources :experimental_conditions do
+      collection do
+        post :create_from_existing
+      end
+    end
+    resources :content_blobs do
+      member do
+        get :view_pdf_content
+        get :get_pdf
+        get :download
+      end
+    end
+  end
+
+  resources :publications do
+    collection do
+      get :preview
+      post :fetch_preview
+    end
+    member do
+      post :update_annotations_ajax
+      post :disassociate_authors
+    end
+  end
+
+  resources :events do
+    collection do
+      get :preview
+    end
+  end
+
+  resource :policies do
+    member do
+      get :preview_permissions
+    end
+  end
+
+  resources :spreadsheet_annotations, :only => [:create, :destroy, :update]
+
+  ### BIOSAMPLES AND ORGANISMS ###
+
+  resources :specimens
+  resources :samples
+
+  resources :strains do
+    member do
+      post :update_annotations_ajax
+    end
+    collection do
+      get :existing_strains_for_assay_organism
     end
 
   end
 
-  resources :compounds
+  resources :biosamples do
+    collection do
+      get :existing_strains
+      get :existing_specimens
+      get :strains_of_selected_organism
+      get :existing_samples
+      get :strain_form
+      put :update_strain
+      post :create_specimen_sample
+      post :create_strain
+      post :create_strain_popup
+      post :edit_strain_popup
+    end
+  end
+
+  resources :organisms do
+    member do
+      get :visualise
+    end
+    collection do
+      post :search_ajax
+    end
+  end
+
+
+  ### MISC MATCHES ###
+
   match '/search/' => 'search#index', :as => :search
   match '/search/save' => 'search#save', :as => :save_search
   match '/search/delete' => 'search#delete', :as => :delete_search
