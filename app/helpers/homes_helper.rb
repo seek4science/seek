@@ -4,6 +4,9 @@ module HomesHelper
 
   RECENT_SIZE=5
 
+  def home_description_text
+    simple_format(auto_link(Seek::Config.home_description.html_safe,:sanitize=>false),{},:sanitize=>false)
+  end
 
   def recent_project_changes_hash
 
