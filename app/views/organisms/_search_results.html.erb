@@ -1,5 +1,5 @@
-<%= form_tag :url=>search_ajax_organisms_path,
-             :before=>"show_ajax_loader('search_results');", :remote => true do -%>
+<%= form_tag(search_ajax_organisms_path,
+             {:before=>"show_ajax_loader('search_results');", :remote => true}) do -%>
     <%= hidden_field_tag :pagenum, 1 -%>
     <p>
       <label>Search for:</label><br/>
@@ -13,7 +13,7 @@
                      :before=>"show_ajax_loader('search_results');"},
                     {:remote => true} unless pagenum.to_i <= 1 -%>
       <%= "Page #{pagenum.to_s}  of #{pages.to_s}" -%>
-      <%= link_to image("arrow_right"),
+      <%= link_to_with_callbacks image("arrow_right"),
                   {:url=>url_for(:action=>:search_ajax, :controller=>:organisms, :pagenum=>pagenum.to_i+1, :search_term=>search_term),
                    :before=>"show_ajax_loader('search_results');"},
                   {:remote => true} unless pagenum.to_i >= pages.to_i -%>

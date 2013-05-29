@@ -5,7 +5,7 @@ new_with_errors=new_resources.select{|r| !r.error.nil?}
 new_resources=new_resources - new_with_errors
 duplicate_resources=fetch_results.select{|r| r.duplicate} %>
 <%= "Harvested #{fetch_results.size} results" %>
-<%= form_tag :url=>url_for(:controller => "jerm", :action => "insert_results"),:before=>"harvester_initiated();", :remote => true do -%>
+<%= form_tag( {url_for(:controller => "jerm", :action => "insert_results")},{:before=>"harvester_initiated();", :remote => true}) do -%>
 <%= hidden_field_tag :project,@project.id %>
 <h2>New</h2>
 <table class="jerm_results">

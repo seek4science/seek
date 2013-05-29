@@ -7,8 +7,8 @@
                      :failure => "$j('#spreadsheet_errors').show();",
                      :loading => "$j('#spinner" + annotation.id.to_s + "').show();",
                      :complete => "$j('#spinner" + annotation.id.to_s + "').hide();",
-                     :html => {:id => "annotation_form"},
-                     :remote => true) do %>
+                     :html => {:id => "annotation_form", :remote => true}) do %>
+
       <div class="annotation_content">
         <div class="annotation_avatar">
           <%= avatar(annotation.source.person, 24) -%>
