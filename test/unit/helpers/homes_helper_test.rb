@@ -1,6 +1,6 @@
 require 'test_helper'
 
-class HomeHelperTest < ActionView::TestCase
+class HomesHelperTest < ActionView::TestCase
 
   test "should retrieve recently added/downloaded items in the chronological order" do
     n = 5
