@@ -310,6 +310,8 @@ SEEK::Application.routes.draw do
       get :existing_samples
       get :strain_form
       post :create_strain
+      post :create_strain_popup
+      post :edit_strain_popup
     end
 
 
