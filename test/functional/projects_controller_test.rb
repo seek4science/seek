@@ -407,13 +407,13 @@ class ProjectsControllerTest < ActionController::TestCase
 
 	test "non admin cannot administer project" do
 		login_as(:pal_user)
-		get :admins,:id=>projects(:sysmo_project)
+		get :admin,:id=>projects(:sysmo_project)
 		assert_response :redirect
 		assert_not_nil flash[:error]
 	end
 
 	test "admin can administer project" do
-		get :admins,:id=>projects(:sysmo_project)
+		get :admin,:id=>projects(:sysmo_project)
 		assert_response :success
 		assert_nil flash[:error]
 	end
@@ -476,7 +476,7 @@ class ProjectsControllerTest < ActionController::TestCase
     assert_response :success
     assert_select "a", :text => /Project administration/, :count => 1
 
-    get :admins, :id => project
+    get :admin, :id => project
     assert_response :success
 
     new_institution = Institution.create(:name => 'a test institution')
@@ -496,7 +496,7 @@ class ProjectsControllerTest < ActionController::TestCase
     assert_response :success
     assert_select "a", :text => /Project administration/, :count => 0
 
-    get :admins, :id => a_project
+    get :admin, :id => a_project
     assert_redirected_to :root
     assert_not_nil flash[:error]
 
@@ -517,7 +517,7 @@ class ProjectsControllerTest < ActionController::TestCase
     a_project = Factory(:project)
     a_project.institutions << Factory(:institution)
 
-    get :admins, :id => project
+    get :admin, :id => project
     assert_response :success
     assert_select "select#project_institution_ids", :count => 1 do
       (project.institutions + [new_institution]).each do |institution|

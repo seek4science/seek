@@ -337,7 +337,6 @@ SEEK::Application.routes.draw do
       get :check_related_items
       get :check_gatekeeper_required
       post :publish
-      get :admins
       get :admin
       get :published
       get :batch_publishing_preview
@@ -355,10 +354,11 @@ SEEK::Application.routes.draw do
   resources :projects do
     collection do
       get :request_institutions
+      get :view_items_in_tab
     end
     member do
       get :asset_report
-      get :admins
+      get :admin
     end
     resources :avatars do
       member do
