@@ -50,14 +50,15 @@ SEEK::Application.routes.draw do
     end
   end
 
-  resources :help_documents do
-    resources :help_attachments, :only => [:create, :destroy] do
-      member do
-        get :download
-      end
+  resources :help_documents
+
+  resources :help_attachments, :only => [:create, :destroy] do
+    member do
+      get :download
     end
-    resources :help_images, :only => [:create, :destroy]
+
   end
+  resources :help_images, :only => [:create, :destroy]
 
   resources :forum_attachments, :only => [:create, :destroy] do
     member do
@@ -450,7 +451,6 @@ SEEK::Application.routes.draw do
   match '/tool_list_autocomplete' => 'people#auto_complete_for_tools_name', :as => :tool_list_autocomplete
   match '/expertise_list_autocomplete' => 'people#auto_complete_for_expertise_name', :as => :expertise_list_autocomplete
   match '/organism_list_autocomplete' => 'projects#auto_complete_for_organism_name', :as => :organism_list_autocomplete
-
 
   match '/signup' => 'users#new', :as => :signup
 
