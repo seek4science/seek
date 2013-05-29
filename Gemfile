@@ -88,6 +88,7 @@ group :development do
   gem "pry-doc"
   gem 'ruby18_source_location'
   gem "pry-remote"
+  gem "request-log-analyzer"
 end
 
 group :test do

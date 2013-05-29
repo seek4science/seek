@@ -281,6 +281,7 @@ GEM
       rdf (>= 0.3.4)
     rdoc (3.12.2)
       json (~> 1.4)
+    request-log-analyzer (1.12.9)
     rest-client (1.6.7)
       mime-types (>= 1.16)
     rmagick (2.12.2)
@@ -398,6 +399,7 @@ DEPENDENCIES
   rdf-rdfxml (>= 0.3.8)
   rdoc
   redbox!
+  request-log-analyzer
   rest-client (>= 1.6.1)
   rmagick (= 2.12.2)
   rubaidh-google_analytics (~> 1.1.4)
