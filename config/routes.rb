@@ -40,7 +40,10 @@ SEEK::Application.routes.draw do
 
   resources :attachments
   resources :presentations do
-
+    collection do
+      post :test_asset_url
+      get :preview
+    end
     member do
       get :check_related_items
       get :check_gatekeeper_required
@@ -227,6 +230,7 @@ SEEK::Application.routes.draw do
     collection do
       get :build
       get :preview
+      post :test_asset_url
     end
     member do
       get :builder
@@ -336,6 +340,7 @@ SEEK::Application.routes.draw do
     end
     collection do
       get :preview
+      post :test_asset_url
     end
     resources :experimental_conditions do
       collection do
