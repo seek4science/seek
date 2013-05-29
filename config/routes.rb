@@ -38,7 +38,51 @@ SEEK::Application.routes.draw do
   match 'index.html' => 'homes#index', :as => :match
   match 'index' => 'homes#index', :as => :match
 
-  resources :attachments
+  resources :data_files do
+    collection do
+      post :test_asset_url
+      post :upload_for_tool
+      post :upload_from_email
+      get :preview
+      get :view_items_in_tab
+    end
+    member do
+      get :check_related_items
+      get :matching_models
+      get :data
+      get :check_gatekeeper_required
+      post :publish
+      get :plot
+      get :explore
+      post :request_resource
+      get :download
+      post :convert_to_presentation
+      post :update_annotations_ajax
+      get :published
+      get :approve_or_reject_publish
+      get :publish_related_items
+      post :gatekeeper_decide
+      post :new_version
+    end
+    resources :studied_factors do
+      collection do
+        post :create_from_existing
+      end
+
+
+    end
+
+    resources :content_blobs do
+
+      member do
+        get :view_pdf_content
+        get :get_pdf
+        get :download
+      end
+
+    end
+  end
+
   resources :presentations do
     collection do
       post :test_asset_url
@@ -68,6 +112,95 @@ SEEK::Application.routes.draw do
     end
   end
 
+  resources :models do
+    collection do
+      get :build
+      get :preview
+      post :test_asset_url
+    end
+    member do
+      get :builder
+      get :check_related_items
+      get :visualise
+      get :check_gatekeeper_required
+      post :publish
+      post :execute
+      post :request_resource
+      get :download
+      post :update_annotations_ajax
+      post :simulate
+      get :matching_data
+      get :published
+      post :export_as_xgmml
+      get :approve_or_reject_publish
+      get :publish_related_items
+      post :submit_to_jws
+      post :gatekeeper_decide
+      post :new_version
+    end
+    resources :model_images do
+      collection do
+        post :new
+      end
+      member do
+        post :select
+      end
+
+    end
+
+    resources :content_blobs do
+
+      member do
+        get :view_pdf_content
+        get :get_pdf
+        get :download
+      end
+
+    end
+  end
+
+  resources :sops do
+
+    member do
+      get :check_related_items
+      get :check_gatekeeper_required
+      post :publish
+      post :request_resource
+      get :download
+      post :update_annotations_ajax
+      get :published
+      get :approve_or_reject_publish
+      get :publish_related_items
+      post :gatekeeper_decide
+      post :new_version
+    end
+    collection do
+      get :preview
+      post :test_asset_url
+    end
+    resources :experimental_conditions do
+      collection do
+        post :create_from_existing
+      end
+
+
+    end
+
+    resources :content_blobs do
+
+      member do
+        get :view_pdf_content
+        get :get_pdf
+        get :download
+      end
+
+    end
+  end
+
+  resources :attachments
+
+
+
   resource :policies do
     member do
       get :preview_permissions
@@ -77,7 +210,11 @@ SEEK::Application.routes.draw do
   resources :subscriptions
   resources :specimens
   resources :samples
-  resources :events
+  resources :events do
+    collection do
+      get :preview
+    end
+  end
   resources :strains do
 
     member do
@@ -145,7 +282,9 @@ SEEK::Application.routes.draw do
   end
 
   resources :assays do
-
+    collection do
+      get :preview
+    end
     member do
       post :update_annotations_ajax
       get :approve_or_reject_publish
@@ -170,46 +309,7 @@ SEEK::Application.routes.draw do
 
   end
 
-  resources :data_files do
-    collection do
-      post :test_asset_url
-      get :preview
-    end
-    member do
-      get :check_related_items
-      get :matching_models
-      get :data
-      get :check_gatekeeper_required
-      post :publish
-      get :plot
-      get :explore
-      post :request_resource
-      get :download
-      post :convert_to_presentation
-      post :update_annotations_ajax
-      get :published
-      get :approve_or_reject_publish
-      get :publish_related_items
-      post :gatekeeper_decide
-    end
-    resources :studied_factors do
-      collection do
-        post :create_from_existing
-      end
 
-
-    end
-
-    resources :content_blobs do
-
-      member do
-        get :view_pdf_content
-        get :get_pdf
-        get :download
-      end
-
-    end
-  end
 
   resources :spreadsheet_annotations, :only => [:create, :destroy, :update]
   resources :uuids
@@ -226,51 +326,7 @@ SEEK::Application.routes.draw do
     end
   end
 
-  resources :models do
-    collection do
-      get :build
-      get :preview
-      post :test_asset_url
-    end
-    member do
-      get :builder
-      get :check_related_items
-      get :visualise
-      get :check_gatekeeper_required
-      post :publish
-      post :execute
-      post :request_resource
-      get :download
-      post :update_annotations_ajax
-      post :simulate
-      get :matching_data
-      get :published
-      post :export_as_xgmml
-      get :approve_or_reject_publish
-      get :publish_related_items
-      post :submit_to_jws
-      post :gatekeeper_decide
-    end
-    resources :model_images do
-      collection do
-        post :new
-      end
-      member do
-        post :select
-      end
 
-    end
-
-    resources :content_blobs do
-
-      member do
-        get :view_pdf_content
-        get :get_pdf
-        get :download
-      end
-
-    end
-  end
 
   resources :people do
     collection do
@@ -323,43 +379,7 @@ SEEK::Application.routes.draw do
     end
   end
 
-  resources :sops do
 
-    member do
-      get :check_related_items
-      get :check_gatekeeper_required
-      post :publish
-      post :request_resource
-      get :download
-      post :update_annotations_ajax
-      get :published
-      get :approve_or_reject_publish
-      get :publish_related_items
-      post :gatekeeper_decide
-      post :new_version
-    end
-    collection do
-      get :preview
-      post :test_asset_url
-    end
-    resources :experimental_conditions do
-      collection do
-        post :create_from_existing
-      end
-
-
-    end
-
-    resources :content_blobs do
-
-      member do
-        get :view_pdf_content
-        get :get_pdf
-        get :download
-      end
-
-    end
-  end
 
   resources :users do
     collection do

@@ -1163,7 +1163,7 @@ class DataFilesControllerTest < ActionController::TestCase
 
   test "correct response to unknown action" do
     df=data_files(:picture)
-    assert_raises AbstractController::ActionNotFound do
+    assert_raises ActionController::RoutingError do
       get :sdkfjshdfkhsdf, :id=>df
     end
   end
