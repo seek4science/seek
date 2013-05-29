@@ -338,9 +338,11 @@ SEEK::Application.routes.draw do
       get :check_gatekeeper_required
       post :publish
       get :admins
+      get :admin
       get :published
       get :batch_publishing_preview
       get :publish_related_items
+      put :administer_update
     end
     resources :avatars do
       member do

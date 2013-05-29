@@ -19,7 +19,7 @@ class AdminsControllerTest < ActionController::TestCase
   end
 
   test "get registration form" do
-    login_as Factory(:admins).user
+    login_as Factory(:admin).user
     get :registration_form
     assert_response :success
   end

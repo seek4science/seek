@@ -9,7 +9,7 @@ class StudiesControllerTest < ActionController::TestCase
   include RdfTestCases
 
   def setup
-    login_as Factory(:admins).user
+    login_as Factory(:admin).user
   end
 
   def rest_api_test_object

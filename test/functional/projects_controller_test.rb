@@ -432,7 +432,7 @@ class ProjectsControllerTest < ActionController::TestCase
 	end
 
 	test "admin has option to administer project" do
-    admin = Factory :admins
+    admin = Factory :admin
     assert_equal 1,admin.projects.count
     project = admin.projects.first
     login_as(admin.user)

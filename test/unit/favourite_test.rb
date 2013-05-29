@@ -14,7 +14,7 @@ class FavouriteTest < ActiveSupport::TestCase
     o=Factory(:organism)
     fav=Favourite.new(:resource=>o,:user=>users(:quentin))
     fav.save!
-    User.with_current_user Factory(:admins) do
+    User.with_current_user Factory(:admin) do
       assert_difference("Favourite.count",-1) do
         o.destroy
       end

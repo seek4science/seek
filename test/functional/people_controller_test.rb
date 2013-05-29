@@ -301,7 +301,7 @@ class PeopleControllerTest < ActionController::TestCase
   end
 
   def test_admin_sees_non_current_user_login_name
-    current_user = Factory(:admins).user
+    current_user = Factory(:admin).user
     other_person = Factory(:person)
     login_as(current_user)
     get :show, :id=> other_person
@@ -525,7 +525,7 @@ class PeopleControllerTest < ActionController::TestCase
 
   test 'admin should see the session of assigning roles to a person' do
     person = Factory(:person)
-    get :admins, :id => person
+    get :admin, :id => person
     assert_select "input#_roles_asset_manager", :count => 1
     assert_select "input#_roles_project_manager", :count => 1
     assert_select "input#_roles_gatekeeper", :count => 1
@@ -534,7 +534,7 @@ class PeopleControllerTest < ActionController::TestCase
   test 'non-admin should not see the session of assigning roles to a person' do
     login_as(:aaron)
     person = Factory(:person)
-    get :admins, :id => person
+    get :admin, :id => person
     assert_select "input#_roles_asset_manager", :count => 0
     assert_select "input#_roles_project_manager", :count => 0
     assert_select "input#_roles_gatekeeper", :count => 0
@@ -559,27 +559,27 @@ class PeopleControllerTest < ActionController::TestCase
 
   def test_project_manager_can_administer_others
     login_as(:project_manager)
-    get :admins, :id=> people(:aaron_person)
+    get :admin, :id=> people(:aaron_person)
     assert_response :success
   end
 
   def test_admin_can_administer_others
     login_as(:quentin)
-    get :admins, :id=>people(:aaron_person)
+    get :admin, :id=>people(:aaron_person)
     assert_response :success
 
   end
 
   test 'non-admin can not administer others' do
     login_as(:fred)
-    get :admins, :id=> people(:aaron_person)
+    get :admin, :id=> people(:aaron_person)
     assert_redirected_to :root
   end
 
   test 'can not administer yourself' do
     aaron = people(:aaron_person)
     login_as(aaron.user)
-    get :admins, :id=> aaron
+    get :admin, :id=> aaron
     assert_redirected_to :root
   end
 
@@ -652,7 +652,7 @@ class PeopleControllerTest < ActionController::TestCase
     a_person = Factory(:person)
 
     login_as(project_manager.user)
-    get :admins, :id => a_person
+    get :admin, :id => a_person
 
     assert_response :success
 
@@ -672,7 +672,7 @@ class PeopleControllerTest < ActionController::TestCase
     assert_not_nil a_work_group.project
 
     login_as(project_manager.user)
-    get :admins, :id => a_person
+    get :admin, :id => a_person
 
     assert_response :success
     assert_select "optgroup[label=?]", a_work_group.project.title, :count => 0
@@ -743,13 +743,13 @@ class PeopleControllerTest < ActionController::TestCase
 
   test "project manager can not administer admin" do
     project_manager = Factory(:project_manager)
-    admin = Factory(:admins)
+    admin = Factory(:admin)
 
     login_as(project_manager.user)
     get :show, :id => admin
     assert_select "a", :text => /Person Administration/, :count => 0
 
-    get :admins, :id => admin
+    get :admin, :id => admin
 
     assert_redirected_to :root
     assert_not_nil flash[:error]
@@ -762,7 +762,7 @@ class PeopleControllerTest < ActionController::TestCase
 
   test "project manager can not edit admin" do
     project_manager = Factory(:project_manager)
-    admin = Factory(:admins)
+    admin = Factory(:admin)
 
     login_as(project_manager.user)
     get :show, :id => admin
@@ -780,12 +780,12 @@ class PeopleControllerTest < ActionController::TestCase
   end
 
   test 'admin can administer other admin' do
-    admin = Factory(:admins)
+    admin = Factory(:admin)
 
     get :show, :id => admin
     assert_select "a", :text => /Person Administration/, :count => 1
 
-    get :admins, :id => admin
+    get :admin, :id => admin
     assert_response :success
 
     assert !admin.is_gatekeeper?
@@ -795,7 +795,7 @@ class PeopleControllerTest < ActionController::TestCase
   end
 
   test 'admin can edit other admin' do
-    admin = Factory(:admins)
+    admin = Factory(:admin)
     assert_not_nil admin.user
     assert_not_equal User.current_user, admin.user
 
@@ -829,7 +829,7 @@ class PeopleControllerTest < ActionController::TestCase
     get :show, :id => people(:fred)
     assert_select "a", :text => /Person Administration/, :count => 0
 
-    get :admins, :id=>people(:fred)
+    get :admin, :id=>people(:fred)
     assert_redirected_to :root
     assert_not_nil flash[:error]
 
@@ -844,7 +844,7 @@ class PeopleControllerTest < ActionController::TestCase
     assert !(users(:project_manager).person.projects & p.projects).empty?
     assert !p.can_edit_projects?
 
-    get :admins, :id => p
+    get :admin, :id => p
     assert_response :success
     assert_select "input#person_can_edit_projects", :count => 1
 
@@ -859,7 +859,7 @@ class PeopleControllerTest < ActionController::TestCase
     assert (users(:project_manager).person.projects & p.projects).empty?
     assert !p.can_edit_projects?
 
-    get :admins, :id => p
+    get :admin, :id => p
     assert_response :success
     assert_select "input#person_can_edit_projects", :count => 0
 
@@ -874,7 +874,7 @@ class PeopleControllerTest < ActionController::TestCase
     assert !(users(:project_manager).person.projects & p.projects).empty?
     assert !p.can_edit_institutions?
 
-    get :admins, :id => p
+    get :admin, :id => p
     assert_response :success
     assert_select "input#person_can_edit_institutions", :count => 1
 
@@ -889,7 +889,7 @@ class PeopleControllerTest < ActionController::TestCase
     assert (users(:project_manager).person.projects & p.projects).empty?
     assert !p.can_edit_institutions?
 
-    get :admins, :id => p
+    get :admin, :id => p
     assert_response :success
     assert_select "input#person_can_edit_institutions", :count => 0
 

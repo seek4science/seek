@@ -10,7 +10,7 @@ class AssetsHelperTest < ActionView::TestCase
   end
 
   def test_asset_version_links
-    admin = Factory(:admins)
+    admin = Factory(:admin)
     User.with_current_user admin.user do
       model = Factory(:teusink_model, :contributor=>admin.user,:title=>"Teusink")
       v = Factory(:model_version, :model=>model)

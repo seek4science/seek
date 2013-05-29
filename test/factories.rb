@@ -17,7 +17,7 @@
     f.association :user, :factory => :activated_user
   end
 
-  Factory.define(:admins,:parent=>:person) do |f|
+  Factory.define(:admin,:parent=>:person) do |f|
     f.is_admin true
   end
 
@@ -732,7 +732,7 @@ end
   Factory.define :site_announcement do |f|
     f.sequence(:title) {|n| "Announcement #{n}"}
     f.sequence(:body) {|n| "This is the body for announcement #{n}"}
-    f.association :announcer,:factory=>:admins
+    f.association :announcer,:factory=>:admin
     f.is_headline false
     f.expires_at 5.days.since
     f.email_notification false

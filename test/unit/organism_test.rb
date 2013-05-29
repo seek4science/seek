@@ -62,7 +62,7 @@ class OrganismTest < ActiveSupport::TestCase
   end
 
   test "dependent destroyed" do
-    User.with_current_user Factory(:admins) do
+    User.with_current_user Factory(:admin) do
       o=organisms(:yeast_with_bioportal_concept)
       concept=o.bioportal_concept
       assert_not_nil BioportalConcept.find_by_id(concept.id)
@@ -72,7 +72,7 @@ class OrganismTest < ActiveSupport::TestCase
   end
   
   test "can_delete?" do
-    admin = Factory(:admins)
+    admin = Factory(:admin)
     non_admin=Factory(:user)
     o=organisms(:yeast)
     assert !o.can_delete?(admin)
