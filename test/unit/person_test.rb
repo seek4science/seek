@@ -58,7 +58,7 @@ class PersonTest < ActiveSupport::TestCase
 
   test "only first admin person" do
     Person.delete_all
-    person = Factory :admin
+    person = Factory :admins
     assert person.only_first_admin_person?
 
     person.is_admin=false
@@ -580,7 +580,7 @@ class PersonTest < ActiveSupport::TestCase
   end
   
   test 'assign admin role for a person' do
-    User.with_current_user Factory(:admin).user do
+    User.with_current_user Factory(:admins).user do
       person = Factory(:person)
       assert_equal [], person.roles
       assert person.can_manage?
@@ -592,8 +592,8 @@ class PersonTest < ActiveSupport::TestCase
   end
 
   test 'add roles for a person' do
-    User.with_current_user Factory(:admin).user do
-      person = Factory(:admin)
+    User.with_current_user Factory(:admins).user do
+      person = Factory(:admins)
       assert_equal ['admin'], person.roles
       assert person.can_manage?
       person.add_roles ['admin', 'pal']
@@ -604,7 +604,7 @@ class PersonTest < ActiveSupport::TestCase
   end
 
   test 'remove roles for a person' do
-    User.with_current_user Factory(:admin).user do
+    User.with_current_user Factory(:admins).user do
       person = Factory(:person)
       person.roles = ['admin', 'pal']
       person.remove_roles ['admin']
@@ -628,7 +628,7 @@ class PersonTest < ActiveSupport::TestCase
   end
 
   test 'is_admin?' do
-     User.with_current_user Factory(:admin).user do
+     User.with_current_user Factory(:admins).user do
       person = Factory(:person)
       person.is_admin = true
       person.save!
@@ -643,7 +643,7 @@ class PersonTest < ActiveSupport::TestCase
   end
 
   test 'is_pal?' do
-     User.with_current_user Factory(:admin).user do
+     User.with_current_user Factory(:admins).user do
       person = Factory(:person)
       person.is_pal = true
       person.save!
@@ -658,7 +658,7 @@ class PersonTest < ActiveSupport::TestCase
   end
 
   test 'is_project_manager?' do
-     User.with_current_user Factory(:admin).user do
+     User.with_current_user Factory(:admins).user do
       person = Factory(:person)
       person.is_project_manager= true
       person.save!
@@ -673,7 +673,7 @@ class PersonTest < ActiveSupport::TestCase
   end
 
   test 'is_gatekeeper?' do
-     User.with_current_user Factory(:admin).user do
+     User.with_current_user Factory(:admins).user do
       person = Factory(:person)
       person.is_gatekeeper= true
       person.save!
@@ -688,7 +688,7 @@ class PersonTest < ActiveSupport::TestCase
   end
 
   test 'is_asset_manager?' do
-    User.with_current_user Factory(:admin).user do
+    User.with_current_user Factory(:admins).user do
       person = Factory(:person)
       person.is_asset_manager = true
       person.save!

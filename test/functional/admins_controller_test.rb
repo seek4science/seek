@@ -1,6 +1,6 @@
 require 'test_helper'
 
-class AdminControllerTest < ActionController::TestCase
+class AdminsControllerTest < ActionController::TestCase
 
   fixtures :all
 
@@ -19,7 +19,7 @@ class AdminControllerTest < ActionController::TestCase
   end
 
   test "get registration form" do
-    login_as Factory(:admin).user
+    login_as Factory(:admins).user
     get :registration_form
     assert_response :success
   end

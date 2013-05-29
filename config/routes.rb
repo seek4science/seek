@@ -1,6 +1,30 @@
 SEEK::Application.routes.draw do
   root :to=>"home#index"
 
+  resource :admin do
+    member do
+      get :show
+      get :tags
+      get :features_enabled
+      get :rebrand
+      get :home_settings
+      get :pagination
+      get :biosamples_renaming
+      get :others
+      get :get_stats
+      get :registration_form
+      get :restart_server
+      get :update_home_settings
+      post :get_stats
+      post :update_admins
+      post :update_rebrand
+      post :test_email_configuration
+      post :update_others
+      post :update_features_enabled
+      post :update_pagination
+    end
+  end
+
   resources :attachments
   resources :presentations do
 
@@ -228,7 +252,7 @@ SEEK::Application.routes.draw do
       get :check_related_items
       get :check_gatekeeper_required
       post :publish
-      get :admin
+      get :admins
       get :published
       get :batch_publishing_preview
       get :publish_related_items
@@ -247,7 +271,7 @@ SEEK::Application.routes.draw do
     end
     member do
       get :asset_report
-      get :admin
+      get :admins
     end
     resources :avatars do
       member do
@@ -374,8 +398,7 @@ SEEK::Application.routes.draw do
   match '/tags/:id' => 'tags#show', :as => :show_ann
   match '/jerm/' => 'jerm#index', :as => :jerm
   match '/countries/:country_name' => 'countries#show', :as => :country
-  match '/admin/' => 'admin#show', :as => :admin
-  match '/admin/registration_form' => 'admin#registration_form', :as => :registration_form
+
   match '/data_fuse/' => 'data_fuse#show', :as => :data_fuse
   match '/home/feedback' => 'home#feedback', :as => :feedback, :method => :get
   match '/home/send_feedback' => 'home#send_feedback', :as => :send_feedback, :method => :post
@@ -401,5 +424,8 @@ SEEK::Application.routes.draw do
   match '/activate/:activation_code' => 'users#activate', :activation_code => nil, :as => :activate
   match '/forgot_password' => 'users#forgot_password', :as => :forgot_password
   match '/policies/request_settings' => 'policies#send_policy_data', :as => :request_policy_settings
-  match '/:controller(/:action(/:id))'
+
+  # This is a legacy wild controller route that's not recommended for RESTful applications.
+  # Note: This route will make all actions in every controller accessible via GET requests.
+  # match ':controller(/:action(/:id))(.:format)'
 end

@@ -445,7 +445,7 @@ class DataFilesControllerTest < ActionController::TestCase
   test "should create data file from email tool" do
     old_admin_impersonation = Seek::Config.admin_impersonation_enabled
     Seek::Config.admin_impersonation_enabled = true
-    login_as Factory(:admin).user
+    login_as Factory(:admins).user
     assert_difference('DataFile.count') do
       assert_difference('ContentBlob.count') do
         session[:xml_login] = true
