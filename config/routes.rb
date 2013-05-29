@@ -63,6 +63,12 @@ SEEK::Application.routes.draw do
     end
   end
 
+  resource :policies do
+    member do
+      get :preview_permissions
+    end
+  end
+
   resources :subscriptions
   resources :specimens
   resources :samples
@@ -72,12 +78,16 @@ SEEK::Application.routes.draw do
     member do
       post :update_annotations_ajax
     end
+    collection do
+      get :existing_strains_for_assay_organism
+    end
 
   end
 
   resources :publications do
     collection do
       post :fetch_preview
+      get :preview
     end
     member do
       post :update_annotations_ajax
@@ -158,6 +168,7 @@ SEEK::Application.routes.draw do
   resources :data_files do
     collection do
       post :test_asset_url
+      get :preview
     end
     member do
       get :check_related_items
@@ -213,6 +224,7 @@ SEEK::Application.routes.draw do
   resources :models do
     collection do
       get :build
+      get :preview
     end
     member do
       get :builder
@@ -319,6 +331,9 @@ SEEK::Application.routes.draw do
       get :publish_related_items
       post :gatekeeper_decide
       post :new_version
+    end
+    collection do
+      get :preview
     end
     resources :experimental_conditions do
       collection do

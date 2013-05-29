@@ -392,7 +392,7 @@ module ApplicationHelper
   def preview_permission_popup_link resource
     resource_name = resource.class.name.underscore
     resource_id = resource.id
-    url = url_for(:controller => 'policies', :action => 'preview_permissions')
+    url = preview_permissions_policies_path
     is_new_file = resource.new_record?
     contributor_id = resource.contributing_user.try(:id)
     return link_to_remote_redbox("preview permission",
