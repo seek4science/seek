@@ -434,6 +434,7 @@ SEEK::Application.routes.draw do
   match '/tags' => 'tags#index', :as => :all_anns
   match '/tags/:id' => 'tags#show', :as => :show_ann
   match '/jerm/' => 'jerm#index', :as => :jerm
+  match '/jerm/fetch' => 'jerm#fetch', :as=>:jerm
   match '/countries/:country_name' => 'countries#show', :as => :country
 
   match '/data_fuse/' => 'data_fuse#show', :as => :data_fuse
