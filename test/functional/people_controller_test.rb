@@ -64,7 +64,7 @@ class PeopleControllerTest < ActionController::TestCase
     person = Person.find(assigns(:person).id)
     assert person.is_admin?
     assert person.only_first_admin_person?
-    assert_redirected_to registration_form_path(:during_setup=>"true")
+    assert_redirected_to registration_form_admin_path(:during_setup=>"true")
   end
 
 

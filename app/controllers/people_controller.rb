@@ -184,7 +184,7 @@ class PeopleController < ApplicationController
         else
           flash[:notice] = 'Person was successfully created.'
           if @person.only_first_admin_person?
-            format.html { redirect_to registration_form_path(:during_setup=>"true") }
+            format.html { redirect_to registration_form_admin_path(:during_setup=>"true") }
           else
             format.html { redirect_to(@person) }
           end
