@@ -99,7 +99,6 @@ SEEK::Application.routes.draw do
     member do
       get :show
     end
-
   end
 
   ### YELLOW PAGES ###
