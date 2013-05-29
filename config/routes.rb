@@ -387,6 +387,8 @@ SEEK::Application.routes.draw do
         post :display_contents
         post :move_asset_to
         post :create_folder
+        post :set_project_folder_title
+        post :set_project_folder_description
       end
 
     end
