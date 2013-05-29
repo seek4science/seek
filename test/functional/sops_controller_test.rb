@@ -826,6 +826,21 @@ class SopsControllerTest < ActionController::TestCase
     end
   end
 
+  test "view_items_in_tab" do
+    other_user = Factory :user
+    sop = Factory :sop,:title=>"a sop",:contributor=>User.current_user,:policy=>Factory(:public_policy)
+    private_sop = Factory :sop,:title=>"a private sop",:contributor=>other_user,:policy=>Factory(:private_policy)
+    xml_http_request :get, :view_items_in_tab,:resource_type=>"Sop",:resource_ids=>[sop.id,private_sop.id,1000].join(",")
+    assert_response :success
+
+    assert @response.body.include?("a sop")
+    assert !@response.body.include?("a private sop")
+
+    #try with no parameters
+    xml_http_request :get, :view_items_in_tab
+    assert_response :success
+  end
+
   private
 
   def valid_sop_with_url

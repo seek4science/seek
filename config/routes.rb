@@ -87,6 +87,7 @@ SEEK::Application.routes.draw do
     collection do
       post :test_asset_url
       get :preview
+      get :view_items_in_tab
     end
     member do
       get :check_related_items
@@ -117,6 +118,7 @@ SEEK::Application.routes.draw do
       get :build
       get :preview
       post :test_asset_url
+      get :view_items_in_tab
     end
     member do
       get :builder
@@ -160,6 +162,11 @@ SEEK::Application.routes.draw do
   end
 
   resources :sops do
+    collection do
+      get :preview
+      post :test_asset_url
+      get :view_items_in_tab
+    end
 
     member do
       get :check_related_items
@@ -174,20 +181,13 @@ SEEK::Application.routes.draw do
       post :gatekeeper_decide
       post :new_version
     end
-    collection do
-      get :preview
-      post :test_asset_url
-    end
     resources :experimental_conditions do
       collection do
         post :create_from_existing
       end
-
-
     end
 
     resources :content_blobs do
-
       member do
         get :view_pdf_content
         get :get_pdf
