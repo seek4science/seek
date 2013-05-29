@@ -610,6 +610,10 @@ module ApplicationHelper
     return text.html_safe
   end
 
+  def link_to_with_callbacks name, options, html_options
+    link_to name, "#", html_options.merge(:onclick=> remote_function(options))
+  end
+
   private  
   PAGE_TITLES={"home"=>"Home", "projects"=>"Projects","institutions"=>"Institutions", "people"=>"People", "sessions"=>"Login","users"=>"Signup","search"=>"Search","assays"=>"Assays","sops"=>"SOPs","models"=>"Models","data_files"=>"Data","publications"=>"Publications","investigations"=>"Investigations","studies"=>"Studies","specimens"=>"Specimens","samples"=>"Samples","presentations"=>"Presentations"}
 end
