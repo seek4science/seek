@@ -199,7 +199,7 @@ module ApplicationHelper
   end
 
   def tooltip_title_attrib(text, delay=200)
-    return "header=[] body=[#{text}] cssheader=[boxoverTooltipHeader] cssbody=[boxoverTooltipBody] delay=[#{delay}]".html_safe
+    return "header=[] body=[#{text}] cssheader=[boxoverTooltipHeader] cssbody=[boxoverTooltipBody] delay=[#{delay}]"
   end
       
   # text in "caption" will be used to display the item next to the image_tag_for_key;

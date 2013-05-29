@@ -65,7 +65,7 @@
         var elem2 = $('openid_login');
         var link = $('login_toggle_link');
         if (elem1.style.display == 'none') {
-            link.innerHTML = '<%= "Log in using "+image_tag("openid-16x16.gif")+"OpenID" %>';
+            link.innerHTML = '<%= ("Log in using "+image_tag("openid-16x16.gif")+"OpenID").html_safe %>';
             Effect.BlindUp('openid_login', {
                 duration: 0.2
             });
