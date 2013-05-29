@@ -278,6 +278,9 @@ SEEK::Application.routes.draw do
       get :approve_or_reject_publish
       post :gatekeeper_decide
     end
+    collection do
+      post :investigation_selected_ajax
+    end
 
   end
 
