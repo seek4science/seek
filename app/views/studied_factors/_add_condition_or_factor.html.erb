@@ -21,8 +21,7 @@
   :url=> path_to_object,
   :before=>"$('#{entity}_submit').disabled=true;",
   :loaded=>"$('#{entity}_submit').disabled=false;",
-  :html=>{:method=>:post, :id => "add_condition_or_factor_form"},
-  :remote => true do |f| -%>
+  :html=>{:method=>:post, :id => "add_condition_or_factor_form", :remote => true } do |f| -%>
 
 
   <div class="conditions_or_factors" >
@@ -70,7 +69,7 @@
   </div>
 
   <div class='border_top'>
-    <%= f.submit "Add", :style => "width:50px;font-weight:bold;" -%>
+    <%= f.submit "Add", :id => "#{entity}_submit", :style => "width:50px;font-weight:bold;" -%>
   </div>
  </div>
 <% end -%>

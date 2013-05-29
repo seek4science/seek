@@ -16,8 +16,7 @@
   :url=> path_to_object,
   :before=>"$('update_#{object.id}').disabled=true;",
   :loaded=>"$('update_#{object.id}').disabled=false;",
-  :html=>{:method=>:put, :id => "edit_condition_or_factor_#{object.id}_form", :style => "display:none"},
-  :remote => true do |f| -%>
+  :html=>{:method=>:put, :id => "edit_condition_or_factor_#{object.id}_form", :style => "display:none", :remote => true} do |f| -%>
 
 
   <div class="conditions_or_factors" >
