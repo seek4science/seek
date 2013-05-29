@@ -81,7 +81,7 @@ original_filename=nil
           <span class="required">*</span>
           <%= text_field upload_field, :data_url, :size => 55 -%>
           <span style="display:inline-block;">
-                        <%= link_to image("test", :title => "Test", :alt => "Test")+" Test",
+                        <%= link_to_with_callbacks image("test", :title => "Test", :alt => "Test")+" Test",
                                            {:url => {:action => :test_asset_url},
                                             :method => :post,
                                             :type => :synchronous,

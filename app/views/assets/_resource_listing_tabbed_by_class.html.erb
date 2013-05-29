@@ -90,17 +90,17 @@
               <div class="hidden_list_item" id ="view_list_items" style="color:#000">
                 <% item ||= nil
                     if item %>
-                      <%= link_to "View all "+(extra_count + resources.size).to_s+" items", :html => {:id => "view_#{resource_type}s_and_extra", :style => "display:block"},
-                                         :url => url_for(:action => 'view_items_in_tab'),
-                                         :remote=>true,
+                      <%= link_to_with_callbacks "View all "+(extra_count + resources.size).to_s+" items",
+                                        {:url => url_for(:action => 'view_items_in_tab'),
                                          :with => "'resource_type=' + '#{resource_type}' + '&resource_ids=' + '#{(resource_hash[resource_type][:items] + resource_hash[resource_type][:extra_items]).collect(&:id).join(',')}'",
-                                         :before => "show_large_ajax_loader('#{resource_type}_list_items_container')"
+                                         :before => "show_large_ajax_loader('#{resource_type}_list_items_container')"},
+                                        {:id => "view_#{resource_type}s_and_extra", :style => "display:block", :remote=>true}
                       -%>
-                      <%= link_to "View " + resources.size.to_s + " items", :html => {:id => "view_#{resource_type}s", :style => "display:none"},
-                                         :remote=>true,
-                                         :url => url_for(:action => 'view_items_in_tab'),
+                      <%= link_to_with_callbacks "View " + resources.size.to_s + " items",
+                                        {:url => url_for(:action => 'view_items_in_tab'),
                                          :with => "'resource_type=' + '#{resource_type}' + '&resource_ids=' + '#{resource_hash[resource_type][:items].collect(&:id).join(',')}'",
-                                         :before => "show_large_ajax_loader('#{resource_type}_list_items_container')"
+                                         :before => "show_large_ajax_loader('#{resource_type}_list_items_container')"},
+                                        {:id => "view_#{resource_type}s", :style => "display:none", :remote=>true}
                       -%>
                     <% else
                         link_to "View all items", eval("#{resource_type.pluralize.underscore}_path")
