@@ -254,6 +254,9 @@ SEEK::Application.routes.draw do
     member do
       get :visualise
     end
+    collection do
+      post :search_ajax
+    end
 
   end
 
