@@ -119,6 +119,8 @@ SEEK::Application.routes.draw do
       get :preview
       post :test_asset_url
       get :view_items_in_tab
+      post :update_model_metadata
+      post :create_model_metadata
     end
     member do
       get :builder
@@ -139,6 +141,7 @@ SEEK::Application.routes.draw do
       post :submit_to_jws
       post :gatekeeper_decide
       post :new_version
+      post :submit_to_sycamore
     end
     resources :model_images do
       collection do
