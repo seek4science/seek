@@ -38,6 +38,6 @@ class ReindexingJob
   end
 
   def self.exists?
-    Delayed::Job.find(:first, :conditions => ['handler = ? AND locked_at IS ?', @@my_yaml, nil]) != nil
+    Delayed::Job.where(['handler = ? AND locked_at IS ?', @@my_yaml, nil]) != nil
   end
 end
