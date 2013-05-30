@@ -72,7 +72,7 @@ class Strain < ActiveRecord::Base
 
   def self.default_strain_for_organism organism
     organism = Organism.find(organism) unless organism.is_a?(Organism)
-    strain = Strain.find(:first,:conditions=>{:organism_id=>organism.id,:is_dummy=>true})
+    strain = Strain.where(:organism_id=>organism.id,:is_dummy=>true).first
     if strain.nil?
       gene = Gene.find_by_title('wild-type') || Gene.create(:title => 'wild-type')
       genotype = Genotype.new(:gene => gene)

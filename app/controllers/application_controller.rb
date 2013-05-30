@@ -423,11 +423,11 @@ class ApplicationController < ActionController::Base
 
   def check_log_exists action,controllername,object
     if action=="create"
-      a=ActivityLog.find(:first,:conditions=>{
+      a=ActivityLog.where(
           :activity_loggable_type=>object.class.name,
           :activity_loggable_id=>object.id,
           :controller_name=>controllername,
-          :action=>"create"})
+          :action=>"create").first
       
       logger.error("ERROR: Duplicate create activity log about to be created for #{object.class.name}:#{object.id}") unless a.nil?
     end

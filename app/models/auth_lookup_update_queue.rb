@@ -3,9 +3,9 @@ class AuthLookupUpdateQueue < ActiveRecord::Base
 
   def self.exists?(item)
     if item.nil?
-      !AuthLookupUpdateQueue.find(:first,:conditions=>["item_id IS ? AND item_type IS ?",nil,nil]).nil?
+      !AuthLookupUpdateQueue.where(["item_id IS ? AND item_type IS ?",nil,nil]).first.nil?
     else
-      !AuthLookupUpdateQueue.find(:first,:conditions=>{:item_id=>item.id,:item_type=>item.class.name}).nil?
+      !AuthLookupUpdateQueue.where(:item_id=>item.id,:item_type=>item.class.name).first.nil?
     end
 
   end

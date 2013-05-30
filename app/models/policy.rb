@@ -34,7 +34,7 @@ class Policy < ActiveRecord::Base
 
   def assets
     Seek::Util.authorized_types.collect do |type|
-      type.find(:all,:conditions=>{:policy_id=>id})
+      type.where(:policy_id=>id)
     end.flatten.uniq
   end
   
@@ -149,7 +149,7 @@ class Policy < ActiveRecord::Base
         # now add any remaining new memberships
         contributor_types.try :each do |contributor_type|
           new_permission_data[contributor_type.to_s].try :each do |p|
-            if policy.new_record? or !Permission.find :first, :conditions => {:contributor_type => contributor_type, :contributor_id => p[0], :policy_id => policy.id}
+            if policy.new_record? or !Permission.where(:contributor_type => contributor_type, :contributor_id => p[0], :policy_id => policy.id).first
               p = policy.permissions.build :contributor_type => contributor_type, :contributor_id => p[0], :access_type => p[1]["access_type"]
             end
           end
@@ -402,9 +402,9 @@ class Policy < ActiveRecord::Base
   #review people in black list, white list and normal workgroup
   def get_people_in_FG contributor, fg_id=nil, is_white_list=nil, is_black_list=nil
     if is_white_list
-      f_group = FavouriteGroup.find(:all, :conditions => ["name = ? AND user_id = ?", "__whitelist__", contributor.user.id]).first
+      f_group = FavouriteGroup.where(["name = ? AND user_id = ?", "__whitelist__", contributor.user.id]).first
     elsif is_black_list
-      f_group = FavouriteGroup.find(:all, :conditions => ["name = ? AND user_id = ?", "__blacklist__", contributor.user.id]).first
+      f_group = FavouriteGroup.where(["name = ? AND user_id = ?", "__blacklist__", contributor.user.id]).first
     else
       f_group = FavouriteGroup.find_by_id(fg_id)
     end
@@ -446,7 +446,7 @@ class Policy < ActiveRecord::Base
   #review people in network
   def get_people_in_network access_type
     people_in_network = [] #id, name, access_type
-    projects = Project.find(:all)
+    projects = Project.all
     projects.each do |project|
       project.people.each do |person|
         unless person.blank?

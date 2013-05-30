@@ -12,7 +12,7 @@ module HomesHelper
 
     projects=current_user.person.projects
     
-    people=Person.find(:all,:order=>'updated_at DESC')
+    people=Person.order('updated_at DESC')
     selected_people=[]
 
     people.each do |p|      
@@ -42,8 +42,8 @@ module HomesHelper
 
   def recent_changes_hash
 
-    item_hash=classify_for_tabs(Person.find(:all,:order=>'updated_at DESC',:limit=>RECENT_SIZE))
-    item_hash.merge! classify_for_tabs(Project.find(:all,:order=>'updated_at DESC',:limit=>RECENT_SIZE))
+    item_hash=classify_for_tabs(Person.order('updated_at DESC').limit(RECENT_SIZE))
+    item_hash.merge! classify_for_tabs(Project.order('updated_at DESC').limit(RECENT_SIZE))
 
     classes=Seek::Util.persistent_classes.select do |c|
         c.is_isa? || c.is_asset?
@@ -65,7 +65,7 @@ module HomesHelper
 
   def recently_downloaded_item_logs time=1.month.ago, number_of_item=10
     #Rails.cache.fetch("download_activity_#{current_user_id}") do
-      activity_logs = ActivityLog.find(:all, :include => "activity_loggable", :order => "created_at DESC", :conditions => ["action = ? AND created_at > ?", 'download', time])
+      activity_logs = ActivityLog.where(["action = ? AND created_at > ?", 'download', time]).order("created_at DESC")
       selected_activity_logs = []
       selected_items = []
       count = 0
@@ -85,7 +85,7 @@ module HomesHelper
   def recently_added_item_logs time=1.month.ago, number_of_item=10
     #Rails.cache.fetch("create_activity_#{current_user_id}") do
       item_types = Seek::Util.user_creatable_types.collect{|type| type.name}
-      activity_logs = ActivityLog.find(:all, :include => "activity_loggable", :order => "created_at DESC", :conditions => ["action = ? AND created_at > ? AND activity_loggable_type in (?)", 'create', time, item_types])
+      activity_logs = ActivityLog.where(["action = ? AND created_at > ? AND activity_loggable_type in (?)", 'create', time, item_types]).order("created_at DESC")
       selected_activity_logs = []
       count = 0
       activity_logs.each do |activity_log|
