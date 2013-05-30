@@ -109,6 +109,7 @@ SEEK::Application.routes.draw do
     collection do
       get :select
       get :get_work_group
+      get :view_items_in_tab
       post :userless_project_selected_ajax
     end
     member do
