@@ -162,6 +162,7 @@ SEEK::Application.routes.draw do
   resources :institutions do
     collection do
       get :request_all
+      get :view_items_in_tab
     end
     resources :avatars do
       member do
@@ -173,6 +174,9 @@ SEEK::Application.routes.draw do
   ### ISA ###
 
   resources :investigations do
+    collection do
+      get :view_items_in_tab
+    end
     member do
       get :approve_or_reject_publish
       post :gatekeeper_decide
@@ -180,18 +184,21 @@ SEEK::Application.routes.draw do
   end
 
   resources :studies do
+    collection do
+      post :investigation_selected_ajax
+      get :view_items_in_tab
+    end
     member do
       get :approve_or_reject_publish
       post :gatekeeper_decide
     end
-    collection do
-      post :investigation_selected_ajax
-    end
+
   end
 
   resources :assays do
     collection do
       get :preview
+      get :view_items_in_tab
     end
     member do
       get :approve_or_reject_publish
@@ -367,6 +374,7 @@ SEEK::Application.routes.draw do
     collection do
       get :preview
       post :fetch_preview
+      get :view_items_in_tab
     end
     member do
       post :update_annotations_ajax
@@ -377,6 +385,7 @@ SEEK::Application.routes.draw do
   resources :events do
     collection do
       get :preview
+      get :view_items_in_tab
     end
   end
 
@@ -394,12 +403,14 @@ SEEK::Application.routes.draw do
   resources :samples
 
   resources :strains do
+    collection do
+      get :existing_strains_for_assay_organism
+      get :view_items_in_tab
+    end
     member do
       post :update_annotations_ajax
     end
-    collection do
-      get :existing_strains_for_assay_organism
-    end
+
 
   end
 
@@ -419,12 +430,14 @@ SEEK::Application.routes.draw do
   end
 
   resources :organisms do
+    collection do
+      post :search_ajax
+      get :view_items_in_tab
+    end
     member do
       get :visualise
     end
-    collection do
-      post :search_ajax
-    end
+
   end
 
 
