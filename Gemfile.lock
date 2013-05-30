@@ -18,6 +18,12 @@ GIT
     app_version (1.0.0)
 
 GIT
+  remote: git://github.com/SysMO-DB/bioportal.git
+  revision: b10ef8b0ad8f1bf4a0eb0c7c702476cf45919157
+  specs:
+    bioportal (1.0.0)
+
+GIT
   remote: git://github.com/SysMO-DB/convert_office.git
   revision: 753f2567dbd625bc89071e1150404efbb562e130
   ref: 753f2567dbd625bc89071e1150404efbb562e130
@@ -35,6 +41,24 @@ GIT
   revision: d24c42b9608f39f82e37e757f530d8199049c557
   specs:
     gibberish (1.0.0)
+
+GIT
+  remote: git://github.com/SysMO-DB/my_rails_settings.git
+  revision: e3f7fe9625ea27fea42b02c95e30cb4f1341655b
+  specs:
+    my_rails_settings (1.0.0)
+
+GIT
+  remote: git://github.com/SysMO-DB/my_responds_to_parent.git
+  revision: cb8f7fc4aa41023f96f34c6e90e67a154d4ea977
+  specs:
+    my_responds_to_parent (1.0.0)
+
+GIT
+  remote: git://github.com/SysMO-DB/my_savage_beast
+  revision: 8a69e1d76c1e384a2945bcb1c7fccf7fa11b9c78
+  specs:
+    my_savage_beast (2.3)
 
 GIT
   remote: git://github.com/SysMO-DB/open_id_authentication.git
@@ -77,6 +101,12 @@ GIT
     white_list (1.0.0)
 
 GIT
+  remote: git://github.com/SysMO-DB/white_list_formatted_content.git
+  revision: c02bea47e477c1ac59e45a2a8a51aaa2c8e6b72f
+  specs:
+    white_list_formatted_content (1.0.0)
+
+GIT
   remote: git://github.com/myGrid/annotations.git
   revision: d33e78993ee957fa12d71cbe9f03100dd9b0ad15
   specs:
@@ -93,36 +123,6 @@ GIT
   revision: 977048211b94599fe0f08eb37a481f3d69df48f6
   specs:
     calendar_date_select (1.16.2)
-
-GIT
-  remote: git://github.com/quyen/bioportal.git
-  revision: b10ef8b0ad8f1bf4a0eb0c7c702476cf45919157
-  specs:
-    bioportal (1.0.0)
-
-GIT
-  remote: git://github.com/quyen/my_rails_settings.git
-  revision: e3f7fe9625ea27fea42b02c95e30cb4f1341655b
-  specs:
-    my_rails_settings (1.0.0)
-
-GIT
-  remote: git://github.com/quyen/my_responds_to_parent.git
-  revision: cb8f7fc4aa41023f96f34c6e90e67a154d4ea977
-  specs:
-    my_responds_to_parent (1.0.0)
-
-GIT
-  remote: git://github.com/quyen/my_savage_beast
-  revision: dc377c821730e3b13fec4d73811850293785af80
-  specs:
-    my_savage_beast (2.3)
-
-GIT
-  remote: git://github.com/quyen/white_list_formatted_content.git
-  revision: c02bea47e477c1ac59e45a2a8a51aaa2c8e6b72f
-  specs:
-    white_list_formatted_content (1.0.0)
 
 GEM
   remote: https://rubygems.org/
