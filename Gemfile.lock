@@ -37,6 +37,12 @@ GIT
     doi_query_tool (0.0.0)
 
 GIT
+  remote: git://github.com/SysMO-DB/fleximage
+  revision: 7788fc11562e80ad2542d94aad18a3231453f4df
+  specs:
+    fleximage (0.1)
+
+GIT
   remote: git://github.com/SysMO-DB/gibberish.git
   revision: d24c42b9608f39f82e37e757f530d8199049c557
   specs:
@@ -370,6 +376,7 @@ DEPENDENCIES
   exception_notification
   factory_girl (= 2.6.4)
   fastercsv (= 1.5.1)
+  fleximage!
   fssm
   gibberish!
   hpricot (~> 0.8.2)

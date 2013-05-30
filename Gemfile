@@ -67,6 +67,8 @@ gem "app_version", :git => "git://github.com/SysMO-DB/app_version.git"
 gem 'doi_query_tool', :git => "git://github.com/SysMO-DB/doi_query_tool.git"
 gem 'convert_office',:git=>"git://github.com/SysMO-DB/convert_office.git", :ref=>"753f2567dbd625bc89071e1150404efbb562e130"
 
+gem "fleximage", :git=>"git://github.com/SysMO-DB/fleximage"
+
 gem 'search_biomodel', "2.2.1",:git=>"git://github.com/myGrid/search_biomodel.git"
 gem 'my_annotations', :git=>"git://github.com/myGrid/annotations.git"
 
