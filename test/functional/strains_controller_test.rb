@@ -170,8 +170,8 @@ class StrainsControllerTest < ActionController::TestCase
     assert !strain.can_manage?(user)
 
     login_as(user)
-    put :update, :strain => {:id => strain.id}, :sharing => {:sharing_scope => Policy::EVERYONE, :access_type_4 => Policy::EDITING}
-    assert_redirected_to strains_path
+    put :update, :id => strain.id, :sharing => {:sharing_scope => Policy::EVERYONE, :access_type_4 => Policy::EDITING}
+    assert_redirected_to strain_path(strain)
 
     updated_strain = Strain.find_by_id strain.id
     assert_equal Policy::ALL_SYSMO_USERS, updated_strain.policy.sharing_scope
@@ -184,8 +184,8 @@ class StrainsControllerTest < ActionController::TestCase
     assert !strain.can_manage?(user)
 
     login_as(user)
-    put :update, :strain => {:id => strain.id}, :sharing => {:permissions => {:contributor_types => ActiveSupport::JSON.encode(['Person']), :values => ActiveSupport::JSON.encode({"Person" => {user.person.id => {"access_type" => Policy::MANAGING}}})}}
-    assert_redirected_to strains_path
+    put :update, :id => strain.id, :sharing => {:permissions => {:contributor_types => ActiveSupport::JSON.encode(['Person']), :values => ActiveSupport::JSON.encode({"Person" => {user.person.id => {"access_type" => Policy::MANAGING}}})}}
+    assert_redirected_to strain_path(strain)
 
     updated_strain = Strain.find_by_id strain.id
     assert updated_strain.policy.permissions.empty?
