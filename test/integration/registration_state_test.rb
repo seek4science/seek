@@ -12,10 +12,10 @@ class RegistrationStateTest < ActionController::IntegrationTest
 
     assert_nil User.current_user.person
 
-    get "/people/select"
+    get select_people_path
     assert_response :success
 
-    get "/session/new"
+    get new_session_path
     assert_response :success
 
     xml_http_request :post,'people/userless_project_selected_ajax',{:project_id=>Factory(:project).id}
