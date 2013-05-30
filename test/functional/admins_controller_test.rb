@@ -158,4 +158,11 @@ class AdminsControllerTest < ActionController::TestCase
 
   end
 
+  test "update home page settings" do
+    login_as Factory(:admin).user
+    assert_not_equal "This is the home description",Seek::Config.home_description
+    post :update_home_settings, :home_description=>"This is the home description"
+    assert_equal "This is the home description",Seek::Config.home_description
+  end
+
 end

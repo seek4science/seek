@@ -16,7 +16,7 @@ SEEK::Application.routes.draw do
       get :others
       get :get_stats
       get :registration_form
-      get :update_home_settings
+      post :update_home_settings
       post :restart_server
       post :get_stats
       post :update_admins
