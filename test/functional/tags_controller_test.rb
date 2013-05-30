@@ -46,6 +46,7 @@ class TagsControllerTest < ActionController::TestCase
     exp=Factory :expertise,:value=>"golf",:source=>p.user,:annotatable=>p
     get :show,:id=>exp.value
     assert_response :success
+    assert_select "div#notice_flash",:text=>/1 item tagged with 'golf'/,:count=>1
     assert_select "div.list_items_container" do
       assert_select "a",:text=>p.name,:count=>1
     end
