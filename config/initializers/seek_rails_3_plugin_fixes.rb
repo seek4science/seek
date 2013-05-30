@@ -3,10 +3,5 @@
 
 SEEK::Application.configure do
 
-  require_dependency File.join(Gem.loaded_specs['my_savage_beast'].full_gem_path,'app','models',"monitorship")
-  require_dependency File.join(Gem.loaded_specs['my_savage_beast'].full_gem_path,'app','models',"moderatorship")
-  require_dependency File.join(Gem.loaded_specs['my_savage_beast'].full_gem_path,'app','models',"posts_sweeper")
-
-  require_dependency File.join(Gem.loaded_specs['my_savage_beast'].full_gem_path,'app','controllers',"forums_controller")
 
 end
