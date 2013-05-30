@@ -25,7 +25,7 @@
         <br/>
         <br/>
         <!-- Save new version action --><h6>Save as new version</h6>
-        Model format: <%= select_tag "model_format","<option value='sbml'>SBML</option><option value='dat'>JWS Dat</option>" -%>
+        Model format: <%= select_tag "model_format","<option value='sbml'>SBML</option><option value='dat'>JWS Dat</option>".html_safe -%>
         <br/>
         <input value="Save" type="button" alt="Save" title="" id="new_version_button" onclick="create_panel_cookies();save_new_version_extra_options();"/>
         <br/>

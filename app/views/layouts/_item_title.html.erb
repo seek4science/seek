@@ -7,7 +7,7 @@ title_prefix||=""
 title_postfix||=""
 title ||= item.title || ""
 
-title = title_prefix + title + title_postfix
+title = "#{h(title_prefix) + h(title) + h(title_postfix)}".html_safe
 
 
 image_style_for_title_length = title.length > 89 ? "float:left" : "position:absolute"
@@ -20,11 +20,11 @@ image_style_for_title_length = title.length > 89 ? "float:left" : "position:abso
         <div class="contribution_title_image" style="<%= image_style_for_title_length -%>"><%= avatar -%></div>
     <% end %>
 
-    <h1><%= h(title) -%></h1>
+    <h1><%= title -%></h1>
 
 </div>
 
-<% if item.respond_to?(:private?) && item.respond_to?(:public?) && item.try(:can_manage?) %>
+<% if @action=="show" && item.respond_to?(:private?) && item.respond_to?(:public?) && item.try(:can_manage?) %>
     <div class="sharing_summary">
       <%=
           if item.private?
