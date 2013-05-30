@@ -74,6 +74,8 @@ SEEK::Application.routes.draw do
   resources :uuids
   resources :compounds
 
+  resources :project_folders
+
   ### USERS AND SESSIONS ###
 
   resources :users do
