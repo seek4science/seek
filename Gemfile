@@ -56,7 +56,7 @@ gem 'pubmed_query_tool', :git => "git://github.com/SysMO-DB/pubmed_query_tool.gi
 gem 'my_rails_settings', :git => "git://github.com/SysMO-DB/my_rails_settings.git", :require=>"settings"
 gem 'piwik_analytics',:git=>"git://github.com/SysMO-DB/piwik-ruby-tracking.git"
 gem 'my_savage_beast', :git => "git://github.com/SysMO-DB/my_savage_beast"
-gem 'redbox', :git=>"git://github.com/SysMO-DB/redbox.git"
+gem 'redbox', :git=>"git://github.com/SysMO-DB/redbox"
 gem "my_responds_to_parent", :git => "git://github.com/SysMO-DB/my_responds_to_parent.git"
 gem 'site_announcements', :git => "git://github.com/SysMO-DB/site_announcements.git"
 gem 'open_id_authentication', :git => "git://github.com/SysMO-DB/open_id_authentication.git"

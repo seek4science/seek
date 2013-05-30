@@ -89,8 +89,8 @@ GIT
     pubmed_query_tool (1.0.0)
 
 GIT
-  remote: git://github.com/SysMO-DB/redbox.git
-  revision: c2cf9d4d95b6d79496b3bbefacffa920692429d4
+  remote: git://github.com/SysMO-DB/redbox
+  revision: 42b7b0edacb3a686324f664cdcb20b0265e5bc53
   specs:
     redbox (1.0.4)
 
