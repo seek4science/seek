@@ -171,7 +171,7 @@ class ModelImagesController < ApplicationController
 
      begin
 
-       @model_image = ModelImage.find params[:id],:conditions => { :model_id => @image_for_id}
+       @model_image = ModelImage.where(:model_id => @image_for_id).find(params[:id])
      rescue ActiveRecord::RecordNotFound
        flash[:error] = "Image not found or belongs to a different model."
        redirect_to root_path

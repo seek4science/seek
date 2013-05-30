@@ -159,7 +159,7 @@ class FavouriteGroupsController < ApplicationController
   private
   
   def find_favourite_group
-    f_group = FavouriteGroup.find(params[:id], :conditions => { :user_id => current_user.id } )
+    f_group = FavouriteGroup.where(:user_id => current_user.id).find(params[:id])
     
     if f_group
       @f_group = f_group

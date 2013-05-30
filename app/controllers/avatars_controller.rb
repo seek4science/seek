@@ -248,7 +248,7 @@ class AvatarsController < ApplicationController
     # current user is authorised to perform the desired action with avatars of the object in URL;
     # check if the avatar ID in the URL belongs to the specified object
     begin
-      @avatar = Avatar.find( params[:id], :conditions => { :owner_type => @avatar_for, :owner_id => @avatar_for_id } )
+      @avatar = Avatar.where(:owner_type => @avatar_for, :owner_id => @avatar_for_id).find( params[:id])
     rescue ActiveRecord::RecordNotFound
       flash[:error] = "Avatar not found or belongs to a different #{@avatar_for.downcase}."
       redirect_to(root_path)
@@ -263,7 +263,7 @@ class AvatarsController < ApplicationController
     # also, show avatars to all members of a project/institution
     if User.admin_logged_in? || (@avatar_owner_instance.class.name == "Person" && @avatar_for_id.to_i == current_user.person.id.to_i) ||
      (["Project", "Institution"].include?(@avatar_for) && @avatar_owner_instance.people.include?(current_user))
-      @avatars = Avatar.all(:conditions => { :owner_type => @avatar_for, :owner_id => @avatar_for_id })
+      @avatars = Avatar.where(:owner_type => @avatar_for, :owner_id => @avatar_for_id)
     else
       flash[:error] = "You can only view avatars that belong to you or any projects/institutions where you are a member of."
       redirect_to(person_path(current_user.person))
