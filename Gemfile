@@ -74,9 +74,8 @@ gem 'my_annotations', :git=>"git://github.com/myGrid/annotations.git"
 
 group :development do
   gem "sqlite3","1.3.7"
-  gem "unicorn"
+  gem "unicorn-rails"
   gem "parallel_tests"
-  gem "mongrel"
   gem "pry"
   gem "pry-doc"
   gem 'ruby18_source_location'
