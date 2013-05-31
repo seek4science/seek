@@ -30,7 +30,7 @@
         <div style="float:left"><%= time_ago_in_words(annotation.created_at) %> ago</div>
         <div style="float:right">
           <% if annotation.source == current_user %>
-            <%= link_to_with_callback(image('spreadsheet_annotation_destroy', :title => "Delete Annotation"),
+            <%= link_to_with_callbacks(image('spreadsheet_annotation_destroy', :title => "Delete Annotation"),
                       {:url=>{:controller=>"spreadsheet_annotations", :action=>"destroy", :id => annotation.id},
                        :method => :delete,
                        :update => { :success => "annotations", :failure => "spreadsheet_errors"},
