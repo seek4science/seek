@@ -27,11 +27,11 @@
   </table>
 <% end -%>
 
-<%= button_to "Search in SabioRK",
+<%= button_to_with_callbacks "Search in SabioRK",
                      {:url => {:controller => 'compounds', :action => "search_in_sabiork"},
                       :with => "'compound_name=' + escape($F('compound_title'))",
-                     :before=>"$('search_in_sabiork').disabled=true;",
-                     :loaded=>"$('search_in_sabiork').disabled=false;",},
+                      :before=>"$('search_in_sabiork').disabled=true;",
+                      :loaded=>"$('search_in_sabiork').disabled=false;",},
                      {:style => "font-weight:bold; margin: 1em 20em 1em",
                       :id => 'search_in_sabiork',
                       :remote => true } %>

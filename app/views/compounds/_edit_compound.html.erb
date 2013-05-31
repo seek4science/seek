@@ -56,7 +56,7 @@
       </table>
 
     <% end -%>
-    <%= button_to "Search in SabioRK",
+    <%= button_to_with_callbacks "Search in SabioRK",
                      {:url => {:controller => 'compounds', :action => "search_in_sabiork"},
                       :with => "'compound_name=' + escape($F('#{compound.id}_title')) + '&id=' + '#{compound.id}'",
                      :before=>"$('search_in_sabiork_#{compound.id}').disabled=true;",

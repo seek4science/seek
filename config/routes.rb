@@ -72,7 +72,11 @@ SEEK::Application.routes.draw do
   resources :measured_items
   resources :saved_searches
   resources :uuids
-  resources :compounds
+  resources :compounds do
+    collection do
+      post :search_in_sabiork
+    end
+  end
 
   resources :project_folders
 
