@@ -401,7 +401,7 @@ SEEK::Application.routes.draw do
 
   resource :policies do
     member do
-      get :preview_permissions
+      post :preview_permissions
     end
   end
 

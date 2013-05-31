@@ -35,14 +35,14 @@ function validateResourceFields(is_new_file, resource_name, is_managed) {
             $('attributions_autocomplete_input').focus();
             return(false);
         }
-/*        clickLink($('preview_permission'));*/
+        clickLink($('preview_permission'));
     }
-/*    else{*/
+    else{
         // filename and title set - can submit
         $(resource_name + '_submit_btn').disabled = true;
         $(resource_name + '_submit_btn').value = (is_new_file==true ? "Creating..." : "Updating...");
         $(resource_name + '_submit_btn').form.submit();
-/*    }*/
+    }
 
 }
 
