@@ -616,6 +616,12 @@ module ApplicationHelper
     link_to name, "#", html_options
   end
 
+  def button_to_with_callbacks name, options={}, html_options={}
+    html_options = html_options.merge(:onclick=> remote_function(options))
+    html_options = html_options.merge(:remote => true) if html_options[:remote].nil?
+    button_to name, '#', html_options
+  end
+
   private  
   PAGE_TITLES={"home"=>"Home", "projects"=>"Projects","institutions"=>"Institutions", "people"=>"People", "sessions"=>"Login","users"=>"Signup","search"=>"Search","assays"=>"Assays","sops"=>"SOPs","models"=>"Models","data_files"=>"Data","publications"=>"Publications","investigations"=>"Investigations","studies"=>"Studies","specimens"=>"Specimens","samples"=>"Samples","presentations"=>"Presentations"}
 end
