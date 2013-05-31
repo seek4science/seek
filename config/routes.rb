@@ -1,5 +1,11 @@
 SEEK::Application.routes.draw do
 
+  get "errors/error_422"
+
+  get "errors/error_404"
+
+  get "errors/error_500"
+
   ### GENERAL PAGES ###
 
   root :to => "homes#index"
@@ -475,6 +481,11 @@ SEEK::Application.routes.draw do
   match '/activate/:activation_code' => 'users#activate', :activation_code => nil, :as => :activate
   match '/forgot_password' => 'users#forgot_password', :as => :forgot_password
   match '/policies/request_settings' => 'policies#send_policy_data', :as => :request_policy_settings
+  match '/fail'=>'fail#index',:as=>:fail,:via=>:get
+
+  unless Rails.application.config.consider_all_requests_local
+    match '*not_found', :to=>'errors#error_404'
+  end
 
   # This is a legacy wild controller route that's not recommended for RESTful applications.
   # Note: This route will make all actions in every controller accessible via GET requests.
