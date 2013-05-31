@@ -3,7 +3,7 @@
       <span class='setting_name'>
         <%= name -%>
       </span>
-      <%= "<br/>" if field.include?("textarea") -%>
+      <%= "<br/>".html_safe if field.include?("textarea") -%>
       <span class='<%= field.include?(%!type="text"!) ? "setting_field" : "setting_checkbox" -%>' >
         <%= field -%>
       </span>

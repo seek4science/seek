@@ -291,7 +291,7 @@ class ModelsController < ApplicationController
     title=white_list(params[:updated_model_type])
     id=params[:updated_model_type_id]
     success=false
-    model_type_with_matching_title=ModelType.find(:first,:conditions=>{:title=>title})
+    model_type_with_matching_title=ModelType.where(:title=>title).first
     if model_type_with_matching_title.nil? || model_type_with_matching_title.id.to_s==id
       m=ModelType.find(id)
       m.title=title
@@ -318,7 +318,7 @@ class ModelsController < ApplicationController
   def create_model_type params
     title=white_list(params[:model_type])
     success=false
-    if ModelType.find(:first,:conditions=>{:title=>title}).nil?
+    if ModelType.where(:title=>title).first.nil?
       new_model_type=ModelType.new(:title=>title)
       if new_model_type.save
         msg="OK. Model type #{title} added."
@@ -345,7 +345,7 @@ class ModelsController < ApplicationController
   def create_model_format params
     title=white_list(params[:model_format])
     success=false
-    if ModelFormat.find(:first,:conditions=>{:title=>title}).nil?
+    if ModelFormat.where(:title=>title).first.nil?
       new_model_format=ModelFormat.new(:title=>title)
       if new_model_format.save
         msg="OK. Model format #{title} added."
@@ -373,7 +373,7 @@ class ModelsController < ApplicationController
     title=white_list(params[:updated_model_format])
     id=params[:updated_model_format_id]
     success=false    
-    model_format_with_matching_title=ModelFormat.find(:first,:conditions=>{:title=>title})
+    model_format_with_matching_title=ModelFormat.where(:title=>title).first
     if model_format_with_matching_title.nil? || model_format_with_matching_title.id.to_s==id
       m=ModelFormat.find(id)
       m.title=title

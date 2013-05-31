@@ -127,7 +127,7 @@ class JwsFunctionalTest < ActionController::TestCase
       m.content_blobs.first.dump_data_to_file
       post :simulate, :id=>m, :version=>m.version
       assert_response :success
-      assert_select "iframe",:count=>1
+      assert_select "div#jws_simulator_wrapper>iframe#jws_simulator",:count=>1
     end
 
     test "changing model with jws builder" do

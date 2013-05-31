@@ -17,7 +17,7 @@ class AuthLookupUpdateJob
   def process_queue
     #including item_type in the order, encourages assets to be processed before users (since they are much quicker), due to tha happy coincidence
     #that User falls last alphabetically. Its not that important if a new authorized type is added after User in the future.
-    todo = AuthLookupUpdateQueue.all(:limit=>BATCHSIZE,:order=>"priority,item_type,id").collect do |queued|
+    todo = AuthLookupUpdateQueue.order("priority,item_type,id").limit(BATCHSIZE).collect do |queued|
       todo = queued.item
       queued.destroy
       todo
@@ -94,9 +94,9 @@ class AuthLookupUpdateJob
 
   def self.count ignore_locked=true
     if ignore_locked
-      Delayed::Job.find(:all,:conditions=>['handler = ? AND locked_at IS ? AND failed_at IS ?',@@my_yaml,nil,nil]).count
+      Delayed::Job.where(['handler = ? AND locked_at IS ? AND failed_at IS ?',@@my_yaml,nil,nil]).count
     else
-      Delayed::Job.find(:all,:conditions=>['handler = ? AND failed_at IS ?',@@my_yaml,nil]).count
+      Delayed::Job.where(['handler = ? AND failed_at IS ?',@@my_yaml,nil]).count
     end
   end
 

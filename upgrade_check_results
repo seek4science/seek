@@ -1,183 +1,8 @@
-[31m[1mDeprecated ERb helper calls[0m
-[37mBlock helpers that use concat (e.g., form_for) should use <%= instead of <%.  The current form will continue to work for now, but you will get deprecation warnings since this form will go away in the future.
-[1mMore information:[0m [36mhttp://weblog.rubyonrails.org/
-
-[37mThe culprits: 
-[33m	- app/views/assay_types/edit.html.erb
-[33m	- app/views/assay_types/new.html.erb
-[33m	- app/views/assays/edit.html.erb
-[33m	- app/views/assays/new.html.erb
-[33m	- app/views/data_files/edit.html.erb
-[33m	- app/views/events/form.html.erb
-[33m	- app/views/forums/new.html.erb
-[33m	- app/views/help_documents/_attachments.html.erb
-[33m	- app/views/help_documents/_form.html.erb
-[33m	- app/views/help_documents/_images.html.erb
-[33m	- app/views/institutions/edit.html.erb
-[33m	- app/views/institutions/new.html.erb
-[33m	- app/views/investigations/edit.html.erb
-[33m	- app/views/investigations/new.html.erb
-[33m	- app/views/models/edit.html.erb
-[33m	- app/views/organisms/_form.html.erb
-[33m	- app/views/people/_registration_profile_creation.erb
-[33m	- app/views/people/_userless_people_list.erb
-[33m	- app/views/people/admin.html.erb
-[33m	- app/views/people/edit.html.erb
-[33m	- app/views/people/new.html.erb
-[33m	- app/views/posts/_attachments.html.erb
-[33m	- app/views/presentations/edit.html.erb
-[33m	- app/views/projects/admin.html.erb
-[33m	- app/views/projects/edit.html.erb
-[33m	- app/views/projects/new.html.erb
-[33m	- app/views/publications/_publication_preview.html.erb
-[33m	- app/views/samples/edit.html.erb
-[33m	- app/views/samples/new.html.erb
-[33m	- app/views/sops/edit.html.erb
-[33m	- app/views/specimens/edit.html.erb
-[33m	- app/views/specimens/new.html.erb
-[33m	- app/views/strains/edit.html.erb
-[33m	- app/views/strains/new.html.erb
-[33m	- app/views/studies/edit.html.erb
-[33m	- app/views/studies/new.html.erb
-[33m	- app/views/technology_types/edit.html.erb
-[33m	- app/views/technology_types/new.html.erb
-[33m	- app/views/topics/new.html.erb
-[33m	- app/views/topics/show.html.erb
-[33m	- app/views/users/edit.html.erb
-[33m	- app/views/admin/_admin_selection.html.erb
-[33m	- app/views/admin/_impersonate.html.erb
-[33m	- app/views/admin/biosamples_renaming.html.erb
-[33m	- app/views/admin/edit_tag.html.erb
-[33m	- app/views/admin/features_enabled.html.erb
-[33m	- app/views/admin/home_settings.html.erb
-[33m	- app/views/admin/others.html.erb
-[33m	- app/views/admin/pagination.html.erb
-[33m	- app/views/admin/rebrand.html.erb
-[33m	- app/views/assets/_upload_new_version_form.html.erb
-[33m	- app/views/assets/publishing/waiting_approval_list.html.erb
-[33m	- app/views/assets/publishing/publish_related_items_confirm.html.erb
-[33m	- app/views/assets/publishing/publish_related_items.html.erb
-[33m	- app/views/assets/publishing/batch_publishing_preview.html.erb
-[33m	- app/views/assets/publishing/approve_or_reject_publish.html.erb
-[33m	- app/views/assets/publishing/_related_items_in_svg.erb
-[33m	- app/views/avatars/new.html.erb
-[33m	- app/views/data_files/new.html.erb
-[33m	- app/views/data_fuse/assets_selected.html.erb
-[33m	- app/views/data_fuse/show.html.erb
-[33m	- app/views/gadgets/_sign_in.rhtml
-[33m	- app/views/home/feedback.html.erb
-[33m	- app/views/layouts/_head.html.erb
-[33m	- app/views/model_images/new.html.erb
-[33m	- app/views/models/annotator.html.erb
-[33m	- app/views/models/builder.html.erb
-[33m	- app/views/models/new.html.erb
-[33m	- app/views/models/show.html.erb
-[33m	- app/views/presentations/new.html.erb
-[33m	- app/views/publications/edit.html.erb
-[33m	- app/views/search/_search_bar.html.erb
-[33m	- app/views/sops/new.html.erb
-[33m	- app/views/users/forgot_password.html.erb
-[33m	- app/views/users/new.html.erb
-[33m	- app/views/assets/_batch_upload.html.erb
-[33m	- app/views/assets/_special_auth_code_form.html.erb
-[33m	- app/views/biosamples/_genotype_form.html.erb
-[33m	- app/views/biosamples/_phenotype_form.html.erb
-[33m	- app/views/people/_subscriptions.html.erb
-[33m	- app/views/people/_work_groups.html.erb
-[33m	- app/views/samples/_form.html.erb
-[33m	- app/views/strains/_genotype_form.html.erb
-[33m	- app/views/strains/_phenotype_form.html.erb
-[0m
-[31m[1mDeprecated AJAX helper calls[0m
-[37mAJAX javascript helpers have been switched to be unobtrusive and use :remote => true instead of having a seperate function to handle remote requests.
-[1mMore information:[0m [36mhttp://blog.jordanwest.me/modest-rubyist-archive/rails-3-ujs-and-csrf-meta-tags
-
-[37mThe culprits: 
-[33m	- app/views/admin/_email.html.erb
-[33m	- app/views/admin/_stats.html.erb
-[33m	- app/views/annotations/_annotation_plot_data.html.erb
-[33m	- app/views/annotations/_annotation_text_data.html.erb
-[33m	- app/views/assets/_advanced_creator_select.html.erb
-[33m	- app/views/assets/_batch_upload.html.erb
-[33m	- app/views/assets/_resource_listing_tabbed_by_class.html.erb
-[33m	- app/views/assets/_upload.html.erb
-[33m	- app/views/compounds/_compound_row.html.erb
-[33m	- app/views/help_documents/_attachment_list.html.erb
-[33m	- app/views/help_documents/_image_list.html.erb
-[33m	- app/views/home/_guide_box.html.erb
-[33m	- app/views/models/_model_metadata.html.erb
-[33m	- app/views/models/show.html.erb
-[33m	- app/views/organisms/_search_results.html.erb
-[33m	- app/views/posts/_attachment_list.html.erb
-[33m	- app/views/studied_factors/_condition_or_factor_row.html.erb
-[33m	- app/views/topics/show.html.erb
-[33m	- app/views/annotations/_annotation_plot_data.html.erb
-[33m	- app/views/annotations/_annotation_text_data.html.erb
-[33m	- app/views/assets/_request_resource.html.erb
-[33m	- app/views/assets/_tags_box.html.erb
-[33m	- app/views/folders/_folder_details.html.erb
-[33m	- app/views/jerm/_fetch_results.html.erb
-[33m	- app/views/jerm/index.html.erb
-[33m	- app/views/organisms/_search_results.html.erb
-[33m	- app/views/publications/new.html.erb
-[33m	- app/views/spreadsheets/_annotation_form.html.erb
-[33m	- app/views/spreadsheets/_plot.html.erb
-[33m	- app/views/studied_factors/_add_condition_or_factor.html.erb
-[33m	- app/views/biosamples/_create_strain_popup.html.erb
-[33m	- app/views/biosamples/_edit_strain_popup.html.erb
-[33m	- app/views/compounds/_add_compound.html.erb
-[33m	- app/views/compounds/_edit_compound.html.erb
-[33m	- app/views/posts/_edit.html.erb
-[33m	- app/views/studied_factors/_add_condition_or_factor.html.erb
-[33m	- app/views/studied_factors/_edit_condition_or_factor.html.erb
-[0m
-[31m[1mDeprecated constant(s)[0m
-[37mConstants like RAILS_ENV, RAILS_ROOT, and RAILS_DEFAULT_LOGGER are now deprecated.
-[1mMore information:[0m [36mhttp://litanyagainstfear.com/blog/2010/02/03/the-rails-module/
-
-[37mThe culprits: 
-[33m	- lib/tasks/cruise.rake
-[33m	- app/controllers/model_images_controller.rb
-[33m	- app/controllers/models_controller.rb
-[33m	- app/models/attachment.rb
-[33m	- app/models/model_image.rb
-[33m	- app/jobs/send_announcement_emails_job.rb
-[33m	- lib/seek/permissions/authorization.rb
-[0m
 [31m[1mSoon-to-be-deprecated ActiveRecord calls[0m
 [37mMethods such as find(:all), find(:first), finds with conditions, and the :joins option will soon be deprecated.
 [1mMore information:[0m [36mhttp://m.onkey.org/2010/1/22/active-record-query-interface
 
 [37mThe culprits: 
-[33m	- app/controllers/admin_controller.rb
-[33m	- app/controllers/publications_controller.rb
-[33m	- app/controllers/posts_controller.rb
-[33m	- app/controllers/model_images_controller.rb
-[33m	- app/controllers/publications_controller.rb
-[33m	- app/controllers/application_controller.rb
-[33m	- app/controllers/favourite_groups_controller.rb
-[33m	- app/controllers/models_controller.rb
-[33m	- app/models/user.rb
-[33m	- app/models/auth_lookup_update_queue.rb
-[33m	- app/models/strain.rb
-[33m	- app/models/relationship.rb
-[33m	- app/models/project_folder.rb
-[33m	- app/controllers/publications_controller.rb
-[33m	- app/controllers/posts_controller.rb
-[33m	- app/controllers/model_images_controller.rb
-[33m	- app/controllers/topics_controller.rb
-[33m	- app/controllers/application_controller.rb
-[33m	- app/controllers/countries_controller.rb
-[33m	- app/controllers/favourite_groups_controller.rb
-[33m	- app/controllers/avatars_controller.rb
-[33m	- app/models/project.rb
-[33m	- app/models/user.rb
-[33m	- app/models/policy.rb
-[33m	- app/models/person.rb
-[33m	- app/models/model.rb
-[33m	- app/models/relationship.rb
-[33m	- app/models/favourite_group.rb
-[33m	- app/helpers/home_helper.rb
 [33m	- app/controllers/posts_controller.rb
 [0m
 [31m[1mDeprecated ActionMailer API[0m
@@ -185,38 +10,25 @@
 [1mMore information:[0m [36mhttp://lindsaar.net/2010/1/26/new-actionmailer-api-in-rails-3
 
 [37mThe culprits: 
-[33m	- app/controllers/admin_controller.rb
-[33m	- app/controllers/users_controller.rb
-[33m	- app/controllers/home_controller.rb
-[33m	- app/controllers/sops_controller.rb
-[33m	- app/controllers/data_files_controller.rb
-[33m	- app/controllers/jerm_controller.rb
 [33m	- app/controllers/samples_controller.rb
-[33m	- app/controllers/models_controller.rb
-[33m	- app/controllers/people_controller.rb
 [0m
 [31m[1mOld ActionMailer class API[0m
 [37mYou're using the old API in a mailer class.
 [1mMore information:[0m [36mhttp://lindsaar.net/2010/1/26/new-actionmailer-api-in-rails-3
 
 [37mThe culprits: 
-[33m	- app/models/mailer.rb
-[33m	- app/models/sub_mailer.rb
 [33m	- app/models/forum_attachment.rb
 [33m	- app/models/attachment.rb
 [33m	- app/models/help_attachment.rb
 [33m	- app/models/help_image.rb
-[33m	- app/models/mailer.rb
-[33m	- app/models/sub_mailer.rb
 [33m	- app/models/institution.rb
 [33m	- app/models/person.rb
 [33m	- app/models/publication.rb
 [0m
-[31m[1mDeprecated ActionMailer attribute :sent_on[0m
-[37mUsing the new mailer API, you can specify :date to the mail method.
-[1mMore information:[0m [36mhttp://stackoverflow.com/questions/7367185/weird-error-when-delivering-mail-undefined-method-index-for-2011-09-09-2215
+[31m[1mDeprecated constant(s)[0m
+[37mConstants like RAILS_ENV, RAILS_ROOT, and RAILS_DEFAULT_LOGGER are now deprecated.
+[1mMore information:[0m [36mhttp://litanyagainstfear.com/blog/2010/02/03/the-rails-module/
 
 [37mThe culprits: 
-[33m	- app/models/mailer.rb
-[33m	- app/models/sub_mailer.rb
+[33m	- lib/tasks/cruise.rake
 [0m

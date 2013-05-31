@@ -30,7 +30,7 @@ class FavouriteGroup < ActiveRecord::Base
   
   # return all favourite group [name, id] pairs for a particular user
   def self.get_all_without_blacklists_and_whitelists(user_id)
-    all_groups = FavouriteGroup.find(:all, :conditions => {:user_id => user_id})
+    all_groups = FavouriteGroup.where(:user_id => user_id)
     return all_groups.collect { |g| [g.name, g.id] unless [FavouriteGroup::WHITELIST_NAME, FavouriteGroup::BLACKLIST_NAME].include?(g.name) }.compact
   end
 end

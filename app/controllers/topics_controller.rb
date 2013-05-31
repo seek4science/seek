@@ -31,14 +31,14 @@ class TopicsController < ApplicationController
         # authors of topics don't get counted towards total hits
         @topic.hit! unless logged_in? and @topic.user == current_user
         @posts = @topic.posts.paginate :page => params[:page]
-        User.find(:all, :conditions => ['id IN (?)', @posts.collect { |p| p.user_id }.uniq]) unless @posts.blank?
+        User.where(['id IN (?)', @posts.collect { |p| p.user_id }.uniq]) unless @posts.blank?
         @post   = Post.new
       end
       format.xml do
         render :xml => @topic.to_xml
       end
       format.rss do
-        @posts = @topic.posts.find(:all, :order => 'created_at desc', :limit => 25)
+        @posts = @topic.posts.order('created_at desc').limit(25)
         render :action => 'show', :layout => false
       end
     end

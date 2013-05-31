@@ -170,7 +170,7 @@ class Person < ActiveRecord::Base
 
 
   def self.userless_people
-    p=Person.find(:all)
+    p=Person.all
     return p.select{|person| person.user.nil?}
   end
 
@@ -187,7 +187,7 @@ class Person < ActiveRecord::Base
 
   # get a list of people with their email for autocomplete fields
   def self.get_all_as_json
-    all_people = Person.find(:all, :order => "ID asc")
+    all_people = Person.order("ID asc")
     names_emails = all_people.collect{ |p| {"id" => p.id,
         "name" => (p.first_name.blank? ? (logger.error("\n----\nUNEXPECTED DATA: person id = #{p.id} doesn't have a first name\n----\n"); "(NO FIRST NAME)") : h(p.first_name)) + " " +
                   (p.last_name.blank? ? (logger.error("\n----\nUNEXPECTED DATA: person id = #{p.id} doesn't have a last name\n----\n"); "(NO LAST NAME)") : h(p.last_name)),
@@ -383,7 +383,7 @@ class Person < ActiveRecord::Base
 
   #remove the permissions which are set on this person
   def remove_permissions
-    permissions = Permission.find(:all, :conditions => ["contributor_type =? and contributor_id=?", 'Person', id])
+    permissions = Permission.where(["contributor_type =? and contributor_id=?", 'Person', id])
     permissions.each do |p|
       p.destroy
     end

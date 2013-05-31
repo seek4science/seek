@@ -53,7 +53,7 @@ class Model < ActiveRecord::Base
     belongs_to :model_format
 
     def content_blobs
-      ContentBlob.find(:all, :conditions => ["asset_id =? and asset_type =? and asset_version =?", self.parent.id, self.parent.class.name, self.version])
+      ContentBlob.where(["asset_id =? and asset_type =? and asset_version =?", self.parent.id, self.parent.class.name, self.version])
     end
 
   end

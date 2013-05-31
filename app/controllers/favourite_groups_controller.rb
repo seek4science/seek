@@ -19,7 +19,7 @@ class FavouriteGroupsController < ApplicationController
   
   def create
     group_name = white_list(params[:favourite_group_name])
-    already_exists = FavouriteGroup.find(:first, :conditions => { :name => group_name, :user_id => current_user.id })
+    already_exists = FavouriteGroup.where(:name => group_name, :user_id => current_user.id).first
     
     unless already_exists
       # group doesn't exist - create a new one..
@@ -64,7 +64,7 @@ class FavouriteGroupsController < ApplicationController
   
   def update
     group_name = white_list(params[:favourite_group_name])
-    found = FavouriteGroup.find(:first, :conditions => { :name => group_name, :user_id => current_user.id })
+    found = FavouriteGroup.where(:name => group_name, :user_id => current_user.id).first
     
     # if the found group with the same is the current one - that's fine; otherwise - can't rename a group with such new name 
     unless found.nil?
@@ -102,7 +102,7 @@ class FavouriteGroupsController < ApplicationController
       group_members.each do |new_memb|
         person_id = new_memb[0].to_i
         person_access_type = new_memb[1]
-        unless (found = FavouriteGroupMembership.find(:first, :conditions => { :person_id => person_id, :favourite_group_id => @f_group.id }))
+        unless (found = FavouriteGroupMembership.where(:person_id => person_id, :favourite_group_id => @f_group.id).first)
           FavouriteGroupMembership.create(:person_id => person_id, :access_type => person_access_type, :favourite_group_id => @f_group.id)
           changes_made = true
         end
@@ -159,7 +159,7 @@ class FavouriteGroupsController < ApplicationController
   private
   
   def find_favourite_group
-    f_group = FavouriteGroup.find(params[:id], :conditions => { :user_id => current_user.id } )
+    f_group = FavouriteGroup.where(:user_id => current_user.id).find(params[:id])
     
     if f_group
       @f_group = f_group

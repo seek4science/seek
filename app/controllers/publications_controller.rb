@@ -120,7 +120,7 @@ class PublicationsController < ApplicationController
         to_add.each_with_index do |a,i|
           @publication.creators << a
           removing_non_seek_author = to_remove[i]
-          updating_publication_author_order = PublicationAuthorOrder.find(:all, :conditions => ["publication_id=? AND author_id=? AND author_type=?", @publication.id, removing_non_seek_author.id, 'PublicationAuthor' ]).first
+          updating_publication_author_order = PublicationAuthorOrder.where(["publication_id=? AND author_id=? AND author_type=?", @publication.id, removing_non_seek_author.id, 'PublicationAuthor' ]).first
           updating_publication_author_order.author = a
           updating_publication_author_order.save
         end
@@ -337,13 +337,13 @@ class PublicationsController < ApplicationController
     asset_ids.each do |id|
       asset = asset_type.constantize.find_by_id(id)
       if asset && asset.send("can_#{required_action}?")
-        unless Relationship.find(:first, :conditions => { :subject_type => asset_type, :subject_id => asset.id, :predicate => Relationship::RELATED_TO_PUBLICATION, :object_type => "Publication", :object_id => @publication.id })
+        unless Relationship.where(:subject_type => asset_type, :subject_id => asset.id, :predicate => Relationship::RELATED_TO_PUBLICATION, :object_type => "Publication", :object_id => @publication.id).first
           Relationship.create(:subject_type => asset_type, :subject_id => asset.id, :predicate => Relationship::RELATED_TO_PUBLICATION, :object_type => "Publication", :object_id => @publication.id)
         end
       end
     end
     #Destroy asset relationship that aren't needed
-    associate_relationships = Relationship.find(:all,:conditions=>["object_id = ? and subject_type = ?",@publication.id,asset_type])
+    associate_relationships = Relationship.where(["object_id = ? and subject_type = ?",@publication.id,asset_type]).all
     associate_relationships.each do |associate_relationship|
       asset = associate_relationship.subject
       if asset.send("can_#{required_action}?") && !asset_ids.include?(asset.id.to_s)

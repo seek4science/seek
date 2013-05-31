@@ -63,7 +63,7 @@ class Relationship < ActiveRecord::Base
     # add any remaining new attributions
     new_attributions.each_key do |attributable_type|
       new_attributions["#{attributable_type}"].each do |attributable_id|
-        unless (found = Relationship.find(:first, :conditions => { :subject_type => resource.class.name, :subject_id => resource.id, :predicate => predicate, :object_type => attributable_type, :object_id => attributable_id }))
+        unless (found = Relationship.where(:subject_type => resource.class.name, :subject_id => resource.id, :predicate => predicate, :object_type => attributable_type, :object_id => attributable_id ).first)
           Relationship.create(:subject_type => resource.class.name, :subject_id => resource.id, :predicate => predicate, :object_type => attributable_type, :object_id => attributable_id)
         end
       end

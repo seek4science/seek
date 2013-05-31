@@ -137,7 +137,7 @@ class User < ActiveRecord::Base
 
   # Authenticates a user by their login name and unencrypted password.  Returns the user or nil.
   def self.authenticate(login, password)
-    u = find :first, :conditions => ['login = ?', login] # need to get the salt
+    u = User.where(['login = ?', login]).first # need to get the salt
     u && u.authenticated?(password) ? u : nil
   end
 
@@ -192,12 +192,12 @@ class User < ActiveRecord::Base
   
   # returns a 'whitelist' favourite group for the user (or 'nil' if not found)
   def get_whitelist
-    return FavouriteGroup.find(:first, :conditions => { :user_id => self.id, :name => FavouriteGroup::WHITELIST_NAME } )
+    return FavouriteGroup.where(:user_id => self.id, :name => FavouriteGroup::WHITELIST_NAME).first
   end
   
   # returns a 'blacklist' favourite group for the user (or 'nil' if not found)
   def get_blacklist
-    return FavouriteGroup.find(:first, :conditions => { :user_id => self.id, :name => FavouriteGroup::BLACKLIST_NAME } )
+    return FavouriteGroup.where(:user_id => self.id, :name => FavouriteGroup::BLACKLIST_NAME).first
   end
 
   #required for savage beast plugin

@@ -10,7 +10,6 @@ class ApplicationController < ActionController::Base
 
   include CommonSweepers
 
-
   before_filter :log_extra_exception_data
 
   after_filter :log_event
@@ -77,7 +76,7 @@ class ApplicationController < ActionController::Base
 
   def is_current_user_auth
     begin
-      @user = User.find(params[:id], :conditions => ["id = ?", current_user.try(:id)])
+      @user = User.where(["id = ?", current_user.try(:id)]).find(params[:id])
     rescue ActiveRecord::RecordNotFound
       error("User not found (id not authorized)", "is invalid (not owner)")
       return false
@@ -423,11 +422,11 @@ class ApplicationController < ActionController::Base
 
   def check_log_exists action,controllername,object
     if action=="create"
-      a=ActivityLog.find(:first,:conditions=>{
+      a=ActivityLog.where(
           :activity_loggable_type=>object.class.name,
           :activity_loggable_id=>object.id,
           :controller_name=>controllername,
-          :action=>"create"})
+          :action=>"create").first
       
       logger.error("ERROR: Duplicate create activity log about to be created for #{object.class.name}:#{object.id}") unless a.nil?
     end

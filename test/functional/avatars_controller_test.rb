@@ -1,19 +1,21 @@
 require 'test_helper'
 
 class AvatarsControllerTest < ActionController::TestCase
-  
-  fixtures :people,:users,:avatars
 
-  include AuthenticatedTestHelper  
+
+  include AuthenticatedTestHelper
+
+  def setup
+    @admin = Factory(:admin)
+  end
 
   test "show new" do
-    login_as(:quentin)
-    get :new, :person_id=>people(:quentin_person).id
+    login_as(@admin.user)
+    get :new, :person_id=>@admin.id
     assert_response :success
   end
 
   test "non project member can upload avatar" do
-    login_as(:quentin)
     u=Factory(:user_not_in_project)
     login_as(u)
     assert u.person.projects.empty?,"This person should not be in any projects"
@@ -35,14 +37,13 @@ class AvatarsControllerTest < ActionController::TestCase
   end
 
   test "handles missing parent in route when logged out" do
-    #p=Factory :person
     get :show,:id=>2
     assert_redirected_to root_path
     assert_not_nil flash[:error]
   end
 
   test 'breadcrumb for avatar index' do
-    login_as(:quentin)
+    login_as @admin.user
     person = Factory(:person)
     get :index,:person_id => person.id
     assert_response :success
@@ -55,7 +56,7 @@ class AvatarsControllerTest < ActionController::TestCase
   end
 
   test 'breadcrumb for uploading new avatar' do
-    login_as(:quentin)
+    login_as @admin.user
     person = Factory(:person)
     get :new,:person_id => person.id
     assert_response :success

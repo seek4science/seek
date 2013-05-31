@@ -151,7 +151,7 @@ class Project < ActiveRecord::Base
   
   # get a listing of institutions for this project
   def get_institutions_listing
-    workgroups_for_project = WorkGroup.find(:all, :conditions => {:project_id => self.id})
+    workgroups_for_project = WorkGroup.where(:project_id => self.id)
     return workgroups_for_project.collect { |w| [w.institution.name, w.institution.id, w.id] }
   end
 

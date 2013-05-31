@@ -12,10 +12,16 @@ class AdminsControllerTest < ActionController::TestCase
     assert_response :success
   end
 
-  test "only admin can restart the server" do
-    login_as(:aaron)
+  test "non admin cannot restart the server" do
+    login_as(Factory(:user))
     post :restart_server
     assert_not_nil flash[:error]
+  end
+
+  test "admin can restart the server" do
+    login_as(Factory(:admin).user)
+    post :restart_server
+    assert_nil flash[:error]
   end
 
   test "get registration form" do
@@ -150,6 +156,13 @@ class AdminsControllerTest < ActionController::TestCase
       assert_select "td > span[class='none_text']",:text=>/No date defined/,:count=>1
     end
 
+  end
+
+  test "update home page settings" do
+    login_as Factory(:admin).user
+    assert_not_equal "This is the home description",Seek::Config.home_description
+    post :update_home_settings, :home_description=>"This is the home description"
+    assert_equal "This is the home description",Seek::Config.home_description
   end
 
 end

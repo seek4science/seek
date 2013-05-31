@@ -152,7 +152,7 @@ class ModelImagesController < ApplicationController
 
   def find_model_images
       if @model_instance.can_view? current_user
-        @model_images = ModelImage.find(:all,:conditions=>{:model_id=>@image_for_id})
+        @model_images = ModelImage.where :model_id=>@image_for_id
       else
        flash[:error] = "You can only view images for models you can access"
        redirect_to root_path
@@ -171,7 +171,7 @@ class ModelImagesController < ApplicationController
 
      begin
 
-       @model_image = ModelImage.find params[:id],:conditions => { :model_id => @image_for_id}
+       @model_image = ModelImage.where(:model_id => @image_for_id).find(params[:id])
      rescue ActiveRecord::RecordNotFound
        flash[:error] = "Image not found or belongs to a different model."
        redirect_to root_path

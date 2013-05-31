@@ -183,10 +183,22 @@ class ModelsControllerTest < ActionController::TestCase
     assert_not_nil flash[:error]
   end
   
-  test "should get new" do
+  test "should get new as non admin" do
     get :new    
     assert_response :success
     assert_select "h1",:text=>"New Model"
+
+    #non admins can't edit types
+    assert_select "span#delete_model_type_icon",:count=>0
+  end
+
+  test "should get new as admin" do
+    login_as(Factory(:admin).user)
+    get :new
+    assert_response :success
+
+    #admins can edit type
+    assert_select "span#delete_model_type_icon",:count=>1
   end
 
   test "should get new populated from params" do

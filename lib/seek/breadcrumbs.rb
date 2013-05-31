@@ -33,7 +33,12 @@ module Seek
         if action_name == 'new_object_based_on_existing_one'
           add_breadcrumb "New #{controller_name.humanize.singularize.downcase} based on this one", url_for(:controller => controller_name, :action => action_name, :id => resource.try(:id))
         else
-          add_breadcrumb "#{action_name.capitalize.humanize}", url_for(:controller => controller_name, :action => action_name, :id => resource.try(:id))
+          if resource.nil?
+            url = url_for(:controller => controller_name, :action => action_name)
+          else
+            url = url_for(:controller => controller_name, :action => action_name, :id => resource.try(:id))
+          end
+          add_breadcrumb "#{action_name.capitalize.humanize}", url
         end
       end
     end

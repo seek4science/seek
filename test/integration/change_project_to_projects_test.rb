@@ -5,7 +5,7 @@ class ChangeProjectToProjectsTest < ActionController::IntegrationTest
   ASSETS_WITH_MULTIPLE_PROJECTS = %w[data_files events investigations models publications sops samples specimens presentations]
   def setup
     User.current_user = Factory(:user, :login => 'test')
-    post '/sessions/create', :login => 'test', :password => 'blah'
+    post '/session', :login => 'test', :password => 'blah'
     @is_vl=Seek::Config.is_virtualliver
     Seek::Config.is_virtualliver = true
   end
@@ -32,7 +32,7 @@ class ChangeProjectToProjectsTest < ActionController::IntegrationTest
 
       item.projects = [Factory(:project), Factory(:project)]
       disable_authorization_checks do
-        post "/#{type_name}/update/#{item.id}", "#{item.class.name.downcase}".to_sym => {:id => item.id},
+        put "/#{type_name}/#{item.id}", "#{item.class.name.downcase}".to_sym => {:id => item.id},
            :sharing=>{"access_type_#{Policy::ALL_SYSMO_USERS}"=>Policy::VISIBLE, :sharing_scope=>Policy::ALL_SYSMO_USERS, :your_proj_access_type => Policy::ACCESSIBLE}
       end
 

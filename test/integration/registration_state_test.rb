@@ -5,17 +5,17 @@ class RegistrationStateTest < ActionController::IntegrationTest
   fixtures :all
 
   test "partially registered user always redirects to select person" do
-    
+
     User.current_user = Factory(:user, :login => 'partial',:person=>nil)
-    post '/sessions/create', :login => 'partial', :password => 'blah'
+    post '/session', :login => 'partial', :password => 'blah'
     assert_redirected_to select_people_path
 
     assert_nil User.current_user.person
 
-    get "/people/select"
+    get select_people_path
     assert_response :success
 
-    get "/session/new"
+    get new_session_path
     assert_response :success
 
     xml_http_request :post,'people/userless_project_selected_ajax',{:project_id=>Factory(:project).id}

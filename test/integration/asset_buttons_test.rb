@@ -6,7 +6,7 @@ class AssetButtonsTest < ActionController::IntegrationTest
   def setup
     User.current_user = Factory(:user, :login => 'test')
     @current_user = User.current_user
-    post '/sessions/create', :login => 'test', :password => 'blah'
+    post '/session', :login => 'test', :password => 'blah'
   end
 
   test 'show delete' do

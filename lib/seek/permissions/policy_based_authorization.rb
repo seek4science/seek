@@ -110,7 +110,7 @@ module Seek
             ids=assets.collect{|asset| asset.id}
             clause = "asset_id IN (#{ids.join(',')})"
             sql =  "SELECT asset_id from #{lookup_table_name} WHERE user_id = #{user_id} AND (#{clause}) AND can_#{action}=#{ActiveRecord::Base.connection.quoted_true}"
-            ids = ActiveRecord::Base.connection.select_all(sql).collect{|k| k["asset_id"]}
+            ids = ActiveRecord::Base.connection.select_all(sql).collect{|k| k["asset_id"].to_s}
             assets = assets.select{|asset| ids.include?(asset.id.to_s)}
           else
             assets = assets.select{|a| a.send("authorized_for_#{action}?",user)}

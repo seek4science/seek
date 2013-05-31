@@ -32,7 +32,6 @@ SEEK::Application.configure do
   Seek::Config.default :community_news_number_of_entries,10
   Seek::Config.default :home_description, 'You can configure the text that goes here within the Admin pages: Site Configuration->Home page settings.'
   Seek::Config.default :publish_button_enabled, true
-  Seek::Config.default :strategic_eager_loading, false
   Seek::Config.default :auth_lookup_enabled,true
   Seek::Config.default :sample_parser_enabled,false
   Seek::Config.default :external_search_enabled, true
