@@ -78,7 +78,6 @@ group :development do
   gem "parallel_tests"
   gem "pry"
   gem "pry-doc"
-  gem 'ruby18_source_location'
   gem "pry-remote"
   gem "request-log-analyzer"
 end
