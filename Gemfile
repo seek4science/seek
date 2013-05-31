@@ -80,6 +80,7 @@ group :development do
   gem "pry-doc"
   gem "pry-remote"
   gem "request-log-analyzer"
+  gem 'rails-dev-boost', :git => 'git://github.com/thedarkone/rails-dev-boost.git'
 end
 
 group :test do

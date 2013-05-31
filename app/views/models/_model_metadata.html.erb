@@ -7,7 +7,7 @@
   <span id="model_type_selection">
     <%= collection_select :model,
       :model_type_id,
-      ModelType.find(:all),
+      ModelType.all,
       :id,
       :title,
       {:include_blank=>"Not specified"},
@@ -39,7 +39,7 @@
   <span id="add_model_type_form" style="display:none;">
     <p>
       <%= text_field_tag :model_type -%>
-      <%= button_to "Add",
+      <%= button_to_with_callbacks "Add",
         {:url=>{:action=>:create_model_metadata, :attribute=>"model_type"},
         :with=>"$('model_type').serialize()",
         :before=>"show_ajax_loader('model_type_selection');$('add_model_type_form').hide();"},
@@ -52,7 +52,7 @@
     <p>
       <%= hidden_field_tag :updated_model_type_id -%>
       <%= text_field_tag :updated_model_type -%>
-      <%= button_to "Update",
+      <%= button_to_with_callbacks "Update",
         {:url=>{:action=>:update_model_metadata, :attribute=>"model_type"},
         :with=>"$('updated_model_type').serialize() + '&' + $('updated_model_type_id').serialize()",
         :before=>"show_ajax_loader('model_type_selection');$('edit_model_type_form').hide();"},
@@ -71,7 +71,7 @@
   <b>Model format:</b><br/>
 
   <span id="model_format_selection">
-    <%= collection_select :model, :model_format_id, ModelFormat.find(:all), :id, :title,
+    <%= collection_select :model, :model_format_id, ModelFormat.all, :id, :title,
       {:include_blank=>"Not specified"},
       {:onchange=>"model_format_selection_changed();" }
     -%>
@@ -100,10 +100,10 @@
   <span id="add_model_format_form" style="display:none;">
     <p>
       <%= text_field_tag :model_format -%>
-      <%= button_to "Add",
+      <%= button_to_with_callbacks "Add",
         {:url=>{:action=>:create_model_metadata, :attribute=>"model_format"},
         :with=>"$('model_format').serialize()",
-        :before=>"show_ajax_loader('model_format_selection');$('add_model_format_form').hide();"},
+        :before=>"show_ajax_loader('model_format_selection');$('add_model_format_form').hide()"},
         {:remote=>true}
       -%>
     </p>
@@ -113,7 +113,7 @@
     <p>
       <%= hidden_field_tag :updated_model_format_id -%>
       <%= text_field_tag :updated_model_format -%>
-      <%= button_to "Update",
+      <%= button_to_with_callbacks "Update",
         {:url=>{:action=>:update_model_metadata, :attribute=>"model_format"},
         :with=>"$('updated_model_format').serialize() + '&' + $('updated_model_format_id').serialize()",
         :before=>"show_ajax_loader('model_format_selection');$('edit_model_format_form').hide();"},
@@ -128,7 +128,7 @@
 
 
 <%
-environment_options=[['Unknown', 0]]|RecommendedModelEnvironment.find(:all).collect{|e| [h(e.title), e.id]}
+environment_options=[['Unknown', 0]]|RecommendedModelEnvironment.all.collect{|e| [h(e.title), e.id]}
 %>
 <p>
   <b>Preferred execution or visualisation environment:</b><br/>
@@ -142,7 +142,7 @@ environment_options=[['Unknown', 0]]|RecommendedModelEnvironment.find(:all).coll
 
 <script type="text/javascript">
 <%
-ModelFormat.find(:all).each do |format|
+ModelFormat.all.each do |format|
   if (format.models.empty?)
     -%>
       model_formats_for_deletion.push(<%=  format.id -%>);
@@ -153,7 +153,7 @@ end
 %>
 
 <%
-ModelType.find(:all).each do |type|
+ModelType.all.each do |type|
   if (type.models.empty?)
     -%>
       model_types_for_deletion.push(<%=  type.id -%>);
