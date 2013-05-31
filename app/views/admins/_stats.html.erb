@@ -23,7 +23,7 @@
 -%>
 
 <%= link_to_with_callbacks image('refresh'),
-            {:url=>{:action=>"get_stats",:controller=>"admin",:element=>"stats_list"},
+            {:url=>{:action=>"get_stats",:controller=>"admins",:element=>"stats_list"},
              :with=>"'id='+encodeURIComponent($F('stats_query'))",
              :update => {:success => 'stats_list'},
              :success => "Element.show('stats_list'); new Effect.Highlight('stats_list', { duration: 1.0 });",
