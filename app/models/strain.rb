@@ -19,7 +19,7 @@ class Strain < ActiveRecord::Base
 
   validates_presence_of :title, :organism
 
-  scope :without_default,:conditions=>{:is_dummy=>false}
+  scope :without_default,where(:is_dummy=>false)
 
   include ActsAsCachedTree
   include Subscribable

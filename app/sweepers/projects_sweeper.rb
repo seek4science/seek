@@ -25,7 +25,4 @@ class ProjectsSweeper < ActionController::Caching::Sweeper
 
   end
 
-  private
-
-
 end

@@ -41,8 +41,7 @@ class Institution < ActiveRecord::Base
 
   # get a listing of all known institutions
   def self.get_all_institutions_listing
-    institutions = Institution.find(:all)
-    return institutions.collect { |i| [i.name, i.id] }
+    Institution.all.collect { |i| [i.name, i.id] }
   end  
   
 end

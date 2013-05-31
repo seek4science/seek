@@ -16,7 +16,7 @@ class ActivityLog  < ActiveRecord::Base
   def self.remove_duplicate_creates
     duplicates=ActivityLog.duplicates "create"
     duplicates.each do |duplicate|
-      matches = ActivityLog.find(:all, :conditions=>{:activity_loggable_id=>duplicate.activity_loggable_id, :activity_loggable_type=>duplicate.activity_loggable_type, :action=>"create"}, :order=>"created_at ASC")
+      matches = ActivityLog.where(:activity_loggable_id=>duplicate.activity_loggable_id, :activity_loggable_type=>duplicate.activity_loggable_type, :action=>"create").order("created_at ASC")
       (1...matches.count).to_a.each do |index|
         matches[index].destroy
       end
