@@ -4,11 +4,13 @@
 require 'authenticated_system'
 
 class ApplicationController < ActionController::Base
-  #require_dependency File.join(Gem.loaded_specs['my_annotations'].full_gem_path,'lib','app','controllers','application_controller')
+  include Seek::Errors::ControllerErrorHandling
 
   self.mod_porter_secret = PORTER_SECRET
 
   include CommonSweepers
+
+
 
   before_filter :log_extra_exception_data
 

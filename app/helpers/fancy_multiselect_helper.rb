@@ -19,6 +19,7 @@ module FancyMultiselectHelper
       options[:possibilities_options] = {} unless options[:possibilities_options]
       onchange = options[:possibilities_options][:onchange] || ''
       onchange += remote_function(
+          :method=>:get,
           :url=>{:action=>"preview", :controller=>"#{association}", :element=>"#{association}_preview"},
           :with=>"'id='+this.value",
           :before=>"show_ajax_loader('#{association}_preview')") + ';'

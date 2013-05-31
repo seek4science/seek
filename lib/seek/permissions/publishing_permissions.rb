@@ -50,16 +50,16 @@ module Seek
       end
 
       def is_rejected? time=3.months.ago
-        !ResourcePublishLog.find(:all, :conditions => ["resource_type=? AND resource_id=? AND publish_state=? AND created_at >?",
+        !ResourcePublishLog.where(["resource_type=? AND resource_id=? AND publish_state=? AND created_at >?",
                                                 self.class.name,self.id,ResourcePublishLog::REJECTED, time]).empty?
       end
 
       def is_waiting_approval? user=nil,time=3.months.ago
         if user
-          !ResourcePublishLog.find(:all, :conditions => ["resource_type=? AND resource_id=? AND culprit_type=? AND culprit_id=? AND publish_state=? AND created_at >?",
+          !ResourcePublishLog.where(["resource_type=? AND resource_id=? AND culprit_type=? AND culprit_id=? AND publish_state=? AND created_at >?",
                                                       self.class.name,self.id, user.class.name, user.id,ResourcePublishLog::WAITING_FOR_APPROVAL,time]).empty?
         else
-          !ResourcePublishLog.find(:all, :conditions => ["resource_type=? AND resource_id=? AND publish_state=? AND created_at >?",
+          !ResourcePublishLog.where(["resource_type=? AND resource_id=? AND publish_state=? AND created_at >?",
                                                          self.class.name,self.id,ResourcePublishLog::WAITING_FOR_APPROVAL,time]).empty?
         end
       end

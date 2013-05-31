@@ -3,13 +3,12 @@
 <%= error_messages_for('publication', :message => nil) %>
 
 <div class="show_basic">
-  <%= form_tag(url_for(:action => :fetch_preview, :controller => :publications),
-               {:update => {:success => 'publication_preview_container', :failure => 'publication_error'},
+  <%= form_tag(fetch_preview_publications_path,
+               {:remote=>true,:update => {:success => 'publication_preview_container', :failure => 'publication_error'},
                 :success => "Element.show('publication_preview_container'); Element.hide('publication_error'); new Effect.Highlight('publication_preview_container', { duration: 1.0 });",
                 :failure => "Element.show('publication_error'); Element.hide('publication_preview_container');new Effect.Highlight('publication_error', { duration: 1.0, startcolor: '#FF5555' });",
                 :loading => "Element.hide('publication_preview_container');Element.show('spinner');$('fetch_button').disabled=true;",
-                :complete => "Element.hide('spinner');$('fetch_button').disabled=false;",
-                :remote => true}) do %>
+                :complete => "Element.hide('spinner');$('fetch_button').disabled=false;"}) do %>
     <p>
       Choose whether to search by PubMed ID or DOI using the dropdown menu below, then enter the document identifier into the text box and click "Fetch".<br/>
       If SEEK successfully retrieves your publication, click "Register" to process to the next step.

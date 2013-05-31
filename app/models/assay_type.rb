@@ -34,8 +34,6 @@ class AssayType < ActiveRecord::Base
   def self.modelling_assay_type_id
     at=AssayType.find_by_title("modelling analysis type").id
   end
- 
-  private
 
 
 

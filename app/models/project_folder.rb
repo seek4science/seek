@@ -36,7 +36,7 @@ class ProjectFolder < ActiveRecord::Base
   end
 
   def self.new_items_folder project
-    ProjectFolder.first(:conditions=>{:project_id=>project.id,:incoming=>true})
+    ProjectFolder.where(:project_id=>project.id,:incoming=>true).first
   end
 
   #constucts the default project folders for a given project from a yaml file, by default using Rails.root/config/default_data/default_project_folders.yml
@@ -97,7 +97,7 @@ class ProjectFolder < ActiveRecord::Base
     assets=Array(assets)
     if (project_id == source_folder.project_id)
       assets.each do |asset|
-        link = ProjectFolderAsset.first(:conditions=>{:asset_id=>asset.id,:asset_type=>asset.class.name,:project_folder_id=>source_folder.id})
+        link = ProjectFolderAsset.where(:asset_id=>asset.id,:asset_type=>asset.class.name,:project_folder_id=>source_folder.id).first
         link.project_folder=self
         link.save!
       end

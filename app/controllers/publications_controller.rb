@@ -200,13 +200,17 @@ class PublicationsController < ApplicationController
         end
       end
 
-      respond_to do |format|
-        format.html { render :partial => "publications/publication_error", :locals => {:publication => @publication, :error_text => @error_text}, :status => 500 }
+      render :update do |page|
+        page[:publication_preview_container].hide
+        page[:publication_error].show
+        page[:publication_error].replace_html(render(:partial => "publications/publication_error", :locals => {:publication => @publication, :error_text => @error_text}, :status => 500 ))
       end
 
     else
-      respond_to do |format|
-        format.html { render :partial => "publications/publication_preview", :locals => {:publication => @publication, :authors => result.authors} }
+      render :update do |page|
+        page[:publication_error].hide
+        page[:publication_preview_container].show
+        page[:publication_preview_container].replace_html(render(:partial => "publications/publication_preview", :locals => {:publication => @publication, :authors => result.authors}))
       end
     end
 

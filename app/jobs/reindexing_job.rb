@@ -6,7 +6,7 @@ class ReindexingJob
   DEFAULT_PRIORITY=2
 
   def perform
-    todo = ReindexingQueue.all(:limit => BATCHSIZE, :order => :id).collect do |queued|
+    todo = ReindexingQueue.order("id ASC").limit(BATCHSIZE).collect do |queued|
       todo = queued.item
       queued.destroy
       todo

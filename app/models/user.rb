@@ -42,8 +42,8 @@ class User < ActiveRecord::Base
     
   has_many :favourite_groups, :dependent => :destroy
   
-  scope :not_activated,:conditions=>['activation_code IS NOT NULL']
-  scope :without_profile,:conditions=>['person_id IS NULL']  
+  scope :not_activated,where('activation_code IS NOT NULL')
+  scope :without_profile,where('person_id IS NULL')
   
   acts_as_uniquely_identifiable
 

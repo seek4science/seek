@@ -144,7 +144,7 @@ class Project < ActiveRecord::Base
 
   # Returns a list of projects that contain people that do not have users assigned to them
   def self.with_userless_people
-    p=Project.find(:all, :include=>:work_groups)
+    p=Project.all(:include=>:work_groups)
     return p.select { |proj| proj.includes_userless_people? }
   end
   
