@@ -26,6 +26,7 @@
           <%= select_tag :possible_models,
             options_for_select([["Select Model ...", 0]]|project_models.collect{|s| [truncate(h(s.title), :length=>select_truncate_length), s.id]}),
             {:style=>"width:90%",:onchange=>remote_function(
+                    :method=>:get,
               :url=>preview_models_path(:element=>"model_preview"),
               :with=>"'id='+this.value",
               :before=>"show_ajax_loader('model_preview')"

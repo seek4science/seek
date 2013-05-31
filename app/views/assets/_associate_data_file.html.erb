@@ -30,6 +30,7 @@
         <%= select_tag :possible_data_files,
           options_for_select([["Select Data file ...",0]]|project_data_files.collect{|s| [truncate(h(s.title),:length=>select_truncate_length),s.id]}),
           {:style=>"width:90%",:onchange=>remote_function(
+            :method=>:get,
             :url=>preview_data_files_path(:element=>"data_file_preview"),
             :with=>"'id='+this.value",
             :before=>"show_ajax_loader('data_file_preview')"

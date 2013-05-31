@@ -44,6 +44,7 @@
             <%= select_tag :possible_assays,
               options_for_select([["Select #{single_assay_class_text} ...",0]]|project_assays.collect{|s| [truncate(h(s.title),:length=>select_truncate_length),s.id]}),
               {:style=>"width:90%",:onchange=>remote_function(
+                :method=>:get,
                 :url=>{:action=>"preview",:controller=>"assays",:element=>"assay_preview"},
                 :with=>"'id='+this.value",
                 :before=>"show_ajax_loader('assay_preview')"
@@ -60,6 +61,7 @@
             <%= select_tag :possible_assays,
                   options_for_select([["Select Assay ...",0]]|project_assays.collect{|s| [truncate(h(s.title),:length=>select_truncate_length),s.id]}),
                   {:style=>"width:90%",:onchange=>remote_function(
+                    :method=>:get,
                     :url=>{:action=>"preview",:controller=>"assays",:element=>"assay_preview"},
                     :with=>"'id='+this.value",
                     :before=>"show_ajax_loader('assay_preview')"

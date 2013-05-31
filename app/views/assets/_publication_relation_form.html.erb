@@ -21,6 +21,7 @@
                 <%= select_tag :possible_publications,
                 options_for_select([["Select Publication ...",0]]|project_publications.collect{|s| [truncate(h(s.title),:length=>select_truncate_length),s.id]}),
                 {:style=>"width:90%",:onchange=>remote_function(
+                        :method=>:get,
                 :url=>preview_publications_path(:element=>"publication_preview"),
                 :with=>"'id='+this.value",
                 :before=>"show_ajax_loader('publication_preview')"
