@@ -90,7 +90,7 @@ GIT
 
 GIT
   remote: git://github.com/SysMO-DB/redbox
-  revision: 42b7b0edacb3a686324f664cdcb20b0265e5bc53
+  revision: e642058d9bac916d54d72ed7bd63558cb2a134c9
   specs:
     redbox (1.0.4)
 
