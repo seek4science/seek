@@ -96,7 +96,7 @@ GIT
 
 GIT
   remote: git://github.com/SysMO-DB/site_announcements.git
-  revision: e69987d2e063e809400df8ee5d337ffc10467b2b
+  revision: 547e6744d443c519935efe7820e0f986c55bed02
   specs:
     site_announcements (1.0.0)
 
