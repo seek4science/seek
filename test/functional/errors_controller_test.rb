@@ -16,9 +16,5 @@ class ErrorsControllerTest < ActionController::TestCase
     assert_response :success
   end
 
-  test "should get error_500" do
-    get :error_500
-    assert_response :success
-  end
 
 end
