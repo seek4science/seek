@@ -617,9 +617,12 @@ module ApplicationHelper
   end
 
   def button_to_with_callbacks name, options={}, html_options={}
-    html_options = html_options.merge(:onclick=> remote_function(options))
-    html_options = html_options.merge(:remote => true) if html_options[:remote].nil?
-    button_to name, '#', html_options
+    html = "<input type='button' value='#{name}' onclick=\"#{remote_function(options)}\""
+    html_options.each do |key,value|
+      html << "#{key} = '#{value}'"
+    end
+    html << "/>"
+    html.html_safe
   end
 
   private  
