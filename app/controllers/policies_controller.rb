@@ -62,7 +62,6 @@ class PoliciesController < ApplicationController
   end
 
   def preview_permissions
-      set_no_layout
       policy = sharing_params_to_policy
       current_person = User.current_user.try(:person)
       contributor_person = (params['is_new_file'] == 'false') ?  User.find_by_id(params['contributor_id'].to_i).try(:person) : current_person
