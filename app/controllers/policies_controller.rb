@@ -89,7 +89,7 @@ class PoliciesController < ApplicationController
       privileged_people['asset_managers'] = asset_managers unless asset_managers.empty?
 
       respond_to do |format|
-        format.html { render :template=>"layouts/preview_permissions",
+        format.html { render :partial => "layouts/preview_permissions",
                              :locals => {:policy => policy, :privileged_people => privileged_people,
                                          :updated_can_publish_immediately => updated_can_publish_immediately(resource),
                                          :send_request_publish_approval => !resource.is_waiting_approval?(current_user)}}

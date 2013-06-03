@@ -30,7 +30,7 @@ function validateResourceFields(is_new_file, resource_name, is_managed) {
         // (only do this if the fold with attributions is expanded)
         if($('attributions_fold_content').style.display == "block" &&
             autocompleters[attributions_autocompleter_id].getRecognizedSelectedIDs() != "")
-            {
+        {
             alert('You didn\'t press "Add" link to add items in the attributions autocomplete field.');
             $('attributions_autocomplete_input').focus();
             return(false);
