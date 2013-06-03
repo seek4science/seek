@@ -25,7 +25,7 @@ class HelpDocument < ActiveRecord::Base
   def self.friendly_redcloth_link(identifier)
     doc = HelpDocument.find_by_identifier(identifier.downcase)
     unless doc.nil?
-      return "\"#{doc.title}\"" + ":" + "/help/" + doc.to_param
+      return "\"#{doc.title}\"" + ":" + "/help_documents/" + doc.to_param
     else
       return ""
     end    
