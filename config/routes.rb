@@ -400,7 +400,7 @@ SEEK::Application.routes.draw do
   end
 
   resource :policies do
-    member do
+    collection do
       post :preview_permissions
     end
   end
