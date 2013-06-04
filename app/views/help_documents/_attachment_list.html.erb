@@ -22,7 +22,8 @@
         <%= link_to_with_callbacks(image('destroy', :title => "Delete attachment", :alt => "Delete attachment"),
                           {:update => "attachments_list",
                            :url => help_attachment_path(a),
-                           :confirm => 'Are you sure you wish to delete this attachment?', 
+                           :with=>"'help_document_id=' + '#{@help_document.identifier}'",
+                           :confirm => 'Are you sure you wish to delete this attachment?',
                            :method => :delete,
                            :loading => "Element.show('attachment_spinner_#{a.id}')"},
                           {:remote => true}) %>
