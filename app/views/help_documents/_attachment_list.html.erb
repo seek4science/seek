@@ -18,7 +18,7 @@
     <% attachments.each do |a| %>
       <li>
         <%= link_to "#{a.filename} - #{a.title} (#{number_to_human_size(a.size)})", download_help_attachment_path(a) -%>
-        <%= link_to(image('new', :title => "Insert link to attachment", :alt => "Insert link to attachment"), "#", :onclick => "insertAtCursor('help_document_body',\"\\\"#{a.title || a.filename}\\\":#{download_help_attachment_path(a)}\"); return false;".html_safe) %>
+        <%= link_to(image('new', :title => "Insert link to attachment", :alt => "Insert link to attachment"), "#", :onclick => "insertAtCursor('help_document_body',\"\\\"#{a.title || a.filename}\\\":#{download_help_attachment_path(a)}\"); return false;") %>
         <%= link_to_with_callbacks(image('destroy', :title => "Delete attachment", :alt => "Delete attachment"),
                           {:update => "attachments_list",
                            :url => help_attachment_path(a),

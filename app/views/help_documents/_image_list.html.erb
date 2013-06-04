@@ -22,7 +22,7 @@
       </div>
     <% end %>
     <br/>
-    <%= link_to(image('new', :title => "Insert image", :alt => "Insert image"), "#", :onclick => "insertAtCursor('help_document_body',\"!#{i.public_filename}!\"); return false;".html_safe) %>
+    <%= link_to(image('new', :title => "Insert image", :alt => "Insert image"), "#", :onclick => "insertAtCursor('help_document_body',\"!#{i.public_filename}!\"); return false;") %>
     <%= link_to_with_callbacks(image('destroy', :title => "Delete image", :alt => "Delete image"),
                       {:update => "images_list",
                        :url => help_image_path(i),
