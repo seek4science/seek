@@ -15,7 +15,7 @@ class HelpDocument < ActiveRecord::Base
     doc = doc.gsub(/\[([-a-zA-Z0-9]+)\]/) {|match| HelpDocument.friendly_redcloth_link($1)}
     #redcloth-ify
     doc = RedCloth.new(doc, [ :hard_breaks ])
-    return doc.to_html
+    return doc.to_html.html_safe
   end
 
   def to_param
@@ -25,7 +25,7 @@ class HelpDocument < ActiveRecord::Base
   def self.friendly_redcloth_link(identifier)
     doc = HelpDocument.find_by_identifier(identifier.downcase)
     unless doc.nil?
-      return "\"#{doc.title}\"" + ":" + "/help_documents/" + doc.to_param
+      return ("\"#{doc.title}\"" + ":" + "/help_documents/" + doc.to_param).html_safe
     else
       return ""
     end    
