@@ -102,7 +102,7 @@ module Seek
       SEEK::Application.config.middleware.use ExceptionNotifier,
         :sender_address         => [self.noreply_sender],
         :email_prefix           => "[ #{self.application_title} ERROR ] ",
-        :exception_recipients   => self.exception_notification_recipients.split(%r([, ]))
+        :exception_recipients   => self.exception_notification_recipients.nil? ? [] : self.exception_notification_recipients.split(%r([, ]))
     end
 
     def open_id_authentication_store_propagate
