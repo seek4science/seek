@@ -19,6 +19,7 @@ module Seek
       end
 
       def render_application_error(exception)
+        Rails.logger.error "ERROR - #{exception.class.name} - #{exception.message}"
         status = error_response_code(exception)
         respond_to do |format|
           format.html { render :template=>"errors/error_#{status}", :layout=>'layouts/errors', :status=>status }
