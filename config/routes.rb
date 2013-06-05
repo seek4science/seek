@@ -487,10 +487,6 @@ SEEK::Application.routes.draw do
   match '/policies/request_settings' => 'policies#send_policy_data', :as => :request_policy_settings
   match '/fail'=>'fail#index',:as=>:fail,:via=>:get
 
-  unless Rails.application.config.consider_all_requests_local
-    match '*not_found', :to=>'errors#error_404'
-  end
-
   # This is a legacy wild controller route that's not recommended for RESTful applications.
   # Note: This route will make all actions in every controller accessible via GET requests.
   # match ':controller(/:action(/:id))(.:format)'

@@ -90,19 +90,19 @@ module Seek
       end
     end
 
-    def exception_notification_enabled_propagate
-      if self.exception_notification_enabled
-        SEEK::Application.config.middleware.use ExceptionNotifier,
+    def exception_notification_recipients_propagate
+      configure_exception_notification
+    end
 
-        :render_only            => true
-        #:send_email_error_codes => %W( 400 406 403 405 410 500 501 503 ),
-        #:sender_address         => [self.noreply_sender],
-        #:email_prefix           => "[ #{self.application_title} ERROR ] ",
-        #:exception_recipients   => self.exception_notification_recipients.split(%r([, ]))
-      else
-        SEEK::Application.config.middleware.use ExceptionNotifier,
-          :render_only => true
-      end
+    def exception_notification_enabled_propagate
+      configure_exception_notification
+    end
+
+    def configure_exception_notification
+      SEEK::Application.config.middleware.use ExceptionNotifier,
+        :sender_address         => [self.noreply_sender],
+        :email_prefix           => "[ #{self.application_title} ERROR ] ",
+        :exception_recipients   => self.exception_notification_recipients.nil? ? [] : self.exception_notification_recipients.split(%r([, ]))
     end
 
     def open_id_authentication_store_propagate
