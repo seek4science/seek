@@ -18,7 +18,7 @@ SEEK::Application.configure do
   config.cache_store = [:file_store, "#{Rails.root}/tmp/cache"]
 
   # Don't care if the mailer can't send
-  config.action_mailer.raise_delivery_errors = true
+  config.action_mailer.raise_delivery_errors = false
 
   # Print deprecation notices to the Rails logger
   config.active_support.deprecation = :log
