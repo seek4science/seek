@@ -19,8 +19,9 @@ module Seek
       end
 
       def render_application_error(exception)
-        Rails.logger.error "ERROR - #{exception.class.name} - #{exception.message}"
+        logger.error "ERROR - #{exception.class.name} (#{exception.message})"
         status = error_response_code(exception)
+        exception_notification(status,exception)
         respond_to do |format|
           format.html { render :template=>"errors/error_#{status}", :layout=>'layouts/errors', :status=>status }
           format.all { render :nothing=>true, :status=>status }
@@ -31,6 +32,15 @@ module Seek
         ERROR_MAP[exception.class] || 500
       end
 
+      def exception_notification status,exception
+        unless !Seek::Config.exception_notification_enabled || status==404
+          begin
+            ExceptionNotifier::Notifier.exception_notification(request.env,exception).deliver
+          rescue
+            logger.error "ERROR - #{exception.class.name} (#{exception.message})"
+          end
+        end
+      end
     end
   end
 end
