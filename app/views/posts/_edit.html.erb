@@ -29,7 +29,7 @@
       <tr>
         <td valign="bottom" style="padding-bottom:15px;">
           <%= ajax_spinner_for "editbox", "spinner_black.gif" %>
-          <%= submit_tag 'Save Changes'[], :or => link_to_function('cancel'[], "EditForm.cancel()"), :tabindex => 2 %>
+          <%= submit_tag 'Save Changes'[] %> <%= link_to_function('Cancel'[], "EditForm.cancel()") %>
         </td>
       </tr>
     </table>
