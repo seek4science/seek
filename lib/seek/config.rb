@@ -55,9 +55,14 @@ module Seek
     def smtp_propagate
       smtp_hash = self.smtp
       password =  self.smtp_settings 'password'
-      smtp_hash.merge! :password => password
+      smtp_hash.merge! "password" => password
 
-      ActionMailer::Base.smtp_settings = smtp_hash
+      new_hash = {}
+      smtp_hash.keys.each do |key|
+        new_hash[key.to_sym]=smtp_hash[key]
+      end
+
+      ActionMailer::Base.smtp_settings = new_hash
     end
 
     def google_analytics_enabled_propagate

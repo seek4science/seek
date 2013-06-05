@@ -27,7 +27,7 @@ class HomesController < ApplicationController
     subject=params[:subject]
     anon=params[:anon]
     details=params[:details]
-    
+
     anon=anon=="true"
 
     if subject.nil? or details.nil?
