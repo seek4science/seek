@@ -1,4 +1,5 @@
 class ErrorsController < ApplicationController
+  layout 'errors'
   def error_404
   end
 
