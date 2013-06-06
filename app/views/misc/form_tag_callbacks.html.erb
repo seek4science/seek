@@ -1,0 +1,7 @@
+<script type="text/javascript">
+  <% if loading -%>
+        var loading_<%= id -%>=function() {<%= loading.html_safe -%>};
+
+        $('<%= id -%>').observe("ajax:before",loading_<%= id -%>);
+  <% end -%>
+</script>

@@ -17,4 +17,14 @@ module AjaxHelper
     html.html_safe
   end
 
+  def form_tag_with_callbacks url_for_options = {}, options = {}, &block
+    loading = options.delete(:loading)
+    id = options[:id]
+    html = form_tag url_for_options, options, &block
+    html << render(:template=>"misc/form_tag_callbacks",:locals=>{:id=>id, :loading=>loading})
+
+
+    html
+  end
+
 end
