@@ -20,36 +20,31 @@ class SpreadsheetAnnotationsController < ApplicationController
                                      :value => content)
 
         if(@annotation.save)
-          respond_to do |format|
-            format.html { render :partial => "spreadsheets/annotations", :locals=>{ :annotations => @content_blob.spreadsheet_annotations }}
-          end
+          render_success_update attribute_name
         else
-          respond_to do |format|
-            format.html { render :partial => "spreadsheets/spreadsheet_errors", :status => 500, :locals=>{ :verb => "adding", :errors => @annotation.errors} }
-          end
+          render_failure_update attribute_name, @annotation.errors
         end
       else
-        respond_to do |format|
-          format.html { render :partial => "spreadsheets/spreadsheet_errors", :status => 500, :locals=>{ :verb => "adding", :errors => cell.errors} }
-        end
+        render_failure_update attribute_name, cell.errors
       end
     else
-      respond_to do |format|
-        format.html { render :partial => "spreadsheets/annotations", :locals=>{ :annotations => @content_blob.spreadsheet_annotations }}
-      end
+      render_success_update attribute_name
     end
 
   end
 
-
   def update
     if @annotation.errors.empty? && @annotation.update_attributes(:value => params[:annotation_content])
-      respond_to do |format|
-        format.html { render :partial => "spreadsheets/annotations", :locals=>{ :annotations => @content_blob.spreadsheet_annotations} }
+      render :update do |page|
+        page.replace_html "annotations", :partial => "spreadsheets/annotations", :locals=>{ :annotations => @content_blob.spreadsheet_annotations }
+        page["spinner" + @annotation.id.to_s].hide
+        page["spreadsheet_errors"].hide
       end
     else
-      respond_to do |format|
-        format.html { render :partial => "spreadsheets/spreadsheet_errors", :status => 500, :locals=>{ :verb => "editing", :errors => @annotation.errors} }
+      render :update do |page|
+        page.replace_html "spreadsheet_errors", :partial => "spreadsheets/spreadsheet_errors", :status => 500, :locals=>{ :verb => "adding", :errors => @annotation.errors}
+        page["spinner" + @annotation.id.to_s].hide
+        page["spreadsheet_errors"].show
       end
     end
   end
@@ -97,4 +92,31 @@ class SpreadsheetAnnotationsController < ApplicationController
     end
   end
 
+  def render_success_update attribute_name
+    render :update do |page|
+      page.replace_html "annotations", :partial => "spreadsheets/annotations", :locals=>{ :annotations => @content_blob.spreadsheet_annotations }
+      page["annotation_form"].hide
+      page["spreadsheet_errors"].hide
+      if attribute_name == "annotation"
+        page["spinner"].hide
+      else
+        page["spinner_plot"].hide
+        page["plot_panel"].hide
+      end
+    end
+  end
+
+  def render_failure_update attribute_name, errors
+    render :update do |page|
+      page.replace_html "spreadsheet_errors", :partial => "spreadsheets/spreadsheet_errors", :status => 500, :locals=>{ :verb => "adding", :errors => errors}
+      page["annotation_form"].hide
+      page["spreadsheet_errors"].show
+      if attribute_name == "annotation"
+        page["spinner"].hide
+      else
+        page["spinner_plot"].hide
+        page["plot_panel"].hide
+      end
+    end
+  end
 end
