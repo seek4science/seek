@@ -11,8 +11,8 @@ resource_type = text_for_resource(resource)
 
 
           <div id="request_resource_form" style="display:none;width:100%">
-            <%= form_tag(polymorphic_url(resource, :action => :request_resource),
-                         {:before=>"Effect.Appear('requesting_resource_status');$('request_resource_form').hide();",
+            <%= form_tag_with_callbacks(polymorphic_url(resource, :action => :request_resource),
+                         {:id=>"request_resource",:before=>"Effect.Appear('requesting_resource_status');$('request_resource_form').hide();",
                          :remote => true}) do -%>
 
             <p>

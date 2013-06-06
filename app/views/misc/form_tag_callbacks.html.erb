@@ -1,15 +1,45 @@
 <script type="text/javascript">
+    <% if loading -%>
+        var loading_<%= id -%> = function () {<%= loading.html_safe -%>
+        };
+
+        $('<%= id -%>').observe("ajax:before", loading_<%= id -%>);
+    <% end -%>
+
     <% if before -%>
         var before_<%= id -%> = function () {<%= before.html_safe -%>
         };
 
         $('<%= id -%>').observe("ajax:before", before_<%= id -%>);
     <% end -%>
-    <% if loaded -%>
-        var loaded_<%= id -%> = function () {<%= loaded.html_safe -%>
+
+    <% if complete -%>
+        var complete_<%= id -%> = function () {<%= complete.html_safe -%>
         };
 
-        $('<%= id -%>').observe("ajax:complete", loaded_<%= id -%>);
+        $('<%= id -%>').observe("ajax:complete", complete_<%= id -%>);
 
+    <% end -%>
+
+    <% if after -%>
+        var after_<%= id -%> = function () {<%= after.html_safe -%>
+        };
+
+        $('<%= id -%>').observe("ajax:after", after_<%= id -%>);
+    <% end -%>
+
+    <% if success -%>
+        var success_<%= id -%> = function () {<%= success.html_safe -%>
+        };
+
+        $('<%= id -%>').observe("ajax:success", success_<%= id -%>);
+
+    <% end -%>
+
+    <% if failure -%>
+        var failure_<%= id -%> = function () {<%= failure.html_safe -%>
+        };
+
+        $('<%= id -%>').observe("ajax:failure", failure_<%= id -%>);
     <% end -%>
 </script>

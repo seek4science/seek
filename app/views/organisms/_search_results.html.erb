@@ -1,5 +1,5 @@
-<%= form_tag(search_ajax_organisms_path,
-             {:before=>"show_ajax_loader('search_results');", :remote => true}) do -%>
+<%= form_tag_with_callbacks(search_ajax_organisms_path,
+             {:id=>"search_organism",:before=>"show_ajax_loader('search_results');", :remote => true}) do -%>
     <%= hidden_field_tag :pagenum, 1 -%>
     <p>
       <label>Search for:</label><br/>
