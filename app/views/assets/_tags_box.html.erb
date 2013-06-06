@@ -28,8 +28,9 @@
 
 <div id="create_a_tag" style="display:none;">
 
-  <%= form_tag({:action => :update_annotations_ajax},
+  <%= form_tag_with_callbacks({:action => :update_annotations_ajax},
                {:method =>:post,
+                :id=>"create_tag",
                 :loading =>"$('tags_submit_button').value='Updating...';$('tags_submit_button').disabled=true;show_ajax_loader('tag_cloud');",
                 :remote => true}) do
   %>

@@ -1,0 +1,15 @@
+<script type="text/javascript">
+    <% if before -%>
+        var before_<%= id -%> = function () {<%= before.html_safe -%>
+        };
+
+        $('<%= id -%>').observe("ajax:before", before_<%= id -%>);
+    <% end -%>
+    <% if loaded -%>
+        var loaded_<%= id -%> = function () {<%= loaded.html_safe -%>
+        };
+
+        $('<%= id -%>').observe("ajax:complete", loaded_<%= id -%>);
+
+    <% end -%>
+</script>

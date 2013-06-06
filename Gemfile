@@ -52,7 +52,6 @@ gem 'rails_autolink'
 gem 'gibberish', :git => "git://github.com/SysMO-DB/gibberish.git"
 gem 'white_list', :git => "git://github.com/SysMO-DB/white_list.git"
 gem 'white_list_formatted_content', :git => "git://github.com/SysMO-DB/white_list_formatted_content.git"
-gem 'pubmed_query_tool', :git => "git://github.com/SysMO-DB/pubmed_query_tool.git"
 gem 'my_rails_settings', :git => "git://github.com/SysMO-DB/my_rails_settings.git", :require=>"settings"
 gem 'piwik_analytics',:git=>"git://github.com/SysMO-DB/piwik-ruby-tracking.git"
 gem 'my_savage_beast', :git => "git://github.com/SysMO-DB/my_savage_beast"
@@ -65,6 +64,7 @@ gem 'acts_as_activity_logged', :git => "git://github.com/SysMO-DB/acts_as_activi
 gem 'acts_as_trashable',:git=> "git://github.com/SysMO-DB/acts_as_trashable.git"
 gem "app_version", :git => "git://github.com/SysMO-DB/app_version.git"
 gem 'doi_query_tool', :git => "git://github.com/SysMO-DB/doi_query_tool.git"
+gem 'pubmed_query_tool', :git => "git://github.com/SysMO-DB/pubmed_query_tool.git"
 gem 'convert_office',:git=>"git://github.com/SysMO-DB/convert_office.git", :ref=>"753f2567dbd625bc89071e1150404efbb562e130"
 
 gem "fleximage", :git=>"git://github.com/SysMO-DB/fleximage"
