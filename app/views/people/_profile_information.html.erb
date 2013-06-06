@@ -2,8 +2,8 @@
     admin_or_me = (current_user.try(:person) == @person || admin_logged_in?)
 %>
 
-<div <%= "class='yui-gc'" if admin_or_me -%> >
-  <div <%= "class='yui-u first'" if admin_or_me -%>>
+<div <%= "class='yui-gc'".html_safe if admin_or_me -%> >
+  <div <%= "class='yui-u first'".html_safe if admin_or_me -%>>
     <p>
       <b>Name:</b>
       <%= h @person.name %>
@@ -31,35 +31,35 @@
     <%= render :partial=>"areas_of_expertise", :locals => {:person=>@person} %>
   </div>
   <% if admin_or_me %>
-  <div class="yui-u">
+      <div <%= "class='yui-u'".html_safe %>>
 
-        <p>
-          <span class='none_text'>Only shown to you and administrators</span>
-        </p>
-
-        <p>
-          <b>Seek ID: </b>
-          <%= @person.id %>
-        </p>
-        <% if !@person.user.nil? && @person.user.login %>
             <p>
-              <b>Login name:</b>
-              <%= h @person.user.login %>
+              <span class='none_text'>Only shown to you and administrators</span>
             </p>
-        <% end %>
-        <% if !@person.user.nil? && @person.user.openid %>
-            <p>
-              <b>OpenID URL:</b>
-              <%= h @person.user.openid %>
-            </p>
-        <% end %>
-        <p>
-          <b>Joined:</b>
-          <%= @person.registered? ? date_as_string(@person.user.created_at, true) : 'This person has not yet registered' -%>
-        </p>
 
-  </div>
-    <% end %>
+            <p>
+              <b>Seek ID: </b>
+              <%= @person.id %>
+            </p>
+            <% if !@person.user.nil? && @person.user.login %>
+                <p>
+                  <b>Login name:</b>
+                  <%= h @person.user.login %>
+                </p>
+            <% end %>
+            <% if !@person.user.nil? && @person.user.openid %>
+                <p>
+                  <b>OpenID URL:</b>
+                  <%= h @person.user.openid %>
+                </p>
+            <% end %>
+            <p>
+              <b>Joined:</b>
+              <%= @person.registered? ? date_as_string(@person.user.created_at, true) : 'This person has not yet registered' -%>
+            </p>
+
+      </div>
+  <% end %>
 </div>
 
 <%= item_description @person.description,:label=>"About me" %>
