@@ -82,7 +82,7 @@ class TopicsController < ApplicationController
   end
   
   def update
-    @topic.attributes = params[:topic]
+    @topic.title = params[:topic][:title]
     assign_protected
     @topic.save!
     respond_to do |format|
