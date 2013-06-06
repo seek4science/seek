@@ -1,7 +1,7 @@
 <div id="edit" class="editbox">
   <div class="container">
-    <%= form_for :post, :url => post_path(:forum_id => @post.forum_id, :topic_id => @post.topic_id, :id => @post),
-      :html => { :method => :put, :remote => true }, :before => "$('editbox_spinner').show();" do |f| -%>
+    <%= form_for_with_callbacks :post, :url => post_path(:forum_id => @post.forum_id, :topic_id => @post.topic_id, :id => @post),
+      :before => "$('editbox_spinner').show();",:html => {:id=>"edit_forum_post", :method => :put, :remote => true } do |f| -%>
   
     <table width="100%" border="0" cellpadding="0" cellspacing="0">
       <tr>
