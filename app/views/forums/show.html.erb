@@ -2,7 +2,7 @@
   <% content_for :right do %>
 
     <% unless @forum.description.blank? %>
-      <%= @forum.description_html %>
+      <%= @forum.description_html.html_safe %>
       <hr />
     <% end %>
 
@@ -75,9 +75,9 @@
           <% end %>
         </td>
         <td class="c2">
-          <%= "Sticky"[:sticky_title]+": <strong>" if topic.sticky? %>
+          <%= ("Sticky"[:sticky_title]+": <strong>").html_safe if topic.sticky? %>
           <%= topic_title_link (topic), :class => "entry-title", :rel => "bookmark" %>
-          <%= "</strong>" if topic.sticky? %>
+          <%= "</strong>".html_safe if topic.sticky? %>
           <% if topic.paged? -%>
             <small><%= link_to 'last'[], forum_topic_path(:forum_id => @forum, :id => topic, :page => topic.last_page) %></small>
           <% end -%>
@@ -87,7 +87,7 @@
         <td class="lp inv">
           <%= time_ago_in_words(topic.replied_at) %> ago
           <br/>
-          <%= 'by {user}'[:by_user, "<strong>#{h(topic.replied_by_user.display_name)}</strong>"] %>
+          <%= 'by {user}'[:by_user, "<strong>#{h(topic.replied_by_user.display_name)}</strong>"].html_safe %>
           <span><%= link_to '(view)'[], forum_topic_path(:forum_id => @forum, :id => topic, :page => topic.last_page, :anchor => "posts-#{topic.last_post_id}") %></span>
         </td>
       </tr>

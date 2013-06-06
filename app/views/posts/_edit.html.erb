@@ -17,11 +17,11 @@
           <h5><%= 'Formatting Help'[] %></h5>
   
           <ul class="help">
-            <li><%= '*bold*'[:formatting_bold] %></li>
-            <li><%= '_italics_'[:formatting_italics] %></li>
-            <li><%= 'bq. <span>(quotes)</span>'[:formatting_blockquote] %></li>
+            <li><%= '*bold*'[:formatting_bold].html_safe %></li>
+            <li><%= '_italics_'[:formatting_italics].html_safe  %></li>
+            <li><%= 'bq. <span>(quotes)</span>'[:formatting_blockquote].html_safe  %></li>
             <li>"IBM":http://www.ibm.com</li>
-            <li><%= '* or # <span>(lists)</span>'[:formatting_list] %></li>
+            <li><%= '* or # <span>(lists)</span>'[:formatting_list].html_safe %></li>
           </ul>
   
         </td>
@@ -29,7 +29,7 @@
       <tr>
         <td valign="bottom" style="padding-bottom:15px;">
           <%= ajax_spinner_for "editbox", "spinner_black.gif" %>
-          <%= submit_tag 'Save Changes'[], :or => link_to_function('cancel'[], "EditForm.cancel()"), :tabindex => 2 %>
+          <%= submit_tag 'Save Changes'[] %> <%= link_to_function('Cancel'[], "EditForm.cancel()") %>
         </td>
       </tr>
     </table>
