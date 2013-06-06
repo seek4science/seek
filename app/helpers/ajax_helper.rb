@@ -25,7 +25,6 @@ module AjaxHelper
   end
 
   def form_for_with_callbacks record, options={}, &block
-    pp options
     js = form_callback_javascript options
     html = form_for record, options, &block
     html << js
