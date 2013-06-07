@@ -33,7 +33,6 @@
         };
 
         $('<%= id -%>').observe("ajax:success", success_<%= id -%>);
-
     <% end -%>
 
     <% if failure -%>
@@ -42,4 +41,11 @@
 
         $('<%= id -%>').observe("ajax:failure", failure_<%= id -%>);
     <% end -%>
+
+    <% if success_update_element -%>
+    $('<%= id -%>').observe("ajax:success", function(event) {
+        $('<%= success_update_element -%>').update(event.memo.responseText);
+    });
+    <% end -%>
+
 </script>

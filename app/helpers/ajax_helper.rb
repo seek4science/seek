@@ -43,13 +43,20 @@ module AjaxHelper
     after = options.delete(:after)
     id = options[:id]
     id ||= options[:html][:id] if options[:html]
+    success_update_element = options[:update][:success] if options[:update]
+    failure_update_element = options[:update][:failure] if options[:update]
+
     render(:template=>"misc/form_tag_callbacks",:locals=>{:id=>id,
                                                           :before=>before,
                                                           :loading=>loading,
                                                           :complete=>complete,
                                                           :after=>after,
                                                           :success=>success,
-                                                          :failure=>failure})
+                                                          :failure=>failure,
+                                                          :success_update_element=>success_update_element,
+                                                          :failure_update_element=>failure_update_element
+
+    })
   end
 
 

@@ -4,7 +4,7 @@
     <div style="float: right"><a href="#" onclick="$j('#annotation_form').hide(); return false;">Close</a></div>
     <br style="clear:both"/>
   </div>
-  <%= form_tag_with_callbacks({:controller => "spreadsheet_annotations", :action => "create"},
+  <%= form_tag_with_callbacks(spreadsheet_annotations_path,
                 {:update => {:success => "annotations", :failure => "spreadsheet_errors"},
                 :success => "$j('#spreadsheet_errors').hide();",
                 :failure => "$j('#spreadsheet_errors').show();",
