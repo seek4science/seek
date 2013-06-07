@@ -4,8 +4,13 @@
     <div style="float: right"><a href="#" onclick="$j('#annotation_form').hide(); return false;">Close</a></div>
     <br style="clear:both"/>
   </div>
-  <%= form_tag(spreadsheet_annotations_path,
-               {:html => {:id => "annotation_form"},
+  <%= form_tag({:controller => "spreadsheet_annotations", :action => "create"},
+               {:update => {:success => "annotations", :failure => "spreadsheet_errors"},
+                :success => "$j('#spreadsheet_errors').hide();",
+                :failure => "$j('#spreadsheet_errors').show();",
+                :loading => "Element.show('spinner');",
+                :complete => "Element.hide('spinner');Element.hide('annotation_form');",
+                :html => {:id => "annotation_form"},
                 :remote => true}) do %>
     
     <%= hidden_field_tag :annotation_content_blob_id, @display_data_file.content_blob.id %>
@@ -24,7 +29,7 @@
     </p>
     <%# --- %>
                        
-    <%= submit_tag 'Add Annotation',:id=>"fetch_button", :onclick => "Element.show('spinner')" %>
+    <%= submit_tag 'Add Annotation',:id=>"fetch_button" %>
   <% end %>
   <%= image_tag "ajax-loader.gif", :id => 'spinner', :style => 'display:none;' -%>
 </div>
