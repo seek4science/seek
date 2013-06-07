@@ -1,0 +1,6 @@
+
+  <%  if (annotation.attribute.name == "plot_data") -%>
+      <%= render :partial=>"spreadsheets/annotation_plot_data",:object=>annotation -%>
+  <% else -%>
+      <%= render :partial=>"spreadsheets/annotation_text_data",:object=>annotation -%>
+  <% end -%>

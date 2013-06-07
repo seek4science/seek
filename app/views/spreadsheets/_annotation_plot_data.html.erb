@@ -1,9 +1,13 @@
 <% annotation = annotation_plot_data -%>
 <div class="annotation annotation_plot_data" id="annotation_<%=annotation.id-%>">
-    <%= form_tag(spreadsheet_annotation_path(annotation.id),
-                 :method => :put,
-                 :remote => true,
-                 :html => {:id => "annotation_form"}) do %>
+    <%= form_tag(spreadsheet_annotation_path(annotation),
+                     {:method => :put,
+                     :update => { :success => "annotations", :failure => "spreadsheet_errors"},
+                     :success => "$j('#spreadsheet_errors').hide();",
+                     :failure => "$j('#spreadsheet_errors').show();",
+                     :loading => "$j('#spinner" + annotation.id.to_s + "').show();",
+                     :complete => "$j('#spinner" + annotation.id.to_s + "').hide();",
+                     :id => "edit_plot_data_form_#{annotation.id}", :remote => true}) do %>
 
       <div class="annotation_content">
         <div class="annotation_avatar">
@@ -39,7 +43,7 @@
         </div>
         <br style="clear:both"/>
         <div id="annotation_controls" style="display:none">
-          <%= submit_tag 'Save Changes',:id=>"fetch_button", :onclick => "$j('#spinner" + annotation.id.to_s + "').show();" %> or <%= link_to "Cancel", "", :onclick => "toggle_annotation_form('" + annotation.id.to_s + "'); return false;"-%>
+          <%= submit_tag 'Save Changes',:id=>"edit_plot_data_button" %> or <%= link_to "Cancel", "", :onclick => "toggle_annotation_form('" + annotation.id.to_s + "'); return false;"-%>
         </div>
       </div>
       <% end %>
