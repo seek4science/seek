@@ -92,7 +92,7 @@
                         <!-- reactions script -->
                         <script type="text/javascript">
                             var rtreaction = new ResizeableTextbox('reaction');
-                            rtreaction.SetText("<%= @params_hash['reaction'] -%>");
+                            rtreaction.SetText("<%= @params_hash['reaction'].html_safe -%>");
                             rtreaction.GetContainer().style.left = '10px';
                             rtreaction.GetContainer().style.top = '10px';
                             rtreaction.SetCurrentWidth(600);
@@ -130,7 +130,7 @@
                         <!-- equations script -->
                         <script type="text/javascript"> 
 						var rtkinetics = new ResizeableTextbox('kinetics');
-						rtkinetics.SetText("<%= @params_hash['kinetics'] -%>");
+						rtkinetics.SetText("<%= @params_hash['kinetics'].html_safe -%>");
 						rtkinetics.GetContainer().style.left = '10px';
 						rtkinetics.GetContainer().style.top = '10px';
 						rtkinetics.SetCurrentWidth(600);
