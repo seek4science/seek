@@ -12,13 +12,14 @@
   </div>
   <div>&nbsp;</div>
 
-  <%= form_tag({:controller => "spreadsheet_annotations", :action => "create"},
-               {:update => {:success => "annotations", :failure => "spreadsheet_errors"},
+  <%= form_tag_with_callbacks(spreadsheet_annotations_path,
+               {       :method=>:post,
+                       :update => {:success => "annotations", :failure => "spreadsheet_errors"},
                 :success => "$j('#spreadsheet_errors').hide();",
                 :failure => "$j('#spreadsheet_errors').show();",
-                :loading => "Element.show('spinner_plot');",
-                :complete => "Element.hide('spinner_plot');Element.hide('plot_panel');",
-                :html => {:id => "plot_panel"},
+                :loading => "Element.show('spinner_plot');$('store_plot_button').disabled=true;",
+                :complete => "Element.hide('spinner_plot');Element.hide('plot_panel');$('store_plot_button').disabled=false;",
+                :id => "plot_panel_form",
                 :remote => true}) do %>
 
     <div style="display:none;">
@@ -30,7 +31,7 @@
       <%= text_area_tag :annotation_content,nil,:class=>"annotation_content_class" %>
       <%= hidden_field_tag :annotation_attribute_name, "plot_data" %>
     </div>
-    <%= submit_tag 'Store as annotation',:id=>"fetch_button" %>
+    <%= submit_tag 'Store as annotation',:id=>"store_plot_button" %>
   <% end %>
   <%= image_tag "ajax-loader.gif", :id => 'spinner_plot', :style => 'display:none;' -%>
 

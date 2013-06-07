@@ -21,11 +21,11 @@ class SpreadsheetAnnotationsController < ApplicationController
 
         if(@annotation.save)
           respond_to do |format|
-            format.html { render :partial => "spreadsheets/annotations", :locals=>{ :annotations => @content_blob.spreadsheet_annotations }}
+            format.js { render :partial => "spreadsheets/annotations", :locals=>{ :annotations => @content_blob.spreadsheet_annotations }}
           end
         else
           respond_to do |format|
-            format.html { render :partial => "spreadsheets/spreadsheet_errors", :status => 500, :locals=>{ :verb => "adding", :errors => @annotation.errors} }
+            format.js { render :partial => "spreadsheets/spreadsheet_errors", :status => 500, :locals=>{ :verb => "adding", :errors => @annotation.errors} }
           end
         end
       else

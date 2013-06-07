@@ -4,14 +4,14 @@
     <div style="float: right"><a href="#" onclick="$j('#annotation_form').hide(); return false;">Close</a></div>
     <br style="clear:both"/>
   </div>
-  <%= form_tag({:controller => "spreadsheet_annotations", :action => "create"},
-               {:update => {:success => "annotations", :failure => "spreadsheet_errors"},
+  <%= form_tag_with_callbacks({:controller => "spreadsheet_annotations", :action => "create"},
+                {:update => {:success => "annotations", :failure => "spreadsheet_errors"},
                 :success => "$j('#spreadsheet_errors').hide();",
                 :failure => "$j('#spreadsheet_errors').show();",
-                :loading => "Element.show('spinner');",
-                :complete => "Element.hide('spinner');Element.hide('annotation_form');",
-                :html => {:id => "annotation_form"},
-                :remote => true}) do %>
+                :loading => "Element.show('spinner');$('create_annotation_button').disabled=true;",
+                :complete => "Element.hide('spinner');Element.hide('annotation_form');$('create_annotation_button').disabled=false;",
+                :id => "new_annotation_form",:remote => true}
+                ) do %>
     
     <%= hidden_field_tag :annotation_content_blob_id, @display_data_file.content_blob.id %>
     <%= hidden_field_tag :annotation_sheet_id, "0" %>
@@ -21,15 +21,13 @@
       <%= text_field_tag :annotation_cell_coverage, nil,:class=>"annotation_cell_coverage_class" %>
     </p>
 
-    <%#The stuff here can potentially be abstracted out into a partial when dealing with different annotation types%>
     <p>
       Content:<br/>
       <%= text_area_tag :annotation_content,nil %>
       <%= hidden_field_tag :annotation_attribute_name, "annotation" %>
     </p>
-    <%# --- %>
                        
-    <%= submit_tag 'Add Annotation',:id=>"fetch_button" %>
+    <%= submit_tag 'Add Annotation',:id=>"create_annotation_button" %>
   <% end %>
   <%= image_tag "ajax-loader.gif", :id => 'spinner', :style => 'display:none;' -%>
 </div>
