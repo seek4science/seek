@@ -84,6 +84,8 @@ class SpreadsheetAnnotationsControllerTest < ActionController::TestCase
     xhr  :put, :update, {:id => annotations(:annotation_1).id,
          :annotation_content => "Updated"}
 
+    assert_response :error
+
     assert assigns(:annotation).errors.full_messages.include?("You may not edit or remove other users' annotations.")
 
     assert_equal "HELLO WORLD", assigns(:annotation).value.text
