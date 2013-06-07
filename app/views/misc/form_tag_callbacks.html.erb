@@ -48,4 +48,10 @@
     });
     <% end -%>
 
+    <% if failure_update_element -%>
+    $('<%= id -%>').observe("ajax:failure", function(event) {
+        $('<%= failure_update_element -%>').update(event.memo.responseText);
+    });
+    <% end -%>
+
 </script>
