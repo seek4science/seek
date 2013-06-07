@@ -3,8 +3,9 @@
 <%= error_messages_for('publication', :message => nil) %>
 
 <div class="show_basic">
-  <%= form_tag(fetch_preview_publications_path,
-               {:remote=>true,:update => {:success => 'publication_preview_container', :failure => 'publication_error'},
+  <%= form_tag_with_callbacks(fetch_preview_publications_path,
+               {:remote=>true,
+                :id=>"fetch_publication",
                 :success => "Element.show('publication_preview_container'); Element.hide('publication_error'); new Effect.Highlight('publication_preview_container', { duration: 1.0 });",
                 :failure => "Element.show('publication_error'); Element.hide('publication_preview_container');new Effect.Highlight('publication_error', { duration: 1.0, startcolor: '#FF5555' });",
                 :loading => "Element.hide('publication_preview_container');Element.show('spinner');$('fetch_button').disabled=true;",

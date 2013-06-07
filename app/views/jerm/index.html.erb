@@ -29,8 +29,8 @@
 
 <h1>JERM Administration</h1>
 
-<%= form_tag(url_for(:controller=>:jerm,:action=>:fetch),
-  {:before=>"harvester_initiated();", :remote => true}) do -%>
+<%= form_tag_with_callbacks(url_for(:controller=>:jerm,:action=>:fetch),
+  {:id=>"start_jerm",:before=>"harvester_initiated();", :remote => true}) do -%>
   Project: <%= select_tag :project,
     options_for_select( Project.find(:all).collect{|p| [h("#{p.title}"),p.id]} ),
     :onchange=>"javascript: selected_product_changed()"

@@ -25,7 +25,6 @@ module AjaxHelper
   end
 
   def form_for_with_callbacks record, options={}, &block
-    pp options
     js = form_callback_javascript options
     html = form_for record, options, &block
     html << js
@@ -35,12 +34,22 @@ module AjaxHelper
   private
 
   def form_callback_javascript options
-    before = options.delete(:loading)
-    before ||= options.delete(:before)
-    loaded = options.delete(:loaded)
+    loading = options.delete(:loading)
+    before = options.delete(:before)
+    complete = options.delete(:loaded)
+    complete ||= options.delete(:complete)
+    success = options.delete(:success)
+    failure = options.delete(:failure)
+    after = options.delete(:after)
     id = options[:id]
     id ||= options[:html][:id] if options[:html]
-    render(:template=>"misc/form_tag_callbacks",:locals=>{:id=>id, :before=>before, :loaded=>loaded})
+    render(:template=>"misc/form_tag_callbacks",:locals=>{:id=>id,
+                                                          :before=>before,
+                                                          :loading=>loading,
+                                                          :complete=>complete,
+                                                          :after=>after,
+                                                          :success=>success,
+                                                          :failure=>failure})
   end
 
 
