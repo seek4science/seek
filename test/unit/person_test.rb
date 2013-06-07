@@ -614,6 +614,23 @@ class PersonTest < ActiveSupport::TestCase
     end
   end
 
+  test "get the correct investigations and studides" do
+    p = Factory(:person)
+    u = p.user
+
+    inv1 = Factory(:investigation, :contributor=>p)
+    inv2 = Factory(:investigation, :contributor=>u)
+
+    study1 = Factory(:study, :contributor=>p)
+    study2 = Factory(:study, :contributor=>u)
+    p = Person.find(p.id)
+
+    assert_equal [study1,study2],p.studies.sort_by(&:id)
+
+    assert_equal [inv1,inv2],p.investigations.sort_by(&:id)
+
+  end
+
   test 'non-admin can not change the roles of a person' do
     User.with_current_user Factory(:person).user do
       person = Factory(:person)

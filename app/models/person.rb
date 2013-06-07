@@ -63,9 +63,9 @@ class Person < ActiveRecord::Base
 
   has_many :work_groups, :through=>:group_memberships, :before_add => proc {|person, wg| person.project_subscriptions.build :project => wg.project unless person.project_subscriptions.detect {|ps| ps.project == wg.project}},
   :before_remove => proc {|person, wg| person.project_subscriptions.delete(person.project_subscriptions.detect {|ps| ps.project == wg.project})}
-  has_many :studies, :foreign_key => :contributor_id
+  has_many :studies_for_person, :as=>:contributor, :class_name=>"Study"
   has_many :assays,:foreign_key => :owner_id
-  has_many :investigations,:foreign_key=>:contributor_id
+  has_many :investigations_for_person,:as=>:contributor, :class_name=>"Investigation"
 
 
   has_one :user, :dependent=>:destroy
@@ -127,6 +127,22 @@ class Person < ActiveRecord::Base
    #the roles defined within SEEK
   def roles=(roles)
     self.roles_mask = (roles & ROLES).map { |r| 2**ROLES.index(r) }.sum
+  end
+
+  def studies
+    result = studies_for_person
+    if user
+      result = (result | user.studies).compact
+    end
+    result
+  end
+
+  def investigations
+    result = investigations_for_person
+    if user
+      result = (result | user.investigations).compact
+    end
+    result
   end
 
   def roles
