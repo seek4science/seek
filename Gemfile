@@ -19,8 +19,8 @@ gem 'factory_girl',"2.6.4"
 gem 'ratom',"0.6.9"
 gem 'rubyzip'
 gem 'bio'
-gem 'sunspot_rails','1.3.3'
-gem 'sunspot_solr','1.3.3'
+gem 'sunspot_rails','1.3.1'
+gem 'sunspot_solr','1.3.1'
 gem 'savon',"1.1.0"
 gem "dynamic_form"
 gem "prototype-rails"
