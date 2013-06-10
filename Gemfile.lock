@@ -202,7 +202,6 @@ GEM
       actionmailer (>= 3.0.4)
     factory_girl (2.6.4)
       activesupport (>= 2.3.9)
-    fastercsv (1.5.1)
     ffi (1.8.1)
     fssm (0.2.10)
     gyoku (0.4.6)
@@ -378,7 +377,6 @@ DEPENDENCIES
   equivalent-xml
   exception_notification
   factory_girl (= 2.6.4)
-  fastercsv (= 1.5.1)
   fleximage!
   fssm
   gibberish!
