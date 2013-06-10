@@ -161,7 +161,7 @@ class CompoundsController < ApplicationController
   private  
 
   def find_all_compounds
-     @compounds=Compound.find(:all,:order=>:name)
+     @compounds=Compound.order(:name)
   end
 
 end

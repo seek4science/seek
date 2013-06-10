@@ -12,7 +12,7 @@
           <td>
             <div id="assay_list_collection">
               <%= f.label :available_disciplines %><br/>
-              <%= select_tag :possible_disciplines,options_for_select( Discipline.find(:all).collect{|d| [h("#{d.title}"),d.id]} ),:style => "width: 15em;" %>
+              <%= select_tag :possible_disciplines,options_for_select( Discipline.all.collect{|d| [h("#{d.title}"),d.id]} ),:style => "width: 15em;" %>
               <b><%= link_to_function "Add","addSelectedDiscipline(); return(false);" %></b>
             </div>
           </td>

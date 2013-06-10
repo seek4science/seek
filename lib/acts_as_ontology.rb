@@ -23,7 +23,7 @@ module Stu
           if (root_id)
             roots << self.find(root_id)
           else            
-            all=self.find(:all,:include=>:parents)
+            all=self.includes(:parents)
             all.each do |o|
               roots << o if o.parents.empty?
             end

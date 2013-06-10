@@ -12,6 +12,6 @@
 
 <%= render :partial => "assets/resource_list", :locals => { :collection => @models, :authorization_for_showing_already_done=>true } %>
 
-<% if @models.page == "latest" && Model.find(:all).length > Seek::Config.limit_latest%>
+<% if @models.page == "latest" && Model.count > Seek::Config.limit_latest%>
     <%= render :partial => "layouts/paginate_see_all"%>
 <% end %>

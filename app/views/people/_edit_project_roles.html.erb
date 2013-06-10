@@ -1,6 +1,6 @@
 
 <label>Available roles</label><br/>
-<%= select_tag "possible_roles_#{group_membership.id}",options_for_select( ProjectRole.find(:all).collect{|d| [h("#{d.name}"),d.id]} ),:style => "width: 15em;" %>
+<%= select_tag "possible_roles_#{group_membership.id}",options_for_select( ProjectRole.all.collect{|d| [h("#{d.name}"),d.id]} ),:style => "width: 15em;" %>
 <b><%= link_to_function "Add","addSelectedRole(#{group_membership.id});return(false);" %></b>
 <br/>
 <%= link_to_function "Done","stopRolesEdit(#{group_membership.id});return(false);" %>

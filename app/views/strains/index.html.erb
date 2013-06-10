@@ -15,7 +15,7 @@
 </div>
 
 
-<% if @strains.page == "latest" && Strain.find(:all).length > Seek::Config.limit_latest %>
+<% if @strains.page == "latest" && Strain.count > Seek::Config.limit_latest %>
     <%= render :partial => "layouts/paginate_see_all" %>
 <% end %>
 

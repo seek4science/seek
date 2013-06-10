@@ -1,6 +1,6 @@
 module WorkGroupsHelper
   def work_group_select_choices
-    WorkGroup.find(:all).map{|wg| [wg.project.name+" at "+wg.institution.name,wg.id]}
+    WorkGroup.all.map{|wg| [wg.project.name+" at "+wg.institution.name,wg.id]}
   end
   
   WorkGroupOption = Struct.new(:id, :institution_name)
@@ -27,7 +27,7 @@ module WorkGroupsHelper
     if project_manager_logged_in? && !admin_logged_in?
       work_groups = current_user.person.projects.collect(&:work_groups).flatten
     else
-      work_groups = WorkGroup.find(:all,:include=>[:project,:institution])
+      work_groups = WorkGroup.includes(:project,:institution)
     end
 
 
