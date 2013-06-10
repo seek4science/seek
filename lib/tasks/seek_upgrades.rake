@@ -49,7 +49,7 @@ namespace :seek do
       title = yaml[k]["title"]
       uri = yaml[k]["term_uri"]
       unless uri.nil?
-        assay_type = AssayType.find(:first,:conditions=>["lower(title)=?",title.downcase])
+        assay_type = AssayType.where(["lower(title)=?",title.downcase]).first
 
         unless assay_type.nil?
               assay_type.term_uri = uri
@@ -70,7 +70,7 @@ namespace :seek do
       title = yaml[k]["title"]
       uri = yaml[k]["term_uri"]
       unless uri.nil?
-        tech_type = TechnologyType.find(:first,:conditions=>["lower(title)=?",title.downcase])
+        tech_type = TechnologyType.where(["lower(title)=?",title.downcase]).first
         unless tech_type.nil?
               tech_type.term_uri = uri
               tech_type.save
