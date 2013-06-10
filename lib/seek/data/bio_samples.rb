@@ -569,7 +569,7 @@ module Seek
                 specimen.age == age &&
                 specimen.age_unit == age_unit
               sleep(1);
-              new_sp = specimen.clone
+              new_sp = specimen.dup
               now = Time.now
               new_sp.title = "#{specimen_title}-#{now}"
               new_sp.contributor = User.current_user
