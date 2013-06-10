@@ -60,10 +60,10 @@ module Seek
         latest_unpublished_log =  ResourcePublishLog.last(:conditions => ["resource_type=? AND resource_id=? AND publish_state=?",
                                                                           @resource.class.name, @resource.id, ResourcePublishLog::UNPUBLISHED])
         if latest_unpublished_log.nil?
-          requesters = ResourcePublishLog.find(:all, :conditions => ["resource_type=? AND resource_id=? AND publish_state=?",
+          requesters = ResourcePublishLog.where(["resource_type=? AND resource_id=? AND publish_state=?",
                                                                      @resource.class.name, @resource.id, ResourcePublishLog::WAITING_FOR_APPROVAL]).collect(&:culprit)
         else
-          requesters = ResourcePublishLog.find(:all, :conditions => ["resource_type=? AND resource_id=? AND publish_state=? AND created_at >?",
+          requesters = ResourcePublishLog.where(["resource_type=? AND resource_id=? AND publish_state=? AND created_at >?",
                                                                      @resource.class.name, @resource.id, ResourcePublishLog::WAITING_FOR_APPROVAL,latest_unpublished_log.created_at ]).collect(&:culprit)
         end
         requesters.compact.each do |requester|

@@ -10,7 +10,7 @@ module Seek
     def initialize
       create_attributes
       
-      logs = ActivityLog.find(:all,:conditions=>["(action = ? or action = ?)","create","download"])
+      logs = ActivityLog.where(["(action = ? or action = ?)","create","download"])
       logs.each do |log|
         next unless INCLUDED_TYPES.include?(log.activity_loggable_type)
         action=""      
