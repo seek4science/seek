@@ -29,7 +29,7 @@ module HomesHelper
 
     classes.each do |c|
       valid=[]
-      c.find(:all,:order=>'updated_at DESC').each do |i|
+      c.order('updated_at DESC').each do |i|
         valid << i if !(projects & i.projects).empty? && i.can_view?
         break if valid.size >= RECENT_SIZE
       end
@@ -53,7 +53,7 @@ module HomesHelper
 
     classes.each do |c|
       valid=[]
-      c.find(:all,:order=>"updated_at DESC").each do |i|
+      c.order("updated_at DESC").each do |i|
         valid << i if !i.authorization_supported? || i.can_view?(current_user)
         break if valid.size>=RECENT_SIZE
       end

@@ -73,13 +73,13 @@ module Subscribable
   def remove_subscriptions projects
     unless projects.empty?
       project_subscription_ids = projects.collect{|project| project.project_subscriptions}.flatten.collect(&:id)
-      subscriptions = Subscription.find(:all, :conditions => ['subscribable_type=? AND subscribable_id=? AND project_subscription_id IN (?)', self.class.name, self.id, project_subscription_ids])
+      subscriptions = Subscription.where(['subscribable_type=? AND subscribable_id=? AND project_subscription_id IN (?)', self.class.name, self.id, project_subscription_ids])
       #remove also subcriptions for studies and assays association with this investigation
       if self.kind_of?(Investigation)
         study_ids = self.studies.collect(&:id)
         assay_ids = self.assays.collect(&:id)
-        subscriptions |= Subscription.find(:all, :conditions => ['subscribable_type=? AND subscribable_id IN (?) AND project_subscription_id IN (?)', 'Study', study_ids, project_subscription_ids])
-        subscriptions |= Subscription.find(:all, :conditions => ['subscribable_type=? AND subscribable_id IN (?) AND project_subscription_id IN (?)', 'Assay', assay_ids, project_subscription_ids])
+        subscriptions |= Subscription.where(['subscribable_type=? AND subscribable_id IN (?) AND project_subscription_id IN (?)', 'Study', study_ids, project_subscription_ids])
+        subscriptions |= Subscription.where(['subscribable_type=? AND subscribable_id IN (?) AND project_subscription_id IN (?)', 'Assay', assay_ids, project_subscription_ids])
       end
       subscriptions.each{|s| s.destroy}
     end

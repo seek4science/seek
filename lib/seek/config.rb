@@ -99,8 +99,7 @@ module Seek
     end
 
     def configure_exception_notification
-
-      if exception_notification_enabled
+      if exception_notification_enabled && !Rails.application.config.consider_all_requests_local
         SEEK::Application.config.middleware.use ExceptionNotifier,
           :sender_address         => [self.noreply_sender],
           :email_prefix           => "[ #{self.application_title} ERROR ] ",

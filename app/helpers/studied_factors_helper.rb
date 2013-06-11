@@ -6,7 +6,7 @@ module StudiedFactorsHelper
       all_substances = []
 
       #From Compounds table
-      compounds =  Compound.find(:all)
+      compounds =  Compound.all
       compounds.each do |compound|
         s = Substance.new
         s.id = compound.id.to_s + ',Compound'
@@ -15,7 +15,7 @@ module StudiedFactorsHelper
       end
 
       #From Synonyms table
-      synonyms = Synonym.find(:all)
+      synonyms = Synonym.all
       synonyms.each do |synonym|
         s = Substance.new
         s.id = synonym.id.to_s + ',Synonym'
@@ -80,7 +80,7 @@ module StudiedFactorsHelper
 
   #get the fses_or_ecs of the project the asset belongs to, but dont include the fses_or_ecs of that asset
   def fses_or_ecs_of_project asset, fs_or_ec
-    neighboring_assets = asset.class.find(:all).select do |a|
+    neighboring_assets = asset.class.all.select do |a|
       projects_in_common = (a.projects & asset.projects)
       a != asset and !projects_in_common.empty?
     end

@@ -8,7 +8,7 @@ class Favourite < ActiveRecord::Base
     if Seek::Config.events_enabled
       Favourite.find_all_by_user_id(user.id)
     else
-      Favourite.find_all_by_user_id(user.id,:conditions=>['resource_type != ?','Event'])
+      Favourite.where(['user_id = ? AND resource_type != ?',user.id,'Event'])
     end
   end
   

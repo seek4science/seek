@@ -5,7 +5,7 @@ class AddTitlesToTimeUnits < ActiveRecord::Migration
   TITLES_FOR_SYM = {"s"=>"second","min"=>"minute","h"=>"hour","d"=>"day","wk"=>"week","mo"=>"month","yr"=>"year"}
 
   def self.up
-    Unit.find(:all,:conditions=>{:comment=>"time",:title=>nil}).each do |unit|
+    Unit.where({:comment=>"time",:title=>nil}).each do |unit|
       title = TITLES_FOR_SYM[unit.symbol]
       unless title.nil?
         unit.title = title
@@ -17,7 +17,7 @@ class AddTitlesToTimeUnits < ActiveRecord::Migration
   end
 
   def self.down
-    Unit.find(:all,:conditions=>{:comment=>"time"}).each do |unit|
+    Unit.where({:comment=>"time"}).each do |unit|
       unit.title=nil
       unit.save
     end

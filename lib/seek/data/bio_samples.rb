@@ -480,7 +480,7 @@ module Seek
           #     t.unit_id == unit.id and
           #    t.substance == substance and
           #    t.concentration.to_s == concentration }
-          treatment = Treatment.find(:first, :conditions => ["treatment_protocol = ? and unit_id = ? and substance = ? and cast(concentration as char) = ?", treatment_protocol, unit.id, substance, concentration])
+          treatment = Treatment.where(["treatment_protocol = ? and unit_id = ? and substance = ? and cast(concentration as char) = ?", treatment_protocol, unit.id, substance, concentration]).first
 
           treatment = Treatment.new :substance => substance, :concentration => concentration, :unit_id => unit.id, :treatment_protocol => treatment_protocol unless treatment
 
@@ -569,7 +569,7 @@ module Seek
                 specimen.age == age &&
                 specimen.age_unit == age_unit
               sleep(1);
-              new_sp = specimen.clone
+              new_sp = specimen.dup
               now = Time.now
               new_sp.title = "#{specimen_title}-#{now}"
               new_sp.contributor = User.current_user
@@ -596,7 +596,7 @@ module Seek
             modification = Modification.new :title => genotype_modification, :symbol => genotype_modification unless modification
             modification.save!
 
-            genotype =  Genotype.find(:first, :conditions => ["gene_id = ? and modification_id = ? and specimen_id = ? and strain_id = ?", gene.id, modification.id, specimen.id, strain.id])
+            genotype =  Genotype.where(["gene_id = ? and modification_id = ? and specimen_id = ? and strain_id = ?", gene.id, modification.id, specimen.id, strain.id]).first
             genotype  = Genotype.new :gene_id => gene.id, :modification_id => modification.id, :specimen_id => specimen.id, :strain_id => strain.id unless genotype
             genotype.save!
           end

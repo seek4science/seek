@@ -576,7 +576,7 @@ class ModelsControllerTest < ActionController::TestCase
     end
     
     assert_response :success
-    assert_not_nil ModelType.find(:first,:conditions=>{:title=>"fred"})
+    assert_not_nil ModelType.where({:title=>"fred"}).first
     
   end
   
@@ -587,7 +587,7 @@ class ModelsControllerTest < ActionController::TestCase
     end
     
     assert_response :success
-    assert_not_nil ModelType.find(:first,:conditions=>{:title=>"fred"})
+    assert_not_nil ModelType.where({:title=>"fred"}).first
     
   end
   
@@ -597,7 +597,7 @@ class ModelsControllerTest < ActionController::TestCase
       post :create_model_metadata, :attribute=>"model_type",:model_type=>"fred"
     end
     
-    assert_nil ModelType.find(:first,:conditions=>{:title=>"fred"})
+    assert_nil ModelType.where({:title=>"fred"}).first
     
   end
   
@@ -617,7 +617,7 @@ class ModelsControllerTest < ActionController::TestCase
     end
     
     assert_response :success
-    assert_not_nil ModelFormat.find(:first,:conditions=>{:title=>"fred"})
+    assert_not_nil ModelFormat.where({:title=>"fred"}).first
     
   end
   
@@ -628,7 +628,7 @@ class ModelsControllerTest < ActionController::TestCase
     end
     
     assert_response :success
-    assert_not_nil ModelFormat.find(:first,:conditions=>{:title=>"fred"})
+    assert_not_nil ModelFormat.where({:title=>"fred"}).first
     
   end
   
@@ -638,7 +638,7 @@ class ModelsControllerTest < ActionController::TestCase
       post :create_model_metadata, :attribute=>"model_format",:model_format=>"fred"
     end
     
-    assert_nil ModelFormat.find(:first,:conditions=>{:title=>"fred"})
+    assert_nil ModelFormat.where({:title=>"fred"}).first
     
   end
   
@@ -655,78 +655,78 @@ class ModelsControllerTest < ActionController::TestCase
     login_as(:quentin)
     m=model_formats(:SBML)
     
-    assert_nil ModelFormat.find(:first,:conditions=>{:title=>"fred"})
+    assert_nil ModelFormat.where({:title=>"fred"}).first
     
     assert_no_difference('ModelFormat.count') do
       put :update_model_metadata, :attribute=>"model_format",:updated_model_format=>"fred",:updated_model_format_id=>m.id
     end
     
-    assert_not_nil ModelFormat.find(:first,:conditions=>{:title=>"fred"})
+    assert_not_nil ModelFormat.where({:title=>"fred"}).first
   end
   
   test "should update model format as pal" do
     login_as(:pal_user)
     m=model_formats(:SBML)
     
-    assert_nil ModelFormat.find(:first,:conditions=>{:title=>"fred"})
+    assert_nil ModelFormat.where({:title=>"fred"}).first
     
     assert_no_difference('ModelFormat.count') do
       put :update_model_metadata, :attribute=>"model_format",:updated_model_format=>"fred",:updated_model_format_id=>m.id
     end
     
-    assert_not_nil ModelFormat.find(:first,:conditions=>{:title=>"fred"})
+    assert_not_nil ModelFormat.where({:title=>"fred"}).first
   end
   
   test "should not update model format as non pal" do
     login_as(:aaron)
     m=model_formats(:SBML)
     
-    assert_nil ModelFormat.find(:first,:conditions=>{:title=>"fred"})
+    assert_nil ModelFormat.where({:title=>"fred"}).first
     
     assert_no_difference('ModelFormat.count') do
       put :update_model_metadata, :attribute=>"model_format",:updated_model_format=>"fred",:updated_model_format_id=>m.id
     end
     
-    assert_nil ModelFormat.find(:first,:conditions=>{:title=>"fred"})
+    assert_nil ModelFormat.where({:title=>"fred"}).first
   end
   
   test "should update model type" do
     login_as(:quentin)
     m=model_types(:ODE)
     
-    assert_nil ModelType.find(:first,:conditions=>{:title=>"fred"})
+    assert_nil ModelType.where({:title=>"fred"}).first
     
     assert_no_difference('ModelFormat.count') do
       put :update_model_metadata, :attribute=>"model_type",:updated_model_type=>"fred",:updated_model_type_id=>m.id
     end
     
-    assert_not_nil ModelType.find(:first,:conditions=>{:title=>"fred"})
+    assert_not_nil ModelType.where({:title=>"fred"}).first
   end
   
   test "should update model type as pal" do
     login_as(:pal_user)
     m=model_types(:ODE)
     
-    assert_nil ModelType.find(:first,:conditions=>{:title=>"fred"})
+    assert_nil ModelType.where({:title=>"fred"}).first
     
     assert_no_difference('ModelFormat.count') do
       put :update_model_metadata, :attribute=>"model_type",:updated_model_type=>"fred",:updated_model_type_id=>m.id
     end
     
-    assert_not_nil ModelType.find(:first,:conditions=>{:title=>"fred"})
+    assert_not_nil ModelType.where({:title=>"fred"}).first
   end
   
   test "should not update model type as non pal" do
     login_as(:aaron)
     m=model_types(:ODE)
     
-    assert_nil ModelType.find(:first,:conditions=>{:title=>"fred"})
+    assert_nil ModelType.where({:title=>"fred"}).first
     
     assert_no_difference('ModelFormat.count') do
       put :update_model_metadata, :attribute=>"model_type",:updated_model_type=>"fred",:updated_model_type_id=>m.id
     end
     
-    assert_nil ModelType.find(:first,:conditions=>{:title=>"fred"})
+    assert_nil ModelType.where({:title=>"fred"}).first
   end
   
   def test_should_show_version

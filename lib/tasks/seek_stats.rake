@@ -63,7 +63,7 @@ namespace :seek_stats do
     conditions = conditions.delete_if{|k,v| v.nil?}
 
     filename="#{Rails.root}/tmp/activity-#{action}-#{type || "all"}.csv"
-    logs = ActivityLog.find(:all,:conditions=>conditions,:order=>:created_at)
+    logs = ActivityLog.where(conditions).order(:created_at)
     File.open(filename, "w") do |file|
       file << "date,month,type,id,controller,action,project_id,project_name,culprit_project_matches"
       logs.each do |log|

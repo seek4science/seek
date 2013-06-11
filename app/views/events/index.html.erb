@@ -10,6 +10,6 @@
 <% end %>
 <%= render :partial => "assets/resource_list", :locals => { :collection => @events, :authorization_for_showing_already_done=>true } %>
 
-<% if @events.page == "latest" && Event.find(:all).length > Seek::Config.limit_latest %>
+<% if @events.page == "latest" && Event.count > Seek::Config.limit_latest %>
     <%= render :partial => "layouts/paginate_see_all"%>
 <% end %>

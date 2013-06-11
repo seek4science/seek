@@ -142,7 +142,7 @@ class Sample < ActiveRecord::Base
  end
 
  def clone_with_associations
-   new_object= self.clone
+   new_object= self.dup
    new_object.policy = self.policy.deep_copy
    new_object.data_file_masters = self.data_file_masters.select(&:can_view?)
    new_object.sop_masters = self.sop_masters.select(&:can_view?)

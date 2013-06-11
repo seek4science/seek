@@ -30,7 +30,7 @@ module StudiesHelper
   end
 
   def sorted_measured_items
-    items=MeasuredItem.find(:all)
+    items=MeasuredItem.all
     items.sort{|a,b| a.title <=> b.title}
   end
 

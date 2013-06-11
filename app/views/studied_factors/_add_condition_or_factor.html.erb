@@ -44,8 +44,8 @@
         <td><%=  f.collection_select :measured_item_id, MeasuredItem.factors_studied_items.sort{|a,b| a.title <=> b.title},:id,:title, {}, {:onchange => "additionalFieldForItem('add_condition_or_factor_form', '')"} %></td>
         <td><%=  f.collection_select :unit_id, Unit.factors_studied_units.sort{|a,b| a.order <=> b.order},:id,:symbol %></td>
       <% elsif entity == 'experimental_condition' %>
-        <td><%= f.collection_select :measured_item_id, MeasuredItem.find(:all).sort{|a,b| a.title <=> b.title},:id,:title, {}, {:onchange => "additionalFieldForItem('add_condition_or_factor_form', '')"} %></td>
-        <td><%=  f.collection_select :unit_id, Unit.find(:all).sort{|a,b| a.order <=> b.order},:id,:symbol %></td>
+        <td><%= f.collection_select :measured_item_id, MeasuredItem.all.sort{|a,b| a.title <=> b.title},:id,:title, {}, {:onchange => "additionalFieldForItem('add_condition_or_factor_form', '')"} %></td>
+        <td><%=  f.collection_select :unit_id, Unit.all.sort{|a,b| a.order <=> b.order},:id,:symbol %></td>
       <% end %>
 
       <td><%= f.text_field :start_value,:size=>4 %></td>

@@ -11,6 +11,6 @@
   <%= render :partial=>"assets/resource_list_item", :collection=>@projects %>
 </div>
 
-<% if @projects.page == "latest" && Project.find(:all).length > Seek::Config.limit_latest%>
+<% if @projects.page == "latest" && Project.count > Seek::Config.limit_latest%>
     <%= render :partial => "layouts/paginate_see_all"%>
 <% end %>

@@ -52,7 +52,7 @@ module Seek
       end
 
       tags.each do |tag|
-        exists = TextValue.find(:all, :conditions=>{:text=>tag})
+        exists = TextValue.where({:text=>tag})
         # text_value exists for this attr
         if !exists.empty?
 

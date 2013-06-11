@@ -1,5 +1,5 @@
 require 'libxml'
-require 'fastercsv'
+require 'csv'
 require 'simple-spreadsheet-extractor'
 require 'open-uri'
 
@@ -154,7 +154,7 @@ class DataFuseController < ApplicationController
     matched_keys = []
     matching_csv = []
 
-    FasterCSV.parse(csv).each do |row|
+    CSV.parse(csv).each do |row|
       matched_row = []
       row.each_with_index do |v, i|
         if matching_columns[i]
@@ -170,7 +170,7 @@ class DataFuseController < ApplicationController
       matching_csv << matched_row unless matched_row.empty?
     end
 
-    result = FasterCSV.generate do |out|
+    result = CSV.generate do |out|
       matching_csv.each do |row|
         out << row
       end

@@ -15,7 +15,7 @@
 </div>
 
 
-<% if @specimens.page == "latest" && Specimen.find(:all).length > Seek::Config.limit_latest %>
+<% if @specimens.page == "latest" && Specimen.count > Seek::Config.limit_latest %>
     <%= render :partial => "layouts/paginate_see_all" %>
 <% end %>
 
