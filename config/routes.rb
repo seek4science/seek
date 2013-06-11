@@ -1,11 +1,5 @@
 SEEK::Application.routes.draw do
 
-  get "errors/error_422"
-
-  get "errors/error_404"
-
-  get "errors/error_500"
-
   ### GENERAL PAGES ###
 
   root :to => "homes#index"
@@ -84,7 +78,7 @@ SEEK::Application.routes.draw do
     end
   end
 
-  resources :project_folders
+  #resources :project_folders
 
   ### USERS AND SESSIONS ###
 
@@ -486,6 +480,12 @@ SEEK::Application.routes.draw do
   match '/forgot_password' => 'users#forgot_password', :as => :forgot_password
   match '/policies/request_settings' => 'policies#send_policy_data', :as => :request_policy_settings
   match '/fail'=>'fail#index',:as=>:fail,:via=>:get
+
+  get "errors/error_422"
+
+  get "errors/error_404"
+
+  get "errors/error_500"
 
   # This is a legacy wild controller route that's not recommended for RESTful applications.
   # Note: This route will make all actions in every controller accessible via GET requests.

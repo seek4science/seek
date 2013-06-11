@@ -6,7 +6,7 @@
 
 <ul class="sectionIcons">
   <% if Seek::Config.project_browser_enabled && logged_in_and_registered? && current_user.person.member_of?(@project) -%>
-    <li><%= image_tag_for_key('organise', project_folders_path(@project), "Organise", nil, "Organise") -%></li>
+    <li><%= image_tag_for_key('organise', project_folders_path(@project.id), "Organise", nil, "Organise") -%></li>
   <% end -%>
 <% if mine?(@project) || @project.try(:can_be_edited_by?, current_user) -%>
 
