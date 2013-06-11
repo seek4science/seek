@@ -3,6 +3,7 @@ require_dependency File.join(Gem.loaded_specs['acts_as_activity_logged'].full_ge
 class ActivityLog  < ActiveRecord::Base
 
   enforce_authorization_on_association :activity_loggable,:view
+  serialize :data
 
   #returns items that have duplicates for a given action - NOTE that the result does not contain all the actual duplicates.
   scope :duplicates, lambda {|action|
