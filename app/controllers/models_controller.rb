@@ -245,7 +245,7 @@ class ModelsController < ApplicationController
     end
     
     render :update do |page|
-      page.replace_html "model_type_selection",collection_select(:model, :model_type_id, ModelType.find(:all), :id, :title, {:include_blank=>"Not specified"},{:onchange=>"model_type_selection_changed();" })
+      page.replace_html "model_type_selection",collection_select(:model, :model_type_id, ModelType.all, :id, :title, {:include_blank=>"Not specified"},{:onchange=>"model_type_selection_changed();" })
       page.replace_html "model_type_info","#{msg}<br/>"
       info_colour= success ? "green" : "red"
       page << "$('model_type_info').style.color='#{info_colour}';"
@@ -270,7 +270,7 @@ class ModelsController < ApplicationController
     end
     
     render :update do |page|
-      page.replace_html "model_format_selection",collection_select(:model, :model_format_id, ModelFormat.find(:all), :id, :title, {:include_blank=>"Not specified"},{:onchange=>"model_format_selection_changed();" })
+      page.replace_html "model_format_selection",collection_select(:model, :model_format_id, ModelFormat.all, :id, :title, {:include_blank=>"Not specified"},{:onchange=>"model_format_selection_changed();" })
       page.replace_html "model_format_info","#{msg}<br/>"
       info_colour= success ? "green" : "red"
       page << "$('model_format_info').style.color='#{info_colour}';"
@@ -306,7 +306,7 @@ class ModelsController < ApplicationController
     end
     
     render :update do |page|
-      page.replace_html "model_type_selection",collection_select(:model, :model_type_id, ModelType.find(:all), :id, :title, {:include_blank=>"Not specified"},{:onchange=>"model_type_selection_changed();" })
+      page.replace_html "model_type_selection",collection_select(:model, :model_type_id, ModelType.all, :id, :title, {:include_blank=>"Not specified"},{:onchange=>"model_type_selection_changed();" })
       page.replace_html "model_type_info","#{msg}<br/>"
       info_colour= success ? "green" : "red"
       page << "$('model_type_info').style.color='#{info_colour}';"
@@ -332,7 +332,7 @@ class ModelsController < ApplicationController
     
     
     render :update do |page|
-      page.replace_html "model_type_selection",collection_select(:model, :model_type_id, ModelType.find(:all), :id, :title, {:include_blank=>"Not specified"},{:onchange=>"model_type_selection_changed();" })
+      page.replace_html "model_type_selection",collection_select(:model, :model_type_id, ModelType.all, :id, :title, {:include_blank=>"Not specified"},{:onchange=>"model_type_selection_changed();" })
       page.replace_html "model_type_info","#{msg}<br/>"
       info_colour= success ? "green" : "red"
       page << "$('model_type_info').style.color='#{info_colour}';"
@@ -359,7 +359,7 @@ class ModelsController < ApplicationController
     
     
     render :update do |page|
-      page.replace_html "model_format_selection",collection_select(:model, :model_format_id, ModelFormat.find(:all), :id, :title, {:include_blank=>"Not specified"},{:onchange=>"model_format_selection_changed();" })
+      page.replace_html "model_format_selection",collection_select(:model, :model_format_id, ModelFormat.all, :id, :title, {:include_blank=>"Not specified"},{:onchange=>"model_format_selection_changed();" })
       page.replace_html "model_format_info","#{msg}<br/>"
       info_colour= success ? "green" : "red"
       page << "$('model_format_info').style.color='#{info_colour}';"
@@ -388,7 +388,7 @@ class ModelsController < ApplicationController
     end
     
     render :update do |page|
-      page.replace_html "model_format_selection",collection_select(:model, :model_format_id, ModelFormat.find(:all), :id, :title, {:include_blank=>"Not specified"},{:onchange=>"model_format_selection_changed();" })
+      page.replace_html "model_format_selection",collection_select(:model, :model_format_id, ModelFormat.all, :id, :title, {:include_blank=>"Not specified"},{:onchange=>"model_format_selection_changed();" })
       page.replace_html "model_format_info","#{msg}<br/>"
       info_colour= success ? "green" : "red"
       page << "$('model_format_info').style.color='#{info_colour}';"

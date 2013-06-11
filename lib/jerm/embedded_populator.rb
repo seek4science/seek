@@ -9,7 +9,7 @@ module Jerm
   class EmbeddedPopulator < Populator    
     
     def find_by_uri uri
-      ContentBlob.find(:first,:conditions=>{:url=>uri})
+      ContentBlob.where({:url=>uri}).first
     end
     
     #adds the resource as a new asset within the registry
@@ -20,12 +20,12 @@ module Jerm
       begin
         warning=nil
         warning_code=0
-        project = Project.find(:first,:conditions=>['name = ?',resource.project])
+        project = Project.where(['name = ?',resource.project]).first
         
         if resource.author_seek_id && resource.author_seek_id.to_i>0 #final check it that the string is a number. to_i on String returns 0 if not
           author = Person.find(resource.author_seek_id)
         else
-          author = Person.find(:first,:conditions=>['first_name = ? AND last_name = ?',resource.author_first_name,resource.author_last_name])
+          author = Person.where(['first_name = ? AND last_name = ?',resource.author_first_name,resource.author_last_name]).first
         end
         
         if project.nil?

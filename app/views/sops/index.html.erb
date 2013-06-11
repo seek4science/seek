@@ -12,6 +12,6 @@
 
 <%= render :partial => "assets/resource_list", :locals => { :collection => @sops, :authorization_for_showing_already_done=>true } %>
 
-<% if @sops.page == "latest" && Sop.find(:all).length > Seek::Config.limit_latest%>
+<% if @sops.page == "latest" && Sop.count > Seek::Config.limit_latest%>
     <%= render :partial => "layouts/paginate_see_all"%>
 <% end %>

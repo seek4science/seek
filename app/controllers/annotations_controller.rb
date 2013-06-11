@@ -18,9 +18,6 @@ class AnnotationsController < ApplicationController
         @other_tagging_assets << annotatable unless @other_tagging_assets.include?(annotatable)
       end
 
-
-      #TextValue.find(:all, @original_tag.value_id).each do
-
       if @other_tagging_assets.empty?
         flash.now[:notice]="No objects (or none that you are authorized to view) are tagged with '<b>#{annotation.value.text}</b>'."
       else

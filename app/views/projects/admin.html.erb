@@ -24,9 +24,9 @@
       <%
          institution_list = []
          if admin_logged_in?
-            institution_list |= Institution.find(:all)
+            institution_list |= Institution.all
          elsif project_manager_logged_in?
-            institution_list |= (Institution.find(:all).select{|i| i.projects.empty?} + @project.institutions).uniq
+            institution_list |= (Institution.all.select{|i| i.projects.empty?} + @project.institutions).uniq
          end
       %>
       <%= f.collection_select :institution_ids, institution_list, :id, :name, {}, {:style => "width: 85%; height: 200px;", :multiple=>true} -%>

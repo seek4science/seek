@@ -22,7 +22,7 @@
      parent_id_prefix = "specimen"
    end
 
-   all_institutions = Institution.find(:all, :order => :name)
+   all_institutions = Institution.order(:name)
    existing_creators = []
    if action == :new
      existing_creators = [current_user.person]

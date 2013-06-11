@@ -1,5 +1,5 @@
 <%
-  all_organisms = Organism.find(:all,:order=>:title)
+  all_organisms = Organism.order(:title)
 -%>
 <script type="text/javascript">
     strain_form("<%=strain.id-%>","<%=strain.organism_id-%>","edit", '<%=url_for(:controller => 'biosamples', :action => 'strain_form')-%>');

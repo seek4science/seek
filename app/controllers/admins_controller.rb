@@ -215,7 +215,7 @@ class AdminsController < ApplicationController
       redirect_to :action=>:tags
     else
       @tag=TextValue.find(params[:id])
-      @all_tags_as_json=TextValue.find(:all).collect{|t| {'id'=>t.id, 'name'=>t.text}}.to_json
+      @all_tags_as_json=TextValue.all.collect{|t| {'id'=>t.id, 'name'=>t.text}}.to_json
       respond_to do |format|
         format.html
       end
@@ -259,7 +259,7 @@ class AdminsController < ApplicationController
         collection = {}
         type = "invalid_users"
         pal_role=ProjectRole.pal_role
-        collection[:pal_mismatch] = Person.find(:all).select {|p| p.is_pal? != p.project_roles.include?(pal_role)}
+        collection[:pal_mismatch] = Person.all.select {|p| p.is_pal? != p.project_roles.include?(pal_role)}
         collection[:duplicates] = Person.duplicates
         collection[:no_person] = User.without_profile
       when "not_activated"
@@ -338,7 +338,7 @@ class AdminsController < ApplicationController
     x[Date.parse(start).jd]=0
     x[Date.today.jd]=0
 
-    model.find(:all, :order=>:created_at).each do |i|
+    model.order(:created_at).each do |i|
       date=i.created_at.to_date
       day=date.jd
       x[day] ||= 0

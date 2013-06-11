@@ -13,7 +13,7 @@
 
 <%
    select_truncate_length=120
-   all_organisms = Organism.find(:all, :order => :title)
+   all_organisms = Organism.order(:title)
    default_selected_organisms = try_block { current_user.person.projects.first.organism_ids }.blank? ? [0] : try_block { current_user.person.projects.first.organism_ids }
 -%>
 

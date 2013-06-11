@@ -19,7 +19,7 @@
 
   }
 
-<% Project.find(:all).each do |p| %>
+<% Project.all.each do |p| %>
     run_times[<%= p.id %>]="<%= p.last_jerm_run.blank? ? "Never" : p.last_jerm_run.to_s %>";
 <% end %>
 
@@ -32,7 +32,7 @@
 <%= form_tag_with_callbacks(url_for(:controller=>:jerm,:action=>:fetch),
   {:id=>"start_jerm",:before=>"harvester_initiated();", :remote => true}) do -%>
   Project: <%= select_tag :project,
-    options_for_select( Project.find(:all).collect{|p| [h("#{p.title}"),p.id]} ),
+    options_for_select( Project.all.collect{|p| [h("#{p.title}"),p.id]} ),
     :onchange=>"javascript: selected_product_changed()"
 %>
   <span id="last_ran"></span><br/>

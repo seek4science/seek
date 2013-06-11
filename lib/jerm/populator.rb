@@ -68,7 +68,7 @@ module Jerm
       if find_by_uri(resource.uri).nil?
         #Check the file doesn't exist
         #FIXME: Checks project here and again in the embeddedpopulator later on.
-        project = Project.find(:first,:conditions=>['name = ?',resource.project]) #get project
+        project = Project.where(:conditions=>['name = ?',resource.project]).first #get project
         if project.nil?
           return false
         end

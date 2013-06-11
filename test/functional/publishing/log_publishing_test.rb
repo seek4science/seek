@@ -20,7 +20,7 @@ class LogPublishingTest < ActionController::TestCase
     assert_difference ('ResourcePublishLog.count') do
       post :create, :sop => sop_params, :sharing => public_sharing
     end
-    publish_log = ResourcePublishLog.find(:last)
+    publish_log = ResourcePublishLog.last
     assert_equal ResourcePublishLog::PUBLISHED, publish_log.publish_state.to_i
     sop = assigns(:sop)
     assert_equal sop, publish_log.resource
@@ -32,7 +32,7 @@ class LogPublishingTest < ActionController::TestCase
     assert_difference ('ResourcePublishLog.count') do
       post :create, :sop => valid_sop, :sharing => {:sharing_scope => Policy::EVERYONE, "access_type_#{Policy::EVERYONE}" => Policy::VISIBLE}
     end
-    publish_log = ResourcePublishLog.find(:last)
+    publish_log = ResourcePublishLog.last
     assert_equal ResourcePublishLog::WAITING_FOR_APPROVAL, publish_log.publish_state.to_i
     sop = assigns(:sop)
     assert_equal sop, publish_log.resource
@@ -59,7 +59,7 @@ class LogPublishingTest < ActionController::TestCase
     assert_difference ('ResourcePublishLog.count') do
       put :update, :id => sop.id, :sharing => public_sharing
     end
-    publish_log = ResourcePublishLog.find(:last)
+    publish_log = ResourcePublishLog.last
     assert_equal ResourcePublishLog::PUBLISHED, publish_log.publish_state.to_i
     sop = assigns(:sop)
     assert_equal sop, publish_log.resource
@@ -77,7 +77,7 @@ class LogPublishingTest < ActionController::TestCase
     assert_difference ('ResourcePublishLog.count') do
       put :update, :id => sop.id, :sharing => {:sharing_scope => Policy::EVERYONE, "access_type_#{Policy::EVERYONE}" => Policy::VISIBLE}
     end
-    publish_log = ResourcePublishLog.find(:last)
+    publish_log = ResourcePublishLog.last
     assert_equal ResourcePublishLog::WAITING_FOR_APPROVAL, publish_log.publish_state.to_i
     sop = assigns(:sop)
     assert_equal sop, publish_log.resource
@@ -108,7 +108,7 @@ class LogPublishingTest < ActionController::TestCase
     assert_difference ('ResourcePublishLog.count') do
       put :update, :id => sop.id, :sharing => {:sharing_scope => Policy::PRIVATE, "access_type_#{Policy::PRIVATE}" => Policy::NO_ACCESS}
     end
-    publish_log = ResourcePublishLog.find(:last)
+    publish_log = ResourcePublishLog.last
     assert_equal ResourcePublishLog::UNPUBLISHED, publish_log.publish_state.to_i
     sop = assigns(:sop)
     assert_equal sop, publish_log.resource
@@ -129,7 +129,7 @@ class LogPublishingTest < ActionController::TestCase
       post :gatekeeper_decide, :id => df.id, :gatekeeper_decision => 1
     end
 
-    publish_log = ResourcePublishLog.find(:last)
+    publish_log = ResourcePublishLog.last
     assert_equal ResourcePublishLog::PUBLISHED, publish_log.publish_state.to_i
     df = assigns(:data_file)
     assert_equal df, publish_log.resource

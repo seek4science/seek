@@ -171,7 +171,7 @@ class Specimen < ActiveRecord::Base
   end
 
   def clone_with_associations
-    new_object= self.clone
+    new_object= self.dup
     new_object.policy = self.policy.deep_copy
     new_object.sop_masters = self.try(:sop_masters)
     new_object.creators = self.try(:creators)

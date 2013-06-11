@@ -35,12 +35,12 @@ class PeopleController < ApplicationController
     if (params[:discipline_id])
       @discipline=Discipline.find(params[:discipline_id])
       #FIXME: strips out the disciplines that don't match
-      @people=Person.find(:all,:include=>:disciplines,:conditions=>["disciplines.id=?",@discipline.id])
+      @people=Person.where(["disciplines.id=?",@discipline.id]).includes(:disciplines)
       #need to reload the people to get their full discipline list - otherwise only get those matched above. Must be a better solution to this
       @people.each(&:reload)
     elsif (params[:project_role_id])
       @project_role=ProjectRole.find(params[:project_role_id])
-      @people=Person.find(:all,:include=>[:group_memberships])
+      @people=Person.includes(:group_memberships)
       #FIXME: this needs double checking, (a) not sure its right, (b) can be paged when using find.
       @people=@people.select{|p| !(p.group_memberships & @project_role.group_memberships).empty?}
     end

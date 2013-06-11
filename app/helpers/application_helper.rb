@@ -239,12 +239,6 @@ module ApplicationHelper
       else
         return (contributor_name_link + you_string).html_safe
       end
-      # other types might be supported
-      # elsif contributortype.to_s == "Network"
-      #network = Network.find(:first, :select => "id, title", :conditions => ["id = ?", contributorid])
-      #return nil unless network
-      #
-      #return title(network)
     else
       return nil
     end

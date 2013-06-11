@@ -1,4 +1,4 @@
-require 'fastercsv'
+require 'csv'
 
 
 module Seek
@@ -80,7 +80,7 @@ module Seek
         #load template
         path_to_template=File.join(File.dirname(__FILE__), "rdf_mappings.csv")
         rows = Rails.cache.fetch("rdf_definitions",:expires_in=>1.hour) do
-          FasterCSV.read(path_to_template)
+          CSV.read(path_to_template)
         end
         rows.each do |row|
           unless row[0].downcase=="class"

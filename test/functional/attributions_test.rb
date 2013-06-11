@@ -114,9 +114,9 @@ class AttributionsTest < ActionController::TestCase
     # --- Verify that synchronisation was performed correctly ---
     
     # attribution that was supposed to be deleted was really destroyed
-    deleted_attr_to_sop_one = Relationship.find(:first, :conditions => { :subject_id => attr_to_sop_one.subject_id, :subject_type => attr_to_sop_one.subject_type,
+    deleted_attr_to_sop_one = Relationship.where({ :subject_id => attr_to_sop_one.subject_id, :subject_type => attr_to_sop_one.subject_type,
                                                                          :predicate => attr_to_sop_one.predicate, :object_id => attr_to_sop_one.object_id,
-                                                                         :object_type => attr_to_sop_one.object_type } )
+                                                                         :object_type => attr_to_sop_one.object_type } ).first
     assert_equal nil, deleted_attr_to_sop_one
     
     
@@ -124,19 +124,19 @@ class AttributionsTest < ActionController::TestCase
     # this will then indicate that it was identified to be existing and was properly
     # handled by keeping intact instead of removing and re-creating new record with the
     # same attribution data
-    remaining_attr_to_sop_two = Relationship.find(:first, :conditions => { :subject_id => attr_to_sop_two.subject_id, :subject_type => attr_to_sop_two.subject_type,
+    remaining_attr_to_sop_two = Relationship.where({ :subject_id => attr_to_sop_two.subject_id, :subject_type => attr_to_sop_two.subject_type,
                                                                            :predicate => attr_to_sop_two.predicate, :object_id => attr_to_sop_two.object_id,
-                                                                           :object_type => attr_to_sop_two.object_type } )
+                                                                           :object_type => attr_to_sop_two.object_type } ).first
     assert_equal attr_to_sop_two.id, remaining_attr_to_sop_two.id
     
     
     # make sure that new attribution was created correctly
     # (we have already checked that the total number of attributions after running the test
     #  is correct - one removed, one added, one left unchanged: total - unchanged)
-    new_attr = Relationship.find(:first, :conditions => { :subject_id => sop_id, :subject_type => sop_instance.class.name,
+    new_attr = Relationship.where({ :subject_id => sop_id, :subject_type => sop_instance.class.name,
                                                           :predicate => Relationship::ATTRIBUTED_TO, :object_id => 44,
-                                                          :object_type => "Sop" } )
-    assert (!new_attr.nil?), "new attribution should't be nil - nil means that it wasn't created"
+                                                          :object_type => "Sop" } ).first
+    assert (!new_attr.nil?), "new attribution shouldn't be nil - nil means that it wasn't created"
   end
 
   test "should display attributions" do

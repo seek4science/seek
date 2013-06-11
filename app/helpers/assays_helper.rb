@@ -6,7 +6,7 @@ module AssaysHelper
 
   #assays that haven't already been associated with a study
   def assays_available_for_study_association
-    Assay.find(:all,:conditions=>['study_id IS NULL'])
+    Assay.where(['study_id IS NULL'])
   end
 
   def assay_organism_list_item assay_organism

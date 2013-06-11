@@ -39,11 +39,19 @@ class FoldersController < ApplicationController
 
   def create_folder
     title=params[:title]
-    @folder.add_child(title)
-    @folder.save!
-    render :update do |page|
-      page.reload
+    if title.length>2
+      @folder.add_child(title)
+      @folder.save!
+      respond_to do |format|
+        format.js {render :text=>""}
+      end
+    else
+      error_text="The name is too short, it must be 2 or more characters"
+      respond_to do |format|
+        format.js {render :text=>error_text,:status=>500}
+      end
     end
+
   end
 
   #moves the asset identified by :asset_id and :asset_type from this folder to the folder identified by :dest_folder_id

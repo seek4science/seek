@@ -13,6 +13,6 @@
   <%= render :partial => "assets/resource_list_item", :collection=>@studies %>
 </div>
 
-<% if @studies.page == "latest" && Study.find(:all).length > Seek::Config.limit_latest%>
+<% if @studies.page == "latest" && Study.count > Seek::Config.limit_latest%>
     <%= render :partial => "layouts/paginate_see_all"%>
 <% end %>

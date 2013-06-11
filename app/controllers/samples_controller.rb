@@ -167,7 +167,7 @@ class SamplesController < ApplicationController
     join_class_string = ['Sop', resource.class.name].sort.join
     join_class = join_class_string.constantize
     to_remove.each do |id|
-      joins = join_class.find(:all, :conditions=>{"#{resource.class.name.downcase}_id".to_sym=>resource.id,:sop_id=>id})
+      joins = join_class.where({"#{resource.class.name.downcase}_id".to_sym=>resource.id,:sop_id=>id})
       joins.each{|j| j.destroy}
     end
     (new_sop_ids - existing_ids).each do |id|
