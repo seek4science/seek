@@ -56,20 +56,6 @@ function folder_clicked(folder_id, project_id) {
 
 }
 
-function create_child() {
-    var child_form = $("create_child_form");
-    var title = child_form.title.value;
-    if (title.strip().length < 2) {
-        alert("New folder name is too short.");
-    }
-    else {
-        child_form.commit.disable();
-        child_form.commit.value = "Creating ...";
-        if (child_form.onsubmit()) {
-            child_form.submit();
-        }
-    }
-}
 
 function focus_folder(folder_id) {
     var element_id = element_id_for_folder_id(folder_id);
