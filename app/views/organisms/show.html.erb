@@ -6,7 +6,7 @@
   </ul>
 <% end %>
 
-<%= render :partial => "layouts/item_title",:locals=>{:item=>@organism} %>
+<%= render :partial => "general/item_title",:locals=>{:item=>@organism} %>
 
 <div class="show_basic">
 
@@ -31,5 +31,5 @@
   </thead>
   <%= render :partial=>"strain_information_row", :collection=>@organism.strains.without_default.select(&:can_view?) -%>
   </table>
-<%= render :partial=>"layouts/items_related_to",:object => @organism %>
+<%= render :partial=>"general/items_related_to",:object => @organism %>
 </div>

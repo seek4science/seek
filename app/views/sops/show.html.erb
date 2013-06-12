@@ -1,6 +1,6 @@
 <%= javascript_include_tag "resource" -%>
 
-<%= render :partial => "layouts/item_title",:locals=>{:item=>@sop} %>
+<%= render :partial => "general/item_title",:locals=>{:item=>@sop} %>
 
 <ul class="sectionIcons">
     <%= asset_buttons @sop,@display_sop.version -%>
@@ -40,7 +40,7 @@
     <br/>
 
     <%# get, classify and authorize all assets for this project -%>
-    <%= render :partial=>"layouts/items_related_to",:object => @sop %>
+    <%= render :partial=>"general/items_related_to",:object => @sop %>
   </div>
 
 </div>

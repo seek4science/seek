@@ -2,7 +2,7 @@
 
 <% truncate_length_for_boxes = 22 -%>
 
-<%= render :partial => "layouts/item_title",:locals=>{:item=>@institution} -%>
+<%= render :partial => "general/item_title",:locals=>{:item=>@institution} -%>
 
 <% if mine?(@institution) || @institution.try(:can_be_edited_by?, current_user) -%>
   <ul class="sectionIcons">
@@ -46,6 +46,6 @@
   </div>
 
   <div style="clear:both;">
-    <%= render :partial=>"layouts/items_related_to",:object => @institution %>
+    <%= render :partial=>"general/items_related_to",:object => @institution %>
   </div>
 </div>

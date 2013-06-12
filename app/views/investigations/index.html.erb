@@ -6,7 +6,7 @@
 
 <% if @investigations.public_methods.include?("page_totals") %>
   <!-- only do the page links if the collection supports it -->
-  <%= render :partial => "layouts/paginate_alphabetical", :locals => { :pages => @investigations.pages, :page_totals=>@investigations.page_totals,:current_page=>@investigations.page } -%>
+  <%= render :partial => "general/paginate_alphabetical", :locals => { :pages => @investigations.pages, :page_totals=>@investigations.page_totals,:current_page=>@investigations.page } -%>
 <% end %>
 
 <div class="list_items_container">
@@ -14,5 +14,5 @@
 </div>
 
 <% if @investigations.page == "latest" && Investigation.count > Seek::Config.limit_latest%>
-    <%= render :partial => "layouts/paginate_see_all"%>
+    <%= render :partial => "general/paginate_see_all"%>
 <% end %>

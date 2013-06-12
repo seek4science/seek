@@ -7,4 +7,4 @@
     all_tags,item_tags = fetch_tags_for_item @person,"tool"
 %>
 
-<%= render :partial=>"layouts/select_tags",:locals=>{:all_tags=>all_tags, :item_tags=>item_tags, :name=>"tool", :no_tags_message=>"Type the tools or techniques you use regularly" } -%>
+<%= render :partial=>"tags/select_tags",:locals=>{:all_tags=>all_tags, :item_tags=>item_tags, :name=>"tool", :no_tags_message=>"Type the tools or techniques you use regularly" } -%>

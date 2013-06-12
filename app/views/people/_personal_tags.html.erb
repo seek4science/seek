@@ -22,6 +22,6 @@
     <%= "#{person.first_name.capitalize}'s tags" -%>
   </p>
 
-  <%= render :partial=>"layouts/tag_cloud",:locals=>{:tags=>tags,:show_overall_count=>true,:id=>"personal_tags",:tags_smaller=>true,:no_tags_text=>"This person has not yet tagged anything."} %>
+  <%= render :partial=>"tags/tag_cloud",:locals=>{:tags=>tags,:show_overall_count=>true,:id=>"personal_tags",:tags_smaller=>true,:no_tags_text=>"This person has not yet tagged anything."} %>
  
 </div>

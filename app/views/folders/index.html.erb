@@ -5,7 +5,7 @@
 %>
 <%= render :partial=>"yui_css_and_js" -%>
 
-<%= render :partial => "layouts/item_title",:locals=>{:title=>"Project item browser for the project '#{link_to h(@project.title),@project}'&nbsp;#{help_button}".html_safe} -%>
+<%= render :partial => "general/item_title",:locals=>{:title=>"Project item browser for the project '#{link_to h(@project.title),@project}'&nbsp;#{help_button}".html_safe} -%>
 <%=  -%>
 
 

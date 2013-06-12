@@ -46,7 +46,7 @@ module AjaxHelper
     success_update_element = options[:update][:success] if options[:update]
     failure_update_element = options[:update][:failure] if options[:update]
 
-    render(:template=>"misc/form_tag_callbacks",:locals=>{:id=>id,
+    render(:template=>"general/form_tag_callbacks",:locals=>{:id=>id,
                                                           :before=>before,
                                                           :loading=>loading,
                                                           :complete=>complete,
