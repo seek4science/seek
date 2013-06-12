@@ -19,7 +19,7 @@ module ResourceListItemHelper
     elsif resource.class.name.downcase=="event"
       ""
     else
-      "layouts/avatars"
+      "avatars/list_item_avatars"
     end
   end
 

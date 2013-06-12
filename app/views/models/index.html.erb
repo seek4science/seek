@@ -7,11 +7,11 @@
 
 <% if @models.public_methods.include?("page_totals") %>
   <!-- only do the page links if the collection supports it -->
-  <%= render :partial => "layouts/paginate_alphabetical", :locals => { :pages => @models.pages, :page_totals=>@models.page_totals,:current_page=>@models.page } -%>
+  <%= render :partial => "general/paginate_alphabetical", :locals => { :pages => @models.pages, :page_totals=>@models.page_totals,:current_page=>@models.page } -%>
 <% end %>
 
 <%= render :partial => "assets/resource_list", :locals => { :collection => @models, :authorization_for_showing_already_done=>true } %>
 
 <% if @models.page == "latest" && Model.count > Seek::Config.limit_latest%>
-    <%= render :partial => "layouts/paginate_see_all"%>
+    <%= render :partial => "general/paginate_see_all"%>
 <% end %>

@@ -1,6 +1,6 @@
 <% drag_id=model_to_drag_id @person %>
 
-<%= render :partial => "layouts/item_title", :locals=>{:item=>@person} %>
+<%= render :partial => "general/item_title", :locals=>{:item=>@person} %>
 
 <ul class="sectionIcons">
   <% if mine?(@person) || @person.can_be_edited_by?(current_user) -%>
@@ -52,7 +52,7 @@
     <%= render :partial=>"people/project_roles", :locals=>{:editable=>false} %>
     <%= render :partial=>"people/project_subscriptions",:locals => {:person=>@person} if (mine?(@person) || current_user.try(:person).try(:is_admin?))  %>
     <%# get, classify and authorize all assets for this person's user (assets belong to users, not people!) -%>
-    <%= render :partial=>"layouts/items_related_to", :object => @person %>
+    <%= render :partial=>"general/items_related_to", :object => @person %>
     <%# show the following section only to admins and only if the @person has an associated "user", which is not an admin itself - -%>
     <%# this is because it's not needed then: admins can see everything anyway -%>
     <% if admin_logged_in? -%>

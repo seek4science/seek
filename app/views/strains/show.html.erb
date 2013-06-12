@@ -1,6 +1,6 @@
 <% truncate_length_for_boxes = 22 -%>
 
-<%= render :partial => "layouts/item_title", :locals=>{:item=>@strain} %>
+<%= render :partial => "general/item_title", :locals=>{:item=>@strain} %>
 
 <ul class="sectionIcons">
   <%= render :partial => "subscriptions/subscribe", :locals => {:object => @strain} %>
@@ -58,7 +58,7 @@
 
   <div style="clear:both">
     <br/>
-    <%= render :partial=>"layouts/items_related_to", :object => @strain %>
+    <%= render :partial=>"general/items_related_to", :object => @strain %>
   </div>
 
 </div>

@@ -32,6 +32,6 @@
           Tags should be separated by a comma, and known tags will appear in the drop-down box as you type.
       <% end %>
     </p>
-    <%= render :partial=>"layouts/select_tags", :locals=>{:all_tags=>all_tags, :owned_tags=>owned_annotations, :item_tags=>item_tags, :name=>"tag"} -%>
+    <%= render :partial=>"tags/select_tags", :locals=>{:all_tags=>all_tags, :owned_tags=>owned_annotations, :item_tags=>item_tags, :name=>"tag"} -%>
   </div>
 </div>

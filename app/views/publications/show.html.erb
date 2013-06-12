@@ -1,4 +1,4 @@
-<%= render :partial => "layouts/item_title",:locals=>{:item=>@publication} %>
+<%= render :partial => "general/item_title",:locals=>{:item=>@publication} %>
 
 <ul class="sectionIcons">
   <% if !@publication.pubmed_id.nil? %>
@@ -60,7 +60,7 @@
   
   <div style="clear:both;padding-top:1em;">      
     <%= embedded_isa_svg(@publication, false, @publication) -%>
-    <%= render :partial=>"layouts/items_related_to",:object => @publication %>
+    <%= render :partial=>"general/items_related_to",:object => @publication %>
 
   </div>
 </div>

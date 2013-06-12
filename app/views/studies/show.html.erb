@@ -1,4 +1,4 @@
-<%= render :partial => "layouts/item_title",:locals=>{:item=>@study} %>
+<%= render :partial => "general/item_title",:locals=>{:item=>@study} %>
 
 <ul class="sectionIcons">
     <%= render :partial => "subscriptions/subscribe", :locals => {:object => @study} %>
@@ -64,6 +64,6 @@
     <%= embedded_isa_svg(@study.investigation,false,@study) -%>
   </div>
 
-  <%= render :partial=>"layouts/items_related_to", :object => @study %>
+  <%= render :partial=>"general/items_related_to", :object => @study %>
 
 </div>

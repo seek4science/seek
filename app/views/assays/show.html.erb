@@ -1,4 +1,4 @@
-<%= render :partial => "layouts/item_title",:locals=>{:item=>@assay} %>
+<%= render :partial => "general/item_title",:locals=>{:item=>@assay} %>
 
 <%
 @assay_word=@assay.is_modelling? ? "Analysis" : "Assay" %>
@@ -130,6 +130,6 @@
 
     <div style="clear:both">
         <%= embedded_isa_svg(@assay.study, true, @assay) -%>
-        <%= render :partial=>"layouts/items_related_to",:object => @assay %>
+        <%= render :partial=>"general/items_related_to",:object => @assay %>
     </div>
 </div>

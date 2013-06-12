@@ -1,4 +1,4 @@
-<%= render :partial => "layouts/item_title",:locals=>{:item=>@event} %>
+<%= render :partial => "general/item_title",:locals=>{:item=>@event} %>
 
 <ul class="sectionIcons">
 <%= asset_buttons @event,nil,"This deletes the Event listing. Are you sure?'" -%>
@@ -60,7 +60,7 @@
     <%= render :partial => "assets/special_auth_code_display", :locals => {:resource => @event}%>
     <%= item_description @event.description -%>
 
-    <%= render :partial=>"layouts/items_related_to",:object => @event %>
+    <%= render :partial=>"general/items_related_to",:object => @event %>
 
   </div>
 

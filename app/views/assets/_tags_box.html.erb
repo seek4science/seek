@@ -18,7 +18,7 @@
   <%= h(title) -%>
 </p>
 
-<%= render :partial=>"layouts/tag_cloud", :locals=>{:tags=>all_item_tags, :show_overall_count=>false, :id=>"tag_cloud", :tags_smaller=>true, :no_tags_text=>"This item has not yet been tagged."} %>
+<%= render :partial=>"tags/tag_cloud", :locals=>{:tags=>all_item_tags, :show_overall_count=>false, :id=>"tag_cloud", :tags_smaller=>true, :no_tags_text=>"This item has not yet been tagged."} %>
 
 <small>
   [
