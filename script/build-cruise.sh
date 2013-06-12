@@ -14,7 +14,7 @@ rm -rf filestore/
 #rvm handling is based on example at http://pivotallabs.com/users/mbarinek/blog/articles/1450-rails-3-with-rvm-and-cruise-control
 
 desired_ruby=ruby-1.8.7
-project_name=seek_rails3
+project_name=seek018
 rubygems=1.8.25
 
 # remove annoying "warning: Insecure world writable dir"
