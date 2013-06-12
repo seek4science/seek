@@ -93,7 +93,7 @@ module GroupedPagination
       if page == "all"
         records=self.all
       elsif page == "latest"
-        records=self.unscoped.order("created_at DESC").limit(@latest_limit)
+        records=self.unscoped.order("updated_at DESC").limit(@latest_limit)
       elsif @pages.include?(page)
         conditions = merge_optional_conditions(options[:conditions], page)
         query_options = {:conditions=>conditions}

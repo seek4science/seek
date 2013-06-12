@@ -3,7 +3,7 @@
 <p>
   <ul class="sectionIcons">
 	  <li><%= image_tag_for_key("avatars", all_avatars_link(avatar_for_instance), nil, nil, "Manage Pictures") -%></li>
-		<li><%= image_tag_for_key('avatar', new_avatar_link(avatar_for_instance), nil, {:onclick => "store_and_submit_unsaved_data(this, '#{controller.action_name}_#{object_type}_#{avatar_for_instance.id}'); return(false);"}, 'Upload New Picture') -%></li>
+	  <li><%= image_tag_for_key('avatar', new_avatar_link(avatar_for_instance), nil, nil, "Upload New Picture") -%></li>
 	</ul>
 		
 	<p class="box_standout" style="text-align: center; padding: 0.3em 0.5em; margin: 1.5em 0 1em 0;">
@@ -28,25 +28,4 @@
 </p>
 
 
-<script type="text/javascript">
-	function store_and_submit_unsaved_data(caller, main_form_id) {
-		// make sure that correct method will be used
-		all_method_elements = document.getElementsByName("_method")
-		for(var i = 0; i < all_method_elements.length; i++)
-		  all_method_elements[i].value = "POST";
-		
-		// submit the full "edit person" form, but change the url - all data will be posted
-		// to 'upload new avatar' page, then taken back to "edit" page afterwards
-		var f = $(main_form_id);
-		f.action = caller.href;
-		
-		// add a parameter to define where the system should return after avatar is uploaded
-		var m = document.createElement('input');
-		m.setAttribute('type', 'hidden');
-		m.setAttribute('name', 'return_to');
-		m.setAttribute('value', '<%= eval("edit_#{object_type}_path(#{avatar_for_instance.id})") -%>');
-		f.appendChild(m);
-		
-		f.submit();
-	}
-</script>
+
