@@ -1,4 +1,5 @@
-<% @search_query="" unless @search_query %>
+<%= javascript_include_tag 'default_text_search' %>
+<% @search_query="Search here..." unless @search_query %>
 
 <% search_type_options.each do |s|
      if s == "People" || s == "Projects" || s == "Institutions"
@@ -25,7 +26,7 @@ end %>
   <% form_tag search_path do -%>
     <div id="search_box">
       <font size="2" color="white"><b> <%= "Search:" %> </b></font>
-      <%= text_field_tag :search_query, @search_query -%>
+      <%= text_field_tag :search_query, @search_query, :onclick => "clickclear(this, 'Search here...')", :onblur => "clickrecall(this, 'Search here...')" -%>
       <%= select_tag :search_type, options_for_select(search_type_options,@search_type)  %>
       <%= select_tag :scale, (options_for_select({"All" => 'all'}, :selected => (params[:scale] ? nil : 'all')) + options_from_collection_for_select(Scale.all, :title, :display_title, params[:scale])) %>
       <% if Seek::Config.external_search_enabled %>
