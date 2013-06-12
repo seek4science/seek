@@ -43,10 +43,11 @@ The released versions are listed below:
 * 0.16.2
 * 0.16.3
 * 0.17.0
+* 0.17.1
 
 <em>(Note there was no 0.12.x version released externally, this was an internal release)</em>
 
-Each version has a tag in mercurial that is the version preceeded by a <em>v</em> - e.g. v0.11.1, v0.13.2, v0.14.0
+Each version has a tag in mercurial, which has the format of <em>v</em> prefix followed by the version - e.g. v0.11.1, v0.13.2, v0.17.1
 
 When upgrading between minor versions (i.e. from 0.11.x to 0.13.x) it is necessary to run a seek:upgrade rake task to perform
 upgrade changes and import any new data. The upgrade task may require an internet connection, and sometimes can take some time to run,
@@ -62,7 +63,7 @@ Upgrading follows the standard steps:
 
     RAILS_ENV=production ./script/delayed_job stop
     bundle exec rake sunspot:solr:stop RAILS_ENV=production
-    hg pull https://bitbucket.org/seek4science/seek -r v0.17.0
+    hg pull https://bitbucket.org/seek4science/seek -r v0.17.1
     hg update
     hg merge # only required if you've made changes since installing. If you have you may need to deal with conflicts.
     hg commit -m "merged" # likewise - only required if you made changes since installing
