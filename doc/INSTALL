@@ -67,9 +67,9 @@ on how to setup Apache and {Passenger Phusion (modrails)}[http://www.modrails.co
 
 Our source code is stored within the {Seek4Science BitBucket repository}[https://bitbucket.org/seek4science/seek], using Mercurial[http://mercurial.selenic.com/] as the version control system.
 
-For a stable version, you should check out according to a stable tag. Our current stable tag is <em>0.17.0</em>, so to retrieve this version you should use:
+For a stable version, you should check out according to a stable tag. Our current stable tag is <em>0.17.1</em>, so to retrieve this version you should use:
 
-  hg clone https://bitbucket.org/seek4science/seek -r v0.17.0 seek
+  hg clone https://bitbucket.org/seek4science/seek -r v0.17.1 seek
 
 This will create a <i>seek</i> directory that contains the application.
   
