@@ -53,7 +53,7 @@ module SEEK
         :person_reindexer,
         :assets_creator_reindexer
 
-    config.action_view.sanitized_allowed_attributes = 'rel'
+    config.action_view.sanitized_allowed_attributes = ['rel']
 
   end
 end
