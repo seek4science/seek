@@ -1,7 +1,6 @@
 require 'rubygems'
 require 'rake'
-require 'active_record/fixtures'
-require 'lib/seek/factor_studied.rb'
+require 'lib/seek/factor_studied'
 require 'libxml'
 require 'simple-spreadsheet-extractor'
 require 'active_record/fixtures'
