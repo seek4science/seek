@@ -15,7 +15,7 @@ gem 'simple-spreadsheet-extractor',"0.12.1"
 gem "rmagick","2.12.2"
 gem "mysql2"
 gem 'rest-client',">=1.6.1"
-gem 'factory_girl'
+gem 'factory_girl', "2.6.4"
 gem 'ratom',"0.6.9"
 gem 'rubyzip'
 gem 'bio'
