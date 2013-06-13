@@ -1,3 +1,4 @@
+#encoding: utf-8
 dimensionless:
   symbol: dimensionless
   comment: dimensionless
@@ -213,7 +214,7 @@ a.u.:
   order: 39
 
 percent:
-  symbol: %
+  symbol: "%"
   comment: percentage
   order: 38
 
