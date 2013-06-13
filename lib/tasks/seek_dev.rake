@@ -73,7 +73,7 @@ namespace :seek_dev do
 
   desc "Generate an XMI db/schema.xml file describing the current DB as seen by AR. Produces XMI 1.1 for UML 1.3 Rose Extended, viewable e.g. by StarUML"
   task :xmi => :environment do
-    require 'lib/uml_dumper.rb'
+    require 'uml_dumper.rb'
     File.open("doc/data_models/schema.xmi", "w") do |file|
       ActiveRecord::UmlDumper.dump(ActiveRecord::Base.connection, file)
     end
