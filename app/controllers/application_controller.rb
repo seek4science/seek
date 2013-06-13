@@ -42,8 +42,6 @@ class ApplicationController < ActionController::Base
     params[:xml].each {|k,v| params[k] = v} if request.format.xml? and params[:xml]
   end
 
-  layout "main"
-
   def set_no_layout
     self.class.layout nil
   end
