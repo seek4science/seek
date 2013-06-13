@@ -45,6 +45,7 @@ gem "will_paginate", "~> 3.0.4"
 gem 'calendar_date_select', :git => 'git://github.com/paneq/calendar_date_select.git'
 gem "yaml_db"
 gem 'rails_autolink'
+gem 'rfc-822'
 
 
 #Linked to SysMO Git repositories

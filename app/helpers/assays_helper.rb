@@ -1,8 +1,8 @@
 require 'acts_as_ontology_view_helper'
 
 module AssaysHelper
-  
-  include Stu::Acts::Ontology::ActsAsOntologyViewHelper  
+
+  include Stu::Acts::Ontology::ActsAsOntologyViewHelper
 
   #assays that haven't already been associated with a study
   def assays_available_for_study_association
@@ -10,10 +10,10 @@ module AssaysHelper
   end
 
   def assay_organism_list_item assay_organism
-    result = link_to h(assay_organism.organism.title),assay_organism.organism
+    result = link_to h(assay_organism.organism.title), assay_organism.organism
     if assay_organism.strain
-       result += " : "
-       result += assay_organism.strain.title
+      result += " : "
+      result += assay_organism.strain.title
     end
     if assay_organism.culture_growth_type
       result += " (#{assay_organism.culture_growth_type.title})"
@@ -21,13 +21,11 @@ module AssaysHelper
     return result.html_safe
   end
 
-
-
   def authorised_assays projects=nil
     authorised_assets(Assay, projects, "edit")
   end
 
-  def list_assay_samples_and_organisms attribute,assay_samples,assay_organisms, none_text="Not Specified"
+  def list_assay_samples_and_organisms attribute, assay_samples, assay_organisms, none_text="Not Specified"
 
     result= "<p class=\"list_item_attribute\"> <b>#{attribute}</b>: "
 
@@ -41,7 +39,7 @@ module AssaysHelper
       culture_growth_type = as.specimen.culture_growth_type
 
       if organism
-      result += link_to h(organism.title),organism,{:class => "assay_organism_info"}
+        result += link_to h(organism.title), organism, {:class => "assay_organism_info"}
       end
 
       if strain
@@ -51,7 +49,7 @@ module AssaysHelper
 
       if sample
         result += " : "
-        result += link_to h(sample.title),sample
+        result += link_to h(sample.title), sample
       end
 
       if culture_growth_type
@@ -65,9 +63,9 @@ module AssaysHelper
       strain = ao.strain
       culture_growth_type = ao.culture_growth_type
 
-       result += "<br/>" if assay_samples.blank? and ao==assay_organisms.first
+      result += "<br/>" if assay_samples.blank? and ao==assay_organisms.first
       if organism
-      result += link_to h(organism.title),organism,{:class => "assay_organism_info"}
+        result += link_to h(organism.title), organism, {:class => "assay_organism_info"}
       end
 
       if strain
@@ -85,7 +83,7 @@ module AssaysHelper
     return result.html_safe
   end
 
-  def list_assay_samples attribute,assay_samples, none_text="Not Specified"
+  def list_assay_samples attribute, assay_samples, none_text="Not Specified"
 
     result= "<p class=\"list_item_attribute\"> <b>#{attribute}</b>: "
 
@@ -100,7 +98,7 @@ module AssaysHelper
 
 
       if organism
-      result += link_to h(organism.title),organism,{:class => "assay_organism_info"}
+        result += link_to h(organism.title), organism, {:class => "assay_organism_info"}
       end
 
       if strain
@@ -110,7 +108,7 @@ module AssaysHelper
 
       if sample
         result += " : "
-        result += link_to h(sample.title),sample       
+        result += link_to h(sample.title), sample
       end
 
       if culture_growth_type
@@ -124,31 +122,31 @@ module AssaysHelper
     return result.html_safe
   end
 
-  def list_assay_organisms attribute,assay_organisms,none_text="Not specified"
+  def list_assay_organisms attribute, assay_organisms, none_text="Not specified"
     result="<p class=\"list_item_attribute\"> <b>#{attribute}</b>: "
     result +="<span class='none_text'>#{none_text}</span>" if assay_organisms.empty?
 
     assay_organisms.each do |ao|
 
-     organism = ao.organism
-     strain = ao.strain
-     culture_growth_type = ao.culture_growth_type
+      organism = ao.organism
+      strain = ao.strain
+      culture_growth_type = ao.culture_growth_type
 
-        if organism
-            result += link_to h(organism.title),organism,{:class => "assay_organism_info"}
-        end
-
-        if strain
-          result += " : "
-          result += strain.title
-        end
-       
-
-        if culture_growth_type
-          result += " (#{culture_growth_type.title})"
-        end
-        result += ",<br/>" unless ao==assay_organisms.last
+      if organism
+        result += link_to h(organism.title), organism, {:class => "assay_organism_info"}
       end
+
+      if strain
+        result += " : "
+        result += strain.title
+      end
+
+
+      if culture_growth_type
+        result += " (#{culture_growth_type.title})"
+      end
+      result += ",<br/>" unless ao==assay_organisms.last
+    end
 
     result += "</p>"
     return result.html_safe

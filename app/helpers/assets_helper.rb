@@ -158,9 +158,9 @@ module AssetsHelper
       elsif resource.respond_to? method_name
         related[type][:items] = resource.send method_name
       elsif resource.respond_to? "related_#{method_name.singularize}"
-         related[type][:items] = [resource.send "related_#{method_name.singularize}"]
+         related[type][:items] = [resource.send("related_#{method_name.singularize}")]
       elsif resource.respond_to? method_name.singularize
-        related[type][:items] = [resource.send method_name.singularize]
+        related[type][:items] = [resource.send(method_name.singularize)]
       end
     end
 

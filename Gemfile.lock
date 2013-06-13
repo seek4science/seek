@@ -298,6 +298,7 @@ GEM
     request-log-analyzer (1.12.9)
     rest-client (1.6.7)
       mime-types (>= 1.16)
+    rfc-822 (0.3.0)
     rmagick (2.12.2)
     rsolr (1.0.9)
       builder (>= 2.1.2)
@@ -412,6 +413,7 @@ DEPENDENCIES
   redbox!
   request-log-analyzer
   rest-client (>= 1.6.1)
+  rfc-822
   rmagick (= 2.12.2)
   rubaidh-google_analytics (~> 1.1.4)
   ruby-openid
