@@ -1,5 +1,4 @@
 require 'grouped_pagination'
-require 'rfc822'
 
 class Person < ActiveRecord::Base
 
@@ -25,7 +24,7 @@ class Person < ActiveRecord::Base
   validates_presence_of :email
 
   #FIXME: consolidate these regular expressions into 1 holding class
-  validates_format_of :email,:with=>RFC822::EmailAddress
+  validates_format_of :email,:with => RFC822::EMAIL
   validates_format_of :web_page, :with=>/(^$)|(^(http|https):\/\/[a-z0-9]+([\-\.]{1}[a-z0-9]+)*\.[a-z]{2,5}(([0-9]{1,5})?\/.*)?$)/ix,:allow_nil=>true,:allow_blank=>true
 
   validates_uniqueness_of :email,:case_sensitive => false
