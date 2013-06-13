@@ -345,7 +345,7 @@ class AssayTest < ActiveSupport::TestCase
       :study => studies(:metabolomics_study),
       :owner => people(:person_for_model_owner),
       :assay_class => assay_classes(:experimental_assay_class),
-      :samples => [Factory :sample]
+      :samples => [Factory(:sample)]
     )
   end
 
