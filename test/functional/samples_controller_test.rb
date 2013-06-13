@@ -262,7 +262,7 @@ class SamplesControllerTest < ActionController::TestCase
   end
 
   test "should not destroy sample related to an existing assay" do
-    s = Factory :sample, :assays => [Factory :experimental_assay], :contributor => Factory(:user)
+    s = Factory :sample, :assays => [Factory(:experimental_assay)], :contributor => Factory(:user)
     assert_no_difference("Sample.count") do
       delete :destroy, :id => s.id
     end
