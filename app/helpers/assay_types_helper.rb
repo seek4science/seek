@@ -1,3 +1,4 @@
+#encoding: utf-8
 module AssayTypesHelper
   
   #Displays the ontology with links to edit and remove each node, if requested.
