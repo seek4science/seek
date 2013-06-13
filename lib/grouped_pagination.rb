@@ -1,3 +1,4 @@
+#encoding: utf-8
 =begin
 Inspired by http://www.hennessynet.com/blog/?p=70
 but as a seperate mixin, rather than built into the will_paginate plugin
