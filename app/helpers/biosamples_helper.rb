@@ -56,10 +56,12 @@ module BiosamplesHelper
   
   def organism_selection_onchange_function
      function =  remote_function(:url=>{:action=>"existing_strains", :controller=>"biosamples"},
+                                                      :method => :get,
                                                       :with=>"'organism_ids='+$F('strain_organism_ids')",
                                                       :before=>"show_large_ajax_loader('existing_strains')")+ ";"
      function += remote_function(:url => {:controller => 'biosamples',
                                           :action => 'existing_specimens'},
+                                          :method => :get,
                                           :with => "'strain_ids=' + getSelectedStrains() + '&organism_ids='+$F('strain_organism_ids')",
                                           :before=>"show_large_ajax_loader('existing_specimens')") + ";"  if Seek::Config.is_virtualliver
      function +=  "check_show_existing_items('strain_organism_ids', 'existing_strains', '');"
@@ -75,6 +77,7 @@ module BiosamplesHelper
   def strain_checkbox_onchange_function
         function = remote_function(:url => {:controller => 'biosamples',
                                             :action => 'existing_specimens'},
+                                            :method => :get,
                                             :with => "'strain_ids=' + getSelectedStrains()+'&organism_ids='+$F('strain_organism_ids')",
                                             :before=>"show_large_ajax_loader('existing_specimens')")+ ";"
         function += "show_existing_specimens();hide_existing_samples();" unless Seek::Config.is_virtualliver
@@ -113,6 +116,7 @@ module BiosamplesHelper
       [strain_info,
        (check_box_tag "selected_specimen_#{specimen.id}", specimen.id, false, {:onchange => remote_function(:url => {:controller => 'biosamples',
                                                                                                                      :action => 'existing_samples'},
+                                                                                                                    :method => :get,
                                                                                                                     :with => "'specimen_ids=' + getSelectedSpecimens()",
                                                                                                                     :before=>"show_large_ajax_loader('existing_samples')") + ";show_existing_samples();"}),
        link_to(specimen.title, specimen_path(specimen.id)), text_or_not_specified(specimen.born_info), text_or_not_specified(specimen.culture_growth_type.try(:title)), text_or_not_specified(creators.join(", ")), specimen.id, text_or_not_specified(asset_version_links(specimen.sops).join(", ")), delete_icon, update_icon]
@@ -121,6 +125,7 @@ module BiosamplesHelper
       [strain_info,
            (check_box_tag "selected_specimen_#{specimen.id}", specimen.id, false, {:onchange => remote_function(:url => {:controller => 'biosamples',
                                                                                                                          :action => 'existing_samples'},
+                                                                                                                        :method => :get,
                                                                                                                         :with => "'specimen_ids=' + getSelectedSpecimens()",
                                                                                                                         :before=>"show_large_ajax_loader('existing_samples')") + ";show_existing_samples();"}),
            link_to(specimen.title, specimen_path(specimen.id)), text_or_not_specified(specimen.born_info), text_or_not_specified(specimen.culture_growth_type.try(:title)), text_or_not_specified(specimen.genotype_info),text_or_not_specified(specimen.phenotype_info),text_or_not_specified(creators.join(", ")), specimen.id, text_or_not_specified(asset_version_links(specimen.sops).join(", ")), delete_icon, update_icon]
