@@ -116,7 +116,7 @@ class UsersController < ApplicationController
   
   def edit
     @user = User.find(params[:id])
-    render :action=>:edit, :layout=>"main"
+    render :action=>:edit
   end
   
   def update    
