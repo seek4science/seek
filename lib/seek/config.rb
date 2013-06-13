@@ -123,9 +123,9 @@ module Seek
     end
 
     def propagate_all
-      prop_methods=self.methods.select{|m| m.end_with?("_propagate")}
+      prop_methods=self.methods.select{|m| m.to_s.end_with?("_propagate")}
       prop_methods.each do |m|
-        eval m
+        eval m.to_s
       end
     end
 
