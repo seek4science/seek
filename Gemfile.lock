@@ -201,8 +201,8 @@ GEM
     escape (0.0.4)
     exception_notification (3.0.1)
       actionmailer (>= 3.0.4)
-    factory_girl (2.6.4)
-      activesupport (>= 2.3.9)
+    factory_girl (4.2.0)
+      activesupport (>= 3.0.0)
     ffi (1.8.1)
     fssm (0.2.10)
     gyoku (0.4.6)
@@ -227,7 +227,7 @@ GEM
     method_source (0.8.1)
     mime-types (1.23)
     modporter-plugin (0.1.0)
-    multi_json (1.7.4)
+    multi_json (1.7.6)
     mysql2 (0.3.11)
     nokogiri (1.5.9)
     nori (1.1.5)
@@ -380,7 +380,7 @@ DEPENDENCIES
   dynamic_form
   equivalent-xml
   exception_notification
-  factory_girl (= 2.6.4)
+  factory_girl
   fleximage!
   fssm
   gibberish!
