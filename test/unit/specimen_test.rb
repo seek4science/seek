@@ -95,13 +95,13 @@ class SpecimenTest < ActiveSupport::TestCase
     specimen = Factory :specimen
     User.current_user = specimen.contributor
     specimen.phenotypes_attributes = {0 => {:description => 'test phenotype'}, 1 => {:description => 'test phenotype2'}}
-    assert specimen.phenotypes.count, 2
+
     assert specimen.phenotypes.detect {|p| p.description == 'test phenotype'}
     assert specimen.phenotypes.detect {|p| p.description == 'test phenotype2'}
 
     assert specimen.save
     specimen.reload
-    assert specimen.phenotypes.count, 2
+    assert_equal 2, specimen.phenotypes.count
     assert specimen.phenotypes.detect {|p| p.description == 'test phenotype'}
     assert specimen.phenotypes.detect {|p| p.description == 'test phenotype2'}
   end
