@@ -367,7 +367,7 @@
                 // first index is the category of contributor type of the permission, the second - consecutive
                 // number of occurrences of permissions for such type of contributor
                 permission_settings['<%= p.contributor_type -%>'][permissions_for_set['<%= p.contributor_type -%>']] =
-                  ['<%= contributor_name -%>', <%= p.contributor_id -%>, <%= p.access_type -%>, <%= allow_removal -%> ];
+                  ['<%= h(contributor_name) -%>', <%= p.contributor_id -%>, <%= p.access_type -%>, <%= allow_removal -%> ];
             <% end -%>
           <% end -%>
       <% end -%>
