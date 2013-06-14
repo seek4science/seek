@@ -79,13 +79,13 @@ class SpecimenTest < ActiveSupport::TestCase
     specimen = Factory :specimen
     User.current_user = specimen.contributor
     specimen.genotypes_attributes = {0 => {:gene_attributes => {:title => 'test gene'}, :modification_attributes => {:title => 'test modification'}}, 1 => {:gene_attributes => {:title => 'test gene2'}, :modification_attributes => {:title => 'test modification2'}}}
-    assert specimen.genotypes.count, 2
+    assert_equal specimen.genotypes.count, 2
     assert specimen.genotypes.detect {|g| g.gene.title == 'test gene' && g.modification.title == 'test modification'}
     assert specimen.genotypes.detect {|g| g.gene.title == 'test gene2' && g.modification.title == 'test modification2'}
 
     assert specimen.save
     specimen.reload
-    assert specimen.genotypes.count, 2
+    assert_equal 2, specimen.genotypes.count
     assert specimen.genotypes.detect {|g| g.gene.title == 'test gene' && g.modification.title == 'test modification'}
     assert specimen.genotypes.detect {|g| g.gene.title == 'test gene2' && g.modification.title == 'test modification2'}
 
@@ -151,7 +151,7 @@ class SpecimenTest < ActiveSupport::TestCase
       specimen = Factory :specimen, :contributor => User.current_user
       sop = Factory :sop, :contributor => User.current_user
       sop_version_2 = Factory(:sop_version, :sop => sop)
-      assert 2, sop.versions.count
+      assert_equal 2, sop.versions.count
       assert_equal sop_version_2, sop.latest_version
 
       specimen.build_sop_masters [sop.id]

@@ -32,7 +32,7 @@ class SessionsControllerTest < ActionController::TestCase
     assert_response :success
 
     User.destroy_all #remove all users
-    assert 0,User.count
+    assert_equal 0,User.count
     get :new
     assert_response :redirect
     assert_redirected_to signup_url
