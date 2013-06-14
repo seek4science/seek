@@ -384,7 +384,7 @@ test "should show organism and strain information of a sample if there is organi
   test "sample-sop association when sop has multiple versions" do
     sop = Factory :sop, :contributor => User.current_user
     sop_version_2 = Factory(:sop_version, :sop => sop)
-    assert 2, sop.versions.count
+    assert_equal 2, sop.versions.count
     assert_equal sop.latest_version, sop_version_2
 
     assert_difference("Sample.count") do
