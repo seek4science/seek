@@ -10,7 +10,7 @@
   end
 
   Factory.define(:person_in_project, :parent => :brand_new_person) do |f|
-    f.group_memberships {[Factory.build :group_membership]}
+    f.group_memberships {[Factory.build(:group_membership)]}
   end
 
   Factory.define(:person, :parent => :person_in_project) do |f|
@@ -202,7 +202,7 @@ end
   Factory.define(:experimental_assay, :parent => :assay_base) do |f|
     f.association :assay_class, :factory => :experimental_assay_class
     f.association :technology_type
-    f.samples {[Factory.build :sample]}
+    f.samples {[Factory.build(:sample)]}
   end
 
     Factory.define(:assay, :parent => :modelling_assay) {}
@@ -387,7 +387,7 @@ end
   #Presentation
   Factory.define(:presentation) do |f|
     f.sequence(:title) { |n| "A Presentation #{n}" }
-    f.projects { [Factory.build :project] }
+    f.projects { [Factory.build(:project)] }
     # f.data_url "http://www.virtual-liver.de/images/logo.png"
     f.association :contributor, :factory => :user
     f.after_create do |presentation|

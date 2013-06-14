@@ -883,7 +883,7 @@ class AuthorizationTest < ActiveSupport::TestCase
 
   test 'unauthorized_change_to_autosave?' do
     df = Factory(:data_file)
-    assert Policy::PRIVATE, df.policy.sharing_scope
+    assert_equal Policy::PRIVATE, df.policy.sharing_scope
     df.policy.sharing_scope = Policy::ALL_SYSMO_USERS
     assert !df.save
     assert !df.errors.empty?

@@ -42,7 +42,7 @@ class StudyTest < ActiveSupport::TestCase
     assert !study.can_delete?(project_member.user)
     assert study.can_delete?(study.contributor)
 
-    study=Factory :study, :contributor => Factory(:person), :assays => [Factory :assay]
+    study=Factory :study, :contributor => Factory(:person), :assays => [Factory(:assay)]
     assert !study.can_delete?(study.contributor)
   end
 

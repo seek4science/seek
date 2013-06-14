@@ -278,7 +278,7 @@ class SubscriptionTest < ActiveSupport::TestCase
     assert SetSubscriptionsForItemJob.exists?(s.class.name, s.id, [updated_project.id])
     SetSubscriptionsForItemJob.new(s.class.name, s.id, [updated_project.id]).perform
 
-    assert 1, s.projects.count
+    assert_equal 1, s.projects.count
     assert updated_project, s.projects.first
 
     #should no longer subscribe to this item because of changing project

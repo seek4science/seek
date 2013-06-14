@@ -97,8 +97,8 @@ class SopTest < ActiveSupport::TestCase
 
     sop=Sop.find(sop.id)
 
-    assert 1,sop.version
-    assert 1,sop.versions.size
+    assert_equal 1,sop.version
+    assert_equal 1,sop.versions.size
     assert_equal sop,sop.versions.last.sop
     assert_equal sop.title,sop.versions.first.title
 

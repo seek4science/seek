@@ -57,7 +57,7 @@ class CompoundTest < ActiveSupport::TestCase
     compound.synonyms = [synonyms1, synonyms2]
     assert compound.save!
     assert_not_nil compound.synonyms
-    assert compound.synonyms.count, 2
+    assert_equal compound.synonyms.count, 2
   end
 
   test 'should create the association compound has_many studied_factors, through studied_factor_links table ' do

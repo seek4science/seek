@@ -166,7 +166,7 @@ class ContentBlob < ActiveRecord::Base
     data_to_save ||= self.data_old
     
     if !data_to_save.nil?
-      File.open(filepath,"w+") do |f|      
+      File.open(filepath,"wb+") do |f|
         f.write(data_to_save)    
       end
     end
@@ -185,7 +185,7 @@ class ContentBlob < ActiveRecord::Base
         logger.info "Falling back to ruby copy because of: #{e.message}"
         @tmp_io_object.rewind
 
-        File.open(filepath, "w+") do |f|
+        File.open(filepath, "wb+") do |f|
           buffer=""
           while @tmp_io_object.read(16384, buffer)
             f << buffer

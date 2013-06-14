@@ -481,7 +481,7 @@ class PersonTest < ActiveSupport::TestCase
     end
     p=Person.find(p.id)
     assert_not_nil p.notifiee_info
-    assert true,p.receive_notifications?    
+    assert p.receive_notifications?
   end
   
   def test_dependent_notifiee_info_is_destroyed_with_person

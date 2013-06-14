@@ -131,7 +131,7 @@ class BioSamplesControllerTest < ActionController::TestCase
     xml_http_request(:get, :strains_of_selected_organism, {:organism_id => organism.id})
 
     received_data = ActiveSupport::JSON.decode(@response.body)
-    assert 200, received_data['status']
+    assert_equal 200, received_data['status']
     received_strains = received_data["strains"]
     assert_equal 3, received_strains.count
     assert received_strains.include?([new_strain.id, new_strain.info])

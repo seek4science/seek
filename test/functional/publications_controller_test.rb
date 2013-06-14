@@ -310,7 +310,7 @@ class PublicationsControllerTest < ActionController::TestCase
                         "Mark Delderfield","Ian Dunlop","Matthew Gamble","Danius Michaelides","Stuart Owen","David Newman","Shoaib Sufi","Carole Goble"]
 
     authors = publication.publication_author_orders.sort_by(&:order).collect{|o| o.author.first_name + ' ' + o.author.last_name}
-    assert original_authors, authors
+    assert_equal original_authors, authors
 
     seek_author1 = Factory(:person, :first_name => 'Stuart', :last_name => 'Owen')
     seek_author2 = Factory(:person, :first_name => 'Carole', :last_name => 'Goble')

@@ -67,7 +67,7 @@ class InvestigationTest < ActiveSupport::TestCase
   end
 
   test "authorized user cant delete with study" do
-    investigation = Factory :investigation, :studies => [Factory :study], :contributor => Factory(:user)
+    investigation = Factory :investigation, :studies => [Factory(:study)], :contributor => Factory(:user)
     assert !investigation.can_delete?(investigation.contributor)
   end
   

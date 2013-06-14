@@ -333,7 +333,7 @@ class DataFileTest < ActiveSupport::TestCase
 
         assert_equal 1, data_file.annotations.count
         assert_equal 0, data_file.annotations.first.versions.count
-        assert 'fish', data_file.annotations.first.value.text
+        assert_equal 'fish', data_file.annotations.first.value.text
 
         data_file_converted = data_file.to_presentation
         data_file_converted.reload
@@ -364,8 +364,7 @@ class DataFileTest < ActiveSupport::TestCase
         data_file_converted.reload
         data_file.reload
 
-        assert [], data_file.annotations
-        assert [], Annotation::Version.find(:all, :conditions => ['annotatable_type=? and annotatable_id=?', 'DataFile', data_file.id])
+        assert_equal [], Annotation::Version.find(:all, :conditions => ['annotatable_type=? and annotatable_id=?', 'DataFile', data_file.id])
         assert_equal 1, data_file_converted.annotations.count
         assert_equal 0, data_file_converted.annotations.first.versions.count
         assert 'fish', data_file_converted.annotations.first.value.text
