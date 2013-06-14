@@ -18,7 +18,7 @@ class DataFilesControllerTest < ActionController::TestCase
 
   def rest_api_test_object
     @object=data_files(:picture)
-    @object.tag_with "tag1,tag2"
+    @object.tag_with "tag1"
     @object
   end
   
