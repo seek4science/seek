@@ -17,12 +17,12 @@ module Seek
         selected_key = "#{attr}_autocompleter_selected_ids".to_sym
         unrecognized_key = "#{attr}_autocompleter_unrecognized_items".to_sym
       
-        params[selected_key].each do |selected_id|
+        Array(params[selected_key]).each do |selected_id|
           tag=TextValue.find(selected_id)
           tags << tag.text
         end unless params[selected_key].nil?
 
-        params[unrecognized_key].each do |item|
+        Array(params[unrecognized_key]).each do |item|
           tags << item
         end unless params[unrecognized_key].nil?
 
