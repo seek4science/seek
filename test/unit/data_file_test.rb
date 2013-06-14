@@ -364,7 +364,6 @@ class DataFileTest < ActiveSupport::TestCase
         data_file_converted.reload
         data_file.reload
 
-        assert_equal [], data_file.annotations
         assert_equal [], Annotation::Version.find(:all, :conditions => ['annotatable_type=? and annotatable_id=?', 'DataFile', data_file.id])
         assert_equal 1, data_file_converted.annotations.count
         assert_equal 0, data_file_converted.annotations.first.versions.count
