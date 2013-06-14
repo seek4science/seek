@@ -29,7 +29,7 @@ class ModelImage < ActiveRecord::Base
     if file.respond_to?(:content_type) && file.respond_to?(:original_filename)
       format = file.content_type.split("/").last
       FileUtils.mkdir_p(original_path)
-      File.open("#{original_path}/#{file.original_filename}.#{format}", 'w') do |f|
+      File.open("#{original_path}/#{file.original_filename}.#{format}", 'wb') do |f|
         file.rewind
         f.write file.read
       end
