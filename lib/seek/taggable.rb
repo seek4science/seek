@@ -37,7 +37,7 @@ module Seek
 
     #returns true or false to indicate the tags have changed
     def tag_with tags, attr="tag", owner=User.current_user,owned_tags_only=false
-
+      tags = Array(tags)
       #FIXME: yuck! - this is required so that self has an id and can be assigned to an Annotation.annotatable
       return if self.new_record? && !self.save
 
