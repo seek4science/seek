@@ -7,7 +7,7 @@
           <% existing_strains_for_assay_organism.each do |strain| -%>
               <% strain_links << link_to_function(h(strain.title), "setStrainTextField('#{strain.title}');") %>
           <% end -%>
-      <%= strain_links.join(", ") -%>
+      <%= strain_links.join(", ").html_safe -%>
   <% end -%>
 </div>
 
