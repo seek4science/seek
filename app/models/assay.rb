@@ -153,6 +153,7 @@ class Assay < ActiveRecord::Base
     assay_organism.assay = self
     assay_organism.organism = organism
     strain=nil
+
     if (!strain_title.blank?)
       strain=organism.strains.find_by_title(strain_title)
     end

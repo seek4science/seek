@@ -87,7 +87,6 @@ class AssaysController < ApplicationController
     data_file_ids = params[:data_file_ids] || []
     model_ids     = params[:model_ids] || []
 
-
      organisms.each do |text|
       o_id, strain, culture_growth_type_text=text.split(",")
       culture_growth=CultureGrowthType.find_by_title(culture_growth_type_text)
