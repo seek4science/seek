@@ -32,7 +32,7 @@ GIT
 
 GIT
   remote: git://github.com/SysMO-DB/doi_query_tool.git
-  revision: e4b50f50258ec2e5cfc3e9da159b63b656d7cecd
+  revision: 09fc4e9a86daf0514ee21106fd6eff578745702f
   specs:
     doi_query_tool (0.0.0)
 
@@ -215,7 +215,7 @@ GEM
     in_place_editing (1.2.0)
     journey (1.0.4)
     json (1.7.7)
-    libxml-ruby (2.2.2)
+    libxml-ruby (2.6.0)
     listen (1.1.4)
       rb-fsevent (>= 0.9.3)
       rb-inotify (>= 0.9)
@@ -316,9 +316,9 @@ GEM
       nokogiri (>= 1.4.0)
       nori (~> 1.1.0)
       wasabi (~> 2.5.0)
-    simple-spreadsheet-extractor (0.12.1)
-      libxml-ruby (= 2.2.2)
-      libxml-ruby (= 2.2.2)
+    simple-spreadsheet-extractor (0.12.3)
+      libxml-ruby (= 2.6.0)
+      libxml-ruby (= 2.6.0)
       open4 (= 1.3.0)
       open4 (= 1.3.0)
     slop (3.4.4)
@@ -386,7 +386,7 @@ DEPENDENCIES
   gibberish!
   hpricot (~> 0.8.2)
   in_place_editing
-  libxml-ruby (= 2.2.2)
+  libxml-ruby (= 2.6.0)
   modporter-plugin
   my_annotations!
   my_rails_settings!
@@ -421,7 +421,7 @@ DEPENDENCIES
   rubyzip
   savon (= 1.1.0)
   search_biomodel (= 2.2.1)!
-  simple-spreadsheet-extractor (= 0.12.1)
+  simple-spreadsheet-extractor (= 0.12.3)
   site_announcements!
   sqlite3 (= 1.3.7)
   sunspot_rails (= 1.3.1)

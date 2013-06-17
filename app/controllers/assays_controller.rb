@@ -87,8 +87,7 @@ class AssaysController < ApplicationController
     data_file_ids = params[:data_file_ids] || []
     model_ids     = params[:model_ids] || []
 
-
-     organisms.each do |text|
+     Array(organisms).each do |text|
       o_id, strain, culture_growth_type_text=text.split(",")
       culture_growth=CultureGrowthType.find_by_title(culture_growth_type_text)
       @assay.associate_organism(o_id, strain, culture_growth)
@@ -102,16 +101,16 @@ class AssaysController < ApplicationController
 
 
       if @assay.save
-        data_file_ids.each do |text|
+        Array(data_file_ids).each do |text|
           a_id, r_type = text.split(",")
           d = DataFile.find(a_id)
           @assay.relate(d, RelationshipType.find_by_title(r_type)) if d.can_view?
         end
-        model_ids.each do |a_id|
+        Array(model_ids).each do |a_id|
           m = Model.find(a_id)
           @assay.relate(m) if m.can_view?
         end
-        sop_ids.each do |a_id|
+        Array(sop_ids).each do |a_id|
           s = Sop.find(a_id)
           @assay.relate(s) if s.can_view?
         end
@@ -151,7 +150,7 @@ class AssaysController < ApplicationController
     publication_params    = params[:related_publication_ids].nil?? [] : params[:related_publication_ids].collect { |i| ["Publication", i.split(",").first]}
 
     @assay.assay_organisms = []
-    organisms.each do |text|
+    Array(organisms).each do |text|
           o_id, strain, culture_growth_type_text=text.split(",")
           culture_growth=CultureGrowthType.find_by_title(culture_growth_type_text)
           @assay.associate_organism(o_id, strain, culture_growth)
@@ -168,16 +167,16 @@ class AssaysController < ApplicationController
 
     respond_to do |format|
       if @assay.save
-        data_file_ids.each do |text|
+        Array(data_file_ids).each do |text|
           a_id, r_type = text.split(",")
           d = DataFile.find(a_id)
           assay_assets_to_keep << @assay.relate(d, RelationshipType.find_by_title(r_type)) if d.can_view?
         end
-        model_ids.each do |a_id|
+        Array(model_ids).each do |a_id|
           m = Model.find(a_id)
           assay_assets_to_keep << @assay.relate(m) if m.can_view?
         end
-        sop_ids.each do |a_id|
+        Array(sop_ids).each do |a_id|
           s = Sop.find(a_id)
           assay_assets_to_keep << @assay.relate(s) if s.can_view?
         end

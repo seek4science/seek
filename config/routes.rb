@@ -25,6 +25,7 @@ SEEK::Application.routes.draw do
       post :update_others
       post :update_features_enabled
       post :update_pagination
+      post :update_biosamples_renaming
       post :delete_tag
       post :edit_tag
     end
