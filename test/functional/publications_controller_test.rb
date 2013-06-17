@@ -324,7 +324,7 @@ class PublicationsControllerTest < ActionController::TestCase
 
     publication.reload
     authors = publication.publication_author_orders.sort_by(&:order).collect{|o| o.author.first_name + ' ' + o.author.last_name}
-    assert original_authors, authors
+    assert_equal original_authors, authors
 
     #Disassociate seek-authors
     assert_difference('PublicationAuthor.count', 2) do
@@ -335,7 +335,7 @@ class PublicationsControllerTest < ActionController::TestCase
 
     publication.reload
     authors = publication.publication_author_orders.sort_by(&:order).collect{|o| o.author.first_name + ' ' + o.author.last_name}
-    assert original_authors, authors
+    assert_equal original_authors, authors
   end
 
   test "should display the right author order after some authors are associate with seek-profiles" do
