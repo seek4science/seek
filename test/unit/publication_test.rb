@@ -118,6 +118,7 @@ class PublicationTest < ActiveSupport::TestCase
     mock_crossref(:email=>"fred@email.com",:doi=>"10.1371/journal.pcbi.1002352",:content_file=>"cross_ref2.xml")
     query=DoiQuery.new("fred@email.com")
     result = query.fetch("10.1371/journal.pcbi.1002352")
+    assert result.error.nil?, "There should not be an error"
     assert !result.authors.collect{|auth| auth.last_name}.include?("Papin")
     assert_equal 5,result.authors.size
     assert_nil result.error
