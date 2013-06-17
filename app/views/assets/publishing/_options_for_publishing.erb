@@ -13,11 +13,11 @@
       <li class="type_and_title"><%= text_for_resource item -%>:&nbsp;<%= link_to h(item.title), item, :target => "_blank" -%>
         <%=list_item_visibility(item,"icon_visibility")-%>
       </li>
-      <li class="secondary">Manageable by <%= item.managers.empty? ? "<span class='none_text'>None</span>" : item.managers.collect { |m| link_to(h(m.title), m) }.join(", ") -%></li>
+      <li class="secondary">Manageable by <%= item.managers.empty? ? "<span class='none_text'>None</span>".html_safe : item.managers.collect { |m| link_to(h(m.title), m) }.join(", ").html_safe -%></li>
   <% else %>
       <li class="type_and_title"><%= text_for_resource item -%>:&nbsp;This item is hidden to you</li>
       <% if current_user.try(:person) && item.can_see_hidden_item?(current_user.person) %>
-          <li class="secondary">Manageable by <%= item.managers.empty? ? "<span class='none_text'>None</span>" : item.managers.collect { |m| link_to(h(m.title), m) }.join(", ") -%></li>
+          <li class="secondary">Manageable by <%= item.managers.empty? ? "<span class='none_text'>None</span>".html_safe : item.managers.collect { |m| link_to(h(m.title), m) }.join(", ").html_safe -%></li>
       <% end %>
   <% end %>
 
