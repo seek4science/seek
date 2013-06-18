@@ -118,7 +118,7 @@ class StudiesController < ApplicationController
       render :partial => "assets/back_to_singleselect_parent",:locals => {:child=>@study,:parent=>"assay"}
     else
       respond_to do |format|
-        flash[:notice] = 'The study was successfully created.<br/>'
+        flash[:notice] = 'The study was successfully created.<br/>'.html_safe
         if @study.create_from_asset=="true"
           flash.now[:notice] << "Now you can create new assay by clicking 'add an assay' button"
           format.html { redirect_to study_path(:id=>@study,:create_from_asset=>@study.create_from_asset) }
