@@ -2,9 +2,9 @@
 
 <ul class="sectionIcons">
   <% if !@publication.pubmed_id.nil? %>
-    <li><%= image_tag_for_key('visit_pubmed', "http://www.ncbi.nlm.nih.gov/pubmed/#{@publication.pubmed_id}", nil, {:popup => true}, 'View Publication On PubMed') -%></li>
+    <li><%= image_tag_for_key('visit_pubmed', "http://www.ncbi.nlm.nih.gov/pubmed/#{@publication.pubmed_id}", nil, {:target => "_blank"}, 'View Publication On PubMed') -%></li>
   <% elsif !@publication.doi.nil? %>
-    <li><%= image_tag_for_key('visit_pubmed', "http://dx.doi.org/#{@publication.doi}", nil, {:popup => true, :target => "_blank"}, 'View Publication') -%></li>
+    <li><%= image_tag_for_key('visit_pubmed', "http://dx.doi.org/#{@publication.doi}", nil, {:target => "_blank"}, 'View Publication') -%></li>
   <% end -%>
   <% if @publication.can_edit? -%>
       <li><%= image_tag_for_key('manage', edit_publication_path(@publication), nil, nil, 'Manage Publication') -%></li>
@@ -22,11 +22,11 @@
       <p>
         <% unless @publication.pubmed_id.nil? %>
           <label>PubMed ID:</label>
-          <%= link_to @publication.pubmed_id, "http://www.ncbi.nlm.nih.gov/pubmed/#{@publication.pubmed_id}",{:popup => true} %>
+          <%= link_to @publication.pubmed_id, "http://www.ncbi.nlm.nih.gov/pubmed/#{@publication.pubmed_id}",{:target => "_blank"} %>
         <% end %>
         <% unless @publication.doi.nil? %>
           <label>DOI:</label>
-          <%= link_to @publication.doi, "http://dx.doi.org/#{@publication.doi}",{:popup => true} %>
+          <%= link_to @publication.doi, "http://dx.doi.org/#{@publication.doi}",{:target => "_blank"} %>
         <% end %>
       </p>
       
