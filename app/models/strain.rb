@@ -31,7 +31,7 @@ class Strain < ActiveRecord::Base
 
   validates_presence_of :projects, :unless => Proc.new{|s| s.is_dummy? || Seek::Config.is_virtualliver}
 
-  grouped_pagination :pages=>("A".."Z").to_a, :default_page => Seek::Config.default_page(self.name.underscore.pluralize)
+  grouped_pagination
 
   searchable(:ignore_attribute_changes_of=>[:updated_at]) do
       text :searchable_terms

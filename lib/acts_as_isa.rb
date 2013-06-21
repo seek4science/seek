@@ -30,7 +30,7 @@ module Acts #:nodoc:
 
         has_many :activity_logs, :as => :activity_loggable
 
-        grouped_pagination :default_page => Seek::Config.default_page(self.name.underscore.pluralize)
+        grouped_pagination
 
         acts_as_uniquely_identifiable
 

@@ -22,9 +22,7 @@ module GroupedPagination
     def grouped_pagination(options={})
       @pages = options[:pages] || ("A".."Z").to_a + ["?"]
       @field = options[:field] || "first_letter"
-      @latest_limit = options[:latest_limit] || Seek::Config.limit_latest
-      @default_page = options[:default_page] || 'all'
-      
+
       before_save :update_first_letter
       
       include GroupedPagination::InstanceMethods
@@ -34,8 +32,11 @@ module GroupedPagination
     def paginate_after_fetch(collection, *args)
       options=args.pop unless args.nil?
       options ||= {}
+
+      @latest_limit = Seek::Config.limit_latest
+      @default_page = Seek::Config.default_page(self.name.underscore.pluralize) || 'all'
       
-      default_page = options[:default_page] || @default_page
+      default_page = @default_page
       default_page = @pages.first if default_page == "first"      
       
       page = options[:page] || default_page            

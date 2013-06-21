@@ -61,7 +61,7 @@ class Sample < ActiveRecord::Base
 
   validates_presence_of :donation_date if Seek::Config.is_virtualliver
 
-  grouped_pagination :pages=>("A".."Z").to_a, :default_page => Seek::Config.default_page(self.name.underscore.pluralize)
+  grouped_pagination
 
   HUMANIZED_COLUMNS = {:title => "Sample name", :lab_internal_number=> "Sample lab internal identifier", :provider_id => "Provider's sample identifier"}
 

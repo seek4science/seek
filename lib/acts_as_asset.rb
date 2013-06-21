@@ -79,7 +79,7 @@ module Acts #:nodoc:
 
         after_create :add_new_to_folder
 
-        grouped_pagination :default_page => Seek::Config.default_page(self.name.underscore.pluralize)
+        grouped_pagination
 
         class_eval do
           extend Acts::Asset::SingletonMethods

@@ -57,7 +57,7 @@ class Specimen < ActiveRecord::Base
 
   has_many :sops,:class_name => "Sop::Version",:finder_sql => Proc.new{self.sop_sql()}
   has_many :sop_masters,:class_name => "SopSpecimen"
-  grouped_pagination :pages=>("A".."Z").to_a, :default_page => Seek::Config.default_page(self.name.underscore.pluralize)
+  grouped_pagination
 
   def build_sop_masters sop_ids
     # map string ids to int ids for ["1","2"].include? 1 == false
