@@ -52,7 +52,7 @@ class AssayTypesController < ApplicationController
     
 
       if @assay_type.save
-        if @assay_type.parent_name
+        if @assay_type.parent_name == 'assay'
           render :partial => "assets/back_to_singleselect_parent",:locals => {:child=>@assay_type,:parent=>@assay_type.parent_name}
         else
          respond_to do |format|
