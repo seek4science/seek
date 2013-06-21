@@ -9,7 +9,7 @@ module AssayTypesHelper
     roots.each do |root|
       list = list + indented_child_options(root,0,show_edit,show_delete,selected_id)
     end
-    list
+    list.join("\n").html_safe
   end
   
   #Displays the ontology node with appropriate indentation, as well as optional

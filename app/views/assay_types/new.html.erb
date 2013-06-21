@@ -2,7 +2,7 @@
 
 <div class="show_basic">
   <div style="float:left">
-    <ul><%= ontology_editor_display(AssayType, false, false, @assay_type.id).join("\n").html_safe %></ul>
+    <ul><%= ontology_editor_display AssayType, false, false, @assay_type.id %></ul>
   </div>      
   <div style="float:left">
     <%= form_for @assay_type do |f| %>
