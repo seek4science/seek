@@ -28,7 +28,7 @@
         <% else %>
             <%#param code is used for temporary link %>
             <% view_pdf_content_url = polymorphic_path([asset, content_blob], :action => 'view_pdf_content', :code => params[:code]) %>
-            <%= image_tag_for_key "show", view_pdf_content_url, 'View content', {:onclick => "isCanvasSupportBrowser();isIEVersionSupported", :title => 'View inline content this file'}, label %>
+            <%= image_tag_for_key "show", view_pdf_content_url, 'View content', {:onclick => "isCanvasSupportBrowser();isIEVersionSupported", :title => 'View inline content this file', :target => '_blank'}, label %>
         <% end %>
         <%= li_end.html_safe %>
     <% end %>
