@@ -162,7 +162,7 @@ class UsersController < ApplicationController
       self.current_user = user
     end
     
-    redirect_to :controller => 'home', :action => 'index'
+    redirect_to :controller => 'homes', :action => 'index'
   end
 
   def hide_guide_box
