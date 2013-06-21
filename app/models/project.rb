@@ -12,7 +12,7 @@ class Project < ActiveRecord::Base
 
   title_trimmer
 
-  default_scope order("#{table_name}.name")
+  default_scope :order => "#{self.table_name}.name"
   validates_uniqueness_of :name
 
   grouped_pagination #shouldn't need "Other" tab for project

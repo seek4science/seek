@@ -46,7 +46,6 @@ module GroupedPagination
         records=collection
       elsif page == "latest"
         records=collection.sort{|x,y| y.updated_at <=> x.updated_at}[0...@latest_limit]
-        records = records.sort_by {|r| collection.index r}
       elsif @pages.include?(page)           
         records=collection.select {|i| i.first_letter == page}        
       end
