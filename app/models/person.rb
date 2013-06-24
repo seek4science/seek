@@ -16,11 +16,6 @@ class Person < ActiveRecord::Base
 
   after_save :queue_update_auth_table
 
-
-  #grouped_pagination :pages=>("A".."Z").to_a #shouldn't need "Other" tab for people
-  #load the configuration for the pagination
-  grouped_pagination
-
   validates_presence_of :email
 
   #FIXME: consolidate these regular expressions into 1 holding class
