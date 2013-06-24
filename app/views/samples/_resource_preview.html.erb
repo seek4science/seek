@@ -1,11 +1,10 @@
 <% unless resource.nil? -%>
 
-    <div title='<%= tooltip_title_attrib(h(resource.description), 1000) %>'>
       <p class="title">
         <%= list_item_title resource -%>
       </p>
 
-      <%= render :partial => 'projects/show_project_relationship', :locals => {:resource => resource, :list_item => false} -%>
+      <%= render :partial => 'projects/show_project_relationship', :locals => {:resource => resource, :list_item => true} -%>
 
       <%= list_item_authorized_attribute "Owner", resource.contributor.try(:person) %>
 
@@ -14,6 +13,5 @@
       <%= list_item_attribute "Organism",organism_and_strain(resource.specimen.strain) -%>
 
       <%= list_item_authorized_attribute Seek::Config.sample_parent_term.capitalize, resource.specimen -%>
-    </div>
 
 <% end -%>
