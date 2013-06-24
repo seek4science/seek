@@ -1,11 +1,11 @@
 class ModelImage < ActiveRecord::Base
-  Model_IMAGE_PATH = 'filestore/model_images'
+
   LARGE_SIZE = "1000x1000"
   belongs_to :model
   after_create :change_filename unless Rails.env=="test"
 
   acts_as_fleximage do
-    image_directory Model_IMAGE_PATH
+    image_directory Seek::Config.model_image_filestore_path
     use_creation_date_based_directories false
     image_storage_format :jpg
     output_image_jpg_quality 85
@@ -20,16 +20,17 @@ class ModelImage < ActiveRecord::Base
     content_type.split("/").last
   end                                                                                                                                 #
 
-  def original_path
-    "#{Rails.root}/#{Model_IMAGE_PATH}/original"
+
+  def self.original_path
+    File.join(self.image_directory,"original")
   end
 
   def image_file= file
     # save_original_file
     if file.respond_to?(:content_type) && file.respond_to?(:original_filename)
       format = file.content_type.split("/").last
-      FileUtils.mkdir_p(original_path)
-      File.open("#{original_path}/#{file.original_filename}.#{format}", 'wb') do |f|
+      FileUtils.mkdir_p(ModelImage.original_path)
+      File.open(File.join(ModelImage.original_path,"#{file.original_filename}.#{format}"), 'wb') do |f|
         file.rewind
         f.write file.read
       end
@@ -39,7 +40,7 @@ class ModelImage < ActiveRecord::Base
   end
 
   def change_filename
-    File.rename "#{original_path}/#{original_filename}.#{original_image_format}", "#{original_path}/#{id}.#{original_image_format}"
+    File.rename File.join(ModelImage.original_path,"#{original_filename}.#{original_image_format}"), File.join(ModelImage.original_path,"#{id}.#{original_image_format}")
   end
 
   def select!

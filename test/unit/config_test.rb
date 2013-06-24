@@ -34,6 +34,31 @@ class ConfigTest < ActiveSupport::TestCase
 
   end
 
+  test "filestore_location" do
+    cb = Factory :content_blob
+
+    assert_equal "tmp/filestore",Seek::Config.filestore_path
+    assert_equal "#{Rails.root}/tmp/filestore/assets",Seek::Config.asset_filestore_path
+    assert_equal "#{Rails.root}/tmp/filestore/model_images", Seek::Config.model_image_filestore_path
+    assert_equal "#{Rails.root}/tmp/filestore/avatars", Seek::Config.avatar_filestore_path
+
+    assert_equal "#{Rails.root}/tmp/filestore/assets/#{cb.uuid}.dat",cb.filepath
+    assert_equal "#{Rails.root}/tmp/filestore/model_images",ModelImage.image_directory
+    assert_equal "#{Rails.root}/tmp/filestore/model_images/original",ModelImage.original_path
+
+    assert_equal "#{Rails.root}/tmp/filestore/avatars",Avatar.image_directory
+    with_config_value :filestore_path,"/tmp/fish" do
+      assert_equal "/tmp/fish/assets",Seek::Config.asset_filestore_path
+      assert_equal "/tmp/fish/model_images", Seek::Config.model_image_filestore_path
+      assert_equal "/tmp/fish/avatars", Seek::Config.avatar_filestore_path
+
+      assert_equal "/tmp/fish/assets/#{cb.uuid}.dat",cb.filepath
+
+
+    end
+
+  end
+
   test "email_enabled" do
     #NOTE: this is the value in seek_testing.rb, the actual default is 'false'
     assert_equal true ,Seek::Config.email_enabled
