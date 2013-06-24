@@ -36,7 +36,7 @@ module GroupedPagination
       options ||= {}
 
       @latest_limit = options[:latest_limit] || @latest_limit
-      @default_page = options[:default_pate] || @default_page
+      @default_page = options[:default_page] || @default_page
       
       default_page = @default_page
       default_page = @pages.first if default_page == "first"      

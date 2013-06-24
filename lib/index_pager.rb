@@ -7,9 +7,11 @@ module IndexPager
     objects = eval("@"+controller)
     objects.size
     @hidden=0
-    params[:page] ||= model_class.default_page
+    params[:page] ||= Seek::Config.default_page(controller)
 
-    objects=model_class.paginate_after_fetch(objects, :page=>params[:page]) unless objects.respond_to?("page_totals")
+    objects=model_class.paginate_after_fetch(objects, :page=>params[:page],
+                                                      :latest_limit => Seek::Config.limit_latest
+                                            ) unless objects.respond_to?("page_totals")
     eval("@"+controller+"= objects")
 
     respond_to do |format|
