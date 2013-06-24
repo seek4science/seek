@@ -94,8 +94,8 @@ module ResourceListItemHelper
     html.html_safe
   end
 
-  def list_item_authorized_attribute attribute, object, url='undefined', method = :title
-    url = object if url == 'undefined'
+  def list_item_authorized_attribute attribute, object, url=nil, method = :title
+    url = object if url.nil?
     not_authorized_text = object.try(:title_is_public?) ? object.title : "Not available"
     list_item_optional_attribute attribute, object.try(:can_view?) ? object.send(method) : nil, url, not_authorized_text
   end

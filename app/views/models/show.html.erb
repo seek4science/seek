@@ -47,7 +47,7 @@
             <%= form_tag("http://sycamore.eml.org/sycamore/submission.jsp", :id => 'sycamore-form', :target => '_blank') do -%>
                 <%= hidden_field_tag 'sbml_model' -%>
                 <%= hidden_field_tag 'sender', 'seek' -%>
-                <%= link_to image('execute') + "Simulate Model on Sycamore", {:action => 'submit_to_sycamore', :id => @model.id, :version => @display_model.version}, :remote => true -%>
+                <%= link_to image('execute') + "Simulate Model on Sycamore", {:action => 'submit_to_sycamore', :id => @model.id, :version => @display_model.version}, :remote => true, :method => :post -%>
             <% end -%>
 
           </li>

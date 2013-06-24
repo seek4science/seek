@@ -2,7 +2,7 @@
     
   <div title='<%= tooltip_title_attrib(h(resource.description), 1000) %>'>
     <p class="title">
-      <%= h resource.title -%>
+      <%= list_item_title resource -%>
     </p>
 
     <%= list_item_attribute "Version", resource.version -%>
@@ -13,7 +13,7 @@
     
     <%= list_item_simple_list resource.creators, "Creator" -%>
     
-    <%= list_item_description resource.description -%>  
+    <%= list_item_description resource.description -%>
   </div>
 
 <% end -%>

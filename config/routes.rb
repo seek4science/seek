@@ -405,7 +405,11 @@ SEEK::Application.routes.draw do
   ### BIOSAMPLES AND ORGANISMS ###
 
   resources :specimens
-  resources :samples
+  resources :samples do
+    collection do
+      get :preview
+    end
+  end
 
   resources :strains do
     collection do
@@ -469,7 +473,7 @@ SEEK::Application.routes.draw do
   match 'studies/new_investigation_redbox' => 'studies#new_investigation_redbox', :as => :new_investigation_redbox, :via => :post
   match 'experiments/create_investigation' => 'studies#create_investigation', :as => :create_investigation, :via => :post
   match '/work_groups/review/:type/:id/:access_type' => 'work_groups#review_popup', :as => :review_work_group, :via => :post
-  match ':controller/new_object_based_on_existing_one/:id' => "#new_object_based_on_existing_one", :as => :new_object_based_on_existing_one, :via => :post
+  match ':controller/new_object_based_on_existing_one/:id' => "#new_object_based_on_existing_one", :as => :new_object_based_on_existing_one, :via => :get
   match '/tool_list_autocomplete' => 'people#auto_complete_for_tools_name', :as => :tool_list_autocomplete
   match '/expertise_list_autocomplete' => 'people#auto_complete_for_expertise_name', :as => :expertise_list_autocomplete
   match '/organism_list_autocomplete' => 'projects#auto_complete_for_organism_name', :as => :organism_list_autocomplete

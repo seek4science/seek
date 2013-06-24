@@ -25,7 +25,7 @@
       </div>
       <div class="association_step">
         <p style="color: #666666;">
-            You may select an existing Data File or <%= link_to h("upload a new Data File here"), new_data_file_path(:parent_name=>controller_name.underscore.singularize),:popup => true%>  for the <%= resource_text -%>.
+            You may select an existing Data File or <%= link_to h("upload a new Data File here"), new_data_file_path(:parent_name=>controller_name.underscore.singularize), :onclick => "window.open(this.href);return false;" %>  for the <%= resource_text -%>.
         </p>
         <%= select_tag :possible_data_files,
           options_for_select([["Select Data file ...",0]]|project_data_files.collect{|s| [truncate(h(s.title),:length=>select_truncate_length),s.id]}),

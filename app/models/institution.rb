@@ -12,7 +12,7 @@ class Institution < ActiveRecord::Base
   default_scope order("#{table_name}.name")
 
   #load the configuration for the pagination
-  grouped_pagination :default_page => Seek::Config.default_page(self.name.underscore.pluralize)
+  grouped_pagination
   validates_uniqueness_of :name
 
   validates_format_of :web_page, :with=>/(^$)|(^(http|https):\/\/[a-z0-9]+([\-\.]{1}[a-z0-9]+)*\.[a-z]{2,5}(([0-9]{1,5})?\/.*)?$)/ix,:allow_nil=>true,:allow_blank=>true

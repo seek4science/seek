@@ -9,11 +9,7 @@ module AssayTypesHelper
     roots.each do |root|
       list = list + indented_child_options(root,0,show_edit,show_delete,selected_id)
     end
-    
-    list.collect do |item|
-      (item + "\n").html_safe
-    end
-
+    list.join("\n").html_safe
   end
   
   #Displays the ontology node with appropriate indentation, as well as optional
@@ -28,7 +24,7 @@ module AssayTypesHelper
                     (show_delete ? (child.assays.size == 0 ? link_to(image("destroy"),child, :confirm =>
                       "Are you sure you want to remove this #{child.class.name}?  This cannot be undone.",
                       :method => :delete, :style=>"vertical-align:middle") : "<span style=\"color: #666666;\">(#{child.assays.size} assays)</span>") : "") +
-                    "</li>").html_safe
+                    "</li>")
         result = result + indented_child_options(child,depth+1,show_edit,show_delete,selected_id) if child.has_children?
       end
     end

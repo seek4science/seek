@@ -1,0 +1,19 @@
+<% unless resource.nil? -%>
+
+      <p class="title">
+        <%= list_item_title resource -%>
+      </p>
+
+      <%= render :partial => 'projects/show_project_relationship', :locals => {:resource => resource, :list_item => true} -%>
+
+      <%= list_item_authorized_attribute "Owner", resource.contributor.try(:person) %>
+
+      <%= list_item_attribute "Lab internal ID", h(resource.lab_internal_number) %>
+
+      <%= list_item_attribute "Organism", resource.specimen.strain.organism.title, organism_path(resource.specimen.strain.organism) -%>
+
+      <%= list_item_authorized_attribute "Strain", (resource.specimen.strain.is_dummy? ? nil : resource.specimen.strain), nil, :info -%>
+
+      <%= list_item_authorized_attribute Seek::Config.sample_parent_term.capitalize, resource.specimen -%>
+
+<% end -%>

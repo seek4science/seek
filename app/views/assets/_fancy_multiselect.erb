@@ -31,7 +31,7 @@
       <div class="association_step">
         <% if with_new_link  %>
          <p style="color: #666666;">
-             You may select an existing  <%= association.to_s.singularize %> or create <%= link_to h("new #{association.to_s.singularize.capitalize} here"), new_association_path,:popup => true%>  for the <%= object_type_text -%>.
+             You may select an existing  <%= association.to_s.singularize %> or create <%= link_to h("new #{association.to_s.singularize.capitalize} here"), new_association_path, :onclick => "window.open(this.href);return false;"%>  for the <%= object_type_text -%>.
         </p>
         <% end  %>
          <%= select_tag possibilities_collection_id,
