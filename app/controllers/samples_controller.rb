@@ -2,7 +2,7 @@ class SamplesController < ApplicationController
 
   include IndexPager
   before_filter :find_assets, :only => [:index]
-  before_filter :find_and_auth, :only => [:show, :edit, :update, :destroy]
+  before_filter :find_and_auth, :only => [:show, :edit, :update, :destroy,:preview]
   before_filter :virtualliver_only, :only => [:new_object_based_on_existing_one]
 
   include Seek::Publishing::GatekeeperPublish
@@ -184,6 +184,20 @@ class SamplesController < ApplicationController
       else
         flash.now[:error] = "Unable to delete sample" if !@sample.specimen.nil?
         format.html { render :action => "show" }
+      end
+    end
+  end
+
+  def preview
+
+    element=params[:element]
+    sample=Sample.find_by_id(params[:id])
+
+    render :update do |page|
+      if sample.try :can_view?
+        page.replace_html element,:partial=>"samples/resource_preview",:locals=>{:resource=>sample}
+      else
+        page.replace_html element,:text=>"Nothing is selected to preview."
       end
     end
   end

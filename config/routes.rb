@@ -405,7 +405,11 @@ SEEK::Application.routes.draw do
   ### BIOSAMPLES AND ORGANISMS ###
 
   resources :specimens
-  resources :samples
+  resources :samples do
+    collection do
+      get :preview
+    end
+  end
 
   resources :strains do
     collection do
