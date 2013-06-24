@@ -163,13 +163,14 @@ class Project < ActiveRecord::Base
     unless site_username.nil? && site_password.nil?
       cred={:username=>site_username,:password=>site_password}
       cred=encrypt(cred,generate_key(GLOBAL_PASSPHRASE))
-      self.site_credentials=cred.force_encoding("UTF-8")
+      self.site_credentials=Base64.encode64(cred).encode('utf-8')
     end
   end
 
   def decrypt_credentials
     begin
-      cred=decrypt(site_credentials,generate_key(GLOBAL_PASSPHRASE))
+      decoded = Base64.decode64 site_credentials
+      cred=decrypt(decoded,generate_key(GLOBAL_PASSPHRASE))
       self.site_password=cred[:password]
       self.site_username=cred[:username]
     rescue
