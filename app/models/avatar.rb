@@ -1,6 +1,5 @@
 # it's fine to keep all avatars in one folder - as image IDs will be the same as record IDs in "avatars" table
 # (hence will be unique, no matter what kind of owner -- person/project/institution -- we have)
-AVATAR_STORAGE_PATH = 'filestore/avatars'
 
 # DECLARING WHAT "LARGE" AVATAR IS
 LARGE_SIZE = "1000x1000"
@@ -9,7 +8,7 @@ LARGE_SIZE = "1000x1000"
 class Avatar < ActiveRecord::Base
   
   acts_as_fleximage do
-    image_directory AVATAR_STORAGE_PATH
+    image_directory Seek::Config.avatar_filestore_path
     use_creation_date_based_directories false
     image_storage_format      :jpg
     output_image_jpg_quality  85

@@ -12,8 +12,6 @@ class ContentBlob < ActiveRecord::Base
   include Seek::MimeTypes
 
   belongs_to :asset, :polymorphic => true
-
-  DATA_STORAGE_PATH = "filestore/content_blobs/"
   
   #the actual data value stored in memory. If this could be large, then using :tmp_io_object is preferred
   attr_writer :data
@@ -112,19 +110,12 @@ class ContentBlob < ActiveRecord::Base
   end
 
   def storage_directory
-    if Rails.env == "test"
-      path = ContentBlob.test_storage_location
-    else
-      path = "#{Rails.root}/#{DATA_STORAGE_PATH}/#{Rails.env}"
-    end
+    path = Seek::Config.asset_filestore_path
     FileUtils.mkdir_p(path)
     return path
   end
 
-  #The location contentblobs are stored when Rails.env='test' - this is only used for unit/functional testing purposes.
-  def self.test_storage_location
-    "#{Rails.root}/tmp/test_content_blobs"
-  end
+
 
   def dump_data_to_file        
     raise Exception.new("You cannot define both :data content and a :tmp_io_object") unless @data.nil? || @tmp_io_object.nil?

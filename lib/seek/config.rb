@@ -135,6 +135,27 @@ module Seek
   module CustomAccessors
     include SimpleCrypt
 
+    def asset_filestore_path
+      append_filestore_path "assets"
+    end
+
+    def avatar_filestore_path
+      append_filestore_path "avatars"
+    end
+
+    def model_image_filestore_path
+      append_filestore_path "model_images"
+    end
+
+    def append_filestore_path inner_dir
+      path = filestore_path
+      unless path.start_with? "/"
+        path = File.join(Rails.root,path)
+      end
+      File.join(path,inner_dir)
+    end
+
+
     def smtp_settings field
       value = self.smtp[field.to_sym]
       if field == :password || field == 'password'
@@ -254,7 +275,7 @@ module Seek
       :google_analytics_tracker_id,:piwik_analytics_enabled,:piwik_analytics_url, :exception_notification_enabled,:exception_notification_recipients,:open_id_authentication_store, :sycamore_enabled,
       :project_news_enabled,:project_news_feed_urls,:community_news_enabled,:community_news_feed_urls,:is_virtualliver, :sabiork_ws_base_url, :publish_button_enabled,
       :admin_impersonation_enabled, :auth_lookup_enabled,:sample_parent_term,:specimen_culture_starting_date,:sample_age,:specimen_creators, :sample_parser_enabled,
-      :project_browser_enabled, :experimental_features_enabled, :external_search_enabled,:pdf_conversion_enabled]
+      :project_browser_enabled, :experimental_features_enabled, :external_search_enabled,:pdf_conversion_enabled,:filestore_path]
 
     #Settings that require a conversion to integer
     setting :tag_threshold,:convert=>"to_i"
