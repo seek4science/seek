@@ -162,7 +162,8 @@ class Project < ActiveRecord::Base
   def set_credentials
     unless site_username.nil? && site_password.nil?
       cred={:username=>site_username,:password=>site_password}
-      self.site_credentials=encrypt(cred,generate_key(GLOBAL_PASSPHRASE))
+      cred=encrypt(cred,generate_key(GLOBAL_PASSPHRASE))
+      self.site_credentials=cred.force_encoding("UTF-8")
     end
   end
 
