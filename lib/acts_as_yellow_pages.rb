@@ -31,6 +31,10 @@ module Acts #:nodoc:
 
         acts_as_uniquely_identifiable
 
+        #grouped_pagination :pages=>("A".."Z").to_a #shouldn't need "Other" tab for people, project, institution
+        #load the configuration for the pagination
+        grouped_pagination :pages=>("A".."Z").to_a
+
         class_eval do
           extend Acts::Yellow_Pages::SingletonMethods
         end
