@@ -68,7 +68,11 @@
     <h2><%= Seek::Config.sample_parent_term.capitalize -%> details</h2>
 
     <div class="main_content_left_box">
-      <%= render :partial => "sample_specimen_details", :object => @sample.specimen %>
+      <% if @sample.specimen.can_view? %>
+        <%= render :partial => "sample_specimen_details", :object => @sample.specimen %>
+      <% else %>
+        <%= render :partial => "assets/hidden_items", :local => {:hidden_items => [@sample.specimen]} %>
+      <% end %>
     </div>
     <br/>
     <%= render :partial => "assets/resource_main_content_right", :locals => {:resource => @sample.specimen, :title => 'Owner and creators'} %>
