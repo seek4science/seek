@@ -88,6 +88,7 @@ group :test do
   gem "timocratic-test_benchmark"
   gem "ruby-prof"
   gem "webmock"
+  gem 'minitest-reporters','>= 0.4.1'
 end
 
 
