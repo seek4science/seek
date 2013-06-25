@@ -187,6 +187,7 @@ GEM
     coderay (1.0.9)
     country-select (1.1.1)
     crack (0.3.2)
+    daemon_controller (1.1.4)
     daemons (1.1.9)
     delayed_job (3.0.5)
       activesupport (~> 3.0)
@@ -234,6 +235,10 @@ GEM
     parallel (0.6.4)
     parallel_tests (0.12.3)
       parallel
+    passenger (4.0.5)
+      daemon_controller (>= 1.1.0)
+      rack
+      rake (>= 0.8.1)
     polyglot (0.3.3)
     pothoven-attachment_fu (3.2.8)
     pr_geohash (1.0.0)
@@ -393,6 +398,7 @@ DEPENDENCIES
   nokogiri (= 1.5.9)
   open_id_authentication!
   parallel_tests
+  passenger
   piwik_analytics!
   pothoven-attachment_fu
   prototype-rails
