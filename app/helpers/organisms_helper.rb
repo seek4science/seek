@@ -58,11 +58,7 @@ module OrganismsHelper
       if strain && !strain.is_dummy? && strain.can_view?
         result << " : <span class='strain_info'>#{link_to h(strain.info), strain}</span>"
       elsif strain && !strain.is_dummy? && !strain.can_view?
-        result << "<span class=\"none_text\"> : hidden strain</span>"
-        contributor_links = hidden_item_contributor_links [strain]
-        if !contributor_links.empty?
-          result << "<span class=\"none_text\">(Please contact: #{contributor_links.join(', ')})</span>"
-        end
+        result << hidden_items_html([strain], " : hidden strain")
       end
     end
     result.empty? ? "<span class='none_text'>#{none_text}</span>".html_safe : result.html_safe

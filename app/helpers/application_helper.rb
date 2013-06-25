@@ -52,13 +52,20 @@ module ApplicationHelper
 
 
         if count_hidden_items && !hidden_items.empty?
-          html << "<span class=\"none_text\">#{items.size > 0 ? " and " : ""}#{hidden_items.size} hidden #{hidden_items.size > 1 ? "items" :"item"}</span>"
-          contributor_links = hidden_item_contributor_links hidden_items
-          if !contributor_links.empty?
-            html << "<span class=\"none_text\">(Please contact: #{contributor_links.join(', ')})</span>"
-          end
+          text = items.size > 0 ? " and " : ""
+          text << "#{hidden_items.size} hidden #{hidden_items.size > 1 ? 'items' :'item'}"
+          html << hidden_items_html(hidden_items,text)
         end
 
+    end
+    html.html_safe
+  end
+
+  def hidden_items_html hidden_items, text='hidden item'
+    html = "<span class=\"none_text\">#{text}</span>"
+    contributor_links = hidden_item_contributor_links hidden_items
+    if !contributor_links.empty?
+      html << "<span class=\"none_text\">(Please contact: #{contributor_links.join(', ')})</span>"
     end
     html.html_safe
   end

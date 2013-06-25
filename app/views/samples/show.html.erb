@@ -71,7 +71,7 @@
       <% if @sample.specimen.can_view? %>
         <%= render :partial => "sample_specimen_details", :object => @sample.specimen %>
       <% else %>
-        <%= render :partial => "assets/hidden_items", :local => {:hidden_items => [@sample.specimen]} %>
+          <%= hidden_items_html([@sample.specimen], "This item is hidden")  %>
       <% end %>
     </div>
     <br/>
