@@ -4,7 +4,7 @@
     <li><%= image_tag_for_key "new", new_sample_path, "New sample", nil, "New sample" %></li>
 </ul>
 <% end %>
-<% if @samples.public_methods.include?("page_totals") %>
+<% if @samples.public_methods.include?(:page_totals) %>
   <!-- only do the page links if the collection supports it -->
   <%= render :partial => "general/paginate_alphabetical", :locals => { :pages => @samples.pages, :page_totals=>@samples.page_totals,:current_page=>@samples.page } -%>
 <% end %>

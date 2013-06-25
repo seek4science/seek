@@ -6,7 +6,7 @@
     <% end -%>
 </ul>
 
-<% if @institutions.public_methods.include?("page_totals") %>
+<% if @institutions.public_methods.include?(:page_totals) %>
   <!-- only do the page links if the collection supports it -->
   <%= render :partial => "general/paginate_alphabetical", :locals => { :pages => @institutions.pages, :page_totals=>@institutions.page_totals,:current_page=>@institutions.page } -%>
 <% end %>

@@ -5,7 +5,7 @@
     </ul>
 <% end %>
 
-<% if @presentations.public_methods.include?("page_totals") %>
+<% if @presentations.public_methods.include?(:page_totals) %>
   <!-- only do the page links if the collection supports it -->
   <%= render :partial => "general/paginate_alphabetical", :locals => { :pages => @presentations.pages, :page_totals=>@presentations.page_totals,:current_page=>@presentations.page } -%>
 <% end %>
