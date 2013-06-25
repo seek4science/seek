@@ -2,7 +2,7 @@
 
 <p>
   <label><%= Seek::Config.sample_parent_term.capitalize -%> name:</label>
-  <%= text_or_not_specified(specimen.title) -%>
+  <%= link_to specimen.title,specimen -%>
 </p>
 <% if Seek::Config.is_virtualliver %>
     <p>
