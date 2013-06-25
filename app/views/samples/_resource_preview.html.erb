@@ -14,6 +14,6 @@
 
       <%= list_item_authorized_list (resource.specimen.strain.is_dummy? ? [] : [resource.specimen.strain]),"Strain", true, 50, true %>
 
-      <%= list_item_authorized_attribute Seek::Config.sample_parent_term.capitalize, resource.specimen -%>
+      <%= list_item_authorized_list [resource.specimen], Seek::Config.sample_parent_term.capitalize, true, 50, true %>
 
 <% end -%>
