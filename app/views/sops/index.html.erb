@@ -5,7 +5,7 @@
     </ul>
 <% end %>
 
-<% if @sops.public_methods.include?("page_totals") %>
+<% if @sops.public_methods.include?(:page_totals) %>
   <!-- only do the page links if the collection supports it -->
   <%= render :partial => "general/paginate_alphabetical", :locals => { :pages => @sops.pages, :page_totals=>@sops.page_totals,:current_page=>@sops.page } -%>
 <% end %>

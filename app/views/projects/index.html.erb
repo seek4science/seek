@@ -2,7 +2,7 @@
   <h2><%= "Projects involved with the organism '"+h(@organisms)+"' ... " -%></h2>
 <% end %>
 
-<% if @projects.public_methods.include?("page_totals") %>
+<% if @projects.public_methods.include?(:page_totals) %>
   <!-- only do the page links if the collection supports it -->
   <%= render :partial => "general/paginate_alphabetical", :locals => { :pages => @projects.pages, :page_totals=>@projects.page_totals,:current_page=>@projects.page } -%>
 <% end %>

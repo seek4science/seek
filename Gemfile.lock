@@ -179,6 +179,7 @@ GEM
     akami (1.2.0)
       gyoku (>= 0.4.0)
       nokogiri (>= 1.4.0)
+    ansi (1.4.3)
     arel (3.0.2)
     bio (1.4.3)
     breadcrumbs_on_rails (2.3.0)
@@ -207,6 +208,7 @@ GEM
     fssm (0.2.10)
     gyoku (0.4.6)
       builder (>= 2.1.2)
+    hashie (2.0.5)
     hike (1.2.2)
     hpricot (0.8.6)
     httpi (1.1.1)
@@ -226,6 +228,12 @@ GEM
       treetop (~> 1.4.8)
     method_source (0.8.1)
     mime-types (1.23)
+    minitest (4.7.5)
+    minitest-reporters (0.14.20)
+      ansi
+      builder
+      minitest (>= 2.12, < 5.0)
+      powerbar
     modporter-plugin (0.1.0)
     multi_json (1.7.6)
     mysql2 (0.3.11)
@@ -241,6 +249,9 @@ GEM
       rake (>= 0.8.1)
     polyglot (0.3.3)
     pothoven-attachment_fu (3.2.8)
+    powerbar (1.0.11)
+      ansi (~> 1.4.0)
+      hashie (>= 1.1.0)
     pr_geohash (1.0.0)
     prototype-rails (3.2.1)
       rails (~> 3.2)
@@ -389,6 +400,7 @@ DEPENDENCIES
   hpricot (~> 0.8.2)
   in_place_editing
   libxml-ruby (= 2.6.0)
+  minitest-reporters (>= 0.4.1)
   modporter-plugin
   my_annotations!
   my_rails_settings!

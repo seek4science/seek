@@ -9,7 +9,8 @@
 <div class="list_item_right_column">
 
   <%= render :partial => 'projects/show_project_relationship', :locals => {:resource => resource, :list_item => true}%>
-  <%= list_item_organism "Organism",resource.organism,resource.strain,resource.culture_growth_type %>
+  <%= list_item_attribute "Organism", resource.strain.organism.title, organism_path(resource.strain.organism) -%>
+  <%= list_item_authorized_list (resource.strain.is_dummy? ? [] : [resource.strain]),"Strain", true, 50, true %>
   <%= list_item_authorized_list resource.sop_masters.map(&:sop), "SOPs", true, 50, true %>
 
 </div>

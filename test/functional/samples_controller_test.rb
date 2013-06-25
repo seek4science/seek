@@ -299,17 +299,22 @@ class SamplesControllerTest < ActionController::TestCase
 
 
 test "should show organism and strain information of a sample if there is organism" do
-    s = Factory :sample, :contributor => User.current_user
-    get :show, :id => s.id
+    specimen = Factory(:specimen, :contributor => User.current_user)
+    sample = Factory :sample, :specimen_id => specimen.id, :contributor => User.current_user
+    assert_equal true, sample.specimen.can_view?
 
+    get :show, :id => sample.id
     assert_response :success
     assert_not_nil assigns(:sample)
-    assert_select 'p a[href=?]', organism_path(s.specimen.strain.organism), :count => 1
+    assert_select 'p a[href=?]', organism_path(sample.specimen.strain.organism), :count => 2 # one in the related cell cuture
   end
 
   test 'should have specimen comment and sex fields in the specimen/sample show page' do
-    s = Factory :sample, :contributor => User.current_user
-    get :show, :id => s.id
+    specimen = Factory(:specimen, :contributor => User.current_user)
+    sample = Factory :sample, :specimen_id => specimen.id, :contributor => User.current_user
+    assert_equal true, sample.specimen.can_view?
+
+    get :show, :id => sample.id
     assert_response :success
     assert_select "label", :text => /Comment/, :count => 2 #one for specimen, one for sample
     assert_select "label", :text => /Gender/, :count => 1
@@ -330,8 +335,11 @@ test "should show organism and strain information of a sample if there is organi
   end
 
   test 'should have sample Comment in the specimen/sample show page' do
-      s = Factory :sample, :contributor => User.current_user
-      get :show, :id => s.id
+      specimen = Factory(:specimen, :contributor => User.current_user)
+      sample = Factory :sample, :specimen_id => specimen.id, :contributor => User.current_user
+      assert_equal true, sample.specimen.can_view?
+
+      get :show, :id => sample.id
       assert_response :success
       assert_select "label", :text => /Comment/, :count => 2 #one for specimen, one for sample
   end

@@ -15,7 +15,7 @@
 <% end -%>
 
 
-<% if @people.public_methods.include?("page_totals") %>
+<% if @people.public_methods.include?(:page_totals) %>
   <!-- only do the page links if the collection supports it -->
   <%= render :partial => "general/paginate_alphabetical", :locals => { :pages => @people.pages, :page_totals=>@people.page_totals,:current_page=>@people.page } -%>
 <% end %>

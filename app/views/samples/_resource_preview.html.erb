@@ -12,8 +12,8 @@
 
       <%= list_item_attribute "Organism", resource.specimen.strain.organism.title, organism_path(resource.specimen.strain.organism) -%>
 
-      <%= list_item_authorized_attribute "Strain", (resource.specimen.strain.is_dummy? ? nil : resource.specimen.strain), nil, :info -%>
+      <%= list_item_authorized_list (resource.specimen.strain.is_dummy? ? [] : [resource.specimen.strain]),"Strain", true, 50, true %>
 
-      <%= list_item_authorized_attribute Seek::Config.sample_parent_term.capitalize, resource.specimen -%>
+      <%= list_item_authorized_list [resource.specimen], Seek::Config.sample_parent_term.capitalize, true, 50, true %>
 
 <% end -%>

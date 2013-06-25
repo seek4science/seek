@@ -55,8 +55,10 @@ module OrganismsHelper
     result = ""
     if organism
       result << link_to(h(organism.title), organism)
-      if strain && !strain.is_dummy?
-        result << " : <span class='strain_info'>#{h(strain.info)}</span>"
+      if strain && !strain.is_dummy? && strain.can_view?
+        result << " : <span class='strain_info'>#{link_to h(strain.info), strain}</span>"
+      elsif strain && !strain.is_dummy? && !strain.can_view?
+        result << hidden_items_html([strain], " : hidden strain")
       end
     end
     result.empty? ? "<span class='none_text'>#{none_text}</span>".html_safe : result.html_safe
