@@ -364,6 +364,24 @@ class PublicationsControllerTest < ActionController::TestCase
     assert_select 'p', :text => /#{joined_original_authors}/
   end
 
+  test 'should update page pagination when changing the setting from admin' do
+    assert_equal 'latest', Seek::Config.default_pages[:publications]
+    get :index
+    assert_response :success
+    assert_select "li.current_page" do
+      assert_select "a[href=?]", publications_path(:page => 'latest')
+    end
+
+    #change the setting
+    Seek::Config.default_pages[:publications] = 'all'
+    get :index
+    assert_response :success
+
+    assert_select "li.current_page" do
+      assert_select "a[href=?]", publications_path(:page => 'all')
+    end
+  end
+
   def mock_crossref options
     url= "http://www.crossref.org/openurl/"
     params={}

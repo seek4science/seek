@@ -1092,4 +1092,17 @@ class PeopleControllerTest < ActionController::TestCase
       assert_response :success
       assert_select "div.foldTitle", :text => "Subscriptions", :count => 0
   end
+
+  test 'should update page limit_latest when changing the setting from admin' do
+    assert_equal 'latest', Seek::Config.default_pages[:people]
+    assert_not_equal 5, Seek::Config.limit_latest
+
+    Seek::Config.limit_latest = 5
+    get :index
+    assert_response :success
+    assert_select "li.current_page" do
+      assert_select "a[href=?]", people_path(:page => 'latest')
+    end
+    assert_select "div.list_item_title", :count => 5
+  end
 end

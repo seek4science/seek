@@ -69,6 +69,7 @@ gem 'convert_office',:git=>"git://github.com/SysMO-DB/convert_office.git", :ref=
 
 gem "fleximage", :git=>"git://github.com/SysMO-DB/fleximage"
 
+
 gem 'search_biomodel', "2.2.1",:git=>"git://github.com/myGrid/search_biomodel.git"
 gem 'my_annotations', :git=>"git://github.com/myGrid/annotations.git"
 

@@ -4,7 +4,7 @@
 <%
   def make_file(uuid,name)
      fixture_file = "#{Rails.root}/test/fixtures/files/#{name}"
-     dir = "#{ContentBlob.test_storage_location}"
+     dir = "#{Seek::Config.asset_filestore_path}"
      FileUtils.mkdir(dir) unless File.exists?(dir)
      destination = "#{dir}/#{uuid}.dat"
      FileUtils.cp(fixture_file,destination)

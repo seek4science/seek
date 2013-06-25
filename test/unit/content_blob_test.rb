@@ -247,7 +247,7 @@ class ContentBlobTest < ActiveSupport::TestCase
   test 'storage_directory and filepath' do
     content_blob = Factory(:content_blob)
     storage_directory = content_blob.storage_directory
-    assert_equal  "#{Rails.root}/tmp/test_content_blobs", storage_directory
+    assert_equal  "#{Rails.root}/tmp/filestore/assets", storage_directory
     assert_equal (storage_directory + '/' + content_blob.uuid + '.dat'), content_blob.filepath
     assert_equal (storage_directory + '/' + content_blob.uuid + '.pdf'), content_blob.filepath('pdf')
     assert_equal (storage_directory + '/' + content_blob.uuid + '.txt'), content_blob.filepath('txt')

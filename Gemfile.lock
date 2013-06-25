@@ -38,7 +38,7 @@ GIT
 
 GIT
   remote: git://github.com/SysMO-DB/fleximage
-  revision: 92dd9ad564801d9d36f8b8419064c26db68888b3
+  revision: 658985eb1460fb5d6612f624463e6cbf067ad973
   specs:
     fleximage (0.1)
 

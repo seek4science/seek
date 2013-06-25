@@ -19,6 +19,7 @@ SEEK::Application.configure do
       Settings.defaults[:sample_parser_enabled] = true
       Settings.defaults[:project_browser_enabled] = true
       Settings.defaults[:experimental_features_enabled] = true
+      Settings.defaults[:filestore_path] = "tmp/filestore"
     end
   end
 end
