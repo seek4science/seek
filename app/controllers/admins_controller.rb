@@ -81,11 +81,11 @@ class AdminsController < ApplicationController
   def update_home_settings
     Seek::Config.project_news_enabled= string_to_boolean params[:project_news_enabled]
     Seek::Config.project_news_feed_urls= params[:project_news_feed_urls]
-    Seek::Config.project_news_number_of_entries= params[:project_news_number_of_entries] if only_integer params[:tag_threshold], "number of project news"
+    Seek::Config.project_news_number_of_entries= params[:project_news_number_of_entries] if only_integer params[:project_news_number_of_entries], "project news items"
 
     Seek::Config.community_news_enabled= string_to_boolean params[:community_news_enabled]
     Seek::Config.community_news_feed_urls= params[:community_news_feed_urls]
-    Seek::Config.community_news_number_of_entries= params[:community_news_number_of_entries] if only_integer params[:tag_threshold], "number of community news"
+    Seek::Config.community_news_number_of_entries= params[:community_news_number_of_entries] if only_integer params[:community_news_number_of_entries], "community news items"
 
     Seek::Config.home_description = params[:home_description]
     begin
@@ -362,7 +362,7 @@ class AdminsController < ApplicationController
        Integer(input)
        return true
      rescue
-       flash[:error] = "Please enter the correct #{field}"
+       flash[:error] = "Please enter a valid number for the #{field}"
        return false
      end
   end
@@ -372,11 +372,11 @@ class AdminsController < ApplicationController
        if Integer(input) > 0
          return true
        else
-         flash[:error] = "Please enter the correct #{field}"
+         flash[:error] = "Please enter a valid positive number for the #{field}"
          return false
        end
      rescue
-       flash[:error] = "Please enter the correct #{field}"
+       flash[:error] = "Please enter a valid positive number for the #{field}"
        return false
      end
   end
