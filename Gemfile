@@ -15,12 +15,12 @@ gem 'simple-spreadsheet-extractor',"0.12.3"
 gem "rmagick","2.12.2"
 gem "mysql2"
 gem 'rest-client',">=1.6.1"
-gem 'factory_girl',"2.6.4"
+gem 'factory_girl', "2.6.4"
 gem 'ratom',"0.6.9"
 gem 'rubyzip'
 gem 'bio'
-gem 'sunspot_rails','1.3.1'
-gem 'sunspot_solr','1.3.1'
+gem 'sunspot_rails'
+gem 'sunspot_solr'
 gem 'savon',"1.1.0"
 gem "dynamic_form"
 gem "prototype-rails"
@@ -46,6 +46,7 @@ gem 'calendar_date_select', :git => 'git://github.com/paneq/calendar_date_select
 gem "yaml_db"
 gem 'rails_autolink'
 gem 'rfc-822'
+gem 'nokogiri',"1.5.9"
 
 
 #Linked to SysMO Git repositories
@@ -66,12 +67,11 @@ gem "app_version", :git => "git://github.com/SysMO-DB/app_version.git"
 gem 'doi_query_tool', :git => "git://github.com/SysMO-DB/doi_query_tool.git"
 gem 'pubmed_query_tool', :git => "git://github.com/SysMO-DB/pubmed_query_tool.git"
 gem 'convert_office',:git=>"git://github.com/SysMO-DB/convert_office.git", :ref=>"753f2567dbd625bc89071e1150404efbb562e130"
-
 gem "fleximage", :git=>"git://github.com/SysMO-DB/fleximage"
-
-
 gem 'search_biomodel', "2.2.1",:git=>"git://github.com/myGrid/search_biomodel.git"
 gem 'my_annotations', :git=>"git://github.com/myGrid/annotations.git"
+
+gem 'passenger'
 
 group :development do
   gem "sqlite3","1.3.7"

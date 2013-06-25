@@ -13,7 +13,7 @@ rm -rf filestore/
 
 #rvm handling is based on example at http://pivotallabs.com/users/mbarinek/blog/articles/1450-rails-3-with-rvm-and-cruise-control
 
-desired_ruby=ruby-1.8.7
+desired_ruby=ruby-1.9.3
 project_name=seek018
 rubygems=1.8.25
 

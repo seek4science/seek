@@ -10,6 +10,7 @@ namespace :seek do
   task :upgrade_version_tasks=>[
             :environment,
             :repopulate_auth_lookup_tables,
+            :move_asset_files
   ]
 
   desc("upgrades SEEK from the last released version to the latest released version")
@@ -28,6 +29,19 @@ namespace :seek do
     end
 
     puts "Upgrade completed successfully"
+  end
+
+  task(:move_asset_files=>:environment) do
+    oldpath=File.join(Rails.root,"filestore","content_blobs",Rails.env.downcase)
+    newpath = Seek::Config.asset_filestore_path
+    puts "Moving asset files from:\n\t#{oldpath}\nto:\n\t#{newpath}"
+    FileUtils.mkdir_p newpath
+    if File.exists? oldpath
+      FileUtils.mv Dir.glob("#{oldpath}/*"),newpath
+      puts "You can now safely remove #{oldpath}"
+    else
+      puts "The old asset location #{oldpath} doesn't exist, nothing to do"
+    end
   end
 
 
