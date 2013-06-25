@@ -66,16 +66,15 @@
   <div style="clear:both">
     <br/>
     <h2><%= Seek::Config.sample_parent_term.capitalize -%> details</h2>
-
-    <div class="main_content_left_box">
-      <% if @sample.specimen.can_view? %>
-        <%= render :partial => "sample_specimen_details", :object => @sample.specimen %>
-      <% else %>
-          <%= hidden_items_html([@sample.specimen], "This item is hidden")  %>
-      <% end %>
-    </div>
-    <br/>
-    <%= render :partial => "assets/resource_main_content_right", :locals => {:resource => @sample.specimen, :title => 'Owner and creators'} %>
+    <% if @sample.specimen.can_view? %>
+        <div class="main_content_left_box">
+            <%= render :partial => "sample_specimen_details", :object => @sample.specimen %>
+        </div>
+        <br/>
+        <%= render :partial => "assets/resource_main_content_right", :locals => {:resource => @sample.specimen, :title => 'Owner and creators'} %>
+    <% else %>
+        <%= hidden_items_html([@sample.specimen], "This item is hidden")  %>
+    <% end %>
   </div>
 
   <div style="clear:both">
