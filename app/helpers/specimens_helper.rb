@@ -6,9 +6,14 @@ module SpecimensHelper
     if organism
       result = link_to h(organism.title),organism,{:class => "assay_organism_info"}
 
-      if strain && !strain.is_dummy?
-        result += " : "
-        result +=  "#{h(strain.info)}"
+      if strain && !strain.is_dummy? && strain.can_view?
+        result += " : <span class='strain_info'>#{link_to h(strain.info), strain}</span>".html_safe
+      elsif strain && !strain.is_dummy? && !strain.can_view?
+        result += "<span class=\"none_text\"> : hidden strain</span>".html_safe
+        contributor_links = hidden_item_contributor_links [strain]
+        if !contributor_links.empty?
+          result += "<span class=\"none_text\">(Please contact: #{contributor_links.join(', ')})</span>".html_safe
+        end
       end
 
       if culture_growth_type
