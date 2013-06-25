@@ -46,6 +46,7 @@ gem 'calendar_date_select', :git => 'git://github.com/paneq/calendar_date_select
 gem "yaml_db"
 gem 'rails_autolink'
 gem 'rfc-822'
+gem 'nokogiri',"1.5.9"
 
 
 #Linked to SysMO Git repositories
