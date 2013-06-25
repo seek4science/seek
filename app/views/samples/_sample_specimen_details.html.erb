@@ -127,8 +127,14 @@
 </p>
 <% unless Seek::Config.is_virtualliver %>
 <p>
-  <label>Organism and strain:</label>
-  <%= organism_and_strain( specimen.strain) -%>
+  <% organism = specimen.strain.organism %>
+  <label>Organism:</label>
+  <%= link_to organism.title, organism -%>
 </p>
-<%= render :partial => "assets/special_auth_code_display", :locals => {:resource => specimen} %>
+
+ <span style="font-size: 120%;">
+  <%= list_item_authorized_list (specimen.strain.is_dummy? ? [] : [specimen.strain]),"Strain", true, 50, true %>
+ </span>
+
+ <%= render :partial => "assets/special_auth_code_display", :locals => {:resource => specimen} %>
 <% end %>
