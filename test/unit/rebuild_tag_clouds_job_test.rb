@@ -22,6 +22,12 @@ class RebuildTagCloudsJobTest < ActiveSupport::TestCase
     job.locked_at = Time.now
     job.save!
     assert !RebuildTagCloudsJob.exists?,"Should ignore locked jobs"
+
+    assert_nil job.failed_at
+    job.failed_at = Time.now
+    job.locked_at = nil
+    job.save!
+    assert !RebuildTagCloudsJob.exists?,"Should ignore failed jobs"
   end
 
   test "count" do
