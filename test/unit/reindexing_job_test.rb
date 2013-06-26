@@ -11,8 +11,15 @@ class ReindexingJobTest < ActiveSupport::TestCase
 
     assert ReindexingJob.exists?
     job=Delayed::Job.first
+
+    assert_nil job.failed_at
+    job.failed_at = Time.now
+    job.save!
+    assert !ReindexingJob.exists?,"Should ignore failed jobs"
+
     assert_nil job.locked_at
     job.locked_at = Time.now
+    job.failed_at = nil
     job.save!
     assert !ReindexingJob.exists?,"Should ignore locked jobs"
     
