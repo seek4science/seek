@@ -167,8 +167,22 @@ class AdminsControllerTest < ActionController::TestCase
   test "update home page settings" do
     login_as Factory(:admin).user
     assert_not_equal "This is the home description",Seek::Config.home_description
-    post :update_home_settings, :home_description=>"This is the home description"
+    post :update_home_settings,
+         :home_description=>"This is the home description",
+         :project_news_number_of_entries=>"3",
+         :community_news_number_of_entries=>"7",
+         :community_news_enabled=>"1",
+         :project_news_enabled=>"1",
+         :community_news_feed_urls=>"http://fish.com, http://goats.com",
+         :project_news_feed_urls=>"http://carrot.com, http://soup.com"
+
     assert_equal "This is the home description",Seek::Config.home_description
+    assert_equal "http://fish.com, http://goats.com",Seek::Config.community_news_feed_urls
+    assert_equal "http://carrot.com, http://soup.com",Seek::Config.project_news_feed_urls
+    assert_equal 7,Seek::Config.community_news_number_of_entries
+    assert_equal 3,Seek::Config.project_news_number_of_entries
+    assert Seek::Config.community_news_enabled
+    assert Seek::Config.project_news_enabled
   end
 
 end

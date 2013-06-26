@@ -3,9 +3,8 @@ require File.expand_path(File.dirname(__FILE__) + "/../config/environment")
 require 'rails/test_help'
 
 require "minitest/reporters"
-MiniTest::Reporters.use!
+MiniTest::Reporters.use! MiniTest::Reporters::DefaultReporter.new
 
-#require 'test_benchmark'
 require 'rest_test_cases'
 require 'rdf_test_cases'
 require 'ruby-prof'
@@ -13,6 +12,7 @@ require 'factory_girl'
 require 'webmock/test_unit'
 require 'action_view/test_case'
 require 'tmpdir'
+require 'authenticated_test_helper'
 
 
 FactoryGirl.find_definitions #It looks like requiring factory_girl _should_ do this automatically, but it doesn't seem to work
