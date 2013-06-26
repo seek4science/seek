@@ -31,6 +31,8 @@ class Strain < ActiveRecord::Base
 
   validates_presence_of :projects, :unless => Proc.new{|s| s.is_dummy? || Seek::Config.is_virtualliver}
 
+  default_scope :order => "#{self.table_name}.title"
+
   grouped_pagination
 
   searchable(:ignore_attribute_changes_of=>[:updated_at]) do

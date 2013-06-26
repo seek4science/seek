@@ -9,22 +9,6 @@ class SopTest < ActiveSupport::TestCase
     assert_equal p,s.projects.first
   end
 
-  test "sort by updated_at" do
-    last = 9999999999999 #safe until the year 318857 !
-
-    Sop.record_timestamps = false
-    Factory(:sop,:title=>"8 day old SOP",:updated_at=>8.day.ago)
-    Factory(:sop,:title=>"20 day old SOP",:updated_at=>20.days.ago)
-    Sop.record_timestamps = true
-    
-    sops = Sop.find(:all)
-
-    sops.each do |sop|
-      assert sop.updated_at.to_i <= last
-      last=sop.updated_at.to_i
-    end
-  end
-
   test "to_rdf" do
     object = Factory :sop, :description=>"An excellent SOP", :projects=>[Factory(:project),Factory(:project)], :assay_ids=>[Factory(:assay).id]
     Factory :assets_creator,:asset=>object,:creator=>Factory(:person)

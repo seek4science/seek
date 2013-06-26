@@ -1,7 +1,6 @@
 require 'acts_as_asset'
 require 'acts_as_versioned_resource'
 require 'explicit_versioning'
-require 'grouped_pagination'
 require 'title_trimmer'
 
 class Model < ActiveRecord::Base
@@ -17,6 +16,8 @@ class Model < ActiveRecord::Base
 
   acts_as_asset
   acts_as_trashable
+
+  default_scope :order => "#{self.table_name}.title"
 
   include Seek::Models::ModelExtraction
 

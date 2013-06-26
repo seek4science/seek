@@ -57,6 +57,9 @@ class Specimen < ActiveRecord::Base
 
   has_many :sops,:class_name => "Sop::Version",:finder_sql => Proc.new{self.sop_sql()}
   has_many :sop_masters,:class_name => "SopSpecimen"
+
+  default_scope :order => "#{self.table_name}.title"
+
   grouped_pagination
 
   def build_sop_masters sop_ids

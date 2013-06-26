@@ -9,6 +9,7 @@
 # * See license.txt for details.
 # ********************************************************************************
 require 'seek/permissions/acts_as_authorized'
+require 'grouped_pagination'
 
 module Acts #:nodoc:
   module Asset #:nodoc:
@@ -36,8 +37,6 @@ module Acts #:nodoc:
 
         attr_writer :original_filename,:content_type
         does_not_require_can_edit :last_used_at
-
-        default_scope :order => "#{self.table_name}.updated_at DESC"
 
         validates_presence_of :title
         validates_presence_of :projects

@@ -20,10 +20,16 @@ class AuthLookupJobTest  < ActiveSupport::TestCase
     end
 
     assert AuthLookupUpdateJob.exists?
-
     job=Delayed::Job.first
+
+    assert_nil job.failed_at
+    job.failed_at = Time.now
+    job.save!
+    assert !AuthLookupUpdateJob.exists?,"Should ignore failed jobs"
+
     assert_nil job.locked_at
     job.locked_at = Time.now
+    job.failed_at = nil
     job.save!
     assert !AuthLookupUpdateJob.exists?,"Should ignore locked jobs"
   end

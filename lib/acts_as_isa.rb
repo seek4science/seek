@@ -16,7 +16,7 @@ module Acts #:nodoc:
       def acts_as_isa
         acts_as_favouritable
         
-        default_scope :order => "#{self.table_name}.updated_at DESC"
+        default_scope :order => "#{self.table_name}.title"
 
         title_trimmer
 

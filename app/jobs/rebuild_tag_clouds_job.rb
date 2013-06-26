@@ -19,6 +19,6 @@ class RebuildTagCloudsJob
   end
 
   def self.count
-    Delayed::Job.where(['handler = ? AND locked_at IS ?',@@my_yaml,nil]).count
+    Delayed::Job.where(['handler = ? AND locked_at IS ? AND failed_at IS ?',@@my_yaml,nil,nil]).count
   end
 end
