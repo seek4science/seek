@@ -981,7 +981,7 @@ class ModelsControllerTest < ActionController::TestCase
     model = Factory :model, :contributor => User.current_user
     disable_authorization_checks do
       attribution = Factory :model
-      model.relationships.create :object => attribution, :predicate => Relationship::ATTRIBUTED_TO
+      model.relationships.create :other_object => attribution, :predicate => Relationship::ATTRIBUTED_TO
       model.save!
       attribution.destroy
     end

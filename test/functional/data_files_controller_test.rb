@@ -990,7 +990,7 @@ class DataFilesControllerTest < ActionController::TestCase
     login_as(:pal_user) #this user is a member of sysmo, and can edit this data file
     df=data_files(:editable_data_file)
     jerm_file=data_files(:data_file_with_no_contributor)
-    r=Relationship.new(:subject => df, :predicate => Relationship::ATTRIBUTED_TO, :object => jerm_file)
+    r=Relationship.new(:subject => df, :predicate => Relationship::ATTRIBUTED_TO, :other_object => jerm_file)
     r.save!
     df = DataFile.find(df.id)
     assert df.attributions.collect{|a| a.other_object}.include?(jerm_file),"The datafile should have had the jerm file added as an attribution"
@@ -1270,7 +1270,7 @@ class DataFilesControllerTest < ActionController::TestCase
 
   test "converted presentations have correct attributions" do
     data_file = Factory :data_file,:contributor=>User.current_user
-    disable_authorization_checks {data_file.relationships.create :object => Factory(:data_file), :subject => data_file, :predicate => Relationship::ATTRIBUTED_TO}
+    disable_authorization_checks {data_file.relationships.create :other_object => Factory(:data_file), :subject => data_file, :predicate => Relationship::ATTRIBUTED_TO}
     df_attributions = data_file.attributions_objects
     assert_difference("DataFile.count", -1) do
       assert_difference("Presentation.count") do
