@@ -1,5 +1,4 @@
 require 'acts_as_asset'
-require 'grouped_pagination'
 require 'explicit_versioning'
 require 'acts_as_versioned_resource'
 
@@ -13,6 +12,8 @@ class Presentation < ActiveRecord::Base
    end if Seek::Config.solr_enabled
 
    acts_as_asset
+
+   default_scope :order => "#{self.table_name}.title"
 
    after_save :queue_background_reindexing if Seek::Config.solr_enabled
 
