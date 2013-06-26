@@ -176,7 +176,7 @@ class Assay < ActiveRecord::Base
   end
   
   def related_publications
-    self.relationships.select {|a| a.object_type == "Publication"}.collect { |a| a.object }
+    self.relationships.select {|a| a.other_object_type == "Publication"}.collect { |a| a.other_object }
   end
 
   def related_asset_ids asset_type

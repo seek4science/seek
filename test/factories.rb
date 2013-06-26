@@ -698,7 +698,7 @@ end
 
   Factory.define(:relationship) do |f|
     f.association :subject, :factory => :model
-    f.association :object, :factory => :model
+    f.association :other_object, :factory => :model
     f.predicate Relationship::ATTRIBUTED_TO
   end
 

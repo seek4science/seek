@@ -342,13 +342,13 @@ class PublicationsController < ApplicationController
     asset_ids.each do |id|
       asset = asset_type.constantize.find_by_id(id)
       if asset && asset.send("can_#{required_action}?")
-        unless Relationship.where(:subject_type => asset_type, :subject_id => asset.id, :predicate => Relationship::RELATED_TO_PUBLICATION, :object_type => "Publication", :object_id => @publication.id).first
-          Relationship.create(:subject_type => asset_type, :subject_id => asset.id, :predicate => Relationship::RELATED_TO_PUBLICATION, :object_type => "Publication", :object_id => @publication.id)
+        unless Relationship.where(:subject_type => asset_type, :subject_id => asset.id, :predicate => Relationship::RELATED_TO_PUBLICATION, :other_object_type => "Publication", :other_object_id => @publication.id).first
+          Relationship.create(:subject_type => asset_type, :subject_id => asset.id, :predicate => Relationship::RELATED_TO_PUBLICATION, :other_object_type => "Publication", :other_object_id => @publication.id)
         end
       end
     end
     #Destroy asset relationship that aren't needed
-    associate_relationships = Relationship.where(["object_id = ? and subject_type = ?",@publication.id,asset_type]).all
+    associate_relationships = Relationship.where(["other_object_id = ? and subject_type = ?",@publication.id,asset_type]).all
     associate_relationships.each do |associate_relationship|
       asset = associate_relationship.subject
       if asset.send("can_#{required_action}?") && !asset_ids.include?(asset.id.to_s)

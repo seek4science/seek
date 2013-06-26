@@ -1,3 +1,4 @@
+# encoding: UTF-8
 # This file is auto-generated from the current state of the database. Instead
 # of editing this file, please use the migrations feature of Active Record to
 # incrementally modify your database, and then regenerate this schema definition.
@@ -10,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20130510095830) do
+ActiveRecord::Schema.define(:version => 20130626105656) do
 
   create_table "activity_logs", :force => true do |t|
     t.string   "action"
@@ -696,9 +697,9 @@ ActiveRecord::Schema.define(:version => 20130510095830) do
     t.text     "other_creators"
     t.string   "uuid"
     t.integer  "policy_id"
-    t.integer  "model_image_id"
     t.string   "imported_source"
     t.string   "imported_url"
+    t.integer  "model_image_id"
   end
 
   add_index "model_versions", ["contributor_id", "contributor_type"], :name => "index_model_versions_on_contributor_id_and_contributor_type"
@@ -727,9 +728,9 @@ ActiveRecord::Schema.define(:version => 20130510095830) do
     t.text     "other_creators"
     t.string   "uuid"
     t.integer  "policy_id"
-    t.integer  "model_image_id"
     t.string   "imported_source"
     t.string   "imported_url"
+    t.integer  "model_image_id"
   end
 
   add_index "models", ["contributor_id", "contributor_type"], :name => "index_models_on_contributor_id_and_contributor_type"
@@ -1078,11 +1079,11 @@ ActiveRecord::Schema.define(:version => 20130510095830) do
   end
 
   create_table "relationships", :force => true do |t|
-    t.string   "subject_type", :null => false
-    t.integer  "subject_id",   :null => false
-    t.string   "predicate",    :null => false
-    t.string   "object_type",  :null => false
-    t.integer  "object_id",    :null => false
+    t.string   "subject_type",      :null => false
+    t.integer  "subject_id",        :null => false
+    t.string   "predicate",         :null => false
+    t.string   "other_object_type", :null => false
+    t.integer  "other_object_id",   :null => false
     t.datetime "created_at"
     t.datetime "updated_at"
   end
@@ -1139,9 +1140,9 @@ ActiveRecord::Schema.define(:version => 20130510095830) do
     t.string   "provider_name"
     t.float    "age_at_sampling"
     t.string   "uuid"
+    t.integer  "age_at_sampling_unit_id"
     t.string   "sample_type"
     t.string   "treatment"
-    t.integer  "age_at_sampling_unit_id"
   end
 
   create_table "samples_tissue_and_cell_types", :id => false, :force => true do |t|
@@ -1450,10 +1451,10 @@ ActiveRecord::Schema.define(:version => 20130510095830) do
   end
 
   create_table "text_value_versions", :force => true do |t|
-    t.integer  "text_value_id",                            :null => false
-    t.integer  "version",                                  :null => false
+    t.integer  "text_value_id",                          :null => false
+    t.integer  "version",                                :null => false
     t.integer  "version_creator_id"
-    t.text     "text",               :limit => 2147483647, :null => false
+    t.text     "text",               :limit => 16777215, :null => false
     t.datetime "created_at"
     t.datetime "updated_at"
   end
@@ -1463,7 +1464,7 @@ ActiveRecord::Schema.define(:version => 20130510095830) do
   create_table "text_values", :force => true do |t|
     t.integer  "version"
     t.integer  "version_creator_id"
-    t.text     "text",               :limit => 2147483647, :null => false
+    t.text     "text",               :limit => 16777215, :null => false
     t.datetime "created_at"
     t.datetime "updated_at"
   end

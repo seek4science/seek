@@ -38,7 +38,7 @@ class Publication < ActiveRecord::Base
   
   has_many :backwards_relationships, 
     :class_name => 'Relationship',
-    :as => :object,
+    :as => :other_object,
     :dependent => :destroy
 
   

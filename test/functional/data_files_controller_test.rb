@@ -993,7 +993,7 @@ class DataFilesControllerTest < ActionController::TestCase
     r=Relationship.new(:subject => df, :predicate => Relationship::ATTRIBUTED_TO, :object => jerm_file)
     r.save!
     df = DataFile.find(df.id)
-    assert df.attributions.collect{|a| a.object}.include?(jerm_file),"The datafile should have had the jerm file added as an attribution"
+    assert df.attributions.collect{|a| a.other_object}.include?(jerm_file),"The datafile should have had the jerm file added as an attribution"
     assert_difference('ActivityLog.count') do
       get :show,:id=>df
     end

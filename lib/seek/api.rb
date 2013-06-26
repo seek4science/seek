@@ -81,7 +81,7 @@ module Seek
         pieces = uri.downcase.gsub(Seek::Config.site_base_host.downcase, '').split('/').delete_if { |s| s.blank? }
         obj = pieces[0].singularize.camelize.constantize.find(pieces[1])
       rescue Exception => ex
-        BioCatalogue::Util.log_exception(ex, :warning, "BioCatalogue::Api.object_for_uri failed to find an object for the uri '#{uri}'")
+        Logger.warn("Seek::Api.object_for_uri failed to find an object for the uri '#{uri}'")
       end
       
       return obj

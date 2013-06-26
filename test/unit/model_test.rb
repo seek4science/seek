@@ -29,7 +29,7 @@ class ModelTest < ActiveSupport::TestCase
     object = Factory :model, :assay_ids=>[Factory(:assay).id]
     assert object.contains_sbml?
     pub = Factory :publication
-    Factory :relationship,:subject=>object,:predicate=>Relationship::RELATED_TO_PUBLICATION,:object=>pub
+    Factory :relationship,:subject=>object,:predicate=>Relationship::RELATED_TO_PUBLICATION,:other_object=>pub
     object.reload
     rdf = object.to_rdf
     RDF::Reader.for(:rdfxml).new(rdf) do |reader|
