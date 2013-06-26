@@ -85,7 +85,6 @@ end
 
 group :test do
   gem "sqlite3","1.3.7"
-  gem "timocratic-test_benchmark"
   gem "ruby-prof"
   gem "webmock"
   gem 'minitest-reporters','>= 0.4.1'

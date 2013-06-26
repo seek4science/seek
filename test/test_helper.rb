@@ -5,7 +5,6 @@ require 'rails/test_help'
 require "minitest/reporters"
 MiniTest::Reporters.use! MiniTest::Reporters::DefaultReporter.new
 
-#require 'test_benchmark'
 require 'rest_test_cases'
 require 'rdf_test_cases'
 require 'ruby-prof'
