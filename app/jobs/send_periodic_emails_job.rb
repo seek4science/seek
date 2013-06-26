@@ -93,11 +93,8 @@ class SendPeriodicEmailsJob < Struct.new(:frequency)
     t=Time.now
     # start tomorrow if time now is later than midday
     t = t + 1.day if t > Time.local_time(t.year, t.month,t.day,12,00,00)
-    #at 12:00:00
-    SendPeriodicEmailsJob.create_job('daily', Time.local_time(t.year, t.month,t.day,12,00,00)) if !SendPeriodicEmailsJob.exists?('daily')
-    #at 12:05:00
-    SendPeriodicEmailsJob.create_job('weekly', Time.local_time(t.year, t.month,t.day,12,05,00)) if !SendPeriodicEmailsJob.exists?('weekly')
-    #at 12:10:00
-    SendPeriodicEmailsJob.create_job('monthly', Time.local_time(t.year, t.month,t.day,12,10,00)) if !SendPeriodicEmailsJob.exists?('monthly')
+    SendPeriodicEmailsJob.create_job('daily', Time.local_time(t.year, t.month,t.day,12,00,00))   #at 12:00:00
+    SendPeriodicEmailsJob.create_job('weekly', Time.local_time(t.year, t.month,t.day,12,05,00))  #at 12:05:00
+    SendPeriodicEmailsJob.create_job('monthly', Time.local_time(t.year, t.month,t.day,12,10,00)) #at 12:10:00
   end
 end
