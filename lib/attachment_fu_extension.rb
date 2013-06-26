@@ -1,13 +1,5 @@
 Technoweenie::AttachmentFu::InstanceMethods.module_eval do
 
-
-  @@image_mime_types ||= {".gif" => "image/gif", ".ief" => "image/ief", ".jpe" => "image/jpeg", ".jpeg" => "image/jpeg", ".jpg" => "image/jpeg", ".pbm" => "image/x-portable-bitmap", ".pgm" => "image/x-portable-graymap", ".png" => "image/png", ".pnm" => "image/x-portable-anymap", ".ppm" => "image/x-portable-pixmap", ".ras" => "image/cmu-raster", ".rgb" => "image/x-rgb", ".tif" => "image/tiff", ".tiff" => "image/tiff", ".xbm" => "image/x-xbitmap", ".xpm" => "image/x-xpixmap", ".xwd" => "image/x-xwindowdump"}.freeze
-
-
-  def image?
-    self.class.image?(content_type) || @@image_mime_types.values.include?(content_type)
-  end
-
   def uploaded_data_with_extension=(file_data)
     unless self.class == ForumAttachment || self.class == HelpAttachment  #FIXME: This check is an indication that this extension is applied too broadly, I think.
       upload_results = self.uploaded_data_without_extension=file_data
