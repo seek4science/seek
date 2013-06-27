@@ -26,7 +26,7 @@ class ModelTest < ActiveSupport::TestCase
   end
 
   test "to_rdf" do
-    object = Factory :model, :assay_ids=>[Factory(:assay).id]
+    object = Factory :model, :assay_ids=>[Factory(:assay).id], :policy=>Factory(:public_policy)
     assert object.contains_sbml?
     pub = Factory :publication
     Factory :relationship,:subject=>object,:predicate=>Relationship::RELATED_TO_PUBLICATION,:other_object=>pub
