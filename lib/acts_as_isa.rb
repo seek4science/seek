@@ -15,8 +15,8 @@ module Acts #:nodoc:
     module ClassMethods
       def acts_as_isa
         acts_as_favouritable
-        
-        default_scope :order => "#{self.table_name}.title"
+
+        scope :default_order, order("title")
 
         title_trimmer
 

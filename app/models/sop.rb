@@ -15,7 +15,7 @@ class Sop < ActiveRecord::Base
   acts_as_asset
   acts_as_trashable
 
-  default_scope :order => "#{self.table_name}.title"
+  scope :default_order, order("title")
 
   title_trimmer
 

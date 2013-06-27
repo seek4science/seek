@@ -31,7 +31,7 @@ class Strain < ActiveRecord::Base
 
   validates_presence_of :projects, :unless => Proc.new{|s| s.is_dummy? || Seek::Config.is_virtualliver}
 
-  default_scope :order => "#{self.table_name}.title"
+  scope :default_order, order("title")
 
   grouped_pagination
 

@@ -27,7 +27,7 @@ module IndexPager
     if model_class.respond_to? :all_authorized_for
       found = model_class.all_authorized_for "view",User.current_user
     else
-      found = model_class.all
+      found = model_class.default_order
     end
     found = apply_filters(found)
     

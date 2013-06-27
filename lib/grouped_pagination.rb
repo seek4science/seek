@@ -94,7 +94,7 @@ module GroupedPagination
     
       records=[]
       if page == "all"
-        records=self.all
+        records=self.default_order
       elsif page == "latest"
         records=self.unscoped.order("updated_at DESC").limit(@latest_limit)
       elsif @pages.include?(page)

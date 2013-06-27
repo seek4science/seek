@@ -82,11 +82,11 @@ module Seek
               assets = lookup_for_action_and_user action, user_id, projects
             else
               Rails.logger.info("Lookup table #{lookup_table_name} is incomplete for user_id = #{user_id} - doing things the slow way")
-              assets = all.select { |df| df.send("authorized_for_#{action}?",user) }
+              assets = default_order.select { |df| df.send("authorized_for_#{action}?",user) }
               programatic_project_filter = !projects.nil?
             end
           else
-            assets = all.select { |df| df.send("authorized_for_#{action}?",user) }
+            assets = default_order.select { |df| df.send("authorized_for_#{action}?",user) }
           end
 
           if filter_by_permissions

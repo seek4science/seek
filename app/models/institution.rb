@@ -9,7 +9,7 @@ class Institution < ActiveRecord::Base
 
   acts_as_yellow_pages
 
-  default_scope order("#{table_name}.name")
+  scope :default_order, order("name")
 
   validates_uniqueness_of :name
 

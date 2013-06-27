@@ -61,8 +61,8 @@ class Publication < ActiveRecord::Base
 
   alias :seek_authors :creators
 
-  #TODO: refactor to something like 'sorted_by :start_date', which should create the default scope and the sort method. Maybe rename the sort method.
-  default_scope :order => "#{self.table_name}.published_date DESC"
+  scope :default_order, order("published_date DESC")
+
   def self.sort publications
     publications.sort_by &:published_date
   end

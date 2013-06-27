@@ -6,7 +6,7 @@ class Person < ActiveRecord::Base
   include Seek::Taggable
 
   acts_as_yellow_pages
-  default_scope order("#{table_name}.last_name, #{table_name}.first_name")
+  scope :default_order, order("last_name, first_name")
 
   before_save :first_person_admin
   before_destroy :clean_up_and_assign_permissions

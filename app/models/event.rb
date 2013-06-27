@@ -9,8 +9,7 @@ class Event < ActiveRecord::Base
 
   include Subscribable
 
-  #TODO: refactor to something like 'sorted_by :start_date', which should create the default scope and the sort method. Maybe rename the sort method.
-  default_scope :order => "#{self.table_name}.start_date DESC"
+  scope :default_order, order("start_date DESC")
 
   searchable(:ignore_attribute_changes_of=>[:updated_at]) do
     text :address,:city,:country,:url,:description,:title

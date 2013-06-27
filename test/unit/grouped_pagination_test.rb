@@ -235,7 +235,7 @@ class GroupedPaginationTest < ActiveSupport::TestCase
       item2 = Factory(type, :updated_at => 1.second.ago)
 
       klass = type.to_s.camelize.constantize
-      latest_items = klass.paginate_after_fetch(klass.all, :page=>'latest')
+      latest_items = klass.paginate_after_fetch(klass.default_order, :page=>'latest')
       assert latest_items.index(item2) < latest_items.index(item1)
     end
   end
@@ -244,10 +244,10 @@ class GroupedPaginationTest < ActiveSupport::TestCase
     publication1 = Factory(:publication, :title => 'AB', :published_date => 2.days.ago)
     publication2 = Factory(:publication, :title => 'AC', :published_date => 1.days.ago)
 
-    all_items = Publication.paginate_after_fetch(Publication.all, :page=>'all')
+    all_items = Publication.paginate_after_fetch(Publication.default_order, :page=>'all')
     assert all_items.index(publication2) < all_items.index(publication1)
 
-    pageA_items = Publication.paginate_after_fetch(Publication.all, :page=>'A')
+    pageA_items = Publication.paginate_after_fetch(Publication.default_order, :page=>'A')
     assert pageA_items.index(publication2) < pageA_items.index(publication1)
   end
 
@@ -255,10 +255,10 @@ class GroupedPaginationTest < ActiveSupport::TestCase
     event1 = Factory(:event, :title => 'AB', :start_date => 2.days.ago)
     event2 = Factory(:event, :title => 'AC', :start_date => 1.days.ago)
 
-    all_items = Event.paginate_after_fetch(Event.all, :page=>'all')
+    all_items = Event.paginate_after_fetch(Event.default_order, :page=>'all')
     assert all_items.index(event2) < all_items.index(event1)
 
-    pageA_items = Event.paginate_after_fetch(Event.all, :page=>'A')
+    pageA_items = Event.paginate_after_fetch(Event.default_order, :page=>'A')
     assert pageA_items.index(event2) < pageA_items.index(event1)
   end
 
@@ -269,10 +269,10 @@ class GroupedPaginationTest < ActiveSupport::TestCase
       item2 = Factory(type, :name => 'AC', :updated_at => 1.days.ago)
 
       klass = type.to_s.camelize.constantize
-      all_items = klass.paginate_after_fetch(klass.all, :page=>'all')
+      all_items = klass.paginate_after_fetch(klass.default_order, :page=>'all')
       assert all_items.index(item1) < all_items.index(item2)
 
-      pageA_items = klass.paginate_after_fetch(klass.all, :page=>'A')
+      pageA_items = klass.paginate_after_fetch(klass.default_order, :page=>'A')
       assert pageA_items.index(item1) < pageA_items.index(item2)
     end
   end
@@ -284,10 +284,10 @@ class GroupedPaginationTest < ActiveSupport::TestCase
       item2 = Factory(type, :title => 'AC', :updated_at => 1.days.ago)
 
       klass = type.to_s.camelize.constantize
-      all_items = klass.paginate_after_fetch(klass.all, :page=>'all')
+      all_items = klass.paginate_after_fetch(klass.default_order, :page=>'all')
       assert all_items.index(item1) < all_items.index(item2)
 
-      pageA_items = klass.paginate_after_fetch(klass.all, :page=>'A')
+      pageA_items = klass.paginate_after_fetch(klass.default_order, :page=>'A')
       assert pageA_items.index(item1) < pageA_items.index(item2)
     end
   end

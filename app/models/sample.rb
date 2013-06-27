@@ -61,7 +61,7 @@ class Sample < ActiveRecord::Base
 
   validates_presence_of :donation_date if Seek::Config.is_virtualliver
 
- default_scope :order => "#{self.table_name}.title"
+ scope :default_order, order("title")
 
  grouped_pagination
 

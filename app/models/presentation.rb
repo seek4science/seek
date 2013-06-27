@@ -13,7 +13,7 @@ class Presentation < ActiveRecord::Base
 
    acts_as_asset
 
-   default_scope :order => "#{self.table_name}.title"
+   scope :default_order, order("title")
 
    after_save :queue_background_reindexing if Seek::Config.solr_enabled
 
