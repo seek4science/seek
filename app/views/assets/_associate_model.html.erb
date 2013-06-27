@@ -1,7 +1,7 @@
 <%
    resource_text ||= text_for_resource(resource)
-   all_models=authorised_models.sort{|a, b| a.title<=>b.title}
-   project_models=authorised_models(current_user.person.projects).sort_by &:title
+   all_models=authorised_models
+   project_models=authorised_models(current_user.person.projects)
     select_truncate_length=120
     associated_models = resource.is_a?(Publication) ? resource.related_models : resource.models
 -%>

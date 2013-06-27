@@ -1,12 +1,12 @@
 <%
     show_relationships = resource.is_a?(DataFile)
     resource_text ||= text_for_resource(resource)
-    all_assays=authorised_assays.sort_by &:title
+    all_assays=authorised_assays
     all_assays = authorised_assays.select do |assay|
             assay.is_modelling?
          end if resource.is_a? Model
 
-    project_assays=authorised_assays(current_user.person.projects).sort_by &:title
+    project_assays=authorised_assays(current_user.person.projects)
     project_assays=project_assays.select{|a| a.is_modelling?} if resource.is_a?(Model)
     select_truncate_length=120
     associated_assays = resource.is_a?(Publication) ? resource.related_assays : resource.assays

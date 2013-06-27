@@ -12,8 +12,8 @@
     <div class="yui-u first" style="width:66%; float:left">
       
       <%
-         all_data_files=authorised_data_files.sort{|a, b| a.title<=>b.title}
-         project_data_files=authorised_data_files(current_user.person.projects).sort_by &:title
+         all_data_files=authorised_data_files
+         project_data_files=authorised_data_files(current_user.person.projects)
         select_truncate_length=120
       -%>
       

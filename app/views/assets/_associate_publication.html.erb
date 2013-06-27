@@ -13,7 +13,7 @@
     <div class="yui-u first" style="width:66%; float:left">
       
       <%
-        all_publications = Publication.all
+        all_publications = Publication.all.sort_by(&:title)
         project_publications=all_publications.select{|df| current_user.person.member_of?(df.projects)}
         select_truncate_length=120
       -%>

@@ -1,7 +1,7 @@
 <%
     resource_text ||= text_for_resource(resource)
-    all_sops=authorised_sops.sort{|a, b| a.title<=>b.title}
-    project_sops=authorised_sops(current_user.person.projects).sort_by &:title
+    all_sops=authorised_sops
+    project_sops=authorised_sops(current_user.person.projects)
     select_truncate_length=120
     associated_sops = resource.is_a?(Publication) ? resource.related_sops : resource.sops
 -%>
