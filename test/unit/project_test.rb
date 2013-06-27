@@ -59,7 +59,7 @@ class ProjectTest < ActiveSupport::TestCase
   end
 
   def test_ordered_by_name
-    assert Project.all.sort_by {|p| p.name.downcase} == Project.all || Project.all.sort_by {|p| p.name} == Project.all
+    assert Project.all.sort_by {|p| p.name.downcase} == Project.default_order || Project.all.sort_by {|p| p.name} == Project.default_order
   end
 
   def test_title_alias_for_name

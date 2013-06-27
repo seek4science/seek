@@ -138,7 +138,7 @@ class PublicationTest < ActiveSupport::TestCase
   end
 
   test "sort by published_date" do
-    assert_equal Publication.find(:all).sort_by { |p| p.published_date}.reverse, Publication.find(:all)
+    assert_equal Publication.find(:all).sort_by { |p| p.published_date}.reverse, Publication.default_order
   end
   
   test "title trimmed" do
