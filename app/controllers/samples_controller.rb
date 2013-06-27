@@ -101,7 +101,7 @@ class SamplesController < ApplicationController
     if @sample.save
       #send publishing request for specimen
       if !@sample.specimen.can_publish? && params[:sharing] && (params[:sharing][:sharing_scope].to_i == Policy::EVERYONE)
-        deliver_request_publish_approval @sample.specimen
+        deliver_request_publish_approval [@sample.specimen]
       end
 
       @sample.create_or_update_assets data_file_ids, "DataFile"

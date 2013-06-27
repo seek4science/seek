@@ -55,8 +55,8 @@ module Seek
 
         @waiting_for_publish_items.each do |item|
           ResourcePublishLog.add_log ResourcePublishLog::WAITING_FOR_APPROVAL, item
-          deliver_request_publish_approval item
         end
+        deliver_request_publish_approval @waiting_for_publish_items
 
         respond_to do |format|
           if @asset && request.env['HTTP_REFERER'].try(:normalize_trailing_slash) == polymorphic_url(@asset).normalize_trailing_slash
@@ -155,17 +155,27 @@ module Seek
           return if object.nil? || (object.respond_to?("new_record?") && object.new_record?) || (object.respond_to?("errors") && !object.errors.empty?)
 
           if params[:sharing] && params[:sharing][:sharing_scope].to_i == Policy::EVERYONE && object.gatekeeper_required? && !User.current_user.person.is_gatekeeper_of?(object) && !object.is_waiting_approval?(current_user)
-            deliver_request_publish_approval object
+            deliver_request_publish_approval [object]
           end
         end
       end
 
-      def deliver_request_publish_approval item
+      def deliver_request_publish_approval items
         if (Seek::Config.email_enabled)
-          begin
-            Mailer.request_publish_approval(item.gatekeepers, User.current_user,item,base_host).deliver
-          rescue Exception => e
-            Rails.logger.error("Error sending request publish email to a gatekeeper - #{e.message}")
+          gatekeepers_items={}
+          items.each do |item|
+            item.gatekeepers.each do |person|
+              gatekeepers_items[person]||=[]
+              gatekeepers_items[person] << item
+            end
+          end
+
+          gatekeepers_items.keys.each do |gatekeeper|
+            begin
+              Mailer.request_publish_approval(gatekeeper, User.current_user, gatekeepers_items[gatekeeper],base_host).deliver
+            rescue Exception => e
+              Rails.logger.error("Error sending notification email to the owner #{gatekeeper.name} - #{e.message}")
+            end
           end
         end
       end
