@@ -37,7 +37,7 @@
         <%=h @publication.journal -%>
         <br/>
         <label>Date Published:</label>
-        <%= @publication.published_date.strftime("#{@publication.published_date.day.ordinalize} %B %Y") -%>
+        <%= date_as_string(@publication.published_date) -%>
       </p>
 
       <p>

@@ -19,11 +19,7 @@
         <% if @event.start_date.nil? %>
           <%= text_or_not_specified nil %>
         <% else %>
-          <% if @event.start_date.hour == 0 and @event.start_date.min == 0 and @event.start_date.sec == 0 then %>
-              <%=h @event.start_date.strftime('%d/%m/%Y') %>
-          <% else %>
-              <%=h @event.start_date.strftime('%d/%m/%Y @ %H:%M:%S') %>
-          <% end %>
+          <%= date_as_string(@event.start_date, !(@event.start_date.hour == 0 and @event.start_date.min == 0 and @event.start_date.sec == 0)) %>
         <% end %>
       </p>
       <p>
@@ -31,11 +27,7 @@
         <% if @event.end_date.nil? %>
           <%= text_or_not_specified nil %>
         <% else %>
-            <% if @event.end_date.hour == 0 and @event.end_date.min == 0 and @event.end_date.sec == 0 then %>
-              <%=h @event.end_date.strftime('%d/%m/%Y') %>
-          <% else %>
-              <%=h @event.end_date.strftime('%d/%m/%Y @ %H:%M:%S') %>
-          <% end %>
+            <%= date_as_string(@event.end_date,!(@event.end_date.hour == 0 and @event.end_date.min == 0 and @event.end_date.sec == 0)) -%>
         <% end %>
       </p>
 
