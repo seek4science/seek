@@ -9,7 +9,7 @@
 # * See license.txt for details.
 # ********************************************************************************
 require 'seek/permissions/acts_as_authorized'
-require 'grouped_pagination'
+#require 'grouped_pagination'
 
 module Acts #:nodoc:
   module Asset #:nodoc:

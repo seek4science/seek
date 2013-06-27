@@ -178,10 +178,13 @@ class ModelTest < ActiveSupport::TestCase
   end
   
   test "titled trimmed" do
-    model=models(:teusink)
-    model.title=" space"
-    model.save!
-    assert_equal "space",model.title
+    model=Factory :model
+    User.with_current_user model.contributor do
+      model.title=" space"
+      model.save!
+      assert_equal "space",model.title
+    end
+
   end
 
   test "model with no contributor" do
@@ -191,34 +194,38 @@ class ModelTest < ActiveSupport::TestCase
 
   test "versions destroyed as dependent" do
     model=models(:teusink)
-    User.current_user = model.contributor
-    assert_equal 2,model.versions.size,"There should be 2 versions of this Model"
-    assert_difference("Model.count",-1) do
-      assert_difference("Model::Version.count",-2) do
-        model.destroy
+    User.with_current_user model.contributor do
+      assert_equal 2,model.versions.size,"There should be 2 versions of this Model"
+      assert_difference("Model.count",-1) do
+        assert_difference("Model::Version.count",-2) do
+          model.destroy
+        end
       end
     end
+
   end
 
   test "make sure content blob is preserved after deletion" do
-    model = models(:teusink)
-    User.current_user = model.contributor
-    assert_equal 1, model.content_blobs.size,"Must have an associated content blob for this test to work"
-    assert_not_nil model.content_blobs.first,"Must have an associated content blob for this test to work"
-    cb=model.content_blobs.first
-    assert_difference("Model.count",-1) do
-      assert_no_difference("ContentBlob.count") do
-        model.destroy
+    model = Factory :model
+    User.with_current_user  model.contributor do
+      assert_equal 1, model.content_blobs.size,"Must have an associated content blob for this test to work"
+      assert_not_nil model.content_blobs.first,"Must have an associated content blob for this test to work"
+      cb=model.content_blobs.first
+      assert_difference("Model.count",-1) do
+        assert_no_difference("ContentBlob.count") do
+          model.destroy
+        end
       end
+      assert_not_nil ContentBlob.find(cb.id)
     end
-    assert_not_nil ContentBlob.find(cb.id)
   end
 
   test "is restorable after destroy" do
     model = Factory :model, :policy  => Factory(:all_sysmo_viewable_policy), :title => 'is it restorable?'
-    User.current_user = model.contributor
-    assert_difference("Model.count",-1) do
-      model.destroy
+    User.with_current_user model.contributor do
+      assert_difference("Model.count",-1) do
+        model.destroy
+      end
     end
     assert_nil Model.find_by_title 'is it restorable?'
     assert_difference("Model.count",1) do
@@ -229,10 +236,16 @@ class ModelTest < ActiveSupport::TestCase
 
 
   test 'failing to delete due to can_delete still creates trash' do
-    model = Factory :model, :policy => Factory(:private_policy)
-    assert_no_difference("Model.count") do
-      model.destroy
+    user = Factory :user
+    contributor = Factory :person
+    model = Factory :model, :policy => Factory(:private_policy),:contributor=>contributor
+    User.with_current_user user do
+      assert !model.can_delete?
+      assert_no_difference("Model.count") do
+        model.destroy
+      end
     end
+
     assert_not_nil Model.restore_trash(model.id)
   end
   
