@@ -68,10 +68,17 @@ Kernel.class_eval do
 end
 
 class ActiveSupport::TestCase
+  setup :clear_rails_cache
+  teardown :clear_current_user
 
-  setup do
+  def clear_rails_cache
     Rails.cache.clear
   end
+
+  def clear_current_user
+    User.current_user = nil
+  end
+
   # Transactional fixtures accelerate your tests by wrapping each test method
   # in a transaction that's rolled back on completion.  This ensures that the
   # test database remains unchanged so your fixtures don't have to be reloaded
