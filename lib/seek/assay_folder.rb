@@ -53,7 +53,7 @@ module Seek
       assets = Array(assets)
       assets.each do |asset|
         if asset.is_a?(Publication)
-          Relationship.create :subject=>assay,:object=>asset,:predicate=>Relationship::RELATED_TO_PUBLICATION
+          Relationship.create :subject=>assay,:other_object=>asset,:predicate=>Relationship::RELATED_TO_PUBLICATION
         else
           assay.relate(asset)
         end
@@ -67,7 +67,7 @@ module Seek
         aa.destroy if assets.include?(aa.asset)
       end
       assay.relationships.each do |rel|
-        rel.destroy if assets.include?(rel.object)
+        rel.destroy if assets.include?(rel.other_object)
       end
     end
 

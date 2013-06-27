@@ -20,7 +20,7 @@ class PublicationTest < ActiveSupport::TestCase
 
   test "to_rdf" do
     object = Factory :publication
-    Factory :relationship, :subject=>Factory(:assay), :object=>object, :predicate=>Relationship::RELATED_TO_PUBLICATION
+    Factory :relationship, :subject=>Factory(:assay), :other_object=>object, :predicate=>Relationship::RELATED_TO_PUBLICATION
     object.reload
 
     rdf = object.to_rdf

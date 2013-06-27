@@ -71,9 +71,9 @@ class AttributionsTest < ActionController::TestCase
     end
     
     # double-check to see that no attributions for this sop remain
-    destroyed_sop_attributions = Relationship.find(:all, :conditions => { :subject_id => sop_instance.id,
-                                                                          :subject_type => sop_instance.class.name,
-                                                                          :predicate => Relationship::ATTRIBUTED_TO })
+    destroyed_sop_attributions = Relationship.where :subject_id => sop_instance.id,
+                                                    :subject_type => sop_instance.class.name,
+                                                    :predicate => Relationship::ATTRIBUTED_TO
     assert_equal [], destroyed_sop_attributions
   end
   
@@ -92,7 +92,7 @@ class AttributionsTest < ActionController::TestCase
     sop_instance = Sop.find(sop_id)
     
     assert_equal 2, sop_instance.attributions.length
-    if sop_instance.attributions[0].object_id == 1
+    if sop_instance.attributions[0].other_object_id == 1
       attr_to_sop_one = sop_instance.attributions[0]
       attr_to_sop_two = sop_instance.attributions[1]
     else
@@ -115,8 +115,8 @@ class AttributionsTest < ActionController::TestCase
     
     # attribution that was supposed to be deleted was really destroyed
     deleted_attr_to_sop_one = Relationship.where({ :subject_id => attr_to_sop_one.subject_id, :subject_type => attr_to_sop_one.subject_type,
-                                                                         :predicate => attr_to_sop_one.predicate, :object_id => attr_to_sop_one.object_id,
-                                                                         :object_type => attr_to_sop_one.object_type } ).first
+                                                                         :predicate => attr_to_sop_one.predicate, :other_object_id => attr_to_sop_one.other_object_id,
+                                                                         :other_object_type => attr_to_sop_one.other_object_type } ).first
     assert_equal nil, deleted_attr_to_sop_one
     
     
@@ -125,8 +125,8 @@ class AttributionsTest < ActionController::TestCase
     # handled by keeping intact instead of removing and re-creating new record with the
     # same attribution data
     remaining_attr_to_sop_two = Relationship.where({ :subject_id => attr_to_sop_two.subject_id, :subject_type => attr_to_sop_two.subject_type,
-                                                                           :predicate => attr_to_sop_two.predicate, :object_id => attr_to_sop_two.object_id,
-                                                                           :object_type => attr_to_sop_two.object_type } ).first
+                                                                           :predicate => attr_to_sop_two.predicate, :other_object_id => attr_to_sop_two.other_object_id,
+                                                                           :other_object_type => attr_to_sop_two.other_object_type } ).first
     assert_equal attr_to_sop_two.id, remaining_attr_to_sop_two.id
     
     
@@ -134,8 +134,8 @@ class AttributionsTest < ActionController::TestCase
     # (we have already checked that the total number of attributions after running the test
     #  is correct - one removed, one added, one left unchanged: total - unchanged)
     new_attr = Relationship.where({ :subject_id => sop_id, :subject_type => sop_instance.class.name,
-                                                          :predicate => Relationship::ATTRIBUTED_TO, :object_id => 44,
-                                                          :object_type => "Sop" } ).first
+                                                          :predicate => Relationship::ATTRIBUTED_TO, :other_object_id => 44,
+                                                          :other_object_type => "Sop" } ).first
     assert (!new_attr.nil?), "new attribution shouldn't be nil - nil means that it wasn't created"
   end
 
@@ -145,10 +145,10 @@ class AttributionsTest < ActionController::TestCase
     sop1 = Factory :sop,:policy=>(Factory :public_policy),:contributor=>u
     sop2 = Factory :sop,:policy=>(Factory :public_policy),:contributor=>u
     sop3 = Factory :sop,:policy=>(Factory :public_policy),:contributor=>u
-    Relationship.create :subject=>sop1,:object=>sop2,:predicate=>Relationship::ATTRIBUTED_TO
+    Relationship.create :subject=>sop1,:other_object=>sop2,:predicate=>Relationship::ATTRIBUTED_TO
     sop1.reload
     sop2.reload
-    assert_equal [sop2],sop1.attributions.collect{|r| r.object}
+    assert_equal [sop2],sop1.attributions.collect{|r| r.other_object}
     assert_equal [sop2],sop1.attributions_objects
 
     get :show,:id=>sop1

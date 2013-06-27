@@ -54,7 +54,7 @@ module Acts #:nodoc:
 
         has_many :inverse_relationships,
                  :class_name => 'Relationship',
-                 :as => :object,
+                 :as => :other_object,
                  :dependent => :destroy
 
         has_many :assay_assets, :dependent => :destroy, :as => :asset, :foreign_key => :asset_id
@@ -134,11 +134,11 @@ module Acts #:nodoc:
       end
 
       def attributions_objects
-        self.attributions.collect { |a| a.object }
+        self.attributions.collect { |a| a.other_object }
       end
 
       def related_publications
-        self.relationships.select { |a| a.object_type == "Publication" }.collect { |a| a.object }
+        self.relationships.select { |a| a.other_object_type == "Publication" }.collect { |a| a.other_object }
       end
 
       def cache_remote_content_blob

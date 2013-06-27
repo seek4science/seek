@@ -47,7 +47,7 @@ module Acts #:nodoc:
       # this method will take attributions' association and return a collection of resources,
       # to which the current resource is attributed
       def attributions_objects
-        self.parent.attributions.collect { |a| a.object }
+        self.parent.attributions.collect { |a| a.other_object }
       end
 
       Seek::Permissions::AUTHORIZATION_ACTIONS.each do |action|

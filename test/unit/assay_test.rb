@@ -24,7 +24,7 @@ class AssayTest < ActiveSupport::TestCase
     assay = Factory :assay, :assay_type=>Factory(:assay_type), :technology_type=>Factory(:technology_type)
     Factory :assay_organism, :assay=>assay, :organism=>Factory(:organism)
     pub = Factory :publication
-    Factory :relationship, :subject=>assay, :predicate=>Relationship::RELATED_TO_PUBLICATION,:object=>pub
+    Factory :relationship, :subject=>assay, :predicate=>Relationship::RELATED_TO_PUBLICATION,:other_object=>pub
     Factory :assay_asset, :assay=>assay
     assay.reload
     assert_equal 1,assay.assets.size

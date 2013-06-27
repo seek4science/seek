@@ -239,7 +239,7 @@ class DataFileTest < ActiveSupport::TestCase
   test "to rdf" do
     df=Factory :data_file, :assay_ids=>[Factory(:assay,:technology_type=>Factory(:technology_type)).id,Factory(:assay).id]
     pub = Factory :publication
-    Factory :relationship,:subject=>df,:predicate=>Relationship::RELATED_TO_PUBLICATION,:object=>pub
+    Factory :relationship,:subject=>df,:predicate=>Relationship::RELATED_TO_PUBLICATION,:other_object=>pub
     df.reload
     rdf = df.to_rdf
     assert_not_nil rdf
@@ -257,8 +257,8 @@ class DataFileTest < ActiveSupport::TestCase
       data_file = Factory :data_file,:contributor=>user,:version=>2,
                           :assay_ids=>[Factory(:modelling_assay).id,Factory(:experimental_assay).id]
       Factory :content_blob,:asset=>data_file
-      Factory :attribution,:subject=>data_file,:object=>attribution_df
-      Factory :relationship,:subject=>data_file,:object=>Factory(:publication),:predicate=>Relationship::RELATED_TO_PUBLICATION
+      Factory :attribution,:subject=>data_file,:other_object=>attribution_df
+      Factory :relationship,:subject=>data_file,:other_object=>Factory(:publication),:predicate=>Relationship::RELATED_TO_PUBLICATION
       data_file.creators = [Factory(:person),Factory(:person)]
       Factory :annotation,:attribute_name=>"tag",:annotatable=> data_file,:attribute_id => AnnotationAttribute.create(:name=>"tag").id
       data_file.events = [Factory(:event)]

@@ -36,7 +36,7 @@ class AssayFolderTest < ActiveSupport::TestCase
       project = assay.projects.first
       assay.relate(sop)
       assay.relate(private_sop)
-      Relationship.create :subject=>assay, :object=>publication, :predicate=>Relationship::RELATED_TO_PUBLICATION
+      Relationship.create :subject=>assay, :other_object=>publication, :predicate=>Relationship::RELATED_TO_PUBLICATION
       assert_equal [publication],assay.related_publications
 
       folder = Seek::AssayFolder.new assay,project
@@ -115,7 +115,7 @@ class AssayFolderTest < ActiveSupport::TestCase
   test "remove publication asset" do
     assay = Factory(:experimental_assay,:policy=>Factory(:public_policy))
     publication = Factory :publication, :contributor=>@user.person
-    Relationship.create :subject=>assay, :object=>publication, :predicate=>Relationship::RELATED_TO_PUBLICATION
+    Relationship.create :subject=>assay, :other_object=>publication, :predicate=>Relationship::RELATED_TO_PUBLICATION
     assert_equal [publication],assay.related_publications
     assay.reload
     folder = Seek::AssayFolder.new assay,assay.projects.first

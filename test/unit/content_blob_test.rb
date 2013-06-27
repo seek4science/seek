@@ -206,8 +206,11 @@ class ContentBlobTest < ActiveSupport::TestCase
     blob.reload
     assert_equal "frog",blob.data_io_object.read
 
-    file_path=File.expand_path(__FILE__) #use the current file
-    io_object = File.new(file_path,"r")
+    f= Tempfile.new("seek-data-io-test")
+    f << "fish"
+    f.close
+
+    io_object = File.new(f.path,"r")
     blob=ContentBlob.new(:tmp_io_object=>io_object)
     blob.save!
     blob.reload
