@@ -55,6 +55,7 @@ class FeedReaderTest < ActiveSupport::TestCase
   end
 
   test "handles error and ignores bad feed" do
+    XML::Error.set_handler(&XML::Error::QUIET_HANDLER)
     stub_request(:get,"http://dodgy.atom.feed").to_return(:status=>200,:body=>"<badly><formed></xml>")
     Seek::Config.project_news_feed_urls="http://dodgy.atom.feed"
     Seek::Config.project_news_number_of_entries = 5
