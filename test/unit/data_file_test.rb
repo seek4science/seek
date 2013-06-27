@@ -197,7 +197,7 @@ class DataFileTest < ActiveSupport::TestCase
   end
 
   test "title_trimmed" do
-    User.current_user Factory(:user) do
+    User.with_current_user Factory(:user) do
       df= Factory :data_file ,:policy=>Factory(:policy,:sharing_scope=>Policy::ALL_SYSMO_USERS,:access_type=>Policy::EDITING) #data_files(:picture)
       df.title=" should be trimmed"
       df.save!
