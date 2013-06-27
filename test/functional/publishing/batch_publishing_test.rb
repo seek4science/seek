@@ -12,10 +12,10 @@ class BatchPublishingTest < ActionController::TestCase
     login_as(:aaron)
   end
 
-  test "should have the -Publish all your assets- only one your own profile" do
+  test "should have the -Publish your assets- only one your own profile" do
     get :show, :id => User.current_user.person
     assert_response :success
-    assert_select "a[href=?]", batch_publishing_preview_person_path, :text => /Publish all your assets/
+    assert_select "a[href=?]", batch_publishing_preview_person_path, :text => /Publish your assets/
 
     get :batch_publishing_preview, :id => User.current_user.person.id
     assert_response :success
@@ -25,7 +25,7 @@ class BatchPublishingTest < ActionController::TestCase
     a_person = Factory(:person)
     get :show, :id => a_person
     assert_response :success
-    assert_select "a", :text => /Publish all your assets/, :count => 0
+    assert_select "a", :text => /Publish your assets/, :count => 0
 
     get :batch_publishing_preview, :id => a_person.id
     assert_redirected_to :root
