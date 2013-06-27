@@ -57,12 +57,12 @@ class InvestigationTest < ActiveSupport::TestCase
   end
 
   test "unauthorized users can't delete" do
-    investigation = Factory :investigation
+    investigation = Factory :investigation, :policy=>Factory(:private_policy)
     assert !investigation.can_delete?(Factory(:user))
   end
 
   test 'authorized user can delete' do
-    investigation = Factory :investigation, :studies => [], :contributor => Factory(:user)
+    investigation = Factory :investigation, :studies => [], :policy=>Factory(:private_policy)
     assert investigation.can_delete?(investigation.contributor)
   end
 
