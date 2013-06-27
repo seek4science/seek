@@ -35,7 +35,14 @@
 
       <% resource = (controller_name == 'people') ? current_user.person : @asset %>
 
-      <%= submit_tag "Submit" -%>
+      <%
+         # Can not check the gatekeeper_required until the items are chosen
+         # So draftly check based on the existing of projects gatekeepers
+         draftly_check_gatekeeper_required = !current_user.person.is_gatekeeper? && !current_user.person.projects.collect(&:gatekeepers).flatten.empty?
+         submit_button_text = draftly_check_gatekeeper_required ? 'Next' : 'Submit'
+      %>
+
+      <%= submit_tag submit_button_text -%>
       Or
       <%= link_to 'Cancel', resource %>
   <% end %>
