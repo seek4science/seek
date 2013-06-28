@@ -364,7 +364,9 @@ class SinglePublishingTest < ActionController::TestCase
   def data_with_isa
     df = data_file_for_publishing
     other_user = users(:quentin)
-    assay = Factory :experimental_assay, :contributor=>df.contributor.person, :study=>Factory(:study,:contributor=>df.contributor.person)
+    assay = Factory :experimental_assay, :contributor=>df.contributor.person,
+                    :study=>Factory(:study,:contributor=>df.contributor.person,
+                                    :investigation=>Factory(:investigation,:contributor=>df.contributor.person))
     other_persons_data_file = Factory :data_file, :contributor=>other_user, :project_ids=>other_user.person.projects.collect(&:id),:policy=>Factory(:policy, :sharing_scope => Policy::ALL_SYSMO_USERS, :access_type => Policy::VISIBLE)
     assay.relate(df)
     assay.relate(other_persons_data_file)
