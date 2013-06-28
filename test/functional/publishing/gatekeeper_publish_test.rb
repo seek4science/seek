@@ -137,4 +137,23 @@ class GatekeeperPublishTest < ActionController::TestCase
     assert_equal ResourcePublishLog::REJECTED, log.publish_state
     assert_equal 'not ready', log.comment
   end
+
+  test 'gatekeeper postpone decision' do
+    gatekeeper = Factory(:gatekeeper)
+    df = Factory(:data_file, :project_ids => gatekeeper.projects.collect(&:id))
+    policy = df.policy
+    df.resource_publish_logs.create(:publish_state=>ResourcePublishLog::WAITING_FOR_APPROVAL,:culprit=>df.contributor)
+
+    assert_no_difference("ResourcePublishLog.count") do
+      assert_emails 0 do
+        login_as(gatekeeper.user)
+        post :gatekeeper_decide, :id => df.id, :gatekeeper_decision => -1
+      end
+    end
+
+    assert_redirected_to :root
+    df.reload
+    assert !df.can_download?(nil)
+    assert_equal policy, df.policy
+  end
 end

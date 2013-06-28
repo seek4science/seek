@@ -26,6 +26,9 @@
             <br/>
             <input type="radio" name="gatekeeper_decision" value="0" onclick="Effect.Appear('extra_comment_session', { duration: 0.25 });"/>
             Reject
+            <br/>
+            <input type="radio" name="gatekeeper_decision" value="-1" onclick="Effect.Fade('extra_comment_session', { duration: 0.25 });"/>
+            Decide later
           </div>
           <div id="extra_comment_session" style=" margin-left:1em;display:none;">
             If you are going to reject this request, please input the reasons/comments here so that the requesters are
