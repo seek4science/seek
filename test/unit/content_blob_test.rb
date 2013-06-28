@@ -249,11 +249,13 @@ class ContentBlobTest < ActiveSupport::TestCase
 
   test 'storage_directory and filepath' do
     content_blob = Factory(:content_blob)
-    storage_directory = content_blob.storage_directory
+    storage_directory = content_blob.data_storage_directory
+    converted_storage_directory = content_blob.converted_storage_directory
     assert_equal  "#{Rails.root}/tmp/filestore/assets", storage_directory
+    assert_equal  "#{Rails.root}/tmp/filestore/tmp/converted", converted_storage_directory
     assert_equal (storage_directory + '/' + content_blob.uuid + '.dat'), content_blob.filepath
-    assert_equal (storage_directory + '/' + content_blob.uuid + '.pdf'), content_blob.filepath('pdf')
-    assert_equal (storage_directory + '/' + content_blob.uuid + '.txt'), content_blob.filepath('txt')
+    assert_equal (converted_storage_directory + '/' + content_blob.uuid + '.pdf'), content_blob.filepath('pdf')
+    assert_equal (converted_storage_directory + '/' + content_blob.uuid + '.txt'), content_blob.filepath('txt')
   end
 
   test 'file_exists?' do
@@ -295,8 +297,7 @@ class ContentBlobTest < ActiveSupport::TestCase
 
     assert File.exists?(pdf_path), "pdf was not created during conversion"
 
-    storage_directory = content_blob.storage_directory
-    Docsplit.extract_text(pdf_path, :output => storage_directory)
+    content_blob.extract_text_from_pdf
 
     assert File.exists? content_blob.filepath('txt')
 
@@ -314,8 +315,7 @@ class ContentBlobTest < ActiveSupport::TestCase
 
     assert File.exists?(content_blob.filepath('pdf')), "pdf was not created during conversion"
 
-    storage_directory = content_blob.storage_directory
-    Docsplit.extract_text(content_blob.filepath('pdf'), :output => storage_directory)
+    content_blob.extract_text_from_pdf
 
     assert File.exists? content_blob.filepath('txt')
 
@@ -333,8 +333,7 @@ class ContentBlobTest < ActiveSupport::TestCase
 
     assert File.exists?(content_blob.filepath('pdf')), "pdf was not created during conversion"
 
-    storage_directory = content_blob.storage_directory
-    Docsplit.extract_text(content_blob.filepath('pdf'), :output => storage_directory)
+    content_blob.extract_text_from_pdf
 
     assert File.exists? content_blob.filepath('txt')
 
@@ -352,8 +351,7 @@ class ContentBlobTest < ActiveSupport::TestCase
 
     assert File.exists?(content_blob.filepath('pdf')), "pdf was not created during conversion"
 
-    storage_directory = content_blob.storage_directory
-    Docsplit.extract_text(content_blob.filepath('pdf'), :output => storage_directory)
+    content_blob.extract_text_from_pdf
 
     assert File.exists? content_blob.filepath('txt')
 
@@ -371,8 +369,7 @@ class ContentBlobTest < ActiveSupport::TestCase
 
     assert File.exists?(content_blob.filepath('pdf')), "pdf was not created during conversion"
 
-    storage_directory = content_blob.storage_directory
-    Docsplit.extract_text(content_blob.filepath('pdf'), :output => storage_directory)
+    content_blob.extract_text_from_pdf
 
     assert File.exists? content_blob.filepath('txt')
 
@@ -390,8 +387,7 @@ class ContentBlobTest < ActiveSupport::TestCase
 
     assert File.exists?(content_blob.filepath('pdf')), "pdf was not created during conversion"
 
-    storage_directory = content_blob.storage_directory
-    Docsplit.extract_text(content_blob.filepath('pdf'), :output => storage_directory)
+    content_blob.extract_text_from_pdf
 
     assert File.exists? content_blob.filepath('txt')
 
@@ -409,8 +405,7 @@ class ContentBlobTest < ActiveSupport::TestCase
 
     assert File.exists?(content_blob.filepath('pdf')), "pdf was not created during conversion"
 
-    storage_directory = content_blob.storage_directory
-    Docsplit.extract_text(content_blob.filepath('pdf'), :output => storage_directory)
+    content_blob.extract_text_from_pdf
 
     assert File.exists? content_blob.filepath('txt')
 

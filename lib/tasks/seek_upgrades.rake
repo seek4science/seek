@@ -10,7 +10,8 @@ namespace :seek do
   task :upgrade_version_tasks=>[
             :environment,
             :repopulate_auth_lookup_tables,
-            :move_asset_files
+            :move_asset_files,
+            :remove_converted_pdf_and_txt_files_from_asset_store
   ]
 
   desc("upgrades SEEK from the last released version to the latest released version")
@@ -42,6 +43,11 @@ namespace :seek do
     else
       puts "The old asset location #{oldpath} doesn't exist, nothing to do"
     end
+  end
+
+  task(:remove_converted_pdf_and_txt_files_from_asset_store=>:environment) do
+    FileUtils.rm Dir.glob(File.join(Seek::Config.asset_filestore_path,"*.pdf"))
+    FileUtils.rm Dir.glob(File.join(Seek::Config.asset_filestore_path,"*.txt"))
   end
 
 

@@ -40,10 +40,8 @@ module Seek
       end
     end
 
-    private
-
     def extract_text_from_pdf
-      output_directory = storage_directory
+      output_directory = converted_storage_directory
       pdf_filepath = filepath('pdf')
       txt_filepath = filepath('txt')
 
@@ -64,11 +62,13 @@ module Seek
       end
     end
 
+    private
+
     def split_content content,delimiter="\n"
       content.split(delimiter).select{|str| !str.blank?}
     end
 
-    #filters special characters \n \f
+    #filters special characters, keeping alphanumeric characts and newlines
     def filter_text_content content
       content.gsub(/[^0-9a-z \n]/i, '')
     end

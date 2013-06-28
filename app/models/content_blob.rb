@@ -106,13 +106,27 @@ class ContentBlob < ActiveRecord::Base
   end
 
   def filepath format='dat',uuid_to_use=nil
-    return "#{storage_directory}/#{storage_filename(format,uuid_to_use)}"
+    if format=="dat"
+     File.join(data_storage_directory,storage_filename(format,uuid_to_use))
+    else
+      File.join(converted_storage_directory,storage_filename(format,uuid_to_use))
+    end
   end
 
-  def storage_directory
+  def data_storage_directory
     path = Seek::Config.asset_filestore_path
-    FileUtils.mkdir_p(path)
-    return path
+    unless File.exist?(path)
+      FileUtils.mkdir_p path
+    end
+    path
+  end
+
+  def converted_storage_directory
+    path = Seek::Config.converted_filestore_path
+    unless File.exist?(path)
+      FileUtils.mkdir_p path
+    end
+    path
   end
 
 

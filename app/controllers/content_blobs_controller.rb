@@ -59,7 +59,7 @@ class ContentBlobsController < ApplicationController
   #then return the pdf file
   def pdf_or_convert dat_filepath=@content_blob.filepath
     file_path_array = dat_filepath.split('.')
-    pdf_filepath = file_path_array.take(file_path_array.length - 1).join('.') + '.pdf'
+    pdf_filepath = @content_blob.filepath("pdf")
     if @content_blob.is_pdf?
       send_file dat_filepath, :filename => @content_blob.original_filename, :type => @content_blob.content_type, :disposition => 'attachment'
     else
