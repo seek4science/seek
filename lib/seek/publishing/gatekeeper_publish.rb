@@ -25,7 +25,7 @@ module Seek
               flash[:error] = "There is a problem in making this item published"
             end
           end
-          #reject
+        #reject
         elsif gatekeeper_decision == 0
           extra_comment = params[:extra_comment]
           process_gatekeeper_feedback 'reject', extra_comment
@@ -34,6 +34,11 @@ module Seek
           respond_to do |format|
             flash[:notice]="You rejected to publish this item"
             format.html{redirect_to @resource}
+          end
+        #decide later
+        elsif gatekeeper_decision == -1
+          respond_to do |format|
+            format.html{redirect_to :root}
           end
         end
       end
