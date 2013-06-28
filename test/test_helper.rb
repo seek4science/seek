@@ -69,7 +69,7 @@ end
 
 class ActiveSupport::TestCase
   setup :clear_rails_cache
-  #teardown :clear_current_user
+  teardown :clear_current_user
 
   def clear_rails_cache
     Rails.cache.clear

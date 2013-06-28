@@ -2,25 +2,30 @@ require 'test_helper'
 
 
 class SpecialAuthCodesAccessTest < ActionController::IntegrationTest
+
   ASSETS_WITH_AUTH_CODES = %w[data_files events models sops samples specimens presentations]
 
   ASSETS_WITH_AUTH_CODES.each do |type_name|
     test "form allows creating temporary access links for #{type_name}" do
-      User.current_user = Factory(:user, :login => 'test')
-      post '/session', :login => 'test', :password => 'blah'
+      user = Factory(:user, :login => 'test')
+      User.with_current_user user do
+        post '/session', :login => 'test', :password => 'blah'
 
-      get "/#{type_name}/new"
-      assert_select "form div#temporary_links", :count => 0
+        get "/#{type_name}/new"
+        assert_select "form div#temporary_links", :count => 0
 
-      get "/#{type_name}/#{Factory(type_name.singularize.to_sym, :policy => Factory(:public_policy)).id}/edit"
-      assert_select "form div#temporary_links"
+        get "/#{type_name}/#{Factory(type_name.singularize.to_sym, :policy => Factory(:public_policy)).id}/edit"
+        assert_select "form div#temporary_links"
+      end
     end
   end
 
   ASSETS_WITH_AUTH_CODES.each do |type_name|
     test "anonymous visitors can use access codes to show or download #{type_name}" do
       item = Factory(type_name.singularize.to_sym, :policy => Factory(:private_policy))
-      item.special_auth_codes << Factory(:special_auth_code, :asset => item)
+      disable_authorization_checks do
+        item.special_auth_codes << Factory(:special_auth_code, :asset => item)
+      end
 
       code = CGI::escape(item.special_auth_codes.first.code)
       get "/#{type_name}/#{item.id}?code=#{code}"
@@ -48,17 +53,19 @@ class SpecialAuthCodesAccessTest < ActionController::IntegrationTest
 
   ASSETS_WITH_AUTH_CODES.each do |type_name|
     test "anonymous visitors can see or download #{type_name} with wrong code" do
-      item = Factory(type_name.singularize.to_sym, :policy => Factory(:private_policy))
-      item.special_auth_codes << Factory(:special_auth_code, :asset => item)
+        item = Factory(type_name.singularize.to_sym, :policy => Factory(:private_policy))
+        disable_authorization_checks do
+          item.special_auth_codes << Factory(:special_auth_code, :asset => item)
+        end
+        random_code = CGI::escape(SecureRandom.base64(30))
+        get "/#{type_name}/#{item.id}?code=#{random_code}"
+        assert_redirected_to eval "#{type_name}_path"
+        assert_not_nil flash[:error]
 
-      random_code = CGI::escape(SecureRandom.base64(30))
-      get "/#{type_name}/#{item.id}?code=#{random_code}"
-      assert_redirected_to eval "#{type_name}_path"
-      assert_not_nil flash[:error]
+        if item.is_downloadable?
+          test_failing_for item, type_name, 'download', random_code
+        end
 
-      if item.is_downloadable?
-        test_failing_for item, type_name, 'download', random_code
-      end
     end
   end
 
@@ -66,9 +73,6 @@ class SpecialAuthCodesAccessTest < ActionController::IntegrationTest
     test "auth codes allow access to private #{type_name} until they expire" do
       auth_code = Factory :special_auth_code, :expiration_date => (Time.now + 1.days), :asset => Factory(type_name.singularize.to_sym, :policy => Factory(:private_policy))
       item = auth_code.asset
-
-      #assert !item.can_view?
-      #assert !item.can_download?
 
       #test without code instead of can_...? function
       get "/#{type_name}/#{item.id}"
@@ -127,7 +131,9 @@ class SpecialAuthCodesAccessTest < ActionController::IntegrationTest
   ASSETS_WITH_AUTH_CODES.each do |type_name|
     test "should display unexpired temporary link of #{type_name} for manager" do
       item = Factory(type_name.singularize.to_sym, :policy => Factory(:private_policy), :contributor => Factory(:user))
-      item.special_auth_codes << Factory(:special_auth_code, :asset => item)
+      disable_authorization_checks do
+        item.special_auth_codes << Factory(:special_auth_code, :asset => item)
+      end
 
       post '/session', :login => item.contributor.login, :password => item.contributor.password
       get "/#{type_name}/#{item.id}"
@@ -139,15 +145,18 @@ class SpecialAuthCodesAccessTest < ActionController::IntegrationTest
 
   ASSETS_WITH_AUTH_CODES.each do |type_name|
     test "should not display unexpired temporary link of #{type_name} for non-manager" do
-      item = Factory(type_name.singularize.to_sym, :policy => Factory(:publicly_viewable_policy), :contributor => Factory(:user))
-      item.special_auth_codes << Factory(:special_auth_code, :asset => item)
       user = Factory(:user)
+      User.with_current_user user do
+        item = Factory(type_name.singularize.to_sym, :policy => Factory(:publicly_viewable_policy), :contributor => user)
+        item.special_auth_codes << Factory(:special_auth_code, :asset => item)
+        user = Factory(:user)
 
-      post '/session', :login => user.login, :password => user.password
-      get "/#{type_name}/#{item.id}"
+        post '/session', :login => user.login, :password => user.password
+        get "/#{type_name}/#{item.id}"
 
-      assert_response :success, "failed for asset #{type_name}"
-      assert_select "p", :text => /Temporary access link/, :count => 0
+        assert_response :success, "failed for asset #{type_name}"
+        assert_select "p", :text => /Temporary access link/, :count => 0
+      end
     end
   end
 
