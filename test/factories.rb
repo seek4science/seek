@@ -376,6 +376,12 @@ end
     end
   end
 
+  Factory.define(:doc_model, :parent=>:model) do |f|
+    f.after_create do |model|
+      model.content_blobs = [Factory.create(:doc_content_blob, :asset=>model,:asset_version=>model.version)]
+    end
+  end
+
   #Publication
   Factory.define(:publication) do |f|
     f.sequence(:title) {|n| "A Publication #{n}"}

@@ -14,8 +14,9 @@
               <%= image_tag_for_key('spreadsheet', polymorphic_path(asset, :version => version, :action => :explore, :code=>params[:code]), "Explore #{human_name}", nil, "Explore #{human_name}") -%>
             </li>
         <% end -%>
-        <% unless Seek::Util.multi_files_asset_types.include?(asset.class) %>
-            <%= render :partial => "assets/view_content", :locals => {:content_blob => display_asset.content_blob, :button_style => true} -%>
+        <% unless Seek::Util.multi_files_asset_types.include?(asset.class) && (display_asset.content_blobs.count > 1) %>
+            <% content_blob = display_asset.respond_to?(:content_blobs) ? display_asset.content_blobs.first : display_asset.content_blob %>
+            <%= render :partial => "assets/view_content", :locals => {:content_blob => content_blob, :button_style => true} -%>
         <% end %>
     <% end -%>
     <% if logged_in? && !can_download_asset?(asset, params[:code]) %>

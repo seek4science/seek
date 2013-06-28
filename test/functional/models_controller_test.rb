@@ -1154,6 +1154,24 @@ class ModelsControllerTest < ActionController::TestCase
     end
   end
 
+  test "should have -View content- button on the model containing one inline viewable file" do
+    one_file_model = Factory(:doc_model, :policy => Factory(:all_sysmo_downloadable_policy))
+    assert_equal 1, one_file_model.content_blobs.count
+    assert one_file_model.content_blobs.first.is_content_viewable?
+    get :show, :id => one_file_model.id
+    assert_response :success
+    assert_select 'a', :text => /View content/, :count => 1
+
+    multiple_files_model = Factory(:model,
+                                   :content_blobs => [Factory(:doc_content_blob), Factory(:content_blob)],
+                                   :policy => Factory(:all_sysmo_downloadable_policy))
+    assert_equal 2, multiple_files_model.content_blobs.count
+    assert multiple_files_model.content_blobs.first.is_content_viewable?
+    get :show, :id => multiple_files_model.id
+    assert_response :success
+    assert_select 'a', :text => /View content/, :count => 0
+  end
+
   def valid_model
     { :title=>"Test",:project_ids=>[projects(:sysmo_project).id]}
   end
