@@ -223,7 +223,6 @@ end
   Factory.define(:investigation) do |f|
     f.projects {[Factory.build(:project)]}
     f.sequence(:title) { |n| "Investigation#{n}" }
-    f.association :contributor, :factory => :person
   end
 
   #Strain

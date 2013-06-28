@@ -206,7 +206,7 @@ class TreatmentsTest < ActiveSupport::TestCase
   end
 
   test "extract invalid xml" do
-    LibXML::XML::Error.set_handler(&XML::Error::QUIET_HANDLER)
+    XML::Error.set_handler(&XML::Error::QUIET_HANDLER)
     treatment = Seek::Data::Treatments.new "this is not xml"
 
     assert_equal 0,treatment.values.keys.count

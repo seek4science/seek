@@ -26,15 +26,17 @@ class ModelTest < ActiveSupport::TestCase
   end
 
   test "to_rdf" do
-    object = Factory :model, :assay_ids=>[Factory(:assay).id]
-    assert object.contains_sbml?
-    pub = Factory :publication
-    Factory :relationship,:subject=>object,:predicate=>Relationship::RELATED_TO_PUBLICATION,:other_object=>pub
-    object.reload
-    rdf = object.to_rdf
-    RDF::Reader.for(:rdfxml).new(rdf) do |reader|
-      assert reader.statements.count > 1
-      assert_equal RDF::URI.new("http://localhost:3000/models/#{object.id}"), reader.statements.first.subject
+    User.with_current_user Factory(:user) do
+      object = Factory :model, :assay_ids=>[Factory(:assay).id], :policy=>Factory(:public_policy)
+      assert object.contains_sbml?
+      pub = Factory :publication
+      Factory :relationship,:subject=>object,:predicate=>Relationship::RELATED_TO_PUBLICATION,:other_object=>pub
+      object.reload
+      rdf = object.to_rdf
+      RDF::Reader.for(:rdfxml).new(rdf) do |reader|
+        assert reader.statements.count > 1
+        assert_equal RDF::URI.new("http://localhost:3000/models/#{object.id}"), reader.statements.first.subject
+      end
     end
   end
 
