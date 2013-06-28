@@ -46,7 +46,11 @@ class ConfigTest < ActiveSupport::TestCase
     assert_equal "#{Rails.root}/tmp/filestore/model_images",ModelImage.image_directory
     assert_equal "#{Rails.root}/tmp/filestore/model_images/original",ModelImage.original_path
 
+    assert_equal "#{Rails.root}/tmp/filestore/tmp",Seek::Config.temporary_filestore_path
+    assert_equal "#{Rails.root}/tmp/filestore/tmp/converted",Seek::Config.converted_filestore_path
+
     assert_equal "#{Rails.root}/tmp/filestore/avatars",Avatar.image_directory
+
     with_config_value :filestore_path,"/tmp/fish" do
       assert_equal "/tmp/fish/assets",Seek::Config.asset_filestore_path
       assert_equal "/tmp/fish/model_images", Seek::Config.model_image_filestore_path
@@ -54,7 +58,8 @@ class ConfigTest < ActiveSupport::TestCase
 
       assert_equal "/tmp/fish/assets/#{cb.uuid}.dat",cb.filepath
 
-
+      assert_equal "/tmp/fish/tmp",Seek::Config.temporary_filestore_path
+      assert_equal "/tmp/fish/tmp/converted",Seek::Config.converted_filestore_path
     end
 
   end

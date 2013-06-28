@@ -135,6 +135,14 @@ module Seek
   module CustomAccessors
     include SimpleCrypt
 
+    def temporary_filestore_path
+      append_filestore_path "tmp"
+    end
+
+    def converted_filestore_path
+      File.join(temporary_filestore_path,"converted")
+    end
+
     def asset_filestore_path
       append_filestore_path "assets"
     end
