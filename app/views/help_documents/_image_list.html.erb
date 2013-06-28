@@ -16,7 +16,7 @@
 <% end %>
 <% images.each do |i| %>
   <div class="image_thumbnail">
-    <% link_to(i.public_filename, :target => "blank") do %>
+    <%= link_to(i.public_filename, :target => "blank") do %>
       <div class="thumb">
         <%= image_tag(i.public_filename(:thumb), :class => "thumb") -%>
       </div>
