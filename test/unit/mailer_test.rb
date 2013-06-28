@@ -100,9 +100,9 @@ class MailerTest < ActionMailer::TestCase
   end
 
   test "request publish approval" do
-    resource = data_files(:picture)
+    resources = [data_files(:picture),models(:teusink)]
     gatekeeper = people(:gatekeeper_person)
-    @expected.subject = "A SEEK member requested your approval to publish: #{resource.title}"
+    @expected.subject = "A SEEK member requested your approval to publish some items."
 
     @expected.to = gatekeeper.email_with_name
     @expected.from = "no-reply@sysmo-db.org"
@@ -112,7 +112,7 @@ class MailerTest < ActionMailer::TestCase
     @expected.body = read_fixture('request_publish_approval')
     user=users(:aaron)
 
-    assert_equal encode_mail(@expected),encode_mail(Mailer.request_publish_approval([gatekeeper],user,resource,"localhost"))
+    assert_equal encode_mail(@expected),encode_mail(Mailer.request_publish_approval(gatekeeper,user,resources,"localhost"))
 
   end
 

@@ -33,13 +33,13 @@ class Mailer < ActionMailer::Base
          :subject=>"A #{Seek::Config.application_name} member requests you make some items public")
   end
 
-  def request_publish_approval(gatekeepers,user,resource,base_host)
-    @gatekeepers = gatekeepers
+  def request_publish_approval(gatekeeper,user,resources,base_host)
+    @gatekeeper = gatekeeper
     @requester=user.person
-    @resource=resource
+    @resources=resources
     @host=base_host
-    mail(:to=>gatekeepers.collect{|m| m.email_with_name},:reply_to=>user.person.email_with_name,
-         :subject=>"A #{Seek::Config.application_name} member requested your approval to publish: #{resource.title}")
+    mail(:to=>gatekeeper.email_with_name,:reply_to=>user.person.email_with_name,
+         :subject=>"A #{Seek::Config.application_name} member requested your approval to publish some items.")
   end
 
   def gatekeeper_approval_feedback requester, gatekeeper, resource, base_host
