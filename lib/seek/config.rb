@@ -135,6 +135,9 @@ module Seek
   module CustomAccessors
     include SimpleCrypt
 
+    def rdf_filestore_path
+      File.join(temporary_filestore_path,"rdf")
+    end
     def temporary_filestore_path
       append_filestore_path "tmp"
     end

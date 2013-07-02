@@ -70,7 +70,7 @@ module Seek
       end
 
       def rdf_filestore_path
-        path = RdfGeneration.rdf_filestore_path
+        path = Seek::Config.rdf_filestore_path
         unless File.exists?(path)
           FileUtils.mkdir_p(path)
         end

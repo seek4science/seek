@@ -10,11 +10,6 @@ module Seek
         base.after_save :create_rdf_generation_job
       end
 
-      def self.rdf_filestore_path
-        File.join(Rails.root, "tmp", "rdf")
-      end
-
-
       def to_rdf
         rdf_graph = to_rdf_graph
         RDF::Writer.for(:rdfxml).buffer(:prefixes=>ns_prefixes) do |writer|
@@ -45,28 +40,46 @@ module Seek
         RDF::Resource.new(uri)
       end
 
-      def save_rdf dir=nil
-        dir||=RdfGeneration.rdf_filestore_path
+      def save_rdf
         #seperate public and private (to an outside user) into separate directories
-        inner_dir = self.can_view?(nil) ? "public" : "private"
-        dir = File.join(dir,inner_dir)
-
-        if !File.exists?(dir)
-          FileUtils.mkdir_p(dir)
+        if self.can_view?(nil)
+          path = public_rdf_storage_path
+          other_path = private_rdf_storage_path
+        else
+          path = private_rdf_storage_path
+          other_path = public_rdf_storage_path
         end
-        rdf = self.to_rdf
-        unique_id="#{self.class.name}-#{self.id}"
-        filename="#{unique_id}.rdf"
 
-        path = File.join(dir,filename)
+        #this is necessary to remove the old rdf if the permissions switched from public to private, or vice-versa
+        FileUtils.rm other_path if File.exists?(other_path)
+
         File.open(path,"w") do |f|
-          f.write(rdf)
+          f.write(self.to_rdf)
           f.flush
         end
         path
       end
 
       private
+
+      def private_rdf_storage_path
+        rdf_storage_path "private"
+      end
+
+      def public_rdf_storage_path
+        rdf_storage_path "public"
+      end
+
+      def rdf_storage_path inner_dir
+        path = File.join(Seek::Config.rdf_filestore_path,inner_dir)
+        if !File.exists?(path)
+          FileUtils.mkdir_p(path)
+        end
+        unique_id="#{self.class.name}-#{self.id}"
+        filename = "#{unique_id}.rdf"
+        File.join(path,filename)
+      end
+
 
       #extra steps that cannot be easily handled by the csv template
       def additional_triples rdf_graph

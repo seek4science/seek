@@ -37,19 +37,20 @@ class ConfigTest < ActiveSupport::TestCase
   test "filestore_location" do
     cb = Factory :content_blob
 
-    assert_equal "tmp/filestore",Seek::Config.filestore_path
-    assert_equal "#{Rails.root}/tmp/filestore/assets",Seek::Config.asset_filestore_path
-    assert_equal "#{Rails.root}/tmp/filestore/model_images", Seek::Config.model_image_filestore_path
-    assert_equal "#{Rails.root}/tmp/filestore/avatars", Seek::Config.avatar_filestore_path
+    assert_equal "tmp/testing-filestore",Seek::Config.filestore_path
+    assert_equal "#{Rails.root}/tmp/testing-filestore/assets",Seek::Config.asset_filestore_path
+    assert_equal "#{Rails.root}/tmp/testing-filestore/model_images", Seek::Config.model_image_filestore_path
+    assert_equal "#{Rails.root}/tmp/testing-filestore/avatars", Seek::Config.avatar_filestore_path
+    assert_equal "#{Rails.root}/tmp/testing-filestore/tmp/rdf", Seek::Config.rdf_filestore_path
 
-    assert_equal "#{Rails.root}/tmp/filestore/assets/#{cb.uuid}.dat",cb.filepath
-    assert_equal "#{Rails.root}/tmp/filestore/model_images",ModelImage.image_directory
-    assert_equal "#{Rails.root}/tmp/filestore/model_images/original",ModelImage.original_path
+    assert_equal "#{Rails.root}/tmp/testing-filestore/assets/#{cb.uuid}.dat",cb.filepath
+    assert_equal "#{Rails.root}/tmp/testing-filestore/model_images",ModelImage.image_directory
+    assert_equal "#{Rails.root}/tmp/testing-filestore/model_images/original",ModelImage.original_path
 
-    assert_equal "#{Rails.root}/tmp/filestore/tmp",Seek::Config.temporary_filestore_path
-    assert_equal "#{Rails.root}/tmp/filestore/tmp/converted",Seek::Config.converted_filestore_path
+    assert_equal "#{Rails.root}/tmp/testing-filestore/tmp",Seek::Config.temporary_filestore_path
+    assert_equal "#{Rails.root}/tmp/testing-filestore/tmp/converted",Seek::Config.converted_filestore_path
 
-    assert_equal "#{Rails.root}/tmp/filestore/avatars",Avatar.image_directory
+    assert_equal "#{Rails.root}/tmp/testing-filestore/avatars",Avatar.image_directory
 
     with_config_value :filestore_path,"/tmp/fish" do
       assert_equal "/tmp/fish/assets",Seek::Config.asset_filestore_path
@@ -60,6 +61,8 @@ class ConfigTest < ActiveSupport::TestCase
 
       assert_equal "/tmp/fish/tmp",Seek::Config.temporary_filestore_path
       assert_equal "/tmp/fish/tmp/converted",Seek::Config.converted_filestore_path
+      assert_equal "/tmp/fish/tmp/rdf", Seek::Config.rdf_filestore_path
+
     end
 
   end
