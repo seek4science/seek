@@ -19,7 +19,7 @@ GIT
 
 GIT
   remote: git://github.com/SysMO-DB/bioportal.git
-  revision: b10ef8b0ad8f1bf4a0eb0c7c702476cf45919157
+  revision: 8c861fd91ca8e2fe3ab67b09779355c8379050ec
   specs:
     bioportal (1.0.0)
 
