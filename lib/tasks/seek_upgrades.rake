@@ -11,7 +11,8 @@ namespace :seek do
             :environment,
             :repopulate_auth_lookup_tables,
             :move_asset_files,
-            :remove_converted_pdf_and_txt_files_from_asset_store
+            :remove_converted_pdf_and_txt_files_from_asset_store,
+            :clear_send_email_jobs
   ]
 
   desc("upgrades SEEK from the last released version to the latest released version")
@@ -48,6 +49,10 @@ namespace :seek do
   task(:remove_converted_pdf_and_txt_files_from_asset_store=>:environment) do
     FileUtils.rm Dir.glob(File.join(Seek::Config.asset_filestore_path,"*.pdf"))
     FileUtils.rm Dir.glob(File.join(Seek::Config.asset_filestore_path,"*.txt"))
+  end
+
+  task(:clear_send_email_jobs=>:environment) do
+    Delayed::Job.where(["handler like ?","%SendPeriodicEmailsJob%"]).destroy_all
   end
 
 
