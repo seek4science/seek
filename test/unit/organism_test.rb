@@ -33,6 +33,13 @@ class OrganismTest < ActiveSupport::TestCase
     end
   end
 
+  test "can_view" do
+    o=Factory(:organism)
+    assert o.can_view?
+    assert o.can_view?(nil)
+    assert o.can_view?(Factory(:user))
+  end
+
   test "searchable_terms" do
     o=organisms(:Saccharomyces_cerevisiae)
     assert o.searchable_terms.include?("Saccharomyces cerevisiae")
