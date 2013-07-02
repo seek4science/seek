@@ -60,8 +60,12 @@ SEEK::Application.configure do
 
   ENV['LANG'] = 'en_US.UTF-8'
 
-  if ActiveRecord::Base.connection.table_exists? 'delayed_jobs'
-    SendPeriodicEmailsJob.create_initial_jobs
+  begin
+    if ActiveRecord::Base.connection.table_exists? 'delayed_jobs'
+      SendPeriodicEmailsJob.create_initial_jobs
+    end
+  rescue Exception=>e
+    Rails.logger.error "Error creating default delayed jobs - #{e.message}"
   end
 
   ConvertOffice::ConvertOfficeConfig.options =
