@@ -36,6 +36,7 @@ class OrganismsController < ApplicationController
   end
 
   def visualise
+    @no_sidebar=true
     respond_to do |format|
       format.html
     end
