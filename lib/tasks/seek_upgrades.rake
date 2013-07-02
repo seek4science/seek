@@ -16,7 +16,7 @@ namespace :seek do
   ]
 
   desc("upgrades SEEK from the last released version to the latest released version")
-  task(:upgrade=>[:environment,"db:migrate","tmp:clear","tmp:assets:clear"]) do
+  task(:upgrade=>[:environment,"db:migrate","db:sessions:clear","tmp:clear","tmp:assets:clear"]) do
     
     solr=Seek::Config.solr_enabled
 
