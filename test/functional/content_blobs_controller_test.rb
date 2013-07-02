@@ -82,6 +82,11 @@ class ContentBlobsControllerTest < ActionController::TestCase
 
     get :get_pdf, {:sop_id => ms_word_sop.id, :id => ms_word_sop.content_blob.id}
     assert_response :success
+
+    assert_equal "attachment; filename=\"ms_word_test.pdf\"",@response.header['Content-Disposition']
+    assert_equal "application/pdf",@response.header['Content-Type']
+    assert_equal "9240",@response.header['Content-Length']
+
     assert File.exists?(ms_word_sop.content_blob.filepath)
     assert File.exists?(pdf_path)
   end
@@ -99,7 +104,11 @@ class ContentBlobsControllerTest < ActionController::TestCase
     get :get_pdf, {:sop_id => pdf_sop.id, :id => pdf_sop.content_blob.id}
 
     assert_response :success
-    #the file is fetched on fly, instead of saving locally
+
+    assert_equal "attachment; filename=\"a_pdf_file.pdf\"",@response.header['Content-Disposition']
+    assert_equal "application/pdf",@response.header['Content-Type']
+    assert_equal "8827",@response.header['Content-Length']
+
     assert !File.exists?(pdf_sop.content_blob.filepath)
     assert !File.exists?(pdf_sop.content_blob.filepath('pdf'))
   end
@@ -115,9 +124,12 @@ class ContentBlobsControllerTest < ActionController::TestCase
 
     get :get_pdf, {:sop_id => doc_sop.id, :id => doc_sop.content_blob.id}
     assert_response :success
-    #the file is fetched on fly, instead of saving locally
+    assert_equal "attachment; filename=\"ms_word_test.pdf\"",@response.header['Content-Disposition']
+    assert_equal "application/pdf",@response.header['Content-Type']
+    assert_equal "9240",@response.header['Content-Length']
+
     assert !File.exists?(doc_sop.content_blob.filepath)
-    assert !File.exists?(doc_sop.content_blob.filepath('pdf'))
+    assert File.exists?(doc_sop.content_blob.filepath('pdf')),"the converted file should remain"
   end
 
   test "should gracefully handle view_pdf for non existing asset" do

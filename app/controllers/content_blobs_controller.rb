@@ -58,15 +58,18 @@ class ContentBlobsController < ApplicationController
   #check whether the file is pdf, otherwise convert to pdf
   #then return the pdf file
   def pdf_or_convert dat_filepath=@content_blob.filepath
-    file_path_array = dat_filepath.split('.')
+
     pdf_filepath = @content_blob.filepath("pdf")
     if @content_blob.is_pdf?
-      send_file dat_filepath, :filename => @content_blob.original_filename, :type => @content_blob.content_type, :disposition => 'attachment'
+      send_file dat_filepath, :filename => @content_blob.original_filename, :type => "application/pdf", :disposition => 'attachment'
+      headers["Content-Length"]=File.size(dat_filepath).to_s
     else
       @content_blob.convert_to_pdf(dat_filepath,pdf_filepath)
 
       if File.exists?(pdf_filepath)
-        send_file pdf_filepath, :filename => @content_blob.original_filename, :type => @content_blob.content_type, :disposition => 'attachment'
+        filename = File.basename(@content_blob.original_filename,File.extname(@content_blob.original_filename))+".pdf"
+        send_file pdf_filepath, :filename =>filename , :type => "application/pdf", :disposition => 'attachment'
+        headers["Content-Length"]=File.size(pdf_filepath).to_s
       else
         raise Exception.new('Unable to convert the file for display')
       end
@@ -76,6 +79,9 @@ class ContentBlobsController < ApplicationController
   def get_and_process_file from_url=true,from_jerm=false
     if from_url
       data_hash = get_data_hash_from_url
+      #delete the previous conversion to refresh, but only if a copy of the original exists
+      pdf_path = @content_blob.filepath("pdf")
+      FileUtils.rm pdf_path if File.exist?(pdf_path) && @content_blob.file_exists?
     else
       data_hash = get_data_hash_from_jerm
     end

@@ -129,8 +129,6 @@ class ContentBlob < ActiveRecord::Base
     path
   end
 
-
-
   def dump_data_to_file        
     raise Exception.new("You cannot define both :data content and a :tmp_io_object") unless @data.nil? || @tmp_io_object.nil?
     check_uuid
@@ -140,8 +138,6 @@ class ContentBlob < ActiveRecord::Base
       dump_data_object_to_file
     end    
   end
-
-
 
   private
 
