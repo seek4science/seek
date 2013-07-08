@@ -214,9 +214,8 @@ GEM
     equivalent-xml (0.3.0)
       nokogiri (>= 1.4.3)
     erubis (2.7.0)
-    exception_notification (4.0.0)
+    exception_notification (3.0.1)
       actionmailer (>= 3.0.4)
-      activesupport (>= 3.0.4)
     factory_girl (2.6.4)
       activesupport (>= 2.3.9)
     ffi (1.9.0)
@@ -411,7 +410,7 @@ DEPENDENCIES
   doi_query_tool!
   dynamic_form
   equivalent-xml
-  exception_notification
+  exception_notification (= 3.0.1)
   factory_girl (= 2.6.4)
   fleximage!
   fssm
