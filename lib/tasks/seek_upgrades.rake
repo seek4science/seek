@@ -55,5 +55,14 @@ namespace :seek do
     Delayed::Job.where(["handler like ?","%SendPeriodicEmailsJob%"]).destroy_all
   end
 
-
+  desc("Ruby 1.9.3 uses psych engine while some older versions use syck. Some encoded value using syck can not be decoded by psych")
+  task(:reencode_settings_table_using_psych=>:environment) do
+    temp = YAML::ENGINE.yamler
+    YAML::ENGINE.yamler = 'syck'
+    settings = Settings.all
+    YAML::ENGINE.yamler = temp
+    settings.each do |var, value|
+      Settings.send "#{var}=", value
+    end
+  end
 end
