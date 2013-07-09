@@ -1,0 +1,8 @@
+uri: http://localhost:8890/sparql
+update_uri: http://localhost:8899/sparql-auth
+
+username: sowen
+password: asim0v
+
+private_graph: seek:private
+public_graph: seek:public

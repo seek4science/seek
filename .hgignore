@@ -8,6 +8,7 @@ db/*.sqlite3
 config/database.yml
 config/initializers/seek_local.rb
 config/environment_local.rb
+config/virtuoso_settings.yml
 
 *.DS_Store
 log/*.log*
