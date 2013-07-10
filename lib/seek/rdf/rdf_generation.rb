@@ -10,7 +10,7 @@ module Seek
 
       def self.included(base)
         base.before_save :create_rdf_removal_job
-        base.after_save :create_rdf_generation_job
+        base.after_save :create_rdf_generation_job, :refresh_dependents_rdf
         base.before_destroy :create_rdf_removal_job
       end
 
@@ -126,16 +126,48 @@ module Seek
         }
       end
 
-      def create_rdf_generation_job
-        unless (self.changed - ["updated_at","last_used_at"]).empty?
+      def create_rdf_generation_job force=false
+        unless !force && (self.changed - ["updated_at","last_used_at"]).empty?
           RdfGenerationJob.create_job self
         end
       end
 
-      def create_rdf_removal_job
-        unless self.new_record? || (self.changed - ["updated_at","last_used_at"]).empty?
+      def create_rdf_removal_job force=false
+        unless self.new_record? || (!force && (self.changed - ["updated_at","last_used_at"]).empty?)
           RdfRemovalJob.create_job self
         end
+      end
+
+      def refresh_dependents_rdf
+        self.find(self.id).dependent_items.each do |item|
+          item.refresh_rdf if item.respond_to?(:refresh_rdf)
+        end
+      end
+
+      def dependent_items
+        items = []
+        #FIXME: this should go into a seperate mixin for active-record
+        methods=[:data_files,:sops,:models,:publications,
+                 :data_file_masters, :sop_masters, :model_masters,
+                 :assays, :studies, :investigations,
+                 :institutions, :creators, :owners,:owner, :contributors, :contributor,:projects, :events, :presentations,
+                 :samples, :specimens, :compounds, :organisms, :strains,
+                ]
+        methods.each do |method|
+          if self.respond_to?(method)
+            deps = Array(self.send(method))
+            #resolve User back to Person
+            deps = deps.collect{|dep| dep.is_a?(User) ? [dep, dep.person] : dep }.flatten.compact
+            items = items | deps
+          end
+        end
+
+        items.compact.uniq
+      end
+
+      def refresh_rdf
+        create_rdf_removal_job true
+        create_rdf_generation_job true
       end
 
     end

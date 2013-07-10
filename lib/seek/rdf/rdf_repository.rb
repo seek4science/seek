@@ -2,7 +2,6 @@ module Seek
   module Rdf
     module RdfRepository
 
-
       def remove_rdf_from_repository
         if configured_for_rdf_send?
           connect_to_repository
