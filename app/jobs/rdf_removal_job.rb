@@ -3,8 +3,10 @@ class RdfRemovalJob < Struct.new(:item_type_name,:item_id)
 
   def perform
     item = item_type_name.constantize.find_by_id(item_id)
-    sleep(5)
-    item.delete_rdf
+    unless item.nil?
+      item.remove_rdf_from_repository if item.configured_for_rdf_send?
+      item.delete_rdf
+    end
   end
 
   def self.create_job item,destination_dir=nil,t=Time.now, priority=DEFAULT_PRIORITY

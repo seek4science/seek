@@ -16,6 +16,13 @@ module Seek
         Rails.logger.debug(result)
       end
 
+      def remove_statement_from_repository statement, graph_uri
+        graph = RDF::URI.new graph_uri
+        q = QUERY.delete([statement.subject, statement.predicate, statement.object]).graph(graph)
+        result = @repo.delete(q)
+        Rails.logger.debug(result)
+      end
+
 
       def read_virtuoso_configuration
 

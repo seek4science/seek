@@ -2,7 +2,32 @@ module Seek
   module Rdf
     module RdfRepository
 
-      def send_rdf
+
+      def remove_rdf_from_repository
+        if configured_for_rdf_send?
+          connect_to_repository
+          private_path = self.private_rdf_storage_path
+          graph = @config.private_graph
+          if !graph.nil? && File.exist?(private_path)
+            with_statements_from_file private_path do |statement|
+              if statement.valid?
+                remove_statement_from_repository statement,graph
+              end
+            end
+          end
+          public_path = self.public_rdf_storage_path
+          graph = @config.private_graph
+          if !graph.nil? && File.exist?(public_path)
+            with_statements_from_file public_path do |statement|
+              if statement.valid?
+                remove_statement_from_repository statement,graph
+              end
+            end
+          end
+        end
+      end
+
+      def send_rdf_to_repository
         if configured_for_rdf_send?
           connect_to_repository
           graphs = rdf_graph_uris

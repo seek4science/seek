@@ -5,9 +5,8 @@ class RdfGenerationJob < Struct.new(:item_type_name,:item_id)
     item = item_type_name.constantize.find_by_id(item_id)
     unless item.nil?
       item.save_rdf
-      item.send_rdf if item.configured_for_rdf_send?
+      item.send_rdf_to_repository if item.configured_for_rdf_send?
     end
-    item.save_rdf unless item.nil?
   end
 
   def self.create_job item,destination_dir=nil,t=Time.now, priority=DEFAULT_PRIORITY
