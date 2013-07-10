@@ -7,11 +7,11 @@ require File.expand_path(File.join(File.dirname(__FILE__), '..', 'config', 'envi
 #this should be changed to the specific watcher implmentation for your rdf triple store
 #see Seek::Rdf::RdfWatcher for more details
 
-WATCHER_CLASS = Seek::Rdf::RdfWatcher
+WATCHER_CLASS = Seek::Rdf::VirtuosoRdfWatcher
 
 pid_dir = File.join(Rails.root,"tmp","pids")
 FileUtils.mkdir_p(pid_dir) if !File.exists?(pid_dir)
 
-Daemons.run_proc("watch_rdf",{:dir=>pid_dir,:dir_mode=>:normal}) do
+#Daemons.run_proc("watch_rdf",{:dir=>pid_dir,:dir_mode=>:normal}) do
     WATCHER_CLASS.new(ARGV).start
-end
+#end

@@ -53,8 +53,11 @@ module Seek
         #this is necessary to remove the old rdf if the permissions switched from public to private, or vice-versa
         FileUtils.rm other_path if File.exists?(other_path)
 
+        #need to get the rdf first, before creating the file
+        rdf = self.to_rdf
+
         File.open(path,"w") do |f|
-          f.write(self.to_rdf)
+          f.write(rdf)
           f.flush
         end
         path

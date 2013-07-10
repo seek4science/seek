@@ -78,7 +78,13 @@ module Seek
       end
 
       def setup_logger
-        @logger = Logger.new File.join(Rails.root,"log","watch_rdf.log")
+        @logger = Logger.new File.join(Rails.root,"log",logfile_name)
+        @logger.level = Logger::INFO
+        @logger
+      end
+
+      def logfile_name
+        "watch_rdf.log"
       end
 
     end
