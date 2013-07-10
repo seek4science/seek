@@ -24,6 +24,13 @@ module Seek
         path
       end
 
+      def delete_rdf
+        public_path = public_rdf_storage_path
+        private_path = private_rdf_storage_path
+        FileUtils.rm(public_path) if File.exists?(public_path)
+        FileUtils.rm(private_path) if File.exists?(private_path)
+      end
+
       def private_rdf_storage_path
         rdf_storage_path "private"
       end

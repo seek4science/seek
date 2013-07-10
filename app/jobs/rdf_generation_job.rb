@@ -1,5 +1,5 @@
 class RdfGenerationJob < Struct.new(:item_type_name,:item_id)
-  DEFAULT_PRIORITY=2
+  DEFAULT_PRIORITY=3
 
   def perform
     item = item_type_name.constantize.find_by_id(item_id)
