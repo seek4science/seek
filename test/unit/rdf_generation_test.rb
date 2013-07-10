@@ -38,6 +38,14 @@ class RDFGenerationTest < ActiveSupport::TestCase
     end
   end
 
+  test "rdf storage path" do
+    public = Factory(:assay, :policy=>Factory(:public_policy))
+    assert_equal File.join(Rails.root,"tmp/testing-filestore/tmp/rdf/public","Assay-#{public.id}.rdf"), public.rdf_storage_path
+
+    private = Factory(:assay, :policy=>Factory(:private_policy))
+    assert_equal File.join(Rails.root,"tmp/testing-filestore/tmp/rdf/private","Assay-#{private.id}.rdf"), private.rdf_storage_path
+  end
+
   test "save rdf" do
     assay = Factory(:assay, :policy=>Factory(:public_policy))
     assert assay.can_view?(nil)

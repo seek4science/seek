@@ -4,10 +4,13 @@ require 'csv'
 module Seek
   module Rdf
     module RdfGeneration
+      include RdfStorage
+      include VirtuosoRepository
       include RightField
 
       def self.included(base)
         base.after_save :create_rdf_generation_job
+        base.before_destroy :create_rdf_removal_job
       end
 
       def to_rdf
@@ -38,49 +41,6 @@ module Seek
       def rdf_resource
         uri = Seek::Config.site_base_host+"/#{self.class.name.tableize}/#{self.id}"
         RDF::Resource.new(uri)
-      end
-
-      def save_rdf
-        #seperate public and private (to an outside user) into separate directories
-        if self.can_view?(nil)
-          path = public_rdf_storage_path
-          other_path = private_rdf_storage_path
-        else
-          path = private_rdf_storage_path
-          other_path = public_rdf_storage_path
-        end
-
-        #this is necessary to remove the old rdf if the permissions switched from public to private, or vice-versa
-        FileUtils.rm other_path if File.exists?(other_path)
-
-        #need to get the rdf first, before creating the file
-        rdf = self.to_rdf
-
-        File.open(path,"w") do |f|
-          f.write(rdf)
-          f.flush
-        end
-        path
-      end
-
-      private
-
-      def private_rdf_storage_path
-        rdf_storage_path "private"
-      end
-
-      def public_rdf_storage_path
-        rdf_storage_path "public"
-      end
-
-      def rdf_storage_path inner_dir
-        path = File.join(Seek::Config.rdf_filestore_path,inner_dir)
-        if !File.exists?(path)
-          FileUtils.mkdir_p(path)
-        end
-        unique_id="#{self.class.name}-#{self.id}"
-        filename = "#{unique_id}.rdf"
-        File.join(path,filename)
       end
 
 
@@ -165,10 +125,47 @@ module Seek
         }
       end
 
-      def create_rdf_generation_job
-        unless (self.changed - ["updated_at","last_used_at"]).empty?
-          RdfGenerationJob.create_job self
+      def create_rdf_generation_job force=false,refresh_dependents=true
+        unless !force && (self.changed - ["updated_at","last_used_at"]).empty?
+          RdfGenerationJob.create_job self,refresh_dependents
         end
+      end
+
+      def create_rdf_removal_job force=false
+        unless self.new_record? || (!force && (self.changed - ["updated_at","last_used_at"]).empty?)
+          RdfRemovalJob.create_job self
+        end
+      end
+
+      def refresh_dependents_rdf
+        dependent_items.each do |item|
+          item.refresh_rdf if item.respond_to?(:refresh_rdf)
+        end
+      end
+
+      def dependent_items
+        items = []
+        #FIXME: this should go into a seperate mixin for active-record
+        methods=[:data_files,:sops,:models,:publications,
+                 :data_file_masters, :sop_masters, :model_masters,
+                 :assays, :studies, :investigations,
+                 :institutions, :creators, :owners,:owner, :contributors, :contributor,:projects, :events, :presentations,
+                 :samples, :specimens, :compounds, :organisms, :strains,
+                ]
+        methods.each do |method|
+          if self.respond_to?(method)
+            deps = Array(self.send(method))
+            #resolve User back to Person
+            deps = deps.collect{|dep| dep.is_a?(User) ? [dep, dep.person] : dep }.flatten.compact
+            items = items | deps
+          end
+        end
+
+        items.compact.uniq
+      end
+
+      def refresh_rdf
+        create_rdf_generation_job(true, false)
       end
 
     end
