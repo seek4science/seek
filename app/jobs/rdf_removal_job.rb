@@ -3,6 +3,7 @@ class RdfRemovalJob < Struct.new(:item_type_name,:item_id)
 
   def perform
     item = item_type_name.constantize.find_by_id(item_id)
+    sleep(5)
     item.delete_rdf
   end
 
