@@ -9,6 +9,7 @@ module Seek
 
       def self.included(base)
         base.after_save :create_rdf_generation_job
+        base.before_destroy :create_rdf_removal_job
       end
 
       def to_rdf
@@ -126,6 +127,12 @@ module Seek
       def create_rdf_generation_job
         unless (self.changed - ["updated_at","last_used_at"]).empty?
           RdfGenerationJob.create_job self
+        end
+      end
+
+      def create_rdf_removal_job
+        unless (self.changed - ["updated_at","last_used_at"]).empty?
+          RdfRemovalJob.create_job self
         end
       end
 

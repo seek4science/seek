@@ -1,6 +1,6 @@
 require 'test_helper'
 
-class RdfGenerationJobTest  < ActiveSupport::TestCase
+class RdfRemovalJobTest  < ActiveSupport::TestCase
   def setup
     Delayed::Job.delete_all
   end

@@ -7,7 +7,6 @@ module Seek
       class Config < Struct.new(:username, :password, :uri, :update_uri, :private_graph, :public_graph); end
       QUERY = RDF::Virtuoso::Query
 
-
       def insert_rdf path, graph_uri
         graph = RDF::URI.new graph_uri
         with_statements_from_file path do |statement|
