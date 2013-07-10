@@ -26,7 +26,6 @@ div.home_panel .homepanel_list {
     padding-bottom: 0.5em;
     margin-left: 0.5em;
     max-height: 23.5em;
-    overflow-y: auto;
 }
 
 div.home_panel .homepanel_list ul {
