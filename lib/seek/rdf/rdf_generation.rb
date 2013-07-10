@@ -9,7 +9,6 @@ module Seek
       include RightField
 
       def self.included(base)
-        base.before_save :create_rdf_removal_job
         base.after_save :create_rdf_generation_job
         base.before_destroy :create_rdf_removal_job
       end
@@ -166,7 +165,6 @@ module Seek
       end
 
       def refresh_rdf
-        create_rdf_removal_job(true)
         create_rdf_generation_job(true, false)
       end
 
