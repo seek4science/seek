@@ -10,7 +10,7 @@ module Seek
 
       def self.included(base)
         base.before_save :create_rdf_removal_job
-        base.after_save :create_rdf_generation_job, :refresh_dependents_rdf
+        base.after_save :create_rdf_generation_job
         base.before_destroy :create_rdf_removal_job
       end
 
@@ -126,9 +126,9 @@ module Seek
         }
       end
 
-      def create_rdf_generation_job force=false
+      def create_rdf_generation_job force=false,refresh_dependents=true
         unless !force && (self.changed - ["updated_at","last_used_at"]).empty?
-          RdfGenerationJob.create_job self
+          RdfGenerationJob.create_job self,refresh_dependents
         end
       end
 
@@ -139,7 +139,7 @@ module Seek
       end
 
       def refresh_dependents_rdf
-        self.find(self.id).dependent_items.each do |item|
+        dependent_items.each do |item|
           item.refresh_rdf if item.respond_to?(:refresh_rdf)
         end
       end
@@ -166,8 +166,8 @@ module Seek
       end
 
       def refresh_rdf
-        create_rdf_removal_job true
-        create_rdf_generation_job true
+        create_rdf_removal_job(true)
+        create_rdf_generation_job(true, false)
       end
 
     end
