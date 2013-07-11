@@ -23,19 +23,22 @@ module Seek
         Rails.logger.debug(result)
       end
 
+      def get_query_object
+        QUERY
+      end
+
 
       def read_virtuoso_configuration
 
         if configured_for_rdf_send?
           y = YAML.load_file(rdf_repository_config_path)
-
           @config=Config.new
-          @config.username=y["username"]
-          @config.password=y["password"]
-          @config.uri=y["uri"]
-          @config.update_uri=y["update_uri"]
-          @config.private_graph=y["private_graph"]
-          @config.public_graph=y["public_graph"]
+          @config.username=y[Rails.env]["username"]
+          @config.password=y[Rails.env]["password"]
+          @config.uri=y[Rails.env]["uri"]
+          @config.update_uri=y[Rails.env]["update_uri"]
+          @config.private_graph=y[Rails.env]["private_graph"]
+          @config.public_graph=y[Rails.env]["public_graph"]
 
         else
           raise Exception.new "No configuration file found at #{rdf_repository_config_path}"
@@ -49,6 +52,11 @@ module Seek
                                                :username => @config.username,
                                                :password => @config.password,
                                                :auth_method => 'digest')
+      end
+
+      def enabled_for_environment?
+        y = YAML.load_file(rdf_repository_config_path)
+        !y[Rails.env].nil? && !y[Rails.env]["disabled"]
       end
 
       def rdf_repository_config_filename

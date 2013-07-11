@@ -28,7 +28,7 @@ class RdfRemovalJobTest  < ActiveSupport::TestCase
   test "perform" do
     item = Factory(:assay)
     item.save_rdf
-    path = File.join(Rails.root,"tmp/testing-filestore/tmp/rdf/private","Assay-#{item.id}.rdf")
+    path = File.join(Rails.root,"tmp/testing-filestore/tmp/rdf/private","Assay-test-#{item.id}.rdf")
     assert File.exists?(path)
     removal_job = RdfRemovalJob.new "Assay",item.id
     removal_job.perform
