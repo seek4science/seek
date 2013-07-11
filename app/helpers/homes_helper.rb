@@ -158,7 +158,7 @@ module HomesHelper
       html=''
        unless item.blank?
          image=resource_avatar(item,:class=>"home_asset_icon")
-          icon  = link_to_draggable(image, show_resource_path(item), :id=>model_to_drag_id(item), :class=> "asset", :title => tooltip_title_attrib(text_for_resource(item)))
+          icon  = link_to(image, show_resource_path(item), :class=> "asset", :title => tooltip_title_attrib(text_for_resource(item)))
 
           path = url_for(item)
           description = try_block{item.description} || try_block{item.abstract}
