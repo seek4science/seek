@@ -24,7 +24,7 @@ class RdfGenerationJobTest  < ActiveSupport::TestCase
     item = Factory(:assay,:policy=>Factory(:public_policy))
 
 
-    expected_rdf_file = File.join(Rails.root,"tmp/testing-filestore/tmp/rdf/public","Assay-#{item.id}.rdf")
+    expected_rdf_file = File.join(Rails.root,"tmp/testing-filestore/tmp/rdf/public","Assay-test-#{item.id}.rdf")
     FileUtils.rm expected_rdf_file if File.exists?(expected_rdf_file)
 
     job = RdfGenerationJob.new "Assay",item.id

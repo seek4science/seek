@@ -32,9 +32,13 @@ module Seek
         if !File.exists?(path)
           FileUtils.mkdir_p(path)
         end
-        unique_id="#{self.class.name}-#{self.id}"
-        filename = "#{unique_id}.rdf"
+
+        filename = rdf_storage_filename
         File.join(path,filename)
+      end
+
+      def rdf_storage_filename
+        "#{self.class.name}-#{Rails.env}-#{self.id}.rdf"
       end
     end
   end
