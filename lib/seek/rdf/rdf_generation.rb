@@ -10,7 +10,7 @@ module Seek
 
       def self.included(base)
         base.after_save :create_rdf_generation_job
-        base.before_destroy :create_rdf_removal_job
+        base.before_destroy :remove_rdf
       end
 
       def to_rdf
@@ -131,10 +131,10 @@ module Seek
         end
       end
 
-      def create_rdf_removal_job force=false
-        unless self.new_record? || (!force && (self.changed - ["updated_at","last_used_at"]).empty?)
-          RdfRemovalJob.create_job self
-        end
+      def remove_rdf
+        self.remove_rdf_from_repository if self.configured_for_rdf_send?
+        self.delete_rdf
+        refresh_dependents_rdf
       end
 
       def refresh_dependents_rdf
