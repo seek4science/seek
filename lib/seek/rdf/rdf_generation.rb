@@ -5,7 +5,6 @@ module Seek
   module Rdf
     module RdfGeneration
       include RdfStorage
-      include VirtuosoRepository
       include RightField
 
       def self.included(base)
