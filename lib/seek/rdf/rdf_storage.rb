@@ -1,6 +1,7 @@
 module Seek
   module Rdf
     module RdfStorage
+      include RdfRepositoryStorage
       def save_rdf
         path = self.rdf_storage_path
 
