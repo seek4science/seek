@@ -70,7 +70,7 @@ module Seek
       end
 
       def configured_for_rdf_send?
-        File.exists?(rdf_repository_config_path)
+        File.exists?(rdf_repository_config_path) && enabled_for_environment?
       end
 
       def rdf_repository_config_path

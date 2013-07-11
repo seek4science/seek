@@ -1,10 +1,37 @@
 #change settings where appropriate, and then save as virtuoso_settings.yml
 
-uri: http://localhost:8890/sparql
-update_uri: http://localhost:8899/sparql-auth
+production:
+  uri: http://localhost:8890/sparql
+  update_uri: http://localhost:8899/sparql-auth
 
-username: username
-password: password
+  username: username
+  password: password
 
-private_graph: seek:private
-public_graph: seek:public
+  private_graph: seek:private
+  public_graph: seek:public
+
+development:
+  #if disabled is missing, the default is setting false.
+  disabled: false
+
+  uri: http://localhost:8890/sparql
+  update_uri: http://localhost:8899/sparql-auth
+
+  username: username
+  password: password
+
+  private_graph: seek-development:private
+  public_graph: seek-development:public
+
+test:
+  #if disabled is missing, the default is setting false.
+  disabled: true
+
+  uri: http://localhost:8890/sparql
+  update_uri: http://localhost:8899/sparql-auth
+
+  username: username
+  password: password
+
+  private_graph: seek-development:private
+  public_graph: seek-development:public
