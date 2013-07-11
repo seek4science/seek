@@ -23,6 +23,10 @@ module Seek
         Rails.logger.debug(result)
       end
 
+      def get_query_object
+        QUERY
+      end
+
 
       def read_virtuoso_configuration
 
@@ -52,7 +56,6 @@ module Seek
 
       def enabled_for_environment?
         y = YAML.load_file(rdf_repository_config_path)
-        pp y
         !y[Rails.env].nil? && !y[Rails.env]["disabled"]
       end
 
