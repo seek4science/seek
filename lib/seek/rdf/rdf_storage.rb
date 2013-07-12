@@ -1,7 +1,9 @@
 module Seek
   module Rdf
     module RdfStorage
+      include RdfRepositoryStorage
       def save_rdf
+        delete_rdf
         path = self.rdf_storage_path
 
         File.open(path,"w") do |f|

@@ -3,35 +3,34 @@ require 'rdf/rdfxml'
 
 module Seek
   module Rdf
-    module VirtuosoRepository
-      include RdfRepository
+    class VirtuosoRepository < RdfRepository
+
+      include Singleton
+
       class Config < Struct.new(:username, :password, :uri, :update_uri, :private_graph, :public_graph); end
       QUERY = RDF::Virtuoso::Query
-
-
-      def send_statement_to_repository statement, graph_uri
-        graph = RDF::URI.new graph_uri
-        q = QUERY.insert([statement.subject, statement.predicate, statement.object]).graph(graph)
-        result = @repo.insert(q)
-        Rails.logger.debug(result)
-      end
-
-      def remove_statement_from_repository statement, graph_uri
-        graph = RDF::URI.new graph_uri
-        q = QUERY.delete([statement.subject, statement.predicate, statement.object]).graph(graph)
-        result = @repo.delete(q)
-        Rails.logger.debug(result)
-      end
 
       def get_query_object
         QUERY
       end
 
+      def get_repository_object
+        connect_to_repository if @repo.nil?
+        @repo
+      end
 
-      def read_virtuoso_configuration
+      def get_configuration
+        read_configuration if @config.nil?
+        @config
+      end
 
-        if configured_for_rdf_send?
-          y = YAML.load_file(rdf_repository_config_path)
+      private
+
+
+
+      def read_configuration
+        if configured?
+          y = YAML.load_file(config_path)
           @config=Config.new
           @config.username=y[Rails.env]["username"]
           @config.password=y[Rails.env]["password"]
@@ -46,20 +45,19 @@ module Seek
       end
 
       def connect_to_repository
-        read_virtuoso_configuration
-        @repo =  RDF::Virtuoso::Repository.new(@config.uri,
-                                               :update_uri => @config.update_uri,
-                                               :username => @config.username,
-                                               :password => @config.password,
+        @repo =  RDF::Virtuoso::Repository.new(get_configuration.uri,
+                                               :update_uri => get_configuration.update_uri,
+                                               :username => get_configuration.username,
+                                               :password => get_configuration.password,
                                                :auth_method => 'digest')
       end
 
       def enabled_for_environment?
-        y = YAML.load_file(rdf_repository_config_path)
+        y = YAML.load_file(config_path)
         !y[Rails.env].nil? && !y[Rails.env]["disabled"]
       end
 
-      def rdf_repository_config_filename
+      def config_filename
         "virtuoso_settings.yml"
       end
     end
