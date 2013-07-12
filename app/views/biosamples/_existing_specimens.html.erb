@@ -74,13 +74,13 @@
                 <th>Strain</th>
                 <th></th>
                 <th>Title</th>
-                <th><%= Seek::Config.specimen_culture_starting_date%></th>
+                <th><%= I18n.t 'biosamples.specimen_culture_starting_date'%></th>
                 <th>Culture type</th>
                 <% if Seek::Config.is_virtualliver %>
                     <th>Genotypes</th>
                     <th>Phenotypes</th>
                 <% end %>
-                <th><%= Seek::Config.specimen_creators%></th>
+                <th><%= I18n.t 'biosamples.specimen_creators'%></th>
                 <th>Seek ID</th>
                 <th>Related SOPs</th>
               </tr>
