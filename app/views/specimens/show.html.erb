@@ -7,7 +7,7 @@
   <% if @specimen.can_manage? %>
   <li><%= image_tag_for_key('manage', edit_specimen_path, "Manage #{(I18n.t 'biosamples.sample_parent_term').capitalize}", nil, "Manage #{(I18n.t 'biosamples.sample_parent_term').capitalize}") %></li>
   <% elsif @specimen.can_edit? %>
-      <li><%= image_tag_for_key('edit', edit_specimen_path(@specimen), "Edit #{(I18n.t 'biosamples.sample_parent_term').capitalize}", nil, 'Edit #{(I18n.t 'biosamples.sample_parent_term').capitalize}') %></li>
+      <li><%= image_tag_for_key('edit', edit_specimen_path(@specimen), "Edit #{(I18n.t 'biosamples.sample_parent_term').capitalize}", nil, "Edit #{(I18n.t 'biosamples.sample_parent_term').capitalize}") %></li>
   <% end %>
   <%= delete_icon(@specimen, current_user)-%>
 
