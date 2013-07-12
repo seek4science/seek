@@ -1,5 +1,7 @@
-# Sample localization file for English. Add more files in this directory for other locales.
-# See https://github.com/svenfuchs/rails-i18n/tree/master/rails%2Flocale for starting points.
-
 en:
-  hello: "Hello world"
+  #Biosamples renaming
+  biosamples:
+    sample_parent_term: "cell culture"
+    specimen_culture_starting_date: "Culture starting date"
+    sample_age: "Age at sampling"
+    specimen_creators: "Creators"

@@ -12,7 +12,7 @@
     <% end %>
 <% else %>
     <p>
-       <%= f.label "Choose a #{Seek::Config.sample_parent_term}" %> <span class="required">*</span><br/>
+       <%= f.label "Choose a #{I18n.t 'biosamples.sample_parent_term'}" %> <span class="required">*</span><br/>
       <%= f.collection_select(:specimen_id, Specimen.all_authorized_for('view'), :id, :title,{:include_blank =>"Please Select..."},{:style=>"width:50%"}) %>
       </p>
 <% end %>

@@ -91,8 +91,8 @@ class BioSamplesControllerTest < ActionController::TestCase
     get :existing_samples, :specimen_ids => specimen_ids
     assert_response :success
     assert_select "table#sample_table tbody" do
-      assert_select 'tr td', :text => Seek::Config.sample_parent_term.capitalize + ': ' + specimen1.title, :count => samples_of_specimen1.length
-      assert_select 'tr td', :text => Seek::Config.sample_parent_term.capitalize + ': ' + specimen2.title, :count => samples_of_specimen2.length
+      assert_select 'tr td', :text => (I18n.t 'biosamples.sample_parent_term').capitalize + ': ' + specimen1.title, :count => samples_of_specimen1.length
+      assert_select 'tr td', :text => (I18n.t 'biosamples.sample_parent_term').capitalize + ': ' + specimen2.title, :count => samples_of_specimen2.length
       samples.each do |sample|
         assert_select 'tr td', :text => sample.id, :count => 1
       end

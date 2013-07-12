@@ -556,7 +556,7 @@ module ApplicationHelper
     elsif resource_type == "Sop"
       pluralize ? "SOPs" : "SOP"
     elsif resource_type == "Specimen"
-      pluralize ? Seek::Config.sample_parent_term.capitalize.pluralize : Seek::Config.sample_parent_term.capitalize
+      pluralize ? (I18n.t 'biosamples.sample_parent_term').capitalize.pluralize : (I18n.t 'biosamples.sample_parent_term').capitalize
     else
       pluralize ? resource_type.pluralize : resource_type
     end
@@ -589,8 +589,8 @@ module ApplicationHelper
   NO_DELETE_EXPLANTIONS={Assay=>"You cannot delete this Assay. It might be published or it has items associated with it.",
                          Study=>"You cannot delete this Study. It might be published or it has Assays associated with it.",
                          Investigation=>"You cannot delete this Investigation. It might be published or it has Studies associated with it." ,
-                         Strain=>"You cannot delete this Strain. It might be published or it has #{Seek::Config.sample_parent_term}s/Samples associated with it.",
-                         Specimen=>"You cannot delete this #{Seek::Config.sample_parent_term}. It might be published or it has Samples associated with it.",
+                         Strain=>"You cannot delete this Strain. It might be published or it has #{I18n.t 'biosamples.sample_parent_term'}s/Samples associated with it.",
+                         Specimen=>"You cannot delete this #{I18n.t 'biosamples.sample_parent_term'}. It might be published or it has Samples associated with it.",
                          Sample=>"You cannot delete this Sample. It might be published or it has Assays associated with it."
   }
 

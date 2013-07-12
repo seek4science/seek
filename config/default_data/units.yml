@@ -148,77 +148,72 @@ year:
   comment: time
   order: 27
 
-population doublings:
-  title: population doublings
-  symbol: population doublings
-  comment: time
-  order: 28
 
 hour-1:
   symbol: h-1
   comment: rate
   factors_studied: false
-  order: 29
+  order: 28
 
 min-1:
   symbol: min-1
   comment: rate
   factors_studied: false
-  order: 30
+  order: 29
 
 sec-1:
   symbol: sec-1
   comment: rate
   factors_studied: false
-  order: 31
+  order: 30
 
 L/min:
   symbol: L/min
   comment: flow rate
-  order: 32
+  order: 31
 
 mL/min:
   symbol: mL/min
   comment: flow rate
-  order: 33
+  order: 32
 
 metre:
   symbol: m
   comment: metre
   factors_studied: false
-  order: 34
+  order: 33
 
 µm:
   symbol: µm
   comment: micrometer
-  order: 35
+  order: 34
 
 celcius:
   symbol: °C
   comment: Celcius
-  order: 36
+  order: 35
 
 bar:
   symbol: bar
   comment: headspace pressure
-  order: 37
+  order: 36
 
 rpm:
   symbol: rpm
   comment: revolutions per minute
-  order: 38
+  order: 37
 
 percent:
   symbol: "%"
   comment: percentage
-  order: 39
+  order: 38
 
 a.u.:
   symbol: a.u.
   comment: arbitrary units
-  order: 40
+  order: 39
 
 dimensionless:
   symbol: dimensionless
   comment: dimensionless
-  order: 41
+  order: 40

@@ -42,7 +42,7 @@
         <p class="none_text">No strains have yet been defined for
           <span style="font-weight: bold;"> <%= h(organisms_title) -%></span>.</p>
     <% else -%>
-      <p class="none_text">Please select the strains to browse the associated <%= Seek::Config.sample_parent_term -%>s.
+      <p class="none_text">Please select the strains to browse the associated <%= I18n.t 'biosamples.sample_parent_term' -%>s.
         </p>
 
         <div class="scroll_box">

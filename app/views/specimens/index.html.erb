@@ -1,6 +1,6 @@
 <% if logged_in? and current_user.person.member? %>
     <ul class="sectionIcons">
-      <li><%= image_tag_for_key "new", new_specimen_path, "New Specimen", nil, "New specimen" %></li>
+      <li><%= image_tag_for_key "new", new_specimen_path, "New #{(I18n.t 'biosamples.sample_parent_term').capitalize}", nil, "New #{(I18n.t 'biosamples.sample_parent_term').capitalize}" %></li>
     </ul>
 <% end %>
 

@@ -35,9 +35,9 @@ class Specimen < ActiveRecord::Base
   alias_attribute :description, :comments
 
   HUMANIZED_COLUMNS = Seek::Config.is_virtualliver ? {} : {:born => 'culture starting date', :culture_growth_type => 'culture type'}
-  HUMANIZED_COLUMNS[:title] = "#{Seek::Config.sample_parent_term.capitalize} title"
-  HUMANIZED_COLUMNS[:lab_internal_number] = "#{Seek::Config.sample_parent_term.capitalize} lab internal identifier"
-  HUMANIZED_COLUMNS[:provider_id] = "provider's #{Seek::Config.sample_parent_term} identifier"
+  HUMANIZED_COLUMNS[:title] = "#{(I18n.t 'biosamples.sample_parent_term').capitalize} title"
+  HUMANIZED_COLUMNS[:lab_internal_number] = "#{(I18n.t 'biosamples.sample_parent_term').capitalize} lab internal identifier"
+  HUMANIZED_COLUMNS[:provider_id] = "provider's #{(I18n.t 'biosamples.sample_parent_term')} identifier"
 
   validates_numericality_of :age, :only_integer => true, :greater_than=> 0, :allow_nil=> true, :message => "is not a positive integer"
   validates_presence_of :title,:lab_internal_number, :contributor,:strain

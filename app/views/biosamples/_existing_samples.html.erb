@@ -39,7 +39,7 @@
    </div>
    <div class='foldContent'>
       <% if existing_samples.empty? -%>
-          <p class="none_text">No samples have yet been defined for the selected <%= Seek::Config.sample_parent_term -%>s
+          <p class="none_text">No samples have yet been defined for the selected <%= I18n.t 'biosamples.sample_parent_term' -%>s
           </p>
       <% else -%>
           <div class="scroll_box">
@@ -50,7 +50,7 @@
                 <th>Title</th>
                 <th>Lab internal identifier</th>
                 <th>Date at sampling</th>
-                <th><%= Seek::Config.sample_age%></th>
+                <th><%= I18n.t 'biosamples.sample_age' %></th>
                 <th>Provider name</th>
                 <th>Seek ID</th>
                 <th>Comment</th>
