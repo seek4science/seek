@@ -2,6 +2,9 @@ class AssetsCreator < ActiveRecord::Base
   
   belongs_to :asset, :polymorphic => true
   belongs_to :creator, :class_name => 'Person'
+
+  include Seek::Rdf::ReactToAssociatedChange
+  update_rdf_on_change :asset
   
   def self.add_or_update_creator_list(resource, creator_params)
     recieved_creators = (creator_params.blank? ? [] : ActiveSupport::JSON.decode(creator_params)).uniq
@@ -28,4 +31,5 @@ class AssetsCreator < ActiveRecord::Base
       resource.creators << Person.find_by_id(i)
     end
   end
+
 end
