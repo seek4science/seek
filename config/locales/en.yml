@@ -5,3 +5,9 @@ en:
     specimen_culture_starting_date: "Culture starting date"
     sample_age: "Age at sampling"
     specimen_creators: "Creators"
+
+  #Assay
+  assay:
+    assay: "Assay"
+    experimental_assay: "Experimental Assay"
+    modelling_analysis:  "Modelling Analysis"
