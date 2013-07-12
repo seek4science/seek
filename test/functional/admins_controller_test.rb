@@ -103,13 +103,6 @@ class AdminsControllerTest < ActionController::TestCase
     assert_not_nil flash[:error]
   end
 
-  test "should get biosamples attributes renaming page" do
-    login_as Factory(:admin).user
-    get :biosamples_renaming
-    assert_response :success
-  end
-
-
   test "update admins" do
     login_as(:quentin)
     quentin=people(:quentin_person)

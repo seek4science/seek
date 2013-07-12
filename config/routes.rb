@@ -12,7 +12,6 @@ SEEK::Application.routes.draw do
       get :rebrand
       get :home_settings
       get :pagination
-      get :biosamples_renaming
       get :others
       get :get_stats
       get :registration_form
@@ -25,7 +24,6 @@ SEEK::Application.routes.draw do
       post :update_others
       post :update_features_enabled
       post :update_pagination
-      post :update_biosamples_renaming
       post :delete_tag
       post :edit_tag
     end
