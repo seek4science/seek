@@ -148,6 +148,7 @@ module Seek
         #FIXME: this should go into a seperate mixin for active-record
         methods=[:data_files,:sops,:models,:publications,
                  :data_file_masters, :sop_masters, :model_masters,
+                 :assets,
                  :assays, :studies, :investigations,
                  :institutions, :creators, :owners,:owner, :contributors, :contributor,:projects, :events, :presentations,
                  :samples, :specimens, :compounds, :organisms, :strains,
