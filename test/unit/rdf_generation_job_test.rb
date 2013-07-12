@@ -10,13 +10,43 @@ class RdfGenerationJobTest  < ActiveSupport::TestCase
     Delayed::Job.delete_all
   end
 
+  test "created on save" do
+    assert_difference("Delayed::Job.count",1) do
+      item = Factory(:project)
+    end
+  end
+
   test "create job" do
     item = Factory(:assay)
+
+    Delayed::Job.delete_all
+
     assert_difference("Delayed::Job.count",1) do
       RdfGenerationJob.create_job item
     end
     job = Delayed::Job.last
     assert_equal 3,job.priority
+
+  end
+
+  test "exists" do
+    project = Factory(:project)
+    project2 = Factory(:project)
+
+    Delayed::Job.delete_all
+
+    assert !RdfGenerationJob.exists?(project,true)
+    assert !RdfGenerationJob.exists?(project,false)
+
+    Delayed::Job.enqueue RdfGenerationJob.new(project.class.name,project.id,true),:priority=>1,:run_at=>Time.now
+    assert RdfGenerationJob.exists?(project,true)
+    assert RdfGenerationJob.exists?(project,false), "should reports exists, because one alreayd exists with refresh_dependents true"
+    assert !RdfGenerationJob.exists?(project2,true)
+    assert !RdfGenerationJob.exists?(project2,false)
+
+    Delayed::Job.enqueue RdfGenerationJob.new(project2.class.name,project2.id,false),:priority=>1,:run_at=>Time.now
+    assert RdfGenerationJob.exists?(project2,false)
+    assert !RdfGenerationJob.exists?(project2,true) ,"shouldn't reports exists, because one alreayd exists with refresh_dependents false, but this is true"
 
   end
 
