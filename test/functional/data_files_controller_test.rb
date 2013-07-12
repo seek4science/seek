@@ -489,7 +489,7 @@ class DataFilesControllerTest < ActionController::TestCase
     mock_remote_file "#{Rails.root}/test/fixtures/files/html_file.html","http://webpage.com",{'Content-Type' => 'text/html'}
     assert_difference('DataFile.count') do
       assert_difference('ContentBlob.count') do
-        post :create, :data_file => { :title=>"Test HTTP",:data_url=>"http://webpage.com",:projects=>[projects(:sysmo_project)]}, :sharing=>valid_sharing
+        post :create, :data_file => { :title=>"Test HTTP",:data_url=>"http://webpage.com",:projects=>[projects(:sysmo_project)], :external_link => true}, :sharing=>valid_sharing
       end
     end
 
@@ -609,9 +609,6 @@ class DataFilesControllerTest < ActionController::TestCase
     assert_select "div.contribution_aftertitle" do
       assert_select "b",:text=>/Downloads/,:count=>0
     end
-
-
-
   end
 
   test "show download button for non website data file" do
