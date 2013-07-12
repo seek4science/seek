@@ -65,7 +65,7 @@
 
   <div style="clear:both">
     <br/>
-    <h2><%= Seek::Config.sample_parent_term.capitalize -%> details</h2>
+    <h2><%= (I18n.t 'biosamples.sample_parent_term').capitalize -%> details</h2>
     <% if @sample.specimen.can_view? %>
         <div class="main_content_left_box">
             <%= render :partial => "sample_specimen_details", :object => @sample.specimen %>

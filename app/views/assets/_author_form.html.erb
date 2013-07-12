@@ -12,7 +12,7 @@
 <% resource_type_attributed_to_types = "Creators" -%>
 
 <% original_resource_type = resource_type -%>
-<% resource_type = Seek::Config.sample_parent_term if resource_type == 'Specimen' %>
+<% resource_type = (I18n.t 'biosamples.sample_parent_term') if resource_type == 'Specimen' %>
 <% resource_type = text_for_resource(resource_type) -%>
 
 

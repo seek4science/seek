@@ -14,7 +14,7 @@ module BiosamplesHelper
 
   
    def create_sample_popup_link
-     link_to image("new") + "Create new sample", new_sample_path(), {:id => 'new_sample_link', :target => '_blank', :onclick => "if (checkSelectOneSpecimen('#{Seek::Config.sample_parent_term}')) {return(true);} else {return(false);}"}
+     link_to image("new") + "Create new sample", new_sample_path(), {:id => 'new_sample_link', :target => '_blank', :onclick => "if (checkSelectOneSpecimen('#{I18n.t "biosamples.sample_parent_term"}')) {return(true);} else {return(false);}"}
    end
 
   def edit_strain_popup_link strain
@@ -93,20 +93,20 @@ module BiosamplesHelper
     end
     creators << specimen.other_creators unless specimen.other_creators.blank?
 
-    explanation = "You are unable to delete this #{Seek::Config.sample_parent_term}. "
+    explanation = "You are unable to delete this #{I18n.t 'biosamples.sample_parent_term'}. "
     explanation += unable_to_delete_text specimen  unless specimen.samples.blank?
     disabled_delete_icon = image('destroy', {:alt=>"Delete",:class=>"disabled",:onclick=>"javascript:alert(\"#{explanation}\")",:title=>"#{tooltip_title_attrib(explanation)}"})
 
-    delete_icon = specimen.can_delete? ? (link_to image("destroy", :alt => "Delete", :title => "Delete this #{Seek::Config.sample_parent_term}"),
+    delete_icon = specimen.can_delete? ? (link_to image("destroy", :alt => "Delete", :title => "Delete this #{I18n.t 'biosamples.sample_parent_term'}"),
                          {:action => "destroy", :controller => 'biosamples', :id => specimen.id, :class => 'specimen', :id_column_position => id_column},
-                         :confirm => "Are you sure you want to delete this #{Seek::Config.sample_parent_term}?", :method => :delete, :remote => true) : disabled_delete_icon
+                         :confirm => "Are you sure you want to delete this #{I18n.t 'biosamples.sample_parent_term'}?", :method => :delete, :remote => true) : disabled_delete_icon
     update_icon = nil
     if specimen.can_manage?
-      update_icon = link_to image("manage"), edit_specimen_path(specimen) + "?from_biosamples=true", {:title => "Manage this #{Seek::Config.sample_parent_term}", :target => '_blank'}
+      update_icon = link_to image("manage"), edit_specimen_path(specimen) + "?from_biosamples=true", {:title => "Manage this #{I18n.t 'biosamples.sample_parent_term'}", :target => '_blank'}
     elsif specimen.can_edit?
-      update_icon = link_to image("edit"), edit_specimen_path(specimen) + "?from_biosamples=true", {:title => "Edit this #{Seek::Config.sample_parent_term}", :target => '_blank'}
+      update_icon = link_to image("edit"), edit_specimen_path(specimen) + "?from_biosamples=true", {:title => "Edit this #{I18n.t 'biosamples.sample_parent_term'}", :target => '_blank'}
     else
-      explanation = "You are unable to edit this #{Seek::Config.sample_parent_term}."
+      explanation = "You are unable to edit this #{I18n.t 'biosamples.sample_parent_term'}."
       update_icon = image('edit', {:alt=>"Edit",:class=>"disabled",:onclick=>"javascript:alert(\"#{explanation}\")",:title=>"#{tooltip_title_attrib(explanation)}"})
     end
     strain = specimen.strain

@@ -174,7 +174,7 @@ class Sample < ActiveRecord::Base
   end
 
   def specimen_info
-    specimen.nil? ? '' : Seek::Config.sample_parent_term.capitalize + ': ' + specimen.title
+    specimen.nil? ? '' : (I18n.t 'biosamples.sample_parent_term').capitalize + ': ' + specimen.title
   end
 
   def age_at_sampling_info

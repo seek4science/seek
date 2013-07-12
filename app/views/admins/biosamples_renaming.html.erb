@@ -8,7 +8,7 @@
     <%= render :partial=>'setting_li',:locals=>{
             :description=>"The term of samples' parent where they are extracted.'",
             :name=>"Sample Parent",
-            :field=>text_field_tag(:sample_parent_term, Seek::Config.sample_parent_term, :title => 'cell culture, specimen, or others')
+            :field=>text_field_tag(:sample_parent_term, (I18n.t 'biosamples.sample_parent_term'), :title => 'cell culture, specimen, or others')
     } -%>
     <%= render :partial=>'setting_li',:locals=>{
                 :description=>"Title of people who are responsible for samples parent.",
