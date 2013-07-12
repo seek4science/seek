@@ -33,7 +33,7 @@ class ContentBlob < ActiveRecord::Base
 
   before_save :check_version
 
-  before_create :check_url_content_type  unless Seek::Config.is_virtualliver
+  before_create :check_url_content_type, :unless =>  "Seek::Config.is_virtualliver"
 
   has_many :worksheets, :dependent => :destroy
 
