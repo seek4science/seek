@@ -48,10 +48,13 @@ SEEK::Application.configure do
 
   Seek::Config.propagate_all
 
-#these inflections are put here, because the config variables are just loaded after the propagation
+  #Need to load defaut_locale file for internationalization used in Inflector below
+  #coz this file is loaded at a later point
+  I18n.load_path << File.join(File.dirname(__FILE__), "../locales/en.yml")
+  #these inflections are put here, because the config variables are just loaded after the propagation
   ActiveSupport::Inflector.inflections do |inflect|
-    inflect.human 'Specimen', Seek::Config.sample_parent_term.capitalize  unless Seek::Config.sample_parent_term.blank?
-    inflect.human 'specimen', Seek::Config.sample_parent_term.capitalize  unless Seek::Config.sample_parent_term.blank?
+    inflect.human 'Specimen', (I18n.t "biosamples.sample_parent_term").capitalize  unless (I18n.t "biosamples.sample_parent_term").blank?
+    inflect.human 'specimen', (I18n.t "biosamples.sample_parent_term")  unless (I18n.t "biosamples.sample_parent_term").blank?
   end
 
 
