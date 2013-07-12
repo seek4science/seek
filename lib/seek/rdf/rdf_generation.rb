@@ -163,6 +163,12 @@ module Seek
         end
 
         items.compact.uniq
+
+        if (self.configured_for_rdf_send?)
+          items = items | related_items_from_sparql
+        end
+
+        items.compact.uniq
       end
 
       def refresh_rdf
