@@ -94,12 +94,20 @@ module Seek
                 if item.respond_to?(:rdf_resource)
                   item.rdf_resource
                 else
-                  RDF::Resource.new(item)
+                  uri = RDF::URI.new(item)
+                  begin
+                    uri.validate!
+                  rescue
+                    nil
+                  end
                 end
           else
             item.nil? ? "" : item
           end
-          rdf_graph << [resource,property_uri,o]
+          unless o.nil?
+            rdf_graph << [resource,property_uri,o]
+          end
+
         end
         rdf_graph
       end

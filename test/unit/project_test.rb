@@ -41,6 +41,36 @@ class ProjectTest < ActiveSupport::TestCase
     end
   end
 
+  test "rdf with empty URI resource" do
+    object = Factory :project, :web_page=>"http://google.com"
+
+    homepage_predicate = RDF::URI.new "http://xmlns.com/foaf/0.1/homepage"
+    found = false
+    RDF::Reader.for(:rdfxml).new(object.to_rdf) do |reader|
+      reader.each_statement do |statement|
+        if statement.predicate == homepage_predicate
+          found = true
+          assert statement.valid?, "statement is not valid"
+          assert_equal RDF::URI.new("http://google.com"),statement.object
+        end
+      end
+    end
+    assert found,"Didn't find homepage predicate"
+
+    object.web_page=""
+    found = false
+    RDF::Reader.for(:rdfxml).new(object.to_rdf) do |reader|
+      reader.each_statement do |statement|
+        if statement.predicate == homepage_predicate
+          found = true
+
+          assert statement.valid?, "statement is not valid"
+        end
+      end
+    end
+    assert !found,"The homepage statement should have been skipped"
+  end
+
   def test_avatar_key
     p=projects(:sysmo_project)
     assert_nil p.avatar_key
