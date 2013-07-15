@@ -556,7 +556,9 @@ module ApplicationHelper
     elsif resource_type == "Sop"
       pluralize ? "SOPs" : "SOP"
     elsif resource_type == "Specimen"
-      pluralize ? (I18n.t 'biosamples.sample_parent_term').capitalize.pluralize : (I18n.t 'biosamples.sample_parent_term').capitalize
+      pluralize ? t('biosamples.sample_parent_term').capitalize.pluralize : t('biosamples.sample_parent_term').capitalize
+    elsif resource_type == "Assay"
+      pluralize ? t('assays.assay').capitalize.pluralize : t('assays.assay').capitalize
     else
       pluralize ? resource_type.pluralize : resource_type
     end
