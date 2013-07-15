@@ -7,7 +7,7 @@ en:
     specimen_creators: "Creators"
 
   #Assay
-  assay:
-    assay: "Assay"
-    experimental_assay: "Experimental Assay"
-    modelling_analysis:  "Modelling Analysis"
+  assays:
+    assay: "Experiment"
+    experimental_assay: "Wetlab Experiment"
+    modelling_analysis:  "Modelling Experiment"

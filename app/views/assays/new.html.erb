@@ -15,7 +15,7 @@
         </ul>
     <% else %>
         <div class="contribution_title">
-          <h1><%=  @assay.is_modelling? ? "Modelling analysis creation" : "Assay creation" -%></h1>
+          <h1><%=  @assay.is_modelling? ? "#{t('assays.modelling_analysis')} creation" : "#{t('assays.assay')} creation" -%></h1>
         </div>
 
         <% unless @assay.assay_class %>
@@ -23,9 +23,9 @@
 
             <span>Please select the class of assay you wish to create</span>
             <br/><br/><br/>
-            <%= link_to "<p class='select_assay_class'>#{image("assay_experimental_avatar",:size=>"32x32")}An experimental assay</p>".html_safe,new_assay_path(:class=>:experimental,:study_id=>params[:study_id],:create_from_asset=>@assay.create_from_asset) %>
+            <%= link_to "<p class='select_assay_class'>#{image("assay_experimental_avatar",:size=>"32x32")}An #{t('assays.experimental_assay')}</p>".html_safe,new_assay_path(:class=>:experimental,:study_id=>params[:study_id],:create_from_asset=>@assay.create_from_asset) %>
 
-            <%= link_to "<p class='select_assay_class'>#{image("assay_modelling_avatar",:size=>"32x32")}A modelling analysis</p>".html_safe,new_assay_path(:class=>:modelling,:study_id=>params[:study_id],:create_from_asset=>@assay.create_from_asset) %>
+            <%= link_to "<p class='select_assay_class'>#{image("assay_modelling_avatar",:size=>"32x32")}A #{t('assays.modelling_analysis')}</p>".html_safe,new_assay_path(:class=>:modelling,:study_id=>params[:study_id],:create_from_asset=>@assay.create_from_asset) %>
 
           </div>
         <% else %>

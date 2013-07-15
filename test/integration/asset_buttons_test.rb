@@ -13,7 +13,7 @@ class AssetButtonsTest < ActionController::IntegrationTest
     ASSETS.each do |type_name|
       if type_name == "assays"
         contributor = @current_user.person
-        human_name = 'Modelling analysis'
+        human_name = I18n.t('assays.modelling_analysis')
       else
         contributor = @current_user
         human_name = type_name.singularize.humanize

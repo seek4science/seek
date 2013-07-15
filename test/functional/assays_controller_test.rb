@@ -584,9 +584,9 @@ end
     get :new
     assert_response :success
     assert_select "a[href=?]", new_assay_path(:class=>:experimental), :count=>1
-    assert_select "a", :text=>/An experimental assay/i, :count=>1
+    assert_select "a", :text=>/An #{I18n.t('assays.experimental_assay')}/i, :count=>1
     assert_select "a[href=?]", new_assay_path(:class=>:modelling), :count=>1
-    assert_select "a", :text=>/A modelling analysis/i, :count=>1
+    assert_select "a", :text=>/A #{I18n.t('assays.modelling_analysis')}/i, :count=>1
   end
 
   test "get new with class doesnt present options for class" do
@@ -594,16 +594,16 @@ end
     get :new, :class=>"experimental"
     assert_response :success
     assert_select "a[href=?]", new_assay_path(:class=>:experimental), :count=>0
-    assert_select "a", :text=>/An experimental assay/i, :count=>0
+    assert_select "a", :text=>/An #{I18n.t('assays.experimental_assay')}/i, :count=>0
     assert_select "a[href=?]", new_assay_path(:class=>:modelling), :count=>0
-    assert_select "a", :text=>/A modelling analysis/i, :count=>0
+    assert_select "a", :text=>/A #{I18n.t('assays.modelling_analysis')}/i, :count=>0
 
     get :new, :class=>"modelling"
     assert_response :success
     assert_select "a[href=?]", new_assay_path(:class=>:experimental), :count=>0
-    assert_select "a", :text=>/An experimental assay/i, :count=>0
+    assert_select "a", :text=>/An #{I18n.t('assays.experimental_assay')}/i, :count=>0
     assert_select "a[href=?]", new_assay_path(:class=>:modelling), :count=>0
-    assert_select "a", :text=>/A modelling analysis/i, :count=>0
+    assert_select "a", :text=>/A #{I18n.t('assays.modelling_analysis')}/i, :count=>0
   end
 
   test "data file list should only include those from project" do

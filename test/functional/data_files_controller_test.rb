@@ -56,9 +56,9 @@ class DataFilesControllerTest < ActionController::TestCase
     login_as(Factory(:user))
     get :new
     assert_response :success
-    assert_select 'div.foldTitle',:text=>/Experimental Assays and Modelling Analyses/
-    assert_select 'div#associate_assay_fold_content p',:text=>/The following Experimental Assays and Modelling Analyses are associated with this Data file:/
-    assert_select 'div.association_step p',:text=>/You may select an existing editable Experimental Assay or Modelling Analysis to associate with this Data file./
+    assert_select 'div.foldTitle',:text=>/#{I18n.t('assays.experimental_assay').pluralize} and #{I18n.t('assays.modelling_analysis').pluralize}/
+    assert_select 'div#associate_assay_fold_content p',:text=>/The following #{I18n.t('assays.experimental_assay').pluralize} and #{I18n.t('assays.experimental_assay').pluralize} are associated with this Data file:/
+    assert_select 'div.association_step p',:text=>/You may select an existing editable #{I18n.t('assays.experimental_assay')} or #{I18n.t('assays.experimental_assay')} to associate with this Data file./
   end
 
   test "correct title and text for associating an assay for edit" do
@@ -67,9 +67,9 @@ class DataFilesControllerTest < ActionController::TestCase
     get :edit, :id=>df.id
     assert_response :success
 
-    assert_select 'div.foldTitle',:text=>/Experimental Assays and Modelling Analyses/
-    assert_select 'div#associate_assay_fold_content p',:text=>/The following Experimental Assays and Modelling Analyses are associated with this Data file:/
-    assert_select 'div.association_step p',:text=>/You may select an existing editable Experimental Assay or Modelling Analysis to associate with this Data file./
+    assert_select 'div.foldTitle',:text=>/#{I18n.t('assays.experimental_assay').pluralize} and #{I18n.t('assays.modelling_analysis').pluralize}/
+    assert_select 'div#associate_assay_fold_content p',:text=>/The following #{I18n.t('assays.experimental_assay').pluralize} and #{I18n.t('assays.modelling_analysis').pluralize} are associated with this Data file:/
+    assert_select 'div.association_step p',:text=>/You may select an existing editable #{I18n.t('assays.experimental_assay')} or #{I18n.t('assays.experimental_assay')} to associate with this Data file./
   end
 
   test "view_items_in_tab" do

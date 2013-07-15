@@ -153,7 +153,7 @@ help_documents:
       Currently, publications are linked to people and projects. In the next version, publications will be linked to other <%= Seek::Config.project_name %> assets to allow you to use the SEEK as a supplementary data store\r\n\
       \r\n\
       \r\n\
-      *Attribution* \xE2\x80\x93 Some assets are based on others, for example, a model may use data from an experimental assay, or a SOP may be a modified version of another. The attribution section allows you to specify when this is the case\r\n"
+      *Attribution* \xE2\x80\x93 Some assets are based on others, for example, a model may use data from an <%= I18n.t('assays.experimental_assay').downcase %>, or a SOP may be a modified version of another. The attribution section allows you to specify when this is the case\r\n"
     - 2010-05-20 08:37:01
     - 2010-05-20 08:37:01
   - - "9"
@@ -352,7 +352,7 @@ help_documents:
       * *Investigation:* a high level description of the area and the main aims of a project\r\n    ** In <%= Seek::Config.project_name %>, this may be the overall aims as stated on the <%= Seek::Config.project_name %> website. \r\n\
       If your project has several subprojects that do not share any data, you should define an investigation for each.\r\n    ** *BII Example:* Growth control of the eukaryote cell: a systems biology study in yeast\r\n    ** *<%= Seek::Config.project_name %> Example* Analysis of Central Carbon Metabolism of Sulfolobus solfataricus under varying temperatures\r\n\
       \r\n\
-      * *Study:* a particular biological hypothesis or analysis\r\n   ** In <%= Seek::Config.project_name %>, these studies may contain only experimental assays, only modelling analyses, only informatics analyses, \r\n\
+      * *Study:* a particular biological hypothesis or analysis\r\n   ** In <%= Seek::Config.project_name %>, these studies may contain only <%= I18n.t('assays.experimental_assay').downcase.pluralize %>, only <%= I18n.t('assays.modelling_analysis').downcase.pluralize %>, only informatics analyses, \r\n\
       or a mixture of all \r\n   ** *BII Example:* Study of the impact of changes in flux on the transcriptome, proteome, endometabolome and exometabolome \r\n\
       of the yeast Saccharomyces cerevisiae under different nutrient limitations\r\n   ** *<%= Seek::Config.project_name %> Example:* Comparison of S. solfataricus grown at 70 and 80 degrees\r\n\
       \r\n\

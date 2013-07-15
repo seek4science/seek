@@ -12,11 +12,11 @@
     associated_assays = resource.is_a?(Publication) ? resource.related_assays : resource.assays
 
     if resource.is_a? Model
-      assay_class_text = "Modelling Analyses"
-      single_assay_class_text = "Modelling Analysis"
+      single_assay_class_text = t 'assays.modelling_analysis'
+      assay_class_text = single_assay_class_text.pluralize
     else
-      assay_class_text = "Experimental Assays and Modelling Analyses"
-      single_assay_class_text = "Experimental Assay or Modelling Analysis"
+      assay_class_text = "#{t('assays.experimental_assay').pluralize} and #{t('assays.modelling_analysis').pluralize}"
+      single_assay_class_text = "#{t('assays.experimental_assay')} or #{t('assays.modelling_analysis')}"
     end
 %>
 
@@ -53,7 +53,7 @@
               <%= select_tag :assay_ids,'',{:multiple=>true,:style=>"display:none;"} -%>
               <br/>
               <div id="relationship" style="display:none;">
-                <%= label_tag "How is the data used in this Modelling Analysis" %><br/>
+                <%= label_tag "How is the data used in this #{t('assay.modelling_analysis')}" %><br/>
                 <%= select_tag :assay_relationship_type, options_for_select([["None",0]] + RelationshipType.all.collect{|r| [r.title,r.id]}) %>
               </div>
               <br/>

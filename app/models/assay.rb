@@ -202,7 +202,7 @@ class Assay < ActiveRecord::Base
 
   def no_sample_for_modelling_assay
     #FIXME: allows at the moment until fixtures and factories are updated: JIRA: SYSMO-734
-    errors[:base] << "You cannot associate a modelling analysis with a sample" if is_modelling? && !samples.empty? && !Seek::Config.is_virtualliver
+    errors[:base] << "You cannot associate a #{I18n.t('assays.modelling_analysis')} with a sample" if is_modelling? && !samples.empty? && !Seek::Config.is_virtualliver
   end
 
   def organism_terms

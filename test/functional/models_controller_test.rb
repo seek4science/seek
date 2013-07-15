@@ -161,9 +161,9 @@ class ModelsControllerTest < ActionController::TestCase
     get :new
     assert_response :success
 
-    assert_select 'div.foldTitle',:text=>/Modelling Analyses/
-    assert_select 'div#associate_assay_fold_content p',:text=>/The following Modelling Analyses are associated with this Model:/
-    assert_select 'div.association_step p',:text=>/You may select an existing editable Modelling Analysis to associate with this Model./
+    assert_select 'div.foldTitle',:text=>/#{I18n.t('assays.modelling_analysis').pluralize}/
+    assert_select 'div#associate_assay_fold_content p',:text=>/The following #{I18n.t('assays.modelling_analysis').pluralize} are associated with this Model:/
+    assert_select 'div.association_step p',:text=>/You may select an existing editable #{I18n.t('assays.modelling_analysis')} to associate with this Model./
   end
 
   test "correct title and text for associating a modelling analysis for edit" do
@@ -172,9 +172,9 @@ class ModelsControllerTest < ActionController::TestCase
     get :edit, :id=>model.id
     assert_response :success
 
-    assert_select 'div.foldTitle',:text=>/Modelling Analyses/
-    assert_select 'div#associate_assay_fold_content p',:text=>/The following Modelling Analyses are associated with this Model:/
-    assert_select 'div.association_step p',:text=>/You may select an existing editable Modelling Analysis to associate with this Model./
+    assert_select 'div.foldTitle',:text=>/#{I18n.t('assays.experimental_assay').pluralize}/
+    assert_select 'div#associate_assay_fold_content p',:text=>/The following #{I18n.t('assays.modelling_analysis').pluralize} are associated with this Model:/
+    assert_select 'div.association_step p',:text=>/You may select an existing editable #{I18n.t('assays.modelling_analysis')} to associate with this Model./
   end
 
   test "fail gracefullly when trying to access a missing model" do

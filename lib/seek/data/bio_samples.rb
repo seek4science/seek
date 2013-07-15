@@ -194,8 +194,8 @@ module Seek
         @study.investigation = @investigation
         study.save!
 
-        assay_class = AssayClass.find_by_title("Experimental Assay")
-        assay_class = AssayClass.create :title => "Experimental Assay" unless assay_class
+        assay_class = AssayClass.find_by_title(I18n.t('assays.experimental_assay'))
+        assay_class = AssayClass.create :title => I18n.t('assays.experimental_assay') unless assay_class
         assay_type =  AssayType.find_by_title(assay_type_title)
         assay_type = AssayType.create :title=> assay_type_title unless assay_type
 
