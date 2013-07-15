@@ -259,7 +259,7 @@ class StudiesControllerTest < ActionController::TestCase
     assert_response :success
 
     assert_select "div.tabbertab" do
-      assert_select "h3",:text=>"#{t('assays.assay').pluralize} (1)",:count=>1
+      assert_select "h3",:text=>"#{I18n.t('assays.assay').pluralize} (1)",:count=>1
       assert_select "h3",:text=>"SOPs (1+1)",:count=>1
       assert_select "h3",:text=>"Data Files (1+1)",:count=>1
     end

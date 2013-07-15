@@ -11,7 +11,7 @@ module Seek
       end
 
     def initialize assay,project
-      raise Exception.new("Project does not match those related to the #{I18n t('assays.assay').downcase}") unless assay.projects.include?(project)
+      raise Exception.new("Project does not match those related to the #{t('assays.assay').downcase}") unless assay.projects.include?(project)
       @assay = assay
       @project = project
       @parent=nil
