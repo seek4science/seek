@@ -4,11 +4,15 @@ class RdfGenerationJob < Struct.new(:item_type_name,:item_id, :refresh_dependent
   def perform
     item = item_type_name.constantize.find_by_id(item_id)
     unless item.nil?
-      item.remove_rdf_from_repository if item.configured_for_rdf_send?
-      item.delete_rdf
-      item.save_rdf
-      item.send_rdf_to_repository if item.configured_for_rdf_send?
-      item.refresh_dependents_rdf if refresh_dependents
+      begin
+        item.remove_rdf_from_repository if item.configured_for_rdf_send?
+        item.delete_rdf
+        item.save_rdf
+        item.send_rdf_to_repository if item.configured_for_rdf_send?
+        item.refresh_dependents_rdf if refresh_dependents
+      rescue Exception=>e
+        Rails.logger.error("Error generating rdf for #{item.class.name} - #{item.id}: #{e.message}")
+      end
     end
   end
 
