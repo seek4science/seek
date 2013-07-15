@@ -23,10 +23,9 @@ module Seek
           get_repository_object.delete *args
         end
 
-        def send_rdf(item)
+        def send_rdf(item,graphs=rdf_graph_uris(item))
           if configured?
             connect_to_repository
-            graphs = rdf_graph_uris(item)
             with_statements(item) do |statement|
               if statement.valid?
                 graphs.each do |graph_uri|
@@ -41,29 +40,68 @@ module Seek
           end
         end
 
-        def remove_rdf(item)
+        def remove_rdf(item,graphs=[get_configuration.public_graph,get_configuration.private_graph].compact)
           if configured?
             connect_to_repository
-            private_path = item.private_rdf_storage_path
-            graph = get_configuration.private_graph
-            if !graph.nil? && File.exist?(private_path)
-              with_statements_from_file private_path do |statement|
+            rdf_file_path = last_rdf_file_path(item)
+            if !rdf_file_path.nil?
+              with_statements_from_file rdf_file_path do |statement|
                 if statement.valid?
-                  remove_statement_from_repository statement,graph
-                end
-              end
-            end
-            public_path = item.public_rdf_storage_path
-            graph = get_configuration.private_graph
-            if !graph.nil? && File.exist?(public_path)
-              with_statements_from_file public_path do |statement|
-                if statement.valid?
-                  remove_statement_from_repository statement,graph
+                  graphs.each do |graph|
+                    remove_statement_from_repository statement,graph
+                  end
                 end
               end
             end
           end
         end
+
+        def update_rdf(item)
+          if configured?
+            connect_to_repository
+            graphs = rdf_graph_uris(item)
+            rdf_file_path = last_rdf_file_path(item)
+            if !graphs.include?(get_configuration.public_graph) && !rdf_file_path.nil?
+              remove_rdf(item,[get_configuration.public_graph])
+            end
+            if graphs.include?(get_configuration.public_graph) && rdf_file_path == item.private_rdf_storage_path
+              send_rdf(item,[get_configuration.public_graph])
+            end
+            old_statements = []
+            unless rdf_file_path.nil?
+              with_statements_from_file rdf_file_path do |statement|
+                old_statements << statement
+              end
+            end
+            new_statements = []
+            with_statements(item) do |statement|
+              new_statements << statement
+            end
+
+            #cannot simply do new_statements - old_statements, because although eql? works, the same statements have different hashes
+            to_add = new_statements.select { |s| !old_statements.include?(s) }
+            to_remove = old_statements.select { |s| !new_statements.include?(s) }
+
+            graphs.each do |graph|
+              to_remove.each do |statement|
+                if statement.valid?
+                  remove_statement_from_repository(statement, graph)
+                else
+                  Rails.logger.error("Invalid statement - '#{statement}'")
+                end
+              end
+
+              to_add.each do |statement|
+                if statement.valid?
+                  send_statement_to_repository(statement, graph)
+                else
+                  Rails.logger.error("Invalid statement - '#{statement}'")
+                end
+              end
+            end
+          end
+        end
+
 
         def configured?
           File.exists?(config_path) && enabled_for_environment?
@@ -105,6 +143,13 @@ module Seek
           raise "Not implemented: subclass should determine whether a configuration has been set for the current Rails.env"
         end
 
+        def last_rdf_file_path item
+          path = nil
+          path ||= item.rdf_storage_path if File.exists?(item.rdf_storage_path)
+          path ||= item.private_rdf_storage_path if File.exists?(item.private_rdf_storage_path)
+          path ||= item.public_rdf_storage_path if File.exists?(item.public_rdf_storage_path)
+          path
+        end
 
         def send_statement_to_repository statement, graph_uri
           graph = RDF::URI.new graph_uri
