@@ -120,7 +120,7 @@ class StudiesController < ApplicationController
       respond_to do |format|
         flash[:notice] = 'The study was successfully created.<br/>'.html_safe
         if @study.create_from_asset=="true"
-          flash.now[:notice] << "Now you can create new assay by clicking 'add an assay' button"
+          flash.now[:notice] << "Now you can create new #{t('assays.assay').downcase} by clicking 'add an assay' button".html_safe
           format.html { redirect_to study_path(:id=>@study,:create_from_asset=>@study.create_from_asset) }
         else
         format.html { redirect_to study_path(@study) }
@@ -161,7 +161,7 @@ class StudiesController < ApplicationController
       end
       if !valid
         unless valid
-          error("Cannot add an assay already associated with a Study", "is invalid (invalid Assay)")
+          error("Cannot add an #{t('assays.assay')} already associated with a Study", "is invalid (invalid #{t('assays.assay')})")
           return false
         end
       end

@@ -59,7 +59,7 @@
               <br/>
         <% else %>
             <%= select_tag :possible_assays,
-                  options_for_select([["Select Assay ...",0]]|project_assays.collect{|s| [truncate(h(s.title),:length=>select_truncate_length),s.id]}),
+                  options_for_select([["Select #{t('assays.assay')} ...",0]]|project_assays.collect{|s| [truncate(h(s.title),:length=>select_truncate_length),s.id]}),
                   {:style=>"width:90%",:onchange=>remote_function(
                     :method=>:get,
                     :url=>{:action=>"preview",:controller=>"assays",:element=>"assay_preview"},
@@ -108,7 +108,7 @@
           selection_box.options.length = 0;
 
           if (checked) {
-          <% ([["Select Assay ...",0]]|all_assays.collect{|s| [truncate(h(s.title),:length=>select_truncate_length),s.id]}).each do |df_details| -%>
+          <% ([["Select #{t('assays.assay')} ...",0]]|all_assays.collect{|s| [truncate(h(s.title),:length=>select_truncate_length),s.id]}).each do |df_details| -%>
               option = document.createElement("OPTION");
               option.text = '<%= escape_javascript(df_details[0]) -%>';
               option.value = '<%= df_details[1] -%>';
@@ -121,7 +121,7 @@
           <% end -%>
           }
           else {
-          <% ([["Select Assay ...",0]]|project_assays.collect{|s| [truncate(h(s.title),:length=>select_truncate_length),s.id]}).each do |df_details| -%>
+          <% ([["Select #{t('assays.assay')} ...",0]]|project_assays.collect{|s| [truncate(h(s.title),:length=>select_truncate_length),s.id]}).each do |df_details| -%>
               option = document.createElement("OPTION");
               option.text = '<%= escape_javascript(df_details[0]) -%>';
               option.value = '<%= df_details[1] -%>';

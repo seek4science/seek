@@ -150,7 +150,7 @@ class ModelsControllerTest < ActionController::TestCase
     get :new
     assert_response :success
     assert_select 'select#possible_assays' do
-      assert_select "option", :text=>/Select Assay .../,:count=>1
+      assert_select "option", :text=>/Select #{t('assays.assay')} .../,:count=>1
       assert_select "option", :text=>/Modelling Assay/,:count=>1
       assert_select "option", :text=>/Metabolomics Assay/,:count=>0
     end

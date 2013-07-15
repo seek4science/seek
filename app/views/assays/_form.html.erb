@@ -1,8 +1,8 @@
 <%= javascript_include_tag 'strain.js' -%>
 <%
  select_truncate_length=120
-@assay_text=@assay.is_modelling? ? "analysis" : "assay"
-@assay_type_text=@assay.is_modelling? ? "biological problem addressed" : "assay type"
+@assay_text=@assay.is_modelling? ? "#{t('assays.modelling_analysis').downcase}" : "#{t('assays.experimental_assay').downcase}"
+@assay_type_text=@assay.is_modelling? ? "biological problem addressed" : "#{t('assays.assay').downcase} type"
 %>
 <%= javascript_include_tag "assays.js"  %>
 <%= javascript_include_tag "sharing.js", "resource.js"%>
@@ -64,7 +64,7 @@
   <tr>
     <td><%= f.label "#{@assay_type_text.capitalize}: " %>
     <% if User.current_user.try(:can_manage_types?) %>
-      <%= link_to h("New assay type?"),new_assay_type_path(:parent_name=>controller_name.underscore.singularize), :onclick => "window.open(this.href);return false;" %>
+      <%= link_to h("New #{t('assays.assay').downcase} type?"),new_assay_type_path(:parent_name=>controller_name.underscore.singularize), :onclick => "window.open(this.href);return false;" %>
     <% end %>
     </td>
     <% unless @assay.is_modelling? -%>

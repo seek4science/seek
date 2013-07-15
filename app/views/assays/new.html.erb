@@ -21,7 +21,7 @@
         <% unless @assay.assay_class %>
           <div class="assay_selection">
 
-            <span>Please select the class of assay you wish to create</span>
+            <span>Please select the class of <%= t('assays.assay').downcase %> you wish to create</span>
             <br/><br/><br/>
             <%= link_to "<p class='select_assay_class'>#{image("assay_experimental_avatar",:size=>"32x32")}An #{t('assays.experimental_assay')}</p>".html_safe,new_assay_path(:class=>:experimental,:study_id=>params[:study_id],:create_from_asset=>@assay.create_from_asset) %>
 
