@@ -51,7 +51,7 @@ class InvestigationsController < ApplicationController
         respond_to do |format|
           flash[:notice] = 'The Investigation was successfully created.'
           if @investigation.create_from_asset=="true"
-             flash.now[:notice] << "<br/> Now you can create new study for your assay by clicking 'add a study' button"
+             flash.now[:notice] << "<br/> Now you can create new study for your #{t('assays.assay').downcase} by clicking 'add a study' button".html_safe
             format.html { redirect_to investigation_path(:id=>@investigation,:create_from_asset=>@investigation.create_from_asset) }
           else
             format.html { redirect_to investigation_path(@investigation) }

@@ -194,12 +194,12 @@ module Seek
         @study.investigation = @investigation
         study.save!
 
-        assay_class = AssayClass.find_by_title("Experimental Assay")
-        assay_class = AssayClass.create :title => "Experimental Assay" unless assay_class
+        assay_class = AssayClass.find_by_title(I18n.t('assays.experimental_assay'))
+        assay_class = AssayClass.create :title => I18n.t('assays.experimental_assay') unless assay_class
         assay_type =  AssayType.find_by_title(assay_type_title)
         assay_type = AssayType.create :title=> assay_type_title unless assay_type
 
-        assay_title = filename.nil? ? "dummy assay" : filename.split(".").first
+        assay_title = filename.nil? ? "dummy #{t('assays.assay').downcase}" : filename.split(".").first
         @assay = Assay.all.detect{|a|a.title == assay_title && a.study_id == study.id && a.assay_class_id == assay_class.try(:id) && a.assay_type == assay_type && a.owner_id == User.current_user.person.id}
         unless @assay
           @assay = Assay.new :title => assay_title
@@ -699,7 +699,7 @@ module Seek
               @assay.save!
             end
           else
-            Rails.logger.warn "no assay defined for samples"
+            Rails.logger.warn "no #{t('assays.assay').downcase} defined for samples"
           end
 
 

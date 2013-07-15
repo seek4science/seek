@@ -11,7 +11,7 @@
     <% end -%>
     <%= delete_icon(@assay,current_user) %>
     <% if logged_in? and current_user.person.member? %>
-      <li><%= image_tag_for_key('new', new_object_based_on_existing_one_path(:controller_name=>"assays", :id=>@assay.id), nil, nil, 'New Assay based on this one') %></li>
+      <li><%= image_tag_for_key('new', new_object_based_on_existing_one_path(:controller_name=>"assays", :id=>@assay.id), nil, nil, "New #{t('assays.assay')} based on this one") %></li>
     <% end %>
 </ul>
 
@@ -22,7 +22,7 @@
           <%= image("warning") %><b style="color:red">WARNING</b>
           <br/>
           <br/>
-          An Assay may be edited by anybody, regardless of project membership, until it has been associated with a Study
+          An <%= t('assays.assay') %> may be edited by anybody, regardless of project membership, until it has been associated with a Study
       </div>
       <% end -%>
       <p class="id">

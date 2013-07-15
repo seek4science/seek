@@ -56,7 +56,7 @@ class AssayTypesController < ApplicationController
           render :partial => "assets/back_to_singleselect_parent",:locals => {:child=>@assay_type,:parent=>@assay_type.parent_name}
         else
          respond_to do |format|
-          flash[:notice] = 'Assay type was successfully created.'
+          flash[:notice] = "#{t('assays.assay')} type was successfully created."
           format.html { redirect_to(:action => 'manage') }
           format.xml  { render :xml => @assay_type, :status => :created, :location => @assay_type }
            end
@@ -78,7 +78,7 @@ class AssayTypesController < ApplicationController
         unless params[:assay_type][:parent_id] == @assay_type.parents.collect {|par| par.id}
           @assay_type.parents = params[:assay_type][:parent_id].collect {|p_id| AssayType.find_by_id(p_id)}
         end
-        flash[:notice] = 'Assay type was successfully updated.'
+        flash[:notice] = "#{t('assays.assay')} type was successfully updated."
         format.html { redirect_to(:action => 'manage') }
         format.xml  { head :ok }
       else
@@ -94,16 +94,16 @@ class AssayTypesController < ApplicationController
     respond_to do |format|
       if @assay_type.assays.empty? && @assay_type.get_child_assays.empty? && @assay_type.children.empty?
         @assay_type.destroy
-        flash[:notice] = 'Assay type was deleted.'
+        flash[:notice] = "#{t('assays.assay')} type was deleted."
         format.html { redirect_to(:action => 'manage') }
         format.xml  { head :ok }
       else
         if !@assay_type.children.empty?
-          flash[:error]="Unable to delete assay types with children" 
+          flash[:error]="Unable to delete #{t('assays.assay').downcase} types with children"
         elsif !@assay_type.get_child_assays.empty?
-          flash[:error]="Unable to delete assay type due to reliance from #{@assay_type.get_child_assays.count} existing assays on child assay types"
+          flash[:error]="Unable to delete #{t('assays.assay').downcase} type due to reliance from #{@assay_type.get_child_assays.count} existing #{t('assays.assay').downcase.pluralize} on child #{t('assays.assay').downcase} types"
         elsif !@assay_type.assays.empty?
-          flash[:error]="Unable to delete assay type due to reliance from #{@assay_type.get_child_assays.count} existing assays"        
+          flash[:error]="Unable to delete #{t('assays.assay').downcase} type due to reliance from #{@assay_type.get_child_assays.count} existing #{t('assays.assay').downcase.pluralize}"
         end
         format.html { redirect_to(:action => 'manage') }
         format.xml  { render :xml => @assay_type.errors, :status => :unprocessable_entity }

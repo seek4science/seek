@@ -12,11 +12,11 @@
     associated_assays = resource.is_a?(Publication) ? resource.related_assays : resource.assays
 
     if resource.is_a? Model
-      assay_class_text = "Modelling Analyses"
-      single_assay_class_text = "Modelling Analysis"
+      single_assay_class_text = t 'assays.modelling_analysis'
+      assay_class_text = single_assay_class_text.pluralize
     else
-      assay_class_text = "Experimental Assays and Modelling Analyses"
-      single_assay_class_text = "Experimental Assay or Modelling Analysis"
+      assay_class_text = "#{t('assays.experimental_assay').pluralize} and #{t('assays.modelling_analysis').pluralize}"
+      single_assay_class_text = "#{t('assays.experimental_assay')} or #{t('assays.modelling_analysis')}"
     end
 %>
 
@@ -53,13 +53,13 @@
               <%= select_tag :assay_ids,'',{:multiple=>true,:style=>"display:none;"} -%>
               <br/>
               <div id="relationship" style="display:none;">
-                <%= label_tag "How is the data used in this Modelling Analysis" %><br/>
+                <%= label_tag "How is the data used in this #{t('assay.modelling_analysis')}" %><br/>
                 <%= select_tag :assay_relationship_type, options_for_select([["None",0]] + RelationshipType.all.collect{|r| [r.title,r.id]}) %>
               </div>
               <br/>
         <% else %>
             <%= select_tag :possible_assays,
-                  options_for_select([["Select Assay ...",0]]|project_assays.collect{|s| [truncate(h(s.title),:length=>select_truncate_length),s.id]}),
+                  options_for_select([["Select #{t('assays.assay')} ...",0]]|project_assays.collect{|s| [truncate(h(s.title),:length=>select_truncate_length),s.id]}),
                   {:style=>"width:90%",:onchange=>remote_function(
                     :method=>:get,
                     :url=>{:action=>"preview",:controller=>"assays",:element=>"assay_preview"},
@@ -108,7 +108,7 @@
           selection_box.options.length = 0;
 
           if (checked) {
-          <% ([["Select Assay ...",0]]|all_assays.collect{|s| [truncate(h(s.title),:length=>select_truncate_length),s.id]}).each do |df_details| -%>
+          <% ([["Select #{t('assays.assay')} ...",0]]|all_assays.collect{|s| [truncate(h(s.title),:length=>select_truncate_length),s.id]}).each do |df_details| -%>
               option = document.createElement("OPTION");
               option.text = '<%= escape_javascript(df_details[0]) -%>';
               option.value = '<%= df_details[1] -%>';
@@ -121,7 +121,7 @@
           <% end -%>
           }
           else {
-          <% ([["Select Assay ...",0]]|project_assays.collect{|s| [truncate(h(s.title),:length=>select_truncate_length),s.id]}).each do |df_details| -%>
+          <% ([["Select #{t('assays.assay')} ...",0]]|project_assays.collect{|s| [truncate(h(s.title),:length=>select_truncate_length),s.id]}).each do |df_details| -%>
               option = document.createElement("OPTION");
               option.text = '<%= escape_javascript(df_details[0]) -%>';
               option.value = '<%= df_details[1] -%>';

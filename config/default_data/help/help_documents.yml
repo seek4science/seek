@@ -428,7 +428,7 @@ help_documents:
       * *Investigation:* a high level description of the area and the main aims of a project\r\n    ** In SysMO, this may be the overall aims as stated on the sysmo.net website. \r\n\
       If your project has several subprojects that do not share any data, you should define an investigation for each.\r\n    ** *BII Example:* Growth control of the eukaryote cell: a systems biology study in yeast\r\n    ** *SysMO Example* Analysis of Central Carbon Metabolism of Sulfolobus solfataricus under varying temperatures\r\n\
       \r\n\
-      * *Study:* a particular biological hypothesis or analysis\r\n   ** In SysMO, these studies may contain only experimental assays, only modelling analyses, only informatics analyses, \r\n\
+      * *Study:* a particular biological hypothesis or analysis\r\n   ** In SysMO, these studies may contain only experimental assays, only modelling analysises, only informatics analyses, \r\n\
       or a mixture of all \r\n   ** *BII Example:* Study of the impact of changes in flux on the transcriptome, proteome, endometabolome and exometabolome \r\n\
       of the yeast Saccharomyces cerevisiae under different nutrient limitations\r\n   ** *SysMO Example:* Comparison of S. solfataricus grown at 70 and 80 degrees\r\n\
       \r\n\
@@ -520,7 +520,7 @@ help_documents:
       
       !/help_images/0000/0003/ISADataModel.png!
        
-      In this case, the Assay is not a laboratory experiment, but a modelling task. Referring to it as an assay is therefore confusing, so we call these Modelling Analyses instead of Assays. This modelling analysis has a publication and a model associated with it, as well as a data file that was used for model validation. The data file is also associated with another assay (Intracellular Metabolites). This assay describes how the validation data was originally produced. As you can see, it is possible to associate data files, models, and other SEEK assets with more than one assay if necessary. 
+      In this case, the Assay is not a laboratory experiment, but a modelling task. Referring to it as an assay is therefore confusing, so we call these Modelling Analyses instead of Assays. This modelling analysis has a publication and a model associated with it, as well as a data file that was used for model validation. The data file is also associated with another assay (Intracellular Metabolites). This assay describes how the validation data was originally produced. As you can see, it is possible to associate data files, models, and other SEEK assets with more than one assay if necessary.
       
       h2. Using ISA when Uploading SEEK Assets
       

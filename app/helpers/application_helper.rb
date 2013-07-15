@@ -586,12 +586,12 @@ module ApplicationHelper
     end
   end
 
-  NO_DELETE_EXPLANTIONS={Assay=>"You cannot delete this Assay. It might be published or it has items associated with it.",
-                         Study=>"You cannot delete this Study. It might be published or it has Assays associated with it.",
+  NO_DELETE_EXPLANTIONS={Assay=>"You cannot delete this #{t('assays.assay')}. It might be published or it has items associated with it.",
+                         Study=>"You cannot delete this Study. It might be published or it has #{t('assays.assay').pluralize} associated with it.",
                          Investigation=>"You cannot delete this Investigation. It might be published or it has Studies associated with it." ,
                          Strain=>"You cannot delete this Strain. It might be published or it has #{I18n.t 'biosamples.sample_parent_term'}s/Samples associated with it.",
                          Specimen=>"You cannot delete this #{I18n.t 'biosamples.sample_parent_term'}. It might be published or it has Samples associated with it.",
-                         Sample=>"You cannot delete this Sample. It might be published or it has Assays associated with it."
+                         Sample=>"You cannot delete this Sample. It might be published or it has #{t('assays.assay').pluralize} associated with it."
   }
 
   def delete_icon model_item, user

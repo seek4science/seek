@@ -23,7 +23,7 @@ module AssayTypesHelper
                     (show_edit ? link_to(image("edit"), edit_polymorphic_path(child), {:style=>"vertical-align:middle"}) : "") + " " +
                     (show_delete ? (child.assays.size == 0 ? link_to(image("destroy"),child, :confirm =>
                       "Are you sure you want to remove this #{child.class.name}?  This cannot be undone.",
-                      :method => :delete, :style=>"vertical-align:middle") : "<span style=\"color: #666666;\">(#{child.assays.size} assays)</span>") : "") +
+                      :method => :delete, :style=>"vertical-align:middle") : "<span style=\"color: #666666;\">(#{child.assays.size} #{t('assays.assay').downcase.pluralize})</span>") : "") +
                     "</li>")
         result = result + indented_child_options(child,depth+1,show_edit,show_delete,selected_id) if child.has_children?
       end

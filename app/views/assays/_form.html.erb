@@ -1,8 +1,8 @@
 <%= javascript_include_tag 'strain.js' -%>
 <%
  select_truncate_length=120
-@assay_text=@assay.is_modelling? ? "analysis" : "assay"
-@assay_type_text=@assay.is_modelling? ? "biological problem addressed" : "assay type"
+@assay_text=@assay.is_modelling? ? "#{t('assays.modelling_analysis').downcase}" : "#{t('assays.experimental_assay').downcase}"
+@assay_type_text=@assay.is_modelling? ? "biological problem addressed" : "#{t('assays.assay').downcase} type"
 %>
 <%= javascript_include_tag "assays.js"  %>
 <%= javascript_include_tag "sharing.js", "resource.js"%>
@@ -64,7 +64,7 @@
   <tr>
     <td><%= f.label "#{@assay_type_text.capitalize}: " %>
     <% if User.current_user.try(:can_manage_types?) %>
-      <%= link_to h("New assay type?"),new_assay_type_path(:parent_name=>controller_name.underscore.singularize), :onclick => "window.open(this.href);return false;" %>
+      <%= link_to h("New #{t('assays.assay').downcase} type?"),new_assay_type_path(:parent_name=>controller_name.underscore.singularize), :onclick => "window.open(this.href);return false;" %>
     <% end %>
     </td>
     <% unless @assay.is_modelling? -%>
@@ -146,46 +146,6 @@
   function hideTitle(){
     var elem = document.getElementById("full_study_title");
     elem.style.display = 'none';
-  }
-  
-  function changeTypes(){
-    var value = $("assay_class_select").value;
-    var assayTypeRoot = "";
-    var technologyTypeRoot = "";
-    //Get the ID of the Modelling Assay class
-    var modellingAssayClassID = <%= AssayClass.find_by_title("Modelling Assay").try(:id) || 0 -%>;
-    var experimentalAssayClassID = <%= AssayClass.find_by_title("Experimental Assay").try(:id) || 0 -%>;
-    if (value == modellingAssayClassID){
-      //Get the IDs of the Type roots to switch the select box to.
-      assayTypeRoot = <%= AssayType.find_by_title("modelling assay types").try(:id) || 0 -%>;
-      technologyTypeRoot = <%= TechnologyType.find_by_title("modelling technology").try(:id) || 0 -%>;
-      $('associate_model_form').style.display = '';
-      $('data_file_relationship_type_section').style.display = '';
-    }
-    else if (value == experimentalAssayClassID){
-      //Get the IDs of the Type roots to switch the select box to.
-      assayTypeRoot = <%= AssayType.find_by_title("assay types").try(:id) || 0 -%>;
-      technologyTypeRoot = <%= TechnologyType.find_by_title("technology").try(:id) || 0 -%>;
-      $('associate_model_form').style.display = 'none';
-      $('data_file_relationship_type_section').style.display = 'none';
-    }
-    //Change AssayType form
-    var assayTypeSelect = $("assay_assay_type_id");
-    for (var i=0;i < assayTypeSelect.options.length;i++) {
-      if (assayTypeSelect.options[i].value == assayTypeRoot)
-        assayTypeSelect.options[i].selected = true;
-      else 
-        assayTypeSelect.options[i].selected = false;
-    }
-    //Change TechnologyType form
-    var techTypeSelect = $("assay_technology_type_id");
-    for ( i=0;i < techTypeSelect.options.length;i++) {
-      if (techTypeSelect.options[i].value == technologyTypeRoot)
-        techTypeSelect.options[i].selected = true;
-      else 
-        techTypeSelect.options[i].selected = false;
-    }
-
   }
 
   function check_show_organism_form() {

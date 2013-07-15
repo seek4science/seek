@@ -182,12 +182,12 @@ end
   end
 
   Factory.define(:modelling_assay_class, :class => AssayClass) do |f|
-    f.title 'Modelling Assay'
+    f.title I18n.t('assays.modelling_analysis')
     f.key 'MODEL'
   end
 
   Factory.define(:experimental_assay_class, :class => AssayClass) do |f|
-    f.title 'Experimental Assay'
+    f.title I18n.t('assays.experimental_assay')
     f.key 'EXP'
   end
 

@@ -20,24 +20,24 @@ class AssaysController < ApplicationController
 
     unless @assay.study.can_edit?
       @assay.study = nil
-      flash.now[:notice] = "The study of the existing assay cannot be viewed, please specify your own study! <br/>"
+      flash.now[:notice] = "The study of the existing #{t('assays.assay').downcase} cannot be viewed, please specify your own study! <br/>".html_safe
     end
 
     @existing_assay.data_file_masters.each do |d|
       if !d.can_view?
-       flash.now[:notice] << "Some or all data files of the existing assay cannot be viewed, you may specify your own! <br/>"
+       flash.now[:notice] << "Some or all data files of the existing #{t('assays.assay').downcase} cannot be viewed, you may specify your own! <br/>".html_safe
         break
       end
     end
     @existing_assay.sop_masters.each do |s|
        if !s.can_view?
-       flash.now[:notice] << "Some or all sops of the existing assay cannot be viewed, you may specify your own! <br/>"
+       flash.now[:notice] << "Some or all sops of the existing #{t('assays.assay').downcase} cannot be viewed, you may specify your own! <br/>".html_safe
         break
       end
     end
     @existing_assay.model_masters.each do |m|
        if !m.can_view?
-       flash.now[:notice] << "Some or all models of the existing assay cannot be viewed, you may specify your own! <br/>"
+       flash.now[:notice] << "Some or all models of the existing #{t('assays.assay').downcase} cannot be viewed, you may specify your own! <br/>".html_safe
         break
       end
     end
@@ -124,7 +124,7 @@ class AssaysController < ApplicationController
           render :action=>:update_assays_list
         else
           respond_to do |format|
-          flash[:notice] = 'Assay was successfully created.'
+          flash[:notice] = "#{t('assays.assay')} was successfully created."
           format.html { redirect_to(@assay) }
           format.xml { render :xml => @assay, :status => :created, :location => @assay }
           end
@@ -191,7 +191,7 @@ class AssaysController < ApplicationController
         @assay.updated_at=Time.now
         @assay.save!
 
-        flash[:notice] = 'Assay was successfully updated.'
+        flash[:notice] = "#{t('assays.assay')} was successfully updated."
         format.html { redirect_to(@assay) }
         format.xml { head :ok }
       else
