@@ -183,8 +183,6 @@ module Seek
         create_rdf_generation_job(true, false)
       end
 
-
-
     end
   end
 end
