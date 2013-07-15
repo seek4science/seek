@@ -5,7 +5,7 @@ class ProjectTest < ActiveSupport::TestCase
   fixtures :projects, :institutions, :work_groups, :group_memberships, :people, :users,  :publications, :assets, :organisms
   #checks that the dependent work_groups are destoryed when the project s
   def test_delete_work_groups_when_project_deleted
-    n_wg=WorkGroup.find(:all).size
+    n_wg=WorkGroup.all.size
     p=Project.find(2)
     assert_equal 1,p.work_groups.size
         
@@ -13,8 +13,8 @@ class ProjectTest < ActiveSupport::TestCase
     p.save!
     p.destroy
     
-    assert_equal n_wg-1,WorkGroup.find(:all).size
-    wg=WorkGroup.find(:all).first
+    assert_equal n_wg-1,WorkGroup.all.size
+    wg=WorkGroup.all.first
     assert_same 1,wg.project_id
   end
 

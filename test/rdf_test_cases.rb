@@ -20,6 +20,10 @@ module RdfTestCases
     RDF::Reader.for(:rdfxml).new(rdf) do |reader|
       assert reader.statements.count > 0
       assert_equal RDF::URI.new(expected_resource_uri), reader.statements.first.subject
+      reader.rewind
+      reader.each_statement do |statement|
+        assert statement.valid?,"RDF contained an invalid statement - #{statement}"
+      end
     end
 
   end
