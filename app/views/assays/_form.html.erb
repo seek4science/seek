@@ -147,46 +147,6 @@
     var elem = document.getElementById("full_study_title");
     elem.style.display = 'none';
   }
-  
-  function changeTypes(){
-    var value = $("assay_class_select").value;
-    var assayTypeRoot = "";
-    var technologyTypeRoot = "";
-    //Get the ID of the Modelling Assay class
-    var modellingAssayClassID = <%= AssayClass.find_by_title("Modelling Assay").try(:id) || 0 -%>;
-    var experimentalAssayClassID = <%= AssayClass.find_by_title("Experimental Assay").try(:id) || 0 -%>;
-    if (value == modellingAssayClassID){
-      //Get the IDs of the Type roots to switch the select box to.
-      assayTypeRoot = <%= AssayType.find_by_title("modelling assay types").try(:id) || 0 -%>;
-      technologyTypeRoot = <%= TechnologyType.find_by_title("modelling technology").try(:id) || 0 -%>;
-      $('associate_model_form').style.display = '';
-      $('data_file_relationship_type_section').style.display = '';
-    }
-    else if (value == experimentalAssayClassID){
-      //Get the IDs of the Type roots to switch the select box to.
-      assayTypeRoot = <%= AssayType.find_by_title("assay types").try(:id) || 0 -%>;
-      technologyTypeRoot = <%= TechnologyType.find_by_title("technology").try(:id) || 0 -%>;
-      $('associate_model_form').style.display = 'none';
-      $('data_file_relationship_type_section').style.display = 'none';
-    }
-    //Change AssayType form
-    var assayTypeSelect = $("assay_assay_type_id");
-    for (var i=0;i < assayTypeSelect.options.length;i++) {
-      if (assayTypeSelect.options[i].value == assayTypeRoot)
-        assayTypeSelect.options[i].selected = true;
-      else 
-        assayTypeSelect.options[i].selected = false;
-    }
-    //Change TechnologyType form
-    var techTypeSelect = $("assay_technology_type_id");
-    for ( i=0;i < techTypeSelect.options.length;i++) {
-      if (techTypeSelect.options[i].value == technologyTypeRoot)
-        techTypeSelect.options[i].selected = true;
-      else 
-        techTypeSelect.options[i].selected = false;
-    }
-
-  }
 
   function check_show_organism_form() {
       if ($F('assay_sample_ids') && $F('assay_sample_ids').length > 0) {
