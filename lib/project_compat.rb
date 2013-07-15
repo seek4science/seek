@@ -12,7 +12,7 @@ module ProjectCompat
 
   def react_to_project_addition project
     SetSubscriptionsForItemJob.create_job(self.class.name, self.id, [project.id]) if (!self.new_record? && self.subscribable?)
-    self.create_rdf_generation_job(true) if self.respond_to?(:create_rdf_generation_job)
+    self.update_rdf_on_associated_change(project) if self.respond_to?(:update_rdf_on_associated_change)
   end
 
   def react_to_project_removal project

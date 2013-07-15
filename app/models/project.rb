@@ -5,6 +5,7 @@ require 'title_trimmer'
 class Project < ActiveRecord::Base
 
   include Seek::Rdf::RdfGeneration
+  include Seek::Rdf::ReactToAssociatedChange
 
   acts_as_yellow_pages 
 
@@ -55,7 +56,7 @@ class Project < ActiveRecord::Base
   alias_attribute :webpage, :web_page
   alias_attribute :internal_webpage, :wiki_page
 
-  has_and_belongs_to_many :organisms
+  has_and_belongs_to_many :organisms, :before_add=>:update_rdf_on_associated_change, :before_remove=>:update_rdf_on_associated_change
   has_many :project_subscriptions,:dependent => :destroy
   
   searchable(:ignore_attribute_changes_of=>[:updated_at]) do

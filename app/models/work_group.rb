@@ -3,6 +3,9 @@ class WorkGroup < ActiveRecord::Base
   belongs_to :project
   has_many :group_memberships, :dependent => :destroy
   has_many :people, :through=>:group_memberships
+
+  include Seek::Rdf::ReactToAssociatedChange
+  update_rdf_on_change :institution, :project
   
   def destroy
     if people.empty?

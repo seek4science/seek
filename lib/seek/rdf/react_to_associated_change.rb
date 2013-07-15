@@ -9,7 +9,7 @@ module Seek
       end
 
       module ClassMethods
-        def update_rdf_on_change items
+        def update_rdf_on_change *items
           items = Array(items)
           items.each do |item|
             method = "refresh_#{item.to_s}_rdf"
@@ -25,6 +25,10 @@ module Seek
         end
       end
 
+      def update_rdf_on_associated_change associated_item
+        refresh_rdf
+        associated_item.refresh_rdf if associated_item.respond_to?(:refresh_rdf)
+      end
 
     end
   end
