@@ -5,7 +5,7 @@ class ProjectTest < ActiveSupport::TestCase
   fixtures :projects, :institutions, :work_groups, :group_memberships, :people, :users,  :publications, :assets, :organisms
   #checks that the dependent work_groups are destoryed when the project s
   def test_delete_work_groups_when_project_deleted
-    n_wg=WorkGroup.find(:all).size
+    n_wg=WorkGroup.all.size
     p=Project.find(2)
     assert_equal 1,p.work_groups.size
         
@@ -13,8 +13,8 @@ class ProjectTest < ActiveSupport::TestCase
     p.save!
     p.destroy
     
-    assert_equal n_wg-1,WorkGroup.find(:all).size
-    wg=WorkGroup.find(:all).first
+    assert_equal n_wg-1,WorkGroup.all.size
+    wg=WorkGroup.all.first
     assert_same 1,wg.project_id
   end
 
@@ -39,6 +39,36 @@ class ProjectTest < ActiveSupport::TestCase
       assert reader.statements.count > 1
       assert_equal RDF::URI.new("http://localhost:3000/projects/#{object.id}"), reader.statements.first.subject
     end
+  end
+
+  test "rdf with empty URI resource" do
+    object = Factory :project, :web_page=>"http://google.com"
+
+    homepage_predicate = RDF::URI.new "http://xmlns.com/foaf/0.1/homepage"
+    found = false
+    RDF::Reader.for(:rdfxml).new(object.to_rdf) do |reader|
+      reader.each_statement do |statement|
+        if statement.predicate == homepage_predicate
+          found = true
+          assert statement.valid?, "statement is not valid"
+          assert_equal RDF::URI.new("http://google.com"),statement.object
+        end
+      end
+    end
+    assert found,"Didn't find homepage predicate"
+
+    object.web_page=""
+    found = false
+    RDF::Reader.for(:rdfxml).new(object.to_rdf) do |reader|
+      reader.each_statement do |statement|
+        if statement.predicate == homepage_predicate
+          found = true
+
+          assert statement.valid?, "statement is not valid"
+        end
+      end
+    end
+    assert !found,"The homepage statement should have been skipped"
   end
 
   def test_avatar_key

@@ -94,12 +94,20 @@ module Seek
                 if item.respond_to?(:rdf_resource)
                   item.rdf_resource
                 else
-                  RDF::Resource.new(item)
+                  uri = RDF::URI.new(item)
+                  begin
+                    uri.validate!
+                  rescue
+                    nil
+                  end
                 end
           else
             item.nil? ? "" : item
           end
-          rdf_graph << [resource,property_uri,o]
+          unless o.nil?
+            rdf_graph << [resource,property_uri,o]
+          end
+
         end
         rdf_graph
       end
@@ -148,6 +156,7 @@ module Seek
         #FIXME: this should go into a seperate mixin for active-record
         methods=[:data_files,:sops,:models,:publications,
                  :data_file_masters, :sop_masters, :model_masters,
+                 :assets,
                  :assays, :studies, :investigations,
                  :institutions, :creators, :owners,:owner, :contributors, :contributor,:projects, :events, :presentations,
                  :samples, :specimens, :compounds, :organisms, :strains,
@@ -162,11 +171,19 @@ module Seek
         end
 
         items.compact.uniq
+
+        if (self.configured_for_rdf_send?)
+          items = items | related_items_from_sparql
+        end
+
+        items.compact.uniq
       end
 
       def refresh_rdf
         create_rdf_generation_job(true, false)
       end
+
+
 
     end
   end

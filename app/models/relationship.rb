@@ -16,6 +16,9 @@ class Relationship < ActiveRecord::Base
   belongs_to :subject , :polymorphic => true
   belongs_to :other_object, :polymorphic => true
 
+  include Seek::Rdf::ReactToAssociatedChange
+  update_rdf_on_change :subject
+
 
   # **********************************************************************
   # A set of constants to define the predicates which are currently in use

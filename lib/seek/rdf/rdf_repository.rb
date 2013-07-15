@@ -69,6 +69,16 @@ module Seek
           File.exists?(config_path) && enabled_for_environment?
         end
 
+        def uris_of_items_related_to item
+          q = query.select.where([:s, :p, item.rdf_resource]).from(RDF::URI.new(get_configuration.private_graph))
+          results = select(q).collect{|result| result[:s]}
+
+          q = query.select.where([item.rdf_resource, :p, :o]).from(RDF::URI.new(get_configuration.private_graph))
+          results = results | select(q).collect{|result| result[:o]}
+
+          results.select{|result| result.is_a?(RDF::URI)}.collect{|result| result.to_s}.uniq
+        end
+
         #Abstract methods
 
         def get_configuration

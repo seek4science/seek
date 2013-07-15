@@ -14,6 +14,28 @@ module Seek
         !Seek::Rdf::RdfRepository.instance.nil? && Seek::Rdf::RdfRepository.instance.configured?
       end
 
+      def related_items_from_sparql
+        items = []
+        if configured_for_rdf_send?
+          Seek::Rdf::RdfRepository.instance.uris_of_items_related_to(self).each do |uri|
+            begin
+              puts uri
+              route = SEEK::Application.routes.recognize_path(uri)
+              puts route
+              if !route.nil? && !route[:id].nil?
+                klass = route[:controller].singularize.camelize.constantize
+                puts klass
+                id = route[:id]
+                items << klass.find(id)
+              end
+            rescue Exception=>e
+              puts e
+            end
+          end
+        end
+        items
+      end
+
     end
   end
 end

@@ -68,5 +68,38 @@ class RdfTripleStoreTest < ActionController::IntegrationTest
       assert_equal 0,result.count
     end
 
+    test "uris of items related to" do
+      person = Factory(:person)
+      data_file = Factory(:data_file)
+      model = Factory(:model)
+      sop = Factory(:sop)
+
+      pp SEEK::Application.routes.recognize_path("http://news.bbc.co.uk")
+
+      q = @repository.query.insert([person.rdf_resource,RDF::URI.new("http://is/member_of"),@project.rdf_resource]).graph(@graph)
+      @repository.insert(q)
+
+      q = @repository.query.insert([data_file.rdf_resource,RDF::URI.new("http://is/created_by"),@project.rdf_resource]).graph(@graph)
+      @repository.insert(q)
+
+      q = @repository.query.insert([data_file.rdf_resource,RDF::URI.new("http://is/linked_to"),@project.rdf_resource]).graph(@graph)
+      @repository.insert(q)
+
+      q = @repository.query.insert([model.rdf_resource,RDF::URI.new("http://is/related_to"),person.rdf_resource]).graph(@graph)
+      @repository.insert(q)
+
+      q = @repository.query.insert([model.rdf_resource,RDF::URI.new("http://has/name"),"A model"]).graph(@graph)
+      @repository.insert(q)
+
+      q = @repository.query.insert([@project.rdf_resource,RDF::URI.new("http://produced"),sop.rdf_resource]).graph(@graph)
+      @repository.insert(q)
+
+      uris = @repository.uris_of_items_related_to @project
+      assert_equal 3,uris.count
+      assert_equal ["http://localhost:3000/data_files/#{data_file.id}","http://localhost:3000/people/#{person.id}","http://localhost:3000/sops/#{sop.id}"],uris.sort
+
+
+    end
+
 
 end

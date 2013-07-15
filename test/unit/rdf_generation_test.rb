@@ -20,24 +20,6 @@ class RDFGenerationTest < ActiveSupport::TestCase
   end
 
 
-
-  test "rdf generation job created after save" do
-    item = nil
-
-    assert_difference("Delayed::Job.count",1) do
-      item = Factory :project
-    end
-    assert_difference("Delayed::Job.count",1) do
-      item.title="sdfhsdfkhsdfklsdf2"
-      item.save!
-    end
-    item = Factory :model
-    item.last_used_at=Time.now
-    assert_no_difference("Delayed::Job.count") do
-      item.save!
-    end
-  end
-
   test "rdf storage path" do
     public = Factory(:assay, :policy=>Factory(:public_policy))
     assert_equal File.join(Rails.root,"tmp/testing-filestore/tmp/rdf/public","Assay-test-#{public.id}.rdf"), public.rdf_storage_path

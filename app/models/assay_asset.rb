@@ -6,6 +6,10 @@ class AssayAsset < ActiveRecord::Base
   belongs_to :relationship_type
   
   before_save :check_version
+
+  include Seek::Rdf::ReactToAssociatedChange
+  update_rdf_on_change :assay
+
   
   #always returns the correct versioned asset (e.g Sop::Version) according to the stored version, or latest version if version is nil
   def versioned_asset
@@ -23,5 +27,5 @@ class AssayAsset < ActiveRecord::Base
       self.version=asset.version
     end
   end
-  
+
 end
