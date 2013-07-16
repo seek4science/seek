@@ -3,7 +3,6 @@ module Seek
     #provides methods related to storing Rdf, in particular in files, but also includes RdfRepositoryStorage to support
     #storage in a triple store if configured
     module RdfStorage
-      include RdfRepositoryStorage
 
       #saves the RDF to a file according to the configured filestore, in a directory rdf/. Filenames are based upon the asset
       #type, the Rails.env, and the asset id. rdf for private asset (not publically visible) are stored in a private subdirectory,

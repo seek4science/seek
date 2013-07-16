@@ -1,5 +1,16 @@
 module Seek
   module Rdf
+    #Contains some helpful methods for when rdf needs updating due to changes to an associated item. Because the items themselves
+    #are not saved, this is required to trigger a job to update the relevant items
+    #
+    #if there is a Model for a join table (e.g. see AssayOrganism) then you can use:
+    #   include Seek::Rdf::ReactToAssociatedChange
+    #   update_rdf_on_change :item
+    #this will cause ':item' to be updated when the join is saved or destroyed
+    #
+    #also for has_many, or has_and_belongs_to_many, you can add (e.g)
+    #  has_many :people, :before_add=>:update_rdf_on_assocated_change, :before_remove=>:update_rdf_on_associated_change
+
     module ReactToAssociatedChange
       def self.included(mod)
         mod.class_eval do

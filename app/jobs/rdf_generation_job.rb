@@ -5,9 +5,12 @@ class RdfGenerationJob < Struct.new(:item_type_name,:item_id, :refresh_dependent
     item = item_type_name.constantize.find_by_id(item_id)
     unless item.nil?
       begin
-        item.update_repository_rdf if item.rdf_repository_configured?
-        item.delete_rdf
-        item.save_rdf
+        if item.rdf_repository_configured?
+          item.update_repository_rdf
+        else
+          item.delete_rdf
+          item.save_rdf
+        end
         item.refresh_dependents_rdf if refresh_dependents
       rescue Exception=>e
         Rails.logger.error("Error generating rdf for #{item.class.name} - #{item.id}: #{e.message}")
