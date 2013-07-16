@@ -36,6 +36,7 @@ class RdfTripleStoreTest < ActionController::IntegrationTest
 
     test "configured for send" do
       assert @repository.configured?
+      assert @project.rdf_repository_configured?
     end
 
     test "send to store" do

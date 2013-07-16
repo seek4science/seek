@@ -14,13 +14,13 @@ module Seek
         Seek::Rdf::RdfRepository.instance.update_rdf(self)
       end
 
-      def configured_for_rdf_send?
+      def rdf_repository_configured?
         !Seek::Rdf::RdfRepository.instance.nil? && Seek::Rdf::RdfRepository.instance.configured?
       end
 
       def related_items_from_sparql
         items = []
-        if configured_for_rdf_send?
+        if rdf_repository_configured?
           Seek::Rdf::RdfRepository.instance.uris_of_items_related_to(self).each do |uri|
             begin
               puts uri

@@ -140,7 +140,7 @@ module Seek
       end
 
       def remove_rdf
-        self.remove_rdf_from_repository if self.configured_for_rdf_send?
+        self.remove_rdf_from_repository if self.rdf_repository_configured?
         self.delete_rdf
         refresh_dependents_rdf
       end
@@ -172,7 +172,7 @@ module Seek
 
         items.compact.uniq
 
-        if (self.configured_for_rdf_send?)
+        if (self.rdf_repository_configured?)
           items = items | related_items_from_sparql
         end
 
