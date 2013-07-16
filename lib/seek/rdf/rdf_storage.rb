@@ -1,7 +1,13 @@
 module Seek
   module Rdf
+    #provides methods related to storing Rdf, in particular in files, but also includes RdfRepositoryStorage to support
+    #storage in a triple store if configured
     module RdfStorage
       include RdfRepositoryStorage
+
+      #saves the RDF to a file according to the configured filestore, in a directory rdf/. Filenames are based upon the asset
+      #type, the Rails.env, and the asset id. rdf for private asset (not publically visible) are stored in a private subdirectory,
+      #and those that are public are stored in a public subdirectory
       def save_rdf
         delete_rdf
         path = self.rdf_storage_path
@@ -13,6 +19,7 @@ module Seek
         path
       end
 
+      #deletes any files that contain the rdf for this item, either from public or private subdirectories.
       def delete_rdf
         public_path = public_rdf_storage_path
         private_path = private_rdf_storage_path
@@ -20,14 +27,17 @@ module Seek
         FileUtils.rm(private_path) if File.exists?(private_path)
       end
 
+      #returns the path that rdf for non publicly visible assets are stored.
       def private_rdf_storage_path
         rdf_storage_path "private"
       end
 
+      #returns the path that rdf for publicly visible assets are stored.
       def public_rdf_storage_path
         rdf_storage_path "public"
       end
 
+      #returns the path that rdf for this item will be stored, according to its visibility
       def rdf_storage_path inner_dir=nil?
         inner_dir ||= self.can_view?(nil) ? "public" : "private"
         path = File.join(Seek::Config.rdf_filestore_path,inner_dir)
@@ -39,6 +49,7 @@ module Seek
         File.join(path,filename)
       end
 
+      #the generated filename for this asset, based upon its type, the Rails.env, and its id
       def rdf_storage_filename
         "#{self.class.name}-#{Rails.env}-#{self.id}.rdf"
       end
