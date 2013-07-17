@@ -3,6 +3,7 @@ require 'rdf/rdfxml'
 
 module Seek
   module Rdf
+    #A specialization of RdfRepository, to support the Open Virtuoso Quad Store.
     class VirtuosoRepository < RdfRepository
 
       include Singleton
@@ -25,8 +26,6 @@ module Seek
       end
 
       private
-
-
 
       def read_configuration
         if configured?

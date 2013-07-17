@@ -36,6 +36,7 @@ class RdfTripleStoreTest < ActionController::IntegrationTest
 
     test "configured for send" do
       assert @repository.configured?
+      assert @project.rdf_repository_configured?
     end
 
     test "send to store" do
@@ -75,7 +76,6 @@ class RdfTripleStoreTest < ActionController::IntegrationTest
       assert sop.can_view?(nil)
 
       @repository.send_rdf(sop)
-      sop.save_rdf
       subject=sop.rdf_resource
 
       q = @repository.query.select.where([subject, :p, :o]).from(@graph)
@@ -108,7 +108,6 @@ class RdfTripleStoreTest < ActionController::IntegrationTest
       assert !sop.can_view?(nil)
 
       @repository.send_rdf(sop)
-      sop.save_rdf
       subject=sop.rdf_resource
 
       q = @repository.query.select.where([subject, :p, :o]).from(@graph)
@@ -133,7 +132,7 @@ class RdfTripleStoreTest < ActionController::IntegrationTest
 
     test "remove even after a change" do
       @repository.send_rdf(@project)
-      @project.save_rdf
+
 
       @project.title="new title"
       @project.save!
@@ -177,7 +176,7 @@ class RdfTripleStoreTest < ActionController::IntegrationTest
 
     test "update rdf" do
       @repository.send_rdf(@project)
-      @project.save_rdf
+
 
       title = @project.title
 
@@ -212,9 +211,9 @@ class RdfTripleStoreTest < ActionController::IntegrationTest
     test "update rdf change visibility" do
       sop = Factory(:sop,:policy=>Factory(:public_policy))
       assert sop.can_view?(nil)
-      sop.delete_rdf
+
       @repository.update_rdf(sop)
-      sop.save_rdf
+
 
       subject = sop.rdf_resource
 
@@ -232,8 +231,6 @@ class RdfTripleStoreTest < ActionController::IntegrationTest
       assert !sop.can_view?(nil), "the sop should now be hidden"
 
       @repository.update_rdf(sop)
-      sop.delete_rdf
-      sop.save_rdf
 
       q = @repository.query.select.where([subject, :p, :o]).from(@graph)
       result = @repository.select(q)
@@ -253,8 +250,6 @@ class RdfTripleStoreTest < ActionController::IntegrationTest
       assert sop.can_view?(nil),"The sop should now be visible"
 
       @repository.update_rdf(sop)
-      sop.delete_rdf
-      sop.save_rdf
 
       q = @repository.query.select.where([subject, :p, :o]).from(@graph)
       result = @repository.select(q)

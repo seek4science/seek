@@ -22,17 +22,17 @@ class RDFGenerationTest < ActiveSupport::TestCase
 
   test "rdf storage path" do
     public = Factory(:assay, :policy=>Factory(:public_policy))
-    assert_equal File.join(Rails.root,"tmp/testing-filestore/tmp/rdf/public","Assay-test-#{public.id}.rdf"), public.rdf_storage_path
+    assert_equal File.join(Rails.root,"tmp/testing-filestore/rdf/public","Assay-test-#{public.id}.rdf"), public.rdf_storage_path
 
     private = Factory(:assay, :policy=>Factory(:private_policy))
-    assert_equal File.join(Rails.root,"tmp/testing-filestore/tmp/rdf/private","Assay-test-#{private.id}.rdf"), private.rdf_storage_path
+    assert_equal File.join(Rails.root,"tmp/testing-filestore/rdf/private","Assay-test-#{private.id}.rdf"), private.rdf_storage_path
   end
 
   test "save rdf" do
     assay = Factory(:assay, :policy=>Factory(:public_policy))
     assert assay.can_view?(nil)
 
-    expected_rdf_file = File.join(Rails.root,"tmp/testing-filestore/tmp/rdf/public","Assay-test-#{assay.id}.rdf")
+    expected_rdf_file = File.join(Rails.root,"tmp/testing-filestore/rdf/public","Assay-test-#{assay.id}.rdf")
     FileUtils.rm expected_rdf_file if File.exists?(expected_rdf_file)
 
     assay.save_rdf
@@ -51,7 +51,7 @@ class RDFGenerationTest < ActiveSupport::TestCase
     sop = Factory(:sop, :policy=>Factory(:private_policy))
     assert !sop.can_view?(nil)
 
-    expected_rdf_file = File.join(Rails.root,"tmp/testing-filestore/tmp/rdf/private","Sop-test-#{sop.id}.rdf")
+    expected_rdf_file = File.join(Rails.root,"tmp/testing-filestore/rdf/private","Sop-test-#{sop.id}.rdf")
     FileUtils.rm expected_rdf_file if File.exists?(expected_rdf_file)
 
     sop.save_rdf
@@ -71,8 +71,8 @@ class RDFGenerationTest < ActiveSupport::TestCase
       assay = Factory(:assay, :policy=>Factory(:public_policy))
       assert assay.can_view?(nil)
 
-      public_rdf_file = File.join(Rails.root,"tmp/testing-filestore/tmp/rdf/public","Assay-test-#{assay.id}.rdf")
-      private_rdf_file = File.join(Rails.root,"tmp/testing-filestore/tmp/rdf/private","Assay-test-#{assay.id}.rdf")
+      public_rdf_file = File.join(Rails.root,"tmp/testing-filestore/rdf/public","Assay-test-#{assay.id}.rdf")
+      private_rdf_file = File.join(Rails.root,"tmp/testing-filestore/rdf/private","Assay-test-#{assay.id}.rdf")
       FileUtils.rm public_rdf_file if File.exists?(public_rdf_file)
       FileUtils.rm private_rdf_file if File.exists?(private_rdf_file)
 

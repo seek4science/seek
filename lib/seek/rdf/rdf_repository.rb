@@ -1,5 +1,16 @@
 module Seek
   module Rdf
+    #This is the base class of all rdf repositories, and can be considered an Abstract class. A subclass specialization
+    #is required to support a given repository - an example of which is VirtuosoRepository.
+    #
+    #the base class must at least implement the methods
+    #   get_configuration - supplies a configuration class
+    #   get_query_object - supplies class for of Rdf::Query
+    #   get_repository_object - supplies an instance of Rdf::Repository
+    #
+    #   config_filename - the filename (without the full path) of the configuration file, which will be found in config/
+    #   enabled_for_environment? - indicates whether the repository has been configured for the given Rails.env
+    #
     class RdfRepository
 
         def self.instance
@@ -23,7 +34,7 @@ module Seek
           get_repository_object.delete *args
         end
 
-        def send_rdf(item,graphs=rdf_graph_uris(item))
+        def send_rdf(item,graphs=rdf_graph_uris(item), save_file = true)
           if configured?
             connect_to_repository
             with_statements(item) do |statement|
@@ -35,12 +46,13 @@ module Seek
                 Rails.logger.error("Invalid statement - '#{statement}'")
               end
             end
+            item.save_rdf if save_file
           else
             Rails.logger.warn "Attempting to send rdf, but not configured"
           end
         end
 
-        def remove_rdf(item,graphs=[get_configuration.public_graph,get_configuration.private_graph].compact)
+        def remove_rdf(item,graphs=[get_configuration.public_graph,get_configuration.private_graph].compact,delete_file = true)
           if configured?
             connect_to_repository
             rdf_file_path = last_rdf_file_path(item)
@@ -53,6 +65,7 @@ module Seek
                 end
               end
             end
+            item.delete_rdf if delete_file
           end
         end
 
@@ -62,10 +75,10 @@ module Seek
             graphs = rdf_graph_uris(item)
             rdf_file_path = last_rdf_file_path(item)
             if !graphs.include?(get_configuration.public_graph) && !rdf_file_path.nil?
-              remove_rdf(item,[get_configuration.public_graph])
+              remove_rdf(item,[get_configuration.public_graph],false)
             end
             if graphs.include?(get_configuration.public_graph) && rdf_file_path == item.private_rdf_storage_path
-              send_rdf(item,[get_configuration.public_graph])
+              send_rdf(item,[get_configuration.public_graph],false)
             end
             old_statements = []
             unless rdf_file_path.nil?
@@ -99,6 +112,8 @@ module Seek
                 end
               end
             end
+            item.delete_rdf
+            item.save_rdf
           end
         end
 
