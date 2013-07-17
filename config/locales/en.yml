@@ -8,6 +8,6 @@ en:
 
   #Assay
   assays:
-    assay: "Assay"
-    experimental_assay: "Experimental Assay"
-    modelling_analysis:  "Modelling Analysis"
+    assay: "Experiment"
+    experimental_assay: "Wetlab experiment"
+    modelling_analysis:  "Modelling analysis"

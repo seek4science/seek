@@ -1,7 +1,7 @@
 <%= javascript_include_tag 'strain.js' -%>
 <%
  select_truncate_length=120
-@assay_text=@assay.is_modelling? ? "#{t('assays.modelling_analysis')}" : "#{t('assays.experimental_assay')}"
+@assay_text=@assay.is_modelling? ? "#{t('assays.modelling_analysis')}" : "#{t('assays.assay')}"
 @assay_type_text=@assay.is_modelling? ? "biological problem addressed" : "#{t('assays.assay').downcase} type"
 %>
 <%= javascript_include_tag "assays.js"  %>
@@ -113,7 +113,7 @@
 
 <%= render :partial => "assets/associate_data_file",:locals=>{:f=>f, :resource => @assay,:show_relationships=>@assay.is_modelling?} -%>
 
-<%= render :partial => "assets/publication_relation_form", :locals => { :resource_type => (@assay.is_modelling? ? t('assays.modelling_analysis') : t('assays.experimental_assay')),
+<%= render :partial => "assets/publication_relation_form", :locals => { :resource_type => (@assay.is_modelling? ? t('assays.modelling_analysis') : t('assays.assay')),
                                                                         :related_publications => @assay.related_publications} -%>
 
 <% end -%>
