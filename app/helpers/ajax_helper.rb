@@ -2,19 +2,18 @@
 module AjaxHelper
 
   def link_to_with_callbacks name, options={}, html_options={}
-    html_options = html_options.merge(:onclick=> remote_function(options))
-    html_options = html_options.merge(:remote => true) if html_options[:remote].nil?
-    link_to name, "#", html_options
+
+    #replacing remote_funtion to use the form_callback_javascript to handle the callbacks straight-forward.
+    #However handling the :with=> element is quite tricky to solve, so for now continuing to use remote_function
+    html_options[:onclick]=remote_function(options)+";#{html_options[:onclick]}"
+    html_options[:remote]=false
+    html = link_to name,"#",html_options
+    html.html_safe
   end
 
   def button_to_with_callbacks name, options={}, html_options={}
-
-    html_options[:value]=name
-    html_options[:onclick]=remote_function(options)
     html_options[:type]="button"
-    html = tag("input",html_options)
-
-    html.html_safe
+    link_to_with_callbacks name,options,html_options
   end
 
   def form_tag_with_callbacks url_for_options = {}, options = {}, &block
