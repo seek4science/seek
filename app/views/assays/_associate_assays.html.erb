@@ -79,7 +79,7 @@
       <%= check_box_tag :include_other_project_assays, nil, false, {:onchange=>"toggle_assay_list();",:style=>"margin-top:0.5em;"} -%> Associate <%= assay_class_text -%> from other projects?
     </div>
   
-    <%= render :partial => 'assets/preview_box', :locals => {:preview_name => t('assays.assay')}%>
+    <%= render :partial => 'assets/preview_box', :locals => {:preview_name => 'assay'}%>
   
   </div>
 </div>
