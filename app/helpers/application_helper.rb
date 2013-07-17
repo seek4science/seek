@@ -365,7 +365,7 @@ module ApplicationHelper
   end
   
   def workgroup_member_review_popup_link resource_type=nil
-    return link_to_remote_redbox("<b>Review members, set individual<br/>permissions and add afterwards</b>", 
+    return link_to_remote_redbox("<b>Review members, set individual<br/>permissions and add afterwards</b>".html_safe,
       { :url => review_work_group_url("type", "id", "access_type"),
         :failure => "alert('Sorry, an error has occurred.'); RedBox.close();",
         :with => "'resource_type=' + '#{resource_type}'" },
