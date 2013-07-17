@@ -55,6 +55,8 @@ SEEK::Application.configure do
   ActiveSupport::Inflector.inflections do |inflect|
     inflect.human 'Specimen', (I18n.t "biosamples.sample_parent_term").capitalize  unless (I18n.t "biosamples.sample_parent_term").blank?
     inflect.human 'specimen', (I18n.t "biosamples.sample_parent_term").capitalize  unless (I18n.t "biosamples.sample_parent_term").blank?
+    inflect.human 'Assay', (I18n.t "assays.assay").capitalize  unless (I18n.t "assays.assay").blank?
+    inflect.human 'assay', (I18n.t "assays.assay").capitalize  unless (I18n.t "assays.assay").blank?
   end
 
 

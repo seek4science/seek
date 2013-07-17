@@ -1,7 +1,7 @@
 <%= render :partial => "general/item_title",:locals=>{:item=>@assay} %>
 
 <%
-@assay_word=@assay.is_modelling? ? "Analysis" : "Assay" %>
+@assay_word=@assay.is_modelling? ? t('assays.modelling_analysis') : t('assays.assay') %>
 <ul class="sectionIcons">
     <%= render :partial => "subscriptions/subscribe", :locals => {:object => @assay }%>
     <% if @assay.can_manage? -%>
@@ -11,7 +11,7 @@
     <% end -%>
     <%= delete_icon(@assay,current_user) %>
     <% if logged_in? and current_user.person.member? %>
-      <li><%= image_tag_for_key('new', new_object_based_on_existing_one_path(:controller_name=>"assays", :id=>@assay.id), nil, nil, "New #{t('assays.assay')} based on this one") %></li>
+      <li><%= image_tag_for_key('new', new_object_based_on_existing_one_path(:controller_name=>"assays", :id=>@assay.id), nil, nil, "New #{@assay_word} based on this one") %></li>
     <% end %>
 </ul>
 

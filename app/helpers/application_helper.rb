@@ -365,7 +365,7 @@ module ApplicationHelper
   end
   
   def workgroup_member_review_popup_link resource_type=nil
-    return link_to_remote_redbox("<b>Review members, set individual<br/>permissions and add afterwards</b>", 
+    return link_to_remote_redbox("<b>Review members, set individual<br/>permissions and add afterwards</b>".html_safe,
       { :url => review_work_group_url("type", "id", "access_type"),
         :failure => "alert('Sorry, an error has occurred.'); RedBox.close();",
         :with => "'resource_type=' + '#{resource_type}'" },
@@ -588,12 +588,12 @@ module ApplicationHelper
     end
   end
 
-  NO_DELETE_EXPLANTIONS={Assay=>"You cannot delete this #{t('assays.assay')}. It might be published or it has items associated with it.",
-                         Study=>"You cannot delete this Study. It might be published or it has #{t('assays.assay').pluralize} associated with it.",
+  NO_DELETE_EXPLANTIONS={Assay=>"You cannot delete this #{I18n.t('assays.assay')}. It might be published or it has items associated with it.",
+                         Study=>"You cannot delete this Study. It might be published or it has #{I18n.t('assays.assay').pluralize} associated with it.",
                          Investigation=>"You cannot delete this Investigation. It might be published or it has Studies associated with it." ,
                          Strain=>"You cannot delete this Strain. It might be published or it has #{I18n.t 'biosamples.sample_parent_term'}s/Samples associated with it.",
                          Specimen=>"You cannot delete this #{I18n.t 'biosamples.sample_parent_term'}. It might be published or it has Samples associated with it.",
-                         Sample=>"You cannot delete this Sample. It might be published or it has #{t('assays.assay').pluralize} associated with it."
+                         Sample=>"You cannot delete this Sample. It might be published or it has #{I18n.t('assays.assay').pluralize} associated with it."
   }
 
   def delete_icon model_item, user
@@ -616,7 +616,7 @@ module ApplicationHelper
 
 
   private  
-  PAGE_TITLES={"home"=>"Home", "projects"=>"Projects","institutions"=>"Institutions", "people"=>"People", "sessions"=>"Login","users"=>"Signup","search"=>"Search","assays"=>"Assays","sops"=>"SOPs","models"=>"Models","data_files"=>"Data","publications"=>"Publications","investigations"=>"Investigations","studies"=>"Studies","specimens"=>"Specimens","samples"=>"Samples","presentations"=>"Presentations"}
+  PAGE_TITLES={"home"=>"Home", "projects"=>"Projects","institutions"=>"Institutions", "people"=>"People", "sessions"=>"Login","users"=>"Signup","search"=>"Search","assays"=>I18n.t('assays.assay').pluralize.capitalize,"sops"=>"SOPs","models"=>"Models","data_files"=>"Data","publications"=>"Publications","investigations"=>"Investigations","studies"=>"Studies","specimens"=>"Specimens","samples"=>"Samples","presentations"=>"Presentations"}
 end
 
 class ApplicationFormBuilder< ActionView::Helpers::FormBuilder
