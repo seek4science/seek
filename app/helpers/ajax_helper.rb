@@ -3,8 +3,9 @@ module AjaxHelper
 
   def link_to_with_callbacks name, options={}, html_options={}
 
-    #replacing remote_funtion to use the form_callback_javascript to handle the callbacks straight-forward.
-    #However handling the :with=> element is quite tricky to solve, so for now continuing to use remote_function
+    # Replacing remote_funtion and instead using the form_callback_javascript to handle the callbacks is straight-forward, and can be used the exactly as in
+    # form_for_with_callbacks.
+    # However handling the :with=> element is quite tricky to solve, so for now continuing to use remote_function
     html_options[:onclick]=remote_function(options)+";#{html_options[:onclick]}"
     html_options[:remote]=false
     html = link_to name,"#",html_options
