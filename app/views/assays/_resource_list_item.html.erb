@@ -1,5 +1,5 @@
 <%
-   @assay_text=resource.is_modelling? ? "Analysis" : "Assay"
+   @assay_text=resource.is_modelling? ? t('assays.modelling_analysis') : t('assays.experimental_assay')
 %>
 
 <%= list_item_title resource %>

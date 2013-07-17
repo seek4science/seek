@@ -1,7 +1,7 @@
 <%= javascript_include_tag 'strain.js' -%>
 <%
  select_truncate_length=120
-@assay_text=@assay.is_modelling? ? "#{t('assays.modelling_analysis').downcase}" : "#{t('assays.experimental_assay').downcase}"
+@assay_text=@assay.is_modelling? ? "#{t('assays.modelling_analysis')}" : "#{t('assays.experimental_assay')}"
 @assay_type_text=@assay.is_modelling? ? "biological problem addressed" : "#{t('assays.assay').downcase} type"
 %>
 <%= javascript_include_tag "assays.js"  %>
@@ -37,7 +37,7 @@
       <div id="full_study_title" style="display:none; position: absolute; border: 1px solid black; background-color: #FFFF88; padding: 5px; text-align:left;"></div>
     <%= f.label :study -%>
     <span class="required">*</span>
-     <%= link_to h(" New Study?"),new_study_path(:new_link_from_assay=>true), :onclick => "window.open(this.href);return false;" %> <br/>
+     <%= link_to h(" New study?"),new_study_path(:new_link_from_assay=>true), :onclick => "window.open(this.href);return false;" %> <br/>
     <% investigations = Investigation.all.select &:can_view? -%>
       <% options = @assay.study.nil? ? "<option value=\"\">Not specified</option>"  : "" %>
       <% investigations.each do |i| %>
@@ -113,7 +113,7 @@
 
 <%= render :partial => "assets/associate_data_file",:locals=>{:f=>f, :resource => @assay,:show_relationships=>@assay.is_modelling?} -%>
 
-<%= render :partial => "assets/publication_relation_form", :locals => { :resource_type => "Assay",
+<%= render :partial => "assets/publication_relation_form", :locals => { :resource_type => (@assay.is_modelling? ? t('assays.modelling_analysis') : t('assays.experimental_assay')),
                                                                         :related_publications => @assay.related_publications} -%>
 
 <% end -%>
