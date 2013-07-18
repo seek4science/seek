@@ -137,6 +137,7 @@ class SamplesController < ApplicationController
 
       if @sample.save
         deliver_request_publish_approval params[:sharing], @sample
+        #TODO CONFIG improve configurability. Configuration currently is deduced from other parameters
         if tissue_and_cell_types.blank?
           @sample.tissue_and_cell_types= tissue_and_cell_types
           @sample.save
