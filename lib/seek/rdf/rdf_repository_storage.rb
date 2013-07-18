@@ -3,7 +3,7 @@ module Seek
     #Module that works in conjuction with RdfStorage to support maintaning the RDF in a triple store as well as those stored on
     #file
     module RdfRepositoryStorage
-      include RdfStorage
+      include RdfFileStorage
       #Will send the rdf related to self to the configured repository. This will not remove previously existing triples.
       #It will also updated the saved file containing the latest rdf
       def send_rdf_to_repository

@@ -21,7 +21,7 @@ class RdfTripleStoreTest < ActionController::IntegrationTest
         q = @repository.query.delete([:s, :p, :o]).graph(@public_graph).where([:s, :p, :o])
         @repository.delete(q)
 
-        @project.delete_rdf
+        @project.delete_rdf_file
       end
     end
 
@@ -51,7 +51,7 @@ class RdfTripleStoreTest < ActionController::IntegrationTest
     test "remove public from store" do
       assert @project.can_view?(nil)
       @repository.send_rdf(@project)
-      @project.save_rdf
+      @project.save_rdf_file
 
       q = @repository.query.select.where([@subject, :p, :o]).from(@graph)
       result = @repository.select(q)
@@ -100,7 +100,7 @@ class RdfTripleStoreTest < ActionController::IntegrationTest
       result = @repository.select(q)
       assert_equal 0,result.count
 
-      sop.delete_rdf
+      sop.delete_rdf_file
     end
 
     test "remove private from store" do
@@ -127,7 +127,7 @@ class RdfTripleStoreTest < ActionController::IntegrationTest
       result = @repository.select(q)
       assert_equal 0,result.count
 
-      sop.delete_rdf
+      sop.delete_rdf_file
     end
 
     test "remove even after a change" do
@@ -264,7 +264,7 @@ class RdfTripleStoreTest < ActionController::IntegrationTest
       assert_equal 1,result.count
       assert_equal "Updated Title",result[0][:o].value
 
-      sop.delete_rdf
+      sop.delete_rdf_file
     end
 
 
