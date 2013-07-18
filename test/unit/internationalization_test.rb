@@ -14,8 +14,8 @@ class InternationalizationTest < ActiveSupport::TestCase
   test "assay" do
     as_not_virtualliver do
       assert_equal "Assay", (I18n.t "assays.assay")
-      assert_equal "Experimental Assay", (I18n.t "assays.experimental_assay")
-      assert_equal "Modelling Analysis", (I18n.t "assays.modelling_analysis")
+      assert_equal "Experimental assay", (I18n.t "assays.experimental_assay")
+      assert_equal "Modelling analysis", (I18n.t "assays.modelling_analysis")
     end
   end
 
