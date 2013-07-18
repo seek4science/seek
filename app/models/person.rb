@@ -46,7 +46,7 @@ class Person < ActiveRecord::Base
   validates_format_of :email,:with=>RFC822::EmailAddress
   validates_format_of :web_page, :with=>/(^$)|(^(http|https):\/\/[a-z0-9]+([\-\.]{1}[a-z0-9]+)*\.[a-z]{2,5}(([0-9]{1,5})?\/.*)?$)/ix,:allow_nil=>true,:allow_blank=>true
 
-  validates_uniqueness_of :email,:case_sensitive => false
+  #validates_uniqueness_of :email,:case_sensitive => false
 
   has_and_belongs_to_many :disciplines
 
