@@ -34,7 +34,7 @@
 
 </div>
 
-<h2>Related assays</h2>
+<h2>Related <%= t('assays.assay').downcase.pluralize %></h2>
 <div class="list_items_container">
   <%= render :partial => "assets/resource_list_item", :collection=>@authorized_assays -%>
 </div>
