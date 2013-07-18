@@ -278,21 +278,21 @@ class AdminsController < ApplicationController
     respond_to do |format|
       case type
         when "invalid_users"
-          format.js { render :partial => "admins/invalid_user_stats_list", :locals => { :collection => collection} }
+          format.html { render :partial => "admins/invalid_user_stats_list", :locals => { :collection => collection} }
         when "users"
-          format.js { render :partial => "admins/user_stats_list", :locals => { :title => title, :collection => collection} }
+          format.html { render :partial => "admins/user_stats_list", :locals => { :title => title, :collection => collection} }
         when "content_stats"
-          format.js { render :partial => "admins/content_stats", :locals => {:stats => Seek::ContentStats.generate} }
+          format.html { render :partial => "admins/content_stats", :locals => {:stats => Seek::ContentStats.generate} }
         when "activity_stats"
-          format.js { render :partial => "admins/activity_stats", :locals => {:stats => Seek::ActivityStats.new} }
+          format.html { render :partial => "admins/activity_stats", :locals => {:stats => Seek::ActivityStats.new} }
         when "search_stats"
-          format.js { render :partial => "admins/search_stats", :locals => {:stats => Seek::SearchStats.new} }
+          format.html { render :partial => "admins/search_stats", :locals => {:stats => Seek::SearchStats.new} }
         when "job_queue"
-          format.js { render :partial => "admins/job_queue" }
+          format.html { render :partial => "admins/job_queue" }
         when "auth_consistency"
-          format.js { render :partial => "admins/auth_consistency" }
+          format.html { render :partial => "admins/auth_consistency" }
         when "none"
-          format.js { render :text=>"" }
+          format.html { render :text=>"" }
       end
     end
   end
