@@ -114,7 +114,7 @@ module DotGenerator
     end
 
     def tooltip
-      item_type.upcase + ": " + label
+      item_type.humanize.upcase + ": " + label
     end
 
     def label
