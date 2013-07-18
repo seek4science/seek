@@ -147,6 +147,7 @@ class AdminsControllerTest < ActionController::TestCase
 
     xml_http_request :get,:get_stats,{:id=>"job_queue"}
     assert_response :success
+
     assert_select "p",:text=>"Total delayed jobs waiting = 1"
     assert_select "tr" do
       assert_select "td",:text=>/11th September 2010 at/,:count=>1
