@@ -1,6 +1,12 @@
-Wed, 12 Jun 2013 11:51:09 +0100
-doc/BACKUPS	Fri, 22 Mar 2013 10:24:08 +0000
-doc/README_FOR_APP	Tue, 07 May 2013 14:17:21 +0100
-doc/CREDITS	Fri, 19 Apr 2013 15:47:13 +0100
-doc/UPGRADING	Wed, 12 Jun 2013 11:50:35 +0100
-doc/INSTALL	Wed, 12 Jun 2013 11:48:34 +0100
+Thu, 18 Jul 2013 16:57:05 +0100
+doc/README_FOR_APP	Tue, 07 May 2013 16:42:07 +0100
+doc/CREDITS	Thu, 11 Jul 2013 10:04:57 +0100
+doc/INSTALL	Thu, 18 Jul 2013 16:36:47 +0100
+doc/UPGRADING	Wed, 12 Jun 2013 11:52:48 +0100
+doc/BACKUPS	Fri, 22 Feb 2013 15:26:21 +0000
+doc/setting_up_virtuoso	Thu, 18 Jul 2013 16:56:54 +0100
+lib/seek/rdf/rdf_repository.rb	Thu, 18 Jul 2013 16:11:04 +0100
+lib/seek/rdf/rdf_repository_storage.rb	Thu, 18 Jul 2013 16:06:04 +0100
+lib/seek/rdf/rdf_file_storage.rb	Thu, 18 Jul 2013 16:10:01 +0100
+lib/seek/rdf/virtuoso_repository.rb	Tue, 16 Jul 2013 14:13:53 +0100
+lib/seek/rdf/rdf_generation.rb	Tue, 16 Jul 2013 14:05:06 +0100

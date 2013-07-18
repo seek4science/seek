@@ -4,7 +4,7 @@
 <head>
 <meta content="text/html; charset=utf-8" http-equiv="Content-Type">
 
-<title>BACKUPS - Sysmo-SEEK Technical and API Documentation</title>
+<title>module Seek::Rdf - Sysmo-SEEK Technical and API Documentation</title>
 
 <link type="text/css" media="screen" href="../rdoc.css" rel="stylesheet">
 
@@ -20,7 +20,7 @@
 <script type="text/javascript" charset="utf-8" src="../js/darkfish.js"></script>
 
 
-<body class="file">
+<body id="top" class="module">
 <nav id="metadata">
   <nav id="home-section" class="section">
   <h3 class="section-header">
@@ -42,6 +42,28 @@
   <ul id="search-results" class="initially-hidden"></ul>
 </nav>
 
+
+  <div id="file-metadata">
+    <nav id="file-list-section" class="section">
+  <h3 class="section-header">Defined In</h3>
+  <ul>
+    <li>lib/seek/rdf/rdf_repository.rb
+    <li>lib/seek/rdf/rdf_repository_storage.rb
+    <li>lib/seek/rdf/rdf_file_storage.rb
+    <li>lib/seek/rdf/virtuoso_repository.rb
+    <li>lib/seek/rdf/rdf_generation.rb
+  </ul>
+</nav>
+
+    
+  </div>
+
+  <div id="class-metadata">
+    
+    
+    
+    
+  </div>
 
   <div id="project-metadata">
     <nav id="fileindex-section" class="section project-section">
@@ -91,76 +113,30 @@
   </div>
 </nav>
 
-<div id="documentation" class="description">
+<div id="documentation">
+  <h1 class="module">module Seek::Rdf</h1>
+
+  <div id="description" class="description">
+    
+  </div><!-- description -->
+
   
-<h1 id="label-Backing+Up">Backing Up</h1>
+  
+  
+  <section id="5Buntitled-5D" class="documentation-section">
+    
 
-<h2 id="label-Backing+up+the+database">Backing up the database</h2>
+    
 
-<p>You can backup the database using <a
-href="http://linuxcommand.org/man_pages/mysqldump1.html">mysqldump</a>
-using the following syntax. The database name, username and password
-follows that which was used in the install guide - however the username and
-password should be different for you if you’d changed them as suggested.</p>
+    
 
-<pre>mysqldump -umysqluser -pmysqlpassword seek_production &gt; seek_production.sql</pre>
+    
 
-<h2 id="label-Backing+up+files">Backing up files</h2>
+    <!-- Methods -->
+    
+  </section><!-- 5Buntitled-5D -->
 
-<p>The is also no harm in backing up the entire SEEK directory, however the
-essential directory to backup it the <em>filestore/</em> directory. This is
-the directory that contains all asset files, and other potentially
-important files.</p>
-
-<h2 id="label-Restoring">Restoring</h2>
-
-<p>Should you ever need to restore the database you can do so by logging into
-mysql</p>
-
-<pre>mysql -umysqluser -pmysqlpassword</pre>
-
-<p>and creating the database (assuming it no longer exists), connecting to it,
-and importing the dump:</p>
-
-<pre>&gt;create database seek_production;
-&gt;\r seek_production
-&gt;\. ./seek_production.sql</pre>
-
-<p>The files can be restored simply by copying the <em>filestore/</em>
-directory back into the SEEK root directory.</p>
-
-<h2 id="label-Incremental+Backups">Incremental Backups</h2>
-
-<p>Incremental backups allow you to recover a particular version of the backup
-from a given point in time, depending upon the frequency of the backup and
-when the back ups started.</p>
-
-<p>For our own SEEK deployments, we use <a
-href="http://www.gnu.org/savannah-checkouts/non-gnu/rdiff-backup/">rdiff-backup</a>
-within a simple script that is run nightly using <a
-href="http://crontab.org/">crontab</a>. e.g.</p>
-
-<pre>#!/bin/sh
-
-logger &quot;Local Rdiff backup started&quot;
-
-BACKUPDIR=/var/backups/seek
-INCLUDE=/etc/rdiff-backup/backup.include
-EXCLUDE=/etc/rdiff-backup/backup.exclude
-
-/usr/bin/rdiff-backup --terminal-verbosity 9 --print-statistics --terminal-verbosity 2  --exclude-globbing-filelist $EXCLUDE  --include-globbing-filelist $INCLUDE  --exclude / / $BACKUPDIR
-
-logger &quot;Local Rdiff backup complete&quot;</pre>
-
-<p>where <em>backup.include</em> is a file that includes a list of paths
-(files or directories) to be backed up, and <em>backup.exclude</em> is a
-list of paths that should be excluded.</p>
-
-<p><em>BACKUPDIR</em> can also be an ssh url, e.g
-<em>backup@backupserver.co.uk:/var/local/backup/</em></p>
-
-</div>
-
+</div><!-- documentation -->
 
 
 <footer id="validator-badges">

@@ -6,7 +6,7 @@ SEEK is based upon the Ruby on Rails platform. Although the information on this 
 SEEK up and running, some background reading on Ruby on Rails would be beneficial if it is new to you. Documentation and resources describing Ruby on Rails can be found
 at http://rubyonrails.org/documentation. Since SEEK uses v2.3 of Rails, http://guides.rubyonrails.org/v2.3.11/ and http://api.rubyonrails.org/v2.3.11 may be useful as well.
 
-We recommend that you run SEEK on a Linux system. All of the examples here describe installing on an Ubuntu (10.04 LTS) or Debian system, but should be easily transferrable to other Linux systems such as Fedora or CentOS.
+We recommend that you run SEEK on a Linux system. All of the examples here describe installing on an Ubuntu (10.04 LTS) or Debian system, but should be easily transferable to other Linux systems such as Fedora or CentOS.
 
 Although possible, installing and running Ruby on Rails on a Windows system is troublesome and is not covered here.
 

@@ -11,15 +11,19 @@ namespace :doc do
     rdoc.options << '--line-numbers' << '--inline-source'
     rdoc.options << '--charset' << 'utf-8'
     rdoc.rdoc_files.include('doc/README_FOR_APP')
-#    rdoc.rdoc_files.include('doc/JERM')
-#    rdoc.rdoc_files.include('doc/ARCHITECTURE')
+
     rdoc.rdoc_files.include('doc/CREDITS')
     rdoc.rdoc_files.include('doc/INSTALL')
     rdoc.rdoc_files.include('doc/UPGRADING')
     rdoc.rdoc_files.include('doc/BACKUPS')
+    rdoc.rdoc_files.include('doc/setting_up_virtuoso')
 #    rdoc.rdoc_files.include('app/**/*.rb')
 
-#    rdoc.rdoc_files.include('lib/jerm/resource.rb')
+    rdoc.rdoc_files.include('lib/seek/rdf/rdf_repository.rb')
+    rdoc.rdoc_files.include('lib/seek/rdf/rdf_repository_storage.rb')
+    rdoc.rdoc_files.include('lib/seek/rdf/rdf_file_storage.rb')
+    rdoc.rdoc_files.include('lib/seek/rdf/virtuoso_repository.rb')
+    rdoc.rdoc_files.include('lib/seek/rdf/rdf_generation.rb')
 #    rdoc.rdoc_files.include('lib/jerm/harvester.rb')
 #    rdoc.rdoc_files.include('lib/jerm/populator.rb')
 #    rdoc.rdoc_files.include('lib/jerm/embedded_populator.rb')
