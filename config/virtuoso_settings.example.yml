@@ -33,5 +33,5 @@ test:
   username: username
   password: password
 
-  private_graph: seek-development:private
-  public_graph: seek-development:public
+  private_graph: seek-testing:private
+  public_graph: seek-testing:public
