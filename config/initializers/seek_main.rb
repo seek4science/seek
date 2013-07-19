@@ -61,6 +61,8 @@ SEEK::Application.configure do
     inflect.human 'sop', (I18n.t "sop")
     inflect.human 'Presentation', (I18n.t "presentation")
     inflect.human 'presentation', (I18n.t "presentation")
+    inflect.human 'DataFile', (I18n.t "data_file")
+    inflect.human 'datafile', (I18n.t "data_file")
   end
 
 

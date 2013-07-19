@@ -39,7 +39,7 @@ module Jerm
     def populate resource            
       begin
         if resource.uri.blank?
-          response={:response=>:fail,:message=>"No URL to data file described"}
+          response={:response=>:fail,:message=>"No URL to #{t('data_file')} described"}
         elsif !exists?(resource)
           response=add_as_new(resource)
         else

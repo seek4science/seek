@@ -26,7 +26,7 @@ class DataFuseController < ApplicationController
       if data_file.try :can_download?
         page.replace_html element, :partial=>"data_fuse/csv_view", :locals=>{:csv=>csv}
       else
-        page.replace_html element, :text=>"Data File not found, or not authorized to examine"
+        page.replace_html element, :text=>"#{t('data_file')} not found, or not authorized to examine"
       end
     end
 

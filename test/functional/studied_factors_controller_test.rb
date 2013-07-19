@@ -282,7 +282,7 @@ class StudiedFactorsControllerTest < ActionController::TestCase
     assert df.can_edit?
     get :index, {:data_file_id => df.id, :version => df.version}
     assert_response :success
-    assert_select "div.breadcrumbs", :text => /Home > Data files Index > #{df.title} > Factors studied Index/, :count => 1 do
+    assert_select "div.breadcrumbs", :text => /Home > #{t('data_file').pluralize} Index > #{df.title} > Factors studied Index/, :count => 1 do
       assert_select "a[href=?]", root_path, :count => 1
       assert_select "a[href=?]", data_files_url, :count => 1
       assert_select "a[href=?]", data_file_url(df)

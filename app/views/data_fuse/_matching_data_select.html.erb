@@ -10,9 +10,9 @@
    end
 
 %>
-<h2>Data File (Spreadsheet)</h2>
+<h2><%= t('data_file') %> (Spreadsheet)</h2>
   <%= select_tag :data_file_id,
-          options_for_select([["Select Data file ...",0]]|selection),
+          options_for_select([["Select #{t('data_file')} ...",0]]|selection),
           {:style=>"width:55em;",:onchange=>remote_function(
             :url=>{:action=>"preview_data_file",:element=>"data_file_preview"},
             :with=>"'id='+this.value",
@@ -25,13 +25,13 @@
    } -%>
 
   <div id="data_file_preview" class="list_item">
-    <span class="none_text">No data file selected</span>
+    <span class="none_text">No <%= t('data_file') %> selected</span>
   </div>
 
 
   <div id="csv_view" class="list_item">
     <h3>Contents summary (last sheet)</h3>
-    <span class="none_text">No data file selected</span>
+    <span class="none_text">No <%= t('data_file') %> selected</span>
   </div>
       <br/> <br/>
   <%= submit_tag "Next",:disable_with=>"Submitting..." -%>

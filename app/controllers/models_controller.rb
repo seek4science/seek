@@ -583,7 +583,7 @@ class ModelsController < ApplicationController
     authorised_ids = DataFile.authorize_asset_collection(data_files,"view").collect &:id
     @matching_data_items = @matching_data_items.select{|mdf| authorised_ids.include?(mdf.primary_key.to_i)}
 
-    flash.now[:notice]="#{@matching_data_items.count} Data files found that may be relevant to this Model"
+    flash.now[:notice]="#{@matching_data_items.count} #{t('data_file').pluralize} found that may be relevant to this Model"
     respond_to do |format|
       format.html
     end

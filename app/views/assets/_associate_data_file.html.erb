@@ -4,8 +4,8 @@
 <div class="fold">
 
   <div class="foldTitle">
-    <%= help_icon("Here you associate Data file in SEEK to this #{resource_text}.") -%>
-    Data files
+    <%= help_icon("Here you associate #{t('data_file')} in SEEK to this #{resource_text}.") -%>
+    <%= t('data_file').pluralize %>
   </div>
 
   <div id="associate_data_fold_content" class="foldContent" style="display:<%= associated_data_files.blank? ? 'none' : 'block' -%>">
@@ -18,17 +18,17 @@
       -%>
       
       <p style="color: #666666;">
-        The following Data files are involved in this <%= resource_text -%>:
+        The following <%= t('data_file').pluralize %> are involved in this <%= resource_text -%>:
       </p>
       <div id="data_file_to_list" class="box_editing_inner" style="line-height: 1.5">
         <span class="none_text" id="data_files">Loading...</span>
       </div>
       <div class="association_step">
         <p style="color: #666666;">
-            You may select an existing Data file or <%= link_to h("upload a new Data file here"), new_data_file_path(:parent_name=>controller_name.underscore.singularize), :onclick => "window.open(this.href);return false;" %>  for the <%= resource_text -%>.
+            You may select an existing <%= t('data_file') %> or <%= link_to h("upload a new #{t('data_file')} here"), new_data_file_path(:parent_name=>controller_name.underscore.singularize), :onclick => "window.open(this.href);return false;" %>  for the <%= resource_text -%>.
         </p>
         <%= select_tag :possible_data_files,
-          options_for_select([["Select Data file ...",0]]|project_data_files.collect{|s| [truncate(h(s.title),:length=>select_truncate_length),s.id]}),
+          options_for_select([["Select #{t('data_file')} ...",0]]|project_data_files.collect{|s| [truncate(h(s.title),:length=>select_truncate_length),s.id]}),
           {:style=>"width:90%",:onchange=>remote_function(
             :method=>:get,
             :url=>preview_data_files_path(:element=>"data_file_preview"),
@@ -46,7 +46,7 @@
         <% end -%>
         
         <br/>
-        <%= check_box_tag :include_other_project_data_files, nil, false, {:onchange=>"toggle_data_file_list();",:style=>"margin-top:0.5em;"} -%> Associate Data files from other projects?
+        <%= check_box_tag :include_other_project_data_files, nil, false, {:onchange=>"toggle_data_file_list();",:style=>"margin-top:0.5em;"} -%> Associate <%= t('data_file').pluralize %> from other projects?
       </div>
 	  <br/>
       <%= link_to_function (image("new") + " Associate with this #{resource_text}"), "addSelectedDataFile(); return(false);", :id=>"add_data_file_link", :class=>"block_link" %>
@@ -66,7 +66,7 @@
         selection_box.options.length=0;
 
         if (checked) {
-    <% ([["Select Data file ...",0]]|all_data_files.collect{|s| [truncate(h(s.title),:length=>select_truncate_length),s.id]}).each do |df_details| -%>
+    <% ([["Select #{t('data_file')} ...",0]]|all_data_files.collect{|s| [truncate(h(s.title),:length=>select_truncate_length),s.id]}).each do |df_details| -%>
             option = document.createElement("OPTION");
             option.text = '<%= escape_javascript(df_details[0]) -%>';
             option.value = '<%= df_details[1] -%>';
@@ -79,7 +79,7 @@
     <% end -%>
         }
         else {
-    <% ([["Select Data file ...",0]]|project_data_files.collect{|s| [truncate(h(s.title),:length=>select_truncate_length),s.id]}).each do |df_details| -%>
+    <% ([["Select #{t('data_file')} ...",0]]|project_data_files.collect{|s| [truncate(h(s.title),:length=>select_truncate_length),s.id]}).each do |df_details| -%>
             option = document.createElement("OPTION");
             option.text = '<%= escape_javascript(df_details[0]) -%>';
             option.value = '<%= df_details[1] -%>';

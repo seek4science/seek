@@ -101,7 +101,7 @@ module Seek
         end
 
         if template_sheet.nil? && samples_sheet.nil?
-          @errors << "This data file does not match the given template."
+          @errors << "This #{t('data_file')} does not match the given template."
           raise  @errors
         end
 

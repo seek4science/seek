@@ -62,7 +62,7 @@
     } -%>
 
     <%= render :partial=>'setting_li',:locals=>{
-            :name=>"Data files",
+            :name=>t('data_file').pluralize,
             :field=>(radio_button_tag(:data_files, "latest", Seek::Config.default_page("data_files") == "latest") +
                     label_tag(:data_files_latest, "latest") +
                     radio_button_tag(:data_files, "all",Seek::Config.default_page("data_files") == "all") +

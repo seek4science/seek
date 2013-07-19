@@ -145,7 +145,7 @@ module ApplicationHelper
     Seek::Util.user_creatable_types.each do |c|
       name=c.name.underscore
       path = eval "new_#{name}_path"
-      data_file_with_sample_path = eval "new_data_file_path(:page_title=>'Data File with Sample Parsing',:is_with_sample=>true)"
+      data_file_with_sample_path = eval "new_data_file_path(:page_title=>(#{t('data_file')} + ' with Sample Parsing'),:is_with_sample=>true)"
       if c==Seek::Util.user_creatable_types.first
         script << "if "
       else
@@ -165,7 +165,7 @@ module ApplicationHelper
   #selection of assets for new asset gadget
   def new_creatable_selection_list
     creatable_options = Seek::Util.user_creatable_types.collect { |c| [c.name.underscore.humanize, c.name.underscore] }
-    creatable_options << ["Data file with sample", "data_file_with_sample"] if Seek::Config.sample_parser_enabled
+    creatable_options << ["#{t('data_file')} with sample", "data_file_with_sample"] if Seek::Config.sample_parser_enabled
     creatable_options
   end
 
@@ -551,19 +551,14 @@ module ApplicationHelper
   end
 
   def resource_tab_item_name resource_type,pluralize=true
-    if resource_type.include?"DataFile"
-      pluralize ? resource_type.titleize.pluralize : resource_type.titleize
-    elsif resource_type == "Sop"
-      pluralize ? t('sop').pluralize : t('sop')
-    elsif resource_type == "Presentation"
-      pluralize ? t('presentation').pluralize : t('presentation')
-    elsif resource_type == "Specimen"
-      pluralize ? t('biosamples.sample_parent_term').capitalize.pluralize : t('biosamples.sample_parent_term').capitalize
-    elsif resource_type == "Assay"
-      pluralize ? t('assays.assay').capitalize.pluralize : t('assays.assay').capitalize
-    else
-      pluralize ? resource_type.pluralize : resource_type
-    end
+    resource_type = resource_type.singularize
+    translated_resource_type = translate_resource_type(resource_type)
+    result = translated_resource_type.include?("translation missing") ? resource_type : translated_resource_type
+    pluralize ? result.pluralize : result
+  end
+
+  def translate_resource_type resource_type
+    t("#{resource_type}")
   end
 
   def add_return_to_search
@@ -618,7 +613,7 @@ module ApplicationHelper
 
 
   private  
-  PAGE_TITLES={"home"=>"Home", "projects"=>"Projects","institutions"=>"Institutions", "people"=>"People", "sessions"=>"Login","users"=>"Signup","search"=>"Search","assays"=>I18n.t('assays.assay').pluralize.capitalize,"sops"=>I18n.t('sop').pluralize,"models"=>"Models","data_files"=>"Data","publications"=>"Publications","investigations"=>"Investigations","studies"=>"Studies","specimens"=>"Specimens","samples"=>"Samples","presentations"=>I18n.t('presentation').pluralize}
+  PAGE_TITLES={"home"=>"Home", "projects"=>"Projects","institutions"=>"Institutions", "people"=>"People", "sessions"=>"Login","users"=>"Signup","search"=>"Search","assays"=>I18n.t('assays.assay').pluralize.capitalize,"sops"=>I18n.t('sop').pluralize,"models"=>"Models","data_files"=>I18n.t('data_file').pluralize,"publications"=>"Publications","investigations"=>"Investigations","studies"=>"Studies","specimens"=>"Specimens","samples"=>"Samples","presentations"=>I18n.t('presentation').pluralize}
 end
 
 class ApplicationFormBuilder< ActionView::Helpers::FormBuilder

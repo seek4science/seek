@@ -20,24 +20,24 @@ class AssaysController < ApplicationController
 
     unless @assay.study.can_edit?
       @assay.study = nil
-      flash.now[:notice] = "The study of the existing #{t('assays.assay').downcase} cannot be viewed, please specify your own study! <br/>".html_safe
+      flash.now[:notice] = "The Study of the existing #{t('assays.assay')} cannot be viewed, please specify your own Study! <br/>".html_safe
     end
 
     @existing_assay.data_file_masters.each do |d|
       if !d.can_view?
-       flash.now[:notice] << "Some or all data files of the existing #{t('assays.assay').downcase} cannot be viewed, you may specify your own! <br/>".html_safe
+       flash.now[:notice] << "Some or all #{t('data_file').pluralize} of the existing #{t('assays.assay')} cannot be viewed, you may specify your own! <br/>".html_safe
         break
       end
     end
     @existing_assay.sop_masters.each do |s|
        if !s.can_view?
-       flash.now[:notice] << "Some or all #{t('sop').pluralize} of the existing #{t('assays.assay').downcase} cannot be viewed, you may specify your own! <br/>".html_safe
+       flash.now[:notice] << "Some or all #{t('sop').pluralize} of the existing #{t('assays.assay')} cannot be viewed, you may specify your own! <br/>".html_safe
         break
       end
     end
     @existing_assay.model_masters.each do |m|
        if !m.can_view?
-       flash.now[:notice] << "Some or all models of the existing #{t('assays.assay').downcase} cannot be viewed, you may specify your own! <br/>".html_safe
+       flash.now[:notice] << "Some or all Models of the existing #{t('assays.assay')} cannot be viewed, you may specify your own! <br/>".html_safe
         break
       end
     end

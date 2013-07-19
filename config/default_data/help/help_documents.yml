@@ -113,7 +113,7 @@ help_documents:
       *Genotype* \xE2\x80\x93 a brief text description of the genotype\r\n\
       *Phenotype* \xE2\x80\x93 a brief text description of the phenotype\r\n\
       *Culture Growth* - This describes how the culture was grown for this assay. You can choose values from a drop-down list when adding new assays directly to SEEK\r\n\
-      *Data File Titles* \xE2\x80\x93 the title of one or many data files produced during this assay\r\n\
+      *<%= t('data_file') %> Titles* \xE2\x80\x93 the title of one or many data <%= t('data_file').downcase.pluralize %> produced during this assay\r\n\
       *<%= t('sop') %> Titles* \xE2\x80\x93 the title of one or many <%= t('sop').pluralize %> used to execute this assay\r\n\
       \r\n\
       \r\n\
@@ -136,7 +136,7 @@ help_documents:
       *Model Type* \xE2\x80\x93 what kind of mathematical equations does your model contain e.g. ODE, algebraic\r\n\
       *Model Format* \xE2\x80\x93 e.g. SBML, CellML. If uploading directly through SEEK, you will be able to chose from a drop-down list\r\n\
       *Model Execution Environment and URL* \xE2\x80\x93 how do you run a simulation on your model? This field should provide a link to a tool or resource which would allow you to run your model\r\n\
-      *Linking Models to Data* \xE2\x80\x93 this section allows you to specify how and where data files were used to a) construct your model b) validate your model, or c) record simulation results from your model. If you are uploading directly through SEEK, you can find the relevant files by searching a drop-down list. If uploading through a JERM Harvester, you should use the data file title or SEEKID \r\n\
+      *Linking Models to Data* \xE2\x80\x93 this section allows you to specify how and where <%= t('data_file').downcase.pluralize %> were used to a) construct your model b) validate your model, or c) record simulation results from your model. If you are uploading directly through SEEK, you can find the relevant files by searching a drop-down list. If uploading through a JERM Harvester, you should use the <%= t('data_file').downcase %> title or SEEKID \r\n\
       \r\n\
       \r\n\
       h3. <%= t('sop').pluralize %>\r\n\
@@ -173,13 +173,13 @@ help_documents:
       This worksheet is an overview of the experiment, factors studied, protocols, publication information and contact details.\r\n\
       \r\n\
       *SDRF \xE2\x80\x93 Sample and Data Relationship Format*\r\n\
-      This worksheet details the links between sample and data, it can include information about the source (e.g. organism rat), the sample (e.g. rat liver), extracts (e.g. total RNA), labelled extract (e.g. synthetic DNA), hybridisations (e.g. a reference on the Array as defined by the ADF), raw data (e.g. a reference to a raw data file), normalisation (e.g. a reference to normalised data file), derived array data files (e.g. a reference to a derived data file, or file matrix)\r\n\
+      This worksheet details the links between sample and data, it can include information about the source (e.g. organism rat), the sample (e.g. rat liver), extracts (e.g. total RNA), labelled extract (e.g. synthetic DNA), hybridisations (e.g. a reference on the Array as defined by the ADF), raw data (e.g. a reference to a raw <%= t('data_file').downcase %>), normalisation (e.g. a reference to normalised <%= t('data_file').downcase %>), derived array <%= t('data_file').downcase.pluralize %> (e.g. a reference to a derived <%= t('data_file').downcase %>, or file matrix)\r\n\
       \r\n\
       *Raw Data and Processed Data*\r\n\
       These worksheets hold the actual and derived data values\r\n\
       \r\n\
       *ADF \xE2\x80\x93 Array Design Format (optional)*\r\n\
-      This worksheet provides the array-level annotation for the experiment, relating the row-level identifiers in the data files to biological sequence annotation.\r\n\
+      This worksheet provides the array-level annotation for the experiment, relating the row-level identifiers in the <%= t('data_file').downcase.pluralize %> to biological sequence annotation.\r\n\
       \r\n\
       There are a detailed \"set of help pages and examples provided by the MGED community\":http://tab2mage.sourceforge.net/docs/magetab_docs.html\r\n\
       \r\n\
@@ -195,7 +195,7 @@ help_documents:
       \r\n\
       h3. SDRF\r\n\
       \r\n\
-      This file links the sample and source information to the data files and their locations.\r\n\
+      This file links the sample and source information to the <%= t('data_file').downcase.pluralize %> and their locations.\r\n\
       The \xE2\x80\x9Cprotocol\xE2\x80\x9D columns will normally be followed by \xE2\x80\x9Cfactor value\xE2\x80\x9D columns. Again, we can extract these from the experimental conditions and factors studies sections of SEEK where you are referring to a <%= t('sop') %> already submitted. \r\n\
       \r\n\
       \r\n\
@@ -260,7 +260,7 @@ help_documents:
       \r\n\
       h6. What is the assay Tab for?\r\n\
       \r\n\
-      An assay describes a particular experiment. It allows you to associate data files, <%= t('sop').pluralize %> and models together as well as describing the type of assay and any technology required to perform the experiment.\r\n\
+      An assay describes a particular experiment. It allows you to associate <%= t('data_file').downcase.pluralize %>, <%= t('sop').pluralize %> and models together as well as describing the type of assay and any technology required to perform the experiment.\r\n\
       \r\n\
       \r\n\
       h6. Can I change or add information to SEEK assets after they are uploaded?\r\n\
@@ -472,7 +472,7 @@ help_documents:
       *Genotype* \xE2\x80\x93 a brief text description of the genotype\r\n\
       *Phenotype* \xE2\x80\x93 a brief text description of the phenotype\r\n\
       *Culture Growth* - This describes how the culture was grown for this assay. You can choose values from a drop-down list when adding new assays directly to SEEK\r\n\
-      *Data File Titles* \xE2\x80\x93 the title of one or many data files produced during this assay\r\n\
+      *<%= t('data_file') %> Titles* \xE2\x80\x93 the title of one or many <%= t('data_file').downcase.pluralize %> produced during this assay\r\n\
       *<%= t('sop') %> Titles* \xE2\x80\x93 the title of one or many <%= t('sop').pluralize %> used to execute this assay\r\n"
     - 2010-09-01 08:59:29
     - 2010-09-01 09:04:59
@@ -520,7 +520,7 @@ help_documents:
       
       !/help_images/0000/0003/ISADataModel.png!
        
-      In this case, the Assay is not a laboratory experiment, but a modelling task. Referring to it as an assay is therefore confusing, so we call these Modelling Analyses instead of Assays. This modelling analysis has a publication and a model associated with it, as well as a data file that was used for model validation. The data file is also associated with another assay (Intracellular Metabolites). This assay describes how the validation data was originally produced. As you can see, it is possible to associate data files, models, and other SEEK assets with more than one assay if necessary.
+      In this case, the Assay is not a laboratory experiment, but a modelling task. Referring to it as an assay is therefore confusing, so we call these Modelling Analyses instead of Assays. This modelling analysis has a publication and a model associated with it, as well as a <%= t('data_file').downcase %> that was used for model validation. The <%= t('data_file').downcase %> is also associated with another assay (Intracellular Metabolites). This assay describes how the validation data was originally produced. As you can see, it is possible to associate <%= t('data_file').downcase.pluralize %>, models, and other SEEK assets with more than one assay if necessary.
       
       h2. Using ISA when Uploading SEEK Assets
       
@@ -534,7 +534,7 @@ help_documents:
       
       When uploading your data, you will be asked wish assay(s) it is associated with. If you have already described the assay in the SEEK, you can find it from the drop-down list and link it, if you have not yet described your assay, you can leave this step out for the time-being. If your data is JERM compliant, many of the metadata elements in the upload form are the same as those in the first JERM metadata sheet. Soon, these elements will be automatically populated from your file, but for now, you will be asked to specify them in the web interface.
       Once you have uploaded your data, you can create a new assay if necessary and link it back to your data. New assays can be associated with pre-existing Studies and Investigations, or new ones can be created as required. 
-      If you upload data without linking it to the ISA structure, you won't be able to link it to models or <%= t('sop').pluralize %>. You will receive a warning email for these orphan  data files after they remain unlinked for more than 3 months.
+      If you upload data without linking it to the ISA structure, you won't be able to link it to models or <%= t('sop').pluralize %>. You will receive a warning email for these orphan  <%= t('data_file').downcase.pluralize %> after they remain unlinked for more than 3 months.
       
       
 

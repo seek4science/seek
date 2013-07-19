@@ -38,10 +38,10 @@ class DataFilesController < ApplicationController
         end
 
         ActivityLog.create :action=>"create",:culprit=>User.current_user,:activity_loggable=>@presentation,:controller_name=>controller_name.downcase
-        flash[:notice]="Data File '#{@presentation.title}' is successfully converted to Presentation"
+        flash[:notice]="#{t('data_file')} '#{@presentation.title}' is successfully converted to #{t('presentation')}"
         format.html { redirect_to presentation_path(@presentation) }
       else
-        flash[:error] = "Data File failed to convert to Presentation!!"
+        flash[:error] = "#{t('data_file')} failed to convert to #{t('presentation')}!!"
         format.html {
           redirect_to data_file_path @data_file
         }
@@ -132,7 +132,7 @@ class DataFilesController < ApplicationController
         #send email to the file uploader and receiver
         Mailer.file_uploaded(current_user,Person.find(params[:recipient_id]),@data_file,base_host).deliver
 
-        flash.now[:notice] ="Data file was successfully uploaded and saved." if flash.now[:notice].nil?
+        flash.now[:notice] ="#{t('data_file')} was successfully uploaded and saved." if flash.now[:notice].nil?
         render :text => flash.now[:notice]
       else
         errors = (@data_file.errors.map { |e| e.join(" ") }.join("\n"))
@@ -153,7 +153,7 @@ class DataFilesController < ApplicationController
             @data_file.creators = [User.current_user.person]
             create_content_blobs
 
-            flash.now[:notice] ="Data file was successfully uploaded and saved." if flash.now[:notice].nil?
+            flash.now[:notice] ="#{t('data_file')} was successfully uploaded and saved." if flash.now[:notice].nil?
             render :text => flash.now[:notice]
           else
             errors = (@data_file.errors.map { |e| e.join(" ") }.join("\n"))
@@ -195,7 +195,7 @@ class DataFilesController < ApplicationController
           render :partial => "assets/back_to_fancy_parent", :locals => {:child => @data_file, :parent_name => @data_file.parent_name, :is_not_fancy => true}
         else
           respond_to do |format|
-            flash[:notice] = 'Data file was successfully uploaded and saved.' if flash.now[:notice].nil?
+            flash[:notice] = "#{t('data_file')} was successfully uploaded and saved." if flash.now[:notice].nil?
             #parse the data file if it is with sample data
             if @data_file.is_with_sample
               bio_samples = @data_file.bio_samples_population params[:institution_id]
@@ -293,7 +293,7 @@ class DataFilesController < ApplicationController
         #update creators
         AssetsCreator.add_or_update_creator_list(@data_file, params[:creators])
 
-        flash[:notice] = 'Data file metadata was successfully updated.'
+        flash[:notice] = "#{t('data_file')} metadata was successfully updated."
         format.html { redirect_to data_file_path(@data_file) }
 
 

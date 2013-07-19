@@ -4,11 +4,11 @@
 
 <ul class="sectionIcons">
   <li>
-    <%= image_tag_for_key('arrow_left', data_file_path(@data_file), 'Return to Data file', nil, 'Return to Data file') -%>
+    <%= image_tag_for_key('arrow_left', data_file_path(@data_file), "Return to #{t('data_file')}", nil, "Return to #{t('data_file')}") -%>
   </li>
 </ul>
 
-<h1>Exploring Data File</h1>
+<h1>Exploring <%= t('data_file') %></h1>
 
 <div style="margin-left: auto; margin-right: auto; width: 98%;">
   <div id="spreadsheet_errors"></div>
