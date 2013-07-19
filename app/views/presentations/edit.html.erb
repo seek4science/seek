@@ -3,7 +3,7 @@
 
 <% current_user_authorized_to_manage = @presentation.can_manage? -%>
 
-<h1>Editing Presentation: <%= link_to(h(@presentation.title), edit_presentation_path) -%></h1>
+<h1>Editing <%= t('presentation') %>: <%= link_to(h(@presentation.title), edit_presentation_path) -%></h1>
 <div class="show_basic">
     <%= form_for(@presentation) do |f| %>
     <div class="asset_form">

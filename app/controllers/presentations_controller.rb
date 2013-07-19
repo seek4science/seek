@@ -80,7 +80,7 @@ class PresentationsController < ApplicationController
           #Add creators
           AssetsCreator.add_or_update_creator_list(@presentation, params[:creators])
 
-          flash[:notice] = 'Presentation was successfully uploaded and saved.'
+          flash[:notice] = "#{t('presentation')} was successfully uploaded and saved."
           format.html { redirect_to presentation_path(@presentation) }
           Assay.find(assay_ids).each do |assay|
             if assay.can_edit?
@@ -159,7 +159,7 @@ class PresentationsController < ApplicationController
         #update creators
         AssetsCreator.add_or_update_creator_list(@presentation, params[:creators])
 
-        flash[:notice] = 'Presentation metadata was successfully updated.'
+        flash[:notice] = "#{t('presentation')} metadata was successfully updated."
         format.html { redirect_to presentation_path(@presentation) }
         # Update new assay_asset
         Assay.find(assay_ids).each do |assay|

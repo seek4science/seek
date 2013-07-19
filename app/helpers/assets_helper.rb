@@ -41,6 +41,8 @@ module AssetsHelper
       text = resource_or_text.is_modelling? ? t("assays.modelling_analysis") : t("assays.assay")
     elsif resource_or_text.is_a?(Sop)
       text = t('sop')
+    elsif resource_or_text.is_a?(Presentation)
+      text = t('presentation')
     else
       text = resource_or_text.class.name
     end

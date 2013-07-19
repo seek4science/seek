@@ -59,6 +59,8 @@ SEEK::Application.configure do
     inflect.human 'assay', (I18n.t "assays.assay")
     inflect.human 'Sop', (I18n.t "sop")
     inflect.human 'sop', (I18n.t "sop")
+    inflect.human 'Presentation', (I18n.t "presentation")
+    inflect.human 'presentation', (I18n.t "presentation")
   end
 
 

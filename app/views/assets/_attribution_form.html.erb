@@ -16,7 +16,7 @@
   <% when "datafile" -%>
   <% resource_type_attributed_to_types = "Data files" -%>
   <% when "presentation" -%>
-  <% resource_type_attributed_to_types = "Presentations" -%>
+  <% resource_type_attributed_to_types = t('presentation').pluralize -%>
 <% else -%>
   <% resource_type_attributed_to_types = "THIS MUST BE A NEW TYPE OF RESOURCE FOR WHICH ATTRIBUTIONS ARE INTRODUCED - ADD IT HERE" -%>
 <% end -%>

@@ -21,8 +21,13 @@ class InternationalizationTest < ActiveSupport::TestCase
 
   test "sop" do
     as_not_virtualliver do
-      assert_equal "Methodology", (I18n.t "sop")
+      assert_equal "SOP", (I18n.t "sop")
     end
   end
 
+  test "presentation" do
+    as_not_virtualliver do
+      assert_equal "Presentation", (I18n.t "presentation")
+    end
+  end
 end
