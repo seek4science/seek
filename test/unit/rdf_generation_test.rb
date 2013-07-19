@@ -28,14 +28,14 @@ class RDFGenerationTest < ActiveSupport::TestCase
     assert_equal File.join(Rails.root,"tmp/testing-filestore/rdf/private","Assay-test-#{private.id}.rdf"), private.rdf_storage_path
   end
 
-  test "save rdf" do
+  test "save rdf file" do
     assay = Factory(:assay, :policy=>Factory(:public_policy))
     assert assay.can_view?(nil)
 
     expected_rdf_file = File.join(Rails.root,"tmp/testing-filestore/rdf/public","Assay-test-#{assay.id}.rdf")
     FileUtils.rm expected_rdf_file if File.exists?(expected_rdf_file)
 
-    assay.save_rdf
+    assay.save_rdf_file
 
     assert File.exists?(expected_rdf_file)
     rdf=""
@@ -54,7 +54,7 @@ class RDFGenerationTest < ActiveSupport::TestCase
     expected_rdf_file = File.join(Rails.root,"tmp/testing-filestore/rdf/private","Sop-test-#{sop.id}.rdf")
     FileUtils.rm expected_rdf_file if File.exists?(expected_rdf_file)
 
-    sop.save_rdf
+    sop.save_rdf_file
 
     assert File.exists?(expected_rdf_file)
     rdf=""
@@ -76,7 +76,7 @@ class RDFGenerationTest < ActiveSupport::TestCase
       FileUtils.rm public_rdf_file if File.exists?(public_rdf_file)
       FileUtils.rm private_rdf_file if File.exists?(private_rdf_file)
 
-      file = assay.save_rdf
+      file = assay.save_rdf_file
       assert_equal public_rdf_file, file
 
       assert File.exists?(public_rdf_file)
@@ -88,7 +88,7 @@ class RDFGenerationTest < ActiveSupport::TestCase
       end
 
       assert !assay.can_view?(nil)
-      file = assay.save_rdf
+      file = assay.save_rdf_file
       assert_equal private_rdf_file, file
 
       assert File.exists?(private_rdf_file)
@@ -100,7 +100,7 @@ class RDFGenerationTest < ActiveSupport::TestCase
       end
 
       assert assay.can_view?(nil)
-      file = assay.save_rdf
+      file = assay.save_rdf_file
       assert_equal public_rdf_file, file
 
       assert File.exists?(public_rdf_file)

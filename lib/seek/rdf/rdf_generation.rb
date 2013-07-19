@@ -140,7 +140,7 @@ module Seek
 
       def remove_rdf
         self.remove_rdf_from_repository if self.rdf_repository_configured?
-        self.delete_rdf
+        self.delete_rdf_file
         refresh_dependents_rdf
       end
 

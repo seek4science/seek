@@ -59,6 +59,8 @@
   
     <li class="file"><a href="../doc/UPGRADING.html">UPGRADING</a>
   
+    <li class="file"><a href="../doc/setting_up_virtuoso.html">setting_up_virtuoso</a>
+  
   </ul>
 </nav>
 
@@ -66,6 +68,22 @@
   <h3 class="section-header">Class and Module Index</h3>
 
   <ul class="link-list">
+  
+    <li><a href="../Seek.html">Seek</a>
+  
+    <li><a href="../Seek/Rdf.html">Seek::Rdf</a>
+  
+    <li><a href="../Seek/Rdf/RdfFileStorage.html">Seek::Rdf::RdfFileStorage</a>
+  
+    <li><a href="../Seek/Rdf/RdfGeneration.html">Seek::Rdf::RdfGeneration</a>
+  
+    <li><a href="../Seek/Rdf/RdfRepository.html">Seek::Rdf::RdfRepository</a>
+  
+    <li><a href="../Seek/Rdf/RdfRepositoryStorage.html">Seek::Rdf::RdfRepositoryStorage</a>
+  
+    <li><a href="../Seek/Rdf/VirtuosoRepository.html">Seek::Rdf::VirtuosoRepository</a>
+  
+    <li><a href="../Seek/Rdf/VirtuosoRepository/Config.html">Seek::Rdf::VirtuosoRepository::Config</a>
   
   </ul>
 </nav>
@@ -95,10 +113,7 @@ may be useful as well.</p>
 
 <p>We recommend that you run SEEK on a Linux system. All of the examples here
 describe installing on an Ubuntu (10.04 LTS) or Debian system, but should
-be easily transferrable to other Linux systems such as Fedora. There is a
-script for CentOS that was contributed to us by Mark Woodbridge (Imperial
-College, London) available at <a
-href="https://gist.github.com/2127663">gist.github.com/2127663</a></p>
+be easily transferable to other Linux systems such as Fedora or CentOS.</p>
 
 <p>Although possible, installing and running Ruby on Rails on a Windows system
 is troublesome and is not covered here.</p>
@@ -287,8 +302,8 @@ production server, you can start the Open Office service with:</p>
 
 <pre>soffice -headless -accept=&quot;socket,host=127.0.0.1,port=8100;urp;&quot; --nofirststartwizard &gt; /dev/null 2&gt;&amp;1</pre>
 
-<p>The 8100 port is used by default, if you’d like to run on another port,
-you need also to synchronize the changed port with the default soffice_port
+<p>The 8100 port is used by default, if you’d like to run on another port, you
+need also to synchronize the changed port with the default soffice_port
 setting for convert_office plugin in config/environment.rb</p>
 
 <p>If you run on production server, using Apache and Passenger Phusion, you
@@ -349,8 +364,8 @@ raise funding in the future, as it provides evidence of SEEK adoption.</p>
 <h2 id="label-Administering+the+system">Administering the system</h2>
 
 <p>Once logged in as an administrator, you will notice a link on the
-right-hand side of the tabs/search bar “Admin Enabled”. Selecting this
-will provide you with some admin facilities for creating new projects,
+right-hand side of the tabs/search bar “Admin Enabled”. Selecting this will
+provide you with some admin facilities for creating new projects,
 institutions and profiles; defining additional administrators; or modifying
 the behaviour of SEEK.</p>
 
@@ -433,9 +448,9 @@ to enable SEEK to send emails - such are emails about changes within your
 project, notification emails, feedback emails and notifications about
 errors. You can configure email under Admin-&gt;Site
 configuration-&gt;Enable/disable features. Part way down that page there is
-a checkbox “Email enabled” that you should select. This reveals some
-SMTP settings that you need to fill out. Any that are not needed can be
-left blank. The meaning of the settings are:</p>
+a checkbox “Email enabled” that you should select. This reveals some SMTP
+settings that you need to fill out. Any that are not needed can be left
+blank. The meaning of the settings are:</p>
 <ul><li>
 <p>Address - the address (name or IP address) of the SMTP server used to
 deliver outgoing mail</p>
@@ -488,8 +503,8 @@ modules, and follow the instructions it provides</p>
 <pre class="ruby"><span class="ruby-identifier">sudo</span> <span class="ruby-identifier">passenger</span><span class="ruby-operator">-</span><span class="ruby-identifier">install</span><span class="ruby-operator">-</span><span class="ruby-identifier">apache2</span><span class="ruby-operator">-</span><span class="ruby-keyword">module</span>
 </pre>
 
-<p>If you’ve followed the instructions, you will have added something like
-the following (the version numbers may differ) to your
+<p>If you’ve followed the instructions, you will have added something like the
+following (the version numbers may differ) to your
 <em>/etc/apache/http.conf</em></p>
 
 <pre>LoadModule passenger_module /usr/lib/ruby/gems/1.8/gems/passenger-3.0.7/ext/apache2/mod_passenger.so
@@ -518,8 +533,7 @@ open office and Sunspot sections above for instructions on how to do this.</p>
 various text elements under Admin-&gt;Site Configuration-&gt;Site branding.</p>
 
 <p>To insert your application/project name into the help documents for SEEK,
-and to remove the logos/links to SEEK’s ‘related projects and
-friends’ use</p>
+and to remove the logos/links to SEEK’s ‘related projects and friends’ use</p>
 
 <pre>bundle exec rake seek:rebrand</pre>
 
@@ -543,7 +557,7 @@ href="http://groups.google.com/group/seek-development">groups.google.com/group/s
 
 <footer id="validator-badges">
   <p><a href="http://validator.w3.org/check/referer">[Validate]</a>
-  <p>Generated by <a href="https://github.com/rdoc/rdoc">RDoc</a> 3.12.
+  <p>Generated by <a href="https://github.com/rdoc/rdoc">RDoc</a> 3.12.2.
   <p>Generated with the <a href="http://deveiate.org/projects/Darkfish-Rdoc/">Darkfish Rdoc Generator</a> 3.
 </footer>
 

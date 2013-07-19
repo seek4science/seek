@@ -13,27 +13,33 @@ module Seek
     #
     class RdfRepository
 
+        #provides a singleton instance of the configured repository
         def self.instance
           #TODO: in the future, when/if we support more repository flavours, the instance we return will need to be configurable
           Seek::Rdf::VirtuosoRepository.instance
         end
 
+        #an RDF::Query that can be used to create queries to query the repository
         def query
           get_query_object
         end
 
+        #execute a selection query, which delegates to Rdf::Repository#query
         def select *args
           get_repository_object.select *args
         end
 
+        #execute a insert query, which delegates to Rdf::Repository#query
         def insert *args
           get_repository_object.insert *args
         end
 
+        #execute a deletion query, which delegates to Rdf::Repository#query
         def delete *args
           get_repository_object.delete *args
         end
 
+        #send the rdf related to item to the repository, and update the rdf file
         def send_rdf(item,graphs=rdf_graph_uris(item), save_file = true)
           if configured?
             connect_to_repository
@@ -46,12 +52,13 @@ module Seek
                 Rails.logger.error("Invalid statement - '#{statement}'")
               end
             end
-            item.save_rdf if save_file
+            item.save_rdf_file if save_file
           else
             Rails.logger.warn "Attempting to send rdf, but not configured"
           end
         end
 
+        #remove the rdf related to item from the repository, and delete the rdf file
         def remove_rdf(item,graphs=[get_configuration.public_graph,get_configuration.private_graph].compact,delete_file = true)
           if configured?
             connect_to_repository
@@ -65,10 +72,12 @@ module Seek
                 end
               end
             end
-            item.delete_rdf if delete_file
+            item.delete_rdf_file if delete_file
           end
         end
 
+        #updates the rdf in the repository and updates the rdf file. This is more efficient that calling remove_rdf and send_rdf, since
+        #it consolidates the triples that have changed since the last send (according to the rdf file), and only updates, add or removes those triples.
         def update_rdf(item)
           if configured?
             connect_to_repository
@@ -112,8 +121,8 @@ module Seek
                 end
               end
             end
-            item.delete_rdf
-            item.save_rdf
+            item.delete_rdf_file
+            item.save_rdf_file
           end
         end
 
@@ -122,6 +131,10 @@ module Seek
           File.exists?(config_path) && enabled_for_environment?
         end
 
+        #provides the URI's of any items related to the item - discovered by querying the triple store to find both:
+        #  <this_item> ?predicate <related_item>
+        # or
+        # <related_item> ?predicate <this_item>
         def uris_of_items_related_to item
           q = query.select.where([:s, :p, item.rdf_resource]).from(RDF::URI.new(get_configuration.private_graph))
           results = select(q).collect{|result| result[:s]}

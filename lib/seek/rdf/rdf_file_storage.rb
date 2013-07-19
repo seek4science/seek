@@ -2,13 +2,13 @@ module Seek
   module Rdf
     #provides methods related to storing Rdf, in particular in files, but also includes RdfRepositoryStorage to support
     #storage in a triple store if configured
-    module RdfStorage
+    module RdfFileStorage
 
       #saves the RDF to a file according to the configured filestore, in a directory rdf/. Filenames are based upon the asset
       #type, the Rails.env, and the asset id. rdf for private asset (not publically visible) are stored in a private subdirectory,
       #and those that are public are stored in a public subdirectory
-      def save_rdf
-        delete_rdf
+      def save_rdf_file
+        delete_rdf_file
         path = self.rdf_storage_path
 
         File.open(path,"w") do |f|
@@ -19,7 +19,7 @@ module Seek
       end
 
       #deletes any files that contain the rdf for this item, either from public or private subdirectories.
-      def delete_rdf
+      def delete_rdf_file
         public_path = public_rdf_storage_path
         private_path = private_rdf_storage_path
         FileUtils.rm(public_path) if File.exists?(public_path)
