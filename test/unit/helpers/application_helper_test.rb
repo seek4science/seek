@@ -41,14 +41,14 @@ class ApplicationHelperTest < ActionView::TestCase
   end
 
   test "resource tab title" do
-    assert_equal "EBI Biomodels",resource_tab_item_name("EBI Biomodels",false)
+    assert_equal "EBI Biomodels",resource_tab_item_name("EBI Biomodels",true)
     assert_equal "Database",resource_tab_item_name("Database",false)
     assert_equal "Models",resource_tab_item_name("Model")
-    assert_equal "Data Files",resource_tab_item_name("DataFile")
-    assert_equal "Data Files",resource_tab_item_name("DataFiles")
-    assert_equal "Data File",resource_tab_item_name("DataFile",false)
-    assert_equal "SOPs",resource_tab_item_name("SOP")
-    assert_equal "SOPs",resource_tab_item_name("Sop")
-    assert_equal "SOP",resource_tab_item_name("Sop",false)
+    assert_equal I18n.t('data_file').pluralize,resource_tab_item_name("DataFile")
+    assert_equal I18n.t('data_file').pluralize,resource_tab_item_name("DataFiles")
+    assert_equal I18n.t('data_file'),resource_tab_item_name("DataFile",false)
+    assert_equal I18n.t('sop').pluralize,resource_tab_item_name("SOP")
+    assert_equal I18n.t('sop').pluralize,resource_tab_item_name("Sop")
+    assert_equal I18n.t('sop'),resource_tab_item_name("Sop",false)
   end
 end

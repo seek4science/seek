@@ -21,7 +21,7 @@ class PoliciesControllerTest < ActionController::TestCase
     post :preview_permissions, :sharing_scope => 0, :resource_name => 'data_file'
 
     assert_response :success
-    assert_select "p",:text=>"You keep this Data file private (only visible to you)", :count=>1
+    assert_select "p",:text=>"You keep this #{I18n.t('data_file')} private (only visible to you)", :count=>1
   end
 
   test 'should show the preview permission when choosing network scope' do

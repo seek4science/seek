@@ -20,7 +20,7 @@ class SinglePublishingTest < ActionController::TestCase
 
     get :show,:id=>df
     assert_response :success
-    assert_select "a", :text => /Publish Data file/
+    assert_select "a", :text => /Publish #{I18n.t('data_file')}/
 
     get :check_related_items,:id=>df
     assert_response :success
@@ -46,7 +46,7 @@ class SinglePublishingTest < ActionController::TestCase
 
     get :show,:id=>df
     assert_response :success
-    assert_select "a", :text => /Publish Data file/, :count => 0
+    assert_select "a", :text => /Publish #{I18n.t('data_file')}/, :count => 0
 
     get :check_related_items,:id=>df
     assert_redirected_to :root
@@ -122,7 +122,7 @@ class SinglePublishingTest < ActionController::TestCase
       assert_select "input[type='checkbox'][id=?]","publish_Assay_#{assay.id}"
     end
 
-    assert_select "li.type_and_title",:text=>/Data file/,:count=>4 do
+    assert_select "li.type_and_title",:text=>/#{I18n.t('data_file')}/,:count=>4 do
       assert_select "a[href=?]",data_file_path(df),:text=>/#{df.title}/
       assert_select "a[href=?]",data_file_path(publishing_df),:text=>/#{publishing_df.title}/
       assert_select "a[href=?]",data_file_path(request_publishing_df),:text=>/#{request_publishing_df.title}/
@@ -344,12 +344,12 @@ class SinglePublishingTest < ActionController::TestCase
     assert_response :success
 
     assert_select "ul#published" do
-      assert_select "li",:text=>/Data file: #{df.title}/,:count=>1
-      assert_select "li",:text=>/Data file: #{df1.title}/,:count=>0
+      assert_select "li",:text=>/#{I18n.t('data_file')}: #{df.title}/,:count=>1
+      assert_select "li",:text=>/#{I18n.t('data_file')}: #{df1.title}/,:count=>0
     end
 
     assert_select "ul#publish_requested" do
-      assert_select "li",:text=>/Data file: #{df2.title}/,:count=>1
+      assert_select "li",:text=>/#{I18n.t('data_file')}: #{df2.title}/,:count=>1
     end
 
     assert_select "ul#notified", :count => 0

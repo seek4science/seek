@@ -261,7 +261,7 @@ class StudiesControllerTest < ActionController::TestCase
     assert_select "div.tabbertab" do
       assert_select "h3",:text=>"#{I18n.t('assays.assay').pluralize} (1)",:count=>1
       assert_select "h3",:text=>"SOPs (1+1)",:count=>1
-      assert_select "h3",:text=>"#{t('data_file').pluralize} (1+1)",:count=>1
+      assert_select "h3",:text=>"#{I18n.t('data_file').pluralize} (1+1)",:count=>1
     end
     
     assert_select "div.list_item" do

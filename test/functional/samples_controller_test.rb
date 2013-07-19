@@ -55,7 +55,7 @@ class SamplesControllerTest < ActionController::TestCase
     assert_response :success
 
     assert_select "div#specimens" do
-      assert_select "h3", :text=>/Cell cultures/
+      assert_select "h3", :text=>/#{I18n.t('biosamples.sample_parent_term').pluralize}/
     end
   end
 
