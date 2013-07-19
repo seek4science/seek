@@ -31,7 +31,7 @@ class AssaysController < ApplicationController
     end
     @existing_assay.sop_masters.each do |s|
        if !s.can_view?
-       flash.now[:notice] << "Some or all sops of the existing #{t('assays.assay').downcase} cannot be viewed, you may specify your own! <br/>".html_safe
+       flash.now[:notice] << "Some or all #{t('sop').pluralize} of the existing #{t('assays.assay').downcase} cannot be viewed, you may specify your own! <br/>".html_safe
         break
       end
     end

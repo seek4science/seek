@@ -44,7 +44,7 @@ module Seek
     end
 
     def add_index_breadcrumb controller_name, breadcrumb_name=nil
-      breadcrumb_name ||= "#{controller_name.humanize} Index"
+      breadcrumb_name ||= "#{controller_name.singularize.humanize.pluralize} Index"
       add_breadcrumb breadcrumb_name, url_for(:controller => controller_name, :action => 'index')
     end
 

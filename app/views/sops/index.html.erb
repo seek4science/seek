@@ -1,6 +1,6 @@
 <% if logged_in? and current_user.person.member?%>
     <ul class="sectionIcons">
-        <li><%= image_tag_for_key "new", new_sop_path, "Upload a SOP", nil, "Upload a SOP" %></li>
+        <li><%= image_tag_for_key "new", new_sop_path, "Upload a #{t('sop')}", nil, "Upload a #{t('sop')}" %></li>
         <!-- <li><%#= image_tag_for_key "view-all", all_files_path, nil, nil, "View All Files" %></li> -->
     </ul>
 <% end %>

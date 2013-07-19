@@ -10,7 +10,7 @@
 <%= hidden_field_tag "attributions", "" -%>
 
 <% case resource_type.downcase; when "sop" -%>
-  <% resource_type_attributed_to_types = "SOPs" -%>
+  <% resource_type_attributed_to_types = t('sop').pluralize -%>
   <% when "model" -%>
   <% resource_type_attributed_to_types = "Models" -%>
   <% when "datafile" -%>

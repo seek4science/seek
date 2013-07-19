@@ -17,7 +17,7 @@ class SpecimensController < ApplicationController
 
      @existing_specimen.sop_masters.each do |s|
        if !s.sop.can_view?
-       flash.now[:notice] = "Some or all sops of the existing specimen cannot be viewed, you may specify your own!"
+       flash.now[:notice] = "Some or all #{t('sop').pluralize} of the existing specimen cannot be viewed, you may specify your own!"
         break
       end
      end

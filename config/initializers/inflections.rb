@@ -2,10 +2,6 @@
 SEEK::Application.configure do
 
   ActiveSupport::Inflector.inflections do |inflect|
-    inflect.human 'sop', "SOP"
-    inflect.human 'sops', 'SOPs'
-    inflect.human 'Sop', 'SOP'
-    inflect.human 'Sops', 'SOPs'
     inflect.irregular "specimen","specimens"
   end
 

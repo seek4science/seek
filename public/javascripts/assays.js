@@ -61,7 +61,7 @@ function addSelectedSop() {
         updateSops();
     }
     else {
-    alert('The following Sop had already been added:\n\n' +
+    alert('The following item had already been added:\n\n' +
         title);
     }
 

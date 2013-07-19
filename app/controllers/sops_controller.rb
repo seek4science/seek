@@ -105,7 +105,7 @@ class SopsController < ApplicationController
           #Add creators
           AssetsCreator.add_or_update_creator_list(@sop, params[:creators])
           
-          flash[:notice] = 'SOP was successfully uploaded and saved.'
+          flash[:notice] = "#{t('sop')} was successfully uploaded and saved."
           format.html { redirect_to sop_path(@sop) }
           Assay.find(assay_ids).each do |assay|
             if assay.can_edit?
@@ -152,7 +152,7 @@ class SopsController < ApplicationController
         #update authors
         AssetsCreator.add_or_update_creator_list(@sop, params[:creators])
         
-        flash[:notice] = 'SOP metadata was successfully updated.'
+        flash[:notice] = "#{t('sop')} metadata was successfully updated."
         format.html { redirect_to sop_path(@sop) }
         # Update new assay_asset
         Assay.find(assay_ids).each do |assay|

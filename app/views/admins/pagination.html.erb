@@ -80,7 +80,7 @@
     } -%>
 
     <%= render :partial=>'setting_li',:locals=>{
-            :name=>"SOPs",
+            :name=>t('sop').pluralize,
             :field=>(radio_button_tag(:sops, "latest", Seek::Config.default_page("sops") == "latest") +
                     label_tag(:sops_latest, "latest") +
                     radio_button_tag(:sops, "all",Seek::Config.default_page("sops") == "all") +

@@ -23,7 +23,7 @@
   <h3><%= t('assays.assay') %> folders</h3>
     <p>
       Items can easily be associated with <%= t('assays.assay').downcase.pluralize %> by dragging them to the appropriate <%= t('assays.assay').downcase %> folder at the bottom half of the folder tree. <br/>
-      Currently only <%= I18n.t('assays.experimental_assay').pluralize %> are supported, and only those you have permission to edit are listed. Publications, DataFiles and SOPs can be dragged to <%= t('assays.assay').downcase %> folders, other items will be rejected.
+      Currently only <%= I18n.t('assays.experimental_assay').pluralize %> are supported, and only those you have permission to edit are listed. Publications, DataFiles and <%= t('sop').pluralize %> can be dragged to <%= t('assays.assay').downcase %> folders, other items will be rejected.
       The item is not removed from its current folder when associating with an assay.
     </p>
     <p>

@@ -19,7 +19,7 @@
 	</tr>
 	
 	<tr>
-		<td>SOPs uploaded</td>		
+		<td><%= t('sop').pluralize %> uploaded</td>
 		<td><%= stats.yearly_sops_created -%></td>
         <td><%= stats.six_monthly_sops_created -%></td>
 		<td><%= stats.monthly_sops_created -%></td>
@@ -66,7 +66,7 @@
 
 	
 	<tr>
-		<td>SOPs downloaded</td>		
+		<td><%= t('sop').pluralize %> downloaded</td>
 		<td><%= stats.yearly_sops_downloaded -%></td>
         <td><%= stats.six_monthly_sops_downloaded -%></td>
 		<td><%= stats.monthly_sops_downloaded -%></td>

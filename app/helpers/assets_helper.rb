@@ -36,9 +36,11 @@ module AssetsHelper
     if resource_or_text.is_a?(String)
       text = resource_or_text
     elsif resource_or_text.kind_of?(Specimen)
-      text = I18n.t 'biosamples.sample_parent_term'
+      text = t('biosamples.sample_parent_term')
     elsif resource_or_text.is_a?(Assay)
       text = resource_or_text.is_modelling? ? t("assays.modelling_analysis") : t("assays.assay")
+    elsif resource_or_text.is_a?(Sop)
+      text = t('sop')
     else
       text = resource_or_text.class.name
     end

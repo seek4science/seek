@@ -113,7 +113,7 @@ help_documents:
       *Phenotype* \xE2\x80\x93 a brief text description of the phenotype\r\n\
       *Culture Growth* - This describes how the culture was grown for this assay. You can choose values from a drop-down list when adding new assays directly to SEEK\r\n\
       *Data File Titles* \xE2\x80\x93 the title of one or many data files produced during this assay\r\n\
-      *SOP Titles* \xE2\x80\x93 the title of one or many SOPs used to execute this assay\r\n\
+      *<%= t('sop') %> Titles* \xE2\x80\x93 the title of one or many <%= t('sop').pluralize %> used to execute this assay\r\n\
       \r\n\
       \r\n\
       h2. <%= Seek::Config.project_name %> Assets\r\n\
@@ -138,10 +138,10 @@ help_documents:
       *Linking Models to Data* \xE2\x80\x93 this section allows you to specify how and where data files were used to a) construct your model b) validate your model, or c) record simulation results from your model. If you are uploading directly through SEEK, you can find the relevant files by searching a drop-down list. If uploading through a JERM Harvester, you should use the data file title or SEEKID \r\n\
       \r\n\
       \r\n\
-      h3. SOPs\r\n\
+      h3. <%= t('sop').pluralize %>\r\n\
       \r\n\
       *Title* \xE2\x80\x93 as described above. All assets should have a title\r\n\
-      *Description* - free text to describe what the SOP is used for\r\n\
+      *Description* - free text to describe what the <%= t('sop') %> is used for\r\n\
       *Experimental conditions* - what were the measurements in this experiment (e.g. concentration, pH or gene expression). If you are uploading directly through SEEK, you can chose from a drop-down list\r\n\
       *Measured Item* \xE2\x80\x93 what was measured in this data, e.g. concentration of glucose. Measured items should be named using controlled vocabulary terms wherever possible, for example, glucose has chEBI name glucose and chEBI ID CHEBI:17234\r\n\
       *Units*  \xE2\x80\x93  how the measurements were taken e.g. concentration in mmol, or mass in grams.\r\n\
@@ -153,7 +153,7 @@ help_documents:
       Currently, publications are linked to people and projects. In the next version, publications will be linked to other <%= Seek::Config.project_name %> assets to allow you to use the SEEK as a supplementary data store\r\n\
       \r\n\
       \r\n\
-      *Attribution* \xE2\x80\x93 Some assets are based on others, for example, a model may use data from an <%= I18n.t('assays.experimental_assay').downcase %>, or a SOP may be a modified version of another. The attribution section allows you to specify when this is the case\r\n"
+      *Attribution* \xE2\x80\x93 Some assets are based on others, for example, a model may use data from an experimental assay, or a <%= t('sop') %> may be a modified version of another. The attribution section allows you to specify when this is the case\r\n"
     - 2010-05-20 08:37:01
     - 2010-05-20 08:37:01
   - - "9"
@@ -190,13 +190,13 @@ help_documents:
       h3. IDF\r\n\
       \r\n\
       Many of the personal details in the IDF sheet can be automatically extracted from your <%= Seek::Config.application_name %> profile. If you add your SEEK ID as an additional field (called SEEK ID), we can extract all your personal details from your profile so there is no need to complete these personal details fields. \r\n\
-      Similarly, you can refer to protocols (SOPs in SEEK) by their SEEK ID, and we can automatically extract their name and brief description.\r\n\
+      Similarly, you can refer to protocols (<%= t('sop').pluralize %> in SEEK) by their SEEK ID, and we can automatically extract their name and brief description.\r\n\
       This worksheet also contains fields to link to publications. In many cases, data could be shared in SEEK before publication. If so, please leave these fields blank, but do not remove them.\r\n\
       \r\n\
       h3. SDRF\r\n\
       \r\n\
       This file links the sample and source information to the data files and their locations.\r\n\
-      The \xE2\x80\x9Cprotocol\xE2\x80\x9D columns will normally be followed by \xE2\x80\x9Cfactor value\xE2\x80\x9D columns. Again, we can extract these from the experimental conditions and factors studies sections of SEEK where you are referring to a SOP already submitted. \r\n\
+      The \xE2\x80\x9Cprotocol\xE2\x80\x9D columns will normally be followed by \xE2\x80\x9Cfactor value\xE2\x80\x9D columns. Again, we can extract these from the experimental conditions and factors studies sections of SEEK where you are referring to a <%= t('sop') %> already submitted. \r\n\
       \r\n\
       \r\n\
       h3. Raw Data and Processed Data\r\n\
@@ -220,7 +220,7 @@ help_documents:
     - Frequently Asked Questions
     - "h6. What is the <%= Seek::Config.application_name %>? \r\n\
       \r\n\
-      The SEEK is a catalogue of assets held by the <%= Seek::Config.project_long_name %>. You can use the SEEK searching interface to find Data, Models, SOPs and protocols. You can also use it to find people, their institutions and their expertise\r\n\
+      The SEEK is a catalogue of assets held by the <%= Seek::Config.project_long_name %>. You can use the SEEK searching interface to find Data, Models, <%= t('sop').pluralize %> and protocols. You can also use it to find people, their institutions and their expertise\r\n\
       \r\n\
       \r\n\
       h6. What is the Yellow Page?\r\n\
@@ -228,7 +228,7 @@ help_documents:
       A directory of all the current and past members of the <%= Seek::Config.project_long_name %>, their project associates, their institutions and their expertise and experience\r\n\
       \r\n\
       \r\n\
-      h6. Are the <%= Seek::Config.project_name %> Assets (Data, Models, and SOPs) kept in SEEK?\r\n\
+      h6. Are the <%= Seek::Config.project_name %> Assets (Data, Models, and <%= t('sop').pluralize %>) kept in SEEK?\r\n\
       \r\n\
       Not normally. SEEK links to the repositories of each <%= Seek::Config.project_name %> project, so it is a catalogue of what is available rather than a repository. You can, however, upload files if you wish.\r\n\
       \r\n\
@@ -238,9 +238,9 @@ help_documents:
       SEEK can handle models in any format, but we recommend that you use SBML. JWS Online simulations can also be run from SEEK for models in SBML\r\n\
       \r\n\
       \r\n\
-      h6. What format should SOPs be in?\r\n\
+      h6. What format should <%= t('sop').pluralize %> be in?\r\n\
       \r\n\
-      You can upload SOPs in any format, but we recommend you use the \xE2\x80\x9CNature Protocols\xE2\x80\x9D format. A template is available for download from SEEK. In the future, we will be able to extract extra information from this format to help with the searching\r\n\
+      You can upload <%= t('sop').pluralize %> in any format, but we recommend you use the \xE2\x80\x9CNature Protocols\xE2\x80\x9D format. A template is available for download from SEEK. In the future, we will be able to extract extra information from this format to help with the searching\r\n\
       \r\n\
       \r\n\
       h6. Can I delete things from SEEK?\r\n\
@@ -260,7 +260,7 @@ help_documents:
       \r\n\
       h6. What is the assay Tab for?\r\n\
       \r\n\
-      An assay describes a particular experiment. It allows you to associate data files, SOPs and models together as well as describing the type of assay and any technology required to perform the experiment.\r\n\
+      An assay describes a particular experiment. It allows you to associate data files, <%= t('sop').pluralize %> and models together as well as describing the type of assay and any technology required to perform the experiment.\r\n\
       \r\n\
       \r\n\
       h6. Can I change or add information to SEEK assets after they are uploaded?\r\n\
@@ -397,6 +397,6 @@ help_documents:
       *Phenotype* \xE2\x80\x93 a brief text description of the phenotype\r\n\
       *Culture Growth* - This describes how the culture was grown for this assay. You can choose values from a drop-down list when adding new assays directly to SEEK\r\n\
       *Data File Titles* \xE2\x80\x93 the title of one or many data files produced during this assay\r\n\
-      *SOP Titles* \xE2\x80\x93 the title of one or many SOPs used to execute this assay\r\n"
+      *<%= t('sop') %> Titles* \xE2\x80\x93 the title of one or many <%= t('sop').pluralize %> used to execute this assay\r\n"
     - 2010-09-01 08:59:29
     - 2010-09-01 09:04:59
