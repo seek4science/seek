@@ -76,12 +76,12 @@ class SopsControllerTest < ActionController::TestCase
 
     get :show, :id => sop
     assert_response :success
-    assert_select "#request_resource_button > a",:text=>/Request SOP/,:count=>1
+    assert_select "#request_resource_button > a",:text=>/Request #{I18n.t('sop')}/,:count=>1
 
     logout
     get :show, :id => sop
     assert_response :success
-    assert_select "#request_resource_button > a",:text=>/Request SOP/,:count=>0
+    assert_select "#request_resource_button > a",:text=>/Request #{I18n.t('sop')}/,:count=>0
   end
 
   test "fail gracefullly when trying to access a missing sop" do
@@ -105,7 +105,7 @@ class SopsControllerTest < ActionController::TestCase
 
   def test_title
     get :index
-    assert_select "title", :text=>/The Sysmo SEEK SOPs.*/, :count=>1
+    assert_select "title", :text=>/The Sysmo SEEK #{I18n.t('sop').pluralize}.*/, :count=>1
   end
 
   test "should get index" do
@@ -127,7 +127,7 @@ class SopsControllerTest < ActionController::TestCase
     get :show, :id=>sop
     assert_redirected_to sops_path
     assert_not_nil flash[:error]
-    assert_equal "You are not authorized to view this SOP, you may need to login first.",flash[:error]
+    assert_equal "You are not authorized to view this #{I18n.t('sop')}, you may need to login first.",flash[:error]
   end
 
   test "should not show private sop to another user" do
@@ -135,13 +135,13 @@ class SopsControllerTest < ActionController::TestCase
     get :show, :id=>sop
     assert_redirected_to sops_path
     assert_not_nil flash[:error]
-    assert_equal "You are not authorized to view this SOP.",flash[:error]
+    assert_equal "You are not authorized to view this #{I18n.t('sop')}.",flash[:error]
   end
 
   test "should get new" do
     get :new
     assert_response :success
-    assert_select "h1", :text=>"New SOP"
+    assert_select "h1", :text=>"New #{I18n.t('sop')}"
   end
 
   test "should correctly handle bad data url" do
@@ -317,10 +317,10 @@ class SopsControllerTest < ActionController::TestCase
     login_as(:owner_of_my_first_sop)
     get :edit, :id => sops(:my_first_sop)
     assert_response :success
-    assert_select "h1", :text=>/Editing SOP/
+    assert_select "h1", :text=>/Editing #{I18n.t('sop')}/
 
     #this is to check the SOP is all upper case in the sharing form
-    assert_select "label",:text=>/Keep this SOP private/
+    assert_select "label",:text=>/Keep this #{I18n.t('sop')} private/
   end
 
   test "publications excluded in form for sops" do
@@ -628,7 +628,7 @@ class SopsControllerTest < ActionController::TestCase
   test 'breadcrumb for sop index' do
     get :index
     assert_response :success
-    assert_select "div.breadcrumbs", :text => /Home > SOPs Index/, :count => 1 do
+    assert_select "div.breadcrumbs", :text => /Home > #{I18n.t('sop').pluralize} Index/, :count => 1 do
       assert_select "a[href=?]", root_path, :count => 1
     end
   end
@@ -637,7 +637,7 @@ class SopsControllerTest < ActionController::TestCase
     sop = sops(:sop_with_fully_public_policy)
     get :show, :id => sop
     assert_response :success
-    assert_select "div.breadcrumbs", :text => /Home > SOPs Index > #{sop.title}/, :count => 1 do
+    assert_select "div.breadcrumbs", :text => /Home > #{I18n.t('sop').pluralize} Index > #{sop.title}/, :count => 1 do
       assert_select "a[href=?]", root_path, :count => 1
        assert_select "a[href=?]", sops_url, :count => 1
     end
@@ -648,7 +648,7 @@ class SopsControllerTest < ActionController::TestCase
     assert sop.can_edit?
     get :edit, :id => sop
     assert_response :success
-    assert_select "div.breadcrumbs", :text => /Home > SOPs Index > #{sop.title} > Edit/, :count => 1 do
+    assert_select "div.breadcrumbs", :text => /Home > #{I18n.t('sop').pluralize} Index > #{sop.title} > Edit/, :count => 1 do
       assert_select "a[href=?]", root_path, :count => 1
       assert_select "a[href=?]", sops_url, :count => 1
       assert_select "a[href=?]", sop_url(sop), :count => 1
@@ -658,7 +658,7 @@ class SopsControllerTest < ActionController::TestCase
   test 'breadcrumb for creating new sop' do
     get :new
     assert_response :success
-    assert_select "div.breadcrumbs", :text => /Home > SOPs Index > New/, :count => 1 do
+    assert_select "div.breadcrumbs", :text => /Home > #{I18n.t('sop').pluralize} Index > New/, :count => 1 do
       assert_select "a[href=?]", root_path, :count => 1
       assert_select "a[href=?]", sops_url, :count => 1
     end
