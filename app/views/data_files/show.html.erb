@@ -69,12 +69,12 @@
                    end
                  -%>
                 <% if is_empty -%>
-                    <span class="none_text">No treatments were found in the data file, or it does not match a known template.</span>
+                    <span class="none_text">No treatments were found in the <%= t('data_file') %>, or it does not match a known template.</span>
                 <% else -%>
                     <%= treatment_table -%>
                 <% end -%>
         <% else -%>
-            <span id="treatments" class="none_text">You do not have permission to view the treatments for this file.</span>
+            <span id="treatments" class="none_text">You do not have permission to view the treatments for this <%= t('data_file') %>.</span>
         <% end -%>
       </div>
     </div>

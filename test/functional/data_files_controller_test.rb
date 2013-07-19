@@ -57,8 +57,8 @@ class DataFilesControllerTest < ActionController::TestCase
     get :new
     assert_response :success
     assert_select 'div.foldTitle',:text=>/#{I18n.t('assays.experimental_assay').pluralize} and #{I18n.t('assays.modelling_analysis').pluralize}/
-    assert_select 'div#associate_assay_fold_content p',:text=>/The following #{I18n.t('assays.experimental_assay').pluralize} and #{I18n.t('assays.modelling_analysis').pluralize} are associated with this Data file:/
-    assert_select 'div.association_step p',:text=>/You may select an existing editable #{I18n.t('assays.experimental_assay')} or #{I18n.t('assays.modelling_analysis')} to associate with this Data file./
+    assert_select 'div#associate_assay_fold_content p',:text=>/The following #{I18n.t('assays.experimental_assay').pluralize} and #{I18n.t('assays.modelling_analysis').pluralize} are associated with this #{I18n.t('data_file')}:/
+    assert_select 'div.association_step p',:text=>/You may select an existing editable #{I18n.t('assays.experimental_assay')} or #{I18n.t('assays.modelling_analysis')} to associate with this #{I18n.t('data_file')}./
   end
 
   test "correct title and text for associating an assay for edit" do
@@ -68,8 +68,8 @@ class DataFilesControllerTest < ActionController::TestCase
     assert_response :success
 
     assert_select 'div.foldTitle',:text=>/#{I18n.t('assays.experimental_assay').pluralize} and #{I18n.t('assays.modelling_analysis').pluralize}/
-    assert_select 'div#associate_assay_fold_content p',:text=>/The following #{I18n.t('assays.experimental_assay').pluralize} and #{I18n.t('assays.modelling_analysis').pluralize} are associated with this Data file:/
-    assert_select 'div.association_step p',:text=>/You may select an existing editable #{I18n.t('assays.experimental_assay')} or #{I18n.t('assays.modelling_analysis')} to associate with this Data file./
+    assert_select 'div#associate_assay_fold_content p',:text=>/The following #{I18n.t('assays.experimental_assay').pluralize} and #{I18n.t('assays.modelling_analysis').pluralize} are associated with this #{I18n.t('data_file')}:/
+    assert_select 'div.association_step p',:text=>/You may select an existing editable #{I18n.t('assays.experimental_assay')} or #{I18n.t('assays.modelling_analysis')} to associate with this #{I18n.t('data_file')}./
   end
 
   test "view_items_in_tab" do
@@ -99,7 +99,7 @@ class DataFilesControllerTest < ActionController::TestCase
     get :index
     assert_select "ul.tabnav" do
       assert_select "li#selected_tabnav" do
-        assert_select "a[href=?]",data_files_path,:text=>"Data files"
+        assert_select "a[href=?]",data_files_path,:text=>I18n.t('data_file').pluralize
       end
     end
   end
@@ -259,7 +259,7 @@ class DataFilesControllerTest < ActionController::TestCase
   test "should get new" do
     get :new
     assert_response :success
-    assert_select "h1",:text=>"New Data file"
+    assert_select "h1",:text=>"New #{I18n.t('data_file')}"
   end
   
   test "should correctly handle bad data url" do
@@ -602,8 +602,8 @@ class DataFilesControllerTest < ActionController::TestCase
   test "should get edit" do
     get :edit, :id => data_files(:picture)
     assert_response :success
-    assert_select "h1",:text=>/Editing Data file/
-    assert_select "label",:text=>/Keep this Data file private/
+    assert_select "h1",:text=>/Editing #{I18n.t('data_file')}/
+    assert_select "label",:text=>/Keep this #{I18n.t('data_file')} private/
   end
 
   
@@ -644,7 +644,7 @@ class DataFilesControllerTest < ActionController::TestCase
     assert_response :success
     assert_select "ul.sectionIcons > li > span.icon" do
       assert_select "a[href=?]",download_data_file_path(df,:version=>df.version),:count=>1
-      assert_select "a",:text=>/Download Data file/,:count=>1
+      assert_select "a",:text=>/Download #{I18n.t('data_file')}/,:count=>1
     end
 
     assert_select "div.contribution_section_box > div.usage_info" do
@@ -1178,12 +1178,12 @@ class DataFilesControllerTest < ActionController::TestCase
     end
 
     assert_response :success
-    assert_select "#request_resource_button > a",:text=>/Request Data file/,:count=>1
+    assert_select "#request_resource_button > a",:text=>/Request #{I18n.t('data_file')}/,:count=>1
 
     logout
     get :show, :id => df
     assert_response :success
-    assert_select "#request_resource_button > a",:text=>/Request Data file/,:count=>0
+    assert_select "#request_resource_button > a",:text=>/Request #{I18n.t('data_file')}/,:count=>0
   end
 
   test "should create sharing permissions 'with your project and with all SysMO members'" do
@@ -1443,7 +1443,7 @@ class DataFilesControllerTest < ActionController::TestCase
     get :show, :id=>df
     assert_redirected_to data_files_path
     assert_not_nil flash[:error]
-    assert_equal "You are not authorized to view this Data file, you may need to login first.",flash[:error]
+    assert_equal "You are not authorized to view this #{I18n.t('data_file')}, you may need to login first.",flash[:error]
   end
 
   test "should not show private data file to another user" do
@@ -1452,7 +1452,7 @@ class DataFilesControllerTest < ActionController::TestCase
     get :show, :id=>df
     assert_redirected_to data_files_path
     assert_not_nil flash[:error]
-    assert_equal "You are not authorized to view this Data file.",flash[:error]
+    assert_equal "You are not authorized to view this #{I18n.t('data_file')}.",flash[:error]
   end
 
   test "should show error for the user who doesn't login or is not the project member, when the user specify the version and this version is not the latest version" do

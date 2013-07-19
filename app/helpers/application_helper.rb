@@ -145,7 +145,7 @@ module ApplicationHelper
     Seek::Util.user_creatable_types.each do |c|
       name=c.name.underscore
       path = eval "new_#{name}_path"
-      data_file_with_sample_path = eval "new_data_file_path(:page_title=>(#{t('data_file')} + ' with Sample Parsing'),:is_with_sample=>true)"
+      data_file_with_sample_path = eval "new_data_file_path(:page_title=>'#{t("data_file")} with Sample Parsing',:is_with_sample=>true)"
       if c==Seek::Util.user_creatable_types.first
         script << "if "
       else
@@ -552,13 +552,19 @@ module ApplicationHelper
 
   def resource_tab_item_name resource_type,pluralize=true
     resource_type = resource_type.singularize
-    translated_resource_type = translate_resource_type(resource_type)
-    result = translated_resource_type.include?("translation missing") ? resource_type : translated_resource_type
+    if resource_type == "Specimen"
+      result = t('biosamples.sample_parent_term')
+    elsif resource_type == "Assay"
+      result = t('assays.assay')
+    else
+      translated_resource_type = translate_resource_type(resource_type)
+      result = translated_resource_type.include?("translation missing") ? resource_type : translated_resource_type
+    end
     pluralize ? result.pluralize : result
   end
 
   def translate_resource_type resource_type
-    t("#{resource_type}")
+    t("#{resource_type.underscore}")
   end
 
   def add_return_to_search
