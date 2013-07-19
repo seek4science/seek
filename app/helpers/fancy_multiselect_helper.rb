@@ -84,7 +84,7 @@ module FancyMultiselectHelper
 
       #set default values for locals being sent to the partial
       #override default values with options passed in to the method
-      options.reverse_merge! :intro => "The following #{association.to_s.capitalize} are associated with this #{object_type_text}:",
+      options.reverse_merge! :intro => "The following #{association.to_s.singularize.humanize.pluralize.capitalize} are associated with this #{object_type_text}:",
                              :button_text => "Associate with this #{object_type_text}",
                              :default_choice_text => "Select #{association.to_s.singularize.capitalize} ...",
                              :name => "#{options[:object_class].name.underscore}[#{association.to_s.singularize}_ids]",
