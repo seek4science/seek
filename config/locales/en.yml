@@ -8,7 +8,7 @@ en:
     specimen_creators: "Creators"
 
   #Investigation
-  investigation: "Investigation_test"
+  investigation: "Invest_test"
 
   #Study
   study: "Study_test"
@@ -30,3 +30,6 @@ en:
 
   #Presentation
   presentation: "Technical report"
+
+  #Event
+  event: "Event_test"

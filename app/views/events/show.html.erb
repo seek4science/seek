@@ -1,7 +1,7 @@
 <%= render :partial => "general/item_title",:locals=>{:item=>@event} %>
 
 <ul class="sectionIcons">
-<%= asset_buttons @event,nil,"This deletes the Event listing. Are you sure?'" -%>
+<%= asset_buttons @event,nil,"This deletes the #{t('event')} listing. Are you sure?'" -%>
 </ul>
 
 <div class="show_basic">
@@ -32,7 +32,7 @@
       </p>
 
       <p class="web_page">
-        <label>Event Website: </label><%= text_or_not_specified(@event.url, :external_link=>true) -%>
+        <label><%= t('event') %> Website: </label><%= text_or_not_specified(@event.url, :external_link=>true) -%>
       </p>
 
       <p class="address">

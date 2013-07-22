@@ -10,8 +10,8 @@
             :field=>check_box_tag(:public_seek_enabled, 1,Seek::Config.public_seek_enabled)
     } -%>
     <%= render :partial=>'setting_li',:locals=>{
-            :description=>"Whether the Events are displayed and can be added.",
-            :name=>"Events enabled",
+            :description=>"Whether the #{t('event').pluralize} are displayed and can be added.",
+            :name=>"#{t('event').pluralize} enabled",
             :field=>check_box_tag(:events_enabled, 1,Seek::Config.events_enabled)
     } -%>
 

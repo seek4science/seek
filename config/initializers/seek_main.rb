@@ -69,6 +69,8 @@ SEEK::Application.configure do
     inflect.human 'study', I18n.t('study')
     inflect.human 'Model', I18n.t('model')
     inflect.human 'model', I18n.t('model')
+    inflect.human 'Event', I18n.t('event')
+    inflect.human 'event', I18n.t('event')
   end
 
 
