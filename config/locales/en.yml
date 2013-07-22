@@ -8,28 +8,28 @@ en:
     specimen_creators: "Creators"
 
   #Investigation
-  investigation: "Invest_test"
+  investigation: "Invest test"
 
   #Study
-  study: "Study_test"
+  study: "Stud test"
 
   #Assay
   assays:
     assay: "Experiment"
     experimental_assay: "Wetlab experiment"
-    modelling_analysis:  "Modelling analysis"
+    modelling_analysis:  "Drylab analysis"
 
   #DataFile
   data_file: "Data set"
 
   #Model
-  model: "Model_test"
+  model: "Mod test"
 
   #Sop
-  sop: "SOP_test"
+  sop: "Methodology"
 
   #Presentation
   presentation: "Technical report"
 
   #Event
-  event: "Event_test"
+  event: "Meeting"
