@@ -18,7 +18,7 @@ class InvestigationsControllerTest < ActionController::TestCase
 
   def test_title
     get :index
-    assert_select "title",:text=>/The Sysmo SEEK Investigations.*/, :count=>1
+    assert_select "title",:text=>/The Sysmo SEEK #{I18n.t('investigation').pluralize}.*/i, :count=>1
   end
 
   test "should show index" do
@@ -123,12 +123,12 @@ class InvestigationsControllerTest < ActionController::TestCase
   test "no edit button in show for unauthorized user" do
     login_as(Factory(:user))
     get :show, :id=>Factory(:investigation, :policy => Factory(:private_policy))
-    assert_select "a",:text=>/Edit investigation/,:count=>0
+    assert_select "a",:text=>/Edit #{I18n.t('investigation')}/i,:count=>0
   end
 
   test "edit button in show for authorized user" do
     get :show, :id=>investigations(:metabolomics_investigation)
-    assert_select "a[href=?]",edit_investigation_path(investigations(:metabolomics_investigation)),:text=>/Edit investigation/,:count=>1
+    assert_select "a[href=?]",edit_investigation_path(investigations(:metabolomics_investigation)),:text=>/Edit #{I18n.t('investigation')}/i,:count=>1
   end
 
   test "no add study button for person that can edit" do
@@ -136,13 +136,13 @@ class InvestigationsControllerTest < ActionController::TestCase
     inv = investigations(:metabolomics_investigation)
     assert !inv.can_edit?,"Aaron should not be able to edit this investigation"
     get :show, :id=>inv
-    assert_select "a",:text=>/Add a study/,:count=>0
+    assert_select "a",:text=>/Add a study/i,:count=>0
   end
 
   test "add study button for person that can edit" do
     inv = investigations(:metabolomics_investigation)
     get :show, :id=>inv
-    assert_select "a[href=?]",new_study_path(:investigation_id=>inv),:text=>/Add a study/,:count=>1
+    assert_select "a[href=?]",new_study_path(:investigation_id=>inv),:text=>/Add a study/i,:count=>1
   end
 
 
@@ -192,19 +192,19 @@ class InvestigationsControllerTest < ActionController::TestCase
 
   test "option to delete investigation without study" do    
     get :show,:id=>Factory(:investigation, :contributor => User.current_user).id
-    assert_select "a",:text=>/Delete Investigation/,:count=>1
+    assert_select "a",:text=>/Delete #{I18n.t('investigation')}/i,:count=>1
   end
 
   test "no option to delete investigation with study" do
     get :show,:id=>investigations(:metabolomics_investigation).id
-    assert_select "a",:text=>/Delete Investigation/,:count=>0
+    assert_select "a",:text=>/Delete #{I18n.t('investigation')}/i,:count=>0
   end
 
   test "no option to delete investigation when unauthorized" do
     i = Factory :investigation, :policy => Factory(:private_policy)
     login_as Factory(:user)
     get :show,:id=>i.id
-    assert_select "a",:text=>/Delete Investigation/,:count=>0
+    assert_select "a",:text=>/Delete #{I18n.t('investigation')}/i,:count=>0
   end
 
   def test_should_add_nofollow_to_links_in_show_page

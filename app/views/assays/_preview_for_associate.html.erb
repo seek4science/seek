@@ -12,7 +12,7 @@
       <%= list_item_attribute "Technology type", h(resource.technology_type.title.capitalize), resource.technology_type %>
   <% end -%>
 
-  <%= list_item_optional_attribute "Investigation", h(resource.investigation.try(:title)), resource.investigation %>
+  <%= list_item_optional_attribute t('investigation'), h(resource.investigation.try(:title)), resource.investigation %>
 
   <%= list_item_optional_attribute "Study", h(resource.study.try(:title)), resource.study %>
 

@@ -53,16 +53,18 @@ SEEK::Application.configure do
   I18n.load_path << File.join(File.dirname(__FILE__), "../locales/en.yml")
   #these inflections are put here, because the config variables are just loaded after the propagation
   ActiveSupport::Inflector.inflections do |inflect|
-    inflect.human 'Specimen', (I18n.t "biosamples.sample_parent_term")
-    inflect.human 'specimen', (I18n.t "biosamples.sample_parent_term")
-    inflect.human 'Assay', (I18n.t "assays.assay")
-    inflect.human 'assay', (I18n.t "assays.assay")
-    inflect.human 'Sop', (I18n.t "sop")
-    inflect.human 'sop', (I18n.t "sop")
-    inflect.human 'Presentation', (I18n.t "presentation")
-    inflect.human 'presentation', (I18n.t "presentation")
-    inflect.human 'DataFile', (I18n.t "data_file")
-    inflect.human 'data_file', (I18n.t "data_file")
+    inflect.human 'Specimen', I18n.t('biosamples.sample_parent_term')
+    inflect.human 'specimen', I18n.t('biosamples.sample_parent_term')
+    inflect.human 'Assay', I18n.t('assays.assay')
+    inflect.human 'assay', I18n.t('assays.assay')
+    inflect.human 'Sop', I18n.t('sop')
+    inflect.human 'sop', I18n.t('sop')
+    inflect.human 'Presentation', I18n.t('presentation')
+    inflect.human 'presentation', I18n.t('presentation')
+    inflect.human 'DataFile', I18n.t('data_file')
+    inflect.human 'data_file', I18n.t('data_file')
+    inflect.human 'Investigation', I18n.t('investigation')
+    inflect.human 'investigation', I18n.t('investigation')
   end
 
 

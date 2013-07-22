@@ -12,7 +12,7 @@
       <%= list_item_attribute "Technology type", try_block{resource.technology_type.title.capitalize}, resource.technology_type %>
   <% end -%>
 
-  <%= list_item_authorized_list [resource.investigation], "Investigation", true, 50, true %>
+  <%= list_item_authorized_list [resource.investigation], t('investigation'), true, 50, true %>
 
   <%= list_item_authorized_list [resource.study], "Study", true, 50, true %>
 

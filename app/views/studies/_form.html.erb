@@ -26,13 +26,13 @@
 
 <div class="fold">
   <div class="foldTitle">
-    Investigation details
+    <%= t('investigation') %> details
   </div>
   <div class="foldContent">
 
     <p>
-      <%= f.label :investigation %><span class="required">*</span>
-      <%=link_to h("New Investigation?"),new_investigation_path(:new_link_from_study=>true), :onclick => "window.open(this.href);return false;"%><br/>
+      <%= t('investigation') %><span class="required">*</span>
+      <%=link_to h("New #{t('investigation')}?"),new_investigation_path(:new_link_from_study=>true), :onclick => "window.open(this.href);return false;"%><br/>
       <div id="investigation_collection">
         <%= render :partial=>"studies/investigation_list",:locals=>{:investigations=>Investigation.all.select {|i|current_user.person.member_of? i.projects}} -%>
       </div>

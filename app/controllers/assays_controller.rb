@@ -60,10 +60,10 @@ class AssaysController < ApplicationController
     end
     respond_to do |format|
       if investigations.blank?
-         flash.now[:notice] = "No study and investigation available, you have to create a new investigation first before creating your study and assay!"
+         flash.now[:notice] = "No Study and #{t('investigation')} available, you have to create a new #{t('investigation')} first before creating your Study and #{t('assays.assay')}!"
       else
         if studies.flatten.blank?
-          flash.now[:notice] = "No study available, you have to create a new study before creating your assay!"
+          flash.now[:notice] = "No Study available, you have to create a new Study before creating your #{t('assays.assay')}!"
         end
       end
 

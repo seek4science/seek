@@ -21,3 +21,6 @@ en:
 
   #DataFile
   data_file: "Data set"
+
+  #Investigation
+  investigation: "Project"

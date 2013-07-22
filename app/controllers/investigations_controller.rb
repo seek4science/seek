@@ -49,9 +49,9 @@ class InvestigationsController < ApplicationController
           render :partial => "assets/back_to_singleselect_parent",:locals => {:child=>@investigation,:parent=>"study"}
        else
         respond_to do |format|
-          flash[:notice] = 'The Investigation was successfully created.'
+          flash[:notice] = "The #{t('investigation')} was successfully created."
           if @investigation.create_from_asset=="true"
-             flash.now[:notice] << "<br/> Now you can create new study for your #{t('assays.assay').downcase} by clicking 'add a study' button".html_safe
+             flash.now[:notice] << "<br/> Now you can create new Study for your #{t('assays.assay')} by clicking 'add a study' button".html_safe
             format.html { redirect_to investigation_path(:id=>@investigation,:create_from_asset=>@investigation.create_from_asset) }
           else
             format.html { redirect_to investigation_path(@investigation) }
@@ -99,7 +99,7 @@ class InvestigationsController < ApplicationController
 
     respond_to do |format|
       if @investigation.save
-        flash[:notice] = 'Investigation was successfully updated.'
+        flash[:notice] = "#{t('investigation')} was successfully updated."
         format.html { redirect_to(@investigation) }
         format.xml  { head :ok }
       else

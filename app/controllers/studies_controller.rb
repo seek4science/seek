@@ -19,7 +19,7 @@ class StudiesController < ApplicationController
 
     unless @study.investigation.can_edit?
        @study.investigation = nil
-      flash.now[:notice] = 'The investigation of the existing study cannot be viewed, please specify your own investigation!'
+      flash.now[:notice] = "The #{t('investigation')} of the existing Study cannot be viewed, please specify your own #{t('investigation')}!"
     end
 
     render :action => "new"
@@ -37,13 +37,13 @@ class StudiesController < ApplicationController
       if investigation.can_edit?
         @study.investigation = investigation
       else
-        flash.now[:error] = "You do not have permission to associate the new study with the investigation '#{investigation.title}'."
+        flash.now[:error] = "You do not have permission to associate the new Study with the #{t('investigation')} '#{investigation.title}'."
       end
     end
     investigations = Investigation.all.select &:can_view?
     respond_to do |format|
       if investigations.blank?
-       flash.now[:notice] = "No investigation available, you have to create a new one before creating your study!"
+       flash.now[:notice] = "No #{t('investigation')} available, you have to create a new one before creating your Study!"
       end
       format.html
     end

@@ -36,4 +36,10 @@ class InternationalizationTest < ActiveSupport::TestCase
       assert_equal "Data file", (I18n.t "data_file")
     end
   end
+
+  test "investigation" do
+    as_not_virtualliver do
+      assert_equal "Investigation", (I18n.t "investigation")
+    end
+  end
 end
