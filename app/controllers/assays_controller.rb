@@ -20,7 +20,7 @@ class AssaysController < ApplicationController
 
     unless @assay.study.can_edit?
       @assay.study = nil
-      flash.now[:notice] = "The Study of the existing #{t('assays.assay')} cannot be viewed, please specify your own Study! <br/>".html_safe
+      flash.now[:notice] = "The #{t('study')} of the existing #{t('assays.assay')} cannot be viewed, please specify your own #{t('study')}! <br/>".html_safe
     end
 
     @existing_assay.data_file_masters.each do |d|
@@ -60,10 +60,10 @@ class AssaysController < ApplicationController
     end
     respond_to do |format|
       if investigations.blank?
-         flash.now[:notice] = "No Study and #{t('investigation')} available, you have to create a new #{t('investigation')} first before creating your Study and #{t('assays.assay')}!"
+         flash.now[:notice] = "No #{t('study')} and #{t('investigation')} available, you have to create a new #{t('investigation')} first before creating your #{t('study')} and #{t('assays.assay')}!"
       else
         if studies.flatten.blank?
-          flash.now[:notice] = "No Study available, you have to create a new Study before creating your #{t('assays.assay')}!"
+          flash.now[:notice] = "No #{t('study')} available, you have to create a new #{t('study')} before creating your #{t('assays.assay')}!"
         end
       end
 

@@ -22,7 +22,7 @@
           <%= image("warning") %><b style="color:red">WARNING</b>
           <br/>
           <br/>
-          An <%= t('assays.assay') %> may be edited by anybody, regardless of project membership, until it has been associated with a Study
+          An <%= t('assays.assay') %> may be edited by anybody, regardless of project membership, until it has been associated with a <%= t('study') %>
       </div>
       <% end -%>
       <p class="id">
@@ -48,11 +48,11 @@
 
      <%= render :partial => 'projects/show_project_relationship', :locals => {:resource => @assay}  %>
       <p id="investigation">
-          <b>Investigation: </b>
+          <b><%= t('investigation') %>: </b>
           <%= investigation_link(@assay.investigation) %>
       </p>
       <p id="study">
-          <b>Study: </b>
+          <b><%= t('study') %>: </b>
           <%= studies_link_list [@assay.study] %>
       </p>
       <p id="assay_type">

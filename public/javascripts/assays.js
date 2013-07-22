@@ -216,7 +216,7 @@ function addSelectedModel() {
         updateModels();
     }
     else {
-        alert('The following Model had already been added:\n\n' +
+        alert('The following item had already been added:\n\n' +
             title);
     }
 }

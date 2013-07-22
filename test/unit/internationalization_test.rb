@@ -42,4 +42,10 @@ class InternationalizationTest < ActiveSupport::TestCase
       assert_equal "Investigation", (I18n.t "investigation")
     end
   end
+
+  test "study" do
+    as_not_virtualliver do
+      assert_equal "Study", (I18n.t "study")
+    end
+  end
 end

@@ -592,8 +592,8 @@ module ApplicationHelper
   end
 
   NO_DELETE_EXPLANTIONS={Assay=>"You cannot delete this #{I18n.t('assays.assay')}. It might be published or it has items associated with it.",
-                         Study=>"You cannot delete this Study. It might be published or it has #{I18n.t('assays.assay').pluralize} associated with it.",
-                         Investigation=>"You cannot delete this #{I18n.t('investigation')}. It might be published or it has Studies associated with it." ,
+                         Study=>"You cannot delete this #{I18n.t('study')}. It might be published or it has #{I18n.t('assays.assay').pluralize} associated with it.",
+                         Investigation=>"You cannot delete this #{I18n.t('investigation')}. It might be published or it has #{I18n.t('study').pluralize} associated with it." ,
                          Strain=>"You cannot delete this Strain. It might be published or it has #{I18n.t 'biosamples.sample_parent_term'}s/Samples associated with it.",
                          Specimen=>"You cannot delete this #{I18n.t 'biosamples.sample_parent_term'}. It might be published or it has Samples associated with it.",
                          Sample=>"You cannot delete this Sample. It might be published or it has #{I18n.t('assays.assay').pluralize} associated with it."
@@ -619,7 +619,7 @@ module ApplicationHelper
 
 
   private  
-  PAGE_TITLES={"home"=>"Home", "projects"=>"Projects","institutions"=>"Institutions", "people"=>"People", "sessions"=>"Login","users"=>"Signup","search"=>"Search","assays"=>I18n.t('assays.assay').pluralize.capitalize,"sops"=>I18n.t('sop').pluralize,"models"=>"Models","data_files"=>I18n.t('data_file').pluralize,"publications"=>"Publications","investigations"=>I18n.t('investigation').pluralize,"studies"=>"Studies","specimens"=>"Specimens","samples"=>"Samples","presentations"=>I18n.t('presentation').pluralize}
+  PAGE_TITLES={"home"=>"Home", "projects"=>"Projects","institutions"=>"Institutions", "people"=>"People", "sessions"=>"Login","users"=>"Signup","search"=>"Search","assays"=>I18n.t('assays.assay').pluralize.capitalize,"sops"=>I18n.t('sop').pluralize,"models"=>"Models","data_files"=>I18n.t('data_file').pluralize,"publications"=>"Publications","investigations"=>I18n.t('investigation').pluralize,"studies"=>I18n.t('study').pluralize,"specimens"=>"Specimens","samples"=>"Samples","presentations"=>I18n.t('presentation').pluralize}
 end
 
 class ApplicationFormBuilder< ActionView::Helpers::FormBuilder

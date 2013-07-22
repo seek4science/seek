@@ -14,7 +14,7 @@
 
   <%= list_item_optional_attribute t('investigation'), h(resource.investigation.try(:title)), resource.investigation %>
 
-  <%= list_item_optional_attribute "Study", h(resource.study.try(:title)), resource.study %>
+  <%= list_item_optional_attribute t('study'), h(resource.study.try(:title)), resource.study %>
 
   <%= list_item_authorized_list(resource.models, "Models", true, 50, true) if resource.is_modelling? %>
 

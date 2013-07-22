@@ -23,4 +23,7 @@ en:
   data_file: "Data set"
 
   #Investigation
-  investigation: "Project"
+  investigation: "Investigationtest"
+
+  #Study
+  study: "Studytest"

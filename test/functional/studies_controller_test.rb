@@ -35,7 +35,7 @@ class StudiesControllerTest < ActionController::TestCase
   
   def test_title
     get :index
-    assert_select "title",:text=>/The Sysmo SEEK Studies.*/, :count=>1
+    assert_select "title",:text=>/The Sysmo SEEK #{I18n.t('study').pluralize}.*/i, :count=>1
   end
 
   test "should get show" do
@@ -189,12 +189,12 @@ class StudiesControllerTest < ActionController::TestCase
     login_as Factory(:user)
     study = Factory :study, :policy => Factory(:private_policy)
     get :show, :id=>study
-    assert_select "a",:text=>/Edit study/,:count=>0
+    assert_select "a",:text=>/Edit #{I18n.t('study')}/i,:count=>0
   end
 
   test "edit button in show for person in project" do
     get :show, :id=>studies(:metabolomics_study)
-    assert_select "a",:text=>/Edit study/,:count=>1
+    assert_select "a",:text=>/Edit #{I18n.t('study')}/i,:count=>1
   end
 
 

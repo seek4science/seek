@@ -6,12 +6,12 @@
 -%>
 <% if investigations.blank? %>
     <ul class="sectionIcons">
-        <%= image_tag_for_key('arrow_right', new_investigation_path(:create_from_asset=>@assay.create_from_asset), "New investigation", {:style=>"font-size:larger"}, "New investigation") -%>
+        <%= image_tag_for_key('arrow_right', new_investigation_path(:create_from_asset=>@assay.create_from_asset), "New #{t('investigation')}", {:style=>"font-size:larger"}, "New #{t('investigation')}") -%>
     </ul>
 <% else %>
     <% if studies.flatten.blank? %>
         <ul class="sectionIcons">
-            <%= image_tag_for_key('arrow_right', new_study_path(:create_from_asset=>@assay.create_from_asset), "New study", {:style=>"font-size:larger"}, "New study") -%>
+            <%= image_tag_for_key('arrow_right', new_study_path(:create_from_asset=>@assay.create_from_asset), "New #{t('study')}", {:style=>"font-size:larger"}, "New #{t('study')}") -%>
         </ul>
     <% else %>
         <div class="contribution_title">
@@ -21,7 +21,7 @@
         <% unless @assay.assay_class %>
           <div class="assay_selection">
 
-            <span>Please select the class of <%= t('assays.assay').downcase %> you wish to create</span>
+            <span>Please select the class of <%= t('assays.assay') %> you wish to create</span>
             <br/><br/><br/>
             <%= link_to "<p class='select_assay_class'>#{image("assay_experimental_avatar",:size=>"32x32")}An #{t('assays.experimental_assay')}</p>".html_safe,new_assay_path(:class=>:experimental,:study_id=>params[:study_id],:create_from_asset=>@assay.create_from_asset) %>
 

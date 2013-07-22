@@ -21,7 +21,7 @@ function addSelectedEvent() {
         updateEvents();
     }
     else {
-        alert('The following Event had already been added:\n\n' +
+        alert('The following item had already been added:\n\n' +
                 title);
     }
 }
@@ -42,7 +42,7 @@ function updateEvents() {
 
     // update the page
     if (events_array.length == 0) {
-        $('event_to_list').innerHTML = '<span class="none_text">No Event</span>';
+        $('event_to_list').innerHTML = '<span class="none_text">None</span>';
     }
     else {
         $('event_to_list').innerHTML = event_text;

@@ -2,7 +2,7 @@
 
 <div class="list_item_left_column">
 <%= list_item_attribute "ID", resource.id %>
-<%= list_item_authorized_list resource.studies, "Studies" %>
+<%= list_item_authorized_list resource.studies, t('study').pluralize %>
 </div>
 
 <div class="list_item_right_column">

@@ -1,6 +1,6 @@
 <% if logged_in? and current_user.person.member?%>
     <ul class="sectionIcons">
-        <li><%= image_tag_for_key "new", new_study_path, "New Study", nil, "New Study" %></li>
+        <li><%= image_tag_for_key "new", new_study_path, "New #{t('study')}", nil, "New #{t('study')}" %></li>
     </ul>
 <% end %>
 

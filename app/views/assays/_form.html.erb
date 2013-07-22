@@ -35,9 +35,9 @@
   <% if @assay.study.blank? or @assay.study.can_view? %>
       <p>
       <div id="full_study_title" style="display:none; position: absolute; border: 1px solid black; background-color: #FFFF88; padding: 5px; text-align:left;"></div>
-    <%= f.label :study -%>
+    <%= t('study') -%>
     <span class="required">*</span>
-     <%= link_to h(" New study?"),new_study_path(:new_link_from_assay=>true), :onclick => "window.open(this.href);return false;" %> <br/>
+     <%= link_to h(" New #{t('study')}?"),new_study_path(:new_link_from_assay=>true), :onclick => "window.open(this.href);return false;" %> <br/>
     <% investigations = Investigation.all.select &:can_view? -%>
       <% options = @assay.study.nil? ? "<option value=\"\">Not specified</option>"  : "" %>
       <% investigations.each do |i| %>

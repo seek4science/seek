@@ -10,7 +10,7 @@
 
   <% if @investigation.can_edit? -%>
       <li>
-        <%= image_tag_for_key('new', new_study_path(:investigation_id=>@investigation,:create_from_asset=>@investigation.create_from_asset), "Add a Study", nil, "Add a Study") -%>
+        <%= image_tag_for_key('new', new_study_path(:investigation_id=>@investigation,:create_from_asset=>@investigation.create_from_asset), "Add a #{t('study')}", nil, "Add a #{t('study')}") -%>
       </li>
   <% end -%>
 

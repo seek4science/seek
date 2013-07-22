@@ -65,6 +65,8 @@ SEEK::Application.configure do
     inflect.human 'data_file', I18n.t('data_file')
     inflect.human 'Investigation', I18n.t('investigation')
     inflect.human 'investigation', I18n.t('investigation')
+    inflect.human 'Study', I18n.t('study')
+    inflect.human 'study', I18n.t('study')
   end
 
 

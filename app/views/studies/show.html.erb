@@ -3,20 +3,20 @@
 <ul class="sectionIcons">
     <%= render :partial => "subscriptions/subscribe", :locals => {:object => @study} %>
     <% if @study.can_manage? -%>
-      <li><%= image_tag_for_key('manage', edit_study_path, nil, nil, "Manage study") -%></li>
+      <li><%= image_tag_for_key('manage', edit_study_path, nil, nil, "Manage #{t('study')}") -%></li>
     <% elsif @study.can_edit?-%>
-      <li><%= image_tag_for_key('edit', edit_study_path, "Edit study", nil, 'Edit study') -%></li>
+      <li><%= image_tag_for_key('edit', edit_study_path, "Edit #{t('study')}", nil, "Edit #{t('study')}") -%></li>
     <% end -%>
 
     <% if @study.can_edit? -%>
         <li>
-          <%= image_tag_for_key('new', new_assay_path(:study_id=>@study,:create_from_asset=>@study.create_from_asset), "Add an assay", nil, 'Add an assay') -%>
+          <%= image_tag_for_key('new', new_assay_path(:study_id=>@study,:create_from_asset=>@study.create_from_asset), "Add an #{t('assays.assay')}", nil, "Add an #{t('assays.assay')}") -%>
         </li>
     <% end -%>
 
   <%= delete_icon @study,current_user -%>
     <% if logged_in? and current_user.person.member? %>
-      <li><%= image_tag_for_key('new', new_object_based_on_existing_one_path(:controller_name=>"studies",:id=>@study.id), nil, nil, 'New study based on this one') %></li>
+      <li><%= image_tag_for_key('new', new_object_based_on_existing_one_path(:controller_name=>"studies",:id=>@study.id), nil, nil, "New #{t('study')} based on this one") %></li>
     <% end %>
 </ul>
 

@@ -19,7 +19,7 @@ class StudiesController < ApplicationController
 
     unless @study.investigation.can_edit?
        @study.investigation = nil
-      flash.now[:notice] = "The #{t('investigation')} of the existing Study cannot be viewed, please specify your own #{t('investigation')}!"
+      flash.now[:notice] = "The #{t('investigation')} of the existing #{t('study')} cannot be viewed, please specify your own #{t('investigation')}!"
     end
 
     render :action => "new"
@@ -37,7 +37,7 @@ class StudiesController < ApplicationController
       if investigation.can_edit?
         @study.investigation = investigation
       else
-        flash.now[:error] = "You do not have permission to associate the new Study with the #{t('investigation')} '#{investigation.title}'."
+        flash.now[:error] = "You do not have permission to associate the new #{t('study')} with the #{t('investigation')} '#{investigation.title}'."
       end
     end
     investigations = Investigation.all.select &:can_view?
@@ -83,7 +83,7 @@ class StudiesController < ApplicationController
 
     respond_to do |format|
       if @study.save
-        flash[:notice] = 'Study was successfully updated.'
+        flash[:notice] = "#{t('study')} was successfully updated."
         format.html { redirect_to(@study) }
         format.xml  { head :ok }
       else
@@ -118,9 +118,9 @@ class StudiesController < ApplicationController
       render :partial => "assets/back_to_singleselect_parent",:locals => {:child=>@study,:parent=>"assay"}
     else
       respond_to do |format|
-        flash[:notice] = 'The study was successfully created.<br/>'.html_safe
+        flash[:notice] = "The #{t('study')} was successfully created.<br/>".html_safe
         if @study.create_from_asset=="true"
-          flash.now[:notice] << "Now you can create new #{t('assays.assay').downcase} by clicking 'add an assay' button".html_safe
+          flash.now[:notice] << "Now you can create new #{t('assays.assay')} by clicking -Add an #{t('assays.assay')}- button".html_safe
           format.html { redirect_to study_path(:id=>@study,:create_from_asset=>@study.create_from_asset) }
         else
         format.html { redirect_to study_path(@study) }
