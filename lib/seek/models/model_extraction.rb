@@ -47,7 +47,7 @@ module Seek
           end
           species.select { |s| !s.blank? }.uniq
         rescue Exception => e
-          Rails.logger.error("Error processing sbml model content for content_blob #{content_blob.id} #{e}")
+          Rails.logger.error("Error processing sbml #{t('model')} content for content_blob #{content_blob.id} #{e}")
           []
         end
       end
@@ -73,7 +73,7 @@ module Seek
           end
           species
         rescue Exception => e
-          Rails.logger.error("Error processing dat model content for content_blob #{content_blob.id} #{e}")
+          Rails.logger.error("Error processing dat #{t('model')}  content for content_blob #{content_blob.id} #{e}")
           []
         end
       end
@@ -90,7 +90,7 @@ module Seek
           end
           params
         rescue Exception => e
-          Rails.logger.error("Error processing sbml model content for content_blob #{content_blob.id} #{e}")
+          Rails.logger.error("Error processing sbml #{t('model')}  content for content_blob #{content_blob.id} #{e}")
           {}
         end
       end
@@ -117,7 +117,7 @@ module Seek
           end
           params_and_values
         rescue Exception => e
-          Rails.logger.error("Error processing dat model content for content_blob #{content_blob.id} #{e}")
+          Rails.logger.error("Error processing dat #{t('model')}  content for content_blob #{content_blob.id} #{e}")
           {}
         end
       end

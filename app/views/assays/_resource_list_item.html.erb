@@ -16,7 +16,7 @@
 
   <%= list_item_authorized_list [resource.study], t('study'), true, 50, true %>
 
-  <%= list_item_authorized_list(resource.model_masters, "Models", true, 50, true) if resource.is_modelling? %>
+  <%= list_item_authorized_list(resource.model_masters, t('model').pluralize, true, 50, true) if resource.is_modelling? %>
 
 </div>
 

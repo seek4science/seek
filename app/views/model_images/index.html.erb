@@ -8,7 +8,7 @@
 </ul>
 
 
-<h1>Model Images: <%= link_to @model_instance.title, url_for(@model_instance) -%></h1>
+<h1><%= t('model') %> Images: <%= link_to @model_instance.title, url_for(@model_instance) -%></h1>
 
 <% unless @model_images.empty? %>
 

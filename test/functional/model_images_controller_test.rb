@@ -28,7 +28,7 @@ class ModelImagesControllerTest < ActionController::TestCase
     get :show,:model_id=>model.id,:id=>model.model_image.id
     assert_redirected_to root_path
     assert_not_nil flash[:error]
-    assert_equal "You can only view images for models you can access",flash[:error]
+    assert_equal "You can only view images for #{I18n.t('model').pluralize} you can access",flash[:error]
   end
 
 end

@@ -48,4 +48,10 @@ class InternationalizationTest < ActiveSupport::TestCase
       assert_equal "Study", (I18n.t "study")
     end
   end
+
+  test "model" do
+    as_not_virtualliver do
+      assert_equal "Model", (I18n.t "model")
+    end
+  end
 end

@@ -17,7 +17,7 @@
           <% end -%>
           <% if can_download_asset?(@model, params[:code]) -%>
               <li>
-                <%= image_tag_for_key('execute', simulate_model_path(@model, :version => @display_model.version, :code => params[:code]), nil, {:method => :post}, "Simulate Model on JWS") -%>
+                <%= image_tag_for_key('execute', simulate_model_path(@model, :version => @display_model.version, :code => params[:code]), nil, {:method => :post}, "Simulate #{t('model')} on JWS") -%>
               </li>
           <% end -%>
       <% end -%>
@@ -33,7 +33,7 @@
   <% if cytoscapeweb_supported?(@display_model) %>
            <% if can_download_asset?(@model, params[:code]) -%>
                <li>
-                 <%= image_tag_for_key('cytoscape_web', visualise_model_path(@model, :version => @display_model.version, :code => params[:code]), nil, {:target => "_blank"}, "Visualise Model with Cytoscape Web") -%>
+                 <%= image_tag_for_key('cytoscape_web', visualise_model_path(@model, :version => @display_model.version, :code => params[:code]), nil, {:target => "_blank"}, "Visualise #{t('model')} with Cytoscape Web") -%>
                </li>
            <% end -%>
    <% end %>
@@ -47,7 +47,7 @@
             <%= form_tag("http://sycamore.eml.org/sycamore/submission.jsp", :id => 'sycamore-form', :target => '_blank') do -%>
                 <%= hidden_field_tag 'sbml_model' -%>
                 <%= hidden_field_tag 'sender', 'seek' -%>
-                <%= link_to image('execute') + "Simulate Model on Sycamore", {:action => 'submit_to_sycamore', :id => @model.id, :version => @display_model.version}, :remote => true, :method => :post -%>
+                <%= link_to image('execute') + "Simulate #{t('model')} on Sycamore", {:action => 'submit_to_sycamore', :id => @model.id, :version => @display_model.version}, :remote => true, :method => :post -%>
             <% end -%>
 
           </li>
@@ -76,11 +76,11 @@
                 <% end -%>
             </p>
             <p>
-                <b>Model type:</b>
+                <b><%= t('model') %> type:</b>
                 <%= model_type_text @display_model.model_type %>
             </p>
             <p>
-                <b>Model format:</b>
+                <b><%= t('model') %> format:</b>
                 <%= model_format_text @display_model.model_format %>
             </p>
             <p>

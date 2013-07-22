@@ -7,23 +7,26 @@ en:
     sample_age: "Age at sampling"
     specimen_creators: "Creators"
 
+  #Investigation
+  investigation: "Investigation_test"
+
+  #Study
+  study: "Study_test"
+
   #Assay
   assays:
-    assay: "Assay"
-    experimental_assay: "Experimental assay"
+    assay: "Experiment"
+    experimental_assay: "Wetlab experiment"
     modelling_analysis:  "Modelling analysis"
-
-  #Sop
-  sop: "SOP"
-
-  #Presentation
-  presentation: "Technical report"
 
   #DataFile
   data_file: "Data set"
 
-  #Investigation
-  investigation: "Investigationtest"
+  #Model
+  model: "Model_test"
 
-  #Study
-  study: "Studytest"
+  #Sop
+  sop: "SOP_test"
+
+  #Presentation
+  presentation: "Technical report"

@@ -122,7 +122,7 @@ class ModelImagesController < ApplicationController
 
        @model_image.save
        respond_to do |format|
-         flash[:notice]= 'Model image was successfully updated.'
+         flash[:notice]= "#{t('model')} image was successfully updated."
          format.html { redirect_to model_model_image_url @model_instance.id}
        end
      else
@@ -154,7 +154,7 @@ class ModelImagesController < ApplicationController
       if @model_instance.can_view? current_user
         @model_images = ModelImage.where :model_id=>@image_for_id
       else
-       flash[:error] = "You can only view images for models you can access"
+       flash[:error] = "You can only view images for #{t('model').pluralize} you can access"
        redirect_to root_path
       end
   end
@@ -164,7 +164,7 @@ class ModelImagesController < ApplicationController
 
      action = translate_action(action_name)
      unless is_auth?(@model_instance,action)
-       flash[:error] = "You can only #{action} images for models you can access"
+       flash[:error] = "You can only #{action} images for #{t('model').pluralize} you can access"
        redirect_to root_path
        return false
      end

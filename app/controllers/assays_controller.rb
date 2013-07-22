@@ -37,7 +37,7 @@ class AssaysController < ApplicationController
     end
     @existing_assay.model_masters.each do |m|
        if !m.can_view?
-       flash.now[:notice] << "Some or all Models of the existing #{t('assays.assay')} cannot be viewed, you may specify your own! <br/>".html_safe
+       flash.now[:notice] << "Some or all #{t('model').pluralize} of the existing #{t('assays.assay')} cannot be viewed, you may specify your own! <br/>".html_safe
         break
       end
     end

@@ -135,7 +135,7 @@ class DataFuseController < ApplicationController
 
         page.replace_html element, :partial=>"data_fuse/parameter_keys", :locals=>{:keys=>ps}
       else
-        page.replace_html element, :text=>"Model not found, or not authorized to examine"
+        page.replace_html element, :text=>"#{t('model')} not found, or not authorized to examine"
       end
     end
   end

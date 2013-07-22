@@ -16,7 +16,7 @@
 
   <%= list_item_optional_attribute t('study'), h(resource.study.try(:title)), resource.study %>
 
-  <%= list_item_authorized_list(resource.models, "Models", true, 50, true) if resource.is_modelling? %>
+  <%= list_item_authorized_list(resource.models, t('model').pluralize, true, 50, true) if resource.is_modelling? %>
 
 
 

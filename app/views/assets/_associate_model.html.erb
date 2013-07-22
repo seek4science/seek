@@ -8,14 +8,14 @@
 
 <div class="fold">
   <div class="foldTitle">
-    <%= help_icon("Here you associate Models in SEEK to this #{resource_text}.") -%>
-    Models
+    <%= help_icon("Here you associate #{t('model').pluralize} in SEEK to this #{resource_text}.") -%>
+    <%= t('model').pluralize %>
   </div>
 
   <div id="associate_model_fold_content" class="foldContent" style="display:<%= associated_models.blank? ? 'none' : 'block' -%>">
     <div class="yui-u first" style="width:66%; float:left">
       <p style="color: #666666;">
-        The following Models are involved in this <%= resource_text -%>:
+        The following  <%= t('model').pluralize %> are involved in this <%= resource_text -%>:
       </p>
       <div id="model_to_list" class="box_editing_inner" style="line-height: 1.5;">
         <span class="none_text" id="models">Loading...</span>
@@ -24,7 +24,7 @@
       <div id="add_model_elements">
         <div class="association_step">
           <%= select_tag :possible_models,
-            options_for_select([["Select Model ...", 0]]|project_models.collect{|s| [truncate(h(s.title), :length=>select_truncate_length), s.id]}),
+            options_for_select([["Select #{t('model')} ...", 0]]|project_models.collect{|s| [truncate(h(s.title), :length=>select_truncate_length), s.id]}),
             {:style=>"width:90%",:onchange=>remote_function(
                     :method=>:get,
               :url=>preview_models_path(:element=>"model_preview"),
@@ -36,7 +36,7 @@
           <%= select_tag :model_ids, options_from_collection_for_select([], :id, :title), {:multiple=>true, :style=>"display:none;"} -%>
 
           <br/>
-          <%= check_box_tag :include_other_project_models, nil, false, {:onchange=>"toggle_model_list();",:style=>"margin-top:0.5em;"} -%> Associate Models from other projects?
+          <%= check_box_tag :include_other_project_models, nil, false, {:onchange=>"toggle_model_list();",:style=>"margin-top:0.5em;"} -%> Associate <%=  t('model').pluralize %> from other projects?
         </div>
 		<br/>
         <%= link_to_function (image("new") + " Associate with this #{resource_text}"), "addSelectedModel(); return(false);", :id=>"add_model_link", :class=>"block_link" %>
@@ -55,7 +55,7 @@
         selection_box.options.length=0;
 
         if (checked) {
-        <% ([["Select Model ...",0]]|all_models.collect{|s| [truncate(h(s.title),:length=>select_truncate_length),s.id]}).each do |model_details| -%>
+        <% ([["Select #{t('model')} ...",0]]|all_models.collect{|s| [truncate(h(s.title),:length=>select_truncate_length),s.id]}).each do |model_details| -%>
             option = document.createElement("OPTION");
             option.text = '<%= escape_javascript(model_details[0]) -%>';
             option.value = '<%= model_details[1] -%>';
@@ -68,7 +68,7 @@
         <% end -%>
         }
         else {
-        <% ([["Select Model ...",0]]|project_models.collect{|s| [truncate(h(s.title),:length=>select_truncate_length),s.id]}).each do |model_details| -%>
+        <% ([["Select #{t('model')} ...",0]]|project_models.collect{|s| [truncate(h(s.title),:length=>select_truncate_length),s.id]}).each do |model_details| -%>
             option = document.createElement("OPTION");
             option.text = '<%= escape_javascript(model_details[0]) -%>';
             option.value = '<%= model_details[1] -%>';

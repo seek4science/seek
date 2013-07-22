@@ -30,13 +30,13 @@
     <div id="<%= panel_id -%>" class="squareboxcontent" style="display: none">
       <ul>
         <li>
-          <span class="annotation_title">Model name:</span><%= text_field_tag "modelname",annotations.model_name -%>
+          <span class="annotation_title"><%= t('model') %> name:</span><%= text_field_tag "modelname",annotations.model_name -%>
         </li>
         <li>
           <span class="annotation_title">Citation URL:</span><%= text_field_tag "citationURL",annotations.citation_url -%>
         </li>
         <li>
-          <span class="annotation_title">Model URN:</span><%= text_field_tag "modelURN",annotations.model_urn -%>
+          <span class="annotation_title"><%= t('model') %> URN:</span><%= text_field_tag "modelURN",annotations.model_urn -%>
         </li>
         <li>
           <span class="annotation_title">Creation date:</span><%= text_field_tag "creationDate",annotations.creation_date -%>

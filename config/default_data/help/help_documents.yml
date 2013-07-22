@@ -38,7 +38,7 @@ help_documents:
     - index
     - List of Topics
     - |-
-      h2. Guidelines for Data and Model Annotation in SEEK
+      h2. Guidelines for Data and <%= t('model') %> Annotation in SEEK
       
       [metadata-guidelines]
       [isa-guide]
@@ -113,7 +113,7 @@ help_documents:
       *Genotype* \xE2\x80\x93 a brief text description of the genotype\r\n\
       *Phenotype* \xE2\x80\x93 a brief text description of the phenotype\r\n\
       *Culture Growth* - This describes how the culture was grown for this assay. You can choose values from a drop-down list when adding new assays directly to SEEK\r\n\
-      *<%= t('data_file') %> Titles* \xE2\x80\x93 the title of one or many data <%= t('data_file').downcase.pluralize %> produced during this assay\r\n\
+      *<%= t('data_file') %> Titles* \xE2\x80\x93 the title of one or many data <%= t('data_file').pluralize %> produced during this assay\r\n\
       *<%= t('sop') %> Titles* \xE2\x80\x93 the title of one or many <%= t('sop').pluralize %> used to execute this assay\r\n\
       \r\n\
       \r\n\
@@ -129,14 +129,14 @@ help_documents:
       *Units* \xE2\x80\x93 how the measurements were taken, e.g. concentration in mmol, or mass in grams.\r\n\
       \r\n\
       \r\n\
-      h3. Models \r\n\
+      h3. <%= t('model').pluralize %> \r\n\
       \r\n\
       *Filename/archive name* \xE2\x80\x93 the title of the asset\r\n\
-      *Description* - free text to describe what the model is showing\r\n\
-      *Model Type* \xE2\x80\x93 what kind of mathematical equations does your model contain e.g. ODE, algebraic\r\n\
-      *Model Format* \xE2\x80\x93 e.g. SBML, CellML. If uploading directly through SEEK, you will be able to chose from a drop-down list\r\n\
-      *Model Execution Environment and URL* \xE2\x80\x93 how do you run a simulation on your model? This field should provide a link to a tool or resource which would allow you to run your model\r\n\
-      *Linking Models to Data* \xE2\x80\x93 this section allows you to specify how and where <%= t('data_file').downcase.pluralize %> were used to a) construct your model b) validate your model, or c) record simulation results from your model. If you are uploading directly through SEEK, you can find the relevant files by searching a drop-down list. If uploading through a JERM Harvester, you should use the <%= t('data_file').downcase %> title or SEEKID \r\n\
+      *Description* - free text to describe what the <%= t('model') %> is showing\r\n\
+      *<%= t('model') %> Type* \xE2\x80\x93 what kind of mathematical equations does your <%= t('model') %> contain e.g. ODE, algebraic\r\n\
+      *<%= t('model') %> Format* \xE2\x80\x93 e.g. SBML, CellML. If uploading directly through SEEK, you will be able to chose from a drop-down list\r\n\
+      *<%= t('model') %> Execution Environment and URL* \xE2\x80\x93 how do you run a simulation on your <%= t('model') %>? This field should provide a link to a tool or resource which would allow you to run your <%= t('model') %>\r\n\
+      *Linking <%= t('model').pluralize %> to Data* \xE2\x80\x93 this section allows you to specify how and where <%= t('data_file').pluralize %> were used to a) construct your <%= t('model') %> b) validate your <%= t('model') %>, or c) record simulation results from your <%= t('model') %>. If you are uploading directly through SEEK, you can find the relevant files by searching a drop-down list. If uploading through a JERM Harvester, you should use the <%= t('data_file') %> title or SEEKID \r\n\
       \r\n\
       \r\n\
       h3. <%= t('sop').pluralize %>\r\n\
@@ -153,7 +153,7 @@ help_documents:
       Currently, publications are linked to people and projects. In the next version, publications will be linked to other SysMO assets to allow you to use the SEEK as a supplementary data store\r\n\
       \r\n\
       \r\n\
-      *Attribution* \xE2\x80\x93 Some assets are based on others, for example, a model may use data from an experimental assay, or a <%= t('sop') %> may be a modified version of another. The attribution section allows you to specify when this is the case\r\n"
+      *Attribution* \xE2\x80\x93 Some assets are based on others, for example, a <%= t('model') %> may use data from an experimental assay, or a <%= t('sop') %> may be a modified version of another. The attribution section allows you to specify when this is the case\r\n"
     - 2010-05-20 08:37:01
     - 2011-08-17 09:03:44
   - - "9"
@@ -173,13 +173,13 @@ help_documents:
       This worksheet is an overview of the experiment, factors studied, protocols, publication information and contact details.\r\n\
       \r\n\
       *SDRF \xE2\x80\x93 Sample and Data Relationship Format*\r\n\
-      This worksheet details the links between sample and data, it can include information about the source (e.g. organism rat), the sample (e.g. rat liver), extracts (e.g. total RNA), labelled extract (e.g. synthetic DNA), hybridisations (e.g. a reference on the Array as defined by the ADF), raw data (e.g. a reference to a raw <%= t('data_file').downcase %>), normalisation (e.g. a reference to normalised <%= t('data_file').downcase %>), derived array <%= t('data_file').downcase.pluralize %> (e.g. a reference to a derived <%= t('data_file').downcase %>, or file matrix)\r\n\
+      This worksheet details the links between sample and data, it can include information about the source (e.g. organism rat), the sample (e.g. rat liver), extracts (e.g. total RNA), labelled extract (e.g. synthetic DNA), hybridisations (e.g. a reference on the Array as defined by the ADF), raw data (e.g. a reference to a raw <%= t('data_file') %>), normalisation (e.g. a reference to normalised <%= t('data_file') %>), derived array <%= t('data_file').pluralize %> (e.g. a reference to a derived <%= t('data_file') %>, or file matrix)\r\n\
       \r\n\
       *Raw Data and Processed Data*\r\n\
       These worksheets hold the actual and derived data values\r\n\
       \r\n\
       *ADF \xE2\x80\x93 Array Design Format (optional)*\r\n\
-      This worksheet provides the array-level annotation for the experiment, relating the row-level identifiers in the <%= t('data_file').downcase.pluralize %> to biological sequence annotation.\r\n\
+      This worksheet provides the array-level annotation for the experiment, relating the row-level identifiers in the <%= t('data_file').pluralize %> to biological sequence annotation.\r\n\
       \r\n\
       There are a detailed \"set of help pages and examples provided by the MGED community\":http://tab2mage.sourceforge.net/docs/magetab_docs.html\r\n\
       \r\n\
@@ -195,7 +195,7 @@ help_documents:
       \r\n\
       h3. SDRF\r\n\
       \r\n\
-      This file links the sample and source information to the <%= t('data_file').downcase.pluralize %> and their locations.\r\n\
+      This file links the sample and source information to the <%= t('data_file').pluralize %> and their locations.\r\n\
       The \xE2\x80\x9Cprotocol\xE2\x80\x9D columns will normally be followed by \xE2\x80\x9Cfactor value\xE2\x80\x9D columns. Again, we can extract these from the experimental conditions and factors studies sections of SEEK where you are referring to a <%= t('sop') %> already submitted. \r\n\
       \r\n\
       \r\n\
@@ -220,7 +220,7 @@ help_documents:
     - Frequently Asked Questions
     - "h6. What is the SysMO-SEEK? \r\n\
       \r\n\
-      The SEEK is a catalogue of assets held by the SysMO consortium. You can use the SEEK searching interface to find Data, Models, <%= t('sop').pluralize %> and protocols. You can also use it to find people, their institutions and their expertise\r\n\
+      The SEEK is a catalogue of assets held by the SysMO consortium. You can use the SEEK searching interface to find Data, <%= t('model').pluralize %>, <%= t('sop').pluralize %> and protocols. You can also use it to find people, their institutions and their expertise\r\n\
       \r\n\
       \r\n\
       h6. What is the Yellow Page?\r\n\
@@ -228,14 +228,14 @@ help_documents:
       A directory of all the current and past members of the SysMO consortium, their project associates, their institutions and their expertise and experience\r\n\
       \r\n\
       \r\n\
-      h6. Are the SysMO Assets (Data, Models, and <%= t('sop').pluralize %>) kept in SEEK?\r\n\
+      h6. Are the SysMO Assets (Data, <%= t('model').pluralize %>, and <%= t('sop').pluralize %>) kept in SEEK?\r\n\
       \r\n\
       Not normally. SEEK links to the repositories of each SysMO project, so it is a catalogue of what is available rather than a repository. You can, however, upload files if you wish.\r\n\
       \r\n\
       \r\n\
-      h6. What kind of models can I store/link to?\r\n\
+      h6. What kind of <%= t('model').pluralize %> can I store/link to?\r\n\
       \r\n\
-      SEEK can handle models in any format, but we recommend that you use SBML. JWS Online simulations can also be run from SEEK for models in SBML\r\n\
+      SEEK can handle <%= t('model').pluralize %> in any format, but we recommend that you use SBML. JWS Online simulations can also be run from SEEK for <%= t('model').pluralize %> in SBML\r\n\
       \r\n\
       \r\n\
       h6. What format should <%= t('sop').pluralize %> be in?\r\n\
@@ -260,7 +260,7 @@ help_documents:
       \r\n\
       h6. What is the assay Tab for?\r\n\
       \r\n\
-      An assay describes a particular experiment. It allows you to associate <%= t('data_file').downcase.pluralize %>, <%= t('sop').pluralize %> and models together as well as describing the type of assay and any technology required to perform the experiment.\r\n\
+      An assay describes a particular experiment. It allows you to associate <%= t('data_file').pluralize %>, <%= t('sop').pluralize %> and <%= t('model').pluralize %> together as well as describing the type of assay and any technology required to perform the experiment.\r\n\
       \r\n\
       \r\n\
       h6. Can I change or add information to SEEK assets after they are uploaded?\r\n\
@@ -274,7 +274,7 @@ help_documents:
       \r\n\
       h6. What is metadata?\r\n\
       \r\n\
-      Metadata is a description of the data and where it originates (it is data about the data). For example, metadata about a model would include; who produced it, what project was it associated with, what format it was in, what type of model etc."
+      Metadata is a description of the data and where it originates (it is data about the data). For example, metadata about a <%= t('model') %> would include; who produced it, what project was it associated with, what format it was in, what type of <%= t('model') %> etc."
     - 2010-05-20 09:11:43
     - 2010-05-20 09:11:43
   - - "11"
@@ -308,7 +308,7 @@ help_documents:
     - controlled-vocabularies
     - Controlled Vocabularies and Ontologies
     - |
-      SysMO-DB recommends that consortium members use identifiers from public databases and terms from community ontologies wherever possible when describing and annotating data and models. The following table shows the resources available for annotation by biological object category. These are the resources recommended by SysMO-DB and also represent the most commonly used in the SysMO consortium.
+      SysMO-DB recommends that consortium members use identifiers from public databases and terms from community ontologies wherever possible when describing and annotating data and <%= t('model').pluralize %>. The following table shows the resources available for annotation by biological object category. These are the resources recommended by SysMO-DB and also represent the most commonly used in the SysMO consortium.
       
       
       |_. Entity |_. Resource |_. Example ID |_. Database URL |_. MIRIAM URN |
@@ -327,9 +327,9 @@ help_documents:
       | Model Descriptions | Systems Biology Ontology | "SBO:0000244":http://www.ebi.ac.uk/sbo/main/browse.jsp?nodeId=245| "http://www.ebi.ac.uk/sbo/":http://www.ebi.ac.uk/sbo/ | urn:miriam:biomodels.sbo |
       
       
-      h2. Assistance with Data and Models Annotation
+      h2. Assistance with Data and <%= t('model').pluralize %> Annotation
       
-      Accessing and navigating these resources can be difficult and time-consuming for large data sets. SysMO-DB provide tools to make data and model annotation easier.
+      Accessing and navigating these resources can be difficult and time-consuming for large data sets. SysMO-DB provide tools to make data and <%= t('model') %> annotation easier.
       
       h3. RightField
       
@@ -339,8 +339,8 @@ help_documents:
       
       h3. JWS OneStop
       
-      OneStop assists with model annotation and publishing. It is a one-stop-shop for producing a MIRIAM-compliant, annotated model in SBML. OneStop extracts the names used for species and reactions in an uploaded model and uses these names to search public databases for the official terms and MIRIAM identifiers. It uses the Semantic SBML web service (http://semanticsbml.org/) for searching and returns a list of possible matches that the modellers can select from. This ensures the accuracy of each annotation whilst providing an easy mechanism for identifying possible matches. 
-      In addition to annotations, OneStop also provides editing and validation functionality as well as automatically exporting models in SBGN.
+      OneStop assists with <%= t('model') %> annotation and publishing. It is a one-stop-shop for producing a MIRIAM-compliant, annotated <%= t('model') %> in SBML. OneStop extracts the names used for species and reactions in an uploaded <%= t('model') %> and uses these names to search public databases for the official terms and MIRIAM identifiers. It uses the Semantic SBML web service (http://semanticsbml.org/) for searching and returns a list of possible matches that can be selected from. This ensures the accuracy of each annotation whilst providing an easy mechanism for identifying possible matches.
+      In addition to annotations, OneStop also provides editing and validation functionality as well as automatically exporting <%= t('model').pluralize %> in SBGN.
       
 
     - 2010-05-27 10:44:44
@@ -472,7 +472,7 @@ help_documents:
       *Genotype* \xE2\x80\x93 a brief text description of the genotype\r\n\
       *Phenotype* \xE2\x80\x93 a brief text description of the phenotype\r\n\
       *Culture Growth* - This describes how the culture was grown for this assay. You can choose values from a drop-down list when adding new assays directly to SEEK\r\n\
-      *<%= t('data_file') %> Titles* \xE2\x80\x93 the title of one or many <%= t('data_file').downcase.pluralize %> produced during this assay\r\n\
+      *<%= t('data_file') %> Titles* \xE2\x80\x93 the title of one or many <%= t('data_file').pluralize %> produced during this assay\r\n\
       *<%= t('sop') %> Titles* \xE2\x80\x93 the title of one or many <%= t('sop').pluralize %> used to execute this assay\r\n"
     - 2010-09-01 08:59:29
     - 2010-09-01 09:04:59
@@ -482,9 +482,9 @@ help_documents:
     - |
       h1. A Quick Guide to Using ISA in SEEK
       
-      ISA stands for Investigations, Studies and Assays. It is the structure developed by the ISA-TAB community (http://isacommons.org/) and adopted by the SEEK to help you describe your data, experiments and models.
-      In SEEK, you can upload or link to any data, models or protocols from your projects, but they don't normally exist in isolation. ISA provides a framework for expressing how the work in your projects fits together. For example, you may have transcriptomics, proteomics and metabolomics data which was all created to address the same biological problem. 
-      ISA also allows you to associate your data to the <%= t('sop').pluralize %> that were used to create them. For models, it allows linkage to construction or validation data sets. This makes it easier for others to interpret your results, or to repeat or validate your results when required.
+      ISA stands for Investigations, Studies and Assays. It is the structure developed by the ISA-TAB community (http://isacommons.org/) and adopted by the SEEK to help you describe your data, experiments and <%= t('model').pluralize %>.
+      In SEEK, you can upload or link to any data, <%= t('model').pluralize %> or protocols from your projects, but they don't normally exist in isolation. ISA provides a framework for expressing how the work in your projects fits together. For example, you may have transcriptomics, proteomics and metabolomics data which was all created to address the same biological problem.
+      ISA also allows you to associate your data to the <%= t('sop').pluralize %> that were used to create them. For <%= t('model').pluralize %>, it allows linkage to construction or validation data sets. This makes it easier for others to interpret your results, or to repeat or validate your results when required.
       The aim of using the ISA structure is to ensure a complete record of the experiment and associated assets is available and accessible to other project members in a standard format.
       
       h2. Investigations, Studies and Assays Defined
@@ -520,7 +520,7 @@ help_documents:
       
       !/help_images/0000/0003/ISADataModel.png!
        
-      In this case, the Assay is not a laboratory experiment, but a modelling task. Referring to it as an assay is therefore confusing, so we call these Modelling Analyses instead of Assays. This modelling analysis has a publication and a model associated with it, as well as a <%= t('data_file').downcase %> that was used for model validation. The <%= t('data_file').downcase %> is also associated with another assay (Intracellular Metabolites). This assay describes how the validation data was originally produced. As you can see, it is possible to associate <%= t('data_file').downcase.pluralize %>, models, and other SEEK assets with more than one assay if necessary.
+      In this case, the Assay is not a laboratory experiment, but a modelling task. Referring to it as an assay is therefore confusing, so we call these Modelling Analyses instead of Assays. This modelling analysis has a publication and a model associated with it, as well as a <%= t('data_file') %> that was used for model validation. The <%= t('data_file') %> is also associated with another assay (Intracellular Metabolites). This assay describes how the validation data was originally produced. As you can see, it is possible to associate <%= t('data_file').pluralize %>, <%= t('data_file').pluralize %>, and other SEEK assets with more than one assay if necessary.
       
       h2. Using ISA when Uploading SEEK Assets
       
@@ -534,7 +534,7 @@ help_documents:
       
       When uploading your data, you will be asked wish assay(s) it is associated with. If you have already described the assay in the SEEK, you can find it from the drop-down list and link it, if you have not yet described your assay, you can leave this step out for the time-being. If your data is JERM compliant, many of the metadata elements in the upload form are the same as those in the first JERM metadata sheet. Soon, these elements will be automatically populated from your file, but for now, you will be asked to specify them in the web interface.
       Once you have uploaded your data, you can create a new assay if necessary and link it back to your data. New assays can be associated with pre-existing Studies and Investigations, or new ones can be created as required. 
-      If you upload data without linking it to the ISA structure, you won't be able to link it to models or <%= t('sop').pluralize %>. You will receive a warning email for these orphan  <%= t('data_file').downcase.pluralize %> after they remain unlinked for more than 3 months.
+      If you upload data without linking it to the ISA structure, you won't be able to link it to <%= t('model').pluralize %> or <%= t('sop').pluralize %>. You will receive a warning email for these orphan  <%= t('data_file').pluralize %> after they remain unlinked for more than 3 months.
       
       
 

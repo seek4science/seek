@@ -29,7 +29,7 @@ class SamplesController < ApplicationController
     end
     @existing_sample.model_masters.each do |m|
        if !m.can_view?
-       flash.now[:notice] << "Some or all Models of the existing Sample cannot be viewed, you may specify your own! <br/>"
+       flash.now[:notice] << "Some or all #{t('model').pluralize} of the existing Sample cannot be viewed, you may specify your own! <br/>"
         break
       end
     end

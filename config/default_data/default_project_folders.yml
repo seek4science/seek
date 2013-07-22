@@ -4,20 +4,20 @@ root:
   deletable: false
 
 models:
-  title: "Models"
+  title: <%= I18n.t('model').pluralize %>
   children: published
 
 published:
   title: "Published"
 
 data:
-  title: "Data Files"
+  title: <%= I18n.t('data_file').pluralize %>
 
 sops:
-  title: "SOPs"
+  title: <%= I18n.t('sop').pluralize %>
 
 presentations:
-  title: "Presentations"
+  title: <%= I18n.t('presentation').pluralize %>
 
 publications:
   title: "Publications"

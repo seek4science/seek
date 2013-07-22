@@ -38,7 +38,7 @@ help_documents:
     - index
     - List of Topics
     - |-
-      h2. Guidelines for Data and Model Annotation in SEEK
+      h2. Guidelines for Data and <%= I18n.I18n.t('model') %> Annotation in SEEK
 
       [metadata-guidelines]
       [isa-best-practice]
@@ -112,7 +112,7 @@ help_documents:
       *Genotype* \xE2\x80\x93 a brief text description of the genotype\r\n\
       *Phenotype* \xE2\x80\x93 a brief text description of the phenotype\r\n\
       *Culture Growth* - This describes how the culture was grown for this assay. You can choose values from a drop-down list when adding new assays directly to SEEK\r\n\
-      *<%= t('data_file') %> Titles* \xE2\x80\x93 the title of one or many <%= t('data_file').downcase.pluralize %> produced during this assay\r\n\
+      *<%= t('data_file') %> Titles* \xE2\x80\x93 the title of one or many <%= t('data_file').pluralize %> produced during this assay\r\n\
       *<%= t('sop') %> Titles* \xE2\x80\x93 the title of one or many <%= t('sop').pluralize %> used to execute this assay\r\n\
       \r\n\
       \r\n\
@@ -128,14 +128,14 @@ help_documents:
       *Units* \xE2\x80\x93 how the measurements were taken, e.g. concentration in mmol, or mass in grams.\r\n\
       \r\n\
       \r\n\
-      h3. Models \r\n\
+      h3. <%= I18n.I18n.t('model').pluralize %> \r\n\
       \r\n\
       *Filename/archive name* \xE2\x80\x93 the title of the asset\r\n\
-      *Description* - free text to describe what the model is showing\r\n\
-      *Model Type* \xE2\x80\x93 what kind of mathematical equations does your model contain e.g. ODE, algebraic\r\n\
-      *Model Format* \xE2\x80\x93 e.g. SBML, CellML. If uploading directly through SEEK, you will be able to chose from a drop-down list\r\n\
-      *Model Execution Environment and URL* \xE2\x80\x93 how do you run a simulation on your model? This field should provide a link to a tool or resource which would allow you to run your model\r\n\
-      *Linking Models to Data* \xE2\x80\x93 this section allows you to specify how and where <%= t('data_file').downcase.pluralize %> were used to a) construct your model b) validate your model, or c) record simulation results from your model. If you are uploading directly through SEEK, you can find the relevant files by searching a drop-down list. If uploading through a JERM Harvester, you should use the <%= t('data_file').downcase %> title or SEEKID \r\n\
+      *Description* - free text to describe what the <%= I18n.t('model') %> is showing\r\n\
+      *<%= I18n.t('model') %> Type* \xE2\x80\x93 what kind of mathematical equations does your <%= I18n.t('model') %> contain e.g. ODE, algebraic\r\n\
+      *<%= I18n.t('model') %> Format* \xE2\x80\x93 e.g. SBML, CellML. If uploading directly through SEEK, you will be able to chose from a drop-down list\r\n\
+      *<%= I18n.t('model') %> Execution Environment and URL* \xE2\x80\x93 how do you run a simulation on your <%= I18n.t('model') %>? This field should provide a link to a tool or resource which would allow you to run your <%= I18n.t('model') %>\r\n\
+      *Linking <%= I18n.t('model').pluralize %> to Data* \xE2\x80\x93 this section allows you to specify how and where <%= t('data_file').pluralize %> were used to a) construct your <%= I18n.t('model') %> b) validate your <%= I18n.t('model') %>, or c) record simulation results from your <%= I18n.t('model') %>. If you are uploading directly through SEEK, you can find the relevant files by searching a drop-down list. If uploading through a JERM Harvester, you should use the <%= t('data_file') %> title or SEEKID \r\n\
       \r\n\
       \r\n\
       h3. <%= t('sop').pluralize %>\r\n\
@@ -153,7 +153,7 @@ help_documents:
       Currently, publications are linked to people and projects. In the next version, publications will be linked to other <%= Seek::Config.project_name %> assets to allow you to use the SEEK as a supplementary data store\r\n\
       \r\n\
       \r\n\
-      *Attribution* \xE2\x80\x93 Some assets are based on others, for example, a model may use data from an experimental assay, or a <%= t('sop') %> may be a modified version of another. The attribution section allows you to specify when this is the case\r\n"
+      *Attribution* \xE2\x80\x93 Some assets are based on others, for example, a <%= I18n.t('model') %> may use data from an experimental assay, or a <%= t('sop') %> may be a modified version of another. The attribution section allows you to specify when this is the case\r\n"
     - 2010-05-20 08:37:01
     - 2010-05-20 08:37:01
   - - "9"
@@ -173,13 +173,13 @@ help_documents:
       This worksheet is an overview of the experiment, factors studied, protocols, publication information and contact details.\r\n\
       \r\n\
       *SDRF \xE2\x80\x93 Sample and Data Relationship Format*\r\n\
-      This worksheet details the links between sample and data, it can include information about the source (e.g. organism rat), the sample (e.g. rat liver), extracts (e.g. total RNA), labelled extract (e.g. synthetic DNA), hybridisations (e.g. a reference on the Array as defined by the ADF), raw data (e.g. a reference to a raw <%= t('data_file').downcase %>), normalisation (e.g. a reference to normalised <%= t('data_file').downcase %>), derived array <%= t('data_file').downcase.pluralize %> (e.g. a reference to a derived <%= t('data_file').downcase %>, or file matrix)\r\n\
+      This worksheet details the links between sample and data, it can include information about the source (e.g. organism rat), the sample (e.g. rat liver), extracts (e.g. total RNA), labelled extract (e.g. synthetic DNA), hybridisations (e.g. a reference on the Array as defined by the ADF), raw data (e.g. a reference to a raw <%= t('data_file') %>), normalisation (e.g. a reference to normalised <%= t('data_file') %>), derived array <%= t('data_file').pluralize %> (e.g. a reference to a derived <%= t('data_file') %>, or file matrix)\r\n\
       \r\n\
       *Raw Data and Processed Data*\r\n\
       These worksheets hold the actual and derived data values\r\n\
       \r\n\
       *ADF \xE2\x80\x93 Array Design Format (optional)*\r\n\
-      This worksheet provides the array-level annotation for the experiment, relating the row-level identifiers in the <%= t('data_file').downcase.pluralize %> to biological sequence annotation.\r\n\
+      This worksheet provides the array-level annotation for the experiment, relating the row-level identifiers in the <%= t('data_file').pluralize %> to biological sequence annotation.\r\n\
       \r\n\
       There are a detailed \"set of help pages and examples provided by the MGED community\":http://tab2mage.sourceforge.net/docs/magetab_docs.html\r\n\
       \r\n\
@@ -195,7 +195,7 @@ help_documents:
       \r\n\
       h3. SDRF\r\n\
       \r\n\
-      This file links the sample and source information to the <%= t('data_file').downcase.pluralize %> and their locations.\r\n\
+      This file links the sample and source information to the <%= t('data_file').pluralize %> and their locations.\r\n\
       The \xE2\x80\x9Cprotocol\xE2\x80\x9D columns will normally be followed by \xE2\x80\x9Cfactor value\xE2\x80\x9D columns. Again, we can extract these from the experimental conditions and factors studies sections of SEEK where you are referring to a <%= t('sop') %> already submitted. \r\n\
       \r\n\
       \r\n\
@@ -220,7 +220,7 @@ help_documents:
     - Frequently Asked Questions
     - "h6. What is the <%= Seek::Config.application_name %>? \r\n\
       \r\n\
-      The SEEK is a catalogue of assets held by the <%= Seek::Config.project_long_name %>. You can use the SEEK searching interface to find Data, Models, <%= t('sop').pluralize %> and protocols. You can also use it to find people, their institutions and their expertise\r\n\
+      The SEEK is a catalogue of assets held by the <%= Seek::Config.project_long_name %>. You can use the SEEK searching interface to find Data, <%= I18n.t('model').pluralize %>, <%= t('sop').pluralize %> and protocols. You can also use it to find people, their institutions and their expertise\r\n\
       \r\n\
       \r\n\
       h6. What is the Yellow Page?\r\n\
@@ -228,14 +228,14 @@ help_documents:
       A directory of all the current and past members of the <%= Seek::Config.project_long_name %>, their project associates, their institutions and their expertise and experience\r\n\
       \r\n\
       \r\n\
-      h6. Are the <%= Seek::Config.project_name %> Assets (Data, Models, and <%= t('sop').pluralize %>) kept in SEEK?\r\n\
+      h6. Are the <%= Seek::Config.project_name %> Assets (Data, <%= I18n.t('model').pluralize %>, and <%= t('sop').pluralize %>) kept in SEEK?\r\n\
       \r\n\
       Not normally. SEEK links to the repositories of each <%= Seek::Config.project_name %> project, so it is a catalogue of what is available rather than a repository. You can, however, upload files if you wish.\r\n\
       \r\n\
       \r\n\
-      h6. What kind of models can I store/link to?\r\n\
+      h6. What kind of <%= I18n.t('model').pluralize %> can I store/link to?\r\n\
       \r\n\
-      SEEK can handle models in any format, but we recommend that you use SBML. JWS Online simulations can also be run from SEEK for models in SBML\r\n\
+      SEEK can handle <%= I18n.t('model').pluralize %> in any format, but we recommend that you use SBML. JWS Online simulations can also be run from SEEK for <%= I18n.t('model').pluralize %> in SBML\r\n\
       \r\n\
       \r\n\
       h6. What format should <%= t('sop').pluralize %> be in?\r\n\
@@ -260,7 +260,7 @@ help_documents:
       \r\n\
       h6. What is the assay Tab for?\r\n\
       \r\n\
-      An assay describes a particular experiment. It allows you to associate <%= t('data_file').downcase.pluralize %>, <%= t('sop').pluralize %> and models together as well as describing the type of assay and any technology required to perform the experiment.\r\n\
+      An assay describes a particular experiment. It allows you to associate <%= t('data_file').pluralize %>, <%= t('sop').pluralize %> and <%= I18n.t('model').pluralize %> together as well as describing the type of assay and any technology required to perform the experiment.\r\n\
       \r\n\
       \r\n\
       h6. Can I change or add information to SEEK assets after they are uploaded?\r\n\
@@ -274,7 +274,7 @@ help_documents:
       \r\n\
       h6. What is metadata?\r\n\
       \r\n\
-      Metadata is a description of the data and where it originates (it is data about the data). For example, metadata about a model would include; who produced it, what project was it associated with, what format it was in, what type of model etc."
+      Metadata is a description of the data and where it originates (it is data about the data). For example, metadata about a <%= I18n.t('model') %> would include; who produced it, what project was it associated with, what format it was in, what type of <%= I18n.t('model') %> etc."
     - 2010-05-20 09:11:43
     - 2010-05-20 09:11:43
   - - "11"
@@ -352,7 +352,7 @@ help_documents:
       * *Investigation:* a high level description of the area and the main aims of a project\r\n    ** In <%= Seek::Config.project_name %>, this may be the overall aims as stated on the <%= Seek::Config.project_name %> website. \r\n\
       If your project has several subprojects that do not share any data, you should define an investigation for each.\r\n    ** *BII Example:* Growth control of the eukaryote cell: a systems biology study in yeast\r\n    ** *<%= Seek::Config.project_name %> Example* Analysis of Central Carbon Metabolism of Sulfolobus solfataricus under varying temperatures\r\n\
       \r\n\
-      * *Study:* a particular biological hypothesis or analysis\r\n   ** In <%= Seek::Config.project_name %>, these studies may contain only <%= I18n.t('assays.experimental_assay').downcase.pluralize %>, only <%= I18n.t('assays.modelling_analysis').downcase.pluralize %>, only informatics analyses, \r\n\
+      * *Study:* a particular biological hypothesis or analysis\r\n   ** In <%= Seek::Config.project_name %>, these studies may contain only <%= I18n.t('assays.experimental_assay').pluralize %>, only <%= I18n.t('assays.modelling_analysis').pluralize %>, only informatics analyses, \r\n\
       or a mixture of all \r\n   ** *BII Example:* Study of the impact of changes in flux on the transcriptome, proteome, endometabolome and exometabolome \r\n\
       of the yeast Saccharomyces cerevisiae under different nutrient limitations\r\n   ** *<%= Seek::Config.project_name %> Example:* Comparison of S. solfataricus grown at 70 and 80 degrees\r\n\
       \r\n\
@@ -396,7 +396,7 @@ help_documents:
       *Genotype* \xE2\x80\x93 a brief text description of the genotype\r\n\
       *Phenotype* \xE2\x80\x93 a brief text description of the phenotype\r\n\
       *Culture Growth* - This describes how the culture was grown for this assay. You can choose values from a drop-down list when adding new assays directly to SEEK\r\n\
-      *<%= t('data_file') %> Titles* \xE2\x80\x93 the title of one or many <%= t('data_file').downcase.pluralize %> produced during this assay\r\n\
+      *<%= t('data_file') %> Titles* \xE2\x80\x93 the title of one or many <%= t('data_file').pluralize %> produced during this assay\r\n\
       *<%= t('sop') %> Titles* \xE2\x80\x93 the title of one or many <%= t('sop').pluralize %> used to execute this assay\r\n"
     - 2010-09-01 08:59:29
     - 2010-09-01 09:04:59

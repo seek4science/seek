@@ -162,8 +162,8 @@ class ModelsControllerTest < ActionController::TestCase
     assert_response :success
 
     assert_select 'div.foldTitle',:text=>/#{I18n.t('assays.modelling_analysis').pluralize}/
-    assert_select 'div#associate_assay_fold_content p',:text=>/The following #{I18n.t('assays.modelling_analysis').pluralize} are associated with this Model:/
-    assert_select 'div.association_step p',:text=>/You may select an existing editable #{I18n.t('assays.modelling_analysis')} to associate with this Model./
+    assert_select 'div#associate_assay_fold_content p',:text=>/The following #{I18n.t('assays.modelling_analysis').pluralize} are associated with this #{I18n.t('model')}:/
+    assert_select 'div.association_step p',:text=>/You may select an existing editable #{I18n.t('assays.modelling_analysis')} to associate with this #{I18n.t('model')}./
   end
 
   test "correct title and text for associating a modelling analysis for edit" do
@@ -173,8 +173,8 @@ class ModelsControllerTest < ActionController::TestCase
     assert_response :success
 
     assert_select 'div.foldTitle',:text=>/#{I18n.t('assays.modelling_analysis').pluralize}/
-    assert_select 'div#associate_assay_fold_content p',:text=>/The following #{I18n.t('assays.modelling_analysis').pluralize} are associated with this Model:/
-    assert_select 'div.association_step p',:text=>/You may select an existing editable #{I18n.t('assays.modelling_analysis')} to associate with this Model./
+    assert_select 'div#associate_assay_fold_content p',:text=>/The following #{I18n.t('assays.modelling_analysis').pluralize} are associated with this #{I18n.t('model')}:/
+    assert_select 'div.association_step p',:text=>/You may select an existing editable #{I18n.t('assays.modelling_analysis')} to associate with this #{I18n.t('model')}./
   end
 
   test "fail gracefullly when trying to access a missing model" do
@@ -186,7 +186,7 @@ class ModelsControllerTest < ActionController::TestCase
   test "should get new as non admin" do
     get :new    
     assert_response :success
-    assert_select "h1",:text=>"New Model"
+    assert_select "h1",:text=>"New #{I18n.t('model')}"
 
     #non admins can't edit types
     assert_select "span#delete_model_type_icon",:count=>0
@@ -463,7 +463,7 @@ class ModelsControllerTest < ActionController::TestCase
     assert_response :success
 
     assert_select "div.box_about_actor" do
-      assert_select "p > strong",:text=>"1 item is associated with this Model:"
+      assert_select "p > strong",:text=>"1 item is associated with this #{I18n.t('model')}:"
       assert_select "ul.fileinfo_list" do
         assert_select "li.fileinfo_container" do
             assert_select "p > b",:text=>/Filename:/
@@ -489,7 +489,7 @@ class ModelsControllerTest < ActionController::TestCase
     assert_response :success
 
     assert_select "div.box_about_actor" do
-      assert_select "p > strong",:text=>"2 items are associated with this Model:"
+      assert_select "p > strong",:text=>"2 items are associated with this #{I18n.t('model')}:"
       assert_select "ul.fileinfo_list" do
         assert_select "li.fileinfo_container",:count=>2 do
           assert_select "p > b",:text=>/Filename:/,:count=>2
@@ -513,7 +513,7 @@ class ModelsControllerTest < ActionController::TestCase
     end
 
     assert_response :success
-    assert_select "p.import_details",:text=>/This Model was originally imported from/ do
+    assert_select "p.import_details",:text=>/This #{I18n.t('model')} was originally imported from/ do
       assert_select "strong",:text=>"Some place"
       assert_select "a[href=?][target='_blank']","http://somewhere/model.xml",:text=>"http://somewhere/model.xml"
     end
@@ -531,7 +531,7 @@ class ModelsControllerTest < ActionController::TestCase
   test "should get edit" do
     get :edit, :id => models(:teusink)
     assert_response :success
-    assert_select "h1",:text=>/Editing Model/
+    assert_select "h1",:text=>/Editing #{I18n.t('model')}/
   end
   
   test "publications included in form for model" do
@@ -1015,7 +1015,7 @@ class ModelsControllerTest < ActionController::TestCase
     login_as(model.contributor)
     get :show, :id=>model.id
     assert_response :success
-    assert_select "a[href=?]",visualise_model_path(model,:version=>model.version), :text=>"Visualise Model with Cytoscape Web"
+    assert_select "a[href=?]",visualise_model_path(model,:version=>model.version), :text=>"Visualise #{I18n.t('model')} with Cytoscape Web"
   end
 
   test "should not display cytoscape button for supported models" do
@@ -1039,7 +1039,7 @@ class ModelsControllerTest < ActionController::TestCase
       login_as(model.contributor)
       get :show, :id=>model.id
       assert_response :success
-      assert_select "a", :text => /Simulate Model on Sycamore/
+      assert_select "a", :text => /Simulate #{I18n.t('model')} on Sycamore/
     end
   end
 
@@ -1069,7 +1069,7 @@ class ModelsControllerTest < ActionController::TestCase
       assert !model.can_download?
 
       post :submit_to_sycamore, :id => model.id, :version => model.version
-      assert @response.body.include?('You are not allowed to simulate this model with Sycamore')
+      assert @response.body.include?("You are not allowed to simulate this #{I18n.t('model')} with Sycamore")
     end
   end
 

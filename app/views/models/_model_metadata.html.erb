@@ -2,7 +2,7 @@
 
 <p>
   <span id="model_type_info" style="display:none;"></span>
-  <b>Model type:</b><br/>
+  <b><%= t('model') %> type:</b><br/>
 
   <span id="model_type_selection">
     <%= collection_select :model,
@@ -23,7 +23,7 @@
       <%= hidden_field_tag :selected_model_type_id %>
       <%= link_to_with_callbacks image("destroy"),
        {:url=>{:action=>:delete_model_metadata,:attribute=>"model_type"},
-        :confirm=>"Are you sure you wish to delete this model type?",
+        :confirm=>"Are you sure you wish to delete this #{t('model')} type?",
         :with=>"$('selected_model_type_id').serialize()",
         :before=>"show_ajax_loader('model_type_selection');$('edit_model_type_icon').hide();$('delete_model_type_icon').hide();"},
        {:remote => true}
@@ -68,7 +68,7 @@
 
 <p>
   <span id="model_format_info" style="display:none;"></span>
-  <b>Model format:</b><br/>
+  <b><%= t('model') %> format:</b><br/>
 
   <span id="model_format_selection">
     <%= collection_select :model, :model_format_id, ModelFormat.all, :id, :title,
@@ -85,7 +85,7 @@
       <%= hidden_field_tag :selected_model_format_id %>
       <%= link_to_with_callbacks image("destroy"),
        {:url=>{:action=>:delete_model_metadata,:attribute=>"model_format"},
-        :confirm=>"Are you sure you wish to delete this model format?",
+        :confirm=>"Are you sure you wish to delete this #{t('model')} format?",
         :with=>"$('selected_model_format_id').serialize()",
         :before=>"show_ajax_loader('model_format_selection');$('edit_model_format_icon').hide();$('delete_model_format_icon').hide();"},
        {:remote => true}

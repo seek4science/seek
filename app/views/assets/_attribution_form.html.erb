@@ -12,7 +12,7 @@
 <% case resource_type.downcase; when "sop" -%>
   <% resource_type_attributed_to_types = t('sop').pluralize -%>
   <% when "model" -%>
-  <% resource_type_attributed_to_types = "Models" -%>
+  <% resource_type_attributed_to_types = t('model').pluralize -%>
   <% when "datafile" -%>
   <% resource_type_attributed_to_types = t('data_file').pluralize -%>
   <% when "presentation" -%>

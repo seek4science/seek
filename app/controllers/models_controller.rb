@@ -43,7 +43,7 @@ class ModelsController < ApplicationController
   end
 
   def visualise
-    raise Exception.new("This model does not support Cytoscape") unless @display_model.contains_xgmml?
+    raise Exception.new("This #{t('model')} does not support Cytoscape") unless @display_model.contains_xgmml?
      # for xgmml file
      doc = find_xgmml_doc @display_model
      # convert " to \" and newline to \n
@@ -106,7 +106,7 @@ class ModelsController < ApplicationController
         flash[:error]="JWS Online encountered a problem processing this model."
         format.html { redirect_to model_path(@model,:version=>@display_model.version)}
       elsif !supported
-        flash[:error]="This model is of neither SBML or JWS Online (Dat) format so cannot be used with JWS Online"
+        flash[:error]="This #{t('model')} is of neither SBML or JWS Online (Dat) format so cannot be used with JWS Online"
         format.html { redirect_to model_path(@model,:version=>@display_model.version)}        
       else
         format.html
@@ -182,7 +182,7 @@ class ModelsController < ApplicationController
     if !Seek::Config.sycamore_enabled
       error_message = "Interaction with Sycamore is currently disabled"
     elsif !@model.can_download? && (params[:code].nil? || (params[:code] && !@model.auth_by_code?(params[:code])))
-      error_message = "You are not allowed to simulate this model with Sycamore"
+      error_message = "You are not allowed to simulate this #{t('model')} with Sycamore"
     end
 
     render :update do |page|
@@ -202,7 +202,7 @@ class ModelsController < ApplicationController
         @modelname = Seek::JWS::Simulator.new.simulate(@display_model.jws_supported_content_blobs.first)
       end
     rescue Exception=>e
-      Rails.logger.error("Problem simulating model on JWS Online #{e}")
+      Rails.logger.error("Problem simulating #{t('model')} on JWS Online #{e}")
       raise e unless Rails.env=="production"
       error=e
     end
@@ -212,7 +212,7 @@ class ModelsController < ApplicationController
         flash[:error]="JWS Online encountered a problem processing this model."
         format.html { redirect_to(@model, :version=>@display_model.version) }
       elsif !@display_model.is_jws_supported?
-        flash[:error]="This model is of neither SBML or JWS Online (Dat) format so cannot be used with JWS Online"
+        flash[:error]="This #{t('model')} is of neither SBML or JWS Online (Dat) format so cannot be used with JWS Online"
         format.html { redirect_to(@model, :version=>@display_model.version) }
       else
          format.html { render :simulate,:layout=>"jws_simulate" }
@@ -296,13 +296,13 @@ class ModelsController < ApplicationController
       m=ModelType.find(id)
       m.title=title
       if m.save
-        msg="OK. Model type changed to #{title}."
+        msg="OK. #{t('model')} type changed to #{title}."
         success=true
       else
         msg="ERROR - There was a problem changing to #{title}"
       end
     else
-      msg="ERROR - Another model type with #{title} already exists"
+      msg="ERROR - Another #{t('model')} type with #{title} already exists"
     end
     
     render :update do |page|
@@ -321,13 +321,13 @@ class ModelsController < ApplicationController
     if ModelType.where(:title=>title).first.nil?
       new_model_type=ModelType.new(:title=>title)
       if new_model_type.save
-        msg="OK. Model type #{title} added."
+        msg="OK. #{t('model')} type #{title} added."
         success=true
       else
         msg="ERROR - There was a problem adding #{title}"
       end
     else
-      msg="ERROR - Model type #{title} already exists"
+      msg="ERROR - #{t('model')} type #{title} already exists"
     end
     
     
@@ -348,13 +348,13 @@ class ModelsController < ApplicationController
     if ModelFormat.where(:title=>title).first.nil?
       new_model_format=ModelFormat.new(:title=>title)
       if new_model_format.save
-        msg="OK. Model format #{title} added."
+        msg="OK. #{t('model')} format #{title} added."
         success=true
       else
         msg="ERROR - There was a problem adding #{title}"
       end
     else
-      msg="ERROR - Another model format #{title} already exists"
+      msg="ERROR - Another #{t('model')} format #{title} already exists"
     end
     
     
@@ -378,13 +378,13 @@ class ModelsController < ApplicationController
       m=ModelFormat.find(id)
       m.title=title
       if m.save
-        msg="OK. Model format changed to #{title}."
+        msg="OK. #{t('model')} format changed to #{title}."
         success=true
       else
         msg="ERROR - There was a problem changing to #{title}"
       end
     else
-      msg="ERROR - Another model format with #{title} already exists"
+      msg="ERROR - Another #{t('model')} format with #{title} already exists"
     end
     
     render :update do |page|
@@ -461,7 +461,7 @@ class ModelsController < ApplicationController
           #Add creators
           AssetsCreator.add_or_update_creator_list(@model, params[:creators])
           
-          flash[:notice] = 'Model was successfully uploaded and saved.'
+          flash[:notice] = "#{t('model')} was successfully uploaded and saved."
           format.html { redirect_to model_path(@model) }
           Assay.find(assay_ids).each do |assay|
             if assay.can_edit?
@@ -514,7 +514,7 @@ class ModelsController < ApplicationController
           #update creators
           AssetsCreator.add_or_update_creator_list(@model, params[:creators])
 
-          flash[:notice] = 'Model metadata was successfully updated.'
+          flash[:notice] = "#{t('model')} metadata was successfully updated."
           format.html { redirect_to model_path(@model) }
           # Update new assay_asset
           Assay.find(assay_ids).each do |assay|
@@ -583,7 +583,7 @@ class ModelsController < ApplicationController
     authorised_ids = DataFile.authorize_asset_collection(data_files,"view").collect &:id
     @matching_data_items = @matching_data_items.select{|mdf| authorised_ids.include?(mdf.primary_key.to_i)}
 
-    flash.now[:notice]="#{@matching_data_items.count} #{t('data_file').pluralize} found that may be relevant to this Model"
+    flash.now[:notice]="#{@matching_data_items.count} #{t('data_file').pluralize} found that may be relevant to this #{t('model')}"
     respond_to do |format|
       format.html
     end
