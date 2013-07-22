@@ -192,7 +192,7 @@ class InvestigationsControllerTest < ActionController::TestCase
 
   test "option to delete investigation without study" do    
     get :show,:id=>Factory(:investigation, :contributor => User.current_user).id
-    assert_select "a",:text=>/Delete #{I18n.t('investigation')}/i,:count=>1
+    assert_select "a",:text=>/Delete #{I18n.t('investigation')}/,:count=>1
   end
 
   test "no option to delete investigation with study" do

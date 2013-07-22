@@ -43,7 +43,7 @@ class ApplicationHelperTest < ActionView::TestCase
   test "resource tab title" do
     assert_equal "EBI Biomodels",resource_tab_item_name("EBI Biomodels",true)
     assert_equal "Database",resource_tab_item_name("Database",false)
-    assert_equal "Models",resource_tab_item_name("Model")
+    assert_equal I18n.t('model').pluralize,resource_tab_item_name("Model")
     assert_equal I18n.t('data_file').pluralize,resource_tab_item_name("DataFile")
     assert_equal I18n.t('data_file').pluralize,resource_tab_item_name("DataFiles")
     assert_equal I18n.t('data_file'),resource_tab_item_name("DataFile",false)

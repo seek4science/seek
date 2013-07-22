@@ -73,9 +73,9 @@ class HomesControllerTest < ActionController::TestCase
     login_as(:quentin)
     get :index
     if Seek::Config.is_virtualliver
-      assert_select "div.section>li>a[href=?]","/sops",:text=>"SOPs",:count=>1
+      assert_select "div.section>li>a[href=?]","/sops",:text=>"#{I18n.t('sop').pluralize}",:count=>1
     else
-      assert_select "ul.tabnav>li>a[href=?]","/sops",:text=>"SOPs",:count=>1
+      assert_select "ul.tabnav>li>a[href=?]","/sops",:text=>"#{I18n.t('sop').pluralize}",:count=>1
     end
 
   end
@@ -84,7 +84,7 @@ class HomesControllerTest < ActionController::TestCase
     login_as(:quentin)
     get :index
     assert_select "ul#new_asset_menu",:count=>1 do
-      assert_select "li.dynamic_menu_li", :text=>"SOP", :count => 1
+      assert_select "li.dynamic_menu_li", :text=>"#{I18n.t('sop')}", :count => 1
     end
   end
 

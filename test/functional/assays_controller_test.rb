@@ -754,7 +754,7 @@ end
     assert_response :success
 
     assert_select "div.tabbertab" do
-      assert_select "h3", :text=>"SOPs (1+1)", :count=>1
+      assert_select "h3", :text=>"#{I18n.t('sop').pluralize} (1+1)", :count=>1
       assert_select "h3", :text=>"#{I18n.t('data_file').pluralize} (1+1)", :count=>1
     end
 

@@ -81,7 +81,7 @@ class EventsControllerTest < ActionController::TestCase
   test "should get new" do
     get :new
     assert_response :success
-    assert_select "h1",:text=>"New Event"
+    assert_select "h1",:text=>"New #{I18n.t('event')}"
   end
 
   test "should get unauthorized message" do
@@ -118,7 +118,7 @@ class EventsControllerTest < ActionController::TestCase
   test "should get edit" do
     get :edit, :id => events(:event_with_no_files)
     assert_response :success
-    assert_select "h1", /Editing Event:/
+    assert_select "h1", /Editing #{I18n.t('event')}:/
   end
 
   test "should update events title" do
