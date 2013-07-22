@@ -35,7 +35,7 @@
     } -%>
 
     <%= render :partial=>'setting_li',:locals=>{
-            :name=>"Investigations",
+            :name=>t('investigation').pluralize,
             :field=>(radio_button_tag(:investigations, "latest", Seek::Config.default_page("investigations") == "latest") +
                     label_tag(:investigations_latest, "latest") +
                     radio_button_tag(:investigations, "all",Seek::Config.default_page("investigations") == "all") +
