@@ -43,7 +43,7 @@ class ProjectFolder < ActiveRecord::Base
   def self.initialize_default_folders project, yaml_path=File.join(Rails.root,"config","default_data","default_project_folders.yml")
     raise Exception.new("This project already has folders defined") unless ProjectFolder.root_folders(project).empty?
 
-    yaml=YAML::load_file yaml_path
+    yaml = YAML.load(ERB.new(File.read(yaml_path)).result)
     folders={}
 
     #create individual folder items
