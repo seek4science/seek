@@ -136,13 +136,13 @@ class InvestigationsControllerTest < ActionController::TestCase
     inv = investigations(:metabolomics_investigation)
     assert !inv.can_edit?,"Aaron should not be able to edit this investigation"
     get :show, :id=>inv
-    assert_select "a",:text=>/Add a study/i,:count=>0
+    assert_select "a",:text=>/Add a #{I18n.t('study')}/i,:count=>0
   end
 
   test "add study button for person that can edit" do
     inv = investigations(:metabolomics_investigation)
     get :show, :id=>inv
-    assert_select "a[href=?]",new_study_path(:investigation_id=>inv),:text=>/Add a study/i,:count=>1
+    assert_select "a[href=?]",new_study_path(:investigation_id=>inv),:text=>/Add a #{I18n.t('study')}/i,:count=>1
   end
 
 
