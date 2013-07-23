@@ -50,7 +50,7 @@ module Seek
 
     def add_show_breadcrumb resource, breadcrumb_name=nil
       unless resource.is_a?(ProjectFolder)
-        breadcrumb_name ||= "#{resource.respond_to?(:title) ? h(resource.title) : resource.id}"
+        breadcrumb_name ||= "#{resource.respond_to?(:title) ? resource.title : resource.id}"
         add_breadcrumb breadcrumb_name, url_for(:controller => resource.class.name.underscore.pluralize, :action => 'show', :id => resource.id)
       end
     end
