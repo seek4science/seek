@@ -53,7 +53,7 @@
               <%= select_tag :assay_ids,'',{:multiple=>true,:style=>"display:none;"} -%>
               <br/>
               <div id="relationship" style="display:none;">
-                <%= label_tag "How is the data used in this #{t('assay.modelling_analysis')}" %><br/>
+                <%= label_tag "How is the data used in this #{t('assays.modelling_analysis')}" %><br/>
                 <%= select_tag :assay_relationship_type, options_for_select([["None",0]] + RelationshipType.all.collect{|r| [r.title,r.id]}) %>
               </div>
               <br/>
