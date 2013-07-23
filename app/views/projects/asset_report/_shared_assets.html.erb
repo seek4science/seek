@@ -1,6 +1,6 @@
 <h1>Data, <%= t('model').pluralize %> and <%= t('sop').pluralize %> that are a available publicly, including to non <%= Seek::Config.application_name %> members</h1>
 <p class='box_infotext' style="width:98%;text-align:center;margin-bottom:1em;">
-  These are the Data, <%= t('model').pluralize %> and <%= t('sop').pluralize %> that are available to download by any visitor to the <%= Seek::Config.application_name -%>, including those without a registered account.
+  These are the <%= t('data_file').pluralize %>, <%= t('model').pluralize %> and <%= t('sop').pluralize %> that are available to download by any visitor to the <%= Seek::Config.application_name -%>, including those without a registered account.
 </p>
 <% @types.each do |type| -%>
 
@@ -25,9 +25,9 @@
 <% end -%>
 
 
-<h1>Data, <%= t('model').pluralize %> and <%= t('sop').pluralize %> that are available to all projects, but are not available publicly</h1>
+<h1><%= t('data_file').pluralize %>, <%= t('model').pluralize %> and <%= t('sop').pluralize %> that are available to all projects, but are not available publicly</h1>
 <p class='box_infotext' style="width:98%;text-align:center;margin-bottom:1em;">
-  These are the Data, <%= t('model').pluralize %> and <%= t('sop').pluralize %> that are not available to download by any visitor to the <%= Seek::Config.application_name -%>, but are available to download by all members with a registered account.
+  These are the <%= t('data_file').pluralize %>, <%= t('model').pluralize %> and <%= t('sop').pluralize %> that are not available to download by any visitor to the <%= Seek::Config.application_name -%>, but are available to download by all members with a registered account.
 </p>
 <% @types.each do |type| -%>
 
