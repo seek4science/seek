@@ -33,7 +33,7 @@ module BiosamplesHelper
                                    },
                                    :title => "Edit this strain")
     else
-      explanation = "You are unable to edit this Strain"
+      explanation = "You are not authorized to edit this Strain"
       return image('edit', {:alt=>"Edit",:class=>"disabled",:onclick=>"javascript:alert(\"#{explanation}\")",:title=>"#{tooltip_title_attrib(explanation)}"})
     end
   end
@@ -93,8 +93,7 @@ module BiosamplesHelper
     end
     creators << specimen.other_creators unless specimen.other_creators.blank?
 
-    explanation = "You are unable to delete this #{I18n.t 'biosamples.sample_parent_term'}. "
-    explanation += unable_to_delete_text specimen  unless specimen.samples.blank?
+    explanation = unable_to_delete_text specimen
     disabled_delete_icon = image('destroy', {:alt=>"Delete",:class=>"disabled",:onclick=>"javascript:alert(\"#{explanation}\")",:title=>"#{tooltip_title_attrib(explanation)}"})
 
     delete_icon = specimen.can_delete? ? (link_to image("destroy", :alt => "Delete", :title => "Delete this #{I18n.t 'biosamples.sample_parent_term'}"),
@@ -106,7 +105,7 @@ module BiosamplesHelper
     elsif specimen.can_edit?
       update_icon = link_to image("edit"), edit_specimen_path(specimen) + "?from_biosamples=true", {:title => "Edit this #{I18n.t 'biosamples.sample_parent_term'}", :target => '_blank'}
     else
-      explanation = "You are unable to edit this #{I18n.t 'biosamples.sample_parent_term'}."
+      explanation = "You are not authorized to edit this #{I18n.t 'biosamples.sample_parent_term'}."
       update_icon = image('edit', {:alt=>"Edit",:class=>"disabled",:onclick=>"javascript:alert(\"#{explanation}\")",:title=>"#{tooltip_title_attrib(explanation)}"})
     end
     strain = specimen.strain
@@ -133,8 +132,7 @@ module BiosamplesHelper
   end
 
   def sample_row_data sample
-    explanation = "You are unable to delete this Sample. "
-    explanation += unable_to_delete_text sample  unless sample.assays.blank?
+    explanation = unable_to_delete_text sample
     disabled_delete_icon =  image('destroy', {:alt=>"Delete",:class=>"disabled",:onclick=>"javascript:alert(\"#{explanation}\")",:title=>"#{tooltip_title_attrib(explanation)}"})
 
     delete_icon = sample.can_delete? ? (link_to image("destroy", :alt => "Delete", :title => "Delete this sample"),
@@ -146,7 +144,7 @@ module BiosamplesHelper
     elsif sample.can_edit?
       update_icon = link_to image("edit"), edit_sample_path(sample) + "?from_biosamples=true", {:title => "Edit this sample}", :target => '_blank'}
     else
-      explanation = "You are unable to edit this Sample"
+      explanation = "You are not authorized to edit this Sample"
       update_icon = image('edit', {:alt=>"Edit",:class=>"disabled",:onclick=>"javascript:alert(\"#{explanation}\")",:title=>"#{tooltip_title_attrib(explanation)}"})
     end
 
