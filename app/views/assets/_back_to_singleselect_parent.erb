@@ -6,7 +6,7 @@
     child_type = "<%= child.class.name.underscore%>";
     parent_type ="<%= parent%>";
     if (!window.opener) {
-        alert("New "+ child_type +" was created but its parent window was closed.");
+        alert("New "+ "<%= text_for_resource(child)%>" +" was created but its parent window was closed.");
         window.close();
     }
     child_list_id = window.opener.document.getElementById(parent_type + "_" + child_type + "_id");
@@ -16,6 +16,6 @@
      child_list_id.onchange() ;
     }
 
-    alert("New "+ child_type +" was created! You can add it to your "+ parent_type +" now.");
+    alert("New "+ "<%= text_for_resource(child)%>" +" was created! You can use it now.");
     window.close();
 </script>

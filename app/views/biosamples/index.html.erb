@@ -18,7 +18,7 @@
 -%>
 
 <div class="contribution_title">
-     <h1>Browse organisms, strains, <%= I18n.t 'biosamples.sample_parent_term'%>s and samples</h1>
+     <h1>Browse Organisms, Strains, <%= I18n.t('biosamples.sample_parent_term').pluralize %> and Samples</h1>
 </div>
 
 <br/>
@@ -27,7 +27,7 @@
     Organism
   </div>
   <div class="foldContent">
-    <p class="none_text">Please select the organisms to browse the associated strains</p>
+    <p class="none_text">Please select the Organisms to browse the associated Strains</p>
     <%= select_tag "strain[organism_ids]",
                    options_for_select([["Select Organisms ...", 0]]|all_organisms.collect { |o| [truncate(h(o.title), :length => select_truncate_length), o.id] }, :selected => default_selected_organisms),
                  {:onchange=> organism_selection_onchange_function,

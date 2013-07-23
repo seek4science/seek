@@ -63,9 +63,9 @@
   </div>
   <div class="foldContent">
       <% if existing_specimens.empty? -%>
-          <p class="none_text">No <%= I18n.t 'biosamples.sample_parent_term'%>s have yet been defined for the selected organisms and strains.</p>
+          <p class="none_text">No <%= I18n.t('biosamples.sample_parent_term').pluralize %> have yet been defined for the selected Organisms and Strains.</p>
       <% else -%>
-          <p class="none_text">Please select the <%= I18n.t 'biosamples.sample_parent_term'%>s to browse the associated samples.</p>
+          <p class="none_text">Please select the <%= I18n.t('biosamples.sample_parent_term').pluralize %> to browse the associated Samples.</p>
 
           <div class="scroll_box">
             <table cellpadding="0" cellspacing="0" border="0" class="display" id="specimen_table" style="width: 100%">

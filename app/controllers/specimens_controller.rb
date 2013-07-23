@@ -17,7 +17,7 @@ class SpecimensController < ApplicationController
 
      @existing_specimen.sop_masters.each do |s|
        if !s.sop.can_view?
-       flash.now[:notice] = "Some or all #{t('sop').pluralize} of the existing specimen cannot be viewed, you may specify your own!"
+       flash.now[:notice] = "Some or all #{t('sop').pluralize} of the existing #{t('biosamples.sample_parent_term')} cannot be viewed, you may specify your own!"
         break
       end
      end
@@ -64,7 +64,7 @@ class SpecimensController < ApplicationController
         render :partial => "biosamples/back_to_biosamples", :locals => {:action => 'create', :object => @specimen}
       else
         respond_to do |format|
-          flash[:notice] = 'Specimen was successfully created.'
+          flash[:notice] = "#{t('biosamples.sample_parent_term')} was successfully created."
           format.html { redirect_to(@specimen) }
           format.xml  { head :ok }
         end
@@ -107,7 +107,7 @@ class SpecimensController < ApplicationController
         render :partial => "biosamples/back_to_biosamples", :locals => {:action => 'update', :object => @specimen}
       else
         respond_to do |format|
-          flash[:notice] = 'Specimen was successfully updated.'
+          flash[:notice] = "#{t('biosamples.sample_parent_term')} was successfully updated."
           format.html { redirect_to(@specimen) }
           format.xml { head :ok }
         end

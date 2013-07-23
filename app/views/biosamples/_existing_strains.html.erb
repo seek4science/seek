@@ -39,10 +39,10 @@
        organisms_title = organisms_title.blank? ? '' : organisms_title.join(', ')
     %>
     <% if existing_strains.empty? -%>
-        <p class="none_text">No strains have yet been defined for
+        <p class="none_text">No Strains have yet been defined for
           <span style="font-weight: bold;"> <%= h(organisms_title) -%></span>.</p>
     <% else -%>
-      <p class="none_text">Please select the strains to browse the associated <%= I18n.t 'biosamples.sample_parent_term' -%>s.
+      <p class="none_text">Please select the Strains to browse the associated <%= I18n.t('biosamples.sample_parent_term').pluralize -%>.
         </p>
 
         <div class="scroll_box">
