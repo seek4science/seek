@@ -19,7 +19,7 @@
 				<% if item -%>
 				  <% item_type = item.class.name -%>
                                         <% by_text = item.contributor.nil? ? "" : " by #{item.contributor.person.name}" %>
-					<% tooltip_txt = "<b>#{item_type}:</b> \"#{item.title}\"#{by_text}" -%>
+					<% tooltip_txt = "<b>#{item_type.humanize}:</b> \"#{item.title}\"#{by_text}" -%>
 				  <%= list_item_with_icon(item_type.underscore, item, h(item.title), truncate_to, tooltip_txt, 34) -%>
 				<% else -%>
 				  <li><span class="none_text">Private item</span></li>
