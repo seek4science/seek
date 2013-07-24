@@ -26,7 +26,7 @@
 
   <% if Seek::Config.solr_enabled && @display_model.latest_version? && (@model.contains_sbml? || @model.contains_jws_dat?) -%>
       <li>
-        <%= image_tag_for_key("search",matching_data_model_path(@model),nil,nil,"Find related data") -%>
+        <%= image_tag_for_key("search",matching_data_model_path(@model),nil,nil,"Find related #{t('data_file').pluralize}") -%>
       </li>
   <% end -%>
 

@@ -1549,7 +1549,7 @@ class DataFilesControllerTest < ActionController::TestCase
       login_as(d.contributor.user)
       get :show,:id=>d
       assert_response :success
-      assert_select "ul.sectionIcons span.icon > a[href=?]",matching_models_data_file_path(d),:text=>/Find related models/
+      assert_select "ul.sectionIcons span.icon > a[href=?]",matching_models_data_file_path(d),:text=>/Find related #{I18n.t('model').pluralize}/
     end
   end
 
@@ -1560,7 +1560,7 @@ class DataFilesControllerTest < ActionController::TestCase
       get :show,:id=>d
       assert_response :success
       assert_select "ul.sectionIcons span.icon > a[href=?]",matching_models_data_file_path(d),:count=>0
-      assert_select "ul.sectionIcons span.icon > a",:text=>/Find related models/,:count=>0
+      assert_select "ul.sectionIcons span.icon > a",:text=>/Find related #{I18n.t('model').pluralize}/,:count=>0
     end
   end
 
@@ -1575,13 +1575,13 @@ class DataFilesControllerTest < ActionController::TestCase
     with_config_value :solr_enabled,true do
       get :show,:id=>d,:version=>2
       assert_response :success
-      assert_select "ul.sectionIcons span.icon > a",:text=>/Find related models/,:count=>1
-      assert_select "ul.sectionIcons span.icon > a[href=?]",matching_models_data_file_path(d),:text=>/Find related models/
+      assert_select "ul.sectionIcons span.icon > a",:text=>/Find related #{I18n.t('model').pluralize}/,:count=>1
+      assert_select "ul.sectionIcons span.icon > a[href=?]",matching_models_data_file_path(d),:text=>/Find related #{I18n.t('model').pluralize}/
 
       get :show,:id=>d,:version=>1
       assert_response :success
       assert_select "ul.sectionIcons span.icon > a[href=?]",matching_models_data_file_path(d),:count=>0
-      assert_select "ul.sectionIcons span.icon > a",:text=>/Find related models/,:count=>0
+      assert_select "ul.sectionIcons span.icon > a",:text=>/Find related #{I18n.t('model').pluralize}/,:count=>0
     end
   end
 

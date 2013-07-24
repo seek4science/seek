@@ -1108,7 +1108,7 @@ class ModelsControllerTest < ActionController::TestCase
       login_as(m.contributor.user)
       get :show,:id=>m
       assert_response :success
-      assert_select "ul.sectionIcons span.icon > a[href=?]",matching_data_model_path(m),:text=>/Find related data/
+      assert_select "ul.sectionIcons span.icon > a[href=?]",matching_data_model_path(m),:text=>/Find related #{I18n.t('data_file').pluralize}/
     end
   end
 
@@ -1118,7 +1118,7 @@ class ModelsControllerTest < ActionController::TestCase
       login_as(m.contributor.user)
       get :show,:id=>m
       assert_response :success
-      assert_select "ul.sectionIcons span.icon > a[href=?]",matching_data_model_path(m),:text=>/Find related data/
+      assert_select "ul.sectionIcons span.icon > a[href=?]",matching_data_model_path(m),:text=>/Find related #{I18n.t('data_file').pluralize}/
     end
   end
 
@@ -1129,7 +1129,7 @@ class ModelsControllerTest < ActionController::TestCase
       get :show,:id=>m
       assert_response :success
       assert_select "ul.sectionIcons span.icon > a[href=?]",matching_data_model_path(m),:count=>0
-      assert_select "ul.sectionIcons span.icon > a",:text=>/Find related data/,:count=>0
+      assert_select "ul.sectionIcons span.icon > a",:text=>/Find related #{I18n.t('data_file').pluralize}/,:count=>0
     end
   end
 
@@ -1144,13 +1144,13 @@ class ModelsControllerTest < ActionController::TestCase
     with_config_value :solr_enabled,true do
       get :show,:id=>m,:version=>2
       assert_response :success
-      assert_select "ul.sectionIcons span.icon > a",:text=>/Find related data/
-      assert_select "ul.sectionIcons span.icon > a[href=?]",matching_data_model_path(m),:text=>/Find related data/
+      assert_select "ul.sectionIcons span.icon > a",:text=>/Find related #{I18n.t('data_file').pluralize}/
+      assert_select "ul.sectionIcons span.icon > a[href=?]",matching_data_model_path(m),:text=>/Find related #{I18n.t('data_file').pluralize}/
 
       get :show,:id=>m,:version=>1
       assert_response :success
       assert_select "ul.sectionIcons span.icon > a[href=?]",matching_data_model_path(m),:count=>0
-      assert_select "ul.sectionIcons span.icon > a",:text=>/Find related data/,:count=>0
+      assert_select "ul.sectionIcons span.icon > a",:text=>/Find related #{I18n.t('data_file').pluralize}/,:count=>0
     end
   end
 
