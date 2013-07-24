@@ -32,7 +32,7 @@
                   jQuery.noConflict();
                   var $j = jQuery;
                   $j(function () {
-                      var json_data = <%= data -%>;
+                      var json_data = <%= data.html_safe -%>;
 
                       var options = { series:{
                           curvedLines:{
