@@ -56,7 +56,7 @@ module FancyMultiselectHelper
         check_box_and_alternative_list << check_box_tag("include_other_project_#{association}", nil, false,
                                                 {:onchange => "swapSelectListContents('possible_#{type}_#{association.to_s.singularize}_ids','alternative_#{association.to_s.singularize}_ids');".html_safe,
                                                 :style => "margin-top:0.5em;"}).html_safe
-        check_box_and_alternative_list <<  "Associate #{association.to_s.humanize} from other projects?".html_safe
+        check_box_and_alternative_list <<  "Associate #{association.to_s.singularize.humanize.pluralize} from other projects?".html_safe
         check_box_and_alternative_list << select_tag("alternative_#{association.to_s.singularize}_ids",
                                               options_for_select([["Select #{association.to_s.singularize.humanize} ...", 0]]|options[:project_possibilities].collect { |o| [truncate(h(o.title), :length => 120), o.id] }), {:style => 'display:none;'}).html_safe
 
@@ -84,9 +84,9 @@ module FancyMultiselectHelper
 
       #set default values for locals being sent to the partial
       #override default values with options passed in to the method
-      options.reverse_merge! :intro => "The following #{association.to_s.singularize.humanize.pluralize.capitalize} are associated with this #{object_type_text}:",
+      options.reverse_merge! :intro => "The following #{association.to_s.singularize.humanize.pluralize} are associated with this #{object_type_text}:",
                              :button_text => "Associate with this #{object_type_text}",
-                             :default_choice_text => "Select #{association.to_s.singularize.capitalize} ...",
+                             :default_choice_text => "Select #{association.to_s.singularize.humanize} ...",
                              :name => "#{options[:object_class].name.underscore}[#{association.to_s.singularize}_ids]",
                              :possibilities => [],
                              :value_method => :id,
@@ -121,8 +121,8 @@ module FancyMultiselectHelper
     def fancy_multiselect object, association, options = {}
       hidden = options.delete(:hidden)
       object_type_text = options[:object_type_text] || options[:object_class].name.underscore.humanize
-      object_type_text = (I18n.t 'biosamples.sample_parent_term').capitalize if object_type_text == 'Specimen'
-      title = (help_icon("Here you can associate the #{object_type_text} with specific #{association}.") + " #{association.to_s.titleize}") + (options[:required] ? ' <span class="required">*</span>'.html_safe : '')
+      object_type_text = (I18n.t 'biosamples.sample_parent_term') if object_type_text == 'Specimen'
+      title = (help_icon("Here you can associate the #{object_type_text} with specific #{association.to_s.singularize.humanize.pluralize}.") + " #{association.to_s.singularize.humanize.pluralize}") + (options[:required] ? ' <span class="required">*</span>'.html_safe : '')
 
       folding_box "add_#{association}_form", title , :hidden => hidden, :contents => super(object, association, options)
     end
