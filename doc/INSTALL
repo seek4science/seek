@@ -16,7 +16,7 @@ SEEK requires Ruby version 1.8.7.
 
 The steps in the next section outline the commands required to install all the required packages for Ubuntu or Debian. 
 
-MySQL server needs to be installed installed, along the development package (required to compile the MySQL rubygem). We use the Ubuntu/Debian packages <em>mysql-server</em> and <em>libmysqlclient15-dev</em>
+MySQL server needs to be installed, along the development package (required to compile the MySQL rubygem). We use the Ubuntu/Debian packages <em>mysql-server</em> and <em>libmysqlclient15-dev</em>
 
 The ImageMagick libraries need to be installed, as these are required by the rmagic gem. We use the The Ubuntu/Debian package <em>libmagick++9-dev</em>
 
