@@ -239,9 +239,11 @@ namespace :seek do
   def revert_fixtures_identify
 
     include ActiveRecord
+=begin
     def Fixtures.identify(label)
       label.to_s.hash.abs
     end
+=end
   end
 
   def create_tag text, attribute
