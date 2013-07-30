@@ -6,7 +6,7 @@
 
 SEEK_PATH="/home/$(whoami)" 
 SEEK_DIRECTORY="seek"
-REPOSITORY="https://bitbucket.org/seek4science/seek -r v0.17.0"
+REPOSITORY="https://bitbucket.org/seek4science/seek -r v0.17.1"
 
 txtgrn=$(tput setaf 2) # Green
 txtrst=$(tput sgr0) # Text reset
@@ -50,12 +50,15 @@ fi
 
 echo "${txtgrn} *********************************** ${txtrst}"
 echo "${txtgrn} Cloning SEEK from $REPOSITORY ${txtrst}"
-sudo hg clone "$REPOSITORY" "$SEEK_DIRECTORY"
+sudo hg clone $REPOSITORY $SEEK_DIRECTORY
 
 sudo chown -R $(whoami):$(whoami) $SEEK_PATH/$SEEK_DIRECTORY
 
 sudo gem install -d bundler rake
-sudo chown -R $(whoami):$(whoami) /home/$(whoami)/.gem
+
+if [ -d /home/$(whoami)/.gem ]; then
+    sudo chown -R $(whoami):$(whoami) /home/$(whoami)/.gem
+fi
 
 cd "$SEEK_DIRECTORY"
 bundle install
