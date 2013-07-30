@@ -102,7 +102,7 @@ class DataFilesControllerTest < ActionController::TestCase
         assert_select "a[href=?]",data_files_path,:text=>I18n.t('data_file').pluralize
       end
     end
-    assert_select "ul.tabnav2" do
+    assert_select "ul.menutabs" do
       assert_select "li#selected_tabnav" do
         assert_select "a",:text=>I18n.t("menu.assets")
       end
