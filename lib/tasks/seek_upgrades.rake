@@ -12,6 +12,7 @@ namespace :seek do
             :repopulate_auth_lookup_tables,
             :move_asset_files,
             :remove_converted_pdf_and_txt_files_from_asset_store,
+            :clear_send_email_jobs,
             :reencode_settings_table_using_psych,
             :reencode_delayedjobs_table_using_psych
   ]
