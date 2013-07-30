@@ -6,33 +6,33 @@ module MenuHelper
 
   def menu_definitions
     definitions=[
-        {:title=>"Yellow pages", :sections=>[
+        {:title=>t("menu.yellow_pages"), :sections=>[
             {:controller=>"people",:title=>"People"},
             {:controller=>"projects",:title=>"Projects"},
             {:controller=>"institutions",:title=>"Institutions"}
         ]},
 
-        {:title=>"ISA",:sections=>[
-            {:controller=>"investigations",:title=>"Investigations"},
-            {:controller=>"studies",:title=>"Studies"},
-            {:controller=>"assays",:title=>"Assays"}
+        {:title=>t("menu.isa"),:sections=>[
+            {:controller=>"investigations",:title=>t("investigation").pluralize},
+            {:controller=>"studies",:title=>t("study").pluralize},
+            {:controller=>"assays",:title=>t("assays.assay").pluralize}
         ]},
 
-        {:title=>"Assets",:sections=>[
-            {:controller=>"data_files",:title=>"Data files"},
-            {:controller=>"models", :title=>"Models"},
-            {:controller=>"sops", :title=>"SOPs"},
+        {:title=>t("menu.assets"),:sections=>[
+            {:controller=>"data_files",:title=>t("data_file").pluralize},
+            {:controller=>"models", :title=>t("model").pluralize},
+            {:controller=>"sops", :title=>t("sop").pluralize},
             {:controller=>"publications", :title=>"Publications"},
             {:controller=>"biosamples",:title=>"Biosamples"}
         ]},
-        {:title=>"Activities",:sections=>[
-            {:controller=>"presentations",:title=>"Presentations"},
-            {:controller=>"events", :title=>"Events"},
+        {:title=>t("menu.activities"),:sections=>[
+            {:controller=>"presentations",:title=>t("presentation").pluralize},
+            {:controller=>"events", :title=>t("event").pluralize},
         ]},
-        {:controller=>"help_documents",:title=>"Help",:spacer=>true}
+        {:controller=>"help_documents",:title=>t("menu.documentation"),:spacer=>true}
         ]
     if admin_logged_in?
-      definitions << {:controller=>"admin",:title=>"Admin",:spacer=>true}
+      definitions << {:controller=>"admin",:title=>t("menu.admin"),:spacer=>true}
     end
     definitions
   end
@@ -53,7 +53,7 @@ module MenuHelper
         click_js = "$('section_menu_items').hide();"
         "<li #{attributes}>#{link_to(menu[:title],path,{:onmouseover=>click_js})}</li>"
       else
-        click_js = 'update_menu_text("'+menu_section_id(menu[:title])+'");return false;'
+        click_js = 'update_menu_text("'+menu_section_id(menu[:title])+'",true);return false;'
         "<li #{attributes}>#{link_to(menu[:title],{},{:onmouseover=>click_js,:onclick=>click_js})}</li>"
       end
 
