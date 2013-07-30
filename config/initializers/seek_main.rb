@@ -28,6 +28,7 @@ require 'in_place_editing'
 require 'strategic_eager_loading'
 require 'seek/breadcrumbs'
 require 'string_extension'
+reguire 'recaptcha'
 
 GLOBAL_PASSPHRASE="ohx0ipuk2baiXah" unless defined? GLOBAL_PASSPHRASE
 
