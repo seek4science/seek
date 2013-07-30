@@ -39,12 +39,7 @@ for Ubuntu Precise 12.04 (LTS):
 for Ubuntu Lucid 10.04 (LTS):
   sudo apt-get install wget git mercurial ruby rdoc ri libopenssl-ruby ruby-dev mysql-server libssl-dev build-essential openssh-server git-core
   sudo apt-get install libmysqlclient16-dev libmagick++-dev libxslt-dev libxml++2.6-dev openjdk-6-jdk graphviz libsqlite3-dev sqlite3
-  sudo apt-get install poppler-utils
-  sudo apt-get purge openoffice* libreoffice*
-  sudo apt-get install python-software-properties
-  sudo add-apt-repository ppa:libreoffice/libreoffice-3-5
-  sudo apt-get update
-  sudo apt-get install libreoffice
+  sudo apt-get install poppler-utils openoffice.org openoffice.org-java-common
   
 If setting up for production deployment using the {Passenger Phusion (modrails)}[http://www.modrails.com/] module you can save a step later by also using:
 
@@ -176,8 +171,18 @@ Then to start the service manually you use:
 
 remember on Ubuntu 10.04 only single hyphens are used for the options.
 
-We recommend the OpenOffice service is setup using an init.d script, following the same procedures for delayed job using the script found at:
+We recommend the Libre Office service is setup using an init.d script, following the same procedures for delayed job using the script found at:
 https://gist.github.com/3787679
+
+If you have problem with converting speed, you should upgrade to Ubuntu 12.04 to use Libre Office.
+Or you can install libre office 3.5 from PPA, but there could be problems later on when upgrading OS.
+Here are the command to install libre office from PPA:
+
+   sudo apt-get purge openoffice* libreoffice*
+   sudo apt-get install python-software-properties
+   sudo add-apt-repository ppa:libreoffice/libreoffice-3-5
+   sudo apt-get update
+   sudo apt-get install libreoffice
 
 == Starting the server
 
