@@ -29,15 +29,9 @@ module MenuHelper
             {:controller=>"presentations",:title=>t("presentation").pluralize},
             {:controller=>"events", :title=>t("event").pluralize},
         ]},
-        {:title=>t("menu.documentation"),:spacer=>true, :sections=>[
-            {:controller=>"help_documents",:title=>t("menu.help")},
-            {:path=>"/help_documents/faq",:title=>t("menu.faq")},
-            {:path=>"/help_documents/templates",:title=>t("menu.jerm_templates")},
-            {:path=>"/help_documents/isa-best-practice",:title=>t("menu.isa_best_practice")}
-        ]}
         ]
     if logged_in_and_registered?
-      account_menu = {:title=>t("menu.account"),:sections=>[]}
+      account_menu = {:title=>t("menu.account"),:spacer=>true,:sections=>[]}
 
       account_menu[:sections] << {:path=>feedback_home_path(),:title=>t("menu.feedback")} if Seek::Config.email_enabled
 
@@ -49,6 +43,13 @@ module MenuHelper
 
       definitions << account_menu
     end
+
+    definitions << {:title=>t("menu.documentation"),:spacer=>true, :sections=>[
+        {:controller=>"help_documents",:title=>t("menu.help")},
+        {:path=>"/help_documents/faq",:title=>t("menu.faq")},
+        {:path=>"/help_documents/templates",:title=>t("menu.jerm_templates")},
+        {:path=>"/help_documents/isa-best-practice",:title=>t("menu.isa_best_practice")}
+    ]}
     definitions
   end
 
