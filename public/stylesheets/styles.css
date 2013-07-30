@@ -3,6 +3,7 @@ body {
 	line-height: 1.0;
     border-left: #8e8e8e solid 10px;
     border-right: #8e8e8e solid 10px;
+    min-width: 1024px;
 }
 
 
@@ -765,11 +766,11 @@ img.badge {
 
 #topbar {
     height: 20px;
-    text-align: center;
     background-image: url('../images/searchfade-repeat.png');
     background-repeat: repeat-x;
     background-position: top center;
     padding: 10px 0;
+    border-top: 0px;
 }
 
 #topbar * {
@@ -1650,13 +1651,17 @@ ul.modifications {
     float: left;
     margin-top: 2em;
 }
-#search_box input[type="text"] {
-    width: 28em;
+
+#search_box {
+    float: right;
+    margin-right: 2em;
+    width:auto;
 }
 
-#search_box input[type="text"] {
-    width: 28em;
+#search_query {
+    width:30em;
 }
+
 
 
 ul.modification_row {

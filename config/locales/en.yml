@@ -33,3 +33,18 @@ en:
 
   #Event
   event: "Event"
+
+
+  menu:
+    yellow_pages: "Yellow pages"
+    isa:  "ISA"
+    assets: "Assets"
+    activities: "Activities"
+    documentation: "Documentation"
+    admin: "Server Administration"
+    help: "Help documents"
+    account: "Account"
+    faq: "FAQ"
+    jerm_templates: "JERM templates"
+    feedback: "Provide Feedback"
+    isa_best_practice: "ISA best practice"

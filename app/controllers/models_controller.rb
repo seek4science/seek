@@ -161,7 +161,8 @@ class ModelsController < ApplicationController
         format.html { render :action=>"builder" }
       elsif @error_keys.empty? && following_action == "simulate"
         @modelname=@saved_file
-        format.html {render :simulate,:layout=>"jws_simulate"}
+        @no_sidebar=true
+        format.html {render :simulate}
       elsif @error_keys.empty? && following_action == "annotate"
         format.html {render :action=>"annotator"}
       elsif @error_keys.empty? && following_action == "save_new_version"
@@ -215,7 +216,8 @@ class ModelsController < ApplicationController
         flash[:error]="This #{t('model')} is of neither SBML or JWS Online (Dat) format so cannot be used with JWS Online"
         format.html { redirect_to(@model, :version=>@display_model.version) }
       else
-         format.html { render :simulate,:layout=>"jws_simulate" }
+        @no_sidebar=true
+         format.html { render :simulate }
       end
     end
   end
