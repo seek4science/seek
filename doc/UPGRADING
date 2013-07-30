@@ -79,20 +79,30 @@ Upgrading follows the standard steps:
 
 == Steps to upgrade from 0.15.x to 0.16.x
 
-First there are additional dependencies you will need, which on Ubuntu 10.04/12.04 can be installed with:
+First there are additional dependencies you will need, which on Ubuntu 12.04 can be installed with:
 
-    sudo apt-get install poppler-utils tesseract-ocr openoffice.org openoffice.org-java-common
+    sudo apt-get install poppler-utils tesseract-ocr libreoffice
 
-Open Office is a background service which is called by convert_office plugin, to convert some document types (ms office documents,
+On Ubuntu 10.04:
+
+    sudo apt-get install poppler-utils tesseract-ocr
+    sudo apt-get purge openoffice* libreoffice*
+    sudo apt-get install python-software-properties
+    sudo add-apt-repository ppa:libreoffice/libreoffice-3-5
+    sudo apt-get update
+    sudo apt-get install libreoffice
+
+
+Libre Office is a background service which is called by convert_office plugin, to convert some document types (ms office documents,
 open office documents, etc.) into pdf document.
 
-The command to start open office in headless mode and as the background process:
+The command to start libre office in headless mode and as the background process:
 
     nohup soffice --headless --accept="socket,host=127.0.0.1,port=8100;urp;" --nofirststartwizard > /dev/null 2>&1
 
-If you run on production server, using apache and phusion passenger, you will need to run the Open Office service under www-data user.
+If you run on production server, using apache and phusion passenger, you will need to run the Libre Office service under www-data user.
 To do this it will need to create a working directory in /var/www. The name of the directory
-changes between versions, but will be called something similar to libreoffice or .openoffice.org2. The easiest way to create this directory
+changes between versions, but will be called something similar to libreoffice. The easiest way to create this directory
 is to make a note of the permissions for /var/www, then make it writable to www-data, start the service, and then put the permissions on /var/www back to
 what they were originally.
 
