@@ -15,7 +15,7 @@ en:
 
   #Assay
   assays:
-    assay: "Assay"
+    assay: "Experiment"
     experimental_assay: "Experimental assay"
     modelling_analysis:  "Modelling analysis"
 

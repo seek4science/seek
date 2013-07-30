@@ -765,11 +765,11 @@ img.badge {
 
 #topbar {
     height: 20px;
-    text-align: center;
     background-image: url('../images/searchfade-repeat.png');
     background-repeat: repeat-x;
     background-position: top center;
     padding: 10px 0;
+    border-top: 0px;
 }
 
 #topbar * {
@@ -1650,6 +1650,12 @@ ul.modifications {
     float: left;
     margin-top: 2em;
 }
+
+#search_box {
+    float: right;
+    margin-right: 10em;
+}
+
 #search_box input[type="text"] {
     width: 28em;
 }

@@ -1,0 +1,38 @@
+<div>
+  <ul class="tabnav2">
+
+    <%= top_level_menu_tabs(menu_definitions) -%>
+
+  </ul>
+</div>
+
+
+
+<% menu_definitions.each do |menu| -%>
+    <span id="<%= menu_section_id(menu[:title]) -%>" style="display:none;">
+
+        <%= section_menu_items menu[:sections] %>
+
+    </span>
+
+<% end -%>
+
+
+
+
+
+<script type="text/javascript">
+
+  function update_menu_text(source_id) {
+      var sections = $('section_menu_items');
+      var source = $(source_id);
+      sections.hide();
+      sections.update(source.innerHTML);
+      Effect.Appear('section_menu_items',{duration:0.3});
+  }
+
+  function select_menu_item(section_id) {
+      update_menu_text(section_id);
+  }
+
+</script>
