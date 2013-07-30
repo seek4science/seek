@@ -34,12 +34,12 @@ The following commands will install the core required packages:
 for Ubuntu Precise 12.04 (LTS):
   sudo apt-get install wget git mercurial ruby ri1.8 libruby1.8 ruby-dev mysql-server libssl-dev build-essential openssh-server git-core
   sudo apt-get install libmysqlclient-dev libmagick++-dev libxslt1-dev libxml++2.6-dev openjdk-6-jdk graphviz libsqlite3-dev sqlite3
-  sudo apt-get install poppler-utils tesseract-ocr libreoffice
+  sudo apt-get install poppler-utils libreoffice
 
 for Ubuntu Lucid 10.04 (LTS):
   sudo apt-get install wget git mercurial ruby rdoc ri libopenssl-ruby ruby-dev mysql-server libssl-dev build-essential openssh-server git-core
   sudo apt-get install libmysqlclient16-dev libmagick++-dev libxslt-dev libxml++2.6-dev openjdk-6-jdk graphviz libsqlite3-dev sqlite3
-  sudo apt-get install poppler-utils tesseract-ocr
+  sudo apt-get install poppler-utils
   sudo apt-get purge openoffice* libreoffice*
   sudo apt-get install python-software-properties
   sudo add-apt-repository ppa:libreoffice/libreoffice-3-5

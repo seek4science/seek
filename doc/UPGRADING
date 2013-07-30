@@ -81,11 +81,11 @@ Upgrading follows the standard steps:
 
 First there are additional dependencies you will need, which on Ubuntu 12.04 can be installed with:
 
-    sudo apt-get install poppler-utils tesseract-ocr libreoffice
+    sudo apt-get install poppler-utils libreoffice
 
 On Ubuntu 10.04:
 
-    sudo apt-get install poppler-utils tesseract-ocr
+    sudo apt-get install poppler-utils
     sudo apt-get purge openoffice* libreoffice*
     sudo apt-get install python-software-properties
     sudo add-apt-repository ppa:libreoffice/libreoffice-3-5

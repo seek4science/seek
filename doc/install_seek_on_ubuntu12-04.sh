@@ -21,7 +21,7 @@ echo "${txtgrn} Installing prequisites ${txtrst}"
 sudo apt-get update
 sudo apt-get install wget git mercurial ruby ri1.8 libruby1.8 ruby-dev mysql-server libssl-dev build-essential openssh-server
 sudo apt-get install libmysqlclient-dev libmagick++-dev libxslt1-dev libxml++2.6-dev openjdk-6-jdk graphviz libsqlite3-dev sqlite3
-sudo apt-get install poppler-utils tesseract-ocr libreoffice
+sudo apt-get install poppler-utils libreoffice
 
 echo "${txtgrn} *********************************** ${txtrst}"
 echo "${txtgrn} Installing rubygems ${txtrst}"
