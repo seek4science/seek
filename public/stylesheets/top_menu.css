@@ -47,7 +47,7 @@
 }
 
 .tabnav2 li#selected_tabnav a {
-    background-color: #2651ff;
+    background-color: #001dff;
     background-image: none;
     color: #FFFFFF;
 }
@@ -68,7 +68,7 @@ ul#section_menu_items > li {
 }
 
 ul#section_menu_items > li.selected_menu {
-    background-color: #2651ff;
+    background-color: #001dff;
 }
 
 ul#section_menu_items > li > a {
@@ -78,5 +78,5 @@ ul#section_menu_items > li > a {
 }
 
 ul#section_menu_items > li > a:hover {
-    background-color: #2651ff;
+    background-color: #001dff;
 }

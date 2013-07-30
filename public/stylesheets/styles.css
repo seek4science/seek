@@ -3,6 +3,7 @@ body {
 	line-height: 1.0;
     border-left: #8e8e8e solid 10px;
     border-right: #8e8e8e solid 10px;
+    min-width: 1024px;
 }
 
 
@@ -1653,16 +1654,14 @@ ul.modifications {
 
 #search_box {
     float: right;
-    margin-right: 10em;
+    margin-right: 2em;
+    width:auto;
 }
 
-#search_box input[type="text"] {
-    width: 28em;
+#search_query {
+    width:30em;
 }
 
-#search_box input[type="text"] {
-    width: 28em;
-}
 
 
 ul.modification_row {
