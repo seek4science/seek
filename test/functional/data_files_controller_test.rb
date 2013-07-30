@@ -97,9 +97,14 @@ class DataFilesControllerTest < ActionController::TestCase
 
   test "data files tab should be selected" do
     get :index
-    assert_select "ul.tabnav" do
-      assert_select "li#selected_tabnav" do
+    assert_select "span#assets_menu_section" do
+      assert_select "li.selected_menu" do
         assert_select "a[href=?]",data_files_path,:text=>I18n.t('data_file').pluralize
+      end
+    end
+    assert_select "ul.tabnav2" do
+      assert_select "li#selected_tabnav" do
+        assert_select "a",:text=>I18n.t("menu.assets")
       end
     end
   end

@@ -24,17 +24,26 @@ class HomesControllerTest < ActionController::TestCase
     end
   end
 
-  test "shouldn't display feedback link as non logged in" do
+  test "shouldn't display feedback link when not logged in" do
     get :index
     assert_response :success
-    assert_select "div#topbar a",:text=>/Provide Feedback/,:count=>0
+    assert_select "span#account_menu_section", :count=>0
+
+    assert_select "li" do
+        assert_select "a[href=?]",feedback_home_path,:text=>I18n.t("menu.feedback"),:count=>0
+    end
+
   end
 
-  test "should display feedback link as logged in" do
+  test "should display feedback link when logged in" do
     login_as(Factory(:user))
     get :index
     assert_response :success
-    assert_select "div#topbar a",:text=>/Provide Feedback/
+    assert_select "span#account_menu_section" do
+      assert_select "li" do
+        assert_select "a[href=?]",feedback_home_path,:text=>I18n.t("menu.feedback")
+      end
+    end
   end
 
   test "should get feedback form" do
@@ -55,27 +64,40 @@ class HomesControllerTest < ActionController::TestCase
     end
   end
 
-  test "admin link not visible to non admin" do
+  test "admin menu item not visible to non admin" do
     login_as(:aaron)
     get :index
     assert_response :success
-    assert_select "a#adminmode[href=?]",admin_path,:count=>0
+    assert_response :success
+    assert_select "span#account_menu_section" do
+      assert_select "li" do
+        assert_select "a",:text=>I18n.t("menu.admin"),:count=>0
+      end
+    end
   end
 
-  test "admin tab visible to admin" do
+  test "admin menu item visible to admin" do
     login_as(:quentin)
     get :index
     assert_response :success
-    assert_select "a#adminmode[href=?]",admin_path,:count=>1
+    assert_select "span#account_menu_section" do
+      assert_select "li" do
+        assert_select "a",:text=>I18n.t("menu.admin")
+      end
+    end
   end
 
-  test "SOP tab should be capitalized" do
+  test "SOP menu item should be capitalized" do
     login_as(:quentin)
     get :index
     if Seek::Config.is_virtualliver
-      assert_select "div.section>li>a[href=?]","/sops",:text=>"#{I18n.t('sop').pluralize}",:count=>1
+      assert_select "div.section>li>a[href=?]","/sops",:text=>"SOPs",:count=>1
     else
-      assert_select "ul.tabnav>li>a[href=?]","/sops",:text=>"#{I18n.t('sop').pluralize}",:count=>1
+      assert_select "span#assets_menu_section" do
+        assert_select "li" do
+          assert_select "a[href=?]",sops_path,:text=>"SOPs"
+        end
+      end
     end
 
   end
