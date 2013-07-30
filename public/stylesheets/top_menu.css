@@ -28,6 +28,7 @@
     background-position: top;
     background-repeat: repeat-x;
     background-color: #EDEDED;
+    font-size:larger;
 }
 
 .menutabs li a:link {
@@ -55,7 +56,6 @@
 ul#section_menu_items {
     margin: 0em 3em;
     float:left;
-
 }
 
 ul#section_menu_items > li {
