@@ -22,7 +22,12 @@ sudo apt-get update
 
 sudo apt-get install wget git-core mercurial ruby rdoc ri libopenssl-ruby ruby-dev mysql-server libssl-dev build-essential openssh-server
 sudo apt-get install libmysqlclient16-dev libmagick++-dev libxslt-dev libxml++2.6-dev openjdk-6-jdk graphviz libsqlite3-dev sqlite3
-sudo apt-get install poppler-utils tesseract-ocr openoffice.org openoffice.org-java-common
+sudo apt-get install poppler-utils tesseract-ocr
+sudo apt-get purge openoffice* libreoffice*
+sudo apt-get install python-software-properties
+sudo add-apt-repository ppa:libreoffice/libreoffice-3-5
+sudo apt-get update
+sudo apt-get install libreoffice
 
 echo "${txtgrn} *********************************** ${txtrst}"
 echo "${txtgrn} Installing rubygems ${txtrst}"
