@@ -814,6 +814,7 @@ module Seek
               new_sp.contributor = User.current_user
               new_sp.projects = specimen.projects
               new_sp.created_at = now
+              new_sp.policy = @file.policy.deep_copy
               new_sp.save!
               @warnings << "Warning: specimen with the name '#{specimen_title}' is already created in SEEK.<br/>"
               @warnings << "It is renamed and saved as '#{new_sp.title}'.<br/>"
