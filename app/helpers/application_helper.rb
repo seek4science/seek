@@ -86,7 +86,7 @@ module ApplicationHelper
   end
 
   def tabbar
-    Seek::Config.is_virtualliver ? render(:partial=>"general/tabnav_dropdown") : render(:partial=>"general/tabnav")
+    Seek::Config.is_virtualliver ? render(:partial=>"general/tabnav_dropdown") : render(:partial=>"general/tabnav2")
   end
 
   #joins the list with seperator and the last item with an 'and'

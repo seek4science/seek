@@ -12,12 +12,14 @@
   <%= csrf_meta_tag %>
 
   <%= javascript_include_tag 'savage_beast/application.js' -%>
-  <%= javascript_include_tag 'prototype.js','prototype_ujs.js', 'effects.js', 'dragdrop.js', 'boxover.js', 'scriptaculous.js', 'controls.js', 'redbox.js', 'builder.js', 'application.js', 'tagging.js', 'autocompleter_advanced.js', 'publication.js','dynamic_menu.js', :cache=>'js_cached' %>
+  <%= javascript_include_tag 'prototype.js','prototype_ujs.js', 'effects.js', 'dragdrop.js', 'boxover.js', 'scriptaculous.js', 'controls.js', 'redbox.js', 'builder.js', 'application.js', 'tagging.js', 'autocompleter_advanced.js', 'publication.js','top_menus.js', :cache=>'js_cached' %>
+  <%= javascript_include_tag 'dynamic_menu.js' if Seek::Config.is_virtualliver -%>
 
-
-  <%= stylesheets = ['reset-fonts-grids', 'base-min', 'my_exp', 'folds', 'gadgets', 'acts_as_taggable_stylesheet', 'styles', 'favourites', 'fast_auto_complete', 'redbox', 'autocompleter_advanced', 'alphabetical_pagination', 'savage_beast/forums', 'site_announcements', 'tabnav','dynamic_menu']
+  <%= stylesheets = ['reset-fonts-grids', 'base-min', 'my_exp', 'folds', 'gadgets', 'acts_as_taggable_stylesheet', 'styles', 'favourites', 'fast_auto_complete', 'redbox', 'autocompleter_advanced', 'alphabetical_pagination', 'savage_beast/forums', 'site_announcements', 'tabnav','top_menu']
       stylesheets = stylesheets << 'local' if File.exists?('public/stylesheets/local.css')
+      stylesheets << 'dynamic_menu' if Seek::Config.is_virtualliver
       stylesheets << {:cache => 'css_cached'}
+
       stylesheet_link_tag *stylesheets %>
 
   <script type="text/javascript">
@@ -45,10 +47,8 @@
   <div id="header">
     <%= render :partial=>"layouts/header_main" %>
   </div>
-  <%= tabbar %>
-  <div id="topbar">
-    <%= render :partial=>"search/search_bar" %>
-  </div>
+    <%= render :partial=>"general/top_bar" %>
+
 
   <div id="bd">
     <div id="yui-main">

@@ -33,3 +33,12 @@ en:
 
   #Event
   event: "Event"
+
+
+  menu:
+    yellow_pages: "Yellow pages"
+    isa:  "ISA"
+    assets: "Assets"
+    activities: "Activities"
+    documentation: "Docs"
+    admin: "Administration"
