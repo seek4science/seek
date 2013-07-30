@@ -58,9 +58,9 @@ bundle check || bundle install || exit 1
 remove_annoying_warning
 
 # finally, run rake
-bundle exec rake cruise2
+bundle exec rake cruise
 
 #comment out above and uncomment this line to get more verbose test information
-#bundle exec rake cruise2 TESTOPTS="-v"
+#bundle exec rake cruise TESTOPTS="-v"
 
 

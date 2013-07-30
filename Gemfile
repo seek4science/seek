@@ -76,7 +76,6 @@ gem 'passenger'
 
 group :development do
   gem "sqlite3","1.3.7"
-  gem "parallel_tests"
   gem "pry"
   gem "pry-doc"
   gem "pry-remote"
