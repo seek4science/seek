@@ -29,10 +29,25 @@ module MenuHelper
             {:controller=>"presentations",:title=>t("presentation").pluralize},
             {:controller=>"events", :title=>t("event").pluralize},
         ]},
-        {:controller=>"help_documents",:title=>t("menu.documentation"),:spacer=>true}
+        {:title=>t("menu.documentation"),:spacer=>true, :sections=>[
+            {:controller=>"help_documents",:title=>t("menu.help")},
+            {:path=>"/help_documents/faq",:title=>t("menu.faq")},
+            {:path=>"/help_documents/templates",:title=>t("menu.jerm_templates")},
+            {:path=>"/help_documents/isa-best-practice",:title=>t("menu.isa_best_practice")}
+        ]}
         ]
-    if admin_logged_in?
-      definitions << {:controller=>"admin",:title=>t("menu.admin"),:spacer=>true}
+    if logged_in_and_registered?
+      account_menu = {:title=>t("menu.account"),:sections=>[]}
+
+      account_menu[:sections] << {:path=>feedback_home_path(),:title=>t("menu.feedback")} if Seek::Config.email_enabled
+
+      account_menu[:sections] << {:path=>person_path(User.current_user.person),:title=>"Your profile"}
+
+      account_menu[:sections] << {:controller=>"admin",:title=>t("menu.admin")} if admin_logged_in?
+
+      account_menu[:sections] << {:path=>"/logout",:title=>"Logout"}
+
+      definitions << account_menu
     end
     definitions
   end
@@ -66,7 +81,8 @@ module MenuHelper
       c = section[:controller]
       title = section[:title]
       title ||= c.capitalize
-      path = eval "#{c}_path"
+
+      path = section[:path] || eval("#{c}_path")
 
       link = link_to title, path
       attributes = "class='selected_menu'" if c == controller.controller_name.to_s
