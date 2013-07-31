@@ -52,6 +52,8 @@ class ModelImagesController < ApplicationController
     end
     size = size[0..-($1.length.to_i + 2)] if size =~ /[0-9]+x[0-9]+\.([a-z0-9]+)/ # trim file extension
 
+    size = filter_size size
+
     id = params[:id].to_i
 
     if !cache_exists?(id, size) # look in file system cache before attempting db access
@@ -73,6 +75,28 @@ class ModelImagesController < ApplicationController
         @cache_file=full_cache_path(id, size)
         @type='image/jpeg'
       end
+    end
+  end
+
+  def filter_size size
+    max_size=1500
+    matches = size.match /([0-9]+)x([0-9]+).*/
+    if matches
+      width = matches[1].to_i
+      height = matches[2].to_i
+      width = max_size if width>max_size
+      height = max_size if height>max_size
+      return "#{width}x#{height}"
+    else
+      matches = size.match /([0-9]+)/
+      if matches
+        width=matches[1].to_i
+        width = max_size if width>max_size
+        return "#{width}"
+      else
+        return "900"
+      end
+
     end
 
   end

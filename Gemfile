@@ -39,6 +39,7 @@ gem "rdf-rdfxml"
 gem "equivalent-xml"
 gem "breadcrumbs_on_rails","1.0.1"
 gem 'docsplit'
+gem "recaptcha", '0.3.1'
 
 group :development do
   gem "sqlite3-ruby","1.2.5",:require=>"sqlite3"

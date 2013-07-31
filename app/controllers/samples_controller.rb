@@ -96,7 +96,7 @@ class SamplesController < ApplicationController
         tissue_and_cell_types.each do |t|
           t_id, t_title = t.split(",")
           @sample.associate_tissue_and_cell_type(t_id, t_title)
-        end
+        end if @sample.respond_to?(:tissue_and_cell_types)
       @sample.create_or_update_assets data_file_ids, "DataFile"
       @sample.create_or_update_assets model_ids, "Model"
       @sample.create_or_update_assets sop_ids, "Sop"
@@ -137,6 +137,7 @@ class SamplesController < ApplicationController
 
       if @sample.save
         deliver_request_publish_approval params[:sharing], @sample
+        #TODO CONFIG improve configurability. Configuration currently is deduced from other parameters
         if tissue_and_cell_types.blank?
           @sample.tissue_and_cell_types= tissue_and_cell_types
           @sample.save

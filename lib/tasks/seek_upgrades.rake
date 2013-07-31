@@ -17,7 +17,7 @@ namespace :seek do
             :detect_web_page_content_blobs
   ]
 
-  desc "Disassociates creators and refreshes the list of publication authors from the doi/pubmed for all publications"
+  desc "Disassociates contributors and refreshes the list of publication authors from the doi/pubmed for all publications"
   task :reset_publication_authors=>[:environment] do
     disable_authorization_checks do
       Publication.all.each do |publication|

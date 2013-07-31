@@ -88,7 +88,9 @@ class PoliciesControllerTest < ActionController::TestCase
       login_as(sop.contributor)
       post :preview_permissions, :sharing_scope => Policy::EVERYONE, :access_type => Policy::VISIBLE, :is_new_file => "false", :resource_name => 'sop', :resource_id => sop.id,:project_ids => gatekeeper.projects.first.id.to_s
 
-      assert_select "span",:text=>"(An email will be sent to the Gatekeepers of the projects associated with this SOP to ask for publishing approval. This SOP will not be published until one of the Gatekeepers has granted approval)", :count=>1
+      unless Seek::Config.is_virtualliver
+        assert_select "span",:text=>"(An email will be sent to the Gatekeepers of the projects associated with this SOP to ask for publishing approval. This SOP will not be published until one of the Gatekeepers has granted approval)", :count=>1
+      end
   end
 
   test 'should not show notice message when an item can be published right away' do

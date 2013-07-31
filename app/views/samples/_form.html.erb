@@ -81,10 +81,9 @@
   <br/>
   <%= render :partial => 'projects/project_selector', :locals => {:resource => @sample,:allow_nil=>Seek::Config.is_virtualliver ? true : false}%>
 
-  <%= render :partial => "samples/select_tissue_and_cell_types", :locals=>{:resource => @sample}-%>
-
+  <%= render :partial => "samples/select_tissue_and_cell_types", :locals=>{:resource => @sample} if Seek::Config.is_virtualliver  -%>
   <p>
-        <%= f.fancy_multiselect :scales, {:possibilities=>sort_scales(Scale.all)} -%>
+        <%= f.fancy_multiselect :scales, {:possibilities=>sort_scales(Scale.all)} if @sample.is_scalable? -%>
   </p>
   <br style="clear:both"/>
 

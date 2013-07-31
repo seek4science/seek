@@ -180,7 +180,7 @@ namespace :seek do
   #You can also run it any time you want to force everyone to subscribe to something they would be subscribed to by default
   task :create_default_subscriptions => :environment do
     Person.all.each do |p|
-      p.set_default_subscriptions
+      set_default_subscriptions  p
       disable_authorization_checks { p.save(false) }
     end
   end
@@ -281,5 +281,11 @@ namespace :seek do
 
     end
   end
+  def set_default_subscriptions person
+    person.projects.each do |proj|
+      person.project_subscriptions.build :project => proj
+    end
+  end
+
 end
 

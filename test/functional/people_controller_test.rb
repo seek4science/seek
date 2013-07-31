@@ -145,19 +145,22 @@ class PeopleControllerTest < ActionController::TestCase
     assert_response :success
   end
 
-  test 'anonymous user cannot view people' do
-    logout
-    get :show, :id => people(:quentin_person)
-    assert_present flash[:error]
+  if Seek::Config.is_virtualliver
+    test 'anonymous user cannot view people' do
+        logout
+        get :show, :id => people(:quentin_person)
+        assert_not_nil flash[:error]
+      end
+
+
+    test 'anonymous user doesnt see people in index' do
+      Factory :person, :first_name => 'Invisible', :last_name => ''
+      logout
+      get :index
+      assert_select 'a', :text => /Invisible/, :count => 0
+    end
   end
 
-  test 'anonymous user doesnt see people in index' do
-    Factory :person, :first_name => 'Invisible', :last_name => ''
-    logout
-    get :index
-    assert_select 'a', :text => /Invisible/, :count => 0
-  end
-  
   def test_should_get_edit
     get :edit, :id => people(:quentin_person)
     assert_response :success
@@ -808,36 +811,31 @@ class PeopleControllerTest < ActionController::TestCase
     assert_not_nil flash[:error]
   end
 
-  test 'admin can administer other admin' do
+  test 'admin can NOT administer other admin' do
     admin = Factory(:admin)
 
+    # cannot admin other admins
     get :show, :id => admin
-    assert_select "a", :text => /Person Administration/, :count => 1
+    assert_select "a", :text => /Person Administration/, :count => 0
 
     get :admin, :id => admin
-    assert_response :success
+    assert_redirected_to root_path
 
-    assert !admin.is_gatekeeper?
-    put :administer_update, :id => admin, :person => {}, :roles => {:gatekeeper => true}
-    assert_redirected_to person_path(admin)
-    assert assigns(:person).is_gatekeeper?
+
   end
 
-  test 'admin can edit other admin' do
+  test 'admin can NOT edit other admin but himself' do
     admin = Factory(:admin)
     assert_not_nil admin.user
     assert_not_equal User.current_user, admin.user
 
     get :show, :id => admin
-    assert_select "a", :text => /Edit Profile/, :count => 1
+    assert_select "a", :text => /Edit Profile/, :count => 0
 
     get :edit, :id => admin
-    assert_response :success
+    assert_redirected_to root_path
 
-    assert_not_equal 'test', admin.title
-    put :update, :id => admin, :person => {:first_name => 'test'}
-    assert_redirected_to person_path(admin)
-    assert_equal 'test', assigns(:person).first_name
+
   end
 
   test "can edit themself" do
@@ -1056,7 +1054,7 @@ class PeopleControllerTest < ActionController::TestCase
     Seek::Config.email_enabled=temp
   end
 
-  test 'should subscribe a person to a project when assign a person to that project' do
+  test 'should person subscribe to the project when assigned to that project' do
       a_person = Factory(:person)
       project = Factory(:project)
       work_group = Factory(:work_group, :project => project)
@@ -1077,6 +1075,7 @@ class PeopleControllerTest < ActionController::TestCase
       assert_equal 1, projects.count
       assert_equal 1, work_groups.count
       assert a_person.project_subscriptions.collect(&:project).include?(projects.first)
+
 
       s=Factory(:subscribable, :projects => projects)
       SetSubscriptionsForItemJob.new(s.class.name, s.id, projects.collect(&:id)).perform

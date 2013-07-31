@@ -2,14 +2,15 @@
 <% if asset.is_downloadable? -%>
     <% display_asset = asset.find_version(version) %>
     <%# param code is used for temporary link -%>
-    <% if display_asset.contains_downloadable_items? && can_download_asset?(asset, params[:code]) -%>
+
         <%
            path = polymorphic_path(asset,:version=>version,:action=>:download,:code=>params[:code])
+           is_external_link = display_asset.respond_to?(:content_blob) ?   display_asset.content_blob.external_link? : ( display_asset.respond_to?(:content_blobs) && display_asset.content_blobs.count == 1 && display_asset.content_blobs.first.external_link?)
+           link_url =  try_block{display_asset.content_blob.url} || try_block{ display_asset.content_blobs.first.url}
         %>
+    <% if display_asset.contains_downloadable_items? && can_download_asset?(asset, params[:code]) -%>
         <li>
-           <% external_link = asset.respond_to?(:content_blob) ?   asset.content_blob.external_link? : ( asset.respond_to?(:content_blobs) && asset.content_blobs.count == 1 && asset.content_blobs.first.external_link?) %>
-          <%= image_tag_for_key('download', path, (external_link ? "Link" : "Download"), {:target => 'blank'}, (external_link ? "Link" : "Download")) -%>
-
+          <%= image_tag_for_key('download', path, "Download #{human_name}", nil, "Download #{human_name}") -%>
         </li>
         <% if asset.is_a?(DataFile) && display_asset.contains_extractable_spreadsheet? %>
             <li>
@@ -19,7 +20,12 @@
         <% unless Seek::Util.multi_files_asset_types.include?(asset.class) %>
             <%= render :partial => "assets/view_content", :locals => {:content_blob => display_asset.content_blob, :button_style => true} -%>
         <% end %>
-    <% elsif logged_in? -%>
+    <% elsif is_external_link %>
+        <li>
+          <%= image_tag_for_key('download', link_url, "Link", {:target => 'blank'}, "Link" ) -%>
+        </li>
+    <% end -%>
+    <% if logged_in? && !can_download_asset?(asset, params[:code]) %>
         <li>
           <%= render :partial=>"assets/request_resource",:locals=>{:resource=>asset} %>
         </li>

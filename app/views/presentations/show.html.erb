@@ -1,7 +1,7 @@
 <%= javascript_include_tag "resource" -%>
 <% truncate_length_for_boxes = 22 -%>
 
-<%= render :partial => "layouts/item_title",:locals=>{:item=>@presentation, :version=>@display_presentation.version} %>
+<%= render :partial => "layouts/item_title",:locals=>{:item=>@presentation} %>
 
 <ul class="sectionIcons">
     <%= asset_buttons @presentation,@display_presentation.version -%>

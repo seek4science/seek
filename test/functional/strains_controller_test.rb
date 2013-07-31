@@ -82,7 +82,10 @@ class StrainsControllerTest < ActionController::TestCase
     login_as Factory(:user, :person => Factory(:brand_new_person))
     s = Factory :strain, :policy => Factory(:private_policy)
     get :edit, :id => s.id
-    assert_redirected_to strain_path(s)
+    as_virtualliver do
+      assert_redirected_to logout_path
+    end
+
     assert flash[:error]
   end
   test "unauthorized user cannot update strain" do
@@ -90,7 +93,10 @@ class StrainsControllerTest < ActionController::TestCase
     s = Factory :strain, :policy => Factory(:private_policy)
 
     put :update, :id => s.id, :strain => {:title => "test"}
-    assert_redirected_to strain_path(s)
+    as_virtualliver do
+      assert_redirected_to logout_path
+    end
+
     assert flash[:error]
   end
 
@@ -101,7 +107,10 @@ class StrainsControllerTest < ActionController::TestCase
       delete :destroy, :id => s.id
     end
     assert flash[:error]
-    assert_redirected_to strains_path
+    as_virtualliver do
+      assert_redirected_to logout_path
+    end
+
   end
 
   test "contributor can delete strain" do

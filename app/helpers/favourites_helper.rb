@@ -44,10 +44,10 @@ module FavouritesHelper
   #an avatar with an image_tag_for_key in the corner to show it can be favourited
   def favouritable_icon(item, size=100)
     #the image_tag_for_key:
-    html = avatar(item, size, true)    
-    html = "<div class='favouritable_icon'>#{html}</div>"
+    html = avatar(item, size, true)
 
     html = link_to_draggable(html, show_resource_path(item), :id=>model_to_drag_id(item), :class=> "asset", :title=>tooltip_title_attrib(get_object_title(item)))
+    html = "<div class='favouritable_icon'>#{html}</div>"
     return html
   end 
   

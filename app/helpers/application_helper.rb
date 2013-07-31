@@ -3,7 +3,7 @@ require_dependency File.join(Rails.root, 'vendor', 'plugins', 'annotations', 'li
 module ApplicationHelper  
   include SavageBeast::ApplicationHelper
   include FancyMultiselectHelper
-
+  include Recaptcha::ClientHelper
 
   def date_as_string date,show_time_of_day=false
     date = Time.parse(date.to_s) unless date.is_a?(Time) || date.blank?

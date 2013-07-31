@@ -4,7 +4,8 @@ require "acts_as_scalable"
 class Sample < ActiveRecord::Base
  include Subscribable
 
-  acts_as_scalable
+  acts_as_scalable if Seek::Config.is_virtualliver
+
   acts_as_authorized
   acts_as_favouritable
   acts_as_uniquely_identifiable
@@ -17,7 +18,7 @@ class Sample < ActiveRecord::Base
 
   accepts_nested_attributes_for :specimen
 
- has_and_belongs_to_many :tissue_and_cell_types
+ has_and_belongs_to_many :tissue_and_cell_types  if Seek::Config.is_virtualliver
 
   belongs_to :institution
   has_and_belongs_to_many :assays
@@ -31,7 +32,6 @@ class Sample < ActiveRecord::Base
    validates_presence_of :projects, :unless => "Seek::Config.is_virtualliver"
 
 
-  has_and_belongs_to_many :tissue_and_cell_types
 
   def self.sop_sql()
   'SELECT sop_versions.* FROM sop_versions ' +

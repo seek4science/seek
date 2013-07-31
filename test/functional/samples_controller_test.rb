@@ -406,7 +406,8 @@ test "should show organism and strain information of a sample if there is organi
                                 :donation_date => Date.today,
                                 :project_ids => [Factory(:project).id],
                                 :specimen => Factory(:specimen, :contributor => User.current_user)},
-           :sample_sop_ids => [sop.id]
+           :sample_sop_ids => [sop.id],
+           :sharing => valid_sharing
 
 
     end

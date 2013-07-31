@@ -45,7 +45,12 @@ module AssetsHelper
     disabled=versions.size==1
     options=""
     versions.each do |v|
-      options << "<option value='#{url_for(:id=>versioned_resource, :version=>v.version)}'"
+      if (v.version==versioned_resource.version)
+        options << "<option value='#{url_for(:id=>versioned_resource)}'"
+      else
+        options << "<option value='#{url_for(:id=>versioned_resource, :version=>v.version)}'"
+      end
+
       options << " selected='selected'" if v.version==displayed_resource_version.version
       options << "> #{v.version.to_s} #{versioned_resource.describe_version(v.version)} </option>"
     end
@@ -56,7 +61,8 @@ module AssetsHelper
     ) + "<form id='show_version_form' onsubmit='showResourceVersion(this); return false;'></form>".html_safe
   end
 
-  def resource_title_draggable_avatar resource,version
+  def resource_title_draggable_avatar resource,version=nil
+
     icon=""
     image=nil
     if resource.avatar_key
@@ -70,6 +76,9 @@ module AssetsHelper
       end
       icon = link_to_draggable(image, show_resource_path(resource_version), :id=>model_to_drag_id(resource_version), :class=> "asset", :title=>tooltip_title_attrib(get_object_title(resource))) unless image.nil?
     else
+      if resource.use_mime_type_for_avatar?
+        image = image file_type_icon_key(resource), {}
+      end
       icon = link_to_draggable(image, show_resource_path(resource), :id=>model_to_drag_id(resource), :class=> "asset", :title=>tooltip_title_attrib(get_object_title(resource))) unless image.nil?
     end
     icon

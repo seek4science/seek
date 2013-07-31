@@ -1,27 +1,27 @@
 <%
 
 item||=nil
-version||=nil
-avatar = item.nil? ? nil : resource_title_draggable_avatar(item,version)
+
+avatar = item.nil? ? nil : resource_title_draggable_avatar(item,params[:version])
 title_prefix||="" 
 title_postfix||=""
 title ||= item.title || ""
 
 title = title_prefix + title + title_postfix
 
-#based on a screen width of 1200, if the title is long make the image position:relative so that the image does not float above the text
-#otherwise its position:absolute to make the image float and the text look centred
-make_image_relative = title.length > 89
-extra_image_style = make_image_relative ? "style='position:relative;'" : ""
+
+image_style_for_title_length = title.length > 89 ? "float:left" : "position:absolute"
 
 
 %>
 
 <div class="contribution_title">
     <% unless avatar.blank? -%>
-        <div class="contribution_title_image" <%= extra_image_style -%>><%= avatar -%></div>
+        <div class="contribution_title_image" style="<%= image_style_for_title_length -%>"><%= avatar -%></div>
     <% end %>
-    <h1 style="z-index:10;position:relative;"><%= h(title) -%></h1>
+
+    <h1><%= h(title) -%></h1>
+
 </div>
 
 <% if item.respond_to?(:private?) && item.respond_to?(:public?) && item.try(:can_manage?) %>

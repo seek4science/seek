@@ -68,7 +68,10 @@ module Acts #:nodoc:
 
       end 
       def contains_downloadable_items?
-        self.parent.contains_downloadable_items?
+        blobs = []
+        blobs << self.content_blob if self.respond_to?(:content_blob)
+        blobs = blobs | self.content_blobs if self.respond_to?(:content_blobs)
+        !blobs.compact.select { |blob| !blob.is_webpage? }.empty?
       end
 
       #returns a list of the people that can manage this file

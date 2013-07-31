@@ -9,11 +9,6 @@ class ProjectSubscriptionJob < Struct.new(:project_subscription_id)
       all_in_project(project).each do |item|
         item.subscriptions << Subscription.new(:person => ps.person, :project_subscription_id => project_subscription_id) unless item.subscribed?(ps.person)
       end
-      project.ancestors.each do |parent_project|
-        all_in_project(parent_project).each do |item|
-          item.subscriptions << Subscription.new(:person => ps.person) unless item.subscribed?(ps.person)
-        end
-      end
     end
   end
 
@@ -25,6 +20,7 @@ class ProjectSubscriptionJob < Struct.new(:project_subscription_id)
     Delayed::Job.enqueue(ProjectSubscriptionJob.new(project_subscription_id), priority, t) unless exists? project_subscription_id
   end
 
+  #all direct assets in the project, but related_#{asset_type} includes also assets from descendants
   def all_in_project project
     assets = []
     assets |= project.studies

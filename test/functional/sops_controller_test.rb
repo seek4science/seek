@@ -295,6 +295,12 @@ class SopsControllerTest < ActionController::TestCase
       assert_select "p > b",:text=>/Size:/
       assert_select "p",:text=>/8.8 KB/
     end
+
+    al = ActivityLog.last
+    assert_equal "show",al.action
+    assert_equal User.current_user,al.culprit
+    assert_equal s,al.activity_loggable
+    assert_equal "Rails Testing",al.user_agent
   end
 
   test "should get edit" do
@@ -613,7 +619,7 @@ class SopsControllerTest < ActionController::TestCase
     get :index
     assert_response :success
     no_other_creator_sops = assigns(:sops).select { |s| s.other_creators.blank? }
-    assert_select 'p.list_item_attribute', :text => /Other creators: Not specified/, :count => no_other_creator_sops.count
+    assert_select 'p.list_item_attribute', :text => /Other contributors: Not specified/, :count => no_other_creator_sops.count
   end
 
   test 'breadcrumb for sop index' do

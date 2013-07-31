@@ -144,6 +144,8 @@ each released minor version in order incrementally (i.e. 0.13.x -&gt;
 <p>0.16.1</p>
 </li><li>
 <p>0.16.2</p>
+</li><li>
+<p>0.16.3</p>
 </li></ul>
 
 <p><em>(Note there was no 0.12.x version released externally, this was an
@@ -207,7 +209,7 @@ previous versions:</p>
 
 <pre>RAILS_ENV=production ./script/delayed_job stop
 bundle exec rake sunspot:solr:stop RAILS_ENV=production
-hg pull https://sysmo-db.googlecode.com/hg/ -r v0.16.2
+hg pull https://sysmo-db.googlecode.com/hg/ -r v0.16.3
 hg update
 hg merge # only required if you've made changes since installing. If you have you may need to deal with conflicts.
 hg commit -m &quot;merged&quot; # likewise - only required if you made changes since installing
@@ -326,15 +328,15 @@ reflect the change to sunspot:solr:start. The updated script should look
 something like: <a
 href="https://gist.github.com/3143434">gist.github.com/3143434</a></p>
 
-<h2 id="label-Steps+to+upgrade+between+patches+%28e.g.+between+0.16.0+to+0.16.2%29">Steps to upgrade between patches (e.g. between 0.16.0 to 0.16.2)</h2>
+<h2 id="label-Steps+to+upgrade+between+patches+%28e.g.+between+0.16.0+to+0.16.3%29">Steps to upgrade between patches (e.g. between 0.16.0 to 0.16.3)</h2>
 
-<p>This example shows upgrading from v0.16.0, or v0.16.1, to v0.16.2 as an
-example, but the process is the same for upgrading between patch versions
-unless otherwise stated. You can upgrade directly from one patch version to
-another, skipping the intermediate versions (so you can upgrade directly
-0.16.0 to 0.16.2 without first having to upgrade to 0.16.1)</p>
+<p>This example shows upgrading from v0.16.0, v0.16.1, or v0.16.2 to v0.16.3
+as an example, but the process is the same for upgrading between patch
+versions unless otherwise stated. You can upgrade directly from one patch
+version to another, skipping the intermediate versions (so you can upgrade
+directly 0.16.0 to 0.16.3 without first having to upgrade to 0.16.1)</p>
 
-<pre>hg pull https://sysmo-db.googlecode.com/hg/ -r v0.16.2
+<pre>hg pull https://sysmo-db.googlecode.com/hg/ -r v0.16.3
 hg update
 hg merge # if necessary
 hg commit -m &quot;merged&quot; # if necessary

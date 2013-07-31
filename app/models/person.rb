@@ -46,7 +46,7 @@ class Person < ActiveRecord::Base
   validates_format_of :email,:with=>RFC822::EmailAddress
   validates_format_of :web_page, :with=>/(^$)|(^(http|https):\/\/[a-z0-9]+([\-\.]{1}[a-z0-9]+)*\.[a-z]{2,5}(([0-9]{1,5})?\/.*)?$)/ix,:allow_nil=>true,:allow_blank=>true
 
-  validates_uniqueness_of :email,:case_sensitive => false
+  #validates_uniqueness_of :email,:case_sensitive => false
 
   has_and_belongs_to_many :disciplines
 
@@ -59,10 +59,23 @@ class Person < ActiveRecord::Base
   :before_remove => [:unsubscribe_to_work_group_project, :touch_work_group_project]
 
   def subscribe_to_work_group_project wg
+
+    #subscribe direct project
     project_subscriptions.build :project => wg.project unless project_subscriptions.detect {|ps| ps.project == wg.project}
+
+    #subscribe to ancestor projects
+    if Project.is_hierarchical?
+       wg.project.ancestors.each do |ancestor_proj|
+         project_subscriptions.build :project => ancestor_proj unless project_subscriptions.detect {|ps| ps.project == ancestor_proj}
+       end
+    end
+
   end
 
   def unsubscribe_to_work_group_project wg
+
+    #FIXME: ONLY direct project subscriptions are deleted, the related parent projects subscriptions remains there.
+    # people have to manually unsubscribe them on profle_edit_page
     if ps = project_subscriptions.detect {|ps| ps.project == wg.project}
       project_subscriptions.delete ps
     end
@@ -96,11 +109,10 @@ class Person < ActiveRecord::Base
 
   alias_attribute :webpage,:web_page
 
-  has_many :project_subscriptions, :before_add => proc {|person, ps| ps.person = person},:dependent => :destroy
+  has_many :project_subscriptions, :before_add => proc {|person, ps| ps.person = person},:uniq=> true, :dependent => :destroy
   accepts_nested_attributes_for :project_subscriptions, :allow_destroy => true
 
   has_many :subscriptions,:dependent => :destroy
-  before_create :set_default_subscriptions
 
   ROLES = %w[admin pal project_manager asset_manager gatekeeper]
   ROLES_MASK_FOR_ADMIN = 2**ROLES.index('admin')
@@ -152,11 +164,7 @@ class Person < ActiveRecord::Base
     self.roles_mask = self.roles_mask.to_i - ((remove_roles & ROLES).map { |r| 2**ROLES.index(r) }.sum)
   end
 
-  def set_default_subscriptions
-    projects.each do |proj|
-      project_subscriptions.build :project => proj
-    end
-  end
+
 
   RELATED_RESOURCE_TYPES = [:data_files,:models,:sops,:presentations,:events,:publications, :investigations]
   RELATED_RESOURCE_TYPES.each do |type|
@@ -190,9 +198,9 @@ class Person < ActiveRecord::Base
   def self.get_all_as_json
     all_people = Person.find(:all, :order => "ID asc")
     names_emails = all_people.collect{ |p| {"id" => p.id,
-        "name" => (p.first_name.blank? ? (logger.error("\n----\nUNEXPECTED DATA: person id = #{p.id} doesn't have a first name\n----\n"); "(NO FIRST NAME)") : p.first_name) + " " +
-                  (p.last_name.blank? ? (logger.error("\n----\nUNEXPECTED DATA: person id = #{p.id} doesn't have a last name\n----\n"); "(NO LAST NAME)") : p.last_name),
-        "email" => (p.email.blank? ? "unknown" : p.email) } }
+        "name" => (p.first_name.blank? ? (logger.error("\n----\nUNEXPECTED DATA: person id = #{p.id} doesn't have a first name\n----\n"); "(NO FIRST NAME)") : h(p.first_name)) + " " +
+                  (p.last_name.blank? ? (logger.error("\n----\nUNEXPECTED DATA: person id = #{p.id} doesn't have a last name\n----\n"); "(NO LAST NAME)") : h(p.last_name)),
+        "email" => (p.email.blank? ? "unknown" : h(p.email)) } }
     return names_emails.to_json
   end
 
@@ -238,19 +246,14 @@ class Person < ActiveRecord::Base
     work_groups.collect {|wg| wg.institution }.uniq
   end
 
-  def direct_projects
-    #updating workgroups doesn't change groupmemberships until you save. And vice versa.
-    work_groups.collect {|wg| wg.project }.uniq | group_memberships.collect{|gm| gm.work_group.project}
-  end
-
+  #Person#projects is OVERRIDDEN in Seek::ProjectHierarchies if Project.is_hierarchical?
   def projects
-    @known_project ||= direct_projects.collect{|proj| [proj] + proj.ancestors}.flatten.uniq
+      #updating workgroups doesn't change groupmemberships until you save. And vice versa.
+      @known_projects ||= work_groups.collect {|wg| wg.project }.uniq | group_memberships.collect{|gm| gm.work_group.project}
+      @known_projects
   end
 
 
-  def projects_and_descendants
-    @project_and_descendants ||= direct_projects.collect{|proj| [proj] + proj.descendants}.flatten.uniq
-  end
 
   def member?
     !projects.empty?
@@ -308,9 +311,13 @@ class Person < ActiveRecord::Base
     self.first_letter=first_letter
   end
 
-  def project_roles_of_project(project)
+  def project_roles_of_project(projects_or_project)
     #Get intersection of all project memberships + person's memberships to find project membership
-    memberships = group_memberships.select{|g| g.work_group.project == project}
+    if projects_or_project.is_a? Array
+      memberships = group_memberships.select{|g| projects_or_project.include? g.work_group.project}
+    else
+      memberships = group_memberships.select{|g| g.work_group.project == projects_or_project}
+    end
     return memberships.collect{|m| m.project_roles}.flatten
   end
 

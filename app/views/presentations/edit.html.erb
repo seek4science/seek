@@ -25,10 +25,9 @@
         <% end -%>
         <%# only the owner should be able to change sharing permissions -%>
         <% if current_user_authorized_to_manage -%>
-        <p>
-        <%= fancy_multiselect @presentation,:scales, {:possibilities=>sort_scales(Scale.all)} -%>
-        </p>
-
+             <p>
+            <%= fancy_multiselect @presentation,:scales, {:possibilities=>sort_scales(Scale.all)} if @presentation.is_scalable? -%>
+            </p>
 		<%= render :partial=>"assets/asset_form_bottom", :locals=> {:f => f} -%>
         
         <p>

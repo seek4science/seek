@@ -100,9 +100,9 @@
 
   // recreate internal store of creators..
 <% existing_creators.each do |c| -%>
-    creator_name = '<%= c.name -%>';
+    creator_name = '<%= h(c.name) -%>';
     creator_id = <%= c.id -%>;
-    creator_email = '<%= c.email -%>';
+    creator_email = '<%= h(c.email) -%>';
 
     //creator_settings.push([creator_name, creator_email, creator_id]);
     addCreator(creator_name,creator_email,creator_id);
@@ -203,7 +203,7 @@ function addCreators() {
 
     if(selIDs == "") {
         // no creators to add
-        alert("Please choose some creators!");
+        alert("Please choose some contributors!");
         return(false);
     }
     else {

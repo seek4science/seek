@@ -292,11 +292,13 @@ class PublicationsControllerTest < ActionController::TestCase
     assert_redirected_to publications_path
   end
   
-  test "shouldn't add paper with non-unique title" do
+  test "shouldn't add paper with non-unique title within the same project" do
     mock_crossref(:email=>"sowen@cs.man.ac.uk",:doi=>"10.1093/nar/gkl320",:content_file=>"cross_ref4.xml")
+    pub = Publication.find_by_doi("10.1093/nar/gkl320")
+
     #PubMed version of publication already exists, so it shouldn't re-add
     assert_no_difference('Publication.count') do
-      post :create, :publication => {:doi => "10.1093/nar/gkl320" }
+      post :create, :publication => {:doi => "10.1093/nar/gkl320" ,:projects=>pub.projects.first} if pub
     end
   end
 
@@ -309,32 +311,40 @@ class PublicationsControllerTest < ActionController::TestCase
     original_authors = ["Sean Bechhofer","Iain Buchan","David De Roure","Paolo Missier","John Ainsworth","Jiten Bhagat","Philip Couch","Don Cruickshank",
                         "Mark Delderfield","Ian Dunlop","Matthew Gamble","Danius Michaelides","Stuart Owen","David Newman","Shoaib Sufi","Carole Goble"]
 
-    authors = publication.publication_author_orders.sort_by(&:order).collect{|o| o.author.first_name + ' ' + o.author.last_name}
+    authors = publication.publication_authors
     assert original_authors, authors
 
     seek_author1 = Factory(:person, :first_name => 'Stuart', :last_name => 'Owen')
     seek_author2 = Factory(:person, :first_name => 'Carole', :last_name => 'Goble')
 
     #Associate a non-seek author to a seek person
-    assert_difference('PublicationAuthor.count', -2) do
-      assert_difference('AssetsCreator.count', 2) do
-        put :update, :id => publication.id, :author => {publication.non_seek_authors[12].id => seek_author1.id,publication.non_seek_authors[15].id => seek_author2.id}
+    if Seek::Config.is_virtualliver
+      assert_difference('publication.non_seek_authors.count', -2) do
+        assert_difference('AssetsCreator.count', 2) do
+          put :update, :id => publication.id, :author => {publication.non_seek_authors[12].id => seek_author1.id, publication.non_seek_authors[15].id => seek_author2.id}
+        end
+      end
+    else
+      assert_difference('PublicationAuthor.count', -2) do
+        assert_difference('AssetsCreator.count', 2) do
+          put :update, :id => publication.id, :author => {publication.non_seek_authors[12].id => seek_author1.id,publication.non_seek_authors[15].id => seek_author2.id}
+        end
       end
     end
 
     publication.reload
-    authors = publication.publication_author_orders.sort_by(&:order).collect{|o| o.author.first_name + ' ' + o.author.last_name}
+    authors = publication.publication_authors
     assert original_authors, authors
 
     #Disassociate seek-authors
-    assert_difference('PublicationAuthor.count', 2) do
+    assert_difference('publication.non_seek_authors.count', 2) do
       assert_difference('AssetsCreator.count', -2) do
         post :disassociate_authors, :id => publication.id
       end
     end
 
     publication.reload
-    authors = publication.publication_author_orders.sort_by(&:order).collect{|o| o.author.first_name + ' ' + o.author.last_name}
+    authors = publication.publication_authors
     assert original_authors, authors
   end
 
@@ -351,7 +361,7 @@ class PublicationsControllerTest < ActionController::TestCase
     seek_author2 = Factory(:person, :first_name => 'Carole', :last_name => 'Goble')
 
     #Associate a non-seek author to a seek person
-    assert_difference('PublicationAuthor.count', -2) do
+    assert_difference('publication.non_seek_authors.count', -2) do
       assert_difference('AssetsCreator.count', 2) do
         put :update, :id => publication.id, :author => {publication.non_seek_authors[12].id => seek_author1.id,publication.non_seek_authors[15].id => seek_author2.id}
       end

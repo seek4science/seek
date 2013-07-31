@@ -3,7 +3,7 @@ Hi <%= @gatekeepers.collect{|o| o.name}.join(", ") -%>,
 
     The <%= Seek::Config.application_name %> user <%= @requester.name -%>, <%= person_url(@requester,:host=>@host) -%>, has requested your approval to publish "<%= @resource.title -%>": <%= url_for(:action=>:show,:controller=>controller,:id=>@resource,:host=>@host) -%>.
 
-    You can aprrove or reject by clicking on following link:
+    You can approve or reject by clicking on the following link:
     <%= url_for(:controller => controller, :action => 'approve_or_reject_publish', :id => @resource.id, :host=>@host) -%>
 
 

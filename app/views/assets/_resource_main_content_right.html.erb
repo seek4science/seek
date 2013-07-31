@@ -1,6 +1,7 @@
 <% truncate_length_for_boxes = 22 -%>
 
-<div class="main_content_right_box_wider">  
+<div class="main_content_right_box_wider">
+
   <%= render :partial => "assets/resource_authors_box", :locals => { :resource => resource, :truncate_to => truncate_length_for_boxes } if resource.respond_to?("creators") -%>
 
   <% if resource.class.is_taggable? -%>

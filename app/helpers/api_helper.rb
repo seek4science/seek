@@ -142,10 +142,10 @@ module ApiHelper
       api_partial_collection builder,organisms
     end if object.respond_to?("organism") || object.respond_to?("organisms")
         
-    builder.tag! "creators" do      
+    builder.tag! "creators" do
       api_partial_collection builder,(object.creators || [])
-    end if object.respond_to?("creators")
-            
+    end if !object.instance_of?(Publication) && object.respond_to?("creators")
+
     unless hide_contact_details?
       builder.tag! "email",object.email if object.respond_to?("email")
       builder.tag! "webpage",object.webpage if object.respond_to?("webpage")

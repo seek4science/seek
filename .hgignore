@@ -4,13 +4,11 @@ syntax: glob
 
 db/*.sqlite3
 config/database.yml
-config/database2.yml
 config/initializers/seek_local.rb
 config/environment_local.rb
 
 *.DS_Store
 log/*.log*
-nbproject/*
 
 filestore*/
 
@@ -19,7 +17,6 @@ debug.log
 
 tmp/pids/*
 tmp/cache/*
-tmp/data.sql
 tmp/avatars/*
 tmp/models/*
 tmp/model_images/*
@@ -40,16 +37,10 @@ solr/pids/
 public/help_images/*
 public/javascripts/*_cached.js
 public/stylesheets/*_cached.css
-public/javascripts/pdfjs/*
 
 .bundle/config
 
-new_version
-server
-svg
-
 vendor/plugins/annotations/.git
-vendor/plugins/rails-dev-boost/*
 vendor/bundle/
 vendor/cache/
 *.~lock*

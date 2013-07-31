@@ -900,7 +900,8 @@ end
                :assay_sop_ids=>["#{sop.id}"],
                :model_ids=>["#{model.id}"],
                :data_file_ids=>["#{df.id},#{rel.title}"],
-               :related_publication_ids=>["#{pub.id}"]
+               :related_publication_ids=>["#{pub.id}"],
+               :sharing => valid_sharing # default policy is nil in VLN
           end
         end
       end

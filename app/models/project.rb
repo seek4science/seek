@@ -5,42 +5,8 @@ require 'title_trimmer'
 class Project < ActiveRecord::Base
 
   acts_as_yellow_pages
-
   include SimpleCrypt
-  include ActsAsCachedTree
 
-  after_update :touch_for_hierarchy_updates
-
-  def touch_for_hierarchy_updates
-    if changed_attributes.include? :parent_id
-      Permission.find_by_contributor_type("Project", :conditions => {:contributor_id => ([id] + ancestors.map(&:id) + descendants.map(&:id))}).each &:touch
-      ancestors.each &:touch
-      descendants.each &:touch
-    end
-  end
-
-  #when I have a new ancestor, subscribe to items in that project
-  write_inheritable_array :before_add_for_ancestors, [:add_indirect_subscriptions]
-
-  has_many :project_subscriptions
-
-  def add_indirect_subscriptions ancestor
-    subscribers = project_subscriptions.scoped(:include => :person).map(&:person)
-    possibly_new_items = ancestor.subscribable_items #might already have subscriptions to these some other way
-    subscribers.each do |p|
-      possibly_new_items.each {|i| i.subscribe(p); disable_authorization_checks{i.save(false)} if i.changed_for_autosave?}
-    end
-  end
-
-  def subscribable_items
-    #TODO: Possibly refactor this. Probably the Project#subscribable_items should only return the subscribable items directly in _this_ project, not including its ancestors
-    ProjectSubscription.subscribable_types.collect {|klass|
-      if klass.reflect_on_association(:projects)
-        then klass.scoped(:include => :projects)
-      else
-        klass.all
-      end}.flatten.select {|item| !(([self] + ancestors) & item.projects).empty?}
-  end
 
   title_trimmer
   
@@ -61,16 +27,12 @@ class Project < ActiveRecord::Base
   has_and_belongs_to_many :events
   has_and_belongs_to_many :presentations
 
-  RELATED_RESOURCE_TYPES = ["Investigation","Study","Assay","DataFile","Model","Sop","Publication","Event","Presentation","Organism"]
+  RELATED_RESOURCE_TYPES = ["Investigation", "Study", "Assay", "DataFile", "Model", "Sop", "Publication", "Event", "Presentation", "Organism"]
 
   RELATED_RESOURCE_TYPES.each do |type|
-     define_method "related_#{type.underscore.pluralize}" do
-         res = send "#{type.underscore.pluralize}"
-         descendants.each do |descendant|
-           res = res | descendant.send("#{type.underscore.pluralize}")
-         end
-          res.compact
-     end
+    define_method "related_#{type.underscore.pluralize}" do
+      send "#{type.underscore.pluralize}"
+    end
   end
 
 
@@ -96,26 +58,14 @@ class Project < ActiveRecord::Base
   end
 
   has_many :work_groups, :dependent=>:destroy
-  has_many :institutions, :through=>:work_groups, :after_add => :create_ancestor_workgroups, :before_remove => :check_workgroup_is_empty
-
-  def create_ancestor_workgroups institution
-    parent.institutions << institution unless parent.nil? || parent.institutions.include?(institution)
-  end
-
-  def check_workgroup_is_empty institution
-    work_groups_of_institution = work_groups.select {|wg| wg.institution == institution }
-    people = work_groups_of_institution.collect { |wg| wg.people }.flatten
-    if !people.empty?
-      raise Exception.new("Cannot delete with associated people. This WorkGroup has "+people.size.to_s+" people associated with it")
-    end
-  end
+  has_many :institutions, :through=>:work_groups
 
   alias_attribute :webpage, :web_page
   alias_attribute :internal_webpage, :wiki_page
 
   has_and_belongs_to_many :organisms
   has_many :project_subscriptions,:dependent => :destroy
-  
+
   searchable(:ignore_attribute_changes_of=>[:updated_at]) do
     text :name , :description, :locations
   end if Seek::Config.solr_enabled
@@ -127,25 +77,26 @@ class Project < ActiveRecord::Base
   def assets
     data_files | sops | models | publications | presentations
   end
+  #OVERRIDDEN in Seek::ProjectHierarchies if Project.is_hierarchical?
   def project_coordinators
     coordinator_role = ProjectRole.project_coordinator_role
-    ([self] + descendants).map {|proj| proj.people.select{|p| p.project_roles_of_project(proj).include?(coordinator_role)}}.flatten.uniq
-  
+    people.select{|p| p.project_roles_of_project(self).include?(coordinator_role)}
   end
 
+  #OVERRIDDEN in Seek::ProjectHierarchies if Project.is_hierarchical?
   #this is the intersection of project role and seek role
-  def pals
-    pal_role=ProjectRole.pal_role
-    people.select{|p| p.is_pal?}.select do |possible_pal|
-      possible_pal.project_roles_of_project(self).include?(pal_role)
-    end | descendants.collect(&:pals).flatten
-  end
-
-  #this is project role
-  def pis
-    pi_role = ProjectRole.find_by_name('PI')
-    people.select{|p| p.project_roles_of_project(self).include?(pi_role)} | descendants.collect(&:pis).flatten
-  end
+    def pals
+      pal_role=ProjectRole.pal_role
+      people.select{|p| p.is_pal?}.select do |possible_pal|
+        possible_pal.project_roles_of_project(self).include?(pal_role)
+      end
+    end
+   #OVERRIDDEN in Seek::ProjectHierarchies if Project.is_hierarchical?
+    #this is project role
+    def pis
+      pi_role = ProjectRole.find_by_name('PI')
+      people.select{|p| p.project_roles_of_project(self).include?(pi_role)}
+    end
 
   #this is seek role
   def asset_managers
@@ -173,12 +124,13 @@ class Project < ActiveRecord::Base
     return locations
   end
 
+  #OVERRIDDEN in Seek::ProjectHierarchies if Project.is_hierarchical?
   def people
-    #TODO: look into doing this with a named_scope or direct query
-   res =  ([self] + descendants).collect {|proj| proj.work_groups.collect(&:people)}.flatten.uniq.compact
-   res.sort_by{|a| (a.last_name.blank? ? a.name : a.last_name)}
-  end
-
+      #TODO: look into doing this with a named_scope or direct query
+      res = work_groups.collect(&:people).flatten.uniq.compact
+      #TODO: write a test to check they are ordered
+      res.sort_by{|a| (a.last_name.blank? ? a.name : a.last_name)}
+    end
   # provides a list of people that are said to be members of this project, but are not associated with any user
   def userless_people
     people.select{|p| p.user.nil?}
@@ -245,4 +197,8 @@ class Project < ActiveRecord::Base
     user == nil ? false : (user.is_admin? || (self.has_member?(user) && (user.is_project_manager?)))
   end
 
+
+   #should put below at the bottom in order to override methods for hierarchies,
+   #Try to find a better way for overriding methods regardless where to include the module
+    include Seek::ProjectHierarchies if Seek::Config.is_virtualliver
 end

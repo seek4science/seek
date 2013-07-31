@@ -934,9 +934,6 @@ ul.related_asset_list li{
 }
 
 .contribution_title_image {
-    float: left;
-    position: absolute;
-
     margin-left: 1em;
     margin-right: 0.5em;
     margin-top: -0.2em;
@@ -946,6 +943,10 @@ ul.related_asset_list li{
     
 	min-width :2.3em;
     min-height: 2.3em;
+    max-width: 2.3em;
+
+    z-index:1;
+
 }
 
 .contribution_title_image img {        
@@ -1729,8 +1730,19 @@ li.fileinfo div.fileinfo2 {
     margin: 0.25em;
     min-height: 8.1em;
     max-width: 22em;
+    word-wrap: break-word;
 }
 
+table.fileinfo th {
+    font-style:  italic;
+
+
+}
+table.fileinfo th,td {
+    text-align: left;
+    height: 5px;
+    padding-bottom: 1px;
+}
 
 div#guide_box {
     min-height: 4em;

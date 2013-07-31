@@ -13,7 +13,7 @@ class ModelsControllerTest < ActionController::TestCase
   end
 
   def rest_api_test_object
-    @object=Factory :model_2_files, :contributor=>User.current_user
+    @object=Factory :model_2_files, :contributor=>User.current_user, :policy=>Factory(:private_policy)
   end
   
   test "should get index" do
@@ -360,21 +360,7 @@ class ModelsControllerTest < ActionController::TestCase
     assert_equal user, model.contributor
   end
   
-  def test_missing_sharing_should_default_to_private
-    assert_difference('Model.count') do
-      assert_difference('ContentBlob.count') do
-        post :create, :model => valid_model,:content_blob=>{:file_0=>fixture_file_upload('files/little_file.txt',Mime::TEXT)}
-      end
-    end
 
-    m = assigns(:model)
-    assert !m.valid?
-    assert !m.policy.valid?
-    assert_blank m.policy.sharing_scope
-    assert_blank m.policy.access_type
-    assert_blank m.policy.permissions
-
-  end
   
   test "should create model with url" do
     mock_remote_file "#{Rails.root}/test/fixtures/files/file_picture.png","http://www.sysmo-db.org/images/sysmo-db-logo-grad2.png"
@@ -397,7 +383,8 @@ class ModelsControllerTest < ActionController::TestCase
   
   test "should create model and store with url and store flag" do
     model_details=valid_model_with_url
-    model_details[:local_copy]="1"
+    key = Seek::Config.is_virtualliver ? :external_link : :local_copy
+    model_details[key]="1"
     assert_difference('Model.count') do
       assert_difference('ContentBlob.count') do
         post :create, :model => model_details,:content_blob=>{:url_0=>"http://www.sysmo-db.org/images/sysmo-db-logo-grad2.png"}, :sharing=>valid_sharing
@@ -408,8 +395,10 @@ class ModelsControllerTest < ActionController::TestCase
     assert_equal users(:model_owner),model.contributor
     assert_equal 1,model.content_blobs.count
     assert !model.content_blobs.first.url.blank?
-    assert !model.content_blobs.first.data_io_object.read.nil?
-    assert model.content_blobs.first.file_exists?
+
+
+    assert !model.content_blobs.first.data_io_object.read.nil? unless Seek::Config.is_virtualliver
+    assert model.content_blobs.first.file_exists? unless Seek::Config.is_virtualliver
     assert_equal "sysmo-db-logo-grad2.png", model.content_blobs.first.original_filename
     assert_equal "image/png", model.content_blobs.first.content_type
   end
@@ -421,8 +410,9 @@ class ModelsControllerTest < ActionController::TestCase
     stub_request(:head, "http://news.bbc.co.uk").to_return(:status=>301,:headers=>{'Location'=>'http://bbc.co.uk/news'})
     stub_request(:head, "http://bbc.co.uk/news").to_return(:status=>200,:headers=>{'Content-Type' => 'text/html'})
 
+    key = Seek::Config.is_virtualliver ? :external_link : :local_copy
     model_details=valid_model_with_url
-    model_details[:local_copy]="0"
+    model_details[key]="0"
     assert_difference('Model.count') do
       assert_difference('ContentBlob.count') do
         post :create, :model => model_details,:content_blob=>{:url_0=>"http://news.bbc.co.uk"}, :sharing=>valid_sharing
@@ -433,7 +423,21 @@ class ModelsControllerTest < ActionController::TestCase
     assert_equal users(:model_owner),model.contributor
     assert_equal 1,model.content_blobs.count
     assert_equal "http://news.bbc.co.uk",model.content_blobs.first.url
-    assert model.content_blobs.first.is_webpage?
+    assert model.content_blobs.first.is_webpage? unless Seek::Config.is_virtualliver
+
+
+    model_details[key]="1"
+    assert_difference('Model.count') do
+      assert_difference('ContentBlob.count') do
+        post :create, :model => model_details, :content_blob => {:url_0 => "http://news.bbc.co.uk"}, :sharing => valid_sharing
+      end
+    end
+    model = assigns(:model)
+    assert_redirected_to model_path(model)
+    assert_equal users(:model_owner), model.contributor
+    assert_equal 1, model.content_blobs.count
+    assert_equal "http://news.bbc.co.uk", model.content_blobs.first.url
+    assert model.content_blobs.first.is_webpage? if Seek::Config.is_virtualliver
 
   end
   
@@ -1065,10 +1069,12 @@ class ModelsControllerTest < ActionController::TestCase
   end
 
   test "should not submit_to_sycamore if sycamore is disable" do
+    with_config_value :sycamore_enabled,false do
     model = Factory :teusink_model
     login_as(model.contributor)
     post :submit_to_sycamore, :id => model.id, :version => model.version
     assert @response.body.include?('Interaction with Sycamore is currently disabled')
+    end
   end
 
   test "should not submit_to_sycamore if model is not downloadable" do
@@ -1092,7 +1098,7 @@ class ModelsControllerTest < ActionController::TestCase
   end
 
   test "should create new model version based on content_blobs of previous version" do
-    m = Factory(:model_2_files)
+    m = Factory(:model_2_files, :policy => Factory(:private_policy))
     retained_content_blob = m.content_blobs.first
     login_as(m.contributor)
     assert_difference("Model::Version.count", 1) do

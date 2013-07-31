@@ -2,7 +2,7 @@
 <%= javascript_include_tag "resource" ,"zoom/lightbox"-%>
 <%= stylesheet_link_tag "lightbox" %>
 
-<%= render :partial => "layouts/item_title",:locals=>{:item=>@model, :version => @display_model.version} %>
+<%= render :partial => "layouts/item_title",:locals=>{:item=>@model} %>
 
 <ul class="sectionIcons">
   <%= asset_buttons @model, @display_model.version -%>

@@ -44,6 +44,9 @@ module ActiveRecordExtensions
 
       class_alias_method_chain :accepts_nested_attributes_for, :allow_destroy_bugfix
 
+      def self.is_hierarchical?
+           include? ActsAsCachedTree if defined? ActsAsCachedTree
+      end
     end
 
 

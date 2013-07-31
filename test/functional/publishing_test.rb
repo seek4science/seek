@@ -65,7 +65,7 @@ class PublishingTest < ActionController::TestCase
     assert_select "li.type_and_title",:text=>/Data file/,:count=>1 do
       assert_select "a[href=?]",data_file_path(other_df),:text=>/#{other_df.title}/
     end
-    assert_select "li.secondary",:text=>/Notify owner/ do
+    assert_select "li.secondary",:text=>/Notify contributor/ do
       assert_select "input[checked='checked'][type='checkbox'][id=?]","publish_DataFile_#{other_df.id}"
     end
 
