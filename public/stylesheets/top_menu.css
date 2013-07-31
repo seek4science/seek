@@ -79,3 +79,14 @@ ul#section_menu_items > li > a {
 ul#section_menu_items > li > a:hover {
     background-color: #001dff;
 }
+
+#search_box {
+    float: right;
+    margin-right: 2em;
+    width:auto;
+    color:white;
+}
+
+#search_query {
+    width:30em;
+}
