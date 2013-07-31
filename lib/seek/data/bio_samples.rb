@@ -65,8 +65,9 @@ module Seek
         if doc
           template = @file.template_name
           Rails.logger.warn "Template = #{template}, Institution name = " + @institution_name
+          filename = @file.content_blob.original_filename
           parser_mapper = Seek::ParserMapper.new
-          @parser_mapping = parser_mapper.mapping(template.downcase != "autodetect by filename" ? template.downcase : parser_mapper.filename_to_mapping_name(@file.original_filename))
+          @parser_mapping = parser_mapper.mapping(template.downcase != "autodetect by filename" ? template.downcase : parser_mapper.filename_to_mapping_name(filename))
 
           if @parser_mapping
             @samples_mapping = @parser_mapping[:samples_mapping]
@@ -77,8 +78,8 @@ module Seek
 
             extract_from_document doc
           else
-            Rails.logger.warn "No parser mapping found for #{file.original_filename}"
-            @errors << "No parser mapping found for #{file.original_filename}"
+            Rails.logger.warn "No parser mapping found for #{filename}"
+            @errors << "No parser mapping found for #{filename}"
             raise  @errors
           end
 
@@ -128,7 +129,7 @@ module Seek
 
 
       if @to_populate
-          Rails.logger.warn "MOCK JASON:"
+          Rails.logger.warn "MOCK JSON:"
           Rails.logger.warn build_mock_json_import
           Rails.logger.warn "Populate db"
           populate_db build_mock_json_import
@@ -813,6 +814,7 @@ module Seek
               new_sp.contributor = User.current_user
               new_sp.projects = specimen.projects
               new_sp.created_at = now
+              new_sp.policy = @file.policy.deep_copy
               new_sp.save!
               @warnings << "Warning: specimen with the name '#{specimen_title}' is already created in SEEK.<br/>"
               @warnings << "It is renamed and saved as '#{new_sp.title}'.<br/>"
