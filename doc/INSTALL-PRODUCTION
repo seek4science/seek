@@ -1,0 +1,23 @@
+= Installing SEEK in a production environment
+
+This page contains some extra notes about setting up SEEK for production (i.e. for real use rather than for development).
+
+By reading and following these extra notes, you will more performance out of SEEK, and reduce the ongoing maintenance.
+
+
+== Before you install
+
+Before following the standard INSTALL guide you need to set an environment variable to indicate that you intend to run SEEK as production.
+
+  >export RAILS_ENV=production
+
+This will make sure some of the rake tasks affect the appropriate database.
+
+To save time later there are also some additional packages to install:
+
+
+You can now follow the overall {Installation Guide}[link:doc/INSTALL.html], and then return to this page for some additional steps to get SEEK running together with Apache,
+and also automating the required services.
+
+
+== After you have installed SEEK

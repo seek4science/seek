@@ -4,7 +4,7 @@
 <head>
 <meta content="text/html; charset=utf-8" http-equiv="Content-Type">
 
-<title>setting_up_virtuoso - SEEK Technical Guide</title>
+<title>OTHER-DISTRIBUTIONS - SEEK Technical Guide</title>
 
 <link type="text/css" media="screen" href="../rdoc.css" rel="stylesheet">
 
@@ -99,75 +99,23 @@
 
 <div id="documentation" class="description">
   
-<h1 id="label-Configuring+SEEK+for+Virtuoso">Configuring SEEK for Virtuoso</h1>
+<h1 id="label-Installing+SEEK+for+other+Linux+distributions">Installing SEEK for other Linux distributions</h1>
 
-<p>It is possible to configure SEEK to automatically send RDF triples to a
-Virtuoso Repository. Developers may also be interested in how to extend
-this for other triple stores - this is potentially quite simple and please
-contact us on our {mailing list}<a
-href="http://groups.google.com/group/seek-development">groups.google.com/group/seek-development</a>
-if you are interested.</p>
+<h2 id="label-Ubuntu+10.04+%28LTS%29">Ubuntu 10.04 (LTS)</h2>
 
-<h2 id="label-Installing+Virtuoso">Installing Virtuoso</h2>
+<p><em>TODO</em></p>
 
-<p>Virtuoso is available as a Debian package, and this is the easiest way to
-install it.</p>
+<h2 id="label-Debian+Wheezy">Debian Wheezy</h2>
 
-<p>For other distributions, or for the latest version, please follow the
-online documentation using the link at the end of this section.</p>
+<p><em>TODO</em></p>
 
-<pre>sudo apt-get install virtuoso-opensource</pre>
+<h2 id="label-CentOS">CentOS</h2>
 
-<p>Note that during the installation process, you will be asked for a password
-for the DBA and DAV users. We find this doesn’t change the password and it
-remains as the defaults <em>dba</em> or <em>dav</em> - you will need to
-change this passwords after the installation.</p>
+<p><em>Contributions welcome</em></p>
 
-<p>Once installed you should be able to access it, on the port 8890 - <a
-href="http://localhost:8890">localhost:8890</a> - Click “Conductor” at the
-top right to login and change the default passwords.</p>
+<h2 id="label-Fedora">Fedora</h2>
 
-<p>You may also need to set additional privileges for deleting triples. You
-can do this using isql-vt:</p>
-
-<pre>&gt; isql-vt -U dba
-SQL&gt; grant execute on SPARQL_DELETE_DICT_CONTENT to &quot;SPARQL&quot;;
-SQL&gt; grant execute on SPARQL_DELETE_DICT_CONTENT to SPARQL_UPDATE;</pre>
-
-<p>For more information about setting up and configuring Virtuoso please visit
-<a
-href="http://virtuoso.openlinksw.com/dataspace/doc/dav/wiki/Main/">virtuoso.openlinksw.com/dataspace/doc/dav/wiki/Main/</a></p>
-
-<h2 id="label-Configuring+SEEK">Configuring SEEK</h2>
-
-<p>You first need to copy the file
-<em>config/virtuoso-settings.example.yml</em> to
-<em>config/virtuoso-settings.yml</em></p>
-
-<p>This file contains configurations for the environments Rails runs under -
-production:, development: and test:. If you don’t need it configured under
-a given environment, just delete that section, or add <em>disabled:
-true</em></p>
-
-<p>You need to at least set up the username and password.</p>
-
-<p>There are 2 graphs defined - a private graph (that contains everything) and
-a public graph (that only contains RDF for publicly accessible items).
-However, you will need to configure Virtuoso to prevent access to the
-private graph. By default it will be publicly accessible.</p>
-
-<p>If you don’t wish to create a private graph - remove the configuration
-<em>private_graph</em>.</p>
-
-<p>Finally, to start generating and sending triples run the command</p>
-
-<pre>bundle exec rake seek_rdf:generate RAILS_ENV=production</pre>
-
-<p>setting the appropriate environment for RAILS_ENV. This will generated a
-set of background jobs, which will start generated and sending the RDF.</p>
-
-<p>You can check the progress of these jobs in the Admin pages of SEEK, under
-Statistics and then select Job Queue from the dropdown list.</p>
+<p><em>Contributions welcome</em></p>
 
 </div>
 

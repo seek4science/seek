@@ -1,12 +1,15 @@
-Thu, 18 Jul 2013 16:57:05 +0100
+Thu, 01 Aug 2013 12:50:28 +0100
 doc/README_FOR_APP	Tue, 07 May 2013 16:42:07 +0100
 doc/CREDITS	Thu, 11 Jul 2013 10:04:57 +0100
-doc/INSTALL	Thu, 18 Jul 2013 16:36:47 +0100
-doc/UPGRADING	Wed, 12 Jun 2013 11:52:48 +0100
+doc/INSTALL	Thu, 01 Aug 2013 11:45:30 +0100
+doc/INSTALL-PRODUCTION	Wed, 31 Jul 2013 15:49:44 +0100
+doc/OTHER-DISTRIBUTIONS	Thu, 01 Aug 2013 11:35:11 +0100
+doc/UPGRADING	Tue, 30 Jul 2013 17:16:02 +0100
 doc/BACKUPS	Fri, 22 Feb 2013 15:26:21 +0000
+doc/ADMINISTRATION	Thu, 01 Aug 2013 11:46:05 +0100
 doc/setting_up_virtuoso	Thu, 18 Jul 2013 16:56:54 +0100
 lib/seek/rdf/rdf_repository.rb	Thu, 18 Jul 2013 16:11:04 +0100
 lib/seek/rdf/rdf_repository_storage.rb	Thu, 18 Jul 2013 16:06:04 +0100
 lib/seek/rdf/rdf_file_storage.rb	Thu, 18 Jul 2013 16:10:01 +0100
 lib/seek/rdf/virtuoso_repository.rb	Tue, 16 Jul 2013 14:13:53 +0100
-lib/seek/rdf/rdf_generation.rb	Tue, 16 Jul 2013 14:05:06 +0100
+lib/seek/rdf/rdf_generation.rb	Thu, 18 Jul 2013 17:00:12 +0100

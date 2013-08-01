@@ -97,9 +97,14 @@ class DataFilesControllerTest < ActionController::TestCase
 
   test "data files tab should be selected" do
     get :index
-    assert_select "ul.tabnav" do
-      assert_select "li#selected_tabnav" do
+    assert_select "span#assets_menu_section" do
+      assert_select "li.selected_menu" do
         assert_select "a[href=?]",data_files_path,:text=>I18n.t('data_file').pluralize
+      end
+    end
+    assert_select "ul.menutabs" do
+      assert_select "li#selected_tabnav" do
+        assert_select "a",:text=>I18n.t("menu.assets")
       end
     end
   end
@@ -1241,46 +1246,7 @@ class DataFilesControllerTest < ActionController::TestCase
   end
 
 
-  test "can move to presentations" do
-    data_file = Factory :data_file, :contributor => User.current_user
-    assert_difference("DataFile.count", -1) do
-      assert_difference("Presentation.count") do
-        post :convert_to_presentation, :id => data_file
-      end
-    end
-    assert assigns(:presentation)
-    assert_redirected_to assigns(:presentation)
-  end
 
-  test "converting to presentation logs creation activity" do
-    data_file = Factory :data_file,:contributor=>User.current_user
-    assert_difference("ActivityLog.count") do
-          post :convert_to_presentation, :id=>data_file
-    end
-    assert assigns(:presentation)
-    presentation = assigns(:presentation)
-
-    #needs to mimic the logging of a presentation being created
-    al = ActivityLog.last
-    assert_equal "create",al.action
-    assert_equal User.current_user,al.culprit
-    assert_equal presentation,al.activity_loggable
-    assert_equal "data_files",al.controller_name
-  end
-
-  test "converted presentations have correct attributions" do
-    data_file = Factory :data_file,:contributor=>User.current_user
-    disable_authorization_checks {data_file.relationships.create :other_object => Factory(:data_file), :subject => data_file, :predicate => Relationship::ATTRIBUTED_TO}
-    df_attributions = data_file.attributions_objects
-    assert_difference("DataFile.count", -1) do
-      assert_difference("Presentation.count") do
-        post :convert_to_presentation, :id=>data_file.id
-      end
-    end
-
-    assert_equal df_attributions, assigns(:presentation).attributions_objects
-    assert !assigns(:presentation).attributions_objects.empty?
-  end
 
   test "explore logged as inline view" do
     data = Factory :small_test_spreadsheet_datafile,:policy=>Factory(:public_policy)

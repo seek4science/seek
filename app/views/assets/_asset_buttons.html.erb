@@ -45,12 +45,6 @@
 
   <%= delete_icon(asset, current_user)%>
 
-  <% if (asset.can_delete? or current_user.try(:admin?)) and asset.respond_to? :to_presentation %>
-      <li>
-        <%= image_tag_for_key "arrow_right", convert_to_presentation_data_file_path(asset.id), nil, {:title => "click to move this #{t('data_file')} to #{t('presentation').pluralize}",:confirm => "Are you sure you wish to move this #{t('data_file')} to #{t('presentation').pluralize}? Doing so is irreversible!", :method => :post}, "Move to #{t('presentation').pluralize}"%>
-     </li>
-   <% end %>
-
 <%= render :partial => "subscriptions/subscribe", :locals => {:object => asset } -%>
 
 

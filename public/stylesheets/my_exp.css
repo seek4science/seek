@@ -209,54 +209,6 @@ li {
 	border: 1px solid #CCCCCC;
 }
 
-/* begin css tabs nav */
-.tabnav {
-	text-align: left;
-	font-weight: bolder;
-	font-size: 108%;
-	padding: 3px 0;
-	padding-left: 2em;
-	margin: 0;
-}
-
-.tabnav li {
-	list-style: none;
-	margin: 0;
-	display: inline;
-}
-
-.tabnav li a {
-	padding: 3px 8px;
-	margin-left: 1px;
-	border-top: 1px solid #BBBBBB;
-	border-left: 1px solid #BBBBBB;
-	border-right: 1px solid #BBBBBB;
-	border-bottom: 1px solid transparent;
-	text-decoration: none;
-	background-image: url('../images/tab-bg.png');
-	background-position: top;
-	background-repeat: repeat-x;
-	background-color: #EDEDED;
-}
-
-.tabnav li a:link {
-	color: #333333;
-}
-
-.tabnav li a:visited {
-	color: #333333;
-}
-
-.tabnav li a:hover {
-	color: #FFFFFF;
-	background: #317eff;
-}
-
-.tabnav li#selected_tabnav a {
-	background-color: #317eff;
-	background-image: none;
-	color: #FFFFFF;
-}
 
 /* end css tabs nav */ 
 

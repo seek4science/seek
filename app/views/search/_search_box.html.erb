@@ -2,11 +2,6 @@
 <% @search_type="All" unless @search_type %>
 
 
-<script type="text/javascript">
-
-</script>
-
-
 <% if Seek::Config.solr_enabled -%>
 
   <%= form_tag search_path do -%>
@@ -14,7 +9,7 @@
       <%= text_field_tag :search_query, @search_query, :style=>"display:none;" -%>
       <%= select_tag :search_type, options_for_select(search_type_options,@search_type)  %>
       <% if Seek::Config.external_search_enabled %>
-        <span title='<%= tooltip_title_attrib(external_search_tooltip_text) -%>'>
+        <span title='<%= tooltip_title_attrib(external_search_tooltip_text) -%>' >
           <%= check_box_tag :include_external_search, 1, @include_external_search -%>External
         </span>
       <% end %>

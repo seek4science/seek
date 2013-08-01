@@ -6,15 +6,19 @@ class JermControllerTest < ActionController::TestCase
   fixtures :all
 
   test "index" do
-    login_as(:quentin)
-    get :index
-    assert_response :success
+    with_config_value :jerm_enabled,true do
+      login_as(:quentin)
+      get :index
+      assert_response :success
+    end
   end
 
   test "no index for non-admin" do
-    login_as(:aaron)
-    get :index
-    assert_redirected_to :root
+    with_config_value :jerm_enabled,true do
+      login_as(:aaron)
+      get :index
+      assert_redirected_to :root
+    end
   end
 
   

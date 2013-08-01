@@ -97,17 +97,7 @@ min-width:
     padding: 0 0 0 0;
 }
 
-.tabnav {
-    text-align: center;
-    font-weight: bolder;
-    font-size: 95%;
-    padding: 4px 0 3px 2em;
-    margin: 0;
-}
 
-.tabnav li.tab_gap_before {
-    margin-left: 1em;
-}
 
 
 .box_editing {
@@ -1652,15 +1642,7 @@ ul.modifications {
     margin-top: 2em;
 }
 
-#search_box {
-    float: right;
-    margin-right: 2em;
-    width:auto;
-}
 
-#search_query {
-    width:30em;
-}
 
 
 

@@ -4,7 +4,7 @@
 <head>
 <meta content="text/html; charset=utf-8" http-equiv="Content-Type">
 
-<title>UPGRADING - Sysmo-SEEK Technical and API Documentation</title>
+<title>UPGRADING - SEEK Technical Guide</title>
 
 <link type="text/css" media="screen" href="../rdoc.css" rel="stylesheet">
 
@@ -49,11 +49,17 @@
 
   <ul>
   
+    <li class="file"><a href="../doc/ADMINISTRATION.html">ADMINISTRATION</a>
+  
     <li class="file"><a href="../doc/BACKUPS.html">BACKUPS</a>
   
     <li class="file"><a href="../doc/CREDITS.html">CREDITS</a>
   
     <li class="file"><a href="../doc/INSTALL.html">INSTALL</a>
+  
+    <li class="file"><a href="../doc/INSTALL-PRODUCTION.html">INSTALL-PRODUCTION</a>
+  
+    <li class="file"><a href="../doc/OTHER-DISTRIBUTIONS.html">OTHER-DISTRIBUTIONS</a>
   
     <li class="file"><a href="../doc/README_FOR_APP.html">README_FOR_APP</a>
   
@@ -209,22 +215,26 @@ touch tmp/restart.txt</pre>
 <h2 id="label-Steps+to+upgrade+from+0.15.x+to+0.16.x">Steps to upgrade from 0.15.x to 0.16.x</h2>
 
 <p>First there are additional dependencies you will need, which on Ubuntu
-10.04/12.04 can be installed with:</p>
+12.04 can be installed with:</p>
 
-<pre>sudo apt-get install poppler-utils tesseract-ocr openoffice.org openoffice.org-java-common</pre>
+<pre>sudo apt-get install poppler-utils libreoffice</pre>
 
-<p>Open Office is a background service which is called by convert_office
+<p>On Ubuntu 10.04:</p>
+
+<pre>sudo apt-get install poppler-utils openoffice.org openoffice.org-java-common</pre>
+
+<p>Libre Office is a background service which is called by convert_office
 plugin, to convert some document types (ms office documents, open office
 documents, etc.) into pdf document.</p>
 
-<p>The command to start open office in headless mode and as the background
+<p>The command to start libre office in headless mode and as the background
 process:</p>
 
 <pre>nohup soffice --headless --accept=&quot;socket,host=127.0.0.1,port=8100;urp;&quot; --nofirststartwizard &gt; /dev/null 2&gt;&amp;1</pre>
 
 <p>If you run on production server, using apache and phusion passenger, you
-will need to run the Open Office service under www-data user. To do this it
-will need to create a working directory in /var/www. The name of the
+will need to run the Libre Office service under www-data user. To do this
+it will need to create a working directory in /var/www. The name of the
 directory changes between versions, but will be called something similar to
 libreoffice or .openoffice.org2. The easiest way to create this directory
 is to make a note of the permissions for /var/www, then make it writable to
@@ -241,9 +251,20 @@ to what they were originally.</p>
 need also to synchronize the changed port with the default soffice_port
 setting for convert_office plugin in config/environment.rb</p>
 
-<p>We recommend the OpenOffice service is setup using an init.d script,
+<p>We recommend the Libre Office service is setup using an init.d script,
 following the same procedures for delayed job using the script found at: <a
 href="https://gist.github.com/3787679">gist.github.com/3787679</a></p>
+
+<p>If you have problem with converting speed, you should upgrade OS to Ubuntu
+12.04 to use Libre Office. Or you can install libre office 3.5 from PPA,
+but there could be problems later on when upgrading OS. Here are the
+command to install libre office from PPA:</p>
+
+<pre>sudo apt-get purge openoffice* libreoffice*
+sudo apt-get install python-software-properties
+sudo add-apt-repository ppa:libreoffice/libreoffice-3-5
+sudo apt-get update
+sudo apt-get install libreoffice</pre>
 
 <p>Other than this, the remaining steps are the same standard steps are
 previous versions:</p>
