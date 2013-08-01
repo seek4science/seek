@@ -45,13 +45,20 @@
   <div id="bd">
     <div id="yui-main">
       <div <%= "class='yui-b'".html_safe unless @no_sidebar %> id="content">
-        <div class="breadcrumbs">
-          <%= render_breadcrumbs :separator => ' > ' %>
-        </div>
+        <table width="100%">
+          <tr>
+            <td>
+              <div class="breadcrumbs">
+                <%= render_breadcrumbs :separator => ' > ' %>
+              </div>
+            </td>
 
-        <div class="return_to_search" id='return_to_search'>
-          <%= add_return_to_search %>
-        </div>
+            <td class="return_to_search" id='return_to_search'>
+              <%= add_return_to_search %>
+            </td>
+          </tr>
+        </table>
+
         <%# applying styling to error / notice messages -%>
         <% if flash[:error] %>
             <div id="error_flash" class="box_standout" style="color: red; font-weight: bold; margin: 0.8em 0.8em; line-height: 1.4;">
