@@ -9,8 +9,8 @@ class ConfigTest < ActiveSupport::TestCase
   test "events enabled" do
     assert_equal true ,Seek::Config.events_enabled
   end
-  test "jerm_enabled" do
-    assert_equal true ,Seek::Config.jerm_enabled
+  test "jerm_disabled" do
+    assert_equal false ,Seek::Config.jerm_enabled
   end
   test "solr enabled" do
     assert_equal false ,Seek::Config.solr_enabled
