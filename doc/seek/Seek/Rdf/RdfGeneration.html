@@ -4,7 +4,7 @@
 <head>
 <meta content="text/html; charset=utf-8" http-equiv="Content-Type">
 
-<title>module Seek::Rdf::RdfGeneration - Sysmo-SEEK Technical and API Documentation</title>
+<title>module Seek::Rdf::RdfGeneration - SEEK Technical Guide</title>
 
 <link type="text/css" media="screen" href="../../rdoc.css" rel="stylesheet">
 
@@ -121,11 +121,17 @@
 
   <ul>
   
+    <li class="file"><a href="../../doc/ADMINISTRATION.html">ADMINISTRATION</a>
+  
     <li class="file"><a href="../../doc/BACKUPS.html">BACKUPS</a>
   
     <li class="file"><a href="../../doc/CREDITS.html">CREDITS</a>
   
     <li class="file"><a href="../../doc/INSTALL.html">INSTALL</a>
+  
+    <li class="file"><a href="../../doc/INSTALL-PRODUCTION.html">INSTALL-PRODUCTION</a>
+  
+    <li class="file"><a href="../../doc/OTHER-DISTRIBUTIONS.html">OTHER-DISTRIBUTIONS</a>
   
     <li class="file"><a href="../../doc/README_FOR_APP.html">README_FOR_APP</a>
   
@@ -675,7 +681,7 @@ the RDF</p>
             <pre><span class="ruby-comment"># File lib/seek/rdf/rdf_generation.rb, line 141</span>
 <span class="ruby-keyword">def</span> <span class="ruby-identifier">remove_rdf</span>
   <span class="ruby-keyword">self</span>.<span class="ruby-identifier">remove_rdf_from_repository</span> <span class="ruby-keyword">if</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier">rdf_repository_configured?</span>
-  <span class="ruby-keyword">self</span>.<span class="ruby-identifier">delete_rdf</span>
+  <span class="ruby-keyword">self</span>.<span class="ruby-identifier">delete_rdf_file</span>
   <span class="ruby-identifier">refresh_dependents_rdf</span>
 <span class="ruby-keyword">end</span></pre>
           </div><!-- remove_rdf-source -->

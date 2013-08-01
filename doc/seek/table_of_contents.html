@@ -4,7 +4,7 @@
 <head>
 <meta content="text/html; charset=utf-8" http-equiv="Content-Type">
 
-<title>Table of Contents - Sysmo-SEEK Technical and API Documentation</title>
+<title>Table of Contents - SEEK Technical Guide</title>
 
 <link type="text/css" media="screen" href="./rdoc.css" rel="stylesheet">
 
@@ -21,11 +21,19 @@
 
 
 <body class="indexpage">
-<h1>Table of Contents - Sysmo-SEEK Technical and API Documentation</h1>
+<h1>Table of Contents - SEEK Technical Guide</h1>
 
 <h2>Pages</h2>
 <ul>
   <li class="file">
+    <a href="doc/ADMINISTRATION.html">ADMINISTRATION</a>
+
+    <img class="toc-toggle" src="images/transparent.png" alt="" title="toggle headings">
+    <ul class="initially-hidden">
+      <li><a href="doc/ADMINISTRATION.html#label-Administration+of+SEEK">Administration of SEEK</a>
+    </ul>
+  </li>
+    <li class="file">
     <a href="doc/BACKUPS.html">BACKUPS</a>
 
     <img class="toc-toggle" src="images/transparent.png" alt="" title="toggle headings">
@@ -55,24 +63,41 @@
     <img class="toc-toggle" src="images/transparent.png" alt="" title="toggle headings">
     <ul class="initially-hidden">
       <li><a href="doc/INSTALL.html#label-Installing+SEEK">Installing SEEK</a>
-      <li><a href="doc/INSTALL.html#label-Prerequesites">Prerequesites</a>
-      <li><a href="doc/INSTALL.html#label-Getting+the+source+code">Getting the source code</a>
-      <li><a href="doc/INSTALL.html#label-The+RAILS_ENV+environment+variable">The RAILS_ENV environment variable</a>
-      <li><a href="doc/INSTALL.html#label-Configuring+the+database">Configuring the database</a>
-      <li><a href="doc/INSTALL.html#label-Starting+Delayed-Job+%28Background+processing%29">Starting Delayed-Job (Background processing)</a>
-      <li><a href="doc/INSTALL.html#label-Starting+Open+Office">Starting Open Office</a>
-      <li><a href="doc/INSTALL.html#label-Starting+the+server">Starting the server</a>
-      <li><a href="doc/INSTALL.html#label-Creating+the+Admin+user">Creating the Admin user</a>
-      <li><a href="doc/INSTALL.html#label-Registering+SEEK">Registering SEEK</a>
-      <li><a href="doc/INSTALL.html#label-Administering+the+system">Administering the system</a>
-      <li><a href="doc/INSTALL.html#label-Enabling+search+and+starting+the+Sunspot+SOLR+server">Enabling search and starting the Sunspot SOLR server</a>
-      <li><a href="doc/INSTALL.html#label-Configuring+BioPortal">Configuring BioPortal</a>
-      <li><a href="doc/INSTALL.html#label-Configuring+DOI+and+PubMed+search">Configuring DOI and PubMed search</a>
-      <li><a href="doc/INSTALL.html#label-Configuring+Email">Configuring Email</a>
-      <li><a href="doc/INSTALL.html#label-Setting+up+Passenger+Phusion+and+Apache+for+production+servers.">Setting up Passenger Phusion and Apache for production servers.</a>
-      <li><a href="doc/INSTALL.html#label-Rebranding+SysMO+SEEK+for+other+projects">Rebranding SysMO SEEK for other projects</a>
-      <li><a href="doc/INSTALL.html#label-Backing+up">Backing up</a>
-      <li><a href="doc/INSTALL.html#label-Contacting+us+and+other+developers">Contacting us and other developers</a>
+      <li><a href="doc/INSTALL.html#label-Introduction">Introduction</a>
+      <li><a href="doc/INSTALL.html#label-Installing+packages">Installing packages</a>
+      <li><a href="doc/INSTALL.html#label-Development+or+Production%3F">Development or Production?</a>
+      <li><a href="doc/INSTALL.html#label-Setting+up+Ruby+and+RubyGems+with+RVM">Setting up Ruby and RubyGems with RVM</a>
+      <li><a href="doc/INSTALL.html#label-Getting+SEEK">Getting SEEK</a>
+      <li><a href="doc/INSTALL.html#label-Setting+up+the+Database">Setting up the Database</a>
+      <li><a href="doc/INSTALL.html#label-Starting+the+SEEK+services">Starting the SEEK services</a>
+      <li><a href="doc/INSTALL.html#label-Starting+and+Stopping+the+Search+Service">Starting and Stopping the Search Service</a>
+      <li><a href="doc/INSTALL.html#label-Starting+and+Stopping+the+Background+Service">Starting and Stopping the Background Service</a>
+      <li><a href="doc/INSTALL.html#label-Starting+and+Stopping+the+SOFFICE+service">Starting and Stopping the SOFFICE service</a>
+      <li><a href="doc/INSTALL.html#label-Starting+SEEK">Starting SEEK</a>
+      <li><a href="doc/INSTALL.html#label-Creating+an+Administrator">Creating an Administrator</a>
+      <li><a href="doc/INSTALL.html#label-Final+steps">Final steps</a>
+    </ul>
+  </li>
+    <li class="file">
+    <a href="doc/INSTALL-PRODUCTION.html">INSTALL-PRODUCTION</a>
+
+    <img class="toc-toggle" src="images/transparent.png" alt="" title="toggle headings">
+    <ul class="initially-hidden">
+      <li><a href="doc/INSTALL-PRODUCTION.html#label-Installing+SEEK+in+a+production+environment">Installing SEEK in a production environment</a>
+      <li><a href="doc/INSTALL-PRODUCTION.html#label-Before+you+install">Before you install</a>
+      <li><a href="doc/INSTALL-PRODUCTION.html#label-After+you+have+installed+SEEK">After you have installed SEEK</a>
+    </ul>
+  </li>
+    <li class="file">
+    <a href="doc/OTHER-DISTRIBUTIONS.html">OTHER-DISTRIBUTIONS</a>
+
+    <img class="toc-toggle" src="images/transparent.png" alt="" title="toggle headings">
+    <ul class="initially-hidden">
+      <li><a href="doc/OTHER-DISTRIBUTIONS.html#label-Installing+SEEK+for+other+Linux+distributions">Installing SEEK for other Linux distributions</a>
+      <li><a href="doc/OTHER-DISTRIBUTIONS.html#label-Ubuntu+10.04+%28LTS%29">Ubuntu 10.04 (LTS)</a>
+      <li><a href="doc/OTHER-DISTRIBUTIONS.html#label-Debian+Wheezy">Debian Wheezy</a>
+      <li><a href="doc/OTHER-DISTRIBUTIONS.html#label-CentOS">CentOS</a>
+      <li><a href="doc/OTHER-DISTRIBUTIONS.html#label-Fedora">Fedora</a>
     </ul>
   </li>
     <li class="file">
