@@ -107,24 +107,156 @@
 <p>By reading and following these extra notes, you will more performance out
 of SEEK, and reduce the ongoing maintenance.</p>
 
-<h2 id="label-Before+you+install">Before you install</h2>
-
-<p>Before following the standard <a href="INSTALL.html">INSTALL</a> guide you
-need to set an environment variable to indicate that you intend to run SEEK
-as production.</p>
-
-<pre>&gt;export RAILS_ENV=production</pre>
+<h2 id="label-Before+you+install+SEEK">Before you install SEEK</h2>
 
 <p>This will make sure some of the rake tasks affect the appropriate database.</p>
 
 <p>To save time later there are also some additional packages to install:</p>
+
+<pre>sudo apt-get install apache2-mpm-prefork apache2-prefork-dev libapr1-dev libaprutil1-dev libcurl4-openssl-dev</pre>
+
+<p>You will need to install SEEK as the www-data user. First, to make the
+installation simpler, give this user a dedicated home directory:</p>
+
+<pre>sudo /etc/init.d/apache2 stop
+sudo usermod -d /home/www-data www-data
+sudo usermod -s /bin/bash www-data
+sudo /etc/init.d/apache2 start
+sudo mkdir /home/www-data
+sudo chown www-data /home/www-data</pre>
+
+<p>We recommend installing SEEK in /srv/rails/seek - first you need to create
+this and grant permissions to www-data</p>
+
+<pre>sudo mkdir -p /srv/rails
+sudo chown www-data /srv/rails</pre>
+
+<p>Now switch to the www-data user</p>
+
+<pre>sudo su - www-data
+cd /srv/rails</pre>
+
+<p>Before following the standard <a href="INSTALL.html">INSTALL</a> guide you
+need to set an environment variable to indicate that you intend to setup
+and run SEEK as production.</p>
+
+<pre>export RAILS_ENV=production</pre>
+
+<p>you will need to reset this variable if you close your shell and start a
+new session</p>
 
 <p>You can now follow the overall <a href="INSTALL.html">Installation
 Guide</a>, and then return to this page for some additional steps to get
 SEEK running together with Apache, and also automating the required
 services.</p>
 
+<p>If you have problems with requiring a sudo password during the RVM steps -
+first setup RVM and ruby-1.9.3 as a user with sudo access, and repeat the
+steps as the www-data user. This means the required packages should then be
+installed. At the time of writing this guide this shouldn’t be necessary.</p>
+
 <h2 id="label-After+you+have+installed+SEEK">After you have installed SEEK</h2>
+
+<h3 id="label-Serving+SEEK+through+Apache">Serving SEEK through Apache</h3>
+
+<p>First you need to setup <a
+href="https://www.phusionpassenger.com/">Passenger Phusion</a> .Still as
+the www-data user, run the command:</p>
+
+<pre class="ruby"><span class="ruby-identifier">bundle</span> <span class="ruby-identifier">exec</span> <span class="ruby-identifier">passenger</span><span class="ruby-operator">-</span><span class="ruby-identifier">install</span><span class="ruby-operator">-</span><span class="ruby-identifier">apache2</span><span class="ruby-operator">-</span><span class="ruby-keyword">module</span>
+</pre>
+
+<p>This will compile a module for Apache, and at the end present you with some
+lines that need adding to /etc/apache2/http.conf.</p>
+
+<p>You will need to be a user that has sudo permissions, and edit this file:</p>
+
+<pre>sudo nano /etc/apache2/http.conf</pre>
+
+<p>These will look something like</p>
+
+<pre>LoadModule passenger_module /home/www-data/.rvm/gems/ruby-1.9.3-p448@seek/gems/passenger-4.0.7/buildout/apache2/mod_passenger.so
+PassengerRoot /home/www-data/.rvm/gems/ruby-1.9.3-p448@seek/gems/passenger-4.0.7
+PassengerDefaultRuby /home/www-data/.rvm/wrappers/ruby-1.9.3-p448@seek/ruby</pre>
+
+<p>Now create a virtual host definition for SEEK:</p>
+
+<pre>sudo nano /etc/apache2/sites-available/seek</pre>
+
+<p>which looks like (if you have registered a DNS for your site, then set
+ServerName appropriately):</p>
+
+<pre>&lt;VirtualHost *:80&gt;
+   ServerName www.yourhost.com
+   DocumentRoot /srv/rails/seek/public
+      &lt;Directory /srv/rails/seek/public&gt;
+       AllowOverride all
+       Options -MultiViews
+    &lt;/Directory&gt;
+ &lt;/VirtualHost&gt;</pre>
+
+<p>Now enable the SEEK site, and disable the default that is installed with
+Apache, and restart:</p>
+
+<pre>sudo a2ensite seek
+sudo a2dissite default
+sudo service apache2 restart</pre>
+
+<p>If you now visit <a href="http://localhost">localhost</a> (note there is no
+3000 port) - you should see SEEK.</p>
+
+<p>If you wish to restart SEEK, maybe after an upgrade, without restarting
+Apache you can do so by running (as www-data)</p>
+
+<pre>touch /srv/rails/seek/tmp/restart.txt</pre>
+
+<h3 id="label-Setting+up+the+services">Setting up the services</h3>
+
+<p>The following steps show how to setup sunspot:solr search, delayed_job and
+soffice to run as a service, and automatically start and shutdown when you
+restart the server.</p>
+
+<h4 id="label-Search+Service">Search Service</h4>
+
+<p>Create the file /etc/init.d/solr-seek and copy the contents of <a
+href="https://gist.github.com/3143434">gist.github.com/3143434</a> into it.</p>
+
+<p>Then run</p>
+
+<pre>sudo chmod +x /etc/init.d/solr-seek
+sudo update-rc.d solr-seek defaults</pre>
+
+<p>start it up with:</p>
+
+<pre>sudo /etc/init.d/solr-seek start</pre>
+
+<h4 id="label-Delayed+Job+Background+Service">Delayed Job Background Service</h4>
+
+<p>Create the file /etc/init.d/delayed_job-seek and copy the contents of <a
+href="https://gist.github.com/3169625">gist.github.com/3169625</a> into it.</p>
+
+<p>The run:</p>
+
+<pre>sudo chmod +x /etc/init.d/delayed_job-seek
+sudo update-rc.d delayed_job-seek defaults</pre>
+
+<p>start it up with:</p>
+
+<pre>sudo /etc/init.d/delayed_job-seek start</pre>
+
+<h3 id="label-The+LibreOffice+Soffice+service">The LibreOffice Soffice service</h3>
+
+<p>Create the file /etc/init.d/soffice and copy the contents of <a
+href="https://gist.github.com/3787679">gist.github.com/3787679</a> into it.</p>
+
+<p>The run:</p>
+
+<pre>sudo chmod +x /etc/init.d/soffice
+sudo update-rc.d soffice defaults</pre>
+
+<p>start it up with:</p>
+
+<pre>sudo /etc/init.d/soffice start</pre>
 
 </div>
 
