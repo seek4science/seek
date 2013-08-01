@@ -237,8 +237,6 @@ namespace :seek do
 
   #reverts to use pre-2.3.4 id generation to keep generated ID's consistent
   def revert_fixtures_identify
-    include ActiveRecord
-
     def Fixtures.identify(label)
       label.to_s.hash.abs
     end
