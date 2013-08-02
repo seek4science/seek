@@ -8,8 +8,11 @@ namespace :doc do
     rdoc.rdoc_dir = 'doc/seek'
     rdoc.template = ENV['template'] if ENV['template']
     rdoc.title = ENV['title'] || "SEEK Technical Guide"
-    rdoc.options << '--line-numbers' << '--inline-source'
+    rdoc.options << '--line-numbers'
     rdoc.options << '--charset' << 'utf-8'
+    rdoc.options << "--main" << "'INSTALL'"
+
+
     rdoc.rdoc_files.include('doc/README_FOR_APP')
 
     rdoc.rdoc_files.include('doc/CREDITS')

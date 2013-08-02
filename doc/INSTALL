@@ -14,7 +14,8 @@ We recommend that you run SEEK on a Linux system. This guide is based on an Ubun
 However, running on other Linux distributions the main difference is the name of the required packages that have to be installed for that distribution, other than that the steps will be the same.
 If you want to install on different distribution or version please visit {Other Distributions}[link:doc/OTHER-DISTRIBUTIONS.html] and see if it is listed there.
 
-You will need to have <em>sudo</em> access on the machine you are installing SEEK, or be able to login as root.
+You will need to have <em>sudo</em> access on the machine you are installing SEEK, or be able to login as root. You will also need an active internet connection throughout
+the installation process.
 
 Although possible, installing and running Ruby on Rails on a Windows system is troublesome and is not covered here.
 
@@ -31,13 +32,14 @@ Now install the packages:
 
   sudo apt-get install mysql-server
 
-Pay attention to the root password you use when installing mysql - you will need this later.
+Pay attention to what you use for the 'MySQL root' password when requested - you will need this later.
 
 The remaining packages are:
 
   sudo apt-get install wget curl mercurial ruby libssl-dev build-essential openssh-server git-core libreadline-dev
   sudo apt-get install libxml++2.6-dev openjdk-7-jdk graphviz libsqlite3-dev sqlite3
-  sudo apt-get install  poppler-utils libreoffice libmysqlclient-dev libmagick++-dev libxslt1-dev
+  sudo apt-get install poppler-utils libreoffice libmysqlclient-dev libmagick++-dev libxslt1-dev
+  sudo apt-get install gawk libyaml-dev autoconf libgdbm-dev libncurses5-dev automake bison libffi-dev
 
 == Development or Production?
 
@@ -95,7 +97,7 @@ You first need to setup the database configuration file. You need to copy a defa
 
 <b>IMPORTANT:</b> you should at least change the default username and password. Change this for each environment (development,production,test).
 
-Now you need to grant permissions for the user and password you just used. You will need the root password you created for mySQL when installing the package. e.g:
+Now you need to grant permissions for the user and password you just used (changing the example below appropriately). You will need the root password you created for mySQL when installing the package. e.g:
 
   > mysql -uroot -p
   Enter password:
@@ -188,6 +190,11 @@ You will be prompted to fill out our very short Registration form. <b>Please do 
 If you are setting up SEEK for production use, please now return to our {Installing SEEK for Production Guide}[link:doc/INSTALL-PRODUCTION.html].
 
 You should also now read our {Administration Guide}[link:doc/ADMINISTRATION.html] for details of some basic tasks and settings.
+
+
+== Contacting us and other developers
+
+There is a public Google Group available for SEEK development at http://groups.google.com/group/seek-development
 
 
 

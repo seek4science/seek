@@ -125,7 +125,8 @@ visit <a href="OTHER-DISTRIBUTIONS.html">Other Distributions</a> and see if
 it is listed there.</p>
 
 <p>You will need to have <em>sudo</em> access on the machine you are
-installing SEEK, or be able to login as root.</p>
+installing SEEK, or be able to login as root. You will also need an active
+internet connection throughout the installation process.</p>
 
 <p>Although possible, installing and running Ruby on Rails on a Windows system
 is troublesome and is not covered here.</p>
@@ -145,14 +146,15 @@ sudo apt-get upgrade</pre>
 
 <pre>sudo apt-get install mysql-server</pre>
 
-<p>Pay attention to the root password you use when installing mysql - you will
-need this later.</p>
+<p>Pay attention to what you use for the ‘MySQL root’ password when requested
+- you will need this later.</p>
 
 <p>The remaining packages are:</p>
 
 <pre>sudo apt-get install wget curl mercurial ruby libssl-dev build-essential openssh-server git-core libreadline-dev
 sudo apt-get install libxml++2.6-dev openjdk-7-jdk graphviz libsqlite3-dev sqlite3
-sudo apt-get install  poppler-utils libreoffice libmysqlclient-dev libmagick++-dev libxslt1-dev</pre>
+sudo apt-get install poppler-utils libreoffice libmysqlclient-dev libmagick++-dev libxslt1-dev
+sudo apt-get install gawk libyaml-dev autoconf libgdbm-dev libncurses5-dev automake bison libffi-dev</pre>
 
 <h2 id="label-Development+or+Production%3F">Development or Production?</h2>
 
@@ -223,9 +225,9 @@ nano config/database.yml</pre>
 and password. Change this for each environment
 (development,production,test).</p>
 
-<p>Now you need to grant permissions for the user and password you just used.
-You will need the root password you created for mySQL when installing the
-package. e.g:</p>
+<p>Now you need to grant permissions for the user and password you just used
+(changing the example below appropriately). You will need the root password
+you created for mySQL when installing the package. e.g:</p>
 
 <pre>&gt; mysql -uroot -p
 Enter password:
@@ -337,6 +339,11 @@ href="INSTALL-PRODUCTION.html">Installing SEEK for Production Guide</a>.</p>
 
 <p>You should also now read our <a href="ADMINISTRATION.html">Administration
 Guide</a> for details of some basic tasks and settings.</p>
+
+<h2 id="label-Contacting+us+and+other+developers">Contacting us and other developers</h2>
+
+<p>There is a public Google Group available for SEEK development at <a
+href="http://groups.google.com/group/seek-development">groups.google.com/group/seek-development</a></p>
 
 </div>
 
