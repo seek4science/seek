@@ -19,7 +19,7 @@ class ProjectsControllerTest < ActionController::TestCase
 
   def test_title
 		get :index
-		assert_select "title",:text=>/The Sysmo SEEK Projects.*/, :count=>1
+		assert_select "title",:text=>/The Sysmo SEEK #{I18n.t('project').pluralize}.*/, :count=>1
 	end
 
 	def test_should_get_index
@@ -199,7 +199,7 @@ class ProjectsControllerTest < ActionController::TestCase
 	def test_user_can_edit_project
 		login_as(:can_edit)
 		get :show, :id=>projects(:three)
-		assert_select "a",:text=>/Edit Project/,:count=>1
+		assert_select "a",:text=>/Edit #{I18n.t('project')}/,:count=>1
 
 		get :edit, :id=>projects(:three)
 		assert_response :success
@@ -211,7 +211,7 @@ class ProjectsControllerTest < ActionController::TestCase
 	def test_user_project_manager
 		login_as(:project_manager)
 		get :show, :id=>projects(:three)
-		assert_select "a",:text=>/Edit Project/,:count=>1
+		assert_select "a",:text=>/Edit #{I18n.t('project')}/,:count=>1
 
 		get :edit, :id=>projects(:three)
 		assert_response :success
@@ -223,7 +223,7 @@ class ProjectsControllerTest < ActionController::TestCase
 	def test_user_cant_edit_project
 		login_as(:cant_edit)
 		get :show, :id=>projects(:three)
-		assert_select "a",:text=>/Edit Project/,:count=>0
+		assert_select "a",:text=>/Edit #{I18n.t('project')}/,:count=>0
 
 		get :edit, :id=>projects(:three)
 		assert_response :redirect
@@ -233,7 +233,7 @@ class ProjectsControllerTest < ActionController::TestCase
 
 	def test_admin_can_edit
 		get :show, :id=>projects(:one)
-		assert_select "a",:text=>/Edit Project/,:count=>1
+		assert_select "a",:text=>/Edit #{I18n.t('project')}/,:count=>1
 
 		get :edit, :id=>projects(:one)
 		assert_response :success
@@ -302,7 +302,7 @@ class ProjectsControllerTest < ActionController::TestCase
     login_as project_manager.user
     get :show,:id=>project_manager.projects.first
 		assert_select "div.box_about_actor p.project_managers" do
-			assert_select "label",:text=>"Project Managers:",:count=>1
+			assert_select "label",:text=>"#{I18n.t('project')} Managers:",:count=>1
 			assert_select "a",:count=>1
 			assert_select "a[href=?]",person_path(project_manager),:text=>project_manager.name,:count=>1
 		end
@@ -362,7 +362,7 @@ class ProjectsControllerTest < ActionController::TestCase
 		assert_select "div.box_about_actor p.pals" do
 			assert_select "label",:text=>"SysMO-DB PALs:",:count=>1
 			assert_select "a",:count=>0
-			assert_select "span.none_text",:text=>"No PALs for this project",:count=>1
+			assert_select "span.none_text",:text=>"No PALs for this #{I18n.t('project')}",:count=>1
 		end
   end
 
@@ -375,7 +375,7 @@ class ProjectsControllerTest < ActionController::TestCase
 		assert_select "div.box_about_actor p.asset_managers" do
 			assert_select "label",:text=>"Asset Managers:",:count=>1
 			assert_select "a",:count=>0
-			assert_select "span.none_text",:text=>"No Asset Managers for this project",:count=>1
+			assert_select "span.none_text",:text=>"No Asset Managers for this #{I18n.t('project')}",:count=>1
 		end
   end
 
@@ -386,9 +386,9 @@ class ProjectsControllerTest < ActionController::TestCase
     login_as person.user
     get :show,:id=>project
 		assert_select "div.box_about_actor p.project_managers" do
-			assert_select "label",:text=>"Project Managers:",:count=>1
+			assert_select "label",:text=>"#{I18n.t('project')} Managers:",:count=>1
 			assert_select "a",:count=>0
-			assert_select "span.none_text",:text=>"No Project Managers for this project",:count=>1
+			assert_select "span.none_text",:text=>"No #{I18n.t('project')} Managers for this #{I18n.t('project')}",:count=>1
 		end
 	end
 
@@ -401,7 +401,7 @@ class ProjectsControllerTest < ActionController::TestCase
 		assert_select "div.box_about_actor p.gatekeepers" do
 			assert_select "label",:text=>"Gatekeepers:",:count=>1
 			assert_select "a",:count=>0
-			assert_select "span.none_text",:text=>"No Gatekeepers for this project",:count=>1
+			assert_select "span.none_text",:text=>"No Gatekeepers for this #{I18n.t('project')}",:count=>1
 		end
 	end
 
@@ -439,7 +439,7 @@ class ProjectsControllerTest < ActionController::TestCase
 		get :show,:id=>project
 		assert_select "ul.sectionIcons" do
 			assert_select "span.icon" do
-				assert_select "a[href=?]",admin_project_path(project),:text=>/Project administration/,:count=>1
+				assert_select "a[href=?]",admin_project_path(project),:text=>/#{I18n.t('project')} administration/,:count=>1
 			end
 		end
 	end
@@ -474,7 +474,7 @@ class ProjectsControllerTest < ActionController::TestCase
 
     get :show, :id => project
     assert_response :success
-    assert_select "a", :text => /Project administration/, :count => 1
+    assert_select "a", :text => /#{I18n.t('project')} administration/, :count => 1
 
     get :admin, :id => project
     assert_response :success
