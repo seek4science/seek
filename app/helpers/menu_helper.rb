@@ -37,9 +37,9 @@ module MenuHelper
 
       account_menu[:sections] << {:path=>person_path(User.current_user.person),:title=>"Your profile"}
 
-      account_menu[:sections] << {:controller=>"admin",:title=>t("menu.admin")} if admin_logged_in?
+      account_menu[:sections] << {:path=>admin_path,:title=>t("menu.admin")} if admin_logged_in?
 
-      account_menu[:sections] << {:path=>"/logout",:title=>"Logout"}
+      account_menu[:sections] << {:path=>"/logout",:title=>"Logout",:options=>{:confirm=>"Are you sure you wish to logout?"}}
 
       definitions << account_menu
     end
@@ -56,8 +56,6 @@ module MenuHelper
   def top_level_menu_tabs definitions
     selected_tab = current_top_level_tab(definitions)
     definitions.collect do |menu|
-
-
 
       attributes = ""
       attributes << "id = 'selected_tabnav'" if selected_tab == menu
@@ -78,15 +76,17 @@ module MenuHelper
 
   def section_menu_items sections
     sections||=[]
+    selected_section = current_second_level_section sections
     sections.collect do |section|
       c = section[:controller]
+      path = section[:path]
       title = section[:title]
       title ||= c.capitalize
 
       path = section[:path] || eval("#{c}_path")
-
-      link = link_to title, path
-      attributes = "class='selected_menu'" if c == controller.controller_name.to_s
+      options = section[:options] || {}
+      link = link_to title, path,options
+      attributes = "class='selected_menu'" if section == selected_section
 
       "<li #{attributes}>#{link}</li>"
     end.join("").html_safe
@@ -100,12 +100,33 @@ module MenuHelper
     end
   end
 
+  def current_second_level_section sections
+    section = sections.find do |section|
+      request.path.end_with?(section[:path])
+    end
+
+    c = controller.controller_name.to_s
+
+
+    section ||= sections.find do |section|
+      section[:controller]==c
+    end
+
+    section
+  end
 
   def current_top_level_tab definitions
     c = controller.controller_name.to_s
-    menu = definitions.select do |menu|
+    path = request.path
+
+    menu = definitions.find do |menu|
+      !menu[:sections].nil? && !menu[:sections].select{|section| !section[:path].nil? && section[:path].end_with?(path)}.empty?
+    end
+
+    menu ||= definitions.find do |menu|
       !menu[:sections].nil? && !menu[:sections].select{|section| section[:controller]==c}.empty?
-    end.first
+    end
+
     menu
   end
 
