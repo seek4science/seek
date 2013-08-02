@@ -41,7 +41,7 @@ class ProjectFolder < ActiveRecord::Base
 
   #constucts the default project folders for a given project from a yaml file, by default using Rails.root/config/default_data/default_project_folders.yml
   def self.initialize_default_folders project, yaml_path=File.join(Rails.root,"config","default_data","default_project_folders.yml")
-    raise Exception.new("This project already has folders defined") unless ProjectFolder.root_folders(project).empty?
+    raise Exception.new("This #{I18n.t('project')} already has folders defined") unless ProjectFolder.root_folders(project).empty?
 
     yaml = YAML.load(ERB.new(File.read(yaml_path)).result)
     folders={}
@@ -67,7 +67,7 @@ class ProjectFolder < ActiveRecord::Base
           unless folder.nil?
             parent.children << folder
           else
-            Rails.logger.error("Default project folder for key #{child} not found")
+            Rails.logger.error("Default #{I18n.t('project')} folder for key #{child} not found")
           end
         end
         parent.save!

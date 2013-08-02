@@ -378,9 +378,9 @@ class PeopleController < ApplicationController
         params[projects_or_institutions].each do |project_or_institution|
           project_or_institution_details= project_or_institution.split(',')
           if project_or_institution_details[0] == 'Others'
-             details.concat("Other #{projects_or_institutions}: #{params["other_#{projects_or_institutions}"]}; ")
+             details.concat("Other #{projects_or_institutions.singularize.humanize.pluralize}: #{params["other_#{projects_or_institutions}"]}; ")
           else
-             details.concat("#{projects_or_institutions.singularize.capitalize}: #{project_or_institution_details[0]}, Id: #{project_or_institution_details[1]}; ")
+             details.concat("#{projects_or_institutions.singularize.humanize.capitalize}: #{project_or_institution_details[0]}, Id: #{project_or_institution_details[1]}; ")
           end
         end
     end
@@ -415,7 +415,7 @@ class PeopleController < ApplicationController
           flag = false if !project_manager_projects.include? project
         end
         if flag == false
-          error("Project manager can not assign person to the projects that they are not in","Is invalid")
+          error("#{t('project')} manager can not assign person to the #{t('project').pluralize} that they are not in","Is invalid")
         end
         return flag
       end

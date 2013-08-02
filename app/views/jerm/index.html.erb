@@ -31,7 +31,7 @@
 
 <%= form_tag_with_callbacks(url_for(:controller=>:jerm,:action=>:fetch),
   {:id=>"start_jerm",:before=>"harvester_initiated();", :remote => true}) do -%>
-  Project: <%= select_tag :project,
+  <%= t('project') %>: <%= select_tag :project,
     options_for_select( Project.all.collect{|p| [h("#{p.title}"),p.id]} ),
     :onchange=>"javascript: selected_product_changed()"
 %>

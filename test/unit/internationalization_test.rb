@@ -60,4 +60,10 @@ class InternationalizationTest < ActiveSupport::TestCase
       assert_equal "Event", (I18n.t "event")
     end
   end
+
+  test "project" do
+    as_not_virtualliver do
+      assert_equal "Project", (I18n.t "project")
+    end
+  end
 end

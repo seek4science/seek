@@ -180,10 +180,10 @@ module ResourceListItemHelper
         end
       when Policy::ALL_SYSMO_USERS
         if policy.access_type > 0
-          title = "Visible to all #{Seek::Config.project_name} projects"
+          title = "Visible to all #{Seek::Config.project_name} #{t('project').pluralize}"
           html << image('open', :title=>title, :class => css_class)
         else
-          title = "Visible to the projects associated with this item"
+          title = "Visible to the #{t('project').pluralize} associated with this item"
           html << image('open', :title=>title, :class => css_class)
         end
       when Policy::EVERYONE

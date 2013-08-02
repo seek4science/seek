@@ -76,7 +76,7 @@
 	  <br/>
       <%= link_to_function (image("new") + " Associate with this #{resource_text}"), "addSelectedAssay(); return(false);", :id=>"add_assay_link", :class=>"block_link" %>
 
-      <%= check_box_tag :include_other_project_assays, nil, false, {:onchange=>"toggle_assay_list();",:style=>"margin-top:0.5em;"} -%> Associate <%= assay_class_text -%> from other projects?
+      <%= check_box_tag :include_other_project_assays, nil, false, {:onchange=>"toggle_assay_list();",:style=>"margin-top:0.5em;"} -%> Associate <%= assay_class_text -%> from other <%= t('project').pluralize %>?
     </div>
   
     <%= render :partial => 'assets/preview_box', :locals => {:preview_name => 'assay'}%>

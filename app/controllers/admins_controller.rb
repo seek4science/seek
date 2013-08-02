@@ -81,7 +81,7 @@ class AdminsController < ApplicationController
   def update_home_settings
     Seek::Config.project_news_enabled= string_to_boolean params[:project_news_enabled]
     Seek::Config.project_news_feed_urls= params[:project_news_feed_urls]
-    Seek::Config.project_news_number_of_entries= params[:project_news_number_of_entries] if only_integer params[:project_news_number_of_entries], "project news items"
+    Seek::Config.project_news_number_of_entries= params[:project_news_number_of_entries] if only_integer params[:project_news_number_of_entries], "#{t('project')} news items"
 
     Seek::Config.community_news_enabled= string_to_boolean params[:community_news_enabled]
     Seek::Config.community_news_feed_urls= params[:community_news_feed_urls]
@@ -259,7 +259,7 @@ class AdminsController < ApplicationController
         collection = User.not_activated
         type = "users"
       when "projectless"
-        title = "Users not in a #{Seek::Config.project_name} project"
+        title = "Users not in a #{Seek::Config.project_name} #{t('project')}"
         collection = Person.without_group.registered
         type = "users"
       when "contents"

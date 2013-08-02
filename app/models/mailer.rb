@@ -125,7 +125,7 @@ class Mailer < ActionMailer::Base
     @user = user
     @host = base_host
     mail(:to=>project_manager_email(project_manager),:reply_to=>user.person.email_with_name,
-         :subject=>"#{Seek::Config.application_name} member signed up, please assign this person to the projects which you are project manager")
+         :subject=>"#{Seek::Config.application_name} member signed up, please assign this person to the #{I18n.t('project').pluralize.downcase} which you are #{I18n.t('project').downcase} manager")
   end
 
   def resources_harvested(harvester_responses,user,base_host)
@@ -163,7 +163,7 @@ class Mailer < ActionMailer::Base
     begin
       project_manager.email_with_name
     rescue
-      Rails.logger.error("Error determining project manager #{project_manager.name} email addresses")
+      Rails.logger.error("Error determining #{I18n.t('project')} manager #{project_manager.name} email addresses")
       ["sowen@cs.man.ac.uk"]
     end
   end

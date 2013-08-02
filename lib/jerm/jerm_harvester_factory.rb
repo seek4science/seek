@@ -13,7 +13,7 @@ module Jerm
       harvester_class=@@harvesters.find do |h|
         h.name.downcase.start_with?("jerm::"+clean_project_name.downcase)
       end
-      raise Exception.new("Unable to find Harvester for project #{project_name}") if harvester_class.nil?
+      raise Exception.new("Unable to find Harvester for #{t('project')} #{project_name}") if harvester_class.nil?
       return harvester_class.new(root_uri,uname,pwd)
     end
         

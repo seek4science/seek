@@ -36,7 +36,7 @@
           <%= select_tag :model_ids, options_from_collection_for_select([], :id, :title), {:multiple=>true, :style=>"display:none;"} -%>
 
           <br/>
-          <%= check_box_tag :include_other_project_models, nil, false, {:onchange=>"toggle_model_list();",:style=>"margin-top:0.5em;"} -%> Associate <%=  t('model').pluralize %> from other projects?
+          <%= check_box_tag :include_other_project_models, nil, false, {:onchange=>"toggle_model_list();",:style=>"margin-top:0.5em;"} -%> Associate <%=  t('model').pluralize %> from other <%= t('project').pluralize %>?
         </div>
 		<br/>
         <%= link_to_function (image("new") + " Associate with this #{resource_text}"), "addSelectedModel(); return(false);", :id=>"add_model_link", :class=>"block_link" %>

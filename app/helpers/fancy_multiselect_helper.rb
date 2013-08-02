@@ -56,7 +56,7 @@ module FancyMultiselectHelper
         check_box_and_alternative_list << check_box_tag("include_other_project_#{association}", nil, false,
                                                 {:onchange => "swapSelectListContents('possible_#{type}_#{association.to_s.singularize}_ids','alternative_#{association.to_s.singularize}_ids');".html_safe,
                                                 :style => "margin-top:0.5em;"}).html_safe
-        check_box_and_alternative_list <<  "Associate #{association.to_s.singularize.humanize.pluralize} from other projects?".html_safe
+        check_box_and_alternative_list <<  "Associate #{association.to_s.singularize.humanize.pluralize} from other #{t('project').pluralize}?".html_safe
         check_box_and_alternative_list << select_tag("alternative_#{association.to_s.singularize}_ids",
                                               options_for_select([["Select #{association.to_s.singularize.humanize} ...", 0]]|options[:project_possibilities].collect { |o| [truncate(h(o.title), :length => 120), o.id] }), {:style => 'display:none;'}).html_safe
 

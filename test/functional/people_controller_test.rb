@@ -545,7 +545,7 @@ class PeopleControllerTest < ActionController::TestCase
     person.is_asset_manager = true
     person.save!
     get :show, :id => person
-    assert_select "li", :text => /This person is an asset manager/, :count => 1
+    assert_select "li", :text => /This person is an Asset Manager/, :count => 1
   end
 
   test 'should not show that the person is asset manager for non-admin' do
@@ -554,7 +554,7 @@ class PeopleControllerTest < ActionController::TestCase
     person.save
     login_as(:aaron)
     get :show, :id => person
-    assert_select "li", :text => /This person is an asset manager/, :count => 0
+    assert_select "li", :text => /This person is an Asset Manager/, :count => 0
   end
 
   def test_project_manager_can_administer_others
@@ -952,7 +952,7 @@ class PeopleControllerTest < ActionController::TestCase
     person.is_gatekeeper = true
     person.save
     get :show, :id => person
-    assert_select "li", :text => /This person is a gatekeeper/, :count => 1
+    assert_select "li", :text => /This person is a Gatekeeper/, :count => 1
   end
 
   test 'should not show that the person is gatekeeper for non-admin' do
@@ -961,7 +961,7 @@ class PeopleControllerTest < ActionController::TestCase
     person.save
     login_as(:aaron)
     get :show, :id => person
-    assert_select "li", :text => /This person is a gatekeeper/, :count => 0
+    assert_select "li", :text => /This person is a Gatekeeper/, :count => 0
   end
 
   test 'should have gatekeeper icon on person show page' do

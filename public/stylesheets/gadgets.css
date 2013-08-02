@@ -213,13 +213,14 @@
 input.gadget_button {
     background-color: #307af5;
     font-weight: bolder;
-    width: 7em;
     height: 2em;
     border: thin #dcdcdc;
     border-radius: 2px;
     color: white;
     margin-top:0.4em;
     margin-bottom:0.4em;
+    padding-left: 1em;
+    padding-right: 1em;
 
 }
 

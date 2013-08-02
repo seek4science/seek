@@ -1,5 +1,5 @@
 <%= javascript_include_tag 'sharing.js'%>
-<h1>Administer Project: <%= link_to h(@project.name), project_path(@project) -%></h1>
+<h1>Administer <%= t('project') %>: <%= link_to h(@project.name), project_path(@project) -%></h1>
 
 <div class="show_basic">
   <%= form_for(@project) do |f| -%>
@@ -13,8 +13,8 @@
     <h2 style="margin-top: 2em;">Participating Institutions</h2>
 
     <div style="width: 95%; text-align: left;">
-      <%= help_icon("To select multiple institutions press & hold CTRL<br/>while making your selection from the list below.") -%>
-      <%= f.label :institution_ids, "Please select the institutions that participate in this project", :style => "line-height: 2;" -%><br/>
+      <%= help_icon("To select multiple institutions press & hold CTRL<br/>while making youpotr selection from the list below.") -%>
+      <%= f.label :institution_ids, "Please select the institutions that participate in this #{t('project')}", :style => "line-height: 2;" -%><br/>
       <%
          institution_list = []
          if admin_logged_in?

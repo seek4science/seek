@@ -14,8 +14,8 @@
 <center>
   <p class="box_infotext" style="text-align:center">
     If you are a member of <%= Seek::Config.project_name %>, then you should already have a basic profile.<br/>
-    Please select a project you are a member of to begin finding your profile.<br/><br/>
-    If you are not a <%= Seek::Config.project_name %> member, or cannot find your project, then proceed to <b>
+    Please select a <%= t('project') %> you are a member of to begin finding your profile.<br/><br/>
+    If you are not a <%= Seek::Config.project_name %> member, or cannot find your <%= t('project') %>, then proceed to <b>
       <%= link_to_function "create new profile" do |page|
         page.visual_effect :toggle_blind, "profile_selection"
         page.visual_effect :toggle_blind, "profile_creation"
@@ -32,7 +32,7 @@
       </p>
     <% else %>
       <%= select_tag "project_id",
-        options_for_select([["Select project..",0]]|@userless_projects.collect {|p| [p.name,p.id]}),
+        options_for_select([["Select #{t('project')}..",0]]|@userless_projects.collect {|p| [p.name,p.id]}),
         {:onchange=>remote_function(
           :update=>:people_list,
           :url=>{:action=>"userless_project_selected_ajax"},

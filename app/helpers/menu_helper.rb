@@ -8,7 +8,7 @@ module MenuHelper
     definitions=[
         {:title=>t("menu.yellow_pages"), :sections=>[
             {:controller=>"people",:title=>"People"},
-            {:controller=>"projects",:title=>"Projects"},
+            {:controller=>"projects",:title=>t("project").pluralize},
             {:controller=>"institutions",:title=>"Institutions"}
         ]},
 

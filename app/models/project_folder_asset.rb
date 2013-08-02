@@ -11,7 +11,7 @@ class ProjectFolderAsset < ActiveRecord::Base
     prj = project_folder.try(:project)
     asset_projects = Array(asset.try(:projects))
     if !asset_projects.include?(prj)
-      errors[:base] << "Invalid asset projects for folder"
+      errors[:base] << "Invalid asset #{I18n.t('project').pluralize} for folder"
     end
   end
 

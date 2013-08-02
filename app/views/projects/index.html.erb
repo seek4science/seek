@@ -1,5 +1,5 @@
 <% if @organisms -%>
-  <h2><%= "Projects involved with the organism '"+h(@organisms)+"' ... " -%></h2>
+  <h2><%= "#{t('project').pluralize} involved with the organism '"+h(@organisms)+"' ... " -%></h2>
 <% end %>
 
 <% if @projects.public_methods.include?(:page_totals) %>
