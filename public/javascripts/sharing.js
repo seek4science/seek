@@ -21,8 +21,9 @@ UPDATE_FAVOURITE_GROUP_LINK = null;
 
 REVIEW_WORK_GROUP_LINK = null;
 
-GET_PERMISSION_SUMMARY_LINK = null
+GET_PERMISSION_SUMMARY_LINK = null;
 
+PROJECT_TRANSLATED_TERM = null;
 
 // declarations for autocompleters
 // (IDs can be any strings - the only constraint is that they should hold unique names for each autocompleter)
@@ -65,7 +66,12 @@ function updateCustomSharingSettings() {
   
     for(contributor_type in permissions_for_set)
         for(var i = 0; i < permission_settings[contributor_type].length; i++) {
-            shared_with += '<b>' + contributor_type + '</b>: ' + permission_settings[contributor_type][i][0]
+            if (contributor_type == "Project"){
+                shared_with += '<b>' + PROJECT_TRANSLATED_TERM + '</b>: '
+            }else{
+                shared_with += '<b>' + contributor_type + '</b>: '
+            }
+            shared_with += permission_settings[contributor_type][i][0]
             + '&nbsp;&nbsp;<span style="color: #5F5F5F;">('+ accessTypeTranslation(permission_settings[contributor_type][i][2]) +')</span>'
             + '&nbsp;&nbsp;<small style="vertical-align: middle;">'
             if (permission_settings[contributor_type][i].length<4 || permission_settings[contributor_type][i][3]==true) {
@@ -319,7 +325,7 @@ function loadInstitutionsForProject(project_id, project_name) {
                                    
                 // if a particular project has been selected, add an option "all project"
                 if(project_id != "") {
-                    $('proj_institution_select').options[0] = new Option("All "+ project_name +" Project", "");
+                    $('proj_institution_select').options[0] = new Option("All "+ project_name +" " + PROJECT_TRANSLATED_TERM, "");
                     next_index_to_use++;
                     prefix_txt = project_name + " @ ";
                 }

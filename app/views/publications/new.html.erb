@@ -22,7 +22,7 @@
     </p>
 
     <p>
-        Please select the projects this publication is related to. You must select a project, and it must be a project
+        Please select the <%= t('project').pluralize %> this publication is related to. You must select a <%= t('project') %>, and it must be a <%= t('project') %>
         you are a member of.
     </p>
     <%= render :partial => 'projects/project_selector', :locals => {:resource => @publication} -%>

@@ -55,7 +55,7 @@ class PoliciesController < ApplicationController
         elsif supported && !authorized
           render :json => {:status => 403, :error => "You are not authorized to view policy for that #{entity_type}."}
         else
-          render :json => {:status => 400, :error => "Requests for default project policies are only supported at the moment."}
+          render :json => {:status => 400, :error => "Requests for default #{t('project')} policies are only supported at the moment."}
         end
       }
     end

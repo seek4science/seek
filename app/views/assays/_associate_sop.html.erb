@@ -37,7 +37,7 @@
         
         <br/>
 
-        <%= check_box_tag :include_other_project_sops, nil, false, {:onchange=>"toggle_sop_list();",:style=>"margin-top:0.5em;"} -%> Associate <%= t('sop').pluralize %> from other projects?
+        <%= check_box_tag :include_other_project_sops, nil, false, {:onchange=>"toggle_sop_list();",:style=>"margin-top:0.5em;"} -%> Associate <%= t('sop').pluralize %> from other <%= t('project').pluralize %>?
       </div>
 	  <br/>
       <%= link_to_function (image("new") + " Associate with this #{resource_text}"), "addSelectedSop(); return(false);", :id=>"add_sop_link", :class=>"block_link" %>

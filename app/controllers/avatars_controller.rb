@@ -206,7 +206,7 @@ class AvatarsController < ApplicationController
     
     # check that nested route is used, not a direct link
     if (@avatar_for.nil? || @avatar_for_id.nil?)
-      flash[:error] = "Avatars are only available for people, projects and institutions."
+      flash[:error] = "Avatars are only available for people, #{t('project').pluralize} and institutions."
       redirect_to(root_path)
       return false
     end

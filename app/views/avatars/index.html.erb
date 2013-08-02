@@ -8,7 +8,7 @@
 </ul>
 
 
-<h1><%= @avatar_for -%> Pictures: <%= link_to @avatar_owner_instance.name, url_for(@avatar_owner_instance) -%></h1>
+<h1><%= @avatar_for.humanize -%> Pictures: <%= link_to @avatar_owner_instance.name, url_for(@avatar_owner_instance) -%></h1>
 
 <% unless @avatars.empty? %>
 

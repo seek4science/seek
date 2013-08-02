@@ -6,23 +6,23 @@
 <%= form_tag :action=>"update_rebrand" do -%>
    <ul class="settings">
         <%= render :partial=>'setting_li',:locals=>{
-            :description=>"A name for you project, this is the text that is used in sentences. Example Sysmo_DB, Virtual Liver",
-            :name=>"Project name",
+            :description=>"A name for you #{t('project')}, this is the text that is used in sentences. Example Sysmo_DB, Virtual Liver",
+            :name=>"#{t('project')} name",
             :field=>text_field_tag(:project_name, Seek::Config.project_name)
          } -%>
         <%= render :partial=>'setting_li',:locals=>{
-            :description=>"The title for you project, this is the text that is used in titles. In the majority of cases it will be the same as project name, unless you want to prefix it with 'The'.",
-            :name=>"Project title",
+            :description=>"The title for you #{t('project')}, this is the text that is used in titles. In the majority of cases it will be the same as #{t('project')} name, unless you want to prefix it with 'The'.",
+            :name=>"#{t('project')} title",
             :field=>text_field_tag(:project_title, Seek::Config.project_title)
          } -%>
         <%= render :partial=>'setting_li',:locals=>{
-            :description=>"Whether your project is a group, consortium, etc.",
-            :name=>"Project type",
+            :description=>"Whether your #{t('project')} is a group, consortium, etc.",
+            :name=>"#{t('project')} type",
             :field=>text_field_tag(:project_type, Seek::Config.project_type)
         } -%>
         <%= render :partial=>'setting_li',:locals=>{
-            :description=>"A URL that is used as a link to your projects website.",
-            :name=>"Project link",
+            :description=>"A URL that is used as a link to your #{t('project')} website.",
+            :name=>"#{t('project')} link",
             :field=>text_field_tag(:project_link, Seek::Config.project_link)
          } -%>
 
@@ -39,18 +39,18 @@
          } -%>
 
         <%= render :partial=>'setting_li',:locals=>{
-            :description=>"The name of the data management project, if different from the project, as used in titles. For example, in SysMO the project is SysMO, but the DM project name is SysMO-DB",
-            :name=>"Data management project name",
+            :description=>"The name of the data management #{t('project')}, if different from the #{t('project')}, as used in titles. For example, in SysMO the #{t('project')} is SysMO, but the DM #{t('project')} name is SysMO-DB",
+            :name=>"Data management #{t('project')} name",
             :field=>text_field_tag(:dm_project_name, Seek::Config.dm_project_name)
          } -%>
         <%= render :partial=>'setting_li',:locals=>{
-            :description=>"The name of the data management project, as used in titles.",
-            :name=>"Data management project title",
+            :description=>"The name of the data management #{t('project')}, as used in titles.",
+            :name=>"Data management #{t('project')} title",
             :field=>text_field_tag(:dm_project_title, Seek::Config.dm_project_title)
          } -%>
         <%= render :partial=>'setting_li',:locals=>{
-            :description=>"A URL that is used in links to the data management project",
-            :name=>"Data management project link",
+            :description=>"A URL that is used in links to the data management #{t('project')}",
+            :name=>"Data management #{t('project')} link",
             :field=>text_field_tag(:dm_project_link, Seek::Config.dm_project_link)
          } -%>
 
@@ -80,7 +80,7 @@
         </ul>
 
         <%= render :partial=>'setting_li',:locals=>{
-            :description=>"If you have been developing SEEK for your project, you may been to provide some additional copyright information.",
+            :description=>"If you have been developing SEEK for your #{t('project')}, you may been to provide some additional copyright information.",
             :name=>"Copyright addendum enabled",
             :field=>check_box_tag(:copyright_addendum_enabled, 1, Seek::Config.copyright_addendum_enabled,:onchange=>toggle_appear_javascript('copyright_details'))
          } -%>

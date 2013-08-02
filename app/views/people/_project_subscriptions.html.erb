@@ -3,14 +3,14 @@
     Subscriptions
   </div>
   <div class="foldContent">
-    Here is the list of projects you are subscribed to:
+    Here is the list of <%= t('project').pluralize %> you are subscribed to:
     <% project_subscriptions = person.project_subscriptions.uniq %>
     <% if project_subscriptions.empty? %>
         <span class='none_text'>None</span>
     <% else %>
         <table>
           <tr>
-            <th> Project</th>
+            <th> <%= t('project') %></th>
             <th>Email Frequency</th>
           </tr>
           <% project_subscriptions.each do |project_subscription| %>

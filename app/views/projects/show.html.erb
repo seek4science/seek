@@ -10,18 +10,18 @@
   <% end -%>
 <% if mine?(@project) || @project.try(:can_be_edited_by?, current_user) -%>
 
-    <li><%= image_tag_for_key('edit', edit_project_path(@project), "Edit Project Details", nil, 'Edit Project Details') -%></li>
+    <li><%= image_tag_for_key('edit', edit_project_path(@project), "Edit #{t('project')} Details", nil, "Edit #{t('project')} Details") -%></li>
 
     <% if @project.try(:can_be_administered_by?, current_user) -%>
-      <li><%= image_tag_for_key "admin", admin_project_path(@project), "Administer", nil, "Project administration" -%></li>
+      <li><%= image_tag_for_key "admin", admin_project_path(@project), "Administer", nil, "#{t('project')} administration" -%></li>
      <% end -%>
     <% if admin_logged_in? -%>
-      <li><%= image_tag_for_key "destroy", project_path(@project), "Delete Project", { :confirm => 'Are you sure?', :method => :delete }, "Delete Project" -%></li>
+      <li><%= image_tag_for_key "destroy", project_path(@project), "Delete #{t('project')}", { :confirm => 'Are you sure?', :method => :delete }, "Delete #{t('project')}" -%></li>
     <% end -%>
 
 <% end -%>
   <% if @project.try(:has_member?,current_user) -%>
-      <% tooltip_text="This will present you with a short report about the items that have been shared outside of your project" %>
+      <% tooltip_text="This will present you with a short report about the items that have been shared outside of your #{t('project')}" %>
       <li><%= image_tag_for_key "report", asset_report_project_path(@project), "Asset report", {:title=>tooltip_title_attrib(tooltip_text)}, "Asset report" -%></li>
   <% end -%>
 </ul>
@@ -60,7 +60,7 @@
         </p>
 
         <p class="project_managers">
-          <label>Project Managers:</label>
+          <label><%= t('project') %> Managers:</label>
           <%= project_managers_link_list @project -%>
         </p>
 
@@ -79,7 +79,7 @@
 
   <% if Seek::Config.is_virtualliver && logged_in_and_member? -%>
       <div style="clear:both;">
-          <b>Project Members(<%= link_to_function "show", visual_effect(:toggle_appear, "project_mailing_list")+"$('project_mailing_list').style.display=='none'? this.innerHTML='hide' : this.innerHTML='show';" %>):</b><br/><br/>
+          <b><%= t('project') %> Members(<%= link_to_function "show", visual_effect(:toggle_appear, "project_mailing_list")+"$('project_mailing_list').style.display=='none'? this.innerHTML='hide' : this.innerHTML='show';" %>):</b><br/><br/>
           <div id="project_mailing_list" style="display: none;">
             <%= project_mailing_list @project %>
           </div>
@@ -87,7 +87,7 @@
   <% end %>
 
   <div style="clear:both;">
-    <%=  item_description @project.description,:label=>"About this project" %>
+    <%=  item_description @project.description,:label=>"About this #{t('project')}" %>
 
     <%# get, classify and authorize all assets for this project -%>
     <%= render :partial=>"general/items_related_to",:object => @project %>

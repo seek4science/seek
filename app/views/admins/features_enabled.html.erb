@@ -16,7 +16,7 @@
     } -%>
 
     <%= render :partial=>'setting_li',:locals=>{
-            :description=>"Whether JERM harvesting is enabled. You probably want this disabled. If enabled you need to administer a project to setup the connection and default sharing policy.",
+            :description=>"Whether JERM harvesting is enabled. You probably want this disabled. If enabled you need to administer a #{t('project')} to setup the connection and default sharing policy.",
             :name=>"JERM harvesting enabled",
             :field=>check_box_tag(:jerm_enabled, 1, Seek::Config.jerm_enabled)
     } -%>

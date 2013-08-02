@@ -1,7 +1,7 @@
 <%
    select_truncate_length=120
    projects = Project.all
-   info_text = "Here you can customize your subscriptions to projects. You will be informed by email of resources that have been created or updated within the projects that you have subscribed to, during the time period you specified. You will only be notified of items that you are authorized to view. By default, your subscription is for weekly notifications about activity in your own projects."
+   info_text = "Here you can customize your subscriptions to #{t('project').pluralize}. You will be informed by email of resources that have been created or updated within the #{t('project').pluralize} that you have subscribed to, during the time period you specified. You will only be notified of items that you are authorized to view. By default, your subscription is for weekly notifications about activity in your own projects."
 %>
 <div class="fold">
   <div class="foldTitle">
@@ -9,7 +9,7 @@
     Subscriptions
   </div>
   <div class="foldContent">
-    <span class="none_text"> The following projects are subscribed by you, you may click it to view or edit the subscription: </span>
+    <span class="none_text"> The following <%= t('project').pluralize %> are subscribed by you, you may click it to view or edit the subscription: </span>
     <ul id="project_subscription_list">
       <% project_subscriptions = @person.project_subscriptions %>
       <span class="none_text" id="no_project_text" style="display: <%= project_subscriptions.empty? ? 'block' : 'none' %>">None</span>
@@ -20,9 +20,9 @@
       <% end %>
     </ul>
     <br/>
-     <span class="none_text"> You can subscribe other projects: </span> <br/>
+     <span class="none_text"> You can subscribe other <%= t('project').pluralize %>: </span> <br/>
     <%= select_tag :select_project_subscription,
-                   options_for_select([["Select Project ...", 0]]|projects.collect { |p| [truncate(h(p.title), :length=>select_truncate_length), p.id] }),
+                   options_for_select([["Select #{t('project')} ...", 0]]|projects.collect { |p| [truncate(h(p.title), :length=>select_truncate_length), p.id] }),
                    {:style=>"width:90%",
                     :onchange=>"show_project_subscription();return(false);"} -%>
 
@@ -36,7 +36,7 @@
         <div id="subscription<%= project_subscription.project_id %>" style="display:none;">
           <fieldset>
             <%= sub_form.hidden_field :id unless sub_form.object.new_record? %>
-            <legend> Project: <%= h(project_subscription.project.name) %></legend>
+            <legend> <%= t('project') %>: <%= h(project_subscription.project.name) %></legend>
             <%= sub_form.hidden_field :project_id %>
             <br/>
 

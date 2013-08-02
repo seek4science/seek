@@ -1,5 +1,5 @@
 root:
-  title: "Project items"
+  title: <%= I18n.t('project') + "items" %>
   children: models, data, sops, presentations, publications
   deletable: false
 

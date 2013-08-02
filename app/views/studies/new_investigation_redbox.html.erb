@@ -10,7 +10,7 @@
 
       <div id="errorExplanation" class="errorExplanation" style="display:none;"></div>
 
-      Creating a new <%= t('investigation') %> for the project <b>'<%= h(@investigation.projects.first.name) %>'</b>
+      Creating a new <%= t('investigation') %> for the <%= t('project') %> <b>'<%= h(@investigation.projects.first.name) %>'</b>
 
       <%= hidden_field_tag :project_id,@investigation.projects.first.id %>
 

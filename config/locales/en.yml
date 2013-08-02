@@ -34,6 +34,9 @@ en:
   #Event
   event: "Event"
 
+  #Project
+  project: "Something"
+
 
   menu:
     yellow_pages: "Yellow pages"

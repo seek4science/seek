@@ -24,10 +24,10 @@
     }
 </script>
 <div style="margin-left:0.5em;">
-    <%= link_to_function (image("multi_add") + " Add multiple project members"), "Effect.Appear('adv_creator_select');return false;", :class=>"block_link" %>
+    <%= link_to_function (image("multi_add") + " Add multiple #{t('project')} members"), "Effect.Appear('adv_creator_select');return false;", :class=>"block_link" %>
     <div id="adv_creator_select" style="display:none">
         <p>
-            Add multiple people at once from a given project, at a given institution, using the menu below.
+            Add multiple people at once from a given <%= t('project') %>, at a given institution, using the menu below.
         </p>
         <%= select_tag("adv_project_id","<option selected=\"selected\" value=\"0\">Select project...</option>"+options_from_collection_for_select(Project.all, :id, :name),
         :id => "adv_creator_select_projects",

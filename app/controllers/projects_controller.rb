@@ -134,7 +134,7 @@ class ProjectsController < ApplicationController
 
     respond_to do |format|
       if @project.save
-        flash[:notice] = 'Project was successfully created.'
+        flash[:notice] = "#{t('project')} was successfully created."
         format.html { redirect_to(@project) }
         format.xml  { render :xml => @project, :status => :created, :location => @project }
       else
@@ -160,7 +160,7 @@ class ProjectsController < ApplicationController
       if @project.update_attributes(params[:project])
         
 
-        flash[:notice] = 'Project was successfully updated.'
+        flash[:notice] = "#{t('project')} was successfully updated."
         format.html { redirect_to(@project) }
         format.xml  { head :ok }
       else
@@ -205,7 +205,7 @@ class ProjectsController < ApplicationController
         if success
           render :json => {:status => 200, :institution_list => institution_list }
         else
-          render :json => {:status => 404, :error => "Couldn't find Project with ID #{project_id}."}
+          render :json => {:status => 404, :error => "Couldn't find #{t('project')} with ID #{project_id}."}
         end
       }
     end
@@ -224,7 +224,7 @@ class ProjectsController < ApplicationController
   def member_of_this_project
     @project = Project.find(params[:id])
     if @project.nil? || !@project.has_member?(current_user)
-      flash[:error]="You are not a member of this project, so cannot access this page."
+      flash[:error]="You are not a member of this #{t('project')}, so cannot access this page."
       redirect_to project_path(@project)
       false
     else

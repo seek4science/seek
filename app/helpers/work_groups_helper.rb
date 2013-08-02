@@ -47,7 +47,7 @@ module WorkGroupsHelper
     
     options << last_project unless last_project.nil?
 
-    no_project = Project.new(:name => 'No Projects')
+    no_project = Project.new(:name => "No #{t('project').pluralize}")
     last_no_project = ProjectType.new(no_project)
     last_no_project << WorkGroupOption.new(nil, 'No Institutions')
     options.insert(0, last_no_project)

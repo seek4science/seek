@@ -46,14 +46,14 @@
           <% if policy.sharing_scope == Policy::PRIVATE %>
               <p class="private">You keep this <%= resource_name.humanize %> private (only visible to you)</p>
           <% elsif policy.sharing_scope == Policy::ALL_SYSMO_USERS %>
-              <p class="shared">All the project members within the network <%= ((policy.access_type == Policy::NO_ACCESS) ? 'have ' : 'can ') + Policy.get_access_type_wording(policy.access_type, try_block{resource_name.camelize.constantize.new()}).downcase -%></p>
+              <p class="shared">All the <%= t('project') %> members within the network <%= ((policy.access_type == Policy::NO_ACCESS) ? 'have ' : 'can ') + Policy.get_access_type_wording(policy.access_type, try_block{resource_name.camelize.constantize.new()}).downcase -%></p>
           <% elsif policy.sharing_scope == Policy::EVERYONE  %>
               <p class='public'>All visitors (including anonymous visitors with no login) can <%= Policy.get_access_type_wording(policy.access_type, try_block{resource_name.camelize.constantize.new()}).downcase -%></p>
               <% if !updated_can_publish_immediately %>
                   <% if send_request_publish_approval %>
-                    <p class="gatekeeper_notice">(An email will be sent to the Gatekeepers of the projects associated with this <%= resource_name.humanize %> to ask for publishing approval. This <%= resource_name.humanize %> will not be published until one of the Gatekeepers has granted approval)</p>
+                    <p class="gatekeeper_notice">(An email will be sent to the Gatekeepers of the <%= t('project').pluralize %> associated with this <%= resource_name.humanize %> to ask for publishing approval. This <%= resource_name.humanize %> will not be published until one of the Gatekeepers has granted approval)</p>
                   <% else %>
-                    <p class="gatekeeper_notice">(You requested the publishing approval from the Gatekeepers of the projects associated with this <%= resource_name.humanize %>, and it is waiting for the decision. This <%= resource_name.humanize %> will not be published until one of the Gatekeepers has granted approval)</p>
+                    <p class="gatekeeper_notice">(You requested the publishing approval from the Gatekeepers of the <%= t('project').pluralize %> associated with this <%= resource_name.humanize %>, and it is waiting for the decision. This <%= resource_name.humanize %> will not be published until one of the Gatekeepers has granted approval)</p>
                   <% end %>
               <% end %>
           <% end %>

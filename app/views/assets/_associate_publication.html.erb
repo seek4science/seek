@@ -39,7 +39,7 @@
         
         <br/>
 
-        <%= check_box_tag :include_other_project_publications, nil, false, {:onchange=>"toggle_publication_list();",:style=>"margin-top:0.5em;"} -%> Associate Publications from other projects?
+        <%= check_box_tag :include_other_project_publications, nil, false, {:onchange=>"toggle_publication_list();",:style=>"margin-top:0.5em;"} -%> Associate Publications from other <%= t('project').pluralize %>?
       </div>
 	  <br/>
       <%= link_to_function (image("new") + " Associate with this #{resource_text}"), "addSelectedPublication(); return(false);", :id=>"add_publication_link", :class=>"block_link" %>

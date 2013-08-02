@@ -42,7 +42,7 @@
 For authorised assets the numbers are split as <em>total</em> / <em>visible</em> / <em>accessible</em> / <em>publicly visible</em> / <em>publicly accessible</em>
 <table>
   <tr>
-    <th>Project</th>
+    <th><%= t('project') %></th>
     <th>People (Registered)</th>
     <% authorised_types.each do |type| %>
         <th><%= resource_tab_item_name(type.name) -%></th>
@@ -91,4 +91,4 @@ For authorised assets the numbers are split as <em>total</em> / <em>visible</em>
   </tr>
 </table>
 <hr/>
-<em>* Note that this is the overall number of people, and registered users. This may not necessarily by the sum of the values above due to people being in multiple projects.</em>
+<em>* Note that this is the overall number of people, and registered users. This may not necessarily by the sum of the values above due to people being in multiple <%= t('project').pluralize %>.</em>
