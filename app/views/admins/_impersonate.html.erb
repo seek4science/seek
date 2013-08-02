@@ -1,5 +1,5 @@
 <%
-	users = User.all.collect{|u| [u.person.name, u.id] unless u.person.nil?}.compact
+	users = User.includes(:person).collect{|u| [u.person.name, u.id] unless u.person.nil?}.compact
 	users = users.sort{|a,b| a[0] <=> b[0]}
 -%>
 <%= form_tag impersonate_users_url do %>
