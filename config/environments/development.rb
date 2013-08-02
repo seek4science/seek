@@ -38,6 +38,8 @@ SEEK::Application.configure do
 
   # Expands the lines which load the assets
   config.assets.debug = true
+
+  config.enable_mini_profiler = false
 end
 
 

@@ -39,6 +39,7 @@ SEEK::Application.configure do
   Seek::Config.default :experimental_features_enabled,false
   Seek::Config.default :pdf_conversion_enabled,true
   Seek::Config.default :filestore_path,"filestore"
+  Seek::Config.default :rack_profiler_enabled, false
 
 #time in minutes that the feeds on the front page are cached for
   Seek::Config.default :home_feeds_cache_timeout,2

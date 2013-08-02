@@ -49,6 +49,8 @@ gem 'rfc-822'
 gem 'nokogiri',"1.5.9"
 gem 'rdf-virtuoso', :git=>'git://github.com/digibib/rdf-virtuoso.git'
 
+#Is required in the initializer if configured to be on
+gem "rack-mini-profiler", :require=>false
 
 #Linked to SysMO Git repositories
 gem 'gibberish', :git => "git://github.com/SysMO-DB/gibberish.git"
@@ -72,7 +74,8 @@ gem "fleximage", :git=>"git://github.com/SysMO-DB/fleximage"
 gem 'search_biomodel', "2.2.1",:git=>"git://github.com/myGrid/search_biomodel.git"
 gem 'my_annotations', :git=>"git://github.com/myGrid/annotations.git"
 
-gem 'passenger'
+
+gem "unicorn-rails"
 
 group :development do
   gem "sqlite3","1.3.7"
@@ -81,8 +84,10 @@ group :development do
   gem "pry-remote"
   gem "request-log-analyzer"
   gem 'rails-dev-boost', :git => 'git://github.com/thedarkone/rails-dev-boost.git'
-  gem "unicorn-rails"
+  gem 'passenger'
 end
+
+
 
 group :test do
   gem "sqlite3","1.3.7"
