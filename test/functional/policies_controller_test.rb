@@ -28,7 +28,7 @@ class PoliciesControllerTest < ActionController::TestCase
     post :preview_permissions, :sharing_scope => Policy::ALL_SYSMO_USERS, :access_type => Policy::VISIBLE, :resource_name => 'data_file'
 
     assert_response :success
-    assert_select "p", :text => "All the project members within the network can #{Policy.get_access_type_wording(Policy::VISIBLE, 'data_file'.camelize.constantize.new()).downcase}", :count => 1
+    assert_select "p", :text => "All the #{I18n.t('project')} members within the network can #{Policy.get_access_type_wording(Policy::VISIBLE, 'data_file'.camelize.constantize.new()).downcase}", :count => 1
   end
 
   test 'should show the preview permission when custom the permissions for Person, Project and FavouriteGroup' do
@@ -57,7 +57,7 @@ class PoliciesControllerTest < ActionController::TestCase
 
     assert_select 'p', :text=>"#{person.name} can #{Policy.get_access_type_wording(Policy::MANAGING, 'data_file'.camelize.constantize.new()).downcase}", :count => 1
     assert_select 'p', :text=>"Members of Favourite group #{favorite_group.name} have #{Policy.get_access_type_wording(Policy::DETERMINED_BY_GROUP, 'data_file'.camelize.constantize.new()).downcase}", :count => 1
-    assert_select 'p', :text=>"Members of Project #{project.name} can #{Policy.get_access_type_wording(Policy::ACCESSIBLE, 'data_file'.camelize.constantize.new()).downcase}", :count => 1
+    assert_select 'p', :text=>"Members of #{I18n.t('project')} #{project.name} can #{Policy.get_access_type_wording(Policy::ACCESSIBLE, 'data_file'.camelize.constantize.new()).downcase}", :count => 1
   end
 
   test 'should show the correct manager(contributor) when updating a study' do
@@ -88,7 +88,7 @@ class PoliciesControllerTest < ActionController::TestCase
       login_as(sop.contributor)
       post :preview_permissions, :sharing_scope => Policy::EVERYONE, :access_type => Policy::VISIBLE, :is_new_file => "false", :resource_name => 'sop', :resource_id => sop.id,:project_ids => gatekeeper.projects.first.id.to_s
 
-      assert_select "p",:text=>"(An email will be sent to the Gatekeepers of the projects associated with this #{I18n.t('sop')} to ask for publishing approval. This #{I18n.t('sop')} will not be published until one of the Gatekeepers has granted approval)", :count=>1
+      assert_select "p",:text=>"(An email will be sent to the Gatekeepers of the #{I18n.t('project').pluralize} associated with this #{I18n.t('sop')} to ask for publishing approval. This #{I18n.t('sop')} will not be published until one of the Gatekeepers has granted approval)", :count=>1
   end
 
   test 'should show notice message when an item is requested to be published and the request was alread sent by this user' do
@@ -98,13 +98,13 @@ class PoliciesControllerTest < ActionController::TestCase
     ResourcePublishLog.add_log ResourcePublishLog::WAITING_FOR_APPROVAL, sop
     post :preview_permissions, :sharing_scope => Policy::EVERYONE, :access_type => Policy::VISIBLE, :is_new_file => "false", :resource_name => 'sop', :resource_id => sop.id,:project_ids => gatekeeper.projects.first.id.to_s
 
-    assert_select "p",:text=>"(You requested the publishing approval from the Gatekeepers of the projects associated with this #{I18n.t('sop')}, and it is waiting for the decision. This #{I18n.t('sop')} will not be published until one of the Gatekeepers has granted approval)", :count=>1
+    assert_select "p",:text=>"(You requested the publishing approval from the Gatekeepers of the #{I18n.t('project').pluralize} associated with this #{I18n.t('sop')}, and it is waiting for the decision. This #{I18n.t('sop')} will not be published until one of the Gatekeepers has granted approval)", :count=>1
   end
 
   test 'should not show notice message when an item can be published right away' do
       post :preview_permissions, :sharing_scope => Policy::EVERYONE, :access_type => Policy::VISIBLE, :is_new_file => "true", :resource_name => 'sop', :project_ids => Factory(:project).id.to_s
 
-      assert_select "p",:text=>"(An email will be sent to the Gatekeepers of the projects associated with this #{I18n.t('sop')} to ask for publishing approval. This #{I18n.t('sop')} will not be published until one of the Gatekeepers has granted approval)", :count=>0
+      assert_select "p",:text=>"(An email will be sent to the Gatekeepers of the  #{I18n.t('project').pluralize} associated with this #{I18n.t('sop')} to ask for publishing approval. This #{I18n.t('sop')} will not be published until one of the Gatekeepers has granted approval)", :count=>0
   end
 
   test 'when creating an item, can not publish the item if associate to it the project which has gatekeeper' do

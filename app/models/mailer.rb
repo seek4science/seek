@@ -125,7 +125,7 @@ class Mailer < ActionMailer::Base
     @user = user
     @host = base_host
     mail(:to=>project_manager_email(project_manager),:reply_to=>user.person.email_with_name,
-         :subject=>"#{Seek::Config.application_name} member signed up, please assign this person to the #{I18n.t('project').pluralize} which you are #{I18n.t('project')} manager")
+         :subject=>"#{Seek::Config.application_name} member signed up, please assign this person to the #{I18n.t('project').pluralize.downcase} which you are #{I18n.t('project').downcase} manager")
   end
 
   def resources_harvested(harvester_responses,user,base_host)
