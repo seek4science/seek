@@ -33,11 +33,11 @@ module MenuHelper
     if logged_in_and_registered?
       account_menu = {:title=>t("menu.account"),:spacer=>true,:sections=>[]}
 
-      account_menu[:sections] << {:path=>feedback_home_path(),:title=>t("menu.feedback")} if Seek::Config.email_enabled
-
       account_menu[:sections] << {:path=>person_path(User.current_user.person),:title=>"Your profile"}
 
       account_menu[:sections] << {:path=>admin_path,:title=>t("menu.admin")} if admin_logged_in?
+
+      account_menu[:sections] << {:path=>feedback_home_path(),:title=>t("menu.feedback")} if Seek::Config.email_enabled
 
       account_menu[:sections] << {:path=>"/logout",:title=>"Logout",:options=>{:confirm=>"Are you sure you wish to logout?"}}
 
