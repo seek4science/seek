@@ -37,6 +37,4 @@ SEEK::Application.configure do
   config.active_support.deprecation = :stderr
 
   config.cache_store = :memory_store
-
-  config.enable_mini_profiler = false
 end
