@@ -11,18 +11,18 @@ namespace :doc do
     rdoc.options << '--line-numbers'
     rdoc.options << '--charset' << 'utf-8'
 
-    rdoc.rdoc_files.include('doc/README_FOR_APP')
+    rdoc.rdoc_files.include('doc/README')
 
     rdoc.rdoc_files.include('doc/CREDITS')
     rdoc.rdoc_files.include('doc/INSTALL')
     rdoc.rdoc_files.include('doc/INSTALL-PRODUCTION')
     rdoc.rdoc_files.include('doc/OTHER-DISTRIBUTIONS')
     rdoc.rdoc_files.include('doc/UPGRADING')
-    rdoc.rdoc_files.include('doc/UPGRADING-TO-0-16-AND-EARLIER')
+    rdoc.rdoc_files.include('doc/EARLIER-UPGRADES')
     rdoc.rdoc_files.include('doc/UPGRADING-TO-0-18')
     rdoc.rdoc_files.include('doc/BACKUPS')
     rdoc.rdoc_files.include('doc/ADMINISTRATION')
-    rdoc.rdoc_files.include('doc/setting_up_virtuoso')
+    rdoc.rdoc_files.include('doc/SETTING-UP-VIRTUOSO')
 
     rdoc.rdoc_files.include('lib/seek/rdf/rdf_repository.rb')
     rdoc.rdoc_files.include('lib/seek/rdf/rdf_repository_storage.rb')
