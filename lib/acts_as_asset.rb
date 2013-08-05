@@ -65,15 +65,6 @@ module Acts #:nodoc:
 
         has_many :project_folder_assets, :as=>:asset, :dependent=>:destroy
 
-        searchable do
-          text :creators do
-            creators.compact.map(&:name)
-          end
-          text :content_blob do
-            content_blob_search_terms
-          end
-        end if Seek::Config.solr_enabled
-
         has_many :activity_logs, :as => :activity_loggable
 
         after_create :add_new_to_folder
