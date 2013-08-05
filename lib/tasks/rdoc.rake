@@ -10,8 +10,6 @@ namespace :doc do
     rdoc.title = ENV['title'] || "SEEK Technical Guide"
     rdoc.options << '--line-numbers'
     rdoc.options << '--charset' << 'utf-8'
-    rdoc.options << "--main" << "'INSTALL'"
-
 
     rdoc.rdoc_files.include('doc/README_FOR_APP')
 
@@ -20,10 +18,11 @@ namespace :doc do
     rdoc.rdoc_files.include('doc/INSTALL-PRODUCTION')
     rdoc.rdoc_files.include('doc/OTHER-DISTRIBUTIONS')
     rdoc.rdoc_files.include('doc/UPGRADING')
+    rdoc.rdoc_files.include('doc/UPGRADING-TO-0-16-AND-EARLIER')
+    rdoc.rdoc_files.include('doc/UPGRADING-TO-0-18')
     rdoc.rdoc_files.include('doc/BACKUPS')
     rdoc.rdoc_files.include('doc/ADMINISTRATION')
     rdoc.rdoc_files.include('doc/setting_up_virtuoso')
-
 
     rdoc.rdoc_files.include('lib/seek/rdf/rdf_repository.rb')
     rdoc.rdoc_files.include('lib/seek/rdf/rdf_repository_storage.rb')
