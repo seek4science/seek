@@ -1,1 +1,112 @@
 = Upgrading to SEEK 0.18
+
+== Backing up
+
+We always recommend you backup before doing an upgrade, but in this case it is even more important. Please read our
+{Backup Guide}[link:doc/BACKUPS.html] for details on what to backup and some tips on how to do so.
+
+
+== Upgrading a Production SEEK
+
+If you run SEEK in a production environment, first set your environment variable. You will need to do this if you
+open a new shell part way through the backup.
+
+  export RAILS_ENV=production
+
+== Stopping Services
+
+If you use init.d scripts to start and stop the Delayed Job or Solr Search services, please stop them using that script.
+Otherwise do:
+
+  ./script/delayed_job stop
+  bundle exec sunspot:solr:stop
+
+== Installating Package dependencies
+
+Please install the packages described in the {Installation Guide}[link:doc/INSTALL.html]. If you are running a production server, please
+also install the packages described in the {Production Installation Guide}[link:doc/INSTALL-PRODUCTION.html]
+
+== Installing Ruby 1.9.3 with RVM
+
+We strongly encourage that you use {RVM}[https://rvm.io/] for managing your Ruby and RubyGems version. Although you can use the version that comes with your linux distribution,
+it is more difficult to control the version you use and keep up to date.
+
+To install RVM follow the steps at https://rvm.io/rvm/install . The current basic installation method is to run:
+
+  \curl -L https://get.rvm.io | bash
+
+to save restarting your shell run:
+
+  source $HOME/.rvm/scripts/rvm
+
+now install Ruby 1.9.3
+
+  rvm install ruby-1.9.3
+
+you may be asked for your password so that some additional packages can be installed. You will then need to wait for Ruby to be downloaded and compiled.
+
+This version of SEEK has been developed and tested using Rubygems version 1.8.25. This is the version installed with Ruby 1.9.3 at the time of writing this, but to be sure run:
+
+  rvm rubygems 1.8.25
+
+Now you just need to create the <em>Gemset</em> for SEEK. RVM allows what it calls <em>Gemsets</em> to seperate the gems installed, in isolation from each other, for different applications.
+To create the gemset run:
+
+  rvm gemset create seek
+
+And finally
+
+  rvm use ruby-1.9.3@seek
+  gem install bundler
+
+== Fetching and Updating SEEK
+
+You are now ready to fetch the SEEK code and start upgrading. Make sure your <em>RAILS_ENV</em> is still set to <em>production</em> if necessary.
+
+  hg pull https://bitbucket.org/seek4science/seek -r v0.18.0
+  hg update
+  hg merge # only required if you've made changes since installing. If you have you may need to deal with conflicts.
+  hg commit -m "merged" # likewise - only required if you made changes since installing
+  bundle install --deployment
+
+You now need to edit the <em>config/database.yml</em> file, and change the <em>adaptor</em> setting from <em>mysql</em> to <em>mysql2</em>.
+
+If you are unsure what to change, have a look at <em>config/database.default.yml</em>.
+
+Then continue with:
+
+  bundle exec rake db:migrate
+  bundle exec rake seek:upgrade
+  bundle exec rake tmp:assets:clear
+  bundle exec rake tmp:clear
+
+== Converting the database
+
+== Updating the init.d scripts
+
+If you use init.d scripts to start and stop the Delayed Job, Solr Search and Soffice services, you may need to update these.
+
+Solr Search - https://gist.github.com/3143434
+
+Delayed Job - https://gist.github.com/3169625
+
+Soffice - https://gist.github.com/3787679
+
+== Starting up SEEK and the Services
+
+You can now startup the services, either using the init.d scripts or by running:
+
+  bundle exec rake sunspot:solr:start
+  ./script/delayed_job start
+
+If you don't use SEEK with Apache, the command to start it is now:
+
+  bundle exec rails server
+
+=== Updating Passenger Phusion
+
+If you run SEEK with Apache, you may find you need to update and reconfigure Apache and Passenger Phusion. Please follow the steps
+in this section of the {Production Installation Guide}[link:doc/INSTALL-PRODUCTION.html]
+
+
+
