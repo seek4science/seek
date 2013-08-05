@@ -202,6 +202,35 @@ bundle exec rake tmp:clear</pre>
 
 <h2 id="label-Converting+the+database">Converting the database</h2>
 
+<p>This bit is a bit fiddly, but is required to update your mysql database to
+correctly report UTF-8. If you know of a cleaner way to do this then please
+let us know!</p>
+
+<p>First refer to <em>config/database.yml</em> to check the database name, and
+the username and password you use. Then make a dump of the database using
+the following, but replacing &lt;mysql_username&gt; and
+&lt;database_name&gt;:</p>
+
+<pre>mysqldump -u &lt;mysql_username&gt; -p --opt --default-character-set=latin1 --skip-set-charset  &lt;database_name&gt; &gt; seek_db.sql</pre>
+
+<p>Now a couple of commands to change the contents of the dump</p>
+
+<pre>sed -e 's/CHARSET=latin1/CHARSET=utf8/g' seek_db.sql &gt; seek_db_utf8.sql
+sed -e 's/COLLATE=utf8_unicode_ci//g' seek_db_utf8.sql &gt; seek_db_converted.sql</pre>
+
+<p>Now refresh the database from the dump:</p>
+
+<pre>mysql -u &lt;mysql_username&gt; -p &lt;database_name&gt; &lt; seek_db_converted.sql</pre>
+
+<p>If you have started up SEEK before doing this conversion you may need to
+clear the SEEK cache:</p>
+
+<pre>bundle exec rake tmp:clear</pre>
+
+<p>You can now clear out the intermediate files:</p>
+
+<pre>rm seek_db.sql seek_db_utf8.sql seek_db_converted.sql</pre>
+
 <h2 id="label-Updating+the+init.d+scripts">Updating the init.d scripts</h2>
 
 <p>If you use init.d scripts to start and stop the Delayed Job, Solr Search
