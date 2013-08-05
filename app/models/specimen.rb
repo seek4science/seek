@@ -123,6 +123,7 @@ class Specimen < ActiveRecord::Base
       text << title
       text << description
       text << lab_internal_number
+      text << other_creators
       if (strain)
         text << strain.info
         text << strain.try(:organism).try(:title).to_s
