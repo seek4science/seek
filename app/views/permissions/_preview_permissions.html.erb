@@ -35,6 +35,7 @@
    permissions = policy.permissions
    privileged_people_array = privileged_people.blank? ? [] : privileged_people.values.flatten.uniq
    #Dont show the additional fine-grained sharing permissions for a person if this person belongs to privileged people, coz this person will be showed in privileged people part
+   #FIXME: still show fine-grained permissions for the creators if they have manage right, then remove them from privileged people list.
    permissions = permissions.select{|p| !privileged_people_array.include?(p.contributor)}
 
 %>
