@@ -716,7 +716,7 @@ class AuthorizationTest < ActiveSupport::TestCase
   test "anyone can do anything on policy free items, except the overriten can_action?" do
     item = Factory :project
     User.current_user = Factory :user
-    actions.reject{|a| a == 'delete'}.each {|a| assert item.can_perform? a}
+    actions.reject{|a| a == :delete}.each {|a| assert item.can_perform? a}
     assert item.can_edit?
     assert item.can_view?
     assert item.can_download?
