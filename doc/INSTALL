@@ -89,7 +89,7 @@ Now you are ready for installing SEEK. To fetch the latest version of SEEK (v0.1
 Now to install the ruby gems SEEK needs:
 
   gem install bundler
-  bundle install
+  bundle install  --deployment
 
 == Setting up the Database
 
