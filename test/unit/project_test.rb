@@ -8,12 +8,14 @@ class ProjectTest < ActiveSupport::TestCase
     n_wg=WorkGroup.all.size
     p=Project.find(2)
     assert_equal 1,p.work_groups.size
+    wg = p.work_groups.first
         
-    p.work_groups.first.people=[]
-    p.save!
+    wg.people=[]
+    wg.save!
+    User.current_user = Factory(:admin).user
     p.destroy
     
-    assert_equal n_wg-1,WorkGroup.all.size
+    assert_equal nil,WorkGroup.find_by_id(wg.id)
     wg=WorkGroup.all.first
     assert_same 1,wg.project_id
   end

@@ -11,10 +11,12 @@ class InstitutionTest < ActiveSupport::TestCase
     
     assert_equal 1,i.work_groups.size
 
-    i.work_groups.first.people=[]
+    wg = i.work_groups.first
+    wg.people=[]
+    User.current_user = Factory(:admin).user
     i.destroy
-    assert_equal (n_inst-1),Institution.find(:all).size
-    assert_equal (n_wg-1), WorkGroup.find(:all).size, "the workgroup should also have been destroyed"
+    assert_equal nil, Institution.find_by_id(i.id)
+    assert_equal nil, WorkGroup.find_by_id(wg.id), "the workgroup should also have been destroyed"
   end
 
   def test_ordered_by_name

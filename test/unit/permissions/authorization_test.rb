@@ -713,15 +713,15 @@ class AuthorizationTest < ActiveSupport::TestCase
     assert sop.can_manage?(user), "The sop should now be managable to the pal"
   end
 
-  def test_anyone_can_do_anything_for_policy_free_items
+  test "anyone can do anything on policy free items, except the overriten can_action?" do
     item = Factory :project
     User.current_user = Factory :user
-    actions.each {|a| assert item.can_perform? a}
+    actions.reject{|a| a == 'delete'}.each {|a| assert item.can_perform? a}
     assert item.can_edit?
     assert item.can_view?
     assert item.can_download?
-    assert item.can_delete?
     assert item.can_manage?
+    assert !item.can_delete? #can_delete? is overriten for project
   end
 
   def test_contributor_can_do_anything
