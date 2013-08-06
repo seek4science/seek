@@ -69,8 +69,12 @@ class ProjectsControllerTest < ActionController::TestCase
 	end
 
 	def test_should_destroy_project
+    project = projects(:four)
+    get :show, :id => project
+    assert_select "span.icon", :text => /Delete #{I18n.t('project')}/, :count => 1
+
 		assert_difference('Project.count', -1) do
-			delete :destroy, :id => projects(:four)
+			delete :destroy, :id => project
 		end
 
 		assert_redirected_to projects_path
@@ -78,10 +82,27 @@ class ProjectsControllerTest < ActionController::TestCase
 
 	def test_non_admin_should_not_destroy_project
 		login_as(:aaron)
+    project = projects(:four)
+    get :show, :id => project.id
+    assert_select "span.icon", :text => /Delete #{I18n.t('project')}/, :count => 0
+    assert_select "span.disabled_icon", :text => /Delete #{I18n.t('project')}/, :count => 0
 		assert_no_difference('Project.count') do
-			delete :destroy, :id => projects(:four)
-		end
+			delete :destroy, :id => project
+    end
+    assert_not_nil flash[:error]
+  end
 
+  test "can not destroy project if it contains people" do
+    project = projects(:four)
+    work_group = Factory(:work_group, :project => project)
+    a_person = Factory(:person, :group_memberships => [Factory(:group_membership, :work_group => work_group)])
+    get :show, :id => project
+    assert_select "span.disabled_icon", :text => /Delete #{I18n.t('project')}/, :count => 1
+    assert_no_difference('Project.count') do
+      delete :destroy, :id => project
+    end
+    assert_redirected_to project_path(project)
+    assert_not_nil flash[:error]
   end
 
   test "asset report visible to project member" do

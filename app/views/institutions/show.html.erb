@@ -8,9 +8,7 @@
   <ul class="sectionIcons">
     <li><%= image_tag_for_key('edit', edit_institution_path(@institution), "Edit Institution Details", nil, 'Edit Institution Details') -%></li>
     <% if admin_logged_in? -%>
-      <li>
-        <%= image_tag_for_key "destroy", institution_path(@institution), "Delete Institution", { :confirm => 'Are you sure?', :method => :delete }, "Delete Institution" -%>
-      </li>
+        <%= delete_icon(@institution,current_user) %>
     <% end -%>
   </ul>
 <% end %>

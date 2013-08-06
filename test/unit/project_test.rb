@@ -300,4 +300,29 @@ class ProjectTest < ActiveSupport::TestCase
     latest_projects = Project.paginate_after_fetch([project1,project2], :page=>'latest')
     assert_equal project2, latest_projects.first
   end
+
+  test "can_delete?" do
+    project = Factory(:project)
+
+    #none-admin can not delete
+    user = Factory(:user)
+    assert !user.is_admin?
+    assert project.work_groups.collect(&:people).flatten.empty?
+    assert !project.can_delete?(user)
+
+    #can not delete if workgroups contain people
+    user = Factory(:admin).user
+    assert user.is_admin?
+    project = Factory(:project)
+    work_group = Factory(:work_group, :project => project)
+    a_person = Factory(:person, :group_memberships => [Factory(:group_membership, :work_group => work_group)])
+    assert !project.work_groups.collect(&:people).flatten.empty?
+    assert !project.can_delete?(user)
+
+    #can delete if admin and workgroups are empty
+    work_group.group_memberships.delete_all
+    assert project.work_groups.reload.collect(&:people).flatten.empty?
+    assert user.is_admin?
+    assert project.can_delete?(user)
+  end
 end

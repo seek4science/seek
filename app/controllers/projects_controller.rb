@@ -174,11 +174,17 @@ class ProjectsController < ApplicationController
   # DELETE /projects/1.xml
   def destroy
     @project = Project.find(params[:id])
-    @project.destroy
 
     respond_to do |format|
-      format.html { redirect_to(projects_url) }
-      format.xml  { head :ok }
+      if @project.can_delete?
+        @project.destroy
+        format.html { redirect_to(projects_url) }
+        format.xml  { head :ok }
+      else
+        flash[:error] = "Unable to delete this #{t('project')}"
+        format.html { redirect_to(project_url) }
+        format.xml  { render :xml => "Unable to delete this #{t('project')}", :status => :unprocessable_entity }
+      end
     end
   end
   

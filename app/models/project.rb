@@ -198,4 +198,8 @@ class Project < ActiveRecord::Base
     user == nil ? false : (user.is_admin? || (self.has_member?(user) && (user.is_project_manager?)))
   end
 
+  def can_delete?(user=User.current_user)
+    user == nil ? false : (user.is_admin? && work_groups.collect(&:people).flatten.empty?)
+  end
+
 end

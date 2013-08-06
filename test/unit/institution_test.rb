@@ -130,4 +130,29 @@ class InstitutionTest < ActiveSupport::TestCase
     x.save
     assert_equal x.uuid, uuid
   end
+
+  test "can_delete?" do
+    institution = Factory(:institution)
+
+    #none-admin can not delete
+    user = Factory(:user)
+    assert !user.is_admin?
+    assert institution.work_groups.collect(&:people).flatten.empty?
+    assert !institution.can_delete?(user)
+
+    #can not delete if workgroups contain people
+    user = Factory(:admin).user
+    assert user.is_admin?
+    institution = Factory(:project)
+    work_group = Factory(:work_group, :project => institution)
+    a_person = Factory(:person, :group_memberships => [Factory(:group_membership, :work_group => work_group)])
+    assert !institution.work_groups.collect(&:people).flatten.empty?
+    assert !institution.can_delete?(user)
+
+    #can delete if admin and workgroups are empty
+    work_group.group_memberships.delete_all
+    assert institution.work_groups.reload.collect(&:people).flatten.empty?
+    assert user.is_admin?
+    assert institution.can_delete?(user)
+  end
 end

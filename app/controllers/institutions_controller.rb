@@ -95,11 +95,17 @@ class InstitutionsController < ApplicationController
   # DELETE /institutions/1.xml
   def destroy
     @institution = Institution.find(params[:id])
-    @institution.destroy
 
     respond_to do |format|
-      format.html { redirect_to(institutions_url) }
-      format.xml  { head :ok }
+      if @institution.can_delete?
+        @institution.destroy
+        format.html { redirect_to(institutions_url) }
+        format.xml { head :ok }
+      else
+        flash[:error] = "Unable to delete this Institution"
+        format.html { redirect_to(institution_url) }
+        format.xml { render :xml => "Unable to delete this Institution", :status => :unprocessable_entity }
+      end
     end
   end
 

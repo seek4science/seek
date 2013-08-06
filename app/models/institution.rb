@@ -40,6 +40,10 @@ class Institution < ActiveRecord::Base
   # get a listing of all known institutions
   def self.get_all_institutions_listing
     Institution.all.collect { |i| [i.name, i.id] }
-  end  
+  end
+
+  def can_delete?(user=User.current_user)
+    user == nil ? false : (user.is_admin? && work_groups.collect(&:people).flatten.empty?)
+  end
   
 end
