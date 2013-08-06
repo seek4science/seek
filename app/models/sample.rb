@@ -23,7 +23,10 @@ class Sample < ActiveRecord::Base
   belongs_to :institution
   has_and_belongs_to_many :assays
 
-  has_many :sample_assets,:dependent => :destroy
+ has_many :assets_creators, :dependent => :destroy, :as => :asset, :foreign_key => :asset_id
+ has_many :creators, :class_name => "Person", :through => :assets_creators, :order=>'assets_creators.id', :after_add => :update_timestamp, :after_remove => :update_timestamp
+
+ has_many :sample_assets,:dependent => :destroy
   validates_numericality_of :age_at_sampling, :greater_than=> 0, :allow_nil=> true, :message => "is invalid value", :unless => "Seek::Config.is_virtualliver"
   validates_presence_of :projects, :unless => "Seek::Config.is_virtualliver"
   def self.sop_sql()
