@@ -6,7 +6,7 @@ If you have installed SEEK, please take a moment to fill out our very short,opti
 
 SEEK is based upon the Ruby on Rails platform. Although the information on this page should provide you with everything you need to get a basic installation of
 SEEK up and running, some background reading on Ruby on Rails would be beneficial if it is new to you. Documentation and resources describing Ruby on Rails can be found
-at http://rubyonrails.org/documentation.
+at http://rubyonrails.org/documentation .
 
 SEEK is based on the 3.2 version of Rails, and requires Ruby 1.9.3.
 
