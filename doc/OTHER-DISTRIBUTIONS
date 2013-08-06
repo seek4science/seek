@@ -1,8 +1,39 @@
 = Installing SEEK for other Linux distributions
 
+Our main {Install Guide}[link:doc/INSTALL.html] is based upon the Ubuntu 12.04 (LTS) distribution and version. However, other than the distribution
+packages the install process should be very similar for other distributions.
+
+For some other common distributions, we describe here the required distribution packages, and any other differences we are aware of from our general install guide.
+
 == Ubuntu 10.04 (LTS)
 
-<em>TODO</em>
+The general packages:
+
+  sudo apt-get install wget curl mercurial ruby rdoc ri libopenssl-ruby ruby-dev mysql-server libssl-dev build-essential openssh-server git-core
+  sudo apt-get install libmysqlclient16-dev libmagick++-dev libxslt-dev libxml++2.6-dev openjdk-6-jdk graphviz libsqlite3-dev sqlite3
+  sudo apt-get install poppler-utils openoffice.org openoffice.org-java-common
+
+To avoid being prompted during the Ruby 1.9.3 installation with RVM:
+
+  sudo apt-get install libreadline6-dev libyaml-dev autoconf libgdbm-dev libncurses5-dev automake bison libffi-dev
+
+To install the Passenger Phusion module to run SEEK with Apache:
+
+  sudo apt-get install apache2-mpm-prefork apache2-prefork-dev libapr1-dev libaprutil1-dev libcurl4-openssl-dev
+
+
+The command to start soffice is also slightly different, using just single rather than double hyphens for the arguments:
+
+  soffice -headless -accept="socket,host=127.0.0.1,port=8100;urp;" -nofirststartwizard > /dev/null 2>&1 &
+
+If you find the conversion of documents to PDF (for View Content in the browser) is slow, you can install a more recent LibreOffice 3.5
+from a separate repository - although this may affect future Operating System upgrades:
+
+   sudo apt-get purge openoffice* libreoffice*
+   sudo apt-get install python-software-properties
+   sudo add-apt-repository ppa:libreoffice/libreoffice-3-5
+   sudo apt-get update
+   sudo apt-get install libreoffice
 
 == Debian Wheezy
 

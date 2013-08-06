@@ -5,7 +5,6 @@
 We always recommend you backup before doing an upgrade, but in this case it is even more important. Please read our
 {Backup Guide}[link:doc/BACKUPS.html] for details on what to backup and some tips on how to do so.
 
-
 == Upgrading a Production SEEK
 
 If you run SEEK in a production environment, first set your environment variable. You will need to do this if you

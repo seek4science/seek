@@ -1,17 +1,17 @@
-Mon, 05 Aug 2013 15:56:44 +0100
-doc/README	Tue, 07 May 2013 16:42:07 +0100
-doc/CREDITS	Mon, 05 Aug 2013 15:56:26 +0100
-doc/INSTALL	Mon, 05 Aug 2013 11:52:57 +0100
-doc/INSTALL-PRODUCTION	Thu, 01 Aug 2013 17:18:35 +0100
-doc/OTHER-DISTRIBUTIONS	Thu, 01 Aug 2013 11:35:11 +0100
-doc/UPGRADING	Mon, 05 Aug 2013 11:56:05 +0100
-doc/EARLIER-UPGRADES	Mon, 05 Aug 2013 11:38:27 +0100
-doc/UPGRADING-TO-0-18	Mon, 05 Aug 2013 15:53:22 +0100
-doc/BACKUPS	Fri, 22 Feb 2013 15:26:21 +0000
-doc/ADMINISTRATION	Thu, 01 Aug 2013 17:17:16 +0100
-doc/SETTING-UP-VIRTUOSO	Thu, 18 Jul 2013 16:56:54 +0100
-lib/seek/rdf/rdf_repository.rb	Thu, 18 Jul 2013 16:11:04 +0100
-lib/seek/rdf/rdf_repository_storage.rb	Thu, 18 Jul 2013 16:06:04 +0100
-lib/seek/rdf/rdf_file_storage.rb	Thu, 18 Jul 2013 16:10:01 +0100
-lib/seek/rdf/virtuoso_repository.rb	Tue, 16 Jul 2013 14:13:53 +0100
-lib/seek/rdf/rdf_generation.rb	Thu, 18 Jul 2013 17:00:12 +0100
+Tue, 06 Aug 2013 15:19:32 +0100
+doc/README	Tue, 06 Aug 2013 14:22:47 +0100
+doc/CREDITS	Tue, 06 Aug 2013 14:22:47 +0100
+doc/INSTALL	Tue, 06 Aug 2013 14:22:47 +0100
+doc/INSTALL-PRODUCTION	Tue, 06 Aug 2013 14:22:47 +0100
+doc/OTHER-DISTRIBUTIONS	Tue, 06 Aug 2013 15:02:00 +0100
+doc/UPGRADING	Tue, 06 Aug 2013 14:22:48 +0100
+doc/EARLIER-UPGRADES	Tue, 06 Aug 2013 14:22:47 +0100
+doc/UPGRADING-TO-0-18	Tue, 06 Aug 2013 15:10:46 +0100
+doc/BACKUPS	Tue, 06 Aug 2013 14:22:47 +0100
+doc/ADMINISTRATION	Tue, 06 Aug 2013 14:22:47 +0100
+doc/SETTING-UP-VIRTUOSO	Tue, 06 Aug 2013 14:22:47 +0100
+lib/seek/rdf/rdf_repository.rb	Tue, 06 Aug 2013 14:22:52 +0100
+lib/seek/rdf/rdf_repository_storage.rb	Tue, 06 Aug 2013 14:22:52 +0100
+lib/seek/rdf/rdf_file_storage.rb	Tue, 06 Aug 2013 14:22:52 +0100
+lib/seek/rdf/virtuoso_repository.rb	Tue, 06 Aug 2013 14:22:52 +0100
+lib/seek/rdf/rdf_generation.rb	Tue, 06 Aug 2013 14:22:52 +0100
