@@ -35,14 +35,18 @@ from a separate repository - although this may affect future Operating System up
    sudo apt-get update
    sudo apt-get install libreoffice
 
-== Debian Wheezy
+== Debian Wheezy ( version 7.1 )
 
-<em>TODO</em>
+By default, the user you create for Debian during the installation is not added to the sudoers list. You may want to add your user to the <em>sudo</em> group e.g
 
-== CentOS
+  adduser fred sudo
 
-<em>Contributions welcome</em>
+more details can be found at https://wiki.debian.org/sudo
 
-== Fedora
+Alternatively, when following the installation run commands that start with <em>sudo</em> as the root user.
 
-<em>Contributions welcome</em>
+The required package names are just the same as for Ubuntu 12.04 - so just follow the install guide.
+
+If you encounter issues related to <em>rvm use</em> - you may need to configure your terminal to run commands as a login shell. There is a checkbox that can be found under the menu <em>Edit</em>, <em>Profile Preferences</em> and then
+under the tab <em>Title and Command</em>.
+

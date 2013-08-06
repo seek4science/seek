@@ -146,17 +146,27 @@ sudo add-apt-repository ppa:libreoffice/libreoffice-3-5
 sudo apt-get update
 sudo apt-get install libreoffice</pre>
 
-<h2 id="label-Debian+Wheezy">Debian Wheezy</h2>
+<h2 id="label-Debian+Wheezy+%28+version+7.1+%29">Debian Wheezy ( version 7.1 )</h2>
 
-<p><em>TODO</em></p>
+<p>By default, the user you create for Debian during the installation is not
+added to the sudoers list. You may want to add your user to the
+<em>sudo</em> group e.g</p>
 
-<h2 id="label-CentOS">CentOS</h2>
+<pre>adduser fred sudo</pre>
 
-<p><em>Contributions welcome</em></p>
+<p>more details can be found at <a
+href="https://wiki.debian.org/sudo">wiki.debian.org/sudo</a></p>
 
-<h2 id="label-Fedora">Fedora</h2>
+<p>Alternatively, when following the installation run commands that start with
+<em>sudo</em> as the root user.</p>
 
-<p><em>Contributions welcome</em></p>
+<p>The required package names are just the same as for Ubuntu 12.04 - so just
+follow the install guide.</p>
+
+<p>If you encounter issues related to <em>rvm use</em> - you may need to
+configure your terminal to run commands as a login shell. There is a
+checkbox that can be found under the menu <em>Edit</em>, <em>Profile
+Preferences</em> and then under the tab <em>Title and Command</em>.</p>
 
 </div>
 

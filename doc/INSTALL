@@ -39,6 +39,9 @@ The remaining packages are:
   sudo apt-get install wget curl mercurial ruby libssl-dev build-essential openssh-server git-core libreadline-dev
   sudo apt-get install libxml++2.6-dev openjdk-7-jdk graphviz libsqlite3-dev sqlite3
   sudo apt-get install poppler-utils libreoffice libmysqlclient-dev libmagick++-dev libxslt1-dev
+
+Installing these packages now will make installing Ruby 1.9.3 easier later on:
+
   sudo apt-get install gawk libyaml-dev autoconf libgdbm-dev libncurses5-dev automake bison libffi-dev
 
 == Development or Production?
