@@ -49,15 +49,20 @@ SEEK::Application.routes.draw do
     end
   end
 
-  resources :help_documents
-
-  resources :help_attachments, :only => [:create, :destroy] do
+  resources :help, controller: 'help_documents', as: :help_documents do
+    resources :attachments, controller: 'help_attachments', as: :help_attachments,only: [:create,:destroy] do
+      member do
+        get :download
+      end
+    end
+    resources :images, controller: 'help_images', as: :help_images, only: [:create, :destroy]
+  end
+  resources :help_attachments, only: [:create,:destroy] do
     member do
       get :download
     end
-
   end
-  resources :help_images, :only => [:create, :destroy]
+  resources :help_images, only: [:create, :destroy]
 
   resources :forum_attachments, :only => [:create, :destroy] do
     member do

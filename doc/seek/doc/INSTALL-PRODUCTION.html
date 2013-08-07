@@ -125,9 +125,9 @@ installation simpler, give this user a dedicated home directory:</p>
 <pre>sudo /etc/init.d/apache2 stop
 sudo usermod -d /home/www-data www-data
 sudo usermod -s /bin/bash www-data
-sudo /etc/init.d/apache2 start
 sudo mkdir /home/www-data
-sudo chown www-data /home/www-data</pre>
+sudo chown www-data /home/www-data
+sudo /etc/init.d/apache2 start</pre>
 
 <p>We recommend installing SEEK in /srv/rails/seek - first you need to create
 this and grant permissions to www-data</p>
