@@ -10,7 +10,7 @@ class PublishingPermissionsTest < ActiveSupport::TestCase
     log = ResourcePublishLog.add_log(ResourcePublishLog::REJECTED, df)
     assert df.is_rejected?
 
-    log.created_at=7.months.ago
+    log.created_at=4.months.ago
     assert log.save
     assert !df.is_rejected?
   end
@@ -25,7 +25,7 @@ class PublishingPermissionsTest < ActiveSupport::TestCase
       assert df.is_waiting_approval?
       assert df.is_waiting_approval?(User.current_user)
 
-      log.created_at=7.months.ago
+      log.created_at=4.months.ago
       assert log.save
       assert !df.is_waiting_approval?
     end
@@ -70,13 +70,27 @@ class PublishingPermissionsTest < ActiveSupport::TestCase
     assert !Factory(:publication).is_in_isa_publishable?
   end
 
-  test "publishable when item is manageable and is not yet published" do
+  test "publishable when item is manageable and is not yet published and gatekeeper is not required" do
     user = Factory(:user)
     User.with_current_user user do
       df = Factory(:data_file, :contributor => User.current_user)
       assert df.can_manage?,'This item must be manageable for the test to succeed'
       assert !df.is_published?,'This item must be not published for the test to succeed'
       assert !df.gatekeeper_required?,'This item must not require gatekeeper for the test to succeed'
+
+      assert df.can_publish?,'This item should be publishable'
+    end
+  end
+
+  test "publishable when item is manageable and is not yet published and gatekeeper is required and is not waiting for approval and is not rejected" do
+    user = Factory(:user)
+    User.with_current_user user do
+      df = Factory(:data_file, :contributor => User.current_user, :projects => Factory(:gatekeeper).projects)
+      assert df.can_manage?,'This item must be manageable for the test to succeed'
+      assert !df.is_published?,'This item must be not published for the test to succeed'
+      assert df.gatekeeper_required?,'This item must require gatekeeper for the test to be meaningful'
+      assert !df.is_waiting_approval?(User.current_user),'This item must not be waiting for approval for the test to be meaningful'
+      assert !df.is_rejected?,'This item must require gatekeeper for the test to be meaningful'
 
       assert df.can_publish?,'This item should be publishable'
     end
@@ -106,38 +120,136 @@ class PublishingPermissionsTest < ActiveSupport::TestCase
     end
   end
 
-  test "publish! is performed when can manage and no gatekeeper is required" do
+  test "not publishable when item is waiting for approval" do
+    user = Factory(:user)
+    User.with_current_user user do
+      df = Factory(:data_file, :contributor => User.current_user, :projects => Factory(:gatekeeper).projects)
+      df.resource_publish_logs.create(:publish_state=>ResourcePublishLog::WAITING_FOR_APPROVAL,:culprit=>User.current_user)
+      assert df.can_manage?,'This item must be manageable for the test to be meaningful'
+      assert !df.is_published?,'This item must be not published for the test to be meaningful'
+      assert df.gatekeeper_required?,'This item must require gatekeeper for the test to succeed'
+      assert df.is_waiting_approval?(User.current_user),'This item must be waiting for approval for the test to succeed'
+      assert !df.is_rejected?,'This item must not be rejected for the test to be meaningful'
+
+      assert !df.can_publish?,'This item should not be publishable'
+    end
+  end
+
+  test "not publishable when item was rejected" do
+    user = Factory(:user)
+    User.with_current_user user do
+      df = Factory(:data_file, :contributor => User.current_user, :projects => Factory(:gatekeeper).projects)
+      df.resource_publish_logs.create(:publish_state=>ResourcePublishLog::REJECTED)
+      assert df.can_manage?,'This item must be manageable for the test to be meaningful'
+      assert !df.is_published?,'This item must be not published for the test to be meaningful'
+      assert df.gatekeeper_required?,'This item must require gatekeeper for the test to succeed'
+      assert !df.is_waiting_approval?(User.current_user),'This item must be waiting for approval for the test to be meaningful'
+      assert df.is_rejected?,'This item must not be rejected for the test to succeed'
+
+      assert !df.can_publish?,'This item should not be publishable'
+    end
+  end
+
+  test "gatekeeper of asset can publish if they can manage it as well" do
+      gatekeeper = Factory(:gatekeeper)
+      datafile = Factory(:data_file, :projects => gatekeeper.projects, :contributor => gatekeeper.user)
+
+      User.with_current_user gatekeeper.user do
+        assert gatekeeper.is_gatekeeper_of?(datafile),'The gatekeeper must be the gatekeeper of the datafile for the test to succeed'
+        assert datafile.can_manage?,'The datafile must be manageable for the test to succeed'
+
+        assert datafile.can_publish?,'This datafile should be publishable'
+      end
+  end
+
+  test "gatekeeper of asset can publish, if the asset is waiting for his approval" do
+    gatekeeper = Factory(:gatekeeper)
+    datafile = Factory(:data_file, :projects => gatekeeper.projects)
+    datafile.resource_publish_logs.create(:publish_state=>ResourcePublishLog::WAITING_FOR_APPROVAL,:culprit=>datafile.contributor)
+
+    User.with_current_user gatekeeper.user do
+      assert gatekeeper.is_gatekeeper_of?(datafile),'The gatekeeper must be the gatekeeper of datafile for the test to succeed'
+      assert !datafile.can_manage?,'The datafile must be manageable for the test to be meaningful'
+      assert datafile.is_waiting_approval?,'The datafile must be waiting for approval for the test to succeed'
+
+      assert datafile.can_publish?,'This datafile should be publishable'
+    end
+  end
+
+  test "gatekeeper can not publish asset which he is not the gatekeeper of" do
+    gatekeeper = Factory(:gatekeeper)
+    datafile = Factory(:data_file)
+    datafile.resource_publish_logs.create(:publish_state=>ResourcePublishLog::WAITING_FOR_APPROVAL,:culprit=>datafile.contributor)
+
+    User.with_current_user gatekeeper.user do
+      assert !gatekeeper.is_gatekeeper_of?(datafile),'The gatekeeper must not be the gatekeeper of datafile for the test to be succeed'
+      assert datafile.is_waiting_approval?,'The datafile must be waiting for approval for the test to be meaningful'
+
+      assert !datafile.can_publish?,'This datafile should not be publishable'
+    end
+  end
+
+  test "gatekeeper of asset can not publish, if they can not manage and the asset is not waiting for his approval" do
+    gatekeeper = Factory(:gatekeeper)
+    datafile = Factory(:data_file, :projects => gatekeeper.projects)
+
+    User.with_current_user gatekeeper.user do
+      assert gatekeeper.is_gatekeeper_of?(datafile), 'The gatekeeper must be the gatekeeper of datafile for the test to be meaningful'
+      assert !datafile.can_manage?, 'The datafile must not be manageable for the test to succeed'
+      assert !datafile.is_waiting_approval?,'The datafile must be waiting for approval for the test to succeed'
+
+      assert !datafile.can_publish?, 'This datafile should not be publishable'
+    end
+  end
+
+  test "gatekeeper can not publish if the asset is already published" do
+    gatekeeper = Factory(:gatekeeper)
+    datafile = Factory(:data_file,:projects => gatekeeper.projects,
+                       :policy => Factory(:public_policy),:contributor=>gatekeeper.user)
+
+    User.with_current_user gatekeeper.user do
+      assert datafile.is_published?,"This datafile must be already published for the test to succeed"
+      assert gatekeeper.is_gatekeeper_of?(datafile), 'The gatekeeper must be the gatekeeper of datafile for the test to be meaningful'
+      assert datafile.can_manage?, 'The datafile must not be manageable for the test to succeed'
+
+      assert !datafile.can_publish?, 'This datafile should not be publishable'
+    end
+  end
+
+  test "publish! only when can_publish?" do
     user = Factory(:user)
     df = Factory(:data_file, :contributor => user)
     User.with_current_user user do
-      assert df.can_manage?, 'The datafile must be manageable for the test to succeed'
+      assert df.can_publish?
+      assert df.publish!
+    end
+
+    assert !df.can_publish?
+    assert !df.publish!
+  end
+
+  test "publish! is performed when no gatekeeper is required" do
+    user = Factory(:user)
+    df = Factory(:data_file, :contributor => user)
+    User.with_current_user user do
+      assert df.can_publish?,'The datafile must be publishable'
       assert !df.gatekeeper_required?, 'The gatekeeper must not be required for the test to succeed'
+      assert !df.is_published?,'This datafile must not be published yet for the test to be meaningful'
 
       assert df.publish!
       assert df.is_published?,'This datafile should be published now'
     end
   end
 
-  test "publish! is not performed when can not manage even no gatekeeper is required" do
-    df = Factory(:data_file)
-    User.with_current_user Factory(:user) do
-      assert !df.can_manage?, 'The datafile must be manageable for the test to succeed'
-      assert !df.gatekeeper_required?, 'The gatekeeper must not be required for the test to succeed'
-
-      assert !df.publish!
-      assert !df.is_published?,'This datafile should be published now'
-    end
-  end
-
-  test "publish! is performed when you are the gatekeeper of the item and the item is waiting for your approval" do
+  test "publish! is performed when you are the gatekeeper of the item" do
     gatekeeper = Factory(:gatekeeper)
     df = Factory(:data_file, :projects=>gatekeeper.projects)
     df.resource_publish_logs.create(:publish_state=>ResourcePublishLog::WAITING_FOR_APPROVAL)
 
     User.with_current_user gatekeeper.user do
-      assert df.gatekeeper_required?, 'The gatekeeper must be required for the test to succeed'
-      assert gatekeeper.is_gatekeeper_of?(df), 'The gatekeeper must be the gatekeeper of this asset for the test to succeed'
-      assert df.is_waiting_approval?, 'The item must not be requested for approval for the test to succeed'
+      assert df.can_publish?,'The datafile must be publishable for the test to succeed'
+      assert df.gatekeeper_required?, 'The gatekeeper must not be required for the test to succeed'
+      assert !df.is_published?,'This datafile must not be published yet for the test to be meaningful'
 
       assert df.publish!
       assert df.is_published?,'This datafile should be published now'
@@ -150,25 +262,13 @@ class PublishingPermissionsTest < ActiveSupport::TestCase
     df = Factory(:data_file, :projects=>gatekeeper.projects, :contributor => user)
 
     User.with_current_user user do
-      assert df.gatekeeper_required?, 'The gatekeeper must be required for the test to succeed'
+      assert df.can_publish?,'The datafile must be publishable for the test to succeed'
+      assert df.gatekeeper_required?, 'The gatekeeper must not be required for the test to succeed'
       assert !user.person.is_gatekeeper_of?(df), 'You are not the gatekeeper of this datafile for the test to succeed'
+      assert !df.is_published?,'This datafile must not be published yet for the test to be meaningful'
 
       assert !df.publish!
       assert !df.is_published?,'This datafile should not be published'
-    end
-  end
-
-  test "publish! is not performed when the item has not been requested for approval" do
-    gatekeeper = Factory(:gatekeeper)
-    df = Factory(:data_file, :projects=>gatekeeper.projects)
-
-    User.with_current_user gatekeeper.user do
-      assert df.gatekeeper_required?, 'The gatekeeper must be required for the test to succeed'
-      assert gatekeeper.is_gatekeeper_of?(df), 'The gatekeeper must be the gatekeeper of this asset for the test to succeed'
-      assert !df.is_waiting_approval?, 'The item must not be requested for approval for the test to succeed'
-
-      assert !df.publish!
-      assert !df.is_published?,'This datafile should be published now'
     end
   end
 
