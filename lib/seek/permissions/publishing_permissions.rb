@@ -17,7 +17,8 @@ module Seek
         if self.new_record?
           true
         else
-          !self.is_published?
+          return false if self.is_published?
+          !self.is_waiting_approval?(user) && !self.is_rejected?
         end
       end
 

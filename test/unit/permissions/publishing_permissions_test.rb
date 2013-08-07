@@ -10,7 +10,7 @@ class PublishingPermissionsTest < ActiveSupport::TestCase
     log = ResourcePublishLog.add_log(ResourcePublishLog::REJECTED, df)
     assert df.is_rejected?
 
-    log.created_at=7.months.ago
+    log.created_at=4.months.ago
     assert log.save
     assert !df.is_rejected?
   end
@@ -25,7 +25,7 @@ class PublishingPermissionsTest < ActiveSupport::TestCase
       assert df.is_waiting_approval?
       assert df.is_waiting_approval?(User.current_user)
 
-      log.created_at=7.months.ago
+      log.created_at=4.months.ago
       assert log.save
       assert !df.is_waiting_approval?
     end
@@ -70,13 +70,14 @@ class PublishingPermissionsTest < ActiveSupport::TestCase
     assert !Factory(:publication).is_in_isa_publishable?
   end
 
-  test "publishable when item is manageable and is not yet published" do
+  test "publishable when item is manageable and is not yet published and is not waiting for approval and is not rejected" do
     user = Factory(:user)
     User.with_current_user user do
-      df = Factory(:data_file, :contributor => User.current_user)
+      df = Factory(:data_file, :contributor => User.current_user, :projects => Factory(:gatekeeper).projects)
       assert df.can_manage?,'This item must be manageable for the test to succeed'
       assert !df.is_published?,'This item must be not published for the test to succeed'
-      assert !df.gatekeeper_required?,'This item must not require gatekeeper for the test to succeed'
+      assert !df.is_waiting_approval?(User.current_user),'This item must not be waiting for approval for the test to be meaningful'
+      assert !df.is_rejected?,'This item must require gatekeeper for the test to be meaningful'
 
       assert df.can_publish?,'This item should be publishable'
     end
@@ -88,7 +89,6 @@ class PublishingPermissionsTest < ActiveSupport::TestCase
       df = Factory(:data_file, :policy => Factory(:all_sysmo_viewable_policy))
       assert !df.can_manage?,'This item must be manageable for the test to succeed'
       assert !df.is_published?,'This item must be not published for the test to be meaningful'
-      assert !df.gatekeeper_required?,'This item must require gatekeeper for the test to be meaningful'
 
       assert !df.can_publish?,'This item should not be publishable'
     end
@@ -100,7 +100,34 @@ class PublishingPermissionsTest < ActiveSupport::TestCase
       df = Factory(:data_file, :policy => Factory(:public_policy))
       assert df.can_manage?,'This item must be manageable for the test to be meaningful'
       assert df.is_published?,'This item must be not published for the test to succeed'
-      assert !df.gatekeeper_required?,'This item must require gatekeeper for the test to be meaningful'
+
+      assert !df.can_publish?,'This item should not be publishable'
+    end
+  end
+
+  test "not publishable when item is waiting for approval" do
+    user = Factory(:user)
+    User.with_current_user user do
+      df = Factory(:data_file, :contributor => User.current_user, :projects => Factory(:gatekeeper).projects)
+      df.resource_publish_logs.create(:publish_state=>ResourcePublishLog::WAITING_FOR_APPROVAL,:culprit=>User.current_user)
+      assert df.can_manage?,'This item must be manageable for the test to be meaningful'
+      assert !df.is_published?,'This item must be not published for the test to be meaningful'
+      assert df.is_waiting_approval?(User.current_user),'This item must be waiting for approval for the test to succeed'
+      assert !df.is_rejected?,'This item must not be rejected for the test to be meaningful'
+
+      assert !df.can_publish?,'This item should not be publishable'
+    end
+  end
+
+  test "not publishable when item was rejected" do
+    user = Factory(:user)
+    User.with_current_user user do
+      df = Factory(:data_file, :contributor => User.current_user, :projects => Factory(:gatekeeper).projects)
+      df.resource_publish_logs.create(:publish_state=>ResourcePublishLog::REJECTED)
+      assert df.can_manage?,'This item must be manageable for the test to be meaningful'
+      assert !df.is_published?,'This item must be not published for the test to be meaningful'
+      assert !df.is_waiting_approval?(User.current_user),'This item must be waiting for approval for the test to be meaningful'
+      assert df.is_rejected?,'This item must not be rejected for the test to succeed'
 
       assert !df.can_publish?,'This item should not be publishable'
     end
