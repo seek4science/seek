@@ -10,33 +10,30 @@ module Seek
       end
 
       def can_publish? user=User.current_user
-        (Ability.new(user).can? :publish, self) || (can_manage?(user) && state_allows_publish?(user))
+        can_manage?(user) && state_allows_publish?(user)
       end
 
       def state_allows_publish? user=User.current_user
         if self.new_record?
-          return true if !self.gatekeeper_required?
-          !self.is_waiting_approval?(user) && !self.is_rejected?
+          true
         else
-          return false if self.is_published?
-          return true if !self.gatekeeper_required?
-          !self.is_waiting_approval?(user) && !self.is_rejected?
+          !self.is_published?
         end
       end
 
       def publish!
-        if can_publish?
-          if gatekeeper_required? && !User.current_user.person.is_gatekeeper_of?(self)
-            false
+        if gatekeeper_required?
+          if User.current_user.person.is_gatekeeper_of?(self) && self.is_waiting_approval?
+            change_policy_to_public
           else
-            policy.access_type=Policy::ACCESSIBLE
-            policy.sharing_scope=Policy::EVERYONE
-            policy.save
-            self.resource_publish_logs.create(:publish_state=>ResourcePublishLog::PUBLISHED,:culprit=>User.current_user)
-            touch
+            false
           end
         else
-          false
+          if can_manage?
+            change_policy_to_public
+          else
+            false
+          end
         end
       end
 
@@ -49,12 +46,12 @@ module Seek
         end
       end
 
-      def is_rejected? time=3.months.ago
+      def is_rejected? time=ResourcePublishLog::CONSIDERING_TIME.ago
         !ResourcePublishLog.where(["resource_type=? AND resource_id=? AND publish_state=? AND created_at >?",
                                                 self.class.name,self.id,ResourcePublishLog::REJECTED, time]).empty?
       end
 
-      def is_waiting_approval? user=nil,time=3.months.ago
+      def is_waiting_approval? user=nil,time=ResourcePublishLog::CONSIDERING_TIME.ago
         if user
           !ResourcePublishLog.where(["resource_type=? AND resource_id=? AND culprit_type=? AND culprit_id=? AND publish_state=? AND created_at >?",
                                                       self.class.name,self.id, user.class.name, user.id,ResourcePublishLog::WAITING_FOR_APPROVAL,time]).empty?
@@ -90,6 +87,15 @@ module Seek
         end
       end
 
+      private
+
+      def change_policy_to_public
+        policy.access_type=Policy::ACCESSIBLE
+        policy.sharing_scope=Policy::EVERYONE
+        policy.save
+        self.resource_publish_logs.create(:publish_state=>ResourcePublishLog::PUBLISHED,:culprit=>User.current_user)
+        touch
+      end
     end
   end
 end

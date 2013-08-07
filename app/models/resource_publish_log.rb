@@ -8,6 +8,7 @@ class ResourcePublishLog < ActiveRecord::Base
   UNPUBLISHED = 3
   REJECTED=4
 
+  CONSIDERING_TIME = 6.months
 
   def self.add_log publish_state, resource, comment="", user=User.current_user
     ResourcePublishLog.create(
