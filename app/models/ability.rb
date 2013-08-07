@@ -46,6 +46,18 @@ class Ability
 
   #gatekeeper can publish the assets belonging to their project if as well can manage or the item is waiting for his approval
   def gatekeeper gatekeeper
-
+    can :publish, :all do |item|
+      if gatekeeper.is_gatekeeper_of?(item)
+        if item.can_manage?(gatekeeper.user) && !item.is_published?
+          true
+        elsif !item.is_published? && item.is_waiting_approval?(nil, 5.years.ago)
+          true
+        else
+          false
+        end
+      else
+        false
+      end
+    end
   end
 end
