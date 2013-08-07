@@ -74,6 +74,8 @@ gem 'my_annotations', :git=>"git://github.com/myGrid/annotations.git"
 
 gem 'passenger'
 
+gem "unicorn-rails"
+
 group :development do
   gem "sqlite3","1.3.7"
   gem "pry"
@@ -81,7 +83,6 @@ group :development do
   gem "pry-remote"
   gem "request-log-analyzer"
   gem 'rails-dev-boost', :git => 'git://github.com/thedarkone/rails-dev-boost.git'
-  gem "unicorn-rails"
 end
 
 group :test do
