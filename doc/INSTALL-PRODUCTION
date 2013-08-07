@@ -20,9 +20,10 @@ You will need to install SEEK as the www-data user. First, to make the installat
   sudo /etc/init.d/apache2 stop
   sudo usermod -d /home/www-data www-data
   sudo usermod -s /bin/bash www-data
-  sudo /etc/init.d/apache2 start
   sudo mkdir /home/www-data
   sudo chown www-data /home/www-data
+  sudo /etc/init.d/apache2 start
+
 
 We recommend installing SEEK in /srv/rails/seek - first you need to create this and grant permissions to www-data
 

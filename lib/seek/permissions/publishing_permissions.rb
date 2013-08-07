@@ -49,12 +49,12 @@ module Seek
         end
       end
 
-      def is_rejected? time=3.months.ago
+      def is_rejected? time=ResourcePublishLog::CONSIDERING_TIME.ago
         !ResourcePublishLog.where(["resource_type=? AND resource_id=? AND publish_state=? AND created_at >?",
                                                 self.class.name,self.id,ResourcePublishLog::REJECTED, time]).empty?
       end
 
-      def is_waiting_approval? user=nil,time=3.months.ago
+      def is_waiting_approval? user=nil,time=ResourcePublishLog::CONSIDERING_TIME.ago
         if user
           !ResourcePublishLog.where(["resource_type=? AND resource_id=? AND culprit_type=? AND culprit_id=? AND publish_state=? AND created_at >?",
                                                       self.class.name,self.id, user.class.name, user.id,ResourcePublishLog::WAITING_FOR_APPROVAL,time]).empty?

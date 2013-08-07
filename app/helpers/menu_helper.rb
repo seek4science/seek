@@ -46,9 +46,9 @@ module MenuHelper
 
     definitions << {:title=>t("menu.documentation"),:spacer=>true, :sections=>[
         {:controller=>"help_documents",:title=>t("menu.help")},
-        {:path=>"/help_documents/faq",:title=>t("menu.faq")},
-        {:path=>"/help_documents/templates",:title=>t("menu.jerm_templates")},
-        {:path=>"/help_documents/isa-best-practice",:title=>t("menu.isa_best_practice")}
+        {:path=>"/help/faq",:title=>t("menu.faq")},
+        {:path=>"/help/templates",:title=>t("menu.jerm_templates")},
+        {:path=>"/help/isa-best-practice",:title=>t("menu.isa_best_practice")}
     ]}
     definitions
   end
