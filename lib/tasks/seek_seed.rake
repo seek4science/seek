@@ -13,7 +13,7 @@ end
 namespace :seek do
   include Seek::FactorStudied
   include SysMODB::SpreadsheetExtractor
-  
+
   desc 'seeds the database with the controlled vocabularies'
   task :seed=>[:environment,:seed_testing,:load_help_docs]
 
@@ -43,10 +43,10 @@ namespace :seek do
 
   desc "seeds the database with the list of compounds and synonyms extracted from sabio-rk and stored in config/default_data/"
   task(:compounds=>:environment) do
-    Fixtures.create_fixtures(File.join(Rails.root, "config/default_data"), "compounds")
-    Fixtures.create_fixtures(File.join(Rails.root, "config/default_data"), "synonyms")
-    Fixtures.create_fixtures(File.join(Rails.root, "config/default_data"), "mappings")
-    Fixtures.create_fixtures(File.join(Rails.root, "config/default_data"), "mapping_links")
+    ActiveRecord::Fixtures.create_fixtures(File.join(Rails.root, "config/default_data"), "compounds")
+    ActiveRecord::Fixtures.create_fixtures(File.join(Rails.root, "config/default_data"), "synonyms")
+    ActiveRecord::Fixtures.create_fixtures(File.join(Rails.root, "config/default_data"), "mappings")
+    ActiveRecord::Fixtures.create_fixtures(File.join(Rails.root, "config/default_data"), "mapping_links")
   end
 
   task(:culture_growth_types=>:environment) do
