@@ -86,7 +86,6 @@ namespace :seek do
     BioportalConcept.delete_all
     ActiveRecord::Fixtures.create_fixtures(File.join(Rails.root, "config/default_data"), "bioportal_concepts")
 
-    revert_fixtures_identify
     Strain.delete_all
     ActiveRecord::Fixtures.create_fixtures(File.join(Rails.root, "config/default_data"), "strains")
     disable_authorization_checks do
