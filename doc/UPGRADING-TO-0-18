@@ -36,7 +36,7 @@ To install RVM follow the steps at https://rvm.io/rvm/install . The current basi
 
 to save restarting your shell run:
 
-  source $HOME/.rvm/scripts/rvm
+  source ~/.rvm/scripts/rvm
 
 now install Ruby 1.9.3
 
