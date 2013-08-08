@@ -98,12 +98,6 @@ min-width:
 }
 
 
-
-
-.box_editing {
-	
-}
-
 .box_editing_inner {
 	padding: 0.5em;
 	border: 1px solid #9BCDFF;
@@ -1745,6 +1739,17 @@ ul.usage_times_list {
     text-align: center;
 }
 
+.box_infotext {
+    background-color: #FFFFCC;
+    margin: 0;
+    padding: 0.5em 0.8em;
+    border: 1px solid #EED799;
+    line-height: 1.4;
+}
 
+.none_text {
+    font-style: italic;
+    color: #666666;
+}
 
 
