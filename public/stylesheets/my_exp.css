@@ -1158,19 +1158,7 @@ div.auto_complete ul strong.highlight {
 
 
 
-.box_infotext {
-	font-size: 93%;
-	background-color: #FFFFCC;
-	margin: 0; 
-	padding: 0.5em 0.8em;
-	border: 1px solid #EED799;
-	line-height: 1.4;
-}
 
-.none_text {
-	font-style: italic;
-	color: #666666;
-}
 
 .denied_text {
 	font-style: italic;

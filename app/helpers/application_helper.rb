@@ -18,6 +18,10 @@ module ApplicationHelper
     str.html_safe
   end
 
+  def show_title title
+    render :partial=>"general/item_title", :locals=>{:title=>title}
+  end
+
   def version_text
     "(v.#{SEEK::Application::APP_VERSION.to_s})"
   end
