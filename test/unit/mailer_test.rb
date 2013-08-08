@@ -138,7 +138,7 @@ class MailerTest < ActionMailer::TestCase
     resource = data_files(:picture)
     gatekeeper = people(:gatekeeper_person)
     requester = people(:aaron_person)
-    @expected.subject = "A SEEK gatekeeper approved your request to publish: #{resource.title}"
+    @expected.subject = "A SEEK Gatekeeper approved your request to publish: #{resource.title}"
 
     @expected.to = requester.email_with_name
     @expected.from = "no-reply@sysmo-db.org"
@@ -155,7 +155,7 @@ class MailerTest < ActionMailer::TestCase
     resource = data_files(:picture)
     gatekeeper = people(:gatekeeper_person)
     requester = people(:aaron_person)
-    @expected.subject = "A SEEK gatekeeper rejected your request to publish: #{resource.title}"
+    @expected.subject = "A SEEK Gatekeeper rejected your request to publish: #{resource.title}"
 
     @expected.to = requester.email_with_name
     @expected.from = "no-reply@sysmo-db.org"
