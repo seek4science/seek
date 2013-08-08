@@ -69,7 +69,7 @@ module Seek
       end
 
       def gatekeepers
-        self.projects.collect(&:gatekeepers).flatten
+        self.projects.collect(&:gatekeepers).flatten.uniq
       end
 
       #the asset that can be published together with publishing the whole ISA
