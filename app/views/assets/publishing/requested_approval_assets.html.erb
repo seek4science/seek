@@ -1,11 +1,20 @@
-<style>
+<style type="text/css">
+    .approve {
+
+    }
+
+    .reject {
+
+    }
+
+    .decide_later {
+
+    }
+
     span.published {
         font-size: 18px;
         font-weight: bold;
         color: green;
-    }
-    div.radio_buttons {
-        font-size: 16px;
     }
 </style>
 
@@ -15,28 +24,47 @@
     <%= form_tag :action => :gatekeeper_decide do %>
         Please select your decision:
         <% @requested_approval_assets.each do |asset| %>
-            <div class="list_items_container" id="<%= asset.class.name %>_list_items_container">
-              <%= render :partial => "assets/resource_list_item", :object => asset, :locals => {:actions_partial_disable => true} -%>
-              <br/>
-              <br/>
-              <div class="radio_buttons">
-                <br/>
-                <input type="radio" name="gatekeeper_decide[<%= asset.class.name %>][<%= asset.id %>][decision]" value="1" />
-                Approve
-                <br/>
-                <input type="radio" name="gatekeeper_decide[<%= asset.class.name %>][<%= asset.id %>][decision]" value="0" />
-                Reject
-                <br/>
-                <input type="radio" name="gatekeeper_decide[<%= asset.class.name %>][<%= asset.id %>][decision]" value="-1" />
-                Decide later
-              </div>
+            <ul>
+              <li class="type_and_title">
+                <%= text_for_resource asset -%>:&nbsp;<%= link_to (asset.title), asset, :target => "_blank" -%>
+                <%= list_item_visibility(asset, "icon_visibility") -%>
+              </li>
+              <li class="secondary">
+                Requested by:
+                <span class="request_info">
+                    <% asset.publish_requesters.each do |requester| %>
+                      <%= link_to(requester.name, requester) %>
+                      On
+                      <%
+                         log = ResourcePublishLog.where(["resource_type=? AND resource_id=? AND publish_state=? AND user_id=?",
+                                                   asset.class.name, asset.id, ResourcePublishLog::WAITING_FOR_APPROVAL, requester.user.id]).last
+                      %>
+                      <%= date_as_string(log.created_at) %>
+                      <br/>
+                    <% end %>
+                </span>
+              </li>
 
-              <div id="comment_<%= asset.class.name %>_<%= asset.id %>" style=" margin-left:1em">
-                If you are going to approve/reject, you might want to input the reasons/comments here so that the requesters are informed.
-                <br/>
-                <%= text_area_tag "gatekeeper_decide[#{asset.class.name}][#{asset.id}][comment]", nil, :size => "50x8" -%>
-              </div>
-            </div>
+              <li class="secondary">
+                <div class="radio_buttons">
+                  <br/>
+                  <input type="radio" name="gatekeeper_decide[<%= asset.class.name %>][<%= asset.id %>][decision]" value="1" />
+                  <span class="approve">Approve</span>
+                  <br/>
+                  <input type="radio" name="gatekeeper_decide[<%= asset.class.name %>][<%= asset.id %>][decision]" value="0" />
+                  <span class="reject">Reject</span>
+                  <br/>
+                  <input type="radio" name="gatekeeper_decide[<%= asset.class.name %>][<%= asset.id %>][decision]" value="-1" />
+                  <span class="decide_later">Decide later</span>
+                </div>
+
+                <div id="comment_<%= asset.class.name %>_<%= asset.id %>" style=" margin-left:1em">
+                  Reasons/comments:
+                  <br/>
+                  <%= text_area_tag "gatekeeper_decide[#{asset.class.name}][#{asset.id}][comment]", nil -%>
+                </div>
+              </li>
+            </ul>
         <% end %>
 
         <br/>
