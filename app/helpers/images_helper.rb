@@ -326,7 +326,7 @@ module ImagesHelper
       when "home"
         "famfamfam_silk/house.png"
       when "waiting"
-        "ajax-loader.gif"
+        "misc_icons/waiting.png"
     else
       return nil
     end
