@@ -23,6 +23,7 @@ namespace :doc do
     rdoc.rdoc_files.include('doc/BACKUPS')
     rdoc.rdoc_files.include('doc/ADMINISTRATION')
     rdoc.rdoc_files.include('doc/SETTING-UP-VIRTUOSO')
+    rdoc.rdoc_files.include('doc/CONTRIBUTING_TO_SEEK')
 
     rdoc.rdoc_files.include('lib/seek/rdf/rdf_repository.rb')
     rdoc.rdoc_files.include('lib/seek/rdf/rdf_repository_storage.rb')
