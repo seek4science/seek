@@ -215,17 +215,9 @@ SEEK::Application.routes.draw do
     end
   end
 
-  resources :assay_types do
-    collection do
-      get :manage
-    end
-  end
+  resources :assay_types, only: [:show,:index]
 
-  resources :technology_types do
-    collection do
-      get :manage
-    end
-  end
+  resources :technology_types, only: [:show,:index]
 
   ### ASSETS ###
 

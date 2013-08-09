@@ -14,8 +14,6 @@
   
   <h3>Manage</h3>
   <ul>
-    <li><%= link_to "Manage #{t('assays.assay').downcase} types", url_for(:action=>"manage", :controller=>"assay_types") %></li>
-    <li><%= link_to "Manage technology types", url_for(:action=>"manage", :controller=>"technology_types") %></li>
     <li><%= link_to "Manage tags", tags_admin_path %></li>
     <li><%= link_to "Manage compounds", url_for(:action=>"index", :controller=>"compounds") %></li>
   </ul>

@@ -67,31 +67,6 @@ class User < ActiveRecord::Base
     self
   end
 
-  def can_manage_types?
-    unless Seek::Config.type_managers_enabled
-      return false
-    end
-
-    case Seek::Config.type_managers
-      when "admins"
-      if User.admin_logged_in?
-        return true
-      else
-        return false
-      end
-      when "pals"
-      if User.admin_logged_in? || User.pal_logged_in?
-        return true
-      else
-        return false
-      end
-      when "users"
-      return true
-      when "none"
-      return false
-    end
-  end
-
   def self.admin_logged_in?
     self.logged_in_and_registered? && self.current_user.person.is_admin?
   end
