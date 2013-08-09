@@ -196,9 +196,6 @@ class ModelsControllerTest < ActionController::TestCase
     login_as(Factory(:admin).user)
     get :new
     assert_response :success
-
-    #admins can edit type
-    assert_select "span#delete_model_type_icon",:count=>1
   end
 
   test "should get new populated from params" do
@@ -567,47 +564,6 @@ class ModelsControllerTest < ActionController::TestCase
     end
     
     assert_redirected_to models_path
-  end
-  
-  test "should add model type" do
-    login_as(:quentin)
-    assert_difference('ModelType.count',1) do
-      post :create_model_metadata, :attribute=>"model_type",:model_type=>"fred"
-    end
-    
-    assert_response :success
-    assert_not_nil ModelType.where({:title=>"fred"}).first
-    
-  end
-  
-  test "should add model type as pal" do
-    login_as(:pal_user)
-    assert_difference('ModelType.count',1) do
-      post :create_model_metadata, :attribute=>"model_type",:model_type=>"fred"
-    end
-    
-    assert_response :success
-    assert_not_nil ModelType.where({:title=>"fred"}).first
-    
-  end
-  
-  test "should not add model type as non pal" do
-    login_as(:aaron)
-    assert_no_difference('ModelType.count') do
-      post :create_model_metadata, :attribute=>"model_type",:model_type=>"fred"
-    end
-    
-    assert_nil ModelType.where({:title=>"fred"}).first
-    
-  end
-  
-  test "should not add duplicate model type" do
-    login_as(:quentin)
-    m=model_types(:ODE)
-    assert_no_difference('ModelType.count') do
-      post :create_model_metadata, :attribute=>"model_type",:model_type=>m.title
-    end
-    
   end
   
   def test_should_show_version
