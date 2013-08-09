@@ -1,20 +1,57 @@
+<%= stylesheet_link_tag "publishing" %>
+
 <style type="text/css">
-    .approve {
-
-    }
-
-    .reject {
-
-    }
-
-    .decide_later {
-
-    }
-
     span.published {
         font-size: 18px;
         font-weight: bold;
         color: green;
+    }
+    ul.item_for_decision {
+        padding-left: 1em;
+        margin-top: 2em;
+        margin-bottom: 2em;
+    }
+
+    ul.item_for_decision li.type_and_title {
+        font-weight:bolder;
+        list-style-type: none;
+    }
+
+    ul.item_for_decision li.request_info {
+        list-style-type: none;
+    }
+
+    ul.item_for_decision li.radio_buttons {
+        list-style-type: none;
+    }
+
+    ul.item_for_decision li.radio_buttons span.approve {
+        color: limegreen;
+        padding-right: 1em;
+    }
+
+    ul.item_for_decision li.radio_buttons span.approve {
+        color: limegreen;
+        font-weight:bolder;
+        padding-right: 1em;
+    }
+
+    ul.item_for_decision li.radio_buttons span.reject {
+        color: red;
+        font-weight:bolder;
+        padding-right: 1em;
+    }
+
+    ul.item_for_decision li.radio_buttons span.decide_later {
+        font-weight:bolder;
+    }
+
+    ul.item_for_decision li.comment {
+        list-style-type: none;
+    }
+
+    img.icon_visibility {
+        margin-left:2em;
     }
 </style>
 
@@ -24,14 +61,13 @@
     <%= form_tag :action => :gatekeeper_decide do %>
         Please select your decision:
         <% @requested_approval_assets.each do |asset| %>
-            <ul>
+            <ul class="item_for_decision">
               <li class="type_and_title">
-                <%= text_for_resource asset -%>:&nbsp;<%= link_to (asset.title), asset, :target => "_blank" -%>
+                <%= text_for_resource asset -%>:&nbsp;<%= link_to (asset.title), asset -%>
                 <%= list_item_visibility(asset, "icon_visibility") -%>
               </li>
-              <li class="secondary">
-                Requested by:
-                <span class="request_info">
+              <li class="request_info">
+                Requested by:&nbsp;
                     <% asset.publish_requesters.each do |requester| %>
                       <%= link_to(requester.name, requester) %>
                       On
@@ -42,27 +78,22 @@
                       <%= date_as_string(log.created_at) %>
                       <br/>
                     <% end %>
-                </span>
               </li>
 
-              <li class="secondary">
-                <div class="radio_buttons">
-                  <br/>
-                  <input type="radio" name="gatekeeper_decide[<%= asset.class.name %>][<%= asset.id %>][decision]" value="1" />
+              <li class="radio_buttons">
+                  <input type="radio" name="gatekeeper_decide[<%= asset.class.name %>][<%= asset.id %>][decision]" value="1"/>
                   <span class="approve">Approve</span>
-                  <br/>
-                  <input type="radio" name="gatekeeper_decide[<%= asset.class.name %>][<%= asset.id %>][decision]" value="0" />
-                  <span class="reject">Reject</span>
-                  <br/>
-                  <input type="radio" name="gatekeeper_decide[<%= asset.class.name %>][<%= asset.id %>][decision]" value="-1" />
-                  <span class="decide_later">Decide later</span>
-                </div>
 
-                <div id="comment_<%= asset.class.name %>_<%= asset.id %>" style=" margin-left:1em">
+                  <input type="radio" name="gatekeeper_decide[<%= asset.class.name %>][<%= asset.id %>][decision]" value="0"/>
+                  <span class="reject">Reject</span>
+
+                  <input type="radio" name="gatekeeper_decide[<%= asset.class.name %>][<%= asset.id %>][decision]" value="-1"/>
+                  <span class="decide_later">Decide later</span>
+              </li>
+              <li class="comment" id="comment_<%= asset.class.name %>_<%= asset.id %>">
                   Reasons/comments:
                   <br/>
-                  <%= text_area_tag "gatekeeper_decide[#{asset.class.name}][#{asset.id}][comment]", nil -%>
-                </div>
+                  <%= text_area_tag "gatekeeper_decide[#{asset.class.name}][#{asset.id}][comment]", nil, :style => "width: 50%;", :rows => 3 -%>
               </li>
             </ul>
         <% end %>
