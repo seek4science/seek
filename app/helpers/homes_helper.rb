@@ -63,42 +63,7 @@ module HomesHelper
     item_hash
   end
 
-  def recently_downloaded_item_logs time=1.month.ago, number_of_item=10
-    #Rails.cache.fetch("download_activity_#{current_user_id}") do
-      activity_logs = ActivityLog.where(["action = ? AND created_at > ?", 'download', time]).order("created_at DESC")
-      selected_activity_logs = []
-      selected_items = []
-      count = 0
-      activity_logs.each do |activity_log|
-         item = activity_log.activity_loggable
-         if !item.nil? && !selected_items.include?(item) && item.can_view?
-           selected_items.push item
-           selected_activity_logs.push activity_log
-           count += 1
-         end
-         break if count == number_of_item
-      end
-      selected_activity_logs
-    #end
-  end
 
-  def recently_added_item_logs time=1.month.ago, number_of_item=10
-    #Rails.cache.fetch("create_activity_#{current_user_id}") do
-      item_types = Seek::Util.user_creatable_types.collect{|type| type.name}
-      activity_logs = ActivityLog.where(["action = ? AND created_at > ? AND activity_loggable_type in (?)", 'create', time, item_types]).order("created_at DESC")
-      selected_activity_logs = []
-      count = 0
-      activity_logs.each do |activity_log|
-        item = activity_log.activity_loggable
-        if !item.nil? && item_types.include?(activity_log.activity_loggable_type) && item.can_view?
-          selected_activity_logs.push activity_log
-          count += 1
-        end
-        break if count == number_of_item
-      end
-      selected_activity_logs
-    #end
-  end
 
   # get multiple feeds from multiple sites
   def get_feed feed_url=nil
@@ -154,21 +119,73 @@ module HomesHelper
       html.html_safe
   end
 
+  def recently_downloaded_item_logs_hash time=1.month.ago, number_of_item=10
+    Rails.cache.fetch("download_activity_#{current_user_id}") do
+      activity_logs = ActivityLog.where(["action = ? AND created_at > ?", 'download', time]).order("created_at DESC")
+      selected_activity_logs = []
+      selected_items = []
+      count = 0
+      activity_logs.each do |activity_log|
+        item = activity_log.activity_loggable
+        if !item.nil? && !selected_items.include?(item) && item.can_view?
+          selected_items.push item
+          selected_activity_logs.push activity_log
+          count += 1
+        end
+        break if count == number_of_item
+      end
+      convert_logs_to_hash selected_activity_logs
+    end
+  end
 
-  def display_single_item item, action, at_time
+  def recently_added_item_logs_hash time=1.month.ago, number_of_item=10
+    Rails.cache.fetch("create_activity_#{current_user_id}") do
+      item_types = Seek::Util.user_creatable_types.collect{|type| type.name}
+      activity_logs = ActivityLog.where(["action = ? AND created_at > ? AND activity_loggable_type in (?)", 'create', time, item_types]).order("created_at DESC")
+      selected_activity_logs = []
+      count = 0
+      activity_logs.each do |activity_log|
+        item = activity_log.activity_loggable
+        if !item.nil? && item_types.include?(activity_log.activity_loggable_type) && item.can_view?
+          selected_activity_logs.push activity_log
+          count += 1
+        end
+        break if count == number_of_item
+      end
+      convert_logs_to_hash selected_activity_logs
+    end
+  end
+
+  def convert_logs_to_hash logs
+    logs.collect do |log|
+      item = log.activity_loggable
+      {
+          type: text_for_resource(item),
+          title: item.title,
+          action: log.action,
+          description: item.respond_to?(:description) ? item.description : nil,
+          abstract: item.respond_to?(:abstract) ? item.abstract : nil,
+          created_at: item.created_at,
+          avatar_image: resource_avatar(item,:class=>"home_asset_icon"),
+          url: show_resource_path(item)
+      }
+    end
+  end
+
+  def display_single_log_item_hash item, action
       html=''
        unless item.blank?
-         image=resource_avatar(item,:class=>"home_asset_icon")
-          icon  = link_to(image, show_resource_path(item), :class=> "asset", :title => tooltip_title_attrib(text_for_resource(item)))
+         image=item[:avatar_image]
+          icon  = link_to(image, item[:url], :class=> "asset", :title => tooltip_title_attrib(item[:type]))
 
-          path = url_for(item)
-          description = try_block{item.description} || try_block{item.abstract}
-          tooltip=tooltip_title_attrib("<p>#{description.blank? ? 'No description' : description}</p><p class='feedinfo none_text'>#{at_time}</p>")
+          description = item[:description] || item[:abstract]
+
+          tooltip=tooltip_title_attrib("<p>#{description.blank? ? 'No description' : description}</p><p class='feedinfo none_text'>#{item[:created_at]}</p>")
           html << "<li class='homepanel_item'>"
           html << "#{icon} "
-          html << link_to("#{item.title}", path, :title => tooltip)
+          html << link_to(h(item[:title]), item[:url], :title => tooltip)
           html << "<div class='feedinfo none_text'>"
-          html << "<span>#{text_for_resource(item)} - #{action} #{time_ago_in_words(at_time)} ago</span>"
+          html << "<span>#{item[:type]} - #{action} #{time_ago_in_words(item[:created_at])} ago</span>"
           html << "</div>"
           html << "</li>"
       end
