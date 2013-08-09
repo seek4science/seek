@@ -213,10 +213,6 @@ class ConfigTest < ActiveSupport::TestCase
   test "limit_latest" do
     assert_equal 7,Seek::Config.limit_latest
   end
-#others
-  test "type_managers" do
-    assert_equal "admins",Seek::Config.type_managers
-  end
 
   test "pubmed_api_email" do
     assert_equal nil,Seek::Config.pubmed_api_email
