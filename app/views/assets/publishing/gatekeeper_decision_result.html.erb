@@ -1,0 +1,50 @@
+<%= stylesheet_link_tag "publishing" %>
+
+<div class="show_basic">
+
+  <h1>Your decision results</h1>
+
+  <h2>Items that were successfully published</h2>
+  <ul class="publishing_options" id="published">
+    <% published_items = @approve_items - @problematic_items %>
+    <% if published_items.empty? -%>
+        <li class="none_text">No items</li>
+    <% else %>
+        <% published_items.each do |item| -%>
+            <li class="type_and_title"><%= text_for_resource item -%>: <%= link_to item.title, item -%></li>
+        <% end -%>
+    <% end -%>
+  </ul>
+
+  <h2>Items that were rejected</h2>
+  <ul class="publishing_options" id="rejected">
+    <% if @reject_items.empty? -%>
+        <li class="none_text">No items</li>
+    <% else %>
+        <% @reject_items.each do |item| -%>
+            <li class="type_and_title"><%= text_for_resource item -%>: <%= link_to item.title, item -%></li>
+        <% end -%>
+    <% end -%>
+  </ul>
+
+  <h2>Items that will decide later</h2>
+  <ul class="publishing_options" id="decide_later">
+    <% if @decide_later_items.empty? -%>
+        <li class="none_text">No items</li>
+    <% else %>
+        <% @decide_later_items.each do |item| -%>
+            <li class="type_and_title"><%= text_for_resource item -%>: <%= link_to item.title, item -%></li>
+        <% end -%>
+    <% end -%>
+  </ul>
+
+  <% if !@problematic_items.empty? -%>
+      <h2>Items that were decided to make published but were not published due to an unforseen problem</h2>
+      <ul class="publishing_options" id="problematic">
+        <% @problematic_items.each do |item| -%>
+            <li class="type_and_title"><%= text_for_resource item -%>: <%= link_to item.title, item -%></li>
+        <% end -%>
+      </ul>
+  <% end -%>
+
+</div>

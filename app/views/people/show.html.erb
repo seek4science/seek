@@ -11,6 +11,13 @@
           <li>
             <%= image_tag_for_key "lock", url_for({:controller=>:users, :action=>:edit, :id=>@person.user}), "Manage Account", nil, "Manage Account" -%>
           </li>
+          <% if @person.is_gatekeeper? %>
+              <li>
+                <%= image_tag_for_key "waiting", requested_approval_assets_person_path(@person), "Waiting approval assets",
+                                      {:title => "The list of assets that were requested for your approval to make published"},
+                                      "Waiting approval assets" -%>
+              </li>
+          <% end %>
       <% end -%>
       <% if admin_logged_in? -%>
           <li>

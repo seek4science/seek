@@ -32,12 +32,19 @@ module Seek
             policy.access_type=Policy::ACCESSIBLE
             policy.sharing_scope=Policy::EVERYONE
             policy.save
+            #FIXME:may need to add comment
             self.resource_publish_logs.create(:publish_state=>ResourcePublishLog::PUBLISHED,:culprit=>User.current_user)
             touch
           end
         else
           false
         end
+      end
+
+      def reject comment
+        resource_publish_logs.create(:publish_state=>ResourcePublishLog::REJECTED,
+                                     :culprit=>User.current_user,
+                                     :comment=>comment)
       end
 
       def is_published?

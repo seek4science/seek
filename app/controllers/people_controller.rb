@@ -2,6 +2,7 @@ class PeopleController < ApplicationController
 
   include Seek::AnnotationCommon
   include Seek::Publishing::PublishingCommon
+  include Seek::Publishing::GatekeeperPublish
 
   before_filter :find_and_auth, :only => [:show, :edit, :update, :destroy]
   before_filter :current_user_exists,:only=>[:select,:userless_project_selected_ajax,:create,:new]
