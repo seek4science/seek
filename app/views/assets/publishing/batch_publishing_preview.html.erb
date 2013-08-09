@@ -2,14 +2,23 @@
 <%= stylesheet_link_tag "publishing" %>
 
 <div class="show_basic">
-  <h1>Batch publishing preview.</h1>
+  <%= show_title "Batch publishing of your items" %>
 
   <div class="box_infotext">
-    <ul style="padding-left:1em;">
-      <li>
-        Having the permission to publish an asset, you can publish it by <b>checking</b> the <span class="published"><b>Publish</b></span> checkbox beside that asset.
-      </li>
-    </ul>
+    <p>
+      Publishing means that you will be making the item visible, and where applicable downloadable, to other people
+      visiting the <%= Seek::Config.application_name -%>.
+    </p>
+
+    <p>
+      This view presents you with the list of items that you have permission to publish, but have not yet been.
+    </p>
+
+    <p>
+      You can select an item to be published by <b>checking</b> the <span class="published"><b>Publish</b></span>
+      checkbox beside that item.
+    </p>
+
   </div>
   <br/>
 
@@ -26,7 +35,7 @@
           <% end %>
           <br/>
 
-          <%= submit_tag "OK"-%>
+          <%= submit_tag "Next"-%>
           Or
           <%= link_to "Cancel", person_path(params[:id].to_i)-%>
       <% end -%>
