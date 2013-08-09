@@ -9,7 +9,7 @@ class HomesHelperTest < ActionView::TestCase
 
     create_logs = []
 
-    private = Factory(:data_file,:policy => Factory(:private_policy))
+    private = Factory(:data_file,:title=>"A private data file",:policy => Factory(:private_policy))
     assert !private.can_view?(user)
     create_logs << Factory(:activity_log,:action=>:create,:activity_loggable => private, :created_at => 9.day.ago, :culprit=>user)
     download_logs = []
@@ -20,36 +20,36 @@ class HomesHelperTest < ActionView::TestCase
       download_logs << Factory(:activity_log, :action => 'download', :activity_loggable => item, :created_at => i.hour.ago, :culprit=>user)
     end
 
-    recently_added_item_logs =  recently_added_item_logs(1.year.ago, n)
+    recently_added_item_logs =  recently_added_item_logs_hash(1.year.ago, n)
     recently_added_item_logs.each do |recently_added_item_log|
-      assert_not_nil recently_added_item_log.activity_loggable
-      assert recently_added_item_log.activity_loggable.can_view?(user)
-      assert recently_added_item_log.created_at >= 1.year.ago
+      assert_not_nil recently_added_item_log[:title]
+      assert_not_equal private.title,recently_added_item_log[:title]
+      assert recently_added_item_log[:created_at] >= 1.year.ago
     end
 
     #test the sorting by lasted logs
-    sorted_recently_added_item_logs = recently_added_item_logs.sort{|a,b| b.created_at <=> a.created_at}
+    sorted_recently_added_item_logs = recently_added_item_logs.sort{|a,b| b[:created_at] <=> a[:created_at]}
     assert_equal sorted_recently_added_item_logs,recently_added_item_logs
 
-    recently_downloaded_items = []
-    recently_downloaded_item_logs =  recently_downloaded_item_logs(1.year.ago, n)
+    recently_downloaded_item_titles = []
+    recently_downloaded_item_logs =  recently_downloaded_item_logs_hash(1.year.ago, n)
     recently_downloaded_item_logs.each do |recently_downloaded_item_log|
-      assert_not_nil recently_downloaded_item_log.activity_loggable
-      assert recently_downloaded_item_log.activity_loggable.can_view?(user)
-      assert recently_downloaded_item_log.created_at >= 1.year.ago
-      recently_downloaded_items.push recently_downloaded_item_log.activity_loggable
+      assert_not_nil recently_downloaded_item_log[:title]
+      assert_not_equal private.title,recently_downloaded_item_log[:title]
+      assert recently_downloaded_item_log[:created_at] >= 1.year.ago
+      recently_downloaded_item_titles.push recently_downloaded_item_log[:title]
     end
 
-    sorted_recently_downloaded_item_logs = recently_downloaded_item_logs.sort{|a,b| b.created_at <=> a.created_at}
+    sorted_recently_downloaded_item_logs = recently_downloaded_item_logs.sort{|a,b| b[:created_at] <=> a[:created_at]}
     assert_equal sorted_recently_downloaded_item_logs,recently_downloaded_item_logs
 
     #test the recently_downloaded_items dont contain the duplication
-    assert_equal recently_downloaded_items,  recently_downloaded_items.uniq
+    assert_equal recently_downloaded_item_titles,  recently_downloaded_item_titles.uniq
     download_logs = download_logs.select{|log| log.activity_loggable == item}.sort{|a,b| b.created_at <=> a.created_at}
 
-    #test the lasted recenly_downloaded_log is taken
-    recently_downloaded_item_logs = recently_downloaded_item_logs.select{|log| log.activity_loggable == item}
+    #test the last recently_downloaded_log is taken
+    recently_downloaded_item_logs = recently_downloaded_item_logs.select{|log| log[:title] == item.title}
     assert_equal 1, recently_downloaded_item_logs.count
-    assert_equal recently_downloaded_item_logs.first, download_logs.first
+    assert_equal recently_downloaded_item_logs[0][:log_id], download_logs.first.id
   end
 end
