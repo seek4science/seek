@@ -3,9 +3,8 @@
     <div class="heading">Latest additions</div>
     <div id="recently_added" class="homepanel_list">
       <ul>
-        <% recently_added_item_logs(25.years.ago, 8).each do |added_item_log|
-          uploaded_item = added_item_log.activity_loggable %>
-            <%= display_single_item(uploaded_item, 'added', added_item_log.created_at) -%>
+        <% recently_added_item_logs_hash(25.years.ago, 8).each do |added_item_log| -%>
+            <%= display_single_log_item_hash(added_item_log, 'added') -%>
         <% end %>
       </ul>
     </div>
@@ -15,10 +14,8 @@
     <div class="heading">Latest downloads</div>
     <div id="recently_downloaded" class="homepanel_list">
       <ul>
-        <% recently_downloaded_item_logs(25.years.ago, 8).each do |downloaded_item_log|
-          downloaded_item = downloaded_item_log.activity_loggable
-        %>
-            <%= display_single_item(downloaded_item, 'downloaded', downloaded_item_log.created_at) -%>
+        <% recently_downloaded_item_logs_hash(25.years.ago, 8).each do |downloaded_item_log| %>
+            <%= display_single_log_item_hash(downloaded_item_log, 'downloaded') -%>
         <% end %>
       </ul>
     </div>
