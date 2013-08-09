@@ -33,7 +33,7 @@ module Seek
     #the directory used to contain the cached files
     def self.cache_dir
       if Rails.env=="test"
-        dir = File.join(Dir.tmpdir,"seek-cache","atom-feeds")
+        dir = File.join(Rails.root,"tmp","testing-seek-cache","atom-feeds")
       else
         dir = File.join(Rails.root,"tmp","cache","atom-feeds")
       end
