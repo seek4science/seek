@@ -12,7 +12,7 @@ class ResourcePublishLog < ActiveRecord::Base
 
   def self.add_log publish_state, resource, comment="", user=User.current_user
     ResourcePublishLog.create(
-        :culprit => user,
+        :user => user,
         :resource=>resource,
         :publish_state=>publish_state,
         :comment=>comment)

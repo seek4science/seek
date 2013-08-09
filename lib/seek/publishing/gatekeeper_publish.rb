@@ -75,12 +75,7 @@ module Seek
       def requesters_items items
         requesters_items={}
         items.each do |item|
-          requesters = ResourcePublishLog.where(["resource_type=? AND resource_id=? AND publish_state=?",
-                                                 item.class.name, item.id, ResourcePublishLog::WAITING_FOR_APPROVAL]).collect(&:culprit)
-          requesters.compact.each do |requester|
-            if !requester.kind_of?(Person) && requester.respond_to?(:person)
-              requester = requester.person
-            end
+          item.publish_requesters.each do |requester|
             requesters_items[requester]||=[]
             requesters_items[requester] << item
           end
