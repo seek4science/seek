@@ -1,5 +1,22 @@
 = Administration of SEEK
 
+Here are described some basic administration tasks you may want to do after installing SEEK. All admin tasks can be found in the Admin area, by selecting the Account tab, and then selecting
+Server Administration. Many of the settings have a description of what they do and are not covered here.
+
+== Creating a Project and Institution
+
+Before you can add items, such as Data files or Models, to SEEK, you need to create the first Project and Institution and add yourself to them.
+
+You can first create your Project and Institution from the Common Tasks in the admin area.
+
+Once these have been created, you need to link the Project to the Institution, by navigating to the Project show page and clicking the Project administration button. From this page you can
+select one or more Institutions for this Project, and then saving by clicking the Update button at the bottom of the form.
+
+You can add yourself to the Project and Institution you have created, by navigating to your profile, selecting Person administration, and then selecting the Project/Institution pair from the list, and clicking
+the Update button at the bottom of the form.
+
+Note that, Projects can be associated with multiple Institutions, and People can belong to multiple Project/Institution pairs. When selecting multiple items from the lists you need to hold CTRL as you select them.
+
 == Configuring Email
 
 By default email is disabled, but if you are able to you can configure it to enable SEEK to send emails - such are emails about changes within your project, notification emails, feedback emails and notifications about errors.
@@ -35,6 +52,3 @@ To be able to support adding publications using a PubMed[http://www.ncbi.nlm.nih
 
 * For PubMed you simply need to add your email address under Admin->Site Configuration->Additional Settings
 * For DOI - you need to register your email address with CrossRef[http://www.crossref.org/] at http://www.crossref.org/requestaccount/ and then provide that email to SEEK under Admin->Site Configuration->Additional Settings
-
-
-<em>TODO</em>
