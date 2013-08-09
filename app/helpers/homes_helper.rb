@@ -1,6 +1,9 @@
 
 module HomesHelper
+
   include UsersHelper
+  include AssetsHelper
+  include ImagesHelper
 
   RECENT_SIZE=5
 
@@ -165,9 +168,10 @@ module HomesHelper
           action: log.action,
           description: item.respond_to?(:description) ? item.description : nil,
           abstract: item.respond_to?(:abstract) ? item.abstract : nil,
-          created_at: item.created_at,
+          created_at: log.created_at,
           avatar_image: resource_avatar(item,:class=>"home_asset_icon"),
-          url: show_resource_path(item)
+          url: show_resource_path(item),
+          log_id: log.id
       }
     end
   end

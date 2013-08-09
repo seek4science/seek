@@ -2,6 +2,8 @@
 # and open the template in the editor.
 
 module ImagesHelper
+
+  include Seek::MimeTypes
   
   def info_icon_with_tooltip(info_text, delay=200)
     return image("info",

@@ -1,4 +1,5 @@
 module AssetsHelper
+  include ApplicationHelper
 
   def request_request_label resource
     icon_filename=icon_filename_for_key("message")

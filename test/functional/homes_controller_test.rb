@@ -236,44 +236,6 @@ class HomesControllerTest < ActionController::TestCase
     assert_select 'div#community_news ul>li', 7
   end
 
-  test 'should show recently added and downloaded items with the filter can_view?' do
-    login_as(:aaron)
-    #recently added
-    recently_added_item_logs =  recently_added_item_logs(1.year.ago, 10)
-    recently_added_item_logs.each do |added_item_log|
-      assert added_item_log.activity_loggable.can_view?
-    end
-    #recently downloaded
-    recently_downloaded_item_logs =  recently_downloaded_item_logs(1.year.ago, 10)
-    recently_downloaded_item_logs.each do |downloaded_item_log|
-      assert downloaded_item_log.activity_loggable.can_view?
-    end
-
-    get :index
-    assert_response :success
-
-    assert_select 'div#recently_added ul>li', recently_added_item_logs.count
-    assert_select 'div#recently_downloaded ul>li', recently_downloaded_item_logs.count
-
-    logout
-    #recently uploaded
-    recently_added_item_logs =  recently_added_item_logs(1.year.ago, 10)
-    recently_added_item_logs.each do |added_item_log|
-      assert added_item_log.activity_loggable.can_view?
-    end
-    #recently downloaded
-    recently_downloaded_item_logs =  recently_downloaded_item_logs(1.year.ago, 10)
-    recently_downloaded_item_logs.each do |downloaded_item_log|
-      assert downloaded_item_log.activity_loggable.can_view?
-    end
-
-    get :index
-    assert_response :success
-
-    assert_select 'div#recently_added ul>li', recently_added_item_logs.count
-    assert_select 'div#recently_downloaded ul>li', recently_downloaded_item_logs.count
-  end
-
   test "recently added should include data_file" do
     login_as(:aaron)
 
