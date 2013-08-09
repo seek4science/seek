@@ -215,17 +215,9 @@ SEEK::Application.routes.draw do
     end
   end
 
-  resources :assay_types do
-    collection do
-      get :manage
-    end
-  end
+  resources :assay_types, only: [:show,:index]
 
-  resources :technology_types do
-    collection do
-      get :manage
-    end
-  end
+  resources :technology_types, only: [:show,:index]
 
   ### ASSETS ###
 
@@ -302,9 +294,6 @@ SEEK::Application.routes.draw do
       get :build
       get :preview
       get :view_items_in_tab
-      post :update_model_metadata
-      post :create_model_metadata
-      post :delete_model_metadata
       post :test_asset_url
     end
     member do

@@ -47,7 +47,7 @@ class Mailer < ActionMailer::Base
     @requester=requester
     @resource=resource
     @host=base_host
-    mail(:to=>requester.email_with_name,:subject=>"A #{Seek::Config.application_name} gatekeeper approved your request to publish: #{resource.title}")
+    mail(:to=>requester.email_with_name,:subject=>"A #{Seek::Config.application_name} Gatekeeper approved your request to publish: #{resource.title}")
 
   end
 
@@ -62,7 +62,7 @@ class Mailer < ActionMailer::Base
       extra_comment = gatekeeper.name + " left reasons/comments: " + extra_comment
     end
     @extra_comment=extra_comment
-    mail(:to => requester.email_with_name, :subject => "A #{Seek::Config.application_name} gatekeeper rejected your request to publish: #{resource.title}", :reply_to => gatekeeper.email_with_name)
+    mail(:to => requester.email_with_name, :subject => "A #{Seek::Config.application_name} Gatekeeper rejected your request to publish: #{resource.title}", :reply_to => gatekeeper.email_with_name)
 
   end
 

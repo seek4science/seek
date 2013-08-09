@@ -1,7 +1,7 @@
 <% controller=@resource.class.name.underscore.pluralize -%>
 Hi <%= @requester.name -%>,
 
-    The <%= Seek::Config.application_name %> gatekeeper <%= @gatekeeper.name -%>, <%= person_url(@gatekeeper,:host=>@host) -%> rejected to publish:
+    The <%= Seek::Config.application_name %> Gatekeeper <%= @gatekeeper.name -%>, <%= person_url(@gatekeeper,:host=>@host) -%> rejected your wish publish:
     "<%= @resource.title -%>": <%= url_for(:action=>:show,:controller=>controller,:id=>@resource,:host=>@host) -%>.
 
     <%= @extra_comment -%>

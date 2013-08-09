@@ -1,10 +1,10 @@
 <% controller=@resource.class.name.underscore.pluralize -%>
 Hi <%= @requester.name -%>,
 
-    The <%= Seek::Config.application_name %> gatekeeper <%= @gatekeeper.name -%>, <%= person_url(@gatekeeper,:host=>@host) -%> approved to publish:
+    The <%= Seek::Config.application_name %> Gatekeeper <%= @gatekeeper.name -%>, <%= person_url(@gatekeeper,:host=>@host) -%> approved your wish to publish:
     "<%= @resource.title -%>": <%= url_for(:action=>:show,:controller=>controller,:id=>@resource,:host=>@host) -%>.
 
-    This <%= @resource.class.name -%> is now accessible in <%= Seek::Config.application_name %> without logging in.
+    This <%= @resource.class.name -%> is now accessible to all visitors of the <%= Seek::Config.application_name %>.
 
     This is an automated email.
 

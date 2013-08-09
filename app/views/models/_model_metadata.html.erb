@@ -1,4 +1,4 @@
-<% can_edit=admin_logged_in? || current_user_is_pal? -%>
+
 
 <p>
   <span id="model_type_info" style="display:none;"></span>
@@ -14,55 +14,10 @@
       {:onchange=>"model_type_selection_changed();" } -%>
   </span>
 
-  <% if can_edit %>
-    <%= link_to_function image("new"), "$('add_model_type_form').show();$('edit_model_type_form').hide();" -%>
-    <span id="edit_model_type_icon" style="display:none;">
-      <%= link_to_function image("edit"), "$('add_model_type_form').hide();$('edit_model_type_form').show();" -%>
-    </span>
-    <span id="delete_model_type_icon" style="display:none;">
-      <%= hidden_field_tag :selected_model_type_id %>
-      <%= link_to_with_callbacks image("destroy"),
-       {:url=>{:action=>:delete_model_metadata,:attribute=>"model_type"},
-        :confirm=>"Are you sure you wish to delete this #{t('model')} type?",
-        :with=>"$('selected_model_type_id').serialize()",
-        :before=>"show_ajax_loader('model_type_selection');$('edit_model_type_icon').hide();$('delete_model_type_icon').hide();"},
-       {:remote => true}
-      -%>
-    </span>
-  
-  <% end -%>
 
 </p>
 
-<% if can_edit -%>
 
-  <span id="add_model_type_form" style="display:none;">
-    <p>
-      <%= text_field_tag :model_type -%>
-      <%= button_to_with_callbacks "Add",
-        {:url=>{:action=>:create_model_metadata, :attribute=>"model_type"},
-        :with=>"$('model_type').serialize()",
-        :before=>"show_ajax_loader('model_type_selection');$('add_model_type_form').hide();"},
-        {:remote=>true}
-      -%>
-    </p>
-  </span>
-
-  <span id="edit_model_type_form" style="display:none;">
-    <p>
-      <%= hidden_field_tag :updated_model_type_id -%>
-      <%= text_field_tag :updated_model_type -%>
-      <%= button_to_with_callbacks "Update",
-        {:url=>{:action=>:update_model_metadata, :attribute=>"model_type"},
-        :with=>"$('updated_model_type').serialize() + '&' + $('updated_model_type_id').serialize()",
-        :before=>"show_ajax_loader('model_type_selection');$('edit_model_type_form').hide();"},
-        {:id=>"update_model_type_button",:remote=>true}
-      -%>
-    </p>
-  </span>
-
-
-<% end -%>
 
 
 
@@ -76,53 +31,10 @@
       {:onchange=>"model_format_selection_changed();" }
     -%>
   </span>
-  <% if can_edit %>
-    <%= link_to_function image("new"), "$('add_model_format_form').show();$('edit_model_format_form').hide();" -%>
-    <span id="edit_model_format_icon" style="display:none;">
-      <%= link_to_function image("edit"), "$('add_model_format_form').hide();$('edit_model_format_form').show();" -%>
-    </span>
-    <span id="delete_model_format_icon" style="display:none;">
-      <%= hidden_field_tag :selected_model_format_id %>
-      <%= link_to_with_callbacks image("destroy"),
-       {:url=>{:action=>:delete_model_metadata,:attribute=>"model_format"},
-        :confirm=>"Are you sure you wish to delete this #{t('model')} format?",
-        :with=>"$('selected_model_format_id').serialize()",
-        :before=>"show_ajax_loader('model_format_selection');$('edit_model_format_icon').hide();$('delete_model_format_icon').hide();"},
-       {:remote => true}
-      -%>
-    </span>
 
-  <% end -%>
 </p>
 
-<% if can_edit -%>
 
-  <span id="add_model_format_form" style="display:none;">
-    <p>
-      <%= text_field_tag :model_format -%>
-      <%= button_to_with_callbacks "Add",
-        {:url=>{:action=>:create_model_metadata, :attribute=>"model_format"},
-        :with=>"$('model_format').serialize()",
-        :before=>"show_ajax_loader('model_format_selection');$('add_model_format_form').hide()"},
-        {:remote=>true}
-      -%>
-    </p>
-  </span>
-
-  <span id="edit_model_format_form" style="display:none;">
-    <p>
-      <%= hidden_field_tag :updated_model_format_id -%>
-      <%= text_field_tag :updated_model_format -%>
-      <%= button_to_with_callbacks "Update",
-        {:url=>{:action=>:update_model_metadata, :attribute=>"model_format"},
-        :with=>"$('updated_model_format').serialize() + '&' + $('updated_model_format_id').serialize()",
-        :before=>"show_ajax_loader('model_format_selection');$('edit_model_format_form').hide();"},
-        {:id=>"update_model_format_button",:remote=>true}
-      -%>
-    </p>
-  </span>
-
-<% end -%>
 
 
 
