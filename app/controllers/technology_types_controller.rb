@@ -1,7 +1,5 @@
 class TechnologyTypesController < ApplicationController
   
-  before_filter :check_allowed_to_manage_types, :except=>[:show,:index]
-  
   def show
     @technology_type = TechnologyType.find(params[:id])
     

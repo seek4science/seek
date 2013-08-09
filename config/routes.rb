@@ -294,9 +294,6 @@ SEEK::Application.routes.draw do
       get :build
       get :preview
       get :view_items_in_tab
-      post :update_model_metadata
-      post :create_model_metadata
-      post :delete_model_metadata
       post :test_asset_url
     end
     member do

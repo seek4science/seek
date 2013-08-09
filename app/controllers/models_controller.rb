@@ -8,8 +8,6 @@ class ModelsController < ApplicationController
   include DotGenerator
   include Seek::AssetsCommon
   include AssetsCommonExtension
-
-  before_filter :pal_or_admin_required,:only=> [:create_model_metadata,:update_model_metadata,:delete_model_metadata ]
   
   before_filter :find_assets, :only => [ :index ]
   before_filter :find_and_auth, :except => [ :build,:index, :new, :create,:create_model_metadata,:update_model_metadata,:delete_model_metadata,:request_resource,:preview,:test_asset_url, :update_annotations_ajax]
@@ -279,126 +277,7 @@ class ModelsController < ApplicationController
       page.visual_effect :appear, "model_format_info"      
     end    
   end
-  
-  def create_model_metadata
-    attribute=params[:attribute]
-    if attribute=="model_type"
-      create_model_type params
-    elsif attribute=="model_format"
-      create_model_format params
-    end
-  end
-  
-  def update_model_type params
-    title=white_list(params[:updated_model_type])
-    id=params[:updated_model_type_id]
-    success=false
-    model_type_with_matching_title=ModelType.where(:title=>title).first
-    if model_type_with_matching_title.nil? || model_type_with_matching_title.id.to_s==id
-      m=ModelType.find(id)
-      m.title=title
-      if m.save
-        msg="OK. #{t('model')} type changed to #{title}."
-        success=true
-      else
-        msg="ERROR - There was a problem changing to #{title}"
-      end
-    else
-      msg="ERROR - Another #{t('model')} type with #{title} already exists"
-    end
-    
-    render :update do |page|
-      page.replace_html "model_type_selection",collection_select(:model, :model_type_id, ModelType.all, :id, :title, {:include_blank=>"Not specified"},{:onchange=>"model_type_selection_changed();" })
-      page.replace_html "model_type_info","#{msg}<br/>"
-      info_colour= success ? "green" : "red"
-      page << "$('model_type_info').style.color='#{info_colour}';"
-      page.visual_effect :appear, "model_type_info"
-    end
-    
-  end
-    
-  def create_model_type params
-    title=white_list(params[:model_type])
-    success=false
-    if ModelType.where(:title=>title).first.nil?
-      new_model_type=ModelType.new(:title=>title)
-      if new_model_type.save
-        msg="OK. #{t('model')} type #{title} added."
-        success=true
-      else
-        msg="ERROR - There was a problem adding #{title}"
-      end
-    else
-      msg="ERROR - #{t('model')} type #{title} already exists"
-    end
-    
-    
-    render :update do |page|
-      page.replace_html "model_type_selection",collection_select(:model, :model_type_id, ModelType.all, :id, :title, {:include_blank=>"Not specified"},{:onchange=>"model_type_selection_changed();" })
-      page.replace_html "model_type_info","#{msg}<br/>"
-      info_colour= success ? "green" : "red"
-      page << "$('model_type_info').style.color='#{info_colour}';"
-      page.visual_effect :appear, "model_type_info"
-      page << "model_types_for_deletion.push(#{new_model_type.id});" if success
-      
-    end
-  end
-  
-  def create_model_format params
-    title=white_list(params[:model_format])
-    success=false
-    if ModelFormat.where(:title=>title).first.nil?
-      new_model_format=ModelFormat.new(:title=>title)
-      if new_model_format.save
-        msg="OK. #{t('model')} format #{title} added."
-        success=true
-      else
-        msg="ERROR - There was a problem adding #{title}"
-      end
-    else
-      msg="ERROR - Another #{t('model')} format #{title} already exists"
-    end
-    
-    
-    render :update do |page|
-      page.replace_html "model_format_selection",collection_select(:model, :model_format_id, ModelFormat.all, :id, :title, {:include_blank=>"Not specified"},{:onchange=>"model_format_selection_changed();" })
-      page.replace_html "model_format_info","#{msg}<br/>"
-      info_colour= success ? "green" : "red"
-      page << "$('model_format_info').style.color='#{info_colour}';"
-      page.visual_effect :appear, "model_format_info"
-      page << "model_formats_for_deletion.push(#{new_model_format.id});" if success
-      
-    end
-  end
-  
-  def update_model_format params
-    title=white_list(params[:updated_model_format])
-    id=params[:updated_model_format_id]
-    success=false    
-    model_format_with_matching_title=ModelFormat.where(:title=>title).first
-    if model_format_with_matching_title.nil? || model_format_with_matching_title.id.to_s==id
-      m=ModelFormat.find(id)
-      m.title=title
-      if m.save
-        msg="OK. #{t('model')} format changed to #{title}."
-        success=true
-      else
-        msg="ERROR - There was a problem changing to #{title}"
-      end
-    else
-      msg="ERROR - Another #{t('model')} format with #{title} already exists"
-    end
-    
-    render :update do |page|
-      page.replace_html "model_format_selection",collection_select(:model, :model_format_id, ModelFormat.all, :id, :title, {:include_blank=>"Not specified"},{:onchange=>"model_format_selection_changed();" })
-      page.replace_html "model_format_info","#{msg}<br/>"
-      info_colour= success ? "green" : "red"
-      page << "$('model_format_info').style.color='#{info_colour}';"
-      page.visual_effect :appear, "model_format_info"
-    end
-    
-  end
-  
+
   
   # GET /models/1
   # GET /models/1.xml

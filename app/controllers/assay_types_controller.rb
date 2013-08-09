@@ -1,7 +1,5 @@
 class AssayTypesController < ApplicationController
 
-  before_filter :check_allowed_to_manage_types, :except=>[:show,:index]
-
   def show
     @assay_type = AssayType.find(params[:id])
     respond_to do |format|
