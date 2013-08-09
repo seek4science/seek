@@ -1,0 +1,48 @@
+<style>
+    span.published {
+        font-size: 18px;
+        font-weight: bold;
+        color: green;
+    }
+    div.radio_buttons {
+        font-size: 16px;
+    }
+</style>
+
+<% if @requested_approval_assets.empty? %>
+    <span class="published">You have no assets waiting for your approval</span>
+<% else %>
+    <%= form_tag :action => :gatekeeper_decide do %>
+        Please select your decision:
+        <% @requested_approval_assets.each do |asset| %>
+            <div class="list_items_container" id="<%= asset.class.name %>_list_items_container">
+              <%= render :partial => "assets/resource_list_item", :object => asset, :locals => {:actions_partial_disable => true} -%>
+              <br/>
+              <br/>
+              <div class="radio_buttons">
+                <br/>
+                <input type="radio" name="gatekeeper_decide[<%= asset.class.name %>][<%= asset.id %>][decision]" value="1" />
+                Approve
+                <br/>
+                <input type="radio" name="gatekeeper_decide[<%= asset.class.name %>][<%= asset.id %>][decision]" value="0" />
+                Reject
+                <br/>
+                <input type="radio" name="gatekeeper_decide[<%= asset.class.name %>][<%= asset.id %>][decision]" value="-1" />
+                Decide later
+              </div>
+
+              <div id="comment_<%= asset.class.name %>_<%= asset.id %>" style=" margin-left:1em">
+                If you are going to approve/reject, you might want to input the reasons/comments here so that the requesters are informed.
+                <br/>
+                <%= text_area_tag "gatekeeper_decide[#{asset.class.name}][#{asset.id}][comment]", nil, :size => "50x8" -%>
+              </div>
+            </div>
+        <% end %>
+
+        <br/>
+        <%= submit_tag "Submit", :disable_with => "Submitting ..." -%>
+        Or
+        <%= link_to "Cancel", person_path(params[:id].to_i) -%>
+    <% end %>
+<% end %>
+

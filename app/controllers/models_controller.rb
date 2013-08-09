@@ -17,7 +17,6 @@ class ModelsController < ApplicationController
     
   before_filter :jws_enabled,:only=>[:builder,:simulate,:submit_to_jws]
 
-  include Seek::Publishing::GatekeeperPublish
   include Seek::Publishing::PublishingCommon
 
   include Seek::BreadCrumbs

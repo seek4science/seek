@@ -129,6 +129,9 @@ SEEK::Application.routes.draw do
       get :publish_related_items
       put :administer_update
       post :publish
+      get :requested_approval_assets
+      post :gatekeeper_decide
+      get :gatekeeper_decision_result
     end
     resources :avatars do
       member do
@@ -185,10 +188,6 @@ SEEK::Application.routes.draw do
     collection do
       get :view_items_in_tab
     end
-    member do
-      get :approve_or_reject_publish
-      post :gatekeeper_decide
-    end
   end
 
   resources :studies do
@@ -196,11 +195,6 @@ SEEK::Application.routes.draw do
       post :investigation_selected_ajax
       get :view_items_in_tab
     end
-    member do
-      get :approve_or_reject_publish
-      post :gatekeeper_decide
-    end
-
   end
 
   resources :assays do
@@ -209,8 +203,6 @@ SEEK::Application.routes.draw do
       get :view_items_in_tab
     end
     member do
-      get :approve_or_reject_publish
-      post :gatekeeper_decide
       post :update_annotations_ajax
     end
   end
@@ -246,13 +238,11 @@ SEEK::Application.routes.draw do
       get :explore
       get :download
       get :published
-      get :approve_or_reject_publish
       get :publish_related_items
       post :publish
       post :request_resource
       post :convert_to_presentation
       post :update_annotations_ajax
-      post :gatekeeper_decide
       post :new_version
     end
     resources :studied_factors do
@@ -280,12 +270,10 @@ SEEK::Application.routes.draw do
       get :check_gatekeeper_required
       get :download
       get :published
-      get :approve_or_reject_publish
       get :publish_related_items
       post :publish
       post :request_resource
       post :update_annotations_ajax
-      post :gatekeeper_decide
       post :new_version
     end
     resources :content_blobs do
@@ -315,10 +303,8 @@ SEEK::Application.routes.draw do
       get :download
       get :matching_data
       get :published
-      get :approve_or_reject_publish
       get :publish_related_items
       post :submit_to_jws
-      post :gatekeeper_decide
       post :new_version
       post :submit_to_sycamore
       post :export_as_xgmml
@@ -356,12 +342,10 @@ SEEK::Application.routes.draw do
       get :check_gatekeeper_required
       get :download
       get :published
-      get :approve_or_reject_publish
       get :publish_related_items
       post :publish
       post :request_resource
       post :update_annotations_ajax
-      post :gatekeeper_decide
       post :new_version
     end
     resources :experimental_conditions do

@@ -325,6 +325,8 @@ module ImagesHelper
         "jws/shadow2.gif"
       when "home"
         "famfamfam_silk/house.png"
+      when "waiting"
+        "ajax-loader.gif"
     else
       return nil
     end
