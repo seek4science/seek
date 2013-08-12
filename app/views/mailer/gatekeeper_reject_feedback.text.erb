@@ -1,11 +1,11 @@
 Hi <%= @requester.name -%>,
 
-    Upon to your publishing requests, the <%= Seek::Config.application_name %> gatekeeper <%= @gatekeeper.name -%>, <%= person_url(@gatekeeper,:host=>@host) -%> rejected to publish:
+    Upon your publishing requests, the <%= Seek::Config.application_name %> Gatekeeper <%= @gatekeeper.name -%>, <%= person_url(@gatekeeper,:host=>@host) -%> rejected your wish to publish:
     <% @items_and_comments.each do |item_and_comment| %>
         <% item = item_and_comment[:item] %>
         <% controller=item.class.name.underscore.pluralize -%>
         <%= item.class.name.humanize -%>: <%= item.title -%> - <%= url_for(:action=>:show,:controller=>controller,:id=>item,:host=>@host) -%>.
-        Comment: <%= item_and_comment[:comment].blank? ? 'No comment' : item_and_comment['comment'] %>
+        Comment: <%= item_and_comment[:comment].blank? ? 'No comment' : item_and_comment[:comment] %>.
 
     <% end %>
     You can also reply to <%= @gatekeeper.name %> by replying to this email.
