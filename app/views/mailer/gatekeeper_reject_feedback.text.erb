@@ -6,8 +6,8 @@ Hi <%= @requester.name -%>,
         <% controller=item.class.name.underscore.pluralize -%>
         <%= item.class.name.humanize -%>: <%= item.title -%> - <%= url_for(:action=>:show,:controller=>controller,:id=>item,:host=>@host) -%>.
         Comment: <%= item_and_comment[:comment].blank? ? 'No comment' : item_and_comment['comment'] %>
-    <% end %>
 
+    <% end %>
     You can also reply to <%= @gatekeeper.name %> by replying to this email.
 
     This is an automated email.
