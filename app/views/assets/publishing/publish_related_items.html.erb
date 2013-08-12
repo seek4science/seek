@@ -1,27 +1,26 @@
 <%= javascript_include_tag 'publishing' %>
 <%= stylesheet_link_tag "publishing" %>
 <div class="show_basic">
-  <br/>
+  <%= show_title "Review and select #{t('assays.assay').pluralize}, #{t('study').pluralize} and #{t('investigation').pluralize}" %>
 
   <div class="box_infotext">
-    <ul style="padding-left:1em;">
-      <li>
-        Here you can publish together with the selected items in previous step their related items. They are organized
-        in ISA structure.
-      </li>
-      <li>
-        Having the permission to publish an item, you can publish it by <b>checking</b> the
-        <span class="published"><b>Publish</b></span> checkbox beside that asset.
-      </li>
-      <li>
-        If you dont have the permission to publish an item or it was already published, the checkbox is
-        <span style="color:gray;font-weight:bolder">disabled</span>
-      </li>
-      <li>
-        The selected items in previous step are marked in the dash boxes, and the publish checkboxes are checked by
-        default
-      </li>
-    </ul>
+    <p>
+      Below are listed the <b><%= "#{t('assays.assay').pluralize}, #{t('study').pluralize} and #{t('investigation').pluralize}" -%></b> that are related to the items
+      you previously wished to publish.
+    </p>
+    <p>
+      If you have the required access rights, you can choose to publish it by <b>checking</b> the
+      <span class="published"><b>Publish</b></span> checkbox beside the item.
+    </p>
+    <p>
+      If you do not have the required access rights to publish, the checkbox is
+      <span style="color:gray;font-weight:bolder">disabled</span>. Somebody that can publish that item is listed next to it and you should contact them and ask them to publish it for you.
+    </p>
+    <p>
+      The selected items in previous step are shown together with the associated <%= t('assays.assay') -%>, and the publish checkboxes are checked by
+      default. Other items related to that <%= t('assays.assay') -%> are also shown, should you want to choose to publish them together.
+    </p>
+
   </div>
   <br/>
   <%= form_tag({:action => :check_gatekeeper_required},:method=>:get) do %>
