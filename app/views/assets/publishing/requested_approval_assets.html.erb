@@ -60,7 +60,8 @@
   <% else %>
       <%= form_tag :action => :gatekeeper_decide do %>
           <h2>You have been requested to make the following items published. Please select your decision:</h2>
-          <% @requested_approval_assets.each do |asset| %>
+          <% isa_order = ['Investigation', 'Study', 'Assay']%>
+          <% @requested_approval_assets.sort_by { |a| [a.is_isa? ? -1 : 1, isa_order.index(a.class.name), a.class.name] }.each do |asset| %>
               <ul class="item_for_decision">
                 <li class="type_and_title">
                   <%= text_for_resource asset -%>:&nbsp;<%= link_to (asset.title), asset -%>

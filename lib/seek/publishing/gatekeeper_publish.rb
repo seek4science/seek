@@ -7,7 +7,7 @@ module Seek
       end
 
       def requested_approval_assets
-        @requested_approval_assets = ResourcePublishLog.requested_approval_assets_for(current_user.person)
+        @requested_approval_assets = ResourcePublishLog.requested_approval_assets_for(@gatekeeper)
         respond_to do |format|
           format.html {render :template => "assets/publishing/requested_approval_assets"}
         end
