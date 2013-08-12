@@ -1,11 +1,10 @@
-<%= stylesheet_link_tag "publishing" %>
-
 <style type="text/css">
     span.published {
         font-size: 18px;
         font-weight: bold;
         color: green;
     }
+
     ul.item_for_decision {
         padding-left: 1em;
         margin-top: 2em;
@@ -13,7 +12,7 @@
     }
 
     ul.item_for_decision li.type_and_title {
-        font-weight:bolder;
+        font-weight: bolder;
         list-style-type: none;
     }
 
@@ -25,83 +24,98 @@
         list-style-type: none;
     }
 
-    ul.item_for_decision li.radio_buttons span.approve {
-        color: limegreen;
-        padding-right: 1em;
-    }
-
-    ul.item_for_decision li.radio_buttons span.approve {
-        color: limegreen;
-        font-weight:bolder;
-        padding-right: 1em;
-    }
-
-    ul.item_for_decision li.radio_buttons span.reject {
-        color: red;
-        font-weight:bolder;
-        padding-right: 1em;
-    }
-
-    ul.item_for_decision li.radio_buttons span.decide_later {
-        font-weight:bolder;
-    }
-
     ul.item_for_decision li.comment {
         list-style-type: none;
     }
 
+    span.approve {
+        color: limegreen;
+        font-weight: bolder;
+    }
+
+    span.reject {
+        color: red;
+        font-weight: bolder;
+    }
+
+    span.decide_later {
+        font-weight: bolder;
+    }
+
     img.icon_visibility {
-        margin-left:2em;
+        margin-left: 2em;
     }
 </style>
 
-<% if @requested_approval_assets.empty? %>
-    <span class="published">You have no assets waiting for your approval</span>
-<% else %>
-    <%= form_tag :action => :gatekeeper_decide do %>
-        Please select your decision:
-        <% @requested_approval_assets.each do |asset| %>
-            <ul class="item_for_decision">
-              <li class="type_and_title">
-                <%= text_for_resource asset -%>:&nbsp;<%= link_to (asset.title), asset -%>
-                <%= list_item_visibility(asset, "icon_visibility") -%>
-              </li>
-              <li class="request_info">
-                Requested by:&nbsp;
-                    <% asset.publish_requesters.each do |requester| %>
+<div class="show_basic">
+  <br/>
+  <div class="box_infotext">
+    <ul style="padding-left:1em;">
+      <li>
+        <% project_names = current_user.person.projects.collect(&:name) %>
+        You are the <b>Gatekeeper</b> of <%= project_names.count > 1 ? t('project').pluralize : t('project') %>
+        : <%= project_names.join(', ') %>.
+      </li>
+      <li>
+        As the <b>Gatekeeper</b>, you control the process of making the items within
+        your <%= project_names.count > 1 ? t('project').pluralize : t('project') %> published, that is:
+        the owners of the items ask for your approval to make the items published.
+      </li>
+      <li>
+        The owners will be informed if you <span class="approve">approve</span> or <span class="reject">reject</span> the requests.
+      </li>
+    </ul>
+  </div>
+
+  <br/>
+  <% if @requested_approval_assets.empty? %>
+      <span class="published">You have no items waiting for your approval</span>
+  <% else %>
+      <%= form_tag :action => :gatekeeper_decide do %>
+          <h2>You have been requested to make the following items published. Please select your decision:</h2>
+          <% @requested_approval_assets.each do |asset| %>
+              <ul class="item_for_decision">
+                <li class="type_and_title">
+                  <%= text_for_resource asset -%>:&nbsp;<%= link_to (asset.title), asset -%>
+                  <%= list_item_visibility(asset, "icon_visibility") -%>
+                </li>
+                <li class="request_info">
+                  Requested by:&nbsp;
+                  <% asset.publish_requesters.each do |requester| %>
                       <%= link_to(requester.name, requester) %>
                       On
                       <%
                          log = ResourcePublishLog.where(["resource_type=? AND resource_id=? AND publish_state=? AND user_id=?",
-                                                   asset.class.name, asset.id, ResourcePublishLog::WAITING_FOR_APPROVAL, requester.user.id]).last
+                                                         asset.class.name, asset.id, ResourcePublishLog::WAITING_FOR_APPROVAL, requester.user.id]).last
                       %>
                       <%= date_as_string(log.created_at) %>
                       <br/>
-                    <% end %>
-              </li>
+                  <% end %>
+                </li>
 
-              <li class="radio_buttons">
+                <li class="radio_buttons">
                   <input type="radio" name="gatekeeper_decide[<%= asset.class.name %>][<%= asset.id %>][decision]" value="1"/>
-                  <span class="approve">Approve</span>
+                  <span class="approve" style="padding-right: 2em;">Approve</span>
 
                   <input type="radio" name="gatekeeper_decide[<%= asset.class.name %>][<%= asset.id %>][decision]" value="0"/>
-                  <span class="reject">Reject</span>
+                  <span class="reject" style="padding-right: 2em;">Reject</span>
 
                   <input type="radio" name="gatekeeper_decide[<%= asset.class.name %>][<%= asset.id %>][decision]" value="-1"/>
                   <span class="decide_later">Decide later</span>
-              </li>
-              <li class="comment" id="comment_<%= asset.class.name %>_<%= asset.id %>">
-                  Reasons/comments:
+                </li>
+                <li class="comment" id="comment_<%= asset.class.name %>_<%= asset.id %>">
+                  Reasons/comments(optional):
                   <br/>
                   <%= text_area_tag "gatekeeper_decide[#{asset.class.name}][#{asset.id}][comment]", nil, :style => "width: 50%;", :rows => 3 -%>
-              </li>
-            </ul>
-        <% end %>
+                </li>
+              </ul>
+          <% end %>
 
-        <br/>
-        <%= submit_tag "Submit", :disable_with => "Submitting ..." -%>
-        Or
-        <%= link_to "Cancel", person_path(params[:id].to_i) -%>
-    <% end %>
-<% end %>
+          <br/>
+          <%= submit_tag "Submit", :disable_with => "Submitting ..." -%>
+          Or
+          <%= link_to "Cancel", person_path(params[:id].to_i) -%>
+      <% end %>
+  <% end %>
+</div>
 
