@@ -21,8 +21,8 @@ class ResourcePublishLog < ActiveRecord::Base
   def self.requested_approval_assets_for gatekeeper
     #FIXME: write tests for this method.
     resource_types = Seek::Util.authorized_types.select{|klass| klass.is_isa? || klass.first.try(:is_in_isa_publishable?) }.collect{|klass| klass.name}
-    requested_approval_logs = ResourcePublishLog.includes(:resource).where(["publish_state=? AND resource_type IN (?) AND created_at >?",
-                                                                              WAITING_FOR_APPROVAL, resource_types, CONSIDERING_TIME.ago])
+    requested_approval_logs = ResourcePublishLog.includes(:resource).where(["publish_state=? AND resource_type IN (?)",
+                                                                              WAITING_FOR_APPROVAL, resource_types])
     requested_approval_assets = requested_approval_logs.collect(&:resource)
     requested_approval_assets.select!{|asset| !asset.is_published?}
     requested_approval_assets.select!{|asset| gatekeeper.is_gatekeeper_of? asset}
