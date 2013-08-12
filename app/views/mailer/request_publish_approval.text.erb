@@ -4,7 +4,7 @@ Hi <%= @gatekeeper.name -%>,
     You can approve or reject by clicking on the links beside the items:
     <% @resources.each do |resource|%>
         <% controller=resource.class.name.underscore.pluralize -%>
-        "<%= resource.title -%>": <%= url_for(:controller => controller, :action => 'approve_or_reject_publish', :id => resource.id, :host=>@host) -%>
+        "<%= resource.title -%>": <%#= url_for(:controller => controller, :action => 'approve_or_reject_publish', :id => resource.id, :host=>@host) -%>
 
     <% end %>
 

@@ -42,28 +42,22 @@ class Mailer < ActionMailer::Base
          :subject=>"A #{Seek::Config.application_name} member requested your approval to publish some items.")
   end
 
-  def gatekeeper_approval_feedback requester, gatekeeper, resource, base_host
+  def gatekeeper_approval_feedback requester, gatekeeper, items_and_comments, base_host
     @gatekeeper = gatekeeper
     @requester=requester
-    @resource=resource
+    @items_and_comments=items_and_comments
     @host=base_host
-    mail(:to=>requester.email_with_name,:subject=>"A #{Seek::Config.application_name} gatekeeper approved your request to publish: #{resource.title}")
+    mail(:to=>requester.email_with_name,:subject=>"A #{Seek::Config.application_name} gatekeeper approved your publishing requests.")
 
   end
 
-  def gatekeeper_reject_feedback requester, gatekeeper, resource, extra_comment, base_host
+  def gatekeeper_reject_feedback requester, gatekeeper, items_and_comments, base_host
     @gatekeeper = gatekeeper
     @requester=requester
-    @resource=resource
+    @items_and_comments=items_and_comments
     @host=base_host
-    if extra_comment.blank?
-      extra_comment = gatekeeper.name + " did not leave any reasons/comments"
-    else
-      extra_comment = gatekeeper.name + " left reasons/comments: " + extra_comment
-    end
-    @extra_comment=extra_comment
-    mail(:to => requester.email_with_name, :subject => "A #{Seek::Config.application_name} gatekeeper rejected your request to publish: #{resource.title}", :reply_to => gatekeeper.email_with_name)
 
+    mail(:to => requester.email_with_name, :subject => "A #{Seek::Config.application_name} gatekeeper rejected your publishing requests.", :reply_to => gatekeeper.email_with_name)
   end
 
   def request_resource(user,resource,details,base_host)

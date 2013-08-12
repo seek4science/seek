@@ -25,7 +25,7 @@ module Seek
         end
 
         respond_to do |format|
-          flash[:notice]="Decision making complete"
+          flash[:notice]="Decision making complete!"
           format.html {render :template => "assets/publishing/gatekeeper_decision_result"}
         end
       end
@@ -45,9 +45,11 @@ module Seek
 
       def deliver_gatekeeper_approval_feedback items
         if (Seek::Config.email_enabled)
-          requesters_items(items).keys.each do |requester|
+          requesters_items_comments = requesters_items_and_comments(items)
+          requesters_items_comments.keys.each do |requester_id|
+            requester = Person.find_by_id(requester_id)
             begin
-              Mailer.gatekeeper_approval_feedback(requester, current_user.person , requesters_items[requester], base_host).deliver
+              Mailer.gatekeeper_approval_feedback(requester, @gatekeeper , requesters_items_comments[requester_id], base_host).deliver
             rescue Exception => e
               Rails.logger.error("Error sending gatekeeper approval feedback email to the requester #{requester.name}- #{e.message}")
             end
@@ -57,14 +59,11 @@ module Seek
 
       def deliver_gatekeeper_reject_feedback items
         if (Seek::Config.email_enabled)
-          requesters_items(items).keys.each do |requester|
+          requesters_items_comments = requesters_items_and_comments(items)
+          requesters_items_comments.keys.each do |requester_id|
+            requester = Person.find_by_id(requester_id)
             begin
-              #FIXME: add extra_comment.
-              items_with_comment =[]
-              requesters_items[requester].each do |item|
-                items_with_comment << [item, params[:gatekeeper_decide]["#{item.class.name}"]["#{item.id}"]["comment"]]
-              end
-              Mailer.gatekeeper_reject_feedback(requester, current_user.person, items_with_comment, base_host).deliver
+              Mailer.gatekeeper_reject_feedback(requester, @gatekeeper,  requesters_items_comments[requester_id], base_host).deliver
             rescue Exception => e
               Rails.logger.error("Error sending gatekeeper reject feedback email to the requester #{requester.name}- #{e.message}")
             end
@@ -72,15 +71,16 @@ module Seek
         end
       end
 
-      def requesters_items items
-        requesters_items={}
+      def requesters_items_and_comments items
+        requesters_items_and_comments={}
         items.each do |item|
-          item.publish_requesters.each do |requester|
-            requesters_items[requester]||=[]
-            requesters_items[requester] << item
+          item.publish_requesters.collect(&:id).each do |requester_id|
+            requesters_items_and_comments[requester_id]||=[]
+            requesters_items_and_comments[requester_id] << {:item => item,
+                                                         :comment => params[:gatekeeper_decide]["#{item.class.name}"]["#{item.id}"]["comment"]}
           end
         end
-        requesters_items
+        requesters_items_and_comments
       end
 
       def resolve_items_params param

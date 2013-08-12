@@ -135,10 +135,11 @@ class MailerTest < ActionMailer::TestCase
   end
 
   test "gatekeeper approval feedback" do
-    resource = data_files(:picture)
+    item = data_files(:picture)
+    items_and_comments = [{:item => item, :comment => nil}]
     gatekeeper = people(:gatekeeper_person)
     requester = people(:aaron_person)
-    @expected.subject = "A SEEK gatekeeper approved your request to publish: #{resource.title}"
+    @expected.subject = "A SEEK gatekeeper approved your publishing requests."
 
     @expected.to = requester.email_with_name
     @expected.from = "no-reply@sysmo-db.org"
@@ -147,15 +148,16 @@ class MailerTest < ActionMailer::TestCase
     @expected.body = read_fixture('gatekeeper_approval_feedback')
 
 
-    assert_equal encode_mail(@expected),encode_mail(Mailer.gatekeeper_approval_feedback(requester, gatekeeper, resource,"localhost"))
+    assert_equal encode_mail(@expected),encode_mail(Mailer.gatekeeper_approval_feedback(requester, gatekeeper, items_and_comments,"localhost"))
 
   end
 
   test "gatekeeper reject feedback" do
-    resource = data_files(:picture)
+    item = data_files(:picture)
+    items_and_comments = [{:item => item, :comment => 'not ready'}]
     gatekeeper = people(:gatekeeper_person)
     requester = people(:aaron_person)
-    @expected.subject = "A SEEK gatekeeper rejected your request to publish: #{resource.title}"
+    @expected.subject = "A SEEK gatekeeper rejected your publishing requests."
 
     @expected.to = requester.email_with_name
     @expected.from = "no-reply@sysmo-db.org"
@@ -163,10 +165,8 @@ class MailerTest < ActionMailer::TestCase
 
 
     @expected.body = read_fixture('gatekeeper_reject_feedback')
-    extra_comment = 'Not ready'
 
-    assert_equal encode_mail(@expected),encode_mail(Mailer.gatekeeper_reject_feedback(requester, gatekeeper, resource, extra_comment, "localhost"))
-
+    assert_equal encode_mail(@expected),encode_mail(Mailer.gatekeeper_reject_feedback(requester, gatekeeper, items_and_comments, "localhost"))
   end
 
 

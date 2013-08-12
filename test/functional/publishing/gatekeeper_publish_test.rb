@@ -107,10 +107,9 @@ class GatekeeperPublishTest < ActionController::TestCase
     login_as(@gatekeeper.user)
 
     assert_difference("ResourcePublishLog.count",2) do
-      #FIXME:fix email
-      #assert_emails 2 do
+      assert_emails 2 do
         post :gatekeeper_decide, params.merge(:id=> @gatekeeper.id)
-      #end
+      end
     end
 
     assert_response :success
@@ -122,9 +121,11 @@ class GatekeeperPublishTest < ActionController::TestCase
     sop.reload
     assert !sop.can_download?(nil)
 
-    log= ResourcePublishLog.last
-    assert_equal ResourcePublishLog::REJECTED, log.publish_state
-    assert_equal 'not ready', log.comment
+    approved_log= ResourcePublishLog.where(["publish_state=?", ResourcePublishLog::PUBLISHED ]).last
+    assert_equal 'ready', approved_log.comment
+
+    rejected_log= ResourcePublishLog.where(["publish_state=?", ResourcePublishLog::REJECTED ]).last
+    assert_equal 'not ready', rejected_log.comment
   end
 
   test 'only allow gatekeeper_decide the authorized items' do
@@ -198,6 +199,7 @@ class GatekeeperPublishTest < ActionController::TestCase
     params[:gatekeeper_decide][df.class.name]||={}
     params[:gatekeeper_decide][df.class.name][df.id.to_s]||={}
     params[:gatekeeper_decide][df.class.name][df.id.to_s]['decision']=1
+    params[:gatekeeper_decide][df.class.name][df.id.to_s]['comment']='ready'
     params[:gatekeeper_decide][model.class.name]||={}
     params[:gatekeeper_decide][model.class.name][model.id.to_s]||={}
     params[:gatekeeper_decide][model.class.name][model.id.to_s]['decision']=0
