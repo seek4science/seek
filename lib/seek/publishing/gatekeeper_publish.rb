@@ -15,7 +15,7 @@ module Seek
 
       def gatekeeper_decide
         resolve_items_params params[:gatekeeper_decide]
-        @problematic_items = @approve_items.select{|item| !item.publish!}
+        @problematic_items = @approve_items.select{|item| !item.publish!(params[:gatekeeper_decide]["#{item.class.name}"]["#{item.id}"]["comment"])}
 
         deliver_gatekeeper_approval_feedback(@approve_items - @problematic_items)
         deliver_gatekeeper_reject_feedback(@reject_items)

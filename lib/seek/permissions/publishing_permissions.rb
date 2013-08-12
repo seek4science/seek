@@ -24,7 +24,7 @@ module Seek
         end
       end
 
-      def publish!
+      def publish! comment=nil
         if can_publish?
           if gatekeeper_required? && !User.current_user.person.is_gatekeeper_of?(self)
             false
@@ -33,7 +33,9 @@ module Seek
             policy.sharing_scope=Policy::EVERYONE
             policy.save
             #FIXME:may need to add comment
-            self.resource_publish_logs.create(:publish_state=>ResourcePublishLog::PUBLISHED,:user=>User.current_user)
+            self.resource_publish_logs.create(:publish_state=>ResourcePublishLog::PUBLISHED,
+                                              :user=>User.current_user,
+                                              :comment=>comment)
             touch
           end
         else
