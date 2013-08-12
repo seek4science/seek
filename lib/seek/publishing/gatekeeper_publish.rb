@@ -25,7 +25,7 @@ module Seek
         end
 
         respond_to do |format|
-          flash[:notice]="Publishing complete"
+          flash[:notice]="Decision making complete"
           format.html {render :template => "assets/publishing/gatekeeper_decision_result"}
         end
       end
