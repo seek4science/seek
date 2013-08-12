@@ -90,7 +90,7 @@
                   <input type="radio" name="gatekeeper_decide[<%= asset.class.name %>][<%= asset.id %>][decision]" value="-1" checked="true"/>
                   <span class="decide_later">Decide later</span>
                 </li>
-                <li class="comment" id="comment_<%= asset.class.name %>_<%= asset.id %>">
+                <li class="comment">
                   Reasons/comments(optional):
                   <br/>
                   <%= text_area_tag "gatekeeper_decide[#{asset.class.name}][#{asset.id}][comment]", nil, :style => "width: 50%;", :rows => 3 -%>

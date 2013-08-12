@@ -104,6 +104,12 @@ module Seek
             end
           end
         end
+        #filter only authorized items for making decision
+        requested_approval_assets = ResourcePublishLog.requested_approval_assets_for @gatekeeper
+        @approve_items = @approve_items & requested_approval_assets
+        @reject_items = @reject_items & requested_approval_assets
+        @decide_later_items = @decide_later_items & requested_approval_assets
+
         @approve_items.uniq!
         @reject_items.uniq!
         @decide_later_items.uniq!

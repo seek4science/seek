@@ -61,35 +61,41 @@ class GatekeeperPublishTest < ActionController::TestCase
 
     assert ResourcePublishLog.requested_approval_assets_for(@gatekeeper).empty?
     get :requested_approval_assets, :id => @gatekeeper
-    assert_select "span", :text => "You have no assets waiting for your approval"
+    assert_select "span", :text => "You have no items waiting for your approval"
 
+    user = Factory(:user)
     df = Factory(:data_file, :projects => @gatekeeper.projects)
     model = Factory(:model, :projects => @gatekeeper.projects)
     sop = Factory(:sop, :projects => @gatekeeper.projects)
-    ResourcePublishLog.add_log(ResourcePublishLog::WAITING_FOR_APPROVAL, df)
-    ResourcePublishLog.add_log(ResourcePublishLog::WAITING_FOR_APPROVAL, model)
-    ResourcePublishLog.add_log(ResourcePublishLog::WAITING_FOR_APPROVAL, sop)
+    ResourcePublishLog.add_log(ResourcePublishLog::WAITING_FOR_APPROVAL, df, nil, user)
+    ResourcePublishLog.add_log(ResourcePublishLog::WAITING_FOR_APPROVAL, model, nil, user)
+    ResourcePublishLog.add_log(ResourcePublishLog::WAITING_FOR_APPROVAL, sop, nil, user)
 
     requested_approval_assets = ResourcePublishLog.requested_approval_assets_for(@gatekeeper)
     assert_equal 3, requested_approval_assets.count
 
     get :requested_approval_assets, :id => @gatekeeper
 
-    assert_select "div.list_item_title", :count => 3 do
+    assert_select "li.type_and_title", :count => 3 do
       assert_select "a[href=?]", data_file_path(df)
       assert_select "a[href=?]", model_path(model)
       assert_select "a[href=?]", sop_path(sop)
     end
-    assert_select "div.radio_buttons", :count => 3 do
+
+    assert_select "li.request_info", :count => 3 do
+      assert_select "a[href=?]", person_path(user.person), :count => 3
+    end
+
+    assert_select "li.radio_buttons", :count => 3 do
       [df, model, sop].each do |asset|
         assert_select "input[type=radio][name=?][value=?]", "gatekeeper_decide[#{asset.class.name}][#{asset.id}][decision]", 1
         assert_select "input[type=radio][name=?][value=?]", "gatekeeper_decide[#{asset.class.name}][#{asset.id}][decision]", 0
-        assert_select "input[type=radio][name=?][value=?]", "gatekeeper_decide[#{asset.class.name}][#{asset.id}][decision]", -1
+        assert_select "input[type=radio][name=?][value=?][checked=?]", "gatekeeper_decide[#{asset.class.name}][#{asset.id}][decision]", -1, "true"
       end
     end
 
-    [df, model, sop].each do |asset|
-      assert_select "div#comment_#{asset.class.name}_#{asset.id}" do
+    assert_select "li.comment", :count => 3 do
+      [df, model, sop].each do |asset|
         assert_select "textarea[name=?]", "gatekeeper_decide[#{asset.class.name}][#{asset.id}][comment]"
       end
     end
@@ -119,6 +125,36 @@ class GatekeeperPublishTest < ActionController::TestCase
     log= ResourcePublishLog.last
     assert_equal ResourcePublishLog::REJECTED, log.publish_state
     assert_equal 'not ready', log.comment
+  end
+
+  test 'only allow gatekeeper_decide the authorized items' do
+    params = {:gatekeeper_decide=>{}}
+    unauthorized_df = Factory(:data_file)
+    unauthorized_model = Factory(:model)
+    params[:gatekeeper_decide][unauthorized_df.class.name]||={}
+    params[:gatekeeper_decide][unauthorized_df.class.name][unauthorized_df.id.to_s]||={}
+    params[:gatekeeper_decide][unauthorized_df.class.name][unauthorized_df.id.to_s]['decision']=1
+    params[:gatekeeper_decide][unauthorized_model.class.name]||={}
+    params[:gatekeeper_decide][unauthorized_model.class.name][unauthorized_model.id.to_s]||={}
+    params[:gatekeeper_decide][unauthorized_model.class.name][unauthorized_model.id.to_s]['decision']=0
+
+    login_as(@gatekeeper.user)
+
+    assert_no_difference("ResourcePublishLog.count") do
+      assert_emails 0 do
+        post :gatekeeper_decide, params.merge(:id=> @gatekeeper.id)
+      end
+    end
+
+    assert_response :success
+    unauthorized_df.reload
+    assert !unauthorized_df.can_download?(nil)
+
+    unauthorized_model.reload
+    assert !unauthorized_model.can_download?(nil)
+    logs= ResourcePublishLog.where(["publish_state=? AND resource_type=? AND resource_id=?",
+                                        ResourcePublishLog::REJECTED, "Model", unauthorized_model.id])
+    assert logs.empty?
   end
 
   test "gatekeeper_decision_result" do
