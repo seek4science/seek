@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20130809144222) do
+ActiveRecord::Schema.define(:version => 20130813102022) do
 
   create_table "activity_logs", :force => true do |t|
     t.string   "action"
@@ -26,7 +26,7 @@ ActiveRecord::Schema.define(:version => 20130809144222) do
     t.datetime "updated_at"
     t.string   "http_referer"
     t.string   "user_agent"
-    t.text     "data",                   :limit => 2147483647
+    t.text     "data",                   :limit => 16777215
     t.string   "controller_name"
   end
 
@@ -1098,6 +1098,10 @@ ActiveRecord::Schema.define(:version => 20130809144222) do
     t.datetime "updated_at"
     t.text     "comment"
   end
+
+  add_index "resource_publish_logs", ["publish_state"], :name => "index_resource_publish_logs_on_publish_state"
+  add_index "resource_publish_logs", ["resource_type", "resource_id"], :name => "index_resource_publish_logs_on_resource_type_and_resource_id"
+  add_index "resource_publish_logs", ["user_id"], :name => "index_resource_publish_logs_on_user_id"
 
   create_table "sample_assets", :force => true do |t|
     t.integer  "sample_id"
