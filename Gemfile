@@ -81,7 +81,6 @@ group :development do
   gem "pry-remote"
   gem "request-log-analyzer"
   gem 'rails-dev-boost', :git => 'git://github.com/thedarkone/rails-dev-boost.git'
-  gem 'simplecov'
 end
 
 group :test do
