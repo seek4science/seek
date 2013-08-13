@@ -125,13 +125,18 @@ class LogPublishingTest < ActionController::TestCase
     logout
 
     login_as(gatekeeper.user)
+    @controller = PeopleController.new()
+    params = {:gatekeeper_decide=>{}}
+    params[:gatekeeper_decide][df.class.name]||={}
+    params[:gatekeeper_decide][df.class.name][df.id.to_s]||={}
+    params[:gatekeeper_decide][df.class.name][df.id.to_s]['decision']=1
+
     assert_difference ('ResourcePublishLog.count') do
-      post :gatekeeper_decide, :id => df.id, :gatekeeper_decision => 1
+      post :gatekeeper_decide, params.merge(:id=> gatekeeper.id)
     end
 
     publish_log = ResourcePublishLog.last
     assert_equal ResourcePublishLog::PUBLISHED, publish_log.publish_state.to_i
-    df = assigns(:data_file)
     assert_equal df, publish_log.resource
     assert_equal gatekeeper.user, publish_log.user
   end
