@@ -24,7 +24,7 @@ class LogPublishingTest < ActionController::TestCase
     assert_equal ResourcePublishLog::PUBLISHED, publish_log.publish_state.to_i
     sop = assigns(:sop)
     assert_equal sop, publish_log.resource
-    assert_equal sop.contributor, publish_log.culprit
+    assert_equal sop.contributor, publish_log.user
   end
 
   test 'log when creating item and request publish it' do
@@ -36,7 +36,7 @@ class LogPublishingTest < ActionController::TestCase
     assert_equal ResourcePublishLog::WAITING_FOR_APPROVAL, publish_log.publish_state.to_i
     sop = assigns(:sop)
     assert_equal sop, publish_log.resource
-    assert_equal sop.contributor, publish_log.culprit
+    assert_equal sop.contributor, publish_log.user
   end
 
   test 'dont log when creating the non-public item' do
@@ -63,7 +63,7 @@ class LogPublishingTest < ActionController::TestCase
     assert_equal ResourcePublishLog::PUBLISHED, publish_log.publish_state.to_i
     sop = assigns(:sop)
     assert_equal sop, publish_log.resource
-    assert_equal sop.contributor, publish_log.culprit
+    assert_equal sop.contributor, publish_log.user
   end
 
   test 'log when sending the publish request approval during updating a non-public item' do
@@ -81,7 +81,7 @@ class LogPublishingTest < ActionController::TestCase
     assert_equal ResourcePublishLog::WAITING_FOR_APPROVAL, publish_log.publish_state.to_i
     sop = assigns(:sop)
     assert_equal sop, publish_log.resource
-    assert_equal sop.contributor, publish_log.culprit
+    assert_equal sop.contributor, publish_log.user
   end
 
   test 'dont log when updating an item with the not-related public sharing' do
@@ -103,7 +103,7 @@ class LogPublishingTest < ActionController::TestCase
     assert_equal Policy::EVERYONE, sop.policy.sharing_scope
 
     #create a published log for the published sop
-    ResourcePublishLog.create(:resource => sop, :culprit => User.current_user, :publish_state => ResourcePublishLog::PUBLISHED)
+    ResourcePublishLog.create(:resource => sop, :user => User.current_user, :publish_state => ResourcePublishLog::PUBLISHED)
 
     assert_difference ('ResourcePublishLog.count') do
       put :update, :id => sop.id, :sharing => {:sharing_scope => Policy::PRIVATE, "access_type_#{Policy::PRIVATE}" => Policy::NO_ACCESS}
@@ -112,7 +112,7 @@ class LogPublishingTest < ActionController::TestCase
     assert_equal ResourcePublishLog::UNPUBLISHED, publish_log.publish_state.to_i
     sop = assigns(:sop)
     assert_equal sop, publish_log.resource
-    assert_equal sop.contributor, publish_log.culprit
+    assert_equal sop.contributor, publish_log.user
   end
 
   test 'log when approving publishing an item' do
@@ -133,7 +133,7 @@ class LogPublishingTest < ActionController::TestCase
     assert_equal ResourcePublishLog::PUBLISHED, publish_log.publish_state.to_i
     df = assigns(:data_file)
     assert_equal df, publish_log.resource
-    assert_equal gatekeeper.user, publish_log.culprit
+    assert_equal gatekeeper.user, publish_log.user
   end
 
   test 'log when publish isa' do
