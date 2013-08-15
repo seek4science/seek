@@ -1552,7 +1552,30 @@ class DataFilesControllerTest < ActionController::TestCase
   end
 
 
+  test "you should not subscribe to the asset created by the person whose projects overlap with you" do
+    proj = Factory(:project)
+    current_person = User.current_user.person
+    current_person.project_subscriptions.create :project => proj, :frequency => 'weekly'
+    a_person = Factory(:person)
+    a_person.project_subscriptions.create :project => a_person.projects.first, :frequency => 'weekly'
+    current_person.projects << a_person.projects.first
+    assert current_person.save
+    assert current_person.reload.projects.include?(a_person.projects.first)
+    assert Subscription.all.empty?
 
+    df_param = { :title=>"Test",:data=>fixture_file_upload('files/file_picture.png'),:project_ids=>[proj.id]}
+    post :create, :data_file => df_param, :sharing=>valid_sharing
+
+    df = assigns(:data_file)
+
+    assert SetSubscriptionsForItemJob.exists?(df.class.name, df.id, df.projects.collect(&:id))
+    SetSubscriptionsForItemJob.new(df.class.name, df.id, df.projects.collect(&:id)).perform
+
+    assert df.subscribed?(current_person)
+    assert !df.subscribed?(a_person)
+    assert_equal 1, current_person.subscriptions.count
+    assert_equal proj, current_person.subscriptions.first.project_subscription.project
+  end
 
   private
 
