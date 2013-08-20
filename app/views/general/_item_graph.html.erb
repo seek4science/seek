@@ -16,16 +16,18 @@
                 .selector('node')
                 .css({
                     'shape': 'roundrectangle',
+                    'border-color': 'data(borderColor)',
+                    'border-width': 2,
                     'das': 'mapData(weight, 40, 80, 20, 60)',
                     'content': 'data(name)',
                     'text-valign': 'center',
-                    'text-outline-width': 2,
+                    'text-outline-width': 1,
                     'text-outline-color': 'data(faveColor)',
                     'background-color': 'data(faveColor)',
                     'color': 'black',
                     'width':150,
                     'height':30,
-                    'font-size':9
+                    'font-size':10
                 })
 
 
@@ -33,7 +35,6 @@
                 .css({
                     'width': 'mapData(strength, 70, 100, 2, 6)',
                     'target-arrow-shape': 'triangle',
-                    'source-arrow-shape': 'circle',
                     'line-color': 'data(faveColor)',
                     'source-arrow-color': 'data(faveColor)',
                     'target-arrow-color': 'data(faveColor)'
