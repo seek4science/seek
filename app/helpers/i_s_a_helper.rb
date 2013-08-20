@@ -87,8 +87,9 @@ module ISAHelper
         source.strip!
         target.strip!
         edge.strip!
+        target_type = target.split('_').first
         hash_elements[:elements] << {:group => 'edges',
-                                     :data => {:id => edge, :source => source, :target => target, :faveColor => '#6FB1FC'}
+                                     :data => {:id => edge, :source => source, :target => target, :faveColor => (BORDER_COLOURS[target_type] || BORDER_COLOURS.default)}
         }
       end
 
