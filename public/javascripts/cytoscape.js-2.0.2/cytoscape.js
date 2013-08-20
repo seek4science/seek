@@ -15887,8 +15887,8 @@ var cytoscape;
             var depth = info.depth;
             var index = info.index;
 
-            var distanceX = Math.max( width / (depths[depth].length + 1), minDistance );
-            var distanceY = Math.max( height / (depths.length + 1), minDistance );
+            var distanceX = width / (depths.length + 3);
+            var distanceY = height / (depths[depth].length + 1);
             var radiusStepSize = Math.min( width / 2 / depths.length, height / 2 / depths.length );
             radiusStepSize = Math.max( radiusStepSize, minDistance );
 
@@ -15907,8 +15907,8 @@ var cytoscape;
 
             } else {
                 return {
-                    x: (index + 1) * distanceX,
-                    y: (depth + 1) * distanceY
+                    y: (index + 1) * distanceY,
+                    x: (depth + 1) * distanceX
                 };
             }
             
