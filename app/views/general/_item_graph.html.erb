@@ -1,13 +1,13 @@
 <%= javascript_include_tag "jquery-1.5.1.min.js", "cytoscape.js-2.0.2/cytoscape.js", "cytoscape.js-2.0.2/jquery.cxtmenu.min",
                            "cytoscape.js-2.0.2/jquery.cytoscape-edgehandles.min", "cytoscape.js-2.0.2/jquery.cytoscape-panzoom.min" %>
 
-<div id="cyid" style="float:center;position:inherit; width: 100%; height: 400px; background-color: #fff0f5;"></div>
+<div id="cy" style="float:center;position:inherit; width: 100%; height: 400px; background-color: #fff0f5;"></div>
 
 <script type="text/javascript">
     jQuery.noConflict();
     var $j = jQuery;
 
-    $j('#cyid').cytoscape({
+    $j('#cy').cytoscape({
         layout: {
           name: 'breadthfirst'
         },
@@ -51,42 +51,22 @@
             cy = this;
 
             //Centre on all elements in the graph.
-            cy.center();
+            cy.reset();
         }
     });
 
     $j(function(){
-        nodes = cy.$('node');
-        edges = cy.$('edge');
-
-        nodes.on('click', function(e){
+        cy.$('node').on('click', function(e){
             var node = e.cyTarget;
-            nodes.css('opacity',0.3);
-            nodes.css('width',150);
-            nodes.css('height',30);
-            edges.css('opacity',0.2);
-            node.css('opacity',1);
-            edges.each(function(i, edge){
-                var source = edge.source();
-                var target =edge.target();
-                if (source.id() == node.id()){
-                    edge.css('opacity',1);
-                    target.css('opacity',1);
-                }
-                if (target.id() == node.id()){
-                    edge.css('opacity',1);
-                    source.css('opacity',1);
-                }
-            });
-
-            node.animate({
-                css: { width:200, height:40 }
-            }, {
-                duration: 300
-            });
-
-
+            animateSelectedNode(node);
         });
+
+        //animate the current asset node
+        var asset_type =  '<%= controller_name.singularize.camelize %>';
+        var asset_id = '<%= params[:id] %>';
+        var asset_node_id = asset_type + '_' + asset_id;
+        var asset_node = cy.nodes('[id=\''+ asset_node_id +'\']')[0];
+        animateSelectedNode(asset_node);
 
         //nodes.one('mouseover', function(e){
         //    var node = e.cyTarget;
@@ -101,5 +81,33 @@
 
         //});
     });
+
+    function animateSelectedNode(node){
+        var nodes = cy.$('node');
+        var edges = cy.$('edge');
+        nodes.css('opacity',0.3);
+        nodes.css('width',150);
+        nodes.css('height',30);
+        edges.css('opacity',0.2);
+        node.css('opacity',1);
+        edges.each(function(i, edge){
+            var source = edge.source();
+            var target =edge.target();
+            if (source.id() == node.id()){
+                edge.css('opacity',1);
+                target.css('opacity',1);
+            }
+            if (target.id() == node.id()){
+                edge.css('opacity',1);
+                source.css('opacity',1);
+            }
+        });
+
+        node.animate({
+            css: { width:200, height:40 }
+        }, {
+            duration: 300
+        });
+    }
 
 </script>
