@@ -1,13 +1,13 @@
 <%= javascript_include_tag "jquery-1.5.1.min.js", "cytoscape.js-2.0.2/cytoscape.js", "cytoscape.js-2.0.2/jquery.cxtmenu.min",
                            "cytoscape.js-2.0.2/jquery.cytoscape-edgehandles.min", "cytoscape.js-2.0.2/jquery.cytoscape-panzoom.min" %>
 
-<div id="cy" style="float:center;position:inherit; width: 100%; height: 400px; background-color: #fff0f5;"></div>
+<div id="cyid" style="float:center;position:inherit; width: 100%; height: 400px; background-color: #fff0f5;"></div>
 
 <script type="text/javascript">
     jQuery.noConflict();
     var $j = jQuery;
 
-    $j('#cy').cytoscape({
+    $j('#cyid').cytoscape({
         layout: {
           name: 'breadthfirst'
         },
@@ -52,54 +52,54 @@
 
             //Centre on all elements in the graph.
             cy.center();
-
-            nodes = cy.$('node');
-            edges = cy.$('edge');
-
-            nodes.one('click', function(e){
-                var node = e.cyTarget;
-                nodes.css('opacity',0.3);
-                nodes.css('width',150);
-                nodes.css('height',30);
-                edges.css('opacity',0.2);
-                node.css('opacity',1);
-                edges.each(function(i, edge){
-                    var source = edge.source();
-                    var target =edge.target();
-                    if (source.id() == node.id()){
-                        edge.css('opacity',1);
-                        target.css('opacity',1);
-                    }
-                    if (target.id() == node.id()){
-                        edge.css('opacity',1);
-                        source.css('opacity',1);
-                    }
-                });
-
-                node.animate({
-                    css: { width:200, height:40 }
-                }, {
-                    duration: 300
-                });
-
-
-            });
-
-            nodes.one('mouseover', function(e){
-                var node = e.cyTarget;
-
-                //node.css('background-color','red');
-
-            });
-
-            nodes.one('mouseout', function(e){
-                //var node = e.cyTarget;
-                //node.css('background-color','yellow');
-
-            });
-
-
         }
+    });
+
+    $j(function(){
+        nodes = cy.$('node');
+        edges = cy.$('edge');
+
+        nodes.on('click', function(e){
+            var node = e.cyTarget;
+            nodes.css('opacity',0.3);
+            nodes.css('width',150);
+            nodes.css('height',30);
+            edges.css('opacity',0.2);
+            node.css('opacity',1);
+            edges.each(function(i, edge){
+                var source = edge.source();
+                var target =edge.target();
+                if (source.id() == node.id()){
+                    edge.css('opacity',1);
+                    target.css('opacity',1);
+                }
+                if (target.id() == node.id()){
+                    edge.css('opacity',1);
+                    source.css('opacity',1);
+                }
+            });
+
+            node.animate({
+                css: { width:200, height:40 }
+            }, {
+                duration: 300
+            });
+
+
+        });
+
+        //nodes.one('mouseover', function(e){
+        //    var node = e.cyTarget;
+
+        //node.css('background-color','red');
+
+        //});
+
+        //nodes.one('mouseout', function(e){
+        //var node = e.cyTarget;
+        //node.css('background-color','yellow');
+
+        //});
     });
 
 </script>
