@@ -77,7 +77,9 @@ module ISAHelper
         item = item_type.constantize.find_by_id(item_id)
         hash_elements[:elements] << {:group => 'nodes',
                                      :data => {:id => node,
-                                               :name => truncate(item.title) ,
+                                               :name => truncate(item_type.humanize + ': ' +  item.title) ,
+                                               :full_title => (item_type.humanize + ': ' +  item.title) ,
+                                               :path => polymorphic_path(item),
                                                :faveColor => (FILL_COLOURS[item_type] || FILL_COLOURS.default),
                                                :borderColor => (BORDER_COLOURS[item_type] || BORDER_COLOURS.default)}
                                     }

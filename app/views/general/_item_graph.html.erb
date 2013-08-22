@@ -1,7 +1,16 @@
 <%= javascript_include_tag "jquery-1.5.1.min.js", "cytoscape.js-2.0.2/cytoscape.js", "cytoscape.js-2.0.2/jquery.cxtmenu.min",
                            "cytoscape.js-2.0.2/jquery.cytoscape-edgehandles.min", "cytoscape.js-2.0.2/jquery.cytoscape-panzoom.min" %>
 
-<div id="cy" style="float:center;position:inherit; width: 100%; height: 400px; background-color: #fff0f5;"></div>
+<div style="background-color: #fff0f5;">
+    <div class="yui-u first"  style="float:left; width: 80%">
+        <div id="cy" style="height:400px;"></div>
+    </div>
+    <div class="yui-u" style="float:left; width: 20%">
+      <div id="node_info" style="margin-top: 2em;">
+      	
+      </div>
+    </div>
+</div>
 
 <script type="text/javascript">
     jQuery.noConflict();
@@ -10,8 +19,12 @@
     $j('#cy').cytoscape({
         layout: {
           name: 'breadthfirst'
-        },
-
+        },        
+        
+        autoHeight: 'auto',
+        minZoom: 0.5,
+    	maxZoom: 3,
+    
         style: cytoscape.stylesheet()
                 .selector('node')
                 .css({
@@ -52,13 +65,15 @@
 
             //Centre on all elements in the graph.
             cy.reset();
+            cy.center();
         }
     });
 
     $j(function(){
         cy.$('node').on('click', function(e){
             var node = e.cyTarget;
-            animateSelectedNode(node);
+            animateNode(node);
+            displayNodeInfo(node);
         });
 
         //animate the current asset node
@@ -66,7 +81,7 @@
         var asset_id = '<%= params[:id] %>';
         var asset_node_id = asset_type + '_' + asset_id;
         var asset_node = cy.nodes('[id=\''+ asset_node_id +'\']')[0];
-        animateSelectedNode(asset_node);
+        animateNode(asset_node);
 
         //nodes.one('mouseover', function(e){
         //    var node = e.cyTarget;
@@ -82,7 +97,7 @@
         //});
     });
 
-    function animateSelectedNode(node){
+    function animateNode(node){
         var nodes = cy.$('node');
         var edges = cy.$('edge');
         nodes.css('opacity',0.3);
@@ -109,5 +124,54 @@
             duration: 300
         });
     }
+
+    function displayNodeInfo(node){
+        var html = "<span style='font-size:15px;font-weight:bolder;'>Chosen item:</span>";
+        html += "<ul style='margin-left:1em;margin-top:0.5em;'>";
+        var node_data = node.data();
+        html += '<li>';
+        html += "<a href='\''+ node_data.path +'\''>";
+        html += '<b>';
+        html += node_data.full_title;
+        html += '</b>';
+        html += "</a>";
+        html += '</li>';
+        html += '</ul>';
+        
+        html += '<br/>';
+        html += '<br/>';
+        
+        html += "<span style='font-size:15px;font-weight:bolder;'>Connected items:</span>";
+        html += "<ul style='margin-left:1em;margin-top:0.5em;'>";
+        var connected_nodes = connectedNodes(node);
+        for(var i=0;i<connected_nodes.length;i++){
+           var node_data = connected_nodes[i].data();
+           html += '<li>';
+           html += "<a href='\''+ node_data.path +'\''>";
+           html += node_data.full_title;
+           html += "</a>";
+           html += '</li>';	
+        }
+
+	html += '</ul>';
+        $('node_info').innerHTML = html;
+    }
+
+    function connectedNodes(node){
+        var edges = cy.$('edge');
+        var connected_nodes = [];
+        edges.each(function(i, edge){
+            var source = edge.source();
+            var target =edge.target();
+            if (source.id() == node.id()){
+               connected_nodes.push(target);
+            }
+            if (target.id() == node.id()){
+               connected_nodes.push(source);
+            }
+        });
+        return connected_nodes;
+    }
+
 
 </script>
