@@ -1,5 +1,6 @@
 <%= javascript_include_tag "jquery-1.5.1.min.js", "cytoscape.js-2.0.2/cytoscape.js", "cytoscape.js-2.0.2/jquery.cxtmenu.min",
                            "cytoscape.js-2.0.2/jquery.cytoscape-edgehandles.min", "cytoscape.js-2.0.2/jquery.cytoscape-panzoom.min" %>
+<%= javascript_include_tag "jscrollpane/jquery.jscrollpane.min", "jscrollpane/jquery.mousewheel"%>
 
 <div style="background-color: #fff0f5;">
     <div class="yui-u first"  style="float:left; width: 80%">
@@ -68,10 +69,15 @@
     });
 
     $j(function(){
-        cy.$('node').on('click', function(e){
+        var nodes = cy.$('node');
+        nodes.on('click', function(e){
+            var node = e.cyTarget;
+            displayNodeInfo(node);
+        });
+
+        nodes.on('mouseover', function(e){
             var node = e.cyTarget;
             animateNode(node);
-            displayNodeInfo(node);
         });
 
         //animate the current asset node
@@ -80,19 +86,6 @@
         var asset_node_id = asset_type + '_' + asset_id;
         var asset_node = cy.nodes('[id=\''+ asset_node_id +'\']')[0];
         animateNode(asset_node);
-
-        //nodes.one('mouseover', function(e){
-        //    var node = e.cyTarget;
-
-        //node.css('background-color','red');
-
-        //});
-
-        //nodes.one('mouseout', function(e){
-        //var node = e.cyTarget;
-        //node.css('background-color','yellow');
-
-        //});
     });
 
     function animateNode(node){
@@ -101,6 +94,7 @@
         nodes.css('opacity',0.3);
         nodes.css('width',150);
         nodes.css('height',30);
+        nodes.css('font-size',10);
         edges.css('opacity',0.2);
         node.css('opacity',1);
         edges.each(function(i, edge){
@@ -121,6 +115,7 @@
         }, {
             duration: 300
         });
+        node.css('font-size', 12);
     }
 
     function displayNodeInfo(node){
