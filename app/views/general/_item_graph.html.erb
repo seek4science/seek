@@ -3,7 +3,7 @@
 
 <div style="background-color: #fff0f5;">
     <div class="yui-u first"  style="float:left; width: 80%">
-        <div id="cy" style="height:400px;"></div>
+        <div id="cy"></div>
     </div>
     <div class="yui-u" style="float:left; width: 20%">
       <div id="node_info" style="margin-top: 2em;">
@@ -19,9 +19,8 @@
     $j('#cy').cytoscape({
         layout: {
           name: 'breadthfirst'
-        },        
-        
-        autoHeight: 'auto',
+        },
+
         minZoom: 0.5,
     	maxZoom: 3,
     
@@ -63,7 +62,6 @@
         ready: function(){
             cy = this;
 
-            //Centre on all elements in the graph.
             cy.reset();
             cy.center();
         }

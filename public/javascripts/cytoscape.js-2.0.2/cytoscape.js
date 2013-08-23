@@ -15695,8 +15695,8 @@ var cytoscape;
         var edges = cy.edges();
         var container = cy.container();
         
-        var width = container.clientWidth;
-        var height = container.clientHeight;
+        //var width = container.clientWidth;
+        //var height = container.clientHeight;
 
         var roots;
         if( $$.is.elementOrCollection(options.roots) ){
@@ -15887,7 +15887,21 @@ var cytoscape;
             var depth = info.depth;
             var index = info.index;
 
-            var distanceX = width / (depths.length + 3);
+            var width = container.clientWidth;
+            //calculate the height dynamically
+            var height = graphHeight();
+
+            function graphHeight(){
+                var max_index = 0;
+                for (var i=0;i<depths.length;i++){
+                    max_index = Math.max(depths[i].length, max_index);
+                }
+                return (2*max_index + 1)*nodes[0].outerHeight();
+            }
+
+            $('cy').style.height = height+'px';
+
+            var distanceX = Math.max(width / (depths.length + 1), minDistance );
             var distanceY = height / (depths[depth].length + 1);
             var radiusStepSize = Math.min( width / 2 / depths.length, height / 2 / depths.length );
             radiusStepSize = Math.max( radiusStepSize, minDistance );
