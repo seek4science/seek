@@ -127,7 +127,7 @@
 
     <%= render :partial=>"assets/resource_main_content_right",:locals => { :resource => @assay, :creators=>[@assay.owner] } %>
     <div style="clear:both">
-        <%= render :partial=>"general/item_graph",:object=>@assay %>
+        <%= render :partial=>"general/isa_graph", :locals => {:root_item => @assay.study, :current_item => @assay, :deep => true} %>
     </div>
 
     <div style="clear:both">

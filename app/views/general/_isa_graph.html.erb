@@ -2,6 +2,10 @@
                            "cytoscape.js-2.0.2/jquery.cytoscape-edgehandles.js", "cytoscape.js-2.0.2/jquery.cytoscape-panzoom.js" %>
 <%= stylesheet_link_tag "cytoscape.js-2.0.2/jquery.cytoscape-panzoom.css", "cytoscape.js-2.0.2/css/font-awesome.css" %>
 
+<%
+  current_item ||= nil
+  deep ||= true
+%>
 <div style="background-color: #fff0f5;">
     <div class="yui-u first"  style="float:left; width: 78%">
         <div id="cy"></div>
@@ -57,7 +61,7 @@
                     'text-opacity': 0
                 }),
 
-        elements: <%= cytoscape_elements(item_graph.study, true, item_graph).to_json.html_safe %>,
+        elements: <%= cytoscape_elements(root_item, current_item, deep).to_json.html_safe %>,
 
         ready: function(){
             cy = this;
