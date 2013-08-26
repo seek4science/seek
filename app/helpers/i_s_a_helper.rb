@@ -4,38 +4,6 @@ require 'dot_generator'
 module ISAHelper
 
   include DotGenerator
-  
-  def embedded_isa_svg root_item,deep=true,current_item=nil
-    begin
-      current_item||=root_item
-      html = '<script src="/javascripts/svg/svg.js" data-path="/javascripts/svg/"></script>'
-      html << "\n"
-      svg = to_svg(root_item,deep,current_item)
-      unless  svg.blank?
-        html << "<div id='isa_svg'><script type=\'image/svg+xml'>#{svg}</script></div>"
-      end
-      html.html_safe
-    rescue Exception=>e
-      "<div id='isa_svg' class='none_text'>Currently unable to display the graph for this item</div>".html_safe
-    end
-
-  end
-
-  def embedded_isa_svg_for_publishing root_item,deep=true,selected_items=[],current_item=nil
-    begin
-      current_item||=root_item
-      html = '<script src="/javascripts/svg/svg.js" data-path="/javascripts/svg/"></script>'
-      html << "\n"
-      svg = to_svg_for_publishing(root_item,deep,current_item,selected_items)
-      unless  svg.blank?
-        html << "<div id='isa_svg'><script type=\'image/svg+xml'>#{svg}</script></div>"
-      end
-      html.html_safe
-    rescue Exception=>e
-      "<div id='isa_svg' class='none_text'>Currently unable to display the graph for this item</div>".html_safe
-    end
-
-  end
 
   FILL_COLOURS = {'Sop'=>"#7ac5cd", #cadetblue3
                   'Model'=>"#cdcd00", #yellow3
@@ -64,7 +32,7 @@ module ISAHelper
   FILL_COLOURS.default = "#8ee5ee" #cadetblue2
   BORDER_COLOURS.default = "#71b7be"
 
-  def buiding_elements root_item,deep=true,current_item=nil
+  def cytoscape_elements root_item,deep=true,current_item=nil
     begin
       current_item||=root_item
       dot_elements = to_dot(root_item,deep,current_item)
@@ -72,45 +40,57 @@ module ISAHelper
       edges = elements.select{|e| e.include?('--')}
       nodes = edges.collect{|edge| edge.split('--')}.flatten.uniq
       nodes = nodes.each{|n| n.strip!}
-      hash_elements = {:elements => []}
-
-      nodes.each do |node|
-        item_type, item_id = node.split('_')
-        item = item_type.constantize.find_by_id(item_id)
-        if item.can_view?
-          hash_elements[:elements] << {:group => 'nodes',
-                                       :data => {:id => node,
-                                                 :name => truncate(item_type.humanize + ': ' +  item.title) ,
-                                                 :full_title => (item_type.humanize + ': ' +  item.title) ,
-                                                 :path => polymorphic_path(item),
-                                                 :faveColor => (FILL_COLOURS[item_type] || FILL_COLOURS.default),
-                                                 :borderColor => (BORDER_COLOURS[item_type] || BORDER_COLOURS.default)}
-          }
-        else
-          hash_elements[:elements] << {:group => 'nodes',
-                                       :data => {:id => node,
-                                                 :name => 'Hidden Item' ,
-                                                 :faveColor => FILL_COLOURS['HiddenItem'],
-                                                 :borderColor => BORDER_COLOURS['HiddenItem']}
-          }
-        end
-      end
-
-      edges.each do |edge|
-        source, target = edge.split('--')
-        source.strip!
-        target.strip!
-        edge.strip!
-        target_type = target.split('_').first
-        hash_elements[:elements] << {:group => 'edges',
-                                     :data => {:id => edge, :source => source, :target => target, :faveColor => (BORDER_COLOURS[target_type] || BORDER_COLOURS.default)}
-        }
-      end
-
-      hash_elements[:elements]
+      cytoscape_elements = cytoscape_node_elements(nodes) + cytoscape_edge_elements(edges)
+      cytoscape_elements
     rescue Exception=>e
-      "<div class='none_text'>Currently unable to display the graph for this item</div>".html_safe
     end
   end
-  
+
+  def cytoscape_node_elements nodes
+    cytoscape_node_elements = []
+    nodes.each do |node|
+      item_type, item_id = node.split('_')
+      item = item_type.constantize.find_by_id(item_id)
+      if item.can_view?
+        cytoscape_node_elements << {:group => 'nodes',
+                               :data => {:id => node,
+                                         :name => truncate(item_type.humanize + ': ' +  item.title) ,
+                                         :full_title => (item_type.humanize + ': ' +  item.title) ,
+                                         :path => polymorphic_path(item),
+                                         :faveColor => (FILL_COLOURS[item_type] || FILL_COLOURS.default),
+                                         :borderColor => (BORDER_COLOURS[item_type] || BORDER_COLOURS.default)}
+        }
+      else
+        cytoscape_node_elements << {:group => 'nodes',
+                               :data => {:id => node,
+                                         :name => 'Hidden Item' ,
+                                         :faveColor => (FILL_COLOURS['HiddenItem'] || FILL_COLOURS.default),
+                                         :borderColor => (BORDER_COLOURS['HiddenItem'] || BORDER_COLOURS.default)}
+        }
+      end
+    end
+    cytoscape_node_elements
+  end
+
+  def cytoscape_edge_elements edges
+    cytoscape_edge_elements = []
+    edges.each do |edge|
+      source, target = edge.split('--')
+      source.strip!
+      target.strip!
+      edge.strip!
+      target_type,target_id = target.split('_')
+      target_item = target_type.constantize.find_by_id(target_id)
+      if target_item.can_view?
+        cytoscape_edge_elements << {:group => 'edges',
+                                    :data => {:id => edge, :source => source, :target => target, :faveColor => (BORDER_COLOURS[target_type] || BORDER_COLOURS.default)}
+        }
+      else
+        cytoscape_edge_elements << {:group => 'edges',
+                                    :data => {:id => edge, :source => source, :target => target, :faveColor => (BORDER_COLOURS['HiddenItem'] || BORDER_COLOURS.default)}
+        }
+      end
+    end
+    cytoscape_edge_elements
+  end
 end

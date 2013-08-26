@@ -57,7 +57,7 @@
                     'text-opacity': 0
                 }),
 
-        elements: <%= buiding_elements(item_graph.study, true, item_graph).to_json.html_safe %>,
+        elements: <%= cytoscape_elements(item_graph.study, true, item_graph).to_json.html_safe %>,
 
         ready: function(){
             cy = this;
