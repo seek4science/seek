@@ -46,7 +46,8 @@ module ISAHelper
                   'Publication'=>"#84B5FD",
                   'Presentation' => "#8ee5ee", #cadetblue2
                   'Sample' => "#ffa500", #orange
-                  'Specimen' => "#ff0000"} #red
+                  'Specimen' => "#ff0000", #red
+                  'HiddenItem' => "#d3d3d3"} #lightgray
 
   BORDER_COLOURS = {'Sop'=>"#619da4",
                     'Model'=>"#a4a400",
@@ -57,7 +58,8 @@ module ISAHelper
                     'Publication'=>"#6990ca",
                     'Presentation' => "#71b7be", #cadetblue2
                     'Sample' => "#cc8400",
-                    'Specimen' => "#cc0000"}
+                    'Specimen' => "#cc0000",
+                    'HiddenItem' => "#a8a8a8"}
 
   FILL_COLOURS.default = "#8ee5ee" #cadetblue2
   BORDER_COLOURS.default = "#71b7be"
@@ -75,15 +77,25 @@ module ISAHelper
       nodes.each do |node|
         item_type, item_id = node.split('_')
         item = item_type.constantize.find_by_id(item_id)
-        hash_elements[:elements] << {:group => 'nodes',
-                                     :data => {:id => node,
-                                               :name => truncate(item_type.humanize + ': ' +  item.title) ,
-                                               :full_title => (item_type.humanize + ': ' +  item.title) ,
-                                               :path => polymorphic_path(item),
-                                               :faveColor => (FILL_COLOURS[item_type] || FILL_COLOURS.default),
-                                               :borderColor => (BORDER_COLOURS[item_type] || BORDER_COLOURS.default)}
-                                    }
+        if item.can_view?
+          hash_elements[:elements] << {:group => 'nodes',
+                                       :data => {:id => node,
+                                                 :name => truncate(item_type.humanize + ': ' +  item.title) ,
+                                                 :full_title => (item_type.humanize + ': ' +  item.title) ,
+                                                 :path => polymorphic_path(item),
+                                                 :faveColor => (FILL_COLOURS[item_type] || FILL_COLOURS.default),
+                                                 :borderColor => (BORDER_COLOURS[item_type] || BORDER_COLOURS.default)}
+          }
+        else
+          hash_elements[:elements] << {:group => 'nodes',
+                                       :data => {:id => node,
+                                                 :name => 'Hidden Item' ,
+                                                 :faveColor => FILL_COLOURS['HiddenItem'],
+                                                 :borderColor => BORDER_COLOURS['HiddenItem']}
+          }
+        end
       end
+
       edges.each do |edge|
         source, target = edge.split('--')
         source.strip!
