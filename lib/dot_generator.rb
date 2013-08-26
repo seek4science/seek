@@ -529,10 +529,3 @@ class AssayAssetNode < AssetNode
     end
   end
 end
-
-class SampleNode < SeekNode
-  def children
-    [item.specimen]
-  end
-end
-
