@@ -1,6 +1,6 @@
-<%= javascript_include_tag "jquery-1.5.1.min.js", "cytoscape.js-2.0.2/cytoscape.js", "cytoscape.js-2.0.2/jquery.cxtmenu.min",
-                           "cytoscape.js-2.0.2/jquery.cytoscape-edgehandles.min", "cytoscape.js-2.0.2/jquery.cytoscape-panzoom.min" %>
-<%= javascript_include_tag "jscrollpane/jquery.jscrollpane.min", "jscrollpane/jquery.mousewheel"%>
+<%= javascript_include_tag "jquery-1.5.1.min.js", "cytoscape.js-2.0.2/cytoscape.js", "cytoscape.js-2.0.2/jquery.cxtmenu.js",
+                           "cytoscape.js-2.0.2/jquery.cytoscape-edgehandles.js", "cytoscape.js-2.0.2/jquery.cytoscape-panzoom.js" %>
+<%= stylesheet_link_tag "cytoscape.js-2.0.2/jquery.cytoscape-panzoom.css", "cytoscape.js-2.0.2/css/font-awesome.css" %>
 
 <div style="background-color: #fff0f5;">
     <div class="yui-u first"  style="float:left; width: 80%">
@@ -69,6 +69,8 @@
     });
 
     $j(function(){
+        $j('#cy').cytoscapePanzoom();
+
         var nodes = cy.$('node');
         nodes.on('click', function(e){
             var node = e.cyTarget;
