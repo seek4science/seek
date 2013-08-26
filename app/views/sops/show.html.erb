@@ -28,11 +28,11 @@
 
   <%= render :partial=>"assets/resource_main_content_right",:locals => { :resource => @sop, :versioned_resource=>@display_sop } %>
 
-  <div style="clear:both;padding-top:1em;">
-    <p>
-        <%= embedded_isa_svg(@sop, true, @sop) -%>
-    </p>
+  <div style="clear:both">
+    <%= render :partial=>"general/isa_graph", :locals => {:root_item => @sop, :current_item => @sop, :deep => true} %>
+  </div>
 
+  <div style="clear:both;padding-top:1em;">
     <h2>
       Experimental Conditions
     </h2>

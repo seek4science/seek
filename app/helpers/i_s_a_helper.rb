@@ -32,7 +32,7 @@ module ISAHelper
   FILL_COLOURS.default = "#8ee5ee" #cadetblue2
   BORDER_COLOURS.default = "#71b7be"
 
-  def cytoscape_elements root_item,current_item=nil,deep=true
+  def cytoscape_elements root_item,deep=true,current_item=nil
     begin
       current_item||=root_item
       dot_elements = to_dot(root_item,deep,current_item)

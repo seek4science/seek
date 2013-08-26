@@ -35,8 +35,8 @@
   </div>
   <%= render :partial=>"assets/resource_main_content_right",:locals => { :resource => @investigation, :creators => [@investigation.contributing_user.try(:person)] } %>
 
-  <div style="clear:both;">
-	<%= embedded_isa_svg(@investigation,false) -%>
+  <div style="clear:both">
+    <%= render :partial=>"general/isa_graph", :locals => {:root_item => @investigation, :deep => false} %>
   </div>
 
     <%= render :partial=>"general/items_related_to",:object => @investigation %>

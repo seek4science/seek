@@ -35,11 +35,12 @@
   </div>
 
   <%= render :partial=>"assets/resource_main_content_right",:locals => { :resource => @data_file, :versioned_resource=>@display_data_file } -%>
-  
+
+  <div style="clear:both">
+    <%= render :partial=>"general/isa_graph", :locals => {:root_item => @data_file, :current_item => @data_file, :deep => true} %>
+  </div>
+
   <div style="clear:both;">
-    <p>
-        <%= embedded_isa_svg(@data_file, true, @data_file) -%>
-      </p>
     <p>
       <h2>Factors studied:</h2>
       <%= render :partial=>"data_files/studied_factors" -%>
