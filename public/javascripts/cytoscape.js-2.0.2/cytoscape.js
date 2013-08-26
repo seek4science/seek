@@ -15890,6 +15890,8 @@ var cytoscape;
             var width = container.clientWidth;
             //calculate the height dynamically
             var height = graphHeight();
+            height = Math.max(height, 230);
+            container.style.height = height+'px';
 
             function graphHeight(){
                 var max_index = 0;
@@ -15898,8 +15900,6 @@ var cytoscape;
                 }
                 return (2*max_index + 1)*nodes[0].outerHeight();
             }
-
-            $('cy').style.height = height+'px';
 
             var distanceX = Math.max(width / (depths.length + 1), minDistance );
             var distanceY = height / (depths[depth].length + 1);
