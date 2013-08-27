@@ -56,8 +56,8 @@ module ISAHelper
       if item.can_view?
         cytoscape_node_elements << {:group => 'nodes',
                                :data => {:id => node,
-                                         :name => truncate(item_type.humanize + ': ' +  item.title) ,
-                                         :full_title => ("<b>#{item_type.humanize}: </b>" +  item.title) ,
+                                         :name => truncate(item_type.humanize + ': ' +  h(item.title)) ,
+                                         :full_title => ("<b>#{item_type.humanize}: </b>" +  h(item.title)) ,
                                          :path => polymorphic_path(item),
                                          :faveColor => (FILL_COLOURS[item_type] || FILL_COLOURS.default),
                                          :borderColor => (BORDER_COLOURS[item_type] || BORDER_COLOURS.default)}
