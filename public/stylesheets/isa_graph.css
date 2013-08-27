@@ -1,10 +1,12 @@
 div.isa_graph {
     float: left;
     width: 78%;
+    background-color: #fffff3;
 }
 
 div.node_info {
     float: right;
-    width: 18%;
+    width: 19%;
+    background-color: #fffff3;
 }
 
