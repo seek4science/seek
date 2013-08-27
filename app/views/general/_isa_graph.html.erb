@@ -71,8 +71,15 @@
 
     $j(function(){
         var nodes = cy.$('node');
-        if (nodes.length > 0)
+        if (nodes.length > 0){
             $j('#cy').cytoscapePanzoom();
+            //reset on panzoom also reset all nodes and edges css
+            $j('.ui-cytoscape-panzoom-reset').click(function(){
+                normalizingNodes(nodes);
+                appearingNodes(nodes);
+                appearingEdges(cy.$('edge'));
+            });
+        }
 
         nodes.on('click', function(e){
             var node = e.cyTarget;

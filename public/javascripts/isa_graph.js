@@ -1,19 +1,24 @@
 function animateNode(node){
     var nodes = cy.$('node');
     var edges = cy.$('edge');
-    deactivating_nodes(nodes);
-    deactivating_edges(edges);
-    activating_nodes(node);
+
+    fadingNodes(nodes);
+    normalizingNodes(nodes);
+    fadingEdges(edges);
+
+    appearingNodes(node);
     edges.each(function(i, edge){
         var source = edge.source();
         var target =edge.target();
         if (source.id() == node.id()){
-            activating_edges(edge);
-            activating_nodes(target);
+            appearingEdges(edge);
+            appearingNodes(target);
+            normalizingNodes(target);
         }
         if (target.id() == node.id()){
-            activating_edges(edge);
-            activating_nodes(source);
+            appearingEdges(edge);
+            appearingNodes(source);
+            normalizingNodes(source);
         }
     });
 
@@ -78,22 +83,25 @@ function connectedNodes(node){
     return connected_nodes;
 }
 
-function activating_nodes(nodes){
+function appearingNodes(nodes){
     nodes.css('opacity', 1);
 }
 
-function activating_edges(edges){
+function appearingEdges(edges){
     edges.css('opacity', 1);
 }
 
-function deactivating_nodes(nodes){
+function fadingNodes(nodes){
     nodes.css('opacity', 0.3);
+}
+
+function fadingEdges(edges){
+    edges.css('opacity', 0.2);
+}
+
+function normalizingNodes(nodes){
     nodes.css('width',default_node_width);
     nodes.css('height',default_node_height);
     nodes.css('font-size',default_font_size);
     nodes.css('font-weight', 'normal');
-}
-
-function deactivating_edges(edges){
-    edges.css('opacity', 0.2);
 }
