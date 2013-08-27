@@ -56,7 +56,7 @@ module ISAHelper
       if item.can_view?
         cytoscape_node_elements << {:group => 'nodes',
                                :data => {:id => node,
-                                         :name => truncate(item_type.humanize + ': ' +  item.title, :length => 35) ,
+                                         :name => truncate(item_type.humanize + ': ' +  item.title) ,
                                          :full_title => (item_type.humanize + ': ' +  item.title) ,
                                          :path => polymorphic_path(item),
                                          :faveColor => (FILL_COLOURS[item_type] || FILL_COLOURS.default),
@@ -85,14 +85,35 @@ module ISAHelper
       target_item = target_type.constantize.find_by_id(target_id)
       if target_item.can_view?
         cytoscape_edge_elements << {:group => 'edges',
-                                    :data => {:id => edge, :source => source, :target => target, :faveColor => (BORDER_COLOURS[target_type] || BORDER_COLOURS.default)}
+                                    :data => {:id => edge,
+                                              :name => edge_label(source, target),
+                                              :source => source,
+                                              :target => target,
+                                              :faveColor => (BORDER_COLOURS[target_type] || BORDER_COLOURS.default)}
         }
       else
         cytoscape_edge_elements << {:group => 'edges',
-                                    :data => {:id => edge, :source => source, :target => target, :faveColor => (BORDER_COLOURS['HiddenItem'] || BORDER_COLOURS.default)}
+                                    :data => {:id => edge,
+                                              :source => source,
+                                              :name => edge_label(source, target),
+                                              :target => target,
+                                              :faveColor => (BORDER_COLOURS['HiddenItem'] || BORDER_COLOURS.default)}
         }
       end
     end
     cytoscape_edge_elements
+  end
+
+  def edge_label source,target
+    source_type,source_id = source.split('_')
+    target_type,target_id = target.split('_')
+
+    label = ''
+    if source_type == 'Assay'
+      assay_asset = AssayAsset.where(["assay_id=? AND asset_type=? AND asset_id=?",
+                        source_id, target_type, target_id]).first
+      label << assay_asset.try(:relationship_type).try(:title).to_s
+    end
+    label
   end
 end

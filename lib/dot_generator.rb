@@ -252,24 +252,9 @@ class AssayNode < SeekNode
   end
 
   def children
-    deep ? item.assay_assets + item.related_publications + item.samples : []
+    deep ? item.asset_masters + item.related_publications : []
   end
 end
 
 
 
-#AssayAssetNode is only used for children of Assay
-class AssayAssetNode < AssetNode
-  def initialize assay_asset
-    @assay_asset = assay_asset
-    super assay_asset.asset
-  end
-
-  def edge other, attributes={}
-    if @assay_asset.relationship_type
-      super other, {:label => @assay_asset.relationship_type.title, :fontsize => 9}.merge(attributes)
-    else
-      super
-    end
-  end
-end

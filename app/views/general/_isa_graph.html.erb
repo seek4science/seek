@@ -18,9 +18,9 @@
     jQuery.noConflict();
     var $j = jQuery;
 
-    var default_node_width = 200;
-    var default_node_height = 40;
-    var default_font_size = 12;
+    var default_node_width = 175;
+    var default_node_height = 35;
+    var default_font_size = 11;
 
     $j('#cy').cytoscape({
         layout: {
@@ -53,10 +53,13 @@
                     'target-arrow-shape': 'triangle',
                     'line-color': 'data(faveColor)',
                     'source-arrow-color': 'data(faveColor)',
-                    'target-arrow-color': 'data(faveColor)'
+                    'target-arrow-color': 'data(faveColor)',
+                    'content': 'data(name)',
+                    'color': '#323232',
+                    'font-size': (default_font_size-2)
                 }),
 
-        elements: <%= cytoscape_elements(root_item, current_item, deep).to_json.html_safe %>,
+        elements: <%= cytoscape_elements(root_item, deep, current_item).to_json.html_safe %>,
 
         ready: function(){
             cy = this;
