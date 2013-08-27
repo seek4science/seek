@@ -40,9 +40,7 @@ function displayNodeInfo(node){
         html += '</b>';
     }else{
         html += '<a href=\''+ node_data.path +'\'>';
-        html += '<b>';
         html += node_data.full_title;
-        html += '</b>';
         html += "</a>";
     }
     html += '</li>';

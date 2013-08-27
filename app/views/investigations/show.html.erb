@@ -39,7 +39,8 @@
     <%= render :partial=>"general/isa_graph", :locals => {:root_item => @investigation, :deep => false} %>
   </div>
 
+  <div style="clear:both">
     <%= render :partial=>"general/items_related_to",:object => @investigation %>
-
+  </div>
 
 </div>
