@@ -10,3 +10,6 @@ div.node_info {
     background-color: #fffff3;
 }
 
+div.node_info ul.items {
+    margin-left: 1em;
+}

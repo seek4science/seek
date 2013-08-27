@@ -29,8 +29,9 @@ function animateNode(node){
 }
 
 function displayNodeInfo(node){
-    var html = "<span style='font-size:15px;font-weight:bolder;'>Chosen item:</span>";
-    html += "<ul style='margin-left:1em;margin-top:0.5em;'>";
+    //var html = "<span style='font-size:15px;font-weight:bolder;'>Chosen item:</span>";
+    var html = "<h3>Chosen item</h3>"
+    html += "<ul class='items'>";
     var node_data = node.data();
     html += '<li>';
     if (node_data.name == 'Hidden Item'){
@@ -48,10 +49,9 @@ function displayNodeInfo(node){
     html += '</ul>';
 
     html += '<br/>';
-    html += '<br/>';
 
-    html += "<span style='font-size:15px;font-weight:bolder;'>Connected items:</span>";
-    html += "<ul style='margin-left:1em;margin-top:0.5em;'>";
+    html += "<h3>Connected items</h3>";
+    html += "<ul class='items'>";
     var connected_nodes = connectedNodes(node);
     for(var i=0;i<connected_nodes.length;i++){
         var node_data = connected_nodes[i].data();
