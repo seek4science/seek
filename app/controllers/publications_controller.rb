@@ -33,9 +33,6 @@ class PublicationsController < ApplicationController
       format.html # show.html.erb
       format.xml
       format.rdf { render :template=>'rdf/show'}
-      format.svg { render :text=>to_svg(@publication,params[:deep]=='false',@publication)}
-      format.dot { render :text=>to_dot(@publication,params[:deep]=='false',@publication)}
-      format.png { render :text=>to_png(@publication,params[:deep]=='false',@publication)}
       format.enw { send_data @publication.endnote, :type => "application/x-endnote-refer", :filename => "#{@publication.title}.enw" }
     end
   end

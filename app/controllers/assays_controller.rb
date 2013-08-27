@@ -205,9 +205,6 @@ class AssaysController < ApplicationController
       format.html
       format.xml
       format.rdf { render :template=>'rdf/show'}
-      format.svg { render :text=>to_svg(@assay.study, params[:deep]=='true', @assay) }
-      format.dot { render :text=>to_dot(@assay.study, params[:deep]=='true', @assay) }
-      format.png { render :text=>to_png(@assay.study, params[:deep]=='true', @assay) }
     end
   end
 

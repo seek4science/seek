@@ -111,9 +111,6 @@ class PresentationsController < ApplicationController
     respond_to do |format|
       format.html # show.html.erb
       format.xml
-      format.svg { render :text=>to_svg(@presentation,params[:deep]=='true',@presentation)}
-      format.dot { render :text=>to_dot(@presentation,params[:deep]=='true',@presentation)}
-      format.png { render :text=>to_png(@presentation,params[:deep]=='true',@presentation)}
     end
   end
 
