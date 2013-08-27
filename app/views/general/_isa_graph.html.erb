@@ -70,9 +70,10 @@
     });
 
     $j(function(){
-        $j('#cy').cytoscapePanzoom();
-
         var nodes = cy.$('node');
+        if (nodes.length > 0)
+            $j('#cy').cytoscapePanzoom();
+
         nodes.on('click', function(e){
             var node = e.cyTarget;
             displayNodeInfo(node);
