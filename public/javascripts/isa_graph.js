@@ -29,21 +29,10 @@ function animateNode(node){
 }
 
 function displayNodeInfo(node){
-    //var html = "<span style='font-size:15px;font-weight:bolder;'>Chosen item:</span>";
     var html = "<h3>Chosen item</h3>"
     html += "<ul class='items'>";
-    var node_data = node.data();
-    html += '<li>';
-    if (node_data.name == 'Hidden Item'){
-        html += '<b>';
-        html += node_data.name;
-        html += '</b>';
-    }else{
-        html += '<a href=\''+ node_data.path +'\'>';
-        html += node_data.full_title;
-        html += "</a>";
-    }
-    html += '</li>';
+    var item_data = node.data();
+    html += itemInfo(item_data);
     html += '</ul>';
 
     html += '<br/>';
@@ -52,20 +41,27 @@ function displayNodeInfo(node){
     html += "<ul class='items'>";
     var connected_nodes = connectedNodes(node);
     for(var i=0;i<connected_nodes.length;i++){
-        var node_data = connected_nodes[i].data();
-        html += '<li>';
-        if (node_data.name == 'Hidden Item'){
-            html += node_data.name;
-        }else{
-            html += '<a href=\''+ node_data.path +'\'>';
-            html += node_data.full_title;
-            html += "</a>";
-        }
-        html += '</li>';
+        var item_data = connected_nodes[i].data();
+        html += itemInfo(item_data);
     }
 
     html += '</ul>';
     $('node_info').innerHTML = html;
+}
+
+function itemInfo(item_data){
+    html = '<li>';
+    if (item_data.name == 'Hidden Item'){
+        html += '<b>';
+        html += item_data.name;
+        html += '</b>';
+    }else{
+        html += '<a href=\''+ item_data.path +'\'>';
+        html += item_data.full_title;
+        html += "</a>";
+    }
+    html += '</li>';
+    return html;
 }
 
 function connectedNodes(node){
