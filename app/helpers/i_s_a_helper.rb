@@ -46,6 +46,8 @@ module ISAHelper
     end
   end
 
+  private
+
   def cytoscape_node_elements nodes
     cytoscape_node_elements = []
     nodes.each do |node|
@@ -54,7 +56,7 @@ module ISAHelper
       if item.can_view?
         cytoscape_node_elements << {:group => 'nodes',
                                :data => {:id => node,
-                                         :name => truncate(item_type.humanize + ': ' +  item.title) ,
+                                         :name => truncate(item_type.humanize + ': ' +  item.title, :length => 35) ,
                                          :full_title => (item_type.humanize + ': ' +  item.title) ,
                                          :path => polymorphic_path(item),
                                          :faveColor => (FILL_COLOURS[item_type] || FILL_COLOURS.default),
