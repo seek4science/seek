@@ -51,10 +51,8 @@ function displayNodeInfo(node){
 
 function itemInfo(item_data){
     html = '<li>';
-    if (item_data.name == 'Hidden Item'){
-        html += '<b>';
-        html += item_data.name;
-        html += '</b>';
+    if (item_data.name == 'Hidden item'){
+        html += item_data.full_title;
     }else{
         html += '<a href=\''+ item_data.path +'\'>';
         html += item_data.full_title;

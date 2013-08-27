@@ -55,19 +55,20 @@ module ISAHelper
       item = item_type.constantize.find_by_id(item_id)
       if item.can_view?
         cytoscape_node_elements << {:group => 'nodes',
-                               :data => {:id => node,
-                                         :name => truncate(item_type.humanize + ': ' +  h(item.title)) ,
-                                         :full_title => ("<b>#{item_type.humanize}: </b>" +  h(item.title)) ,
-                                         :path => polymorphic_path(item),
-                                         :faveColor => (FILL_COLOURS[item_type] || FILL_COLOURS.default),
-                                         :borderColor => (BORDER_COLOURS[item_type] || BORDER_COLOURS.default)}
+                                    :data => {:id => node,
+                                              :name => truncate(item_type.humanize + ': ' +  h(item.title)) ,
+                                              :full_title => ("<b>#{item_type.humanize}: </b>" +  h(item.title)) ,
+                                              :path => polymorphic_path(item),
+                                              :faveColor => (FILL_COLOURS[item_type] || FILL_COLOURS.default),
+                                              :borderColor => (BORDER_COLOURS[item_type] || BORDER_COLOURS.default)}
         }
       else
         cytoscape_node_elements << {:group => 'nodes',
-                               :data => {:id => node,
-                                         :name => 'Hidden Item' ,
-                                         :faveColor => (FILL_COLOURS['HiddenItem'] || FILL_COLOURS.default),
-                                         :borderColor => (BORDER_COLOURS['HiddenItem'] || BORDER_COLOURS.default)}
+                                    :data => {:id => node,
+                                              :name => 'Hidden item',
+                                              :full_title => hidden_items_html([item], 'Hidden item'),
+                                              :faveColor => (FILL_COLOURS['HiddenItem'] || FILL_COLOURS.default),
+                                              :borderColor => (BORDER_COLOURS['HiddenItem'] || BORDER_COLOURS.default)}
         }
       end
     end
