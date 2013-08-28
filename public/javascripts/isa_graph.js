@@ -2,10 +2,12 @@ function animateNode(node){
     var nodes = cy.$('node');
     var edges = cy.$('edge');
 
-    fadingNodes(nodes);
+    //first normalizing all nodes and fading all nodes and edges
     normalizingNodes(nodes);
+    fadingNodes(nodes);
     fadingEdges(edges);
 
+    //then appearing the chosen node and the connected nodes and edges
     appearingNodes(node);
     edges.each(function(i, edge){
         var source = edge.source();
@@ -13,16 +15,14 @@ function animateNode(node){
         if (source.id() == node.id()){
             appearingEdges(edge);
             appearingNodes(target);
-            normalizingNodes(target);
         }
         if (target.id() == node.id()){
             appearingEdges(edge);
             appearingNodes(source);
-            normalizingNodes(source);
         }
     });
 
-    //need to call after processing all nodes and edges
+    //then animate the chosen node
     node.animate({
         css: { 'width':250, 'height':50 }
     }, {

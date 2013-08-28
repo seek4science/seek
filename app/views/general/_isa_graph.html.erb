@@ -71,6 +71,8 @@
 
     $j(function(){
         var nodes = cy.$('node');
+
+        //display panzoom control only when having nodes
         if (nodes.length > 0){
             $j('#cy').cytoscapePanzoom();
             //reset on panzoom also reset all nodes and edges css
@@ -83,12 +85,8 @@
 
         nodes.on('click', function(e){
             var node = e.cyTarget;
-            displayNodeInfo(node);
-        });
-
-        nodes.on('mouseover', function(e){
-            var node = e.cyTarget;
             animateNode(node);
+            displayNodeInfo(node);
         });
 
         //animate the current asset node
