@@ -74,14 +74,15 @@ class Publication < ActiveRecord::Base
     false
   end
 
-  def extract_pubmed_metadata(pubmed_record)
-    self.title = pubmed_record.title.chop #remove full stop
-    self.abstract = pubmed_record.abstract
-    self.published_date = pubmed_record.date_published
-    self.journal = pubmed_record.journal
-    self.pubmed_id = pubmed_record.pmid
+  def extract_pubmed_metadata(medline)
+    reference = medline.reference
+    self.title = reference.title.chop #remove full stop
+    self.abstract = reference.abstract
+    self.journal = reference.journal
+    self.pubmed_id = reference.pubmed
+    self.published_date = reference.published_date(medline.pubmed['PHST'])
   end
-  
+
   def extract_doi_metadata(doi_record)
     self.title = doi_record.title
     self.published_date = doi_record.date_published
@@ -151,7 +152,7 @@ class Publication < ActiveRecord::Base
                           :year => published_date.year}.with_indifferent_access)
     end
   end
-  
+
   def check_identifier_present
     if doi.blank? && pubmed_id.blank?
       self.errors[:base] << "Please specify either a PubMed ID or DOI"
@@ -207,4 +208,5 @@ class Publication < ActiveRecord::Base
     true
   end
 end
+
 

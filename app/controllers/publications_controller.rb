@@ -4,6 +4,7 @@ class PublicationsController < ApplicationController
   include IndexPager
   include DotGenerator
   include Seek::AssetsCommon
+  include Seek::BioReferenceExtension
   
   require 'pubmed_query_tool'
   
@@ -319,8 +320,8 @@ class PublicationsController < ApplicationController
 
   def get_data(publication, pubmed_id, doi=nil)
     if !pubmed_id.nil?
-      query = PubmedQuery.new("sysmo-seek",Seek::Config.pubmed_api_email)
-      result = query.fetch(pubmed_id)
+      medline = Bio::MEDLINE.new(Bio::PubMed.efetch(pubmed_id).first)
+      result = medline.reference
       unless result.nil? || !result.error.nil?
         publication.extract_pubmed_metadata(result)
       end
