@@ -11,7 +11,7 @@ module Seek
           last_name, first_name = author.split(',')
           last_name.strip!
           first_name.strip!
-          reformat_authors << Author.new(first_name, last_name, nil)
+          reformat_authors << Author.new(first_name, last_name)
         end
         reformat_authors
       end
@@ -37,12 +37,11 @@ module Seek
     end
 
     class Author
-      attr_accessor :first_name, :last_name, :initials
+      attr_accessor :first_name, :last_name
 
-      def initialize(first, last, init)
+      def initialize(first, last)
         self.first_name = first
         self.last_name = last
-        self.initials = init
       end
 
       def name

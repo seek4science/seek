@@ -323,7 +323,7 @@ class PublicationsController < ApplicationController
       medline = Bio::MEDLINE.new(Bio::PubMed.efetch(pubmed_id).first)
       result = medline.reference
       unless result.nil? || !result.error.nil?
-        publication.extract_pubmed_metadata(result)
+        publication.extract_pubmed_metadata(medline)
       end
       return result
     elsif !doi.nil?
