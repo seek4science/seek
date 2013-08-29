@@ -320,10 +320,9 @@ class PublicationsController < ApplicationController
 
   def get_data(publication, pubmed_id, doi=nil)
     if !pubmed_id.nil?
-      medline = Bio::MEDLINE.new(Bio::PubMed.efetch(pubmed_id).first)
-      result = medline.reference
+      result = Bio::MEDLINE.new(Bio::PubMed.efetch(pubmed_id).first).reference
       unless result.nil? || !result.error.nil?
-        publication.extract_pubmed_metadata(medline)
+        publication.extract_pubmed_metadata(result)
       end
       return result
     elsif !doi.nil?

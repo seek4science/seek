@@ -74,13 +74,12 @@ class Publication < ActiveRecord::Base
     false
   end
 
-  def extract_pubmed_metadata(medline)
-    reference = medline.reference
+  def extract_pubmed_metadata(reference)
     self.title = reference.title.chop #remove full stop
     self.abstract = reference.abstract
     self.journal = reference.journal
     self.pubmed_id = reference.pubmed
-    self.published_date = reference.published_date(medline.pubmed['PHST'])
+    self.published_date = reference.published_date
   end
 
   def extract_doi_metadata(doi_record)
