@@ -326,7 +326,7 @@ class PublicationsController < ApplicationController
       begin
         result = Bio::MEDLINE.new(Bio::PubMed.efetch(pubmed_id).first).reference
       rescue Exception=>e
-        result = Bio::MEDLINE.new("")
+        result = Bio::Reference.new({})
         result.error = e.message
       end
 

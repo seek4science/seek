@@ -12,23 +12,31 @@ module Seek
       alias_method_chain :reference, :additional_fields
 
       def published_date
+        published_date = nil
+        #first parse published date on PHST - Publication History Status Date
         history_status_date = @pubmed['PHST']
         unless history_status_date.blank?
           #Publication History Status Date: 2012/07/19 [received] 2013/03/05 [accepted] 2013/03/16 [aheadofprint]
-          if history_status_date.include?('[aheadofprint]')
-            published_date_index = history_status_date.index('[aheadofprint]') - 11
-            history_status_date[published_date_index, 10]
-          else
-            nil
+          publish_status = ["epublish","ppublish","aheadofprint","entrez,","pubmed","medline"]
+          publish_status.each do |status|
+            if history_status_date.include?(status)
+              published_date_index = history_status_date.index(status) - 12
+              published_date = history_status_date[published_date_index, 10]
+              break
+            end
           end
-        else
-          nil
         end
+        #if not found then parse on EDAT - Entrez Date, the date the citation was added to PubMed
+        if published_date.blank?
+          published_date = @pubmed['EDAT'][0,10]
+        end
+        published_date
       end
 
       def error
-        error = @pubmed["Cann"] + @pubmed["id:"]
-        error.blank? ? nil : error
+        if @pubmed['PMID'].blank?
+          "No publication could be found on PubMed with that ID"
+        end
       end
     end
 
