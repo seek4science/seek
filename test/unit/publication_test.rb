@@ -54,26 +54,24 @@ class PublicationTest < ActiveSupport::TestCase
   end
 
   test "publication date from pubmed" do
-    mock_pubmed(:email=>"fred@email.com",:id=>21533085,:content_file=>"pubmed_21533085.xml")
-    mock_pubmed(:email=>"fred@email.com",:id=>20533085,:content_file=>"pubmed_20533085.xml")
-    mock_pubmed(:email=>"fred@email.com",:id=>1,:content_file=>"pubmed_1.xml")
-    query = PubmedQuery.new("seek","fred@email.com")
-    result = query.fetch(21533085)
+    mock_pubmed(:content_file=>"pubmed_21533085.txt")
+    mock_pubmed(:content_file=>"pubmed_20533085.txt")
+    mock_pubmed(:content_file=>"pubmed_1.txt")
+    result = Bio::MEDLINE.new(Bio::PubMed.efetch(21533085).first).reference
 
-    assert_equal Date.parse("20 April 2011"),result.date_published
+    assert_equal Date.parse("20 April 2011"),result.published_date
 
-    result = query.fetch(1)
-    assert_equal Date.parse("1 June 1975"),result.date_published
+    result = Bio::MEDLINE.new(Bio::PubMed.efetch(1).first).reference
+    assert_equal Date.parse("1 June 1975"),result.published_date
 
-    result = query.fetch(20533085)
-    assert_equal Date.parse("9 June 2010"),result.date_published
+    result = Bio::MEDLINE.new(Bio::PubMed.efetch(20533085).first).reference
+    assert_equal Date.parse("9 June 2010"),result.published_date
     assert_nil result.error
   end
 
   test "unknown pubmed_id" do
-    mock_pubmed(:email=>"fred@email.com",:id=>1111111111111,:content_file=>"pubmed_not_found.xml")
-    query = PubmedQuery.new("seek","fred@email.com")
-    result = query.fetch(1111111111111)
+    mock_pubmed(:content_file=>"pubmed_not_found.txt")
+    result = Bio::MEDLINE.new(Bio::PubMed.efetch(1111111111111).first).reference
     assert_equal "No publication could be found with that PubMed ID",result.error
   end
 
@@ -282,15 +280,9 @@ class PublicationTest < ActiveSupport::TestCase
   end
 
   def mock_pubmed options
-    params={}
-    params[:db] = "pubmed" unless params[:db]
-    params[:retmode] = "xml"
-    params[:id] = options[:id]
-    params[:tool] = "seek"
-    params[:email] = options[:email]
-    url = "http://eutils.ncbi.nlm.nih.gov/entrez/eutils/efetch.fcgi?" + params.to_param
+    url = "http://eutils.ncbi.nlm.nih.gov/entrez/eutils/efetch.fcgi"
     file=options[:content_file]
-    stub_request(:get,url).to_return(:body=>File.new("#{Rails.root}/test/fixtures/files/mocking/#{file}"))
+    stub_request(:post,url).to_return(:body=>File.new("#{Rails.root}/test/fixtures/files/mocking/#{file}"))
   end
   
 end

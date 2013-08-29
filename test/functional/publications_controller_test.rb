@@ -34,7 +34,7 @@ class PublicationsControllerTest < ActionController::TestCase
   end
 
   test "should not relate assays thay are not authorized for edit during create publication" do
-    mock_pubmed(:email=>"",:id=>1,:content_file=>"pubmed_1.xml")
+    mock_pubmed(:content_file=>"pubmed_1.txt")
     assay=assays(:metabolomics_assay)
     assert_difference('Publication.count') do
       post :create, :publication => {:pubmed_id => 1,:project_ids=>[projects(:sysmo_project).id]},:assay_ids=>[assay.id.to_s]
@@ -46,7 +46,7 @@ class PublicationsControllerTest < ActionController::TestCase
   end
 
   test "should create publication" do
-    mock_pubmed(:email=>"",:id=>1,:content_file=>"pubmed_1.xml")
+    mock_pubmed(:content_file=>"pubmed_1.txt")
     login_as(:model_owner) #can edit assay
     assay=assays(:metabolomics_assay)
     assert_difference('Publication.count') do
@@ -257,7 +257,7 @@ class PublicationsControllerTest < ActionController::TestCase
   end
   
   test "should disassociate authors" do
-    mock_pubmed(:email=>"",:id=>5,:content_file=>"pubmed_5.xml",:tool=>"seek")
+    mock_pubmed(:content_file=>"pubmed_5.txt")
     p = publications(:one)
     p.creators << people(:quentin_person)
     p.creators << people(:aaron_person)
@@ -396,14 +396,8 @@ class PublicationsControllerTest < ActionController::TestCase
   end
 
   def mock_pubmed options
-    params={}
-    params[:db] = "pubmed" unless params[:db]
-    params[:retmode] = "xml"
-    params[:id] = options[:id]
-    params[:tool] = options[:tool] || "sysmo-seek"
-    params[:email] = options[:email]
-    url = "http://eutils.ncbi.nlm.nih.gov/entrez/eutils/efetch.fcgi?" + params.to_param
+    url = "http://eutils.ncbi.nlm.nih.gov/entrez/eutils/efetch.fcgi"
     file=options[:content_file]
-    stub_request(:get,url).to_return(:body=>File.new("#{Rails.root}/test/fixtures/files/mocking/#{file}"))
+    stub_request(:post,url).to_return(:body=>File.new("#{Rails.root}/test/fixtures/files/mocking/#{file}"))
   end
 end

@@ -285,8 +285,11 @@ class PublicationsController < ApplicationController
   def fetch_pubmed_or_doi_result pubmed_id,doi
     result = nil
     if pubmed_id
-      query = PubmedQuery.new("seek",Seek::Config.pubmed_api_email)
-      result = query.fetch(pubmed_id)
+      begin
+        result = Bio::MEDLINE.new(Bio::PubMed.efetch(pubmed_id).first).reference
+      rescue Exception=>e
+        result.error = e.message
+      end
     elsif doi
       query = DoiQuery.new(Seek::Config.crossref_api_email)
       result = query.fetch(doi)
@@ -320,7 +323,13 @@ class PublicationsController < ApplicationController
 
   def get_data(publication, pubmed_id, doi=nil)
     if !pubmed_id.nil?
-      result = Bio::MEDLINE.new(Bio::PubMed.efetch(pubmed_id).first).reference
+      begin
+        result = Bio::MEDLINE.new(Bio::PubMed.efetch(pubmed_id).first).reference
+      rescue Exception=>e
+        result = Bio::MEDLINE.new("")
+        result.error = e.message
+      end
+
       unless result.nil? || !result.error.nil?
         publication.extract_pubmed_metadata(result)
       end

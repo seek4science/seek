@@ -27,7 +27,8 @@ module Seek
       end
 
       def error
-         nil
+        error = @pubmed["Cann"] + @pubmed["id:"]
+        error.blank? ? nil : error
       end
     end
 
