@@ -66,10 +66,10 @@ module ApplicationHelper
   end
 
   def hidden_items_html hidden_items, text='hidden item'
-    html = "<span class=\"none_text\">#{text}</span>"
+    html = "<span class='none_text'>#{text}</span>"
     contributor_links = hidden_item_contributor_links hidden_items
     if !contributor_links.empty?
-      html << "<span class=\"none_text\">(Please contact: #{contributor_links.join(', ')})</span>"
+      html << "<span class='none_text'>(Please contact: #{contributor_links.join(', ')})</span>"
     end
     html.html_safe
   end
