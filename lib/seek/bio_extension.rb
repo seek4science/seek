@@ -1,6 +1,6 @@
 #reformat the authors
 module Seek
-  module BioReferenceExtension
+  module BioExtension
     class Bio::MEDLINE
       def reference_with_additional_fields
         reference = reference_without_additional_fields

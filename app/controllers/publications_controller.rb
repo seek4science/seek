@@ -4,7 +4,7 @@ class PublicationsController < ApplicationController
   include IndexPager
   include DotGenerator
   include Seek::AssetsCommon
-  include Seek::BioReferenceExtension
+  include Seek::BioExtension
   
   require 'pubmed_query_tool'
   
