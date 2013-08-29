@@ -1,0 +1,91 @@
+PMID- 21533085
+OWN - NLM
+STAT- MEDLINE
+DA  - 20110502
+DCOM- 20110830
+LR  - 20130630
+IS  - 1932-6203 (Electronic)
+IS  - 1932-6203 (Linking)
+VI  - 6
+IP  - 4
+DP  - 2011
+TI  - Modeling the TNFalpha-induced apoptosis pathway in hepatocytes.
+PG  - e18646
+LID - 10.1371/journal.pone.0018646 [doi]
+AB  - The proinflammatory cytokine TNFalpha fails to provoke cell death in isolated
+      hepatocytes but has been implicated in hepatocyte apoptosis during liver diseases
+      associated with chronic inflammation. Recently, we showed that TNFalpha is able
+      to sensitize primary murine hepatocytes cultured on collagen to Fas
+      ligand-induced apoptosis and presented a mathematical model of the sensitizing
+      effect. Here, we analyze how TNFalpha induces apoptosis in combination with the
+      transcriptional inhibitor actinomycin D (ActD). Accumulation of reactive oxygen
+      species (ROS) in response to TNFR activation turns out to be critical for
+      sustained activation of JNK which then triggers mitochondrial pathway-dependent
+      apoptosis. In addition, the amount of JNK is strongly upregulated in a
+      ROS-dependent way. In contrast to TNFalpha plus cycloheximide no cFLIP
+      degradation is observed suggesting a different apoptosis pathway in which the
+      Itch-mediated cFLIP degradation and predominantly caspase-8 activation is not
+      involved. Time-resolved data of the respective pro- and antiapoptotic factors are
+      obtained and subjected to mathematical modeling. On the basis of these data we
+      developed a mathematical model which reproduces the complex interplay regulating 
+      the phosphorylation status of JNK and generation of ROS. This model was fully
+      integrated with our model of TNFalpha/Fas ligand sensitizing as well as with a
+      published NF-kappaB-model. The resulting comprehensive model delivers insight in 
+      the dynamical interplay between the TNFalpha and FasL pathways, NF-kappaB and ROS
+      and gives an example for successful model integration.
+AD  - Institute for System Dynamics, University of Stuttgart, Stuttgart, Germany.
+FAU - Schlatter, Rebekka
+AU  - Schlatter R
+FAU - Schmich, Kathrin
+AU  - Schmich K
+FAU - Lutz, Anna
+AU  - Lutz A
+FAU - Trefzger, Judith
+AU  - Trefzger J
+FAU - Sawodny, Oliver
+AU  - Sawodny O
+FAU - Ederer, Michael
+AU  - Ederer M
+FAU - Merfort, Irmgard
+AU  - Merfort I
+LA  - eng
+PT  - Journal Article
+PT  - Research Support, Non-U.S. Gov't
+DEP - 20110420
+PL  - United States
+TA  - PLoS One
+JT  - PloS one
+JID - 101285081
+RN  - 0 (DNA Primers)
+RN  - 0 (Reactive Oxygen Species)
+RN  - 0 (Tumor Necrosis Factor-alpha)
+RN  - 50-76-0 (Dactinomycin)
+RN  - 9007-43-6 (Cytochromes c)
+SB  - IM
+MH  - Animals
+MH  - Apoptosis/*physiology
+MH  - Base Sequence
+MH  - Blotting, Western
+MH  - Cytochromes c/metabolism
+MH  - DNA Primers
+MH  - Dactinomycin/pharmacology
+MH  - Enzyme Activation
+MH  - Enzyme-Linked Immunosorbent Assay
+MH  - Hepatocytes/*cytology/drug effects/enzymology/metabolism
+MH  - Mice
+MH  - Mice, Inbred C57BL
+MH  - Mice, Knockout
+MH  - *Models, Biological
+MH  - Reactive Oxygen Species/metabolism
+MH  - Tumor Necrosis Factor-alpha/*physiology
+PMC - PMC3080376
+OID - NLM: PMC3080376
+EDAT- 2011/05/03 06:00
+MHDA- 2011/08/31 06:00
+CRDT- 2011/05/03 06:00
+PHST- 2010/10/07 [received]
+PHST- 2011/03/14 [accepted]
+PHST- 2011/04/20 [epublish]
+AID - 10.1371/journal.pone.0018646 [doi]
+PST - epublish
+SO  - PLoS One. 2011 Apr 20;6(4):e18646. doi: 10.1371/journal.pone.0018646.
