@@ -35,16 +35,16 @@ class Publication < ActiveRecord::Base
   validate :check_identifier_present
   validate :check_uniqueness_of_identifier_within_project
   validate :check_uniqueness_of_title_within_project
-  
+
   has_many :non_seek_authors, :class_name => 'PublicationAuthor', :dependent => :destroy
   has_many :publication_author_orders, :dependent => :destroy
-  
-  has_many :backwards_relationships, 
+
+  has_many :backwards_relationships,
     :class_name => 'Relationship',
     :as => :other_object,
     :dependent => :destroy
 
-  
+
   if Seek::Config.events_enabled
     has_and_belongs_to_many :events
   else
@@ -59,7 +59,7 @@ class Publication < ActiveRecord::Base
     def event_ids= events_ids
 
     end
-    
+
   end
 
   alias :seek_authors :creators
@@ -89,15 +89,15 @@ class Publication < ActiveRecord::Base
     self.doi = doi_record.doi
     self.publication_type = doi_record.publication_type
   end
-  
+
   def related_data_files
     self.backwards_relationships.select {|a| a.subject_type == "DataFile"}.collect { |a| a.subject }
   end
-  
+
   def related_models
     self.backwards_relationships.select {|a| a.subject_type == "Model"}.collect { |a| a.subject }
   end
-  
+
   def related_assays
     self.backwards_relationships.select {|a| a.subject_type == "Assay"}.collect { |a| a.subject }
   end
@@ -130,7 +130,7 @@ class Publication < ActiveRecord::Base
     organisms = organisms | related_models.collect{|m| m.organism}.uniq.compact
     organisms
   end
-  
+
   def self.subscribers_are_notified_of? action
     action == 'create'
   end
@@ -138,16 +138,22 @@ class Publication < ActiveRecord::Base
   def endnote
    bio_reference.endnote
   end
-  
+
   private
 
   def bio_reference
+    #FIXME: after merging with VL code to have author index on publication_authors, will use dirrectly publication info from seek, to avoid exception when fetching live
     if pubmed_id
-      Bio::MEDLINE.new(Bio::PubMed.efetch(pubmed_id).first).reference
+      begin
+        Bio::MEDLINE.new(Bio::PubMed.efetch(pubmed_id).first).reference
+      rescue
+        Bio::Reference.new({})
+      end
     else
       #TODO: Bio::Reference supports a 'url' option. Should this be the URL on seek, or the URL of the 'View Publication' button, or neither?
+      authors = publication_author_orders.sort_by(&:order).collect(&:author)
       Bio::Reference.new({:title => title, :journal => journal, :abstract => abstract,
-                          :authors => (seek_authors + non_seek_authors).map {|e| [e.last_name, e.first_name].join(', ')},
+                          :authors => authors.map {|a| [a.last_name, a.first_name].join(', ')},
                           :year => published_date.year}.with_indifferent_access)
     end
   end
