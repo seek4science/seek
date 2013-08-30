@@ -6,8 +6,8 @@ core_xlink(publication).merge(is_root ? xml_root_attributes : {}) do
   render :partial=>"api/standard_elements",:locals=>{:parent_xml => parent_xml,:is_root=>is_root,:object=>publication} 
   if (is_root)
         parent_xml.tag! "creators" do
-          publication.publication_authors.each do |pa|
-              if pa.person
+          publication.publication_author_orders.collect(&:author).each do |pa|
+              if pa.kind_of?(Person)
                     api_partial parent_xml, pa.person
               else
                 parent_xml.tag! "person" do
