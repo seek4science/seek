@@ -36,3 +36,16 @@
   <%= image_tag "ajax-loader-large.gif", :id => 'spinner', :style => 'display:none;' -%>
   <div id="publication_preview_container" style="display:none;"></div>
 </div>
+
+<script type="text/javascript">
+    function updateProjectIds(){
+        var form = $('new_publication');
+        //need to query by classname, as there are now two elements with the same id publication_project_ids
+        //this is the inactive element
+        var inactive_project_select = form.getElementsByClassName('project_ids')[0];
+        //this is the active element, that the selected value gets changed through UI
+        var active_project_select = $('publication_project_ids');
+        //need to update inactive element from active element
+        inactive_project_select.setValue(active_project_select.getValue());
+    }
+</script>
