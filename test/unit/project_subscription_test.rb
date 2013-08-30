@@ -59,6 +59,16 @@ class ProjectSubscriptionTest < ActiveSupport::TestCase
     assert @subscribables_in_proj.map(&:current_users_subscription).all?(&:monthly?)
   end
 
+  test 'subscribers to a project auto subscribe to new publication in the project' do
+    ps = current_person.project_subscriptions.create :project => @proj
+    ProjectSubscriptionJob.new(ps.id).perform
+    publication = Factory(:publication, :projects => [Factory(:project),@proj])
+    assert SetSubscriptionsForItemJob.exists?(publication.class.name, publication.id, publication.projects.collect(&:id))
+    SetSubscriptionsForItemJob.new(publication.class.name, publication.id, publication.projects.collect(&:id)).perform
+
+    assert publication.subscribed?
+  end
+
   private
 
   def current_person

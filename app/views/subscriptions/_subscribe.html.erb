@@ -1,4 +1,4 @@
-<% if current_user && object.subscribable? && (object.class != Publication) -%>
+<% if current_user && object.subscribable? -%>
     <li>
       <% if object.subscribed? %>
           <%= image_tag_for_key 'unsubscribe', object.current_users_subscription, nil, {:method => :delete}-%>

@@ -5,6 +5,8 @@ require 'libxml'
 
 class Publication < ActiveRecord::Base
   include Seek::Rdf::RdfGeneration
+  include Subscribable
+
   title_trimmer
 
   #searchable must come before acts_as_asset is called
