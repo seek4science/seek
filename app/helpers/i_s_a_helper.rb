@@ -110,7 +110,7 @@ module ISAHelper
     target_type,target_id = target.split('_')
 
     label = ''
-    if source_type == 'Assay' && tart_get_type == 'DataFile'
+    if source_type == 'Assay' && target_type == 'DataFile'
       assay_asset = AssayAsset.where(["assay_id=? AND asset_id=?",
                         source_id, target_id]).first
       label << assay_asset.try(:relationship_type).try(:title).to_s
