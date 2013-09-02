@@ -200,7 +200,7 @@ module Acts #:nodoc:
       def content_blob_search_terms
         if self.respond_to?(:content_blob) || self.respond_to?(:content_blobs)
           blobs = self.respond_to?(:content_blobs) ? content_blobs : [content_blob]
-          blobs.collect do |blob|
+          blobs.compact.collect do |blob|
             [blob.original_filename] | [blob.pdf_contents_for_search]
           end.flatten.compact.uniq
         else
