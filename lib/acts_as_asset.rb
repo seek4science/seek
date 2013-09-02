@@ -71,6 +71,16 @@ module Acts #:nodoc:
 
         grouped_pagination
 
+        searchable do
+          text :title, :searchable_tags
+          text :creators do
+            creators.compact.map(&:name)
+          end
+          text :content_blob do
+            content_blob_search_terms
+          end
+        end if Seek::Config.solr_enabled
+
         class_eval do
           extend Acts::Asset::SingletonMethods
         end

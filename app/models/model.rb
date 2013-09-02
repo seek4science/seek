@@ -11,13 +11,7 @@ class Model < ActiveRecord::Base
 
   #searchable must come before acts_as_asset call
   searchable(:auto_index=>false) do
-    text :description,:title,:organism_terms,:searchable_tags, :model_contents_for_search,:assay_type_titles,:technology_type_titles, :other_creators
-    text :creators do
-      creators.compact.map(&:name)
-    end
-    text :content_blob do
-      content_blob_search_terms
-    end
+    text :description,:organism_terms,:model_contents_for_search,:assay_type_titles,:technology_type_titles, :other_creators
   end if Seek::Config.solr_enabled
 
   acts_as_asset
