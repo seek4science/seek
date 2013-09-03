@@ -51,7 +51,11 @@ function displayNodeInfo(node){
     }
 
     html += '</ul>';
-    $('node_info').innerHTML = html;
+
+    var node_info = $('node_info')
+    node_info.innerHTML = html;
+
+    alignCenterVertical(node_info, node_info.clientHeight);
 }
 
 function itemInfo(item_data){
@@ -87,7 +91,7 @@ function processPanzoom() {
     //display panzoom
     $j('#cy').cytoscapePanzoom();
 
-    alignPanzoomCenteredVertical();
+    alignCenterVertical($j('.ui-cytoscape-panzoom')[0], 230);
 
     //reset on panzoom also reset all nodes and edges css
     $j('.ui-cytoscape-panzoom-reset').click(function () {
@@ -98,14 +102,10 @@ function processPanzoom() {
     });
 }
 
-function alignPanzoomCenteredVertical(){
+function alignCenterVertical(element, element_height){
     var graph_height = cy.container().style.height.split('px')[0];
-    var panzoom_height = 230;
-    var panzoom_position = (graph_height - panzoom_height)/2;
-    var panzoom = $j('.ui-cytoscape-panzoom')[0];
-    panzoom.style['top']=panzoom_position+'px'
-
-
+    var distance_from_top = (graph_height - element_height)/2;
+    element.style['top']=distance_from_top+'px';
 }
 
 function appearingNodes(nodes){

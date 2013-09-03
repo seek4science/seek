@@ -5,6 +5,7 @@ div.isa_graph {
 }
 
 div.node_info {
+    position: relative;
     float: right;
     width: 19.5%;
     background-color: #fffff3;
