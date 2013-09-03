@@ -26,7 +26,14 @@
   <div class="box_infotext">
     <ul style="padding-left:1em;">
       <li>
-
+        The <b>Gatekeeper</b> is a person that needs to approve items before they are finally published.
+      </li>
+      <li>
+        When you request to make an item published, an email will be sent to that person, and they will either approve
+        or reject the publication. Once this has happened, you will be notified back via an email.
+      </li>
+      <li>
+        Following is the list of items that you have requested to make published, but are still waiting for gatekeeper's approval.
       </li>
     </ul>
   </div>
@@ -34,8 +41,9 @@
   <br/>
   <% if @waiting_approval_assets.empty? %>
       <span class="published">You have no items waiting for gatekeeper's approval</span>
+      <br/>
   <% else %>
-      <h2>You have requested to make the following items published:</h2>
+      <h2>You have requested to make the following items published and they are still wating for gatekeeper's approval:</h2>
       <% isa_order = ['Investigation', 'Study', 'Assay'] %>
       <% @waiting_approval_assets.sort_by { |a| [a.is_isa? ? -1 : 1, isa_order.index(a.class.name), a.class.name] }.each do |asset| %>
           <ul class="item_waiting_for_approval">
@@ -60,8 +68,12 @@
   <% end %>
 
   <br/>
+  <b>
+    <%= link_to "Back to profile", person_path(params[:id].to_i) -%>
+  </b>
 
-  <%= link_to "Back to profile", person_path(params[:id].to_i) -%>
+  <br/>
+  <br/>
 
 </div>
 
