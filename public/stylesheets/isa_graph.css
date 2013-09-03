@@ -2,6 +2,7 @@ div.isa_graph {
     float: left;
     width: 79.5%;
     background-color: #fffff3;
+    border: 1px solid #ececc7;
 }
 
 div.node_info {
