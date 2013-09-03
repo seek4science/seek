@@ -57,6 +57,9 @@
   <br/>
   <% if @requested_approval_assets.empty? %>
       <span class="published">You have no items waiting for your approval</span>
+      <br/>
+      <br/>
+      <%= link_to "Back to profile", person_path(params[:id].to_i) -%>
   <% else %>
       <%= form_tag :action => :gatekeeper_decide do %>
           <h2>You have been requested to make the following items published. Please select your decision:</h2>
