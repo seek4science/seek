@@ -28,4 +28,14 @@ class ResourcePublishLog < ActiveRecord::Base
     requested_approval_assets.select!{|asset| gatekeeper.is_gatekeeper_of? asset}
     requested_approval_assets.uniq
   end
+
+  def self.waiting_approval_assets_for user
+    resource_types = Seek::Util.authorized_types.select{|klass| klass.is_isa? || klass.first.try(:is_in_isa_publishable?) }.collect{|klass| klass.name}
+    waiting_approval_logs = ResourcePublishLog.includes(:resource).where(["publish_state=? AND resource_type IN (?) AND user_id=?",
+                                                                            WAITING_FOR_APPROVAL, resource_types, user.id])
+    waiting_approval_assets = waiting_approval_logs.collect(&:resource).compact
+    waiting_approval_assets.select!{|asset| !asset.is_published?}
+    waiting_approval_assets.uniq
+  end
+
 end

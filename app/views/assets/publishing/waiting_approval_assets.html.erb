@@ -1,0 +1,67 @@
+<style type="text/css">
+    span.published {
+        font-size: 18px;
+        font-weight: bold;
+        color: green;
+    }
+
+    ul.item_waiting_for_approval {
+        padding-left: 1em;
+        margin-top: 2em;
+        margin-bottom: 2em;
+    }
+
+    ul.item_waiting_for_approval li.type_and_title {
+        font-weight: bolder;
+    }
+
+    img.icon_visibility {
+        margin-left: 2em;
+    }
+</style>
+
+<div class="show_basic">
+  <br/>
+
+  <div class="box_infotext">
+    <ul style="padding-left:1em;">
+      <li>
+
+      </li>
+    </ul>
+  </div>
+
+  <br/>
+  <% if @waiting_approval_assets.empty? %>
+      <span class="published">You have no items waiting for gatekeeper's approval</span>
+  <% else %>
+      <h2>You have requested to make the following items published:</h2>
+      <% isa_order = ['Investigation', 'Study', 'Assay'] %>
+      <% @waiting_approval_assets.sort_by { |a| [a.is_isa? ? -1 : 1, isa_order.index(a.class.name), a.class.name] }.each do |asset| %>
+          <ul class="item_waiting_for_approval">
+            <li class="type_and_title">
+              <%= text_for_resource asset -%>:&nbsp;<%= link_to (asset.title), asset -%>
+              <%= list_item_visibility(asset, "icon_visibility") -%>
+            </li>
+            <li class="request_info">
+              Requested on:&nbsp;
+              <%
+                 log = ResourcePublishLog.where(["resource_type=? AND resource_id=? AND publish_state=? AND user_id=?",
+                                                 asset.class.name, asset.id, ResourcePublishLog::WAITING_FOR_APPROVAL, current_user.id]).last
+              %>
+              <%= date_as_string(log.created_at) %>
+              <br/>
+              Being approved by:&nbsp;
+              <% gatekeeper_links = asset.gatekeepers.collect { |gatekeeper| link_to(gatekeeper.name, gatekeeper) }.join(' or ').html_safe %>
+              <%= gatekeeper_links %>
+            </li>
+          </ul>
+      <% end %>
+  <% end %>
+
+  <br/>
+
+  <%= link_to "Back to profile", person_path(params[:id].to_i) -%>
+
+</div>
+
