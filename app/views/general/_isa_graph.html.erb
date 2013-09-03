@@ -66,28 +66,25 @@
 
             cy.reset();
             cy.center();
+            var nodes = cy.$('node');
+
+            //display panzoom control only when having nodes
+            if (nodes.length > 0){
+                processPanzoom();
+            }
+
+            nodes.on('click', function(e){
+                var node = e.cyTarget;
+                animateNode(node);
+                displayNodeInfo(node);
+            });
+
+            //animate the current asset node
+            var asset_type =  '<%= controller_name.singularize.camelize %>';
+            var asset_id = '<%= params[:id] %>';
+            var asset_node_id = asset_type + '_' + asset_id;
+            var asset_node = cy.nodes('[id=\''+ asset_node_id +'\']')[0];
+            animateNode(asset_node);
         }
-    });
-
-    $j(function(){
-        var nodes = cy.$('node');
-
-        //display panzoom control only when having nodes
-        if (nodes.length > 0){
-            processPanzoom();
-        }
-
-        nodes.on('click', function(e){
-            var node = e.cyTarget;
-            animateNode(node);
-            displayNodeInfo(node);
-        });
-
-        //animate the current asset node
-        var asset_type =  '<%= controller_name.singularize.camelize %>';
-        var asset_id = '<%= params[:id] %>';
-        var asset_node_id = asset_type + '_' + asset_id;
-        var asset_node = cy.nodes('[id=\''+ asset_node_id +'\']')[0];
-        animateNode(asset_node);
     });
 </script>
