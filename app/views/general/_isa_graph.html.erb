@@ -74,13 +74,7 @@
 
         //display panzoom control only when having nodes
         if (nodes.length > 0){
-            $j('#cy').cytoscapePanzoom();
-            //reset on panzoom also reset all nodes and edges css
-            $j('.ui-cytoscape-panzoom-reset').click(function(){
-                normalizingNodes(nodes);
-                appearingNodes(nodes);
-                appearingEdges(cy.$('edge'));
-            });
+            processPanzoom();
         }
 
         nodes.on('click', function(e){

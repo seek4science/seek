@@ -83,6 +83,31 @@ function connectedNodes(node){
     return connected_nodes;
 }
 
+function processPanzoom() {
+    //display panzoom
+    $j('#cy').cytoscapePanzoom();
+
+    alignPanzoomCenteredVertical();
+
+    //reset on panzoom also reset all nodes and edges css
+    $j('.ui-cytoscape-panzoom-reset').click(function () {
+        var nodes = cy.$('node')
+        normalizingNodes(nodes);
+        appearingNodes(nodes);
+        appearingEdges(cy.$('edge'));
+    });
+}
+
+function alignPanzoomCenteredVertical(){
+    var graph_height = cy.container().style.height.split('px')[0];
+    var panzoom_height = 230;
+    var panzoom_position = (graph_height - panzoom_height)/2;
+    var panzoom = $j('.ui-cytoscape-panzoom')[0];
+    panzoom.style['top']=panzoom_position+'px'
+
+
+}
+
 function appearingNodes(nodes){
     nodes.css('opacity', 1);
 }
