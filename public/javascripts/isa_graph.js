@@ -99,6 +99,7 @@ function processPanzoom() {
         normalizingNodes(nodes);
         appearingNodes(nodes);
         appearingEdges(cy.$('edge'));
+        $('node_info').innerHTML = '';
     });
 }
 
