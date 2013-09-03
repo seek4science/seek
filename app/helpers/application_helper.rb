@@ -82,7 +82,7 @@ module ApplicationHelper
       contributor_person = hi.contributing_user.person
       if current_user.try(:person) && hi.can_see_hidden_item?(current_user.person) && contributor_person.can_view?
         contributor_name = contributor_person.name
-        contributor_link = link_to(contributor_name, person_path(contributor_person))
+        contributor_link = "<a href='#{person_path(contributor_person)}'>#{contributor_name}</a>"
         contributor_links << contributor_link if contributor_link && !contributor_links.include?(contributor_link)
       end
     end
