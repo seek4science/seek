@@ -52,9 +52,11 @@ function displayNodeInfo(node){
 
     html += '</ul>';
 
-    var node_info = $('node_info')
-    node_info.innerHTML = html;
+    var node_info = $('node_info');
+    $('node_info').innerHTML = html;
 
+    //can not use Effect.Appear here, it does not activate clientHeight
+    node_info.style['display'] = 'block';
     alignCenterVertical(node_info, node_info.clientHeight);
 }
 
@@ -99,7 +101,7 @@ function processPanzoom() {
         normalizingNodes(nodes);
         appearingNodes(nodes);
         appearingEdges(cy.$('edge'));
-        $('node_info').innerHTML = '';
+        Effect.Fade('node_info', { duration: 0.25 });
     });
 }
 
