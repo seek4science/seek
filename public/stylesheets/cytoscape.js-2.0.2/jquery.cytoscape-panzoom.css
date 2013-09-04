@@ -28,7 +28,7 @@
 	line-height: 1;
 	color: #666;
 	font-size: 11px;
-	z-index: 9;
+	z-index: 9999;
 }
 
 .ui-cytoscape-panzoom-zoom-button {
