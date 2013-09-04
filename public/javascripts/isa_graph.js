@@ -139,3 +139,11 @@ function normalizingNodes(nodes){
     nodes.css('font-size',default_font_size);
     nodes.css('font-weight', 'normal');
 }
+
+function resizeGraph(){
+    cy.fit(50);
+    if (cy.zoom() > 1){
+        cy.reset();
+        cy.center();
+    }
+}
