@@ -9,6 +9,8 @@ class Publication < ActiveRecord::Base
 
   title_trimmer
 
+  alias_attribute :description, :abstract
+
   #searchable must come before acts_as_asset is called
   searchable(:ignore_attribute_changes_of=>[:updated_at,:last_used_at]) do
     text :abstract,:journal,:pubmed_id, :doi

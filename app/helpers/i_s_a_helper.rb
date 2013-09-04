@@ -54,11 +54,15 @@ module ISAHelper
       item_type, item_id = node.split('_')
       item = item_type.constantize.find_by_id(item_id)
       if item.can_view?
+        description = item.description
+        no_description_text = item.kind_of?(Publication) ? 'No abstract' : 'No description'
+        tooltip = description.blank? ? no_description_text : truncate(description, :length => 500)
+        link = link_to("<b>#{item_type.humanize}: </b>".html_safe +  h(item.title), polymorphic_path(item), :title => tooltip_title_attrib("#{tooltip}"))
+
         cytoscape_node_elements << {:group => 'nodes',
                                     :data => {:id => node,
                                               :name => truncate(item_type.humanize + ': ' + item.title),
-                                              :full_title => ("<b>#{item_type.humanize}: </b>" +  h(item.title)) ,
-                                              :path => polymorphic_path(item),
+                                              :link => link,
                                               :faveColor => (FILL_COLOURS[item_type] || FILL_COLOURS.default),
                                               :borderColor => (BORDER_COLOURS[item_type] || BORDER_COLOURS.default)}
         }
@@ -66,7 +70,7 @@ module ISAHelper
         cytoscape_node_elements << {:group => 'nodes',
                                     :data => {:id => node,
                                               :name => 'Hidden item',
-                                              :full_title => hidden_items_html([item], 'Hidden item'),
+                                              :hidden_item_info => hidden_items_html([item], 'Hidden item'),
                                               :faveColor => (FILL_COLOURS['HiddenItem'] || FILL_COLOURS.default),
                                               :borderColor => (BORDER_COLOURS['HiddenItem'] || BORDER_COLOURS.default)}
         }
