@@ -1,7 +1,7 @@
 = Configuring SEEK for Virtuoso
 
 It is possible to configure SEEK to automatically send RDF triples to a Virtuoso Repository.
-Developers may also be interested in how to extend this for other triple stores - this is potentially quite simple and please contact us on our {mailing list}http://groups.google.com/group/seek-development if you are interested.
+Developers may also be interested in how to extend this for other triple stores - this is potentially quite simple and please contact us on our {developers mailing list}http://groups.google.com/group/seek-development if you are interested.
 
 
 == Installing Virtuoso
