@@ -93,7 +93,13 @@ function processPanzoom() {
     //display panzoom
     $j('#cy').cytoscapePanzoom();
 
-    alignCenterVertical($j('.ui-cytoscape-panzoom')[0], 230);
+    //set again the graph height if panzoom height is bigger
+    var panzoom_height = 220;
+    var graph_height = cy.container().style.height.split('px')[0];
+    cy.container().style.height = Math.max(graph_height, panzoom_height) +'px';
+
+    alignCenterVertical($j('.ui-cytoscape-panzoom')[0], panzoom_height);
+
 
     //reset on panzoom also reset all nodes and edges css
     $j('.ui-cytoscape-panzoom-reset').click(function () {

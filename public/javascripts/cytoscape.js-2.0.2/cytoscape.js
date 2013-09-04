@@ -15890,8 +15890,6 @@ var cytoscape;
             var width = container.clientWidth;
             //calculate the height dynamically
             var height = graphHeight();
-            //the hight of panzoom control is 230px
-            height = Math.max(height, 230);
             container.style.height = height+'px';
 
             function graphHeight(){

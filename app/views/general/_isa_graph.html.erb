@@ -62,9 +62,6 @@
 
         ready: function(){
             cy = this;
-
-            cy.reset();
-            cy.center();
             var nodes = cy.$('node');
 
             //display panzoom control only when having nodes
@@ -84,6 +81,9 @@
             var asset_node_id = asset_type + '_' + asset_id;
             var asset_node = cy.nodes('[id=\''+ asset_node_id +'\']')[0];
             animateNode(asset_node);
+
+            cy.reset();
+            cy.center();
         }
     });
 </script>
