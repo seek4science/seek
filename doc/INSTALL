@@ -4,6 +4,8 @@
 
 If you have installed SEEK, please take a moment to fill out our very short,optional {SEEK Registration Form}[http://www.sysmo-db.org/seek-registration]
 
+If you have any problems or questions, you should contact us. The following link will give you details on how to {Contact Us}[link:doc/CONTACTING_US.html]
+
 SEEK is based upon the Ruby on Rails platform. Although the information on this page should provide you with everything you need to get a basic installation of
 SEEK up and running, some background reading on Ruby on Rails would be beneficial if it is new to you. Documentation and resources describing Ruby on Rails can be found
 at http://rubyonrails.org/documentation .
@@ -36,7 +38,7 @@ Pay attention to what you use for the 'MySQL root' password when requested - you
 
 The remaining packages are:
 
-  sudo apt-get install wget curl mercurial ruby libssl-dev build-essential openssh-server git-core libreadline-dev
+  sudo apt-get install wget curl mercurial ruby libssl-dev build-essential openssh-server git libreadline-dev
   sudo apt-get install libxml++2.6-dev openjdk-7-jdk graphviz libsqlite3-dev sqlite3
   sudo apt-get install poppler-utils libreoffice libmysqlclient-dev libmagick++-dev libxslt1-dev
 
@@ -195,9 +197,7 @@ If you are setting up SEEK for production use, please now return to our {Install
 You should also now read our {Administration Guide}[link:doc/ADMINISTRATION.html] for details of some basic tasks and settings.
 
 
-== Contacting us and other developers
 
-There is a public Google Group available for SEEK development at http://groups.google.com/group/seek-development
 
 
 
