@@ -9,7 +9,7 @@ stable source code.
 If you have never used Ruby or Ruby on Rails, we strongly suggest you read through the documentation at http://rubyonrails.org/documentation. There are also many tutorials available
 online.
 
-You can contact us through our developers mailing list at http://groups.google.com/group/seek-development . We particularly encourage you to contact us before you start on adding a new
+You can contact us through our developers mailing list at http://groups.google.com/group/seek-developers . We particularly encourage you to contact us before you start on adding a new
 feature, as it maybe something that we have already put some thought into or have in our pipeline.
 
 Our main source code repository can be found at https://bitbucket.org/seek4science/seek . You can fork or clone this project before making changes to it, and then
