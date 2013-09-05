@@ -58,8 +58,8 @@ module ISAHelper
       if item.can_view?
         description = item.description
         no_description_text = item.kind_of?(Publication) ? 'No abstract' : 'No description'
-        tooltip = description.blank? ? no_description_text : truncate(description, :length => 500)
-        link = link_to("<b>#{item_type.humanize}: </b>".html_safe +  h(item.title), polymorphic_path(item), :title => tooltip_title_attrib("#{tooltip}"))
+        tooltip = description.blank? ? no_description_text : truncate(h(description), :length => 500)
+        link = link_to("<b>#{item_type.humanize}: </b>".html_safe +  h(item.title), polymorphic_path(item), :title => tooltip_title_attrib(tooltip))
 
         cytoscape_node_elements << {:group => 'nodes',
                                     :data => {:id => node,
