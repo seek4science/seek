@@ -72,7 +72,7 @@ module Acts #:nodoc:
         grouped_pagination
 
         searchable do
-          text :title, :searchable_tags
+          text :title, :description, :searchable_tags
           text :creators do
             creators.compact.map(&:name)
           end

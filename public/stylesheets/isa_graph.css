@@ -1,22 +1,29 @@
 div.isa_graph {
     float: left;
     width: 79.5%;
-    background-color: #fffff3;
-    border: 1px solid #ececc7;
+    margin-top: 1em;
+    margin-bottom: 1em;
 }
 
 div.node_info {
     position: relative;
     float: right;
     width: 18%;
-    background-color: #fffff3;
-    border: 1px solid #ececc7;
+    border: 1px solid lightgray;
     padding-left: 1%;
     padding-right: 1%;
     padding-bottom: 1%;
     display:none;
+    margin-top: 1em;
+    margin-bottom: 1em;
 }
 
 div.node_info ul.items {
     margin-left: 1em;
+}
+
+.ui-cytoscape-panzoom {
+    position: relative;
+    float: right;
+    right: 4.5em;
 }

@@ -1,7 +1,9 @@
 <%= javascript_include_tag "jquery-1.5.1.min.js", "cytoscape.js-2.0.2/cytoscape.js", "cytoscape.js-2.0.2/jquery.cxtmenu.js",
-                           "cytoscape.js-2.0.2/jquery.cytoscape-edgehandles.js", "cytoscape.js-2.0.2/jquery.cytoscape-panzoom.js",
-                           "isa_graph.js" %>
-<%= stylesheet_link_tag "cytoscape.js-2.0.2/jquery.cytoscape-panzoom.css", "cytoscape.js-2.0.2/css/font-awesome.css", "isa_graph.css" %>
+                           "cytoscape.js-2.0.2/jquery.cytoscape-edgehandles.js", "cytoscape.js-2.0.2/jquery.cytoscape-panzoom.js" %>
+<%= stylesheet_link_tag "cytoscape.js-2.0.2/jquery.cytoscape-panzoom.css", "cytoscape.js-2.0.2/css/font-awesome.css" %>
+
+<%= javascript_include_tag "isa_graph.js", 'detect_browser' %>
+<%= stylesheet_link_tag "isa_graph.css" %>
 
 <%
   current_item ||= nil
@@ -17,73 +19,86 @@
     jQuery.noConflict();
     var $j = jQuery;
 
-    var default_node_width = 175;
-    var default_node_height = 35;
-    var default_font_size = 11;
+    var isa_graph = $j('.isa_graph')[0];
+    var elements = <%= cytoscape_elements(root_item, deep, current_item).to_json.html_safe %>;
 
-    $j('#cy').cytoscape({
-        layout: {
-          name: 'breadthfirst'
-        },
+    if (!isCanvasSupportBrowser() || !isIEVersionSupported(5)){
+        isa_graph.innerHTML = "<div class='none_text'>Unable to display the graph for this browser version. Please upgrade your browser.</div>";
+        isa_graph.style['text-align'] = 'center';
+    }
+    else if (elements.error == 'error'){
+        isa_graph.innerHTML = "<div class='none_text'>Currently unable to display the graph for this item</div>";
+        isa_graph.style['text-align'] = 'center';
+    }else{
+        var default_node_width = 175;
+        var default_node_height = 35;
+        var default_font_size = 11;
 
-        showOverlay: false,
+        $j('#cy').cytoscape({
+            layout: {
+              name: 'breadthfirst'
+            },
 
-        style: cytoscape.stylesheet()
-                .selector('node')
-                .css({
-                    'shape': 'roundrectangle',
-                    'border-color': 'data(borderColor)',
-                    'border-width': 2,
-                    'das': 'mapData(weight, 40, 80, 20, 60)',
-                    'content': 'data(name)',
-                    'text-valign': 'center',
-                    'text-outline-width': 1,
-                    'text-outline-color': 'data(faveColor)',
-                    'background-color': 'data(faveColor)',
-                    'color': '#323232',
-                    'width':default_node_width,
-                    'height':default_node_height,
-                    'font-size':default_font_size
-                })
+            showOverlay: false,
 
-                .selector('edge')
-                .css({
-                    'width': 1.5,
-                    'target-arrow-shape': 'triangle',
-                    'line-color': 'data(faveColor)',
-                    'source-arrow-color': 'data(faveColor)',
-                    'target-arrow-color': 'data(faveColor)',
-                    'content': 'data(name)',
-                    'color': '#323232',
-                    'font-size': (default_font_size-2)
-                }),
+            style: cytoscape.stylesheet()
+                    .selector('node')
+                    .css({
+                        'shape': 'roundrectangle',
+                        'border-color': 'data(borderColor)',
+                        'border-width': 2,
+                        'das': 'mapData(weight, 40, 80, 20, 60)',
+                        'content': 'data(name)',
+                        'text-valign': 'center',
+                        'text-outline-width': 1,
+                        'text-outline-color': 'data(faveColor)',
+                        'background-color': 'data(faveColor)',
+                        'color': '#323232',
+                        'width':default_node_width,
+                        'height':default_node_height,
+                        'font-size':default_font_size
+                    })
 
-        elements: <%= cytoscape_elements(root_item, deep, current_item).to_json.html_safe %>,
+                    .selector('edge')
+                    .css({
+                        'width': 1.5,
+                        'target-arrow-shape': 'triangle',
+                        'line-color': 'data(faveColor)',
+                        'source-arrow-color': 'data(faveColor)',
+                        'target-arrow-color': 'data(faveColor)',
+                        'content': 'data(name)',
+                        'color': '#323232',
+                        'font-size': (default_font_size-2)
+                    }),
 
-        ready: function(){
-            cy = this;
+            elements: elements,
 
-            cy.reset();
-            cy.center();
-            var nodes = cy.$('node');
+            ready: function(){
+                cy = this;
+                var nodes = cy.$('node');
 
-            //display panzoom control only when having nodes
-            if (nodes.length > 0){
-                processPanzoom();
+                //process only when having nodes
+                if (nodes.length > 0){
+                    processPanzoom();
+
+                    nodes.on('click', function(e){
+                        var node = e.cyTarget;
+                        animateNode(node);
+                        displayNodeInfo(node);
+                    });
+
+                    //animate the current asset node
+                    var asset_type =  '<%= controller_name.singularize.camelize %>';
+                    var asset_id = '<%= params[:id] %>';
+                    var asset_node_id = asset_type + '_' + asset_id;
+                    var asset_node = cy.nodes('[id=\''+ asset_node_id +'\']')[0];
+                    animateNode(asset_node);
+
+                    resizeGraph();
+                }else{
+                    $j('.isa_graph')[0].hide();
+                }
             }
-
-            nodes.on('click', function(e){
-                var node = e.cyTarget;
-                animateNode(node);
-                displayNodeInfo(node);
-            });
-
-            //animate the current asset node
-            var asset_type =  '<%= controller_name.singularize.camelize %>';
-            var asset_id = '<%= params[:id] %>';
-            var asset_node_id = asset_type + '_' + asset_id;
-            var asset_node = cy.nodes('[id=\''+ asset_node_id +'\']')[0];
-            animateNode(asset_node);
-        }
-    });
+        });
+    }
 </script>

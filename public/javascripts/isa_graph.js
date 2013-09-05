@@ -63,11 +63,9 @@ function displayNodeInfo(node){
 function itemInfo(item_data){
     html = '<li>';
     if (item_data.name == 'Hidden item'){
-        html += item_data.full_title;
+        html += item_data.hidden_item_info;
     }else{
-        html += '<a href=\''+ item_data.path +'\'>';
-        html += item_data.full_title;
-        html += "</a>";
+        html += item_data.link;
     }
     html += '</li>';
     return html;
@@ -93,7 +91,13 @@ function processPanzoom() {
     //display panzoom
     $j('#cy').cytoscapePanzoom();
 
-    alignCenterVertical($j('.ui-cytoscape-panzoom')[0], 230);
+    //set again the graph height if panzoom height is bigger
+    var panzoom_height = 220;
+    var graph_height = cy.container().style.height.split('px')[0];
+    cy.container().style.height = Math.max(graph_height, panzoom_height) +'px';
+
+    alignCenterVertical($j('.ui-cytoscape-panzoom')[0], panzoom_height);
+
 
     //reset on panzoom also reset all nodes and edges css
     $j('.ui-cytoscape-panzoom-reset').click(function () {
@@ -132,4 +136,12 @@ function normalizingNodes(nodes){
     nodes.css('height',default_node_height);
     nodes.css('font-size',default_font_size);
     nodes.css('font-weight', 'normal');
+}
+
+function resizeGraph(){
+    cy.fit(50);
+    if (cy.zoom() > 1){
+        cy.reset();
+        cy.center();
+    }
 }

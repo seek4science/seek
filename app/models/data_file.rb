@@ -13,7 +13,7 @@ class DataFile < ActiveRecord::Base
 
   #searchable must come before acts_as_asset call
   searchable(:auto_index=>false) do
-    text :description,:spreadsheet_annotation_search_fields,:fs_search_fields,
+    text :spreadsheet_annotation_search_fields,:fs_search_fields,
          :assay_type_titles,:technology_type_titles, :spreadsheet_contents_for_search, :other_creators
   end if Seek::Config.solr_enabled
 

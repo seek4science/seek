@@ -28,27 +28,16 @@
         <% else %>
             <%#param code is used for temporary link %>
             <% view_pdf_content_url = polymorphic_path([asset, content_blob], :action => 'view_pdf_content', :code => params[:code]) %>
-            <%= image_tag_for_key "show", view_pdf_content_url, 'View content', {:onclick => "isCanvasSupportBrowser();isIEVersionSupported", :title => 'View inline content this file'}, label %>
+            <%= image_tag_for_key "show", view_pdf_content_url, 'View content', {:onclick => "checkSupportedBrowser();", :title => 'View inline content this file'}, label %>
         <% end %>
         <%= li_end.html_safe %>
     <% end %>
 <% end %>
 
 <script type="text/javascript">
-    function isCanvasSupportBrowser(){
-        var test_canvas = document.createElement("canvas") //try and create sample canvas element
-        var canvas_check=(test_canvas.getContext)? true : false //check if object supports getContext() method, a method of the canvas element
-        if (!canvas_check){
-            alert('View content is not supported in this browser version. Please upgrade your browser.');
+    function checkSupportedBrowser(){
+        if (!isCanvasSupportBrowser() || !isIEVersionSupported(5)){
+            alert('View inline content of this item is not supported in this browser version. Please upgrade your browser.');
         }
-        return canvas_check;
-    }
-    function isIEVersionSupported(){
-        var browser = detect_browser();
-        if (browser.name == 'Microsoft Internet Explorer' && browser.majorVersion < 5){
-            alert('View content is not supported in this Internet Explorer version. Please upgrade your browser.');
-            return false;
-        }else
-            return true;
     }
 </script>

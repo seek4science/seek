@@ -32,10 +32,12 @@
     <%= render :partial=>"general/isa_graph", :locals => {:root_item => @sop, :current_item => @sop, :deep => true} %>
   </div>
 
-  <div style="clear:both;padding-top:1em;">
-    <h2>
-      Experimental Conditions
-    </h2>
+  <div style="clear:both;">
+    <p>
+        <h2>
+          Experimental Conditions
+        </h2>
+    </p>
     <%= render :partial=>"sops/simple_experimental_conditions_list" %>
     <br/>
 
