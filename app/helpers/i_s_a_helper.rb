@@ -43,7 +43,8 @@ module ISAHelper
       cytoscape_elements = cytoscape_node_elements(nodes) + cytoscape_edge_elements(edges)
       cytoscape_elements
     rescue Exception=>e
-      "$('cy').innerHTML= 'Currently unable to display the graph for this item'"
+      Rails.logger.error("Error generating nodes and edges for the graph - #{e.message}")
+      {:error => 'error'}
     end
   end
 

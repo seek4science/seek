@@ -17,74 +17,81 @@
     jQuery.noConflict();
     var $j = jQuery;
 
-    var default_node_width = 175;
-    var default_node_height = 35;
-    var default_font_size = 11;
+    var elements = <%= cytoscape_elements(root_item, deep, current_item).to_json.html_safe %>;
+    if (elements.error == 'error'){
+        var isa_graph = $j('.isa_graph')[0];
+        isa_graph.innerHTML = "<div class='none_text'>Currently unable to display the graph for this item</div>";
+        isa_graph.style['text-align'] = 'center';
+    }else{
+        var default_node_width = 175;
+        var default_node_height = 35;
+        var default_font_size = 11;
 
-    $j('#cy').cytoscape({
-        layout: {
-          name: 'breadthfirst'
-        },
+        $j('#cy').cytoscape({
+            layout: {
+              name: 'breadthfirst'
+            },
 
-        showOverlay: false,
+            showOverlay: false,
 
-        style: cytoscape.stylesheet()
-                .selector('node')
-                .css({
-                    'shape': 'roundrectangle',
-                    'border-color': 'data(borderColor)',
-                    'border-width': 2,
-                    'das': 'mapData(weight, 40, 80, 20, 60)',
-                    'content': 'data(name)',
-                    'text-valign': 'center',
-                    'text-outline-width': 1,
-                    'text-outline-color': 'data(faveColor)',
-                    'background-color': 'data(faveColor)',
-                    'color': '#323232',
-                    'width':default_node_width,
-                    'height':default_node_height,
-                    'font-size':default_font_size
-                })
+            style: cytoscape.stylesheet()
+                    .selector('node')
+                    .css({
+                        'shape': 'roundrectangle',
+                        'border-color': 'data(borderColor)',
+                        'border-width': 2,
+                        'das': 'mapData(weight, 40, 80, 20, 60)',
+                        'content': 'data(name)',
+                        'text-valign': 'center',
+                        'text-outline-width': 1,
+                        'text-outline-color': 'data(faveColor)',
+                        'background-color': 'data(faveColor)',
+                        'color': '#323232',
+                        'width':default_node_width,
+                        'height':default_node_height,
+                        'font-size':default_font_size
+                    })
 
-                .selector('edge')
-                .css({
-                    'width': 1.5,
-                    'target-arrow-shape': 'triangle',
-                    'line-color': 'data(faveColor)',
-                    'source-arrow-color': 'data(faveColor)',
-                    'target-arrow-color': 'data(faveColor)',
-                    'content': 'data(name)',
-                    'color': '#323232',
-                    'font-size': (default_font_size-2)
-                }),
+                    .selector('edge')
+                    .css({
+                        'width': 1.5,
+                        'target-arrow-shape': 'triangle',
+                        'line-color': 'data(faveColor)',
+                        'source-arrow-color': 'data(faveColor)',
+                        'target-arrow-color': 'data(faveColor)',
+                        'content': 'data(name)',
+                        'color': '#323232',
+                        'font-size': (default_font_size-2)
+                    }),
 
-        elements: <%= cytoscape_elements(root_item, deep, current_item).to_json.html_safe %>,
+            elements: elements,
 
-        ready: function(){
-            cy = this;
-            var nodes = cy.$('node');
+            ready: function(){
+                cy = this;
+                var nodes = cy.$('node');
 
-            //process only when having nodes
-            if (nodes.length > 0){
-                processPanzoom();
+                //process only when having nodes
+                if (nodes.length > 0){
+                    processPanzoom();
 
-                nodes.on('click', function(e){
-                    var node = e.cyTarget;
-                    animateNode(node);
-                    displayNodeInfo(node);
-                });
+                    nodes.on('click', function(e){
+                        var node = e.cyTarget;
+                        animateNode(node);
+                        displayNodeInfo(node);
+                    });
 
-                //animate the current asset node
-                var asset_type =  '<%= controller_name.singularize.camelize %>';
-                var asset_id = '<%= params[:id] %>';
-                var asset_node_id = asset_type + '_' + asset_id;
-                var asset_node = cy.nodes('[id=\''+ asset_node_id +'\']')[0];
-                animateNode(asset_node);
+                    //animate the current asset node
+                    var asset_type =  '<%= controller_name.singularize.camelize %>';
+                    var asset_id = '<%= params[:id] %>';
+                    var asset_node_id = asset_type + '_' + asset_id;
+                    var asset_node = cy.nodes('[id=\''+ asset_node_id +'\']')[0];
+                    animateNode(asset_node);
 
-                resizeGraph();
-            }else{
-                $j('.isa_graph')[0].hide();
+                    resizeGraph();
+                }else{
+                    $j('.isa_graph')[0].hide();
+                }
             }
-        }
-    });
+        });
+    }
 </script>
