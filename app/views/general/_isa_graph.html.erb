@@ -1,6 +1,6 @@
 <%= javascript_include_tag "jquery-1.5.1.min.js", "cytoscape.js-2.0.2/cytoscape.js", "cytoscape.js-2.0.2/jquery.cxtmenu.js",
-                           "cytoscape.js-2.0.2/jquery.cytoscape-edgehandles.js", "cytoscape.js-2.0.2/jquery.cytoscape-panzoom.js",
-                           "isa_graph.js" %>
+                           "cytoscape.js-2.0.2/jquery.cytoscape-edgehandles.js", "cytoscape.js-2.0.2/jquery.cytoscape-panzoom.js" %>
+<%= javascript_include_tag "isa_graph.js", 'detect_browser' %>
 <%= stylesheet_link_tag "cytoscape.js-2.0.2/jquery.cytoscape-panzoom.css", "cytoscape.js-2.0.2/css/font-awesome.css", "isa_graph.css" %>
 
 <%
@@ -17,9 +17,14 @@
     jQuery.noConflict();
     var $j = jQuery;
 
+    var isa_graph = $j('.isa_graph')[0];
     var elements = <%= cytoscape_elements(root_item, deep, current_item).to_json.html_safe %>;
-    if (elements.error == 'error'){
-        var isa_graph = $j('.isa_graph')[0];
+
+    if (!isCanvasSupportBrowser() || !isIEVersionSupported(5)){
+        isa_graph.innerHTML = "<div class='none_text'>Unable to display the graph for this browser version. Please upgrade your browser.</div>";
+        isa_graph.style['text-align'] = 'center';
+    }
+    else if (elements.error == 'error'){
         isa_graph.innerHTML = "<div class='none_text'>Currently unable to display the graph for this item</div>";
         isa_graph.style['text-align'] = 'center';
     }else{

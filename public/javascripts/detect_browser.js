@@ -65,3 +65,17 @@ function detect_browser(){
     }
     return browser;
 }
+
+function isCanvasSupportBrowser(){
+    var test_canvas = document.createElement("canvas") //try and create sample canvas element
+    var canvas_check=(test_canvas.getContext)? true : false //check if object supports getContext() method, a method of the canvas element
+    return canvas_check;
+}
+
+function isIEVersionSupported(min_support_version){
+    var browser = detect_browser();
+    if (browser.name == 'Microsoft Internet Explorer' && browser.majorVersion < min_support_version){
+        return false;
+    }else
+        return true;
+}
