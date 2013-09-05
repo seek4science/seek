@@ -99,6 +99,19 @@ class DataFileTest < ActiveSupport::TestCase
     assert !asset.valid?
   end
 
+  test "version created on save" do
+    User.current_user = Factory(:user)
+    df = DataFile.new(:title=>"testing versions",:projects=>[Factory(:project)])
+    assert df.valid?
+    df.save!
+    df = DataFile.find(df.id)
+    assert_equal 1, df.version
+
+    assert_not_nil df.find_version(1)
+    assert_equal df.find_version(1),df.latest_version
+    assert_equal df.contributor,df.latest_version.contributor
+  end
+
   def test_avatar_key
 
     assert_nil data_files(:picture).avatar_key
