@@ -17,7 +17,8 @@
  * You should have received a copy of the GNU Lesser General Public License along with
  * cytoscape.js. If not, see <http://www.gnu.org/licenses/>.
  */
- 
+
+/* This file has been modified */
 
 // this is put as a global var in the browser
 // or it's just a global to this module if commonjs
