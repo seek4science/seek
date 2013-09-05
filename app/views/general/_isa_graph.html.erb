@@ -1,7 +1,9 @@
 <%= javascript_include_tag "jquery-1.5.1.min.js", "cytoscape.js-2.0.2/cytoscape.js", "cytoscape.js-2.0.2/jquery.cxtmenu.js",
                            "cytoscape.js-2.0.2/jquery.cytoscape-edgehandles.js", "cytoscape.js-2.0.2/jquery.cytoscape-panzoom.js" %>
+<%= stylesheet_link_tag "cytoscape.js-2.0.2/jquery.cytoscape-panzoom.css", "cytoscape.js-2.0.2/css/font-awesome.css" %>
+
 <%= javascript_include_tag "isa_graph.js", 'detect_browser' %>
-<%= stylesheet_link_tag "cytoscape.js-2.0.2/jquery.cytoscape-panzoom.css", "cytoscape.js-2.0.2/css/font-awesome.css", "isa_graph.css" %>
+<%= stylesheet_link_tag "isa_graph.css" %>
 
 <%
   current_item ||= nil
