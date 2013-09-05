@@ -401,9 +401,12 @@ class DataFilesControllerTest < ActionController::TestCase
 
     assert_difference('ActivityLog.count') do
       assert_difference('DataFile.count') do
-        assert_difference('ContentBlob.count') do
-          post :create, :data_file => valid_data_file, :sharing=>valid_sharing, :assay_ids => [assay.id.to_s]
+        assert_difference('DataFile::Version.count') do
+          assert_difference('ContentBlob.count') do
+            post :create, :data_file => valid_data_file, :sharing=>valid_sharing, :assay_ids => [assay.id.to_s]
+          end
         end
+
       end
     end
     assert_redirected_to data_file_path(assigns(:data_file))
@@ -411,6 +414,8 @@ class DataFilesControllerTest < ActionController::TestCase
     
     assert !assigns(:data_file).content_blob.data_io_object.read.nil?
     assert assigns(:data_file).content_blob.url.blank?
+    assert_equal 1,assigns(:data_file).version
+    assert_not_nil assigns(:data_file).latest_version
     assay.reload
     assert assay.related_asset_ids('DataFile').include? assigns(:data_file).id
   end
