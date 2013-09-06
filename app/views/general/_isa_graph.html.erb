@@ -22,14 +22,13 @@
     var isa_graph = $j('.isa_graph')[0];
     var elements = <%= cytoscape_elements(root_item, deep, current_item).to_json.html_safe %>;
 
-    if (!isCanvasSupportBrowser() || !isIEVersionSupported(5)){
+    if (elements.error == 'error'){
+        isa_graph.innerHTML = "<div class='none_text'>Currently unable to display the graph for this item</div>";
+        isa_graph.style['text-align'] = 'center';}
+    else if (!isCanvasSupportBrowser() || !isIEVersionSupported(5)){
         isa_graph.innerHTML = "<div class='none_text'>Unable to display the graph for this browser version. Please upgrade your browser.</div>";
         isa_graph.style['text-align'] = 'center';
-    }
-    else if (elements.error == 'error'){
-        isa_graph.innerHTML = "<div class='none_text'>Currently unable to display the graph for this item</div>";
-        isa_graph.style['text-align'] = 'center';
-    }else{
+   }else{
         var default_node_width = 175;
         var default_node_height = 35;
         var default_font_size = 11;
