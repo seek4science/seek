@@ -11,8 +11,6 @@ class JwsUnitTest < ActiveSupport::TestCase
     blob=Factory :invalid_sbml_content_blob
     exception = assert_raises(Exception) { params_hash,attributions,saved_file,objects_hash,error_keys = @builder.builder_content blob }
     assert_not_nil exception.message
-    #assert !error_keys.empty?
-    #assert error_keys.include?("parameters")
   end if Seek::Config.jws_enabled
 
   test "jws online response with valid SBML model" do
