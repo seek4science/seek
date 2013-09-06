@@ -8126,7 +8126,7 @@ var cytoscape;
 		//--
 		
 		//--Wheel-related data 
-		this.zoomData = {freeToZoom: false, lastPointerX: null};
+		this.zoomData = {freeToZoom: true, lastPointerX: null};
 		//--
 		
 		this.redraws = 0;
@@ -8933,7 +8933,7 @@ var cytoscape;
 			if (r.zoomData.freeToZoom) {
 				e.preventDefault();
 				
-				var diff = e.wheelDeltaY / 1000 || e.detail / -32;
+				var diff = e.wheelDelta / 1000 || e.detail / -32;
 				
 				if( cy.panningEnabled() && cy.zoomingEnabled() ){
 					cy.zoom({level: cy.zoom() * Math.pow(10, diff), position: {x: unpos[0], y: unpos[1]}});
@@ -8965,7 +8965,7 @@ var cytoscape;
 				{ r.zoomData.freeToZoom = true; } r.zoomData.lastPointerX = e.pageX; 
 		}, false);
 		
-		r.registerBinding(r.data.container, "mouseout", function(e) { 
+		r.registerBinding(r.data.container, "mouseout", function(e) {		 
 			r.zoomData.freeToZoom = false; r.zoomData.lastPointerX = null 
 		}, false);
 		// --
