@@ -458,7 +458,7 @@ DEPENDENCIES
   rubaidh-google_analytics (~> 1.1.4)
   ruby-openid
   ruby-prof
-  rubyzip
+  rubyzip (= 0.9.9)
   savon (= 1.1.0)
   search_biomodel (= 2.2.1)!
   simple-spreadsheet-extractor (= 0.12.3)
