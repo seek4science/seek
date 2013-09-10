@@ -1,26 +1,29 @@
 <%= javascript_include_tag "resource.js"%>
 
 <style>
-  #preview_permissions ul.people_list {
-      max-height: 10em;
-      overflow-y: auto;
-  }
-  #preview_permissions ul.people_list li.name {
-      color: #ff8c00;
-  }
   #preview_permissions p.private {
       color: red;
       font-weight: bold;
+      margin-left: 1em;
   }
   #preview_permissions p.shared {
       font-weight: bold;
+      margin-left: 1em;
   }
   #preview_permissions p.public{
       color: green;
       font-weight: bold;
+      margin-left: 1em;
   }
   #preview_permissions p.gatekeeper_notice{
       color:red;
+      margin-left: 1em;
+  }
+  #preview_permissions p.permission{
+      margin-left: 1em;
+  }
+  #preview_permissions p.privileged_person{
+      margin-left: 1em;
   }
 </style>
 
@@ -31,13 +34,17 @@
 %>
 
 <div class="redbox_contents" id="preview_permissions" style="width:600px;">
-    <div class="body">
+  <div class="head">
+    <span style="float:center;">Preview of your sharing settings</span>
+  </div>
+
+  <div class="body">
       <% if policy.sharing_scope == Policy::PRIVATE %>
         <%= policy_and_permissions_for_private_scope(permissions, privileged_people, resource_name) %>
       <% elsif policy.sharing_scope == Policy::ALL_SYSMO_USERS %>
         <%= policy_and_permissions_for_network_scope(policy, permissions, privileged_people, resource_name) %>
       <% elsif policy.sharing_scope == Policy::EVERYONE  %>
-        <%= policy_and_permissions_for_public_scope(policy, privileged_people, resource_name, updated_can_publish_immediately, send_request_publish_approval) %>
+        <%= policy_and_permissions_for_public_scope(policy, permissions, privileged_people, resource_name, updated_can_publish_immediately, send_request_publish_approval) %>
       <% end %>
 
       <%= process_privileged_people(privileged_people, resource_name) %>

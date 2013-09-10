@@ -29,7 +29,8 @@ module PolicyHelper
   end
 
   def policy_and_permissions_for_private_scope(permissions, privileged_people, resource_name)
-    html = "<p class='private'>You keep this #{resource_name.humanize} private (only visible to you)</p>"
+    html = "<h3>You will share this #{resource_name.humanize} with:</h3>"
+    html << "<p class='private'>You keep this #{resource_name.humanize} private (only visible to you)</p>"
     html << process_permissions(permissions, resource_name)
     html.html_safe
   end
@@ -38,7 +39,7 @@ module PolicyHelper
     html =''
 
     if policy.access_type != Policy::NO_ACCESS
-      html << "<h2>You will share this #{resource_name.humanize} with:</h2>"
+      html << "<h3>You will share this #{resource_name.humanize} with:</h3>"
       html << "<p class='shared'>All the #{t('project')} members within the network can "
       html << Policy.get_access_type_wording(policy.access_type, resource_name.camelize.constantize.new()).downcase
       html << "</p>"
@@ -51,7 +52,7 @@ module PolicyHelper
   end
 
   def policy_and_permissions_for_public_scope(policy, permissions, privileged_people, resource_name, updated_can_publish_immediately, send_request_publish_approval)
-    html = "<h2>You will share this #{resource_name.humanize} with:</h2>"
+    html = "<h3>You will share this #{resource_name.humanize} with:</h3>"
     html << "<p class='public'>All visitors (including anonymous visitors with no login) can #{Policy.get_access_type_wording(policy.access_type, resource_name.camelize.constantize.new()).downcase} </p>"
     if !updated_can_publish_immediately
       if send_request_publish_approval
@@ -99,12 +100,12 @@ module PolicyHelper
 
     html = ''
     if !permissions.empty?
-      html = "<h2>Additional fine-grained sharing permissions:</h2>"
+      html = "<h3>Fine-grained sharing permissions:</h3>"
       permissions.each do |p|
         contributor = p.contributor
         group_name = (p.contributor_type == 'WorkGroup') ? (h(contributor.project.name) + ' @ ' + h(contributor.institution.name)) : h(contributor.name)
         prefix_text = (p.contributor_type == 'Person') ? '' : ('Members of ' + p.contributor_type.underscore.humanize + ' ')
-        html << "<p>#{prefix_text + group_name}"
+        html << "<p class='permission'>#{prefix_text + group_name}"
         html << ((p.access_type == Policy::DETERMINED_BY_GROUP) ? ' have ' : ' can ')
         html << Policy.get_access_type_wording(p.access_type, resource_name.camelize.constantize.new()).downcase
         html << "</p>"
@@ -117,16 +118,18 @@ module PolicyHelper
   def process_privileged_people privileged_people, resource_name
     html = ''
     if !privileged_people.blank?
-      html << "<h2> Privileged people :</h2>"
+      html << "<h3> Privileged people:</h3>"
       privileged_people.each do |key, value|
         value.each do |v|
+          html << "<p class='privileged_person'>"
           if key == 'contributor'
-            html << "<p>#{v.name} can #{Policy.get_access_type_wording(Policy::MANAGING, try_block { resource_name.camelize.constantize.new() }).downcase} as an uploader </p>"
+            html << "#{v.name} can #{Policy.get_access_type_wording(Policy::MANAGING, try_block { resource_name.camelize.constantize.new() }).downcase} as an uploader"
           elsif key == 'creators'
-            html << "<p>#{v.name} can #{Policy.get_access_type_wording(Policy::EDITING, try_block { resource_name.camelize.constantize.new() }).downcase} as a creator </p>"
+            html << "#{v.name} can #{Policy.get_access_type_wording(Policy::EDITING, try_block { resource_name.camelize.constantize.new() }).downcase} as a creator"
           elsif key == 'asset_managers'
-            html << "<p>#{v.name} can #{Policy.get_access_type_wording(Policy::MANAGING, try_block { resource_name.camelize.constantize.new() }).downcase} as an asset manager </p>"
+            html << "#{v.name} can #{Policy.get_access_type_wording(Policy::MANAGING, try_block { resource_name.camelize.constantize.new() }).downcase} as an asset manager"
           end
+          html << "</p>"
         end
       end
     end
