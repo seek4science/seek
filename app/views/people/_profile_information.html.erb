@@ -29,6 +29,10 @@
     </p>
 
     <%= render :partial=>"areas_of_expertise", :locals => {:person=>@person} %>
+    <p>
+      <b>ORCID Identifier:</b>
+      <%= orcid_identifier(@person) -%>
+    </p>
   </div>
   <% if admin_or_me %>
       <div <%= "class='yui-u'".html_safe %>>

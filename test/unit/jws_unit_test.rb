@@ -8,7 +8,6 @@ class JwsUnitTest < ActiveSupport::TestCase
   end
 
   test "jws online response handled when errors present" do
-    skip("temporarily skipped whilst jws online undergoes some upgrades")
     blob=Factory :invalid_sbml_content_blob
     params_hash,attributions,saved_file,objects_hash,error_keys = @builder.builder_content blob
     assert !error_keys.empty?

@@ -37,6 +37,7 @@ class Person < ActiveRecord::Base
   has_many :assays,:foreign_key => :owner_id
   has_many :investigations_for_person,:as=>:contributor, :class_name=>"Investigation"
 
+  validate :orcid_id_must_be_valid_or_blank
 
   has_one :user, :dependent=>:destroy
 
@@ -448,6 +449,30 @@ class Person < ActiveRecord::Base
   #a before_save trigger, that checks if the person is the first one created, and if so defines it as admin
   def first_person_admin
     self.is_admin = true if Person.count==0
+  end
+
+  def orcid_id_must_be_valid_or_blank
+    valid = true
+    unless orcid.blank? #blank or nil is OK
+
+      id = orcid
+      id = orcid.gsub("http://orcid.org/","") if orcid.start_with?("http://orcid.org")
+      #check structure with regular expression
+      if id =~ /[0-9]{4}-[0-9]{4}-[0-9]{4}-[0-9,X]{4}/
+        id = id.gsub("-","")
+
+        #calculating the checksum according to ISO/IEC 7064:2003, MOD 11-2 ; see - http://support.orcid.org/knowledgebase/articles/116780-structure-of-the-orcid-identifier
+        total=0
+        (0...15).each{|x| total = (total + id[x].to_i) * 2}
+        remainder = total % 11
+        result = (12 - remainder) % 11
+        result = result == 10 ? "X" : result.to_s
+        valid = id[15] == result
+      else
+        valid = false
+      end
+      errors.add("Orcid identifier"," isn't a valid ORCID identifier.") unless valid
+    end
   end
 
 end

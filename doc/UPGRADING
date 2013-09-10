@@ -31,13 +31,13 @@ When upgrading between versions greater than v0.11.x you need to upgrade to each
 
 Each version has a tag in mercurial, which has the format of <em>v</em> prefix followed by the version - e.g. v0.11.1, v0.13.2, v0.17.1
 
-When upgrading between minor versions (i.e. from 0.11.x to 0.13.x) it is necessary to run a seek:upgrade rake task to perform
+<b>When upgrading between minor versions (i.e. from 0.11.x to 0.13.x)</b> it is necessary to run a seek:upgrade rake task to perform
 upgrade changes and import any new data. The upgrade task may require an internet connection, and sometimes can take some time to run,
 so please be patient. There are instructions for upgrading between each minor version listed below, but they will generally follow the
 same pattern. Upgrading to version 0.18 is an exception and involves some additional steps - due to the upgrade of the required versions of Rails and Ruby.
 
-When upgrading between patch versions (i.e between 0.16.0 and 0.16.3) it should
-only be necessary to a db:migrate rake task. Using seek:upgrade should still work, but could take a lot of unnecessary time. There is more details and
+<b>When upgrading between patch versions (i.e between 0.16.0 and 0.16.3)</b> it should
+only be necessary to run <em>bundle install</em> and the <em>db:migrate</em> rake task. Using seek:upgrade should still work, but could take a lot of unnecessary time. There is more details and
 an example towards the end of the this page.
 
 == Steps to upgrade from 0.17.x to 0.18.x
