@@ -199,8 +199,6 @@ limitations under the License.
 
 </div> <!-- outerContainer -->
 <div id="printContainer"></div>
-</body>
-
 <script type="text/javascript">
     window.onload = function() {
         document.title="<%= page_title(controller.controller_name, controller.action_name)+": Viewing #{@content_blob.original_filename}" -%>";
@@ -208,10 +206,13 @@ limitations under the License.
 
     function backToItem(){
         var current_url = location.href;
-            back_url = current_url.split('content_blobs')[0];
-            location.href = back_url;
+        back_url = current_url.split('content_blobs')[0];
+        location.href = back_url;
     }
 </script>
+</body>
+
+
 
 </html>
 
