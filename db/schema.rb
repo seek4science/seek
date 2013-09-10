@@ -1092,16 +1092,13 @@ ActiveRecord::Schema.define(:version => 20130910122251) do
   create_table "resource_publish_logs", :force => true do |t|
     t.string   "resource_type"
     t.integer  "resource_id"
-    t.integer  "user_id"
+    t.string   "culprit_type"
+    t.integer  "culprit_id"
     t.integer  "publish_state"
     t.datetime "created_at"
     t.datetime "updated_at"
     t.text     "comment"
   end
-
-  add_index "resource_publish_logs", ["publish_state"], :name => "index_resource_publish_logs_on_publish_state"
-  add_index "resource_publish_logs", ["resource_type", "resource_id"], :name => "index_resource_publish_logs_on_resource_type_and_resource_id"
-  add_index "resource_publish_logs", ["user_id"], :name => "index_resource_publish_logs_on_user_id"
 
   create_table "sample_assets", :force => true do |t|
     t.integer  "sample_id"
