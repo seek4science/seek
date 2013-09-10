@@ -50,6 +50,24 @@ class PersonTest < ActiveSupport::TestCase
     end
   end
 
+  test "orcid id validation" do
+    p = Factory :person
+    p.orcid = nil
+    assert p.valid?
+    p.orcid = "sdff-1111-1111-1111"
+    assert !p.valid?
+    p.orcid = "1111111111111111"
+    assert !p.valid?
+    p.orcid = "0000-0002-1694-2339"
+    assert !p.valid?,"checksum doesn't match"
+    p.orcid = "0000-0002-1694-233X"
+    assert p.valid?
+    p.orcid = "http://orcid.org/0000-0002-1694-233X"
+    assert p.valid?
+    p.orcid = "http://orcid.org/0000-0003-2130-0865"
+    assert p.valid?
+  end
+
   test "email uri" do
     p = Factory :person, :email=>"sfkh^sd@weoruweoru.com"
     assert_equal "mailto:sfkh%5Esd@weoruweoru.com",p.email_uri
