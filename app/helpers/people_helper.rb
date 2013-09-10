@@ -19,6 +19,20 @@ module PeopleHelper
     icons.html_safe
   end
 
+  def orcid_identifier person
+    id = person.orcid
+    unless id.nil?
+      id = "http://orcid.org/"+id unless id.start_with?("http://orcid.org/")
+      id = link_to(id,id,:target=>"_blank").html_safe
+    end
+
+    pp "dddddd"
+    pp id
+    pp "dddddd"
+    id.nil? ? text_or_not_specified(id) : id
+
+  end
+
   def discipline_list person
     unless person.disciplines.empty?
       text=""

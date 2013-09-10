@@ -65,10 +65,10 @@ module MenuHelper
       if !c.nil?
         path = eval("#{c}_path")
         click_js = "$('section_menu_items').hide();"
-        "<li #{attributes}>#{link_to(menu[:title],path,{:onmouseover=>click_js})}</li>"
+        "<li #{attributes}>#{link_to(menu[:title],path,)}</li>"
       else
         click_js = 'update_menu_text("'+menu_section_id(menu[:title])+'",true);return false;'
-        "<li #{attributes}>#{link_to(menu[:title],{},{:onmouseover=>click_js,:onclick=>click_js})}</li>"
+        "<li #{attributes}>#{link_to(menu[:title],{},{:onclick=>click_js})}</li>"
       end
 
     end.join(" ").html_safe
