@@ -10,7 +10,7 @@
   
     <%= f.error_messages %>
 
-    <h2 style="margin-top: 2em;">Participating Institutions</h2>
+    <h2>Participating Institutions</h2>
 
       <%= f.label :institution_ids, "Please select the institutions that participate in this #{t('project')}:", :style => "line-height: 2; margin-left: 1em;" -%><br/>
       <%
@@ -32,13 +32,22 @@
       </div>
       <%= f.select :institution_ids, institution_list.collect(&:id), {}, :style => 'display:none;', :multiple => true -%>
 
-    <% if admin_logged_in?%>
-        <%= render :partial=>"jerm_details",:locals=>{:f=>f} %>
+    <% if admin_logged_in? && Seek::Config.jerm_enabled %>
         <br/>
-        <%= render :partial=>"assets/sharing_form"%>
+        <div id="details_for_jerm" class="fold" >
+          <div class="foldTitle">
+            <%= help_icon("These are details you will need if you have created and wish to use a <b>JERM harvester</b> for this project, to register assets from a remote site.") -%>
+            JERM details
+          </div>
+          <div class="foldContent" style="display:none;">
+              <%= render :partial=>"jerm_details",:locals=>{:f=>f} %>
+              <br/>
+              <%= render :partial=>"assets/sharing_form"%>
+          </div>
+        </div>
     <%end%>
 
-    <p style="margin-top: 2em; text-align: center;">
+    <p>
       <%= f.submit("Update", :disable_with=>"Updating...", :onclick => "updateInstitutionIds();") -%>
       or <%= link_to 'Cancel', project_path(@project.id) -%>
     </p>

@@ -35,7 +35,7 @@
     Would you like to review and publish the related <%= "#{t('assays.assay').pluralize}, #{t('study').pluralize} and #{t('investigation').pluralize}" -%>?
   </div>
 
-  <%= form_tag({:action => :publish_related_items},:method=>:get) do %>
+  <%= form_tag({:action => :publish_related_items},:method=>:post) do %>
       <div style="display:none">
         <% @items_for_publishing.each do |item| %>
             <%= check_box_tag publishing_item_param(item), 1, true %>

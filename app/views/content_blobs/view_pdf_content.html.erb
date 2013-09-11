@@ -19,12 +19,7 @@ limitations under the License.
  This file has been modified
 -->
 
-<%= javascript_include_tag 'pdfjs/compatibility.js', 'pdfjs/debugger.js', 'pdfjs/l10n.js', 'pdfjs/pdf.js', 'pdfjs/viewer.js', :cache=>"pdfjs_cached"%>
-<%= stylesheet_link_tag 'pdfjs/viewer'%>
 
-<script type="text/javascript">
-    DEFAULT_URL = '<%= @pdf_url %>'
-</script>
 
 <html dir="ltr">
 <head>
@@ -32,6 +27,12 @@ limitations under the License.
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
     <style id="PDFJS_FONT_STYLE_TAG"></style>
+  <%= javascript_include_tag 'pdfjs/compatibility.js', 'pdfjs/debugger.js', 'pdfjs/l10n.js', 'pdfjs/pdf.js', 'pdfjs/viewer.js', :cache=>"pdfjs_cached"%>
+  <%= stylesheet_link_tag 'pdfjs/viewer'%>
+
+  <script type="text/javascript">
+      DEFAULT_URL = '<%= @pdf_url %>'
+  </script>
 </head>
 
 <body>
@@ -198,8 +199,6 @@ limitations under the License.
 
 </div> <!-- outerContainer -->
 <div id="printContainer"></div>
-</body>
-
 <script type="text/javascript">
     window.onload = function() {
         document.title="<%= page_title(controller.controller_name, controller.action_name)+": Viewing #{@content_blob.original_filename}" -%>";
@@ -207,10 +206,13 @@ limitations under the License.
 
     function backToItem(){
         var current_url = location.href;
-            back_url = current_url.split('content_blobs')[0];
-            location.href = back_url;
+        back_url = current_url.split('content_blobs')[0];
+        location.href = back_url;
     }
 </script>
+</body>
+
+
 
 </html>
 
