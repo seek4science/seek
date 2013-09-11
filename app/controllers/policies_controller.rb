@@ -74,7 +74,7 @@ class PoliciesController < ApplicationController
       cloned_resource= resource_with_assigned_projects cloned_resource,params[:project_ids]
       cloned_resource.policy = policy
       cloned_resource.creators = creators if cloned_resource.respond_to?:creators
-      cloned_resource.contributor = contributor_person.user
+      cloned_resource.contributor = contributor_person
 
       asset_managers = get_asset_managers cloned_resource
 
