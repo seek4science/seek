@@ -31,7 +31,7 @@ module Seek
 
       def handle_rightfield_contents object
         graph = nil
-        if (object.respond_to?(:contains_extractable_spreadsheet?) && object.contains_extractable_spreadsheet? && object.content_blob.is_xls?)
+        if (object.respond_to?(:contains_extractable_spreadsheet?) && object.contains_extractable_spreadsheet?)
           begin
             graph = generate_rightfield_rdf_graph(self)
           rescue Exception=>e
