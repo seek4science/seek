@@ -10,7 +10,7 @@ class ProjectsControllerTest < ActionController::TestCase
 	fixtures :all
 
 	def setup
-		login_as(:quentin)
+		login_as(Factory(:admin).user)
   end
 
   def rest_api_test_object
@@ -508,6 +508,24 @@ class ProjectsControllerTest < ActionController::TestCase
     assert !(a_project.institutions.include?new_institution)
   end
 
+  test "jerm details not shown if disabled" do
+    project = Factory(:project)
+    with_config_value :jerm_enabled,false do
+      get :admin, :id=>project.id
+      assert_response :success
+      assert_select "div#details_for_jerm", :count=>0
+    end
+  end
+
+  test "jerm details shown is enabled" do
+    project = Factory(:project)
+    with_config_value :jerm_enabled,true do
+      get :admin, :id=>project.id
+      assert_response :success
+      assert_select "div#details_for_jerm", :count=>1
+    end
+  end
+
   test 'project manager can only see the new institutions (which are not yet in any projects) and the institutions this project' do
     project_manager = Factory(:project_manager)
     project = project_manager.projects.first
@@ -580,20 +598,22 @@ class ProjectsControllerTest < ActionController::TestCase
   end
 
   test 'project manager can not administer jerm detail' do
-    project_manager = Factory(:project_manager)
-    project = project_manager.projects.first
-    assert_nil project.site_root_uri
-    assert_nil project.site_username
-    assert_nil project.site_password
+    with_config_value :jerm_enabled,true do
+      project_manager = Factory(:project_manager)
+      project = project_manager.projects.first
+      assert_nil project.site_root_uri
+      assert_nil project.site_username
+      assert_nil project.site_password
 
-    login_as(project_manager.user)
-		put :update, :id => project.id, :project => {:site_root_uri => 'test', :site_username => 'test', :site_password => 'test'}
+      login_as(project_manager.user)
+      put :update, :id => project.id, :project => {:site_root_uri => 'test', :site_username => 'test', :site_password => 'test'}
 
-    project.reload
-    assert_redirected_to project
-		assert_nil project.site_root_uri
-    assert_nil project.site_username
-    assert_nil project.site_password
+      project.reload
+      assert_redirected_to project
+      assert_nil project.site_root_uri
+      assert_nil project.site_username
+      assert_nil project.site_password
+    end
   end
 
   test "should view_items_in_tab in project page for non-admin" do
