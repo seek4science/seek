@@ -47,6 +47,18 @@ class RDFGenerationTest < ActiveSupport::TestCase
     assert !File.exists?(expected_rdf_file)
   end
 
+  test "rdf with problem excel file" do
+    #a file that was found to cause an error during the RightField part of the RDF generation.
+    df = Factory(:data_file,:content_blob=>Factory(:spreadsheet_content_blob,:data=> File.new("#{Rails.root}/test/fixtures/files/test_file_FakStudied_OK.xls","rb").read))
+    rdf = df.to_rdf
+    assert_not_nil(rdf)
+
+    #just checks it is valid rdf/xml and contains some statements for now
+    RDF::Reader.for(:rdfxml).new(rdf) do |reader|
+      assert_equal RDF::URI.new("http://localhost:3000/data_files/#{df.id}"), reader.statements.first.subject
+    end
+  end
+
   test "save private rdf" do
     sop = Factory(:sop, :policy=>Factory(:private_policy))
     assert !sop.can_view?(nil)

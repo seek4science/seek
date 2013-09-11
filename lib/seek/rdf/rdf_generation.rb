@@ -30,11 +30,15 @@ module Seek
       end
 
       def handle_rightfield_contents object
-        if (object.respond_to?(:contains_extractable_spreadsheet?) && contains_extractable_spreadsheet? && content_blob.is_xls?)
-          generate_rightfield_rdf_graph(self)
-        else
-          RDF::Graph.new
+        graph = nil
+        if (object.respond_to?(:contains_extractable_spreadsheet?) && object.contains_extractable_spreadsheet?)
+          begin
+            graph = generate_rightfield_rdf_graph(self)
+          rescue Exception=>e
+            Rails.logger.error "Error generating RightField part of rdf for #{object} - #{e.message}"
+          end
         end
+        graph || RDF::Graph.new
       end
 
       def rdf_resource
