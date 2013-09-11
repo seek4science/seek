@@ -122,11 +122,11 @@ SEEK::Application.routes.draw do
     end
     member do
       post :check_related_items
-      get :check_gatekeeper_required
+      post :check_gatekeeper_required
       get :admin
       get :published
       get :batch_publishing_preview
-      get :publish_related_items
+      post :publish_related_items
       put :administer_update
       post :publish
     end
@@ -230,16 +230,16 @@ SEEK::Application.routes.draw do
       post :upload_from_email
     end
     member do
-      get :check_related_items
+      post :check_related_items
       get :matching_models
       get :data
-      get :check_gatekeeper_required
+      post :check_gatekeeper_required
       get :plot
       get :explore
       get :download
       get :published
       get :approve_or_reject_publish
-      get :publish_related_items
+      post :publish_related_items
       post :publish
       post :request_resource
       post :convert_to_presentation
@@ -268,12 +268,12 @@ SEEK::Application.routes.draw do
       post :test_asset_url
     end
     member do
-      get :check_related_items
-      get :check_gatekeeper_required
+      post :check_related_items
+      post :check_gatekeeper_required
       get :download
       get :published
       get :approve_or_reject_publish
-      get :publish_related_items
+      post :publish_related_items
       post :publish
       post :request_resource
       post :update_annotations_ajax
@@ -298,14 +298,14 @@ SEEK::Application.routes.draw do
     end
     member do
       get :builder
-      get :check_related_items
+      post :check_related_items
       get :visualise
-      get :check_gatekeeper_required
+      post :check_gatekeeper_required
       get :download
       get :matching_data
       get :published
       get :approve_or_reject_publish
-      get :publish_related_items
+      post :publish_related_items
       post :submit_to_jws
       post :gatekeeper_decide
       post :new_version
@@ -341,12 +341,12 @@ SEEK::Application.routes.draw do
       post :test_asset_url
     end
     member do
-      get :check_related_items
-      get :check_gatekeeper_required
+      post :check_related_items
+      post :check_gatekeeper_required
       get :download
       get :published
       get :approve_or_reject_publish
-      get :publish_related_items
+      post :publish_related_items
       post :publish
       post :request_resource
       post :update_annotations_ajax
