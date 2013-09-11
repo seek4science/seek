@@ -24,14 +24,15 @@
 
 	<%= render :partial=>"assets/asset_form_bottom", :locals=> { :f => f } -%>
 
-        <p>
-            <% if Seek::Config.events_enabled -%>
-                <%= render :partial => "assets/associate_event", :locals=>{:resource => @data_file, :show_relationships=>false} -%>
-            <% end -%>
-        </p>
+
         <p>
             <%= render :partial => "assays/associate_assays", :locals=>{:resource => @data_file} -%>
         </p>
+          <p>
+            <% if Seek::Config.events_enabled -%>
+                <%= render :partial => "assets/associate_event", :locals=>{:resource => @data_file, :show_relationships=>false} -%>
+            <% end -%>
+          </p>
         <%= fields_for(@data_file) {|f| f.fancy_multiselect :samples, {:hidden=> @data_file.samples.blank?  ? true : false, :other_projects_checkbox => true}}  -%>
         <% end -%>
         <%= preview_permission_popup_link(@data_file)-%>
