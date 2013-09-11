@@ -540,13 +540,12 @@ class ProjectsControllerTest < ActionController::TestCase
 
     get :admin, :id => project
     assert_response :success
-    assert_select "select#project_institution_ids", :count => 1 do
-      (project.institutions + [new_institution]).each do |institution|
-         assert_select 'option', :text => institution.title, :count => 1
-      end
-      a_project.institutions.each do |institution|
-         assert_select 'option', :text => institution.title, :count => 0
-      end
+
+    (project.institutions + [new_institution]).each do |institution|
+      assert_select "input[type='checkbox'][value='#{institution.id}']", :count => 1
+    end
+    a_project.institutions.each do |institution|
+      assert_select "input[type='checkbox'][value='#{institution.id}']", :count => 0
     end
   end
 

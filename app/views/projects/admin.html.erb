@@ -12,9 +12,7 @@
 
     <h2 style="margin-top: 2em;">Participating Institutions</h2>
 
-    <div style="width: 95%; text-align: left;">
-      <%= help_icon("To select multiple institutions press & hold CTRL<br/>while making youpotr selection from the list below.") -%>
-      <%= f.label :institution_ids, "Please select the institutions that participate in this #{t('project')}", :style => "line-height: 2;" -%><br/>
+      <%= f.label :institution_ids, "Please select the institutions that participate in this #{t('project')}:", :style => "line-height: 2; margin-left: 1em;" -%><br/>
       <%
          institution_list = []
          if admin_logged_in?
@@ -23,8 +21,16 @@
            institution_list |= (Institution.all.select{|i| i.projects.empty?} + @project.institutions).uniq
          end
       %>
-      <%= f.collection_select :institution_ids, institution_list, :id, :name, {}, {:style => "width: 85%; height: 200px;", :multiple=>true} -%>
-    </div>
+
+      <% chosen_institutions = @project.institutions %>
+      <div style="margin-top: 1em; margin-bottom: 2em; margin-left: 2em; width: 90%; height: 500px; overflow: auto;">
+          <% institution_list.each do |institution| %>
+              <%= check_box_tag "institution_#{institution.id}", institution.id, chosen_institutions.include?(institution), :class => 'institution_checkbox' %>
+              <%= institution.title %>
+              <br/>
+          <% end %>
+      </div>
+      <%= f.select :institution_ids, institution_list.collect(&:id), {}, :style => 'display:none;', :multiple => true -%>
 
     <% if admin_logged_in?%>
         <%= render :partial=>"jerm_details",:locals=>{:f=>f} %>
@@ -33,7 +39,7 @@
     <%end%>
 
     <p style="margin-top: 2em; text-align: center;">
-      <%= f.submit("Update", :disable_with=>"Updating...") -%>
+      <%= f.submit("Update", :disable_with=>"Updating...", :onclick => "updateInstitutionIds();") -%>
       or <%= link_to 'Cancel', project_path(@project.id) -%>
     </p>
 

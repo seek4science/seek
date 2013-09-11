@@ -81,3 +81,17 @@ function addOrganism(title,id) {
     organisms.push([title,id])
 }
 
+function updateInstitutionIds(){
+    var institution_ids_element = $('project_institution_ids');
+    var institution_ids = [];
+    var checkbox_elements = document.getElementsByClassName('institution_checkbox');
+    for(var i = 0; i < checkbox_elements.length ; i++){
+        var checkbox = checkbox_elements[i];
+        if (checkbox.checked){
+            institution_ids.push(checkbox.value);
+        }
+    }
+
+    institution_ids_element.setValue(institution_ids);
+}
+
