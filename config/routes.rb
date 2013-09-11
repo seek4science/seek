@@ -121,7 +121,7 @@ SEEK::Application.routes.draw do
       post :userless_project_selected_ajax
     end
     member do
-      get :check_related_items
+      post :check_related_items
       get :check_gatekeeper_required
       get :admin
       get :published
