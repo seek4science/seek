@@ -213,3 +213,17 @@ function stopRolesEdit(group_id) {
 
     updateRoles(false,group_id);
 }
+
+function updateWorkGroupIds(){
+    var wg_ids_element = $('person_work_group_ids');
+    var wg_ids = [];
+    var checkbox_elements = document.getElementsByClassName('work_group_checkbox');
+    for(var i = 0; i < checkbox_elements.length ; i++){
+        var checkbox = checkbox_elements[i];
+        if (checkbox.checked){
+            wg_ids.push(checkbox.value);
+        }
+    }
+
+    wg_ids_element.setValue(wg_ids);
+}

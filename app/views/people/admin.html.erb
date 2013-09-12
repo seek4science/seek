@@ -1,3 +1,5 @@
+<%= javascript_include_tag "people.js" %>
+
 <h1>Administer Person: <%= link_to h(@person.name), person_path(@person) -%></h1>
 
 <div class="show_basic">
@@ -48,7 +50,7 @@
           </p>
       <% end -%>
       <p style="margin-top: 2em; text-align: center;">
-        <%= f.submit("Update", :disable_with=>"Updating...") -%>
+        <%= f.submit("Update", :disable_with=>"Updating...", :onclick => "updateWorkGroupIds()") -%>
         or <%= link_to 'Cancel', person_path(@person.id) -%>
       </p>
 
