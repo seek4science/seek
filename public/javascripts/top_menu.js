@@ -24,11 +24,14 @@ document.observe("dom:loaded",function() {
 });
 
 function set_searchbox_width() {
-    if (document.viewport.getWidth()<=1180) {
-        $("search_query").style.width="19em";
+    search_query = $("search_query");
+    if (search_query != null){
+        if (document.viewport.getWidth()<=1180) {
+            search_query.style.width="19em";
+        }
+        else {
+            search_query.style.width="30em";
+        }
+        search_query.show();
     }
-    else {
-        $("search_query").style.width="30em";
-    }
-    $("search_query").show();
 }
