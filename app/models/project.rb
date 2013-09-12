@@ -51,7 +51,14 @@ class Project < ActiveRecord::Base
   end
 
   has_many :work_groups, :dependent=>:destroy
-  has_many :institutions, :through=>:work_groups
+  has_many :institutions, :through=>:work_groups, :before_remove => :group_memberships_empty?
+
+  def group_memberships_empty? institution
+    work_group = WorkGroup.where(['project_id=? AND institution_id=?', self.id, institution.id]).first
+    if !work_group.people.empty?
+      raise Exception.new("Cannot delete the " +work_group.description+ ". This Work Group has "+work_group.people.size.to_s+" people associated with it. Please disassociate first the people from this Work Group")
+    end
+  end
   
   alias_attribute :webpage, :web_page
   alias_attribute :internal_webpage, :wiki_page

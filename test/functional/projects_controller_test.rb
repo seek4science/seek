@@ -651,6 +651,25 @@ class ProjectsControllerTest < ActionController::TestCase
     assert @response.body.include?("a data file")
   end
 
+  test "can not remove workgroup if it contains people" do
+    project = Factory(:project)
+    institution = Factory(:institution)
+    work_group = Factory(:work_group, :project => project, :institution => institution)
+    a_person = Factory(:person, :group_memberships => [Factory(:group_membership, :work_group => work_group)])
+
+    assert !project.institutions.empty?
+    assert !work_group.people.empty?
+
+    assert_no_difference('WorkGroup.count') do
+      post :update, :id => project, :project => {:institution_ids => []}
+    end
+
+    assert_redirected_to project
+    assert_not_nil flash[:error]
+    assert !project.reload.institutions.empty?
+    assert !work_group.reload.people.empty?
+  end
+
 	private
 
 	def valid_project

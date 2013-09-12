@@ -156,16 +156,21 @@ class ProjectsController < ApplicationController
 
     @project.default_policy = (@project.default_policy || Policy.default).set_attributes_with_sharing params[:sharing], [@project] if params[:sharing]
 
-    respond_to do |format|
-      if @project.update_attributes(params[:project])
-        
-
-        flash[:notice] = "#{t('project')} was successfully updated."
+    begin
+      respond_to do |format|
+        if @project.update_attributes(params[:project])
+          flash[:notice] = "#{t('project')} was successfully updated."
+          format.html { redirect_to(@project) }
+          format.xml  { head :ok }
+        else
+          format.html { render :action => "edit" }
+          format.xml  { render :xml => @project.errors, :status => :unprocessable_entity }
+        end
+      end
+    rescue Exception=>e
+      respond_to do |format|
+        flash[:error] = e.message
         format.html { redirect_to(@project) }
-        format.xml  { head :ok }
-      else
-        format.html { render :action => "edit" }
-        format.xml  { render :xml => @project.errors, :status => :unprocessable_entity }
       end
     end
   end
