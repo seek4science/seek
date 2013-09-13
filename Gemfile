@@ -73,7 +73,7 @@ gem 'search_biomodel', "2.2.1",:git=>"git://github.com/myGrid/search_biomodel.gi
 gem 'my_annotations', :git=>"git://github.com/myGrid/annotations.git"
 
 gem 'passenger'
-#gem 'unicorn-rails'
+gem 'unicorn-rails'
 
 group :development do
   gem "sqlite3","1.3.7"
