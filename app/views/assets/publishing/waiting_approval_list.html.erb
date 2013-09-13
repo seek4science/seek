@@ -15,7 +15,7 @@
     </p>
   </div>
   <h2>The following items require approval from a Gatekeeper:</h2>
-  <ul class="publishing_options">
+  <ul class="publishing_options" id="waiting_approval">
     <% @waiting_for_publish_items.each do |item| %>
         <li class="type_and_title"><%= text_for_resource item -%>
           :&nbsp;<%= link_to h(item.title), item, :target => "_blank" -%></li>
@@ -25,7 +25,7 @@
   </ul>
   <% unless @items_for_immediate_publishing.empty? -%>
   <h2>The following items will be published immediately and do not require approval from a Gatekeeper:</h2>
-      <ul class="publishing_options">
+      <ul class="publishing_options" id="publish_immediately">
           <% @items_for_immediate_publishing.each do |item| %>
               <li class="type_and_title">
                 <%= text_for_resource item -%>: <%= link_to item.title, item -%>
