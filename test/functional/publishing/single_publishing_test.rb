@@ -153,7 +153,7 @@ class SinglePublishingTest < ActionController::TestCase
     get :check_gatekeeper_required, params.merge(:id=> df.id)
     assert_response :success
 
-    assert_select "ul" do
+    assert_select "ul#waiting_approval" do
       assert_select "a[href=?]", data_file_path(df), :text => /#{df.title}/, :count => 1
       assert_select "a[href=?]", model_path(model), :text => /#{model.title}/, :count => 1
       assert_select "a[href=?]", sop_path(sop), :text => /#{sop.title}/, :count => 0
@@ -161,33 +161,38 @@ class SinglePublishingTest < ActionController::TestCase
     end
 
     assert_select "div[style=display:none;]" do
-      assert_select "input[type='checkbox'][checked='checked'][id=?]","publish_DataFile_#{df.id}"
-      assert_select "input[type='checkbox'][checked='checked'][id=?]","publish_Model_#{model.id}"
-      assert_select "input[type='checkbox'][checked='checked'][id=?]","publish_Sop_#{sop.id}"
+      assert_select "input[type='hidden'][value='1'][id=?]","publish_DataFile_#{df.id}"
+      assert_select "input[type='hidden'][value='1'][id=?]","publish_Model_#{model.id}"
+      assert_select "input[type='hidden'][value='1'][id=?]","publish_Sop_#{sop.id}"
     end
   end
 
-  test "if the asset has no related items, redirect to check_gatekeeper_required" do
+  test "if the asset has no related items, proceed directly to check_gatekeeper_required" do
     df=data_file_for_publishing
     gatekeeper = Factory(:gatekeeper)
     df.projects << gatekeeper.projects.first
     assert df.can_publish?,"The data file must be manageable for this test to succeed"
 
     get :check_related_items,:id=>df
-    assert_redirected_to check_gatekeeper_required_data_file_path(df)
+    assert_response :success
+    assert_select "ul#waiting_approval",:count=>1
     assert_nil flash[:error]
+
+    df.reload
+    assert !df.is_published?
   end
 
-  test "if the asset requires no gatekeeper, publish the asset" do
+  test "if the asset requires no gatekeeper, proceed to confirmation step" do
     df=data_file_for_publishing
     assert df.can_publish?,"The data file must be manageable for this test to succeed"
     assert !df.is_published?,"The data file must not be published for this test to be meaningful"
+    assert !df.gatekeeper_required?, "The data file must need require a gatekeeper for this test to proceed"
 
     get :check_gatekeeper_required,:id=>df
-    assert_response :redirect
+    assert_response :success
+    assert_select "h1",:text=>/Confirm publishing/
     assert_nil flash[:error]
-    df.reload
-    assert df.is_published?,"The data file should be published now"
+
   end
 
   test "do publish" do

@@ -35,6 +35,7 @@ module Seek
 
       def check_gatekeeper_required
         @waiting_for_publish_items = @items_for_publishing.select { |item| item.gatekeeper_required? && !User.current_user.person.is_gatekeeper_of?(item) }
+        @items_for_immediate_publishing = @items_for_publishing - @waiting_for_publish_items
         if !@waiting_for_publish_items.empty?
           respond_to do |format|
             format.html { render :template => "assets/publishing/waiting_approval_list" }
