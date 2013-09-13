@@ -31,7 +31,9 @@
   <ul class="publishing_options" id="published">
     <% if published_items.empty? -%><li class="none_text">No items</li><% end -%>
     <% published_items.each do |item| -%>
-        <li class="type_and_title"><%= text_for_resource item -%>: <%= link_to item.title, item -%></li>
+        <li class="type_and_title">
+          <%= text_for_resource item -%>: <%= link_to item.title, item -%>
+        </li>
     <% end -%>
   </ul>
 
