@@ -33,6 +33,8 @@ class ContentBlob < ActiveRecord::Base
 
   before_create :check_url_content_type
 
+  after_save :copy_image, :if => "is_image?"
+
   has_many :worksheets, :dependent => :destroy
 
   def spreadsheet_annotations
@@ -137,6 +139,31 @@ class ContentBlob < ActiveRecord::Base
     else
       dump_data_object_to_file
     end    
+  end
+
+  def resized_image_storage_directory
+    path = Seek::Config.resized_image_asset_filestore_path
+    unless File.exist?(path)
+      FileUtils.mkdir_p path
+    end
+    path
+  end
+
+  acts_as_fleximage do
+    image_directory Seek::Config.resized_image_asset_filestore_path
+    use_creation_date_based_directories false
+    image_storage_format :jpg
+    output_image_jpg_quality 85
+    require_image false
+    invalid_image_message 'was not a readable image'
+  end
+
+  acts_as_fleximage_extension
+
+  def copy_image
+    if file_exists?
+      FileUtils.cp filepath, (resized_image_storage_directory + "/#{id}.jpg")
+    end
   end
 
   private

@@ -44,9 +44,10 @@ class ContentBlobsController < ApplicationController
     @asset.just_used
 
     disposition = params[:disposition] || 'attachment'
+    image_size = params[:image_size]
 
     respond_to do |format|
-      format.html {handle_download disposition}
+      format.html {handle_download(disposition, image_size)}
       format.pdf {get_pdf}
     end
   end

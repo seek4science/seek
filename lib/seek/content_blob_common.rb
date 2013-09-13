@@ -1,11 +1,18 @@
 module Seek
   module ContentBlobCommon
-    def handle_download disposition='attachment'
+    def handle_download disposition='attachment', image_size=nil
       if @content_blob.url.blank?
         if @content_blob.file_exists?
-          send_file @content_blob.filepath, :filename => @content_blob.original_filename, :type => @content_blob.content_type || "application/octet-stream", :disposition => disposition
-          #added for the benefit of the tests after rails3 upgrade - but doubt it is required
-          headers["Content-Length"]=@content_blob.filesize.to_s
+          if image_size && @content_blob.is_image?
+            @content_blob.resize_image(image_size)
+            filepath = @content_blob.full_cache_path(image_size)
+            headers["Content-Length"]=File.size(filepath).to_s
+          else
+            filepath = @content_blob.filepath
+            #added for the benefit of the tests after rails3 upgrade - but doubt it is required
+            headers["Content-Length"]=@content_blob.filesize.to_s
+          end
+          send_file filepath, :filename => @content_blob.original_filename, :type => @content_blob.content_type || "application/octet-stream", :disposition => disposition
         else
           redirect_on_error @asset_version,"Unable to find a copy of the file for download, or an alternative location. Please contact an administrator of #{Seek::Config.application_name}."
         end

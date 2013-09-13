@@ -12,7 +12,7 @@ module Seek
     end
 
     module InstanceMethods
-      def resize_image size
+      def resize_image size='900'
         size = size[0..-($1.length.to_i + 2)] if size =~ /[0-9]+x[0-9]+\.([a-z0-9]+)/ # trim file extension
         size = filter_size size
         if !cache_exists?(size) # look in file system cache before attempting db access
@@ -76,7 +76,14 @@ module Seek
             return "900"
           end
         end
+      end
 
+      def width
+        if self.respond_to?(:image_width)
+          image_width
+        elsif File.exist?(full_cache_path)
+          Magick::Image.read(full_cache_path).first.try(:columns)
+        end
       end
     end
 
