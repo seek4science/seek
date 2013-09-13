@@ -75,43 +75,19 @@ class AvatarsController < ApplicationController
     else  
       size = params[:size]
     end
-    size = size[0..-($1.length.to_i + 2)] if size =~ /[0-9]+x[0-9]+\.([a-z0-9]+)/ # trim file extension
 
-    size = filter_size size
-
-    id = params[:id].to_i
-    
-    if !cache_exists?(id, size) # look in file system cache before attempting db access      
-
-      resize_image size
-
-    end
+    @avatar.resize_image(size)
     
     respond_to do |format|
       format.html do
-        send_file(full_cache_path(id, size), :type => 'image/jpg', :disposition => 'inline')
+        send_file(@avatar.full_cache_path(size), :type => 'image/jpg', :disposition => 'inline')
       end
       format.xml do        
-        @cache_file=full_cache_path(id, size)
+        @cache_file=@avatar.full_cache_path(size)
         @type='image/jpg'
       end
     end
     
-  end
-
-  def filter_size size
-    max_size=500
-    matches = size.match /([0-9]+)x([0-9]+).*/
-    if matches
-      width = matches[1].to_i
-      height = matches[2].to_i
-      width = max_size if width>max_size
-      height = max_size if height>max_size
-      return "#{width}x#{height}"
-    else
-      return "100x100"
-    end
-
   end
 
   #required when first running after switching avatars from .jpg format rather than .png (for lower bandwidth and page load time)
@@ -123,16 +99,6 @@ class AvatarsController < ApplicationController
     image.write(png_path)
     Rails.logger.info("Converted #{jpg_path} to #{png_path}")
   end
-
-  def resize_image size
-    @avatar.operate do |image|
-      image.resize size
-      @image_binary = image.image.to_blob
-    end
-    # cache data
-    cache_data!(@avatar, @image_binary, size)
-  end
-  
   
   # GET /users/1/avatars
   # GET /avatars -> denied by before_filter
@@ -270,33 +236,6 @@ class AvatarsController < ApplicationController
       return false
     end
   end
-  
-  
-  # returns true if /avatars/show/:id?size=#{size}x#{size} is cached in file system
-  def cache_exists?(avatar, size=nil)
-    File.exists?(full_cache_path(avatar, size))
-  end
-  
-  # caches data (where size = #{size}x#{size})
-  def cache_data!(avatar, image_binary, size=nil)
-    FileUtils.mkdir_p(cache_path(avatar, size))
-    File.open(full_cache_path(avatar, size), "wb+") { |f| f.write(image_binary) }
-  end
-  
-  def cache_path(avatar, size=nil, include_local_name=false)
-    
-    id = avatar.kind_of?(Integer) ? avatar : avatar.id
-    rtn = "#{Rails.root}/tmp/avatars"
-    rtn = "#{rtn}/#{size}" if size
-    rtn = "#{rtn}/#{id}.#{Avatar.image_storage_format}" if include_local_name
-    
-    return rtn
-  end
-  
-  def full_cache_path(avatar, size=nil) 
-    cache_path(avatar, size, true) 
-  end
-  
   
   # this helper will store to session full form data of edited Person / Project / Institution
   # to allow users to go to "upload new avatar" screen without loosing any new data

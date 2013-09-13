@@ -13,6 +13,7 @@ class ModelImage < ActiveRecord::Base
     missing_image_message 'is required'
     invalid_image_message 'was not a readable image'
   end
+  acts_as_fleximage_extension
 
   validates_presence_of :model
 
