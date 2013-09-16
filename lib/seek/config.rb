@@ -150,10 +150,6 @@ module Seek
       append_filestore_path "assets"
     end
 
-    def resized_image_asset_filestore_path
-      append_filestore_path "resized_image_assets"
-    end
-
     def avatar_filestore_path
       append_filestore_path "avatars"
     end

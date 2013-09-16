@@ -36,11 +36,11 @@ module Seek
       def cache_path(size=nil, include_local_name=false)
         id = self.kind_of?(Integer) ? self : self.id
         if self.kind_of?(ContentBlob)
-          rtn = Seek::Config.resized_image_asset_filestore_path
+          rtn = Seek::Config.temporary_filestore_path + '/image_assets'
         elsif self.kind_of?(Avatar)
-          rtn = Seek::Config.avatar_filestore_path
+          rtn = Seek::Config.temporary_filestore_path + '/avatars'
         elsif self.kind_of?(ModelImage)
-          rtn = Seek::Config.model_image_filestore_path
+          rtn = Seek::Config.temporary_filestore_path + '/model_images'
         end
 
         rtn = "#{rtn}/#{size}" if size

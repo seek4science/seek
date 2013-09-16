@@ -9,8 +9,7 @@ namespace :seek do
   #these are the tasks required for this version upgrade
   task :upgrade_version_tasks=>[
             :environment,
-            :repopulate_auth_lookup_tables,
-            :copy_image_assets
+            :repopulate_auth_lookup_tables
   ]
 
   desc("upgrades SEEK from the last released version to the latest released version")
@@ -31,14 +30,4 @@ namespace :seek do
     puts "Upgrade completed successfully"
   end
 
-  desc("Copy image assets to the Seek::Config.resized_image_asset_filestore_path")
-  task(:copy_image_assets=>:environment) do
-    puts "Copying image asset files to:\n\t#{Seek::Config.resized_image_asset_filestore_path}"
-
-    ContentBlob.all.each do |content_blob|
-      if content_blob.is_image?
-        content_blob.copy_image
-      end
-    end
-  end
 end

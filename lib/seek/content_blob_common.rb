@@ -4,6 +4,7 @@ module Seek
       if @content_blob.url.blank?
         if @content_blob.file_exists?
           if image_size && @content_blob.is_image?
+            @content_blob.copy_image
             @content_blob.resize_image(image_size)
             filepath = @content_blob.full_cache_path(image_size)
             headers["Content-Length"]=File.size(filepath).to_s
