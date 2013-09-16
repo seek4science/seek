@@ -23,7 +23,7 @@ module Seek
             format.html { render :template => "assets/publishing/publish_related_items_confirm"}
           end
         else
-          redirect_to :action=>:check_gatekeeper_required, :publish => params[:publish]
+          check_gatekeeper_required
         end
       end
 
@@ -35,12 +35,19 @@ module Seek
 
       def check_gatekeeper_required
         @waiting_for_publish_items = @items_for_publishing.select { |item| item.gatekeeper_required? && !User.current_user.person.is_gatekeeper_of?(item) }
+        @items_for_immediate_publishing = @items_for_publishing - @waiting_for_publish_items
         if !@waiting_for_publish_items.empty?
           respond_to do |format|
             format.html { render :template => "assets/publishing/waiting_approval_list" }
           end
         else
-          publish
+          publish_final_confirmation
+        end
+      end
+
+      def publish_final_confirmation
+        respond_to do |format|
+          format.html { render :template => "assets/publishing/publish_final_confirmation"}
         end
       end
 
