@@ -1,14 +1,17 @@
 div.isa_graph {
     float: left;
-    width: 79.5%;
+    width: 79%;
     margin-top: 1em;
     margin-bottom: 1em;
+    background-color: white;
+    border: 1px solid lightgray;
 }
 
 div.node_info {
     position: relative;
     float: right;
     width: 18%;
+    background-color: white;
     border: 1px solid lightgray;
     padding-left: 1%;
     padding-right: 1%;
@@ -26,4 +29,5 @@ div.node_info ul.items {
     position: relative;
     float: right;
     right: 4.5em;
+    margin-right:1em;
 }
