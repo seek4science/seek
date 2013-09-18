@@ -23,8 +23,7 @@ class SessionsController < ApplicationController
     redirect_to root_path
   end
 
-  def create
-    raise "fred"
+  def create   
     if using_open_id?
       open_id_authentication
     else      
