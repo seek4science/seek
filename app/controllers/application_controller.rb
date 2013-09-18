@@ -10,8 +10,6 @@ class ApplicationController < ActionController::Base
 
   include CommonSweepers
 
-  filter_parameter_logging "rack.request.form_vars"
-
   before_filter :log_extra_exception_data
 
   after_filter :log_event
