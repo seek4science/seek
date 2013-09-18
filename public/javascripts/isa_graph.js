@@ -114,6 +114,8 @@ function alignCenterVertical(element, element_height){
     var distance_from_top = (graph_height - element_height)/2;
     if (distance_from_top > 0){
         element.style['top']=distance_from_top+'px';
+    }else{
+        element.style['top']='0px';
     }
 }
 
