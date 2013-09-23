@@ -28,8 +28,8 @@ class InvestigationTest < ActiveSupport::TestCase
     Factory :relationship, :subject=>assay2, :predicate=>Relationship::RELATED_TO_PUBLICATION,:other_object=>pub2
     Factory :relationship, :subject=>assay2, :predicate=>Relationship::RELATED_TO_PUBLICATION,:other_object=>pub3
 
-    study = Factory(:study,:assays=>[assay1,assay2])
-    inv = study.investigation
+    inv = Factory(:investigation, :studies=>[Factory(:study,:assays=>[assay1]),Factory(:study,:assays=>[assay2])])
+
     assert_equal 3,inv.related_publications.size
     assert_equal [pub1,pub2,pub3],inv.related_publications.sort_by(&:id)
   end
