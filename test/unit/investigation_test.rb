@@ -14,6 +14,26 @@ class InvestigationTest < ActiveSupport::TestCase
     assert_equal Investigation.find(:all).sort_by {|i| i.updated_at.to_i * -1},Investigation.find(:all)
   end
 
+  test "publications through the study assays" do
+
+    assay1 = Factory :assay
+    assay2 = Factory :assay
+
+    pub1 = Factory :publication, :title=>"pub 1"
+    pub2 = Factory :publication, :title=>"pub 2"
+    pub3 = Factory :publication, :title=>"pub 3"
+    Factory :relationship, :subject=>assay1, :predicate=>Relationship::RELATED_TO_PUBLICATION,:other_object=>pub1
+    Factory :relationship, :subject=>assay1, :predicate=>Relationship::RELATED_TO_PUBLICATION,:other_object=>pub2
+
+    Factory :relationship, :subject=>assay2, :predicate=>Relationship::RELATED_TO_PUBLICATION,:other_object=>pub2
+    Factory :relationship, :subject=>assay2, :predicate=>Relationship::RELATED_TO_PUBLICATION,:other_object=>pub3
+
+    inv = Factory(:investigation, :studies=>[Factory(:study,:assays=>[assay1]),Factory(:study,:assays=>[assay2])])
+
+    assert_equal 3,inv.related_publications.size
+    assert_equal [pub1,pub2,pub3],inv.related_publications.sort_by(&:id)
+  end
+
   test "assays through association" do
     inv=investigations(:metabolomics_investigation)
     assays=inv.assays

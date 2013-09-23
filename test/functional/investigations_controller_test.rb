@@ -27,6 +27,29 @@ class InvestigationsControllerTest < ActionController::TestCase
     assert_not_nil assigns(:investigations)
   end
 
+  test "should show aggregated publications linked to assay" do
+    assay1 = Factory :assay,:policy => Factory(:public_policy)
+    assay2 = Factory :assay,:policy => Factory(:public_policy)
+
+    pub1 = Factory :publication, :title=>"pub 1"
+    pub2 = Factory :publication, :title=>"pub 2"
+    pub3 = Factory :publication, :title=>"pub 3"
+    Factory :relationship, :subject=>assay1, :predicate=>Relationship::RELATED_TO_PUBLICATION,:other_object=>pub1
+    Factory :relationship, :subject=>assay1, :predicate=>Relationship::RELATED_TO_PUBLICATION,:other_object=>pub2
+
+    Factory :relationship, :subject=>assay2, :predicate=>Relationship::RELATED_TO_PUBLICATION,:other_object=>pub2
+    Factory :relationship, :subject=>assay2, :predicate=>Relationship::RELATED_TO_PUBLICATION,:other_object=>pub3
+
+    study = Factory(:study,:assays=>[assay1,assay2],:policy => Factory(:public_policy))
+
+    get :show,:id=>study.investigation.id
+    assert_response :success
+
+    assert_select "div.tabbertab" do
+      assert_select "h3",:text=>"Publications (3)",:count=>1
+    end
+  end
+
   test "should show draggable icon in index" do
     get :index
     assert_response :success
