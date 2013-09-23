@@ -26,7 +26,7 @@ class Investigation < ActiveRecord::Base
   end
   
   #FIXME: see comment in Assay about reversing these
-  ["data_file","sop","model"].each do |type|
+  ["data_file","sop","model","publication"].each do |type|
     eval <<-END_EVAL
       def #{type}_masters
         studies.collect{|study| study.send(:#{type}_masters)}.flatten.uniq
