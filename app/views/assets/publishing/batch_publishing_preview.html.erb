@@ -38,7 +38,7 @@
           <% end %>
           <br/>
 
-          <%= submit_tag "Next"-%>
+          <%= submit_tag "Next", :disable_with=>"Next"-%>
           Or
           <%= link_to "Cancel", person_path(params[:id].to_i)-%>
       <% end -%>
