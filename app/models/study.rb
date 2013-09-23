@@ -31,7 +31,7 @@ class Study < ActiveRecord::Base
   end if Seek::Config.solr_enabled
 
   #FIXME: see comment in Assay about reversing these
-  ["data_file","sop","model"].each do |type|
+  ["data_file","sop","model","publication"].each do |type|
     eval <<-END_EVAL
       def #{type}_masters
         assays.collect{|a| a.send(:#{type}_masters)}.flatten.uniq
