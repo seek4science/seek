@@ -79,6 +79,12 @@ class ScaleTest < ActiveSupport::TestCase
       assert assets.include?(df)
       assert assets.include?(df2)
 
+      #also by id
+      assets = Scale.with_scale(scale3.id)
+      assert_equal 3,assets.size
+      assert assets.include?(m)
+      assert assets.include?(df)
+      assert assets.include?(df2)
 
     end
 

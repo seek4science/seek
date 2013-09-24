@@ -9,6 +9,7 @@ class Scale < ActiveRecord::Base
   acts_as_annotation_value :content_field => :title
 
   def self.with_scale scale
+    scale = Scale.find_by_id(scale) if scale.is_a?(Numeric)
     scale.annotations.with_attribute_name("scale").collect{|an| an.annotatable}
   end
 end
