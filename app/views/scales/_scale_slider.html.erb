@@ -1,0 +1,59 @@
+<% current_scale ||= 'cell' %>
+<script type="text/javascript">
+    var scales_arr = ["cell","intercellular","liverLobule","liver","organism","all"];
+    var current_scale = <%= ["cell","intercellular","liverLobule","liver","organism","all"].index(current_scale) -%>;
+</script>
+<%= javascript_include_tag "jquery-1.5.1.min.js","jquery-ui-1.8.14.custom.min.js","scales/scales.js" %>
+<%= stylesheet_link_tag  "scales/scales" %>
+
+<div id="wrapper">
+
+
+  <div id="options">
+    <div id="minus">-</div>
+    <ul id="scale_list" class="step">
+
+      <li id="all">all -</li>
+      <li id="organism" >organism -</li>
+      <li id="liver">liver -</li>
+      <li id="liverLobule">liver lobule -</li>
+      <li id="intercellular" >intercellular -</li>
+      <li id="cell">cell -</li>
+
+    </ul>
+    <div id="slider"></div>
+    <div id="plus">+</div>
+
+  </div>
+
+  <div id="zoom" >
+    <%= image_tag "scales/all.png", {:alt=>"all", :id=>"bild-5"} %>
+    <%= image_tag "scales/organism.png", {:alt=>"organism.png", :id=>"bild-4"} %>
+    <%= image_tag "scales/liver.png", {:alt=>"liver.png", :id=>"bild-3"} %>
+    <%= image_tag "scales/liverlobule.png", :alt=>"liverlobule.png", :id=>"bild-2" %>
+    <%= image_tag "scales/intercellular.png", :alt=>"intercellular.png", :id=>"bild-1" %>
+    <%= image_tag "scales/cellular.png", :alt=>"cellular.png", :id=>"bild-0" %>
+  </div>
+</div>
+
+<script type="text/javascript">
+    function scales_onclick() {
+        $$('#scale_list li').each(function(item){
+            item.onclick = function(){
+                <%= scale_slider_function %>
+                if ($('scale')){
+                    $('scale').value = this.id
+                }
+                return false;
+            };
+        });
+
+    }
+
+
+    scales_onclick();
+
+    if ($('scale')) {
+        $('scale').value = scales_arr[current_scale];
+    }
+</script>

@@ -1,6 +1,10 @@
 SEEK::Application.routes.draw do
 
-  resources :scales
+  resources :scales do
+    collection do
+      post :search
+    end
+  end
 
 
   ### GENERAL PAGES ###

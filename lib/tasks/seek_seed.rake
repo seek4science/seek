@@ -41,6 +41,15 @@ namespace :seek do
     end
   end
 
+  desc("adds the scales defined by Virtual Liver")
+  task(:vl_scales=>:environment) do
+    Scale.new(:title=>"Organism",:key=>"organism",:pos=>1,:image_name=>"organism.png").save!
+    Scale.new(:title=>"Liver",:key=>"liver",:pos=>2,:image_name=>"liver.png").save!
+    Scale.new(:title=>"Liver Lobule",:key=>"liverlobule",:pos=>3,:image_name=>"liverlobule.png").save!
+    Scale.new(:title=>"Intercellular",:key=>"intercellular",:image_name=>"intercellular.png",:pos=>4).save!
+    Scale.new(:title=>"Cell",:key=>"cell",:image_name=>"cell.png",:pos=>5).save!
+  end
+
   desc "seeds the database with the list of compounds and synonyms extracted from sabio-rk and stored in config/default_data/"
   task(:compounds=>:environment) do
     ActiveRecord::Fixtures.create_fixtures(File.join(Rails.root, "config/default_data"), "compounds")
