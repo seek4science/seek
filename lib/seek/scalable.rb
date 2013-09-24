@@ -13,11 +13,10 @@ module Seek
     end
 
     module InstanceMethods
-      def scales= scales
-        #TODO: look into reusing Taggable and tag_with
+      def scales= scales, source=User.current_user
         Array(scales).each do |scale|
           annotation = Annotation.new(
-              :source=>User.current_user,
+              :source=>source,
               :annotatable=>self,
               :attribute_name=>"scale",
               :value=>scale
