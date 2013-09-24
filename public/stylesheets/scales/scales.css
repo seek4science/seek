@@ -91,17 +91,8 @@
 }
 
 #wrapper{
-
-    /*background-color: #FFFFFF;*/
-    width: 100%;
-    margin: auto; /* Div soll zentriert werden */
-    min-height: 100%; /* Mindesthöhe für moderne Browser */
-    height:auto !important; /* Important Regel für moderne Browser */
-    height:100%; /* Mindesthöhe für den IE */
-    overflow: hidden !important; /* FF Scroll-leiste */
-    float:left;
-    padding-top:5px;
-    padding-left:5px;
+    width: 50em;
+    margin: 0 auto;
 }
 
 .scaled_items{
