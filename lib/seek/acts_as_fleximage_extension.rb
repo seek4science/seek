@@ -13,8 +13,6 @@ module Seek
 
     module InstanceMethods
       def resize_image size='900'
-        size = size[0..-($1.length.to_i + 2)] if size =~ /[0-9]+x[0-9]+\.([a-z0-9]+)/ # trim file extension
-        size = filter_size size
         if !cache_exists?(size) # look in file system cache before attempting db access
                                 # resize (keeping image side ratio), encode and cache the picture
           self.operate do |image|
@@ -43,7 +41,10 @@ module Seek
           rtn = Seek::Config.temporary_filestore_path + '/model_images'
         end
 
-        rtn = "#{rtn}/#{size}" if size
+        if size
+          size = filter_size size
+          rtn = "#{rtn}/#{size}"
+        end
         rtn = "#{rtn}/#{id}.#{self.class.image_storage_format}" if include_local_name
 
         return rtn
@@ -58,6 +59,7 @@ module Seek
       end
 
       def filter_size size
+        size = size[0..-($1.length.to_i + 2)] if size =~ /[0-9]+x[0-9]+\.([a-z0-9]+)/ # trim file extension
         max_size=1500
         matches = size.match /([0-9]+)x([0-9]+).*/
         if matches
