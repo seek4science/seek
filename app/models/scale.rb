@@ -7,4 +7,8 @@ class Scale < ActiveRecord::Base
   validates_uniqueness_of :title,:key,:image_name
 
   acts_as_annotation_value :content_field => :title
+
+  def self.with_scale scale
+    scale.annotations.with_attribute_name("scale").collect{|an| an.annotatable}
+  end
 end
