@@ -38,7 +38,7 @@ class ScalesController < ApplicationController
   private
 
   def everything
-    Seek::Util.user_creatable_types.inject([]) do |items, klass|
+    Seek::Util.scalable_types.inject([]) do |items, klass|
       items + klass.all
     end
   end

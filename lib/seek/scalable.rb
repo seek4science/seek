@@ -10,6 +10,10 @@ module Seek
         acts_as_annotatable :name_field=>:title
         include Seek::Scalable::InstanceMethods
       end
+
+      def scalable?
+
+      end
     end
 
     module InstanceMethods
