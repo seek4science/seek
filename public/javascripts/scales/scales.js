@@ -94,7 +94,7 @@ jQuery(document).ready(function($) {
             });
             $(newImage).animate({
                 height: "100%",
-                marginLeft: "100px",
+                marginLeft: "0px",
                 marginTop: "0px",
                 opacity:'1'
             }, {
@@ -134,7 +134,7 @@ jQuery(document).ready(function($) {
             });
             $(newImage).animate({
                 height: "100%",
-                marginLeft: "100px",
+                marginLeft: "0px",
                 marginTop: "0px",
                 opacity:'1'
             }, {
