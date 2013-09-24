@@ -229,3 +229,10 @@ jQuery(document).ready(function($) {
 
     /* Source Code: http://atomicrobotdesign.com/blog/web-development/controlling-html-using-the-jquery-ui-slider-and-links/ */
 });
+
+function load_tabs() {
+    var tabberOptions = {'onLoad':function() {
+
+    }};
+    tabberAutomatic(tabberOptions);
+}

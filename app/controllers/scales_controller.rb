@@ -30,7 +30,7 @@ class ScalesController < ApplicationController
                                                                                                                   :limit => 20,
                                                                                                                   :tabs_id => "#{scale_title}_resource_listing_tabbed_by_class",
                                                                                                                   :actions_partial_disable => true, :display_immediately=>true}
-      page << "tabberAutomatic(tabberOptions);"
+      page << "load_tabs();"
     end
 
   end
