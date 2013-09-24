@@ -29,8 +29,7 @@ class ScalesController < ApplicationController
                                                                                                                   :narrow_view => true, :authorization_already_done => true,
                                                                                                                   :limit => 20,
                                                                                                                   :tabs_id => "#{scale_title}_resource_listing_tabbed_by_class",
-                                                                                                                  :actions_partial_disable => true}
-      page << "displayTabs();"
+                                                                                                                  :actions_partial_disable => true, :display_immediately=>true}
     end
 
   end

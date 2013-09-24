@@ -200,7 +200,7 @@ jQuery(document).ready(function($) {
         $('#liver').click(function(e) {
             moveSlider(e, 3);
         });
-        $('#liverLobule').click(function(e) {
+        $('#liverlobule').click(function(e) {
             moveSlider(e, 2);
         });
         $('#intercellular').click(function(e) {

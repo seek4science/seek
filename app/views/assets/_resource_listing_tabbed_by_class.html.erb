@@ -9,6 +9,8 @@
 <% narrow_view ||= false -%>
 <% authorization_already_done ||= false -%>
 <% actions_partial_disable ||= false %>
+<% display_immediately ||= false %>
+
 <% unless authorization_already_done
        resource_hash.each_value do |res|
            unless res[:items].empty?
@@ -134,3 +136,8 @@
 
 <% end -%>
 
+<% if display_immediately %>
+    <script>
+      displayTabs();
+    </script>
+<% end %>
