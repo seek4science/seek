@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20130910122251) do
+ActiveRecord::Schema.define(:version => 20130924091747) do
 
   create_table "activity_logs", :force => true do |t|
     t.string   "action"
@@ -1158,6 +1158,15 @@ ActiveRecord::Schema.define(:version => 20130910122251) do
     t.datetime "created_at"
     t.datetime "updated_at"
     t.boolean  "include_external_search", :default => false
+  end
+
+  create_table "scales", :force => true do |t|
+    t.string   "title"
+    t.string   "key"
+    t.integer  "pos",        :default => 1
+    t.string   "image_name"
+    t.datetime "created_at",                :null => false
+    t.datetime "updated_at",                :null => false
   end
 
   create_table "sessions", :force => true do |t|

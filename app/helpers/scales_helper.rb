@@ -1,0 +1,2 @@
+module ScalesHelper
+end

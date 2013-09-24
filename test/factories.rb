@@ -811,3 +811,10 @@ end
     f.association :strain, :factory => :strain
     f.association :specimen,:factory => :specimen
   end
+
+  Factory.define :scale do |f|
+    f.sequence(:title) {|n| "scale #{n}"}
+    f.sequence(:pos) {|n| n}
+    f.sequence(:key) {|n| "scale_key #{n}"}
+    f.sequence(:image_name) {|n| "image_#{n}"}
+  end

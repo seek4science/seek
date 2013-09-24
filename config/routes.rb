@@ -1,5 +1,8 @@
 SEEK::Application.routes.draw do
 
+  resources :scales
+
+
   ### GENERAL PAGES ###
 
   root :to => "homes#index"
