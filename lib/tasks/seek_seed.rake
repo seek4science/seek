@@ -47,7 +47,7 @@ namespace :seek do
     Scale.new(:title=>"Liver",:key=>"liver",:pos=>2,:image_name=>"liver.png").save!
     Scale.new(:title=>"Liver Lobule",:key=>"liverlobule",:pos=>3,:image_name=>"liverlobule.png").save!
     Scale.new(:title=>"Intercellular",:key=>"intercellular",:image_name=>"intercellular.png",:pos=>4).save!
-    Scale.new(:title=>"Cell",:key=>"cell",:image_name=>"cell.png",:pos=>5).save!
+    Scale.new(:title=>"Cell",:key=>"cell",:image_name=>"cellular.png",:pos=>5).save!
   end
 
   desc "seeds the database with the list of compounds and synonyms extracted from sabio-rk and stored in config/default_data/"

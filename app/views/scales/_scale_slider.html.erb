@@ -12,15 +12,12 @@
   <div id="options">
     <div id="minus">-</div>
     <ul id="scale_list" class="step">
-
       <li id="all">all -</li>
-      <li id="organism" >organism -</li>
-      <li id="liver">liver -</li>
-      <li id="liverlobule">liver lobule -</li>
-      <li id="intercellular" >intercellular -</li>
-      <li id="cell">cell -</li>
-
+      <% Scale.all.each do |s| -%>
+        <li id="<%= s.key -%>"><%= s.title -%></li>
+      <% end %>
     </ul>
+
     <div id="slider"></div>
     <div id="plus">+</div>
 
@@ -28,11 +25,10 @@
 
   <div id="zoom" >
     <%= image_tag "scales/all.png", {:alt=>"all", :id=>"bild-5"} %>
-    <%= image_tag "scales/organism.png", {:alt=>"organism.png", :id=>"bild-4"} %>
-    <%= image_tag "scales/liver.png", {:alt=>"liver.png", :id=>"bild-3"} %>
-    <%= image_tag "scales/liverlobule.png", :alt=>"liverlobule.png", :id=>"bild-2" %>
-    <%= image_tag "scales/intercellular.png", :alt=>"intercellular.png", :id=>"bild-1" %>
-    <%= image_tag "scales/cellular.png", :alt=>"cellular.png", :id=>"bild-0" %>
+    <% Scale.all.each do |s| -%>
+        <%= image_tag s.image_path,{:alt=>s.image_name,:id=>"bild-#{s.pos-1}"} %>
+    <% end %>
+
   </div>
 </div>
 
