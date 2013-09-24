@@ -38,7 +38,6 @@ class ScaleTest < ActiveSupport::TestCase
     scale.key="scale"
     scale.image_name="fred.jpg"
     assert !scale.valid?
-
   end
 
   test "default pos" do
