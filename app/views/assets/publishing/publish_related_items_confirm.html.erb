@@ -1,3 +1,5 @@
+<%= stylesheet_link_tag "publishing" %>
+
 <div class="show_basic">
   <%= show_title "Publish the associated #{t('assays.assay').pluralize}, #{t('study').pluralize} and #{t('investigation').pluralize}?" %>
 
@@ -19,11 +21,11 @@
   <br/>
 
   <h2>The following items are linked to <%= t("assays.assay").pluralize -%>:</h2>
-  <ul style="padding-left:1em;">
+  <ul class="publishing_options">
 
     <% @items_for_publishing.each do |item| %>
         <% if !item.assays.empty? %>
-            <li>
+            <li class="type_and_title">
               <b><%= text_for_resource item -%>:</b>&nbsp;<%= link_to h(item.title), item, :target => "_blank" -%>
             </li>
         <% end %>
@@ -45,8 +47,8 @@
 
       <br/>
       <% resource = (controller_name == 'people') ? current_user.person : @asset %>
-      <%= submit_tag "Next" -%>
-      <%= submit_tag "Skip", :onclick => "this.form.action='check_gatekeeper_required'" -%>
+      <%= submit_tag "Next", :disable_with=>"Next" -%>
+      <%= submit_tag "Skip", :onclick => "this.form.action='check_gatekeeper_required'", :disable_with=>"Skip" -%>
       <%= link_to "Cancel", polymorphic_path(resource) -%>
   <% end %>
 </div>

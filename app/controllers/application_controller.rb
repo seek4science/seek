@@ -10,8 +10,6 @@ class ApplicationController < ActionController::Base
 
   include CommonSweepers
 
-
-
   before_filter :log_extra_exception_data
 
   after_filter :log_event

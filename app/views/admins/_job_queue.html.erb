@@ -1,3 +1,5 @@
+
+
 <%
     queue = AuthLookupUpdateQueue.all | ReindexingQueue.all
     queue = queue.sort_by &:created_at
@@ -24,9 +26,16 @@
       <td><%= item.attempts -%></td>
       <td><%= date_as_string(item.run_at,true) -%></td>
       <td><%= date_as_string(item.locked_at,true) -%></td>
-      <td><%= date_as_string(item.failed_at,true) -%></td>
+      <td>
+        <%= item.failed_at.nil? ? date_as_string(item.failed_at,true) : link_to_function(date_as_string(item.failed_at,true),"Effect.toggle('last_error_#{item.id}','appear', { delay: 0.5 });") -%>
+      </td>
       <td><%= item.handler -%></td>
     </tr>
+    <% unless item.last_error.nil? -%>
+      <tr id='<%= "last_error_#{item.id}" -%>' style="display:none;">
+        <td colspan="7"><%= item.last_error -%></td>
+      </tr>
+    <% end %>
    <% end -%>
 </table>
 
@@ -53,3 +62,4 @@
     </tr>
    <% end -%>
 </table>
+
