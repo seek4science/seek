@@ -194,23 +194,10 @@ jQuery(document).ready(function($) {
             valCheck();
         }
 
-        $('#organism').click(function(e) {
-            moveSlider(e, 4);
-        });
-        $('#liver').click(function(e) {
-            moveSlider(e, 3);
-        });
-        $('#liverlobule').click(function(e) {
-            moveSlider(e, 2);
-        });
-        $('#intercellular').click(function(e) {
-            moveSlider(e, 1);
-        });
-        $('#cell').click(function(e) {
-            moveSlider(e, 0);
-        });
-        $('#all').click(function(e) {
-            moveSlider(e, 5);
+        scales_arr.each(function( scale ){
+            $('#' + scale).click(function(e) {
+                moveSlider(e, scales_arr.indexOf(scale));
+            });
         });
 
         //initial status

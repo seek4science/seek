@@ -1,7 +1,11 @@
 <% current_scale ||= 'cell' %>
 <script type="text/javascript">
-    var scales_arr = ["cell","intercellular","liverLobule","liver","organism","all"];
-    var current_scale = <%= ["cell","intercellular","liverLobule","liver","organism","all"].index(current_scale) -%>;
+    var scales_arr = [];
+    <% (Scale.all.collect(&:key).reverse + ['all']).each do |key| %>
+        scales_arr.push('<%= key %>');
+    <% end %>
+
+    var current_scale = scales_arr.indexOf('<%= current_scale %>');
 </script>
 <%= javascript_include_tag "jquery-1.5.1.min.js","jquery-ui-1.8.14.custom.min.js","scales/scales.js" %>
 <%= stylesheet_link_tag  "scales/scales" %>
