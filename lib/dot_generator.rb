@@ -140,8 +140,9 @@ module DotGenerator
     Node.deep = deep
     Node.controller = self
     Node.edges = []
-
-    dot = node_for(root_item).as_dot
+    dot = "graph ISA_graph {"
+    dot << node_for(root_item).as_dot
+    dot << "}"
     return dot
   end
 end
