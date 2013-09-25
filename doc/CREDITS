@@ -36,6 +36,8 @@ Pdf rendering library - https://github.com/mozilla/pdf.js
 
 jScrollPane - http://jscrollpane.kelvinluck.com/
 
+The scales image zooming a slider was based on source code in a blog post by Mike Thomas as http://atomicrobotdesign.com/blog/web-development/controlling-html-using-the-jquery-ui-slider-and-links/
+
 == Icons and themes
 
 FamFamFam icon set (flags and silk) - http://www.famfamfam.com/lab/icons/silk/

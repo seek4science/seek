@@ -10,22 +10,22 @@ module Seek
         acts_as_annotatable :name_field=>:title
         include Seek::Scalable::InstanceMethods
       end
-
-      def scalable?
-
-      end
     end
 
     module InstanceMethods
+
       def scales= scales, source=User.current_user
         Array(scales).each do |scale|
-          annotation = Annotation.new(
-              :source=>source,
-              :annotatable=>self,
-              :attribute_name=>"scale",
-              :value=>scale
-          )
-          annotation.save!
+          scale=Scale.find_by_id(scale) if scale.is_a?(Numeric) || scale.is_a?(String)
+          unless scale.nil?
+            annotation = Annotation.new(
+                :source=>source,
+                :annotatable=>self,
+                :attribute_name=>"scale",
+                :value=>scale
+            )
+            annotation.save
+          end
         end
       end
 

@@ -1,4 +1,5 @@
-/* Source Code: http://atomicrobotdesign.com/blog/web-development/controlling-html-using-the-jquery-ui-slider-and-links/ */
+/* Based on source code from the Blog post by Mike Thomas at: http://atomicrobotdesign.com/blog/web-development/controlling-html-using-the-jquery-ui-slider-and-links/ */
+
 $.noConflict();
 
 jQuery(document).ready(function($) {

@@ -327,6 +327,7 @@ class ModelsController < ApplicationController
       @model.policy.set_attributes_with_sharing params[:sharing], @model.projects
 
       update_annotations @model
+      update_scales @model
       build_model_image @model,params[:model_image]
       assay_ids = params[:assay_ids] || []
       respond_to do |format|

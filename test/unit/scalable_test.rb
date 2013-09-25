@@ -22,6 +22,20 @@ class ScalableTest < ActiveSupport::TestCase
     assert_equal [@small_scale],scales
   end
 
+  test "assign scales using ids" do
+    @model.scales = [@small_scale.id]
+    @model.save
+    scales = Model.find(@model.id).scales
+    assert_equal [@small_scale],scales
+
+    #skip invalid id's and handle string id's
+    model2=Factory :model
+    model2.scales = ["","9999",@small_scale.id.to_s]
+    model2.save
+    scales = Model.find(model2.id).scales
+    assert_equal [@small_scale],scales
+  end
+
   test "retrieved scales are ordered" do
     @model.scales = [@large_scale,@small_scale,@medium_scale]
     @model.save
