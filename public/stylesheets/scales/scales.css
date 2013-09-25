@@ -121,7 +121,7 @@
 
 
 
-#bild-1,#bild-2,#bild-3,#bild-4,#bild-5,#bild-6{
+.scale_image{
     display:none;
     height:50%;
     z-index:0;

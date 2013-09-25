@@ -46,13 +46,10 @@ jQuery(document).ready(function($) {
             if (val > previousValue) {
                 imageSwapZoomOut(curImage, imgarray[val]);
                 curImage = imgarray[val];
-
             }
             else {
                 imageSwapZoomIn(curImage, imgarray[val]);
                 curImage = imgarray[val];
-
-
             }
         }
 
