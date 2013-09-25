@@ -1,3 +1,5 @@
+/* Based on source code from the Blog post by Mike Thomas at: http://atomicrobotdesign.com/blog/web-development/controlling-html-using-the-jquery-ui-slider-and-links/ */
+
 $.noConflict();
 
 jQuery(document).ready(function($) {
@@ -227,7 +229,6 @@ jQuery(document).ready(function($) {
 
 
 
-    /* Source Code: http://atomicrobotdesign.com/blog/web-development/controlling-html-using-the-jquery-ui-slider-and-links/ */
 });
 
 function load_tabs() {
