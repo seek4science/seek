@@ -36,6 +36,26 @@ class ScalableTest < ActiveSupport::TestCase
     assert_equal [@small_scale],scales
   end
 
+  test "updating scales correctly resolves differences" do
+    @model.scales = [@small_scale.id]
+    @model.save
+    assert_no_difference("Annotation.count") do
+      @model.scales = [@medium_scale.id]
+    end
+    @model.save
+    assert_equal [@medium_scale],@model.scales
+    assert_difference("Annotation.count",1) do
+      @model.scales = [@medium_scale.id,@large_scale.id]
+    end
+    @model.save
+    assert_equal [@medium_scale,@large_scale],@model.scales
+    assert_difference("Annotation.count",-2) do
+      @model.scales = []
+    end
+    @model.save
+    assert_equal [],@model.scales
+  end
+
   test "retrieved scales are ordered" do
     @model.scales = [@large_scale,@small_scale,@medium_scale]
     @model.save

@@ -278,6 +278,11 @@ class ModelsControllerTest < ActionController::TestCase
     m = assigns(:model)
     assert_not_nil m
     assert_equal [scale1,scale2],m.scales
+    scale3 = Factory(:scale)
+
+    put :update,:id=> m.id, :scale_ids=>[scale3.id.to_s]
+    m = assigns(:model)
+    assert_equal [scale3],m.scales
   end
 
   test "should create model" do

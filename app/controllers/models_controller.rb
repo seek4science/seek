@@ -364,59 +364,60 @@ class ModelsController < ApplicationController
   # PUT /models/1.xml
   def update
     # remove protected columns (including a "link" to content blob - actual data cannot be updated!)
-      if params[:model]
-        [:contributor_id, :contributor_type, :original_filename, :content_type, :content_blob_id, :created_at, :updated_at, :last_used_at].each do |column_name|
-          params[:model].delete(column_name)
-        end
-
-        # update 'last_used_at' timestamp on the Model
-        params[:model][:last_used_at] = Time.now
+    if params[:model]
+      [:contributor_id, :contributor_type, :original_filename, :content_type, :content_blob_id, :created_at, :updated_at, :last_used_at].each do |column_name|
+        params[:model].delete(column_name)
       end
+
+      # update 'last_used_at' timestamp on the Model
+      params[:model][:last_used_at] = Time.now
+    end
 
     update_annotations @model
-      publication_params    = params[:related_publication_ids].nil?? [] : params[:related_publication_ids].collect { |i| ["Publication", i.split(",").first]}
+    update_scales @model
+    publication_params = params[:related_publication_ids].nil? ? [] : params[:related_publication_ids].collect { |i| ["Publication", i.split(",").first] }
 
-      @model.attributes = params[:model]
+    @model.attributes = params[:model]
 
-      if params[:sharing]
-        @model.policy_or_default
-        @model.policy.set_attributes_with_sharing params[:sharing], @model.projects
-      end
+    if params[:sharing]
+      @model.policy_or_default
+      @model.policy.set_attributes_with_sharing params[:sharing], @model.projects
+    end
 
-      assay_ids = params[:assay_ids] || []
-      respond_to do |format|
-        if @model.save
+    assay_ids = params[:assay_ids] || []
+    respond_to do |format|
+      if @model.save
 
-          # update attributions
-          Relationship.create_or_update_attributions(@model, params[:attributions])
+        # update attributions
+        Relationship.create_or_update_attributions(@model, params[:attributions])
 
-          # update related publications
-          Relationship.create_or_update_attributions(@model,publication_params, Relationship::RELATED_TO_PUBLICATION)
+        # update related publications
+        Relationship.create_or_update_attributions(@model, publication_params, Relationship::RELATED_TO_PUBLICATION)
 
-          #update creators
-          AssetsCreator.add_or_update_creator_list(@model, params[:creators])
+        #update creators
+        AssetsCreator.add_or_update_creator_list(@model, params[:creators])
 
-          flash[:notice] = "#{t('model')} metadata was successfully updated."
-          format.html { redirect_to model_path(@model) }
-          # Update new assay_asset
-          Assay.find(assay_ids).each do |assay|
-            if assay.can_edit?
-              assay.relate(@model)
-            end
+        flash[:notice] = "#{t('model')} metadata was successfully updated."
+        format.html { redirect_to model_path(@model) }
+        # Update new assay_asset
+        Assay.find(assay_ids).each do |assay|
+          if assay.can_edit?
+            assay.relate(@model)
           end
-          #Destroy AssayAssets that aren't needed
-          assay_assets = @model.assay_assets
-          assay_assets.each do |assay_asset|
-            if assay_asset.assay.can_edit? and !assay_ids.include?(assay_asset.assay_id.to_s)
-              AssayAsset.destroy(assay_asset.id)
-            end
-          end
-        else
-          format.html {
-            render :action => "edit"
-          }
         end
+        #Destroy AssayAssets that aren't needed
+        assay_assets = @model.assay_assets
+        assay_assets.each do |assay_asset|
+          if assay_asset.assay.can_edit? and !assay_ids.include?(assay_asset.assay_id.to_s)
+            AssayAsset.destroy(assay_asset.id)
+          end
+        end
+      else
+        format.html {
+          render :action => "edit"
+        }
       end
+    end
   end
   
   # DELETE /models/1
