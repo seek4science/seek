@@ -28,9 +28,9 @@ class ScalesControllerTest < ActionController::TestCase
     get :index
     assert_response :success
     assert_select "ul#scale_list" do
-      assert_select "li##{@scale1.key}",:text=>@scale1.title
-      assert_select "li##{@scale2.key}",:text=>@scale2.title
-      assert_select "li##{@scale3.key}",:text=>@scale3.title
+      assert_select "li##{@scale1.key}",:text=>@scale1.title + " -"
+      assert_select "li##{@scale2.key}",:text=>@scale2.title + " -"
+      assert_select "li##{@scale3.key}",:text=>@scale3.title + " -"
     end
   end
 
@@ -39,9 +39,20 @@ class ScalesControllerTest < ActionController::TestCase
     get :show,:id=>@scale1.id
     assert_response :success
     assert_select "ul#scale_list" do
-      assert_select "li##{@scale1.key}",:text=>@scale1.title
-      assert_select "li##{@scale2.key}",:text=>@scale2.title
-      assert_select "li##{@scale3.key}",:text=>@scale3.title
+      assert_select "li##{@scale1.key}",:text=>@scale1.title + " -"
+      assert_select "li##{@scale2.key}",:text=>@scale2.title + " -"
+      assert_select "li##{@scale3.key}",:text=>@scale3.title + " -"
+    end
+  end
+
+  test "show all" do
+    logout
+    get :show,:id=>"all"
+    assert_response :success
+    assert_select "ul#scale_list" do
+      assert_select "li##{@scale1.key}",:text=>@scale1.title + " -"
+      assert_select "li##{@scale2.key}",:text=>@scale2.title + " -"
+      assert_select "li##{@scale3.key}",:text=>@scale3.title + " -"
     end
   end
 end

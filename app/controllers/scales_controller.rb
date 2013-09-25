@@ -36,7 +36,7 @@ class ScalesController < ApplicationController
   end
 
   def show
-    @scale=Scale.find(params[:id])
+    @scale_key=Scale.find_by_id(params[:id]).try(:key) || "all"
   end
 
   private
