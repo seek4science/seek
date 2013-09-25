@@ -815,6 +815,6 @@ end
   Factory.define :scale do |f|
     f.sequence(:title) {|n| "scale #{n}"}
     f.sequence(:pos) {|n| n}
-    f.sequence(:key) {|n| "scale_key #{n}"}
+    f.sequence(:key) {|n| "scale_key_#{n}"}
     f.sequence(:image_name) {|n| "image_#{n}"}
   end
