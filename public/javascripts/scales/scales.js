@@ -51,6 +51,7 @@ jQuery(document).ready(function($) {
                 imageSwapZoomIn(curImage, imgarray[val]);
                 curImage = imgarray[val];
             }
+            previousValue=val;
         }
 
         //ANIMATION if images are changing!!
