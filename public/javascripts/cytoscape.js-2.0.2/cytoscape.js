@@ -8952,6 +8952,7 @@ var cytoscape;
 		
 		// Functions to help with whether mouse wheel should trigger zooming
 		// --
+        /*
 		r.registerBinding(r.data.container, "mousewheel", wheelHandler, true);
 		r.registerBinding(r.data.container, "DOMMouseScroll", wheelHandler, true);
 		r.registerBinding(r.data.container, "MozMousePixelScroll", function(e){
@@ -8968,6 +8969,7 @@ var cytoscape;
 		r.registerBinding(r.data.container, "mouseout", function(e) {		 
 			r.zoomData.freeToZoom = false; r.zoomData.lastPointerX = null 
 		}, false);
+		*/
 		// --
 		
 		// Functions to help with handling mouseout/mouseover on the Cytoscape container
