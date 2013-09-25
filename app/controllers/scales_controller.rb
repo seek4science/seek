@@ -35,6 +35,10 @@ class ScalesController < ApplicationController
 
   end
 
+  def show
+    @scale=Scale.find(params[:id])
+  end
+
   private
 
   def everything

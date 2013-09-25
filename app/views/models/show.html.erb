@@ -75,6 +75,9 @@
                 <span class="none_text">Not specified</span>
                 <% end -%>
             </p>
+            <% if show_scales -%>
+                <%= render :partial=>"scales/asset_scales_list",:object=>@model.scales -%>
+            <% end %>
             <p>
                 <b><%= t('model') %> type:</b>
                 <%= model_type_text @display_model.model_type %>

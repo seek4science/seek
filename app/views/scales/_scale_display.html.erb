@@ -1,0 +1,21 @@
+<script type="text/javascript">
+    var loaded_scales = new Array();
+</script>
+
+
+<%= render :partial => 'scales/scale_slider', :locals => {:current_scale => current_scale.key,:scale_slider_function => (remote_function(
+        :url=>{:action=>'search', :controller=>'scales'},
+        :with=>"'scale_type='+this.id",
+        :before=>"show_ajax_loader(this.id+'_results')",
+        :condition=>'!loaded_scales[this.id]') +
+        "; loaded_scales[this.id] = true;
+        $$('#scaled_items > div').invoke('hide');
+        $(this.id+'_results').show();".html_safe)} %>
+
+<div id="scaled_items">
+  <% keys = Scale.all.map(&:key).reverse
+     keys = ['all'] + keys
+     keys.each do |s| -%>
+      <div id="<%= s %>_results" class="scaled_items" style="display: none;"></div>
+  <% end %>
+</div>
