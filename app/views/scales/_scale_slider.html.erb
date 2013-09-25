@@ -16,9 +16,9 @@
   <div id="options">
     <div id="minus">-</div>
     <ul id="scale_list" class="step">
-      <li id="all">all -</li>
+      <li id="all">All -</li>
       <% Scale.all.each do |s| -%>
-        <li id="<%= s.key -%>"><%= s.title -%></li>
+        <li id="<%= s.key -%>"><%= s.title -%> -</li>
       <% end %>
     </ul>
 
