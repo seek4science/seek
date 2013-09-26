@@ -267,4 +267,24 @@ class ConfigTest < ActiveSupport::TestCase
   test "publish_button_enabled" do
     assert_equal true,Seek::Config.publish_button_enabled
   end
+
+  test "datacite configuration for doi's" do
+    assert_equal nil,Seek::Config.datacite_username
+    assert_equal "https://mds.datacite.org/",Seek::Config.datacite_url
+    Seek::Config.datacite_username = "fred"
+
+    assert_equal "fred",Seek::Config.datacite_username
+    Seek::Config.datacite_url = "http://other_ezid.net"
+    assert_equal "http://other_ezid.net",Seek::Config.datacite_url
+
+    assert_equal nil,Seek::Config.datacite_password
+    assert_nil Seek::Config.datacite_password_enc
+    Seek::Config.datacite_password="fish"
+    assert_equal "fish",Seek::Config.datacite_password
+    assert_not_equal "fish",Seek::Config.datacite_password_enc
+    assert_not_nil Seek::Config.datacite_password_enc
+
+    Seek::Config.datacite_password=nil
+    assert_nil Seek::Config.datacite_password_enc
+  end
 end
