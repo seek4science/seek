@@ -6,7 +6,9 @@ class SubMailer < ActionMailer::Base
     @activity_logs = activity_logs
     @person = person
     @frequency = frequency
-    mail(:to=>person.email_with_name,:subject=>"#{Seek::Config.application_title} Subscription Report")
+    mail(:to=>person.email_with_name,:subject=>"#{Seek::Config.application_title} Subscription Report") do |format|
+      format.html { render :send_digest_subscription}
+    end
   end
 
   def send_immediate_subscription person, activity_log
