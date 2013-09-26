@@ -25,6 +25,7 @@ class SubMailerTest < ActionMailer::TestCase
     assert email.body.include?("Dear #{p.name},")
     assert email.body.include?(%!<td><a href="http://localhost:3000/data_files/#{df.id}">#{df.title}</a></td>!)
     assert email.body.include?(%!<td><a href="http://localhost:3000/people/#{p2.id}">#{p2.name}</a></td>!)
+    assert email.body.include?("following resources have been created or updated")
   end
 
   test "send immediate email" do
@@ -48,6 +49,7 @@ class SubMailerTest < ActionMailer::TestCase
     assert email.body.include?("Dear #{p.name},")
     assert email.body.include?(%!<td><a href="http://localhost:3000/data_files/#{df.id}">#{df.title}</a></td>!)
     assert email.body.include?(%!<td><a href="http://localhost:3000/people/#{p2.id}">#{p2.name}</a></td>!)
+    assert email.body.include?("following resources have just been created or updated in")
   end
 
 end

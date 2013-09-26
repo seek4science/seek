@@ -2,7 +2,7 @@ Dear <%= @person.name%>,
 <br/>
 <br/>
 <% if @frequency == 'immediately' %>
-The following resources have just been created/updated in <%= Seek::Config.application_title %>:
+The following resources have just been created or updated in <%= Seek::Config.application_title %>:
 <% else %>
     <%
        if @frequency == 'daily'
