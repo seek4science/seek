@@ -139,6 +139,15 @@ namespace :seek_dev do
     FileUtils.rm_r("db/#{dir}/")
   end
 
+  desc("adds the scales defined by Virtual Liver")
+  task(:vl_scales=>:environment) do
+    Scale.destroy_all
+    Scale.new(:title=>"Organism",:key=>"organism",:pos=>5,:image_name=>"organism.png").save!
+    Scale.new(:title=>"Liver",:key=>"liver",:pos=>4,:image_name=>"liver.png").save!
+    Scale.new(:title=>"Liver Lobule",:key=>"liverlobule",:pos=>3,:image_name=>"liverlobule.png").save!
+    Scale.new(:title=>"Intercellular",:key=>"intercellular",:image_name=>"intercellular.png",:pos=>2).save!
+    Scale.new(:title=>"Cell",:key=>"cell",:image_name=>"cellular.png",:pos=>1).save!
+  end
 
 
 end

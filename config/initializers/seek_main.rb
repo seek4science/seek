@@ -40,6 +40,8 @@ require 'background_reindexing'
 require 'subscribable'
 require 'seek/permissions/publishing_permissions'
 
+require 'seek/scalable'
+
 SEEK::Application.configure do
   GLOBAL_PASSPHRASE="ohx0ipuk2baiXah" unless defined? GLOBAL_PASSPHRASE
 

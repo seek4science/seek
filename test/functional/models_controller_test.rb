@@ -105,6 +105,7 @@ class ModelsControllerTest < ActionController::TestCase
     assert_not_nil flash[:error]    
   end
 
+
   test 'creators show in list item' do
     p1=Factory :person
     p2=Factory :person
@@ -264,6 +265,24 @@ class ModelsControllerTest < ActionController::TestCase
     put :update,:id=> m.id, :model => {:sample_ids=> [Factory(:sample,:title=>"editTestSample",:contributor=> User.current_user).id]}
     m = assigns(:model)
     assert_equal "editTestSample", m.samples.first.title
+  end
+
+  test "association of scales" do
+    scale1=Factory :scale
+    scale2=Factory :scale, :pos=>2
+    model_params = valid_model
+
+    assert_difference("Model.count") do
+      post :create,:model => model_params,:scale_ids=>[scale1.id.to_s,scale2.id.to_s],:content_blob=>{:file_0=>fixture_file_upload('files/little_file.txt',Mime::TEXT)}
+    end
+    m = assigns(:model)
+    assert_not_nil m
+    assert_equal [scale1,scale2],m.scales
+    scale3 = Factory(:scale)
+
+    put :update,:id=> m.id, :scale_ids=>[scale3.id.to_s]
+    m = assigns(:model)
+    assert_equal [scale3],m.scales
   end
 
   test "should create model" do

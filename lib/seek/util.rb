@@ -56,6 +56,14 @@ module Seek
 
     end
 
+    def self.scalable_types
+      @@scalable_types ||= begin
+        persistent_classes.select do |c|
+          c.included_modules.include?(Seek::Scalable::InstanceMethods)
+        end.sort_by(&:name)
+      end
+    end
+
     def self.rdf_capable_types
       @@rdf_capable_types ||= begin
         persistent_classes.select do |c|

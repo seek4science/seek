@@ -30,6 +30,7 @@ module Acts #:nodoc:
       def acts_as_asset
         include Seek::Taggable
 
+        acts_as_scalable
         acts_as_authorized
         acts_as_uniquely_identifiable
         acts_as_annotatable :name_field=>:title
