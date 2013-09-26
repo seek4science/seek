@@ -75,5 +75,7 @@ SEEK::Application.configure do
   Seek::Config.default :open_id_authentication_store,:memory
 
   Seek::Config.default :max_attachments_num,100
+
+  Seek::Config.default :datacite_url,"https://mds.datacite.org/"
 end
 
