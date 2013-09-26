@@ -6,6 +6,8 @@ class Scale < ActiveRecord::Base
   validates_presence_of :title,:key,:image_name
   validates_uniqueness_of :title,:key,:image_name
 
+  after_destroy :remove_annotations
+
   acts_as_annotation_value :content_field => :title
 
   def self.with_scale scale
@@ -15,5 +17,11 @@ class Scale < ActiveRecord::Base
 
   def image_path
     "scales/#{image_name}"
+  end
+
+  private
+
+  def remove_annotations
+    self.annotations.destroy_all
   end
 end

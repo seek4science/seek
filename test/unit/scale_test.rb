@@ -85,9 +85,34 @@ class ScaleTest < ActiveSupport::TestCase
       assert assets.include?(m)
       assert assets.include?(df)
       assert assets.include?(df2)
+    end
+  end
 
+  test "destroy annotation when destroyed" do
+    scale1 = Factory(:scale)
+    User.with_current_user(Factory(:user)) do
+      assert_difference("Annotation.count",4) do
+        m=Factory(:model)
+        m.scales=scale1
+        m.save!
+        m2=Factory(:model)
+        m2.scales=scale1
+        m2.save!
+        df=Factory(:data_file)
+        df.scales=scale1
+        df.save!
+        df2=Factory(:data_file)
+        df2.scales=scale1
+        df2.save!
+      end
+      id = scale1.id
+      assert_difference("Annotation.count",-4) do
+        scale1.destroy
+      end
+      assert Annotation.where(:value_type=>"Scale",:value_id=>id).empty?
     end
 
   end
+
 
 end
