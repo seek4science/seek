@@ -29,7 +29,6 @@
 }
 
 .ui-slider-vertical {
-    height: 200px;
     width: 0.8em;
 }
 
@@ -110,13 +109,13 @@
 
 #zoom{
     height:300px;
-    width:500px;
+    width:450px;
     /*      border: 1px dashed black; */
     position:relative;
     overflow:hidden;
     float:left;
     margin-left: 0em;
-    min-height: 6em;
+    //min-height: 6em;
 }
 
 
