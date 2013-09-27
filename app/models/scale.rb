@@ -12,7 +12,11 @@ class Scale < ActiveRecord::Base
 
   def self.with_scale scale
     scale = Scale.find_by_id(scale) if scale.is_a?(Numeric)
-    scale.annotations.with_attribute_name("scale").collect{|an| an.annotatable}
+    scale.assets
+  end
+
+  def assets
+    self.annotations.with_attribute_name("scale").collect{|an| an.annotatable}
   end
 
   def image_path
