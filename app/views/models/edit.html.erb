@@ -34,7 +34,7 @@
         <p>
             <%= render :partial => "organisms/select_organism",:locals=>{:model_class=>Model} -%>
         </p>
-      <% if show_scales %>
+      <% if show_scales? %>
           <%= render :partial => "scales/scales_selector",:locals=>{:object=>@model} %>
       <% end %>
 

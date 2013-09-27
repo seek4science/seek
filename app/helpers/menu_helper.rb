@@ -30,7 +30,7 @@ module MenuHelper
             {:controller=>"events", :title=>t("event").pluralize},
         ]},
         ]
-    if show_scales
+    if show_scales?
       scales_menu = {:title=>t("scale").pluralize,:sections=>[]}
       scales_menu[:sections] << {:path=>scales_path,:title=>"Browse #{t("scale").pluralize}"}
       definitions << scales_menu
