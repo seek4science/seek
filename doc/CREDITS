@@ -39,6 +39,7 @@ jScrollPane - http://jscrollpane.kelvinluck.com/
 Cytoscape.js - http://cytoscape.github.io/cytoscape.js/
 
 The scales image zooming a slider was based on source code in a blog post by Mike Thomas as http://atomicrobotdesign.com/blog/web-development/controlling-html-using-the-jquery-ui-slider-and-links/
+and the contribution of Elina Wetsch, the former web developer of SDBV Group at HITS gGmbH.
 
 == Icons and themes
 
