@@ -20,7 +20,7 @@ en:
     modelling_analysis:  "Modelling analysis"
 
   #DataFile
-  data_file: "Data file"
+  data_file: "Data or Clinical profile"
 
   #Model
   model: "Model"
