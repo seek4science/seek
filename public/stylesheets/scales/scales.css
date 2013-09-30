@@ -99,13 +99,11 @@
 
 }
 
-
 .step li:hover{
     color:#17B274;
 }
 
 .step li:active{color:#ff0000;}
-
 
 #zoom{
     height:300px;
@@ -115,7 +113,7 @@
     overflow:hidden;
     float:left;
     margin-left: 0em;
-    //min-height: 6em;
+    margin-top: 1.5em;
 }
 
 
@@ -133,9 +131,7 @@ ul#scale_list li {
     display:none;
 }
 
-#zoom {
-    margin-top: 1.5em;
-}
+
 
 #zoom img{
     position:absolute;
