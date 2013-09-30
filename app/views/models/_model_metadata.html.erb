@@ -1,57 +1,54 @@
+<div class="fold">
+  <div class="foldTitle">
+    <%= "#{t('model')} type details" %>
+  </div>
+  <div class="foldContent">
+
+    <p>
+      <span id="model_type_info" style="display:none;"></span>
+      <b><%= t('model') %> type:</b><br/>
+
+      <span id="model_type_selection">
+        <%= collection_select :model,
+                              :model_type_id,
+                              ModelType.all,
+                              :id,
+                              :title,
+                              {:include_blank => "Not specified"},
+                              {:onchange => "model_type_selection_changed();"} -%>
+      </span>
 
 
-<p>
-  <span id="model_type_info" style="display:none;"></span>
-  <b><%= t('model') %> type:</b><br/>
-
-  <span id="model_type_selection">
-    <%= collection_select :model,
-      :model_type_id,
-      ModelType.all,
-      :id,
-      :title,
-      {:include_blank=>"Not specified"},
-      {:onchange=>"model_type_selection_changed();" } -%>
-  </span>
+    </p>
 
 
-</p>
+    <p>
+      <span id="model_format_info" style="display:none;"></span>
+      <b><%= t('model') %> format:</b><br/>
 
+      <span id="model_format_selection">
+        <%= collection_select :model, :model_format_id, ModelFormat.all, :id, :title,
+                              {:include_blank => "Not specified"},
+                              {:onchange => "model_format_selection_changed();"}
+        -%>
+      </span>
 
+    </p>
 
-
-
-<p>
-  <span id="model_format_info" style="display:none;"></span>
-  <b><%= t('model') %> format:</b><br/>
-
-  <span id="model_format_selection">
-    <%= collection_select :model, :model_format_id, ModelFormat.all, :id, :title,
-      {:include_blank=>"Not specified"},
-      {:onchange=>"model_format_selection_changed();" }
-    -%>
-  </span>
-
-</p>
-
-
-
-
-
-
-<%
-environment_options=[['Unknown', 0]]|RecommendedModelEnvironment.all.collect{|e| [h(e.title), e.id]}
-%>
-<p>
-  <b>Preferred execution or visualisation environment:</b><br/>
-  <%= select_tag 'model[recommended_environment_id]',
-    options_for_select(environment_options, @model.recommended_environment_id),
-    {
-    :name=>"model[recommended_environment_id]"
-  }
-%>
-</p>
-
+    <%
+       environment_options=[['Unknown', 0]]|RecommendedModelEnvironment.all.collect { |e| [h(e.title), e.id] }
+    %>
+    <p>
+      <b>Preferred execution or visualisation environment:</b><br/>
+      <%= select_tag 'model[recommended_environment_id]',
+                     options_for_select(environment_options, @model.recommended_environment_id),
+                     {
+                             :name => "model[recommended_environment_id]"
+                     }
+      %>
+    </p>
+  </div>
+</div>
 <script type="text/javascript">
 <%
 ModelFormat.all.each do |format|
