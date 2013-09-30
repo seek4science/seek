@@ -125,7 +125,7 @@ class ApplicationController < ActionController::Base
         else
           resources = resources.select &:can_view?
         end
-
+        resources.sort!{|item,item2| item2.updated_at <=> item.updated_at}
         page.replace_html "#{resource_type}_list_items_container",
                           :partial => "assets/resource_list",
                           :locals => {:collection => resources,

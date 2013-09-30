@@ -142,8 +142,58 @@ module AssetsHelper
   def get_related_resources(resource, limit=nil)
     name = resource.class.name.split("::")[0]
 
+    related = collect_related_items(resource)
+
+    #Authorize
+    authorize_related_items(related)
+
+    order_related_items(related)
+    
+    #Limit items viewable, and put the excess count in extra_count
+    related.each_key do |key|
+      if limit && related[key][:items].size > limit && ["Project", "Investigation", "Study", "Assay", "Person", "Specimen", "Sample"].include?(resource.class.name)
+        related[key][:extra_count] = related[key][:items].size - limit
+        related[key][:items] = related[key][:items][0...limit]
+      end
+    end
+
+    return related
+    end
+
+  def order_related_items(related)
+    related.each do |key, res|
+      res[:items].sort!{|item,item2| item2.updated_at <=> item.updated_at}
+    end
+  end
+
+  def authorize_related_items(related)
+    related.each do |key, res|
+      res[:items].uniq!
+      res[:items].compact!
+      unless res[:items].empty?
+        total_count = res[:items].size
+        if key == 'Project' || key == 'Institution'
+          res[:hidden_count] = 0
+        elsif key == 'Person'
+          if Seek::Config.is_virtualliver && User.current_user.nil?
+            res[:items] = []
+            res[:hidden_count] = total_count
+          else
+            res[:hidden_count] = 0
+          end
+        else
+          total = res[:items]
+          res[:items] = key.constantize.authorize_asset_collection res[:items], 'view', User.current_user
+          res[:hidden_count] = total_count - res[:items].size
+          res[:hidden_items] = total - res[:items]
+        end
+      end
+    end
+  end
+
+  def collect_related_items(resource)
     related = {"Person" => {}, "Project" => {}, "Institution" => {}, "Investigation" => {},
-               "Study" => {}, "Assay" => {}, "Specimen" =>{}, "Sample" => {}, "DataFile" => {}, "Model" => {}, "Sop" => {}, "Publication" => {},"Presentation" => {}, "Event" => {}}
+               "Study" => {}, "Assay" => {}, "Specimen" => {}, "Sample" => {}, "DataFile" => {}, "Model" => {}, "Sop" => {}, "Publication" => {}, "Presentation" => {}, "Event" => {}}
 
     related.each_key do |key|
       related[key][:items] = []
@@ -164,46 +214,13 @@ module AssetsHelper
       elsif resource.respond_to? method_name
         related[type][:items] = resource.send method_name
       elsif resource.respond_to? "related_#{method_name.singularize}"
-         related[type][:items] = [resource.send("related_#{method_name.singularize}")]
+        related[type][:items] = [resource.send("related_#{method_name.singularize}")]
       elsif resource.respond_to? method_name.singularize
         related[type][:items] = [resource.send(method_name.singularize)]
       end
     end
-
-    #Authorize
-    related.each do |key, res|
-      res[:items].uniq!
-      res[:items].compact!
-      unless res[:items].empty?
-        total_count = res[:items].size
-        if key == 'Project' || key == 'Institution'
-          res[:hidden_count] = 0
-        elsif key == 'Person'
-          if Seek::Config.is_virtualliver && User.current_user.nil?
-            res[:items] = []
-            res[:hidden_count] = total_count
-          else
-            res[:hidden_count] = 0
-          end
-        else
-          total = res[:items]
-          res[:items] = key.constantize.authorize_asset_collection res[:items],'view',User.current_user
-          res[:hidden_count] = total_count - res[:items].size
-          res[:hidden_items] = total - res[:items]
-        end
-      end
-    end
-    
-    #Limit items viewable, and put the excess count in extra_count
-    related.each_key do |key|
-      if limit && related[key][:items].size > limit && ["Project", "Investigation", "Study", "Assay", "Person", "Specimen", "Sample"].include?(resource.class.name)
-        related[key][:extra_count] = related[key][:items].size - limit
-        related[key][:items] = related[key][:items][0...limit]
-      end
-    end
-
-    return related
-    end
+    related
+  end
 
   def filter_url(resource_type, context_resource)
     #For example, if context_resource is a project with an id of 1, filter text is "(:filter => {:project => 1}, :page=>'all')"
