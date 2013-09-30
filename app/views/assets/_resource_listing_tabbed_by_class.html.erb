@@ -10,6 +10,7 @@
 <% authorization_already_done ||= false -%>
 <% actions_partial_disable ||= false %>
 <% display_immediately ||= false %>
+<% show_empty_tabs ||= false %>
 
 <% unless authorization_already_done
        resource_hash.each_value do |res|
@@ -42,10 +43,10 @@
 <% total_count = 0 %>
 <% resource_hash.each_key do |k| %>
   <% count = resource_hash[k][:items].size + resource_hash[k][:hidden_count] %>
-  <% resource_hash.delete(k) if count == 0 %>
+  <% resource_hash.delete(k) if (!show_empty_tabs && count == 0) %>
   <% total_count += count %>
 <% end %>
-<% unless total_count == 0-%>
+<% if total_count > 0 || show_empty_tabs -%>
   <div id='<%= "#{tabs_id}_spinner".html_safe -%>'>
     <center>
       <%= image_tag "ajax-loader-large.gif" -%>
@@ -61,6 +62,7 @@
       <% hidden_count = 0 %>
       <% extra_count = 0 %>
       <% is_external = false -%>
+
       <% unless resource_hash[resource_type].nil? %>
         <% if resource_hash.class == Hash %>
           <% hidden_count = resource_hash[resource_type][:hidden_count] %>
@@ -76,7 +78,7 @@
       <% visible_resource_type = resource_tab_item_name(resource_type,!is_external) -%>
       <% tab_title = "#{visible_resource_type} (#{resources.length+extra_count}#{"+"+hidden_count.to_s if hidden_count > 0})" -%>
       <% title_class = is_external ? "external_result" : "" %>
-      <% unless (resources.empty? && hidden_count < 1) %>
+      <% if (!resources.empty? || hidden_count > 0) || show_empty_tabs %>
         <div id="<%= resource_type.downcase.pluralize.html_safe -%>" class="tabbertab">
           <% unless resources.empty? && extra_count < 1 %>
             <h3 class='<%= title_class -%>'><%= tab_title -%></h3>
@@ -86,6 +88,13 @@
                                                                             :actions_partial_disable => actions_partial_disable} -%>
           <% else %>
             <h3><%= "#{visible_resource_type} (0+#{hidden_count})".html_safe -%></h3>
+            <% if hidden_count==0 -%>
+                  <div class="list_items_container">
+                    <div class="hidden_list_item">
+                        <span class="none_text">There are no matching items</span>
+                    </div>
+                  </div>
+            <% end %>
           <% end %>
           <% unless extra_count < 1 %>
             <div class="list_items_container">
