@@ -92,10 +92,11 @@
 #wrapper{
     width: 50em;
     margin: 0 auto;
+    background-color: white;
 }
 
 .scaled_items{
-    padding-top: 450px;
+    padding-top: 1em;
 
 }
 
@@ -116,6 +117,12 @@
     margin-top: 1.5em;
 }
 
+#zoom img{
+    position:absolute;
+    padding-top:8px;
+    height:100%;
+    vertical-align: middle;
+}
 
 ul#scale_list li {
     height: 0.5em;
@@ -132,18 +139,6 @@ ul#scale_list li {
 }
 
 
-
-#zoom img{
-    position:absolute;
-    /*display:none;
-    margin:auto;
-    vertical-align:middle;
-    text-align:center; */
-    padding-top:8px;
-    //margin-left:100px;
-    height:100%;
-    vertical-align: middle;
-}
 
 
 #plus, #minus{
