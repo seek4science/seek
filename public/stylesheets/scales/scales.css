@@ -119,6 +119,9 @@
 }
 
 
+ul#scale_list li {
+    height: 0.5em;
+}
 
 .scale_image{
     display:none;
@@ -130,6 +133,10 @@
     display:none;
 }
 
+#zoom {
+    margin-top: 1.5em;
+}
+
 #zoom img{
     position:absolute;
     /*display:none;
@@ -139,6 +146,7 @@
     padding-top:8px;
     //margin-left:100px;
     height:100%;
+    vertical-align: middle;
 }
 
 
@@ -153,7 +161,7 @@
 }
 
 #plus{
-    margin-top:-30px;
+    margin-top:-20px;
 }
 
 #minus{
