@@ -87,7 +87,7 @@
                                                                             :authorization_for_showing_already_done => true,
                                                                             :actions_partial_disable => actions_partial_disable} -%>
           <% else %>
-            <h3><%= "#{visible_resource_type} (0+#{hidden_count})".html_safe -%></h3>
+            <h3><%= "#{visible_resource_type} (0#{'+'+hidden_count.to_s if hidden_count>0})".html_safe -%></h3>
             <% if hidden_count==0 -%>
                   <div class="list_items_container">
                     <div class="hidden_list_item">
