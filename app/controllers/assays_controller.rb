@@ -97,6 +97,7 @@ class AssaysController < ApplicationController
     @assay.policy.set_attributes_with_sharing params[:sharing], @assay.projects
 
     update_annotations @assay #this saves the assay
+    update_scales @assay
 
 
       if @assay.save
@@ -156,6 +157,7 @@ class AssaysController < ApplicationController
         end
 
     update_annotations @assay
+    update_scales @assay
 
     assay_assets_to_keep = [] #Store all the asset associations that we are keeping in this
     @assay.attributes = params[:assay]

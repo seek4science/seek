@@ -52,6 +52,9 @@
       <b>Experimentalists:</b>
       <%= text_or_not_specified(@study.experimentalists) %>
     </p>
+    <% if show_scales? -%>
+        <%= render :partial=>"scales/asset_scales_list",:object=>@study.scales -%>
+    <% end %>
 
     <%= item_description @study.description -%>
 
