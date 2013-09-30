@@ -179,6 +179,7 @@ class DataFilesController < ApplicationController
 
       if @data_file.save
         update_annotations @data_file
+        update_scales @data_file
 
         create_content_blobs
 
@@ -267,6 +268,7 @@ class DataFilesController < ApplicationController
     publication_params    = params[:related_publication_ids].nil?? [] : params[:related_publication_ids].collect { |i| ["Publication", i.split(",").first]}
 
     update_annotations @data_file
+    update_scales @data_file
 
     assay_ids = params[:assay_ids] || []
     respond_to do |format|

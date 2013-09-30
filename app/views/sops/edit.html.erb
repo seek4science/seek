@@ -22,6 +22,10 @@
         <% if current_user_authorized_to_manage -%>
             <%= render :partial => "projects/project_selector", :locals => { :resource => @sop, :disable_project_select => true } -%>
         <% end -%>
+
+      <% if show_scales? %>
+          <%= render :partial => "scales/scales_selector",:locals=>{:object=>@sop} %>
+      <% end %>
         <%# only the owner should be able to change sharing permissions -%>
         <% if current_user_authorized_to_manage -%>
 		

@@ -23,6 +23,9 @@
         <% if current_user_authorized_to_manage -%>
             <%= render :partial => "projects/project_selector", :locals => { :resource => @presentation} -%>
         <% end -%>
+      <% if show_scales? %>
+          <%= render :partial => "scales/scales_selector",:locals=>{:object=>@presentation} %>
+      <% end %>
         <%# only the owner should be able to change sharing permissions -%>
         <% if current_user_authorized_to_manage -%>
 

@@ -20,9 +20,14 @@
       <%= render :partial => 'assets/fileinfo',:object=>@display_presentation.content_blob -%>
       <br/>
 
+      <% if show_scales? -%>
+          <%= render :partial=>"scales/asset_scales_list",:object=>@presentation.scales -%>
+      <% end %>
+
       <%= render :partial => "assets/special_auth_code_display", :locals => {:resource => @presentation} %>
 
       <%= item_description @display_presentation.description -%>
+
     </div>
   </div>
 

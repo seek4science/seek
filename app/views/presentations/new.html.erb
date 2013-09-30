@@ -19,6 +19,9 @@
             <%= text_area_tag "presentation[description]", presentation_description_value, :style => "width: 100%;", :rows => 10 -%>
         </p>
         <%= render :partial => "projects/project_selector", :locals => { :resource => @presentation} -%>
+      <% if show_scales? %>
+          <%= render :partial => "scales/scales_selector",:locals=>{:object=>@presentation} %>
+      <% end %>
 
 		<%= fields_for(@presentation) {|f| render :partial=>"assets/asset_form_bottom", :locals=> {:f => f}} -%>
         <p>
