@@ -11,4 +11,12 @@ module ScalesHelper
     links.html_safe
 
   end
+
+  def scales_list_for_list_item scales
+    if show_scales?
+      render :partial=>"scales/asset_scales_list",:object=>scales, :locals=>{:list_item=>true}
+    else
+      ""
+    end
+  end
 end

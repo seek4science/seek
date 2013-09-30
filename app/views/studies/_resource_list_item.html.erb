@@ -3,12 +3,14 @@
 <div class="list_item_left_column">
   <%= list_item_attribute "ID", resource.id %>
   <%= list_item_attribute t('investigation'), h(resource.investigation.title), resource.investigation %>
+  <%= list_item_authorized_attribute "Person responsible", resource.person_responsible %>
 </div>
 
 
 <div class="list_item_right_column">
   <%= render :partial => 'projects/show_project_relationship', :locals => {:resource => resource, :list_item => true}%>
-  <%= list_item_authorized_attribute "Person responsible", resource.person_responsible %>
+  <%= scales_list_for_list_item resource.scales -%>
+
 </div>
 
 <div class="list_item_whole_width">

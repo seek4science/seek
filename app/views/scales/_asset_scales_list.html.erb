@@ -1,4 +1,9 @@
-<p>
-  <b>Scales:</b>
-  <%= scales_list asset_scales_list -%>
+<% list_item ||=false -%>
+<% if list_item -%>
+    <p class="list_item_attribute">
+<% else %>
+    <p>
+<% end %>
+<b>Scales:</b>
+<%= scales_list asset_scales_list -%>
 </p>
