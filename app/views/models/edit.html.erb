@@ -18,18 +18,13 @@
             <%= f.text_area :description, :style => "width: 100%;", :rows => 10 -%>
         </p>
         <p>
-            <div class="fold">
-                <div class="foldTitle">
-                    Other information 
-                </div>
-                <div class="foldContent">
-                    <%# only the owner should get to see this option (ability to reload defaults remain in 'edit' action, but project selector is disabled) -%>
-                    <% if current_user_authorized_to_manage -%>
-                      <%= render :partial => "projects/project_selector", :locals => { :resource => @model, :disable_project_select => true } -%>
-                    <% end -%>
-                    <%= render :partial=>"model_metadata" -%>
-                </div>
-            </div>
+
+            <%# only the owner should get to see this option (ability to reload defaults remain in 'edit' action, but project selector is disabled) -%>
+            <% if current_user_authorized_to_manage -%>
+              <%= render :partial => "projects/project_selector", :locals => { :resource => @model, :disable_project_select => true } -%>
+            <% end -%>
+            <%= render :partial=>"model_metadata" -%>
+
         </p>
         <p>
             <%= render :partial => "organisms/select_organism",:locals=>{:model_class=>Model} -%>

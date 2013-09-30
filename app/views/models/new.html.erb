@@ -20,18 +20,13 @@
             <%= text_area_tag 'model[description]', model_description_value, :style => "width: 100%;", :rows => 10 -%>
         </p>
 
-      <p>
-            <div class="fold">
-                <div class="foldTitle">
-                    Other information 
-                </div>
-                <div class="foldContent">
+        <p>
+
+
                   <%= render :partial => "projects/project_selector", :locals => { :resource => @model } -%>
                     <%= render :partial=>"model_metadata" -%>
-                </div>
-            </div>
-        </p>
 
+        </p>
 
         <%= render :partial => "organisms/select_organism",:locals=>{:model_class=>Model} -%>
         <% if show_scales? %>
