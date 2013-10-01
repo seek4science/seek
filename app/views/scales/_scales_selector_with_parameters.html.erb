@@ -1,0 +1,70 @@
+
+<%
+   name = "scale_ids"
+   possibilities ||= Scale.all
+   selected ||= object.scales.map(&:id)
+   intro ||= "The following Scales are associated with this Model:"
+   default_choice_text ||= "Select Item ..."
+   button_text ||= "Associate"
+   value_method ||= :id
+   text_method ||= :title
+   html_options ||= ''
+   association_step_content ||= nil
+
+
+   default_choice = [default_choice_text, 0]
+   collection_id = name.to_s.gsub(']','').gsub(/[^-a-zA-Z0-9:.]/, "_")
+   possibilities_collection_id = "possible_#{collection_id}"
+   possibilities_options ||= {}
+
+   fold_title = help_icon("Here you can associate the #{t('model')} with specific #{t('scale').pluralize}")
+   fold_title << " #{t('scale').pluralize}"
+%>
+
+<%= require_js "fancy_multiselect.js"  %>
+
+<div id="add_scales_form" class="fold">
+
+  <div class="foldTitle">
+    <%= fold_title %>
+  </div>
+
+  <div id="add_scales_form_fold_content" class="foldContent">
+
+    <div class="yui-u first" <%= html_options %>>
+      <p style="color: #666666;">
+        <%= intro %>
+      </p>
+
+      <div id="<%= collection_id %>_display_area" class="box_editing_inner" style="line-height: 1.5;">
+        <span class="none_text">Loading...</span>
+      </div>
+      <div class="association_step">
+
+        <%= select_tag possibilities_collection_id,
+                       options_for_select([default_choice]|possibilities.collect { |o| [truncate(h(o.send(text_method)), :length => 120), o.send(value_method)] }),
+                       possibilities_options -%>
+        <%# This ensures that the parameter is always sent, even when nothing is selected.
+        It adds a "" as the first item in the array. So if items 1,2, and 3 are selected the
+        value of the parameter will be ["","1","2","3"]. This is compatible with the rails
+        association association_ids= methods, which reject 'blank' values automatically.%>
+        <%= hidden_field_tag "#{name}[]", "" %>
+
+        <%= select_tag name,
+                       options_from_collection_for_select(possibilities, value_method, text_method, selected),
+                       {:multiple => true, :style => "display:none;"} -%>
+        <%= association_step_content -%>
+      </div>
+
+      <br/>
+      <%= link_to_function(image('new') + "#{button_text}", "addSelectedToFancy('#{collection_id}', $F('#{possibilities_collection_id}'))", :id => "add_to_#{collection_id}_link", :class => "block_link") %>
+
+
+    </div>
+  </div>
+</div>
+<script type="text/javascript">
+    Event.observe(window, 'load', function () {
+        updateFancyMultiselect('<%= collection_id %>');
+    });
+</script>
