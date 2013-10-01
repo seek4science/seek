@@ -91,15 +91,27 @@
                  unit: $('choose_unit_for_scale_id').value
 
         }
-
-        if (!$F(multiselect).include(value.scale_id)) {
-
+        if (!scale_and_params_selected(value)) {
             $(multiselect).setValue($F(multiselect).concat(value.scale_id));
             updateScaleAndParamsList(value);
             updateFancyMultiselect2(multiselect);
         } else {
             alert('Item already exists!');
         }
+    }
+
+    function scale_and_params_selected(json) {
+        var found=false;
+        $('scale_ids_and_params').select("option:selected").each(function(opt){
+            var json2=JSON.parse(opt.value);
+            console.log(json);
+            console.log(json2);
+            if (!found) {
+                found = (json.scale_id == json2.scale_id && json.param==json2.param);
+            }
+        });
+        return found;
+
     }
 
     function updateScaleAndParamsList(value) {
@@ -128,49 +140,60 @@
     }
 
     function insertFancyListItem2(multiselect, displaylist, option) {
-        var json = fetchJsonForScale(option.value);
-        var text = option.text;
-        text += " (param:"+json.param+", unit:"+json.unit+")";
-        var title_span = '<span title="' + text.escapeHTML() + '">' + text.truncate(100).escapeHTML() + '</span>';
-        var remove_link = '<a href="" onclick="javascript:removeFromFancy2(';
-        remove_link += "'" + $(multiselect).id + "','";
-        remove_link += option.value + "'";
-        remove_link += '); return(false);">remove</a>';
-        displaylist.insert('<li>' + title_span +'&nbsp;&nbsp;<small style="vertical-align: middle;">[' + remove_link + ']</small></li>');
+        var json_list = fetchJsonForScale(option.value);
+        for (i=0; i<json_list.length;i++) {
+            json = json_list[i];
+            var text = option.text;
+            text += " (param:"+json.param+", unit:"+json.unit+")";
+            var title_span = '<span title="' + text.escapeHTML() + '">' + text.truncate(100).escapeHTML() + '</span>';
+            var remove_link = '<a href="" onclick="javascript:removeFromFancy2(';
+            remove_link += "'" + $(multiselect).id + "','";
+            remove_link += option.value + "','"+json.param+"'";
+            remove_link += '); return(false);">remove</a>';
+            displaylist.insert('<li>' + title_span +'&nbsp;&nbsp;<small style="vertical-align: middle;">[' + remove_link + ']</small></li>');
+        }
+
     }
 
     function fetchJsonForScale(scale_id) {
 
-        var result;
+        var result=new Array();
         var options = $('scale_ids_and_params').childElements().select(function(c){return c.selected});
         options.each(function(opt) {
-            if (!result) {
+
                 var json = JSON.parse(opt.value);
                 if (json.scale_id == scale_id.toString()) {
-                    result=json;
+                    result.push(json);
                 }
-            }
+
         });
         return result;
     }
 
-    function removeFromFancy2(multiselect, value) {
-        $(multiselect).setValue($F(multiselect).without(value));
-        updateFancyMultiselect2(multiselect);
-        var json = fetchJsonForScale(value);
+    function removeFromFancy2(multiselect, value,param) {
+
+        console.log(value);
+        console.log(param);
         $('scale_ids_and_params').select("option:selected").each(function(opt){
             var item=JSON.parse(opt.value)
-            if (item.scale_id == json.scale_id) {
+
+            if (item.scale_id == value && item.param==param) {
+                console.log(opt.value);
                 opt.remove();
             }
         });
+        var json_list = fetchJsonForScale(value);
+        if (json_list.length==0) {
+            $(multiselect).setValue($F(multiselect).without(value));
+        }
+        updateFancyMultiselect2(multiselect);
 
     }
 
     <% object.scales.each do |scale| -%>
     <%
-       info = object.fetch_additional_scale_info(scale.id)
-       unless info.nil?
+       info_list = object.fetch_additional_scale_info(scale.id)
+       info_list.each do |info|
     -%>
 
             updateScaleAndParamsList(<%= info.to_json.html_safe -%>);

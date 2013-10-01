@@ -75,7 +75,7 @@ module Seek
           json["scale_id"]==scale_id.to_s
         end.collect do |an|
           JSON.parse(an.value.text)
-        end.first
+        end
       end
 
       def remove_additional_scale_info scale_id
