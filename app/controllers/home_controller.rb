@@ -6,7 +6,7 @@ class HomeController < ApplicationController
 
   def index
     @scale = Scale.find_by_title(params[:scale_type])
-    @scale ||= Scale.find_by_title('organism') #temporary to avoid expense of dealing with every object
+    #@scale ||= Scale.find_by_title('organism') #temporary to avoid expense of dealing with every object
     #@scale = nil if params[:scale_type] == 'all'
     @scaled_objects = @scale ? @scale.scalings.collect(&:scalable).compact.uniq : everything
 

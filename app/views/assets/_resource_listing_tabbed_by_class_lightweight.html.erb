@@ -61,6 +61,8 @@
         tabs_on_click('<%= key %>', '<%= resource_hash[key].collect(&:id).join(',') %>', '<%= scale_title %>');
     <% end %>
 
+    document.getElementsByClassName('<%= scale_title %>' + '_' + '<%= sorted_result_keys.first %>')[0].click();
+
 </script>
 
 

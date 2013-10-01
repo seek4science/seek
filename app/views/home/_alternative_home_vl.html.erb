@@ -1,9 +1,9 @@
 <script type="text/javascript">
   var loaded_scales = new Array();
-  loaded_scales['organism'] = true;
-  loaded_scales['all'] = false;
+  //loaded_scales['organism'] = false;
+  loaded_scales['all'] = true;
 </script>
-<%= render :partial => 'scales/scale_slider', :locals => {:current_scale => 'organism',:scale_slider_function => (remote_function(
+<%= render :partial => 'scales/scale_slider', :locals => {:current_scale => 'all',:scale_slider_function => (remote_function(
         :url=>{:action=>'scale_search', :controller=>'scales'},
         :with=>"'scale_type='+this.id",
         :before=>"show_ajax_loader(this.id+'_results')",
@@ -45,7 +45,7 @@
 </script>
 
 <div id="scaled_items">
-    <div id="organism_results" class="scaled_items">
+    <div id="all_results" class="scaled_items">
       <% resource_hash = classify_for_tabs_light_weight @scaled_objects -%>
       <%= render :partial => "assets/resource_listing_tabbed_by_class_lightweight",
                    :locals => {:resource_hash => resource_hash,
@@ -56,7 +56,7 @@
     </div>
     <% scale_titles = Scale.all.map(&:title)
        scale_titles = ['all'] + scale_titles
-       scale_titles.reject{|s| s == 'organism'}.each do |s|%>
+       scale_titles.reject{|s| s == 'all'}.each do |s|%>
     <div id="<%= s %>_results" class="scaled_items" style="display: none;"></div>
     <% end %>
 </div>
