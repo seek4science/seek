@@ -28,6 +28,13 @@ class ScalesController < ApplicationController
     @scaled_objects = @scale ? @scale.scalings.collect(&:scalable).compact.uniq : everything
 
     resource_hash={}
+
+    grouped_result = @scaled_objects.group_by{|res| res.class.name}
+    grouped_result.each do |key,value|
+      resource_hash[key] = value
+    end
+
+=begin
     @scaled_objects.each do |res|
       resource_hash[res.class.name] = {:items => [], :hidden_count => 0} unless resource_hash[res.class.name]
       resource_hash[res.class.name][:items] << res
@@ -41,15 +48,17 @@ class ScalesController < ApplicationController
         res[:hidden_count] = total_count - res[:items].size
       end
     end
+=end
 
     render :update do |page|
       scale_title = @scale.try(:title) || 'all'
-      page.replace_html "#{scale_title}_results", :partial=>"assets/resource_listing_tabbed_by_class", :locals =>{:resource_hash=>resource_hash, 
-                                                                                                                  :narrow_view => true, :authorization_already_done => true, 
-                                                                                                                  :limit => 20,
+      page.replace_html "#{scale_title}_results", :partial=>"assets/resource_listing_tabbed_by_class_lightweight", :locals =>{:resource_hash=>resource_hash,
+                                                                                                                  :narrow_view => true,
+                                                                                                                  :authorization_already_done => false,
+                                                                                                                  :limit => 5,
                                                                                                                   :tabs_id => "#{scale_title}_resource_listing_tabbed_by_class",
                                                                                                                   :actions_partial_disable => true}
-      page.replace_html "js_for_tabber", :partial => "assets/force_loading_tabber"
+      #page.replace_html "js_for_tabber", :partial => "assets/force_loading_tabber"
     end
 
    end

@@ -1,0 +1,52 @@
+<%
+
+   if resources.first.respond_to?(:authorized_partial_asset_collection)
+     authorized_resources = clazz.authorized_partial_asset_collection(resources,"view")
+   else
+     authorized_resources = resources.select &:can_view?
+   end
+   limit ||= 5
+   hidden_items = resources - authorized_resources
+   extra_count = resources.count - hidden_items.count - limit
+%>
+
+<div id="<%= scale %>_list_items_container">
+<%= render :partial => "assets/resource_list",
+            :locals => {:collection => authorized_resources.take(limit),
+            :narrow_view => true,
+            :authorization_for_showing_already_done => true,
+            :actions_partial_disable=>true} %>
+
+<% unless extra_count < 1 %>
+    <div class="list_items_container">
+      <div class="hidden_list_item" id ="view_list_items" style="color:#000">
+        <% if authorized_resources %>
+            <%resource_type = resources.first.class.name%>
+            <%= link_to_remote "View all "+(authorized_resources.size).to_s+" items", :html => {:id => "view_#{resource_type}s_and_extra", :style => "display:block"},
+                               :url => url_for(:action => 'view_items_in_tab'),
+                               :with => "'resource_type=' + '#{resources.first.class.name}' + '&resource_ids=' + '#{authorized_resources.collect(&:id).join(',')}'",
+                               :before => "show_large_ajax_loader('#{resource_type}_list_items_container')"
+            -%>
+            <%= link_to_remote "View " + limit.to_s + " items", :html => {:id => "view_#{resource_type}s", :style => "display:none"},
+                               :url => url_for(:action => 'view_items_in_tab'),
+                               :with => "'resource_type=' + '#{resources.first.class.name}' + '&resource_ids=' + '#{authorized_resources.take(limit).collect(&:id).join(',')}'",
+                               :before => "show_large_ajax_loader('#{resource_type}_list_items_container')"
+            -%>
+        <% else
+             link_to "View all items", eval("#{resources.first.class.name.pluralize.underscore}_path")
+           end
+        -%>
+      </div>
+      <br style="clear:both"/>
+    </div>
+<% end %>
+<% unless hidden_items.count < 1 %>
+    <div class="list_items_container">
+      <div class="hidden_list_item">
+        <%= render :partial => "assets/hidden_items", :object => hidden_items -%>
+      </div>
+      <br style="clear:both"/>
+    </div>
+<% end %>
+
+</div>

@@ -15,24 +15,44 @@
 <!--Inserting the javascripts for loading tabber dynamically-->
 <div id="js_for_tabber"></div>
 
+<%= javascript_include_tag "tabber-minimized.js" %>
+<script type="text/javascript">
+    function load_tabs() {
+        var tabberOptions = {'onLoad':function() {
+            displayTabs();
+        }};
+        tabberAutomatic(tabberOptions);
+    }
+
+    function tabs_on_click(resource_type, resource_ids, scale){
+        document.getElementsByClassName(scale + '_' + resource_type)[0].onclick = function(){
+                request = new Ajax.Request('<%= url_for(:controller => 'application', :action => 'view_items_in_tab1') %>',
+                        {
+                            method: 'get',
+                            parameters: {
+                                resource_type: resource_type,
+                                resource_ids: resource_ids,
+                                scale: scale
+                            },
+                            onLoading: show_large_ajax_loader(scale + '_list_items_container'),
+                            onFailure: function(transport){
+                                alert('Something went wrong, please try again...');
+                            }
+                        });
+            }
+
+    }
+</script>
+
 <div id="scaled_items">
     <div id="organism_results" class="scaled_items">
-      <% resource_hash = classify_for_tabs @scaled_objects
-         resource_hash.each do |key,res|
-           res[:items].compact!           
-           unless res[:items].empty?
-             total_count = res[:items].size
-             res[:items] = key.constantize.authorized_partial_asset_collection res[:items], "view", User.current_user
-             res[:hidden_count] = total_count - res[:items].size
-           end
-         end
-      -%>
-      <%= render :partial => "assets/resource_listing_tabbed_by_class",
+      <% resource_hash = classify_for_tabs_light_weight @scaled_objects -%>
+      <%= render :partial => "assets/resource_listing_tabbed_by_class_lightweight",
                    :locals => {:resource_hash => resource_hash,
                                :narrow_view => true,
-                               :authorization_already_done => true, 
-			       :limit => 20,
-			       :actions_partial_disable => true} -%>
+                               :authorization_already_done => true,
+			                   :limit => 5,
+			                   :actions_partial_disable => true} -%>
     </div>
     <% scale_titles = Scale.all.map(&:title)
        scale_titles = ['all'] + scale_titles
@@ -40,6 +60,7 @@
     <div id="<%= s %>_results" class="scaled_items" style="display: none;"></div>
     <% end %>
 </div>
+
 
 
 

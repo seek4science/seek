@@ -129,6 +129,17 @@ module ApplicationHelper
     return results
   end
 
+  def classify_for_tabs_light_weight result_collection
+    results={}
+
+    grouped_result = result_collection.group_by{|res| res.class.name}
+    grouped_result.each do |key,value|
+      results[key] = value
+    end
+    return results
+  end
+
+
   def new_creatable_javascript
     script="<script type='text/javascript'>\n"
     script << "function newAsset() {\n"

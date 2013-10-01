@@ -173,6 +173,21 @@ class ApplicationController < ActionController::Base
     end
   end
 
+  def view_items_in_tab1
+    resource_type = params[:resource_type]
+    resource_ids = (params[:resource_ids] || []).split(',')
+    scale = params[:scale]
+    render :update do |page|
+      if !resource_type.blank?
+        clazz = resource_type.constantize
+        resources = clazz.find_all_by_id(resource_ids)
+        page.replace_html "#{scale}_list_items_container",
+                          :partial => "assets/tab_related_items",
+                          :locals => {:resources => resources, :scale => scale}
+      end
+    end
+  end
+
   private
 
   def project_membership_required
