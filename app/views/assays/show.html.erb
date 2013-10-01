@@ -72,7 +72,7 @@
           <%= list_organisms_and_strains( @assay.assay_organisms.collect{|ao| [ao.organism,ao.strain]} | @assay.samples.collect{|s| [s.specimen.organism,s.specimen.strain]}) -%>
       </p>
      <% if show_scales? -%>
-         <%= render :partial=>"scales/asset_scales_list",:object=>@assay.scales -%>
+         <%= render :partial=>"scales/asset_scales_list",:object=>@assay -%>
      <% end %>
 
      <%= item_description @assay.description -%>

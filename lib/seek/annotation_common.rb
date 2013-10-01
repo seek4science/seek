@@ -43,6 +43,17 @@ module Seek
       scale_ids = params[:scale_ids]
       return if entity.new_record? && !entity.save
       entity.scales=scale_ids
+      unless (params[:scale_ids_and_params].nil?)
+        update_scales_with_params entity
+      end
+    end
+
+    def update_scales_with_params entity
+
+      params[:scale_ids_and_params].each do |json|
+        json = JSON.parse(json)
+        entity.attach_additional_scale_info json["scale_id"], :param=>json["param"],:unit=>json["unit"]
+      end
     end
 
     #Updates all annotations as the owner of the entity, using the parameters passed through the web interface Any tags that do not match those passed in are removed as a tagging for this item.

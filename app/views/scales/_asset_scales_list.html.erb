@@ -1,9 +1,12 @@
-<% list_item ||=false -%>
+<%
+   list_item ||=false
+   entity = asset_scales_list
+-%>
 <% if list_item -%>
     <p class="list_item_attribute">
 <% else %>
     <p>
 <% end %>
 <b>Scales:</b>
-<%= scales_list asset_scales_list -%>
+<%= scales_list entity -%>
 </p>

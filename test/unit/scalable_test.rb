@@ -63,4 +63,17 @@ class ScalableTest < ActiveSupport::TestCase
     assert_equal [@small_scale,@medium_scale,@large_scale],scales
   end
 
+  test "attaching and fetching additional info" do
+    @model.scales = [@small_scale]
+    @model.attach_additional_scale_info @small_scale.id,:param=>"fish",:unit=>"meter"
+    info = @model.fetch_additional_scale_info(@small_scale.id)
+    assert_equal "fish",info["param"]
+    assert_equal "meter",info["unit"]
+    assert_equal @small_scale.id.to_s,info["scale_id"]
+    assert_nil @model.fetch_additional_scale_info(@large_scale.id)
+
+    @model.scales = []
+    assert_nil @model.fetch_additional_scale_info(@small_scale.id)
+  end
+
 end

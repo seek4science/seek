@@ -285,6 +285,28 @@ class ModelsControllerTest < ActionController::TestCase
     assert_equal [scale3],m.scales
   end
 
+  test "association of scales with params" do
+    scale1=Factory :scale
+    scale2=Factory :scale, :pos=>2
+    model_params = valid_model
+    scale_ids_and_params=["{\"scale_id\":\"#{scale1.id}\",\"param\":\"fish\",\"unit\":\"meter\"}","{\"scale_id\":\"#{scale2.id}\",\"param\":\"carrot\",\"unit\":\"cm\"}"]
+
+    assert_difference("Model.count") do
+      post :create,:model => model_params,:scale_ids=>[scale1.id.to_s,scale2.id.to_s],:scale_ids_and_params=>scale_ids_and_params,:content_blob=>{:file_0=>fixture_file_upload('files/little_file.txt',Mime::TEXT)}
+    end
+    m = assigns(:model)
+    assert_not_nil m
+    assert_equal [scale1,scale2],m.scales
+
+    info = m.fetch_additional_scale_info(scale1.id)
+    assert_equal "fish",info["param"]
+    assert_equal "meter",info["unit"]
+
+    info = m.fetch_additional_scale_info(scale2.id)
+    assert_equal "carrot",info["param"]
+    assert_equal "cm",info["unit"]
+  end
+
   test "should create model" do
     login_as(:model_owner)
     assay = assays(:modelling_assay)

@@ -47,7 +47,7 @@
       </p>
 
       <% if show_scales? -%>
-          <%= render :partial=>"scales/asset_scales_list",:object=>@publication.scales -%>
+          <%= render :partial=>"scales/asset_scales_list",:object=>@publication -%>
       <% end %>
 
       <%=  item_description @publication.abstract,:label=>"Abstract",:none_text=>"No abstract specified" %>

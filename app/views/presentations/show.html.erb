@@ -21,7 +21,7 @@
       <br/>
 
       <% if show_scales? -%>
-          <%= render :partial=>"scales/asset_scales_list",:object=>@presentation.scales -%>
+          <%= render :partial=>"scales/asset_scales_list",:object=>@presentation -%>
       <% end %>
 
       <%= render :partial => "assets/special_auth_code_display", :locals => {:resource => @presentation} %>
