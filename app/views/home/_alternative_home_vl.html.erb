@@ -27,7 +27,7 @@
     function tabs_on_click(scale_title, resource_type){
         var click_tab = document.getElementsByClassName(scale_title + '_' + resource_type)[0];
         click_tab.onclick = function(){
-            deactivate_previous_tab();
+            deactivate_previous_tab(scale_title);
             click_tab.parentElement.className = 'tabberactive';
 
             //if the content of the click_tab is already loaded, just show it, otherwise call ajax to get the content
@@ -59,9 +59,10 @@
 
     }
 
-    function deactivate_previous_tab(){
+    function deactivate_previous_tab(scale_title){
         //First change the color of the previous chosen tab
-        var previous_active_tab = document.getElementsByClassName('tabberactive')[0];
+        var scale_result = $(scale_title + '_results');
+        var previous_active_tab = scale_result.getElementsByClassName('tabberactive')[0];
         previous_active_tab.className = '';
         //Then hide the content of the tab
         var scale_and_type = previous_active_tab.childNodes[0].className;
@@ -78,6 +79,18 @@
             tab_content_view_all.hide();
         }
     }
+
+    function check_tab_content(show_tab_content_id, hide_tab_content_id){
+        var tab_content = $(show_tab_content_id);
+        if (tab_content.childNodes.length > 0){
+            tab_content.show();
+            $(hide_tab_content_id).hide();
+            return false;
+        }else{
+            return true;
+        }
+    }
+
 </script>
 
 <div id="scaled_items">
