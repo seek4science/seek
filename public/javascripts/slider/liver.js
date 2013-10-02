@@ -47,6 +47,7 @@ jQuery(document).ready(function($) {
             if (val > previousValue) {
                 imageSwapIn(curImage, imgarray[val]);
                 curImage = imgarray[val];
+                previousValue=val;
 
             }
 
