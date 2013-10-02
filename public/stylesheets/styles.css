@@ -1752,4 +1752,8 @@ ul.usage_times_list {
     color: #666666;
 }
 
+ul.model_scales_list {
+    margin-left:1em;
+}
+
 

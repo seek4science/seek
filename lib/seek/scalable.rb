@@ -11,8 +11,6 @@ module Seek
         include Seek::Scalable::InstanceMethods
         include Seek::Scalable::WithParamsInstanceMethods
       end
-
-
     end
 
     module InstanceMethods
