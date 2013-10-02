@@ -31,7 +31,7 @@ module ScalesHelper
           link = link_to(scale.title, scale)
           param = content_tag(:em, info["param"])
           unit = content_tag(:em, info["unit"])
-          "#{link}(param:#{param} unit:#{unit})"
+          "#{link} (param:#{param} unit:#{unit})"
           end
         end.flatten
         links = join_with_and(links)
