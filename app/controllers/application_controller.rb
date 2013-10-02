@@ -116,6 +116,7 @@ class ApplicationController < ActionController::Base
   def view_items_in_tab
     resource_type = params[:resource_type]
     resource_ids = (params[:resource_ids] || []).split(',')
+    view_type = params[:view_type] || 'view_some'
     render :update do |page|
       if !resource_type.blank?
         clazz = resource_type.constantize
@@ -126,7 +127,7 @@ class ApplicationController < ActionController::Base
           resources = resources.select &:can_view?
         end
 
-        page.replace_html "#{resource_type}_list_items_container",
+        page.replace_html "#{resource_type}_#{view_type}",
                           :partial => "assets/resource_list",
                           :locals => {:collection => resources,
                           :narrow_view => true,
