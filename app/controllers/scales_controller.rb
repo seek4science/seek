@@ -4,7 +4,7 @@ class ScalesController < ApplicationController
     type = params[:scale_type]
     scale = Scale.find_by_key(type)
 
-    assets = scale ? Scale.with_scale(scale) : everything
+    assets = scale ? Scale.with_scale(scale) : everything_with_scale
 
     resource_hash={}
     assets.each do |res|
@@ -41,10 +41,10 @@ class ScalesController < ApplicationController
 
   private
 
-  def everything
-    Seek::Util.scalable_types.inject([]) do |items, klass|
-      items + klass.all
-    end
+  def everything_with_scale
+    Scale.all.collect do |scale|
+      scale.assets
+    end.flatten.uniq
   end
 
 end

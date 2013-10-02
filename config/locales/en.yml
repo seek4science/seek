@@ -37,6 +37,7 @@ en:
   #Project
   project: "Project"
 
+  scale: "Scale"
 
   menu:
     yellow_pages: "Yellow pages"
