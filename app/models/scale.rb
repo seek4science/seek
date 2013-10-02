@@ -23,6 +23,10 @@ class Scale < ActiveRecord::Base
     "scales/#{image_name}"
   end
 
+  def text
+    title
+  end
+
   private
 
   def remove_annotations
