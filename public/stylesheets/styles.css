@@ -648,6 +648,8 @@ p#assay_types label {
     padding-top: 0.5em;
     padding-bottom: 0.5em;
     margin: 0em 2.5em 0em 2.5em;
+    border-radius: 5px;
+    -moz-border-radius: 5px;
 }
 
 div#more_info {
