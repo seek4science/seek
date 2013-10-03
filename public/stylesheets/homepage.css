@@ -7,6 +7,8 @@ div.top_home_panel {
     margin-bottom: 1em;
     min-height: 6em;
     padding-left: 0.25em;
+    border-radius: 5px;
+    -moz-border-radius: 5px;
 }
 
 div.home_panel {
@@ -14,10 +16,8 @@ div.home_panel {
     background-color: #EEE;
     height: 26em;
     float: left;
-    border-top-right-radius: 6px;
-    border-top-left-radius: 6px;
-    -moz-border-radius-topleft: 6px;
-    -moz-border-radius-topright: 6px;
+    border-radius: 5px;
+    -moz-border-radius: 5px;
 }
 
 div.home_panel_pair {
