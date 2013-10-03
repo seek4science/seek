@@ -13,5 +13,15 @@ mail:
 headline:
     title: a headline announcement
     is_headline: true
+    show_in_feed: false
     announcer: pal (Person)
     body: this is a headline announcement
+
+headline_and_feed:
+    title: a headline announcement also in feed
+    is_headline: true
+    show_in_feed: true
+    announcer: pal (Person)
+    body: this is a headline announcement also in feed
+
+
