@@ -7,8 +7,6 @@ div.top_home_panel {
     margin-bottom: 1em;
     min-height: 6em;
     padding-left: 0.25em;
-    border-radius: 5px;
-    -moz-border-radius: 5px;
 }
 
 div.home_panel {
@@ -16,8 +14,6 @@ div.home_panel {
     background-color: #EEE;
     height: 26em;
     float: left;
-    border-radius: 5px;
-    -moz-border-radius: 5px;
 }
 
 div.home_panel_pair {
@@ -53,10 +49,6 @@ div.home_panel .heading {
     text-align: center;
     padding-top: 0.4em;
     padding-bottom: 0.25em;
-    border-top-right-radius: 5px;
-    border-top-left-radius: 5px;
-    -moz-border-radius-topleft: 5px;
-    -moz-border-radius-topright: 5px;
 }
 
 .atom {

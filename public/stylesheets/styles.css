@@ -1754,4 +1754,36 @@ ul.usage_times_list {
     color: #666666;
 }
 
+.with_shadow {
+    border: 1px black solid;
+    box-shadow: -4px -4px 6px #ddd;
+    -moz-box-shadow: -4px -4px 6px #ddd;
+}
+
+.with_smaller_shadow {
+    border: 1px black solid;
+    box-shadow: -2px -2px 5px #ddd;
+    -moz-box-shadow: -4px -4px 5px #ddd;
+}
+
+.curved_top {
+    border-top-right-radius: 6px;
+    border-top-left-radius: 6px;
+    -moz-border-radius-topleft: 6px;
+    -moz-border-radius-topright: 6px;
+}
+
+.curved_bottom {
+    border-bottom-right-radius: 6px;
+    border-bottom-left-radius: 6px;
+    -moz-border-radius-topleft: 6px;
+    -moz-border-radius-topright: 6px;
+}
+
+.curved {
+    border-radius: 6px;
+    -moz-border-radius: 6px;
+}
+
+
 

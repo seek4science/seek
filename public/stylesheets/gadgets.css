@@ -2,7 +2,9 @@
 
 .sysmo_gadget {
 	margin-bottom: 0.5em;
-	text-align: center;        
+	text-align: center;
+
+
 }
 
 .sysmo_gadget p {
@@ -45,7 +47,7 @@
         padding-left: 0.2em;
         padding-right: 0.2em;
 	text-align: center;
-	vertical-align: middle;        
+	vertical-align: middle;
 }
 
 .sysmo_gadget .header p {
@@ -70,6 +72,7 @@
 	margin-top: 0;
 	text-align: center;
   background-color: #FFFFFF;
+
 }
 
 .sysmo_gadget .contents p {
