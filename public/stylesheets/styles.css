@@ -1755,13 +1755,13 @@ ul.usage_times_list {
 }
 
 .with_shadow {
-    border: 1px black solid;
+    border: 1px #aaa solid;
     box-shadow: -4px -4px 6px #ddd;
     -moz-box-shadow: -4px -4px 6px #ddd;
 }
 
 .with_smaller_shadow {
-    border: 1px black solid;
+    border: 1px #aaa solid;
     box-shadow: -2px -2px 5px #ddd;
     -moz-box-shadow: -4px -4px 5px #ddd;
 }
