@@ -85,8 +85,11 @@ module MenuHelper
 
       path = section[:path] || eval("#{c}_path")
       options = section[:options] || {}
+      options[:class]="curved"
       link = link_to title, path,options
-      attributes = "class='selected_menu'" if section == selected_section
+      classes="curved"
+      classes << " selected_menu" if section == selected_section
+      attributes = "class='#{classes}'"
 
       "<li #{attributes}>#{link}</li>"
     end.join("").html_safe
