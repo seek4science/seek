@@ -1,5 +1,6 @@
 body {
-	font: 14px/1.22 "Lucida Grande", "Lucida Sans", Verdana, Helvetica, Arial, sans-serif;
+	font-family: arial,sans-serif;
+    font-size: 14px;
 	line-height: 1.0;
     border-left: #8e8e8e solid 10px;
     border-right: #8e8e8e solid 10px;
