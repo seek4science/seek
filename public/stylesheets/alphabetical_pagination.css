@@ -25,8 +25,8 @@
 }
 
 .alphabetcal_pagination .current_page {
-  background-color:#ABDBFA;
-  border:1px solid #456AAA;
+  background-color:#f0f4ff;
+  border:1px solid #aaa;
 }
 
 .alphabetcal_pagination .disabled_page {	
