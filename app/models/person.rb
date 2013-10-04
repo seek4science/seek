@@ -32,7 +32,7 @@ class Person < ActiveRecord::Base
   has_many :favourite_groups, :through => :favourite_group_memberships
 
   has_many :work_groups, :through=>:group_memberships, :before_add => proc {|person, wg| person.project_subscriptions.build :project => wg.project unless person.project_subscriptions.detect {|ps| ps.project == wg.project}},
-  :before_remove => proc {|person, wg| person.project_subscriptions.delete(person.project_subscriptions.detect {|ps| ps.project == wg.project})}
+  :before_remove => proc {|person, wg| person.project_subscriptions.delete(person.project_subscriptions.detect {|ps| ps.project == wg.project} || [])}
   has_many :studies_for_person, :as=>:contributor, :class_name=>"Study"
   has_many :assays,:foreign_key => :owner_id
   has_many :investigations_for_person,:as=>:contributor, :class_name=>"Investigation"
