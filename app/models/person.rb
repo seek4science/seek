@@ -446,7 +446,8 @@ class Person < ActiveRecord::Base
   
   def cache_key
     key = super
-    key << self.group_memberships.order(:updated_at).last.cache_key unless self.group_memberships.empty?
+    key << self.projects.collect(&:title).join(',')
+    key << self.institutions.collect(&:title).join(',')
     key
   end
 
