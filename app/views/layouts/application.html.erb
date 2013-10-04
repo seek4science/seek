@@ -61,13 +61,13 @@
 
         <%# applying styling to error / notice messages -%>
         <% if flash[:error] %>
-            <div id="error_flash" class="box_standout" style="color: red; font-weight: bold; margin: 0.8em 0.8em; line-height: 1.4;">
+            <div id="error_flash" class="box_standout curved with_smaller_shadow" style="color: red; margin: 0.8em 0.8em; line-height: 1.4;">
               <%= link_to_function image_tag("close.gif", :style => "float: right;"),"new Effect.toggle('error_flash','slide',{duration:0.3});" %>
               <%= flash[:error] %>
             </div>
         <% end %>
         <% if flash[:notice] %>
-            <div id="notice_flash" class="box_standout" style="color: green; font-weight: bold; margin: 0.8em 0.8em; line-height: 1.4;">
+            <div id="notice_flash" class="box_standout curved with_smaller_shadow" style="color: green; margin: 0.8em 0.8em; line-height: 1.4;">
               <%= link_to_function image_tag("close.gif", :style => "float: right;"),"new Effect.toggle('notice_flash','slide',{duration:0.3});" %>
               <%= flash[:notice] %>
             </div>

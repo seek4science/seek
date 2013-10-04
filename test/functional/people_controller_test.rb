@@ -1105,4 +1105,24 @@ class PeopleControllerTest < ActionController::TestCase
     end
     assert_select "div.list_item_title", :count => 5
   end
+
+  test "people not in projects should not be shown in index"  do
+    person_not_in_project=Factory(:brand_new_person,:first_name=>"Person Not In Project")
+    person_in_project=Factory(:person,:first_name=>"Person in Project")
+    assert person_not_in_project.projects.empty?
+    assert !person_in_project.projects.empty?
+    get :index
+    assert_response :success
+    assert_select "div.list_items_container" do
+      assert_select "div.list_item_content  a[href=?]",person_path(person_in_project),:text=>/#{person_in_project.name}/,:count=>1
+      assert_select "div.list_item_content  a[href=?]",person_path(person_not_in_project),:text=>/#{person_not_in_project.name}/,:count=>0
+    end
+
+    get :index,:page=>"P"
+    assert_response :success
+    assert_select "div.list_items_container" do
+      assert_select "div.list_item_content  a[href=?]",person_path(person_in_project),:text=>/#{person_in_project.name}/,:count=>1
+      assert_select "div.list_item_content  a[href=?]",person_path(person_not_in_project),:text=>/#{person_not_in_project.name}/,:count=>0
+    end
+  end
 end

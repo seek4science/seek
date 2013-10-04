@@ -1,11 +1,11 @@
 <% unless logged_in_and_registered? -%>
 <div class="sysmo_gadget">
-    <div class="header">
+    <div class="header curved_top">
         <p>
             Log in / Register
         </p>
     </div>
-    <div class="contents">
+    <div class="contents curved_bottom">
         <%= form_tag session_path do %>
         <%= hidden_field_tag "called_from[controller]", controller.controller_name -%>
         <%= hidden_field_tag "called_from[action]", controller.action_name -%>
@@ -22,7 +22,7 @@
                     Password:
                 </p>
                 <p>
-                    <%= password_field_tag 'password', nil, :class => 'field', :style => 'width:150px'-%>
+                    <%= password_field_tag 'password', nil, :class => 'field curved', :style => 'width:150px'-%>
                 </p>
                 <p class="label">
                     Remember me: <%= check_box_tag 'remember_me',nil,false, {:style=>"width:2em;"} %>
@@ -33,7 +33,7 @@
                     <a href="http://openid.net/" target="_blank"><%= image_tag "openid-16x16.gif" %>OpenID:</a>
                 </p>
                 <p>
-                    <%= text_field_tag 'openid_identifier', nil, :class => 'field', :style => 'width:150px' -%>
+                    <%= text_field_tag 'openid_identifier', nil, :class => 'field curved', :style => 'width:150px' -%>
                 </p>
             </div>
             <p>
@@ -47,13 +47,13 @@
             <%= submit_tag "Log in", :id=>"login_button",:onclick=>"$('login_button').disabled=true;this.form.submit();return(false);" %>
         </p>
         <% end %>
-        <p style="margin-top: 0.6em; line-height: 1.3em; font-size: 93%;">
+        <p>
             <b>Need an account?</b>
             <br/>
             <b><%= link_to "Sign up", signup_url %></b>
         </p>
-        <br/>
-        <p style="margin-top: 0.6em; line-height: 1.3em; font-size: 83%;">
+
+        <p style="font-size: 83%;">
             <b><%= link_to "Forgotten password?", forgot_password_url %></b>
         </p>
     </div>    

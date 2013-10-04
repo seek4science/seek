@@ -123,6 +123,10 @@
 	color: #333333;
 	padding: 2px;
 	font-size: 93%;
+    border-radius: 4px;
+    -moz-border-radius: 4px;
+    -webkit-border-radius: 4px;
+
 }
 
 .sysmo_gadget .sectionIcons {

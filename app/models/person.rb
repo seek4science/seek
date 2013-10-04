@@ -55,6 +55,7 @@ class Person < ActiveRecord::Base
     end
   end if Seek::Config.solr_enabled
 
+  scope :with_group, :include=>:group_memberships, :conditions=>"group_memberships.person_id IS NOT NULL"
   scope :without_group, :include=>:group_memberships, :conditions=>"group_memberships.person_id IS NULL"
   scope :registered,:include=>:user,:conditions=>"users.person_id != 0"
 

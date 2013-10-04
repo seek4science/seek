@@ -57,11 +57,10 @@ li.announcement .announcement_body {
 
 li.announcement span.announcement_edit {
     float: right;
-    font-size: x-small;
 }
 
 li.announcement .announcement_seperator {
-    border-top: #666 ridge 1px;
+    border-top: #aaa solid 1px;
     margin-top: 1em;
     padding-bottom: 1em;
     width: 100%;
@@ -87,7 +86,7 @@ li.feed_announcement {
 }
 
 li.feed_announcement .announcement_title {
-    font-weight: bold;    
+
 }
 
 li.feed_announcement .announcement_date {
@@ -103,7 +102,7 @@ li.feed_announcement .announcement_announcer {
 }
 
 li.feed_announcement .announcement_seperator {
-    border-top: #AAA dotted 1px;
+    border-top: #ccc solid 1px;
     width: 100%;
 }
 
