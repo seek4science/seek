@@ -738,53 +738,7 @@ table.contributable:hover {
 	
 }
 
-.sectionIcons {
-	margin: 1em 0 0.5em 0;
-	font-size: smaller;
-	text-align: center;
-}
 
-.sectionIcons * {
-	vertical-align: middle;
-}
-
-.sectionIcons li {
-	display: inline;
-	vertical-align: middle;
-	margin: 0;
-	margin-left: 8px;
-	/*border: 2px solid #F5F5F5;*/ 
-}
-
-.sectionIcons li:first {
-	margin-left: 0;
-}
-
-.sectionIcons li:hover {
-}
-
-.sectionIcons li * {
-	vertical-align: middle;
-}
-
-.sectionIcons li a {
-	width: 100%;
-	padding: 0.5em 0.5em;
-	*padding: 0.2em 0.5em;
-	line-height: 1.0;
-	text-decoration: none;
-	border: 1px solid #BBBBBB;
-	background-color: #FEF6FF;
-}
-
-.sectionIcons li a:hover {
-	background-color: #0099FF;
-	color: #F5F5F5;
-}
-
-.sectionIcons li a * {
-	vertical-align: middle;
-}
 
 a.button_slim {
 	padding: 0.2em 0.4em 0.5em 0.4em;

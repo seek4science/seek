@@ -1830,6 +1830,58 @@ ul.usage_times_list {
     color: #666666;
 }
 
+.sectionIcons {
+    margin: 1em 0 0.5em 0;
+    font-size: smaller;
+    text-align: center;
+}
+
+.sectionIcons * {
+    vertical-align: middle;
+}
+
+.sectionIcons li {
+    display: inline;
+    vertical-align: middle;
+    margin: 0;
+    margin-left: 8px;
+    /*border: 2px solid #F5F5F5;*/
+}
+
+.sectionIcons li:first {
+    margin-left: 0;
+}
+
+.sectionIcons li:hover {
+}
+
+.sectionIcons li * {
+    vertical-align: middle;
+}
+
+.sectionIcons li a {
+    width: 100%;
+    padding: 0.5em 0.5em;
+    *padding: 0.2em 0.5em;
+    line-height: 1.0;
+    text-decoration: none;
+    border: 1px solid #aaa;
+    background-color: #f8f9ff;
+    border-radius: 4px;
+    -moz-border-radius: 4px;
+    box-shadow: -2px -2px 3px #eee;
+    -moz-box-shadow: -2px -2px 3px #eee;
+}
+
+.sectionIcons li a:hover {
+    background-color: #0099FF;
+    color: #F5F5F5;
+}
+
+.sectionIcons li a * {
+    vertical-align: middle;
+}
+
 .with_shadow {
     border: 1px #aaa solid;
     box-shadow: -4px -4px 6px #ddd;
