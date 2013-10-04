@@ -72,6 +72,26 @@ min-width:
     border: solid 2px red;
 }
 
+textarea {
+    border: solid 1px #aaa;
+    background-color:white;
+    color: #333333;
+    border-radius: 4px;
+    -moz-border-radius: 4px;
+    -webkit-border-radius: 4px;
+    padding: 4px;
+}
+
+input[type="text"] {
+    border: solid 1px #aaa;
+    background-color:white;
+    color: #333333;
+    border-radius: 4px;
+    -moz-border-radius: 4px;
+    -webkit-border-radius: 4px;
+    padding: 2px;
+}
+
 #header {
     padding-top: 0.5em;
     text-align:right;
