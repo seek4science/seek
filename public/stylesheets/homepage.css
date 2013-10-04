@@ -12,7 +12,7 @@ div.top_home_panel {
 div.home_panel {
     border: 1px solid #d3d3d3;
     background-color: #EEE;
-    height: 26em;
+    height: 21.25em;
     float: left;
 }
 
@@ -25,7 +25,7 @@ div.home_panel_pair {
 div.home_panel .homepanel_list {
     padding-bottom: 0.5em;
     margin-left: 0.5em;
-    max-height: 23.5em;
+    max-height: 19em;
 }
 
 div.home_panel .homepanel_list ul {

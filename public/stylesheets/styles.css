@@ -265,7 +265,7 @@ span.disabled_icon {
 
 .box_standout {
     padding: 0.5em 0.8em;
-    border: 1px dotted #999;
+    border: 1px solid #bbb;
     background-color: #fffeda;
 }
 
@@ -338,7 +338,7 @@ span.disabled_icon {
 }
 
 .contribution_version_box {
-    border: 1px solid #ddd;
+    border: 1px solid #aaa;
     margin-bottom: 1em;
     background-color: #F7F7F7;
 }
