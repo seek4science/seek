@@ -2,7 +2,9 @@
 
 .sysmo_gadget {
 	margin-bottom: 0.5em;
-	text-align: center;        
+	text-align: center;
+
+
 }
 
 .sysmo_gadget p {
@@ -45,7 +47,7 @@
         padding-left: 0.2em;
         padding-right: 0.2em;
 	text-align: center;
-	vertical-align: middle;        
+	vertical-align: middle;
 }
 
 .sysmo_gadget .header p {
@@ -70,6 +72,7 @@
 	margin-top: 0;
 	text-align: center;
   background-color: #FFFFFF;
+
 }
 
 .sysmo_gadget .contents p {
@@ -195,7 +198,7 @@
 	margin: 0 1px;
 }
 
-/* end css rounded corners - based on "Snazzy Corners" */
+
 
 /* begin css New Object Gadget style */
 
@@ -212,7 +215,6 @@
 
 input.gadget_button {
     background-color: #307af5;
-    font-weight: bolder;
     height: 2em;
     border: thin #dcdcdc;
     border-radius: 2px;

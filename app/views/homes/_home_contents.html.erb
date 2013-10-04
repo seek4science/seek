@@ -6,8 +6,6 @@
 
 <%= stylesheet_link_tag "homepage","jscrollpane/jquery.jscrollpane" -%>
 
-<h1><%= Seek::Config.application_name -%></h1>
-
 <% if SiteAnnouncement.headline_announcement -%>
     <div class="box_standout headline_announcement">
       <%= site_annoucements_headline %>
@@ -16,7 +14,7 @@
 
 <%= render :partial=>"guide_box" -%>
 
-<div class="top_home_panel">
+<div class="top_home_panel with_shadow curved">
   <%= home_description_text -%>
 </div>
 

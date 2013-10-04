@@ -178,8 +178,8 @@ class HomesControllerTest < ActionController::TestCase
     get :index
     assert_response :success
 
-    assert_select "div[class='yui-u first home_panel'][style='display:none']", :count => 1
-    assert_select "div[class='yui-u home_panel'][style='display:none']", :count => 1
+    assert_select "div[class=?][style='display:none']",/yui-u first home_panel.*/, :count => 1
+    assert_select "div[class=?][style='display:none']",/yui-u home_panel.*/, :count => 1
   end
 
   test "feed reader should handle feed title as subtitle" do
