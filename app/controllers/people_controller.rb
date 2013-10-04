@@ -51,7 +51,8 @@ class PeopleController < ApplicationController
       else
         @people = Person.all
       end
-      @people = apply_filters(@people).select(&:can_view?)
+      @people=@people.select{|p| !p.group_memberships.empty?}
+      @people = apply_filters(@people).select(&:can_view?)#.select{|p| !p.group_memberships.empty?}
       @people=Person.paginate_after_fetch(@people,
                                           :page=>(params[:page] || Seek::Config.default_page('people')),
                                           :latest_limit => Seek::Config.limit_latest)
