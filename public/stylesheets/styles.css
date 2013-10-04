@@ -168,7 +168,7 @@ table.list_item .standout {
     border: 1px dotted #999;
     margin: 0.2em 0;
     padding: 0.5em 0.6em;
-    background-color: #FFFFCC;
+    background-color: #fffeda;
     text-align: left;
     line-height: 1;
     font-size: 93%;
@@ -262,6 +262,12 @@ span.disabled_icon {
     color: #000099;
 }
 
+.box_standout {
+    padding: 0.5em 0.8em;
+    border: 1px dotted #999;
+    background-color: #fffeda;
+}
+
 .disabled {
     filter:progid:DXImageTransform.Microsoft.Alpha( Opacity=50 );
     opacity: 0.50;    
@@ -330,12 +336,79 @@ span.disabled_icon {
 
 }
 
+.contribution_version_box {
+    border: 1px solid #ddd;
+    margin-bottom: 1em;
+    background-color: #F7F7F7;
+}
+
+.contribution_version_box .title {
+    font-size: 108%;
+    font-weight: bold;
+    color: #660000;
+}
+
+.contribution_version_selector_box {
+    padding: 0.6em 0.5em 0.4em 0.5em;
+    border-width: 0 0 1px 0;
+    //background-image: url('../images/box-bg1.png');
+    background-position: top;
+    background-repeat: repeat-x;
+    background-color: #fffeda;
+    color: #333333;
+}
+
+.contribution_version_selector_box * {
+    vertical-align: middle;
+}
+
+.contribution_version_selector_box table {
+    width: 100%;
+    margin: 0;
+    padding: 0;
+    border-collapse: collapse;
+}
+
+.contribution_version_selector_box table td {
+    padding: 0em 0.5em;
+}
+
+.contribution_version_selector_box .heading {
+    text-align: left;
+    font-size: 108%;
+    font-weight: bold;
+    color: #333333;
+}
+
+.contribution_version_inner_box {
+    padding: 0.6em 0.7em;
+}
+
+.contribution_version_inner_box h4 {
+    text-align: center;
+}
+
+.contribution_version_inner_box .option_box {
+    padding: 0.2em 0.6em;
+    border: 1px solid #CCCCCC;
+}
+
+.contribution_version_meta_info_box {
+    padding: 0.3em 0.6em;
+    border: 1px dotted #999999;
+    background-color: #FFFFCC;
+    color: #333333;
+    line-height: 1.2;
+    font-size: 85%;
+    margin-left: 2.5em;
+}
+
 .contribution_section_box {
-	background-image: url('../images/box-bg1.png');
+	//background-image: url('../images/box-bg1.png');
 	background-position: top;
 	background-repeat: repeat-x;
-	background-color: #FFFFCC;
-    padding: 0.5em 0 1em 0;
+	background-color: #fffeda;
+    padding: 0.5em 0.25em;
 	border: 1px dotted #999;
 	text-align: center;
 	margin-bottom: 0.6em;
@@ -833,7 +906,7 @@ div.list_item_desc {
     border: 1px dotted #999;
     margin: 0.2em 0;
     padding: 0.4em 0.6em;
-    background-color: #FFFFCC;
+    background-color: #fffeda;
     text-align: left;
     line-height: 1.3;
     overflow: hidden;
@@ -1685,12 +1758,14 @@ ul.fileinfo_list {
 
 ul.fileinfo_list li.fileinfo_container {
     float: left;
+    background-color: white;
+    padding: 0.25em;
+    margin: 0.5em;
 }
 
 li.fileinfo_container div.fileinfo {
-    background-color: white;
-    border: 1px dotted black;
-    padding: 0.75em;
+
+    //border: 1px dotted black;
     margin: 0.25em;
     min-height: 8.1em;
     max-width: 30em;
