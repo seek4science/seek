@@ -1,11 +1,11 @@
 <% unless logged_in_and_registered? -%>
 <div class="sysmo_gadget">
-    <div class="header">
+    <div class="header curved_top">
         <p>
             Log in / Register
         </p>
     </div>
-    <div class="contents">
+    <div class="contents curved_bottom">
         <%= form_tag session_path do %>
         <%= hidden_field_tag "called_from[controller]", controller.controller_name -%>
         <%= hidden_field_tag "called_from[action]", controller.action_name -%>

@@ -4,10 +4,10 @@
 <% if current_user.try(:person).try(:member?) -%>
     <div class="sysmo_gadget">
 
-      <div class="header">
+      <div class="header curved_top">
         Go to my <%= t('project') %>
       </div>
-      <div class="contents">
+      <div class="contents curved_bottom">
         <div style="text-align: center">
 
             <input type=button id="my_project_button" class="gadget_button" value="My <%= t('project') %>" onclick="javascript:myProjectClicked();"/>
