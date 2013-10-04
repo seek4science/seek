@@ -10,7 +10,7 @@ module OrganismsHelper
   
   def organisms_link_list organisms
     link_list=""
-    link_list="<span class='non_text'>No Organisms specified</span>" if organisms.empty?
+    link_list="<span class='none_text'>No Organisms specified</span>" if organisms.empty?
     organisms.each do |o|
       link_list << organism_link_to(o)
       link_list << ", " unless o==organisms.last   
