@@ -970,7 +970,7 @@ div.list_item_actions {
 }
 
 div.list_item_desc {
-    border: 1px dotted #999;
+    border: 1px solid #bbb;;
     margin: 0.2em 0;
     padding: 0.4em 0.6em;
     background-color: #fffeda;
@@ -981,9 +981,9 @@ div.list_item_desc {
 }
 
 div.list_item_title{
-    border-bottom:1px dotted black;
-    margin-bottom:0.25em;
-    padding-bottom:0.25em;
+    border-bottom:1px solid #bbb;
+    margin-bottom:0.1em;
+    padding-bottom:0.1em;
 }
 
 div.list_item_title p {
@@ -999,7 +999,7 @@ p.list_item_attribute {
 div.list_item_left_column{
     float: left;
     width: 45%;
-    border-right: 1px dotted black;
+    border-right: 1px solid #bbb;
 }
 
 div.list_item_right_column{
