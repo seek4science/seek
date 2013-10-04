@@ -779,4 +779,16 @@ class PersonTest < ActiveSupport::TestCase
 
   end
 
+  test "should be able to remove the workgroup whose project is not subcribed" do
+    p=Factory :person
+    wg = Factory :work_group
+    p.work_groups = [wg]
+
+    p.project_subscriptions.delete_all
+    assert p.project_subscriptions.empty?
+    p.work_groups = []
+    p.save
+    assert p.work_groups.empty?
+  end
+
 end
