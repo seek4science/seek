@@ -12,7 +12,7 @@
 
             <input type=button id="my_project_button" class="gadget_button" value="My <%= t('project') %>" onclick="javascript:myProjectClicked();"/>
 
-            <ul id="my_project_menu" class='dynamic_menu' style="display:none;">
+            <ul id="my_project_menu" class='dynamic_menu with_smaller_shadow' style="display:none;">
 
                 <% current_user.person.projects.each do |p| %>
                     <li class='dynamic_menu_li' onclick="javascript:location.href='<%= project_path(p) -%>';"><%= h(p.name) %></li>

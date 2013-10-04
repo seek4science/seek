@@ -1855,7 +1855,6 @@ ul.usage_times_list {
     vertical-align: middle;
     margin: 0;
     margin-left: 8px;
-    /*border: 2px solid #F5F5F5;*/
 }
 
 .sectionIcons li:first {
@@ -1867,6 +1866,7 @@ ul.usage_times_list {
 
 .sectionIcons li * {
     vertical-align: middle;
+
 }
 
 .sectionIcons li a {
@@ -1936,6 +1936,16 @@ input[type="submit"] {
     border-radius: 4px;
     -moz-border-radius: 4px;
     -webkit-border-radius: 4px;
+}
+
+.framed {
+    border: 1px solid #aaa;
+    padding: 3px;
+    background-color: #FFFFFF;
+}
+
+.framed_nospace {
+    border: 1px solid #aaa;
 }
 
 

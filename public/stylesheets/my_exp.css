@@ -199,15 +199,7 @@ li {
 	_display: inline; /* ie4 ie5 ie6 */
 }
 
-.framed {
-	border: 1px solid #CCCCCC;
-	padding: 3px;
-	background-color: #FFFFFF;
-}
 
-.framed_nospace {
-	border: 1px solid #CCCCCC;
-}
 
 
 /* end css tabs nav */ 
