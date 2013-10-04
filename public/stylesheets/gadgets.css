@@ -198,7 +198,7 @@
 	margin: 0 1px;
 }
 
-/* end css rounded corners - based on "Snazzy Corners" */
+
 
 /* begin css New Object Gadget style */
 
@@ -215,7 +215,6 @@
 
 input.gadget_button {
     background-color: #307af5;
-    font-weight: bolder;
     height: 2em;
     border: thin #dcdcdc;
     border-radius: 2px;
