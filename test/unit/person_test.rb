@@ -68,6 +68,7 @@ class PersonTest < ActiveSupport::TestCase
     assert p.valid?
   end
 
+
   test "email uri" do
     p = Factory :person, :email=>"sfkh^sd@weoruweoru.com"
     assert_equal "mailto:sfkh%5Esd@weoruweoru.com",p.email_uri

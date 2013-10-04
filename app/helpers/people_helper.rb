@@ -21,11 +21,11 @@ module PeopleHelper
 
   def orcid_identifier person
     id = person.orcid
-    unless id.nil?
+    unless id.blank?
       id = "http://orcid.org/"+id unless id.start_with?("http://orcid.org/")
       id = link_to(id,id,:target=>"_blank").html_safe
     end
-    id.nil? ? text_or_not_specified(id) : id
+    id.blank? ? text_or_not_specified(id) : id
   end
 
   def discipline_list person
