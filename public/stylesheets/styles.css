@@ -899,6 +899,15 @@ a.asset img.avatar {
     min-height: 3em;
 }
 
+img.search_fav_avatar {
+    padding :5px;
+    border:1px solid #ccc;
+    background-color: #fff;
+    min-width :3em;
+    min-height: 3em;
+    vertical-align:middle;
+}
+
 div.list_item, div.private_list_item, div.public_list_item {
     width: 95%;
     background-color: #F0F0F0;

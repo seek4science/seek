@@ -1,7 +1,7 @@
 <div class="show_basic">
 <% unless !logged_in? || params[:saved_search] %>
-      <div class="box_standout">
-        <% tiny_image = image "saved_search_avatar", {:style => "padding: 5px; border:1px solid #CCCCCC;background-color:#FFFFFF;vertical-align:middle;"} %>
+      <div class="box_standout curved with_smaller_shadow">
+        <% tiny_image = image "saved_search_avatar", {:class => "avatar curved with_smaller_shadow search_fav_avatar"} %>
         <%= link_to_draggable(tiny_image, search_path, :title=>tooltip_title_attrib("Drag to Favourites to save this search"), :class=>"search", :id => "drag_search") %>
         Drag this icon over to your Favourites to save this search.
       </div>
