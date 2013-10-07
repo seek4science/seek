@@ -108,8 +108,8 @@ module ApiHelper
     return result
   end
   
-  def dc_xml_tag(builder, term, value, *attributes)
-    builder.tag! "dc:#{term}", value, attributes
+  def dc_xml_tag(builder, term, value)
+    builder.tag! "dc:#{term}", value
   end
   
   def dcterms_xml_tag(builder, term, value)
