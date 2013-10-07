@@ -26,7 +26,7 @@ module RestTestCases
 
       title = doc.find("//dc:title",["dc:http://purl.org/dc/elements/1.1/"]).first
       assert_not_nil title
-      assert_equal object.name,title.content
+      assert_equal object.title,title.content
     end
   end
   
