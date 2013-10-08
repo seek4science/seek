@@ -12,7 +12,7 @@ gem 'libxml-ruby',"2.6.0",:require=>"libxml"
 gem 'uuidtools',"2.1.1"
 gem "RedCloth","4.2.9"
 gem 'simple-spreadsheet-extractor',"0.12.3"
-gem "rmagick"
+gem "rmagick", :require => false
 gem "mysql2"
 gem 'rest-client',">=1.6.1"
 gem 'factory_girl', "2.6.4"
