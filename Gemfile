@@ -75,6 +75,8 @@ gem 'my_annotations', :git=>"git://github.com/myGrid/annotations.git"
 gem 'passenger'
 gem 'unicorn-rails'
 
+gem 'taverna-t2flow', :path=> 'vendor/gems/taverna-t2flow-0.4.5-biovel-fix'
+
 group :development do
   gem "sqlite3","1.3.7"
   gem "pry"
