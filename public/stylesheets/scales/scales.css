@@ -126,6 +126,7 @@
 
 ul#scale_list li {
     height: 0.5em;
+    font-size:14px;
 }
 
 .scale_image{
