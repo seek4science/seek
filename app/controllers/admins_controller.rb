@@ -167,6 +167,8 @@ class AdminsController < ApplicationController
 
   def restart_server
     system ("touch #{Rails.root}/tmp/restart.txt")
+    system ("script/delayed_job stop")
+    system ("script/delayed_job start")
     flash[:notice] = 'The server was restarted'
     redirect_to :action=>:show
   end
