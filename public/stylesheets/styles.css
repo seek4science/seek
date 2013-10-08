@@ -2,7 +2,7 @@ body {
 	font-family: arial,sans-serif;
     font-size: 14px;
 	line-height: 1.0;
-    bloleft: #8e8e8e solid 10px;
+    border-left: #8e8e8e solid 10px;
     border-right: #8e8e8e solid 10px;
     min-width: 1024px;
 }
