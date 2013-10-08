@@ -48,7 +48,7 @@
         <%= navigation_link 'Home', '#', nil, controller_name == 'homes' -%>
         <%= navigation_link 'Workflows', '#', nil, controller_name == 'workflows' -%>
         <%= navigation_link 'Runs', '#', nil, controller_name == 'runs' -%>
-        <%= navigation_link 'Data', '#', nil, controller_name == 'data_files' -%>
+        <%= navigation_link 'Data', data_files_path, nil, controller_name == 'data_files' -%>
       </ul>
       <ul class="menutabs clearfix" style="float: right">
         <% if logged_in? %>
