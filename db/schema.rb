@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20130924091747) do
+ActiveRecord::Schema.define(:version => 20131008125317) do
 
   create_table "activity_logs", :force => true do |t|
     t.string   "action"
@@ -1567,6 +1567,48 @@ ActiveRecord::Schema.define(:version => 20130924091747) do
   end
 
   add_index "work_groups", ["project_id"], :name => "index_work_groups_on_project_id"
+
+  create_table "workflow_categories", :force => true do |t|
+    t.string "name"
+  end
+
+  create_table "workflow_input_port_types", :force => true do |t|
+    t.string "name"
+  end
+
+  create_table "workflow_input_ports", :force => true do |t|
+    t.string  "name"
+    t.text    "description"
+    t.integer "type_id"
+    t.text    "example_value"
+    t.integer "example_data_file_id"
+  end
+
+  create_table "workflow_output_port_types", :force => true do |t|
+    t.string "name"
+  end
+
+  create_table "workflow_output_ports", :force => true do |t|
+    t.string  "name"
+    t.text    "description"
+    t.integer "type_id"
+    t.text    "example_value"
+    t.integer "example_data_file_id"
+  end
+
+  create_table "workflows", :force => true do |t|
+    t.string   "title"
+    t.text     "description"
+    t.integer  "category_id"
+    t.integer  "contributor_id"
+    t.string   "contributor_type"
+    t.string   "uuid"
+    t.integer  "policy_id"
+    t.text     "other_creators"
+    t.string   "first_letter",     :limit => 1
+    t.datetime "created_at",                    :null => false
+    t.datetime "updated_at",                    :null => false
+  end
 
   create_table "worksheets", :force => true do |t|
     t.integer "content_blob_id"
