@@ -32,7 +32,7 @@ class Person < ActiveRecord::Base
   has_many :favourite_groups, :through => :favourite_group_memberships
 
   has_many :work_groups, :through=>:group_memberships, :before_add => proc {|person, wg| person.project_subscriptions.build :project => wg.project unless person.project_subscriptions.detect {|ps| ps.project == wg.project}},
-  :before_remove => proc {|person, wg| person.project_subscriptions.delete(person.project_subscriptions.detect {|ps| ps.project == wg.project})}
+  :before_remove => proc {|person, wg| person.project_subscriptions.delete(person.project_subscriptions.detect {|ps| ps.project == wg.project} || [])}
   has_many :studies_for_person, :as=>:contributor, :class_name=>"Study"
   has_many :assays,:foreign_key => :owner_id
   has_many :investigations_for_person,:as=>:contributor, :class_name=>"Investigation"
@@ -55,6 +55,7 @@ class Person < ActiveRecord::Base
     end
   end if Seek::Config.solr_enabled
 
+  scope :with_group, :include=>:group_memberships, :conditions=>"group_memberships.person_id IS NOT NULL"
   scope :without_group, :include=>:group_memberships, :conditions=>"group_memberships.person_id IS NULL"
   scope :registered,:include=>:user,:conditions=>"users.person_id != 0"
 
@@ -446,7 +447,8 @@ class Person < ActiveRecord::Base
   
   def cache_key
     key = super
-    key << self.group_memberships.order(:updated_at).last.cache_key unless self.group_memberships.empty?
+    key << self.projects.collect(&:title).join(',')
+    key << self.institutions.collect(&:title).join(',')
     key
   end
 

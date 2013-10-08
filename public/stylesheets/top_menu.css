@@ -1,5 +1,4 @@
 .menutabs {
-    font-weight: bolder;
     padding: 4px 0 1px 2em;
     margin: 0;
     border-top: 0px;
@@ -28,6 +27,7 @@
     background-position: top;
     background-repeat: repeat-x;
     background-color: #EDEDED;
+
 }
 
 .menutabs li a:link {
@@ -71,7 +71,6 @@ ul#section_menu_items > li.selected_menu {
 }
 
 ul#section_menu_items > li > a {
-    font-weight: bolder;
     color :white;
     padding: 0.25em 0.5em;
 }

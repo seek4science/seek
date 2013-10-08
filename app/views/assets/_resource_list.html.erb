@@ -1,9 +1,10 @@
 <% authorization_for_showing_already_done ||= false -%>
 <% narrow_view ||= false -%>
 <% actions_partial_disable ||= false %>
+<% view_type ||= 'view_some' %>
 
 <% unless collection.empty? -%>
-  <div class="list_items_container" id="<%=collection.first.class.name%>_list_items_container">
+  <div class="list_items_container" id="<%=collection.first.class.name%>_<%= view_type %>">
 
     <% collection.each do |item| -%>
 		  <% if authorization_for_showing_already_done || item.can_view? -%>

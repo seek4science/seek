@@ -255,7 +255,7 @@
 
           
           <div class="method-source-code" id="additional_triples-source">
-            <pre><span class="ruby-comment"># File lib/seek/rdf/rdf_generation.rb, line 47</span>
+            <pre><span class="ruby-comment"># File lib/seek/rdf/rdf_generation.rb, line 51</span>
 <span class="ruby-keyword">def</span> <span class="ruby-identifier">additional_triples</span> <span class="ruby-identifier">rdf_graph</span>
   <span class="ruby-keyword">if</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier">is_a?</span>(<span class="ruby-constant">Model</span>) <span class="ruby-operator">&amp;&amp;</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier">contains_sbml?</span>
     <span class="ruby-identifier">rdf_graph</span> <span class="ruby-operator">&lt;&lt;</span> [<span class="ruby-keyword">self</span>.<span class="ruby-identifier">rdf_resource</span>,<span class="ruby-constant">JERMVocab</span>.<span class="ruby-identifier">hasFormat</span>,<span class="ruby-constant">JERMVocab</span>.<span class="ruby-constant">SBML_format</span>]
@@ -288,7 +288,7 @@
 
           
           <div class="method-source-code" id="create_rdf_generation_job-source">
-            <pre><span class="ruby-comment"># File lib/seek/rdf/rdf_generation.rb, line 135</span>
+            <pre><span class="ruby-comment"># File lib/seek/rdf/rdf_generation.rb, line 139</span>
 <span class="ruby-keyword">def</span> <span class="ruby-identifier">create_rdf_generation_job</span> <span class="ruby-identifier">force</span>=<span class="ruby-keyword">false</span>,<span class="ruby-identifier">refresh_dependents</span>=<span class="ruby-keyword">true</span>
   <span class="ruby-keyword">unless</span> <span class="ruby-operator">!</span><span class="ruby-identifier">force</span> <span class="ruby-operator">&amp;&amp;</span> (<span class="ruby-keyword">self</span>.<span class="ruby-identifier">changed</span> <span class="ruby-operator">-</span> [<span class="ruby-string">&quot;updated_at&quot;</span>,<span class="ruby-string">&quot;last_used_at&quot;</span>]).<span class="ruby-identifier">empty?</span>
     <span class="ruby-constant">RdfGenerationJob</span>.<span class="ruby-identifier">create_job</span> <span class="ruby-keyword">self</span>,<span class="ruby-identifier">refresh_dependents</span>
@@ -320,7 +320,7 @@
 
           
           <div class="method-source-code" id="dependent_items-source">
-            <pre><span class="ruby-comment"># File lib/seek/rdf/rdf_generation.rb, line 153</span>
+            <pre><span class="ruby-comment"># File lib/seek/rdf/rdf_generation.rb, line 157</span>
 <span class="ruby-keyword">def</span> <span class="ruby-identifier">dependent_items</span>
   <span class="ruby-identifier">items</span> = []
   <span class="ruby-comment">#FIXME: this should go into a seperate mixin for active-record</span>
@@ -374,7 +374,7 @@
 
           
           <div class="method-source-code" id="describe_type-source">
-            <pre><span class="ruby-comment"># File lib/seek/rdf/rdf_generation.rb, line 114</span>
+            <pre><span class="ruby-comment"># File lib/seek/rdf/rdf_generation.rb, line 118</span>
 <span class="ruby-keyword">def</span> <span class="ruby-identifier">describe_type</span> <span class="ruby-identifier">rdf_graph</span>
  <span class="ruby-identifier">it_is</span> = <span class="ruby-constant">JERMVocab</span>.<span class="ruby-identifier">for_type</span> <span class="ruby-keyword">self</span>
  <span class="ruby-keyword">unless</span> <span class="ruby-identifier">it_is</span>.<span class="ruby-identifier">nil?</span>
@@ -409,7 +409,7 @@
 
           
           <div class="method-source-code" id="generate_from_csv_definitions-source">
-            <pre><span class="ruby-comment"># File lib/seek/rdf/rdf_generation.rb, line 54</span>
+            <pre><span class="ruby-comment"># File lib/seek/rdf/rdf_generation.rb, line 58</span>
 <span class="ruby-keyword">def</span> <span class="ruby-identifier">generate_from_csv_definitions</span> <span class="ruby-identifier">rdf_graph</span>
   <span class="ruby-comment">#load template</span>
   <span class="ruby-identifier">path_to_template</span>=<span class="ruby-constant">File</span>.<span class="ruby-identifier">join</span>(<span class="ruby-constant">File</span>.<span class="ruby-identifier">dirname</span>(<span class="ruby-keyword">__FILE__</span>), <span class="ruby-string">&quot;rdf_mappings.csv&quot;</span>)
@@ -459,7 +459,7 @@
 
           
           <div class="method-source-code" id="generate_triples-source">
-            <pre><span class="ruby-comment"># File lib/seek/rdf/rdf_generation.rb, line 78</span>
+            <pre><span class="ruby-comment"># File lib/seek/rdf/rdf_generation.rb, line 82</span>
 <span class="ruby-keyword">def</span> <span class="ruby-identifier">generate_triples</span> <span class="ruby-identifier">subject</span>, <span class="ruby-identifier">method</span>, <span class="ruby-identifier">property</span>,<span class="ruby-identifier">uri_or_literal</span>,<span class="ruby-identifier">transformation</span>,<span class="ruby-identifier">collection_transform</span>,<span class="ruby-identifier">rdf_graph</span>
   <span class="ruby-identifier">resource</span> = <span class="ruby-identifier">subject</span>.<span class="ruby-identifier">rdf_resource</span>
   <span class="ruby-identifier">transform</span> = <span class="ruby-identifier">transformation</span>.<span class="ruby-identifier">strip</span> <span class="ruby-keyword">unless</span> <span class="ruby-identifier">transformation</span>.<span class="ruby-identifier">nil?</span>
@@ -523,11 +523,15 @@
           <div class="method-source-code" id="handle_rightfield_contents-source">
             <pre><span class="ruby-comment"># File lib/seek/rdf/rdf_generation.rb, line 32</span>
 <span class="ruby-keyword">def</span> <span class="ruby-identifier">handle_rightfield_contents</span> <span class="ruby-identifier">object</span>
-  <span class="ruby-keyword">if</span> (<span class="ruby-identifier">object</span>.<span class="ruby-identifier">respond_to?</span>(<span class="ruby-value">:contains_extractable_spreadsheet?</span>) <span class="ruby-operator">&amp;&amp;</span> <span class="ruby-identifier">contains_extractable_spreadsheet?</span> <span class="ruby-operator">&amp;&amp;</span> <span class="ruby-identifier">content_blob</span>.<span class="ruby-identifier">is_xls?</span>)
-    <span class="ruby-identifier">generate_rightfield_rdf_graph</span>(<span class="ruby-keyword">self</span>)
-  <span class="ruby-keyword">else</span>
-    <span class="ruby-constant">RDF</span><span class="ruby-operator">::</span><span class="ruby-constant">Graph</span>.<span class="ruby-identifier">new</span>
+  <span class="ruby-identifier">graph</span> = <span class="ruby-keyword">nil</span>
+  <span class="ruby-keyword">if</span> (<span class="ruby-identifier">object</span>.<span class="ruby-identifier">respond_to?</span>(<span class="ruby-value">:contains_extractable_spreadsheet?</span>) <span class="ruby-operator">&amp;&amp;</span> <span class="ruby-identifier">object</span>.<span class="ruby-identifier">contains_extractable_spreadsheet?</span>)
+    <span class="ruby-keyword">begin</span>
+      <span class="ruby-identifier">graph</span> = <span class="ruby-identifier">generate_rightfield_rdf_graph</span>(<span class="ruby-keyword">self</span>)
+    <span class="ruby-keyword">rescue</span> <span class="ruby-constant">Exception</span>=<span class="ruby-operator">&gt;</span><span class="ruby-identifier">e</span>
+      <span class="ruby-constant">Rails</span>.<span class="ruby-identifier">logger</span>.<span class="ruby-identifier">error</span> <span class="ruby-node">&quot;Error generating RightField part of rdf for #{object} - #{e.message}&quot;</span>
+    <span class="ruby-keyword">end</span>
   <span class="ruby-keyword">end</span>
+  <span class="ruby-identifier">graph</span> <span class="ruby-operator">||</span> <span class="ruby-constant">RDF</span><span class="ruby-operator">::</span><span class="ruby-constant">Graph</span>.<span class="ruby-identifier">new</span>
 <span class="ruby-keyword">end</span></pre>
           </div><!-- handle_rightfield_contents-source -->
           
@@ -556,7 +560,7 @@ the RDF</p>
 
           
           <div class="method-source-code" id="ns_prefixes-source">
-            <pre><span class="ruby-comment"># File lib/seek/rdf/rdf_generation.rb, line 124</span>
+            <pre><span class="ruby-comment"># File lib/seek/rdf/rdf_generation.rb, line 128</span>
 <span class="ruby-keyword">def</span> <span class="ruby-identifier">ns_prefixes</span>
   {
       <span class="ruby-string">&quot;jerm&quot;</span>=<span class="ruby-operator">&gt;</span><span class="ruby-constant">JERMVocab</span>.<span class="ruby-identifier">to_uri</span>.<span class="ruby-identifier">to_s</span>,
@@ -593,7 +597,7 @@ the RDF</p>
 
           
           <div class="method-source-code" id="rdf_resource-source">
-            <pre><span class="ruby-comment"># File lib/seek/rdf/rdf_generation.rb, line 40</span>
+            <pre><span class="ruby-comment"># File lib/seek/rdf/rdf_generation.rb, line 44</span>
 <span class="ruby-keyword">def</span> <span class="ruby-identifier">rdf_resource</span>
   <span class="ruby-identifier">uri</span> = <span class="ruby-constant">Seek</span><span class="ruby-operator">::</span><span class="ruby-constant">Config</span>.<span class="ruby-identifier">site_base_host</span><span class="ruby-operator">+</span><span class="ruby-node">&quot;/#{self.class.name.tableize}/#{self.id}&quot;</span>
   <span class="ruby-constant">RDF</span><span class="ruby-operator">::</span><span class="ruby-constant">Resource</span>.<span class="ruby-identifier">new</span>(<span class="ruby-identifier">uri</span>)
@@ -624,7 +628,7 @@ the RDF</p>
 
           
           <div class="method-source-code" id="refresh_dependents_rdf-source">
-            <pre><span class="ruby-comment"># File lib/seek/rdf/rdf_generation.rb, line 147</span>
+            <pre><span class="ruby-comment"># File lib/seek/rdf/rdf_generation.rb, line 151</span>
 <span class="ruby-keyword">def</span> <span class="ruby-identifier">refresh_dependents_rdf</span>
   <span class="ruby-identifier">dependent_items</span>.<span class="ruby-identifier">each</span> <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">item</span><span class="ruby-operator">|</span>
     <span class="ruby-identifier">item</span>.<span class="ruby-identifier">refresh_rdf</span> <span class="ruby-keyword">if</span> <span class="ruby-identifier">item</span>.<span class="ruby-identifier">respond_to?</span>(<span class="ruby-value">:refresh_rdf</span>)
@@ -656,7 +660,7 @@ the RDF</p>
 
           
           <div class="method-source-code" id="refresh_rdf-source">
-            <pre><span class="ruby-comment"># File lib/seek/rdf/rdf_generation.rb, line 181</span>
+            <pre><span class="ruby-comment"># File lib/seek/rdf/rdf_generation.rb, line 185</span>
 <span class="ruby-keyword">def</span> <span class="ruby-identifier">refresh_rdf</span>
   <span class="ruby-identifier">create_rdf_generation_job</span>(<span class="ruby-keyword">true</span>, <span class="ruby-keyword">false</span>)
 <span class="ruby-keyword">end</span></pre>
@@ -686,7 +690,7 @@ the RDF</p>
 
           
           <div class="method-source-code" id="remove_rdf-source">
-            <pre><span class="ruby-comment"># File lib/seek/rdf/rdf_generation.rb, line 141</span>
+            <pre><span class="ruby-comment"># File lib/seek/rdf/rdf_generation.rb, line 145</span>
 <span class="ruby-keyword">def</span> <span class="ruby-identifier">remove_rdf</span>
   <span class="ruby-keyword">self</span>.<span class="ruby-identifier">remove_rdf_from_repository</span> <span class="ruby-keyword">if</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier">rdf_repository_configured?</span>
   <span class="ruby-keyword">self</span>.<span class="ruby-identifier">delete_rdf_file</span>
