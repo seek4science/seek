@@ -65,6 +65,15 @@ module Seek
       ActionMailer::Base.smtp_settings = new_hash
     end
 
+    def bioportal_api_key_propagate
+      affected = ActiveRecord::Base.descendants.select do |cl|
+        cl.respond_to?(:bioportal_api_key=)
+      end
+      affected.each do |cl|
+        cl.bioportal_api_key = bioportal_api_key
+      end
+    end
+
     def google_analytics_enabled_propagate
       Rubaidh::GoogleAnalytics.enabled = self.google_analytics_enabled
       if self.google_analytics_enabled

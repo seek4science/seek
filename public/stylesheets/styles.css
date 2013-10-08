@@ -637,7 +637,8 @@ ul.tabbernav
     padding: 3px 0;
     border-bottom: 1px solid #CCC;    
     font-size: 90%;    
-    margin-left: 1em;
+    margin-left: 0.5em;
+    margin-right: 0.5em;
 }
 
 ul.tabbernav li
@@ -651,10 +652,15 @@ ul.tabbernav li a
 {
     padding: 3px 0.5em;
     margin-left: 3px;
-    border: 1px solid #CCC;
+    border: 1px solid #aaa;
     border-bottom: none;
     background: #ccccff;
-    text-decoration: none;    
+    text-decoration: none;
+    border-top-right-radius: 4px;
+    border-top-left-radius: 4px;
+    -moz-border-radius-topleft: 4px;
+    -moz-border-radius-topright: 4px;
+
 }
 
 ul.tabbernav li a:link { color: #333; }

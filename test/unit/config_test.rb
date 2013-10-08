@@ -287,4 +287,11 @@ class ConfigTest < ActiveSupport::TestCase
     Seek::Config.datacite_password=nil
     assert_nil Seek::Config.datacite_password_enc
   end
+
+  test 'propagate bioportal api key' do
+      assert_equal "fish",Organism.bioportal_api_key
+      Seek::Config.bioportal_api_key = "frog"
+      assert_equal "frog",Organism.bioportal_api_key
+  end
+
 end
