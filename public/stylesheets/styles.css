@@ -1,10 +1,7 @@
 body {
 	font-family: arial,sans-serif;
     font-size: 14px;
-	line-height: 1.0;
-    bloleft: #8e8e8e solid 10px;
-    border-right: #8e8e8e solid 10px;
-    min-width: 1024px;
+  line-height: 1.0;
 }
 
 
@@ -93,8 +90,9 @@ input[type="text"] {
 }
 
 #header {
-    padding-top: 0.5em;
-    text-align:right;
+  height: 50px;
+  background-color: #99cc33;
+  border-bottom: 1px solid #999;
 }
 
 #main_pane {
@@ -2011,6 +2009,3 @@ input[type="submit"] {
 .framed_nospace {
     border: 1px solid #aaa;
 }
-
-
-

@@ -29,6 +29,8 @@ class ApplicationController < ActionController::Base
 
   helper :all
 
+  layout 'biovel'
+
   def strip_root_for_xml_requests
     #intended to use as a before filter on requests that lack a single root model.
     #XML requests are required to have a single root node. This assumes the root node

@@ -1,0 +1,61 @@
+.clearfix:before, .clearfix:after {
+    content: " ";
+    display: table;
+}
+.clearfix:after {
+    clear: both;
+}
+
+/* Max Width */
+
+#header > div, #bd > div, #ft > div {
+  max-width: 1400px;
+  min-width: 800px;
+  margin: auto;
+}
+
+.workflow-category {
+  display: inline-block;
+  width: 300px;
+  height: 80px;
+  line-height:80px;
+  background-color: #eee;
+  font-size: 16px;
+  box-shadow: 1px 1px 3px #999;
+  margin: 10px;
+  color: #333333;
+}
+
+.workflow-category:hover {
+  background-color: #b1e10f;
+  color: #333333;
+}
+
+body, html {
+  background: #FAFAFA;
+  margin: 0;
+  padding: 0;
+  height: 100%;
+}
+
+#ft {
+  width: 100%;
+  position: absolute;
+  min-width: 800px;
+  height: 180px;
+}
+
+#bd {
+  min-height: 0;
+  padding-bottom: 180px;
+}
+
+#container {
+  position: relative;
+  min-height: 100%;
+}
+
+a:hover {
+  color: #3d47ba;
+}
+

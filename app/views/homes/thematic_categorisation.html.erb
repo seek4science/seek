@@ -1,0 +1,8 @@
+<h1>Choose an analysis...</h1>
+<div style="width: 800px; margin: auto">
+  <% WorkflowCategory.all.each do |category| %>
+    <a href="#" class="workflow-category">
+      <%= category.name %>
+    </a>
+  <% end %>
+</div>
