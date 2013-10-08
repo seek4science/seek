@@ -1,0 +1,359 @@
+<workflow xmlns="http://taverna.sf.net/2008/xml/t2flow" version="1" producedBy="taverna-2.1.0"><dataflow id="2f216461-50f5-45be-a2d2-49c84b1fce5e" role="top"><name>BiomartAndEMBOSSAnalysis</name><inputPorts /><outputPorts><port><name>outputPlot</name><annotations><annotation_chain encoding="xstream"><net.sf.taverna.t2.annotation.AnnotationChainImpl xmlns="">
+  <annotationAssertions>
+    <net.sf.taverna.t2.annotation.AnnotationAssertionImpl>
+      <annotationBean class="net.sf.taverna.t2.annotation.annotationbeans.MimeType">
+        <text>image/png</text>
+      </annotationBean>
+      <date>2009-12-15 21:49:47.668 GMT</date>
+      <creators />
+      <curationEventList />
+    </net.sf.taverna.t2.annotation.AnnotationAssertionImpl>
+  </annotationAssertions>
+</net.sf.taverna.t2.annotation.AnnotationChainImpl></annotation_chain><annotation_chain encoding="xstream"><net.sf.taverna.t2.annotation.AnnotationChainImpl xmlns="">
+  <annotationAssertions>
+    <net.sf.taverna.t2.annotation.AnnotationAssertionImpl>
+      <annotationBean class="net.sf.taverna.t2.annotation.annotationbeans.MimeType">
+        <text>application/octet-stream</text>
+      </annotationBean>
+      <date>2009-12-15 21:49:47.668 GMT</date>
+      <creators />
+      <curationEventList />
+    </net.sf.taverna.t2.annotation.AnnotationAssertionImpl>
+  </annotationAssertions>
+</net.sf.taverna.t2.annotation.AnnotationChainImpl></annotation_chain></annotations></port><port><name>HSapIDs</name><annotations><annotation_chain encoding="xstream"><net.sf.taverna.t2.annotation.AnnotationChainImpl xmlns="">
+  <annotationAssertions>
+    <net.sf.taverna.t2.annotation.AnnotationAssertionImpl>
+      <annotationBean class="net.sf.taverna.t2.annotation.annotationbeans.MimeType">
+        <text>text/plain</text>
+      </annotationBean>
+      <date>2009-12-15 21:49:47.668 GMT</date>
+      <creators />
+      <curationEventList />
+    </net.sf.taverna.t2.annotation.AnnotationAssertionImpl>
+  </annotationAssertions>
+</net.sf.taverna.t2.annotation.AnnotationChainImpl></annotation_chain></annotations></port><port><name>MMusIDs</name><annotations><annotation_chain encoding="xstream"><net.sf.taverna.t2.annotation.AnnotationChainImpl xmlns="">
+  <annotationAssertions>
+    <net.sf.taverna.t2.annotation.AnnotationAssertionImpl>
+      <annotationBean class="net.sf.taverna.t2.annotation.annotationbeans.MimeType">
+        <text>text/plain</text>
+      </annotationBean>
+      <date>2009-12-15 21:49:47.668 GMT</date>
+      <creators />
+      <curationEventList />
+    </net.sf.taverna.t2.annotation.AnnotationAssertionImpl>
+  </annotationAssertions>
+</net.sf.taverna.t2.annotation.AnnotationChainImpl></annotation_chain></annotations></port><port><name>RNorIDs</name><annotations><annotation_chain encoding="xstream"><net.sf.taverna.t2.annotation.AnnotationChainImpl xmlns="">
+  <annotationAssertions>
+    <net.sf.taverna.t2.annotation.AnnotationAssertionImpl>
+      <annotationBean class="net.sf.taverna.t2.annotation.annotationbeans.MimeType">
+        <text>text/plain</text>
+      </annotationBean>
+      <date>2009-12-15 21:49:47.668 GMT</date>
+      <creators />
+      <curationEventList />
+    </net.sf.taverna.t2.annotation.AnnotationAssertionImpl>
+  </annotationAssertions>
+</net.sf.taverna.t2.annotation.AnnotationChainImpl></annotation_chain></annotations></port></outputPorts><processors><processor><name>GetUniqueHomolog</name><inputPorts><port><name>HSGeneIDs</name><depth>1</depth></port><port><name>RatGeneIDs</name><depth>1</depth></port><port><name>MouseGeneIDs</name><depth>1</depth></port></inputPorts><outputPorts><port><name>MouseOut</name><depth>1</depth><granularDepth>1</granularDepth></port><port><name>HSOut</name><depth>1</depth><granularDepth>1</granularDepth></port><port><name>RatOut</name><depth>1</depth><granularDepth>1</granularDepth></port></outputPorts><annotations /><activities><activity><raven><group>net.sf.taverna.t2.activities</group><artifact>beanshell-activity</artifact><version>1.0</version></raven><class>net.sf.taverna.t2.activities.beanshell.BeanshellActivity</class><inputMap><map from="RatGeneIDs" to="RatGeneIDs" /><map from="HSGeneIDs" to="HSGeneIDs" /><map from="MouseGeneIDs" to="MouseGeneIDs" /></inputMap><outputMap><map from="RatOut" to="RatOut" /><map from="HSOut" to="HSOut" /><map from="MouseOut" to="MouseOut" /></outputMap><configBean encoding="xstream"><net.sf.taverna.t2.activities.beanshell.BeanshellActivityConfigurationBean xmlns="">
+  <script>List HSOut = new ArrayList();
+List RatOut = new ArrayList();
+List MouseOut = new ArrayList();
+
+Map hsToMouse = new HashMap();
+Iterator j = MouseGeneIDs.iterator();
+for (Iterator i = HSGeneIDs.iterator(); i.hasNext();) {
+  String id = (String)i.next();
+  hsToMouse.put(id, j.next());
+}
+Map hsToRat = new HashMap();
+j = RatGeneIDs.iterator();
+for (Iterator i = HSGeneIDs.iterator(); i.hasNext();) {
+  String id = (String)i.next();
+  hsToRat.put(id, j.next());
+}
+
+// Build the unique outputs
+for (Iterator i = hsToRat.keySet().iterator(); i.hasNext();) {
+  String hsID = (String)i.next();
+  String ratID = (String)hsToRat.get(hsID);
+  // Remove version number
+  // ratID = (ratID.split("."))[0];
+  String mouseID = (String)hsToMouse.get(hsID);
+  // Remove version number
+  //mouseId = (mouseID.split("."))[0];
+  if (ratID != null &amp;&amp; mouseID != null &amp;&amp; ratID.equals("")==false &amp;&amp; mouseID.equals("")==false) {
+    HSOut.add(hsID);
+    RatOut.add(ratID.split("\\.")[0]);
+    MouseOut.add(mouseID.split("\\.")[0]);
+  }
+}</script>
+  <dependencies />
+  <classLoaderSharing>workflow</classLoaderSharing>
+  <localDependencies />
+  <artifactDependencies />
+  <inputs>
+    <net.sf.taverna.t2.workflowmodel.processor.activity.config.ActivityInputPortDefinitionBean>
+      <handledReferenceSchemes />
+      <translatedElementType>java.lang.String</translatedElementType>
+      <allowsLiteralValues>true</allowsLiteralValues>
+      <name>HSGeneIDs</name>
+      <depth>1</depth>
+      <mimeTypes>
+        <string>l('text/plain')</string>
+      </mimeTypes>
+    </net.sf.taverna.t2.workflowmodel.processor.activity.config.ActivityInputPortDefinitionBean>
+    <net.sf.taverna.t2.workflowmodel.processor.activity.config.ActivityInputPortDefinitionBean>
+      <handledReferenceSchemes />
+      <translatedElementType>java.lang.String</translatedElementType>
+      <allowsLiteralValues>true</allowsLiteralValues>
+      <name>MouseGeneIDs</name>
+      <depth>1</depth>
+      <mimeTypes>
+        <string>l('text/plain')</string>
+      </mimeTypes>
+    </net.sf.taverna.t2.workflowmodel.processor.activity.config.ActivityInputPortDefinitionBean>
+    <net.sf.taverna.t2.workflowmodel.processor.activity.config.ActivityInputPortDefinitionBean>
+      <handledReferenceSchemes />
+      <translatedElementType>java.lang.String</translatedElementType>
+      <allowsLiteralValues>true</allowsLiteralValues>
+      <name>RatGeneIDs</name>
+      <depth>1</depth>
+      <mimeTypes>
+        <string>l('text/plain')</string>
+      </mimeTypes>
+    </net.sf.taverna.t2.workflowmodel.processor.activity.config.ActivityInputPortDefinitionBean>
+  </inputs>
+  <outputs>
+    <net.sf.taverna.t2.workflowmodel.processor.activity.config.ActivityOutputPortDefinitionBean>
+      <granularDepth>1</granularDepth>
+      <name>HSOut</name>
+      <depth>1</depth>
+      <mimeTypes>
+        <string>l('text/plain')</string>
+      </mimeTypes>
+    </net.sf.taverna.t2.workflowmodel.processor.activity.config.ActivityOutputPortDefinitionBean>
+    <net.sf.taverna.t2.workflowmodel.processor.activity.config.ActivityOutputPortDefinitionBean>
+      <granularDepth>1</granularDepth>
+      <name>RatOut</name>
+      <depth>1</depth>
+      <mimeTypes>
+        <string>l('text/plain')</string>
+      </mimeTypes>
+    </net.sf.taverna.t2.workflowmodel.processor.activity.config.ActivityOutputPortDefinitionBean>
+    <net.sf.taverna.t2.workflowmodel.processor.activity.config.ActivityOutputPortDefinitionBean>
+      <granularDepth>1</granularDepth>
+      <name>MouseOut</name>
+      <depth>1</depth>
+      <mimeTypes>
+        <string>l('text/plain')</string>
+      </mimeTypes>
+    </net.sf.taverna.t2.workflowmodel.processor.activity.config.ActivityOutputPortDefinitionBean>
+  </outputs>
+</net.sf.taverna.t2.activities.beanshell.BeanshellActivityConfigurationBean></configBean><annotations /></activity></activities><dispatchStack><dispatchLayer><raven><group>net.sf.taverna.t2.core</group><artifact>workflowmodel-impl</artifact><version>1.0</version></raven><class>net.sf.taverna.t2.workflowmodel.processor.dispatch.layers.Parallelize</class><configBean encoding="xstream"><net.sf.taverna.t2.workflowmodel.processor.dispatch.layers.ParallelizeConfig xmlns="">
+  <maxJobs>1</maxJobs>
+</net.sf.taverna.t2.workflowmodel.processor.dispatch.layers.ParallelizeConfig></configBean></dispatchLayer><dispatchLayer><raven><group>net.sf.taverna.t2.core</group><artifact>workflowmodel-impl</artifact><version>1.0</version></raven><class>net.sf.taverna.t2.workflowmodel.processor.dispatch.layers.ErrorBounce</class><configBean encoding="xstream"><null xmlns="" /></configBean></dispatchLayer><dispatchLayer><raven><group>net.sf.taverna.t2.core</group><artifact>workflowmodel-impl</artifact><version>1.0</version></raven><class>net.sf.taverna.t2.workflowmodel.processor.dispatch.layers.Failover</class><configBean encoding="xstream"><null xmlns="" /></configBean></dispatchLayer><dispatchLayer><raven><group>net.sf.taverna.t2.core</group><artifact>workflowmodel-impl</artifact><version>1.0</version></raven><class>net.sf.taverna.t2.workflowmodel.processor.dispatch.layers.Retry</class><configBean encoding="xstream"><net.sf.taverna.t2.workflowmodel.processor.dispatch.layers.RetryConfig xmlns="">
+  <backoffFactor>1.0</backoffFactor>
+  <initialDelay>0</initialDelay>
+  <maxDelay>0</maxDelay>
+  <maxRetries>0</maxRetries>
+</net.sf.taverna.t2.workflowmodel.processor.dispatch.layers.RetryConfig></configBean></dispatchLayer><dispatchLayer><raven><group>net.sf.taverna.t2.core</group><artifact>workflowmodel-impl</artifact><version>1.0</version></raven><class>net.sf.taverna.t2.workflowmodel.processor.dispatch.layers.Invoke</class><configBean encoding="xstream"><null xmlns="" /></configBean></dispatchLayer></dispatchStack><iterationStrategyStack><iteration><strategy><cross><port name="RatGeneIDs" depth="1" /><port name="MouseGeneIDs" depth="1" /><port name="HSGeneIDs" depth="1" /></cross></strategy></iteration></iterationStrategyStack></processor><processor><name>hsapiensGeneEnsembl</name><inputPorts /><outputPorts><port><name>hsapiens_gene_ensembl.mouse_ensembl_gene</name><depth>1</depth><granularDepth>1</granularDepth></port><port><name>hsapiens_gene_ensembl.ensembl_gene_id</name><depth>1</depth><granularDepth>1</granularDepth></port><port><name>hsapiens_gene_ensembl.rat_ensembl_gene</name><depth>1</depth><granularDepth>1</granularDepth></port></outputPorts><annotations /><activities><activity><raven><group>net.sf.taverna.t2.activities</group><artifact>biomart-activity</artifact><version>1.0</version></raven><class>net.sf.taverna.t2.activities.biomart.BiomartActivity</class><inputMap /><outputMap><map from="hsapiens_gene_ensembl.rat_ensembl_gene" to="hsapiens_gene_ensembl.rat_ensembl_gene" /><map from="hsapiens_gene_ensembl.ensembl_gene_id" to="hsapiens_gene_ensembl.ensembl_gene_id" /><map from="hsapiens_gene_ensembl.mouse_ensembl_gene" to="hsapiens_gene_ensembl.mouse_ensembl_gene" /></outputMap><configBean encoding="jdomxml"><MartQuery xmlns=""><MartService location="http://www.biomart.org/biomart/martservice" /><MartDataset displayName="Homo sapiens genes (GRCh37)" name="hsapiens_gene_ensembl" type="TableSet" initialBatchSize="200" maximumBatchSize="50000" visible="false" interface="default" modified="2009-07-15 14:24:08"><MartURLLocation database="ensembl_mart_55" default="1" displayName="ENSEMBL 55 GENES (SANGER UK)" host="www.biomart.org" includeDatasets="" martUser="" name="ensembl" path="/biomart/martservice" port="80" serverVirtualSchema="default" virtualSchema="default" visible="1" redirect="0" /></MartDataset><Query virtualSchemaName="default" count="0" uniqueRows="0" softwareVersion="0.7" requestId="taverna"><Dataset name="hsapiens_gene_ensembl"><Attribute name="ensembl_gene_id" /><Attribute name="mouse_ensembl_gene" /><Attribute name="rat_ensembl_gene" /><Filter name="chromosome_name" value="22" /><Filter name="with_mmusculus_homolog" excluded="0" /></Dataset></Query></MartQuery></configBean><annotations /></activity></activities><dispatchStack><dispatchLayer><raven><group>net.sf.taverna.t2.core</group><artifact>workflowmodel-impl</artifact><version>1.0</version></raven><class>net.sf.taverna.t2.workflowmodel.processor.dispatch.layers.Parallelize</class><configBean encoding="xstream"><net.sf.taverna.t2.workflowmodel.processor.dispatch.layers.ParallelizeConfig xmlns="">
+  <maxJobs>1</maxJobs>
+</net.sf.taverna.t2.workflowmodel.processor.dispatch.layers.ParallelizeConfig></configBean></dispatchLayer><dispatchLayer><raven><group>net.sf.taverna.t2.core</group><artifact>workflowmodel-impl</artifact><version>1.0</version></raven><class>net.sf.taverna.t2.workflowmodel.processor.dispatch.layers.ErrorBounce</class><configBean encoding="xstream"><null xmlns="" /></configBean></dispatchLayer><dispatchLayer><raven><group>net.sf.taverna.t2.core</group><artifact>workflowmodel-impl</artifact><version>1.0</version></raven><class>net.sf.taverna.t2.workflowmodel.processor.dispatch.layers.Failover</class><configBean encoding="xstream"><null xmlns="" /></configBean></dispatchLayer><dispatchLayer><raven><group>net.sf.taverna.t2.core</group><artifact>workflowmodel-impl</artifact><version>1.0</version></raven><class>net.sf.taverna.t2.workflowmodel.processor.dispatch.layers.Retry</class><configBean encoding="xstream"><net.sf.taverna.t2.workflowmodel.processor.dispatch.layers.RetryConfig xmlns="">
+  <backoffFactor>1.0</backoffFactor>
+  <initialDelay>0</initialDelay>
+  <maxDelay>0</maxDelay>
+  <maxRetries>0</maxRetries>
+</net.sf.taverna.t2.workflowmodel.processor.dispatch.layers.RetryConfig></configBean></dispatchLayer><dispatchLayer><raven><group>net.sf.taverna.t2.core</group><artifact>workflowmodel-impl</artifact><version>1.0</version></raven><class>net.sf.taverna.t2.workflowmodel.processor.dispatch.layers.Invoke</class><configBean encoding="xstream"><null xmlns="" /></configBean></dispatchLayer></dispatchStack><iterationStrategyStack><iteration><strategy><cross /></strategy></iteration></iterationStrategyStack></processor><processor><name>getHSapSequence</name><inputPorts><port><name>hsapiens_gene_ensembl.ensembl_gene_id_filter</name><depth>1</depth></port></inputPorts><outputPorts><port><name>hsapiens_gene_ensembl.ensembl_gene_id</name><depth>1</depth><granularDepth>1</granularDepth></port><port><name>hsapiens_gene_ensembl.coding_gene_flank</name><depth>1</depth><granularDepth>1</granularDepth></port></outputPorts><annotations /><activities><activity><raven><group>net.sf.taverna.t2.activities</group><artifact>biomart-activity</artifact><version>1.0</version></raven><class>net.sf.taverna.t2.activities.biomart.BiomartActivity</class><inputMap><map from="hsapiens_gene_ensembl.ensembl_gene_id_filter" to="hsapiens_gene_ensembl.ensembl_gene_id_filter" /></inputMap><outputMap><map from="hsapiens_gene_ensembl.coding_gene_flank" to="hsapiens_gene_ensembl.coding_gene_flank" /><map from="hsapiens_gene_ensembl.ensembl_gene_id" to="hsapiens_gene_ensembl.ensembl_gene_id" /></outputMap><configBean encoding="jdomxml"><MartQuery xmlns=""><MartService location="http://www.biomart.org/biomart/martservice" /><MartDataset displayName="Homo sapiens genes (GRCh37)" name="hsapiens_gene_ensembl" type="TableSet" initialBatchSize="200" maximumBatchSize="50000" visible="false" interface="default" modified="2009-07-15 14:24:08"><MartURLLocation database="ensembl_mart_55" default="1" displayName="ENSEMBL 55 GENES (SANGER UK)" host="www.biomart.org" includeDatasets="" martUser="" name="ensembl" path="/biomart/martservice" port="80" serverVirtualSchema="default" virtualSchema="default" visible="1" redirect="0" /></MartDataset><Query virtualSchemaName="default" count="0" uniqueRows="0" softwareVersion="0.7" requestId="taverna"><Dataset name="hsapiens_gene_ensembl"><Attribute name="coding_gene_flank" /><Attribute name="ensembl_gene_id" /><Filter name="ensembl_gene_id" value="" list="true" /><Filter name="upstream_flank" value="100" /></Dataset></Query></MartQuery></configBean><annotations /></activity></activities><dispatchStack><dispatchLayer><raven><group>net.sf.taverna.t2.core</group><artifact>workflowmodel-impl</artifact><version>1.0</version></raven><class>net.sf.taverna.t2.workflowmodel.processor.dispatch.layers.Parallelize</class><configBean encoding="xstream"><net.sf.taverna.t2.workflowmodel.processor.dispatch.layers.ParallelizeConfig xmlns="">
+  <maxJobs>1</maxJobs>
+</net.sf.taverna.t2.workflowmodel.processor.dispatch.layers.ParallelizeConfig></configBean></dispatchLayer><dispatchLayer><raven><group>net.sf.taverna.t2.core</group><artifact>workflowmodel-impl</artifact><version>1.0</version></raven><class>net.sf.taverna.t2.workflowmodel.processor.dispatch.layers.ErrorBounce</class><configBean encoding="xstream"><null xmlns="" /></configBean></dispatchLayer><dispatchLayer><raven><group>net.sf.taverna.t2.core</group><artifact>workflowmodel-impl</artifact><version>1.0</version></raven><class>net.sf.taverna.t2.workflowmodel.processor.dispatch.layers.Failover</class><configBean encoding="xstream"><null xmlns="" /></configBean></dispatchLayer><dispatchLayer><raven><group>net.sf.taverna.t2.core</group><artifact>workflowmodel-impl</artifact><version>1.0</version></raven><class>net.sf.taverna.t2.workflowmodel.processor.dispatch.layers.Retry</class><configBean encoding="xstream"><net.sf.taverna.t2.workflowmodel.processor.dispatch.layers.RetryConfig xmlns="">
+  <backoffFactor>1.0</backoffFactor>
+  <initialDelay>0</initialDelay>
+  <maxDelay>0</maxDelay>
+  <maxRetries>0</maxRetries>
+</net.sf.taverna.t2.workflowmodel.processor.dispatch.layers.RetryConfig></configBean></dispatchLayer><dispatchLayer><raven><group>net.sf.taverna.t2.core</group><artifact>workflowmodel-impl</artifact><version>1.0</version></raven><class>net.sf.taverna.t2.workflowmodel.processor.dispatch.layers.Invoke</class><configBean encoding="xstream"><null xmlns="" /></configBean></dispatchLayer></dispatchStack><iterationStrategyStack><iteration><strategy><cross><port name="hsapiens_gene_ensembl.ensembl_gene_id_filter" depth="1" /></cross></strategy></iteration></iterationStrategyStack></processor><processor><name>CreateFasta</name><inputPorts><port><name>hsSeq</name><depth>0</depth></port><port><name>rnSeq</name><depth>0</depth></port><port><name>mmSeq</name><depth>0</depth></port></inputPorts><outputPorts><port><name>fasta</name><depth>0</depth><granularDepth>0</granularDepth></port></outputPorts><annotations /><activities><activity><raven><group>net.sf.taverna.t2.activities</group><artifact>beanshell-activity</artifact><version>1.0</version></raven><class>net.sf.taverna.t2.activities.beanshell.BeanshellActivity</class><inputMap><map from="hsSeq" to="hsSeq" /><map from="rnSeq" to="rnSeq" /><map from="mmSeq" to="mmSeq" /></inputMap><outputMap><map from="fasta" to="fasta" /></outputMap><configBean encoding="xstream"><net.sf.taverna.t2.activities.beanshell.BeanshellActivityConfigurationBean xmlns="">
+  <script>fasta = "&gt;Human\n"+hsSeq+"\n&gt;Mouse\n"+mmSeq+"\n&gt;Rat\n"+rnSeq;</script>
+  <dependencies />
+  <classLoaderSharing>workflow</classLoaderSharing>
+  <localDependencies />
+  <artifactDependencies />
+  <inputs>
+    <net.sf.taverna.t2.workflowmodel.processor.activity.config.ActivityInputPortDefinitionBean>
+      <handledReferenceSchemes />
+      <translatedElementType>java.lang.String</translatedElementType>
+      <allowsLiteralValues>true</allowsLiteralValues>
+      <name>hsSeq</name>
+      <depth>0</depth>
+      <mimeTypes>
+        <string>'text/plain'</string>
+      </mimeTypes>
+    </net.sf.taverna.t2.workflowmodel.processor.activity.config.ActivityInputPortDefinitionBean>
+    <net.sf.taverna.t2.workflowmodel.processor.activity.config.ActivityInputPortDefinitionBean>
+      <handledReferenceSchemes />
+      <translatedElementType>java.lang.String</translatedElementType>
+      <allowsLiteralValues>true</allowsLiteralValues>
+      <name>mmSeq</name>
+      <depth>0</depth>
+      <mimeTypes>
+        <string>'text/plain'</string>
+      </mimeTypes>
+    </net.sf.taverna.t2.workflowmodel.processor.activity.config.ActivityInputPortDefinitionBean>
+    <net.sf.taverna.t2.workflowmodel.processor.activity.config.ActivityInputPortDefinitionBean>
+      <handledReferenceSchemes />
+      <translatedElementType>java.lang.String</translatedElementType>
+      <allowsLiteralValues>true</allowsLiteralValues>
+      <name>rnSeq</name>
+      <depth>0</depth>
+      <mimeTypes>
+        <string>'text/plain'</string>
+      </mimeTypes>
+    </net.sf.taverna.t2.workflowmodel.processor.activity.config.ActivityInputPortDefinitionBean>
+  </inputs>
+  <outputs>
+    <net.sf.taverna.t2.workflowmodel.processor.activity.config.ActivityOutputPortDefinitionBean>
+      <granularDepth>0</granularDepth>
+      <name>fasta</name>
+      <depth>0</depth>
+      <mimeTypes>
+        <string>'text/plain'</string>
+      </mimeTypes>
+    </net.sf.taverna.t2.workflowmodel.processor.activity.config.ActivityOutputPortDefinitionBean>
+  </outputs>
+</net.sf.taverna.t2.activities.beanshell.BeanshellActivityConfigurationBean></configBean><annotations /></activity></activities><dispatchStack><dispatchLayer><raven><group>net.sf.taverna.t2.core</group><artifact>workflowmodel-impl</artifact><version>1.0</version></raven><class>net.sf.taverna.t2.workflowmodel.processor.dispatch.layers.Parallelize</class><configBean encoding="xstream"><net.sf.taverna.t2.workflowmodel.processor.dispatch.layers.ParallelizeConfig xmlns="">
+  <maxJobs>1</maxJobs>
+</net.sf.taverna.t2.workflowmodel.processor.dispatch.layers.ParallelizeConfig></configBean></dispatchLayer><dispatchLayer><raven><group>net.sf.taverna.t2.core</group><artifact>workflowmodel-impl</artifact><version>1.0</version></raven><class>net.sf.taverna.t2.workflowmodel.processor.dispatch.layers.ErrorBounce</class><configBean encoding="xstream"><null xmlns="" /></configBean></dispatchLayer><dispatchLayer><raven><group>net.sf.taverna.t2.core</group><artifact>workflowmodel-impl</artifact><version>1.0</version></raven><class>net.sf.taverna.t2.workflowmodel.processor.dispatch.layers.Failover</class><configBean encoding="xstream"><null xmlns="" /></configBean></dispatchLayer><dispatchLayer><raven><group>net.sf.taverna.t2.core</group><artifact>workflowmodel-impl</artifact><version>1.0</version></raven><class>net.sf.taverna.t2.workflowmodel.processor.dispatch.layers.Retry</class><configBean encoding="xstream"><net.sf.taverna.t2.workflowmodel.processor.dispatch.layers.RetryConfig xmlns="">
+  <backoffFactor>1.0</backoffFactor>
+  <initialDelay>0</initialDelay>
+  <maxDelay>0</maxDelay>
+  <maxRetries>0</maxRetries>
+</net.sf.taverna.t2.workflowmodel.processor.dispatch.layers.RetryConfig></configBean></dispatchLayer><dispatchLayer><raven><group>net.sf.taverna.t2.core</group><artifact>workflowmodel-impl</artifact><version>1.0</version></raven><class>net.sf.taverna.t2.workflowmodel.processor.dispatch.layers.Invoke</class><configBean encoding="xstream"><null xmlns="" /></configBean></dispatchLayer></dispatchStack><iterationStrategyStack><iteration><strategy><dot><port name="hsSeq" depth="0" /><port name="mmSeq" depth="0" /><port name="rnSeq" depth="0" /></dot></strategy></iteration></iterationStrategyStack></processor><processor><name>getRNorSequence</name><inputPorts><port><name>rnorvegicus_gene_ensembl.ensembl_gene_id_filter</name><depth>1</depth></port></inputPorts><outputPorts><port><name>rnorvegicus_gene_ensembl.ensembl_gene_id</name><depth>1</depth><granularDepth>1</granularDepth></port><port><name>rnorvegicus_gene_ensembl.coding_gene_flank</name><depth>1</depth><granularDepth>1</granularDepth></port></outputPorts><annotations /><activities><activity><raven><group>net.sf.taverna.t2.activities</group><artifact>biomart-activity</artifact><version>1.0</version></raven><class>net.sf.taverna.t2.activities.biomart.BiomartActivity</class><inputMap><map from="rnorvegicus_gene_ensembl.ensembl_gene_id_filter" to="rnorvegicus_gene_ensembl.ensembl_gene_id_filter" /></inputMap><outputMap><map from="rnorvegicus_gene_ensembl.coding_gene_flank" to="rnorvegicus_gene_ensembl.coding_gene_flank" /><map from="rnorvegicus_gene_ensembl.ensembl_gene_id" to="rnorvegicus_gene_ensembl.ensembl_gene_id" /></outputMap><configBean encoding="jdomxml"><MartQuery xmlns=""><MartService location="http://www.biomart.org/biomart/martservice" /><MartDataset displayName="Rattus norvegicus genes (RGSC3.4)" name="rnorvegicus_gene_ensembl" type="TableSet" initialBatchSize="200" maximumBatchSize="50000" visible="false" interface="default" modified="2009-07-15 14:36:01"><MartURLLocation database="ensembl_mart_55" default="1" displayName="ENSEMBL 55 GENES (SANGER UK)" host="www.biomart.org" includeDatasets="" martUser="" name="ensembl" path="/biomart/martservice" port="80" serverVirtualSchema="default" virtualSchema="default" visible="1" redirect="0" /></MartDataset><Query virtualSchemaName="default" count="0" uniqueRows="0" softwareVersion="0.7" requestId="taverna"><Dataset name="rnorvegicus_gene_ensembl"><Attribute name="coding_gene_flank" /><Attribute name="ensembl_gene_id" /><Filter name="ensembl_gene_id" value="" list="true" /><Filter name="upstream_flank" value="100" /></Dataset></Query></MartQuery></configBean><annotations /></activity></activities><dispatchStack><dispatchLayer><raven><group>net.sf.taverna.t2.core</group><artifact>workflowmodel-impl</artifact><version>1.0</version></raven><class>net.sf.taverna.t2.workflowmodel.processor.dispatch.layers.Parallelize</class><configBean encoding="xstream"><net.sf.taverna.t2.workflowmodel.processor.dispatch.layers.ParallelizeConfig xmlns="">
+  <maxJobs>1</maxJobs>
+</net.sf.taverna.t2.workflowmodel.processor.dispatch.layers.ParallelizeConfig></configBean></dispatchLayer><dispatchLayer><raven><group>net.sf.taverna.t2.core</group><artifact>workflowmodel-impl</artifact><version>1.0</version></raven><class>net.sf.taverna.t2.workflowmodel.processor.dispatch.layers.ErrorBounce</class><configBean encoding="xstream"><null xmlns="" /></configBean></dispatchLayer><dispatchLayer><raven><group>net.sf.taverna.t2.core</group><artifact>workflowmodel-impl</artifact><version>1.0</version></raven><class>net.sf.taverna.t2.workflowmodel.processor.dispatch.layers.Failover</class><configBean encoding="xstream"><null xmlns="" /></configBean></dispatchLayer><dispatchLayer><raven><group>net.sf.taverna.t2.core</group><artifact>workflowmodel-impl</artifact><version>1.0</version></raven><class>net.sf.taverna.t2.workflowmodel.processor.dispatch.layers.Retry</class><configBean encoding="xstream"><net.sf.taverna.t2.workflowmodel.processor.dispatch.layers.RetryConfig xmlns="">
+  <backoffFactor>1.0</backoffFactor>
+  <initialDelay>0</initialDelay>
+  <maxDelay>0</maxDelay>
+  <maxRetries>0</maxRetries>
+</net.sf.taverna.t2.workflowmodel.processor.dispatch.layers.RetryConfig></configBean></dispatchLayer><dispatchLayer><raven><group>net.sf.taverna.t2.core</group><artifact>workflowmodel-impl</artifact><version>1.0</version></raven><class>net.sf.taverna.t2.workflowmodel.processor.dispatch.layers.Invoke</class><configBean encoding="xstream"><null xmlns="" /></configBean></dispatchLayer></dispatchStack><iterationStrategyStack><iteration><strategy><cross><port name="rnorvegicus_gene_ensembl.ensembl_gene_id_filter" depth="1" /></cross></strategy></iteration></iterationStrategyStack></processor><processor><name>getMMusSequence</name><inputPorts><port><name>mmusculus_gene_ensembl.ensembl_gene_id_filter</name><depth>1</depth></port></inputPorts><outputPorts><port><name>mmusculus_gene_ensembl.ensembl_gene_id</name><depth>1</depth><granularDepth>1</granularDepth></port><port><name>mmusculus_gene_ensembl.coding_gene_flank</name><depth>1</depth><granularDepth>1</granularDepth></port></outputPorts><annotations /><activities><activity><raven><group>net.sf.taverna.t2.activities</group><artifact>biomart-activity</artifact><version>1.0</version></raven><class>net.sf.taverna.t2.activities.biomart.BiomartActivity</class><inputMap><map from="mmusculus_gene_ensembl.ensembl_gene_id_filter" to="mmusculus_gene_ensembl.ensembl_gene_id_filter" /></inputMap><outputMap><map from="mmusculus_gene_ensembl.coding_gene_flank" to="mmusculus_gene_ensembl.coding_gene_flank" /><map from="mmusculus_gene_ensembl.ensembl_gene_id" to="mmusculus_gene_ensembl.ensembl_gene_id" /></outputMap><configBean encoding="jdomxml"><MartQuery xmlns=""><MartService location="http://www.biomart.org/biomart/martservice" /><MartDataset displayName="Mus musculus genes (NCBIM37)" name="mmusculus_gene_ensembl" type="TableSet" initialBatchSize="200" maximumBatchSize="50000" visible="false" interface="default" modified="2009-07-15 14:45:36"><MartURLLocation database="ensembl_mart_55" default="1" displayName="ENSEMBL 55 GENES (SANGER UK)" host="www.biomart.org" includeDatasets="" martUser="" name="ensembl" path="/biomart/martservice" port="80" serverVirtualSchema="default" virtualSchema="default" visible="1" redirect="0" /></MartDataset><Query virtualSchemaName="default" count="0" uniqueRows="0" softwareVersion="0.7" requestId="taverna"><Dataset name="mmusculus_gene_ensembl"><Attribute name="coding_gene_flank" /><Attribute name="ensembl_gene_id" /><Filter name="ensembl_gene_id" value="" list="true" /><Filter name="upstream_flank" value="100" /></Dataset></Query></MartQuery></configBean><annotations /></activity></activities><dispatchStack><dispatchLayer><raven><group>net.sf.taverna.t2.core</group><artifact>workflowmodel-impl</artifact><version>1.0</version></raven><class>net.sf.taverna.t2.workflowmodel.processor.dispatch.layers.Parallelize</class><configBean encoding="xstream"><net.sf.taverna.t2.workflowmodel.processor.dispatch.layers.ParallelizeConfig xmlns="">
+  <maxJobs>1</maxJobs>
+</net.sf.taverna.t2.workflowmodel.processor.dispatch.layers.ParallelizeConfig></configBean></dispatchLayer><dispatchLayer><raven><group>net.sf.taverna.t2.core</group><artifact>workflowmodel-impl</artifact><version>1.0</version></raven><class>net.sf.taverna.t2.workflowmodel.processor.dispatch.layers.ErrorBounce</class><configBean encoding="xstream"><null xmlns="" /></configBean></dispatchLayer><dispatchLayer><raven><group>net.sf.taverna.t2.core</group><artifact>workflowmodel-impl</artifact><version>1.0</version></raven><class>net.sf.taverna.t2.workflowmodel.processor.dispatch.layers.Failover</class><configBean encoding="xstream"><null xmlns="" /></configBean></dispatchLayer><dispatchLayer><raven><group>net.sf.taverna.t2.core</group><artifact>workflowmodel-impl</artifact><version>1.0</version></raven><class>net.sf.taverna.t2.workflowmodel.processor.dispatch.layers.Retry</class><configBean encoding="xstream"><net.sf.taverna.t2.workflowmodel.processor.dispatch.layers.RetryConfig xmlns="">
+  <backoffFactor>1.0</backoffFactor>
+  <initialDelay>0</initialDelay>
+  <maxDelay>0</maxDelay>
+  <maxRetries>0</maxRetries>
+</net.sf.taverna.t2.workflowmodel.processor.dispatch.layers.RetryConfig></configBean></dispatchLayer><dispatchLayer><raven><group>net.sf.taverna.t2.core</group><artifact>workflowmodel-impl</artifact><version>1.0</version></raven><class>net.sf.taverna.t2.workflowmodel.processor.dispatch.layers.Invoke</class><configBean encoding="xstream"><null xmlns="" /></configBean></dispatchLayer></dispatchStack><iterationStrategyStack><iteration><strategy><cross><port name="mmusculus_gene_ensembl.ensembl_gene_id_filter" depth="1" /></cross></strategy></iteration></iterationStrategyStack></processor><processor><name>FlattenImageList</name><inputPorts><port><name>inputlist</name><depth>2</depth></port></inputPorts><outputPorts><port><name>outputlist</name><depth>1</depth><granularDepth>1</granularDepth></port></outputPorts><annotations /><activities><activity><raven><group>net.sf.taverna.t2.activities</group><artifact>localworker-activity</artifact><version>1.0</version></raven><class>net.sf.taverna.t2.activities.localworker.LocalworkerActivity</class><inputMap><map from="inputlist" to="inputlist" /></inputMap><outputMap><map from="outputlist" to="outputlist" /></outputMap><configBean encoding="xstream"><net.sf.taverna.t2.activities.localworker.LocalworkerActivityConfigurationBean xmlns="">
+  <localworkerName>org.embl.ebi.escience.scuflworkers.java.FlattenList</localworkerName>
+  <script>flatten(inputs, outputs, depth) {
+	for (i = inputs.iterator(); i.hasNext();) {
+	    element = i.next();
+		if (element instanceof Collection &amp;&amp; depth &gt; 0) {
+			flatten(element, outputs, depth - 1);
+		} else {
+			outputs.add(element);
+		}
+	}
+}
+
+outputlist = new ArrayList();
+
+flatten(inputlist, outputlist, 1);</script>
+  <dependencies />
+  <classLoaderSharing>workflow</classLoaderSharing>
+  <localDependencies />
+  <artifactDependencies />
+  <inputs>
+    <net.sf.taverna.t2.workflowmodel.processor.activity.config.ActivityInputPortDefinitionBean>
+      <handledReferenceSchemes />
+      <translatedElementType>[B</translatedElementType>
+      <allowsLiteralValues>true</allowsLiteralValues>
+      <name>inputlist</name>
+      <depth>2</depth>
+      <mimeTypes>
+        <string>l(l(''))</string>
+      </mimeTypes>
+    </net.sf.taverna.t2.workflowmodel.processor.activity.config.ActivityInputPortDefinitionBean>
+  </inputs>
+  <outputs>
+    <net.sf.taverna.t2.workflowmodel.processor.activity.config.ActivityOutputPortDefinitionBean>
+      <granularDepth>1</granularDepth>
+      <name>outputlist</name>
+      <depth>1</depth>
+      <mimeTypes>
+        <string>l('')</string>
+      </mimeTypes>
+    </net.sf.taverna.t2.workflowmodel.processor.activity.config.ActivityOutputPortDefinitionBean>
+  </outputs>
+</net.sf.taverna.t2.activities.localworker.LocalworkerActivityConfigurationBean></configBean><annotations /></activity></activities><dispatchStack><dispatchLayer><raven><group>net.sf.taverna.t2.core</group><artifact>workflowmodel-impl</artifact><version>1.0</version></raven><class>net.sf.taverna.t2.workflowmodel.processor.dispatch.layers.Parallelize</class><configBean encoding="xstream"><net.sf.taverna.t2.workflowmodel.processor.dispatch.layers.ParallelizeConfig xmlns="">
+  <maxJobs>1</maxJobs>
+</net.sf.taverna.t2.workflowmodel.processor.dispatch.layers.ParallelizeConfig></configBean></dispatchLayer><dispatchLayer><raven><group>net.sf.taverna.t2.core</group><artifact>workflowmodel-impl</artifact><version>1.0</version></raven><class>net.sf.taverna.t2.workflowmodel.processor.dispatch.layers.ErrorBounce</class><configBean encoding="xstream"><null xmlns="" /></configBean></dispatchLayer><dispatchLayer><raven><group>net.sf.taverna.t2.core</group><artifact>workflowmodel-impl</artifact><version>1.0</version></raven><class>net.sf.taverna.t2.workflowmodel.processor.dispatch.layers.Failover</class><configBean encoding="xstream"><null xmlns="" /></configBean></dispatchLayer><dispatchLayer><raven><group>net.sf.taverna.t2.core</group><artifact>workflowmodel-impl</artifact><version>1.0</version></raven><class>net.sf.taverna.t2.workflowmodel.processor.dispatch.layers.Retry</class><configBean encoding="xstream"><net.sf.taverna.t2.workflowmodel.processor.dispatch.layers.RetryConfig xmlns="">
+  <backoffFactor>1.0</backoffFactor>
+  <initialDelay>0</initialDelay>
+  <maxDelay>0</maxDelay>
+  <maxRetries>0</maxRetries>
+</net.sf.taverna.t2.workflowmodel.processor.dispatch.layers.RetryConfig></configBean></dispatchLayer><dispatchLayer><raven><group>net.sf.taverna.t2.core</group><artifact>workflowmodel-impl</artifact><version>1.0</version></raven><class>net.sf.taverna.t2.workflowmodel.processor.dispatch.layers.Invoke</class><configBean encoding="xstream"><null xmlns="" /></configBean></dispatchLayer></dispatchStack><iterationStrategyStack><iteration><strategy><cross><port name="inputlist" depth="2" /></cross></strategy></iteration></iterationStrategyStack></processor><processor><name>seqret</name><inputPorts><port><name>sequence_direct_data</name><depth>0</depth></port></inputPorts><outputPorts><port><name>report</name><depth>0</depth><granularDepth>0</granularDepth></port><port><name>outseq_url</name><depth>0</depth><granularDepth>0</granularDepth></port><port><name>outseq</name><depth>0</depth><granularDepth>0</granularDepth></port></outputPorts><annotations /><activities><activity><raven><group>net.sf.taverna.t2.activities</group><artifact>soaplab-activity</artifact><version>1.0</version></raven><class>net.sf.taverna.t2.activities.soaplab.SoaplabActivity</class><inputMap><map from="sequence_direct_data" to="sequence_direct_data" /></inputMap><outputMap><map from="outseq_url" to="outseq_url" /><map from="report" to="report" /><map from="outseq" to="outseq" /></outputMap><configBean encoding="xstream"><net.sf.taverna.t2.activities.soaplab.SoaplabActivityConfigurationBean xmlns="">
+  <endpoint>http://www.ebi.ac.uk/soaplab/emboss4/services/edit.seqret</endpoint>
+  <pollingInterval>0</pollingInterval>
+  <pollingBackoff>1.0</pollingBackoff>
+  <pollingIntervalMax>0</pollingIntervalMax>
+</net.sf.taverna.t2.activities.soaplab.SoaplabActivityConfigurationBean></configBean><annotations /></activity></activities><dispatchStack><dispatchLayer><raven><group>net.sf.taverna.t2.core</group><artifact>workflowmodel-impl</artifact><version>1.0</version></raven><class>net.sf.taverna.t2.workflowmodel.processor.dispatch.layers.Parallelize</class><configBean encoding="xstream"><net.sf.taverna.t2.workflowmodel.processor.dispatch.layers.ParallelizeConfig xmlns="">
+  <maxJobs>5</maxJobs>
+</net.sf.taverna.t2.workflowmodel.processor.dispatch.layers.ParallelizeConfig></configBean></dispatchLayer><dispatchLayer><raven><group>net.sf.taverna.t2.core</group><artifact>workflowmodel-impl</artifact><version>1.0</version></raven><class>net.sf.taverna.t2.workflowmodel.processor.dispatch.layers.ErrorBounce</class><configBean encoding="xstream"><null xmlns="" /></configBean></dispatchLayer><dispatchLayer><raven><group>net.sf.taverna.t2.core</group><artifact>workflowmodel-impl</artifact><version>1.0</version></raven><class>net.sf.taverna.t2.workflowmodel.processor.dispatch.layers.Failover</class><configBean encoding="xstream"><null xmlns="" /></configBean></dispatchLayer><dispatchLayer><raven><group>net.sf.taverna.t2.core</group><artifact>workflowmodel-impl</artifact><version>1.0</version></raven><class>net.sf.taverna.t2.workflowmodel.processor.dispatch.layers.Retry</class><configBean encoding="xstream"><net.sf.taverna.t2.workflowmodel.processor.dispatch.layers.RetryConfig xmlns="">
+  <backoffFactor>1.0</backoffFactor>
+  <initialDelay>0</initialDelay>
+  <maxDelay>0</maxDelay>
+  <maxRetries>0</maxRetries>
+</net.sf.taverna.t2.workflowmodel.processor.dispatch.layers.RetryConfig></configBean></dispatchLayer><dispatchLayer><raven><group>net.sf.taverna.t2.core</group><artifact>workflowmodel-impl</artifact><version>1.0</version></raven><class>net.sf.taverna.t2.workflowmodel.processor.dispatch.layers.Invoke</class><configBean encoding="xstream"><null xmlns="" /></configBean></dispatchLayer></dispatchStack><iterationStrategyStack><iteration><strategy><cross><port name="sequence_direct_data" depth="0" /></cross></strategy></iteration></iterationStrategyStack></processor><processor><name>plot</name><inputPorts><port><name>sequences_direct_data</name><depth>0</depth></port></inputPorts><outputPorts><port><name>Graphics_in_Postscript_url</name><depth>0</depth><granularDepth>0</granularDepth></port><port><name>Graphics_in_Postscript</name><depth>0</depth><granularDepth>0</granularDepth></port><port><name>report</name><depth>0</depth><granularDepth>0</granularDepth></port><port><name>Graphics_in_PNG</name><depth>1</depth><granularDepth>1</granularDepth></port><port><name>Graphics_in_PNG_url</name><depth>0</depth><granularDepth>0</granularDepth></port></outputPorts><annotations /><activities><activity><raven><group>net.sf.taverna.t2.activities</group><artifact>soaplab-activity</artifact><version>1.0</version></raven><class>net.sf.taverna.t2.activities.soaplab.SoaplabActivity</class><inputMap><map from="sequences_direct_data" to="sequences_direct_data" /></inputMap><outputMap><map from="Graphics_in_PNG_url" to="Graphics_in_PNG_url" /><map from="Graphics_in_Postscript_url" to="Graphics_in_Postscript_url" /><map from="Graphics_in_Postscript" to="Graphics_in_Postscript" /><map from="report" to="report" /><map from="Graphics_in_PNG" to="Graphics_in_PNG" /></outputMap><configBean encoding="xstream"><net.sf.taverna.t2.activities.soaplab.SoaplabActivityConfigurationBean xmlns="">
+  <endpoint>http://www.ebi.ac.uk/soaplab/emboss4/services/alignment_multiple.prettyplot</endpoint>
+  <pollingInterval>0</pollingInterval>
+  <pollingBackoff>1.0</pollingBackoff>
+  <pollingIntervalMax>0</pollingIntervalMax>
+</net.sf.taverna.t2.activities.soaplab.SoaplabActivityConfigurationBean></configBean><annotations /></activity></activities><dispatchStack><dispatchLayer><raven><group>net.sf.taverna.t2.core</group><artifact>workflowmodel-impl</artifact><version>1.0</version></raven><class>net.sf.taverna.t2.workflowmodel.processor.dispatch.layers.Parallelize</class><configBean encoding="xstream"><net.sf.taverna.t2.workflowmodel.processor.dispatch.layers.ParallelizeConfig xmlns="">
+  <maxJobs>5</maxJobs>
+</net.sf.taverna.t2.workflowmodel.processor.dispatch.layers.ParallelizeConfig></configBean></dispatchLayer><dispatchLayer><raven><group>net.sf.taverna.t2.core</group><artifact>workflowmodel-impl</artifact><version>1.0</version></raven><class>net.sf.taverna.t2.workflowmodel.processor.dispatch.layers.ErrorBounce</class><configBean encoding="xstream"><null xmlns="" /></configBean></dispatchLayer><dispatchLayer><raven><group>net.sf.taverna.t2.core</group><artifact>workflowmodel-impl</artifact><version>1.0</version></raven><class>net.sf.taverna.t2.workflowmodel.processor.dispatch.layers.Failover</class><configBean encoding="xstream"><null xmlns="" /></configBean></dispatchLayer><dispatchLayer><raven><group>net.sf.taverna.t2.core</group><artifact>workflowmodel-impl</artifact><version>1.0</version></raven><class>net.sf.taverna.t2.workflowmodel.processor.dispatch.layers.Retry</class><configBean encoding="xstream"><net.sf.taverna.t2.workflowmodel.processor.dispatch.layers.RetryConfig xmlns="">
+  <backoffFactor>1.0</backoffFactor>
+  <initialDelay>0</initialDelay>
+  <maxDelay>0</maxDelay>
+  <maxRetries>0</maxRetries>
+</net.sf.taverna.t2.workflowmodel.processor.dispatch.layers.RetryConfig></configBean></dispatchLayer><dispatchLayer><raven><group>net.sf.taverna.t2.core</group><artifact>workflowmodel-impl</artifact><version>1.0</version></raven><class>net.sf.taverna.t2.workflowmodel.processor.dispatch.layers.Invoke</class><configBean encoding="xstream"><null xmlns="" /></configBean></dispatchLayer></dispatchStack><iterationStrategyStack><iteration><strategy><cross><port name="sequences_direct_data" depth="0" /></cross></strategy></iteration></iterationStrategyStack></processor><processor><name>emma</name><inputPorts><port><name>sequence_direct_data</name><depth>0</depth></port></inputPorts><outputPorts><port><name>outseq</name><depth>0</depth><granularDepth>0</granularDepth></port><port><name>dendoutfile_url</name><depth>0</depth><granularDepth>0</granularDepth></port><port><name>dendoutfile</name><depth>0</depth><granularDepth>0</granularDepth></port><port><name>outseq_url</name><depth>0</depth><granularDepth>0</granularDepth></port><port><name>report</name><depth>0</depth><granularDepth>0</granularDepth></port></outputPorts><annotations /><activities><activity><raven><group>net.sf.taverna.t2.activities</group><artifact>soaplab-activity</artifact><version>1.0</version></raven><class>net.sf.taverna.t2.activities.soaplab.SoaplabActivity</class><inputMap><map from="sequence_direct_data" to="sequence_direct_data" /></inputMap><outputMap><map from="outseq_url" to="outseq_url" /><map from="dendoutfile" to="dendoutfile" /><map from="dendoutfile_url" to="dendoutfile_url" /><map from="report" to="report" /><map from="outseq" to="outseq" /></outputMap><configBean encoding="xstream"><net.sf.taverna.t2.activities.soaplab.SoaplabActivityConfigurationBean xmlns="">
+  <endpoint>http://www.ebi.ac.uk/soaplab/emboss4/services/alignment_multiple.emma</endpoint>
+  <pollingInterval>0</pollingInterval>
+  <pollingBackoff>1.0</pollingBackoff>
+  <pollingIntervalMax>0</pollingIntervalMax>
+</net.sf.taverna.t2.activities.soaplab.SoaplabActivityConfigurationBean></configBean><annotations /></activity></activities><dispatchStack><dispatchLayer><raven><group>net.sf.taverna.t2.core</group><artifact>workflowmodel-impl</artifact><version>1.0</version></raven><class>net.sf.taverna.t2.workflowmodel.processor.dispatch.layers.Parallelize</class><configBean encoding="xstream"><net.sf.taverna.t2.workflowmodel.processor.dispatch.layers.ParallelizeConfig xmlns="">
+  <maxJobs>5</maxJobs>
+</net.sf.taverna.t2.workflowmodel.processor.dispatch.layers.ParallelizeConfig></configBean></dispatchLayer><dispatchLayer><raven><group>net.sf.taverna.t2.core</group><artifact>workflowmodel-impl</artifact><version>1.0</version></raven><class>net.sf.taverna.t2.workflowmodel.processor.dispatch.layers.ErrorBounce</class><configBean encoding="xstream"><null xmlns="" /></configBean></dispatchLayer><dispatchLayer><raven><group>net.sf.taverna.t2.core</group><artifact>workflowmodel-impl</artifact><version>1.0</version></raven><class>net.sf.taverna.t2.workflowmodel.processor.dispatch.layers.Failover</class><configBean encoding="xstream"><null xmlns="" /></configBean></dispatchLayer><dispatchLayer><raven><group>net.sf.taverna.t2.core</group><artifact>workflowmodel-impl</artifact><version>1.0</version></raven><class>net.sf.taverna.t2.workflowmodel.processor.dispatch.layers.Retry</class><configBean encoding="xstream"><net.sf.taverna.t2.workflowmodel.processor.dispatch.layers.RetryConfig xmlns="">
+  <backoffFactor>1.0</backoffFactor>
+  <initialDelay>0</initialDelay>
+  <maxDelay>0</maxDelay>
+  <maxRetries>0</maxRetries>
+</net.sf.taverna.t2.workflowmodel.processor.dispatch.layers.RetryConfig></configBean></dispatchLayer><dispatchLayer><raven><group>net.sf.taverna.t2.core</group><artifact>workflowmodel-impl</artifact><version>1.0</version></raven><class>net.sf.taverna.t2.workflowmodel.processor.dispatch.layers.Invoke</class><configBean encoding="xstream"><null xmlns="" /></configBean></dispatchLayer></dispatchStack><iterationStrategyStack><iteration><strategy><cross><port name="sequence_direct_data" depth="0" /></cross></strategy></iteration></iterationStrategyStack></processor></processors><conditions /><datalinks><datalink><sink type="processor"><processor>GetUniqueHomolog</processor><port>HSGeneIDs</port></sink><source type="processor"><processor>hsapiensGeneEnsembl</processor><port>hsapiens_gene_ensembl.ensembl_gene_id</port></source></datalink><datalink><sink type="processor"><processor>GetUniqueHomolog</processor><port>RatGeneIDs</port></sink><source type="processor"><processor>hsapiensGeneEnsembl</processor><port>hsapiens_gene_ensembl.rat_ensembl_gene</port></source></datalink><datalink><sink type="processor"><processor>GetUniqueHomolog</processor><port>MouseGeneIDs</port></sink><source type="processor"><processor>hsapiensGeneEnsembl</processor><port>hsapiens_gene_ensembl.mouse_ensembl_gene</port></source></datalink><datalink><sink type="processor"><processor>getHSapSequence</processor><port>hsapiens_gene_ensembl.ensembl_gene_id_filter</port></sink><source type="processor"><processor>GetUniqueHomolog</processor><port>HSOut</port></source></datalink><datalink><sink type="processor"><processor>CreateFasta</processor><port>hsSeq</port></sink><source type="processor"><processor>getHSapSequence</processor><port>hsapiens_gene_ensembl.coding_gene_flank</port></source></datalink><datalink><sink type="processor"><processor>CreateFasta</processor><port>rnSeq</port></sink><source type="processor"><processor>getRNorSequence</processor><port>rnorvegicus_gene_ensembl.coding_gene_flank</port></source></datalink><datalink><sink type="processor"><processor>CreateFasta</processor><port>mmSeq</port></sink><source type="processor"><processor>getMMusSequence</processor><port>mmusculus_gene_ensembl.coding_gene_flank</port></source></datalink><datalink><sink type="processor"><processor>getRNorSequence</processor><port>rnorvegicus_gene_ensembl.ensembl_gene_id_filter</port></sink><source type="processor"><processor>GetUniqueHomolog</processor><port>RatOut</port></source></datalink><datalink><sink type="processor"><processor>getMMusSequence</processor><port>mmusculus_gene_ensembl.ensembl_gene_id_filter</port></sink><source type="processor"><processor>GetUniqueHomolog</processor><port>MouseOut</port></source></datalink><datalink><sink type="processor"><processor>FlattenImageList</processor><port>inputlist</port></sink><source type="processor"><processor>plot</processor><port>Graphics_in_PNG</port></source></datalink><datalink><sink type="processor"><processor>seqret</processor><port>sequence_direct_data</port></sink><source type="processor"><processor>CreateFasta</processor><port>fasta</port></source></datalink><datalink><sink type="processor"><processor>plot</processor><port>sequences_direct_data</port></sink><source type="processor"><processor>emma</processor><port>outseq</port></source></datalink><datalink><sink type="processor"><processor>emma</processor><port>sequence_direct_data</port></sink><source type="processor"><processor>seqret</processor><port>outseq</port></source></datalink><datalink><sink type="dataflow"><port>outputPlot</port></sink><source type="processor"><processor>FlattenImageList</processor><port>outputlist</port></source></datalink><datalink><sink type="dataflow"><port>HSapIDs</port></sink><source type="processor"><processor>GetUniqueHomolog</processor><port>HSOut</port></source></datalink><datalink><sink type="dataflow"><port>MMusIDs</port></sink><source type="processor"><processor>GetUniqueHomolog</processor><port>MouseOut</port></source></datalink><datalink><sink type="dataflow"><port>RNorIDs</port></sink><source type="processor"><processor>GetUniqueHomolog</processor><port>RatOut</port></source></datalink></datalinks><annotations><annotation_chain encoding="xstream"><net.sf.taverna.t2.annotation.AnnotationChainImpl xmlns="">
+  <annotationAssertions>
+    <net.sf.taverna.t2.annotation.AnnotationAssertionImpl>
+      <annotationBean class="net.sf.taverna.t2.annotation.annotationbeans.DescriptiveTitle">
+        <text>BiomartAndEMBOSSAnalysis</text>
+      </annotationBean>
+      <date>2009-12-15 21:49:49.57 GMT</date>
+      <creators />
+      <curationEventList />
+    </net.sf.taverna.t2.annotation.AnnotationAssertionImpl>
+  </annotationAssertions>
+</net.sf.taverna.t2.annotation.AnnotationChainImpl></annotation_chain><annotation_chain encoding="xstream"><net.sf.taverna.t2.annotation.AnnotationChainImpl xmlns="">
+  <annotationAssertions>
+    <net.sf.taverna.t2.annotation.AnnotationAssertionImpl>
+      <annotationBean class="net.sf.taverna.t2.annotation.annotationbeans.FreeTextDescription">
+        <text>Using Biomart and EMBOSS soaplab services, This workflow retrieves a number of sequences from 3 species: mouse, human, rat; align them, and returns a plot of the alignment result. Corresponding sequence ids are also returned.</text>
+      </annotationBean>
+      <date>2009-12-15 21:49:49.57 GMT</date>
+      <creators />
+      <curationEventList />
+    </net.sf.taverna.t2.annotation.AnnotationAssertionImpl>
+  </annotationAssertions>
+</net.sf.taverna.t2.annotation.AnnotationChainImpl></annotation_chain><annotation_chain encoding="xstream"><net.sf.taverna.t2.annotation.AnnotationChainImpl xmlns="">
+  <annotationAssertions>
+    <net.sf.taverna.t2.annotation.AnnotationAssertionImpl>
+      <annotationBean class="net.sf.taverna.t2.annotation.annotationbeans.Author">
+        <text />
+      </annotationBean>
+      <date>2009-12-15 21:49:49.57 GMT</date>
+      <creators />
+      <curationEventList />
+    </net.sf.taverna.t2.annotation.AnnotationAssertionImpl>
+  </annotationAssertions>
+</net.sf.taverna.t2.annotation.AnnotationChainImpl></annotation_chain></annotations></dataflow></workflow>
