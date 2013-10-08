@@ -98,9 +98,9 @@
   text-align: left;
 }
 
-.sysmo_gadget .contents .box1 {
-	border: 1px dotted #999999;
-	padding: 0.2em 0;
+.sysmo_gadget .contents .login_surround {
+	border: 1px solid #ccc;
+    padding: 0.2em 0;
 }
 
 .sysmo_gadget .contents .label {
