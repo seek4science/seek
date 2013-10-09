@@ -96,6 +96,8 @@ class WorkflowsController < ApplicationController
     if @workflow.save
       update_annotations @workflow
 
+      extract_workflow_metadata
+
       # update attributions
       Relationship.create_or_update_attributions(@workflow, params[:attributions])
 
@@ -143,10 +145,10 @@ class WorkflowsController < ApplicationController
   def describe_ports
     if @workflow.input_ports.empty? && @workflow.output_ports.empty?
       @workflow.t2flow.sources.each do |source|
-        @workflow.input_ports.build(:name => source.name)
+        @workflow.input_ports.build(:name => source.name, :port_type_id => WorkflowInputPortType.first.id)
       end
       @workflow.t2flow.sinks.each do |sink|
-        @workflow.output_ports.build(:name => sink.name)
+        @workflow.output_ports.build(:name => sink.name, :port_type_id => WorkflowOutputPortType.first.id)
       end
     end
   end

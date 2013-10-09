@@ -4,30 +4,46 @@
   <%= form_for(@workflow) do |f| -%>
     <div class="asset_form">
       <%= error_messages_for :workflow -%>
-      <table>        
+      <table>
+        <tr>
+          <th class="port-name">Inputs</th>
+          <% WorkflowInputPortType.all.each do |t| %>
+            <th class="port-type">
+              <%= t.name -%>
+            </th>
+          <% end %>
+        </tr>
         <%= f.fields_for(:input_ports) do |i| %>
           <tr>
-            <td><%= i.object.name %></td>
+            <td class="port-name"><%= i.object.name %></td>
             <%= i.hidden_field(:name) %>
             <%= i.hidden_field(:description) %>
             <% WorkflowInputPortType.all.each do |t| %>
-              <td>
+              <td class="port-type">
                 <label>
-                  <%= i.radio_button(:port_type_id, t.id) %> <%= t.name -%>
+                  <%= i.radio_button(:port_type_id, t.id) %>
                 </label>
               </td>
             <% end %>
           </tr>
         <% end %>
+        <tr>
+          <th class="port-name">Outputs</th>
+          <% WorkflowOutputPortType.all.each do |t| %>
+            <th class="port-type">
+              <%= t.name -%>
+            </th>
+          <% end %>
+        </tr>
         <%= f.fields_for(:output_ports) do |o| %>
             <tr>
-              <td><%= o.object.name %></td>
+              <td class="port-name"><%= o.object.name %></td>
               <%= o.hidden_field(:name) %>
               <%= o.hidden_field(:description) %>
               <% WorkflowOutputPortType.all.each do |t| %>
-                <td>
+                <td class="port-type">
                   <label>
-                    <%= o.radio_button(:port_type_id, t.id) %> <%= t.name -%>
+                    <%= o.radio_button(:port_type_id, t.id) %>
                   </label>
                 </td>
               <% end %>

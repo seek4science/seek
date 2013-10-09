@@ -71,3 +71,24 @@ a:hover {
 div.asset_form {
   text-align: left;
 }
+
+td.port-name, th.port-name {
+  text-align: right;
+}
+
+td.port-type, th.port-type {
+  text-align: left;
+  padding-left: 5em;
+}
+
+th.port-type, th.port-name {
+  padding-top: 20px;
+}
+
+td.port-type input {
+  vertical-align: middle;
+}
+td.port-type label {
+  font-weight: normal;
+}
+
