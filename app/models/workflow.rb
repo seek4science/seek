@@ -24,6 +24,8 @@ class Workflow < ActiveRecord::Base
   has_many :output_ports, :class_name => 'WorkflowOutputPort'
   has_one :content_blob, :as => :asset, :foreign_key => :asset_id, :conditions => Proc.new { ["content_blobs.asset_version =?", version] }
 
+  accepts_nested_attributes_for :input_ports, :output_ports
+
   def self.user_creatable?
     true
   end

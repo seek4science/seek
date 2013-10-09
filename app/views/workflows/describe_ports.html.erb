@@ -1,0 +1,45 @@
+<%= javascript_include_tag "sharing.js","associate_events.js","assays.js","attribution.js","resource.js" %>
+
+<div class="show_basic">
+  <%= form_for(@workflow) do |f| -%>
+    <div class="asset_form">
+      <%= error_messages_for :workflow -%>
+      <table>        
+        <%= f.fields_for(:input_ports) do |i| %>
+          <tr>
+            <td><%= i.object.name %></td>
+            <%= i.hidden_field(:name) %>
+            <%= i.hidden_field(:description) %>
+            <% WorkflowInputPortType.all.each do |t| %>
+              <td>
+                <label>
+                  <%= i.radio_button(:port_type_id, t.id) %> <%= t.name -%>
+                </label>
+              </td>
+            <% end %>
+          </tr>
+        <% end %>
+        <%= f.fields_for(:output_ports) do |o| %>
+            <tr>
+              <td><%= o.object.name %></td>
+              <%= o.hidden_field(:name) %>
+              <%= o.hidden_field(:description) %>
+              <% WorkflowOutputPortType.all.each do |t| %>
+                <td>
+                  <label>
+                    <%= o.radio_button(:port_type_id, t.id) %> <%= t.name -%>
+                  </label>
+                </td>
+              <% end %>
+            </tr>
+        <% end %>
+      </table>
+      <p>
+        <%= preview_permission_popup_link(@workflow)-%>
+        <%= submit_tag @workflow.new_record? ? "Save" : "Save Changes" -%>
+        or
+        <%= link_to 'Cancel', @workflow -%>
+      </p>
+    </div>
+  <% end %>
+</div>

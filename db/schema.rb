@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20131009074806) do
+ActiveRecord::Schema.define(:version => 20131009131404) do
 
   create_table "activity_logs", :force => true do |t|
     t.string   "action"
@@ -1594,9 +1594,10 @@ ActiveRecord::Schema.define(:version => 20131009074806) do
   create_table "workflow_input_ports", :force => true do |t|
     t.string  "name"
     t.text    "description"
-    t.integer "type_id"
+    t.integer "port_type_id"
     t.text    "example_value"
     t.integer "example_data_file_id"
+    t.integer "workflow_id"
   end
 
   create_table "workflow_output_port_types", :force => true do |t|
@@ -1606,9 +1607,10 @@ ActiveRecord::Schema.define(:version => 20131009074806) do
   create_table "workflow_output_ports", :force => true do |t|
     t.string  "name"
     t.text    "description"
-    t.integer "type_id"
+    t.integer "port_type_id"
     t.text    "example_value"
     t.integer "example_data_file_id"
+    t.integer "workflow_id"
   end
 
   create_table "workflows", :force => true do |t|
@@ -1623,6 +1625,7 @@ ActiveRecord::Schema.define(:version => 20131009074806) do
     t.string   "first_letter",     :limit => 1
     t.datetime "created_at",                    :null => false
     t.datetime "updated_at",                    :null => false
+    t.datetime "last_used_at"
   end
 
   create_table "worksheets", :force => true do |t|
