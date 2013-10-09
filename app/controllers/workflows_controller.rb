@@ -159,7 +159,8 @@ class WorkflowsController < ApplicationController
   def find_workflows
     find_assets
     unless params[:category_id].blank?
-      @workflows.select { |w| w.category_id == params[:category_id] }
+      @category = WorkflowCategory.find_by_id(params[:category_id])
+      @workflows = @workflows.select { |w| w.category == @category }
     end
   end
 

@@ -10,9 +10,13 @@
       </p>
     <% end %>
 
-    <%= render :partial => "projects/project_selector", :locals => { :resource => @workflow } -%>
+    <%= f.select(:category_id, WorkflowCategory.all.collect {|c| [ c.name, c.id ] }, { include_blank: false }) %>
 
-    <%= fields_for(@workflow) {|form| render :partial=>"assets/asset_form_bottom", :locals=> {:f => form}} -%>
+    <div style="display: none">
+      <%= render :partial => "projects/project_selector", :locals => { :resource => @workflow } -%>
+
+      <%= fields_for(@workflow) {|form| render :partial=>"assets/asset_form_bottom", :locals=> {:f => form}} -%>
+    </div>
 
     <p>
       <%= preview_permission_popup_link(@workflow)-%>

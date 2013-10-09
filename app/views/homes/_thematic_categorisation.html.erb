@@ -1,8 +1,8 @@
 <h1>Choose an analysis...</h1>
 <div style="width: 800px; margin: auto">
   <% WorkflowCategory.all.each do |category| %>
-    <a href="#" class="workflow-category">
+    <%= link_to workflows_path(:category_id => category.id), :class => "workflow-category" do %>
       <%= category.name %>
-    </a>
+    <% end %>
   <% end %>
 </div>
