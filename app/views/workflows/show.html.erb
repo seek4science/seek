@@ -1,4 +1,4 @@
-<%= render :partial => "general/item_title",:locals=>{:item=>@workflow } -%>
+<%= render :partial => "general/item_title", :locals => {:item => @workflow} -%>
 
 
 <ul class="sectionIcons">
@@ -10,19 +10,213 @@
 
   <div class="main_content_left_box">
     <div class="box_about_actor">
-      <%= render :partial => 'assets/fileinfo',:object=>@workflow.content_blob -%>
+      <%= render :partial => 'fileinfo', :object => @workflow.content_blob -%>
 
       <br/>
       <%= render :partial => "assets/special_auth_code_display", :locals => {:resource => @workflow} %>
       <%= item_description @workflow.description -%>
     </div>
-    <div style="clear:both"></div>
 
-    <%# render :partial=>"biovel_ports" -%>
-    <%  model = @workflow.t2flow %>
-    <!--R Scripts-->
-    <% processors = model.processors || [] -%>
-    <% rscripts = processors.select{|proc| proc.type=='rshell'} || []%>
+    <% workflow_model = @workflow.t2flow %>
+    <% processors = workflow_model.all_processors || [] -%>
+    <% #inputs = @workflow.input_ports || []  -%>
+    <% #outputs = @workflow.output_ports || []  -%>
+
+    <!-- Data inputs -->
+    <% data_inputs = workflow_model.sources || [] -%>
+    <% #data_inputs = inputs.select{|in| in.type.blank? || in.type == WorkflowInputPortType::DATA} || []  -%>
+    <div class="fold">
+      <div class="foldTitle">
+        Data Inputs (<%= data_inputs.count -%>)
+      </div>
+      <div class="foldContent" style="display: none;">
+        <% unless data_inputs.blank? -%>
+            <table class="simple">
+              <tr>
+                <th>Name</th>
+                <th>Description</th>
+                <th>Example</th>
+              </tr>
+
+              <% data_inputs.each do |s| -%>
+                  <tr>
+                    <td><b><%= h s.name -%></b></td>
+                    <td>
+                      <% if s.descriptions %>
+                          <% s.descriptions.each do |desc| %>
+                              <%= h desc -%>
+                              <%= '<hr />' unless desc==s.descriptions.last %>
+                          <% end %>
+                      <% end %>
+                    </td>
+                    <td>Some value</td>
+                  </tr>
+              <% end %>
+            </table>
+        <% else %>
+            <p class="none_text">None</p>
+        <% end %>
+      </div>
+    </div>
+
+    <!-- Parameter inputs -->
+    <% paramater_inputs = workflow_model.sources || [] -%>
+    <% #paramater_inputs = inputs.select{|in| in.type == WorkflowInputPortType::PARAMETER} || []  -%>
+    <div class="fold">
+      <div class="foldTitle">
+        Parameter Inputs (<%= paramater_inputs.count -%>)
+      </div>
+      <div class="foldContent" style="display: none;">
+        <% unless paramater_inputs.blank? -%>
+            <table class="simple">
+              <tr>
+                <th>Name</th>
+                <th>Description</th>
+                <th>Example</th>
+              </tr>
+
+              <% paramater_inputs.each do |s| -%>
+                  <tr>
+                    <td><b><%= h s.name -%></b></td>
+                    <td>
+                      <% if s.descriptions %>
+                          <% s.descriptions.each do |desc| %>
+                              <%= h desc -%>
+                              <%= '<hr />' unless desc==s.descriptions.last %>
+                          <% end %>
+                      <% end %>
+                    </td>
+                    <td>Some value</td>
+                  </tr>
+              <% end %>
+            </table>
+        <% else %>
+            <p class="none_text">None</p>
+        <% end %>
+      </div>
+    </div>
+
+    <!-- Result outputs -->
+    <% result_outputs = workflow_model.sinks || [] -%>
+    <% #result_outputs = outputs.select{|in| in.type.blank? || in.type == WorkflowOutputPortType::RESULT} || []  -%>
+    <div class="fold">
+      <div class="foldTitle">
+        Result Outputs (<%= result_outputs.count -%>)
+      </div>
+      <div class="foldContent" style="display: none;">
+        <% unless result_outputs.blank? -%>
+            <table class="simple">
+              <tr>
+                <th>Name</th>
+                <th>Description</th>
+                <th>Example</th>
+              </tr>
+
+              <% result_outputs.each do |s| -%>
+                  <tr>
+                    <td><b><%= h s.name -%></b></td>
+                    <td>
+                      <% if s.descriptions %>
+                          <% s.descriptions.each do |desc| %>
+                              <%= h desc -%>
+                              <%= '<hr />' unless desc==s.descriptions.last %>
+                          <% end %>
+                      <% end %>
+                    </td>
+                    <td>Some value</td>
+                  </tr>
+              <% end %>
+            </table>
+        <% else %>
+            <p class="none_text">None</p>
+        <% end %>
+      </div>
+    </div>
+
+    <!-- Error/log outputs -->
+    <% error_log_outputs = workflow_model.sinks || [] -%>
+    <% #error_log_outputs = outputs.select{|in| in.type == WorkflowOutputPortType::ERROR_LOG} || []  -%>
+    <div class="fold">
+      <div class="foldTitle">
+        Error/Log Outputs (<%= error_log_outputs.count -%>)
+      </div>
+      <div class="foldContent" style="display: none;">
+        <% unless error_log_outputs.blank? -%>
+            <table class="simple">
+              <tr>
+                <th>Name</th>
+                <th>Description</th>
+                <th>Example</th>
+              </tr>
+
+              <% error_log_outputs.each do |s| -%>
+                  <tr>
+                    <td><b><%= h s.name -%></b></td>
+                    <td>
+                      <% if s.descriptions %>
+                          <% s.descriptions.each do |desc| %>
+                              <%= h desc -%>
+                              <%= '<hr />' unless desc==s.descriptions.last %>
+                          <% end %>
+                      <% end %>
+                    </td>
+                    <td>Some value</td>
+                  </tr>
+              <% end %>
+            </table>
+        <% else %>
+            <p class="none_text">None</p>
+        <% end %>
+      </div>
+    </div>
+
+    <!-- Interactions -->
+    <% interactions = processors.select { |proc| proc.type == 'interaction' } || [] %>
+    <div class="fold">
+      <div class="foldTitle">
+        Interactions (<%= interactions.count -%>)
+      </div>
+      <div class="foldContent" style="display: none;">
+        <% unless interactions.blank? -%>
+            <table class="simple">
+              <tr>
+                <th>Name</th>
+                <th>Description</th>
+                <th>Inputs</th>
+                <th>Outputs</th>
+              </tr>
+
+              <% interactions.each do |b| -%>
+                  <tr>
+                    <td><b><%= h b.name.html_safe unless b.name.blank? -%></b></td>
+                    <td><%= h b.description.html_safe unless b.description.blank? -%></td>
+                    <td>
+                      <% if b.inputs %>
+                          <% b.inputs.each do |x| %>
+                              <%= h x.html_safe -%>
+                              <%= "<br/>".html_safe unless x==b.inputs.last %>
+                          <% end %>
+                      <% end %>
+                    </td>
+                    <td>
+                      <% if b.outputs %>
+                          <% b.outputs.each do |x| %>
+                              <%= h x.html_safe -%>
+                              <%= "<br/>".html_safe unless x==b.outputs.last %>
+                          <% end %>
+                      <% end %>
+                    </td>
+                  </tr>
+              <% end %>
+            </table>
+        <% else %>
+            <p class="none_text">None</p>
+        <% end %>
+      </div>
+    </div>
+
+    <!-- R Scripts -->
+    <% rscripts = processors.select { |proc| proc.type=='rshell' } || [] %>
     <div class="fold">
       <div class="foldTitle">
         R Scripts (<%= rscripts.select{|a| !a.script.nil?}.count -%>)
@@ -32,7 +226,18 @@
             <table class="simple">
               <% rscripts.each do |b| -%>
                   <% unless b.script.nil? || b.name.nil? %>
-                      <tr><td><h3><%= b.name %></h3><pre><%= b.script.gsub("\n", "<br>").html_safe %></pre></td></tr>
+                      <tr>
+                        <td>
+                          <h3><%= b.name %></h3>
+                          <div>
+                            <%= ('<strong>Description: </strong>' + b.description + '<br/>').html_safe unless b.description.blank? %>
+                            <%= ('<strong>Inputs: </strong>' + b.inputs.join(", ") + '<br/>').html_safe unless b.inputs.blank? %>
+                            <%= ('<strong>Outputs: </strong>' + b.outputs.join(", ") + '<br/>').html_safe unless b.outputs.blank? %>
+                            <strong>Script:</strong><br/>
+                          </div>
+                          <pre><%= b.script.gsub("\n", "<br>").html_safe %></pre>
+                        </td>
+                      </tr>
                   <% end %>
               <% end %>
             </table>
@@ -42,15 +247,11 @@
       </div>
     </div>
   </div>
-  <!-- R scripts on the Main and the Explore Workflow pages.-->
-  <%= render :partial=>"assets/resource_main_content_right",:locals => { :resource => @workflow } -%>
 
-  <div style="clear:both">
-    <%= render :partial=>"general/isa_graph", :locals => {:root_item => @workflow, :current_item => @workflow, :deep => true} %>
+  <div class="main_content_right_box">
+    <%= render :partial=>"general/items_related_to",:object => @workflow -%>
   </div>
 
-
   <div style="clear:both"></div>
-  <%= render :partial=>"general/items_related_to",:object => @workflow -%>
 
 </div>
