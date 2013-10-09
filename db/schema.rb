@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20131008125317) do
+ActiveRecord::Schema.define(:version => 20131009074806) do
 
   create_table "activity_logs", :force => true do |t|
     t.string   "action"
@@ -1013,6 +1013,11 @@ ActiveRecord::Schema.define(:version => 20131008125317) do
     t.integer "strain_id"
   end
 
+  create_table "projects_workflows", :force => true do |t|
+    t.integer "workflow_id"
+    t.integer "project_id"
+  end
+
   create_table "publication_auth_lookup", :id => false, :force => true do |t|
     t.integer "user_id"
     t.integer "asset_id"
@@ -1567,6 +1572,16 @@ ActiveRecord::Schema.define(:version => 20131008125317) do
   end
 
   add_index "work_groups", ["project_id"], :name => "index_work_groups_on_project_id"
+
+  create_table "workflow_auth_lookup", :force => true do |t|
+    t.integer "user_id"
+    t.integer "asset_id"
+    t.integer "can_view",     :limit => 1
+    t.integer "can_manage",   :limit => 1
+    t.integer "can_edit",     :limit => 1
+    t.integer "can_download", :limit => 1
+    t.integer "can_delete",   :limit => 1
+  end
 
   create_table "workflow_categories", :force => true do |t|
     t.string "name"
