@@ -329,6 +329,8 @@ module ImagesHelper
         "famfamfam_silk/house.png"
       when "waiting"
         "misc_icons/waiting.png"
+      when "run_workflow"
+        "famfamfam_silk/cog_go.png"
     else
       return nil
     end

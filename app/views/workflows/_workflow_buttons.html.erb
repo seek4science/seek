@@ -1,0 +1,25 @@
+<!-- Run button -->
+<li>
+  <%= image_tag_for_key('run_workflow', polymorphic_path(workflow, :version => version, :based_off => based_off, :action => :run, :code=>params[:code]), "Run #{human_name}", nil, "Run #{human_name}") -%>
+</li>
+
+<!-- Manage button -->
+<% if workflow.can_manage? -%>
+    <li><%= image_tag_for_key('manage', edit_workflow_path, nil, nil, "Manage #{human_name}") -%></li>
+<% end -%>
+
+<!-- Download button -->
+<% if workflow.contains_downloadable_items? && workflow.is_downloadable? -%>
+    <%# param code is used for temporary link -%>
+    <% if can_download_asset?(workflow, params[:code]) -%>
+        <%
+           path = polymorphic_path(workflow,:version=>version,:action=>:download,:code=>params[:code])
+        %>
+        <li>
+          <%= image_tag_for_key('download', path, "Download #{human_name}", nil, "Download #{human_name}") -%>
+        </li>
+    <% end -%>
+<% end -%>
+
+<!-- Delete button -->
+<%= delete_icon(workflow, current_user) %>
