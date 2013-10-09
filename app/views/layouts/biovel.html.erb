@@ -51,7 +51,7 @@
         <%= navigation_link 'Data', data_files_path, nil, controller_name == 'data_files' -%>
       </ul>
       <ul class="menutabs clearfix" style="float: right">
-        <% if logged_in? %>
+        <% if logged_in? && current_user.person %>
           <%= navigation_link current_user.person.name, current_user.person, nil, false -%>
           <%= navigation_link('Admin', admin_path, nil, false) if admin_logged_in? -%>
           <%= navigation_link 'Log out', logout_path, nil, false -%>
