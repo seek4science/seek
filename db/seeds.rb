@@ -1,7 +1,7 @@
 # Seeds the database with BioVeL-specific data
 
 # Seeds workflow categories
-workflow_categories = ['Taxonomic Refinement', 'Ecological Niche Modelling', 'Metagenomics', 'Phylogenetics', 'Population Modelling', 'Ecosystem Functioning and Valuation', 'Other']
+workflow_categories = ['Taxonomic Refinement', 'Ecological Niche Modelling', 'Metagenomics', 'Phylogenetics', 'Population Modelling', 'Ecosystem Modelling', 'Other']
 
 WorkflowCategory.delete_all
 
