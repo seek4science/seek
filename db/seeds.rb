@@ -1,7 +1,9 @@
 # Seeds the database with BioVeL-specific data
 
 # Seeds workflow categories
-workflow_categories = ['Taxonomic Refinement', 'Ecological Niche Modelling', 'Metagenomics', 'Phylogenetics', 'Population Modelling', 'Ecosystem Modelling', 'Other']
+workflow_categories = [WorkflowCategory::TAXONOMIC_REFINEMENT, WorkflowCategory::ENM, WorkflowCategory::METAGENOMICS,
+                       WorkflowCategory::PHYLOGENETICS, WorkflowCategory::POPULATION_MODELLING, WorkflowCategory::ECOSYSTEM_MODELLING,
+                       WorkflowCategory::OTHER]
 
 WorkflowCategory.delete_all
 
@@ -12,7 +14,7 @@ end
 puts "Seeded #{WorkflowCategory.count} workflow categories."
 
 # Seeds workflow input port types
-workflow_input_port_types = ['Data', 'Parameter']
+workflow_input_port_types = [WorkflowInputPortType::DATA, WorkflowInputPortType::PARAMETER]
 
 WorkflowInputPortType.delete_all
 
@@ -23,7 +25,7 @@ end
 puts "Seeded #{WorkflowInputPortType.count} workflow input port types."
 
 # Seeds workflow output port types
-workflow_output_port_types = ['Result', 'Error/Log']
+workflow_output_port_types = [WorkflowOutputPortType::RESULT, WorkflowInputPortType::ERROR_LOG]
 
 WorkflowOutputPortType.delete_all
 

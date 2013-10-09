@@ -1,7 +1,7 @@
 <% item = items_related_to %>
 <% resource_hash = get_related_resources(item) %>
 <h2 style="margin-top: 3em;">
-  Items related to <span style="font-weight:bolder;"><%= h(get_object_title(item)) -%></span>.
+  Related items
 </h2>
 
 <%= render :partial => "assets/resource_listing_tabbed_by_class", :locals => { :resource_hash => resource_hash,
