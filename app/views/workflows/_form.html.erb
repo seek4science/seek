@@ -1,0 +1,25 @@
+<%= form_for(@workflow, :html => { :multipart => true } ) do |f| -%>
+  <div class="asset_form">
+    <%= error_messages_for :workflow -%>
+    <%= hidden_field_tag 'workflow[title]', 'A workflow' -%>
+    <% if @workflow.new_record? %>
+      <p style="margin: 1.5em 0;">
+        <b>File</b> <span class="required">*</span>
+        <br/>
+        <%= file_field_tag 'workflow[data]' %>
+      </p>
+    <% end %>
+
+    <%= render :partial => "projects/project_selector", :locals => { :resource => @workflow } -%>
+
+    <%= fields_for(@workflow) {|form| render :partial=>"assets/asset_form_bottom", :locals=> {:f => form}} -%>
+
+    <p>
+      <%= preview_permission_popup_link(@workflow)-%>
+      <%= submit_tag @workflow.new_record? ? "Upload and Save" : "Save Changes", :id => "workflow_submit_btn", :onclick => "javascript: validateResourceFields(true,'workflow',true); return(false);" -%>
+      or
+      <%= link_to 'Cancel', workflows_path -%>
+    </p>
+  </div>
+
+<% end %>

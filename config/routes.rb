@@ -433,6 +433,20 @@ SEEK::Application.routes.draw do
 
   end
 
+  resources :workflows do
+    collection do
+#      post :test_asset_url
+#      get :preview
+    end
+
+    member do
+      get :run
+#      get :check_related_items
+      get :download
+      post :update_annotations_ajax
+#      get :view_items_in_tab
+    end
+  end
 
   ### MISC MATCHES ###
 

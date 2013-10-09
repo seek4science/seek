@@ -1,0 +1,56 @@
+<%= render :partial => "general/item_title",:locals=>{:item=>@workflow } -%>
+
+
+<ul class="sectionIcons">
+
+</ul>
+<br/>
+
+<div class="show_basic">
+
+  <div class="main_content_left_box">
+    <div class="box_about_actor">
+      <%= render :partial => 'assets/fileinfo',:object=>@workflow.content_blob -%>
+
+      <br/>
+      <%= render :partial => "assets/special_auth_code_display", :locals => {:resource => @workflow} %>
+      <%= item_description @workflow.description -%>
+    </div>
+    <div style="clear:both"></div>
+
+    <%# render :partial=>"biovel_ports" -%>
+    <%  model = @workflow.t2flow %>
+    <!--R Scripts-->
+    <% processors = model.processors || [] -%>
+    <% rscripts = processors.select{|proc| proc.type=='rshell'} || []%>
+    <div class="fold">
+      <div class="foldTitle">
+        R Scripts (<%= rscripts.select{|a| !a.script.nil?}.count -%>)
+      </div>
+      <div class="foldContent" style="display: none;">
+        <% unless rscripts.blank? -%>
+            <table class="simple">
+              <% rscripts.each do |b| -%>
+                  <% unless b.script.nil? || b.name.nil? %>
+                      <tr><td><h3><%= b.name %></h3><pre><%= b.script.gsub("\n", "<br>").html_safe %></pre></td></tr>
+                  <% end %>
+              <% end %>
+            </table>
+        <% else %>
+            <p class="none_text">None</p>
+        <% end %>
+      </div>
+    </div>
+  </div>
+  <!-- R scripts on the Main and the Explore Workflow pages.-->
+  <%= render :partial=>"assets/resource_main_content_right",:locals => { :resource => @workflow } -%>
+
+  <div style="clear:both">
+    <%= render :partial=>"general/isa_graph", :locals => {:root_item => @workflow, :current_item => @workflow, :deep => true} %>
+  </div>
+
+
+  <div style="clear:both"></div>
+  <%= render :partial=>"general/items_related_to",:object => @workflow -%>
+
+</div>

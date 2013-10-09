@@ -2,6 +2,9 @@ require 'acts_as_asset'
 require 'acts_as_versioned_resource'
 require 'explicit_versioning'
 require 'title_trimmer'
+require 't2flow/model'
+require 't2flow/parser'
+require 't2flow/dot'
 
 class Workflow < ActiveRecord::Base
 
@@ -36,6 +39,33 @@ class Workflow < ActiveRecord::Base
       }
     }
     return with_contributors.to_json
+  end
+
+  # Hack to get around SEEK not being able to cope with unversioned assets
+  def version
+    1
+  end
+
+  def t2flow
+    @t2flow ||= T2Flow::Parser.new.parse(content_blob.data_io_object.read)
+  end
+
+  private
+
+  def generate_workflow_image
+    img_path = "/images/workflow_images/#{id}.svg"
+    file_path = "#{Rails.root}/public#{img_path}"
+    FileUtils.mkdir("#{Rails.root}/public/images/workflow_images") unless File.exists?("#{Rails.root}/public/images/workflow_images")
+    unless File.exists?(file_path)
+      i = Tempfile.new("workflowimage#{@workflow.id}")
+      T2Flow::Dot.new.write_dot(i, t2flow)
+      i.close(false)
+      img = StringIO.new(`dot -Tsvg #{i.path}`)
+      File.open(file_path,"w") do |f|
+        f.write(img.read)
+      end
+    end
+    @workflow_image = img_path
   end
 
 end

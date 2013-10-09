@@ -45,14 +45,15 @@
     <div>
       <%= link_to image_tag("seek-logo-smaller.png", :alt => "SEEK", :title => "SEEK", :style => "height: 50px"), root_path, :style => "float: left" %>
       <ul class="menutabs clearfix">
-        <%= navigation_link 'Home', '#', nil, controller_name == 'homes' -%>
-        <%= navigation_link 'Workflows', '#', nil, controller_name == 'workflows' -%>
+        <%= navigation_link 'Home', root_path, nil, controller_name == 'homes' -%>
+        <%= navigation_link 'Workflows', workflows_path, nil, controller_name == 'workflows' -%>
         <%= navigation_link 'Runs', '#', nil, controller_name == 'runs' -%>
         <%= navigation_link 'Data', data_files_path, nil, controller_name == 'data_files' -%>
       </ul>
       <ul class="menutabs clearfix" style="float: right">
         <% if logged_in? %>
           <%= navigation_link current_user.person.name, current_user.person, nil, false -%>
+          <%= navigation_link('Admin', admin_path, nil, false) if admin_logged_in? -%>
           <%= navigation_link 'Log out', logout_path, nil, false -%>
         <% else %>
           <%= navigation_link 'Log in', new_session_path, nil, false -%>

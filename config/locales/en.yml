@@ -37,6 +37,9 @@ en:
   #Project
   project: "Project"
 
+  #Workflow
+  workflow: "Workflow"
+
   scale: "Scale"
 
   menu:
