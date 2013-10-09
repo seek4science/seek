@@ -18,6 +18,8 @@
   <%= button_to 'Restart server', restart_server_admin_path, :id => 'restart_server', :onclick => "confirmation(this.id, 'Restarting ...');return false;" -%>
   <br/>
   <%= button_to 'Restart background tasks', restart_delayed_job_admin_path, :id => 'restart_delayed_job', :onclick => "confirmation(this.id, 'Restarting ...');return false;" -%>
+  <br/>
+  <%= button_to 'Clear cache', clear_cache_admin_path, :id => 'clear_cache', :onclick => "confirmation(this.id, 'Clearing ...');return false;" -%>
 
 </div>
 

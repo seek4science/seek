@@ -166,8 +166,8 @@ class AdminsController < ApplicationController
   end
 
   def restart_server
-    restart = system ("touch #{Rails.root}/tmp/restart.txt")
-    if restart
+    restart_result = system ("touch #{Rails.root}/tmp/restart.txt")
+    if restart_result
       flash[:notice] = 'The server was restarted'
     else
       flash[:error] = 'There is a problem with restarting the server'
@@ -177,12 +177,24 @@ class AdminsController < ApplicationController
   end
 
   def restart_delayed_job
-    stop = system ("script/delayed_job stop RAILS_ENV=production ")
-    start = system ("script/delayed_job start RAILS_ENV=production ")
-    if stop && start
+    stop_result = system ("script/delayed_job stop RAILS_ENV=production ")
+    start_result = system ("script/delayed_job start RAILS_ENV=production ")
+    if stop_result && start_result
       flash[:notice] = 'The background tasks were restarted'
     else
       flash[:error] = 'There is a problem with restarting the background tasks'
+    end
+
+    redirect_to :action=>:show
+  end
+
+  def clear_cache
+    clear_tmp = system ("bundle exec rake tmp:clear RAILS_ENV=production ")
+    clear_assets = system ("bundle exec rake tmp:assets:clear RAILS_ENV=production ")
+    if clear_tmp && clear_assets
+      flash[:notice] = 'The cache was cleared'
+    else
+      flash[:error] = 'There is a problem with clearing the cache'
     end
 
     redirect_to :action=>:show

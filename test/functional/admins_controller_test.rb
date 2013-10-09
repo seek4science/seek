@@ -42,6 +42,18 @@ class AdminsControllerTest < ActionController::TestCase
     assert_nil flash[:error]
   end
 
+  test "non admin cannot clear cache" do
+    login_as(Factory(:user))
+    post :clear_cache
+    assert_not_nil flash[:error]
+  end
+
+  test "admin can clear cache" do
+    login_as(Factory(:admin).user)
+    post :clear_cache
+    assert_nil flash[:error]
+  end
+
   test "none admin not get registration form" do
     login_as Factory(:person).user
     get :registration_form
