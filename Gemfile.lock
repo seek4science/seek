@@ -147,6 +147,12 @@ GIT
       listen (>= 0.5)
       railties (>= 3.0)
 
+PATH
+  remote: vendor/gems/taverna-t2flow-0.4.5-biovel-fix
+  specs:
+    taverna-t2flow (0.4.5)
+      libxml-ruby (>= 1.1.4)
+
 GEM
   remote: https://rubygems.org/
   remote: http://gems.github.com/
@@ -465,6 +471,7 @@ DEPENDENCIES
   sqlite3 (= 1.3.7)
   sunspot_rails
   sunspot_solr
+  taverna-t2flow!
   unicorn-rails
   uuidtools (= 2.1.1)
   webmock
