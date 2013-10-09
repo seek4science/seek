@@ -30,6 +30,18 @@ class AdminsControllerTest < ActionController::TestCase
     assert_response :success
   end
 
+  test "non admin cannot restart the delayed job" do
+    login_as(Factory(:user))
+    post :restart_delayed_job
+    assert_not_nil flash[:error]
+  end
+
+  test "admin can restart the delayed job" do
+    login_as(Factory(:admin).user)
+    post :restart_delayed_job
+    assert_nil flash[:error]
+  end
+
   test "none admin not get registration form" do
     login_as Factory(:person).user
     get :registration_form

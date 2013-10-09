@@ -167,9 +167,19 @@ class AdminsController < ApplicationController
 
   def restart_server
     system ("touch #{Rails.root}/tmp/restart.txt")
-    system ("script/delayed_job stop")
-    system ("script/delayed_job start")
     flash[:notice] = 'The server was restarted'
+    redirect_to :action=>:show
+  end
+
+  def restart_delayed_job
+    stop = system ("script/delayed_job stop RAILS_ENV=production ")
+    start = system ("script/delayed_job start RAILS_ENV=production ")
+    if stop && start
+      flash[:notice] = 'The background tasks were restarted'
+    else
+      flash[:error] = 'There is a problem with restarting the background tasks'
+    end
+
     redirect_to :action=>:show
   end
 
