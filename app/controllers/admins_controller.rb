@@ -166,8 +166,13 @@ class AdminsController < ApplicationController
   end
 
   def restart_server
-    system ("touch #{Rails.root}/tmp/restart.txt")
-    flash[:notice] = 'The server was restarted'
+    restart = system ("touch #{Rails.root}/tmp/restart.txt")
+    if restart
+      flash[:notice] = 'The server was restarted'
+    else
+      flash[:error] = 'There is a problem with restarting the server'
+    end
+
     redirect_to :action=>:show
   end
 
