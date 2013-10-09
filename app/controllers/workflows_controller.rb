@@ -63,7 +63,7 @@ class WorkflowsController < ApplicationController
         AssetsCreator.add_or_update_creator_list(@workflow, params[:creators])
         respond_to do |format|
           flash[:notice] = "#{t('workflow')} was successfully uploaded and saved." if flash.now[:notice].nil?
-          format.html { redirect_to workflow_path(@workflow) }
+          format.html { redirect_to describe_ports_workflow_path(@workflow) }
         end
       else
         respond_to do |format|
@@ -136,6 +136,17 @@ class WorkflowsController < ApplicationController
         page.replace_html element,:partial=>"assets/resource_preview",:locals=>{:resource=>workflow}
       else
         page.replace_html element,:text=>"Nothing is selected to preview."
+      end
+    end
+  end
+
+  def describe_ports
+    if @workflow.input_ports.empty? && @workflow.output_ports.empty?
+      @workflow.t2flow.sources.each do |source|
+        @workflow.input_ports.build(:name => source.name)
+      end
+      @workflow.t2flow.sinks.each do |sink|
+        @workflow.output_ports.build(:name => sink.name)
       end
     end
   end

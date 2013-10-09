@@ -223,7 +223,7 @@ class ApplicationController < ActionController::Base
 
       when 'edit', 'new', 'create', 'update', 'new_version', 'create_version',
           'destroy_version', 'edit_version', 'update_version', 'new_item',
-          'create_item', 'edit_item', 'update_item', 'quick_add', 'resolve_link'
+          'create_item', 'edit_item', 'update_item', 'quick_add', 'resolve_link', 'describe_ports'
         'edit'
 
       when 'destroy', 'destroy_item'

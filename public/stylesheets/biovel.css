@@ -67,3 +67,7 @@ a:hover {
   background-color: #99cc33;
   border-bottom: 1px solid #88bb22;
 }
+
+div.asset_form {
+  text-align: left;
+}

@@ -9,18 +9,21 @@
         <%= file_field_tag 'workflow[data]' %>
       </p>
     <% end %>
-
-    <%= f.select(:category_id, WorkflowCategory.all.collect {|c| [ c.name, c.id ] }, { include_blank: false }) %>
-
+    <p style="margin: 1.5em 0;">
+      <b>Category</b>
+      <br/>
+      <%= f.select(:category_id, WorkflowCategory.all.collect {|c| [ c.name, c.id ] }, { include_blank: true }) %>
+    </p>
     <div style="display: none">
       <%= render :partial => "projects/project_selector", :locals => { :resource => @workflow } -%>
-
-      <%= fields_for(@workflow) {|form| render :partial=>"assets/asset_form_bottom", :locals=> {:f => form}} -%>
     </div>
+
+    <%= fields_for(@workflow) {|form| render :partial=>"assets/asset_form_bottom", :locals=> {:f => form,
+          :attribution_enable => false, :creators_enable => false, :show_publications => false, :sharing_enable => !@workflow.new_record? }} -%>
 
     <p>
       <%= preview_permission_popup_link(@workflow)-%>
-      <%= submit_tag @workflow.new_record? ? "Upload and Save" : "Save Changes", :id => "workflow_submit_btn", :onclick => "javascript: validateResourceFields(true,'workflow',true); return(false);" -%>
+      <%= submit_tag @workflow.new_record? ? "Next" : "Save Changes", :id => "workflow_submit_btn", :onclick => "javascript: validateResourceFields(true,'workflow',true); return(false);" -%>
       or
       <%= link_to 'Cancel', workflows_path -%>
     </p>
