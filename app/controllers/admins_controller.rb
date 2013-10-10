@@ -1,7 +1,7 @@
 class AdminsController < ApplicationController
   include CommonSweepers
 
-  RESTART_MSG = "You settings have been updated. If you changed some settings e.g. search, you need to restart some processes.
+  RESTART_MSG = "Your settings have been updated. If you changed some settings e.g. search, you need to restart some processes.
                  Please see the buttons and explanations below."
   
   before_filter :login_required
