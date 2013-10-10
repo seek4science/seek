@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20131009131404) do
+ActiveRecord::Schema.define(:version => 20131010081432) do
 
   create_table "activity_logs", :force => true do |t|
     t.string   "action"
@@ -1013,6 +1013,11 @@ ActiveRecord::Schema.define(:version => 20131009131404) do
     t.integer "strain_id"
   end
 
+  create_table "projects_workflow_versions", :force => true do |t|
+    t.integer "version_id"
+    t.integer "project_id"
+  end
+
   create_table "projects_workflows", :force => true do |t|
     t.integer "workflow_id"
     t.integer "project_id"
@@ -1598,6 +1603,7 @@ ActiveRecord::Schema.define(:version => 20131009131404) do
     t.text    "example_value"
     t.integer "example_data_file_id"
     t.integer "workflow_id"
+    t.integer "workflow_version"
   end
 
   create_table "workflow_output_port_types", :force => true do |t|
@@ -1611,6 +1617,25 @@ ActiveRecord::Schema.define(:version => 20131009131404) do
     t.text    "example_value"
     t.integer "example_data_file_id"
     t.integer "workflow_id"
+    t.integer "workflow_version"
+  end
+
+  create_table "workflow_versions", :force => true do |t|
+    t.string   "title"
+    t.text     "description"
+    t.integer  "category_id"
+    t.integer  "contributor_id"
+    t.string   "contributor_type"
+    t.string   "uuid"
+    t.integer  "policy_id"
+    t.text     "other_creators"
+    t.string   "first_letter",      :limit => 1
+    t.datetime "created_at",                     :null => false
+    t.datetime "updated_at",                     :null => false
+    t.datetime "last_used_at"
+    t.integer  "workflow_id"
+    t.text     "revision_comments"
+    t.integer  "version"
   end
 
   create_table "workflows", :force => true do |t|
@@ -1626,6 +1651,7 @@ ActiveRecord::Schema.define(:version => 20131009131404) do
     t.datetime "created_at",                    :null => false
     t.datetime "updated_at",                    :null => false
     t.datetime "last_used_at"
+    t.integer  "version"
   end
 
   create_table "worksheets", :force => true do |t|

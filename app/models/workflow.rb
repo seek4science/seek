@@ -20,11 +20,45 @@ class Workflow < ActiveRecord::Base
   after_save :queue_background_reindexing if Seek::Config.solr_enabled
 
   belongs_to :category, :class_name => 'WorkflowCategory'
-  has_many :input_ports, :class_name => 'WorkflowInputPort'
-  has_many :output_ports, :class_name => 'WorkflowOutputPort'
+  has_many :input_ports, :class_name => 'WorkflowInputPort',
+           :conditions => proc { "workflow_version = #{self.version}" },
+           :dependent => :destroy
+
+  has_many :output_ports, :class_name => 'WorkflowOutputPort',
+           :conditions => proc { "workflow_version = #{self.version}"},
+           :dependent => :destroy
+
   has_one :content_blob, :as => :asset, :foreign_key => :asset_id, :conditions => Proc.new { ["content_blobs.asset_version =?", version] }
 
   accepts_nested_attributes_for :input_ports, :output_ports
+
+  has_one :content_blob, :as => :asset, :foreign_key => :asset_id, :conditions => Proc.new { ["content_blobs.asset_version =?", version] }
+
+  explicit_versioning(:version_column => "version") do
+    acts_as_versioned_resource
+    acts_as_favouritable
+
+    has_one :content_blob, :primary_key => :workflow_id, :foreign_key => :asset_id, :conditions => Proc.new { ["content_blobs.asset_version =? AND content_blobs.asset_type =?", version, parent.class.name] }
+    has_many :input_ports, :class_name => 'WorkflowInputPort',
+             :primary_key => "workflow_id",
+             :foreign_key => "workflow_id",
+             :conditions => proc { "workflow_version = #{self.version}"},
+             :dependent => :destroy
+
+    has_many :output_ports, :class_name => 'WorkflowOutputPort',
+             :primary_key => "workflow_id",
+             :foreign_key => "workflow_id",
+             :conditions => proc { "workflow_version = #{self.version}"},
+             :dependent => :destroy
+
+    def content_blobs
+      ContentBlob.where(["asset_id =? and asset_type =? and asset_version =?", self.parent.id, self.parent.class.name, self.version])
+    end
+
+    def t2flow
+      @t2flow ||= T2Flow::Parser.new.parse(content_blob.data_io_object.read)
+    end
+  end
 
   def self.user_creatable?
     true
@@ -43,11 +77,6 @@ class Workflow < ActiveRecord::Base
     return with_contributors.to_json
   end
 
-  # Hack to get around SEEK not being able to cope with unversioned assets
-  def version
-    1
-  end
-
   def t2flow
     @t2flow ||= T2Flow::Parser.new.parse(content_blob.data_io_object.read)
   end
@@ -55,7 +84,7 @@ class Workflow < ActiveRecord::Base
   private
 
   def generate_workflow_image
-    img_path = "/images/workflow_images/#{id}.svg"
+    img_path = "/images/workflow_images/#{id}v#{version}.svg"
     file_path = "#{Rails.root}/public#{img_path}"
     FileUtils.mkdir("#{Rails.root}/public/images/workflow_images") unless File.exists?("#{Rails.root}/public/images/workflow_images")
     unless File.exists?(file_path)

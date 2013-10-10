@@ -8,17 +8,21 @@
 <br/>
 
 <div class="show_basic">
+<%# Versioning hidden for now: %>
+<% render :partial=>"assets/upload_new_version_form", :locals=>{:resource=>@workflow} -%>
 
-  <div class="main_content_left_box">
+<div class="main_content_left_box">
+  <%# Versioning hidden for now: %>
+  <% render :partial=>"assets/resource_version_details", :locals=>{:displayed_resource=>@display_workflow, :resource=>@workflow} -%>
     <div class="box_about_actor">
-      <%= render :partial => 'fileinfo', :object => @workflow.content_blob -%>
+      <%= render :partial => 'fileinfo', :object => @display_workflow.content_blob -%>
 
       <br/>
       <%= render :partial => "assets/special_auth_code_display", :locals => {:resource => @workflow} %>
-      <%= item_description @workflow.description -%>
+      <%= item_description @display_workflow.description -%>
     </div>
 
-    <% workflow_model = @workflow.t2flow %>
+    <% workflow_model = @display_workflow.t2flow %>
     <% processors = workflow_model.all_processors || [] -%>
     <% #inputs = @workflow.input_ports || []  -%>
     <% #outputs = @workflow.output_ports || []  -%>

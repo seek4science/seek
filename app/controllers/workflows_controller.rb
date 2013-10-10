@@ -10,6 +10,7 @@ class WorkflowsController < ApplicationController
 
   before_filter :find_workflows, :only => [ :index ]
   before_filter :find_and_auth, :except => [ :index, :new, :create, :preview ]
+  before_filter :find_display_asset, :only=>[:show, :download, :run]
 
   include Seek::Publishing::PublishingCommon
   include Seek::BreadCrumbs
@@ -139,6 +140,28 @@ class WorkflowsController < ApplicationController
       else
         page.replace_html element,:text=>"Nothing is selected to preview."
       end
+    end
+  end
+
+  def new_version
+    if (handle_data nil)
+      comments=params[:revision_comment]
+
+      respond_to do |format|
+        if @workflow.save_as_new_version(comments)
+          create_content_blobs
+          extract_workflow_metadata
+
+          flash[:notice] = "New version uploaded - now on version #{@workflow.version}"
+          format.html { redirect_to describe_ports_workflow_path(@workflow) }
+        else
+          flash[:error] = "Unable to save new version"
+          format.html {redirect_to @workflow }
+        end
+      end
+    else
+      flash[:error]=flash.now[:error]
+      redirect_to @workflow
     end
   end
 

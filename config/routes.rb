@@ -435,7 +435,7 @@ SEEK::Application.routes.draw do
 
   resources :workflows do
     collection do
-#      post :test_asset_url
+      post :test_asset_url
 #      get :preview
     end
 
@@ -444,6 +444,7 @@ SEEK::Application.routes.draw do
 #      get :check_related_items
       get :download
       get :describe_ports
+      post :new_version
       post :update_annotations_ajax
 #      get :view_items_in_tab
     end
