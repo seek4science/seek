@@ -110,12 +110,34 @@ td.port-type label {
 }
 
 pre.script_example_data_box {
-    overflow: scroll;
+    overflow: auto;
     max-height: 400px;
-    white-space: -moz-pre-wrap; /* Mozilla, supported since 1999 */
+    white-space: -moz-pre-wrap !important; /* Mozilla, supported since 1999 */
     white-space: -pre-wrap; /* Opera */
     white-space: -o-pre-wrap; /* Opera */
     white-space: pre-wrap; /* CSS3 - Text module (Candidate Recommendation) http://www.w3.org/TR/css3-text/#white-space */
     word-wrap: break-word; /* IE 5.5+ */
+}
 
+.workflow {
+    display: inline-block;
+    width: 270px;
+    height: 200px;
+    background-color: #E0F495;
+    font-size: 14px;
+    box-shadow: 1px 1px 3px #ccc;
+    border: 1px solid #ccc;
+    margin: 3px;
+    color: #333333;
+    padding: 0 0.4em 0 0.4em;
+}
+
+div.small_list_item_title {
+    border-bottom: 1px solid #BBBBBB;
+    margin-bottom: 0.1em;
+    padding-bottom: 0.1em;
+    font-size: 80%;
+    font-weight: bold;
+    text-align: left;
+    padding: 0.4em 0.6em;
 }

@@ -10,7 +10,7 @@
   <!-- only do the page links if the collection supports it -->
   <%= render :partial => "general/paginate_alphabetical", :locals => { :pages => @workflows.pages, :page_totals=>@workflows.page_totals,:current_page=>@workflows.page } -%>
 <% end %>
-<%= render :partial => "assets/resource_list", :locals => { :collection => @workflows, :authorization_for_showing_already_done=>true } %>
+<%= render :partial => "workflow_list", :locals => { :collection => @workflows, :authorization_for_showing_already_done=>true } %>
 
 <% if @workflows.page == "latest" && Workflow.count > Seek::Config.limit_latest%>
    <%= render :partial => "general/paginate_see_all"%>

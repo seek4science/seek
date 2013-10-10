@@ -1,0 +1,21 @@
+<!-- Workflow icon and title -->
+<% image = resource_avatar workflow,:style=>"width: 24px; height: 24px; vertical-align: middle"  %>
+<div class="small_list_item_title">
+  <%= "#{link_to image, show_resource_path(workflow)}".html_safe %>
+  <%= "#{link_to workflow.title, show_resource_path(workflow)}".html_safe %>
+</div>
+
+<!-- Workflow visibility, e.g. 'private' -->
+<%= ((workflow.authorization_supported? && workflow.can_manage?) ? list_item_visibility(workflow) : "").html_safe %>
+
+<!-- Workflow category (not really needed if we are already inside a category ...) -->
+<p class="list_item_attribute">
+  <b>Category</b>
+  :
+  <%= workflow.category.name %>
+</p>
+
+<!-- Description -->
+<div class="list_item_whole_width">
+  <%= small_list_item_description workflow.description %>
+</div>
