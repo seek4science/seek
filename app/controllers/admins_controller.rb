@@ -188,8 +188,8 @@ class AdminsController < ApplicationController
   end
 
   def clear_cache
-    clear_tmp = system ("bundle exec rake tmp:clear RAILS_ENV=#{Rails.env}")
-    clear_assets = system ("bundle exec rake tmp:assets:clear RAILS_ENV=#{Rails.env}")
+    clear_tmp = system ("cd #{Rails.root} && bundle exec rake tmp:clear RAILS_ENV=#{Rails.env}")
+    clear_assets = system ("cd #{Rails.root} && bundle exec rake tmp:assets:clear RAILS_ENV=#{Rails.env}")
     if clear_tmp && clear_assets
       flash[:notice] = 'The cache was cleared'
     else
