@@ -9,7 +9,9 @@
 <% end -%>
 
 <!-- Download button -->
-<% if workflow.contains_downloadable_items? && workflow.is_downloadable? -%>
+<% display_workflow = workflow.find_version(version) %>
+
+<% if display_workflow.contains_downloadable_items? && display_workflow.is_downloadable? -%>
     <%# param code is used for temporary link -%>
     <% if can_download_asset?(workflow, params[:code]) -%>
         <%
