@@ -1,32 +1,38 @@
 <%= form_for(@workflow, :html => { :multipart => true } ) do |f| -%>
-  <div class="asset_form">
-    <%= error_messages_for :workflow -%>
-    <%= hidden_field_tag 'workflow[title]', 'A workflow' -%>
-    <% if @workflow.new_record? %>
-      <p style="margin: 1.5em 0;">
-        <b>File</b> <span class="required">*</span>
-        <br/>
-        <%= file_field_tag 'workflow[data]' %>
+    <div class="asset_form">
+      <%= error_messages_for :workflow -%>
+      <%= hidden_field_tag 'workflow[title]', 'A workflow' -%>
+      <% if @workflow.new_record? %>
+          <p style="margin: 1.5em 0;">
+            <b>File</b> <span class="required">*</span>
+            <br/>
+            <%= file_field_tag 'workflow[data]' %>
+          </p>
+      <% end %>
+
+      <div class="fold" id="sharing_form">
+        <div class="foldTitle">
+          <%= help_icon("Here you can specify the category this workflow belongs to.") -%>
+          Category
+        </div>
+        <div class="foldContent" >
+          <%= f.select(:category_id, WorkflowCategory.all.collect {|c| [ c.name, c.id ] }, { include_blank: true }) %>
+        </div>
+      </div>
+
+      <div style="display: none">
+        <%= render :partial => "projects/project_selector", :locals => { :resource => @workflow } -%>
+      </div>
+
+      <%= fields_for(@workflow) {|form| render :partial=>"assets/asset_form_bottom", :locals=> {:f => form,
+                                                                                                :attribution_enable => false, :creators_enable => false, :show_publications => false, :sharing_enable => !@workflow.new_record? }} -%>
+
+      <p>
+        <%= preview_permission_popup_link(@workflow)-%>
+        <%= submit_tag @workflow.new_record? ? "Next" : "Save Changes", :id => "workflow_submit_btn", :onclick => "javascript: validateResourceFields(true,'workflow',true); return(false);" -%>
+        or
+        <%= link_to 'Cancel', workflows_path -%>
       </p>
-    <% end %>
-    <p style="margin: 1.5em 0;">
-      <b>Category</b>
-      <br/>
-      <%= f.select(:category_id, WorkflowCategory.all.collect {|c| [ c.name, c.id ] }, { include_blank: true }) %>
-    </p>
-    <div style="display: none">
-      <%= render :partial => "projects/project_selector", :locals => { :resource => @workflow } -%>
     </div>
-
-    <%= fields_for(@workflow) {|form| render :partial=>"assets/asset_form_bottom", :locals=> {:f => form,
-          :attribution_enable => false, :creators_enable => false, :show_publications => false, :sharing_enable => !@workflow.new_record? }} -%>
-
-    <p>
-      <%= preview_permission_popup_link(@workflow)-%>
-      <%= submit_tag @workflow.new_record? ? "Next" : "Save Changes", :id => "workflow_submit_btn", :onclick => "javascript: validateResourceFields(true,'workflow',true); return(false);" -%>
-      or
-      <%= link_to 'Cancel', workflows_path -%>
-    </p>
-  </div>
 
 <% end %>
