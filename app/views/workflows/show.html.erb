@@ -1,6 +1,5 @@
 <%= render :partial => "general/item_title", :locals => {:item => @workflow} -%>
 
-
 <ul class="sectionIcons">
   <% human_name = text_for_resource @workflow %>
   <%= render :partial=>"workflow_buttons",:locals=>{:workflow => @workflow, :version=>@workflow.version, :based_off=>nil, :human_name=>human_name} %>
@@ -8,6 +7,7 @@
 <br/>
 
 <div class="show_basic">
+
 <%# Versioning hidden for now: %>
 <% render :partial=>"assets/upload_new_version_form", :locals=>{:resource=>@workflow} -%>
 
@@ -16,7 +16,11 @@
   <% render :partial=>"assets/resource_version_details", :locals=>{:displayed_resource=>@display_workflow, :resource=>@workflow} -%>
     <div class="box_about_actor">
       <%= render :partial => 'fileinfo', :object => @display_workflow.content_blob -%>
-
+      <br/>
+      <p>
+        <b>Category:</b>
+        <%= @workflow.category.name.html_safe -%>
+      </p>
       <br/>
       <%= render :partial => "assets/special_auth_code_display", :locals => {:resource => @workflow} %>
       <%= item_description @display_workflow.description -%>
@@ -24,12 +28,11 @@
 
     <% workflow_model = @display_workflow.t2flow %>
     <% processors = workflow_model.all_processors || [] -%>
-    <% #inputs = @workflow.input_ports || []  -%>
-    <% #outputs = @workflow.output_ports || []  -%>
+    <% inputs = @workflow.input_ports || []  -%>
+    <% outputs = @workflow.output_ports || []  -%>
 
     <!-- Data inputs -->
-    <% data_inputs = workflow_model.sources || [] -%>
-    <% #data_inputs = inputs.select{|in| in.type.blank? || in.type == WorkflowInputPortType::DATA} || []  -%>
+    <% data_inputs = inputs.select{|input| (input.type.blank? || input.type == WorkflowInputPortType::DATA)}  -%>
     <div class="fold">
       <div class="foldTitle">
         Data Inputs (<%= data_inputs.count -%>)
@@ -45,16 +48,9 @@
 
               <% data_inputs.each do |s| -%>
                   <tr>
-                    <td><b><%= h s.name -%></b></td>
-                    <td>
-                      <% if s.descriptions %>
-                          <% s.descriptions.each do |desc| %>
-                              <%= h desc -%>
-                              <%= '<hr />' unless desc==s.descriptions.last %>
-                          <% end %>
-                      <% end %>
-                    </td>
-                    <td>Some value</td>
+                    <td><b><%= s.name.html_safe -%></b></td>
+                    <td><%= (s.description || '').html_safe -%></td>
+                    <td><%= (s.example_value || '').html_safe -%></td>
                   </tr>
               <% end %>
             </table>
@@ -65,8 +61,7 @@
     </div>
 
     <!-- Parameter inputs -->
-    <% paramater_inputs = workflow_model.sources || [] -%>
-    <% #paramater_inputs = inputs.select{|in| in.type == WorkflowInputPortType::PARAMETER} || []  -%>
+    <% paramater_inputs = inputs.select{|input| input.type == WorkflowInputPortType::PARAMETER} -%>
     <div class="fold">
       <div class="foldTitle">
         Parameter Inputs (<%= paramater_inputs.count -%>)
@@ -82,16 +77,9 @@
 
               <% paramater_inputs.each do |s| -%>
                   <tr>
-                    <td><b><%= h s.name -%></b></td>
-                    <td>
-                      <% if s.descriptions %>
-                          <% s.descriptions.each do |desc| %>
-                              <%= h desc -%>
-                              <%= '<hr />' unless desc==s.descriptions.last %>
-                          <% end %>
-                      <% end %>
-                    </td>
-                    <td>Some value</td>
+                    <td><b><%= s.name.html_safe -%></b></td>
+                    <td><%= (s.description || '').html_safe -%></td>
+                    <td><%= (s.example_value || '').html_safe -%></td>
                   </tr>
               <% end %>
             </table>
@@ -102,8 +90,7 @@
     </div>
 
     <!-- Result outputs -->
-    <% result_outputs = workflow_model.sinks || [] -%>
-    <% #result_outputs = outputs.select{|in| in.type.blank? || in.type == WorkflowOutputPortType::RESULT} || []  -%>
+    <% result_outputs = outputs.select{|output| (output.type.blank? || output.type == WorkflowOutputPortType::RESULT)} -%>
     <div class="fold">
       <div class="foldTitle">
         Result Outputs (<%= result_outputs.count -%>)
@@ -119,16 +106,9 @@
 
               <% result_outputs.each do |s| -%>
                   <tr>
-                    <td><b><%= h s.name -%></b></td>
-                    <td>
-                      <% if s.descriptions %>
-                          <% s.descriptions.each do |desc| %>
-                              <%= h desc -%>
-                              <%= '<hr />' unless desc==s.descriptions.last %>
-                          <% end %>
-                      <% end %>
-                    </td>
-                    <td>Some value</td>
+                    <td><b><%= s.name.html_safe -%></b></td>
+                    <td><%= (s.description || '').html_safe -%></td>
+                    <td><%= (s.example_value || '').html_safe -%></td>
                   </tr>
               <% end %>
             </table>
@@ -139,8 +119,7 @@
     </div>
 
     <!-- Error/log outputs -->
-    <% error_log_outputs = workflow_model.sinks || [] -%>
-    <% #error_log_outputs = outputs.select{|in| in.type == WorkflowOutputPortType::ERROR_LOG} || []  -%>
+    <% error_log_outputs = outputs.select{|output| output.type == WorkflowOutputPortType::ERROR_LOG} -%>
     <div class="fold">
       <div class="foldTitle">
         Error/Log Outputs (<%= error_log_outputs.count -%>)
@@ -156,16 +135,9 @@
 
               <% error_log_outputs.each do |s| -%>
                   <tr>
-                    <td><b><%= h s.name -%></b></td>
-                    <td>
-                      <% if s.descriptions %>
-                          <% s.descriptions.each do |desc| %>
-                              <%= h desc -%>
-                              <%= '<hr />' unless desc==s.descriptions.last %>
-                          <% end %>
-                      <% end %>
-                    </td>
-                    <td>Some value</td>
+                    <td><b><%= s.name.html_safe -%></b></td>
+                    <td><%= (s.description || '').html_safe -%></td>
+                    <td><%= (s.example_value || '').html_safe -%></td>
                   </tr>
               <% end %>
             </table>
@@ -198,8 +170,8 @@
                     <td>
                       <% if b.inputs %>
                           <% b.inputs.each do |x| %>
-                              <%= h x.html_safe -%>
-                              <%= "<br/>".html_safe unless x==b.inputs.last %>
+                              <%= x.html_safe -%>
+                              <%= "<br/>" unless x==b.inputs.last %>
                           <% end %>
                       <% end %>
                     </td>
@@ -207,7 +179,7 @@
                       <% if b.outputs %>
                           <% b.outputs.each do |x| %>
                               <%= h x.html_safe -%>
-                              <%= "<br/>".html_safe unless x==b.outputs.last %>
+                              <%= "<br/>" unless x==b.outputs.last %>
                           <% end %>
                       <% end %>
                     </td>
