@@ -171,7 +171,7 @@
                       <% if b.inputs %>
                           <% b.inputs.each do |x| %>
                               <%= x.html_safe -%>
-                              <%= "<br/>" unless x==b.inputs.last %>
+                              <%= "<br/>".html_safe unless x==b.inputs.last %>
                           <% end %>
                       <% end %>
                     </td>
@@ -179,7 +179,7 @@
                       <% if b.outputs %>
                           <% b.outputs.each do |x| %>
                               <%= h x.html_safe -%>
-                              <%= "<br/>" unless x==b.outputs.last %>
+                              <%= "<br/>".html_safe unless x==b.outputs.last %>
                           <% end %>
                       <% end %>
                     </td>
@@ -200,7 +200,7 @@
       </div>
       <div class="foldContent" style="display: none;">
         <% unless rscripts.blank? -%>
-            <table class="simple">
+            <table class="simple" style="width: 100%;">
               <% rscripts.each do |b| -%>
                   <% unless b.script.nil? || b.name.nil? %>
                       <tr>
@@ -212,7 +212,7 @@
                             <%= ('<strong>Outputs: </strong>' + b.outputs.join(", ") + '<br/>').html_safe unless b.outputs.blank? %>
                             <strong>Script:</strong><br/>
                           </div>
-                          <pre><%= b.script.gsub("\n", "<br>").html_safe %></pre>
+                          <pre class="script_example_data_box"><%= b.script.gsub("\n", "<br>").html_safe %></pre>
                         </td>
                       </tr>
                   <% end %>
