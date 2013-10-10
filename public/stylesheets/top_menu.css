@@ -9,6 +9,7 @@
     list-style: none;
     margin: 0;
     display: inline;
+    font-size: larger;
 }
 
 .menutabs li.spacer_before {
@@ -62,8 +63,6 @@ ul#section_menu_items > li {
     list-style-type: none;
     float:left;
     margin-top: 0em;
-
-
 }
 
 ul#section_menu_items > li.selected_menu {
