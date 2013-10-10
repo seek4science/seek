@@ -445,12 +445,6 @@ class Person < ActiveRecord::Base
     is_asset_manager? && !(item.projects & projects).empty?
   end
   
-  def cache_key
-    key = super
-    key << self.projects.collect(&:title).join(',')
-    key << self.institutions.collect(&:title).join(',')
-    key
-  end
 
   private
 

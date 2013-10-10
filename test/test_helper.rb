@@ -71,6 +71,10 @@ class ActiveSupport::TestCase
   setup :clear_rails_cache
   teardown :clear_current_user
 
+  def skip_jws_tests?
+    true
+  end
+
   def clear_rails_cache
     Rails.cache.clear
   end
