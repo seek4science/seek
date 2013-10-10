@@ -32,7 +32,7 @@
     <% outputs = @workflow.output_ports || []  -%>
 
     <!-- Data inputs -->
-    <% data_inputs = inputs.select{|input| (input.type.blank? || input.type == WorkflowInputPortType::DATA)}  -%>
+    <% data_inputs = inputs.select{|input| (input.port_type.name == WorkflowInputPortType::DATA)}  -%>
     <div class="fold">
       <div class="foldTitle">
         Data Inputs (<%= data_inputs.count -%>)
@@ -61,7 +61,7 @@
     </div>
 
     <!-- Parameter inputs -->
-    <% paramater_inputs = inputs.select{|input| input.type == WorkflowInputPortType::PARAMETER} -%>
+    <% paramater_inputs = inputs.select{|input| input.port_type.name == WorkflowInputPortType::PARAMETER} -%>
     <div class="fold">
       <div class="foldTitle">
         Parameter Inputs (<%= paramater_inputs.count -%>)
