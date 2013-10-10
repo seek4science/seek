@@ -176,8 +176,8 @@ class AdminsController < ApplicationController
   end
 
   def restart_delayed_job
-    stop_result = system ("script/delayed_job stop RAILS_ENV=production ")
-    start_result = system ("script/delayed_job start RAILS_ENV=production ")
+    stop_result = system ("#{Rails.root}/script/delayed_job stop RAILS_ENV=#{Rails.env}")
+    start_result = system ("#{Rails.root}/script/delayed_job start RAILS_ENV=#{Rails.env} ")
     if stop_result && start_result
       flash[:notice] = 'The background tasks were restarted'
     else
