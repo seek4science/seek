@@ -13,6 +13,7 @@ module CommonSweepers
     expire_download_activity
     expire_create_activity
     expire_resource_list_item_action_partial
+    expire_resource_list_item_content
   end
 
   def expire_new_object_gadget
@@ -34,6 +35,14 @@ module CommonSweepers
 
   def expire_resource_list_item_action_partial
     ActionController::Base.new.expire_fragment(/rli_actions.*/)
+  end
+
+  def expire_resource_list_item_content item=nil
+    if item.nil?
+      ActionController::Base.new.expire_fragment(/rli_.*/)
+    else
+      ActionController::Base.new.expire_fragment(/rli_#{item.cache_key}.*/)
+    end
   end
 
   #fragments that should change due to authorization changes

@@ -445,11 +445,6 @@ class Person < ActiveRecord::Base
     is_asset_manager? && !(item.projects & projects).empty?
   end
   
-  def cache_key
-    key = super
-    key << self.group_memberships.order(:updated_at).last.cache_key unless self.group_memberships.empty?
-    key
-  end
 
   private
 

@@ -12,6 +12,7 @@ class JwsFunctionalTest < ActionController::TestCase
   #FIXME: some of these tests would be better suited as integration tests using capybara - https://github.com/jnicklas/capybara
 
   def setup
+    skip("currently skipping jws online tests") if skip_jws_tests?
     WebMock.allow_net_connect!
     login_as(:model_owner)
   end
