@@ -4,9 +4,9 @@
   <ul class='settings'>
     <br/>
     <%= render :partial=>'setting_li',:locals=>{
-            :description=>"When changing settings 'search enabled, events enabled' or changing code, you need to restart the server.
+            :description=>"When changing settings 'search enabled, events enabled' or changing code in production environment, you need to restart the server.
                            If deployed in production environment in conjunction with Passenger Phusion you can use this button,
-                           otherwise you need to restart manually.*",
+                           otherwise you need to restart manually.",
             :name=>"",
             :field=>button_to('Restart server', restart_server_admin_path, :id => 'restart_server',:onclick => "confirmation(this.id, 'Restarting ...');return false;")
     } -%>
@@ -18,13 +18,6 @@
             :field=>button_to('Restart background tasks', restart_delayed_job_admin_path, :id => 'restart_delayed_job', :onclick => "confirmation(this.id, 'Restarting ...');return false;")
     } -%>
 
-    <%= render :partial=>'setting_li',:locals=>{
-            :description=>"They are javascript, css, and some parts of html pages, that are cached on server.*",
-            :name=>"",
-            :field=>button_to('Clear cache', clear_cache_admin_path, :id => 'clear_cache', :onclick => "confirmation(this.id, 'Clearing ...');return false;")
-    } -%>
-
-    <span class='none_text'>* They are only needed if running under production environment.</span>
   </ul>
 </div>
 

@@ -177,18 +177,6 @@ class AdminsController < ApplicationController
     redirect_with_status(error, 'background tasks')
   end
 
-  def clear_cache
-    clear_tmp = system ("cd #{Rails.root} && bundle exec rake tmp:clear RAILS_ENV=#{Rails.env}")
-    clear_assets = system ("cd #{Rails.root} && bundle exec rake tmp:assets:clear RAILS_ENV=#{Rails.env}")
-    if clear_tmp && clear_assets
-      flash[:notice] = 'The cache was cleared'
-    else
-      flash[:error] = 'There is a problem with clearing the cache'
-    end
-
-    redirect_to :action=>:show
-  end
-
   def edit_tag
     if request.post?
       @tag=TextValue.find(params[:id])
