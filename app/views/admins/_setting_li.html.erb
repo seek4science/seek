@@ -1,10 +1,19 @@
 <% description ||= nil -%>
+<%
+   if field.include?(%!type="text"!)
+     element_class = "setting_text_field"
+   elsif field.include?(%!type="checkbox"!)
+     element_class = "setting_checkbox"
+   else
+     element_class = ""
+   end
+%>
 <li>
       <span class='setting_name'>
         <%= name -%>
       </span>
       <%= "<br/>".html_safe if field.include?("textarea") -%>
-      <span class='<%= field.include?(%!type="text"!) ? "setting_field" : "setting_checkbox" -%>' >
+      <span class='<%= element_class -%>' >
         <%= field -%>
       </span>
       <% if description -%>

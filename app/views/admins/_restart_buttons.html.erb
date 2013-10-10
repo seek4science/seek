@@ -1,0 +1,40 @@
+<%= stylesheet_link_tag "settings" -%>
+
+<div class='box_normal'>
+  <ul class='settings'>
+    <br/>
+    <%= render :partial=>'setting_li',:locals=>{
+            :description=>"When changing settings: search enabled, events enabled, you need to restart the server.
+                           If deployed in conjunction with Passenger Phusion you can use this button,
+                           otherwise you need to restart manually.",
+            :name=>"",
+            :field=>button_to('Restart server', restart_server_admin_path, :id => 'restart_server',:onclick => "confirmation(this.id, 'Restarting ...');return false;")
+    } -%>
+
+    <%= render :partial=>'setting_li',:locals=>{
+            :description=>"When changing setting: search enabled, you need to restart some background tasks.",
+            :name=>"",
+            :field=>button_to('Restart background tasks', restart_delayed_job_admin_path, :id => 'restart_delayed_job', :onclick => "confirmation(this.id, 'Restarting ...');return false;")
+    } -%>
+
+    <%= render :partial=>'setting_li',:locals=>{
+            :description=>"When changing the site branding settings, you need to clear the cache.",
+            :name=>"",
+            :field=>button_to('Clear cache', clear_cache_admin_path, :id => 'clear_cache', :onclick => "confirmation(this.id, 'Clearing ...');return false;")
+    } -%>
+
+
+  </ul>
+</div>
+
+<script type="text/javascript">
+    function confirmation(button_id, value){
+        if (confirm('Are you sure?')){
+            var button = $(button_id);
+            button.disabled = true;
+            button.value = value
+            button.form.submit();
+        }
+    }
+
+</script>

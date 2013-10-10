@@ -1,3 +1,4 @@
+<%= stylesheet_link_tag "settings" -%>
 <h1> Administration <span style="font-size:smaller;"><%= version_text -%></span></h1>
 
 
@@ -10,16 +11,8 @@
   <%= render :partial => 'layouts/collapsable_div', :locals => {:title => "Register SEEK", :partial => 'admins/registration'} -%>
 
   <br/>
-  <div class='box_infotext'>
-      If you are running in an production environment deployed in conjunction with <%= link_to "Passenger Phusion (modrails)","http://www.modrails.com/",:target=>"_blank" -%>
-      on a single machine, then the following button will restart the instances for you.
-    </div>
-  <br/>
-  <%= button_to 'Restart server', restart_server_admin_path, :id => 'restart_server', :onclick => "confirmation(this.id, 'Restarting ...');return false;" -%>
-  <br/>
-  <%= button_to 'Restart background tasks', restart_delayed_job_admin_path, :id => 'restart_delayed_job', :onclick => "confirmation(this.id, 'Restarting ...');return false;" -%>
-  <br/>
-  <%= button_to 'Clear cache', clear_cache_admin_path, :id => 'clear_cache', :onclick => "confirmation(this.id, 'Clearing ...');return false;" -%>
+
+  <%= render :partial => "admins/restart_buttons" -%>
 
 </div>
 

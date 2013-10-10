@@ -1905,6 +1905,16 @@ ul.usage_times_list {
     -webkit-border-radius: 4px;
 }
 
+.box_normal {
+    margin: 0;
+    padding: 0.5em 0.8em;
+    line-height: 1.4;
+    border: 1px solid #bbb;
+    border-radius: 4px;
+    -moz-border-radius: 4px;
+    -webkit-border-radius: 4px;
+}
+
 .none_text {
     font-style: italic;
     color: #666666;

@@ -1,9 +1,8 @@
 class AdminsController < ApplicationController
   include CommonSweepers
 
-  RESTART_MSG = "You settings have been updated. If you enabled search you need to restart your server.
-                 If deployed in conjunction with Passenger Phusion you can use the button at the bottom of this page,
-                 otherwise you need to restart manually."
+  RESTART_MSG = "You settings have been updated. If you changed some settings e.g. search, you need to restart some processes.
+                 Please see the buttons and explanations below."
   
   before_filter :login_required
   before_filter :is_user_admin_auth
