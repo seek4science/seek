@@ -165,26 +165,16 @@ class AdminsController < ApplicationController
   end
 
   def restart_server
-    restart_result = system ("touch #{Rails.root}/tmp/restart.txt")
-    if restart_result
-      flash[:notice] = 'The server was restarted'
-    else
-      flash[:error] = 'There is a problem with restarting the server'
-    end
-
-    redirect_to :action=>:show
+    command = "touch #{Rails.root}/tmp/restart.txt"
+    error = execute_command(command)
+    redirect_with_status(error, 'server')
   end
 
   def restart_delayed_job
-    stop_result = system ("#{Rails.root}/script/delayed_job stop RAILS_ENV=#{Rails.env}")
-    start_result = system ("#{Rails.root}/script/delayed_job start RAILS_ENV=#{Rails.env} ")
-    if stop_result && start_result
-      flash[:notice] = 'The background tasks were restarted'
-    else
-      flash[:error] = 'There is a problem with restarting the background tasks'
-    end
-
-    redirect_to :action=>:show
+    command = "#{Rails.root}/script/delayed_job stop RAILS_ENV=#{Rails.env}"
+    command << "&& #{Rails.root}/script/delayed_job start RAILS_ENV=#{Rails.env}"
+    error = execute_command(command)
+    redirect_with_status(error, 'background tasks')
   end
 
   def clear_cache
@@ -418,4 +408,25 @@ class AdminsController < ApplicationController
        redirect_to :action=> action.to_s
      end
   end
+
+  def execute_command(command)
+    begin
+      cl = Cocaine::CommandLine.new(command)
+      cl.run
+      return nil
+    rescue Exception => e
+      error =  e.message
+      return error
+    end
+  end
+
+  def redirect_with_status(error, process)
+    if error.blank?
+      flash[:notice] = "The #{process} was restarted"
+    else
+      flash[:error] = "There is a problem with restarting the #{process}. #{error.gsub("Cocaine::", "")}"
+    end
+    redirect_to :action=>:show
+  end
+
 end

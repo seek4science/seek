@@ -198,6 +198,10 @@ GEM
     breadcrumbs_on_rails (2.3.0)
     builder (3.0.4)
     cancan (1.6.10)
+    climate_control (0.0.3)
+      activesupport (>= 3.0)
+    cocaine (0.5.2)
+      climate_control (>= 0.0.3, < 1.0)
     coderay (1.0.9)
     country-select (1.1.1)
     crack (0.4.0)
@@ -408,6 +412,7 @@ DEPENDENCIES
   breadcrumbs_on_rails
   calendar_date_select!
   cancan
+  cocaine
   convert_office!
   country-select
   daemons
