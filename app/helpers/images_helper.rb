@@ -331,6 +331,8 @@ module ImagesHelper
         "misc_icons/waiting.png"
       when "run_workflow"
         "famfamfam_silk/cog_go.png"
+      when "workflow_avatar"
+        "logos/taverna_logo.png"
     else
       return nil
     end
