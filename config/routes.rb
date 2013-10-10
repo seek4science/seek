@@ -440,13 +440,13 @@ SEEK::Application.routes.draw do
     end
 
     member do
-      get :run
 #      get :check_related_items
       get :download
       get :describe_ports
       post :new_version
       post :update_annotations_ajax
 #      get :view_items_in_tab
+      resources :runs
     end
   end
 
