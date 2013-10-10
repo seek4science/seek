@@ -168,10 +168,16 @@ class WorkflowsController < ApplicationController
   def describe_ports
     if @workflow.input_ports.empty? && @workflow.output_ports.empty?
       @workflow.t2flow.sources.each do |source|
-        @workflow.input_ports.build(:name => source.name, :port_type_id => WorkflowInputPortType.first.id)
+        @workflow.input_ports.build(:name => source.name,
+                                    :description => (source.descriptions || []).last,
+                                    :example_value => (source.example_values || []).last,
+                                    :port_type_id => WorkflowInputPortType.first.id)
       end
       @workflow.t2flow.sinks.each do |sink|
-        @workflow.output_ports.build(:name => sink.name, :port_type_id => WorkflowOutputPortType.first.id)
+        @workflow.output_ports.build(:name => sink.name,
+                                    :description => (sink.descriptions || []).last,
+                                    :example_value => (sink.example_values || []).last,
+                                    :port_type_id => WorkflowOutputPortType.first.id)
       end
     end
   end
@@ -182,8 +188,8 @@ class WorkflowsController < ApplicationController
   def extract_workflow_metadata
     @t2flow = T2Flow::Parser.new.parse(@workflow.content_blob.data_io_object.read)
 
-    @workflow.title = @t2flow.annotations.titles.first
-    @workflow.description = @t2flow.annotations.descriptions.first
+    @workflow.title = @t2flow.annotations.titles.last
+    @workflow.description = @t2flow.annotations.descriptions.last
     # Needs to create ports here
     @workflow.save
 

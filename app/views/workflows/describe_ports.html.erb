@@ -18,6 +18,7 @@
             <td class="port-name"><%= i.object.name %></td>
             <%= i.hidden_field(:name) %>
             <%= i.hidden_field(:description) %>
+            <%= i.hidden_field(:example_value) %>
             <% WorkflowInputPortType.all.each do |t| %>
               <td class="port-type">
                 <label>
@@ -40,6 +41,7 @@
               <td class="port-name"><%= o.object.name %></td>
               <%= o.hidden_field(:name) %>
               <%= o.hidden_field(:description) %>
+              <%= o.hidden_field(:example_value) %>
               <% WorkflowOutputPortType.all.each do |t| %>
                 <td class="port-type">
                   <label>
