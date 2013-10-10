@@ -1,6 +1,7 @@
 class ProjectsController < ApplicationController
   include WhiteListHelper
   include IndexPager
+  include CommonSweepers
   
   before_filter :find_assets, :only=>[:index]
   before_filter :is_user_admin_auth, :except=>[:index, :show, :edit, :update, :request_institutions, :admin, :asset_report, :view_items_in_tab]
@@ -158,7 +159,7 @@ class ProjectsController < ApplicationController
 
     respond_to do |format|
       if @project.update_attributes(params[:project])
-        
+        expire_resource_list_item_content
 
         flash[:notice] = "#{t('project')} was successfully updated."
         format.html { redirect_to(@project) }
