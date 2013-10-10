@@ -12,6 +12,7 @@ class JwsFunctionalTest < ActionController::TestCase
   #FIXME: some of these tests would be better suited as integration tests using capybara - https://github.com/jnicklas/capybara
 
   def setup
+    skip("currently skipping jws online tests") if skip_jws_tests?
     WebMock.allow_net_connect!
     login_as(:model_owner)
   end
@@ -83,7 +84,6 @@ class JwsFunctionalTest < ActionController::TestCase
     end
 
     test "save new sbml version with jws builder" do
-      skip("temporarily skipped whilst jws online undergoes some upgrades")
       m=models(:jws_model)
       current_version=m.version
       m.content_blobs.first.dump_data_to_file
