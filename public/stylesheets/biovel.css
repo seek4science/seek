@@ -92,3 +92,20 @@ td.port-type label {
   font-weight: normal;
 }
 
+#search_box {
+  padding: 12px 20px;
+}
+
+#search_box input[type="submit"] {
+  line-height: 20px;
+}
+
+#search_box input[type="text"] {
+  height: 20px;
+  width: 15em;
+}
+
+#search_box select {
+  display: none;
+}
+
