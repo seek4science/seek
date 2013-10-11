@@ -25,7 +25,7 @@ end
 puts "Seeded #{WorkflowInputPortType.count} workflow input port types."
 
 # Seeds workflow output port types
-workflow_output_port_types = [WorkflowOutputPortType::RESULT, WorkflowInputPortType::ERROR_LOG]
+workflow_output_port_types = [WorkflowOutputPortType::RESULT, WorkflowOutputPortType::ERROR_LOG]
 
 WorkflowOutputPortType.delete_all
 

@@ -109,7 +109,7 @@ td.port-type label {
   display: none;
 }
 
-pre.script_example_data_box {
+.script_example_data_box {
     overflow: auto;
     max-height: 400px;
     white-space: -moz-pre-wrap !important; /* Mozilla, supported since 1999 */
@@ -117,6 +117,10 @@ pre.script_example_data_box {
     white-space: -o-pre-wrap; /* Opera */
     white-space: pre-wrap; /* CSS3 - Text module (Candidate Recommendation) http://www.w3.org/TR/css3-text/#white-space */
     word-wrap: break-word; /* IE 5.5+ */
+    overflow-y: hidden;
+    overflow: auto;
+    word-wrap: inherit;
+    width: 100%;
 }
 
 .workflow {
