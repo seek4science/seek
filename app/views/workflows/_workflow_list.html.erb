@@ -1,14 +1,11 @@
 <% authorization_for_showing_already_done ||= false -%>
-<% narrow_view ||= false -%>
-<% actions_partial_disable ||= false %>
-<% view_type ||= 'view_some' %>
 
 <% unless collection.empty? -%>
     <div style="width: 900px; margin: auto">
     <% collection.each do |workflow| %>
         <% if authorization_for_showing_already_done || workflow.can_view? -%>
-              <div class="workflow">
-                <%= render :partial => "workflow_list_item", :locals => {:workflow => workflow, :actions_partial_disable => actions_partial_disable} -%>
+              <div class="workflow clearfix">
+                <%= render :partial => "workflow_list_item", :locals => {:workflow => workflow, :show_category => show_category} -%>
               </div>
         <% end %>
     <% end %>
