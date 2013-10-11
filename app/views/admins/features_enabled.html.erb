@@ -22,7 +22,7 @@
     } -%>
 
     <%= render :partial=>'setting_li',:locals=>{
-            :description=>"Whether search is enabled. If switched on you need to ensure SOLR is running and its index is up to date. You need to restart both the server, and the Delayed Job service, after chaning this setting.",
+            :description=>"Whether search is enabled. If switched on you need to ensure SOLR is running and its index is up to date. You need to restart both the server, and the Background service, after chaning this setting.",
             :name=>"Search enabled",
             :field=>check_box_tag(:solr_enabled, 1, Seek::Config.solr_enabled, :title => 'enable search function')
     } -%>
@@ -31,6 +31,12 @@
             :description=>"Whether pdf conversion is enabled. It allows converting some document types to pdf format. If enabled, you need to ensure open office is running",
             :name=>"Pdf conversion enabled",
             :field=>check_box_tag(:pdf_conversion_enabled, 1, Seek::Config.pdf_conversion_enabled)
+    } -%>
+
+    <%= render :partial=>'setting_li',:locals=>{
+            :description=>"Whether the Activities/Forum tab is displayed and forum functionalities are available",
+            :name=>"Forum enabled",
+            :field=>check_box_tag(:forum_enabled, 1, Seek::Config.forum_enabled)
     } -%>
 
     <%= render :partial=>'setting_li',:locals=>{

@@ -38,6 +38,7 @@ SEEK::Application.configure do
   Seek::Config.default :project_browser_enabled,false
   Seek::Config.default :experimental_features_enabled,false
   Seek::Config.default :pdf_conversion_enabled,true
+  Seek::Config.default :forum_enabled,false
   Seek::Config.default :filestore_path,"filestore"
 
 #time in minutes that the feeds on the front page are cached for

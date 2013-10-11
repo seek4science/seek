@@ -28,6 +28,7 @@ module MenuHelper
         {:title=>t("menu.activities"),:sections=>[
             {:controller=>"presentations",:title=>t("presentation").pluralize},
             {:controller=>"events", :title=>t("event").pluralize},
+            {:controller=>"forums", :title => "Forums"}
         ]},
         ]
     if show_scales?
