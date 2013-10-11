@@ -22,6 +22,22 @@ module AdminHelper
     words.join(", ").html_safe
   end
 
-
+  def is_delayed_job_running?
+    #get delayedjob pid
+    path = "#{Rails.root}/tmp/pids/delayed_job.pid"
+    if File.exist?(path)
+      pid = File.open(path).read.strip
+      #check if this process is actually running
+      begin
+        cl = Cocaine::CommandLine.new("ps -p #{pid}")
+        result = cl.run
+        result.include?(pid)
+      rescue
+        false
+      end
+    else
+      false
+    end
+  end
 
 end
