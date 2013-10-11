@@ -4,7 +4,7 @@
   <ul class='settings'>
     <br/>
     <%= render :partial=>'setting_li',:locals=>{
-            :description=>"When changing settings 'search enabled, events enabled' or changing code in production environment, you need to restart the server.
+            :description=>"When changing settings '<b>search enabled, events enabled</b>' or changing code in production environment, you need to restart the server.
                            If deployed in production environment in conjunction with Passenger Phusion you can use this button,
                            otherwise you need to restart manually.",
             :name=>"",
@@ -13,7 +13,7 @@
 
     <%= render :partial=>'setting_li',:locals=>{
             :description=>"Some background tasks are running in different process to server process, e.g. solr reindex, send subscription emails.
-                           When changing setting 'search enabled' or changing code, you need to restart this process.*",
+                           When changing setting '<b>search enabled</b>' or changing code, you need to restart this process.*",
             :name=>"",
             :field=>button_to('Restart background tasks', restart_delayed_job_admin_path, :id => 'restart_delayed_job', :onclick => "confirmation(this.id, 'Restarting ...');return false;")
     } -%>

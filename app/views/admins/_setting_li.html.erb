@@ -18,7 +18,7 @@
       </span>
       <% if description -%>
           <span class='setting_description'>
-            <%= description -%>
+            <%= description.html_safe -%>
           </span>
       <% end -%>
 </li>
