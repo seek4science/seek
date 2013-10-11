@@ -27,8 +27,8 @@ module MenuHelper
         ]},
         {:title=>t("menu.activities"),:sections=>[
             {:controller=>"presentations",:title=>t("presentation").pluralize},
-            {:controller=>"events", :title=>t("event").pluralize},
-            {:controller=>"forums", :title => "Forums"}
+            {:controller=>"events", :title=>t("event").pluralize, :hide => !Seek::Config.events_enabled},
+            {:controller=>"forums", :title => "Forums", :hide => !Seek::Config.forum_enabled}
         ]},
         ]
     if show_scales?
@@ -84,20 +84,22 @@ module MenuHelper
     sections||=[]
     selected_section = current_second_level_section sections
     sections.collect do |section|
-      c = section[:controller]
-      path = section[:path]
-      title = section[:title]
-      title ||= c.capitalize
+      unless section[:hide]
+        c = section[:controller]
+        path = section[:path]
+        title = section[:title]
+        title ||= c.capitalize
 
-      path = section[:path] || eval("#{c}_path")
-      options = section[:options] || {}
-      options[:class]="curved"
-      link = link_to title, path,options
-      classes="curved"
-      classes << " selected_menu" if section == selected_section
-      attributes = "class='#{classes}'"
+        path = section[:path] || eval("#{c}_path")
+        options = section[:options] || {}
+        options[:class]="curved"
+        link = link_to title, path,options
+        classes="curved"
+        classes << " selected_menu" if section == selected_section
+        attributes = "class='#{classes}'"
 
-      "<li #{attributes}>#{link}</li>"
+        "<li #{attributes}>#{link}</li>"
+      end
     end.join("").html_safe
   end
 
