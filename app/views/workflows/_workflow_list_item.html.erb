@@ -14,13 +14,20 @@
 <!-- Workflow visibility, e.g. 'private' -->
 <% ((workflow.authorization_supported? && workflow.can_manage?) ? list_item_visibility(workflow) : "").html_safe %>
 
+<!-- Uploader and creators -->
+<div style="padding-top: 3px;">
+  <%= list_item_contributor workflow -%>
+  <% list_item_authorized_list workflow.creators, "Creator" %>
+  <% list_item_optional_attribute "Other creators", h(workflow.other_creators), nil -%>
+</div>
+
 <!-- Description -->
 <div class="description">
   <%= text_or_not_specified(workflow.description, :description => true, :auto_link=>true, :length=>300) %>
 </div>
 
 <!-- Action buttons -->
-<ul class="sectionIcons" style="float: right; padding: 0; margin: 0;">
+<ul class="sectionIcons" style="float: right; padding: 0; margin: 0">
   <li>
     <% human_name = text_for_resource workflow %>
     <%= image_tag_for_key('run_workflow', new_run_path(workflow, :version => workflow.version, :based_off => nil), "Run #{human_name}", nil, "Run #{human_name}") -%>
