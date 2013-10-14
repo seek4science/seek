@@ -547,54 +547,29 @@ class ProjectsControllerTest < ActionController::TestCase
     end
   end
 
-  test 'project manager can only see the new institutions (which are not yet in any projects) and the institutions this project' do
+  test 'project manager can only see all institutions' do
     project_manager = Factory(:project_manager)
     project = project_manager.projects.first
     login_as(project_manager.user)
-
-    new_institution = Institution.create(:name => 'a test institution')
-    a_project = Factory(:project)
-    a_project.institutions << Factory(:institution)
+    Factory(:institution)
 
     get :admin, :id => project
     assert_response :success
-
-    (project.institutions + [new_institution]).each do |institution|
+    Institution.all.each do |institution|
       assert_select "input[type='checkbox'][value='#{institution.id}']", :count => 1
     end
-    a_project.institutions.each do |institution|
-      assert_select "input[type='checkbox'][value='#{institution.id}']", :count => 0
-    end
   end
 
-  test 'project manager can assign only the new institutions (which are not yet in any projects) to their project' do
+  test 'project manager can assign all institutions to their project' do
     project_manager = Factory(:project_manager)
     project = project_manager.projects.first
     login_as(project_manager.user)
+    a_institution = Factory(:institution)
 
-    new_institution = Institution.create(:name => 'a test institution')
-
-    put :update, :id => project, :project => {:institution_ids => (project.institutions + [new_institution]).collect(&:id)}
+    put :update, :id => project, :project => {:institution_ids => Institution.all.collect(&:id)}
     assert_redirected_to project_path(project)
     project.reload
-    assert project.institutions.include?new_institution
-  end
-
-  test 'project manager can not assign the institutions (which are already in the other projects) to their project' do
-    project_manager = Factory(:project_manager)
-    project = project_manager.projects.first
-    a_project = Factory(:project)
-    a_project.institutions << Factory(:institution)
-
-    login_as(project_manager.user)
-
-    put :update, :id => project, :project => {:institution_ids => (project.institutions + a_project.institutions).collect(&:id)}
-    assert_redirected_to :root
-    assert_not_nil flash[:error]
-    project.reload
-    a_project.institutions.each do |i|
-       assert !(project.institutions.include?i)
-    end
+    assert_equal Institution.count, project.institutions.count
   end
 
   test 'project manager can not administer sharing policy' do
