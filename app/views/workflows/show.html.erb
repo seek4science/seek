@@ -24,7 +24,7 @@
       <!-- Uploader -->
       <p>
         <b>Uploader:</b>
-        <%= @workflow.contributor.nil? ? jerm_harvester_name.html_safe : @workflow.contributor.person.name  %>
+        <%= @workflow.contributor.nil? ? jerm_harvester_name.html_safe : link_to(@workflow.contributor.person.name, person_path(@workflow.contributor.person))  %>
       </p>
 
       <%= render :partial => "assets/special_auth_code_display", :locals => {:resource => @workflow} %>
