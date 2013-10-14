@@ -7,6 +7,7 @@ function showResourceVersion(form) {
 // ***************  Resource Upload Validation  *****************
 
 function validateResourceFields(is_new_file, resource_name, is_managed) {
+    // check if sharing rights are defined
     if (!($(document.getElementById('sharing_scope_0')).checked) &&
         !($(document.getElementById('sharing_scope_2')).checked) &&
         !($(document.getElementById('sharing_scope_4')).checked))
@@ -15,7 +16,6 @@ function validateResourceFields(is_new_file, resource_name, is_managed) {
         $(document.getElementById('sharing_scope_0')).focus();
         return(false);
     }
-
 
     // only make this test if that's a new SOP
     if(is_new_file) {

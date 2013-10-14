@@ -25,43 +25,16 @@ class ScalesController < ApplicationController
 
    def scale_search
     @scale = Scale.find_by_title(params[:scale_type])
-    @scaled_objects = @scale ? @scale.scalings.collect(&:scalable).compact.uniq : everything
-
-    resource_hash={}
-    @scaled_objects.each do |res|
-      resource_hash[res.class.name] = {:items => [], :hidden_count => 0} unless resource_hash[res.class.name]
-      resource_hash[res.class.name][:items] << res
-    end
-
-    resource_hash.each do |key,res|
-      res[:items].compact!      
-      unless res[:items].empty?
-        total_count = res[:items].size
-        res[:items] = key.constantize.authorized_partial_asset_collection res[:items], "view", User.current_user
-        res[:hidden_count] = total_count - res[:items].size
-      end
-    end
-
     render :update do |page|
       scale_title = @scale.try(:title) || 'all'
-      page.replace_html "#{scale_title}_results", :partial=>"assets/resource_listing_tabbed_by_class", :locals =>{:resource_hash=>resource_hash, 
-                                                                                                                  :narrow_view => true, :authorization_already_done => true, 
-                                                                                                                  :limit => 20,
-                                                                                                                  :tabs_id => "#{scale_title}_resource_listing_tabbed_by_class",
-                                                                                                                  :actions_partial_disable => true}
-      page.replace_html "js_for_tabber", :partial => "assets/force_loading_tabber"
+      page.replace_html "#{scale_title}_results", :partial=>"assets/resource_by_scale",
+                        :locals =>{:scale_title => scale_title,
+                                   :tabs_id => "resource_by_scale_#{scale_title}"}
     end
-
    end
 
 
   private
-
-   def everything
-    Seek::Util.user_creatable_types.inject([]) do |items, klass|
-      items + klass.all
-    end
-  end
 
   #Removes all results from the search results collection passed in that are not Authorised to show for the current_user
   def select_authorised collection
