@@ -1,18 +1,16 @@
-<!-- Workflow category (not really needed if we are already inside a category ...) -->
-<% if show_category %>
-  <div class="category">
-    <%= workflow.category.name %>
-  </div>
-<% end %>
-
-<!-- Workflow icon and title -->
-<% image = resource_avatar workflow,:style=>"width: 24px; height: 24px; vertical-align: middle"  %>
-<h3>
-  <% link_to image, show_resource_path(workflow) %>
+<!-- Workflow icon, title and category (category not really needed if we are already inside a category?) -->
+<% image = resource_avatar workflow,:style=>"width: 24px; height: 24px; vertical-align: middle; float: left; padding-right: 5px;"  %>
+<h3 style="float: left; width: 100%; margin: 0; padding: 0; vertical-align:middle;">
+  <%= link_to image, show_resource_path(workflow) %>
   <%= link_to workflow.title, show_resource_path(workflow) %>
+  <% if show_category %>
+      <div class="category" style="float: right; font-weight:normal;">
+        <%= workflow.category.name %>
+      </div>
+  <% end %>
 </h3>
 
-
+<div style="clear: both;"></div>
 <!-- Workflow visibility, e.g. 'private' -->
 <% ((workflow.authorization_supported? && workflow.can_manage?) ? list_item_visibility(workflow) : "").html_safe %>
 
@@ -21,4 +19,10 @@
   <%= text_or_not_specified(workflow.description, :description => true, :auto_link=>true, :length=>300) %>
 </div>
 
-<%= link_to 'Run', new_run_path(workflow), :class => "run_workflow" %>
+<!-- Action buttons -->
+<ul class="sectionIcons" style="float: right; padding: 0; margin: 0;">
+  <li>
+    <% human_name = text_for_resource workflow %>
+    <%= image_tag_for_key('run_workflow', new_run_path(workflow, :version => workflow.version, :based_off => nil), "Run #{human_name}", nil, "Run #{human_name}") -%>
+  </li>
+</ul>
