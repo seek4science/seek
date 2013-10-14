@@ -487,9 +487,14 @@ class DataFilesControllerTest < ActionController::TestCase
 
   test "should add link to a webpage" do
     mock_remote_file "#{Rails.root}/test/fixtures/files/html_file.html","http://webpage.com",{'Content-Type' => 'text/html'}
+    if Seek::Config.is_virtualliver
+      params_data_file = { :title=>"Test HTTP",:data_url=>"http://webpage.com",:projects=>[projects(:sysmo_project)], :external_link => "1"}
+    else
+      params_data_file = { :title=>"Test HTTP",:data_url=>"http://webpage.com",:projects=>[projects(:sysmo_project)]}
+    end
     assert_difference('DataFile.count') do
       assert_difference('ContentBlob.count') do
-        post :create, :data_file => { :title=>"Test HTTP",:data_url=>"http://webpage.com",:projects=>[projects(:sysmo_project)]}, :sharing=>valid_sharing
+        post :create, :data_file => params_data_file, :sharing=>valid_sharing
       end
     end
 
@@ -506,10 +511,15 @@ class DataFilesControllerTest < ActionController::TestCase
 
   test "should add link to a webpage from windows browser" do
     mock_remote_file "#{Rails.root}/test/fixtures/files/html_file.html","http://webpage.com",{'Content-Type' => 'text/html'}
+    if Seek::Config.is_virtualliver
+      params_data_file = { :title=>"Test HTTP",:data_url=>"http://webpage.com",:projects=>[projects(:sysmo_project)], :external_link => "1"}
+    else
+      params_data_file = { :title=>"Test HTTP",:data_url=>"http://webpage.com",:projects=>[projects(:sysmo_project)]}
+    end
     assert_difference('DataFile.count') do
       assert_difference('ContentBlob.count') do
         @request.env['HTTP_USER_AGENT']="Windows"
-        post :create, :data_file => { :title=>"Test HTTP",:data_url=>"http://webpage.com",:projects=>[projects(:sysmo_project)]}, :sharing=>valid_sharing
+        post :create, :data_file => params_data_file, :sharing=>valid_sharing
       end
     end
 
@@ -526,7 +536,11 @@ class DataFilesControllerTest < ActionController::TestCase
 
   test "should show wepage as a link" do
     mock_remote_file "#{Rails.root}/test/fixtures/files/html_file.html","http://webpage.com",{'Content-Type' => 'text/html'}
-    df = Factory :data_file,:content_blob=>Factory(:content_blob,:url=>"http://webpage.com")
+    if Seek::Config.is_virtualliver
+      df = Factory :data_file,:content_blob=>Factory(:content_blob,:url=>"http://webpage.com", :external_link => true)
+    else
+      df = Factory :data_file,:content_blob=>Factory(:content_blob,:url=>"http://webpage.com")
+    end
     assert df.content_blob.is_webpage?
     login_as(df.contributor.user)
     get :show,:id=>df
@@ -592,9 +606,13 @@ class DataFilesControllerTest < ActionController::TestCase
     assert_select "div#publications_fold_content",true
   end
 
-  test "dont show download button or count for website data file" do
+  test "dont show download button or count for website/external_link data file" do
     mock_remote_file "#{Rails.root}/test/fixtures/files/html_file.html","http://webpage.com",{'Content-Type' => 'text/html'}
-    df = Factory :data_file,:content_blob=>Factory(:content_blob,:url=>"http://webpage.com")
+    if Seek::Config.is_virtualliver
+      df = Factory :data_file,:content_blob=>Factory(:content_blob,:url=>"http://webpage.com", :external_link => true)
+    else
+      df = Factory :data_file,:content_blob=>Factory(:content_blob,:url=>"http://webpage.com")
+    end
     assert df.content_blob.is_webpage?
     login_as(df.contributor.user)
     assert df.can_download?(df.contributor.user)
@@ -609,9 +627,6 @@ class DataFilesControllerTest < ActionController::TestCase
     assert_select "div.contribution_aftertitle" do
       assert_select "b",:text=>/Downloads/,:count=>0
     end
-
-
-
   end
 
   test "show download button for non website data file" do

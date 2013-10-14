@@ -577,58 +577,34 @@ end
 
   test "download link for sop in tab has version" do
     login_as(:owner_of_my_first_sop)
-    as_not_virtualliver do
-      assert_difference('ActivityLog.count') do
-        get :show, :id => assays(:metabolomics_assay)
-      end
-
-      assert_response :success
-
-      assert_select "div.list_item div.list_item_actions" do
-        path=download_sop_path(sops(:my_first_sop))
-        assert_select "a[href=?]", path, :minumum => 1
-      end
+    assert_difference('ActivityLog.count') do
+      get :show, :id => assays(:metabolomics_assay)
     end
-    as_virtualliver do
-      assert_difference('ActivityLog.count') do
-        get :show, :id => assays(:metabolomics_assay)
-      end
 
-      assert_response :success
+    assert_response :success
 
-      assert_select "div.list_item div.list_item_actions", :count => 0
+    assert_select "div.list_item div.list_item_actions" do
+      path=download_sop_path(sops(:my_first_sop))
+      assert_select "a[href=?]", path, :minumum => 1
     end
   end
 
   test "show link for sop in tab has version" do
     login_as(:owner_of_my_first_sop)
-    as_not_virtualliver do
-      assert_difference('ActivityLog.count') do
-        get :show, :id => assays(:metabolomics_assay)
-      end
-
-      assert_response :success
-
-      assert_select "div.list_item div.list_item_actions" do
-        path=sop_path(sops(:my_first_sop))
-        assert_select "a[href=?]", path, :minumum => 1
-      end
+    assert_difference('ActivityLog.count') do
+      get :show, :id => assays(:metabolomics_assay)
     end
 
-    as_virtualliver do
-      assert_difference('ActivityLog.count') do
-        get :show, :id => assays(:metabolomics_assay)
-      end
+    assert_response :success
 
-      assert_response :success
-
-      assert_select "div.list_item div.list_item_actions", :count => 0
+    assert_select "div.list_item div.list_item_actions" do
+      path=sop_path(sops(:my_first_sop))
+      assert_select "a[href=?]", path, :minumum => 1
     end
   end
 
   test "edit link for sop in tabs" do
     login_as(:owner_of_my_first_sop)
-    as_not_virtualliver do
     assert_difference('ActivityLog.count') do
       get :show, :id=>assays(:metabolomics_assay)
     end
@@ -639,93 +615,47 @@ end
       path=edit_sop_path(sops(:my_first_sop))
       assert_select "a[href=?]", path, :minumum=>1
     end
-    end
-    as_virtualliver do
-      assert_difference('ActivityLog.count') do
-        get :show, :id=>assays(:metabolomics_assay)
-      end
-
-      assert_response :success
-
-      assert_select "div.list_item div.list_item_actions", :count => 0
-    end
   end
 
   test "download link for data_file in tabs" do
     login_as(:owner_of_my_first_sop)
-    as_not_virtualliver do
-      assert_difference('ActivityLog.count') do
-        get :show, :id => assays(:metabolomics_assay)
-      end
-
-      assert_response :success
-
-      assert_select "div.list_item div.list_item_actions" do
-        path=download_data_file_path(data_files(:picture))
-        assert_select "a[href=?]", path, :minumum => 1
-      end
+    assert_difference('ActivityLog.count') do
+      get :show, :id => assays(:metabolomics_assay)
     end
 
-    as_virtualliver do
-      assert_difference('ActivityLog.count') do
-        get :show, :id => assays(:metabolomics_assay)
-      end
+    assert_response :success
 
-      assert_response :success
-
-      assert_select "div.list_item div.list_item_actions", :count => 0
+    assert_select "div.list_item div.list_item_actions" do
+      path=download_data_file_path(data_files(:picture))
+      assert_select "a[href=?]", path, :minumum => 1
     end
   end
 
   test "show link for data_file in tabs" do
     login_as(:owner_of_my_first_sop)
-    as_not_virtualliver do
-      assert_difference('ActivityLog.count') do
-        get :show, :id => assays(:metabolomics_assay)
-      end
-
-      assert_response :success
-
-      assert_select "div.list_item div.list_item_actions" do
-        path=data_file_path(data_files(:picture))
-        assert_select "a[href=?]", path, :minumum => 1
-      end
+    assert_difference('ActivityLog.count') do
+      get :show, :id => assays(:metabolomics_assay)
     end
 
-    as_virtualliver do
-      assert_difference('ActivityLog.count') do
-        get :show, :id => assays(:metabolomics_assay)
-      end
+    assert_response :success
 
-      assert_response :success
-
-      assert_select "div.list_item div.list_item_actions", :count => 0
+    assert_select "div.list_item div.list_item_actions" do
+      path=data_file_path(data_files(:picture))
+      assert_select "a[href=?]", path, :minumum => 1
     end
   end
 
   test "edit link for data_file in tabs" do
     login_as(:owner_of_my_first_sop)
-    as_not_virtualliver do
-      assert_difference('ActivityLog.count') do
-        get :show, :id => assays(:metabolomics_assay)
-      end
-
-      assert_response :success
-
-      assert_select "div.list_item div.list_item_actions" do
-        path=edit_data_file_path(data_files(:picture))
-        assert_select "a[href=?]", path, :minumum => 1
-      end
+    assert_difference('ActivityLog.count') do
+      get :show, :id => assays(:metabolomics_assay)
     end
 
-    as_virtualliver do
-      assert_difference('ActivityLog.count') do
-        get :show, :id => assays(:metabolomics_assay)
-      end
+    assert_response :success
 
-      assert_response :success
-
-      assert_select "div.list_item div.list_item_actions", :count =>0
+    assert_select "div.list_item div.list_item_actions" do
+      path=edit_data_file_path(data_files(:picture))
+      assert_select "a[href=?]", path, :minumum => 1
     end
   end
 
@@ -774,64 +704,33 @@ end
     check_fixtures_for_authorization_of_sops_and_datafiles_links
     login_as(:model_owner)
     assay=assays(:assay_with_public_and_private_sops_and_datafiles)
-    as_not_virtualliver do
-      assert_difference('ActivityLog.count') do
-        get :show, :id => assay.id
-      end
 
-      assert_response :success
-
-      assert_select "div.tabbertab" do
-        assert_select "h3", :text => "SOPs (1+1)", :count => 1
-        assert_select "h3", :text => "Data Files (1+1)", :count => 1
-      end
-
-      assert_select "div.list_item" do
-        assert_select "div.list_item_title a[href=?]", sop_path(sops(:sop_with_fully_public_policy)), :text => "SOP with fully public policy", :count => 1
-        assert_select "div.list_item_actions a[href=?]", sop_path(sops(:sop_with_fully_public_policy)), :count => 1
-        assert_select "div.list_item_title a[href=?]", sop_path(sops(:sop_with_private_policy_and_custom_sharing)), :count => 0
-        assert_select "div.list_item_actions a[href=?]", sop_path(sops(:sop_with_private_policy_and_custom_sharing)), :count => 0
-
-        assert_select "div.list_item_title a[href=?]", sop_path(sops(:sop_with_fully_public_policy)), :text => "SOP with fully public policy", :count => 1
-        assert_select "div.list_item_actions a[href=?]", sop_path(sops(:sop_with_fully_public_policy)), :count => 1
-        assert_select "div.list_item_title a[href=?]", sop_path(sops(:sop_with_private_policy_and_custom_sharing)), :count => 0
-        assert_select "div.list_item_actions a[href=?]", sop_path(sops(:sop_with_private_policy_and_custom_sharing)), :count => 0
-
-        assert_select "div.list_item_title a[href=?]", data_file_path(data_files(:downloadable_data_file)), :text => "Download Only", :count => 1
-        assert_select "div.list_item_actions a[href=?]", data_file_path(data_files(:downloadable_data_file)), :count => 1
-        assert_select "div.list_item_title a[href=?]", data_file_path(data_files(:private_data_file)), :count => 0
-        assert_select "div.list_item_actions a[href=?]", data_file_path(data_files(:private_data_file)), :count => 0
-      end
+    assert_difference('ActivityLog.count') do
+      get :show, :id => assay.id
     end
 
-    as_virtualliver do
-      assert_difference('ActivityLog.count') do
-        get :show, :id => assay.id
-      end
+    assert_response :success
 
-      assert_response :success
+    assert_select "div.tabbertab" do
+      assert_select "h3", :text => "SOPs (1+1)", :count => 1
+      assert_select "h3", :text => "Data Files (1+1)", :count => 1
+    end
 
-      assert_select "div.tabbertab" do
-        assert_select "h3", :text => "SOPs (1+1)", :count => 1
-        assert_select "h3", :text => "Data Files (1+1)", :count => 1
-      end
+    assert_select "div.list_item" do
+      assert_select "div.list_item_title a[href=?]", sop_path(sops(:sop_with_fully_public_policy)), :text => "SOP with fully public policy", :count => 1
+      assert_select "div.list_item_actions a[href=?]", sop_path(sops(:sop_with_fully_public_policy)), :count => 1
+      assert_select "div.list_item_title a[href=?]", sop_path(sops(:sop_with_private_policy_and_custom_sharing)), :count => 0
+      assert_select "div.list_item_actions a[href=?]", sop_path(sops(:sop_with_private_policy_and_custom_sharing)), :count => 0
 
-      assert_select "div.list_item" do
-        assert_select "div.list_item_title a[href=?]", sop_path(sops(:sop_with_fully_public_policy)), :text => "SOP with fully public policy", :count => 1
-        assert_select "div.list_item_actions a[href=?]", sop_path(sops(:sop_with_fully_public_policy)), :count => 0
-        assert_select "div.list_item_title a[href=?]", sop_path(sops(:sop_with_private_policy_and_custom_sharing)), :count => 0
-        assert_select "div.list_item_actions a[href=?]", sop_path(sops(:sop_with_private_policy_and_custom_sharing)), :count => 0
+      assert_select "div.list_item_title a[href=?]", sop_path(sops(:sop_with_fully_public_policy)), :text => "SOP with fully public policy", :count => 1
+      assert_select "div.list_item_actions a[href=?]", sop_path(sops(:sop_with_fully_public_policy)), :count => 1
+      assert_select "div.list_item_title a[href=?]", sop_path(sops(:sop_with_private_policy_and_custom_sharing)), :count => 0
+      assert_select "div.list_item_actions a[href=?]", sop_path(sops(:sop_with_private_policy_and_custom_sharing)), :count => 0
 
-        assert_select "div.list_item_title a[href=?]", sop_path(sops(:sop_with_fully_public_policy)), :text => "SOP with fully public policy", :count => 1
-        assert_select "div.list_item_actions a[href=?]", sop_path(sops(:sop_with_fully_public_policy)), :count => 0
-        assert_select "div.list_item_title a[href=?]", sop_path(sops(:sop_with_private_policy_and_custom_sharing)), :count => 0
-        assert_select "div.list_item_actions a[href=?]", sop_path(sops(:sop_with_private_policy_and_custom_sharing)), :count => 0
-
-        assert_select "div.list_item_title a[href=?]", data_file_path(data_files(:downloadable_data_file)), :text => "Download Only", :count => 1
-        assert_select "div.list_item_actions a[href=?]", data_file_path(data_files(:downloadable_data_file)), :count => 0
-        assert_select "div.list_item_title a[href=?]", data_file_path(data_files(:private_data_file)), :count => 0
-        assert_select "div.list_item_actions a[href=?]", data_file_path(data_files(:private_data_file)), :count => 0
-      end
+      assert_select "div.list_item_title a[href=?]", data_file_path(data_files(:downloadable_data_file)), :text => "Download Only", :count => 1
+      assert_select "div.list_item_actions a[href=?]", data_file_path(data_files(:downloadable_data_file)), :count => 1
+      assert_select "div.list_item_title a[href=?]", data_file_path(data_files(:private_data_file)), :count => 0
+      assert_select "div.list_item_actions a[href=?]", data_file_path(data_files(:private_data_file)), :count => 0
     end
 
   end

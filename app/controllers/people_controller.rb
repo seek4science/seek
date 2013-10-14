@@ -30,7 +30,11 @@ class PeopleController < ApplicationController
   # GET /people.xml
   def index
     if (params[:discipline_id])
-      @people=Person.find(:all,:include=>:disciplines).select{|p| p.discipline_id == params[:discipline_id]}
+      @discipline=Discipline.find(params[:discipline_id])
+      #FIXME: strips out the disciplines that don't match
+      @people=Person.find(:all,:include=>:disciplines,:conditions=>["disciplines.id=?",@discipline.id])
+      #need to reload the people to get their full discipline list - otherwise only get those matched above. Must be a better solution to this
+      @people.each(&:reload)
     elsif (params[:project_role_id])
       @project_role=ProjectRole.find(params[:project_role_id])
       @people=Person.find(:all,:include=>[:group_memberships])
