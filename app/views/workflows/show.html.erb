@@ -51,7 +51,7 @@
                     <strong>Example value:</strong>
                   </p>
                   <% unless b.example_value.blank? %>
-                    <textarea class="script_example_data_box" readonly="true" style="height: 250px"><%= b.example_value %></textarea>
+                    <p><pre class="script_example_data_box"><%= b.example_value %></pre></p>
                   <% end %>
                 </td>
               </tr>
