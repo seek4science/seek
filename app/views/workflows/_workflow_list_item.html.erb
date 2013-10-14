@@ -27,9 +27,9 @@
 </div>
 
 <!-- Action buttons -->
-<ul class="sectionIcons" style="float: right; padding: 0; margin: 0">
+<ul class="sectionIcons" style="float: right; padding: 0; margin: 0;">
   <li>
     <% human_name = text_for_resource workflow %>
-    <%= image_tag_for_key('run_workflow', new_run_path(workflow, :version => workflow.version, :based_off => nil), "Run #{human_name}", nil, "Run #{human_name}") -%>
+    <%= image_tag_for_key('run_workflow', new_run_path(workflow, :version => workflow.version, :based_off => nil), "Run #{human_name}", {:style => "font-size: smaller;"}, "Run #{human_name}") -%>
   </li>
 </ul>
