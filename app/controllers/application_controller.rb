@@ -173,6 +173,39 @@ class ApplicationController < ActionController::Base
     end
   end
 
+  def view_items_in_scale
+    resource_type = params[:resource_type]
+    scale = Scale.find_by_title(params[:scale_title])
+    view_type = params[:view_type]
+    if scale
+      scale_title = scale.title
+      resources = Scaling.find(:all, :include => :scalable, :conditions => ["scale_id=? AND scalable_type=?", scale.id, resource_type]).collect(&:scalable).compact.uniq
+      if resources.first.respond_to?(:authorized_partial_asset_collection)
+        authorized_resources = clazz.authorized_partial_asset_collection(resources,"view")
+      else
+        authorized_resources = resources.select &:can_view?
+      end
+    else
+      scale_title = 'all'
+      klazz = resource_type.constantize
+      resources = klazz.all
+      if resources.first.respond_to?(:all_authorized_for)
+        authorized_resources = klazz.all_authorized_for('view')
+      else
+        authorized_resources = resources.select &:can_view?
+      end
+    end
+
+    render :update do |page|
+        page.replace_html "#{scale_title}_#{resource_type}_#{view_type}",
+                          :partial => "assets/scale_related_items",
+                          :locals => {:resources => resources,
+                                      :scale_title => scale_title,
+                                      :authorized_resources => authorized_resources,
+                                      :view_type => view_type }
+    end
+  end
+
   private
 
   def project_membership_required

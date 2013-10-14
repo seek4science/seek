@@ -1,0 +1,68 @@
+<% tabs_id ||= "resource_list_by_class" -%>
+<% scale_title ||= "all" -%>
+
+<script type="text/javascript">
+    tabber_ids.push("<%= tabs_id -%>");
+</script>
+
+<%
+   resource_hash = {}
+   scale = Scale.find_by_title(scale_title)
+   if scale
+     grouped_scalings = scale.scalings.group_by { |scaling| scaling.scalable_type }
+     grouped_scalings.each do |key, value|
+       resource_hash[key] = value.count
+     end if !grouped_scalings.blank?
+   else
+     Seek::Util.user_creatable_types.each do |klass|
+       number_of_items = klass.count
+       resource_hash["#{klass}"] = number_of_items if number_of_items > 0
+     end
+   end
+%>
+
+<% if !resource_hash.blank? -%>
+    <div id='<%= "#{tabs_id}_spinner" -%>'>
+      <center>
+        <%= image_tag "ajax-loader-large.gif" -%>
+      </center>
+    </div>
+    <div <%= "id='#{tabs_id}'" if tabs_id -%> class="tabber" style="display:none;">
+      <%
+         sorted_result_keys = resource_hash.keys.sort_by do |key|
+           ASSET_ORDER.index(key)
+         end
+      %>
+
+      <% sorted_result_keys.each do |key| -%>
+          <div class="tabbertab">
+            <% tab_title = "#{key} (#{resource_hash[key]})" -%>
+            <h3 class="<%= scale_title %>_<%= key %>"><%= tab_title -%></h3>
+          </div>
+
+      <% end %>
+
+    </div>
+    <% sorted_result_keys.each do |key| -%>
+        <div id="<%= scale_title %>_<%= key %>_view_some"></div>
+        <div id="<%= scale_title %>_<%= key %>_view_all"></div>
+    <% end %>
+
+    <script type="text/javascript">
+        load_tabs();
+        <% sorted_result_keys.each do |key| %>
+            tabs_on_click('<%= scale_title %>', '<%= key %>');
+        <% end %>
+
+        //Load content for first tab
+        document.getElementsByClassName('<%= scale_title %>' + '_' + '<%= sorted_result_keys.first %>')[0].click();
+    </script>
+
+<% else -%>
+    <span class="none_text">No items.</span>
+<% end -%>
+
+
+
+
+

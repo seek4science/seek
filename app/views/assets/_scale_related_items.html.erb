@@ -1,0 +1,52 @@
+<%
+   limit ||= 5
+   hidden_items = resources - authorized_resources
+   hidden_count = hidden_items.count
+   extra_count = resources.count - hidden_items.count - limit
+   resource_type = resources.first.class.name
+%>
+
+<%= render :partial => "assets/resource_list",
+            :locals => {:collection => (view_type == 'view_some' ? authorized_resources.take(limit) : authorized_resources),
+            :narrow_view => true,
+            :authorization_for_showing_already_done => true,
+            :actions_partial_disable=>true} %>
+
+<% if extra_count > 0 %>
+    <div class="list_items_container">
+      <div class="hidden_list_item" id ="view_list_items" style="color:#000">
+           <%
+              tab_content_view_all = scale_title + '_' + resource_type + '_view_all'
+              tab_content_view_some = scale_title + '_' + resource_type + '_view_some'
+           %>
+           <%= link_to_remote "View all "+(authorized_resources.size).to_s+" items",
+                               :html => {:style => (view_type=='view_all' ? "display:none" : "display:block")},
+                               :url => url_for(:action => 'view_items_in_scale'),
+                               :condition => "check_tab_content('#{tab_content_view_all}', '#{tab_content_view_some}')",
+                               :with => "'resource_type=' + '#{resource_type}' + '&scale_title=' + '#{scale_title}' + '&view_type=' + 'view_all'",
+                               :before => "$('#{tab_content_view_some}').hide();
+                                           $('#{tab_content_view_all}').show();
+                                           show_large_ajax_loader('#{tab_content_view_all}');"
+            -%>
+            <%= link_to_remote "View " + limit.to_s + " items",
+                               :html => {:style => (view_type=='view_some' ? "display:none" : "display:block")},
+                               :url => url_for(:action => 'view_items_in_scale'),
+                               :condition => "check_tab_content('#{tab_content_view_some}', '#{tab_content_view_all}')",
+                               :with => "'resource_type=' + '#{resource_type}' + '&scale_title=' + '#{scale_title}' + '&view_type=' + 'view_some'",
+                               :before => "$('#{tab_content_view_all}').hide();
+                                           $('#{tab_content_view_some}').show();
+                                           show_large_ajax_loader('#{tab_content_view_some}');"
+            -%>
+       </div>
+      <br style="clear:both"/>
+    </div>
+<% end %>
+<% if hidden_count > 0 %>
+    <div class="list_items_container">
+      <div class="hidden_list_item">
+        <%# only show hidden item count, does not make sense to show list of uploaders, and in order to improve the speed of the default load%>
+          <%= hidden_count -%> hidden <%= hidden_count > 1 ? "items" : "item" %>
+      </div>
+      <br style="clear:both"/>
+    </div>
+<% end %>

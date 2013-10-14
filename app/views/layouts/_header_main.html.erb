@@ -1,6 +1,6 @@
 <% from_homepage = (request.url== root_url) ? true :false %>
 <% cache "header_#{from_homepage}" do -%>
-    <% if from_homepage %>
+    <% if from_homepage || Seek::Config.is_virtualliver %>
         <table width="100%">
           <tr>
             <td style="text-align:left">
