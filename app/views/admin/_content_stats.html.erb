@@ -2,44 +2,30 @@
   authorised_types=Seek::ContentStats::AUTHORISED_TYPES
   #So we don't have to run lengthy authorization a second time when calculating total stats
 
-  total_visible_models = []
-  total_accessible_models = []
   total_publicly_visible_models = []
   total_publicly_accessible_models = []
 
-  total_accessible_sops = []
-  total_visible_sops = []
   total_publicly_accessible_sops = []
   total_publicly_visible_sops = []
 
-  total_accessible_data_files = []
-  total_visible_data_files = []
   total_publicly_visible_data_files = []
   total_publicly_accessible_data_files = []
 
-  total_accessible_assays = []
-  total_visible_assays = []
   total_publicly_visible_assays = []
   total_publicly_accessible_assays = []
 
-  total_accessible_studies = []
-  total_visible_studies = []
   total_publicly_visible_studies = []
   total_publicly_accessible_studies = []
 
-  total_accessible_investigations = []
-  total_visible_investigations = []
   total_publicly_visible_investigations = []
   total_publicly_accessible_investigations = []
 
-  total_accessible_presentations = []
-  total_visible_presentations = []
   total_publicly_visible_presentations = []
   total_publicly_accessible_presentations = []
 %>
 
 <h3>Content statistics</h3>
-For authorised assets the numbers are split as <em>total</em> / <em>visible</em> / <em>accessible</em> / <em>publicly visible</em> / <em>publicly accessible</em>
+For authorised assets the numbers are split as <em>total</em> / <em>publicly visible</em> / <em>publicly accessible</em>
 <table>
   <tr>
     <th>Project</th>
@@ -57,17 +43,13 @@ For authorised assets the numbers are split as <em>total</em> / <em>visible</em>
     <td><%= stat.people.count -%> (<%= registered_people -%>)</td>
     <% authorised_types.each do |type| %>
         <% type_str = type.name.underscore.pluralize
-            vis = stat.send("visible_#{type_str}",[stat.project])
-            acc = stat.send("accessible_#{type_str}",[stat.project])
             pub_vis = stat.send("publicly_visible_#{type_str}",[stat.project])
             pub_acc = stat.send("publicly_accessible_#{type_str}",[stat.project])
             total = stat.send("#{type_str}").count
-            eval("total_visible_#{type_str} |= vis")
-            eval("total_accessible_#{type_str} |= acc")
             eval("total_publicly_visible_#{type_str} |= pub_vis")
             eval("total_publicly_accessible_#{type_str} |= pub_acc")
         -%>
-        <td><%= "#{total}/#{vis.count}/#{acc.count}/#{pub_vis.count}/#{pub_acc.count}" -%></td>
+        <td><%= "#{total}/#{pub_vis.count}/#{pub_acc.count}" -%></td>
     <% end -%>
 
     <td><%= stat.publications.count -%> </td>
@@ -79,12 +61,10 @@ For authorised assets the numbers are split as <em>total</em> / <em>visible</em>
     <% authorised_types.each do |type| %>
         <%  type_str = type.name.underscore.pluralize
             total=type.count
-            total_vis = eval("total_visible_#{type_str}").count
-            total_acc = eval("total_accessible_#{type_str}").count
             total_pub_vis = eval("total_publicly_visible_#{type_str}").count
             total_pub_acc = eval("total_publicly_accessible_#{type_str}").count
         %>
-        <td><%= "#{total}/#{total_vis}/#{total_acc}/#{total_pub_vis}/#{total_pub_acc}" -%></td>
+        <td><%= "#{total}/#{total_pub_vis}/#{total_pub_acc}" -%></td>
     <% end -%>
 
     <td><%= Publication.count -%></td>
