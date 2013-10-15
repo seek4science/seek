@@ -1,6 +1,6 @@
 <!-- Run button -->
 <li>
-  <%= image_tag_for_key('run_workflow', new_run_path(workflow, :version => version, :based_off => based_off), "Run #{human_name}", nil, "Run #{human_name}") -%>
+  <%= image_tag_for_key('run_workflow', taverna_player.new_run_path(:workflow_id => workflow, :version => version, :based_off => based_off), "Run #{human_name}", nil, "Run #{human_name}") -%>
 </li>
 
 <!-- Manage button -->

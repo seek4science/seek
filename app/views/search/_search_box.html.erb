@@ -4,7 +4,7 @@
 
 <% if Seek::Config.solr_enabled -%>
 
-  <%= form_tag search_path do -%>
+  <%= form_tag main_app.search_path do -%>
     <div id="search_box">
       <%= text_field_tag :search_query, @search_query,:class=>"curved", :style=>"display:none;" -%>
       <%= select_tag :search_type, options_for_select(search_type_options,@search_type)  %>
