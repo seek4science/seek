@@ -1,0 +1,7 @@
+<div id="run-button">
+  <% if run.finished? || run.cancelled? %>
+    <%= link_to 'Delete', run, :method => :delete, :data => { confirm: 'Are you sure?' } -%>
+  <% else %>
+    <%= link_to "Cancel", cancel_run_path(run.id), :method => :put, :data => { confirm: "Are you sure?" } -%>
+  <% end %>
+</div>

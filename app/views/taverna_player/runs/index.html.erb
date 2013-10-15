@@ -1,0 +1,28 @@
+<h1>Runs</h1>
+
+<table>
+  <tr>
+    <th>Run</th>
+    <th>Name</th>
+    <th>Id on Taverna Server</th>
+    <th>State</th>
+    <th>Create time</th>
+    <th>Start time</th>
+    <th>Finish time</th>
+    <th colspan="2">Actions</th>
+  </tr>
+
+<% @runs.each do |run| %>
+  <tr>
+    <td><%= run.id %></td>
+    <td><%= run.name %></td>
+    <td><%= run.run_id %></td>
+    <td><%= run.state %></td>
+    <td><%= run.create_time %></td>
+    <td><%= run.start_time %></td>
+    <td><%= run.finish_time %></td>
+    <td><%= link_to 'Show', run %></td>
+    <td><%= render :partial => "button", :locals => { :run => run } %></td>
+  </tr>
+<% end %>
+</table>

@@ -1,0 +1,7 @@
+
+<div id="run-interaction">
+  <% unless interaction.nil? %>
+    <%= content_tag(:iframe, "", {:width => "100%", :height => "500px",
+   	  :src => run_path(run) + "/proxy/#{interaction.uri}"}) %>
+  <% end %>
+</div>

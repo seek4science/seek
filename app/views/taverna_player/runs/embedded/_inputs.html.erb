@@ -1,0 +1,21 @@
+
+<div id="run-inputs">
+  <h2>Inputs</h2>
+
+  <% run.inputs.each do |input| %>
+    <p>
+      <b>Name:</b>
+      <%= input.name %>
+    </p>
+
+    <p>
+      <b>Value:</b>
+      <%= input.value %>
+    </p>
+
+    <p>
+      <b>File:</b>
+      <%= link_to input.file_file_name, input.file.url %>
+    </p>
+  <% end%>
+</div>

@@ -1,0 +1,18 @@
+<h1>Run 1</h1>
+
+<%= render :partial => "info", :locals => { :run => @run } %>
+
+<%= render :partial => "button", :locals => { :run => @run } %>
+
+<% if @run.inputs.size > 0 %>
+  <%= render :partial => "inputs", :locals => { :run => @run } %>
+<% end %>
+
+<%= render :partial => "interaction", :locals =>
+  { :run => @run, :interaction => @interaction } %>
+
+<%= render :partial => "outputs", :locals => { :run => @run } %>
+
+<% unless @run.finished? || @run.cancelled? %>
+  <%= render :partial => "poll", :locals => { :reload => run_path(@run) } %>
+<% end %>

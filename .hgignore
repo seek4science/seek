@@ -43,6 +43,7 @@ solr/pids/
 public/help_images/*
 public/javascripts/*_cached.js
 public/stylesheets/*_cached.css
+public/system/
 
 .bundle/config
 
