@@ -34,14 +34,16 @@
           <%= f.text_field :name, :value => workflow_title, :size => 80 %>
         </div>
 
-        <% unless workflow_inputs.blank? %>
+        <!-- Data inputs -->
+        <% data_inputs = workflow_inputs.select{|input| (input.port_type.name == WorkflowInputPortType::DATA)}  -%>
+        <% unless data_inputs.blank? %>
             <div class="fold">
               <div class="foldTitle">
                 Data Inputs
               </div>
               <div class="foldContent" style="display: none;">
                 <table class="simple" style="width: 100%;">
-                  <% workflow_inputs.each do |input| %>
+                  <% data_inputs.each do |input| %>
                       <tr>
                         <td>
                           <h3><%= input[:name] %></h3>
@@ -73,14 +75,16 @@
             </div>
         <% end %>
 
-        <% unless workflow_inputs.blank? %>
+        <!-- Parameter inputs -->
+        <% paramater_inputs = workflow_inputs.select{|input| input.port_type.name == WorkflowInputPortType::PARAMETER} -%>
+        <% unless paramater_inputs.blank? %>
             <div class="fold">
               <div class="foldTitle">
                 Parameter Inputs
               </div>
               <div class="foldContent" style="display: none;">
                 <table class="simple" style="width: 100%;">
-                  <% workflow_inputs.each do |input| %>
+                  <% paramater_inputs.each do |input| %>
                       <tr>
                         <td>
                           <h3><%= input[:name] %></h3>
@@ -109,6 +113,7 @@
                   <% end %>
                 </table>
               </div>
+            </div>
         <% end %>
 
         <br/>
