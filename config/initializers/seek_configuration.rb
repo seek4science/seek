@@ -83,6 +83,5 @@ Seek::Config.default :sample_age, "Age at sampling"
 Seek::Config.default :specimen_creators, "Contributors"
 
 
-Seek::Config.default :max_attachments_num,100
 
 Seek::Config.default :admin_impersonation_enabled, true

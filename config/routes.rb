@@ -1,5 +1,5 @@
 ActionController::Routing::Routes.draw do |map|
-  map.resources :attachments
+
   map.resources :presentations,:member => {:download=>:get,:new_version=>:post, :preview_publish=>:get,:publish=>[:post, :get],:request_resource=>:post, :update_annotations_ajax=>:post,:destroy_version => :delete } do |presentation|
     presentation.resources :content_blobs, :member => {:download => :get, :view_pdf_content => :get, :get_pdf => :get}
   end
