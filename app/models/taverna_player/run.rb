@@ -7,6 +7,7 @@ module TavernaPlayer
     belongs_to :sweep
 
     attr_accessor :user_id # temporary hack until we add user_id column
+    attr_accessible :user_id
     # Extend the Run model here.
   end
 end
