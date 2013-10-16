@@ -14,11 +14,6 @@
             <div style="text-align: center;">
 
               <input type=button id="new_asset_button" class="gadget_button" value="CREATE" onclick="javascript:toggleDynamicMenu('new_asset_menu');"/>
-
-              <% if Seek::Config.is_virtualliver -%>
-                <input type=button id="file_upload_tool" class="gadget_button" value="Upload tool" onclick="window.open('http://seek.virtual-liver.de/file_upload_tool/')">
-              <% end %>
-
               <ul id="new_asset_menu" class='dynamic_menu' style="display:none;">
 
                 <% new_creatable_selection_list.each do |item| -%>
@@ -26,6 +21,10 @@
                 <% end -%>
 
               </ul>
+
+              <% if Seek::Config.is_virtualliver -%>
+                  <input type=button id="file_upload_tool" class="gadget_button" value="Upload tool" onclick="window.open('http://seek.virtual-liver.de/file_upload_tool/')">
+              <% end %>
 
             </div>
           </div>
