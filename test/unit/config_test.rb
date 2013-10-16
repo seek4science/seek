@@ -250,4 +250,8 @@ class ConfigTest < ActiveSupport::TestCase
   test "publish_button_enabled" do
     assert_equal true,Seek::Config.publish_button_enabled
   end
+
+  test "recaptcha enabled" do
+    assert_equal true, Seek::Config.recaptcha_enabled
+  end
 end

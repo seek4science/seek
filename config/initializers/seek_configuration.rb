@@ -83,5 +83,5 @@ Seek::Config.default :sample_age, "Age at sampling"
 Seek::Config.default :specimen_creators, "Contributors"
 
 
-
+Seek::Config.default :recaptcha_enabled, true
 Seek::Config.default :admin_impersonation_enabled, true

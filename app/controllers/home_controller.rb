@@ -33,7 +33,7 @@ class HomeController < ApplicationController
       flash[:error]="You must provide a Subject and details"
       render :action=>:feedback
     else
-      if verify_recaptcha && Seek::Config.email_enabled
+      if ( Seek::Config.recaptcha_enabled ? verify_recaptcha : true) && Seek::Config.email_enabled
         Mailer.deliver_feedback(current_user,@subject,@details,@anon,base_host)
         flash[:notice]="Your feedback has been delivered. Thank You."
         redirect_to root_path
