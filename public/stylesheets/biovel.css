@@ -180,3 +180,50 @@ div.small_list_item_title {
     background-color: #b1e10f;
   color: #283a12;
 }
+
+
+table.display tr.odd.gradeA {
+    background-color: #F7F4F4;
+}
+
+table.display tr.even.gradeA {
+    background-color: #FFFFFF;
+}
+
+/* For the Conditional-CSS grading rows */
+/*
+ 	Colour calculations (based off the main row colours)
+  Level 1:
+		dd > c4
+		ee > d5
+	Level 2:
+	  dd > d1
+	  ee > e2
+ */
+tr.odd.gradeA td.sorting_1 {
+    background-color: #E8E3E3;
+}
+
+tr.odd.gradeA td.sorting_2 {
+    background-color: #d1ffd1;
+}
+
+tr.odd.gradeA td.sorting_3 {
+    background-color: #d1ffd1;
+}
+
+tr.even.gradeA td.sorting_1 {
+    background-color: #F7F4F4;
+}
+
+tr.even.gradeA td.sorting_2 {
+    background-color: #e2ffe2;
+}
+
+tr.even.gradeA td.sorting_3 {
+    background-color: #e2ffe2;
+}
+
+.dataTables_filter {
+    padding: 10px 0px 10px 10px;
+}
