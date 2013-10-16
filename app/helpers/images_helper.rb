@@ -333,6 +333,8 @@ module ImagesHelper
         "famfamfam_silk/cog_go.png"
       when "workflow_avatar"
         "logos/taverna_logo.png"
+      when "sweep"
+        "famfamfam_silk/chart_organisation.png"
     else
       return nil
     end

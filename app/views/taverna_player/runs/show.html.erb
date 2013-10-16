@@ -13,6 +13,9 @@
     <div style="float: left; margin: 10px 10px 10px -5px;">
       <ul class="sectionIcons">
         <%= render :partial => "delete_or_cancel_button", :locals => { :run => @run } %>
+        <% if @run.finished? %>
+          <li><%= image_tag_for_key('sweep', main_app.new_sweep_path(:run_id => @run.id), nil, nil, "New sweep based on this run") -%></li>
+        <% end %>
       </ul>
     </div>
 
