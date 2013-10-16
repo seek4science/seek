@@ -1,12 +1,14 @@
 <div id="run-info">
-  <p>
-    <b>Run:</b>
-    <%= run.run_id %>
-  </p>
+  <!--<p>-->
+    <!--<b>Name:</b>-->
+    <!--<% run.name %>-->
+  <!--</p>-->
 
   <p>
-    <b>Name:</b>
-    <%= run.name %>
+    <b>Workflow:</b>
+    <% workflow = Workflow.find(run.workflow_id) %>
+    <%= link_to workflow.title, main_app.workflow_path(workflow)#, :version => run.workflow_version)),
+    %>
   </p>
 
   <p>
@@ -19,23 +21,29 @@
     <%= run.status_message %>
   </p>
 
+  <%
+     create_time = run.create_time.blank? ? '' : run.create_time.strftime("%e %b %Y %H:%m:%S %Z")
+     start_time = run.start_time.blank? ? '' : run.start_time.strftime("%e %b %Y %H:%m:%S %Z")
+     finish_time = run.finish_time.blank? ? '' : run.finish_time.strftime("%e %b %Y %H:%m:%S %Z")
+  %>
+
   <p>
     <b>Create time:</b>
-    <%= run.create_time %>
+    <%= create_time %>
   </p>
 
   <p>
     <b>Start time:</b>
-    <%= run.start_time %>
+    <%= start_time %>
   </p>
 
   <p>
     <b>Finish time:</b>
-    <%= run.finish_time %>
+    <%= finish_time %>
   </p>
 
-  <p>
-    <b>Embedded:</b>
-    <%= run.embedded %>
-  </p>
+  <!--<p>-->
+    <!--<b>Embedded:</b>-->
+    <!--<% run.embedded %>-->
+  <!--</p>-->
 </div>
