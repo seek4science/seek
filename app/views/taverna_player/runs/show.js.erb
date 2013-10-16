@@ -1,7 +1,7 @@
 
 $j("#run-info").replaceWith('<%= escape_javascript(render(:partial => "info", :locals => { :run => @run })) %>');
 
-$j("#run-button").replaceWith('<%= escape_javascript(render(:partial => "button", :locals => { :run => @run })) %>');
+$j("#run-button").replaceWith('<%= escape_javascript(render(:partial => "delete_or_cancel_button", :locals => { :run => @run })) %>');
 
 <% if @interaction.nil? || @new_interaction %>
   $j("#run-interaction").replaceWith('<%= escape_javascript(render(:partial => "interaction", :locals => { :run => @run, :interaction => @interaction })) %>');

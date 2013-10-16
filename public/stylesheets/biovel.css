@@ -186,3 +186,42 @@ div.small_list_item_title {
   text-align: left;
 }
 
+table.display tr.odd.gradeA {
+    background-color: #F7F4F4;
+}
+
+table.display tr.even.gradeA {
+    background-color: #FFFFFF;
+}
+
+tr.odd.gradeA td.sorting_1 {
+    background-color: #E8E3E3;
+}
+
+tr.odd.gradeA td.sorting_2 {
+    background-color: #d1ffd1;
+}
+
+tr.odd.gradeA td.sorting_3 {
+    background-color: #d1ffd1;
+}
+
+tr.even.gradeA td.sorting_1 {
+    background-color: #F7F4F4;
+}
+
+tr.even.gradeA td.sorting_2 {
+    background-color: #e2ffe2;
+}
+
+tr.even.gradeA td.sorting_3 {
+    background-color: #e2ffe2;
+}
+
+.dataTables_filter {
+    padding: 10px 0px 20px 10px;
+}
+
+table.display td {
+    border-bottom:1pt solid #BABABA;
+}

@@ -1,20 +1,33 @@
 <%= javascript_include_tag 'jquery-1.5.1.min.js' %>
 
-<h1>Run 1</h1>
+<div id="content">
+  <div class="contribution_title">
+    <h1><%= 'Run: ' + @run.name -%></h1>
+  </div>
 
-<%= render :partial => "info", :locals => { :run => @run } %>
+  <div class="show_basic">
+    <%= render :partial => "info", :locals => { :run => @run } %>
 
-<%= render :partial => "button", :locals => { :run => @run } %>
+    <div style="float: left; margin: 10px 10px 5px -5px;">
+      <ul class="sectionIcons">
+        <%= render :partial => "delete_or_cancel_button", :locals => { :run => @run } %>
+      </ul>
+    </div>
 
-<% if @run.inputs.size > 0 %>
-  <%= render :partial => "inputs", :locals => { :run => @run } %>
-<% end %>
+    <div style="clear: both;"></div>
 
-<%= render :partial => "interaction", :locals =>
-  { :run => @run, :interaction => @interaction } %>
+    <% if @run.inputs.size > 0 %>
+        <%= render :partial => "inputs", :locals => { :run => @run } %>
+    <% end %>
 
-<%= render :partial => "outputs", :locals => { :run => @run } %>
+    <%= render :partial => "interaction", :locals =>
+            { :run => @run, :interaction => @interaction } %>
 
-<% unless @run.finished? || @run.cancelled? %>
-  <%= render :partial => "poll", :locals => { :reload => run_path(@run) } %>
-<% end %>
+    <%= render :partial => "outputs", :locals => { :run => @run } %>
+
+    <% unless @run.finished? || @run.cancelled? %>
+        <%= render :partial => "poll", :locals => { :reload => run_path(@run) } %>
+    <% end %>
+  </div>
+</div>
+
