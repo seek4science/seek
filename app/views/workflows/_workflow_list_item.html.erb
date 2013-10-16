@@ -15,11 +15,11 @@
 <% ((workflow.authorization_supported? && workflow.can_manage?) ? list_item_visibility(workflow) : "").html_safe %>
 
 <!-- Uploader and creators -->
-<!--<div style="padding-top: 3px;">-->
-  <!--<%= list_item_contributor workflow -%>-->
-  <!--<% list_item_authorized_list workflow.creators, "Creator" %>-->
-  <!--<% list_item_optional_attribute "Other creators", h(workflow.other_creators), nil -%>-->
-<!--</div>-->
+<div style="padding-top: 3px;">
+  <%= list_item_contributor workflow -%>
+  <% list_item_authorized_list workflow.creators, "Creator" %>
+  <% list_item_optional_attribute "Other creators", h(workflow.other_creators), nil -%>
+</div>
 
 <!-- Description -->
 <div class="description">

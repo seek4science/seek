@@ -12,23 +12,8 @@
 <% render :partial=>"assets/upload_new_version_form", :locals=>{:resource=>@workflow} -%>
 
 <div class="main_content_left_box">
-<%# Versioning hidden for now: %>
-<% render :partial=>"assets/resource_version_details", :locals=>{:displayed_resource=>@display_workflow, :resource=>@workflow} -%>
-
-<% workflow_model = @display_workflow.t2flow %>
-<% processors = workflow_model.all_processors || [] -%>
-<% inputs = @workflow.input_ports || []  -%>
-<% outputs = @workflow.output_ports || []  -%>
-
-<div class="box_about_actor">
-  <%= item_description @display_workflow.description -%>
-</div>
-
-<div class="fold">
-  <div class="foldTitle">
-    Details
-  </div>
-  <div class="foldContent" style="display: none;">
+  <%# Versioning hidden for now: %>
+  <% render :partial=>"assets/resource_version_details", :locals=>{:displayed_resource=>@display_workflow, :resource=>@workflow} -%>
     <div class="box_about_actor">
       <%= render :partial => 'fileinfo', :object => @display_workflow.content_blob -%>
       <p>
@@ -43,203 +28,207 @@
       </p>
 
       <%= render :partial => "assets/special_auth_code_display", :locals => {:resource => @workflow} %>
+      <%= item_description @display_workflow.description -%>
+    </div>
+
+    <% workflow_model = @display_workflow.t2flow %>
+    <% processors = workflow_model.all_processors || [] -%>
+    <% inputs = @workflow.input_ports || []  -%>
+    <% outputs = @workflow.output_ports || []  -%>
+
+    <!-- Data inputs -->
+    <% data_inputs = inputs.select{|input| (input.port_type.name == WorkflowInputPortType::DATA)}  -%>
+    <div class="fold">
+      <div class="foldTitle">
+        Data Inputs (<%= data_inputs.count -%>)
+      </div>
+      <div class="foldContent" style="display: none;">
+        <% unless data_inputs.blank? -%>
+            <table class="simple" style="width: 100%;">
+              <% data_inputs.each do |b| -%>
+              <tr>
+                <td>
+                  <h3><%= b.name %></h3>
+                  <p>
+                    <%= ('<strong>Description: </strong>' + (b.description || '')).html_safe %>
+                  </p>
+                  <p>
+                    <strong>Example value:</strong>
+                  </p>
+                  <% unless b.example_value.blank? %>
+                    <p><pre class="script_example_data_box"><%= b.example_value %></pre></p>
+                  <% end %>
+                </td>
+              </tr>
+              <% end %>
+            </table>
+        <% else %>
+            <p class="none_text">None</p>
+        <% end %>
+      </div>
+    </div>
+
+    <!-- Parameter inputs -->
+    <% paramater_inputs = inputs.select{|input| input.port_type.name == WorkflowInputPortType::PARAMETER} -%>
+    <div class="fold">
+      <div class="foldTitle">
+        Parameter Inputs (<%= paramater_inputs.count -%>)
+      </div>
+      <div class="foldContent" style="display: none;">
+        <% unless paramater_inputs.blank? -%>
+            <table class="simple" style="width: 100%;">
+              <% paramater_inputs.each do |b| -%>
+                  <tr>
+                    <td>
+                      <h3><%= b.name %></h3>
+                      <p>
+                        <%= ('<strong>Description: </strong>' + (b.description || '')).html_safe %>
+                      </p>
+                      <p>
+                        <strong>Example value:</strong>
+                      </p>
+                      <% unless b.example_value.blank? %>
+                          <p><pre class="script_example_data_box"><%= b.example_value %></pre></p>
+                      <% end %>
+                    </td>
+                  </tr>
+              <% end %>
+            </table>
+        <% else %>
+            <p class="none_text">None</p>
+        <% end %>
+      </div>
+    </div>
+
+    <!-- Result outputs -->
+    <% result_outputs = outputs.select{|output| output.port_type.name == WorkflowOutputPortType::RESULT} -%>
+    <div class="fold">
+      <div class="foldTitle">
+        Result Outputs (<%= result_outputs.count -%>)
+      </div>
+      <div class="foldContent" style="display: none;">
+        <% unless result_outputs.blank? -%>
+            <table class="simple" style="width: 100%;">
+              <% result_outputs.each do |b| -%>
+                  <tr>
+                    <td>
+                      <h3><%= b.name %></h3>
+                      <p>
+                        <%= ('<strong>Description: </strong>' + (b.description || '')).html_safe %>
+                      </p>
+                      <p>
+                        <strong>Example value:</strong>
+                      </p>
+                      <% unless b.example_value.blank? %>
+                          <p><pre class="script_example_data_box"><%= b.example_value %></pre></p>
+                      <% end %>
+                    </td>
+                  </tr>
+              <% end %>
+            </table>
+        <% else %>
+            <p class="none_text">None</p>
+        <% end %>
+      </div>
+    </div>
+
+    <!-- Error/log outputs -->
+    <% error_log_outputs = outputs.select{|output| output.port_type.name == WorkflowOutputPortType::ERROR_LOG} -%>
+    <div class="fold">
+      <div class="foldTitle">
+        Error/Log Outputs (<%= error_log_outputs.count -%>)
+      </div>
+      <div class="foldContent" style="display: none;">
+        <% unless error_log_outputs.blank? -%>
+            <table class="simple" style="width: 100%;">
+              <% error_log_outputs.each do |b| -%>
+                  <tr>
+                    <td>
+                      <h3><%= b.name %></h3>
+                      <p>
+                        <%= ('<strong>Description: </strong>' + (b.description || '') ).html_safe %>
+                      </p>
+                      <p>
+                        <strong>Example value:</strong>
+                      </p>
+                      <% unless b.example_value.blank? %>
+                          <p><pre class="script_example_data_box"><%= b.example_value %></pre></p>
+                      <% end %>
+                    </td>
+                  </tr>
+              <% end %>
+            </table>
+        <% else %>
+            <p class="none_text">None</p>
+        <% end %>
+      </div>
+    </div>
+
+    <!-- Interactions -->
+    <% interactions = processors.select { |proc| proc.type == 'interaction' } || [] %>
+    <div class="fold">
+      <div class="foldTitle">
+        Interactions (<%= interactions.count -%>)
+      </div>
+      <div class="foldContent" style="display: none;">
+        <% unless interactions.blank? -%>
+            <table class="simple" style="width: 100%;">
+              <% interactions.each do |b| -%>
+                  <tr>
+                    <td>
+                      <h3><%= b.name %></h3>
+                      <div>
+                        <%= ('<p><strong>Description: </strong>' + (b.description || '') + '</p>').html_safe %>
+                        <%= ('<p><strong>Inputs: </strong>' + (b.inputs.blank? ? '' : b.inputs.join(", ")) + '</p>').html_safe %>
+                        <%= ('<p><strong>Outputs: </strong>' + (b.outputs.blank? ? '' : b.outputs.join(", ")) + '</p>').html_safe %>
+                      </div>
+                    </td>
+                  </tr>
+              <% end %>
+            </table>
+        <% else %>
+            <p class="none_text">None</p>
+        <% end %>
+      </div>
+    </div>
+
+    <!-- R Scripts -->
+    <% rscripts = processors.select { |proc| proc.type=='rshell' } || [] %>
+    <div class="fold">
+      <div class="foldTitle">
+        R Scripts (<%= rscripts.count -%>)
+      </div>
+      <div class="foldContent" style="display: none;">
+        <% unless rscripts.blank? -%>
+            <table class="simple" style="width: 100%;">
+              <% rscripts.each do |b| -%>
+                      <tr>
+                        <td>
+                          <h3><%= b.name %></h3>
+                          <div>
+                            <%= ('<p><strong>Description: </strong>' + (b.description || '') + '</p>').html_safe %>
+                            <%= ('<p><strong>Inputs: </strong>' + (b.inputs.blank? ? '' : b.inputs.join(", ")) + '</p>').html_safe %>
+                            <%= ('<p><strong>Outputs: </strong>' + (b.outputs.blank? ? '' : b.outputs.join(", ")) + '</p>').html_safe %>
+                            <p><strong>Script:</strong></p>
+                          <% unless b.script.blank? # should not ever be blank%>
+                              <p><pre class="script_example_data_box"><%= b.script.html_safe %></pre></p>
+                          <% end %>
+                          </div>
+                        </td>
+                      </tr>
+              <% end %>
+            </table>
+        <% else %>
+            <p class="none_text">None</p>
+        <% end %>
+      </div>
     </div>
   </div>
-</div>
 
-<!-- Data inputs -->
-<% data_inputs = inputs.select{|input| (input.port_type.name == WorkflowInputPortType::DATA)}  -%>
-<div class="fold">
-  <div class="foldTitle">
-    Data Inputs (<%= data_inputs.count -%>)
+  <div class="main_content_right_box">
+    <%= render :partial=>"general/items_related_to",:object => @workflow -%>
   </div>
-  <div class="foldContent" style="display: none;">
-    <% unless data_inputs.blank? -%>
-        <table class="simple" style="width: 100%;">
-          <% data_inputs.each do |b| -%>
-              <tr>
-                <td>
-                  <h3><%= b.name %></h3>
-                  <p>
-                    <%= ('<strong>Description: </strong>' + (b.description || '')).html_safe %>
-                  </p>
-                  <p>
-                    <strong>Example value:</strong>
-                  </p>
-                  <% unless b.example_value.blank? %>
-                      <p><pre class="script_example_data_box"><%= b.example_value %></pre></p>
-                  <% end %>
-                </td>
-              </tr>
-          <% end %>
-        </table>
-    <% else %>
-        <p class="none_text">None</p>
-    <% end %>
-  </div>
-</div>
 
-<!-- Parameter inputs -->
-<% paramater_inputs = inputs.select{|input| input.port_type.name == WorkflowInputPortType::PARAMETER} -%>
-<div class="fold">
-  <div class="foldTitle">
-    Parameter Inputs (<%= paramater_inputs.count -%>)
-  </div>
-  <div class="foldContent" style="display: none;">
-    <% unless paramater_inputs.blank? -%>
-        <table class="simple" style="width: 100%;">
-          <% paramater_inputs.each do |b| -%>
-              <tr>
-                <td>
-                  <h3><%= b.name %></h3>
-                  <p>
-                    <%= ('<strong>Description: </strong>' + (b.description || '')).html_safe %>
-                  </p>
-                  <p>
-                    <strong>Example value:</strong>
-                  </p>
-                  <% unless b.example_value.blank? %>
-                      <p><pre class="script_example_data_box"><%= b.example_value %></pre></p>
-                  <% end %>
-                </td>
-              </tr>
-          <% end %>
-        </table>
-    <% else %>
-        <p class="none_text">None</p>
-    <% end %>
-  </div>
-</div>
-
-<!-- Result outputs -->
-<% result_outputs = outputs.select{|output| output.port_type.name == WorkflowOutputPortType::RESULT} -%>
-<div class="fold">
-  <div class="foldTitle">
-    Result Outputs (<%= result_outputs.count -%>)
-  </div>
-  <div class="foldContent" style="display: none;">
-    <% unless result_outputs.blank? -%>
-        <table class="simple" style="width: 100%;">
-          <% result_outputs.each do |b| -%>
-              <tr>
-                <td>
-                  <h3><%= b.name %></h3>
-                  <p>
-                    <%= ('<strong>Description: </strong>' + (b.description || '')).html_safe %>
-                  </p>
-                  <p>
-                    <strong>Example value:</strong>
-                  </p>
-                  <% unless b.example_value.blank? %>
-                      <p><pre class="script_example_data_box"><%= b.example_value %></pre></p>
-                  <% end %>
-                </td>
-              </tr>
-          <% end %>
-        </table>
-    <% else %>
-        <p class="none_text">None</p>
-    <% end %>
-  </div>
-</div>
-
-<!-- Error/log outputs -->
-<% error_log_outputs = outputs.select{|output| output.port_type.name == WorkflowOutputPortType::ERROR_LOG} -%>
-<div class="fold">
-  <div class="foldTitle">
-    Error/Log Outputs (<%= error_log_outputs.count -%>)
-  </div>
-  <div class="foldContent" style="display: none;">
-    <% unless error_log_outputs.blank? -%>
-        <table class="simple" style="width: 100%;">
-          <% error_log_outputs.each do |b| -%>
-              <tr>
-                <td>
-                  <h3><%= b.name %></h3>
-                  <p>
-                    <%= ('<strong>Description: </strong>' + (b.description || '') ).html_safe %>
-                  </p>
-                  <p>
-                    <strong>Example value:</strong>
-                  </p>
-                  <% unless b.example_value.blank? %>
-                      <p><pre class="script_example_data_box"><%= b.example_value %></pre></p>
-                  <% end %>
-                </td>
-              </tr>
-          <% end %>
-        </table>
-    <% else %>
-        <p class="none_text">None</p>
-    <% end %>
-  </div>
-</div>
-
-<!-- Interactions -->
-<% interactions = processors.select { |proc| proc.type == 'interaction' } || [] %>
-<div class="fold">
-  <div class="foldTitle">
-    Interactions (<%= interactions.count -%>)
-  </div>
-  <div class="foldContent" style="display: none;">
-    <% unless interactions.blank? -%>
-        <table class="simple" style="width: 100%;">
-          <% interactions.each do |b| -%>
-              <tr>
-                <td>
-                  <h3><%= b.name %></h3>
-                  <div>
-                    <%= ('<p><strong>Description: </strong>' + (b.description || '') + '</p>').html_safe %>
-                    <%= ('<p><strong>Inputs: </strong>' + (b.inputs.blank? ? '' : b.inputs.join(", ")) + '</p>').html_safe %>
-                    <%= ('<p><strong>Outputs: </strong>' + (b.outputs.blank? ? '' : b.outputs.join(", ")) + '</p>').html_safe %>
-                  </div>
-                </td>
-              </tr>
-          <% end %>
-        </table>
-    <% else %>
-        <p class="none_text">None</p>
-    <% end %>
-  </div>
-</div>
-
-<!-- R Scripts -->
-<% rscripts = processors.select { |proc| proc.type=='rshell' } || [] %>
-<div class="fold">
-  <div class="foldTitle">
-    R Scripts (<%= rscripts.count -%>)
-  </div>
-  <div class="foldContent" style="display: none;">
-    <% unless rscripts.blank? -%>
-        <table class="simple" style="width: 100%;">
-          <% rscripts.each do |b| -%>
-              <tr>
-                <td>
-                  <h3><%= b.name %></h3>
-                  <div>
-                    <%= ('<p><strong>Description: </strong>' + (b.description || '') + '</p>').html_safe %>
-                    <%= ('<p><strong>Inputs: </strong>' + (b.inputs.blank? ? '' : b.inputs.join(", ")) + '</p>').html_safe %>
-                    <%= ('<p><strong>Outputs: </strong>' + (b.outputs.blank? ? '' : b.outputs.join(", ")) + '</p>').html_safe %>
-                    <p><strong>Script:</strong></p>
-                    <% unless b.script.blank? # should not ever be blank%>
-                        <p><pre class="script_example_data_box"><%= b.script.html_safe %></pre></p>
-                    <% end %>
-                  </div>
-                </td>
-              </tr>
-          <% end %>
-        </table>
-    <% else %>
-        <p class="none_text">None</p>
-    <% end %>
-  </div>
-</div>
-</div>
-
-<div class="main_content_right_box">
-  <%= render :partial=>"general/items_related_to",:object => @workflow -%>
-</div>
-
-<div style="clear:both"></div>
+  <div style="clear:both"></div>
 
 </div>
