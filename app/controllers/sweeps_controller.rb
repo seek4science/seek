@@ -57,8 +57,10 @@ class SweepsController < ApplicationController
       run_attributes[:name] = "#{params[:sweep][:name]} ##{run_id.to_i + 1}"
       # Copy parameters from "parent" run
       base_index = run_attributes[:inputs_attributes].keys.map {|k| k.to_i}.max + 1
-      run[:inputs_attributes].each do |input_id, input_attributes|
-        run_attributes[:inputs_attributes][(base_index + input_id.to_i).to_s] = input_attributes
+      if run && run[:inputs_attributes]
+        run[:inputs_attributes].each do |input_id, input_attributes|
+          run_attributes[:inputs_attributes][(base_index + input_id.to_i).to_s] = input_attributes
+        end
       end
     end
   end
