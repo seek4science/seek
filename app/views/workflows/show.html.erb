@@ -14,22 +14,31 @@
 <div class="main_content_left_box">
   <%# Versioning hidden for now: %>
   <% render :partial=>"assets/resource_version_details", :locals=>{:displayed_resource=>@display_workflow, :resource=>@workflow} -%>
-    <div class="box_about_actor">
-      <%= render :partial => 'fileinfo', :object => @display_workflow.content_blob -%>
-      <p>
-        <b>Category:</b>
-        <%= @workflow.category.name.html_safe -%>
-      </p>
 
-      <!-- Uploader -->
-      <p>
-        <b>Uploader:</b>
-        <%= @workflow.contributor.nil? ? jerm_harvester_name.html_safe : link_to(@workflow.contributor.person.name, person_path(@workflow.contributor.person))  %>
-      </p>
+  <%= item_description @display_workflow.description -%>
 
-      <%= render :partial => "assets/special_auth_code_display", :locals => {:resource => @workflow} %>
-      <%= item_description @display_workflow.description -%>
+  <div class="fold">
+    <div class="foldTitle">
+      Details
     </div>
+    <div class="foldContent" style="display: none;">
+      <div class="box_about_actor">
+        <%= render :partial => 'fileinfo', :object => @display_workflow.content_blob -%>
+        <p>
+          <b>Category:</b>
+          <%= @workflow.category.name.html_safe -%>
+        </p>
+
+        <!-- Uploader -->
+        <p>
+          <b>Uploader:</b>
+          <%= @workflow.contributor.nil? ? jerm_harvester_name.html_safe : link_to(@workflow.contributor.person.name, person_path(@workflow.contributor.person))  %>
+        </p>
+
+        <%= render :partial => "assets/special_auth_code_display", :locals => {:resource => @workflow} %>
+      </div>
+    </div>
+  </div>
 
     <% workflow_model = @display_workflow.t2flow %>
     <% processors = workflow_model.all_processors || [] -%>
