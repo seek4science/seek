@@ -225,5 +225,9 @@ tr.even.gradeA td.sorting_3 {
 }
 
 .dataTables_filter {
-    padding: 10px 0px 10px 10px;
+    padding: 10px 0px 20px 10px;
+}
+
+table.display td {
+    border-bottom:1pt solid #BABABA;
 }
