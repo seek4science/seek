@@ -1,131 +1,43 @@
 <% workflow_title = TavernaPlayer.workflow_proxy.title(@workflow) || "" %>
 <% workflow_inputs = TavernaPlayer.workflow_proxy.inputs(@workflow) %>
 
-<%
-   avatar = nil
-   #avatar = resource_title_draggable_avatar(@workflow,version)
-   #title_prefix||=""
-   #title_postfix||=""
-   #title ||= @workflow.title || ""
-   #
-   #title = "#{h(title_prefix) + h(title) + h(title_postfix)}".html_safe
-   #
-   #
-   #image_style_for_title_length = title.length > 89 ? "float:left" : "position:absolute"
-%>
-
 <div id="content">
   <div class="contribution_title">
-    <% unless avatar.blank? -%>
-        <div class="contribution_title_image curved with_smaller_shadow" style="<%= image_style_for_title_length -%>"><%= avatar -%></div>
-    <% end %>
     <h1><%= 'New Workflow Run: ' + workflow_title -%></h1>
   </div>
 
   <div class="show_basic">
-    <% #workflow_to_run = @workflow.version(version) %>
-
     <%= form_for @run, :html => {:multipart => true} do |f| %>
-        <%= f.hidden_field :workflow_id, :value => @workflow.id %>
-        <%= f.hidden_field :embedded %>
+      <%= f.hidden_field :workflow_id, :value => @workflow.id %>
+      <%# f.hidden_field :workflow_version, :value => @workflow_version.version %>
+      <%= f.hidden_field :embedded %>
 
-        <div class="box_about_actor" style="text-align: left; padding: 20px 20px 20px 0px;">
-          <%= f.label :name, "Run name:"  %>
-          <%= f.text_field :name, :value => workflow_title, :size => 80 %>
-        </div>
+      <div class="box_about_actor" style="text-align: left; padding: 20px 20px 20px 0px;">
+        <%= f.label :name, "Run name:"  %>
+        <%= f.text_field :name, :value => "#{workflow_title} Run", :size => 80 %>
+      </div>
 
-        <!-- Data inputs -->
-        <% data_inputs = workflow_inputs.select{|input| (input.port_type.name == WorkflowInputPortType::DATA)}  -%>
-        <% unless data_inputs.blank? %>
-            <div class="fold">
-              <div class="foldTitle">
-                Data Inputs
-              </div>
-              <div class="foldContent">
-                <table class="simple" style="width: 100%;">
-                  <% data_inputs.each do |input| %>
-                      <tr>
-                        <td>
-                          <h3><%= input[:name] %></h3>
-                          <p>
-                            <%= ('<strong>Description: </strong>' + (input[:description] || '')).html_safe %>
-                          </p>
-                          <% unless input[:example].blank? %>
-                              <p>Example value: <%= input[:example] %></p>
-                              <p>
-                                The example value is automatically entered in the box below.
-                                Click to edit or enter a new value directly or choose a file.
-                              </p>
-                          <% else %>
-                              <p>Set this input value by entering data directly or choosing a file.</p>
-                              <%= f.fields_for :inputs, TavernaPlayer::RunPort::Input.new do |input_fields| %>
-                                  <%= input_fields.hidden_field :name, :value => input[:name] %>
-                                  <%= input_fields.text_area :value, :value => input[:example], :rows => 3 %>
-                                  <br/>
-                                  <p>
-                                    <%= input_fields.file_field :file %>
-                                  </p>
-                              <% end %>
-                          <% end %>
-                        </td>
-                      </tr>
-                  <% end %>
-                </table>
-              </div>
-            </div>
-        <% end %>
+      <!-- Data inputs -->
+      <% data_inputs = workflow_inputs.select{|input| (input.port_type.name == WorkflowInputPortType::DATA)}  -%>
+      <% unless data_inputs.blank? %>
+        <%= render :partial => 'inputs_form', :locals => {:title => "Data", :inputs => data_inputs, :form => f} %>
+      <% end %>
 
-        <!-- Parameter inputs -->
-        <% paramater_inputs = workflow_inputs.select{|input| input.port_type.name == WorkflowInputPortType::PARAMETER} -%>
-        <% unless paramater_inputs.blank? %>
-            <div class="fold">
-              <div class="foldTitle">
-                Parameter Inputs
-              </div>
-              <div class="foldContent">
-                <table class="simple" style="width: 100%;">
-                  <% paramater_inputs.each do |input| %>
-                      <tr>
-                        <td>
-                          <h3><%= input[:name] %></h3>
-                          <p>
-                            <%= ('<strong>Description: </strong>' + (input[:description] || '')).html_safe %>
-                          </p>
-                          <% unless input[:example].blank? %>
-                              <p>Example value: <%= input[:example] %></p>
-                              <p>
-                                The example value is automatically entered in the box below.
-                                Click to edit or enter a new value directly or choose a file.
-                              </p>
-                          <% else %>
-                              <p>Set this input value by entering data directly or choosing a file.</p>
-                              <%= f.fields_for :inputs, TavernaPlayer::RunPort::Input.new do |input_fields| %>
-                                  <%= input_fields.hidden_field :name, :value => input[:name] %>
-                                  <%= input_fields.text_area :value, :value => input[:example], :rows => 3 %>
-                                  <br/>
-                                  <p>
-                                    <%= input_fields.file_field :file %>
-                                  </p>
-                              <% end %>
-                          <% end %>
-                        </td>
-                      </tr>
-                  <% end %>
-                </table>
-              </div>
-            </div>
-        <% end %>
+      <!-- Parameter inputs -->
+      <% paramater_inputs = workflow_inputs.select{|input| input.port_type.name == WorkflowInputPortType::PARAMETER} -%>
+      <% unless paramater_inputs.blank? %>
+        <%= render :partial => 'inputs_form', :locals => {:title => "Parameters", :inputs => paramater_inputs, :form => f} %>
+      <% end %>
+      <br/>
 
-        <br/>
-
-        <div style="float: left;">
-          <%= f.submit 'Start Run' %>
-          <% unless @run.embedded? %>
+      <div style="float: left;">
+        <%= f.submit 'Start Run' %>
+        <% unless @run.embedded? %>
               <span style="padding-left: 10px;">
                  <%= link_to 'Cancel', :back %>
               </span>
-          <% end %>
-        </div>
+        <% end %>
+      </div>
     <% end %>
     </div>
 </div>

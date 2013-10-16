@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20131015082657) do
+ActiveRecord::Schema.define(:version => 20131016101128) do
 
   create_table "activity_logs", :force => true do |t|
     t.string   "action"
@@ -1435,6 +1435,15 @@ ActiveRecord::Schema.define(:version => 20131015082657) do
     t.integer  "project_subscription_id"
   end
 
+  create_table "sweeps", :force => true do |t|
+    t.string   "name"
+    t.integer  "user_id"
+    t.integer  "workflow_id"
+    t.integer  "workflow_version"
+    t.datetime "created_at",       :null => false
+    t.datetime "updated_at",       :null => false
+  end
+
   create_table "synonyms", :force => true do |t|
     t.string   "name"
     t.integer  "substance_id"
@@ -1514,6 +1523,7 @@ ActiveRecord::Schema.define(:version => 20131015082657) do
     t.datetime "log_updated_at"
     t.string   "name",                 :default => "None"
     t.integer  "delayed_job_id"
+    t.integer  "sweep_id"
   end
 
   add_index "taverna_player_runs", ["run_id"], :name => "index_taverna_player_runs_on_run_id"

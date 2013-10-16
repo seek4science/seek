@@ -449,6 +449,14 @@ SEEK::Application.routes.draw do
       post :update_annotations_ajax
 #      get :view_items_in_tab
     end
+
+    resources :runs, :controller => 'TavernaPlayer::Runs'
+  end
+
+  resources :sweeps do
+    member do
+      put :cancel
+    end
   end
 
   ### MISC MATCHES ###

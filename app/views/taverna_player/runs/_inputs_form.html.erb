@@ -1,0 +1,55 @@
+<% sweep_length ||= 1 %>
+<% sweepable = sweep_length > 1 %>
+
+<div class="fold">
+  <div class="foldTitle">
+    <%= title %>
+  </div>
+  <div class="foldContent workflow_input" <%= 'style="display: none;"'.html_safe if hidden ||= false-%>>
+    <% inputs.each do |input| %>
+      <% input_data = form.object.new_record? ? nil : form.object.inputs.select { |i| i.name == input[:name] }.last %>
+      <h3><%= input[:name] %></h3>
+      <p>
+        <% unless input[:description].blank? %>
+          <%= input[:description] %>
+        <% else %>
+          <span class="none_text">No description</span>
+        <% end %>
+      </p>
+      <% unless input[:example].blank? %>
+        <p>Example value: <%= input[:example] %></p>
+        <% unless input_data.try(:value) %>
+          <p>
+            The example value is automatically entered in the box below.
+            Click to edit or enter a new value directly or choose a file.
+          </p>
+        <% end %>
+      <% else %>
+        <% if sweepable %>
+          <% sweep_length.times do |i| %>
+            <h4>Iteration <%= i+1 -%></h4>
+            <%= form.fields_for :runs, TavernaPlayer::Run.new do |run_fields| %>
+              <%= run_fields.fields_for :inputs, TavernaPlayer::RunPort::Input.new do |input_fields| %>
+                <%= input_fields.hidden_field :name, :value => input[:name] %>
+                <%= input_fields.text_area :value, :value => input_data.try(:value) || input[:example], :rows => 3, :cols => 40 %>
+                <br/>
+                <p>
+                  <%= input_fields.file_field :file %>
+                </p>
+              <% end %>
+            <% end %>
+          <% end %>
+        <% else %>
+          <%= form.fields_for :inputs, TavernaPlayer::RunPort::Input.new do |input_fields| %>
+            <%= input_fields.hidden_field :name, :value => input[:name] %>
+            <%= input_fields.text_area :value, :value => input_data.try(:value) || input[:example], :rows => 3, :cols => 40 %>
+            <br/>
+            <p>
+              <%= input_fields.file_field :file %>
+            </p>
+          <% end %>
+        <% end %>
+      <% end %>
+    <% end %>
+  </div>
+</div>
