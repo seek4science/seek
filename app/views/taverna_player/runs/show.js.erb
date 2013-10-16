@@ -1,16 +1,16 @@
 
-$("#run-info").replaceWith('<%= escape_javascript(render(:partial => "info", :locals => { :run => @run })) %>');
+$j("#run-info").replaceWith('<%= escape_javascript(render(:partial => "info", :locals => { :run => @run })) %>');
 
-$("#run-button").replaceWith('<%= escape_javascript(render(:partial => "button", :locals => { :run => @run })) %>');
+$j("#run-button").replaceWith('<%= escape_javascript(render(:partial => "button", :locals => { :run => @run })) %>');
 
 <% if @interaction.nil? || @new_interaction %>
-  $("#run-interaction").replaceWith('<%= escape_javascript(render(:partial => "interaction", :locals => { :run => @run, :interaction => @interaction })) %>');
+  $j("#run-interaction").replaceWith('<%= escape_javascript(render(:partial => "interaction", :locals => { :run => @run, :interaction => @interaction })) %>');
 <% end %>
 
 <% if @run.outputs.size > 0 %>
-  $("#run-outputs").replaceWith('<%= escape_javascript(render(:partial => "outputs", :locals => { :run => @run })) %>');
+  $j("#run-outputs").replaceWith('<%= escape_javascript(render(:partial => "outputs", :locals => { :run => @run })) %>');
 <% end %>
 
 <% unless @run.finished? || @run.cancelled? %>
-  $("#run-poll").replaceWith('<%= escape_javascript(render(:partial => "poll", :locals => { :reload => run_path(@run) })) %>');
+  $j("#run-poll").replaceWith('<%= escape_javascript(render(:partial => "poll", :locals => { :reload => run_path(@run) })) %>');
 <% end %>
