@@ -16,4 +16,17 @@ class Sweep < ActiveRecord::Base
     end
   end
 
+  def cancelled?
+    runs.all? { |run| run.cancelled? }
+  end
+
+  def finished?
+    runs.all? { |run| run.finished? }
+  end
+
+  # HACK - This needs to say something real
+  def state
+    'doing stuff'
+  end
+
 end

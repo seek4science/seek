@@ -53,14 +53,24 @@
         <% @runs.each do |run| -%>
             <%
                workflow = Workflow.find(run.workflow_id)
-               create_time = run.create_time.blank? ? '' : run.create_time.strftime("%e %b %Y %H:%m:%S %Z")
-               finish_time = run.finish_time.blank? ? '' : run.finish_time.strftime("%e %b %Y %H:%m:%S %Z")
-               action_buttons = render(:partial => "delete_or_cancel_button", :locals => { :run => run })
+               if run.is_a?(Sweep)
+                 create_time = run.created_at
+               else
+                 create_time = run.create_time.blank? ? '' : run.create_time.strftime("%e %b %Y %H:%m:%S %Z")
+               end
+
+               if run.is_a?(Sweep)
+                 finish_time = run.runs.any? {|r| r.finish_time.blank? } ? '' : run.runs.map { |r| r.finish_time }.max.strftime("%e %b %Y %H:%m:%S %Z")
+               else
+                 finish_time = run.finish_time.blank? ? '' : run.finish_time.strftime("%e %b %Y %H:%m:%S %Z")
+               end
+
+               action_buttons = ''# render(:partial => "delete_or_cancel_button", :locals => { :run => run })
             %>
             <tr class="gradeA">
-              <% row = [link_to(run.name, run),
+              <% row = [link_to(run.name, run.is_a?(Sweep) ? '' : run),
                         link_to(workflow.title, main_app.workflow_path(workflow)),#, :version => run.workflow_version)),
-                        'Simple',
+                        run.is_a?(Sweep) ? 'Sweep' : 'Simple',
                         run.state,
                         create_time,
                         finish_time,

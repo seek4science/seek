@@ -4,6 +4,8 @@ module TavernaPlayer
 
     before_filter :find_workflow_and_version, :only => :new
     before_filter :set_user, :only => :create
+    before_filter :find_runs, :only => :index
+    before_filter :add_sweeps, :only => :index
 
     def new
       @run = Run.new
@@ -56,6 +58,18 @@ module TavernaPlayer
 
     def set_user
       #params[:run][:user_id] = current_user.id
+    end
+
+    def find_runs
+      select = params[:workflow_id] ? { :workflow_id => params[:workflow_id] } : {}
+      @runs = Run.where(select).includes(:sweep).all
+    end
+
+    # Returns a list of simple Run objects and Sweep objects
+    def add_sweeps
+      @runs = @runs.group_by { |run| run.sweep }
+      @runs = @runs[nil] + @runs.keys
+      @runs.compact! # to ignore 'nil' key
     end
   end
 end
