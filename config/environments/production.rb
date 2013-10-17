@@ -23,6 +23,11 @@ SEEK::Application.configure do
 
   # Generate digests for assets URLs
   config.assets.digest = true
+  #config.assets.precompile += %w( jquery-1.5.1.min.js jscrollpane/jquery.jscrollpane.min.js jscrollpane/jquery.mousewheel.js jscrollpane/jquery.jscrollpane.css )
+
+  #The X-Sendfile header is a directive to the web server to ignore the response from the application,
+  #and instead serve a specified file from disk
+  #config.action_dispatch.x_sendfile_header = "X-Sendfile"
 
   # Defaults to nil and saved in location specified by config.assets.prefix
   # config.assets.manifest = YOUR_PATH

@@ -220,6 +220,7 @@ GEM
     erubis (2.7.0)
     exception_notification (3.0.1)
       actionmailer (>= 3.0.4)
+    execjs (2.0.2)
     factory_girl (2.6.4)
       activesupport (>= 2.3.9)
     ffi (1.9.0)
@@ -239,6 +240,7 @@ GEM
     journey (1.0.4)
     json (1.8.0)
     kgio (2.8.0)
+    libv8 (3.16.14.3)
     libxml-ruby (2.6.0)
     listen (1.2.2)
       rb-fsevent (>= 0.9.3)
@@ -256,7 +258,7 @@ GEM
       minitest (>= 2.12, < 5.0)
       powerbar
     modporter-plugin (0.1.0)
-    multi_json (1.7.7)
+    multi_json (1.8.1)
     multi_xml (0.5.4)
     mysql2 (0.3.11)
     net-http-persistent (2.8)
@@ -331,6 +333,7 @@ GEM
       rdf (>= 0.3.4)
     rdoc (3.12.2)
       json (~> 1.4)
+    ref (1.0.5)
     request-log-analyzer (1.12.9)
     rest-client (1.6.7)
       mime-types (>= 1.16)
@@ -372,12 +375,18 @@ GEM
       nokogiri
       sunspot (= 2.0.0)
     sunspot_solr (2.0.0)
+    therubyracer (0.12.0)
+      libv8 (~> 3.16.14.0)
+      ref
     thor (0.18.1)
     tilt (1.4.1)
     treetop (1.4.14)
       polyglot
       polyglot (>= 0.3.1)
     tzinfo (0.3.37)
+    uglifier (2.2.1)
+      execjs (>= 0.3.0)
+      multi_json (~> 1.0, >= 1.0.2)
     unicorn (4.6.3)
       kgio (~> 2.6)
       rack
@@ -395,6 +404,7 @@ GEM
     will_paginate (3.0.4)
     yaml_db (0.2.3)
     yard (0.8.6.2)
+    yui-compressor (0.12.0)
 
 PLATFORMS
   ruby
@@ -422,6 +432,7 @@ DEPENDENCIES
   dynamic_form
   equivalent-xml
   exception_notification (= 3.0.1)
+  execjs
   factory_girl (= 2.6.4)
   fleximage!
   fssm
@@ -468,9 +479,12 @@ DEPENDENCIES
   search_biomodel (= 2.2.1)!
   simple-spreadsheet-extractor (= 0.12.3)
   site_announcements!
+  sprockets (~> 2.0)
   sqlite3 (= 1.3.7)
   sunspot_rails
   sunspot_solr
+  therubyracer
+  uglifier
   unicorn-rails
   uuidtools (= 2.1.1)
   webmock
@@ -478,3 +492,4 @@ DEPENDENCIES
   white_list_formatted_content!
   will_paginate (~> 3.0.4)
   yaml_db
+  yui-compressor
