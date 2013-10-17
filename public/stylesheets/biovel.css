@@ -44,13 +44,14 @@ body, html {
   width: 100%;
   position: absolute;
   min-width: 800px;
-  height: 100px;
+  height: 80px;
   border: none;
   background: #555;
   color: #ffffff;
   font-weight: normal;
   padding-top: 20px;
   text-align: left;
+  margin-top: 20px;
 }
 
 #ft a {
@@ -59,7 +60,7 @@ body, html {
 
 #bd {
   min-height: 0;
-  padding-bottom: 100px;
+  padding: 0 20px 120px;
 }
 
 #container {
@@ -67,8 +68,12 @@ body, html {
   min-height: 100%;
 }
 
+a {
+  color: #003355;
+}
+
 a:hover {
-  color: #3d47ba;
+  color: #225577;
 }
 
 #header {
@@ -103,21 +108,18 @@ td.port-type label {
   font-weight: normal;
 }
 
-#search_box {
-  padding: 12px 20px;
+#workflow_search_box {
+  padding: 12px 10px;
+  text-align: right;
 }
 
-#search_box input[type="submit"] {
+#workflow_search_box input[type="submit"] {
   line-height: 20px;
 }
 
-#search_box input[type="text"] {
+#workflow_search_box input[type="text"] {
   height: 20px;
   width: 15em;
-}
-
-#search_box select {
-  display: none;
 }
 
 .script_example_data_box {
@@ -142,6 +144,7 @@ td.port-type label {
     font-size: 16px;
     box-shadow: 1px 1px 3px #ccc;
     border: 1px solid #ccc;
+    overflow: auto;
 }
 
 .workflow .category {
@@ -179,4 +182,65 @@ div.small_list_item_title {
 .run_workflow:hover {
     background-color: #b1e10f;
   color: #283a12;
+}
+
+.workflow_input {
+  text-align: left;
+}
+
+table.display tr.odd.gradeA {
+    background-color: #F7F4F4;
+}
+
+table.display tr.even.gradeA {
+    background-color: #FFFFFF;
+}
+
+tr.odd.gradeA td.sorting_1 {
+    background-color: #E8E3E3;
+}
+
+tr.odd.gradeA td.sorting_2 {
+    background-color: #d1ffd1;
+}
+
+tr.odd.gradeA td.sorting_3 {
+    background-color: #d1ffd1;
+}
+
+tr.even.gradeA td.sorting_1 {
+    background-color: #F7F4F4;
+}
+
+tr.even.gradeA td.sorting_2 {
+    background-color: #e2ffe2;
+}
+
+tr.even.gradeA td.sorting_3 {
+    background-color: #e2ffe2;
+}
+
+.dataTables_filter {
+    padding: 10px 0px 20px 10px;
+}
+
+table.display td {
+    border-bottom:1pt solid #BABABA;
+}
+
+#workflow_filters {
+  float: left;
+  width: 250px;
+  text-align: left;
+  margin-right: 10px;
+}
+
+#workflow_filters a.active {
+  background-color: #ACF;
+}
+
+#workflow_list {
+  min-width: 640px;
+  max-width: 1140px;
+  margin-left: 260px;
 }

@@ -1,5 +1,7 @@
 SEEK::Application.routes.draw do
 
+  mount TavernaPlayer::Engine, :at => "/"
+
   resources :scales do
     collection do
       post :search
@@ -446,7 +448,16 @@ SEEK::Application.routes.draw do
       post :new_version
       post :update_annotations_ajax
 #      get :view_items_in_tab
-      resources :runs
+    end
+
+    resources :runs, :controller => 'TavernaPlayer::Runs'
+  end
+
+  resources :runs, :controller => 'TavernaPlayer::Runs', :only => ['update']
+
+  resources :sweeps do
+    member do
+      put :cancel
     end
   end
 

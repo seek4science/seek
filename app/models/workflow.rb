@@ -58,6 +58,10 @@ class Workflow < ActiveRecord::Base
     def t2flow
       @t2flow ||= T2Flow::Parser.new.parse(content_blob.data_io_object.read)
     end
+
+    def file_path
+      content_blob.filepath
+    end
   end
 
   def self.user_creatable?
@@ -79,6 +83,18 @@ class Workflow < ActiveRecord::Base
 
   def t2flow
     @t2flow ||= T2Flow::Parser.new.parse(content_blob.data_io_object.read)
+  end
+
+  def file_path
+    content_blob.filepath
+  end
+
+  def self.by_category(cid)
+    where(:category_id => cid)
+  end
+
+  def self.by_uploader(uid)
+    where(:contributor_id => uid, :contributor_type => "User")
   end
 
   private

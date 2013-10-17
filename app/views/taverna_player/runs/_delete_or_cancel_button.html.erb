@@ -1,0 +1,21 @@
+<!--<div id="run-button">-->
+<%
+   image_filename = icon_filename_for_key('destroy')
+
+   image_options = { :alt => 'Delete' }
+   img_tag = image_tag(image_filename, image_options).html_safe
+
+   delete_tag = "#{img_tag} Delete".html_safe
+   cancel_tag = "#{img_tag} Cancel".html_safe
+%>
+<% if run.finished? || run.cancelled? %>
+    <li>
+      <!-- Delete run button -->
+
+      <%= link_to ('<span class="icon">' + delete_tag + '</span>').html_safe, run, :method => :delete, :data => { confirm: 'Are you sure?' } -%>
+    </li>
+<% else %>
+    <!-- Cancel run button -->
+    <li><%= link_to ('<span class="icon">' + cancel_tag + '</span>').html_safe, cancel_run_path(run.id), :method => :put, :data => { confirm: "Are you sure?" } -%></li>
+<% end %>
+<!--</div>-->

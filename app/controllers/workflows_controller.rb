@@ -8,7 +8,7 @@ class WorkflowsController < ApplicationController
   include Seek::AssetsCommon
   include AssetsCommonExtension
 
-  before_filter :find_workflows, :only => [ :index ]
+  before_filter :find_and_filter_workflows, :only => [ :index ]
   before_filter :find_and_auth, :except => [ :index, :new, :create, :preview ]
   before_filter :find_display_asset, :only=>[:show, :download, :run]
 
@@ -198,12 +198,24 @@ class WorkflowsController < ApplicationController
     @workflow.content_blob.save
   end
 
-  def find_workflows
+  def find_and_filter_workflows
     find_assets
-    unless params[:category_id].blank?
-      @category = WorkflowCategory.find_by_id(params[:category_id])
-      @workflows = @workflows.select { |w| w.category == @category }
+
+    # Filter by uploader and category
+    filter_results = Workflow.where(true)
+    filter_results = filter_results.by_category(params[:category_id].to_i) unless params[:category_id].blank?
+    filter_results = filter_results.by_uploader(params[:uploader_id].to_i) unless params[:uploader_id].blank?
+    @workflows = @workflows & filter_results
+
+    # Filter by search results
+    unless params[:query].blank?
+      search_results = Workflow.search do |query|
+        query.keywords(params[:query].downcase)
+      end.results
+      @workflows = @workflows & search_results
     end
+
+    @workflows
   end
 
 end

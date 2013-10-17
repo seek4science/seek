@@ -1,0 +1,40 @@
+<div id="workflow_filters">
+  <h3>Currently showing</h3>
+  <% unless (params.keys & ['category_id', 'uploader_id', 'query']).empty? %>
+    <ul>
+      <% unless params[:category_id].blank? %>
+        <li>
+          In category <strong><%= WorkflowCategory.find_by_id(params[:category_id]).try(:name)-%></strong>
+          <%= workflow_filter('(clear)', params, :category_id, nil) -%>
+        </li>
+      <% end %>
+      <% unless params[:uploader_id].blank? %>
+        <li>
+          Uploaded by <strong><%= User.find_by_id(params[:uploader_id]).try(:person).try(:name)-%></strong>
+          <%= workflow_filter('(clear)', params, :uploader_id, nil) -%>
+        </li>
+      <% end %>
+      <% unless params[:query].blank? %>
+        <li>
+          Matching query: <strong><%= params[:query]-%></strong>
+          <%= workflow_filter('(clear)', params, :query, nil) -%>
+        </li>
+      <% end %>
+    </ul>
+    <%= link_to 'Clear all filters', workflows_path -%>
+  <% else %>
+      All workflows
+  <% end %>
+  <h3>Category</h3>
+  <ul>
+    <% WorkflowCategory.all.each do |category| %>
+      <li><%= workflow_filter category.name, params, :category_id, category.id -%></li>
+    <% end %>
+  </ul>
+  <h3>Uploader</h3>
+  <ul>
+  <% User.all.each do |user| %>
+    <li><%= workflow_filter  user.person.name, params, :uploader_id, user.id -%></li>
+  <% end %>
+  </ul>
+</div>

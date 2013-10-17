@@ -1,9 +1,0 @@
-<% form_tag runs_path do %>
-  <%= hidden_field_tag 'sweep_length', sweep_length %>
-  <%= sweep_length.times do |i| %>
-    <% @inputs.each do |input| %>
-      <h3><%= input.name -%></h3>
-      <%= text_field_tag "run[#{i}][#{input.name}][value]", "" %>
-    <% end %>
-  <% end %>
-<% end %>

@@ -1,4 +1,4 @@
-source 'https://rubygems.org'
+source 'http://rubygems.org'
 source 'http://gems.github.com'
 
 gem "rails", "3.2.14"
@@ -16,7 +16,7 @@ gem "rmagick", :require => false
 gem "mysql2"
 gem 'rest-client',">=1.6.1"
 gem 'factory_girl', "2.6.4"
-gem 'ratom',"0.6.9"
+gem 'ratom',"~>0.8.2"
 gem 'rubyzip',"0.9.9"
 gem 'bio'
 gem 'sunspot_rails'
@@ -75,7 +75,9 @@ gem 'my_annotations', :git=>"git://github.com/myGrid/annotations.git"
 gem 'passenger'
 gem 'unicorn-rails'
 
-gem 'taverna-t2flow', :path=> 'vendor/gems/taverna-t2flow-0.4.5-biovel-fix'
+gem 'taverna-t2flow'
+gem "taverna-player", :git => "git://github.com/myGrid/taverna-player", :branch => "master"
+gem "t2-server", :git => "git://github.com/myGrid/t2-server-gem", :branch => "next"
 
 group :development do
   gem "sqlite3","1.3.7"

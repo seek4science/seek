@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20131010081432) do
+ActiveRecord::Schema.define(:version => 20131017123546) do
 
   create_table "activity_logs", :force => true do |t|
     t.string   "action"
@@ -375,9 +375,9 @@ ActiveRecord::Schema.define(:version => 20131010081432) do
     t.datetime "locked_at"
     t.datetime "failed_at"
     t.string   "locked_by"
-    t.datetime "created_at"
-    t.datetime "updated_at"
     t.string   "queue"
+    t.datetime "created_at",                :null => false
+    t.datetime "updated_at",                :null => false
   end
 
   add_index "delayed_jobs", ["priority", "run_at"], :name => "delayed_jobs_priority"
@@ -1435,6 +1435,15 @@ ActiveRecord::Schema.define(:version => 20131010081432) do
     t.integer  "project_subscription_id"
   end
 
+  create_table "sweeps", :force => true do |t|
+    t.string   "name"
+    t.integer  "user_id"
+    t.integer  "workflow_id"
+    t.integer  "workflow_version"
+    t.datetime "created_at",       :null => false
+    t.datetime "updated_at",       :null => false
+  end
+
   create_table "synonyms", :force => true do |t|
     t.string   "name"
     t.integer  "substance_id"
@@ -1461,6 +1470,79 @@ ActiveRecord::Schema.define(:version => 20131010081432) do
   create_table "tags", :force => true do |t|
     t.string "name"
   end
+
+  create_table "taverna_player_interactions", :force => true do |t|
+    t.boolean  "replied",                          :default => false
+    t.integer  "run_id"
+    t.datetime "created_at",                                          :null => false
+    t.datetime "updated_at",                                          :null => false
+    t.boolean  "displayed",                        :default => false
+    t.string   "unique_id"
+    t.text     "page"
+    t.string   "feed_reply"
+    t.text     "output_value", :limit => 16777215
+  end
+
+  add_index "taverna_player_interactions", ["run_id"], :name => "index_taverna_player_interactions_on_run_id"
+  add_index "taverna_player_interactions", ["unique_id"], :name => "index_taverna_player_interactions_on_unique_id"
+
+  create_table "taverna_player_run_ports", :force => true do |t|
+    t.string   "name"
+    t.string   "value"
+    t.string   "port_type"
+    t.integer  "run_id"
+    t.datetime "created_at",                       :null => false
+    t.datetime "updated_at",                       :null => false
+    t.string   "file_file_name"
+    t.string   "file_content_type"
+    t.integer  "file_file_size"
+    t.datetime "file_updated_at"
+    t.integer  "depth",             :default => 0
+    t.text     "metadata"
+  end
+
+  add_index "taverna_player_run_ports", ["run_id"], :name => "index_taverna_player_run_ports_on_run_id"
+
+  create_table "taverna_player_runs", :force => true do |t|
+    t.string   "run_id"
+    t.string   "saved_state",          :default => "pending", :null => false
+    t.datetime "create_time"
+    t.datetime "start_time"
+    t.datetime "finish_time"
+    t.integer  "workflow_id",                                 :null => false
+    t.datetime "created_at",                                  :null => false
+    t.datetime "updated_at",                                  :null => false
+    t.string   "status_message"
+    t.string   "results_file_name"
+    t.string   "results_content_type"
+    t.integer  "results_file_size"
+    t.datetime "results_updated_at"
+    t.boolean  "embedded",             :default => false
+    t.string   "proxy_notifications"
+    t.string   "proxy_interactions"
+    t.boolean  "stop",                 :default => false
+    t.string   "log_file_name"
+    t.string   "log_content_type"
+    t.integer  "log_file_size"
+    t.datetime "log_updated_at"
+    t.string   "name",                 :default => "None"
+    t.integer  "delayed_job_id"
+    t.integer  "sweep_id"
+  end
+
+  add_index "taverna_player_runs", ["run_id"], :name => "index_taverna_player_runs_on_run_id"
+
+  create_table "taverna_player_service_credentials", :force => true do |t|
+    t.string   "uri",         :null => false
+    t.string   "name"
+    t.text     "description"
+    t.string   "login"
+    t.string   "password"
+    t.datetime "created_at",  :null => false
+    t.datetime "updated_at",  :null => false
+  end
+
+  add_index "taverna_player_service_credentials", ["uri"], :name => "index_taverna_player_service_credentials_on_uri"
 
   create_table "technology_types", :force => true do |t|
     t.string   "title"

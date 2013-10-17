@@ -1,0 +1,81 @@
+<%= javascript_include_tag 'DataTables-1.8.2/jquery.js', 'DataTables-1.8.2/jquery.dataTables.js', 'DataTables-1.8.2/jquery.dataTables.rowGrouping.js', 'DataTables-1.8.2/Scroller.js' %>
+<script type="text/javascript">
+    jQuery.noConflict();
+    var $j = jQuery;
+</script>
+
+<script type="text/javascript" charset="utf-8">
+    $j(document).ready(function () {
+        workflow_runs_table = $j('#workflow_runs_table').dataTable({
+            "bPaginate":false,
+            "bLengthChange":false,
+            "bFilter":true,
+            "bSort":true,
+            "bInfo":false,
+            "bAutoWidth":false,
+            "bRetrieve":true,
+            "aaSorting":[
+                [ 2, "asc" ]
+            ],
+            "aoColumns":[
+                { "sWidth":"20%" },
+                { "sWidth":"20%" },
+                { "sWidth":"10%" },
+                { "sWidth":"10%" },
+                { "sWidth":"15%" },
+                { "sWidth":"15%" },
+                { "sWidth":"10%", "bSortable":false }
+            ]
+        });
+    });
+</script>
+
+<div class="contribution_title">
+  <h1><%= 'Workflow Runs' -%></h1>
+</div>
+
+<div class="show_basic">
+  <div id="workflow_runs">
+    <div class="scroll_box">
+      <table cellpadding="0" cellspacing="0" class="display" id="workflow_runs_table" style="">
+        <thead>
+        <tr>
+          <th>Run</th>
+          <th>Workflow</th>
+          <th>Type</th>
+          <th>State</th>
+          <th>Create time</th>
+          <th>Finish time</th>
+          <th>Actions</th>
+        </tr>
+        </thead>
+        <tbody>
+        <% @runs.each do |run| -%>
+            <%
+               workflow = Workflow.find(run.workflow_id)
+               create_time = run.create_time.blank? ? '' : run.create_time.strftime("%e %b %Y %H:%m:%S %Z")
+               finish_time = run.finish_time.blank? ? '' : run.finish_time.strftime("%e %b %Y %H:%m:%S %Z")
+               action_buttons = render(:partial => "delete_or_cancel_button", :locals => { :run => run })
+            %>
+            <tr class="gradeA">
+              <% row = [link_to(run.name, run),
+                        link_to(workflow.title, main_app.workflow_path(workflow)),#, :version => run.workflow_version)),
+                        'Simple',
+                        run.state,
+                        create_time,
+                        finish_time,
+                        action_buttons]
+                 #(run.finished? || run.cancelled?) ? link_to('Delete', run, :method => :delete, :data => { confirm: 'Are you sure you want to delete this run?' }) : link_to("Cancel", cancel_run_path(run.id), :method => :put, :data => { confirm: "Are you sure you want to cancel this run?" })]
+              %>
+              <% row.each do |column_data| %>
+                  <td><%= column_data %></td>
+              <% end %>
+            </tr>
+        <% end -%>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+</div>
+

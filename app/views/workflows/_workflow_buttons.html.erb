@@ -1,11 +1,11 @@
 <!-- Run button -->
 <li>
-  <%= image_tag_for_key('run_workflow', new_run_path(workflow, :version => version, :based_off => based_off), "Run #{human_name}", nil, "Run #{human_name}") -%>
+  <%= image_tag_for_key('run_workflow', taverna_player.new_run_path(:workflow_id => workflow, :version => version), "Run #{human_name}", nil, "Run #{human_name}") -%>
 </li>
 
 <!-- Manage button -->
 <% if workflow.can_manage? -%>
-    <li><%= image_tag_for_key('manage', edit_workflow_path(workflow, :version => version, :based_off => based_off), nil, nil, "Manage #{human_name}") -%></li>
+    <li><%= image_tag_for_key('manage', edit_workflow_path(workflow, :version => version), nil, nil, "Manage #{human_name}") -%></li>
 <% end -%>
 
 <!-- Download button -->
