@@ -25,13 +25,13 @@
   <% else %>
       All workflows
   <% end %>
-  <h3>Category</h3>
+  <h3>Filter by category</h3>
   <ul>
     <% WorkflowCategory.all.each do |category| %>
       <li><%= workflow_filter category.name, params, :category_id, category.id -%></li>
     <% end %>
   </ul>
-  <h3>Uploader</h3>
+  <h3>Filter by uploader</h3>
   <ul>
   <% User.all.each do |user| %>
     <li><%= workflow_filter  user.person.name, params, :uploader_id, user.id -%></li>
