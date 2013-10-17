@@ -1,5 +1,5 @@
 <div id="workflow_search_box">
-  <% if Seek::Config.external_search_enabled %>
+  <% if Seek::Config.solr_enabled %>
     <%= form_tag workflows_path, :method => :get do -%>
       <%= hidden_field_tag :category_id, params[:category_id] unless params[:category_id].blank?-%>
       <%= hidden_field_tag :uploader_id, params[:uploader_id] unless params[:uploader_id].blank?-%>
