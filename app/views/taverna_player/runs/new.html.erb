@@ -1,12 +1,12 @@
 <% workflow_title = TavernaPlayer.workflow_proxy.title(@workflow) || "" %>
 <% workflow_inputs = TavernaPlayer.workflow_proxy.inputs(@workflow) %>
 
-  <div class="contribution_title">
-    <h1><%= 'New Workflow Run: ' + workflow_title -%></h1>
-  </div>
+<div class="contribution_title">
+  <h1><%= 'New Workflow Run: ' + workflow_title -%></h1>
+</div>
 
-  <div class="show_basic">
-    <%= form_for @run, :html => {:multipart => true} do |f| %>
+<div class="show_basic">
+  <%= form_for @run, :html => {:multipart => true} do |f| %>
       <%= f.hidden_field :workflow_id, :value => @workflow.id %>
       <%# f.hidden_field :workflow_version, :value => @workflow_version.version %>
       <%= f.hidden_field :embedded %>
@@ -19,13 +19,13 @@
       <!-- Data inputs -->
       <% data_inputs = workflow_inputs.select{|input| (input.port_type.name == WorkflowInputPortType::DATA)}  -%>
       <% unless data_inputs.blank? %>
-        <%= render :partial => 'inputs_form', :locals => {:title => "Data", :inputs => data_inputs, :form => f} %>
+          <%= render :partial => 'inputs_form', :locals => {:title => "Data", :inputs => data_inputs, :form => f} %>
       <% end %>
 
       <!-- Parameter inputs -->
       <% paramater_inputs = workflow_inputs.select{|input| input.port_type.name == WorkflowInputPortType::PARAMETER} -%>
       <% unless paramater_inputs.blank? %>
-        <%= render :partial => 'inputs_form', :locals => {:title => "Parameters", :inputs => paramater_inputs, :form => f} %>
+          <%= render :partial => 'inputs_form', :locals => {:title => "Parameters", :inputs => paramater_inputs, :form => f} %>
       <% end %>
       <br/>
 
@@ -37,5 +37,5 @@
               </span>
         <% end %>
       </div>
-    <% end %>
-    </div>
+  <% end %>
+</div>

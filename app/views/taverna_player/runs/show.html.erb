@@ -2,148 +2,148 @@
 
 <% workflow = Workflow.find(@run.workflow_id) %>
 
-  <div class="contribution_title">
-    <h1><%= 'Run: ' + @run.name -%></h1>
+<div class="contribution_title">
+  <h1><%= 'Run: ' + @run.name -%></h1>
+</div>
+
+<div class="show_basic">
+  <%= render :partial => "form", :locals => { :run => @run } %>
+
+  <div style="float: left; margin: 10px 10px 10px -5px;">
+    <ul class="sectionIcons">
+      <%= render :partial => "delete_or_cancel_button", :locals => { :run => @run } %>
+      <% if @run.finished? %>
+          <li><%= image_tag_for_key('sweep', main_app.new_sweep_path(:run_id => @run.id), nil, nil, "Data sweep based on this run") -%></li>
+      <% end %>
+    </ul>
   </div>
 
-  <div class="show_basic">
-    <%= render :partial => "info", :locals => { :run => @run } %>
+  <div style="clear: both;"></div>
 
-    <div style="float: left; margin: 10px 10px 10px -5px;">
-      <ul class="sectionIcons">
-        <%= render :partial => "delete_or_cancel_button", :locals => { :run => @run } %>
-        <% if @run.finished? %>
-          <li><%= image_tag_for_key('sweep', main_app.new_sweep_path(:run_id => @run.id), nil, nil, "New sweep based on this run") -%></li>
-        <% end %>
-      </ul>
+
+  <!--<% if @run.inputs.size > 0 %>-->
+      <!--<%= render :partial => "inputs", :locals => { :run => @run } %>-->
+      <!--<% end %>-->
+
+  <!-- Data input port names from the workflow -->
+  <% data_input_port_names = workflow.input_ports.select{|input| (input.port_type.name == WorkflowInputPortType::DATA)}.collect{|i| i.name}  -%>
+  <!-- Figure out data inputs from the run -->
+  <% run_data_inputs = @run.inputs.select{|input| data_input_port_names.include?(input.name)}%>
+  <div class="fold">
+    <div class="foldTitle">
+      Data Inputs (<%= run_data_inputs.count -%>)
     </div>
-
-    <div style="clear: both;"></div>
-
-
-    <!--<% if @run.inputs.size > 0 %>-->
-        <!--<%= render :partial => "inputs", :locals => { :run => @run } %>-->
-        <!--<% end %>-->
-
-    <!-- Data input port names from the workflow -->
-    <% data_input_port_names = workflow.input_ports.select{|input| (input.port_type.name == WorkflowInputPortType::DATA)}.collect{|i| i.name}  -%>
-    <!-- Figure out data inputs from the run -->
-    <% run_data_inputs = @run.inputs.select{|input| data_input_port_names.include?(input.name)}%>
-    <div class="fold">
-      <div class="foldTitle">
-        Data Inputs (<%= run_data_inputs.count -%>)
-      </div>
-      <div class="foldContent" style="display: none;">
-        <% unless run_data_inputs.blank? -%>
-            <table class="simple" style="width: 100%;">
-              <% run_data_inputs.each do |b| -%>
-                  <tr>
-                    <td>
-                      <h3><%= b.name %></h3>
-                      <p>
-                        <strong>Value:</strong>
-                      </p>
-                      <% unless b.value.blank? %>
-                          <p><pre class="script_example_data_box"><%= b.value %></pre></p>
-                      <% end %>
-                      <% unless b.file_file_name.blank? %>
-                          <p><%= link_to b.file_file_name, b.file.url %></p>
-                      <% end %>
-                    </td>
-                  </tr>
-              <% end %>
-            </table>
-        <% else %>
-            <p class="none_text">None</p>
-        <% end %>
-      </div>
-    </div>
-
-    <!-- Parameter input port names from the workflow -->
-    <% parameter_input_port_names = workflow.input_ports.select{|input| (input.port_type.name == WorkflowInputPortType::PARAMETER)}.collect{|i| i.name}  -%>
-    <!-- Figure out parameter inputs from the run -->
-    <% run_parameter_inputs = @run.inputs.select{|input| parameter_input_port_names.include?(input.name)}%>
-    <!-- Figure out parameter inputs from the run -->
-    <div class="fold">
-      <div class="foldTitle">
-        Parameter Inputs (<%= run_parameter_inputs.count -%>)
-      </div>
-      <div class="foldContent" style="display: none;">
-        <% unless run_parameter_inputs.blank? -%>
-            <table class="simple" style="width: 100%;">
-              <% run_parameter_inputs.each do |b| -%>
-                  <tr>
-                    <td>
-                      <h3><%= b.name %></h3>
-                      <p>
-                        <strong>Value:</strong>
-                      </p>
-                      <% unless b.value.blank? %>
-                          <p><pre class="script_example_data_box"><%= b.value %></pre></p>
-                      <% end %>
-                      <% unless b.file_file_name.blank? %>
+    <div class="foldContent" style="display: none;">
+      <% unless run_data_inputs.blank? -%>
+          <table class="simple" style="width: 100%;">
+            <% run_data_inputs.each do |b| -%>
+                <tr>
+                  <td>
+                    <h3><%= b.name %></h3>
+                    <p>
+                      <strong>Value:</strong>
+                    </p>
+                    <% unless b.value.blank? %>
+                        <p><pre class="script_example_data_box"><%= b.value %></pre></p>
+                    <% end %>
+                    <% unless b.file_file_name.blank? %>
                         <p><%= link_to b.file_file_name, b.file.url %></p>
-                      <% end %>
-                    </td>
-                  </tr>
-              <% end %>
-            </table>
-        <% else %>
-            <p class="none_text">None</p>
-        <% end %>
-      </div>
+                    <% end %>
+                  </td>
+                </tr>
+            <% end %>
+          </table>
+      <% else %>
+          <p class="none_text">None</p>
+      <% end %>
     </div>
-
-    <%= render :partial => "interaction", :locals =>
-            { :run => @run, :interaction => @interaction } %>
-
-    <!--<%= render :partial => "outputs", :locals => { :run => @run } %>-->
-
-    <!-- Result output port names from the workflow -->
-    <% result_output_port_names = workflow.output_ports.select{|output| (output.port_type.name == WorkflowOutputPortType::RESULT)}.collect{|i| i.name}  -%>
-    <!-- Figure out result outputs from the run -->
-    <% run_result_outputs = @run.outputs.select{|output| result_output_port_names.include?(output.name)}%>
-    <div class="fold">
-      <div class="foldTitle">
-        Result Outputs (<%= run_result_outputs.count -%>)
-      </div>
-      <div class="foldContent">
-        <% unless run_result_outputs.blank? -%>
-            <p>
-              <b>Log:</b>
-              <%= link_to "Taverna Server log", @run.log.url %>
-            </p>
-
-            <div style="float: left; margin: 10px 10px 10px -5px;">
-              <ul class="sectionIcons">
-                <%= render :partial => 'download_all_button', :locals => {:run => @run} %>
-              </ul>
-            </div>
-
-            <div style="clear: both;"></div>
-
-            <table class="simple" style="width: 100%;">
-              <% run_result_outputs.each do |b| -%>
-                  <tr>
-                    <td>
-                      <h3><%= b.name %></h3>
-                      <p>
-                        <strong>Value:</strong>
-                        <%= "(#{b.metadata[:type]})" if b.depth == 0 %>
-                        <%= show_output(@run, b) %>
-                      </p>
-                    </td>
-                  </tr>
-              <% end %>
-            </table>
-        <% else %>
-            <p class="none_text">None</p>
-        <% end %>
-      </div>
-    </div>
-
-
-    <% unless @run.finished? || @run.cancelled? %>
-        <%= render :partial => "poll", :locals => { :reload => run_path(@run) } %>
-    <% end %>
   </div>
+
+  <!-- Parameter input port names from the workflow -->
+  <% parameter_input_port_names = workflow.input_ports.select{|input| (input.port_type.name == WorkflowInputPortType::PARAMETER)}.collect{|i| i.name}  -%>
+  <!-- Figure out parameter inputs from the run -->
+  <% run_parameter_inputs = @run.inputs.select{|input| parameter_input_port_names.include?(input.name)}%>
+  <!-- Figure out parameter inputs from the run -->
+  <div class="fold">
+    <div class="foldTitle">
+      Parameter Inputs (<%= run_parameter_inputs.count -%>)
+    </div>
+    <div class="foldContent" style="display: none;">
+      <% unless run_parameter_inputs.blank? -%>
+          <table class="simple" style="width: 100%;">
+            <% run_parameter_inputs.each do |b| -%>
+                <tr>
+                  <td>
+                    <h3><%= b.name %></h3>
+                    <p>
+                      <strong>Value:</strong>
+                    </p>
+                    <% unless b.value.blank? %>
+                        <p><pre class="script_example_data_box"><%= b.value %></pre></p>
+                    <% end %>
+                    <% unless b.file_file_name.blank? %>
+                        <p><%= link_to b.file_file_name, b.file.url %></p>
+                    <% end %>
+                  </td>
+                </tr>
+            <% end %>
+          </table>
+      <% else %>
+          <p class="none_text">None</p>
+      <% end %>
+    </div>
+  </div>
+
+  <%= render :partial => "interaction", :locals =>
+          { :run => @run, :interaction => @interaction } %>
+
+  <!--<%= render :partial => "outputs", :locals => { :run => @run } %>-->
+
+  <!-- Result output port names from the workflow -->
+  <% result_output_port_names = workflow.output_ports.select{|output| (output.port_type.name == WorkflowOutputPortType::RESULT)}.collect{|i| i.name}  -%>
+  <!-- Figure out result outputs from the run -->
+  <% run_result_outputs = @run.outputs.select{|output| result_output_port_names.include?(output.name)}%>
+  <div class="fold">
+    <div class="foldTitle">
+      Result Outputs (<%= run_result_outputs.count -%>)
+    </div>
+    <div class="foldContent">
+      <% unless run_result_outputs.blank? -%>
+          <p>
+            <b>Log:</b>
+            <%= link_to "Taverna Server log", @run.log.url %>
+          </p>
+
+          <div style="float: left; margin: 10px 10px 10px -5px;">
+            <ul class="sectionIcons">
+              <%= render :partial => 'download_all_button', :locals => {:run => @run} %>
+            </ul>
+          </div>
+
+          <div style="clear: both;"></div>
+
+          <table class="simple" style="width: 100%;">
+            <% run_result_outputs.each do |b| -%>
+                <tr>
+                  <td>
+                    <h3><%= b.name %></h3>
+                    <p>
+                      <strong>Value:</strong>
+                      <%= "(#{b.metadata[:type]})" if b.depth == 0 %>
+                      <%= show_output(@run, b) %>
+                    </p>
+                  </td>
+                </tr>
+            <% end %>
+          </table>
+      <% else %>
+          <p class="none_text">None</p>
+      <% end %>
+    </div>
+  </div>
+
+
+  <% unless @run.finished? || @run.cancelled? %>
+      <%= render :partial => "poll", :locals => { :reload => run_path(@run) } %>
+  <% end %>
+</div>

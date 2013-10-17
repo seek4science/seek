@@ -16,7 +16,7 @@
           Category
         </div>
         <div class="foldContent" >
-          <%= f.select(:category_id, WorkflowCategory.all.collect {|c| [ c.name, c.id ] }, { include_blank: true }) %>
+          <%= f.select(:category_id, WorkflowCategory.all.collect {|c| [ c.name, c.id ] }) %>
         </div>
       </div>
 
