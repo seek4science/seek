@@ -1,5 +1,5 @@
 
-$j("#run-info").replaceWith('<%= escape_javascript(render(:partial => "info", :locals => { :run => @run })) %>');
+$j("#run-info").replaceWith('<%= escape_javascript(render(:partial => "form", :locals => { :run => @run })) %>');
 
 $j("#run-button").replaceWith('<%= escape_javascript(render(:partial => "delete_or_cancel_button", :locals => { :run => @run })) %>');
 

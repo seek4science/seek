@@ -15,6 +15,27 @@ module TavernaPlayer
       end
     end
 
+    def update
+      new_name = params[:run_name]
+
+      # Name cannot be blank - show the erro message to the user
+      if new_name.blank?
+        flash[:error] = 'Run name cannot be blank.'
+        flash[:notice] = nil
+      # If the new name is the same as the current run name - do nothing
+      elsif new_name != @run.name
+        @run.name = new_name
+        @run.save!
+        flash[:notice] = 'Run name updated.'
+        flash[:error] = nil
+      end
+
+      respond_to do |format|
+        # Render show.html.erb unless the run is embedded.
+        format.html { render "taverna_player/runs/show" }
+      end
+    end
+
     private
 
     def find_workflow_and_version
