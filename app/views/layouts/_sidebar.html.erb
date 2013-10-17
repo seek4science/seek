@@ -2,9 +2,6 @@
 
     <%= render :partial => "gadgets/new_object_gadget" -%>
     <%= render :partial => "gadgets/my_project_gadget" -%>
-    <% if Seek::Config.is_virtualliver -%>
-        <%= render :partial => "gadgets/file_upload_tool_gadget" -%>
-    <% end %>
     <%= render :partial=>"gadgets/announcements_gadget" %>
     <%= render :partial => "gadgets/favourites" -%>
     <div id="sidebar_tag_cloud">
