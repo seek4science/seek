@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20131016101128) do
+ActiveRecord::Schema.define(:version => 20131017123546) do
 
   create_table "activity_logs", :force => true do |t|
     t.string   "action"
@@ -1472,15 +1472,19 @@ ActiveRecord::Schema.define(:version => 20131016101128) do
   end
 
   create_table "taverna_player_interactions", :force => true do |t|
-    t.string   "uri"
-    t.boolean  "replied",    :default => false
+    t.boolean  "replied",                          :default => false
     t.integer  "run_id"
-    t.datetime "created_at",                    :null => false
-    t.datetime "updated_at",                    :null => false
-    t.boolean  "displayed",  :default => false
+    t.datetime "created_at",                                          :null => false
+    t.datetime "updated_at",                                          :null => false
+    t.boolean  "displayed",                        :default => false
+    t.string   "unique_id"
+    t.text     "page"
+    t.string   "feed_reply"
+    t.text     "output_value", :limit => 16777215
   end
 
   add_index "taverna_player_interactions", ["run_id"], :name => "index_taverna_player_interactions_on_run_id"
+  add_index "taverna_player_interactions", ["unique_id"], :name => "index_taverna_player_interactions_on_unique_id"
 
   create_table "taverna_player_run_ports", :force => true do |t|
     t.string   "name"

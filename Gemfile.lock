@@ -134,8 +134,19 @@ GIT
     search_biomodel (2.2.1)
 
 GIT
+  remote: git://github.com/myGrid/t2-server-gem
+  revision: 72fba2108e351983bf76df5a3ed18017f72001e3
+  branch: next
+  specs:
+    t2-server (1.0.0)
+      hirb (>= 0.4.0)
+      net-http-persistent (~> 2.6)
+      ratom (~> 0.8.2)
+      taverna-baclava (~> 1.0.0)
+
+GIT
   remote: git://github.com/myGrid/taverna-player
-  revision: e01ef76214d83937bbc330fb5ec338c0c3ef827c
+  revision: dd6247e1c1772c93c1e5dc32f49ce43e032ab9d4
   branch: master
   specs:
     taverna-player (0.0.1)
@@ -156,7 +167,7 @@ GIT
     calendar_date_select (1.16.2)
 
 GEM
-  remote: https://rubygems.org/
+  remote: http://rubygems.org/
   remote: http://gems.github.com/
   specs:
     RedCloth (4.2.9)
@@ -380,11 +391,6 @@ GEM
       nokogiri
       sunspot (= 2.0.0)
     sunspot_solr (2.0.0)
-    t2-server (1.0.1)
-      hirb (>= 0.4.0)
-      net-http-persistent (~> 2.6)
-      ratom (~> 0.8.2)
-      taverna-baclava (~> 1.0.0)
     taverna-baclava (1.0.0)
       builder (~> 3.0.0)
     taverna-t2flow (0.4.5)
@@ -486,7 +492,7 @@ DEPENDENCIES
   sqlite3 (= 1.3.7)
   sunspot_rails
   sunspot_solr
-  t2-server (~> 1.0.1)
+  t2-server!
   taverna-player!
   taverna-t2flow
   unicorn-rails
