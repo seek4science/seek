@@ -1,6 +1,6 @@
-<% sweep_length ||= 1
+<%
+   sweep_length ||= 1
    locked ||= false
-   sweepable = sweep_length > 1
    hidden ||= false
 %>
 
@@ -12,8 +12,8 @@
     <% end %>
   </div>
   <div class="foldContent workflow_input" <%= 'style="display: none;"'.html_safe if hidden -%>>
-    <% sweep_length.times do |i| %>
-      <% if sweep_length > 1 %>
+    <% if form.object.is_a?(Sweep) %>
+      <% sweep_length.times do |i| %>
         <h2>Iteration <%= i+1 -%></h2>
         <%= form.fields_for :runs, TavernaPlayer::Run.new do |run_fields| %>
           <% inputs.each do |input| %>
@@ -21,11 +21,11 @@
                                                                                  :locked => locked } %>
           <% end %>
         <% end %>
-      <% else %>
-        <% inputs.each do |input| %>
-          <%= render :partial => 'taverna_player/runs/input_form', :locals => {:input => input, :form => form,
-                                                                               :locked => locked } %>
-        <% end %>
+      <% end %>
+    <% else %>
+      <% inputs.each do |input| %>
+        <%= render :partial => 'taverna_player/runs/input_form', :locals => {:input => input, :form => form,
+                                                                             :locked => locked } %>
       <% end %>
     <% end %>
   </div>
