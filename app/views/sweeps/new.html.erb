@@ -29,7 +29,7 @@
         <!-- Parameter inputs -->
         <% paramater_inputs = workflow_inputs.select{|input| input.port_type.name == WorkflowInputPortType::PARAMETER} -%>
         <% unless paramater_inputs.blank? %>
-          <%= render :partial => 'taverna_player/runs/inputs_form', :locals => {:title => "Parameters", :inputs => paramater_inputs, :form => r, :hidden => true} %>
+          <%= render :partial => 'taverna_player/runs/inputs_form', :locals => {:title => "Parameters", :inputs => paramater_inputs, :form => r, :hidden => true, :locked => true } %>
         <% end %>
       <% end %>
       <br/>
