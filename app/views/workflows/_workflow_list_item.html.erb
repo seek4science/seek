@@ -10,7 +10,6 @@
   <% end %>
 </h3>
 
-<div style="clear: both;"></div>
 <!-- Workflow visibility, e.g. 'private' -->
 <% ((workflow.authorization_supported? && workflow.can_manage?) ? list_item_visibility(workflow) : "").html_safe %>
 

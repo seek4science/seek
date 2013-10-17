@@ -89,6 +89,14 @@ class Workflow < ActiveRecord::Base
     content_blob.filepath
   end
 
+  def self.by_category(cid)
+    where(:category_id => cid)
+  end
+
+  def self.by_uploader(uid)
+    where(:contributor_id => uid, :contributor_type => "User")
+  end
+
   private
 
   def generate_workflow_image

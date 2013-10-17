@@ -1,10 +1,10 @@
 <% authorization_for_showing_already_done ||= false -%>
 
 <% unless collection.empty? -%>
-    <div style="width: 900px; margin: auto">
+    <div id="workflow_list">
     <% collection.each do |workflow| %>
         <% if authorization_for_showing_already_done || workflow.can_view? -%>
-              <div class="workflow clearfix">
+              <div class="workflow">
                 <%= render :partial => "workflow_list_item", :locals => {:workflow => workflow, :show_category => show_category} -%>
               </div>
         <% end %>

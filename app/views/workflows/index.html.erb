@@ -6,6 +6,12 @@
     </ul>
 <% end %>
 
+<%= render :partial => 'search' %>
+
+<div style="min-width: 900px; max-width: 1400px;" class="clearfix">
+<%= render :partial => 'filters' %>
+
 <%= render :partial => "workflow_list", :locals => { :collection => @workflows,
                                                      :authorization_for_showing_already_done=>true,
                                                      :show_category => @category.nil? } %>
+</div>

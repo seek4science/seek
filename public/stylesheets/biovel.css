@@ -51,6 +51,7 @@ body, html {
   font-weight: normal;
   padding-top: 20px;
   text-align: left;
+  margin-top: 20px;
 }
 
 #ft a {
@@ -59,17 +60,20 @@ body, html {
 
 #bd {
   min-height: 0;
-  padding: 0 20px 100px;
+  padding: 0 20px 120px;
 }
 
 #container {
   position: relative;
   min-height: 100%;
-  padding-bottom: 10px;
+}
+
+a {
+  color: #003355;
 }
 
 a:hover {
-  color: #3d47ba;
+  color: #225577;
 }
 
 #header {
@@ -104,21 +108,18 @@ td.port-type label {
   font-weight: normal;
 }
 
-#search_box {
-  padding: 12px 20px;
+#workflow_search_box {
+  padding: 12px 10px;
+  text-align: right;
 }
 
-#search_box input[type="submit"] {
+#workflow_search_box input[type="submit"] {
   line-height: 20px;
 }
 
-#search_box input[type="text"] {
+#workflow_search_box input[type="text"] {
   height: 20px;
   width: 15em;
-}
-
-#search_box select {
-  display: none;
 }
 
 .script_example_data_box {
@@ -143,6 +144,7 @@ td.port-type label {
     font-size: 16px;
     box-shadow: 1px 1px 3px #ccc;
     border: 1px solid #ccc;
+    overflow: auto;
 }
 
 .workflow .category {
@@ -224,4 +226,21 @@ tr.even.gradeA td.sorting_3 {
 
 table.display td {
     border-bottom:1pt solid #BABABA;
+}
+
+#workflow_filters {
+  float: left;
+  width: 250px;
+  text-align: left;
+  margin-right: 10px;
+}
+
+#workflow_filters a.active {
+  background-color: #ACF;
+}
+
+#workflow_list {
+  min-width: 640px;
+  max-width: 1140px;
+  margin-left: 260px;
 }
