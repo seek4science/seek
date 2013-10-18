@@ -5,22 +5,6 @@
     tabber_ids.push("<%= tabs_id -%>");
 </script>
 
-<%
-   resource_hash = {}
-   scale = Scale.find_by_title(scale_title)
-   if scale
-     grouped_scalings = scale.scalings.group_by { |scaling| scaling.scalable_type }
-     grouped_scalings.each do |key, value|
-       resource_hash[key] = value.count
-     end if !grouped_scalings.blank?
-   else
-     Seek::Util.user_creatable_types.each do |klass|
-       number_of_items = klass.count
-       resource_hash["#{klass}"] = number_of_items if number_of_items > 0
-     end
-   end
-%>
-
 <% if !resource_hash.blank? -%>
     <div id='<%= "#{tabs_id}_spinner" -%>'>
       <center>
@@ -36,7 +20,7 @@
 
       <% sorted_result_keys.each do |key| -%>
           <div class="tabbertab">
-            <% tab_title = "#{key} (#{resource_hash[key]})" -%>
+            <% tab_title = "#{key} (#{resource_hash[key].count})" -%>
             <h3 class="<%= scale_title %>_<%= key %>"><%= tab_title -%></h3>
           </div>
 
@@ -51,7 +35,7 @@
     <script type="text/javascript">
         load_tabs();
         <% sorted_result_keys.each do |key| %>
-            tabs_on_click('<%= scale_title %>', '<%= key %>');
+        tabs_on_click('<%= scale_title %>', '<%= key %>', '<%=resource_hash[key].collect(&:id).join(',') %>');
         <% end %>
 
         //Load content for first tab

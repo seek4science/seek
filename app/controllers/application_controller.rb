@@ -17,7 +17,7 @@ class ApplicationController < ActionController::Base
   ActiveRecord::RecordNotFound => "404",
   ::ActionController::UnknownController => "404",
   ::ActionController::UnknownAction => "404",
-  ::ActionController::RoutingError => "404",  
+  ::ActionController::RoutingError => "404",
   ::ActionView::MissingTemplate => "406",
   ::ActionView::TemplateError => "500"
   }
@@ -76,7 +76,7 @@ class ApplicationController < ActionController::Base
     return  "http://#{base_host}"
   end
   helper_method :application_root
-  
+
 
   def self.fast_auto_complete_for(object, method, options = {})
     define_method("auto_complete_for_#{object}_#{method}") do
@@ -173,32 +173,23 @@ class ApplicationController < ActionController::Base
     end
   end
 
-  def view_items_in_scale
+  def resource_in_tab
     resource_type = params[:resource_type]
-    scale = Scale.find_by_title(params[:scale_title])
     view_type = params[:view_type]
-    if scale
-      scale_title = scale.title
-      resources = Scaling.find(:all, :include => :scalable, :conditions => ["scale_id=? AND scalable_type=?", scale.id, resource_type]).collect(&:scalable).compact.uniq
-      if resources.first.respond_to?(:authorized_partial_asset_collection)
-        authorized_resources = clazz.authorized_partial_asset_collection(resources,"view")
-      else
-        authorized_resources = resources.select &:can_view?
-      end
+    scale_title = params[:scale_title] || ''
+
+    resource_ids = (params[:resource_ids] || []).split(',')
+    clazz = resource_type.constantize
+    resources = clazz.find_all_by_id(resource_ids)
+    if clazz.respond_to?(:authorized_partial_asset_collection)
+      authorized_resources = clazz.authorized_partial_asset_collection(resources,"view")
     else
-      scale_title = 'all'
-      klazz = resource_type.constantize
-      resources = klazz.all
-      if resources.first.respond_to?(:all_authorized_for)
-        authorized_resources = klazz.all_authorized_for('view')
-      else
-        authorized_resources = resources.select &:can_view?
-      end
+      authorized_resources = resources.select &:can_view?
     end
 
     render :update do |page|
         page.replace_html "#{scale_title}_#{resource_type}_#{view_type}",
-                          :partial => "assets/scale_related_items",
+                          :partial => "assets/resource_in_tab",
                           :locals => {:resources => resources,
                                       :scale_title => scale_title,
                                       :authorized_resources => authorized_resources,

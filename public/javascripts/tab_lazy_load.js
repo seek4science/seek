@@ -5,7 +5,7 @@ function load_tabs() {
     tabberAutomatic(tabberOptions);
 }
 
-function tabs_on_click(scale_title, resource_type){
+function tabs_on_click(scale_title, resource_type, resource_ids){
     var click_tab = document.getElementsByClassName(scale_title + '_' + resource_type)[0];
     click_tab.onclick = function(){
         deactivate_previous_tab(scale_title);
@@ -22,11 +22,12 @@ function tabs_on_click(scale_title, resource_type){
             tab_content_view_some.show();
         }else{
             tab_content_view_some.show();
-            request = new Ajax.Request('/application/view_items_in_scale',
+            request = new Ajax.Request('/application/resource_in_tab',
             {
                 method: 'get',
                 parameters: {
                     resource_type: resource_type,
+                    resource_ids: resource_ids,
                     scale_title: scale_title,
                     view_type: 'view_some'
                 },
