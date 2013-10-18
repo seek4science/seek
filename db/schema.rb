@@ -9,7 +9,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20130711145856) do
+ActiveRecord::Schema.define(:version => 20131015144138) do
 
   create_table "activity_logs", :force => true do |t|
     t.string   "action"
@@ -540,6 +540,11 @@ ActiveRecord::Schema.define(:version => 20130711145856) do
     t.integer "project_role_id"
   end
 
+  create_table "group_memberships_roles", :id => false, :force => true do |t|
+    t.integer "group_membership_id"
+    t.integer "role_id"
+  end
+
   create_table "help_attachments", :force => true do |t|
     t.integer  "help_document_id"
     t.string   "title"
@@ -1059,8 +1064,7 @@ ActiveRecord::Schema.define(:version => 20130711145856) do
     t.string   "doi"
     t.string   "uuid"
     t.integer  "policy_id"
-    t.integer  "publication_type",                :default => 1
-    t.string   "citation",         :limit => 256
+    t.integer  "publication_type",              :default => 1
   end
 
   add_index "publications", ["contributor_id", "contributor_type"], :name => "index_publications_on_contributor_id_and_contributor_type"
@@ -1101,6 +1105,12 @@ ActiveRecord::Schema.define(:version => 20130711145856) do
     t.string   "culprit_type"
     t.integer  "culprit_id"
     t.integer  "publish_state"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
+  create_table "roles", :force => true do |t|
+    t.string   "name"
     t.datetime "created_at"
     t.datetime "updated_at"
   end

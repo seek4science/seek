@@ -36,11 +36,7 @@
         </div>
       </div>
     </td>
-    <td>
-         <div class="tab_gap_before">
-           <%= link_to "Biosamples", biosamples_path, {:class =>"item1"}%>
-         </div>
-     </td>
+
     <td>
       <div class="tab_gap_before">
         <a class="item1" href="javascript:void(0)">Assets</a>
@@ -62,22 +58,28 @@
           <!-- Presentations tab -->
           <%= tab_definition :controllers=>["presentations"]-%>
 
-          <!-- slides tab -->
-
+          <!-- biosamples tab -->
+          <%= tab_definition :controllers=>["biosamples"]-%>
 
         </div>
       </div>
     </td>
     <td>
       <div class="tab_gap_before">
-        <% if logged_in? %>
-            <%= link_to "Forums", forums_path, {:class =>"item1"} %>
-        <% end %>
+        <a class="item1" href="javascript:void(0)">Activities</a>
+
+        <div class="section">
+          <!-- Events tab -->
+          <%= tab_definition :controllers => ["events"] if Seek::Config.events_enabled -%>
+          <!-- Forums tab -->
+          <%= tab_definition :controllers => ["forums"] if logged_in? -%>
+        </div>
+
       </div>
     </td>
     <td>
       <div class="tab_gap_before">
-        <%= link_to "Events", events_path, {:class =>"item1"} if Seek::Config.events_enabled %>
+        <%= link_to "Content Statistics", statistics_path,{:class =>"item1",:target=>"_blank"} if logged_in?%>
       </div>
     </td>
     <td>

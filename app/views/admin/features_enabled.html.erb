@@ -34,6 +34,12 @@
     } -%>
 
     <%= render :partial=>'setting_li',:locals=>{
+                :description=>"Whether delete of one version of the versioned asset is enabled. It allows to delete previous (older) versions without deleting the complete asset",
+                :name=>"Delete asset version enabled",
+                :field=>check_box_tag(:delete_asset_version_enabled, 1, Seek::Config.delete_asset_version_enabled)
+     } -%>
+
+    <%= render :partial=>'setting_li',:locals=>{
             :description=>"Hides email addresses, skype and internal web addresses.",
             :name=>"Hide contact details",
             :field=>check_box_tag(:hide_details_enabled, 1, Seek::Config.hide_details_enabled)

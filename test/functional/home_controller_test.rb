@@ -25,9 +25,11 @@ class HomeControllerTest < ActionController::TestCase
   end
 
   test "should get feedback form" do
-    login_as(:quentin)
-    get :feedback
-    assert_response :success
+    with_config_value :recaptcha_enabled, false do
+      login_as(:quentin)
+      get :feedback
+      assert_response :success
+    end
   end
 
   test "should send feedback for anonymous user" do

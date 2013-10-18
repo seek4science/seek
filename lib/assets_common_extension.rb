@@ -2,6 +2,26 @@ module AssetsCommonExtension
   include Seek::MimeTypes
   include Seek::ContentBlobCommon
 
+  def destroy_version
+      name = self.controller_name.singularize
+      @asset = eval("@#{name}")
+
+      if Seek::Config.delete_asset_version_enabled
+            @asset.destroy_version  params[:version]
+
+            flash[:notice] = "Version #{params[:version]} was deleted!"
+            respond_to do |format|
+              format.html { redirect_to(polymorphic_path(@asset)) }
+              format.xml { head :ok }
+            end
+      else
+        flash[:error] = "Deleting a version of #{@asset.class.name.underscore.humanize} is not enabled!"
+        respond_to do |format|
+              format.html { redirect_to(polymorphic_path(@asset)) }
+              format.xml { head :ok }
+        end
+      end
+  end
   def download
     if self.controller_name=="models"
       download_model

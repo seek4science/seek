@@ -916,7 +916,31 @@ class DataFilesControllerTest < ActionController::TestCase
 
     assert_redirected_to data_files_path
   end
-  
+
+  test "should be possible to delete one version of data file" do
+      Seek::Config.delete_asset_version_enabled = true
+      #upload a data file
+      df = Factory :data_file, :contributor => User.current_user
+      #upload new version 1 of the data file
+      post :new_version, :id=>df, :data_file=>{:data=>fixture_file_upload('files/file_picture.png')}, :revision_comment=>"This is a new revision 1"
+      #upload new version 2 of the data file
+      post :new_version, :id=>df, :data_file=>{:data=>fixture_file_upload('files/txt_test.txt')}, :revision_comment=>"This is a new revision 2"
+
+      df.reload
+      assert_equal 3, df.versions.length
+
+      # the latest version is 3
+      assert_equal 3, df.version
+
+      assert_difference("df.versions.length", -1) do
+        put :destroy_version, :id=>df, :version => 3
+        df.reload
+      end
+      # the latest version becomes 2
+      assert_equal 2, df.version
+      assert_redirected_to data_file_path(df)
+  end
+
   test "adding_new_conditions_to_different_versions" do
     d=data_files(:editable_data_file)    
     sf = StudiedFactor.create(:unit => units(:gram),:measured_item => measured_items(:weight),
@@ -1494,6 +1518,7 @@ class DataFilesControllerTest < ActionController::TestCase
       assert_select "option[selected='selected']", :text => /Download/
     end
   end
+
 
   private
 

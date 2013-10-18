@@ -40,7 +40,7 @@ Seek::Config.default :external_search_enabled, true
 Seek::Config.default :project_browser_enabled,false
 Seek::Config.default :experimental_features_enabled,false
 Seek::Config.default :pdf_conversion_enabled,true
-
+Seek::Config.default :delete_asset_version_enabled, false
 #time in minutes that the feeds on the front page are cached for
 Seek::Config.default :home_feeds_cache_timeout,2
 
@@ -83,6 +83,5 @@ Seek::Config.default :sample_age, "Age at sampling"
 Seek::Config.default :specimen_creators, "Contributors"
 
 
-Seek::Config.default :max_attachments_num,100
-
+Seek::Config.default :recaptcha_enabled, true
 Seek::Config.default :admin_impersonation_enabled, true
