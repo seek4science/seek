@@ -26,6 +26,7 @@
 
 <h3>Content statistics</h3>
 For authorised assets the numbers are split as <em>total</em> / <em>publicly visible</em> / <em>publicly accessible</em>
+<div class='content_stats'>
 <table>
   <tr>
     <th>Project</th>
@@ -57,18 +58,19 @@ For authorised assets the numbers are split as <em>total</em> / <em>publicly vis
   <% end %>
   <tr style="background-color: #DEF">
     <td><b>Overall</b></td>
-    <td><%= Person.count -%> (<%= User.count(:all,:conditions=>"person_id IS NOT NULL") -%>)<em>*</em></td>
+    <td><b><%= Person.count -%> (<%= User.count(:all,:conditions=>"person_id IS NOT NULL") -%>)<em>*</em></b></td>
     <% authorised_types.each do |type| %>
         <%  type_str = type.name.underscore.pluralize
             total=type.count
             total_pub_vis = eval("total_publicly_visible_#{type_str}").count
             total_pub_acc = eval("total_publicly_accessible_#{type_str}").count
         %>
-        <td><%= "#{total}/#{total_pub_vis}/#{total_pub_acc}" -%></td>
+        <td><b><%= "#{total}/#{total_pub_vis}/#{total_pub_acc}" -%></b></td>
     <% end -%>
 
-    <td><%= Publication.count -%></td>
+    <td><b><%= Publication.count -%></b></td>
   </tr>
 </table>
+</div>
 <hr/>
 <em>* Note that this is the overall number of people, and registered users. This may not necessarily by the sum of the values above due to people being in multiple projects.</em>
