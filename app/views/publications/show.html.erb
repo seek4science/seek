@@ -36,6 +36,9 @@
         <label><%= publication_type_text @publication.publication_type -%>:</label>
         <%=h @publication.journal -%>
         <br/>
+        <label><%= "Citation:" -%></label>
+        <%=h @publication.citation -%>
+        <br/>
         <label>Date Published:</label>
         <%= @publication.published_date.strftime("#{@publication.published_date.day.ordinalize} %B %Y") -%>
       </p>

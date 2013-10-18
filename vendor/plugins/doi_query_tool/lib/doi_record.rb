@@ -1,5 +1,5 @@
 class DoiRecord
-  attr_accessor :authors, :title, :abstract, :journal, :doi, :xml, :date_published,:publication_type, :error
+  attr_accessor :authors, :title, :abstract, :journal, :doi, :xml, :date_published,:publication_type, :error, :citation
 
   PUBLICATION_TYPES = {:journal=>1,:conference=>2,:book_chapter=>3}
 
@@ -11,12 +11,13 @@ class DoiRecord
     self.doi = attributes[:doi]
     self.xml = attributes[:doc]
     self.date_published = attributes[:pub_date]
-    self.authors = attributes[:authors] || []    
+    self.authors = attributes[:authors] || []
     self.publication_type = attributes[:type] || PUBLICATION_TYPES[:journal]
     self.error=attributes[:error] || nil
+    self.citation = attributes[:citation]
   end
 
-  
+
   def lookup_url
     DOI_BASE_URL + self.doi
   end
