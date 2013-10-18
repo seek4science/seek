@@ -1,18 +1,20 @@
 <div id="publication_preview" class="list_item" style="margin-bottom:1em">
-	
+
   <p class="list_item_title"><%= publication.title %></p>
-        
+
   <%= list_item_attribute "PubMed ID", publication.pubmed_id, "http://www.ncbi.nlm.nih.gov/pubmed/#{publication.pubmed_id}", {:popup => true} unless publication.pubmed_id.nil? %>
-  
+
   <%= list_item_attribute "DOI", publication.doi, "http://dx.doi.org/#{publication.doi}", {:popup => true} unless publication.doi.nil? %>
-  
+
   <%= list_item_simple_list(authors, "Author(s)") {|a| a.first_name + " " + a.last_name} -%>
-  
+
   <%= list_item_expandable_text "Abstract", h(publication.abstract) %>
-  
+
   <%= list_item_optional_attribute publication_type_text(publication.publication_type), h(publication.journal) %>
-  
-  <%= list_item_attribute "Date Published", publication.published_date.strftime('%d/%m/%Y') %>    
+
+  <%= list_item_attribute "Date Published", publication.published_date.strftime('%d/%m/%Y') %>
+
+  <%= list_item_attribute "Citation", publication.citation%>
 
 </div>
 

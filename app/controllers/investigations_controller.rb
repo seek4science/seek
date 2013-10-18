@@ -4,7 +4,7 @@ class InvestigationsController < ApplicationController
   include IndexPager
 
   before_filter :find_assets, :only=>[:index]
-  before_filter :find_and_auth,:only=>[:edit, :update, :destroy]
+  before_filter :find_and_auth,:only=>[:edit, :update, :destroy, :show]
 
   include Seek::Publishing
   include Seek::BreadCrumbs

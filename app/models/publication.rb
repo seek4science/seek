@@ -4,7 +4,7 @@ require 'title_trimmer'
 require 'libxml'
 
 class Publication < ActiveRecord::Base
-  
+
   title_trimmer
 
   #searchable must come before acts_as_asset is called
@@ -32,7 +32,7 @@ class Publication < ActiveRecord::Base
   validate :check_identifier_present
   validate :check_uniqueness_of_identifier_within_project
   validate :check_uniqueness_of_title_within_project
-  
+
   has_many :publication_authors, :dependent => :destroy, :autosave => true
 
   after_update :update_creators_from_publication_authors
@@ -49,15 +49,15 @@ class Publication < ActiveRecord::Base
       policy.permissions << Permission.create(:contributor => author, :policy => policy, :access_type => Policy::MANAGING)
     end
     #Add contributor
-   policy.permissions << Permission.create(:contributor => contributor.person, :policy => policy, :access_type => Policy::MANAGING)
+   policy.permissions << Permission.create(:contributor => contributor.person, :policy => policy, :access_type => Policy::MANAGING) unless contributor.nil?
   end
-  
-  has_many :backwards_relationships, 
+
+  has_many :backwards_relationships,
     :class_name => 'Relationship',
     :as => :object,
     :dependent => :destroy
 
-  
+
   if Seek::Config.events_enabled
     has_and_belongs_to_many :events
   else
@@ -72,7 +72,7 @@ class Publication < ActiveRecord::Base
     def event_ids= events_ids
 
     end
-    
+
   end
 
   alias :seek_authors :creators
@@ -98,24 +98,26 @@ class Publication < ActiveRecord::Base
     self.published_date = pubmed_record.date_published
     self.journal = pubmed_record.journal
     self.pubmed_id = pubmed_record.pmid
+      self.citation = pubmed_record.citation
   end
-  
+
   def extract_doi_metadata(doi_record)
     self.title = doi_record.title
     self.published_date = doi_record.date_published
     self.journal = doi_record.journal
     self.doi = doi_record.doi
     self.publication_type = doi_record.publication_type
+    self.citation = doi_record.citation
   end
-  
+
   def related_data_files
     self.backwards_relationships.select {|a| a.subject_type == "DataFile"}.collect { |a| a.subject }
   end
-  
+
   def related_models
     self.backwards_relationships.select {|a| a.subject_type == "Model"}.collect { |a| a.subject }
   end
-  
+
   def related_assays
     self.backwards_relationships.select {|a| a.subject_type == "Assay"}.collect { |a| a.subject }
   end
@@ -148,7 +150,7 @@ class Publication < ActiveRecord::Base
     organisms = organisms | related_models.collect{|m| m.organism}.uniq.compact
     organisms
   end
-  
+
   def self.subscribers_are_notified_of? action
     action == 'create'
   end
@@ -156,7 +158,7 @@ class Publication < ActiveRecord::Base
   def endnote
    bio_reference.endnote
   end
-  
+
   private
 
   def bio_reference
@@ -169,7 +171,7 @@ class Publication < ActiveRecord::Base
                           :year => published_date.year}.with_indifferent_access)
     end
   end
-  
+
   def check_identifier_present
     if doi.blank? && pubmed_id.blank?
       self.errors.add_to_base("Please specify either a PubMed ID or DOI")

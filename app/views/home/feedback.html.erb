@@ -50,12 +50,12 @@ var RecaptchaOptions = {
       <%= label_tag :details -%><br/>
       <%= text_area_tag :details,@details,:cols=>60,:rows=>15 -%>
     </p>
-
+    <% if Seek::Config.recaptcha_enabled %>
     <div>
       <%= label_tag :verification -%>
       <p><%= recaptcha_tags -%></p>
     </div>
-
+    <% end %>
     <%= submit_tag "Send feedback",:onclick=>"return check_form();" -%>
 
 
