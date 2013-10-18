@@ -15,98 +15,26 @@
 <!--Inserting the javascripts for loading tabber dynamically-->
 <div id="js_for_tabber"></div>
 
+<!--the files need to be loaded before calling the partial resource_tabbed_lazy_loading
+    and with this order
+-->
 <%= javascript_include_tag "tabber-minimized.js" %>
-<script type="text/javascript">
-    function load_tabs() {
-        var tabberOptions = {'onLoad':function() {
-            displayTabs();
-        }};
-        tabberAutomatic(tabberOptions);
-    }
-
-    function tabs_on_click(scale_title, resource_type){
-        var click_tab = document.getElementsByClassName(scale_title + '_' + resource_type)[0];
-        click_tab.onclick = function(){
-            deactivate_previous_tab(scale_title);
-            click_tab.parentElement.className = 'tabberactive';
-
-            //if the content of the click_tab is already loaded, just show it, otherwise call ajax to get the content
-            var tab_content_view_some_id = scale_title + '_' + resource_type + '_view_some';
-            var tab_content_view_some = $(tab_content_view_some_id);
-            var tab_content_view_all_id = scale_title + '_' + resource_type + '_view_all';
-            var tab_content_view_all = $(tab_content_view_all_id);
-            if (tab_content_view_all.childNodes.length > 0){
-                tab_content_view_all.show();
-            }else if (tab_content_view_some.childNodes.length > 0){
-                tab_content_view_some.show();
-            }else{
-                tab_content_view_some.show();
-                request = new Ajax.Request('<%= url_for(:controller => 'application', :action => 'view_items_in_scale') %>',
-                        {
-                            method: 'get',
-                            parameters: {
-                                resource_type: resource_type,
-                                scale_title: scale_title,
-                                view_type: 'view_some'
-                            },
-                            onLoading: show_large_ajax_loader(tab_content_view_some_id),
-                            onFailure: function(transport){
-                                alert('Something went wrong, please try again...');
-                            }
-                        });
-            }
-        }
-
-    }
-
-    function deactivate_previous_tab(scale_title){
-        //First change the color of the previous chosen tab
-        var scale_result = $(scale_title + '_results');
-        var previous_active_tab = scale_result.getElementsByClassName('tabberactive')[0];
-        previous_active_tab.className = '';
-        //Then hide the content of the tab
-        var scale_and_type = previous_active_tab.childNodes[0].className;
-        var scale = scale_and_type.split('_')[0].strip();
-        var resource_type = scale_and_type.split('_')[1].strip();
-        var tab_content_view_some_id = scale + '_' + resource_type + '_view_some';
-        var tab_content_view_all_id = scale + '_' + resource_type + '_view_all';
-        var tab_content_view_some = $(tab_content_view_some_id);
-        var tab_content_view_all = $(tab_content_view_all_id);
-        if (tab_content_view_some != null){
-            tab_content_view_some.hide();
-        }
-        if (tab_content_view_all != null){
-            tab_content_view_all.hide();
-        }
-    }
-
-    function check_tab_content(show_tab_content_id, hide_tab_content_id){
-        var tab_content = $(show_tab_content_id);
-        if (tab_content.childNodes.length > 0){
-            tab_content.show();
-            $(hide_tab_content_id).hide();
-            //refresh_boxover_tooltip_position, so it does not create the blank at the end of the page when switching from -view all- to -view some- items
-            refresh_boxover_tooltip_position();
-            return false;
-        }else{
-            return true;
-        }
-    }
-    
-    function refresh_boxover_tooltip_position(){
-        var boxover_tooltip = document.getElementsByClassName('boxoverTooltipBody')[0];
-        if (boxover_tooltip != null){
-            boxover_tooltip.parentNode.style['top']='0px';
-        }
-    }
-
-</script>
+<%= javascript_include_tag "tab_lazy_load.js" %>
 
 <div id="scaled_items">
     <div id="all_results" class="scaled_items">
-      <%= render :partial => "assets/resource_by_scale",
+      <%
+         resource_hash = {}
+         Seek::Util.user_creatable_types.each do |klass|
+           items = klass.all
+           resource_hash["#{klass}"] = items if items.count > 0
+         end
+      %>
+
+      <%= render :partial => "assets/resource_tabbed_lazy_loading",
                    :locals => {:scale_title => 'all',
-                               :tabs_id => "resource_by_scale_all"} -%>
+                               :tabs_id => "resource_tabbed_lazy_loading_all",
+                               :resource_hash => resource_hash} -%>
     </div>
     <% scale_titles = Scale.all.map(&:title)
        scale_titles = ['all'] + scale_titles
