@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20131017123546) do
+ActiveRecord::Schema.define(:version => 20131021114102) do
 
   create_table "activity_logs", :force => true do |t|
     t.string   "action"
@@ -1528,6 +1528,7 @@ ActiveRecord::Schema.define(:version => 20131017123546) do
     t.string   "name",                 :default => "None"
     t.integer  "delayed_job_id"
     t.integer  "sweep_id"
+    t.integer  "user_id"
   end
 
   add_index "taverna_player_runs", ["run_id"], :name => "index_taverna_player_runs_on_run_id"
