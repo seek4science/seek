@@ -244,3 +244,13 @@ table.display td {
   max-width: 1140px;
   margin-left: 260px;
 }
+
+#menubar-login-form {
+  position: absolute;
+  top: 50px;
+  border-width: 0 1px 1px;
+  border-style: solid;
+  border-color: #ccc;
+  box-shadow: 0 3px 5px #ccc;
+  width: 200px;
+}

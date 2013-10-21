@@ -56,12 +56,12 @@
           <%= navigation_link('Admin', main_app.admin_path, nil, false) if admin_logged_in? -%>
           <%= navigation_link 'Log out', main_app.logout_path, nil, false -%>
         <% else %>
-          <%= navigation_link 'Log in', main_app.new_session_path, nil, false -%>
+          <li><a href="#" onclick="$('menubar-login-form').toggle();">Log in / Register</a></li>
+          <div id="menubar-login-form" style="display: none"><%= render :partial => "gadgets/sign_in" %></div>
         <% end %>
       </ul>
     </div>
   </div>
-
   <div id="bd">
     <div id="yui-main">
       <div id="content">
