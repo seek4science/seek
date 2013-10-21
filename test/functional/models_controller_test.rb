@@ -268,7 +268,7 @@ class ModelsControllerTest < ActionController::TestCase
   end
 
   test "association of scales" do
-    scale1=Factory :scale
+    scale1=Factory :scale, :pos=>1
     scale2=Factory :scale, :pos=>2
     model_params = valid_model
 
@@ -286,7 +286,7 @@ class ModelsControllerTest < ActionController::TestCase
   end
 
   test "association of scales with params" do
-    scale1=Factory :scale
+    scale1=Factory :scale, :pos=>1
     scale2=Factory :scale, :pos=>2
     model_params = valid_model
     scale_ids_and_params=["{\"scale_id\":\"#{scale1.id}\",\"param\":\"fish\",\"unit\":\"meter\"}",
