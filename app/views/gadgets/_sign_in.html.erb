@@ -7,6 +7,7 @@
     </div>
     <div class="contents curved_bottom">
         <%= form_tag main_app.session_path do %>
+        <%= hidden_field_tag "called_from[url]", request.original_url -%>
         <%= hidden_field_tag "called_from[controller]", controller.controller_name -%>
         <%= hidden_field_tag "called_from[action]", controller.action_name -%>
         <%= hidden_field_tag "called_from[id]", params[:id] -%>

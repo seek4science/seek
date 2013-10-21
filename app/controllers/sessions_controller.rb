@@ -94,7 +94,9 @@ class SessionsController < ApplicationController
     end
     
     respond_to do |format|
-      if !params[:called_from].blank? && params[:called_from][:controller] != "sessions"
+      if !params[:called_from].blank? && !params[:called_from][:url].blank?
+        return_to_url = params[:called_from][:url]
+      elsif !params[:called_from].blank? && params[:called_from][:controller] != "sessions"
         unless params[:called_from][:id].blank?
           return_to_url = url_for(:controller => params[:called_from][:controller], :action => params[:called_from][:action], :id => params[:called_from][:id])
         else
