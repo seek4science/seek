@@ -44,10 +44,10 @@ body, html {
   width: 100%;
   position: absolute;
   min-width: 800px;
-  height: 80px;
+  height: 110px;
   border: none;
-  background: #555;
-  color: #ffffff;
+  background: #dddddd;
+  color: #555555;
   font-weight: normal;
   padding-top: 20px;
   text-align: left;
@@ -55,12 +55,12 @@ body, html {
 }
 
 #ft a {
-  color: #B1E10F;
+  font-weight: bold;
 }
 
 #bd {
   min-height: 0;
-  padding: 0 20px 120px;
+  padding: 0 20px 150px;
 }
 
 #container {
