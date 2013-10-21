@@ -33,8 +33,13 @@
   </ul>
   <h3>Filter by uploader</h3>
   <ul>
+    <% if logged_in? && current_user.person %>
+      <li><%= workflow_filter  current_user.person.name, params, :uploader_id, current_user.id -%> (you)</li>
+    <% end %>
   <% User.all.each do |user| %>
-    <li><%= workflow_filter  user.person.name, params, :uploader_id, user.id -%></li>
+    <% unless user == current_user %>
+      <li><%= workflow_filter  user.person.name, params, :uploader_id, user.id -%></li>
+    <% end %>
   <% end %>
   </ul>
 </div>
