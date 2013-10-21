@@ -272,3 +272,10 @@ div.file_input {
 div.text_input {
   margin-right: 20px;
 }
+
+div.your_recent {
+  text-align: left;
+  padding: 20px;
+  width: 360px;
+  float: left;
+}
