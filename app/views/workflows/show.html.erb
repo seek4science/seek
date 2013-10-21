@@ -235,7 +235,7 @@
   </div>
 
   <div class="main_content_right_box">
-    <%= render :partial=>"general/items_related_to",:object => @workflow -%>
+    <%= render :partial=> "related_items", :locals => { :workflow => @workflow} -%>
   </div>
 
   <div style="clear:both"></div>

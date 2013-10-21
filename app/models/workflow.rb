@@ -34,6 +34,10 @@ class Workflow < ActiveRecord::Base
 
   has_one :content_blob, :as => :asset, :foreign_key => :asset_id, :conditions => Proc.new { ["content_blobs.asset_version =?", version] }
 
+  has_many :runs, :class_name => "TavernaPlayer::Run", :dependent => :destroy
+
+  has_many :sweeps, :class_name => "Sweep", :dependent => :destroy
+
   explicit_versioning(:version_column => "version") do
     acts_as_versioned_resource
     acts_as_favouritable
@@ -96,6 +100,28 @@ class Workflow < ActiveRecord::Base
   def self.by_uploader(uid)
     where(:contributor_id => uid, :contributor_type => "User")
   end
+
+  # Related items, like runs and sweeps
+  def collect_related_items
+    related = {'Run' => {}, 'Sweep' => {}}
+
+    related.each_key do |key|
+      related[key][:items] = []
+      related[key][:hidden_items] = []
+      related[key][:hidden_count] = 0
+      related[key][:extra_count] = 0
+    end
+
+    related_types = related.keys
+    related_types.each do |type|
+      method_name = type.underscore.pluralize
+      if self.respond_to? method_name
+        related[type][:items] = self.send method_name
+      end
+    end
+
+    related
+    end
 
   private
 
