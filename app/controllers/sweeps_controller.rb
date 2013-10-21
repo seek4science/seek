@@ -4,6 +4,10 @@ class SweepsController < ApplicationController
   before_filter :find_workflow_and_version, :only => :new
   before_filter :set_runlet_parameters, :only => :create
 
+  def show
+    @sweep = Sweep.find(params[:id])
+  end
+
   def new
     @sweep = Sweep.new
   end
