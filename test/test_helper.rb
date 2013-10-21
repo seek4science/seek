@@ -7,6 +7,7 @@ MiniTest::Reporters.use! MiniTest::Reporters::DefaultReporter.new
 
 require 'rest_test_cases'
 require 'rdf_test_cases'
+require 'functional_authorization_tests'
 require 'ruby-prof'
 require 'factory_girl'
 require 'webmock/test_unit'
