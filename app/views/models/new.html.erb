@@ -30,7 +30,7 @@
 
         <%= render :partial => "organisms/select_organism",:locals=>{:model_class=>Model} -%>
         <% if show_scales? %>
-            <%= render :partial => "scales/scales_selector",:locals=>{:object=>@model} %>
+            <%= render :partial => "scales/scales_selector_with_parameters",:locals=>{:object=>@model} %>
         <% end %>
 
         <%= fields_for(@model) {|f| render :partial=>"assets/asset_form_bottom", :locals=> {:f => f}} -%>

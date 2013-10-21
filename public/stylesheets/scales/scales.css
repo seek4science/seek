@@ -92,20 +92,19 @@
 #wrapper{
     width: 50em;
     margin: 0 auto;
+    background-color: white;
 }
 
 .scaled_items{
-    padding-top: 450px;
+    padding-top: 1em;
 
 }
-
 
 .step li:hover{
     color:#17B274;
 }
 
 .step li:active{color:#ff0000;}
-
 
 #zoom{
     height:300px;
@@ -115,10 +114,20 @@
     overflow:hidden;
     float:left;
     margin-left: 0em;
-    //min-height: 6em;
+    margin-top: 1.5em;
 }
 
+#zoom img{
+    position:absolute;
+    padding-top:8px;
+    height:100%;
+    vertical-align: middle;
+}
 
+ul#scale_list li {
+    height: 0.5em;
+    font-size:14px;
+}
 
 .scale_image{
     display:none;
@@ -130,16 +139,7 @@
     display:none;
 }
 
-#zoom img{
-    position:absolute;
-    /*display:none;
-    margin:auto;
-    vertical-align:middle;
-    text-align:center; */
-    padding-top:8px;
-    //margin-left:100px;
-    height:100%;
-}
+
 
 
 #plus, #minus{
@@ -153,7 +153,7 @@
 }
 
 #plus{
-    margin-top:-30px;
+    margin-top:-20px;
 }
 
 #minus{

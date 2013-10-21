@@ -44,7 +44,10 @@
             <%= text_area_tag 'data_file[description]', data_file_description_value, :style => "width: 100%;", :rows => 10 -%>
         </p>
         <%= render :partial => "projects/project_selector", :locals => { :resource => @data_file } -%>
-        
+
+      <% if show_scales? %>
+          <%= render :partial => "scales/scales_selector",:locals=>{:object=>@data_file} %>
+      <% end %>
 
         <%= fields_for(@data_file) {|f|render :partial=>"assets/asset_form_bottom", :locals=> {:f => f}} -%>
 

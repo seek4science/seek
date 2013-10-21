@@ -1920,6 +1920,10 @@ ul.usage_times_list {
     color: #666666;
 }
 
+ul.model_scales_list {
+    margin-left:1em;
+}
+
 .sectionIcons {
     margin: 1em 0 0.5em 0;
     font-size: smaller;
