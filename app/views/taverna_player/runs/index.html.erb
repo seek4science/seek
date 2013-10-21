@@ -65,7 +65,7 @@
                  finish_time = run.finish_time.blank? ? '' : run.finish_time.strftime("%e %b %Y %H:%m:%S %Z")
                end
 
-               action_buttons = ''# render(:partial => "delete_or_cancel_button", :locals => { :run => run })
+               action_buttons = render(:partial => "delete_or_cancel_button", :locals => { :run => run })
             %>
             <tr class="gradeA">
               <% row = [link_to(run.name, run.is_a?(Sweep) ? '' : run),
@@ -74,9 +74,7 @@
                         run.state,
                         create_time,
                         finish_time,
-                        action_buttons]
-                 #(run.finished? || run.cancelled?) ? link_to('Delete', run, :method => :delete, :data => { confirm: 'Are you sure you want to delete this run?' }) : link_to("Cancel", cancel_run_path(run.id), :method => :put, :data => { confirm: "Are you sure you want to cancel this run?" })]
-              %>
+                        action_buttons] %>
               <% row.each do |column_data| %>
                   <td><%= column_data %></td>
               <% end %>

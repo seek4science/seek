@@ -57,7 +57,7 @@ module TavernaPlayer
     end
 
     def set_user
-      #params[:run][:user_id] = current_user.id
+      params[:run][:user_id] = current_user.id
     end
 
     def find_runs
