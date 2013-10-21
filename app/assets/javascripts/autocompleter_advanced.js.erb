@@ -119,10 +119,10 @@
 
 
 // Init - preload images
-(new Image()).src = '../../images/autocompleter_tokens/token.gif';
-(new Image()).src = '../../images/autocompleter_tokens/token_selected.gif';
-(new Image()).src = '../../images/autocompleter_tokens/token_hover.gif';
-(new Image()).src = '../../images/autocompleter_tokens/token_x.gif';
+(new Image()).src = "<%= asset_path('autocompleter_tokens/token.gif') %>";
+(new Image()).src = "<%= asset_path('autocompleter_tokens/token_selected.gif') %>";
+(new Image()).src = "<%= asset_path('autocompleter_tokens/token_hover.gif') %>";
+(new Image()).src = "<%= asset_path('token_x.gif') %>";
 
 
 Autocompleter.LocalAdvanced = Class.create(Autocompleter.Base, {

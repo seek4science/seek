@@ -35,7 +35,7 @@ h1 {
 }
 
 h2 {
-	background-image: url('../images/header-bg.png');
+	background-image: url("<%= asset_path('header-bg.png') %>");
 	background-position: top;
 	background-repeat: repeat-x;
 	background-color: #EEEEEE;
@@ -138,7 +138,7 @@ li {
 #myexp_searchbar {
 	height: 20px;
 	text-align: center;
-	background-image: url('../images/searchfade.png');
+	background-image: url("<%= asset_path('searchfade.png') %>");
 	background-repeat: no-repeat;
 	background-position: top center;
 	padding: 10px 0;
@@ -170,7 +170,7 @@ li {
 }
 
 #openid_url {
-	background: url("../images/openid-16x16.gif") no-repeat;
+	background: url("<%= asset_path('openid-16x16.gif') %>") no-repeat;
 	background-color: #FFFFFF;
 	padding-left: 16px;
 }
@@ -310,7 +310,7 @@ ul.breadcrumb_list a:hover {
 	color: #222222;
 	padding: 0.1em 1em 0.4em 1em;
 	text-align: center;
-	background-image: url('../images/header-bg2.png');
+	background-image: url("<%= asset_path('header-bg2.png') %>");
 	background-position: top;
 	background-repeat: repeat-x;
 	background-color: #CFDFEF;

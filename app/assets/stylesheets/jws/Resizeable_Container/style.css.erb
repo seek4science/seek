@@ -42,7 +42,7 @@
   width: 4px;
   top: 3px;
   cursor: e-resize;
-  background-image: url('../../../images/jws/vert_repeater.gif');
+  background-image: url("<%= asset_path('jws/vert_repeater.gif') %>");
   background-repeat: repeat-y;
 }
 
@@ -52,14 +52,14 @@
   height: 4px;
   left: 3px;
   cursor: s-resize;
-  background-image: url('../../../images/jws/horz_repeater.gif');
+  background-image: url("<%= asset_path('jws/horz_repeater.gif') %>");
   background-repeat: repeat-x;
 }
 
 .reCorner, .reLeftCorner, .reTopCorner, .reBottomHandle, .reRightHandle, .reTopRightImage, .reBottomLeftImage
 {
   position: absolute;
-  background-image: url('../../../images/jws/non_repeaters.gif');
+  background-image: url("<%= asset_path('jws/non_repeaters.gif') %>");
   background-repeat: no-repeat;
 }
 

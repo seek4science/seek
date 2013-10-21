@@ -90,7 +90,7 @@ function MultiSelector(list_target,object_name,method) {
         new_col4.appendChild(new_row_button);
 
 
-        new_col2.innerHTML = '<img src="/images/file_icons/small/genericGray.png">';
+        new_col2.innerHTML = '<img src= "<%= asset_path('file_icons/small/genericGray.png') %>">';
         if (element.type =='text'){
            var original_filename =document.getElementsByName('content_blob[original_filename_' + (this.id_url - 2) + ']')[0].value;
            new_col3.innerHTML = (original_filename || element.value);

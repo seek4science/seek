@@ -27,7 +27,7 @@ var SCROLLBAR_PADDING = 40;
 var VERTICAL_PADDING = 5;
 var MIN_SCALE = 0.25;
 var MAX_SCALE = 4.0;
-var IMAGE_DIR = './images/pdfjs';
+var IMAGE_DIR = './assets/pdfjs';
 var SETTINGS_MEMORY = 20;
 var ANNOT_MIN_SIZE = 10;
 var RenderingStates = {
@@ -43,7 +43,7 @@ var FindStates = {
   FIND_PENDING: 3
 };
 
-PDFJS.workerSrc = '/javascripts/pdfjs/pdf.js';
+PDFJS.workerSrc = "<%= asset_path('pdfjs/pdf.js') %>";
 
 var mozL10n = document.mozL10n || document.webL10n;
 
