@@ -259,3 +259,16 @@ table.display td {
 #workflow_runs_table_wrapper {
   position: static;
 }
+
+div.file_input, div.text_input {
+  float: left;
+}
+
+div.file_input {
+  color: #666;
+  line-height: 1.5;
+}
+
+div.text_input {
+  margin-right: 20px;
+}
