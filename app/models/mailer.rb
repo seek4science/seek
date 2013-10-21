@@ -169,7 +169,7 @@ class Mailer < ActionMailer::Base
   end
 
   def test_email testing_email
-    mail(:to=>testing_email,:subject=>"SEEK Configuration Email Test")
+    mail(:from=>Seek::Config.noreply_sender,:to=>testing_email,:subject=>"SEEK Configuration Email Test")
   end
 
   private
