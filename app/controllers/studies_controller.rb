@@ -10,6 +10,8 @@ class StudiesController < ApplicationController
 
   include Seek::Publishing::PublishingCommon
 
+  include Seek::AnnotationCommon
+
   include Seek::BreadCrumbs
 
   def new_object_based_on_existing_one
@@ -82,6 +84,7 @@ class StudiesController < ApplicationController
 
     respond_to do |format|
       if @study.save
+        update_scales @study
         flash[:notice] = "#{t('study')} was successfully updated."
         format.html { redirect_to(@study) }
         format.xml  { head :ok }
@@ -110,6 +113,7 @@ class StudiesController < ApplicationController
 
 
   if @study.save
+    update_scales @study
     if @study.new_link_from_assay=="true"
       render :partial => "assets/back_to_singleselect_parent",:locals => {:child=>@study,:parent=>"assay"}
     else

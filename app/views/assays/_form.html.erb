@@ -89,6 +89,9 @@
 <div id="add_organism_form">
     <%= render :partial=>"assays/select_organisms" -%>
 </div>
+    <% if show_scales? %>
+        <%= render :partial => "scales/scales_selector",:locals=>{:object=>@assay} %>
+    <% end %>
 
 <br style="clear:both"/>
 

@@ -89,6 +89,7 @@ class SopsController < ApplicationController
       @sop.policy.set_attributes_with_sharing params[:sharing], @sop.projects
 
       update_annotations @sop
+      update_scales @sop
       assay_ids = params[:assay_ids] || []
       respond_to do |format|
         if @sop.save
@@ -131,6 +132,8 @@ class SopsController < ApplicationController
     end
 
     update_annotations @sop
+    update_scales @sop
+
     assay_ids = params[:assay_ids] || []
 
     @sop.attributes = params[:sop]

@@ -65,6 +65,7 @@ class PublicationsController < ApplicationController
     assay_ids = params[:assay_ids] || []
     respond_to do |format|
       if @publication.save
+        update_scales @publication
         create_non_seek_authors result.authors
 
         create_or_update_associations assay_ids, "Assay", "edit"
@@ -146,7 +147,9 @@ class PublicationsController < ApplicationController
         end      
         #Add contributor
         @publication.policy.permissions << Permission.create(:contributor => @publication.contributor.person, :policy => @publication.policy, :access_type => Policy::MANAGING)
-        
+
+        update_scales @publication
+
         flash[:notice] = 'Publication was successfully updated.'
         format.html { redirect_to(@publication) }
         format.xml  { head :ok }

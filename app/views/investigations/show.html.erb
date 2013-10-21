@@ -32,6 +32,9 @@
     <%= item_description @investigation.description -%>
 
     <br/>
+    <% if show_scales? -%>
+        <%= render :partial=>"scales/asset_scales_list",:object=>@investigation -%>
+    <% end %>
   </div>
   <%= render :partial=>"assets/resource_main_content_right",:locals => { :resource => @investigation, :creators => [@investigation.contributing_user.try(:person)] } %>
 

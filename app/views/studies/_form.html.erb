@@ -48,6 +48,11 @@
     </p>
 
   </div>
+  <% if show_scales? %>
+      <p>
+      <%= render :partial => "scales/scales_selector",:locals=>{:object=>@study} %>
+      </p>
+  <% end %>
   <p>
     <%= render :partial=>"assets/sharing_form" if @study.can_manage? -%>
   </p>

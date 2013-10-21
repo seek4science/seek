@@ -5,6 +5,8 @@
   <%= error_messages_for('publication', :message => nil) %>
   <%= form_tag publication_path(@publication), :method => :put do %>
     <%= render :partial => 'projects/project_selector', :locals => {:resource => @publication}%>
+
+
     
     <% if @publication.pubmed_id.nil? && @publication.doi %>
       <p>
@@ -60,6 +62,9 @@
     </div>
     <br style="clear: both"/>
     <div>
+      <% if show_scales? %>
+          <%= render :partial => "scales/scales_selector",:locals=>{:object=>@publication} %>
+      <% end %>
     <p>
         <%= render :partial=>"assets/select_tags" -%>
     </p>
