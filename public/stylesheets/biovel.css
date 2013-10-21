@@ -255,3 +255,7 @@ table.display td {
   box-shadow: 0 3px 5px #ccc;
   width: 200px;
 }
+
+#workflow_runs_table_wrapper {
+  position: static;
+}
