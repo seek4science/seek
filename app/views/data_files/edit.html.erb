@@ -1,4 +1,4 @@
-<%= javascript_include_tag "sharing.js","associate_events.js","assays.js","attribution.js","resource.js" %>
+<%#= javascript_include_tag "sharing.js","associate_events.js","assays.js","attribution.js","resource.js" %>
 
 <% current_user_authorized_to_manage = @data_file.can_manage? -%>
 <h1>Editing <%= t('data_file') %>: <%= link_to(h(@data_file.title), data_file_path(@data_file)) -%></h1>

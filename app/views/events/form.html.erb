@@ -1,8 +1,8 @@
 <% current_user_authorized_to_manage = @event.new_record?|| @event.can_manage? -%>
-<%= javascript_include_tag 'assays.js' %>
-<%= javascript_include_tag 'calendar_date_select/calendar_date_select' %>
-<%= stylesheet_link_tag 'calendar_date_select/default' %>
-<%= javascript_include_tag "sharing.js", 'resource.js' %>
+<%#= javascript_include_tag 'assays.js' %>
+<%#= javascript_include_tag 'calendar_date_select/calendar_date_select' %>
+<%#= stylesheet_link_tag 'calendar_date_select/default' %>
+<%#= javascript_include_tag "sharing.js", 'resource.js' %>
 
 <h1><%= @new ? "New #{t('event')}" : ("Editing #{t('event')}: ".html_safe + link_to(h(@event.title), event_path(@event))) -%></h1>
 <div class="show_basic">
