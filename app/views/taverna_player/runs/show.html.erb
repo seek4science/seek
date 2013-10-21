@@ -11,10 +11,11 @@
 
   <div style="float: left; margin: 10px 10px 10px -5px;">
     <ul class="sectionIcons">
-      <%= render :partial => "delete_or_cancel_button", :locals => { :run => @run } %>
+      <%= render :partial => 'download_all_button', :locals => {:run => @run} %>
       <% if @run.finished? %>
           <li><%= image_tag_for_key('sweep', main_app.new_sweep_path(:run_id => @run.id), nil, nil, "Data sweep based on this run") -%></li>
       <% end %>
+      <%= render :partial => "delete_or_cancel_button", :locals => { :run => @run } %>
     </ul>
   </div>
 
@@ -109,17 +110,6 @@
     </div>
     <div class="foldContent">
       <% unless run_result_outputs.blank? -%>
-          <p>
-            <b>Log:</b>
-            <%= link_to "Taverna Server log", @run.log.url %>
-          </p>
-
-          <div style="float: left; margin: 10px 10px 10px -5px;">
-            <ul class="sectionIcons">
-              <%= render :partial => 'download_all_button', :locals => {:run => @run} %>
-            </ul>
-          </div>
-
           <div style="clear: both;"></div>
 
           <table class="simple" style="width: 100%;">
@@ -142,6 +132,17 @@
     </div>
   </div>
 
+  <div class="fold">
+    <div class="foldTitle">
+      Advanced
+    </div>
+    <div class="foldContent" style="display: none;">
+      <p>
+        <b>Log:</b>
+        <%= link_to "Taverna Server log", @run.log.url %>
+      </p>
+    </div>
+  </div>
 
   <% unless @run.finished? || @run.cancelled? %>
       <%= render :partial => "poll", :locals => { :reload => run_path(@run) } %>
