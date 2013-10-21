@@ -25,11 +25,27 @@ class ScalesController < ApplicationController
 
    def scale_search
     @scale = Scale.find_by_title(params[:scale_type])
+    resource_hash = {}
+
+    if @scale
+      scalables = Scaling.find(:all, :include => :scalable, :conditions => ["scale_id=?", @scale.id]).collect(&:scalable).compact.uniq
+      grouped_scalings = scalables.group_by { |scalable| scalable.class.name }
+      grouped_scalings.each do |key, value|
+        resource_hash[key] = value
+      end if !grouped_scalings.blank?
+    else
+      Seek::Util.user_creatable_types.each do |klass|
+        items = klass.all
+        resource_hash["#{klass}"] = items if items.count > 0
+      end
+    end
+
     render :update do |page|
       scale_title = @scale.try(:title) || 'all'
-      page.replace_html "#{scale_title}_results", :partial=>"assets/resource_by_scale",
+      page.replace_html "#{scale_title}_results", :partial=>"assets/resource_tabbed_lazy_loading",
                         :locals =>{:scale_title => scale_title,
-                                   :tabs_id => "resource_by_scale_#{scale_title}"}
+                                   :tabs_id => "resource_tabbed_lazy_loading_#{scale_title}",
+                                   :resource_hash => resource_hash }
     end
    end
 

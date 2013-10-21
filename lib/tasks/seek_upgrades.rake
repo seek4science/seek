@@ -292,7 +292,28 @@ namespace :seek do
      end
   end
 
-  desc "pre-populate investigations with projects in VLN SEEK "
+  task(:repopulate_citation_for_publication=>:environment) do
+    disable_authorization_checks do
+      Publication.all.each do |publication|
+        #Query pubmed article to fetch authors
+        result = nil
+        pubmed_id = publication.pubmed_id
+        doi = publication.doi
+        if pubmed_id
+          query = PubmedQuery.new("seek",Seek::Config.pubmed_api_email)
+          result = query.fetch(pubmed_id)
+        elsif doi
+          query = DoiQuery.new(Seek::Config.crossref_api_email)
+          result = query.fetch(doi)
+        end
+        unless result.nil?
+          publication.citation = result.citation
+          publication.save
+        end
+      end
+    end
+  end
+desc "pre-populate investigations with projects in VLN SEEK "
   task(:pre_populate_investigations => :environment) do
     #projects leaves will be associated with new created default investigation
 
@@ -321,4 +342,5 @@ namespace :seek do
       puts "Investigation '#{new_inv.title}' was created successfully!"
     end
   end
+
 end
