@@ -291,4 +291,34 @@ namespace :seek do
        end
      end
   end
+
+  desc "pre-populate investigations with projects in VLN SEEK "
+  task(:pre_populate_investigations => :environment) do
+    #projects leaves will be associated with new created default investigation
+
+    #Project A-G
+    inv_projects_parents = Project.find(:all, :conditions => ["name REGEXP?", "^[A-Z][:]"])
+    inv_projects = inv_projects_parents.map { |parent| parent.descendants }.flatten.select { |proj| proj.children.empty? }
+    #show cases, "Showcase LIAM (Liver Image Analysis Based Model)" is excluded as there is no people involved in this project
+    ["Showcase HGF and Regeneration", "Showcase LPS and Inflammation", "Showcase Steatosis"].each do |proj_name|
+      inv_projects = inv_projects | [Project.find_by_name(proj_name)]
+    end
+    inv_projects.each do |proj|
+      new_inv = Investigation.new :title => proj.name, :description => "Default investigation for project #{proj.name}"
+      new_inv.projects = [proj]
+      unless proj.project_coordinators.empty?
+        new_inv.contributor = proj.project_coordinators.first.user
+        User.current_user = proj.project_coordinators.first.user
+      end
+      policy = Policy.new(:name => "default project and other projects policy for pre-populated investigation",
+                          :sharing_scope => Policy::ALL_SYSMO_USERS,
+                          :access_type => Policy::ACCESSIBLE )
+
+      policy.permissions << Permission.new(:contributor => proj, :access_type => Policy::EDITING)
+
+      new_inv.policy = policy
+      new_inv.save!
+      puts "Investigation '#{new_inv.title}' was created successfully!"
+    end
+  end
 end
