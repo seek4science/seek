@@ -18,19 +18,22 @@
 
   <%= render :partial => "inputs", :locals => {:run => @run} %>
 
-  <div class="fold">
-    <div class="foldTitle">
-      Advanced
-    </div>
-    <div class="foldContent" style="display: none;">
-      <p>
-        <b>Log:</b>
-        <%= link_to "Taverna Server log", @run.log.url %>
-      </p>
+  <div id="advanced" style="display: none">
+    <div class="fold">
+      <div class="foldTitle">
+        Advanced
+      </div>
+      <div class="foldContent" style="display: none;">
+        <p>
+          <b>Log:</b>
+          <span id="log_url"></span>
+        </p>
+      </div>
     </div>
   </div>
 
-  <% unless @run.finished? || @run.cancelled? %>
+  <%= javascript_include_tag 'jquery-1.5.1.min.js' %>
+  <% unless @run.complete? %>
       <%= render :partial => "poll", :locals => {:reload => run_path(@run)} %>
   <% end %>
 </div>

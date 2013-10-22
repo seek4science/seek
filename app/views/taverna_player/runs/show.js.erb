@@ -13,4 +13,7 @@ $j("#buttons").replaceWith('<%= escape_javascript(render(:partial => "buttons", 
 
 <% unless @run.complete? %>
   $j("#run-poll").replaceWith('<%= escape_javascript(render(:partial => "poll", :locals => { :reload => run_path(@run) })) %>');
+<% else %>
+  $j("#advanced #log_url").replaceWith('<%= escape_javascript(link_to("Taverna Server log", @run.log.url)) %>');
+  $j("#advanced").show();
 <% end %>
