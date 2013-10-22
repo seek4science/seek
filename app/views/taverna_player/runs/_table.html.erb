@@ -18,8 +18,9 @@
                 [ 2, "asc" ]
             ],
             "aoColumns":[
-                { "sWidth":"20%" },
-                { "sWidth":"20%" },
+                { "sWidth":"15%" },
+                { "sWidth":"15%" },
+                { "sWidth":"10%" },
                 { "sWidth":"10%" },
                 { "sWidth":"10%" },
                 { "sWidth":"15%" },
@@ -37,9 +38,10 @@
       <tr>
         <th>Run</th>
         <th>Workflow</th>
+        <th>Category</th>
         <th>Type</th>
         <th>State</th>
-        <th>Create time</th>
+        <th>Creation time</th>
         <th>Finish time</th>
         <th>Actions</th>
       </tr>
@@ -65,6 +67,7 @@
         <tr class="gradeA">
           <% row = [link_to(run.name, run.is_a?(Sweep) ? main_app.sweep_path(run) : taverna_player.run_path(run)),
                     link_to(workflow.title, main_app.workflow_path(workflow)),#, :version => run.workflow_version)),
+                    workflow.category.name,
                     run.is_a?(Sweep) ? 'Sweep' : 'Simple',
                     run.state,
                     create_time,

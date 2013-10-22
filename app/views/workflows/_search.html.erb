@@ -3,6 +3,7 @@
     <%= form_tag workflows_path, :method => :get do -%>
       <%= text_field_tag :query, params[:query], :placeholder => "Search workflows...", :class=>"curved" -%>
       <%= submit_tag "Search" -%>
+      <%= submit_tag "Clear" %>
     <% end %>
   <% end %>
 </div>
