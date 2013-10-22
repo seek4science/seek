@@ -1,10 +1,14 @@
 <%= javascript_include_tag "sharing.js","associate_events.js","assays.js","attribution.js","resource.js" %>
 
 <h1>Manage workflow: <%= @workflow.title %></h1>
-
-<!-- Delete button -->
-<p><ul class="sectionIcons">
+<p>
+<ul class="sectionIcons">
+  <li>
     <%= delete_icon(@workflow, current_user) %>
+  </li>
+  <li>
+    <%= share_icon %>
+  </li>
 </ul><p>
 
 <div class="show_basic">

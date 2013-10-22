@@ -1,12 +1,4 @@
-<p>
-<ul class="sectionIcons">
-  <li>
-    <%= delete_icon(@workflow, current_user) %>
-  </li>
-  <li>
-    <%= share_icon %>
-  </li>
-</ul><p>
+
   <%= form_for(@workflow, :html => {:multipart => true}) do |f| -%>
       <!-- Delete button -->
     <div class="asset_form">
