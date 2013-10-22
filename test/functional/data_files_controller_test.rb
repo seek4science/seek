@@ -28,6 +28,32 @@ class DataFilesControllerTest < ActionController::TestCase
     assert_select "title",:text=>/The Sysmo SEEK Data.*/, :count=>1
   end
 
+  test "response code for not accessible rdf" do
+    df = Factory :data_file,:policy=>Factory(:private_policy)
+    logout
+    get :show,:id=>df.id,:format=>"rdf"
+    assert_response :forbidden
+  end
+
+  test "response code for not available rdf" do
+    logout
+    get :show,:id=>9,:format=>"rdf"
+    assert_response :not_found
+  end
+
+  test "response code for not accessible xml" do
+    df = Factory :data_file,:policy=>Factory(:private_policy)
+    logout
+    get :show,:id=>df.id,:format=>"xml"
+    assert_response :forbidden
+  end
+
+  test "response code for not available xml" do
+    logout
+    get :show,:id=>9,:format=>"xml"
+    assert_response :not_found
+  end
+
   #because the activity logging is currently an after_filter, the AuthorizationEnforcement can silently prevent
   #the log being saved, unless it is public, since it has passed out of the around filter and User.current_user is nil
   test "download and view activity logging for private items" do
