@@ -321,6 +321,8 @@ module ImagesHelper
         "famfamfam_silk/folder.png"
       when "search"
         "famfamfam_silk/eye.png"
+      when "find"
+        "famfamfam_silk/find.png"
       when "report"
         "famfamfam_silk/report.png"
       when "jws_shadow"
