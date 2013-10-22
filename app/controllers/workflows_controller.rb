@@ -201,6 +201,9 @@ class WorkflowsController < ApplicationController
   def find_and_filter_workflows
     find_assets
 
+    # Has the user cleared the search box? - return all items.
+    return @workfows if params[:commit] == 'Clear'
+
     # Filter by uploader and category
     filter_results = Workflow.where(true)
     filter_results = filter_results.by_category(params[:category_id].to_i) unless params[:category_id].blank?
