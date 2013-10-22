@@ -11,7 +11,9 @@
     <ul class="sectionIcons">
       <%= render :partial => 'download_all_button', :locals => {:run => @run} %>
       <% if @run.finished? %>
-          <li><%= image_tag_for_key('sweep', main_app.new_sweep_path(:run_id => @run.id), nil, nil, "Data sweep based on this run") -%></li>
+          <% if @run.sweep_id.blank? # if this run is part of a sweep - do not give option to create a new sweep off it %>
+              <li><%= image_tag_for_key('sweep', main_app.new_sweep_path(:run_id => @run.id), nil, nil, "Data sweep based on this run") -%></li>
+          <% end %>
           <% if @run.can_manage? -%>
               <li><%= image_tag_for_key('manage', main_app.edit_run_path(@run), nil, nil, "Manage run") -%></li>
           <% end -%>
