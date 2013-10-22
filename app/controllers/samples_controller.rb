@@ -2,7 +2,7 @@ class SamplesController < ApplicationController
 
   include IndexPager
   before_filter :find_assets, :only => [:index]
-  before_filter :find_and_auth, :only => [:show, :edit, :update, :destroy,:preview]
+  before_filter :find_and_authorize_requested_item, :only => [:show, :edit, :update, :destroy,:preview]
   before_filter :virtualliver_only, :only => [:new_object_based_on_existing_one]
 
   include Seek::Publishing::PublishingCommon

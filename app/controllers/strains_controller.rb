@@ -2,7 +2,7 @@ class StrainsController < ApplicationController
   include IndexPager
   include Seek::AnnotationCommon
   before_filter :find_assets, :only => [:index]
-  before_filter :find_and_auth, :only => [:show, :edit, :update, :destroy]
+  before_filter :find_and_authorize_requested_item, :only => [:show, :edit, :update, :destroy]
 
   before_filter :get_strains_for_organism,:only=>[:existing_strains_for_assay_organism]
 

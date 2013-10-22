@@ -253,7 +253,7 @@ class ApplicationController < ActionController::Base
   end
 
   #handles finding and authorizing an asset for all controllers that require authorization, and handling if the item cannot be found
-  def find_and_auth
+  def find_and_authorize_requested_item
     begin
       name = self.controller_name.singularize
       action = translate_action(action_name)
