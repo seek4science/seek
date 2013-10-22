@@ -1,4 +1,14 @@
-<%= form_for(@workflow, :html => { :multipart => true } ) do |f| -%>
+<p>
+<ul class="sectionIcons">
+  <li>
+    <%= delete_icon(@workflow, current_user) %>
+  </li>
+  <li>
+    <%= share_icon %>
+  </li>
+</ul><p>
+  <%= form_for(@workflow, :html => {:multipart => true}) do |f| -%>
+      <!-- Delete button -->
     <div class="asset_form">
       <%= error_messages_for :workflow -%>
       <%= hidden_field_tag 'workflow[title]', 'A workflow' -%>
@@ -15,32 +25,32 @@
           <%= help_icon("Here you can specify the category this workflow belongs to.") -%>
           Category
         </div>
-        <div class="foldContent" >
-          <%= f.select(:category_id, WorkflowCategory.all.collect {|c| [ c.name, c.id ] }) %>
+        <div class="foldContent">
+          <%= f.select(:category_id, WorkflowCategory.all.collect { |c| [c.name, c.id] }) %>
         </div>
       </div>
 
       <% unless @workflow.new_record? %>
-        <div class="fold" id="sharing_form">
-          <div class="foldTitle">
-            <%= help_icon("Here you can select the input and output types of the workflow.") -%>
-            Input and Output Types
+          <div class="fold" id="sharing_form">
+            <div class="foldTitle">
+              <%= help_icon("Here you can select the input and output types of the workflow.") -%>
+              Input and Output Types
+            </div>
+            <div class="foldContent">
+              <%= render :partial => 'port_type_table', :locals => {:f => f} %>
+            </div>
           </div>
-          <div class="foldContent" >
-            <%= render :partial => 'port_type_table', :locals => {:f => f} %>
-          </div>
-        </div>
       <% end %>
 
       <div style="display: none">
-        <%= render :partial => "projects/project_selector", :locals => { :resource => @workflow } -%>
+        <%= render :partial => "projects/project_selector", :locals => {:resource => @workflow} -%>
       </div>
 
-      <%= fields_for(@workflow) {|form| render :partial=>"assets/asset_form_bottom", :locals=> {:f => form,
-                                                                                                :attribution_enable => false, :creators_enable => false, :show_publications => false, :sharing_enable => !@workflow.new_record? }} -%>
+      <%= fields_for(@workflow) { |form| render :partial => "assets/asset_form_bottom", :locals => {:f => form,
+                                                                                                    :attribution_enable => false, :creators_enable => false, :show_publications => false, :sharing_enable => !@workflow.new_record?, :sharing_link => false} } -%>
 
       <p>
-        <%= preview_permission_popup_link(@workflow)-%>
+        <%= preview_permission_popup_link(@workflow) -%>
         <%= submit_tag @workflow.new_record? ? "Next" : "Save Changes", :id => "workflow_submit_btn", :onclick => "javascript: validateResourceFields(true,'workflow',true); return(false);" -%>
         or
         <%= link_to 'Cancel', workflows_path -%>

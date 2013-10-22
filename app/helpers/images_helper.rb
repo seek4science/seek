@@ -335,6 +335,8 @@ module ImagesHelper
         "logos/taverna_logo.png"
       when "sweep"
         "famfamfam_silk/chart_organisation.png"
+      when "share"
+        "famfamfam_silk/link.png"
     else
       return nil
     end

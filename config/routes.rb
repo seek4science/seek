@@ -445,6 +445,7 @@ SEEK::Application.routes.draw do
 #      get :check_related_items
       get :download
       get :describe_ports
+      post :temp_link
       post :new_version
       post :update_annotations_ajax
 #      get :view_items_in_tab

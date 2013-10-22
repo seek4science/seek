@@ -19,6 +19,13 @@ class WorkflowsController < ApplicationController
 
   end
 
+  def temp_link
+    @workflow = Workflow.find(params[:id])
+    respond_to do |format|
+      format.html { render :partial => "sharing/temp_link" }
+    end
+  end
+
   def run
   end
 

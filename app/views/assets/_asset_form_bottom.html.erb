@@ -18,6 +18,7 @@
    sharing_enable=true if sharing_enable.nil?
    attribution_enable=true if attribution_enable.nil?
    creators_enable=true if creators_enable.nil?
+   sharing_link=true if sharing_link.nil?
 %>
 <% if sharing_enable -%>
     <p>
@@ -44,8 +45,10 @@
                                                                :other_creators => other_creators} -%>
     </p>
 <% end %>
-<% if f.try(:object).try(:is_a?, (Seek::Permissions::CodeBasedAuthorization)) && !f.try(:object).try(:new_record?) %>
-    <%= render :partial => 'assets/special_auth_code_form', :locals => {:f => f}%>
+<% if sharing_link %>
+    <% if f.try(:object).try(:is_a?, (Seek::Permissions::CodeBasedAuthorization)) && !f.try(:object).try(:new_record?) %>
+        <%= render :partial => 'assets/special_auth_code_form', :locals => {:f => f}%>
+    <% end %>
 <% end %>
 <% if show_publications -%>
     <p>
