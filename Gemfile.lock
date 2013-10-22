@@ -135,7 +135,7 @@ GIT
 
 GIT
   remote: git://github.com/myGrid/t2-server-gem
-  revision: 72fba2108e351983bf76df5a3ed18017f72001e3
+  revision: dcbc8a959763a743202e68eb6c076ce6055569b6
   branch: next
   specs:
     t2-server (1.0.0)
@@ -146,7 +146,7 @@ GIT
 
 GIT
   remote: git://github.com/myGrid/taverna-player
-  revision: 068139123a618b991ae00edcb8647e130e1712af
+  revision: d6ae480aeb28d2a7d80a98b0ae2b91cc010f6a9c
   branch: master
   specs:
     taverna-player (0.0.1)

@@ -28,6 +28,10 @@ class Sweep < ActiveRecord::Base
     runs.any? { |run| run.running? }
   end
 
+  def complete?
+    runs.all? { |run| run.complete? }
+  end
+
   def state
     if running?
       'running'
