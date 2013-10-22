@@ -38,7 +38,7 @@ TavernaPlayer.setup do |config|
   config.server_address = "http://localhost:8080/taverna"
   config.server_username = "taverna"
   config.server_password = "taverna"
-  config.server_poll_interval = 5
+  config.server_poll_interval = 1
   config.server_retry_interval = 10
 
   # Taverna Server connection configuration.
