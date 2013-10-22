@@ -38,9 +38,9 @@
       <% data_input_port_names = workflow.input_ports.select { |input| (input.port_type.name == WorkflowInputPortType::DATA) }.collect { |i| i.name } -%>
       <!-- Figure out data inputs from the run -->
       <% run_data_inputs = @run.inputs.select { |input| data_input_port_names.include?(input.name) } %>
-      <h2>Data (<%= run_data_inputs.count -%>)</h2>
+      <h2 style='background-color: #CDDEEF; background-image: url("/public/images/header-bg2.png");'>Data (<%= run_data_inputs.count -%>)</h2>
       <% unless run_data_inputs.blank? -%>
-          <table class="simple" style="width: 100%;">
+          <table class="simple" style="width: 96%; margin-left:2%; margin-right:2%;">
             <% run_data_inputs.each do |b| -%>
                 <tr>
                   <td>
@@ -62,7 +62,7 @@
             <% end %>
           </table>
       <% else %>
-          <p class="none_text">None</p>
+          <p class="none_text" style="margin-left:20px;">None</p>
       <% end %>
 
       <!-- Parameter input port names from the workflow -->
@@ -70,9 +70,9 @@
       <!-- Figure out parameter inputs from the run -->
       <% run_parameter_inputs = @run.inputs.select { |input| parameter_input_port_names.include?(input.name) } %>
       <!-- Figure out parameter inputs from the run -->
-      <h2>Parameters (<%= run_parameter_inputs.count -%>)</h2>
+      <h2 style='background-color: #CDDEEF; background-image: url("/public/images/header-bg2.png");'>Parameters (<%= run_parameter_inputs.count -%>)</h2>
       <% unless run_parameter_inputs.blank? -%>
-          <table class="simple" style="width: 100%;">
+          <table class="simple" style="width: 96%; margin-left:2%; margin-right:2%;">
             <% run_parameter_inputs.each do |b| -%>
                 <tr>
                   <td>
@@ -94,7 +94,7 @@
             <% end %>
           </table>
       <% else %>
-          <p class="none_text">None</p>
+          <p class="none_text" style="margin-left:20px;">None</p>
       <% end %>
 
     </div>
@@ -115,11 +115,11 @@
       <% result_output_port_names = workflow.output_ports.select { |output| (output.port_type.name == WorkflowOutputPortType::RESULT) }.collect { |i| i.name } -%>
       <!-- Figure out result outputs from the run -->
       <% run_result_outputs = @run.outputs.select { |output| result_output_port_names.include?(output.name) } %>
-      <h2>Results (<%= run_result_outputs.count -%>)</h2>
+      <h2 style='background-color: #CDDEEF; background-image: url("/public/images/header-bg2.png");'>Results (<%= run_result_outputs.count -%>)</h2>
       <% unless run_result_outputs.blank? -%>
           <div style="clear: both;"></div>
 
-          <table class="simple" style="width: 100%;">
+          <table class="simple" style="width: 96%; margin-left:2%; margin-right:2%;">
             <% run_result_outputs.each do |b| -%>
                 <tr>
                   <td>
@@ -135,18 +135,18 @@
             <% end %>
           </table>
       <% else %>
-          <p class="none_text">None</p>
+          <p class="none_text" style="margin-left:20px;">None</p>
       <% end %>
 
       <!-- Error/log output port names from the workflow -->
       <% error_log_output_port_names = workflow.output_ports.select { |output| (output.port_type.name == WorkflowOutputPortType::ERROR_LOG) }.collect { |i| i.name } -%>
       <!-- Figure out error/log outputs from the run -->
       <% run_error_log_outputs = @run.outputs.select { |output| error_log_output_port_names.include?(output.name) } %>
-      <h2>Errors/Logs (<%= run_error_log_outputs.count -%>)</h2>
+      <h2 style='background-color: #CDDEEF; background-image: url("/public/images/header-bg2.png");'>Errors/Logs (<%= run_error_log_outputs.count -%>)</h2>
       <% unless run_error_log_outputs.blank? -%>
           <div style="clear: both;"></div>
 
-          <table class="simple" style="width: 100%;">
+          <table class="simple" style="width: 96%; margin-left:2%; margin-right:2%;">
             <% run_error_log_outputs.each do |b| -%>
                 <tr>
                   <td>
@@ -162,7 +162,7 @@
             <% end %>
           </table>
       <% else %>
-          <p class="none_text">None</p>
+          <p class="none_text" style="margin-left:20px;">None</p>
       <% end %>
 
     </div>

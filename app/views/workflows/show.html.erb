@@ -22,15 +22,19 @@
   <% inputs = @workflow.input_ports || [] -%>
   <% outputs = @workflow.output_ports || [] -%>
 
-  <!-- Data inputs -->
-  <% data_inputs = inputs.select { |input| (input.port_type.name == WorkflowInputPortType::DATA) } -%>
+  <!-- Inputs -->
   <div class="fold">
     <div class="foldTitle">
-      Data Inputs (<%= data_inputs.count -%>)
+      Inputs (<%= inputs.count %>)
     </div>
     <div class="foldContent" style="display: none;">
+
+      <!-- Data inputs -->
+      <% data_inputs = inputs.select { |input| (input.port_type.name == WorkflowInputPortType::DATA) } -%>
+      <h2 style='background-color: #CDDEEF; background-image: url("/public/images/header-bg2.png");'>Data
+        (<%= data_inputs.count -%>)</h2>
       <% unless data_inputs.blank? -%>
-          <table class="simple" style="width: 100%;">
+          <table class="simple" style="width: 96%; margin-left:2%; margin-right:2%;">
             <% data_inputs.each do |b| -%>
                 <tr>
                   <td>
@@ -53,20 +57,15 @@
             <% end %>
           </table>
       <% else %>
-          <p class="none_text">None</p>
+          <p class="none_text" style="margin-left:20px;">None</p>
       <% end %>
-    </div>
-  </div>
 
-  <!-- Parameter inputs -->
-  <% paramater_inputs = inputs.select { |input| input.port_type.name == WorkflowInputPortType::PARAMETER } -%>
-  <div class="fold">
-    <div class="foldTitle">
-      Parameter Inputs (<%= paramater_inputs.count -%>)
-    </div>
-    <div class="foldContent" style="display: none;">
+      <!-- Parameter inputs -->
+      <% paramater_inputs = inputs.select { |input| input.port_type.name == WorkflowInputPortType::PARAMETER } -%>
+      <h2 style='background-color: #CDDEEF; background-image: url("/public/images/header-bg2.png");'>Parameters
+        (<%= paramater_inputs.count -%>)</h2>
       <% unless paramater_inputs.blank? -%>
-          <table class="simple" style="width: 100%;">
+          <table class="simple" style="width: 96%; margin-left:2%; margin-right:2%;">
             <% paramater_inputs.each do |b| -%>
                 <tr>
                   <td>
@@ -89,82 +88,83 @@
             <% end %>
           </table>
       <% else %>
-          <p class="none_text">None</p>
+          <p class="none_text" style="margin-left:20px;">None</p>
       <% end %>
+
     </div>
   </div>
 
-  <!-- Result outputs -->
-  <% result_outputs = outputs.select { |output| output.port_type.name == WorkflowOutputPortType::RESULT } -%>
+  <!-- Outputs -->
   <div class="fold">
     <div class="foldTitle">
-      Result Outputs (<%= result_outputs.count -%>)
+      Outputs (<%= outputs.count %>)
     </div>
     <div class="foldContent" style="display: none;">
-      <% unless result_outputs.blank? -%>
-          <table class="simple" style="width: 100%;">
-            <% result_outputs.each do |b| -%>
-                <tr>
-                  <td>
-                    <h3><%= b.name %></h3>
 
-                    <p>
-                      <%= ('<strong>Description: </strong>' + (b.description || '')).html_safe %>
-                    </p>
+    <!-- Result outputs -->
+    <% result_outputs = outputs.select { |output| output.port_type.name == WorkflowOutputPortType::RESULT } -%>
+    <h2 style='background-color: #CDDEEF; background-image: url("/public/images/header-bg2.png");'>Result Outputs
+      (<%= result_outputs.count -%>)</h2>
+    <% unless result_outputs.blank? -%>
+        <table class="simple" style="width: 96%; margin-left:2%; margin-right:2%;">
+          <% result_outputs.each do |b| -%>
+              <tr>
+                <td>
+                  <h3><%= b.name %></h3>
 
-                    <p>
-                      <strong>Example value:</strong>
-                    </p>
-                    <% unless b.example_value.blank? %>
-                        <p>
-                        <pre class="script_example_data_box"><%= b.example_value %></pre>
-                        </p>
-                    <% end %>
-                  </td>
-                </tr>
-            <% end %>
-          </table>
-      <% else %>
-          <p class="none_text">None</p>
-      <% end %>
-    </div>
+                  <p>
+                    <%= ('<strong>Description: </strong>' + (b.description || '')).html_safe %>
+                  </p>
+
+                  <p>
+                    <strong>Example value:</strong>
+                  </p>
+                  <% unless b.example_value.blank? %>
+                      <p>
+                      <pre class="script_example_data_box"><%= b.example_value %></pre>
+                      </p>
+                  <% end %>
+                </td>
+              </tr>
+          <% end %>
+        </table>
+    <% else %>
+        <p class="none_text" style="margin-left:20px;">None</p>
+    <% end %>
+
+    <!-- Error/log outputs -->
+    <% error_log_outputs = outputs.select { |output| output.port_type.name == WorkflowOutputPortType::ERROR_LOG } -%>
+    <h2 style='background-color: #CDDEEF; background-image: url("/public/images/header-bg2.png");'>Error/Log Outputs
+      (<%= error_log_outputs.count -%>)</h2>
+    <% unless error_log_outputs.blank? -%>
+        <table class="simple" style="width: 96%; margin-left:2%; margin-right:2%;">
+          <% error_log_outputs.each do |b| -%>
+              <tr>
+                <td>
+                  <h3><%= b.name %></h3>
+
+                  <p>
+                    <%= ('<strong>Description: </strong>' + (b.description || '')).html_safe %>
+                  </p>
+
+                  <p>
+                    <strong>Example value:</strong>
+                  </p>
+                  <% unless b.example_value.blank? %>
+                      <p>
+                      <pre class="script_example_data_box"><%= b.example_value %></pre>
+                      </p>
+                  <% end %>
+                </td>
+              </tr>
+          <% end %>
+        </table>
+    <% else %>
+        <p class="none_text" style="margin-left:20px;">None</p>
+    <% end %>
+
   </div>
-
-  <!-- Error/log outputs -->
-  <% error_log_outputs = outputs.select { |output| output.port_type.name == WorkflowOutputPortType::ERROR_LOG } -%>
-  <div class="fold">
-    <div class="foldTitle">
-      Error/Log Outputs (<%= error_log_outputs.count -%>)
-    </div>
-    <div class="foldContent" style="display: none;">
-      <% unless error_log_outputs.blank? -%>
-          <table class="simple" style="width: 100%;">
-            <% error_log_outputs.each do |b| -%>
-                <tr>
-                  <td>
-                    <h3><%= b.name %></h3>
-
-                    <p>
-                      <%= ('<strong>Description: </strong>' + (b.description || '')).html_safe %>
-                    </p>
-
-                    <p>
-                      <strong>Example value:</strong>
-                    </p>
-                    <% unless b.example_value.blank? %>
-                        <p>
-                        <pre class="script_example_data_box"><%= b.example_value %></pre>
-                        </p>
-                    <% end %>
-                  </td>
-                </tr>
-            <% end %>
-          </table>
-      <% else %>
-          <p class="none_text">None</p>
-      <% end %>
-    </div>
-  </div>
+</div>
 
   <!-- Interactions -->
   <% interactions = processors.select { |proc| proc.type == 'interaction' } || [] %>
