@@ -41,8 +41,8 @@
         <th>Category</th>
         <th>Type</th>
         <th>State</th>
-        <th>Creation time</th>
-        <th>Finish time</th>
+        <th>Created</th>
+        <th>Finished</th>
         <th>Actions</th>
       </tr>
       </thead>
@@ -50,11 +50,7 @@
       <% runs.each do |run| -%>
         <%
            workflow = Workflow.find(run.workflow_id)
-           if run.is_a?(Sweep)
-             create_time = run.created_at.strftime("%e %b %Y %H:%m:%S %Z")
-           else
-             create_time = run.create_time.blank? ? '' : run.create_time.strftime("%e %b %Y %H:%m:%S %Z")
-           end
+           created_at = run.created_at.strftime("%e %b %Y %H:%m:%S %Z")
 
            if run.is_a?(Sweep)
              finish_time = run.runs.any? {|r| r.finish_time.blank? } ? '' : run.runs.map { |r| r.finish_time }.max.strftime("%e %b %Y %H:%m:%S %Z")
@@ -70,7 +66,7 @@
                     workflow.category.name,
                     run.is_a?(Sweep) ? 'Sweep' : 'Simple',
                     run.state,
-                    create_time,
+                    created_at,
                     finish_time,
                     action_buttons] %>
           <% row.each do |column_data| %>

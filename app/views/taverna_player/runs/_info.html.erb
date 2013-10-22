@@ -24,23 +24,23 @@
 
   <div style="float: left">
     <%
-       create_time = run.create_time.blank? ? '' : run.create_time.strftime("%e %b %Y %H:%m:%S %Z")
-       start_time = run.start_time.blank? ? '' : run.start_time.strftime("%e %b %Y %H:%m:%S %Z")
-       finish_time = run.finish_time.blank? ? '' : run.finish_time.strftime("%e %b %Y %H:%m:%S %Z")
+       created_at = run.created_at.strftime("%e %b %Y %H:%m:%S %Z")
+       start_time = run.start_time.blank? ? 'n/a' : run.start_time.strftime("%e %b %Y %H:%m:%S %Z")
+       finish_time = run.finish_time.blank? ? 'n/a' : run.finish_time.strftime("%e %b %Y %H:%m:%S %Z")
     %>
 
     <p>
-      <b>Create time:</b>
-      <%= create_time %>
+      <b>Created at:</b>
+      <%= created_at %>
     </p>
 
     <p>
-      <b>Start time:</b>
+      <b>Started at:</b>
       <%= start_time %>
     </p>
 
     <p>
-      <b>Finish time:</b>
+      <b>Finished at:</b>
       <%= finish_time %>
     </p>
   </div>
