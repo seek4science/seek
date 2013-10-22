@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20131017123546) do
+ActiveRecord::Schema.define(:version => 20131022125846) do
 
   create_table "activity_logs", :force => true do |t|
     t.string   "action"
@@ -1013,6 +1013,11 @@ ActiveRecord::Schema.define(:version => 20131017123546) do
     t.integer "strain_id"
   end
 
+  create_table "projects_taverna_player_runs", :force => true do |t|
+    t.integer "run_id"
+    t.integer "project_id"
+  end
+
   create_table "projects_workflow_versions", :force => true do |t|
     t.integer "version_id"
     t.integer "project_id"
@@ -1481,10 +1486,21 @@ ActiveRecord::Schema.define(:version => 20131017123546) do
     t.text     "page"
     t.string   "feed_reply"
     t.text     "output_value", :limit => 16777215
+    t.string   "serial"
   end
 
   add_index "taverna_player_interactions", ["run_id"], :name => "index_taverna_player_interactions_on_run_id"
   add_index "taverna_player_interactions", ["unique_id"], :name => "index_taverna_player_interactions_on_unique_id"
+
+  create_table "taverna_player_run_auth_lookup", :force => true do |t|
+    t.integer "user_id"
+    t.integer "asset_id"
+    t.integer "can_view",     :limit => 1
+    t.integer "can_manage",   :limit => 1
+    t.integer "can_edit",     :limit => 1
+    t.integer "can_download", :limit => 1
+    t.integer "can_delete",   :limit => 1
+  end
 
   create_table "taverna_player_run_ports", :force => true do |t|
     t.string   "name"
@@ -1528,6 +1544,11 @@ ActiveRecord::Schema.define(:version => 20131017123546) do
     t.string   "name",                 :default => "None"
     t.integer  "delayed_job_id"
     t.integer  "sweep_id"
+    t.integer  "contributor_id"
+    t.integer  "policy_id"
+    t.string   "contributor_type"
+    t.text     "failure_message"
+    t.integer  "parent_id"
   end
 
   add_index "taverna_player_runs", ["run_id"], :name => "index_taverna_player_runs_on_run_id"

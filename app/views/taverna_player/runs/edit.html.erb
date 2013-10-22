@@ -1,0 +1,23 @@
+<h1>Manage run: <%= @run.name %></h1>
+
+<div class="show_basic">
+  <%= form_for @run, :url => main_app.run_path(@run.id), :method => "put" do |f| -%>
+    <div class="asset_form">
+      <%= error_messages_for :run -%>
+      <p>
+        <b>Name:</b>
+        <%= f.text_field :name, :size => 80 -%>
+      </p>
+
+      <p>
+        <%= render :partial => "assets/sharing_form" -%>
+      </p>
+
+      <p>
+        <%= submit_tag 'Save' -%>
+        or
+        <%= link_to 'Cancel', main_app.run_path(@run) -%>
+      </p>
+    </div>
+  <% end %>
+</div>

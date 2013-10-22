@@ -12,7 +12,7 @@
           </p>
       <% end %>
 
-      <div class="fold" id="sharing_form">
+      <div class="fold">
         <div class="foldTitle">
           <%= help_icon("Here you can specify the category this workflow belongs to.") -%>
           Category
@@ -23,14 +23,13 @@
       </div>
 
       <% unless @workflow.new_record? %>
-          <div class="fold" id="sharing_form">
-            <div class="foldTitle">
-              <%= help_icon("Here you can select the input and output types of the workflow.") -%>
-              Input and Output Types
-            </div>
-            <div class="foldContent">
-              <%= render :partial => 'port_type_table', :locals => {:f => f} %>
-            </div>
+        <div class="fold">
+          <div class="foldTitle">
+            <%= help_icon("Here you can select the input and output types of the workflow.") -%>
+            Input and Output Types
+          </div>
+          <div class="foldContent" >
+            <%= render :partial => 'port_type_table', :locals => {:f => f} %>
           </div>
       <% end %>
 

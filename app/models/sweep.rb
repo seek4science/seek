@@ -24,9 +24,23 @@ class Sweep < ActiveRecord::Base
     runs.all? { |run| run.finished? }
   end
 
-  # HACK - This needs to say something real
-  def state
-    'doing stuff'
+  def running?
+    runs.any? { |run| run.running? }
   end
 
+  def complete?
+    runs.all? { |run| run.complete? }
+  end
+
+  def state
+    if running?
+      'running'
+    elsif finished?
+      'finished'
+    elsif cancelled?
+      'cancelled'
+    else
+      'pending'
+    end
+  end
 end

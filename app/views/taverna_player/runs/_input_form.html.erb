@@ -1,14 +1,11 @@
 <% locked ||= false %>
 
 <% input_data = form.object.new_record? ? nil : form.object.inputs.select { |i| i.name == input[:name] }.last %>
-<h3><%= input[:name] %></h3>
-<p>
+<h3><%= input[:name] %>
   <% unless input[:description].blank? %>
-    <%= input[:description] %>
-  <% else %>
-    <span class="none_text">No description</span>
+    <%= help_icon(input[:description]) -%>
   <% end %>
-</p>
+</h3>
 
 <% if locked %>
   <% unless input_data.value.blank? %>
@@ -37,10 +34,13 @@
     <% end %>
 
     <%= input_fields.hidden_field :name, :value => input[:name] %>
-    <%= input_fields.text_area :value, :value => input_data.try(:value) || input[:example], :rows => 3, :cols => 40 %>
-    <br/>
-    <p>
+    <div class="text_input">
+      <%= input_fields.text_area :value, :value => input_data.try(:value) || input[:example], :rows => 2, :cols => 40, :placeholder => "Enter input here..." %>
+    </div>
+    <div class="file_input">
+      Or select a file...<br/>
       <%= input_fields.file_field :file %>
-    </p>
+    </div>
+    <div style="clear:both"></div>
   <% end %>
 <% end %>

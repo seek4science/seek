@@ -1,7 +1,7 @@
 
-$j("#run-info").replaceWith('<%= escape_javascript(render(:partial => "form", :locals => { :run => @run })) %>');
+$j("#run-info").replaceWith('<%= escape_javascript(render(:partial => "info", :locals => { :run => @run })) %>');
 
-$j("#run-button").replaceWith('<%= escape_javascript(render(:partial => "delete_or_cancel_button", :locals => { :run => @run })) %>');
+$j("#buttons").replaceWith('<%= escape_javascript(render(:partial => "buttons", :locals => { :run => @run })) %>');
 
 <% if @interaction.nil? || @new_interaction %>
   $j("#run-interaction").replaceWith('<%= escape_javascript(render(:partial => "interaction", :locals => { :run => @run, :interaction => @interaction })) %>');
@@ -11,6 +11,9 @@ $j("#run-button").replaceWith('<%= escape_javascript(render(:partial => "delete_
   $j("#run-outputs").replaceWith('<%= escape_javascript(render(:partial => "outputs", :locals => { :run => @run })) %>');
 <% end %>
 
-<% unless @run.finished? || @run.cancelled? %>
+<% unless @run.complete? %>
   $j("#run-poll").replaceWith('<%= escape_javascript(render(:partial => "poll", :locals => { :reload => run_path(@run) })) %>');
+<% else %>
+  $j("#advanced #log_url").replaceWith('<%= escape_javascript(link_to("Taverna Server log", @run.log.url)) %>');
+  $j("#advanced").show();
 <% end %>

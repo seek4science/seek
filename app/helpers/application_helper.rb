@@ -344,7 +344,7 @@ module ApplicationHelper
 
   def favourite_group_popup_link_action_new resource_type=nil
     return link_to_remote_redbox("Create new favourite group",
-      { :url => new_favourite_group_url,
+      { :url => main_app.new_favourite_group_url,
         :failure => "alert('Sorry, an error has occurred.'); RedBox.close();",
         :with => "'resource_type=' + '#{resource_type}'" },
       { #:style => options[:style],
@@ -357,7 +357,7 @@ module ApplicationHelper
   
   def favourite_group_popup_link_action_edit resource_type=nil
     return link_to_remote_redbox("Edit selected favourite group",
-      { :url => edit_favourite_group_url,
+      { :url => main_app.edit_favourite_group_url,
         :failure => "alert('Sorry, an error has occurred.'); RedBox.close();",
         :with => "'resource_type=' + '#{resource_type}' + '&id=' + selectedFavouriteGroup()" },
       { #:style => options[:style],
@@ -370,7 +370,7 @@ module ApplicationHelper
   
   def workgroup_member_review_popup_link resource_type=nil
     return link_to_remote_redbox("<b>Review members, set individual<br/>permissions and add afterwards</b>".html_safe,
-      { :url => review_work_group_url("type", "id", "access_type"),
+      { :url => main_app.review_work_group_url("type", "id", "access_type"),
         :failure => "alert('Sorry, an error has occurred.'); RedBox.close();",
         :with => "'resource_type=' + '#{resource_type}'" },
       { #:style => options[:style],

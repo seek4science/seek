@@ -140,7 +140,7 @@ module Seek
 
         #the name of the lookup table, holding authorisation lookup information, for this given authorised type
         def lookup_table_name
-          "#{self.name.underscore}_auth_lookup"
+          "#{self.table_name.singularize}_auth_lookup" # Changed to handle namespaced models e.g. TavernaPlayer::Run
         end
 
         #removes all entries from the authorization lookup type for this authorized type

@@ -38,6 +38,7 @@ body, html {
   margin: 0;
   padding: 0;
   height: 100%;
+  color: #444;
 }
 
 #ft {
@@ -258,4 +259,28 @@ table.display td {
 
 #workflow_runs_table_wrapper {
   position: static;
+}
+
+div.file_input, div.text_input {
+  float: left;
+}
+
+div.file_input {
+  color: #666;
+  line-height: 1.5;
+}
+
+div.text_input {
+  margin-right: 20px;
+}
+
+div.your_recent {
+  text-align: left;
+  padding: 20px;
+  width: 360px;
+  float: left;
+}
+
+body {
+  text-align: left;
 }

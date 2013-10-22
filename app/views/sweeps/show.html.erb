@@ -1,0 +1,9 @@
+<%= javascript_include_tag 'jquery-1.5.1.min.js' %>
+
+<div class="contribution_title">
+  <h1><%= 'Sweep: ' + @sweep.name -%></h1>
+</div>
+
+<div class="show_basic">
+  <%= render :partial => 'taverna_player/runs/table', :locals => {:runs => @sweep.runs} %>
+</div>

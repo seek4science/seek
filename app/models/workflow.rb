@@ -32,7 +32,9 @@ class Workflow < ActiveRecord::Base
 
   accepts_nested_attributes_for :input_ports, :output_ports
 
-  has_one :content_blob, :as => :asset, :foreign_key => :asset_id, :conditions => Proc.new { ["content_blobs.asset_version =?", version] }
+  has_many :runs, :class_name => "TavernaPlayer::Run", :dependent => :destroy
+
+  has_many :sweeps, :class_name => "Sweep", :dependent => :destroy
 
   explicit_versioning(:version_column => "version") do
     acts_as_versioned_resource
@@ -63,6 +65,10 @@ class Workflow < ActiveRecord::Base
       content_blob.filepath
     end
   end
+
+  searchable(:ignore_attribute_changes_of=>[:updated_at]) do
+    text :title , :description, :category, :uploader
+  end if Seek::Config.solr_enabled
 
   def self.user_creatable?
     true
@@ -95,6 +101,40 @@ class Workflow < ActiveRecord::Base
 
   def self.by_uploader(uid)
     where(:contributor_id => uid, :contributor_type => "User")
+  end
+
+  def self.uploader()
+    if :contributor_type == 'User'
+      return contributor.person.name
+    else
+      return nil
+    end
+  end
+
+  # Related items, like runs and sweeps
+  def collect_related_items
+    related = {'Run' => {}, 'Sweep' => {}}
+
+    related.each_key do |key|
+      related[key][:items] = []
+      related[key][:hidden_items] = []
+      related[key][:hidden_count] = 0
+      related[key][:extra_count] = 0
+    end
+
+    related_types = related.keys
+    related_types.each do |type|
+      method_name = type.underscore.pluralize
+      if self.respond_to? method_name
+        related[type][:items] = self.send method_name
+        if method_name == 'runs'
+          # Remove all runs that belong to a sweep
+          related[type][:items] = related[type][:items].select{ |run| run.sweep_id.blank? }
+        end
+      end
+    end
+
+    related
   end
 
   private

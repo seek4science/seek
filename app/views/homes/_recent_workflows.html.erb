@@ -1,0 +1,13 @@
+<% workflows = Workflow.where(:contributor_id => current_user.id, :contributor_type => 'User').order(:created_at).limit(5) %>
+<div class="your_recent">
+  <h2>Your recent workflows</h2>
+  <% if workflows.empty? %>
+    <span class="none_text">No workflows</span>
+  <% else %>
+    <ul>
+      <% workflows.each do |workflow| %>
+        <li><%= link_to workflow.title, main_app.workflow_path(workflow) -%></li>
+      <% end %>
+    </ul>
+  <% end %>
+</div>
