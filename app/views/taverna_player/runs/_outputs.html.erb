@@ -31,7 +31,7 @@
     <% error_log_output_port_names = run.workflow.output_ports.select { |output| (output.port_type.name == WorkflowOutputPortType::ERROR_LOG) }.collect { |i| i.name } -%>
     <!-- Figure out error/log outputs from the run -->
     <% run_error_log_outputs = run.outputs.select { |output| error_log_output_port_names.include?(output.name) } %>
-    <h2 style='background-color: #CDDEEF; background-image: url("/public/images/header-bg2.png");'>Errors/Logs (<%= run_error_log_outputs.count -%>)</h2>
+    <h2 style='background-color: #CDDEEF; background-image: url("../images/header-bg2.png");'>Errors/Logs (<%= run_error_log_outputs.count -%>)</h2>
     <% unless run_error_log_outputs.blank? -%>
       <div style="clear: both;"></div>
 
