@@ -11,6 +11,7 @@ class DataFilesControllerTest < ActionController::TestCase
   include RestTestCases
   include RdfTestCases
   include SharingFormTestHelper
+  include FunctionalAuthorizationTests
 
   def setup
     login_as(:datafile_owner)

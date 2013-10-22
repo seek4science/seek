@@ -4,7 +4,7 @@ class PeopleController < ApplicationController
   include Seek::Publishing::PublishingCommon
   include Seek::Publishing::GatekeeperPublish
 
-  before_filter :find_and_auth, :only => [:show, :edit, :update, :destroy]
+  before_filter :find_and_authorize_requested_item, :only => [:show, :edit, :update, :destroy]
   before_filter :current_user_exists,:only=>[:select,:userless_project_selected_ajax,:create,:new]
   before_filter :is_user_admin_auth,:only=>[:destroy]
   before_filter :is_user_admin_or_personless, :only=>[:new]

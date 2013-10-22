@@ -5,7 +5,7 @@ class AssaysController < ApplicationController
   include Seek::AnnotationCommon
 
   before_filter :find_assets, :only=>[:index]
-  before_filter :find_and_auth, :only=>[:edit, :update, :destroy, :show]
+  before_filter :find_and_authorize_requested_item, :only=>[:edit, :update, :destroy, :show]
 
   include Seek::Publishing::PublishingCommon
 

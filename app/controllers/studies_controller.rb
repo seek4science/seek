@@ -4,7 +4,7 @@ class StudiesController < ApplicationController
   include IndexPager
 
   before_filter :find_assets, :only=>[:index]
-  before_filter :find_and_auth, :only=>[:edit, :update, :destroy, :show]
+  before_filter :find_and_authorize_requested_item, :only=>[:edit, :update, :destroy, :show]
 
   before_filter :check_assays_are_not_already_associated_with_another_study,:only=>[:create,:update]
 

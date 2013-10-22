@@ -49,7 +49,7 @@ class SearchController < ApplicationController
             search_result = source.search do |query|
               query.keywords(downcase_query)
             end.results
-            search_result = search_result.sort_by(&:published_date).reverse if source == Publication
+            search_result = search_result.sort_by(&:published_date).reverse if source == Publication && Seek::Config.is_virtualliver
             @results |= search_result
           end
       else

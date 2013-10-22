@@ -1,6 +1,6 @@
 class EventsController < ApplicationController
   #before_filter :login_required
-  before_filter :find_and_auth, :except =>  [ :index, :new, :create, :preview]
+  before_filter :find_and_authorize_requested_item, :except =>  [ :index, :new, :create, :preview]
 
   before_filter :find_assets
 

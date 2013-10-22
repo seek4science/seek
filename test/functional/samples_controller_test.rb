@@ -5,6 +5,7 @@ class SamplesControllerTest < ActionController::TestCase
   include AuthenticatedTestHelper
   include RestTestCases
   include RdfTestCases
+  include FunctionalAuthorizationTests
 
   # Called before every test method runs. Can be used
   # to set up fixture information.
