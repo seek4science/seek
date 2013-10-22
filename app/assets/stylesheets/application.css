@@ -1,30 +1,20 @@
 /* ...
-* require_tree .
-* require_tree ../../../vendor/assets/stylesheets/
-
-*= require top_menu
-*= require styles
-*= require gadgets
 *= require reset-fonts-grids
 *= require base-min
 *= require my_exp
-*= require dynamic_menu
-*= require favourites
-*= require site_announcements
-
-*= require homepage
-*= require jscrollpane/jquery.jscrollpane
-
 *= require folds
-
+*= require gadgets
 *= require acts_as_taggable_stylesheet
-
-
+*= require styles
+*= require favourites
 *= require fast_auto_complete
-*= require redbox
+* require redbox
 *= require autocompleter_advanced
 *= require alphabetical_pagination
+*= require savage_beast/forums
+*= require site_announcements
 *= require tabnav
-
-
+*= require top_menu
+*= require dynamic_menu
+*= require local
 */

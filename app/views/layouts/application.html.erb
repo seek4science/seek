@@ -11,8 +11,8 @@
 
   <%= csrf_meta_tag %>
 
-  <%= javascript_include_tag 'application' %>
   <%= stylesheet_link_tag 'application' %>
+  <%= javascript_include_tag 'application' %>
 
   <%#= javascript_include_tag 'savage_beast/application.js' -%>
   <%#= javascript_include_tag 'prototype.js','prototype_ujs.js', 'effects.js', 'dragdrop.js', 'boxover.js', 'scriptaculous.js', 'controls.js', 'redbox.js', 'builder.js', 'application.js', 'tagging.js', 'autocompleter_advanced.js', 'publication.js','top_menu.js','dynamic_menu.js', :cache=>'js_cached' %>
@@ -98,8 +98,8 @@
 </div>
 
 <%# NB! These javascript include should be here - otherwise folds / tabs will not be displayed on any pages. -%>
-<%#= javascript_include_tag "folds.js" %>
-<%#= javascript_include_tag "tabber-minimized.js" %>
+<%= javascript_include_tag "folds.js" %>
+<%= javascript_include_tag "tabber-minimized.js" %>
 
 <%= piwik_tracking_tag %>
 </body>

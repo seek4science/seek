@@ -1,10 +1,10 @@
-<%#= javascript_include_tag 'sharing.js'%>
+<%= javascript_include_tag 'sharing.js'%>
 <h1>Administer <%= t('project') %>: <%= link_to h(@project.name), project_path(@project) -%></h1>
 
 <div class="show_basic">
   <%= form_for(@project) do |f| -%>
 
-    <%#= javascript_include_tag "projects.js" %>
+    <%= javascript_include_tag "projects.js" %>
   
     <%= f.hidden_field :avatar_id -%>
   

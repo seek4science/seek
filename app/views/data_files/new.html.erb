@@ -1,4 +1,4 @@
-<%#= javascript_include_tag "sharing.js","associate_events.js","assays.js","attribution.js","resource.js" -%>
+<%= javascript_include_tag "sharing.js","associate_events.js","assays.js","attribution.js","resource.js" -%>
 <% @page_title ||= "New #{t('data_file')}" %>
 <h1><%= @page_title %></h1>
 <% all_institutions = Institution.order(:name) %>

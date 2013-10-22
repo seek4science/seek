@@ -1,12 +1,7 @@
 <!-- Required CSS -->
-<%#= stylesheet_link_tag "yui/treeview/treeview" -%>
-<%#= stylesheet_link_tag "yui/treeview/calendar" -%>
-
+<%= stylesheet_link_tag "yui/index" -%>
 
 <!-- Dependency source file -->
-<%#= javascript_include_tag "yui/yahoo-dom-event","yui/animation-min","yui/calendar-min","yui/json-min","yui/treeview-min", :cache=>"yui_tree_js_cached" -%>
+<%= javascript_include_tag "yui/index" -%>
 
-<!-- for folder icon view -->
-<%#= stylesheet_link_tag "yui/treeview/tree" -%>
-
-<%#= stylesheet_link_tag "project_folders" -%>
+<%= stylesheet_link_tag "project_folders" -%>

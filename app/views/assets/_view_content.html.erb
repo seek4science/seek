@@ -1,11 +1,11 @@
-<%#= javascript_include_tag 'detect_browser' %>
+<%= javascript_include_tag 'detect_browser' %>
 <% asset = content_blob.asset
    button_style ||= false
    if Seek::Util.inline_viewable_content_types.include?(asset.class) %>
     <%# those libs have been loaded for Model %>
     <% unless asset.is_a?(Model) %>
-        <%#= javascript_include_tag "zoom/lightbox" %>
-        <%#= stylesheet_link_tag "lightbox" %>
+        <%= javascript_include_tag "zoom/lightbox" %>
+        <%= stylesheet_link_tag "lightbox" %>
     <% end %>
 
     <% is_inline_viewable = content_blob.is_content_viewable? %>
