@@ -23,7 +23,73 @@ SEEK::Application.configure do
 
   # Generate digests for assets URLs
   config.assets.digest = true
-  #config.assets.precompile += %w( jquery-1.5.1.min.js jscrollpane/jquery.jscrollpane.min.js jscrollpane/jquery.mousewheel.js jscrollpane/jquery.jscrollpane.css )
+  config.assets.precompile += %w(
+                                  admin.js
+                                  assays.js
+                                  associate_events.js
+                                  attribution.js
+                                  batch_upload.js
+                                  bioportal_form_complete.js
+                                  biosample.js
+                                  detect_browser.js
+                                  fancy_multiselect.js
+                                  folds.js
+                                  isa_graph.js
+                                  jws/index.js
+                                  link_adder.js
+                                  models.js
+                                  people.js
+                                  project_folders.js
+                                  projects.js
+                                  publishing.js
+                                  resource.js
+                                  scales/scales.js
+                                  sharing.js
+                                  spreadsheet_explorer.js
+                                  spreadsheet_explorer_plot.js
+                                  strain.js
+                                  studied_factor.js
+                                  calendar_date_select/index.js
+                                  cytoscape.js-2.0.2/index.js
+                                  cytoscape_web/index.js
+                                  DataTables-1.8.2/index.js
+                                  dropMenu.js
+                                  dygraph-combined.js
+                                  flot/index.js
+                                  jquery-1.5.1.min.js
+                                  jquery-ui-1.8.14.custom.min.js
+                                  jscrollpane/index.js
+                                  parseuri.js
+                                  pdfjs/index.js
+                                  slider.js
+                                  sound.js
+                                  swfobject.js
+                                  tabber-minimized.js
+                                  yui/index.js
+                                  zoom/index.js
+                                  asset_report.css
+                                  batch_upload.css
+                                  biosamples.css
+                                  full_scroll_table.css
+                                  homepage.css
+                                  isa_graph.css
+                                  jws/index.css
+                                  match_making.css
+                                  project_folders.css
+                                  publishing.css
+                                  scaffold.css
+                                  scales/scales.css
+                                  settings.css
+                                  spreadsheet_explorer.css
+                                  calendar_date_select/index.css
+                                  cytoscape.js-2.0.2/index.css
+                                  data_tables.css
+                                  jquery-ui-1.8.14.custom.css
+                                  jscrollpane/jquery.jscrollpane.css
+                                  lightbox.css
+                                  pdfjs/viewer.css
+                                  yui/index.css
+                                )
 
   #The X-Sendfile header is a directive to the web server to ignore the response from the application,
   #and instead serve a specified file from disk
