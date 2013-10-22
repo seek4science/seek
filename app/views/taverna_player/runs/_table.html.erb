@@ -51,7 +51,7 @@
         <%
            workflow = Workflow.find(run.workflow_id)
            if run.is_a?(Sweep)
-             create_time = run.created_at
+             create_time = run.created_at.strftime("%e %b %Y %H:%m:%S %Z")
            else
              create_time = run.create_time.blank? ? '' : run.create_time.strftime("%e %b %Y %H:%m:%S %Z")
            end
