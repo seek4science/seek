@@ -170,7 +170,7 @@
                 <ul style="text-align: left; margin: 1em 0 0.5em 3.2em;">
                   <li id="edit_f_group_li" style="display: <%= favourite_groups.blank? ? "none" : "block" -%>; list-style-type: disc; padding: 0;"><%= favourite_group_popup_link_action_edit(@resource.class.name) -%></li>
                   <li id="delete_f_group_li" style="display: <%= favourite_groups.blank? ? "none" : "block" -%>; list-style-type: disc; padding: 0;">
-                    <%= link_to "Delete selected favourite group", delete_favourite_group_path(0), :onclick => "deleteSelectedFavouriteGroup(); return(false);" -%>
+                    <%= link_to "Delete selected favourite group", main_app.delete_favourite_group_path(0), :onclick => "deleteSelectedFavouriteGroup(); return(false);" -%>
                   </li>
                   <li id="create_f_group_li" style="list-style-type: disc; padding: 0.5em 0 0 0;"><%= favourite_group_popup_link_action_new(@resource.class.name) -%></li>
 
@@ -333,13 +333,13 @@
 <script type="text/javascript">
   init_sharing();
 
-  GET_INSTITUTIONS_LINK = '<%= request_institutions_projects_path -%>';
-  GET_ALL_INSTITUTIONS_LINK = '<%= request_all_institutions_path -%>';
+  GET_INSTITUTIONS_LINK = '<%= main_app.request_institutions_projects_path -%>';
+  GET_ALL_INSTITUTIONS_LINK = '<%= main_app.request_all_institutions_path -%>';
 
-  CREATE_FAVOURITE_GROUP_LINK = '<%= create_favourite_group_path -%>';
-  UPDATE_FAVOURITE_GROUP_LINK = '<%= update_favourite_group_path -%>';
+  CREATE_FAVOURITE_GROUP_LINK = '<%= main_app.create_favourite_group_path -%>';
+  UPDATE_FAVOURITE_GROUP_LINK = '<%= main_app.update_favourite_group_path -%>';
 
-  REVIEW_WORK_GROUP_LINK = '<%= review_work_group_path("type", "id", "access_type") -%>';
+  REVIEW_WORK_GROUP_LINK = '<%= main_app.review_work_group_path("type", "id", "access_type") -%>';
 
   PROJECT_TRANSLATED_TERM = "<%= t('project') -%>";
 

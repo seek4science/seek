@@ -3,7 +3,6 @@ module TavernaPlayer
     include TavernaPlayer::Concerns::Controllers::RunsController
 
     before_filter :find_workflow_and_version, :only => :new
-    before_filter :set_user, :only => :create
     before_filter :find_runs, :only => :index
     before_filter :add_sweeps, :only => :index
 
@@ -17,24 +16,42 @@ module TavernaPlayer
       end
     end
 
-    def update
-      new_name = params[:run_name]
+    def edit
+      @run = Run.find(params[:id])
+    end
 
-      # Name cannot be blank - show the erro message to the user
-      if new_name.blank?
-        flash[:error] = 'Run name cannot be blank.'
-        flash[:notice] = nil
-      # If the new name is the same as the current run name - do nothing
-      elsif new_name != @run.name
-        @run.name = new_name
-        @run.save!
-        flash[:notice] = 'Run name updated.'
-        flash[:error] = nil
+    def update
+      @run.attributes = params[:run]
+
+      if params[:sharing]
+        @run.policy_or_default
+        @run.policy.set_attributes_with_sharing params[:sharing], @run.projects
       end
 
+      if @run.save
+        respond_to do |format|
+          # Render show.html.erb unless the run is embedded.
+          format.html { render "taverna_player/runs/show" }
+        end
+      else
+        puts @run.errors.full_messages
+        respond_to do |format|
+          format.html { render "taverna_player/runs/edit" }
+        end
+      end
+    end
+
+    # POST /runs
+    def create
+      @run = Run.new(params[:run])
+      @run.policy.set_attributes_with_sharing params[:sharing], @run.projects
+
       respond_to do |format|
-        # Render show.html.erb unless the run is embedded.
-        format.html { render "taverna_player/runs/show" }
+        if @run.save
+          format.html { redirect_to @run, :notice => 'Run was successfully created.' }
+        else
+          format.html { render :action => "new" }
+        end
       end
     end
 
@@ -56,19 +73,16 @@ module TavernaPlayer
       end
     end
 
-    def set_user
-      params[:run][:user_id] = current_user.id
-    end
-
     def find_runs
       select = params[:workflow_id] ? { :workflow_id => params[:workflow_id] } : {}
       @runs = Run.where(select).includes(:sweep).all
+      @runs = @runs & Run.all_authorized_for('view', current_user)
     end
 
     # Returns a list of simple Run objects and Sweep objects
     def add_sweeps
       @runs = @runs.group_by { |run| run.sweep }
-      @runs = @runs[nil] + @runs.keys
+      @runs = (@runs[nil] || []) + @runs.keys
       @runs.compact! # to ignore 'nil' key
     end
   end

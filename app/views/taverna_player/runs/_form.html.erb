@@ -1,8 +1,9 @@
 <div id="run-info">
   <%= form_for run, :url => main_app.run_path(run.id), :method => "put" do |f| -%>
       <p>
+        <%= error_messages_for :run -%>
         <b>Name:</b>
-        <%= text_field_tag 'run_name', run.name, :size => 80 -%>
+        <%= f.text_field :name, :size => 80 -%>
         <%= submit_tag('Save') -%>
       </p>
   <% end %>

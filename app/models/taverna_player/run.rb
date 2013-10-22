@@ -5,10 +5,16 @@ module TavernaPlayer
     include TavernaPlayer::Concerns::Models::Run
     # Extend the Run model here.
 
+    validates_presence_of :name
+
     belongs_to :sweep
 
     belongs_to :user
 
     attr_accessible :user_id
+
+    acts_as_authorized
+    belongs_to :policy
+    scope :default_order, order('created_at')
   end
 end

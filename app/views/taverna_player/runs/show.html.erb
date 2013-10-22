@@ -1,5 +1,3 @@
-<%= javascript_include_tag 'jquery-1.5.1.min.js' %>
-
 <% workflow = Workflow.find(@run.workflow_id) %>
 
 <div class="contribution_title">
@@ -14,6 +12,9 @@
       <%= render :partial => "delete_or_cancel_button", :locals => { :run => @run } %>
       <% if @run.finished? %>
           <li><%= image_tag_for_key('sweep', main_app.new_sweep_path(:run_id => @run.id), nil, nil, "Data sweep based on this run") -%></li>
+          <% if @run.can_manage? -%>
+              <li><%= image_tag_for_key('manage', main_app.edit_run_path(@run), nil, nil, "Manage run") -%></li>
+          <% end -%>
       <% end %>
     </ul>
   </div>
