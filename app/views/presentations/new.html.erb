@@ -1,4 +1,4 @@
-<%#= javascript_include_tag "sharing.js", "assays.js","attribution.js","resource.js" -%>
+<%= javascript_include_tag "sharing.js", "assays.js","attribution.js","resource.js" -%>
 <h1>New <%= t('presentation') %></h1>
 <div class="show_basic">
     <%= form_tag({:action => :create}, :multipart => true) do -%>

@@ -27,8 +27,8 @@ limitations under the License.
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
     <style id="PDFJS_FONT_STYLE_TAG"></style>
-  <%#= javascript_include_tag 'pdfjs/compatibility.js', 'pdfjs/debugger.js', 'pdfjs/l10n.js', 'pdfjs/pdf.js', 'pdfjs/viewer.js', :cache=>"pdfjs_cached"%>
-  <%#= stylesheet_link_tag 'pdfjs/viewer'%>
+  <%= javascript_include_tag 'pdfjs/compatibility.js', 'pdfjs/debugger.js', 'pdfjs/l10n.js', 'pdfjs/pdf.js', 'pdfjs/viewer.js', :cache=>"pdfjs_cached"%>
+  <%= stylesheet_link_tag 'pdfjs/viewer'%>
 
   <script type="text/javascript">
       DEFAULT_URL = '<%= @pdf_url %>'
