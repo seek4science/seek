@@ -57,7 +57,6 @@ class SweepsController < ApplicationController
     run = params[:sweep].delete(:run)
     params[:sweep][:runs_attributes].each do |run_id, run_attributes|
       run_attributes[:workflow_id] = params[:sweep][:workflow_id]
-      run_attributes[:user_id] = current_user.id
       run_attributes[:name] = "#{params[:sweep][:name]} ##{run_id.to_i + 1}"
       # Copy parameters from "parent" run
       base_index = run_attributes[:inputs_attributes].keys.map {|k| k.to_i}.max + 1
