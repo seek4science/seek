@@ -37,7 +37,7 @@ module RestTestCases
       item = Factory itemname.to_sym, :policy => Factory(:private_policy)
 
       logout
-      get :show,:id=>item.id,:format=>"rdf"
+      get :show,:id=>item.id,:format=>"xml"
       assert_response :forbidden
     end
   end
@@ -50,7 +50,7 @@ module RestTestCases
     end
 
     logout
-    get :show,:id=>id,:format=>"rdf"
+    get :show,:id=>id,:format=>"xml"
     assert_response :not_found
   end
   
