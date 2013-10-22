@@ -127,11 +127,15 @@ class Workflow < ActiveRecord::Base
       method_name = type.underscore.pluralize
       if self.respond_to? method_name
         related[type][:items] = self.send method_name
+        if method_name == 'runs'
+          # Remove all runs that belong to a sweep
+          related[type][:items] = related[type][:items].select{ |run| run.sweep_id.blank? }
+        end
       end
     end
 
     related
-    end
+  end
 
   private
 
