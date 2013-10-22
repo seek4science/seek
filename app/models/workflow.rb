@@ -32,8 +32,6 @@ class Workflow < ActiveRecord::Base
 
   accepts_nested_attributes_for :input_ports, :output_ports
 
-  has_one :content_blob, :as => :asset, :foreign_key => :asset_id, :conditions => Proc.new { ["content_blobs.asset_version =?", version] }
-
   has_many :runs, :class_name => "TavernaPlayer::Run", :dependent => :destroy
 
   has_many :sweeps, :class_name => "Sweep", :dependent => :destroy
@@ -68,6 +66,10 @@ class Workflow < ActiveRecord::Base
     end
   end
 
+  searchable(:ignore_attribute_changes_of=>[:updated_at]) do
+    text :title , :description, :category, :uploader
+  end if Seek::Config.solr_enabled
+
   def self.user_creatable?
     true
   end
@@ -99,6 +101,14 @@ class Workflow < ActiveRecord::Base
 
   def self.by_uploader(uid)
     where(:contributor_id => uid, :contributor_type => "User")
+  end
+
+  def self.uploader()
+    if :contributor_type == 'User'
+      return contributor.person.name
+    else
+      return nil
+    end
   end
 
   # Related items, like runs and sweeps
