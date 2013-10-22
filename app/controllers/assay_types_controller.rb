@@ -1,7 +1,6 @@
 class AssayTypesController < ApplicationController
 
   def show
-    @assay_type = AssayType.find(params[:id])
     respond_to do |format|
       format.html
       format.xml

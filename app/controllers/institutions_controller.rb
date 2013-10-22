@@ -1,8 +1,9 @@
 class InstitutionsController < ApplicationController
+
   include WhiteListHelper
   include IndexPager
   include CommonSweepers
-  
+
   before_filter :find_assets, :only=>[:index]
   before_filter :is_user_admin_auth, :only => [:destroy]
   before_filter :editable_by_user, :only=>[:edit,:update]
@@ -14,8 +15,6 @@ class InstitutionsController < ApplicationController
   # GET /institutions/1
   # GET /institutions/1.xml
   def show
-    @institution = Institution.find(params[:id])
-
     respond_to do |format|
       format.html # show.html.erb
       format.rdf { render :template=>'rdf/show'}

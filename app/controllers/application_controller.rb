@@ -12,6 +12,7 @@ class ApplicationController < ActionController::Base
 
   before_filter :log_extra_exception_data
 
+
   after_filter :log_event
 
   include AuthenticatedSystem
@@ -26,6 +27,8 @@ class ApplicationController < ActionController::Base
   before_filter :profile_for_login_required
 
   before_filter :project_membership_required,:only=>[:create,:new]
+
+  before_filter :find_item, :only=>[:show,:edit,:admin,:destroy]
 
   helper :all
 
@@ -234,6 +237,24 @@ class ApplicationController < ActionController::Base
     end
   end
 
+  #hanles finding an asset, and responding when it cannot be found. If it can be found the item instance is set (e.g. @project for projects_controller)
+  def find_item
+    name = self.controller_name.singularize
+    object = name.camelize.constantize.find_by_id(params[:id])
+    if (object.nil?)
+      respond_to do |format|
+        flash[:error] = "The #{name.humanize} does not exist!"
+        format.rdf { render  :text=>"Not found",:status => :not_found }
+        format.xml { render  :text=>"<error>404 Not found</error>",:status => :not_found }
+        format.json { render :text=>"Not found", :status => :not_found }
+        format.html { redirect_to eval "#{self.controller_name}_path" }
+      end
+    else
+      eval "@#{name} = object"
+    end
+  end
+
+  #handles finding and authorizing an asset for all controllers that require authorization, and handling if the item cannot be found
   def find_and_auth
     begin
       name = self.controller_name.singularize

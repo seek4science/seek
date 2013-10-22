@@ -1,4 +1,5 @@
 class CompoundsController < ApplicationController
+
   before_filter :login_required
   before_filter :is_user_admin_auth
   before_filter :find_all_compounds
@@ -55,7 +56,6 @@ class CompoundsController < ApplicationController
    end
 
    def show
-     @compound = Compound.find(params[:id])
      respond_to do |format|
        format.rdf { render :template=>'rdf/show'}
      end
