@@ -1,21 +1,75 @@
-
 <div id="run-inputs">
-  <h2>Inputs</h2>
+  <% if @run.inputs.any? %>
+    <div class="fold">
+      <div class="foldTitle">
+        Inputs
+      </div>
+      <div class="foldContent" style="display: none;">
 
-  <% run.inputs.each do |input| %>
-    <p>
-      <b>Name:</b>
-      <%= input.name %>
-    </p>
+        <!-- Data input port names from the workflow -->
+        <% data_input_port_names = run.workflow.input_ports.select { |input| (input.port_type.name == WorkflowInputPortType::DATA) }.collect { |i| i.name } -%>
+        <!-- Figure out data inputs from the run -->
+        <% run_data_inputs = run.inputs.select { |input| data_input_port_names.include?(input.name) } %>
+        <h2 style='background-color: #CDDEEF; background-image: url("/public/images/header-bg2.png");'>Data (<%= run_data_inputs.count -%>)</h2>
+        <% unless run_data_inputs.blank? -%>
+          <table class="simple" style="width: 96%; margin-left:2%; margin-right:2%;">
+            <% run_data_inputs.each do |b| -%>
+              <tr>
+                <td>
+                  <h3><%= b.name %></h3>
 
-    <p>
-      <b>Value:</b>
-      <%= input.value %>
-    </p>
+                  <p>
+                    <strong>Value:</strong>
+                  </p>
+                  <% unless b.value.blank? %>
+                    <p>
+                    <pre class="script_example_data_box"><%= b.value %></pre>
+                    </p>
+                  <% end %>
+                  <% unless b.file_file_name.blank? %>
+                    <p><%= link_to b.file_file_name, b.file.url %></p>
+                  <% end %>
+                </td>
+              </tr>
+            <% end %>
+          </table>
+        <% else %>
+          <p class="none_text" style="margin-left:20px;">None</p>
+        <% end %>
 
-    <p>
-      <b>File:</b>
-      <%= link_to input.file_file_name, input.file.url %>
-    </p>
-  <% end%>
+        <!-- Parameter input port names from the workflow -->
+        <% parameter_input_port_names = run.workflow.input_ports.select { |input| (input.port_type.name == WorkflowInputPortType::PARAMETER) }.collect { |i| i.name } -%>
+        <!-- Figure out parameter inputs from the run -->
+        <% run_parameter_inputs = run.inputs.select { |input| parameter_input_port_names.include?(input.name) } %>
+        <!-- Figure out parameter inputs from the run -->
+        <h2 style='background-color: #CDDEEF; background-image: url("/public/images/header-bg2.png");'>Parameters (<%= run_parameter_inputs.count -%>)</h2>
+        <% unless run_parameter_inputs.blank? -%>
+          <table class="simple" style="width: 96%; margin-left:2%; margin-right:2%;">
+            <% run_parameter_inputs.each do |b| -%>
+              <tr>
+                <td>
+                  <h3><%= b.name %></h3>
+
+                  <p>
+                    <strong>Value:</strong>
+                  </p>
+                  <% unless b.value.blank? %>
+                    <p>
+                    <pre class="script_example_data_box"><%= b.value %></pre>
+                    </p>
+                  <% end %>
+                  <% unless b.file_file_name.blank? %>
+                    <p><%= link_to b.file_file_name, b.file.url %></p>
+                  <% end %>
+                </td>
+              </tr>
+            <% end %>
+          </table>
+        <% else %>
+          <p class="none_text" style="margin-left:20px;">None</p>
+        <% end %>
+
+      </div>
+    </div>
+  <% end %>
 </div>

@@ -280,3 +280,7 @@ div.your_recent {
   width: 360px;
   float: left;
 }
+
+body {
+  text-align: left;
+}
