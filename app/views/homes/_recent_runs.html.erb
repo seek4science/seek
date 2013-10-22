@@ -1,4 +1,4 @@
-<% runs = TavernaPlayer::Run.where(:user_id => current_user.id).order(:created_at).limit(5) %>
+<% runs = TavernaPlayer::Run.by_owner(current_user.id).order(:created_at).limit(5) %>
 <div class="your_recent">
   <h2>Your recent runs</h2>
   <% if runs.empty? %>

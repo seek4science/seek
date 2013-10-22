@@ -16,5 +16,9 @@ module TavernaPlayer
     acts_as_authorized
     belongs_to :policy
     scope :default_order, order('created_at')
+
+    def self.by_owner(uid)
+      where(:contributor_id => uid, :contributor_type => "User")
+    end
   end
 end
