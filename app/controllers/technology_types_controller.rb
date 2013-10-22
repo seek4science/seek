@@ -1,4 +1,5 @@
 class TechnologyTypesController < ApplicationController
+  before_filter :find_requested_item, :only=>[:show]
 
   def show
     respond_to do |format|

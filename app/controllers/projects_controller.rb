@@ -5,6 +5,7 @@ class ProjectsController < ApplicationController
   include IndexPager
   include CommonSweepers
 
+  before_filter :find_requested_item, :only=>[:show,:admin, :edit,:update, :destroy]
   before_filter :find_assets, :only=>[:index]
   before_filter :is_user_admin_auth, :except=>[:index, :show, :edit, :update, :request_institutions, :admin, :asset_report, :view_items_in_tab]
   before_filter :editable_by_user, :only=>[:edit,:update]
@@ -45,7 +46,6 @@ class ProjectsController < ApplicationController
   end
 
   def admin
-    @project = Project.find(params[:id])
     
     respond_to do |format|
       format.html # admin.html.erb
@@ -96,7 +96,6 @@ class ProjectsController < ApplicationController
 
   # GET /projects/1/edit
   def edit
-    @project = Project.find(params[:id])
     
     possible_unsaved_data = "unsaved_#{@project.class.name}_#{@project.id}".to_sym
     if session[possible_unsaved_data]
@@ -148,8 +147,6 @@ class ProjectsController < ApplicationController
   # PUT /projects/1
   # PUT /projects/1.xml
   def update
-    @project = Project.find(params[:id])
-    #@project.work_groups.each{|wg| wg.destroy} if params[:project][:institutions].nil?
     
     # extra check required to see if any avatar was actually selected (or it remains to be the default one)
     avatar_id = params[:project].delete(:avatar_id).to_i
@@ -180,8 +177,6 @@ class ProjectsController < ApplicationController
   # DELETE /projects/1
   # DELETE /projects/1.xml
   def destroy
-    @project = Project.find(params[:id])
-
     respond_to do |format|
       if @project.can_delete?
         @project.destroy

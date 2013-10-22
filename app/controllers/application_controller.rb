@@ -28,8 +28,6 @@ class ApplicationController < ActionController::Base
 
   before_filter :project_membership_required,:only=>[:create,:new]
 
-  before_filter :find_item, :only=>[:show,:edit,:admin,:destroy]
-
   helper :all
 
   def strip_root_for_xml_requests
@@ -238,7 +236,7 @@ class ApplicationController < ActionController::Base
   end
 
   #hanles finding an asset, and responding when it cannot be found. If it can be found the item instance is set (e.g. @project for projects_controller)
-  def find_item
+  def find_requested_item
     name = self.controller_name.singularize
     object = name.camelize.constantize.find_by_id(params[:id])
     if (object.nil?)

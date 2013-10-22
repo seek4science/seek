@@ -1,5 +1,6 @@
 class OrganismsController < ApplicationController
-  
+
+  before_filter :find_requested_item, :only=>[:show,:edit,:update, :destroy]
   before_filter :login_required,:except=>[:show,:index,:visualise]
   before_filter :is_user_admin_auth,:only=>[:edit,:update,:new,:create,:destroy]
   before_filter :find_item,:only=>[:show,:edit,:more_ajax,:visualise,:destroy]
@@ -89,7 +90,6 @@ class OrganismsController < ApplicationController
   end
   
   def update
-    @organism = Organism.find(params[:id])
 
     respond_to do |format|
       if @organism.update_attributes(params[:organism])
