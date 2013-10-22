@@ -49,7 +49,7 @@ SEEK::Application.configure do
                                   spreadsheet_explorer_plot.js
                                   strain.js
                                   studied_factor.js
-                                  calendar_date_select/index.js
+                                  calendar_date_select/calendar_date_select
                                   cytoscape.js-2.0.2/index.js
                                   cytoscape_web/index.js
                                   DataTables-1.8.2/index.js
@@ -66,7 +66,7 @@ SEEK::Application.configure do
                                   swfobject.js
                                   tabber-minimized.js
                                   yui/index.js
-                                  zoom/index.js
+                                  zoom/lightbox.js
                                   asset_report.css
                                   batch_upload.css
                                   biosamples.css
@@ -81,7 +81,7 @@ SEEK::Application.configure do
                                   scales/scales.css
                                   settings.css
                                   spreadsheet_explorer.css
-                                  calendar_date_select/index.css
+                                  calendar_date_select/default.css
                                   cytoscape.js-2.0.2/index.css
                                   data_tables.css
                                   jquery-ui-1.8.14.custom.css

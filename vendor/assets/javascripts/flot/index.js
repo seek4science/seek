@@ -1,2 +1,4 @@
 // ...
-//= require_tree .
+//= require excanvas
+//= require jquery.flot
+//= require curvedLines
