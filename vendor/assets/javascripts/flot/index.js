@@ -1,4 +1,4 @@
 // ...
-//= require excanvas
-//= require jquery.flot
-//= require curvedLines
+//= require flot/excanvas
+//= require flot/jquery.flot
+//= require flot/curvedLines

@@ -1,13 +1,13 @@
 // ...
 //= require savage_beast/application
 //= require prototype
-//= prototype_ujs
-//= effects
-//= dragdrop
+//= require prototype_ujs
+//= require effects
+//= require dragdrop
 //= require boxover
 //= require scriptaculous
 //= require controls
-//= require redbox
+// require redbox
 //= require builder
 //= require application_shared
 //= require tagging

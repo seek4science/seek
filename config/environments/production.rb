@@ -49,7 +49,7 @@ SEEK::Application.configure do
                                   spreadsheet_explorer_plot.js
                                   strain.js
                                   studied_factor.js
-                                  calendar_date_select/calendar_date_select
+                                  calendar_date_select/calendar_date_select.js
                                   cytoscape.js-2.0.2/index.js
                                   cytoscape_web/index.js
                                   DataTables-1.8.2/index.js
