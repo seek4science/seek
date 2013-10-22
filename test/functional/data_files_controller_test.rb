@@ -37,7 +37,7 @@ class DataFilesControllerTest < ActionController::TestCase
 
   test "response code for not available rdf" do
     logout
-    get :show,:id=>9,:format=>"rdf"
+    get :show,:id=>9999,:format=>"rdf"
     assert_response :not_found
   end
 
@@ -50,7 +50,7 @@ class DataFilesControllerTest < ActionController::TestCase
 
   test "response code for not available xml" do
     logout
-    get :show,:id=>9,:format=>"xml"
+    get :show,:id=>9999,:format=>"xml"
     assert_response :not_found
   end
 
