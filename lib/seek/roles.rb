@@ -3,8 +3,8 @@ module Seek
 
     ROLES = %w[admin pal project_manager asset_manager gatekeeper]
 
-    def self.included(mod)
-      mod.extend(ClassMethods)
+    def self.included(base)
+      base.extend(ClassMethods)
       ROLES.each do |role|
         eval <<-END_EVAL
             def is_#{role}?
@@ -29,6 +29,7 @@ module Seek
     end
 
     module ClassMethods
+
       def mask_for_role(role)
         2**ROLES.index(role)
       end
