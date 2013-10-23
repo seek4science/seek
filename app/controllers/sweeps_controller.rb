@@ -51,7 +51,7 @@ class SweepsController < ApplicationController
   private
 
   def find_run
-    if !params[:run_id].blank? # New sweep based on a previous run
+    if !params[:run_id].blank? # New sweep based on a previous special_run
       @run = TavernaPlayer::Run.find(params[:run_id], :include => :inputs)
     else # New sweep from scratch
       @run = nil
@@ -71,15 +71,15 @@ class SweepsController < ApplicationController
   end
 
   def set_runlet_parameters
+    shared_input_values_for_all_runs = params[:sweep].delete(:shared_input_values_for_all_runs)
     params[:sweep][:runs_attributes].each do |run_id, run_attributes|
       run_attributes[:workflow_id] = params[:sweep][:workflow_id]
       run_attributes[:name] = "#{params[:sweep][:name]} ##{run_id.to_i + 1}"
       # Copy parameters from "parent" run
-      if !params[:sweep][:run].blank?
-        run = params[:sweep].delete(:run)
+      if !shared_input_values_for_all_runs.blank?
         base_index = run_attributes[:inputs_attributes].keys.map { |k| k.to_i }.max + 1
-        if run && run[:inputs_attributes]
-          run[:inputs_attributes].each do |input_id, input_attributes|
+        if shared_input_values_for_all_runs && shared_input_values_for_all_runs[:inputs_attributes]
+          shared_input_values_for_all_runs[:inputs_attributes].each do |input_id, input_attributes|
             run_attributes[:inputs_attributes][(base_index + input_id.to_i).to_s] = input_attributes
           end
         end

@@ -1,14 +1,18 @@
 <% workflow_title = TavernaPlayer.workflow_proxy.title(@workflow) || "" %>
 <% workflow_inputs = TavernaPlayer.workflow_proxy.inputs(@workflow) %>
 <% params[:sweep_length] ||= '5' %>
+<% data_inputs = workflow_inputs.select { |input| (input.port_type.name == WorkflowInputPortType::DATA) } %>
+<% data_input_names = data_inputs.collect { |input| input.name } %>
+<% parameter_inputs = workflow_inputs.select { |input| input.port_type.name == WorkflowInputPortType::PARAMETER } %>
+<% params[:sweep_data_input_name] ||= data_inputs[0].name # Data input port to iterate over in a sweep    %>
 
 <div class="contribution_title">
   <h1><%= 'New Data Sweep for Workflow: ' + workflow_title -%></h1>
 </div>
 
 <div class="show_basic">
-  <%= form_for @sweep, :html => {:multipart => true} do |f| %>
-      <%= f.hidden_field :workflow_id, :value => @workflow.id %>
+  <%= form_for @sweep, :html => {:multipart => true} do |sweep_form| %>
+      <%= sweep_form.hidden_field :workflow_id, :value => @workflow.id %>
       <%# f.hidden_field :workflow_version, :value => @workflow_version.version %>
 
       <div style="text-align: left; padding: 20px 20px 20px 0px;">
@@ -19,44 +23,97 @@
             </p>
         <% end %>
         <p>
-          <%= f.label :name, "Sweep name:" %>
-          <%= f.text_field :name, :value => "#{workflow_title} sweep", :size => 80 %><br/>
+          <%= sweep_form.label :name, "Sweep name:" %>
+          <%= sweep_form.text_field :name, :value => "#{workflow_title} sweep", :size => 80 %><br/>
         </p>
+
+        <p>
+          <%= label_tag "Data input to iterate over:" %>
+          <% if !@run.blank? %>
+              <%= select_tag :sweep_data_input_name, options_for_select(data_input_names, :selected => params[:sweep_data_input_name]),
+                             :onchange => "window.location = '#{new_sweep_url(:run_id => params[:run_id])}&sweep_length=#{params[:sweep_length]}&sweep_data_input_name=' + this.options[this.selectedIndex].value;" %>
+          <% else %>
+              <%= select_tag :sweep_data_input_name, options_for_select(data_input_names, :selected => params[:sweep_data_input_name]),
+                             :onchange => "window.location = '#{new_sweep_url(:workflow_id => params[:workflow_id])}&sweep_length=#{params[:sweep_length]}&sweep_data_input_name=' + this.options[this.selectedIndex].value;" %>
+          <% end %>
         </p>
-        <%= label_tag "Sweep length:" %>
-        <% if !@run.blank? %>
-            <%= select_tag :sweep_length, options_for_select(1.upto(20), :selected => params[:sweep_length]),
-                           :onchange => "window.location = '#{new_sweep_url(:run_id => params[:run_id])}&sweep_length=' + this.options[this.selectedIndex].value;" %>
-        <% else %>
-            <%= select_tag :sweep_length, options_for_select(1.upto(20), :selected => params[:sweep_length]),
-                           :onchange => "window.location = '#{new_sweep_url(:workflow_id => params[:workflow_id])}&sweep_length=' + this.options[this.selectedIndex].value;" %>
-        <% end %>
+
+        <p>
+          <%= label_tag "Number of iterations:" %>
+          <% if !@run.blank? %>
+              <%= select_tag :sweep_length, options_for_select(1.upto(20), :selected => params[:sweep_length]),
+                             :onchange => "window.location = '#{new_sweep_url(:run_id => params[:run_id])}&sweep_length=' + this.options[this.selectedIndex].value + '&sweep_data_input_name=#{params[:sweep_data_input_name]}'" %>
+          <% else %>
+              <%= select_tag :sweep_length, options_for_select(1.upto(20), :selected => params[:sweep_length]),
+                             :onchange => "window.location = '#{new_sweep_url(:workflow_id => params[:workflow_id])}&sweep_length=' + this.options[this.selectedIndex].value + '&sweep_data_input_name=#{params[:sweep_data_input_name]}'" %>
+          <% end %>
         </p>
       </div>
 
-      <!-- Data inputs -->
-      <% data_inputs = workflow_inputs.select { |input| (input.port_type.name == WorkflowInputPortType::DATA) } -%>
-      <% unless data_inputs.blank? %>
-          <%= render :partial => 'taverna_player/runs/inputs_form', :locals => {:title => "Data", :inputs => data_inputs, :form => f, :sweep_length => params[:sweep_length].to_i} %>
-      <% end %>
+      <% sweep_based_on_run = @run.blank? ? false : true %>
 
-      <!-- Parameter inputs -->
-      <% paramater_inputs = workflow_inputs.select { |input| input.port_type.name == WorkflowInputPortType::PARAMETER } -%>
-      <% if !@run.blank? %>
-          <%= f.fields_for @run, TavernaPlayer::Run.new do |r| %>
-              <% unless paramater_inputs.blank? %>
-                  <%= render :partial => 'taverna_player/runs/inputs_form', :locals => {:title => "Parameters", :inputs => paramater_inputs, :form => r, :hidden => true, :locked => true} %>
+      <div class="fold">
+        <div class="foldTitle">
+          Data
+        </div>
+        <div class="foldContent">
+
+          <!--# Show all iterations over the input data port that we are sweeping over.-->
+          <!--# This is equivalent to all runs that will be created for this sweep.-->
+              <h3><%= params[:sweep_data_input_name] %></h3>
+              <% params[:sweep_length].to_i.times do |i| %>
+              <h2 style="margin-left: 20px; background-color: #CDDEEF; background-image: url('/public/images/header-bg2.png');">Iteration <%= i+1 %> </h2>
+              <%= sweep_form.fields_for :runs, TavernaPlayer::Run.new do |runs_form| %>
+                  <% sweepable_input = data_inputs.select { |input| input.name == params[:sweep_data_input_name] }[0] %>
+                  <div style="margin-left: 20px;">
+                    <%= render :partial => 'input_form', :locals => {:workflow_input => sweepable_input,
+                                                                           :form => runs_form,
+                                                                           :print_input_port_name => false,
+                                                                           :sweep_iteration => (i + 1)} %>
+                  </div>
               <% end %>
           <% end %>
-      <% else %>
-          <% unless paramater_inputs.blank? %>
-              <%= render :partial => 'taverna_player/runs/inputs_form', :locals => {:title => "Parameters", :inputs => paramater_inputs, :form => f, :hidden => false, :locked => false} %>
-          <% end %>
-      <% end %>
-      <br/>
 
-      <div style="float: left;">
-        <%= f.submit 'Start Run' %>
-      </div>
+          <% if data_inputs.length == 1 # close the fold divs for "Data" fold if there are no more data inputs  %>
+             </div></div>
+          <% end %>
+
+              <!--Another form for all other input ports which values are fixed (i.e. shared over all sweep iterations). -->
+              <!--These will be copied over to each individual run/iteration of a sweep as input data values for those ports. -->
+              <!--They form "special shared values" that needs to be removed from a sweep model after the input data is copied.-->
+          <%= sweep_form.fields_for :shared_input_values_for_all_runs, TavernaPlayer::Run.new do |shared_input_values| %>
+              <% data_inputs.select { |din| din.name != params[:sweep_data_input_name] }.each do |input| %>
+                  <%= render :partial => 'input_form', :locals => {:workflow_input => input,
+                                                                         :form => shared_input_values,
+                                                                         :print_input_port_name => true} %>
+              <% end %>
+
+              <% if data_inputs.length > 1 # close the fold divs for "Data" fold %>
+                  </div></div>
+              <% end %>
+
+              <div class="fold">
+                <div class="foldTitle">
+                  Parameters
+                </div>
+                <div class="foldContent">
+                  <% if !parameter_inputs.blank? %>
+                      <% parameter_inputs.each do |input| %>
+                          <%= render :partial => 'input_form', :locals => {:workflow_input => input,
+                                                                           :form => shared_input_values,
+                                                                           :sweep_based_on_run => sweep_based_on_run,
+                                                                           :print_input_name => true} %>
+                      <% end %>
+                  <% else %>
+                      <p class="none_text" style="margin-left:20px;">None</p>
+                <% end %>
+                </div>
+              </div>
+          <% end %>
+          <br/>
+
+          <div style="float: left;">
+            <%= sweep_form.submit 'Start Sweep' %>
+          </div>
   <% end %>
-</div>
+  </div>

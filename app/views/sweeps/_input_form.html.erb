@@ -1,0 +1,45 @@
+<% sweep_based_on_run = !@run.blank? %>
+<% print_input_port_name = true if print_input_port_name == nil %>
+<% sweep_iteration  ||= sweep_iteration # A bit silly but otherwise Rails moans about variable sweep_iteration not being defined %>
+
+<% # input_value = form.object.new_record? ? nil : form.object.inputs.select { |i| i.name == workflow_input[:name] }.last  %>
+<% run_input = @run.blank? ? nil : @run.inputs.select { |i| i.name == workflow_input.name }.last %>
+
+<% if print_input_port_name %>
+    <h3>
+      <%= workflow_input[:name] %>
+      <% unless workflow_input[:description].blank? %>
+          <%= help_icon(workflow_input[:description]) -%>
+      <% end %>
+    </h3>
+<% end %>
+
+<%
+   # Show the (editable) data port value from the previous run the sweep is based on or an example value, if exists.
+   # Otherwise, just show an empty input field for the value.
+   if sweep_based_on_run
+     if sweep_iteration.blank? || (sweep_iteration == 1) # For the first iteration or if it is not an iteration - show values, for others just blank input fields
+       value = run_input.try(:value)
+     else
+       value = nil
+     end
+   else
+     if sweep_iteration.blank? || (sweep_iteration == 1)
+       value = workflow_input[:example_value]
+     else
+       value = nil
+     end
+   end
+%>
+
+<%= form.fields_for :inputs, TavernaPlayer::RunPort::Input.new do |input_fields| %>
+    <%= input_fields.hidden_field :name, :value => workflow_input[:name] %>
+    <div class="text_input">
+      <%= input_fields.text_area :value, :value => value, :rows => 2, :cols => 40, :placeholder => "Enter input here..." %>
+    </div>
+    <div class="file_input">
+      Or select a file...<br/>
+      <%= input_fields.file_field :file %>
+    </div>
+    <div style="clear:both"></div>
+<% end %>
