@@ -11,7 +11,7 @@
 
   <div class="body">
     <div align="center" style="margin-top: 1em">
-      <%= form_for(@workflow, :html => { :multipart => true } ) do |f| -%>
+      <%= form_for(workflow, :html => { :multipart => true } ) do |f| -%>
           <% if f.try(:object).try(:is_a?, (Seek::Permissions::CodeBasedAuthorization)) && !f.try(:object).try(:new_record?) %>
               <%= render :partial => 'assets/special_auth_code_form', :locals => {:f => f} %>
           <% end %>
