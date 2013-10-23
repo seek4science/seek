@@ -127,12 +127,11 @@ module AssetsHelper
     return path
   end
 
-  #Get a hash of appropriate related resources for the given resource. Also returns a hash of hidden resources
-  def get_related_resources(resource, limit=nil)
+  def get_all_related_items resource
     name = resource.class.name.split("::")[0]
 
     related = {"Person" => {}, "Project" => {}, "Institution" => {}, "Investigation" => {},
-               "Study" => {}, "Assay" => {}, "Specimen" =>{}, "Sample" => {}, "DataFile" => {}, "Model" => {}, "Sop" => {}, "Publication" => {},"Presentation" => {}, "Event" => {}}
+               "Study" => {}, "Assay" => {}, "Specimen" => {}, "Sample" => {}, "DataFile" => {}, "Model" => {}, "Sop" => {}, "Publication" => {}, "Presentation" => {}, "Event" => {}}
 
     related.each_key do |key|
       related[key][:items] = []
@@ -153,11 +152,17 @@ module AssetsHelper
       elsif resource.respond_to? method_name
         related[type][:items] = resource.send method_name
       elsif resource.respond_to? "related_#{method_name.singularize}"
-         related[type][:items] = [resource.send "related_#{method_name.singularize}"]
+        related[type][:items] = [resource.send "related_#{method_name.singularize}"]
       elsif resource.respond_to? method_name.singularize
         related[type][:items] = [resource.send method_name.singularize]
       end
     end
+    related
+  end
+  #Get a hash of appropriate related resources for the given resource. Also returns a hash of hidden resources
+  def get_related_resources(resource, limit=nil)
+
+    related = get_all_related_items resource
 
     #Authorize
     related.each do |key, res|

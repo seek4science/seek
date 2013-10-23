@@ -1,0 +1,23 @@
+<!--the files need to be loaded before calling the partial resource_tabbed_lazy_loading
+    and with this order
+-->
+<%= javascript_include_tag "tabber-minimized.js" %>
+<%= javascript_include_tag "tab_lazy_load.js" %>
+
+<% scaled_results_disabled ||=false
+   actions_partial_disable ||=false
+%>
+<div id="all_results" class="scaled_items">
+  <%= render :partial => "assets/resource_tabbed_lazy_loading",
+             :locals => {:scale_title => scale_title,
+                         :tabs_id => "resource_tabbed_lazy_loading"+"_#{scale_title}",
+                         :resource_hash => resource_hash,
+                         :actions_partial_disable => actions_partial_disable} -%>
+</div>
+<% if !scaled_results_disabled %>
+<% scale_titles = Scale.all.map(&:title)
+   scale_titles = ['all'] + scale_titles
+   scale_titles.reject { |s| s == 'all' }.each do |s| %>
+    <div id="<%= s %>_results" class="scaled_items" style="display: none;"></div>
+<% end %>
+<% end %>
