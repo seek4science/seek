@@ -231,6 +231,11 @@ table.display td {
     border-bottom:1pt solid #BABABA;
 }
 
+table.display tr td:first-child {
+  text-align: left;
+  padding-left: 20px;
+}
+
 #workflow_filters {
   float: left;
   width: 250px;
