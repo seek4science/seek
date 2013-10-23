@@ -1,3 +1,14 @@
+<div class="breadcrumbs">
+  <a href="/">Home</a> &gt;
+  <%= link_to @run.workflow.category.name, main_app.workflows_path(:category_id => @run.workflow.category) -%> &gt;
+  <%= link_to @run.workflow.title, main_app.workflow_path(@run.workflow) -%> &gt;
+  <% if @run.sweep %>
+    <%= link_to @run.sweep.name, main_app.sweep_path(@run.sweep) -%> &gt;
+  <% end %>
+  <%= link_to @run.name, taverna_player.run_path(@run) -%> &gt;
+  Manage
+</div>
+
 <h1>Manage run: <%= @run.name %></h1>
 
 <div class="show_basic">

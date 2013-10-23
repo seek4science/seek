@@ -1,3 +1,9 @@
+<div class="breadcrumbs">
+  <a href="/">Home</a> &gt;
+  <%= link_to @workflow.category.name, main_app.workflows_path(:category_id => @workflow.category) -%> &gt;
+  <%= @workflow.title -%>
+</div>
+
 <%= render :partial => "general/item_title", :locals => {:item => @workflow} -%>
 
 <ul class="sectionIcons">

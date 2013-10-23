@@ -1,3 +1,10 @@
+<div class="breadcrumbs">
+  <a href="/">Home</a> &gt;
+  <%= link_to @workflow.category.name, main_app.workflows_path(:category_id => @workflow.category) -%> &gt;
+  <%= link_to @workflow.title, main_app.workflow_path(@workflow) -%> &gt;
+  New Run
+</div>
+
 <% workflow_title = TavernaPlayer.workflow_proxy.title(@workflow) || "" %>
 <% workflow_inputs = TavernaPlayer.workflow_proxy.inputs(@workflow) %>
 

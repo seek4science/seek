@@ -12,6 +12,26 @@ class SweepsController < ApplicationController
     @sweep = Sweep.new
   end
 
+  def edit
+    @sweep = Sweep.find(params[:id])
+    respond_to do |format|
+      format.html
+    end
+  end
+
+  def update
+    @sweep = Sweep.find(params[:id])
+    if @sweep.update_attributes(params[:sweep])
+      respond_to do |format|
+        format.html { redirect_to sweep_path(@sweep) }
+      end
+    else
+      respond_to do |format|
+        format.html { render edit_sweep_path(@sweep) }
+      end
+    end
+  end
+
   def create
     params[:sweep][:user_id] = current_user.id
     @sweep = Sweep.new(params[:sweep])

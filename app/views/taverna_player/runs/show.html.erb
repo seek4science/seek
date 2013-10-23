@@ -1,5 +1,15 @@
 <% workflow = Workflow.find(@run.workflow_id) %>
 
+<div class="breadcrumbs">
+  <a href="/">Home</a> &gt;
+  <%= link_to workflow.category.name, main_app.workflows_path(:category_id => workflow.category) -%> &gt;
+  <%= link_to workflow.title, main_app.workflow_path(workflow) -%> &gt;
+  <% if @run.sweep %>
+    <%= link_to @run.sweep.name, main_app.sweep_path(@run.sweep) -%> &gt;
+  <% end %>
+  <%= @run.name -%>
+</div>
+
 <div class="contribution_title">
   <h1><%= 'Run: ' + @run.name -%></h1>
 </div>
