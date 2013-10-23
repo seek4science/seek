@@ -41,7 +41,7 @@
     tabber_ids.push("<%= tabs_id -%>");
 </script>
 
-<% resource_hash = workflow.collect_related_items %>
+<% resource_hash = workflow.collect_related_items unless workflow.nil?%>
 <% total_count = 0 %>
 <% resource_hash.each_key do |k| %>
     <% count = resource_hash[k][:items].size + resource_hash[k][:hidden_count] %>
@@ -156,7 +156,7 @@
 <% else -%>
     <div class="list_items_container">
       <div class="hidden_list_item">
-        <span class="none_text">No items found.</span>
+        <span class="none_text">No related items found.</span>
       </div>
     </div>
 <% end -%>

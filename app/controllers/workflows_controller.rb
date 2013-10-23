@@ -20,9 +20,9 @@ class WorkflowsController < ApplicationController
   end
 
   def temp_link
-    @workflow = Workflow.find(params[:id])
+    workflow = Workflow.find(params[:id])
     respond_to do |format|
-      format.html { render :partial => "sharing/temp_link" }
+      format.html { render :partial => "sharing/temp_link", :locals => { :workflow => workflow } }
     end
   end
 
@@ -101,7 +101,7 @@ class WorkflowsController < ApplicationController
        @workflow.policy.set_attributes_with_sharing params[:sharing], @workflow.projects
      end
 
-    if @workflow.save
+    if @workflow.save && !params[:sharing_form]
       update_annotations @workflow
 
       extract_workflow_metadata
@@ -120,6 +120,9 @@ class WorkflowsController < ApplicationController
         format.html { redirect_to workflow_path(@workflow) }
       end
     else
+      if @workflow.save && params[:sharing_form]
+        flash[:notice] = "Sharing link has been #{!@workflow.special_auth_codes.empty? ? "enabled" : "disabled"}" if flash.now[:notice].nil?
+      end
       respond_to do |format|
         format.html {
           render :action => "edit"
