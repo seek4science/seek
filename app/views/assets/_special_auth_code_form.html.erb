@@ -1,3 +1,4 @@
+<%= hidden_field_tag :sharing_form, "true" %>
 <% if f.object.can_manage? %>
   <% title_and_help = capture do %>
         <%= help_icon("Here you can create temporary a access link for reviewing this asset. The reviewers with this link can view/download this asset with no login") %>
