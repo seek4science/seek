@@ -120,6 +120,9 @@ class WorkflowsController < ApplicationController
         format.html { redirect_to workflow_path(@workflow) }
       end
     else
+      if @workflow.save && params[:sharing_form]
+        flash[:notice] = "Sharing link has been #{!@workflow.special_auth_codes.empty? ? "enabled" : "disabled"}" if flash.now[:notice].nil?
+      end
       respond_to do |format|
         format.html {
           render :action => "edit"
