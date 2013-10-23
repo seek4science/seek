@@ -3,9 +3,9 @@
   <%= image_tag_for_key('run_workflow', taverna_player.new_run_path(:workflow_id => workflow, :version => version), nil, nil, "Run #{human_name}") -%>
 </li>
 
-<!-- Run new data sweep button -->
+<!-- Run new data sweep button - only if there is at least on data port to sweep over. -->
 <li>
-    <%= image_tag_for_key('sweep', new_sweep_path(:workflow_id => workflow.id), nil, nil, "Run Data Sweep") -%>
+    <%= image_tag_for_key('sweep', new_sweep_path(:workflow_id => workflow.id), nil, nil, "Run Data Sweep") if workflow.input_ports.select{|port| (port.port_type.name == WorkflowInputPortType::DATA)}.length > 0 -%>
 </li>
 
 <!-- Manage button -->
