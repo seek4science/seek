@@ -39,7 +39,6 @@ class Ability
 
   #asset manager can manage the assets belonging to their project
   def asset_manager asset_manager
-     raise "method hit"
      can [:manage_asset, :delete, :edit, :download, :view], :all do |item|
         asset_manager.is_asset_manager_of?(item)
      end
