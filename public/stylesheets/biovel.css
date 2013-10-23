@@ -25,6 +25,7 @@
   border: 1px solid #ccc;
   margin: 10px;
   color: #333333;
+  text-align: center;
 }
 
 .workflow-category:hover {
@@ -190,35 +191,35 @@ div.small_list_item_title {
   text-align: left;
 }
 
-table.display tr.odd.gradeA {
+table.display tr.odd {
     background-color: #F7F4F4;
 }
 
-table.display tr.even.gradeA {
+table.display tr.even {
     background-color: #FFFFFF;
 }
 
-tr.odd.gradeA td.sorting_1 {
+tr.odd td.sorting_1 {
     background-color: #E8E3E3;
 }
 
-tr.odd.gradeA td.sorting_2 {
+tr.odd td.sorting_2 {
     background-color: #d1ffd1;
 }
 
-tr.odd.gradeA td.sorting_3 {
+tr.odd td.sorting_3 {
     background-color: #d1ffd1;
 }
 
-tr.even.gradeA td.sorting_1 {
+tr.even td.sorting_1 {
     background-color: #F7F4F4;
 }
 
-tr.even.gradeA td.sorting_2 {
+tr.even td.sorting_2 {
     background-color: #e2ffe2;
 }
 
-tr.even.gradeA td.sorting_3 {
+tr.even td.sorting_3 {
     background-color: #e2ffe2;
 }
 
@@ -228,6 +229,11 @@ tr.even.gradeA td.sorting_3 {
 
 table.display td {
     border-bottom:1pt solid #BABABA;
+}
+
+table.display tr td:first-child {
+  text-align: left;
+  padding-left: 20px;
 }
 
 #workflow_filters {

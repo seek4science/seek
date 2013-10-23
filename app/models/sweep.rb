@@ -43,4 +43,8 @@ class Sweep < ActiveRecord::Base
       'pending'
     end
   end
+
+  def self.by_owner(uid)
+    where(:user_id => uid)
+  end
 end

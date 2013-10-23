@@ -337,6 +337,10 @@ module ImagesHelper
         "famfamfam_silk/chart_organisation.png"
       when "share"
         "famfamfam_silk/link.png"
+      when "sweep_run"
+        "famfamfam_silk/table_multiple.png"
+      when "simple_run"
+        "famfamfam_silk/table.png"
     else
       return nil
     end

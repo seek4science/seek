@@ -459,6 +459,7 @@ SEEK::Application.routes.draw do
   resources :sweeps do
     member do
       put :cancel
+      get :runs
     end
   end
 

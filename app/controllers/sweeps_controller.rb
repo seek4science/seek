@@ -5,7 +5,7 @@ class SweepsController < ApplicationController
   before_filter :set_runlet_parameters, :only => :create
 
   def show
-    @sweep = Sweep.find(params[:id])
+    @sweep = Sweep.find(params[:id], :include => :runs)
   end
 
   def new
@@ -37,6 +37,14 @@ class SweepsController < ApplicationController
     @sweep.destroy
     respond_to do |format|
       format.html { redirect_to taverna_player.runs_path }
+    end
+  end
+
+  def runs
+    @sweep = Sweep.find(params[:id], :include => {:runs => :workflow})
+    @runs = @sweep.runs
+    respond_to do |format|
+      format.js { render "taverna_player/runs/index" }
     end
   end
 

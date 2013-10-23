@@ -251,7 +251,7 @@
         <!-- Upload time -->
         <p>
           <b>Uploaded at:</b>
-          <%= @workflow.created_at.strftime("%e %b %Y %H:%m:%S %Z") %>
+          <%= @workflow.created_at.strftime("%e %b %Y %H:%M:%S %Z") %>
         </p>
 
         <%= render :partial => "assets/special_auth_code_display", :locals => {:resource => @workflow} %>

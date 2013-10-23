@@ -2,9 +2,6 @@
 <script type="text/javascript">
     jQuery.noConflict();
     var $j = jQuery;
-</script>
-
-<script type="text/javascript" charset="utf-8">
     $j(document).ready(function () {
         workflow_runs_table = $j('#workflow_runs_table').dataTable({
             "bPaginate":false,
@@ -15,19 +12,19 @@
             "bAutoWidth":false,
             "bRetrieve":true,
             "aaSorting":[
-                [ 5, "desc" ]
+                [ 4, "desc" ]
             ],
             "aoColumns":[
                 { "sWidth":"15%" },
                 { "sWidth":"15%" },
                 { "sWidth":"10%" },
                 { "sWidth":"10%" },
-                { "sWidth":"10%" },
-                { "sWidth":"15%" },
-                { "sWidth":"15%" },
-                { "sWidth":"10%", "bSortable":false }
+                { "sWidth":"15%", "bSearchable": false },
+                { "sWidth":"15%", "bSearchable": false },
+                { "sWidth":"10%", "bSortable":false, "bSearchable": false }
             ]
         });
+        window.setInterval(function () { $j.get("<%= polling_url %>", null, null, "script") }, 5000);
     });
 </script>
 
@@ -39,7 +36,6 @@
         <th>Run</th>
         <th>Workflow</th>
         <th>Category</th>
-        <th>Type</th>
         <th>State</th>
         <th>Created</th>
         <th>Finished</th>
@@ -47,33 +43,7 @@
       </tr>
       </thead>
       <tbody>
-      <% runs.each do |run| -%>
-        <%
-           workflow = Workflow.find(run.workflow_id)
-           created_at = run.created_at.strftime("%e %b %Y %H:%m:%S %Z")
-
-           if run.is_a?(Sweep)
-             finish_time = run.runs.any? {|r| r.finish_time.blank? } ? '' : run.runs.map { |r| r.finish_time }.max.strftime("%e %b %Y %H:%m:%S %Z")
-           else
-             finish_time = run.finish_time.blank? ? '' : run.finish_time.strftime("%e %b %Y %H:%m:%S %Z")
-           end
-
-           action_buttons = render(:partial => "taverna_player/runs/delete_or_cancel_button", :locals => { :run => run })
-        %>
-        <tr class="gradeA">
-          <% row = [link_to(run.name, run.is_a?(Sweep) ? main_app.sweep_path(run) : taverna_player.run_path(run)),
-                    link_to(workflow.title, main_app.workflow_path(workflow)),#, :version => run.workflow_version)),
-                    workflow.category.name,
-                    run.is_a?(Sweep) ? 'Sweep' : 'Simple',
-                    run.state,
-                    created_at,
-                    finish_time,
-                    action_buttons] %>
-          <% row.each do |column_data| %>
-            <td><%= column_data %></td>
-          <% end %>
-        </tr>
-      <% end -%>
+      <%= render :partial => 'taverna_player/runs/table_body', :locals => { :runs => runs } %>
       </tbody>
     </table>
   </div>

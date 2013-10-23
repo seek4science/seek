@@ -1,5 +1,5 @@
 <h1>Choose an analysis...</h1>
-<div style="width: 800px; margin: auto">
+<div style="width: 800px; margin: auto; text-align: center">
   <% WorkflowCategory.all.each do |category| %>
       <% if category.name != WorkflowCategory::OTHER %>
           <%= link_to workflows_path(:category_id => category.id), :class => "workflow-category" do %>

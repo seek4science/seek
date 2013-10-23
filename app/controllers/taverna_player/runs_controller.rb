@@ -55,6 +55,14 @@ module TavernaPlayer
       end
     end
 
+    # GET /runs
+    def index
+      respond_to do |format|
+        format.html # index.html.erb
+        format.js # index.js.erb
+      end
+    end
+
     private
 
     def find_workflow_and_version
@@ -75,7 +83,7 @@ module TavernaPlayer
 
     def find_runs
       select = params[:workflow_id] ? { :workflow_id => params[:workflow_id] } : {}
-      @runs = Run.where(select).includes(:sweep).all
+      @runs = Run.where(select).includes(:sweep).includes(:workflow).all
       @runs = @runs & Run.all_authorized_for('view', current_user)
     end
 
