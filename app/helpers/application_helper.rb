@@ -619,11 +619,11 @@ module ApplicationHelper
 
 
   def share_icon
-    html = link_to_remote_redbox("Share Workflow",
+    icon = simple_image_tag_for_key('share').html_safe
+    html = link_to_remote_redbox(icon + "Share Workflow".html_safe,
                                  {:url => url_for(:action => 'temp_link'),
                                   :failure => "alert('Sorry, an error has occurred.'); RedBox.close();"}
     )
-    #html = image_tag_for_key('share', url_for('temp_link'), 'Share', {:rel => "lightbox"}, "add_a_temporary_link").html_safe
     return html.html_safe
   end
 
