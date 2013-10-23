@@ -767,6 +767,10 @@ class PersonTest < ActiveSupport::TestCase
     assert gatekeeper.is_gatekeeper_of?(sop)
   end
 
+  test "order of ROLES" do
+    assert_equal %w[admin pal project_manager asset_manager gatekeeper],Person::ROLES,"The order of the ROLES is critical as it determines the mask that is used."
+  end
+
   test 'replace admins, pals named_scope by a static function' do
     admins = Person.admins
     assert_equal 1, admins.count
