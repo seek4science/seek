@@ -20,12 +20,13 @@ class SweepsController < ApplicationController
       raise
     end
     respond_to do |format|
-      format.html { redirect_to taverna_player.runs_path(:sweep_id => @sweep.id) }
+      format.html { redirect_to sweep_path(@sweep) }
     end
   end
 
   def cancel
     @sweep = Sweep.find(params[:id])
+    @sweep.cancel
     respond_to do |format|
       format.html { redirect_to taverna_player.runs_path }
     end
