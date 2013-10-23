@@ -22,7 +22,7 @@
   <div style="clear: both;"></div>
 
   <%= render :partial => "interaction", :locals =>
-          {:run => @run, :interaction => @interaction} %><br/>
+          {:run => @run, :interaction => @interaction} %>
 
   <%= render :partial => "outputs", :locals => {:run => @run} %>
 
@@ -36,7 +36,7 @@
       <div class="foldContent" style="display: none;">
         <p>
           <b>Log:</b>
-          <span id="log_url"></span>
+          <span id="log_url"><%= link_to("Taverna Server log", @run.log.url) unless @run.log.blank? || @run.log.url.blank? %></span>
         </p>
       </div>
     </div>
