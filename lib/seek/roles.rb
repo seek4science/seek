@@ -11,12 +11,6 @@ module Seek
               roles.include?('#{role}')
             end
 
-            def is_#{role}
-              roles.include?('#{role}')
-            end
-
-
-
             def is_#{role}=(yes)
               if yes
                 add_roles ['#{role}']
