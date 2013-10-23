@@ -3,5 +3,5 @@
 </div>
 
 <div class="show_basic">
-  <%= render :partial => 'table', :locals => {:runs => @runs} %>
+  <%= render :partial => 'table', :locals => {:runs => @runs, :polling_url => taverna_player.runs_path } %>
 </div>

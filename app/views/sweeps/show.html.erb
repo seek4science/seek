@@ -5,5 +5,5 @@
 </div>
 
 <div class="show_basic">
-  <%= render :partial => 'taverna_player/runs/table', :locals => {:runs => @sweep.runs} %>
+  <%= render :partial => 'taverna_player/runs/table', :locals => {:runs => @sweep.runs, :polling_url => runs_sweep_path(@sweep) } %>
 </div>
