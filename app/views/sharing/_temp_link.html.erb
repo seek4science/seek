@@ -15,7 +15,7 @@
           <% if f.try(:object).try(:is_a?, (Seek::Permissions::CodeBasedAuthorization)) && !f.try(:object).try(:new_record?) %>
               <%= render :partial => 'assets/special_auth_code_form', :locals => {:f => f} %>
           <% end %>
-          <%= submit_tag "Save Changes", :id => "redbox_workflow_submit_btn", :onclick => "javascript: createOrUpdateResourceInRedBox(false,'workflow'); return(false)" -%>
+          <%= submit_tag "Save Changes", :id => "redbox_workflow_submit_btn", :onclick => "javascript: createOrUpdateResourceInRedBox(false,'workflow'); return(false)", :hidden => true -%>
           <%= submit_tag "Cancel", :onclick => "javascript: RedBox.close(); return(false);"-%>
 
       <% end %>

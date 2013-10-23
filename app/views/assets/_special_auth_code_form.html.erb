@@ -1,8 +1,9 @@
 <%= hidden_field_tag :sharing_form, "true" %>
 <% if f.object.can_manage? %>
+
   <% title_and_help = capture do %>
-        <%= help_icon("Here you can create temporary a access link for reviewing this asset. The reviewers with this link can view/download this asset with no login") %>
-        Temporary Access Link
+        <%= help_icon("Here you can create a temporary access link for reviewing this asset. The reviewers with this link can view/download this asset with no login") %>
+        Sharing Link
   <% end %>
 
   <% content = capture do %>
@@ -24,10 +25,10 @@
                 <br/>
                 <span class='none_text'>(After this date, the link is not accessible anymore)</span>
               </p>
-              <%= sub_form.subform_delete_link 'Revoke', {:onclick => "$('add_a_temporary_link').show()"}, :class => 'hidden_destroy_field' %>
+              <%= sub_form.subform_delete_link 'Revoke', {:onclick => "$('add_a_temporary_link').show(); flipSaveEnable();"}, :class => 'hidden_destroy_field' %>
             </fieldset>
         <% end %>
-        <%= link_to_function "Add a Temporary Link", "addTempLink()", :id => "add_a_temporary_link", :style => "display: #{f.object.special_auth_codes.empty? ? 'block' : 'none'}" %>
+        <%= link_to_function "Add a Sharing Link", "addTempLink(); flipSaveEnable();", :id => "add_a_temporary_link", :style => "display: #{f.object.special_auth_codes.empty? ? 'block' : 'none'}" %>
    <% end %>
   <%= render :partial => 'assets/folding_box', :locals => {:hidden =>  false, :fold_id => 'temporary_links', :fold_title => title_and_help, :contents => content} %>
 <% end %>
