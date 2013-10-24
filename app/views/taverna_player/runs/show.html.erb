@@ -24,7 +24,16 @@
   <%= render :partial => "interaction", :locals =>
           {:run => @run, :interaction => @interaction} %>
 
-  <%= render :partial => "outputs", :locals => {:run => @run} %>
+  <div id="run-outputs" style="<%= 'display: none' unless @run.complete? && @run.outputs.size > 0-%>">
+    <div class="fold">
+      <div class="foldTitle">
+        Outputs
+      </div>
+      <div class="foldContent">
+        <%= render :partial => "outputs", :locals => {:run => @run} %>
+      </div>
+    </div>
+  </div>
 
   <%= render :partial => "inputs", :locals => {:run => @run} %>
 
