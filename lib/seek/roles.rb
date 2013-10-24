@@ -27,7 +27,7 @@ module Seek
         END_EVAL
       end
       base.class_eval do
-        #requires_can_manage :roles_mask
+        requires_can_manage :roles_mask
         has_many :admin_defined_role_projects
       end
 

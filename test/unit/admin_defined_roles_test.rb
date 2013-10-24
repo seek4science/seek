@@ -55,6 +55,8 @@ class AdminDefinedRolesTest < ActiveSupport::TestCase
       person = Factory(:person)
       project = person.projects.first
       person.roles = [['admin'],['gatekeeper',project]]
+      person.save!
+      person.reload
       assert person.is_admin?
       assert person.is_gatekeeper?(project)
       assert_equal ['admin','gatekeeper'],person.roles(project)
@@ -83,17 +85,21 @@ class AdminDefinedRolesTest < ActiveSupport::TestCase
       person2.roles=[['asset_manager',projects]]
       person2.save!
       person2.reload
-      assert_equal ['asset_manager'], person.roles(projects[0])
-      assert_equal ['asset_manager'], person.roles(projects[1])
-      assert_equal [],person.roles(other_project)
+      assert_equal ['asset_manager'], person2.roles(projects[0])
+      assert_equal ['asset_manager'], person2.roles(projects[1])
+      assert_equal [],person2.roles(other_project)
 
-      person2.is_admin=false,projects[0]
-      assert_equal [], person.roles(projects[0])
-      assert_equal ['asset_manager'], person.roles(projects[1])
+      person2.is_asset_manager=false,projects[0]
+      person2.save!
+      person2.reload
+      assert_equal [], person2.roles(projects[0])
+      assert_equal ['asset_manager'], person2.roles(projects[1])
 
-      person2.is_admin=true,projects[0]
-      assert_equal ['asset_manager'], person.roles(projects[0])
-      assert_equal ['asset_manager'], person.roles(projects[1])
+      person2.is_asset_manager=true,projects[0]
+      person2.save!
+      person2.reload
+      assert_equal ['asset_manager'], person2.roles(projects[0])
+      assert_equal ['asset_manager'], person2.roles(projects[1])
     end
   end
 
@@ -242,7 +248,7 @@ class AdminDefinedRolesTest < ActiveSupport::TestCase
       person.save!
 
       assert person.is_project_manager?(project)
-      assert !person.is_project_manager(other_project)
+      assert !person.is_project_manager?(other_project)
 
       person.is_project_manager=false,project
       person.save!
@@ -260,7 +266,7 @@ class AdminDefinedRolesTest < ActiveSupport::TestCase
       person.save!
 
       assert person.is_gatekeeper?(project)
-      assert !person.is_gatekeeper(other_project)
+      assert !person.is_gatekeeper?(other_project)
 
       person.is_gatekeeper=false,project
       person.save!
