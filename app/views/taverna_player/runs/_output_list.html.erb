@@ -1,0 +1,27 @@
+<h2 style='background-color: #CDDEEF; background-image: url("../images/header-bg2.png");'>
+  <%= title -%> (<%= ports.count -%>)
+</h2>
+<% unless ports.blank? -%>
+  <table class="simple" style="width: 96%; margin-left:2%; margin-right:2%;">
+    <% ports.each do |p| -%>
+      <% wf_port = run.workflow.output_ports.select {|o| o.name == p.name}.first %>
+      <tr>
+        <td>
+          <h3>
+            <%= p.name %>
+            <% unless wf_port[:description].blank? %>
+              <%= help_icon(wf_port[:description]) -%>
+            <% end %>
+            <span class="mime_type"><%= "(#{p.metadata[:type]})" if p.depth == 0 %></span>
+          </h3>
+
+          <p>
+            <%= show_output(run, p) %>
+          </p>
+        </td>
+      </tr>
+    <% end %>
+  </table>
+<% else %>
+  <p class="none_text" style="margin-left:20px;">None</p>
+<% end %>

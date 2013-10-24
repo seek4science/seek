@@ -1,0 +1,26 @@
+<h2 style='background-color: #CDDEEF; background-image: url("../images/header-bg2.png");'>
+  <%= title -%> (<%= ports.count -%>)
+</h2>
+<% unless ports.blank? -%>
+  <table class="simple" style="width: 96%; margin-left:2%; margin-right:2%;">
+    <% ports.each do |p| -%>
+      <tr>
+        <td>
+          <h3><%= p.name %></h3>
+
+          <p>
+            <strong>Value:</strong>
+          </p>
+          <% unless p.value.blank? %>
+            <pre class="script_example_data_box"><%= p.value %></pre>
+          <% end %>
+          <% unless p.file_file_name.blank? %>
+            <p><%= link_to p.file_file_name, p.file.url %></p>
+          <% end %>
+        </td>
+      </tr>
+    <% end %>
+  </table>
+<% else %>
+  <p class="none_text" style="margin-left:20px;">None</p>
+<% end %>
