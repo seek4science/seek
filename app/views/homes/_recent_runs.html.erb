@@ -1,3 +1,4 @@
+<% unless current_user.nil? %>
 <% runs = (TavernaPlayer::Run.by_owner(current_user.id).where(:sweep_id => nil).order('created_at DESC').limit(5) +
            Sweep.by_owner(current_user.id).order('created_at DESC').limit(5)).sort_by(&:created_at).reverse.first(5) %>
 <div class="your_recent">
@@ -12,3 +13,4 @@
     </ul>
   <% end %>
 </div>
+<% end %>
