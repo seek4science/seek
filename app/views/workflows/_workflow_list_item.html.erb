@@ -31,6 +31,6 @@
 <ul class="sectionIcons" style="float: right; padding: 0; margin: 0;">
   <li>
     <% human_name = text_for_resource workflow %>
-    <%= image_tag_for_key('run_workflow', taverna_player.new_run_path(:workflow_id => workflow.id, :version => workflow.version, :based_off => nil), "Run #{human_name}", {:style => "font-size: smaller;"}, "Run #{human_name}") -%>
+    <%= image_tag_for_key('run_workflow', taverna_player.new_run_path(:workflow_id => workflow.id, :version => workflow.version, :based_off => nil), nil, {:style => "font-size: smaller;"}, 'Run workflow') -%>
   </li>
 </ul>
