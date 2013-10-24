@@ -39,14 +39,14 @@ class AdminDefinedRolesTest < ActiveSupport::TestCase
     end
   end
 
-  test "setting and retrieving roles using a project id" do
+  test "setting and retrieving roles using a string or int project id" do
     User.with_current_user Factory(:admin).user do
       person = Factory(:person_in_multiple_projects)
       project_ids=person.projects.collect{|p| p.id}
-      person.roles=[['gatekeeper',project_ids],['pal',project_ids.first]]
+      person.roles=[['gatekeeper',project_ids],['pal',project_ids.first.to_s]]
       assert_equal ['gatekeeper','pal'],person.roles(project_ids.first).sort
       assert_equal ['gatekeeper'],person.roles(project_ids[1])
-      assert_equal ['gatekeeper'],person.roles(project_ids[2])
+      assert_equal ['gatekeeper'],person.roles(project_ids[2].to_s)
     end
   end
 

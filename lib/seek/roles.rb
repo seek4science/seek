@@ -70,13 +70,14 @@ module Seek
 
     #fetch the roles assigned for this project
     def roles(project=nil)
+      project_id = (project.is_a?(Project)) ? project.id : project.to_i
       role_names.select do |role_name|
         if self.class.is_project_dependent_role?(role_name)
-          if project.nil?
+          if project_id.nil?
             false
           else
             mask = mask_for_role(role_name)
-            !self.admin_defined_role_projects.where(project_id: project.id,role_mask: mask).empty?
+            !self.admin_defined_role_projects.where(project_id: project_id,role_mask: mask).empty?
           end
         else
           true
@@ -95,13 +96,13 @@ module Seek
       new_mask = self.roles_mask || 0
       roles.each do |role_details|
         rolename = role_details[0]
-        projects = Array(role_details[1])
+        project_ids = Array(role_details[1]).collect{|p| p.is_a?(Project) ? p.id : p.to_i}
         mask = mask_for_role(rolename)
         if self.class.is_project_dependent_role?(rolename)
-          current_projects = self.admin_defined_role_projects.where(role_mask: mask).collect{|r|r.project}
-          to_add =
-          (projects - current_projects).each do |project|
-            self.admin_defined_role_projects << AdminDefinedRoleProject.new(project: project, role_mask: mask)
+          current_projects_ids = self.admin_defined_role_projects.where(role_mask: mask).collect{|r|r.project.id}
+
+          (project_ids - current_projects_ids).each do |project_id|
+            self.admin_defined_role_projects << AdminDefinedRoleProject.new(project_id: project_id, role_mask: mask)
           end
         end
         new_mask += mask if (new_mask & mask).zero?
@@ -113,14 +114,14 @@ module Seek
       new_mask = self.roles_mask
       roles.each do |role_details|
         rolename = role_details[0]
-        projects = Array(role_details[1])
+        project_ids = Array(role_details[1]).collect{|p| p.is_a?(Project) ? p.id : p.to_i}
         mask = mask_for_role(rolename)
         if self.class.is_project_dependent_role?(rolename)
-          current_projects = self.admin_defined_role_projects.where(role_mask: mask).collect{|r|r.project}
-          projects.each do |project|
-            AdminDefinedRoleProject.where(project_id: project.id,role_mask: mask, person_id: self.id).destroy_all
+          current_projects_ids = self.admin_defined_role_projects.where(role_mask: mask).collect{|r|r.project.id}
+          project_ids.each do |project_id|
+            AdminDefinedRoleProject.where(project_id: project_id,role_mask: mask, person_id: self.id).destroy_all
           end
-          new_mask -= mask if (current_projects - projects).empty?
+          new_mask -= mask if (current_projects_ids - project_ids).empty?
         else
           new_mask -= mask
         end
