@@ -23,8 +23,7 @@
   <% end %>
 <% else %>
   <%= form.fields_for :inputs, TavernaPlayer::RunPort::Input.new do |input_fields| %>
-    <% unless input[:example].blank? %>
-      <p>Example value: <%= input[:example] %></p>
+    <% unless input[:example_value].blank? %>
       <% unless input_data.try(:value) %>
         <p>
           The example value is automatically entered in the box below.
@@ -35,7 +34,7 @@
 
     <%= input_fields.hidden_field :name, :value => input[:name] %>
     <div class="text_input">
-      <%= input_fields.text_area :value, :value => input_data.try(:value) || input[:example], :rows => 2, :cols => 40, :placeholder => "Enter input here..." %>
+      <%= input_fields.text_area :value, :value => input_data.try(:value) || input[:example_value], :rows => 3, :cols => 50, :placeholder => "Enter input here..." %>
     </div>
     <div class="file_input">
       Or select a file...<br/>

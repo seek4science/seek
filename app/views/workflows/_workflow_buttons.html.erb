@@ -1,16 +1,16 @@
 <!-- Run workflow button -->
 <li>
-  <%= image_tag_for_key('run_workflow', taverna_player.new_run_path(:workflow_id => workflow, :version => version), nil, nil, "Run #{human_name}") -%>
+  <%= image_tag_for_key('run_workflow', taverna_player.new_run_path(:workflow_id => workflow, :version => version), nil, nil, 'Run workflow') -%>
 </li>
 
 <!-- Run new data sweep button - only if there is at least on data port to sweep over. -->
 <li>
-    <%= image_tag_for_key('sweep', new_sweep_path(:workflow_id => workflow.id), nil, nil, "Run Data Sweep") if workflow.input_ports.select{|port| (port.port_type.name == WorkflowInputPortType::DATA)}.length > 0 -%>
+    <%= image_tag_for_key('sweep', new_sweep_path(:workflow_id => workflow.id), nil, nil, 'Run data sweep') if workflow.input_ports.select{|port| (port.port_type.name == WorkflowInputPortType::DATA)}.length > 0 -%>
 </li>
 
 <!-- Manage button -->
 <% if workflow.can_manage? -%>
-    <li><%= image_tag_for_key('manage', edit_workflow_path(workflow, :version => version), nil, nil, "Manage #{human_name}") -%></li>
+    <li><%= image_tag_for_key('manage', edit_workflow_path(workflow, :version => version), nil, nil, 'Manage workflow') -%></li>
 <% end -%>
 
 <!-- Download button -->
@@ -23,7 +23,7 @@
            path = polymorphic_path(workflow,:version=>version,:action=>:download,:code=>params[:code])
         %>
         <li>
-          <%= image_tag_for_key('download', path, "Download #{human_name}", nil, "Download #{human_name}") -%>
+          <%= image_tag_for_key('download', path, nil, nil, 'Download workflow') -%>
         </li>
     <% end -%>
 <% end -%>
