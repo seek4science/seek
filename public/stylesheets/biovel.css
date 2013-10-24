@@ -290,3 +290,8 @@ div.your_recent {
 body {
   text-align: left;
 }
+
+#run-interaction iframe {
+  margin: 20px auto;
+  border: 1px solid #999;
+}
