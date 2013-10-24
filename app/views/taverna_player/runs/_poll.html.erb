@@ -2,8 +2,6 @@
   <script type="text/javascript">
     var poll_interval = <%= TavernaPlayer.server_poll_interval * 2000 %>
 
-    $j = jQuery.noConflict();
-
     $j(document).ready(
       function() {
         window.setTimeout("poll_run()", poll_interval)

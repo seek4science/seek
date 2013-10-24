@@ -52,6 +52,9 @@
   </div>
 
   <%= javascript_include_tag 'jquery-1.5.1.min.js' %>
+  <script>
+    $j = jQuery.noConflict();
+  </script>
   <% unless @run.complete? %>
       <%= render :partial => "poll", :locals => {:reload => run_path(@run)} %>
   <% end %>
