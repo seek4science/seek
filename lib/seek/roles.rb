@@ -2,18 +2,24 @@ module Seek
   module Roles
 
     ROLES = %w[admin pal project_manager asset_manager gatekeeper]
+    PROJECT_DEPENDENT_ROLES = %w[pal project_manager asset_manager gatekeeper]
 
     def self.included(base)
+      raise "Only People can have roles" unless base==Person
+
       base.extend(ClassMethods)
       ROLES.each do |role|
         eval <<-END_EVAL
-            def is_#{role}?
-              roles.include?('#{role}')
+            def is_#{role}?(project=nil)
+              roles(project).include?('#{role}')
             end
 
-            def is_#{role}=(yes)
-              if yes
-                add_roles ['#{role}']
+            def is_#{role}=(flag_and_project)
+              flag_and_project = Array(flag_and_project)
+              flag = flag_and_project[0]
+              projects = flag_and_project[1]
+              if flag
+                add_roles [['#{role}',projects]]
               else
                 remove_roles ['#{role}']
               end
@@ -21,12 +27,17 @@ module Seek
         END_EVAL
       end
       base.class_eval do
-        requires_can_manage :roles_mask
+        #requires_can_manage :roles_mask
+        has_many :admin_defined_role_projects
       end
 
     end
 
     module ClassMethods
+
+      def is_project_dependent_role? role
+        PROJECT_DEPENDENT_ROLES.include?(role)
+      end
 
       def mask_for_role(role)
         2**ROLES.index(role)
@@ -48,20 +59,50 @@ module Seek
       self.class.mask_for_role(role)
     end
 
-    #the roles defined within SEEK
+
     def roles=(roles)
-      self.roles_mask = (roles & ROLES).map { |r| self.class.mask_for_role(r) }.sum
+      add_roles(roles)
     end
 
-    def roles
+    #fetch the roles assigned for this project
+    def roles(project=nil)
+      role_names.select do |role_name|
+        if self.class.is_project_dependent_role?(role_name)
+          mask = mask_for_role(role_name)
+          !self.admin_defined_role_projects.where(project_id: project.id,role_mask: mask).empty?
+        else
+          true
+        end
+      end
+    end
+
+    def role_names
       ROLES.reject do |r|
         ((roles_mask || 0) & mask_for_role(r)).zero?
       end
     end
 
+    #adds roles for projects, roles is an array, and each element is an array containing the role name and project(s)
     def add_roles roles
-      add_roles = roles - (roles & self.roles)
-      self.roles_mask = self.roles_mask.to_i + ((add_roles & ROLES).map { |r| mask_for_role(r) }.sum)
+      new_mask = 0
+      roles.each do |role_details|
+        rolename = role_details[0]
+        projects = Array(role_details[1])
+        mask = mask_for_role(rolename)
+        if self.class.is_project_dependent_role?(rolename)
+          current_projects = self.admin_defined_role_projects.where(role_mask: mask).collect{|r|r.project}
+          to_remove = current_projects - projects
+          to_add = projects - current_projects
+          to_remove.each do |project|
+            AdminDefinedRoleProject.where(project_id: project.id,role_mask: mask, person_id: self.id).destroy_all
+          end
+          to_add.each do |project|
+            self.admin_defined_role_projects << AdminDefinedRoleProject.new(project: project, role_mask: mask)
+          end
+        end
+        new_mask += mask
+      end
+      self.roles_mask = new_mask
     end
 
     def remove_roles roles

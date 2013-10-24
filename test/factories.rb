@@ -13,6 +13,10 @@
     f.group_memberships {[Factory.build(:group_membership)]}
   end
 
+  Factory.define(:person_in_multiple_projects, :parent=>:brand_new_person) do |f|
+    f.group_memberships {[Factory.build(:group_membership),Factory.build(:group_membership),Factory.build(:group_membership)]}
+  end
+
   Factory.define(:person, :parent => :person_in_project) do |f|
     f.association :user, :factory => :activated_user
   end
