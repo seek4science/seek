@@ -20,6 +20,10 @@ module Seek
             end
         END_EVAL
       end
+      base.class_eval do
+        requires_can_manage :roles_mask
+      end
+
     end
 
     module ClassMethods

@@ -71,8 +71,6 @@ class Person < ActiveRecord::Base
   has_many :subscriptions,:dependent => :destroy
   before_create :set_default_subscriptions
 
-  requires_can_manage :roles_mask
-
   def queue_update_auth_table
     if changes.include?("roles_mask")
       AuthLookupUpdateJob.add_items_to_queue self
