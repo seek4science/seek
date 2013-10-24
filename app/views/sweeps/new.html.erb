@@ -2,7 +2,7 @@
   <a href="/">Home</a> &gt;
   <%= link_to @workflow.category.name, main_app.workflows_path(:category_id => @workflow.category) -%> &gt;
   <%= link_to @workflow.title, main_app.workflow_path(@workflow) -%> &gt;
-  <%= link_to @run.name, taverna_player.run_path(@run) -%> &gt;
+  <%= link_to @run.name, taverna_player.run_path(@run) unless @run.blank?-%> &gt;
   New sweep
 </div>
 
@@ -23,19 +23,21 @@
       <%= sweep_form.hidden_field :workflow_id, :value => @workflow.id %>
       <%# f.hidden_field :workflow_version, :value => @workflow_version.version %>
 
-      <div style="text-align: left; padding: 20px 20px 20px 0px;">
+      <div style="text-align: left; padding: 20px 0px 20px 0px;">
         <% if !@run.blank? %>
-            <p>
+            <div class="box_standout curved" style="padding: 10px 0px 10px 0px;">
+              <p style="text-align: left; padding: 0px 0px 0px 5px;">
               <%= label_tag 'Sweep based on run:' %> <%= link_to(@run.name, @run) %>
               </br>
             </p>
+            </div>
         <% end %>
-        <p>
+        <p style="padding: 10px 0px 0px 5px;">
           <%= sweep_form.label :name, "Sweep name:" %>
           <%= sweep_form.text_field :name, :value => "#{workflow_title} sweep", :size => 80 %><br/>
         </p>
 
-        <p>
+        <p style="padding: 10px 0px 0px 5px;">
           <%= label_tag "Data input to iterate over:" %>
           <% if !@run.blank? %>
               <%= select_tag :sweep_data_input_name, options_for_select(data_input_names, :selected => params[:sweep_data_input_name]),
@@ -46,7 +48,7 @@
           <% end %>
         </p>
 
-        <p>
+        <p style="padding: 10px 0px 0px 5px;">
           <%= label_tag "Number of iterations:" %>
           <% if !@run.blank? %>
               <%= select_tag :sweep_length, options_for_select(1.upto(20), :selected => params[:sweep_length]),
