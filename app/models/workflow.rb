@@ -70,6 +70,11 @@ class Workflow < ActiveRecord::Base
     text :title , :description, :category, :uploader
   end if Seek::Config.solr_enabled
 
+
+  def uploader
+    return self.contributor.person.name
+  end
+
   def self.user_creatable?
     true
   end
