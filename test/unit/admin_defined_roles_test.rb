@@ -38,6 +38,7 @@ class AdminDefinedRolesTest < ActiveSupport::TestCase
   end
 
   test 'non-admin can not change the roles of a person' do
+    admin = Factory(:admin)#needed to avoid the next person becoming an admin due to being the first person
     person = Factory(:person)
     User.with_current_user person.user do
 
@@ -148,9 +149,9 @@ class AdminDefinedRolesTest < ActiveSupport::TestCase
   end
 
   test 'replace admins, pals named_scope by a static function' do
-
-    normal = Factory(:person)
+    Person.destroy_all
     admin = Factory(:admin)
+    normal = Factory(:person)
     pal = Factory(:pal)
 
     admins = Person.admins
