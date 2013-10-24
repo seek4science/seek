@@ -11,7 +11,7 @@ module Seek
       ROLES.each do |role|
         eval <<-END_EVAL
             def is_#{role}?(project=nil)
-              roles(project).include?('#{role}')
+              role_names.include?('#{role}') && roles(project).include?('#{role}')
             end
 
             def is_#{role}=(flag_and_project)
@@ -21,7 +21,7 @@ module Seek
               if flag
                 add_roles [['#{role}',projects]]
               else
-                remove_roles ['#{role}']
+                remove_roles [['#{role}',projects]]
               end
             end
         END_EVAL
@@ -61,6 +61,10 @@ module Seek
 
 
     def roles=(roles)
+      #TODO a bit heavy handed, but works for the moment
+      self.roles_mask=0
+      self.admin_defined_role_projects.destroy_all
+
       add_roles(roles)
     end
 
@@ -68,8 +72,12 @@ module Seek
     def roles(project=nil)
       role_names.select do |role_name|
         if self.class.is_project_dependent_role?(role_name)
-          mask = mask_for_role(role_name)
-          !self.admin_defined_role_projects.where(project_id: project.id,role_mask: mask).empty?
+          if project.nil?
+            false
+          else
+            mask = mask_for_role(role_name)
+            !self.admin_defined_role_projects.where(project_id: project.id,role_mask: mask).empty?
+          end
         else
           true
         end
@@ -84,30 +92,40 @@ module Seek
 
     #adds roles for projects, roles is an array, and each element is an array containing the role name and project(s)
     def add_roles roles
-      new_mask = 0
+      new_mask = self.roles_mask || 0
       roles.each do |role_details|
         rolename = role_details[0]
         projects = Array(role_details[1])
         mask = mask_for_role(rolename)
         if self.class.is_project_dependent_role?(rolename)
           current_projects = self.admin_defined_role_projects.where(role_mask: mask).collect{|r|r.project}
-          to_remove = current_projects - projects
-          to_add = projects - current_projects
-          to_remove.each do |project|
-            AdminDefinedRoleProject.where(project_id: project.id,role_mask: mask, person_id: self.id).destroy_all
-          end
-          to_add.each do |project|
+          to_add =
+          (projects - current_projects).each do |project|
             self.admin_defined_role_projects << AdminDefinedRoleProject.new(project: project, role_mask: mask)
           end
         end
-        new_mask += mask
+        new_mask += mask if (new_mask & mask).zero?
       end
       self.roles_mask = new_mask
     end
 
     def remove_roles roles
-      remove_roles = roles & self.roles
-      self.roles_mask = self.roles_mask.to_i - ((remove_roles & ROLES).map { |r| mask_for_role(r) }.sum)
+      new_mask = self.roles_mask
+      roles.each do |role_details|
+        rolename = role_details[0]
+        projects = Array(role_details[1])
+        mask = mask_for_role(rolename)
+        if self.class.is_project_dependent_role?(rolename)
+          current_projects = self.admin_defined_role_projects.where(role_mask: mask).collect{|r|r.project}
+          projects.each do |project|
+            AdminDefinedRoleProject.where(project_id: project.id,role_mask: mask, person_id: self.id).destroy_all
+          end
+          new_mask -= mask if (current_projects - projects).empty?
+        else
+          new_mask -= mask
+        end
+      end
+      self.roles_mask = new_mask
     end
 
     def is_gatekeeper_of? item

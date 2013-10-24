@@ -102,20 +102,27 @@ class AdminDefinedRolesTest < ActiveSupport::TestCase
       person = Factory(:admin)
       assert_equal 1,person.projects.count
       project = person.projects.first
-      assert_equal ['admin'], person.roles(project)
+      assert_equal ['admin'], person.roles
       assert person.can_manage?
-      person.add_roles [['admin',project],['pal',project]]
+      person.add_roles [['admin'],['pal',project]]
       person.save!
       person.reload
       assert_equal ['admin', 'pal'].sort, person.roles(project).sort
+      assert person.is_admin?
+      assert person.is_pal?(project)
+      assert !person.is_pal?
     end
   end
 
-  test 'update roles for a person' do
+  test 'update roles directly' do
     User.with_current_user Factory(:admin).user do
       person = Factory(:person)
       project = person.projects.first
       person.roles = [['asset_manager',project], ['pal',project]]
+      person.save!
+      person.reload
+      assert_equal ['asset_manager','pal'], person.roles(project).sort
+
       person.roles = [['pal',project]]
       person.save!
       person.reload
@@ -131,6 +138,49 @@ class AdminDefinedRolesTest < ActiveSupport::TestCase
       assert_equal ['asset_manager'],person2.roles(project)
       assert_equal ['pal'],person2.roles(project2)
       assert_equal [],person2.roles(project3)
+    end
+  end
+
+  test "updating roles with assignment" do
+    User.with_current_user Factory(:admin).user do
+      person = Factory(:person_in_multiple_projects)
+      project = person.projects.first
+
+      person.is_admin=true
+      person.save!
+      person.reload
+      assert_equal ['admin'],person.roles(project)
+      assert person.is_admin?
+      assert !person.is_gatekeeper?(project)
+
+      person.is_asset_manager=true,project
+      person.save!
+      person.reload
+      assert_equal ['admin','asset_manager'],person.roles(project).sort
+      assert person.is_admin?
+      assert person.is_asset_manager?(project)
+      assert !person.is_gatekeeper?(project)
+
+      person.is_asset_manager=false,project
+      person.is_pal=true,project
+
+      person.save!
+      person.reload
+      assert_equal ['admin','pal'],person.roles(project).sort
+      assert person.is_admin?
+      assert person.is_pal?(project)
+      assert !person.is_asset_manager?(project)
+      assert !person.is_gatekeeper?(project)
+
+      project2=person.projects.last
+      person.is_pal=true,project2
+      assert person.is_pal?(project)
+      assert !person.is_asset_manager?(project)
+      assert !person.is_gatekeeper?(project)
+      assert person.is_pal?(project2)
+      assert !person.is_asset_manager?(project2)
+      assert !person.is_gatekeeper?(project2)
+
     end
   end
 
@@ -151,13 +201,12 @@ class AdminDefinedRolesTest < ActiveSupport::TestCase
   test 'is_admin?' do
     User.with_current_user Factory(:admin).user do
       person = Factory(:person)
-      project = person.projects.first
-      other_project = Factory(:project)
+
       person.is_admin = true
       person.save!
+      person.reload
 
       assert person.is_admin?
-      assert !person.is_admin?
 
       person.is_admin = false
       person.save!
