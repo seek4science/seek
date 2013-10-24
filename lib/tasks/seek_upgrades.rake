@@ -329,7 +329,6 @@ desc "pre-populate investigations with projects in VLN SEEK "
       new_inv.projects = [proj]
       unless proj.project_coordinators.empty?
         new_inv.contributor = proj.project_coordinators.first.user
-        User.current_user = proj.project_coordinators.first.user
       end
       policy = Policy.new(:name => "default project and other projects policy for pre-populated investigation",
                           :sharing_scope => Policy::ALL_SYSMO_USERS,
