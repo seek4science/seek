@@ -269,17 +269,6 @@ class ProjectTest < ActiveSupport::TestCase
     assert p.valid?
   end
 
-  def test_pals
-    pal=people(:pal)
-    project=projects(:sysmo_project)
-
-    assert_equal 1,project.pals.size
-    assert project.pals.include?(pal)
-
-    project = projects(:moses_project)
-    assert !project.pals.include?(pal)
-  end
-
   test "test uuid generated" do
     p = projects(:one)
     assert_nil p.attributes["uuid"]
@@ -326,5 +315,57 @@ class ProjectTest < ActiveSupport::TestCase
     assert project.work_groups.reload.collect(&:people).flatten.empty?
     assert user.is_admin?
     assert project.can_delete?(user)
+  end
+
+  test "gatekeepers" do
+    User.with_current_user(Factory(:admin)) do
+      person=Factory(:person_in_multiple_projects)
+      proj1 = person.projects.first
+      proj2 = person.projects.last
+      person.is_gatekeeper=true,proj1
+      person.save!
+
+      assert proj1.gatekeepers.include?(person)
+      assert !proj2.gatekeepers.include?(person)
+    end
+  end
+
+  test "project_managers" do
+    User.with_current_user(Factory(:admin)) do
+      person=Factory(:person_in_multiple_projects)
+      proj1 = person.projects.first
+      proj2 = person.projects.last
+      person.is_project_manager=true,proj1
+      person.save!
+
+      assert proj1.project_managers.include?(person)
+      assert !proj2.project_managers.include?(person)
+    end
+  end
+
+  test "asset_managers" do
+    User.with_current_user(Factory(:admin)) do
+      person=Factory(:person_in_multiple_projects)
+      proj1 = person.projects.first
+      proj2 = person.projects.last
+      person.is_asset_manager=true,proj1
+      person.save!
+
+      assert proj1.asset_managers.include?(person)
+      assert !proj2.asset_managers.include?(person)
+    end
+  end
+
+  test "pals" do
+    User.with_current_user(Factory(:admin)) do
+      person=Factory(:person_in_multiple_projects)
+      proj1 = person.projects.first
+      proj2 = person.projects.last
+      person.is_pal=true,proj1
+      person.save!
+
+      assert proj1.pals.include?(person)
+      assert !proj2.pals.include?(person)
+    end
   end
 end

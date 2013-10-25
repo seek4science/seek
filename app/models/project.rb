@@ -91,14 +91,6 @@ class Project < ActiveRecord::Base
     end
   end
 
-  #this is the intersection of project role and seek role
-  def pals
-    pal_role=ProjectRole.pal_role
-    people.select{|p| p.is_pal?}.select do |possible_pal|
-      possible_pal.project_roles_of_project(self).include?(pal_role)
-    end
-  end
-
   #this is project role
   def pis
     pi_role = ProjectRole.find_by_name('PI')
@@ -107,17 +99,27 @@ class Project < ActiveRecord::Base
 
   #this is seek role
   def asset_managers
-    people.select(&:is_asset_manager?)
+    people_with_the_role("asset_manager")
   end
 
   #this is seek role
   def project_managers
-    people.select(&:is_project_manager?)
+    people_with_the_role("project_manager")
   end
 
   #this is seek role
   def gatekeepers
-    people.select(&:is_gatekeeper?)
+    people_with_the_role("gatekeeper")
+  end
+
+  def pals
+    people_with_the_role("pal")
+  end
+
+  #returns people belong to the admin defined seek 'role' for this project
+  def people_with_the_role role
+    mask = Person.mask_for_role(role)
+    AdminDefinedRoleProject.where(role_mask: mask,project_id: self.id).collect{|r| r.person}
   end
 
   def locations
