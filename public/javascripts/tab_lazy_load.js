@@ -5,7 +5,7 @@ function load_tabs() {
     tabberAutomatic(tabberOptions);
 }
 
-function tabs_on_click(scale_title, resource_type, resource_ids){
+function tabs_on_click(scale_title, resource_type, resource_ids, actions_partial_disable){
     var click_tab = document.getElementsByClassName(scale_title + '_' + resource_type)[0];
     click_tab.onclick = function(){
         deactivate_previous_tab(scale_title);
@@ -29,7 +29,8 @@ function tabs_on_click(scale_title, resource_type, resource_ids){
                     resource_type: resource_type,
                     resource_ids: resource_ids,
                     scale_title: scale_title,
-                    view_type: 'view_some'
+                    view_type: 'view_some',
+                    actions_partial_disable: actions_partial_disable
                 },
                 onLoading: show_large_ajax_loader(tab_content_view_some_id),
                 onFailure: function(transport){

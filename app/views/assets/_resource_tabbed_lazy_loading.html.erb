@@ -1,6 +1,6 @@
 <% tabs_id ||= "resource_list_by_class" -%>
 <% scale_title ||= "all" -%>
-
+<% actions_partial_disable ||=false%>
 <script type="text/javascript">
     tabber_ids.push("<%= tabs_id -%>");
 </script>
@@ -20,7 +20,7 @@
 
       <% sorted_result_keys.each do |key| -%>
           <div class="tabbertab">
-            <% tab_title = "#{key} (#{resource_hash[key].count})" -%>
+            <% tab_title = "#{resource_tab_item_name(key)} (#{resource_hash[key].count})" -%>
             <h3 class="<%= scale_title %>_<%= key %>"><%= tab_title -%></h3>
           </div>
 
@@ -35,7 +35,7 @@
     <script type="text/javascript">
         load_tabs();
         <% sorted_result_keys.each do |key| %>
-        tabs_on_click('<%= scale_title %>', '<%= key %>', '<%=resource_hash[key].collect(&:id).join(',') %>');
+        tabs_on_click('<%= scale_title %>', '<%= key %>', '<%=resource_hash[key].collect(&:id).join(',') %>','<%=actions_partial_disable%>');
         <% end %>
 
         //Load content for first tab

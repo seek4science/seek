@@ -1763,6 +1763,8 @@ div#image_file_box {
     margin-top: 0.5em;
 }
 
-
+div.content_stats tr:nth-of-type(odd) {
+    background-color:#E3E3E3;
+}
 
 

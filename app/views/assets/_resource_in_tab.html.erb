@@ -4,13 +4,14 @@
    hidden_count = hidden_items.count
    extra_count = resources.count - hidden_items.count - limit
    resource_type = resources.first.class.name
+   actions_partial_disable ||= false
 %>
 
 <%= render :partial => "assets/resource_list",
            :locals => {:collection => (view_type == 'view_some' ? authorized_resources.take(limit) : authorized_resources),
                        :narrow_view => true,
                        :authorization_for_showing_already_done => true,
-                       :actions_partial_disable=>true} %>
+                       :actions_partial_disable=> actions_partial_disable} %>
 
 <% if extra_count > 0 %>
     <div class="list_items_container">

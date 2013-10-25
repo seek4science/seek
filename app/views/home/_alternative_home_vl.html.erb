@@ -15,32 +15,22 @@
 <!--Inserting the javascripts for loading tabber dynamically-->
 <div id="js_for_tabber"></div>
 
-<!--the files need to be loaded before calling the partial resource_tabbed_lazy_loading
-    and with this order
--->
-<%= javascript_include_tag "tabber-minimized.js" %>
-<%= javascript_include_tag "tab_lazy_load.js" %>
+
 
 <div id="scaled_items">
-    <div id="all_results" class="scaled_items">
-      <%
-         resource_hash = {}
-         Seek::Util.user_creatable_types.each do |klass|
-           items = klass.all
-           resource_hash["#{klass}"] = items if items.count > 0
-         end
-      %>
+  <%
+     resource_hash = {}
+     # resource_hash for all
+     Seek::Util.user_creatable_types.each do |klass|
+       items = klass.all
+       resource_hash["#{klass}"] = items if items.count > 0
+     end
+  %>
 
-      <%= render :partial => "assets/resource_tabbed_lazy_loading",
-                   :locals => {:scale_title => 'all',
-                               :tabs_id => "resource_tabbed_lazy_loading_all",
-                               :resource_hash => resource_hash} -%>
-    </div>
-    <% scale_titles = Scale.all.map(&:title)
-       scale_titles = ['all'] + scale_titles
-       scale_titles.reject{|s| s == 'all'}.each do |s|%>
-    <div id="<%= s %>_results" class="scaled_items" style="display: none;"></div>
-    <% end %>
+
+    <%= render :partial => "scales/scale_search_results_tabs", :locals => {:resource_hash=>resource_hash,
+                                                                           :scale_title=> "all",
+                                                                           :actions_partial_disable => true} %>
 </div>
 
 

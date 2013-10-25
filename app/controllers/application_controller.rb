@@ -178,11 +178,22 @@ class ApplicationController < ActionController::Base
     view_type = params[:view_type]
     scale_title = params[:scale_title] || ''
 
+    if params[:actions_partial_disable] == "true"
+      actions_partial_disable = true
+    else
+      actions_partial_disable = false
+    end
+
+
     resource_ids = (params[:resource_ids] || []).split(',')
     clazz = resource_type.constantize
     resources = clazz.find_all_by_id(resource_ids)
     if clazz.respond_to?(:authorized_partial_asset_collection)
       authorized_resources = clazz.authorized_partial_asset_collection(resources,"view")
+    elsif resource_type == 'Project' || resource_type == 'Institution'
+      authorized_resources = resources
+    elsif resource_type == "Person" && Seek::Config.is_virtualliver && User.current_user.nil?
+      authorized_resources = []
     else
       authorized_resources = resources.select &:can_view?
     end
@@ -193,7 +204,8 @@ class ApplicationController < ActionController::Base
                           :locals => {:resources => resources,
                                       :scale_title => scale_title,
                                       :authorized_resources => authorized_resources,
-                                      :view_type => view_type }
+                                      :view_type => view_type,
+                                      :actions_partial_disable => actions_partial_disable}
     end
   end
 

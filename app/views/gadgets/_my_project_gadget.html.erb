@@ -15,7 +15,7 @@
             <ul id="my_project_menu" class='dynamic_menu' style="display:none;">
 
                 <% current_user.person.projects.each do |p| %>
-                    <li class='dynamic_menu_li' onclick="javascript:location.href='<%= project_path(p) -%>';"><%= h(p.name) %></li>
+                    <li style="border-bottom: 1px dotted grey;" class='dynamic_menu_li' onclick="javascript:location.href='<%= project_path(p) -%>';"><%= h(p.name) %></li>
                 <% end %>
             </ul>
 
