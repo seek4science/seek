@@ -689,28 +689,6 @@ class AuthorizationTest < ActiveSupport::TestCase
     assert sop.can_edit?(users(:aaron))
   end
 
-  def test_asset_with_no_contributor
-    sop=sops(:sop_with_no_contributor) #should be editable to all those that are members of a project
-    user=users(:pal_user)
-    assert Seek::Permissions::Authorization.is_authorized?("view",Sop,sop,user), "The sop with no contributor should be viewable to the pal"
-    assert Seek::Permissions::Authorization.is_authorized?("edit",Sop,sop,user), "The sop with no contributor should be editable to the pal"
-    assert Seek::Permissions::Authorization.is_authorized?("download",Sop,sop,user), "The sop with no contributor should be downloadable to the pal"
-    assert !Seek::Permissions::Authorization.is_authorized?("manage",Sop,sop,user), "The sop with no contributor should not be managable to the pal"
-  end
-
-  def test_asset_with_no_contributor_with_managing_permission
-    sop=sops(:sop_with_no_contributor) #should be editable to all those that are members of a project
-    user=users(:pal_user)
-    assert !Seek::Permissions::Authorization.is_authorized?("manage",Sop,sop,user), "The should not be managable to the pal"
-    #now add the managable
-    p=Permission.new(:contributor=>user.person,:policy=>sop.policy,:access_type=>Policy::MANAGING)    
-    sop.policy.permissions << p
-    sop.policy
-    sop.policy.save!
-    
-    assert sop.can_manage?(user), "The sop should now be managable to the pal"
-  end
-
   test "anyone can do anything on policy free items, except the overriten can_action?" do
     item = Factory :project
     User.current_user = Factory :user
