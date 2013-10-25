@@ -59,19 +59,18 @@ class InstitutionTest < ActiveSupport::TestCase
     i=institutions(:one)
     assert !i.can_be_edited_by?(u),"Institution :one should not be editable by user :can_edit as he is not a member"
 
-    u=users(:project_manager)
-    i=institutions(:two)
-    assert i.can_be_edited_by?(u),"Institution :two should be editable by user :project_manager"
-
     i=institutions(:one)
     assert !i.can_be_edited_by?(u),"Institution :one should not be editable by user :project_manager since this institution is not participating in any of his projects"
 
-    i=Factory(:institution, :projects => [u.person.projects.first])
-    assert i.can_be_edited_by?(u), "This institution should be editable by user :project_manager since one of this institution is participating in one of his projects"
+    pm = Factory(:project_manager)
+    i = pm.group_memberships.first.work_group.institution
+    i2 = Factory(:institution)
+    assert i.can_be_edited_by?(pm.user), "This institution should be editable as this user is project manager of a project this institution is linked to"
+    assert !i2.can_be_edited_by?(pm.user), "This institution should be not editable as this user is project manager but not of a project this institution is linked to"
 
     i=institutions(:one)
-    u=users(:quentin)
-    assert i.can_be_edited_by?(u),"Institution :one should be editable by user :quentin as he's an admin"
+    u=Factory(:admin).user
+    assert i.can_be_edited_by?(u),"Institution :one should be editable by this user, as he's an admin"
 
     u=users(:cant_edit)
     i=institutions(:two)

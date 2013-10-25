@@ -32,9 +32,16 @@ class Institution < ActiveRecord::Base
   end
 
    def can_be_edited_by?(subject)
-    subject == nil ? false : (subject.is_admin? ||
-          (subject.can_edit_institutions? && self.people.include?(subject.person)) ||
-          (subject.is_project_manager? && !(subject.person.projects & projects).empty?))
+    return false if subject.nil?
+    subject.is_admin? || (subject.can_edit_institutions? && self.people.include?(subject.person)) || self.is_managed_by?(subject)
+   end
+
+  #determines if this person is the member of a project for which the user passed is a project manager
+  def is_managed_by? user
+    match = self.projects.find do |p|
+      user.person.is_project_manager?(p)
+    end
+    !match.nil?
   end
 
   # get a listing of all known institutions

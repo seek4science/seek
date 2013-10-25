@@ -277,7 +277,15 @@ class Person < ActiveRecord::Base
   #admin or (project managers of this person and this person does not have a user or not the other admin)
   #themself
   def can_be_edited_by?(subject)
-    subject == nil ? false : (((subject.is_admin? || (!(self.projects & subject.try(:person).try(:projects).to_a).empty? && subject.is_project_manager? && (self.user.nil? || !self.is_admin?)))) || (subject == self.user))
+    subject == nil ? false : (subject == self.user || subject.is_admin? || self.is_managed_by?(subject))
+  end
+
+  #determines if this person is the member of a project for which the user passed is a project manager
+  def is_managed_by? user
+    match = self.projects.find do |p|
+      user.person.is_project_manager?(p)
+    end
+    !match.nil?
   end
 
   #admin or (project manager can administer themselves and the other people, except the other admins)
