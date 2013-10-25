@@ -1,4 +1,4 @@
-<%= javascript_include_tag 'jquery-1.5.1.min.js' %>
+<%= javascript_include_tag 'jquery-1.5.1.min.js', :cache=>"explorer_cached" %>
 
 <div class="breadcrumbs">
   <a href="/">Home</a> &gt;
@@ -12,5 +12,11 @@
 </div>
 
 <div class="show_basic">
+  <h2 style='background-color: #CDDEEF; background-image: url("/public/images/header-bg2.png");'>Runs</h2>
   <%= render :partial => 'taverna_player/runs/table', :locals => {:runs => @sweep.runs, :polling_url => runs_sweep_path(@sweep) } %>
+</div>
+
+<div class="show_basic">
+  <h2 style='background-color: #CDDEEF; background-image: url("/public/images/header-bg2.png");'>Results</h2>
+  <%= render :partial => 'results_table' %>
 </div>

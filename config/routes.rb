@@ -460,6 +460,8 @@ SEEK::Application.routes.draw do
     member do
       put :cancel
       get :runs
+      post :download_results
+      get :view_result
     end
   end
 

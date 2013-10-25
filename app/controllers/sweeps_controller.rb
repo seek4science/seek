@@ -68,6 +68,20 @@ class SweepsController < ApplicationController
     end
   end
 
+  # Give a result value for a given output port of a given run.
+  def view_result
+    @sweep = Sweep.find(params[:id])
+    render "show"
+  end
+
+  # Zip/assemble results for a given output port over selected sweep's runs,
+  # results for a run (for all output ports), or all results for all output ports
+  # and all runs.
+  def download_results
+    @sweep = Sweep.find(params[:id])
+    render "show"
+  end
+
   private
 
   def find_run
@@ -91,6 +105,7 @@ class SweepsController < ApplicationController
   end
 
   def set_runlet_parameters
+
     shared_input_values_for_all_runs = params[:sweep].delete(:shared_input_values_for_all_runs)
     params[:sweep][:runs_attributes].each do |run_id, run_attributes|
       run_attributes[:workflow_id] = params[:sweep][:workflow_id]
