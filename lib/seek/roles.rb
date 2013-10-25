@@ -46,7 +46,8 @@ module Seek
       ROLES.each do |role|
         eval <<-END_EVAL
           def #{role}s
-            self.all.select(&:is_#{role}?)
+            mask = mask_for_role('#{role}')
+            self.where(roles_mask: mask)
           end
           def mask_for_#{role}
             self.mask_for_role('#{role}')

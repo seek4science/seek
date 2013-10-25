@@ -26,20 +26,30 @@
   end
 
   Factory.define(:pal, :parent => :person) do |f|
-    f.is_pal true
-    f.after_create { |pal| pal.group_memberships.first.project_roles << ProjectRole.pal_role}
+
+    f.after_build do |pal|
+      Factory(:pal_role) if ProjectRole.pal_role.nil?
+      pal.group_memberships.first.project_roles << ProjectRole.pal_role
+      pal.is_pal=true,pal.projects
+    end
   end
 
   Factory.define(:asset_manager,:parent=>:person) do |f|
-    f.is_asset_manager true
+    f.after_build do |am|
+      am.is_asset_manager=true,am.projects
+    end
   end
 
   Factory.define(:project_manager,:parent=>:person) do |f|
-    f.is_project_manager true
+    f.after_build do |pm|
+      pm.is_project_manager=true,pm.projects
+    end
   end
 
   Factory.define(:gatekeeper,:parent=>:person) do |f|
-    f.is_gatekeeper true
+    f.after_build do |gk|
+      gk.is_gatekeeper=true,gk.projects
+    end
   end
 
 #User
@@ -474,6 +484,10 @@ end
 
   Factory.define(:project_role) do |f|
     f.name "A Role"
+  end
+
+  Factory.define(:pal_role,:parent=>:project_role) do |f|
+    f.name "A Pal"
   end
 
   Factory.define(:work_group) do |f|

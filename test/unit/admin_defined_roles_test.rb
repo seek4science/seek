@@ -315,22 +315,85 @@ class AdminDefinedRolesTest < ActiveSupport::TestCase
     assert_equal %w[admin pal project_manager asset_manager gatekeeper],Person::ROLES,"The order of the ROLES is critical as it determines the mask that is used."
   end
 
-  test 'replace admins, pals named_scope by a static function' do
-    Person.destroy_all
+  test "factories for roles" do
+    User.with_current_user Factory(:admin).user do
+      admin = Factory(:admin)
+      assert admin.is_admin?
+      assert admin.save
+
+      pal = Factory(:pal)
+      assert !pal.projects.empty?
+      assert pal.is_pal?(pal.projects.first)
+      assert pal.save
+
+      gatekeeper = Factory(:gatekeeper)
+      assert !gatekeeper.projects.empty?
+      assert gatekeeper.is_gatekeeper?(gatekeeper.projects.first)
+      assert gatekeeper.save
+
+      asset_manager = Factory(:asset_manager)
+      assert !asset_manager.projects.empty?
+      assert asset_manager.is_asset_manager?(asset_manager.projects.first)
+      assert asset_manager.save
+
+      project_manager = Factory(:project_manager)
+      assert !project_manager.projects.empty?
+      assert project_manager.is_project_manager?(project_manager.projects.first)
+      assert project_manager.save
+    end
+
+  end
+
+  test 'Person.pals' do
+      admin = Factory(:admin)
+      normal = Factory(:person)
+      pal = Factory(:pal)
+      assert !pal.projects.empty?
+      assert pal.is_pal?(pal.projects.first)
+
+      pals = Person.pals
+
+      assert pals.include?(pal)
+      assert !pals.include?(normal)
+  end
+
+  test 'Person.admins' do
     admin = Factory(:admin)
     normal = Factory(:person)
-    pal = Factory(:pal)
 
     admins = Person.admins
-
     assert admins.include?(admin)
     assert !admins.include?(normal)
-    assert !admins.include?(pal)
-
-    pals = Person.pals
-
-    assert pals.include?(pal)
-    assert !pals.include?(admin)
-    assert !pals.include?(normal)
   end
+
+  test "Person.gatekeepers" do
+    admin = Factory(:admin)
+    normal = Factory(:person)
+    gatekeeper = Factory(:gatekeeper)
+
+    gatekeepers = Person.gatekeepers
+    assert gatekeepers.include?(gatekeeper)
+    assert !gatekeepers.include?(normal)
+  end
+
+  test "Person.asset_managers" do
+    admin = Factory(:admin)
+    normal = Factory(:person)
+    asset_manager = Factory(:asset_manager)
+
+    asset_managers = Person.asset_managers
+    assert asset_managers.include?(asset_manager)
+    assert !asset_managers.include?(normal)
+  end
+
+  test "Person.project_managers" do
+    admin = Factory(:admin)
+    normal = Factory(:person)
+    project_manager = Factory(:project_manager)
+
+    project_managers = Person.project_managers
+    assert project_managers.include?(project_manager)
+    assert !project_managers.include?(normal)
+  end
+
 end
