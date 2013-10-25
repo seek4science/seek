@@ -48,6 +48,7 @@ function deactivate_previous_tab(scale_title){
     previous_active_tab.className = '';
     //Then hide the content of the tab
     var scale_and_type = previous_active_tab.childNodes[0].className;
+    //the content could come from external search
     if (scale_and_type.match("external_result") != null){
         scale_and_type = scale_and_type.split('external_result')[0];
         var resource_type = scale_and_type.split('_')[1].strip();
@@ -91,6 +92,7 @@ function refresh_boxover_tooltip_position(){
     }
 }
 
+//this is the case of search that include the result from external resources
 //check if no internal result is found, then display the first external tab
 function display_first_external_tab_content(scale_title){
     var scaled_result = $(scale_title + "_results");
@@ -104,6 +106,7 @@ function display_first_external_tab_content(scale_title){
     }
 }
 
+//this is the case of search that include the result from external resources
 function external_tabs_on_click(scale_title, resource_type){
     var click_tab = document.getElementsByClassName(scale_title + '_' + resource_type)[0];
     click_tab.onclick = function(){

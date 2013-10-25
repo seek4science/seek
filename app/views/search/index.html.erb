@@ -2,6 +2,7 @@
     $$('#search_results > div').invoke('hide');
     $$('#search_results #' + this.id +'_results').first().show();
     $$('#external_search_result_content > div').invoke('hide');
+    //check if no internal result is found, then display the first external tab
     display_first_external_tab_content(this.id);
 <% end %>
 <%= render :partial => 'scales/scale_slider', :locals => {:scale_slider_function => scale_slider_function, :current_scale => @scale_title} %>
@@ -12,39 +13,24 @@
 <%= javascript_include_tag "tabber-minimized.js" %>
 <%= javascript_include_tag "tab_lazy_load.js" %>
 
+<!--
+The lazy loading tabs are applied to only the internal results
+The external results are loaded immediately.
+Because the external results are loaded and the same for all the scales, its content is generated one time,
+and then apply to all scales in external_search_result_content
+But to make it easier for handling the tab names, they are created multiple times for each scale, by external_search_result_tab partial.
+
+-->
 <% external_resource_hash = {} %>
 <div id='search_results' class="scaled_items">
   <% (Scale.all.map(&:title) | ['all']).each do |scale|%>
       <div id='<%= scale %>_results' <%= "style='display: none'" unless @scale_title == scale%>>
-        <%
-           resource_hash = {}
-           if external_resource_hash.blank?
-             @results_scaled[scale].each do |item|
-               tab = item.respond_to?(:tab) ? item.tab : item.class.name
-               if item.respond_to?(:is_external_search_result?) && item.is_external_search_result?
-                 external_resource_hash[tab] = [] unless external_resource_hash[tab]
-                 external_resource_hash[tab] << item
-               else
-                 resource_hash[tab] = [] unless resource_hash[tab]
-                 resource_hash[tab] << item
-               end
-             end
-           else
-             @results_scaled[scale].each do |item|
-               tab = item.respond_to?(:tab) ? item.tab : item.class.name
-               if item.respond_to?(:is_external_search_result?) && item.is_external_search_result?
-               else
-                 resource_hash[tab] = [] unless resource_hash[tab]
-                 resource_hash[tab] << item
-               end
-             end
-           end
-        -%>
+        <% internal_resource_hash, external_resource_hash = get_resource_hash(scale, external_resource_hash) -%>
 
         <%= render :partial => "assets/resource_tabbed_lazy_loading",
                    :locals => {:scale_title => scale,
                                :tabs_id => "resource_tabbed_lazy_loading_#{scale}",
-                               :resource_hash => resource_hash,
+                               :resource_hash => internal_resource_hash,
                                :external_resource_hash => external_resource_hash} -%>
       </div>
   <% end %>
@@ -73,9 +59,10 @@
 <script type="text/javascript">
     <% first_external_tab = external_resource_hash.keys.first %>
     <% (Scale.all.map(&:title) | ['all']).each do |scale| %>
-    <% external_resource_hash.keys.each do |key| %>
-    external_tabs_on_click('<%= scale %>', '<%= key %>');
-    <% end %>
-    display_first_external_tab_content('<%= scale %>');
+        <% external_resource_hash.keys.each do |key| %>
+            external_tabs_on_click('<%= scale %>', '<%= key %>');
+        <% end %>
+        //check if no internal result is found, then display the first external tab
+        display_first_external_tab_content('<%= scale %>');
     <% end %>
 </script>
