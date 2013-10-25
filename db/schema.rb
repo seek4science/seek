@@ -191,26 +191,6 @@ ActiveRecord::Schema.define(:version => 20131015144138) do
 
   add_index "assets_creators", ["asset_id", "asset_type"], :name => "index_assets_creators_on_asset_id_and_asset_type"
 
-  create_table "attachments", :force => true do |t|
-    t.integer  "size"
-    t.integer  "height"
-    t.integer  "width"
-    t.integer  "parent_id"
-    t.integer  "attachable_id"
-    t.integer  "position"
-    t.string   "content_type"
-    t.string   "filename"
-    t.string   "thumbnail"
-    t.string   "attachable_type"
-    t.datetime "created_at"
-    t.datetime "updated_at"
-    t.string   "data_url"
-    t.string   "original_filename"
-  end
-
-  add_index "attachments", ["attachable_id", "attachable_type"], :name => "index_attachments_on_attachable_id_and_attachable_type"
-  add_index "attachments", ["parent_id"], :name => "index_attachments_on_parent_id"
-
   create_table "auth_lookup_update_queues", :force => true do |t|
     t.integer  "item_id"
     t.string   "item_type"
@@ -1065,6 +1045,7 @@ ActiveRecord::Schema.define(:version => 20131015144138) do
     t.string   "uuid"
     t.integer  "policy_id"
     t.integer  "publication_type",              :default => 1
+    t.string   "citation"
   end
 
   add_index "publications", ["contributor_id", "contributor_type"], :name => "index_publications_on_contributor_id_and_contributor_type"
