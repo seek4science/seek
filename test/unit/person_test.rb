@@ -342,13 +342,14 @@ class PersonTest < ActiveSupport::TestCase
   end
   
   def test_institutions
-    p=people(:quentin_person)
-    assert_equal 2,p.institutions.size
-    
-    p=people(:aaron_person)
-    assert_equal 2,p.work_groups.size
-    assert_equal 2,p.projects.size
-    assert_equal 1,p.institutions.size
+    person = Factory(:person_in_multiple_projects)
+
+    institution = person.group_memberships.first.work_group.institution
+    institution2 = Factory(:institution)
+
+    assert person.institutions.include?(institution)
+    assert !person.institutions.include?(institution2)
+    assert_equal 3,person.institutions.count
   end
   
   def test_projects
