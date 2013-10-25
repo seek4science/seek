@@ -14,9 +14,12 @@ class Ability
 
     person = user.try(:person)
     if person
-      person.roles.each do |role|
-        send(role, person)
+      person.projects.each do |proj|
+        person.roles(proj).each do |role|
+          send(role, person)
+        end
       end
+
     end
   end
 
