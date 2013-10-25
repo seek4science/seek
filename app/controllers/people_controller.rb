@@ -145,6 +145,10 @@ class PeopleController < ApplicationController
   # POST /people.xml
   def create
     @person = Person.new(params[:person])
+
+    # Set work group (BioVeL)
+    @person.work_group_ids = [params[:work_group].to_i]
+
     redirect_action="new"
 
     set_tools_and_expertise(@person, params)

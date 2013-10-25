@@ -2,6 +2,7 @@ module TavernaPlayer
   class RunsController < TavernaPlayer::ApplicationController
     include TavernaPlayer::Concerns::Controllers::RunsController
 
+    before_filter :auth, :except => [ :index, :new, :create ]
     before_filter :find_workflow_and_version, :only => :new
     before_filter :find_runs, :only => :index
     before_filter :add_sweeps, :only => :index
@@ -92,6 +93,27 @@ module TavernaPlayer
       @runs = @runs.group_by { |run| run.sweep }
       @runs = (@runs[nil] || []) + @runs.keys
       @runs.compact! # to ignore 'nil' key
+    end
+
+    def auth
+      action = translate_action(action_name)
+      unless is_auth?(@run, action)
+        if User.current_user.nil?
+          flash[:error] = "You are not authorized to #{action} this Workflow Run, you may need to login first."
+        else
+          flash[:error] = "You are not authorized to #{action} this Workflow Run."
+        end
+        respond_to do |format|
+          format.html do
+            case action
+              when 'manage','edit','download','delete'
+                redirect_to @run
+              else
+                redirect_to taverna_player.runs_path
+            end
+          end
+        end
+      end
     end
   end
 end

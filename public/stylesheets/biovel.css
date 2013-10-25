@@ -124,7 +124,7 @@ td.port-type label {
   width: 15em;
 }
 
-.script_example_data_box {
+.CodeRay > .code > pre, .script_example_data_box {
     overflow: auto;
     max-height: 400px;
     white-space: pre-wrap;       /* css-3 */
@@ -289,4 +289,15 @@ div.your_recent {
 
 body {
   text-align: left;
+}
+
+#run-interaction iframe {
+  margin: 20px auto;
+  border: 1px solid #999;
+}
+
+span.mime_type {
+  color: #999;
+  font-size: 80%;
+  font-weight: normal;
 }

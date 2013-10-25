@@ -32,7 +32,7 @@
 </script>
 
 <h1>New profile</h1>
-<p class="box_infotext" style="text-align:center">
+<p class="box_infotext" style="text-align:center; display: none">
   You should only create a new profile if you could not find yourself listed under your <%= t('project') %>.<br/>
   If you are a member of a <%= Seek::Config.project_name %> <%= t('project') %> and have not yet checked if your profile exists, then you should
   <b><%= link_to_function "select an existing profile" do |page|
@@ -94,6 +94,7 @@
 
 
     <br/>
+  <% if false %>
     <h2><%= t('project').pluralize %> & Institutions</h2>
         <div class="yui-g box_simple">
         <center>
@@ -124,6 +125,8 @@
           </div>
         </center>
         </div>
+    <% end %>
+  <%= render :partial => 'single_project_institution_select' , :locals => { :form => f } %>
 
     <br/>
 
