@@ -1,26 +1,81 @@
-  <% scale_slider_function = capture do %>
-        $$('#search_results > div').invoke('hide');
-        $$('#search_results #' + this.id +'_results').first().show();
-    <% end %>
-    <%= render :partial => 'scales/scale_slider', :locals => {:scale_slider_function => scale_slider_function, :current_scale => @scale_title} %>
-<div id='search_results' class="scaled_items">
-<% (Scale.all.map(&:title) | ['all']).each do |scale|%>
-      <div id='<%= scale %>_results' <%= "style='display: none'" unless @scale_title == scale%>>
-          <% resource_hash = classify_for_tabs @results_scaled[scale] -%>
-        <%= render :partial => "assets/resource_listing_tabbed_by_class",
-                   :locals => {:tabs_id => "#{scale}_results_tabs",
-                               :resource_hash => resource_hash,
-                               :narrow_view => true,
-                               :authorization_already_done => true} -%>
-      </div>
+<% scale_slider_function = capture do %>
+    $$('#search_results > div').invoke('hide');
+    $$('#search_results #' + this.id +'_results').first().show();
+    $$('#external_search_result_content > div').invoke('hide');
+    display_first_external_tab_content(this.id);
 <% end %>
-</div>
-<br />
-<% unless !logged_in? || params[:saved_search] %>
-      <div class="box_standout">
-        <% tiny_image = image "saved_search_avatar", {:style => "padding: 5px; border:1px solid #CCCCCC;background-color:#FFFFFF;vertical-align:middle;"} %>
-        <%= link_to_draggable(tiny_image, search_path, :title=>tooltip_title_attrib("Drag to Favourites to save this search"), :class=>"search", :id => "drag_search") %>
-        Drag this icon over to your Favourites to save this search.
+<%= render :partial => 'scales/scale_slider', :locals => {:scale_slider_function => scale_slider_function, :current_scale => @scale_title} %>
+
+<!--the files need to be loaded before calling the partial resource_tabbed_lazy_loading
+    and with this order
+-->
+<%= javascript_include_tag "tabber-minimized.js" %>
+<%= javascript_include_tag "tab_lazy_load.js" %>
+
+<% external_resource_hash = {} %>
+<div id='search_results' class="scaled_items">
+  <% (Scale.all.map(&:title) | ['all']).each do |scale|%>
+      <div id='<%= scale %>_results' <%= "style='display: none'" unless @scale_title == scale%>>
+        <%
+           resource_hash = {}
+           if external_resource_hash.blank?
+             @results_scaled[scale].each do |item|
+               tab = item.respond_to?(:tab) ? item.tab : item.class.name
+               if item.respond_to?(:is_external_search_result?) && item.is_external_search_result?
+                 external_resource_hash[tab] = [] unless external_resource_hash[tab]
+                 external_resource_hash[tab] << item
+               else
+                 resource_hash[tab] = [] unless resource_hash[tab]
+                 resource_hash[tab] << item
+               end
+             end
+           else
+             @results_scaled[scale].each do |item|
+               tab = item.respond_to?(:tab) ? item.tab : item.class.name
+               if item.respond_to?(:is_external_search_result?) && item.is_external_search_result?
+               else
+                 resource_hash[tab] = [] unless resource_hash[tab]
+                 resource_hash[tab] << item
+               end
+             end
+           end
+        -%>
+
+        <%= render :partial => "assets/resource_tabbed_lazy_loading",
+                   :locals => {:scale_title => scale,
+                               :tabs_id => "resource_tabbed_lazy_loading_#{scale}",
+                               :resource_hash => resource_hash,
+                               :external_resource_hash => external_resource_hash} -%>
       </div>
+  <% end %>
+</div>
+<div id='external_search_result_content'>
+  <% external_resource_hash.each do |key, value| -%>
+      <div id="<%= key%>" style="display: none">
+        <%= render :partial => "assets/resource_in_tab",
+                   :locals => {:resources => value,
+                               :scale_title => 'all',
+                               :authorized_resources => value,
+                               :view_type => 'view_some' } %>
+      </div>
+  <% end %>
+</div>
+<br/>
+<% unless !logged_in? || params[:saved_search] %>
+    <div class="box_standout">
+      <% tiny_image = image "saved_search_avatar", {:style => "padding: 5px; border:1px solid #CCCCCC;background-color:#FFFFFF;vertical-align:middle;"} %>
+      <%= link_to_draggable(tiny_image, search_path, :title=>tooltip_title_attrib("Drag to Favourites to save this search"), :class=>"search", :id => "drag_search") %>
+      Drag this icon over to your Favourites to save this search.
+    </div>
 
 <% end %>
+
+<script type="text/javascript">
+    <% first_external_tab = external_resource_hash.keys.first %>
+    <% (Scale.all.map(&:title) | ['all']).each do |scale| %>
+    <% external_resource_hash.keys.each do |key| %>
+    external_tabs_on_click('<%= scale %>', '<%= key %>');
+    <% end %>
+    display_first_external_tab_content('<%= scale %>');
+    <% end %>
+</script>
