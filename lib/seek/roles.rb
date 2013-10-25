@@ -24,6 +24,13 @@ module Seek
                 remove_roles [['#{role}',projects]]
               end
             end
+
+            def is_#{role}_of?(asset)
+              match = asset.projects.find do |project|
+                is_#{role}?(project)
+              end
+              !match.nil?
+            end
         END_EVAL
       end
       base.class_eval do
@@ -49,6 +56,7 @@ module Seek
             mask = mask_for_role('#{role}')
             self.where(roles_mask: mask)
           end
+
           def mask_for_#{role}
             self.mask_for_role('#{role}')
           end
@@ -130,13 +138,13 @@ module Seek
       self.roles_mask = new_mask
     end
 
-    def is_gatekeeper_of? item
-      is_gatekeeper? && !(item.projects & projects).empty?
-    end
-
-    def is_asset_manager_of? item
-      is_asset_manager? && !(item.projects & projects).empty?
-    end
+    #def is_gatekeeper_of? item
+    #  is_gatekeeper? && !(item.projects & projects).empty?
+    #end
+    #
+    #def is_asset_manager_of? item
+    #  is_asset_manager? && !(item.projects & projects).empty?
+    #end
 
   end
 end

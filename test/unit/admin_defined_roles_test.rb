@@ -191,7 +191,7 @@ class AdminDefinedRolesTest < ActiveSupport::TestCase
   end
 
   test 'non-admin can not change the roles of a person' do
-    admin = Factory(:admin)#needed to avoid the next person becoming an admin due to being the first person
+    Factory(:admin)#needed to avoid the next person becoming an admin due to being the first person
     person = Factory(:person)
     User.with_current_user person.user do
       project = person.projects.first
@@ -299,6 +299,7 @@ class AdminDefinedRolesTest < ActiveSupport::TestCase
     assert !asset_manager.is_asset_manager_of?(sop)
 
     disable_authorization_checks{sop.projects = asset_manager.projects}
+
     assert asset_manager.is_asset_manager_of?(sop)
   end
 
