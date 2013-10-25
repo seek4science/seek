@@ -298,7 +298,7 @@ class Person < ActiveRecord::Base
   end
 
   def can_edit? user = User.current_user
-    new_record? or user && (user.is_admin? || user.is_project_manager? || user == self.user)
+    new_record? || can_be_edited_by?(user)
   end
 
 

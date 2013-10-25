@@ -21,8 +21,8 @@ class PersonTest < ActiveSupport::TestCase
 
     assert person.can_be_edited_by?(person.user)
     assert person.can_be_edited_by?(project_manager.user),"should be editable by the project manager of the same project"
-    assert person.can_be_edited_by?(admin)
-    assert !person.can_be_edited_by?(another_person)
+    assert person.can_be_edited_by?(admin.user)
+    assert !person.can_be_edited_by?(another_person.user)
     assert !person.can_be_edited_by?(project_manager2.user),"should be not editable by the project manager of another project"
 
   end
