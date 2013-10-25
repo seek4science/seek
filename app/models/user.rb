@@ -197,8 +197,8 @@ class User < ActiveRecord::Base
     !person.nil? && person.is_admin?
   end
 
-  def is_project_manager?
-    !person.nil? && person.is_project_manager?
+  def is_project_manager? project
+    !person.nil? && person.is_project_manager?(project)
   end
   
   def can_edit_projects?

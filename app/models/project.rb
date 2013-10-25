@@ -201,7 +201,7 @@ class Project < ActiveRecord::Base
   end
 
   def can_be_edited_by?(user)
-    user == nil ? false : (user.is_admin? || (self.has_member?(user) && (user.can_edit_projects? || user.is_project_manager?)))
+    user == nil ? false : (user.is_admin? || (self.has_member?(user) && (user.can_edit_projects? || user.is_project_manager?(self))))
   end
 
   def can_be_administered_by?(user)

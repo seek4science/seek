@@ -195,7 +195,8 @@ class ProjectTest < ActiveSupport::TestCase
     p=projects(:three)
     assert !p.can_be_edited_by?(u),"Project :three should not be editable by user :cant_edit"
 
-    u=users(:project_manager)
+    u=Factory(:project_manager).user
+    p=u.person.projects.first
     assert p.can_be_edited_by?(u),"Project :three should be editable by user :project_manager"
 
     p=projects(:four)
