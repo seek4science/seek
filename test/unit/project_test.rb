@@ -201,7 +201,21 @@ class ProjectTest < ActiveSupport::TestCase
 
     p=projects(:four)
     assert !p.can_be_edited_by?(u),"Project :four should not be editable by user :can_edit as he is not a member"
-  end    
+  end
+
+  test "can be administered by" do
+    admin = Factory(:admin)
+    pm = Factory(:project_manager)
+    normal = Factory(:person)
+    another_proj = Factory(:project)
+
+    assert pm.projects.first.can_be_administered_by?(pm.user)
+    assert !normal.projects.first.can_be_administered_by?(normal.user)
+
+    assert !another_proj.can_be_administered_by?(normal.user)
+    assert !another_proj.can_be_administered_by?(pm.user)
+    assert another_proj.can_be_administered_by?(admin.user)
+  end
 
   def test_update_first_letter
     p=Project.new(:name=>"test project")

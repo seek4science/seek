@@ -205,7 +205,7 @@ class Project < ActiveRecord::Base
   end
 
   def can_be_administered_by?(user)
-    user == nil ? false : (user.is_admin? || (self.has_member?(user) && (user.is_project_manager?)))
+    user == nil ? false : (user.is_admin? || user.is_project_manager?(self))
   end
 
   def can_delete?(user=User.current_user)
