@@ -230,15 +230,19 @@ class ProjectsControllerTest < ActionController::TestCase
 	end
 
 	def test_user_project_manager
-		login_as(:project_manager)
-		get :show, :id=>projects(:three)
+    pm = Factory(:project_manager)
+    proj = pm.projects.first
+		login_as(pm.user)
+		get :show, :id=>proj.id
 		assert_select "a",:text=>/Edit #{I18n.t('project')}/,:count=>1
 
-		get :edit, :id=>projects(:three)
+		get :edit, :id=>proj.id
 		assert_response :success
 
-		put :update, :id=>projects(:three).id,:project=>{}
-		assert_redirected_to project_path(assigns(:project))
+		put :update, :id=>proj.id,:project=>{:title=>"fish"}
+    proj = assigns(:project)
+		assert_redirected_to project_path(proj)
+    assert_equal "fish",proj.title
 	end
 
 	def test_user_cant_edit_project
@@ -427,8 +431,9 @@ class ProjectsControllerTest < ActionController::TestCase
 	end
 
 	test "non admin cannot administer project" do
-		login_as(:pal_user)
-		get :admin,:id=>projects(:sysmo_project)
+    person = Factory(:person)
+		login_as(person.user)
+		get :admin,:id=>person.projects.first
 		assert_response :redirect
 		assert_not_nil flash[:error]
 	end
