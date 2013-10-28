@@ -100,6 +100,10 @@ class Workflow < ActiveRecord::Base
     content_blob.filepath
   end
 
+  def has_interaction?
+    t2flow.all_processors.any? {|p| p.type == 'interaction'}
+  end
+
   def self.by_category(cid)
     where(:category_id => cid)
   end

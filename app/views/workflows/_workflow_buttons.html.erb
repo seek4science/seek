@@ -4,9 +4,11 @@
 </li>
 
 <!-- Run new data sweep button - only if there is at least on data port to sweep over. -->
-<li>
-    <%= image_tag_for_key('sweep', new_sweep_path(:workflow_id => workflow.id), nil, nil, 'Run data sweep') if workflow.input_ports.select{|port| (port.port_type.name == WorkflowInputPortType::DATA)}.length > 0 -%>
-</li>
+<% if workflow.input_ports.any?{|port| (port.port_type.name == WorkflowInputPortType::DATA)} && !workflow.has_interaction? %>
+  <li>
+      <%= image_tag_for_key('sweep', new_sweep_path(:workflow_id => workflow.id), nil, nil, 'Run data sweep')  -%>
+  </li>
+<% end %>
 
 <!-- Manage button -->
 <% if workflow.can_manage? -%>
