@@ -41,7 +41,7 @@
     <script type="text/javascript">
         load_tabs();
         <% sorted_result_keys.each do |key| %>
-        tabs_on_click('<%= scale_title %>', '<%= key %>', '<%=resource_hash[key].collect(&:id).join(',') %>');
+        tab_on_click('<%= scale_title %>', '<%= key %>', '<%=resource_hash[key].collect(&:id).join(',') %>');
         <% end %>
 
         //Load content for first tab

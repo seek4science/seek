@@ -5,7 +5,7 @@ function load_tabs() {
     tabberAutomatic(tabberOptions);
 }
 
-function tabs_on_click(scale_title, resource_type, resource_ids){
+function tab_on_click(scale_title, resource_type, resource_ids){
     var click_tab = document.getElementsByClassName(scale_title + '_' + resource_type)[0];
     click_tab.onclick = function(){
         deactivate_previous_tab(scale_title);
@@ -108,7 +108,7 @@ function display_first_external_tab_content(scale_title){
 }
 
 //this is the case of search that include the result from external resources
-function external_tabs_on_click(scale_title, resource_type){
+function external_tab_on_click(scale_title, resource_type){
     var click_tab = document.getElementsByClassName(scale_title + '_' + resource_type)[0];
     click_tab.onclick = function(){
         deactivate_previous_tab(scale_title);

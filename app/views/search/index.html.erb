@@ -60,7 +60,7 @@ But to make it easier for handling the tab names, they are created multiple time
 <script type="text/javascript">
     <% (Scale.all.map(&:title) | ['all']).each do |scale| %>
         <% external_resource_hash.keys.each do |key| %>
-            external_tabs_on_click('<%= scale %>', '<%= key %>');
+            external_tab_on_click('<%= scale %>', '<%= key %>');
         <% end %>
         //check if no internal result is found and no tab was chosen, then display the first external tab
         display_first_external_tab_content('<%= scale %>');
