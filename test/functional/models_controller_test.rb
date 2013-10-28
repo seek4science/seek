@@ -674,8 +674,8 @@ class ModelsControllerTest < ActionController::TestCase
     end
   end
   
-  def test_update_should_not_overright_contributor
-    login_as(:pal_user) #this user is a member of sysmo, and can edit this model
+  def test_update_should_not_overwrite_contributor
+    login_as(:model_owner) #this user is a member of sysmo, and can edit this model
     model=models(:model_with_no_contributor)
     put :update, :id => model, :model => {:title=>"blah blah blah blah" }
     updated_model=assigns(:model)
