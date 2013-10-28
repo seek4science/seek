@@ -7,16 +7,6 @@ module TavernaPlayer
     before_filter :find_runs, :only => :index
     before_filter :add_sweeps, :only => :index
 
-    def new
-      @run = Run.new
-      @run.embedded = true if params[:embedded] == "true"
-
-      respond_to do |format|
-        # Render new.html.erb unless the run is embedded.
-        format.html { render "taverna_player/runs/embedded/new" if @run.embedded }
-      end
-    end
-
     def edit
       @run = Run.find(params[:id])
     end
