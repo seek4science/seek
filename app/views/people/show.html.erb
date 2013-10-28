@@ -35,7 +35,7 @@
                               {:title => "The list of assets that you requested for the gatekeeper's approval to make published"},
                               "Your assets waiting for approval" -%>
       </li>
-      <% if @person.is_gatekeeper? %>
+      <% if @person.is_gatekeeper?(nil,true) %>
           <li>
             <%= image_tag_for_key "waiting", requested_approval_assets_person_path(@person), "Waiting approval assets",
                                   {:title => "The list of assets that were requested for your approval to make published"},

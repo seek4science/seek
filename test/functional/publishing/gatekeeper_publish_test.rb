@@ -27,6 +27,7 @@ class GatekeeperPublishTest < ActionController::TestCase
     login_as(@gatekeeper.user)
     get :show, :id => @gatekeeper
     assert_response :success
+
     assert_select "a[href=?]", requested_approval_assets_person_path(@gatekeeper), :text => /Waiting approval assets/, :count => 1
   end
 
