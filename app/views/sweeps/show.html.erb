@@ -1,11 +1,11 @@
-<%= javascript_include_tag 'jquery-1.5.1.min.js', :cache=>"explorer_cached" %>
-
 <div class="breadcrumbs">
   <a href="/">Home</a> &gt;
   <%= link_to @sweep.workflow.category.name, main_app.workflows_path(:category_id => @sweep.workflow.category) -%> &gt;
   <%= link_to @sweep.workflow.title, main_app.workflow_path(@sweep.workflow) -%> &gt;
   <%= @sweep.name -%>
 </div>
+
+<%= render :partial => "buttons", :locals => { :sweep => @sweep } -%>
 
 <div class="contribution_title">
   <h1><%= 'Sweep: ' + @sweep.name -%></h1>
