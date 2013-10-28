@@ -42,7 +42,8 @@ But to make it easier for handling the tab names, they are created multiple time
                    :locals => {:resources => value,
                                :scale_title => 'all',
                                :authorized_resources => value,
-                               :view_type => 'view_some' } %>
+                               :view_type => 'view_all',
+                               :limit => value.count} %>
       </div>
   <% end %>
 </div>
