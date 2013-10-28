@@ -10,8 +10,8 @@ module Seek
       base.extend(ClassMethods)
       ROLES.each do |role|
         eval <<-END_EVAL
-            def is_#{role}?(project=nil)
-              role_names.include?('#{role}') && roles(project).include?('#{role}')
+            def is_#{role}?(project=nil,ignore_project=false)
+              role_names.include?('#{role}') && (ignore_project || roles(project).include?('#{role}'))
             end
 
             def is_#{role}=(flag_and_project)

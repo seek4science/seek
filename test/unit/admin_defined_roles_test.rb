@@ -345,6 +345,16 @@ class AdminDefinedRolesTest < ActiveSupport::TestCase
 
   end
 
+  test "is project manager regardless of project" do
+    admin = Factory(:admin)
+    pm = Factory(:project_manager)
+    normal = Factory(:person)
+    assert !admin.is_project_manager?(nil,true)
+    assert !normal.is_project_manager?(nil,true)
+    assert pm.is_project_manager?(nil,true)
+
+  end
+
   test 'Person.pals' do
       admin = Factory(:admin)
       normal = Factory(:person)
