@@ -226,10 +226,10 @@ class ApplicationController < ActionController::Base
           'create_item', 'edit_item', 'update_item', 'quick_add', 'resolve_link', 'describe_ports'
         'edit'
 
-      when 'destroy', 'destroy_item'
+      when 'destroy', 'destroy_item', 'cancel'
         'delete'
 
-      when 'manage'
+      when 'manage', 'notification', 'read_interaction', 'save_interaction'
           'manage'
       else
         nil
