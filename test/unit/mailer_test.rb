@@ -28,16 +28,18 @@ class MailerTest < ActionMailer::TestCase
   
   test "announcement notification" do
     announcement = Factory(:mail_announcement)
+    recipient = Factory(:person)
+
     @expected.subject = "SEEK Announcement: #{announcement.title}"
-    @expected.to = "Fred Blogs <fred@email.com>"
+    @expected.to = recipient.email_with_name
     @expected.from    = "no-reply@sysmo-db.org"
 
 
     @expected.body    = read_fixture('announcement_notification')
-    
-    person=people(:fred)
+    expected_text = encode_mail(@expected)
+    expected_text.gsub!("-unique_key-",recipient.notifiee_info.unique_key)
 
-    assert_equal encode_mail(@expected), encode_mail(Mailer.announcement_notification(announcement,person.notifiee_info,"localhost"))
+    assert_equal expected_text, encode_mail(Mailer.announcement_notification(announcement,recipient.notifiee_info,"localhost"))
 
   end
 

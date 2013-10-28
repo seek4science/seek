@@ -53,10 +53,11 @@ class SendAnnouncementEmailsJobTest < ActiveSupport::TestCase
 
   test "perform" do
     Delayed::Job.delete_all
+
     BATCHSIZE=50
     from_notifiee_id = 1
-    notifiee1 = Factory(:notifiee_info, :id => 10)
-    notifiee2 = Factory(:notifiee_info, :id => 60)
+    notifiee1 = Factory.create(:notifiee_info, :id => 10)
+    notifiee2 = Factory.create(:notifiee_info, :id => 60)
     site_announcement = SiteAnnouncement.create(:title => 'test announcement', :body => 'test', :email_notification => true)
     assert SendAnnouncementEmailsJob.exists?(site_announcement.id,1)
     assert_emails 1 do
