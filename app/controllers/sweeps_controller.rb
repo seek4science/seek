@@ -1,8 +1,8 @@
 class SweepsController < ApplicationController
 
   before_filter :find_run, :only => :new
-  before_filter :find_workflow_and_version, :only => :new
   before_filter :set_runlet_parameters, :only => :create
+  before_filter :find_workflow_and_version, :only => :new
 
   def show
     @sweep = Sweep.find(params[:id], :include => :runs)
@@ -35,12 +35,13 @@ class SweepsController < ApplicationController
   def create
     params[:sweep][:user_id] = current_user.id
     @sweep = Sweep.new(params[:sweep])
-    unless @sweep.save
-      puts @sweep.errors.full_messages.inspect
-      raise
-    end
+    @workflow = @sweep.workflow
     respond_to do |format|
-      format.html { redirect_to sweep_path(@sweep) }
+      if @sweep.save
+        format.html { redirect_to sweep_path(@sweep) }
+      else
+        format.html { render :action => "new" }
+      end
     end
   end
 

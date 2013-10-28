@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20131022125846) do
+ActiveRecord::Schema.define(:version => 20131028132930) do
 
   create_table "activity_logs", :force => true do |t|
     t.string   "action"
@@ -1521,27 +1521,27 @@ ActiveRecord::Schema.define(:version => 20131022125846) do
 
   create_table "taverna_player_runs", :force => true do |t|
     t.string   "run_id"
-    t.string   "saved_state",          :default => "pending", :null => false
+    t.string   "saved_state",                       :default => "pending", :null => false
     t.datetime "create_time"
     t.datetime "start_time"
     t.datetime "finish_time"
-    t.integer  "workflow_id",                                 :null => false
-    t.datetime "created_at",                                  :null => false
-    t.datetime "updated_at",                                  :null => false
+    t.integer  "workflow_id",                                              :null => false
+    t.datetime "created_at",                                               :null => false
+    t.datetime "updated_at",                                               :null => false
     t.string   "status_message"
     t.string   "results_file_name"
     t.string   "results_content_type"
     t.integer  "results_file_size"
     t.datetime "results_updated_at"
-    t.boolean  "embedded",             :default => false
+    t.boolean  "embedded",                          :default => false
     t.string   "proxy_notifications"
     t.string   "proxy_interactions"
-    t.boolean  "stop",                 :default => false
+    t.boolean  "stop",                              :default => false
     t.string   "log_file_name"
     t.string   "log_content_type"
     t.integer  "log_file_size"
     t.datetime "log_updated_at"
-    t.string   "name",                 :default => "None"
+    t.string   "name",                              :default => "None"
     t.integer  "delayed_job_id"
     t.integer  "sweep_id"
     t.integer  "contributor_id"
@@ -1549,6 +1549,9 @@ ActiveRecord::Schema.define(:version => 20131022125846) do
     t.string   "contributor_type"
     t.text     "failure_message"
     t.integer  "parent_id"
+    t.string   "uuid"
+    t.string   "first_letter",         :limit => 1
+    t.text     "description"
   end
 
   add_index "taverna_player_runs", ["run_id"], :name => "index_taverna_player_runs_on_run_id"

@@ -13,14 +13,12 @@
 </div>
 
 <div class="show_basic">
+  <%= error_messages_for :run -%>
+
   <%= form_for @run, :html => {:multipart => true} do |f| %>
       <%= f.hidden_field :workflow_id, :value => @workflow.id %>
       <%# f.hidden_field :workflow_version, :value => @workflow_version.version %>
       <%= f.hidden_field :embedded %>
-
-      <div style="display: none">
-        <%= render :partial => "assets/sharing_form" -%>
-      </div>
 
       <div class="box_about_actor" style="text-align: left; padding: 20px 20px 20px 0px;">
         <%= f.label :name, "Run name:"  %>

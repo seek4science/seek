@@ -3,19 +3,9 @@ module TavernaPlayer
     include TavernaPlayer::Concerns::Controllers::RunsController
 
     before_filter :auth, :except => [ :index, :new, :create ]
-    before_filter :find_workflow_and_version, :only => :new
     before_filter :find_runs, :only => :index
     before_filter :add_sweeps, :only => :index
-
-    def new
-      @run = Run.new
-      @run.embedded = true if params[:embedded] == "true"
-
-      respond_to do |format|
-        # Render new.html.erb unless the run is embedded.
-        format.html { render "taverna_player/runs/embedded/new" if @run.embedded }
-      end
-    end
+    after_filter :find_workflow_and_version, :only => :new
 
     def edit
       @run = Run.find(params[:id])
@@ -67,7 +57,7 @@ module TavernaPlayer
     private
 
     def find_workflow_and_version
-      @workflow = TavernaPlayer.workflow_proxy.class_name.find(params[:workflow_id])
+      @workflow = @run.workflow || TavernaPlayer.workflow_proxy.class_name.find(params[:workflow_id])
 
       unless params[:version].blank?
         @workflow_version = @workflow.find_version(params[:version])
