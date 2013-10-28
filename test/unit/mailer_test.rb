@@ -27,7 +27,6 @@ class MailerTest < ActionMailer::TestCase
   end
   
   test "announcement notification" do
-    recipient = Factory(:person)
     announcement = Factory(:mail_announcement)
     @expected.subject = "SEEK Announcement: #{announcement.title}"
     @expected.to = "Fred Blogs <fred@email.com>"
