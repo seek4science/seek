@@ -7,6 +7,7 @@ class InvestigationsControllerTest < ActionController::TestCase
   include AuthenticatedTestHelper
   include RestTestCases
   include RdfTestCases
+  include FunctionalAuthorizationTests
   
   def setup
     login_as(:quentin)
@@ -231,13 +232,7 @@ class InvestigationsControllerTest < ActionController::TestCase
     end
   end
 
-  test "private investigation not accessible publicly" do
-    i = Factory :investigation, :policy => Factory(:private_policy)
-    logout
-    get :show,:id=>i.id
-    assert_redirected_to investigations_path
-    assert_not_nil flash[:error]
-  end
+
 
   test "filtering by project" do
     project=projects(:sysmo_project)

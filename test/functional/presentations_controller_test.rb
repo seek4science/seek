@@ -4,6 +4,7 @@ class PresentationsControllerTest < ActionController::TestCase
 
   include AuthenticatedTestHelper
   include RestTestCases
+  include FunctionalAuthorizationTests
 
   def setup
     login_as Factory(:user)

@@ -1,7 +1,8 @@
 class AssayTypesController < ApplicationController
 
+  before_filter :find_requested_item, :only=>[:show]
+
   def show
-    @assay_type = AssayType.find(params[:id])
     respond_to do |format|
       format.html
       format.xml

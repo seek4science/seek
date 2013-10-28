@@ -133,7 +133,7 @@ class PeopleControllerTest < ActionController::TestCase
     p=assigns(:person)
     assert_redirected_to person_path(p)
 
-    put :administer_update, :id => assigns(:person), :person => {:roles_mask => Person::ROLES_MASK_FOR_PAL}
+    put :administer_update, :id => assigns(:person), :person => {:roles_mask => Person.mask_for_pal}
 
     p=assigns(:person)
     assert_redirected_to :root
@@ -186,7 +186,7 @@ class PeopleControllerTest < ActionController::TestCase
     login_as(:quentin)
     p=people(:fred)
     assert !p.is_admin?
-    put :administer_update, :id=>p.id, :person=>{:id=>p.id, :roles_mask=>Person::ROLES_MASK_FOR_ADMIN}
+    put :administer_update, :id=>p.id, :person=>{:id=>p.id, :roles_mask=>Person.mask_for_admin}
     assert_redirected_to person_path(p)
     assert_nil flash[:error]
     p.reload
@@ -197,7 +197,7 @@ class PeopleControllerTest < ActionController::TestCase
     login_as(:aaron)
     p=people(:fred)
     assert !p.is_admin?
-    put :administer_update, :id=>p.id, :person=>{:id=>p.id, :roles_mask=>Person::ROLES_MASK_FOR_ADMIN}
+    put :administer_update, :id=>p.id, :person=>{:id=>p.id, :roles_mask=>Person.mask_for_admin}
     assert_not_nil flash[:error]
     p.reload
     assert !p.is_admin?
@@ -237,7 +237,7 @@ class PeopleControllerTest < ActionController::TestCase
     login_as(:aaron)
     p=people(:aaron_person)
     assert !p.is_admin?
-    put :administer_update, :id=>p.id, :person=>{:id=>p.id, :roles_mask=>Person::ROLES_MASK_FOR_ADMIN, :email=>"ssfdsd@sdfsdf.com"}
+    put :administer_update, :id=>p.id, :person=>{:id=>p.id, :roles_mask=>Person.mask_for_admin, :email=>"ssfdsd@sdfsdf.com"}
     p.reload
     assert !p.is_admin?
   end

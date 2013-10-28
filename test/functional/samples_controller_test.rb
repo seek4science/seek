@@ -5,6 +5,7 @@ class SamplesControllerTest < ActionController::TestCase
   include AuthenticatedTestHelper
   include RestTestCases
   include RdfTestCases
+  include FunctionalAuthorizationTests
 
   # Called before every test method runs. Can be used
   # to set up fixture information.
@@ -31,7 +32,7 @@ class SamplesControllerTest < ActionController::TestCase
   end
 
   test "show xml validates with schema" do
-    s = Factory(:sample,:contributor => Factory(:user,:person => Factory(:person,:roles_mask=> Person::ROLES_MASK_FOR_ADMIN)),
+    s = Factory(:sample,:contributor => Factory(:user,:person => Factory(:person,:roles_mask=> Person.mask_for_admin)),
                 :title => "test sample",
                 :policy => policies(:policy_for_viewable_data_file))
     get :show, :id => s, :format =>"xml"

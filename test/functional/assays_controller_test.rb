@@ -8,6 +8,7 @@ class AssaysControllerTest < ActionController::TestCase
   include AuthenticatedTestHelper
   include RestTestCases
   include RdfTestCases
+  include FunctionalAuthorizationTests
 
   def setup
     login_as(:quentin)

@@ -1,8 +1,8 @@
 class OrganismsController < ApplicationController
-  
+
+  before_filter :find_requested_item, :only=>[:show,:edit,:more_ajax,:visualise,:destroy, :update]
   before_filter :login_required,:except=>[:show,:index,:visualise]
   before_filter :is_user_admin_auth,:only=>[:edit,:update,:new,:create,:destroy]
-  before_filter :find_organism,:only=>[:show,:edit,:more_ajax,:visualise,:destroy]
   
   cache_sweeper :organisms_sweeper,:only=>[:update,:create,:destroy]
 
@@ -89,7 +89,6 @@ class OrganismsController < ApplicationController
   end
   
   def update
-    @organism = Organism.find(params[:id])
 
     respond_to do |format|
       if @organism.update_attributes(params[:organism])
@@ -111,16 +110,5 @@ class OrganismsController < ApplicationController
   end
 
   private
-
-  def find_organism
-    begin
-      @organism=Organism.find(params[:id])
-    rescue ActiveRecord::RecordNotFound
-      respond_to do |format|
-        flash[:error] = "The Organism selected does not exist"
-        format.html { redirect_to root_path }
-      end    
-    end
-  end
   
 end

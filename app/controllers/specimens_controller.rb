@@ -2,7 +2,7 @@ class SpecimensController < ApplicationController
   # To change this template use File | Settings | File Templates.
 
   before_filter :find_assets, :only => [:index]
-  before_filter :find_and_auth, :only => [:show, :update, :edit, :destroy]
+  before_filter :find_and_authorize_requested_item, :only => [:show, :update, :edit, :destroy]
 
   include IndexPager
 

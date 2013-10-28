@@ -9,7 +9,7 @@ class PresentationsController < ApplicationController
   include AssetsCommonExtension
 
   before_filter :find_assets, :only => [ :index ]
-  before_filter :find_and_auth, :except => [ :index, :new, :create, :preview,:update_annotations_ajax]
+  before_filter :find_and_authorize_requested_item, :except => [ :index, :new, :create, :preview,:update_annotations_ajax]
   before_filter :find_display_asset, :only=>[:show, :download]
 
   include Seek::Publishing::PublishingCommon

@@ -12,6 +12,7 @@ class ApplicationController < ActionController::Base
 
   before_filter :log_extra_exception_data
 
+
   after_filter :log_event
 
   include AuthenticatedSystem
@@ -234,7 +235,25 @@ class ApplicationController < ActionController::Base
     end
   end
 
-  def find_and_auth
+  #hanles finding an asset, and responding when it cannot be found. If it can be found the item instance is set (e.g. @project for projects_controller)
+  def find_requested_item
+    name = self.controller_name.singularize
+    object = name.camelize.constantize.find_by_id(params[:id])
+    if (object.nil?)
+      respond_to do |format|
+        flash[:error] = "The #{name.humanize} does not exist!"
+        format.rdf { render  :text=>"Not found",:status => :not_found }
+        format.xml { render  :text=>"<error>404 Not found</error>",:status => :not_found }
+        format.json { render :text=>"Not found", :status => :not_found }
+        format.html { redirect_to eval "#{self.controller_name}_path" }
+      end
+    else
+      eval "@#{name} = object"
+    end
+  end
+
+  #handles finding and authorizing an asset for all controllers that require authorization, and handling if the item cannot be found
+  def find_and_authorize_requested_item
     begin
       name = self.controller_name.singularize
       action = translate_action(action_name)
@@ -265,6 +284,7 @@ class ApplicationController < ActionController::Base
               else                 redirect_to eval "#{self.controller_name}_path"
             end
           end
+          format.rdf { render :text => "You may not #{action} #{name}:#{params[:id]}", :status => :forbidden }
           format.xml { render :text => "You may not #{action} #{name}:#{params[:id]}", :status => :forbidden }
           format.json { render :text => "You may not #{action} #{name}:#{params[:id]}", :status => :forbidden }
         end
@@ -277,6 +297,9 @@ class ApplicationController < ActionController::Base
         else
           flash[:error] = "You are not authorized to view #{name.humanize}"
         end
+        format.rdf { render  :text=>"Not found",:status => :not_found }
+        format.xml { render  :text=>"<error>404 Not found</error>",:status => :not_found }
+        format.json { render :text=>"Not found", :status => :not_found }
         format.html { redirect_to eval "#{self.controller_name}_path" }
       end
       return false
