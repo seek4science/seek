@@ -20,5 +20,11 @@ module TavernaPlayer
     def self.by_owner(uid)
       where(:contributor_id => uid, :contributor_type => "User")
     end
+
+    # Runs should be private by default
+    def default_policy
+      puts
+      Policy.private_policy
+    end
   end
 end
