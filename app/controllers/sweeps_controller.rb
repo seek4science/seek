@@ -73,16 +73,18 @@ class SweepsController < ApplicationController
   # Give a result value for a given output port of a given run.
   def view_result
     @sweep = Sweep.find(params[:id])
-    render "show"
-  end
+    respond_to do |format|
+      format.html { redirect_to sweep_path(@sweep) }
+    end  end
 
   # Zip/assemble results for a given output port over selected sweep's runs,
   # results for a run (for all output ports), or all results for all output ports
   # and all runs.
   def download_results
     @sweep = Sweep.find(params[:id])
-    render "show"
-  end
+    respond_to do |format|
+      format.html { redirect_to sweep_path(@sweep) }
+    end  end
 
   private
 
