@@ -93,12 +93,13 @@ function refresh_boxover_tooltip_position(){
 }
 
 //this is the case of search that include the result from external resources
-//check if no internal result is found, then display the first external tab
+//check if no internal result is found and no tab was chosen, then display the first external tab
 function display_first_external_tab_content(scale_title){
     var scaled_result = $(scale_title + "_results");
     var scaled_all_tabs_count = scaled_result.getElementsByClassName('tabbertab').length;
     var scale_external_tabs_count = scaled_result.getElementsByClassName('external_result').length/2;
-    if (scaled_all_tabs_count == scale_external_tabs_count){
+    var previous_active_tab = scaled_result.getElementsByClassName('tabberactive')[0];
+    if ((scaled_all_tabs_count == scale_external_tabs_count) && (previous_active_tab == null)){
         var click_tab = scaled_result.getElementsByClassName('external_result')[0];
         if (click_tab != null){
             click_tab.click();
@@ -114,4 +115,19 @@ function external_tabs_on_click(scale_title, resource_type){
         click_tab.parentElement.className = 'tabberactive';
         $(resource_type).show();
     }
+}
+
+//this is the case of search that include the result from external resources
+//if the external tab was chosen for this scale, then display its content
+function display_external_tab_content(scale_title){
+    var scaled_result = $(scale_title + "_results");
+    var chosen_tab = scaled_result.getElementsByClassName('tabberactive')[0];
+    var scale_and_type = chosen_tab.childNodes[0].className;
+    //the content could come from external search
+    if (scale_and_type.match("external_result") != null){
+        scale_and_type = scale_and_type.split('external_result')[0];
+        var resource_type = scale_and_type.split('_')[1].strip();
+        $(resource_type).show();
+    }
+
 }

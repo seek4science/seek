@@ -1,9 +1,9 @@
 <% scale_slider_function = capture do %>
     $$('#search_results > div').invoke('hide');
-    $$('#search_results #' + this.id +'_results').first().show();
     $$('#external_search_result_content > div').invoke('hide');
-    //check if no internal result is found, then display the first external tab
-    display_first_external_tab_content(this.id);
+    $$('#search_results #' + this.id +'_results').first().show();
+    //if the external tab was chosen for this scale, then display its content
+    display_external_tab_content(this.id);
 <% end %>
 <%= render :partial => 'scales/scale_slider', :locals => {:scale_slider_function => scale_slider_function, :current_scale => @scale_title} %>
 
@@ -57,12 +57,11 @@ But to make it easier for handling the tab names, they are created multiple time
 <% end %>
 
 <script type="text/javascript">
-    <% first_external_tab = external_resource_hash.keys.first %>
     <% (Scale.all.map(&:title) | ['all']).each do |scale| %>
         <% external_resource_hash.keys.each do |key| %>
             external_tabs_on_click('<%= scale %>', '<%= key %>');
         <% end %>
-        //check if no internal result is found, then display the first external tab
+        //check if no internal result is found and no tab was chosen, then display the first external tab
         display_first_external_tab_content('<%= scale %>');
     <% end %>
 </script>
