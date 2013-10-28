@@ -19,6 +19,8 @@
 </div>
 
 <div class="show_basic">
+  <%= error_messages_for :sweep -%>
+
   <%= form_for @sweep, :html => {:multipart => true} do |sweep_form| %>
       <%= sweep_form.hidden_field :workflow_id, :value => @workflow.id %>
       <%# f.hidden_field :workflow_version, :value => @workflow_version.version %>

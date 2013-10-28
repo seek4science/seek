@@ -13,6 +13,8 @@
 </div>
 
 <div class="show_basic">
+  <%= error_messages_for :run -%>
+
   <%= form_for @run, :html => {:multipart => true} do |f| %>
       <%= f.hidden_field :workflow_id, :value => @workflow.id %>
       <%# f.hidden_field :workflow_version, :value => @workflow_version.version %>
