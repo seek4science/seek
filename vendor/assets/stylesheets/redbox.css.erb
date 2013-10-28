@@ -1,3 +1,29 @@
+.redbox_contents {
+    width: 400px;
+    margin: 0 auto;
+    text-align: left;
+    overflow: auto;
+    background-color: white;
+    border: 2px solid #BBBBBB;
+    z-index: 103;
+}
+
+.redbox_contents .head {
+    padding: 0.3em 0.6em 0.3em 1.2em;
+    background-color: #347BF2;
+    font-size: 1.2em;
+    color: #333333;
+    font-weight: bold;
+}
+
+.redbox_contents .head * {
+    vertical-align: middle;
+}
+
+.redbox_contents .body {
+    padding: 1.2em 2em;
+}
+
 #RB_overlay {
   position: fixed;
   z-index: 100;
@@ -34,30 +60,4 @@
   text-align: center;
   background: #FFF url("<%= asset_path('redbox_spinner.gif') %>") no-repeat center center;
   z-index: 103;
-}
-
-.redbox_contents {
-  width: 400px;
-  margin: 0 auto;
-  text-align: left;
-  overflow: auto;
-  background-color: white;
-  border: 2px solid #BBBBBB;
-  z-index: 103;
-}
-
-.redbox_contents .head {
-	padding: 0.3em 0.6em 0.3em 1.2em;
-	background-color: #347BF2;
-	font-size: 1.2em;
-	color: #333333;
-	font-weight: bold;
-}
-
-.redbox_contents .head * {
-	vertical-align: middle;
-}
-
-.redbox_contents .body {
-	padding: 1.2em 2em;
 }
