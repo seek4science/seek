@@ -7,7 +7,7 @@
 //= require boxover
 //= require scriptaculous
 //= require controls
-// require redbox
+//= require redbox
 //= require builder
 //= require application_shared
 //= require tagging
