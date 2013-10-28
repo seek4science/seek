@@ -11,10 +11,16 @@
 
   Factory.define(:person_in_project, :parent => :brand_new_person) do |f|
     f.group_memberships {[Factory.build(:group_membership)]}
+    f.after_create do |p|
+      p.reload
+    end
   end
 
   Factory.define(:person_in_multiple_projects, :parent=>:brand_new_person) do |f|
     f.group_memberships {[Factory.build(:group_membership),Factory.build(:group_membership),Factory.build(:group_membership)]}
+    f.after_create do |p|
+      p.reload
+    end
   end
 
   Factory.define(:person, :parent => :person_in_project) do |f|

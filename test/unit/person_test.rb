@@ -347,9 +347,9 @@ class PersonTest < ActiveSupport::TestCase
     institution = person.group_memberships.first.work_group.institution
     institution2 = Factory(:institution)
 
+    assert_equal 3,person.institutions.count
     assert person.institutions.include?(institution)
     assert !person.institutions.include?(institution2)
-    assert_equal 3,person.institutions.count
   end
   
   def test_projects
