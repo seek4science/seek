@@ -1,6 +1,4 @@
-<div class="contribution_title">
-  <h1><%= 'Workflow Runs' -%></h1>
-</div>
+<h1><%= 'Workflow Runs' -%></h1>
 
 <div class="show_basic">
   <%= render :partial => 'table', :locals => {:runs => @runs, :polling_url => taverna_player.runs_path } %>
