@@ -1,17 +1,17 @@
 <div id="buttons">
   <ul class="sectionIcons">
     <% if @run.finished? %>
-      <%= render :partial => 'download_all_button', :locals => {:run => @run} %>
+        <li><%= render :partial => 'download_link', :locals => { :download_link_name => "Download all results", :file_url_to_download => run.results.url} %></li>
         <% workflow = Workflow.find(@run.workflow_id) %>
-        <% data_input_ports = workflow.input_ports.select{|input| input.port_type.name == WorkflowInputPortType::DATA} %>
+        <% data_input_ports = workflow.input_ports.select { |input| input.port_type.name == WorkflowInputPortType::DATA } %>
         <!--# If this run is part of a sweep - do not give option to create a new sweep off it.-->
         <!--# Also, if workflow does not have data input ports - there is nothing to sweep over.-->
         <% if @run.sweep_id.blank? && data_input_ports.length > 0 %>
             <li><%= image_tag_for_key('sweep', main_app.new_sweep_path(:run_id => @run.id), nil, nil, "Data sweep based on this run") -%></li>
         <% end %>
-      <% if @run.can_manage? -%>
-        <li><%= image_tag_for_key('manage', main_app.edit_run_path(@run), nil, nil, "Manage run") -%></li>
-      <% end -%>
+        <% if @run.can_manage? -%>
+            <li><%= image_tag_for_key('manage', main_app.edit_run_path(@run), nil, nil, "Manage run") -%></li>
+        <% end -%>
     <% end %>
     <%= render :partial => "delete_or_cancel_button", :locals => {:run => @run} %>
   </ul>

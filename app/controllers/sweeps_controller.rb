@@ -57,7 +57,7 @@ class SweepsController < ApplicationController
     @sweep = Sweep.find(params[:id])
     @sweep.destroy
     respond_to do |format|
-      format.html { redirect_to taverna_player.runs_path }
+      format.html { redirect_to params[:redirect_url].blank? ? taverna_player.runs_path : :redirect_url}
     end
   end
 

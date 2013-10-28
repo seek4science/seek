@@ -11,6 +11,9 @@
   <h1><%= 'Sweep: ' + @sweep.name -%></h1>
 </div>
 
+<%= render :partial => 'buttons', :locals => {:sweep => @sweep} %>
+<br/>
+
 <div class="show_basic">
   <h2 style='background-color: #CDDEEF; background-image: url("/public/images/header-bg2.png");'>Runs</h2>
   <%= render :partial => 'taverna_player/runs/table', :locals => {:runs => @sweep.runs, :polling_url => runs_sweep_path(@sweep) } %>

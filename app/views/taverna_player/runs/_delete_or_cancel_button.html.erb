@@ -5,8 +5,8 @@
    image_options = { :alt => 'Delete' }
    img_tag = image_tag(image_filename, image_options).html_safe
 
-   delete_tag = "#{img_tag} Delete run".html_safe
-   cancel_tag = "#{img_tag} Cancel run".html_safe
+   delete_tag = "#{img_tag} Delete".html_safe
+   cancel_tag = "#{img_tag} Cancel".html_safe
 
    delete_path = run.is_a?(Sweep) ? main_app.sweep_path(run) : taverna_player.run_path(run)
    cancel_path = run.is_a?(Sweep) ? main_app.cancel_sweep_path(run) : taverna_player.cancel_run_path(run)
