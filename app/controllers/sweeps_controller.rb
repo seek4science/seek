@@ -6,6 +6,7 @@ class SweepsController < ApplicationController
 
   def show
     @sweep = Sweep.find(params[:id], :include => :runs)
+    @runs = @sweep.runs.select { |r| r.can_view? }
   end
 
   def new
@@ -63,7 +64,7 @@ class SweepsController < ApplicationController
 
   def runs
     @sweep = Sweep.find(params[:id], :include => {:runs => :workflow})
-    @runs = @sweep.runs
+    @runs = @sweep.runs.select { |r| r.can_view? }
     respond_to do |format|
       format.js { render "taverna_player/runs/index" }
     end
