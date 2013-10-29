@@ -146,13 +146,14 @@ GIT
 
 GIT
   remote: git://github.com/myGrid/taverna-player
-  revision: 227338be0db5468e48889e7630c6e08f900b500a
+  revision: e6e1469bab7cecb3a348ca0aaef3604246627f5e
   branch: master
   specs:
     taverna-player (0.0.1)
       coderay (~> 1.0.9)
       daemons (~> 1.1.9)
       delayed_job_active_record (~> 0.4.3)
+      jbuilder (~> 1.5.2)
       jquery-rails (~> 3.0.4)
       paperclip (~> 3.4.1)
       rails (= 3.2.14)
@@ -254,6 +255,9 @@ GEM
       rack
     i18n (0.6.5)
     in_place_editing (1.2.0)
+    jbuilder (1.5.2)
+      activesupport (>= 3.0.0)
+      multi_json (>= 1.2.0)
     journey (1.0.4)
     jquery-rails (3.0.4)
       railties (>= 3.0, < 5.0)
