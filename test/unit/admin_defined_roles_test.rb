@@ -353,6 +353,10 @@ class AdminDefinedRolesTest < ActiveSupport::TestCase
     assert !normal.is_project_manager?(nil,true)
     assert pm.is_project_manager?(nil,true)
 
+    assert !admin.is_project_manager_of_any_project?
+    assert !normal.is_project_manager_of_any_project?
+    assert pm.is_project_manager_of_any_project?
+
   end
 
   test 'Person.pals' do

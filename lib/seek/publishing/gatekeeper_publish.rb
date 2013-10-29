@@ -38,7 +38,7 @@ module Seek
 
       #checks that the person is a gatekeeper, regardless of project. Later when collecting the assets, they are filtered down to only thsoe the gatekeeper can control.
       def gatekeeper_auth
-        if @gatekeeper.nil? || !@gatekeeper.is_gatekeeper?(nil,true)
+        if @gatekeeper.nil? || !@gatekeeper.is_gatekeeper_of_any_project?
           error("You are not authorized to approve/reject the publishing of items. You might login as a gatekeeper.", "is invalid (insufficient_privileges)")
           return false
         end

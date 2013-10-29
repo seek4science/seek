@@ -14,6 +14,10 @@ module Seek
               role_names.include?('#{role}') && (ignore_project || roles(project).include?('#{role}'))
             end
 
+            def is_#{role}_of_any_project?
+              is_#{role}?(nil,true)
+            end
+
             def is_#{role}=(flag_and_project)
               flag_and_project = Array(flag_and_project)
               flag = flag_and_project[0]
