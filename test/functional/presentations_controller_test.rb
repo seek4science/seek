@@ -233,7 +233,7 @@ class PresentationsControllerTest < ActionController::TestCase
     ms_ppt_presentation = Factory(:ppt_presentation, :policy => Factory(:all_sysmo_downloadable_policy))
     get :show, :id => ms_ppt_presentation.id
     assert_response :success
-    assert_select "img[src=?]", /\/images\/file_icons\/small\/ppt\.png\?.*/
+    assert_select "img[src=?]", /\/assets\/file_icons\/small\/ppt\.png/
 
     #new version
     pdf_presentation = Factory(:presentation_version, :presentation => ms_ppt_presentation)
@@ -244,6 +244,6 @@ class PresentationsControllerTest < ActionController::TestCase
 
     get :show, :id => ms_ppt_presentation.id, :version => 2
     assert_response :success
-    assert_select "img[src=?]", /\/images\/file_icons\/small\/pdf\.png\?.*/
+    assert_select "img[src=?]", /\/assets\/file_icons\/small\/pdf\.png/
   end
 end
