@@ -1,0 +1,25 @@
+$j = jQuery.noConflict();
+
+$modal = $j('#modal-dialog'),
+        $modalBody = $j('#modal-dialog .modal-body'),
+        $modalHeading = $j('#modal-dialog .modal-heading');
+
+$modal.dialog(
+        {
+            modal: true,
+            autoOpen: true,
+            width: 600,
+            draggable: true,
+            resizable: true,
+            dialogClass: 'no-close noTitleStuff',
+            buttons: [ { text: "OK", click: function() { $j(this).dialog( "close" ); } } ]
+        });
+
+<%
+    run = TavernaPlayer::Run.find(params[:run_id])
+    output_port = run.outputs.select{ |port| port.name == params[:output_port_name] }[0]
+    value_to_show = (output_port.blank? || output_port.value.blank?) ? 'N/A' : escape_javascript(output_port.value)
+%>
+$modalHeading.html("Run: <%= run.name %>");
+$modalBody.html("<p>Result value for output port: <strong><%= params[:output_port_name] %></strong></p><pre class=\"script_example_data_box\"><%= value_to_show %></pre>");
+

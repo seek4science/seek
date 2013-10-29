@@ -1,3 +1,5 @@
+require 'zip/zip'
+
 class Sweep < ActiveRecord::Base
 
   has_many :runs, :class_name => 'TavernaPlayer::Run', :dependent => :destroy
@@ -46,5 +48,29 @@ class Sweep < ActiveRecord::Base
 
   def self.by_owner(uid)
     where(:user_id => uid)
+  end
+
+  def build_zip(output_list)
+    Zip::ZipFile.open("#{name}_selected_results.zip", Zip::ZipFile::CREATE) do |zip_file|
+      output_list.group_by {|o| o.name}.each do |output_name, outputs|
+        output_dir_name = output_name
+        zip_file.mkdir(output_dir_name) # Make folder for outputs
+        outputs.each do |output|
+          run_dir_name = "#{output_dir_name}/#{output.run.name}"
+          zip_file.mkdir(run_dir_name) # Make subfolder for each run in the sweep
+          if output.file.exists?
+            file = output.file
+            zip_file.get_output_stream("#{run_dir_name}/#{output.file_file_name}") do |f|
+              f.write(File.read(file.path))
+            end
+          else
+            file = StringIO.new(output.value)
+            zip_file.get_output_stream("#{run_dir_name}/value.txt") do |f|
+              f.write(file.read)
+            end
+          end
+        end
+      end
+    end
   end
 end
