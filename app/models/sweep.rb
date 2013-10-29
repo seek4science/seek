@@ -51,7 +51,10 @@ class Sweep < ActiveRecord::Base
   end
 
   def build_zip(output_list)
-    Zip::ZipFile.open("#{name}_selected_results.zip", Zip::ZipFile::CREATE) do |zip_file|
+    unique_id = output_list.map {|o| o.id}.hash.to_s(16).gsub('-','0')
+    path = "#{Rails.root}/tmp/#{name.parameterize('_')}_results_#{unique_id}.zip"
+
+    Zip::ZipFile.open(path, Zip::ZipFile::CREATE) do |zip_file|
       output_list.group_by {|o| o.name}.each do |output_name, outputs|
         output_dir_name = output_name
         zip_file.mkdir(output_dir_name) # Make folder for outputs
@@ -64,13 +67,14 @@ class Sweep < ActiveRecord::Base
               f.write(File.read(file.path))
             end
           else
-            file = StringIO.new(output.value)
             zip_file.get_output_stream("#{run_dir_name}/value.txt") do |f|
-              f.write(file.read)
+              f.write(output.value)
             end
           end
         end
       end
     end
+
+    path
   end
 end

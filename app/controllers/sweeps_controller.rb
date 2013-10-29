@@ -1,6 +1,6 @@
 class SweepsController < ApplicationController
 
-  before_filter :find_sweep, :except => [:create, :new, :index]
+  before_filter :find_sweep, :except => [:create, :new, :index, :download_results]
   before_filter :find_run, :only => :new
   before_filter :set_runlet_parameters, :only => :create
   before_filter :find_workflow_and_version, :only => :new
@@ -78,9 +78,20 @@ class SweepsController < ApplicationController
   # results for a run (for all output ports), or all results for all output ports
   # and all runs.
   def download_results
+    @sweep = Sweep.find(params[:id], :include => { :runs => :outputs })
+
+    outputs = []
+    params[:download].each do |run_id, output_names|
+      outputs = outputs + @sweep.runs.detect {|r| r.id == run_id.to_i}.outputs.select {|o| output_names.include?(o.name)}
+    end
+
+    path = @sweep.build_zip(outputs)
+
     respond_to do |format|
-      format.html { redirect_to sweep_path(@sweep) }
-    end  end
+      format.html {send_file path, :type => "application/zip",
+        :filename => path.split('/').last }
+    end
+  end
 
   private
 
