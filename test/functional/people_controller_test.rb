@@ -717,8 +717,7 @@ class PeopleControllerTest < ActionController::TestCase
     project_manager = Factory(:project_manager)
     a_person = Factory(:person,:group_memberships=>[Factory(:group_membership,:work_group=>project_manager.group_memberships.first.work_group)])
 
-    other_project = Factory(:project)
-    other_institution = Factory(:institution)
+    workgroup = Factory(:work_group)
 
     login_as(project_manager)
     get :admin, :id => a_person
@@ -733,22 +732,8 @@ class PeopleControllerTest < ActionController::TestCase
       end
     end
 
-    assert_select "optgroup[label=?]", other_project.title, :count => 0
-    assert_select 'option', :text => other_institution.title, :count => 0
-  end
-
-  test "project manager dont see the projects that they are not in to assign people into" do
-    project_manager = Factory(:project_manager)
-    a_person = Factory(:person)
-    a_work_group = Factory(:work_group)
-    assert_not_nil a_work_group.project
-
-    login_as(project_manager.user)
-    get :admin, :id => a_person
-
-    assert_response :success
-    assert_select "optgroup[label=?]", a_work_group.project.title, :count => 0
-    assert_select 'option', :text => a_work_group.institution.title, :count => 0
+    assert_select "optgroup[label=?]", workgroup.project.title, :count => 0
+    assert_select 'option', :text => workgroup.institution.title, :count => 0
   end
 
   test "allow project manager to edit people inside their projects, even outside their institutions" do
