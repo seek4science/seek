@@ -2,6 +2,7 @@
     content: " ";
     display: table;
 }
+
 .clearfix:after {
     clear: both;
 }
@@ -9,130 +10,131 @@
 /* Max Width */
 
 #header > div, #bd > div, #ft > div {
-  max-width: 1400px;
-  min-width: 800px;
-  margin: auto;
+    max-width: 1400px;
+    min-width: 800px;
+    margin: auto;
 }
 
 .workflow-category {
-  display: inline-block;
-  width: 300px;
-  height: 80px;
-  line-height:80px;
-  background-color: #f4f4f4;
-  font-size: 16px;
-  box-shadow: 1px 1px 3px #ccc;
-  border: 1px solid #ccc;
-  margin: 10px;
-  color: #333333;
-  text-align: center;
+    display: inline-block;
+    width: 300px;
+    height: 80px;
+    line-height: 80px;
+    background-color: #f4f4f4;
+    font-size: 16px;
+    box-shadow: 1px 1px 3px #ccc;
+    border: 1px solid #ccc;
+    margin: 10px;
+    color: #333333;
+    text-align: center;
 }
 
 .workflow-category:hover {
-  background-color: #b1e10f;
-  color: #333333;
-  border-color: #77aa11;
+    background-color: #b1e10f;
+    color: #333333;
+    border-color: #77aa11;
 }
 
 body, html {
-  background: #FAFAFA;
-  margin: 0;
-  padding: 0;
-  height: 100%;
-  color: #444;
+    background: #FAFAFA;
+    margin: 0;
+    padding: 0;
+    height: 100%;
+    color: #444;
 }
 
 #ft {
-  width: 100%;
-  position: absolute;
-  min-width: 800px;
-  height: 110px;
-  border: none;
-  background: #dddddd;
-  color: #555555;
-  font-weight: normal;
-  padding-top: 20px;
-  text-align: left;
-  margin-top: 20px;
+    width: 100%;
+    position: absolute;
+    min-width: 800px;
+    height: 110px;
+    border: none;
+    background: #dddddd;
+    color: #555555;
+    font-weight: normal;
+    padding-top: 20px;
+    text-align: left;
+    margin-top: 20px;
 }
 
 #ft a {
-  font-weight: bold;
+    font-weight: bold;
 }
 
 #bd {
-  min-height: 0;
-  padding: 0 20px 150px;
+    min-height: 0;
+    padding: 0 20px 150px;
 }
 
 #container {
-  position: relative;
-  min-height: 100%;
+    position: relative;
+    min-height: 100%;
 }
 
 a {
-  color: #003355;
+    color: #003355;
 }
 
 a:hover {
-  color: #225577;
+    color: #225577;
 }
 
 #header {
-  margin-bottom: 10px;
-  box-shadow: 0 3px 5px #ccc;
-  height: 50px;
-  background-color: #99cc33;
-  border-bottom: 1px solid #88bb22;
+    margin-bottom: 10px;
+    box-shadow: 0 3px 5px #ccc;
+    height: 50px;
+    background-color: #99cc33;
+    border-bottom: 1px solid #88bb22;
 }
 
 div.asset_form {
-  text-align: left;
+    text-align: left;
 }
 
 td.port-name, th.port-name {
-  text-align: right;
+    text-align: right;
 }
 
 td.port-type, th.port-type {
-  text-align: left;
-  padding-left: 5em;
+    text-align: left;
+    padding-left: 5em;
 }
 
 th.port-type, th.port-name {
-  padding-top: 20px;
+    padding-top: 20px;
 }
 
 td.port-type input {
-  vertical-align: middle;
+    vertical-align: middle;
 }
+
 td.port-type label {
-  font-weight: normal;
+    font-weight: normal;
 }
 
 #workflow_search_box {
-  padding: 12px 10px;
-  text-align: right;
+    padding: 12px 10px;
+    text-align: right;
 }
 
 #workflow_search_box input[type="submit"] {
-  line-height: 20px;
+    line-height: 20px;
 }
 
 #workflow_search_box input[type="text"] {
-  height: 20px;
-  width: 15em;
+    height: 20px;
+    width: 15em;
 }
 
 .CodeRay > .code > pre, .script_example_data_box {
     overflow: auto;
     max-height: 400px;
-    white-space: pre-wrap;       /* css-3 */
-    white-space: -moz-pre-wrap !important;  /* Mozilla, since 1999 */
-    white-space: -pre-wrap;      /* Opera 4-6 */
-    white-space: -o-pre-wrap;    /* Opera 7 */
-    word-wrap: break-word;       /* Internet Explorer 5.5+ */
-    word-break: break-all;       /* webkit */
+    white-space: pre-wrap; /* css-3 */
+    white-space: -moz-pre-wrap !important; /* Mozilla, since 1999 */
+    white-space: -pre-wrap; /* Opera 4-6 */
+    white-space: -o-pre-wrap; /* Opera 7 */
+    word-wrap: break-word; /* Internet Explorer 5.5+ */
+    word-break: break-all; /* webkit */
     border: 1px solid #aaa;
 }
 
@@ -150,17 +152,17 @@ td.port-type label {
 }
 
 .workflow .category {
-  background-color: #FFFFCC;
-  border: 1px solid #DDDDAA;
-  border-radius: 4px 4px 4px 4px;
-  float: right;
-  font-size: 12px;
-  padding: 2px 5px;
+    background-color: #FFFFCC;
+    border: 1px solid #DDDDAA;
+    border-radius: 4px 4px 4px 4px;
+    float: right;
+    font-size: 12px;
+    padding: 2px 5px;
 }
 
 .workflow .description {
-  font-size: 14px;
-  padding-top: 5px;
+    font-size: 14px;
+    padding-top: 5px;
 }
 
 div.small_list_item_title {
@@ -173,22 +175,22 @@ div.small_list_item_title {
 }
 
 .run_workflow {
-  padding: 15px 20px;
-  text-decoration: none;
-  color: #283a12;
-  line-height: 20px;
-  display: block;
-  background-color: #99cc33;
-  float: right;
+    padding: 15px 20px;
+    text-decoration: none;
+    color: #283a12;
+    line-height: 20px;
+    display: block;
+    background-color: #99cc33;
+    float: right;
 }
 
 .run_workflow:hover {
     background-color: #b1e10f;
-  color: #283a12;
+    color: #283a12;
 }
 
 .workflow_input {
-  text-align: left;
+    text-align: left;
 }
 
 table.display tr.odd {
@@ -228,76 +230,80 @@ tr.even td.sorting_3 {
 }
 
 table.display td {
-    border-bottom:1pt solid #BABABA;
+    border-bottom: 1pt solid #BABABA;
 }
 
 table.display tr td:first-child {
-  text-align: left;
-  padding-left: 20px;
+    text-align: left;
+    padding-left: 20px;
 }
 
 #workflow_filters {
-  float: left;
-  width: 250px;
-  text-align: left;
-  margin-right: 10px;
+    float: left;
+    width: 250px;
+    text-align: left;
+    margin-right: 10px;
 }
 
 #workflow_filters a.active {
-  background-color: #ACF;
+    background-color: #ACF;
 }
 
 #workflow_list {
-  min-width: 640px;
-  max-width: 1140px;
-  margin-left: 260px;
+    min-width: 640px;
+    max-width: 1140px;
+    margin-left: 260px;
 }
 
 #menubar-login-form {
-  position: absolute;
-  top: 50px;
-  border-width: 0 1px 1px;
-  border-style: solid;
-  border-color: #ccc;
-  box-shadow: 0 3px 5px #ccc;
-  width: 200px;
+    position: absolute;
+    top: 50px;
+    border-width: 0 1px 1px;
+    border-style: solid;
+    border-color: #ccc;
+    box-shadow: 0 3px 5px #ccc;
+    width: 200px;
 }
 
 #workflow_runs_table_wrapper {
-  position: static;
+    position: static;
 }
 
 div.file_input, div.text_input {
-  float: left;
+    float: left;
 }
 
 div.file_input {
-  color: #666;
-  line-height: 1.5;
+    color: #666;
+    line-height: 1.5;
 }
 
 div.text_input {
-  margin-right: 20px;
+    margin-right: 20px;
 }
 
 div.your_recent {
-  text-align: left;
-  padding: 20px;
-  width: 360px;
-  float: left;
+    text-align: left;
+    padding: 20px;
+    width: 360px;
+    float: left;
 }
 
 body {
-  text-align: left;
+    text-align: left;
 }
 
 #run-interaction iframe {
-  margin: 20px auto;
-  border: 1px solid #999;
+    margin: 20px auto;
+    border: 1px solid #999;
 }
 
 span.mime_type {
-  color: #999;
-  font-size: 80%;
-  font-weight: normal;
+    color: #999;
+    font-size: 80%;
+    font-weight: normal;
 }
+
+/* Hide the close button and tittle bar on the jquery modal dialog */
+.no-close .ui-dialog-titlebar-close {display: none }
+.noTitleStuff .ui-dialog-titlebar {display:none}
