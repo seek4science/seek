@@ -71,9 +71,6 @@ class Workflow < ActiveRecord::Base
   end if Seek::Config.solr_enabled
 
 
-  def uploader
-    return self.contributor.person.name
-  end
 
   def self.user_creatable?
     true
@@ -112,9 +109,9 @@ class Workflow < ActiveRecord::Base
     where(:contributor_id => uid, :contributor_type => "User")
   end
 
-  def self.uploader()
+  def uploader
     if :contributor_type == 'User'
-      return contributor.person.name
+      return self.contributor.person.name
     else
       return nil
     end
