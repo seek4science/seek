@@ -1,5 +1,5 @@
 <%= stylesheet_link_tag('jquery-ui-1.8.14.custom') %>
-<%= javascript_include_tag 'jquery-1.5.1.min.js','jquery-ui-1.8.14.custom.min.js' %>
+<%= javascript_include_tag 'jquery-ui-1.8.14.custom.min.js' %>
 
 <script type="text/javascript">
     jQuery.noConflict();
@@ -9,18 +9,18 @@
     $j(document).ready(function () {
         $j('#chk-select-all').click(function () {
             $j('.chk-select').prop('checked', true);
-            $j('.chk-select-row').prop('checked', true);
+            $j('.chk-select-column').prop('checked', true);
         });
 
         $j('#chk-unselect-all').click(function () {
             $j('.chk-select').prop('checked', false);
-            $j('.chk-select-row').prop('checked', false);
+            $j('.chk-select-column').prop('checked', false);
         });
 
-        // This enables the user to select/unselect all checkboxes in a row that
+        // This enables the user to select/unselect all checkboxes in a column that
         // belong to a specific output port by clicking on a special checkbox with
-        // class='chk-select-row' and the name=<name_of_the_output_port>
-        $j('.chk-select-row').click(function () {
+        // class='chk-select-column' and the name=<name_of_the_output_port>
+        $j('.chk-select-column').click(function () {
             if ($j(this).is(":checked")) {
                 $j('.chk-select').filter("[name*='" + $j(this).attr('name') + "']").prop('checked', true);
             } else {
@@ -44,10 +44,10 @@
         <table cellpadding="0" cellspacing="0" class="display" id="sweep_results_table" style="">
           <thead>
           <tr>
-            <th>&nbsp;</th>
-            <th>Output</th>
-            <% @sweep.runs.each do |run| %>
-                <th><%= run.name %></th>
+            <th>Run</th>
+            <% output_ports = @sweep.workflow.output_ports %>
+            <% output_ports.each do |output_port| %>
+                <th><%= output_port.name %></th>
             <% end %>
           </tr>
           </thead>
