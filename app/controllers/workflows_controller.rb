@@ -212,7 +212,12 @@ class WorkflowsController < ApplicationController
     find_assets
 
     # Has the user cleared the search box? - return all items.
-    return @workfows if params[:commit] == 'Clear'
+    uploader = params[:uploader_id] || []
+    category = params[:category_id] || []
+    search_query = params[:query] || []
+    search_included = (params[:commit] == 'Clear') ? false : true
+
+    return @workfows if search_included == false && category.empty? && uploader.empty?
 
     # Filter by uploader and category
     filter_results = Workflow.where(true)
@@ -221,9 +226,9 @@ class WorkflowsController < ApplicationController
     @workflows = @workflows & filter_results
 
     # Filter by search results
-    unless params[:query].blank?
+    unless params[:query].blank? || search_included == false
       search_results = Workflow.search do |query|
-        query.keywords(params[:query].downcase)
+        query.keywords(search_query.downcase)
       end.results
       @workflows = @workflows & search_results
     end
