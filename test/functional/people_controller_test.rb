@@ -175,8 +175,8 @@ class PeopleControllerTest < ActionController::TestCase
   end
 
   def test_change_notification_settings
-    login_as(:quentin)
-    p=people(:fred)
+
+    p=Factory(:person)
     assert p.notifiee_info.receive_notifications?, "should receive notifications by default in fixtures"
 
     put :update, :id=>p.id, :person=>{:id=>p.id}
