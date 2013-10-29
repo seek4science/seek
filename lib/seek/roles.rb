@@ -109,7 +109,12 @@ module Seek
       new_mask = self.roles_mask || 0
       roles.each do |role_details|
         rolename = role_details[0]
-        project_ids = Array(role_details[1]).collect{|p| p.is_a?(Project) ? p.id : p.to_i}
+        projects = Array(role_details[1])
+
+        project_ids = projects.collect{|p| p.is_a?(Project) ? p.id : p.to_i}
+
+        #filter out any projects that the person is not a member of
+        project_ids = project_ids & self.projects.collect(&:id)
         mask = mask_for_role(rolename)
         if self.class.is_project_dependent_role?(rolename)
           current_projects_ids = self.admin_defined_role_projects.where(role_mask: mask).collect{|r|r.project.id}

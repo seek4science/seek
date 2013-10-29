@@ -3,7 +3,22 @@ require 'test_helper'
 class AdminDefinedRolesTest < ActiveSupport::TestCase
 
   test "cannot add a role with a project the person is not a member of" do
-    fail "not yet implemented"
+    person = Factory(:person)
+    project1 = person.projects.first
+    project2 = Factory(:project)
+
+    assert !person.is_gatekeeper?(project1)
+    assert !person.is_gatekeeper?(project2)
+
+    person.roles = [["gatekeeper",[project1,project2]]]
+
+    assert person.is_gatekeeper?(project1)
+    assert !person.is_gatekeeper?(project2)
+
+    assert !person.is_asset_manager?(project2)
+    person.is_asset_manager=true,project2
+    assert !person.is_asset_manager?(project2)
+
   end
 
   test "removing a person from a project removes that role" do
