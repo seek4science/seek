@@ -280,8 +280,10 @@ class Person < ActiveRecord::Base
     subject == nil ? false : (subject == self.user || subject.is_admin? || self.is_managed_by?(subject))
   end
 
-  #determines if this person is the member of a project for which the user passed is a project manager
+  #determines if this person is the member of a project for which the user passed is a project manager,
+  # #and the current person is not an admin
   def is_managed_by? user
+    return false if self.is_admin?
     match = self.projects.find do |p|
       user.person.is_project_manager?(p)
     end

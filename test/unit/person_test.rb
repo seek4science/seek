@@ -13,7 +13,7 @@ class PersonTest < ActiveSupport::TestCase
     admin = Factory(:admin)
     project_manager = Factory(:project_manager)
     project_manager2 = Factory(:project_manager)
-    person = Factory :person,:group_memberships=>project_manager.group_memberships
+    person = Factory :person,:group_memberships=>[Factory(:group_membership,:work_group=>project_manager.group_memberships.first.work_group)]
     another_person = Factory :person
 
     assert_equal person.projects,project_manager.projects
@@ -25,6 +25,16 @@ class PersonTest < ActiveSupport::TestCase
     assert !person.can_be_edited_by?(another_person.user)
     assert !person.can_be_edited_by?(project_manager2.user),"should be not editable by the project manager of another project"
 
+  end
+
+  test "project manager cannot edit an admin within their project" do
+    admin = Factory(:admin)
+    project_manager = Factory(:project_manager,:group_memberships=>[Factory(:group_membership,:work_group=>admin.group_memberships.first.work_group)])
+
+
+    assert !(admin.projects & project_manager.projects).empty?
+
+    assert !admin.can_be_edited_by?(project_manager)
   end
 
   #checks the updated_at doesn't get artificially changed between created and reloading
