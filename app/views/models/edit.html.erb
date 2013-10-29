@@ -1,4 +1,4 @@
-<%= javascript_include_tag "sharing.js","models.js", "assays.js","attribution.js","resource.js" -%>
+<%= javascript_include_tag "sharing","models", "assays","attribution","resource" -%>
 
 <% current_user_authorized_to_manage = @model.can_manage? -%>
 <h1>Editing <%= t('model') %>: <%= link_to(h(@model.title), model_path(@model)) -%></h1>

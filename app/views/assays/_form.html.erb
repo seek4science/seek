@@ -1,11 +1,11 @@
-<%= javascript_include_tag 'strain.js' -%>
+<%= javascript_include_tag 'strain' -%>
 <%
  select_truncate_length=120
 @assay_text=@assay.is_modelling? ? "#{t('assays.modelling_analysis')}" : "#{t('assays.assay')}"
 @assay_type_text=@assay.is_modelling? ? "biological problem addressed" : "#{t('assays.assay').downcase} type"
 %>
-<%= javascript_include_tag "assays.js"  %>
-<%= javascript_include_tag "sharing.js", "resource.js"%>
+<%= javascript_include_tag "assays"  %>
+<%= javascript_include_tag "sharing", "resource"%>
 
 <%= f.error_messages -%>
 <%= f.hidden_field :create_from_asset %>
