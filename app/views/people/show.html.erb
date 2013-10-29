@@ -71,13 +71,13 @@
         <h3 class="admin_warning" style="margin-top: 2.5em;">Access Rights Information - Only Visible to Admins</h3>
         <ul>
 
-          <%= "<li>This person is a <b>#{Seek::Config.dm_project_name} PAL</b></li>".html_safe if @person.is_pal? %>
+          <%= "<li>This person is a <b>#{Seek::Config.dm_project_name} PAL</b></li>".html_safe if @person.is_pal_of_any_project? %>
 
 
-          <%= "<li>This person is a <b>#{t('project')} Manager</b></li>".html_safe if @person.is_project_manager? %>
+          <%= "<li>This person is a <b>#{t('project')} Manager</b></li>".html_safe if @person.is_project_manager_of_any_project? %>
 
-          <%= "<li>This person is an <b>Asset Manager</b></li>".html_safe if @person.is_asset_manager? %>
-          <%= "<li>This person is a <b>Gatekeeper</b></li>".html_safe if @person.is_gatekeeper? %>
+          <%= "<li>This person is an <b>Asset Manager</b></li>".html_safe if @person.is_asset_manager_of_any_project? %>
+          <%= "<li>This person is a <b>Gatekeeper</b></li>".html_safe if @person.is_gatekeeper_of_any_project? %>
 
           <li>
             Editing <b><%= t('project').pluralize %></b>, where this person is

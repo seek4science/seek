@@ -14,6 +14,34 @@ class AdminDefinedRolesTest < ActiveSupport::TestCase
     fail "not yet implemented"
   end
 
+  test "role_names" do
+    person = Factory(:admin)
+    assert_equal ["admin"],person.role_names
+
+    person = Factory(:gatekeeper)
+    assert_equal ["gatekeeper"],person.role_names
+    person = Factory(:asset_manager)
+    assert_equal ["asset_manager"],person.role_names
+    person = Factory(:project_manager)
+    assert_equal ["project_manager"],person.role_names
+    person = Factory(:pal)
+    assert_equal ["pal"],person.role_names
+
+    project = person.projects.first
+    person.is_gatekeeper=true,project
+    assert_equal ["gatekeeper","pal"],person.role_names.sort
+
+    person.is_admin=true
+    assert_equal ["admin","gatekeeper","pal"],person.role_names.sort
+
+    person.is_asset_manager=true,project
+    assert_equal ["admin","asset_manager","gatekeeper","pal"],person.role_names.sort
+
+    person.is_project_manager=true,project
+    assert_equal ["admin","asset_manager","gatekeeper","pal","project_manager"],person.role_names.sort
+
+  end
+
   test "project dependent roles" do
     assert_equal ['pal', 'project_manager', 'asset_manager', 'gatekeeper'],Person::PROJECT_DEPENDENT_ROLES
     assert Person.is_project_dependent_role?('pal')

@@ -546,17 +546,15 @@ class PeopleControllerTest < ActionController::TestCase
   end
 
   test 'should show that the person is asset manager for admin' do
-    person = Factory(:person)
-    person.is_asset_manager = true
-    person.save!
+    person = Factory(:asset_manager)
+
     get :show, :id => person
     assert_select "li", :text => /This person is an Asset Manager/, :count => 1
   end
 
   test 'should not show that the person is asset manager for non-admin' do
-    person = Factory(:person)
-    person.is_asset_manager = true
-    person.save
+    person = Factory(:asset_manager)
+
     login_as(:aaron)
     get :show, :id => person
     assert_select "li", :text => /This person is an Asset Manager/, :count => 0
