@@ -1,11 +1,12 @@
 class SweepsController < ApplicationController
 
+  before_filter :find_sweep, :except => [:create, :new, :index]
   before_filter :find_run, :only => :new
   before_filter :set_runlet_parameters, :only => :create
   before_filter :find_workflow_and_version, :only => :new
+  before_filter :auth, :only => [:update, :edit, :destroy, :cancel]
 
   def show
-    @sweep = Sweep.find(params[:id], :include => :runs)
     @runs = @sweep.runs.select { |r| r.can_view? }
   end
 
@@ -14,14 +15,12 @@ class SweepsController < ApplicationController
   end
 
   def edit
-    @sweep = Sweep.find(params[:id])
     respond_to do |format|
       format.html
     end
   end
 
   def update
-    @sweep = Sweep.find(params[:id])
     if @sweep.update_attributes(params[:sweep])
       respond_to do |format|
         format.html { redirect_to sweep_path(@sweep) }
@@ -47,7 +46,6 @@ class SweepsController < ApplicationController
   end
 
   def cancel
-    @sweep = Sweep.find(params[:id])
     @sweep.cancel
     respond_to do |format|
       format.html { redirect_to taverna_player.runs_path }
@@ -55,7 +53,6 @@ class SweepsController < ApplicationController
   end
 
   def destroy
-    @sweep = Sweep.find(params[:id])
     @sweep.destroy
     respond_to do |format|
       format.html { redirect_to params[:redirect_url].blank? ? taverna_player.runs_path : :redirect_url}
@@ -72,7 +69,6 @@ class SweepsController < ApplicationController
 
   # Give a result value for a given output port of a given run.
   def view_result
-    @sweep = Sweep.find(params[:id])
     respond_to do |format|
       format.html { redirect_to sweep_path(@sweep) }
     end  end
@@ -81,7 +77,6 @@ class SweepsController < ApplicationController
   # results for a run (for all output ports), or all results for all output ports
   # and all runs.
   def download_results
-    @sweep = Sweep.find(params[:id])
     respond_to do |format|
       format.html { redirect_to sweep_path(@sweep) }
     end  end
@@ -124,6 +119,19 @@ class SweepsController < ApplicationController
         end
       end
     end
+  end
+
+  def auth
+    unless @sweep.user == current_user
+      respond_to do |format|
+        flash[:error] = "You are not authorized to #{action_name} this sweep."
+        format.html { redirect_to @sweep }
+      end
+    end
+  end
+
+  def find_sweep
+    @sweep = Sweep.find(params[:id], :include => :runs)
   end
 
 end
