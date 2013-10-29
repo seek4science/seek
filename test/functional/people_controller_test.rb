@@ -611,7 +611,7 @@ class PeopleControllerTest < ActionController::TestCase
       i += 1
     end
     get :index
-    asset_manager_number = assigns(:people).select(&:is_asset_manager?).count
+    asset_manager_number = assigns(:people).select(&:is_asset_manager_of_any_project?).count
     assert_select "img[src*=?]", /medal_bronze_3/, :count => asset_manager_number
   end
 
@@ -630,7 +630,7 @@ class PeopleControllerTest < ActionController::TestCase
 
     get :index
 
-    project_manager_number = assigns(:people).select(&:is_project_manager?).count
+    project_manager_number = assigns(:people).select(&:is_project_manager_of_any_project?).count
     assert_select "img[src*=?]", /medal_gold_1.png/, :count => project_manager_number
   end
 
@@ -917,23 +917,7 @@ class PeopleControllerTest < ActionController::TestCase
     assert !other_person.can_edit_institutions?
   end
 
-  #test "should show the registered date for this person only for admin" do
-  #  a_person = Factory(:person)
-  #  get :show, :id => a_person
-  #  assert_response :success
-  #  text = date_as_string(a_person.user.created_at)
-  #  assert_select 'p', :text => /#{text}/, :count => 1
-  #
-  #
-  #
-  #  get :index
-  #  assert_response :success
-  #  assigns(:people).each do |person|
-  #    unless person.try(:user).try(:created_at).nil?
-  #      assert_select 'p', :text => /#{date_as_string(person.user.created_at)}/, :count => 1
-  #    end
-  #  end
-  #end
+
 
   test "if not admin login should not show the registered date for this person" do
     login_as(:aaron)
@@ -996,7 +980,7 @@ class PeopleControllerTest < ActionController::TestCase
       i += 1
     end
     get :index
-    gatekeeper_number = assigns(:people).select(&:is_gatekeeper?).count
+    gatekeeper_number = assigns(:people).select(&:is_gatekeeper_of_any_project?).count
     assert_select "img[src*=?]", /medal_silver_2/, :count => gatekeeper_number
   end
 
