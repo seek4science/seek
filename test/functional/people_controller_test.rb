@@ -715,9 +715,12 @@ class PeopleControllerTest < ActionController::TestCase
 
   test "project manager see only their projects to assign people into" do
     project_manager = Factory(:project_manager)
-    a_person = Factory(:person)
+    a_person = Factory(:person,:group_memberships=>[Factory(:group_membership,:work_group=>project_manager.group_memberships.first.work_group)])
 
-    login_as(project_manager.user)
+    other_project = Factory(:project)
+    other_institution = Factory(:institution)
+
+    login_as(project_manager)
     get :admin, :id => a_person
 
     assert_response :success
@@ -729,6 +732,9 @@ class PeopleControllerTest < ActionController::TestCase
         end
       end
     end
+
+    assert_select "optgroup[label=?]", other_project.title, :count => 0
+    assert_select 'option', :text => other_institution.title, :count => 0
   end
 
   test "project manager dont see the projects that they are not in to assign people into" do
