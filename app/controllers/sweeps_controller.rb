@@ -67,11 +67,12 @@ class SweepsController < ApplicationController
     end
   end
 
-  # Give a result value for a given output port of a given run.
+  # Display the result value for a given output port of a given run.
   def view_result
     respond_to do |format|
-      format.html { redirect_to sweep_path(@sweep) }
-    end  end
+      format.js  { render 'view_result.js.erb' }
+    end
+  end
 
   # Zip/assemble results for a given output port over selected sweep's runs,
   # results for a run (for all output ports), or all results for all output ports

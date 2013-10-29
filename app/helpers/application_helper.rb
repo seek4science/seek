@@ -627,6 +627,33 @@ module ApplicationHelper
     return html.html_safe
   end
 
+  #
+  # Converts the given HASH array like 'params' to a flat
+  # HASH array that's compatible with url_for and link_to
+  # From http://www.gamecreatures.com/blog/2007/08/21/rails-url_for-and-params-missery/
+  #
+  def flatten_param_hash( params )
+    found = true
+
+    while found
+      found = false
+      new_hash = {}
+
+      params.each do |key,value|
+        if value.is_a?( Hash )
+          found = true
+          value.each do |key2,value2|
+            new_hash[ key.to_s + '[' + key2.to_s + ']' ] = value2
+          end
+        else
+          new_hash[ key.to_s ] = value
+        end
+      end
+      params = new_hash
+    end
+    params
+  end
+
 
   def unable_to_delete_text model_item
     text=NO_DELETE_EXPLANTIONS[model_item.class] || "You are unable to delete this #{model_item.class.name}. It might be published"
