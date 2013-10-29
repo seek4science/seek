@@ -209,33 +209,38 @@ class PeopleControllerTest < ActionController::TestCase
   end
 
   def test_admin_can_set_pal_flag
-    login_as(:quentin)
-    p=people(:fred)
+    p=Factory(:person_in_multiple_projects)
+    project = p.projects.first
+    project2 = p.projects[1]
+    project3 = p.projects[2]
     assert !p.is_pal?
-    put :administer_update, :id=>p.id, :person=>{:id=>p.id, :email=>"ssfdsd@sdfsdf.com"}, :roles => {:pal => true}
+    put :administer_update, :id=>p.id, :person=>{:email=>"ssfdsd@sdfsdf.com"}, :roles => {:pal => [project.id,project2.id]}
     assert_redirected_to person_path(p)
     assert_nil flash[:error]
     p.reload
-    assert p.is_pal?
+    assert p.is_pal?(project)
+    assert p.is_pal?(project2)
+    assert !p.is_pal?(project3)
   end
 
   def test_non_admin_cant_set_pal_flag
     login_as(:aaron)
-    p=people(:fred)
+    p=Factory(:person)
     assert !p.is_pal?
-    put :administer_update, :id=>p.id, :person=>{:id=>p.id, :email=>"ssfdsd@sdfsdf.com"}, :roles => {:pal => true}
+    put :administer_update, :id=>p.id, :person=>{:email=>"ssfdsd@sdfsdf.com"}, :roles => {:pal => [p.projects.first.id]}
     assert_not_nil flash[:error]
     p.reload
-    assert !p.is_pal?
+    assert !p.is_pal?(p.projects.first)
   end
 
   def test_cant_set_yourself_to_pal
-    login_as(:aaron)
-    p=people(:aaron_person)
-    assert !p.is_pal?
-    put :administer_update, :id=>p.id, :person=>{:id=>p.id, :email=>"ssfdsd@sdfsdf.com"}, :roles => {:pal => true}
-    p.reload
-    assert !p.is_pal?
+    me = Factory(:person)
+    login_as(me)
+
+    assert !me.is_pal?
+    put :administer_update, :id=>me.id, :person=>{:email=>"ssfdsd@sdfsdf.com"}, :roles => {:pal => [me.projects.first.id]}
+    me.reload
+    assert !me.is_pal?(me.projects.first)
   end
 
   def test_cant_set_yourself_to_admin
@@ -454,23 +459,24 @@ class PeopleControllerTest < ActionController::TestCase
     assert_equal Policy::MANAGING, permissions.first.access_type
   end
 
-  test 'set pal role for a person' do
-    work_group_id = Factory(:work_group).id
+  test 'set pal role for a person together with workgroup' do
+    work_group = Factory(:work_group)
     assert_difference('Person.count') do
       assert_difference('NotifieeInfo.count') do
-        post :create, :person => {:first_name=>"test", :email=>"hghg@sdfsd.com"}, :roles => {:pal => true}
+        post :create, :person => {:first_name=>"test", :email=>"hghg@sdfsd.com"}
       end
     end
     person = assigns(:person)
-    put :administer_update, :id => person, :person =>{:work_group_ids => [work_group_id]}, :roles => {:pal => true}
+    project = work_group.project
+    put :administer_update, :id => person, :person =>{:work_group_ids => [work_group.id]}, :roles => {:pal => [project.id]}
 
     person = assigns(:person)
     assert_not_nil person
-    assert person.is_pal?
+    assert person.is_pal?(project)
   end
 
-  test 'set project_manager role for a person' do
-    work_group_id = Factory(:work_group).id
+  test 'set project_manager role for a person together with workgroup' do
+    work_group = Factory(:work_group)
     assert_difference('Person.count') do
       assert_difference('NotifieeInfo.count') do
         post :create, :person => {:first_name=>"test", :email=>"hghg@sdfsd.com"}
@@ -478,54 +484,99 @@ class PeopleControllerTest < ActionController::TestCase
     end
 
     person = assigns(:person)
-    put :administer_update, :id => person, :person =>{:work_group_ids => [work_group_id]}, :roles => {:project_manager => true}
+    project = work_group.project
+    put :administer_update, :id => person, :person =>{:work_group_ids => [work_group.id]}, :roles => {:project_manager => [project.id]}
     person = assigns(:person)
     assert_not_nil person
-    assert person.is_project_manager?
+    assert person.is_project_manager?(project)
   end
 
   test 'update roles for a person' do
     person = Factory(:pal)
+    project = person.projects.first
     assert_not_nil person
-    assert person.is_pal?
+    assert person.is_pal?(project)
 
-    put :administer_update, :id => person.id, :person => {:id => person.id}, :roles => {:project_manager => true}
+    put :administer_update, :id => person.id, :person => {:id => person.id}, :roles => {:project_manager => [project.id]}
 
     person = assigns(:person)
     person.reload
     assert_not_nil person
-    assert person.is_project_manager?
-    assert !person.is_pal?
+    assert person.is_project_manager?(project)
+    assert !person.is_pal?(project)
+  end
+
+  test "assign somebody to multiple roles and different projects" do
+    person = Factory :person_in_multiple_projects
+    proj1 = person.projects[0]
+    proj2 = person.projects[1]
+    assert !person.is_asset_manager?(proj1)
+    assert !person.is_project_manager?(proj2)
+
+    put :administer_update, :id => person.id, :person => {:id => person.id}, :roles => {:project_manager => [proj2.id],:asset_manager=>[proj1.id]}
+
+    person = assigns(:person)
+    assert person.is_asset_manager?(proj1)
+    assert person.is_project_manager?(proj2)
+  end
+
+  test "remove somebody from a role" do
+    person = Factory(:asset_manager)
+    project = person.projects.first
+
+    assert person.is_asset_manager?(project)
+
+    put :administer_update, :id => person.id, :person => {:id => person.id}, :roles => {}
+
+    person = assigns(:person)
+    assert !person.is_asset_manager?(project)
+  end
+
+  test "cannot add a role for a project the person doesn't belong to" do
+    person = Factory(:person)
+    project = Factory(:project)
+
+    assert !person.is_asset_manager?(project)
+
+    put :administer_update, :id => person.id, :person => {:id => person.id}, :roles => {:asset_manager=>[project.id]}
+
+    person = assigns(:person)
+    assert !person.is_asset_manager?(project)
   end
 
   test 'update roles for yourself, but keep the admin role' do
-    person = User.current_user.person
+    person = Factory(:admin)
+    login_as(person)
     assert person.is_admin?
-    assert_equal 1, person.roles.count
+    assert_equal 1, person.role_names.count
 
-    put :administer_update, :id => person.id, :person => {:id => person.id}, :roles => {:project_manager => true}
+    project = person.projects.first
+    assert_not_nil project
+
+    put :administer_update, :id => person.id, :person => {}, :roles => {:project_manager => [project.id]}
 
     person = assigns(:person)
     person.reload
     assert_not_nil person
-    assert person.is_project_manager?
+    assert person.is_project_manager?(project)
     assert person.is_admin?
-    assert_equal 2, person.roles.count
+    assert_equal 2, person.role_names.count
   end
 
-  test 'set the asset manager role for a person' do
-    work_group_id = Factory(:work_group).id
+  test 'set the asset manager role for a person with workgroup' do
+    work_group = Factory(:work_group)
     assert_difference('Person.count') do
       assert_difference('NotifieeInfo.count') do
         post :create, :person => {:first_name=>"assert manager", :email=>"asset_manager@sdfsd.com"}
       end
     end
     person = assigns(:person)
-    put :administer_update, :id => person, :person =>{:work_group_ids => [work_group_id]}, :roles => {:asset_manager => true}
+    project = work_group.project
+    put :administer_update, :id => person, :person =>{:work_group_ids => [work_group.id]}, :roles => {:asset_manager => [project.id]}
     person = assigns(:person)
 
     assert_not_nil person
-    assert person.is_asset_manager?
+    assert person.is_asset_manager?(project)
   end
 
   test 'admin should see the session of assigning roles to a person' do
@@ -796,6 +847,7 @@ class PeopleControllerTest < ActionController::TestCase
 
   test 'admin can administer other admin' do
     admin = Factory(:admin)
+    project = admin.projects.first
 
     get :show, :id => admin
     assert_select "a", :text => /Person Administration/, :count => 1
@@ -804,9 +856,10 @@ class PeopleControllerTest < ActionController::TestCase
     assert_response :success
 
     assert !admin.is_gatekeeper?
-    put :administer_update, :id => admin, :person => {}, :roles => {:gatekeeper => true}
+    put :administer_update, :id => admin, :person => {}, :roles => {:gatekeeper => [project.id]}
     assert_redirected_to person_path(admin)
-    assert assigns(:person).is_gatekeeper?
+    assert assigns(:person).is_gatekeeper?(project)
+    assert assigns(:person).is_admin?
   end
 
   test 'admin can edit other admin' do
@@ -935,19 +988,19 @@ class PeopleControllerTest < ActionController::TestCase
     end
   end
 
-  test 'set gatekeeper role for a person' do
-    work_group_id = Factory(:work_group).id
+  test 'set gatekeeper role for a person along with workgroup' do
+    work_group = Factory(:work_group)
     assert_difference('Person.count') do
       assert_difference('NotifieeInfo.count') do
         post :create, :person => {:first_name=>"test", :email=>"hghg@sdfsd.com"}
       end
     end
     person = assigns(:person)
-    put :administer_update, :id => person, :person =>{:work_group_ids => [work_group_id]}, :roles => {:gatekeeper => true}
+    put :administer_update, :id => person, :person =>{:work_group_ids => [work_group.id]}, :roles => {:gatekeeper => [work_group.project.id]}
 
     person = assigns(:person)
     assert_not_nil person
-    assert person.is_gatekeeper?
+    assert person.is_gatekeeper?(work_group.project)
   end
 
   test 'should show that the person is gatekeeper for admin' do

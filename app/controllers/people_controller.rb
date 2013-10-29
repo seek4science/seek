@@ -340,10 +340,12 @@ class PeopleController < ApplicationController
   end
 
   def set_roles person, params
-    roles = person.is_admin? ? ['admin'] : []
+    roles = person.is_admin? ? [['admin']] : []
     if params[:roles]
       params[:roles].each_key do |key|
-        roles << key
+        project_ids=params[:roles][key]
+
+        roles << [key,project_ids]
       end
     end
     person.roles=roles
