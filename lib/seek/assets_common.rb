@@ -84,7 +84,7 @@ module Seek
         msg="There was a problem accessing the URL. You can test the link by opening in another window or tab:<br/><a href=#{asset_url}>#{asset_url}</a>"
       end
       
-      image = "<img src='/images/#{icon_filename}'/>"
+      image = "<img src='/assets/#{icon_filename}'/>"
       render :update do |page|
         page.replace_html "test_url_result_icon",image
         if msg.length>0

@@ -35,6 +35,6 @@
 
 
     </table>
-    <img src='/images/famfamfam_silk/add.png' alt="Add more" title="Add more gene and mutation" onclick="addGenotypeRow('genotype_table','<%=parent_name%>','<%=action%>')"/>
+    <%= image_tag 'famfamfam_silk/add.png', :alt=>"Add more", :title=>"Add more gene and mutation", :onclick=>"addGenotypeRow('genotype_table','#{parent_name}','#{action}')" %>
   </div>
 </center>
