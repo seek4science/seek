@@ -22,10 +22,19 @@
         // class='chk-select-column' and the name=<name_of_the_output_port>
         $j('.chk-select-column').click(function () {
             if ($j(this).is(":checked")) {
-                $j('.chk-select').filter("[name*='" + $j(this).attr('name') + "']").prop('checked', true);
+                $j(".chk-select[value='" + $j(this).attr('name') + "']").prop('checked', true);
             } else {
-                $j('.chk-select').filter("[name*='" + $j(this).attr('name') + "']").prop('checked', false);
+                $j(".chk-select[value='" + $j(this).attr('name') + "']").prop('checked', false);
             }
+        });
+
+        $j('#download_results_button').click(function (e) {
+          if ($j('.chk-select:checked').size() == 0) {
+            alert('Please select at least one result to download');
+            return false;
+          }
+          else
+            return true;
         });
     });
 </script>
@@ -47,7 +56,10 @@
             <th>Run</th>
             <% output_ports = @sweep.workflow.output_ports %>
             <% output_ports.each do |output_port| %>
-                <th><%= output_port.name %></th>
+                <th>
+                  <%= output_port.name -%>
+                  <%= check_box_tag(output_port.name, output_port.name, false, {:class => 'chk-select-column'})  -%>
+                </th>
             <% end %>
           </tr>
           </thead>
@@ -58,7 +70,7 @@
 
         <!--#Button to download all results for this port across all runs&ndash;&gt;-->
         <div style="margin-top: 20px; text-align: right;">
-          <%= submit_tag("Download selected values", :name => "download_results") %>
+          <%= submit_tag("Download selected values", :name => "download_results", :id => "download_results_button") %>
         </div>
     <% end %>
 
