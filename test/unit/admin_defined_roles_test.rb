@@ -26,7 +26,11 @@ class AdminDefinedRolesTest < ActiveSupport::TestCase
   end
 
   test "raises exception for unrecognised role" do
-    fail "not yet implemented"
+    person = Factory(:person)
+    project = person.projects.first
+    assert_raises Seek::Roles::UnknownRoleException do
+      person.roles=[["fish",project]]
+    end
   end
 
   test "role_names" do

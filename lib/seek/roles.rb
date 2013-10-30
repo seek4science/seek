@@ -1,6 +1,10 @@
 module Seek
   module Roles
 
+    class UnknownRoleException < Exception
+
+    end
+
     ROLES = %w[admin pal project_manager asset_manager gatekeeper]
     PROJECT_DEPENDENT_ROLES = %w[pal project_manager asset_manager gatekeeper]
 
@@ -109,6 +113,7 @@ module Seek
       new_mask = self.roles_mask || 0
       roles.each do |role_details|
         rolename = role_details[0]
+        raise UnknownRoleException.new("Unrecognised role name #{rolename}") unless ROLES.include?(rolename)
         projects = Array(role_details[1])
 
         project_ids = projects.collect{|p| p.is_a?(Project) ? p.id : p.to_i}
