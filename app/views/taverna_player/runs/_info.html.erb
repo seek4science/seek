@@ -25,8 +25,8 @@
   <div style="float: left">
     <%
        created_at = run.created_at.strftime("%e %b %Y %H:%m:%S %Z")
-       start_time = run.start_time.blank? ? 'n/a' : run.start_time.strftime("%e %b %Y %H:%m:%S %Z")
-       finish_time = run.finish_time.blank? ? 'n/a' : run.finish_time.strftime("%e %b %Y %H:%m:%S %Z")
+       start_time = run.start_time.blank? ? 'N/A' : run.start_time.strftime("%e %b %Y %H:%m:%S %Z")
+       finish_time = run.finish_time.blank? ? 'N/A' : run.finish_time.strftime("%e %b %Y %H:%m:%S %Z")
     %>
 
     <p>
