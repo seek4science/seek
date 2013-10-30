@@ -1,7 +1,7 @@
 <% unless current_user.nil? %>
-<% workflows = Workflow.where(:contributor_id => current_user.id, :contributor_type => 'User').order(:created_at).limit(5) %>
+<% workflows = TavernaPlayer::Run.by_owner(current_user.id).order('created_at DESC').includes(:workflow).map {|r| r.workflow}.uniq.first(5) %>
 <div class="your_recent">
-  <h2>Your recent workflows</h2>
+  <h2>Your recently used workflows</h2>
   <% if workflows.empty? %>
     <span class="none_text">No workflows</span>
   <% else %>
