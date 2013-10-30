@@ -21,13 +21,8 @@
         </li>
       <% end %>
     </ul>
-      <p></p>
-    <ul class="sectionIcons">
-      <li>
-         <%= link_to 'Clear all filters', workflows_path -%>
-      </li>
-    </ul>
-      <p></p>
+
+    <%= button_to 'Clear all filters', workflows_path, :method => :get -%>
 
   <% else %>
       All workflows
