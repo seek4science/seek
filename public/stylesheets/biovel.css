@@ -311,3 +311,15 @@ span.mime_type {
 .chk-select-column {
   vertical-align: middle;
 }
+
+
+input[type="submit"], button {
+    background: none repeat scroll 0 0 #EEEEEE;
+    border: 1px solid #AAAAAA;
+    border-radius: 3px 3px 3px 3px;
+    color: #000000;
+    cursor: pointer;
+    padding: 3px 4px;
+    font-size: 14px;
+    font-family: arial, ​sans-serif;
+}
