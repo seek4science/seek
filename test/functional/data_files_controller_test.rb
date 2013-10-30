@@ -1564,7 +1564,7 @@ class DataFilesControllerTest < ActionController::TestCase
     current_person.project_subscriptions.create :project => proj, :frequency => 'weekly'
     a_person = Factory(:person)
     a_person.project_subscriptions.create :project => a_person.projects.first, :frequency => 'weekly'
-    current_person.projects << a_person.projects.first
+    current_person.group_memberships << Factory(:group_membership,:work_group=>Factory(:work_group,:project=>a_person.projects.first))
     assert current_person.save
     assert current_person.reload.projects.include?(a_person.projects.first)
     assert Subscription.all.empty?
