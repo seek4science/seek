@@ -52,6 +52,7 @@ class SendAnnouncementEmailsJobTest < ActiveSupport::TestCase
 
 
   test "perform" do
+    skip("needs reimplementing, the logic of creating a notifee with a predefined :id doesn't work")
     Delayed::Job.delete_all
 
     BATCHSIZE=50
