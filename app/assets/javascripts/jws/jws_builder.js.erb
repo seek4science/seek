@@ -154,9 +154,9 @@ function toggleChevron(prefix){
     chevron = $(prefix + "_chevron");
     var expand = (chevron.src.indexOf("expand") > 0);
     if (expand){
- 	chevron.src = "<%= asset_path('jws/collapse.gif') %>";	   
+ 	    chevron.src = "<%= asset_path('jws/collapse.gif') %>";
     }else{
-    	chevron.src = "<%= asset_path('jws/expand.gif') %>"
+    	chevron.src = "<%= asset_path('jws/expand.gif') %>";
     }    
 }
 
