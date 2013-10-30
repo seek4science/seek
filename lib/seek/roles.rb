@@ -43,7 +43,8 @@ module Seek
       end
       base.class_eval do
         requires_can_manage :roles_mask
-        has_many :admin_defined_role_projects
+        has_many :admin_defined_role_projects, :dependent=>:destroy
+        after_save :resolve_admin_defined_role_projects
       end
 
     end
@@ -152,13 +153,26 @@ module Seek
       self.roles_mask = new_mask
     end
 
-    #def is_gatekeeper_of? item
-    #  is_gatekeeper? && !(item.projects & projects).empty?
-    #end
-    #
-    #def is_asset_manager_of? item
-    #  is_asset_manager? && !(item.projects & projects).empty?
-    #end
+    #called as callback after save, to make sure the role project records are aligned with the current projects, deleting
+    #any for projects that have been removed, and resolving the mask
+    def resolve_admin_defined_role_projects
+      projects = self.projects
+
+      admin_defined_role_projects.each do |role|
+        unless projects.include?(role.project)
+          role.destroy
+        end
+      end
+      new_mask = self.roles_mask
+      roles_to_check = role_names & PROJECT_DEPENDENT_ROLES
+      roles_to_check.collect{|name| mask_for_role(name)}.each do |mask|
+        if AdminDefinedRoleProject.where(role_mask: mask, person_id: self.id).empty?
+          new_mask -= mask
+        end
+      end
+      self.update_column :roles_mask,new_mask
+
+    end
 
   end
 end

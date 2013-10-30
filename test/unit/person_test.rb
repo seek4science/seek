@@ -698,7 +698,8 @@ class PersonTest < ActiveSupport::TestCase
     assert p.project_subscriptions.empty?
     p.work_groups = []
     p.save
-    assert p.work_groups.empty?
+    assert_empty p.work_groups
+    assert_empty p.projects
   end
 
 end

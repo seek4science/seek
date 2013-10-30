@@ -22,7 +22,37 @@ class AdminDefinedRolesTest < ActiveSupport::TestCase
   end
 
   test "removing a person from a project removes that role" do
-    fail "not yet implemented"
+
+    person = Factory(:project_manager)
+    project = person.projects.first
+
+    assert person.is_project_manager?(project)
+    assert person.is_project_manager_of_any_project?
+
+    assert_difference("AdminDefinedRoleProject.count",-1) do
+      person.work_groups=[]
+      person.save!
+    end
+
+    person.reload
+
+    refute_includes person.projects,project, "should no longer be a member of that project"
+
+    assert !person.is_project_manager?(project), "should no longer be project manager for that project"
+    assert !person.is_project_manager_of_any_project?, "should no longer be a project manager at all"
+    assert_equal 0,person.roles_mask
+  end
+
+  test "destroying a person destroys the project role details" do
+    person = Factory(:asset_manager)
+    User.with_current_user(Factory(:admin).user) do
+      person.is_pal=true,person.projects.first
+      person.save!
+    end
+
+    assert_difference("AdminDefinedRoleProject.count",-2) do
+      person.destroy
+    end
   end
 
   test "raises exception for unrecognised role" do
