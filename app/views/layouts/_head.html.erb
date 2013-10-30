@@ -7,7 +7,7 @@
   <%= stylesheet_link_tag 'savage_beast/display' %>
   <%= javascript_include_tag "application" %>
 	<%# Assumption: If you're a rails project, you already have your own version of these, and don't need the SB version %>
-	<%= javascript_include_tag "prototype", "effects" %>
+	<%#= javascript_include_tag "prototype", "effects" %>
 <% unless @feed_icons.blank? -%>
   <% @feed_icons.each do |feed| -%>
   <%= auto_discovery_link_tag :rss, feed[:url], :title => "Subscribe to '#{feed[:title]}'" %>
