@@ -152,12 +152,15 @@ function save_new_version_extra_options(){
 
 function toggleChevron(prefix){
     chevron = $(prefix + "_chevron");
-    var expand = (chevron.src.indexOf("expand.gif") > 0);
-    chevron.src = chevron.src.split(expand ? "expand.gif" : "collapse.gif").join(expand ? "collapse.gif" : "expand.gif");
+    var expand = (chevron.src.indexOf("expand") > 0);
+    if (expand){
+ 	chevron.src = "<%= asset_path('jws/collapse.gif') %>";	   
+    }else{
+    	chevron.src = "<%= asset_path('jws/expand.gif') %>"
+    }    
 }
 
 function chevronExpand(prefix){
     chevron = $(prefix + "_chevron");
-    expand = true;
-    chevron.src = chevron.src.split(expand ? "expand.gif" : "collapse.gif").join(expand ? "collapse.gif" : "expand.gif");
+    chevron.src = "<%= asset_path('jws/collapse.gif') %>";
 }
