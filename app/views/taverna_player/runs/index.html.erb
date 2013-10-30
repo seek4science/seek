@@ -16,7 +16,7 @@
       <% end %>
       <div class="easytabs-pane">
         <%= render :partial => 'table', :locals => {:runs => @runs, :polling_url => taverna_player.runs_path,
-                                                    :id => 'workflow_runs_table' } %>
+                                                    :id => 'workflow_runs_table', :redirect_to => taverna_player.runs_path } %>
       </div>
   </div>
 

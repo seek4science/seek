@@ -14,7 +14,7 @@
   <h1><%= 'Run: ' + @run.name -%></h1>
 </div>
 
-<%= render :partial => 'buttons', :locals => {:run => @run} %>
+<%= render :partial => 'buttons', :locals => {:run => @run, :redirect_to => taverna_player.runs_path} %>
 <br/>
 
 <div class="show_basic">

@@ -55,6 +55,21 @@ module TavernaPlayer
       end
     end
 
+    # DELETE /runs/1
+    def destroy
+      if @run.destroy
+        flash[:notice] = "Run was deleted."
+        respond_with(@run) do |format|
+          format.html { redirect_to params[:redirect_to].blank? ? :back : params[:redirect_to]}
+        end
+      else
+        flash[:error] = "Run must be cancelled before deletion."
+        respond_with(@run, :nothing => true, :status => :forbidden) do |format|
+          format.html { redirect_to :back}
+        end
+      end
+    end
+
     private
 
     def find_workflow_and_version

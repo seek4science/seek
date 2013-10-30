@@ -32,6 +32,7 @@
     });
 </script>
 
+<% redirect_to ||= taverna_player.runs_path %>
 <div id="workflow_runs">
   <div class="scroll_box">
     <table cellpadding="0" cellspacing="0" class="display" id="<%= id -%>" style="">
@@ -47,7 +48,7 @@
       </tr>
       </thead>
       <tbody>
-      <%= render :partial => 'taverna_player/runs/table_body', :locals => { :runs => runs } %>
+      <%= render :partial => 'taverna_player/runs/table_body', :locals => { :runs => runs, :redirect_to => redirect_to } %>
       </tbody>
     </table>
   </div>

@@ -1,5 +1,7 @@
 <!--<div id="run-button">-->
 <%
+   redirect_to ||= taverna_player.runs_path
+
    image_filename = icon_filename_for_key('destroy')
 
    image_options = { :alt => 'Delete' }
@@ -8,7 +10,7 @@
    delete_tag = "#{img_tag} Delete".html_safe
    cancel_tag = "#{img_tag} Cancel".html_safe
 
-   delete_path = run.is_a?(Sweep) ? main_app.sweep_path(run) : taverna_player.run_path(run)
+   delete_path = run.is_a?(Sweep) ? main_app.sweep_path(run, :redirect_to => redirect_to) : taverna_player.run_path(run, :redirect_to => redirect_to)
    cancel_path = run.is_a?(Sweep) ? main_app.cancel_sweep_path(run) : taverna_player.cancel_run_path(run)
 %>
 <% if run.can_delete? -%>
