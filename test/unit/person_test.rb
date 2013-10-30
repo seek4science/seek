@@ -5,8 +5,8 @@ class PersonTest < ActiveSupport::TestCase
   
   # Replace this with your real tests.
   def test_work_groups
-    p=people(:quentin_person)
-    assert_equal 2,p.work_groups.size
+    p=Factory(:person_in_multiple_projects)
+    assert_equal 3,p.work_groups.size
   end
 
   def test_can_be_edited_by?
@@ -363,8 +363,8 @@ class PersonTest < ActiveSupport::TestCase
   end
   
   def test_projects
-    p=people(:quentin_person)
-    assert_equal 2,p.projects.size
+    p=Factory(:person_in_multiple_projects)
+    assert_equal 3,p.projects.size
   end
   
   def test_userless_people
