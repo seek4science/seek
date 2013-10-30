@@ -18,7 +18,7 @@
 </div>
 <br/>
 
-<div class="show_basic">
+<div class="show_basic" id="sweep_results_table" style="<%= 'display: none' unless @sweep.complete? -%>">
   <h2 style='background-color: #CDDEEF; background-image: url("/public/images/header-bg2.png");'>Results</h2>
   <%= render :partial => 'results_table' %>
 </div>
