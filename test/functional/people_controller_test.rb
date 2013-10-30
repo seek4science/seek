@@ -582,18 +582,18 @@ class PeopleControllerTest < ActionController::TestCase
   test 'admin should see the session of assigning roles to a person' do
     person = Factory(:person)
     get :admin, :id => person
-    assert_select "input#_roles_asset_manager", :count => 1
-    assert_select "input#_roles_project_manager", :count => 1
-    assert_select "input#_roles_gatekeeper", :count => 1
+    assert_select "select#_roles_asset_manager", :count => 1
+    assert_select "select#_roles_project_manager", :count => 1
+    assert_select "select#_roles_gatekeeper", :count => 1
   end
 
   test 'non-admin should not see the session of assigning roles to a person' do
     login_as(:aaron)
     person = Factory(:person)
     get :admin, :id => person
-    assert_select "input#_roles_asset_manager", :count => 0
-    assert_select "input#_roles_project_manager", :count => 0
-    assert_select "input#_roles_gatekeeper", :count => 0
+    assert_select "select#_roles_asset_manager", :count => 0
+    assert_select "select#_roles_project_manager", :count => 0
+    assert_select "select#_roles_gatekeeper", :count => 0
   end
 
   test 'should show that the person is asset manager for admin' do
