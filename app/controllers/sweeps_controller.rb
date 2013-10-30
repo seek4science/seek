@@ -80,16 +80,23 @@ class SweepsController < ApplicationController
   def download_results
     @sweep = Sweep.find(params[:id], :include => { :runs => :outputs })
 
-    outputs = []
-    params[:download].each do |run_id, output_names|
-      outputs = outputs + @sweep.runs.detect {|r| r.id == run_id.to_i}.outputs.select {|o| output_names.include?(o.name)}
-    end
+    if params[:download].blank?
+      respond_to do |format|
+        flash[:error] = "You must select at least one output to download"
+        format.html { redirect_to :back }
+      end
+    else
+      outputs = []
+      params[:download].each do |run_id, output_names|
+        outputs = outputs + @sweep.runs.detect {|r| r.id == run_id.to_i}.outputs.select {|o| output_names.include?(o.name)}
+      end
 
-    path = @sweep.build_zip(outputs)
+      path = @sweep.build_zip(outputs)
 
-    respond_to do |format|
-      format.html {send_file path, :type => "application/zip",
-        :filename => path.split('/').last }
+      respond_to do |format|
+        format.html {send_file path, :type => "application/zip",
+          :filename => path.split('/').last }
+      end
     end
   end
 

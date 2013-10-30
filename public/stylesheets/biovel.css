@@ -307,3 +307,7 @@ span.mime_type {
 /* Hide the close button and tittle bar on the jquery modal dialog */
 .no-close .ui-dialog-titlebar-close {display: none }
 .noTitleStuff .ui-dialog-titlebar {display:none}
+
+.chk-select-column {
+  vertical-align: middle;
+}

@@ -45,13 +45,6 @@ module SweepsHelper
       rows << row
     end
 
-    # Last row with all checkboxes
-    row = ['']
-    output_ports.each do |output_port|
-      row << check_box_tag(output_port.name, output_port.name, false, {:class => 'chk-select-column'})  # second parameter is used to populate the element's value attribute and gets passed in params
-    end
-    rows << row
-
     return rows
   end
 
