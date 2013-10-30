@@ -86,6 +86,17 @@ module Seek
       add_roles(roles)
     end
 
+    def projects_for_role role
+      raise UnknownRoleException.new("Unrecognised role name #{role}") unless ROLES.include?(role)
+      if self.role_names.include?(role)
+        mask = mask_for_role(role)
+        AdminDefinedRoleProject.where(role_mask: mask, person_id: self.id).collect{|r| r.project}
+      else
+        []
+      end
+
+    end
+
     #fetch the roles assigned for this project
     def roles(project=nil)
       project_id = (project.is_a?(Project)) ? project.id : project.to_i

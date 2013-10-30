@@ -281,6 +281,24 @@ class AdminDefinedRolesTest < ActiveSupport::TestCase
     end
   end
 
+  test "projects for role" do
+    person = Factory :person_in_multiple_projects
+    p1 = person.projects[0]
+    p2 = person.projects[1]
+
+    User.with_current_user(Factory(:admin).user) do
+      person.is_gatekeeper=true,[p1,p2]
+      person.is_pal=true,p1
+      person.is_admin=true
+    end
+
+    assert_equal [p1],person.projects_for_role("pal")
+    assert_equal [p1,p2].sort,person.projects_for_role("gatekeeper").sort
+    assert_equal [],person.projects_for_role("asset_manager")
+
+
+  end
+
   test 'is_admin?' do
     User.with_current_user Factory(:admin).user do
       person = Factory(:person)

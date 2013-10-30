@@ -24,28 +24,14 @@
             <% end -%>
 
             <% if admin_logged_in? %>
-                <label for="is_pal" style="font-weight: normal;">
-                  <%= check_box_tag '[roles][pal]', 1, @person.try(:is_pal?) -%>
-                  This person is a certified <b><%= Seek::Config.dm_project_name %> PAL</b>
-                </label>
-                <br/>
-
-                <label for="is_project_manager" style="font-weight: normal;">
-                  <%= check_box_tag "[roles][project_manager]", 1, @person.try(:is_project_manager?) -%>
-                  This person is a <b><%= t('project') %> Manager</b>
-                </label>
-                <br/>
-
-                <label for="is_asset_manager" style="font-weight: normal;">
-                  <%= check_box_tag "[roles][asset_manager]", 1, @person.try(:is_asset_manager?) -%>
-                  This person is an <b>Asset Manager</b>
-                </label>
-                <br/>
-
-                <label for="is_gatekeeper" style="font-weight: normal;">
-                  <%= check_box_tag "[roles][gatekeeper]", 1, @person.try(:is_gatekeeper?) -%>
-                  This person is a <b>Gatekeeper</b>
-                </label>
+                <%
+                roles = [["pal","a PAL"],["project_manager","a Project Manager"],["asset_manager","an Asset Manager"],["gatekeeper","a Gatekeeper"]]
+                roles.each do |role|
+                %>
+                  <%=  render :partial=>"roles_selector",:locals=>{:role=>role[0],:role_title=>role[1]} -%>
+                <%
+                end
+                %>
             <% end %>
           </p>
       <% end -%>
