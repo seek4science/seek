@@ -5,6 +5,7 @@ module TavernaPlayer
     before_filter :auth, :except => [ :index, :new, :create ]
     before_filter :find_runs, :only => :index
     before_filter :add_sweeps, :only => :index
+    before_filter :filter_users_runs_and_sweeps, :only => :index
     after_filter :find_workflow_and_version, :only => :new
 
     def edit
@@ -83,6 +84,13 @@ module TavernaPlayer
       @runs = @runs.group_by { |run| run.sweep }
       @runs = (@runs[nil] || []) + @runs.keys
       @runs.compact! # to ignore 'nil' key
+    end
+
+    def filter_users_runs_and_sweeps
+      @user_runs = @runs.select do |run|
+        run.is_a?(Sweep) && run.user == current_user ||
+        run.is_a?(TavernaPlayer::Run) && run.contributor == current_user
+      end
     end
 
     def auth

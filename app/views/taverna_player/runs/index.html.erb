@@ -1,5 +1,29 @@
 <h1><%= 'Workflow Runs' -%></h1>
 
 <div class="show_basic">
-  <%= render :partial => 'table', :locals => {:runs => @runs, :polling_url => taverna_player.runs_path } %>
+  <div class="easytabs-container">
+      <ul class="easytabs-nav">
+          <% if logged_in? %>
+            <li>Your Runs</li>
+          <% end %>
+          <li>All Runs</li>
+      </ul>
+      <% if logged_in? %>
+        <div class="easytabs-pane">
+          <%= render :partial => 'table', :locals => {:runs => @user_runs, :polling_url => taverna_player.runs_path,
+                                                      :id => 'workflow_user_runs_table' } %>
+        </div>
+      <% end %>
+      <div class="easytabs-pane">
+        <%= render :partial => 'table', :locals => {:runs => @runs, :polling_url => taverna_player.runs_path,
+                                                    :id => 'workflow_runs_table' } %>
+      </div>
+  </div>
+
+  <%= javascript_include_tag 'easytabs.js' -%>
+  <script type="text/javascript">
+      $j(function (){
+          $j('.easytabs-container').easyTabs();
+      });
+  </script>
 </div>

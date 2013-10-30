@@ -1,9 +1,10 @@
 <%= javascript_include_tag 'DataTables-1.8.2/jquery.js', 'DataTables-1.8.2/jquery.dataTables.js', 'DataTables-1.8.2/jquery.dataTables.rowGrouping.js', 'DataTables-1.8.2/Scroller.js' %>
+<% id ||= 'workflow_runs_table' %>
 <script type="text/javascript">
     jQuery.noConflict();
     var $j = jQuery;
     $j(document).ready(function () {
-        workflow_runs_table = $j('#workflow_runs_table').dataTable({
+        workflow_runs_table = $j('#<%= id -%>').dataTable({
             "bPaginate":false,
             "bLengthChange":false,
             "bFilter":true,
@@ -11,6 +12,9 @@
             "bInfo":false,
             "bAutoWidth":false,
             "bRetrieve":true,
+            "oLanguage": {
+                "sEmptyTable": "No workflow runs found"
+            },
             "aaSorting":[
                 [ 4, "desc" ]
             ],
@@ -30,7 +34,7 @@
 
 <div id="workflow_runs">
   <div class="scroll_box">
-    <table cellpadding="0" cellspacing="0" class="display" id="workflow_runs_table" style="">
+    <table cellpadding="0" cellspacing="0" class="display" id="<%= id -%>" style="">
       <thead>
       <tr>
         <th>Run</th>
