@@ -440,7 +440,7 @@ class PeopleControllerTest < ActionController::TestCase
     role = ProjectRole.find_by_name('Sysmo-DB Pal')
     pal = Factory(:person_in_project, :group_memberships => [Factory(:group_membership, :work_group => work_group)])
     pal.group_memberships.first.project_roles << role
-    pal.is_pal = true
+    pal.is_pal = true,project
     pal.save
     assert_equal pal, project.pals.first
     assert_equal 0, project.pis.count
@@ -548,7 +548,7 @@ class PeopleControllerTest < ActionController::TestCase
     person = Factory(:admin)
     login_as(person)
     assert person.is_admin?
-    assert_equal 1, person.role_names.count
+    assert_equal ["admin"], person.role_names
 
     project = person.projects.first
     assert_not_nil project
@@ -556,11 +556,11 @@ class PeopleControllerTest < ActionController::TestCase
     put :administer_update, :id => person.id, :person => {}, :roles => {:project_manager => [project.id]}
 
     person = assigns(:person)
-    person.reload
+
     assert_not_nil person
     assert person.is_project_manager?(project)
     assert person.is_admin?
-    assert_equal 2, person.role_names.count
+    assert_equal ["admin","project_manager"], person.role_names.sort
   end
 
   test 'set the asset manager role for a person with workgroup' do
@@ -620,13 +620,13 @@ class PeopleControllerTest < ActionController::TestCase
     assert_response :success
   end
 
-  def test_project_manager_cannot_administer_others_in_different_project
+  def test_project_manager_can_administer_others_in_different_project
     pm = Factory(:project_manager)
     other_person = Factory(:person)
     assert (pm.projects & other_person.projects).empty?, "Project manager should not belong to the same project as the person he is trying to admin"
     login_as(pm)
     get :admin, :id=> other_person.id
-    assert_redirected_to :root
+    assert_response :success
   end
 
   def test_admin_can_administer_others
@@ -737,84 +737,45 @@ class PeopleControllerTest < ActionController::TestCase
   end
 
   test "allow project manager to edit people inside their projects, even outside their institutions" do
-    project_manager = Factory(:user_not_in_project).person
-    project_manager.is_project_manager = true
-    project_manager.save
-    assert project_manager.is_project_manager?
-    assert project_manager.institutions.empty?
-    assert project_manager.projects.empty?
+    project_manager = Factory(:project_manager)
+    project = project_manager.projects.first
+    person = Factory(:person,:group_memberships=>[Factory(:group_membership,:work_group=>Factory(:work_group,:project=>project))])
+    assert_includes project_manager.projects,person.projects.first, "they should be in the same project"
+    refute_includes project_manager.institutions,person.institutions.first,"they should not be in the same institution"
+    assert_equal 1,person.institutions.count,"should only be in 1 project"
 
-    project = Factory(:project)
-    institution1 = Factory(:institution)
-    institution2 = Factory(:institution)
-    project.institutions = [institution1, institution2]
-    project.save
-    assert_equal 2, project.institutions.count
+    assert project_manager.is_project_manager?(project)
 
-    project_manager.work_groups = institution1.work_groups
-    project_manager.save
-
-    assert_equal 1, project_manager.institutions.count
-    assert_equal institution1, project_manager.institutions.first
-
-    assert_equal 1, project_manager.institutions.first.projects.count
-    assert_equal project, project_manager.institutions.first.projects.first
-
-    a_person = Factory(:user_not_in_project).person
-    a_person.work_groups = institution2.work_groups
-    a_person.save
-
-    assert_equal 1, a_person.institutions.first.projects.count
-    assert_equal project, a_person.institutions.first.projects.first
-
-    login_as(project_manager.user)
-    get :edit, :id => a_person
+    login_as(project_manager)
+    get :edit, :id => person
 
     assert_response :success
 
-    put :update, :id => a_person, :person => {:first_name => 'blabla'}
+    put :update, :id => person, :person => {:first_name => 'blabla'}
 
     assert_redirected_to person_path(assigns(:person))
-    a_person.reload
-    assert_equal 'blabla', a_person.first_name
+    person = assigns(:person)
+    assert_equal 'blabla', person.first_name
   end
 
   test "not allow project manager to edit people outside their projects" do
     project_manager = Factory(:project_manager)
     a_person = Factory(:person)
-    assert (project_manager.projects & a_person.projects).empty?
+    refute_includes project_manager.projects,a_person.projects.first,"they should not be in the same project"
+    assert_equal 1,a_person.projects.count,"should by in only 1 project"
 
-    login_as(project_manager.user)
+    login_as(project_manager)
     get :edit, :id => a_person
 
-    assert_redirected_to :root
+    assert_response :redirect
     assert_not_nil flash[:error]
 
     put :update, :id => a_person, :person => {:first_name => 'blabla'}
 
-    assert_redirected_to :root
+    assert_response :redirect
     assert_not_nil flash[:error]
     a_person.reload
     assert_not_equal 'blabla', a_person.first_name
-  end
-
-  test "project manager can not administer admin" do
-    project_manager = Factory(:project_manager)
-    admin = Factory(:admin,:group_memberships=>[Factory(:group_membership,:work_group=>project_manager.group_memberships.first.work_group)])
-
-    login_as(project_manager.user)
-    get :show, :id => admin
-    assert_select "a", :text => /Person Administration/, :count => 0
-
-    get :admin, :id => admin
-
-    assert_redirected_to :root
-    assert_not_nil flash[:error]
-
-    put :administer_update, :id => admin, :person => {}
-
-    assert_redirected_to :root
-    assert_not_nil flash[:error]
   end
 
   test "project manager can not edit admin" do
@@ -827,13 +788,15 @@ class PeopleControllerTest < ActionController::TestCase
 
     get :edit, :id => admin
 
-    assert_redirected_to :root
+    assert_response :redirect
     assert_not_nil flash[:error]
 
-    put :update, :id => admin, :person => {}
+    put :update, :id => admin, :person => {:first_name=>"blablba"}
 
-    assert_redirected_to :root
+    assert_response :redirect
     assert_not_nil flash[:error]
+
+    refute_equal "blablba",assigns(:person).first_name
   end
 
   test 'admin can administer other admin' do
@@ -846,7 +809,7 @@ class PeopleControllerTest < ActionController::TestCase
     get :admin, :id => admin
     assert_response :success
 
-    assert !admin.is_gatekeeper?
+    assert !admin.is_gatekeeper?(project)
     put :administer_update, :id => admin, :person => {}, :roles => {:gatekeeper => [project.id]}
     assert_redirected_to person_path(admin)
     assert assigns(:person).is_gatekeeper?(project)

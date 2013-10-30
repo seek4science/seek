@@ -292,11 +292,12 @@ class Person < ActiveRecord::Base
     !match.nil?
   end
 
-  #admin or (project manager can administer themselves and the other people, except the other admins)
+  #admin can administer other people, project manager can administer other people except other admins and themself
   def can_be_administered_by?(user)
-    return false if user.nil? || user.person.nil? || user.person == self
+    return false if user.nil? || user.person.nil?
 
-    user.is_admin? || (user.person.is_project_manager_of_any_project? && !self.user.try(:is_admin?))
+
+    user.is_admin? || (user.person.is_project_manager_of_any_project? && (self.is_admin? || self!=user.person))
   end
 
   def can_view? user = User.current_user

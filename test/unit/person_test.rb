@@ -32,9 +32,13 @@ class PersonTest < ActiveSupport::TestCase
 
   test "can be administered by" do
     admin = Factory(:admin)
+    admin2 = Factory(:admin)
     project_manager = Factory(:project_manager)
     person_in_same_project = Factory :person,:group_memberships=>[Factory(:group_membership,:work_group=>project_manager.group_memberships.first.work_group)]
     person_in_different_project = Factory :person
+
+    assert admin.can_be_administered_by?(admin.user),"admin can administer themself"
+    assert admin2.can_be_administered_by?(admin.user),"admin can administer another admin"
 
     assert project_manager.can_be_administered_by?(admin.user),"admin should be able to administer another project manager"
     assert person_in_same_project.can_be_administered_by?(project_manager.user),"project manager should be able to administer someone from same project"
@@ -47,6 +51,8 @@ class PersonTest < ActiveSupport::TestCase
 
     assert project_manager.can_be_administered_by?(admin),"you can also ask by passing a person"
     assert person_in_same_project.can_be_administered_by?(project_manager),"you can also ask by passing a person"
+
+
   end
 
   test "project manager cannot edit an admin within their project" do
