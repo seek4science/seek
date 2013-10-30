@@ -143,6 +143,10 @@ class Workflow < ActiveRecord::Base
     related
   end
 
+  def default_policy
+    Policy.sysmo_and_projects_policy
+  end
+
   private
 
   def generate_workflow_image
