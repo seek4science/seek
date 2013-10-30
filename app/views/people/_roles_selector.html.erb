@@ -18,7 +18,7 @@
   <span id='projects_for_<%= role %>'>
     <%= text_or_not_specified(project_list,:none_text=>"No projects assigned") -%>
     &nbsp;
-    <%= link_to "[edit]","javascript:Effect.Appear('#{hidden_block}');return false" %>
+    <%= link_to "[edit]","javascript:Effect.Appear('#{hidden_block}');Effect.Fade('projects_for_#{role}');return false" %>
   </span>
 
 </p>
@@ -34,7 +34,7 @@
   <% end -%>
 </ul>
 <%= select_tag user_selection_id,options_from_collection_for_select(@person.projects,"id","title") -%>
-  &nbsp;<%= link_to "Add","javascript:#{add_method}()" -%>
+  &nbsp;<%= link_to "Add as #{role_title}","javascript:#{add_method}()" -%>
 
   <br>
 
