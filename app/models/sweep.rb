@@ -54,21 +54,23 @@ class Sweep < ActiveRecord::Base
     unique_id = output_list.map {|o| o.id}.hash.to_s(16).gsub('-','0')
     path = "#{Rails.root}/tmp/#{name.parameterize('_')}_results_#{unique_id}.zip"
 
-    Zip::ZipFile.open(path, Zip::ZipFile::CREATE) do |zip_file|
-      output_list.group_by {|o| o.name}.each do |output_name, outputs|
-        output_dir_name = output_name
-        zip_file.mkdir(output_dir_name) # Make folder for outputs
-        outputs.each do |output|
-          run_dir_name = "#{output_dir_name}/#{output.run.name}"
-          zip_file.mkdir(run_dir_name) # Make subfolder for each run in the sweep
-          if output.file.exists?
-            file = output.file
-            zip_file.get_output_stream("#{run_dir_name}/#{output.file_file_name}") do |f|
-              f.write(File.read(file.path))
-            end
-          else
-            zip_file.get_output_stream("#{run_dir_name}/value.txt") do |f|
-              f.write(output.value)
+    unless File.exists?(path)
+      Zip::ZipFile.open(path, Zip::ZipFile::CREATE) do |zip_file|
+        output_list.group_by {|o| o.name}.each do |output_name, outputs|
+          output_dir_name = output_name
+          zip_file.mkdir(output_dir_name) # Make folder for outputs
+          outputs.each do |output|
+            run_dir_name = "#{output_dir_name}/#{output.run.name}"
+            zip_file.mkdir(run_dir_name) # Make subfolder for each run in the sweep
+            if output.file.exists?
+              file = output.file
+              zip_file.get_output_stream("#{run_dir_name}/#{output.file_file_name}") do |f|
+                f.write(File.read(file.path))
+              end
+            else
+              zip_file.get_output_stream("#{run_dir_name}/value.txt") do |f|
+                f.write(output.value)
+              end
             end
           end
         end
