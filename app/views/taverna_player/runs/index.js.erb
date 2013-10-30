@@ -3,7 +3,7 @@ var json = <%= runs_table(@runs).to_json.html_safe -%>;
 $j('#workflow_runs_table').dataTable().fnClearTable();
 $j('#workflow_runs_table').dataTable().fnAddData(json);
 
-<% if logged_in? %>
+<% if logged_in? && @user_runs %>
   var user_json = <%= runs_table(@user_runs).to_json.html_safe -%>;
 
   $j('#workflow_user_runs_table').dataTable().fnClearTable();
