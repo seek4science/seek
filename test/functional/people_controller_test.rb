@@ -958,17 +958,15 @@ class PeopleControllerTest < ActionController::TestCase
   end
 
   test 'should show that the person is gatekeeper for admin' do
-    person = Factory(:person)
-    person.is_gatekeeper = true
-    person.save
+    person = Factory(:gatekeeper)
+
     get :show, :id => person
     assert_select "li", :text => /This person is a Gatekeeper/, :count => 1
   end
 
   test 'should not show that the person is gatekeeper for non-admin' do
-    person = Factory(:person)
-    person.is_gatekeeper = true
-    person.save
+    person = Factory(:gatekeeper)
+
     login_as(:aaron)
     get :show, :id => person
     assert_select "li", :text => /This person is a Gatekeeper/, :count => 0

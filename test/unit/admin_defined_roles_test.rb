@@ -22,7 +22,7 @@ class AdminDefinedRolesTest < ActiveSupport::TestCase
   end
 
   test "removing a person from a project removes that role" do
-
+    Factory(:admin) #prevents this following person also becoming an admin due to being first
     person = Factory(:project_manager)
     project = person.projects.first
 
