@@ -91,6 +91,8 @@ module TavernaPlayer
         run.is_a?(Sweep) && run.user == current_user ||
         run.is_a?(TavernaPlayer::Run) && run.contributor == current_user
       end
+
+      @runs = @runs - @user_runs
     end
 
     def auth

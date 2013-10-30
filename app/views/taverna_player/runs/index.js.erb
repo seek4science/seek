@@ -9,3 +9,7 @@ $j('#workflow_runs_table').dataTable().fnAddData(json);
   $j('#workflow_user_runs_table').dataTable().fnClearTable();
   $j('#workflow_user_runs_table').dataTable().fnAddData(user_json);
 <% end %>
+
+<% if @sweep && @sweep.complete? %>
+  $j('#sweep_results_table').fadeIn();
+<% end %>
