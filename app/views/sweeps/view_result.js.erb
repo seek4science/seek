@@ -21,7 +21,7 @@ $modal.dialog(
 
 <%
     run = TavernaPlayer::Run.find(params[:run_id])
-    output = run.outputs.select{ |output| output.name == params[:output_port_name]}[0]
+    output = run.outputs.detect{ |output| output.name == params[:output_port_name]}
 
     if output.blank?
         html = "<pre class=\"script_example_data_box\">Value is N/A.</pre>"

@@ -3,7 +3,7 @@
 <div id="buttons">
   <ul class="sectionIcons">
     <% if @run.finished? %>
-        <li><%= render :partial => 'download_link', :locals => { :download_link_name => "Download all results", :file_url_to_download => run.results.url} %></li>
+        <li><%= render :partial => 'download_link', :locals => { :download_link_name => "Download all results", :download_url => run.results.url} %></li>
         <% workflow = Workflow.find(@run.workflow_id) %>
         <% data_input_ports = workflow.input_ports.select { |input| input.port_type.name == WorkflowInputPortType::DATA } %>
         <!--# If this run is part of a sweep - do not give option to create a new sweep off it.-->

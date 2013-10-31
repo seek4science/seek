@@ -76,7 +76,7 @@
               <% params[:sweep_length].to_i.times do |i| %>
               <h2 style="margin-left: 20px; background-color: #CDDEEF; background-image: url('/public/images/header-bg2.png');">Iteration <%= i+1 %> </h2>
               <%= sweep_form.fields_for :runs, TavernaPlayer::Run.new do |runs_form| %>
-                  <% sweepable_input = data_inputs.select { |input| input.name == params[:sweep_data_input_name] }[0] %>
+                  <% sweepable_input = data_inputs.detect{|input| input.name == params[:sweep_data_input_name]} %>
                   <div style="margin-left: 20px;">
                     <%= render :partial => 'input_form', :locals => {:workflow_input => sweepable_input,
                                                                            :form => runs_form,
