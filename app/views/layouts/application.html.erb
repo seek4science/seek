@@ -13,6 +13,7 @@
 
   <%= stylesheet_link_tag 'application' %>
   <%= javascript_include_tag 'application' %>
+  <%= stylesheet_link_tag 'local' if File.exists?('public/assets/local.css') %>
 
   <%#= javascript_include_tag 'savage_beast/application.js' -%>
   <%#= javascript_include_tag 'prototype.js','prototype_ujs.js', 'effects.js', 'dragdrop.js', 'boxover.js', 'scriptaculous.js', 'controls.js', 'redbox.js', 'builder.js', 'application.js', 'tagging.js', 'autocompleter_advanced.js', 'publication.js','top_menu.js','dynamic_menu.js', :cache=>'js_cached' %>
