@@ -15,7 +15,10 @@
       <%= link_to workflow.title, main_app.workflow_path(workflow)#, :version => run.workflow_version)),
       %>
     </p>
-
+    <p>
+      <b>Category:</b>
+      <%= workflow.category.name %>
+    </p>
     <p>
       <b>Status:</b>
       <%= run.status_message %> <%= image_tag('ajax-loader.gif', :style => "vertical-align: middle") unless run.complete? %>
