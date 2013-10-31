@@ -29,7 +29,7 @@ limitations under the License.
     <style id="PDFJS_FONT_STYLE_TAG"></style>
 
   <%= stylesheet_link_tag 'pdfjs/viewer'%>
-  <%= javascript_include_tag 'pdfjs/index'%>
+  <%= javascript_include_tag 'pdfjs/compatibility', 'pdfjs/debugger', 'pdfjs/l10n', 'pdfjs/pdf', 'pdfjs/viewer' %>
 
   <script type="text/javascript">
       DEFAULT_URL = '<%= @pdf_url %>'
