@@ -46,7 +46,7 @@
       <div class="foldContent" style="display: none;">
         <p>
           <b>Log:</b>
-          <span id="log_url"><%= link_to("Taverna Server log", @run.log.url) unless @run.log.blank? || @run.log.url.blank? %></span>
+          <pre id="log_url" class="script_example_data_box"><%= File.read(@run.log.path) unless @run.log.blank? || @run.log.url.blank? %></pre>
         </p>
       </div>
     </div>
