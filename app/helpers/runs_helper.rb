@@ -1,6 +1,6 @@
 module RunsHelper
 
-  def runs_table(runs, redirect_to)
+  def runs_table(runs, redirect_to=nil)
     runs.map do |run|
       workflow = run.workflow
       created_at = run.created_at.strftime("%e %b %Y %H:%M:%S %Z")
