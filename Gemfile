@@ -93,11 +93,5 @@ group :test do
 end
 
 group :assets do
-  #gem 'sass-rails',   "~> 3.1.0"
-  #gem 'coffee-rails', "~> 3.1.0"
-  gem 'sprockets', '~> 2.0'
-  gem 'uglifier'
-  gem 'execjs'
   gem 'yui-compressor'
-  gem 'therubyracer'
 end
