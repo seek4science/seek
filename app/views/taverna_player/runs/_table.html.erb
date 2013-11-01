@@ -1,6 +1,10 @@
 <%= javascript_include_tag 'DataTables-1.8.2/jquery.js', 'DataTables-1.8.2/jquery.dataTables.js', 'DataTables-1.8.2/jquery.dataTables.rowGrouping.js', 'DataTables-1.8.2/Scroller.js' %>
 <% id ||= 'workflow_runs_table' %>
+<% default_sort ||= [4, 'desc'] %>
+<% poll = true unless defined? poll %>
 <script type="text/javascript">
+    var poller;
+
     jQuery.noConflict();
     var $j = jQuery;
     $j(document).ready(function () {
@@ -16,7 +20,7 @@
                 "sEmptyTable": "No workflow runs found"
             },
             "aaSorting":[
-                [ 4, "desc" ]
+                [ <%= default_sort[0] -%>, "<%= default_sort[1] -%>" ]
             ],
             "aoColumns":[
                 { "sWidth":"15%" },
@@ -28,7 +32,9 @@
                 { "sWidth":"10%", "bSortable":false, "bSearchable": false }
             ]
         });
-        window.setInterval(function () { $j.get("<%= polling_url %>", null, null, "script") }, 5000);
+        <% if poll %>
+          poller = window.setInterval(function () { $j.get("<%= polling_url %>", null, null, "script") }, 5000);
+        <% end %>
     });
 </script>
 

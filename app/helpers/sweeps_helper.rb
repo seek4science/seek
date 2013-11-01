@@ -46,10 +46,10 @@ module SweepsHelper
           link_to_view = 'N/A'
         else
           chk_box = check_box_tag("download[#{run.id}][]", output_port.name, false, {:multiple => true, :class => 'chk-select', :id => "download_run#{i+1}_#{output_port.name}"})
-          link_to_view = link_to 'View', view_result_sweep_path(:run_id => run.id, :output_port_name => output_port.name), remote: true
+          link_to_view = link_to '(View)', view_result_sweep_path(:run_id => run.id, :output_port_name => output_port.name), remote: true, class: 'preview_result'
         end
 
-        row << "#{chk_box} #{link_to_view}".html_safe
+        row << "#{chk_box}<br/>#{link_to_view}".html_safe
       end
 
       rows << row

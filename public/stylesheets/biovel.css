@@ -329,3 +329,20 @@ h2.standout {
   background-color: #CDDEEF;
   background-image: url('/public/images/header-bg2.png');
 }
+
+#sweep_results_table table {
+  width: auto;
+  background-color: white;
+  border-collapse: collapse;
+  margin: 10px 0;
+}
+
+#sweep_results_table table td, #sweep_results_table table th {
+  border: 1px solid #ccc;
+  padding: 10px;
+}
+
+a.preview_result {
+  font-size: 80%;
+}
+
