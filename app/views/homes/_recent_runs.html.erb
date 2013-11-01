@@ -8,7 +8,7 @@
   <% else %>
     <ul>
       <% runs.each do |run| %>
-        <li><%= link_to run.name, taverna_player.run_path(run) -%></li>
+        <li><%= link_to run.name, run -%></li>
       <% end %>
     </ul>
   <% end %>
