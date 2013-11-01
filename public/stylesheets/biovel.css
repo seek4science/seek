@@ -11,7 +11,7 @@
 
 #header > div, #bd > div, #ft > div {
     max-width: 1400px;
-    min-width: 800px;
+    min-width: 900px;
     margin: auto;
 }
 
@@ -263,6 +263,8 @@ table.display tr td:first-child {
     border-color: #ccc;
     box-shadow: 0 3px 5px #ccc;
     width: 200px;
+    margin-left: -60px;
+    background: white;
 }
 
 #workflow_runs_table_wrapper {
@@ -312,7 +314,6 @@ span.mime_type {
   vertical-align: middle;
 }
 
-
 input[type="submit"], button {
     background: none repeat scroll 0 0 #EEEEEE;
     border: 1px solid #AAAAAA;
@@ -321,5 +322,10 @@ input[type="submit"], button {
     cursor: pointer;
     padding: 3px 4px;
     font-size: 14px;
-    font-family: arial, ​sans-serif;
+    font-family: arial, sans-serif;
+}
+
+h2.standout {
+  background-color: #CDDEEF;
+  background-image: url('/public/images/header-bg2.png');
 }

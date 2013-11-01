@@ -21,7 +21,7 @@
   <%= stylesheets = ['reset-fonts-grids', 'base-min', 'my_exp', 'folds', 'gadgets', 'acts_as_taggable_stylesheet',
                      'styles', 'favourites', 'fast_auto_complete', 'redbox', 'autocompleter_advanced',
                      'alphabetical_pagination', 'savage_beast/forums', 'site_announcements', 'tabnav','top_menu',
-                     'dynamic_menu', 'data_tables', 'biovel', 'easytabs']
+                     'dynamic_menu', 'data_tables', 'biovel', 'easytabs', 'biovel_colours']
       stylesheets = stylesheets << 'local' if File.exists?('public/stylesheets/local.css')
       stylesheets << {:cache => 'css_cached'}
 
@@ -49,7 +49,7 @@
         <%= navigation_link 'Workflows', main_app.workflows_path, nil, controller_name == 'workflows' -%>
         <%= navigation_link 'Runs', taverna_player.runs_path, nil, controller_name == 'runs' -%>
       </ul>
-      <ul class="menutabs clearfix" style="float: right">
+      <ul class="menutabs clearfix" style="float: right; margin-right: 20px">
         <% if logged_in? && current_user.person %>
           <%= navigation_link current_user.person.name, main_app.person_path(current_user.person), nil, false -%>
           <%= navigation_link('Admin', main_app.admin_path, nil, false) if admin_logged_in? -%>

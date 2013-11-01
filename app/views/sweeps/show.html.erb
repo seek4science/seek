@@ -13,12 +13,12 @@
 <br/>
 
 <div class="show_basic">
-  <h2 style='background-color: #CDDEEF; background-image: url("/public/images/header-bg2.png");'>Runs</h2>
+  <h2 class="standout">Runs</h2>
   <%= render :partial => 'taverna_player/runs/table', :locals => {:runs => @runs, :polling_url => runs_sweep_path(@sweep), :redirect_to => sweep_path(@sweep) } %>
 </div>
 <br/>
 
 <div class="show_basic" id="sweep_results_table" style="<%= 'display: none' unless @sweep.complete? -%>">
-  <h2 style='background-color: #CDDEEF; background-image: url("/public/images/header-bg2.png");'>Results</h2>
+  <h2 class="standout">Results</h2>
   <%= render :partial => 'results_table' %>
 </div>
