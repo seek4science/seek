@@ -55,7 +55,7 @@ class SweepsController < ApplicationController
   def destroy
     @sweep.destroy
     respond_to do |format|
-      format.html { redirect_to params[:redirect_to].blank? ? taverna_player.runs_path : :redirect_to}
+      format.html { redirect_to params[:redirect_to].blank? ? taverna_player.runs_path : params[:redirect_to]}
     end
   end
 
