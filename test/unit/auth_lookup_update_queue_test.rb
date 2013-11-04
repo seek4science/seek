@@ -214,7 +214,7 @@ class AuthLookupUpdateQueueTest < ActiveSupport::TestCase
 
     AuthLookupUpdateQueue.destroy_all
     assert_difference("AuthLookupUpdateQueue.count", 1) do
-      person.roles=['admin']
+      person.is_admin=true
       disable_authorization_checks do
         person.save!
       end

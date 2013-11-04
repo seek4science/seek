@@ -13,7 +13,7 @@ module PeopleHelper
 
   def seek_role_icons person
     icons = ''
-    person.roles.each do |role|
+    person.role_names.each do |role|
       icons << image("#{role}",:alt=>"#{role}",:title=>tooltip_title_attrib(role.humanize), :style=>"vertical-align: middle")
     end
     icons.html_safe

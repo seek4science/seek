@@ -985,7 +985,7 @@ class DataFilesControllerTest < ActionController::TestCase
   
   
   def test_update_should_not_overwrite_contributor
-    login_as(:pal_user) #this user is a member of sysmo, and can edit this data file
+    login_as(:datafile_owner) #this user is a member of sysmo, and can edit this data file
     df=data_files(:data_file_with_no_contributor)
     assert_difference('ActivityLog.count') do
       put :update, :id => df, :data_file => {:title=>"blah blah blah blah"}
@@ -998,7 +998,7 @@ class DataFilesControllerTest < ActionController::TestCase
   end
   
   def test_show_item_attributed_to_jerm_file
-    login_as(:pal_user) #this user is a member of sysmo, and can edit this data file
+    login_as(:datafile_owner) #this user is a member of sysmo, and can edit this data file
     df=data_files(:editable_data_file)
     jerm_file=data_files(:data_file_with_no_contributor)
     r=Relationship.new(:subject => df, :predicate => Relationship::ATTRIBUTED_TO, :other_object => jerm_file)
@@ -1564,7 +1564,7 @@ class DataFilesControllerTest < ActionController::TestCase
     current_person.project_subscriptions.create :project => proj, :frequency => 'weekly'
     a_person = Factory(:person)
     a_person.project_subscriptions.create :project => a_person.projects.first, :frequency => 'weekly'
-    current_person.projects << a_person.projects.first
+    current_person.group_memberships << Factory(:group_membership,:work_group=>Factory(:work_group,:project=>a_person.projects.first))
     assert current_person.save
     assert current_person.reload.projects.include?(a_person.projects.first)
     assert Subscription.all.empty?

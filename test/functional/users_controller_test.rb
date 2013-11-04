@@ -124,7 +124,7 @@ class UsersControllerTest < ActionController::TestCase
     login_as :part_registered
     u=users(:part_registered)
     
-    p=people(:pal)
+    p=Factory(:pal)
     post :update, :id=>u.id,:user=>{:id=>u.id,:person_id=>p.id}
     assert_nil flash[:error]
     u=User.find(u.id)

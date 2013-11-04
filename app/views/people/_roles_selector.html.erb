@@ -1,0 +1,75 @@
+<%
+
+   projects = @person.projects_for_role(role)
+   project_list = projects.collect(&:title).collect{|t| "<strong>#{t}</strong>"}.join(", ")
+   project_ids = projects.collect(&:id)
+   select_name = "[roles][#{role}]"
+   select_id = "_roles_#{role}"
+   hidden_block = "edit_#{role}"
+   remove_method = "remove_project_from_#{role}"
+   add_method = "add_project_to_#{role}"
+   ul_block = "project_list_for_#{role}"
+   user_selection_id = "possible_project_for_#{role}"
+
+%>
+<p>
+
+  This person is <strong><%= role_title -%></strong> in the following projects:
+  <span id='projects_for_<%= role %>'>
+    <%= text_or_not_specified(project_list,:none_text=>"No projects assigned") -%>
+    &nbsp;
+    <%= link_to "[edit]","javascript:Effect.Appear('#{hidden_block}');Effect.Fade('projects_for_#{role}');return false" %>
+  </span>
+
+</p>
+
+<div id='<%= hidden_block %>' style="display:none;">
+<ul id='<%= ul_block %>'>
+  <% projects.each do |project| %>
+  <li id="<%=role -%>_project_<%= project.id %>">
+    <%= project.title -%>
+    &nbsp
+    <%= link_to "[remove]","javascript:#{remove_method}(#{project.id});return false;" %>
+  </li>
+  <% end -%>
+</ul>
+<%= select_tag user_selection_id,options_from_collection_for_select(@person.projects,"id","title") -%>
+  &nbsp;<%= link_to "Add as #{role_title}","javascript:#{add_method}()" -%>
+
+  <br>
+
+
+</div>
+<%= select_tag select_name,
+               options_from_collection_for_select(Project.all,"id","title",project_ids),
+               {:multiple=>true,:style=>"display:none;"} -%>
+
+<script type="text/javascript">
+  function <%= remove_method %>(project_id) {
+      var display_id = "<%= role %>_project_"+project_id;
+      $(display_id).remove();
+      var select = $('<%= select_id %>');
+      var options = select.childElements().select(function(c){return c.selected && c.value==project_id})
+      if (options.length>0) {
+          options[0].selected=false;
+      }
+  }
+  function <%= add_method %>() {
+      var selection = $('<%= user_selection_id %>');
+      var selected_option = selection.options[selection.selectedIndex];
+      var project_id = selected_option.value;
+      var project_name = selected_option.text;
+
+      var select = $('<%= select_id %>');
+      var options = select.childElements().select(function(c){return !c.selected && c.value==project_id})
+      if (options.length>0) {
+          options[0].selected=true;
+      }
+
+      var list_block = $('<%= ul_block %>');
+      var list_item = "<li id='<%= role %>_project_"+project_id+"'>"+project_name+"&nbsp;";
+      list_item = list_item + "<a href='javascript:<%= remove_method %>("+project_id+");return false;'>[remove]</a>";
+      list_item = list_item +"</li>";
+      list_block.insert(list_item);
+  }
+</script>

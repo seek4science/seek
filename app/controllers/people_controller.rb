@@ -250,10 +250,11 @@ class PeopleController < ApplicationController
       params[:person]["#{param}"] = temp[:person]["#{param}"] if temp[:person]["#{param}"] and allowed
       params["#{param}"] = temp["#{param}"] if temp["#{param}"] and allowed
     end
-    set_roles(@person, params) if User.admin_logged_in?
+
 
     respond_to do |format|
       if @person.update_attributes(params[:person])
+        set_roles(@person, params) if User.admin_logged_in?
         @person.save #this seems to be required to get the tags to be set correctly - update_attributes alone doesn't [SYSMO-158]
         @person.touch
         flash[:notice] = 'Person was successfully updated.'
@@ -340,10 +341,12 @@ class PeopleController < ApplicationController
   end
 
   def set_roles person, params
-    roles = person.is_admin? ? ['admin'] : []
+    roles = person.is_admin? ? [['admin']] : []
     if params[:roles]
       params[:roles].each_key do |key|
-        roles << key
+        project_ids=params[:roles][key]
+
+        roles << [key,project_ids]
       end
     end
     person.roles=roles

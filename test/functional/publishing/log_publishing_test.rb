@@ -10,13 +10,13 @@ class LogPublishingTest < ActionController::TestCase
 
   def setup
     login_as(:datafile_owner)
-    @object=data_files(:picture)
+    @gatekeeper=Factory(:gatekeeper)
   end
 
   test 'log when creating the public item' do
     @controller = SopsController.new()
     sop_params = valid_sop
-    sop_params[:project_ids] = [projects(:three).id] #this project has no gatekeeper
+    sop_params[:project_ids] = [Factory(:project).id] #this project has no gatekeeper
     assert_difference ('ResourcePublishLog.count') do
       post :create, :sop => sop_params, :sharing => public_sharing
     end
@@ -50,9 +50,10 @@ class LogPublishingTest < ActionController::TestCase
 
   test 'log when updating an item from non-public to public' do
     @controller = SopsController.new()
-    login_as(:owner_of_my_first_sop)
+    owner = Factory(:person)
+    login_as(owner.user)
 
-    sop = sops(:sop_with_project_without_gatekeeper)
+    sop = Factory(:sop,:contributor=>owner.user)
     assert_not_equal Policy::EVERYONE, sop.policy.sharing_scope
     assert sop.can_publish?
 
@@ -68,9 +69,10 @@ class LogPublishingTest < ActionController::TestCase
 
   test 'log when sending the publish request approval during updating a non-public item' do
     @controller = SopsController.new()
-    login_as(:owner_of_my_first_sop)
+    owner = Factory(:person)
+    login_as(owner.user)
 
-    sop = sops(:my_first_sop)
+    sop = Factory(:sop,:project_ids=>[@gatekeeper.projects.first.id],:contributor=>owner.user)
     assert_not_equal Policy::EVERYONE, sop.policy.sharing_scope
     assert sop.can_publish?
 
@@ -86,8 +88,9 @@ class LogPublishingTest < ActionController::TestCase
 
   test 'dont log when updating an item with the not-related public sharing' do
     @controller = SopsController.new()
-    login_as(:owner_of_my_first_sop)
-    sop = sops(:my_first_sop)
+    owner = Factory(:person)
+    login_as(owner.user)
+    sop = Factory(:sop,:contributor=>owner.user)
     assert_not_equal Policy::EVERYONE, sop.policy.sharing_scope
 
     assert_no_difference ('ResourcePublishLog.count') do
@@ -97,9 +100,10 @@ class LogPublishingTest < ActionController::TestCase
 
   test 'log when un-publishing an item' do
     @controller = SopsController.new()
-    login_as(:owner_of_fully_public_policy)
+    owner = Factory(:person)
+    login_as(owner.user)
 
-    sop = sops(:sop_with_fully_public_policy)
+    sop = Factory(:sop,:contributor=>owner.user,:policy=>Factory(:public_policy))
     assert_equal Policy::EVERYONE, sop.policy.sharing_scope
 
     #create a published log for the published sop
@@ -116,15 +120,15 @@ class LogPublishingTest < ActionController::TestCase
   end
 
   test 'log when approving publishing an item' do
-    gatekeeper = Factory(:gatekeeper)
-    df = Factory(:data_file, :project_ids => gatekeeper.projects.collect(&:id))
+
+    df = Factory(:data_file, :project_ids => @gatekeeper.projects.collect(&:id))
 
     login_as(df.contributor)
     put :update, :id => df.id, :sharing => {:sharing_scope => Policy::EVERYONE, "access_type_#{Policy::EVERYONE}" => Policy::VISIBLE}
 
     logout
 
-    login_as(gatekeeper.user)
+    login_as(@gatekeeper.user)
     @controller = PeopleController.new()
     params = {:gatekeeper_decide=>{}}
     params[:gatekeeper_decide][df.class.name]||={}
@@ -132,13 +136,40 @@ class LogPublishingTest < ActionController::TestCase
     params[:gatekeeper_decide][df.class.name][df.id.to_s]['decision']=1
 
     assert_difference ('ResourcePublishLog.count') do
-      post :gatekeeper_decide, params.merge(:id=> gatekeeper.id)
+      post :gatekeeper_decide, params.merge(:id=> @gatekeeper.id)
     end
 
     publish_log = ResourcePublishLog.last
     assert_equal ResourcePublishLog::PUBLISHED, publish_log.publish_state.to_i
     assert_equal df, publish_log.resource
-    assert_equal gatekeeper.user, publish_log.user
+    assert_equal @gatekeeper.user, publish_log.user
+  end
+
+  test "gatekeeper cannot approve an item from another project" do
+    gatekeeper2 = Factory(:gatekeeper)
+    df = Factory(:data_file, :project_ids => gatekeeper2.projects.collect(&:id))
+
+    login_as(df.contributor)
+    put :update, :id => df.id, :sharing => {:sharing_scope => Policy::EVERYONE, "access_type_#{Policy::EVERYONE}" => Policy::VISIBLE}
+
+    logout
+
+    publish_log = ResourcePublishLog.last
+    assert_equal ResourcePublishLog::WAITING_FOR_APPROVAL,publish_log.publish_state.to_i
+
+    login_as(@gatekeeper.user)
+    @controller = PeopleController.new()
+    params = {:gatekeeper_decide=>{}}
+    params[:gatekeeper_decide][df.class.name]||={}
+    params[:gatekeeper_decide][df.class.name][df.id.to_s]||={}
+    params[:gatekeeper_decide][df.class.name][df.id.to_s]['decision']=1
+
+    assert_no_difference ('ResourcePublishLog.count') do
+      post :gatekeeper_decide, params.merge(:id=> @gatekeeper.id)
+    end
+
+    publish_log2 = ResourcePublishLog.last
+    assert_equal publish_log2,publish_log
   end
 
   test 'log when publish isa' do
@@ -179,7 +210,7 @@ class LogPublishingTest < ActionController::TestCase
   private
 
   def valid_sop
-    {:title => "Test", :data => fixture_file_upload('files/file_picture.png'), :project_ids => [projects(:sysmo_project).id]}
+    {:title => "Test", :data => fixture_file_upload('files/file_picture.png'), :project_ids => [@gatekeeper.projects.first.id]}
   end
 
   def public_sharing

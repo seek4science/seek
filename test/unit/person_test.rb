@@ -5,17 +5,64 @@ class PersonTest < ActiveSupport::TestCase
   
   # Replace this with your real tests.
   def test_work_groups
-    p=people(:quentin_person)
-    assert_equal 2,p.work_groups.size
+    p=Factory(:person_in_multiple_projects)
+    assert_equal 3,p.work_groups.size
   end
 
   def test_can_be_edited_by?
-    Person.all.each do |p|
-      assert p.can_be_edited_by? p.user if p.user
-      assert p.can_be_edited_by? users(:quentin) if (!p.is_admin? && p.user != users(:quentin))
-      assert p.can_be_edited_by? users(:project_manager) if (!p.is_admin? && p.user != users(:quentin) && !(p.projects & users(:project_manager).person.projects).empty?)
-      assert !p.can_be_edited_by?(users(:can_edit)) unless (p.user == users(:can_edit))
-    end
+    admin = Factory(:admin)
+    project_manager = Factory(:project_manager)
+    project_manager2 = Factory(:project_manager)
+    person = Factory :person,:group_memberships=>[Factory(:group_membership,:work_group=>project_manager.group_memberships.first.work_group)]
+    another_person = Factory :person
+
+    assert_equal person.projects,project_manager.projects
+    assert_not_equal person.projects,project_manager2.projects
+
+    assert person.can_be_edited_by?(person.user)
+    assert person.can_be_edited_by?(project_manager.user),"should be editable by the project manager of the same project"
+    assert person.can_be_edited_by?(admin.user)
+    assert !person.can_be_edited_by?(another_person.user)
+    assert !person.can_be_edited_by?(project_manager2.user),"should be not editable by the project manager of another project"
+
+    assert person.can_be_edited_by?(person), "You can also ask by passing in a person"
+    assert person.can_be_edited_by?(project_manager),"You can also ask by passing in a person"
+
+  end
+
+  test "can be administered by" do
+    admin = Factory(:admin)
+    admin2 = Factory(:admin)
+    project_manager = Factory(:project_manager)
+    person_in_same_project = Factory :person,:group_memberships=>[Factory(:group_membership,:work_group=>project_manager.group_memberships.first.work_group)]
+    person_in_different_project = Factory :person
+
+    assert admin.can_be_administered_by?(admin.user),"admin can administer themself"
+    assert admin2.can_be_administered_by?(admin.user),"admin can administer another admin"
+
+    assert project_manager.can_be_administered_by?(admin.user),"admin should be able to administer another project manager"
+    assert person_in_same_project.can_be_administered_by?(project_manager.user),"project manager should be able to administer someone from same project"
+    assert person_in_different_project.can_be_administered_by?(project_manager.user),"project manager should be able to administer someone from another project"
+
+    assert !project_manager.can_be_administered_by?(person_in_same_project.user),"a normal person cannot administer someone else"
+    assert !project_manager.can_be_administered_by?(project_manager.user),"project manager should not administer himself"
+    assert !person_in_same_project.can_be_administered_by?(person_in_same_project.user), "person should not administer themself"
+    assert !person_in_same_project.can_be_administered_by?(nil)
+
+    assert project_manager.can_be_administered_by?(admin),"you can also ask by passing a person"
+    assert person_in_same_project.can_be_administered_by?(project_manager),"you can also ask by passing a person"
+
+
+  end
+
+  test "project manager cannot edit an admin within their project" do
+    admin = Factory(:admin)
+    project_manager = Factory(:project_manager,:group_memberships=>[Factory(:group_membership,:work_group=>admin.group_memberships.first.work_group)])
+
+
+    assert !(admin.projects & project_manager.projects).empty?
+
+    assert !admin.can_be_edited_by?(project_manager)
   end
 
   #checks the updated_at doesn't get artificially changed between created and reloading
@@ -333,18 +380,19 @@ class PersonTest < ActiveSupport::TestCase
   end
   
   def test_institutions
-    p=people(:quentin_person)
-    assert_equal 2,p.institutions.size
-    
-    p=people(:aaron_person)
-    assert_equal 2,p.work_groups.size
-    assert_equal 2,p.projects.size
-    assert_equal 1,p.institutions.size
+    person = Factory(:person_in_multiple_projects)
+
+    institution = person.group_memberships.first.work_group.institution
+    institution2 = Factory(:institution)
+
+    assert_equal 3,person.institutions.count
+    assert person.institutions.include?(institution)
+    assert !person.institutions.include?(institution2)
   end
   
   def test_projects
-    p=people(:quentin_person)
-    assert_equal 2,p.projects.size
+    p=Factory(:person_in_multiple_projects)
+    assert_equal 3,p.projects.size
   end
   
   def test_userless_people
@@ -650,7 +698,8 @@ class PersonTest < ActiveSupport::TestCase
     assert p.project_subscriptions.empty?
     p.work_groups = []
     p.save
-    assert p.work_groups.empty?
+    assert_empty p.work_groups
+    assert_empty p.projects
   end
 
 end

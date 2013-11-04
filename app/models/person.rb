@@ -203,8 +203,7 @@ class Person < ActiveRecord::Base
 
   def projects
     #updating workgroups doesn't change groupmemberships until you save. And vice versa.
-    @known_projects ||= work_groups.collect {|wg| wg.project }.uniq | group_memberships.collect{|gm| gm.work_group.project}
-    @known_projects
+    work_groups.collect {|wg| wg.project }.uniq | group_memberships.collect{|gm| gm.work_group.project}.uniq
   end
 
   def member?
@@ -277,12 +276,27 @@ class Person < ActiveRecord::Base
   #admin or (project managers of this person and this person does not have a user or not the other admin)
   #themself
   def can_be_edited_by?(subject)
-    subject == nil ? false : (((subject.is_admin? || (!(self.projects & subject.try(:person).try(:projects).to_a).empty? && subject.is_project_manager? && (self.user.nil? || !self.is_admin?)))) || (subject == self.user))
+    return false if subject.nil?
+    subject = subject.user if subject.is_a?(Person)
+    subject == self.user || subject.is_admin? || self.is_managed_by?(subject)
   end
 
-  #admin or (project manager can administer themselves and the other people, except the other admins)
+  #determines if this person is the member of a project for which the user passed is a project manager,
+  # #and the current person is not an admin
+  def is_managed_by? user
+    return false if self.is_admin?
+    match = self.projects.find do |p|
+      user.person.is_project_manager?(p)
+    end
+    !match.nil?
+  end
+
+  #admin can administer other people, project manager can administer other people except other admins and themself
   def can_be_administered_by?(user)
-    user == nil ? false : ((user.is_admin?) || (user.is_project_manager? && (self.user==user || !self.user.try(:is_admin?))))
+    return false if user.nil? || user.person.nil?
+
+
+    user.is_admin? || (user.person.is_project_manager_of_any_project? && (self.is_admin? || self!=user.person))
   end
 
   def can_view? user = User.current_user
@@ -290,7 +304,7 @@ class Person < ActiveRecord::Base
   end
 
   def can_edit? user = User.current_user
-    new_record? or user && (user.is_admin? || user.is_project_manager? || user == self.user)
+    new_record? || can_be_edited_by?(user)
   end
 
 

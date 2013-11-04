@@ -11,6 +11,16 @@
 
   Factory.define(:person_in_project, :parent => :brand_new_person) do |f|
     f.group_memberships {[Factory.build(:group_membership)]}
+    f.after_create do |p|
+      p.reload
+    end
+  end
+
+  Factory.define(:person_in_multiple_projects, :parent=>:brand_new_person) do |f|
+    f.group_memberships {[Factory.build(:group_membership),Factory.build(:group_membership),Factory.build(:group_membership)]}
+    f.after_create do |p|
+      p.reload
+    end
   end
 
   Factory.define(:person, :parent => :person_in_project) do |f|
@@ -22,20 +32,30 @@
   end
 
   Factory.define(:pal, :parent => :person) do |f|
-    f.is_pal true
-    f.after_create { |pal| pal.group_memberships.first.project_roles << ProjectRole.pal_role}
+
+    f.after_build do |pal|
+      Factory(:pal_role) if ProjectRole.pal_role.nil?
+      pal.group_memberships.first.project_roles << ProjectRole.pal_role
+      pal.is_pal=true,pal.projects
+    end
   end
 
   Factory.define(:asset_manager,:parent=>:person) do |f|
-    f.is_asset_manager true
+    f.after_build do |am|
+      am.is_asset_manager=true,am.projects
+    end
   end
 
   Factory.define(:project_manager,:parent=>:person) do |f|
-    f.is_project_manager true
+    f.after_build do |pm|
+      pm.is_project_manager=true,pm.projects
+    end
   end
 
   Factory.define(:gatekeeper,:parent=>:person) do |f|
-    f.is_gatekeeper true
+    f.after_build do |gk|
+      gk.is_gatekeeper=true,gk.projects
+    end
   end
 
 #User
@@ -472,6 +492,10 @@ end
     f.name "A Role"
   end
 
+  Factory.define(:pal_role,:parent=>:project_role) do |f|
+    f.name "A Pal"
+  end
+
   Factory.define(:work_group) do |f|
     f.association :project
     f.association :institution
@@ -739,13 +763,25 @@ end
     f.sequence(:title) {|n| "Announcement #{n}"}
     f.sequence(:body) {|n| "This is the body for announcement #{n}"}
     f.association :announcer,:factory=>:admin
-    f.is_headline false
     f.expires_at 5.days.since
     f.email_notification false
+    f.is_headline false
   end
 
   Factory.define :headline_announcement,:parent=>:site_announcement do |f|
     f.is_headline true
+    f.title "a headline announcement"
+  end
+
+  Factory.define :feed_announcement,:parent=>:site_announcement do |f|
+    f.show_in_feed true
+    f.title "a feed announcement"
+  end
+
+  Factory.define :mail_announcement, :parent=>:site_announcement do |f|
+    f.email_notification true
+    f.title "a mail announcement"
+    f.body "this is a mail announcement"
   end
 
   Factory.define :annotation do |f|

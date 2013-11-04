@@ -519,7 +519,7 @@ class SopsControllerTest < ActionController::TestCase
   end
 
   def test_editing_doesnt_change_contributor
-    login_as(:pal_user) #this user is a member of sysmo, and can edit this sop
+    login_as(:model_owner) #this user is a member of sysmo, and can edit this sop
     sop=sops(:sop_with_no_contributor)
     put :update, :id => sop, :sop => {:title=>"blah blah blah"}, :sharing=>valid_sharing
     updated_sop=assigns(:sop)

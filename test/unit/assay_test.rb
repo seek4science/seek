@@ -6,11 +6,10 @@ class AssayTest < ActiveSupport::TestCase
 
 
   test "shouldnt edit the assay" do
-    ActiveRecord::Fixtures
-    non_admin = Factory :user,:person=> Factory(:person,:is_admin=>false)
-    user = non_admin #users(:aaron)
+    non_admin = Factory :user
+    assert !non_admin.person.is_admin?
     assay = assays(:modelling_assay_with_data_and_relationship)
-    assert_equal false, assay.can_edit?(user)
+    assert_equal false, assay.can_edit?(non_admin)
   end
 
   test "sops association" do
