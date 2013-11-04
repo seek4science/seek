@@ -1,5 +1,7 @@
 <%
   authorised_types=Seek::ContentStats::AUTHORISED_TYPES
+  non_downloadable=[Investigation,Study,Assay]
+  na_tag = content_tag(:span,"--",class:'none_text')
   #So we don't have to run lengthy authorization a second time when calculating total stats
 
   total_visible_models = []
@@ -66,8 +68,10 @@ For authorised assets the numbers are split as <em>total</em> / <em>visible</em>
             eval("total_accessible_#{type_str} |= acc")
             eval("total_publicly_visible_#{type_str} |= pub_vis")
             eval("total_publicly_accessible_#{type_str} |= pub_acc")
+            display_accessible_count = non_downloadable.include?(type) ? na_tag : acc.count
+            display_pub_accessible_count = non_downloadable.include?(type) ? na_tag : pub_acc.count
         -%>
-        <td><%= "#{total}/#{vis.count}/#{acc.count}/#{pub_vis.count}/#{pub_acc.count}" -%></td>
+        <td><%= "#{total}/#{vis.count}/#{display_accessible_count}/#{pub_vis.count}/#{display_pub_accessible_count}".html_safe -%></td>
     <% end -%>
 
     <td><%= stat.publications.count -%> </td>
@@ -83,8 +87,10 @@ For authorised assets the numbers are split as <em>total</em> / <em>visible</em>
             total_acc = eval("total_accessible_#{type_str}").count
             total_pub_vis = eval("total_publicly_visible_#{type_str}").count
             total_pub_acc = eval("total_publicly_accessible_#{type_str}").count
+            display_total_accessible_count = non_downloadable.include?(type) ? na_tag : total_acc
+            display_total_pub_accessible_count = non_downloadable.include?(type) ? na_tag : total_pub_acc
         %>
-        <td><%= "#{total}/#{total_vis}/#{total_acc}/#{total_pub_vis}/#{total_pub_acc}" -%></td>
+        <td><%= "#{total}/#{total_vis}/#{display_total_accessible_count}/#{total_pub_vis}/#{display_total_pub_accessible_count}".html_safe -%></td>
     <% end -%>
 
     <td><%= Publication.count -%></td>
