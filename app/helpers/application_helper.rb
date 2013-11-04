@@ -397,7 +397,7 @@ module ApplicationHelper
         :with => "'sharing_scope=' + selectedSharingScope() + '&access_type=' + selectedAccessType(selectedSharingScope())
         + '&project_ids=' + getProjectIds('#{resource_name}') + '&project_access_type=' + $F('sharing_your_proj_access_type')
         + '&contributor_types=' + $F('sharing_permissions_contributor_types') + '&contributor_values=' + $F('sharing_permissions_values')
-        + '&creators=' + getCreators() + '&contributor_id=' + '#{contributor_id}' + '&resource_name=' + '#{resource_name}' + '&resource_id=' + '#{resource_id}' + '&is_new_file=' + '#{is_new_file}'"},
+        + '&creators=' + encodeURIComponent(getCreators()) + '&contributor_id=' + '#{contributor_id}' + '&resource_name=' + '#{resource_name}' + '&resource_id=' + '#{resource_id}' + '&is_new_file=' + '#{is_new_file}'"},
       { :id => 'preview_permission',
         :style => 'display:none'
       } #,
