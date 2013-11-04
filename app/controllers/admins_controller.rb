@@ -400,7 +400,6 @@ class AdminsController < ApplicationController
 
   def execute_command(command)
     return nil if Rails.env=="test"
-    raise "fred"
     begin
       cl = Cocaine::CommandLine.new(command)
       cl.run
