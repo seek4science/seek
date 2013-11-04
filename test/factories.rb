@@ -3,6 +3,10 @@
 #:assay_modelling and :assay_experimental rely on the existence of the AssayClass's
 
 #Person
+  Factory.define(:admin_defined_role_project, :class=>AdminDefinedRoleProject) do |f|
+
+  end
+
   Factory.define(:brand_new_person, :class => Person) do |f|
     f.sequence(:email) { |n| "test#{n}@test.com" }
     f.sequence(:first_name) { |n| "Person#{n}" }
@@ -32,29 +36,33 @@
   end
 
   Factory.define(:pal, :parent => :person) do |f|
-
+    f.roles_mask 2
     f.after_build do |pal|
       Factory(:pal_role) if ProjectRole.pal_role.nil?
       pal.group_memberships.first.project_roles << ProjectRole.pal_role
-      pal.is_pal=true,pal.projects
+      Factory(:admin_defined_role_project,:project=>pal.projects.first,:person=>pal,:role_mask=>2)
+      pal.roles_mask = 2
     end
   end
 
   Factory.define(:asset_manager,:parent=>:person) do |f|
     f.after_build do |am|
-      am.is_asset_manager=true,am.projects
+      Factory(:admin_defined_role_project,:project=>am.projects.first,:person=>am,:role_mask=>8)
+      am.roles_mask = 8
     end
   end
 
   Factory.define(:project_manager,:parent=>:person) do |f|
     f.after_build do |pm|
-      pm.is_project_manager=true,pm.projects
+      Factory(:admin_defined_role_project,:project=>pm.projects.first,:person=>pm,:role_mask=>4)
+      pm.roles_mask = 4
     end
   end
 
   Factory.define(:gatekeeper,:parent=>:person) do |f|
     f.after_build do |gk|
-      gk.is_gatekeeper=true,gk.projects
+      Factory(:admin_defined_role_project,:project=>gk.projects.first,:person=>gk,:role_mask=>16)
+      gk.roles_mask = 16
     end
   end
 
