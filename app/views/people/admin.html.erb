@@ -7,7 +7,7 @@
       <% if admin_logged_in? || project_manager_logged_in? -%>
           <h2 style="margin-top: 1.5em;">Choose <%= t('project') %> / Institution&nbsp;&nbsp;&nbsp;</h2>
           <%= render :partial => "work_groups", :locals=> {:person => @person} -%>
-          <h2 style="margin-top: 1.5em;">Assign roles or permissions&nbsp;&nbsp;&nbsp;</h2>
+
           <p style="line-height: 1.8;">
             <% if admin_logged_in? || (project_manager_logged_in? && !(@person.projects & current_user.try(:person).try(:projects).to_a).empty?) %>
 
@@ -24,14 +24,27 @@
             <% end -%>
 
             <% if admin_logged_in? %>
-                <%
-                roles = [["pal","a PAL"],["project_manager","a Project Manager"],["asset_manager","an Asset Manager"],["gatekeeper","a Gatekeeper"]]
-                roles.each do |role|
-                %>
-                  <%=  render :partial=>"roles_selector",:locals=>{:role=>role[0],:role_title=>role[1]} -%>
-                <%
-                end
-                %>
+                    <h2>Administer defined roles</h2>
+                    <p class="box_infotext">
+                      These are the roles that can be assigned to a person by an Adminster, to allow this person to carry out specific tasks within that role. Each role is
+                      associated with, and only applies to, a particular <%= t('Project').downcase.html_safe %>.
+                      <br/><strong>Note</strong> that if new projects are added to this person (above), they will
+                      need to be saved before the <%= t('Project').downcase.pluralize.html_safe %> you can associate with a role are available. If the person is removed from a <%= t('Project').downcase.html_safe %> then the role will also be automatically removed.
+                    </p>
+                    <br/>
+                    <%
+                       roles = [["pal", "a PAL"], ["project_manager", "a Project Manager"], ["asset_manager", "an Asset Manager"], ["gatekeeper", "a Gatekeeper"]]
+                       roles.each do |role|
+                    %>
+                        <%= render :partial => "roles_selector", :locals => {:role => role[0], :role_title => role[1]} -%>
+                        <%= tag("hr")  %>
+                    <%
+                       end
+                    %>
+
+
+
+
             <% end %>
           </p>
       <% end -%>
