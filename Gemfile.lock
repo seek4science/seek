@@ -62,7 +62,7 @@ GIT
 
 GIT
   remote: git://github.com/SysMO-DB/my_savage_beast
-  revision: 456fa6ef2752e7e4c3331b9bc0e632b2b84e22ec
+  revision: 4ff41d5e7d1f17440240fe0886a7c9827f8f53c6
   specs:
     my_savage_beast (2.3)
 
