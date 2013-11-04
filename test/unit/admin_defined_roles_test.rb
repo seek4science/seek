@@ -418,6 +418,8 @@ class AdminDefinedRolesTest < ActiveSupport::TestCase
       assert admin.save
 
       pal = Factory(:pal)
+      pal.reload
+      assert_equal 2,pal.roles_mask,"mask should be 2"
       assert !pal.projects.empty?
       assert pal.is_pal?(pal.projects.first)
       assert pal.save
