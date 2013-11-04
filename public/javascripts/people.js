@@ -227,3 +227,45 @@ function updateWorkGroupIds(){
 
     wg_ids_element.setValue(wg_ids);
 }
+
+function removePersonFromAdminDefinedRole(role,project_id) {
+    var display_id = role+"_project_"+project_id;
+    $(display_id).remove();
+    var select = $('_roles_'+role);
+    var options = select.childElements().select(function(c){return c.selected && c.value==project_id})
+    if (options.length>0) {
+        options[0].selected=false;
+    }
+}
+
+function addPersonToAdminDefinedRole(role) {
+    var selection = $('possible_project_for_'+role);
+    var selected_option = selection.options[selection.selectedIndex];
+    var project_id = selected_option.value;
+    var project_name = selected_option.text;
+
+    if (!isAdminDefinedRoleAlreadySelected(role,project_id)) {
+        var select = $('_roles_'+role);
+        var options = select.childElements().select(function(c){return !c.selected && c.value==project_id})
+        if (options.length>0) {
+            options[0].selected=true;
+        }
+
+        var list_block = $('project_list_for_'+role);
+        var list_item = "<li id='"+role+"_project_"+project_id+"'>"+project_name+"&nbsp;";
+        var remove_link = "<a href=\"javascript:removePersonFromAdminDefinedRole('"+role+"',"+project_id+");\">[remove]</a>";
+        list_item = list_item + remove_link;
+        list_item = list_item +"</li>";
+        list_block.insert(list_item);
+    }
+    else {
+        alert("The role is already selected for that project");
+    }
+
+
+}
+function isAdminDefinedRoleAlreadySelected(role,project_id) {
+    var select = $('_roles_'+role);
+    var options = select.childElements().select(function(c){return c.selected && c.value==project_id});
+    return options.length>0;
+}
