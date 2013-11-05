@@ -17,7 +17,7 @@ The following resources have just been created or updated in <%= Seek::Config.ap
 <br/>
 
 <% @activity_logs.group_by(&:action).each do |action, logs| %>
-    <label style="color:#f0342a;"><b>Items <%= action.capitalize%>d:</b></label>
+    <label style="color:#f0342a;"><b>Resources <%= action.capitalize%>d:</b></label>
     <div id="new_resources" class="new_resources" >
        <table border="1px" cellpadding="5" style="border-collapse: collapse;
               font-family: 'Lucida Grande', Tahoma, Arial, Helvetica, sans-serif;

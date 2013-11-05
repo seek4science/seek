@@ -29,8 +29,8 @@ class SubMailerTest < ActionMailer::TestCase
     assert email.body.include?(%!<td><a href="http://localhost:3000/data_files/#{df.id}">#{df.title}</a></td>!)
     assert email.body.include?(%!<td><a href="http://localhost:3000/people/#{p2.id}">#{p2.name}</a></td>!)
     assert email.body.include?("following resources have been created or updated")
-    assert email.body.include?("Items Created:")
-    assert email.body.include?("Items Updated:")
+    assert email.body.include?("Resources Created:")
+    assert email.body.include?("Resources Updated:")
     assert email.body.include?("Date Created")
     assert email.body.include?("Date Updated")
     assert email.body.include?("25th December 2012 at 13:15")
@@ -59,7 +59,7 @@ class SubMailerTest < ActionMailer::TestCase
     assert email.body.include?(%!<td><a href="http://localhost:3000/data_files/#{df.id}">#{df.title}</a></td>!)
     assert email.body.include?(%!<td><a href="http://localhost:3000/people/#{p2.id}">#{p2.name}</a></td>!)
     assert email.body.include?("following resources have just been created or updated in")
-    assert email.body.include?("Items Created:")
+    assert email.body.include?("Resources Created:")
   end
 
 end
