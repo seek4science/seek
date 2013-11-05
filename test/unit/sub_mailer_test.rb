@@ -7,14 +7,17 @@ class SubMailerTest < ActionMailer::TestCase
     p = Factory :person
     p2 = Factory :person
     df = Factory :data_file, :projects=>p.projects
+    model = Factory :model, :projects=>p.projects
+
     log = Factory :activity_log,:activity_loggable=>df,:action=>"create",:controller_name=>"data_files",:created_at=>2.hour.ago, :culprit=>p2.user
 
+    log2 = Factory :activity_log,:activity_loggable=>model,:action=>"update",:controller_name=>"data_files",:created_at=>DateTime.new(2012,12,25,13,15,0), :culprit=>p2.user
     email = nil
 
     now = Time.now
 
     pretend_now_is(now) do
-      email = SubMailer.send_digest_subscription p, [log], 'daily'
+      email = SubMailer.send_digest_subscription p, [log,log2], 'daily'
     end
 
     assert_equal "text/html; charset=UTF-8",email.content_type
@@ -26,6 +29,12 @@ class SubMailerTest < ActionMailer::TestCase
     assert email.body.include?(%!<td><a href="http://localhost:3000/data_files/#{df.id}">#{df.title}</a></td>!)
     assert email.body.include?(%!<td><a href="http://localhost:3000/people/#{p2.id}">#{p2.name}</a></td>!)
     assert email.body.include?("following resources have been created or updated")
+    assert email.body.include?("Items Created:")
+    assert email.body.include?("Items Updated:")
+    assert email.body.include?("Date Created")
+    assert email.body.include?("Date Updated")
+    assert email.body.include?("25th December 2012 at 13:15")
+
   end
 
   test "send immediate email" do
@@ -50,6 +59,7 @@ class SubMailerTest < ActionMailer::TestCase
     assert email.body.include?(%!<td><a href="http://localhost:3000/data_files/#{df.id}">#{df.title}</a></td>!)
     assert email.body.include?(%!<td><a href="http://localhost:3000/people/#{p2.id}">#{p2.name}</a></td>!)
     assert email.body.include?("following resources have just been created or updated in")
+    assert email.body.include?("Items Created:")
   end
 
 end
