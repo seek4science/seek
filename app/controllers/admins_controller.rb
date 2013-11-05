@@ -225,9 +225,9 @@ class AdminsController < ApplicationController
     tag=TextValue.find(params[:id])
     if request.post?
       tag.annotations.each do |a|
-        a.delete
+        a.destroy
       end
-      tag.delete
+      tag.destroy
       flash.now[:notice]="Tag #{tag.text} deleted"
 
     else
