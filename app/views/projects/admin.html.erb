@@ -13,7 +13,7 @@
     <h2>Participating Institutions</h2>
 
       <%= f.label :institution_ids, "Please select the institutions that participate in this #{t('project')}:", :style => "line-height: 2; margin-left: 1em;" -%><br/>
-      <% institution_list = Institution.all %>
+      <% institution_list = Institution.order(:name) %>
 
       <% chosen_institutions = @project.institutions %>
       <div style="margin-top: 1em; margin-bottom: 2em; margin-left: 2em; width: 90%; height: 500px; overflow: auto;">
