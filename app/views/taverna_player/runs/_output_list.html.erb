@@ -12,7 +12,7 @@
             <% unless wf_port[:description].blank? %>
               <%= help_icon(wf_port[:description]) -%>
             <% end %>
-            <span class="mime_type"><%= "(#{p.metadata[:type]})" if p.depth == 0 %></span>
+            <span class="mime_type"><%= p.depth == 0 ? "(#{p.metadata[:type]})" : "(list of depth #{p.depth})" %></span>
               <ul class="sectionIcons" style="font-weight: normal; vertical-align:middle; text-align:right; position:relative; top:-15px; /* ugly, but necessary relative positioning */">
 
                 <li><%= render :partial => "download_link", :locals => { :download_link_name => "Download value", :download_url => "/runs/#{run.id}/download/output/#{p.name}" } %></li>
