@@ -7,14 +7,20 @@ module ApplicationHelper
   include SavageBeast::ApplicationHelper
   include FancyMultiselectHelper
 
-  def date_as_string date,show_time_of_day=false
-    date = Time.parse(date.to_s) unless date.is_a?(Time) || date.blank?
-    if date.blank?
-      str="<span class='none_text'>No date defined</span>"
+  def date_as_string date,show_time_of_day=false,year_only_1st_jan=false
+    #for publications, if it is the first of jan, then it can be assumed it is just the year (unlikely have a publication on New Years Day)
+    if (year_only_1st_jan && !date.blank? && date.month==1 && date.day==1)
+      str=date.year.to_s
     else
-      str = date.localtime.strftime("#{date.day.ordinalize} %B %Y")
-      str = date.localtime.strftime("#{str} at %H:%M") if show_time_of_day
+      date = Time.parse(date.to_s) unless date.is_a?(Time) || date.blank?
+      if date.blank?
+        str="<span class='none_text'>No date defined</span>"
+      else
+        str = date.localtime.strftime("#{date.day.ordinalize} %B %Y")
+        str = date.localtime.strftime("#{str} at %H:%M") if show_time_of_day
+      end
     end
+
     str.html_safe
   end
 

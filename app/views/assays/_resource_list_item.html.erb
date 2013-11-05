@@ -1,5 +1,5 @@
 <%
-   @assay_text=resource.is_modelling? ? t('assays.modelling_analysis') : t('assays.assay')
+   assay_type_text = resource.is_modelling? ? "Biological problem addressed" : "#{t('assays.assay')} type"
 %>
 
 <%= list_item_title resource %>
@@ -7,7 +7,7 @@
 <div class="list_item_left_column">
   <%= list_item_attribute "ID", resource.id %>
 
-  <%= list_item_attribute "#{@assay_text} type", resource.assay_type.try(:title).try(:capitalize), resource.assay_type %>
+  <%= list_item_attribute "#{assay_type_text}", resource.assay_type.try(:title).try(:capitalize), resource.assay_type %>
   <% unless resource.is_modelling? -%>
       <%= list_item_attribute "Technology type", try_block{resource.technology_type.title.capitalize}, resource.technology_type %>
   <% end -%>

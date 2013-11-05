@@ -35,7 +35,7 @@ namespace :seek do
     Person.where("roles_mask > 0").each do |p|
       if p.admin_defined_role_projects.empty?
         roles = []
-        p.role_names.each do |role|
+        (p.role_names & Person::PROJECT_DEPENDENT_ROLES).each do |role|
           puts "Updating #{p.name} for - '#{role}' - adding to #{p.projects.count} projects"
           roles << [role,p.projects]
         end

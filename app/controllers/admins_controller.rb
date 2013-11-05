@@ -172,8 +172,7 @@ class AdminsController < ApplicationController
   end
 
   def restart_delayed_job
-    command = "#{Rails.root}/script/delayed_job stop RAILS_ENV=#{Rails.env}"
-    command << "&& #{Rails.root}/script/delayed_job start RAILS_ENV=#{Rails.env}"
+    command = "RAILS_ENV=#{Rails.env} ruby #{Rails.root}/script/delayed_job restart"
     error = execute_command(command)
     redirect_with_status(error, 'background tasks')
   end
@@ -226,9 +225,9 @@ class AdminsController < ApplicationController
     tag=TextValue.find(params[:id])
     if request.post?
       tag.annotations.each do |a|
-        a.delete
+        a.destroy
       end
-      tag.delete
+      tag.destroy
       flash.now[:notice]="Tag #{tag.text} deleted"
 
     else
@@ -404,6 +403,8 @@ class AdminsController < ApplicationController
       cl = Cocaine::CommandLine.new(command)
       cl.run
       return nil
+    rescue Cocaine::CommandNotFoundError => e
+      return "The command the restart the background tasks could not be found!"
     rescue Exception => e
       error =  e.message
       return error

@@ -9,8 +9,12 @@
 
     
     <% if @publication.pubmed_id.nil? && @publication.doi %>
+      <label>Abstract:</label><br/>
+      <p class="box_infotext">
+        When adding a publication through a DOI, it is not possible to fetch the original abstract automatically.
+        <br/>Please paste the abstract below
+      </p>
       <p>
-        <label>Abstract:</label><br/>
         <%= text_area(:publication, :abstract, :cols => 90, :rows => 8) %>
       </p>
     <% end %>

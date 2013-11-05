@@ -11,6 +11,32 @@ class ApplicationHelperTest < ActionView::TestCase
     assert_equal "a: b: c and d",join_with_and(["a","b","c","d"],": ")
   end
 
+  test "force to treat 1 Jan as year only" do
+    date = Date.new(2012,1,1)
+    text = date_as_string(date,false,true)
+    assert_equal "2012",text
+
+    date = Date.new(2012,2,1)
+    text = date_as_string(date,false,true)
+    assert_equal "1st February 2012",text
+
+    date = Date.new(2012,1,2)
+    text = date_as_string(date,false,true)
+    assert_equal "2nd January 2012",text
+  end
+
+  test "should handle nil date" do
+    text = date_as_string(nil)
+    assert_equal "<span class='none_text'>No date defined</span>",text
+
+    text = date_as_string(nil,false,true)
+    assert_equal "<span class='none_text'>No date defined</span>",text
+
+    text = date_as_string(nil,true,true)
+    assert_equal "<span class='none_text'>No date defined</span>",text
+
+  end
+
   test 'showing local time instead of GMT/UTC for date_as_string' do
     sop = Factory(:sop)
     created_at = sop.created_at

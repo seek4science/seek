@@ -150,6 +150,26 @@ class AdminsControllerTest < ActionController::TestCase
     assert_equal raise_delivery_errors_setting, ActionMailer::Base.raise_delivery_errors
   end
 
+  test "get edit tag" do
+    login_as(Factory(:admin))
+    p = Factory(:person)
+    model = Factory(:model)
+    tag=Factory :tag,:value=>"twinkle",:source=>p.user,:annotatable=>model
+    get :edit_tag,:id=>tag.value.id
+    assert_response :success
+  end
+
+  test "non admin cannot get edit tag" do
+    login_as(Factory(:person))
+    p = Factory(:person)
+    model = Factory(:model)
+    tag=Factory :tag,:value=>"twinkle",:source=>p.user,:annotatable=>model
+    get :edit_tag,:id=>tag.value.id
+    assert_response :redirect
+    refute_nil flash[:error]
+  end
+
+
   test "job statistics stats" do
     login_as(:quentin)
     Delayed::Job.destroy_all

@@ -1,4 +1,5 @@
 class SubMailer < ActionMailer::Base
+  add_template_helper(ApplicationHelper)
 
   def send_digest_subscription person, activity_logs, frequency
     @activity_logs = activity_logs
