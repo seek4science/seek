@@ -1,16 +1,12 @@
 <% unless current_user.nil? %>
-<% runs = (TavernaPlayer::Run.by_owner(current_user.id).where(:sweep_id => nil).order('created_at DESC').limit(5) +
-           Sweep.by_owner(current_user.id).order('created_at DESC').limit(5)).sort_by(&:created_at).reverse.first(5) %>
-<div class="your_recent">
-  <h2>Your recent runs</h2>
-  <% if runs.empty? %>
-    <span class="none_text">No workflow runs</span>
-  <% else %>
-    <ul>
-      <% runs.each do |run| %>
-        <li><%= link_to run.name, run -%></li>
-      <% end %>
-    </ul>
-  <% end %>
-</div>
+  <% runs = (TavernaPlayer::Run.by_owner(current_user.id).where(:sweep_id => nil).order('created_at DESC').limit(5) +
+             Sweep.by_owner(current_user.id).order('created_at DESC').limit(5)).sort_by(&:created_at).reverse.first(5) %>
+  <div class="your_recent">
+    <h2>Your recent runs</h2>
+    <% if runs.empty? %>
+      <span class="none_text">No workflow runs</span>
+    <% else %>
+      <%= render :partial => 'taverna_player/runs/runs_and_sweeps_list', :locals => { :items => runs } %>
+    <% end %>
+  </div>
 <% end %>
