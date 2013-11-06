@@ -1,3 +1,5 @@
+require 'delayed/command'
+
 class AdminsController < ApplicationController
   include CommonSweepers
 
@@ -172,8 +174,12 @@ class AdminsController < ApplicationController
   end
 
   def restart_delayed_job
-    command = "RAILS_ENV=#{Rails.env} ruby #{Rails.root}/script/delayed_job restart"
-    error = execute_command(command)
+    error = nil
+    begin
+      Delayed::Command.new(["restart"]).daemonize
+    rescue Exception=>e
+      error=e.message
+    end
     redirect_with_status(error, 'background tasks')
   end
 
