@@ -14,6 +14,6 @@ $j('#workflow_runs_table').dataTable().fnAddData(json);
   $j("#sweep_results").replaceWith('<%= escape_javascript(render(:partial => "sweeps/results_table")) -%>');
   <% if @sweep.complete? %>
     $j('#sweep_results_table').fadeIn();
-    window.clearInterval(poller); //stop refresh after sweep has finished
+    window.clearInterval($j('#workflow_runs_table').data('poller')); //stop refresh after sweep has finished
   <% end %>
 <% end %>

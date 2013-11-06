@@ -1,12 +1,15 @@
 <%= javascript_include_tag 'DataTables-1.8.2/jquery.js', 'DataTables-1.8.2/jquery.dataTables.js', 'DataTables-1.8.2/jquery.dataTables.rowGrouping.js', 'DataTables-1.8.2/Scroller.js' %>
 <% id ||= 'workflow_runs_table' %>
 <% default_sort ||= [4, 'desc'] %>
-<% poll = true unless defined? poll %>
+<%
+  unless defined?(poll)
+     poll = true
+  end
+%>
 <script type="text/javascript">
-    var poller;
-
     jQuery.noConflict();
     var $j = jQuery;
+    $j('#<%= id -%>').data('poller', null);
     $j(document).ready(function () {
         workflow_runs_table = $j('#<%= id -%>').dataTable({
             "bPaginate":false,
@@ -33,7 +36,7 @@
             ]
         });
         <% if poll %>
-          poller = window.setInterval(function () { $j.get("<%= polling_url %>", null, null, "script") }, 5000);
+          $j('#<%= id -%>').data('poller', window.setInterval(function () { $j.get("<%= polling_url %>", null, null, "script") }, 5000));
         <% end %>
     });
 </script>
