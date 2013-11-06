@@ -51,11 +51,12 @@ class SiteAnnouncementsControllerTest < ActionController::TestCase
 
   test "should email registered users" do
     NotifieeInfo.delete_all
-    i=0
-    while i < 5
-      Factory(:person)
-      i+=1
+    people = []
+    (0...5).to_a.each do
+      people << Factory(:person)
     end
+
+    assert_equal 5,people.size
 
     registered_receivers = Person.registered.select {|p| p.notifiee_info.try :receive_notifications?}
     assert registered_receivers.count>=5
@@ -64,7 +65,8 @@ class SiteAnnouncementsControllerTest < ActionController::TestCase
       post :create,:site_announcement=>{:title=>"fred", :email_notification => true}
       site_announcement = assigns(:site_announcement)
       assert SendAnnouncementEmailsJob.exists?(site_announcement.id,1)
-      SendAnnouncementEmailsJob.new(site_announcement.id, 1).perform
+      first_id = people.collect(&:notifiee_info).collect(&:id).min
+      SendAnnouncementEmailsJob.new(site_announcement.id, first_id).perform
     end
   end
   

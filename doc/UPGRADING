@@ -40,6 +40,26 @@ same pattern. Upgrading to version 0.18 is an exception and involves some additi
 only be necessary to run <em>bundle install</em> and the <em>db:migrate</em> rake task. Using seek:upgrade should still work, but could take a lot of unnecessary time. There is more details and
 an example towards the end of the this page.
 
+== Steps to upgrade from 0.18.x to 0.19.x
+
+Upgrading follows the standard steps:
+
+    RAILS_ENV=production ./script/delayed_job stop
+    bundle exec rake sunspot:solr:stop RAILS_ENV=production
+    hg pull https://bitbucket.org/seek4science/seek -r v0.19.0
+    hg update
+    hg merge # only required if you've made changes since installing. If you have you may need to deal with conflicts.
+    hg commit -m "merged" # likewise - only required if you made changes since installing
+    bundle install --deployment
+    bundle exec rake seek:upgrade RAILS_ENV=production
+
+    bundle exec rake sunspot:solr:start RAILS_ENV=production # to restart the search server
+    RAILS_ENV=production ./script/delayed_job start
+
+    touch tmp/restart.txt
+    bundle exec rake tmp:assets:clear RAILS_ENV=production
+    bundle exec rake tmp:clear RAILS_ENV=production
+
 == Steps to upgrade from 0.17.x to 0.18.x
 
 The changes for Version 0.18 included upgrading Ruby to version 1.9.3 and Rails to version 3.2 - this means the upgrade
@@ -59,12 +79,13 @@ Upgrading follows the standard steps:
     hg commit -m "merged" # likewise - only required if you made changes since installing
     bundle install --deployment
     bundle exec rake seek:upgrade RAILS_ENV=production
-    bundle exec rake tmp:assets:clear RAILS_ENV=production
-    bundle exec rake tmp:clear RAILS_ENV=production
 
     bundle exec rake sunspot:solr:start RAILS_ENV=production # to restart the search server
     RAILS_ENV=production ./script/delayed_job start
+
     touch tmp/restart.txt
+    bundle exec rake tmp:assets:clear RAILS_ENV=production
+    bundle exec rake tmp:clear RAILS_ENV=production
 
 
 
@@ -79,13 +100,13 @@ otherwise stated. You can upgrade directly from one patch version to another, sk
   hg commit -m "merged" # if necessary
   bundle install --deployment
   bundle exec rake db:migrate RAILS_ENV=production
-  bundle exec rake tmp:assets:clear RAILS_ENV=production
-  bundle exec rake tmp:clear RAILS_ENV=production
 
   RAILS_ENV=production ./script/delayed_job stop
   RAILS_ENV=production ./script/delayed_job start
 
   touch tmp/restart.txt
+  bundle exec rake tmp:assets:clear RAILS_ENV=production
+  bundle exec rake tmp:clear RAILS_ENV=production
 
 
 == Earlier upgrade notes

@@ -175,17 +175,16 @@ the www-data user, run the command:</p>
 </pre>
 
 <p>This will compile a module for Apache, and at the end present you with some
-lines that need adding to /etc/apache2/http.conf.</p>
-
-<p>You will need to be a user that has sudo permissions, and edit this file:</p>
-
-<pre>sudo nano /etc/apache2/http.conf</pre>
-
-<p>These will look something like</p>
+lines that need adding to /etc/apache2/http.conf. These will look something
+like the following, but the paths will most likely be different:</p>
 
 <pre>LoadModule passenger_module /home/www-data/.rvm/gems/ruby-1.9.3-p448@seek/gems/passenger-4.0.7/buildout/apache2/mod_passenger.so
 PassengerRoot /home/www-data/.rvm/gems/ruby-1.9.3-p448@seek/gems/passenger-4.0.7
 PassengerDefaultRuby /home/www-data/.rvm/wrappers/ruby-1.9.3-p448@seek/ruby</pre>
+
+<p>You will need to be a user that has sudo permissions, and edit this file:</p>
+
+<pre>sudo nano /etc/apache2/http.conf</pre>
 
 <p>Now create a virtual host definition for SEEK:</p>
 
