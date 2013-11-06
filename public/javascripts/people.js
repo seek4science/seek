@@ -270,7 +270,9 @@ function addPersonToAdminDefinedRole(role) {
 //remove the list item that says no projects defined (with the id no_projects_for_$role
 function removeNoProjectAssignedForAdminDefinedRole(role) {
     var id = "no_projects_for_"+role;
-    $(id).remove();
+    if ($(id)) {
+        $(id).remove();
+    }
 }
 
 //adds a list item to indicate there are no projects for this role, with the id no_projects_for_$role
