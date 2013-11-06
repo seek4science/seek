@@ -39,7 +39,7 @@ Pay attention to what you use for the 'MySQL root' password when requested - you
 The remaining packages are:
 
   sudo apt-get install wget curl mercurial ruby libssl-dev build-essential openssh-server git libreadline-dev
-  sudo apt-get install libxml++2.6-dev openjdk-7-jdk graphviz libsqlite3-dev sqlite3
+  sudo apt-get install libxml++2.6-dev openjdk-7-jdk libsqlite3-dev sqlite3
   sudo apt-get install poppler-utils libreoffice libmysqlclient-dev libmagick++-dev libxslt1-dev
 
 Installing these packages now will make installing Ruby 1.9.3 easier later on:
@@ -83,9 +83,9 @@ To create the gemset run:
 
 == Getting SEEK
 
-Now you are ready for installing SEEK. To fetch the latest version of SEEK <em>(v0.18.3)</em> change to the directory you want to install it and then run:
+Now you are ready for installing SEEK. To fetch the latest version of SEEK <em>(v0.19.0)</em> change to the directory you want to install it and then run:
 
-  hg clone https://bitbucket.org/seek4science/seek -r v0.18.3 seek
+  hg clone https://bitbucket.org/seek4science/seek -r v0.19.0 seek
   cd seek/
 
 Now to install the ruby gems SEEK needs:

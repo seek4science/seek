@@ -58,16 +58,17 @@ First you need to setup {Passenger Phusion}[https://www.phusionpassenger.com/] .
   bundle exec passenger-install-apache2-module
 
 This will compile a module for Apache, and at the end present you with some lines that need adding to /etc/apache2/http.conf.
+These will look something like the following, but the paths will most likely be different:
+
+  LoadModule passenger_module /home/www-data/.rvm/gems/ruby-1.9.3-p448@seek/gems/passenger-4.0.7/buildout/apache2/mod_passenger.so
+  PassengerRoot /home/www-data/.rvm/gems/ruby-1.9.3-p448@seek/gems/passenger-4.0.7
+  PassengerDefaultRuby /home/www-data/.rvm/wrappers/ruby-1.9.3-p448@seek/ruby
 
 You will need to be a user that has sudo permissions, and edit this file:
 
   sudo nano /etc/apache2/http.conf
 
-These will look something like
 
-  LoadModule passenger_module /home/www-data/.rvm/gems/ruby-1.9.3-p448@seek/gems/passenger-4.0.7/buildout/apache2/mod_passenger.so
-  PassengerRoot /home/www-data/.rvm/gems/ruby-1.9.3-p448@seek/gems/passenger-4.0.7
-  PassengerDefaultRuby /home/www-data/.rvm/wrappers/ruby-1.9.3-p448@seek/ruby
 
 Now create a virtual host definition for SEEK:
 
