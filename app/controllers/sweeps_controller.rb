@@ -125,13 +125,13 @@ class SweepsController < ApplicationController
   def set_runlet_parameters
 
     shared_input_values_for_all_runs = params[:sweep].delete(:shared_input_values_for_all_runs)
-    params[:sweep][:runs_attributes].each do |run_id, run_attributes|
+    params[:sweep][:runs_attributes].each_with_index do |(run_id, run_attributes), iteration_index|
       run_attributes[:workflow_id] = params[:sweep][:workflow_id]
-      run_attributes[:name] = "#{params[:sweep][:name]} ##{run_id.to_i + 1}"
-      # Copy parameters from "parent" run
+      run_attributes[:name] = "#{params[:sweep][:name]} ##{iteration_index + 1}"
+      # Copy shared inputs from "parent" run
       if !shared_input_values_for_all_runs.blank?
         base_index = run_attributes[:inputs_attributes].keys.map { |k| k.to_i }.max + 1
-        if shared_input_values_for_all_runs && shared_input_values_for_all_runs[:inputs_attributes]
+        if shared_input_values_for_all_runs[:inputs_attributes]
           shared_input_values_for_all_runs[:inputs_attributes].each do |input_id, input_attributes|
             run_attributes[:inputs_attributes][(base_index + input_id.to_i).to_s] = input_attributes
           end
