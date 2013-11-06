@@ -27,7 +27,7 @@ module AdminHelper
     begin
       pid = Daemons::PidFile.new("#{Rails.root}/tmp/pids","delayed_job")
       if pid.running?
-        status = "Currently running [Process ID: #{pid.pid}]"
+        status = "Running [Process ID: #{pid.pid}]"
       else
         status = "<span class='error_text'>Not running</span>"
       end
