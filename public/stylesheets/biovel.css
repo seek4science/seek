@@ -346,3 +346,12 @@ a.preview_result {
   font-size: 80%;
 }
 
+#related_runs li {
+  line-height: 20px;
+  margin-left: 5px;
+}
+
+#related_runs img {
+  vertical-align: text-top;
+  margin-right: 10px;
+}

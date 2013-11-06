@@ -4,7 +4,7 @@ class SweepsController < ApplicationController
   before_filter :find_run, :only => :new
   before_filter :set_runlet_parameters, :only => :create
   before_filter :find_workflow_and_version, :only => :new
-  before_filter :auth, :only => [:update, :edit, :destroy, :cancel]
+  before_filter :auth
 
   def show
     @runs = @sweep.runs.select { |r| r.can_view? }
@@ -141,11 +141,29 @@ class SweepsController < ApplicationController
   end
 
   def auth
-    unless @sweep.user == current_user
-      respond_to do |format|
-        flash[:error] = "You are not authorized to #{action_name} this sweep."
-        format.html { redirect_to @sweep }
-      end
+    case action_name
+      when 'update', 'edit', 'destroy', 'cancel'
+        unless @sweep.user == current_user
+          respond_to do |format|
+            flash[:error] = "You are not authorized to #{action_name} this sweep."
+            format.html { redirect_to @sweep }
+          end
+        end
+      when 'show'
+        unless @sweep.can_view?
+          respond_to do |format|
+            flash[:error] = "You are not authorized to view this sweep."
+            format.html do
+              begin
+                redirect_to :back
+              rescue ActionController::RedirectBackError
+                redirect_to taverna_player.runs_path
+              end
+            end
+          end
+        end
+      else
+        true
     end
   end
 

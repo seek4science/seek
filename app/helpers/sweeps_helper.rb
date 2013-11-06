@@ -32,7 +32,7 @@ module SweepsHelper
     rows = []
 
     # Values of all the output ports for each run
-    sweep.runs.each_with_index do |run, i|
+    sweep.runs.select { |r| r.can_view? }.each_with_index do |run, i|
 
       # Run name
       row = [ link_to("#{image('simple_run')} #{run.name}".html_safe, taverna_player.run_path(run))]

@@ -79,4 +79,10 @@ class Sweep < ActiveRecord::Base
 
     path
   end
+
+  # Sweep should only be visible if at least one of its runs is visible... or theres no point in viewing it!
+  def can_view?
+    runs.any? { |r| r.can_view? }
+  end
+
 end
