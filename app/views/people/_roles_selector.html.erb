@@ -19,7 +19,7 @@
 </style>
 <p>
 
-  This person is <strong><%= role_title -%></strong> in the following <%= t('Project').downcase.pluralize.html_safe -%>:
+  This person is <strong><%= role_title -%></strong> for the following <%= t('Project').downcase.pluralize.html_safe -%>:
   <span id='projects_for_<%= role %>'>
     <%= text_or_not_specified(project_list,:none_text=>"No #{t('Project').downcase.pluralize} assigned") -%>
     &nbsp;
