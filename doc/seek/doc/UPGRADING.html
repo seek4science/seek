@@ -184,12 +184,13 @@ hg merge # only required if you've made changes since installing. If you have yo
 hg commit -m &quot;merged&quot; # likewise - only required if you made changes since installing
 bundle install --deployment
 bundle exec rake seek:upgrade RAILS_ENV=production
-bundle exec rake tmp:assets:clear RAILS_ENV=production
-bundle exec rake tmp:clear RAILS_ENV=production
 
 bundle exec rake sunspot:solr:start RAILS_ENV=production # to restart the search server
 RAILS_ENV=production ./script/delayed_job start
-touch tmp/restart.txt</pre>
+
+touch tmp/restart.txt
+bundle exec rake tmp:assets:clear RAILS_ENV=production
+bundle exec rake tmp:clear RAILS_ENV=production</pre>
 
 <h2 id="label-Steps+to+upgrade+from+0.17.x+to+0.18.x">Steps to upgrade from 0.17.x to 0.18.x</h2>
 
@@ -213,12 +214,13 @@ hg merge # only required if you've made changes since installing. If you have yo
 hg commit -m &quot;merged&quot; # likewise - only required if you made changes since installing
 bundle install --deployment
 bundle exec rake seek:upgrade RAILS_ENV=production
-bundle exec rake tmp:assets:clear RAILS_ENV=production
-bundle exec rake tmp:clear RAILS_ENV=production
 
 bundle exec rake sunspot:solr:start RAILS_ENV=production # to restart the search server
 RAILS_ENV=production ./script/delayed_job start
-touch tmp/restart.txt</pre>
+
+touch tmp/restart.txt
+bundle exec rake tmp:assets:clear RAILS_ENV=production
+bundle exec rake tmp:clear RAILS_ENV=production</pre>
 
 <h2 id="label-Steps+to+upgrade+between+patches+%28e.g.+between+0.16.0+to+0.16.3%29">Steps to upgrade between patches (e.g. between 0.16.0 to 0.16.3)</h2>
 
@@ -234,13 +236,13 @@ hg merge # if necessary
 hg commit -m &quot;merged&quot; # if necessary
 bundle install --deployment
 bundle exec rake db:migrate RAILS_ENV=production
-bundle exec rake tmp:assets:clear RAILS_ENV=production
-bundle exec rake tmp:clear RAILS_ENV=production
 
 RAILS_ENV=production ./script/delayed_job stop
 RAILS_ENV=production ./script/delayed_job start
 
-touch tmp/restart.txt</pre>
+touch tmp/restart.txt
+bundle exec rake tmp:assets:clear RAILS_ENV=production
+bundle exec rake tmp:clear RAILS_ENV=production</pre>
 
 <h2 id="label-Earlier+upgrade+notes">Earlier upgrade notes</h2>
 

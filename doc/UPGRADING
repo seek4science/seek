@@ -52,12 +52,13 @@ Upgrading follows the standard steps:
     hg commit -m "merged" # likewise - only required if you made changes since installing
     bundle install --deployment
     bundle exec rake seek:upgrade RAILS_ENV=production
-    bundle exec rake tmp:assets:clear RAILS_ENV=production
-    bundle exec rake tmp:clear RAILS_ENV=production
 
     bundle exec rake sunspot:solr:start RAILS_ENV=production # to restart the search server
     RAILS_ENV=production ./script/delayed_job start
+
     touch tmp/restart.txt
+    bundle exec rake tmp:assets:clear RAILS_ENV=production
+    bundle exec rake tmp:clear RAILS_ENV=production
 
 == Steps to upgrade from 0.17.x to 0.18.x
 
@@ -78,12 +79,13 @@ Upgrading follows the standard steps:
     hg commit -m "merged" # likewise - only required if you made changes since installing
     bundle install --deployment
     bundle exec rake seek:upgrade RAILS_ENV=production
-    bundle exec rake tmp:assets:clear RAILS_ENV=production
-    bundle exec rake tmp:clear RAILS_ENV=production
 
     bundle exec rake sunspot:solr:start RAILS_ENV=production # to restart the search server
     RAILS_ENV=production ./script/delayed_job start
+
     touch tmp/restart.txt
+    bundle exec rake tmp:assets:clear RAILS_ENV=production
+    bundle exec rake tmp:clear RAILS_ENV=production
 
 
 
@@ -98,13 +100,13 @@ otherwise stated. You can upgrade directly from one patch version to another, sk
   hg commit -m "merged" # if necessary
   bundle install --deployment
   bundle exec rake db:migrate RAILS_ENV=production
-  bundle exec rake tmp:assets:clear RAILS_ENV=production
-  bundle exec rake tmp:clear RAILS_ENV=production
 
   RAILS_ENV=production ./script/delayed_job stop
   RAILS_ENV=production ./script/delayed_job start
 
   touch tmp/restart.txt
+  bundle exec rake tmp:assets:clear RAILS_ENV=production
+  bundle exec rake tmp:clear RAILS_ENV=production
 
 
 == Earlier upgrade notes
