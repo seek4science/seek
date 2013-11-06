@@ -17,15 +17,9 @@
             :name=>"",
             :field=>button_to('Restart background tasks', restart_delayed_job_admin_path, :id => 'restart_delayed_job', :onclick => "confirmation(this.id, 'Restarting ...');return false;")
     } -%>
-    <%
-       if is_delayed_job_running?
-         delayed_job_status = "is running"
-       else
-         delayed_job_status = "is not running"
-       end
-    %>
 
-    <span class="none_text">* The background process <%= delayed_job_status %></span>
+
+    <span class="none_text">* The background process - <%= delayed_job_status %></span>
   </ul>
 </div>
 
