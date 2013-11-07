@@ -508,4 +508,14 @@ class AdminDefinedRolesTest < ActiveSupport::TestCase
     assert !project_managers.include?(normal)
   end
 
+  test "is_in_any_gatekeeped_projects?" do
+    normal = Factory(:person)
+    gatekeeper = Factory(:gatekeeper)
+    assert !normal.is_in_any_gatekeeped_projects?
+
+    another_normal = Factory :person,
+                             :group_memberships=>[Factory(:group_membership,
+                                                          :work_group=>gatekeeper.group_memberships.first.work_group)]
+    assert another_normal.is_in_any_gatekeeped_projects?
+  end
 end
