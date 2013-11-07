@@ -4,7 +4,7 @@ class Person < ActiveRecord::Base
 
   include Seek::Rdf::RdfGeneration
   include Seek::Taggable
-  include Seek::Roles
+  include Seek::AdminDefinedRoles
 
   acts_as_yellow_pages
   scope :default_order, order("last_name, first_name")
