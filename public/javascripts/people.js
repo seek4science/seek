@@ -236,6 +236,9 @@ function removePersonFromAdminDefinedRole(role,project_id) {
     if (options.length>0) {
         options[0].selected=false;
     }
+    if (select.childElements().select(function(c){return c.selected}).length==0) {
+        addNoProjectAssignedForAdminDefinedRole(role);
+    }
 }
 
 function addPersonToAdminDefinedRole(role) {
@@ -243,6 +246,8 @@ function addPersonToAdminDefinedRole(role) {
     var selected_option = selection.options[selection.selectedIndex];
     var project_id = selected_option.value;
     var project_name = selected_option.text;
+
+    removeNoProjectAssignedForAdminDefinedRole(role);
 
     if (!isAdminDefinedRoleAlreadySelected(role,project_id)) {
         var select = $('_roles_'+role);
@@ -261,9 +266,22 @@ function addPersonToAdminDefinedRole(role) {
     else {
         alert("The role is already selected for that project");
     }
-
-
 }
+//remove the list item that says no projects defined (with the id no_projects_for_$role
+function removeNoProjectAssignedForAdminDefinedRole(role) {
+    var id = "no_projects_for_"+role;
+    if ($(id)) {
+        $(id).remove();
+    }
+}
+
+//adds a list item to indicate there are no projects for this role, with the id no_projects_for_$role
+function addNoProjectAssignedForAdminDefinedRole(role) {
+    var list_block = $('project_list_for_'+role);
+    var list_item = "<li id='no_projects_for_"+role+"' class='none_text'>No projects assigned</li>";
+    list_block.insert(list_item);
+}
+
 function isAdminDefinedRoleAlreadySelected(role,project_id) {
     var select = $('_roles_'+role);
     var options = select.childElements().select(function(c){return c.selected && c.value==project_id});

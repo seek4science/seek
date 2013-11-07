@@ -49,6 +49,7 @@ module Seek
       private
 
       def authorised_assets assets,action,user
+        assets = assets.select{|asset| asset.is_downloadable?} if action=="download"
         assets.select{|asset| asset.can_perform?(action, user)}
       end
       

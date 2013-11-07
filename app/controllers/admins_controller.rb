@@ -1,3 +1,5 @@
+require 'delayed/command'
+
 class AdminsController < ApplicationController
   include CommonSweepers
 
@@ -172,9 +174,23 @@ class AdminsController < ApplicationController
   end
 
   def restart_delayed_job
-    command = "#{Rails.root}/script/delayed_job stop RAILS_ENV=#{Rails.env}"
-    command << "&& #{Rails.root}/script/delayed_job start RAILS_ENV=#{Rails.env}"
-    error = execute_command(command)
+    error = nil
+    if Rails.env!="test"
+      begin
+        Delayed::Command.new(["restart"]).daemonize
+
+        #give it up to 5 seconds to start up, otherwise the page reloads too quickly and says it is not running
+        pid = Daemons::PidFile.new("#{Rails.root}/tmp/pids","delayed_job")
+        x=0
+        while !pid.running? && (x<10)
+          sleep(0.5)
+          x+=1
+        end
+      rescue Exception=>e
+        error=e.message
+      end
+    end
+
     redirect_with_status(error, 'background tasks')
   end
 
@@ -226,9 +242,9 @@ class AdminsController < ApplicationController
     tag=TextValue.find(params[:id])
     if request.post?
       tag.annotations.each do |a|
-        a.delete
+        a.destroy
       end
-      tag.delete
+      tag.destroy
       flash.now[:notice]="Tag #{tag.text} deleted"
 
     else
@@ -399,10 +415,13 @@ class AdminsController < ApplicationController
   end
 
   def execute_command(command)
+    return nil if Rails.env=="test"
     begin
       cl = Cocaine::CommandLine.new(command)
       cl.run
       return nil
+    rescue Cocaine::CommandNotFoundError => e
+      return "The command the restart the background tasks could not be found!"
     rescue Exception => e
       error =  e.message
       return error
