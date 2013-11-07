@@ -40,7 +40,7 @@
     <ul style="padding-left:1em;">
       <li>
         <% project_names = current_user.person.projects_for_role('gatekeeper').collect(&:title) %>
-        You are the <b>Gatekeeper</b> for the <%= project_names.count > 1 ? t('project').pluralize.downcase : t('project') %>
+        You are the <b>Gatekeeper</b> for the <%= t('project').downcase.pluralize(project_names.count) %>
         : <%= project_names.join(', ') %>.
       </li>
       <li>
