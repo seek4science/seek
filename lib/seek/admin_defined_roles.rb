@@ -1,5 +1,5 @@
 module Seek
-  module Roles
+  module AdminDefinedRoles
 
     class UnknownRoleException < Exception
 

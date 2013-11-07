@@ -58,7 +58,7 @@ class AdminDefinedRolesTest < ActiveSupport::TestCase
   test "raises exception for unrecognised role" do
     person = Factory(:person)
     project = person.projects.first
-    assert_raises Seek::Roles::UnknownRoleException do
+    assert_raises Seek::AdminDefinedRoles::UnknownRoleException do
       person.roles=[["fish",project]]
     end
   end
