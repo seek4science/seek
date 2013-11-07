@@ -20,14 +20,14 @@
 </style>
 
 <%= fields_for person do |f| %>
-    <% work_group_groups = work_group_groups_for_selection %>
+    <% work_group_groups = work_group_groups_for_selection(person) %>
     <% chosen_wg_ids = person.work_groups.collect(&:id) %>
       <div class="work_groups">
         <% work_group_groups.each do |work_group_group| %>
             <div class="wg_project"><%= work_group_group.project_name %></div>
             <div class="wg_institution">
                 <% work_group_group.options.each do |option| %>
-                    <%= check_box_tag "workgroup_#{option.id}", option.id, chosen_wg_ids.include?(option.id), :class => 'work_group_checkbox' %>
+                    <%= check_box_tag "workgroup_#{option.id}", option.id, chosen_wg_ids.include?(option.id), class: 'work_group_checkbox',disabled: !work_group_group.editable %>
                     <%= option.institution_name %>
                     <br/>
                 <% end %>

@@ -9,9 +9,9 @@ class PeopleController < ApplicationController
   before_filter :is_user_admin_auth,:only=>[:destroy]
   before_filter :is_user_admin_or_personless, :only=>[:new]
   before_filter :removed_params,:only=>[:update,:create]
+  before_filter :administerable_by_user, :only => [:admin, :administer_update]
   before_filter :do_projects_belong_to_project_manager_projects,:only=>[:administer_update]
   before_filter :editable_by_user, :only => [:edit, :update]
-  before_filter :administerable_by_user, :only => [:admin, :administer_update]
 
   skip_before_filter :project_membership_required
   skip_before_filter :profile_for_login_required,:only=>[:select,:userless_project_selected_ajax,:create]
@@ -418,7 +418,9 @@ class PeopleController < ApplicationController
         project_manager_projects = current_user.person.projects
         flag = true
         projects.each do |project|
-          flag = false if !project_manager_projects.include? project
+          unless @person.projects.include?(project) || project.can_be_administered_by?(current_user)
+            flag = false
+          end
         end
         if flag == false
           error("#{t('project')} manager can not assign person to the #{t('project').pluralize} that they are not in","Is invalid")

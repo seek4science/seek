@@ -685,13 +685,102 @@ class PeopleControllerTest < ActionController::TestCase
     assert_select "img[src*=?]", /medal_gold_1.png/, :count => project_manager_number
   end
 
+  test "project manager can only see projects he can manage to assign to person" do
+    project_manager = Factory(:person_in_multiple_projects)
+    managed_project = project_manager.projects.first
+    not_managed_project = project_manager.projects.last
+    project_manager.is_project_manager=true,managed_project
+    project_manager.save!
+
+    assert project_manager.is_project_manager_of_any_project?
+    assert managed_project.can_be_administered_by?(project_manager)
+    refute not_managed_project.can_be_administered_by?(project_manager)
+
+    subject = Factory(:person)
+    assert subject.can_be_administered_by?(project_manager)
+    refute project_manager.user.nil?
+    login_as project_manager
+
+    get :admin,:id=>subject
+    assert_response :success
+
+    assert_select "div.work_groups" do
+      wg = managed_project.work_groups.first
+      assert_select "div.wg_project",:text=>managed_project.title,:count=>1
+      assert_select "input[type=checkbox]#workgroup_#{wg.id}",:count=>1
+      assert_select "input[type=checkbox][disabled='disabled']#workgroup_#{wg.id}",:count=>0
+
+      wg = not_managed_project.work_groups.first
+      assert_select "input[type=checkbox]#workgroup_#{wg.id}",:count=>0
+      assert_select "div.wg_project",:text=>not_managed_project.title,:count=>0
+    end
+  end
+
+  test "when project manager admins a person - should show their existing project he cant manage as disabled" do
+    project_manager = Factory(:project_manager)
+    person = Factory(:person)
+    refute_empty person.projects
+
+    existing_project = person.projects.first
+    existing_wg = existing_project.work_groups.first
+    login_as project_manager
+    get :admin,:id=>person
+    assert_response :success
+    assert_select "div.work_groups" do
+      assert_select "div.wg_project",:text=>existing_project.title,:count=>1
+      assert_select "input[type=checkbox][disabled='disabled']#workgroup_#{existing_wg.id}",:count=>1
+    end
+  end
+
+  test "when administering a persons projects, should not remove the workgroup you cannot administer" do
+    project_manager = Factory(:project_manager)
+    person = Factory(:person)
+    refute_empty person.projects
+
+    refute project_manager.is_project_manager?(person.projects.first)
+    assert project_manager.is_project_manager?(project_manager.projects.first)
+
+    existing_wg = person.projects.first.work_groups.first
+    project_manager_wg = project_manager.projects.first.work_groups.first
+
+    refute_nil project_manager_wg
+    login_as project_manager
+    put :administer_update, :id => person.id, :person => {:work_group_ids =>[project_manager_wg.id,existing_wg.id] }
+    assert_redirected_to person_path(assigns(:person))
+    person.reload
+    assert_include person.work_groups,project_manager_wg
+    assert_include person.work_groups,existing_wg
+  end
+
+  test "not allow project manager assign people into their projects they do not manage" do
+    project_manager = Factory(:person_in_multiple_projects)
+    managed_project = project_manager.projects.first
+    not_managed_project = project_manager.projects.last
+    project_manager.is_project_manager=true,managed_project
+    project_manager.save!
+
+    assert project_manager.is_project_manager_of_any_project?
+    refute not_managed_project.can_be_administered_by?(project_manager)
+
+    subject = Factory(:person)
+    assert subject.can_be_administered_by?(project_manager)
+
+    bad_wg = not_managed_project.work_groups.first
+    login_as project_manager
+    put :administer_update, :id => subject.id, :person => {:work_group_ids =>[bad_wg.id] }
+    assert_response :redirect
+    refute_nil flash[:error]
+    subject.reload
+    refute_includes subject.projects,not_managed_project
+  end
+
   test "allow project manager to assign people into only their projects" do
     project_manager = Factory(:project_manager)
 
     project_manager_work_group_ids = project_manager.projects.collect(&:work_groups).flatten.collect(&:id)
     a_person = Factory(:person)
 
-    login_as(project_manager.user)
+    login_as(project_manager)
     put :administer_update, :id => a_person.id, :person => {:work_group_ids => project_manager_work_group_ids}
 
     assert_redirected_to person_path(assigns(:person))
@@ -1133,4 +1222,6 @@ class PeopleControllerTest < ActionController::TestCase
       assert_select "div.list_item_content  a[href=?]",person_path(person_not_in_project),:text=>/#{person_not_in_project.name}/,:count=>0
     end
   end
+
+
 end

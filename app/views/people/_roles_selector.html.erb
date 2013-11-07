@@ -19,11 +19,11 @@
 </style>
 <p>
 
-  This person is <strong><%= role_title -%></strong> in the following <%= t('Project').downcase.pluralize.html_safe -%>:
+  This person is <strong><%= role_title -%></strong> for the following <%= t('Project').downcase.pluralize.html_safe -%>:
   <span id='projects_for_<%= role %>'>
     <%= text_or_not_specified(project_list,:none_text=>"No #{t('Project').downcase.pluralize} assigned") -%>
     &nbsp;
-    <%= link_to "[edit]","javascript:Effect.Appear('#{hidden_block}');Effect.Fade('projects_for_#{role}');" %>
+    <%= link_to_function "[edit]","Effect.Appear('#{hidden_block}');Effect.Fade('projects_for_#{role}');return(false);" %>
   </span>
 
 </p>
@@ -37,14 +37,14 @@
       <% projects.each do |project| %>
           <li id="<%= role -%>_project_<%= project.id %>">
             <%= project.title -%>
-            <%= link_to "[remove]", "javascript:removePersonFromAdminDefinedRole('#{role}',#{project.id});" %>
+            <%= link_to_function "[remove]", "removePersonFromAdminDefinedRole('#{role}',#{project.id});return(false);" %>
           </li>
       <% end -%>
     </ul>
   </div>
   <div style="padding-top:0.25em;">
       <%= select_tag user_selection_id, options_from_collection_for_select(@person.projects.sort_by(&:title), "id", "title") -%>
-      &nbsp;<%= link_to "Add", "javascript:addPersonToAdminDefinedRole('#{role}');" -%>
+      &nbsp;<%= link_to_function "Add", "addPersonToAdminDefinedRole('#{role}');return(false);" -%>
   </div>
   <br>
 </div>

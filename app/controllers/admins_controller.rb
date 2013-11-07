@@ -175,19 +175,22 @@ class AdminsController < ApplicationController
 
   def restart_delayed_job
     error = nil
-    begin
-      Delayed::Command.new(["restart"]).daemonize
+    if Rails.env!="test"
+      begin
+        Delayed::Command.new(["restart"]).daemonize
 
-      #give it up to 5 seconds to start up, otherwise the page reloads too quickly and says it is not running
-      pid = Daemons::PidFile.new("#{Rails.root}/tmp/pids","delayed_job")
-      x=0
-      while !pid.running? && (x<10)
-        sleep(0.5)
-        x+=1
+        #give it up to 5 seconds to start up, otherwise the page reloads too quickly and says it is not running
+        pid = Daemons::PidFile.new("#{Rails.root}/tmp/pids","delayed_job")
+        x=0
+        while !pid.running? && (x<10)
+          sleep(0.5)
+          x+=1
+        end
+      rescue Exception=>e
+        error=e.message
       end
-    rescue Exception=>e
-      error=e.message
     end
+
     redirect_with_status(error, 'background tasks')
   end
 
