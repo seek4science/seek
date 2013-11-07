@@ -21,6 +21,7 @@
   end
 
   Factory.define(:person_in_multiple_projects, :parent=>:brand_new_person) do |f|
+    f.association :user, :factory => :activated_user
     f.group_memberships {[Factory.build(:group_membership),Factory.build(:group_membership),Factory.build(:group_membership)]}
     f.after_create do |p|
       p.reload
