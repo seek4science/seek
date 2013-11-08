@@ -184,8 +184,8 @@ class ApplicationController < ActionController::Base
       actions_partial_disable = false
     end
 
-
-    resource_ids = (params[:resource_ids] || []).split(',')
+     #params[:resource_ids] is passed as string, e.g. "id1, id2, ..."
+    resource_ids = (params[:resource_ids] || '').split(',')
     clazz = resource_type.constantize
     resources = clazz.find_all_by_id(resource_ids)
     if clazz.respond_to?(:authorized_partial_asset_collection)
