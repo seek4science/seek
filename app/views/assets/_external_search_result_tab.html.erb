@@ -1,0 +1,8 @@
+<% external_resource_hash.each do |key, value| -%>
+    <% resources = value %>
+    <div class="tabbertab">
+      <% tab_title = "#{key} (#{resources.count})" -%>
+      <h3 class="<%= scale_title %>_<%= key %> external_result"><%= tab_title -%></h3>
+    </div>
+
+<% end %>
