@@ -1,0 +1,50 @@
+<style>
+    ul.my_profile_dynamic_menu {
+        position: absolute;
+        z-index: 2;
+        background-color: white;
+        list-style-type:none;
+        float:right;
+        right: 1em;
+        width: 10em;
+        margin-top: -0.1em;
+        border: solid #AAA 1px;
+    }
+    ul.my_profile_dynamic_menu>li {
+        list-style: none;
+        text-align: left;
+        padding-left: 0.5em;
+    }
+    ul.my_profile_dynamic_menu>li:hover {
+        background-color: #307af5;
+    }
+</style>
+
+<% if logged_in_and_registered? %>
+    <div class="sysmo_gadget">
+      <div class="contents curved">
+        <div id="logged_in_as">
+          <% current_person = current_user.person %>
+          <% if current_person.avatar.nil? %>
+              <% avatar = image_tag(icon_filename_for_key("person_avatar"), :size => "32x32") %>
+          <% else %>
+              <% avatar = image_tag avatar_url(current_person, current_person.avatar_id, 32) %>
+          <% end %>
+
+          <%= link_to(avatar + ' ' + current_person.name, person_path(current_person)) %>
+
+          <%= image_tag(icon_filename_for_key('arrow_down_small'), :onclick => "toggleDynamicMenu('my_profile_menu');") %>
+
+          <ul id="my_profile_menu" class='my_profile_dynamic_menu with_smaller_shadow' style="display:none;">
+            <% if current_person.is_admin? %>
+                <li class='dynamic_menu_li' onclick="javascript:location.href='<%= admin_path -%>';">Server admin</li>
+            <% end %>
+            <li class='dynamic_menu_li' onclick="javascript:location.href='<%= feedback_home_path -%>';">Provide
+              feedback
+            </li>
+            <li class='dynamic_menu_li' onclick="javascript:location.href='<%= logout_path -%>';">Logout</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+<% end -%>
