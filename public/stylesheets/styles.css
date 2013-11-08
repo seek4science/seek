@@ -2030,5 +2030,21 @@ input[type="submit"] {
     border: 1px solid #aaa;
 }
 
+div.data_model_relationship {
+    border: 1px dotted black;
+    background-color: #EEEEFF;
+    padding: 5px
+}
+
+div.data_model_relationship ul li {
+    list-style: none;
+    list-style-position: inside;
+    margin-left: 5px;
+}
+
+div.data_model_relationship span.relationship_type {
+    color: #1465FF;
+}
+
 
 
