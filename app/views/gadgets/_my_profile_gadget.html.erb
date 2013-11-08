@@ -1,0 +1,30 @@
+<% current_person = current_user.try(:person)%>
+<% if current_person.try(:member?) -%>
+    <div class="sysmo_gadget">
+
+      <div class="contents curved">
+        <div style="text-align: center">
+            <% if current_person.avatar.nil? %>
+                <%= default_avatar('Person', 64, '', "toggleDynamicMenu('my_profile_menu');") %>
+            <% else %>
+               <%= image_tag avatar_url(current_person, current_person.avatar_id, 64),
+                             :class => 'framed', :onclick => "toggleDynamicMenu('my_profile_menu');" %>
+            <% end %>
+          <br/>
+          <span style='font-size:smaller;'>
+            <%= link_to(current_person.name, person_path(current_person)) %>
+          </span>
+          <ul id="my_profile_menu" class='dynamic_menu with_smaller_shadow' style="display:none;margin-top:-1.5em;">
+            <% if current_person.is_admin? %>
+                <li class='dynamic_menu_li' onclick="javascript:location.href='<%= admin_path -%>';">Server admin</li>
+            <% end %>
+            <li class='dynamic_menu_li' onclick="javascript:location.href='<%= feedback_home_path -%>';">Provide feedback</li>
+            <li class='dynamic_menu_li' onclick="javascript:location.href='<%= logout_path -%>';">Logout</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+<% end -%>
+
+
+
