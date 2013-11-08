@@ -65,6 +65,8 @@ module ImagesHelper
       "famfamfam_silk/arrow_right.png"
       when "arrow_left", "back"
       "famfamfam_silk/arrow_left.png"
+      when "arrow_down_small"
+        "misc_icons/arrow_down_small.png"
       when "bioportal_logo"
       "logos/bioportal_logo.png"
       when "new","add"
