@@ -650,6 +650,8 @@
                        minOccurs="1" maxOccurs="1"></xsd:element>
           <xsd:element name="journal" type="xsd:string"
                        minOccurs="1" maxOccurs="1"></xsd:element>
+          <xsd:element name="citation" type="xsd:string"
+                                 minOccurs="1" maxOccurs="1"></xsd:element>
           <xsd:element name="published_date" type="xsd:date"
                        minOccurs="1" maxOccurs="1"></xsd:element>
           <xsd:element name="associated" type="AssociatedItems"
