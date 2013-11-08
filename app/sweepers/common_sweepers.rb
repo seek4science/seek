@@ -26,6 +26,7 @@ module CommonSweepers
   end
 
   def expire_download_activity
+    raise "Boo!"
     ActionController::Base.new.expire_fragment(/download_activity.*/)
   end
 
