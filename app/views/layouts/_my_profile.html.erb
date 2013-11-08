@@ -1,5 +1,5 @@
 <style>
-    ul.my_profile_dynamic_menu {
+    ul#my_profile_menu {
         position: absolute;
         z-index: 2;
         background-color: white;
@@ -7,16 +7,36 @@
         float:right;
         right: 1em;
         width: 10em;
-        margin-top: -0.1em;
+        margin-top: 0.5em;
         border: solid #AAA 1px;
     }
-    ul.my_profile_dynamic_menu>li {
+    ul#my_profile_menu > li {
         list-style: none;
         text-align: left;
+        padding-left: 0.25em;
+    }
+    ul#my_profile_menu > li.dynamic_menu_li {
         padding-left: 0.5em;
     }
-    ul.my_profile_dynamic_menu>li:hover {
-        background-color: #307af5;
+
+    ul#my_profile_menu:before {
+        border-color: transparent transparent #ccc;
+        border-style: solid;
+        border-width: 0 10px 10px;
+        content: "";
+        display: block;
+        height: 0;
+        left: 8em;
+        position: absolute;
+        top: -10px;
+        width: 0;
+    }
+    ul#my_profile_menu > li.my_profile_menu_header {
+        background-color: #ccc;
+    }
+    ul#my_profile_menu > li.my_profile_menu_break {
+        border-bottom: 1px solid #ddd;
+        font-size: 4px;
     }
 </style>
 
@@ -35,15 +55,17 @@
 
           <%= image_tag(icon_filename_for_key('arrow_down_small'), :onclick => "toggleDynamicMenu('my_profile_menu');") %>
 
-          <ul id="my_profile_menu" class='my_profile_dynamic_menu with_smaller_shadow' style="display:none;">
+          <ul id="my_profile_menu" class='dynamic_menu with_smaller_shadow' style="display:none;">
+            <li class="my_profile_menu_header">&nbsp;</li>
+            <li class='dynamic_menu_li' onclick="javascript:location.href='<%= person_path(current_person) -%>';">Your profile
+            </li>
             <% if current_person.is_admin? %>
                 <li class='dynamic_menu_li' onclick="javascript:location.href='<%= admin_path -%>';">Server admin</li>
             <% end %>
             <li class='dynamic_menu_li' onclick="javascript:location.href='<%= feedback_home_path -%>';">Provide
               feedback
             </li>
-            <li class='dynamic_menu_li' onclick="javascript:location.href='<%= person_path(current_person) -%>';">Your profile
-            </li>
+            <li class="my_profile_menu_break">&nbsp;</li>
             <li class='dynamic_menu_li' onclick="javascript:location.href='<%= logout_path -%>';">Logout</li>
           </ul>
         </div>
