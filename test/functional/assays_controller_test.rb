@@ -1055,5 +1055,38 @@ end
         assert_select "a[href=?]", data_file_path(df), :text => df.title
         assert_select "a[href=?]", model_path(model), :text => model.title, :count => 0
         assert_select "a[href=?]", sop_path(sop), :text => sop.title
-   end
+  end
+
+  test "should not show private data or model title on modelling analysis summary" do
+    df = Factory(:data_file, :title=>"private data file", :policy=>Factory(:private_policy))
+    df2 = Factory(:data_file, :title=>"public data file", :policy=>Factory(:public_policy))
+    model = Factory(:model, :title=>"private model", :policy=>Factory(:private_policy))
+    model2 = Factory(:model, :title=>"public model", :policy=>Factory(:public_policy))
+    assay = Factory(:modelling_assay,:policy=>Factory(:public_policy))
+
+    assay.data_file_masters << df
+    assay.data_file_masters << df2
+    assay.model_masters << model
+    assay.model_masters << model2
+
+    assay.save!
+
+    login_as Factory(:person)
+
+    get :show,:id=>assay.id
+    assert_response :success
+    assert_select "div.data_model_relationship" do
+      assert_select "ul.related_models" do
+        assert_select "li a[href=?]",model_path(model2),:text=>/#{model2.title}/,:count=>1
+        assert_select "li a[href=?]",model_path(model),:text=>/#{model.title}/,:count=>0
+        assert_select "li",:text=>/Hidden/,:count=>1
+      end
+      assert_select "ul.related_data_files" do
+        assert_select "li a[href=?]",data_file_path(df2),:text=>/#{df2.title}/,:count=>1
+        assert_select "li a[href=?]",data_file_path(df),:text=>/#{df.title}/,:count=>0
+        assert_select "li",:text=>/Hidden/,:count=>1
+      end
+    end
+
+  end
 end
