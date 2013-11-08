@@ -38,9 +38,6 @@ SEEK::Application.configure do
 
   # Expands the lines which load the assets
   config.assets.debug = true
-  config.serve_static_assets = true
-  #disable the rails-dev-boost's async mode to get rid of warning message
-  RailsDevelopmentBoost.async = false if defined?(RailsDevelopmentBoost)
 end
 
 

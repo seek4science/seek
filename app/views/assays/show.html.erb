@@ -80,50 +80,40 @@ assay_type_text = @assay.is_modelling? ? "Biological problem addressed" : "#{t('
 
      <%= item_description @assay.description -%>
 
-     <%# FIXME: should be in a css file rather than in the middle of a page -%>
-      <style type="text/css">
-          div.data_model_relationship {
-              border: 1px dotted black;
-              background-color: #EEEEFF;
-              padding: 5px
-          }
-          
-          div.data_model_relationship ul li {
-              list-style: none;
-              list-style-position: inside;
-              margin-left: 5px;
-          }
-          
-          div.data_model_relationship span {
-              color: #1465FF;
-          }
-          
-      </style>
+
       <% if ((@assay.is_modelling?) && !@assay.models.empty? && !@assay.data_files.empty?) %><%#MODELLING ASSAY %>
-      <div class="data_model_relationship">
-          <% unless @assay.models.empty? %>
-          <b><%= @assay.models.size > 1 ? t('model').pluralize : t('model') %>:</b>
-          <br/>
-          <ul>
-              <% @assay.model_masters.each do |m| %>
-              <li>
-                  <%= link_to truncate(h(m.title), :length=>110), show_resource_path(m) %>
-              </li>
+          <div class="data_model_relationship">
+              <% unless @assay.models.empty? %>
+              <b><%= @assay.models.size > 1 ? t('model').pluralize : t('model') %>:</b>
+              <br/>
+              <ul class="related_models">
+                  <% @assay.model_masters.each do |m| %>
+                  <li>
+                      <% if m.can_view? %>
+                        <%= link_to truncate(h(m.title), :length=>110), show_resource_path(m) %>
+                      <% else %>
+                        <span class="none_text">Hidden <%= t('model') %></span>
+                      <% end %>
+                  </li>
+                  <% end %>
+              </ul>
               <% end %>
-          </ul>
-          <% end %>
-          <% unless @assay.data_files.empty? %>
-          <b>Data:</b>
-          <br/>
-          <ul>
-              <% @assay.data_file_masters.each do |d| %>
-              <li>
-                  <%= link_to truncate(h(d.title), :length=>110), show_resource_path(d) %><%= d.relationship_type(@assay) ? (" <span>(" + d.relationship_type(@assay).title + ")</span>").html_safe : "" %>
-              </li>
+              <% unless @assay.data_files.empty? %>
+              <b>Data:</b>
+              <br/>
+              <ul class="related_data_files">
+                  <% @assay.data_file_masters.each do |d| %>
+                  <li>
+                    <% if d.can_view? %>
+                        <%= link_to truncate(h(d.title), :length=>110), show_resource_path(d) %>
+                    <% else %>
+                        <span class="none_text">Hidden <%= t('data_file') %></span><%= d.relationship_type(@assay) ? (" <span class='relationship_type'>(" + d.relationship_type(@assay).title + ")</span>").html_safe : "" %>
+                    <% end %>
+                  </li>
+                  <% end %>
+              </ul>
               <% end %>
-          </ul>
-          <% end %>
-      </div>
+          </div>
       <% end %>
 
 	  

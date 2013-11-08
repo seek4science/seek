@@ -47,6 +47,9 @@ module Seek
         after_save :resolve_admin_defined_role_projects
       end
 
+      def is_in_any_gatekept_projects?
+        !projects.collect(&:gatekeepers).flatten.empty?
+      end
     end
 
     module ClassMethods
