@@ -2070,6 +2070,7 @@ ul#my_profile_menu {
 }
 div#logged_in_as img {
     vertical-align: middle;
+    margin-right:0.5em;
 }
 ul#my_profile_menu > li {
     list-style: none;
