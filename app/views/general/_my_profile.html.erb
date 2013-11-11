@@ -60,7 +60,7 @@
               feedback
             </li>
             <li class="my_profile_menu_break">&nbsp;</li>
-            <li class='dynamic_menu_li' onclick="javascript:location.href='<%= logout_path -%>';">Logout</li>
+            <li class='dynamic_menu_li' onclick="javascript:if (confirm('Are you sure you wish to logout?')){location.href='<%= logout_path -%>';};">Logout</li>
           </ul>
         </div>
       </div>
